@@ -18,55 +18,52 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$sysmapWidget = new CWidget();
+$sysmapWidget = (new CWidget())->setTitle(_('Maps'));
 
 // create header buttons
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$createForm->addItem(new CSubmit('form', _('Create map')));
-$createForm->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'));
+$createForm = (new CForm('get'))->cleanItems();
+$createForm->addItem((new CList())->
+	addItem(new CSubmit('form', _('Create map')))->
+	addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'))
+);
 
-$sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'), $createForm);
+$sysmapWidget->setControls($createForm);
 
 // create form
 $sysmapForm = new CForm();
 $sysmapForm->setName('frm_maps');
 
-$sysmapWidget->addHeader(_('Maps'));
-$sysmapWidget->addHeaderRowNumber();
-
 // create table
-$sysmapTable = new CTableInfo(_('No maps found.'));
-$sysmapTable->setHeader(array(
-	new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');"),
+$sysmapTable = new CTableInfo();
+$sysmapTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
-	_('Edit')
-));
+	_('Map')
+]);
 
 foreach ($this->data['maps'] as $map) {
-	$sysmapTable->addRow(array(
+	$sysmapTable->addRow([
 		new CCheckBox('maps['.$map['sysmapid'].']', null, null, $map['sysmapid']),
-		new CLink($map['name'], 'sysmap.php?sysmapid='.$map['sysmapid']),
+		new CLink($map['name'], 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form'),
 		$map['width'],
 		$map['height'],
-		new CLink(_('Edit'), 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form')
-	));
+		new CLink(_('Edit'), 'sysmap.php?sysmapid='.$map['sysmapid']),
+	]);
 }
 
 // append table to form
-$sysmapForm->addItem(array(
-	$this->data['paging'],
+$sysmapForm->addItem([
 	$sysmapTable,
 	$this->data['paging'],
-	get_table_header(
-	new CActionButtonList('action', 'maps', array(
-		'map.export' => array('name' => _('Export')),
-		'map.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected maps?'))
-	)))
-));
+	new CActionButtonList('action', 'maps', [
+		'map.export' => ['name' => _('Export')],
+		'map.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected maps?')]
+	])
+]);
 
 // append form to widget
 $sysmapWidget->addItem($sysmapForm);

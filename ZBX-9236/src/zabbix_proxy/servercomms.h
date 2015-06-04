@@ -27,10 +27,10 @@ extern char	*CONFIG_HOSTNAME;
 
 #include "comms.h"
 
-int	connect_to_server(zbx_sock_t *sock, int timeout, int retry_interval);
-void	disconnect_server(zbx_sock_t *sock);
+int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval);
+void	disconnect_server(zbx_socket_t *sock);
 
-int	get_data_from_server(zbx_sock_t *sock, const char *request);
-int	put_data_to_server(zbx_sock_t *sock, struct zbx_json *j, char **error);
+int	get_data_from_server(zbx_socket_t *sock, const char *request, char **error);
+int	put_data_to_server(zbx_socket_t *sock, struct zbx_json *j, char **error);
 
 #endif

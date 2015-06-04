@@ -32,27 +32,27 @@ class CPageHeader {
 	/**
 	 * @var array of css file paths
 	 */
-	protected $cssFiles = array();
+	protected $cssFiles = [];
 
 	/**
 	 * @var array of css styles
 	 */
-	protected $styles = array();
+	protected $styles = [];
 
 	/**
 	 * @var array of js file paths
 	 */
-	protected $jsFiles = array();
+	protected $jsFiles = [];
 
 	/**
 	 * @var array of js scripts to render before js files
 	 */
-	protected $jsBefore = array();
+	protected $jsBefore = [];
 
 	/**
 	 * @var array of js scripts to render after js files
 	 */
-	protected $js = array();
+	protected $js = [];
 
 	/**
 	 * @param string $title
@@ -74,11 +74,7 @@ class CPageHeader {
 	 * Add initial css files.
 	 */
 	public function addCssInit() {
-		$this->cssFiles[] = 'styles/default.css';
-		$this->cssFiles[] = 'styles/color.css';
-		$this->cssFiles[] = 'styles/icon.css';
-		$this->cssFiles[] = 'styles/blocks.css';
-		$this->cssFiles[] = 'styles/pages.css';
+		$this->cssFiles[] = 'styles/zabbix.css';
 	}
 
 	/**

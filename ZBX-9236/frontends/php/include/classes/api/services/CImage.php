@@ -28,7 +28,7 @@ class CImage extends CApiService {
 
 	protected $tableName = 'images';
 	protected $tableAlias = 'i';
-	protected $sortColumns = array('imageid', 'name');
+	protected $sortColumns = ['imageid', 'name'];
 
 	/**
 	 * Get images data
@@ -47,18 +47,18 @@ class CImage extends CApiService {
 	 * @param string $options['order']
 	 * @return array|boolean image data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 
-		$sqlParts = array(
-			'select'	=> array('images' => 'i.imageid'),
-			'from'		=> array('images' => 'images i'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['images' => 'i.imageid'],
+			'from'		=> ['images' => 'images i'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'imageids'					=> null,
 			'sysmapids'					=> null,
 			// filter
@@ -77,7 +77,7 @@ class CImage extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
@@ -127,7 +127,7 @@ class CImage extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$imageids = array();
+		$imageids = [];
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$res = DBselect($this->createSelectQueryFromParts($sqlParts), $sqlParts['limit']);
@@ -159,47 +159,6 @@ class CImage extends CApiService {
 	}
 
 	/**
-	 * Get images.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $image
-	 * @param string $image['name']
-	 * @param string $image['hostid']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $imageData) {
-		$this->deprecated('image.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $imageData
-		));
-	}
-
-	/**
-	 * Check if image exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('image.exists method is deprecated.');
-
-		$image = $this->get(array(
-			'output' => array('imageid'),
-			'filter' => zbx_array_mintersect(array(array('imageid', 'name'), 'imagetype'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $image;
-	}
-
-	/**
 	 * Add images.
 	 *
 	 * @param array $images ['name' => string, 'image' => string, 'imagetype' => int]
@@ -213,7 +172,7 @@ class CImage extends CApiService {
 
 		$this->validateCreate($images);
 
-		$imageids = array();
+		$imageids = [];
 		foreach ($images as $image) {
 			// decode BASE64
 			$image['image'] = base64_decode($image['image']);
@@ -222,11 +181,11 @@ class CImage extends CApiService {
 			$this->checkImage($image['image']);
 
 			$imageid = get_dbid('images', 'imageid');
-			$values = array(
+			$values = [
 				'imageid' => $imageid,
 				'name' => zbx_dbstr($image['name']),
 				'imagetype' => zbx_dbstr($image['imagetype'])
-			);
+			];
 
 			switch ($DB['TYPE']) {
 				case ZBX_DB_ORACLE:
@@ -296,7 +255,7 @@ class CImage extends CApiService {
 			$imageids[] = $imageid;
 		}
 
-		return array('imageids' => $imageids);
+		return ['imageids' => $imageids];
 	}
 
 	/**
@@ -314,7 +273,7 @@ class CImage extends CApiService {
 		$this->validateUpdate($images);
 
 		foreach ($images as $image) {
-			$values = array();
+			$values = [];
 
 			if (isset($image['name'])) {
 				$values['name'] = zbx_dbstr($image['name']);
@@ -382,7 +341,7 @@ class CImage extends CApiService {
 			}
 
 			if ($values) {
-				$sqlUpd = array();
+				$sqlUpd = [];
 				foreach ($values as $field => $value) {
 					$sqlUpd[] = $field.'='.$value;
 				}
@@ -395,7 +354,7 @@ class CImage extends CApiService {
 			}
 		}
 
-		return array('imageids' => zbx_objectValues($images, 'imageid'));
+		return ['imageids' => zbx_objectValues($images, 'imageid')];
 	}
 
 	/**
@@ -423,7 +382,7 @@ class CImage extends CApiService {
 					' OR '.dbConditionInt('imp.iconid', $imageids).')'
 		);
 
-		$usedInIconmaps = array();
+		$usedInIconmaps = [];
 		while ($iconmap = DBfetch($dbIconmaps)) {
 			$usedInIconmaps[] = $iconmap['name'];
 		}
@@ -449,7 +408,7 @@ class CImage extends CApiService {
 				' OR '.dbConditionInt('sm.backgroundid', $imageids)
 		);
 
-		$usedInMaps = array();
+		$usedInMaps = [];
 		while ($sysmap = DBfetch($dbSysmaps)) {
 			$usedInMaps[] = $sysmap['name'];
 		}
@@ -461,14 +420,14 @@ class CImage extends CApiService {
 			);
 		}
 
-		DB::update('sysmaps_elements', array('values' => array('iconid_off' => 0), 'where' => array('iconid_off' => $imageids)));
-		DB::update('sysmaps_elements', array('values' => array('iconid_on' => 0), 'where' => array('iconid_on' => $imageids)));
-		DB::update('sysmaps_elements', array('values' => array('iconid_disabled' => 0), 'where' => array('iconid_disabled' => $imageids)));
-		DB::update('sysmaps_elements', array('values' => array('iconid_maintenance' => 0), 'where' => array('iconid_maintenance' => $imageids)));
+		DB::update('sysmaps_elements', ['values' => ['iconid_off' => 0], 'where' => ['iconid_off' => $imageids]]);
+		DB::update('sysmaps_elements', ['values' => ['iconid_on' => 0], 'where' => ['iconid_on' => $imageids]]);
+		DB::update('sysmaps_elements', ['values' => ['iconid_disabled' => 0], 'where' => ['iconid_disabled' => $imageids]]);
+		DB::update('sysmaps_elements', ['values' => ['iconid_maintenance' => 0], 'where' => ['iconid_maintenance' => $imageids]]);
 
-		DB::delete('images', array('imageid' => $imageids));
+		DB::delete('images', ['imageid' => $imageids]);
 
-		return array('imageids' => $imageids);
+		return ['imageids' => $imageids];
 	}
 
 	/**
@@ -488,11 +447,11 @@ class CImage extends CApiService {
 
 		// check fields
 		foreach ($images as $image) {
-			$imageDbFields = array(
+			$imageDbFields = [
 				'name' => null,
 				'image' => null,
 				'imagetype' => 1
-			);
+			];
 
 			if (!check_db_fields($imageDbFields, $image)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for image "%1$s".', $image['name']));
@@ -500,18 +459,18 @@ class CImage extends CApiService {
 		}
 
 		// check host name duplicates
-		$collectionValidator = new CCollectionValidator(array(
+		$collectionValidator = new CCollectionValidator([
 			'uniqueField' => 'name',
 			'messageDuplicate' => _('Image "%1$s" already exists.')
-		));
+		]);
 		$this->checkValidator($images, $collectionValidator);
 
 		// check existing names
-		$dbImages = API::getApiService()->select($this->tableName(), array(
-			'output' => array('name'),
-			'filter' => array('name' => zbx_objectValues($images, 'name')),
+		$dbImages = API::getApiService()->select($this->tableName(), [
+			'output' => ['name'],
+			'filter' => ['name' => zbx_objectValues($images, 'name')],
 			'limit' => 1
-		));
+		]);
 
 		if ($dbImages) {
 			$dbImage = reset($dbImages);
@@ -534,18 +493,18 @@ class CImage extends CApiService {
 		}
 
 		foreach ($images as $image) {
-			if (!check_db_fields(array('imageid'), $image)) {
+			if (!check_db_fields(['imageid'], $image)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect input parameters.'));
 			}
 		}
 
-		$dbImages = API::getApiService()->select($this->tableName(), array(
-			'filter' => array('imageid' => zbx_objectValues($images, 'imageid')),
-			'output' => array('imageid', 'name'),
+		$dbImages = API::getApiService()->select($this->tableName(), [
+			'filter' => ['imageid' => zbx_objectValues($images, 'imageid')],
+			'output' => ['imageid', 'name'],
 			'preservekeys' => true
-		));
+		]);
 
-		$changedImageNames = array();
+		$changedImageNames = [];
 		foreach ($images as $image) {
 			if (!isset($dbImages[$image['imageid']])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -571,11 +530,11 @@ class CImage extends CApiService {
 
 		// check for existing image names
 		if ($changedImageNames) {
-			$dbImages = API::getApiService()->select($this->tableName(), array(
-				'output' => array('name'),
-				'filter' => array('name' => $changedImageNames),
+			$dbImages = API::getApiService()->select($this->tableName(), [
+				'output' => ['name'],
+				'filter' => ['name' => $changedImageNames],
 				'limit' => 1
-			));
+			]);
 
 			if ($dbImages) {
 				$dbImage = reset($dbImages);
@@ -617,7 +576,7 @@ class CImage extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		if ($options['countOutput'] === null) {
 			if ($options['output'] == API_OUTPUT_EXTEND) {
-				$options['output'] = array('imageid', 'imagetype', 'name');
+				$options['output'] = ['imageid', 'imagetype', 'name'];
 			}
 			elseif (is_array($options['output']) && in_array('image', $options['output'])) {
 				foreach ($options['output'] as $idx => $field) {

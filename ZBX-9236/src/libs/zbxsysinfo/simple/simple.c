@@ -32,6 +32,8 @@ ZBX_METRIC	parameters_simple[] =
 {
 	{"net.tcp.service",	CF_HAVEPARAMS,	CHECK_SERVICE, 		"ssh,127.0.0.1,22"},
 	{"net.tcp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF, 	"ssh,127.0.0.1,22"},
+	{"net.udp.service",	CF_HAVEPARAMS,	CHECK_SERVICE, 		"ntp,127.0.0.1,123"},
+	{"net.udp.service.perf",CF_HAVEPARAMS,	CHECK_SERVICE_PERF, 	"ntp,127.0.0.1,123"},
 	{NULL}
 };
 
@@ -132,7 +134,7 @@ static int	find_ssh_ident_string(const char *recv_buf, int *remote_major, int *r
 static int	check_ssh(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	int		ret;
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	char		send_buf[MAX_STRING_LEN];
 	int		remote_major, remote_minor;
 
@@ -158,7 +160,7 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	}
 
 	if (FAIL == ret)
-		zabbix_log(LOG_LEVEL_DEBUG, "SSH check error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "SSH check error: %s", zbx_socket_strerror());
 
 	return SYSINFO_RET_OK;
 }
@@ -219,13 +221,12 @@ clean:
 static int	check_telnet(const char *host, unsigned short port, int timeout, int *value_int)
 {
 	const char	*__function_name = "check_telnet";
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 #ifdef _WINDOWS
 	u_long		argp = 1;
 #else
 	int		flags;
 #endif
-
 	*value_int = 0;
 
 	if (SUCCEED == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, timeout))
@@ -246,7 +247,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 		zbx_tcp_close(&s);
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __function_name, zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "%s error: %s", __function_name, zbx_socket_strerror());
 
 	return SYSINFO_RET_OK;
 }
@@ -328,93 +329,104 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (0 == strcmp(service, "ssh"))
+	if (0 == strncmp("net.tcp.service", get_rkey(request), 15))
 	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_SSH_PORT;
-		ret = check_ssh(ip, port, CONFIG_TIMEOUT, &value_int);
-	}
-	else if (0 == strcmp(service, "ntp") || 0 == strcmp(service, "service.ntp" /* deprecated */))
-	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_NTP_PORT;
-		ret = check_ntp(ip, port, CONFIG_TIMEOUT, &value_int);
-	}
-	else if (0 == strcmp(service, "ldap"))
-	{
-#ifdef HAVE_LDAP
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_LDAP_PORT;
-		ret = check_ldap(ip, port, CONFIG_TIMEOUT, &value_int);
-#else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for LDAP check was not compiled in."));
-#endif
-	}
-	else if (0 == strcmp(service, "smtp"))
-	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_SMTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_smtp, "QUIT\r\n", &value_int);
-	}
-	else if (0 == strcmp(service, "ftp"))
-	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_FTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_ftp, "QUIT\r\n", &value_int);
-	}
-	else if (0 == strcmp(service, "http"))
-	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_HTTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
-	}
-	else if (0 == strcmp(service, "pop"))
-	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_POP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_pop, "QUIT\r\n", &value_int);
-	}
-	else if (0 == strcmp(service, "nntp"))
-	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_NNTP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_nntp, "QUIT\r\n", &value_int);
-	}
-	else if (0 == strcmp(service, "imap"))
-	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_IMAP_PORT;
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_imap, "a1 LOGOUT\r\n", &value_int);
-	}
-	else if (0 == strcmp(service, "tcp"))
-	{
-		if (NULL == port_str || '\0' == *port_str)
+		if (0 == strcmp(service, "ssh"))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-			return SYSINFO_RET_FAIL;
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_SSH_PORT;
+			ret = check_ssh(ip, port, CONFIG_TIMEOUT, &value_int);
 		}
-		ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
-	}
-	else if (0 == strcmp(service, "https"))
-	{
-#ifdef HAVE_LIBCURL
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_HTTPS_PORT;
-		ret = check_https(ip, port, CONFIG_TIMEOUT, &value_int);
+		else if (0 == strcmp(service, "ldap"))
+		{
+#ifdef HAVE_LDAP
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_LDAP_PORT;
+			ret = check_ldap(ip, port, CONFIG_TIMEOUT, &value_int);
 #else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTPS check was not compiled in."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for LDAP check was not compiled in."));
 #endif
+		}
+		else if (0 == strcmp(service, "smtp"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_SMTP_PORT;
+			ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_smtp, "QUIT\r\n", &value_int);
+		}
+		else if (0 == strcmp(service, "ftp"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_FTP_PORT;
+			ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_ftp, "QUIT\r\n", &value_int);
+		}
+		else if (0 == strcmp(service, "http"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_HTTP_PORT;
+			ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
+		}
+		else if (0 == strcmp(service, "pop"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_POP_PORT;
+			ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_pop, "QUIT\r\n", &value_int);
+		}
+		else if (0 == strcmp(service, "nntp"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_NNTP_PORT;
+			ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_nntp, "QUIT\r\n", &value_int);
+		}
+		else if (0 == strcmp(service, "imap"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_IMAP_PORT;
+			ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, validate_imap, "a1 LOGOUT\r\n", &value_int);
+		}
+		else if (0 == strcmp(service, "tcp"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+				return SYSINFO_RET_FAIL;
+			}
+			ret = tcp_expect(ip, port, CONFIG_TIMEOUT, NULL, NULL, NULL, &value_int);
+		}
+		else if (0 == strcmp(service, "https"))
+		{
+#ifdef HAVE_LIBCURL
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_HTTPS_PORT;
+			ret = check_https(ip, port, CONFIG_TIMEOUT, &value_int);
+#else
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTPS check was not compiled in."));
+#endif
+		}
+		else if (0 == strcmp(service, "telnet"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_TELNET_PORT;
+			ret = check_telnet(ip, port, CONFIG_TIMEOUT, &value_int);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return ret;
+		}
 	}
-	else if (0 == strcmp(service, "telnet"))
+	else	/* net.udp.service */
 	{
-		if (NULL == port_str || '\0' == *port_str)
-			port = ZBX_DEFAULT_TELNET_PORT;
-		ret = check_telnet(ip, port, CONFIG_TIMEOUT, &value_int);
-	}
-	else
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return ret;
+		if (0 == strcmp(service, "ntp"))
+		{
+			if (NULL == port_str || '\0' == *port_str)
+				port = ZBX_DEFAULT_NTP_PORT;
+			ret = check_ntp(ip, port, CONFIG_TIMEOUT, &value_int);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+			return ret;
+		}
 	}
 
 	if (SYSINFO_RET_OK == ret)
@@ -443,9 +455,17 @@ int	check_service(AGENT_REQUEST *request, const char *default_addr, AGENT_RESULT
  *   net.tcp.service[smtp,127.0.0.1]
  *   net.tcp.service[ssh,127.0.0.1,22]
  *
+ *   net.udp.service[ntp]
+ *   net.udp.service[ntp,127.0.0.1]
+ *   net.udp.service[ntp,127.0.0.1,123]
+ *
  *   net.tcp.service.perf[ssh]
  *   net.tcp.service.perf[smtp,127.0.0.1]
  *   net.tcp.service.perf[ssh,127.0.0.1,22]
+ *
+ *   net.udp.service.perf[ntp]
+ *   net.udp.service.perf[ntp,127.0.0.1]
+ *   net.udp.service.perf[ntp,127.0.0.1,123]
  *
  * The old name for these checks is check_service[*].
  */

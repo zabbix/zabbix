@@ -19,8 +19,7 @@
 **/
 
 
-$hostGroupWidget = new CWidget();
-$hostGroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'));
+$hostGroupWidget = (new CWidget())->setTitle(_('Host groups'));
 
 // create form
 $hostGroupForm = new CForm();
@@ -36,7 +35,7 @@ $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SI
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 	64
 );
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $hostGroupFormList->addRow(_('Group name'), $nameTextBox);
 
 // append groups and hosts to form list
@@ -60,35 +59,36 @@ foreach ($this->data['r_hosts'] as $host) {
 		$hostsComboBox->addItem($host['hostid'], $host['name'], true, false);
 	}
 }
-$hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
+$hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
 
 // append tabs to form
 $hostGroupTab = new CTabView();
 $hostGroupTab->addTab('hostgroupTab', _('Host group'), $hostGroupFormList);
-$hostGroupForm->addItem($hostGroupTab);
 
 // append buttons to form
 if ($this->data['groupid'] == 0) {
-	$hostGroupForm->addItem(makeFormFooter(
+	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 else {
 	$deleteButton = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
 	if (!isset($this->data['deletableHostGroups'][$this->data['groupid']])) {
-		$deleteButton->attr('disabled', 'disabled');
+		$deleteButton->setAttribute('disabled', 'disabled');
 	}
 
-	$hostGroupForm->addItem(makeFormFooter(
+	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			$deleteButton,
 			new CButtonCancel()
-		)
+		]
 	));
 }
+
+$hostGroupForm->addItem($hostGroupTab);
 
 $hostGroupWidget->addItem($hostGroupForm);
 

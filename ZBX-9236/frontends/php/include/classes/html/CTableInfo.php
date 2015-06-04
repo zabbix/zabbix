@@ -21,14 +21,11 @@
 
 class CTableInfo extends CTable {
 
-	public function __construct($message = '...', $class = 'tableinfo') {
-		parent::__construct($message, $class);
-		$this->setOddRowClass('odd_row');
-		$this->setEvenRowClass('even_row');
-		$this->attributes['cellpadding'] = 3;
-		$this->attributes['cellspacing'] = 1;
-		$this->headerClass = 'header';
-		$this->footerClass = 'footer';
+	public function __construct($message = null) {
+		if ($message === null) {
+			$message = _('No data found');
+		}
+		parent::__construct($message, ZBX_STYLE_LIST_TABLE);
 		$this->addMakeVerticalRotationJs = false;
 	}
 

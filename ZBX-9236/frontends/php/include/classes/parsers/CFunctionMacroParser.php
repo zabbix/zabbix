@@ -37,6 +37,36 @@ class CFunctionMacroParser extends CParser {
 	protected $source;
 
 	/**
+	 * An options array
+	 *
+	 * Supported options:
+	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
+	 *
+	 * @var array
+	 */
+	public $options = ['18_simple_checks' => false];
+
+	/**
+	 * Parser for user macros.
+	 *
+	 * @var CMacroParser
+	 */
+	protected $userMacroParser;
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct($options = []) {
+		if (array_key_exists('18_simple_checks', $options)) {
+			$this->options['18_simple_checks'] = $options['18_simple_checks'];
+		}
+
+		if ($this->options['18_simple_checks'] === true) {
+			$this->userMacroParser = new CMacroParser('$');
+		}
+	}
+
+	/**
 	 * @param string    $source
 	 * @param int       $startPos
 	 *
@@ -80,7 +110,7 @@ class CFunctionMacroParser extends CParser {
 		$result->pos = $startPos;
 		$result->length = $expressionLength;
 
-		$result->expression = array(
+		$result->expression = [
 			'expression' => $expression,
 			'pos' => $startPos,
 			'host' => $host,
@@ -89,7 +119,7 @@ class CFunctionMacroParser extends CParser {
 			'functionName' => $functionName,
 			'functionParam' => substr($function, strpos($function, '(') + 1, -1),
 			'functionParamList' => $functionParamList
-		);
+		];
 
 		return $result;
 	}
@@ -132,6 +162,25 @@ class CFunctionMacroParser extends CParser {
 		if (isset($this->source[$this->pos]) && $this->source[$this->pos] == '(') {
 			while ($this->pos > $startPos && $this->source[$this->pos] != '.') {
 				$this->pos--;
+			}
+		}
+		// for instance, tcp,22
+		elseif ($this->options['18_simple_checks'] === true
+				&& isset($this->source[$this->pos]) && $this->source[$this->pos] == ',') {
+			$this->pos++;
+
+			// user macro
+			$result = $this->userMacroParser->parse($this->source, $this->pos);
+
+			if ($result !== false) {
+				$this->pos += $result->length;
+			}
+			// numeric parameter or empty parameter
+			else {
+				while (isset($this->source[$this->pos])
+						&& $this->source[$this->pos] > '0' && $this->source[$this->pos] < '9') {
+					$this->pos++;
+				}
 			}
 		}
 		// for instance, net.tcp.port[,80]
@@ -256,7 +305,7 @@ class CFunctionMacroParser extends CParser {
 
 		$state = self::STATE_NEW;
 		$num = 0;
-		$functionParamList = array();
+		$functionParamList = [];
 		$functionParamList[$num] = '';
 
 		while (isset($this->source[$this->pos])) {
@@ -336,7 +385,7 @@ class CFunctionMacroParser extends CParser {
 
 		$function = substr($this->source, $startPos, $this->pos - $startPos);
 
-		return array($function, $functionParamList);
+		return [$function, $functionParamList];
 	}
 
 	/**

@@ -28,7 +28,7 @@ class CApplication extends CApiService {
 
 	protected $tableName = 'applications';
 	protected $tableAlias = 'a';
-	protected $sortColumns = array('applicationid', 'name');
+	protected $sortColumns = ['applicationid', 'name'];
 
 	/**
 	 * Get applications data.
@@ -48,21 +48,21 @@ class CApplication extends CApiService {
 	 *
 	 * @return array	item data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('apps' => 'a.applicationid'),
-			'from'		=> array('applications' => 'applications a'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['apps' => 'a.applicationid'],
+			'from'		=> ['applications' => 'applications a'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -81,9 +81,7 @@ class CApplication extends CApiService {
 			'searchWildcardsEnabled'	=> null,
 			// output
 			'output'					=> API_OUTPUT_EXTEND,
-			'expandData'				=> null,
 			'selectHost'				=> null,
-			'selectHosts'				=> null,
 			'selectItems'				=> null,
 			'countOutput'				=> null,
 			'groupCount'				=> null,
@@ -91,11 +89,8 @@ class CApplication extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
-
-		$this->checkDeprecatedParam($options, 'expandData');
-		$this->checkDeprecatedParam($options, 'selectHosts');
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -230,7 +225,7 @@ class CApplication extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -239,27 +234,6 @@ class CApplication extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Check if application exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('application.exists method is deprecated.');
-
-		$application = $this->get(array(
-			'output' => array('applicationid'),
-			'filter' => zbx_array_mintersect(array(array('hostid', 'host'), 'name'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $application;
 	}
 
 	public function checkInput(&$applications, $method) {
@@ -273,27 +247,27 @@ class CApplication extends CApiService {
 
 		// permissions
 		if ($update || $delete) {
-			$itemDbFields = array('applicationid' => null);
-			$dbApplications = $this->get(array(
+			$itemDbFields = ['applicationid' => null];
+			$dbApplications = $this->get([
 				'output' => API_OUTPUT_EXTEND,
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
 				'editable' => 1,
 				'preservekeys' => 1
-			));
+			]);
 		}
 		else {
-			$itemDbFields = array('name' => null, 'hostid' => null);
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status'),
+			$itemDbFields = ['name' => null, 'hostid' => null];
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid', 'host', 'status'],
 				'hostids' => zbx_objectValues($applications, 'hostid'),
 				'templated_hosts' => 1,
 				'editable' => 1,
 				'preservekeys' => 1
-			));
+			]);
 		}
 
 		if ($update){
-			$applications = $this->extendObjects($this->tableName(), $applications, array('name'));
+			$applications = $this->extendObjects($this->tableName(), $applications, ['name']);
 		}
 
 		foreach ($applications as &$application) {
@@ -341,14 +315,14 @@ class CApplication extends CApiService {
 
 			// check existence
 			if ($update || $create) {
-				$applicationsExists = $this->get(array(
+				$applicationsExists = $this->get([
 					'output' => API_OUTPUT_EXTEND,
-					'filter' => array(
+					'filter' => [
 						'hostid' => $application['hostid'],
 						'name' => $application['name']
-					),
+					],
 					'nopermissions' => 1
-				));
+				]);
 				foreach ($applicationsExists as $applicationExists) {
 					if (!$update || (bccomp($applicationExists['applicationid'], $application['applicationid']) != 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists.', $application['name']));
@@ -374,7 +348,7 @@ class CApplication extends CApiService {
 		$applications = $appManager->create($applications);
 		$appManager->inherit($applications);
 
-		return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
+		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
 
 	/**
@@ -392,7 +366,7 @@ class CApplication extends CApiService {
 		$appManager->update($applications);
 		$appManager->inherit($applications);
 
-		return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
+		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
 
 	/**
@@ -405,13 +379,13 @@ class CApplication extends CApiService {
 	 */
 	public function delete(array $applicationids, $nopermissions = false) {
 		// TODO: remove $nopermissions hack
-		$options = array(
+		$options = [
 			'applicationids' => $applicationids,
 			'editable' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
-			'selectHost' => array('name', 'hostid')
-		);
+			'selectHost' => ['name', 'hostid']
+		];
 		$delApplications = $this->get($options);
 
 		if (!$nopermissions) {
@@ -428,7 +402,7 @@ class CApplication extends CApiService {
 		$appManager = new CApplicationManager();
 
 		// fetch application children
-		$childApplicationIds = array();
+		$childApplicationIds = [];
 		$parentApplicationIds = $applicationids;
 		while ($parentApplicationIds) {
 			$parentApplicationIds = $appManager->fetchExclusiveChildIds($parentApplicationIds);
@@ -442,13 +416,13 @@ class CApplication extends CApiService {
 			$childApplicationIds = $appManager->fetchEmptyIds($childApplicationIds);
 		}
 
-		$childApplications = $this->get(array(
+		$childApplications = $this->get([
 			'applicationids' => $childApplicationIds,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHost' => array('name', 'hostid')
-		));
+			'selectHost' => ['name', 'hostid']
+		]);
 
 		$appManager->delete(array_merge($applicationids, $childApplicationIds));
 
@@ -459,7 +433,7 @@ class CApplication extends CApiService {
 			));
 		}
 
-		return array('applicationids' => $applicationids);
+		return ['applicationids' => $applicationids];
 	}
 
 	/**
@@ -482,26 +456,26 @@ class CApplication extends CApiService {
 		$itemIds = zbx_objectValues($items, 'itemid');
 
 		// validate permissions
-		$allowedApplications = $this->get(array(
+		$allowedApplications = $this->get([
 			'applicationids' => $applicationIds,
-			'output' => array('applicationid', 'hostid', 'name'),
-			'selectHost' => array('hostid', 'name'),
+			'output' => ['applicationid', 'hostid', 'name'],
+			'selectHost' => ['hostid', 'name'],
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 		foreach ($applications as $application) {
 			if (!isset($allowedApplications[$application['applicationid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
-		$allowedItems = API::Item()->get(array(
+		$allowedItems = API::Item()->get([
 			'itemids' => $itemIds,
-			'selectHosts' => array('name'),
-			'output' => array('itemid', 'hostid', 'name'),
+			'selectHosts' => ['name'],
+			'output' => ['itemid', 'hostid', 'name'],
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 		foreach ($items as $item) {
 			if (!isset($allowedItems[$item['itemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -540,7 +514,7 @@ class CApplication extends CApiService {
 			$linked[$pair['applicationid']][$pair['itemid']] = true;
 		}
 
-		$createApplications = array();
+		$createApplications = [];
 
 		foreach ($applicationIds as $applicationId) {
 			foreach ($itemIds as $itemId) {
@@ -548,10 +522,10 @@ class CApplication extends CApiService {
 					continue;
 				}
 
-				$createApplications[] = array(
+				$createApplications[] = [
 					'itemid' => $itemId,
 					'applicationid' => $applicationId
-				);
+				];
 			}
 		}
 
@@ -570,38 +544,19 @@ class CApplication extends CApiService {
 						' AND '.dbConditionInt('a2.applicationid', $applicationIds)
 				);
 
-				$childApplications = array();
+				$childApplications = [];
 
 				while ($dbApplication = DBfetch($dbApplications)) {
 					$childApplications[] = $dbApplication;
 				}
 
-				if (!$result = $this->massAdd(array('items' => $child, 'applications' => $childApplications))) {
+				if (!$result = $this->massAdd(['items' => $child, 'applications' => $childApplications])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add items.'));
 				}
 			}
 		}
 
-		return array('applicationids' => $applicationIds);
-	}
-
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		if ($options['countOutput'] === null) {
-			// expandData
-			if (!is_null($options['expandData'])) {
-				$sqlParts['select']['host'] = 'h.host';
-				$sqlParts['from']['hosts'] = 'hosts h';
-				$sqlParts['where']['ah'] = 'a.hostid=h.hostid';
-			}
-
-			if ($options['selectHosts'] !== null) {
-				$sqlParts = $this->addQuerySelect('a.hostid', $sqlParts);
-			}
-		}
-
-		return $sqlParts;
+		return ['applicationids' => $applicationIds];
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -615,7 +570,7 @@ class CApplication extends CApiService {
 					' WHERE '.dbConditionInt('at.applicationid', array_keys($result))
 			);
 			$relationMap = new CRelationMap();
-			$templateApplications = array();
+			$templateApplications = [];
 			while ($templateApplication = DBfetch($query)) {
 				$relationMap->addRelation($templateApplication['applicationid'], $templateApplication['application_templateid']);
 				$templateApplications[$templateApplication['application_templateid']] = $templateApplication['templateid'];
@@ -623,41 +578,28 @@ class CApplication extends CApiService {
 			$result = $relationMap->mapMany($result, $templateApplications, 'templateids');
 		}
 
-		// adding hosts (deprecated)
-		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
-			$hosts = API::Host()->get(array(
-				'output' => $options['selectHosts'],
-				'hostids' => $relationMap->getRelatedIds(),
-				'nopermissions' => true,
-				'templated_hosts' => true,
-				'preservekeys' => true
-			));
-			$result = $relationMap->mapMany($result, $hosts, 'hosts');
-		}
-
 		// adding one host
 		if ($options['selectHost'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'output' => $options['selectHost'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'templated_hosts' => true,
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapOne($result, $hosts, 'host');
 		}
 
 		// adding items
 		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'itemid', 'items_applications');
-			$items = API::Item()->get(array(
+			$items = API::Item()->get([
 				'output' => $options['selectItems'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $items, 'items');
 		}
 

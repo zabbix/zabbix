@@ -25,19 +25,18 @@ require_once dirname(__FILE__).'/include/html.inc.php';
 
 $page['title'] = _('Search');
 $page['file'] = 'search.php';
-$page['hist_arg'] = array();
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'type'=>		array(T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null),
-	'search'=>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
+$fields = [
+	'type'=>		[T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null],
+	'search'=>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	// ajax
-	'widgetName' =>	array(T_ZBX_STR, O_OPT, P_ACT,	null,			null),
-	'widgetState'=>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		null)
-);
+	'widgetName' =>	[T_ZBX_STR, O_OPT, P_ACT,	null,			null],
+	'widgetState'=>	[T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		null]
+];
 check_fields($fields);
 
 /*
@@ -55,13 +54,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Display
  */
-$admin = in_array(CWebUser::$data['type'], array(
+$admin = in_array(CWebUser::$data['type'], [
 	USER_TYPE_ZABBIX_ADMIN,
 	USER_TYPE_SUPER_ADMIN
-));
+]);
 $rows_per_page = CWebUser::$data['rows_per_page'];
-
-$searchWidget = new CWidget('search_wdgt');
 
 $search = getRequest('search', '');
 
@@ -69,20 +66,17 @@ $search = getRequest('search', '');
 if (zbx_empty($search)) {
 	$search = _('Search pattern is empty');
 }
-$searchWidget->setClass('header');
-$searchWidget->addHeader(array(
-	_('SEARCH').NAME_DELIMITER,
-	bold($search)
-), SPACE);
+
+$searchWidget = (new CWidget())->setTitle(_('Search').':'.SPACE.$search);
 
 // FIND Hosts
-$params = array(
-	'search' => array(
+$params = [
+	'search' => [
 		'host' => $search,
 		'name' => $search,
 		'dns' => $search,
 		'ip' => $search
-	),
+	],
 	'limit' => $rows_per_page,
 	'selectGroups' => API_OUTPUT_EXTEND,
 	'selectInterfaces' => API_OUTPUT_EXTEND,
@@ -93,9 +87,9 @@ $params = array(
 	'selectScreens' => API_OUTPUT_COUNT,
 	'selectHttpTests' => API_OUTPUT_COUNT,
 	'selectDiscoveries' => API_OUTPUT_COUNT,
-	'output' => array('name', 'status', 'host'),
+	'output' => ['name', 'status', 'host'],
 	'searchByAny' => true
-);
+];
 $db_hosts = API::Host()->get($params);
 
 order_result($db_hosts, 'name');
@@ -105,45 +99,45 @@ $hosts = selectByPattern($db_hosts, 'name', $search, $rows_per_page);
 
 $hostids = zbx_objectValues($hosts, 'hostid');
 
-$rw_hosts = API::Host()->get(array(
-	'output' => array('hostid'),
+$rw_hosts = API::Host()->get([
+	'output' => ['hostid'],
 	'hostids' => $hostids,
 	'editable' => 1
-));
+]);
 $rw_hosts = zbx_toHash($rw_hosts, 'hostid');
 
-$params = array(
-	'search' => array(
+$params = [
+	'search' => [
 		'host' => $search,
 		'name' => $search,
 		'dns' => $search,
 		'ip' => $search
-	),
+	],
 	'countOutput' => 1,
 	'searchByAny' => true
-);
+];
 
 $overalCount = API::Host()->get($params);
 $viewCount = count($hosts);
 
-$table = new CTableInfo(_('No hosts found.'));
-$table->setHeader(array(
-	new CCol(_('Host')),
-	new CCol(_('IP')),
-	new CCol(_('DNS')),
-	new CCol(_('Latest data')),
-	new CCol(_('Triggers')),
-	new CCol(_('Events')),
-	new CCol(_('Graphs')),
-	new CCol(_('Screens')),
-	new CCol(_('Web')),
-	new CCol(_('Applications')),
-	new CCol(_('Items')),
-	new CCol(_('Triggers')),
-	new CCol(_('Graphs')),
-	new CCol(_('Discovery')),
-	new CCol(_('Web'))
-));
+$table = new CTableInfo();
+$table->setHeader([
+	new CColHeader(_('Host')),
+	new CColHeader(_('IP')),
+	new CColHeader(_('DNS')),
+	new CColHeader(_('Latest data')),
+	new CColHeader(_('Triggers')),
+	new CColHeader(_('Events')),
+	new CColHeader(_('Graphs')),
+	new CColHeader(_('Screens')),
+	new CColHeader(_('Web')),
+	new CColHeader(_('Applications')),
+	new CColHeader(_('Items')),
+	new CColHeader(_('Triggers')),
+	new CColHeader(_('Graphs')),
+	new CColHeader(_('Discovery')),
+	new CColHeader(_('Web'))
+]);
 
 foreach ($hosts as $hnum => $host) {
 	$hostid = $host['hostid'];
@@ -153,7 +147,7 @@ foreach ($hosts as $hnum => $host) {
 	$host['dns'] = $interface['dns'];
 	$host['port'] = $interface['port'];
 
-	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? 'on' : null;
+	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null;
 
 	$group = reset($host['groups']);
 	$link = 'groupid='.$group['groupid'].'&hostid='.$hostid;
@@ -163,36 +157,36 @@ foreach ($hosts as $hnum => $host) {
 
 	if ($admin && isset($rw_hosts[$hostid])) {
 		// host
-		$hostCell = array(new CLink($visibleName, 'hosts.php?form=update&'.$link, $style));
+		$hostCell = [new CLink($visibleName, 'hosts.php?form=update&'.$link, $style)];
 
-		$applications_link = array(
+		$applications_link = [
 			new CLink(_('Applications'), 'applications.php?'.$link),
-			' ('.$host['applications'].')'
-		);
-		$items_link = array(
+			CViewHelper::showNum($host['applications'])
+		];
+		$items_link = [
 			new CLink(_('Items'), 'items.php?filter_set=1&'.$link),
-			' ('.$host['items'].')'
-		);
-		$triggers_link = array(
+			CViewHelper::showNum($host['items'])
+		];
+		$triggers_link = [
 			new CLink(_('Triggers'), 'triggers.php?'.$link),
-			' ('.$host['triggers'].')'
-		);
-		$graphs_link = array(
+			CViewHelper::showNum($host['triggers'])
+		];
+		$graphs_link = [
 			new CLink(_('Graphs'), 'graphs.php?'.$link),
-			' ('.$host['graphs'].')'
-		);
-		$discoveryLink = array(
+			CViewHelper::showNum($host['graphs'])
+		];
+		$discoveryLink = [
 			new CLink(_('Discovery'), 'host_discovery.php?'.$link),
-			' ('.$host['discoveries'].')'
-		);
-		$httpTestsLink = array(
+			CViewHelper::showNum($host['discoveries'])
+		];
+		$httpTestsLink = [
 			new CLink(_('Web'), 'httpconf.php?'.$link),
-			' ('.$host['httpTests'].')'
-		);
+			CViewHelper::showNum($host['httpTests'])
+		];
 	}
 	else {
 		// host
-		$hostCell = array(new CSpan($visibleName, $style));
+		$hostCell = [new CSpan($visibleName, $style)];
 
 		$applications_link = _('Applications').' ('.$host['applications'].')';
 		$items_link = _('Items').' ('.$host['items'].')';
@@ -213,7 +207,7 @@ foreach ($hosts as $hnum => $host) {
 	$hostip = make_decoration($host['ip'], $search);
 	$hostdns = make_decoration($host['dns'], $search);
 
-	$table->addRow(array(
+	$table->addRow([
 		$hostCell,
 		$hostip,
 		$hostdns,
@@ -229,58 +223,58 @@ foreach ($hosts as $hnum => $host) {
 		$graphs_link,
 		$discoveryLink,
 		$httpTestsLink
-	));
+	]);
 }
 
 $searchHostWidget = new CCollapsibleUiWidget('search_hosts', $table);
 $searchHostWidget->open = (bool) CProfile::get('web.search.hats.search_hosts.state', true);
 $searchHostWidget->setHeader(_('Hosts'));
-$searchHostWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+$searchHostWidget->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
 
 $searchWidget->addItem(new CDiv($searchHostWidget));
 //----------------
 
 
 // Find Host groups
-$params = array(
+$params = [
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => API_OUTPUT_COUNT,
 	'selectTemplates' => API_OUTPUT_COUNT,
-	'search' => array('name' => $search),
+	'search' => ['name' => $search],
 	'limit' => $rows_per_page
-);
+];
 $db_hostGroups = API::HostGroup()->get($params);
 order_result($db_hostGroups, 'name');
 
 $hostGroups = selectByPattern($db_hostGroups, 'name', $search, $rows_per_page);
 $groupids = zbx_objectValues($hostGroups, 'groupid');
 
-$rw_hostGroups = API::HostGroup()->get(array(
-	'output' => array('groupid'),
+$rw_hostGroups = API::HostGroup()->get([
+	'output' => ['groupid'],
 	'groupids' => $groupids,
 	'editable' => true
-));
+]);
 $rw_hostGroups = zbx_toHash($rw_hostGroups, 'groupid');
 
-$params = array(
-	'search' => array('name' => $search),
+$params = [
+	'search' => ['name' => $search],
 	'countOutput' => 1
-);
+];
 $overalCount = API::HostGroup()->get($params);
 $viewCount = count($hostGroups);
 
-$header = array(
-	new CCol(_('Host group')),
-	new CCol(_('Latest data')),
-	new CCol(_('Triggers')),
-	new CCol(_('Events')),
-	new CCol(_('Graphs')),
-	new CCol(_('Web')),
-	$admin ? new CCol(_('Hosts')) : null,
-	$admin ? new CCol(_('Templates')) : null,
-);
+$header = [
+	new CColHeader(_('Host group')),
+	new CColHeader(_('Latest data')),
+	new CColHeader(_('Triggers')),
+	new CColHeader(_('Events')),
+	new CColHeader(_('Graphs')),
+	new CColHeader(_('Web')),
+	$admin ? new CColHeader(_('Hosts')) : null,
+	$admin ? new CColHeader(_('Templates')) : null,
+];
 
-$table = new CTableInfo(_('No host groups found.'));
+$table = new CTableInfo();
 $table->setHeader($header);
 
 foreach ($hostGroups as $hnum => $group) {
@@ -295,23 +289,23 @@ foreach ($hostGroups as $hnum => $group) {
 	if ($admin) {
 		if (isset($rw_hostGroups[$hostgroupid])) {
 			if ($group['hosts']) {
-				$hostsLink = array(
+				$hostsLink = [
 					new CLink(_('Hosts'), 'hosts.php?groupid='.$hostgroupid),
-					' ('.$group['hosts'].')'
-				);
+					CViewHelper::showNum($group['hosts'])
+				];
 			}
 			else {
-				$hostsLink = _('Hosts').' (0)';
+				$hostsLink = _('Hosts');
 			}
 
 			if ($group['templates']) {
-				$templatesLink = array(
+				$templatesLink = [
 					new CLink(_('Templates'), 'templates.php?groupid='.$hostgroupid),
-					' ('.$group['templates'].')'
-				);
+					CViewHelper::showNum($group['templates'])
+				];
 			}
 			else {
-				$templatesLink = _('Templates').' (0)';
+				$templatesLink = _('Templates');
 			}
 
 			$hgroup_link = new CLink($caption, 'hostgroups.php?form=update&'.$link);
@@ -322,7 +316,7 @@ foreach ($hostGroups as $hnum => $group) {
 		}
 	}
 
-	$table->addRow(array(
+	$table->addRow([
 		$hgroup_link,
 		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$hostgroupid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
@@ -331,22 +325,22 @@ foreach ($hostGroups as $hnum => $group) {
 		new CLink(_('Web'), 'httpmon.php?'.$link),
 		$hostsLink,
 		$templatesLink
-	));
+	]);
 }
 
 $searchHostGroupWidget = new CCollapsibleUiWidget('search_hostgroup', $table);
 $searchHostGroupWidget->open = (bool) CProfile::get('web.search.hats.search_hostgroup.state', true);
 $searchHostGroupWidget->setHeader(_('Host groups'));
-$searchHostGroupWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+$searchHostGroupWidget->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
 
 $searchWidget->addItem(new CDiv($searchHostGroupWidget));
 //----------------
 
 // FIND Templates
 if ($admin) {
-	$params = array(
-		'output' => array('name', 'host'),
-		'selectGroups' => array('groupid'),
+	$params = [
+		'output' => ['name', 'host'],
+		'selectGroups' => ['groupid'],
 		'sortfield' => 'name',
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
@@ -355,13 +349,13 @@ if ($admin) {
 		'selectScreens' => API_OUTPUT_COUNT,
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'selectDiscoveries' => API_OUTPUT_COUNT,
-		'search' => array(
+		'search' => [
 			'host' => $search,
 			'name' => $search
-		),
+		],
 		'searchByAny' => true,
 		'limit' => $rows_per_page
-	);
+	];
 	$db_templates = API::Template()->get($params);
 	order_result($db_templates, 'name');
 
@@ -370,37 +364,37 @@ if ($admin) {
 
 	$templateids = zbx_objectValues($templates, 'templateid');
 
-	$rw_templates = API::Template()->get(array(
-		'output' => array('templateid'),
+	$rw_templates = API::Template()->get([
+		'output' => ['templateid'],
 		'templateids' => $templateids,
 		'editable' => 1
-	));
+	]);
 	$rw_templates = zbx_toHash($rw_templates, 'templateid');
 
-	$params = array(
-		'search' => array(
+	$params = [
+		'search' => [
 			'host' => $search,
 			'name' => $search
-		),
+		],
 		'countOutput' => 1,
 		'searchByAny' => true
-	);
+	];
 
 	$overalCount = API::Template()->get($params);
 	$viewCount = count($templates);
 
-	$header = array(
-		new CCol(_('Template')),
-		new CCol(_('Applications')),
-		new CCol(_('Items')),
-		new CCol(_('Triggers')),
-		new CCol(_('Graphs')),
-		new CCol(_('Screens')),
-		new CCol(_('Discovery')),
-		new CCol(_('Web')),
-	);
+	$header = [
+		new CColHeader(_('Template')),
+		new CColHeader(_('Applications')),
+		new CColHeader(_('Items')),
+		new CColHeader(_('Triggers')),
+		new CColHeader(_('Graphs')),
+		new CColHeader(_('Screens')),
+		new CColHeader(_('Discovery')),
+		new CColHeader(_('Web')),
+	];
 
-	$table = new CTableInfo(_('No templates found.'));
+	$table = new CTableInfo();
 	$table->setHeader($header);
 
 	foreach ($templates as $tnum => $template) {
@@ -414,42 +408,42 @@ if ($admin) {
 
 		if (isset($rw_templates[$templateid])) {
 			// template
-			$templateCell = array(new CLink($templateVisibleName,
+			$templateCell = [new CLink($templateVisibleName,
 				'templates.php?form=update&'.'&templateid='.$templateid
-			));
+			)];
 
-			$applications_link = array(
+			$applications_link = [
 				new CLink(_('Applications'), 'applications.php?'.$link),
-				' ('.$template['applications'].')'
-			);
-			$items_link = array(
+				CViewHelper::showNum($host['applications'])
+			];
+			$items_link = [
 				new CLink(_('Items'), 'items.php?filter_set=1&'.$link),
-				' ('.$template['items'].')'
-			);
-			$triggers_link = array(
+				CViewHelper::showNum($host['items'])
+			];
+			$triggers_link = [
 				new CLink(_('Triggers'), 'triggers.php?'.$link),
-				' ('.$template['triggers'].')'
-			);
-			$graphs_link = array(
+				CViewHelper::showNum($host['triggers'])
+			];
+			$graphs_link = [
 				new CLink(_('Graphs'), 'graphs.php?'.$link),
-				' ('.$template['graphs'].')'
-			);
-			$screensLink = array(
+				CViewHelper::showNum($host['graphs'])
+			];
+			$screensLink = [
 				new CLink(_('Screens'), 'screenconf.php?templateid='.$templateid),
-				' ('.$template['screens'].')'
-			);
-			$discoveryLink = array(
+				CViewHelper::showNum($host['screens'])
+			];
+			$discoveryLink = [
 				new CLink(_('Discovery'), 'host_discovery.php?'.$link),
-				' ('.$template['discoveries'].')'
-			);
-			$httpTestsLink = array(
+				CViewHelper::showNum($host['discoveries'])
+			];
+			$httpTestsLink = [
 				new CLink(_('Web'), 'httpconf.php?'.$link),
-				' ('.$template['httpTests'].')'
-			);
+				CViewHelper::showNum($host['httpTests'])
+			];
 		}
 		else {
 			// host
-			$templateCell = array(new CSpan($templateVisibleName));
+			$templateCell = [new CSpan($templateVisibleName)];
 
 			$applications_link = _('Applications').' ('.$template['applications'].')';
 			$items_link = _('Items').' ('.$template['items'].')';
@@ -468,7 +462,7 @@ if ($admin) {
 			$templateCell[] = ')';
 		}
 
-		$table->addRow(array(
+		$table->addRow([
 			$templateCell,
 			$applications_link,
 			$items_link,
@@ -477,13 +471,13 @@ if ($admin) {
 			$screensLink,
 			$discoveryLink,
 			$httpTestsLink
-		));
+		]);
 	}
 
 	$searchTemplateWidget = new CCollapsibleUiWidget('search_templates', $table);
 	$searchTemplateWidget->open = (bool) CProfile::get('web.search.hats.search_templates.state', true);
 	$searchTemplateWidget->setHeader(_('Templates'));
-	$searchTemplateWidget->setFooter(_s('Displaying %1$s of %2$s found', $viewCount, $overalCount));
+	$searchTemplateWidget->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
 
 	$searchWidget->addItem(new CDiv($searchTemplateWidget));
 }

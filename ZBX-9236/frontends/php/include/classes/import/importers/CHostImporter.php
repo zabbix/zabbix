@@ -24,7 +24,7 @@ class CHostImporter extends CImporter {
 	/**
 	 * @var array		a list of host IDs which were created or updated to create an interface cache for those hosts
 	 */
-	protected $processedHostIds = array();
+	protected $processedHostIds = [];
 
 	/**
 	 * Import hosts.
@@ -34,8 +34,8 @@ class CHostImporter extends CImporter {
 	 * @throws Exception
 	 */
 	public function import(array $hosts) {
-		$hostsToCreate = array();
-		$hostsToUpdate = array();
+		$hostsToCreate = [];
+		$hostsToUpdate = [];
 
 		foreach ($hosts as $host) {
 			// preserve host related templates to massAdd them later
@@ -45,7 +45,7 @@ class CHostImporter extends CImporter {
 					if (!$templateId) {
 						throw new Exception(_s('Template "%1$s" for host "%2$s" does not exist.', $template['name'], $host['host']));
 					}
-					$templateLinkage[$host['host']][] = array('templateid' => $templateId);
+					$templateLinkage[$host['host']][] = ['templateid' => $templateId];
 				}
 			}
 			unset($host['templates']);
@@ -73,10 +73,10 @@ class CHostImporter extends CImporter {
 				$this->referencer->addHostRef($hostHost, $hostId);
 
 				if (!empty($templateLinkage[$hostHost])) {
-					API::Template()->massAdd(array(
-						'hosts' => array('hostid' => $hostId),
+					API::Template()->massAdd([
+						'hosts' => ['hostid' => $hostId],
 						'templates' => $templateLinkage[$hostHost]
-					));
+					]);
 				}
 			}
 		}
@@ -87,19 +87,19 @@ class CHostImporter extends CImporter {
 				$this->processedHostIds[$host['host']] = $host['hostid'];
 
 				if (!empty($templateLinkage[$host['host']])) {
-					API::Template()->massAdd(array(
+					API::Template()->massAdd([
 						'hosts' => $host,
 						'templates' => $templateLinkage[$host['host']]
-					));
+					]);
 				}
 			}
 		}
 
 		// create interfaces cache interface_ref->interfaceid
-		$dbInterfaces = API::HostInterface()->get(array(
+		$dbInterfaces = API::HostInterface()->get([
 			'hostids' => $this->processedHostIds,
 			'output' => API_OUTPUT_EXTEND
-		));
+		]);
 
 		foreach ($hosts as $host) {
 			if (isset($this->processedHostIds[$host['host']])) {
@@ -107,7 +107,7 @@ class CHostImporter extends CImporter {
 					$hostId = $this->processedHostIds[$host['host']];
 
 					if (!isset($this->referencer->interfacesCache[$hostId])) {
-						$this->referencer->interfacesCache[$hostId] = array();
+						$this->referencer->interfacesCache[$hostId] = [];
 					}
 
 					foreach ($dbInterfaces as $dbInterface) {
@@ -118,7 +118,7 @@ class CHostImporter extends CImporter {
 								&& $dbInterface['port'] == $interface['port']
 								&& $dbInterface['type'] == $interface['type']
 								&& $dbInterface['main'] == $interface['main']
-								&& $dbInterface['bulk'] == $interface['bulk']) {
+								&& (!isset($interface['bulk']) || $dbInterface['bulk'] == $interface['bulk'])) {
 							$refName = $interface['interface_ref'];
 							$this->referencer->interfacesCache[$hostId][$refName] = $dbInterface['interfaceid'];
 						}
@@ -152,7 +152,7 @@ class CHostImporter extends CImporter {
 			if (!$groupId) {
 				throw new Exception(_s('Group "%1$s" for host "%2$s" does not exist.', $group['name'], $host['host']));
 			}
-			$host['groups'][$gnum] = array('groupid' => $groupId);
+			$host['groups'][$gnum] = ['groupid' => $groupId];
 		}
 
 		if (isset($host['proxy'])) {
@@ -171,12 +171,15 @@ class CHostImporter extends CImporter {
 
 		if ($hostId = $this->referencer->resolveHost($host['host'])) {
 			$host['hostid'] = $hostId;
-			foreach ($host['macros'] as &$macro) {
-				if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
-					$macro['hostmacroid'] = $hostMacroId;
+
+			if (array_key_exists('macros', $host)) {
+				foreach ($host['macros'] as &$macro) {
+					if ($hostMacroId = $this->referencer->resolveMacro($hostId, $macro['macro'])) {
+						$macro['hostmacroid'] = $hostMacroId;
+					}
 				}
+				unset($macro);
 			}
-			unset($macro);
 		}
 
 
@@ -191,17 +194,17 @@ class CHostImporter extends CImporter {
 	 * @return array
 	 */
 	protected function addInterfaceIds(array $xmlHosts) {
-		$dbInterfaces = API::HostInterface()->get(array(
+		$dbInterfaces = API::HostInterface()->get([
 			'hostids' => zbx_objectValues($xmlHosts, 'hostid'),
 			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		));
+		]);
 
 		// build lookup maps for:
 		// - interfaces per host
 		// - default (primary) interface ids per host per interface type
-		$dbHostInterfaces = array();
-		$dbHostMainInterfaceIds = array();
+		$dbHostInterfaces = [];
+		$dbHostMainInterfaceIds = [];
 
 		foreach ($dbInterfaces as $dbInterface) {
 			$dbHostId = $dbInterface['hostid'];
@@ -223,9 +226,9 @@ class CHostImporter extends CImporter {
 
 			$currentDbHostMainInterfaceIds = isset($dbHostMainInterfaceIds[$xmlHostId])
 				? $dbHostMainInterfaceIds[$xmlHostId]
-				: array();
+				: [];
 
-			$reusedInterfaceIds = array();
+			$reusedInterfaceIds = [];
 
 			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
 				$xmlHostInterfaceType = $xmlHostInterface['type'];
@@ -255,7 +258,8 @@ class CHostImporter extends CImporter {
 							&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
 							&& $dbHostInterface['port'] == $xmlHostInterface['port']
 							&& $dbHostInterface['type'] == $xmlHostInterface['type']
-							&& $dbHostInterface['bulk'] == $xmlHostInterface['bulk']) {
+							&& (!isset($xmlHostInterface['bulk'])
+								|| $dbHostInterface['bulk'] == $xmlHostInterface['bulk'])) {
 						$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
 						$reusedInterfaceIds[$dbHostInterfaceId] = true;
 						break;

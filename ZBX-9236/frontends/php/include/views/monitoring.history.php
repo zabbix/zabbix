@@ -21,15 +21,15 @@
 
 require_once dirname(__FILE__).'/js/monitoring.history.js.php';
 
-$historyWidget = new CWidget(null, 'history');
+$historyWidget = new CWidget('history');
 
-$header = array(
-	'left' => _n('%1$s ITEM', '%1$s ITEMS', count($this->data['items'])),
-	'right' => array()
-);
-$headerPlaintext = array();
+$header = [
+	'left' => _n('%1$s item', '%1$s items', count($this->data['items'])),
+	'right' => new CList()
+];
+$headerPlaintext = [];
 
-$hostNames = array();
+$hostNames = [];
 foreach ($this->data['items'] as $itemData) {
 	$hostName = $itemData['hosts'][0]['name'];
 
@@ -42,31 +42,30 @@ $item = reset($this->data['items']);
 $host = reset($item['hosts']);
 
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
-	$header['left'] = array(
+	$header['left'] = [
 		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
 		NAME_DELIMITER,
 		$item['name_expanded']
-	);
+	];
 	$headerPlaintext[] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
 
 	if ($this->data['action'] == HISTORY_GRAPH) {
-		$header['right'][] = get_icon('favourite', array(
+		$header['right']->addItem(get_icon('favourite', [
 			'fav' => 'web.favorite.graphids',
 			'elid' => $item['itemid'],
 			'elname' => 'itemid'
-		));
+		]));
 	}
 }
 elseif (count($hostNames) == 1) {
-	$header['left'] = array(
+	$header['left'] = [
 		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
 		NAME_DELIMITER,
 		$header['left']
-	);
+	];
 }
 
-$header['right'][] = ' ';
-$header['right'][] = get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']));
+$header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 
 // don't display the action form if we view multiple items on a graph
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
@@ -83,35 +82,33 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 		$actionForm->addVar('mark_color', $_REQUEST['mark_color']);
 	}
 
-	$actionComboBox = new CComboBox('action', $this->data['action'], 'submit()');
+	$actions = [];
 	if (isset($this->data['iv_numeric'][$this->data['value_type']])) {
-		$actionComboBox->addItem(HISTORY_GRAPH, _('Graph'));
+		$actions[HISTORY_GRAPH] = _('Graph');
 	}
-	$actionComboBox->addItem(HISTORY_VALUES, _('Values'));
-	$actionComboBox->addItem(HISTORY_LATEST, _('500 latest values'));
-	$actionForm->addItem($actionComboBox);
+	$actions[HISTORY_VALUES] = _('Values');
+	$actions[HISTORY_LATEST] = _('500 latest values');
+	$actionForm->addItem(new CComboBox('action', $this->data['action'], 'submit()', $actions));
 
 	if ($this->data['action'] != HISTORY_GRAPH) {
-		$actionForm->addItem(array(' ', new CSubmit('plaintext', _('As plain text'))));
+		$actionForm->addItem([' ', new CSubmit('plaintext', _('As plain text'))]);
 	}
 
-	array_unshift($header['right'], $actionForm, ' ');
+	$header['right']->addItem($actionForm);
 }
 
 // create filter
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
-		$filterForm = new CFormTable(null, null, 'get');
-		$filterForm->setTableClass('formtable old-filter');
-		$filterForm->setAttribute('name', 'zbx_filter');
-		$filterForm->setAttribute('id', 'zbx_filter');
+		$filterForm = new CFilter();
+		$filterColumn1 = new CFormList();
 		$filterForm->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {
 			$filterForm->addVar('itemids[]', $itemId, 'filter_itemids_'.$itemId);
 		}
 
 		$itemListbox = new CListBox('cmbitemlist[]');
-		$itemsData = array();
+		$itemsData = [];
 		foreach ($this->data['items'] as $itemid => $item) {
 			if (!isset($this->data['iv_string'][$item['value_type']])) {
 				unset($this->data['items'][$itemid]);
@@ -136,30 +133,29 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 			$deleteItemButton = new CSubmit('remove_log', _('Remove selected'));
 		}
 
-		$filterForm->addRow(_('Items list'), array($itemListbox, BR(), $addItemButton, $deleteItemButton));
-		$filterForm->addRow(_('Select rows with value like'), new CTextBox('filter', getRequest('filter', ''), ZBX_TEXTBOX_FILTER_SIZE));
+		$filterColumn1->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton]);
+		$filterColumn1->addRow(_('Select rows with value like'), new CTextBox('filter', getRequest('filter', ''), ZBX_TEXTBOX_FILTER_SIZE));
 
 		$filterTask = getRequest('filter_task', 0);
 
-		$taskComboBox = new CComboBox('filter_task', $filterTask, 'submit()');
-		$taskComboBox->addItem(FILTER_TASK_SHOW, _('Show selected'));
-		$taskComboBox->addItem(FILTER_TASK_HIDE, _('Hide selected'));
-		$taskComboBox->addItem(FILTER_TASK_MARK, _('Mark selected'));
-		$taskComboBox->addItem(FILTER_TASK_INVERT_MARK, _('Mark others'));
-		$tasks = array($taskComboBox);
+		$tasks = [new CComboBox('filter_task', $filterTask, 'submit()', [
+			FILTER_TASK_SHOW => _('Show selected'),
+			FILTER_TASK_HIDE => _('Hide selected'),
+			FILTER_TASK_MARK => _('Mark selected'),
+			FILTER_TASK_INVERT_MARK => _('Mark others')
+		])];
 
-		if (str_in_array($filterTask, array(FILTER_TASK_MARK, FILTER_TASK_INVERT_MARK))) {
-			$colorComboBox = new CComboBox('mark_color', getRequest('mark_color', 0));
-			$colorComboBox->addItem(MARK_COLOR_RED, _('as Red'));
-			$colorComboBox->addItem(MARK_COLOR_GREEN, _('as Green'));
-			$colorComboBox->addItem(MARK_COLOR_BLUE, _('as Blue'));
-
+		if (str_in_array($filterTask, [FILTER_TASK_MARK, FILTER_TASK_INVERT_MARK])) {
 			$tasks[] = ' ';
-			$tasks[] = $colorComboBox;
+			$tasks[] = new CComboBox('mark_color', getRequest('mark_color', 0), null, [
+				MARK_COLOR_RED => _('as Red'),
+				MARK_COLOR_GREEN => _('as Green'),
+				MARK_COLOR_BLUE => _('as Blue')
+			]);
 		}
 
-		$filterForm->addRow(_('Selected'), $tasks);
-		$filterForm->addItemToBottomRow(new CSubmit('select', _('Filter')));
+		$filterColumn1->addRow(_('Selected'), $tasks);
+		$filterForm->addColumn($filterColumn1);
 	}
 }
 
@@ -176,7 +172,7 @@ else {
 }
 
 // create history screen
-$screen = CScreenBuilder::getScreen(array(
+$screen = CScreenBuilder::getScreen([
 	'resourcetype' => SCREEN_RESOURCE_HISTORY,
 	'action' => $this->data['action'],
 	'items' => $this->data['items'],
@@ -190,14 +186,14 @@ $screen = CScreenBuilder::getScreen(array(
 	'mark_color' => getRequest('mark_color'),
 	'plaintext' => $this->data['plaintext'],
 	'graphtype' => $this->data['graphtype']
-));
+]);
 
 // append plaintext to widget
 if ($this->data['plaintext']) {
 	$plaintextSpan = new CSpan(null, 'textblackwhite');
 
 	foreach ($headerPlaintext as $text) {
-		$plaintextSpan->addItem(array(new CJsScript($text), BR()));
+		$plaintextSpan->addItem([new CJsScript($text), BR()]);
 	}
 
 	$screen = $screen->get();
@@ -210,32 +206,24 @@ if ($this->data['plaintext']) {
 	$historyWidget->addItem($plaintextSpan);
 }
 else {
-	$right = new CTable();
-	$right->addRow($header['right']);
-
-	$historyWidget->addPageHeader($header['left'], $right);
+	$historyWidget->setTitle($header['left']);
+	$historyWidget->setControls($header['right']);
 	$historyWidget->addItem(BR());
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
-		$historyWidget->addFlicker($filterForm, CProfile::get('web.history.filter.state', 1));
+		$filterForm->addNavigator();
 	}
 
-	$historyTable = new CTable(null, 'maxwidth');
-	$historyTable->addRow($screen->get());
-
-	$historyWidget->addItem($historyTable);
-
-	if (in_array($this->data['action'], array(HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH))) {
-		// time bar
-		$filter = array(
-			new CDiv(null, null, 'scrollbar_cntr')
-		);
+	if (in_array($this->data['action'], [HISTORY_VALUES, HISTORY_GRAPH, HISTORY_BATCH_GRAPH])) {
+		if(!isset($filterForm)) {
+			$filterForm = new CFilter('web.history.filter.state');
+		}
+		$filterColumn1 = new CFormList();
 
 		// display the graph type filter for graphs with multiple items
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
-			$filterTable = new CTable('', 'filter');
 
-			$graphType = array(
+			$graphType = [
 				new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, null, 'graphtype_'.GRAPH_TYPE_NORMAL,
 					($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
 				),
@@ -244,28 +232,26 @@ else {
 					($this->data['graphtype'] == GRAPH_TYPE_STACKED)
 				),
 				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
-			);
-			$filterTable->addRow(array(
-				new CCol(bold(_('Graph type').':'), 'label'),
-				new CCol(new CSpan($graphType, 'jqueryinputset radioset'), 'buttoncol')
-			));
+			];
+			$filterColumn1->addRow(_('Graph type'), $graphType);
+			$filterForm->addColumn($filterColumn1);
 
-			$filterForm = new CForm('GET');
-			$filterForm->setAttribute('name', 'zbx_filter');
-			$filterForm->setAttribute('id', 'zbx_filter');
 			$filterForm->addVar('action', $this->data['action']);
 			$filterForm->addVar('itemids', $this->data['itemids']);
-			$filterForm->addItem($filterTable);
-
-			$filter[] = $filterForm;
 		}
 
-		$historyWidget->addFlicker($filter, CProfile::get('web.history.filter.state', 1));
+		$filterForm->addNavigator();
+		$historyWidget->addItem($filterForm);
 
-		CScreenBuilder::insertScreenStandardJs(array(
+		$historyTable = (new CTable())->
+			addClass('maxwidth')->
+			addRow($screen->get());
+		$historyWidget->addItem($historyTable);
+
+		CScreenBuilder::insertScreenStandardJs([
 			'timeline' => $screen->timeline,
 			'profileIdx' => $screen->profileIdx
-		));
+		]);
 	}
 }
 

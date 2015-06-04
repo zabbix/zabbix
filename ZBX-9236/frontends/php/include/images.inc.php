@@ -33,7 +33,7 @@ function get_default_image() {
  * @return array image data from db
  */
 function get_image_by_imageid($imageid) {
-	static $images = array();
+	static $images = [];
 
 	if (!isset($images[$imageid])) {
 		$row = DBfetch(DBselect('SELECT i.* FROM images i WHERE i.imageid='.zbx_dbstr($imageid)));

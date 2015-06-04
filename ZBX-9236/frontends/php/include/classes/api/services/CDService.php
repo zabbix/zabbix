@@ -28,7 +28,7 @@ class CDService extends CApiService {
 
 	protected $tableName = 'dservices';
 	protected $tableAlias = 'ds';
-	protected $sortColumns = array('dserviceid', 'dhostid', 'ip');
+	protected $sortColumns = ['dserviceid', 'dhostid', 'ip'];
 
 	/**
 	 * Get discovery service data.
@@ -57,20 +57,20 @@ class CDService extends CApiService {
 	 *
 	 * @return array									service data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 
-		$sqlParts = array(
-			'select'	=> array('dservices' => 'ds.dserviceid'),
-			'from'		=> array('dservices' => 'dservices ds'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['dservices' => 'ds.dserviceid'],
+			'from'		=> ['dservices' => 'dservices ds'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'dserviceids'				=> null,
 			'dhostids'					=> null,
 			'dcheckids'					=> null,
@@ -96,7 +96,7 @@ class CDService extends CApiService {
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 // editable + PERMISSION CHECK
@@ -105,7 +105,7 @@ class CDService extends CApiService {
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
 		}
 		elseif (!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)) {
-			return array();
+			return [];
 		}
 
 // dserviceids
@@ -192,7 +192,7 @@ class CDService extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('dhostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['dhostid'], $options['output']);
 		}
 
 // removing keys (hash -> array)
@@ -201,27 +201,6 @@ class CDService extends CApiService {
 		}
 
 	return $result;
-	}
-
-	/**
-	 * Check if discovered service exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('dservice.exists method is deprecated.');
-
-		$service = $this->get(array(
-			'output' => array('dserviceid'),
-			'filter' => zbx_array_mintersect(array(array('dserviceid')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $service;
 	}
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
@@ -255,11 +234,11 @@ class CDService extends CApiService {
 				$relationMap->addRelation($rule['dserviceid'], $rule['druleid']);
 			}
 
-			$drules = API::DRule()->get(array(
+			$drules = API::DRule()->get([
 				'output' => $options['selectDRules'],
 				'druleids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			if (!is_null($options['limitSelects'])) {
 				order_result($drules, 'name');
 			}
@@ -269,11 +248,11 @@ class CDService extends CApiService {
 		// selectDHosts
 		if ($options['selectDHosts'] !== null && $options['selectDHosts'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'dserviceid', 'dhostid');
-			$dhosts = API::DHost()->get(array(
+			$dhosts = API::DHost()->get([
 				'output' => $options['selectDHosts'],
 				'dhosts' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			if (!is_null($options['limitSelects'])) {
 				order_result($dhosts, 'dhostid');
 			}
@@ -295,23 +274,23 @@ class CDService extends CApiService {
 					$relationMap->addRelation($rule['dserviceid'], $rule['hostid']);
 				}
 
-				$hosts = API::Host()->get(array(
+				$hosts = API::Host()->get([
 					'output' => $options['selectHosts'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true,
 					'sortfield' => 'status'
-				));
+				]);
 				if (!is_null($options['limitSelects'])) {
 					order_result($hosts, 'hostid');
 				}
 				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {
-				$hosts = API::Host()->get(array(
+				$hosts = API::Host()->get([
 					'dserviceids' => $dserviceIds,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$hosts = zbx_toHash($hosts, 'hostid');
 				foreach ($result as $dserviceid => $dservice) {
 					if (isset($hosts[$dserviceid]))

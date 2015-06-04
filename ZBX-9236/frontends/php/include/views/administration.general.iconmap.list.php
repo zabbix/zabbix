@@ -19,25 +19,25 @@
 **/
 
 
-$iconMapTable = new CTableInfo(_('No icon maps found.'));
-$iconMapTable->setHeader(array(
+$iconMapTable = new CTableInfo();
+$iconMapTable->setHeader([
 	_('Name'),
 	_('Icon map')
-));
+]);
 $iconMapTable->addItem(BR());
 
 foreach ($this->data['iconmaps'] as $iconMap) {
-	$row = array();
+	$row = [];
 	foreach ($iconMap['mappings'] as $mapping) {
 		$row[] = $this->data['inventoryList'][$mapping['inventory_link']].NAME_DELIMITER.
 				$mapping['expression'].SPACE.'&rArr;'.SPACE.$this->data['iconList'][$mapping['iconid']];
 		$row[] = BR();
 	}
 
-	$iconMapTable->addRow(array(
+	$iconMapTable->addRow([
 		new CLink($iconMap['name'], 'adm.iconmapping.php?form=update&iconmapid='.$iconMap['iconmapid']),
 		$row
-	));
+	]);
 }
 
 return $iconMapTable;

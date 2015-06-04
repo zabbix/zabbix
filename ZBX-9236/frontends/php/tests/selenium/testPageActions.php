@@ -138,12 +138,12 @@ class testPageActions extends CWebTest {
 	}
 
 	public static function allEventSources() {
-		return array(
-			array(EVENT_SOURCE_TRIGGERS),
-			array(EVENT_SOURCE_DISCOVERY),
-			array(EVENT_SOURCE_AUTO_REGISTRATION),
-			array(EVENT_SOURCE_INTERNAL)
-		);
+		return [
+			[EVENT_SOURCE_TRIGGERS],
+			[EVENT_SOURCE_DISCOVERY],
+			[EVENT_SOURCE_AUTO_REGISTRATION],
+			[EVENT_SOURCE_INTERNAL]
+		];
 	}
 
 	public static function allActions() {
@@ -166,17 +166,17 @@ class testPageActions extends CWebTest {
 		$this->zbxTestTextPresent('Actions');
 		$this->zbxTestTextPresent('Displaying');
 
-		$eventsources = array(
+		$eventsources = [
 			EVENT_SOURCE_TRIGGERS => 'Triggers',
 			EVENT_SOURCE_DISCOVERY => 'Discovery',
 			EVENT_SOURCE_AUTO_REGISTRATION => 'Auto registration',
 			EVENT_SOURCE_INTERNAL => 'Internal'
-		);
+		];
 
 		$this->zbxTestDrowpdownAssertSelected('eventsource', $eventsources[$eventsource]);
 		$this->zbxTestDropdownHasOptions('eventsource', $eventsources);
 
-		$this->zbxTestTextPresent(array('Name', 'Conditions', 'Operations', 'Status'));
+		$this->zbxTestTextPresent(['Name', 'Conditions', 'Operations', 'Status']);
 
 		$dbResult = DBselect(
 			'SELECT name,status'.
@@ -188,10 +188,10 @@ class testPageActions extends CWebTest {
 		while ($dbRow = DBfetch($dbResult)) {
 			$statusStr = ($dbRow['status'] == ACTION_STATUS_ENABLED ? 'Enabled' : 'Disabled');
 
-			$this->zbxTestTextPresent(array($dbRow['name'], $statusStr));
+			$this->zbxTestTextPresent([$dbRow['name'], $statusStr]);
 		}
 
-		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
 		$this->assertElementValue('goButton', 'Go (0)');
 	}
 

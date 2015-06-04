@@ -26,21 +26,23 @@ $page['title'] = _('ZABBIX');
 $page['file'] = 'index.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'name' =>		array(T_ZBX_STR, O_NO,	null,	null,		'isset({enter})', _('Username')),
-	'password' =>	array(T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'),
-	'sessionid' =>	array(T_ZBX_STR, O_OPT, null,	null,			null),
-	'reconnect' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 65535), null),
-	'enter' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'autologin' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
-	'request' =>	array(T_ZBX_STR, O_OPT, null,	null,			null)
-);
+$fields = [
+	'name' =>		[T_ZBX_STR, O_NO,	null,	null,		'isset({enter})', _('Username')],
+	'password' =>	[T_ZBX_STR, O_OPT, null,	null,			'isset({enter})'],
+	'sessionid' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
+	'reconnect' =>	[T_ZBX_INT, O_OPT, P_SYS|P_ACT,	BETWEEN(0, 65535), null],
+	'enter' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'autologin' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
+	'request' =>	[T_ZBX_STR, O_OPT, null,	null,			null]
+];
 check_fields($fields);
 
 // logout
 if (isset($_REQUEST['reconnect'])) {
 	DBstart();
-	add_audit(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, _('Manual Logout'));
+	add_audit_details(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, CWebUser::$data['userid'], '', _('Manual Logout'),
+		CWebUser::$data['userid']
+	);
 	DBend(true);
 	CWebUser::logout();
 	redirect('index.php');
@@ -69,7 +71,7 @@ if (isset($_REQUEST['enter']) && $_REQUEST['enter'] == _('Sign in')) {
 
 	if ($loginSuccess) {
 		// save remember login preference
-		$user = array('autologin' => $autoLogin);
+		$user = ['autologin' => $autoLogin];
 
 		if (CWebUser::$data['autologin'] != $autoLogin) {
 			API::User()->updateProfile($user);

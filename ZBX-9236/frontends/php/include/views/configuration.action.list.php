@@ -18,49 +18,52 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$actionWidget = new CWidget();
+$actionWidget = (new CWidget())->setTitle(_('Actions'));
 
 // create new action button
 $createForm = new CForm('get');
 $createForm->cleanItems();
-$createForm->addVar('eventsource', $this->data['eventsource']);
-$createForm->addItem(new CSubmit('form', _('Create action')));
-$actionWidget->addPageHeader(_('CONFIGURATION OF ACTIONS'), $createForm);
+$createForm->addVar('eventsource', $data['eventsource']);
+$controls = new CList();
 
 // create widget header
-$sourceComboBox = new CComboBox('eventsource', $this->data['eventsource'], 'submit()');
-$sourceComboBox->addItem(EVENT_SOURCE_TRIGGERS, _('Triggers'));
-$sourceComboBox->addItem(EVENT_SOURCE_DISCOVERY, _('Discovery'));
-$sourceComboBox->addItem(EVENT_SOURCE_AUTO_REGISTRATION, _('Auto registration'));
-$sourceComboBox->addItem(EVENT_SOURCE_INTERNAL, _x('Internal', 'event source'));
-$filterForm = new CForm('get');
-$filterForm->addItem(array(_('Event source'), SPACE, $sourceComboBox));
+$controls->addItem([_('Event source'), SPACE, new CComboBox('eventsource', $data['eventsource'], 'submit()',
+	[
+		EVENT_SOURCE_TRIGGERS => _('Triggers'),
+		EVENT_SOURCE_DISCOVERY => _('Discovery'),
+		EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
+		EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
+	]
+)]);
+$controls->addItem(new CSubmit('form', _('Create action')));
 
-$actionWidget->addHeader(_('Actions'), $filterForm);
-$actionWidget->addHeaderRowNumber();
+$createForm->addItem($controls);
+
+$actionWidget->setControls($createForm);
 
 // create form
 $actionForm = new CForm();
 $actionForm->setName('actionForm');
 
 // create table
-$actionTable = new CTableInfo(_('No actions found.'));
-$actionTable->setHeader(array(
-	new CCheckBox('all_items', null, "checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');"),
+$actionTable = new CTableInfo();
+$actionTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_items', null, "checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Conditions'),
 	_('Operations'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 if ($this->data['actions']) {
 	$actionConditionStringValues = actionConditionValueToString($this->data['actions'], $this->data['config']);
 	$actionOperationDescriptions = getActionOperationDescriptions($this->data['actions']);
 
 	foreach ($this->data['actions'] as $aIdx => $action) {
-		$conditions = array();
-		$operations = array();
+		$conditions = [];
+		$operations = [];
 
 		order_result($action['filter']['conditions'], 'conditiontype', ZBX_SORT_DOWN);
 
@@ -71,7 +74,7 @@ if ($this->data['actions']) {
 			$conditions[] = BR();
 		}
 
-		sortOperations($this->data['eventsource'], $action['operations']);
+		sortOperations($data['eventsource'], $action['operations']);
 
 		foreach ($action['operations'] as $oIdx => $operation) {
 			$operations[] = $actionOperationDescriptions[$aIdx][$oIdx];
@@ -80,37 +83,36 @@ if ($this->data['actions']) {
 		if ($action['status'] == ACTION_STATUS_DISABLED) {
 			$status = new CLink(_('Disabled'),
 				'actionconf.php?action=action.massenable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
-				'disabled'
+				ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED
 			);
 		}
 		else {
 			$status = new CLink(_('Enabled'),
 				'actionconf.php?action=action.massdisable&g_actionid[]='.$action['actionid'].url_param('eventsource'),
-				'enabled'
+				ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN
 			);
 		}
 
-		$actionTable->addRow(array(
+		$actionTable->addRow([
 			new CCheckBox('g_actionid['.$action['actionid'].']', null, null, $action['actionid']),
 			new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
 			$conditions,
-			new CCol($operations, 'wraptext'),
+			$operations,
 			$status
-		));
+		]);
 	}
 }
 
 // append table to form
-$actionForm->addItem(array(
-	$this->data['paging'],
+$actionForm->addItem([
 	$actionTable,
 	$this->data['paging'],
-	get_table_header(new CActionButtonList('action', 'g_actionid', array(
-		'action.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected actions?')),
-		'action.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected actions?')),
-		'action.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected actions?'))
-	)))
-));
+	new CActionButtonList('action', 'g_actionid', [
+		'action.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected actions?')],
+		'action.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected actions?')],
+		'action.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected actions?')]
+	])
+]);
 
 // append form to widget
 $actionWidget->addItem($actionForm);

@@ -25,18 +25,17 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Trigger description');
 $page['file'] = 'tr_comments.php';
-$page['hist_arg'] = array('triggerid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'triggerid' =>	array(T_ZBX_INT, O_MAND, P_SYS,			DB_ID,	null),
-	'comments' =>	array(T_ZBX_STR, O_OPT, null,			null,	'isset({update})'),
+$fields = [
+	'triggerid' =>	[T_ZBX_INT, O_MAND, P_SYS,			DB_ID,	null],
+	'comments' =>	[T_ZBX_STR, O_OPT, null,			null,	'isset({update})'],
 	// actions
-	'update' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null)
-);
+	'update' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'cancel' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null]
+];
 check_fields($fields);
 
 if (!isset($_REQUEST['triggerid'])) {
@@ -46,11 +45,11 @@ if (!isset($_REQUEST['triggerid'])) {
 /*
  * Permissions
  */
-$trigger = API::Trigger()->get(array(
+$trigger = API::Trigger()->get([
 	'triggerids' => $_REQUEST['triggerid'],
 	'output' => API_OUTPUT_EXTEND,
 	'expandDescription' => true
-));
+]);
 
 if (!$trigger) {
 	access_deny();
@@ -90,18 +89,18 @@ elseif (isset($_REQUEST['cancel'])) {
 /*
  * Display
  */
-$triggerEditable = API::Trigger()->get(array(
+$triggerEditable = API::Trigger()->get([
 	'triggerids' => $_REQUEST['triggerid'],
-	'output' => array('triggerid'),
+	'output' => ['triggerid'],
 	'editable' => true
-));
+]);
 
-$data = array(
+$data = [
 	'triggerid' => getRequest('triggerid'),
 	'trigger' => $trigger,
 	'isTriggerEditable' => !empty($triggerEditable),
 	'isCommentExist' => !empty($trigger['comments'])
-);
+];
 
 // render view
 $triggerCommentView = new CView('monitoring.triggerComment', $data);

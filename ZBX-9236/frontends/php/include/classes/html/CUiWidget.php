@@ -68,9 +68,10 @@ class CUiWidget extends CDiv {
 	 */
 	public function __construct($id, $body = null) {
 		$this->id = $id;
-		$this->body = $body ? array($body) : array();
+		$this->body = $body ? [$body] : [];
 
-		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget ui-tabs');
+//		parent::__construct(null, 'ui-widget ui-widget-content ui-helper-clearfix ui-corner-all widget ui-tabs');
+		parent::__construct(null, 'dashbrd-widget');
 
 		$this->setAttribute('id', $this->id.'_widget');
 	}
@@ -79,18 +80,22 @@ class CUiWidget extends CDiv {
 	 * Set widget header.
 	 *
 	 * @param string|array|CTag $caption
-	 * @param string|array|CTag $icons
+	 * @param array             $icons
 	 */
-	public function setHeader($caption = null, $icons = SPACE) {
+	public function setHeader($caption = null, array $icons = []) {
 		zbx_value2array($icons);
 
 		if ($caption === null && $icons !== null) {
 			$caption = SPACE;
 		}
 
-		$this->header = new CDiv(null, 'nowrap ui-corner-all ui-widget-header header');
+		$this->header = new CDiv(null, 'dashbrd-widget-head header');
 
-		$this->header->addItem(array($icons, $caption));
+		$this->header->addItem(new CTag('h4', 'yes', $caption));
+
+		if ($icons) {
+			$this->header->addItem(new CList($icons));
+		}
 	}
 
 	/**
@@ -100,17 +105,17 @@ class CUiWidget extends CDiv {
 	 * @param string|array|CTag $rightColumn
 	 */
 	public function setDoubleHeader($leftColumn, $rightColumn) {
-		$leftColumn = new CCol($leftColumn);
-		$leftColumn->addStyle('text-align: left; border: 0;');
+		$leftColumn = (new CCol($leftColumn))->
+			addStyle('text-align: left; border: 0;');
 
-		$rightColumn = new CCol($rightColumn);
-		$rightColumn->addStyle('text-align: right; border: 0;');
+		$rightColumn = (new CCol($rightColumn))->
+			addStyle('text-align: right; border: 0;');
 
 		$table = new CTable();
 		$table->addStyle('width: 100%;');
-		$table->addRow(array($leftColumn, $rightColumn));
+		$table->addRow([$leftColumn, $rightColumn]);
 
-		$this->header = new CDiv($table, 'nowrap ui-corner-all ui-widget-header header');
+		$this->header = new CDiv($table, ZBX_STYLE_NOWRAP.' ui-corner-all ui-widget-header header');
 	}
 
 	/**
@@ -119,8 +124,9 @@ class CUiWidget extends CDiv {
 	 * @param string|array|CTag $footer
 	 * @param bool				$right
 	 */
-	public function setFooter($footer, $right = false) {
-		$this->footer = new CDiv($footer, 'nowrap ui-corner-all ui-widget-header footer '.($right ? ' right' : ' left'));
+	public function setFooter($list) {
+		$this->footer = $list;
+		$this->footer->addClass('dashbrd-widget-foot');
 	}
 
 	/**

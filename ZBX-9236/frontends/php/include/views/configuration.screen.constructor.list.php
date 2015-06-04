@@ -19,20 +19,18 @@
 **/
 
 
-$screenWidget = new CWidget();
-$screenWidget->addPageHeader(_('CONFIGURATION OF SCREENS'));
-$screenWidget->addHeader($this->data['screen']['name']);
+$screenWidget = (new CWidget())->setTitle(_('Screens'))->addHeader($this->data['screen']['name']);
 if (!empty($this->data['screen']['templateid'])) {
 	$screenWidget->addItem(get_header_host_table('screens', $this->data['screen']['templateid']));
 }
 $screenWidget->addItem(BR());
 
-$screenBuilder = new CScreenBuilder(array(
+$screenBuilder = new CScreenBuilder([
 	'isFlickerfree' => false,
 	'screen' => $this->data['screen'],
 	'mode' => SCREEN_MODE_EDIT,
 	'updateProfile' => false
-));
+]);
 $screenWidget->addItem($screenBuilder->show());
 
 $screenBuilder->insertInitScreenJs($this->data['screenid']);

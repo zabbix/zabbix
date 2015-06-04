@@ -35,7 +35,7 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestTextPresent('Host');
 		$this->zbxTestTextPresent('Source');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(array('Time', 'Host', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions'));
+		$this->zbxTestTextPresent(['Time', 'Host', 'Description', 'Status', 'Severity', 'Duration', 'Ack', 'Actions']);
 	}
 
 	public function testPageEvents_Discovery_CheckLayout() {
@@ -47,7 +47,7 @@ class testPageEvents extends CWebTest {
 		$this->zbxTestTextPresent('HISTORY OF EVENTS');
 		$this->zbxTestTextPresent('Source');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(array('Time', 'IP', 'DNS', 'Description', 'Status'));
+		$this->zbxTestTextPresent(['Time', 'IP', 'DNS', 'Description', 'Status']);
 	}
 
 	public function testPageEvents_Triggers_NoHostNames() {

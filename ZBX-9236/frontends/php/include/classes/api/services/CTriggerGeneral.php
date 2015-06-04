@@ -33,7 +33,7 @@ abstract class CTriggerGeneral extends CApiService {
 	 *
 	 * @return array
 	 */
-	abstract public function get(array $options = array());
+	abstract public function get(array $options = []);
 
 	/**
 	 * @abstract
@@ -64,11 +64,11 @@ abstract class CTriggerGeneral extends CApiService {
 	 * @return bool
 	 */
 	protected function inherit(array $trigger, array $hostIds = null) {
-		$triggerTemplates = API::Template()->get(array(
+		$triggerTemplates = API::Template()->get([
 			'triggerids' => $trigger['triggerid'],
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true
-		));
+		]);
 
 		if (empty($triggerTemplates)) {
 			// nothing to inherit, just exit
@@ -76,11 +76,11 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		if (!isset($trigger['expression']) || !isset($trigger['description'])) {
-			$dbTriggers = $this->get(array(
+			$dbTriggers = $this->get([
 				'triggerids' => $trigger['triggerid'],
-				'output' => array('expression', 'description'),
+				'output' => ['expression', 'description'],
 				'nopermissions' => true
-			));
+			]);
 			$dbTrigger = reset($dbTriggers);
 
 			if (!isset($trigger['description'])) {
@@ -92,14 +92,14 @@ abstract class CTriggerGeneral extends CApiService {
 		}
 
 		// fetch all of the child hosts
-		$childHosts = API::Host()->get(array(
+		$childHosts = API::Host()->get([
 			'templateids' => zbx_objectValues($triggerTemplates, 'templateid'),
-			'output' => array('hostid', 'host'),
+			'output' => ['hostid', 'host'],
 			'preservekeys' => true,
 			'hostids' => $hostIds,
 			'nopermissions' => true,
 			'templated_hosts' => true
-		));
+		]);
 
 		foreach ($childHosts as $childHost) {
 			// update the child trigger on the child host
@@ -153,11 +153,11 @@ abstract class CTriggerGeneral extends CApiService {
 		while ($exprPart = prev($expressionData->expressions));
 
 		// check if a child trigger already exists on the host
-		$childTriggers = $this->get(array(
-			'filter' => array('templateid' => $newTrigger['templateid']),
-			'output' => array('triggerid'),
+		$childTriggers = $this->get([
+			'filter' => ['templateid' => $newTrigger['templateid']],
+			'output' => ['triggerid'],
 			'hostids' => $chdHost['hostid']
-		));
+		]);
 
 		// yes we have a child trigger, just update it
 		if ($childTrigger = reset($childTriggers)) {
@@ -166,15 +166,15 @@ abstract class CTriggerGeneral extends CApiService {
 		// no child trigger found
 		else {
 			// look for a trigger with the same description and expression
-			$childTriggers = $this->get(array(
-				'filter' => array(
+			$childTriggers = $this->get([
+				'filter' => [
 					'description' => $newTrigger['description'],
 					'flags' => null
-				),
-				'output' => array('triggerid', 'expression'),
+				],
+				'output' => ['triggerid', 'expression'],
 				'nopermissions' => true,
 				'hostids' => $chdHost['hostid']
-			));
+			]);
 
 			foreach ($childTriggers as $childTrigger) {
 				$tmpExp = explode_exp($childTrigger['expression']);
@@ -193,11 +193,11 @@ abstract class CTriggerGeneral extends CApiService {
 			$this->updateReal($newTrigger);
 		}
 		else {
-			$oldTrigger = $this->get(array(
+			$oldTrigger = $this->get([
 				'triggerids' => $trigger['triggerid'],
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
-			));
+			]);
 			$oldTrigger = reset($oldTrigger);
 			unset($oldTrigger['triggerid']);
 			foreach ($oldTrigger as $key => $value) {
@@ -232,14 +232,14 @@ abstract class CTriggerGeneral extends CApiService {
 		// make sure we have all the required data
 		if (!isset($trigger['description']) || !isset($trigger['expression'])) {
 			$explodeExpression = !isset($trigger['expression']);
-			$trigger = $this->extendObject($this->tableName(), $trigger, array('description', 'expression'));
+			$trigger = $this->extendObject($this->tableName(), $trigger, ['description', 'expression']);
 
 			if ($explodeExpression) {
 				$trigger['expression'] = explode_exp($trigger['expression']);
 			}
 		}
 
-		$filter = array('description' => $trigger['description']);
+		$filter = ['description' => $trigger['description']];
 
 		if ($hostId) {
 			$filter['hostid'] = $hostId;
@@ -251,11 +251,11 @@ abstract class CTriggerGeneral extends CApiService {
 			$filter['host'] = reset($expressionHosts);
 		}
 
-		$triggers = $this->get(array(
+		$triggers = $this->get([
 			'filter' => $filter,
-			'output' => array('expression', 'triggerid'),
+			'output' => ['expression', 'triggerid'],
 			'nopermissions' => true
-		));
+		]);
 
 		foreach ($triggers as $dbTrigger) {
 			$tmpExp = explode_exp($dbTrigger['expression']);
@@ -264,14 +264,14 @@ abstract class CTriggerGeneral extends CApiService {
 			$differentTrigger = (!isset($trigger['triggerid']) || !idcmp($trigger['triggerid'], $dbTrigger['triggerid']));
 
 			if (strcmp($tmpExp, $trigger['expression']) == 0 && $differentTrigger) {
-				$options = array(
-					'output' => array('name'),
+				$options = [
+					'output' => ['name'],
 					'templated_hosts' => true,
 					'nopermissions' => true,
 					'limit' => 1
-				);
+				];
 				if (isset($filter['host'])) {
-					$options['filter'] = array('host' => $filter['host']);
+					$options['filter'] = ['host' => $filter['host']];
 				}
 				else {
 					$options['hostids'] = $hostId;
@@ -304,11 +304,11 @@ abstract class CTriggerGeneral extends CApiService {
 				$relationMap->addRelation($relation['triggerid'], $relation['groupid']);
 			}
 
-			$groups = API::HostGroup()->get(array(
+			$groups = API::HostGroup()->get([
 				'output' => $options['selectGroups'],
 				'groupids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $groups, 'groups');
 		}
 
@@ -325,13 +325,13 @@ abstract class CTriggerGeneral extends CApiService {
 				$relationMap->addRelation($relation['triggerid'], $relation['hostid']);
 			}
 
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'output' => $options['selectHosts'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			]);
 			if (!is_null($options['limitSelects'])) {
 				order_result($hosts, 'host');
 			}
@@ -340,14 +340,14 @@ abstract class CTriggerGeneral extends CApiService {
 
 		// adding functions
 		if ($options['selectFunctions'] !== null && $options['selectFunctions'] != API_OUTPUT_COUNT) {
-			$functions = API::getApiService()->select('functions', array(
-				'output' => $this->outputExtend($options['selectFunctions'], array('triggerid', 'functionid')),
-				'filter' => array('triggerid' => $triggerids),
+			$functions = API::getApiService()->select('functions', [
+				'output' => $this->outputExtend($options['selectFunctions'], ['triggerid', 'functionid']),
+				'filter' => ['triggerid' => $triggerids],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($functions, 'triggerid', 'functionid');
 
-			$functions = $this->unsetExtraFields($functions, array('triggerid', 'functionid'), $options['selectFunctions']);
+			$functions = $this->unsetExtraFields($functions, ['triggerid', 'functionid'], $options['selectFunctions']);
 			$result = $relationMap->mapMany($result, $functions, 'functions');
 		}
 

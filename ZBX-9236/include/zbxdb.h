@@ -149,6 +149,12 @@
 #	define ZBX_SQL_MOD(x, y) "mod(" #x "," #y ")"
 #endif
 
+#ifdef HAVE_SQLITE3
+#	define ZBX_FOR_UPDATE	""	/* SQLite3 does not support "select ... for update" */
+#else
+#	define ZBX_FOR_UPDATE	" for update"
+#endif
+
 #ifdef HAVE_MULTIROW_INSERT
 #	define ZBX_ROW_DL	","
 #else

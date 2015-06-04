@@ -26,13 +26,12 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Configuration of screens');
 $page['file'] = 'screenedit.php';
-$page['hist_arg'] = array('screenid');
-$page['scripts'] = array('class.cscreen.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js');
+$page['scripts'] = ['class.cscreen.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js', 'multiselect.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$knownResourceTypes = array(
+$knownResourceTypes = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_MAP,
@@ -54,63 +53,63 @@ $knownResourceTypes = array(
 	SCREEN_RESOURCE_CHART,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_LLD_GRAPH
-);
+];
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'screenid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,			null),
-	'screenitemid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'resourcetype' =>	array(T_ZBX_INT, O_OPT, null,	IN($knownResourceTypes), 'isset({add}) || isset({update})'),
-	'caption' =>		array(T_ZBX_STR, O_OPT, null,	null,			null),
-	'resourceid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null,
-		hasRequest('add') || hasRequest('update') ? getResourceNameByType(getRequest('resourcetype')) : null),
-	'templateid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,			null),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')),
-	'height' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')),
-	'max_columns' =>	array(T_ZBX_INT, O_OPT, null,
+$fields = [
+	'screenid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,			null],
+	'screenitemid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'resourcetype' =>	[T_ZBX_INT, O_OPT, null,	IN($knownResourceTypes), 'isset({add}) || isset({update})'],
+	'caption' =>		[T_ZBX_STR, O_OPT, null,	null,			null],
+	'resourceid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,			null,
+		hasRequest('add') || hasRequest('update') ? getResourceNameByType(getRequest('resourcetype')) : null],
+	'templateid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,			null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Width')],
+	'height' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), null, _('Height')],
+	'max_columns' =>	[T_ZBX_INT, O_OPT, null,
 		BETWEEN(SCREEN_SURROGATE_MAX_COLUMNS_MIN, SCREEN_SURROGATE_MAX_COLUMNS_MAX), null, _('Max columns')
-	),
-	'colspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Column span')),
-	'rowspan' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Row span')),
-	'elements' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Show lines')),
-	'sort_triggers' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(SCREEN_SORT_TRIGGERS_DATE_DESC, SCREEN_SORT_TRIGGERS_RECIPIENT_DESC), null),
-	'valign' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(VALIGN_MIDDLE, VALIGN_BOTTOM), null),
-	'halign' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(HALIGN_CENTER, HALIGN_RIGHT), null),
-	'style' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 2),	'isset({add}) || isset({update})'),
-	'url' =>			array(T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'),
-	'dynamic' =>		array(T_ZBX_INT, O_OPT, null,	null,			null),
-	'x' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), '(isset({add}) || isset({update})) && isset({form}) && {form} != "update"'),
-	'y' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), '(isset({add}) || isset({update})) && isset({form}) && {form} != "update"'),
-	'screen_type' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
-	'tr_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'tr_hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null),
-	'application' =>	array(T_ZBX_STR, O_OPT, null,	null,			null),
+	],
+	'colspan' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Column span')],
+	'rowspan' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Row span')],
+	'elements' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), null, _('Show lines')],
+	'sort_triggers' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(SCREEN_SORT_TRIGGERS_DATE_DESC, SCREEN_SORT_TRIGGERS_RECIPIENT_DESC), null],
+	'valign' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(VALIGN_MIDDLE, VALIGN_BOTTOM), null],
+	'halign' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(HALIGN_CENTER, HALIGN_RIGHT), null],
+	'style' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 2),	'isset({add}) || isset({update})'],
+	'url' =>			[T_ZBX_STR, O_OPT, null,	null,			'isset({add}) || isset({update})'],
+	'dynamic' =>		[T_ZBX_INT, O_OPT, null,	null,			null],
+	'x' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), '(isset({add}) || isset({update})) && isset({form}) && {form} != "update"'],
+	'y' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(1, 100), '(isset({add}) || isset({update})) && isset({form}) && {form} != "update"'],
+	'screen_type' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
+	'tr_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'tr_hostid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,			null],
+	'application' =>	[T_ZBX_STR, O_OPT, null,	null,			null],
 	// actions
-	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,			null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,			null),
-	'add_row' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
-	'add_col' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
-	'rmv_row' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
-	'rmv_col' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
-	'sw_pos' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null),
-	'ajaxAction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,			null)
-);
+	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
+	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
+	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,			null],
+	'add_row' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
+	'add_col' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
+	'rmv_row' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
+	'rmv_col' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
+	'sw_pos' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 100), null],
+	'ajaxAction' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,			null]
+];
 check_fields($fields);
 $_REQUEST['dynamic'] = getRequest('dynamic', SCREEN_SIMPLE_ITEM);
 
 /*
  * Permissions
  */
-$options = array(
+$options = [
 	'screenids' => $_REQUEST['screenid'],
 	'editable' => true,
 	'output' => API_OUTPUT_EXTEND,
 	'selectScreenItems' => API_OUTPUT_EXTEND
-);
+];
 $screens = API::Screen()->get($options);
 if (empty($screens)) {
 	$screens = API::TemplateScreen()->get($options);
@@ -124,7 +123,7 @@ $screen = reset($screens);
  * Ajax
  */
 if (!empty($_REQUEST['ajaxAction']) && $_REQUEST['ajaxAction'] == 'sw_pos') {
-	$sw_pos = getRequest('sw_pos', array());
+	$sw_pos = getRequest('sw_pos', []);
 	if (count($sw_pos) > 3) {
 		DBstart();
 
@@ -181,7 +180,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
-	$screenItem = array(
+	$screenItem = [
 		'screenid' => getRequest('screenid'),
 		'resourcetype' => getRequest('resourcetype'),
 		'caption' => getRequest('caption'),
@@ -198,7 +197,7 @@ if (hasRequest('add') || hasRequest('update')) {
 		'elements' => getRequest('elements', 0),
 		'sort_triggers' => getRequest('sort_triggers', SCREEN_SORT_TRIGGERS_DATE_DESC),
 		'application' => getRequest('application', '')
-	);
+	];
 
 	if (hasRequest('resourceid')) {
 		$screenItem['resourceid'] = getRequest('resourceid');
@@ -233,7 +232,7 @@ if (hasRequest('add') || hasRequest('update')) {
 elseif (hasRequest('delete')) {
 	DBstart();
 
-	$screenitemid = API::ScreenItem()->delete(array(getRequest('screenitemid')));
+	$screenitemid = API::ScreenItem()->delete([getRequest('screenitemid')]);
 
 	if ($screenitemid) {
 		$screenitemid = reset($screenitemid);
@@ -377,9 +376,9 @@ elseif (isset($_REQUEST['rmv_col'])) {
 /*
  * Display
  */
-$data = array(
+$data = [
 	'screenid' => getRequest('screenid', 0)
-);
+];
 
 // getting updated screen, so we wont have to refresh the page to see changes
 $data['screen'] = API::Screen()->get($options);

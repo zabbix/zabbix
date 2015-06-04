@@ -28,7 +28,7 @@ class CHostInterface extends CApiService {
 
 	protected $tableName = 'interface';
 	protected $tableAlias = 'hi';
-	protected $sortColumns = array('interfaceid', 'dns', 'ip');
+	protected $sortColumns = ['interfaceid', 'dns', 'ip'];
 
 	/**
 	 * Get interface data.
@@ -46,21 +46,21 @@ class CHostInterface extends CApiService {
 	 *
 	 * @return array|boolean Interface data as array or false if error
 	 */
-	public function get(array $options = array()) {
-		$result = array();
+	public function get(array $options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userId = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('interface' => 'hi.interfaceid'),
-			'from'		=> array('interface' => 'interface hi'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['interface' => 'hi.interfaceid'],
+			'from'		=> ['interface' => 'interface hi'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'interfaceids'				=> null,
@@ -86,7 +86,7 @@ class CHostInterface extends CApiService {
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
@@ -178,7 +178,7 @@ class CHostInterface extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -187,27 +187,6 @@ class CHostInterface extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Check if host interface exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('hostinterface.exists method is deprecated.');
-
-		$hostInterface = $this->get(array(
-			'output' => array('interfaceid'),
-			'filter' => zbx_array_mintersect(array('interfaceid', 'hostid', 'ip', 'dns'), $object),
-			'limit' => 1
-		));
-
-		return (bool) $hostInterface;
 	}
 
 	/**
@@ -221,38 +200,38 @@ class CHostInterface extends CApiService {
 
 		// permissions
 		if ($update) {
-			$interfaceDBfields = array('interfaceid' => null);
-			$dbInterfaces = $this->get(array(
+			$interfaceDBfields = ['interfaceid' => null];
+			$dbInterfaces = $this->get([
 				'output' => API_OUTPUT_EXTEND,
 				'interfaceids' => zbx_objectValues($interfaces, 'interfaceid'),
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 		}
 		else {
-			$interfaceDBfields = array(
+			$interfaceDBfields = [
 				'hostid' => null,
 				'ip' => null,
 				'dns' => null,
 				'useip' => null,
 				'port' => null,
 				'main' => null
-			);
+			];
 		}
 
-		$dbHosts = API::Host()->get(array(
-			'output' => array('host'),
+		$dbHosts = API::Host()->get([
+			'output' => ['host'],
 			'hostids' => zbx_objectValues($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
-		$dbProxies = API::Proxy()->get(array(
-			'output' => array('host'),
+		$dbProxies = API::Proxy()->get([
+			'output' => ['host'],
 			'proxyids' => zbx_objectValues($interfaces, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($interfaces as &$interface) {
 			if (!check_db_fields($interfaceDBfields, $interface)) {
@@ -336,11 +315,11 @@ class CHostInterface extends CApiService {
 
 		// check if any of the affected hosts are discovered
 		if ($update) {
-			$interfaces = $this->extendObjects('interface', $interfaces, array('hostid'));
+			$interfaces = $this->extendObjects('interface', $interfaces, ['hostid']);
 		}
-		$this->checkValidator(zbx_objectValues($interfaces, 'hostid'), new CHostNormalValidator(array(
+		$this->checkValidator(zbx_objectValues($interfaces, 'hostid'), new CHostNormalValidator([
 			'message' => _('Cannot update interface for discovered host "%1$s".')
-		)));
+		]));
 	}
 
 	/**
@@ -358,7 +337,7 @@ class CHostInterface extends CApiService {
 
 		$interfaceIds = DB::insert('interface', $interfaces);
 
-		return array('interfaceids' => $interfaceIds);
+		return ['interfaceids' => $interfaceIds];
 	}
 
 	/**
@@ -374,16 +353,16 @@ class CHostInterface extends CApiService {
 		$this->checkInput($interfaces, __FUNCTION__);
 		$this->checkMainInterfacesOnUpdate($interfaces);
 
-		$data = array();
+		$data = [];
 		foreach ($interfaces as $interface) {
-			$data[] = array(
+			$data[] = [
 				'values' => $interface,
-				'where' => array('interfaceid' => $interface['interfaceid'])
-			);
+				'where' => ['interfaceid' => $interface['interfaceid']]
+			];
 		}
 		DB::update('interface', $data);
 
-		return array('interfaceids' => zbx_objectValues($interfaces, 'interfaceid'));
+		return ['interfaceids' => zbx_objectValues($interfaces, 'interfaceid')];
 	}
 
 	protected function clearValues(array $interface) {
@@ -412,12 +391,12 @@ class CHostInterface extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$dbInterfaces = $this->get(array(
+		$dbInterfaces = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'interfaceids' => $interfaceids,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 		foreach ($interfaceids as $interfaceId) {
 			if (!isset($dbInterfaces[$interfaceId])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -426,16 +405,16 @@ class CHostInterface extends CApiService {
 
 		$this->checkMainInterfacesOnDelete($interfaceids);
 
-		DB::delete('interface', array('interfaceid' => $interfaceids));
+		DB::delete('interface', ['interfaceid' => $interfaceids]);
 
-		return array('interfaceids' => $interfaceids);
+		return ['interfaceids' => $interfaceids];
 	}
 
 	public function massAdd(array $data) {
 		$interfaces = zbx_toArray($data['interfaces']);
 		$hosts = zbx_toArray($data['hosts']);
 
-		$insertData = array();
+		$insertData = [];
 		foreach ($interfaces as $interface) {
 			foreach ($hosts as $host) {
 				$newInterface = $interface;
@@ -447,7 +426,7 @@ class CHostInterface extends CApiService {
 
 		$interfaceIds = $this->create($insertData);
 
-		return array('interfaceids' => $interfaceIds);
+		return ['interfaceids' => $interfaceIds];
 	}
 
 	protected function validateMassRemove(array $data) {
@@ -466,16 +445,16 @@ class CHostInterface extends CApiService {
 			$this->checkBulk($interface);
 
 			// check main interfaces
-			$interfacesToRemove = API::getApiService()->select($this->tableName(), array(
-				'output' => array('interfaceid'),
-				'filter' => array(
+			$interfacesToRemove = API::getApiService()->select($this->tableName(), [
+				'output' => ['interfaceid'],
+				'filter' => [
 					'hostid' => $data['hostids'],
 					'ip' => $interface['ip'],
 					'dns' => $interface['dns'],
 					'port' => $interface['port'],
 					'bulk' => $interface['bulk']
-				)
-			));
+				]
+			]);
 			if ($interfacesToRemove) {
 				$this->checkMainInterfacesOnDelete(zbx_objectValues($interfacesToRemove, 'interfaceid'));
 			}
@@ -498,20 +477,20 @@ class CHostInterface extends CApiService {
 
 		$this->validateMassRemove($data);
 
-		$interfaceIds = array();
+		$interfaceIds = [];
 		foreach ($data['interfaces'] as $interface) {
-			$interfaces = $this->get(array(
-				'output' => array('interfaceid'),
-				'filter' => array(
+			$interfaces = $this->get([
+				'output' => ['interfaceid'],
+				'filter' => [
 					'hostid' => $data['hostids'],
 					'ip' => $interface['ip'],
 					'dns' => $interface['dns'],
 					'port' => $interface['port'],
 					'bulk' => $interface['bulk']
-				),
+				],
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			if ($interfaces) {
 				$interfaceIds = array_merge($interfaceIds, array_keys($interfaces));
@@ -520,10 +499,10 @@ class CHostInterface extends CApiService {
 
 		if ($interfaceIds) {
 			$interfaceIds = array_keys(array_flip($interfaceIds));
-			DB::delete('interface', array('interfaceid' => $interfaceIds));
+			DB::delete('interface', ['interfaceid' => $interfaceIds]);
 		}
 
-		return array('interfaceids' => $interfaceIds);
+		return ['interfaceids' => $interfaceIds];
 	}
 
 	/**
@@ -537,15 +516,15 @@ class CHostInterface extends CApiService {
 
 			$this->checkHostInterfaces($host['interfaces'], $host['hostid']);
 
-			$interfacesToDelete = API::HostInterface()->get(array(
+			$interfacesToDelete = API::HostInterface()->get([
 				'hostids' => $host['hostid'],
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true,
 				'nopermissions' => true
-			));
+			]);
 
-			$interfacesToAdd = array();
-			$interfacesToUpdate = array();
+			$interfacesToAdd = [];
+			$interfacesToUpdate = [];
 
 			foreach ($host['interfaces'] as $interface) {
 				$interface['hostid'] = $host['hostid'];
@@ -562,12 +541,12 @@ class CHostInterface extends CApiService {
 			if ($interfacesToUpdate) {
 				API::HostInterface()->checkInput($interfacesToUpdate, 'update');
 
-				$data = array();
+				$data = [];
 				foreach ($interfacesToUpdate as $interface) {
-					$data[] = array(
+					$data[] = [
 						'values' => $interface,
-						'where' => array('interfaceid' => $interface['interfaceid'])
-					);
+						'where' => ['interfaceid' => $interface['interfaceid']]
+					];
 				}
 				DB::update('interface', $data);
 			}
@@ -668,7 +647,7 @@ class CHostInterface extends CApiService {
 	}
 
 	private function checkHostInterfaces(array $interfaces, $hostid) {
-		$interfacesWithMissingData = array();
+		$interfacesWithMissingData = [];
 
 		foreach ($interfaces as $interface) {
 			if (!isset($interface['type'], $interface['main'])) {
@@ -677,12 +656,12 @@ class CHostInterface extends CApiService {
 		}
 
 		if ($interfacesWithMissingData) {
-			$dbInterfaces = API::HostInterface()->get(array(
+			$dbInterfaces = API::HostInterface()->get([
 				'interfaceids' => $interfacesWithMissingData,
-				'output' => array('main', 'type'),
+				'output' => ['main', 'type'],
 				'preservekeys' => true,
 				'nopermissions' => true
-			));
+			]);
 		}
 
 		foreach ($interfaces as $id => $interface) {
@@ -696,24 +675,24 @@ class CHostInterface extends CApiService {
 	}
 
 	private function checkMainInterfacesOnCreate(array $interfaces) {
-		$hostIds = array();
+		$hostIds = [];
 		foreach ($interfaces as $interface) {
 			$hostIds[$interface['hostid']] = $interface['hostid'];
 		}
 
-		$dbInterfaces = API::HostInterface()->get(array(
+		$dbInterfaces = API::HostInterface()->get([
 			'hostids' => $hostIds,
-			'output' => array('hostid', 'main', 'type'),
+			'output' => ['hostid', 'main', 'type'],
 			'preservekeys' => true,
 			'nopermissions' => true
-		));
+		]);
 		$interfaces = array_merge($dbInterfaces, $interfaces);
 
 		$this->checkMainInterfaces($interfaces);
 	}
 
 	private function checkMainInterfacesOnUpdate(array $interfaces) {
-		$interfaceidsWithoutHostIds = array();
+		$interfaceidsWithoutHostIds = [];
 
 		// gather all hostids where interfaces should be checked
 		foreach ($interfaces as $interface) {
@@ -728,7 +707,7 @@ class CHostInterface extends CApiService {
 		}
 
 		// gather missing host ids
-		$hostIds = array();
+		$hostIds = [];
 		if ($interfaceidsWithoutHostIds) {
 			$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceidsWithoutHostIds));
 			while ($hostData = DBfetch($dbResult)) {
@@ -736,12 +715,12 @@ class CHostInterface extends CApiService {
 			}
 		}
 
-		$dbInterfaces = API::HostInterface()->get(array(
+		$dbInterfaces = API::HostInterface()->get([
 			'hostids' => $hostIds,
-			'output' => array('hostid', 'main', 'type'),
+			'output' => ['hostid', 'main', 'type'],
 			'preservekeys' => true,
 			'nopermissions' => true
-		));
+		]);
 
 		// update interfaces from DB with data that will be updated.
 		foreach ($interfaces as $interface) {
@@ -759,18 +738,18 @@ class CHostInterface extends CApiService {
 	private function checkMainInterfacesOnDelete(array $interfaceIds) {
 		$this->checkIfInterfaceHasItems($interfaceIds);
 
-		$hostids = array();
+		$hostids = [];
 		$dbResult = DBselect('SELECT DISTINCT i.hostid FROM interface i WHERE '.dbConditionInt('i.interfaceid', $interfaceIds));
 		while ($hostData = DBfetch($dbResult)) {
 			$hostids[$hostData['hostid']] = $hostData['hostid'];
 		}
 
-		$dbInterfaces = API::HostInterface()->get(array(
+		$dbInterfaces = API::HostInterface()->get([
 			'hostids' => $hostids,
-			'output' => array('hostid', 'main', 'type'),
+			'output' => ['hostid', 'main', 'type'],
 			'preservekeys' => true,
 			'nopermissions' => true
-		));
+		]);
 
 		foreach ($interfaceIds as $interfaceId) {
 			unset($dbInterfaces[$interfaceId]);
@@ -786,14 +765,14 @@ class CHostInterface extends CApiService {
 	 * @param array $interfaces
 	 */
 	private function checkMainInterfaces(array $interfaces) {
-		$interfaceTypes = array();
+		$interfaceTypes = [];
 		foreach ($interfaces as $interface) {
 			if (!isset($interfaceTypes[$interface['hostid']])) {
-				$interfaceTypes[$interface['hostid']] = array();
+				$interfaceTypes[$interface['hostid']] = [];
 			}
 
 			if (!isset($interfaceTypes[$interface['hostid']][$interface['type']])) {
-				$interfaceTypes[$interface['hostid']][$interface['type']] = array('main' => 0, 'all' => 0);
+				$interfaceTypes[$interface['hostid']][$interface['type']] = ['main' => 0, 'all' => 0];
 			}
 
 			if ($interface['main'] == INTERFACE_PRIMARY) {
@@ -807,12 +786,12 @@ class CHostInterface extends CApiService {
 		foreach ($interfaceTypes as $interfaceHostId => $interfaceType) {
 			foreach ($interfaceType as $type => $counters) {
 				if ($counters['all'] && !$counters['main']) {
-					$host = API::Host()->get(array(
+					$host = API::Host()->get([
 						'hostids' => $interfaceHostId,
-						'output' => array('name'),
+						'output' => ['name'],
 						'preservekeys' => true,
 						'nopermissions' => true
-					));
+					]);
 					$host = reset($host);
 
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -827,14 +806,14 @@ class CHostInterface extends CApiService {
 	}
 
 	private function checkIfInterfaceHasItems(array $interfaceIds) {
-		$items = API::Item()->get(array(
-			'output' => array('name'),
-			'selectHosts' => array('name'),
+		$items = API::Item()->get([
+			'output' => ['name'],
+			'selectHosts' => ['name'],
 			'interfaceids' => $interfaceIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'limit' => 1
-		));
+		]);
 
 		foreach ($items as $item) {
 			$host = reset($item['hosts']);
@@ -862,37 +841,37 @@ class CHostInterface extends CApiService {
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'interfaceid', 'hostid');
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'output' => $options['selectHosts'],
 				'hosts' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding items
 		if ($options['selectItems'] !== null) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
-				$items = API::Item()->get(array(
-					'output' => $this->outputExtend($options['selectItems'], array('itemid', 'interfaceid')),
+				$items = API::Item()->get([
+					'output' => $this->outputExtend($options['selectItems'], ['itemid', 'interfaceid']),
 					'interfaceids' => $interfaceIds,
 					'nopermissions' => true,
 					'preservekeys' => true,
-					'filter' => array('flags' => null)
-				));
+					'filter' => ['flags' => null]
+				]);
 				$relationMap = $this->createRelationMap($items, 'interfaceid', 'itemid');
 
-				$items = $this->unsetExtraFields($items, array('interfaceid', 'itemid'), $options['selectItems']);
+				$items = $this->unsetExtraFields($items, ['interfaceid', 'itemid'], $options['selectItems']);
 				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
 			}
 			else {
-				$items = API::Item()->get(array(
+				$items = API::Item()->get([
 					'interfaceids' => $interfaceIds,
 					'nopermissions' => true,
-					'filter' => array('flags' => null),
+					'filter' => ['flags' => null],
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$items = zbx_toHash($items, 'interfaceid');
 				foreach ($result as $interfaceId => $interface) {
 					$result[$interfaceId]['items'] = isset($items[$interfaceId]) ? $items[$interfaceId]['rowscount'] : 0;

@@ -33,7 +33,7 @@ require_once __DIR__.'/../../include/services.inc.php';
 // register autoloader
 require_once __DIR__.'/../../include/classes/core/CAutoloader.php';
 
-$autoloader = new CAutoloader(array(
+$autoloader = new CAutoloader([
 	__DIR__.'/../../include/classes',
 	__DIR__.'/../../include/classes/core',
 	__DIR__.'/../../include/classes/helpers',
@@ -54,8 +54,12 @@ $autoloader = new CAutoloader(array(
 	__DIR__.'/../../include/classes/api/managers',
 	__DIR__.'/../../include/classes/html',
 	__DIR__.'/../../include/classes/html/interfaces',
+	__DIR__.'/../../include/classes/import',
+	__DIR__.'/../../include/classes/import/readers',
+	__DIR__.'/../../include/classes/import/converters',
 	__DIR__.'/include/classes/html',
 	__DIR__.'/include/classes/validators',
 	__DIR__.'/include/classes/parsers',
-));
+	__DIR__.'/include/classes/import/converters',
+]);
 $autoloader->register();

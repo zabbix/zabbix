@@ -19,9 +19,9 @@
 **/
 
 
-$workingTimeTab = new CFormList('scriptsTab');
+$workingTimeTab = new CFormList();
 $wtTextBox = new CTextBox('work_period', $data['work_period'], ZBX_TEXTBOX_STANDARD_SIZE);
-$wtTextBox->attr('autofocus', 'autofocus');
+$wtTextBox->setAttribute('autofocus', 'autofocus');
 $workingTimeTab->addRow(_('Working time'), $wtTextBox);
 
 $workingTimeView = new CTabView();
@@ -29,7 +29,8 @@ $workingTimeView->addTab('workingTime', _('Working time'), $workingTimeTab);
 
 $workingTimeForm = new CForm();
 $workingTimeForm->setName('workingTimeForm');
+$workingTimeView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
+
 $workingTimeForm->addItem($workingTimeView);
-$workingTimeForm->addItem(makeFormFooter(new CSubmit('update', _('Update'))));
 
 return $workingTimeForm;

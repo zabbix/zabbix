@@ -26,7 +26,7 @@ class testFormLogin extends CWebTest {
 	}
 
 	public function testFormLogin_LoginOK() {
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
@@ -43,7 +43,7 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_LoginIncorrectPassword() {
 		DBsave_tables('users');
 
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
@@ -52,7 +52,7 @@ class testFormLogin extends CWebTest {
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->zbxTestClickWait('enter');
-		$this->zbxTestTextPresent(array('Login name or password is incorrect', 'Username', 'Password'));
+		$this->zbxTestTextPresent(['Login name or password is incorrect', 'Username', 'Password']);
 
 		$sql = 'SELECT * FROM users WHERE attempt_failed>0 AND alias='.zbx_dbstr('Admin');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_failed should not be zero after incorrect login.');
@@ -67,7 +67,7 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_BlockAccount() {
 		DBsave_tables('users');
 
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
@@ -77,7 +77,7 @@ class testFormLogin extends CWebTest {
 			$this->input_type('name', 'Admin');
 			$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
 			$this->zbxTestClickWait('enter');
-			$this->zbxTestTextPresent(array('Login name or password is incorrect', 'Username', 'Password'));
+			$this->zbxTestTextPresent(['Login name or password is incorrect', 'Username', 'Password']);
 
 			$sql = 'SELECT * FROM users WHERE alias=\'Admin\' AND attempt_failed='.$i.'';
 			$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Field users.attempt_failed should be equal '.$i.' after '.$i.' incorrect login.');
@@ -90,7 +90,7 @@ class testFormLogin extends CWebTest {
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->zbxTestClickWait('enter');
-		$this->zbxTestTextPresent(array('Account is blocked for', 'seconds', 'Username', 'Password'));
+		$this->zbxTestTextPresent(['Account is blocked for', 'seconds', 'Username', 'Password']);
 
 		DBrestore_tables('users');
 	}
@@ -98,7 +98,7 @@ class testFormLogin extends CWebTest {
 	public function testFormLogin_BlockAccountAndRecoverAfter30Seconds() {
 		DBsave_tables('users');
 
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
 		$this->zbxTestTextPresent('Username');
@@ -123,15 +123,15 @@ class testFormLogin extends CWebTest {
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', '!@$#%$&^*(\"\'\\*;:');
 		$this->zbxTestClickWait('enter');
-		$this->zbxTestTextPresent(array('Account is blocked for', 'seconds', 'Username', 'Password'));
+		$this->zbxTestTextPresent(['Account is blocked for', 'seconds', 'Username', 'Password']);
 
 		// account is blocked, waiting 35 sec and trying to login
 		sleep(35);
 
-		$this->zbxTestLogin('dashboard.php');
+		$this->zbxTestLogin('zabbix.php?action=dashboard.view');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestClickWait('link=Logout');
-		$this->zbxTestTextPresent(array('Username', 'Password'));
+		$this->zbxTestTextPresent(['Username', 'Password']);
 
 		$this->input_type('name', 'Admin');
 		$this->input_type('password', 'zabbix');

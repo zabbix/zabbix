@@ -28,7 +28,7 @@ class CTemplateScreen extends CScreen {
 
 	protected $tableName = 'screens';
 	protected $tableAlias = 's';
-	protected $sortColumns = array('screenid', 'name');
+	protected $sortColumns = ['screenid', 'name'];
 
 	/**
 	 * Get screen data.
@@ -43,21 +43,21 @@ class CTemplateScreen extends CScreen {
 	 *
 	 * @return array
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('screens' => 's.screenid,s.templateid'),
-			'from'		=> array('screens' => 'screens s'),
-			'where'		=> array('template' => 's.templateid IS NOT NULL'),
-			'order'		=> array(),
-			'group'		=> array(),
+		$sqlParts = [
+			'select'	=> ['screens' => 's.screenid,s.templateid'],
+			'from'		=> ['screens' => 'screens s'],
+			'where'		=> ['template' => 's.templateid IS NOT NULL'],
+			'order'		=> [],
+			'group'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'screenids'					=> null,
 			'screenitemids'				=> null,
 			'templateids'				=> null,
@@ -81,7 +81,7 @@ class CTemplateScreen extends CScreen {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		if (!is_null($options['editable']) || (is_null($options['hostids']) && is_null($options['templateids']))) {
@@ -94,21 +94,21 @@ class CTemplateScreen extends CScreen {
 			if (!is_null($options['templateids'])) {
 				unset($options['hostids']);
 
-				$options['templateids'] = API::Template()->get(array(
-					'output' => array('templateid'),
+				$options['templateids'] = API::Template()->get([
+					'output' => ['templateid'],
 					'templateids' => $options['templateids'],
 					'editable' => $options['editable'],
 					'preservekeys' => true
-				));
+				]);
 				$options['templateids'] = array_keys($options['templateids']);
 			}
 			elseif (!is_null($options['hostids'])) {
-				$options['templateids'] = API::Host()->get(array(
-					'output' => array('hostid'),
+				$options['templateids'] = API::Host()->get([
+					'output' => ['hostid'],
 					'hostids' => $options['hostids'],
 					'editable' => $options['editable'],
 					'preservekeys' => true
-				));
+				]);
 				$options['templateids'] = array_keys($options['templateids']);
 			}
 			else {
@@ -160,7 +160,7 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// hostids
-		$templatesChain = array();
+		$templatesChain = [];
 		if (!is_null($options['hostids'])) {
 			zbx_value2array($options['hostids']);
 
@@ -174,7 +174,7 @@ class CTemplateScreen extends CScreen {
 					' WHERE '.dbConditionInt('hostid', $childTemplateids);
 				$dbTemplates = DBselect($sql);
 
-				$childTemplateids = array();
+				$childTemplateids = [];
 				while ($link = DBfetch($dbTemplates)) {
 					$childTemplateids[$link['templateid']] = $link['templateid'];
 					$linkedTemplateids[$link['templateid']] = $link['templateid'];
@@ -228,13 +228,13 @@ class CTemplateScreen extends CScreen {
 
 		// adding screenitems
 		if ($options['selectScreenItems'] !== null && $options['selectScreenItems'] != API_OUTPUT_COUNT) {
-			$screenItems = API::getApiService()->select('screens_items', array(
+			$screenItems = API::getApiService()->select('screens_items', [
 				'output' => $this->outputExtend($options['selectScreenItems'],
-					array('screenid', 'screenitemid', 'resourcetype', 'resourceid')
+					['screenid', 'screenitemid', 'resourcetype', 'resourceid']
 				),
-				'filter' => array('screenid' => $screenIds),
+				'filter' => ['screenid' => $screenIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($screenItems, 'screenid', 'screenitemid');
 
 			foreach ($screenItems as $screenItem) {
@@ -250,7 +250,7 @@ class CTemplateScreen extends CScreen {
 			}
 
 			$screenItems = $this->unsetExtraFields($screenItems,
-				array('screenid', 'screenitemid', 'resourceid', 'resourcetype'),
+				['screenid', 'screenitemid', 'resourceid', 'resourcetype'],
 				$options['selectScreenItems']
 			);
 			$result = $relationMap->mapMany($result, $screenItems, 'screenitems');
@@ -260,28 +260,28 @@ class CTemplateScreen extends CScreen {
 		if (!is_null($options['selectScreenItems']) && !is_null($options['hostids'])) {
 			// prepare graphs
 			if (!empty($graphids)) {
-				$tplGraphs = API::Graph()->get(array(
-					'output' => array('graphid', 'name'),
+				$tplGraphs = API::Graph()->get([
+					'output' => ['graphid', 'name'],
 					'graphids' => $graphids,
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 
-				$dbGraphs = API::Graph()->get(array(
-					'output' => array('graphid', 'name'),
-					'selectHosts' => array('hostid'),
+				$dbGraphs = API::Graph()->get([
+					'output' => ['graphid', 'name'],
+					'selectHosts' => ['hostid'],
 					'hostids' => $options['hostids'],
-					'filter' => array('name' => zbx_objectValues($tplGraphs, 'name')),
+					'filter' => ['name' => zbx_objectValues($tplGraphs, 'name')],
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
-				$realGraphs = array();
+				]);
+				$realGraphs = [];
 				foreach ($dbGraphs as $graph) {
 					$host = reset($graph['hosts']);
 					unset($graph['hosts']);
 
 					if (!isset($realGraphs[$host['hostid']])) {
-						$realGraphs[$host['hostid']] = array();
+						$realGraphs[$host['hostid']] = [];
 					}
 					$realGraphs[$host['hostid']][$graph['name']] = $graph;
 				}
@@ -289,27 +289,27 @@ class CTemplateScreen extends CScreen {
 
 			// prepare items
 			if (!empty($itemids)) {
-				$tplItems = API::Item()->get(array(
-					'output' => array('itemid', 'key_', 'hostid'),
+				$tplItems = API::Item()->get([
+					'output' => ['itemid', 'key_', 'hostid'],
 					'itemids' => $itemids,
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 
-				$dbItems = API::Item()->get(array(
-					'output' => array('itemid', 'key_', 'hostid'),
+				$dbItems = API::Item()->get([
+					'output' => ['itemid', 'key_', 'hostid'],
 					'hostids' => $options['hostids'],
-					'filter' => array('key_' => zbx_objectValues($tplItems, 'key_')),
+					'filter' => ['key_' => zbx_objectValues($tplItems, 'key_')],
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 
-				$realItems = array();
+				$realItems = [];
 				foreach ($dbItems as $item) {
 					unset($item['hosts']);
 
 					if (!isset($realItems[$item['hostid']])) {
-						$realItems[$item['hostid']] = array();
+						$realItems[$item['hostid']] = [];
 					}
 					$realItems[$item['hostid']][$item['key_']] = $item;
 				}
@@ -323,7 +323,7 @@ class CTemplateScreen extends CScreen {
 			// creating copies of templated screens (inheritance)
 			// screenNum is needed due to we can't refer to screenid/hostid/templateid as they will repeat
 			$screenNum = 0;
-			$vrtResult = array();
+			$vrtResult = [];
 
 			foreach ($result as $screen) {
 				if (is_null($options['hostids']) || isset($options['hostids'][$screen['templateid']])) {
@@ -372,7 +372,7 @@ class CTemplateScreen extends CScreen {
 		}
 
 		if ($result) {
-			$result = $this->unsetExtraFields($result, array('templateid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['templateid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -386,44 +386,22 @@ class CTemplateScreen extends CScreen {
 		return $result;
 	}
 
-	/**
-	 * Check if template screen exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('templatescreen.exists method is deprecated.');
-
-		$templateScreen = $this->get(array(
-			'output' => array('screenid'),
-			'filter' => zbx_array_mintersect(array(array('screenid', 'name'), 'templateid'), $object),
-			'preservekeys' => true,
-			'limit' => 1
-		));
-
-		return (bool) $templateScreen;
-	}
-
 	public function copy(array $data) {
 		$screenIds = $data['screenIds'] = zbx_toArray($data['screenIds']);
 		$templateIds = $data['templateIds'] = zbx_toArray($data['templateIds']);
 
 		$this->validateCopy($data);
 
-		$screens = $this->get(array(
+		$screens = $this->get([
 			'screenids' => $screenIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectScreenItems' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($templateIds as $templateId) {
-			$resourceGraphIds = array();
-			$resourceItemIds = array();
+			$resourceGraphIds = [];
+			$resourceItemIds = [];
 			foreach ($screens as &$screen) {
 				$screen['templateid'] = $templateId;
 
@@ -443,7 +421,7 @@ class CTemplateScreen extends CScreen {
 			unset($screen);
 
 			// get same items on destination template
-			$resourceItemsMap = array();
+			$resourceItemsMap = [];
 			$dbItems = DBselect(
 				'SELECT src.itemid AS srcid,dest.itemid as destid'.
 				' FROM items dest,items src'.
@@ -456,7 +434,7 @@ class CTemplateScreen extends CScreen {
 			}
 
 			// get same graphs on destination template
-			$resourceGraphsMap = array();
+			$resourceGraphsMap = [];
 			$dbGraphs = DBselect(
 				'SELECT src.graphid AS srcid,dest.graphid as destid'.
 				' FROM graphs dest,graphs src,graphs_items destgi,items desti'.
@@ -472,7 +450,7 @@ class CTemplateScreen extends CScreen {
 
 			$newScreenIds = DB::insert('screens', $screens);
 
-			$insertScreenItems = array();
+			$insertScreenItems = [];
 			foreach ($screens as $snum => $screen) {
 				foreach ($screen['screenitems'] as $screenItem) {
 					$screenItem['screenid'] = $newScreenIds[$snum];
@@ -537,7 +515,7 @@ class CTemplateScreen extends CScreen {
 	 * @param array $screens
 	 */
 	protected function validateCreate(array $screens) {
-		$screenDbFields = array('name' => null, 'templateid' => null);
+		$screenDbFields = ['name' => null, 'templateid' => null];
 
 		foreach ($screens as $screen) {
 			if (!check_db_fields($screenDbFields, $screen)) {
@@ -547,21 +525,21 @@ class CTemplateScreen extends CScreen {
 
 		$templateIds = zbx_objectValues($screens, 'templateid');
 
-		$dbScreens = $this->get(array(
-			'filter' => array(
+		$dbScreens = $this->get([
+			'filter' => [
 				'name' => zbx_objectValues($screens, 'name'),
 				'templateid' => $templateIds
-			),
-			'output' => array('name', 'templateid'),
+			],
+			'output' => ['name', 'templateid'],
 			'nopermissions' => true
-		));
+		]);
 
-		$dbTemplates = API::Template()->get(array(
+		$dbTemplates = API::Template()->get([
 			'templateids' => $templateIds,
-			'output' => array('name', 'templateid'),
+			'output' => ['name', 'templateid'],
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($templateIds as $templateId) {
 			if (!isset($dbTemplates[$templateId])) {
@@ -598,19 +576,19 @@ class CTemplateScreen extends CScreen {
 			_('Incorrect template screen ID.')
 		);
 
-		$dbScreens = $this->get(array(
-			'output' => array('screenid', 'hsize', 'vsize', 'templateid'),
-			'selectScreenItems' => array('screenitemid', 'x', 'y', 'colspan', 'rowspan'),
+		$dbScreens = $this->get([
+			'output' => ['screenid', 'hsize', 'vsize', 'templateid'],
+			'selectScreenItems' => ['screenitemid', 'x', 'y', 'colspan', 'rowspan'],
 			'screenids' => zbx_objectValues($screens, 'screenid'),
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		$this->validateUpdate($screens, $dbScreens);
 		$this->updateReal($screens);
 		$this->truncateScreenItems($screens, $dbScreens);
 
-		return array('screenids' => zbx_objectValues($screens, 'screenid'));
+		return ['screenids' => zbx_objectValues($screens, 'screenid')];
 	}
 
 	protected function validateUpdate(array $screens, array $dbScreens) {
@@ -620,7 +598,7 @@ class CTemplateScreen extends CScreen {
 			}
 		}
 
-		$screens = $this->extendObjects($this->tableName(), $screens, array('name'));
+		$screens = $this->extendObjects($this->tableName(), $screens, ['name']);
 
 		foreach ($screens as $screen) {
 			// "templateid" is not allowed
@@ -632,14 +610,14 @@ class CTemplateScreen extends CScreen {
 			}
 
 			if (isset($screen['name'])) {
-				$dbScreenExist = $this->get(array(
-					'filter' => array(
+				$dbScreenExist = $this->get([
+					'filter' => [
 						'name' => $screen['name'],
 						'templateid' => $dbScreens[$screen['screenid']]['templateid']
-					),
+					],
 					'nopermissions' => true,
-					'output' => array('screenid')
-				));
+					'output' => ['screenid']
+				]);
 				$dbScreenExist = reset($dbScreenExist);
 
 				if ($dbScreenExist && bccomp($dbScreenExist['screenid'], $screen['screenid']) != 0) {
@@ -659,12 +637,12 @@ class CTemplateScreen extends CScreen {
 		$screenIds = $data['screenIds'];
 		$templateIds = $data['templateIds'];
 
-		$dbScreens = $this->get(array(
+		$dbScreens = $this->get([
 			'screenids' => $screenIds,
-			'output' => array('screenid', 'name', 'templateid'),
+			'output' => ['screenid', 'name', 'templateid'],
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($screenIds as $screenId) {
 			if (!isset($dbScreens[$screenId])) {
@@ -678,14 +656,14 @@ class CTemplateScreen extends CScreen {
 		}
 
 		// check if screen with same name exists
-		$dbExistingScreens = $this->get(array(
-			'filter' => array(
+		$dbExistingScreens = $this->get([
+			'filter' => [
 				'name' => zbx_objectValues($dbScreens, 'name'),
 				'templateid' => $templateIds
-			),
-			'output' => array('name', 'templateid'),
+			],
+			'output' => ['name', 'templateid'],
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($dbExistingScreens as $dbExistingScreen) {
 			$dbTemplate = DBfetch(DBselect(

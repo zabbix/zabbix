@@ -28,7 +28,7 @@ class CUserGroup extends CApiService {
 
 	protected $tableName = 'usrgrp';
 	protected $tableAlias = 'g';
-	protected $sortColumns = array('usrgrpid', 'name');
+	protected $sortColumns = ['usrgrpid', 'name'];
 
 	/**
 	 * Get user groups.
@@ -46,19 +46,19 @@ class CUserGroup extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 
-		$sqlParts = array(
-			'select'	=> array('usrgrp' => 'g.usrgrpid'),
-			'from'		=> array('usrgrp' => 'usrgrp g'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['usrgrp' => 'g.usrgrpid'],
+			'from'		=> ['usrgrp' => 'usrgrp g'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'status'					=> null,
@@ -79,7 +79,7 @@ class CUserGroup extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 
 		$options = zbx_array_merge($defOptions, $options);
 
@@ -93,7 +93,7 @@ class CUserGroup extends CApiService {
 				')';
 			}
 			else {
-				return array();
+				return [];
 			}
 		}
 
@@ -167,63 +167,6 @@ class CUserGroup extends CApiService {
 	}
 
 	/**
-	 * Get user groups by name.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $groupData
-	 * @param string $groupData['name']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $groupData) {
-		$this->deprecated('usergroup.getobjects method is deprecated.');
-
-		$result = array();
-		$usrgrpids = array();
-
-		$res = DBselect(
-			'SELECT g.usrgrpid'.
-			' FROM usrgrp g'.
-			' WHERE g.name='.zbx_dbstr($groupData['name'])
-		);
-
-		while ($group = DBfetch($res)) {
-			$usrgrpids[$group['usrgrpid']] = $group['usrgrpid'];
-		}
-
-		if ($usrgrpids) {
-			$result = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
-				'usrgrpids' => $usrgrpids
-			));
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Check if user group exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('usergroup.exists method is deprecated.');
-
-		$userGroup = $this->get(array(
-			'output' => array('usrgrpid'),
-			'filter' => array('name' => $object['name']),
-			'limit' => 1,
-		));
-
-		return (bool) $userGroup;
-	}
-
-	/**
 	 * Create UserGroups.
 	 *
 	 * @param array $usrgrps
@@ -235,21 +178,21 @@ class CUserGroup extends CApiService {
 		}
 
 		$usrgrps = zbx_toArray($usrgrps);
-		$insert = array();
+		$insert = [];
 
 		foreach ($usrgrps as $gnum => $usrgrp) {
-			$usrgrpDbFields = array(
+			$usrgrpDbFields = [
 				'name' => null,
-			);
+			];
 			if (!check_db_fields($usrgrpDbFields, $usrgrp)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 			}
 
-			$userGroupExists = $this->get(array(
-				'output' => array('usrgrpid'),
-				'filter' => array('name' => $usrgrp['name']),
+			$userGroupExists = $this->get([
+				'output' => ['usrgrpid'],
+				'filter' => ['name' => $usrgrp['name']],
 				'limit' => 1
-			));
+			]);
 			if ($userGroupExists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%1$s" already exists.', $usrgrp['name']));
 			}
@@ -259,7 +202,7 @@ class CUserGroup extends CApiService {
 
 
 		foreach ($usrgrps as $gnum => $usrgrp) {
-			$massAdd = array();
+			$massAdd = [];
 			if (isset($usrgrp['userids'])) {
 				$massAdd['userids'] = $usrgrp['userids'];
 			}
@@ -273,7 +216,7 @@ class CUserGroup extends CApiService {
 			}
 		}
 
-		return array('usrgrpids' => $usrgrpids);
+		return ['usrgrpids' => $usrgrpids];
 	}
 
 	/**
@@ -294,7 +237,7 @@ class CUserGroup extends CApiService {
 
 		foreach ($usrgrps as $usrgrp) {
 			// checks if usergroup id is present
-			$groupDbFields = array('usrgrpid' => null);
+			$groupDbFields = ['usrgrpid' => null];
 			if (!check_db_fields($groupDbFields, $usrgrp)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for user group.'));
 			}
@@ -306,7 +249,7 @@ class CUserGroup extends CApiService {
 			}
 		}
 
-		return array('usrgrpids'=> zbx_objectValues($usrgrps, 'usrgrpid'));
+		return ['usrgrpids'=> zbx_objectValues($usrgrps, 'usrgrpid')];
 	}
 
 	public function massAdd($data) {
@@ -319,10 +262,10 @@ class CUserGroup extends CApiService {
 		$rights = (isset($data['rights']) && !is_null($data['rights'])) ? zbx_toArray($data['rights']) : null;
 
 		if (!is_null($userids)) {
-			$options = array(
+			$options = [
 				'usrgrpids' => $usrgrpids,
 				'output' => API_OUTPUT_EXTEND,
-			);
+			];
 			$usrgrps = $this->get($options);
 			foreach ($usrgrps as $usrgrp) {
 				if ((($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
@@ -332,25 +275,25 @@ class CUserGroup extends CApiService {
 				}
 			}
 
-			$linkedUsers = array();
+			$linkedUsers = [];
 			$sql = 'SELECT usrgrpid, userid'.
 				' FROM users_groups'.
 				' WHERE '.dbConditionInt('usrgrpid', $usrgrpids).
 				' AND '.dbConditionInt('userid', $userids);
 			$linkedUsersDb = DBselect($sql);
 			while ($link = DBfetch($linkedUsersDb)) {
-				if (!isset($linkedUsers[$link['usrgrpid']])) $linkedUsers[$link['usrgrpid']] = array();
+				if (!isset($linkedUsers[$link['usrgrpid']])) $linkedUsers[$link['usrgrpid']] = [];
 				$linkedUsers[$link['usrgrpid']][$link['userid']] = 1;
 			}
 
-			$usersInsert = array();
+			$usersInsert = [];
 			foreach ($usrgrpids as $usrgrpid) {
 				foreach ($userids as $userid) {
 					if (!isset($linkedUsers[$usrgrpid][$userid])) {
-						$usersInsert[] = array(
+						$usersInsert[] = [
 							'usrgrpid' => $usrgrpid,
 							'userid' => $userid,
-						);
+						];
 					}
 				}
 			}
@@ -358,33 +301,33 @@ class CUserGroup extends CApiService {
 		}
 
 		if (!is_null($rights)) {
-			$linkedRights = array();
+			$linkedRights = [];
 			$sql = 'SELECT groupid,id'.
 				' FROM rights'.
 				' WHERE '.dbConditionInt('groupid', $usrgrpids).
 					' AND '.dbConditionInt('id', zbx_objectValues($rights, 'id'));
 			$linkedRightsDb = DBselect($sql);
 			while ($link = DBfetch($linkedRightsDb)) {
-				if (!isset($linkedRights[$link['groupid']])) $linkedRights[$link['groupid']] = array();
+				if (!isset($linkedRights[$link['groupid']])) $linkedRights[$link['groupid']] = [];
 				$linkedRights[$link['groupid']][$link['id']] = 1;
 			}
 
-			$rightInsert = array();
+			$rightInsert = [];
 			foreach ($usrgrpids as $usrgrpid) {
 				foreach ($rights as $right) {
 					if (!isset($linkedRights[$usrgrpid][$right['id']])) {
-						$rightInsert[] = array(
+						$rightInsert[] = [
 							'groupid' => $usrgrpid,
 							'permission' => $right['permission'],
 							'id' => $right['id']
-						);
+						];
 					}
 				}
 			}
 			DB::insert('rights', $rightInsert);
 		}
 
-		return array('usrgrpids' => $usrgrpids);
+		return ['usrgrpids' => $usrgrpids];
 	}
 
 	/**
@@ -423,11 +366,11 @@ class CUserGroup extends CApiService {
 			}
 			else {
 				// check if there already is hostgroup with this name, except current hostgroup
-				$groupExists = $this->get(array(
-					'filter' => array('name' => $data['name']),
-					'output' => array('usrgrpid'),
+				$groupExists = $this->get([
+					'filter' => ['name' => $data['name']],
+					'output' => ['usrgrpid'],
 					'limit' => 1
-				));
+				]);
 				$groupExists = reset($groupExists);
 				if ($groupExists && (bccomp($groupExists['usrgrpid'], $usrgrpids[0]) != 0) ) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('User group "%s" already exists.', $data['name']));
@@ -440,10 +383,10 @@ class CUserGroup extends CApiService {
 		unset($usrgrpTableUpdateData['usrgrpids'], $usrgrpTableUpdateData['userids'], $usrgrpTableUpdateData['rights']);
 		if (!empty($usrgrpTableUpdateData)) {
 			foreach ($usrgrpids as $usrgrpid) {
-				DB::update('usrgrp', array(
+				DB::update('usrgrp', [
 					'values' => $usrgrpTableUpdateData,
-					'where' => array('usrgrpid' => $usrgrpid),
-				));
+					'where' => ['usrgrpid' => $usrgrpid],
+				]);
 			}
 		}
 
@@ -453,10 +396,10 @@ class CUserGroup extends CApiService {
 			$userids = zbx_toArray($data['userids']);
 
 			// check whether user tries to add himself to a disabled user group
-			$usrgrps = $this->get(array(
+			$usrgrps = $this->get([
 				'usrgrpids' => $usrgrpids,
 				'output' => API_OUTPUT_EXTEND,
-			));
+			]);
 			if (uint_in_array(self::$userData['userid'], $userids)) {
 				foreach ($usrgrps as $usrgrp) {
 					if (($usrgrp['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
@@ -467,28 +410,28 @@ class CUserGroup extends CApiService {
 			}
 
 			// get already linked users
-			$linkedUsers = array();
+			$linkedUsers = [];
 			$sql = 'SELECT usrgrpid,userid'.
 				' FROM users_groups'.
 				' WHERE '.dbConditionInt('usrgrpid', $usrgrpids);
 			$linkedUsersDb = DBselect($sql);
 			while ($link = DBfetch($linkedUsersDb)) {
 				if (!isset($linkedUsers[$link['usrgrpid']])) {
-					$linkedUsers[$link['usrgrpid']] = array();
+					$linkedUsers[$link['usrgrpid']] = [];
 				}
 				$linkedUsers[$link['usrgrpid']][$link['userid']] = 1;
 			}
 
 			// get user-userGroup links to insert and get user ids to unlink
-			$userUsergroupLinksToInsert = array();
-			$userIdsToUnlink = array();
+			$userUsergroupLinksToInsert = [];
+			$userIdsToUnlink = [];
 			foreach ($usrgrpids as $usrgrpid) {
 				foreach ($userids as $userid) {
 					if (!isset($linkedUsers[$usrgrpid][$userid])) {
-						$userUsergroupLinksToInsert[] = array(
+						$userUsergroupLinksToInsert[] = [
 							'usrgrpid' => $usrgrpid,
 							'userid' => $userid,
-						);
+						];
 					}
 					unset($linkedUsers[$usrgrpid][$userid]);
 				}
@@ -504,10 +447,10 @@ class CUserGroup extends CApiService {
 
 			// unlink users from user groups
 			if (!empty($userIdsToUnlink)) {
-				DB::delete('users_groups', array(
+				DB::delete('users_groups', [
 					'userid' => $userIdsToUnlink,
 					'usrgrpid' => $usrgrpids,
-				));
+				]);
 			}
 		}
 
@@ -518,14 +461,14 @@ class CUserGroup extends CApiService {
 			$rights = zbx_toArray($data['rights']);
 
 			// get already linked rights
-			$linkedRights = array();
+			$linkedRights = [];
 			$sql = 'SELECT groupid,permission,id'.
 				' FROM rights'.
 				' WHERE '.dbConditionInt('groupid', $usrgrpids);
 			$linkedRightsDb = DBselect($sql);
 			while ($link = DBfetch($linkedRightsDb)) {
 				if (!isset($linkedRights[$link['groupid']])) {
-					$linkedRights[$link['groupid']] = array();
+					$linkedRights[$link['groupid']] = [];
 				}
 				$linkedRights[$link['groupid']][$link['id']] = $link['permission'];
 			}
@@ -533,23 +476,23 @@ class CUserGroup extends CApiService {
 			// get right-userGroup links to insert
 			// get right-userGroup links to update permissions
 			// get rightIds to unlink rights from user groups
-			$rightUsergroupLinksToInsert = array();
-			$rightUsergroupLinksToUpdate = array();
-			$rightIdsToUnlink = array();
+			$rightUsergroupLinksToInsert = [];
+			$rightUsergroupLinksToUpdate = [];
+			$rightIdsToUnlink = [];
 			foreach ($usrgrpids as $usrgrpid) {
 				foreach ($rights as $right) {
 					if (!isset($linkedRights[$usrgrpid][$right['id']])) {
-						$rightUsergroupLinksToInsert[] = array(
+						$rightUsergroupLinksToInsert[] = [
 							'groupid' => $usrgrpid,
 							'id' => $right['id'],
 							'permission' => $right['permission'],
-						);
+						];
 					}
 					elseif ($linkedRights[$usrgrpid][$right['id']] != $right['permission']) {
-						$rightUsergroupLinksToUpdate[] = array(
-							'values' => array('permission' => $right['permission']),
-							'where' => array('groupid' => $usrgrpid, 'id' => $right['id']),
-						);
+						$rightUsergroupLinksToUpdate[] = [
+							'values' => ['permission' => $right['permission']],
+							'where' => ['groupid' => $usrgrpid, 'id' => $right['id']],
+						];
 					}
 					unset($linkedRights[$usrgrpid][$right['id']]);
 				}
@@ -566,10 +509,10 @@ class CUserGroup extends CApiService {
 
 			// unlink rights from user groups
 			if (!empty($rightIdsToUnlink)) {
-				DB::delete('rights', array(
+				DB::delete('rights', [
 					'id' => $rightIdsToUnlink,
 					'groupid' => $usrgrpids,
-				));
+				]);
 			}
 
 			// update right-userGroup permissions
@@ -578,7 +521,7 @@ class CUserGroup extends CApiService {
 			}
 		}
 
-		return array('usrgrpids' => $usrgrpids);
+		return ['usrgrpids' => $usrgrpids];
 	}
 
 	/**
@@ -591,7 +534,7 @@ class CUserGroup extends CApiService {
 	public function delete(array $userGroupIds) {
 		$this->validateDelete($userGroupIds);
 
-		$operationIds = $delelteOperationIds = array();
+		$operationIds = $delelteOperationIds = [];
 
 		$dbOperations = DBselect(
 			'SELECT DISTINCT om.operationid'.
@@ -612,13 +555,13 @@ class CUserGroup extends CApiService {
 			$delelteOperationIds[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('opmessage_grp', array('usrgrpid' => $userGroupIds));
-		DB::delete('operations', array('operationid' => $delelteOperationIds));
-		DB::delete('rights', array('groupid' => $userGroupIds));
-		DB::delete('users_groups', array('usrgrpid' => $userGroupIds));
-		DB::delete('usrgrp', array('usrgrpid' => $userGroupIds));
+		DB::delete('opmessage_grp', ['usrgrpid' => $userGroupIds]);
+		DB::delete('operations', ['operationid' => $delelteOperationIds]);
+		DB::delete('rights', ['groupid' => $userGroupIds]);
+		DB::delete('users_groups', ['usrgrpid' => $userGroupIds]);
+		DB::delete('usrgrp', ['usrgrpid' => $userGroupIds]);
 
-		return array('usrgrpids' => $userGroupIds);
+		return ['usrgrpids' => $userGroupIds];
 	}
 
 	/**
@@ -637,18 +580,18 @@ class CUserGroup extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$dbUserGroups = $this->get(array(
-			'output' => array('usrgrpid', 'name'),
+		$dbUserGroups = $this->get([
+			'output' => ['usrgrpid', 'name'],
 			'usrgrpids' => $userGroupIds,
 			'preservekeys' => true
-		));
+		]);
 
 		// check if user group is used in scripts
-		$dbScripts = API::Script()->get(array(
-			'output' => array('scriptid', 'name', 'usrgrpid'),
+		$dbScripts = API::Script()->get([
+			'output' => ['scriptid', 'name', 'usrgrpid'],
 			'usrgrpids' => $userGroupIds,
 			'nopermissions' => true
-		));
+		]);
 
 		foreach ($dbScripts as $dbScript) {
 			if ($dbScript['usrgrpid'] == 0) {
@@ -673,11 +616,11 @@ class CUserGroup extends CApiService {
 		}
 
 		// check if user group is used in users with 1 user group
-		$dbUsers = API::User()->get(array(
-			'output' => array('userid', 'usrgrpid', 'alias'),
+		$dbUsers = API::User()->get([
+			'output' => ['userid', 'usrgrpid', 'alias'],
 			'usrgrpids' => $userGroupIds,
-			'selectUsrgrps' => array('usrgrpid')
-		));
+			'selectUsrgrps' => ['usrgrpid']
+		]);
 
 		foreach ($dbUsers as $dbUser) {
 			if (count($dbUser['usrgrps']) == 1) {
@@ -702,10 +645,10 @@ class CUserGroup extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'usrgrpids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -720,11 +663,11 @@ class CUserGroup extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'usrgrpids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -736,12 +679,12 @@ class CUserGroup extends CApiService {
 		if ($options['selectUsers'] !== null && $options['selectUsers'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'userid', 'users_groups');
 
-			$dbUsers = API::User()->get(array(
+			$dbUsers = API::User()->get([
 				'output' => $options['selectUsers'],
 				'userids' => $relationMap->getRelatedIds(),
 				'getAccess' => ($options['selectUsers'] == API_OUTPUT_EXTEND) ? true : null,
 				'preservekeys' => true
-			));
+			]);
 
 			$result = $relationMap->mapMany($result, $dbUsers, 'users');
 		}

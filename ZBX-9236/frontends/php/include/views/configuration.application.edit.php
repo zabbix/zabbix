@@ -19,11 +19,8 @@
 **/
 
 
-$applicationWidget = new CWidget();
-$applicationWidget->addPageHeader(_('CONFIGURATION OF APPLICATIONS'));
-
-// append host summary to widget header
-$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
+$applicationWidget = (new CWidget())->setTitle(_('Applications'))->
+	addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
 $applicationForm = new CForm();
@@ -37,31 +34,32 @@ if (!empty($this->data['applicationid'])) {
 // create form list
 $applicationFormList = new CFormList('applicationFormList');
 $nameTextBox = new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $applicationFormList->addRow(_('Name'), $nameTextBox);
 
 // append tabs to form
 $applicationTab = new CTabView();
 $applicationTab->addTab('applicationTab', _('Application'), $applicationFormList);
-$applicationForm->addItem($applicationTab);
 
 // append buttons to form
 if (!empty($this->data['applicationid'])) {
-	$applicationForm->addItem(makeFormFooter(
+	$applicationTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
-			new CButtonDelete(_('Delete application?'), url_params(array('hostid', 'form', 'applicationid'))),
+			new CButtonDelete(_('Delete application?'), url_params(['hostid', 'form', 'applicationid'])),
 			new CButtonCancel(url_param('hostid'))
-		)
+		]
 	));
 }
 else {
-	$applicationForm->addItem(makeFormFooter(
+	$applicationTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('hostid')))
+		[new CButtonCancel(url_param('hostid'))]
 	));
 }
+
+$applicationForm->addItem($applicationTab);
 
 // append form to widget
 $applicationWidget->addItem($applicationForm);

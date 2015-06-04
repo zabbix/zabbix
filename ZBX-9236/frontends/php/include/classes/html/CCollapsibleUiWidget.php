@@ -39,18 +39,21 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 * Sets the header and adds a default expand-collapse icon.
 	 *
 	 * @param string|array|CTag $caption
-	 * @param string|array|CTag $icons
+	 * @param array              $icons
 	 */
-	public function setHeader($caption = null, $icons = SPACE) {
-		zbx_value2array($icons);
-
-		$icon = new CIcon(
-			_('Show').'/'._('Hide'),
-			$this->open ? 'arrowup' : 'arrowdown'
-		);
-		$icon->addAction('onclick', 'changeWidgetState(this, "'.$this->id.'");');
+	public function setHeader($caption = null, array $icons = []) {
+		$icon = new CRedirectButton(SPACE, null);
+		if($this->open) {
+			$icon->addClass(ZBX_STYLE_BTN_WIDGET_COLLAPSE);
+			$icon->setTitle(_('Hide'));
+		}
+		else {
+			$icon->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND);
+			$icon->setTitle(_('Open'));
+		}
+		$icon->onClick('changeWidgetState(this, "'.$this->id.'");');
 		$icon->setAttribute('id', $this->id.'_icon');
-		array_unshift($icons, $icon);
+		$icons[] = $icon;
 
 		parent::setHeader($caption, $icons);
 	}

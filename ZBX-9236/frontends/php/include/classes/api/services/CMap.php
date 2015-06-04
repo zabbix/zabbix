@@ -28,7 +28,7 @@ class CMap extends CMapElement {
 
 	protected $tableName = 'sysmaps';
 	protected $tableAlias = 's';
-	protected $sortColumns = array('name', 'width', 'height');
+	protected $sortColumns = ['name', 'width', 'height'];
 
 	/**
 	 * Get map data.
@@ -54,19 +54,19 @@ class CMap extends CMapElement {
 	 *
 	 * @return array|boolean Host data as array or false if error
 	 */
-	public function get(array $options = array()) {
-		$result = array();
+	public function get(array $options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 
-		$sqlParts = array(
-			'select'	=> array('sysmaps' => 's.sysmapid'),
-			'from'		=> array('sysmaps' => 'sysmaps s'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['sysmaps' => 's.sysmapid'],
+			'from'		=> ['sysmaps' => 'sysmaps s'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'sysmapids'					=> null,
 			'editable'					=> null,
 			'nopermissions'				=> null,
@@ -89,7 +89,7 @@ class CMap extends CMapElement {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// sysmapids
@@ -113,7 +113,7 @@ class CMap extends CMapElement {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$sysmapids = array();
+		$sysmapids = [];
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -137,7 +137,7 @@ class CMap extends CMapElement {
 
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($result) {
-				$linkTriggers = array();
+				$linkTriggers = [];
 
 				$dbLinkTriggers = DBselect(
 					'SELECT slt.triggerid,sl.sysmapid'.
@@ -150,12 +150,12 @@ class CMap extends CMapElement {
 				}
 
 				if ($linkTriggers) {
-					$trigOptions = array(
+					$trigOptions = [
 						'triggerids' => $linkTriggers,
 						'editable' => $options['editable'],
-						'output' => array('triggerid'),
+						'output' => ['triggerid'],
 						'preservekeys' => true
-					);
+					];
 					$allTriggers = API::Trigger()->get($trigOptions);
 					foreach ($linkTriggers as $id => $triggerid) {
 						if (!isset($allTriggers[$triggerid])) {
@@ -164,12 +164,12 @@ class CMap extends CMapElement {
 					}
 				}
 
-				$hostsToCheck = array();
-				$mapsToCheck = array();
-				$triggersToCheck = array();
-				$hostGroupsToCheck = array();
+				$hostsToCheck = [];
+				$mapsToCheck = [];
+				$triggersToCheck = [];
+				$hostGroupsToCheck = [];
 
-				$selements = array();
+				$selements = [];
 				$dbSelements = DBselect('SELECT se.* FROM sysmaps_elements se WHERE '.dbConditionInt('se.sysmapid', $sysmapids));
 				while ($selement = DBfetch($dbSelements)) {
 					$selements[$selement['selementid']] = $selement;
@@ -191,12 +191,12 @@ class CMap extends CMapElement {
 				}
 
 				if ($hostsToCheck) {
-					$allowedHosts = API::Host()->get(array(
+					$allowedHosts = API::Host()->get([
 						'hostids' => $hostsToCheck,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => array('hostid')
-					));
+						'output' => ['hostid']
+					]);
 
 					foreach ($hostsToCheck as $elementid) {
 						if (!isset($allowedHosts[$elementid])) {
@@ -211,12 +211,12 @@ class CMap extends CMapElement {
 				}
 
 				if ($mapsToCheck) {
-					$allowedMaps = $this->get(array(
+					$allowedMaps = $this->get([
 						'sysmapids' => $mapsToCheck,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => array('sysmapid')
-					));
+						'output' => ['sysmapid']
+					]);
 
 					foreach ($mapsToCheck as $elementid) {
 						if (!isset($allowedMaps[$elementid])) {
@@ -231,12 +231,12 @@ class CMap extends CMapElement {
 				}
 
 				if ($triggersToCheck) {
-					$allowedTriggers = API::Trigger()->get(array(
+					$allowedTriggers = API::Trigger()->get([
 						'triggerids' => $triggersToCheck,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => array('triggerid')
-					));
+						'output' => ['triggerid']
+					]);
 
 					foreach ($triggersToCheck as $elementid) {
 						if (!isset($allowedTriggers[$elementid])) {
@@ -251,12 +251,12 @@ class CMap extends CMapElement {
 				}
 
 				if ($hostGroupsToCheck) {
-					$allowedHostGroups = API::HostGroup()->get(array(
+					$allowedHostGroups = API::HostGroup()->get([
 						'groupids' => $hostGroupsToCheck,
 						'editable' => $options['editable'],
 						'preservekeys' => true,
-						'output' => array('groupid')
-					));
+						'output' => ['groupid']
+					]);
 
 					foreach ($hostGroupsToCheck as $elementid) {
 						if (!isset($allowedHostGroups[$elementid])) {
@@ -288,47 +288,6 @@ class CMap extends CMapElement {
 		return $result;
 	}
 
-	/**
-	 * Get maps by map name and ID.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array  $sysmapData
-	 * @param string $sysmapData['name']
-	 * @param string $sysmapData['sysmapid']
-	 *
-	 * @return array
-	 */
-	public function getObjects(array $sysmapData) {
-		$this->deprecated('map.getobjects method is deprecated.');
-
-		return $this->get(array(
-			'output' => API_OUTPUT_EXTEND,
-			'filter' => $sysmapData
-		));
-	}
-
-	/**
-	 * Check if map exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('map.exists method is deprecated.');
-
-		$map = $this->get(array(
-			'output' => array('sysmapid'),
-			'filter' => zbx_array_mintersect(array(array('sysmapid', 'name')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $map;
-	}
-
 	public function checkInput(&$maps, $method) {
 		$create = ($method == 'create');
 		$update = ($method == 'update');
@@ -336,9 +295,9 @@ class CMap extends CMapElement {
 
 		// permissions
 		if ($update || $delete) {
-			$mapDbFields = array('sysmapid' => null);
+			$mapDbFields = ['sysmapid' => null];
 
-			$dbMaps = $this->get(array(
+			$dbMaps = $this->get([
 				'sysmapids' => zbx_objectValues($maps, 'sysmapid'),
 				'output' => API_OUTPUT_EXTEND,
 				'editable' => true,
@@ -346,20 +305,20 @@ class CMap extends CMapElement {
 				'selectLinks' => API_OUTPUT_EXTEND,
 				'selectSelements' => API_OUTPUT_EXTEND,
 				'selectUrls' => API_OUTPUT_EXTEND
-			));
+			]);
 		}
 		else {
-			$mapDbFields = array(
+			$mapDbFields = [
 				'name' => null,
 				'width' => null,
 				'height' => null,
-				'urls' => array(),
-				'selements' => array(),
-				'links' => array()
-			);
+				'urls' => [],
+				'selements' => [],
+				'links' => []
+			];
 		}
 
-		$mapNames = array();
+		$mapNames = [];
 
 		foreach ($maps as &$map) {
 			if (!check_db_fields($mapDbFields, $map)) {
@@ -395,14 +354,14 @@ class CMap extends CMapElement {
 			}
 
 			// labels
-			$mapLabels = array('label_type' => array('typeName' => _('icon')));
+			$mapLabels = ['label_type' => ['typeName' => _('icon')]];
 
-			if ($dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
-				$mapLabels['label_type_hostgroup'] = array('string' => 'label_string_hostgroup', 'typeName' => _('host group'));
-				$mapLabels['label_type_host'] = array('string' => 'label_string_host', 'typeName' => _('host'));
-				$mapLabels['label_type_trigger'] = array('string' => 'label_string_trigger', 'typeName' => _('trigger'));
-				$mapLabels['label_type_map'] = array('string' => 'label_string_map', 'typeName' => _('map'));
-				$mapLabels['label_type_image'] = array('string' => 'label_string_image', 'typeName' => _('image'));
+			if (isset($dbMap['label_format']) && $dbMap['label_format'] == SYSMAP_LABEL_ADVANCED_ON) {
+				$mapLabels['label_type_hostgroup'] = ['string' => 'label_string_hostgroup', 'typeName' => _('host group')];
+				$mapLabels['label_type_host'] = ['string' => 'label_string_host', 'typeName' => _('host')];
+				$mapLabels['label_type_trigger'] = ['string' => 'label_string_trigger', 'typeName' => _('trigger')];
+				$mapLabels['label_type_map'] = ['string' => 'label_string_map', 'typeName' => _('map')];
+				$mapLabels['label_type_image'] = ['string' => 'label_string_image', 'typeName' => _('image')];
 			}
 
 			foreach ($mapLabels as $labelName => $labelData) {
@@ -438,7 +397,7 @@ class CMap extends CMapElement {
 			}
 
 			// validating grid options
-			$possibleGridSizes = array(20, 40, 50, 75, 100);
+			$possibleGridSizes = [20, 40, 50, 75, 100];
 
 			if ($update || $create) {
 				// grid size
@@ -503,11 +462,11 @@ class CMap extends CMapElement {
 
 		// exists
 		if (($create || $update) && $mapNames) {
-			$existDbMaps = $this->get(array(
-				'filter' => array('name' => array_keys($mapNames)),
-				'output' => array('sysmapid', 'name'),
+			$existDbMaps = $this->get([
+				'filter' => ['name' => array_keys($mapNames)],
+				'output' => ['sysmapid', 'name'],
 				'nopermissions' => true
-			));
+			]);
 			foreach ($existDbMaps as $dbMap) {
 				if ($create || bccomp($mapNames[$dbMap['name']], $dbMap['sysmapid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Map with name "%s" already exists.', $dbMap['name']));
@@ -542,9 +501,9 @@ class CMap extends CMapElement {
 
 		$sysmapIds = DB::insert('sysmaps', $maps);
 
-		$newUrls = array();
-		$newSelements = array();
-		$newLinks = array();
+		$newUrls = [];
+		$newSelements = [];
+		$newLinks = [];
 
 		foreach ($sysmapIds as $key => $sysmapId) {
 			foreach ($maps[$key]['urls'] as $url) {
@@ -572,7 +531,7 @@ class CMap extends CMapElement {
 
 			if ($newLinks) {
 				// links
-				$mapVirtSelements = array();
+				$mapVirtSelements = [];
 				foreach ($selementids['selementids'] as $key => $selementid) {
 					$mapVirtSelements[$newSelements[$key]['selementid']] = $selementid;
 				}
@@ -586,7 +545,7 @@ class CMap extends CMapElement {
 				$linkIds = $this->createLinks($newLinks);
 
 				// linkTriggers
-				$newLinkTriggers = array();
+				$newLinkTriggers = [];
 				foreach ($linkIds['linkids'] as $key => $linkId) {
 					if (!isset($newLinks[$key]['linktriggers'])) {
 						continue;
@@ -604,7 +563,7 @@ class CMap extends CMapElement {
 			}
 		}
 
-		return array('sysmapids' => $sysmapIds);
+		return ['sysmapids' => $sysmapIds];
 	}
 
 	/**
@@ -630,16 +589,16 @@ class CMap extends CMapElement {
 
 		$dbMaps = $this->checkInput($maps, __FUNCTION__);
 
-		$updateMaps = array();
-		$urlIdsToDelete = $urlsToUpdate = $urlsToAdd = array();
-		$selementsToDelete = $selementsToUpdate = $selementsToAdd = array();
-		$linksToDelete = $linksToUpdate = $linksToAdd = array();
+		$updateMaps = [];
+		$urlIdsToDelete = $urlsToUpdate = $urlsToAdd = [];
+		$selementsToDelete = $selementsToUpdate = $selementsToAdd = [];
+		$linksToDelete = $linksToUpdate = $linksToAdd = [];
 
 		foreach ($maps as $map) {
-			$updateMaps[] = array(
+			$updateMaps[] = [
 				'values' => $map,
-				'where' => array('sysmapid' => $map['sysmapid']),
-			);
+				'where' => ['sysmapid' => $map['sysmapid']],
+			];
 
 			$dbMap = $dbMaps[$map['sysmapid']];
 
@@ -648,10 +607,10 @@ class CMap extends CMapElement {
 				$urlDiff = zbx_array_diff($map['urls'], $dbMap['urls'], 'name');
 
 				foreach ($urlDiff['both'] as $updateUrl) {
-					$urlsToUpdate[] = array(
+					$urlsToUpdate[] = [
 						'values' => $updateUrl,
-						'where' => array('name' => $updateUrl['name'], 'sysmapid' => $map['sysmapid'])
-					);
+						'where' => ['name' => $updateUrl['name'], 'sysmapid' => $map['sysmapid']]
+					];
 				}
 
 				foreach ($urlDiff['first'] as $newUrl) {
@@ -699,11 +658,11 @@ class CMap extends CMapElement {
 		DB::update('sysmap_url', $urlsToUpdate);
 
 		if ($urlIdsToDelete) {
-			DB::delete('sysmap_url', array('sysmapurlid' => $urlIdsToDelete));
+			DB::delete('sysmap_url', ['sysmapurlid' => $urlIdsToDelete]);
 		}
 
 		// selements
-		$newSelementIds = array('selementids' => array());
+		$newSelementIds = ['selementids' => []];
 		if ($selementsToAdd) {
 			$newSelementIds = $this->createSelements($selementsToAdd);
 		}
@@ -718,7 +677,7 @@ class CMap extends CMapElement {
 
 		// links
 		if ($linksToAdd || $linksToUpdate) {
-			$selementsNames = array();
+			$selementsNames = [];
 			foreach ($newSelementIds['selementids'] as $key => $selementId) {
 				$selementsNames[$selementsToAdd[$key]['selementid']] = $selementId;
 			}
@@ -748,7 +707,7 @@ class CMap extends CMapElement {
 			unset($selementsNames);
 		}
 
-		$newLinkIds = $updateLinkIds = array('linkids' => array());
+		$newLinkIds = $updateLinkIds = ['linkids' => []];
 
 		if ($linksToAdd) {
 			$newLinkIds = $this->createLinks($linksToAdd);
@@ -763,7 +722,7 @@ class CMap extends CMapElement {
 		}
 
 		// link triggers
-		$linkTriggersToDelete = $linkTriggersToUpdate = $linkTriggersToAdd = array();
+		$linkTriggersToDelete = $linkTriggersToUpdate = $linkTriggersToAdd = [];
 
 		foreach ($newLinkIds['linkids'] as $key => $linkId) {
 			if (!isset($linksToAdd[$key]['linktriggers'])) {
@@ -776,7 +735,7 @@ class CMap extends CMapElement {
 			}
 		}
 
-		$dbLinks = array();
+		$dbLinks = [];
 
 		$linkTriggerResource = DBselect(
 			'SELECT slt.* FROM sysmaps_link_triggers slt WHERE '.dbConditionInt('slt.linkid', $updateLinkIds['linkids'])
@@ -790,7 +749,7 @@ class CMap extends CMapElement {
 				continue;
 			}
 
-			$dbLinkTriggers = isset($dbLinks[$linkId]) ? $dbLinks[$linkId] : array();
+			$dbLinkTriggers = isset($dbLinks[$linkId]) ? $dbLinks[$linkId] : [];
 			$dbLinkTriggersDiff = zbx_array_diff($linksToUpdate[$key]['linktriggers'], $dbLinkTriggers, 'linktriggerid');
 
 			foreach ($dbLinkTriggersDiff['first'] as $newLinkTrigger) {
@@ -814,7 +773,7 @@ class CMap extends CMapElement {
 			$this->updateLinkTriggers($linkTriggersToUpdate);
 		}
 
-		return array('sysmapids' => $sysmapIds);
+		return ['sysmapids' => $sysmapIds];
 	}
 
 	/**
@@ -829,26 +788,26 @@ class CMap extends CMapElement {
 
 		$this->checkInput($maps, __FUNCTION__);
 
-		DB::delete('sysmaps_elements', array(
+		DB::delete('sysmaps_elements', [
 			'elementid' => $sysmapIds,
 			'elementtype' => SYSMAP_ELEMENT_TYPE_MAP
-		));
-		DB::delete('screens_items', array(
+		]);
+		DB::delete('screens_items', [
 			'resourceid' => $sysmapIds,
 			'resourcetype' => SCREEN_RESOURCE_MAP
-		));
-		DB::delete('profiles', array(
+		]);
+		DB::delete('profiles', [
 			'idx' => 'web.maps.sysmapid',
 			'value_id' => $sysmapIds
-		));
-		DB::delete('profiles', array(
+		]);
+		DB::delete('profiles', [
 			'idx' => 'web.favorite.sysmapids',
 			'source' => 'sysmapid',
 			'value_id' => $sysmapIds
-		));
-		DB::delete('sysmaps', array('sysmapid' => $sysmapIds));
+		]);
+		DB::delete('sysmaps', ['sysmapid' => $sysmapIds]);
 
-		return array('sysmapids' => $sysmapIds);
+		return ['sysmapids' => $sysmapIds];
 	}
 
 	private function expandUrlMacro($url, $selement) {
@@ -887,10 +846,10 @@ class CMap extends CMapElement {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'sysmapids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -902,11 +861,11 @@ class CMap extends CMapElement {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'sysmapids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -918,17 +877,17 @@ class CMap extends CMapElement {
 
 		// adding elements
 		if ($options['selectSelements'] !== null && $options['selectSelements'] != API_OUTPUT_COUNT) {
-			$selements = API::getApiService()->select('sysmaps_elements', array(
-				'output' => $this->outputExtend($options['selectSelements'], array('selementid', 'sysmapid')),
-				'filter' => array('sysmapid' => $sysmapIds),
+			$selements = API::getApiService()->select('sysmaps_elements', [
+				'output' => $this->outputExtend($options['selectSelements'], ['selementid', 'sysmapid']),
+				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($selements, 'sysmapid', 'selementid');
 
 			// add selement URLs
 			if ($this->outputIsRequested('urls', $options['selectSelements'])) {
 				foreach ($selements as &$selement) {
-					$selement['urls'] = array();
+					$selement['urls'] = [];
 				}
 				unset($selement);
 
@@ -965,37 +924,37 @@ class CMap extends CMapElement {
 				}
 			}
 
-			$selements = $this->unsetExtraFields($selements, array('sysmapid', 'selementid'), $options['selectSelements']);
+			$selements = $this->unsetExtraFields($selements, ['sysmapid', 'selementid'], $options['selectSelements']);
 			$result = $relationMap->mapMany($result, $selements, 'selements');
 		}
 
 		// adding icon maps
 		if ($options['selectIconMap'] !== null && $options['selectIconMap'] != API_OUTPUT_COUNT) {
-			$iconMaps = API::getApiService()->select($this->tableName(), array(
-				'output' => array('sysmapid', 'iconmapid'),
-				'filter' => array('sysmapid' => $sysmapIds)
-			));
+			$iconMaps = API::getApiService()->select($this->tableName(), [
+				'output' => ['sysmapid', 'iconmapid'],
+				'filter' => ['sysmapid' => $sysmapIds]
+			]);
 
 			$relationMap = $this->createRelationMap($iconMaps, 'sysmapid', 'iconmapid');
 
-			$iconMaps = API::IconMap()->get(array(
-				'output' => $this->outputExtend($options['selectIconMap'], array('iconmapid')),
+			$iconMaps = API::IconMap()->get([
+				'output' => $this->outputExtend($options['selectIconMap'], ['iconmapid']),
 				'iconmapids' => zbx_objectValues($iconMaps, 'iconmapid'),
 				'preservekeys' => true
-			));
+			]);
 
-			$iconMaps = $this->unsetExtraFields($iconMaps, array('iconmapid'), $options['selectIconMap']);
+			$iconMaps = $this->unsetExtraFields($iconMaps, ['iconmapid'], $options['selectIconMap']);
 
 			$result = $relationMap->mapOne($result, $iconMaps, 'iconmap');
 		}
 
 		// adding links
 		if ($options['selectLinks'] !== null && $options['selectLinks'] != API_OUTPUT_COUNT) {
-			$links = API::getApiService()->select('sysmaps_links', array(
-				'output' => $this->outputExtend($options['selectLinks'], array('sysmapid', 'linkid')),
-				'filter' => array('sysmapid' => $sysmapIds),
+			$links = API::getApiService()->select('sysmaps_links', [
+				'output' => $this->outputExtend($options['selectLinks'], ['sysmapid', 'linkid']),
+				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($links, 'sysmapid', 'linkid');
 
 			// add link triggers
@@ -1009,20 +968,20 @@ class CMap extends CMapElement {
 				$links = $linkTriggerRelationMap->mapMany($links, $linkTriggers, 'linktriggers');
 			}
 
-			$links = $this->unsetExtraFields($links, array('sysmapid', 'linkid'), $options['selectLinks']);
+			$links = $this->unsetExtraFields($links, ['sysmapid', 'linkid'], $options['selectLinks']);
 			$result = $relationMap->mapMany($result, $links, 'links');
 		}
 
 		// adding urls
 		if ($options['selectUrls'] !== null && $options['selectUrls'] != API_OUTPUT_COUNT) {
-			$links = API::getApiService()->select('sysmap_url', array(
-				'output' => $this->outputExtend($options['selectUrls'], array('sysmapid', 'sysmapurlid')),
-				'filter' => array('sysmapid' => $sysmapIds),
+			$links = API::getApiService()->select('sysmap_url', [
+				'output' => $this->outputExtend($options['selectUrls'], ['sysmapid', 'sysmapurlid']),
+				'filter' => ['sysmapid' => $sysmapIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($links, 'sysmapid', 'sysmapurlid');
 
-			$links = $this->unsetExtraFields($links, array('sysmapid', 'sysmapurlid'), $options['selectUrls']);
+			$links = $this->unsetExtraFields($links, ['sysmapid', 'sysmapurlid'], $options['selectUrls']);
 			$result = $relationMap->mapMany($result, $links, 'urls');
 		}
 

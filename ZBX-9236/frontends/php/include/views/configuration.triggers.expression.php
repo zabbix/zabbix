@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
-$expressionWidget = new CWidget(null, 'trigger-popup');
+$expressionWidget = new CWidget('trigger-popup');
 
 // create form
 $expressionForm = new CForm();
@@ -35,17 +35,17 @@ if (!empty($this->data['parent_discoveryid'])) {
 }
 
 // create form list
-$expressionFormList = new CFormList('expressionFormList');
+$expressionFormList = new CFormList();
 
 // append item to form list
-$item = array(
+$item = [
 	new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, true),
 	new CButton('select', _('Select'), 'return PopUp(\'popup.php?writeonly=1&dstfrm='.$expressionForm->getName().
 		'&dstfld1=itemid&dstfld2=description&submitParent=1'.(!empty($this->data['parent_discoveryid']) ? '&normal_only=1' : '').
 		'&srctbl=items&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
 		'button-form'
 	)
-);
+];
 if (!empty($this->data['parent_discoveryid'])) {
 	$item[] = new CButton('select', _('Select prototype'), 'return PopUp(\'popup.php?dstfrm='.$expressionForm->getName().
 		'&dstfld1=itemid&dstfld2=description&submitParent=1'.url_param('parent_discoveryid', true).
@@ -100,7 +100,7 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 					: new CTextBox('params['.$paramId.']', $paramValue, 10);
 			}
 
-			$expressionFormList->addRow($paramFunction['C'], array($paramField, $paramTypeElement));
+			$expressionFormList->addRow($paramFunction['C'], [$paramField, $paramTypeElement]);
 		}
 		else {
 			$expressionFormList->addRow($paramFunction['C'],
@@ -119,14 +119,14 @@ $expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10)
 // append tabs to form
 $expressionTab = new CTabView();
 $expressionTab->addTab('expressionTab', _('Trigger expression condition'), $expressionFormList);
-$expressionForm->addItem($expressionTab);
 
 // append buttons to form
-$expressionForm->addItem(makeFormFooter(
+$expressionTab->setFooter(makeFormFooter(
 	new CSubmit('insert', _('Insert')),
-	array(new CButtonCancel(url_params(array('parent_discoveryid', 'dstfrm', 'dstfld1')))
-)));
+	[new CButtonCancel(url_params(['parent_discoveryid', 'dstfrm', 'dstfld1']))
+]));
 
+$expressionForm->addItem($expressionTab);
 $expressionWidget->addItem($expressionForm);
 
 return $expressionWidget;

@@ -28,7 +28,7 @@ class CDRule extends CApiService {
 
 	protected $tableName = 'drules';
 	protected $tableAlias = 'dr';
-	protected $sortColumns = array('druleid', 'name');
+	protected $sortColumns = ['druleid', 'name'];
 
 	/**
 	 * Get drule data.
@@ -37,19 +37,19 @@ class CDRule extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get(array $options = array()) {
-		$result = array();
+	public function get(array $options = []) {
+		$result = [];
 
-		$sqlParts = array(
-			'select'	=> array('drules' => 'dr.druleid'),
-			'from'		=> array('drules' => 'drules dr'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['drules' => 'dr.druleid'],
+			'from'		=> ['drules' => 'drules dr'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'druleids'					=> null,
 			'dhostids'					=> null,
 			'dserviceids'				=> null,
@@ -72,11 +72,11 @@ class CDRule extends CApiService {
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		if (CWebUser::getType() < USER_TYPE_ZABBIX_ADMIN) {
-			return array();
+			return [];
 		}
 
 // druleids
@@ -166,37 +166,6 @@ class CDRule extends CApiService {
 	return $result;
 	}
 
-	/**
-	 * Check if discovery rule exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('drule.exists method is deprecated.');
-
-		$options = array(
-			'output' => array('druleid'),
-			'filter' => array(),
-			'limit' => 1
-		);
-
-		if (isset($object['name'])) {
-			$options['filter']['name'] = $object['name'];
-		}
-
-		if (isset($object['druleids'])) {
-			$options['druleids'] = zbx_toArray($object['druleids']);
-		}
-
-		$dRule = $this->get($options);
-
-		return (bool) $dRule;
-	}
-
 	public function checkInput(array &$dRules) {
 		$dRules = zbx_toArray($dRules);
 
@@ -208,8 +177,8 @@ class CDRule extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$proxies = array();
-		$ipRangeValidator = new CIPRangeValidator(array('ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT));
+		$proxies = [];
+		$ipRangeValidator = new CIPRangeValidator(['ipRangeLimit' => ZBX_DISCOVERER_IPRANGE_LIMIT]);
 		foreach ($dRules as $dRule) {
 			if (!isset($dRule['iprange'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('IP range cannot be empty.'));
@@ -239,11 +208,11 @@ class CDRule extends CApiService {
 		}
 
 		if (!empty($proxies)) {
-			$proxiesDB = API::proxy()->get(array(
+			$proxiesDB = API::proxy()->get([
 				'proxyids' => $proxies,
-				'output' => array('proxyid'),
+				'output' => ['proxyid'],
 				'preservekeys' => true,
-			));
+			]);
 			foreach ($proxies as $proxy) {
 				if (!isset($proxiesDB[$proxy])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect proxyid.'));
@@ -257,7 +226,7 @@ class CDRule extends CApiService {
 
 		foreach ($dChecks as $dcnum => $dCheck) {
 			if (isset($dCheck['uniq']) && ($dCheck['uniq'] == 1)) {
-				if (!in_array($dCheck['type'], array(SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3))) {
+				if (!in_array($dCheck['type'], [SVC_AGENT, SVC_SNMPv1, SVC_SNMPv2c, SVC_SNMPv3])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_('Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.')
 					);
@@ -316,10 +285,10 @@ class CDRule extends CApiService {
 			// validate snmpv3 fields
 			if (isset($dCheck['snmpv3_securitylevel']) && $dCheck['snmpv3_securitylevel'] != ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
 				// snmpv3 authprotocol
-				if (str_in_array($dCheck['snmpv3_securitylevel'], array(ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV))) {
+				if (str_in_array($dCheck['snmpv3_securitylevel'], [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV])) {
 					if (zbx_empty($dCheck['snmpv3_authprotocol'])
 							|| (isset($dCheck['snmpv3_authprotocol'])
-									&& !str_in_array($dCheck['snmpv3_authprotocol'], array(ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA)))) {
+									&& !str_in_array($dCheck['snmpv3_authprotocol'], [ITEM_AUTHPROTOCOL_MD5, ITEM_AUTHPROTOCOL_SHA]))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect authentication protocol for discovery rule "%1$s".', $dCheck['name']));
 					}
 				}
@@ -328,7 +297,7 @@ class CDRule extends CApiService {
 				if ($dCheck['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV) {
 					if (zbx_empty($dCheck['snmpv3_privprotocol'])
 							|| (isset($dCheck['snmpv3_privprotocol'])
-									&& !str_in_array($dCheck['snmpv3_privprotocol'], array(ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES)))) {
+									&& !str_in_array($dCheck['snmpv3_privprotocol'], [ITEM_PRIVPROTOCOL_DES, ITEM_PRIVPROTOCOL_AES]))) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect privacy protocol for discovery rule "%1$s".', $dCheck['name']));
 					}
 				}
@@ -414,18 +383,18 @@ class CDRule extends CApiService {
 		$this->validateRequiredFields($dRules, __FUNCTION__);
 
 		// check host name duplicates
-		$collectionValidator = new CCollectionValidator(array(
+		$collectionValidator = new CCollectionValidator([
 			'uniqueField' => 'name',
 			'messageDuplicate' => _('Discovery rule "%1$s" already exists.')
-		));
+		]);
 		$this->checkValidator($dRules, $collectionValidator);
 
 		// checking to the duplicate names
-		$dbDRules = API::getApiService()->select($this->tableName(), array(
-			'output' => array('name'),
-			'filter' => array('name' => zbx_objectValues($dRules, 'name')),
+		$dbDRules = API::getApiService()->select($this->tableName(), [
+			'output' => ['name'],
+			'filter' => ['name' => zbx_objectValues($dRules, 'name')],
 			'limit' => 1
-		));
+		]);
 
 		if ($dbDRules) {
 			$dbDRule = reset($dbDRules);
@@ -434,7 +403,7 @@ class CDRule extends CApiService {
 
 		$druleids = DB::insert('drules', $dRules);
 
-		$dChecksCreate = array();
+		$dChecksCreate = [];
 		foreach ($dRules as $dNum => $dRule) {
 			foreach ($dRule['dchecks'] as $dCheck) {
 				$dCheck['druleid'] = $druleids[$dNum];
@@ -444,7 +413,7 @@ class CDRule extends CApiService {
 
 		DB::insert('dchecks', $dChecksCreate);
 
-		return array('druleids' => $druleids);
+		return ['druleids' => $druleids];
 	}
 
 	/**
@@ -481,20 +450,20 @@ class CDRule extends CApiService {
 
 		$dRuleIds = zbx_objectValues($dRules, 'druleid');
 
-		$dRulesDb = API::DRule()->get(array(
+		$dRulesDb = API::DRule()->get([
 			'druleids' => $dRuleIds,
 			'output' => API_OUTPUT_EXTEND,
 			'selectDChecks' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		$defaultValues = DB::getDefaults('dchecks');
 
-		$dRulesUpdate = array();
-		$dCheckIdsDelete = array();
-		$dChecksCreate = array();
-		$dRuleNamesChanged = array();
+		$dRulesUpdate = [];
+		$dCheckIdsDelete = [];
+		$dChecksCreate = [];
+		$dRuleNamesChanged = [];
 
 		// validate drule duplicate names
 		foreach ($dRules as $dRule) {
@@ -515,11 +484,11 @@ class CDRule extends CApiService {
 		}
 
 		if ($dRuleNamesChanged) {
-			$dbDRules = API::getApiService()->select($this->tableName(), array(
-				'output' => array('name'),
-				'filter' => array('name' => $dRuleNamesChanged),
+			$dbDRules = API::getApiService()->select($this->tableName(), [
+				'output' => ['name'],
+				'filter' => ['name' => $dRuleNamesChanged],
 				'limit' => 1
-			));
+			]);
 
 			if ($dbDRules) {
 				$dbDRule = reset($dbDRules);
@@ -530,16 +499,16 @@ class CDRule extends CApiService {
 		}
 
 		foreach ($dRules as $dRule) {
-			$dRulesUpdate[] = array(
+			$dRulesUpdate[] = [
 				'values' => $dRule,
-				'where' => array('druleid' => $dRule['druleid'])
-			);
+				'where' => ['druleid' => $dRule['druleid']]
+			];
 
 			// update dchecks
 			$dbChecks = $dRulesDb[$dRule['druleid']]['dchecks'];
 
-			$newChecks = array();
-			$oldChecks = array();
+			$newChecks = [];
+			$oldChecks = [];
 
 			foreach ($dRule['dchecks'] as $check) {
 				$check['druleid'] = $dRule['druleid'];
@@ -566,7 +535,7 @@ class CDRule extends CApiService {
 
 		DB::update('drules', $dRulesUpdate);
 
-		return array('druleids' => $dRuleIds);
+		return ['druleids' => $dRuleIds];
 	}
 
 	/**
@@ -579,10 +548,10 @@ class CDRule extends CApiService {
 	public function delete(array $dRuleIds) {
 		$this->validateDelete($dRuleIds);
 
-		$actionIds = array();
-		$conditionIds = array();
+		$actionIds = [];
+		$conditionIds = [];
 
-		$dCheckIds = array();
+		$dCheckIds = [];
 
 		$dbChecks = DBselect('SELECT dc.dcheckid FROM dchecks dc WHERE '.dbConditionInt('dc.druleid', $dRuleIds));
 
@@ -603,24 +572,24 @@ class CDRule extends CApiService {
 		}
 
 		if ($actionIds) {
-			DB::update('actions', array(
-				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => array_unique($actionIds))
-			));
+			DB::update('actions', [
+				'values' => ['status' => ACTION_STATUS_DISABLED],
+				'where' => ['actionid' => array_unique($actionIds)]
+			]);
 		}
 
 		if ($conditionIds) {
-			DB::delete('conditions', array('conditionid' => $conditionIds));
+			DB::delete('conditions', ['conditionid' => $conditionIds]);
 		}
 
-		$result = DB::delete('drules', array('druleid' => $dRuleIds));
+		$result = DB::delete('drules', ['druleid' => $dRuleIds]);
 		if ($result) {
 			foreach ($dRuleIds as $dRuleId) {
 				add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_DISCOVERY_RULE, '['.$dRuleId.']');
 			}
 		}
 
-		return array('druleids' => $dRuleIds);
+		return ['druleids' => $dRuleIds];
 	}
 
 	/**
@@ -646,7 +615,7 @@ class CDRule extends CApiService {
 	 * @param array $dCheckIds
 	 */
 	protected function deleteActionConditions(array $dCheckIds) {
-		$actionIds = array();
+		$actionIds = [];
 
 		// conditions
 		$dbActions = DBselect(
@@ -662,15 +631,15 @@ class CDRule extends CApiService {
 
 		// disabling actions with deleted conditions
 		if ($actionIds) {
-			DB::update('actions', array(
-				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => $actionIds),
-			));
+			DB::update('actions', [
+				'values' => ['status' => ACTION_STATUS_DISABLED],
+				'where' => ['actionid' => $actionIds],
+			]);
 
-			DB::delete('conditions', array(
+			DB::delete('conditions', [
 				'conditiontype' => CONDITION_TYPE_DCHECK,
 				'value' => $dCheckIds
-			));
+			]);
 		}
 	}
 
@@ -688,10 +657,10 @@ class CDRule extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'druleids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -710,11 +679,11 @@ class CDRule extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'druleids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -728,24 +697,24 @@ class CDRule extends CApiService {
 		if (!is_null($options['selectDChecks'])) {
 			if ($options['selectDChecks'] != API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'druleid', 'dcheckid', 'dchecks');
-				$dchecks = API::DCheck()->get(array(
+				$dchecks = API::DCheck()->get([
 					'output' => $options['selectDChecks'],
 					'dcheckids' => $relationMap->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 				if (!is_null($options['limitSelects'])) {
 					order_result($dchecks, 'dcheckid');
 				}
 				$result = $relationMap->mapMany($result, $dchecks, 'dchecks', $options['limitSelects']);
 			}
 			else {
-				$dchecks = API::DCheck()->get(array(
+				$dchecks = API::DCheck()->get([
 					'druleids' => $druleids,
 					'nopermissions' => true,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$dchecks = zbx_toHash($dchecks, 'druleid');
 				foreach ($result as $druleid => $drule) {
 					if (isset($dchecks[$druleid]))
@@ -760,22 +729,22 @@ class CDRule extends CApiService {
 		if (!is_null($options['selectDHosts'])) {
 			if ($options['selectDHosts'] != API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'druleid', 'dhostid', 'dhosts');
-				$dhosts = API::DHost()->get(array(
+				$dhosts = API::DHost()->get([
 					'output' => $options['selectDHosts'],
 					'dhostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
-				));
+				]);
 				if (!is_null($options['limitSelects'])) {
 					order_result($dhosts, 'dhostid');
 				}
 				$result = $relationMap->mapMany($result, $dhosts, 'dhosts', $options['limitSelects']);
 			}
 			else {
-				$dhosts = API::DHost()->get(array(
+				$dhosts = API::DHost()->get([
 					'druleids' => $druleids,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$dhosts = zbx_toHash($dhosts, 'druleid');
 				foreach ($result as $druleid => $drule) {
 					if (isset($dhosts[$druleid]))

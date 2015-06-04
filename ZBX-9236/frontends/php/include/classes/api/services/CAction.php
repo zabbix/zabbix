@@ -28,7 +28,7 @@ class CAction extends CApiService {
 
 	protected $tableName = 'actions';
 	protected $tableAlias = 'a';
-	protected $sortColumns = array('actionid', 'name', 'status');
+	protected $sortColumns = ['actionid', 'name', 'status'];
 
 	/**
 	 * Get actions data
@@ -49,20 +49,20 @@ class CAction extends CApiService {
 	 *
 	 * @return array|int item data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userId = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('actions' => 'a.actionid'),
-			'from'		=> array('actions' => 'actions a'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['actions' => 'a.actionid'],
+			'from'		=> ['actions' => 'actions a'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'actionids'					=> null,
@@ -89,7 +89,7 @@ class CAction extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
@@ -248,7 +248,7 @@ class CAction extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$actionIds = array();
+		$actionIds = [];
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -266,8 +266,8 @@ class CAction extends CApiService {
 
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			// check hosts, templates
-			$hosts = array();
-			$hostIds = array();
+			$hosts = [];
+			$hostIds = [];
 			$sql = 'SELECT o.actionid,och.hostid'.
 					' FROM operations o,opcommand_hst och'.
 					' WHERE o.operationid=och.operationid'.
@@ -276,7 +276,7 @@ class CAction extends CApiService {
 			$dbHosts = DBselect($sql);
 			while ($host = DBfetch($dbHosts)) {
 				if (!isset($hosts[$host['hostid']])) {
-					$hosts[$host['hostid']] = array();
+					$hosts[$host['hostid']] = [];
 				}
 				$hosts[$host['hostid']][$host['actionid']] = $host['actionid'];
 				$hostIds[$host['hostid']] = $host['hostid'];
@@ -290,19 +290,19 @@ class CAction extends CApiService {
 			);
 			while ($template = DBfetch($dbTemplates)) {
 				if (!isset($hosts[$template['templateid']])) {
-					$hosts[$template['templateid']] = array();
+					$hosts[$template['templateid']] = [];
 				}
 				$hosts[$template['templateid']][$template['actionid']] = $template['actionid'];
 				$hostIds[$template['templateid']] = $template['templateid'];
 			}
 
-			$allowedHosts = API::Host()->get(array(
+			$allowedHosts = API::Host()->get([
 				'hostids' => $hostIds,
-				'output' => array('hostid'),
+				'output' => ['hostid'],
 				'editable' => $options['editable'],
 				'templated_hosts' => true,
 				'preservekeys' => true
-			));
+			]);
 			foreach ($hostIds as $hostId) {
 				if (isset($allowedHosts[$hostId])) {
 					continue;
@@ -314,8 +314,8 @@ class CAction extends CApiService {
 			unset($allowedHosts);
 
 			// check hostgroups
-			$groups = array();
-			$groupIds = array();
+			$groups = [];
+			$groupIds = [];
 			$dbGroups = DBselect(
 				'SELECT o.actionid,ocg.groupid'.
 				' FROM operations o,opcommand_grp ocg'.
@@ -324,7 +324,7 @@ class CAction extends CApiService {
 			);
 			while ($group = DBfetch($dbGroups)) {
 				if (!isset($groups[$group['groupid']])) {
-					$groups[$group['groupid']] = array();
+					$groups[$group['groupid']] = [];
 				}
 				$groups[$group['groupid']][$group['actionid']] = $group['actionid'];
 				$groupIds[$group['groupid']] = $group['groupid'];
@@ -338,18 +338,18 @@ class CAction extends CApiService {
 			);
 			while ($group = DBfetch($dbGroups)) {
 				if (!isset($groups[$group['groupid']])) {
-					$groups[$group['groupid']] = array();
+					$groups[$group['groupid']] = [];
 				}
 				$groups[$group['groupid']][$group['actionid']] = $group['actionid'];
 				$groupIds[$group['groupid']] = $group['groupid'];
 			}
 
-			$allowedGroups = API::HostGroup()->get(array(
+			$allowedGroups = API::HostGroup()->get([
 				'groupids' => $groupIds,
-				'output' => array('groupid'),
+				'output' => ['groupid'],
 				'editable' => $options['editable'],
 				'preservekeys' => true
-			));
+			]);
 			foreach ($groupIds as $groupId) {
 				if (isset($allowedGroups[$groupId])) {
 					continue;
@@ -361,8 +361,8 @@ class CAction extends CApiService {
 			unset($allowedGroups);
 
 			// check scripts
-			$scripts = array();
-			$scriptIds = array();
+			$scripts = [];
+			$scriptIds = [];
 			$dbScripts = DBselect(
 				'SELECT o.actionid,oc.scriptid'.
 				' FROM operations o,opcommand oc'.
@@ -372,17 +372,17 @@ class CAction extends CApiService {
 			);
 			while ($script = DBfetch($dbScripts)) {
 				if (!isset($scripts[$script['scriptid']])) {
-					$scripts[$script['scriptid']] = array();
+					$scripts[$script['scriptid']] = [];
 				}
 				$scripts[$script['scriptid']][$script['actionid']] = $script['actionid'];
 				$scriptIds[$script['scriptid']] = $script['scriptid'];
 			}
 
-			$allowedScripts = API::Script()->get(array(
+			$allowedScripts = API::Script()->get([
 				'scriptids' => $scriptIds,
-				'output' => array('scriptid'),
+				'output' => ['scriptid'],
 				'preservekeys' => true
-			));
+			]);
 			foreach ($scriptIds as $scriptId) {
 				if (isset($allowedScripts[$scriptId])) {
 					continue;
@@ -394,8 +394,8 @@ class CAction extends CApiService {
 			unset($allowedScripts);
 
 			// check users
-			$users = array();
-			$userIds = array();
+			$users = [];
+			$userIds = [];
 			$dbUsers = DBselect(
 				'SELECT o.actionid,omu.userid'.
 				' FROM operations o,opmessage_usr omu'.
@@ -404,17 +404,17 @@ class CAction extends CApiService {
 			);
 			while ($user = DBfetch($dbUsers)) {
 				if (!isset($users[$user['userid']])) {
-					$users[$user['userid']] = array();
+					$users[$user['userid']] = [];
 				}
 				$users[$user['userid']][$user['actionid']] = $user['actionid'];
 				$userIds[$user['userid']] = $user['userid'];
 			}
 
-			$allowedUsers = API::User()->get(array(
+			$allowedUsers = API::User()->get([
 				'userids' => $userIds,
-				'output' => array('userid'),
+				'output' => ['userid'],
 				'preservekeys' => true
-			));
+			]);
 			foreach ($userIds as $userId) {
 				if (isset($allowedUsers[$userId])) {
 					continue;
@@ -425,8 +425,8 @@ class CAction extends CApiService {
 			}
 
 			// check usergroups
-			$userGroups = array();
-			$userGroupIds = array();
+			$userGroups = [];
+			$userGroupIds = [];
 			$dbUserGroups = DBselect(
 				'SELECT o.actionid,omg.usrgrpid'.
 				' FROM operations o,opmessage_grp omg'.
@@ -435,17 +435,17 @@ class CAction extends CApiService {
 			);
 			while ($userGroup = DBfetch($dbUserGroups)) {
 				if (!isset($userGroups[$userGroup['usrgrpid']])) {
-					$userGroups[$userGroup['usrgrpid']] = array();
+					$userGroups[$userGroup['usrgrpid']] = [];
 				}
 				$userGroups[$userGroup['usrgrpid']][$userGroup['actionid']] = $userGroup['actionid'];
 				$userGroupIds[$userGroup['usrgrpid']] = $userGroup['usrgrpid'];
 			}
 
-			$allowedUserGroups = API::UserGroup()->get(array(
+			$allowedUserGroups = API::UserGroup()->get([
 				'usrgrpids' => $userGroupIds,
-				'output' => array('usrgrpid'),
+				'output' => ['usrgrpid'],
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($userGroupIds as $userGroupId) {
 				if (isset($allowedUserGroups[$userGroupId])) {
@@ -470,8 +470,8 @@ class CAction extends CApiService {
 
 				if ($options['selectFilter'] !== null) {
 					$filter = $this->unsetExtraFields(
-						array($action['filter']),
-						array('conditions', 'formula', 'evaltype'),
+						[$action['filter']],
+						['conditions', 'formula', 'evaltype'],
 						$options['selectFilter']
 					);
 					$filter = reset($filter);
@@ -495,27 +495,6 @@ class CAction extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Check if action exists.
-	 *
-	 * @deprecated	As of version 2.4, use get method instead.
-	 *
-	 * @param array	$object
-	 *
-	 * @return bool
-	 */
-	public function exists(array $object) {
-		$this->deprecated('action.exists method is deprecated.');
-
-		$action = $this->get(array(
-			'output' => array('actionid'),
-			'filter' => zbx_array_mintersect(array(array('actionid', 'name')), $object),
-			'limit' => 1
-		));
-
-		return (bool) $action;
 	}
 
 	/**
@@ -549,8 +528,8 @@ class CAction extends CApiService {
 		$actions = DB::save('actions', $actions);
 		$actions = zbx_toHash($actions, 'actionid');
 
-		$conditionsToCreate = array();
-		$operationsToCreate = array();
+		$conditionsToCreate = [];
+		$operationsToCreate = [];
 		// Collect conditions and operations to be created and set appropriate action ID.
 		foreach ($actions as $actionId => &$action) {
 			if (isset($action['filter'])) {
@@ -570,7 +549,7 @@ class CAction extends CApiService {
 		$createdConditions = $this->addConditions($conditionsToCreate);
 
 		// Group back created action conditions by action ID to be used for updating action formula.
-		$conditionsForActions = array();
+		$conditionsForActions = [];
 		foreach ($createdConditions as $condition) {
 			$conditionsForActions[$condition['actionid']][$condition['conditionid']] = $condition;
 		}
@@ -588,7 +567,7 @@ class CAction extends CApiService {
 		// Add operations.
 		$this->addOperations($operationsToCreate);
 
-		return array('actionids' => array_keys($actions));
+		return ['actionids' => array_keys($actions)];
 	}
 
 	/**
@@ -611,22 +590,22 @@ class CAction extends CApiService {
 		$actions = zbx_toHash($actions, 'actionid');
 		$actionIds = array_keys($actions);
 
-		$actionsDb = $this->get(array(
+		$actionsDb = $this->get([
 			'actionids'        => $actionIds,
 			'editable'         => true,
 			'output'           => API_OUTPUT_EXTEND,
 			'preservekeys'     => true,
 			'selectOperations' => API_OUTPUT_EXTEND,
-			'selectFilter'     => array('formula', 'conditions')
-		));
+			'selectFilter'     => ['formula', 'conditions']
+		]);
 
 		$this->validateUpdate($actions, $actionsDb);
 
-		$operationsToCreate = array();
-		$operationsToUpdate = array();
-		$operationIdsForDelete = array();
+		$operationsToCreate = [];
+		$operationsToUpdate = [];
+		$operationIdsForDelete = [];
 
-		$actionsUpdateData = array();
+		$actionsUpdateData = [];
 
 		$newActionConditions = null;
 		foreach ($actions as $actionId => $action) {
@@ -674,7 +653,7 @@ class CAction extends CApiService {
 				$operationIdsForDelete = array_merge($operationIdsForDelete, array_keys($operationsDb));
 			}
 
-			$actionsUpdateData[] = array('values' => $actionUpdateValues, 'where' => array('actionid' => $actionId));
+			$actionsUpdateData[] = ['values' => $actionUpdateValues, 'where' => ['actionid' => $actionId]];
 		}
 
 		if ($actionsUpdateData) {
@@ -693,10 +672,10 @@ class CAction extends CApiService {
 		foreach ($actions as $actionId => $action) {
 			if (isset($action['filter'])) {
 				if ($newActionConditions === null) {
-					$newActionConditions = array();
+					$newActionConditions = [];
 				}
 
-				$newActionConditions[$actionId] = array();
+				$newActionConditions[$actionId] = [];
 				foreach ($action['filter']['conditions'] as $condition) {
 					$condition['actionid'] = $actionId;
 					$newActionConditions[$actionId][] = $condition;
@@ -706,7 +685,7 @@ class CAction extends CApiService {
 
 		// if we have any conditions, fetch current conditions from db and do replace by position and group result
 		// by actionid into $actionConditions
-		$actionConditions = array();
+		$actionConditions = [];
 		if ($newActionConditions !== null) {
 			$existingConditions = DBfetchArray(DBselect(
 				'SELECT conditionid,actionid,conditiontype,operator,value'.
@@ -714,7 +693,7 @@ class CAction extends CApiService {
 				' WHERE '.dbConditionInt('actionid', $actionIds).
 				' ORDER BY conditionid'
 			));
-			$existingActionConditions = array();
+			$existingActionConditions = [];
 			foreach ($existingConditions as $condition) {
 				$existingActionConditions[$condition['actionid']][] = $condition;
 			}
@@ -732,7 +711,7 @@ class CAction extends CApiService {
 			}
 		}
 
-		return array('actionids' => $actionIds);
+		return ['actionids' => $actionIds];
 	}
 
 	/**
@@ -742,10 +721,10 @@ class CAction extends CApiService {
 	 */
 	protected function addConditions($conditions) {
 		foreach ($conditions as $condition) {
-			$connectionDbFields = array(
+			$connectionDbFields = [
 				'actionid' => null,
 				'conditiontype' => null
-			);
+			];
 			if (!check_db_fields($connectionDbFields, $condition)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameters for condition.'));
 			}
@@ -755,14 +734,14 @@ class CAction extends CApiService {
 	}
 
 	protected function updateConditions($conditions) {
-		$update = array();
+		$update = [];
 		foreach ($conditions as $condition) {
 			$conditionId = $condition['conditionid'];
 			unset($condition['conditionid']);
-			$update = array(
+			$update = [
 				'values' => $condition,
-				'where' => array('conditionid' => $conditionId)
-			);
+				'where' => ['conditionid' => $conditionId]
+			];
 		}
 		DB::update('conditions', $update);
 
@@ -770,7 +749,7 @@ class CAction extends CApiService {
 	}
 
 	protected function deleteConditions($conditionids) {
-		DB::delete('conditions', array('conditionid' => $conditionids));
+		DB::delete('conditions', ['conditionid' => $conditionids]);
 	}
 
 	/**
@@ -780,10 +759,10 @@ class CAction extends CApiService {
 	 */
 	protected function addOperations($operations) {
 		foreach ($operations as $operation) {
-			$operationDbFields = array(
+			$operationDbFields = [
 				'actionid' => null,
 				'operationtype' => null
-			);
+			];
 			if (!check_db_fields($operationDbFields, $operation)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect parameter for operations.'));
 			}
@@ -792,15 +771,15 @@ class CAction extends CApiService {
 		$operations = DB::save('operations', $operations);
 		$operations = zbx_toHash($operations, 'operationid');
 
-		$opMessagesToInsert = array();
-		$opCommandsToInsert = array();
-		$opMessageGrpsToInsert = array();
-		$opMessageUsrsToInsert = array();
-		$opCommandHstsToInsert = array();
-		$opCommandGroupInserts = array();
-		$opGroupsToInsert = array();
-		$opTemplatesToInsert = array();
-		$opConditionsToInsert = array();
+		$opMessagesToInsert = [];
+		$opCommandsToInsert = [];
+		$opMessageGrpsToInsert = [];
+		$opMessageUsrsToInsert = [];
+		$opCommandHstsToInsert = [];
+		$opCommandGroupInserts = [];
+		$opGroupsToInsert = [];
+		$opTemplatesToInsert = [];
+		$opConditionsToInsert = [];
 
 		foreach ($operations as $operationId => $operation) {
 			switch ($operation['operationtype']) {
@@ -811,18 +790,18 @@ class CAction extends CApiService {
 					}
 					if (isset($operation['opmessage_usr'])) {
 						foreach ($operation['opmessage_usr'] as $user) {
-							$opMessageUsrsToInsert[] = array(
+							$opMessageUsrsToInsert[] = [
 								'operationid' => $operationId,
 								'userid' => $user['userid']
-							);
+							];
 						}
 					}
 					if (isset($operation['opmessage_grp'])) {
 						foreach ($operation['opmessage_grp'] as $userGroup) {
-							$opMessageGrpsToInsert[] = array(
+							$opMessageGrpsToInsert[] = [
 								'operationid' => $operationId,
 								'usrgrpid' => $userGroup['usrgrpid']
-							);
+							];
 						}
 					}
 					break;
@@ -833,37 +812,37 @@ class CAction extends CApiService {
 					}
 					if (isset($operation['opcommand_hst'])) {
 						foreach ($operation['opcommand_hst'] as $host) {
-							$opCommandHstsToInsert[] = array(
+							$opCommandHstsToInsert[] = [
 								'operationid' => $operationId,
 								'hostid' => $host['hostid']
-							);
+							];
 						}
 					}
 					if (isset($operation['opcommand_grp'])) {
 						foreach ($operation['opcommand_grp'] as $hostGroup) {
-							$opCommandGroupInserts[] = array(
+							$opCommandGroupInserts[] = [
 								'operationid' => $operationId,
 								'groupid' => $hostGroup['groupid']
-							);
+							];
 						}
 					}
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
 					foreach ($operation['opgroup'] as $hostGroup) {
-						$opGroupsToInsert[] = array(
+						$opGroupsToInsert[] = [
 							'operationid' => $operationId,
 							'groupid' => $hostGroup['groupid']
-						);
+						];
 					}
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					foreach ($operation['optemplate'] as $template) {
-						$opTemplatesToInsert[] = array(
+						$opTemplatesToInsert[] = [
 							'operationid' => $operationId,
 							'templateid' => $template['templateid']
-						);
+						];
 					}
 					break;
 				case OPERATION_TYPE_HOST_ADD:
@@ -896,38 +875,38 @@ class CAction extends CApiService {
 	 * @param array $actionsDb
 	 */
 	protected function updateOperations($operations, $actionsDb) {
-		$operationsUpdate = array();
+		$operationsUpdate = [];
 
 		// messages
-		$opMessagesToInsert = array();
-		$opMessagesToUpdate = array();
-		$opMessagesToDeleteByOpId = array();
+		$opMessagesToInsert = [];
+		$opMessagesToUpdate = [];
+		$opMessagesToDeleteByOpId = [];
 
-		$opMessageGrpsToInsert = array();
-		$opMessageUsrsToInsert = array();
-		$opMessageGrpsToDeleteByOpId = array();
-		$opMessageUsrsToDeleteByOpId = array();
+		$opMessageGrpsToInsert = [];
+		$opMessageUsrsToInsert = [];
+		$opMessageGrpsToDeleteByOpId = [];
+		$opMessageUsrsToDeleteByOpId = [];
 
 		// commands
-		$opCommandsToInsert = array();
-		$opCommandsToUpdate = array();
-		$opCommandsToDeleteByOpId = array();
+		$opCommandsToInsert = [];
+		$opCommandsToUpdate = [];
+		$opCommandsToDeleteByOpId = [];
 
-		$opCommandGrpsToInsert = array();
-		$opCommandHstsToInsert = array();
-		$opCommandGrpsToDeleteByOpId = array();
-		$opCommandHstsToDeleteByOpId = array();
+		$opCommandGrpsToInsert = [];
+		$opCommandHstsToInsert = [];
+		$opCommandGrpsToDeleteByOpId = [];
+		$opCommandHstsToDeleteByOpId = [];
 
 		// groups
-		$opGroupsToInsert = array();
-		$opGroupsToDeleteByOpId = array();
+		$opGroupsToInsert = [];
+		$opGroupsToDeleteByOpId = [];
 
 		// templates
-		$opTemplateToInsert = array();
-		$opTemplatesToDeleteByOpId = array();
+		$opTemplateToInsert = [];
+		$opTemplatesToDeleteByOpId = [];
 
 		// operation conditions
-		$opConditionsToInsert = array();
+		$opConditionsToInsert = [];
 
 		foreach ($operations as $operation) {
 			$operationsDb = zbx_toHash($actionsDb[$operation['actionid']]['operations'], 'operationid');
@@ -978,24 +957,24 @@ class CAction extends CApiService {
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
 					if (!isset($operation['opmessage_grp'])) {
-						$operation['opmessage_grp'] = array();
+						$operation['opmessage_grp'] = [];
 					}
 					else {
-						zbx_array_push($operation['opmessage_grp'], array('operationid' => $operation['operationid']));
+						zbx_array_push($operation['opmessage_grp'], ['operationid' => $operation['operationid']]);
 					}
 
 					if (!isset($operation['opmessage_usr'])) {
-						$operation['opmessage_usr'] = array();
+						$operation['opmessage_usr'] = [];
 					}
 					else {
-						zbx_array_push($operation['opmessage_usr'], array('operationid' => $operation['operationid']));
+						zbx_array_push($operation['opmessage_usr'], ['operationid' => $operation['operationid']]);
 					}
 
 					if (!isset($operationDb['opmessage_usr'])) {
-						$operationDb['opmessage_usr'] = array();
+						$operationDb['opmessage_usr'] = [];
 					}
 					if (!isset($operationDb['opmessage_grp'])) {
-						$operationDb['opmessage_grp'] = array();
+						$operationDb['opmessage_grp'] = [];
 					}
 
 					if ($typeChanged) {
@@ -1006,51 +985,51 @@ class CAction extends CApiService {
 						$opMessageUsrsToInsert = array_merge($opMessageUsrsToInsert, $operation['opmessage_usr']);
 					}
 					else {
-						$opMessagesToUpdate[] = array(
+						$opMessagesToUpdate[] = [
 							'values' => $operation['opmessage'],
-							'where' => array('operationid'=>$operation['operationid'])
-						);
+							'where' => ['operationid'=>$operation['operationid']]
+						];
 
 						$diff = zbx_array_diff($operation['opmessage_grp'], $operationDb['opmessage_grp'], 'usrgrpid');
 						$opMessageGrpsToInsert = array_merge($opMessageGrpsToInsert, $diff['first']);
 
 						foreach ($diff['second'] as $opMessageGrp) {
-							DB::delete('opmessage_grp', array(
+							DB::delete('opmessage_grp', [
 								'usrgrpid' => $opMessageGrp['usrgrpid'],
 								'operationid' => $operation['operationid']
-							));
+							]);
 						}
 
 						$diff = zbx_array_diff($operation['opmessage_usr'], $operationDb['opmessage_usr'], 'userid');
 						$opMessageUsrsToInsert = array_merge($opMessageUsrsToInsert, $diff['first']);
 						foreach ($diff['second'] as $opMessageUsr) {
-							DB::delete('opmessage_usr', array(
+							DB::delete('opmessage_usr', [
 								'userid' => $opMessageUsr['userid'],
 								'operationid' => $operation['operationid']
-							));
+							]);
 						}
 					}
 					break;
 				case OPERATION_TYPE_COMMAND:
 					if (!isset($operation['opcommand_grp'])) {
-						$operation['opcommand_grp'] = array();
+						$operation['opcommand_grp'] = [];
 					}
 					else {
-						zbx_array_push($operation['opcommand_grp'], array('operationid' => $operation['operationid']));
+						zbx_array_push($operation['opcommand_grp'], ['operationid' => $operation['operationid']]);
 					}
 
 					if (!isset($operation['opcommand_hst'])) {
-						$operation['opcommand_hst'] = array();
+						$operation['opcommand_hst'] = [];
 					}
 					else {
-						zbx_array_push($operation['opcommand_hst'], array('operationid' => $operation['operationid']));
+						zbx_array_push($operation['opcommand_hst'], ['operationid' => $operation['operationid']]);
 					}
 
 					if (!isset($operationDb['opcommand_grp'])) {
-						$operationDb['opcommand_grp'] = array();
+						$operationDb['opcommand_grp'] = [];
 					}
 					if (!isset($operationDb['opcommand_hst'])) {
-						$operationDb['opcommand_hst'] = array();
+						$operationDb['opcommand_hst'] = [];
 					}
 
 					if ($typeChanged) {
@@ -1085,83 +1064,83 @@ class CAction extends CApiService {
 							$operation['opcommand']['privatekey'] = '';
 						}
 
-						$opCommandsToUpdate[] = array(
+						$opCommandsToUpdate[] = [
 							'values' => $operation['opcommand'],
-							'where' => array('operationid' => $operation['operationid'])
-						);
+							'where' => ['operationid' => $operation['operationid']]
+						];
 
 						$diff = zbx_array_diff($operation['opcommand_grp'], $operationDb['opcommand_grp'], 'groupid');
 						$opCommandGrpsToInsert = array_merge($opCommandGrpsToInsert, $diff['first']);
 
 						foreach ($diff['second'] as $opMessageGrp) {
-							DB::delete('opcommand_grp', array(
+							DB::delete('opcommand_grp', [
 								'groupid' => $opMessageGrp['groupid'],
 								'operationid' => $operation['operationid']
-							));
+							]);
 						}
 
 						$diff = zbx_array_diff($operation['opcommand_hst'], $operationDb['opcommand_hst'], 'hostid');
 						$opCommandHstsToInsert = array_merge($opCommandHstsToInsert, $diff['first']);
 						$opCommandHostIds = zbx_objectValues($diff['second'], 'opcommand_hstid');
 						if ($opCommandHostIds) {
-							DB::delete('opcommand_hst', array(
+							DB::delete('opcommand_hst', [
 								'opcommand_hstid' => $opCommandHostIds
-							));
+							]);
 						}
 					}
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
 					if (!isset($operation['opgroup'])) {
-						$operation['opgroup'] = array();
+						$operation['opgroup'] = [];
 					}
 					else {
-						zbx_array_push($operation['opgroup'], array('operationid' => $operation['operationid']));
+						zbx_array_push($operation['opgroup'], ['operationid' => $operation['operationid']]);
 					}
 
 					if (!isset($operationDb['opgroup'])) {
-						$operationDb['opgroup'] = array();
+						$operationDb['opgroup'] = [];
 					}
 
 					$diff = zbx_array_diff($operation['opgroup'], $operationDb['opgroup'], 'groupid');
 					$opGroupsToInsert = array_merge($opGroupsToInsert, $diff['first']);
 					foreach ($diff['second'] as $opGroup) {
-						DB::delete('opgroup', array(
+						DB::delete('opgroup', [
 							'groupid' => $opGroup['groupid'],
 							'operationid' => $operation['operationid']
-						));
+						]);
 					}
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					if (!isset($operation['optemplate'])) {
-						$operation['optemplate'] = array();
+						$operation['optemplate'] = [];
 					}
 					else {
-						zbx_array_push($operation['optemplate'], array('operationid' => $operation['operationid']));
+						zbx_array_push($operation['optemplate'], ['operationid' => $operation['operationid']]);
 					}
 
 					if (!isset($operationDb['optemplate'])) {
-						$operationDb['optemplate'] = array();
+						$operationDb['optemplate'] = [];
 					}
 
 					$diff = zbx_array_diff($operation['optemplate'], $operationDb['optemplate'], 'templateid');
 					$opTemplateToInsert = array_merge($opTemplateToInsert, $diff['first']);
 
 					foreach ($diff['second'] as $opTemplate) {
-						DB::delete('optemplate', array(
+						DB::delete('optemplate', [
 							'templateid' => $opTemplate['templateid'],
 							'operationid' => $operation['operationid']
-						));
+						]);
 					}
 					break;
 			}
 
 			if (!isset($operation['opconditions'])) {
-				$operation['opconditions'] = array();
+				$operation['opconditions'] = [];
 			}
 			else {
-				zbx_array_push($operation['opconditions'], array('operationid' => $operation['operationid']));
+				zbx_array_push($operation['opconditions'], ['operationid' => $operation['operationid']]);
 			}
 
 			self::validateOperationConditions($operation['opconditions']);
@@ -1171,50 +1150,50 @@ class CAction extends CApiService {
 
 			$opConditionsIdsToDelete = zbx_objectValues($diff['second'], 'opconditionid');
 			if (!empty($opConditionsIdsToDelete)) {
-				DB::delete('opconditions', array('opconditionid' => $opConditionsIdsToDelete));
+				DB::delete('opconditions', ['opconditionid' => $opConditionsIdsToDelete]);
 			}
 
 			$operationId = $operation['operationid'];
 			unset($operation['operationid']);
 			if (!empty($operation)) {
-				$operationsUpdate[] = array(
+				$operationsUpdate[] = [
 					'values' => $operation,
-					'where' => array('operationid' => $operationId)
-				);
+					'where' => ['operationid' => $operationId]
+				];
 			}
 		}
 
 		DB::update('operations', $operationsUpdate);
 
 		if (!empty($opMessagesToDeleteByOpId)) {
-			DB::delete('opmessage', array('operationid' => $opMessagesToDeleteByOpId));
+			DB::delete('opmessage', ['operationid' => $opMessagesToDeleteByOpId]);
 		}
 		if (!empty($opCommandsToDeleteByOpId)) {
-			DB::delete('opcommand', array('operationid' => $opCommandsToDeleteByOpId));
+			DB::delete('opcommand', ['operationid' => $opCommandsToDeleteByOpId]);
 		}
 		if (!empty($opMessageGrpsToDeleteByOpId)) {
-			DB::delete('opmessage_grp', array('operationid' => $opMessageGrpsToDeleteByOpId));
+			DB::delete('opmessage_grp', ['operationid' => $opMessageGrpsToDeleteByOpId]);
 		}
 		if (!empty($opMessageUsrsToDeleteByOpId)) {
-			DB::delete('opmessage_usr', array('operationid' => $opMessageUsrsToDeleteByOpId));
+			DB::delete('opmessage_usr', ['operationid' => $opMessageUsrsToDeleteByOpId]);
 		}
 		if (!empty($opCommandHstsToDeleteByOpId)) {
-			DB::delete('opcommand_hst', array('operationid' => $opCommandHstsToDeleteByOpId));
+			DB::delete('opcommand_hst', ['operationid' => $opCommandHstsToDeleteByOpId]);
 		}
 		if (!empty($opCommandGrpsToDeleteByOpId)) {
-			DB::delete('opcommand_grp', array('operationid' => $opCommandGrpsToDeleteByOpId));
+			DB::delete('opcommand_grp', ['operationid' => $opCommandGrpsToDeleteByOpId]);
 		}
 		if (!empty($opCommandGrpsToDeleteByOpId)) {
-			DB::delete('opcommand_grp', array('opcommand_grpid' => $opCommandGrpsToDeleteByOpId));
+			DB::delete('opcommand_grp', ['opcommand_grpid' => $opCommandGrpsToDeleteByOpId]);
 		}
 		if (!empty($opCommandHstsToDeleteByOpId)) {
-			DB::delete('opcommand_hst', array('opcommand_hstid' => $opCommandHstsToDeleteByOpId));
+			DB::delete('opcommand_hst', ['opcommand_hstid' => $opCommandHstsToDeleteByOpId]);
 		}
 		if (!empty($opGroupsToDeleteByOpId)) {
-			DB::delete('opgroup', array('operationid' => $opGroupsToDeleteByOpId));
+			DB::delete('opgroup', ['operationid' => $opGroupsToDeleteByOpId]);
 		}
 		if (!empty($opTemplatesToDeleteByOpId)) {
-			DB::delete('optemplate', array('operationid' => $opTemplatesToDeleteByOpId));
+			DB::delete('optemplate', ['operationid' => $opTemplatesToDeleteByOpId]);
 		}
 
 		DB::insert('opmessage', $opMessagesToInsert, false);
@@ -1231,7 +1210,7 @@ class CAction extends CApiService {
 	}
 
 	protected function deleteOperations($operationIds) {
-		DB::delete('operations', array('operationid' => $operationIds));
+		DB::delete('operations', ['operationid' => $operationIds]);
 	}
 
 	/**
@@ -1246,12 +1225,12 @@ class CAction extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$delActions = $this->get(array(
+		$delActions = $this->get([
 			'actionids' => $actionids,
 			'editable' => true,
-			'output' => array('actionid'),
+			'output' => ['actionid'],
 			'preservekeys' => true
-		));
+		]);
 		foreach ($actionids as $actionid) {
 			if (isset($delActions[$actionid])) {
 				continue;
@@ -1259,10 +1238,10 @@ class CAction extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		DB::delete('actions', array('actionid' => $actionids));
-		DB::delete('alerts', array('actionid' => $actionids));
+		DB::delete('actions', ['actionid' => $actionids]);
+		DB::delete('alerts', ['actionid' => $actionids]);
 
-		return array('actionids' => $actionids);
+		return ['actionids' => $actionids];
 	}
 
 	/**
@@ -1294,14 +1273,14 @@ class CAction extends CApiService {
 				}
 			}
 
-			$hostIdsAll = array();
-			$hostGroupIdsAll = array();
-			$userIdsAll = array();
-			$userGroupIdsAll = array();
+			$hostIdsAll = [];
+			$hostGroupIdsAll = [];
+			$userIdsAll = [];
+			$userGroupIdsAll = [];
 			switch ($operation['operationtype']) {
 				case OPERATION_TYPE_MESSAGE:
-					$userIds = isset($operation['opmessage_usr']) ? zbx_objectValues($operation['opmessage_usr'], 'userid') : array();
-					$userGroupIds = isset($operation['opmessage_grp']) ? zbx_objectValues($operation['opmessage_grp'], 'usrgrpid') : array();
+					$userIds = isset($operation['opmessage_usr']) ? zbx_objectValues($operation['opmessage_usr'], 'userid') : [];
+					$userGroupIds = isset($operation['opmessage_grp']) ? zbx_objectValues($operation['opmessage_grp'], 'usrgrpid') : [];
 
 					if (empty($userIds) && empty($userGroupIds)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No recipients for action operation message.'));
@@ -1355,11 +1334,11 @@ class CAction extends CApiService {
 							if (!isset($operation['opcommand']['scriptid']) || zbx_empty($operation['opcommand']['scriptid'])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _('No script specified for action operation command.'));
 							}
-							$scripts = API::Script()->get(array(
-								'output' => array('scriptid','name'),
+							$scripts = API::Script()->get([
+								'output' => ['scriptid','name'],
 								'scriptids' => $operation['opcommand']['scriptid'],
 								'preservekeys' => true
-							));
+							]);
 							if (!isset($scripts[$operation['opcommand']['scriptid']])) {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _('Specified script does not exist or you do not have rights on it for action operation command.'));
 							}
@@ -1379,12 +1358,12 @@ class CAction extends CApiService {
 						}
 					}
 
-					$groupIds = array();
+					$groupIds = [];
 					if (isset($operation['opcommand_grp'])) {
 						$groupIds = zbx_objectValues($operation['opcommand_grp'], 'groupid');
 					}
 
-					$hostIds = array();
+					$hostIds = [];
 					$withoutCurrent = true;
 					if (isset($operation['opcommand_hst'])) {
 						foreach ($operation['opcommand_hst'] as $hstCommand) {
@@ -1411,7 +1390,7 @@ class CAction extends CApiService {
 					break;
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
-					$groupIds = isset($operation['opgroup']) ? zbx_objectValues($operation['opgroup'], 'groupid') : array();
+					$groupIds = isset($operation['opgroup']) ? zbx_objectValues($operation['opgroup'], 'groupid') : [];
 					if (empty($groupIds)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no group to operate.'));
 					}
@@ -1419,7 +1398,7 @@ class CAction extends CApiService {
 					break;
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					$templateIds = isset($operation['optemplate']) ? zbx_objectValues($operation['optemplate'], 'templateid') : array();
+					$templateIds = isset($operation['optemplate']) ? zbx_objectValues($operation['optemplate'], 'templateid') : [];
 					if (empty($templateIds)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Operation has no template to operate.'));
 					}
@@ -1460,10 +1439,10 @@ class CAction extends CApiService {
 	 */
 	public static function validateOperationConditions($conditions) {
 		$conditions = zbx_toArray($conditions);
-		$ackStatuses = array(
+		$ackStatuses = [
 			EVENT_ACKNOWLEDGED => 1,
 			EVENT_NOT_ACKNOWLEDGED => 1
-		);
+		];
 
 		foreach ($conditions as $condition) {
 			switch ($condition['conditiontype']) {
@@ -1493,20 +1472,20 @@ class CAction extends CApiService {
 			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
 			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
 
-			$filters = array();
+			$filters = [];
 			foreach ($result as $action) {
-				$filters[$action['actionid']] = array(
+				$filters[$action['actionid']] = [
 					'evaltype' => $action['evaltype'],
 					'formula' => isset($action['formula']) ? $action['formula'] : ''
-				);
+				];
 			}
 
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = API::getApiService()->select('conditions', array(
-						'output' => array('actionid', 'conditionid', 'conditiontype', 'operator', 'value'),
-						'filter' => array('actionid' => $actionIds),
+				$conditions = API::getApiService()->select('conditions', [
+						'output' => ['actionid', 'conditionid', 'conditiontype', 'operator', 'value'],
+						'filter' => ['actionid' => $actionIds],
 					'preservekeys' => true
-				));
+				]);
 
 				$relationMap = $this->createRelationMap($conditions, 'actionid', 'conditionid');
 				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
@@ -1521,14 +1500,14 @@ class CAction extends CApiService {
 						$conditions = $filter['conditions'];
 
 						// sort conditions
-						$sortFields = array(
-							array('field' => 'conditiontype', 'order' => ZBX_SORT_DOWN),
-							array('field' => 'operator', 'order' => ZBX_SORT_DOWN),
-							array('field' => 'value', 'order' => ZBX_SORT_DOWN)
-						);
+						$sortFields = [
+							['field' => 'conditiontype', 'order' => ZBX_SORT_DOWN],
+							['field' => 'operator', 'order' => ZBX_SORT_DOWN],
+							['field' => 'value', 'order' => ZBX_SORT_DOWN]
+						];
 						CArrayHelper::sort($conditions, $sortFields);
 
-						$conditionsForFormula = array();
+						$conditionsForFormula = [];
 						foreach ($conditions as $condition) {
 							$conditionsForFormula[$condition['conditionid']] = $condition['conditiontype'];
 						}
@@ -1563,19 +1542,19 @@ class CAction extends CApiService {
 
 		// adding operations
 		if ($options['selectOperations'] !== null && $options['selectOperations'] != API_OUTPUT_COUNT) {
-			$operations = API::getApiService()->select('operations', array(
+			$operations = API::getApiService()->select('operations', [
 				'output' => $this->outputExtend($options['selectOperations'],
-					array('operationid', 'actionid', 'operationtype')
+					['operationid', 'actionid', 'operationtype']
 				),
-				'filter' => array('actionid' => $actionIds),
+				'filter' => ['actionid' => $actionIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($operations, 'actionid', 'operationid');
 			$operationIds = $relationMap->getRelatedIds();
 
 			if ($this->outputIsRequested('opconditions', $options['selectOperations'])) {
 				foreach ($operations as &$operation) {
-					$operation['opconditions'] = array();
+					$operation['opconditions'] = [];
 				}
 				unset($operation);
 
@@ -1585,7 +1564,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			$opmessage = $opcommand = $opgroup = $optemplate = array();
+			$opmessage = $opcommand = $opgroup = $optemplate = [];
 			foreach ($operations as $operationid => $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
@@ -1613,7 +1592,7 @@ class CAction extends CApiService {
 			if (!empty($opmessage)) {
 				if ($this->outputIsRequested('opmessage', $options['selectOperations'])) {
 					foreach ($opmessage as $operationId) {
-						$operations[$operationId]['opmessage'] = array();
+						$operations[$operationId]['opmessage'] = [];
 					}
 
 					$dbOpmessages = DBselect(
@@ -1628,7 +1607,7 @@ class CAction extends CApiService {
 
 				if ($this->outputIsRequested('opmessage_grp', $options['selectOperations'])) {
 					foreach ($opmessage as $operationId) {
-						$operations[$operationId]['opmessage_grp'] = array();
+						$operations[$operationId]['opmessage_grp'] = [];
 					}
 
 					$dbOpmessageGrp = DBselect(
@@ -1643,7 +1622,7 @@ class CAction extends CApiService {
 
 				if ($this->outputIsRequested('opmessage_usr', $options['selectOperations'])) {
 					foreach ($opmessage as $operationId) {
-						$operations[$operationId]['opmessage_usr'] = array();
+						$operations[$operationId]['opmessage_usr'] = [];
 					}
 
 					$dbOpmessageUsr = DBselect(
@@ -1661,7 +1640,7 @@ class CAction extends CApiService {
 			if (!empty($opcommand)) {
 				if ($this->outputIsRequested('opcommand', $options['selectOperations'])) {
 					foreach ($opcommand as $operationId) {
-						$operations[$operationId]['opcommand'] = array();
+						$operations[$operationId]['opcommand'] = [];
 					}
 
 					$dbOpcommands = DBselect(
@@ -1676,7 +1655,7 @@ class CAction extends CApiService {
 
 				if ($this->outputIsRequested('opcommand_hst', $options['selectOperations'])) {
 					foreach ($opcommand as $operationId) {
-						$operations[$operationId]['opcommand_hst'] = array();
+						$operations[$operationId]['opcommand_hst'] = [];
 					}
 
 					$dbOpcommandHst = DBselect(
@@ -1691,7 +1670,7 @@ class CAction extends CApiService {
 
 				if ($this->outputIsRequested('opcommand_grp', $options['selectOperations'])) {
 					foreach ($opcommand as $operationId) {
-						$operations[$operationId]['opcommand_grp'] = array();
+						$operations[$operationId]['opcommand_grp'] = [];
 					}
 
 					$dbOpcommandGrp = DBselect(
@@ -1709,7 +1688,7 @@ class CAction extends CApiService {
 			if (!empty($opgroup)) {
 				if ($this->outputIsRequested('opgroup', $options['selectOperations'])) {
 					foreach ($opgroup as $operationId) {
-						$operations[$operationId]['opgroup'] = array();
+						$operations[$operationId]['opgroup'] = [];
 					}
 
 					$dbOpgroup = DBselect(
@@ -1727,7 +1706,7 @@ class CAction extends CApiService {
 			if (!empty($optemplate)) {
 				if ($this->outputIsRequested('optemplate', $options['selectOperations'])) {
 					foreach ($optemplate as $operationId) {
-						$operations[$operationId]['optemplate'] = array();
+						$operations[$operationId]['optemplate'] = [];
 					}
 
 					$dbOptemplate = DBselect(
@@ -1741,7 +1720,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			$operations = $this->unsetExtraFields($operations, array('operationid', 'actionid' ,'operationtype'),
+			$operations = $this->unsetExtraFields($operations, ['operationid', 'actionid' ,'operationtype'],
 				$options['selectOperations']
 			);
 			$result = $relationMap->mapMany($result, $operations, 'operations');
@@ -1756,36 +1735,36 @@ class CAction extends CApiService {
 	 * @return array
 	 */
 	protected function getFilterSchema() {
-		return array(
-			'validators' => array(
-				'evaltype' => new CLimitedSetValidator(array(
-					'values' => array(
+		return [
+			'validators' => [
+				'evaltype' => new CLimitedSetValidator([
+					'values' => [
 						CONDITION_EVAL_TYPE_OR,
 						CONDITION_EVAL_TYPE_AND,
 						CONDITION_EVAL_TYPE_AND_OR,
 						CONDITION_EVAL_TYPE_EXPRESSION
-					),
+					],
 					'messageInvalid' => _('Incorrect type of calculation for action "%1$s".')
-				)),
-				'formula' => new CStringValidator(array(
+				]),
+				'formula' => new CStringValidator([
 					'empty' => true
-				)),
-				'conditions' => new CCollectionValidator(array(
+				]),
+				'conditions' => new CCollectionValidator([
 					'empty' => true,
 					'messageInvalid' => _('Incorrect conditions for action "%1$s".')
-				))
-			),
-			'postValidators' => array(
-				new CConditionValidator(array(
+				])
+			],
+			'postValidators' => [
+				new CConditionValidator([
 					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for action "%1$s": %3$s.'),
 					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for action "%1$s" is not defined.'),
 					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for action "%1$s".')
-				))
-			),
-			'required' => array('evaltype', 'conditions'),
+				])
+			],
+			'required' => ['evaltype', 'conditions'],
 			'messageRequired' => _('No "%2$s" given for the filter of action "%1$s".'),
 			'messageUnsupported' => _('Unsupported parameter "%2$s" for the filter of action "%1$s".')
-		);
+		];
 	}
 
 	/**
@@ -1794,7 +1773,7 @@ class CAction extends CApiService {
 	 * @return array
 	 */
 	protected function getFilterConditionSchema() {
-		$conditionTypes = array(
+		$conditionTypes = [
 			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TRIGGER_NAME,
 			CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TRIGGER_VALUE, CONDITION_TYPE_TIME_PERIOD,
 			CONDITION_TYPE_DHOST_IP, CONDITION_TYPE_DSERVICE_TYPE, CONDITION_TYPE_DSERVICE_PORT,
@@ -1802,45 +1781,42 @@ class CAction extends CApiService {
 			CONDITION_TYPE_EVENT_ACKNOWLEDGED, CONDITION_TYPE_APPLICATION, CONDITION_TYPE_MAINTENANCE,
 			CONDITION_TYPE_DRULE, CONDITION_TYPE_DCHECK, CONDITION_TYPE_PROXY, CONDITION_TYPE_DOBJECT,
 			CONDITION_TYPE_HOST_NAME, CONDITION_TYPE_EVENT_TYPE, CONDITION_TYPE_HOST_METADATA
-		);
+		];
 
-		$operators = array(
+		$operators = [
 			CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE,
 			CONDITION_OPERATOR_NOT_LIKE, CONDITION_OPERATOR_IN, CONDITION_OPERATOR_MORE_EQUAL,
 			CONDITION_OPERATOR_LESS_EQUAL, CONDITION_OPERATOR_NOT_IN
-		);
+		];
 
-		return array(
-			'validators' => array(
-				'conditiontype' => new CLimitedSetValidator(array(
+		return [
+			'validators' => [
+				'conditiontype' => new CLimitedSetValidator([
 					'values' => $conditionTypes,
 					'messageInvalid' => _('Incorrect filter condition type for action "%1$s".')
-				)) ,
-				'value' => new CStringValidator(array(
+				]) ,
+				'value' => new CStringValidator([
 					'empty' => true
-				)),
-				'formulaid' => new CStringValidator(array(
+				]),
+				'formulaid' => new CStringValidator([
 					'regex' => '/[A-Z]+/',
 					'messageEmpty' => _('Empty filter condition formula ID for action "%1$s".'),
 					'messageRegex' => _('Incorrect filter condition formula ID for action "%1$s".')
-				)),
-				'operator' => new CLimitedSetValidator(array(
+				]),
+				'operator' => new CLimitedSetValidator([
 					'values' => $operators,
 					'messageInvalid' => _('Incorrect filter condition operator for action "%1$s".')
-				))
-			),
-			'required' => array('conditiontype', 'value'),
-			'postValidators' => array(
+				])
+			],
+			'required' => ['conditiontype', 'value'],
+			'postValidators' => [
 				new CActionCondValidator()
-			),
+			],
 			'messageRequired' => _('No "%2$s" given for a filter condition of action "%1$s".'),
 			'messageUnsupported' => _('Unsupported parameter "%2$s" for a filter condition of action "%1$s".')
-		);
+		];
 	}
 
-	/**
-	 * {@inheritdoc}
-	 */
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
 
@@ -1869,14 +1845,14 @@ class CAction extends CApiService {
 	 * @param array 	$conditions
 	 */
 	protected function updateFormula($actionId, $formulaWithLetters, array $conditions) {
-		$formulaIdToConditionId = array();
+		$formulaIdToConditionId = [];
 
 		foreach ($conditions as $condition) {
 			$formulaIdToConditionId[$condition['formulaid']] = $condition['conditionid'];
 		}
 		$formula = CConditionHelper::replaceLetterIds($formulaWithLetters, $formulaIdToConditionId);
 
-		DB::updateByPk('actions', $actionId, array('formula' => $formula));
+		DB::updateByPk('actions', $actionId, ['formula' => $formula]);
 	}
 
 	/**
@@ -1885,12 +1861,12 @@ class CAction extends CApiService {
 	 * @param $actions
 	 */
 	public function validateCreate($actions) {
-		$actionDbFields = array(
+		$actionDbFields = [
 			'name'        => null,
 			'eventsource' => null
-		);
+		];
 
-		$duplicates = array();
+		$duplicates = [];
 		foreach ($actions as $action) {
 			if (!check_db_fields($actionDbFields, $action)) {
 				self::exception(
@@ -1914,12 +1890,12 @@ class CAction extends CApiService {
 			}
 		}
 
-		$dbActionsWithSameName = $this->get(array(
-			'filter' => array('name' => $duplicates),
+		$dbActionsWithSameName = $this->get([
+			'filter' => ['name' => $duplicates],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'nopermissions' => true
-		));
+		]);
 		if ($dbActionsWithSameName) {
 			$dbActionWithSameName = reset($dbActionsWithSameName);
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Action "%1$s" already exists.', $dbActionWithSameName['name']));
@@ -1928,8 +1904,8 @@ class CAction extends CApiService {
 		$filterValidator = new CSchemaValidator($this->getFilterSchema());
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
 
-		$conditionsToValidate = array();
-		$operationsToValidate = array();
+		$conditionsToValidate = [];
+		$operationsToValidate = [];
 
 		// Validate "filter" sections and "conditions" in them, ensure that "operations" section
 		// is present and is not empty. Also collect conditions and operations for more validation.
@@ -1985,11 +1961,11 @@ class CAction extends CApiService {
 		$actions = zbx_toHash($actions, 'actionid');
 
 		// check fields
-		$duplicates = array();
+		$duplicates = [];
 		foreach ($actions as $action) {
 			$actionName = isset($action['name']) ? $action['name'] : $actionsDb[$action['actionid']]['name'];
 
-			if (!check_db_fields(array('actionid' => null), $action)) {
+			if (!check_db_fields(['actionid' => null], $action)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 					'Incorrect parameters for action update method "%1$s".', $actionName
 				));
@@ -2008,7 +1984,7 @@ class CAction extends CApiService {
 
 			$this->checkNoParameters(
 				$action,
-				array('eventsource'),
+				['eventsource'],
 				_('Cannot update "%1$s" for action "%2$s".'),
 				$actionName
 			);
@@ -2035,8 +2011,8 @@ class CAction extends CApiService {
 
 		$filterConditionValidator = new CSchemaValidator($this->getFilterConditionSchema());
 
-		$operationsToValidate = array();
-		$conditionsToValidate = array();
+		$operationsToValidate = [];
+		$conditionsToValidate = [];
 
 		foreach ($actions as $actionId => $action) {
 			$actionDb = $actionsDb[$actionId];
@@ -2044,13 +2020,13 @@ class CAction extends CApiService {
 			if (isset($action['name'])) {
 				$actionName = $action['name'];
 
-				$actionExists = $this->get(array(
-					'filter' => array('name' => $actionName),
-					'output' => array('actionid'),
+				$actionExists = $this->get([
+					'filter' => ['name' => $actionName],
+					'output' => ['actionid'],
 					'editable' => true,
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 				if (($actionExists = reset($actionExists))
 					&& (bccomp($actionExists['actionid'], $actionId) != 0)
 				) {
@@ -2109,13 +2085,13 @@ class CAction extends CApiService {
 	 * @param array $conditions   conditions for which permissions to referenced DB entities will be checked
 	 */
 	protected function validateConditionsPermissions(array $conditions) {
-		$hostGroupIdsAll = array();
-		$templateIdsAll = array();
-		$triggerIdsAll = array();
-		$hostIdsAll = array();
-		$discoveryRuleIdsAll = array();
-		$discoveryCheckIdsAll = array();
-		$proxyIdsAll = array();
+		$hostGroupIdsAll = [];
+		$templateIdsAll = [];
+		$triggerIdsAll = [];
+		$hostIdsAll = [];
+		$discoveryRuleIdsAll = [];
+		$discoveryCheckIdsAll = [];
+		$proxyIdsAll = [];
 
 		foreach ($conditions as $condition) {
 			$conditionValue = $condition['value'];

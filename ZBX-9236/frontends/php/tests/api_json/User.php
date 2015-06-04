@@ -24,81 +24,81 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 class API_JSON_User extends CZabbixTest {
 
 	public static function authenticate_data() {
-		return array(
-			array(array('user' => 'Admin', 'password' => 'wrong password'), false),
-			array(array('user' => 'Admin', 'password' => 'zabbix'), true),
-			array(array('password' => 'zabbix', 'user' => 'Admin'), true),
-			array(array('user' => 'Unknown user', 'password' => 'zabbix'), false),
-			array(array('user' => 'Admin'), false),
-			array(array('password' => 'zabbix'), false),
-			array(array('user' => '!@#$%^&\\\'\"""\;:', 'password' => 'zabbix'), false),
-			array(array('password' => '!@#$%^&\\\'\"""\;:', 'user' => 'zabbix'), false)
-		);
+		return [
+			[['user' => 'Admin', 'password' => 'wrong password'], false],
+			[['user' => 'Admin', 'password' => 'zabbix'], true],
+			[['password' => 'zabbix', 'user' => 'Admin'], true],
+			[['user' => 'Unknown user', 'password' => 'zabbix'], false],
+			[['user' => 'Admin'], false],
+			[['password' => 'zabbix'], false],
+			[['user' => '!@#$%^&\\\'\"""\;:', 'password' => 'zabbix'], false],
+			[['password' => '!@#$%^&\\\'\"""\;:', 'user' => 'zabbix'], false]
+		];
 	}
 
 	public static function user_data() {
-		return array(
-			array(
-				'user' => array(
-				),
+		return [
+			[
+				'user' => [
+				],
 				'success_expected' => false,
 				'expected_error' => 'Wrong fields for user'
-			),
-			array(
-				'user' => array(
+			],
+			[
+				'user' => [
 					'alias' => 'Test User 1'
-				),
+				],
 				'success_expected' => false,
 				'expected_error' => 'Wrong fields for user'
-			),
-			array(
-				'user' => array(
+			],
+			[
+				'user' => [
 					'alias' => 'Test User 1',
 					'passwd' => 'zabbix'
-				),
+				],
 				'success_expected' => false,
 				'expected_error' => 'Wrong fields for user'
-			),
-			array(
-				'user' => array(
+			],
+			[
+				'user' => [
 					'alias' => 'Test User 1',
 					'passwd' => 'zabbix',
-					'usrgrps' => array(
+					'usrgrps' => [
 						'usrgrpid' => 7 // Zabbix administrators
-					)
-				),
+					]
+				],
 				'success_expected' => true,
 				'expected_error' => null
-			),
-			array(
-				'user' => array(
+			],
+			[
+				'user' => [
 					'alias' => 'УТФ Юзер',
 					'passwd' => 'zabbix',
-					'usrgrps' => array(
+					'usrgrps' => [
 						'usrgrpid' => 7 // Zabbix administrators
-					)
-				),
+					]
+				],
 				'success_expected' => true,
 				'expected_error' => null
-			),
-			array(
-				'user' => array(
+			],
+			[
+				'user' => [
 					'alias' => 'Admin',
 					'passwd' => 'zabbix',
-					'usrgrps' => array(
+					'usrgrps' => [
 						'usrgrpid' => 7 // Zabbix administrators
-					)
-				),
+					]
+				],
 				'success_expected' => false,
 				'expected_error' => 'already exists'
-			),
-			array(
-				'user' => array(
+			],
+			[
+				'user' => [
 					'alias' => 'Test User 2',
 					'passwd' => 'zabbix',
-					'usrgrps' => array(
+					'usrgrps' => [
 						'usrgrpid' => 7 // Zabbix administrators
-					),
+					],
 					'name' => 'Test User 2 Name',
 					'surname' => 'Test User 2 Surname',
 					'url' => '',
@@ -109,22 +109,22 @@ class API_JSON_User extends CZabbixTest {
 					'type' => 1,
 					'theme' => 'originalblue',
 					'rows_per_page' => 50
-				),
+				],
 				'success_expected' => true,
 				'expected_error' => null
-			),
-			array(
-				'user' => array(
+			],
+			[
+				'user' => [
 					'alias' => 'qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnm',
 					'passwd' => 'zabbix',
-					'usrgrps' => array(
+					'usrgrps' => [
 						'usrgrpid' => 7 // Zabbix administrators
-					)
-				),
+					]
+				],
 				'success_expected' => false,
 				'expected_error' => 'Maximum alias length'
-			)
-		);
+			]
+		];
 	}
 
 	public function testUser_backup() {
@@ -151,7 +151,7 @@ class API_JSON_User extends CZabbixTest {
 	public function testUser_Create($user, $success_expected, $expected_error) {
 		$debug = null;
 
-		$result = $this->api_acall('user.create', array($user), $debug);
+		$result = $this->api_acall('user.create', [$user], $debug);
 
 		if ($success_expected) {
 			$this->assertFalse(array_key_exists('error', $result), $debug);

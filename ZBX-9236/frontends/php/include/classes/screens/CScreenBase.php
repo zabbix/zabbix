@@ -144,7 +144,7 @@ class CScreenBase {
 	 * @param array		$options['timeline']
 	 * @param string	$options['dataId']
 	 */
-	public function __construct(array $options = array()) {
+	public function __construct(array $options = []) {
 		$this->isFlickerfree = isset($options['isFlickerfree']) ? $options['isFlickerfree'] : true;
 		$this->mode = isset($options['mode']) ? $options['mode'] : SCREEN_MODE_SLIDESHOW;
 		$this->timestamp = !empty($options['timestamp']) ? $options['timestamp'] : time();
@@ -171,14 +171,14 @@ class CScreenBase {
 		$this->updateProfile = isset($options['updateProfile']) ? $options['updateProfile'] : true;
 		$this->timeline = !empty($options['timeline']) ? $options['timeline'] : null;
 		if (empty($this->timeline)) {
-			$this->timeline = $this->calculateTime(array(
+			$this->timeline = $this->calculateTime([
 				'profileIdx' => $this->profileIdx,
 				'profileIdx2' => $this->profileIdx2,
 				'updateProfile' => $this->updateProfile,
 				'period' => !empty($options['period']) ? $options['period'] : null,
 				'stime' => !empty($options['stime']) ? $options['stime'] : null,
 				'requestTime' => isset($options['requestTime']) ? $options['requestTime'] : null
-			));
+			]);
 		}
 
 		// get screenitem
@@ -187,17 +187,17 @@ class CScreenBase {
 		}
 		elseif (!empty($options['screenitemid'])) {
 			if ($this->hostid != 0) {
-				$this->screenitem = API::TemplateScreenItem()->get(array(
+				$this->screenitem = API::TemplateScreenItem()->get([
 					'screenitemids' => $options['screenitemid'],
 					'hostids' => $this->hostid,
 					'output' => API_OUTPUT_EXTEND
-				));
+				]);
 			}
 			else {
-				$this->screenitem = API::ScreenItem()->get(array(
+				$this->screenitem = API::ScreenItem()->get([
 					'screenitemids' => $options['screenitemid'],
 					'output' => API_OUTPUT_EXTEND
-				));
+				]);
 			}
 
 			$this->screenitem = reset($this->screenitem);
@@ -259,13 +259,13 @@ class CScreenBase {
 	 *
 	 * @return CDiv
 	 */
-	public function getOutput($item = null, $insertFlickerfreeJs = true, $flickerfreeData = array()) {
+	public function getOutput($item = null, $insertFlickerfreeJs = true, $flickerfreeData = []) {
 		if ($insertFlickerfreeJs) {
 			$this->insertFlickerfreeJs($flickerfreeData);
 		}
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$div = new CDiv(array($item, BR(), new CLink(_('Change'), $this->action)), 'flickerfreescreen', $this->getScreenId());
+			$div = new CDiv([$item, BR(), new CLink(_('Change'), $this->action)], 'flickerfreescreen', $this->getScreenId());
 		}
 		else {
 			$div = new CDiv($item, 'flickerfreescreen', $this->getScreenId());
@@ -282,8 +282,8 @@ class CScreenBase {
 	 *
 	 * @param array $data
 	 */
-	public function insertFlickerfreeJs($data = array()) {
-		$jsData = array(
+	public function insertFlickerfreeJs($data = []) {
+		$jsData = [
 			'id' => $this->getDataId(),
 			'isFlickerfree' => $this->isFlickerfree,
 			'pageFile' => $this->pageFile,
@@ -300,7 +300,7 @@ class CScreenBase {
 			'profileIdx2' => $this->profileIdx2,
 			'updateProfile' => $this->updateProfile,
 			'data' => !empty($data) ? $data : null
-		);
+		];
 
 		zbx_add_post_js('window.flickerfreeScreen.add('.zbx_jsvalue($jsData).');');
 	}
@@ -319,7 +319,7 @@ class CScreenBase {
 	 *
 	 * @return array
 	 */
-	public static function calculateTime(array $options = array()) {
+	public static function calculateTime(array $options = []) {
 		if (!array_key_exists('updateProfile', $options)) {
 			$options['updateProfile'] = true;
 		}
@@ -412,14 +412,14 @@ class CScreenBase {
 			}
 		}
 
-		return array(
+		return [
 			'period' => $options['period'],
 			'stime' => $options['stime'],
 			'stimeNow' => !empty($stimeNow) ? $stimeNow : $options['stime'],
 			'starttime' => date(TIMESTAMP_FORMAT, $time - ZBX_MAX_PERIOD),
 			'usertime' => $usertime,
 			'isNow' => $isNow
-		);
+		];
 	}
 
 	/**
@@ -435,7 +435,7 @@ class CScreenBase {
 	 * @param string	$options['usertime']
 	 * @param int		$options['isNow']
 	 */
-	public static function debugTime(array $time = array()) {
+	public static function debugTime(array $time = []) {
 		return 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
 				'starttime='.date('F j, Y, g:i a', zbxDateToTime($time['starttime'])).', ('.$time['starttime'].')<br/>'.
 				'stime='.date('F j, Y, g:i a', zbxDateToTime($time['stime'])).', ('.$time['stime'].')<br/>'.

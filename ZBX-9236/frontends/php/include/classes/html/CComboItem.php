@@ -23,7 +23,6 @@ class CComboItem extends CTag {
 
 	public function __construct($value, $caption = null, $selected = null, $enabled = null) {
 		parent::__construct('option', 'yes');
-		$this->tag_body_start = '';
 		$this->setAttribute('value', $value);
 		$this->addItem($caption);
 		$this->setSelected($selected);
@@ -62,7 +61,7 @@ class CComboItem extends CTag {
 			$this->removeAttribute('disabled');
 		}
 		else {
-			$this->attr('disabled', 'disabled');
+			$this->setAttribute('disabled', 'disabled');
 		}
 	}
 }

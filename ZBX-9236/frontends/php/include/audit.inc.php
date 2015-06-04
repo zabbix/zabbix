@@ -20,7 +20,7 @@
 
 
 function audit_resource2str($resource_type = null) {
-	$resources = array(
+	$resources = [
 		AUDIT_RESOURCE_USER => _('User'),
 		AUDIT_RESOURCE_ZABBIX_CONFIG => _('Configuration of Zabbix'),
 		AUDIT_RESOURCE_MEDIA_TYPE => _('Media type'),
@@ -48,7 +48,7 @@ function audit_resource2str($resource_type = null) {
 		AUDIT_RESOURCE_SCRIPT => _('Script'),
 		AUDIT_RESOURCE_MACRO => _('Macro'),
 		AUDIT_RESOURCE_TEMPLATE => _('Template')
-	);
+	];
 
 	if (is_null($resource_type)) {
 		natsort($resources);
@@ -62,28 +62,24 @@ function audit_resource2str($resource_type = null) {
 	}
 }
 
-function add_audit($action, $resourcetype, $details, $userId = null) {
-	if ($userId === null) {
-		$userId = CWebUser::$data['userid'];
-	}
-
+function add_audit($action, $resourcetype, $details) {
 	if (mb_strlen($details) > 128) {
 		$details = mb_substr($details, 0, 125).'...';
 	}
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
-	$values = array(
-		'userid' => $userId,
+	$values = [
+		'userid' => CWebUser::$data['userid'],
 		'clock' => time(),
 		'ip' => substr($ip, 0, 39),
 		'action' => $action,
 		'resourcetype' => $resourcetype,
 		'details' => $details
-	);
+	];
 
 	try {
-		DB::insert('auditlog', array($values));
+		DB::insert('auditlog', [$values]);
 		return true;
 	}
 	catch (DBException $e) {
@@ -92,7 +88,7 @@ function add_audit($action, $resourcetype, $details, $userId = null) {
 }
 
 function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $table_name, $values_old, $values_new) {
-	$values_diff = array();
+	$values_diff = [];
 
 	if ($action == AUDIT_ACTION_UPDATE && !empty($values_new)) {
 		foreach ($values_new as $id => $value_new) {
@@ -114,7 +110,7 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 	}
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
-	$values = array(
+	$values = [
 		'userid' => CWebUser::$data['userid'],
 		'clock' => time(),
 		'ip' => substr($ip, 0, 39),
@@ -122,22 +118,22 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 		'resourcetype' => $resourcetype,
 		'resourceid' => $resourceid,
 		'resourcename' => $resourcename
-	);
+	];
 
 	try {
-		$auditId = DB::insert('auditlog', array($values));
+		$auditId = DB::insert('auditlog', [$values]);
 		$auditId = reset($auditId);
 
 		if ($action == AUDIT_ACTION_UPDATE) {
-			$values = array();
+			$values = [];
 			foreach ($values_diff as $id) {
-				$values[] = array(
+				$values[] = [
 					'auditid' => $auditId,
 					'table_name' => $table_name,
 					'field_name' => $id,
 					'oldvalue' => $values_old[$id],
 					'newvalue' => $values_new[$id]
-				);
+				];
 			}
 			DB::insert('auditlog_details', $values);
 		}
@@ -149,15 +145,19 @@ function add_audit_ext($action, $resourcetype, $resourceid, $resourcename, $tabl
 	}
 }
 
-function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null) {
+function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $details = null, $userId = null) {
+	if ($userId === null) {
+		$userId = CWebUser::$data['userid'];
+	}
+
 	if (mb_strlen($resourcename) > 255) {
 		$resourcename = mb_substr($resourcename, 0, 252).'...';
 	}
 
 	$ip = !empty($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
-	$values = array(
-		'userid' => CWebUser::$data['userid'],
+	$values = [
+		'userid' => $userId,
 		'clock' => time(),
 		'ip' => substr($ip, 0, 39),
 		'action' => $action,
@@ -165,9 +165,9 @@ function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $
 		'resourceid' => $resourceid,
 		'resourcename' => $resourcename,
 		'details' => $details
-	);
+	];
 	try {
-		DB::insert('auditlog', array($values));
+		DB::insert('auditlog', [$values]);
 		return true;
 	}
 	catch (DBException $e) {

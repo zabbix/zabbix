@@ -23,17 +23,13 @@ class CDiv extends CTag {
 
 	public function __construct($items = null, $class = null, $id = null) {
 		parent::__construct('div', 'yes');
-		$this->attr('class', $class);
+		if ($class !== null) {
+			$this->addClass($class);
+		}
 		if ($id) {
-			$this->attr('id', zbx_formatDomId($id));
+			$this->setAttribute('id', zbx_formatDomId($id));
 		}
 		$this->addItem($items);
-
-		$this->tag_body_start = '';
-		$this->tag_start = '';
-		$this->tag_end = '';
-		$this->tag_body_start = '';
-		$this->tag_body_end = '';
 
 		return $this;
 	}

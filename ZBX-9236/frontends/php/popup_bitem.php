@@ -33,26 +33,26 @@ define('ZBX_PAGE_NO_MENU', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'dstfrm' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null),
-	'config' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1,2,3'),		null),
-	'gid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID.'({} != 0)',	null),
-	'list_name' =>		array(T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,			'(isset({add}) || isset({update})) && isset({gid})'),
-	'caption' =>		array(T_ZBX_STR, O_OPT,	 null,	null,				null),
-	'itemid' =>			array(T_ZBX_INT, O_OPT,	 P_SYS, DB_ID.'({} != 0)', 'isset({add}) || isset({update})', _('Parameter')),
-	'color' =>			array(T_ZBX_CLR, O_OPT,	 null,	null, 'isset({add}) || isset({update})', _('Colour')),
-	'calc_fnc' =>		array(T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({add}) || isset({update})'),
-	'axisside' =>		array(T_ZBX_INT, O_OPT,	 null,	IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT), null),
+$fields = [
+	'dstfrm' =>			[T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null],
+	'config' =>			[T_ZBX_INT, O_OPT,	 P_SYS,	IN('0,1,2,3'),		null],
+	'gid' =>			[T_ZBX_INT, O_OPT,	 P_SYS,	DB_ID.'({} != 0)',	null],
+	'list_name' =>		[T_ZBX_STR, O_OPT,	 P_SYS,	NOT_EMPTY,			'(isset({add}) || isset({update})) && isset({gid})'],
+	'caption' =>		[T_ZBX_STR, O_OPT,	 null,	null,				null],
+	'itemid' =>			[T_ZBX_INT, O_OPT,	 P_SYS, DB_ID.'({} != 0)', 'isset({add}) || isset({update})', _('Parameter')],
+	'color' =>			[T_ZBX_CLR, O_OPT,	 null,	null, 'isset({add}) || isset({update})', _('Colour')],
+	'calc_fnc' =>		[T_ZBX_INT, O_OPT,	 null,	IN('0,1,2,4,7,9'),	'isset({add}) || isset({update})'],
+	'axisside' =>		[T_ZBX_INT, O_OPT,	 null,	IN(GRAPH_YAXIS_SIDE_LEFT.','.GRAPH_YAXIS_SIDE_RIGHT), null],
 	// actions
-	'add' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,	null),
-	'update' =>			array(T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,	null),
+	'add' =>			[T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,	null],
+	'update' =>			[T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,	null],
 	// other
-	'form' =>			array(T_ZBX_STR, O_OPT,	 P_SYS,	null,	null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	 null,	null,	null),
-	'host' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null),
-	'name' =>			array(T_ZBX_STR, O_OPT,	 null,	null,	null),
-	'name_expanded' =>	array(T_ZBX_STR, O_OPT,	 null,	null,	null)
-);
+	'form' =>			[T_ZBX_STR, O_OPT,	 P_SYS,	null,	null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT,	 null,	null,	null],
+	'host' =>			[T_ZBX_STR, O_OPT,	 null,	null,	null],
+	'name' =>			[T_ZBX_STR, O_OPT,	 null,	null,	null],
+	'name_expanded' =>	[T_ZBX_STR, O_OPT,	 null,	null,	null]
+];
 check_fields($fields);
 
 $caption = getRequest('caption', '');
@@ -60,7 +60,7 @@ $autoCaption = '';
 $_REQUEST['axisside'] = getRequest('axisside',	GRAPH_YAXIS_SIDE_LEFT);
 
 if (getRequest('itemid') > 0) {
-	$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid(getRequest('itemid'))));
+	$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid(getRequest('itemid'))]);
 	$item = reset($items);
 
 	$autoCaption = $item['name_expanded'];
@@ -116,12 +116,12 @@ else {
 	$frmGItem->addVar('list_name', $list_name);
 	$frmGItem->addVar('itemid', $itemid);
 	$frmGItem->addRow(
-		array(
+		[
 			new CVisibilityBox('caption_visible', hasRequest('caption') && $caption != $autoCaption, 'caption',
 				_('Default')
 			),
 			_('Caption')
-		),
+		],
 		new CTextBox('caption', $caption, 50)
 	);
 
@@ -146,22 +146,20 @@ else {
 		'button-plain'
 	);
 
-	$frmGItem->addRow(_('Parameter'), array($txtCondVal, $btnSelect));
+	$frmGItem->addRow(_('Parameter'), [$txtCondVal, $btnSelect]);
 
-	$cmbFnc = new CComboBox('calc_fnc', $calc_fnc);
-	$cmbFnc->addItem(CALC_FNC_MIN, _('min'));
-	$cmbFnc->addItem(CALC_FNC_AVG, _('avg'));
-	$cmbFnc->addItem(CALC_FNC_MAX, _('max'));
-	$cmbFnc->addItem(0, _('Count'));
-
-	$frmGItem->addRow(_('Function'), $cmbFnc);
+	$frmGItem->addRow(_('Function'), new CComboBox('calc_fnc', $calc_fnc, null, [
+		CALC_FNC_MIN => _('min'),
+		CALC_FNC_AVG => _('avg'),
+		CALC_FNC_MAX => _('max'),
+		0 => _('Count')
+	]));
 
 	if ($config == 1) {
-		$cmbAxis = new CComboBox('axisside', $axisside);
-		$cmbAxis->addItem(GRAPH_YAXIS_SIDE_LEFT, _('Left'));
-		$cmbAxis->addItem(GRAPH_YAXIS_SIDE_RIGHT, _('Right'));
-
-		$frmGItem->addRow(_('Axis side'), $cmbAxis);
+		$frmGItem->addRow(_('Axis side'), new CComboBox('axisside', $axisside, null, [
+			GRAPH_YAXIS_SIDE_LEFT => _('Left'),
+			GRAPH_YAXIS_SIDE_RIGHT => _('Right')
+		]));
 	}
 
 	if ($config == 1) {

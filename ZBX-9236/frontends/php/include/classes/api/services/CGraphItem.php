@@ -28,7 +28,7 @@ class CGraphItem extends CApiService {
 
 	protected $tableName = 'graphs_items';
 	protected $tableAlias = 'gi';
-	protected $sortColumns = array('gitemid');
+	protected $sortColumns = ['gitemid'];
 
 	/**
 	 * Get GraphItems data
@@ -36,20 +36,20 @@ class CGraphItem extends CApiService {
 	 * @param array $options
 	 * @return array|boolean
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('gitems' => 'gi.gitemid'),
-			'from'		=> array('graphs_items' => 'graphs_items gi'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['gitems' => 'gi.gitemid'],
+			'from'		=> ['graphs_items' => 'graphs_items gi'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'graphids'		=> null,
 			'itemids'		=> null,
 			'type'			=> null,
@@ -58,16 +58,13 @@ class CGraphItem extends CApiService {
 			// output
 			'selectGraphs'	=> null,
 			'output'		=> API_OUTPUT_EXTEND,
-			'expandData'	=> null,
 			'countOutput'	=> null,
 			'preservekeys'	=> null,
 			'sortfield'		=> '',
 			'sortorder'		=> '',
 			'limit'			=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
-
-		$this->checkDeprecatedParam($options, 'expandData');
 
 		// editable + PERMISSION CHECK
 		if ($userType != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
@@ -133,7 +130,7 @@ class CGraphItem extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('graphid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['graphid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -145,18 +142,6 @@ class CGraphItem extends CApiService {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		// expandData
-		if ($options['expandData'] !== null) {
-			$sqlParts['select'][] = 'i.key_';
-			$sqlParts['select'][] = 'i.hostid';
-			$sqlParts['select'][] = 'i.flags';
-			$sqlParts['select'][] = 'h.host';
-			$sqlParts['from']['items'] = 'items i';
-			$sqlParts['from']['hosts'] = 'hosts h';
-			$sqlParts['where']['gii'] = 'gi.itemid=i.itemid';
-			$sqlParts['where']['hi'] = 'h.hostid=i.hostid';
-		}
 
 		if ($options['selectGraphs'] !== null) {
 			$sqlParts = $this->addQuerySelect('graphid', $sqlParts);
@@ -171,11 +156,11 @@ class CGraphItem extends CApiService {
 		// adding graphs
 		if ($options['selectGraphs'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'gitemid', 'graphid');
-			$graphs = API::Graph()->get(array(
+			$graphs = API::Graph()->get([
 				'output' => $options['selectGraphs'],
 				'gitemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $graphs, 'graphs');
 		}
 

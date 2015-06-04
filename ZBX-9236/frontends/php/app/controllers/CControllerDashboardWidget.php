@@ -24,22 +24,22 @@ require_once dirname(__FILE__).'/../../include/blocks.inc.php';
 class CControllerDashboardWidget extends CController {
 
 	protected function checkInput() {
-		$widgets = array(
+		$widgets = [
 			WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES,
 			WIDGET_WEB_OVERVIEW, WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS,
 			WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS, WIDGET_FAVOURITE_SCREENS
-		);
+		];
 
-		$fields = array(
+		$fields = [
 			'widget' =>			'fatal|required|in '.implode(',', $widgets),
 			'refreshrate' =>	'fatal         |in 10,30,60,120,600,900',
 			'state' =>			'fatal         |in 0,1'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(array('main_block' => '')));
+			$this->setResponse(new CControllerResponseData(['main_block' => '']));
 		}
 
 		return $ret;
@@ -52,9 +52,9 @@ class CControllerDashboardWidget extends CController {
 	protected function doAction() {
 		$widget = $this->getInput('widget');
 
-		$data = array(
+		$data = [
 			'main_block' => ''
-		);
+		];
 
 		// refresh rate
 		if ($this->hasInput('refreshrate')) {

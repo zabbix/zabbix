@@ -42,6 +42,6 @@ class CFunctionMacroParserResult extends CParserResult {
 	 *
 	 * @var array
 	 */
-	public $expression = array();
+	public $expression = [];
 
 }

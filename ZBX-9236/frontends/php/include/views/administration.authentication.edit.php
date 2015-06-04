@@ -19,8 +19,7 @@
 **/
 
 
-$authenticationWidget = new CWidget();
-$authenticationWidget->addPageHeader(_('CONFIGURATION OF AUTHENTICATION'));
+$authenticationWidget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
 $authenticationForm = new CForm();
@@ -30,7 +29,7 @@ $authenticationForm->setName('authenticationForm');
 $authenticationFormList = new CFormList('authenticationList');
 
 // append config radio buttons to form list
-$configTypeRadioButton = array(
+$configTypeRadioButton = [
 	new CRadioButton('config', ZBX_AUTH_INTERNAL, null, 'config_'.ZBX_AUTH_INTERNAL,
 		($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL),
 		'submit()'
@@ -46,7 +45,7 @@ $configTypeRadioButton = array(
 		'submit()'
 	),
 	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
-);
+];
 $authenticationFormList->addRow(_('Default authentication'),
 	new CDiv($configTypeRadioButton, 'jqueryinputset radioset')
 );
@@ -118,13 +117,10 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 $authenticationTab = new CTabView();
 $authenticationTab->addTab('authenticationTab', $this->data['title'], $authenticationFormList);
 
-// append tab to form
-$authenticationForm->addItem($authenticationTab);
-
 // create save button
 $saveButton = new CSubmit('update', _('Update'));
 if ($this->data['is_authentication_type_changed']) {
-	$saveButton->addAction('onclick', 'javascript: if (confirm('.
+	$saveButton->onClick('javascript: if (confirm('.
 		CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?')).')) {'.
 		'jQuery("#authenticationForm").submit(); return true; } else { return false; }'
 	);
@@ -135,11 +131,14 @@ elseif ($this->data['config']['authentication_type'] != ZBX_AUTH_LDAP) {
 
 // append buttons to form
 if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
-	$authenticationForm->addItem(makeFormFooter($saveButton, array(new CSubmit('test', _('Test')))));
+	$authenticationTab->setFooter(makeFormFooter($saveButton, [new CSubmit('test', _('Test'))]));
 }
 else {
-	$authenticationForm->addItem(makeFormFooter($saveButton));
+	$authenticationTab->setFooter(makeFormFooter($saveButton));
 }
+
+// append tab to form
+$authenticationForm->addItem($authenticationTab);
 
 // append form to widget
 $authenticationWidget->addItem($authenticationForm);

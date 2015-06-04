@@ -23,22 +23,21 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of value mapping');
 $page['file'] = 'adm.valuemapping.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'valuemapid' =>		array(T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form}) && {form} == "update") || isset({delete})'),
-	'mapname' =>		array(T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({add}) || isset({update})'),
-	'mappings' =>		array(T_ZBX_STR, O_OPT,	null,			null,		null),
+$fields = [
+	'valuemapid' =>		[T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form}) && {form} == "update") || isset({delete})'],
+	'mapname' =>		[T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'mappings' =>		[T_ZBX_STR, O_OPT,	null,			null,		null],
 	// actions
-	'add' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
-	'update' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
-	'delete' =>			array(T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null),
-	'form' =>			array(T_ZBX_STR, O_OPT,	P_SYS,			null,		null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT,	null,			null,		null)
-);
+	'add' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null],
+	'update' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null],
+	'delete' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null],
+	'form' =>			[T_ZBX_STR, O_OPT,	P_SYS,			null,		null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT,	null,			null,		null]
+];
 check_fields($fields);
 
 /*
@@ -58,8 +57,8 @@ try {
 	if (hasRequest('add') || hasRequest('update')) {
 		DBstart();
 
-		$valueMap = array('name' => getRequest('mapname'));
-		$mappings = getRequest('mappings', array());
+		$valueMap = ['name' => getRequest('mapname')];
+		$mappings = getRequest('mappings', []);
 
 		if (hasRequest('update')) {
 			$messageSuccess = _('Value map updated');
@@ -123,42 +122,47 @@ catch (Exception $e) {
 /*
  * Display
  */
-$generalComboBox = new CComboBox('configDropDown', 'adm.valuemapping.php', 'redirect(this.options[this.selectedIndex].value);');
-$generalComboBox->addItems(array(
-	'adm.gui.php' => _('GUI'),
-	'adm.housekeeper.php' => _('Housekeeping'),
-	'adm.images.php' => _('Images'),
-	'adm.iconmapping.php' => _('Icon mapping'),
-	'adm.regexps.php' => _('Regular expressions'),
-	'adm.macros.php' => _('Macros'),
-	'adm.valuemapping.php' => _('Value mapping'),
-	'adm.workingtime.php' => _('Working time'),
-	'adm.triggerseverities.php' => _('Trigger severities'),
-	'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-	'adm.other.php' => _('Other')
-));
+$valueMapWidget = (new CWidget())->setTitle(_('Value mapping'));
 
 $valueMapForm = new CForm();
 $valueMapForm->cleanItems();
-$valueMapForm->addItem($generalComboBox);
+
+$controls = new CList();
+$controls->addItem(new CComboBox('configDropDown', 'adm.valuemapping.php',
+	'redirect(this.options[this.selectedIndex].value);',
+	[
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	]
+));
+
 if (!isset($_REQUEST['form'])) {
-	$valueMapForm->addItem(new CSubmit('form', _('Create value map')));
+	$controls->addItem(new CSubmit('form', _('Create value map')));
 }
 
-$valueMapWidget = new CWidget();
-$valueMapWidget->addPageHeader(_('CONFIGURATION OF VALUE MAPPING'), $valueMapForm);
+$valueMapForm->addItem($controls);
+$valueMapWidget->setControls($valueMapForm);
 
 if (isset($_REQUEST['form'])) {
-	$data = array(
+	$data = [
 		'form' => getRequest('form', 1),
 		'form_refresh' => getRequest('form_refresh', 0),
 		'valuemapid' => getRequest('valuemapid'),
-		'mappings' => array(),
+		'mappings' => [],
 		'mapname' => '',
 		'confirmMessage' => null,
 		'add_value' => getRequest('add_value'),
 		'add_newvalue' => getRequest('add_newvalue')
-	);
+	];
 
 	if (isset($data['valuemapid'])) {
 		$data['mapname'] = $dbValueMap['name'];
@@ -170,7 +174,7 @@ if (isset($_REQUEST['form'])) {
 		}
 		else {
 			$data['mapname'] = getRequest('mapname', '');
-			$data['mappings'] = getRequest('mappings', array());
+			$data['mappings'] = getRequest('mappings', []);
 		}
 
 		$valueMapCount = DBfetch(DBselect(
@@ -185,7 +189,7 @@ if (isset($_REQUEST['form'])) {
 
 	if (empty($data['valuemapid']) && !empty($data['form_refresh'])) {
 		$data['mapname'] = getRequest('mapname', '');
-		$data['mappings'] = getRequest('mappings', array());
+		$data['mappings'] = getRequest('mappings', []);
 	}
 
 	order_result($data['mappings'], 'value');
@@ -193,34 +197,30 @@ if (isset($_REQUEST['form'])) {
 	$valueMapForm = new CView('administration.general.valuemapping.edit', $data);
 }
 else {
-	$data = array(
-		'valuemaps' => array()
-	);
-
-	$valueMapWidget->addHeader(_('Value mapping'));
-	$valueMapWidget->addItem(BR());
+	$data = [
+		'valuemaps' => []
+	];
 
 	$dbValueMaps = DBselect('SELECT v.valuemapid,v.name FROM valuemaps v');
 
 	while ($dbValueMap = DBfetch($dbValueMaps)) {
 		$data['valuemaps'][$dbValueMap['valuemapid']] = $dbValueMap;
-		$data['valuemaps'][$dbValueMap['valuemapid']]['maps'] = array();
+		$data['valuemaps'][$dbValueMap['valuemapid']]['maps'] = [];
 	}
 	order_result($data['valuemaps'], 'name');
 
 	$dbMaps = DBselect('SELECT m.valuemapid,m.value,m.newvalue FROM mappings m');
 
 	while ($dbMap = DBfetch($dbMaps)) {
-		$data['valuemaps'][$dbMap['valuemapid']]['maps'][] = array(
+		$data['valuemaps'][$dbMap['valuemapid']]['maps'][] = [
 			'value' => $dbMap['value'],
 			'newvalue' => $dbMap['newvalue']
-		);
+		];
 	}
 
 	$valueMapForm = new CView('administration.general.valuemapping.list', $data);
 }
 
-$valueMapWidget->addItem($valueMapForm->render());
-$valueMapWidget->show();
+$valueMapWidget->addItem($valueMapForm->render())->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

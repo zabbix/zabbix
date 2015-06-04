@@ -46,7 +46,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextPresent('Displaying');
 		// Header
 		$this->zbxTestTextPresent(
-			array(
+			[
 				'Name',
 				'Applications',
 				'Items',
@@ -57,12 +57,12 @@ class testPageHosts extends CWebTest {
 				'Templates',
 				'Status',
 				'Availability'
-			)
+			]
 		);
 		// Data
-		$this->zbxTestTextPresent(array($host['name']));
+		$this->zbxTestTextPresent([$host['name']]);
 		$this->zbxTestDropdownHasOptions('action',
-				array('Export selected', 'Mass update', 'Enable selected', 'Disable selected', 'Delete selected'));
+				['Export selected', 'Mass update', 'Enable selected', 'Disable selected', 'Delete selected']);
 	}
 
 	/**
@@ -99,7 +99,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0');
 		// Header
 		$this->zbxTestTextPresent(
-			array(
+			[
 				'Name',
 				'Applications',
 				'Items',
@@ -110,7 +110,7 @@ class testPageHosts extends CWebTest {
 				'Templates',
 				'Status',
 				'Availability'
-			)
+			]
 		);
 
 		$this->zbxTestClickWait('link='.$name);
@@ -134,58 +134,38 @@ class testPageHosts extends CWebTest {
 	*/
 	public function testPageHosts_FilterHost($host) {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClick('flicker_icon_l');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		//$this->zbxTestClick('flicker_icon_l');
+		$this->zbxTestClickWait('filter_rst');
 		$this->input_type('filter_host', $host['name']);
-		$this->input_type('filter_ip', '');
-		$this->input_type('filter_port', '');
-		$this->zbxTestClickWait('filter');
+		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextPresent($host['name']);
 	}
 
-	// Filter returns nothing
+	// filter returns nothing
 	public function testPageHosts_FilterNone() {
 		$this->zbxTestLogin('hosts.php');
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
 
 		// Reset filter
-		$this->zbxTestClick('reset');
+		$this->zbxTestClickWait('filter_rst');
 
 		$this->input_type('filter_host', '1928379128ksdhksdjfh');
-		$this->zbxTestClickWait('filter');
+		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-	}
-
-	public function testPageHosts_FilterNone1() {
-		$this->zbxTestLogin('hosts.php');
-
-		// Reset filter
-		$this->zbxTestClick('reset');
-
-		$this->input_type('filter_host', '_');
-		$this->zbxTestClickWait('filter');
-		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-	}
-
-	public function testPageHosts_FilterNone2() {
-		$this->zbxTestLogin('hosts.php');
-
-		// Reset filter
-		$this->zbxTestClick('reset');
 
 		$this->input_type('filter_host', '%');
-		$this->zbxTestClickWait('filter');
+		$this->zbxTestClickWait('filter_set');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
 	}
 
-	// Filter reset
-
-	/**
-	* @dataProvider allHosts
-	*/
-	public function testPageHosts_FilterReset($host) {
+	// filter reset
+	public function testPageHosts_FilterReset() {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClick('reset');
-		$this->zbxTestClickWait('filter');
-		$this->zbxTestTextPresent($host['name']);
+		$this->zbxTestDropdownSelectWait('groupid', 'all');
+		$this->zbxTestClickWait('filter_rst');
+		$this->zbxTestClickWait('filter_set');
+		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
 
 	/**
@@ -208,7 +188,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextPresent('Displaying');
 		// Header
 		$this->zbxTestTextPresent(
-			array(
+			[
 				'Wizard',
 				'Name',
 				'Triggers',
@@ -220,7 +200,7 @@ class testPageHosts extends CWebTest {
 				'Status',
 				'Applications',
 				'Error'
-			)
+			]
 		);
 	}
 

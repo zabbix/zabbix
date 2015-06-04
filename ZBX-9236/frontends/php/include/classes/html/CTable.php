@@ -33,7 +33,9 @@ class CTable extends CTag {
 
 	public function __construct($message = null, $class = null) {
 		parent::__construct('table', 'yes');
-		$this->attr('class', $class);
+		if ($class !== null) {
+			$this->addClass($class);
+		}
 		$this->rownum = 0;
 		$this->oddRowClass = null;
 		$this->evenRowClass = null;
@@ -73,24 +75,40 @@ class CTable extends CTag {
 			if (isset($this->header) && !isset($item->attributes['colspan'])) {
 				$item->attributes['colspan'] = $this->colnum;
 			}
-			$item = new CRow($item, $class, $id);
+			$item = new CRow($item);
+			if ($class !== null) {
+				$item->addClass($class);
+			}
+			if ($id !== null) {
+				$item->setId($id);
+			}
 		}
 
 		if (is_object($item) && strtolower(get_class($item)) === 'crow') {
-			$item->attr('class', $class);
+			if ($class !== null) {
+				$item->addClass($class);
+			}
 		}
 		else {
-			$item = new CRow($item, $class, $id);
+			$item = new CRow($item);
+			if ($class !== null) {
+				$item->addClass($class);
+			}
+			if ($id !== null) {
+				$item->setId($id);
+			}
 		}
 
 		if (!isset($item->attributes['class']) || is_array($item->attributes['class'])) {
 			$class = ($this->rownum % 2) ? $this->oddRowClass : $this->evenRowClass;
-			$item->attr('class', $class);
+			if ($class !== null) {
+				$item->addClass($class);
+			}
 		}
 		return $item;
 	}
 
-	public function setHeader($value = null, $class = 'header') {
+	public function setHeader($value = null, $class = null) {
 		if (is_null($class)) {
 			$class = $this->headerClass;
 		}
@@ -100,10 +118,14 @@ class CTable extends CTag {
 			}
 		}
 		else {
-			$value = new CRow($value, $class);
+			$value = new CRowHeader($value, $class);
 		}
 		$this->colnum = $value->itemsCount();
+
+		$value = new CTag('thead', 'yes', $value);
 		$this->header = $value->toString();
+
+		return $this;
 	}
 
 	public function setFooter($value = null, $class = 'footer') {
@@ -117,7 +139,8 @@ class CTable extends CTag {
 	public function addRow($item, $class = null, $id = null) {
 		$item = $this->addItem($this->prepareRow($item, $class, $id));
 		++$this->rownum;
-		return $item;
+
+		return $this;
 	}
 
 	public function showRow($item, $class = null, $id = null) {
@@ -137,8 +160,8 @@ class CTable extends CTag {
 
 	public function endToString() {
 		$ret = '';
-		if ($this->rownum == 0 && isset($this->message)) {
-			$ret = $this->prepareRow(new CCol($this->message, 'message'));
+		if ($this->rownum == 0 && $this->message !== null) {
+			$ret = $this->prepareRow(new CCol($this->message), 'nothing-to-show');
 			$ret = $ret->toString();
 		}
 		$ret .= $this->footer;

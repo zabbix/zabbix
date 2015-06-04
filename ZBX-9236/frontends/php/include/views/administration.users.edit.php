@@ -22,12 +22,10 @@
 include('include/views/js/administration.users.edit.js.php');
 
 if ($this->data['is_profile']) {
-	$userWidget = new CWidget(null, 'profile');
-	$userWidget->addPageHeader(_('USER PROFILE').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
+	$userWidget = (new CWidget('profile'))->setTitle(_('User profile').NAME_DELIMITER.$this->data['name'].' '.$this->data['surname']);
 }
 else {
-	$userWidget = new CWidget();
-	$userWidget->addPageHeader(_('CONFIGURATION OF USERS'));
+	$userWidget = (new CWidget())->setTitle(_('Users'));
 }
 
 // create form
@@ -46,7 +44,7 @@ $userFormList = new CFormList('userFormList');
 
 if (!$data['is_profile']) {
 	$nameTextBox = new CTextBox('alias', $this->data['alias'], ZBX_TEXTBOX_STANDARD_SIZE);
-	$nameTextBox->attr('autofocus', 'autofocus');
+	$nameTextBox->setAttribute('autofocus', 'autofocus');
 	$userFormList->addRow(_('Alias'), $nameTextBox);
 	$userFormList->addRow(_x('Name', 'user first name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
 	$userFormList->addRow(_('Surname'), new CTextBox('surname', $this->data['surname'], ZBX_TEXTBOX_STANDARD_SIZE));
@@ -63,15 +61,15 @@ if (!$this->data['is_profile']) {
 	}
 
 	$userFormList->addRow(_('Groups'),
-		array(
+		[
 			$lstGroups,
 			new CButton('add_group', _('Add'),
-				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups", 450, 450);', 'button-form top'),
+				'return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups");', 'button-form top'),
 			BR(),
 			(count($this->data['user_groups']) > 0)
 				? new CSubmit('del_user_group', _('Delete selected'), null, 'button-form')
 				: null
-		)
+		]
 	);
 }
 
@@ -133,7 +131,7 @@ setlocale(LC_MONETARY, zbx_locale_variants(CWebUser::$data['lang']));
 $languageError = '';
 if (!function_exists('bindtextdomain')) {
 	$languageError = 'Translations are unavailable because the PHP gettext module is missing.';
-	$languageComboBox->attr('disabled', 'disabled');
+	$languageComboBox->setAttribute('disabled', 'disabled');
 }
 elseif (!$allLocalesAvailable) {
 	$languageError = _('You are not able to choose some of the languages, because locales for them are not installed on the web server.');
@@ -141,13 +139,12 @@ elseif (!$allLocalesAvailable) {
 
 $userFormList->addRow(
 	_('Language'),
-	$languageError ? array($languageComboBox, SPACE, new CSpan($languageError, 'red wrap')) : $languageComboBox
+	$languageError ? [$languageComboBox, SPACE, new CSpan($languageError, 'red wrap')] : $languageComboBox
 );
 
 // append themes to form list
-$themes = array_merge(array(THEME_DEFAULT => _('System default')), Z::getThemes());
-$themeComboBox = new CComboBox('theme', $this->data['theme'], null, $themes);
-$userFormList->addRow(_('Theme'), $themeComboBox);
+$themes = array_merge([THEME_DEFAULT => _('System default')], Z::getThemes());
+$userFormList->addRow(_('Theme'), new CComboBox('theme', $this->data['theme'], null, $themes));
 
 // append auto-login & auto-logout to form list
 $autologoutCheckBox = new CCheckBox('autologout_visible', isset($this->data['autologout']) ? 'yes': 'no');
@@ -161,7 +158,7 @@ else {
 
 if ($this->data['alias'] != ZBX_GUEST_USER) {
 	$userFormList->addRow(_('Auto-login'), new CCheckBox('autologin', $this->data['autologin'], null, 1));
-	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), array($autologoutCheckBox, $autologoutTextBox));
+	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), [$autologoutCheckBox, $autologoutTextBox]);
 }
 
 $userFormList->addRow(_('Refresh (in seconds)'), new CNumericBox('refresh', $this->data['refresh'], 4));
@@ -171,11 +168,11 @@ $userFormList->addRow(_('URL (after login)'), new CTextBox('url', $this->data['u
 /*
  * Media tab
  */
-if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))) {
+if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])) {
 	$userMediaFormList = new CFormList('userMediaFormList');
 	$userForm->addVar('user_medias', $this->data['user_medias']);
 
-	$mediaTableInfo = new CTableInfo(_('No media found.'));
+	$mediaTableInfo = new CTableInfo();
 
 	foreach ($this->data['user_medias'] as $id => $media) {
 		if (!isset($media['active']) || !$media['active']) {
@@ -204,23 +201,23 @@ if (uint_in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TY
 			$mediaSeverity[$severity]->setHint($severityName.($mediaActive ? ' ('._('on').')' : ' ('._('off').')'));
 		}
 
-		$mediaTableInfo->addRow(array(
+		$mediaTableInfo->addRow([
 			new CCheckBox('user_medias_to_del['.$id.']', null, null, $id),
-			new CSpan($media['description'], 'nowrap'),
-			new CSpan($media['sendto'], 'nowrap'),
-			new CSpan($media['period'], 'nowrap'),
+			new CSpan($media['description'], ZBX_STYLE_NOWRAP),
+			new CSpan($media['sendto'], ZBX_STYLE_NOWRAP),
+			new CSpan($media['period'], ZBX_STYLE_NOWRAP),
 			$mediaSeverity,
 			$status,
-			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'", 550, 400);', 'link_menu'))
+			new CButton('edit_media', _('Edit'), 'return PopUp("popup_media.php'.$mediaUrl.'");', 'link_menu')]
 		);
 	}
 
-	$userMediaFormList->addRow(_('Media'), array($mediaTableInfo,
-		new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'", 550, 400);', 'link_menu'),
+	$userMediaFormList->addRow(_('Media'), [$mediaTableInfo,
+		new CButton('add_media', _('Add'), 'return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");', 'link_menu'),
 		SPACE,
 		SPACE,
 		(count($this->data['user_medias']) > 0) ? new CSubmit('del_user_media', _('Delete selected'), null, 'link_menu') : null
-	));
+	]);
 }
 
 /*
@@ -233,10 +230,14 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList->addRow(_('Frontend messaging'), new CCheckBox('messages[enabled]', $this->data['messages']['enabled'], null, 1));
 	$userMessagingFormList->addRow(_('Message timeout (seconds)'), new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5), false, 'timeout_row');
 
-	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'], 'javascript: if (IE) { submit(); }');
-	$repeatSound->addItem(1, _('Once'));
-	$repeatSound->addItem(10, '10 '._('Seconds'));
-	$repeatSound->addItem(-1, _('Message timeout'));
+	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'],
+		'if (IE) { submit() }',
+		[
+			1 => _('Once'),
+			10 => '10 '._('Seconds'),
+			-1 => _('Message timeout')
+		]
+	);
 	$userMessagingFormList->addRow(_('Play sound'), $repeatSound, false, 'repeat_row');
 
 	$soundList = new CComboBox('messages[sounds.recovery]', $this->data['messages']['sounds.recovery']);
@@ -244,19 +245,20 @@ if ($this->data['is_profile']) {
 		$soundList->addItem($file, $filename);
 	}
 
-	$resolved = array(
+	$resolved = [
 		new CCheckBox('messages[triggers.recovery]', $this->data['messages']['triggers.recovery'], null, 1),
 		_('Recovery'),
 		SPACE,
 		$soundList,
 		new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.recovery');", 'button-form'),
 		new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'button-form')
-	);
+	];
 
-	$triggersTable = new CTable('', 'invisible');
-	$triggersTable->addRow($resolved);
+	$triggersTable = (new CTable(''))->
+		addClass('invisible')->
+		addRow($resolved);
 
-	$msgVisibility = array('1' => array(
+	$msgVisibility = ['1' => [
 		'messages[timeout]',
 		'messages[sounds.repeat]',
 		'messages[sounds.recovery]',
@@ -264,7 +266,7 @@ if ($this->data['is_profile']) {
 		'timeout_row',
 		'repeat_row',
 		'triggers_row'
-	));
+	]];
 
 	// trigger sounds
 	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -273,14 +275,14 @@ if ($this->data['is_profile']) {
 			$soundList->addItem($file, $filename);
 		}
 
-		$triggersTable->addRow(array(
+		$triggersTable->addRow([
 			new CCheckBox('messages[triggers.severities]['.$severity.']', isset($this->data['messages']['triggers.severities'][$severity]), null, 1),
 			getSeverityName($severity, $this->data['config']),
 			SPACE,
 			$soundList,
 			new CButton('start', _('Play'), "javascript: testUserSound('messages_sounds.".$severity."');", 'button-form'),
 			new CButton('stop', _('Stop'), 'javascript: AudioControl.stop();', 'button-form')
-		));
+		]);
 
 		zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');
 		zbx_subarray_push($msgVisibility, 1, 'messages[sounds.'.$severity.']');
@@ -305,14 +307,15 @@ if (!$this->data['is_profile']) {
 	 */
 	$permissionsFormList = new CFormList('permissionsFormList');
 
-	$userTypeComboBox = new CComboBox('user_type', $this->data['user_type'], 'submit();');
-	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_USER, user_type2str(USER_TYPE_ZABBIX_USER));
-	$userTypeComboBox->addItem(USER_TYPE_ZABBIX_ADMIN, user_type2str(USER_TYPE_ZABBIX_ADMIN));
-	$userTypeComboBox->addItem(USER_TYPE_SUPER_ADMIN, user_type2str(USER_TYPE_SUPER_ADMIN));
+	$userTypeComboBox = new CComboBox('user_type', $this->data['user_type'], 'submit();', [
+		USER_TYPE_ZABBIX_USER => user_type2str(USER_TYPE_ZABBIX_USER),
+		USER_TYPE_ZABBIX_ADMIN => user_type2str(USER_TYPE_ZABBIX_ADMIN),
+		USER_TYPE_SUPER_ADMIN => user_type2str(USER_TYPE_SUPER_ADMIN)
+	]);
 
 	if ($data['userid'] != 0 && bccomp(CWebUser::$data['userid'], $data['userid']) == 0) {
 		$userTypeComboBox->setEnabled(false);
-		$permissionsFormList->addRow(_('User type'), array($userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))));
+		$permissionsFormList->addRow(_('User type'), [$userTypeComboBox, SPACE, new CSpan(_('User can\'t change type for himself'))]);
 		$userForm->addVar('user_type', $this->data['user_type']);
 	}
 	else {
@@ -328,14 +331,11 @@ if (isset($userMessagingFormList)) {
 	$userTab->addTab('messagingTab', _('Messaging'), $userMessagingFormList);
 }
 
-// append tab to form
-$userForm->addItem($userTab);
-
 // append buttons to form
 if ($data['userid'] != 0) {
-	$buttons = array(
+	$buttons = [
 		new CButtonCancel()
-	);
+	];
 
 	if (!$this->data['is_profile']) {
 		$deleteButton = new CButtonDelete(_('Delete selected user?'), url_param('form').url_param('userid'));
@@ -346,14 +346,17 @@ if ($data['userid'] != 0) {
 		array_unshift($buttons, $deleteButton);
 	}
 
-	$userForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$userTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$userForm->addItem(makeFormFooter(
+	$userTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
+
+// append tab to form
+$userForm->addItem($userTab);
 
 // append form to widget
 $userWidget->addItem($userForm);
