@@ -266,11 +266,16 @@ if (isset($_REQUEST['form'])) {
 else {
 	$data = array();
 
+	$config = select_config();
+	$sortfield = getPageSortField('name');
+
 	// get drules
 	$data['drules'] = API::DRule()->get(array(
 		'output' => array('proxy_hostid', 'name', 'status', 'iprange', 'delay'),
 		'selectDChecks' => array('type'),
-		'editable' => true
+		'editable' => true,
+		'sortfield' => $sortfield,
+		'limit' => $config['search_limit'] + 1
 	));
 
 	if ($data['drules']) {
@@ -296,7 +301,7 @@ else {
 			}
 		}
 
-		order_result($data['drules'], getPageSortField('name'), getPageSortOrder());
+		order_result($data['drules'], $sortfield, getPageSortOrder());
 	}
 
 	// get paging

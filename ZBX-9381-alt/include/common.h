@@ -1068,4 +1068,6 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
 
+char	*zbx_dyn_escape_shell_single_quote(const char *text);
+
 #endif
