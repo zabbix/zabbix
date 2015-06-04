@@ -642,7 +642,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOU
 	];
 	$screenFormList->addRow(_('Hosts location'), new CDiv($styleRadioButton, 'jqueryinputset radioset'));
 }
-else {
+elseif ($resourceType != SCREEN_RESOURCE_CLOCK) {
 	$screenFormList->addVar('style', 0);
 }
 
