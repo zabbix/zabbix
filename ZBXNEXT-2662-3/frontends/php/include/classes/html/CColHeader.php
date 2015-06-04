@@ -28,6 +28,8 @@ class CColHeader extends CTag {
 
 	public function setColSpan($value) {
 		$this->setAttribute('colspan', $value);
+
+		return $this;
 	}
 
 	public function setWidth($value) {
