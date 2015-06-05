@@ -717,10 +717,11 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 
 int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned char flags, int timeout)
 {
-#define ZBX_TCP_MAX_FIRST_MSG_LEN	16384
+#define ZBX_TLS_MAX_REC_LEN	16384
 
 	zbx_uint64_t	len64_le;
-	ssize_t		i = 0, written = 0;
+	ssize_t		bytes_sent = 0, written = 0;
+	size_t		send_bytes;
 	int		ret = SUCCEED;
 
 	if (0 != timeout)
@@ -728,37 +729,48 @@ int	zbx_tcp_send_ext(zbx_socket_t *s, const char *data, size_t len, unsigned cha
 
 	if (0 != (flags & ZBX_TCP_PROTOCOL))
 	{
-		char	header_buf[ZBX_TCP_MAX_FIRST_MSG_LEN];	/* Buffer is allocated on stack with a hope that it   */
+		size_t	take_bytes;
+		char	header_buf[ZBX_TLS_MAX_REC_LEN];	/* Buffer is allocated on stack with a hope that it   */
 								/* will be short-lived in CPU cache. Static buffer is */
 								/* not used on purpose.				      */
-		size_t	take_bytes;
 
-		memcpy(header_buf, ZBX_TCP_HEADER, ZBX_TCP_HEADER_LEN);
+		memcpy(header_buf, ZBX_TCP_HEADER, (size_t)ZBX_TCP_HEADER_LEN);
 
 		len64_le = zbx_htole_uint64((zbx_uint64_t)len);
 		memcpy(header_buf + ZBX_TCP_HEADER_LEN, &len64_le, sizeof(len64_le));
 
-		take_bytes = MIN(len, ZBX_TCP_MAX_FIRST_MSG_LEN - ZBX_TCP_HEADER_LEN - sizeof(len64_le));
+		take_bytes = MIN(len, ZBX_TLS_MAX_REC_LEN - ZBX_TCP_HEADER_LEN - sizeof(len64_le));
 		memcpy(header_buf + ZBX_TCP_HEADER_LEN + sizeof(len64_le), data, take_bytes);
 
-		if (ZBX_PROTO_ERROR == (i = zbx_tls_write(s, header_buf, ZBX_TCP_HEADER_LEN + sizeof(len64_le) +
-				take_bytes)))
+		send_bytes = ZBX_TCP_HEADER_LEN + sizeof(len64_le) + take_bytes;
+
+		while (written < (ssize_t)send_bytes)
 		{
-			ret = FAIL;
-			goto cleanup;
+			if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, header_buf + written,
+					send_bytes - (size_t)written)))
+			{
+				ret = FAIL;
+				goto cleanup;
+			}
+			written += bytes_sent;
 		}
 
-		written += i - ZBX_TCP_HEADER_LEN - (ssize_t)sizeof(len64_le);
+		written -= ZBX_TCP_HEADER_LEN + (ssize_t)sizeof(len64_le);
 	}
 
 	while (written < (ssize_t)len)
 	{
-		if (ZBX_PROTO_ERROR == (i = zbx_tls_write(s, data + written, len - (size_t)written)))
+		if (ZBX_TCP_SEC_UNENCRYPTED == s->connection_type)
+			send_bytes = len - (size_t)written;
+		else
+			send_bytes = MIN(ZBX_TLS_MAX_REC_LEN, len - (size_t)written);
+
+		if (ZBX_PROTO_ERROR == (bytes_sent = zbx_tls_write(s, data + written, send_bytes)))
 		{
 			ret = FAIL;
 			goto cleanup;
 		}
-		written += i;
+		written += bytes_sent;
 	}
 cleanup:
 	if (0 != timeout)
@@ -766,7 +778,7 @@ cleanup:
 
 	return ret;
 
-#undef ZBX_TCP_MAX_FIRST_MSG_LEN
+#undef ZBX_TLS_MAX_REC_LEN
 }
 
 /******************************************************************************
