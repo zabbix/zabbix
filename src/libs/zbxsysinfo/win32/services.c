@@ -255,10 +255,12 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_SRV_PARAM_PATH		0x03
 #define ZBX_SRV_PARAM_USER		0x04
 #define ZBX_SRV_PARAM_STARTUP		0x05
+#define ZBX_SRV_PARAM_DESCRIPTION	0x06
 
 int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	QUERY_SERVICE_CONFIG	*qsc = NULL;
+	SERVICE_DESCRIPTION	*lpsd = NULL;
 	SERVICE_STATUS		status;
 	SC_HANDLE		h_mgr, h_srv;
 	DWORD			sz = 0;
@@ -292,6 +294,8 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 		param_type = ZBX_SRV_PARAM_USER;
 	else if (0 == strcmp(param, "startup"))
 		param_type = ZBX_SRV_PARAM_STARTUP;
+	else if (0 == strcmp(param, "description"))
+		param_type = ZBX_SRV_PARAM_DESCRIPTION;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -330,6 +334,29 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 		else
 			SET_UI64_RESULT(result, 7);
+	}
+	else if (ZBX_SRV_PARAM_DESCRIPTION == param_type)
+	{
+		QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &sz);
+
+		if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+		{
+			lpsd = (SERVICE_DESCRIPTION *)zbx_malloc(lpsd, sz);
+
+			if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, (LPBYTE)lpsd, sz, &sz) &&
+					NULL != lpsd->lpDescription)
+			{
+				SET_STR_RESULT(result, zbx_unicode_to_utf8(lpsd->lpDescription));
+			}
+			else
+				SET_STR_RESULT(result, "empty");
+
+			zbx_free(lpsd);
+		}
+		else
+		{
+			SET_STR_RESULT(result, "empty");
+		}
 	}
 	else
 	{
