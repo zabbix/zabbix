@@ -24,8 +24,6 @@
 
 static const DWORD	service_states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING,
 	SERVICE_PAUSE_PENDING, SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING, SERVICE_STOPPED};
-static const DWORD	service_types[5] = {SERVICE_KERNEL_DRIVER, SERVICE_FILE_SYSTEM_DRIVER,
-	SERVICE_WIN32_SHARE_PROCESS, SERVICE_WIN32_OWN_PROCESS, SERVICE_INTERACTIVE_PROCESS};
 static const DWORD	start_types[6] = {SERVICE_AUTO_START, SERVICE_AUTO_START, SERVICE_BOOT_START,
 	SERVICE_SYSTEM_START, SERVICE_DEMAND_START, SERVICE_DISABLED};
 
@@ -47,25 +45,6 @@ static const char	*get_state_string(DWORD state)
 			return "stop pending";
 		case SERVICE_STOPPED:
 			return "stopped";
-		default:
-			return "unknown";
-	}
-}
-
-static const char	*get_type_string(DWORD type)
-{
-	switch (type)
-	{
-		case SERVICE_KERNEL_DRIVER:
-			return "kernel driver";
-		case SERVICE_FILE_SYSTEM_DRIVER:
-			return "file system driver";
-		case SERVICE_WIN32_SHARE_PROCESS:
-			return "win32 share process";
-		case SERVICE_WIN32_OWN_PROCESS:
-			return "win32 own process";
-		case SERVICE_INTERACTIVE_PROCESS:
-			return "interactive process";
 		default:
 			return "unknown";
 	}
@@ -150,17 +129,9 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 				if (0 != QueryServiceConfig(h_srv, qsc, sz, &sz))
 				{
-					DWORD	service_type, current_state;
+					DWORD	current_state;
 
 					zbx_json_addobject(&j, NULL);
-
-					service_type = ssp[i].ServiceStatusProcess.dwServiceType;
-					for (k = 0; k < 5 && service_type != service_types[k]; k++)
-						;
-
-					zbx_json_adduint64(&j, "{#SERVICE.TYPE}", k);
-					zbx_json_addstring(&j, "{#SERVICE.TYPENAME}", get_type_string(service_type),
-							ZBX_JSON_TYPE_STRING);
 
 					current_state = ssp[i].ServiceStatusProcess.dwCurrentState;
 					for (k = 0; k < 7 && current_state != service_states[k]; k++)
@@ -249,7 +220,6 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_SRV_PARAM_PATH		0x03
 #define ZBX_SRV_PARAM_USER		0x04
 #define ZBX_SRV_PARAM_STARTUP		0x05
-#define ZBX_SRV_PARAM_TYPE		0x06
 
 int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
@@ -287,8 +257,6 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 		param_type = ZBX_SRV_PARAM_USER;
 	else if (0 == strcmp(param, "startup"))
 		param_type = ZBX_SRV_PARAM_STARTUP;
-	else if (0 == strcmp(param, "type"))
-		param_type = ZBX_SRV_PARAM_TYPE;
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
@@ -379,12 +347,6 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 					SET_UI64_RESULT(result, i);
 				}
-				break;
-			case ZBX_SRV_PARAM_TYPE:
-				for (i = 0; i < 5 && qsc->dwServiceType != service_types[i]; i++)
-					;
-
-				SET_UI64_RESULT(result, i);
 				break;
 		}
 
