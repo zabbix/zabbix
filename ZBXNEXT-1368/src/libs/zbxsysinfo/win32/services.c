@@ -134,8 +134,11 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 					zbx_json_addobject(&j, NULL);
 
 					current_state = ssp[i].ServiceStatusProcess.dwCurrentState;
-					for (k = 0; k < 7 && current_state != service_states[k]; k++)
+					for (k = 0; k < ARRSIZE(service_states) && current_state != service_states[k];
+							k++)
+					{
 						;
+					}
 
 					zbx_json_adduint64(&j, "{#SERVICE.STATE}", k);
 					zbx_json_addstring(&j, "{#SERVICE.STATENAME}", get_state_string(current_state),
@@ -174,8 +177,11 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 					}
 					else
 					{
-						for (k = 2; k < 6 && qsc->dwStartType != start_types[k]; k++)
+						for (k = 2; k < ARRSIZE(start_types) &&
+								qsc->dwStartType != start_types[k]; k++)
+						{
 							;
+						}
 
 						zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
 						zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}",
@@ -288,7 +294,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 != QueryServiceStatus(h_srv, &status))
 		{
-			for (i = 0; i < 7 && status.dwCurrentState != service_states[i]; i++)
+			for (i = 0; i < ARRSIZE(service_states) && status.dwCurrentState != service_states[i]; i++)
 				;
 
 			SET_UI64_RESULT(result, i);
@@ -342,7 +348,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 				}
 				else
 				{
-					for (i = 2; i < 6 && qsc->dwStartType != start_types[i]; i++)
+					for (i = 2; i < ARRSIZE(start_types) && qsc->dwStartType != start_types[i]; i++)
 						;
 
 					SET_UI64_RESULT(result, i);
@@ -405,7 +411,7 @@ int	SERVICE_STATE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (0 != QueryServiceStatus(service, &status))
 		{
-			for (i = 0; i < 7 && status.dwCurrentState != service_states[i]; i++)
+			for (i = 0; i < ARRSIZE(service_states) && status.dwCurrentState != service_states[i]; i++)
 				;
 
 			SET_UI64_RESULT(result, i);
