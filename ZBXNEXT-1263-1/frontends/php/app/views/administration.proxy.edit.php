@@ -93,7 +93,7 @@ $encryptionOut = new CComboBox('tls_connect', $data['tls_connect']);
 $encryptionOut->addItem(HOST_ENCRYPTION_NONE, _('No encryption'));
 $encryptionOut->addItem(HOST_ENCRYPTION_PSK, _('PSK'));
 $encryptionOut->addItem(HOST_ENCRYPTION_CERTIFICATE, _('Certificate'));
-$encryptionFormList->addRow(_('Outgoing encryption'), $encryptionOut);
+$encryptionFormList->addRow(_('Connections to proxy'), $encryptionOut);
 
 $encryptionIn = array();
 $encryptionIn1 = new CCheckBox('tls_in_none', ($data['tls_accept'] & 1) == 1);
@@ -107,7 +107,7 @@ $encryptionIn[] = BR();
 $encryptionIn3 = new CCheckBox('tls_in_cert', ($data['tls_accept'] & 4) == 4);
 $encryptionIn[] = array($encryptionIn3, 'Certificate');
 
-$encryptionFormList->addRow(_('Incoming encryption'), $encryptionIn);
+$encryptionFormList->addRow(_('Connections from proxy'), $encryptionIn);
 
 $encryptionOutIssuer = new CTextBox('tls_issuer', $data['tls_issuer'], 64);
 $encryptionFormList->addRow(_('Issuer'), $encryptionOutIssuer);

@@ -752,12 +752,12 @@ $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
 // Encryption
 $encryptionFormList = new CFormList('encryption');
 
-$encryptionFormList->addRow(_('Outgoing encryption'), new CComboBox('tls_connect', $data['tls_connect'], null, [
+$encryptionFormList->addRow(_('Connections to host'), new CComboBox('tls_connect', $data['tls_connect'], null, [
 	HOST_ENCRYPTION_NONE => _('No encryption'),
 	HOST_ENCRYPTION_PSK => _('PSK'),
 	HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
 ]));
-$encryptionFormList->addRow(_('Incoming encryption'), [
+$encryptionFormList->addRow(_('Connections from host'), [
 	[new CCheckBox('tls_in_none', ($data['tls_accept'] & 1) == 1), 'No encryption'],
 	BR(),
 	[new CCheckBox('tls_in_psk', ($data['tls_accept'] & 2) == 2), 'PSK'],
