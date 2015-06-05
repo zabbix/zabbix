@@ -75,7 +75,6 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$existingInterfaceTypes = [];
-
 	foreach ($parentHost['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
@@ -83,108 +82,78 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
-	// table for agent interfaces with footer
+	// Zabbix agent interfaces
 	$ifTab = (new CTable())
-		->addClass('formElementTable')
 		->setId('agentInterfaces')
-		->setAttribute('data-type', 'agent');
-
-	// header
-	$ifTab->addRow([
-		(new CCol(SPACE))->addClass('interface-drag-control'),
-		(new CCol(_('IP address')))->addClass('interface-ip'),
-		(new CCol(_('DNS name')))->addClass('interface-dns'),
-		(new CCol(_('Connect to')))->addClass('interface-connect-to'),
-		(new CCol(_('Port')))->addClass('interface-port'),
-		(new CCol(_('Default')))->addClass('interface-default'),
-		(new CCol(SPACE))->addClass('interface-control')
+		->setHeader([
+		new CColHeader(),
+		new CColHeader(_('IP address')),
+		new CColHeader(_('DNS name')),
+		new CColHeader(_('Connect to')),
+		new CColHeader(_('Port')),
+		(new CColHeader(_('Default')))->setColSpan(2)
 	]);
 
 	$row = (new CRow())->setId('agentInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
-		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(5));
+	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
 
-	$hostList->addRow(
-		_('Agent interfaces'),
+	$hostList->addRow(_('Agent interfaces'),
 		(new CDiv($ifTab))
-			->addClass('border_dotted')
-			->addClass('objectgroup')
-			->addClass('interface-group'),
-		false,
-		null,
-		'interface-row interface-row-first'
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'agent')
 	);
 
-	// table for SNMP interfaces with footer
-	$ifTab = (new CTable())
-		->addClass('formElementTable')
-		->setId('SNMPInterfaces')
-		->setAttribute('data-type', 'snmp');
+	// SNMP interfaces
+	$ifTab = (new CTable())->setId('SNMPInterfaces');
 
 	$row = (new CRow())->setId('SNMPInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
-		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(5));
+	if (!array_key_exists(INTERFACE_TYPE_SNMP, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(
-		_('SNMP interfaces'),
+
+	$hostList->addRow(_('SNMP interfaces'),
 		(new CDiv($ifTab))
-			->addClass('border_dotted')
-			->addClass('objectgroup')
-			->addClass('interface-group'),
-		false,
-		null,
-		'interface-row'
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'snmp')
 	);
 
-	// table for JMX interfaces with footer
-	$ifTab = (new CTable())
-		->addClass('formElementTable')
-		->setId('JMXInterfaces')
-		->setAttribute('data-type', 'jmx');
+	// JMX interfaces
+	$ifTab = (new CTable())->setId('JMXInterfaces');
 
 	$row = (new CRow())->setId('JMXInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
-		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(5));
+	if (!array_key_exists(INTERFACE_TYPE_JMX, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(
-		_('JMX interfaces'),
+
+	$hostList->addRow(_('JMX interfaces'),
 		(new CDiv($ifTab))
-			->addClass('border_dotted')
-			->addClass('objectgroup')
-			->addClass('interface-group'),
-		false,
-		null,
-		'interface-row'
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'jmx')
 	);
 
-	// table for IPMI interfaces with footer
-	$ifTab = (new CTable())
-		->addClass('formElementTable')
-		->setId('IPMIInterfaces')
-		->setAttribute('data-type', 'ipmi');
+	// IPMI interfaces
+	$ifTab = (new CTable())->setId('IPMIInterfaces');
 
 	$row = (new CRow())->setId('IPMIInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
-		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(5));
+	if (!array_key_exists(INTERFACE_TYPE_IPMI, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
+
 	$hostList->addRow(
 		_('IPMI interfaces'),
 		(new CDiv($ifTab))
-			->addClass('border_dotted')
-			->addClass('objectgroup')
-			->addClass('interface-group'),
-		false,
-		null,
-		'interface-row interface-row-last'
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'ipmi')
 	);
 
 	// proxy
