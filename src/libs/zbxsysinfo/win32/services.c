@@ -97,6 +97,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	QUERY_SERVICE_CONFIG		*qsc = NULL;
+	SERVICE_DESCRIPTION		*lpsd = NULL;
 	SC_HANDLE			h_mgr;
 	DWORD				sz = 0, szn, i, k, services, resume_handle = 0;
 	char				*utf8;
@@ -186,6 +187,34 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 						zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
 						zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}",
 								get_startup_string(qsc->dwStartType),
+								ZBX_JSON_TYPE_STRING);
+					}
+
+
+					QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &sz);
+
+					if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+					{
+						lpsd = (SERVICE_DESCRIPTION *)zbx_malloc(lpsd, sz);
+
+						if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION,
+								(LPBYTE)lpsd, sz, &sz) &&
+								NULL != lpsd->lpDescription)
+						{
+							utf8 = zbx_unicode_to_utf8(lpsd->lpDescription);
+							zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", utf8,
+									ZBX_JSON_TYPE_STRING);
+							zbx_free(utf8);
+						}
+						else
+							zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", "",
+									ZBX_JSON_TYPE_STRING);
+
+						zbx_free(lpsd);
+					}
+					else
+					{
+						zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", "",
 								ZBX_JSON_TYPE_STRING);
 					}
 
