@@ -2052,7 +2052,8 @@ button[disabled] {
 	min-width: 166px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
-	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
+	border-bottom-color: darken($action-border-color, 1%);
+	@include box-shadow(0 4px 20px 0 rgba(118,141,153,0.4));
 
 	li {
 		display: block;
@@ -2154,7 +2155,8 @@ button[disabled] {
 	padding: 15px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
-	@include box-shadow(0 5px 20px 0 rgba(118,141,153,0.3));
+	border-bottom-color: darken($action-border-color, 1%);
+	@include box-shadow(0 4px 20px 0 rgba(118,141,153,0.4));
 
 	.list-table {
 		@include box-shadow(none);
@@ -2772,7 +2774,7 @@ a.overlay-close-btn {
 }
 
 .preloader {
-	background: url(../img/preload.gif) 0 0;
+	background: url(../img/preload.gif) no-repeat 0 0;
 	width: 32px;
 	height: 32px;
 	margin: 0 auto;
