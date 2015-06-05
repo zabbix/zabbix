@@ -4,30 +4,30 @@
 		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 	</td>
 	<td class="interface-ip">
-		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
-		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
-		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
-		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" maxlength="64" value="#{iface.ip}" />
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}">
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}">
+		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
+		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" maxlength="64" value="#{iface.ip}">
 		<div class="interface-bulk">
-			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk} />
+			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
 			<label for="interfaces[#{iface.interfaceid}][bulk]"><?= _('Use bulk requests') ?></label>
 		</div>
 	</td>
 	<td class="interface-dns">
-		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" maxlength="64" value="#{iface.dns}" />
+		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" maxlength="64" value="#{iface.dns}">
 	</td>
 	<td class="interface-connect-to">
 		<div class="jqueryinputset radioset">
-			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
-			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
+			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip}>
+			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns}>
 			<label for="radio_ip_#{iface.interfaceid}"><?= _('IP') ?></label><label for="radio_dns_#{iface.interfaceid}"><?= _('DNS') ?></label>
 		</div>
 	</td>
 	<td class="interface-port">
-		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" maxlength="64" value="#{iface.port}" />
+		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" maxlength="64" value="#{iface.port}">
 	</td>
 	<td class="interface-default">
-		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}" />
+		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td class="interface-control">
@@ -125,13 +125,17 @@
 
 		function addDraggableIcon(domElement) {
 			domElement.draggable({
-				helper: 'clone',
 				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				revert: 'invalid',
+				start: function(event, ui) {
+					jQuery(this).css({'z-index': '1000'})
+				},
 				stop: function(event, ui) {
 					var hostInterfaceId = jQuery(this).data('interfaceid');
 					resetMainInterfaces();
 					resetUseipInterface(hostInterfaceId)
+
+					jQuery(this).css({'z-index': ''})
 				}
 			});
 		}
@@ -344,7 +348,7 @@
 				var hostInterfaceTypeName = jQuery(this).data('type'),
 					hostInterfaceId = ui.draggable.data('interfaceid');
 
-				ui.helper.remove();
+				ui.helper.css({'left': '', 'top': ''});
 
 				if (getHostInterfaceNumericType(hostInterfaceTypeName) == <?= INTERFACE_TYPE_SNMP ?>) {
 					if (jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + hostInterfaceId)).length == 0) {
