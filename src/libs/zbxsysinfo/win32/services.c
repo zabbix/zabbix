@@ -590,8 +590,11 @@ int	SERVICES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SC_HANDLE	h_srv;
 
-			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_CONFIG)))
+			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName,
+					SERVICE_QUERY_STATUS | SERVICE_QUERY_CONFIG)))
+			{
 				continue;
+			}
 
 			if (SUCCEED == check_service_starttype(h_srv, start_type))
 			{
