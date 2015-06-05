@@ -900,7 +900,7 @@ footer {
 					@include opacity(1);
 
 					&:active {
-						background-color: darken($ui-bg-selected-color, 15%);
+						background-color: darken($ui-bg-selected-color, 10%);
 						@include opacity(1);
 					}
 				}
@@ -1648,8 +1648,21 @@ $icon-widget-buttons: (
 	@include opacity(0.5);
 
 	.subfilter-disable-btn {
-		color: lighten($ui-bg-selected-color, 10%);
+		cursor: default;
+		color: darken($ui-bg-selected-color, 15%);
 		background-color: $ui-bg-selected-color;
+
+		&:hover {
+			color: darken($ui-bg-selected-color, 15%);
+		}
+
+		&:focus {
+			color: darken($ui-bg-selected-color, 15%);
+		}
+
+		&:active {
+			color: darken($ui-bg-selected-color, 15%);
+		}
 	}
 }
 
@@ -2696,22 +2709,26 @@ a.overlay-close-btn {
 	position: absolute;
 	top: 0;
 	right: -12px;
-	color: $white;
+	//color: $white;
+	color: darken($ui-bg-selected-color, 40%);
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
 	@include border-radius(2px);
 	@include opacity(1);
 
 	&:hover {
-		background-color: darken($ui-bg-selected-color, 5%);
+		color: darken($ui-bg-selected-color, 65%);
+		//background-color: darken($ui-bg-selected-color, 5%);
 	}
 
-	&:hover {
-		background-color: darken($ui-bg-selected-color, 5%);
+	&:focus {
+		color: darken($ui-bg-selected-color, 55%);
+		//background-color: darken($ui-bg-selected-color, 5%);
 	}
 
 	&:active {
-		background-color: darken($ui-bg-selected-color, 5%);
+		color: darken($ui-bg-selected-color, 55%);
+		//background-color: darken($ui-bg-selected-color, 5%);
 	}
 }
 
@@ -2761,7 +2778,6 @@ a.overlay-close-btn {
 	margin: 0 auto;
 }
 
-// IMAGE MAPS
 $browsers: (
 	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
 	ff: url(../img/browser-sprite.png) no-repeat -66px 0px,
