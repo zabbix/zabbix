@@ -114,24 +114,27 @@ $permissionsTable->addRow([
 $permissionsTable->addRow([
 	[
 		(new CButton('add_read_write', _('Add')))
+			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ_WRITE."');")
-			->addClass('button-form'),
-		(new CSubmit('del_read_write', _('Delete selected')))->addClass('button-form')
+				'&permission='.PERM_READ_WRITE."');"),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSubmit('del_read_write', _('Delete selected')))->addClass(ZBX_STYLE_BTN_GREY)
 	],
 	[
 		(new CButton('add_read_only', _('Add')))
+			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ."');")
-			->addClass('button-form'),
-		(new CSubmit('del_read_only', _('Delete selected')))->addClass('button-form')
+				'&permission='.PERM_READ."');"),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSubmit('del_read_only', _('Delete selected')))->addClass(ZBX_STYLE_BTN_GREY)
 	],
 	[
 		(new CButton('add_deny', _('Add')))
+			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_DENY."');")
-			->addClass('button-form'),
-		(new CSubmit('del_deny', _('Delete selected')))->addClass('button-form')
+				'&permission='.PERM_DENY."');"),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSubmit('del_deny', _('Delete selected')))->addClass(ZBX_STYLE_BTN_GREY)
 	]
 ]);
 $permissionsFormList->addRow(_('Composing permissions'), $permissionsTable);

@@ -61,16 +61,18 @@ else {
 	$itemFormList->addRow(_('Type'), new CComboBox('type', $this->data['type'], null, $this->data['types']));
 }
 
+$key_controls = [new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited'])];
+if (!$this->data['limited']) {
+	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$key_controls[] = (new CButton('keyButton', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.php?srctbl=help_items&srcfld1=key&dstfrm='.$itemForm->getName().
+			'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());');
+
+}
+
 // append key to form list
-$itemFormList->addRow(_('Key'), [
-	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
-	!$this->data['limited']
-		? (new CButton('keyButton', _('Select')))
-			->onClick('return PopUp("popup.php?srctbl=help_items&srcfld1=key'.
-				'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());')
-			->addClass('button-form')
-		: null
-]);
+$itemFormList->addRow(_('Key'), $key_controls);
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
@@ -247,7 +249,7 @@ if ($this->data['limited']) {
 		->setAttribute('disabled', 'disabled');
 	$multiplier[] = $multiplierCheckBox;
 
-	$multiplier[] = SPACE;
+	$multiplier[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE, true);
 	$formulaTextBox->setAttribute('style', 'text-align: right;');
 	$multiplier[] = $formulaTextBox;
@@ -257,7 +259,7 @@ else {
 		->setChecked($this->data['multiplier'] == 1)
 		->onClick('var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }');
 	$multiplier[] = $multiplierCheckBox;
-	$multiplier[] = SPACE;
+	$multiplier[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE);
 	$formulaTextBox->setAttribute('style', 'text-align: right;');
 	$multiplier[] = $formulaTextBox;
