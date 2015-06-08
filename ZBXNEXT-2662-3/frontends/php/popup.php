@@ -550,8 +550,9 @@ if ($srctbl == 'usrgrp') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_usrgrps', null, "javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_usrgrps'))
+					->onClick("javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -584,7 +585,9 @@ if ($srctbl == 'usrgrp') {
 		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow([
-			$multiselect ? new CCheckBox('usrgrps['.$userGroup['usrgrpid'].']', null, null, $userGroup['usrgrpid']) : null,
+			$multiselect
+				? new CCheckBox('usrgrps['.$userGroup['usrgrpid'].']', $userGroup['usrgrpid'])
+				: null,
 			$name,
 		]);
 	}
@@ -612,8 +615,9 @@ elseif ($srctbl == 'users') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_users', null, "javascript: checkAll('".$form->getName()."', 'all_users', 'users');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_users'))
+					->onClick("javascript: checkAll('".$form->getName()."', 'all_users', 'users');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Alias'),
 		_x('Name', 'user first name'),
@@ -654,7 +658,9 @@ elseif ($srctbl == 'users') {
 		$alias->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		$table->addRow([
-			$multiselect ? new CCheckBox('users['.zbx_jsValue($user[$srcfld1]).']', null, null, $user['userid']) : null,
+			$multiselect
+				? new CCheckBox('users['.zbx_jsValue($user[$srcfld1]).']', $user['userid'])
+				: null,
 			$alias,
 			$user['name'],
 			$user['surname']
@@ -686,8 +692,9 @@ elseif ($srctbl == 'templates') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_templates', null, "javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_templates'))
+					->onClick("javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -717,7 +724,7 @@ elseif ($srctbl == 'templates') {
 			$parentId.');';
 
 		if ($multiselect) {
-			$checkBox = new CCheckBox('templates['.$template['templateid'].']', null, null, $template['templateid']);
+			$checkBox = new CCheckBox('templates['.$template['templateid'].']', $template['templateid']);
 		}
 
 		// check for existing
@@ -765,8 +772,9 @@ elseif ($srctbl == 'hosts') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_hosts'))
+					->onClick("javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -796,7 +804,7 @@ elseif ($srctbl == 'hosts') {
 			$parentId.');';
 
 		if ($multiselect) {
-			$checkBox = new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']);
+			$checkBox = new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']);
 		}
 
 		// check for existing
@@ -822,7 +830,7 @@ elseif ($srctbl == 'hosts') {
 
 	if ($multiselect) {
 		$button = (new CButton('select', _('Select')))
-			->onCLick("javascript: addSelectedValues('hosts', ".zbx_jsvalue($reference).', '.$parentId.');');
+			->onClick("javascript: addSelectedValues('hosts', ".zbx_jsvalue($reference).', '.$parentId.');');
 		$table->setFooter((new CCol($button))->addClass('right'));
 	}
 
@@ -844,8 +852,9 @@ elseif ($srctbl == 'host_templates') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_hosts', null, "javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_hosts'))
+					->onClick("javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -876,7 +885,7 @@ elseif ($srctbl == 'host_templates') {
 			$parentId.');';
 
 		if ($multiselect) {
-			$checkBox = new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']);
+			$checkBox = new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']);
 		}
 
 		// check for existing
@@ -924,8 +933,9 @@ elseif ($srctbl == 'host_groups') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_hostgroups', null, "javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_hostgroups'))
+					->onClick("javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -951,7 +961,7 @@ elseif ($srctbl == 'host_groups') {
 		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
 			$parentId.');';
 		if ($multiselect) {
-			$checkBox = new CCheckBox('hostGroups['.$hostgroup['groupid'].']', null, null, $hostgroup['groupid']);
+			$checkBox = new CCheckBox('hostGroups['.$hostgroup['groupid'].']', $hostgroup['groupid']);
 		}
 
 		// check for existing
@@ -1019,8 +1029,9 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_triggers', null, "checkAll('".$form->getName()."', 'all_triggers', 'triggers');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_triggers'))
+					->onClick("checkAll('".$form->getName()."', 'all_triggers', 'triggers');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name'),
 		_('Severity'),
@@ -1122,7 +1133,9 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 		}
 
 		$table->addRow([
-			$multiselect ? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', null, null, $trigger['triggerid']) : null,
+			$multiselect
+				? new CCheckBox('triggers['.zbx_jsValue($trigger[$srcfld1]).']', $trigger['triggerid'])
+				: null,
 			$description,
 			getSeverityCell($trigger['priority'], $config),
 			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
@@ -1171,8 +1184,9 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 		$pageFilter->hostsAll ? _('Host') : null,
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_items', null, "javascript: checkAll('".$form->getName()."', 'all_items', 'items');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_items'))
+					->onClick("javascript: checkAll('".$form->getName()."', 'all_items', 'items');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name'),
 		_('Key'),
@@ -1256,7 +1270,9 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 
 		$table->addRow([
 			($hostid > 0) ? null : $item['hostname'],
-			$multiselect ? new CCheckBox('items['.zbx_jsValue($item[$srcfld1]).']', null, null, $item['itemid']) : null,
+			$multiselect
+				? new CCheckBox('items['.zbx_jsValue($item[$srcfld1]).']', $item['itemid'])
+				: null,
 			$description,
 			$item['key_'],
 			item_type2str($item['type']),
@@ -1303,8 +1319,9 @@ elseif ($srctbl == 'applications') {
 	$table->setHeader([
 		$multiselect
 			? (new CColHeader(
-				new CCheckBox('all_applications', null, "javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');"))
-			)->addClass(ZBX_STYLE_CELL_WIDTH)
+				(new CCheckBox('all_applications'))
+					->onClick("javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		_('Name')
 	]);
@@ -1337,9 +1354,7 @@ elseif ($srctbl == 'applications') {
 			$parentId.');';
 
 		if ($multiselect) {
-			$checkBox = new CCheckBox('applications['.zbx_jsValue('applicationid').']', null, null,
-				$app['applicationid']
-			);
+			$checkBox = new CCheckBox('applications['.zbx_jsValue('applicationid').']', $app['applicationid']);
 		}
 
 		$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
@@ -1378,8 +1393,8 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 	$table = new CTableInfo();
 	if ($multiselect) {
 		$header = [
-			[new CCheckBox('all_graphs', null,
-				"javascript: checkAll('".$form->getName()."', 'all_graphs', 'graphs');"), _('Description')
+			[(new CCheckBox('all_graphs'))->onClick("javascript: checkAll('".$form->getName()."', 'all_graphs', 'graphs');"),
+				_('Description')
 			],
 			_('Graph type')
 		];
@@ -1441,7 +1456,7 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
 
 		if ($multiselect) {
 			$description = new CCol([
-				new CCheckBox('graphs['.zbx_jsValue($graph[$srcfld1]).']', null, null, $graph['graphid']),
+				new CCheckBox('graphs['.zbx_jsValue($graph[$srcfld1]).']', $graph['graphid']),
 				$description
 			]);
 		}
@@ -1489,7 +1504,11 @@ elseif ($srctbl == 'sysmaps') {
 	$table = new CTableInfo();
 
 	if ($multiselect) {
-		$header = [[new CCheckBox('all_sysmaps', null, "javascript: checkAll('".$form->getName()."', 'all_sysmaps', 'sysmaps');"), _('Name')]];
+		$header = [[
+			(new CCheckBox('all_sysmaps'))
+				->onClick("javascript: checkAll('".$form->getName()."', 'all_sysmaps', 'sysmaps');"),
+			_('Name')
+		]];
 	}
 	else {
 		$header = [_('Name')];
@@ -1528,7 +1547,10 @@ elseif ($srctbl == 'sysmaps') {
 		}
 
 		if ($multiselect) {
-			$description = new CCol([new CCheckBox('sysmaps['.zbx_jsValue($sysmap[$srcfld1]).']', null, null, $sysmap['sysmapid']), $description]);
+			$description = new CCol([
+				new CCheckBox('sysmaps['.zbx_jsValue($sysmap[$srcfld1]).']', $sysmap['sysmapid']),
+				$description
+			]);
 		}
 		$table->addRow($description);
 		unset($description);
@@ -1558,7 +1580,10 @@ elseif ($srctbl == 'slides') {
 	$table = new CTableInfo();
 
 	if ($multiselect) {
-		$header = [[new CCheckBox('all_slides', null, "javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"), _('Name')],];
+		$header = [[
+			(new CCheckBox('all_slides'))->onClick("javascript: checkAll('".$form->getName()."', 'all_slides', 'slides');"),
+			_('Name')
+		]];
 	}
 	else {
 		$header = [_('Name')];
@@ -1592,7 +1617,10 @@ elseif ($srctbl == 'slides') {
 		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
-			$name = new CCol([new CCheckBox('slides['.zbx_jsValue($dbSlideshow[$srcfld1]).']', null, null, $dbSlideshow['slideshowid']), $name]);
+			$name = new CCol([
+				new CCheckBox('slides['.zbx_jsValue($dbSlideshow[$srcfld1]).']', $dbSlideshow['slideshowid']),
+				$name
+			]);
 		}
 		$table->addRow($name);
 	}
@@ -1621,9 +1649,10 @@ elseif ($srctbl == 'screens') {
 	$table = new CTableInfo();
 
 	if ($multiselect) {
-		$header = [
-			[new CCheckBox('all_screens', null, "javascript: checkAll('".$form->getName()."', 'all_screens', 'screens');"), _('Name')],
-		];
+		$header = [[
+			(new CCheckBox('all_screens'))->onClick("javascript: checkAll('".$form->getName()."', 'all_screens', 'screens');"),
+			_('Name')
+		]];
 	}
 	else {
 		$header = [_('Name')];
@@ -1653,7 +1682,10 @@ elseif ($srctbl == 'screens') {
 		$name->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
-			$name = new CCol([new CCheckBox('screens['.zbx_jsValue($screen[$srcfld1]).']', null, null, $screen['screenid']), $name]);
+			$name = new CCol([
+				new CCheckBox('screens['.zbx_jsValue($screen[$srcfld1]).']', $screen['screenid']),
+				$name
+			]);
 		}
 		$table->addRow($name);
 	}
@@ -1782,7 +1814,10 @@ elseif ($srctbl == 'scripts') {
 
 	if ($multiselect) {
 		$header = [
-			[new CCheckBox('all_scripts', null, "javascript: checkAll('".$form->getName()."', 'all_scripts', 'scripts');"), _('Name')],
+			[
+				(new CCheckBox('all_scripts'))->onClick("javascript: checkAll('".$form->getName()."', 'all_scripts', 'scripts');"),
+				_('Name')
+			],
 			_('Execute on'),
 			_('Commands')
 		];
@@ -1825,7 +1860,10 @@ elseif ($srctbl == 'scripts') {
 		$description->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 
 		if ($multiselect) {
-			$description = new CCol([new CCheckBox('scripts['.zbx_jsValue($script[$srcfld1]).']', null, null, $script['scriptid']), $description]);
+			$description = new CCol([
+				new CCheckBox('scripts['.zbx_jsValue($script[$srcfld1]).']', $script['scriptid']),
+				$description
+			]);
 		}
 
 		if ($script['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) {

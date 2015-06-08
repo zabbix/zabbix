@@ -81,7 +81,7 @@ if ($this->data['grpswitch']) {
 }
 
 // append host in maintenance checkbox to form list
-$maintenanceCheckBox = new CCheckBox('maintenance', $this->data['maintenance'], null, '1');
+$maintenanceCheckBox = (new CCheckBox('maintenance'))->setChecked($this->data['maintenance'] == 1);
 if (!$this->data['isFilterEnable']) {
 	$maintenanceCheckBox->setAttribute('disabled', 'disabled');
 }
@@ -90,10 +90,9 @@ $dashconfFormList->addRow(_('Hosts'), [$maintenanceCheckBox, _('Show hosts in ma
 // append trigger severities to form list
 $severities = [];
 foreach ($this->data['severities'] as $severity) {
-	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']',
-		isset($this->data['severity'][$severity]), null, 1
-	);
-	$serverityCheckBox->setEnabled($this->data['isFilterEnable']);
+	$serverityCheckBox = (new CCheckBox('trgSeverity['.$severity.']'))
+		->setChecked(isset($this->data['severity'][$severity]))
+		->setEnabled($this->data['isFilterEnable']);
 	$severities[] = [$serverityCheckBox, getSeverityName($severity, $this->data['config'])];
 	$severities[] = BR();
 }

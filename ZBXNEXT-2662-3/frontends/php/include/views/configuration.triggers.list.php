@@ -54,7 +54,7 @@ $triggersForm->addVar('hostid', $this->data['hostid']);
 $triggersTable = new CTableInfo();
 $triggersTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
+		(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
 	($this->data['hostid'] == 0) ? _('Host') : null,
@@ -179,8 +179,8 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	}
 
 	// checkbox
-	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);
-	$checkBox->setEnabled(empty($trigger['discoveryRule']));
+	$checkBox = (new CCheckBox('g_triggerid['.$triggerid.']', $triggerid))
+		->setEnabled(empty($trigger['discoveryRule']));
 
 	$triggersTable->addRow([
 		$checkBox,

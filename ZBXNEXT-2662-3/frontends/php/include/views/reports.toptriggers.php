@@ -96,9 +96,8 @@ $filterColumn1->addRow(
 $severitiesTable = (new CTable())->addClass('severities-table');
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$serverityCheckBox = new CCheckBox('severities['.$severity.']',
-		in_array($severity, $this->data['filter']['severities']), null, 1
-	);
+	$serverityCheckBox = (new CCheckBox('severities['.$severity.']'))
+		->setChecked(in_array($severity, $this->data['filter']['severities']));
 
 	if ($severity % 2) {
 		$severitiesCol2[] = new CCol([$serverityCheckBox, getSeverityName($severity, $this->data['config'])]);

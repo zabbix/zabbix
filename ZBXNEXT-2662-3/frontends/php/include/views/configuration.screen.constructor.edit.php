@@ -350,7 +350,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 		$selectButton
 	], false, null, ZBX_STYLE_NOWRAP);
 	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
-	$screenFormList->addRow(_('Show text as HTML'), new CCheckBox('style', $style, null, 1));
+	$screenFormList->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
 }
 
 /*
@@ -730,7 +730,7 @@ $resourcesWithDynamic = [
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 ];
 if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, $resourcesWithDynamic)) {
-	$screenFormList->addRow(_('Dynamic item'), new CCheckBox('dynamic', $dynamic, null, 1));
+	$screenFormList->addRow(_('Dynamic item'), (new CCheckBox('dynamic'))->setChecked($dynamic == 1));
 }
 
 // append tabs to form

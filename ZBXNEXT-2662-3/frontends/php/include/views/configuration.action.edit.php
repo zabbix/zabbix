@@ -47,7 +47,11 @@ $actionFormList->addRow(_('Default subject'), new CTextBox('def_shortdata', $thi
 $actionFormList->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$actionFormList->addRow(_('Recovery message'), new CCheckBox('recovery_msg', $this->data['action']['recovery_msg'], 'javascript: submit();', 1));
+	$actionFormList->addRow(_('Recovery message'),
+		(new CCheckBox('recovery_msg'))
+			->setChecked($this->data['action']['recovery_msg'] == 1)
+			->onClick('javascript: submit();')
+	);
 	if ($this->data['action']['recovery_msg']) {
 		$actionFormList->addRow(_('Recovery subject'), new CTextBox('r_shortdata', $this->data['action']['r_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
 		$actionFormList->addRow(_('Recovery message'), new CTextArea('r_longdata', $this->data['action']['r_longdata']));
@@ -57,7 +61,9 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 		$actionForm->addVar('r_longdata', $this->data['action']['r_longdata']);
 	}
 }
-$actionFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['action']['status'], null, ACTION_STATUS_ENABLED));
+$actionFormList->addRow(_('Enabled'),
+	(new CCheckBox('status', ACTION_STATUS_ENABLED))->setChecked($this->data['action']['status'] == ACTION_STATUS_ENABLED)
+);
 
 /*
  * Condition tab
@@ -679,7 +685,9 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow(
 				[
 					_('Default message'),
-					new CCheckBox('new_operation[opmessage][default_msg]', $this->data['new_operation']['opmessage']['default_msg'], 'javascript: submit();', 1)
+					(new CCheckBox('new_operation[opmessage][default_msg]'))
+						->setChecked($this->data['new_operation']['opmessage']['default_msg'] == 1)
+						->onClick('javascript: submit();')
 				],
 				'indent_top'
 			);

@@ -47,7 +47,7 @@ $screenForm->addVar('templateid', $this->data['templateid']);
 $screenTable = new CTableInfo();
 $screenTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_screens', null, "checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
+		(new CCheckBox('all_screens'))->onClick("checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Dimension (cols x rows)'),
@@ -56,7 +56,7 @@ $screenTable->setHeader([
 
 foreach ($this->data['screens'] as $screen) {
 	$screenTable->addRow([
-		new CCheckBox('screens['.$screen['screenid'].']', null, null, $screen['screenid']),
+		new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']),
 		new CLink($screen['name'], '?form=update&screenid='.$screen['screenid'].url_param('templateid')),
 		$screen['hsize'].' x '.$screen['vsize'],
 		new CLink(_('Edit'), 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid'))

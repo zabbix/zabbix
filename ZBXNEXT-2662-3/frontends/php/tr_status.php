@@ -271,8 +271,8 @@ $showEventColumn = ($config['event_ack_enable'] && $showEvents != EVENTS_OPTION_
 $switcherName = 'trigger_switchers';
 
 $headerCheckBox = ($showEventColumn)
-	? new CCheckBox('all_events', false, "checkAll('".$triggerForm->GetName()."', 'all_events', 'events');")
-	: new CCheckBox('all_triggers', false, "checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
+	? (new CCheckBox('all_events'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_events', 'events');")
+	: (new CCheckBox('all_triggers'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
 
 if ($showEvents != EVENTS_OPTION_NOEVENT) {
 	$showHideAllDiv = (new CDiv(SPACE))
@@ -723,7 +723,7 @@ foreach ($triggers as $trigger) {
 	$triggerTable->addRow([
 		$openOrCloseDiv,
 		$config['event_ack_enable'] ?
-			($showEventColumn ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', null, $trigger['triggerid'])) : null,
+			($showEventColumn ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', $trigger['triggerid'])) : null,
 		$severityColumn,
 		$statusSpan,
 		$unknown,
@@ -757,7 +757,7 @@ foreach ($triggers as $trigger) {
 			$ack = getEventAckState($event, $page['file']);
 
 			$ackCheckBox = ($event['acknowledged'] == 0 && $event['value'] == TRIGGER_VALUE_TRUE)
-				? new CCheckBox('events['.$event['eventid'].']', 'no', null, $event['eventid'])
+				? new CCheckBox('events['.$event['eventid'].']', $event['eventid'])
 				: SPACE;
 
 			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),

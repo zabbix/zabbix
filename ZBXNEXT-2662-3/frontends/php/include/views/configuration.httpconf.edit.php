@@ -104,7 +104,7 @@ $httpFormList->addRow(_('Variables'), new CTextArea('variables', $this->data['va
 $httpFormList->addRow(_('Headers'), new CTextArea('headers', $this->data['headers']));
 
 // status
-$httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status']));
+$httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
 /*
  * Authentication tab
@@ -130,10 +130,14 @@ $httpAuthenticationFormList->addRow(_('User'), $httpAuthenticationUserTB, $authe
 $httpAuthenticationFormList->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden);
 
 // SSL verify peer checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify peer'), new CCheckBox('verify_peer', $this->data['verify_peer']));
+$httpAuthenticationFormList->addRow(_('SSL verify peer'),
+	(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
+);
 
 // SSL verify host checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify host'), new CCheckBox('verify_host', $this->data['verify_host']));
+$httpAuthenticationFormList->addRow(_('SSL verify host'),
+	(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
+);
 
 // SSL certificate file
 $httpAuthenticationFormList->addRow(

@@ -74,7 +74,7 @@ if (!empty($this->data['parent_discoveryid'])) {
 $graphTable = new CTableInfo();
 $graphTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_graphs', null, "checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');")
+		(new CCheckBox('all_graphs'))->onClick("checkAll('".$graphForm->getName()."', 'all_graphs', 'group_graphid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	!empty($this->data['hostid']) ? null : _('Hosts'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
@@ -142,8 +142,8 @@ foreach ($this->data['graphs'] as $graph) {
 		);
 	}
 
-	$checkBox = new CCheckBox('group_graphid['.$graphid.']', null, null, $graphid);
-	$checkBox->setEnabled($isCheckboxEnabled);
+	$checkBox = (new CCheckBox('group_graphid['.$graphid.']', $graphid))
+		->setEnabled($isCheckboxEnabled);
 
 	$graphTable->addRow([
 		$checkBox,

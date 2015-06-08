@@ -49,7 +49,7 @@ $hostGroupForm->setId('groups');
 
 $hostGroupTable = new CTableInfo();
 $hostGroupTable->setHeader([
-	(new CColHeader(new CCheckBox('all_groups', null, 'checkAll(this.checked)')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Name')
+	(new CColHeader((new CCheckBox('all_groups'))->onClick('checkAll(this.checked)')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Name')
 ]);
 
 $hostGroups = API::HostGroup()->get([
@@ -59,10 +59,10 @@ $hostGroups = API::HostGroup()->get([
 order_result($hostGroups, 'name');
 
 foreach ($hostGroups as $hostGroup) {
-	$hostGroupCheckBox = new CCheckBox();
-	$hostGroupCheckBox->setAttribute('data-id', $hostGroup['groupid']);
-	$hostGroupCheckBox->setAttribute('data-name', $hostGroup['name']);
-	$hostGroupCheckBox->setAttribute('data-permission', $permission);
+	$hostGroupCheckBox = (new CCheckBox())
+		->setAttribute('data-id', $hostGroup['groupid'])
+		->setAttribute('data-name', $hostGroup['name'])
+		->setAttribute('data-permission', $permission);
 
 	$hostGroupTable->addRow(new CCol([$hostGroupCheckBox, $hostGroup['name']]));
 }

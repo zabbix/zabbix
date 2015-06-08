@@ -388,11 +388,11 @@ $filterColumn2->addRow(
 );
 $filterColumn2->addRow(
 	_('Show items without data'),
-	new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1)
+	(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
 );
 $filterColumn2->addRow(
 	_('Show details'),
-	new CCheckBox('show_details', $filter['showDetails'], null, 1)
+	(new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1)
 );
 
 $filterForm->addColumn($filterColumn1);
@@ -443,7 +443,7 @@ $lastDataHeader = (new CColHeader(new CSpan(_x('Change', 'noun in latest data'))
 	->addClass('latest-data')
 	->setAttribute('title', _x('Change', 'noun in latest data'));
 
-$checkAllCheckbox = new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');");
+$checkAllCheckbox = (new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');");
 
 $checkAllCheckboxCol = (new CColHeader($checkAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 
@@ -555,8 +555,8 @@ foreach ($items as $key => $item){
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
-	$checkbox->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
+		->removeAttribute('id');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -747,8 +747,8 @@ foreach ($items as $item) {
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
-	$checkbox->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
+		->removeAttribute('id');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink

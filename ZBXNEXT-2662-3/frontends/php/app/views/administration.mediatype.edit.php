@@ -79,7 +79,9 @@ $mediaTypeFormList->addRow(_('Message text limit'), new CComboBox('eztext_limit'
 	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
 ]));
 
-$mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
+$mediaTypeFormList->addRow(_('Enabled'),
+	(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
+);
 
 // append form list to tab
 $mediaTypeTab = new CTabView();

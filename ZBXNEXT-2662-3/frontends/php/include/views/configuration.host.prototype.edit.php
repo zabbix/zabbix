@@ -166,7 +166,10 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$hostList->addRow(_('Monitored by proxy'), $proxyTb);
 }
 
-$hostList->addRow(_('Enabled'), new CCheckBox('status', (HOST_STATUS_MONITORED == $hostPrototype['status']), null, HOST_STATUS_MONITORED));
+$hostList->addRow(_('Enabled'),
+	(new CCheckBox('status', HOST_STATUS_MONITORED))
+		->setChecked(HOST_STATUS_MONITORED == $hostPrototype['status'])
+);
 
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 

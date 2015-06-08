@@ -93,7 +93,8 @@ $scriptFormList->addRow(_('Required host permissions'), new CComboBox('host_acce
 	PERM_READ_WRITE => _('Write')
 ]));
 $scriptFormList->addRow(new CLabel(_('Enable confirmation'), 'enable_confirmation'),
-	new CCheckBox('enable_confirmation', $data['enable_confirmation']));
+	(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'] == 1)
+);
 
 $confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
 $scriptFormList->addRow($confirmationLabel, [

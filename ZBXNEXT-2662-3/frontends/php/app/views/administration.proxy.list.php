@@ -38,7 +38,8 @@ $proxyForm->setName('proxyForm');
 $proxyTable = new CTableInfo();
 $proxyTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_hosts', null, "checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');")
+		(new CCheckBox('all_hosts'))
+			->onClick("checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),
 	_('Mode'),
@@ -81,7 +82,7 @@ foreach ($data['proxies'] as $proxy) {
 	$name = new CLink($proxy['host'], 'zabbix.php?action=proxy.edit&proxyid='.$proxy['proxyid']);
 
 	$proxyTable->addRow([
-		new CCheckBox('proxyids['.$proxy['proxyid'].']', null, null, $proxy['proxyid']),
+		new CCheckBox('proxyids['.$proxy['proxyid'].']', $proxy['proxyid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
 		$proxy['lastaccess'] == 0

@@ -245,7 +245,7 @@ if (hasRequest('sform')) {
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
 		"&srctbl=items&srcfld1=itemid&srcfld2=name');";
-	$cbtn = (new CSubmit('select_item', _('Select')))->onCLick($script);
+	$cbtn = (new CSubmit('select_item', _('Select')))->onClick($script);
 
 	$frmTRLog->addRow(_('Item'), [$ctb, $cbtn]);
 	$frmTRLog->addVar('itemid', $itemid);
@@ -262,7 +262,7 @@ if (hasRequest('sform')) {
 	$cb = (new CButton('add_exp', _('Add')))->onClick('javascript: add_logexpr();');
 	$cbAdd = (new CButton('add_key_and', _('AND')))->onClick('javascript: add_keyword_and();');
 	$cbOr = (new CButton('add_key_or', _('OR')))->onClick('javascript: add_keyword_or();');
-	$cbIregexp = new CCheckBox('iregexp', 'no', null, 1);
+	$cbIregexp = new CCheckBox('iregexp');
 
 	$frmTRLog->addRow(_('Expression'),
 		[$ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb]
@@ -349,7 +349,7 @@ if (hasRequest('sform')) {
 	$frmTRLog->addRow(_('Comments'), new CTextArea('comments', $comments));
 	$frmTRLog->addRow(_('URL'), new CTextBox('url', $url, 80));
 	$frmTRLog->addRow(_('Disabled'),
-		new CCheckBox('status', $status == TRIGGER_STATUS_DISABLED ? 'yes' : 'no', null, 1)
+		(new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_DISABLED)
 	);
 	if (hasRequest('triggerid')) {
 		$frmTRLog->addItemToBottomRow(new CSubmit('update', _('Update')));

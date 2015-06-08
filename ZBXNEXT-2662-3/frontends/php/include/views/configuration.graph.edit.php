@@ -58,17 +58,25 @@ $graphFormList->addRow(_('Height'), new CNumericBox('height', $this->data['heigh
 $graphFormList->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()));
 
 // append legend to form list
-$graphFormList->addRow(_('Show legend'), new CCheckBox('show_legend', $this->data['show_legend'], null, 1));
+$graphFormList->addRow(_('Show legend'),
+	(new CCheckBox('show_legend'))->setChecked($this->data['show_legend'] == 1)
+);
 
 // append graph types to form list
 if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED) {
-	$graphFormList->addRow(_('Show working time'), new CCheckBox('show_work_period', $this->data['show_work_period'], null, 1));
-	$graphFormList->addRow(_('Show triggers'), new CCheckBox('show_triggers', $this->data['show_triggers'], null, 1));
+	$graphFormList->addRow(_('Show working time'),
+		(new CCheckBox('show_work_period'))->setChecked($this->data['show_work_period'] == 1)
+	);
+	$graphFormList->addRow(_('Show triggers'),
+		(new CCheckBox('show_triggers'))->setChecked($this->data['show_triggers'] == 1)
+	);
 
 	if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
 		// percent left
 		$percentLeftTextBox = new CTextBox('percent_left', $this->data['percent_left'], 6, false, 7);
-		$percentLeftCheckbox = new CCheckBox('visible[percent_left]', 1, 'javascript: showHideVisible("percent_left");', 1);
+		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
+			->setChecked(true)
+			->onClick('javascript: showHideVisible("percent_left");');
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
 			$percentLeftTextBox->setAttribute('style', '');
@@ -83,7 +91,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 		// percent right
 		$percentRightTextBox = new CTextBox('percent_right', $this->data['percent_right'], 6, false, 7);
-		$percentRightCheckbox = new CCheckBox('visible[percent_right]', 1, 'javascript: showHideVisible("percent_right");', 1);
+		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
+			->setChecked(true)
+			->onClick('javascript: showHideVisible("percent_right");');
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
 			$percentRightTextBox->setAttribute('style', '');
@@ -213,7 +223,9 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	$graphFormList->addRow(_('Y axis MAX value'), $yaxisMaxData);
 }
 else {
-	$graphFormList->addRow(_('3D view'), new CCheckBox('show_3d', $this->data['show_3d'], null, 1));
+	$graphFormList->addRow(_('3D view'),
+		(new CCheckBox('show_3d'))->setChecked($this->data['show_3d'] == 1)
+	);
 }
 
 // append items to form list

@@ -44,7 +44,7 @@ $usersForm->setName('userForm');
 $usersTable = new CTableInfo();
 $usersTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_users', null, "checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');")
+		(new CCheckBox('all_users'))->onClick("checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Alias'), 'alias', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_x('Name', 'user first name'), 'name', $this->data['sort'], $this->data['sortorder']),
@@ -130,7 +130,7 @@ foreach ($this->data['users'] as $user) {
 
 	// append user to table
 	$usersTable->addRow([
-		new CCheckBox('group_userid['.$userId.']', null, null, $userId),
+		new CCheckBox('group_userid['.$userId.']', $userId),
 		(new CCol($alias))->addClass(ZBX_STYLE_NOWRAP),
 		$user['name'],
 		$user['surname'],
