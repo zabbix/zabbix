@@ -1485,7 +1485,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 		goto out;
 	}
 
-	/* at this point the value type can be only str, tex or log */
+	/* at this point the value type can be only str, text or log */
 	if (ITEM_VALUE_TYPE_LOG == item->value_type)
 	{
 		for (i = 0; i < values.values_num; i++)
