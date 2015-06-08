@@ -21,11 +21,9 @@
 
 $itemWidget = (new CWidget())->setTitle($this->data['page_header']);
 
-if (!empty($this->data['hostid'])) {
-	$itemWidget->addItem(get_header_host_table('discoveries', $this->data['hostid'],
-		isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : null
-	));
-}
+$itemWidget->addItem(get_header_host_table('discoveries', $this->data['hostid'],
+	isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : 0
+));
 
 // create form
 $itemForm = new CForm();

@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 $triggersWidget = new CWidget();
 
 // append host summary to widget header
-$triggersWidget->addItem(get_header_host_table('triggers', $data['hostid'], $data['parent_discoveryid']));
+$triggersWidget->addItem(get_header_host_table('trigger_prototypes', $data['hostid'], $data['parent_discoveryid']));
 
 $triggersWidget->setTitle(_('Trigger prototypes'));
 

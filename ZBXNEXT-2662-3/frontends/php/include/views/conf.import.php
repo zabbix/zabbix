@@ -21,8 +21,7 @@
 include dirname(__FILE__).'/js/conf.import.js.php';
 
 $rulesTable = (new CTable())
-	->addClass('formElementTable')
-	->setHeader([SPACE, _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
+	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
 
 $titles = [
 	'groups' => _('Groups'),
@@ -39,7 +38,9 @@ $titles = [
 	'maps' => _('Maps'),
 	'images' => _('Images')
 ];
+
 $rules = $this->get('rules');
+
 foreach ($titles as $key => $title) {
 	$cbExist = null;
 	$cbMissed = null;
@@ -80,12 +81,7 @@ foreach ($titles as $key => $title) {
 // form list
 $importFormList = new CFormList('proxyFormList');
 $importFormList->addRow(_('Import file'), new CFile('import_file'));
-$importFormList->addRow(_('Rules'),
-	(new CDiv($rulesTable))
-		->addClass('border_dotted')
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-);
+$importFormList->addRow(_('Rules'), new CDiv($rulesTable));
 
 // tab
 $importTab = new CTabView();
