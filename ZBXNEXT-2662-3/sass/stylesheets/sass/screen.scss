@@ -1649,7 +1649,7 @@ $icon-widget-buttons: (
 
 .disabled {
 	cursor: default !important;
-	@include opacity(0.5);
+	@include opacity(0.4);
 
 	.subfilter-disable-btn {
 		cursor: default;
