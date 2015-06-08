@@ -77,11 +77,10 @@ if (!$filter['statusChange']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
 $statusChangeDays->addStyle('vertical-align: middle;');
-
-$statusChangeCheckBox = new CCheckBox('status_change', $filter['statusChange'],
-	'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()', 1
-);
-$statusChangeCheckBox->addStyle('vertical-align: middle;');
+$statusChangeCheckBox = (new CCheckBox('status_change'))
+	->setChecked($filter['statusChange'] == 1)
+	->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()')
+	->addStyle('vertical-align: middle;');
 
 $daysSpan = (new CSpan(_('days')))->addStyle('vertical-align: middle;');
 $column->addRow(_('Age less than'), [$statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan]);
@@ -137,12 +136,12 @@ $column->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 
 // maintenance filter
 $column->addRow(_('Show hosts in maintenance'),
-	new CCheckBox('show_maintenance', $filter['showMaintenance'], null, 1)
+	(new CCheckBox('show_maintenance'))->setChecked($filter['showMaintenance'] == 1)
 );
 
 // show details
 if (!$overview) {
-	$column->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
+	$column->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
 }
 
 $filterForm->addColumn($column);

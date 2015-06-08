@@ -156,7 +156,9 @@ if ($this->data['input_method'] == IM_TREE) {
 							' document.forms["'.$triggersForm->getName().'"].submit();'.
 						' }'
 					);
-				$triggerCheckbox = new CCheckBox('expr_target_single', ($i == 0) ? 'yes' : 'no', 'check_target(this);', $e['id']);
+				$triggerCheckbox = (new CCheckBox('expr_target_single',$e['id']))
+					->setChecked($i == 0)
+					->onClick('check_target(this);');
 			}
 			else {
 				$triggerCheckbox = null;
@@ -229,7 +231,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	]);
 
 	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))
-		->onCLick('javascript: '.
+		->onClick('javascript: '.
 			'document.getElementById("toggle_input_method").value=1;'.
 			'document.getElementById("input_method").value='.IM_ESTABLISHED.';'.
 			'document.forms["'.$triggersForm->getName().'"].submit();')
@@ -237,19 +239,23 @@ if ($this->data['input_method'] == IM_TREE) {
 	$triggersFormList->addRow(SPACE, [$inputMethodToggle, BR()]);
 }
 
-$triggersFormList->addRow(_('Multiple PROBLEM events generation'), new CCheckBox('type', (($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED) ? 'yes' : 'no'), null, 1));
+$triggersFormList->addRow(_('Multiple PROBLEM events generation'),
+	(new CCheckBox('type'))->setChecked($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED)
+);
 $triggersFormList->addRow(_('Description'), new CTextArea('comments', $this->data['comments']));
 $triggersFormList->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
 $triggersFormList->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
 
 // append status to form list
 if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
-	$status = 'yes';
+	$status = true;
 }
 else {
-	$status = ($this->data['status'] == 0) ? 'yes' : 'no';
+	$status = ($this->data['status'] == 0);
 }
-$triggersFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 1));
+$triggersFormList->addRow(_('Enabled'),
+	(new CCheckBox('status'))->setChecked($status)
+);
 
 // append tabs to form
 $triggersTab = new CTabView();

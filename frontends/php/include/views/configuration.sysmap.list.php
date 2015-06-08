@@ -40,7 +40,7 @@ $sysmapForm->setName('frm_maps');
 $sysmapTable = new CTableInfo();
 $sysmapTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")
+		(new CCheckBox('all_maps'))->onClick("checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
@@ -50,7 +50,7 @@ $sysmapTable->setHeader([
 
 foreach ($this->data['maps'] as $map) {
 	$sysmapTable->addRow([
-		new CCheckBox('maps['.$map['sysmapid'].']', null, null, $map['sysmapid']),
+		new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']),
 		new CLink($map['name'], 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form'),
 		$map['width'],
 		$map['height'],

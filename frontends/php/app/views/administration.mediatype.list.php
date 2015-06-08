@@ -41,9 +41,8 @@ $mediaTypeForm->setName('mediaTypesForm');
 $mediaTypeTable = new CTableInfo();
 $mediaTypeTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_media_types', null,
-			"checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"
-		)
+		(new CCheckBox('all_media_types'))
+			->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
 	make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
@@ -116,7 +115,7 @@ foreach ($data['mediatypes'] as $mediaType) {
 
 	// append row
 	$mediaTypeTable->addRow([
-		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', null, null, $mediaType['mediatypeid']),
+		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', $mediaType['mediatypeid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		media_type2str($mediaType['typeid']),
 		$status,

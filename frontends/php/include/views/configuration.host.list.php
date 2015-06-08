@@ -57,7 +57,7 @@ $form->setName('hosts');
 $table = new CTableInfo();
 $table->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+		(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
 	_('Applications'),
@@ -175,7 +175,7 @@ foreach ($data['hosts'] as $host) {
 	}
 
 	$table->addRow([
-		new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']),
+		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(_('Applications'), 'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),

@@ -60,10 +60,18 @@ $iconMappingsLink = (new CLink(_('show icon mappings'), 'adm.iconmapping.php'))
 $sysmapList->addRow(_('Automatic icon mapping'), [$iconMappingComboBox, SPACE, $iconMappingsLink]);
 
 // append multiple checkboxes to form list
-$sysmapList->addRow(_('Icon highlight'), new CCheckBox('highlight', $this->data['sysmap']['highlight'], null, 1));
-$sysmapList->addRow(_('Mark elements on trigger status change'), new CCheckBox('markelements', $this->data['sysmap']['markelements'], null, 1));
-$sysmapList->addRow(_('Expand single problem'), new CCheckBox('expandproblem', $this->data['sysmap']['expandproblem'], null, 1));
-$sysmapList->addRow(_('Advanced labels'), new CCheckBox('label_format', $this->data['sysmap']['label_format'], null, 1));
+$sysmapList->addRow(_('Icon highlight'),
+	(new CCheckBox('highlight'))->setChecked($this->data['sysmap']['highlight'] == 1)
+);
+$sysmapList->addRow(_('Mark elements on trigger status change'),
+	(new CCheckBox('markelements'))->setChecked($this->data['sysmap']['markelements'] == 1)
+);
+$sysmapList->addRow(_('Expand single problem'),
+	(new CCheckBox('expandproblem'))->setChecked($this->data['sysmap']['expandproblem'] == 1)
+);
+$sysmapList->addRow(_('Advanced labels'),
+	(new CCheckBox('label_format'))->setChecked($this->data['sysmap']['label_format'] == 1)
+);
 
 // append hostgroup to form list
 $labelTypeHostgroupComboBox = new CComboBox('label_type_hostgroup', $this->data['sysmap']['label_type_hostgroup'], null, $this->data['labelTypesLimited']);

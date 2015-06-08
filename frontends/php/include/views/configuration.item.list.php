@@ -55,7 +55,7 @@ $itemTable = (new CTableInfo())
 	->setNoDataMessage(($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.'));
 $itemTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
+		(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	_('Wizard'),
 	empty($this->data['filter_hostid']) ? _('Host') : null,
@@ -247,8 +247,8 @@ foreach ($this->data['items'] as $item) {
 		$menuIcon = SPACE;
 	}
 
-	$checkBox = new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']);
-	$checkBox->setEnabled(empty($item['discoveryRule']));
+	$checkBox = (new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']))
+		->setEnabled(empty($item['discoveryRule']));
 
 	$itemTable->addRow([
 		$checkBox,

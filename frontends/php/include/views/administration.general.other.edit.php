@@ -38,7 +38,7 @@ $otherTab->addRow(_('Refresh unsupported items (in sec)'),
 $otherTab->addRow(_('Group for discovered hosts'), $discoveryGroup);
 $otherTab->addRow(_('User group for database down message'), $alertUserGroup);
 $otherTab->addRow(_('Log unmatched SNMP traps'),
-	new CCheckBox('snmptrap_logging', $data['snmptrap_logging'] == 1, null, 1)
+	(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
 );
 
 $otherView = new CTabView();

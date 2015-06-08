@@ -36,7 +36,7 @@ $slideForm->setName('slideForm');
 $slidesTable = new CTableInfo();
 $slidesTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")
+		(new CCheckBox('all_shows'))->onClick("checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
@@ -45,7 +45,7 @@ $slidesTable->setHeader([
 
 foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow([
-		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
+		new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']),
 		(new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid']))->addClass('action'),
 		convertUnitsS($slide['delay']),
 		$slide['cnt']

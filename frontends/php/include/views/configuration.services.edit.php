@@ -60,7 +60,7 @@ $servicesFormList->addRow(_('Status calculation algorithm'),
 );
 
 // append SLA to form list
-$showslaCheckbox = new CCheckBox('showsla', ($this->data['showsla'] == 0) ? 'no' : 'yes', null, 1);
+$showslaCheckbox = (new CCheckBox('showsla'))->setChecked($this->data['showsla'] == 1);
 $goodslaTextBox = new CTextBox('goodsla', $this->data['goodsla'], 6, false, 8);
 if (!$this->data['showsla']) {
 	$goodslaTextBox->setAttribute('disabled', 'disabled');
@@ -104,12 +104,8 @@ foreach ($this->data['children'] as $child) {
 			new CVar('children['.$child['serviceid'].'][name]', $child['name']),
 			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
 		],
-		new CCheckBox(
-			'children['.$child['serviceid'].'][soft]',
-			isset($child['soft']) && !empty($child['soft']) ? 'checked' : 'no',
-			null,
-			1
-		),
+		(new CCheckBox('children['.$child['serviceid'].'][soft]'))
+			->setChecked(isset($child['soft']) && !empty($child['soft'])),
 		!empty($child['trigger']) ? $child['trigger'] : '',
 		(new CButton('remove', _('Remove')))
 			->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')

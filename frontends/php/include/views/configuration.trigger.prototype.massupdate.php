@@ -48,7 +48,8 @@ $severityDiv = new CSeverity([
 
 $triggersFormList->addRow(
 	[_('Severity'), SPACE,
-		new CVisibilityBox('visible[priority]', isset($data['visible']['priority']), 'priority_div', _('Original')),
+		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
+			->setChecked(isset($data['visible']['priority']))
 	],
 	$severityDiv
 );
@@ -106,9 +107,8 @@ $dependenciesDiv = (new CDiv([$dependenciesTable, $addButton, SPACE, SPACE, SPAC
 
 $triggersFormList->addRow(
 	[_('Replace dependencies'), SPACE,
-		new CVisibilityBox('visible[dependencies]', isset($data['visible']['dependencies']), 'dependencies_div',
-			_('Original')
-		)
+		(new CVisibilityBox('visible[dependencies]', 'dependencies_div', _('Original')))
+			->setChecked(isset($data['visible']['dependencies']))
 	],
 	$dependenciesDiv
 );

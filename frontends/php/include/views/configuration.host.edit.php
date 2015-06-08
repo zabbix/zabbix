@@ -288,7 +288,7 @@ else {
 $hostList->addRow(_('Monitored by proxy'), $proxy);
 
 $hostList->addRow(_('Enabled'),
-	new CCheckBox('status', ($data['status'] == HOST_STATUS_MONITORED), null, HOST_STATUS_MONITORED)
+	(new CCheckBox('status', HOST_STATUS_MONITORED))->setChecked($data['status'] == HOST_STATUS_MONITORED)
 );
 
 if ($data['clone_hostid'] != 0) {

@@ -36,7 +36,7 @@ $triggerDOFormList->addRow(
 		(new CDiv(new CColor('problem_unack_color', $data['problem_unack_color'])))
 			->addClass('inlineblock')
 			->addClass('trigger_displaying_form_col'),
-		new CCheckBox('problem_unack_style', $data['problem_unack_style'] == 1, null, 1)
+		(new CCheckBox('problem_unack_style'))->setChecked($data['problem_unack_style'] == 1)
 	]
 );
 
@@ -48,7 +48,7 @@ $triggerDOFormList->addRow(
 			new CColor('problem_ack_color', $data['problem_ack_color'])))
 				->addClass('inlineblock')
 				->addClass('trigger_displaying_form_col'),
-		new CCheckBox('problem_ack_style', $data['problem_ack_style'] == 1, null, 1)
+		(new CCheckBox('problem_ack_style'))->setChecked($data['problem_ack_style'] == 1)
 	]
 );
 
@@ -59,7 +59,7 @@ $triggerDOFormList->addRow(
 		(new CDiv(new CColor('ok_unack_color', $data['ok_unack_color'])))
 			->addClass('inlineblock')
 			->addClass('trigger_displaying_form_col'),
-		new CCheckBox('ok_unack_style', $data['ok_unack_style'] == 1, null, 1)
+		(new CCheckBox('ok_unack_style'))->setChecked($data['ok_unack_style'] == 1)
 	]
 );
 
@@ -70,7 +70,7 @@ $triggerDOFormList->addRow(
 		(new CDiv(new CColor('ok_ack_color', $data['ok_ack_color'])))
 			->addClass('inlineblock')
 			->addClass('trigger_displaying_form_col'),
-		new CCheckBox('ok_ack_style', $data['ok_ack_style'] == 1, null, 1)
+		(new CCheckBox('ok_ack_style'))->setChecked($data['ok_ack_style'] == 1)
 	]
 );
 

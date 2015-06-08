@@ -244,8 +244,9 @@ $multiplier = [];
 if ($this->data['limited']) {
 	$itemForm->addVar('multiplier', $this->data['multiplier']);
 
-	$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes':'no');
-	$multiplierCheckBox->setAttribute('disabled', 'disabled');
+	$multiplierCheckBox = (new CCheckBox('multiplier'))
+		->setChecked($this->data['multiplier'] == 1)
+		->setAttribute('disabled', 'disabled');
 	$multiplier[] = $multiplierCheckBox;
 
 	$multiplier[] = SPACE;
@@ -254,9 +255,9 @@ if ($this->data['limited']) {
 	$multiplier[] = $formulaTextBox;
 }
 else {
-	$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes': 'no',
-		'var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }', 1
-	);
+	$multiplierCheckBox = (new CCheckBox('multiplier'))
+		->setChecked($this->data['multiplier'] == 1)
+		->onClick('var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }');
 	$multiplier[] = $multiplierCheckBox;
 	$multiplier[] = SPACE;
 	$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE);
@@ -451,7 +452,7 @@ $description->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
 // status
-$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
+$enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($this->data['status'] != ITEM_STATUS_ACTIVE);
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 // append tabs to form

@@ -36,7 +36,7 @@ $maintenanceForm->setName('maintenanceForm');
 $maintenanceTable = new CTableInfo();
 $maintenanceTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")
+		(new CCheckBox('all_maintenances'))->onClick("checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
@@ -62,7 +62,7 @@ foreach ($this->data['maintenances'] as $maintenance) {
 	}
 
 	$maintenanceTable->addRow([
-		new CCheckBox('maintenanceids['.$maintenanceid.']', null, null, $maintenanceid),
+		new CCheckBox('maintenanceids['.$maintenanceid.']', $maintenanceid),
 		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),

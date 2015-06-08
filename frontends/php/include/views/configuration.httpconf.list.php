@@ -48,7 +48,7 @@ $httpForm->addVar('hostid', $this->data['hostid']);
 $httpTable = new CTableInfo();
 $httpTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
+		(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	($this->data['hostid'] == 0)
 		? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
@@ -108,7 +108,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 	}
 
 	$httpTable->addRow([
-		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
+		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', $httpTest['httptestid']),
 		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
 		$httpTest['stepscnt'],

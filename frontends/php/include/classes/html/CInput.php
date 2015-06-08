@@ -46,6 +46,7 @@ class CInput extends CTag {
 		else {
 			$this->removeAttribute('readonly');
 		}
+		return $this;
 	}
 
 	/**
@@ -60,5 +61,6 @@ class CInput extends CTag {
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+		return $this;
 	}
 }

@@ -47,7 +47,8 @@ $hostGroupForm->setName('hostgroupForm');
 $hostGroupTable = new CTableInfo();
 $hostGroupTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")
+		(new CCheckBox('all_groups'))
+			->onClick("checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Hosts'),
@@ -145,7 +146,7 @@ foreach ($this->data['groups'] as $group) {
 	}
 
 	$hostGroupTable->addRow([
-		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
+		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount)],
 		[

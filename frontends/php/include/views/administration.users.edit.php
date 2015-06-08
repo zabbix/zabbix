@@ -149,7 +149,7 @@ $themes = array_merge([THEME_DEFAULT => _('System default')], Z::getThemes());
 $userFormList->addRow(_('Theme'), new CComboBox('theme', $this->data['theme'], null, $themes));
 
 // append auto-login & auto-logout to form list
-$autologoutCheckBox = new CCheckBox('autologout_visible', isset($this->data['autologout']) ? 'yes': 'no');
+$autologoutCheckBox = (new CCheckBox('autologout_visible'))->setChecked(isset($this->data['autologout']));
 if (isset($this->data['autologout'])) {
 	$autologoutTextBox = new CNumericBox('autologout', $this->data['autologout'], 4);
 }
@@ -159,7 +159,7 @@ else {
 }
 
 if ($this->data['alias'] != ZBX_GUEST_USER) {
-	$userFormList->addRow(_('Auto-login'), new CCheckBox('autologin', $this->data['autologin'], null, 1));
+	$userFormList->addRow(_('Auto-login'), (new CCheckBox('autologin'))->setChecked($this->data['autologin']));
 	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), [$autologoutCheckBox, $autologoutTextBox]);
 }
 
@@ -209,7 +209,7 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 		}
 
 		$mediaTableInfo->addRow([
-			new CCheckBox('user_medias_to_del['.$id.']', null, null, $id),
+			(new CCheckBox('user_medias_to_del['.$id.']'))->setChecked($id != 0),
 			(new CSpan($media['description']))->addClass(ZBX_STYLE_NOWRAP),
 			(new CSpan($media['sendto']))->addClass(ZBX_STYLE_NOWRAP),
 			(new CSpan($media['period']))->addClass(ZBX_STYLE_NOWRAP),
@@ -240,7 +240,9 @@ if ($this->data['is_profile']) {
 	$zbxSounds = getSounds();
 
 	$userMessagingFormList = new CFormList();
-	$userMessagingFormList->addRow(_('Frontend messaging'), new CCheckBox('messages[enabled]', $this->data['messages']['enabled'], null, 1));
+	$userMessagingFormList->addRow(_('Frontend messaging'),
+		(new CCheckBox('messages[enabled]'))->setChecked($this->data['messages']['enabled'] == 1)
+	);
 	$userMessagingFormList->addRow(_('Message timeout (seconds)'), new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5), false, 'timeout_row');
 
 	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'],
@@ -259,7 +261,7 @@ if ($this->data['is_profile']) {
 	}
 
 	$resolved = [
-		new CCheckBox('messages[triggers.recovery]', $this->data['messages']['triggers.recovery'], null, 1),
+		(new CCheckBox('messages[triggers.recovery]'))->setChecked($this->data['messages']['triggers.recovery'] == 1),
 		_('Recovery'),
 		SPACE,
 		$soundList,
@@ -294,7 +296,7 @@ if ($this->data['is_profile']) {
 		}
 
 		$triggersTable->addRow([
-			new CCheckBox('messages[triggers.severities]['.$severity.']', isset($this->data['messages']['triggers.severities'][$severity]), null, 1),
+			(new CCheckBox('messages[triggers.severities]['.$severity.']'))->setChecked(isset($this->data['messages']['triggers.severities'][$severity])),
 			getSeverityName($severity, $this->data['config']),
 			SPACE,
 			$soundList,

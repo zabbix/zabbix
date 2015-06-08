@@ -34,7 +34,7 @@ if (!empty($this->data['service'])) {
 $servicesChildTable = new CTableInfo();
 $servicesChildTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');")
+		(new CCheckBox('all_services'))->onClick("javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	_('Service'),
 	_('Status calculation'),
@@ -50,8 +50,8 @@ foreach ($this->data['db_cservices'] as $service) {
 		->setAttribute('data-serviceid', $service['serviceid'])
 		->setAttribute('data-trigger', $service['trigger']);
 
-	$cb = new CCheckBox('services['.$service['serviceid'].']', null, null, $service['serviceid']);
-	$cb->addClass('service-select');
+	$cb = (new CCheckBox('services['.$service['serviceid'].']', $service['serviceid']))
+		->addClass('service-select');
 
 	$servicesChildTable->addRow([
 		$cb,

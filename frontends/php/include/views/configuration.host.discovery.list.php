@@ -42,7 +42,7 @@ $discoveryTable = new CTableInfo();
 
 $discoveryTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
+		(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Items'),
@@ -110,7 +110,7 @@ foreach ($data['discoveries'] as $discovery) {
 	}
 
 	$discoveryTable->addRow([
-		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
+		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
 		$description,
 		[
 			new CLink(

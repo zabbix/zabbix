@@ -65,7 +65,8 @@ $hostFormList->addRow(
 	[
 		_('Replace host groups'),
 		SPACE,
-		new CVisibilityBox('visible[groups]', isset($data['visible']['groups']), 'replaceGroups', _('Original'))
+		(new CVisibilityBox('visible[groups]', 'replaceGroups', _('Original')))
+			->setChecked(isset($data['visible']['groups']))
 	],
 	$replaceGroups
 );
@@ -116,7 +117,8 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 		[
 			_('Add new or existing host groups'),
 			SPACE,
-			new CVisibilityBox('visible[new_groups]', isset($data['visible']['new_groups']), 'newGroups', _('Original'))
+			(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
+				->setChecked(isset($data['visible']['new_groups']))
 		],
 		$newGroups
 	);
@@ -137,7 +139,8 @@ else {
 		[
 			_('New host group'),
 			SPACE,
-			new CVisibilityBox('visible[new_groups]', isset($data['visible']['new_groups']), 'new_groups_', _('Original'))
+			(new CVisibilityBox('visible[new_groups]', 'new_groups_', _('Original')))
+				->setChecked(isset($data['visible']['new_groups']))
 		],
 		$newGroups
 	);
@@ -148,7 +151,8 @@ $hostFormList->addRow(
 	[
 		_('Description'),
 		SPACE,
-		new CVisibilityBox('visible[description]', isset($data['visible']['description']), 'description', _('Original'))
+		(new CVisibilityBox('visible[description]', 'description', _('Original')))
+			->setChecked(isset($data['visible']['description']))
 	],
 	new CTextArea('description', $data['description'])
 );
@@ -163,7 +167,8 @@ $hostFormList->addRow(
 	[
 		_('Monitored by proxy'),
 		SPACE,
-		new CVisibilityBox('visible[proxy_hostid]', isset($data['visible']['proxy_hostid']), 'proxy_hostid', _('Original'))
+		(new CVisibilityBox('visible[proxy_hostid]', 'proxy_hostid', _('Original')))
+			->setChecked(isset($data['visible']['proxy_hostid']))
 	],
 	$proxyComboBox
 );
@@ -173,7 +178,8 @@ $hostFormList->addRow(
 	[
 		_('Status'),
 		SPACE,
-		new CVisibilityBox('visible[status]', isset($data['visible']['status']), 'status', _('Original'))
+		(new CVisibilityBox('visible[status]', 'status', _('Original')))
+			->setChecked(isset($data['visible']['status']))
 	],
 	new CComboBox('status', $data['status'], null, [
 		HOST_STATUS_MONITORED => _('Enabled'),
@@ -204,11 +210,11 @@ $templatesDiv = (new CDiv(
 		]),
 		$clearDiv,
 		(new CDiv([
-			new CCheckBox('mass_replace_tpls', $data['mass_replace_tpls']),
+			(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1),
 			SPACE,
 			_('Replace'),
 			BR(),
-			new CCheckBox('mass_clear_tpls', $data['mass_clear_tpls']),
+			(new CCheckBox('mass_clear_tpls'))->setChecked($data['mass_clear_tpls'] == 1),
 			SPACE,
 			_('Clear when unlinking')
 		]))->addClass('floatleft')
@@ -223,7 +229,8 @@ $templatesFormList->addRow(
 	[
 		_('Link templates'),
 		SPACE,
-		new CVisibilityBox('visible[templates]', isset($data['visible']['templates']), 'templateDiv', _('Original'))
+		(new CVisibilityBox('visible[templates]', 'templateDiv', _('Original')))
+			->setChecked(isset($data['visible']['templates']))
 	],
 	$templatesDiv
 );
@@ -235,7 +242,8 @@ $ipmiFormList->addRow(
 	[
 		_('IPMI authentication algorithm'),
 		SPACE,
-		new CVisibilityBox('visible[ipmi_authtype]', isset($data['visible']['ipmi_authtype']), 'ipmi_authtype', _('Original'))
+		(new CVisibilityBox('visible[ipmi_authtype]', 'ipmi_authtype', _('Original')))
+			->setChecked(isset($data['visible']['ipmi_authtype']))
 	],
 	new CComboBox('ipmi_authtype', $data['ipmi_authtype'], null, ipmiAuthTypes())
 );
@@ -244,7 +252,8 @@ $ipmiFormList->addRow(
 	[
 		_('IPMI privilege level'),
 		SPACE,
-		new CVisibilityBox('visible[ipmi_privilege]', isset($data['visible']['ipmi_privilege']), 'ipmi_privilege', _('Original'))
+		(new CVisibilityBox('visible[ipmi_privilege]', 'ipmi_privilege', _('Original')))
+			->setChecked(isset($data['visible']['ipmi_privilege']))
 	],
 	new CComboBox('ipmi_privilege', $data['ipmi_privilege'], null, ipmiPrivileges())
 );
@@ -253,7 +262,8 @@ $ipmiFormList->addRow(
 	[
 		_('IPMI username'),
 		SPACE,
-		new CVisibilityBox('visible[ipmi_username]', isset($data['visible']['ipmi_username']), 'ipmi_username', _('Original'))
+		(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
+			->setChecked(isset($data['visible']['ipmi_username']))
 	],
 	new CTextBox('ipmi_username', $data['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE)
 );
@@ -262,7 +272,8 @@ $ipmiFormList->addRow(
 	[
 		_('IPMI password'),
 		SPACE,
-		new CVisibilityBox('visible[ipmi_password]', isset($data['visible']['ipmi_password']), 'ipmi_password', _('Original'))
+		(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
+			->setChecked(isset($data['visible']['ipmi_password']))
 	],
 	new CTextBox('ipmi_password', $data['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE)
 );
@@ -274,7 +285,8 @@ $inventoryFormList->addRow(
 	[
 		_('Inventory mode'),
 		SPACE,
-		new CVisibilityBox('visible[inventory_mode]', isset($data['visible']['inventory_mode']), 'inventory_mode', _('Original'))
+		(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode', _('Original')))
+			->setChecked(isset($data['visible']['inventory_mode']))
 	],
 	new CComboBox('inventory_mode', $data['inventory_mode'], null, [
 		HOST_INVENTORY_DISABLED => _('Disabled'),
@@ -304,12 +316,11 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 		[
 			$fieldInfo['title'],
 			SPACE,
-			new CVisibilityBox(
+			(new CVisibilityBox(
 				'visible['.$field.']',
-				isset($data['visible'][$field]),
 				'host_inventory['.$field.']',
 				_('Original')
-			)
+			))->setChecked(isset($data['visible'][$field]))
 		],
 		$fieldInput, false, null, 'formrow-inventory'
 	);

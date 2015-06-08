@@ -24,7 +24,7 @@ $form->setName('regularExpressionsForm');
 $regExpTable = new CTableInfo();
 $regExpTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")
+		(new CCheckBox('all_regexps'))->onClick("checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	_('Name'),
 	_('Expressions')
@@ -80,7 +80,7 @@ foreach($data['db_exps'] as $exp) {
 }
 foreach($data['regexps'] as $regexpid => $regexp) {
 	$regExpTable->addRow([
-		new CCheckBox('regexpids['.$regexp['regexpid'].']', null, null, $regexp['regexpid']),
+		new CCheckBox('regexpids['.$regexp['regexpid'].']', $regexp['regexpid']),
 		new CLink($regexp['name'], 'adm.regexps.php?form=update'.'&regexpid='.$regexp['regexpid']),
 		isset($expressions[$regexpid]) ? $expressions[$regexpid] : ''
 	]);

@@ -60,7 +60,9 @@ if ($isGranted) {
 		GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
 		GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
 	]));
-	$userGroupFormList->addRow(_('Enabled'), new CCheckBox('users_status', $this->data['users_status'] ? (isset($data['usrgrpid']) ? 0 : 1) : 1, null, 1)); // invert user status 0 - enable, 1 - disable
+	$userGroupFormList->addRow(_('Enabled'),
+		(new CCheckBox('users_status'))->setChecked($this->data['users_status'] ? (isset($data['usrgrpid']) ? false : true) : true)
+	);
 }
 else {
 	$userGroupForm->addVar('gui_access', $this->data['gui_access']);
@@ -76,7 +78,7 @@ else {
 			->addClass('green')
 	);
 }
-$userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->data['debug_mode'], null, 1));
+$userGroupFormList->addRow(_('Debug mode'), (new CCheckBox('debug_mode'))->setChecked($this->data['debug_mode'] == 1));
 
 /*
  * Permissions tab

@@ -33,7 +33,7 @@ $discoveryForm->setName('druleForm');
 $discoveryTable = new CTableInfo();
 $discoveryTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
+		(new CCheckBox('all_drules'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('IP range'),
@@ -52,7 +52,7 @@ foreach ($data['drules'] as $drule) {
 	);
 
 	$discoveryTable->addRow([
-		new CCheckBox('g_druleid['.$drule['druleid'].']', null, null, $drule['druleid']),
+		new CCheckBox('g_druleid['.$drule['druleid'].']', $drule['druleid']),
 		$drule['description'],
 		$drule['iprange'],
 		convertUnitsS($drule['delay']),

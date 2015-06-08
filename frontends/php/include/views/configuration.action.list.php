@@ -49,7 +49,8 @@ $actionForm->setName('actionForm');
 $actionTable = new CTableInfo();
 $actionTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');")
+		(new CCheckBox('all_items'))
+			->onClick("checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Conditions'),
@@ -96,7 +97,7 @@ if ($this->data['actions']) {
 		}
 
 		$actionTable->addRow([
-			new CCheckBox('g_actionid['.$action['actionid'].']', null, null, $action['actionid']),
+			new CCheckBox('g_actionid['.$action['actionid'].']', $action['actionid']),
 			new CLink($action['name'], 'actionconf.php?form=update&actionid='.$action['actionid']),
 			$conditions,
 			$operations,

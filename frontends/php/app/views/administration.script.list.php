@@ -39,7 +39,7 @@ $scriptsForm->setId('scripts');
 $scriptsTable = new CTableInfo();
 $scriptsTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
+		(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 	_('Type'),
@@ -77,7 +77,7 @@ foreach ($data['scripts'] as $script) {
 	$name = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
 
 	$scriptsTable->addRow([
-		new CCheckBox('scriptids['.$script['scriptid'].']', 'no', null, $script['scriptid']),
+		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$scriptType,
 		$scriptExecuteOn,
