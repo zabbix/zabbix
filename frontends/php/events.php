@@ -360,9 +360,10 @@ else {
 			_('Trigger'),
 			[
 				new CTextBox('trigger', $trigger, 96, true),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('btn1', _('Select')))
-					->onClick(
-					'return PopUp("popup.php?'.
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick('return PopUp("popup.php?'.
 						'dstfrm=zbx_filter'.
 						'&dstfld1=triggerid'.
 						'&dstfld2=trigger'.
@@ -373,7 +374,8 @@ else {
 						'&monitored_hosts=1'.
 						'&with_monitored_triggers=1'.
 						($pageFilter->hostid ? '&only_hostid='.$pageFilter->hostid : '').
-						'");')
+						'");'
+					)
 			]
 		);
 
