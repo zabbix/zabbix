@@ -35,7 +35,9 @@ $itemsWidget->addHeader([
 	_('Host prototypes of').SPACE,
 	(new CSpan($this->data['discovery_rule']['name']))->addClass(ZBX_STYLE_ORANGE)
 ]);
-$itemsWidget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $this->data['parent_discoveryid']));
+$itemsWidget->addItem(
+	get_header_host_table('hosts', $discoveryRule['hostid'], $this->data['parent_discoveryid'])
+);
 
 // create form
 $itemForm = new CForm();

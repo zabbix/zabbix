@@ -23,22 +23,18 @@ $applicationWidget = (new CWidget())->setTitle(_('Applications'));
 $createForm = (new CForm('get'))->cleanItems();
 
 $controls = (new CList())
-	->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])
-	->addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
+	->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+	->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()]);
 
 // append host summary to widget header
-if (empty($this->data['hostid'])) {
-	$createButton = new CSubmit('form', _('Create application (select host first)'));
-	$createButton->setEnabled(false);
-	$controls->addItem($createButton);
+if ($this->data['hostid'] == 0) {
+	$controls->addItem((new CSubmit('form', _('Create application (select host first)')))->setEnabled(false));
 }
 else {
 	$controls->addItem(new CSubmit('form', _('Create application')));
-
 }
 
 $applicationWidget->setControls($createForm);
-
 
 $createForm->addItem($controls);
 $applicationWidget->setControls($createForm);
@@ -57,7 +53,7 @@ $applicationTable->setHeader([
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	($this->data['hostid'] > 0) ? null : _('Host'),
 	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Show')
+	_('Items')
 ]);
 
 foreach ($this->data['applications'] as $application) {
@@ -90,7 +86,7 @@ foreach ($this->data['applications'] as $application) {
 	$applicationTable->addRow([
 		new CCheckBox('applications['.$application['applicationid'].']', $application['applicationid']),
 		($this->data['hostid'] > 0) ? null : $application['host']['name'],
-		$name,
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[
 			new CLink(
 				_('Items'),
@@ -113,9 +109,7 @@ $applicationForm->addItem([
 	new CActionButtonList('action', 'applications',
 		[
 			'application.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected applications?')],
-			'application.massdisable' => ['name' => _('Disable'),
-				'confirm' => _('Disable selected applications?')
-			],
+			'application.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected applications?')],
 			'application.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected applications?')]
 		],
 		$this->data['hostid']
