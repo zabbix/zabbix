@@ -118,112 +118,112 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		for (i = 0; i < services; i++)
 		{
 			SC_HANDLE	h_srv;
+			DWORD		current_state;
 
 			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_CONFIG)))
 				continue;
 
 			QueryServiceConfig(h_srv, qsc, 0, &sz);
 
-			if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+			if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
 			{
-				qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc(qsc, sz);
-
-				if (0 != QueryServiceConfig(h_srv, qsc, sz, &sz))
-				{
-					DWORD	current_state;
-
-					zbx_json_addobject(&j, NULL);
-
-					current_state = ssp[i].ServiceStatusProcess.dwCurrentState;
-					for (k = 0; k < ARRSIZE(service_states) && current_state != service_states[k];
-							k++)
-					{
-						;
-					}
-
-					zbx_json_adduint64(&j, "{#SERVICE.STATE}", k);
-					zbx_json_addstring(&j, "{#SERVICE.STATENAME}", get_state_string(current_state),
-							ZBX_JSON_TYPE_STRING);
-
-					utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
-					zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
-
-					utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
-					zbx_json_addstring(&j, "{#SERVICE.DISPLAYNAME}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
-
-					utf8 = zbx_unicode_to_utf8(qsc->lpBinaryPathName);
-					zbx_json_addstring(&j, "{#SERVICE.PATH}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
-
-					utf8 = zbx_unicode_to_utf8(qsc->lpServiceStartName);
-					zbx_json_addstring(&j, "{#SERVICE.USER}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
-
-					if (SERVICE_AUTO_START == qsc->dwStartType)
-					{
-						if (SUCCEED == check_delayed_start(h_srv))
-						{
-							zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 1);
-							zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "auto delayed",
-									ZBX_JSON_TYPE_STRING);
-						}
-						else
-						{
-							zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 0);
-							zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "auto",
-									ZBX_JSON_TYPE_STRING);
-						}
-					}
-					else
-					{
-						for (k = 2; k < ARRSIZE(start_types) &&
-								qsc->dwStartType != start_types[k]; k++)
-						{
-							;
-						}
-
-						zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
-						zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}",
-								get_startup_string(qsc->dwStartType),
-								ZBX_JSON_TYPE_STRING);
-					}
-
-
-					QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &sz);
-
-					if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
-					{
-						lpsd = (SERVICE_DESCRIPTION *)zbx_malloc(lpsd, sz);
-
-						if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION,
-								(LPBYTE)lpsd, sz, &sz) &&
-								NULL != lpsd->lpDescription)
-						{
-							utf8 = zbx_unicode_to_utf8(lpsd->lpDescription);
-							zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", utf8,
-									ZBX_JSON_TYPE_STRING);
-							zbx_free(utf8);
-						}
-						else
-							zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", "",
-									ZBX_JSON_TYPE_STRING);
-
-						zbx_free(lpsd);
-					}
-					else
-					{
-						zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", "",
-								ZBX_JSON_TYPE_STRING);
-					}
-
-					zbx_json_close(&j);
-				}
-
-				zbx_free(qsc);
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain configuration of service \"%s\": %s",
+						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
+				CloseServiceHandle(h_srv);
+				continue;
 			}
 
+			qsc = (QUERY_SERVICE_CONFIG *)zbx_malloc(qsc, sz);
+
+			if (0 == QueryServiceConfig(h_srv, qsc, sz, &sz))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain configuration of service \"%s\": %s",
+						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
+				zbx_free(qsc);
+				CloseServiceHandle(h_srv);
+				continue;
+			}
+
+			zbx_json_addobject(&j, NULL);
+
+			current_state = ssp[i].ServiceStatusProcess.dwCurrentState;
+			for (k = 0; k < ARRSIZE(service_states) && current_state != service_states[k]; k++)
+				;
+
+			zbx_json_adduint64(&j, "{#SERVICE.STATE}", k);
+			zbx_json_addstring(&j, "{#SERVICE.STATENAME}", get_state_string(current_state),
+					ZBX_JSON_TYPE_STRING);
+
+			utf8 = zbx_unicode_to_utf8(ssp[i].lpServiceName);
+			zbx_json_addstring(&j, "{#SERVICE.NAME}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			utf8 = zbx_unicode_to_utf8(ssp[i].lpDisplayName);
+			zbx_json_addstring(&j, "{#SERVICE.DISPLAYNAME}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			utf8 = zbx_unicode_to_utf8(qsc->lpBinaryPathName);
+			zbx_json_addstring(&j, "{#SERVICE.PATH}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			utf8 = zbx_unicode_to_utf8(qsc->lpServiceStartName);
+			zbx_json_addstring(&j, "{#SERVICE.USER}", utf8, ZBX_JSON_TYPE_STRING);
+			zbx_free(utf8);
+
+			if (SERVICE_AUTO_START == qsc->dwStartType)
+			{
+				if (SUCCEED == check_delayed_start(h_srv))
+				{
+					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 1);
+					zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "auto delayed",
+							ZBX_JSON_TYPE_STRING);
+				}
+				else
+				{
+					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 0);
+					zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "auto",
+							ZBX_JSON_TYPE_STRING);
+				}
+			}
+			else
+			{
+				for (k = 2; k < ARRSIZE(start_types) &&	qsc->dwStartType != start_types[k]; k++)
+					;
+
+				zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", k);
+				zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", get_startup_string(qsc->dwStartType),
+						ZBX_JSON_TYPE_STRING);
+			}
+
+			QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &sz);
+
+			if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
+						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
+			}
+			else
+			{
+				lpsd = (SERVICE_DESCRIPTION *)zbx_malloc(lpsd, sz);
+
+				if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, (LPBYTE)lpsd, sz, &sz)
+						&& NULL != lpsd->lpDescription)
+				{
+					utf8 = zbx_unicode_to_utf8(lpsd->lpDescription);
+					zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", utf8, ZBX_JSON_TYPE_STRING);
+					zbx_free(utf8);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
+							ssp[i].lpServiceName, strerror_from_system(GetLastError()));
+				}
+
+				zbx_free(lpsd);
+			}
+
+			zbx_free(qsc);
+			zbx_json_close(&j);
 			CloseServiceHandle(h_srv);
 		}
 
