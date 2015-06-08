@@ -3,26 +3,11 @@ $red: #e45959;//#e33734;
 $light-red: #503434;//#593737;//#ed9898;
 $lighter-red: #473232;//#503434;//#fccacf;
 
-$orange: #f24f1d;
-$alt-dark-orange: #e97659;
-
-$yellow: #fad634;
-$light-yellow: #fcf39d;
 $lighter-yellow: #4a442c;//#4b4232;//#4a442c;//#554a34;//#fcf7c2;
 
 $green: #59db8f;//#429e47;
 $light-green: #344e3f;//#375744;//#a5d6a7;
 $lighter-green: #32453a;//#344e3f;//#c5e3c6;
-
-$alt-red: #e45959;
-$alt-orange: #ffa059;
-$alt-yellow: #ffc859;
-$alt-green: #59db8f;
-$alt-dark-blue: #7499ff;
-$alt-blue-grey: #97aab3;
-
-$white: #fff;
-$transparent: transparent;
 
 
 // MAIN
@@ -34,7 +19,7 @@ $body-bg-color: #0e1012;//#101012;//#0d0e0f;//#101214;//#0c1012;//#0f1214;//#0d1
 
 // UI
 $ui-bg-color: #2b2b2b;//#2a2a2a;//#282927;//#282925;//#272822;//#363636;//#2d3135;//#303030;//#2e2f30;//#fff;
-$ui-bg-selected-color: #acbbc2;
+$ui-bg-selected-color: #4f4f4f;//#737370;//#acbbc2;
 $ui-hover-color: #333333;//#292929;//#222529;//#383c40;//#383d42;//#242424;//#e8f4fa;
 
 $action-hover-color: #454545;//#292929;//#222529;//#383c40;//#383d42;//#242424;//#ebebeb;
@@ -56,9 +41,9 @@ $form-disabled-border-color: #3d3d3d; //NEW
 
 
 // BUTTONS
-$btn-font-color: #e6e8f3;//#fff;
-$btn-bg-color: #6c818c;//#44474c;//#5c5c5c;//#0275b8;
-$btn-border-color: #6c818c;
+$btn-font-color: #f2f2f2;//#e6e8f3;//#fff;
+$btn-bg-color: #737370;//#5c5c5c;//#6c818c;//#44474c;//#5c5c5c;//#0275b8;
+$btn-border-color: #737370;//#5c5c5c;//#6c818c;
 
 $btn-alt-font-color: #768d99;//#0275b8;
 $btn-alt-bg-color: transparent;
@@ -68,9 +53,9 @@ $btn-form-font-color: #f2f2f2;//#d1dade;//#2782b8;//#0275b8;
 $btn-form-bg-color: transparent;
 $btn-form-border-color: $form-border-color;
 
-$btn-disabled-font-color: #acbbc2;
+$btn-disabled-font-color: #525252;//#acbbc2;
 $btn-disabled-bg-color: transparent;
-$btn-disabled-border-color: #ccd5d9;
+$btn-disabled-border-color: #3d3d3d;//#ccd5d9;
 
 
 // LINKS
@@ -112,6 +97,17 @@ $link-main-subnav-visited-color: #bfced7;
 
 .setup-container {
 	@include box-shadow(0 0 0 1px #303030);
+}
+
+.signin-container {
+	@include box-shadow(0 0 0 1px #303030);
+}
+
+.object-group {
+
+	.selected {
+		@include box-shadow(0 0 0 1px #303030);
+	}
 }
 
 //.filter-container {
