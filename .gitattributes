@@ -542,7 +542,6 @@ sass/img/browser-sprite.png -text svneol=unset#image/png
 sass/img/icon-sprite.png -text svneol=unset#image/png
 sass/img/preload.gif -text svneol=unset#image/gif
 sass/ms-tile-144x144.png -text svneol=unset#image/png
-sass/overlay-dialog.html -text
 sass/overlay-dialog_with_tables.html -text
 sass/popup.html -text
 sass/screens-edit.html -text
