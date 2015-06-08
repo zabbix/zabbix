@@ -265,7 +265,20 @@ int	main(int argc, char **argv)
 	unsigned short	port = ZBX_DEFAULT_AGENT_PORT;
 	int		ret = SUCCEED, opt_k = 0, opt_p = 0, opt_s = 0, opt_i = 0;
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
+#ifndef _WINDOWS
+	struct rlimit	limit;
 
+	/* disable core dumps */
+
+	limit.rlim_cur = 0;
+	limit.rlim_max = 0;
+
+	if (0 != setrlimit(RLIMIT_CORE, &limit))
+	{
+		zbx_error("cannot set resource limits, exiting...");
+		exit(EXIT_FAILURE);
+	}
+#endif
 	progname = get_program_name(argv[0]);
 
 	/* parse the command-line */
