@@ -219,8 +219,8 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 	else {
 		$removeButton = (new CButton('remove_'.$stepid, _('Remove')))
-			->onClick('javascript: removeStep(this);')
 			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('javascript: removeStep(this);')
 			->setAttribute('remove_step', $stepid);
 		$dragHandler = (new CCol(
 			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)

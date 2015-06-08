@@ -49,7 +49,7 @@ $hostTable = new CTableInfo();
 
 $hostTable->setHeader([
 	(new CColHeader(
-		(new CCheckBox('all_hosts'))-onClick("checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")
+		(new CCheckBox('all_hosts'))->onClick("checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Templates'),

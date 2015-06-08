@@ -67,15 +67,16 @@ if ($this->data['expression_field_readonly']) {
 }
 
 $addExpressionButton = (new CButton('insert', ($this->data['input_method'] == IM_TREE) ? _('Edit') : _('Add')))
+	->addClass(ZBX_STYLE_BTN_GREY)
 	->onClick(
 		'return PopUp("popup_trexpr.php?dstfrm='.$triggersForm->getName().
 			'&dstfld1='.$this->data['expression_field_name'].'&srctbl=expression&srcfld1=expression'.
-			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));')
-	->addClass(ZBX_STYLE_BTN_GREY);
+			'&expression=" + encodeURIComponent(jQuery(\'[name="'.$this->data['expression_field_name'].'"]\').val()));'
+	);
 if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
-$expressionRow = [$expressionTextBox, $addExpressionButton];
+$expressionRow = [$expressionTextBox, (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), $addExpressionButton];
 
 if ($this->data['input_method'] == IM_TREE) {
 	// insert macro button
@@ -85,6 +86,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	if ($this->data['limited']) {
 		$insertMacroButton->setAttribute('disabled', 'disabled');
 	}
+	$expressionRow[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$expressionRow[] = $insertMacroButton;
 
 	array_push($expressionRow, BR());
@@ -94,7 +96,7 @@ if ($this->data['input_method'] == IM_TREE) {
 		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
-		array_push($expressionRow, $addExpressionButton);
+		$expressionRow[] = $addExpressionButton;
 	}
 	else {
 		// add button
@@ -102,21 +104,23 @@ if ($this->data['input_method'] == IM_TREE) {
 		if ($this->data['limited']) {
 			$addExpressionButton->setAttribute('disabled', 'disabled');
 		}
-		array_push($expressionRow, $addExpressionButton);
+		$expressionRow[] = $addExpressionButton;
 
 		// or button
 		$orExpressionButton = (new CSubmit('or_expression', _('Or')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($this->data['limited']) {
 			$orExpressionButton->setAttribute('disabled', 'disabled');
 		}
-		array_push($expressionRow, $orExpressionButton);
+		$expressionRow[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$expressionRow[] = $orExpressionButton;
 
 		// replace button
 		$replaceExpressionButton = (new CSubmit('replace_expression', _('Replace')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($this->data['limited']) {
 			$replaceExpressionButton->setAttribute('disabled', 'disabled');
 		}
-		array_push($expressionRow, $replaceExpressionButton);
+		$expressionRow[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+		$expressionRow[] = $replaceExpressionButton;
 	}
 }
 elseif ($this->data['input_method'] != IM_FORCED) {
@@ -147,8 +151,8 @@ if ($this->data['input_method'] == IM_TREE) {
 	if (!empty($this->data['eHTMLTree'])) {
 		foreach ($this->data['eHTMLTree'] as $i => $e) {
 			if (!$this->data['limited']) {
-				$deleteUrl = (new CSpan(_('Delete')))
-					->addClass('link')
+				$deleteUrl = (new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
 					->onClick('javascript:'.
 						' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
 							' delete_expression("'.$e['id'] .'");'.
