@@ -1412,8 +1412,8 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	DB_ROW			row;
 	unsigned char		operationtype;
 	zbx_uint64_t		groupid, templateid;
-	zbx_vector_uint64_t	lnk_templateids, del_templateids,
-				new_groupids, del_groupids;
+	zbx_vector_uint64_t	lnk_templateids, del_templateids, new_groupids, del_groupids;
+	int			add_host = 0, delete_host = 0, enable_host = 0, disable_host = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
 
@@ -1439,16 +1439,16 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 		switch (operationtype)
 		{
 			case OPERATION_TYPE_HOST_ADD:
-				op_host_add(event);
+				add_host = 1;
 				break;
 			case OPERATION_TYPE_HOST_REMOVE:
-				op_host_del(event);
+				delete_host = 1;
 				break;
 			case OPERATION_TYPE_HOST_ENABLE:
-				op_host_enable(event);
+				enable_host = 1;
 				break;
 			case OPERATION_TYPE_HOST_DISABLE:
-				op_host_disable(event);
+				disable_host = 1;
 				break;
 			case OPERATION_TYPE_GROUP_ADD:
 				if (0 != groupid)
@@ -1471,6 +1471,15 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 		}
 	}
 	DBfree_result(result);
+
+	if (0 != delete_host)
+		op_host_del(event);
+	else if (0 != disable_host)
+		op_host_disable(event);
+	else if (0 != enable_host)
+		op_host_enable(event);
+	else if (0 != add_host)
+		op_host_add(event);
 
 	if (0 != lnk_templateids.values_num)
 	{
