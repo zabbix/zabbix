@@ -479,6 +479,8 @@ static void	zbx_tls_validate_config(void)
 	{
 		zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "--tls-ca-file");
 		zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "--tls-crl-file");
+		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_ISSUER, "--tls-cert-issuer");
+		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_SUBJECT, "--tls-cert-subject");
 		zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "--tls-cert-file");
 		zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "--tls-key-file");
 	}
@@ -575,7 +577,12 @@ static void	zbx_tls_validate_config(void)
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_ISSUER)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-cert-issuer\" is defined but "
+					"\"--tls-cert-file\" and \"--tls-key-file\" are not defined");
+		}
+		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSServerCertIssuer\" is defined but "
 					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
@@ -587,7 +594,12 @@ static void	zbx_tls_validate_config(void)
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_SUBJECT)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-cert-subject\" is defined but "
+					"\"--tls-cert-file\" and \"--tls-key-file\" are not defined");
+		}
+		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSServerCertSubject\" is defined but "
 					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
