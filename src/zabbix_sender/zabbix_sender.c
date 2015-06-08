@@ -912,7 +912,9 @@ int	main(int argc, char **argv)
 	const char		*p;
 	zbx_thread_args_t	thread_args;
 	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
-
+#ifndef _WINDOWS
+	struct rlimit		limit;
+#endif
 	progname = get_program_name(argv[0]);
 
 	parse_commandline(argc, argv);
@@ -921,11 +923,24 @@ int	main(int argc, char **argv)
 
 	zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL);
 
+#ifndef _WINDOWS
+	/* disable core dumps */
+
+	limit.rlim_cur = 0;
+	limit.rlim_max = 0;
+
+	if (0 != setrlimit(RLIMIT_CORE, &limit))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot set resource limits, exiting...");
+		goto exit;
+	}
+#endif
 	if (NULL == ZABBIX_SERVER)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "'ServerActive' parameter required");
 		goto exit;
 	}
+
 	if (0 == ZABBIX_SERVER_PORT)
 		ZABBIX_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
 

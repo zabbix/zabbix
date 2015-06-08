@@ -728,6 +728,7 @@ int	MAIN_ZABBIX_ENTRY()
 {
 	zbx_socket_t	listen_sock;
 	int		i, db_type;
+	struct rlimit	limit;
 
 	if (NULL == CONFIG_LOG_FILE || '\0' == *CONFIG_LOG_FILE)
 		zabbix_open_log(LOG_TYPE_SYSLOG, CONFIG_LOG_LEVEL, NULL);
@@ -797,6 +798,17 @@ int	MAIN_ZABBIX_ENTRY()
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
+
+	/* disable core dumps */
+
+	limit.rlim_cur = 0;
+	limit.rlim_max = 0;
+
+	if (0 != setrlimit(RLIMIT_CORE, &limit))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot set resource limits, exiting...");
+		exit(EXIT_FAILURE);
+	}
 
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
