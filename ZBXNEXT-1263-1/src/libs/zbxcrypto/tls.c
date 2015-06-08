@@ -575,7 +575,7 @@ static void	zbx_tls_validate_config(void)
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_ISSUER)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)))
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSServerCertIssuer\" is defined but "
 					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
@@ -587,7 +587,7 @@ static void	zbx_tls_validate_config(void)
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_SUBJECT)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)))
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSServerCertSubject\" is defined but "
 					"\"TLSCertFile\" and \"TLSKeyFile\" are not defined");
@@ -686,7 +686,7 @@ static void	zbx_tls_validate_config(void)
 
 	/* agentd, agent and passive proxy specific validation */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_PASSIVE | ZBX_PROGRAM_TYPE_AGENT)))
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_PASSIVE)))
 	{
 		/* 'TLSAccept' is the master parameter to be matched by certificate and PSK parameters */
 
@@ -2614,8 +2614,7 @@ void	zbx_tls_init_child(void)
 			}
 		}
 
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_PASSIVE | ZBX_PROGRAM_TYPE_AGENTD |
-				ZBX_PROGRAM_TYPE_AGENT)))
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_PASSIVE | ZBX_PROGRAM_TYPE_AGENTD)))
 		{
 			if (0 != (res = gnutls_psk_allocate_server_credentials(&my_psk_server_creds)))
 			{
@@ -2710,8 +2709,6 @@ void	zbx_tls_init_child(void)
 
 	if (0 != (program_type & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
 		method = TLSv1_2_client_method();
-	else if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENT))
-		method = TLSv1_2_server_method();
 	else	/* ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD */
 		method = TLSv1_2_method();
 
@@ -2887,8 +2884,8 @@ void	zbx_tls_init_child(void)
 
 	/* set up PSK global variables for client callback if PSK comes only from configuration file or command line */
 
-	if (NULL != ctx_psk && 0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT |
-			ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
+	if (NULL != ctx_psk && 0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_SENDER |
+			ZBX_PROGRAM_TYPE_GET)))
 	{
 		psk_identity_for_cb = my_psk_identity;
 		psk_identity_len_for_cb = my_psk_identity_len;
@@ -2911,22 +2908,16 @@ void	zbx_tls_init_child(void)
 			SSL_CTX_set_psk_client_callback(ctx_psk, zbx_psk_client_cb);
 		}
 
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD |
-				ZBX_PROGRAM_TYPE_AGENT)))
-		{
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 			SSL_CTX_set_psk_server_callback(ctx_psk, zbx_psk_server_cb);
-		}
 	}
 
 	if (NULL != ctx_all)
 	{
 		SSL_CTX_set_info_callback(ctx_all, zbx_openssl_info_cb);
 
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD |
-				ZBX_PROGRAM_TYPE_AGENT)))
-		{
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 			SSL_CTX_set_psk_server_callback(ctx_all, zbx_psk_server_cb);
-		}
 	}
 
 
@@ -3891,8 +3882,8 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
 	{
-		/* for agentd and agent the only possibility is a PSK from configuration file */
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)) &&
+		/* for agentd the only possibility is a PSK from configuration file */
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) &&
 				0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
 				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
 		{
@@ -4054,8 +4045,8 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
 	{
-		/* for agentd and agent the only possibility is a PSK from configuration file */
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)) &&
+		/* for agentd the only possibility is a PSK from configuration file */
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD) &&
 				GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx, GNUTLS_CRD_PSK,
 				my_psk_server_creds)))
 		{
@@ -4318,7 +4309,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 				goto out;
 			}
 		}
-		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_AGENT)))
+		else if (0 != (program_type & ZBX_PROGRAM_TYPE_AGENTD))
 		{
 			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "not ready for both certificate and "
 					"PSK-based incoming connection:");
