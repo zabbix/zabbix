@@ -1,73 +1,72 @@
-// NOTIFICATION & ALERT COLORS
-$red: #e45959;//#e33734;
-$light-red: #503434;//#593737;//#ed9898;
-$lighter-red: #473232;//#503434;//#fccacf;
+// NOTIFICATION & ALERT
+$red: #e45959;
+$light-red: #503434;
+$lighter-red: #473232;
 
-$lighter-yellow: #4a442c;//#4b4232;//#4a442c;//#554a34;//#fcf7c2;
+$lighter-yellow: #4a442c;
 
-$green: #59db8f;//#429e47;
-$light-green: #344e3f;//#375744;//#a5d6a7;
-$lighter-green: #32453a;//#344e3f;//#c5e3c6;
+$green: #59db8f;
+$light-green: #344e3f;
+$lighter-green: #32453a;
 
 
 // MAIN
-$main-color: #2d3135;//#768d99;//#2d3135;//#5c5c5c;//#0275b8;
-$font-color: #f2f2f2;//#e1e3ed;//#e6e8f3;//#d1dade;//#1f2c33;
-$font-alt-color: #737370;//#72757b;//#768d99;//#7d7d7d;
-$body-bg-color: #0e1012;//#101012;//#0d0e0f;//#101214;//#0c1012;//#0f1214;//#0d1114; //#000;//#0d1114;//#ebeef0;
+$main-color: #2d3135;
+$font-color: #f2f2f2;
+$font-alt-color: #768d99;
+$body-bg-color: #0e1012;
 
 
 // UI
-$ui-bg-color: #2b2b2b;//#2a2a2a;//#282927;//#282925;//#272822;//#363636;//#2d3135;//#303030;//#2e2f30;//#fff;
-$ui-bg-selected-color: #4f4f4f;//#737370;//#acbbc2;
-$ui-hover-color: #333333;//#292929;//#222529;//#383c40;//#383d42;//#242424;//#e8f4fa;
+$ui-bg-color: #2b2b2b;
+$ui-bg-selected-color: #4f4f4f;
+$ui-hover-color: #333;
 
-$action-hover-color: #454545;//#292929;//#222529;//#383c40;//#383d42;//#242424;//#ebebeb;
-$action-border-color: #383838;//#454545;//#424242;//#383c40;//#383d42;//#3d3d3d;//#ccd5d9;
+$action-hover-color: #454545;
+$action-border-color: #383838;
 
-$table-border-color: #383838;//#424242;//#383c40;//#383d42;//#3d3d3d;//#ebeef0;
+$table-border-color: #383838;
 
 
 // FORMS
-$form-font-color: #e1e3ed;//#e6e8f3;//#d1dade;//#1f2c33;
-$form-bg-color: #2b2b2b;//#363636;//#383d42;//#242424;//#303030;#242424;//#fff;
-$form-border-color: #4f4f4f;//#44474c;//#3d3d3d;//#636363;//#4a4a4a;//#3d3d3d;//#acbbc2;
-$form-border-focus-color: #5c5c5c;//#5b5e64;//#4f5358;//#4a4a4a;//#7d7d7d;//#0275b8; //NEW
+$form-font-color: #e1e3ed;
+$form-bg-color: #2b2b2b;
+$form-border-color: #4f4f4f;
+$form-border-focus-color: #768d99;
 
-$form-disabled-font-color: #525252;//#d1dade;//#1f2c33;
-$form-disabled-bg-color: transparent; //#ebebeb; //NEW
-$form-disabled-border-color: #3d3d3d; //NEW
-
+$form-disabled-font-color: #525252;
+$form-disabled-bg-color: transparent;
+$form-disabled-border-color: #3d3d3d;
 
 
 // BUTTONS
-$btn-font-color: #f2f2f2;//#e6e8f3;//#fff;
-$btn-bg-color: #737370;//#5c5c5c;//#6c818c;//#44474c;//#5c5c5c;//#0275b8;
-$btn-border-color: #737370;//#5c5c5c;//#6c818c;
+$btn-font-color: #f2f2f2;
+$btn-bg-color: #768d99;
+$btn-border-color: #768d99;
 
-$btn-alt-font-color: #768d99;//#0275b8;
+$btn-alt-font-color: #768d99;
 $btn-alt-bg-color: transparent;
 $btn-alt-border-color: $btn-border-color;
 
-$btn-form-font-color: #f2f2f2;//#d1dade;//#2782b8;//#0275b8;
+$btn-form-font-color: #f2f2f2;
 $btn-form-bg-color: transparent;
 $btn-form-border-color: $form-border-color;
 
-$btn-disabled-font-color: #525252;//#acbbc2;
+$btn-disabled-font-color: #525252;
 $btn-disabled-bg-color: transparent;
-$btn-disabled-border-color: #3d3d3d;//#ccd5d9;
+$btn-disabled-border-color: #3d3d3d;
 
 
 // LINKS
-$link-color: #4796c4;//#3d93c4;//#2782b8; //#0275b8;
-$link-hover-color: #4796c4; //#0275b8;
-$link-active-color: #4796c4; //#0275b8;
-$link-visited-color: #4796c4;//#2782b8; //#0275b8;
+$link-color: #4796c4;
+$link-hover-color: #4796c4;
+$link-active-color: #4796c4;
+$link-visited-color: #4796c4;
 
-$link-main-nav-color: #b9bbc4;//#bfdced;
-$link-main-nav-hover-color: #e6e8f3;//#fff;
-$link-main-nav-active-color: #e6e8f3;//#fff;
-$link-main-nav-visited-color: #e6e8f3;//#bfdced;
+$link-main-nav-color: #b9bbc4;
+$link-main-nav-hover-color: #e6e8f3;
+$link-main-nav-active-color: #e6e8f3;
+$link-main-nav-visited-color: #e6e8f3;
 
 $link-main-subnav-color: #bfced7;
 $link-main-subnav-hover-color: #fff;
@@ -76,7 +75,7 @@ $link-main-subnav-visited-color: #bfced7;
 
 
 
-// Important! @import string should always be last
+// Important! @import string should come after variables
 @import 'screen.scss';
 
 .dashbrd-widget {
@@ -110,17 +109,9 @@ $link-main-subnav-visited-color: #bfced7;
 	}
 }
 
-//.filter-container {
-//	@include box-shadow(none);	
-//}
-
 %no-shadow {
 	@include box-shadow(none);
 }
-
-//.available {
-//	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
-//}
 
 .search-suggest {
 	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.5));
@@ -132,11 +123,4 @@ $link-main-subnav-visited-color: #bfced7;
 
 .overlay-dialogue {
 	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.5));
-}
-
-%form-input-style {
-
-	&:focus {
-		border-color: lighten($form-border-color, 15%);
-	}
 }
