@@ -385,9 +385,9 @@ ul.top-nav-icons {
 	}
 
 	&.selected {
-		@include border-radius(2px);
 		background-color: darken($main-color, 7%);
 		color: $link-main-subnav-active-color;
+		@include border-radius(2px);
 	}
 }
 
@@ -465,6 +465,10 @@ article {
 
 	.selected {
 		font-weight: bold;
+		background-color: $ui-bg-color;
+		padding: 4px 9px;
+		@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+		@include border-radius(2px);
 	}
 
 	.arrow-right {
