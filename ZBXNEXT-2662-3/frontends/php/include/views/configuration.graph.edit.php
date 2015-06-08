@@ -116,6 +116,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	]);
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
+		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = new CTextBox('yaxismin', $this->data['yaxismin'], 7);
 	}
 	elseif ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
@@ -131,8 +132,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$ymin_name = $min_host['name'].NAME_DELIMITER.$minItem['name_expanded'];
 		}
 
+		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = new CTextBox('ymin_name', $ymin_name, 36, true);
+		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CButton('yaxis_min', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&dstfld1=ymin_itemid'.
@@ -141,12 +145,13 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&srcfld1=itemid'.
 					'&srcfld2=name'.
 					'&numeric=1'.
-					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");')
-			->addClass('button-form');
+					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");');
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
+			$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMinData[] = (new CButton('yaxis_min_prototype', _('Select prototype')))
+				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('javascript: '.
 					'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 						'&parent_discoveryid='.$this->data['parent_discoveryid'].
@@ -155,8 +160,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'&srctbl=item_prototypes'.
 						'&srcfld1=itemid'.
 						'&srcfld2=name'.
-						'&numeric=1", 0, 0, "zbx_popup_item");')
-				->addClass('button-form');
+						'&numeric=1", 0, 0, "zbx_popup_item");');
 		}
 	}
 	else {
@@ -173,6 +177,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 	]);
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
+		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = new CTextBox('yaxismax', $this->data['yaxismax'], 7);
 	}
 	elseif ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
@@ -188,8 +193,11 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 			$ymax_name = $max_host['name'].NAME_DELIMITER.$maxItem['name_expanded'];
 		}
 
+		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = new CTextBox('ymax_name', $ymax_name, 36, true);
+		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CButton('yaxis_max', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
 			->onClick('javascript: '.
 				'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 					'&dstfld1=ymax_itemid'.
@@ -198,12 +206,13 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 					'&srcfld1=itemid'.
 					'&srcfld2=name'.
 					'&numeric=1'.
-					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");')
-			->addClass('button-form');
+					'&writeonly=1" + getOnlyHostParam(), 0, 0, "zbx_popup_item");');
 
 		// select prototype button
 		if (!empty($this->data['parent_discoveryid'])) {
+			$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 			$yaxisMaxData[] = (new CButton('yaxis_max_prototype', _('Select prototype')))
+				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('javascript: '.
 					'return PopUp("popup.php?dstfrm='.$graphForm->getName().
 						'&parent_discoveryid='.$this->data['parent_discoveryid'].
@@ -212,8 +221,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 						'&srctbl=item_prototypes'.
 						'&srcfld1=itemid'.
 						'&srcfld2=name'.
-						'&numeric=1", 0, 0, "zbx_popup_item");')
-				->addClass('button-form');
+						'&numeric=1", 0, 0, "zbx_popup_item");');
 		}
 	}
 	else {

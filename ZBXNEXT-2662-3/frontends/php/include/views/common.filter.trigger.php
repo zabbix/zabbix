@@ -83,7 +83,13 @@ $statusChangeCheckBox = (new CCheckBox('status_change'))
 	->addStyle('vertical-align: middle;');
 
 $daysSpan = (new CSpan(_('days')))->addStyle('vertical-align: middle;');
-$column->addRow(_('Age less than'), [$statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan]);
+$column->addRow(_('Age less than'), [
+	$statusChangeCheckBox,
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	$statusChangeDays,
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	$daysSpan
+]);
 
 // name
 $column->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
@@ -94,9 +100,10 @@ $application_name_url =
 // application
 $column->addRow(_('Filter by application'), [
 	new CTextBox('application', $filter['application'], 40),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('application_name', _('Select')))
-		->onClick('return PopUp("'.$application_name_url.'");')
 		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("'.$application_name_url.'");')
 ]);
 
 // inventory filter

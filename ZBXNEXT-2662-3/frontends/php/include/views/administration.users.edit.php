@@ -63,11 +63,13 @@ if (!$this->data['is_profile']) {
 	$userFormList->addRow(_('Groups'),
 		[
 			$lstGroups,
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('add_group', _('Add')))
-				->onClick('return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups");', 'button-form top'),
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick('return PopUp("popup_usrgrp.php?dstfrm='.$userForm->getName().'&list_name=user_groups_to_del[]&var_name=user_groups");'),
 			BR(),
 			(count($this->data['user_groups']) > 0)
-				? (new CSubmit('del_user_group', _('Delete selected')))->addClass('button-form')
+				? (new CSubmit('del_user_group', _('Delete selected')))->addClass(ZBX_STYLE_BTN_GREY)
 				: null
 		]
 	);
@@ -90,7 +92,7 @@ if ($data['auth_type'] == ZBX_AUTH_INTERNAL) {
 		}
 	}
 	else {
-		$passwdButton = (new CSubmit('change_password', _('Change password')))->addClass('button-form');
+		$passwdButton = (new CSubmit('change_password', _('Change password')))->addClass(ZBX_STYLE_BTN_GREY);
 		if ($this->data['alias'] == ZBX_GUEST_USER) {
 			$passwdButton->setAttribute('disabled', 'disabled');
 		}
@@ -260,23 +262,24 @@ if ($this->data['is_profile']) {
 		$soundList->addItem($file, $filename);
 	}
 
-	$resolved = [
-		(new CCheckBox('messages[triggers.recovery]'))->setChecked($this->data['messages']['triggers.recovery'] == 1),
-		_('Recovery'),
-		SPACE,
-		$soundList,
-		(new CButton('start', _('Play')))
-			->onClick("javascript: testUserSound('messages_sounds.recovery');")
-			->addClass('button-form'),
-		(new CButton('stop', _('Stop')))
-			->onClick('javascript: AudioControl.stop();')
-			->addClass('button-form')
-	];
-
 	$triggersTable = (new CTable())
-		->setNoDataTable('')
-		->addClass('invisible')
-		->addRow($resolved);
+		->addRow([
+			(new CCheckBox('messages[triggers.recovery]'))
+				->setChecked($this->data['messages']['triggers.recovery'] == 1),
+			_('Recovery'),
+			'',
+			[
+				$soundList,
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('start', _('Play')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick("javascript: testUserSound('messages_sounds.recovery');"),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('stop', _('Stop')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick('javascript: AudioControl.stop();')
+			]
+		]);
 
 	$msgVisibility = ['1' => [
 		'messages[timeout]',
@@ -298,14 +301,18 @@ if ($this->data['is_profile']) {
 		$triggersTable->addRow([
 			(new CCheckBox('messages[triggers.severities]['.$severity.']'))->setChecked(isset($this->data['messages']['triggers.severities'][$severity])),
 			getSeverityName($severity, $this->data['config']),
-			SPACE,
-			$soundList,
-			(new CButton('start', _('Play')))
-				->onClick( "javascript: testUserSound('messages_sounds.".$severity."');")
-				->addClass('button-form'),
-			(new CButton('stop', _('Stop')))
-				->onClick('javascript: AudioControl.stop();')
-				->addClass('button-form')
+			'',
+			[
+				$soundList,
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('start', _('Play')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick( "javascript: testUserSound('messages_sounds.".$severity."');"),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('stop', _('Stop')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick('javascript: AudioControl.stop();')
+			]
 		]);
 
 		zbx_subarray_push($msgVisibility, 1, 'messages[triggers.severities]['.$severity.']');

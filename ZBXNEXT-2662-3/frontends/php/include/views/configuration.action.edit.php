@@ -271,10 +271,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
 			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.php?srctbl=drules&srcfld1=druleid&srcfld2=name'.
 						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=drule");')
-				->addClass('button-form')
 		];
 		break;
 
@@ -282,10 +283,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
 			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.php?srctbl=dchecks&srcfld1=dcheckid&srcfld2=name'.
 						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=dcheck&writeonly=1");')
-				->addClass('button-form')
 		];
 		break;
 
@@ -293,11 +295,12 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
 			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick('return PopUp("popup.php?srctbl=proxies&srcfld1=hostid&srcfld2=host'.
 						'&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value&dstfld2=proxy'.
 						'");')
-				->addClass('button-form')
 		];
 		break;
 

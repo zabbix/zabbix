@@ -563,14 +563,15 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Application'),
 		[
 			new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
-			(new CButton('btn_app', _('Select')))
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton(null, _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
 				->onClick(
 					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
 						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
 						'&with_applications=1'.
 						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
 						.', 0, 0, "application");')
-				->addClass('button-form')
 		]
 	);
 	$filterColumn2->addRow([$snmpCommunityLabel, $snmpSecurityLabel], [$snmpCommunityField, $snmpSecurityField]);

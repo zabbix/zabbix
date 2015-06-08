@@ -47,11 +47,12 @@ $servicesFormList->addRow(_('Name'), $nameTextBox);
 // append parent link to form list
 $servicesFormList->addRow(_('Parent service'), [
 	new CTextBox('parent_name', $this->data['parentname'], ZBX_TEXTBOX_STANDARD_SIZE, true, 128),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select_parent', _('Change')))
+		->addClass(ZBX_STYLE_BTN_GREY)
 		->onClick(
 			"javascript: openWinCentered('services.php?pservices=1".url_param('serviceid')."', ".
 				"'ZBX_Services_List', 740, 420, 'scrollbars=1, toolbar=0, menubar=0, resizable=1, dialog=0');")
-		->addClass('button-form')
 ]);
 
 // append algorithm to form list
@@ -70,9 +71,10 @@ $servicesFormList->addRow(_('Calculate SLA, acceptable SLA (in %)'), [$showslaCh
 // append trigger to form list
 $servicesFormList->addRow(_('Trigger'), [
 	new CTextBox('trigger', $this->data['trigger'], ZBX_TEXTBOX_STANDARD_SIZE, true),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('btn1', _('Select')))
-		->onClick(
-		'return PopUp("popup.php?'.
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.php?'.
 			'dstfrm='.$servicesForm->getName().
 			'&dstfld1=triggerid'.
 			'&dstfld2=trigger'.
@@ -80,8 +82,8 @@ $servicesFormList->addRow(_('Trigger'), [
 			'&srcfld1=triggerid'.
 			'&srcfld2=description'.
 			'&real_hosts=1'.
-			'&with_triggers=1");')
-		->addClass('button-form')
+			'&with_triggers=1");'
+		)
 ]);
 $servicesFormList->addRow(_('Sort order (0->999)'), new CTextBox('sortorder', $this->data['sortorder'], 3, false, 3));
 
