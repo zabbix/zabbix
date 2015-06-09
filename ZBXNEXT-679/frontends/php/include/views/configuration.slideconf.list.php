@@ -34,32 +34,32 @@ $slideForm->setName('slideForm');
 
 // create table
 $slidesTable = new CTableInfo();
-$slidesTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
-		'cell-width'),
+$slidesTable->setHeader([
+	(new CColHeader(
+		new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")))->
+		addClass('cell-width'),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 foreach ($this->data['slides'] as $slide) {
-	$slidesTable->addRow(array(
+	$slidesTable->addRow([
 		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
 		new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid'], 'action'),
 		convertUnitsS($slide['delay']),
 		$slide['cnt']
-	));
+	]);
 }
 
 // append table to form
-$slideForm->addItem(array(
+$slideForm->addItem([
 	$slidesTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'shows', array(
-		'slideshow.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'))
-	))
-));
+	new CActionButtonList('action', 'shows', [
+		'slideshow.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected slide shows?')]
+	])
+]);
 
 // append form to widget
 $slideWidget->addItem($slideForm);

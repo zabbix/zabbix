@@ -30,11 +30,11 @@ class CBarGraphDraw extends CGraphDraw {
 		$this->shiftCaption = 0;
 		$this->maxCaption = 0;
 		$this->drawLegend = 0;
-		$this->series = array();
+		$this->series = [];
 		$this->stacked = false;
-		$this->periodCaption = array();
-		$this->seriesLegend = array();
-		$this->seriesColor = array();
+		$this->periodCaption = [];
+		$this->seriesLegend = [];
+		$this->seriesColor = [];
 		$this->seriesCount = 0;
 		$this->columnWidth = 10; // bar/column width per serie
 		$this->seriesWidth = 10; // overal per serie bar/column width
@@ -44,16 +44,16 @@ class CBarGraphDraw extends CGraphDraw {
 		$this->axisSideRight = false; // do values for axis right/bottom persist
 		$this->xLabel = null;
 		$this->yLabel = null;
-		$this->yaxismin = array(GRAPH_YAXIS_SIDE_LEFT => 0, GRAPH_YAXIS_SIDE_RIGHT => 0);
-		$this->yaxismax = array(GRAPH_YAXIS_SIDE_LEFT => 100, GRAPH_YAXIS_SIDE_RIGHT => 100);
-		$this->minValue = array(GRAPH_YAXIS_SIDE_LEFT => 0, GRAPH_YAXIS_SIDE_RIGHT => 0);
-		$this->maxValue = array(GRAPH_YAXIS_SIDE_LEFT => null, GRAPH_YAXIS_SIDE_RIGHT => null);
+		$this->yaxismin = [GRAPH_YAXIS_SIDE_LEFT => 0, GRAPH_YAXIS_SIDE_RIGHT => 0];
+		$this->yaxismax = [GRAPH_YAXIS_SIDE_LEFT => 100, GRAPH_YAXIS_SIDE_RIGHT => 100];
+		$this->minValue = [GRAPH_YAXIS_SIDE_LEFT => 0, GRAPH_YAXIS_SIDE_RIGHT => 0];
+		$this->maxValue = [GRAPH_YAXIS_SIDE_LEFT => null, GRAPH_YAXIS_SIDE_RIGHT => null];
 		$this->gridLinesCount = null; // how many grids to draw
 		$this->gridPixels = 30; // optimal grid size
-		$this->gridStep = array(GRAPH_YAXIS_SIDE_LEFT => null, GRAPH_YAXIS_SIDE_RIGHT => null); // set value
-		$this->side_values = array(GRAPH_YAXIS_SIDE_LEFT => ITEM_VALUE_TYPE_UINT64, GRAPH_YAXIS_SIDE_RIGHT => ITEM_VALUE_TYPE_UINT64); // 0 - float, 3 - uint
+		$this->gridStep = [GRAPH_YAXIS_SIDE_LEFT => null, GRAPH_YAXIS_SIDE_RIGHT => null]; // set value
+		$this->side_values = [GRAPH_YAXIS_SIDE_LEFT => ITEM_VALUE_TYPE_UINT64, GRAPH_YAXIS_SIDE_RIGHT => ITEM_VALUE_TYPE_UINT64]; // 0 - float, 3 - uint
 		$this->column = null;
-		$this->units = array(GRAPH_YAXIS_SIDE_LEFT => '', GRAPH_YAXIS_SIDE_RIGHT => ''); // units for values
+		$this->units = [GRAPH_YAXIS_SIDE_LEFT => '', GRAPH_YAXIS_SIDE_RIGHT => '']; // units for values
 		$this->minChartHeight = false;
 	}
 
@@ -107,9 +107,9 @@ class CBarGraphDraw extends CGraphDraw {
 			$this->periodCaption[$key] = $key;
 
 			if (!isset($this->series[$key])) {
-				$this->series[$key] = array();
+				$this->series[$key] = [];
 			}
-			$this->series[$key][$this->seriesCount] = array('axis' => $axis, 'value' => $value);
+			$this->series[$key][$this->seriesCount] = ['axis' => $axis, 'value' => $value];
 		}
 
 		$this->seriesCount++;
@@ -285,7 +285,7 @@ class CBarGraphDraw extends CGraphDraw {
 	}
 
 	protected function correctMiniMax() {
-		$sides = array();
+		$sides = [];
 		if ($this->axisSideLeft) {
 			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
 		}
@@ -400,7 +400,7 @@ class CBarGraphDraw extends CGraphDraw {
 			$gbColor
 		);
 
-		$sides = array();
+		$sides = [];
 		if ($this->axisSideLeft) {
 			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
 		}
@@ -426,21 +426,21 @@ class CBarGraphDraw extends CGraphDraw {
 				);
 
 			imagefilledpolygon($this->im,
-					array(
+					[
 						$this->shiftXleft + $this->shiftXCaptionLeft + $triangle - 4, $this->shiftY - 5,
 						$this->shiftXleft + $this->shiftXCaptionLeft + $triangle + 2, $this->shiftY - 5,
 						$this->shiftXleft + $this->shiftXCaptionLeft + $triangle - 1, $this->shiftY - 10,
-					),
+					],
 					3,
 					$this->getColor('White')
 				);
 
 			imagepolygon($this->im,
-				array(
+				[
 					$this->shiftXleft + $this->shiftXCaptionLeft + $triangle - 4, $this->shiftY - 5,
 					$this->shiftXleft + $this->shiftXCaptionLeft + $triangle + 2, $this->shiftY - 5,
 					$this->shiftXleft + $this->shiftXCaptionLeft + $triangle - 1, $this->shiftY - 10,
-				),
+				],
 				3,
 				$this->getColor($this->graphtheme['gridbordercolor'], 0)
 			);
@@ -455,11 +455,11 @@ class CBarGraphDraw extends CGraphDraw {
 		);
 
 		imagefilledpolygon($this->im,
-			array(
+			[
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY - 2,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 5, $this->sizeY + $this->shiftY + 4,
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaptionLeft + 10, $this->sizeY + $this->shiftY + 1,
-			),
+			],
 			3,
 			$this->getColor('White')
 		);
@@ -540,7 +540,7 @@ class CBarGraphDraw extends CGraphDraw {
 	}
 
 	protected function drawSideValues() {
-		$sides = array();
+		$sides = [];
 		if ($this->axisSideLeft) {
 			$sides[] = GRAPH_YAXIS_SIDE_LEFT;
 		}
@@ -556,10 +556,10 @@ class CBarGraphDraw extends CGraphDraw {
 
 			if ($this->column) {
 				for ($i = 0;$i <= $hstr_count; $i++) {
-					$str = convert_units(array(
+					$str = convert_units([
 						'value' => $this->sizeY * $i / $hstr_count * ($max - $min) / $this->sizeY + $min,
 						'units' => $this->units[$axis]
-					));
+					]);
 
 					$sideShift = 0;
 					if (GRAPH_YAXIS_SIDE_LEFT == $axis) {
@@ -578,7 +578,7 @@ class CBarGraphDraw extends CGraphDraw {
 					);
 				}
 			}
-			elseif (uint_in_array($this->type, array(GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED))) {
+			elseif (uint_in_array($this->type, [GRAPH_TYPE_BAR, GRAPH_TYPE_BAR_STACKED])) {
 				if (GRAPH_YAXIS_SIDE_LEFT == $axis) {
 					$shiftYBottom = $this->shiftY + $this->shiftYCaptionTop - 2; // -2 because of some mistake somewhere in calculations! FIX IT!
 				}
@@ -587,10 +587,10 @@ class CBarGraphDraw extends CGraphDraw {
 				}
 
 				for ($i = 0; $i <= $hstr_count; $i++) {
-					$str = convert_units(array(
+					$str = convert_units([
 						'value' => $this->sizeX * $i / $hstr_count * ($max - $min) / $this->sizeX + $min,
 						'units' => $this->units[$axis]
-					));
+					]);
 
 					$sideShift = 0;
 					if (GRAPH_YAXIS_SIDE_LEFT == $axis) {
@@ -682,7 +682,7 @@ class CBarGraphDraw extends CGraphDraw {
 		$start_time = microtime(true);
 		set_image_header();
 
-		$this->column = uint_in_array($this->type, array(GRAPH_TYPE_COLUMN, GRAPH_TYPE_COLUMN_STACKED));
+		$this->column = uint_in_array($this->type, [GRAPH_TYPE_COLUMN, GRAPH_TYPE_COLUMN_STACKED]);
 
 		$this->fullSizeX = $this->sizeX;
 		$this->fullSizeY = $this->sizeY;

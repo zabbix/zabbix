@@ -23,14 +23,14 @@ require_once dirname(__FILE__).'/js/administration.general.gui.php';
 
 $guiTab = new CFormList();
 $guiTab->addRow(_('Default theme'), new CComboBox('default_theme', $data['default_theme'], null, Z::getThemes()));
-$guiTab->addRow(_('Dropdown first entry'), array(
-	new CComboBox('dropdown_first_entry', $data['dropdown_first_entry'], null, array(
+$guiTab->addRow(_('Dropdown first entry'), [
+	new CComboBox('dropdown_first_entry', $data['dropdown_first_entry'], null, [
 		ZBX_DROPDOWN_FIRST_NONE => _('None'),
 		ZBX_DROPDOWN_FIRST_ALL => _('All')
-	)),
+	]),
 	new CCheckBox('dropdown_first_remember', $data['dropdown_first_remember'] == 1, null, 1),
 	_('remember selected')
-));
+]);
 $guiTab->addRow(_('Search/Filter elements limit'),
 	new CNumericBox('search_limit', $data['search_limit'], 6)
 );

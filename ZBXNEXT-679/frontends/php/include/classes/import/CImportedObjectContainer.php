@@ -26,12 +26,12 @@ class CImportedObjectContainer {
 	/**
 	 * @var array with created and updated hosts.
 	 */
-	protected $hostIds = array();
+	protected $hostIds = [];
 
 	/**
 	 * @var array with created and updated templates.
 	 */
-	protected $templateIds = array();
+	protected $templateIds = [];
 
 	/**
 	 * Add host IDs that have been created and updated.

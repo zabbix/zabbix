@@ -56,7 +56,7 @@ class CTimePeriodValidator extends CValidator {
 			$periods = explode(';', $periods);
 		}
 		else {
-			$periods = array($periods);
+			$periods = [$periods];
 		}
 
 		foreach ($periods as $period) {

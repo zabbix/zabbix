@@ -32,27 +32,27 @@ class CPageHeader {
 	/**
 	 * @var array of css file paths
 	 */
-	protected $cssFiles = array();
+	protected $cssFiles = [];
 
 	/**
 	 * @var array of css styles
 	 */
-	protected $styles = array();
+	protected $styles = [];
 
 	/**
 	 * @var array of js file paths
 	 */
-	protected $jsFiles = array();
+	protected $jsFiles = [];
 
 	/**
 	 * @var array of js scripts to render before js files
 	 */
-	protected $jsBefore = array();
+	protected $jsBefore = [];
 
 	/**
 	 * @var array of js scripts to render after js files
 	 */
-	protected $js = array();
+	protected $js = [];
 
 	/**
 	 * @param string $title

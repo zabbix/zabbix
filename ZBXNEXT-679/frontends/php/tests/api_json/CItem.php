@@ -24,19 +24,19 @@ require_once dirname(__FILE__).'/../../include/hosts.inc.php';
 
 class API_JSON_Item extends CZabbixTest {
 	public static function inventory_links() {
-		$data = array();
+		$data = [];
 		$inventoryFields = getHostInventories();
 		$inventoryFieldNumbers = array_keys($inventoryFields);
 		foreach ($inventoryFieldNumbers as $nr) {
-			$data[] = array(
+			$data[] = [
 				$nr,
 				$nr != 1  // item that has inventory_link == 1 exists in test data
-			);
+			];
 		}
 		// few non-existing fields
 		$maxNr = max($inventoryFieldNumbers);
-		$data[] = array($maxNr + 1, false);
-		$data[] = array('string', false);
+		$data[] = [$maxNr + 1, false];
+		$data[] = ['string', false];
 
 		return $data;
 	}
@@ -54,7 +54,7 @@ class API_JSON_Item extends CZabbixTest {
 		// creating item
 		$result = $this->api_acall(
 			'item.create',
-			array(
+			[
 				'name' => 'Item that populates field '.$inventoryFieldNr,
 				'key_' => 'key.test.pop.'.$inventoryFieldNr,
 				'hostid' => 10053,
@@ -63,7 +63,7 @@ class API_JSON_Item extends CZabbixTest {
 				'delay' => 30,
 				'interfaceid' => 10021,
 				'inventory_link' => $inventoryFieldNr
-			),
+			],
 			$debug
 		);
 
