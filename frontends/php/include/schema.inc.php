@@ -713,6 +713,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'flags' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'httptest' => [
@@ -5863,14 +5869,14 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
-			),
+			],
 			'application_prototypeid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'application_prototype',
 				'ref_field' => 'application_prototypeid',
-			),
+			],
 			'itemid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
