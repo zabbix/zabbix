@@ -464,7 +464,6 @@ article {
 	}
 
 	.selected {
-		font-weight: bold;
 		background-color: $ui-bg-color;
 		padding: 4px 9px;
 		@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
@@ -979,8 +978,8 @@ footer {
 
 .sublevel {
 	height: 22px;
-	border: 1px solid $form-disabled-bg-color;
-	background-color: $form-disabled-bg-color;
+	border: 1px solid $action-hover-color;
+	background-color: $action-hover-color;
 	margin: 5px 0;
 	@include border-radius(2px);
 	
@@ -1172,7 +1171,6 @@ footer {
 			display: block;
 			height: 24px;
 			line-height: 24px;
-			//padding: 4px 0;
 		}
 
 		input {
@@ -1211,12 +1209,11 @@ footer {
 			 &.center {
 			 	text-align: center;
 			 	vertical-align: middle;
-			 }
 
-			//.btn-grey {
-				//margin: 5px 0;
-				//display: block;
-			//}
+			 	.btn-grey {
+			 		margin: 3px 0;
+			 	}
+			 }
 		}
 	}
 }
@@ -1341,6 +1338,7 @@ textarea {
 	padding: 5px 0 0 5px;
 	overflow: auto;
 	@extend %form-input-style;
+	@extend %webkit-scrollbar;
 
 	&[disabled] {
 		@extend %form-disabled;
@@ -1357,6 +1355,7 @@ select {
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
 	@extend %form-input-style;
+	@extend %webkit-scrollbar;
 
 	&.select-multiple {
 		width: 300px;
@@ -1404,9 +1403,6 @@ legend {
 
 %form-input-height-padding {
 	padding: 4px 5px;
-	//padding: 0 5px;
-	//min-height: 22px;
-	//line-height: 22px;
 	zoom: 1;
 }
 
@@ -1850,12 +1846,14 @@ button[disabled] {
 %webkit-scrollbar {
 	&::-webkit-scrollbar {
 		width: 6px;
+
 	}
 	&::-webkit-scrollbar-track {
 		background-color: $form-disabled-bg-color;
 	}
 	&::-webkit-scrollbar-thumb {
 		background-color: $form-border-color;
+		@include border-radius(2px);
 	}
 }
 
@@ -1957,8 +1955,6 @@ button[disabled] {
 
 %signin-input {
 	padding: 10px 5px;
-	//min-height: 38px;
-	//line-height: 38px; 
 	width: 100%;
 	@include box-sizing(border-box);
 }
@@ -2212,6 +2208,7 @@ button[disabled] {
 		max-height: 128px;
 		overflow-y: auto;
 		margin-left: -10px;
+		@extend %webkit-scrollbar;
 	}
 }
 
@@ -2457,12 +2454,13 @@ a.grey {
 }
 
 %status {
-	padding: 0 3px;
+	padding: 2px 3px 1px 3px;
 	color: $white;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
 	min-width: 1em;
+	line-height: 1em;
 	display: inline-block;
 	cursor: default;
 	@include border-radius(2px); 
@@ -2602,9 +2600,7 @@ td.disaster-bg {
 	}
 
 	ul {
-		//margin: 8px 0 0 0;
 		border-top-width: 1px;
-		//border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
@@ -2715,7 +2711,6 @@ a.overlay-close-btn {
 	position: absolute;
 	top: 0;
 	right: -12px;
-	//color: $white;
 	color: darken($ui-bg-selected-color, 40%);
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
@@ -2724,17 +2719,14 @@ a.overlay-close-btn {
 
 	&:hover {
 		color: darken($ui-bg-selected-color, 65%);
-		//background-color: darken($ui-bg-selected-color, 5%);
 	}
 
 	&:focus {
 		color: darken($ui-bg-selected-color, 55%);
-		//background-color: darken($ui-bg-selected-color, 5%);
 	}
 
 	&:active {
 		color: darken($ui-bg-selected-color, 55%);
-		//background-color: darken($ui-bg-selected-color, 5%);
 	}
 }
 
