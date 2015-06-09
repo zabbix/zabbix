@@ -57,7 +57,7 @@ class CConfigurationImport {
 	/**
 	 * @var array  cached data from the adapter
 	 */
-	protected $formattedData = array();
+	protected $formattedData = [];
 
 	/**
 	 * Constructor.
@@ -69,23 +69,23 @@ class CConfigurationImport {
 	 * @param CImportedObjectContainer	$importedObjectContainer	class containing processed host and template IDs
 	 * @param CTriggerExpression		$triggerExpression			class to parse trigger expression
 	 */
-	public function __construct(array $options = array(), CImportReferencer $referencer,
+	public function __construct(array $options = [], CImportReferencer $referencer,
 			CImportedObjectContainer $importedObjectContainer, CTriggerExpression $triggerExpression) {
-		$this->options = array(
-			'groups' => array('createMissing' => false),
-			'hosts' => array('updateExisting' => false, 'createMissing' => false),
-			'templates' => array('updateExisting' => false, 'createMissing' => false),
-			'templateScreens' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
-			'applications' => array('updateExisting' => false, 'createMissing' => false),
-			'templateLinkage' => array('createMissing' => false),
-			'items' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
-			'discoveryRules' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
-			'triggers' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
-			'graphs' => array('updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false),
-			'screens' => array('updateExisting' => false, 'createMissing' => false),
-			'maps' => array('updateExisting' => false, 'createMissing' => false),
-			'images' => array('updateExisting' => false, 'createMissing' => false)
-		);
+		$this->options = [
+			'groups' => ['createMissing' => false],
+			'hosts' => ['updateExisting' => false, 'createMissing' => false],
+			'templates' => ['updateExisting' => false, 'createMissing' => false],
+			'templateScreens' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'applications' => ['updateExisting' => false, 'createMissing' => false],
+			'templateLinkage' => ['createMissing' => false],
+			'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'screens' => ['updateExisting' => false, 'createMissing' => false],
+			'maps' => ['updateExisting' => false, 'createMissing' => false],
+			'images' => ['updateExisting' => false, 'createMissing' => false]
+		];
 
 		$this->options = array_merge($this->options, $options);
 		$this->referencer = $referencer;
@@ -139,21 +139,21 @@ class CConfigurationImport {
 	 * @see CImportReferencer
 	 */
 	protected function gatherReferences() {
-		$groupsRefs = array();
-		$templatesRefs = array();
-		$hostsRefs = array();
-		$applicationsRefs = array();
-		$itemsRefs = array();
-		$valueMapsRefs = array();
-		$triggersRefs = array();
-		$graphsRefs = array();
-		$iconMapsRefs = array();
-		$mapsRefs = array();
-		$screensRefs = array();
-		$templateScreensRefs = array();
-		$macrosRefs = array();
-		$proxyRefs = array();
-		$hostPrototypesRefs = array();
+		$groupsRefs = [];
+		$templatesRefs = [];
+		$hostsRefs = [];
+		$applicationsRefs = [];
+		$itemsRefs = [];
+		$valueMapsRefs = [];
+		$triggersRefs = [];
+		$graphsRefs = [];
+		$iconMapsRefs = [];
+		$mapsRefs = [];
+		$screensRefs = [];
+		$templateScreensRefs = [];
+		$macrosRefs = [];
+		$proxyRefs = [];
+		$hostPrototypesRefs = [];
 
 		foreach ($this->getFormattedGroups() as $group) {
 			$groupsRefs[$group['name']] = $group['name'];
@@ -399,6 +399,12 @@ class CConfigurationImport {
 							$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 							break;
 
+						case SCREEN_RESOURCE_CLOCK:
+							if ($screenItem['style'] != TIME_TYPE_HOST) {
+								break;
+							}
+							// break; is not missing here
+
 						case SCREEN_RESOURCE_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 						case SCREEN_RESOURCE_PLAIN_TEXT:
@@ -432,6 +438,12 @@ class CConfigurationImport {
 								$hostsRefs[$resource['host']] = $resource['host'];
 								$graphsRefs[$resource['host']][$resource['name']] = $resource['name'];
 								break;
+
+							case SCREEN_RESOURCE_CLOCK:
+								if ($screenItem['style'] != TIME_TYPE_HOST) {
+									break;
+								}
+								// break; is not missing here
 
 							case SCREEN_RESOURCE_SIMPLE_GRAPH:
 							case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
@@ -550,7 +562,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		$applicationsToCreate = array();
+		$applicationsToCreate = [];
 
 		foreach ($allApplications as $host => $applications) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -592,8 +604,8 @@ class CConfigurationImport {
 			return;
 		}
 
-		$itemsToCreate = array();
-		$itemsToUpdate = array();
+		$itemsToCreate = [];
+		$itemsToUpdate = [];
 
 		foreach ($allItems as $host => $items) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -607,7 +619,7 @@ class CConfigurationImport {
 				$item['hostid'] = $hostId;
 
 				if (isset($item['applications']) && $item['applications']) {
-					$applicationsIds = array();
+					$applicationsIds = [];
 
 					foreach ($item['applications'] as $application) {
 						if ($applicationId = $this->referencer->resolveApplication($hostId, $application['name'])) {
@@ -692,8 +704,8 @@ class CConfigurationImport {
 			}
 		}
 
-		$itemsToCreate = array();
-		$itemsToUpdate = array();
+		$itemsToCreate = [];
+		$itemsToUpdate = [];
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -723,7 +735,7 @@ class CConfigurationImport {
 		}
 
 		// create/update discovery rules and add processed rules to array $processedRules
-		$processedRules = array();
+		$processedRules = [];
 
 		if ($this->options['discoveryRules']['createMissing'] && $itemsToCreate) {
 			$newItemsIds = API::DiscoveryRule()->create($itemsToCreate);
@@ -751,10 +763,10 @@ class CConfigurationImport {
 		$this->referencer->refreshItems();
 
 		// process prototypes
-		$prototypesToUpdate = array();
-		$prototypesToCreate = array();
-		$hostPrototypesToUpdate = array();
-		$hostPrototypesToCreate = array();
+		$prototypesToUpdate = [];
+		$prototypesToCreate = [];
+		$hostPrototypesToUpdate = [];
+		$hostPrototypesToCreate = [];
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -772,7 +784,7 @@ class CConfigurationImport {
 				foreach ($item['item_prototypes'] as $prototype) {
 					$prototype['hostid'] = $hostId;
 
-					$applicationsIds = array();
+					$applicationsIds = [];
 
 					foreach ($prototype['applications'] as $application) {
 						$applicationsIds[] = $this->referencer->resolveApplication($hostId, $application['name']);
@@ -801,7 +813,7 @@ class CConfigurationImport {
 					}
 
 					$prototypeId = $this->referencer->resolveItem($hostId, $prototype['key_']);
-					$prototype['rule'] = array('hostid' => $hostId, 'key' => $item['key_']);
+					$prototype['rule'] = ['hostid' => $hostId, 'key' => $item['key_']];
 
 					if ($prototypeId) {
 						$prototype['itemid'] = $prototypeId;
@@ -815,7 +827,7 @@ class CConfigurationImport {
 				// host prototype
 				foreach ($item['host_prototypes'] as $hostPrototype) {
 					// resolve group prototypes
-					$groupLinks = array();
+					$groupLinks = [];
 
 					foreach ($hostPrototype['group_links'] as $groupLink) {
 						$groupId = $this->referencer->resolveGroup($groupLink['group']['name']);
@@ -830,7 +842,7 @@ class CConfigurationImport {
 							));
 						}
 
-						$groupLinks[] = array('groupid' => $groupId);
+						$groupLinks[] = ['groupid' => $groupId];
 					}
 
 					$hostPrototype['groupLinks'] = $groupLinks;
@@ -838,7 +850,7 @@ class CConfigurationImport {
 					unset($hostPrototype['group_links'], $hostPrototype['group_prototypes']);
 
 					// resolve templates
-					$templates = array();
+					$templates = [];
 
 					foreach ($hostPrototype['templates'] as $template) {
 						$templateId = $this->referencer->resolveTemplate($template['name']);
@@ -853,7 +865,7 @@ class CConfigurationImport {
 							));
 						}
 
-						$templates[] = array('templateid' => $templateId);
+						$templates[] = ['templateid' => $templateId];
 					}
 
 					$hostPrototype['templates'] = $templates;
@@ -924,10 +936,10 @@ class CConfigurationImport {
 		$this->referencer->refreshItems();
 
 		// first we need to create item prototypes and only then graph prototypes
-		$triggersToCreate = array();
-		$triggersToUpdate = array();
-		$graphsToCreate = array();
-		$graphsToUpdate = array();
+		$triggersToCreate = [];
+		$triggersToUpdate = [];
+		$graphsToCreate = [];
+		$graphsToUpdate = [];
 		// the list of triggers to process dependencies
 		$triggers = [];
 
@@ -1126,8 +1138,8 @@ class CConfigurationImport {
 			return;
 		}
 
-		$graphsToCreate = array();
-		$graphsToUpdate = array();
+		$graphsToCreate = [];
+		$graphsToUpdate = [];
 
 		foreach ($allGraphs as $graph) {
 			if ($graph['ymin_item_1']) {
@@ -1339,14 +1351,14 @@ class CConfigurationImport {
 
 		$allImages = zbx_toHash($allImages, 'name');
 
-		$dbImages = API::Image()->get(array(
-			'output' => array('imageid', 'name'),
-			'filter' => array('name' => array_keys($allImages))
-		));
+		$dbImages = API::Image()->get([
+			'output' => ['imageid', 'name'],
+			'filter' => ['name' => array_keys($allImages)]
+		]);
 		$dbImages = zbx_toHash($dbImages, 'name');
 
-		$imagesToUpdate = array();
-		$imagesToCreate = array();
+		$imagesToUpdate = [];
+		$imagesToCreate = [];
 
 		foreach ($allImages as $imageName => $image) {
 			if (isset($dbImages[$imageName])) {
@@ -1432,7 +1444,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		$itemIdsXML = array();
+		$itemIdsXML = [];
 
 		$allItems = $this->getFormattedItems();
 
@@ -1450,14 +1462,14 @@ class CConfigurationImport {
 			}
 		}
 
-		$dbItemIds = API::Item()->get(array(
-			'output' => array('itemid'),
+		$dbItemIds = API::Item()->get([
+			'output' => ['itemid'],
 			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-		));
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
 
 		$itemsToDelete = array_diff_key($dbItemIds, $itemIdsXML);
 
@@ -1488,7 +1500,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		$applicationIdsXML = array();
+		$applicationIdsXML = [];
 
 		$allApplications = $this->getFormattedApplications();
 
@@ -1506,13 +1518,13 @@ class CConfigurationImport {
 			}
 		}
 
-		$dbApplicationIds = API::Application()->get(array(
-			'output' => array('applicationid'),
+		$dbApplicationIds = API::Application()->get([
+			'output' => ['applicationid'],
 			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
-		));
+		]);
 
 		$applicationsToDelete = array_diff_key($dbApplicationIds, $applicationIdsXML);
 		if ($applicationsToDelete) {
@@ -1543,7 +1555,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		$triggersXML = array();
+		$triggersXML = [];
 
 		$allTriggers = $this->getFormattedTriggers();
 
@@ -1557,20 +1569,20 @@ class CConfigurationImport {
 			}
 		}
 
-		$dbTriggerIds = API::Trigger()->get(array(
-			'output' => array('triggerid'),
+		$dbTriggerIds = API::Trigger()->get([
+			'output' => ['triggerid'],
 			'hostids' => $processedHostIds,
-			'selectHosts' => array('hostid'),
+			'selectHosts' => ['hostid'],
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-		));
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
 
 		// check that potentially deletable trigger belongs to same hosts that are in XML
 		// if some triggers belong to more hosts than current XML contains, don't delete them
 		$triggersToDelete = array_diff_key($dbTriggerIds, $triggersXML);
-		$triggerIdsToDelete = array();
+		$triggerIdsToDelete = [];
 		$processedHostIds = array_flip($processedHostIds);
 
 		foreach ($triggersToDelete as $triggerId => $trigger) {
@@ -1608,7 +1620,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		$graphsIdsXML = array();
+		$graphsIdsXML = [];
 
 		// gather host IDs for graphs that exist in XML
 		$allGraphs = $this->getFormattedGraphs();
@@ -1628,20 +1640,20 @@ class CConfigurationImport {
 			}
 		}
 
-		$dbGraphIds = API::Graph()->get(array(
-			'output' => array('graphid'),
+		$dbGraphIds = API::Graph()->get([
+			'output' => ['graphid'],
 			'hostids' => $processedHostIds,
-			'selectHosts' => array('hostid'),
+			'selectHosts' => ['hostid'],
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-		));
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
 
 		// check that potentially deletable graph belongs to same hosts that are in XML
 		// if some graphs belong to more hosts than current XML contains, don't delete them
 		$graphsToDelete = array_diff_key($dbGraphIds, $graphsIdsXML);
-		$graphIdsToDelete = array();
+		$graphIdsToDelete = [];
 		$processedHostIds = array_flip($processedHostIds);
 
 		foreach ($graphsToDelete as $graphId => $graph) {
@@ -1679,7 +1691,7 @@ class CConfigurationImport {
 			return;
 		}
 
-		$discoveryRuleIdsXML = array();
+		$discoveryRuleIdsXML = [];
 
 		$allDiscoveryRules = $this->getFormattedDiscoveryRules();
 
@@ -1697,13 +1709,13 @@ class CConfigurationImport {
 			}
 		}
 
-		$dbDiscoveryRuleIds = API::DiscoveryRule()->get(array(
-			'output' => array('itemid'),
+		$dbDiscoveryRuleIds = API::DiscoveryRule()->get([
+			'output' => ['itemid'],
 			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
-		));
+		]);
 
 		$discoveryRulesToDelete = array_diff_key($dbDiscoveryRuleIds, $discoveryRuleIdsXML);
 
@@ -1714,10 +1726,10 @@ class CConfigurationImport {
 		// refresh discovery rules because templated ones can be inherited to host and used for prototypes
 		$this->referencer->refreshItems();
 
-		$hostPrototypeIdsXML = array();
-		$triggerPrototypeIdsXML = array();
-		$itemPrototypeIdsXML = array();
-		$graphPrototypeIdsXML = array();
+		$hostPrototypeIdsXML = [];
+		$triggerPrototypeIdsXML = [];
+		$itemPrototypeIdsXML = [];
+		$graphPrototypeIdsXML = [];
 
 		foreach ($allDiscoveryRules as $host => $discoveryRules) {
 			$hostId = $this->referencer->resolveHostOrTemplate($host);
@@ -1770,13 +1782,13 @@ class CConfigurationImport {
 		}
 
 		// delete missing host prototypes
-		$dbHostPrototypeIds = API::HostPrototype()->get(array(
-			'output' => array('hostid'),
+		$dbHostPrototypeIds = API::HostPrototype()->get([
+			'output' => ['hostid'],
 			'discoveryids' => $discoveryRuleIdsXML,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
-		));
+		]);
 
 		$hostPrototypesToDelete = array_diff_key($dbHostPrototypeIds, $hostPrototypeIdsXML);
 
@@ -1785,13 +1797,13 @@ class CConfigurationImport {
 		}
 
 		// delete missing trigger prototypes
-		$dbTriggerPrototypeIds = API::TriggerPrototype()->get(array(
-			'output' => array('triggerid'),
+		$dbTriggerPrototypeIds = API::TriggerPrototype()->get([
+			'output' => ['triggerid'],
 			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
-		));
+		]);
 
 		$triggerPrototypesToDelete = array_diff_key($dbTriggerPrototypeIds, $triggerPrototypeIdsXML);
 
@@ -1801,13 +1813,13 @@ class CConfigurationImport {
 		}
 
 		// delete missing graph prototypes
-		$dbGraphPrototypeIds = API::GraphPrototype()->get(array(
-			'output' => array('graphid'),
+		$dbGraphPrototypeIds = API::GraphPrototype()->get([
+			'output' => ['graphid'],
 			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
-		));
+		]);
 
 		$graphPrototypesToDelete = array_diff_key($dbGraphPrototypeIds, $graphPrototypeIdsXML);
 
@@ -1817,13 +1829,13 @@ class CConfigurationImport {
 		}
 
 		// delete missing item prototypes
-		$dbItemPrototypeIds = API::ItemPrototype()->get(array(
-			'output' => array('itemid'),
+		$dbItemPrototypeIds = API::ItemPrototype()->get([
+			'output' => ['itemid'],
 			'hostids' => $processedHostIds,
 			'preservekeys' => true,
 			'nopermissions' => true,
 			'inherited' => false
-		));
+		]);
 
 		$itemPrototypesToDelete = array_diff_key($dbItemPrototypeIds, $itemPrototypeIdsXML);
 
@@ -1949,7 +1961,7 @@ class CConfigurationImport {
 	 * @throws Exception
 	 */
 	protected function parseTriggerExpression($expression) {
-		$expressions = array();
+		$expressions = [];
 
 		$result = $this->triggerExpression->parse($expression);
 		if (!$result) {
@@ -1957,10 +1969,10 @@ class CConfigurationImport {
 		}
 
 		foreach ($result->getTokensByType(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO) as $token) {
-			$expressions[] = array(
+			$expressions[] = [
 				'host' => $token['data']['host'],
 				'item' => $token['data']['item'],
-			);
+			];
 		}
 
 		return $expressions;

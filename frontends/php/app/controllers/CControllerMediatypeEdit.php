@@ -21,14 +21,14 @@
 
 class CControllerMediatypeEdit extends CController {
 
-	private $mediatype = array();
+	private $mediatype = [];
 
 	protected function init() {
 		$this->disableSIDValidation();
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'mediatypeid' =>			'db media_type.mediatypeid',
 			'type' =>					'db media_type.type|in '.implode(',', array_keys(media_type2str())),
 			'description' =>			'db media_type.description',
@@ -47,7 +47,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' =>			'db media_type.username',
 			'passwd' =>					'db media_type.passwd',
 			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -64,14 +64,14 @@ class CControllerMediatypeEdit extends CController {
 		}
 
 		if ($this->hasInput('mediatypeid')) {
-			$mediatypes = API::Mediatype()->get(array(
-				'output' => array('mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
+			$mediatypes = API::Mediatype()->get([
+				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
 					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
 					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication'
-				),
+				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
-			));
+			]);
 
 			if (!$mediatypes) {
 				return false;
@@ -85,7 +85,7 @@ class CControllerMediatypeEdit extends CController {
 
 	protected function doAction() {
 		// default values
-		$data = array(
+		$data = [
 			'sid' => $this->getUserSID(),
 			'mediatypeid' => 0,
 			'type' => MEDIA_TYPE_EMAIL,
@@ -105,7 +105,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE
-		);
+		];
 
 		// get values from the dabatase
 		if ($this->hasInput('mediatypeid')) {
@@ -141,7 +141,7 @@ class CControllerMediatypeEdit extends CController {
 		}
 
 		// overwrite with input variables
-		$this->getInputs($data, array(
+		$this->getInputs($data, [
 			'type',
 			'description',
 			'smtp_server',
@@ -158,7 +158,7 @@ class CControllerMediatypeEdit extends CController {
 			'eztext_username',
 			'passwd',
 			'status'
-		));
+		]);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

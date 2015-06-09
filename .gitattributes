@@ -198,6 +198,7 @@ frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/sla_red15.png -text
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
+frontends/php/img/browser-sprite.png -text svneol=unset#image/png
 frontends/php/img/icon-sprite.png -text svneol=unset#image/png
 frontends/php/img/preload.gif -text svneol=unset#image/gif
 frontends/php/include/classes/helpers/CViewHelper.php -text
@@ -249,6 +250,7 @@ frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
 frontends/php/robots.txt svneol=native#text/plain
 frontends/php/styles/zabbix.css svneol=native#text/css
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/unit/include/classes/import/converters/C20ItemKeyConverterTest.php -text
 frontends/php/tests/unit/include/classes/import/formatters/hostAndTemplate.xml svneol=native#text/xml
 frontends/php/tests/unit/include/classes/import/formatters/map.xml svneol=native#text/xml
 frontends/php/tests/unit/include/classes/import/formatters/screen.xml svneol=native#text/xml

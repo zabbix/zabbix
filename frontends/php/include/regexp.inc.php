@@ -24,7 +24,7 @@ function getRegexp($regexpId) {
 }
 
 function getRegexpExpressions($regexpId) {
-	$expressions = array();
+	$expressions = [];
 
 	$dbExpressions = DBselect(
 		'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
@@ -41,7 +41,7 @@ function getRegexpExpressions($regexpId) {
 function addRegexp(array $regexp, array $expressions) {
 	try {
 		// check required fields
-		$dbFields = array('name' => null, 'test_string' => '');
+		$dbFields = ['name' => null, 'test_string' => ''];
 
 		validateRegexp($expressions);
 
@@ -58,7 +58,7 @@ function addRegexp(array $regexp, array $expressions) {
 			throw new Exception(_s('Regular expression "%s" already exists.', $regexp['name']));
 		}
 
-		$regexpIds = DB::insert('regexps', array($regexp));
+		$regexpIds = DB::insert('regexps', [$regexp]);
 		$regexpId = reset($regexpIds);
 
 		addRegexpExpressions($regexpId, $expressions);
@@ -84,7 +84,7 @@ function updateRegexp(array $regexp, array $expressions) {
 		}
 
 		// check required fields
-		$dbFields = array('name' => null);
+		$dbFields = ['name' => null];
 		if (!check_db_fields($dbFields, $regexp)) {
 			throw new Exception(_('Incorrect arguments passed to function').' [updateRegexp]');
 		}
@@ -101,10 +101,10 @@ function updateRegexp(array $regexp, array $expressions) {
 
 		rewriteRegexpExpressions($regexpId, $expressions);
 
-		DB::update('regexps', array(
+		DB::update('regexps', [
 			'values' => $regexp,
-			'where' => array('regexpid' => $regexpId)
-		));
+			'where' => ['regexpid' => $regexpId]
+		]);
 	}
 	catch (Exception $e) {
 		error($e->getMessage());
@@ -115,10 +115,10 @@ function updateRegexp(array $regexp, array $expressions) {
 }
 
 function validateRegexp($expressions) {
-	$validator = new CRegexValidator(array(
+	$validator = new CRegexValidator([
 		'messageInvalid' => _('Regular expression must be a string'),
 		'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
-	));
+	]);
 
 	foreach ($expressions as $expression) {
 		if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE ||
@@ -143,8 +143,8 @@ function validateRegexp($expressions) {
 function rewriteRegexpExpressions($regexpId, array $expressions) {
 	$dbExpressions = getRegexpExpressions($regexpId);
 
-	$expressionsToAdd = array();
-	$expressionsToUpdate = array();
+	$expressionsToAdd = [];
+	$expressionsToUpdate = [];
 
 	foreach ($expressions as $expression) {
 		if (!isset($expression['expressionid'])) {
@@ -171,7 +171,7 @@ function rewriteRegexpExpressions($regexpId, array $expressions) {
 }
 
 function addRegexpExpressions($regexpId, array $expressions) {
-	$dbFields = array('expression' => null, 'expression_type' => null);
+	$dbFields = ['expression' => null, 'expression_type' => null];
 
 	foreach ($expressions as &$expression) {
 		if (!check_db_fields($dbFields, $expression)) {
@@ -190,26 +190,26 @@ function updateRegexpExpressions(array $expressions) {
 		$expressionId = $expression['expressionid'];
 		unset($expression['expressionid']);
 
-		DB::update('expressions', array(
+		DB::update('expressions', [
 			'values' => $expression,
-			'where' => array('expressionid' => $expressionId)
-		));
+			'where' => ['expressionid' => $expressionId]
+		]);
 	}
 	unset($expression);
 }
 
 function deleteRegexpExpressions(array $expressionIds) {
-	DB::delete('expressions', array('expressionid' => $expressionIds));
+	DB::delete('expressions', ['expressionid' => $expressionIds]);
 }
 
 function expression_type2str($type = null) {
-	$types = array(
+	$types = [
 		EXPRESSION_TYPE_INCLUDED => _('Character string included'),
 		EXPRESSION_TYPE_ANY_INCLUDED => _('Any character string included'),
 		EXPRESSION_TYPE_NOT_INCLUDED => _('Character string not included'),
 		EXPRESSION_TYPE_TRUE => _('Result is TRUE'),
 		EXPRESSION_TYPE_FALSE => _('Result is FALSE')
-	);
+	];
 
 	if ($type === null) {
 		return $types;
@@ -223,9 +223,9 @@ function expression_type2str($type = null) {
 }
 
 function expressionDelimiters() {
-	return array(
+	return [
 		',' => ',',
 		'.' => '.',
 		'/' => '/'
-	);
+	];
 }

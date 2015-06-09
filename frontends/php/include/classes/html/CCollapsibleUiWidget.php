@@ -41,7 +41,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 * @param string|array|CTag $caption
 	 * @param array              $icons
 	 */
-	public function setHeader($caption = null, array $icons = array()) {
+	public function setHeader($caption = null, array $icons = []) {
 		$icon = new CRedirectButton(SPACE, null);
 		if($this->open) {
 			$icon->addClass(ZBX_STYLE_BTN_WIDGET_COLLAPSE);
@@ -51,7 +51,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 			$icon->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND);
 			$icon->setTitle(_('Open'));
 		}
-		$icon->addAction('onclick', 'changeWidgetState(this, "'.$this->id.'");');
+		$icon->onClick('changeWidgetState(this, "'.$this->id.'");');
 		$icon->setAttribute('id', $this->id.'_icon');
 		$icons[] = $icon;
 

@@ -26,104 +26,104 @@ require_once dirname(__FILE__).'/../../include/db.inc.php';
 class dbConditionIntTest extends CZabbixTest {
 
 	public static function provider() {
-		return array(
-			array(
-				array('field', array()),
+		return [
+			[
+				['field', []],
 				'1=0'
-			),
-			array(
-				array('field', range(1, 100)),
+			],
+			[
+				['field', range(1, 100)],
 				"field BETWEEN '1' AND '100'"
-			),
-			array(
-				array('field', array(0)),
+			],
+			[
+				['field', [0]],
 				"field='0'"
-			),
-			array(
-				array('field', array(1)),
+			],
+			[
+				['field', [1]],
 				"field='1'"
-			),
-			array(
-				array('field', array()),
+			],
+			[
+				['field', []],
 				'1=0'
-			),
-			array(
-				array('field', array(true)),
+			],
+			[
+				['field', [true]],
 				'1=0'
-			),
-			array(
-				array('field', array(0, 1)),
+			],
+			[
+				['field', [0, 1]],
 				"field IN ('0','1')"
-			),
-			array(
-				array('field', array(1, 0)),
+			],
+			[
+				['field', [1, 0]],
 				"field IN ('0','1')"
-			),
-			array(
-				array('field', array(1), true),
+			],
+			[
+				['field', [1], true],
 				"field!='1'"
-			),
-			array(
-				array('field', range(1, 20, 5)),
+			],
+			[
+				['field', range(1, 20, 5)],
 				"field IN ('1','6','11','16')"
-			),
-			array(
-				array('field', range(1, 20, 5), true),
+			],
+			[
+				['field', range(1, 20, 5), true],
 				"field NOT IN ('1','6','11','16')"
-			),
-			array(
-				array('field', range(1, 100, 10)),
+			],
+			[
+				['field', range(1, 100, 10)],
 				"field IN ('1','11','21','31','41','51','61','71','81','91')"
-			),
-			array(
-				array('field', array_merge(range(1, 10), range(20, 30))),
+			],
+			[
+				['field', array_merge(range(1, 10), range(20, 30))],
 				"(field BETWEEN '1' AND '10' OR field BETWEEN '20' AND '30')"
-			),
-			array(
-				array('field', array_merge(range(1, 10), range(20, 30)), true),
+			],
+			[
+				['field', array_merge(range(1, 10), range(20, 30)), true],
 				"(NOT field BETWEEN '1' AND '10' AND NOT field BETWEEN '20' AND '30')"
-			),
-			array(
-				array('field', array_merge(range(1, 4), range(1, 4), range(20, 30))),
+			],
+			[
+				['field', array_merge(range(1, 4), range(1, 4), range(20, 30))],
 				"(field BETWEEN '20' AND '30' OR field IN ('1','2','3','4'))"
-			),
-			array(
-				array('field', array_merge(range(1, 4), range(1, 4), range(20, 30)), true),
+			],
+			[
+				['field', array_merge(range(1, 4), range(1, 4), range(20, 30)), true],
 				"(NOT field BETWEEN '20' AND '30' AND field NOT IN ('1','2','3','4'))"
-			),
-			array(
-				array('field', array_merge(range(20, 30), array(10))),
+			],
+			[
+				['field', array_merge(range(20, 30), [10])],
 				"(field BETWEEN '20' AND '30' OR field='10')"
-			),
-			array(
-				array('field', array_merge(range(20, 30), array(10)), true),
+			],
+			[
+				['field', array_merge(range(20, 30), [10]), true],
 				"(NOT field BETWEEN '20' AND '30' AND field!='10')"
-			),
-			array(
-				array('field', array('9223372036854775802', '9223372036854775802', '9223372036854775803', '9223372036854775804', '9223372036854775805', '9223372036854775806')),
+			],
+			[
+				['field', ['9223372036854775802', '9223372036854775802', '9223372036854775803', '9223372036854775804', '9223372036854775805', '9223372036854775806']],
 				"field BETWEEN '9223372036854775802' AND '9223372036854775806'"
-			),
-			array(
-				array('field', array('9223372036854775802', '9223372036854775803', '9223372036854775804', '9223372036854775805', '9223372036854775806', '9223372036854775807')),
+			],
+			[
+				['field', ['9223372036854775802', '9223372036854775803', '9223372036854775804', '9223372036854775805', '9223372036854775806', '9223372036854775807']],
 				"field BETWEEN '9223372036854775802' AND '9223372036854775807'"
-			),
-			array(
-				array('field', array('9223372036854775807', '9223372036854775806', '9223372036854775805', '9223372036854775804', '9223372036854775803', '9223372036854775802')),
+			],
+			[
+				['field', ['9223372036854775807', '9223372036854775806', '9223372036854775805', '9223372036854775804', '9223372036854775803', '9223372036854775802']],
 				"field BETWEEN '9223372036854775802' AND '9223372036854775807'"
-			),
-			array(
-				array('field', array('id_001' => 1)),
+			],
+			[
+				['field', ['id_001' => 1]],
 				"field='1'"
-			),
-			array(
-				array('field', array('id_001' => '1', 'id_002' => '2', 'id_003' => '3', 'id_004' => '4', 'id_005' => '5', 'id_006' => '6')),
+			],
+			[
+				['field', ['id_001' => '1', 'id_002' => '2', 'id_003' => '3', 'id_004' => '4', 'id_005' => '5', 'id_006' => '6']],
 				"field BETWEEN '1' AND '6'"
-			),
-			array(
-				array('field', array('1', '7', '90', '91', '100', '400'), false, false),
+			],
+			[
+				['field', ['1', '7', '90', '91', '100', '400'], false, false],
 				"field IN ('1','7','90','91','100','400')"
-			)
-		);
+			]
+		];
 	}
 
 	/**

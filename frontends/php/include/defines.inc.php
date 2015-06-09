@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'2.5.0');
 define('ZABBIX_API_VERSION',	'2.5.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050016);
+define('ZABBIX_DB_VERSION',		2050017);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -998,6 +998,8 @@ define('HISTORY_LATEST', 'showlatest');
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
+define('ZBX_STYLE_ARTICLE', 'article');
+define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
@@ -1015,6 +1017,7 @@ define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
+define('ZBX_STYLE_LIST_TABLE', 'list-table');
 define('ZBX_STYLE_NA_BG', 'na-bg');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
 define('ZBX_STYLE_NOWRAP', 'nowrap');

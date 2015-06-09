@@ -22,9 +22,9 @@
 class CControllerProxyDelete extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'proxyids' =>	'array_db hosts.hostid|required'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -40,11 +40,11 @@ class CControllerProxyDelete extends CController {
 			return false;
 		}
 
-		$proxies = API::Proxy()->get(array(
+		$proxies = API::Proxy()->get([
 			'proxyids' => $this->getInput('proxyids'),
 			'countOutput' => true,
 			'editable' => true
-		));
+		]);
 
 		return ($proxies == count($this->getInput('proxyids')));
 	}

@@ -25,13 +25,13 @@ $auditWidget = (new CWidget())->setTitle(_('Audit log'));
 $filterForm = new CFilter('web.auditlogs.filter.state');
 
 $filterColumn = new CFormList();
-$filterColumn->addRow(_('User'), array(
+$filterColumn->addRow(_('User'), [
 	new CTextBox('alias', $this->data['alias'], 20),
 	new CButton('btn1', _('Select'),
 		'return PopUp("popup.php?dstfrm=zbx_filter&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
 	)
-));
-$filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action'], null, array(
+]);
+$filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action'], null, [
 	-1 => _('All'),
 	AUDIT_ACTION_LOGIN => _('Login'),
 	AUDIT_ACTION_LOGOUT => _('Logout'),
@@ -40,9 +40,9 @@ $filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action']
 	AUDIT_ACTION_DELETE => _('Delete'),
 	AUDIT_ACTION_ENABLE => _('Enable'),
 	AUDIT_ACTION_DISABLE => _('Disable')
-)));
+]));
 $filterColumn->addRow(_('Resource'), new CComboBox('resourcetype', $this->data['resourcetype'], null,
-	array(-1 => _('All')) + audit_resource2str()
+	[-1 => _('All')] + audit_resource2str()
 ));
 
 $filterForm->addColumn($filterColumn);
@@ -55,7 +55,7 @@ $auditForm->setName('auditForm');
 
 // create table
 $auditTable = new CTableInfo();
-$auditTable->setHeader(array(
+$auditTable->setHeader([
 	_('Time'),
 	_('User'),
 	_('IP'),
@@ -64,12 +64,12 @@ $auditTable->setHeader(array(
 	_('ID'),
 	_('Description'),
 	_('Details')
-));
+]);
 foreach ($this->data['actions'] as $action) {
-	$details = array();
+	$details = [];
 	if (is_array($action['details'])) {
 		foreach ($action['details'] as $detail) {
-			$details[] = array($detail['table_name'].'.'.$detail['field_name'].NAME_DELIMITER.$detail['oldvalue'].' => '.$detail['newvalue'], BR());
+			$details[] = [$detail['table_name'].'.'.$detail['field_name'].NAME_DELIMITER.$detail['oldvalue'].' => '.$detail['newvalue'], BR()];
 		}
 	}
 	else {
@@ -89,10 +89,10 @@ foreach ($this->data['actions'] as $action) {
 }
 
 // append table to form
-$auditForm->addItem(array($auditTable, $this->data['paging']));
+$auditForm->addItem([$auditTable, $this->data['paging']]);
 
 // append navigation bar js
-$objData = array(
+$objData = [
 	'id' => 'timeline_1',
 	'domid' => 'events',
 	'loadSBox' => 0,
@@ -102,7 +102,7 @@ $objData = array(
 	'mainObject' => 1,
 	'periodFixed' => CProfile::get('web.auditlogs.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-);
+];
 zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($this->data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');
 

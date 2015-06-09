@@ -1,131 +1,54 @@
-//$red: #e33734;
-//$light-red: #ed9898;
-//$lighter-red: #fccacf;
-//$alt-red: #e45959;
-
-//$orange: #f24f1d;
-//$alt-dark-orange: #e97659;
-//$alt-orange: #ffa059;
-
-//$yellow: #fad634;
-//$light-yellow: #fcf39d;
-//$lighter-yellow: #fcf7c2;
-//$alt-yellow: #ffc859;
-
-//$green: #429e47;
-//$light-green: #a5d6a7;
-//$lighter-green: #c5e3c6;
-//$alt-green: #59db8f;
-
-//$primary-blue: #2b2b2b; // Primary top nav color
-//$secondary-blue: #222; // Secondary top subnav color
-
-//$alt-dark-blue: #7499ff;
-//$alt-blue: #242424;//#e8f4fa;
-
-//$blue-grey: #768d99;
-//$light-blue-grey: #acbbc2;
-//$lighter-blue-grey: #ccd5d9;
-//$lightest-blue-grey: #0d1114;//#ebeef0; //Background color and table border color
-//$alt-blue-grey: #97aab3;
-
-//$light-grey: #ebebeb;
-//$lighter-grey: #f2f2f2;
-
-//$indigo-black: #d1dade;//#1f2c33;
-//$white: #303030;//#fff;
-//$transparent: transparent;
-
-// LINK COLORS
-//$link-color: #0275b8; // Primary Blue
-//$link-hover-color: #0275b8;
-//$link-active-color: #0275b8;
-//$link-visited-color: #0275b8;
-
-//$link-topnav-color: #bfdced; // Nav Blue
-//$link-topnav-hover-color: #fff;
-//$link-topnav-active-color: #fff;
-//$link-topnav-visited-color: #bfdced;
-
-//$link-topsubnav-color: #bfced7; // SubNav Blue
-//$link-topsubnav-hover-color: #fff;
-//$link-topsubnav-active-color: #fff;
-//$link-topsubnav-visited-color: #bfced7;
-
-
-
-// NOTIFICATION & ALERT COLORS
-$red: #e33734;
-$light-red: #ed9898;
-$lighter-red: #fccacf;
-
-$orange: #f24f1d;
-$alt-dark-orange: #e97659;
-
-$yellow: #fad634;
-$light-yellow: #fcf39d;
-$lighter-yellow: #fcf7c2;
-
-$green: #429e47;
-$light-green: #a5d6a7;
-$lighter-green: #c5e3c6;
-
-$alt-red: #e45959;
-$alt-orange: #ffa059;
-$alt-yellow: #ffc859;
-$alt-green: #59db8f;
-$alt-dark-blue: #7499ff;
-$alt-blue-grey: #97aab3;
-
 $white: #fff;
 $transparent: transparent;
 
 
 // MAIN
-$main-color: #0275b8; //NEW Used across main nav bg and main button bg
-$font-color: #d1dade;//#1f2c33; //NEW
-$font-alt-color: #768d99; //NEW
-$body-bg-color: #0d1114;//#ebeef0; //NEW page bg color
+$main-color: #2d3135;//#768d99;//#2d3135;//#5c5c5c;//#0275b8;
+$font-color: #e6e8f3;//#d1dade;//#1f2c33;
+$font-alt-color: #72757b;//#768d99;//#7d7d7d;
+$body-bg-color: #000;//#0d1114;//#ebeef0;
 
 
 // UI
-$ui-bg-color: #303030;//#fff; //NEW ui element's bg color: widgets, containers for forms, tables, filters, action menus
+$ui-bg-color: #2d3135;//#303030;//#2e2f30;//#fff;
 $ui-bg-selected-color: #acbbc2;
-$ui-hover-color: #242424;//#e8f4fa; //NEW light blue hover for table rows, alt buttons, etc.
-//$ui-border-color: #e8f4fa; //NEW
+$ui-hover-color: #222529;//#383c40;//#383d42;//#242424;//#e8f4fa;
 
-$action-hover-color: #242424;//#ebebeb; //NEW action menu item, calendar item hover colors
-$action-border-color: #3d3d3d;//#ccd5d9; //NEW action menu item, calendar, all overlay border color
+$action-hover-color: #222529;//#383c40;//#383d42;//#242424;//#ebebeb;
+$action-border-color: #383c40;//#383d42;//#3d3d3d;//#ccd5d9;
 
-$table-border-color: #3d3d3d;//#ebeef0; // NEW row separator color in tables
+$table-border-color: #383c40;//#383d42;//#3d3d3d;//#ebeef0;
 
 
 // FORMS
-$form-font-color: #d1dade;//#1f2c33; // NEW
-$form-bg-color: #242424;//#fff; //NEW
-$form-border-color: #3d3d3d;//#acbbc2; //NEW
-$form-border-focus-color: #0275b8; //NEW
+$form-font-color: #e6e8f3;//#d1dade;//#1f2c33;
+$form-bg-color: #383d42;//#242424;//#303030;#242424;//#fff;
+$form-border-color: #44474c;//#3d3d3d;//#636363;//#4a4a4a;//#3d3d3d;//#acbbc2;
+$form-border-focus-color: #5b5e64;//#4f5358;//#4a4a4a;//#7d7d7d;//#0275b8; //NEW
 
-$form-disabled-bg-color: #ebebeb; //NEW
+$form-disabled-font-color: #525252;//#d1dade;//#1f2c33;
+$form-disabled-bg-color: transparent; //#ebebeb; //NEW
+$form-disabled-border-color: #3d3d3d; //NEW
+
 
 
 // BUTTONS
-$btn-font-color: #fff;
-$btn-hover-color: #fff;
-$btn-active-color: #fff;
-$btn-bg-color: #0275b8;
+$btn-font-color: #e6e8f3;//#fff;
+$btn-hover-color: #e6e8f3;//#fff;
+$btn-active-color: #e6e8f3;//#fff;
+$btn-bg-color: #6c818c;//#44474c;//#5c5c5c;//#0275b8;
 
-$btn-alt-font-color: #0275b8;
-$btn-alt-hover-color: #0275b8;
-$btn-alt-active-color: #0275b8;
+$btn-alt-font-color: #768d99;//#0275b8;
+$btn-alt-hover-color: #768d99;//#0275b8;
+$btn-alt-active-color: #768d99;//#0275b8;
 $btn-alt-bg-color: transparent;
 $btn-alt-border-color: $btn-bg-color;
 
-$btn-form-font-color: #0275b8;
+$btn-form-font-color: #d1dade;//#2782b8;//#0275b8;
 $btn-form-hover-color: #0275b8;
 $btn-form-active-color: #0275b8;
-$btn-form-bg-color: transparent;
-$btn-form-border-color: $form-border-color;
+$btn-form-bg-color: #242424;//transparent;
+$btn-form-border-color: #3d3d3d;//$form-border-color;
 
 $btn-disabled-font-color: #acbbc2;
 $btn-disabled-hover-color: #acbbc2;
@@ -135,17 +58,17 @@ $btn-disabled-border-color: #ccd5d9;
 
 
 // LINKS
-$link-color: #0275b8; // Primary Blue
-$link-hover-color: #0275b8;
-$link-active-color: #0275b8;
-$link-visited-color: #0275b8;
+$link-color: #3d93c4;//#2782b8; //#0275b8;
+$link-hover-color: #3d93c4; //#0275b8;
+$link-active-color: #3d93c4; //#0275b8;
+$link-visited-color: #3d93c4;//#2782b8; //#0275b8;
 
-$link-main-nav-color: #bfdced; // Nav Blue
-$link-main-nav-hover-color: #fff;
-$link-main-nav-active-color: #fff;
-$link-main-nav-visited-color: #bfdced;
+$link-main-nav-color: #b9bbc4;//#bfdced;
+$link-main-nav-hover-color: #e6e8f3;//#fff;
+$link-main-nav-active-color: #e6e8f3;//#fff;
+$link-main-nav-visited-color: #e6e8f3;//#bfdced;
 
-$link-main-subnav-color: #bfced7; // SubNav Blue
+$link-main-subnav-color: #bfced7;
 $link-main-subnav-hover-color: #fff;
 $link-main-subnav-active-color: #fff;
 $link-main-subnav-visited-color: #bfced7;

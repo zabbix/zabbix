@@ -160,33 +160,118 @@ static int	DBpatch_2050011(void)
 
 static int	DBpatch_2050012(void)
 {
-	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	DB_RESULT	result;
+	DB_RESULT	result2;
+	DB_ROW		row;
+	char		*key = NULL, *key_esc, *param;
+	int		ret = SUCCEED;
+	AGENT_REQUEST	request;
 
-	return DBadd_field("media_type", &field);
+	/* type - ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE */
+	result = DBselect(
+			"select hostid,itemid,key_"
+			" from items"
+			" where type in (0,3,7)"
+				" and key_ like 'net.tcp.service%%[%%ntp%%'");
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		init_request(&request);
+
+		if (SUCCEED != parse_item_key(row[2], &request))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse item key \"%s\"", row[2]);
+			continue;
+		}
+
+		param = get_rparam(&request, 0);
+
+		if (0 != strcmp("service.ntp", param) && 0 != strcmp("ntp", param))
+		{
+			free_request(&request);
+			continue;
+		}
+
+		key = zbx_strdup(key, row[2]);
+
+		if (0 == strcmp("service.ntp", param))
+		{
+			/* replace "service.ntp" with "ntp" */
+
+			char	*p;
+
+			p = strstr(key, "service.ntp");
+
+			do
+			{
+				*p = *(p + 8);
+			}
+			while ('\0' != *(p++));
+		}
+
+		free_request(&request);
+
+		/* replace "net.tcp.service" with "net.udp.service" */
+
+		key[4] = 'u';
+		key[5] = 'd';
+		key[6] = 'p';
+
+		key_esc = DBdyn_escape_string(key);
+
+		result2 = DBselect("select null from items where hostid=%s and key_='%s'", row[0], key_esc);
+
+		if (NULL == DBfetch(result2))
+		{
+			if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[1]))
+				ret = FAIL;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\":"
+					" item with converted key \"%s\" already exists on host ID [%s]",
+					row[2], key, row[0]);
+		}
+		DBfree_result(result2);
+
+		zbx_free(key_esc);
+	}
+	DBfree_result(result);
+
+	zbx_free(key);
+
+	return ret;
 }
 
 static int	DBpatch_2050013(void)
 {
-	const ZBX_FIELD	field = {"smtp_security", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_2050014(void)
 {
-	const ZBX_FIELD	field = {"smtp_verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"smtp_security", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_2050015(void)
 {
-	const ZBX_FIELD	field = {"smtp_verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const ZBX_FIELD	field = {"smtp_verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
 }
 
 static int	DBpatch_2050016(void)
+{
+	const ZBX_FIELD	field = {"smtp_verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050017(void)
 {
 	const ZBX_FIELD	field = {"smtp_authentication", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
@@ -216,5 +301,6 @@ DBPATCH_ADD(2050013, 0, 1)
 DBPATCH_ADD(2050014, 0, 1)
 DBPATCH_ADD(2050015, 0, 1)
 DBPATCH_ADD(2050016, 0, 1)
+DBPATCH_ADD(2050017, 0, 1)
 
 DBPATCH_END()

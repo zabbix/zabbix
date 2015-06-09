@@ -26,8 +26,8 @@ class testPageWeb extends CWebTest {
 		$this->zbxTestCheckTitle('Status of Web monitoring \[refreshed every 30 sec.\]');
 		$this->zbxTestTextPresent('STATUS OF WEB MONITORING');
 		$this->zbxTestTextPresent('Web scenarios');
-		$this->zbxTestTextPresent(array('Group', 'Host'));
-		$this->zbxTestTextPresent(array('Host', 'Name', 'Number of steps', 'Last check', 'Status'));
+		$this->zbxTestTextPresent(['Group', 'Host']);
+		$this->zbxTestTextPresent(['Host', 'Name', 'Number of steps', 'Last check', 'Status']);
 	}
 
 // Check that no real host or template names displayed

@@ -22,24 +22,24 @@
 class C10ItemKeyConverterTest extends PHPUnit_Framework_TestCase {
 
 	public function dataProvider() {
-		$keys = array('tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh');
+		$keys = ['tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh'];
 
-		$data = array();
+		$data = [];
 		foreach ($keys as $key) {
-			$data[] = array($key, 'net.tcp.service['.$key.']');
-			$data[] = array($key.',', 'net.tcp.service['.$key.']');
-			$data[] = array($key.',1', 'net.tcp.service['.$key.',,1]');
-			$data[] = array($key.',{$PORT}', 'net.tcp.service['.$key.',,{$PORT}]');
-			$data[] = array($key.'_perf', 'net.tcp.service.perf['.$key.']');
-			$data[] = array($key.'_perf,', 'net.tcp.service.perf['.$key.']');
-			$data[] = array($key.'_perf,1', 'net.tcp.service.perf['.$key.',,1]');
-			$data[] = array($key.'_perf,{$PORT}', 'net.tcp.service.perf['.$key.',,{$PORT}]');
+			$data[] = [$key, 'net.tcp.service['.$key.']'];
+			$data[] = [$key.',', 'net.tcp.service['.$key.']'];
+			$data[] = [$key.',1', 'net.tcp.service['.$key.',,1]'];
+			$data[] = [$key.',{$PORT}', 'net.tcp.service['.$key.',,{$PORT}]'];
+			$data[] = [$key.'_perf', 'net.tcp.service.perf['.$key.']'];
+			$data[] = [$key.'_perf,', 'net.tcp.service.perf['.$key.']'];
+			$data[] = [$key.'_perf,1', 'net.tcp.service.perf['.$key.',,1]'];
+			$data[] = [$key.'_perf,{$PORT}', 'net.tcp.service.perf['.$key.',,{$PORT}]'];
 		}
 
 		// keys that shouldn't be converted
-		$data[] = array('myitem', 'myitem');
-		$data[] = array('ftp,10,20', 'ftp,10,20');
-		$data[] = array('vfs.fs.size["/var/tmp", pfree]', 'vfs.fs.size["/var/tmp", pfree]');
+		$data[] = ['myitem', 'myitem'];
+		$data[] = ['ftp,10,20', 'ftp,10,20'];
+		$data[] = ['vfs.fs.size["/var/tmp", pfree]', 'vfs.fs.size["/var/tmp", pfree]'];
 
 		return $data;
 	}
