@@ -3829,12 +3829,6 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK) && NULL == ciphersuites_psk)
-	{
-		*error = zbx_strdup(*error, "cannot accept TLS connection with PSK: no valid PSK loaded");
-		goto out;
-	}
-
 	/* set up TLS context */
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(ssl_context));
 	memset(s->tls_ctx, 0, sizeof(ssl_context));
