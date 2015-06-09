@@ -55,11 +55,7 @@ static const char	*get_startup_string(DWORD startup)
 	switch (startup)
 	{
 		case SERVICE_AUTO_START:
-			return "auto";
-		case SERVICE_BOOT_START:
-			return "boot";
-		case SERVICE_SYSTEM_START:
-			return "system";
+			return "automatic";
 		case SERVICE_DEMAND_START:
 			return "manual";
 		case SERVICE_DISABLED:
@@ -175,13 +171,13 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 				if (SUCCEED == check_delayed_start(h_srv))
 				{
 					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 1);
-					zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "auto delayed",
+					zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "automatic delayed",
 							ZBX_JSON_TYPE_STRING);
 				}
 				else
 				{
 					zbx_json_adduint64(&j, "{#SERVICE.STARTUP}", 0);
-					zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "auto",
+					zbx_json_addstring(&j, "{#SERVICE.STARTUPNAME}", "automatic",
 							ZBX_JSON_TYPE_STRING);
 				}
 			}
