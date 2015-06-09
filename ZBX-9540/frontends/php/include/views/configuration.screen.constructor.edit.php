@@ -573,9 +573,10 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 
 	if (zbx_empty($caption) && TIME_TYPE_HOST == $style && $resourceId > 0) {
 		$items = API::Item()->get([
-			'itemids' => $resourceId,
+			'output' => ['itemid', 'hostid', 'key_', 'name'],
 			'selectHosts' => ['name'],
-			'output' => ['itemid', 'hostid', 'key_', 'name']
+			'itemids' => $resourceId,
+			'webitems' => true
 		]);
 
 		if ($items) {
