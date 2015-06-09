@@ -93,7 +93,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	ENUM_SERVICE_STATUS_PROCESS	*ssp = NULL;
 	QUERY_SERVICE_CONFIG		*qsc = NULL;
-	SERVICE_DESCRIPTION		*lpsd = NULL;
+	SERVICE_DESCRIPTION		*scd = NULL;
 	SC_HANDLE			h_mgr;
 	DWORD				sz = 0, szn, i, k, services, resume_handle = 0;
 	char				*utf8;
@@ -140,7 +140,39 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 				continue;
 			}
 
+			QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &sz);
+
+			if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
+						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
+				zbx_free(qsc);
+				CloseServiceHandle(h_srv);
+				continue;
+			}
+
+			scd = (SERVICE_DESCRIPTION *)zbx_malloc(scd, sz);
+
+			if (0 == QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, (LPBYTE)scd, sz, &sz))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
+						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
+				zbx_free(scd);
+				zbx_free(qsc);
+				CloseServiceHandle(h_srv);
+				continue;
+			}
+
 			zbx_json_addobject(&j, NULL);
+
+			if (NULL != scd->lpDescription)
+			{
+				utf8 = zbx_unicode_to_utf8(scd->lpDescription);
+				zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", utf8, ZBX_JSON_TYPE_STRING);
+				zbx_free(utf8);
+			}
+			else
+				zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", "", ZBX_JSON_TYPE_STRING);
 
 			current_state = ssp[i].ServiceStatusProcess.dwCurrentState;
 			for (k = 0; k < ARRSIZE(service_states) && current_state != service_states[k]; k++)
@@ -191,33 +223,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 						ZBX_JSON_TYPE_STRING);
 			}
 
-			QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &sz);
-
-			if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
-						ssp[i].lpServiceName, strerror_from_system(GetLastError()));
-			}
-			else
-			{
-				lpsd = (SERVICE_DESCRIPTION *)zbx_malloc(lpsd, sz);
-
-				if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, (LPBYTE)lpsd, sz, &sz)
-						&& NULL != lpsd->lpDescription)
-				{
-					utf8 = zbx_unicode_to_utf8(lpsd->lpDescription);
-					zbx_json_addstring(&j, "{#SERVICE.DESCRIPTION}", utf8, ZBX_JSON_TYPE_STRING);
-					zbx_free(utf8);
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_DEBUG, "cannot obtain description of service \"%s\": %s",
-							ssp[i].lpServiceName, strerror_from_system(GetLastError()));
-				}
-
-				zbx_free(lpsd);
-			}
-
+			zbx_free(scd);
 			zbx_free(qsc);
 			zbx_json_close(&j);
 			CloseServiceHandle(h_srv);
