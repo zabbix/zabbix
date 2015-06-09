@@ -13,7 +13,7 @@ $lighter-green: #32453a;
 // MAIN
 $main-color: #2d3135;
 $font-color: #f2f2f2;
-$font-alt-color: #768d99;
+$font-alt-color: #737373;//#768d99;
 $body-bg-color: #0e1012;
 
 
@@ -35,13 +35,13 @@ $form-border-color: #4f4f4f;
 $form-border-focus-color: #768d99;
 
 $form-disabled-font-color: #525252;
-$form-disabled-bg-color: transparent;
+$form-disabled-bg-color: #2b2b2b;
 $form-disabled-border-color: #3d3d3d;
 
 
 // BUTTONS
 $btn-font-color: #f2f2f2;
-$btn-bg-color: #768d99;
+$btn-bg-color: #69808d;//#768d99;
 $btn-border-color: #768d99;
 
 $btn-alt-font-color: #768d99;
@@ -122,5 +122,9 @@ $link-main-subnav-visited-color: #bfced7;
 }
 
 .overlay-dialogue {
+	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.5));
+}
+
+.available {
 	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.5));
 }
