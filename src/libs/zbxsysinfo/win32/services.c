@@ -24,7 +24,8 @@
 
 static const DWORD	service_states[7] = {SERVICE_RUNNING, SERVICE_PAUSED, SERVICE_START_PENDING,
 	SERVICE_PAUSE_PENDING, SERVICE_CONTINUE_PENDING, SERVICE_STOP_PENDING, SERVICE_STOPPED};
-static const DWORD	start_types[4] = {SERVICE_AUTO_START, SERVICE_AUTO_START, SERVICE_DEMAND_START, SERVICE_DISABLED};
+static const DWORD	start_types[4] = {SERVICE_AUTO_START, SERVICE_AUTO_START, SERVICE_DEMAND_START,
+	SERVICE_DISABLED};
 
 static const char	*get_state_string(DWORD state)
 {
@@ -118,7 +119,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL == (h_srv = OpenService(h_mgr, ssp[i].lpServiceName, SERVICE_QUERY_CONFIG)))
 				continue;
 
-			QueryServiceConfig(h_srv, qsc, 0, &sz);
+			QueryServiceConfig(h_srv, NULL, 0, &sz);
 
 			if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
 			{
@@ -371,7 +372,7 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		QueryServiceConfig(h_srv, qsc, 0, &sz);
+		QueryServiceConfig(h_srv, NULL, 0, &sz);
 
 		if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
 		{
