@@ -43,7 +43,7 @@ if (!empty($this->data['templates'])) {
 }
 
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $itemFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
