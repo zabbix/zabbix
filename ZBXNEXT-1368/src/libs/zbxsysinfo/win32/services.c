@@ -261,7 +261,7 @@ int	SERVICE_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	QUERY_SERVICE_CONFIG	*qsc = NULL;
-	SERVICE_DESCRIPTION	*lpsd = NULL;
+	SERVICE_DESCRIPTION	*scd = NULL;
 	SERVICE_STATUS		status;
 	SC_HANDLE		h_mgr, h_srv;
 	DWORD			sz = 0;
@@ -340,24 +340,34 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, NULL, 0, &sz);
 
-		if (ERROR_INSUFFICIENT_BUFFER == GetLastError())
+		if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
 		{
-			lpsd = (SERVICE_DESCRIPTION *)zbx_malloc(lpsd, sz);
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service description: %s",
+					strerror_from_system(GetLastError())));
+			CloseServiceHandle(h_srv);
+			CloseServiceHandle(h_mgr);
+			return SYSINFO_RET_FAIL;
+		}
 
-			if (0 != QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, (LPBYTE)lpsd, sz, &sz) &&
-					NULL != lpsd->lpDescription)
-			{
-				SET_STR_RESULT(result, zbx_unicode_to_utf8(lpsd->lpDescription));
-			}
-			else
-				SET_STR_RESULT(result, "empty");
+		scd = (SERVICE_DESCRIPTION *)zbx_malloc(scd, sz);
 
-			zbx_free(lpsd);
+		if (0 == QueryServiceConfig2(h_srv, SERVICE_CONFIG_DESCRIPTION, (LPBYTE)scd, sz, &sz))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain service description: %s",
+					strerror_from_system(GetLastError())));
+			zbx_free(scd);
+			CloseServiceHandle(h_srv);
+			CloseServiceHandle(h_mgr);
+			return SYSINFO_RET_FAIL;
+		}
+		else if (NULL == scd->lpDescription)
+		{
+			SET_TEXT_RESULT(result, zbx_strdup(NULL, ""));
 		}
 		else
-		{
-			SET_STR_RESULT(result, "empty");
-		}
+			SET_TEXT_RESULT(result, zbx_unicode_to_utf8(scd->lpDescription));
+
+		zbx_free(scd);
 	}
 	else
 	{
