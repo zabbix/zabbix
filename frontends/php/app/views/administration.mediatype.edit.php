@@ -53,7 +53,7 @@ $mediaTypeFormList->addRow(_('Type'), $cmbTypeRow);
 
 $mediaTypeFormList->addRow(_('SMTP server'), [
 		new CTextBox('smtp_server', $data['smtp_server'], ZBX_TEXTBOX_STANDARD_SIZE), _('Port'),
-		new CTextBox('smtp_port', $data['smtp_port'], 5)
+		new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false)
 	],
 	$data['type'] != MEDIA_TYPE_EMAIL
 );
