@@ -440,7 +440,7 @@ footer, .footer {
 .table-paging a, .radio-switch {
   display: inline-block;
   margin-left: -1px;
-  padding: 3px 14px;
+  padding: 3px 11px;
   border: 1px solid #acbbc2;
   text-decoration: none;
   color: #0275b8;
@@ -1597,7 +1597,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 .calendar-time {
   text-align: center; }
   .calendar-time input[type="text"] {
-    width: 22px; }
+    width: 32px; }
 
 .calendar-footer {
   margin: 26px 0 0 0;
