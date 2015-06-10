@@ -170,7 +170,8 @@ p {
 
 /* Main Navigation */
 nav {
-	background-color: darken($main-color, 17%);
+	//background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 
 	a {
 
@@ -208,12 +209,14 @@ nav {
 	height: 36px;
 	line-height: 35px;
 	position: relative;
-	background-color: $main-color;
+	//background-color: $main-color;
+	background-color: $main-nav-bg-color;
 }
 
 .top-nav {
 	font-size: $font-top-nav-size;
-	background-color: $main-color;
+	//background-color: $main-color;
+	background-color: $main-nav-bg-color;
 
 	li {
 		display: block;
@@ -235,7 +238,8 @@ nav {
 				line-height: 0;
 				border-left: 7px solid transparent;
 				border-right: 7px solid transparent;
-				border-bottom: 7px solid darken($main-color, 17%);
+				//border-bottom: 7px solid darken($main-color, 17%);
+				border-bottom: 7px solid $main-subnav-bg-color;
 			}
 
 			a, a:hover {
@@ -303,24 +307,24 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -18px;
+		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -18px;
 	}
 
 	.top-nav-print {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -42px;
+		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -42px;
 	}
 
 	.top-nav-profile {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -66px;
+		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -66px;
 	}
 
 	.top-nav-signout {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -91px;
+		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -91px;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		background: $main-color url(../img/icon-sprite.png) no-repeat -41px -138px;
+		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat -41px -138px;
 	    width: auto;
 		padding: 0 12px 0 27px;
 	}
@@ -330,8 +334,8 @@ ul.top-nav-icons {
 	}
 
 	input {
-		background-color: darken($main-color, 5%);
-		border: 1px solid darken($main-color, 6%);
+		background-color: darken($main-nav-bg-color, 5%);
+		border: 1px solid darken($main-nav-bg-color, 6%);
 		width: 198px;
 		margin: 6px 7px 0 0;
 		color: $white;
@@ -340,7 +344,7 @@ ul.top-nav-icons {
 		@include transition(border-color .2s ease-out);
 
 		&:focus {
-			border-color: darken($main-color, 10%);
+			border-color: darken($main-nav-bg-color, 10%);
 			@include opacity(1);
 		}
 
@@ -353,11 +357,13 @@ ul.top-nav-icons {
 .top-subnav-container {
 	height: 36px;
 	line-height: 36px;
-	background-color: darken($main-color, 17%);
+	//background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 }
 
 .top-subnav {
-	background-color: darken($main-color, 17%);
+	//background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 
 	li {
 		display: block;
@@ -385,7 +391,8 @@ ul.top-nav-icons {
 	}
 
 	&.selected {
-		background-color: darken($main-color, 7%);
+		background-color: $main-subnav-bg-selected-color;
+		//background-color: darken($main-color, 7%);
 		color: $link-main-subnav-active-color;
 		@include border-radius(2px);
 	}
@@ -466,8 +473,6 @@ article {
 	.selected {
 		background-color: $ui-bg-color;
 		padding: 4px 9px;
-		//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-		//@include box-shadow(0 0 0 1px $ui-shadow-color);
 		border: 1px solid $ui-border-color;
 		@include border-radius(2px);
 	}
@@ -511,8 +516,6 @@ footer {
 .list-table {
 	width: 100%;
     background-color: $ui-bg-color;
-    //@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-    //@include box-shadow(0 0 0 1px $ui-shadow-color);
     border: 1px solid $ui-border-color;
 	
 	thead th {
@@ -604,9 +607,6 @@ footer {
 	background-color: $ui-bg-color;
 	margin-top: -1px;
 	padding: 7px 5px;
-	//border-top: 1px solid $table-border-color;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	a {
@@ -787,8 +787,6 @@ footer {
 	padding: 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	.table {
@@ -801,7 +799,6 @@ footer {
 
 	.list-table {                                       
 		margin-bottom: -10px;
-		//@include box-shadow(none);
 		border: none;
 
 		thead {
@@ -1051,7 +1048,6 @@ footer {
 	height: 22px;
 	background-color: $form-bg-color;
 	border-color: $form-border-color;
-	cursor: move;
 	@include border-radius(2px);
 	@include transition(background-color .2s ease-out);
 
@@ -1527,7 +1523,7 @@ button {
 }
 
 .btn-search {
-	background: darken($main-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+	background: darken($main-nav-bg-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
 	position: absolute;
 	border: none;
 	top: 7px;
@@ -1563,7 +1559,6 @@ button {
 		border: 1px solid $ui-border-color;
 		border-bottom: none;
 		margin-bottom: -1px;
-		//@include box-shadow(0 -1px 1px 0 $action-shadow-color);
 
 		.arrow-up {
 			position: absolute;
@@ -1681,7 +1676,7 @@ $icon-widget-buttons: (
 }
 
 %btn-search-hover-focus {
-	background-color: darken($main-color, 5%);
+	background-color: darken($main-nav-bg-color, 5%);
 	@include opacity(1);
 }
 
@@ -1749,19 +1744,13 @@ button[disabled] {
 		}
 
 		&.ui-tabs-active {
-			//border-left: 1px solid $table-border-color;
-			//border-right: 1px solid $table-border-color;
 			a {
-				//padding: 8px 13px 11px 13px;
 				padding: 8px 13px 9px 13px;
 				font-weight: bold;
 				background-color: $ui-bg-color;
 				color: $font-color;
 				text-decoration: none;
 				cursor: default;
-				//border-top: 3px solid $primary-blue;
-				//border-top: 3px solid $main-color;
-				//border-bottom: 3px solid $white;
 				border-bottom: 3px solid $main-color;
 			}
 		}
@@ -1806,8 +1795,6 @@ button[disabled] {
 	padding: 20px 28px;
 	vertical-align: top;
 	position: relative;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	h1 {
@@ -1848,7 +1835,6 @@ button[disabled] {
 	overflow-y: auto;
 
 	.list-table {
-		//@include box-shadow(none);
 		border: none;
 	}
 
@@ -1870,15 +1856,30 @@ button[disabled] {
 
 %webkit-scrollbar {
 	&::-webkit-scrollbar {
-		width: 6px;
+		width: 8px;
+	}
 
-	}
 	&::-webkit-scrollbar-track {
-		background-color: $form-disabled-bg-color;
+		background-color: $action-hover-color;
+		@include border-radius(1px);
 	}
+
 	&::-webkit-scrollbar-thumb {
-		background-color: $form-border-color;
+		background-color: $form-bg-color;
+		border: 1px solid $form-border-color;
 		@include border-radius(2px);
+
+		&:hover {
+			background-color: $ui-hover-color;
+		}
+
+		&:focus {
+			background-color: $ui-hover-color;
+		}
+
+		&:active {
+			background-color: $ui-hover-color;
+		}
 	}
 }
 
@@ -1921,8 +1922,6 @@ button[disabled] {
 	width: 322px;
 	margin: 0 auto;
 	padding: 20px 28px 0 28px;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	h1 {
@@ -1983,7 +1982,6 @@ button[disabled] {
 %signin-input {
 	padding: 10px 5px;
 	width: 100%;
-	//@include box-sizing(border-box);
 }
 
 /* Dashboard */
@@ -2005,12 +2003,9 @@ button[disabled] {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background-color: $ui-bg-color;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	.list-table {
-		//@include box-shadow(none);
 		border: none;
 
 		th {
@@ -2189,7 +2184,6 @@ button[disabled] {
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
 	.list-table {
-		//@include box-shadow(none);
 		border: none;
 
 		th {
