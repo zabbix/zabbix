@@ -631,7 +631,7 @@ footer {
 %paging-btn {
 	display: inline-block;
 	margin-left: -1px;
-	padding: 3px 14px;
+	padding: 3px 11px;
 	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $link-color;
@@ -2347,7 +2347,7 @@ button[disabled] {
 	text-align: center;
 
 	input[type="text"] {
-		width: 22px;
+		width: 32px;
 	}
 }
 
