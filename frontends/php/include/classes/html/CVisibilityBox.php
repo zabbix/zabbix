@@ -21,7 +21,7 @@
 
 class CVisibilityBox extends CCheckBox {
 
-	public function __construct($name = 'visibilitybox', $value = 'yes', $object_name = null, $replace_to = null) {
+	public function __construct($name = 'visibilitybox', $object_name = null, $replace_to = null) {
 		if (!is_array($object_name)) {
 			$object_name = [$object_name];
 		}
@@ -35,7 +35,8 @@ class CVisibilityBox extends CCheckBox {
 			}
 			$action .= 'visibility_status_changeds(this.checked, '.zbx_jsvalue($obj_name).', '.zbx_jsvalue($this->replace_to).');';
 		}
-		parent::__construct($name, $value, $action, 1);
+		parent::__construct($name);
+		$this->onClick($action);
 		insert_javascript_for_visibilitybox();
 	}
 

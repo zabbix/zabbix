@@ -251,9 +251,10 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 			}
 		}
 
-		$table = (new CTable(_('No accessible resources')))->
-			addClass('right_table')->
-			addClass('calculated');
+		$table = (new CTable())
+			->setNoDataMessage(_('No accessible resources'))
+			->addClass('right_table')
+			->addClass('calculated');
 		if (!$isHeaderDisplayed) {
 			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')], 'header');
 			$isHeaderDisplayed = true;
@@ -267,18 +268,20 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 	order_result($data, 'name');
 
-	$output = [new CTag('h3', 'yes', $label)];
+	$output = [new CTag('h3', true, $label)];
 
 	foreach ($data as $id => $element) {
 		$element['name'] = nbsp(CHtml::encode($element['name']));
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
-			$link = new CLink($element['name'], null, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN);
-			$link->onClick(CHtml::encode(
-				'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
-				'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
-			));
+			$link = (new CLink($element['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN)
+				->onClick(CHtml::encode(
+					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
+				));
 			$output[] = $link;
 			$output[] = new CSup(SPACE.$element['count']);
 		}
@@ -287,7 +290,9 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 		else {
 			// subfilter has 0 items
 			if ($element['count'] == 0) {
-				$output[] = new CLink($element['name'], null,  ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREY);
+				$output[] = (new CLink($element['name']))
+					->addClass( ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_GREY);
 				$output[] = new CSup(SPACE.$element['count']);
 			}
 			else {
@@ -296,15 +301,16 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					? new CSup(SPACE.'+'.$element['count'])
 					: new CSup(SPACE.$element['count']);
 
-				$link = new CLink($element['name'], null, ZBX_STYLE_LINK_ACTION);
-				$link->onClick(CHtml::encode(
-					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
-					'create_var("zbx_filter", '.
-						CJs::encodeJson($subfilterName.'['.$id.']').', '.
-						CJs::encodeJson($id).', '.
-						'true'.
-					');'
-				));
+				$link = (new CLink($element['name']))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->onClick(CHtml::encode(
+						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+						'create_var("zbx_filter", '.
+							CJs::encodeJson($subfilterName.'['.$id.']').', '.
+							CJs::encodeJson($id).', '.
+							'true'.
+						');'
+					));
 
 				$output[] = $link;
 				$output[] = $nspan;
@@ -372,7 +378,7 @@ function getItemFilterForm(&$items) {
 	// type select
 	$fTypeVisibility = [];
 	$cmbType = new CComboBox('filter_type', $filter_type);
-	$cmbType->setAttribute('id', 'filter_type');
+	$cmbType->setId('filter_type');
 	$cmbType->addItem(-1, _('all'));
 	foreach (['filter_delay_label', 'filter_delay'] as $vItem) {
 		zbx_subarray_push($fTypeVisibility, -1, $vItem);
@@ -444,40 +450,38 @@ function getItemFilterForm(&$items) {
 	}
 
 	// update interval
-	$updateIntervalLabel = new CSpan(_('Update interval (in sec)'));
-	$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
+	$updateIntervalLabel = (new CSpan(_('Update interval (in sec)')))->setId('filter_delay_label');
 
 	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
 
 	// data type
-	$dataTypeLabel = new CSpan(bold(_('Data type').NAME_DELIMITER));
-	$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
+	$dataTypeLabel = (new CSpan(bold(_('Data type').NAME_DELIMITER)))->setId('filter_data_type_label');
 
 	$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);
 	$dataTypeInput->addItem(-1, _('all'));
 	$dataTypeInput->addItems(item_data_type2str());
 
 	// SNMP community
-	$snmpCommunityLabel = new CSpan([bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER]);
-	$snmpCommunityLabel->setAttribute('id', 'filter_snmp_community_label');
+	$snmpCommunityLabel = (new CSpan([bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER]))
+		->setId('filter_snmp_community_label');
 
 	$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// SNMPv3 security name
-	$snmpSecurityLabel = new CSpan([bold(_('Security name')), SPACE._('like').NAME_DELIMITER]);
-	$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
+	$snmpSecurityLabel = (new CSpan([bold(_('Security name')), SPACE._('like').NAME_DELIMITER]))
+		->setId('filter_snmpv3_securityname_label');
 
 	$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// SNMP OID
-	$snmpOidLabel = new CSpan([bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER]);
-	$snmpOidLabel->setAttribute('id', 'filter_snmp_oid_label');
+	$snmpOidLabel = (new CSpan([bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER]))
+		->setId('filter_snmp_oid_label');
 
 	$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
 
 	// port
-	$portLabel = new CSpan([bold(_('Port')), SPACE._('like').NAME_DELIMITER]);
-	$portLabel->setAttribute('id', 'filter_port_label');
+	$portLabel = (new CSpan([bold(_('Port')), SPACE._('like').NAME_DELIMITER]))
+		->setId('filter_port_label');
 
 	$portField = new CNumericBox('filter_port', $filter_port, 5, false, true);
 
@@ -559,14 +563,15 @@ function getItemFilterForm(&$items) {
 	$filterColumn1->addRow(_('Application'),
 		[
 			new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
-			new CButton('btn_app', _('Select'),
-				'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
-					'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-					'&with_applications=1'.
-					'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
-					.', 0, 0, "application");',
-				'button-form'
-			)
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton(null, _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick(
+					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
+						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
+						'&with_applications=1'.
+						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
+						.', 0, 0, "application");')
 		]
 	);
 	$filterColumn2->addRow([$snmpCommunityLabel, $snmpSecurityLabel], [$snmpCommunityField, $snmpSecurityField]);
@@ -604,7 +609,7 @@ function getItemFilterForm(&$items) {
 	$table_subfilter = new CTableInfo();
 	$table_subfilter->addRow(
 		[
-			new CTag('h4', 'yes',
+			new CTag('h4', true,
 				[
 					_('Subfilter').SPACE,
 					new CSpan(_('affects only filtered data'))
@@ -1047,17 +1052,26 @@ function getItemFormData(array $item = [], array $options = []) {
 					}
 					// discovery rule
 					elseif ($data['is_discovery_rule']) {
-						$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// item prototype
 					elseif ($item['discoveryRule']) {
-						$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
 					else {
-						$data['templates'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 				}
@@ -1397,11 +1411,10 @@ function getTriggerFormData($exprAction) {
 					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 				}
 
-				$data['templates'][] = new CLink(
-					CHtml::encode($db_triggers['name']),
-					$link,
-					'highlight underline weight_normal'
-				);
+				$data['templates'][] = (new CLink(CHtml::encode($db_triggers['name']), $link))
+					->addClass('highlight')
+					->addClass('underline')
+					->addClass('weight_normal');
 				$data['templates'][] = SPACE.'&rArr;'.SPACE;
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
@@ -1517,8 +1530,7 @@ function getTriggerFormData($exprAction) {
 }
 
 function get_timeperiod_form() {
-	$tblPeriod = (new CTable())->
-		addClass('formElementTable');
+	$tblPeriod = (new CTable())->addClass('formElementTable');
 
 	// init new_timeperiod variable
 	$new_timeperiod = getRequest('new_timeperiod', []);
@@ -1656,13 +1668,13 @@ function get_timeperiod_form() {
 		$tblPeriod->addRow([_('Every week(s)'), new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2)]);
 
 		$tabDays = new CTable();
-		$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_mo]', $dayofweek[0], null, 1), _('Monday')]);
-		$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_tu]', $dayofweek[1], null, 1), _('Tuesday')]);
-		$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_we]', $dayofweek[2], null, 1), _('Wednesday')]);
-		$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_th]', $dayofweek[3], null, 1), _('Thursday')]);
-		$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_fr]', $dayofweek[4], null, 1), _('Friday')]);
-		$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_sa]', $dayofweek[5], null, 1), _('Saturday')]);
-		$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_su]', $dayofweek[6], null, 1), _('Sunday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')]);
 		$tblPeriod->addRow([_('Day of week'), $tabDays]);
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
@@ -1670,42 +1682,44 @@ function get_timeperiod_form() {
 
 		$tabMonths = new CTable();
 		$tabMonths->addRow([
-			new CCheckBox('new_timeperiod[month_jan]', $month[0], null, 1), _('January'),
+			(new CCheckBox('new_timeperiod[month_jan]'))->setChecked($month[0] == 1), _('January'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_jul]', $month[6], null, 1), _('July')
+			(new CCheckBox('new_timeperiod[month_jul]'))->setChecked($month[6] == 1), _('July')
 		]);
 		$tabMonths->addRow([
-			new CCheckBox('new_timeperiod[month_feb]', $month[1], null, 1), _('February'),
+			(new CCheckBox('new_timeperiod[month_feb]'))->setChecked($month[1] == 1), _('February'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_aug]', $month[7], null, 1), _('August')
+			(new CCheckBox('new_timeperiod[month_aug]'))->setChecked($month[7] == 1), _('August')
 		]);
 		$tabMonths->addRow([
-			new CCheckBox('new_timeperiod[month_mar]', $month[2], null, 1), _('March'),
+			(new CCheckBox('new_timeperiod[month_mar]'))->setChecked($month[2] == 1), _('March'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_sep]', $month[8], null, 1), _('September')
+			(new CCheckBox('new_timeperiod[month_sep]'))->setChecked($month[8] == 1), _('September')
 		]);
 		$tabMonths->addRow([
-			new CCheckBox('new_timeperiod[month_apr]', $month[3], null, 1), _('April'),
+			(new CCheckBox('new_timeperiod[month_apr]'))->setChecked($month[3] == 1), _('April'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_oct]', $month[9], null, 1), _('October')
+			(new CCheckBox('new_timeperiod[month_oct]'))->setChecked($month[9] == 1), _('October')
 		]);
 		$tabMonths->addRow([
-			new CCheckBox('new_timeperiod[month_may]', $month[4], null, 1), _('May'),
+			(new CCheckBox('new_timeperiod[month_may]'))->setChecked($month[4] == 1), _('May'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_nov]', $month[10], null, 1), _('November')
+			(new CCheckBox('new_timeperiod[month_nov]'))->setChecked($month[10] == 1), _('November')
 		]);
 		$tabMonths->addRow([
-			new CCheckBox('new_timeperiod[month_jun]', $month[5], null, 1), _('June'),
+			(new CCheckBox('new_timeperiod[month_jun]'))->setChecked($month[5] == 1), _('June'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_dec]', $month[11], null, 1), _('December')
+			(new CCheckBox('new_timeperiod[month_dec]'))->setChecked($month[11] == 1), _('December')
 		]);
 		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
 		$tblPeriod->addRow([_('Date'), [
-			new CRadioButton('new_timeperiod[month_date_type]', '0', null, null, !$new_timeperiod['month_date_type'], 'submit()'),
+			(new CRadioButton('new_timeperiod[month_date_type]', '0', !$new_timeperiod['month_date_type']))
+				->onChange('submit()'),
 			_('Day'),
 			SPACE,
-			new CRadioButton('new_timeperiod[month_date_type]', '1', null, null, $new_timeperiod['month_date_type'], 'submit()'),
+			(new CRadioButton('new_timeperiod[month_date_type]', '1', $new_timeperiod['month_date_type']))
+				->onChange('submit()'),
 			_('Day of week')]]
 		);
 
@@ -1719,18 +1733,17 @@ function get_timeperiod_form() {
 			$cmbCount->addItem(4, _('Fourth'));
 			$cmbCount->addItem(5, _('Last'));
 
-			$td = (new CCol($cmbCount))->
-				setColSpan(2);
+			$td = (new CCol($cmbCount))->setColSpan(2);
 
 			$tabDays = new CTable();
 			$tabDays->addRow($td);
-			$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_mo]', $dayofweek[0], null, 1), _('Monday')]);
-			$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_tu]', $dayofweek[1], null, 1), _('Tuesday')]);
-			$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_we]', $dayofweek[2], null, 1), _('Wednesday')]);
-			$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_th]', $dayofweek[3], null, 1), _('Thursday')]);
-			$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_fr]', $dayofweek[4], null, 1), _('Friday')]);
-			$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_sa]', $dayofweek[5], null, 1), _('Saturday')]);
-			$tabDays->addRow([new CCheckBox('new_timeperiod[dayofweek_su]', $dayofweek[6], null, 1), _('Sunday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')]);
 			$tblPeriod->addRow([_('Day of week'), $tabDays]);
 		}
 		else {

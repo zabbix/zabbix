@@ -19,12 +19,12 @@
 **/
 
 
-$applicationWidget = (new CWidget())->setTitle(_('Applications'))->
-	addItem(get_header_host_table('applications', $this->data['hostid']));
+$widget = (new CWidget())
+	->setTitle(_('Applications'))
+	->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
 $applicationForm = new CForm();
-$applicationForm->setName('applicationForm');
 $applicationForm->addVar('form', $this->data['form']);
 $applicationForm->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['applicationid'])) {
@@ -62,6 +62,6 @@ else {
 $applicationForm->addItem($applicationTab);
 
 // append form to widget
-$applicationWidget->addItem($applicationForm);
+$widget->addItem($applicationForm);
 
-return $applicationWidget;
+return $widget;

@@ -21,7 +21,7 @@
 
 include('include/views/js/configuration.services.edit.js.php');
 
-$servicesParentWidget = (new CWidget())->setTitle(_('IT service parent'));
+$widget = (new CWidget())->setTitle(_('IT service parent'));
 
 // create form
 $servicesParentForm = new CForm();
@@ -37,13 +37,14 @@ $servicesParentTable->setHeader([_('Service'), _('Status calculation'), _('Trigg
 $prefix = null;
 
 // root
-$description = new CLink(_('root'), '#', null, 'javascript:
-	jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue(_('root')).');
-	jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue(_('root')).');
-	jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue(0).');
-	self.close();
-	return false;'
-);
+$description = (new CLink(_('root'), '#'))
+	->onClick('javascript:
+		jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue(_('root')).');
+		jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue(_('root')).');
+		jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue(0).');
+		self.close();
+		return false;'
+	);
 $servicesParentTable->addRow([
 		[$prefix, $description],
 		_('Note'),
@@ -52,24 +53,28 @@ $servicesParentTable->addRow([
 
 // others
 foreach ($this->data['db_pservices'] as $db_service) {
-	$description = new CSpan($db_service['name'], 'link');
-	$description->setAttribute('onclick', 'javascript:
-		jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
-		jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
-		jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue($db_service['serviceid']).');
-		self.close();
-		return false;'
-	);
+	$description = (new CSpan($db_service['name']))
+		->addClass('link')
+		->onClick('javascript:
+			jQuery(\'#parent_name\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
+			jQuery(\'#parentname\', window.opener.document).val('.zbx_jsvalue($db_service['name']).');
+			jQuery(\'#parentid\', window.opener.document).val('.zbx_jsvalue($db_service['serviceid']).');
+			self.close();
+			return false;'
+		);
 	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorythm($db_service['algorithm']), $db_service['trigger']]);
 }
-$column = new CCol(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
-$column->setAttribute('style', 'text-align:right;');
+$column = new CCol(
+	(new CButton('cancel', _('Cancel')))
+		->onClick('javascript: self.close();')
+		->setAttribute('style', 'text-align:right;')
+);
 $servicesParentTable->setFooter($column);
 
 // append table to form
 $servicesParentForm->addItem($servicesParentTable);
 
 // append form to widget
-$servicesParentWidget->addItem($servicesParentForm);
+$widget->addItem($servicesParentForm);
 
-return $servicesParentWidget;
+return $widget;

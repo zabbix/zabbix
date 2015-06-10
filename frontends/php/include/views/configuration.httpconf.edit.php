@@ -19,11 +19,11 @@
 **/
 
 
-$httpWidget = (new CWidget())->setTitle(_('Web monitoring'));
+$widget = (new CWidget())->setTitle(_('Web monitoring'));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
 
 // create form
@@ -104,7 +104,7 @@ $httpFormList->addRow(_('Variables'), new CTextArea('variables', $this->data['va
 $httpFormList->addRow(_('Headers'), new CTextArea('headers', $this->data['headers']));
 
 // status
-$httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status']));
+$httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
 /*
  * Authentication tab
@@ -130,10 +130,14 @@ $httpAuthenticationFormList->addRow(_('User'), $httpAuthenticationUserTB, $authe
 $httpAuthenticationFormList->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden);
 
 // SSL verify peer checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify peer'), new CCheckBox('verify_peer', $this->data['verify_peer']));
+$httpAuthenticationFormList->addRow(_('SSL verify peer'),
+	(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
+);
 
 // SSL verify host checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify host'), new CCheckBox('verify_host', $this->data['verify_host']));
+$httpAuthenticationFormList->addRow(_('SSL verify host'),
+	(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
+);
 
 // SSL certificate file
 $httpAuthenticationFormList->addRow(
@@ -157,21 +161,21 @@ $httpAuthenticationFormList->addRow(
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
-$stepsTable = (new CTable())->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 500px;')->
-	setAttribute('id', 'httpStepTable');
-
-$stepsTable->setHeader([
-	(new CCol(SPACE))->setWidth('15'),
-	(new CCol(SPACE))->setWidth('15'),
-	(new CCol(_('Name')))->setWidth('150'),
-	(new CCol(_('Timeout')))->setWidth('50'),
-	(new CCol(_('URL')))->setWidth('200'),
-	(new CCol(_('Required')))->setWidth('50'),
-	(new CCol(_('Status codes')))->addClass(ZBX_STYLE_NOWRAP)->setWidth('90'),
-	(new CCol(''))->setWidth('50')
-]);
+$stepsTable = (new CTable())
+	->setAttribute('style', 'min-width: 700px;')
+	->setId('httpStepTable')
+	->setHeader([
+		(new CColHeader(''))->setWidth('15'),
+		(new CColHeader(''))->setWidth('15'),
+		(new CColHeader(_('Name')))->setWidth('150'),
+		(new CColHeader(_('Timeout')))->setWidth('50'),
+		(new CColHeader(_('URL')))->setWidth('200'),
+		(new CColHeader(_('Required')))->setWidth('50'),
+		(new CColHeader(_('Status codes')))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->setWidth('90'),
+		(new CColHeader(''))->setWidth('50')
+	]);
 
 $i = 1;
 foreach ($this->data['steps'] as $stepid => $step) {
@@ -191,19 +195,19 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['required'] = '';
 	}
 
-	$numSpan = (new CSpan($i++.':'))->
-		addClass('rowNum')->
-		setAttribute('id', 'current_step_'.$stepid);
+	$numSpan = (new CSpan($i++.':'))
+		->addClass('rowNum')
+		->setId('current_step_'.$stepid);
 
-	$name = (new CSpan($step['name'], 'link'))->
-		setAttribute('id', 'name_'.$stepid)->
-		setAttribute('name_step', $stepid);
+	$name = (new CSpan($step['name'], 'link'))
+		->setId('name_'.$stepid)
+		->setAttribute('name_step', $stepid);
 
 	if (mb_strlen($step['url']) > 70) {
 		$start = mb_substr($step['url'], 0, 35);
 		$end = mb_substr($step['url'], mb_strlen($step['url']) - 25, 25);
-		$url = new CSpan($start.SPACE.'...'.SPACE.$end);
-		$url->setHint($step['url']);
+		$url = (new CSpan($start.SPACE.'...'.SPACE.$end))
+			->setHint($step['url']);
 	}
 	else {
 		$url = $step['url'];
@@ -211,34 +215,48 @@ foreach ($this->data['steps'] as $stepid => $step) {
 
 	if ($this->data['templated']) {
 		$removeButton = SPACE;
-		$dragHandler = SPACE;
+		$dragHandler = '';
 	}
 	else {
-		$removeButton = new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);', 'link_menu');
-		$removeButton->setAttribute('remove_step', $stepid);
-		$dragHandler = new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move');
+		$removeButton = (new CButton('remove_'.$stepid, _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('javascript: removeStep(this);')
+			->setAttribute('remove_step', $stepid);
+		$dragHandler = (new CCol(
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
 	}
 
-	$row = (new CRow([
-		$dragHandler,
-		$numSpan,
-		$name,
-		$step['timeout'].SPACE._('sec'),
-		$url,
-		htmlspecialchars($step['required']),
-		$step['status_codes'],
-		$removeButton]))->
-			addClass('sortable')->
-			setId('steps_'.$stepid);
-
-	$stepsTable->addRow($row);
+	$stepsTable->addRow(
+		(new CRow([
+			$dragHandler,
+			$numSpan,
+			$name,
+			$step['timeout'].SPACE._('sec'),
+			$url,
+			htmlspecialchars($step['required']),
+			$step['status_codes'],
+			$removeButton
+		]))
+			->addClass('sortable')
+			->setId('steps_'.$stepid)
+	);
 }
 
 if (!$this->data['templated']) {
-	$stepsTable->addRow((new CCol(new CButton('add_step', _('Add'), null, 'link_menu')))->setColSpan(8));
+	$stepsTable->addRow(
+		(new CCol(
+			(new CButton('add_step', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+		))->setColSpan(8)
+	);
 }
 
-$httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$httpStepFormList->addRow(_('Steps'),
+	(new CDiv($stepsTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 // append tabs to form
 $httpTab = new CTabView();
@@ -282,7 +300,7 @@ else {
 }
 
 $httpForm->addItem($httpTab);
-$httpWidget->addItem($httpForm);
+$widget->addItem($httpForm);
 
 $this->data['agentVisibility'] = [];
 zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'agent_other');
@@ -290,4 +308,4 @@ zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'row_agent_ot
 
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
-return $httpWidget;
+return $widget;

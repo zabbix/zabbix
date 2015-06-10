@@ -469,9 +469,7 @@ if (isset($_REQUEST['form'])) {
 	order_result($data['usergroups'], 'name');
 
 	// render view
-	$userGroupsView = new CView('administration.usergroups.edit', $data);
-	$userGroupsView->render();
-	$userGroupsView->show();
+	$view = new CView('administration.usergroups.edit', $data);
 }
 else {
 	$sortField = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
@@ -500,9 +498,10 @@ else {
 	$data['paging'] = getPagingLine($data['usergroups'], $sortOrder);
 
 	// render view
-	$userGroupsView = new CView('administration.usergroups.list', $data);
-	$userGroupsView->render();
-	$userGroupsView->show();
+	$view = new CView('administration.usergroups.list', $data);
 }
+
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

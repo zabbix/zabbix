@@ -639,22 +639,20 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 						}
 
 						if ($functionData['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $functionData['type'] == ITEM_TYPE_HTTPTEST) {
-							$link = new CSpan($functionData['host'].':'.$functionData['key_'], $style);
+							$link = (new CSpan($functionData['host'].':'.$functionData['key_']))->addClass($style);
 						}
 						elseif ($functionData['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-							$link = new CLink(
-								$functionData['host'].':'.$functionData['key_'],
-								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
-									$trigger['discoveryRuleid'],
-								ZBX_STYLE_LINK_ALT.' '.$style
-							);
+							$link = (new CLink($functionData['host'].':'.$functionData['key_'],
+								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].
+								'&parent_discoveryid='.$trigger['discoveryRuleid']))
+								->addClass(ZBX_STYLE_LINK_ALT)
+								->addClass($style);
 						}
 						else {
-							$link = new CLink(
-								$functionData['host'].':'.$functionData['key_'],
-								'items.php?form=update&itemid='.$functionData['itemid'],
-								ZBX_STYLE_LINK_ALT.' '.$style
-							);
+							$link = (new CLink($functionData['host'].':'.$functionData['key_'],
+								'items.php?form=update&itemid='.$functionData['itemid']))
+								->addClass(ZBX_STYLE_LINK_ALT)
+								->addClass($style);
 						}
 
 						$expressionExpanded[] = ['{', $link,'.', bold($functionData['function'].'('), $functionData['parameter'], bold(')'), '}'];
@@ -667,7 +665,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 
 			if ($error) {
 				if ($html) {
-					$expressionExpanded[] = new CSpan('*ERROR*', 'on');
+					$expressionExpanded[] = (new CSpan('*ERROR*'))->addClass('on');
 				}
 				else {
 					$expressionExpanded .= '*ERROR*';
@@ -771,16 +769,16 @@ function triggerExpression($trigger, $html = false) {
 					}
 
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
-						$link = new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_']), $style);
+						$link = (new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_'])))->addClass($style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-							$trigger['discoveryRuleid'], $style);
+							$trigger['discoveryRuleid']))->addClass($style);
 					}
 					else {
-						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
-							'items.php?form=update&itemid='.$function_data['itemid'], $style);
+						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+							'items.php?form=update&itemid='.$function_data['itemid']))->addClass($style);
 					}
 					array_push(
 						$exp,
@@ -1115,7 +1113,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($hostNames as $hostId => $hostName) {
-			$name = new CSpan($hostName, ZBX_STYLE_LINK_ACTION.' link_menu');
+			$name = (new CSpan($hostName))->addClass(ZBX_STYLE_LINK_ACTION);
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
@@ -1466,7 +1464,7 @@ function make_trigger_details($trigger) {
 	$table->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')]);
 	$table->addRow([_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-		? (new CCol(_('No')))->addCLass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))]);
+		? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))]);
 
 	return $table;
 }
@@ -1561,8 +1559,8 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					$expressionId = 'expr_'.$element['id'];
 
 					$url = new CSpan($element['expression'], 'link');
-					$url->setAttribute('id', $expressionId);
-					$url->setAttribute('onclick', 'javascript: copy_expression("'.$expressionId.'");');
+					$url->setId($expressionId);
+					$url->onClick('javascript: copy_expression("'.$expressionId.'");');
 				}
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;

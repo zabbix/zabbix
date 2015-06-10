@@ -45,7 +45,7 @@ class CTabView extends CDiv {
 			$this->setDisabled($data['disabled']);
 		}
 		parent::__construct();
-		$this->setAttribute('id', zbx_formatDomId($this->id));
+		$this->setId(zbx_formatDomId($this->id));
 		$this->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER);
 	}
 
@@ -67,7 +67,7 @@ class CTabView extends CDiv {
 	public function addTab($id, $header, $body) {
 		$this->headers[$id] = $header;
 		$this->tabs[$id] = new CDiv($body);
-		$this->tabs[$id]->setAttribute('id', zbx_formatDomId($id));
+		$this->tabs[$id]->setId(zbx_formatDomId($id));
 	}
 
 	public function setFooter($footer) {
@@ -77,17 +77,18 @@ class CTabView extends CDiv {
 	public function toString($destroy = true) {
 		// No header if we have only one Tab
 		if (count($this->tabs) == 1) {
-			$this->setAttribute('class', ZBX_STYLE_TABLE_FORMS_CONTAINER);
+			$this->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER);
 
 			$tab = reset($this->tabs);
 			$this->addItem($tab);
 		}
 		else {
-			$headersList = new CList([], ZBX_STYLE_TABS_NAV);
+			$headersList = (new CList())->addClass(ZBX_STYLE_TABS_NAV);
 
 			foreach ($this->headers as $id => $header) {
-				$tabLink = new CLink($header, '#'.$id, null, null, false);
-				$tabLink->setAttribute('id', 'tab_'.$id);
+				$tabLink = (new CLink($header, '#'.$id))
+					->removeSID()
+					->setId('tab_'.$id);
 				$headersList->addItem($tabLink);
 			}
 
