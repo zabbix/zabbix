@@ -332,7 +332,7 @@ ul.top-nav-icons {
 	input {
 		background-color: darken($main-color, 5%);
 		border: 1px solid darken($main-color, 6%);
-		width: 167px;
+		width: 198px;
 		margin: 6px 7px 0 0;
 		color: $white;
 		padding: 4px 24px 4px 5px;
@@ -1345,7 +1345,7 @@ input {
 textarea {
 	width: 300px;
 	height: 50px;
-	padding: 5px 0 0 5px;
+	padding: 4px 5px;
 	overflow: auto;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
@@ -1368,6 +1368,7 @@ select {
 	@extend %webkit-scrollbar;
 
 	&.select-multiple {
+		padding: 4px 5px;
 		width: 300px;
 		height: auto;
 	}
@@ -1423,6 +1424,7 @@ legend {
 	color: $font-color;
 	background-color: $form-bg-color;
 	outline: 0;
+	@include box-sizing(border-box);
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
@@ -1732,6 +1734,14 @@ button[disabled] {
 			&:hover {
 				background-color: $ui-hover-color;
 			}
+
+			&:focus {
+				background-color: $ui-hover-color;
+			}
+
+			&:active {
+				background-color: $ui-hover-color;
+			}
 		} 
 
 		&.ui-tabs-active:first-child {
@@ -1973,7 +1983,7 @@ button[disabled] {
 %signin-input {
 	padding: 10px 5px;
 	width: 100%;
-	@include box-sizing(border-box);
+	//@include box-sizing(border-box);
 }
 
 /* Dashboard */
