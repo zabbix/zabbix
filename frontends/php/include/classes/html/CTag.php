@@ -45,22 +45,16 @@ class CTag extends CObject {
 	 */
 	protected $attrEncStrategy = self::ENC_ALL;
 
-	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
+	public function __construct($tagname, $paired = false, $body = null) {
 		parent::__construct();
+
 		$this->attributes = [];
-		$this->dataAttributes = [];
-
-		if (!is_string($tagname)) {
-			return $this->error('Incorrect tagname for CTag "'.$tagname.'".');
-		}
-
 		$this->tagname = $tagname;
 		$this->paired = $paired;
 
 		if (!is_null($body)) {
 			$this->addItem($body);
 		}
-		$this->addClass($class);
 	}
 
 	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
@@ -76,7 +70,7 @@ class CTag extends CObject {
 			$value = $this->encode($value, $strategy);
 			$res .= ' '.$key.'="'.$value.'"';
 		}
-		$res .= ($this->paired === 'yes') ? '>' : ' />';
+		$res .= ($this->paired) ? '>' : ' />';
 
 		return $res;
 	}
@@ -86,7 +80,7 @@ class CTag extends CObject {
 	}
 
 	public function endToString() {
-		$res = ($this->paired === 'yes') ? '</'.$this->tagname.'>' : '';
+		$res = ($this->paired) ? '</'.$this->tagname.'>' : '';
 
 		return $res;
 	}
@@ -249,12 +243,18 @@ class CTag extends CObject {
 
 	public function setTitle($value) {
 		$this->setAttribute('title', $value);
+
+		return $this;
 	}
 
 	public function setId($id) {
 		$this->setAttribute('id', $id);
 
 		return $this;
+	}
+
+	public function getId() {
+		return $this->getAttribute('id');
 	}
 
 	/**

@@ -23,21 +23,18 @@ class CImg extends CTag {
 
 	public $preloader;
 
-	public function __construct($src, $name = null, $width = null, $height = null, $class = null) {
+	public function __construct($src, $name = null, $width = null, $height = null) {
 		if (is_null($name)) {
 			$name = 'image';
 		}
 
-		parent::__construct('img', 'no');
+		parent::__construct('img');
 		$this->setAttribute('border', 0);
 		$this->setName($name);
 		$this->setAltText($name);
 		$this->setSrc($src);
 		$this->setWidth($width);
 		$this->setHeight($height);
-		if ($class !== null) {
-			$this->addClass($class);
-		}
 	}
 
 	public function setSrc($value) {
@@ -93,7 +90,7 @@ class CImg extends CTag {
 		$id = $this->getAttribute('id');
 		if (empty($id)) {
 			$id = 'img'.uniqid();
-			$this->setAttribute('id', $id);
+			$this->setId($id);
 		}
 
 		insert_js(
@@ -106,7 +103,7 @@ class CImg extends CTag {
 		);
 
 		$this->addClass('preloader');
-		$this->setAttribute('id', $id.'preloader');
+		$this->setId($id.'preloader');
 		$this->setAttribute('src', 'styles/themes/'.getUserTheme(CWebUser::$data).'/images/preloader.gif');
 	}
 }

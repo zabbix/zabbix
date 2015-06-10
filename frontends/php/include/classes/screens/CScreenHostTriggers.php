@@ -64,7 +64,7 @@ class CScreenHostTriggers extends CScreenBase {
 			]);
 			$host = reset($hosts);
 
-			$item = new CSpan(_('Host').NAME_DELIMITER.$host['host'], 'white');
+			$item = (new CSpan(_('Host').NAME_DELIMITER.$host['host']))->addClass('white');
 			$params['hostids'] = $host['hostid'];
 		}
 		else {

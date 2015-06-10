@@ -40,7 +40,7 @@ if ($this->data['slideshows']) {
 			'elname' => 'slideshowid',
 			'elid' => $this->data['elementId']
 		])
-		: new CIcon(_('Favourites'), 'iconplus');
+		: (new CIcon(_('Favourites')))->addClass('iconplus');
 
 	$refreshIcon = get_icon('screenconf');
 
@@ -78,7 +78,10 @@ if ($this->data['slideshows']) {
 		$formFilter->addNavigator();
 		$slideshowWidget->addItem($formFilter);
 
-		$slideshowWidget->addItem(new CDiv(new CDiv(null, 'preloader'), null, WIDGET_SLIDESHOW));
+		$slideshowWidget->addItem(
+			(new CDiv((new CDiv())->addClass('preloader')))
+				->setId(WIDGET_SLIDESHOW)
+		);
 	}
 	else {
 		$controls->addItem($favouriteIcon);

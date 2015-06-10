@@ -19,8 +19,9 @@
 **/
 
 
-$screenWidget = (new CWidget())->setTitle(_('Screens'))->
-	addItem((new CFilter('web.screens.filter.state'))->addNavigator());
+$screenWidget = (new CWidget())
+	->setTitle(_('Screens'))
+	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
 // header form
 $headerForm = new CForm();

@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
-$expressionWidget = new CWidget('trigger-popup');
+$expressionWidget = new CWidget();
 
 // create form
 $expressionForm = new CForm();
@@ -40,18 +40,21 @@ $expressionFormList = new CFormList();
 // append item to form list
 $item = [
 	new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, true),
-	new CButton('select', _('Select'), 'return PopUp(\'popup.php?writeonly=1&dstfrm='.$expressionForm->getName().
-		'&dstfld1=itemid&dstfld2=description&submitParent=1'.(!empty($this->data['parent_discoveryid']) ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
-		'button-form'
-	)
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CButton('select', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp(\'popup.php?writeonly=1&dstfrm='.$expressionForm->getName().
+			'&dstfld1=itemid&dstfld2=description&submitParent=1'.(!empty($this->data['parent_discoveryid']) ? '&normal_only=1' : '').
+			'&srctbl=items&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');')
 ];
+
 if (!empty($this->data['parent_discoveryid'])) {
-	$item[] = new CButton('select', _('Select prototype'), 'return PopUp(\'popup.php?dstfrm='.$expressionForm->getName().
-		'&dstfld1=itemid&dstfld2=description&submitParent=1'.url_param('parent_discoveryid', true).
-		'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
-		'button-form'
-	);
+	$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$item[] = (new CButton('select', _('Select prototype')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp(\'popup.php?dstfrm='.$expressionForm->getName().
+			'&dstfld1=itemid&dstfld2=description&submitParent=1'.url_param('parent_discoveryid', true).
+			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');');
 }
 
 $expressionFormList->addRow(_('Item'), $item);

@@ -18,19 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
-
-// create new discovery rule button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$controls = new CList();
-$createForm->addVar('hostid', $this->data['hostid']);
-$controls->addItem(new CSubmit('form', _('Create discovery rule')));
-$createForm->addItem($controls);
-$discoveryWidget->setControls($createForm);
-
-// header
-$discoveryWidget->addItem(get_header_host_table('discoveries', $this->data['hostid']));
+$widget = (new CWidget())
+	->setTitle(_('Discovery rules'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('hostid', $this->data['hostid'])
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	)
+	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
 // create form
 $discoveryForm = new CForm();
@@ -42,8 +37,8 @@ $discoveryTable = new CTableInfo();
 
 $discoveryTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")))->
-		addClass('cell-width'),
+		(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Items'),
 	_('Triggers'),
@@ -63,29 +58,34 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($discovery['templateid']) {
 		$dbTemplate = get_realhost_by_itemid($discovery['templateid']);
 
-		$description[] = new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+		$description[] = (new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
 	// status
-	$status = new CLink(
+	$status = (new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
 		'?hostid='.$_REQUEST['hostid'].
 			'&g_hostdruleid='.$discovery['itemid'].
 			'&action='.($discovery['status'] == ITEM_STATUS_DISABLED
 				? 'discoveryrule.massenable'
 				: 'discoveryrule.massdisable'
-			),
-		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($discovery['status'], $discovery['state'])
-	);
+			))
+		)
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
 	// info
 	if ($data['showInfoColumn']) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($discovery['error'], ZBX_STYLE_RED);
+			$info = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconerror')
+				->setHint($discovery['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';
@@ -105,7 +105,7 @@ foreach ($data['discoveries'] as $discovery) {
 	}
 
 	$discoveryTable->addRow([
-		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
+		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
 		$description,
 		[
 			new CLink(
@@ -160,6 +160,6 @@ $discoveryForm->addItem([
 ]);
 
 // append form to widget
-$discoveryWidget->addItem($discoveryForm);
+$widget->addItem($discoveryForm);
 
-return $discoveryWidget;
+return $widget;

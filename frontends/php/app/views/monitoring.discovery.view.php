@@ -142,17 +142,21 @@ foreach ($data['drules'] as $drule) {
 	foreach ($discovery_info as $ip => $h_data) {
 		$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
 		$row = [
-			$h_data['type'] == 'primary' ? new CSpan($ip.$dns, $h_data['class']) : new CSpan(SPACE.SPACE.$ip.$dns),
+			$h_data['type'] == 'primary'
+				? (new CSpan($ip.$dns))->addClass($h_data['class'])
+				: new CSpan(SPACE.SPACE.$ip.$dns),
 			new CSpan(empty($h_data['host']) ? '' : $h_data['host']),
-			new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
+			(new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 				? ''
-				: convert_units(['value' => time() - $h_data['time'], 'units' => 'uptime'])), $h_data['class'])
+				: convert_units(['value' => time() - $h_data['time'], 'units' => 'uptime'])))
+			)
+				->addClass($h_data['class'])
 		];
 
 		foreach ($data['services'] as $name => $foo) {
 			$class = null;
 			$time = SPACE;
-			$hint = new CDiv(SPACE, $class);
+			$hint = (new CDiv(SPACE))->addClass($class);
 
 			$hintTable = null;
 			if (isset($h_data['services'][$name])) {

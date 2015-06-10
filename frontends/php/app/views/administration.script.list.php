@@ -23,24 +23,22 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$scriptsWidget = (new CWidget())->setTitle(_('Scripts'));
-
-$createForm = new CForm('get');
-$controls = new CList();
-$controls->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'));
-
-$createForm->addItem($controls);
-$scriptsWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Scripts'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
+	);
 
 $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
-$scriptsForm->setAttribute('id', 'scripts');
+$scriptsForm->setId('scripts');
 
 $scriptsTable = new CTableInfo();
 $scriptsTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")))->
-		addClass('cell-width'),
+		(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 	_('Type'),
 	_('Execute on'),
@@ -77,7 +75,7 @@ foreach ($data['scripts'] as $script) {
 	$name = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
 
 	$scriptsTable->addRow([
-		new CCheckBox('scriptids['.$script['scriptid'].']', 'no', null, $script['scriptid']),
+		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$scriptType,
 		$scriptExecuteOn,
@@ -98,4 +96,4 @@ $scriptsForm->addItem([
 ]);
 
 // append form to widget
-$scriptsWidget->addItem($scriptsForm)->show();
+$widget->addItem($scriptsForm)->show();

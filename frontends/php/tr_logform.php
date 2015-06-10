@@ -240,59 +240,60 @@ if (hasRequest('sform')) {
 	}
 
 	$ctb = new CTextBox('item', $itemName, 80);
-	$ctb->setAttribute('id', 'item');
+	$ctb->setId('item');
 	$ctb->setAttribute('disabled', 'disabled');
 
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
 		"&srctbl=items&srcfld1=itemid&srcfld2=name');";
-	$cbtn = new CSubmit('select_item', _('Select'), $script);
+	$cbtn = (new CSubmit('select_item', _('Select')))->onClick($script);
 
 	$frmTRLog->addRow(_('Item'), [$ctb, $cbtn]);
 	$frmTRLog->addVar('itemid', $itemid);
 
 
 	$exp_select = new CComboBox('expr_type');
-	$exp_select->setAttribute('id', 'expr_type');
+	$exp_select->setId('expr_type');
 	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
 	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
 
 	$ctb = new CTextBox('expression', '', 80);
-	$ctb->setAttribute('id', 'logexpr');
+	$ctb->setId('logexpr');
 
-	$cb = new CButton('add_exp', _('Add'), 'javascript: add_logexpr();');
-	$cbAdd = new CButton('add_key_and', _('AND'), 'javascript: add_keyword_and();');
-	$cbOr = new CButton('add_key_or', _('OR'), 'javascript: add_keyword_or();');
-	$cbIregexp = new CCheckBox('iregexp', 'no', null, 1);
+	$cb = (new CButton('add_exp', _('Add')))->onClick('javascript: add_logexpr();');
+	$cbAdd = (new CButton('add_key_and', _('AND')))->onClick('javascript: add_keyword_and();');
+	$cbOr = (new CButton('add_key_or', _('OR')))->onClick('javascript: add_keyword_or();');
+	$cbIregexp = new CCheckBox('iregexp');
 
 	$frmTRLog->addRow(_('Expression'),
 		[$ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb]
 	);
 
-	$keyTable = new CTableInfo();
-	$keyTable->setAttribute('id', 'key_list');
-	$keyTable->setHeader([_('Keyword'), _('Type'), _('Action')]);
+	$keyTable = (new CTableInfo())
+		->setId('key_list')
+		->setHeader([_('Keyword'), _('Type'), _('Action')]);
 
-	$table = new CTableInfo();
-	$table->setAttribute('id', 'exp_list');
-	$table->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
+	$table = (new CTableInfo())
+		->setId('exp_list')
+		->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
 
 	$maxId = 0;
 	foreach ($expressions as $id => $expr) {
 		$imgup = new CImg('images/general/arrow_up.png', 'up', 12, 14);
-		$imgup->setAttribute('onclick', 'javascript: element_up("logtr'.$id.'");');
-		$imgup->setAttribute('onmouseover', 'javascript: this.style.cursor = "pointer";');
+		$imgup->onClick('javascript: element_up("logtr'.$id.'");');
+		$imgup->onMouseover('javascript: this.style.cursor = "pointer";');
 		$imgup->addClass('updown');
 
 		$imgdn = new CImg('images/general/arrow_down.png', 'down', 12, 14);
-		$imgdn->setAttribute('onclick', 'javascript: element_down("logtr'.$id.'");');
-		$imgdn->setAttribute('onmouseover', 'javascript: this.style.cursor = "pointer";');
+		$imgdn->onClick('javascript: element_down("logtr'.$id.'");');
+		$imgdn->onMouseover('javascript: this.style.cursor = "pointer";');
 		$imgdn->addClass('updown');
 
-		$del_url = new CSpan(_('Delete'), 'link');
-		$del_url->setAttribute('onclick', 'javascript:'.
-			' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) remove_expression("logtr'.$id.'");'.
-			' return false;'
-		);
+		$del_url = (new CSpan(_('Delete')))
+			->addClass('link')
+			->onClick('javascript:'.
+				' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) remove_expression("logtr'.$id.'");'.
+				' return false;'
+			);
 
 		$row = new CRow([
 			htmlspecialchars($expr['value']),
@@ -300,7 +301,7 @@ if (hasRequest('sform')) {
 			[$imgup, ' ', $imgdn],
 			$del_url
 		]);
-		$row->setAttribute('id', 'logtr'.$id);
+		$row->setId('logtr'.$id);
 		$table->addRow($row);
 
 		$frmTRLog->addVar('expressions['.$id.'][value]', $expr['value']);
@@ -314,12 +315,13 @@ if (hasRequest('sform')) {
 
 	$maxId = 0;
 	foreach ($keys as $id => $val) {
-		$del_url = new CLink(_('Delete'), '#', 'action', 'javascript:'.
+		$del_url = (new CLink(_('Delete'), '#'))
+			->addClass('action')
+			->onClick('javascript:'.
 			' if (confirm('.CJs::encodeJson(_('Delete keyword?')).')) remove_keyword("keytr'.$id.'");'.
-			' return false;'
-		);
+			' return false;');
 		$row = new CRow([htmlspecialchars($val['value']), $val['type'], $del_url]);
-		$row->setAttribute('id', 'keytr'.$id);
+		$row->setId('keytr'.$id);
 		$keyTable->addRow($row);
 
 		$frmTRLog->addVar('keys['.$id.'][value]', $val['value']);
@@ -347,7 +349,7 @@ if (hasRequest('sform')) {
 	$frmTRLog->addRow(_('Comments'), new CTextArea('comments', $comments));
 	$frmTRLog->addRow(_('URL'), new CTextBox('url', $url, 80));
 	$frmTRLog->addRow(_('Disabled'),
-		new CCheckBox('status', $status == TRIGGER_STATUS_DISABLED ? 'yes' : 'no', null, 1)
+		(new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_DISABLED)
 	);
 	if (hasRequest('triggerid')) {
 		$frmTRLog->addItemToBottomRow(new CSubmit('update', _('Update')));
@@ -356,7 +358,9 @@ if (hasRequest('sform')) {
 		$frmTRLog->addItemToBottomRow(new CSubmit('add', _('Add')));
 	}
 	$frmTRLog->addItemToBottomRow(SPACE);
-	$frmTRLog->addItemToBottomRow(new CButton('cancel', _('Cancel'), 'javascript: self.close();'));
+	$frmTRLog->addItemToBottomRow(
+		(new CButton('cancel', _('Cancel')))->onClick('javascript: self.close();')
+	);
 
 	$frmTRLog->show();
 }

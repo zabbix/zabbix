@@ -50,8 +50,8 @@ $buttons = [
 ];
 
 if ($this->data['isCommentExist']) {
-	$editButton = new CButton('edit', _('Edit'));
-	$editButton->setEnabled($this->data['isTriggerEditable']);
+	$editButton = (new CButton('edit', _('Edit')))
+		->setEnabled($this->data['isTriggerEditable']);
 
 	array_unshift($buttons, $editButton);
 }

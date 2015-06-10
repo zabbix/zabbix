@@ -25,12 +25,11 @@ class CButtonQMessage extends CSubmit {
 	public $msg;
 	public $name;
 
-	public function __construct($name, $caption, $msg = null, $vars = null,
-			$class = 'button-plain shadow ui-corner-all') {
+	public function __construct($name, $caption, $msg = null, $vars = null) {
 		$this->vars = null;
 		$this->msg = null;
 		$this->name = $name;
-		parent::__construct($name, $caption, null, $class);
+		parent::__construct($name, $caption);
 		$this->setMessage($msg);
 		$this->setVars($vars);
 		$this->setAction(null);
@@ -62,7 +61,7 @@ class CButtonQMessage extends CSubmit {
 
 	public function setAction($value = null) {
 		if (!is_null($value)) {
-			return parent::setAttribute('onclick', $value);
+			return parent::onClick($value);
 		}
 
 		global $page;
@@ -76,6 +75,6 @@ class CButtonQMessage extends CSubmit {
 		else {
 			$action = 'true';
 		}
-		return parent::setAttribute('onclick', 'if ('.$confirmation.') { return '.$action.'; } else { return false; }');
+		return parent::onClick('if ('.$confirmation.') { return '.$action.'; } else { return false; }');
 	}
 }
