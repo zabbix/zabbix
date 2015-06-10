@@ -466,7 +466,9 @@ article {
 	.selected {
 		background-color: $ui-bg-color;
 		padding: 4px 9px;
-		@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+		//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+		//@include box-shadow(0 0 0 1px $ui-shadow-color);
+		border: 1px solid $ui-border-color;
 		@include border-radius(2px);
 	}
 
@@ -509,7 +511,9 @@ footer {
 .list-table {
 	width: 100%;
     background-color: $ui-bg-color;
-    @include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+    //@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+    //@include box-shadow(0 0 0 1px $ui-shadow-color);
+    border: 1px solid $ui-border-color;
 	
 	thead th {
 		font-size: $font-h3-size;
@@ -598,9 +602,12 @@ footer {
 .table-paging {
 	text-align: center;
 	background-color: $ui-bg-color;
+	margin-top: -1px;
 	padding: 7px 5px;
-	border-top: 1px solid $table-border-color;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//border-top: 1px solid $table-border-color;
+	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 0 0 1px $ui-shadow-color);
+	border: 1px solid $ui-border-color;
 
 	a {
 		@extend %paging-btn;
@@ -780,7 +787,9 @@ footer {
 	padding: 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 0 0 1px $ui-shadow-color);
+	border: 1px solid $ui-border-color;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
@@ -792,7 +801,8 @@ footer {
 
 	.list-table {                                       
 		margin-bottom: -10px;
-		@include box-shadow(none);
+		//@include box-shadow(none);
+		border: none;
 
 		thead {
 
@@ -957,7 +967,7 @@ footer {
 	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
-	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
+	@include box-shadow(0 6px 10px 0 $action-shadow-color);
 }
 
 .suggest-found {
@@ -1548,8 +1558,10 @@ button {
 	&.filter-active {
 		color: $link-color;
 		background-color: $ui-bg-color;
-		border: none;
-		@include box-shadow(0 -1px 1px 0 rgba(118,141,153,0.08));
+		border: 1px solid $ui-border-color;
+		border-bottom: none;
+		margin-bottom: -1px;
+		//@include box-shadow(0 -1px 1px 0 $action-shadow-color);
 
 		.arrow-up {
 			position: absolute;
@@ -1784,7 +1796,9 @@ button[disabled] {
 	padding: 20px 28px;
 	vertical-align: top;
 	position: relative;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 0 0 1px $ui-shadow-color);
+	border: 1px solid $ui-border-color;
 
 	h1 {
 		border: none;
@@ -1824,7 +1838,8 @@ button[disabled] {
 	overflow-y: auto;
 
 	.list-table {
-		@include box-shadow(none);
+		//@include box-shadow(none);
+		border: none;
 	}
 
 	.table-forms-td-left {
@@ -1896,7 +1911,9 @@ button[disabled] {
 	width: 322px;
 	margin: 0 auto;
 	padding: 20px 28px 0 28px;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 0 0 1px $ui-shadow-color);
+	border: 1px solid $ui-border-color;
 
 	h1 {
 		border: none;
@@ -1978,10 +1995,13 @@ button[disabled] {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background-color: $ui-bg-color;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	//@include box-shadow(0 0 0 1px $ui-shadow-color);
+	border: 1px solid $ui-border-color;
 
 	.list-table {
-		@include box-shadow(none);
+		//@include box-shadow(none);
+		border: none;
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -2053,7 +2073,7 @@ button[disabled] {
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
-	@include box-shadow(0 4px 20px 0 rgba(118,141,153,0.4));
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
 	li {
 		display: block;
@@ -2131,7 +2151,7 @@ button[disabled] {
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-top: none;
-	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
+	@include box-shadow(0 6px 10px 0 $action-shadow-color);
 
 	li {
 		display: block;
@@ -2156,10 +2176,11 @@ button[disabled] {
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
-	@include box-shadow(0 4px 20px 0 rgba(118,141,153,0.4));
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
 	.list-table {
-		@include box-shadow(none);
+		//@include box-shadow(none);
+		border: none;
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -2643,7 +2664,6 @@ td.disaster-bg {
 	background-color: $light-yellow;
 	color: $font-color;
 	border-top: 1px solid $yellow;
-	@include box-shadow(-1px 0 2px 0 rgba(118,141,153,0.15));
 }
 
 .msg-global {

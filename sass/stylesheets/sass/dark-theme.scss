@@ -21,9 +21,11 @@ $body-bg-color: #0e1012;
 $ui-bg-color: #2b2b2b;
 $ui-bg-selected-color: #4f4f4f;
 $ui-hover-color: #333;
+$ui-border-color: #303030;
 
 $action-hover-color: #454545;
 $action-border-color: #383838;
+$action-shadow-color: rgba(0,0,0,0.5);
 
 $table-border-color: #383838;
 
@@ -77,54 +79,3 @@ $link-main-subnav-visited-color: #bfced7;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
-
-.dashbrd-widget {
-	@include box-shadow(0 0 0 1px #303030);
-}
-
-.list-table {
-	@include box-shadow(0 0 0 1px #303030);
-}
-
-.table-paging {
-	@extend %no-shadow;
-}
-
-.table-forms-container {
-	@include box-shadow(0 0 0 1px #303030);
-}
-
-.setup-container {
-	@include box-shadow(0 0 0 1px #303030);
-}
-
-.signin-container {
-	@include box-shadow(0 0 0 1px #303030);
-}
-
-.object-group {
-
-	.selected {
-		@include box-shadow(0 0 0 1px #303030);
-	}
-}
-
-%no-shadow {
-	@include box-shadow(none);
-}
-
-.search-suggest {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.5));
-}
-
-.action-menu {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.5));
-}
-
-.overlay-dialogue {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.5));
-}
-
-.available {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.5));
-}
