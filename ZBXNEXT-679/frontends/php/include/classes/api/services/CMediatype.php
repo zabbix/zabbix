@@ -229,8 +229,8 @@ class CMediatype extends CApiService {
 
 			if ($mediatype['type'] == MEDIA_TYPE_EMAIL && isset($mediatype['smtp_port'])
 					&& !validatePortNumber($mediatype['smtp_port'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect media type port "%s" provided.',
-					$mediatype['port']
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect media type port "%1$s" provided.',
+					$mediatype['smtp_port']
 				));
 			}
 		}
