@@ -19,7 +19,7 @@
 **/
 
 
-$userGroupWidget = (new CWidget())->setTitle(_('User groups'));
+$widget = (new CWidget())->setTitle(_('User groups'));
 
 // create form
 $userGroupForm = new CForm();
@@ -168,7 +168,7 @@ else {
 
 // append tab to form
 $userGroupForm->addItem($userGroupTab);
-// append form to widget
-$userGroupWidget->addItem($userGroupForm);
 
-return $userGroupWidget;
+$widget->addItem($userGroupForm);
+
+return $widget;

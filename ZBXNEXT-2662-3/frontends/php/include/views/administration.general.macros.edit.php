@@ -21,31 +21,12 @@
 
 require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Macros'));
-
-$header_form = (new CForm())->cleanItems();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.macros.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-
-$header_form->addItem($controls);
-
-$widget->setControls($header_form);
+$widget = (new CWidget())
+	->setTitle(_('Macros'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.macros.php')))
+	);
 
 $table = (new CTable())
 	->addClass('formElementTable')

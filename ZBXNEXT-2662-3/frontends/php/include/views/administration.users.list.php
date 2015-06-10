@@ -18,23 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$usersWidget = (new CWidget())->setTitle(_('Users'));
-
-// append page header to widget
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$controls = new CList();
 $userGroupComboBox = new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()');
 $userGroupComboBox->addItem(0, _('All'));
 
 foreach ($this->data['userGroups'] as $userGroup) {
 	$userGroupComboBox->addItem($userGroup['usrgrpid'], $userGroup['name']);
 }
-$controls->addItem([_('User group').SPACE, $userGroupComboBox]);
-$controls->addItem(new CSubmit('form', _('Create user')));
 
-$createForm->addItem($controls);
-$usersWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Users'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('User group'), SPACE, $userGroupComboBox])
+			->addItem(new CSubmit('form', _('Create user')))
+		)
+	);
 
 // create form
 $usersForm = new CForm();
@@ -159,6 +158,6 @@ $usersForm->addItem([
 ]);
 
 // append form to widget
-$usersWidget->addItem($usersForm);
+$widget->addItem($usersForm);
 
-return $usersWidget;
+return $widget;

@@ -19,6 +19,13 @@
 **/
 
 
+$widget = (new CWidget())
+	->setTitle(_('Other configuration parameters'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.other.php')))
+	);
+
 $otherTab = new CFormList();
 
 $discoveryGroup = new CComboBox('discovery_groupid', $data['discovery_groupid']);
@@ -49,4 +56,6 @@ $otherForm->setName('otherForm');
 $otherView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 $otherForm->addItem($otherView);
 
-return $otherForm;
+$widget->addItem($otherForm);
+
+return $widget;

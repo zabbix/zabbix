@@ -18,15 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$userGroupsWidget = (new CWidget())->setTitle(_('User groups'));
-
-// append page header to widget
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create user group')));
-$createForm->addItem($controls);
-$userGroupsWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('User groups'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create user group'))))
+	);
 
 // create form
 $userGroupsForm = new CForm();
@@ -149,6 +146,6 @@ $userGroupsForm->addItem([
 ]);
 
 // append form to widget
-$userGroupsWidget->addItem($userGroupsForm);
+$widget->addItem($userGroupsForm);
 
-return $userGroupsWidget;
+return $widget;

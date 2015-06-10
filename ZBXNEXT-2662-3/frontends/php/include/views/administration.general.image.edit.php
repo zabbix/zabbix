@@ -18,6 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$widget = (new CWidget())
+	->setTitle(_('Images'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.images.php')))
+	);
 
 $imageForm = new CForm('post', null, 'multipart/form-data');
 $imageForm->setName('imageForm');
@@ -66,4 +72,6 @@ else {
 
 $imageForm->addItem($imageTab);
 
-return $imageForm;
+$widget->addItem($imageForm);
+
+return $widget;

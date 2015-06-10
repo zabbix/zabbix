@@ -21,6 +21,13 @@
 
 include('include/views/js/administration.general.valuemapping.edit.js.php');
 
+$widget = (new CWidget())
+	->setTitle(_('Value mapping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
+	);
+
 $valueMappingForm = new CForm();
 $valueMappingForm->setName('valueMappingForm');
 $valueMappingForm->addVar('form', $this->data['form']);
@@ -81,4 +88,6 @@ else {
 
 $valueMappingForm->addItem($valueMappingTab);
 
-return $valueMappingForm;
+$widget->addItem($valueMappingForm);
+
+return $widget;

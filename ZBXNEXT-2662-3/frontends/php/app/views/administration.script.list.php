@@ -23,14 +23,12 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$scriptsWidget = (new CWidget())->setTitle(_('Scripts'));
-
-$createForm = new CForm('get');
-$controls = new CList();
-$controls->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'));
-
-$createForm->addItem($controls);
-$scriptsWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Scripts'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
+	);
 
 $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
@@ -98,4 +96,4 @@ $scriptsForm->addItem([
 ]);
 
 // append form to widget
-$scriptsWidget->addItem($scriptsForm)->show();
+$widget->addItem($scriptsForm)->show();

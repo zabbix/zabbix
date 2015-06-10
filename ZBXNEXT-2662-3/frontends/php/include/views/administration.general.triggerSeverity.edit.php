@@ -21,6 +21,13 @@
 
 include('include/views/js/administration.general.triggerSeverity.js.php');
 
+$widget = (new CWidget())
+	->setTitle(_('Trigger severities'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerseverities.php')))
+	);
+
 $severityTab = new CFormList();
 
 $headerDiv = (new CDiv(_('Custom severity')))
@@ -78,4 +85,6 @@ $severityView->setFooter(makeFormFooter(
 ));
 $severityForm->addItem($severityView);
 
-return $severityForm;
+$widget->addItem($severityForm);
+
+return $widget;

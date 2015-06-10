@@ -20,19 +20,6 @@
 
 zbx_add_post_js('jqBlink.blink();');
 
-$overviewWidget = (new CWidget())->setTitle(_('Overview'));
-
-$typeComboBox = new CComboBox('type', $this->data['type'], 'submit()', [
-	SHOW_TRIGGERS => _('Triggers'),
-	SHOW_DATA => _('Data')
-]);
-
-$headerForm = new CForm('get');
-$controls = new CList();
-
-$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
-$controls->addItem([_('Type').SPACE, $typeComboBox]);
-
 // hint table
 $hintTable = new CTableInfo();
 $hintTable->addRow([(new CCol(SPACE))->addClass('normal'), _('OK')]);
@@ -63,22 +50,28 @@ if ($this->data['config']['blink_period'] > 0) {
 
 $hintTable->addRow([new CCol(SPACE), _('No trigger')]);
 
-// header left
-$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()', [
-	STYLE_TOP => _('Top'),
-	STYLE_LEFT => _('Left')
-]);
-
-$controls->addItem([_('Hosts location').SPACE, $styleComboBox]);
-
 // header right
 $help = get_icon('overviewhelp');
 $help->setHint($hintTable);
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-$controls->addItem($help);
 
-$headerForm->addItem($controls);
-$overviewWidget->setControls($headerForm);
+$widget = (new CWidget())
+	->setTitle(_('Overview'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem([_('Type'), SPACE, new CComboBox('type', $this->data['type'], 'submit()', [
+				SHOW_TRIGGERS => _('Triggers'),
+				SHOW_DATA => _('Data')
+			])])
+			->addItem([_('Hosts location'), SPACE, new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+				STYLE_TOP => _('Top'),
+				STYLE_LEFT => _('Left')
+			])])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+			->addItem($help)
+		)
+	);
 
 // filter
 $filter = $this->data['filter'];
@@ -102,7 +95,7 @@ $filterFormView = new CView('common.filter.trigger', [
 ]);
 $filterForm = $filterFormView->render();
 
-$overviewWidget->addItem($filterForm);
+$widget->addItem($filterForm);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
@@ -116,6 +109,6 @@ else {
 	$dataTable = new CTableInfo();
 }
 
-$overviewWidget->addItem($dataTable);
+$widget->addItem($dataTable);
 
-return $overviewWidget;
+return $widget;

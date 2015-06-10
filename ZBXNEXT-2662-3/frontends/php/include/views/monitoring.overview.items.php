@@ -19,17 +19,6 @@
 **/
 
 
-$overviewWidget = (new CWidget())->setTitle(_('Overview'));
-
-$headerForm = new CForm('get');
-
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
-$controls->addItem([_('Type').SPACE, new CComboBox('type', $this->data['type'], 'submit()', [
-	SHOW_TRIGGERS => _('Triggers'),
-	SHOW_DATA => _('Data')
-])]);
-
 // hint table
 $hintTable = new CTableInfo();
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
@@ -37,23 +26,28 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 $hintTable->addRow([new CCol(SPACE), _('OK or no trigger')]);
 
-// header left
-$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()', [
-	STYLE_TOP => _('Top'),
-	STYLE_LEFT => _('Left')
-]);
-
-$controls->addItem([_('Hosts location').SPACE, $styleComboBox]);
-
 // header right
 $help = get_icon('overviewhelp');
 $help->setHint($hintTable);
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
-$controls->addItem($help);
 
-$headerForm->addItem($controls);
-
-$overviewWidget->setControls($headerForm);
+$widget = (new CWidget())
+	->setTitle(_('Overview'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem([_('Type'), SPACE, new CComboBox('type', $this->data['type'], 'submit()', [
+				SHOW_TRIGGERS => _('Triggers'),
+				SHOW_DATA => _('Data')
+			])])
+			->addItem([_('Hosts location'), SPACE, new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+				STYLE_TOP => _('Top'),
+				STYLE_LEFT => _('Left')
+			])])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+			->addItem($help)
+		)
+	);
 
 // filter
 $filter = new CFilter('web.overview.filter.state');
@@ -75,7 +69,7 @@ $column->addRow(_('Filter by application'), [
 
 $filter->addColumn($column);
 
-$overviewWidget->addItem($filter);
+$widget->addItem($filter);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
@@ -87,6 +81,6 @@ else {
 	$dataTable = new CTableInfo();
 }
 
-$overviewWidget->addItem($dataTable);
+$widget->addItem($dataTable);
 
-return $overviewWidget;
+return $widget;

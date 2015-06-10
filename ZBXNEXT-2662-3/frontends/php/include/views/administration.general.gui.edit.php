@@ -21,6 +21,13 @@
 
 require_once dirname(__FILE__).'/js/administration.general.gui.php';
 
+$widget = (new CWidget())
+	->setTitle(_('GUI'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.gui.php')))
+	);
+
 $guiTab = new CFormList();
 $guiTab->addRow(_('Default theme'), new CComboBox('default_theme', $data['default_theme'], null, Z::getThemes()));
 $guiTab->addRow(_('Dropdown first entry'), [
@@ -61,4 +68,6 @@ $guiView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
 $guiForm->addItem($guiView);
 
-return $guiForm;
+$widget->addItem($guiForm);
+
+return $widget;

@@ -19,7 +19,7 @@
 **/
 
 
-$authenticationWidget = (new CWidget())->setTitle(_('Authentication'));
+$widget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
 $authenticationForm = new CForm();
@@ -140,6 +140,6 @@ else {
 $authenticationForm->addItem($authenticationTab);
 
 // append form to widget
-$authenticationWidget->addItem($authenticationForm);
+$widget->addItem($authenticationForm);
 
-return $authenticationWidget;
+return $widget;

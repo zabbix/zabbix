@@ -21,7 +21,7 @@
 
 $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
-$proxyWidget = (new CWidget())->setTitle(_('Proxies'));
+$widget = (new CWidget())->setTitle(_('Proxies'));
 
 // create form
 $proxyForm = new CForm();
@@ -121,4 +121,4 @@ else {
 }
 
 $proxyForm->addItem($proxyTab);
-$proxyWidget->addItem($proxyForm)->show();
+$widget->addItem($proxyForm)->show();

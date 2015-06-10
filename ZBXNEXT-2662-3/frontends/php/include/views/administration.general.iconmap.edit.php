@@ -21,6 +21,13 @@
 
 include('include/views/js/administration.general.iconmap.js.php');
 
+$widget = (new CWidget())
+	->setTitle(_('Icon mapping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php')))
+	);
+
 $iconMapTab = new CFormList();
 
 $name = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
@@ -140,4 +147,6 @@ else {
 
 $iconMapForm->addItem($iconMapView);
 
-return $iconMapForm;
+$widget->addItem($iconMapForm);
+
+return $widget;
