@@ -232,7 +232,7 @@ ul.top-nav-icons {
   ul.top-nav-icons input {
     background-color: #02659f;
     border: 1px solid #02629a;
-    width: 167px;
+    width: 198px;
     margin: 6px 7px 0 0;
     color: #fff;
     padding: 4px 24px 4px 5px;
@@ -899,7 +899,7 @@ input[readonly] {
 textarea {
   width: 300px;
   height: 50px;
-  padding: 5px 0 0 5px;
+  padding: 4px 5px;
   overflow: auto; }
   textarea[readonly] {
     color: #1f2c33 !important;
@@ -909,6 +909,7 @@ select {
   padding: 3px 3px 3px 0;
   background-color: #fff; }
   select.select-multiple {
+    padding: 4px 5px;
     width: 300px;
     height: auto; }
   select[readonly] {
@@ -950,6 +951,9 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
   color: #1f2c33;
   background-color: #fff;
   outline: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
   -webkit-transition: border-color 0.2s ease-out;
   -moz-transition: border-color 0.2s ease-out;
   transition: border-color 0.2s ease-out; }
@@ -1201,6 +1205,10 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
       transition: background-color 0.2s ease-out; }
       .ui-tabs-nav li a:hover {
         background-color: #eef7ff; }
+      .ui-tabs-nav li a:focus {
+        background-color: #eef7ff; }
+      .ui-tabs-nav li a:active {
+        background-color: #eef7ff; }
     .ui-tabs-nav li.ui-tabs-active:first-child {
       border-left: 0; }
     .ui-tabs-nav li.ui-tabs-active a {
@@ -1357,10 +1365,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 
 .signin-container input[type="text"], .signin-container input[type="password"] {
   padding: 10px 5px;
-  width: 100%;
-  -webkit-box-sizing: border-box;
-  -moz-box-sizing: border-box;
-  box-sizing: border-box; }
+  width: 100%; }
 
 /* Dashboard */
 .widget-placeholder .cell {

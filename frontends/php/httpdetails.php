@@ -109,15 +109,18 @@ $itemHistory = Manager::History()->getLast($items);
 /*
  * Display
  */
-$httpdetailsWidget = (new CWidget())
+$widget = (new CWidget())
 	->setTitle(
-		_('DETAILS OF WEB SCENARIO').':'.SPACE.
+		_('DETAILS OF WEB SCENARIO').': '.
 		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
+	)
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+		)
 	);
-$controls = new CList();
-$controls->addItem(get_icon('reset', ['id' => getRequest('httptestid')]));
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]));
-$httpdetailsWidget->setControls($controls);
 
 // append table to widget
 $httpdetailsTable = new CTableInfo();
@@ -242,7 +245,7 @@ $httpdetailsTable->addRow([
 	(new CSpan($status['msg']))->addClass($status['style'])->addClass('bold')
 ]);
 
-$httpdetailsWidget->addItem($httpdetailsTable)->show();
+$widget->addItem($httpdetailsTable)->show();
 
 echo BR();
 
