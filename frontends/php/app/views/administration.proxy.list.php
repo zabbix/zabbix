@@ -23,12 +23,12 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$proxyWidget = (new CWidget())->setTitle(_('Proxies'));
-
-// create new proxy button
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addItem((new CList())->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit')));
-$proxyWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Proxies'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(new CRedirectButton(_('Create proxy'), 'zabbix.php?action=proxy.edit')))
+	);
 
 // create form
 $proxyForm = new CForm('get');
@@ -111,4 +111,4 @@ $proxyForm->addItem([
 ]);
 
 // append form to widget
-$proxyWidget->addItem($proxyForm)->show();
+$widget->addItem($proxyForm)->show();

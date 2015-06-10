@@ -21,6 +21,13 @@
 
 include('include/views/js/administration.general.triggerDisplayOptions.js.php');
 
+$widget = (new CWidget())
+	->setTitle(_('Trigger displaying options'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php')))
+	);
+
 $triggerDOFormList = new CFormList();
 
 $headerDiv = (new CDiv(_('Colour')))
@@ -102,4 +109,6 @@ $severityView->setFooter(makeFormFooter(
 
 $severityForm->addItem($severityView);
 
-return $severityForm;
+$widget->addItem($severityForm);
+
+return $widget;

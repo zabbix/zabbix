@@ -21,6 +21,13 @@
 
 require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.php';
 
+$widget = (new CWidget())
+	->setTitle(_('Housekeeping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.housekeeper.php')))
+	);
+
 $houseKeeperTab = new CFormList();
 
 // events and alerts
@@ -159,4 +166,6 @@ $houseKeeperView->setFooter(makeFormFooter(
 
 $houseKeeperForm->addItem($houseKeeperView);
 
-return $houseKeeperForm;
+$widget->addItem($houseKeeperForm);
+
+return $widget;

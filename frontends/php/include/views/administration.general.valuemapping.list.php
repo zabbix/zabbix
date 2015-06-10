@@ -19,6 +19,16 @@
 **/
 
 
+$widget = (new CWidget())
+	->setTitle(_('Value mapping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
+			->addItem(new CSubmit('form', _('Create value map')))
+		)
+	);
+
 $valueMappingTable = new CTableInfo();
 $valueMappingTable->setHeader([
 	_('Name'),
@@ -39,4 +49,6 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 	]);
 }
 
-return $valueMappingTable;
+$widget->addItem($valueMappingTable);
+
+return $widget;

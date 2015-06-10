@@ -19,6 +19,19 @@
 **/
 
 
+$widget = (new CWidget())
+	->setTitle(_('Images'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addVar('imagetype', $data['imagetype'])
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.images.php'))
+			->addItem(
+				new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background'))
+			)
+		)
+	);
+
 // header
 $imageComboBoxForm = new CForm();
 $imageComboBoxForm->addItem(_('Type').SPACE);
@@ -26,7 +39,6 @@ $imageComboBoxForm->addItem(new CComboBox('imagetype', $this->data['imagetype'],
 	IMAGE_TYPE_ICON => _('Icon'),
 	IMAGE_TYPE_BACKGROUND => _('Background')
 ]));
-$this->data['widget']->addHeader(_('Images'), $imageComboBoxForm);
 
 // form
 $imageForm = new CForm();
@@ -69,4 +81,6 @@ if ($count > 0) {
 
 $imageForm->addItem($imageTable);
 
-return $imageForm;
+$widget->addItem($imageForm);
+
+return $widget;

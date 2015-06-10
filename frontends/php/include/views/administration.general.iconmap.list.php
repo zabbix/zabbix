@@ -18,6 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$widget = (new CWidget())
+	->setTitle(_('Icon mapping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php'))
+			->addItem(new CSubmit('form', _('Create icon map')))
+		)
+	);
 
 $iconMapTable = new CTableInfo();
 $iconMapTable->setHeader([
@@ -40,4 +49,6 @@ foreach ($this->data['iconmaps'] as $iconMap) {
 	]);
 }
 
-return $iconMapTable;
+$widget->addItem($iconMapTable);
+
+return $widget;

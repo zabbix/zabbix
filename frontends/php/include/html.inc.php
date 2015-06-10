@@ -711,3 +711,27 @@ function makePageFooter($with_logo = true, $with_version = true)
 			->setAttribute('target', '_blank')
 	]))->addClass(ZBX_STYLE_FOOTER);
 }
+
+/**
+ * Renders a drop-down menu for the Administration->General section.
+ *
+ * @param string $selected
+ *
+ * @return CComboBox
+ */
+function makeAdministrationGeneralMenu($selected)
+{
+	return new CComboBox('configDropDown', $selected, 'redirect(this.options[this.selectedIndex].value);', [
+		'adm.gui.php' => _('GUI'),
+		'adm.housekeeper.php' => _('Housekeeping'),
+		'adm.images.php' => _('Images'),
+		'adm.iconmapping.php' => _('Icon mapping'),
+		'adm.regexps.php' => _('Regular expressions'),
+		'adm.macros.php' => _('Macros'),
+		'adm.valuemapping.php' => _('Value mapping'),
+		'adm.workingtime.php' => _('Working time'),
+		'adm.triggerseverities.php' => _('Trigger severities'),
+		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
+		'adm.other.php' => _('Other')
+	]);
+}
