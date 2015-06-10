@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.slideconf.edit.js.php';
 
-$slideWidget = (new CWidget())->setTitle(_('Slide shows'));
+$widget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create form
 $slideForm = new CForm();
@@ -125,6 +125,6 @@ else {
 }
 
 $slideForm->addItem($slideTab);
-$slideWidget->addItem($slideForm);
+$widget->addItem($slideForm);
 
-return $slideWidget;
+return $widget;

@@ -19,11 +19,11 @@
 **/
 
 
-$httpWidget = (new CWidget())->setTitle(_('Web monitoring'));
+$widget = (new CWidget())->setTitle(_('Web monitoring'));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
 
 // create form
@@ -300,7 +300,7 @@ else {
 }
 
 $httpForm->addItem($httpTab);
-$httpWidget->addItem($httpForm);
+$widget->addItem($httpForm);
 
 $this->data['agentVisibility'] = [];
 zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'agent_other');
@@ -308,4 +308,4 @@ zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'row_agent_ot
 
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
-return $httpWidget;
+return $widget;

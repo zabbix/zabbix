@@ -341,21 +341,14 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 	if ($is_template) {
 		$list->addItem([
-			new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid'))
-		]);
-		$list->addItem((new CSpan())->addClass('arrow-right'));
-
-		$list->addItem([
-			bold(_('Template').NAME_DELIMITER),
+			new CLink(_('All templates'), 'templates.php?templateid='.$db_host['templateid'].url_param('groupid')),
+			' / ',
 			new CLink($db_host['name'], 'templates.php?form=update&templateid='.$db_host['templateid'])
 		]);
 
 		$db_host['hostid'] = $db_host['templateid'];
 	}
 	else {
-		$list->addItem([new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid'))]);
-		$list->addItem((new CSpan())->addClass('arrow-right'));
-
 		$proxy_name = '';
 
 		if ($db_host['proxy_hostid'] != 0) {
@@ -387,7 +380,8 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		}
 
 		$list->addItem([
-			bold(_('Host').NAME_DELIMITER),
+			new CLink(_('All hosts'), 'hosts.php?hostid='.$db_host['hostid'].url_param('groupid')),
+			' / ',
 			new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid'])
 		]);
 		$list->addItem($status);
@@ -399,70 +393,81 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 	 */
 	if ($lld_ruleid == 0) {
 		// applications
-		$link = new CLink(_('Applications'), 'applications.php?hostid='.$db_host['hostid']);
+		$applications = new CSpan([
+			new CLink(_('Applications'), 'applications.php?hostid='.$db_host['hostid']),
+			CViewHelper::showNum($db_host['applications'])
+		]);
 		if ($current_element == 'applications') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$applications->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_host['applications'])]);
+		$list->addItem($applications);
 
 		// items
-		$link = new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$db_host['hostid']);
+		$items = new CSpan([
+			new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$db_host['hostid']),
+			CViewHelper::showNum($db_host['items'])
+		]);
 		if ($current_element == 'items') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$items->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_host['items'])]);
+		$list->addItem($items);
 
 		// triggers
-		$link = new CLink(_('Triggers'), 'triggers.php?hostid='.$db_host['hostid']);
+		$triggers = new CSpan([
+			new CLink(_('Triggers'), 'triggers.php?hostid='.$db_host['hostid']),
+			CViewHelper::showNum($db_host['triggers'])
+		]);
 		if ($current_element == 'triggers') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$triggers->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_host['triggers'])]);
+		$list->addItem($triggers);
 
 		// graphs
-		$link = new CLink(_('Graphs'), 'graphs.php?hostid='.$db_host['hostid']);
+		$graphs = new CSpan([
+			new CLink(_('Graphs'), 'graphs.php?hostid='.$db_host['hostid']),
+			CViewHelper::showNum($db_host['graphs'])
+		]);
 		if ($current_element == 'graphs') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$graphs->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_host['graphs'])]);
+		$list->addItem($graphs);
 
 		// screens
 		if ($is_template) {
-			$link = new CLink(_('Screens'), 'screenconf.php?templateid='.$db_host['hostid']);
+			$screens = new CSpan([
+				new CLink(_('Screens'), 'screenconf.php?templateid='.$db_host['hostid']),
+				CViewHelper::showNum($db_host['screens'])
+			]);
 			if ($current_element == 'screens') {
-				$link->addClass(ZBX_STYLE_SELECTED);
+				$screens->addClass(ZBX_STYLE_SELECTED);
 			}
-
-			$list->addItem([$link, CViewHelper::showNum($db_host['screens'])]);
+			$list->addItem($screens);
 		}
 
 		// discovery rules
-		$link = new CLink(_('Discovery rules'), 'host_discovery.php?hostid='.$db_host['hostid']);
+		$lld_rules = new CSpan([
+			new CLink(_('Discovery rules'), 'host_discovery.php?hostid='.$db_host['hostid']),
+			CViewHelper::showNum($db_host['discoveries'])
+		]);
 		if ($current_element == 'discoveries') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$lld_rules->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_host['discoveries'])]);
+		$list->addItem($lld_rules);
 
 		// web scenarios
-		$link = new CLink(_('Web scenarios'), 'httpconf.php?hostid='.$db_host['hostid']);
+		$http_tests = new CSpan([
+			new CLink(_('Web scenarios'), 'httpconf.php?hostid='.$db_host['hostid']),
+			CViewHelper::showNum($db_host['httpTests'])
+		]);
 		if ($current_element == 'web') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$http_tests->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_host['httpTests'])]);
+		$list->addItem($http_tests);
 	}
 	else {
 		$list->addItem([
-			'&laquo; ',
-			new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'].url_param('groupid'))
-		]);
-		$list->addItem([
-			bold(_('Discovery').NAME_DELIMITER),
+			new CLink(_('Discovery list'), 'host_discovery.php?hostid='.$db_host['hostid'].url_param('groupid')),
+			' / ',
 			new CLink(
 				CHtml::encode($db_discovery_rule['name']),
 				'host_discovery.php?form=update&itemid='.$db_discovery_rule['itemid']
@@ -470,41 +475,47 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 		]);
 
 		// item prototypes
-		$link = new CLink(_('Item prototypes'), 'disc_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']);
+		$item_prototypes = new CSpan([
+			new CLink(_('Item prototypes'), 'disc_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']),
+			CViewHelper::showNum($db_discovery_rule['items'])
+		]);
 		if ($current_element == 'items') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$item_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_discovery_rule['items'])]);
+		$list->addItem($item_prototypes);
 
 		// trigger prototypes
-		$link = new CLink(_('Trigger prototypes'),
-			'trigger_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']
-		);
+		$trigger_prototypes = new CSpan([
+			new CLink(_('Trigger prototypes'),
+				'trigger_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']
+			),
+			CViewHelper::showNum($db_discovery_rule['triggers'])
+		]);
 		if ($current_element == 'triggers') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$trigger_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_discovery_rule['triggers'])]);
+		$list->addItem($trigger_prototypes);
 
 		// graph prototypes
-		$link = new CLink(_('Graph prototypes'), 'graphs.php?parent_discoveryid='.$db_discovery_rule['itemid']);
+		$graph_prototypes = new CSpan([
+			new CLink(_('Graph prototypes'), 'graphs.php?parent_discoveryid='.$db_discovery_rule['itemid']),
+			CViewHelper::showNum($db_discovery_rule['graphs'])
+		]);
 		if ($current_element == 'graphs') {
-			$link->addClass(ZBX_STYLE_SELECTED);
+			$graph_prototypes->addClass(ZBX_STYLE_SELECTED);
 		}
-
-		$list->addItem([$link, CViewHelper::showNum($db_discovery_rule['graphs'])]);
+		$list->addItem($graph_prototypes);
 
 		// host prototypes
 		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-			$link = new CLink(_('Host prototypes'),
-				'host_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']
-			);
+			$host_prototypes = new CSpan([
+				new CLink(_('Host prototypes'), 'host_prototypes.php?parent_discoveryid='.$db_discovery_rule['itemid']),
+				CViewHelper::showNum($db_discovery_rule['hostPrototypes'])
+			]);
 			if ($current_element == 'hosts') {
-				$link->addClass(ZBX_STYLE_SELECTED);
+				$host_prototypes->addClass(ZBX_STYLE_SELECTED);
 			}
-
-			$list->addItem([$link, CViewHelper::showNum($db_discovery_rule['hostPrototypes'])]);
+			$list->addItem($host_prototypes);
 		}
 	}
 

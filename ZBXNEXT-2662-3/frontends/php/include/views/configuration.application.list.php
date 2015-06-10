@@ -13,37 +13,32 @@
 ** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 ** GNU General Public License for more details.
 **
-** You should have received a copy of the GNU General Public License
+	** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$applicationWidget = (new CWidget())->setTitle(_('Applications'));
-
-$createForm = (new CForm('get'))->cleanItems();
-
-$controls = (new CList())
-	->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
-	->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()]);
-
-// append host summary to widget header
 if ($this->data['hostid'] == 0) {
-	$controls->addItem((new CSubmit('form', _('Create application (select host first)')))->setEnabled(false));
+	$create_button = (new CSubmit('form', _('Create application (select host first)')))->setEnabled(false);
 }
 else {
-	$controls->addItem(new CSubmit('form', _('Create application')));
+	$create_button = new CSubmit('form', _('Create application'));
 }
 
-$applicationWidget->setControls($createForm);
-
-$createForm->addItem($controls);
-$applicationWidget->setControls($createForm);
-
-$applicationWidget->addItem(get_header_host_table('applications', $this->data['hostid']));
+$widget = (new CWidget())
+	->setTitle(_('Applications'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])
+			->addItem($create_button)
+		)
+	)
+	->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
 $applicationForm = new CForm();
-$applicationForm->setName('applicationForm');
 
 // create table
 $applicationTable = new CTableInfo();
@@ -117,6 +112,6 @@ $applicationForm->addItem([
 ]);
 
 // append form to widget
-$applicationWidget->addItem($applicationForm);
+$widget->addItem($applicationForm);
 
-return $applicationWidget;
+return $widget;

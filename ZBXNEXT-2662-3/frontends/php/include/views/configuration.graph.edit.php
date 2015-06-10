@@ -19,14 +19,14 @@
 **/
 
 
-$graphWidget = new CWidget();
+$widget = new CWidget();
 
 if (!empty($this->data['parent_discoveryid'])) {
-	$graphWidget->setTitle(_('Graph prototypes'))
+	$widget->setTitle(_('Graph prototypes'))
 		->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	$graphWidget->setTitle(_('Graphs'))
+	$widget->setTitle(_('Graphs'))
 		->addItem(get_header_host_table('graphs', $this->data['hostid']));
 }
 
@@ -368,6 +368,6 @@ require_once dirname(__FILE__).'/js/configuration.graph.edit.js.php';
 $graphForm->addItem($graphTab);
 
 // append form to widget
-$graphWidget->addItem($graphForm);
+$widget->addItem($graphForm);
 
-return $graphWidget;
+return $widget;

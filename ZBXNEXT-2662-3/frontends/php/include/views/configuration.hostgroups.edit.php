@@ -19,7 +19,7 @@
 **/
 
 
-$hostGroupWidget = (new CWidget())->setTitle(_('Host groups'));
+$widget = (new CWidget())->setTitle(_('Host groups'));
 
 // create form
 $hostGroupForm = new CForm();
@@ -95,6 +95,6 @@ else {
 
 $hostGroupForm->addItem($hostGroupTab);
 
-$hostGroupWidget->addItem($hostGroupForm);
+$widget->addItem($hostGroupForm);
 
-return $hostGroupWidget;
+return $widget;

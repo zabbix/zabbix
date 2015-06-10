@@ -25,7 +25,7 @@ global $ZBX_MESSAGES;
 
 $service = $this->data['service'];
 
-$servicesWidget = (new CWidget())->setTitle(_('Configuration of IT services'));
+$widget = (new CWidget())->setTitle(_('IT services'));
 
 // create form
 $servicesForm = new CForm();
@@ -326,6 +326,6 @@ else {
 $servicesForm->addItem($servicesTab);
 
 // append form to widget
-$servicesWidget->addItem($servicesForm);
+$widget->addItem($servicesForm);
 
-return $servicesWidget;
+return $widget;

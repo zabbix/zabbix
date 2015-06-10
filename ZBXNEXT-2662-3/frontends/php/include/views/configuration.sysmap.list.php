@@ -18,19 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$sysmapWidget = (new CWidget())->setTitle(_('Maps'));
-
-// create header buttons
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addItem((new CList())
-	->addItem(new CSubmit('form', _('Create map')))
-	->addItem(
-		(new CButton('form', _('Import')))
-			->onClick('redirect("conf.import.php?rules_preset=map")')
-	)
-);
-
-$sysmapWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Maps'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(new CSubmit('form', _('Create map')))
+			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=map")'))
+		)
+	);
 
 // create form
 $sysmapForm = new CForm();
@@ -69,6 +65,6 @@ $sysmapForm->addItem([
 ]);
 
 // append form to widget
-$sysmapWidget->addItem($sysmapForm);
+$widget->addItem($sysmapForm);
 
-return $sysmapWidget;
+return $widget;

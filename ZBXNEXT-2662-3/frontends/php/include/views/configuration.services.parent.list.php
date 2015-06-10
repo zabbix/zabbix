@@ -21,7 +21,7 @@
 
 include('include/views/js/configuration.services.edit.js.php');
 
-$servicesParentWidget = (new CWidget())->setTitle(_('IT service parent'));
+$widget = (new CWidget())->setTitle(_('IT service parent'));
 
 // create form
 $servicesParentForm = new CForm();
@@ -75,6 +75,6 @@ $servicesParentTable->setFooter($column);
 $servicesParentForm->addItem($servicesParentTable);
 
 // append form to widget
-$servicesParentWidget->addItem($servicesParentForm);
+$widget->addItem($servicesParentForm);
 
-return $servicesParentWidget;
+return $widget;

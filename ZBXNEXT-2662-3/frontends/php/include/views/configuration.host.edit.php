@@ -21,11 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
-$widgetClass = 'host-edit';
-if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$widgetClass .= ' host-edit-discovered';
-}
-$hostWidget = (new CWidget($widgetClass))
+$widget = (new CWidget())
 	->setTitle(_('Hosts'))
 	->addItem(get_header_host_table('', $data['hostid']));
 
@@ -781,6 +777,6 @@ else {
 
 $frmHost->addItem($divTabs);
 
-$hostWidget->addItem($frmHost);
+$widget->addItem($frmHost);
 
-return $hostWidget;
+return $widget;

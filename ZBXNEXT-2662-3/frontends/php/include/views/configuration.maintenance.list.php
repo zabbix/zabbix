@@ -18,15 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
-
-// create new maintenance button
-$createForm = (new CForm('get'))->cleanItems();
-$controls = (new CList())
-	->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])
-	->addItem(new CSubmit('form', _('Create maintenance period')));
-$createForm->addItem($controls);
-$maintenanceWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Maintenance periods'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem(new CSubmit('form', _('Create maintenance period')))
+		));
 
 // create form
 $maintenanceForm = new CForm();
@@ -82,6 +81,6 @@ $maintenanceForm->addItem([
 ]);
 
 // append form to widget
-$maintenanceWidget->addItem($maintenanceForm);
+$widget->addItem($maintenanceForm);
 
-return $maintenanceWidget;
+return $widget;

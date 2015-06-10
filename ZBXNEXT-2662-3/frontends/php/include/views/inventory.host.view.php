@@ -19,7 +19,7 @@
 **/
 
 
-$hostInventoryWidget = (new CWidget('inventory-host'))->setTitle(_('Host inventory'));
+$hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
 
 /*
  * Overview tab

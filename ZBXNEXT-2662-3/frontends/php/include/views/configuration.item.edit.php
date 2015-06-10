@@ -20,12 +20,16 @@
 
 if ($this->data['parent_discoveryid'] == 0) {
 	$host = $this->data['host'];
+	$title = _('Items');
+}
+else {
+	$title = _('Item prototypes');
 }
 
-$itemWidget = (new CWidget())->setTitle($this->data['page_header']);
+$widget = (new CWidget())->setTitle($title);
 
 if (!empty($this->data['hostid'])) {
-	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
+	$widget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 
 // create form
@@ -491,8 +495,8 @@ else {
 }
 
 $itemForm->addItem($itemTab);
-$itemWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 
-return $itemWidget;
+return $widget;

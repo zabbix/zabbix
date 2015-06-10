@@ -19,48 +19,40 @@
 **/
 
 
-$graphWidget = new CWidget();
-
-// create new graph button
-$createForm = (new CForm('get'))->cleanItems();
-
-$controls = new CList();
-
 if (!empty($this->data['parent_discoveryid'])) {
-	$graphWidget->setTitle(_('Graph prototypes of') . SPACE . $this->data['discovery_rule']['name']);
-
-	$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-	$controls->addItem(new CSubmit('form', _('Create graph prototype')));
-
-
-	if (!empty($this->data['hostid'])) {
-		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
-	}
+	$widget = (new CWidget())
+		->setTitle(_('Graph prototypes'))
+		->setControls((new CForm('get'))
+			->cleanItems()
+			->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+			->addItem((new CList())->addItem(new CSubmit('form', _('Create graph prototype'))))
+		)
+		->addItem(get_header_host_table('graphs', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 else {
-	$graphWidget->setTitle(_('Graphs'));
-
-	$createForm->addVar('hostid', $this->data['hostid']);
-
-	$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
-	$controls->addItem([SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
-
 	if (!empty($this->data['hostid'])) {
-		$controls->addItem(new CSubmit('form', _('Create graph')));
+		$create_button = new CSubmit('form', _('Create graph'));
 	}
 	else {
-		$createGraphButton = new CSubmit('form', _('Create graph (select host first)'));
-		$createGraphButton->setEnabled(false);
-		$controls->addItem($createGraphButton);
+		$create_button = (new CSubmit('form', _('Create graph (select host first)')))->setEnabled(false);
 	}
+
+	$widget = (new CWidget())
+		->setTitle(_('Graphs'))
+		->setControls((new CForm('get'))
+			->cleanItems()
+			->addVar('hostid', $this->data['hostid'])
+			->addItem((new CList())
+				->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+				->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])
+				->addItem($create_button)
+			)
+		);
 
 	if (!empty($this->data['hostid'])) {
-		$graphWidget->addItem(get_header_host_table('graphs', $this->data['hostid']));
+		$widget->addItem(get_header_host_table('graphs', $this->data['hostid']));
 	}
 }
-
-$createForm->addItem($controls);
-$graphWidget->setControls($createForm);
 
 // create form
 $graphForm = new CForm();
@@ -182,6 +174,6 @@ $graphForm->addItem([
 ]);
 
 // append form to widget
-$graphWidget->addItem($graphForm);
+$widget->addItem($graphForm);
 
-return $graphWidget;
+return $widget;

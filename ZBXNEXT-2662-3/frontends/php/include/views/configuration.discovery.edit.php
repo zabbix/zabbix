@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
-$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
+$widget = (new CWidget())->setTitle(_('Discovery rules'));
 
 // create form
 $discoveryForm = new CForm();
@@ -106,6 +106,7 @@ else {
 }
 
 $discoveryForm->addItem($discoveryTabs);
-$discoveryWidget->addItem($discoveryForm);
 
-return $discoveryWidget;
+$widget->addItem($discoveryForm);
+
+return $widget;

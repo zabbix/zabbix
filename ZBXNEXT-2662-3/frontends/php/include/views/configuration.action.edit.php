@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 
-$actionWidget = (new CWidget())->setTitle(_('Actions'));
+$widget = (new CWidget())->setTitle(_('Actions'));
 
 // create form
 $actionForm = new CForm();
@@ -1241,6 +1241,6 @@ else {
 $actionForm->addItem($actionTabs);
 
 // append form to widget
-$actionWidget->addItem($actionForm);
+$widget->addItem($actionForm);
 
-return $actionWidget;
+return $widget;

@@ -19,24 +19,14 @@
 **/
 
 
-$itemsWidget = new CWidget();
-$itemsWidget->setTitle([
-	_('Item prototypes of').SPACE,
-	(new CSpan($this->data['discovery_rule']['name']))->addClass(ZBX_STYLE_GREEN)
-]);
-
-// create new item button
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create item prototype')));
-$createForm->addItem($controls);
-
-$itemsWidget->setControls($createForm);
-
-// header
-$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
+$widget = (new CWidget())
+	->setTitle(_('Item prototypes'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create item prototype'))))
+	)
+	->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
 $itemForm = new CForm();
@@ -137,6 +127,6 @@ $itemForm->addItem([
 ]);
 
 // append form to widget
-$itemsWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
-return $itemsWidget;
+return $widget;

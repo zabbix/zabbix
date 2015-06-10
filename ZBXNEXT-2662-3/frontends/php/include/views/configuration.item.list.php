@@ -20,28 +20,25 @@
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-$itemsWidget = (new CWidget('item-list'))->setTitle(_('Items'));
-
-// create new item button
-$createForm = (new CForm('get'))->cleanItems();
-$controls = new CList();
-
 if (empty($this->data['hostid'])) {
-	$createButton = new CSubmit('form', _('Create item (select host first)'));
-	$createButton->setEnabled(false);
-	$controls->addItem($createButton);
+	$create_button = (new CSubmit('form', _('Create item (select host first)')))->setEnabled(false);
 }
 else {
-	$createForm->addVar('hostid', $this->data['hostid']);
-	$controls->addItem(new CSubmit('form', _('Create item')));
+	$create_button = new CSubmit('form', _('Create item'));
 }
-$createForm->addItem($controls);
-$itemsWidget->setControls($createForm);
+
+$widget = (new CWidget())
+	->setTitle(_('Items'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('hostid', $this->data['hostid'])
+		->addItem((new CList())->addItem($create_button))
+	);
 
 if (!empty($this->data['hostid'])) {
-	$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid']));
+	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
-$itemsWidget->addItem($this->data['flicker']);
+$widget->addItem($this->data['flicker']);
 
 // create form
 $itemForm = new CForm();
@@ -289,6 +286,6 @@ $itemForm->addItem([
 ]);
 
 // append form to widget
-$itemsWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
-return $itemsWidget;
+return $widget;

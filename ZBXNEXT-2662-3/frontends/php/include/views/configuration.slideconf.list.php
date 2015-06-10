@@ -18,15 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$slideWidget = (new CWidget())->setTitle(_('Slide shows'));
-
-// create new hostgroup button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create slide show')));
-$createForm->addItem($controls);
-$slideWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Slide shows'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(new CSubmit('form', _('Create slide show')))
+		)
+	);
 
 // create form
 $slideForm = new CForm();
@@ -62,6 +61,6 @@ $slideForm->addItem([
 ]);
 
 // append form to widget
-$slideWidget->addItem($slideForm);
+$widget->addItem($slideForm);
 
-return $slideWidget;
+return $widget;

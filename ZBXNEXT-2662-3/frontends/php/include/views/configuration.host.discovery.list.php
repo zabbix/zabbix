@@ -18,19 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
-
-// create new discovery rule button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$controls = new CList();
-$createForm->addVar('hostid', $this->data['hostid']);
-$controls->addItem(new CSubmit('form', _('Create discovery rule')));
-$createForm->addItem($controls);
-$discoveryWidget->setControls($createForm);
-
-// header
-$discoveryWidget->addItem(get_header_host_table('discoveries', $this->data['hostid']));
+$widget = (new CWidget())
+	->setTitle(_('Discovery rules'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('hostid', $this->data['hostid'])
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	)
+	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
 // create form
 $discoveryForm = new CForm();
@@ -165,6 +160,6 @@ $discoveryForm->addItem([
 ]);
 
 // append form to widget
-$discoveryWidget->addItem($discoveryForm);
+$widget->addItem($discoveryForm);
 
-return $discoveryWidget;
+return $widget;
