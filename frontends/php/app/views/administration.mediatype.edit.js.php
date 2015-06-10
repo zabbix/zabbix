@@ -10,9 +10,9 @@
 						.hide();
 					jQuery('#eztext_link').hide();
 
-					// radio buttons actions
-					securityOptions();
-					authenticationOptions();
+					// radio button actions
+					toggleSecurityOptions();
+					toggleAuthenticationOptions();
 					break;
 
 				case '<?php echo MEDIA_TYPE_EXEC; ?>':
@@ -75,14 +75,14 @@
 		jQuery('#type').trigger('change');
 
 		jQuery('input[name=smtp_security]').change(function() {
-			securityOptions();
+			toggleSecurityOptions();
 		});
 
 		jQuery('input[name=smtp_authentication]').change(function() {
-			authenticationOptions();
+			toggleAuthenticationOptions();
 		});
 
-		function securityOptions() {
+		function toggleSecurityOptions() {
 			if (jQuery('input[name=smtp_security]:checked').val() == <?= SMTP_CONNECTION_SECURITY_NONE ?>) {
 				jQuery('#smtp_verify_peer, #smtp_verify_host').prop('checked', false).closest('li').hide();
 			}
@@ -91,7 +91,7 @@
 			}
 		}
 
-		function authenticationOptions() {
+		function toggleAuthenticationOptions() {
 			if (jQuery('input[name=smtp_authentication]:checked').val() == <?= SMTP_AUTHENTICATION_NORMAL ?>) {
 				jQuery('#smtp_username, #passwd').closest('li').show();
 			}
