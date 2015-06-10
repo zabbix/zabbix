@@ -19,11 +19,11 @@
 **/
 
 
-$itemWidget = (new CWidget())->setTitle($this->data['page_header']);
-
-$itemWidget->addItem(get_header_host_table('discoveries', $this->data['hostid'],
-	isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : 0
-));
+$widget = (new CWidget())
+	->setTitle(_('Discovery rules'))
+	->addItem(get_header_host_table('discoveries', $this->data['hostid'],
+		isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : 0
+	));
 
 // create form
 $itemForm = new CForm();
@@ -398,8 +398,8 @@ else {
 }
 
 $itemForm->addItem($itemTab);
-$itemWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
 
-return $itemWidget;
+return $widget;

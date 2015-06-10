@@ -19,25 +19,16 @@
 **/
 
 
-$itemsWidget = (new CWidget())->setTitle(_('Host prototypes'));
-
-$discoveryRule = $this->data['discovery_rule'];
-
-// create new item button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$createForm->addItem(new CSubmit('form', _('Create host prototype')));
-$itemsWidget->setControls($createForm);
-
-// header
-$itemsWidget->addHeader([
-	_('Host prototypes of').SPACE,
-	(new CSpan($this->data['discovery_rule']['name']))->addClass(ZBX_STYLE_ORANGE)
-]);
-$itemsWidget->addItem(
-	get_header_host_table('hosts', $discoveryRule['hostid'], $this->data['parent_discoveryid'])
-);
+$widget = (new CWidget())
+	->setTitle(_('Host prototypes'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create host prototype'))))
+	)
+	->addItem(
+		get_header_host_table('hosts', $this->data['discovery_rule']['hostid'], $this->data['parent_discoveryid'])
+	);
 
 // create form
 $itemForm = new CForm();
@@ -66,7 +57,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 			->addClass(ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
-	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$discoveryRule['itemid'].'&hostid='.$hostPrototype['hostid']);
+	$name[] = new CLink($hostPrototype['name'], '?form=update&parent_discoveryid='.$this->data['discovery_rule']['itemid'].'&hostid='.$hostPrototype['hostid']);
 
 	// template list
 	if (empty($hostPrototype['templates'])) {
@@ -111,7 +102,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// status
 	$status = (new CLink(item_status2str($hostPrototype['status']),
 		'?group_hostid='.$hostPrototype['hostid'].
-			'&parent_discoveryid='.$discoveryRule['itemid'].
+			'&parent_discoveryid='.$this->data['discovery_rule']['itemid'].
 			'&action='.($hostPrototype['status'] == HOST_STATUS_NOT_MONITORED
 				? 'hostprototype.massenable'
 				: 'hostprototype.massdisable'
@@ -127,7 +118,7 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	]);
 }
 
-zbx_add_post_js('cookie.prefix = "'.$discoveryRule['itemid'].'";');
+zbx_add_post_js('cookie.prefix = "'.$this->data['discovery_rule']['itemid'].'";');
 
 // append table to form
 $itemForm->addItem([
@@ -145,11 +136,11 @@ $itemForm->addItem([
 				'confirm' => _('Delete selected host prototypes?')
 			]
 		],
-		$discoveryRule['itemid']
+		$this->data['discovery_rule']['itemid']
 	)
 ]);
 
 // append form to widget
-$itemsWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
-return $itemsWidget;
+return $widget;

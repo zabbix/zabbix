@@ -61,5 +61,7 @@ class CForm extends CTag {
 		if (!is_null($value)) {
 			$this->addItem(new CVar($name, $value, $id));
 		}
+
+		return $this;
 	}
 }

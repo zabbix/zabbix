@@ -104,7 +104,7 @@ $hostId = getRequest('hostid', 0);
 if (hasRequest('parent_discoveryid')) {
 	// check whether discovery rule is editable by user
 	$discoveryRule = API::DiscoveryRule()->get([
-		'output' => ['name', 'itemid', 'hostid'],
+		'output' => ['itemid', 'hostid'],
 		'itemids' => getRequest('parent_discoveryid'),
 		'editable' => true
 	]);
@@ -619,7 +619,6 @@ else {
 		'hostid' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : $hostId,
 		'parent_discoveryid' => isset($discoveryRule) ? $discoveryRule['itemid'] : null,
 		'graphs' => [],
-		'discovery_rule' => isset($discoveryRule) ? $discoveryRule : null,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
 	];

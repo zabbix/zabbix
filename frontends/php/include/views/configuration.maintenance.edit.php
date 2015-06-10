@@ -19,7 +19,7 @@
 **/
 
 
-$maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
+$widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
 $maintenanceForm = new CForm();
@@ -210,6 +210,7 @@ else {
 }
 
 $maintenanceForm->addItem($maintenanceTab);
-$maintenanceWidget->addItem($maintenanceForm);
 
-return $maintenanceWidget;
+$widget->addItem($maintenanceForm);
+
+return $widget;

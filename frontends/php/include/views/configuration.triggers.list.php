@@ -18,32 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$triggersWidget = (new CWidget('trigger-list'))->setTitle(_('Triggers'));
-
-// append host summary to widget header
-if ($this->data['hostid']) {
-	$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid']));
-}
-
-// create new application button
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addVar('hostid', $this->data['hostid']);
-
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
-$controls->addItem([SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
-
 if (!$this->data['hostid']) {
-	$createButton = new CSubmit('form', _('Create trigger (select host first)'));
-	$createButton->setEnabled(false);
-	$controls->addItem($createButton);
+	$create_button = (new CSubmit('form', _('Create trigger (select host first)')))->setEnabled(false);
 }
 else {
-	$controls->addItem(new CSubmit('form', _('Create trigger')));
+	$create_button = new CSubmit('form', _('Create trigger'));
 }
 
-$createForm->addItem($controls);
-$triggersWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Triggers'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('hostid', $this->data['hostid'])
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])
+			->addItem($create_button)
+		)
+	);
+
+if ($this->data['hostid']) {
+	$widget->addItem(get_header_host_table('triggers', $this->data['hostid']));
+}
 
 // create form
 $triggersForm = new CForm();
@@ -212,6 +208,6 @@ $triggersForm->addItem([
 ]);
 
 // append form to widget
-$triggersWidget->addItem($triggersForm);
+$widget->addItem($triggersForm);
 
-return $triggersWidget;
+return $widget;

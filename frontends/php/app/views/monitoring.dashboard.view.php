@@ -21,7 +21,7 @@
 
 $this->addJSfile('js/class.pmaster.js');
 
-$dashboardWidget = (new CWidget('dashboard'))
+$dashboardWidget = (new CWidget())
 	->setTitle(_('Dashboard'))
 	->setControls(new CList([
 		get_icon('dashconf'),

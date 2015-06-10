@@ -21,7 +21,7 @@
 
 include('include/views/js/configuration.httpconf.popup.js.php');
 
-$httpPopupWidget = new CWidget('httptest-popup');
+$httpPopupWidget = new CWidget();
 
 $result = false;
 if (hasRequest('add') || hasRequest('update')) {

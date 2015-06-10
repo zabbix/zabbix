@@ -18,24 +18,22 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$screenWidget = (new CWidget())->setTitle(_('Screens'));
+$widget = (new CWidget())->setTitle(_('Screens'));
 
-// create new screen button
-$createForm = (new CForm('get'))->cleanItems();
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create screen')));
+$createForm = (new CForm('get'))
+	->cleanItems();
+
+$controls = (new CList())
+	->addItem(new CSubmit('form', _('Create screen')));
 if (!empty($this->data['templateid'])) {
 	$createForm->addVar('templateid', $this->data['templateid']);
-	$screenWidget->addItem(get_header_host_table('screens', $this->data['templateid']));
+	$widget->addItem(get_header_host_table('screens', $this->data['templateid']));
 }
 else {
-	$controls->addItem(
-		(new CButton('form', _('Import')))
-			->onClick('redirect("conf.import.php?rules_preset=screen")')
-	);
+	$controls->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=screen")'));
 }
 $createForm->addItem($controls);
-$screenWidget->setControls($createForm);
+$widget->setControls($createForm);
 
 // create form
 $screenForm = new CForm();
@@ -78,6 +76,6 @@ $screenForm->addItem([
 ]);
 
 // append form to widget
-$screenWidget->addItem($screenForm);
+$widget->addItem($screenForm);
 
-return $screenWidget;
+return $widget;

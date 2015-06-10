@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/monitoring.history.js.php';
 
-$historyWidget = new CWidget('history');
+$historyWidget = new CWidget();
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($this->data['items'])),

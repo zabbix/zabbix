@@ -18,28 +18,23 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$actionWidget = (new CWidget())->setTitle(_('Actions'));
-
-// create new action button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$createForm->addVar('eventsource', $data['eventsource']);
-$controls = new CList();
-
-// create widget header
-$controls->addItem([_('Event source'), SPACE, new CComboBox('eventsource', $data['eventsource'], 'submit()',
-	[
-		EVENT_SOURCE_TRIGGERS => _('Triggers'),
-		EVENT_SOURCE_DISCOVERY => _('Discovery'),
-		EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
-		EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
-	]
-)]);
-$controls->addItem(new CSubmit('form', _('Create action')));
-
-$createForm->addItem($controls);
-
-$actionWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Actions'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('eventsource', $data['eventsource'])
+		->addItem((new CList())
+			->addItem([_('Event source'), SPACE,
+				new CComboBox('eventsource', $data['eventsource'], 'submit()', [
+					EVENT_SOURCE_TRIGGERS => _('Triggers'),
+					EVENT_SOURCE_DISCOVERY => _('Discovery'),
+					EVENT_SOURCE_AUTO_REGISTRATION => _('Auto registration'),
+					EVENT_SOURCE_INTERNAL => _x('Internal', 'event source')
+				])
+			])
+			->addItem(new CSubmit('form', _('Create action')))
+		)
+	);
 
 // create form
 $actionForm = new CForm();
@@ -118,6 +113,6 @@ $actionForm->addItem([
 ]);
 
 // append form to widget
-$actionWidget->addItem($actionForm);
+$widget->addItem($actionForm);
 
-return $actionWidget;
+return $widget;

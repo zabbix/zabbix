@@ -18,12 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
-
-// create new discovery rule button
-$createForm = (new CForm('get'))->cleanItems()
-	->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))));
-$discoveryWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Discovery rules'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	);
 
 // create form
 $discoveryForm = new CForm();
@@ -73,6 +73,6 @@ $discoveryForm->addItem([
 ]);
 
 // append form to widget
-$discoveryWidget->addItem($discoveryForm);
+$widget->addItem($discoveryForm);
 
-return $discoveryWidget;
+return $widget;

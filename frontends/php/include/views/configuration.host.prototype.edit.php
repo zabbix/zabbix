@@ -26,7 +26,7 @@ $parentHost = $data['parent_host'];
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 require_once dirname(__FILE__).'/js/configuration.host.prototype.edit.js.php';
 
-$widget = (new CWidget('hostprototype-edit'))
+$widget = (new CWidget())
 	->setTitle(_('Host prototypes'))
 	->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 

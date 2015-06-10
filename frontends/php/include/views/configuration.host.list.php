@@ -19,19 +19,16 @@
 **/
 
 
-$hostWidget = (new CWidget('host-list'))->setTitle(_('Hosts'));
-
-$frmForm = (new CForm('get'))->cleanItems();
-
-$frmForm->addItem((new CList())
-	->addItem([_('Group').SPACE, $data['pageFilter']->getGroupsCB()])
-	->addItem(new CSubmit('form', _('Create host')))
-	->addItem(
-		(new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")')
-	)
-);
-
-$hostWidget->setControls($frmForm);
+$widget = (new CWidget())
+	->setTitle(_('Hosts'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $data['pageFilter']->getGroupsCB()])
+			->addItem(new CSubmit('form', _('Create host')))
+			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
+		)
+	);
 
 // Filter
 $filter = new CFilter('web.hosts.filter.state');
@@ -48,7 +45,7 @@ $filterColumn4 = new CFormList();
 $filterColumn4->addRow(_('Port like'), new CTextBox('filter_port', $data['filter']['port'], 20));
 $filter->addColumn($filterColumn4);
 
-$hostWidget->addItem($filter);
+$widget->addItem($filter);
 
 // table hosts
 $form = new CForm();
@@ -222,6 +219,6 @@ $form->addItem([
 	)
 ]);
 
-$hostWidget->addItem($form);
+$widget->addItem($form);
 
-return $hostWidget;
+return $widget;

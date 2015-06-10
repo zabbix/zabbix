@@ -21,14 +21,12 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$triggersWidget = new CWidget();
+$widget = (new CWidget())->setTitle(_('Triggers'));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$triggersWidget->addItem(get_header_host_table('triggers', $this->data['hostid']));
+	$widget->addItem(get_header_host_table('triggers', $this->data['hostid']));
 }
-
-$triggersWidget->setTitle(_('Triggers'));
 
 // create form
 $triggersForm = new CForm();
@@ -342,6 +340,6 @@ else {
 // append tabs to form
 $triggersForm->addItem($triggersTab);
 
-$triggersWidget->addItem($triggersForm);
+$widget->addItem($triggersForm);
 
-return $triggersWidget;
+return $widget;

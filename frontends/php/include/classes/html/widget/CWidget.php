@@ -33,16 +33,8 @@ class CWidget {
 	 */
 	protected $body = [];
 
-	/**
-	 * The class of the root div element.
-	 *
-	 * @var string
-	 */
-	protected $rootClass;
-
-	public function __construct($rootClass = null) {
+	public function __construct() {
 		$this->css_class = 'header_wide';
-		$this->setRootClass($rootClass);
 	}
 
 	public function setClass($class = null) {
@@ -156,13 +148,5 @@ class CWidget {
 			$td_r
 		];
 		return $row;
-	}
-
-	public function setRootClass($rootClass) {
-		$this->rootClass = $rootClass;
-	}
-
-	public function getRootClass() {
-		return $this->rootClass;
 	}
 }

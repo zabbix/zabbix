@@ -18,22 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$triggersWidget = (new CWidget())
-	->setTitle(
-		[_('Trigger prototypes of').SPACE, (new CSpan($this->data['discovery_rule']['name']))->addClass('parent-discovery')]
+
+$widget = (new CWidget())
+	->setTitle(_('Trigger prototypes'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create trigger prototype'))))
 	)
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
-// create new application button
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-
-$createForm->addItem((new CList())->addItem(new CSubmit('form', _('Create trigger prototype'))));
-
-$triggersWidget->setControls($createForm);
-
 /*
-$triggersWidget->addHeaderRowNumber(array(
+$widget->addHeaderRowNumber(array(
 	'[ ',
 	new CLink(
 		$this->data['showdisabled'] ? _('Hide disabled trigger prototypes') : _('Show disabled trigger prototypes'),
@@ -184,6 +180,6 @@ $triggersForm->addItem([
 ]);
 
 // append form to widget
-$triggersWidget->addItem($triggersForm);
+$widget->addItem($triggersForm);
 
-return $triggersWidget;
+return $widget;
