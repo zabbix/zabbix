@@ -336,7 +336,11 @@ if ($filter['groupids'] !== null) {
 /*
  * Display
  */
-$latestWidget = (new CWidget())->setTitle(_('Latest data'));
+$widget = (new CWidget())
+	->setTitle(_('Latest data'))
+	->setControls((new CList())
+		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+	);
 
 // Filter
 $filterForm = new CFilter('web.latest.filter.state');
@@ -399,12 +403,8 @@ $filterColumn2->addRow(
 $filterForm->addColumn($filterColumn1);
 $filterForm->addColumn($filterColumn2);
 
-$latestWidget->addItem($filterForm);
+$widget->addItem($filterForm);
 // End of Filter
-
-$controls = new CList();
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]));
-$latestWidget->setControls($controls);
 
 $form = new CForm('GET', 'history.php');
 $form->setName('items');
@@ -892,6 +892,6 @@ $form->addItem([
 	])
 ]);
 
-$latestWidget->addItem($form)->show();
+$widget->addItem($form)->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

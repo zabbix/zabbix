@@ -71,17 +71,16 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-$r_form = new CForm('get');
-$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
-
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
-$controls->addItem([_('Host').SPACE, $pageFilter->getHostsCB()]);
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]));
-
-$r_form->addItem($controls);
-
-$httpmon_wdgt = (new CWidget())->setTitle(_('Web monitoring'))->setControls($r_form);
+$widget = (new CWidget())
+	->setTitle(_('Web monitoring'))
+	->setControls((new CForm('get'))
+		->addVar('fullscreen', $_REQUEST['fullscreen'])
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()])
+			->addItem([_('Host'), SPACE, $pageFilter->getHostsCB()])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+		)
+	);
 
 // TABLE
 $table = new CTableInfo();
@@ -190,7 +189,7 @@ else {
 	getPagingLine($tmp, $sortOrder);
 }
 
-$httpmon_wdgt->addItem([$table, $paging])->show();
+$widget->addItem([$table, $paging])->show();
 
 
 require_once dirname(__FILE__).'/include/page_footer.php';
