@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<link rel="icon" href="/favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+	</head>
+<body>
+	<header role="banner">
+		<div class="nav" role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			</div>
+		</div>
+	</header>
+	<div class="article">
+	<div class="msg-good">
+	Well done! You successfully added new parameters.
+	<div class="msg-details"><span class="link-action">Details</span>
+	<ul>
+	<li>Something</li>
+	<li>Something</li>
+	<li>Something</li>
+	<li>Something</li>
+	</ul></div>
+	<span class="overlay-close-btn" title="Close">&times;</span>
+	</div>
+	<div class="msg-bad">
+	Oh snap! Check form fields and try submitting again.
+	<div class="msg-details"><span class="link-action">Details</span>
+	<ul>
+	<li>Something</li>
+	<li>Something</li>
+	<li>Something</li>
+	<li>Something</li>
+	</ul></div>
+	<span class="overlay-close-btn" title="Close">&times;</span>
+	</div>
+	<div class="msg-bad">
+	Oh snap! Check form fields and try submitting again.
+	<div class="msg-details"><span class="link-action">Details</span>
+	<!--<ul>
+	<li>Something</li>
+	<li>Something</li>
+	<li>Something</li>
+	<li>Something</li>
+	</ul>--></div>
+	<span class="overlay-close-btn" title="Close">&times;</span>
+	</div>
+	
+	<div class="header-title">
+	<h1>Dashboard</h1>
+	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	</div>
+		<ul class="object-group"><li><a href="">All hosts</a></li><li><span class="arrow-right"></span></li><li>Zabbix server:</li><li class="green">Enabled</li><li><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></li><li><span class="status-red">z</span> <span class="status-red">snmp</span> <span class="status-red">jmx</span> <span class="status-red">ipmi</span></li><li><span class="status-grey">z</span> <span class="status-grey">snmp</span> <span class="status-grey">jmx</span> <span class="status-grey">ipmi</span></li><li><a href="">Applications</a>&nbsp;<sup>11</sup></li><li><a href="" class="selected">Items</a>&nbsp;<sup>67</sup></li><li><a href="">Triggers</a>&nbsp;<sup>41</sup></li><li><a href="">Graphs</a>&nbsp;<sup>11</sup></li><li><a href="">Discovery rules</a>&nbsp;<sup>2</sup></li><li><a href="">Web scenarios</a></li></ul>
+	<div class="filter-btn-container">
+	<button type="button" class="filter-trigger">Filter<span class="arrow-down"></span></button>
+	</div>
+	<form>
+	<table class="list-table">
+		<thead>
+			<tr>
+				<th class="cell-width"><input type="checkbox"></th>
+				<th><a href="">Name<span class="arrow-down"></span></a></th>
+				<th><a href="">Applications<span class="arrow-up"></span></a></th>
+				<th>Items</th>
+				<th>Triggers</th>
+				<th>Graphs</th>
+				<th>Discovery</div></th>
+				<th>Web</div></th>
+				<th><!--<div style="width: 22px; height: 55px"><div style="transform: translate(13px, 29px) rotate(315deg); -webkit-transform: translate(13px, 29px) rotate(315deg);">-->Interface<!--</div></div>--></th>
+				<th>Templates</th>
+				<th><a href="">Status</a></th>
+				<th>Availability</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">Test Host</a></td>
+				<td><a href="">Applications</a></td>
+				<td><a href="">Items</a></td>
+				<td><a href="">Triggers</a></td>
+				<td><a href="">Graphs</a></td>
+				<td><a href="">Discovery</a></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="" class="green link-action">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr class="row-selected">
+				<td><input type="checkbox" checked></td>
+				<td><a href="">Zabbix server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="" class="red link-action">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">Main server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="" class="orange link-action">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">Backup server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="" class="grey link-action">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">HQ server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>385</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>35</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>10</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>78</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">Riga server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>24</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>673</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>4</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>9</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>3</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="green link-alt">Template App Zabbix Server</a>, <a href="" class="red link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">Backup server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+				<td><a href="">Discovery</a> <sup>56</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">HQ server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>385</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>35</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>10</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>78</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">Riga server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>24</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>673</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>4</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>9</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>3</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr class="row-selected">
+				<td><input type="checkbox" checked></td>
+				<td><a href="">Zabbix server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">Main server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="link-alt">Template App Zabbix Server</a>, <a href="" class="link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">Backup server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="link-alt">Template App Zabbix Server</a>, <a href="" class="link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+			<tr>
+				<td><input type="checkbox"></td>
+				<td><a href="">HQ server</a></td>
+				<td><a href="">Applications</a>&nbsp;<sup>385</sup></td>
+				<td><a href="">Items</a>&nbsp;<sup>1</sup></td>
+				<td><a href="">Triggers</a>&nbsp;<sup>35</sup></td>
+				<td><a href="">Graphs</a>&nbsp;<sup>10</sup></td>
+				<td><a href="">Discovery</a>&nbsp;<sup>78</sup></td>
+				<td><a href="">Web</a></td>
+				<td>127.0.01: 10050</td>
+				<td><a href="" class="link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
+				<td><a href="">Enabled</a></td>
+				<td>Zabbix</td>
+			</tr>
+		</tbody>
+	</table>
+	</form>
+	<div class="table-paging">
+	<a href="#"><span class="arrow-left"></span></a><a href="#">1</a><a href="#" class="paging-selected">2</a><a href="#">3</a><a href="#"><span class="arrow-right"></span></a>
+	</div>
+	<div class="action-buttons">
+		<button type="button" class="btn-alt" disabled>Enable</button><button type="button" class="btn-alt">Disable</button><button type="button" class="btn-alt">Clear history</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Copy&#133;</button><button type="button" class="btn-alt">Mass update</button>
+		<div id="">0 selected</div>
+	</div>
+	</form>
+	</div>
+	<div class="footer">
+	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
+	</div>
+</body>
+</html>
