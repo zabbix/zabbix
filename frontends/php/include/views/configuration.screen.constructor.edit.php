@@ -568,9 +568,10 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 
 	if (zbx_empty($caption) && TIME_TYPE_HOST == $style && $resourceId > 0) {
 		$items = API::Item()->get([
-			'itemids' => $resourceId,
+			'output' => ['itemid', 'hostid', 'key_', 'name'],
 			'selectHosts' => ['name'],
-			'output' => ['itemid', 'hostid', 'key_', 'name']
+			'itemids' => $resourceId,
+			'webitems' => true
 		]);
 
 		if ($items) {
@@ -648,7 +649,7 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOU
 			->addClass('radioset')
 	);
 }
-else {
+elseif ($resourceType != SCREEN_RESOURCE_CLOCK) {
 	$screenFormList->addVar('style', 0);
 }
 
