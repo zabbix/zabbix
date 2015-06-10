@@ -149,7 +149,7 @@ unset($_REQUEST[$paramsFieldName]);
 
 // permissions
 $discoveryRule = API::DiscoveryRule()->get([
-	'output' => ['hostid', 'name'],
+	'output' => ['hostid'],
 	'itemids' => getRequest('parent_discoveryid'),
 	'editable' => true
 ]);
@@ -351,7 +351,6 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	$data = getItemFormData($itemPrototype);
-	$data['page_header'] = _('CONFIGURATION OF ITEM PROTOTYPES');
 	$data['config'] = select_config();
 
 	// render view
@@ -372,7 +371,6 @@ else {
 		'form' => getRequest('form'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
 		'hostid' => $discoveryRule['hostid'],
-		'discovery_rule' => $discoveryRule,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
 	];

@@ -55,9 +55,9 @@ if (!empty($this->data['graphid'])) {
 		'profileIdx2' => $this->data['graphid']
 	]);
 
-	$chartTable = (new CTable())->
-		addClass('maxwidth')->
-		addRow($screen->get());
+	$chartTable = (new CTable())
+		->addClass('maxwidth')
+		->addRow($screen->get());
 
 	$chartsWidget->addItem($chartTable);
 

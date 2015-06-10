@@ -133,7 +133,7 @@ $frm_row = [];
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$frm_row[] = [
-		new CCheckBox('severity['.$severity.']', str_in_array($severity, $severities), null, $severity),
+		(new CCheckBox('severity['.$severity.']', $severity))->setChecked(str_in_array($severity, $severities)),
 		getSeverityName($severity, $config)
 	];
 	$frm_row[] = BR();

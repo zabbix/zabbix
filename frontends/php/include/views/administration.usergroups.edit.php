@@ -19,7 +19,7 @@
 **/
 
 
-$userGroupWidget = (new CWidget())->setTitle(_('User groups'));
+$widget = (new CWidget())->setTitle(_('User groups'));
 
 // create form
 $userGroupForm = new CForm();
@@ -60,15 +60,25 @@ if ($isGranted) {
 		GROUP_GUI_ACCESS_INTERNAL => user_auth_type2str(GROUP_GUI_ACCESS_INTERNAL),
 		GROUP_GUI_ACCESS_DISABLED => user_auth_type2str(GROUP_GUI_ACCESS_DISABLED)
 	]));
-	$userGroupFormList->addRow(_('Enabled'), new CCheckBox('users_status', $this->data['users_status'] ? (isset($data['usrgrpid']) ? 0 : 1) : 1, null, 1)); // invert user status 0 - enable, 1 - disable
+	$userGroupFormList->addRow(_('Enabled'),
+		(new CCheckBox('users_status'))->setChecked($this->data['users_status'] ? (isset($data['usrgrpid']) ? false : true) : true)
+	);
 }
 else {
 	$userGroupForm->addVar('gui_access', $this->data['gui_access']);
 	$userGroupForm->addVar('users_status', GROUP_STATUS_ENABLED);
-	$userGroupFormList->addRow(_('Frontend access'), new CSpan(user_auth_type2str($this->data['gui_access']), 'text-field green'));
-	$userGroupFormList->addRow(_('Enabled'), new CSpan(_('Enabled'), 'text-field green'));
+	$userGroupFormList->addRow(_('Frontend access'),
+		(new CSpan(user_auth_type2str($this->data['gui_access'])))
+			->addClass('text-field')
+			->addClass('green')
+	);
+	$userGroupFormList->addRow(_('Enabled'),
+		(new CSpan(_('Enabled')))
+			->addClass('text-field')
+			->addClass('green')
+	);
 }
-$userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->data['debug_mode'], null, 1));
+$userGroupFormList->addRow(_('Debug mode'), (new CCheckBox('debug_mode'))->setChecked($this->data['debug_mode'] == 1));
 
 /*
  * Permissions tab
@@ -76,9 +86,9 @@ $userGroupFormList->addRow(_('Debug mode'), new CCheckBox('debug_mode', $this->d
 $permissionsFormList = new CFormList('permissionsFormList');
 
 // append permissions table to form list
-$permissionsTable = (new CTable())->
-	addClass('right_table')->
-	setHeader([_('Read-write'), _('Read only'), _('Deny')], 'header');
+$permissionsTable = (new CTable())
+	->addClass('right_table')
+	->setHeader([_('Read-write'), _('Read only'), _('Deny')], 'header');
 
 $lstWrite = new CListBox('right_to_del[read_write][]', null, 20);
 $lstRead = new CListBox('right_to_del[read_only][]', null, 20);
@@ -103,28 +113,28 @@ $permissionsTable->addRow([
 ]);
 $permissionsTable->addRow([
 	[
-		new CButton('add_read_write', _('Add'),
-			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ_WRITE."');",
-			'button-form'
-		),
-		new CSubmit('del_read_write', _('Delete selected'), null, 'button-form')
+		(new CButton('add_read_write', _('Add')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_READ_WRITE."');"),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSubmit('del_read_write', _('Delete selected')))->addClass(ZBX_STYLE_BTN_GREY)
 	],
 	[
-		new CButton('add_read_only', _('Add'),
-			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_READ."');",
-			'button-form'
-		),
-		new CSubmit('del_read_only', _('Delete selected'), null, 'button-form')
+		(new CButton('add_read_only', _('Add')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_READ."');"),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSubmit('del_read_only', _('Delete selected')))->addClass(ZBX_STYLE_BTN_GREY)
 	],
 	[
-		new CButton('add_deny', _('Add'),
-			"return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
-				'&permission='.PERM_DENY."');",
-			'button-form'
-		),
-		new CSubmit('del_deny', _('Delete selected'), null, 'button-form')
+		(new CButton('add_deny', _('Add')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick("return PopUp('popup_right.php?dstfrm=".$userGroupForm->getName().
+				'&permission='.PERM_DENY."');"),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSubmit('del_deny', _('Delete selected')))->addClass(ZBX_STYLE_BTN_GREY)
 	]
 ]);
 $permissionsFormList->addRow(_('Composing permissions'), $permissionsTable);
@@ -158,7 +168,7 @@ else {
 
 // append tab to form
 $userGroupForm->addItem($userGroupTab);
-// append form to widget
-$userGroupWidget->addItem($userGroupForm);
 
-return $userGroupWidget;
+$widget->addItem($userGroupForm);
+
+return $widget;

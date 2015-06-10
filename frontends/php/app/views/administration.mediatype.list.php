@@ -23,15 +23,12 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$mediaTypeWidget = (new CWidget())->setTitle(_('Media types'));
-
-// create new media type button
-$createForm = new CForm('get');
-
-$controls = new CList();
-$controls->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit'));
-$createForm->addItem($controls);
-$mediaTypeWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Media types'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(new CRedirectButton(_('Create media type'), 'zabbix.php?action=mediatype.edit')))
+	);
 
 // create form
 $mediaTypeForm = new CForm();
@@ -41,10 +38,9 @@ $mediaTypeForm->setName('mediaTypesForm');
 $mediaTypeTable = new CTableInfo();
 $mediaTypeTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_media_types', null,
-			"checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');"
-		)))->
-		addClass('cell-width'),
+		(new CCheckBox('all_media_types'))
+			->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
 	make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
 	_('Status'),
@@ -105,14 +101,18 @@ foreach ($data['mediatypes'] as $mediaType) {
 		'&mediatypeids[]='.$mediaType['mediatypeid'];
 
 	$status = (MEDIA_TYPE_STATUS_ACTIVE == $mediaType['status'])
-		? new CLink(_('Enabled'), $statusLink, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN)
-		: new CLink(_('Disabled'), $statusLink, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
+		? (new CLink(_('Enabled'), $statusLink))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_GREEN)
+		: (new CLink(_('Disabled'), $statusLink))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(ZBX_STYLE_RED);
 
 	$name = new CLink($mediaType['description'], '?action=mediatype.edit&mediatypeid='.$mediaType['mediatypeid']);
 
 	// append row
 	$mediaTypeTable->addRow([
-		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', null, null, $mediaType['mediatypeid']),
+		new CCheckBox('mediatypeids['.$mediaType['mediatypeid'].']', $mediaType['mediatypeid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		media_type2str($mediaType['typeid']),
 		$status,
@@ -133,4 +133,4 @@ $mediaTypeForm->addItem([
 ]);
 
 // append form to widget
-$mediaTypeWidget->addItem($mediaTypeForm)->show();
+$widget->addItem($mediaTypeForm)->show();

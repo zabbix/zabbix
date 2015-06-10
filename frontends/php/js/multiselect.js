@@ -681,8 +681,7 @@ jQuery(function($) {
 			resizeSelectedText(li, text, obj, options);
 
 			var close_btn = $('<span>', {
-				'class': 'subfilter-disable-btn',
-				'text': '×'
+				'class': 'subfilter-disable-btn'
 			});
 
 			if (!options.disabled) {
