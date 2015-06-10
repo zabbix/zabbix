@@ -62,28 +62,28 @@ $mediaTypeFormList->addRow(_('SMTP email'), new CTextBox('smtp_email', $data['sm
 
 $connections = [
 	new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_NONE, null,
-		'smtp_security_'.SMTP_CONNECTION_SECURITY_NONE, ($data['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE)
+		'smtp_security_'.SMTP_CONNECTION_SECURITY_NONE, $data['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE
 	),
 	new CLabel(_('None'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_NONE),
 	new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_STARTTLS, null,
 		'smtp_security_'.SMTP_CONNECTION_SECURITY_STARTTLS,
-		($data['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS)
+		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS
 	),
 	new CLabel(_('STARTTLS'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_STARTTLS),
 	new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_SSL_TLS, null,
 		'smtp_security_'.SMTP_CONNECTION_SECURITY_SSL_TLS,
-		($data['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS)
+		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS
 	),
 	new CLabel(_('SSL/TLS'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_SSL_TLS)
 ];
 
 $authentication = [
 	new CRadioButton('smtp_authentication', SMTP_AUTHENTICATION_NONE, null,
-		'smtp_authentication_'.SMTP_AUTHENTICATION_NONE, ($data['smtp_authentication'] == SMTP_AUTHENTICATION_NONE)
+		'smtp_authentication_'.SMTP_AUTHENTICATION_NONE, $data['smtp_authentication'] == SMTP_AUTHENTICATION_NONE
 	),
 	new CLabel(_('None'), 'smtp_authentication_'.SMTP_AUTHENTICATION_NONE),
 	new CRadioButton('smtp_authentication', SMTP_AUTHENTICATION_NORMAL, null,
-		'smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL, ($data['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL)
+		'smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL, $data['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
 	),
 	new CLabel(_('Normal password'), 'smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL)
 ];
