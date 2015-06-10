@@ -84,19 +84,19 @@
 
 		function securityOptions() {
 			if (jQuery('input[name=smtp_security]:checked').val() == <?= SMTP_CONNECTION_SECURITY_NONE ?>) {
-				jQuery('#smtp_verify_peer, #smtp_verify_host').prop('checked', false).prop('disabled', true);
+				jQuery('#smtp_verify_peer, #smtp_verify_host').prop('checked', false).closest('li').hide();
 			}
 			else {
-				jQuery('#smtp_verify_peer, #smtp_verify_host').prop('disabled', false);
+				jQuery('#smtp_verify_peer, #smtp_verify_host').closest('li').show();
 			}
 		}
 
 		function authenticationOptions() {
 			if (jQuery('input[name=smtp_authentication]:checked').val() == <?= SMTP_AUTHENTICATION_NORMAL ?>) {
-				jQuery('#smtp_username, #passwd').prop('disabled', false);
+				jQuery('#smtp_username, #passwd').closest('li').show();
 			}
 			else {
-				jQuery('#smtp_username, #passwd').val('').prop('disabled', true);
+				jQuery('#smtp_username, #passwd').val('').closest('li').hide();
 			}
 		}
 	});
