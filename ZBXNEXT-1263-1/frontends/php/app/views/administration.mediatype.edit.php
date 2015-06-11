@@ -21,11 +21,11 @@
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
-$mediaTypeWidget = (new CWidget())->setTitle(_('Media types'));
+$widget = (new CWidget())->setTitle(_('Media types'));
 
 // create form
 $mediaTypeForm = new CForm();
-$mediaTypeForm->setAttribute('id', 'mediaTypeForm');
+$mediaTypeForm->setId('mediaTypeForm');
 $mediaTypeForm->addVar('form', 1);
 $mediaTypeForm->addVar('mediatypeid', $data['mediatypeid']);
 
@@ -44,9 +44,10 @@ $cmbType = new CComboBox('type', $data['type'], null, [
 ]);
 $cmbType->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]);
 $cmbTypeRow = [$cmbType];
-$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
-$ez_texting_link->setAttribute('id', 'eztext_link');
-$ez_texting_link->setTarget('_blank');
+$ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
+	->removeSID()
+	->setId('eztext_link')
+	->setTarget('_blank');
 $cmbTypeRow[] = $ez_texting_link;
 
 $mediaTypeFormList->addRow(_('Type'), $cmbTypeRow);
@@ -59,7 +60,8 @@ $mediaTypeFormList->addRow(_('GSM modem'), new CTextBox('gsm_modem', $data['gsm_
 
 // create password field
 if ($data['passwd'] != '') {
-	$passwdButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("passwd").enable().show().focus();');
+	$passwdButton = (new CButton('chPass_btn', _('Change password')))
+		->onClick('this.style.display="none"; $("passwd").enable().show().focus();');
 	$passwdBox = new CPassBox('passwd', $data['passwd'], ZBX_TEXTBOX_SMALL_SIZE);
 	$passwdBox->addStyle('display: none;');
 	$passwdField = [$passwdButton, $passwdBox];
@@ -77,19 +79,19 @@ $mediaTypeFormList->addRow(_('Message text limit'), new CComboBox('eztext_limit'
 	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
 ]));
 
-$mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
+$mediaTypeFormList->addRow(_('Enabled'),
+	(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
+);
 
 // append form list to tab
 $mediaTypeTab = new CTabView();
 $mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 
 // append buttons to form
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list');
-$cancelButton->setAttribute('id', 'cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list'))->setId('cancel');
 
 if ($data['mediatypeid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'mediatype.create');
-	$addButton->setAttribute('id', 'add');
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'mediatype.create'))->setId('add');
 
 	$mediaTypeTab->setFooter(makeFormFooter(
 		$addButton,
@@ -97,15 +99,13 @@ if ($data['mediatypeid'] == 0) {
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'mediatype.update');
-	$updateButton->setAttribute('id', 'update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
+	$updateButton = (new CSubmitButton(_('Update'), 'action', 'mediatype.update'))->setId('update');
+	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
+	$deleteButton = (new CRedirectButton(_('Delete'),
 		'zabbix.php?action=mediatype.delete&sid='.$data['sid'].'&mediatypeids[]='.$data['mediatypeid'],
 		_('Delete media type?')
-	);
-	$deleteButton->setAttribute('id', 'delete');
+	))
+		->setId('delete');
 
 	$mediaTypeTab->setFooter(makeFormFooter(
 		$updateButton,
@@ -121,4 +121,4 @@ else {
 $mediaTypeForm->addItem($mediaTypeTab);
 
 // append form to widget
-$mediaTypeWidget->addItem($mediaTypeForm)->show();
+$widget->addItem($mediaTypeForm)->show();

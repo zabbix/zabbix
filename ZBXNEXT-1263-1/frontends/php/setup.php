@@ -27,8 +27,8 @@ try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_SETUP);
 }
 catch (Exception $e) {
-	(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))->
-		render();
+	(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))
+		->render();
 	exit;
 }
 
@@ -105,16 +105,17 @@ $pageHeader->display();
 /*
  * Dispalying
  */
-$header = new CTag('header', 'yes', new CDiv(new CDiv(null, 'signin-logo')));
-$header->setAttribute('role', 'banner');
+$header = (new CTag('header', true, new CDiv((new CDiv())->addClass('signin-logo'))))
+	->setAttribute('role', 'banner');
 
-$link = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, true);
-$link->setAttribute('target', '_blank');
-$sub_footer = new CDiv(['Licensed under ', $link], 'signin-links');
+$link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
+	->removeSID()
+	->setAttribute('target', '_blank');
+$sub_footer = (new CDiv(['Licensed under ', $link]))->addClass('signin-links');
 
-$body = new CTag('body', 'yes', [
+$body = new CTag('body', true, [
 	$header,
-	new CDiv([$ZBX_SETUP_WIZARD, $sub_footer], ZBX_STYLE_ARTICLE),
+	(new CDiv([$ZBX_SETUP_WIZARD, $sub_footer]))->addClass(ZBX_STYLE_ARTICLE),
 	makePageFooter(false)
 ]);
 

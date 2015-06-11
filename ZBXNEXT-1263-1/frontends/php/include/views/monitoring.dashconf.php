@@ -24,7 +24,7 @@ $dashconfWidget = (new CWidget())->setTitle(_('Dashboard'));
 // create form
 $dashconfForm = new CForm();
 $dashconfForm->setName('dashconf');
-$dashconfForm->setAttribute('id', 'dashform');
+$dashconfForm->setId('dashform');
 $dashconfForm->addVar('filterEnable', $this->data['isFilterEnable']);
 
 // create form list
@@ -32,14 +32,18 @@ $dashconfFormList = new CFormList('dashconfFormList');
 
 // append filter status to form list
 if ($this->data['isFilterEnable']) {
-	$filterStatusSpan = new CSpan(_('Enabled'), ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_GREEN);
-	$filterStatusSpan->setAttribute('onclick', "create_var('".$dashconfForm->getName()."', 'filterEnable', 0, true);");
-	$filterStatusSpan->setAttribute('tabindex', 0);
+	$filterStatusSpan = (new CSpan(_('Enabled')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(ZBX_STYLE_GREEN)
+		->onClick("create_var('".$dashconfForm->getName()."', 'filterEnable', 0, true);")
+		->setAttribute('tabindex', 0);
 }
 else {
-	$filterStatusSpan = new CSpan(_('Disabled'), ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
-	$filterStatusSpan->setAttribute('onclick', "$('dashform').enable(); create_var('".$dashconfForm->getName()."', 'filterEnable', 1, true);");
-	$filterStatusSpan->setAttribute('tabindex', 0);
+	$filterStatusSpan = (new CSpan(_('Disabled')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(ZBX_STYLE_RED)
+		->onClick("$('dashform').enable(); create_var('".$dashconfForm->getName()."', 'filterEnable', 1, true);")
+		->setAttribute('tabindex', 0);
 }
 $dashconfFormList->addRow(_('Dashboard filter'), $filterStatusSpan);
 
@@ -77,7 +81,7 @@ if ($this->data['grpswitch']) {
 }
 
 // append host in maintenance checkbox to form list
-$maintenanceCheckBox = new CCheckBox('maintenance', $this->data['maintenance'], null, '1');
+$maintenanceCheckBox = (new CCheckBox('maintenance'))->setChecked($this->data['maintenance'] == 1);
 if (!$this->data['isFilterEnable']) {
 	$maintenanceCheckBox->setAttribute('disabled', 'disabled');
 }
@@ -86,10 +90,9 @@ $dashconfFormList->addRow(_('Hosts'), [$maintenanceCheckBox, _('Show hosts in ma
 // append trigger severities to form list
 $severities = [];
 foreach ($this->data['severities'] as $severity) {
-	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']',
-		isset($this->data['severity'][$severity]), null, 1
-	);
-	$serverityCheckBox->setEnabled($this->data['isFilterEnable']);
+	$serverityCheckBox = (new CCheckBox('trgSeverity['.$severity.']'))
+		->setChecked(isset($this->data['severity'][$severity]))
+		->setEnabled($this->data['isFilterEnable']);
 	$severities[] = [$serverityCheckBox, getSeverityName($severity, $this->data['config'])];
 	$severities[] = BR();
 }

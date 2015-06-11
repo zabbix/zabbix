@@ -62,7 +62,7 @@
 	</div>
 	<div class="<?= ZBX_STYLE_FOOTER ?>">
 		<a class="logo" target="_blank" href="http://www.zabbix.com"></a>
-		&copy; 2001&ndash;2015, <a target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
+		&copy; 2001&ndash;2015, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
 	</div>
 </body>
 </html>

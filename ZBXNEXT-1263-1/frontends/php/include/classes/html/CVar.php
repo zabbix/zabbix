@@ -51,12 +51,14 @@ class CVar {
 			return null;
 		}
 		if (strpos($value, "\n") === false) {
-			$hiddenVar = new CInput('hidden', $name, $value, null, $this->element_id);
-			$hiddenVar->removeAttribute('class');
+			$hiddenVar = (new CInput('hidden', $name, $value))->removeAttribute('class');
+
+			if ($this->element_id !== null) {
+				$hiddenVar->setId($this->element_id);
+			}
 		}
 		else {
-			$hiddenVar = new CTextArea($name, $value);
-			$hiddenVar->setAttribute('class', 'hidden');
+			$hiddenVar = (new CTextArea($name, $value))->setAttribute('class', 'hidden');
 		}
 		$this->var_container[] = $hiddenVar;
 	}

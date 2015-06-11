@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.slideconf.edit.js.php';
 
-$slideWidget = (new CWidget())->setTitle(_('Slide shows'));
+$widget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create form
 $slideForm = new CForm();
@@ -40,16 +40,16 @@ $slideFormList->addRow(_('Name'), $nameTextBox);
 $slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
 
 // append slide table
-$slideTable = new CTableInfo();
-$slideTable->setAttribute('style', 'min-width: 312px;');
-$slideTable->setAttribute('id', 'slideTable');
-$slideTable->setHeader([
-	(new CColHeader(SPACE))->setWidth(15),
-	(new CColHeader(SPACE))->setWidth(15),
-	_('Screen'),
-	(new CColHeader(_('Delay')))->setWidth(70),
-	(new CColHeader(_('Action')))->setWidth(50)
-]);
+$slideTable = (new CTable())
+	->setAttribute('style', 'min-width: 700px;')
+	->setId('slideTable')
+	->setHeader([
+		(new CColHeader())->setWidth(15),
+		(new CColHeader())->setWidth(15),
+		_('Screen'),
+		(new CColHeader(_('Delay')))->setWidth(70),
+		(new CColHeader(_('Action')))->setWidth(50)
+	]);
 
 $i = 1;
 foreach ($this->data['slides'] as $key => $slides) {
@@ -64,35 +64,43 @@ foreach ($this->data['slides'] as $key => $slides) {
 	$delay = new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false);
 	$delay->setAttribute('placeholder', _('default'));
 
-	$removeButton = new CButton('remove_'.$key, _('Remove'), 'javascript: removeSlide(this);', 'link_menu');
-	$removeButton->setAttribute('remove_slide', $key);
+	$removeButton = (new CButton('remove_'.$key, _('Remove')))
+		->onClick('javascript: removeSlide(this);')
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->setAttribute('remove_slide', $key);
 
-	$row = (new CRow(
-		[
-			(new CCol(new CDiv(null, 'drag-icon')))->addClass('td-drag-icon'),
-			new CSpan($i++.':', 'rowNum', 'current_slide_'.$key),
+	$slideTable->addRow(
+		(new CRow([
+			(new CCol(
+				(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+			))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+			(new CSpan($i++.':'))->addClass('rowNum')->setId('current_slide_'.$key),
 			$name,
 			$delay,
 			$removeButton
-		]))->
-		addClass('sortable')->
-		setId('slides_'.$key);
-	$slideTable->addRow($row);
+		]))
+			->addClass('sortable')
+			->setId('slides_'.$key)
+	);
 }
 
 $addButtonColumn = (new CCol(
 	empty($this->data['work_slide'])
-		? new CButton('add', _('Add'),
-			'return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
-				'&multiselect=1&writeonly=1")',
-			'link_menu')
-		: null))->
-	setColSpan(5);
+		? (new CButton('add', _('Add')))
+			->onClick('return PopUp("popup.php?srctbl=screens&srcfld1=screenid&dstfrm='.$slideForm->getName().
+					'&multiselect=1&writeonly=1")')
+			->addClass(ZBX_STYLE_BTN_LINK)
+		: null
+	))->setColSpan(5);
 
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
-$slideFormList->addRow(_('Slides'), new CDiv($slideTable, 'objectgroup inlineblock border_dotted'));
+$slideFormList->addRow(_('Slides'), (new CDiv($slideTable))
+	->addClass('objectgroup')
+	->addClass('inlineblock')
+	->addClass('border_dotted')
+);
 
 // append tabs to form
 $slideTab = new CTabView();
@@ -117,6 +125,6 @@ else {
 }
 
 $slideForm->addItem($slideTab);
-$slideWidget->addItem($slideForm);
+$widget->addItem($slideForm);
 
-return $slideWidget;
+return $widget;

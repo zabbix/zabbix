@@ -27,9 +27,10 @@ $filterForm = new CFilter('web.auditlogs.filter.state');
 $filterColumn = new CFormList();
 $filterColumn->addRow(_('User'), [
 	new CTextBox('alias', $this->data['alias'], 20),
-	new CButton('btn1', _('Select'),
-		'return PopUp("popup.php?dstfrm=zbx_filter&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
-	)
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CButton('btn1', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.php?dstfrm=zbx_filter&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");')
 ]);
 $filterColumn->addRow(_('Action'), new CComboBox('action', $this->data['action'], null, [
 	-1 => _('All'),
