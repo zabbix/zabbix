@@ -243,6 +243,11 @@ static int	DBpatch_2050012(void)
 	return ret;
 }
 
+static int	DBpatch_2050013(void)
+{
+	return DBdrop_table("user_history");
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -262,5 +267,6 @@ DBPATCH_ADD(2050009, 0, 1)
 DBPATCH_ADD(2050010, 0, 1)
 DBPATCH_ADD(2050011, 0, 1)
 DBPATCH_ADD(2050012, 0, 1)
+DBPATCH_ADD(2050013, 0, 0)
 
 DBPATCH_END()
