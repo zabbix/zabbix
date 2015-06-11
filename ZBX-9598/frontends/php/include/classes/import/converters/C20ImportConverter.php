@@ -46,6 +46,8 @@ class C20ImportConverter extends CConverter {
 	public function convert($data) {
 		$data['zabbix_export']['version'] = '3.0';
 
+		$data = $this->escapeHex($data);
+
 		if (array_key_exists('hosts', $data['zabbix_export'])) {
 			$data['zabbix_export']['hosts'] = $this->convertHosts($data['zabbix_export']['hosts']);
 		}
@@ -64,6 +66,29 @@ class C20ImportConverter extends CConverter {
 		if (array_key_exists('maps', $data['zabbix_export'])) {
 			$data['zabbix_export']['maps'] = $this->convertMaps($data['zabbix_export']['maps']);
 		}
+
+		return $data;
+	}
+
+	/**
+	 * Recursive function to escape hex-like strings with \x by adding a backslash before it.
+	 *
+	 * Exaple: abc\x1bdef -> abc\\x1bdef
+	 *
+	 * @param array $data		array containing import data
+	 *
+	 * @return array
+	 */
+	protected function escapeHex(array $data) {
+		foreach ($data as &$value) {
+			if (is_array($value)) {
+				$value = $this->escapeHex($value);
+			}
+			else {
+				$value = preg_replace('/\\\x/', '\\\\\x', $value);
+			}
+		}
+		unset($value);
 
 		return $data;
 	}

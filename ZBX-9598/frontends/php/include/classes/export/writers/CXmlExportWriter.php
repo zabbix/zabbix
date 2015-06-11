@@ -59,12 +59,12 @@ class CXmlExportWriter extends CExportWriter {
 	 * Exaple: abc\x1b&#27;\x1bdef -> abc\\x1b\x1b\\x1bdef
 	 * where &#27; is ASCII "ESC" control character and \x1b is just a string.
 	 *
-	 * @param array $array		array containing export data
+	 * @param array $data		array containing export data
 	 *
 	 * @return array
 	 */
-	protected function controlCharsToHex(array $array) {
-		foreach ($array as &$value) {
+	protected function controlCharsToHex(array $data) {
+		foreach ($data as &$value) {
 			if (is_array($value)) {
 				$value = $this->controlCharsToHex($value);
 			}
@@ -88,7 +88,7 @@ class CXmlExportWriter extends CExportWriter {
 		}
 		unset($value);
 
-		return $array;
+		return $data;
 	}
 
 	/**

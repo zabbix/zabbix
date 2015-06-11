@@ -60,51 +60,8 @@ class CXmlImportReader extends CImportReader {
 
 		$xml = new XMLReader();
 		$xml->xml($string);
-
 		$array = $this->xmlToArray($xml);
 		$xml->close();
-
-		$array = $this->hexToAscii($array);
-
-		return $array;
-	}
-
-	/**
-	 * Recursive function to convert hex string \x%x format to ASCII characters. The escaped strings \\x
-	 * are translated to \x.
-	 *
-	 * Exaple: abc\\x1b\x1b\\x1bdef -> abc\x1b&#27;\x1bdef
-	 * where \\x1b is an escaped string and \x1b is ASCII control character.
-	 *
-	 * @param array $array		array containing import data
-	 *
-	 * @return array
-	 */
-	protected function hexToAscii(array $array) {
-		foreach ($array as &$value) {
-			if (is_array($value)) {
-				$value = $this->hexToAscii($value);
-			}
-			else {
-				// convert all \x%x to ASCII characters except if \x is preceding with another \
-				$value = preg_replace_callback('/(?<!\\\)\\\x[a-zA-Z0-9]{1,2}/',
-					function ($matches) {
-						foreach ($matches as &$match) {
-							$match = chr(hexdec(str_replace('\x', '', $match)));
-						}
-						unset($match);
-
-						return $matches[0];
-					},
-					$value
-				);
-
-				// convert all \\x to \x
-				$value = preg_replace('/\\\\\\\x/', '\\\x', $value);
-			}
-		}
-		unset($value);
-
 		return $array;
 	}
 
