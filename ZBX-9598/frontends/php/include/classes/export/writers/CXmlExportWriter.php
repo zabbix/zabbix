@@ -43,11 +43,52 @@ class CXmlExportWriter extends CExportWriter {
 		$this->xmlWriter->setIndentString('    ');
 		$this->xmlWriter->startDocument('1.0', 'UTF-8');
 
+		$array = $this->controlCharsToHex($array);
+
 		$this->fromArray($array);
 
 		$this->xmlWriter->endDocument();
 
 		return $this->xmlWriter->outputMemory();
+	}
+
+	/**
+	 * Recursive function to convert ASCII control characters to \x%x format. Additionally it escapes strings with \x
+	 * by adding a backslash before it.
+	 *
+	 * Exaple: abc\x1b&#27;\x1bdef -> abc\\x1b\x1b\\x1bdef
+	 * where &#27; is ASCII "ESC" control character and \x1b is just a string.
+	 *
+	 * @param array $array		array containing export data
+	 *
+	 * @return array
+	 */
+	protected function controlCharsToHex(array $array) {
+		foreach ($array as &$value) {
+			if (is_array($value)) {
+				$value = $this->controlCharsToHex($value);
+			}
+			else {
+				// convert all \x to \\x
+				$value = preg_replace('/\\\x/', '\\\\\x', $value);
+
+				// convert control characters to \x%x
+				$value = preg_replace_callback('/[\x{00}-\x{08}]|[\x{0B}]|[\x{0C}]|[\x{0E}-\x{1F}]/',
+					function ($matches) {
+						foreach ($matches as &$match) {
+							$match = '\x'.dechex(ord($match));
+						}
+						unset($match);
+
+						return $matches[0];
+					},
+					$value
+				);
+			}
+		}
+		unset($value);
+
+		return $array;
 	}
 
 	/**
