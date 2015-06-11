@@ -21,6 +21,13 @@
 
 require_once dirname(__FILE__).'/js/administration.general.gui.php';
 
+$widget = (new CWidget())
+	->setTitle(_('GUI'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.gui.php')))
+	);
+
 $guiTab = new CFormList();
 $guiTab->addRow(_('Default theme'), new CComboBox('default_theme', $data['default_theme'], null, Z::getThemes()));
 $guiTab->addRow(_('Dropdown first entry'), [
@@ -28,7 +35,7 @@ $guiTab->addRow(_('Dropdown first entry'), [
 		ZBX_DROPDOWN_FIRST_NONE => _('None'),
 		ZBX_DROPDOWN_FIRST_ALL => _('All')
 	]),
-	new CCheckBox('dropdown_first_remember', $data['dropdown_first_remember'] == 1, null, 1),
+	(new CCheckBox('dropdown_first_remember'))->setChecked($data['dropdown_first_remember'] == 1),
 	_('remember selected')
 ]);
 $guiTab->addRow(_('Search/Filter elements limit'),
@@ -38,7 +45,7 @@ $guiTab->addRow(_('Max count of elements to show inside table cell'),
 	new CNumericBox('max_in_table', $data['max_in_table'], 5)
 );
 $guiTab->addRow(_('Enable event acknowledges'),
-	new CCheckBox('event_ack_enable', $data['event_ack_enable'] == 1, null, 1)
+	(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)
 );
 $guiTab->addRow(_('Show events not older than (in days)'),
 	new CTextBox('event_expire', $data['event_expire'], 5)
@@ -47,9 +54,8 @@ $guiTab->addRow(_('Max count of events per trigger to show'),
 	new CTextBox('event_show_max', $data['event_show_max'], 5)
 );
 $guiTab->addRow(_('Show warning if Zabbix server is down'),
-	new CCheckBox('server_check_interval', $data['server_check_interval'] == SERVER_CHECK_INTERVAL, null,
-		SERVER_CHECK_INTERVAL
-	)
+	(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))
+		->setChecked($data['server_check_interval'] == SERVER_CHECK_INTERVAL)
 );
 
 $guiView = new CTabView();
@@ -62,4 +68,6 @@ $guiView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
 $guiForm->addItem($guiView);
 
-return $guiForm;
+$widget->addItem($guiForm);
+
+return $widget;

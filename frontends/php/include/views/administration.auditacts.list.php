@@ -28,9 +28,12 @@ $filterColumn->addRow(
 	_('Recipient'),
 	[
 		new CTextBox('alias', $this->data['alias'], 20),
-		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm=zbx_filter'.
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
-		)
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('btn1', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.php?dstfrm=zbx_filter'.
+				'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
+			)
 	]
 );
 
@@ -59,18 +62,18 @@ foreach ($this->data['alerts'] as $alert) {
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
 		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
-			? new CSpan(_('Sent'), ZBX_STYLE_GREEN)
-			: new CSpan(_('Executed'), ZBX_STYLE_GREEN);
+			? (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN)
+			: (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-		$status = new CSpan([
+		$status = (new CSpan([
 			_('In progress').':',
 			BR(),
 			_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-		], ZBX_STYLE_ORANGE);
+		]))->addClass(ZBX_STYLE_ORANGE);
 	}
 	else {
-		$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
+		$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 	}
 
 	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
@@ -94,8 +97,10 @@ foreach ($this->data['alerts'] as $alert) {
 		$info = '';
 	}
 	else {
-		$info = new CDiv(SPACE, 'status_icon iconerror');
-		$info->setHint($alert['error'], ZBX_STYLE_RED);
+		$info = (new CDiv(SPACE))
+			->addClass('status_icon')
+			->addClass('iconerror')
+			->setHint($alert['error'], ZBX_STYLE_RED);
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])

@@ -18,16 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$sysmapWidget = (new CWidget())->setTitle(_('Maps'));
-
-// create header buttons
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addItem((new CList())->
-	addItem(new CSubmit('form', _('Create map')))->
-	addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=map")'))
-);
-
-$sysmapWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Maps'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(new CSubmit('form', _('Create map')))
+			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=map")'))
+		)
+	);
 
 // create form
 $sysmapForm = new CForm();
@@ -37,8 +36,8 @@ $sysmapForm->setName('frm_maps');
 $sysmapTable = new CTableInfo();
 $sysmapTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_maps', null, "checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")))->
-		addClass('cell-width'),
+		(new CCheckBox('all_maps'))->onClick("checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
@@ -47,7 +46,7 @@ $sysmapTable->setHeader([
 
 foreach ($this->data['maps'] as $map) {
 	$sysmapTable->addRow([
-		new CCheckBox('maps['.$map['sysmapid'].']', null, null, $map['sysmapid']),
+		new CCheckBox('maps['.$map['sysmapid'].']', $map['sysmapid']),
 		new CLink($map['name'], 'sysmaps.php?form=update&sysmapid='.$map['sysmapid'].'#form'),
 		$map['width'],
 		$map['height'],
@@ -66,6 +65,6 @@ $sysmapForm->addItem([
 ]);
 
 // append form to widget
-$sysmapWidget->addItem($sysmapForm);
+$widget->addItem($sysmapForm);
 
-return $sysmapWidget;
+return $widget;

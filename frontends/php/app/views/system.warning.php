@@ -23,9 +23,9 @@ $pageHeader = new CPageHeader(_('Fatal error, please report to the Zabbix team')
 $pageHeader->addCssInit();
 $pageHeader->display();
 
-$buttons = [new CButton('back', _('Go to dashboard'),
-	'javascript: document.location = "zabbix.php?action=dashboard.view"',
-	'button'
+$buttons = [
+	(new CButton('back', _('Go to dashboard')))
+		->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"'
 )];
 
 echo '<body>';

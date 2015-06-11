@@ -22,7 +22,7 @@
 class CArea extends CTag {
 
 	public function __construct($coords, $href, $alt, $shape) {
-		parent::__construct('area', 'no');
+		parent::__construct('area');
 		$this->setCoords($coords);
 		$this->setShape($shape);
 		$this->setHref($href);

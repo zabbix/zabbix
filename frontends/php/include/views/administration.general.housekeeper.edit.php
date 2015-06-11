@@ -21,12 +21,18 @@
 
 require_once dirname(__FILE__).'/js/administration.general.housekeeper.edit.js.php';
 
+$widget = (new CWidget())
+	->setTitle(_('Housekeeping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.housekeeper.php')))
+	);
+
 $houseKeeperTab = new CFormList();
 
 // events and alerts
-$eventAlertTab = (new CTable())->
-	addClass('formElementTable');
-$eventsMode = new CCheckBox('hk_events_mode', $data['hk_events_mode'] == 1, null, 1);
+$eventAlertTab = (new CTable())->addClass('formElementTable');
+$eventsMode = (new CCheckBox('hk_events_mode'))->setChecked($data['hk_events_mode'] == 1);
 $eventAlertTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
 	$eventsMode
@@ -60,12 +66,11 @@ $eventAlertTab->addClass('border_dotted objectgroup element-row element-row-firs
 $houseKeeperTab->addRow(_('Events and alerts'), new CDiv($eventAlertTab));
 
 // IT services
-$itServicesTab = (new CTable())->
-	addClass('formElementTable');
+$itServicesTab = (new CTable())->addClass('formElementTable');
 
 $itServicesTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
-	new CCheckBox('hk_services_mode', $data['hk_services_mode'] == 1, null, 1)
+	(new CCheckBox('hk_services_mode'))->setChecked($data['hk_services_mode'] == 1)
 ]);
 
 $houseKeeperServicesMode = new CNumericBox('hk_services', $data['hk_services'], 5);
@@ -78,12 +83,11 @@ $itServicesTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('IT services'), new CDiv($itServicesTab));
 
 // audit
-$auditTab = (new CTable())->
-	addClass('formElementTable');
+$auditTab = (new CTable())->addClass('formElementTable');
 
 $auditTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
-	new CCheckBox('hk_audit_mode', $data['hk_audit_mode'] == 1, null, 1)
+	(new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1)
 ]);
 
 $houseKeeperAuditMode = new CNumericBox('hk_audit', $data['hk_audit'], 5);
@@ -96,12 +100,11 @@ $auditTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('Audit'), new CDiv($auditTab));
 
 // user session
-$userSessionTab = (new CTable())->
-	addClass('formElementTable');
+$userSessionTab = (new CTable())->addClass('formElementTable');
 
 $userSessionTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
-	new CCheckBox('hk_sessions_mode', $data['hk_sessions_mode'] == 1, null, 1)
+	(new CCheckBox('hk_sessions_mode'))->setChecked($data['hk_sessions_mode'] == 1)
 ]);
 
 $houseKeeperSessionsMode = new CNumericBox('hk_sessions', $data['hk_sessions'], 5);
@@ -114,14 +117,13 @@ $userSessionTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('User sessions'), new CDiv($userSessionTab));
 
 // history
-$histortTab = (new CTable())->
-	addClass('formElementTable');
+$histortTab = (new CTable())->addClass('formElementTable');
 
 $histortTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
-	new CCheckBox('hk_history_mode', $data['hk_history_mode'] == 1, null, 1)
+	(new CCheckBox('hk_history_mode'))->setChecked($data['hk_history_mode'] == 1)
 ]);
-$houseKeeperHistoryGlobal = new CCheckBox('hk_history_global', $data['hk_history_global'] == 1, null, 1);
+$houseKeeperHistoryGlobal = (new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1);
 $houseKeeperHistoryModeGlobal = new CNumericBox('hk_history', $data['hk_history'], 5);
 $houseKeeperHistoryModeGlobal->setEnabled($data['hk_history_global'] == 1);
 $histortTab->addRow([new CLabel(_('Override item history period'),
@@ -134,14 +136,13 @@ $histortTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('History'), new CDiv($histortTab));
 
 // trend
-$trendTab = (new CTable())->
-	addClass('formElementTable');
+$trendTab = (new CTable())->addClass('formElementTable');
 
 $trendTab->addRow([
 	new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
-	new CCheckBox('hk_trends_mode', $data['hk_trends_mode'] == 1, null, 1)
+	(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)
 ]);
-$houseKeeperTrendGlobal = new CCheckBox('hk_trends_global', $data['hk_trends_global'] == 1, null, 1);
+$houseKeeperTrendGlobal = (new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1);
 $houseKeeperTrendModeGlobal = new CNumericBox('hk_trends', $data['hk_trends'], 5);
 $houseKeeperTrendModeGlobal->setEnabled($data['hk_trends_global'] == 1);
 $trendTab->addRow([new CLabel(_('Override item trend period'),
@@ -165,4 +166,6 @@ $houseKeeperView->setFooter(makeFormFooter(
 
 $houseKeeperForm->addItem($houseKeeperView);
 
-return $houseKeeperForm;
+$widget->addItem($houseKeeperForm);
+
+return $widget;

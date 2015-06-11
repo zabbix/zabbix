@@ -19,13 +19,11 @@
 **/
 
 
-$itemWidget = (new CWidget())->setTitle($this->data['page_header']);
-
-if (!empty($this->data['hostid'])) {
-	$itemWidget->addItem(get_header_host_table('discoveries', $this->data['hostid'],
-		isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : null
+$widget = (new CWidget())
+	->setTitle(_('Discovery rules'))
+	->addItem(get_header_host_table('discoveries', $this->data['hostid'],
+		isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : 0
 	));
-}
 
 // create form
 $itemForm = new CForm();
@@ -91,9 +89,10 @@ if (!empty($this->data['interfaces'])) {
 		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
-	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
-	$span->setAttribute('id', 'interface_not_defined');
-	$span->setAttribute('style', 'display: none;');
+	$span = (new CSpan(_('No interface found')))
+		->addClass(ZBX_STYLE_RED)
+		->setId('interface_not_defined')
+		->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], false, 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
@@ -123,13 +122,17 @@ $securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmp
 ]);
 $itemFormList->addRow(_('Security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
 $authProtocolRadioButton = [
-	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5),
+	(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5))
+		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
 	new CLabel(_('MD5'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
-	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA),
+	(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA))
+		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA),
 	new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 ];
 $itemFormList->addRow(_('Authentication protocol'),
-	new CDiv($authProtocolRadioButton, 'jqueryinputset radioset'),
+	(new CDiv($authProtocolRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset'),
 	false, 'row_snmpv3_authprotocol'
 );
 $itemFormList->addRow(_('Authentication passphrase'),
@@ -137,13 +140,17 @@ $itemFormList->addRow(_('Authentication passphrase'),
 	false, 'row_snmpv3_authpassphrase'
 );
 $privProtocolRadioButton = [
-	new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES),
+	(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES))
+		->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
 	new CLabel(_('DES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
-	new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES),
+	(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES))
+		->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES),
 	new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 ];
 $itemFormList->addRow(_('Privacy protocol'),
-	new CDiv($privProtocolRadioButton, 'jqueryinputset radioset'),
+	(new CDiv($privProtocolRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset'),
 	false, 'row_snmpv3_privprotocol'
 );
 $itemFormList->addRow(_('Privacy passphrase'),
@@ -192,11 +199,12 @@ $itemFormList->addRow(_('SQL query'),
 $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
 
 // append delay flex to form list
-$delayFlexTable = (new CTable(_('No flexible intervals defined.')))->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 310px;')->
-	setAttribute('id', 'delayFlexTable')->
-	setHeader([_('Interval'), _('Period'), _('Action')]);
+$delayFlexTable = (new CTable())
+	->setNoDataMessage(_('No flexible intervals defined.'))
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 310px;')
+	->setId('delayFlexTable')
+	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
 $this->data['maxReached'] = false;
 foreach ($this->data['delay_flex'] as $delayFlex) {
@@ -209,7 +217,9 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	$row = (new CRow([
 		$delayFlex['delay'],
 		$delayFlex['period'],
-		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
+		(new CButton('remove', _('Remove')))
+			->onClick('javascript: removeDelayFlex('.$i.');')
+			->addClass(ZBX_STYLE_BTN_LINK)
 	]))->setId('delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
 
@@ -221,7 +231,11 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	}
 }
 $itemFormList->addRow(_('Flexible intervals'),
-	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted ui-corner-all'), false, 'row_flex_intervals'
+	(new CDiv($delayFlexTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted'),
+	false, 'row_flex_intervals'
 );
 
 // append new flexible interval to form list
@@ -234,13 +248,14 @@ $newFlexInt = new CSpan([
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CButton('add_delay_flex', _('Add'), null, 'button-form')
+	(new CButton('add_delay_flex', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 ]);
-$newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
+$newFlexInt->setId('row-new-delay-flex-fields');
 
-$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
-$maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
-$maxFlexMsg->setAttribute('style', 'display: none;');
+$maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
+	->addClass(ZBX_STYLE_RED)
+	->setId('row-new-delay-flex-max-reached')
+	->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');
 
@@ -256,7 +271,7 @@ $description->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
 // status
-$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
+$enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($this->data['status'] == ITEM_STATUS_ACTIVE);
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 /*
@@ -266,7 +281,7 @@ $conditionFormList = new CFormList();
 
 // type of calculation
 $formula = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
-$formula->setAttribute('id', 'formula');
+$formula->setId('formula');
 $formula->setAttribute('placeholder', 'A or (B and C) &hellip;');
 if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
@@ -279,17 +294,20 @@ $conditionFormList->addRow(_('Type of calculation'),
 			CONDITION_EVAL_TYPE_OR => _('Or'),
 			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 		]),
-		new CSpan('', ($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) ? 'hidden' : '', 'expression'),
+		(new CSpan(''))
+			->addClass($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION ? 'hidden' : '')
+			->setId('expression'),
 		$formula
 	],
 	(count($this->data['conditions']) < 2), 'conditionRow'
 );
 
 // macros
-$conditionTable = (new CTable(''))->
-	addClass('formElementTable')->
-	setAttribute('id', 'conditions')->
-	addRow([_('Label'), _('Macro'), SPACE, _('Regular expression'), SPACE]);
+$conditionTable = (new CTable())
+	->setNoDataMessage('')
+	->addClass('formElementTable')
+	->setId('conditions')
+	->addRow([_('Label'), _('Macro'), SPACE, _('Regular expression'), SPACE]);
 
 $conditions = $this->data['conditions'];
 if (!$conditions) {
@@ -318,23 +336,35 @@ foreach ($conditions as $i => $condition) {
 	$value->setAttribute('placeholder', _('regular expression'));
 
 	// delete button
-	$deleteButtonCell = [new CButton('conditions_'.$i.'_remove', _('Remove'), null, 'link_menu element-table-remove')];
+	$deleteButtonCell = [
+		(new CButton('conditions_'.$i.'_remove', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	];
 
 	$row = [$formulaId, $macro, new CSpan(_('matches')), $value, $deleteButtonCell];
 	$conditionTable->addRow($row, 'form_row');
 }
 
-$addButton = new CButton('macro_add', _('Add'), null, 'link_menu element-table-add');
-$buttonColumn = new CCol($addButton);
+$buttonColumn = new CCol(
+	(new CButton('macro_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+);
 $buttonColumn->setAttribute('colspan', 5);
 
-$buttonRow = new CRow();
-$buttonRow->setAttribute('id', 'row_new_macro');
-$buttonRow->addItem($buttonColumn);
+$buttonRow = (new CRow())
+	->setId('row_new_macro')
+	->addItem($buttonColumn);
 
 $conditionTable->addRow($buttonRow);
 
-$conditionFormList->addRow(_('Filters'), new CDiv($conditionTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$conditionFormList->addRow(_('Filters'),
+	(new CDiv($conditionTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 
 // append tabs to form
@@ -368,8 +398,8 @@ else {
 }
 
 $itemForm->addItem($itemTab);
-$itemWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.host.discovery.edit.js.php';
 
-return $itemWidget;
+return $widget;

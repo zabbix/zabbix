@@ -103,15 +103,17 @@ function insert_show_color_picker_javascript() {
 		return;
 	}
 	$SHOW_COLOR_PICKER_SCRIPT_INSERTED = true;
-	$table = new CTable();
+	$table = [];
 
 	// gray colors
 	$row = [];
 	foreach (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'] as $c) {
 		$color = $c.$c.$c.$c.$c.$c;
-		$row[] = new CColorCell(null, $color, 'set_color("'.$color.'");');
+		$row[] = (new CColorCell(null, $color))
+			->setTitle('#'.$color)
+			->onClick('set_color("'.$color.'");');
 	}
-	$table->addRow($row);
+	$table[] = (new CDiv($row))->addClass(ZBX_STYLE_COLOR_PICKER);
 
 	// other colors
 	$colors = [
@@ -150,21 +152,22 @@ function insert_show_color_picker_javascript() {
 			$b = $br[$c['b']];
 
 			$color = $r.$r.$g.$g.$b.$b;
-			$row[] = new CColorCell(null, $color, 'set_color("'.$color.'");');
+			$row[] = (new CColorCell(null, $color))
+				->setTitle('#'.$color)
+				->onClick('set_color("'.$color.'");');
 		}
-		$table->addRow($row);
+		$table[] = (new CDiv($row))->addClass(ZBX_STYLE_COLOR_PICKER);
 	}
 
-	$cancel = new CSpan(_('Cancel'), 'link');
-	$cancel->setAttribute('onclick', 'javascript: hide_color_picker();');
+	$cancel = (new CSpan())
+		->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
+		->onClick('javascript: hide_color_picker();');
 
-	$tmp = [$table, $cancel];
-	$script = '
-		var color_picker = null;
-		var curr_lbl = null;
-		var curr_txt = null;
-		var color_table = '.zbx_jsvalue(unpack_object($tmp))."\n";
-	insert_js($script);
+	$tmp = [$cancel, $table];
+	insert_js('var color_picker = null,'."\n".
+		'curr_lbl = null,'."\n".
+		'curr_txt = null,'."\n".
+		'color_table = '.zbx_jsvalue(unpack_object($tmp))."\n");
 	zbx_add_post_js('create_color_picker();');
 }
 

@@ -360,8 +360,10 @@ else {
 			_('Trigger'),
 			[
 				new CTextBox('trigger', $trigger, 96, true),
-				new CButton('btn1', _('Select'),
-					'return PopUp("popup.php?'.
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('btn1', _('Select')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick('return PopUp("popup.php?'.
 						'dstfrm=zbx_filter'.
 						'&dstfld1=triggerid'.
 						'&dstfld2=trigger'.
@@ -373,7 +375,7 @@ else {
 						'&with_monitored_triggers=1'.
 						($pageFilter->hostid ? '&only_hostid='.$pageFilter->hostid : '').
 						'");'
-				)
+					)
 			]
 		);
 
@@ -782,10 +784,11 @@ else {
 					];
 				}
 				else {
-					$triggerDescription = new CSpan($description, ZBX_STYLE_LINK_ACTION.' link_menu');
-					$triggerDescription->setMenuPopup(
-						CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
-					);
+					$triggerDescription = (new CSpan($description))
+						->addClass(ZBX_STYLE_LINK_ACTION)
+						->setMenuPopup(
+							CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
+						);
 
 					// acknowledge
 					$ack = getEventAckState($event, $page['file']);
@@ -804,15 +807,15 @@ else {
 					$hostName = null;
 
 					if (getRequest('hostid', 0) == 0) {
-						$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
-						$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+						$hostName = (new CSpan($host['name']))
+							->addClass(ZBX_STYLE_LINK_ACTION)
+							->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
 
 					$table->addRow([
-						new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
-							'action'
-						),
+						(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
+								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']))
+							->addClass('action'),
 						$hostName,
 						$triggerDescription,
 						$statusSpan,

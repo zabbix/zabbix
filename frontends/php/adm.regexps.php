@@ -225,9 +225,7 @@ if (isset($_REQUEST['form'])) {
 		$data['expressions'] = getRequest('expressions', []);
 	}
 
-	$regExpView = new CView('administration.general.regularexpressions.edit', $data);
-	$regExpView->render();
-	$regExpView->show();
+	$view = new CView('administration.general.regularexpressions.edit', $data);
 }
 else {
 	$data = [
@@ -253,9 +251,10 @@ else {
 		' ORDER BY e.expression_type'
 	));
 
-	$regExpView = new CView('administration.general.regularexpressions.list', $data);
-	$regExpView->render();
-	$regExpView->show();
+	$view = new CView('administration.general.regularexpressions.list', $data);
 }
+
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -111,7 +111,7 @@ function getFavouriteGraphsData() {
 function getFavouriteGraphs() {
 	$data = getFavouriteGraphsData();
 
-	$favourites = new CTableInfo(_('No graphs added.'));
+	$favourites = (new CTableInfo())->setNoDataMessage(_('No graphs added.'));
 
 	if ($data['graphs']) {
 		foreach ($data['graphs'] as $graph) {
@@ -169,7 +169,7 @@ function getFavouriteMapsData() {
 function getFavouriteMaps() {
 	$data = getFavouriteMapsData();
 
-	$favourites = new CTableInfo(_('No maps added.'));
+	$favourites = (new CTableInfo())->setNoDataMessage(_('No maps added.'));
 
 	if ($data) {
 		foreach ($data as $map) {
@@ -248,7 +248,7 @@ function getFavouriteScreensData() {
 function getFavouriteScreens() {
 	$data = getFavouriteScreensData();
 
-	$favourites = new CTableInfo(_('No screens added.'));
+	$favourites = (new CTableInfo())->setNoDataMessage(_('No screens added.'));
 
 	if ($data['screens']) {
 		foreach ($data['screens'] as $screen) {
@@ -421,14 +421,17 @@ function make_system_status($filter) {
 
 			$allTriggersNum = $data['count'];
 			if ($allTriggersNum) {
-				$allTriggersNum = new CSpan($allTriggersNum, ZBX_STYLE_LINK_ACTION);
-				$allTriggersNum->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions, $config));
+				$allTriggersNum = (new CSpan($allTriggersNum))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions, $config));
 			}
 
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
-				$unackTriggersNum = new CSpan($unackTriggersNum, ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
-				$unackTriggersNum->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions, $config));
+				$unackTriggersNum = (new CSpan($unackTriggersNum))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_RED)
+					->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions, $config));
 			}
 
 			switch ($filter['extAck']) {
@@ -483,38 +486,37 @@ function make_status_of_zbx() {
 
 	$table->addRow([
 		_('Zabbix server is running'),
-		new CSpan($status['zabbix_server'], ($status['zabbix_server'] == _('Yes') ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)),
+		(new CSpan($status['zabbix_server']))->addClass($status['zabbix_server'] == _('Yes') ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
 		isset($ZBX_SERVER, $ZBX_SERVER_PORT) ? $ZBX_SERVER.':'.$ZBX_SERVER_PORT : _('Zabbix server IP or port is not set!')
 	]);
-	$title = new CSpan(_('Number of hosts (enabled/disabled/templates)'));
-	$title->setAttribute('title', 'asdad');
+	$title = (new CSpan(_('Number of hosts (enabled/disabled/templates)')))->setAttribute('title', 'asdad');
 	$table->addRow([_('Number of hosts (enabled/disabled/templates)'), $status['hosts_count'],
 		[
-			new CSpan($status['hosts_count_monitored'], ZBX_STYLE_GREEN), ' / ',
-			new CSpan($status['hosts_count_not_monitored'], ZBX_STYLE_RED), ' / ',
-			new CSpan($status['hosts_count_template'], ZBX_STYLE_GREY)
+			(new CSpan($status['hosts_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
+			(new CSpan($status['hosts_count_not_monitored']))->addClass(ZBX_STYLE_RED), ' / ',
+			(new CSpan($status['hosts_count_template']))->addClass(ZBX_STYLE_GREY)
 		]
 	]);
-	$title = new CSpan(_('Number of items (enabled/disabled/not supported)'));
-	$title->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
+	$title = (new CSpan(_('Number of items (enabled/disabled/not supported)')))
+		->setAttribute('title', _('Only items assigned to enabled hosts are counted'));
 	$table->addRow([$title, $status['items_count'],
 		[
-			new CSpan($status['items_count_monitored'], ZBX_STYLE_GREEN), ' / ',
-			new CSpan($status['items_count_disabled'], ZBX_STYLE_RED), ' / ',
-			new CSpan($status['items_count_not_supported'], ZBX_STYLE_GREY)
+			(new CSpan($status['items_count_monitored']))->addClass(ZBX_STYLE_GREEN), ' / ',
+			(new CSpan($status['items_count_disabled']))->addClass(ZBX_STYLE_RED), ' / ',
+			(new CSpan($status['items_count_not_supported']))->addClass(ZBX_STYLE_GREY)
 		]
 	]);
-	$title = new CSpan(_('Number of triggers (enabled/disabled [problem/ok])'));
-	$title->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
+	$title = (new CSpan(_('Number of triggers (enabled/disabled [problem/ok])')))
+		->setAttribute('title', _('Only triggers assigned to enabled hosts and depending on enabled items are counted'));
 	$table->addRow([$title, $status['triggers_count'],
 		[
 			$status['triggers_count_enabled'], ' / ',
 			$status['triggers_count_disabled'], ' [',
-			new CSpan($status['triggers_count_on'], ZBX_STYLE_RED), ' / ',
-			new CSpan($status['triggers_count_off'], ZBX_STYLE_GREEN), ']'
+			(new CSpan($status['triggers_count_on']))->addClass(ZBX_STYLE_RED), ' / ',
+			(new CSpan($status['triggers_count_off']))->addClass(ZBX_STYLE_GREEN), ']'
 		]
 	]);
-	$table->addRow([_('Number of users (online)'), $status['users_count'], new CSpan($status['users_online'], ZBX_STYLE_GREEN)]);
+	$table->addRow([_('Number of users (online)'), $status['users_count'], (new CSpan($status['users_online']))->addClass(ZBX_STYLE_GREEN)]);
 	$table->addRow([_('Required server performance, new values per second'), $status['qps_total'], '']);
 
 	// check requirements
@@ -525,9 +527,9 @@ function make_status_of_zbx() {
 			if ($req['result'] != CFrontendSetup::CHECK_OK) {
 				$class = ($req['result'] == CFrontendSetup::CHECK_WARNING) ? 'notice' : 'fail';
 				$table->addRow([
-					new CSpan($req['name'], $class),
-					new CSpan($req['current'], $class),
-					new CSpan($req['error'], $class)
+					(new CSpan($req['name']))->addClass($class),
+					(new CSpan($req['current']))->addClass($class),
+					(new CSpan($req['error']))->addClass($class)
 				]);
 			}
 		}
@@ -660,14 +662,15 @@ function make_latest_issues(array $filter = []) {
 
 	// indicator of sort field
 	if ($showSortIndicator) {
-		$sortDiv = new CDiv(SPACE, ($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
-		$sortDiv->addStyle('float: left');
-		$hostHeaderDiv = new CDiv([_('Host'), SPACE]);
-		$hostHeaderDiv->addStyle('float: left');
-		$issueHeaderDiv = new CDiv([_('Issue'), SPACE]);
-		$issueHeaderDiv->addStyle('float: left');
-		$lastChangeHeaderDiv = new CDiv([_('Time'), SPACE]);
-		$lastChangeHeaderDiv->addStyle('float: left');
+		$sortDiv = (new CDiv(SPACE))
+			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor')
+			->addStyle('float: left');
+		$hostHeaderDiv = (new CDiv([_('Host'), SPACE]))
+			->addStyle('float: left');
+		$issueHeaderDiv = (new CDiv([_('Issue'), SPACE]))
+			->addStyle('float: left');
+		$lastChangeHeaderDiv = (new CDiv([_('Time'), SPACE]))
+			->addStyle('float: left');
 	}
 
 	$table = new CTableInfo();
@@ -687,14 +690,15 @@ function make_latest_issues(array $filter = []) {
 	foreach ($triggers as $trigger) {
 		$host = $hosts[$trigger['hostid']];
 
-		$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+		$hostName = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 
 		// add maintenance icon with hint if host is in maintenance
 		$maintenanceIcon = null;
 
 		if ($host['maintenance_status']) {
-			$maintenanceIcon = new CDiv(null, 'icon-maintenance-abs');
+			$maintenanceIcon = (new CDiv())->addClass('icon-maintenance-abs');
 
 			// get maintenance
 			$maintenances = API::Maintenance()->get([
@@ -719,13 +723,17 @@ function make_latest_issues(array $filter = []) {
 			$hostName->addClass('left-to-icon-maintenance-abs');
 		}
 
-		$hostDiv = new CDiv([$hostName, $maintenanceIcon], ZBX_STYLE_NOWRAP.' '.'maintenance-abs-cont');
+		$hostDiv = (new CDiv([$hostName, $maintenanceIcon]))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->addClass('maintenance-abs-cont');
 
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
+			$unknown = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconunknown')
+				->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 
 		// trigger has events
@@ -750,15 +758,15 @@ function make_latest_issues(array $filter = []) {
 			]));
 
 			// ack
-			$ack = new CSpan(_('No events'), ZBX_STYLE_GREY);
+			$ack = (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 
 		// description
 		if (!zbx_empty($trigger['url'])) {
-			$description = new CLink($description, $trigger['url'], null, null, true);
+			$description = (new CLink($description, $trigger['url']))->removeSID();
 		}
 		else {
-			$description = new CSpan($description, 'pointer');
+			$description = (new CSpan($description))->addClass('pointer');
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 		if ($trigger['lastEvent']) {
@@ -797,8 +805,8 @@ function make_latest_issues(array $filter = []) {
 		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 	));
 
-	$infoDiv = new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount));
-	$infoDiv->addStyle('text-align: right; padding-right: 3px;');
+	$infoDiv = (new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount)))
+		->addStyle('text-align: right; padding-right: 3px;');
 
 	return new CDiv([$table, $infoDiv, $script]);
 }
@@ -834,8 +842,10 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-			$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
+			$unknown = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconunknown')
+				->setHint($trigger['error'], ZBX_STYLE_RED);
 		}
 
 		// ack

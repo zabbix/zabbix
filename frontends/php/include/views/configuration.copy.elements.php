@@ -68,7 +68,8 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 		array_push(
 			$targets,
 			[
-				new CCheckBox('copy_targetid['.$host['hostid'].']', uint_in_array($host['hostid'], $this->data['copy_targetid']), null, $host['hostid']),
+				(new CCheckBox('copy_targetid['.$host['hostid'].']', $host['hostid']))
+					->setChecked(uint_in_array($host['hostid'], $this->data['copy_targetid'])),
 				SPACE,
 				$host['name'],
 				BR()
@@ -80,7 +81,8 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 		array_push(
 			$targets,
 			[
-				new CCheckBox('copy_targetid['.$template['templateid'].']', uint_in_array($template['templateid'], $this->data['copy_targetid']), null, $template['templateid']),
+				(new CCheckBox('copy_targetid['.$template['templateid'].']', $template['templateid']))
+					->setChecked(uint_in_array($template['templateid'], $this->data['copy_targetid'])),
 				SPACE,
 				$template['name'],
 				BR()
@@ -92,7 +94,8 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 		array_push(
 			$targets,
 			[
-				new CCheckBox('copy_targetid['.$group['groupid'].']', uint_in_array($group['groupid'], $this->data['copy_targetid']), null, $group['groupid']),
+				(new CCheckBox('copy_targetid['.$group['groupid'].']', $group['groupid']))
+					->setChecked(uint_in_array($group['groupid'], $this->data['copy_targetid'])),
 				SPACE,
 				$group['name'],
 				BR()

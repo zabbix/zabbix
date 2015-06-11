@@ -22,7 +22,7 @@
 class CAreaMap extends CTag {
 
 	public function __construct($name = '') {
-		parent::__construct('map', 'yes');
+		parent::__construct('map', true);
 		$this->setName($name);
 	}
 

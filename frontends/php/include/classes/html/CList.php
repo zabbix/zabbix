@@ -27,15 +27,13 @@ class CList extends CTag {
 	 * Creates a UL list.
 	 *
 	 * @param array $values			an array of items to add to the list
-	 * @param string $class			HTML class
 	 */
-	public function __construct(array $values = [], $class = null) {
-		parent::__construct('ul', 'yes');
+	public function __construct(array $values = []) {
+		parent::__construct('ul', true);
 
 		foreach ($values as $value) {
 			$this->addItem($value);
 		}
-		$this->addClass($class);
 
 		if (!$values) {
 			$this->addItem(_('List is empty'), 'empty');
@@ -46,6 +44,12 @@ class CList extends CTag {
 	public function prepareItem($value = null, $class = null, $id = null) {
 		if (!is_null($value)) {
 			$value = new CListItem($value, $class, $id);
+			if ($class !== null) {
+				$value->addClass($class);
+			}
+			if ($id !== null) {
+				$value->setId($id);
+			}
 		}
 
 		return $value;

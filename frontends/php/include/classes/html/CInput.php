@@ -21,24 +21,16 @@
 
 class CInput extends CTag {
 
-	public function __construct($type = 'text', $name = 'textbox', $value = '', $class = null, $id = null) {
-		parent::__construct('input', 'no');
+	public function __construct($type = 'text', $name = 'textbox', $value = '') {
+		parent::__construct('input');
 		$this->setType($type);
 
 		// if id is not passed, it will be the same as element name
-		if ($id === null) {
-			$this->setAttribute('id', zbx_formatDomId($name));
-		}
-		else {
-			$this->setAttribute('id', zbx_formatDomId($id));
-		}
+		$this->setId(zbx_formatDomId($name));
 		$this->setAttribute('name', $name);
 		$this->setAttribute('value', $value);
-		$class = !is_null($class) ? $class : $type;
-		if ($class == 'button' || $class == 'submit') {
-			$class .= ' shadow ui-corner-all';
-		}
-		$this->addClass('input '.$class);
+		$this->addClass($type);
+		$this->addClass('input');
 		return $this;
 	}
 
@@ -54,6 +46,7 @@ class CInput extends CTag {
 		else {
 			$this->removeAttribute('readonly');
 		}
+		return $this;
 	}
 
 	/**
@@ -68,5 +61,6 @@ class CInput extends CTag {
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+		return $this;
 	}
 }
