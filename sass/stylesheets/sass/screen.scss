@@ -170,7 +170,6 @@ p {
 
 /* Main Navigation */
 nav {
-	//background-color: darken($main-color, 17%);
 	background-color: $main-subnav-bg-color;
 
 	a {
@@ -209,13 +208,11 @@ nav {
 	height: 36px;
 	line-height: 35px;
 	position: relative;
-	//background-color: $main-color;
 	background-color: $main-nav-bg-color;
 }
 
 .top-nav {
 	font-size: $font-top-nav-size;
-	//background-color: $main-color;
 	background-color: $main-nav-bg-color;
 
 	li {
@@ -238,7 +235,6 @@ nav {
 				line-height: 0;
 				border-left: 7px solid transparent;
 				border-right: 7px solid transparent;
-				//border-bottom: 7px solid darken($main-color, 17%);
 				border-bottom: 7px solid $main-subnav-bg-color;
 			}
 
@@ -253,12 +249,24 @@ nav {
 		color: $link-main-nav-color;
 		text-decoration: none;
 
+		&:link {
+			color: $link-main-nav-color;
+		}
+
+		&:visited {
+			color: $link-main-nav-visited-color;
+		}
+
 		&:hover {
 			color: $link-main-nav-hover-color;
 		}
 
 		&:focus {
-			color: $link-main-nav-hover-color;
+			color: $link-main-nav-active-color;
+		}
+
+		&:active {
+			color: $link-main-nav-active-color;
 		}
 	}
 }
@@ -357,12 +365,10 @@ ul.top-nav-icons {
 .top-subnav-container {
 	height: 36px;
 	line-height: 36px;
-	//background-color: darken($main-color, 17%);
 	background-color: $main-subnav-bg-color;
 }
 
 .top-subnav {
-	//background-color: darken($main-color, 17%);
 	background-color: $main-subnav-bg-color;
 
 	li {
@@ -374,25 +380,29 @@ ul.top-nav-icons {
 
 .top-subnav a {
 	padding: 5px 8px;
-	color: $link-main-subnav-color;
+
+	&:link {
+		color: $link-main-subnav-color;
+	}
+
+	&:visited {
+		color: $link-main-subnav-visited-color;
+	}
 
 	&:hover {
 		color: $link-main-subnav-hover-color;
-		text-decoration: none;
 	}
 
 	&:focus {
-		color: $link-main-subnav-hover-color;
-		text-decoration: none;
+		color: $link-main-subnav-active-color;
 	}
 
 	&:active {
-		text-decoration: none;
+		color: $link-main-subnav-active-color;
 	}
 
 	&.selected {
 		background-color: $main-subnav-bg-selected-color;
-		//background-color: darken($main-color, 7%);
 		color: $link-main-subnav-active-color;
 		@include border-radius(2px);
 	}

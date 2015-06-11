@@ -68,15 +68,15 @@ $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
 $link-visited-color: #4796c4;
 
-$link-main-nav-color: #b9bbc4;
-$link-main-nav-hover-color: #e6e8f3;
-$link-main-nav-active-color: #e6e8f3;
-$link-main-nav-visited-color: #e6e8f3;
+$link-main-nav-color: rgba(255,255,255,0.75);
+$link-main-nav-hover-color: rgba(255,255,255,1);
+$link-main-nav-active-color: rgba(255,255,255,1);
+$link-main-nav-visited-color: rgba(255,255,255,0.75);
 
-$link-main-subnav-color: #bfced7;
-$link-main-subnav-hover-color: #fff;
-$link-main-subnav-active-color: #fff;
-$link-main-subnav-visited-color: #bfced7;
+$link-main-subnav-color: rgba(255,255,255,0.75);
+$link-main-subnav-hover-color: rgba(255,255,255,1);
+$link-main-subnav-active-color: rgba(255,255,255,1);
+$link-main-subnav-visited-color: rgba(255,255,255,0.75);
 
 
 // Important! @import string should come after variables

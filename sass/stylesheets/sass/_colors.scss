@@ -83,12 +83,12 @@ $link-hover-color: #0275b8 !default;
 $link-active-color: #0275b8 !default;
 $link-visited-color: #0275b8 !default;
 
-$link-main-nav-color: #bfdced !default;
-$link-main-nav-hover-color: #fff !default;
-$link-main-nav-active-color: #fff !default;
-$link-main-nav-visited-color: #bfdced !default;
+$link-main-nav-color: rgba(255,255,255,0.75) !default;
+$link-main-nav-hover-color: rgba(255,255,255,1) !default;
+$link-main-nav-active-color: rgba(255,255,255,1) !default;
+$link-main-nav-visited-color: rgba(255,255,255,0.75) !default;
 
-$link-main-subnav-color: #bfced7 !default;
-$link-main-subnav-hover-color: #fff !default;
-$link-main-subnav-active-color: #fff !default;
-$link-main-subnav-visited-color: #bfced7 !default;
+$link-main-subnav-color: rgba(255,255,255,0.75) !default;
+$link-main-subnav-hover-color: rgba(255,255,255,1) !default;
+$link-main-subnav-active-color: rgba(255,255,255,1) !default;
+$link-main-subnav-visited-color: rgba(255,255,255,0.75) !default;
