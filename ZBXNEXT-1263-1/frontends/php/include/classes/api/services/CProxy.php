@@ -275,6 +275,14 @@ class CProxy extends CApiService {
 						_('No permissions to referred object or it does not exist!'));
 				}
 			}
+
+			// encryption
+			if (array_key_exists('tls_psk', $proxy)
+					&& !preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $proxy['tls_psk'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
+				);
+			}
 		}
 		unset($proxy);
 

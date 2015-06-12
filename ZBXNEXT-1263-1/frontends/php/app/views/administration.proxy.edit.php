@@ -119,7 +119,7 @@ $encryptionFormList->addRow(_('Subject'), $encryptionOutSubject);
 $encryptionPSKIdentity = new CTextBox('tls_psk_identity', $data['tls_psk_identity'], 64);
 $encryptionFormList->addRow(_('PSK identity'), $encryptionPSKIdentity);
 
-$encryptionInPSK = new CTextBox('tls_psk', $data['tls_psk'], 64);
+$encryptionInPSK = new CTextBox('tls_psk', $data['tls_psk'], 64, false, 512);
 $encryptionFormList->addRow(_('PSK'), $encryptionInPSK);
 
 // append tabs to form

@@ -773,7 +773,7 @@ $encryptionFormList->addRow(_('Connections from host'), [
 $encryptionFormList->addRow(_('Issuer'), new CTextBox('tls_issuer', $data['tls_issuer'], 64));
 $encryptionFormList->addRow(_('Subject'), new CTextBox('tls_subject', $data['tls_subject'], 64));
 $encryptionFormList->addRow(_('PSK identity'), new CTextBox('tls_psk_identity', $data['tls_psk_identity'], 64));
-$encryptionFormList->addRow(_('PSK'), new CTextBox('tls_psk', $data['tls_psk'], 64));
+$encryptionFormList->addRow(_('PSK'), new CTextBox('tls_psk', $data['tls_psk'], 64, false, 512));
 
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
 
