@@ -97,6 +97,7 @@ misc/images/pngcrushoutput.txt
 /nbproject
 sass/.sass-cache
 sass/forms_with_tables.html
+sass/overlay-dialog.html
 sass/stylesheets/*.css
 sass/stylesheets/*.map
 sass/stylesheets/sass/screen2.scss

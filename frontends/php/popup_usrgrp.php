@@ -85,7 +85,7 @@ if(form){
 
 	$table = new CTableInfo();
 	$table->setHeader([
-		new CCheckBox("all_groups",NULL,"checkAll('".$form->getName()."','all_groups','new_groups');"),
+		(new CCheckBox("all_groups"))->onClick("checkAll('".$form->getName()."','all_groups','new_groups');"),
 		_('Name')
 		]);
 
@@ -97,8 +97,8 @@ if(form){
 
 	foreach ($userGroups as $userGroup) {
 		$table->addRow([
-			new CCheckBox('new_groups['.$userGroup['usrgrpid'].']',
-				isset($new_groups[$userGroup['usrgrpid']]), null, $userGroup['usrgrpid']),
+			(new CCheckBox('new_groups['.$userGroup['usrgrpid'].']', $userGroup['usrgrpid']))
+				->setChecked(isset($new_groups[$userGroup['usrgrpid']])),
 			$userGroup['name']
 		]);
 	}

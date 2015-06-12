@@ -243,8 +243,8 @@ if (getUserGuiAccess(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
 }
 
 // render view
-$authenticationView = new CView('administration.authentication.edit', $data);
-$authenticationView->render();
-$authenticationView->show();
+$view = new CView('administration.authentication.edit', $data);
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

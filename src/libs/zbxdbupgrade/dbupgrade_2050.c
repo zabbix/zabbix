@@ -161,6 +161,7 @@ static int	DBpatch_2050011(void)
 static int	DBpatch_2050012(void)
 {
 	DB_RESULT	result;
+	DB_RESULT	result2;
 	DB_ROW		row;
 	char		*key = NULL, *key_esc, *param;
 	int		ret = SUCCEED;
@@ -168,7 +169,7 @@ static int	DBpatch_2050012(void)
 
 	/* type - ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE */
 	result = DBselect(
-			"select itemid,key_"
+			"select hostid,itemid,key_"
 			" from items"
 			" where type in (0,3,7)"
 				" and key_ like 'net.tcp.service%%[%%ntp%%'");
@@ -177,9 +178,9 @@ static int	DBpatch_2050012(void)
 	{
 		init_request(&request);
 
-		if (SUCCEED != parse_item_key(row[1], &request))
+		if (SUCCEED != parse_item_key(row[2], &request))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot parse item key \"%s\"", row[1]);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot parse item key \"%s\"", row[2]);
 			continue;
 		}
 
@@ -191,7 +192,7 @@ static int	DBpatch_2050012(void)
 			continue;
 		}
 
-		key = zbx_strdup(key, row[1]);
+		key = zbx_strdup(key, row[2]);
 
 		if (0 == strcmp("service.ntp", param))
 		{
@@ -218,8 +219,20 @@ static int	DBpatch_2050012(void)
 
 		key_esc = DBdyn_escape_string(key);
 
-		if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[0]))
-			ret = FAIL;
+		result2 = DBselect("select null from items where hostid=%s and key_='%s'", row[0], key_esc);
+
+		if (NULL == DBfetch(result2))
+		{
+			if (ZBX_DB_OK > DBexecute("update items set key_='%s' where itemid=%s", key_esc, row[1]))
+				ret = FAIL;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot convert item key \"%s\":"
+					" item with converted key \"%s\" already exists on host ID [%s]",
+					row[2], key, row[0]);
+		}
+		DBfree_result(result2);
 
 		zbx_free(key_esc);
 	}

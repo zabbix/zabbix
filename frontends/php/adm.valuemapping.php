@@ -122,40 +122,9 @@ catch (Exception $e) {
 /*
  * Display
  */
-$valueMapWidget = (new CWidget())->setTitle(_('Value mapping'));
-
-$valueMapForm = new CForm();
-$valueMapForm->cleanItems();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.valuemapping.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-
-if (!isset($_REQUEST['form'])) {
-	$controls->addItem(new CSubmit('form', _('Create value map')));
-}
-
-$valueMapForm->addItem($controls);
-$valueMapWidget->setControls($valueMapForm);
-
 if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form', 1),
-		'form_refresh' => getRequest('form_refresh', 0),
 		'valuemapid' => getRequest('valuemapid'),
 		'mappings' => [],
 		'mapname' => '',
@@ -194,7 +163,7 @@ if (isset($_REQUEST['form'])) {
 
 	order_result($data['mappings'], 'value');
 
-	$valueMapForm = new CView('administration.general.valuemapping.edit', $data);
+	$view = new CView('administration.general.valuemapping.edit', $data);
 }
 else {
 	$data = [
@@ -218,9 +187,10 @@ else {
 		];
 	}
 
-	$valueMapForm = new CView('administration.general.valuemapping.list', $data);
+	$view = new CView('administration.general.valuemapping.list', $data);
 }
 
-$valueMapWidget->addItem($valueMapForm->render())->show();
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

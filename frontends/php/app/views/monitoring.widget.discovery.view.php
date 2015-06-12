@@ -51,8 +51,8 @@ $table->setHeader([
 foreach ($drules as $drule) {
 	$table->addRow([
 		new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
-		new CSpan($drule['up'], ZBX_STYLE_GREEN),
-		new CSpan($drule['down'], ($drule['down'] != 0) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
+		(new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN),
+		(new CSpan($drule['down']))->addClass(($drule['down'] != 0) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 	]);
 }
 

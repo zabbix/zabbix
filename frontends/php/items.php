@@ -881,7 +881,6 @@ if (isset($_REQUEST['form']) && str_in_array($_REQUEST['form'], [_('Create item'
 	}
 
 	$data = getItemFormData($item);
-	$data['page_header'] = _('CONFIGURATION OF ITEMS');
 	$data['inventory_link'] = getRequest('inventory_link');
 	$data['config'] = select_config();
 	$data['host'] = $host;

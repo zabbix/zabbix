@@ -27,8 +27,8 @@ class CSeverity extends CTag {
 	 * @param int    $options['value']
 	 */
 	public function __construct(array $options = []) {
-		parent::__construct('div', 'yes');
-		$this->setAttribute('id', isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
+		parent::__construct('div', true);
+		$this->setId(isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
 		$this->addClass('jqueryinputset radioset control-severity');
 
 		if (!isset($options['value'])) {
@@ -41,13 +41,11 @@ class CSeverity extends CTag {
 		$config = select_config();
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$items[] = new CRadioButton(
+			$items[] = (new CRadioButton(
 				$options['name'],
 				$severity,
-				null,
-				$options['name'].'_'.$severity,
 				($options['value'] == $severity)
-			);
+			))->setId($options['name'].'_'.$severity);
 
 			$css = getSeverityStyle($severity);
 

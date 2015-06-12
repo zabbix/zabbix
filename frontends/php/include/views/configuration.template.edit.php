@@ -117,14 +117,13 @@ else {
 $templateList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
-$newgroupTB = new CTextBox('newgroup', $newgroup);
-$newgroupTB->setAttribute('maxlength', 64);
-$tmp_label = _('New group');
+$new_group = (new CTextBox('newgroup', $newgroup))->setAttribute('maxlength', 64);
+$new_group_label = _('New group');
 if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-	$tmp_label .= SPACE._('(Only super admins can create groups)');
-	$newgroupTB->setReadonly(true);
+	$new_group_label .= ' '._('(Only super admins can create groups)');
+	$new_group->setReadonly(true);
 }
-$templateList->addRow(SPACE, [$tmp_label, BR(), $newgroupTB], null, null, 'new');
+$templateList->addRow($new_group_label, (new CSpan($new_group))->addClass('form-new-group'));
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 $cmbGroups = new CComboBox('twb_groupid', $data['twb_groupid'], 'submit()');
@@ -384,22 +383,22 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 $tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = (new CTable(_('No templates linked.')))->
-	addClass('formElementTable');
-$linkedTemplateTable->setAttribute('id', 'linkedTemplateTable');
-$linkedTemplateTable->setHeader([_('Name'), _('Action')]);
+$linkedTemplateTable = (new CTable())
+	->setNoDataMessage(_('No templates linked.'))
+	->addClass('formElementTable')
+	->setId('linkedTemplateTable')
+	->setHeader([_('Name'), _('Action')]);
 
 $ignoredTemplates = [];
 
 foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
-	$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-	$templateLink->setTarget('_blank');
+	$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+		->setTarget('_blank');
 
-	$unlinkButton = new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu');
-	$unlinkAndClearButton = new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null,
-		'link_menu'
-	);
+	$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
+	$unlinkAndClearButton = (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+		->addClass(ZBX_STYLE_BTN_LINK);
 	$unlinkAndClearButton->addStyle('margin-left: 8px');
 
 	$linkedTemplateTable->addRow(
@@ -419,13 +418,20 @@ foreach ($data['linkedTemplates'] as $template) {
 	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
-$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
+$tmplList->addRow(
+	_('Linked templates'),
+	(new CDiv($linkedTemplateTable))
+		->addClass('template-link-block')
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 // create new linked template table
-$newTemplateTable = (new CTable())->
-	addClass('formElementTable');
-$newTemplateTable->setAttribute('id', 'newTemplateTable');
-$newTemplateTable->setAttribute('style', 'min-width: 400px;');
+$newTemplateTable = (new CTable())
+	->addClass('formElementTable')
+	->setId('newTemplateTable')
+	->setAttribute('style', 'min-width: 400px;');
 
 $newTemplateTable->addRow([new CMultiSelect([
 	'name' => 'add_templates[]',
@@ -439,11 +445,18 @@ $newTemplateTable->addRow([new CMultiSelect([
 
 $newTemplateTable->addRow(
 	[
-		new CSubmit('add_template', _('Add'), null, 'link_menu')
+		(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	]
 );
 
-$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
+$tmplList->addRow(
+	_('Link new templates'),
+	(new CDiv($newTemplateTable))
+		->addClass('template-link-block')
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES
