@@ -870,7 +870,7 @@ footer {
 	}
 
 	.multiselect {
-		width: 165px;
+		width: 160px;
 	}
 }
 
@@ -2469,17 +2469,26 @@ a.grey {
 }
 
 .status-container {
+	display: inline-block;
 	white-space: nowrap;
+	margin: 2px 3px 2px 0;
+
+	&:last-child {
+		margin: 0;
+	}
 
 	span {
-		position: relative;
 		@include border-radius(0);
 
-		&:first-child {
+		&:only-child {
+			@include border-radius(2px)
+		}
+
+		&:first-child:not(:only-child) {
 			@include border-radius(2px 0 0 2px);
 		}
 
-		&:last-child {
+		&:last-child:not(:only-child) {
 			@include border-radius(0 2px 2px 0);
 		}
 	}
