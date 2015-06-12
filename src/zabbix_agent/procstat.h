@@ -20,6 +20,16 @@
 #ifndef ZABBIX_PROCSTAT_H
 #define ZABBIX_PROCSTAT_H
 
+#ifdef ZBX_PROCSTAT_COLLECTOR
+
+#define ZBX_PROCSTAT_CPU_USER			1
+#define ZBX_PROCSTAT_CPU_SYSTEM			2
+#define ZBX_PROCSTAT_CPU_TOTAL			3
+
+#define ZBX_PROCSTAT_FLAGS_ZONE_CURRENT		0
+#define ZBX_PROCSTAT_FLAGS_ZONE_ALL		1
+
+
 /* process cpu utilization data */
 typedef struct
 {
@@ -43,11 +53,11 @@ int	zbx_procstat_collector_enabled();
 
 int	zbx_procstat_enabled();
 
-int	zbx_procstat_get_utime(const char *procname, const char *username, const char *cmdline,
-		int period, double *utime, char **errmsg);
-int	zbx_procstat_get_stime(const char *procname, const char *username, const char *cmdline,
-		int period, double *stime, char **errmsg);
+int	zbx_procstat_get_util(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
+		int period, int type, double *value, char **errmsg);
 
 void	zbx_procstat_collect();
+
+#endif
 
 #endif

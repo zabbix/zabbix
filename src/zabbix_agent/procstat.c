@@ -22,7 +22,6 @@
 #include "mutexs.h"
 #include "stats.h"
 #include "ipc.h"
-#include "db.h"
 #include "procstat.h"
 
 #ifdef ZBX_PROCSTAT_COLLECTOR
@@ -117,6 +116,7 @@ typedef struct
 	size_t				procname;
 	size_t				username;
 	size_t				cmdline;
+	zbx_uint64_t			flags;
 
 	/* the index of first (oldest) entry in the history data */
 	int				h_first;
@@ -149,6 +149,7 @@ typedef struct
 	const char		*procname;
 	const char		*username;
 	const char		*cmdline;
+	zbx_uint64_t		flags;
 
 	/* error code */
 	int			error;
@@ -392,6 +393,7 @@ static int	procstat_running()
  *             procname - [IN] the process name                               *
  *             username - [IN] the user name                                  *
  *             cmdline  - [IN] the command line                               *
+ *             flags    - [IN] platform specific flags                        *
  *                                                                            *
  * Return value: The process statistics query for the specified parameters or *
  *               NULL if the statistics are not being gathered for the        *
@@ -399,7 +401,7 @@ static int	procstat_running()
  *                                                                            *
  ******************************************************************************/
 static	zbx_procstat_query_t	*procstat_get_query(void *base, const char *procname, const char *username,
-		const char *cmdline)
+		const char *cmdline, zbx_uint64_t flags)
 {
 	zbx_procstat_query_t	*query;
 
@@ -410,7 +412,8 @@ static	zbx_procstat_query_t	*procstat_get_query(void *base, const char *procname
 	{
 		if (0 == zbx_strcmp_null(procname, PROCSTAT_PTR_NULL(base, query->procname)) &&
 				0 == zbx_strcmp_null(username, PROCSTAT_PTR_NULL(base, query->username)) &&
-				0 == zbx_strcmp_null(cmdline, PROCSTAT_PTR_NULL(base, query->cmdline)))
+				0 == zbx_strcmp_null(cmdline, PROCSTAT_PTR_NULL(base, query->cmdline)) &&
+				flags == query->flags)
 		{
 			return query;
 		}
@@ -426,15 +429,16 @@ static	zbx_procstat_query_t	*procstat_get_query(void *base, const char *procname
  *                                                                            *
  * Purpose: adds a new query to process statistics collector                  *
  *                                                                            *
- * Parameters: procname       - [IN] the process name                         *
- *             username       - [IN] the user name                            *
- *             cmdline        - [IN] the command line                         *
+ * Parameters: procname - [IN] the process name                               *
+ *             username - [IN] the user name                                  *
+ *             cmdline  - [IN] the command line                               *
+ *             flags    - [IN] platform specific flags                        *
  *                                                                            *
  * Return value:                                                              *
  *     This function calls exit() on shared memory errors.                    *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_add(const char *procname, const char *username, const char *cmdline)
+static void	procstat_add(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags)
 {
 	const char		*__function_name = "procstat_add";
 	char			*errmsg = NULL;
@@ -503,6 +507,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 	query->procname = procstat_strdup(procstat_ref.addr, procname);
 	query->username = procstat_strdup(procstat_ref.addr, username);
 	query->cmdline = procstat_strdup(procstat_ref.addr, cmdline);
+	query->flags = flags;
 	query->last_accessed = time(NULL);
 	query->next = header->active_queries;
 	header->active_queries = query_offset;
@@ -573,9 +578,9 @@ void	zbx_procstat_init()
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_procstat_get_utime                                           *
+ * Function: zbx_procstat_get_util                                            *
  *                                                                            *
- * Purpose: gets process user time utilization                                *
+ * Purpose: gets process cpu utilization                                      *
  *                                                                            *
  * Parameters: procname       - [IN] the process name, NULL - all             *
  *             username       - [IN] the user name, NULL - all                *
@@ -583,7 +588,9 @@ void	zbx_procstat_init()
  *             collector_func - [IN] the callback function to use for process *
  *                              statistics gathering                          *
  *             period         - [IN] the time period                          *
- *             utime          - [OUT] the user time                           *
+ *             type           - [IN] the cpu utilization type, see            *
+ *                              ZBX_PROCSTAT_CPU_* defines                    *
+ *             value          - [OUT] the utilization in %                    *
  *             errmsg         - [OUT] the error message                       *
  *                                                                            *
  * Return value:                                                              *
@@ -595,126 +602,71 @@ void	zbx_procstat_init()
  *     This function calls exit() on shared memory errors.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_procstat_get_utime(const char *procname, const char *username, const char *cmdline, int period,
-		double *utime, char **errmsg)
+int	zbx_procstat_get_util(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
+		int period, int type, double *value, char **errmsg)
 {
 	int		ret = FAIL, current, start;
-	zbx_procstat_query_t	*pstat;
-	zbx_uint64_t	ticks_diff, time_diff;
+	zbx_procstat_query_t	*query;
+	zbx_uint64_t	ticks_diff = 0, time_diff;
 
 	zbx_dshm_lock(&collector->procstat);
 
 	procstat_reattach();
 
-	if (NULL == (pstat = procstat_get_query(procstat_ref.addr, procname, username, cmdline)))
+	if (NULL == (query = procstat_get_query(procstat_ref.addr, procname, username, cmdline, flags)))
 	{
-		procstat_add(procname, username, cmdline);
+		procstat_add(procname, username, cmdline, flags);
 		goto out;
 	}
 
-	pstat->last_accessed = time(NULL);
+	query->last_accessed = time(NULL);
 
-	if (0 != pstat->error)
+	if (0 != query->error)
 	{
-		*errmsg = zbx_dsprintf(*errmsg, "Cannot read cpu utilization data: %s", zbx_strerror(-pstat->error));
+		*errmsg = zbx_dsprintf(*errmsg, "Cannot read cpu utilization data: %s", zbx_strerror(-query->error));
 		goto out;
 	}
 
-	if (1 >= pstat->h_count)
+	if (1 >= query->h_count)
 		goto out;
 
-	if (period >= pstat->h_count)
-		period = pstat->h_count - 1;
+	if (period >= query->h_count)
+		period = query->h_count - 1;
 
-	if (MAX_COLLECTOR_HISTORY <= (current = pstat->h_first + pstat->h_count - 1))
+	if (MAX_COLLECTOR_HISTORY <= (current = query->h_first + query->h_count - 1))
 		current -= MAX_COLLECTOR_HISTORY;
 
 	if (0 > (start = current - period))
 		start += MAX_COLLECTOR_HISTORY;
 
-	ticks_diff = pstat->h_data[current].utime - pstat->h_data[start].utime;
-	time_diff = (zbx_uint64_t)(pstat->h_data[current].timestamp.sec - pstat->h_data[start].timestamp.sec) *
-			1000000000 + pstat->h_data[current].timestamp.ns - pstat->h_data[start].timestamp.ns;
+	if (0 != (type & ZBX_PROCSTAT_CPU_USER))
+			ticks_diff += query->h_data[current].utime - query->h_data[start].utime;
+
+	if (0 != (type & ZBX_PROCSTAT_CPU_SYSTEM))
+			ticks_diff += query->h_data[current].stime - query->h_data[start].stime;
+
+	time_diff = (zbx_uint64_t)(query->h_data[current].timestamp.sec - query->h_data[start].timestamp.sec) *
+			1000000000 + query->h_data[current].timestamp.ns - query->h_data[start].timestamp.ns;
+
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] ticks:" ZBX_FS_UI64 " time:" ZBX_FS_UI64, ticks_diff, time_diff);
+	{
+		int	i;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] first:%d, count:%d", query->h_first, query->h_count);
+		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] start:%d, current:%d", start, current);
+
+		for (i = 0; i < query->h_count; i++)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "[WDN]       [%03d] utime:" ZBX_FS_UI64 ", stime:" ZBX_FS_UI64,
+					i, query->h_data[i].utime, i, query->h_data[i].stime);
+		}
+	}
 
 	/* 1e9 (nanoseconds) * 1e2 (percent) * 1e1 (one digit decimal place) */
 	ticks_diff *= 1000000000000;
 	ticks_diff /= time_diff * sysconf(_SC_CLK_TCK);
-	*utime = (double)ticks_diff / 10;
-
-	ret = SUCCEED;
-out:
-	zbx_dshm_unlock(&collector->procstat);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_procstat_get_stime                                           *
- *                                                                            *
- * Purpose: gets process system time utilization                              *
- *                                                                            *
- * Parameters: procname       - [IN] the process name, NULL - all             *
- *             username       - [IN] the user name, NULL - all                *
- *             cmdline        - [IN] the command line, NULL - all             *
- *             period         - [IN] the time period                          *
- *             stime          - [OUT] the system time                         *
- *             errmsg         - [OUT] the error message                       *
- *                                                                            *
- * Return value:                                                              *
- *     SUCCEED - the stime value was retrieved successfully                   *
- *     FAIL    - either collector does not have at least two data samples     *
- *               required to calculate the statistics, or an error occurred   *
- *               during the collection process. In the second case the errmsg *
- *               will contain an error message.                               *
- *     This function calls exit() on shared memory errors.                    *
- *                                                                            *
- ******************************************************************************/
-int	zbx_procstat_get_stime(const char *procname, const char *username, const char *cmdline, int period,
-		double *stime, char **errmsg)
-{
-	int		ret = FAIL, current, start;
-	zbx_procstat_query_t	*pstat;
-	zbx_uint64_t	ticks_diff, time_diff;
-
-	zbx_dshm_lock(&collector->procstat);
-
-	procstat_reattach();
-
-	if (NULL == (pstat = procstat_get_query(procstat_ref.addr, procname, username, cmdline)))
-	{
-		procstat_add(procname, username, cmdline);
-		goto out;
-	}
-
-	pstat->last_accessed = time(NULL);
-
-	if (0 != pstat->error)
-	{
-		*errmsg = zbx_dsprintf(*errmsg, "Cannot read cpu utilization data: %s", zbx_strerror(-pstat->error));
-		goto out;
-	}
-
-	if (1 >= pstat->h_count)
-		goto out;
-
-	if (period >= pstat->h_count)
-		period = pstat->h_count - 1;
-
-	if (MAX_COLLECTOR_HISTORY <= (current = pstat->h_first + pstat->h_count - 1))
-		current -= MAX_COLLECTOR_HISTORY;
-
-	if (0 > (start = current - period))
-		start += MAX_COLLECTOR_HISTORY;
-
-	ticks_diff = pstat->h_data[current].stime - pstat->h_data[start].stime;
-	time_diff = (zbx_uint64_t)(pstat->h_data[current].timestamp.sec - pstat->h_data[start].timestamp.sec) *
-			1000000000 + pstat->h_data[current].timestamp.ns - pstat->h_data[start].timestamp.ns;
-
-	/* 1e9 (nanoseconds) * 1e2 (percent) * 1e1 (one digit decimal place) */
-	ticks_diff *= 1000000000000;
-	ticks_diff /= time_diff * sysconf(_SC_CLK_TCK);
-	*stime = (double)ticks_diff / 10;
+	*value = (double)ticks_diff / 10;
 
 	ret = SUCCEED;
 out:
@@ -724,7 +676,8 @@ out:
 }
 
 /* external functions used by procstat collector */
-int	zbx_proc_get_pids(const char *procname, const char *username, const char *cmdline, zbx_vector_uint64_t *pids);
+int	zbx_proc_get_pids(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
+		zbx_vector_uint64_t *pids);
 void	zbx_proc_get_stats(zbx_procstat_util_t *procs, int procs_num);
 
 /******************************************************************************
@@ -787,6 +740,7 @@ void	zbx_procstat_collect()
 		qdata->procname = PROCSTAT_PTR_NULL(procstat_ref.addr, query->procname);
 		qdata->username = PROCSTAT_PTR_NULL(procstat_ref.addr, query->username);
 		qdata->cmdline = PROCSTAT_PTR_NULL(procstat_ref.addr, query->cmdline);
+		qdata->flags = query->flags;
 		qdata->utime = 0;
 		qdata->stime = 0;
 
@@ -810,7 +764,8 @@ void	zbx_procstat_collect()
 	{
 		qdata = (zbx_procstat_query_data_t *)queries.values[i];
 
-		qdata->error = zbx_proc_get_pids(qdata->procname, qdata->username, qdata->cmdline, &qdata->pids);
+		qdata->error = zbx_proc_get_pids(qdata->procname, qdata->username, qdata->cmdline, qdata->flags,
+				&qdata->pids);
 
 		if (SUCCEED == qdata->error)
 			pids_num += qdata->pids.values_num;
@@ -956,8 +911,8 @@ void	zbx_procstat_collect()
 		zbx_timespec(&query->h_data[index].timestamp);
 	}
 
-	memcpy(PROCSTAT_SNAPSHOT(procstat_ref.addr), stats, sizeof(zbx_procstat_util_t) * pids.values_num);
 	header->pids_num = pids.values_num;
+	memcpy(PROCSTAT_SNAPSHOT(procstat_ref.addr), stats, sizeof(zbx_procstat_util_t) * pids.values_num);
 
 	zbx_free(stats);
 	zbx_vector_uint64_destroy(&pids);

@@ -22,6 +22,7 @@
 #include "sysinfo.h"
 #include "zbxregexp.h"
 #include "log.h"
+#include "stats.h"
 
 static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 {
@@ -315,6 +316,308 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		close(fd);
 out:
 	SET_UI64_RESULT(result, proccount);
+
+	return SYSINFO_RET_OK;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: proc_read_cpu_util                                               *
+ *                                                                            *
+ * Purpose: reads process cpu utilization values from /proc/[pid]/stat file   *
+ *                                                                            *
+ * Parameters: procutil - [IN/OUT] the process cpu utilization data           *
+ *                                                                            *
+ * Return value: SUCCEED - the process cpu utilization data was read          *
+ *                         successfully                                       *
+ *               <0      - otherwise, -errno code is returned                 *
+ *                                                                            *
+ ******************************************************************************/
+static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
+{
+	int		fd, n;
+	char		tmp[MAX_STRING_LEN];
+	psinfo_t	psinfo;
+	pstatus_t	pstatus;
+
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/psinfo", (int)procutil->pid);
+
+	if (-1 == (fd = open(tmp, O_RDONLY)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "[WDN] cannot open /proc/%d/psinfo", (int)procutil->pid);
+		return -errno;
+	}
+
+	n = read(fd, &psinfo, sizeof(psinfo));
+	close(fd);
+
+	if (-1 == n)
+		return -errno;
+
+	procutil->starttime = psinfo.pr_start.tv_sec;
+
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/status", (int)procutil->pid);
+
+	if (-1 == (fd = open(tmp, O_RDONLY)))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "[WDN] cannot open /proc/%d/status", (int)procutil->pid);
+		return -errno;
+	}
+
+	n = read(fd, &pstatus, sizeof(pstatus));
+	close(fd);
+
+	if (-1 == n)
+		return -errno;
+
+	procutil->utime = ((zbx_uint64_t)pstatus.pr_utime.tv_sec * 1e9 + pstatus.pr_utime.tv_nsec) *
+			sysconf(_SC_CLK_TCK) / 1e9;
+
+	procutil->stime = ((zbx_uint64_t)pstatus.pr_stime.tv_sec * 1e9 + pstatus.pr_stime.tv_nsec) *
+			sysconf(_SC_CLK_TCK) / 1e9;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] pid:%d utime: %d %d (%d)", (int)procutil->pid,
+			pstatus.pr_utime.tv_sec, pstatus.pr_utime.tv_nsec,
+			procutil->utime);
+	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] pid:%d stime: %d %d (%d)", (int)procutil->pid,
+			pstatus.pr_stime.tv_sec, pstatus.pr_stime.tv_nsec,
+			procutil->stime);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_proc_get_stats                                               *
+ *                                                                            *
+ * Purpose: get process cpu utilization data                                  *
+ *                                                                            *
+ * Parameters: procs     - [IN/OUT] an array of process utilization data      *
+ *             procs_num - [IN] the number of items in procs array            *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_proc_get_stats(zbx_procstat_util_t *procs, int procs_num)
+{
+	const char	*__function_name = "zbx_proc_get_stats";
+	int	i;
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __function_name, procs_num);
+
+	for (i = 0; i < procs_num; i++)
+		procs[i].error = proc_read_cpu_util(&procs[i]);
+
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_proc_get_pids                                                *
+ *                                                                            *
+ * Purpose: get pids matching the specified process name, user name and       *
+ *          command line                                                      *
+ *                                                                            *
+ * Parameters: procname    - [IN] the process name, NULL - all                *
+ *             username    - [IN] the user name, NULL - all                   *
+ *             cmdline     - [IN] the command line, NULL - all                *
+ *             pids        - [OUT] the vector of matching pids                *
+ *                                                                            *
+ * Return value: SUCCEED   - the pids were read successfully                  *
+ *               -errno    - failed to read pids                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_proc_get_pids(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
+		zbx_vector_uint64_t *pids)
+{
+	const char	*__function_name = "zbx_proc_get_pids";
+	DIR		*dir;
+	struct dirent	*entries;
+	struct passwd	*usrinfo;
+	char		tmp[MAX_STRING_LEN];
+	int		pid, ret = FAIL, fd = -1;
+	psinfo_t	psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
+#ifdef HAVE_ZONE_H
+	zoneid_t	zoneid;
+#endif
+
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%d", __function_name,
+			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline), flags);
+
+	if (NULL != username)
+	{
+		/* in the case of invalid user there are no matching processes, set empty result */
+		if (NULL == (usrinfo = getpwnam(username)))
+		{
+			ret = SUCCEED;
+			goto out;
+		}
+	}
+	else
+		usrinfo = NULL;
+
+	if (NULL == (dir = opendir("/proc")))
+	{
+		ret = -errno;
+		goto out;
+	}
+
+#ifdef HAVE_ZONE_H
+	zoneid = getzoneid();
+#endif
+
+	while (NULL != (entries = readdir(dir)))
+	{
+		/* skip entries not containing pids */
+		if (FAIL == is_uint32(entries->d_name, &pid))
+			continue;
+
+		if (-1 != fd)
+		{
+			close(fd);
+			fd = -1;
+		}
+
+		zbx_snprintf(tmp, sizeof(tmp), "/proc/%s/psinfo", entries->d_name);
+
+		if (-1 == (fd = open(tmp, O_RDONLY)))
+			continue;
+
+		if (-1 == read(fd, &psinfo, sizeof(psinfo)))
+			continue;
+
+		if (NULL != procname && '\0' != *procname && 0 != strcmp(procname, psinfo.pr_fname))
+			continue;
+
+		if (NULL != usrinfo && usrinfo->pw_uid != psinfo.pr_uid)
+			continue;
+
+		if (NULL != cmdline && '\0' != *cmdline && NULL == zbx_regexp_match(psinfo.pr_psargs, cmdline, NULL))
+			continue;
+
+#ifdef HAVE_ZONE_H
+		if (0 == (ZBX_PROCSTAT_FLAGS_ZONE_ALL & flags) && psinfo.pr_zoneid != zoneid)
+			continue;
+#endif
+
+		zbx_vector_uint64_append(pids, pid);
+	}
+
+	closedir(dir);
+	if (-1 != fd)
+		close(fd);
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): %s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const char	*procname, *username, *cmdline, *tmp, *flags;
+	char		*errmsg = NULL;
+	int		period, type, ret;
+	double		value;
+	zbx_uint64_t	zoneflag;
+
+	/* proc.cpu.util[<procname>,<username>,(user|system),<cmdline>,(avg1|avg5|avg15)] */
+	if (6 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+#ifndef HAVE_ZONE_H
+	if (5 == request->nparam && GLOBAL_ZONEID != getzoneid())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported 6th parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+#endif
+
+	/* zbx_procstat_get_* functions expect NULL for default values -       */
+	/* convert empty procname, username and cmdline strings to NULL values */
+	if (NULL != (procname = get_rparam(request, 0)) && '\0' == *procname)
+		procname = NULL;
+
+	if (NULL != (username = get_rparam(request, 1)) && '\0' == *username)
+		username = NULL;
+
+	if (NULL != (cmdline = get_rparam(request, 3)) && '\0' == *cmdline)
+		cmdline = NULL;
+
+	/* utilization type parameter (user|system) */
+	if (NULL == (tmp = get_rparam(request, 2)) || '\0' == *tmp || 0 == strcmp(tmp, "total"))
+	{
+		type = ZBX_PROCSTAT_CPU_TOTAL;
+	}
+	else if (0 == strcmp(tmp, "user"))
+	{
+		type = ZBX_PROCSTAT_CPU_USER;
+	}
+	else if (0 == strcmp(tmp, "system"))
+	{
+		type = ZBX_PROCSTAT_CPU_SYSTEM;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	/* mode parameter (avg1|avg5|avg15) */
+	if (NULL == (tmp = get_rparam(request, 4)) || '\0' == *tmp || 0 == strcmp(tmp, "avg1"))
+	{
+		period = SEC_PER_MIN;
+	}
+	else if ( 0 == strcmp(tmp, "avg5"))
+	{
+		period = SEC_PER_MIN * 5;
+	}
+	else if ( 0 == strcmp(tmp, "avg15"))
+	{
+		period = SEC_PER_MIN * 15;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (NULL == (flags = get_rparam(request, 5)) || '\0' == *flags)
+	{
+		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_CURRENT;
+	}
+	else if(0 == strcmp(flags, "all"))
+	{
+		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_ALL;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SUCCEED != zbx_procstat_enabled())
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (SUCCEED != (ret = zbx_procstat_get_util(procname, username, cmdline, zoneflag, period, type, &value,
+			&errmsg)))
+	{
+		/* zbx_procstat_get_* functions will return FAIL when either a collection   */
+		/* error was registered or if less than 2 data samples were collected.      */
+		/* In the first case the errmsg will contain error message.                 */
+		if (NULL != errmsg)
+		{
+			SET_MSG_RESULT(result, errmsg);
+			return SYSINFO_RET_FAIL;
+		}
+	}
+	else
+		SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }
