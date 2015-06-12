@@ -83,6 +83,8 @@ connect using TLS and a certificate
 .RE
 .IP "\fB\-\-tls\-ca\-file\fR"
 Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
+.IP "\fB\-\-tls\-crl\-file\fR"
+Full pathname of a file containing revoked certificates.
 .IP "\fB\-\-tls\-cert\-issuer\fR"
 Allowed server certificate issuer.
 .IP "\fB\-\-tls\-cert\-subject\fR"
