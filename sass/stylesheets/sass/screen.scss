@@ -804,7 +804,7 @@ footer {
 	}
 
 	.filter-forms {
-		padding: 0 10px 0px 10px;
+		padding: 0 10px;
 	}
 
 	.list-table {                                       
@@ -869,9 +869,9 @@ footer {
 		margin: 10px 7px 0 7px;
 	}
 
-	.multiselect {
-		width: 160px;
-	}
+	//.multiselect {
+	//	width: 160px;
+	//}
 }
 
 .multiselect-wrapper {
@@ -884,8 +884,9 @@ footer {
 	@extend .multiselect-button;
 	position: relative;
 	margin-right: 3px;
-	width: 312px;
-	min-height: 22px;
+	//width: 312px;
+	//min-height: 22px;
+	min-height: 24px;
 
 	&.active {
 		border-color: $form-border-focus-color;
@@ -896,7 +897,7 @@ footer {
 		background: none;
 		box-sizing: border-box;
 		width: 100%;
-		padding-top: 2px;
+		//padding-top: 2px;
 
 	}
 
@@ -1391,13 +1392,15 @@ select {
 }
 
 fieldset {
-	border: 1px solid lighten($form-border-color, 10%);
+	border: 1px solid $table-border-color;
 	padding: 0 10px 10px 15px;
 }
 
 legend {
 	margin-left: -5px;
 	padding: 0 5px 0 5px;
+	text-transform: $font-transform;
+	font-size: $font-h3-size;
 }
 
 .form-input-margin {
@@ -1866,33 +1869,33 @@ button[disabled] {
 
 %webkit-scrollbar {
 	&::-webkit-scrollbar {
-		width: 8px;
+		width: 9px;
 	}
 
 	&::-webkit-scrollbar-track {
-		background-color: $transparent;
-		@include border-radius(1px);
+		background-color: $scrollbar-track-color;
+		@include border-radius(2px);
 
 		&:hover {
-			background-color: $action-hover-color;
+			background-color: $scrollbar-track-hover-color;
 		}
 	}
 
 	&::-webkit-scrollbar-thumb {
-		background-color: $form-bg-color;
-		border: 1px solid $action-hover-color;
+		background-color: $scrollbar-thumb-color;
+		border: 1px solid $scrollbar-track-hover-color;
 		@include border-radius(2px);
 
 		&:hover {
-			background-color: $ui-hover-color;
+			background-color: $scrollbar-thumb-color;
 		}
 
 		&:focus {
-			background-color: $ui-hover-color;
+			background-color: $scrollbar-thumb-color;
 		}
 
 		&:active {
-			background-color: $ui-hover-color;
+			background-color: $scrollbar-thumb-color;
 		}
 	}
 }
@@ -2332,6 +2335,7 @@ button[disabled] {
 
 	.btn-grey {
 		border: none;
+		background-color: $transparent;
 	}
 }
 
