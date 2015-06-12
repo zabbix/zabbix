@@ -21,7 +21,7 @@
 
 include('include/views/js/configuration.httpconf.popup.js.php');
 
-$httpPopupWidget = new CWidget('httptest-popup');
+$httpPopupWidget = new CWidget();
 
 $result = false;
 if (hasRequest('add') || hasRequest('update')) {
@@ -90,9 +90,9 @@ else {
 
 	$httpPopupFormList->addRow(_('Headers'), new CTextArea('headers', getRequest('headers', '')));
 
-	$httpPopupFormList->addRow(_('Follow redirects'), new CCheckBox('follow_redirects', $followRedirects, null, true));
+	$httpPopupFormList->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1));
 
-	$httpPopupFormList->addRow(_('Retrieve only headers'), new CCheckBox('retrieve_mode', $retrieveMode, null, true));
+	$httpPopupFormList->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1));
 
 	$httpPopupFormList->addRow(_('Timeout'), new CNumericBox('timeout', getRequest('timeout', 15), 5));
 	$httpPopupFormList->addRow(_('Required string'), new CTextBox('required', getRequest('required', ''), ZBX_TEXTBOX_STANDARD_SIZE));

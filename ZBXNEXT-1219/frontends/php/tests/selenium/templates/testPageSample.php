@@ -116,7 +116,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->zbxTestClick('css=span.link_menu');
+		$this->zbxTestClick('css=span.btn-link');
 
 		$this->input_type('filter_host', '1928379128ksdhksdjfh');
 		$this->zbxTestClickWait('filter');
@@ -127,7 +127,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->zbxTestClick('css=span.link_menu');
+		$this->zbxTestClick('css=span.btn-link');
 
 		$this->input_type('filter_host', '_');
 		$this->zbxTestClickWait('filter');
@@ -138,7 +138,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestLogin('hosts.php');
 
 		// Reset filter
-		$this->zbxTestClick('css=span.link_menu');
+		$this->zbxTestClick('css=span.btn-link');
 
 		$this->input_type('filter_host', '%');
 		$this->zbxTestClickWait('filter');
@@ -152,7 +152,7 @@ class testPageHosts extends CWebTest {
 	*/
 	public function testPageHosts_FilterReset($host) {
 		$this->zbxTestLogin('hosts.php');
-		$this->zbxTestClick('css=span.link_menu');
+		$this->zbxTestClick('css=span.btn-link');
 		$this->zbxTestClickWait('filter');
 		$this->zbxTestTextPresent($host['name']);
 	}

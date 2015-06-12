@@ -22,12 +22,8 @@
 class CCol extends CTag {
 
 	public function __construct($item = null) {
-		parent::__construct('td', 'yes');
+		parent::__construct('td', true);
 		$this->addItem($item);
-	}
-
-	public function setAlign($value) {
-		$this->setAttribute('align', $value);
 	}
 
 	public function setRowSpan($value) {
@@ -44,5 +40,7 @@ class CCol extends CTag {
 
 	public function setWidth($value) {
 		$this->setAttribute('width', $value);
+
+		return $this;
 	}
 }

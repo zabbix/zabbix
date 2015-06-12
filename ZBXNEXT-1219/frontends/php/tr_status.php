@@ -265,12 +265,13 @@ $showEventColumn = ($config['event_ack_enable'] && $showEvents != EVENTS_OPTION_
 $switcherName = 'trigger_switchers';
 
 $headerCheckBox = ($showEventColumn)
-	? new CCheckBox('all_events', false, "checkAll('".$triggerForm->GetName()."', 'all_events', 'events');")
-	: new CCheckBox('all_triggers', false, "checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
+	? (new CCheckBox('all_events'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_events', 'events');")
+	: (new CCheckBox('all_triggers'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
 
 if ($showEvents != EVENTS_OPTION_NOEVENT) {
-	$showHideAllDiv = new CDiv(SPACE, 'filterclosed');
-	$showHideAllDiv->setAttribute('id', $switcherName);
+	$showHideAllDiv = (new CDiv(SPACE))
+		->addClass('filterclosed')
+		->setId($switcherName);
 }
 else {
 	$showHideAllDiv = null;
@@ -517,14 +518,15 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
-	$description = new CSpan($trigger['description'], ZBX_STYLE_LINK_ACTION.' link_menu');
-	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+	$description = (new CSpan($trigger['description']))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
 	if ($showDetails) {
 		$description = [
 			$description,
 			BR(),
-			new CDiv(explode_exp($trigger['expression'], true, true), 'trigger-expression')
+			(new CDiv(explode_exp($trigger['expression'], true, true)))->addClass('trigger-expression')
 		];
 	}
 
@@ -566,7 +568,7 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = new CSpan($description, 'pointer');
+	$triggerDescription = (new CSpan($description))->addClass('pointer');
 
 	// host js menu
 	$hostList = [];
@@ -579,12 +581,13 @@ foreach ($triggers as $trigger) {
 			}
 		}
 
-		$hostName = new CSpan($triggerHost['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
+		$hostName = (new CSpan($triggerHost['name']))
+			->addClass(ZBX_STYLE_BTN_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($triggerHost['maintenance_status']) {
-			$maintenanceIcon = new CDiv(null, 'icon-maintenance-inline');
+			$maintenanceIcon = (new CDiv())->addClass('icon-maintenance-inline');
 
 			$maintenances = API::Maintenance()->get([
 				'maintenanceids' => $triggerHost['maintenanceid'],
@@ -642,25 +645,27 @@ foreach ($triggers as $trigger) {
 		if ($trigger['hasEvents']) {
 			if ($trigger['event_count']) {
 				$ackColumn = new CCol([
-					new CLink(
+					(new CLink(
 						_('No'),
 						'acknow.php?'.
 							'triggers[]='.$trigger['triggerid'].
-							'&backurl='.$page['file'],
-						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED
-					), CViewHelper::showNum($trigger['event_count'])
+							'&backurl='.$page['file']))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass(ZBX_STYLE_RED),
+					CViewHelper::showNum($trigger['event_count'])
 				]);
 			}
 			else {
 				$ackColumn = new CCol(
-					new CLink(
+					(new CLink(
 						_('Yes'),
 						'acknow.php?'.
 							'eventid='.$trigger['lastEvent']['eventid'].
 							'&triggerid='.$trigger['lastEvent']['objectid'].
-							'&backurl='.$page['file'],
-						ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN
-				));
+							'&backurl='.$page['file']))
+						->addClass(ZBX_STYLE_LINK_ALT)
+						->addClass(ZBX_STYLE_GREEN)
+				);
 			}
 		}
 		else {
@@ -673,8 +678,9 @@ foreach ($triggers as $trigger) {
 
 	// open or close
 	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
-		$openOrCloseDiv = new CDiv(SPACE, 'filterclosed');
-		$openOrCloseDiv->setAttribute('data-switcherid', $trigger['triggerid']);
+		$openOrCloseDiv = (new CDiv(SPACE))
+			->addClass('filterclosed')
+			->setAttribute('data-switcherid', $trigger['triggerid']);
 	}
 	elseif ($showEvents == EVENTS_OPTION_NOEVENT) {
 		$openOrCloseDiv = null;
@@ -692,8 +698,10 @@ foreach ($triggers as $trigger) {
 	// unknown triggers
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-		$unknown = new CDiv(SPACE, 'status_icon iconunknown');
-		$unknown->setHint($trigger['error'], ZBX_STYLE_RED);
+		$unknown = (new CDiv(SPACE))
+			->addClass('status_icon')
+			->addClass('iconunknown')
+			->setHint($trigger['error'], ZBX_STYLE_RED);
 	}
 
 	// comments
@@ -709,7 +717,7 @@ foreach ($triggers as $trigger) {
 	$triggerTable->addRow([
 		$openOrCloseDiv,
 		$config['event_ack_enable'] ?
-			($showEventColumn ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', 'no', null, $trigger['triggerid'])) : null,
+			($showEventColumn ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', $trigger['triggerid'])) : null,
 		$severityColumn,
 		$statusSpan,
 		$unknown,
@@ -743,7 +751,7 @@ foreach ($triggers as $trigger) {
 			$ack = getEventAckState($event, $page['file']);
 
 			$ackCheckBox = ($event['acknowledged'] == 0 && $event['value'] == TRIGGER_VALUE_TRUE)
-				? new CCheckBox('events['.$event['eventid'].']', 'no', null, $event['eventid'])
+				? new CCheckBox('events['.$event['eventid'].']', $event['eventid'])
 				: SPACE;
 
 			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -764,10 +772,10 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($event['clock']),
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
-				$emptyColumn]))->
-					addClass('odd_row')->
-					setAttribute('data-parentid', $trigger['triggerid'])->
-					addStyle('display: none;');
+				$emptyColumn]))
+					->addClass('odd_row')
+					->setAttribute('data-parentid', $trigger['triggerid'])
+					->addStyle('display: none;');
 			$triggerTable->addRow($row);
 
 			if ($i > $config['event_show_max']) {

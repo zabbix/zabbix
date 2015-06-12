@@ -223,7 +223,7 @@ class CScreenHistory extends CScreenBase {
 
 						$newRow = new CRow($row);
 						if (!is_null($color)) {
-							$newRow->setAttribute('class', $color);
+							$newRow->addClass($color);
 						}
 
 						$historyTable->addRow($newRow);
@@ -297,7 +297,9 @@ class CScreenHistory extends CScreenBase {
 
 			if (($this->action == HISTORY_GRAPH || $this->action == HISTORY_BATCH_GRAPH) && !isset($iv_string[$firstItem['value_type']])) {
 				$containerId = 'graph_cont1';
-				$output[] = new CDiv(null, 'center', $containerId);
+				$output[] = (new CDiv())
+					->addClass('center')
+					->setId($containerId);
 
 				$timeControlData['id'] = $this->getDataId();
 				$timeControlData['containerid'] = $containerId;

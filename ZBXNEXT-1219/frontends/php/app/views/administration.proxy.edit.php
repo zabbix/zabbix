@@ -21,11 +21,11 @@
 
 $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
-$proxyWidget = (new CWidget())->setTitle(_('Proxies'));
+$widget = (new CWidget())->setTitle(_('Proxies'));
 
 // create form
 $proxyForm = new CForm();
-$proxyForm->setAttribute('id', 'proxyForm');
+$proxyForm->setId('proxyForm');
 $proxyForm->addVar('proxyid', $data['proxyid']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
@@ -43,13 +43,14 @@ $proxyFormList->addRow(_('Proxy mode'), new CComboBox('status', $data['status'],
 	HOST_STATUS_PROXY_PASSIVE => _('Passive')
 ]));
 
-$interfaceTable = new CTable(null, 'formElementTable');
-$interfaceTable->addRow([
-	_('IP address'),
-	_('DNS name'),
-	_('Connect to'),
-	_('Port')
-]);
+$interfaceTable = (new CTable())
+	->addClass('formElementTable')
+	->addRow([
+		_('IP address'),
+		_('DNS name'),
+		_('Connect to'),
+		_('Port')
+	]);
 
 $connectByComboBox = new CRadioButtonList('useip', $data['useip']);
 $connectByComboBox->addValue(_('IP'), 1);
@@ -62,7 +63,7 @@ $interfaceTable->addRow([
 	$connectByComboBox,
 	new CTextBox('port', $data['port'], 18, false, 64)
 ]);
-$proxyFormList->addRow(_('Interface'), new CDiv($interfaceTable, 'objectgroup inlineblock border_dotted ui-corner-all'),
+$proxyFormList->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass('objectgroup inlineblock border_dotted'),
 	$data['status'] != HOST_STATUS_PROXY_PASSIVE);
 
 // append hosts to form list
@@ -90,12 +91,10 @@ $proxyTab = new CTabView();
 $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
 
 // append buttons to form
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
-$cancelButton->setAttribute('id', 'cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list'))->setId('cancel');
 
 if ($data['proxyid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'proxy.create');
-	$addButton->setAttribute('id', 'add');
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'proxy.create'))->setId('add');
 
 	$proxyTab->setFooter(makeFormFooter(
 		$addButton,
@@ -103,15 +102,13 @@ if ($data['proxyid'] == 0) {
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'proxy.update');
-	$updateButton->setAttribute('id', 'update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
+	$updateButton = (new CSubmitButton(_('Update'), 'action', 'proxy.update'))->setId('update');
+	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
+	$deleteButton = (new CRedirectButton(_('Delete'),
 		'zabbix.php?action=proxy.delete&sid='.$data['sid'].'&proxyids[]='.$data['proxyid'],
 		_('Delete proxy?')
-	);
-	$deleteButton->setAttribute('id', 'delete');
+	))
+		->setId('delete');
 
 	$proxyTab->setFooter(makeFormFooter(
 		$updateButton,
@@ -124,4 +121,4 @@ else {
 }
 
 $proxyForm->addItem($proxyTab);
-$proxyWidget->addItem($proxyForm)->show();
+$widget->addItem($proxyForm)->show();

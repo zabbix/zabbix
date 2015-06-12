@@ -19,7 +19,7 @@
 **/
 
 
-$maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
+$widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
 $maintenanceForm = new CForm();
@@ -96,14 +96,10 @@ $maintenanceFormList->addRow(_('Description'), new CTextArea('description', $thi
  * Maintenance period tab
  */
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
-$maintenancePeriodTable = (new CTable(_('No maintenance periods defined.')))->
-	addClass('formElementTable')->
-	setHeader([
-		_('Period type'),
-		_('Schedule'),
-		_('Period'),
-		_('Action')
-	]);
+$maintenancePeriodTable = (new CTable())
+	->setNoDataMessage(_('No maintenance periods defined.'))
+	->addClass('formElementTable')
+	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]);
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenancePeriodTable->addRow([
@@ -111,11 +107,10 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		shedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol([
-			new CSubmit('edit_timeperiodid['.$id.']', _('Edit'), null, 'link_menu'),
+			(new CSubmit('edit_timeperiodid['.$id.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
 			SPACE.SPACE,
-			new CSubmit('del_timeperiodid['.$id.']', _('Remove'), null, 'link_menu')
-		]))->
-			addClass(ZBX_STYLE_NOWRAP)
+			(new CSubmit('del_timeperiodid['.$id.']', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
+		]))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
@@ -130,9 +125,12 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	$maintenanceForm->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
-$periodsDiv = new CDiv($maintenancePeriodTable, 'objectgroup inlineblock border_dotted');
+$periodsDiv = (new CDiv($maintenancePeriodTable))
+	->addClass('objectgroup')
+	->addClass('inlineblock')
+	->addClass('border_dotted');
 if (!isset($_REQUEST['new_timeperiod'])) {
-	$periodsDiv->addItem(new CSubmit('new_timeperiod', _('New'), null, 'link_menu'));
+	$periodsDiv->addItem((new CSubmit('new_timeperiod', _('New')))->addClass(ZBX_STYLE_BTN_LINK));
 }
 $maintenancePeriodFormList->addRow(_('Periods'), $periodsDiv);
 
@@ -145,13 +143,16 @@ if (isset($_REQUEST['new_timeperiod'])) {
 	}
 
 	$footer = [
-		new CSubmit('add_timeperiod', $saveLabel, null, 'link_menu'),
+		(new CSubmit('add_timeperiod', $saveLabel))->addClass(ZBX_STYLE_BTN_LINK),
 		SPACE.SPACE,
-		new CSubmit('cancel_new_timeperiod', _('Cancel'), null, 'link_menu')
+		(new CSubmit('cancel_new_timeperiod', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 	];
 
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		new CDiv([get_timeperiod_form(), $footer], 'objectgroup inlineblock border_dotted')
+		(new CDiv([get_timeperiod_form(), $footer]))
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	);
 }
 
@@ -167,13 +168,12 @@ $groupsComboBox = new CComboBox('twb_groupid', $this->data['twb_groupid'], 'subm
 foreach ($this->data['all_groups'] as $group) {
 	$groupsComboBox->addItem($group['groupid'], $group['name']);
 }
-$hostTable = (new CTable())->
-	addClass('formElementTable')->
-	addRow($hostTweenBox->get(_('In maintenance'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
+$hostTable = (new CTable())
+	->addClass('formElementTable')
+	->addRow($hostTweenBox->get(_('In maintenance'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
 $hostsAndGroupsFormList->addRow(_('Hosts in maintenance'), $hostTable);
 
-$groupTable = (new CTable())->
-	addClass('formElementTable');
+$groupTable = (new CTable())->addClass('formElementTable');
 $groupTweenBox = new CTweenBox($maintenanceForm, 'groupids', $this->data['groupids'], 10);
 foreach ($this->data['all_groups'] as $group) {
 	$groupTweenBox->addItem($group['groupid'], $group['name']);
@@ -210,6 +210,7 @@ else {
 }
 
 $maintenanceForm->addItem($maintenanceTab);
-$maintenanceWidget->addItem($maintenanceForm);
 
-return $maintenanceWidget;
+$widget->addItem($maintenanceForm);
+
+return $widget;

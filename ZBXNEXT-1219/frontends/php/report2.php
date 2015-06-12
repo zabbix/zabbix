@@ -167,9 +167,9 @@ if ($triggerData) {
 	$triggerData['hostname'] = $host['name'];
 
 	$reportWidget->setControls(
-		(new CList())->
-			addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))->
-			addItem($triggerData['description'])
+		(new CList())
+			->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))
+			->addItem($triggerData['description'])
 	);
 
 	$table = new CTableInfo();
@@ -402,8 +402,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 			new CLink($trigger['description'], 'events.php?filter_set=1&triggerid='.$trigger['triggerid'].
 				'&source='.EVENT_SOURCE_TRIGGERS
 			),
-			$availability['true'] == 0 ? '' : new CSpan(sprintf('%.4f%%', $availability['true']), ZBX_STYLE_RED),
-			$availability['false'] == 0 ? '' : new CSpan(sprintf('%.4f%%', $availability['false']), ZBX_STYLE_GREEN),
+			$availability['true'] == 0 ? '' : (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
+			$availability['false'] == 0 ? '' : (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].
 				'&filter_hostid='.$_REQUEST['filter_hostid'].'&triggerid='.$trigger['triggerid'])
 		]);

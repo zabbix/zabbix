@@ -63,8 +63,8 @@ class CXmlValidator {
 			);
 		}
 
-		$data['zabbix_export'] = (new $this->versionValidators[$version]())->
-			validate($data['zabbix_export'], '/zabbix_export');
+		$data['zabbix_export'] = (new $this->versionValidators[$version]())
+			->validate($data['zabbix_export'], '/zabbix_export');
 
 		return $data;
 	}

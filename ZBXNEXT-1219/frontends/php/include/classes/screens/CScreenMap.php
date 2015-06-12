@@ -36,7 +36,7 @@ class CScreenMap extends CScreenBase {
 	public function get() {
 		$image = new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].'&width='.$this->screenitem['width']
 			.'&height='.$this->screenitem['height'].'&curtime='.time());
-		$image->setAttribute('id', 'map_'.$this->screenitem['screenitemid']);
+		$image->setId('map_'.$this->screenitem['screenitemid']);
 
 		if ($this->mode == SCREEN_MODE_PREVIEW) {
 			$sysmap = API::Map()->get([
@@ -66,9 +66,12 @@ class CScreenMap extends CScreenBase {
 
 		$this->insertFlickerfreeJs();
 
-		$div = new CDiv($output, 'map-container flickerfreescreen', $this->getScreenId());
-		$div->setAttribute('data-timestamp', $this->timestamp);
-		$div->addStyle('position: relative;');
+		$div = (new CDiv($output))
+			->addClass('map-container')
+			->addClass('flickerfreescreen')
+			->setId($this->getScreenId())
+			->setAttribute('data-timestamp', $this->timestamp)
+			->addStyle('position: relative;');
 
 		return $div;
 	}

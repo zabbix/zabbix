@@ -340,7 +340,6 @@ if (isset($_REQUEST['form'])) {
 	$data = getItemFormData($formItem, [
 		'is_discovery_rule' => true
 	]);
-	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
 	$data['lifetime'] = getRequest('lifetime', 30);
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');

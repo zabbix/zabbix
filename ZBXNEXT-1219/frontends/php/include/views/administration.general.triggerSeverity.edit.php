@@ -21,10 +21,18 @@
 
 include('include/views/js/administration.general.triggerSeverity.js.php');
 
+$widget = (new CWidget())
+	->setTitle(_('Trigger severities'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerseverities.php')))
+	);
+
 $severityTab = new CFormList();
 
-$headerDiv = new CDiv(_('Custom severity'), 'inlineblock');
-$headerDiv->addStyle('width: 16.3em; margin-left: 3px; zoom:1; *display: inline;');
+$headerDiv = (new CDiv(_('Custom severity')))
+	->addClass('inlineblock')
+	->addStyle('width: 16.3em; margin-left: 3px; zoom:1; *display: inline;');
 $severityTab->addRow(SPACE, [$headerDiv, _('Colour')]);
 
 $severityNameTB0 = new CTextBox('severity_name_0', $data['severity_name_0']);
@@ -77,4 +85,6 @@ $severityView->setFooter(makeFormFooter(
 ));
 $severityForm->addItem($severityView);
 
-return $severityForm;
+$widget->addItem($severityForm);
+
+return $widget;
