@@ -571,15 +571,15 @@ function getAvailabilityTable($host, $currentTime) {
 	foreach ($arr as $val) {
 		switch ($host[$val.'_available']) {
 			case HOST_AVAILABLE_TRUE:
-				$ai = (new CSpan($val))->addClass('status-green');
+				$ai = (new CSpan($val))->addClass(ZBX_STYLE_STATUS_GREEN);
 				break;
 			case HOST_AVAILABLE_FALSE:
 				$ai = (new CSpan($val))
-					->addClass('status-red')
+					->addClass(ZBX_STYLE_STATUS_RED)
 					->setHint($host[$val.'_error'], ZBX_STYLE_RED);
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$ai = (new CSpan($val))->addClass('status-grey');
+				$ai = (new CSpan($val))->addClass(ZBX_STYLE_STATUS_GREY);
 				break;
 		}
 		$ad[] = $ai;
@@ -734,4 +734,32 @@ function makeAdministrationGeneralMenu($selected)
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	]);
+}
+
+/**
+ * Renders an error icon like [x] with error message
+ *
+ * @param string $error
+ *
+ * @return CDiv
+ */
+function makeErrorIcon($error)
+{
+	return (new CDiv('x'))
+		->addClass(ZBX_STYLE_STATUS_RED)
+		->setHint($error, ZBX_STYLE_RED);
+}
+
+/**
+ * Renders an unknown icon like [?] with error message
+ *
+ * @param string $error
+ *
+ * @return CDiv
+ */
+function makeUnknownIcon($error)
+{
+	return (new CDiv('?'))
+		->addClass(ZBX_STYLE_STATUS_GREY)
+		->setHint($error, ZBX_STYLE_RED);
 }

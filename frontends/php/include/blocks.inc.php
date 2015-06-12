@@ -730,10 +730,7 @@ function make_latest_issues(array $filter = []) {
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconunknown')
-				->setHint($trigger['error'], ZBX_STYLE_RED);
+			$unknown = makeUnknownIcon($trigger['error']);
 		}
 
 		// trigger has events
@@ -842,10 +839,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconunknown')
-				->setHint($trigger['error'], ZBX_STYLE_RED);
+			$unknown = makeUnknownIcon($trigger['error']);
 		}
 
 		// ack

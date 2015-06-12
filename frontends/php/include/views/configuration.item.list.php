@@ -112,10 +112,7 @@ foreach ($this->data['items'] as $item) {
 		$infoIcons = [];
 
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$infoIcons[] = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconerror')
-				->setHint($item['error'], ZBX_STYLE_RED);
+			$infoIcons[] = makeErrorIcon($item['error']);
 		}
 
 		// discovered item lifetime indicator
