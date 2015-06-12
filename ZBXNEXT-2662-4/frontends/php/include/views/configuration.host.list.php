@@ -66,10 +66,11 @@ $table->setHeader([
 	_('Interface'),
 	_('Templates'),
 	make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
-	_('Availability')
+	_('Availability'),
+	_('Info')
 ]);
 
-$currentTime = time();
+$current_time = time();
 
 foreach ($data['hosts'] as $host) {
 	$interface = reset($host['interfaces']);
@@ -171,6 +172,13 @@ foreach ($data['hosts'] as $host) {
 		$hostTemplates[] = $caption;
 	}
 
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
+		$lifetime_indicator = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
+	}
+	else {
+		$lifetime_indicator = '';
+	}
+
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
@@ -201,7 +209,8 @@ foreach ($data['hosts'] as $host) {
 		$hostInterface,
 		$hostTemplates,
 		$status,
-		getAvailabilityTable($host, $currentTime)
+		getHostAvailabilityTable($host),
+		$lifetime_indicator
 	]);
 }
 

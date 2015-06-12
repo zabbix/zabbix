@@ -1032,6 +1032,7 @@ define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_SELECT_MULTIPLE', 'select-multiple');
 define('ZBX_STYLE_SELECTED', 'selected');
+define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
 define('ZBX_STYLE_STATUS_GREEN', 'status-green');
 define('ZBX_STYLE_STATUS_GREY', 'status-grey');
 define('ZBX_STYLE_STATUS_RED', 'status-red');

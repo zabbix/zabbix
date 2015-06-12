@@ -68,7 +68,7 @@ $itemTable->setHeader([
 	$data['showInfoColumn'] ? _('Info') : null
 ]);
 
-$currentTime = time();
+$current_time = time();
 
 foreach ($this->data['items'] as $item) {
 	// description
@@ -116,29 +116,11 @@ foreach ($this->data['items'] as $item) {
 		}
 
 		// discovered item lifetime indicator
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
-			$info = (new CSpan('!'))->addClass(ZBX_STYLE_STATUS_YELLOW);
-
-			// Check if item should've been deleted in the past.
-			if ($currentTime > $item['itemDiscovery']['ts_delete']) {
-				$info->setHint(_s(
-					'The item is not discovered anymore and will be deleted the next time discovery rule is processed.'
-				));
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
+			if ($infoIcons) {
+				$infoIcons[] = SPACE;
 			}
-			else {
-				$info->setHint(_s(
-					'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-					zbx_date2age($item['itemDiscovery']['ts_delete']),
-					zbx_date2str(DATE_FORMAT, $item['itemDiscovery']['ts_delete']),
-					zbx_date2str(TIME_FORMAT, $item['itemDiscovery']['ts_delete'])
-				));
-			}
-
-			$infoIcons[] = $info;
-		}
-
-		if (!$infoIcons) {
-			$infoIcons[] = '';
+			$infoIcons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
 		}
 	}
 	else {
