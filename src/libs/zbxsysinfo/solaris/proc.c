@@ -343,10 +343,7 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/psinfo", (int)procutil->pid);
 
 	if (-1 == (fd = open(tmp, O_RDONLY)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "[WDN] cannot open /proc/%d/psinfo", (int)procutil->pid);
 		return -errno;
-	}
 
 	n = read(fd, &psinfo, sizeof(psinfo));
 	close(fd);
@@ -359,10 +356,7 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/status", (int)procutil->pid);
 
 	if (-1 == (fd = open(tmp, O_RDONLY)))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "[WDN] cannot open /proc/%d/status", (int)procutil->pid);
 		return -errno;
-	}
 
 	n = read(fd, &pstatus, sizeof(pstatus));
 	close(fd);
@@ -375,13 +369,6 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 
 	procutil->stime = ((zbx_uint64_t)pstatus.pr_stime.tv_sec * 1e9 + pstatus.pr_stime.tv_nsec) *
 			sysconf(_SC_CLK_TCK) / 1e9;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] pid:%d utime: %d %d (%d)", (int)procutil->pid,
-			pstatus.pr_utime.tv_sec, pstatus.pr_utime.tv_nsec,
-			procutil->utime);
-	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] pid:%d stime: %d %d (%d)", (int)procutil->pid,
-			pstatus.pr_stime.tv_sec, pstatus.pr_stime.tv_nsec,
-			procutil->stime);
 
 	return SUCCEED;
 }

@@ -648,21 +648,6 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 	time_diff = (zbx_uint64_t)(query->h_data[current].timestamp.sec - query->h_data[start].timestamp.sec) *
 			1000000000 + query->h_data[current].timestamp.ns - query->h_data[start].timestamp.ns;
 
-
-	zabbix_log(LOG_LEVEL_DEBUG, "[WDN] ticks:" ZBX_FS_UI64 " time:" ZBX_FS_UI64, ticks_diff, time_diff);
-	{
-		int	i;
-
-		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] first:%d, count:%d", query->h_first, query->h_count);
-		zabbix_log(LOG_LEVEL_DEBUG, "[WDN] start:%d, current:%d", start, current);
-
-		for (i = 0; i < query->h_count; i++)
-		{
-			zabbix_log(LOG_LEVEL_DEBUG, "[WDN]       [%03d] utime:" ZBX_FS_UI64 ", stime:" ZBX_FS_UI64,
-					i, query->h_data[i].utime, i, query->h_data[i].stime);
-		}
-	}
-
 	/* 1e9 (nanoseconds) * 1e2 (percent) * 1e1 (one digit decimal place) */
 	ticks_diff *= 1000000000000;
 	ticks_diff /= time_diff * sysconf(_SC_CLK_TCK);
