@@ -1014,7 +1014,7 @@ footer {
 	}
 
 	.btn-grey {
-		background-color: $ui-bg-color;
+		background-color: $btn-form-bg-color;
 		margin-top: -1px;
 	}
 }
@@ -1870,13 +1870,17 @@ button[disabled] {
 	}
 
 	&::-webkit-scrollbar-track {
-		background-color: $action-hover-color;
+		background-color: $transparent;
 		@include border-radius(1px);
+
+		&:hover {
+			background-color: $action-hover-color;
+		}
 	}
 
 	&::-webkit-scrollbar-thumb {
 		background-color: $form-bg-color;
-		border: 1px solid $form-border-color;
+		border: 1px solid $action-hover-color;
 		@include border-radius(2px);
 
 		&:hover {
@@ -2423,7 +2427,7 @@ button[disabled] {
 .dashed-border {
 
 	td {
-		border: 1px dashed $form-border-color;
+		border: 1px dashed $table-border-color;
 
 		td {
 			border: none;
@@ -2464,26 +2468,43 @@ a.grey {
 	@extend .grey;
 }
 
+.status-container {
+	white-space: nowrap;
+
+	span {
+		position: relative;
+		@include border-radius(0);
+
+		&:first-child {
+			@include border-radius(2px 0 0 2px);
+		}
+
+		&:last-child {
+			@include border-radius(0 2px 2px 0);
+		}
+	}
+}
+
 .status-green {
-    border: 1px solid darken(desaturate($alt-green, 10%), 18%);
+    border: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	background-color: darken(desaturate($alt-green, 10%), 16%);
 	@extend %status;
 }
 
 .status-red {
-	border: 1px solid darken(desaturate($alt-red, 10%), 7%);
+	border: 1px solid darken(desaturate($alt-red, 10%), 9%);
 	background-color: darken(desaturate($alt-red, 10%), 5%);
 	@extend %status;
 }
 
 .status-grey {
-	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 10%);
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
 	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
 	@extend %status;
 }
 
 .status-yellow {
-	border: 1px solid darken(desaturate($alt-yellow, 10%), 18%);
+	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
 	background-color: darken(desaturate($alt-yellow, 10%), 16%);
 	@extend %status;
 }
@@ -2493,8 +2514,9 @@ a.grey {
 	color: $white;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
+	//letter-spacing: 0.0688em;
 	text-align: center;
-	min-width: 1em;
+	min-width: 0.7em;
 	line-height: 1em;
 	display: inline-block;
 	cursor: default;
