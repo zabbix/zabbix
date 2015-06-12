@@ -44,7 +44,7 @@ extern int		server_num, process_num;
 
 #ifndef _WINDOWS
 static int		shm_id;
-int 			my_diskstat_shmid = NONEXISTENT_SHMID;
+int 			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 ZBX_DISKDEVICES_DATA	*diskdevices = NULL;
 ZBX_MUTEX		diskstats_lock = ZBX_MUTEX_NULL;
 #endif
@@ -190,7 +190,11 @@ void	init_collector_data()
 
 	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
 	collector->cpus.count = cpu_count;
-	collector->diskstat_shmid = NONEXISTENT_SHMID;
+	collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
+
+#ifdef ZBX_PROCSTAT_COLLECTOR
+	zbx_procstat_init(&collector->procstat);
+#endif
 
 	if (FAIL == zbx_mutex_create_force(&diskstats_lock, ZBX_MUTEX_DISKSTATS))
 	{
@@ -224,13 +228,13 @@ void	free_collector_data()
 	if (NULL == collector)
 		return;
 
-	if (NONEXISTENT_SHMID != collector->diskstat_shmid)
+	if (ZBX_NONEXISTENT_SHMID != collector->diskstat_shmid)
 	{
 		if (-1 == shmctl(collector->diskstat_shmid, IPC_RMID, 0))
 			zabbix_log(LOG_LEVEL_WARNING, "cannot remove shared memory for disk statistics collector: %s",
 					zbx_strerror(errno));
 		diskdevices = NULL;
-		collector->diskstat_shmid = NONEXISTENT_SHMID;
+		collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 	}
 
 	if (-1 == shmctl(shm_id, IPC_RMID, 0))
@@ -301,7 +305,7 @@ void	diskstat_shm_reattach()
 
 		old_shmid = my_diskstat_shmid;
 
-		if (NONEXISTENT_SHMID != my_diskstat_shmid)
+		if (ZBX_NONEXISTENT_SHMID != my_diskstat_shmid)
 		{
 			if (-1 == shmdt((void *) diskdevices))
 			{
@@ -310,7 +314,7 @@ void	diskstat_shm_reattach()
 				exit(EXIT_FAILURE);
 			}
 			diskdevices = NULL;
-			my_diskstat_shmid = NONEXISTENT_SHMID;
+			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 		}
 
 		if ((void *)(-1) == (diskdevices = shmat(collector->diskstat_shmid, NULL, 0)))
@@ -442,6 +446,11 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 		if (0 != DISKDEVICE_COLLECTOR_STARTED(collector))
 			collect_stats_diskdevices();
+
+#ifdef ZBX_PROCSTAT_COLLECTOR
+		zbx_procstat_collect();
+#endif
+
 #endif
 #ifdef _AIX
 		if (1 == collector->vmstat.enabled)

@@ -21,16 +21,25 @@
 #define ZABBIX_STATS_H
 
 #include "threads.h"
+#include "mutexs.h"
 #ifndef _WINDOWS
 #	include "diskdevices.h"
+#       include "ipc.h"
 #endif
 #include "cpustat.h"
 #ifdef _AIX
 #	include "vmstats.h"
 #endif
 
-#ifndef _WINDOWS
-#	define NONEXISTENT_SHMID	(-1)
+#if defined(__sun) && defined(__SVR4)
+#	define ZBX_PROCSTAT_COLLECTOR
+#endif
+#if defined(__linux)
+#	define ZBX_PROCSTAT_COLLECTOR
+#endif
+
+#ifdef ZBX_PROCSTAT_COLLECTOR
+#	include "procstat.h"
 #endif
 
 typedef struct
@@ -38,6 +47,9 @@ typedef struct
 	ZBX_CPUS_STAT_DATA	cpus;
 #ifndef _WINDOWS
 	int 			diskstat_shmid;
+#endif
+#ifdef ZBX_PROCSTAT_COLLECTOR
+	zbx_dshm_t		procstat;
 #endif
 #ifdef _AIX
 	ZBX_VMSTAT_DATA		vmstat;

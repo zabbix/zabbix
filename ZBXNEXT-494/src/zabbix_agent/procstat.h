@@ -17,11 +17,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_PROC_H
-#define ZABBIX_PROC_H
+#ifndef ZABBIX_PROCSTAT_H
+#define ZABBIX_PROCSTAT_H
 
-int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx_uint64_t *bytes);
+/* process cpu utilization data */
+typedef struct
+{
+	pid_t		pid;
 
-int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
+	/* errno error code */
+	int		error;
+
+	zbx_uint64_t	utime;
+	zbx_uint64_t	stime;
+
+	/* process start time, used to validate if the old */
+	/* snapshot data belongs to the same process       */
+	zbx_uint64_t	starttime;
+}
+zbx_procstat_util_t;
+
+void	zbx_procstat_init();
+
+int	zbx_procstat_collector_enabled();
+
+int	zbx_procstat_enabled();
+
+int	zbx_procstat_get_utime(const char *procname, const char *username, const char *cmdline,
+		int period, double *utime, char **errmsg);
+int	zbx_procstat_get_stime(const char *procname, const char *username, const char *cmdline,
+		int period, double *stime, char **errmsg);
+
+void	zbx_procstat_collect();
 
 #endif
