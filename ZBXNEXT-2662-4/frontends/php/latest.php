@@ -583,9 +583,7 @@ foreach ($items as $key => $item){
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = (new CDiv())
-				->addClass('status_icon iconerror')
-				->setHint($item['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($item['error']);
 		}
 		else {
 			$info = '';
@@ -776,9 +774,7 @@ foreach ($items as $item) {
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = (new CDiv())
-				->addClass('status_icon iconerror')
-				->setHint($item['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($item['error']);
 		}
 		else {
 			$info = '';

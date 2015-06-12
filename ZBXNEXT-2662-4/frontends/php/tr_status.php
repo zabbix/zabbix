@@ -698,10 +698,7 @@ foreach ($triggers as $trigger) {
 	// unknown triggers
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-		$unknown = (new CDiv(SPACE))
-			->addClass('status_icon')
-			->addClass('iconunknown')
-			->setHint($trigger['error'], ZBX_STYLE_RED);
+		$unknown = makeUnknownIcon($trigger['error']);
 	}
 
 	// comments

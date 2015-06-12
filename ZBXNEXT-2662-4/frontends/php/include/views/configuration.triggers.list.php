@@ -137,10 +137,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	// info
 	if ($this->data['showInfoColumn']) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconerror')
-				->setHint($trigger['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($trigger['error']);
 		}
 		else {
 			$info = '';
