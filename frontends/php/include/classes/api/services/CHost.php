@@ -634,6 +634,13 @@ class CHost extends CHostGeneral {
 				}
 				$hostNames['name'][$host['name']] = $update ? $host['hostid'] : 1;
 			}
+
+			// encryption
+			if (array_key_exists('tls_psk', $host) && !preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $host['tls_psk'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
+				);
+			}
 		}
 		unset($host);
 
