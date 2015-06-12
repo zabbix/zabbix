@@ -28,8 +28,11 @@
 #include "servercomms.h"
 
 extern unsigned int	configured_tls_connect_mode;
+
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern char		*CONFIG_TLS_SERVER_CERT_ISSUER, *CONFIG_TLS_SERVER_CERT_SUBJECT, *CONFIG_TLS_PSK_IDENTITY;
+extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
+extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
+extern char	*CONFIG_TLS_PSK_IDENTITY;
 #endif
 
 int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
@@ -45,6 +48,7 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 		tls_arg1 = NULL;
 		tls_arg2 = NULL;
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
 	{
 		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
@@ -55,7 +59,7 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
 		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
 	}
-
+#endif
 	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout,
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
