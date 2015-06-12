@@ -2190,3 +2190,48 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 
 	zbx_free(sql);
 }
+
+int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id)
+{
+	const char	*__function_name = "DBlock_record";
+
+	DB_RESULT	result;
+	DB_ROW		row;
+	const ZBX_TABLE	*t;
+	int		ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == zbx_db_txn_level())
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "error: %s() called outside of transaction", __function_name);
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	t = DBget_table(table);
+
+	if (NULL == add_field)
+	{
+		result = DBselect("select null from %s where %s=" ZBX_FS_UI64 ZBX_FOR_UPDATE, table, t->recid, id);
+	}
+	else
+	{
+		result = DBselect("select null from %s where %s=" ZBX_FS_UI64 " and %s=" ZBX_FS_UI64 ZBX_FOR_UPDATE,
+				table, t->recid, id, add_field, add_id);
+	}
+
+	row = DBfetch(result);
+	DBfree_result(result);
+
+	if (NULL == row)
+	{
+		/* no record with such id */
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
