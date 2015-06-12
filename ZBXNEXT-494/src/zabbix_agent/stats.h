@@ -31,13 +31,6 @@
 #	include "vmstats.h"
 #endif
 
-#if defined(__sun) && defined(__SVR4)
-#	define ZBX_PROCSTAT_COLLECTOR
-#endif
-#if defined(__linux)
-#	define ZBX_PROCSTAT_COLLECTOR
-#endif
-
 #ifdef ZBX_PROCSTAT_COLLECTOR
 #	include "procstat.h"
 #endif

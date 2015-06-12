@@ -935,7 +935,8 @@ void	zbx_proc_get_stats(zbx_procstat_util_t *procs, int procs_num)
  *               -errno    - failed to read pids                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proc_get_pids(const char *procname, const char *username, const char *cmdline, zbx_vector_uint64_t *pids)
+int	zbx_proc_get_pids(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
+		zbx_vector_uint64_t *pids)
 {
 	const char	*__function_name = "zbx_proc_get_pids";
 	DIR		*dir;
@@ -1009,9 +1010,6 @@ out:
 	return ret;
 }
 
-#define PROCSTAT_CPU_USER	0
-#define PROCSTAT_CPU_SYSTEM	1
-
 int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp;
@@ -1039,13 +1037,17 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		cmdline = NULL;
 
 	/* utilization type parameter (user|system) */
-	if (NULL == (tmp = get_rparam(request, 2)) || '\0' == *tmp || 0 == strcmp(tmp, "user"))
+	if (NULL == (tmp = get_rparam(request, 2)) || '\0' == *tmp || 0 == strcmp(tmp, "total"))
 	{
-		type = PROCSTAT_CPU_USER;
+		type = ZBX_PROCSTAT_CPU_TOTAL;
+	}
+	else if (0 == strcmp(tmp, "user"))
+	{
+		type = ZBX_PROCSTAT_CPU_USER;
 	}
 	else if (0 == strcmp(tmp, "system"))
 	{
-		type = PROCSTAT_CPU_SYSTEM;
+		type = ZBX_PROCSTAT_CPU_SYSTEM;
 	}
 	else
 	{
@@ -1078,17 +1080,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	switch (type)
-	{
-		case PROCSTAT_CPU_USER:
-			ret = zbx_procstat_get_utime(procname, username, cmdline, period, &value, &errmsg);
-			break;
-		case PROCSTAT_CPU_SYSTEM:
-			ret = zbx_procstat_get_stime(procname, username, cmdline, period, &value, &errmsg);
-			break;
-	}
-
-	if (SUCCEED != ret)
+	if (SUCCEED != (ret = zbx_procstat_get_util(procname, username, cmdline, 0, period, type, &value, &errmsg)))
 	{
 		/* zbx_procstat_get_* functions will return FAIL when either a collection   */
 		/* error was registered or if less than 2 data samples were collected.      */

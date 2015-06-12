@@ -22,6 +22,4 @@
 
 int	byte_value_from_proc_file(FILE *f, const char *label, const char *guard, zbx_uint64_t *bytes);
 
-int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result);
-
 #endif
