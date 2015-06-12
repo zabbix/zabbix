@@ -566,6 +566,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		tls_arg1 = NULL;
 		tls_arg2 = NULL;
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
 	{
 		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
@@ -576,7 +577,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
 		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
 	}
-
+#endif
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
@@ -746,6 +747,7 @@ static int	send_buffer(const char *host, unsigned short port)
 		tls_arg1 = NULL;
 		tls_arg2 = NULL;
 	}
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
 	{
 		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
@@ -756,7 +758,7 @@ static int	send_buffer(const char *host, unsigned short port)
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
 		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
 	}
-
+#endif
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
