@@ -385,7 +385,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid'])
 		]);
 		$list->addItem($status);
-		$list->addItem(getAvailabilityTable($db_host, time()));
+		$list->addItem(getHostAvailabilityTable($db_host));
+
+		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
+			$list->addItem(getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete']));
+		}
 	}
 
 	/*
@@ -554,64 +558,112 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 /**
  * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
  *
- * @param array  $host			an array of host data
- * @param string $currentTime	current Unix timestamp
+ * @param array $host		an array of host data
  *
  * @return CDiv
  */
-function getAvailabilityTable($host, $currentTime) {
-	$arr = ['zbx', 'snmp', 'jmx', 'ipmi'];
+function getHostAvailabilityTable($host) {
+	$container = (new CDiv())->addClass(ZBX_STYLE_STATUS_CONTAINER);
 
-	// for consistency in foreach loop
-	$host['zbx_available'] = $host['available'];
-	$host['zbx_error'] = $host['error'];
-
-	$ad = [];
-
-	foreach ($arr as $val) {
-		switch ($host[$val.'_available']) {
+	foreach (['zbx' => '', 'snmp' => 'snmp_', 'jmx' => 'jmx_', 'ipmi' => 'ipmi_'] as $type => $prefix) {
+		switch ($host[$prefix.'available']) {
 			case HOST_AVAILABLE_TRUE:
-				$ai = (new CSpan($val))->addClass(ZBX_STYLE_STATUS_GREEN);
+				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREEN);
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$ai = (new CSpan($val))
+				$ai = (new CSpan($type))
 					->addClass(ZBX_STYLE_STATUS_RED)
-					->setHint($host[$val.'_error'], ZBX_STYLE_RED);
+					->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$ai = (new CSpan($val))->addClass(ZBX_STYLE_STATUS_GREY);
+				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREY);
 				break;
 		}
-		$ad[] = $ai;
-		$ad[] = ' ';
+		$container->addItem($ai);
 	}
 
-	// discovered host lifetime indicator
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
-		$info = (new CSpan('!'))->addClass(ZBX_STYLE_STATUS_YELLOW);
+	return $container;
+}
 
-		// Check if host should've been deleted in the past.
-		if ($currentTime > $host['hostDiscovery']['ts_delete']) {
-			$info->setHint(_s(
-				'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
-			));
-		}
-		else {
-			$info->setHint(_s(
-				'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($host['hostDiscovery']['ts_delete']),
-				zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
-				zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
-			));
-		}
-
-		$ad[] = $info;
-		$ad[] = ' ';
+/**
+ * Returns the discovered host group lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the host group
+ *
+ * @return CDiv
+ */
+function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The host group is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
 	}
 
-	array_pop($ad);
+	return makeWarningIcon($warning);
+}
 
-	return $ad;
+/**
+ * Returns the discovered host lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the host
+ *
+ * @return CDiv
+ */
+function getHostLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
+	}
+
+	return makeWarningIcon($warning);
+}
+
+/**
+ * Returns the discovered item lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the item
+ *
+ * @return CDiv
+ */
+function getItemLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The item is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
+	}
+
+	return makeWarningIcon($warning);
 }
 
 /**
@@ -741,11 +793,13 @@ function makeAdministrationGeneralMenu($selected)
  *
  * @param string $error
  *
- * @return CDiv
+ * @return CSpan
  */
 function makeErrorIcon($error)
 {
-	return (new CDiv('x'))
+	return (new CSpan(
+		(new CTag('b', true))->addItem('&times;')
+	))
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_RED);
 }
@@ -755,11 +809,29 @@ function makeErrorIcon($error)
  *
  * @param string $error
  *
- * @return CDiv
+ * @return CSpan
  */
 function makeUnknownIcon($error)
 {
-	return (new CDiv('?'))
+	return (new CSpan(
+		(new CTag('b', true))->addItem('?')
+	))
 		->addClass(ZBX_STYLE_STATUS_GREY)
 		->setHint($error, ZBX_STYLE_RED);
+}
+
+/**
+ * Renders a warning icon like [!] with error message
+ *
+ * @param string $error
+ *
+ * @return CSpan
+ */
+function makeWarningIcon($error)
+{
+	return (new CSpan(
+		(new CTag('b', true))->addItem('!')
+	))
+		->addClass(ZBX_STYLE_STATUS_YELLOW)
+		->setHint($error);
 }
