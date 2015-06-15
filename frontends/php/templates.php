@@ -590,22 +590,22 @@ else {
 	$form = new CForm();
 	$form->setName('templates');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
-		_('Applications'),
-		_('Items'),
-		_('Triggers'),
-		_('Graphs'),
-		_('Screens'),
-		_('Discovery'),
-		_('Web'),
-		_('Linked templates'),
-		_('Linked to')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			(new CColHeader(
+				(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH),
+			make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
+			_('Applications'),
+			_('Items'),
+			_('Triggers'),
+			_('Graphs'),
+			_('Screens'),
+			_('Discovery'),
+			_('Web'),
+			_('Linked templates'),
+			_('Linked to')
+		]);
 
 	// get templates
 	$templates = [];

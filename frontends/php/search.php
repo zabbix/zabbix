@@ -120,24 +120,24 @@ $params = [
 $overalCount = API::Host()->get($params);
 $viewCount = count($hosts);
 
-$table = new CTableInfo();
-$table->setHeader([
-	new CColHeader(_('Host')),
-	new CColHeader(_('IP')),
-	new CColHeader(_('DNS')),
-	new CColHeader(_('Latest data')),
-	new CColHeader(_('Triggers')),
-	new CColHeader(_('Events')),
-	new CColHeader(_('Graphs')),
-	new CColHeader(_('Screens')),
-	new CColHeader(_('Web')),
-	new CColHeader(_('Applications')),
-	new CColHeader(_('Items')),
-	new CColHeader(_('Triggers')),
-	new CColHeader(_('Graphs')),
-	new CColHeader(_('Discovery')),
-	new CColHeader(_('Web'))
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		_('Host'),
+		_('IP'),
+		_('DNS'),
+		_('Latest data'),
+		_('Triggers'),
+		_('Events'),
+		_('Graphs'),
+		_('Screens'),
+		_('Web'),
+		_('Applications'),
+		_('Items'),
+		_('Triggers'),
+		_('Graphs'),
+		_('Discovery'),
+		_('Web')
+	]);
 
 foreach ($hosts as $hnum => $host) {
 	$hostid = $host['hostid'];
@@ -263,19 +263,17 @@ $params = [
 $overalCount = API::HostGroup()->get($params);
 $viewCount = count($hostGroups);
 
-$header = [
-	new CColHeader(_('Host group')),
-	new CColHeader(_('Latest data')),
-	new CColHeader(_('Triggers')),
-	new CColHeader(_('Events')),
-	new CColHeader(_('Graphs')),
-	new CColHeader(_('Web')),
-	$admin ? new CColHeader(_('Hosts')) : null,
-	$admin ? new CColHeader(_('Templates')) : null,
-];
-
-$table = new CTableInfo();
-$table->setHeader($header);
+$table = (new CTableInfo())
+	->setHeader([
+		_('Host group'),
+		_('Latest data'),
+		_('Triggers'),
+		_('Events'),
+		_('Graphs'),
+		_('Web'),
+		$admin ? _('Hosts') : null,
+		$admin ? _('Templates') : null
+	]);
 
 foreach ($hostGroups as $hnum => $group) {
 	$hostgroupid = $group['groupid'];
@@ -383,19 +381,17 @@ if ($admin) {
 	$overalCount = API::Template()->get($params);
 	$viewCount = count($templates);
 
-	$header = [
-		new CColHeader(_('Template')),
-		new CColHeader(_('Applications')),
-		new CColHeader(_('Items')),
-		new CColHeader(_('Triggers')),
-		new CColHeader(_('Graphs')),
-		new CColHeader(_('Screens')),
-		new CColHeader(_('Discovery')),
-		new CColHeader(_('Web')),
-	];
-
-	$table = new CTableInfo();
-	$table->setHeader($header);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Template'),
+			_('Applications'),
+			_('Items'),
+			_('Triggers'),
+			_('Graphs'),
+			_('Screens'),
+			_('Discovery'),
+			_('Web'),
+		]);
 
 	foreach ($templates as $tnum => $template) {
 		$templateid = $template['templateid'];

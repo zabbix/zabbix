@@ -70,8 +70,7 @@ if (zbx_empty($media_types)) {
 	$widget->addItem($table)->show();
 }
 else {
-	$table = new CTableInfo();
-	$table->makeVerticalRotation();
+	$table = (new CTableInfo())->makeVerticalRotation();
 
 	// fetch the year of the first alert
 	if (($firstAlert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'))) && $firstAlert['clock']) {

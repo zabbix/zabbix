@@ -474,12 +474,12 @@ function make_system_status($filter) {
 function make_status_of_zbx() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		_('Parameter'),
-		_('Value'),
-		_('Details')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Parameter'),
+			_('Value'),
+			_('Details')
+		]);
 
 	show_messages(); // because in function get_status(); function clear_messages() is called when fsockopen() fails.
 	$status = get_status();
@@ -673,16 +673,16 @@ function make_latest_issues(array $filter = []) {
 			->addStyle('float: left');
 	}
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? [$hostHeaderDiv, $sortDiv] : _('Host'),
-		($showSortIndicator && ($filter['sortfield'] === 'priority')) ? [$issueHeaderDiv, $sortDiv] : _('Issue'),
-		($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? [$lastChangeHeaderDiv, $sortDiv] : _('Last change'),
-		_('Age'),
-		_('Info'),
-		$config['event_ack_enable'] ? _('Ack') : null,
-		_('Actions')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? [$hostHeaderDiv, $sortDiv] : _('Host'),
+			($showSortIndicator && ($filter['sortfield'] === 'priority')) ? [$issueHeaderDiv, $sortDiv] : _('Issue'),
+			($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? [$lastChangeHeaderDiv, $sortDiv] : _('Last change'),
+			_('Age'),
+			_('Info'),
+			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Actions')
+		]);
 
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
@@ -821,15 +821,15 @@ function make_latest_issues(array $filter = []) {
  * @return CTableInfo
  */
 function makeTriggersPopup(array $triggers, array $ackParams, array $actions, array $config) {
-	$popupTable = new CTableInfo();
-	$popupTable->setHeader([
-		_('Host'),
-		_('Issue'),
-		_('Age'),
-		_('Info'),
-		$config['event_ack_enable'] ? _('Ack') : null,
-		_('Actions')
-	]);
+	$popupTable = (new CTableInfo())
+		->setHeader([
+			_('Host'),
+			_('Issue'),
+			_('Age'),
+			_('Info'),
+			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Actions')
+		]);
 
 	CArrayHelper::sort($triggers, [['field' => 'lastchange', 'order' => ZBX_SORT_DOWN]]);
 

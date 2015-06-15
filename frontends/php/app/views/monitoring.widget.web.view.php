@@ -41,13 +41,13 @@ $availableHosts = API::Host()->get([
 ]);
 $availableHostIds = array_keys($availableHosts);
 
-$table = new CTableInfo();
-$table->setHeader([
-	_('Host group'),
-	_('Ok'),
-	_('Failed'),
-	_('Unknown')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		_('Host group'),
+		_('Ok'),
+		_('Failed'),
+		_('Unknown')
+	]);
 
 $data = [];
 

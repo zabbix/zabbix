@@ -123,14 +123,14 @@ $widget = (new CWidget())
 	);
 
 // append table to widget
-$httpdetailsTable = new CTableInfo();
-$httpdetailsTable->setHeader([
-	_('Step'),
-	_('Speed'),
-	_('Response time'),
-	_('Response code'),
-	_('Status')
-]);
+$httpdetailsTable = (new CTableInfo())
+	->setHeader([
+		_('Step'),
+		_('Speed'),
+		_('Response time'),
+		_('Response code'),
+		_('Status')
+	]);
 
 $db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($httpTest['httptestid']).' ORDER BY no');
 
@@ -252,8 +252,8 @@ echo BR();
 // create graphs widget
 $graphsWidget = new CWidget();
 
-$filterForm = new CFilter('web.httpdetails.filter.state');
-$filterForm->addNavigator();
+$filterForm = (new CFilter('web.httpdetails.filter.state'))
+	->addNavigator();
 $graphsWidget->addItem($filterForm);
 
 $graphTable = (new CTableInfo())->setId('graph');

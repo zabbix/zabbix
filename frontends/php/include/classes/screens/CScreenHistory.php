@@ -140,19 +140,19 @@ class CScreenHistory extends CScreenBase {
 				$useEventLogItem = (strpos($firstItem['key_'], 'eventlog[') === 0);
 
 				if (empty($this->plaintext)) {
-					$historyTable = new CTableInfo();
-					$historyTable->setHeader(
-						[
-							_('Timestamp'),
-							$isManyItems ? _('Item') : null,
-							$useLogItem ? _('Local time') : null,
-							($useEventLogItem && $useLogItem) ? _('Source') : null,
-							($useEventLogItem && $useLogItem) ? _('Severity') : null,
-							($useEventLogItem && $useLogItem) ? _('Event ID') : null,
-							_('Value')
-						],
-						'header'
-					);
+					$historyTable = (new CTableInfo())
+						->setHeader(
+							[
+								_('Timestamp'),
+								$isManyItems ? _('Item') : null,
+								$useLogItem ? _('Local time') : null,
+								($useEventLogItem && $useLogItem) ? _('Source') : null,
+								($useEventLogItem && $useLogItem) ? _('Severity') : null,
+								($useEventLogItem && $useLogItem) ? _('Event ID') : null,
+								_('Value')
+							],
+							'header'
+						);
 				}
 
 				if ($this->filter !== '' && in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {
@@ -242,8 +242,8 @@ class CScreenHistory extends CScreenBase {
 			// numeric, float
 			else {
 				if (empty($this->plaintext)) {
-					$historyTable = new CTableInfo();
-					$historyTable->setHeader([_('Timestamp'), _('Value')]);
+					$historyTable = (new CTableInfo())
+						->setHeader([_('Timestamp'), _('Value')]);
 				}
 
 				$options['sortfield'] = ['itemid', 'clock'];

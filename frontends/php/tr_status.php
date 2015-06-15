@@ -277,21 +277,21 @@ else {
 	$showHideAllDiv = null;
 }
 
-$triggerTable = new CTableInfo();
-$triggerTable->setHeader([
-	$showHideAllDiv,
-	$config['event_ack_enable'] ? $headerCheckBox : null,
-	make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
-	_('Status'),
-	_('Info'),
-	make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
-	_('Age'),
-	$showEventColumn ? _('Duration') : null,
-	$config['event_ack_enable'] ? _('Ack') : null,
-	_('Host'),
-	make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
-	_('Description')
-]);
+$triggerTable = (new CTableInfo())
+	->setHeader([
+		$showHideAllDiv,
+		$config['event_ack_enable'] ? $headerCheckBox : null,
+		make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
+		_('Status'),
+		_('Info'),
+		make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
+		_('Age'),
+		$showEventColumn ? _('Duration') : null,
+		$config['event_ack_enable'] ? _('Ack') : null,
+		_('Host'),
+		make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
+		_('Description')
+	]);
 
 // get triggers
 $options = [
@@ -531,25 +531,25 @@ foreach ($triggers as $trigger) {
 	}
 
 	if (!empty($trigger['dependencies'])) {
-		$dependenciesTable = new CTableInfo();
-		$dependenciesTable->setAttribute('style', 'width: 200px;');
-		$dependenciesTable->addRow(bold(_('Depends on').':'));
+		$dependenciesTable = (new CTableInfo())
+			->setAttribute('style', 'width: 200px;')
+			->addRow(bold(_('Depends on').':'));
 
 		foreach ($trigger['dependencies'] as $dependency) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
-		$img = new CImg('images/general/arrow_down2.png', 'DEP_UP');
-		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-		$img->setHint($dependenciesTable);
+		$img = (new CImg('images/general/arrow_down2.png', 'DEP_UP'))
+			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			->setHint($dependenciesTable);
 
 		$description = [$img, SPACE, $description];
 	}
 
 	$dependency = false;
-	$dependenciesTable = new CTableInfo();
-	$dependenciesTable->setAttribute('style', 'width: 200px;');
-	$dependenciesTable->addRow(bold(_('Dependent').':'));
+	$dependenciesTable = (new CTableInfo())
+		->setAttribute('style', 'width: 200px;')
+		->addRow(bold(_('Dependent').':'));
 	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
@@ -560,9 +560,9 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($dependency) {
-		$img = new CImg('images/general/arrow_up2.png', 'DEP_UP');
-		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-		$img->setHint($dependenciesTable);
+		$img = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
+			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			->setHint($dependenciesTable);
 
 		$description = [$img, SPACE, $description];
 	}

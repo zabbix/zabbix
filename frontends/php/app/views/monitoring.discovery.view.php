@@ -35,8 +35,7 @@ $discoveryHeaderForm->addItem($controls);
 $discoveryWidget->setControls($discoveryHeaderForm);
 
 // create table
-$discoveryTable = new CTableInfo();
-$discoveryTable->makeVerticalRotation();
+$discoveryTable = (new CTableInfo())->makeVerticalRotation();
 
 $discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $data['sort'], $data['sortorder']);
 $discoveredDeviceCol->addClass('left');
@@ -163,8 +162,7 @@ foreach ($data['drules'] as $drule) {
 				$class = $h_data['services'][$name]['class'];
 				$time = $h_data['services'][$name]['time'];
 
-				$hintTable = new CTableInfo();
-				$hintTable->setAttribute('style', 'width: auto;');
+				$hintTable = (new CTableInfo())->setAttribute('style', 'width: auto;');
 
 				if ($class == 'active') {
 					$hintTable->setHeader(_('Uptime'));

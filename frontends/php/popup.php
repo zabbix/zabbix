@@ -542,20 +542,20 @@ insert_js_function('addValue');
  * User group
  */
 if ($srctbl == 'usrgrp') {
-	$form = new CForm();
-	$form->setName('usrgrpform');
-	$form->setId('usrgrps');
+	$form = (new CForm())
+		->setName('usrgrpform')
+		->setId('usrgrps');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_usrgrps'))
-					->onClick("javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Name')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_usrgrps'))
+						->onClick("javascript: checkAll('".$form->getName()."', 'all_usrgrps', 'usrgrps');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Name')
+		]);
 
 	$options = [
 		'output' => API_OUTPUT_EXTEND,
@@ -607,22 +607,22 @@ if ($srctbl == 'usrgrp') {
  * Users
  */
 elseif ($srctbl == 'users') {
-	$form = new CForm();
-	$form->setName('userform');
-	$form->setId('users');
+	$form = (new CForm())
+		->setName('userform')
+		->setId('users');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_users'))
-					->onClick("javascript: checkAll('".$form->getName()."', 'all_users', 'users');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Alias'),
-		_x('Name', 'user first name'),
-		_('Surname')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_users'))
+						->onClick("javascript: checkAll('".$form->getName()."', 'all_users', 'users');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Alias'),
+			_x('Name', 'user first name'),
+			_('Surname')
+		]);
 
 	$options = [
 		'output' => ['alias', 'name', 'surname', 'type', 'theme', 'lang'],
@@ -684,20 +684,20 @@ elseif ($srctbl == 'users') {
  * Templates
  */
 elseif ($srctbl == 'templates') {
-	$form = new CForm();
-	$form->setName('templateform');
-	$form->setId('templates');
+	$form = (new CForm())
+		->setName('templateform')
+		->setId('templates');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_templates'))
-					->onClick("javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Name')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_templates'))
+						->onClick("javascript: checkAll('".$form->getName()."', 'all_templates', 'templates');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Name')
+		]);
 
 	$options = [
 		'output' => ['templateid', 'name'],
@@ -764,20 +764,20 @@ elseif ($srctbl == 'templates') {
  * Hosts
  */
 elseif ($srctbl == 'hosts') {
-	$form = new CForm();
-	$form->setName('hostform');
-	$form->setId('hosts');
+	$form = (new CForm())
+		->setName('hostform')
+		->setId('hosts');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_hosts'))
-					->onClick("javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Name')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_hosts'))
+						->onClick("javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Name')
+		]);
 
 	$options = [
 		'output' => ['hostid', 'name'],
@@ -844,20 +844,20 @@ elseif ($srctbl == 'hosts') {
  * Hosts and templates
  */
 elseif ($srctbl == 'host_templates') {
-	$form = new CForm();
-	$form->setName('hosttemplateform');
-	$form->setId('hosts');
+	$form = (new CForm())
+		->setName('hosttemplateform')
+		->setId('hosts');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_hosts'))
-					->onClick("javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Name')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_hosts'))
+						->onClick("javascript: checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Name')
+		]);
 
 	$options = [
 		'output' => ['hostid', 'name'],
@@ -925,20 +925,20 @@ elseif ($srctbl == 'host_templates') {
  * Host group
  */
 elseif ($srctbl == 'host_groups') {
-	$form = new CForm();
-	$form->setName('hostGroupsform');
-	$form->setId('hostGroups');
+	$form = (new CForm())
+		->setName('hostGroupsform')
+		->setId('hostGroups');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_hostgroups'))
-					->onClick("javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Name')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_hostgroups'))
+						->onClick("javascript: checkAll('".$form->getName()."', 'all_hostgroups', 'hostGroups');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Name')
+		]);
 
 	$options = [
 		'output' => ['groupid', 'name'],
@@ -1001,8 +1001,7 @@ elseif ($srctbl == 'host_groups') {
  * Help items
  */
 elseif ($srctbl === 'help_items') {
-	$table = new CTableInfo();
-	$table->setHeader([_('Key'), _('Name')]);
+	$table = (new CTableInfo())->setHeader([_('Key'), _('Name')]);
 
 	$helpItems = new CHelpItems();
 	foreach ($helpItems->getByType($itemType) as $helpItem) {
@@ -1020,23 +1019,22 @@ elseif ($srctbl === 'help_items') {
 elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
 	$config = select_config();
 
-	$form = new CForm();
-	$form->setName('triggerform');
-	$form->setId('triggers');
+	$form = (new CForm())
+		->setName('triggerform')
+		->setId('triggers');
 
-	$table = new CTableInfo();
-
-	$table->setHeader([
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_triggers'))
-					->onClick("checkAll('".$form->getName()."', 'all_triggers', 'triggers');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Name'),
-		_('Severity'),
-		_('Status')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_triggers'))
+						->onClick("checkAll('".$form->getName()."', 'all_triggers', 'triggers');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Name'),
+			_('Severity'),
+			_('Status')
+		]);
 
 	$options = [
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'state'],
@@ -1179,22 +1177,21 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
 
 	$itemPrototypesPopup = ($srctbl === 'item_prototypes');
 
-	$table = new CTableInfo();
-	$header = [
-		$pageFilter->hostsAll ? _('Host') : null,
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_items'))
-					->onClick("javascript: checkAll('".$form->getName()."', 'all_items', 'items');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Name'),
-		_('Key'),
-		_('Type'),
-		_('Type of information'),
-		_('Status')
-	];
-	$table->setHeader($header);
+	$table = (new CTableInfo())
+		->setHeader([
+			$pageFilter->hostsAll ? _('Host') : null,
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_items'))
+						->onClick("javascript: checkAll('".$form->getName()."', 'all_items', 'items');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Name'),
+			_('Key'),
+			_('Type'),
+			_('Type of information'),
+			_('Status')
+		]);
 
 	$options = [
 		'output' => ['itemid', 'hostid', 'name', 'key_', 'flags', 'type', 'value_type', 'status', 'state'],
@@ -1311,20 +1308,20 @@ elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
  * Applications
  */
 elseif ($srctbl == 'applications') {
-	$form = new CForm();
-	$form->setName('applicationform');
-	$form->setId('applications');
+	$form = (new CForm())
+		->setName('applicationform')
+		->setId('applications');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		$multiselect
-			? (new CColHeader(
-				(new CCheckBox('all_applications'))
-					->onClick("javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
-		_('Name')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			$multiselect
+				? (new CColHeader(
+					(new CCheckBox('all_applications'))
+						->onClick("javascript: checkAll('".$form->getName()."', 'all_applications', 'applications');")
+				))->addClass(ZBX_STYLE_CELL_WIDTH)
+				: null,
+			_('Name')
+		]);
 
 	$options = [
 		'output' => ['applicationid', 'name'],
@@ -1384,9 +1381,9 @@ elseif ($srctbl == 'applications') {
  * Graphs or Graph prototypes
  */
 elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
-	$form = new CForm();
-	$form->setName('graphform');
-	$form->setId('graphs');
+	$form = (new CForm())
+		->setName('graphform')
+		->setId('graphs');
 
 	$graphPrototypesPopup = ($srctbl === 'graph_prototypes');
 
@@ -1497,9 +1494,9 @@ elseif ($srctbl === 'graphs' || $srctbl === 'graph_prototypes') {
  * Sysmaps
  */
 elseif ($srctbl == 'sysmaps') {
-	$form = new CForm();
-	$form->setName('sysmapform');
-	$form->setId('sysmaps');
+	$form = (new CForm())
+		->setName('sysmapform')
+		->setId('sysmaps');
 
 	$table = new CTableInfo();
 
@@ -1573,9 +1570,9 @@ elseif ($srctbl == 'sysmaps') {
 elseif ($srctbl == 'slides') {
 	require_once dirname(__FILE__).'/include/screens.inc.php';
 
-	$form = new CForm();
-	$form->setName('slideform');
-	$form->setId('slides');
+	$form = (new CForm())
+		->setName('slideform')
+		->setId('slides');
 
 	$table = new CTableInfo();
 
@@ -1642,9 +1639,9 @@ elseif ($srctbl == 'slides') {
 elseif ($srctbl == 'screens') {
 	require_once dirname(__FILE__).'/include/screens.inc.php';
 
-	$form = new CForm();
-	$form->setName('screenform');
-	$form->setId('screens');
+	$form = (new CForm())
+		->setName('screenform')
+		->setId('screens');
 
 	$table = new CTableInfo();
 
@@ -1707,8 +1704,7 @@ elseif ($srctbl == 'screens') {
 elseif ($srctbl == 'screens2') {
 	require_once dirname(__FILE__).'/include/screens.inc.php';
 
-	$table = new CTableInfo();
-	$table->setHeader(_('Name'));
+	$table = (new CTableInfo())->setHeader(_('Name'));
 
 	$screens = API::Screen()->get([
 		'output' => ['screenid', 'name'],
@@ -1734,8 +1730,7 @@ elseif ($srctbl == 'screens2') {
  * Discovery rules
  */
 elseif ($srctbl === 'drules') {
-	$table = new CTableInfo();
-	$table->setHeader(_('Name'));
+	$table = (new CTableInfo())->setHeader(_('Name'));
 
 	$dRules = API::DRule()->get([
 		'output' => ['druleid', 'name']
@@ -1756,8 +1751,7 @@ elseif ($srctbl === 'drules') {
  * Discovery checks
  */
 elseif ($srctbl === 'dchecks') {
-	$table = new CTableInfo();
-	$table->setHeader(_('Name'));
+	$table = (new CTableInfo())->setHeader(_('Name'));
 
 	$dRules = API::DRule()->get([
 		'selectDChecks' => ['dcheckid', 'type', 'key_', 'ports'],
@@ -1783,8 +1777,7 @@ elseif ($srctbl === 'dchecks') {
  * Proxies
  */
 elseif ($srctbl == 'proxies') {
-	$table = new CTableInfo();
-	$table->setHeader(_('Name'));
+	$table = (new CTableInfo())->setHeader(_('Name'));
 
 	$result = DBselect(
 		'SELECT h.hostid,h.host'.

@@ -209,8 +209,8 @@ else {
 	);
 
 	if ($acknowledges) {
-		$acknowledgesTable = new CTableInfo();
-		$acknowledgesTable->setHeader([_('Time'), _('User'), _('Message')]);
+		$acknowledgesTable = (new CTableInfo())
+			->setHeader([_('Time'), _('User'), _('Message')]);
 
 		while ($acknowledge = DBfetch($acknowledges)) {
 			$acknowledgesTable->addRow([

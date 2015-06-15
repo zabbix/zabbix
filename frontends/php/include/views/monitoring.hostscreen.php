@@ -21,9 +21,9 @@
 
 $screenWidget = new CWidget();
 
-$form = new CFilter('web.hostscreen.filter.state');
-$form->addVar('fullscreen', $this->data['fullscreen']);
-$form->addNavigator();
+$form = (new CFilter('web.hostscreen.filter.state'))
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addNavigator();
 
 $screenWidget->addItem($form);
 

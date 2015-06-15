@@ -21,8 +21,8 @@
 zbx_add_post_js('jqBlink.blink();');
 
 // hint table
-$hintTable = new CTableInfo();
-$hintTable->addRow([(new CCol(SPACE))->addClass('normal'), _('OK')]);
+$hintTable = (new CTableInfo())
+	->addRow([(new CCol(SPACE))->addClass('normal'), _('OK')]);
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
 }

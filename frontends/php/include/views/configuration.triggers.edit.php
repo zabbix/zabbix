@@ -166,8 +166,8 @@ if ($this->data['input_method'] == IM_TREE) {
 			}
 
 			if (!isset($e['expression']['levelErrors'])) {
-				$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
-				$errorImg->setHint(_('No errors found.'));
+				$errorImg = (new CImg('images/general/ok_icon.png', 'expression_no_errors'))
+					->setHint(_('No errors found.'));
 			}
 			else {
 				$allowedTesting = false;

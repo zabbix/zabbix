@@ -34,14 +34,14 @@ class CScreenEvents extends CScreenBase {
 			'eventLimit' => $this->screenitem['elements']
 		];
 
-		$item = new CTableInfo();
-		$item->setHeader([
-			_('Time'),
-			_('Host'),
-			_('Description'),
-			_('Value'),
-			_('Severity')
-		]);
+		$item = (new CTableInfo())
+			->setHeader([
+				_('Time'),
+				_('Host'),
+				_('Description'),
+				_('Value'),
+				_('Severity')
+			]);
 
 		$events = getLastEvents($options);
 

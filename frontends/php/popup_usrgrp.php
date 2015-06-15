@@ -83,10 +83,10 @@ if(form){
 
 	$form->setName('groups');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		(new CCheckBox("all_groups"))->onClick("checkAll('".$form->getName()."','all_groups','new_groups');"),
-		_('Name')
+	$table = (new CTableInfo())
+		->setHeader([
+			(new CCheckBox("all_groups"))->onClick("checkAll('".$form->getName()."','all_groups','new_groups');"),
+			_('Name')
 		]);
 
 	$userGroups = DBfetchArray(DBselect(

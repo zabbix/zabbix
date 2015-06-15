@@ -24,11 +24,10 @@ $overview = $this->data['overview'];
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = new CFilter('web.tr_status.filter.state');
-
-$filterForm->addVar('fullscreen', $filter['fullScreen']);
-$filterForm->addVar('groupid', $filter['groupId']);
-$filterForm->addVar('hostid', $filter['hostId']);
+$filterForm = (new CFilter('web.tr_status.filter.state'))
+	->addVar('fullscreen', $filter['fullScreen'])
+	->addVar('groupid', $filter['groupId'])
+	->addVar('hostid', $filter['hostId']);
 
 $column = new CFormList();
 

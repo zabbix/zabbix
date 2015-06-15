@@ -83,14 +83,14 @@ $widget = (new CWidget())
 	);
 
 // TABLE
-$table = new CTableInfo();
-$table->SetHeader([
-	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
-	make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
-	_('Number of steps'),
-	_('Last check'),
-	_('Status')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		_('Number of steps'),
+		_('Last check'),
+		_('Status')
+	]);
 $paging = null;
 
 

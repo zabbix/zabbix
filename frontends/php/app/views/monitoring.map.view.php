@@ -61,8 +61,8 @@ if ($data['maps']) {
 
 	$mapTable->addRow($actionMap);
 
-	$imgMap = new CImg('map.php?sysmapid='.$data['sysmapid'].'&severity_min='.$data['severity_min']);
-	$imgMap->setMap($actionMap->getName());
+	$imgMap = (new CImg('map.php?sysmapid='.$data['sysmapid'].'&severity_min='.$data['severity_min']))
+		->setMap($actionMap->getName());
 	$mapTable->addRow($imgMap);
 
 	$controls->addItem(get_icon('favourite', [

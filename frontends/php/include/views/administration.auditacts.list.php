@@ -46,16 +46,16 @@ $auditForm = new CForm('get');
 $auditForm->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo();
-$auditTable->setHeader([
-	_('Time'),
-	_('Action'),
-	_('Type'),
-	_('Recipient(s)'),
-	_('Message'),
-	_('Status'),
-	_('Info')
-]);
+$auditTable = (new CTableInfo())
+	->setHeader([
+		_('Time'),
+		_('Action'),
+		_('Type'),
+		_('Recipient(s)'),
+		_('Message'),
+		_('Status'),
+		_('Info')
+	]);
 
 foreach ($this->data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);

@@ -30,18 +30,18 @@ $userGroupsForm = new CForm();
 $userGroupsForm->setName('userGroupsForm');
 
 // create user group table
-$userGroupTable = new CTableInfo();
-$userGroupTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_groups'))->onClick("checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	'#',
-	_('Members'),
-	_('Frontend access'),
-	_('Debug mode'),
-	_('Status')
-]);
+$userGroupTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_groups'))->onClick("checkAll('".$userGroupsForm->getName()."','all_groups','group_groupid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		'#',
+		_('Members'),
+		_('Frontend access'),
+		_('Debug mode'),
+		_('Status')
+	]);
 
 foreach ($this->data['usergroups'] as $usrgrp) {
 	$userGroupId = $usrgrp['usrgrpid'];

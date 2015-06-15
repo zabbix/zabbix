@@ -23,9 +23,9 @@ require_once dirname(__FILE__).'/js/reports.toptriggers.js.php';
 
 $topTriggers = (new CWidget())->setTitle(_('100 busiest triggers'));
 
-$filterForm = new CFilter('web.toptriggers.filter.state');
-$filterForm->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']));
-$filterForm->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
+$filterForm = (new CFilter('web.toptriggers.filter.state'))
+	->addVar('filter_from', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_from']))
+	->addVar('filter_till', date(TIMESTAMP_FORMAT, $this->data['filter']['filter_till']));
 
 $filterColumn1 = new CFormList();
 $filterColumn2 = new CFormList();
@@ -118,13 +118,13 @@ $filterForm->addColumn($filterColumn2);
 $topTriggers->addItem($filterForm);
 
 // table
-$table = new CTableInfo();
-$table->setHeader([
-	_('Host'),
-	_('Trigger'),
-	_('Severity'),
-	_('Number of status changes')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		_('Host'),
+		_('Trigger'),
+		_('Severity'),
+		_('Number of status changes')
+	]);
 
 foreach ($this->data['triggers'] as $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
