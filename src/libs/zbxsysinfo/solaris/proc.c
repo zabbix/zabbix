@@ -364,6 +364,7 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 	if (-1 == n)
 		return -errno;
 
+	/* convert cpu utilization time to clock ticks */
 	procutil->utime = ((zbx_uint64_t)pstatus.pr_utime.tv_sec * 1e9 + pstatus.pr_utime.tv_nsec) *
 			sysconf(_SC_CLK_TCK) / 1e9;
 
@@ -485,7 +486,7 @@ int	zbx_proc_get_pids(const char *procname, const char *username, const char *cm
 			continue;
 #endif
 
-		zbx_vector_uint64_append(pids, pid);
+		zbx_vector_uint64_append(pids, (zbx_uint64_t)pid);
 	}
 
 	closedir(dir);
@@ -517,7 +518,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 #ifndef HAVE_ZONE_H
 	if (5 == request->nparam && GLOBAL_ZONEID != getzoneid())
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported 6th parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported sixth parameter."));
 		return SYSINFO_RET_FAIL;
 	}
 #endif

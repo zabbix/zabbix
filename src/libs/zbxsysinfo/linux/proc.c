@@ -995,7 +995,7 @@ int	zbx_proc_get_pids(const char *procname, const char *username, const char *cm
 		if (FAIL == check_user(f_stat, usrinfo))
 			continue;
 
-		zbx_vector_uint64_append(pids, pid);
+		zbx_vector_uint64_append(pids, (zbx_uint64_t)pid);
 	}
 
 	zbx_fclose(f_cmd);
