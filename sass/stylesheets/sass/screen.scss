@@ -134,6 +134,7 @@ h3 {
 
 h4 {
 	font-size: $font-h4-size;
+	color: $font-color;
 	line-height: $h4-line-height;
 
 	span {
@@ -1604,6 +1605,7 @@ $icon-buttons: (
 @each $icon-buttons, $bgimage in $icon-buttons {
     .btn-#{$icon-buttons} {
         background: $bgimage;
+        @extend %button-icon-size;
     }
 }
 
