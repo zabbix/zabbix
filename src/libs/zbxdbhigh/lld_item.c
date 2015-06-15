@@ -2013,7 +2013,7 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 
 	if (0 == discovery_applicationts.values_num && 0 == del_applicationids.values_num &&
 			0 == del_discoveryids.values_num && 0 == ts_discoveryids.values_num &&
-			0 == lc_discoveryids.values_num )
+			0 == lc_discoveryids.values_num)
 	{
 		goto clean;
 	}
@@ -2043,6 +2043,8 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
 				del_discoveryids.values, del_discoveryids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != ts_discoveryids.values_num)
@@ -2052,6 +2054,8 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
 				ts_discoveryids.values, ts_discoveryids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != lc_discoveryids.values_num)
@@ -2061,6 +2065,8 @@ static void	lld_remove_lost_applications(zbx_uint64_t lld_ruleid, const zbx_vect
 		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_discoveryid",
 				lc_discoveryids.values, lc_discoveryids.values_num);
 		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, ";\n");
+
+		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
 	}
 
 	if (0 != del_applicationids.values_num)
