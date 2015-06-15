@@ -343,21 +343,21 @@
 		});
 
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
-			var is_certificate = (jQuery('#tls_connect').val() == 4) || jQuery('#tls_in_cert').is(":checked"),
-				is_psk = (jQuery('#tls_connect').val() == 2) || jQuery('#tls_in_psk').is(":checked");
+			var is_certificate = (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>) || jQuery('#tls_in_cert').is(":checked"),
+				is_psk = (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?>) || jQuery('#tls_in_psk').is(":checked");
 
 			if (is_certificate) {
-				jQuery('#tls_issuer, #tls_subject').prop('disabled', false);
+				jQuery('#tls_issuer, #tls_subject').closest('li').show();
 			}
 			else {
-				jQuery('#tls_issuer, #tls_subject').prop('disabled', true);
+				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
 			}
 
 			if (is_psk) {
-				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
 			}
 			else {
-				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', true);
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
 			}
 		});
 
@@ -454,6 +454,16 @@
 		}).change();
 
 		// refresh field visibility on document load
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
+			jQuery('#tls_in_none').prop('checked', true);
+		}
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
+			jQuery('#tls_in_psk').prop('checked', true);
+		}
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+			jQuery('#tls_in_cert').prop('checked', true);
+		}
+
 		jQuery('#tls_connect, #tls_psk_out').trigger('change');
 
 		jQuery('#hostForm').submit(function() {
