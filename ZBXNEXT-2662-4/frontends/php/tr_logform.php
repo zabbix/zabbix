@@ -278,15 +278,15 @@ if (hasRequest('sform')) {
 
 	$maxId = 0;
 	foreach ($expressions as $id => $expr) {
-		$imgup = new CImg('images/general/arrow_up.png', 'up', 12, 14);
-		$imgup->onClick('javascript: element_up("logtr'.$id.'");');
-		$imgup->onMouseover('javascript: this.style.cursor = "pointer";');
-		$imgup->addClass('updown');
+		$imgup = (new CImg('images/general/arrow_up.png', 'up', 12, 14))
+			->onClick('javascript: element_up("logtr'.$id.'");')
+			->onMouseover('javascript: this.style.cursor = "pointer";')
+			->addClass('updown');
 
-		$imgdn = new CImg('images/general/arrow_down.png', 'down', 12, 14);
-		$imgdn->onClick('javascript: element_down("logtr'.$id.'");');
-		$imgdn->onMouseover('javascript: this.style.cursor = "pointer";');
-		$imgdn->addClass('updown');
+		$imgdn = (new CImg('images/general/arrow_down.png', 'down', 12, 14))
+			->onClick('javascript: element_down("logtr'.$id.'");')
+			->onMouseover('javascript: this.style.cursor = "pointer";')
+			->addClass('updown');
 
 		$del_url = (new CSpan(_('Delete')))
 			->addClass('link')

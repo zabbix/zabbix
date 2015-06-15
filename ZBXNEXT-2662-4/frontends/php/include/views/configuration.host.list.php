@@ -48,27 +48,26 @@ $filter->addColumn($filterColumn4);
 $widget->addItem($filter);
 
 // table hosts
-$form = new CForm();
-$form->setName('hosts');
+$form = (new CForm())->setName('hosts');
 
-$table = new CTableInfo();
-$table->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
-	_('Applications'),
-	_('Items'),
-	_('Triggers'),
-	_('Graphs'),
-	_('Discovery'),
-	_('Web'),
-	_('Interface'),
-	_('Templates'),
-	make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
-	_('Availability'),
-	_('Info')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
+		_('Applications'),
+		_('Items'),
+		_('Triggers'),
+		_('Graphs'),
+		_('Discovery'),
+		_('Web'),
+		_('Interface'),
+		_('Templates'),
+		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
+		_('Availability'),
+		_('Info')
+	]);
 
 $current_time = time();
 

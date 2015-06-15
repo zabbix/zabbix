@@ -28,17 +28,16 @@ $widget = (new CWidget())
 		)
 	);
 
-$form = new CForm();
-$form->setName('regularExpressionsForm');
+$form = (new CForm())->setName('regularExpressionsForm');
 
-$regExpTable = new CTableInfo();
-$regExpTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_regexps'))->onClick("checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	_('Name'),
-	_('Expressions')
-]);
+$regExpTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_regexps'))->onClick("checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Name'),
+		_('Expressions')
+	]);
 
 $expressions = [];
 $values = [];

@@ -53,17 +53,17 @@ $filterColumn->addRow(
 $filterForm->addColumn($filterColumn);
 $hostInventoryWidget->addItem($filterForm);
 
-$table = new CTableInfo();
-$table->setHeader([
-	make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Group'),
-	make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'pr_type', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('OS'), 'pr_os', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'])
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Group'),
+		make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'pr_type', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('OS'), 'pr_os', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 foreach ($this->data['hosts'] as $host) {
 	$hostGroups = [];

@@ -172,12 +172,12 @@ if ($triggerData) {
 			->addItem($triggerData['description'])
 	);
 
-	$table = new CTableInfo();
-	$table->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
+	$table = (new CTableInfo())
+		->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
 
-	$reportWidget->addItem(BR());
-	$reportWidget->addItem($table);
-	$reportWidget->show();
+	$reportWidget->addItem(BR())
+		->addItem($table)
+		->show();
 }
 elseif (isset($_REQUEST['filter_hostid'])) {
 	$headerForm = new CForm('get');
@@ -202,10 +202,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Filter
 	 */
-	$filterForm = new CFilter('web.avail_report.filter.state');
-	$filterForm->addVar('config', $availabilityReportMode);
-	$filterForm->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']));
-	$filterForm->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
+	$filterForm = (new CFilter('web.avail_report.filter.state'))
+		->addVar('config', $availabilityReportMode)
+		->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']))
+		->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
 
 	$filterColumn1 = new CFormList();
 	$filterColumn2 = new CFormList();
@@ -376,14 +376,14 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Triggers
 	 */
-	$triggerTable = new CTableInfo();
-	$triggerTable->setHeader([
-		($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
-		_('Name'),
-		_('Problems'),
-		_('Ok'),
-		_('Graph')
-	]);
+	$triggerTable = (new CTableInfo())
+		->setHeader([
+			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
+			_('Name'),
+			_('Problems'),
+			_('Ok'),
+			_('Graph')
+		]);
 
 	$triggers = API::Trigger()->get($triggerOptions);
 
@@ -409,8 +409,8 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		]);
 	}
 
-	$reportWidget->addItem([$triggerTable, $paging]);
-	$reportWidget->show();
+	$reportWidget->addItem([$triggerTable, $paging])
+		->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

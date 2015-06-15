@@ -31,8 +31,8 @@ if (!empty($this->data['service'])) {
 }
 
 // create table
-$servicesParentTable = new CTableInfo();
-$servicesParentTable->setHeader([_('Service'), _('Status calculation'), _('Trigger')]);
+$servicesParentTable = (new CTableInfo())
+	->setHeader([_('Service'), _('Status calculation'), _('Trigger')]);
 
 $prefix = null;
 

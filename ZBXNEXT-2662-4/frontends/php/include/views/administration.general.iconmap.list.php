@@ -28,12 +28,12 @@ $widget = (new CWidget())
 		)
 	);
 
-$iconMapTable = new CTableInfo();
-$iconMapTable->setHeader([
-	_('Name'),
-	_('Icon map')
-]);
-$iconMapTable->addItem(BR());
+$iconMapTable = (new CTableInfo())
+	->setHeader([
+		_('Name'),
+		_('Icon map')
+	])
+	->addItem(BR());
 
 foreach ($this->data['iconmaps'] as $iconMap) {
 	$row = [];

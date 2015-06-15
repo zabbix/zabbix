@@ -328,9 +328,9 @@ else {
 	$filterForm = new CFilter('web.events.filter.state');
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-		$filterForm->addVar('triggerid', $triggerId);
-		$filterForm->addVar('stime', $stime);
-		$filterForm->addVar('period', $period);
+		$filterForm->addVar('triggerid', $triggerId)
+			->addVar('stime', $stime)
+			->addVar('period', $period);
 
 		if ($triggerId > 0) {
 			$dbTrigger = API::Trigger()->get([

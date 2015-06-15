@@ -49,18 +49,22 @@ class CFilter extends CTag {
 
 	public function addColumn($column) {
 		$this->columns[] = (new CDiv($column))->addClass('cell');
+		return $this;
 	}
 
 	public function setFooter($footer) {
 		$this->footer = $footer;
+		return $this;
 	}
 
 	public function addNavigator() {
 		$this->navigator = true;
+		return $this;
 	}
 
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+		return $this;
 	}
 
 	private function getHeader() {

@@ -34,19 +34,19 @@ $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
 $scriptsForm->setId('scripts');
 
-$scriptsTable = new CTableInfo();
-$scriptsTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
-	_('Type'),
-	_('Execute on'),
-	make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder']),
-	_('User group'),
-	_('Host group'),
-	_('Host access')
-]);
+$scriptsTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		_('Type'),
+		_('Execute on'),
+		make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder']),
+		_('User group'),
+		_('Host group'),
+		_('Host access')
+	]);
 
 foreach ($data['scripts'] as $script) {
 	switch ($script['type']) {

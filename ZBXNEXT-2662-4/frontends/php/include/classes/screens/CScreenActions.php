@@ -124,16 +124,16 @@ class CScreenActions extends CScreenBase {
 			->addClass(($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
-		$actionTable = new CTableInfo();
-		$actionTable->setHeader([
-			($sortfield === 'clock') ? [$sortfieldSpan, $sortorderSpan] : _('Time'),
-			_('Action'),
-			($sortfield === 'description') ? [$sortfieldSpan, $sortorderSpan] : _('Type'),
-			($sortfield === 'sendto') ? [$sortfieldSpan, $sortorderSpan] : _('Recipient(s)'),
-			_('Message'),
-			($sortfield === 'status') ? [$sortfieldSpan, $sortorderSpan] : _('Status'),
-			_('Info')
-		]);
+		$actionTable = (new CTableInfo())
+			->setHeader([
+				($sortfield === 'clock') ? [$sortfieldSpan, $sortorderSpan] : _('Time'),
+				_('Action'),
+				($sortfield === 'description') ? [$sortfieldSpan, $sortorderSpan] : _('Type'),
+				($sortfield === 'sendto') ? [$sortfieldSpan, $sortorderSpan] : _('Recipient(s)'),
+				_('Message'),
+				($sortfield === 'status') ? [$sortfieldSpan, $sortorderSpan] : _('Status'),
+				_('Info')
+			]);
 
 		$actions = API::Action()->get([
 			'output' => ['actionid', 'name'],

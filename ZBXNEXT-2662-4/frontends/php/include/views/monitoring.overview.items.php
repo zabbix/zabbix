@@ -50,10 +50,10 @@ $widget = (new CWidget())
 	);
 
 // filter
-$filter = new CFilter('web.overview.filter.state');
-$filter->addVar('fullscreen', $this->data['fullscreen']);
-$filter->addVar('groupid', $this->data['groupid']);
-$filter->addVar('hostid', $this->data['hostid']);
+$filter = (new CFilter('web.overview.filter.state'))
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addVar('groupid', $this->data['groupid'])
+	->addVar('hostid', $this->data['hostid']);
 
 $column = new CFormList();
 

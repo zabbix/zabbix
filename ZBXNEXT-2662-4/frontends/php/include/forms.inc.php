@@ -357,18 +357,18 @@ function getItemFilterForm(&$items) {
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-	$form = new CFilter('web.items.filter.state');
-	$form->addVar('subfilter_hosts', $subfilter_hosts);
-	$form->addVar('subfilter_apps', $subfilter_apps);
-	$form->addVar('subfilter_types', $subfilter_types);
-	$form->addVar('subfilter_value_types', $subfilter_value_types);
-	$form->addVar('subfilter_status', $subfilter_status);
-	$form->addVar('subfilter_state', $subfilter_state);
-	$form->addVar('subfilter_templated_items', $subfilter_templated_items);
-	$form->addVar('subfilter_with_triggers', $subfilter_with_triggers);
-	$form->addVar('subfilter_history', $subfilter_history);
-	$form->addVar('subfilter_trends', $subfilter_trends);
-	$form->addVar('subfilter_interval', $subfilter_interval);
+	$form = (new CFilter('web.items.filter.state'))
+		->addVar('subfilter_hosts', $subfilter_hosts)
+		->addVar('subfilter_apps', $subfilter_apps)
+		->addVar('subfilter_types', $subfilter_types)
+		->addVar('subfilter_value_types', $subfilter_value_types)
+		->addVar('subfilter_status', $subfilter_status)
+		->addVar('subfilter_state', $subfilter_state)
+		->addVar('subfilter_templated_items', $subfilter_templated_items)
+		->addVar('subfilter_with_triggers', $subfilter_with_triggers)
+		->addVar('subfilter_history', $subfilter_history)
+		->addVar('subfilter_trends', $subfilter_trends)
+		->addVar('subfilter_interval', $subfilter_interval);
 
 	$filterColumn1 = new CFormList();
 	$filterColumn2 = new CFormList();

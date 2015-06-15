@@ -42,8 +42,8 @@ else {
 $chartForm->addItem($controls);
 $chartsWidget->setControls($chartForm);
 
-$filterForm = new CFilter('web.charts.filter.state');
-$filterForm->addNavigator();
+$filterForm = (new CFilter('web.charts.filter.state'))
+	->addNavigator();
 $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {

@@ -42,15 +42,15 @@ $screenForm->setName('screenForm');
 $screenForm->addVar('templateid', $this->data['templateid']);
 
 // create table
-$screenTable = new CTableInfo();
-$screenTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_screens'))->onClick("checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Dimension (cols x rows)'),
-	_('Screen')
-]);
+$screenTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_screens'))->onClick("checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Dimension (cols x rows)'),
+		_('Screen')
+	]);
 
 foreach ($this->data['screens'] as $screen) {
 	$screenTable->addRow([

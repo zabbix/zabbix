@@ -32,18 +32,18 @@ $maintenanceForm = new CForm();
 $maintenanceForm->setName('maintenanceForm');
 
 // create table
-$maintenanceTable = new CTableInfo();
-$maintenanceTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_maintenances'))->onClick("checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Active till'), 'active_till', $this->data['sort'], $this->data['sortorder']),
-	_('State'),
-	_('Description')
-]);
+$maintenanceTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_maintenances'))->onClick("checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Active till'), 'active_till', $this->data['sort'], $this->data['sortorder']),
+		_('State'),
+		_('Description')
+	]);
 
 foreach ($this->data['maintenances'] as $maintenance) {
 	$maintenanceid = $maintenance['maintenanceid'];

@@ -55,17 +55,17 @@ $auditForm = new CForm('get');
 $auditForm->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo();
-$auditTable->setHeader([
-	_('Time'),
-	_('User'),
-	_('IP'),
-	_('Resource'),
-	_('Action'),
-	_('ID'),
-	_('Description'),
-	_('Details')
-]);
+$auditTable = (new CTableInfo())
+	->setHeader([
+		_('Time'),
+		_('User'),
+		_('IP'),
+		_('Resource'),
+		_('Action'),
+		_('ID'),
+		_('Description'),
+		_('Details')
+	]);
 foreach ($this->data['actions'] as $action) {
 	$details = [];
 	if (is_array($action['details'])) {

@@ -167,16 +167,15 @@ function get_next_event($currentEvent, array $eventList = []) {
 
 function make_event_details($event, $trigger) {
 	$config = select_config();
-	$table = new CTableInfo();
-
-	$table->addRow([
-		_('Event'),
-		CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))
-	]);
-	$table->addRow([
-		_('Time'),
-		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])
-	]);
+	$table = (new CTableInfo())
+		->addRow([
+			_('Event'),
+			CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))
+		])
+		->addRow([
+			_('Time'),
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])
+		]);
 
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
@@ -193,15 +192,15 @@ function make_event_details($event, $trigger) {
 function make_small_eventlist($startEvent) {
 	$config = select_config();
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		_('Time'),
-		_('Status'),
-		_('Duration'),
-		_('Age'),
-		$config['event_ack_enable'] ? _('Ack') : null, // if we need to chow acks
-		_('Actions')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Time'),
+			_('Status'),
+			_('Duration'),
+			_('Age'),
+			$config['event_ack_enable'] ? _('Ack') : null, // if we need to chow acks
+			_('Actions')
+		]);
 
 	$clock = $startEvent['clock'];
 

@@ -44,13 +44,12 @@ $permission = getRequest('permission', PERM_DENY);
 show_table_header(permission2str($permission));
 
 // host groups
-$hostGroupForm = new CForm();
-$hostGroupForm->setId('groups');
+$hostGroupForm = (new CForm())->setId('groups');
 
-$hostGroupTable = new CTableInfo();
-$hostGroupTable->setHeader([
-	(new CColHeader((new CCheckBox('all_groups'))->onClick('checkAll(this.checked)')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Name')
-]);
+$hostGroupTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader((new CCheckBox('all_groups'))->onClick('checkAll(this.checked)')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Name')
+	]);
 
 $hostGroups = API::HostGroup()->get([
 	'output' => ['groupid', 'name']

@@ -41,14 +41,16 @@ class CImg extends CTag {
 		if (!is_string($value)) {
 			return $this->error('Incorrect value for SetSrc "'.$value.'".');
 		}
-		return $this->setAttribute('src', $value);
+		$this->setAttribute('src', $value);
+		return $this;
 	}
 
 	public function setAltText($value = null) {
 		if (!is_string($value)) {
 			return $this->error('Incorrect value for SetText "'.$value.'".');
 		}
-		return $this->setAttribute('alt', $value);
+		$this->setAttribute('alt', $value);
+		return $this;
 	}
 
 	public function setMap($value = null) {
@@ -59,31 +61,34 @@ class CImg extends CTag {
 			return $this->error('Incorrect value for SetMap "'.$value.'".');
 		}
 		$value = '#'.ltrim($value, '#');
-		return $this->setAttribute('usemap', $value);
+		$this->setAttribute('usemap', $value);
+		return $this;
 	}
 
 	public function setWidth($value = null) {
 		if (is_null($value)) {
-			return $this->removeAttribute('width');
+			$this->removeAttribute('width');
 		}
 		elseif (is_numeric($value) || is_int($value)) {
-			return $this->setAttribute('width', $value);
+			$this->setAttribute('width', $value);
 		}
 		else {
-			return $this->error('Incorrect value for SetWidth "'.$value.'".');
+			$this->error('Incorrect value for SetWidth "'.$value.'".');
 		}
+		return $this;
 	}
 
 	public function setHeight($value = null) {
 		if (is_null($value)) {
-			return $this->removeAttribute('height');
+			$this->removeAttribute('height');
 		}
 		elseif (is_numeric($value) || is_int($value)) {
-			return $this->setAttribute('height', $value);
+			$this->setAttribute('height', $value);
 		}
 		else {
-			return $this->error('Incorrect value for SetHeight "'.$value.'".');
+			$this->error('Incorrect value for SetHeight "'.$value.'".');
 		}
+		return $this;
 	}
 
 	public function preload() {
@@ -105,5 +110,6 @@ class CImg extends CTag {
 		$this->addClass('preloader');
 		$this->setId($id.'preloader');
 		$this->setAttribute('src', 'styles/themes/'.getUserTheme(CWebUser::$data).'/images/preloader.gif');
+		return $this;
 	}
 }

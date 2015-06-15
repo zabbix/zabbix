@@ -19,13 +19,13 @@
 **/
 
 
-$table = new CTableInfo();
-$table->setHeader([
-	_('Host group'),
-	_('Without problems'),
-	_('With problems'),
-	_('Total')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		_('Host group'),
+		_('Without problems'),
+		_('With problems'),
+		_('Total')
+	]);
 
 // get host groups
 $groups = API::HostGroup()->get([
@@ -222,8 +222,7 @@ foreach ($groups as $group) {
 
 	if ($data['filter']['extAck']) {
 		if ($hosts_data[$group['groupid']]['lastUnack']) {
-			$table_inf = new CTableInfo();
-			$table_inf->setAttribute('style', 'width: 400px;');
+			$table_inf = (new CTableInfo())->setAttribute('style', 'width: 400px;');
 
 			// set trigger severities as table header starting from highest severity
 			$header = [];
