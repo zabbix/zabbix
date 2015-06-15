@@ -66,7 +66,8 @@ $table->setHeader([
 	_('Interface'),
 	_('Templates'),
 	make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
-	_('Availability')
+	_('Availability'),
+	_('Encryption (in / out)')
 ]);
 
 $currentTime = time();
@@ -171,6 +172,57 @@ foreach ($data['hosts'] as $host) {
 		$hostTemplates[] = $caption;
 	}
 
+	if ($host['tls_connect'] != HOST_ENCRYPTION_NONE || $host['tls_in_psk'] || $host['tls_in_cert']) {
+		// input
+		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
+			$in_encryption = (new CSpan(_('None')))->addClass('status-grey');
+		}
+		elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
+			$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
+		}
+		else {
+			$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
+		}
+
+		// output
+		switch($host['tls_accept']) {
+			case HOST_ENCRYPTION_OUT_NONE:
+			case HOST_ENCRYPTION_OUT_NO:
+				$out_encryption = (new CSpan(_('None')))->addClass('status-grey');
+			case HOST_ENCRYPTION_OUT_PSK:
+				$out_encryption = (new CSpan(_('PSK')))->addClass('status-green');
+			case HOST_ENCRYPTION_OUT_NO_PSK:
+				$out_encryption = [(new CSpan(_('None')))->addClass('status-grey'),
+					(new CSpan(_('PSK')))->addClass('status-green')
+				];
+				break;
+			case HOST_ENCRYPTION_OUT_CERT:
+				$out_encryption = (new CSpan(_('CERT')))->addClass('status-green');
+				break;
+			case HOST_ENCRYPTION_OUT_NO_CERT:
+				$out_encryption = [(new CSpan(_('None')))->addClass('status-grey'),
+					(new CSpan(_('CERT')))->addClass('status-green')
+				];
+				break;
+			case HOST_ENCRYPTION_OUT_PSK_CERT:
+				$out_encryption = [(new CSpan(_('PSK')))->addClass('status-green'),
+					(new CSpan(_('CERT')))->addClass('status-green')
+				];
+				break;
+			case HOST_ENCRYPTION_OUT_ALL:
+				$out_encryption = [(new CSpan(_('None')))->addClass('status-grey'),
+					(new CSpan(_('PSK')))->addClass('status-green'),
+					(new CSpan(_('CERT')))->addClass('status-green')
+				];
+				break;
+		}
+
+		$encryption = (new CDiv([$in_encryption, $out_encryption]))->addClass('status-container');
+	}
+	else {
+		$encryption = '';
+	}
+
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
@@ -201,7 +253,8 @@ foreach ($data['hosts'] as $host) {
 		$hostInterface,
 		$hostTemplates,
 		$status,
-		getAvailabilityTable($host, $currentTime)
+		getAvailabilityTable($host, $currentTime),
+		$encryption
 	]);
 }
 
