@@ -23,6 +23,10 @@
 
 #include "checks_agent.h"
 
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	extern unsigned char	program_type;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: get_value_agent                                                  *
@@ -76,8 +80,9 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			tls_arg2 = item->host.tls_psk;
 		}
 #else
-		zbx_snprintf(buffer, sizeof(buffer), "A TLS connection is configured to be used with agent but support "
-				"for TLS was not not compiled into server or proxy.");
+		zbx_snprintf(buffer, sizeof(buffer), "A TLS connection is configured to be used with agent but support"
+				" for TLS was not compiled into %s.",
+				ZBX_PROGRAM_TYPE_SERVER == program_type ? "server" : "proxy");
 		SET_MSG_RESULT(result, strdup(buffer));
 		ret = NETWORK_ERROR;
 		goto out;
