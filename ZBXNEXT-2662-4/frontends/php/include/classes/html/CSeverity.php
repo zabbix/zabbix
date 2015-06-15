@@ -49,15 +49,14 @@ class CSeverity extends CTag {
 
 			$css = getSeverityStyle($severity);
 
-			$label = new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity,
-				$options['name'].'_label_'.$severity
-			);
-			$label->setAttribute('data-severity', $severity);
-			$label->setAttribute('data-severity-style', $css);
+			$label = (new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity))
+				->setId($options['name'].'_label_'.$severity)
+				->setAttribute('data-severity', $severity)
+				->setAttribute('data-severity-style', $css);
 
 			if ($options['value'] == $severity) {
-				$label->setAttribute('aria-pressed', 'true');
-				$label->addClass($css);
+				$label->setAttribute('aria-pressed', 'true')
+					->addClass($css);
 			}
 			else {
 				$label->setAttribute('aria-pressed', 'false');
