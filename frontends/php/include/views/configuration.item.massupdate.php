@@ -26,11 +26,11 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create form
-$itemForm = new CForm();
-$itemForm->setName('itemForm');
-$itemForm->addVar('group_itemid', $this->data['itemids']);
-$itemForm->addVar('hostid', $this->data['hostid']);
-$itemForm->addVar('action', $this->data['action']);
+$itemForm = (new CForm())
+	->setName('itemForm')
+	->addVar('group_itemid', $this->data['itemids'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('action', $this->data['action']);
 
 // create form list
 $itemFormList = new CFormList('itemFormList');

@@ -24,9 +24,9 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
-$applicationForm = new CForm();
-$applicationForm->addVar('form', $this->data['form']);
-$applicationForm->addVar('hostid', $this->data['hostid']);
+$applicationForm = (new CForm())
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['applicationid'])) {
 	$applicationForm->addVar('applicationid', $this->data['applicationid']);
 }

@@ -53,9 +53,9 @@ $widget = (new CWidget())->setTitle(_('IT services availability report').':'.SPA
 
 $controls = new CList();
 
-$form = new CForm();
-$form->setMethod('get');
-$form->addVar('serviceid', $_REQUEST['serviceid']);
+$form = (new CForm())
+	->setMethod('get')
+	->addVar('serviceid', $_REQUEST['serviceid']);
 
 $controls->addItem([
 	SPACE._('Period').SPACE,

@@ -33,17 +33,16 @@ $widget = (new CWidget())
 	);
 
 // header
-$imageComboBoxForm = new CForm();
-$imageComboBoxForm->addItem(_('Type').SPACE);
-$imageComboBoxForm->addItem(new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
-	IMAGE_TYPE_ICON => _('Icon'),
-	IMAGE_TYPE_BACKGROUND => _('Background')
-]));
+$imageComboBoxForm = (new CForm())
+	->addItem(_('Type').SPACE)
+	->addItem(new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
+		IMAGE_TYPE_ICON => _('Icon'),
+		IMAGE_TYPE_BACKGROUND => _('Background')]));
 
 // form
-$imageForm = new CForm();
-$imageForm->setName('imageForm');
-$imageForm->addItem(BR());
+$imageForm = (new CForm())
+	->setName('imageForm')
+	->addItem(BR());
 
 $imageTable = (new CTable())
 	->setNoDataMessage(_('No images found.'))

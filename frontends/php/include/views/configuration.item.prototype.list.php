@@ -29,10 +29,10 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
-$itemForm = new CForm();
-$itemForm->setName('items');
-$itemForm->addVar('hostid', $this->data['hostid']);
-$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+$itemForm = (new CForm())
+	->setName('items')
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
 $itemTable = (new CTableInfo())

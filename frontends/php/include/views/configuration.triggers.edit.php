@@ -29,13 +29,13 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('form', $this->data['form']);
-$triggersForm->addVar('hostid', $this->data['hostid']);
-$triggersForm->addVar('input_method', $this->data['input_method']);
-$triggersForm->addVar('toggle_input_method', '');
-$triggersForm->addVar('remove_expression', '');
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('input_method', $this->data['input_method'])
+	->addVar('toggle_input_method', '')
+	->addVar('remove_expression', '');
 
 if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $this->data['triggerid']);

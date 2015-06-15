@@ -58,11 +58,9 @@ $guiTab->addRow(_('Show warning if Zabbix server is down'),
 		->setChecked($data['server_check_interval'] == SERVER_CHECK_INTERVAL)
 );
 
-$guiView = new CTabView();
-$guiView->addTab('gui', _('GUI'), $guiTab);
+$guiView = (new CTabView())->addTab('gui', _('GUI'), $guiTab);
 
-$guiForm = new CForm();
-$guiForm->setName('guiForm');
+$guiForm = (new CForm())->setName('guiForm');
 
 $guiView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 

@@ -20,9 +20,10 @@
 
 $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
 
-$rForm = new CForm('get');
-$rForm->addItem((new CList())->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]));
-$hostInventoryWidget->setControls($rForm);
+$hostInventoryWidget->setControls(
+	$rForm = (new CForm('get'))
+		->addItem((new CList())->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]))
+);
 
 // filter
 $filterForm = new CFilter('web.hostinventories.filter.state');

@@ -65,11 +65,10 @@ $buttons_column->setAttribute('colspan', 5);
 $table->addRow(new CRow($buttons_column, null, 'row_new_macro'));
 
 // form list
-$macros_form_list = new CFormList('macrosFormList');
-$macros_form_list->addRow($table);
+$macros_form_list = (new CFormList('macrosFormList'))
+	->addRow($table);
 
-$tab_view = new CTabView();
-$tab_view->addTab('macros', _('Macros'), $macros_form_list);
+$tab_view = (new CTabView())->addTab('macros', _('Macros'), $macros_form_list);
 
 $saveButton = new CSubmit('update', _('Update'));
 $saveButton->setAttribute('data-removed-count', 0);
@@ -77,9 +76,9 @@ $saveButton->main();
 
 $tab_view->setFooter(makeFormFooter($saveButton));
 
-$form = new CForm();
-$form->setName('macrosForm');
-$form->addItem($tab_view);
+$form = (new CForm())
+	->setName('macrosForm')
+	->addItem($tab_view);
 
 $widget->addItem($form);
 

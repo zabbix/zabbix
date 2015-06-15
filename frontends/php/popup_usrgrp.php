@@ -78,10 +78,9 @@ if(form){
 <?php
 	}
 
-	$form = new CForm();
-	$form->addVar('dstfrm', $dstfrm);
-
-	$form->setName('groups');
+	$form = (new CForm())
+		->setName('groups')
+		->addVar('dstfrm', $dstfrm);
 
 	$table = (new CTableInfo())
 		->setHeader([

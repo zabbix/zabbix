@@ -30,13 +30,13 @@ $widget = (new CWidget())
 
 $iconMapTab = new CFormList();
 
-$name = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
-$name->setAttribute('maxlength', 64);
-$name->setAttribute('autofocus', 'autofocus');
+$name = (new CTextBox('iconmap[name]', $this->data['iconmap']['name']))
+	->setAttribute('maxlength', 64)
+	->setAttribute('autofocus', 'autofocus');
 $iconMapTab->addRow(_('Name'), $name);
 
-$iconMapForm = new CForm();
-$iconMapForm->addVar('form', 1);
+$iconMapForm = (new CForm())
+	->addVar('form', 1);
 if (isset($this->data['iconmapid'])) {
 	$iconMapForm->addVar('iconmapid', $this->data['iconmap']['iconmapid']);
 }

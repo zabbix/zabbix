@@ -277,14 +277,13 @@ else {
 	$csvDisabled = true;
 
 	// header
-	$frmForm = new CForm();
+	$frmForm = (new CForm())
+		->addVar('stime', $stime, 'stime_csv')
+		->addVar('period', $period, 'period_csv')
+		->addVar('page', getPageNumber(), 'page_csv');
 	if (hasRequest('source')) {
 		$frmForm->addVar('source', getRequest('source'), 'source_csv');
 	}
-	$frmForm->addVar('stime', $stime, 'stime_csv');
-	$frmForm->addVar('period', $period, 'period_csv');
-	$frmForm->addVar('page', getPageNumber(), 'page_csv');
-
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if ($triggerId) {

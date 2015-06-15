@@ -29,8 +29,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$sysmapForm = new CForm();
-$sysmapForm->setName('frm_maps');
+$sysmapForm = (new CForm())->setName('frm_maps');
 
 // create table
 $sysmapTable = (new CTableInfo())

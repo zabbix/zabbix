@@ -154,17 +154,16 @@ $trendTab->addRow([
 $trendTab->addClass('border_dotted objectgroup element-row');
 $houseKeeperTab->addRow(_('Trends'), new CDiv($trendTab));
 
-$houseKeeperView = new CTabView();
-$houseKeeperView->addTab('houseKeeper', _('Housekeeping'), $houseKeeperTab);
+$houseKeeperView = (new CTabView())
+	->addTab('houseKeeper', _('Housekeeping'), $houseKeeperTab)
+	->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		[new CButton('resetDefaults', _('Reset defaults'))]
+	));
 
-$houseKeeperForm = new CForm();
-$houseKeeperForm->setName('houseKeeperForm');
-$houseKeeperView->setFooter(makeFormFooter(
-	new CSubmit('update', _('Update')),
-	[new CButton('resetDefaults', _('Reset defaults'))]
-));
-
-$houseKeeperForm->addItem($houseKeeperView);
+$houseKeeperForm = (new CForm())
+	->setName('houseKeeperForm')
+	->addItem($houseKeeperView);
 
 $widget->addItem($houseKeeperForm);
 

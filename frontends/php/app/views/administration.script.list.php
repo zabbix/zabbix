@@ -30,9 +30,9 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
 	);
 
-$scriptsForm = new CForm();
-$scriptsForm->setName('scriptsForm');
-$scriptsForm->setId('scripts');
+$scriptsForm = (new CForm())
+	->setName('scriptsForm')
+	->setId('scripts');
 
 $scriptsTable = (new CTableInfo())
 	->setHeader([
@@ -72,11 +72,11 @@ foreach ($data['scripts'] as $script) {
 		$scriptExecuteOn = '';
 	}
 
-	$name = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
-
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(
+			new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid'])
+		))->addClass(ZBX_STYLE_NOWRAP),
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),

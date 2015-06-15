@@ -22,9 +22,9 @@
 $widget = (new CWidget())->setTitle(_('Host groups'));
 
 // create form
-$hostGroupForm = new CForm();
-$hostGroupForm->setName('hostgroupForm');
-$hostGroupForm->addVar('form', $this->data['form']);
+$hostGroupForm = (new CForm())
+	->setName('hostgroupForm')
+	->addVar('form', $this->data['form']);
 if (isset($this->data['groupid'])) {
 	$hostGroupForm->addVar('groupid', $this->data['groupid']);
 }

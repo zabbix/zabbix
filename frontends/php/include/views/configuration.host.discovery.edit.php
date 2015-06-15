@@ -26,10 +26,10 @@ $widget = (new CWidget())
 	));
 
 // create form
-$itemForm = new CForm();
-$itemForm->setName('itemForm');
-$itemForm->addVar('form', $this->data['form']);
-$itemForm->addVar('hostid', $this->data['hostid']);
+$itemForm = (new CForm())
+	->setName('itemForm')
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['parent_discoveryid'])) {
 	$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }

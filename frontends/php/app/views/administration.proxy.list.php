@@ -31,8 +31,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$proxyForm = new CForm('get');
-$proxyForm->setName('proxyForm');
+$proxyForm = (new CForm('get'))->setName('proxyForm');
 
 // create table
 $proxyTable = (new CTableInfo())

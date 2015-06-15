@@ -21,9 +21,9 @@
 
 $searchForm = new CForm('get','search.php');
 
-$searchBox = new CTextBox('search', getRequest('search'));
-$searchBox->setAttribute('autocomplete', 'off');
-$searchBox->addClass('search');
+$searchBox = (new CTextBox('search', getRequest('search')))
+	->setAttribute('autocomplete', 'off')
+	->addClass('search');
 $searchForm->addItem($searchBox);
 
 $searchBtn = (new CSubmit('searchbttn', _('Search')))->addClass('jqueryinput');

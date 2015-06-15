@@ -69,8 +69,8 @@ $header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['f
 
 // don't display the action form if we view multiple items on a graph
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
-	$actionForm = new CForm('get');
-	$actionForm->addVar('itemids', getRequest('itemids'));
+	$actionForm = (new CForm('get'))
+		->addVar('itemids', getRequest('itemids'));
 
 	if (isset($_REQUEST['filter_task'])) {
 		$actionForm->addVar('filter_task', $_REQUEST['filter_task']);

@@ -26,8 +26,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$discoveryForm = new CForm();
-$discoveryForm->setName('druleForm');
+$discoveryForm = (new CForm())->setName('druleForm');
 
 // create table
 $discoveryTable = (new CTableInfo())

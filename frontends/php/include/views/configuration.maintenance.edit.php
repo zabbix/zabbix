@@ -22,9 +22,9 @@
 $widget = (new CWidget())->setTitle(_('Maintenance periods'));
 
 // create form
-$maintenanceForm = new CForm();
-$maintenanceForm->setName('maintenanceForm');
-$maintenanceForm->addVar('form', $this->data['form']);
+$maintenanceForm = (new CForm())
+	->setName('maintenanceForm')
+	->addVar('form', $this->data['form']);
 if (isset($this->data['maintenanceid'])) {
 	$maintenanceForm->addVar('maintenanceid', $this->data['maintenanceid']);
 }

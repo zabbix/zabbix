@@ -31,10 +31,10 @@ if (!empty($data['hostid'])) {
 $triggersWidget->setTitle(_('Triggers'));
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('hostid', $data['hostid']);
-$triggersForm->addVar('action', $data['action']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('hostid', $data['hostid'])
+	->addVar('action', $data['action']);
 
 foreach ($data['g_triggerid'] as $triggerid) {
 	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);

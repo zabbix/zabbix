@@ -81,8 +81,7 @@ else {
 		$minYear = date('Y');
 	}
 
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = (new CForm())->setMethod('get');
 
 	$controls = new CList();
 

@@ -42,8 +42,7 @@ $filterForm->addNavigator();
 $auditWidget->addItem($filterForm);
 
 // create form
-$auditForm = new CForm('get');
-$auditForm->setName('auditForm');
+$auditForm = (new CForm('get'))->setName('auditForm');
 
 // create table
 $auditTable = (new CTableInfo())

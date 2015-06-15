@@ -111,9 +111,9 @@ $period = getRequest('period', ZBX_DEFAULT_INTERVAL);
 
 $widget = (new CWidget())->setTitle(_('New media'));
 
-$form = new CForm();
-$form->addVar('media', $media);
-$form->addVar('dstfrm', $_REQUEST['dstfrm']);
+$form = (new CForm())
+	->addVar('media', $media)
+	->addVar('dstfrm', $_REQUEST['dstfrm']);
 
 $frmMedia = new CFormList(_('New media'));
 

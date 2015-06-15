@@ -60,5 +60,4 @@ $script = new CJsScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").ht
 	_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 ));
 
-$widget = new CDiv([$table, $script]);
-$widget->show();
+$widget = (new CDiv([$table, $script]))->show();

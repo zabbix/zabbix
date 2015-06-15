@@ -21,8 +21,8 @@
 
 $chartsWidget = (new CWidget())->setTitle(_('Graphs'));
 
-$chartForm = new CForm('get');
-$chartForm->addVar('fullscreen', $this->data['fullscreen']);
+$chartForm = (new CForm('get'))
+	->addVar('fullscreen', $this->data['fullscreen']);
 
 $controls = new CList();
 

@@ -29,9 +29,9 @@ else {
 }
 
 // create form
-$userForm = new CForm();
-$userForm->setName('userForm');
-$userForm->addVar('form', $this->data['form']);
+$userForm = (new CForm())
+	->setName('userForm')
+	->addVar('form', $this->data['form']);
 
 if ($data['userid'] != 0) {
 	$userForm->addVar('userid', $data['userid']);

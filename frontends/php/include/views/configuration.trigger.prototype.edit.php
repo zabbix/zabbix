@@ -26,13 +26,13 @@ $triggersWidget = (new CWidget())
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('form', $this->data['form']);
-$triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$triggersForm->addVar('input_method', $this->data['input_method']);
-$triggersForm->addVar('toggle_input_method', '');
-$triggersForm->addVar('remove_expression', '');
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('form', $this->data['form'])
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+	->addVar('input_method', $this->data['input_method'])
+	->addVar('toggle_input_method', '')
+	->addVar('remove_expression', '');
 
 if ($this->data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $this->data['triggerid']);

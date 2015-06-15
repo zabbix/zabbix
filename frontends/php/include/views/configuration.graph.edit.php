@@ -31,18 +31,18 @@ else {
 }
 
 // create form
-$graphForm = new CForm();
-$graphForm->setName('graphForm');
-$graphForm->addVar('form', $this->data['form']);
-$graphForm->addVar('hostid', $this->data['hostid']);
+$graphForm = (new CForm())
+	->setName('graphForm')
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('ymin_itemid', $this->data['ymin_itemid'])
+	->addVar('ymax_itemid', $this->data['ymax_itemid']);
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
 if (!empty($this->data['graphid'])) {
 	$graphForm->addVar('graphid', $this->data['graphid']);
 }
-$graphForm->addVar('ymin_itemid', $this->data['ymin_itemid']);
-$graphForm->addVar('ymax_itemid', $this->data['ymax_itemid']);
 
 // create form list
 $graphFormList = new CFormList('graphFormList');

@@ -48,13 +48,13 @@ $otherTab->addRow(_('Log unmatched SNMP traps'),
 	(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
 );
 
-$otherView = new CTabView();
-$otherView->addTab('other', _('Other parameters'), $otherTab);
-
-$otherForm = new CForm();
-$otherForm->setName('otherForm');
-$otherView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
-$otherForm->addItem($otherView);
+$otherForm = (new CForm())
+	->setName('otherForm')
+	->addItem(
+		(new CTabView())
+			->addTab('other', _('Other parameters'), $otherTab)
+			->setFooter(makeFormFooter(new CSubmit('update', _('Update'))))
+	);
 
 $widget->addItem($otherForm);
 

@@ -36,8 +36,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$usersForm = new CForm();
-$usersForm->setName('userForm');
+$usersForm = (new CForm())->setName('userForm');
 
 // create users table
 $usersTable = (new CTableInfo())

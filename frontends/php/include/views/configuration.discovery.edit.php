@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Discovery rules'));
 
 // create form
-$discoveryForm = new CForm();
-$discoveryForm->setName('discoveryForm');
-$discoveryForm->addVar('form', $this->data['form']);
+$discoveryForm = (new CForm())
+	->setName('discoveryForm')
+	->addVar('form', $this->data['form']);
 if (!empty($this->data['druleid'])) {
 	$discoveryForm->addVar('druleid', $this->data['druleid']);
 }

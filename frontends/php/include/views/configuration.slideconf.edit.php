@@ -24,10 +24,10 @@ require_once dirname(__FILE__).'/js/configuration.slideconf.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create form
-$slideForm = new CForm();
-$slideForm->setName('slideForm');
-$slideForm->addVar('form', $this->data['form']);
-$slideForm->addVar('slides', $this->data['slides_without_delay']);
+$slideForm = (new CForm())
+	->setName('slideForm')
+	->addVar('form', $this->data['form'])
+	->addVar('slides', $this->data['slides_without_delay']);
 if (!empty($this->data['slideshowid'])) {
 	$slideForm->addVar('slideshowid', $this->data['slideshowid']);
 }

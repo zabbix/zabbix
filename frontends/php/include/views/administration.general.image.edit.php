@@ -25,9 +25,9 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.images.php')))
 	);
 
-$imageForm = new CForm('post', null, 'multipart/form-data');
-$imageForm->setName('imageForm');
-$imageForm->addVar('form', $this->data['form']);
+$imageForm = (new CForm('post', null, 'multipart/form-data'))
+	->setName('imageForm')
+	->addVar('form', $this->data['form']);
 if (isset($this->data['imageid'])) {
 	$imageForm->addVar('imageid', $this->data['imageid']);
 }

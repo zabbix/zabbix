@@ -31,8 +31,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$mediaTypeForm = new CForm();
-$mediaTypeForm->setName('mediaTypesForm');
+$mediaTypeForm = (new CForm())->setName('mediaTypesForm');
 
 // create table
 $mediaTypeTable = (new CTableInfo())

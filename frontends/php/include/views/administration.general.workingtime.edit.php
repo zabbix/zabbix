@@ -33,12 +33,11 @@ $workingTimeTab->addRow(_('Working time'), $wtTextBox);
 
 $workingTimeView = new CTabView();
 $workingTimeView->addTab('workingTime', _('Working time'), $workingTimeTab);
-
-$workingTimeForm = new CForm();
-$workingTimeForm->setName('workingTimeForm');
 $workingTimeView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
-$workingTimeForm->addItem($workingTimeView);
+$workingTimeForm = (new CForm())
+	->setName('workingTimeForm')
+	->addItem($workingTimeView);
 
 $widget->addItem($workingTimeForm);
 

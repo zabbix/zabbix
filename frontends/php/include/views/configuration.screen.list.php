@@ -36,10 +36,9 @@ $createForm->addItem($controls);
 $widget->setControls($createForm);
 
 // create form
-$screenForm = new CForm();
-$screenForm->setName('screenForm');
-
-$screenForm->addVar('templateid', $this->data['templateid']);
+$screenForm = (new CForm())
+	->setName('screenForm')
+	->addVar('templateid', $this->data['templateid']);
 
 // create table
 $screenTable = (new CTableInfo())

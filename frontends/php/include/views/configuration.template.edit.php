@@ -36,11 +36,10 @@ $frm_title = _('Template');
 if ($data['templateId'] != 0) {
 	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
-$frmHost = new CForm();
-$frmHost->setName('tpl_for');
-
-$frmHost->addVar('form', $data['form']);
-$frmHost->addVar('groupid', $data['groupId']);
+$frmHost = (new CForm())
+	->setName('tpl_for')
+	->addVar('form', $data['form'])
+	->addVar('groupid', $data['groupId']);
 
 if ($data['templateId'] != 0) {
 	$frmHost->addVar('templateid', $data['templateId']);

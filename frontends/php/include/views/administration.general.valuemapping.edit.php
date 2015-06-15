@@ -28,10 +28,10 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
 	);
 
-$valueMappingForm = new CForm();
-$valueMappingForm->setName('valueMappingForm');
-$valueMappingForm->addVar('form', $this->data['form']);
-$valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
+$valueMappingForm = (new CForm())
+	->setName('valueMappingForm')
+	->addVar('form', $this->data['form'])
+	->addVar('valuemapid', $this->data['valuemapid']);
 
 // create form list
 $valueMappingFormList = new CFormList('valueMappingFormList');
