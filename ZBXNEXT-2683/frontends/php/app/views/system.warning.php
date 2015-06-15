@@ -19,20 +19,20 @@
 **/
 
 
-$pageHeader = new CPageHeader(_('Something wrong hapenned'));
+$pageHeader = new CPageHeader(_('Fatal error, please report to the Zabbix team'));
 $pageHeader->addCssInit();
 $pageHeader->display();
 
-$messages = array();
-foreach ($data['messages'] as $message) {
-	$messages[] = $message;
-	$messages[] = BR();
-}
+$buttons = [
+	(new CButton('back', _('Go to dashboard')))
+		->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"'
+)];
 
-$warning = new CWarning(_('Fatal error, please report to Zabbix Team'), $messages);
-$warning->setButtons(new CButton('back', _('Go to dashboard'),
-	'javascript: document.location = "zabbix.php?action=dashboard.view"',
-	'button'
-));
+echo '<body>';
 
-$warning->show();
+(new CDiv(
+	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons), ZBX_STYLE_ARTICLE
+))->show();
+
+echo '</body>';
+echo '</html>';

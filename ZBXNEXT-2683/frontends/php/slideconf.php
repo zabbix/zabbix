@@ -25,30 +25,29 @@ require_once dirname(__FILE__).'/include/screens.inc.php';
 $page['title'] = _('Configuration of slide shows');
 $page['file'] = 'slideconf.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'shows' =>			array(T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null),
-	'slideshowid' =>	array(T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'),
-	'name' => array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')),
-	'delay' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')),
-	'slides' =>			array(null,		 O_OPT, null,		null,	null),
+$fields = [
+	'shows' =>			[T_ZBX_INT, O_OPT,	P_SYS,		DB_ID,	null],
+	'slideshowid' =>	[T_ZBX_INT, O_NO,	P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
+	'name' => [T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
+	'delay' => [T_ZBX_INT, O_OPT, null, BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})',_('Default delay (in seconds)')],
+	'slides' =>			[null,		 O_OPT, null,		null,	null],
 	// actions
-	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"slideshow.massdelete"'),	null),
-	'clone' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,		null,	null),
+	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"slideshow.massdelete"'),	null],
+	'clone' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,		null,	null],
 	// sort and sortorder
-	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"cnt","delay","name"'),					null),
-	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"cnt","delay","name"'),					null],
+	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 if (!empty($_REQUEST['slides'])) {
@@ -95,14 +94,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	DBstart();
 
 	if (hasRequest('update')) {
-		$result = update_slideshow(getRequest('slideshowid'), getRequest('name'), getRequest('delay'), getRequest('slides', array()));
+		$result = update_slideshow(getRequest('slideshowid'), getRequest('name'), getRequest('delay'), getRequest('slides', []));
 
 		$messageSuccess = _('Slide show updated');
 		$messageFailed = _('Cannot update slide show');
 		$auditAction = AUDIT_ACTION_UPDATE;
 	}
 	else {
-		$result = add_slideshow(getRequest('name'), getRequest('delay'), getRequest('slides', array()));
+		$result = add_slideshow(getRequest('name'), getRequest('delay'), getRequest('slides', []));
 
 		$messageSuccess = _('Slide show added');
 		$messageFailed = _('Cannot add slide show');
@@ -164,14 +163,14 @@ elseif (hasRequest('action') && getRequest('action') == 'slideshow.massdelete' &
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$data = array(
+	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0),
 		'slideshowid' => getRequest('slideshowid'),
 		'name' => getRequest('name', ''),
 		'delay' => getRequest('delay', ZBX_ITEM_DELAY_DEFAULT),
-		'slides' => getRequest('slides', array())
-	);
+		'slides' => getRequest('slides', [])
+	];
 
 	if (isset($data['slideshowid']) && !isset($_REQUEST['form_refresh'])) {
 		$data['name'] = $dbSlideshow['name'];
@@ -205,16 +204,20 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$data = array(
+	$config = select_config();
+	$limit = $config['search_limit'] + 1;
+
+	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
-	);
+	];
 
 	$data['slides'] = DBfetchArray(DBselect(
 			'SELECT s.slideshowid,s.name,s.delay,COUNT(sl.slideshowid) AS cnt'.
 			' FROM slideshows s'.
 				' LEFT JOIN slides sl ON sl.slideshowid=s.slideshowid'.
-			' GROUP BY s.slideshowid,s.name,s.delay'
+			' GROUP BY s.slideshowid,s.name,s.delay'.
+			' ORDER BY '.(($sortField === 'cnt') ? 'cnt' : 's.'.$sortField)
 	));
 
 	foreach ($data['slides'] as $key => $slide) {
@@ -225,7 +228,16 @@ else {
 
 	order_result($data['slides'], $sortField, $sortOrder);
 
-	$data['paging'] = getPagingLine($data['slides']);
+	if ($sortOrder == ZBX_SORT_UP) {
+		$data['slides'] = array_slice($data['slides'], 0, $limit);
+	}
+	else {
+		$data['slides'] = array_slice($data['slides'], -$limit, $limit);
+	}
+
+	order_result($data['slides'], $sortField, $sortOrder);
+
+	$data['paging'] = getPagingLine($data['slides'], $sortOrder);
 
 	// render view
 	$slideshowView = new CView('configuration.slideconf.list', $data);

@@ -5,24 +5,24 @@
 			var ipmi = (jQuery(this).val() == 1);
 
 			if (ipmi) {
-				jQuery('#execute_on, #command').closest('li').addClass('hidden');
+				jQuery('#execute_on, #command').closest('li').hide();
 
 				jQuery('#commandipmi')
 					.val(jQuery('#command').val())
 					.closest('li')
-					.removeClass('hidden');
+					.show();
 			}
 			else {
 				jQuery('#execute_on')
 					.closest('li')
-					.removeClass('hidden');
+					.show();
 
 				jQuery('#command')
 					.val(jQuery('#commandipmi').val())
 					.closest('li')
-					.removeClass('hidden');
+					.show();
 
-				jQuery('#commandipmi').closest('li').addClass('hidden');
+				jQuery('#commandipmi').closest('li').hide();
 			}
 		});
 
@@ -31,7 +31,6 @@
 			jQuery('#scriptid, #delete, #clone').remove();
 			jQuery('#update span').text(<?php echo CJs::encodeJson(_('Add')); ?>);
 			jQuery('#update').val('script.create').attr({id: 'add'});
-			jQuery('#cancel').addClass('ui-corner-left');
 			jQuery('#name').focus();
 		});
 

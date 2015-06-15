@@ -31,7 +31,7 @@
  * Author: Alexander Vladishev                                                *
  *                                                                            *
  ******************************************************************************/
-void	recv_discovery_data(zbx_sock_t *sock, struct zbx_json_parse *jp)
+void	recv_discovery_data(zbx_socket_t *sock, struct zbx_json_parse *jp)
 {
 	const char	*__function_name = "recv_discovery_data";
 
@@ -64,7 +64,7 @@ out:
  * Purpose: send discovery data from proxy to a server                        *
  *                                                                            *
  ******************************************************************************/
-void	send_discovery_data(zbx_sock_t *sock)
+void	send_discovery_data(zbx_socket_t *sock)
 {
 	const char	*__function_name = "send_discovery_data";
 
@@ -87,7 +87,7 @@ void	send_discovery_data(zbx_sock_t *sock)
 
 	if (SUCCEED != zbx_tcp_send_to(sock, j.buffer, CONFIG_TIMEOUT))
 	{
-		error = zbx_strdup(error, zbx_tcp_strerror());
+		error = zbx_strdup(error, zbx_socket_strerror());
 		goto out;
 	}
 

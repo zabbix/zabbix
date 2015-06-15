@@ -40,7 +40,7 @@ function setHostGroupInternal($groupid, $internal) {
 	return DBexecute(
 		'UPDATE groups'.
 		' SET internal='.zbx_dbstr($internal).
-		' WHERE '.dbConditionInt('groupid', array($groupid))
+		' WHERE '.dbConditionInt('groupid', [$groupid])
 	);
 }
 
@@ -48,10 +48,10 @@ function update_config($config) {
 	$configOrig = select_config();
 
 	if (array_key_exists('discovery_groupid', $config)) {
-		$hostGroups = API::HostGroup()->get(array(
-			'output' => array('name'),
+		$hostGroups = API::HostGroup()->get([
+			'output' => ['name'],
 			'groupids' => $config['discovery_groupid']
-		));
+		]);
 		if (!$hostGroups) {
 			error(_('Incorrect host group.'));
 			return false;
@@ -80,7 +80,7 @@ function update_config($config) {
 
 	if ($updateSeverity) {
 		// check duplicate severity names and if name is empty.
-		$names = array();
+		$names = [];
 		for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
 			$varName = 'severity_name_'.$i;
 			if (!array_key_exists($varName, $config)) {
@@ -97,7 +97,7 @@ function update_config($config) {
 		}
 	}
 
-	$update = array();
+	$update = [];
 
 	foreach ($config as $key => $value) {
 		if (!is_null($value)) {
@@ -118,7 +118,7 @@ function update_config($config) {
 	$result = DBexecute('UPDATE config SET '.implode(',', $update));
 
 	if ($result) {
-		$msg = array();
+		$msg = [];
 		if (array_key_exists('hk_events_trigger', $config)) {
 			$msg[] = _s('Trigger event and alert data storage period (in days) "%1$s".', $config['hk_events_trigger']);
 		}
@@ -202,111 +202,4 @@ function update_config($config) {
 	}
 
 	return $result;
-}
-
-/************ HISTORY **************/
-function get_user_history() {
-	$result = array();
-	$delimiter = new CSpan('&raquo;', 'delimiter');
-
-	$history = DBfetch(DBSelect(
-		'SELECT uh.title1,uh.url1,uh.title2,uh.url2,uh.title3,uh.url3,uh.title4,uh.url4,uh.title5,uh.url5'.
-		' FROM user_history uh'.
-		' WHERE uh.userid='.CWebUser::$data['userid'])
-	);
-
-	if (!empty($history) && !zbx_empty($history['url4'])) {
-		CWebUser::$data['last_page'] = array('title' => $history['title4'], 'url' => $history['url4']);
-	}
-	else {
-		CWebUser::$data['last_page'] = array('title' => _('Dashboard'), 'url' => 'zabbix.php?action=dashboard.view');
-	}
-
-	for ($i = 1; $i < 6; $i++) {
-		if (!zbx_empty($history['title'.$i])) {
-			$url = new CLink($history['title'.$i], $history['url'.$i], 'history');
-			array_push($result, array(SPACE, $url, SPACE));
-			array_push($result, $delimiter);
-		}
-	}
-	array_pop($result);
-	return $result;
-}
-
-/**
- * Check if url length is greater than DB field size. If size is OK, return URL string.
- *
- * @param string $page['hist_arg']
- * @param string $page['file']
- *
- * @return string
- */
-function getHistoryUrl($page) {
-	if (isset($page['hist_arg']) && is_array($page['hist_arg'])) {
-		$url = '';
-
-		foreach ($page['hist_arg'] as $arg) {
-			if (isset($_REQUEST[$arg])) {
-				$url .= url_param($arg, true);
-			}
-		}
-
-		if ($url) {
-			$url[0] = '?';
-		}
-
-		$url = $page['file'].$url;
-	}
-	else {
-		$url = $page['file'];
-	}
-
-	// if url length is greater than db field size, skip history update
-	$historyTableSchema = DB::getSchema('user_history');
-
-	// $url is encoded
-	return (strlen($url) > $historyTableSchema['fields']['url5']['length']) ? '' : $url;
-}
-
-function addUserHistory($title, $url) {
-	$userId = CWebUser::$data['userid'];
-
-	$history5 = DBfetch(DBSelect(
-		'SELECT uh.title5,uh.url5'.
-		' FROM user_history uh'.
-		' WHERE uh.userid='.$userId
-	));
-
-	if ($history5) {
-		if ($history5['title5'] === $title) {
-			if ($history5['url5'] === $url) {
-				return true;
-			}
-			else {
-				$sql = 'UPDATE user_history SET url5='.zbx_dbstr($url).' WHERE userid='.$userId;
-			}
-		}
-		else {
-			$sql = 'UPDATE user_history'.
-					' SET title1=title2,'.
-						' url1=url2,'.
-						' title2=title3,'.
-						' url2=url3,'.
-						' title3=title4,'.
-						' url3=url4,'.
-						' title4=title5,'.
-						' url4=url5,'.
-						' title5='.zbx_dbstr($title).','.
-						' url5='.zbx_dbstr($url).
-					' WHERE userid='.$userId;
-		}
-	}
-	else {
-		$userHistoryId = get_dbid('user_history', 'userhistoryid');
-
-		$sql = 'INSERT INTO user_history (userhistoryid, userid, title5, url5)'.
-				' VALUES('.$userHistoryId.', '.$userId.', '.zbx_dbstr($title).', '.zbx_dbstr($url).')';
-	}
-
-	return DBexecute($sql);
 }

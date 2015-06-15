@@ -22,7 +22,7 @@
 class CJsScript extends CObject {
 
 	public function __construct($item = null) {
-		$this->items = array();
+		$this->items = [];
 		$this->addItem($item);
 	}
 

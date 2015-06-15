@@ -26,8 +26,7 @@ require_once dirname(__FILE__).'/include/media.inc.php';
 
 $page['title'] = _('User profile');
 $page['file'] = 'profile.php';
-$page['hist_arg'] = array();
-$page['scripts'] = array('class.cviewswitcher.js');
+$page['scripts'] = ['class.cviewswitcher.js'];
 
 ob_start();
 
@@ -41,39 +40,39 @@ $themes = array_keys(Z::getThemes());
 $themes[] = THEME_DEFAULT;
 
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'password1' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({update}) && isset({form}) && ({form} != "update") && isset({change_password})'),
-	'password2' =>			array(T_ZBX_STR, O_OPT, null, null, 'isset({update}) && isset({form}) && ({form} != "update") && isset({change_password})'),
-	'lang' =>				array(T_ZBX_STR, O_OPT, null, null, null),
-	'theme' =>				array(T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({update})'),
-	'autologin' =>			array(T_ZBX_INT, O_OPT, null, IN('1'), null),
-	'autologout' =>	array(T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
-	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, null, IN('1'), null),
-	'url' =>				array(T_ZBX_STR, O_OPT, null, null, 'isset({update})'),
-	'refresh' => array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({update})', _('Refresh (in seconds)')),
-	'rows_per_page' => array(T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})', _('Rows per page')),
-	'change_password' =>	array(T_ZBX_STR, O_OPT, null, null, null),
-	'user_medias' =>		array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, null),
-	'user_medias_to_del' =>	array(T_ZBX_STR, O_OPT, null, null, null),
-	'new_media' =>			array(T_ZBX_STR, O_OPT, null, null, null),
-	'enable_media' =>		array(T_ZBX_INT, O_OPT, null, null, null),
-	'disable_media' =>		array(T_ZBX_INT, O_OPT, null, null, null),
-	'messages' =>			array(T_ZBX_STR, O_OPT, null, null, null),
+$fields = [
+	'password1' =>			[T_ZBX_STR, O_OPT, null, null, 'isset({update}) && isset({form}) && ({form} != "update") && isset({change_password})'],
+	'password2' =>			[T_ZBX_STR, O_OPT, null, null, 'isset({update}) && isset({form}) && ({form} != "update") && isset({change_password})'],
+	'lang' =>				[T_ZBX_STR, O_OPT, null, null, null],
+	'theme' =>				[T_ZBX_STR, O_OPT, null, IN('"'.implode('","', $themes).'"'), 'isset({update})'],
+	'autologin' =>			[T_ZBX_INT, O_OPT, null, IN('1'), null],
+	'autologout' =>	[T_ZBX_INT, O_OPT, null, BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')],
+	'autologout_visible' =>	[T_ZBX_STR, O_OPT, null, IN('1'), null],
+	'url' =>				[T_ZBX_STR, O_OPT, null, null, 'isset({update})'],
+	'refresh' => [T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_HOUR), 'isset({update})', _('Refresh (in seconds)')],
+	'rows_per_page' => [T_ZBX_INT, O_OPT, null, BETWEEN(1, 999999), 'isset({update})', _('Rows per page')],
+	'change_password' =>	[T_ZBX_STR, O_OPT, null, null, null],
+	'user_medias' =>		[T_ZBX_STR, O_OPT, null, NOT_EMPTY, null],
+	'user_medias_to_del' =>	[T_ZBX_STR, O_OPT, null, null, null],
+	'new_media' =>			[T_ZBX_STR, O_OPT, null, null, null],
+	'enable_media' =>		[T_ZBX_INT, O_OPT, null, null, null],
+	'disable_media' =>		[T_ZBX_INT, O_OPT, null, null, null],
+	'messages' =>			[T_ZBX_STR, O_OPT, null, null, null],
 	// actions
-	'update'=>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'cancel'=>				array(T_ZBX_STR, O_OPT, P_SYS, null, null),
-	'del_user_media'=>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
+	'update'=>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
+	'cancel'=>				[T_ZBX_STR, O_OPT, P_SYS, null, null],
+	'del_user_media'=>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
 	// form
-	'form'=>				array(T_ZBX_STR, O_OPT, P_SYS, null, null),
-	'form_refresh'=>		array(T_ZBX_INT, O_OPT, null, null, null)
-);
+	'form'=>				[T_ZBX_STR, O_OPT, P_SYS, null, null],
+	'form_refresh'=>		[T_ZBX_INT, O_OPT, null, null, null]
+];
 check_fields($fields);
 
 $_REQUEST['autologin'] = getRequest('autologin', 0);
 
 // secondary actions
 if (isset($_REQUEST['new_media'])) {
-	$_REQUEST['user_medias'] = getRequest('user_medias', array());
+	$_REQUEST['user_medias'] = getRequest('user_medias', []);
 	array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);
 }
 elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['enable_media'])) {
@@ -87,7 +86,7 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 	}
 }
 elseif (isset($_REQUEST['del_user_media'])) {
-	$user_medias_to_del = getRequest('user_medias_to_del', array());
+	$user_medias_to_del = getRequest('user_medias_to_del', []);
 	foreach ($user_medias_to_del as $mediaid) {
 		if (isset($_REQUEST['user_medias'][$mediaid])) {
 			unset($_REQUEST['user_medias'][$mediaid]);
@@ -120,7 +119,7 @@ elseif (hasRequest('update')) {
 		show_error_message(_('Password should not be empty'));
 	}
 	else {
-		$user = array();
+		$user = [];
 		$user['userid'] = CWebUser::$data['userid'];
 		$user['alias'] = CWebUser::$data['alias'];
 		$user['passwd'] = getRequest('password1');
@@ -131,13 +130,13 @@ elseif (hasRequest('update')) {
 		$user['refresh'] = getRequest('refresh');
 		$user['rows_per_page'] = getRequest('rows_per_page');
 		$user['user_groups'] = null;
-		$user['user_medias'] = getRequest('user_medias', array());
+		$user['user_medias'] = getRequest('user_medias', []);
 
 		if (hasRequest('lang')) {
 			$user['lang'] = getRequest('lang');
 		}
 
-		$messages = getRequest('messages', array());
+		$messages = getRequest('messages', []);
 		if (!isset($messages['enabled'])) {
 			$messages['enabled'] = 0;
 		}
@@ -145,7 +144,7 @@ elseif (hasRequest('update')) {
 			$messages['triggers.recovery'] = 0;
 		}
 		if (!isset($messages['triggers.severities'])) {
-			$messages['triggers.severities'] = array();
+			$messages['triggers.severities'] = [];
 		}
 
 		DBstart();
@@ -154,10 +153,10 @@ elseif (hasRequest('update')) {
 		$result = API::User()->updateProfile($user);
 
 		if ($result && CwebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$result = API::User()->updateMedia(array(
+			$result = API::User()->updateMedia([
 				'users' => $user,
 				'medias' => $user['user_medias']
-			));
+			]);
 		}
 
 		$result = DBend($result);

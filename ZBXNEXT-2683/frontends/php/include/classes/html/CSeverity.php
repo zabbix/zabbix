@@ -26,43 +26,41 @@ class CSeverity extends CTag {
 	 * @param string $options['name']
 	 * @param int    $options['value']
 	 */
-	public function __construct(array $options = array()) {
-		parent::__construct('div', 'yes');
-		$this->attr('id', isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
+	public function __construct(array $options = []) {
+		parent::__construct('div', true);
+		$this->setId(isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
 		$this->addClass('jqueryinputset radioset control-severity');
 
 		if (!isset($options['value'])) {
 			$options['value'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 
-		$items = array();
+		$items = [];
 		$jsIds = '';
 		$jsLabels = '';
 		$config = select_config();
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$items[] = new CRadioButton(
+			$items[] = (new CRadioButton(
 				$options['name'],
 				$severity,
-				null,
-				$options['name'].'_'.$severity,
 				($options['value'] == $severity)
-			);
+			))->setId($options['name'].'_'.$severity);
 
 			$css = getSeverityStyle($severity);
 
 			$label = new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity,
 				$options['name'].'_label_'.$severity
 			);
-			$label->attr('data-severity', $severity);
-			$label->attr('data-severity-style', $css);
+			$label->setAttribute('data-severity', $severity);
+			$label->setAttribute('data-severity-style', $css);
 
 			if ($options['value'] == $severity) {
-				$label->attr('aria-pressed', 'true');
+				$label->setAttribute('aria-pressed', 'true');
 				$label->addClass($css);
 			}
 			else {
-				$label->attr('aria-pressed', 'false');
+				$label->setAttribute('aria-pressed', 'false');
 			}
 
 			$items[] = $label;

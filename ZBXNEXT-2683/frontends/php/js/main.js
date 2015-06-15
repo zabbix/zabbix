@@ -127,7 +127,7 @@ var MMenu = {
 	showSubMenu: function(show_label) {
 		var menu_div = $('sub_' + show_label);
 		if (!is_null(menu_div)) {
-			$(show_label).className = 'active';
+			$(show_label).className = 'selected';
 			menu_div.show();
 			for (var key in this.menus) {
 				if (key == show_label) {
@@ -365,7 +365,7 @@ var jqBlink = {
 var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic) {
-		var box = jQuery('<div></div>').addClass('hintbox');
+		var box = jQuery('<div></div>').addClass('overlay-dialogue');
 
 		if (typeof hintText === 'string') {
 			hintText = hintText.replace(/\n/g, '<br />');
@@ -379,12 +379,10 @@ var hintBox = {
 		}
 
 		if (isStatic) {
-			var close_link = jQuery('<div>' + locale['S_CLOSE'] + '</div>')
-				.addClass('link')
-				.css({
-					'text-align': 'right',
-					'border-bottom': '1px #333 solid'
-				}).click(function() {
+			var close_link = jQuery('<span>', {
+					'class': 'overlay-close-btn'}
+				)
+				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
 			box.prepend(close_link);
@@ -566,7 +564,7 @@ function create_color_picker() {
 	}
 
 	color_picker = document.createElement('div');
-	color_picker.setAttribute('id', 'color_picker');
+	color_picker.setAttribute('class', 'overlay-dialogue');
 	color_picker.innerHTML = color_table;
 	document.body.appendChild(color_picker);
 	hide_color_picker();
@@ -645,16 +643,16 @@ function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
 
 function changeWidgetState(obj, widgetId) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
-		css = switchElementClass(obj, 'arrowup', 'arrowdown'),
+		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
 
-	if (css === 'arrowdown') {
+	if (css === 'btn-widget-expand') {
 		jQuery('.body', widgetObj).slideUp(50);
-		jQuery('.footer', widgetObj).slideUp(50);
+		jQuery('.dashbrd-widget-foot', widgetObj).slideUp(50);
 	}
 	else {
 		jQuery('.body', widgetObj).slideDown(50);
-		jQuery('.footer', widgetObj).slideDown(50);
+		jQuery('.dashbrd-widget-foot', widgetObj).slideDown(50);
 
 		state = 1;
 	}
@@ -682,57 +680,6 @@ function sendAjaxData(url, options) {
 	options.url = url.getUrl();
 
 	jQuery.ajax(options);
-}
-
-/**
- * Finds all elements with a 'placeholder' attribute and emulates the placeholder in IE.
- */
-function createPlaceholders() {
-	if (IE) {
-		jQuery('[placeholder]').each(function() {
-			var placeholder = jQuery(this);
-
-			if (!placeholder.data('has-placeholder-handlers')) {
-				placeholder
-					.data('has-placeholder-handlers', true)
-					.focus(function() {
-						var obj = jQuery(this);
-
-						if (!obj.attr('placeholder')) {
-							return;
-						}
-
-						if (obj.val() == obj.attr('placeholder')) {
-							obj.val('');
-							obj.removeClass('placeholder');
-						}
-					})
-					.blur(function() {
-						var obj = jQuery(this);
-
-						if (!obj.attr('placeholder')) {
-							return;
-						}
-
-						if (obj.val() == '' ||  obj.val() == obj.attr('placeholder')) {
-							obj.val(obj.attr('placeholder'));
-							obj.addClass('placeholder');
-						}
-					})
-					.blur();
-			}
-
-			jQuery('form').submit(function() {
-				jQuery('.placeholder').each(function() {
-					var obj = jQuery(this);
-
-					if (obj.val() == obj.attr('placeholder')) {
-						obj.val('');
-					}
-				});
-			});
-		});
-	}
 }
 
 /**
@@ -914,8 +861,6 @@ function getConditionFormula(conditions, evalType) {
 		var template = new Template($(options.template).html());
 		beforeRow.before(template.evaluate(data));
 		table.data('dynamicRows').counter++;
-
-		createPlaceholders();
 
 		table.trigger('tableupdate.dynamicRows', options);
 	}

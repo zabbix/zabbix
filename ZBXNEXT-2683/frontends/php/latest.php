@@ -25,9 +25,8 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Latest data');
 $page['file'] = 'latest.php';
-$page['hist_arg'] = array('groupids', 'hostids', 'filter_set');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
-$page['scripts'] = array('multiselect.js');
+$page['scripts'] = ['multiselect.js'];
 
 if (PAGE_TYPE_HTML == $page['type']) {
 	define('ZBX_PAGE_DO_REFRESH', 1);
@@ -36,24 +35,24 @@ if (PAGE_TYPE_HTML == $page['type']) {
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR						TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostids' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'fullscreen' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	'select' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'show_without_data' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'show_details' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favobj' =>				array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'toggle_ids' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'toggle_open_state' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+$fields = [
+	'groupids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'hostids' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'fullscreen' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
+	'select' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'show_without_data' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'show_details' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
+	'favobj' =>				[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'toggle_ids' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'toggle_open_state' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"host","lastclock","name"'),				null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"host","lastclock","name"'),				null],
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 /*
@@ -116,8 +115,8 @@ if (hasRequest('filter_set')) {
 	CProfile::update('web.latest.filter.show_without_data', getRequest('show_without_data', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.show_details', getRequest('show_details', 0), PROFILE_TYPE_INT);
 	CProfile::update('web.latest.filter.application', getRequest('application', ''), PROFILE_TYPE_STR);
-	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids', array()), PROFILE_TYPE_STR);
-	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids', array()), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.latest.filter.groupids', getRequest('groupids', []), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.latest.filter.hostids', getRequest('hostids', []), PROFILE_TYPE_STR);
 }
 elseif (hasRequest('filter_rst')) {
 	DBStart();
@@ -130,14 +129,14 @@ elseif (hasRequest('filter_rst')) {
 	DBend();
 }
 
-$filter = array(
+$filter = [
 	'select' => CProfile::get('web.latest.filter.select', ''),
 	'showWithoutData' => CProfile::get('web.latest.filter.show_without_data', 1),
 	'showDetails' => CProfile::get('web.latest.filter.show_details'),
 	'application' => CProfile::get('web.latest.filter.application', ''),
 	'groupids' => CProfile::getArray('web.latest.filter.groupids'),
 	'hostids' => CProfile::getArray('web.latest.filter.hostids')
-);
+];
 
 // we'll need to hide the host column if only one host is selected
 $singleHostSelected = (count($filter['hostids']) == 1);
@@ -148,22 +147,22 @@ $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortor
 CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-$applications = $items = $hostScripts = array();
+$applications = $items = $hostScripts = [];
 
 // we'll only display the values if the filter is set
 $filterSet = ($filter['select'] !== '' || $filter['application'] !== '' || $filter['groupids'] || $filter['hostids']);
 if ($filterSet) {
-	$hosts = API::Host()->get(array(
-		'output' => array('name', 'hostid', 'status'),
+	$hosts = API::Host()->get([
+		'output' => ['name', 'hostid', 'status'],
 		'hostids' => $filter['hostids'],
 		'groupids' => $filter['groupids'],
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'with_monitored_items' => true,
 		'preservekeys' => true
-	));
+	]);
 }
 else {
-	$hosts = array();
+	$hosts = [];
 }
 
 if ($hosts) {
@@ -174,7 +173,7 @@ if ($hosts) {
 	unset($host);
 
 	if (!$singleHostSelected) {
-		$sortFields = ($sortField === 'host') ? array(array('field' => 'name', 'order' => $sortOrder)) : array('name');
+		$sortFields = ($sortField === 'host') ? [['field' => 'name', 'order' => $sortOrder]] : ['name'];
 		CArrayHelper::sort($hosts, $sortFields);
 	}
 
@@ -184,37 +183,37 @@ if ($hosts) {
 
 	// if an application filter is set, fetch the applications and then use them to filter items
 	if ($filter['application'] !== '') {
-		$applications = API::Application()->get(array(
+		$applications = API::Application()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => $hostIds,
-			'search' => array('name' => $filter['application']),
+			'search' => ['name' => $filter['application']],
 			'preservekeys' => true
-		));
+		]);
 	}
 
-	$items = API::Item()->get(array(
+	$items = API::Item()->get([
 		'hostids' => array_keys($hosts),
-		'output' => array('itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
-			'error', 'trends', 'history', 'delay', 'key_', 'flags'),
-		'selectApplications' => array('applicationid'),
-		'selectItemDiscovery' => array('ts_delete'),
+		'output' => ['itemid', 'name', 'type', 'value_type', 'units', 'hostid', 'state', 'valuemapid', 'status',
+			'error', 'trends', 'history', 'delay', 'key_', 'flags'],
+		'selectApplications' => ['applicationid'],
+		'selectItemDiscovery' => ['ts_delete'],
 		'applicationids' => ($applications !== null) ? zbx_objectValues($applications, 'applicationid') : null,
 		'webitems' => true,
-		'filter' => array(
-			'status' => array(ITEM_STATUS_ACTIVE)
-		),
+		'filter' => [
+			'status' => [ITEM_STATUS_ACTIVE]
+		],
 		'preservekeys' => true
-	));
+	]);
 
 	// if the applications haven't been loaded when filtering, load them based on the retrieved items to avoid
 	// fetching applications from hosts that may not be displayed
 	if ($applications === null) {
-		$applications = API::Application()->get(array(
+		$applications = API::Application()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'hostids' => array_keys(array_flip(zbx_objectValues($items, 'hostid'))),
-			'search' => array('name' => $filter['application']),
+			'search' => ['name' => $filter['application']],
 			'preservekeys' => true
-		));
+		]);
 	}
 }
 
@@ -260,13 +259,13 @@ if ($items) {
 
 		// sort
 		if ($sortField === 'name') {
-			$sortFields = array(array('field' => 'name_expanded', 'order' => $sortOrder), 'itemid');
+			$sortFields = [['field' => 'name_expanded', 'order' => $sortOrder], 'itemid'];
 		}
 		elseif ($sortField === 'lastclock') {
-			$sortFields = array(array('field' => 'lastclock', 'order' => $sortOrder), 'name_expanded', 'itemid');
+			$sortFields = [['field' => 'lastclock', 'order' => $sortOrder], 'name_expanded', 'itemid'];
 		}
 		else {
-			$sortFields = array('name_expanded', 'itemid');
+			$sortFields = ['name_expanded', 'itemid'];
 		}
 		CArrayHelper::sort($items, $sortFields);
 
@@ -278,7 +277,7 @@ if ($items) {
 			unset($application);
 
 			// by default order by application name and application id
-			$sortFields = ($sortField === 'host') ? array(array('field' => 'hostname', 'order' => $sortOrder)) : array();
+			$sortFields = ($sortField === 'host') ? [['field' => 'hostname', 'order' => $sortOrder]] : [];
 			array_push($sortFields, 'name', 'applicationid');
 			CArrayHelper::sort($applications, $sortFields);
 		}
@@ -288,11 +287,11 @@ if ($items) {
 			$hostScripts = API::Script()->getScriptsByHosts($hostIds);
 
 			// get templates screen count
-			$screens = API::TemplateScreen()->get(array(
+			$screens = API::TemplateScreen()->get([
 				'hostids' => $hostIds,
 				'countOutput' => true,
 				'groupCount' => true
-			));
+			]);
 			$screens = zbx_toHash($screens, 'hostid');
 			foreach ($hosts as &$host) {
 				$host['screens'] = isset($screens[$host['hostid']]);
@@ -303,128 +302,109 @@ if ($items) {
 }
 
 // multiselect hosts
-$multiSelectHostData = array();
+$multiSelectHostData = [];
 if ($filter['hostids']) {
-	$filterHosts = API::Host()->get(array(
-		'output' => array('hostid', 'name'),
+	$filterHosts = API::Host()->get([
+		'output' => ['hostid', 'name'],
 		'hostids' => $filter['hostids']
-	));
+	]);
 
 	foreach ($filterHosts as $host) {
-		$multiSelectHostData[] = array(
+		$multiSelectHostData[] = [
 			'id' => $host['hostid'],
 			'name' => $host['name']
-		);
+		];
 	}
 }
 
 // multiselect host groups
-$multiSelectHostGroupData = array();
+$multiSelectHostGroupData = [];
 if ($filter['groupids'] !== null) {
-	$filterGroups = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name'),
+	$filterGroups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
 		'groupids' => $filter['groupids']
-	));
+	]);
 
 	foreach ($filterGroups as $group) {
-		$multiSelectHostGroupData[] = array(
+		$multiSelectHostGroupData[] = [
 			'id' => $group['groupid'],
 			'name' => $group['name']
-		);
+		];
 	}
 }
 
 /*
  * Display
  */
-$latestWidget = new CWidget(null, 'latest-mon');
-$latestWidget->addHeader(_('Items'));
+$widget = (new CWidget())
+	->setTitle(_('Latest data'))
+	->setControls((new CList())
+		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+	);
 
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name',' zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
+// Filter
+$filterForm = new CFilter('web.latest.filter.state');
 
-$filterTable = new CTable(null, 'filter');
-$filterTable->setCellPadding(0);
-$filterTable->setCellSpacing(0);
-
-$filterTable->addRow(
-	array(
-		new CCol(bold(_('Host groups')), 'label'),
-		new CCol(new CMultiSelect(
-			array(
-				'name' => 'groupids[]',
-				'objectName' => 'hostGroup',
-				'data' => $multiSelectHostGroupData,
-				'popup' => array(
-					'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
-						'&srcfld1=groupid&multiselect=1',
-					'width' => 450,
-					'height' => 450
-				)
-			)),
-			'inputcol'
-		),
-		new CCol(bold(_('Name')), 'label'),
-		new CCol(new CTextBox('select', $filter['select'], 40), 'inputcol'),
-	)
+$filterColumn1 = new CFormList();
+$filterColumn1->addRow(
+	_('Host groups'),
+	new CMultiSelect(
+		[
+			'name' => 'groupids[]',
+			'objectName' => 'hostGroup',
+			'data' => $multiSelectHostGroupData,
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
+					'&srcfld1=groupid&multiselect=1'
+			]
+	])
 );
-
-$filterTable->addRow(
-	array(
-		new CCol(bold(_('Hosts')), 'label'),
-		new CCol(new CMultiSelect(
-			array(
+$filterColumn1->addRow(
+		_('Hosts'),
+		new CMultiSelect(
+			[
 				'name' => 'hostids[]',
 				'objectName' => 'hosts',
 				'data' => $multiSelectHostData,
-				'popup' => array(
-					'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
-						'&real_hosts=1&multiselect=1',
-					'width' => 450,
-					'height' => 450
-				)
-			)),
-			'inputcol'
-		),
-		new CCol(bold(_('Show items without data')), 'label'),
-		new CCol(new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1), 'inputcol')
-	)
+				'popup' => [
+					'parameters' => 'srctbl=hosts&dstfrm=zbx_filter&dstfld1=hostids_&srcfld1=hostid'.
+						'&real_hosts=1&multiselect=1'
+				]
+			]
+		)
 );
-
-$filterTable->addRow(array(
-	new CCol(bold(_('Application')), 'label'),
-	new CCol(
-		array(
-			new CTextBox('application', $filter['application']),
-			new CButton('application_name', _('Select'),
-				'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
-					'&with_applications=1&dstfrm='.$filterForm->getName().'");',
-				'button-form'
+$filterColumn1->addRow(
+	_('Application'),
+	[
+		new CTextBox('application', $filter['application']),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('application_name', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
+				'&with_applications=1&dstfrm=zbx_filter");'
 			)
-		),
-		'inputcol'
-	),
-	new CCol(bold(_('Show details')), 'label'),
-	new CCol(new CCheckBox('show_details', $filter['showDetails'], null, 1), 'inputcol'),
-));
-
-$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();',
-	'jqueryinput shadow'
+	]
 );
-$filterButton->main();
 
-$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
+$filterColumn2 = new CFormList();
+$filterColumn2->addRow(
+	_('Name'),
+	new CTextBox('select', $filter['select'], 40)
+);
+$filterColumn2->addRow(
+	_('Show items without data'),
+	(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
+);
+$filterColumn2->addRow(
+	_('Show details'),
+	(new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1)
+);
 
-$divButtons = new CDiv(array($filterButton, $resetButton));
-$divButtons->setAttribute('style', 'padding: 4px 0px;');
+$filterForm->addColumn($filterColumn1);
+$filterForm->addColumn($filterColumn2);
 
-$filterTable->addRow(new CCol($divButtons, 'controls', 4));
-
-$filterForm->addItem($filterTable);
-
-$latestWidget->addFlicker($filterForm, CProfile::get('web.latest.filter.state', 0));
-$latestWidget->addPageHeader(_('LATEST DATA'), get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])));
+$widget->addItem($filterForm);
+// End of Filter
 
 $form = new CForm('GET', 'history.php');
 $form->setName('items');
@@ -432,7 +412,10 @@ $form->setName('items');
 $form->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
 
 // table
-$table = new CTableInfo(($filterSet) ? _('No values found.') : _('Specify some filter condition to see the values.'));
+$table = new CTableInfo();
+if ($filterSet) {
+	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
+}
 
 if ($singleHostSelected) {
 	$hostHeader = null;
@@ -453,35 +436,43 @@ $lastCheckHeader = make_sorting_header(_('Last check'), 'lastclock', $sortField,
 $lastCheckHeader->addClass('latest-lastcheck');
 $lastCheckHeader->setAttribute('title', _('Last check'));
 
-$lastValueHeader = new CCol(new CSpan(_('Last value')), 'latest-lastvalue');
-$lastValueHeader->setAttribute('title', _('Last value'));
+$lastValueHeader = (new CColHeader(new CSpan(_('Last value'))))
+	->addClass('latest-lastvalue')
+	->setAttribute('title', _('Last value'));
 
-$lastDataHeader = new CCol(new CSpan(_x('Change', 'noun in latest data')), 'latest-data');
-$lastDataHeader->setAttribute('title', _x('Change', 'noun in latest data'));
+$lastDataHeader = (new CColHeader(new CSpan(_x('Change', 'noun in latest data'))))
+	->addClass('latest-data')
+	->setAttribute('title', _x('Change', 'noun in latest data'));
 
-$checkAllCheckbox = new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');");
+$checkAllCheckbox = (new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');");
 
-$checkAllCheckboxCol = new CCol($checkAllCheckbox, 'latest-checkbox');
+$checkAllCheckboxCol = (new CColHeader($checkAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
 
 if ($filter['showDetails']) {
-	$intervalHeader = new CCol(new CSpan(_('Interval')), 'latest-interval');
-	$intervalHeader->setAttribute('title', _('Interval'));
+	$intervalHeader = (new CColHeader(_('Interval')))
+		->addClass('latest-interval')
+		->setAttribute('title', _('Interval'));
 
-	$historyHeader = new CCol(new CSpan(_('History')), 'latest-history');
-	$historyHeader->setAttribute('title', _('History'));
+	$historyHeader = (new CColHeader(_('History')))
+		->addClass('latest-history')
+		->setAttribute('title', _('History'));
 
-	$trendsHeader = new CCol(new CSpan(_('Trends')), 'latest-trends');
-	$trendsHeader->setAttribute('title', _('Trends'));
+	$trendsHeader = (new CColHeader(_('Trends')))
+		->addClass('latest-trends')
+		->setAttribute('title', _('Trends'));
 
-	$typeHeader = new CCol(new CSpan(_('Type')), 'latest-type');
-	$typeHeader->setAttribute('title', _('Type'));
+	$typeHeader = (new CColHeader(_('Type')))
+		->addClass('latest-type')
+		->setAttribute('title', _('Type'));
 
-	$infoHeader = new CCol(new CSpan(_('Info')), 'latest-info');
-	$infoHeader->setAttribute('title', _('Info'));
+	$infoHeader = (new CColHeader(_('Info')))
+		->addClass('latest-info')
+		->setAttribute('title', _('Info'));
 
 	$table->addClass('latest-details');
-	$table->setHeader(array(
-		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
+	$table->setHeader([
+		(new CColHeader((new CDiv())->addClass('app-list-toggle-all icon-plus-9x9')))
+			->addClass(ZBX_STYLE_CELL_WIDTH),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
@@ -492,24 +483,25 @@ if ($filter['showDetails']) {
 		$lastCheckHeader,
 		$lastValueHeader,
 		$lastDataHeader,
-		new CCol(null, 'latest-actions'),
+		(new CColHeader())->addClass('latest-actions'),
 		$infoHeader
-	));
+	]);
 }
 else {
-	$table->setHeader(array(
-		new CCol(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')),
+	$table->setHeader([
+		(new CColHeader((new CDiv())->addClass('app-list-toggle-all icon-plus-9x9')))
+			->addClass(ZBX_STYLE_CELL_WIDTH),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
 		$lastCheckHeader,
 		$lastValueHeader,
 		$lastDataHeader,
-		new CCol(null, 'latest-actions')
-	));
+		(new CColHeader())->addClass('latest-actions')
+	]);
 }
 
-$tab_rows = array();
+$tab_rows = [];
 
 $config = select_config();
 
@@ -550,10 +542,10 @@ foreach ($items as $key => $item){
 		}
 
 		// for 'unixtime' change should be calculated as uptime
-		$change .= convert_units(array(
+		$change .= convert_units([
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
-		));
+		]);
 		$change = nbsp($change);
 	}
 	else {
@@ -564,8 +556,8 @@ foreach ($items as $key => $item){
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
-	$checkbox->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
+		->removeAttribute('id');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -579,18 +571,21 @@ foreach ($items as $key => $item){
 		$checkbox->setEnabled(false);
 	}
 
-	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
+	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : '';
 
 	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan($item['key_expanded'], 'enabled')
-			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
+			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
+			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREEN);
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = new CDiv(null, 'status_icon iconerror');
-			$info->setHint($item['error'], 'on');
+			$info = (new CDiv())
+				->addClass('status_icon iconerror')
+				->setHint($item['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';
@@ -604,38 +599,38 @@ foreach ($items as $key => $item){
 			$trendValue = UNKNOWN_VALUE;
 		}
 
-		$row = new CRow(array(
+		$row = new CRow([
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
-			new CCol(new CSpan(
+			new CCol((new CDiv([$item['name_expanded'], BR(), $itemKey]))->addClass($stateCss.' item')),
+			new CCol((new CSpan(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $item['delay'],
-				$stateCss
-			)),
-			new CCol(new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history'], $stateCss)),
-			new CCol(new CSpan($trendValue, $stateCss)),
-			new CCol(new CSpan(item_type2str($item['type']), $stateCss)),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
+					: $item['delay']))
+					->addClass($stateCss)
+			),
+			new CCol((new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($stateCss)),
+			new CCol((new CSpan($trendValue))->addClass($stateCss)),
+			new CCol((new CSpan(item_type2str($item['type'])))->addClass($stateCss)),
+			new CCol((new CSpan($lastClock))->addClass($stateCss)),
+			new CCol((new CSpan($lastValue))->addClass($stateCss)),
+			new CCol((new CSpan($change))->addClass($stateCss)),
 			$actions,
 			$info
-		));
+		]);
 	}
 	else {
-		$row = new CRow(array(
+		$row = new CRow([
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
+			new CCol((new CSpan($item['name_expanded']))->addClass($stateCss)->addClass('item')),
+			new CCol((new CSpan($lastClock))->addClass($stateCss)),
+			new CCol((new CSpan($lastValue))->addClass($stateCss)),
+			new CCol((new CSpan($change))->addClass($stateCss)),
 			$actions
-		));
+		]);
 	}
 
 	// add the item row to each application tab
@@ -662,33 +657,35 @@ foreach ($applications as $appid => $dbApp) {
 
 	$openState = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
-	$toggle = new CDiv(null, 'app-list-toggle icon-plus-9x9');
+	$toggle = (new CDiv())
+		->addClass('app-list-toggle icon-plus-9x9')
+		->setAttribute('data-app-id', $dbApp['applicationid'])
+		->setAttribute('data-open-state', $openState);
 	if ($openState) {
 		$toggle->addClass('icon-minus-9x9');
 	}
-	$toggle->setAttribute('data-app-id', $dbApp['applicationid']);
-	$toggle->setAttribute('data-open-state', $openState);
 
 	$hostName = null;
 
 	if (!$singleHostSelected) {
-		$hostName = new CSpan($host['name'],
-			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
-		);
-
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+		$hostName = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$hostName->addClass(ZBX_STYLE_RED);
+		}
 	}
 
 	// add toggle row
-	$table->addRow(array(
+	$table->addRow([
 		$toggle,
 		'',
 		$hostName,
-		new CCol(array(
+		new CCol([
 				bold($dbApp['name']),
 				' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
-			), null, $filter['showDetails'] ? 10 : 5)
-	), 'odd_row');
+			], null, $filter['showDetails'] ? 10 : 5)
+	], 'odd_row');
 
 	// add toggle sub rows
 	foreach ($appRows as $row) {
@@ -704,7 +701,7 @@ foreach ($applications as $appid => $dbApp) {
 /**
  * Display OTHER ITEMS (which are not linked to application)
  */
-$tab_rows = array();
+$tab_rows = [];
 foreach ($items as $item) {
 	$lastHistory = isset($history[$item['itemid']][0]) ? $history[$item['itemid']][0] : null;
 	$prevHistory = isset($history[$item['itemid']][1]) ? $history[$item['itemid']][1] : null;
@@ -736,10 +733,10 @@ foreach ($items as $item) {
 		}
 
 		// for 'unixtime' change should be calculated as uptime
-		$change .= convert_units(array(
+		$change .= convert_units([
 			'value' => bcsub($lastHistory['value'], $prevHistory['value'], $digits),
 			'units' => $item['units'] == 'unixtime' ? 'uptime' : $item['units']
-		));
+		]);
 		$change = nbsp($change);
 	}
 	else {
@@ -751,8 +748,8 @@ foreach ($items as $item) {
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
-	$checkbox->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
+		->removeAttribute('id');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -766,19 +763,22 @@ foreach ($items as $item) {
 		$checkbox->setEnabled(false);
 	}
 
-	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : '';
+	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : '';
 
 	$host = $hosts[$item['hostid']];
 	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan($item['key_expanded'], 'enabled')
-			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], 'enabled');
+			? (new CSpan($item['key_expanded']))->addClass('enabled')
+			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREEN);
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = new CDiv(null, 'status_icon iconerror');
-			$info->setHint($item['error'], 'on');
+			$info = (new CDiv())
+				->addClass('status_icon iconerror')
+				->setHint($item['error'], ZBX_STYLE_RED);
 		}
 		else {
 			$info = '';
@@ -792,38 +792,38 @@ foreach ($items as $item) {
 			$trendValue = UNKNOWN_VALUE;
 		}
 
-		$row = new CRow(array(
+		$row = new CRow([
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CDiv(array($item['name_expanded'], BR(), $itemKey), $stateCss.' item')),
-			new CCol(new CSpan(
+			new CCol((new CDiv([$item['name_expanded'], BR(), $itemKey]))->addClass($stateCss.' item')),
+			new CCol((new CSpan(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $item['delay'],
-				$stateCss
-			)),
-			new CCol(new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history'], $stateCss)),
-			new CCol(new CSpan($trendValue, $stateCss)),
-			new CCol(new CSpan(item_type2str($item['type']), $stateCss)),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
-			new CCol($actions, $stateCss),
+					: $item['delay']))
+					->addClass($stateCss)
+			),
+			new CCol((new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($stateCss)),
+			new CCol((new CSpan($trendValue))->addClass($stateCss)),
+			new CCol((new CSpan(item_type2str($item['type'])))->addClass($stateCss)),
+			new CCol((new CSpan($lastClock))->addClass($stateCss)),
+			new CCol((new CSpan($lastValue))->addClass($stateCss)),
+			new CCol((new CSpan($change))->addClass($stateCss)),
+			(new CCol($actions))->addClass($stateCss),
 			$info
-		));
+		]);
 	}
 	else {
-		$row = new CRow(array(
+		$row = new CRow([
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
-			new CCol($actions, $stateCss)
-		));
+			new CCol((new CSpan($item['name_expanded']))->addClass($stateCss)->addClass('item')),
+			new CCol((new CSpan($lastClock))->addClass($stateCss)),
+			new CCol((new CSpan($lastValue))->addClass($stateCss)),
+			new CCol((new CSpan($change))->addClass($stateCss)),
+			(new CCol($actions))->addClass($stateCss)
+		]);
 	}
 
 	$hosts[$item['hostid']]['item_cnt']++;
@@ -840,36 +840,38 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	$openState = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
-	$toggle = new CDiv(null, 'app-list-toggle icon-plus-9x9');
+	$toggle = (new CDiv())
+		->addClass('app-list-toggle icon-plus-9x9')
+		->setAttribute('data-app-id', '0_'.$host['hostid'])
+		->setAttribute('data-open-state', $openState);
 	if ($openState) {
 		$toggle->addClass('icon-minus-9x9');
 	}
-	$toggle->setAttribute('data-app-id', '0_'.$host['hostid']);
-	$toggle->setAttribute('data-open-state', $openState);
 
 	$hostName = null;
 
 	if (!$singleHostSelected) {
-		$hostName = new CSpan($host['name'],
-			'link_menu menu-host'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' not-monitored' : '')
-		);
-
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+		$hostName = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$hostName->addClass(ZBX_STYLE_RED);
+		}
 	}
 
 	// add toggle row
-	$table->addRow(array(
+	$table->addRow([
 		$toggle,
 		'',
 		$hostName,
 		new CCol(
-			array(
+			[
 				bold('- '.('other').' -'),
 				' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
-			),
+			],
 			null, $filter['showDetails'] ? 10 : 5
 		)
-	), 'odd_row');
+	], 'odd_row');
 
 	// add toggle sub rows
 	foreach($appRows as $row) {
@@ -882,15 +884,14 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 }
 
-$form->addItem(array(
+$form->addItem([
 	$table,
-	get_table_header(new CActionButtonList('graphtype', 'itemids', array(
-		GRAPH_TYPE_STACKED => array('name' => _('Display stacked graph')),
-		GRAPH_TYPE_NORMAL => array('name' => _('Display graph'))
-	)))
-));
+	new CActionButtonList('graphtype', 'itemids', [
+		GRAPH_TYPE_STACKED => ['name' => _('Display stacked graph')],
+		GRAPH_TYPE_NORMAL => ['name' => _('Display graph')]
+	])
+]);
 
-$latestWidget->addItem($form);
-$latestWidget->show();
+$widget->addItem($form)->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

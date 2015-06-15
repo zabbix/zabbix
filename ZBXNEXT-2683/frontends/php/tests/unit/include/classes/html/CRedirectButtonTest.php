@@ -22,34 +22,34 @@
 class CRedirectButtonTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
-			array(
-				array('caption'),
-				'<button class="button button-plain shadow ui-corner-all" type="button">caption</button>'
-			),
-			array(
-				array('caption', 'http://google.com'),
-				'<button class="button button-plain shadow ui-corner-all" type="button" data-url="http://google.com">caption</button>'
-			),
-			array(
-				array('caption', 'http://google.com', 'Are you sure?'),
-				'<button class="button button-plain shadow ui-corner-all" type="button" data-url="http://google.com" data-confirmation="Are you sure?">caption</button>'
-			),
-			array(
-				array('caption', 'http://google.com', null, 'my-class'),
-				'<button class="button my-class" type="button" data-url="http://google.com">caption</button>'
-			),
+		return [
+			[
+				['caption'],
+				'<button type="button">caption</button>'
+			],
+			[
+				['caption', 'http://google.com'],
+				'<button type="button" data-url="http://google.com">caption</button>'
+			],
+			[
+				['caption', 'http://google.com', 'Are you sure?'],
+				'<button type="button" data-url="http://google.com" data-confirmation="Are you sure?">caption</button>'
+			],
+			[
+				['caption', 'http://google.com', null, 'my-class'],
+				'<button class="my-class" type="button" data-url="http://google.com">caption</button>'
+			],
 			// caption encoding
-			array(
-				array('</button>'),
-				'<button class="button button-plain shadow ui-corner-all" type="button">&lt;/button&gt;</button>'
-			),
+			[
+				['</button>'],
+				'<button type="button">&lt;/button&gt;</button>'
+			],
 			// parameter encoding
-			array(
-				array('caption', 'url"&"'),
-				'<button class="button button-plain shadow ui-corner-all" type="button" data-url="url&quot;&&quot;">caption</button>'
-			),
-		);
+			[
+				['caption', 'url"&"'],
+				'<button type="button" data-url="url&quot;&&quot;">caption</button>'
+			],
+		];
 	}
 
 	/**
@@ -60,7 +60,7 @@ class CRedirectButtonTest extends CTagTest {
 	 *
 	 * @return CRedirectButton
 	 */
-	protected function createTag($caption = null, $url = null, $confirmation = null, $class = 'button-plain shadow ui-corner-all') {
-		return new CRedirectButton($caption, $url, $confirmation, $class);
+	protected function createTag($caption = null, $url = null, $confirmation = null) {
+		return new CRedirectButton($caption, $url, $confirmation);
 	}
 }

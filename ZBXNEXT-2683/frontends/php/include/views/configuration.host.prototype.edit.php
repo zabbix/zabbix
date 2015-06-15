@@ -26,9 +26,9 @@ $parentHost = $data['parent_host'];
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 require_once dirname(__FILE__).'/js/configuration.host.prototype.edit.js.php';
 
-$widget = new CWidget(null, 'hostprototype-edit');
-$widget->addPageHeader(_('CONFIGURATION OF HOST PROTOTYPES'));
-$widget->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
+$widget = (new CWidget())
+	->setTitle(_('Host prototypes'))
+	->addItem(get_header_host_table('hosts', $discoveryRule['hostid'], $discoveryRule['itemid']));
 
 $divTabs = new CTabView();
 if (!isset($_REQUEST['form_refresh'])) {
@@ -43,13 +43,15 @@ $frmHost->addVar('parent_discoveryid', $discoveryRule['itemid']);
 $hostList = new CFormList('hostlist');
 
 if ($hostPrototype['templateid'] && $data['parents']) {
-	$parents = array();
+	$parents = [];
 	foreach (array_reverse($data['parents']) as $parent) {
-		$parents[] = new CLink(
+		$parents[] = (new CLink(
 			$parent['parentHost']['name'],
-			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'],
-			'highlight underline weight_normal'
-		);
+			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'])
+		)
+			->addClass('highlight')
+			->addClass('underline')
+			->addClass('weight_normal');
 		$parents[] = SPACE.'&rArr;'.SPACE;
 	}
 	array_pop($parents);
@@ -72,8 +74,7 @@ $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
-	$existingInterfaceTypes = array();
-
+	$existingInterfaceTypes = [];
 	foreach ($parentHost['interfaces'] as $interface) {
 		$existingInterfaceTypes[$interface['type']] = true;
 	}
@@ -81,69 +82,79 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	zbx_add_post_js('hostInterfacesManager.add('.CJs::encodeJson(array_values($parentHost['interfaces'])).');');
 	zbx_add_post_js('hostInterfacesManager.disable();');
 
-	// table for agent interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'agentInterfaces');
-	$ifTab->setAttribute('data-type', 'agent');
+	// Zabbix agent interfaces
+	$ifTab = (new CTable())
+		->setId('agentInterfaces')
+		->setHeader([
+		new CColHeader(),
+		new CColHeader(_('IP address')),
+		new CColHeader(_('DNS name')),
+		new CColHeader(_('Connect to')),
+		new CColHeader(_('Port')),
+		(new CColHeader(_('Default')))->setColSpan(2)
+	]);
 
-	// header
-	$ifTab->addRow(array(
-		new CCol(SPACE, 'interface-drag-control'),
-		new CCol(_('IP address'), 'interface-ip'),
-		new CCol(_('DNS name'), 'interface-dns'),
-		new CCol(_('Connect to'), 'interface-connect-to'),
-		new CCol(_('Port'), 'interface-port'),
-		new CCol(_('Default'), 'interface-default'),
-		new CCol(SPACE, 'interface-control')
-	));
-
-	$row = new CRow(null, null, 'agentInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
-		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No agent interfaces found.'), null, 5));
+	$row = (new CRow())->setId('agentInterfacesFooter');
+	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
 
-	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
+	$hostList->addRow(_('Agent interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'agent')
+	);
 
-	// table for SNMP interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'SNMPInterfaces');
-	$ifTab->setAttribute('data-type', 'snmp');
+	// SNMP interfaces
+	$ifTab = (new CTable())->setId('SNMPInterfaces');
 
-	$row = new CRow(null, null, 'SNMPInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
-		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No SNMP interfaces found.'), null, 5));
+	$row = (new CRow())->setId('SNMPInterfacesFooter');
+	if (!array_key_exists(INTERFACE_TYPE_SNMP, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
-	// table for JMX interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'JMXInterfaces');
-	$ifTab->setAttribute('data-type', 'jmx');
+	$hostList->addRow(_('SNMP interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'snmp')
+	);
 
-	$row = new CRow(null, null, 'JMXInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
-		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No JMX interfaces found.'), null, 5));
+	// JMX interfaces
+	$ifTab = (new CTable())->setId('JMXInterfaces');
+
+	$row = (new CRow())->setId('JMXInterfacesFooter');
+	if (!array_key_exists(INTERFACE_TYPE_JMX, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
-	// table for IPMI interfaces with footer
-	$ifTab = new CTable(null, 'formElementTable');
-	$ifTab->setAttribute('id', 'IPMIInterfaces');
-	$ifTab->setAttribute('data-type', 'ipmi');
+	$hostList->addRow(_('JMX interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'jmx')
+	);
 
-	$row = new CRow(null, null, 'IPMIInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
-		$row->addItem(new CCol(null, 'interface-drag-control'));
-		$row->addItem(new CCol(_('No IPMI interfaces found.'), null, 5));
+	// IPMI interfaces
+	$ifTab = (new CTable())->setId('IPMIInterfaces');
+
+	$row = (new CRow())->setId('IPMIInterfacesFooter');
+	if (!array_key_exists(INTERFACE_TYPE_IPMI, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
+
+	$hostList->addRow(
+		_('IPMI interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'ipmi')
+	);
 
 	// proxy
 	if ($parentHost['proxy_hostid']) {
@@ -155,82 +166,95 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$hostList->addRow(_('Monitored by proxy'), $proxyTb);
 }
 
-$hostList->addRow(_('Enabled'), new CCheckBox('status', (HOST_STATUS_MONITORED == $hostPrototype['status']), null, HOST_STATUS_MONITORED));
+$hostList->addRow(_('Enabled'),
+	(new CCheckBox('status', HOST_STATUS_MONITORED))
+		->setChecked(HOST_STATUS_MONITORED == $hostPrototype['status'])
+);
 
 $divTabs->addTab('hostTab', _('Host'), $hostList);
 
 // groups
-$groupList = new CFormList('grouplist');
+$groupList = new CFormList();
 
 // existing groups
-$groups = array();
+$groups = [];
 foreach ($data['groups'] as $group) {
-	$groups[] = array(
+	$groups[] = [
 		'id' => $group['groupid'],
 		'name' => $group['name']
-	);
+	];
 }
-$groupList->addRow(_('Groups'), new CMultiSelect(array(
+$groupList->addRow(_('Groups'), new CMultiSelect([
 	'name' => 'group_links[]',
 	'objectName' => 'hostGroup',
-	'objectOptions' => array(
+	'objectOptions' => [
 		'editable' => true,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-	),
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+	],
 	'data' => $groups,
 	'disabled' => (bool) $hostPrototype['templateid'],
-	'popup' => array(
+	'popup' => [
 		'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
-			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1',
-		'width' => 450,
-		'height' => 450
-	)
-)));
+			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
+	]
+]));
 
 // new group prototypes
-$customGroupTable = new CTable(SPACE, 'formElementTable');
-$customGroupTable->setAttribute('id', 'tbl_group_prototypes');
+$customGroupTable = (new CTable())
+	->setNoDataMessage(SPACE)
+	->addClass('formElementTable')
+	->setId('tbl_group_prototypes');
 
 // buttons
-$addButton = new CButton('group_prototype_add', _('Add'), null, 'link_menu');
-$buttonColumn = new CCol($addButton);
-$buttonColumn->setAttribute('colspan', 5);
+$addButton = (new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK);
+$buttonColumn = (new CCol($addButton))->setAttribute('colspan', 5);
 
-$buttonRow = new CRow();
-$buttonRow->setAttribute('id', 'row_new_group_prototype');
-$buttonRow->addItem($buttonColumn);
+$buttonRow = (new CRow())
+	->setId('row_new_group_prototype')
+	->addItem($buttonColumn);
 
 $customGroupTable->addRow($buttonRow);
-$groupDiv = new CDiv($customGroupTable, 'objectgroup border_dotted ui-corner-all group-prototypes');
+$groupDiv = (new CDiv($customGroupTable))
+	->addClass('objectgroup')
+	->addClass('border_dotted')
+	->addClass('group-prototypes');
 $groupList->addRow(_('Group prototypes'), $groupDiv);
 
 $divTabs->addTab('groupTab', _('Groups'), $groupList);
 
 // templates
-$tmplList = new CFormList('tmpllist');
+$tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
-$linkedTemplateTable->attr('id', 'linkedTemplateTable');
-$linkedTemplateTable->attr('style', 'min-width: 400px;');
-$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
+$linkedTemplateTable = (new CTable())
+	->setNoDataMessage(_('No templates linked.'))
+	->addClass('formElementTable')
+	->setId('linkedTemplateTable')
+	->setAttribute('style', 'min-width: 400px;')
+	->setHeader([_('Name'), _('Action')]);
 
-$ignoreTemplates = array();
+$ignoreTemplates = [];
 if ($hostPrototype['templates']) {
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
-		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-		$templateLink->setTarget('_blank');
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
 
-		$linkedTemplateTable->addRow(array(
+		$linkedTemplateTable->addRow([
 			$templateLink,
-			!$hostPrototype['templateid'] ? new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu') : '',
-		));
+			!$hostPrototype['templateid'] ? (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK) : '',
+		]);
 
 		$ignoreTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(
+		_('Linked templates'),
+		(new CDiv($linkedTemplateTable))
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
+	);
 }
 // for inherited prototypes with no templates display a text message
 elseif ($hostPrototype['templateid']) {
@@ -239,25 +263,30 @@ elseif ($hostPrototype['templateid']) {
 
 // create new linked template table
 if (!$hostPrototype['templateid']) {
-	$newTemplateTable = new CTable(null, 'formElementTable');
-	$newTemplateTable->attr('id', 'newTemplateTable');
-	$newTemplateTable->attr('style', 'min-width: 400px;');
+	$newTemplateTable = (new CTable())
+		->addClass('formElementTable')
+		->setId('newTemplateTable')
+		->setAttribute('style', 'min-width: 400px;');
 
-	$newTemplateTable->addRow(array(new CMultiSelect(array(
+	$newTemplateTable->addRow([new CMultiSelect([
 		'name' => 'add_templates[]',
 		'objectName' => 'templates',
 		'ignored' => $ignoreTemplates,
-		'popup' => array(
+		'popup' => [
 			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
-			'width' => 450,
-			'height' => 450
-		)
-	))));
+				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+		]
+	])]);
 
-	$newTemplateTable->addRow(array(new CSubmit('add_template', _('Add'), null, 'link_menu')));
+	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
-	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+	$tmplList->addRow(
+		_('Link new templates'),
+		(new CDiv($newTemplateTable))
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
+	);
 }
 
 $divTabs->addTab('templateTab', _('Templates'), $tmplList);
@@ -265,7 +294,7 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 // display inherited parameters only for hosts prototypes on hosts
 if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	// IPMI
-	$ipmiList = new CFormList('ipmilist');
+	$ipmiList = new CFormList();
 
 	$cmbIPMIAuthtype = new CTextBox('ipmi_authtype', ipmiAuthTypes($parentHost['ipmi_authtype']), ZBX_TEXTBOX_SMALL_SIZE, true);
 	$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
@@ -278,10 +307,19 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 
 	// macros
-	$macrosView = new CView('common.macros', array(
-		'macros' => $parentHost['macros'],
+	$macros = $parentHost['macros'];
+	if ($data['show_inherited_macros']) {
+		$macros = mergeInheritedMacros($macros,
+			getInheritedMacros(zbx_objectValues($hostPrototype['templates'], 'templateid'))
+		);
+	}
+	$macros = array_values(order_macros($macros, 'macro'));
+
+	$macrosView = new CView('hostmacros', [
+		'macros' => $macros,
+		'show_inherited_macros' => $data['show_inherited_macros'],
 		'readonly' => true
-	));
+	]);
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 }
 
@@ -289,39 +327,33 @@ $inventoryFormList = new CFormList('inventorylist');
 
 // radio buttons for inventory type choice
 $inventoryMode = (isset($hostPrototype['inventory']['inventory_mode'])) ? $hostPrototype['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
-$inventoryDisabledBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, null, 'host_inventory_radio_'.HOST_INVENTORY_DISABLED,
-	$inventoryMode == HOST_INVENTORY_DISABLED
-);
-$inventoryDisabledBtn->setEnabled(!$hostPrototype['templateid']);
+$inventoryDisabledBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, $inventoryMode == HOST_INVENTORY_DISABLED))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_DISABLED)
+	->setEnabled(!$hostPrototype['templateid']);
 
-$inventoryManualBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, null, 'host_inventory_radio_'.HOST_INVENTORY_MANUAL,
-	$inventoryMode == HOST_INVENTORY_MANUAL
-);
-$inventoryManualBtn->setEnabled(!$hostPrototype['templateid']);
+$inventoryManualBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, $inventoryMode == HOST_INVENTORY_MANUAL))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_MANUAL)
+	->setEnabled(!$hostPrototype['templateid']);
 
-$inventoryAutomaticBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, null, 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC,
-	$inventoryMode == HOST_INVENTORY_AUTOMATIC
-);
-$inventoryAutomaticBtn->setEnabled(!$hostPrototype['templateid']);
+$inventoryAutomaticBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, $inventoryMode == HOST_INVENTORY_AUTOMATIC))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
+	->setEnabled(!$hostPrototype['templateid']);
 
-$inventoryTypeRadioButton = array(
+$inventoryTypeRadioButton = [
 	$inventoryDisabledBtn,
 	new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
 	$inventoryManualBtn,
 	new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
 	$inventoryAutomaticBtn,
 	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
-);
-$inventoryFormList->addRow(new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
+];
+$inventoryFormList->addRow((new CDiv($inventoryTypeRadioButton))->addClass('jqueryinputset')->addClass('radioset'));
 
 // clearing the float
-$clearFixDiv = new CDiv();
-$clearFixDiv->addStyle('clear: both;');
+$clearFixDiv = (new CDiv())->addStyle('clear: both;');
 $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
-
-$frmHost->addItem($divTabs);
 
 /*
  * footer
@@ -333,22 +365,23 @@ if (isset($hostPrototype['hostid'])) {
 	);
 	$btnDelete->setEnabled($hostPrototype['templateid'] == 0);
 
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array (
+		[
 			new CSubmit('clone', _('Clone')),
 			$btnDelete,
 			new CButtonCancel(url_param('parent_discoveryid'))
-		)
+		]
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('parent_discoveryid')))
+		[new CButtonCancel(url_param('parent_discoveryid'))]
 	));
 }
 
+$frmHost->addItem($divTabs);
 $widget->addItem($frmHost);
 
 return $widget;

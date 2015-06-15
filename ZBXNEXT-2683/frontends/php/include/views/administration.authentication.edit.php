@@ -19,8 +19,7 @@
 **/
 
 
-$authenticationWidget = new CWidget();
-$authenticationWidget->addPageHeader(_('CONFIGURATION OF AUTHENTICATION'));
+$widget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
 $authenticationForm = new CForm();
@@ -30,25 +29,24 @@ $authenticationForm->setName('authenticationForm');
 $authenticationFormList = new CFormList('authenticationList');
 
 // append config radio buttons to form list
-$configTypeRadioButton = array(
-	new CRadioButton('config', ZBX_AUTH_INTERNAL, null, 'config_'.ZBX_AUTH_INTERNAL,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL),
-		'submit()'
-	),
+$configTypeRadioButton = [
+	(new CRadioButton('config', ZBX_AUTH_INTERNAL, ($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL)))
+		->setId('config_'.ZBX_AUTH_INTERNAL)
+		->onChange('submit()'),
 	new CLabel(_x('Internal', 'authentication'), 'config_'.ZBX_AUTH_INTERNAL),
-	new CRadioButton('config', ZBX_AUTH_LDAP, null, 'config_'.ZBX_AUTH_LDAP,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP),
-		'submit()'
-	),
+	(new CRadioButton('config', ZBX_AUTH_LDAP, ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP)))
+		->setId('config_'.ZBX_AUTH_LDAP)
+		->onChange('submit()'),
 	new CLabel(_('LDAP'), 'config_'.ZBX_AUTH_LDAP),
-	new CRadioButton('config', ZBX_AUTH_HTTP, null, 'config_'.ZBX_AUTH_HTTP,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_HTTP),
-		'submit()'
-	),
+	(new CRadioButton('config', ZBX_AUTH_HTTP, ($this->data['config']['authentication_type'] == ZBX_AUTH_HTTP)))
+		->setId('config_'.ZBX_AUTH_HTTP)
+		->onChange('submit()'),
 	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
-);
+];
 $authenticationFormList->addRow(_('Default authentication'),
-	new CDiv($configTypeRadioButton, 'jqueryinputset radioset')
+	(new CDiv($configTypeRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset')
 );
 
 // append LDAP fields to form list
@@ -105,7 +103,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 	else {
 		$authenticationFormList->addRow(
 			_('Bind password'),
-			new CSubmit('change_bind_password', _('Change password'), null, 'button-form')
+			(new CSubmit('change_bind_password', _('Change password')))->addClass(ZBX_STYLE_BTN_GREY)
 		);
 	}
 
@@ -118,13 +116,10 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 $authenticationTab = new CTabView();
 $authenticationTab->addTab('authenticationTab', $this->data['title'], $authenticationFormList);
 
-// append tab to form
-$authenticationForm->addItem($authenticationTab);
-
 // create save button
 $saveButton = new CSubmit('update', _('Update'));
 if ($this->data['is_authentication_type_changed']) {
-	$saveButton->addAction('onclick', 'javascript: if (confirm('.
+	$saveButton->onClick('javascript: if (confirm('.
 		CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?')).')) {'.
 		'jQuery("#authenticationForm").submit(); return true; } else { return false; }'
 	);
@@ -135,13 +130,16 @@ elseif ($this->data['config']['authentication_type'] != ZBX_AUTH_LDAP) {
 
 // append buttons to form
 if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
-	$authenticationForm->addItem(makeFormFooter($saveButton, array(new CSubmit('test', _('Test')))));
+	$authenticationTab->setFooter(makeFormFooter($saveButton, [new CSubmit('test', _('Test'))]));
 }
 else {
-	$authenticationForm->addItem(makeFormFooter($saveButton));
+	$authenticationTab->setFooter(makeFormFooter($saveButton));
 }
 
-// append form to widget
-$authenticationWidget->addItem($authenticationForm);
+// append tab to form
+$authenticationForm->addItem($authenticationTab);
 
-return $authenticationWidget;
+// append form to widget
+$widget->addItem($authenticationForm);
+
+return $widget;

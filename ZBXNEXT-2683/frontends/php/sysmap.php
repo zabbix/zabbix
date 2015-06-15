@@ -25,29 +25,28 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
-$page['hist_arg'] = array('sysmapid');
-$page['scripts'] = array('class.cmap.js', 'class.cviewswitcher.js', 'multiselect.js');
+$page['scripts'] = ['class.cmap.js', 'class.cviewswitcher.js', 'multiselect.js'];
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'sysmapid' =>	array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
-	'selementid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'sysmap' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action})'),
-	'selements' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'links' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+$fields = [
+	'sysmapid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
+	'selementid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'sysmap' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({action})'],
+	'selements' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'links' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// actions
-	'action' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"update"'),	null),
-	'delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' => array(T_ZBX_INT, O_OPT, null,	null,		null),
+	'action' =>		[T_ZBX_STR, O_OPT, P_ACT,	IN('"update"'),	null],
+	'delete' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' => [T_ZBX_INT, O_OPT, null,	null,		null],
 	// ajax
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favid' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null)
-);
+	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'favid' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null]
+];
 check_fields($fields);
 
 /*
@@ -65,11 +64,11 @@ if (isset($_REQUEST['favobj'])) {
 		try {
 			DBstart();
 
-			$sysmap = API::Map()->get(array(
+			$sysmap = API::Map()->get([
 				'sysmapids' => $sysmapid,
 				'editable' => true,
-				'output' => array('sysmapid')
-			));
+				'output' => ['sysmapid']
+			]);
 			$sysmap = reset($sysmap);
 
 			if ($sysmap === false) {
@@ -92,7 +91,7 @@ if (isset($_REQUEST['favobj'])) {
 		}
 		catch (Exception $e) {
 			DBend(false);
-			$msg = array($e->getMessage());
+			$msg = [$e->getMessage()];
 
 			foreach (clear_messages() as $errMsg) {
 				$msg[] = $errMsg['type'].': '.$errMsg['message'];
@@ -118,14 +117,14 @@ if (PAGE_TYPE_HTML != $page['type']) {
  * Permissions
  */
 if (isset($_REQUEST['sysmapid'])) {
-	$sysmap = API::Map()->get(array(
+	$sysmap = API::Map()->get([
 		'sysmapids' => $_REQUEST['sysmapid'],
 		'editable' => true,
 		'output' => API_OUTPUT_EXTEND,
 		'selectSelements' => API_OUTPUT_EXTEND,
 		'selectLinks' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
-	));
+	]);
 	if (empty($sysmap)) {
 		access_deny();
 	}
@@ -137,13 +136,13 @@ if (isset($_REQUEST['sysmapid'])) {
 /*
  * Display
  */
-$data = array(
+$data = [
 	'sysmap' => $sysmap,
-	'iconList' => array(),
+	'iconList' => [],
 	'defaultAutoIconId' => null,
 	'defaultIconId' => null,
 	'defaultIconName' => null
-);
+];
 
 // get selements
 add_elementNames($data['sysmap']['selements']);
@@ -154,13 +153,13 @@ $data['sysmap']['links'] = zbx_toHash($data['sysmap']['links'], 'linkid');
 // get links
 foreach ($data['sysmap']['links'] as &$link) {
 	foreach ($link['linktriggers'] as $lnum => $linkTrigger) {
-		$dbTrigger = API::Trigger()->get(array(
+		$dbTrigger = API::Trigger()->get([
 			'triggerids' => $linkTrigger['triggerid'],
-			'output' => array('description', 'expression'),
+			'output' => ['description', 'expression'],
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'preservekeys' => true,
 			'expandDescription' => true
-		));
+		]);
 		$dbTrigger = reset($dbTrigger);
 		$host = reset($dbTrigger['hosts']);
 
@@ -172,11 +171,11 @@ unset($link);
 
 // get iconmapping
 if ($data['sysmap']['iconmapid']) {
-	$iconMap = API::IconMap()->get(array(
+	$iconMap = API::IconMap()->get([
 		'iconmapids' => $data['sysmap']['iconmapid'],
-		'output' => array('default_iconid'),
+		'output' => ['default_iconid'],
 		'preservekeys' => true
-	));
+	]);
 	$iconMap = reset($iconMap);
 	$data['defaultAutoIconId'] = $iconMap['default_iconid'];
 }
@@ -187,10 +186,10 @@ $icons = DBselect(
 );
 
 while ($icon = DBfetch($icons)) {
-	$data['iconList'][] = array(
+	$data['iconList'][] = [
 		'imageid' => $icon['imageid'],
 		'name' => $icon['name']
-	);
+	];
 
 	if ($icon['name'] == MAP_DEFAULT_ICON || !isset($data['defaultIconId'])) {
 		$data['defaultIconId'] = $icon['imageid'];
@@ -198,7 +197,7 @@ while ($icon = DBfetch($icons)) {
 	}
 }
 if ($data['iconList']) {
-	CArrayHelper::sort($data['iconList'], array('name'));
+	CArrayHelper::sort($data['iconList'], ['name']);
 	$data['iconList'] = array_values($data['iconList']);
 }
 

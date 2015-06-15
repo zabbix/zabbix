@@ -36,14 +36,14 @@ class CHttpTestManager {
 	 *
 	 * @var array
 	 */
-	protected $changedSteps = array();
+	protected $changedSteps = [];
 
 	/**
 	 * Map of parent http test id to child http test id.
 	 *
 	 * @var array
 	 */
-	protected $httpTestParents = array();
+	protected $httpTestParents = [];
 
 	/**
 	 * Save http test to db.
@@ -67,8 +67,8 @@ class CHttpTestManager {
 	 * @return array
 	 */
 	protected function findChangedStepNames(array $httpTests) {
-		$httpSteps = array();
-		$result = array();
+		$httpSteps = [];
+		$result = [];
 		foreach ($httpTests as $httpTest) {
 			if (isset($httpTest['httptestid']) && isset($httpTest['steps'])) {
 				foreach ($httpTest['steps'] as $step) {
@@ -136,24 +136,24 @@ class CHttpTestManager {
 	 */
 	public function update(array $httpTests) {
 		$httpTestIds = zbx_objectValues($httpTests, 'httptestid');
-		$dbHttpTest = API::HttpTest()->get(array(
+		$dbHttpTest = API::HttpTest()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'httptestids' => $httpTestIds,
 			'selectSteps' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
-		$deleteStepItemIds = array();
+		$deleteStepItemIds = [];
 
 		foreach ($httpTests as $httpTest) {
-			DB::update('httptest', array(
+			DB::update('httptest', [
 				'values' => $httpTest,
-				'where' => array('httptestid' => $httpTest['httptestid'])
-			));
+				'where' => ['httptestid' => $httpTest['httptestid']]
+			]);
 
-			$checkItemsUpdate = $updateFields = array();
-			$itemids = array();
+			$checkItemsUpdate = $updateFields = [];
+			$itemids = [];
 			$dbCheckItems = DBselect(
 				'SELECT i.itemid,hi.type'.
 				' FROM items i,httptestitem hi'.
@@ -174,10 +174,10 @@ class CHttpTestManager {
 					$updateFields['delay'] = $httpTest['delay'];
 				}
 				if (!empty($updateFields)) {
-					$checkItemsUpdate[] = array(
+					$checkItemsUpdate[] = [
 						'values' => $updateFields,
-						'where' => array('itemid' => $checkitem['itemid'])
-					);
+						'where' => ['itemid' => $checkitem['itemid']]
+					];
 				}
 			}
 			DB::update('items', $checkItemsUpdate);
@@ -188,7 +188,7 @@ class CHttpTestManager {
 
 			// update steps
 			if (isset($httpTest['steps'])) {
-				$stepsCreate = $stepsUpdate = array();
+				$stepsCreate = $stepsUpdate = [];
 				$dbSteps = zbx_toHash($dbHttpTest[$httpTest['httptestid']]['steps'], 'httpstepid');
 				foreach ($httpTest['steps'] as $webstep) {
 					if (isset($webstep['httpstepid']) && isset($dbSteps[$webstep['httpstepid']])) {
@@ -210,7 +210,7 @@ class CHttpTestManager {
 						$deleteStepItemIds[] = $itemId;
 					}
 
-					DB::delete('httpstep', array('httpstepid' => $stepidsDelete));
+					DB::delete('httpstep', ['httpstepid' => $stepidsDelete]);
 				}
 				if (!empty($stepsUpdate)) {
 					$this->updateStepsReal($httpTest, $stepsUpdate);
@@ -241,10 +241,10 @@ class CHttpTestManager {
 								' AND hs.httptestid='.zbx_dbstr($httpTest['httptestid'])
 					), 'itemid');
 
-					DB::update('items', array(
-						'values' => array('status' => $status),
-						'where' => array('itemid' => $itemIds)
-					));
+					DB::update('items', [
+						'values' => ['status' => $status],
+						'where' => ['itemid' => $itemIds]
+					]);
 				}
 			}
 		}
@@ -276,7 +276,7 @@ class CHttpTestManager {
 	public function link($templateId, $hostIds) {
 		$hostIds = zbx_toArray($hostIds);
 
-		$httpTests = array();
+		$httpTests = [];
 		$dbCursor = DBselect(
 			'SELECT ht.httptestid,ht.name,ht.applicationid,ht.delay,ht.status,ht.variables,ht.agent,'.
 				'ht.authentication,ht.http_user,ht.http_password,ht.http_proxy,ht.retries,ht.hostid,ht.templateid,'.
@@ -311,7 +311,7 @@ class CHttpTestManager {
 	 *
 	 * @return bool
 	 */
-	public function inherit(array $httpTests, array $hostIds = array()) {
+	public function inherit(array $httpTests, array $hostIds = []) {
 		$hostsTemplatesMap = $this->getChildHostsFromHttpTests($httpTests, $hostIds);
 		if (empty($hostsTemplatesMap)) {
 			return true;
@@ -334,8 +334,8 @@ class CHttpTestManager {
 	 *
 	 * @return array
 	 */
-	protected function getChildHostsFromHttpTests(array $httpTests, array $hostIds = array()) {
-		$hostsTemplatesMap = array();
+	protected function getChildHostsFromHttpTests(array $httpTests, array $hostIds = []) {
+		$hostsTemplatesMap = [];
 
 		$sqlWhere = $hostIds ? ' AND '.dbConditionInt('ht.hostid', $hostIds) : '';
 		$dbCursor = DBselect(
@@ -364,7 +364,7 @@ class CHttpTestManager {
 	protected function prepareInheritedHttpTests(array $httpTests, array $hostsTemplatesMap) {
 		$hostHttpTests = $this->getHttpTestsMapsByHostIds(array_keys($hostsTemplatesMap));
 
-		$result = array();
+		$result = [];
 		foreach ($httpTests as $httpTest) {
 			$httpTestId = $httpTest['httptestid'];
 			foreach ($hostHttpTests as $hostId => $hostHttpTest) {
@@ -432,10 +432,10 @@ class CHttpTestManager {
 	 * @param $childId
 	 */
 	protected function createLinkageBetweenHttpTests($parentId, $childId) {
-		DB::update('httptest', array(
-			'values' => array('templateid' => $parentId),
-			'where' => array('httptestid' => $childId)
-		));
+		DB::update('httptest', [
+			'values' => ['templateid' => $parentId],
+			'where' => ['httptestid' => $childId]
+		]);
 
 		$dbCursor = DBselect(
 			'SELECT i1.itemid AS parentid,i2.itemid AS childid'.
@@ -447,10 +447,10 @@ class CHttpTestManager {
 				' AND i1.key_=i2.key_'
 		);
 		while ($dbItems = DBfetch($dbCursor)) {
-			DB::update('items', array(
-				'values' => array('templateid' => $dbItems['parentid']),
-				'where' => array('itemid' => $dbItems['childid'])
-			));
+			DB::update('items', [
+				'values' => ['templateid' => $dbItems['parentid']],
+				'where' => ['itemid' => $dbItems['childid']]
+			]);
 		}
 
 		$dbCursor = DBselect(
@@ -465,10 +465,10 @@ class CHttpTestManager {
 				' AND i1.key_=i2.key_'
 		);
 		while ($dbItems = DBfetch($dbCursor)) {
-			DB::update('items', array(
-				'values' => array('templateid' => $dbItems['parentid']),
-				'where' => array('itemid' => $dbItems['childid'])
-			));
+			DB::update('items', [
+				'values' => ['templateid' => $dbItems['parentid']],
+				'where' => ['itemid' => $dbItems['childid']]
+			]);
 		}
 	}
 
@@ -522,9 +522,9 @@ class CHttpTestManager {
 	 * @return array
 	 */
 	protected function getHttpTestsMapsByHostIds(array $hostIds) {
-		$hostHttpTests = array();
+		$hostHttpTests = [];
 		foreach ($hostIds as $hostid) {
-			$hostHttpTests[$hostid] = array('byName' => array(), 'byTemplateId' => array());
+			$hostHttpTests[$hostid] = ['byName' => [], 'byTemplateId' => []];
 		}
 
 		$dbCursor = DBselect(
@@ -554,7 +554,7 @@ class CHttpTestManager {
 		$firstHash = '';
 		$secondHash = '';
 
-		CArrayHelper::sort($httpTest['steps'], array('no'));
+		CArrayHelper::sort($httpTest['steps'], ['no']);
 		foreach ($httpTest['steps'] as $step) {
 			$firstHash .= $step['no'].$step['name'];
 		}
@@ -565,7 +565,7 @@ class CHttpTestManager {
 			' WHERE hs.httptestid='.zbx_dbstr($exHttpTest['httptestid'])
 		));
 
-		CArrayHelper::sort($dbHttpTestSteps, array('no'));
+		CArrayHelper::sort($dbHttpTestSteps, ['no']);
 		foreach ($dbHttpTestSteps as $dbHttpStep) {
 			$secondHash .= $dbHttpStep['no'].$dbHttpStep['name'];
 		}
@@ -581,8 +581,8 @@ class CHttpTestManager {
 	 * @return array
 	 */
 	protected function save(array $httpTests) {
-		$httpTestsCreate = array();
-		$httpTestsUpdate = array();
+		$httpTestsCreate = [];
+		$httpTestsUpdate = [];
 
 		foreach ($httpTests as $httpTest) {
 			if (isset($httpTest['httptestid'])) {
@@ -613,7 +613,7 @@ class CHttpTestManager {
 	 * @return array
 	 */
 	protected function prepareHttpSteps(array $steps, $exHttpTestId) {
-		$exSteps = array();
+		$exSteps = [];
 		$dbCursor = DBselect(
 			'SELECT hs.httpstepid,hs.name'.
 			' FROM httpstep hs'.
@@ -623,7 +623,7 @@ class CHttpTestManager {
 			$exSteps[$dbHttpStep['name']] = $dbHttpStep['httpstepid'];
 		}
 
-		$result = array();
+		$result = [];
 		foreach ($steps as $step) {
 			$parentTestId = $this->httpTestParents[$exHttpTestId];
 			if (isset($this->changedSteps[$parentTestId][$step['name']])) {
@@ -652,32 +652,32 @@ class CHttpTestManager {
 	 * @throws Exception
 	 */
 	protected function createHttpTestItems(array $httpTest) {
-		$checkitems = array(
-			array(
+		$checkitems = [
+			[
 				'name'				=> 'Download speed for scenario "$1".',
 				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_IN, $httpTest['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 				'units'				=> 'Bps',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_IN
-			),
-			array(
+			],
+			[
 				'name'				=> 'Failed step of scenario "$1".',
 				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTSTEP, $httpTest['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_UINT64,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTSTEP
-			),
-			array(
+			],
+			[
 				'name'				=> 'Last error message of scenario "$1".',
 				'key_'				=> $this->getTestKey(HTTPSTEP_ITEM_TYPE_LASTERROR, $httpTest['name']),
 				'value_type'		=> ITEM_VALUE_TYPE_STR,
 				'units'				=> '',
 				'httptestitemtype'	=> HTTPSTEP_ITEM_TYPE_LASTERROR
-			)
-		);
+			]
+		];
 
 		// if this is a template scenario, fetch the parent http items to link inherited items to them
-		$parentItems = array();
+		$parentItems = [];
 		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
 			$parentItems = DBfetchArrayAssoc(DBselect(
 				'SELECT i.itemid,i.key_'.
@@ -687,9 +687,9 @@ class CHttpTestManager {
 			), 'key_');
 		}
 
-		$insertItems = array();
-		$updateItems = array();
-		$testItemIds = array();
+		$insertItems = [];
+		$updateItems = [];
+		$testItemIds = [];
 		foreach ($checkitems as $item) {
 			$dbItem = DBfetch(DBselect(
 				'SELECT i.itemid,i.templateid'.
@@ -715,7 +715,7 @@ class CHttpTestManager {
 					throw new Exception(_s('Item with key "%1$s" already exists.', $item['key_']));
 				}
 				$testItemIds[] = $dbItem['itemid'];
-				$updateItems[] = array('values' => $item, 'where' => array('itemid' => $dbItem['itemid']));
+				$updateItems[] = ['values' => $item, 'where' => ['itemid' => $dbItem['itemid']]];
 			}
 			else {
 				$insertItems[] = $item;
@@ -730,13 +730,13 @@ class CHttpTestManager {
 			DB::update('items', $updateItems);
 		}
 
-		$itemApplications = array();
+		$itemApplications = [];
 		foreach ($testItemIds as $itemid) {
 			if (!empty($httpTest['applicationid'])) {
-				$itemApplications[] = array(
+				$itemApplications[] = [
 					'applicationid' => $httpTest['applicationid'],
 					'itemid' => $itemid
-				);
+				];
 			}
 		}
 		if (!empty($itemApplications)) {
@@ -744,13 +744,13 @@ class CHttpTestManager {
 		}
 
 
-		$httpTestItems = array();
+		$httpTestItems = [];
 		foreach ($checkitems as $inum => $item) {
-			$httpTestItems[] = array(
+			$httpTestItems[] = [
 				'httptestid' => $httpTest['httptestid'],
 				'itemid' => $testItemIds[$inum],
 				'type' => $item['httptestitemtype']
-			);
+			];
 		}
 		DB::insert('httptestitem', $httpTestItems);
 	}
@@ -770,7 +770,7 @@ class CHttpTestManager {
 		$webstepids = DB::insert('httpstep', $websteps);
 
 		// if this is a template scenario, fetch the parent http items to link inherited items to them
-		$parentStepItems = array();
+		$parentStepItems = [];
 		if (isset($httpTest['templateid']) && $httpTest['templateid']) {
 			$parentStepItems = DBfetchArrayAssoc(DBselect(
 				'SELECT i.itemid,i.key_,hsi.httpstepid'.
@@ -784,29 +784,29 @@ class CHttpTestManager {
 		foreach ($websteps as $snum => $webstep) {
 			$webstepid = $webstepids[$snum];
 
-			$stepitems = array(
-				array(
+			$stepitems = [
+				[
 					'name' => 'Download speed for step "$2" of scenario "$1".',
 					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_IN, $httpTest['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 'Bps',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_IN
-				),
-				array(
+				],
+				[
 					'name' => 'Response time for step "$2" of scenario "$1".',
 					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_TIME, $httpTest['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_FLOAT,
 					'units' => 's',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_TIME
-				),
-				array(
+				],
+				[
 					'name' => 'Response code for step "$2" of scenario "$1".',
 					'key_' => $this->getStepKey(HTTPSTEP_ITEM_TYPE_RSPCODE, $httpTest['name'], $webstep['name']),
 					'value_type' => ITEM_VALUE_TYPE_UINT64,
 					'units' => '',
 					'httpstepitemtype' => HTTPSTEP_ITEM_TYPE_RSPCODE
-				)
-			);
+				]
+			];
 
 			if (!isset($httpTest['delay']) || !isset($httpTest['status'])) {
 				$dbTest = DBfetch(DBselect('SELECT ht.delay,ht.status FROM httptest ht WHERE ht.httptestid='.zbx_dbstr($httpTest['httptestid'])));
@@ -818,9 +818,9 @@ class CHttpTestManager {
 				$status = $httpTest['status'];
 			}
 
-			$insertItems = array();
-			$updateItems = array();
-			$stepItemids = array();
+			$insertItems = [];
+			$updateItems = [];
+			$stepItemids = [];
 			foreach ($stepitems as $item) {
 				$dbItem = DBfetch(DBselect(
 					'SELECT i.itemid,i.templateid'.
@@ -846,7 +846,7 @@ class CHttpTestManager {
 						throw new Exception(_s('Item with key "%1$s" already exists.', $item['key_']));
 					}
 					$stepItemids[] = $dbItem['itemid'];
-					$updateItems[] = array('values' => $item, 'where' => array('itemid' => $dbItem['itemid']));
+					$updateItems[] = ['values' => $item, 'where' => ['itemid' => $dbItem['itemid']]];
 				}
 				else {
 					$insertItems[] = $item;
@@ -861,26 +861,26 @@ class CHttpTestManager {
 				DB::update('items', $updateItems);
 			}
 
-			$itemApplications = array();
+			$itemApplications = [];
 			foreach ($stepItemids as $itemid) {
 				if (!empty($httpTest['applicationid'])) {
-					$itemApplications[] = array(
+					$itemApplications[] = [
 						'applicationid' => $httpTest['applicationid'],
 						'itemid' => $itemid
-					);
+					];
 				}
 			}
 			if (!empty($itemApplications)) {
 				DB::insert('items_applications', $itemApplications);
 			}
 
-			$webstepitems = array();
+			$webstepitems = [];
 			foreach ($stepitems as $inum => $item) {
-				$webstepitems[] = array(
+				$webstepitems[] = [
 					'httpstepid' => $webstepid,
 					'itemid' => $stepItemids[$inum],
 					'type' => $item['httpstepitemtype']
-				);
+				];
 			}
 			DB::insert('httpstepitem', $webstepitems);
 		}
@@ -906,14 +906,14 @@ class CHttpTestManager {
 		);
 
 		foreach ($websteps as $webstep) {
-			DB::update('httpstep', array(
+			DB::update('httpstep', [
 				'values' => $webstep,
-				'where' => array('httpstepid' => $webstep['httpstepid'])
-			));
+				'where' => ['httpstepid' => $webstep['httpstepid']]
+			]);
 
 			// update item keys
-			$itemids = array();
-			$stepitemsUpdate = $updateFields = array();
+			$itemids = [];
+			$stepitemsUpdate = $updateFields = [];
 			$dbStepItems = DBselect(
 				'SELECT i.itemid,i.key_,hi.type'.
 				' FROM items i,httpstepitem hi'.
@@ -947,10 +947,10 @@ class CHttpTestManager {
 					$updateFields['delay'] = $httpTest['delay'];
 				}
 				if (!empty($updateFields)) {
-					$stepitemsUpdate[] = array(
+					$stepitemsUpdate[] = [
 						'values' => $updateFields,
-						'where' => array('itemid' => $stepitem['itemid'])
-					);
+						'where' => ['itemid' => $stepitem['itemid']]
+					];
 				}
 			}
 			DB::update('items', $stepitemsUpdate);
@@ -969,7 +969,7 @@ class CHttpTestManager {
 	 */
 	protected function updateItemsApplications(array $itemIds, $appId) {
 		if (empty($appId)) {
-			DB::delete('items_applications', array('itemid' => $itemIds));
+			DB::delete('items_applications', ['itemid' => $itemIds]);
 		}
 		else {
 			$linkedItemIds = DBfetchColumn(
@@ -978,17 +978,17 @@ class CHttpTestManager {
 			);
 
 			if (!empty($linkedItemIds)) {
-				DB::update('items_applications', array(
-					'values' => array('applicationid' => $appId),
-					'where' => array('itemid' => $linkedItemIds)
-				));
+				DB::update('items_applications', [
+					'values' => ['applicationid' => $appId],
+					'where' => ['itemid' => $linkedItemIds]
+				]);
 			}
 
 			$notLinkedItemIds = array_diff($itemIds, $linkedItemIds);
 			if (!empty($notLinkedItemIds)) {
-				$insert = array();
+				$insert = [];
 				foreach ($notLinkedItemIds as $itemId) {
-					$insert[] = array('itemid' => $itemId, 'applicationid' => $appId);
+					$insert[] = ['itemid' => $itemId, 'applicationid' => $appId];
 				}
 				DB::insert('items_applications', $insert);
 			}
@@ -1063,16 +1063,16 @@ class CHttpTestManager {
 
 		$history = Manager::History()->getLast($httpItems);
 
-		$data = array();
+		$data = [];
 
 		foreach ($httpItems as $httpItem) {
 			if (isset($history[$httpItem['itemid']])) {
 				if (!isset($data[$httpItem['httptestid']])) {
-					$data[$httpItem['httptestid']] = array(
+					$data[$httpItem['httptestid']] = [
 						'lastcheck' => null,
 						'lastfailedstep' => null,
 						'error' => null
-					);
+					];
 				}
 
 				$itemHistory = $history[$httpItem['itemid']][0];

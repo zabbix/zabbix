@@ -68,6 +68,8 @@ class CIPRangeValidator extends CIPValidator {
 		$this->maxIPRange = '';
 
 		foreach (explode(',', $ranges) as $range) {
+			$range = trim($range, ' ');
+
 			if (!$this->isValidMask($range) && !$this->isValidRange($range)) {
 				$this->setError(_s('Invalid IP address range "%1$s".', $range));
 
@@ -183,7 +185,7 @@ class CIPRangeValidator extends CIPValidator {
 		$parts = explode('.', $range);
 
 		$ipCount = 1;
-		$ipParts = array();
+		$ipParts = [];
 
 		foreach ($parts as $part) {
 			if (preg_match('/^([0-9]{1,3})-([0-9]{1,3})$/', $part, $matches)) {
@@ -222,7 +224,7 @@ class CIPRangeValidator extends CIPValidator {
 		$parts = explode(':', $range);
 
 		$ipCount = 1;
-		$ipParts = array();
+		$ipParts = [];
 
 		foreach ($parts as $part) {
 			if (preg_match('/^([a-f0-9]{1,4})-([a-f0-9]{1,4})$/i', $part, $matches)) {

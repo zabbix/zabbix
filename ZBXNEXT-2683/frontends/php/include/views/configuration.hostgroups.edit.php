@@ -19,8 +19,7 @@
 **/
 
 
-$hostGroupWidget = new CWidget();
-$hostGroupWidget->addPageHeader(_('CONFIGURATION OF HOST GROUPS'));
+$widget = (new CWidget())->setTitle(_('Host groups'));
 
 // create form
 $hostGroupForm = new CForm();
@@ -36,7 +35,7 @@ $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SI
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 	64
 );
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $hostGroupFormList->addRow(_('Group name'), $nameTextBox);
 
 // append groups and hosts to form list
@@ -60,36 +59,42 @@ foreach ($this->data['r_hosts'] as $host) {
 		$hostsComboBox->addItem($host['hostid'], $host['name'], true, false);
 	}
 }
-$hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), array(_('Other hosts | Group').SPACE, $groupsComboBox)));
+$hostGroupFormList->addRow(_('Hosts'), $hostsComboBox->get(_('Hosts in'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
 
 // append tabs to form
 $hostGroupTab = new CTabView();
 $hostGroupTab->addTab('hostgroupTab', _('Host group'), $hostGroupFormList);
-$hostGroupForm->addItem($hostGroupTab);
 
 // append buttons to form
 if ($this->data['groupid'] == 0) {
-	$hostGroupForm->addItem(makeFormFooter(
+	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 else {
-	$deleteButton = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
-	if (!isset($this->data['deletableHostGroups'][$this->data['groupid']])) {
-		$deleteButton->attr('disabled', 'disabled');
+	$clone_button = new CSubmit('clone', _('Clone'));
+	if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		$clone_button->setAttribute('disabled', 'disabled');
 	}
 
-	$hostGroupForm->addItem(makeFormFooter(
+	$delete_button = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
+	if (!isset($this->data['deletableHostGroups'][$this->data['groupid']])) {
+		$delete_button->setAttribute('disabled', 'disabled');
+	}
+
+	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
-			new CSubmit('clone', _('Clone')),
-			$deleteButton,
+		[
+			$clone_button,
+			$delete_button,
 			new CButtonCancel()
-		)
+		]
 	));
 }
 
-$hostGroupWidget->addItem($hostGroupForm);
+$hostGroupForm->addItem($hostGroupTab);
 
-return $hostGroupWidget;
+$widget->addItem($hostGroupForm);
+
+return $widget;

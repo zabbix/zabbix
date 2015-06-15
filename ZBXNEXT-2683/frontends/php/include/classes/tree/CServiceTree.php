@@ -42,8 +42,8 @@ class CServiceTree extends CTree {
 			$status = $this->tree[$rowId][$colName];
 
 			// do not show the severity for information and unclassified triggers
-			if (in_array($status, array(TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED))) {
-				$this->tree[$rowId][$colName] = new CSpan(_('OK'), 'green');
+			if (in_array($status, [TRIGGER_SEVERITY_INFORMATION, TRIGGER_SEVERITY_NOT_CLASSIFIED])) {
+				$this->tree[$rowId][$colName] = (new CSpan(_('OK')))->addClass(ZBX_STYLE_GREEN);
 			}
 			else {
 				$this->tree[$rowId][$colName] = getSeverityName($status, $config);

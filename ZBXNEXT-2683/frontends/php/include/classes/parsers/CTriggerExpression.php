@@ -52,7 +52,7 @@ class CTriggerExpression {
 	 *
 	 * @var array
 	 */
-	public $expressions = array();
+	public $expressions = [];
 
 	/**
 	 * An options array
@@ -62,7 +62,7 @@ class CTriggerExpression {
 	 *
 	 * @var array
 	 */
-	public $options = array('lldmacros' => true);
+	public $options = ['lldmacros' => true];
 
 	/**
 	 * Source string.
@@ -132,7 +132,7 @@ class CTriggerExpression {
 	 *
 	 * @var array
 	 */
-	protected $spaceChars = array(' ' => true, "\r" => true, "\n" => true, "\t" => true);
+	protected $spaceChars = [' ' => true, "\r" => true, "\n" => true, "\t" => true];
 
 	/**
 	 * Object containing the results of parsing.
@@ -145,15 +145,15 @@ class CTriggerExpression {
 	 * @param array $options
 	 * @param bool $options['lldmacros']
 	 */
-	public function __construct($options = array()) {
+	public function __construct($options = []) {
 		if (isset($options['lldmacros'])) {
 			$this->options['lldmacros'] = $options['lldmacros'];
 		}
 
-		$this->binaryOperatorParser = new CSetParser(array('<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>'));
-		$this->logicalOperatorParser = new CSetParser(array('and', 'or'));
-		$this->notOperatorParser = new CSetParser(array('not'));
-		$this->macroParser = new CSetParser(array('{TRIGGER.VALUE}'));
+		$this->binaryOperatorParser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
+		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
+		$this->notOperatorParser = new CSetParser(['not']);
+		$this->macroParser = new CSetParser(['{TRIGGER.VALUE}']);
 		$this->functionMacroParser = new CFunctionMacroParser();
 		$this->userMacroParser = new CMacroParser('$');
 		$this->lldMacroParser = new CMacroParser('#');
@@ -191,7 +191,7 @@ class CTriggerExpression {
 		$this->result = new CTriggerExpressionParserResult();
 		$this->isValid = true;
 		$this->error = '';
-		$this->expressions = array();
+		$this->expressions = [];
 
 		$this->pos = 0;
 		$this->expression = $expression;
@@ -480,7 +480,7 @@ class CTriggerExpression {
 	 */
 	public function getHosts() {
 		if (!$this->isValid) {
-			return array();
+			return [];
 		}
 
 		return array_unique(zbx_objectValues($this->expressions, 'host'));
@@ -550,8 +550,7 @@ class CTriggerExpression {
 	private function parseFunctionMacro() {
 		$startPos = $this->pos;
 
-		$parser = new CFunctionMacroParser();
-		$result = $parser->parse($this->expression, $this->pos);
+		$result = $this->functionMacroParser->parse($this->expression, $this->pos);
 
 		if (!$result) {
 			return false;
@@ -561,13 +560,13 @@ class CTriggerExpression {
 
 		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO, $result->match,
 			$startPos, $result->length,
-			array(
+			[
 				'host' => $result->expression['host'],
 				'item' => $result->expression['item'],
 				'function' => $result->expression['function'],
 				'functionName' => $result->expression['functionName'],
 				'functionParams' => $result->expression['functionParamList']
-			)
+			]
 		);
 
 		$this->expressions[] = $result->expression;
@@ -622,9 +621,9 @@ class CTriggerExpression {
 			substr($this->expression, $this->pos, $numberLength),
 			$this->pos,
 			$numberLength,
-			array(
+			[
 				'suffix' => $suffix
-			)
+			]
 		);
 
 		$this->pos = $j - 1;

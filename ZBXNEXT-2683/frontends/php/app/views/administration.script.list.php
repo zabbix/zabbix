@@ -23,22 +23,22 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$scriptsWidget = new CWidget();
-
-$createForm = new CForm('get');
-$createForm->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'));
-
-$scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'), $createForm);
-$scriptsWidget->addHeader(_('Scripts'));
-$scriptsWidget->addHeaderRowNumber();
+$widget = (new CWidget())
+	->setTitle(_('Scripts'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
+	);
 
 $scriptsForm = new CForm();
 $scriptsForm->setName('scriptsForm');
-$scriptsForm->setAttribute('id', 'scripts');
+$scriptsForm->setId('scripts');
 
-$scriptsTable = new CTableInfo(_('No scripts found.'));
-$scriptsTable->setHeader(array(
-	new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');"),
+$scriptsTable = new CTableInfo();
+$scriptsTable->setHeader([
+	(new CColHeader(
+		(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
 	_('Type'),
 	_('Execute on'),
@@ -46,7 +46,7 @@ $scriptsTable->setHeader(array(
 	_('User group'),
 	_('Host group'),
 	_('Host access')
-));
+]);
 
 foreach ($data['scripts'] as $script) {
 	switch ($script['type']) {
@@ -72,29 +72,28 @@ foreach ($data['scripts'] as $script) {
 		$scriptExecuteOn = '';
 	}
 
-	$scriptsTable->addRow(array(
-		new CCheckBox('scriptids['.$script['scriptid'].']', 'no', null, $script['scriptid']),
-		new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']),
+	$name = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
+
+	$scriptsTable->addRow([
+		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
+		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
 		$script['userGroupName'] === null ?  _('All') : $script['userGroupName'],
 		$script['hostGroupName'] === null ?  _('All') : $script['hostGroupName'],
 		($script['host_access'] == PERM_READ_WRITE) ? _('Write') : _('Read')
-	));
+	]);
 }
 
 // append table to form
-$scriptsForm->addItem(array(
-	$data['paging'],
+$scriptsForm->addItem([
 	$scriptsTable,
 	$data['paging'],
-	get_table_header(new CActionButtonList('action', 'scriptids', array(
-		'script.delete' => array('name' => _('Delete'), 'confirm' => _('Delete selected scripts?'))
-	)))
-));
+	new CActionButtonList('action', 'scriptids', [
+		'script.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected scripts?')]
+	])
+]);
 
 // append form to widget
-$scriptsWidget->addItem($scriptsForm);
-
-$scriptsWidget->show();
+$widget->addItem($scriptsForm)->show();

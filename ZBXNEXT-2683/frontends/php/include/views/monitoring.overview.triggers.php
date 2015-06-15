@@ -18,72 +18,66 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 zbx_add_post_js('jqBlink.blink();');
 
-$overviewWidget = new CWidget();
-
-$typeComboBox = new CComboBox('type', $this->data['type'], 'submit()');
-$typeComboBox->addItem(SHOW_TRIGGERS, _('Triggers'));
-$typeComboBox->addItem(SHOW_DATA, _('Data'));
-
-$headerForm = new CForm('get');
-$headerForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
-$headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
-
-$overviewWidget->addHeader(_('Overview'), $headerForm);
-
 // hint table
-$hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
-$hintTable->addRow(array(new CCol(SPACE, 'normal'), _('OK')));
+$hintTable = new CTableInfo();
+$hintTable->addRow([(new CCol(SPACE))->addClass('normal'), _('OK')]);
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$hintTable->addRow(array(getSeverityCell($severity, $this->data['config']), _('PROBLEM')));
+	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
 }
 
 // blinking preview in help popup (only if blinking is enabled)
 if ($this->data['config']['blink_period'] > 0) {
-	$row = new CRow(null);
-	$row->addItem(new CCol(SPACE, 'normal'));
+	$row = new CRow();
+	$row->addItem((new CCol(SPACE))->addClass('normal'));
 	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-		$row->addItem(new CCol(SPACE, getSeverityStyle($i)));
+		$row->addItem((new CCol(SPACE))->addClass(getSeverityStyle($i)));
 	}
-	$col = new CTable('', 'blink overview-mon-severities');
-	$col->addRow($row);
+	$col = (new CTable())
+		->setNoDataMessage('')
+		->addClass('blink')
+		->addClass('overview-mon-severities')
+		->addRow($row);
 
 	// double div necassary for FireFox
-	$col = new CCol(new CDiv(new CDiv($col), 'overview-mon-severities-container'));
+	$col = new CCol(
+		(new CDiv(new CDiv($col)))->addClass('overview-mon-severities-container')
+	);
 
-	$hintTable->addRow(array($col, _s('Age less than %s', convertUnitsS($this->data['config']['blink_period']))));
+	$hintTable->addRow([$col, _s('Age less than %s', convertUnitsS($this->data['config']['blink_period']))]);
 }
 
-$hintTable->addRow(array(new CCol(SPACE), _('No trigger')));
-
-$help = new CIcon(null, 'iconhelp');
-$help->setHint($hintTable);
+$hintTable->addRow([new CCol(SPACE), _('No trigger')]);
 
 // header right
-$overviewWidget->addPageHeader(_('OVERVIEW'), array(
-	get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])),
-	SPACE,
-	$help
-));
+$help = get_icon('overviewhelp');
+$help->setHint($hintTable);
 
-// header left
-$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()');
-$styleComboBox->addItem(STYLE_TOP, _('Top'));
-$styleComboBox->addItem(STYLE_LEFT, _('Left'));
-
-$hostLocationForm = new CForm('get');
-$hostLocationForm->addVar('groupid', $this->data['groupid']);
-$hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
-
-$overviewWidget->addHeader($hostLocationForm);
+$widget = (new CWidget())
+	->setTitle(_('Overview'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem([_('Type'), SPACE, new CComboBox('type', $this->data['type'], 'submit()', [
+				SHOW_TRIGGERS => _('Triggers'),
+				SHOW_DATA => _('Data')
+			])])
+			->addItem([_('Hosts location'), SPACE, new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+				STYLE_TOP => _('Top'),
+				STYLE_LEFT => _('Left')
+			])])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+			->addItem($help)
+		)
+	);
 
 // filter
 $filter = $this->data['filter'];
-$filterFormView = new CView('common.filter.trigger', array(
+$filterFormView = new CView('common.filter.trigger', [
 	'overview' => true,
-	'filter' => array(
+	'filter' => [
 		'showTriggers' => $filter['showTriggers'],
 		'ackStatus' => $filter['ackStatus'],
 		'showSeverity' => $filter['showSeverity'],
@@ -96,12 +90,12 @@ $filterFormView = new CView('common.filter.trigger', array(
 		'hostId' => $this->data['hostid'],
 		'groupId' => $this->data['groupid'],
 		'fullScreen' => $this->data['fullscreen']
-	),
+	],
 	'config' => $this->data['config']
-));
+]);
 $filterForm = $filterFormView->render();
 
-$overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
+$widget->addItem($filterForm);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
@@ -112,9 +106,9 @@ if ($data['pageFilter']->groupsSelected) {
 	);
 }
 else {
-	$dataTable = new CTableInfo(_('No triggers found.'));
+	$dataTable = new CTableInfo();
 }
 
-$overviewWidget->addItem($dataTable);
+$widget->addItem($dataTable);
 
-return $overviewWidget;
+return $widget;
