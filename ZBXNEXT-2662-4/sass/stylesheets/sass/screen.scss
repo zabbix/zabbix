@@ -913,15 +913,15 @@ footer {
 			&.selected {
 
 				.subfilter-enabled {
-					background-color: darken($ui-bg-selected-color, 10%);
+					background-color: lighten($ui-bg-selected-color, 10%);
 				}
 
 				.subfilter-disable-btn {
-					background-color: darken($ui-bg-selected-color, 10%);
+					background-color: lighten($ui-bg-selected-color, 10%);
 					@include opacity(1);
 
 					&:active {
-						background-color: darken($ui-bg-selected-color, 10%);
+						background-color: lighten($ui-bg-selected-color, 10%);
 						@include opacity(1);
 					}
 				}
@@ -938,7 +938,7 @@ footer {
 	padding: 0 5px;
 	white-space: normal;
 	color: $font-alt-color;
-	background-color: $ui-bg-color;
+	background-color: $form-bg-color;
 
 	li {
 		display: block;
@@ -1764,7 +1764,7 @@ button[disabled] {
 				color: $font-color;
 				text-decoration: none;
 				cursor: default;
-				border-bottom: 3px solid $main-color;
+				border-bottom: 3px solid $ui-tab-bg-selected-color;
 			}
 		}
 	}
@@ -1829,7 +1829,7 @@ button[disabled] {
 			padding: 4px 0 4px 28px;
 
 			&.setup-left-current {
-				border-left: 3px solid $main-color;
+				border-left: 3px solid $ui-tab-bg-selected-color;
 				color: $font-alt-color;
 				padding-left: 25px;
 			}
@@ -2170,7 +2170,7 @@ button[disabled] {
 	padding: 0 5px;
 	min-width: 16px;
 	color: $font-alt-color;
-	background-color: $ui-bg-color;
+	background-color: $form-bg-color;
 	border: 1px solid $action-border-color;
 	border-top: none;
 	@include box-shadow(0 6px 10px 0 $action-shadow-color);
