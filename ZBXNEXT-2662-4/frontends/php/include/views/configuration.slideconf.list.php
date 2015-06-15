@@ -28,8 +28,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$slideForm = new CForm();
-$slideForm->setName('slideForm');
+$slideForm = (new CForm())->setName('slideForm');
 
 // create table
 $slidesTable = (new CTableInfo())

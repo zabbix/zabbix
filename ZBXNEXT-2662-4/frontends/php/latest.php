@@ -406,10 +406,10 @@ $filterForm->addColumn($filterColumn2);
 $widget->addItem($filterForm);
 // End of Filter
 
-$form = new CForm('GET', 'history.php');
-$form->setName('items');
+$form = (new CForm('GET', 'history.php'))
+	->setName('items')
 // set an ID for the hidden input so that it wouldn't conflict with the ID of the "Go" button list
-$form->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
+	->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
 
 // table
 $table = new CTableInfo();

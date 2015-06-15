@@ -41,8 +41,7 @@ if (!empty($this->data['hostid'])) {
 $widget->addItem($this->data['flicker']);
 
 // create form
-$itemForm = new CForm();
-$itemForm->setName('items');
+$itemForm = (new CForm())->setName('items');
 if (!empty($this->data['hostid'])) {
 	$itemForm->addVar('hostid', $this->data['hostid']);
 }

@@ -30,12 +30,11 @@ if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
 
-$frmHost = new CForm();
-$frmHost->setName('web.hosts.host.php.');
-
-$frmHost->addVar('form', $data['form']);
-$frmHost->addVar('clear_templates', $data['clear_templates']);
-$frmHost->addVar('flags', $data['flags']);
+$frmHost = (new CForm())
+	->setName('web.hosts.host.php.')
+	->addVar('form', $data['form'])
+	->addVar('clear_templates', $data['clear_templates'])
+	->addVar('flags', $data['flags']);
 
 if ($data['hostid'] != 0) {
 	$frmHost->addVar('hostid', $data['hostid']);

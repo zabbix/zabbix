@@ -27,12 +27,12 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create form
-$httpForm = new CForm();
-$httpForm->setName('httpForm');
-$httpForm->addVar('form', $this->data['form']);
-$httpForm->addVar('hostid', $this->data['hostid']);
-$httpForm->addVar('steps', $this->data['steps']);
-$httpForm->addVar('templated', $this->data['templated']);
+$httpForm = (new CForm())
+	->setName('httpForm')
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('steps', $this->data['steps'])
+	->addVar('templated', $this->data['templated']);
 
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addVar('httptestid', $this->data['httptestid']);

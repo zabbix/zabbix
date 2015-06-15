@@ -28,10 +28,10 @@ $triggersWidget->addItem(get_header_host_table('trigger_prototypes', $data['host
 
 $triggersWidget->setTitle(_('Trigger prototypes'));
 
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('action', $data['action']);
-$triggersForm->addVar('parent_discoveryid', $data['parent_discoveryid']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('action', $data['action'])
+	->addVar('parent_discoveryid', $data['parent_discoveryid']);
 
 foreach ($data['g_triggerid'] as $triggerid) {
 	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);

@@ -35,12 +35,11 @@ class CFilter extends CTag {
 		$this->filterid = $filterid;
 		$this->columns = [];
 
-		$this->form = new CForm('get');
-		$this->form->setAttribute('name', $this->name);
-		$this->form->setId('id', $this->name);
-		$this->form->addVar('ddreset', 1);
-		$this->form->addVar('uncheck', 1);
-
+		$this->form = (new CForm('get'))
+			->setAttribute('name', $this->name)
+			->setId('id', $this->name)
+			->addVar('ddreset', 1)
+			->addVar('uncheck', 1);
 	}
 
 	public function getName() {

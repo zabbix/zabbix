@@ -42,9 +42,9 @@ $widget->addHeaderRowNumber(array(
 */
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
 $triggersTable = (new CTableInfo())

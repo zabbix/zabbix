@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 
 // create form
-$hostView = new CForm();
-$hostView->setName('hostForm');
-$hostView->addVar('action', 'host.massupdate');
+$hostView = (new CForm())
+	->setName('hostForm')
+	->addVar('action', 'host.massupdate');
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }

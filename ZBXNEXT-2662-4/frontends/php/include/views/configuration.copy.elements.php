@@ -32,11 +32,11 @@ if (!empty($this->data['title'])) {
 }
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar($this->data['elements_field'], $this->data['elements']);
-$triggersForm->addVar('hostid', $this->data['hostid']);
-$triggersForm->addVar('action', $this->data['action']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar($this->data['elements_field'], $this->data['elements'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('action', $this->data['action']);
 
 // create form list
 $triggersFormList = new CFormList('triggersFormList');

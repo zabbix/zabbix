@@ -96,11 +96,9 @@ $okPeriodTextBox->addStyle('width: 4em;');
 $okPeriodTextBox->setAttribute('maxlength', '6');
 $triggerDOFormList->addRow(_('On status change triggers blink for'), [$okPeriodTextBox, SPACE, _('seconds')]);
 
-$severityView = new CTabView();
-$severityView->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList);
+$severityView = (new CTabView())->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList);
 
-$severityForm = new CForm();
-$severityForm->setName('triggerDisplayOptions');
+$severityForm = (new CForm())->setName('triggerDisplayOptions');
 
 $severityView->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),

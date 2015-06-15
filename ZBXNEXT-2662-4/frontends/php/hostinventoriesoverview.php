@@ -84,12 +84,13 @@ foreach($inventoryFields as $inventoryField){
 	}
 }
 
-$r_form = new CForm('get');
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
-$controls->addItem([_('Grouping by').SPACE, $inventoryFieldsComboBox]);
-$r_form->addItem($controls);
-$hostinvent_wdgt->setControls($r_form);
+$controls = (new CList())
+	->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()])
+	->addItem([_('Grouping by').SPACE, $inventoryFieldsComboBox]);
+
+$hostinvent_wdgt->setControls(
+	(new CForm('get'))->addItem($controls)
+);
 
 $table = (new CTableInfo())
 	->setHeader(

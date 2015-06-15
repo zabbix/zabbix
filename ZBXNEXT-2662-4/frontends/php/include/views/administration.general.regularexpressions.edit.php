@@ -28,10 +28,10 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.regexps.php')))
 	);
 
-$form = new CForm();
-$form->setId('zabbixRegExpForm');
-$form->addVar('form', 1);
-$form->addVar('regexpid', $data['regexpid']);
+$form = (new CForm())
+	->setId('zabbixRegExpForm')
+	->addVar('form', 1)
+	->addVar('regexpid', $data['regexpid']);
 
 zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($data['expressions'])).');');
 

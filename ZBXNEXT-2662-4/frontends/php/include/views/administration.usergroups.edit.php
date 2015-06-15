@@ -22,10 +22,10 @@
 $widget = (new CWidget())->setTitle(_('User groups'));
 
 // create form
-$userGroupForm = new CForm();
-$userGroupForm->setName('userGroupsForm');
-$userGroupForm->addVar('form', $this->data['form']);
-$userGroupForm->addVar('group_rights', $this->data['group_rights']);
+$userGroupForm = (new CForm())
+	->setName('userGroupsForm')
+	->addVar('form', $this->data['form'])
+	->addVar('group_rights', $this->data['group_rights']);
 if (isset($this->data['usrgrpid'])) {
 	$userGroupForm->addVar('usrgrpid', $this->data['usrgrpid']);
 }

@@ -25,13 +25,13 @@ if (!empty($this->data['templateid'])) {
 }
 
 // create form
-$screenForm = new CForm();
-$screenForm->setName('screenForm');
-$screenForm->addVar('form', $this->data['form']);
+$screenForm = (new CForm())
+	->setName('screenForm')
+	->addVar('form', $this->data['form'])
+	->addVar('templateid', $this->data['templateid']);
 if (!empty($this->data['screenid'])) {
 	$screenForm->addVar('screenid', $this->data['screenid']);
 }
-$screenForm->addVar('templateid', $this->data['templateid']);
 
 // create screen form list
 $screenFormList = new CFormList();

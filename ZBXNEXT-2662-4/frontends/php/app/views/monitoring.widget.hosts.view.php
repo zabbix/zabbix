@@ -366,5 +366,4 @@ $script = new CJsScript(get_js(
 	'jQuery("#'.WIDGET_HOST_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 ));
 
-$widget = new CDiv([$table, $script]);
-$widget->show();
+$widget = (new CDiv([$table, $script]))->show();

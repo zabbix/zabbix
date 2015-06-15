@@ -35,10 +35,10 @@ if (!isset($_REQUEST['form_refresh'])) {
 	$divTabs->setSelected(0);
 }
 
-$frmHost = new CForm();
-$frmHost->setName('hostPrototypeForm.');
-$frmHost->addVar('form', getRequest('form', 1));
-$frmHost->addVar('parent_discoveryid', $discoveryRule['itemid']);
+$frmHost = (new CForm())
+	->setName('hostPrototypeForm.')
+	->addVar('form', getRequest('form', 1))
+	->addVar('parent_discoveryid', $discoveryRule['itemid']);
 
 $hostList = new CFormList('hostlist');
 

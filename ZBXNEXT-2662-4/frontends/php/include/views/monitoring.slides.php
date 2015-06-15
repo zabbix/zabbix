@@ -22,8 +22,8 @@
 $slideshowWidget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create header form
-$slideHeaderForm = new CForm('get');
-$slideHeaderForm->setName('slideHeaderForm');
+$slideHeaderForm = (new CForm('get'))
+	->setName('slideHeaderForm');
 
 $controls = new CList();
 $controls->addItem(new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);',

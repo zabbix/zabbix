@@ -37,8 +37,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$actionForm = new CForm();
-$actionForm->setName('actionForm');
+$actionForm = (new CForm())->setName('actionForm');
 
 // create table
 $actionTable = (new CTableInfo())

@@ -28,12 +28,12 @@ $service = $this->data['service'];
 $widget = (new CWidget())->setTitle(_('IT services'));
 
 // create form
-$servicesForm = new CForm();
-$servicesForm->setName('servicesForm');
-$servicesForm->addVar('form', $this->data['form']);
-$servicesForm->addVar('parentid', $this->data['parentid']);
-$servicesForm->addVar('parentname', $this->data['parentname']);
-$servicesForm->addVar('triggerid', $this->data['triggerid']);
+$servicesForm = (new CForm())
+	->setName('servicesForm')
+	->addVar('form', $this->data['form'])
+	->addVar('parentid', $this->data['parentid'])
+	->addVar('parentname', $this->data['parentname'])
+	->addVar('triggerid', $this->data['triggerid']);
 if (isset($this->data['service'])) {
 	$servicesForm->addVar('serviceid', $this->data['service']['serviceid']);
 }

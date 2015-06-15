@@ -28,9 +28,9 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
 // create form
-$discoveryForm = new CForm();
-$discoveryForm->setName('discovery');
-$discoveryForm->addVar('hostid', $this->data['hostid']);
+$discoveryForm = (new CForm())
+	->setName('discovery')
+	->addVar('hostid', $this->data['hostid']);
 
 // create table
 $discoveryTable = (new CTableInfo())

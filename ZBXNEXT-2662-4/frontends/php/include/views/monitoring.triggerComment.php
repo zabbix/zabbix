@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/js/monitoring.triggerComment.js.php';
 $commentWidget = (new CWidget())->setTitle(_('Comments'));
 
 // create form
-$commentForm = new CForm();
-$commentForm->setName('commentForm');
-$commentForm->addVar('triggerid', $this->data['triggerid']);
+$commentForm = (new CForm())
+	->setName('commentForm')
+	->addVar('triggerid', $this->data['triggerid']);
 
 // create form list
 $commentFormList = new CFormList('commentFormList');

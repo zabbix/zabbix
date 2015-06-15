@@ -233,10 +233,9 @@ else {
 	}
 }
 
-$form = new CForm();
-
 $backURL = getRequest('backurl');
-$form->addVar('backurl', $backURL);
+
+$form = (new CForm())->addVar('backurl', $backURL);
 
 if ($backURL === 'tr_events.php' || $backURL === 'events.php') {
 	$form->addVar('triggerid', getRequest('triggerid'));

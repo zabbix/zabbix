@@ -1171,9 +1171,9 @@ elseif ($srctbl === 'triggers' || $srctbl === 'trigger_prototypes') {
  * Items or Item prototypes
  */
 elseif ($srctbl === 'items' || $srctbl === 'item_prototypes') {
-	$form = new CForm();
-	$form->setName('itemform');
-	$form->setId('items');
+	$form = (new CForm())
+		->setName('itemform')
+		->setId('items');
 
 	$itemPrototypesPopup = ($srctbl === 'item_prototypes');
 
@@ -1799,9 +1799,9 @@ elseif ($srctbl == 'proxies') {
  * Scripts
  */
 elseif ($srctbl == 'scripts') {
-	$form = new CForm();
-	$form->setName('scriptform');
-	$form->setId('scripts');
+	$form = (new CForm())
+		->setName('scriptform')
+		->setId('scripts');
 
 	$table = new CTableInfo();
 

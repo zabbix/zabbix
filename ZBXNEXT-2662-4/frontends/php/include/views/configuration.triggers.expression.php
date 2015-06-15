@@ -24,11 +24,11 @@ require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 $expressionWidget = new CWidget();
 
 // create form
-$expressionForm = new CForm();
-$expressionForm->setName('expression');
-$expressionForm->addVar('dstfrm', $this->data['dstfrm']);
-$expressionForm->addVar('dstfld1', $this->data['dstfld1']);
-$expressionForm->addVar('itemid', $this->data['itemid']);
+$expressionForm = (new CForm())
+	->setName('expression')
+	->addVar('dstfrm', $this->data['dstfrm'])
+	->addVar('dstfld1', $this->data['dstfld1'])
+	->addVar('itemid', $this->data['itemid']);
 
 if (!empty($this->data['parent_discoveryid'])) {
 	$expressionForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);

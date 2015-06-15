@@ -22,10 +22,10 @@
 $dashconfWidget = (new CWidget())->setTitle(_('Dashboard'));
 
 // create form
-$dashconfForm = new CForm();
-$dashconfForm->setName('dashconf');
-$dashconfForm->setId('dashform');
-$dashconfForm->addVar('filterEnable', $this->data['isFilterEnable']);
+$dashconfForm = (new CForm())
+	->setName('dashconf')
+	->setId('dashform')
+	->addVar('filterEnable', $this->data['isFilterEnable']);
 
 // create form list
 $dashconfFormList = new CFormList('dashconfFormList');

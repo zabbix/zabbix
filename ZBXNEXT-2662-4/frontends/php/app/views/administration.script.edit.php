@@ -24,30 +24,33 @@ $this->includeJSfile('app/views/administration.script.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Scripts'));
 
-$scriptForm = new CForm();
-$scriptForm->setId('scriptForm');
-$scriptForm->addVar('form', 1);
-$scriptForm->addVar('scriptid', $data['scriptid']);
+$scriptForm = (new CForm())
+	->setId('scriptForm')
+	->addVar('form', 1)
+	->addVar('scriptid', $data['scriptid']);
 
 $scriptFormList = new CFormList();
 
-// name
-$nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$nameTextBox->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'));
-$scriptFormList->addRow(_('Name'), $nameTextBox);
+$scriptFormList->addRow(
+	_('Name'),
+	(new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE))
+		->setAttribute('autofocus', 'autofocus')
+		->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
+);
 
-// type
-$scriptFormList->addRow(_('Type'), new CComboBox('type', $data['type'], null, [
-	ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
-	ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Script')
-]));
+$scriptFormList->addRow(
+	_('Type'),
+	new CComboBox('type', $data['type'], null, [
+		ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
+		ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Script')
+	])
+);
 
 // execute on
-$typeRadioButton = new CRadioButtonList('execute_on', $data['execute_on']);
-$typeRadioButton->makeVertical();
-$typeRadioButton->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
-$typeRadioButton->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
+$typeRadioButton = (new CRadioButtonList('execute_on', $data['execute_on']))
+	->makeVertical()
+	->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+	->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
 $scriptFormList->addRow(
 	_('Execute on'),
 	(new CDiv($typeRadioButton))->addClass('objectgroup inlineblock border_dotted'),
@@ -63,7 +66,10 @@ $scriptFormList->addRow(
 	new CTextBox('commandipmi', $data['commandipmi'], ZBX_TEXTBOX_STANDARD_SIZE),
 	($data['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
 );
-$scriptFormList->addRow(_('Description'), new CTextArea('description', $data['description']));
+$scriptFormList->addRow(
+	_('Description'),
+	new CTextArea('description', $data['description'])
+);
 
 // user groups
 $user_groups = [0 => _('All')];
@@ -103,8 +109,7 @@ $scriptFormList->addRow($confirmationLabel, [
 	(new CButton('testConfirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 ]);
 
-$scriptView = new CTabView();
-$scriptView->addTab('scripts', _('Script'), $scriptFormList);
+$scriptView = (new CTabView())->addTab('scripts', _('Script'), $scriptFormList);
 
 // footer
 $cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list'))->setId('cancel');

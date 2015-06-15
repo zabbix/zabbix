@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/js/configuration.action.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Actions'));
 
 // create form
-$actionForm = new CForm();
-$actionForm->setName('action.edit');
-$actionForm->addVar('form', $this->data['form']);
+$actionForm = (new CForm())
+	->setName('action.edit')
+	->addVar('form', $this->data['form']);
 
 if ($this->data['actionid']) {
 	$actionForm->addVar('actionid', $this->data['actionid']);

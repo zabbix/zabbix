@@ -24,8 +24,7 @@ include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 $servicesChildWidget = (new CWidget())->setTitle(_('IT service dependencies'));
 
 // create form
-$servicesChildForm = new CForm();
-$servicesChildForm->setName('servicesForm');
+$servicesChildForm = (new CForm())->setName('servicesForm');
 if (!empty($this->data['service'])) {
 	$servicesChildForm->addVar('serviceid', $this->data['service']['serviceid']);
 }

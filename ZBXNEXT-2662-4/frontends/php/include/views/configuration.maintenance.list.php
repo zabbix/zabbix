@@ -28,8 +28,7 @@ $widget = (new CWidget())
 		));
 
 // create form
-$maintenanceForm = new CForm();
-$maintenanceForm->setName('maintenanceForm');
+$maintenanceForm = (new CForm())->setName('maintenanceForm');
 
 // create table
 $maintenanceTable = (new CTableInfo())

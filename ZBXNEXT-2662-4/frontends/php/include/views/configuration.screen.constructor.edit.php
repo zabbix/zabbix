@@ -25,12 +25,10 @@ if (isset($_REQUEST['screenitemid'])) {
 }
 
 // create screen form
-$screenForm = new CForm('post', $action);
-$screenForm->setName('screen_item_form');
+$screenForm = (new CForm('post', $action))->setName('screen_item_form');
 
 // create screen form list
-$screenFormList = new CFormList();
-$screenFormList->addVar('screenid', $_REQUEST['screenid']);
+$screenFormList = (new CFormList())->addVar('screenid', $_REQUEST['screenid']);
 
 if (isset($_REQUEST['screenitemid'])) {
 	$screenFormList->addVar('screenitemid', $_REQUEST['screenitemid']);

@@ -24,17 +24,17 @@ $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 $widget = (new CWidget())->setTitle(_('Proxies'));
 
 // create form
-$proxyForm = new CForm();
-$proxyForm->setId('proxyForm');
-$proxyForm->addVar('proxyid', $data['proxyid']);
+$proxyForm = (new CForm())
+	->setId('proxyForm')
+	->addVar('proxyid', $data['proxyid']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
 }
 
 // create form list
 $proxyFormList = new CFormList('proxyFormList');
-$nameTextBox = new CTextBox('host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
+$nameTextBox = (new CTextBox('host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128))
+	->setAttribute('autofocus', 'autofocus');
 $proxyFormList->addRow(_('Proxy name'), $nameTextBox);
 
 // append status to form list
@@ -52,10 +52,10 @@ $interfaceTable = (new CTable())
 		_('Port')
 	]);
 
-$connectByComboBox = new CRadioButtonList('useip', $data['useip']);
-$connectByComboBox->addValue(_('IP'), 1);
-$connectByComboBox->addValue(_('DNS'), 0);
-$connectByComboBox->useJQueryStyle();
+$connectByComboBox = (new CRadioButtonList('useip', $data['useip']))
+	->addValue(_('IP'), 1)
+	->addValue(_('DNS'), 0)
+	->useJQueryStyle();
 
 $interfaceTable->addRow([
 	new CTextBox('ip', $data['ip'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
@@ -87,8 +87,7 @@ $proxyFormList->addRow(_('Hosts'), $hostsTweenBox->get(_('Proxy hosts'), _('Othe
 $proxyFormList->addRow(_('Description'), new CTextArea('description', $data['description']));
 
 // append tabs to form
-$proxyTab = new CTabView();
-$proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
+$proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxyFormList);
 
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list'))->setId('cancel');

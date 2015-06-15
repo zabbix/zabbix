@@ -35,8 +35,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$hostGroupForm = new CForm();
-$hostGroupForm->setName('hostgroupForm');
+$hostGroupForm = (new CForm())->setName('hostgroupForm');
 
 // create table
 $hostGroupTable = (new CTableInfo())

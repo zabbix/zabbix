@@ -213,8 +213,8 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
  */
 $triggerWidget = (new CWidget())->setTitle(_('Status of triggers'));
 
-$rightForm = new CForm('get');
-$rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
+$rightForm = (new CForm('get'))
+	->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 $controls = new CList();
 $controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
@@ -253,9 +253,9 @@ $triggerWidget->addItem($filterForm);
 /*
  * Form
  */
-$triggerForm = new CForm('get', 'acknow.php');
-$triggerForm->setName('tr_status');
-$triggerForm->addVar('backurl', $page['file']);
+$triggerForm = (new CForm('get', 'acknow.php'))
+	->setName('tr_status')
+	->addVar('backurl', $page['file']);
 
 /*
  * Table

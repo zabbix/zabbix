@@ -26,8 +26,7 @@ $widget = (new CWidget())
 	);
 
 // create form
-$userGroupsForm = new CForm();
-$userGroupsForm->setName('userGroupsForm');
+$userGroupsForm = (new CForm())->setName('userGroupsForm');
 
 // create user group table
 $userGroupTable = (new CTableInfo())
