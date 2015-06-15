@@ -3810,6 +3810,7 @@ static int	__config_regexp_compare(const void *d1, const void *d2)
 	return r1->name == r2->name ? 0 : strcmp(r1->name, r2->name);
 }
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 static zbx_hash_t	__config_psk_hash(const void *data)
 {
 	const ZBX_DC_PSK	*psk_i = (const ZBX_DC_PSK *)data;
@@ -3826,6 +3827,7 @@ static int	__config_psk_compare(const void *d1, const void *d2)
 	return psk_1->tls_psk_identity == psk_2->tls_psk_identity ? 0 : strcmp(psk_1->tls_psk_identity,
 			psk_2->tls_psk_identity);
 }
+#endif
 
 void	init_configuration_cache(void)
 {
