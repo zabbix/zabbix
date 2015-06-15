@@ -172,7 +172,7 @@ foreach ($data['hosts'] as $host) {
 		$hostTemplates[] = $caption;
 	}
 
-	if ($host['tls_connect'] != HOST_ENCRYPTION_NONE || $host['tls_in_psk'] || $host['tls_in_cert']) {
+	if ($host['tls_connect'] != HOST_ENCRYPTION_NONE || $host['tls_accept']) {
 		// input
 		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
 			$in_encryption = (new CSpan(_('None')))->addClass('status-grey');
@@ -185,36 +185,15 @@ foreach ($data['hosts'] as $host) {
 		}
 
 		// output
-		switch($host['tls_accept']) {
-			case HOST_ENCRYPTION_OUT_NONE:
-			case HOST_ENCRYPTION_OUT_NO:
-				$out_encryption = (new CSpan(_('None')))->addClass('status-grey');
-			case HOST_ENCRYPTION_OUT_PSK:
-				$out_encryption = (new CSpan(_('PSK')))->addClass('status-green');
-			case HOST_ENCRYPTION_OUT_NO_PSK:
-				$out_encryption = [(new CSpan(_('None')))->addClass('status-grey'),
-					(new CSpan(_('PSK')))->addClass('status-green')
-				];
-				break;
-			case HOST_ENCRYPTION_OUT_CERT:
-				$out_encryption = (new CSpan(_('CERT')))->addClass('status-green');
-				break;
-			case HOST_ENCRYPTION_OUT_NO_CERT:
-				$out_encryption = [(new CSpan(_('None')))->addClass('status-grey'),
-					(new CSpan(_('CERT')))->addClass('status-green')
-				];
-				break;
-			case HOST_ENCRYPTION_OUT_PSK_CERT:
-				$out_encryption = [(new CSpan(_('PSK')))->addClass('status-green'),
-					(new CSpan(_('CERT')))->addClass('status-green')
-				];
-				break;
-			case HOST_ENCRYPTION_OUT_ALL:
-				$out_encryption = [(new CSpan(_('None')))->addClass('status-grey'),
-					(new CSpan(_('PSK')))->addClass('status-green'),
-					(new CSpan(_('CERT')))->addClass('status-green')
-				];
-				break;
+		$out_encryption = [];
+		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+			$out_encryption[] = (new CSpan(_('None')))->addClass('status-grey');
+		}
+		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
+			$out_encryption[] = (new CSpan(_('PSK')))->addClass('status-green');
+		}
+		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
+			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-green');
 		}
 
 		$encryption = (new CDiv([$in_encryption, $out_encryption]))->addClass('status-container');

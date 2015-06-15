@@ -764,16 +764,16 @@ $encryptionFormList->addRow(_('Connections to host'), new CComboBox('tls_connect
 	HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
 ]));
 $encryptionFormList->addRow(_('Connections from host'), [
-	[new CCheckBox('tls_in_none', ($data['tls_accept'] & 1) == 1), 'No encryption'],
+	[new CCheckBox('tls_in_none'), _('No encryption')],
 	BR(),
-	[new CCheckBox('tls_in_psk', ($data['tls_accept'] & 2) == 2), 'PSK'],
+	[new CCheckBox('tls_in_psk'), _('PSK')],
 	BR(),
-	[new CCheckBox('tls_in_cert', ($data['tls_accept'] & 4) == 4), 'Certificate']
+	[new CCheckBox('tls_in_cert'), _('Certificate')]
 ]);
-$encryptionFormList->addRow(_('Issuer'), new CTextBox('tls_issuer', $data['tls_issuer'], 64));
-$encryptionFormList->addRow(_('Subject'), new CTextBox('tls_subject', $data['tls_subject'], 64));
 $encryptionFormList->addRow(_('PSK identity'), new CTextBox('tls_psk_identity', $data['tls_psk_identity'], 64));
 $encryptionFormList->addRow(_('PSK'), new CTextBox('tls_psk', $data['tls_psk'], 64, false, 512));
+$encryptionFormList->addRow(_('Issuer'), new CTextBox('tls_issuer', $data['tls_issuer'], 64));
+$encryptionFormList->addRow(_('Subject'), new CTextBox('tls_subject', $data['tls_subject'], 64));
 
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
 
