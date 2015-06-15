@@ -111,7 +111,6 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		char **error)
 {
 	zbx_uint64_t		hostid_tmp;
-	unsigned int		status, tls_accept;
 	char			*ch_error;
 	zbx_tls_conn_attr_t	attr;
 
@@ -2204,8 +2203,9 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 	int			*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL,
 				flag_host_allow = 0;
 	size_t			num = 0;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_conn_attr_t	attr;
-
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * values_num);

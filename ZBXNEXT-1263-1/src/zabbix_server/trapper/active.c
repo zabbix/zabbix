@@ -91,8 +91,9 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		if (HOST_STATUS_MONITORED == atoi(row[1]))
 		{
 			unsigned int		tls_accept;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			zbx_tls_conn_attr_t	attr;
-
+#endif
 			tls_accept = (unsigned int)atoi(row[2]);
 
 			if (0 == (tls_accept & sock->connection_type))
