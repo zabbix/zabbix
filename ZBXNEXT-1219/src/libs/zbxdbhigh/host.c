@@ -2522,6 +2522,7 @@ static void	DBcopy_template_item_application_prototypes(zbx_uint64_t hostid, con
 	}
 	while (NULL != (row = DBfetch(result)));
 
+	zbx_db_insert_autoincrement(&db_insert, "item_application_prototypeid");
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);
 out:
