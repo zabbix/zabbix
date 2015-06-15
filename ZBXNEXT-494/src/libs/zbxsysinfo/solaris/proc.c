@@ -572,7 +572,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == (flags = get_rparam(request, 5)) || '\0' == *flags)
+	if (NULL == (flags = get_rparam(request, 5)) || '\0' == *flags || 0 == strcmp(flags, "current"))
 	{
 		zoneflag = ZBX_PROCSTAT_FLAGS_ZONE_CURRENT;
 	}
