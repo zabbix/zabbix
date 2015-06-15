@@ -19,22 +19,68 @@
 **/
 
 
-$macrosForm = new CForm();
-$macrosForm->setName('macrosForm');
+require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
-// tab
-$macrosTab = new CTabView();
+$widget = (new CWidget())
+	->setTitle(_('Macros'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.macros.php')))
+	);
 
-$macrosView = new CView('common.macros', array(
-	'macros' => $this->get('macros')
-));
-$macrosTab->addTab('macros', _('Macros'), $macrosView->render());
+$table = (new CTable())
+	->addClass('formElementTable')
+	->setId('tbl_macros')
+	->addRow([_('Macro'), '', _('Value'), '']);
+
+// fields
+foreach ($data['macros'] as $i => $macro) {
+	$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64);
+	$macro_input->addClass('macro');
+	$macro_input->setAttribute('placeholder', '{$MACRO}');
+
+	$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
+	$value_input->setAttribute('placeholder', _('value'));
+
+	$button_cell = [
+		(new CButton('macros['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	];
+	if (array_key_exists('globalmacroid', $macro)) {
+		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
+	}
+
+	$table->addRow([$macro_input, '&rArr;', $value_input, $button_cell], 'form_row');
+}
+
+// buttons
+$buttons_column = new CCol(
+	(new CButton('macro_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+);
+$buttons_column->setAttribute('colspan', 5);
+
+$table->addRow(new CRow($buttons_column, null, 'row_new_macro'));
+
+// form list
+$macros_form_list = new CFormList('macrosFormList');
+$macros_form_list->addRow($table);
+
+$tab_view = new CTabView();
+$tab_view->addTab('macros', _('Macros'), $macros_form_list);
 
 $saveButton = new CSubmit('update', _('Update'));
-$saveButton->attr('data-removed-count', 0);
+$saveButton->setAttribute('data-removed-count', 0);
 $saveButton->main();
 
-$macrosForm->addItem($macrosTab);
-$macrosForm->addItem(makeFormFooter(null, array($saveButton)));
+$tab_view->setFooter(makeFormFooter($saveButton));
 
-return $macrosForm;
+$form = new CForm();
+$form->setName('macrosForm');
+$form->addItem($tab_view);
+
+$widget->addItem($form);
+
+return $widget;

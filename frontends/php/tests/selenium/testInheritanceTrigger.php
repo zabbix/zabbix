@@ -68,15 +68,15 @@ class testInheritanceTrigger extends CWebTest {
 	}
 
 	public static function create() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_GOOD,
 					'description' => 'testInheritanceTrigger',
 					'expression' => '{Inheritance test template:test-inheritance-item1.last()}=0'
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**

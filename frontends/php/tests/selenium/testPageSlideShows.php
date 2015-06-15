@@ -38,10 +38,10 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
 		// Header
-		$this->zbxTestTextPresent(array('Name', 'Delay', 'Count of slides'));
+		$this->zbxTestTextPresent(['Name', 'Delay', 'Number of slides']);
 		// Data
-		$this->zbxTestTextPresent(array($slideshow['name']));
-		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
+		$this->zbxTestTextPresent([$slideshow['name']]);
+		$this->zbxTestDropdownHasOptions('action', ['Delete selected']);
 	}
 
 	/**
@@ -79,7 +79,7 @@ class testPageSlideShows extends CWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Default delay (in seconds)');
 		$this->zbxTestTextPresent('Slides');
-		$this->zbxTestTextPresent(array('Screen', 'Delay', 'Action'));
+		$this->zbxTestTextPresent(['Screen', 'Delay', 'Action']);
 		$this->zbxTestClickWait('cancel');
 		$this->zbxTestTextPresent('SLIDE SHOWS');
 	}

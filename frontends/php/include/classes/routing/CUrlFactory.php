@@ -28,78 +28,78 @@ class CUrlFactory {
 	 *
 	 * @var array
 	 */
-	protected static $contextConfigs = array(
-		'actionconf.php' => array(
-			'remove' => array('actionid')
-		),
-		'applications.php' => array(
-			'remove' => array('applicationid')
-		),
-		'disc_prototypes.php' => array(
-			'remove' => array('itemid'),
-			'add' => array('hostid', 'parent_discoveryid')
-		),
-		'discoveryconf.php' => array(
-			'remove' => array('druleid')
-		),
-		'graphs.php' => array(
-			'remove' => array('graphid'),
-			'add' => array('hostid', 'parent_discoveryid')
-		),
-		'host_discovery.php' => array(
-			'remove' => array('itemid'),
-			'add' => array('hostid')
-		),
-		'host_prototypes.php' => array(
-			'remove' => array('hostid'),
-			'add' => array('parent_discoveryid')
-		),
-		'hostgroups.php' => array(
-			'remove' => array('groupid')
-		),
-		'hosts.php' => array(
-			'remove' => array('hostid')
-		),
-		'httpconf.php' => array(
-			'remove' => array('httptestid')
-		),
-		'items.php' => array(
-			'remove' => array('itemid')
-		),
-		'maintenance.php' => array(
-			'remove' => array('maintenanceid')
-		),
-		'screenconf.php' => array(
-			'remove' => array('screenid'),
-			'add' => array('templateid')
-		),
-		'slideconf.php' => array(
-			'remove' => array('slideshowid')
-		),
-		'sysmaps.php' => array(
-			'remove' => array('sysmapid')
-		),
-		'templates.php' => array(
-			'remove' => array('templateid')
-		),
-		'trigger_prototypes.php' => array(
-			'remove' =>  array('triggerid'),
-			'add' => array('parent_discoveryid', 'hostid')
-		),
-		'triggers.php' => array(
-			'remove' => array('triggerid'),
-			'add' => array('hostid')
-		),
-		'usergrps.php' => array(
-			'remove' => array('usrgrpid')
-		),
-		'users.php' => array(
-			'remove' => array('userid')
-		),
-		'__default' => array(
-			'remove' => array('cancel', 'form', 'delete')
-		)
-	);
+	protected static $contextConfigs = [
+		'actionconf.php' => [
+			'remove' => ['actionid']
+		],
+		'applications.php' => [
+			'remove' => ['applicationid']
+		],
+		'disc_prototypes.php' => [
+			'remove' => ['itemid'],
+			'add' => ['hostid', 'parent_discoveryid']
+		],
+		'discoveryconf.php' => [
+			'remove' => ['druleid']
+		],
+		'graphs.php' => [
+			'remove' => ['graphid'],
+			'add' => ['hostid', 'parent_discoveryid']
+		],
+		'host_discovery.php' => [
+			'remove' => ['itemid'],
+			'add' => ['hostid']
+		],
+		'host_prototypes.php' => [
+			'remove' => ['hostid'],
+			'add' => ['parent_discoveryid']
+		],
+		'hostgroups.php' => [
+			'remove' => ['groupid']
+		],
+		'hosts.php' => [
+			'remove' => ['hostid']
+		],
+		'httpconf.php' => [
+			'remove' => ['httptestid']
+		],
+		'items.php' => [
+			'remove' => ['itemid']
+		],
+		'maintenance.php' => [
+			'remove' => ['maintenanceid']
+		],
+		'screenconf.php' => [
+			'remove' => ['screenid'],
+			'add' => ['templateid']
+		],
+		'slideconf.php' => [
+			'remove' => ['slideshowid']
+		],
+		'sysmaps.php' => [
+			'remove' => ['sysmapid']
+		],
+		'templates.php' => [
+			'remove' => ['templateid']
+		],
+		'trigger_prototypes.php' => [
+			'remove' =>  ['triggerid'],
+			'add' => ['parent_discoveryid', 'hostid']
+		],
+		'triggers.php' => [
+			'remove' => ['triggerid'],
+			'add' => ['hostid']
+		],
+		'usergrps.php' => [
+			'remove' => ['usrgrpid']
+		],
+		'users.php' => [
+			'remove' => ['userid']
+		],
+		'__default' => [
+			'remove' => ['cancel', 'form', 'delete']
+		]
+	];
 
 	/**
 	 * Creates new CUrl object based on giver URL (or $_REQUEST if null is given),

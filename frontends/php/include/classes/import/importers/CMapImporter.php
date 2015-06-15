@@ -39,7 +39,7 @@ class CMapImporter extends CImporter {
 		 */
 		$mapsWithoutElements = $this->getMapsWithoutElements($maps);
 
-		$mapsToProcess = array('createMissing' => array(), 'updateExisting' => array());
+		$mapsToProcess = ['createMissing' => [], 'updateExisting' => []];
 
 		foreach ($mapsWithoutElements as $mapName => $mapWithoutElements) {
 			$mapId = $this->referencer->resolveMap($mapWithoutElements['name']);
@@ -70,16 +70,16 @@ class CMapImporter extends CImporter {
 		}
 
 		// Form an array of maps that need to be updated with elements and links, respecting the create/update options.
-		$mapsToUpdate = array();
+		$mapsToUpdate = [];
 		foreach ($mapsToProcess as $mapActionKey => $mapArray) {
 			if ($this->options['maps'][$mapActionKey] && $mapsToProcess[$mapActionKey]) {
 				foreach ($mapArray as $mapItem) {
-					$map = array(
+					$map = [
 						'sysmapid' => $maps[$mapItem['name']]['sysmapid'],
 						'name' => $mapItem['name'],
 						'selements' => $maps[$mapItem['name']]['selements'],
 						'links' => $maps[$mapItem['name']]['links']
-					);
+					];
 					$map = $this->resolveMapReferences($map);
 
 					// Remove the map name so API does not make an update query to the database.
@@ -111,7 +111,7 @@ class CMapImporter extends CImporter {
 			}
 
 			foreach ($map['selements'] as $selement) {
-				$checked = array($mapName);
+				$checked = [$mapName];
 				if ($circMaps = $this->checkCircularRecursive($selement, $maps, $checked)) {
 					throw new Exception(_s('Circular reference in maps: %1$s.', implode(' - ', $circMaps)));
 				}
@@ -241,12 +241,12 @@ class CMapImporter extends CImporter {
 						break;
 				}
 
-				$icons = array(
+				$icons = [
 					'icon_off' => 'iconid_off',
 					'icon_on' => 'iconid_on',
 					'icon_disabled' => 'iconid_disabled',
 					'icon_maintenance' => 'iconid_maintenance',
-				);
+				];
 				foreach ($icons as $element => $field) {
 					if (!empty($selement[$element])) {
 						$image = getImageByIdent($selement[$element]);
@@ -301,7 +301,7 @@ class CMapImporter extends CImporter {
 	 */
 	protected function resolveMapElementReferences(array $maps) {
 		foreach ($maps as &$map) {
-			if ($map['iconmap']) {
+			if (isset($map['iconmap']) && $map['iconmap']) {
 				$map['iconmapid'] = $this->referencer->resolveIconMap($map['iconmap']['name']);
 
 				if (!$map['iconmapid']) {
@@ -311,7 +311,7 @@ class CMapImporter extends CImporter {
 				}
 			}
 
-			if ($map['background']) {
+			if (isset($map['background']) && $map['background']) {
 				$image = getImageByIdent($map['background']);
 
 				if (!$image) {

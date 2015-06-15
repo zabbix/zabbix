@@ -19,24 +19,36 @@
 **/
 
 
-$valueMappingTable = new CTableInfo(_('No value maps found.'));
-$valueMappingTable->setHeader(array(
+$widget = (new CWidget())
+	->setTitle(_('Value mapping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
+			->addItem(new CSubmit('form', _('Create value map')))
+		)
+	);
+
+$valueMappingTable = new CTableInfo();
+$valueMappingTable->setHeader([
 	_('Name'),
 	_('Value map')
-));
+]);
 
 foreach ($this->data['valuemaps'] as $valuemap) {
 	order_result($valuemap['maps'], 'value');
 
-	$mappings = array();
+	$mappings = [];
 	foreach ($valuemap['maps'] as $map) {
 		$mappings[] = $map['value'].SPACE.'&rArr;'.SPACE.$map['newvalue'];
 		$mappings[] = BR();
 	}
-	$valueMappingTable->addRow(array(
+	$valueMappingTable->addRow([
 		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
 		$mappings
-	));
+	]);
 }
 
-return $valueMappingTable;
+$widget->addItem($valueMappingTable);
+
+return $widget;

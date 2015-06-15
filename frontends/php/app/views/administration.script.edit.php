@@ -22,27 +22,26 @@
 $this->addJSfile('js/multiselect.js');
 $this->includeJSfile('app/views/administration.script.edit.js.php');
 
-$scriptsWidget = new CWidget();
-$scriptsWidget->addPageHeader(_('CONFIGURATION OF SCRIPTS'));
+$widget = (new CWidget())->setTitle(_('Scripts'));
 
 $scriptForm = new CForm();
-$scriptForm->setAttribute('id', 'scriptForm');
+$scriptForm->setId('scriptForm');
 $scriptForm->addVar('form', 1);
 $scriptForm->addVar('scriptid', $data['scriptid']);
 
-$scriptFormList = new CFormList('scriptsTab');
+$scriptFormList = new CFormList();
 
 // name
 $nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
-$nameTextBox->attr('placeholder', _('<Sub-menu/Sub-menu.../>Script'));
+$nameTextBox->setAttribute('autofocus', 'autofocus');
+$nameTextBox->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'));
 $scriptFormList->addRow(_('Name'), $nameTextBox);
 
 // type
-$typeComboBox = new CComboBox('type', $data['type']);
-$typeComboBox->addItem(ZBX_SCRIPT_TYPE_IPMI, _('IPMI'));
-$typeComboBox->addItem(ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT, _('Script'));
-$scriptFormList->addRow(_('Type'), $typeComboBox);
+$scriptFormList->addRow(_('Type'), new CComboBox('type', $data['type'], null, [
+	ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
+	ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Script')
+]));
 
 // execute on
 $typeRadioButton = new CRadioButtonList('execute_on', $data['execute_on']);
@@ -51,7 +50,7 @@ $typeRadioButton->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
 $typeRadioButton->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
 $scriptFormList->addRow(
 	_('Execute on'),
-	new CDiv($typeRadioButton, 'objectgroup inlineblock border_dotted ui-corner-all'),
+	(new CDiv($typeRadioButton))->addClass('objectgroup inlineblock border_dotted'),
 	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
 );
 $scriptFormList->addRow(
@@ -67,83 +66,76 @@ $scriptFormList->addRow(
 $scriptFormList->addRow(_('Description'), new CTextArea('description', $data['description']));
 
 // user groups
-$userGroups = new CComboBox('usrgrpid', $data['usrgrpid']);
-$userGroups->addItem(0, _('All'));
-foreach ($data['usergroups'] as $userGroup){
-	$userGroups->addItem($userGroup['usrgrpid'], $userGroup['name']);
+$user_groups = [0 => _('All')];
+foreach ($data['usergroups'] as $user_group) {
+	$user_groups[$user_group['usrgrpid']] = $user_group['name'];
 }
-$scriptFormList->addRow(_('User group'), $userGroups);
+$scriptFormList->addRow(_('User group'), new CComboBox('usrgrpid', $data['usrgrpid'], null, $user_groups));
 
 // host groups
-$hostGroups = new CComboBox('hgstype', $data['hgstype']);
-$hostGroups->addItem(0, _('All'));
-$hostGroups->addItem(1, _('Selected'));
-$scriptFormList->addRow(_('Host group'), $hostGroups);
-$scriptFormList->addRow(null, new CMultiSelect(array(
+$scriptFormList->addRow(_('Host group'), new CComboBox('hgstype', $data['hgstype'], null, [
+	0 => _('All'),
+	1 => _('Selected')
+]));
+$scriptFormList->addRow(null, new CMultiSelect([
 	'name' => 'groupid',
 	'selectedLimit' => 1,
 	'objectName' => 'hostGroup',
 	'data' => $data['hostgroup'],
-	'popup' => array(
-		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid',
-		'width' => 450,
-		'height' => 450
-	)
-)), null, 'hostGroupSelection');
+	'popup' => [
+		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
+	]
+]), null, 'hostGroupSelection');
 
 // access
-$accessComboBox = new CComboBox('host_access', $data['host_access']);
-$accessComboBox->addItem(PERM_READ, _('Read'));
-$accessComboBox->addItem(PERM_READ_WRITE, _('Write'));
-$scriptFormList->addRow(_('Required host permissions'), $accessComboBox);
+$scriptFormList->addRow(_('Required host permissions'), new CComboBox('host_access', $data['host_access'], null, [
+	PERM_READ => _('Read'),
+	PERM_READ_WRITE => _('Write')
+]));
 $scriptFormList->addRow(new CLabel(_('Enable confirmation'), 'enable_confirmation'),
-	new CCheckBox('enable_confirmation', $data['enable_confirmation']));
+	(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'] == 1)
+);
 
 $confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
-$scriptFormList->addRow($confirmationLabel, array(
+$scriptFormList->addRow($confirmationLabel, [
 	new CTextBox('confirmation', $data['confirmation'], ZBX_TEXTBOX_STANDARD_SIZE),
 	SPACE,
-	new CButton('testConfirmation', _('Test confirmation'), null, 'link_menu')
-));
+	(new CButton('testConfirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
+]);
 
 $scriptView = new CTabView();
 $scriptView->addTab('scripts', _('Script'), $scriptFormList);
-$scriptForm->addItem($scriptView);
 
 // footer
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list');
-$cancelButton->setAttribute('id', 'cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=script.list'))->setId('cancel');
 
 if ($data['scriptid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'script.create');
-	$addButton->setAttribute('id', 'add');
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'script.create'))->setId('add');
 
-	$scriptForm->addItem(makeFormFooter(
+	$scriptView->setFooter(makeFormFooter(
 		$addButton,
-		array($cancelButton)
+		[$cancelButton]
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'script.update');
-	$updateButton->setAttribute('id', 'update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
+	$updateButton = (new CSubmitButton(_('Update'), 'action', 'script.update'))->setId('update');
+	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
+	$deleteButton = (new CRedirectButton(_('Delete'),
 		'zabbix.php?action=script.delete&sid='.$data['sid'].'&scriptids[]='.$data['scriptid'],
 		_('Delete script?')
-	);
-	$deleteButton->setAttribute('id', 'delete');
+	))
+		->setId('delete');
 
-	$scriptForm->addItem(makeFormFooter(
+	$scriptView->setFooter(makeFormFooter(
 		$updateButton,
-		array(
+		[
 			$cloneButton,
 			$deleteButton,
 			$cancelButton
-		)
+		]
 	));
 }
 
-$scriptsWidget->addItem($scriptForm);
+$scriptForm->addItem($scriptView);
 
-$scriptsWidget->show();
+$widget->addItem($scriptForm)->show();

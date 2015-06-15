@@ -22,46 +22,46 @@
 class CSetParserTest extends CParserTest {
 
 	protected function getParser() {
-		return new CSetParser(array('<', '>', '<>', 'and', 'or'));
+		return new CSetParser(['<', '>', '<>', 'and', 'or']);
 	}
 
 	public function validProvider() {
-		return array(
-			array('<', 0, '<', 1),
-			array('<=', 0, '<', 1),
-			array('>', 0, '>', 1),
-			array('>=', 0, '>', 1),
-			array('<>', 0, '<>', 2),
-			array('<>=', 0, '<>', 2),
-			array('and', 0, 'and', 3),
-			array('and this', 0, 'and', 3),
-			array('or', 0, 'or', 2),
-			array('or this', 0, 'or', 2),
+		return [
+			['<', 0, '<', 1],
+			['<=', 0, '<', 1],
+			['>', 0, '>', 1],
+			['>=', 0, '>', 1],
+			['<>', 0, '<>', 2],
+			['<>=', 0, '<>', 2],
+			['and', 0, 'and', 3],
+			['and this', 0, 'and', 3],
+			['or', 0, 'or', 2],
+			['or this', 0, 'or', 2],
 
-			array('prefix<', 6, '<', 1),
-			array('prefix<=', 6, '<', 1),
-			array('prefix>', 6, '>', 1),
-			array('prefix>=', 6, '>', 1),
-			array('prefix<>', 6, '<>', 2),
-			array('prefix<>=', 6, '<>', 2),
-			array('prefixand', 6, 'and', 3),
-			array('prefixand this', 6, 'and', 3),
-			array('prefixor', 6, 'or', 2),
-			array('prefixor this', 6, 'or', 2),
+			['prefix<', 6, '<', 1],
+			['prefix<=', 6, '<', 1],
+			['prefix>', 6, '>', 1],
+			['prefix>=', 6, '>', 1],
+			['prefix<>', 6, '<>', 2],
+			['prefix<>=', 6, '<>', 2],
+			['prefixand', 6, 'and', 3],
+			['prefixand this', 6, 'and', 3],
+			['prefixor', 6, 'or', 2],
+			['prefixor this', 6, 'or', 2],
 
-			array('><', 0, '>', 1),
-		);
+			['><', 0, '>', 1],
+		];
 	}
 
 	public function invalidProvider() {
-		return array(
-			array('', 0, 0),
-			array('an', 0, 2),
-			array('anor', 0, 4),
-			array('+<', 0, 0),
+		return [
+			['', 0, 0],
+			['an', 0, 2],
+			['anor', 0, 4],
+			['+<', 0, 0],
 
-			array('prefixand', 5, 5),
-			array('prefixand', 7, 9),
-		);
+			['prefixand', 5, 5],
+			['prefixand', 7, 9],
+		];
 	}
 }

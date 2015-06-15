@@ -41,32 +41,32 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 	}
 
 	public static function providerTriggers() {
-		return array(
-			array(
+		return [
+			[
 				'13517',
 				'trigger host.host:Host for trigger description macros | '.
 				'host.host2:{HOST.HOST2} | host.name:Host for trigger description macros | '.
 				'item.value:5 | item.value1:5 | item.lastvalue:5 | host.ip:127.0.0.1 | '.
 				'host.dns: | host.conn:127.0.0.1'
-			),
-		);
+			],
+		];
 	}
 
 	public static function providerReferenceMacros() {
-		return array(
-			array(
+		return [
+			[
 				'expression' => '{123}=1',
 				'text' => 'd $1'
-			),
-			array(
+			],
+			[
 				'expression' => '{1}=1&{2}>2',
 				'text' => 'd $1 $2 $3'
-			),
-			array(
+			],
+			[
 				'expression' => '{1}=123&{2}>{$MACRO}',
 				'text' => 'd $1 $2 $3'
-			),
-		);
+			],
+		];
 	}
 
 	/**

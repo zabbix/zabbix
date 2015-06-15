@@ -22,147 +22,147 @@
 class CCollectionValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
-		return array(
-			array(array(
+		return [
+			[[
 				'empty' => true,
 				'uniqueField' => 'field',
 				'uniqueField2' => 'field',
 				'messageInvalid' => 'Not an array',
 				'messageEmpty' => 'Empty collection',
 				'messageDuplicate' => 'Collection has duplicate values',
-			))
-		);
+			]]
+		];
 	}
 
 	public function validValuesProvider() {
-		return array(
-			array(
-				array(),
-				array(1, 2, 3)
-			),
-			array(
-				array('empty' => true),
-				array()
-			),
-			array(
-				array('uniqueField' => 'type'),
-				array(
-					array('type' => 1),
-					array('type' => 2),
-					array('type' => 3)
-				)
-			),
-			array(
-				array('uniqueField' => 'type', 'uniqueField2' => 'subtype'),
-				array(
-					array('type' => 1, 'subtype' => 1),
-					array('type' => 1, 'subtype' => 2),
-					array('type' => 2, 'subtype' => 1),
-					array('type' => 2, 'subtype' => 2),
-				)
-			),
-			array(
-				array('uniqueField' => 'type', 'uniqueField2' => null),
-				array(
-					array('type' => 1),
-					array('type' => 2),
-					array('type' => 3)
-				)
-			)
-		);
+		return [
+			[
+				[],
+				[1, 2, 3]
+			],
+			[
+				['empty' => true],
+				[]
+			],
+			[
+				['uniqueField' => 'type'],
+				[
+					['type' => 1],
+					['type' => 2],
+					['type' => 3]
+				]
+			],
+			[
+				['uniqueField' => 'type', 'uniqueField2' => 'subtype'],
+				[
+					['type' => 1, 'subtype' => 1],
+					['type' => 1, 'subtype' => 2],
+					['type' => 2, 'subtype' => 1],
+					['type' => 2, 'subtype' => 2],
+				]
+			],
+			[
+				['uniqueField' => 'type', 'uniqueField2' => null],
+				[
+					['type' => 1],
+					['type' => 2],
+					['type' => 3]
+				]
+			]
+		];
 	}
 
 	public function invalidValuesProvider() {
-		return array(
-			array(
-				array('messageInvalid' => 'Not an array'),
+		return [
+			[
+				['messageInvalid' => 'Not an array'],
 				'',
 				'Not an array'
-			),
-			array(
-				array('messageInvalid' => 'Not an array'),
+			],
+			[
+				['messageInvalid' => 'Not an array'],
 				0,
 				'Not an array'
-			),
-			array(
-				array('messageInvalid' => 'Not an array'),
+			],
+			[
+				['messageInvalid' => 'Not an array'],
 				null,
 				'Not an array'
-			),
-			array(
-				array('messageEmpty' => 'Empty collection'),
-				array(),
+			],
+			[
+				['messageEmpty' => 'Empty collection'],
+				[],
 				'Empty collection'
-			),
-			array(
-				array('uniqueField' => 'type', 'messageDuplicate' => 'Duplicate type "%1$s"'),
-				array(
-					array('type' => 1),
-					array('type' => 1),
-					array('type' => 3)
-				),
+			],
+			[
+				['uniqueField' => 'type', 'messageDuplicate' => 'Duplicate type "%1$s"'],
+				[
+					['type' => 1],
+					['type' => 1],
+					['type' => 3]
+				],
 				'Duplicate type "1"'
-			),
-			array(
-				array('uniqueField' => 'type', 'uniqueField2' => 'subtype',
-					'messageDuplicate' => 'Duplicate type "%1$s" and subtype "%2$s"'),
-				array(
-					array('type' => 1, 'subtype' => 1),
-					array('type' => 1, 'subtype' => 2),
-					array('type' => 2, 'subtype' => 2),
-					array('type' => 2, 'subtype' => 2),
-				),
+			],
+			[
+				['uniqueField' => 'type', 'uniqueField2' => 'subtype',
+					'messageDuplicate' => 'Duplicate type "%1$s" and subtype "%2$s"'],
+				[
+					['type' => 1, 'subtype' => 1],
+					['type' => 1, 'subtype' => 2],
+					['type' => 2, 'subtype' => 2],
+					['type' => 2, 'subtype' => 2],
+				],
 				'Duplicate type "2" and subtype "2"'
-			),
-		);
+			],
+		];
 	}
 
 	public function invalidValuesWithObjectsProvider() {
-		return array(
-			array(
-			array('messageInvalid' => 'Not an array for "%1$s"'),
+		return [
+			[
+			['messageInvalid' => 'Not an array for "%1$s"'],
 				'',
 				'Not an array for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Not an array for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Not an array for "%1$s"'],
 				0,
 				'Not an array for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Not an array for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Not an array for "%1$s"'],
 				null,
 				'Not an array for "object"'
-			),
-			array(
-				array('messageEmpty' => 'Empty collection for "%1$s"'),
-				array(),
+			],
+			[
+				['messageEmpty' => 'Empty collection for "%1$s"'],
+				[],
 				'Empty collection for "object"'
-			),
-			array(
-				array('uniqueField' => 'type', 'messageDuplicate' => 'Duplicate type "%2$s" for "%1$s"'),
-				array(
-					array('type' => 1),
-					array('type' => 1),
-					array('type' => 3)
-				),
+			],
+			[
+				['uniqueField' => 'type', 'messageDuplicate' => 'Duplicate type "%2$s" for "%1$s"'],
+				[
+					['type' => 1],
+					['type' => 1],
+					['type' => 3]
+				],
 				'Duplicate type "1" for "object"'
-			),
-			array(
-				array('uniqueField' => 'type', 'uniqueField2' => 'subtype',
-					'messageDuplicate' => 'Duplicate type "%2$s" and subtype "%3$s" for "%1$s"'),
-				array(
-					array('type' => 1, 'subtype' => 1),
-					array('type' => 1, 'subtype' => 2),
-					array('type' => 2, 'subtype' => 2),
-					array('type' => 2, 'subtype' => 2),
-				),
+			],
+			[
+				['uniqueField' => 'type', 'uniqueField2' => 'subtype',
+					'messageDuplicate' => 'Duplicate type "%2$s" and subtype "%3$s" for "%1$s"'],
+				[
+					['type' => 1, 'subtype' => 1],
+					['type' => 1, 'subtype' => 2],
+					['type' => 2, 'subtype' => 2],
+					['type' => 2, 'subtype' => 2],
+				],
 				'Duplicate type "2" and subtype "2" for "object"'
-			),
-		);
+			],
+		];
 	}
 
-	protected function createValidator(array $params = array()) {
+	protected function createValidator(array $params = []) {
 		return new CCollectionValidator($params);
 	}
 }

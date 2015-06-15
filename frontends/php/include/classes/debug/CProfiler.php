@@ -47,14 +47,14 @@ class CProfiler {
 	 *
 	 * @var array
 	 */
-	protected $apiLog = array();
+	protected $apiLog = [];
 
 	/**
 	 * Contains SQL queries info.
 	 *
 	 * @var array
 	 */
-	protected $sqlQueryLog = array();
+	protected $sqlQueryLog = [];
 
 	/**
 	 * Total time of all performed sql queries.
@@ -188,11 +188,12 @@ class CProfiler {
 			$debug_str .= rtrim($callStackString, '-> ').'</span>'.'<br>'.'<br>';
 		}
 
-		$debug = new CDiv(null, 'textcolorstyles');
-		$debug->attr('name', 'zbx_debug_info');
-		$debug->attr('style', 'display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
-		$debug->addItem(array(BR(), new CJsScript($debug_str), BR()));
-		$debug->show();
+		$debug = (new CDiv())
+			->addClass('textcolorstyles')
+			->setAttribute('name', 'zbx_debug_info')
+			->setAttribute('style', 'display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;')
+			->addItem([BR(), new CJsScript($debug_str), BR()])
+			->show();
 	}
 
 	/**
@@ -210,11 +211,11 @@ class CProfiler {
 		$time = round($time, 6);
 
 		$this->sqlTotalTime += $time;
-		$this->sqlQueryLog[] = array(
+		$this->sqlQueryLog[] = [
 			$time,
 			$sql,
 			array_slice(debug_backtrace(), 1)
-		);
+		];
 	}
 
 	/**
@@ -245,14 +246,14 @@ class CProfiler {
 			$line = null;
 		}
 
-		$this->apiLog[] = array(
+		$this->apiLog[] = [
 			$class,
 			$method,
 			$params,
 			$result,
 			$file,
 			$line
-		);
+		];
 	}
 
 	/**
@@ -283,7 +284,7 @@ class CProfiler {
 		}
 
 		$callStackString = '';
-		$callWithFile = array();
+		$callWithFile = [];
 
 		$callStack = array_reverse($callStack);
 		$firstCall = reset($callStack);

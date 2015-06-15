@@ -66,8 +66,8 @@ class CTextTriggerConstructor {
 
 		// regexp used to split an expressions into tokens
 		$ZBX_PREG_EXPESSION_FUNC_FORMAT = '^(['.ZBX_PREG_PRINT.']*) (and|or) (not )?(-)? ?[(]*(([a-zA-Z_.\$]{6,7})(\\((['.ZBX_PREG_PRINT.']+?){0,1}\\)))(['.ZBX_PREG_PRINT.']*)$';
-		$functions = array('regexp' => 1, 'iregexp' => 1);
-		$expr_array = array();
+		$functions = ['regexp' => 1, 'iregexp' => 1];
+		$expr_array = [];
 		$cexpor = 0;
 		$startpos = -1;
 
@@ -100,7 +100,7 @@ class CTextTriggerConstructor {
 			// strip extra spaces around "and" and "or" operators
 			$expr = preg_replace('/\s+(and|or)\s+/U', ' $1 ', $expr);
 
-			$expr_array = array();
+			$expr_array = [];
 			$sub_expr_count=0;
 			$sub_expr = '';
 			$multi = preg_match('/.+(and|or).+/', $expr);
@@ -183,10 +183,10 @@ class CTextTriggerConstructor {
 
 		$parseResult = $this->triggerExpression->parse($expression);
 
-		$expressions = array();
+		$expressions = [];
 		$splitTokens = $this->splitTokensByFirstLevel($parseResult->getTokens());
 		foreach($splitTokens as $key => $tokens) {
-			$expr = array();
+			$expr = [];
 
 			// replace whole function macros with their functions
 			foreach ($tokens as $token) {
@@ -237,8 +237,8 @@ class CTextTriggerConstructor {
 	 * @return array    an array of token arrays grouped by expression
 	 */
 	protected function splitTokensByFirstLevel(array $tokens) {
-		$expresions = array();
-		$currentExpression = array();
+		$expresions = [];
+		$currentExpression = [];
 
 		$level = 0;
 		foreach ($tokens as $token) {
@@ -248,7 +248,7 @@ class CTextTriggerConstructor {
 					// if such an expression is found, save all of the tokens before it as a separate expression
 					if ($level == 0 && ($token['value'] === 'or' || $token['value'] === 'and')) {
 						$expresions[] = $currentExpression;
-						$currentExpression = array();
+						$currentExpression = [];
 
 						// continue to the next token
 						continue 2;

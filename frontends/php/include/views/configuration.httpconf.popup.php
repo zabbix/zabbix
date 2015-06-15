@@ -21,14 +21,14 @@
 
 include('include/views/js/configuration.httpconf.popup.js.php');
 
-$httpPopupWidget = new CWidget(null, 'httptest-popup');
+$httpPopupWidget = new CWidget();
 
 $result = false;
 if (hasRequest('add') || hasRequest('update')) {
 	$result = true;
 	if ((!hasRequest('stepid') || (hasRequest('stepid') && getRequest('name') !== getRequest('old_name')))
 			&& hasRequest('steps_names')) {
-		foreach (getRequest('steps_names', array()) as $name) {
+		foreach (getRequest('steps_names', []) as $name) {
 			if ($name === getRequest('name')) {
 				show_error_message(_s('Step with name "%1$s" already exists.', $name));
 				$result = false;
@@ -48,7 +48,7 @@ else {
 
 if ((hasRequest('add') || hasRequest('update')) && $result) {
 
-	$httpStepForJs = array(
+	$httpStepForJs = [
 		'stepid' => getRequest('stepid'),
 		'name' => getRequest('name'),
 		'timeout' => getRequest('timeout'),
@@ -60,7 +60,7 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 		'headers' => getRequest('headers'),
 		'follow_redirects' => getRequest('follow_redirects'),
 		'retrieve_mode'  => getRequest('retrieve_mode')
-	);
+	];
 
 	if (!hasRequest('stepid')) {
 		insert_js('add_httpstep('.CJs::encodeJson(getRequest('dstfrm')).','.
@@ -82,7 +82,7 @@ else {
 	$httpPopupForm->addVar('old_name', getRequest('old_name'));
 	$httpPopupForm->addVar('steps_names', getRequest('steps_names'));
 
-	$httpPopupFormList = new CFormList('httpPopupFormList');
+	$httpPopupFormList = new CFormList();
 	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', getRequest('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, (bool) getRequest('templated'), 64));
 	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', getRequest('url', ''), ZBX_TEXTBOX_STANDARD_SIZE, false, null));
 	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', getRequest('posts', '')));
@@ -90,9 +90,9 @@ else {
 
 	$httpPopupFormList->addRow(_('Headers'), new CTextArea('headers', getRequest('headers', '')));
 
-	$httpPopupFormList->addRow(_('Follow redirects'), new CCheckBox('follow_redirects', $followRedirects, null, true));
+	$httpPopupFormList->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1));
 
-	$httpPopupFormList->addRow(_('Retrieve only headers'), new CCheckBox('retrieve_mode', $retrieveMode, null, true));
+	$httpPopupFormList->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1));
 
 	$httpPopupFormList->addRow(_('Timeout'), new CNumericBox('timeout', getRequest('timeout', 15), 5));
 	$httpPopupFormList->addRow(_('Required string'), new CTextBox('required', getRequest('required', ''), ZBX_TEXTBOX_STANDARD_SIZE));
@@ -101,22 +101,22 @@ else {
 	// append tabs to form
 	$httpPopupTab = new CTabView();
 	$httpPopupTab->addTab('scenarioStepTab', _('Step of web scenario'), $httpPopupFormList);
-	$httpPopupForm->addItem($httpPopupTab);
 
 	// append buttons to form
 	if (hasRequest('stepid')) {
-		$httpPopupForm->addItem(makeFormFooter(
+		$httpPopupTab->setFooter(makeFormFooter(
 			new CSubmit('update', _('Update')),
-			array(new CButtonCancel(null, 'close_window();'))
+			[new CButtonCancel(null, 'close_window();')]
 		));
 	}
 	else {
-		$httpPopupForm->addItem(makeFormFooter(
+		$httpPopupTab->setFooter(makeFormFooter(
 			new CSubmit('add', _('Add')),
-			array(new CButtonCancel(null, 'close_window();'))
+			[new CButtonCancel(null, 'close_window();')]
 		));
 	}
 
+	$httpPopupForm->addItem($httpPopupTab);
 	$httpPopupWidget->addItem($httpPopupForm);
 }
 

@@ -21,6 +21,13 @@
 
 include('include/views/js/administration.general.valuemapping.edit.js.php');
 
+$widget = (new CWidget())
+	->setTitle(_('Value mapping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
+	);
+
 $valueMappingForm = new CForm();
 $valueMappingForm->setName('valueMappingForm');
 $valueMappingForm->addVar('form', $this->data['form']);
@@ -31,15 +38,24 @@ $valueMappingFormList = new CFormList('valueMappingFormList');
 
 // name
 $nameTextBox = new CTextBox('mapname', $this->data['mapname'], 40, false, 64);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $valueMappingFormList->addRow(_('Name'), $nameTextBox);
 
 // mappings
-$mappingsTable = new CTable(SPACE, 'formElementTable');
-$mappingsTable->setAttribute('id', 'mappingsTable');
-$mappingsTable->addRow(array(_('Value'), SPACE, _('Mapped to'), SPACE));
-$mappingsTable->addRow(new CCol(new CButton('addMapping', _('Add'), '', 'link_menu'), null, 4));
-$valueMappingFormList->addRow(_('Mappings'), new CDiv($mappingsTable, 'border_dotted inlineblock objectgroup'));
+$mappingsTable = (new CTable())
+	->setNoDataMessage(SPACE)
+	->addClass('formElementTable')
+	->setId('mappingsTable')
+	->addRow([_('Value'), SPACE, _('Mapped to'), SPACE])
+	->addRow((new CCol(
+		(new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+	))->setColSpan(4));
+$valueMappingFormList->addRow(_('Mappings'),
+	(new CDiv($mappingsTable))
+		->addClass('border_dotted')
+		->addClass('inlineblock')
+		->addClass('objectgroup')
+);
 
 // add mappings to form by js
 if (empty($this->data['mappings'])) {
@@ -52,23 +68,26 @@ else {
 // append tab
 $valueMappingTab = new CTabView();
 $valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormList);
-$valueMappingForm->addItem($valueMappingTab);
 
 // append buttons
 if (!empty($this->data['valuemapid'])) {
-	$valueMappingForm->addItem(makeFormFooter(
+	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
-	$valueMappingForm->addItem(makeFormFooter(
+	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 
-return $valueMappingForm;
+$valueMappingForm->addItem($valueMappingTab);
+
+$widget->addItem($valueMappingForm);
+
+return $widget;

@@ -28,7 +28,6 @@ require_once dirname(__FILE__).'/include/js.inc.php';
 
 $page['title'] = _('Configuration of users');
 $page['file'] = 'users.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
@@ -36,68 +35,68 @@ $themes = array_keys(Z::getThemes());
 $themes[] = THEME_DEFAULT;
 
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
+$fields = [
 	// users
-	'userid' =>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
-	'group_userid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'filter_usrgrpid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'alias' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Alias')),
-	'name' =>				array(T_ZBX_STR, O_OPT, null,	null,		null, _x('Name', 'user first name')),
-	'surname' =>			array(T_ZBX_STR, O_OPT, null,	null,		null, _('Surname')),
-	'password1' =>			array(T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && isset({form}) && {form} != "update" && isset({change_password})'),
-	'password2' =>			array(T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && isset({form}) && {form} != "update" && isset({change_password})'),
-	'user_type' =>			array(T_ZBX_INT, O_OPT, null,	IN('1,2,3'),'isset({add}) || isset({update})'),
-	'user_groups' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
-	'user_groups_to_del' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'user_medias' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null),
-	'user_medias_to_del' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'new_groups' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'new_media' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'enable_media' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'disable_media' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'lang' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'theme' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', $themes).'"'), 'isset({add}) || isset({update})'),
-	'autologin' =>			array(T_ZBX_INT, O_OPT, null,	IN('1'),	null),
-	'autologout' => 		array(T_ZBX_INT, O_OPT, null,	BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')),
-	'autologout_visible' =>	array(T_ZBX_STR, O_OPT, null,	IN('1'),	null),
-	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'refresh' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_HOUR), 'isset({add}) || isset({update})', _('Refresh (in seconds)')),
-	'rows_per_page' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, 999999),'isset({add}) || isset({update})', _('Rows per page')),
+	'userid' =>				[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
+	'group_userid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'filter_usrgrpid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'alias' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Alias')],
+	'name' =>				[T_ZBX_STR, O_OPT, null,	null,		null, _x('Name', 'user first name')],
+	'surname' =>			[T_ZBX_STR, O_OPT, null,	null,		null, _('Surname')],
+	'password1' =>			[T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && isset({form}) && {form} != "update" && isset({change_password})'],
+	'password2' =>			[T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && isset({form}) && {form} != "update" && isset({change_password})'],
+	'user_type' =>			[T_ZBX_INT, O_OPT, null,	IN('1,2,3'),'isset({add}) || isset({update})'],
+	'user_groups' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null],
+	'user_groups_to_del' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'user_medias' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	null],
+	'user_medias_to_del' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'new_groups' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'new_media' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'enable_media' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'disable_media' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'lang' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'theme' =>				[T_ZBX_STR, O_OPT, null,	IN('"'.implode('","', $themes).'"'), 'isset({add}) || isset({update})'],
+	'autologin' =>			[T_ZBX_INT, O_OPT, null,	IN('1'),	null],
+	'autologout' => 		[T_ZBX_INT, O_OPT, null,	BETWEEN(90, 10000), null, _('Auto-logout (min 90 seconds)')],
+	'autologout_visible' =>	[T_ZBX_STR, O_OPT, null,	IN('1'),	null],
+	'url' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'refresh' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_HOUR), 'isset({add}) || isset({update})', _('Refresh (in seconds)')],
+	'rows_per_page' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(1, 999999),'isset({add}) || isset({update})', _('Rows per page')],
 	// actions
-	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"user.massdelete","user.massunblock"'),	null),
-	'register' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"add permission","delete permission"'), null),
-	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'delete_selected' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'del_user_group' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'del_user_media' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'del_group_user' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'change_password' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
+	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"user.massdelete","user.massunblock"'),	null],
+	'register' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	IN('"add permission","delete permission"'), null],
+	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'delete_selected' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'del_user_group' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'del_user_media' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'del_group_user' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'change_password' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,	null],
+	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	// form
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,			null,	null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,			null,	null),
+	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,			null,	null],
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"alias","name","surname","type"'),		null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"alias","name","surname","type"'),		null],
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
 if (isset($_REQUEST['userid'])) {
-	$users = API::User()->get(array(
+	$users = API::User()->get([
 		'userids' => getRequest('userid'),
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true
-	));
+	]);
 	if (!$users) {
 		access_deny();
 	}
 }
-if (getRequest('filter_usrgrpid') && !API::UserGroup()->isWritable(array($_REQUEST['filter_usrgrpid']))) {
+if (getRequest('filter_usrgrpid') && !API::UserGroup()->isWritable([$_REQUEST['filter_usrgrpid']])) {
 	access_deny();
 }
 
@@ -106,12 +105,12 @@ if (hasRequest('action')) {
 		access_deny();
 	}
 	else {
-		$usersChk = API::User()->get(array(
-			'output' => array('userid'),
+		$usersChk = API::User()->get([
+			'output' => ['userid'],
 			'userids' => getRequest('group_userid'),
 			'countOutput' => true,
 			'editable' => true
-		));
+		]);
 		if ($usersChk != count(getRequest('group_userid'))) {
 			access_deny();
 		}
@@ -124,14 +123,14 @@ if (hasRequest('action')) {
 $config = select_config();
 
 if (isset($_REQUEST['new_groups'])) {
-	$_REQUEST['new_groups'] = getRequest('new_groups', array());
-	$_REQUEST['user_groups'] = getRequest('user_groups', array());
+	$_REQUEST['new_groups'] = getRequest('new_groups', []);
+	$_REQUEST['user_groups'] = getRequest('user_groups', []);
 	$_REQUEST['user_groups'] += $_REQUEST['new_groups'];
 
 	unset($_REQUEST['new_groups']);
 }
 elseif (isset($_REQUEST['new_media'])) {
-	$_REQUEST['user_medias'] = getRequest('user_medias', array());
+	$_REQUEST['user_medias'] = getRequest('user_medias', []);
 
 	array_push($_REQUEST['user_medias'], $_REQUEST['new_media']);
 }
@@ -148,7 +147,7 @@ elseif (isset($_REQUEST['user_medias']) && isset($_REQUEST['disable_media'])) {
 elseif (hasRequest('add') || hasRequest('update')) {
 	$isValid = true;
 
-	$usrgrps = getRequest('user_groups', array());
+	$usrgrps = getRequest('user_groups', []);
 
 	// authentication type
 	if ($usrgrps) {
@@ -205,7 +204,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	if ($isValid) {
-		$user = array();
+		$user = [];
 		$user['alias'] = getRequest('alias');
 		$user['name'] = getRequest('name');
 		$user['surname'] = getRequest('surname');
@@ -217,7 +216,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$user['refresh'] = getRequest('refresh');
 		$user['rows_per_page'] = getRequest('rows_per_page');
 		$user['type'] = getRequest('user_type');
-		$user['user_medias'] = getRequest('user_medias', array());
+		$user['user_medias'] = getRequest('user_medias', []);
 		$user['usrgrps'] = zbx_toObject($usrgrps, 'usrgrpid');
 
 		if (hasRequest('lang')) {
@@ -228,13 +227,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		if (hasRequest('userid')) {
 			$user['userid'] = getRequest('userid');
-			$result = API::User()->update(array($user));
+			$result = API::User()->update([$user]);
 
 			if ($result) {
-				$result = API::User()->updateMedia(array(
+				$result = API::User()->updateMedia([
 					'users' => $user,
 					'medias' => $user['user_medias']
-				));
+				]);
 			}
 
 			$messageSuccess = _('User updated');
@@ -265,14 +264,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (isset($_REQUEST['del_user_media'])) {
-	foreach (getRequest('user_medias_to_del', array()) as $mediaId) {
+	foreach (getRequest('user_medias_to_del', []) as $mediaId) {
 		if (isset($_REQUEST['user_medias'][$mediaId])) {
 			unset($_REQUEST['user_medias'][$mediaId]);
 		}
 	}
 }
 elseif (isset($_REQUEST['del_user_group'])) {
-	foreach (getRequest('user_groups_to_del', array()) as $groupId) {
+	foreach (getRequest('user_groups_to_del', []) as $groupId) {
 		if (isset($_REQUEST['user_groups'][$groupId])) {
 			unset($_REQUEST['user_groups'][$groupId]);
 		}
@@ -283,7 +282,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 
 	DBstart();
 
-	$result = API::User()->delete(array($user['userid']));
+	$result = API::User()->delete([$user['userid']]);
 
 	if ($result) {
 		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
@@ -305,10 +304,10 @@ elseif (hasRequest('action') && getRequest('action') == 'user.massunblock' && ha
 	$result = unblock_user_login($groupUserId);
 
 	if ($result) {
-		$users = API::User()->get(array(
+		$users = API::User()->get([
 			'userids' => $groupUserId,
 			'output' => API_OUTPUT_EXTEND
-		));
+		]);
 
 		foreach ($users as $user) {
 			info('User '.$user['alias'].' unblocked');
@@ -328,10 +327,10 @@ elseif (hasRequest('action') && getRequest('action') == 'user.massdelete' && has
 
 	$groupUserId = getRequest('group_userid');
 
-	$dbUsers = API::User()->get(array(
+	$dbUsers = API::User()->get([
 		'userids' => $groupUserId,
 		'output' => API_OUTPUT_EXTEND
-	));
+	]);
 	$dbUsers = zbx_toHash($dbUsers, 'userid');
 
 	DBstart();
@@ -341,7 +340,7 @@ elseif (hasRequest('action') && getRequest('action') == 'user.massdelete' && has
 			continue;
 		}
 
-		$result |= (bool) API::User()->delete(array($userId));
+		$result |= (bool) API::User()->delete([$userId]);
 
 		if ($result) {
 			$userData = $dbUsers[$userId];
@@ -386,34 +385,34 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$data = array(
+	$data = [
 		'config' => $config,
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
-	);
+	];
 
 	// get user groups
-	$data['userGroups'] = API::UserGroup()->get(array(
+	$data['userGroups'] = API::UserGroup()->get([
 		'output' => API_OUTPUT_EXTEND
-	));
+	]);
 	order_result($data['userGroups'], 'name');
 
 	// get users
-	$data['users'] = API::User()->get(array(
+	$data['users'] = API::User()->get([
 		'usrgrpids' => ($_REQUEST['filter_usrgrpid'] > 0) ? $_REQUEST['filter_usrgrpid'] : null,
 		'output' => API_OUTPUT_EXTEND,
 		'selectUsrgrps' => API_OUTPUT_EXTEND,
 		'getAccess' => 1,
 		'limit' => $config['search_limit'] + 1
-	));
+	]);
 
 	// sorting & paging
 	order_result($data['users'], $sortField, $sortOrder);
-	$data['paging'] = getPagingLine($data['users']);
+	$data['paging'] = getPagingLine($data['users'], $sortOrder);
 
 	// set default lastaccess time to 0
 	foreach ($data['users'] as $user) {
-		$data['usersSessions'][$user['userid']] = array('lastaccess' => 0);
+		$data['usersSessions'][$user['userid']] = ['lastaccess' => 0];
 	}
 
 	$dbSessions = DBselect(

@@ -21,47 +21,55 @@
 
 include('include/views/js/administration.general.triggerSeverity.js.php');
 
-$severityTab = new CFormList('scriptsTab');
+$widget = (new CWidget())
+	->setTitle(_('Trigger severities'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerseverities.php')))
+	);
 
-$headerDiv = new CDiv(_('Custom severity'), 'inlineblock');
-$headerDiv->addStyle('width: 16.3em; margin-left: 3px; zoom:1; *display: inline;');
-$severityTab->addRow(SPACE, array($headerDiv, _('Colour')));
+$severityTab = new CFormList();
+
+$headerDiv = (new CDiv(_('Custom severity')))
+	->addClass('inlineblock')
+	->addStyle('width: 16.3em; margin-left: 3px; zoom:1; *display: inline;');
+$severityTab->addRow(SPACE, [$headerDiv, _('Colour')]);
 
 $severityNameTB0 = new CTextBox('severity_name_0', $data['severity_name_0']);
 $severityNameTB0->addStyle('width: 15em;');
 $severityNameTB0->setAttribute('maxlength', 32);
 $severityColorTB0 = new CColor('severity_color_0', $data['severity_color_0']);
-$severityTab->addRow(_('Not classified'), array($severityNameTB0, SPACE, $severityColorTB0));
+$severityTab->addRow(_('Not classified'), [$severityNameTB0, SPACE, $severityColorTB0]);
 
 $severityNameTB1 = new CTextBox('severity_name_1', $data['severity_name_1']);
 $severityNameTB1->addStyle('width: 15em;');
 $severityNameTB1->setAttribute('maxlength', 32);
 $severityColorTB1 = new CColor('severity_color_1', $data['severity_color_1']);
-$severityTab->addRow(_('Information'), array($severityNameTB1, SPACE, $severityColorTB1));
+$severityTab->addRow(_('Information'), [$severityNameTB1, SPACE, $severityColorTB1]);
 
 $severityNameTB2 = new CTextBox('severity_name_2', $data['severity_name_2']);
 $severityNameTB2->addStyle('width: 15em;');
 $severityNameTB2->setAttribute('maxlength', 32);
 $severityColorTB2 = new CColor('severity_color_2', $data['severity_color_2']);
-$severityTab->addRow(_('Warning'), array($severityNameTB2, SPACE, $severityColorTB2));
+$severityTab->addRow(_('Warning'), [$severityNameTB2, SPACE, $severityColorTB2]);
 
 $severityNameTB3 = new CTextBox('severity_name_3', $data['severity_name_3']);
 $severityNameTB3->addStyle('width: 15em;');
 $severityNameTB3->setAttribute('maxlength', 32);
 $severityColorTB3 = new CColor('severity_color_3', $data['severity_color_3']);
-$severityTab->addRow(_('Average'), array($severityNameTB3, SPACE, $severityColorTB3));
+$severityTab->addRow(_('Average'), [$severityNameTB3, SPACE, $severityColorTB3]);
 
 $severityNameTB4 = new CTextBox('severity_name_4', $data['severity_name_4']);
 $severityNameTB4->addStyle('width: 15em;');
 $severityNameTB4->setAttribute('maxlength', 32);
 $severityColorTB4 = new CColor('severity_color_4', $data['severity_color_4']);
-$severityTab->addRow(_('High'), array($severityNameTB4, SPACE, $severityColorTB4));
+$severityTab->addRow(_('High'), [$severityNameTB4, SPACE, $severityColorTB4]);
 
 $severityNameTB5 = new CTextBox('severity_name_5', $data['severity_name_5']);
 $severityNameTB5->addStyle('width: 15em;');
 $severityNameTB5->setAttribute('maxlength', 32);
 $severityColorTB5 = new CColor('severity_color_5', $data['severity_color_5']);
-$severityTab->addRow(_('Disaster'), array($severityNameTB5, SPACE, $severityColorTB5));
+$severityTab->addRow(_('Disaster'), [$severityNameTB5, SPACE, $severityColorTB5]);
 
 $severityTab->addRow(SPACE);
 $severityTab->addInfo(_('Custom severity names affect all locales and require manual translation!'));
@@ -71,10 +79,12 @@ $severityView->addTab('severities', _('Trigger severities'), $severityTab);
 
 $severityForm = new CForm();
 $severityForm->setName('triggerSeverity');
-$severityForm->addItem($severityView);
-$severityForm->addItem(makeFormFooter(
+$severityView->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
-	array(new CButton('resetDefaults', _('Reset defaults')))
+	[new CButton('resetDefaults', _('Reset defaults'))]
 ));
+$severityForm->addItem($severityView);
 
-return $severityForm;
+$widget->addItem($severityForm);
+
+return $widget;

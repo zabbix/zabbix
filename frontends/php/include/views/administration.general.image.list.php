@@ -19,21 +19,36 @@
 **/
 
 
+$widget = (new CWidget())
+	->setTitle(_('Images'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addVar('imagetype', $data['imagetype'])
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.images.php'))
+			->addItem(
+				new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background'))
+			)
+		)
+	);
+
 // header
-$imageComboBox = new CComboBox('imagetype', $this->data['imagetype'], 'submit();');
-$imageComboBox->addItem(IMAGE_TYPE_ICON, _('Icon'));
-$imageComboBox->addItem(IMAGE_TYPE_BACKGROUND, _('Background'));
 $imageComboBoxForm = new CForm();
 $imageComboBoxForm->addItem(_('Type').SPACE);
-$imageComboBoxForm->addItem($imageComboBox);
-$this->data['widget']->addHeader(_('Images'), $imageComboBoxForm);
+$imageComboBoxForm->addItem(new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
+	IMAGE_TYPE_ICON => _('Icon'),
+	IMAGE_TYPE_BACKGROUND => _('Background')
+]));
 
 // form
 $imageForm = new CForm();
 $imageForm->setName('imageForm');
 $imageForm->addItem(BR());
 
-$imageTable = new CTable(_('No images found.'), 'header_wide padding_standard');
+$imageTable = (new CTable())
+	->setNoDataMessage(_('No images found.'))
+	->addClass('header_wide')
+	->addClass('padding_standard');
 
 $count = 0;
 $imageRow = new CRow();
@@ -44,9 +59,9 @@ foreach ($this->data['images'] as $image) {
 
 	$name = new CLink($image['name'], 'adm.images.php?form=update&imageid='.$image['imageid']);
 
-	$imgColumn = new CCol();
-	$imgColumn->setAttribute('align', 'center');
-	$imgColumn->addItem(array($img, BR(), $name), 'center');
+	$imgColumn = (new CCol())
+		->setAttribute('align', 'center')
+		->addItem([$img, BR(), $name], 'center');
 	$imageRow->addItem($imgColumn);
 
 	$count++;
@@ -66,4 +81,6 @@ if ($count > 0) {
 
 $imageForm->addItem($imageTable);
 
-return $imageForm;
+$widget->addItem($imageForm);
+
+return $widget;

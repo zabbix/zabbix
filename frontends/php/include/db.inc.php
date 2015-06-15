@@ -142,9 +142,9 @@ function DBconnect(&$error) {
 					$result = false;
 				}
 				else {
-					$options = array(
+					$options = [
 						'db2_attr_case' => DB2_CASE_LOWER,
-					);
+					];
 					db2_set_option($DB['DB'], $options, 1);
 					if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
 						DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
@@ -407,7 +407,7 @@ function DBselect($query, $limit = null, $offset = 0) {
 			}
 			break;
 		case ZBX_DB_DB2:
-			$options = array();
+			$options = [];
 			if ($DB['TRANSACTIONS']) {
 				$options['autocommit'] = DB2_AUTOCOMMIT_OFF;
 			}
@@ -598,12 +598,12 @@ function DBfetch($cursor, $convertNulls = true) {
 			break;
 		case ZBX_DB_ORACLE:
 			if ($row = oci_fetch_assoc($cursor)) {
-				$result = array();
+				$result = [];
 				foreach ($row as $key => $value) {
 					$field_type = strtolower(oci_field_type($cursor, $key));
 					// Oracle does not support NULL values for string fields, so if the string is empty, it will return NULL
 					// convert it to an empty string to be consistent with other databases
-					$value = (str_in_array($field_type, array('varchar', 'varchar2', 'blob', 'clob')) && is_null($value)) ? '' : $value;
+					$value = (str_in_array($field_type, ['varchar', 'varchar2', 'blob', 'clob']) && is_null($value)) ? '' : $value;
 
 					if (is_object($value) && (strpos($field_type, 'lob') !== false)) {
 						$value = $value->load();
@@ -753,7 +753,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 	$exclude = is_null($options['excludeSearch']) ? '' : ' NOT ';
 	$glue = (!$options['searchByAny']) ? ' AND ' : ' OR ';
 
-	$search = array();
+	$search = [];
 	foreach ($options['search'] as $field => $patterns) {
 		if (!isset($tableSchema['fields'][$field]) || zbx_empty($patterns)) {
 			continue;
@@ -763,7 +763,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 			continue;
 		}
 
-		$fieldSearch = array();
+		$fieldSearch = [];
 		foreach ((array) $patterns as $pattern) {
 			if (zbx_empty($pattern)) {
 				continue;
@@ -866,11 +866,11 @@ function dbConditionInt($fieldName, array $values, $notIn = false, $sort = true)
 		$values = array_values($values);
 	}
 
-	$betweens = array();
-	$data = array();
+	$betweens = [];
+	$data = [];
 
 	for ($i = 0, $size = count($values); $i < $size; $i++) {
-		$between = array();
+		$between = [];
 
 		// analyze by chunk
 		if (isset($values[$i + $MIN_NUM_BETWEEN])
@@ -978,7 +978,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
  * @return array
  */
 function DBfetchArray($cursor) {
-	$result = array();
+	$result = [];
 	while ($row = DBfetch($cursor)) {
 		$result[] = $row;
 	}
@@ -991,7 +991,7 @@ function DBfetchArray($cursor) {
  * @return array
  */
 function DBfetchArrayAssoc($cursor, $field) {
-	$result = array();
+	$result = [];
 	while ($row = DBfetch($cursor)) {
 		$result[$row[$field]] = $row;
 	}
@@ -1008,7 +1008,7 @@ function DBfetchArrayAssoc($cursor, $field) {
  * @return array
  */
 function DBfetchColumn($cursor, $column, $asHash = false) {
-	$result = array();
+	$result = [];
 
 	while ($dbResult = DBfetch($cursor)) {
 		if ($asHash) {

@@ -5,7 +5,7 @@
 				placeholder="{#MACRO}">
 		</td>
 		<td>
-			<button type="button" class="button link_menu group-prototype-remove" name="remove"><?php echo _('Remove') ?></button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove"><?= _('Remove') ?></button>
 			<input type="hidden" name="group_prototypes[#{i}][group_prototypeid]" value="#{group_prototypeid}" />
 		</td>
 	</tr>
@@ -38,10 +38,10 @@
 			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
 		<?php endif ?>
 		<?php foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?php echo CJs::encodeJson(array(
+			addGroupPrototypeRow(<?= CJs::encodeJson([
 				'name' => $groupPrototype['name'],
 				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
-			)) ?>);
+			]) ?>);
 		<?php endforeach ?>
 
 		<?php if ($hostPrototype['templateid']): ?>

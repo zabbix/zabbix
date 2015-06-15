@@ -21,12 +21,11 @@
 
 $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
-$proxyWidget = new CWidget();
-$proxyWidget->addPageHeader(_('CONFIGURATION OF PROXIES'));
+$widget = (new CWidget())->setTitle(_('Proxies'));
 
 // create form
 $proxyForm = new CForm();
-$proxyForm->setAttribute('id', 'proxyForm');
+$proxyForm->setId('proxyForm');
 $proxyForm->addVar('proxyid', $data['proxyid']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
@@ -35,35 +34,36 @@ if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 // create form list
 $proxyFormList = new CFormList('proxyFormList');
 $nameTextBox = new CTextBox('host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $proxyFormList->addRow(_('Proxy name'), $nameTextBox);
 
 // append status to form list
-$statusBox = new CComboBox('status', $data['status']);
-$statusBox->addItem(HOST_STATUS_PROXY_ACTIVE, _('Active'));
-$statusBox->addItem(HOST_STATUS_PROXY_PASSIVE, _('Passive'));
-$proxyFormList->addRow(_('Proxy mode'), $statusBox);
+$proxyFormList->addRow(_('Proxy mode'), new CComboBox('status', $data['status'], null, [
+	HOST_STATUS_PROXY_ACTIVE => _('Active'),
+	HOST_STATUS_PROXY_PASSIVE => _('Passive')
+]));
 
-$interfaceTable = new CTable(null, 'formElementTable');
-$interfaceTable->addRow(array(
-	_('IP address'),
-	_('DNS name'),
-	_('Connect to'),
-	_('Port')
-));
+$interfaceTable = (new CTable())
+	->addClass('formElementTable')
+	->addRow([
+		_('IP address'),
+		_('DNS name'),
+		_('Connect to'),
+		_('Port')
+	]);
 
 $connectByComboBox = new CRadioButtonList('useip', $data['useip']);
 $connectByComboBox->addValue(_('IP'), 1);
 $connectByComboBox->addValue(_('DNS'), 0);
 $connectByComboBox->useJQueryStyle();
 
-$interfaceTable->addRow(array(
+$interfaceTable->addRow([
 	new CTextBox('ip', $data['ip'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
 	new CTextBox('dns', $data['dns'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
 	$connectByComboBox,
 	new CTextBox('port', $data['port'], 18, false, 64)
-));
-$proxyFormList->addRow(_('Interface'), new CDiv($interfaceTable, 'objectgroup inlineblock border_dotted ui-corner-all'),
+]);
+$proxyFormList->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass('objectgroup inlineblock border_dotted'),
 	$data['status'] != HOST_STATUS_PROXY_PASSIVE);
 
 // append hosts to form list
@@ -89,43 +89,36 @@ $proxyFormList->addRow(_('Description'), new CTextArea('description', $data['des
 // append tabs to form
 $proxyTab = new CTabView();
 $proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
-$proxyForm->addItem($proxyTab);
 
 // append buttons to form
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
-$cancelButton->setAttribute('id', 'cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list'))->setId('cancel');
 
 if ($data['proxyid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'proxy.create');
-	$addButton->setAttribute('id', 'add');
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'proxy.create'))->setId('add');
 
-	$proxyForm->addItem(makeFormFooter(
+	$proxyTab->setFooter(makeFormFooter(
 		$addButton,
-		array($cancelButton)
+		[$cancelButton]
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'proxy.update');
-	$updateButton->setAttribute('id', 'update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
+	$updateButton = (new CSubmitButton(_('Update'), 'action', 'proxy.update'))->setId('update');
+	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
+	$deleteButton = (new CRedirectButton(_('Delete'),
 		'zabbix.php?action=proxy.delete&sid='.$data['sid'].'&proxyids[]='.$data['proxyid'],
 		_('Delete proxy?')
-	);
-	$deleteButton->setAttribute('id', 'delete');
+	))
+		->setId('delete');
 
-	$proxyForm->addItem(makeFormFooter(
+	$proxyTab->setFooter(makeFormFooter(
 		$updateButton,
-		array(
+		[
 			$cloneButton,
 			$deleteButton,
 			$cancelButton
-		)
+		]
 	));
 }
 
-// append form to widget
-$proxyWidget->addItem($proxyForm);
-
-$proxyWidget->show();
+$proxyForm->addItem($proxyTab);
+$widget->addItem($proxyForm)->show();

@@ -19,12 +19,11 @@
 **/
 
 
-$httpWidget = new CWidget();
-$httpWidget->addPageHeader(_('CONFIGURATION OF WEB MONITORING'));
+$widget = (new CWidget())->setTitle(_('Web monitoring'));
 
 // append host summary to widget header
 if (!empty($this->data['hostid'])) {
-	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
 }
 
 // create form
@@ -52,13 +51,13 @@ if (!empty($this->data['templates'])) {
 // Name
 $nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['templated'], 64);
 if (!$this->data['templated']) {
-	$nameTextBox->attr('autofocus', 'autofocus');
+	$nameTextBox->setAttribute('autofocus', 'autofocus');
 }
 $httpFormList->addRow(_('Name'), $nameTextBox);
 
 // Application
 if ($this->data['application_list']) {
-	$applications = zbx_array_merge(array(''), $this->data['application_list']);
+	$applications = zbx_array_merge([''], $this->data['application_list']);
 	$httpFormList->addRow(_('Application'),
 		new CComboBox('applicationid', $this->data['applicationid'], null, $applications)
 	);
@@ -105,7 +104,7 @@ $httpFormList->addRow(_('Variables'), new CTextArea('variables', $this->data['va
 $httpFormList->addRow(_('Headers'), new CTextArea('headers', $this->data['headers']));
 
 // status
-$httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status']));
+$httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
 /*
  * Authentication tab
@@ -113,9 +112,9 @@ $httpFormList->addRow(_('Enabled'), new CCheckBox('status', !$this->data['status
 $httpAuthenticationFormList = new CFormList('httpAuthenticationFormList');
 
 // Authentication type
-$authenticationComboBox = new CComboBox('authentication', $this->data['authentication']);
-$authenticationComboBox->addItems(httptest_authentications());
-$httpAuthenticationFormList->addRow(_('HTTP authentication'), $authenticationComboBox);
+$httpAuthenticationFormList->addRow(_('HTTP authentication'),
+	new CComboBox('authentication', $this->data['authentication'], null, httptest_authentications())
+);
 
 $httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
 $httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
@@ -131,10 +130,14 @@ $httpAuthenticationFormList->addRow(_('User'), $httpAuthenticationUserTB, $authe
 $httpAuthenticationFormList->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden);
 
 // SSL verify peer checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify peer'), new CCheckBox('verify_peer', $this->data['verify_peer']));
+$httpAuthenticationFormList->addRow(_('SSL verify peer'),
+	(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
+);
 
 // SSL verify host checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify host'), new CCheckBox('verify_host', $this->data['verify_host']));
+$httpAuthenticationFormList->addRow(_('SSL verify host'),
+	(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
+);
 
 // SSL certificate file
 $httpAuthenticationFormList->addRow(
@@ -158,21 +161,21 @@ $httpAuthenticationFormList->addRow(
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
-$stepsTable = new CTable(null, 'formElementTable');
-$stepsTable->setAttributes(array(
-	'style' => 'min-width: 500px;',
-	'id' => 'httpStepTable'
-));
-$stepsTable->setHeader(array(
-	new CCol(SPACE, null, null, '15'),
-	new CCol(SPACE, null, null, '15'),
-	new CCol(_('Name'), null, null, '150'),
-	new CCol(_('Timeout'), null, null, '50'),
-	new CCol(_('URL'), null, null, '200'),
-	new CCol(_('Required'), null, null, '50'),
-	new CCol(_('Status codes'), 'nowrap', null, '90'),
-	new CCol('', null, null, '50')
-));
+$stepsTable = (new CTable())
+	->setAttribute('style', 'min-width: 700px;')
+	->setId('httpStepTable')
+	->setHeader([
+		(new CColHeader(''))->setWidth('15'),
+		(new CColHeader(''))->setWidth('15'),
+		(new CColHeader(_('Name')))->setWidth('150'),
+		(new CColHeader(_('Timeout')))->setWidth('50'),
+		(new CColHeader(_('URL')))->setWidth('200'),
+		(new CColHeader(_('Required')))->setWidth('50'),
+		(new CColHeader(_('Status codes')))
+			->addClass(ZBX_STYLE_NOWRAP)
+			->setWidth('90'),
+		(new CColHeader(''))->setWidth('50')
+	]);
 
 $i = 1;
 foreach ($this->data['steps'] as $stepid => $step) {
@@ -192,21 +195,19 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		$step['required'] = '';
 	}
 
-	$numSpan = new CSpan($i++.':');
-	$numSpan->addClass('rowNum');
-	$numSpan->setAttribute('id', 'current_step_'.$stepid);
+	$numSpan = (new CSpan($i++.':'))
+		->addClass('rowNum')
+		->setId('current_step_'.$stepid);
 
-	$name = new CSpan($step['name'], 'link');
-	$name->setAttributes(array(
-		'id' => 'name_'.$stepid,
-		'name_step' => $stepid
-	));
+	$name = (new CSpan($step['name'], 'link'))
+		->setId('name_'.$stepid)
+		->setAttribute('name_step', $stepid);
 
 	if (mb_strlen($step['url']) > 70) {
 		$start = mb_substr($step['url'], 0, 35);
 		$end = mb_substr($step['url'], mb_strlen($step['url']) - 25, 25);
-		$url = new CSpan($start.SPACE.'...'.SPACE.$end);
-		$url->setHint($step['url']);
+		$url = (new CSpan($start.SPACE.'...'.SPACE.$end))
+			->setHint($step['url']);
 	}
 	else {
 		$url = $step['url'];
@@ -214,33 +215,48 @@ foreach ($this->data['steps'] as $stepid => $step) {
 
 	if ($this->data['templated']) {
 		$removeButton = SPACE;
-		$dragHandler = SPACE;
+		$dragHandler = '';
 	}
 	else {
-		$removeButton = new CButton('remove_'.$stepid, _('Remove'), 'javascript: removeStep(this);', 'link_menu');
-		$removeButton->setAttribute('remove_step', $stepid);
-		$dragHandler = new CSpan(null, 'ui-icon ui-icon-arrowthick-2-n-s move');
+		$removeButton = (new CButton('remove_'.$stepid, _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->onClick('javascript: removeStep(this);')
+			->setAttribute('remove_step', $stepid);
+		$dragHandler = (new CCol(
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
 	}
 
-	$row = new CRow(array(
-		$dragHandler,
-		$numSpan,
-		$name,
-		$step['timeout'].SPACE._('sec'),
-		$url,
-		htmlspecialchars($step['required']),
-		$step['status_codes'],
-		$removeButton
-	), 'sortable', 'steps_'.$stepid);
-
-	$stepsTable->addRow($row);
+	$stepsTable->addRow(
+		(new CRow([
+			$dragHandler,
+			$numSpan,
+			$name,
+			$step['timeout'].SPACE._('sec'),
+			$url,
+			htmlspecialchars($step['required']),
+			$step['status_codes'],
+			$removeButton
+		]))
+			->addClass('sortable')
+			->setId('steps_'.$stepid)
+	);
 }
 
 if (!$this->data['templated']) {
-	$stepsTable->addRow(new CCol(new CButton('add_step', _('Add'), null, 'link_menu'), null, 8));
+	$stepsTable->addRow(
+		(new CCol(
+			(new CButton('add_step', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+		))->setColSpan(8)
+	);
 }
 
-$httpStepFormList->addRow(_('Steps'), new CDiv($stepsTable, 'objectgroup inlineblock border_dotted ui-corner-all'));
+$httpStepFormList->addRow(_('Steps'),
+	(new CDiv($stepsTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+);
 
 // append tabs to form
 $httpTab = new CTabView();
@@ -251,11 +267,9 @@ $httpTab->addTab('scenarioTab', _('Scenario'), $httpFormList);
 $httpTab->addTab('stepTab', _('Steps'), $httpStepFormList);
 $httpTab->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFormList);
 
-$httpForm->addItem($httpTab);
-
 // append buttons to form
 if (!empty($this->data['httptestid'])) {
-	$buttons = array(new CSubmit('clone', _('Clone')));
+	$buttons = [new CSubmit('clone', _('Clone'))];
 
 	if ($this->data['templated'] == 0) {
 		$buttons[] = new CButtonDelete(
@@ -276,20 +290,22 @@ if (!empty($this->data['httptestid'])) {
 
 	$buttons[] = new CButtonCancel();
 
-	$httpForm->addItem(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
+	$httpTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
-	$httpForm->addItem(makeFormFooter(
+	$httpTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
-$httpWidget->addItem($httpForm);
 
-$this->data['agentVisibility'] = array();
+$httpForm->addItem($httpTab);
+$widget->addItem($httpForm);
+
+$this->data['agentVisibility'] = [];
 zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'agent_other');
 zbx_subarray_push($this->data['agentVisibility'], ZBX_AGENT_OTHER, 'row_agent_other');
 
 require_once dirname(__FILE__).'/js/configuration.httpconf.edit.js.php';
 
-return $httpWidget;
+return $widget;

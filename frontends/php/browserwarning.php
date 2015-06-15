@@ -21,8 +21,9 @@
 
 require_once dirname(__FILE__).'/include/gettextwrapper.inc.php';
 require_once dirname(__FILE__).'/include/func.inc.php';
+require_once dirname(__FILE__).'/include/html.inc.php';
 require_once dirname(__FILE__).'/include/defines.inc.php';
-require_once dirname(__FILE__).'/include/classes/core/CView.php';
+require_once dirname(__FILE__).'/include/classes/mvc/CView.php';
 
 $browserWarningForm = new CView('general.browserwarning');
 $browserWarningForm->render();

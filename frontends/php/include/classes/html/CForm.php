@@ -22,7 +22,7 @@
 class CForm extends CTag {
 
 	public function __construct($method = 'post', $action = null, $enctype = null) {
-		parent::__construct('form', 'yes');
+		parent::__construct('form', true);
 		$this->setMethod($method);
 		$this->setAction($action);
 		$this->setEnctype($enctype);
@@ -61,5 +61,7 @@ class CForm extends CTag {
 		if (!is_null($value)) {
 			$this->addItem(new CVar($name, $value, $id));
 		}
+
+		return $this;
 	}
 }

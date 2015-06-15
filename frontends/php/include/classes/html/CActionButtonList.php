@@ -66,15 +66,15 @@ class CActionButtonList extends CObject {
 		$this->checkboxesName = $checkboxesName;
 		$this->cookieNamePrefix = $cookieNamePrefix;
 
-		foreach ($buttonsData as $actionValue => $buttonData) {
-			$this->buttons[$actionValue] = new CSubmit($actionName, $buttonData['name']);
-
-			$this->buttons[$actionValue]->removeAttribute('id');
-			$this->buttons[$actionValue]->setAttribute('value', $actionValue);
-			$this->buttons[$actionValue]->addClass('footerButton');
+		foreach ($buttonsData as $action=> $buttonData) {
+			$this->buttons[$action] = (new CSubmit($actionName, $buttonData['name']))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass('footerButton')
+				->removeAttribute('id')
+				->setAttribute('value', $action);
 
 			if (array_key_exists('confirm', $buttonData)) {
-				$this->buttons[$actionValue]->setAttribute('confirm', $buttonData['confirm']);
+				$this->buttons[$action]->setAttribute('confirm', $buttonData['confirm']);
 			}
 		}
 	}
@@ -87,7 +87,7 @@ class CActionButtonList extends CObject {
 	 */
 	public function getSelectedCountElement() {
 		if (!$this->selectedCountElement) {
-			$this->selectedCountElement = new CSpan('0 '._('selected'), null, 'selectedCount');
+			$this->selectedCountElement = (new CSpan(SPACE.'0 '._('selected').SPACE))->setId('selectedCount');
 		}
 
 		return $this->selectedCountElement;
@@ -104,11 +104,14 @@ class CActionButtonList extends CObject {
 		zbx_add_post_js('chkbxRange.pageGoName = '.CJs::encodeJson($this->checkboxesName).';');
 		zbx_add_post_js('chkbxRange.prefix = '.CJs::encodeJson($this->cookieNamePrefix).';');
 
-		$this->items[] = $this->getSelectedCountElement()->toString($destroy);
+		$items = [];
 
 		foreach ($this->buttons as $button) {
-			$this->items[] = $button->toString($destroy);
+			$items[] = $button;
 		}
+
+		$this->items[] = (new CDiv([$this->getSelectedCountElement(), $items]))
+			->addClass('action-buttons');
 
 		return parent::toString($destroy);
 	}

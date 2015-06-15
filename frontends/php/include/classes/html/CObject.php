@@ -24,7 +24,7 @@ class CObject {
 	public $items;
 
 	public function __construct($items = null) {
-		$this->items = array();
+		$this->items = [];
 		if (isset($items)) {
 			$this->addItem($items);
 		}
@@ -51,7 +51,8 @@ class CObject {
 	}
 
 	public function cleanItems() {
-		$this->items = array();
+		$this->items = [];
+		return $this;
 	}
 
 	public function itemsCount() {

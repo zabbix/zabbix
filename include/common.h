@@ -1092,4 +1092,6 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote);
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
 
+char	*zbx_dyn_escape_shell_single_quote(const char *text);
+
 #endif
