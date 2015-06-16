@@ -62,14 +62,14 @@ if (isset($hostPrototype['hostid'])) {
 	$frmHost->addVar('hostid', $hostPrototype['hostid']);
 }
 
-$hostTB = new CTextBox('host', $hostPrototype['host'], ZBX_TEXTBOX_STANDARD_SIZE, (bool) $hostPrototype['templateid']);
-$hostTB->setAttribute('maxlength', 64);
-$hostTB->setAttribute('autofocus', 'autofocus');
+$hostTB = (new CTextBox('host', $hostPrototype['host'], ZBX_TEXTBOX_STANDARD_SIZE, (bool) $hostPrototype['templateid']))
+	->setAttribute('maxlength', 64)
+	->setAttribute('autofocus', 'autofocus');
 $hostList->addRow(_('Host name'), $hostTB);
 
 $name = ($hostPrototype['name'] != $hostPrototype['host']) ? $hostPrototype['name'] : '';
-$visiblenameTB = new CTextBox('name', $name, ZBX_TEXTBOX_STANDARD_SIZE, (bool) $hostPrototype['templateid']);
-$visiblenameTB->setAttribute('maxlength', 64);
+$visiblenameTB = (new CTextBox('name', $name, ZBX_TEXTBOX_STANDARD_SIZE, (bool) $hostPrototype['templateid']))
+	->setAttribute('maxlength', 64);
 $hostList->addRow(_('Visible name'), $visiblenameTB);
 
 // display inherited parameters only for hosts prototypes on hosts

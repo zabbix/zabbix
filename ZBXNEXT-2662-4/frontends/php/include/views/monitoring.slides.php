@@ -68,9 +68,10 @@ if ($this->data['slideshows']) {
 			$controls->addItem([SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()]);
 			$controls->addItem([SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()]);
 		}
-		$controls->addItem($favouriteIcon);
-		$controls->addItem($refreshIcon);
-		$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+		$controls
+			->addItem($favouriteIcon)
+			->addItem($refreshIcon)
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
 
@@ -84,12 +85,13 @@ if ($this->data['slideshows']) {
 		);
 	}
 	else {
-		$controls->addItem($favouriteIcon);
-		$controls->addItem($refreshIcon);
-		$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+		$controls
+			->addItem($favouriteIcon)
+			->addItem($refreshIcon)
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 		$slideHeaderForm->addItem($controls);
-		$slideshowWidget->setControls($slideHeaderForm);
-		$slideshowWidget->addItem(new CTableInfo());
+		$slideshowWidget->setControls($slideHeaderForm)
+			->addItem(new CTableInfo());
 	}
 }
 else {

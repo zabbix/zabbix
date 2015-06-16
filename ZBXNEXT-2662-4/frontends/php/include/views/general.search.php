@@ -18,15 +18,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$searchForm = new CForm('get','search.php');
-
 $searchBox = (new CTextBox('search', getRequest('search')))
 	->setAttribute('autocomplete', 'off')
 	->addClass('search');
-$searchForm->addItem($searchBox);
-
 $searchBtn = (new CSubmit('searchbttn', _('Search')))->addClass('jqueryinput');
-$searchForm->addItem($searchBtn);
+
+$searchForm = (new CForm('get','search.php'))
+	->addItem($searchBox)
+	->addItem($searchBtn);
 
 return (new CDiv($searchForm))->addClass('zbx_search')->setId('zbx_search');

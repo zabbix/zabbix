@@ -29,21 +29,21 @@ $commentForm = (new CForm())
 	->addVar('triggerid', $this->data['triggerid']);
 
 // create form list
-$commentFormList = new CFormList('commentFormList');
-
-$commentTextArea = new CTextArea('comments', CMacrosResolverHelper::resolveTriggerDescription($this->data['trigger']), [
+$commentTextArea = (new CTextArea('comments', CMacrosResolverHelper::resolveTriggerDescription($this->data['trigger']), [
 	'rows' => 25, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'readonly' => $this->data['isCommentExist']
-]);
-$commentTextArea->setAttribute('autofocus', 'autofocus');
-$commentFormList->addRow(_('Description'), $commentTextArea);
+]))
+	->setAttribute('autofocus', 'autofocus');
+
+$commentFormList = (new CFormList('commentFormList'))
+	->addRow(_('Description'), $commentTextArea);
 
 // append tabs to form
-$commentTab = new CTabView();
-$commentTab->addTab('commentTab', _s('Description for "%s".', $this->data['trigger']['description']), $commentFormList);
+$commentTab = (new CTabView())
+	->addTab('commentTab', _s('Description for "%s".', $this->data['trigger']['description']), $commentFormList);
 
 // append buttons to form
-$updateButton = new CSubmit('update', _('Update'));
-$updateButton->setEnabled(!$this->data['isCommentExist']);
+$updateButton = (new CSubmit('update', _('Update')))
+	->setEnabled(!$this->data['isCommentExist']);
 
 $buttons = [
 	new CButtonCancel('&triggerid='.$this->data['triggerid'])

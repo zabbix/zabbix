@@ -46,8 +46,8 @@ $filterColumn->addRow(_('Resource'), new CComboBox('resourcetype', $this->data['
 	[-1 => _('All')] + audit_resource2str()
 ));
 
-$filterForm->addColumn($filterColumn);
-$filterForm->addNavigator();
+$filterForm->addColumn($filterColumn)
+	->addNavigator();
 $auditWidget->addItem($filterForm);
 
 // create form

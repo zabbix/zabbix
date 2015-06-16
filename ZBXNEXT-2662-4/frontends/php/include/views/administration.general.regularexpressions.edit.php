@@ -38,10 +38,10 @@ zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($dat
 /*
  * Expressions tab
  */
-$exprTab = new CFormList('exprTab');
-$nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$exprTab->addRow(_('Name'), $nameTextBox);
+$nameTextBox = (new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128))
+	->setAttribute('autofocus', 'autofocus');
+
+$exprTab = (new CFormList('exprTab'))->addRow(_('Name'), $nameTextBox);
 
 $exprTable = (new CTable())
 	->addClass('formElementTable')

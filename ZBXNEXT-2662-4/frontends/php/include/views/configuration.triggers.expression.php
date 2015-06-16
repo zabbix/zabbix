@@ -120,8 +120,7 @@ else {
 $expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10));
 
 // append tabs to form
-$expressionTab = new CTabView();
-$expressionTab->addTab('expressionTab', _('Trigger expression condition'), $expressionFormList);
+$expressionTab = (new CTabView())->addTab('expressionTab', _('Trigger expression condition'), $expressionFormList);
 
 // append buttons to form
 $expressionTab->setFooter(makeFormFooter(

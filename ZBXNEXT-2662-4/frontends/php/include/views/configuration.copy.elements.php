@@ -109,12 +109,11 @@ if (empty($targets)) {
 $triggersFormList->addRow(_('Target'), $targets);
 
 // append tabs to form
-$triggersTab = new CTabView();
-
-$triggersTab->addTab('triggersTab',
-	_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
-	$triggersFormList
-);
+$triggersTab = (new CTabView())
+	->addTab('triggersTab',
+		_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
+		$triggersFormList
+	);
 
 // append buttons to form
 $triggersTab->setFooter(makeFormFooter(

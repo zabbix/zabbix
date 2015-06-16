@@ -115,14 +115,15 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
 	}
-	$maintenanceForm->addVar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type']);
-	$maintenanceForm->addVar('timeperiods['.$id.'][every]', $timeperiod['every']);
-	$maintenanceForm->addVar('timeperiods['.$id.'][month]', $timeperiod['month']);
-	$maintenanceForm->addVar('timeperiods['.$id.'][dayofweek]', $timeperiod['dayofweek']);
-	$maintenanceForm->addVar('timeperiods['.$id.'][day]', $timeperiod['day']);
-	$maintenanceForm->addVar('timeperiods['.$id.'][start_time]', $timeperiod['start_time']);
-	$maintenanceForm->addVar('timeperiods['.$id.'][start_date]', $timeperiod['start_date']);
-	$maintenanceForm->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
+	$maintenanceForm
+		->addVar('timeperiods['.$id.'][timeperiod_type]', $timeperiod['timeperiod_type'])
+		->addVar('timeperiods['.$id.'][every]', $timeperiod['every'])
+		->addVar('timeperiods['.$id.'][month]', $timeperiod['month'])
+		->addVar('timeperiods['.$id.'][dayofweek]', $timeperiod['dayofweek'])
+		->addVar('timeperiods['.$id.'][day]', $timeperiod['day'])
+		->addVar('timeperiods['.$id.'][start_time]', $timeperiod['start_time'])
+		->addVar('timeperiods['.$id.'][start_date]', $timeperiod['start_date'])
+		->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
 $periodsDiv = (new CDiv($maintenancePeriodTable))
@@ -183,13 +184,13 @@ $groupTable->addRow($groupTweenBox->get(_('In maintenance'), _('Other groups')))
 $hostsAndGroupsFormList->addRow(_('Groups in maintenance'), $groupTable);
 
 // append tabs to form
-$maintenanceTab = new CTabView();
+$maintenanceTab = (new CTabView())
+	->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList)
+	->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList)
+	->addTab('hostTab', _('Hosts & Groups'), $hostsAndGroupsFormList);
 if (!$this->data['form_refresh']) {
 	$maintenanceTab->setSelected(0);
 }
-$maintenanceTab->addTab('maintenanceTab', _('Maintenance'), $maintenanceFormList);
-$maintenanceTab->addTab('periodsTab', _('Periods'), $maintenancePeriodFormList);
-$maintenanceTab->addTab('hostTab', _('Hosts & Groups'), $hostsAndGroupsFormList);
 
 // append buttons to form
 if (isset($this->data['maintenanceid'])) {

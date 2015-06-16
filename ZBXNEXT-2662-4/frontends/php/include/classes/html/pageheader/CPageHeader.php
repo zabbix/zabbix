@@ -68,6 +68,7 @@ class CPageHeader {
 	 */
 	public function addCssFile($path) {
 		$this->cssFiles[$path] = $path;
+		return $this;
 	}
 
 	/**
@@ -75,6 +76,7 @@ class CPageHeader {
 	 */
 	public function addCssInit() {
 		$this->cssFiles[] = 'styles/zabbix.css';
+		return $this;
 	}
 
 	/**
@@ -84,6 +86,7 @@ class CPageHeader {
 	 */
 	public function addStyle($style) {
 		$this->styles[] = $style;
+		return $this;
 	}
 
 	/**
@@ -93,6 +96,7 @@ class CPageHeader {
 	 */
 	public function addJsFile($path) {
 		$this->jsFiles[$path] = $path;
+		return $this;
 	}
 
 	/**
@@ -102,6 +106,7 @@ class CPageHeader {
 	 */
 	public function addJs($js) {
 		$this->js[] = $js;
+		return $this;
 	}
 
 	/**
@@ -111,6 +116,7 @@ class CPageHeader {
 	 */
 	public function addJsBeforeScripts($js) {
 		$this->jsBefore[] = $js;
+		return $this;
 	}
 
 	/**
@@ -156,5 +162,6 @@ HTML;
 		}
 
 		echo '</head>'."\n";
+		return $this;
 	}
 }

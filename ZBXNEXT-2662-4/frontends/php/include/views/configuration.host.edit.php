@@ -649,10 +649,11 @@ else {
 	];
 }
 
-$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
-$ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
-$ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $data['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)));
-$ipmiList->addRow(_('Password'), new CTextBox('ipmi_password', $data['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)));
+$ipmiList
+	->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype)
+	->addRow(_('Privilege level'), $cmbIPMIPrivilege)
+	->addRow(_('Username'), new CTextBox('ipmi_username', $data['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)))
+	->addRow(_('Password'), new CTextBox('ipmi_password', $data['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)));
 $divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
 
 /*

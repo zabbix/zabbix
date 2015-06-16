@@ -43,8 +43,8 @@ if (!empty($this->data['templates'])) {
 	$itemFormList->addRow(_('Parent discovery rules'), $this->data['templates']);
 }
 
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
+$nameTextBox = (new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']))
+	->setAttribute('autofocus', 'autofocus');
 $itemFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
@@ -55,8 +55,8 @@ if ($this->data['limited']) {
 	);
 }
 else {
-	$typeComboBox = new CComboBox('type', $this->data['type']);
-	$typeComboBox->addItems($this->data['types']);
+	$typeComboBox = (new CComboBox('type', $this->data['type']))
+		->addItems($this->data['types']);
 	$itemFormList->addRow(_('Type'), $typeComboBox);
 }
 
@@ -257,17 +257,16 @@ $maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
 	->setId('row-new-delay-flex-max-reached')
 	->setAttribute('style', 'display: none;');
 
-$itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');
-
-$itemFormList->addRow(_('Keep lost resources period (in days)'), new CTextBox('lifetime', $this->data['lifetime'], ZBX_TEXTBOX_SMALL_SIZE, false, 64));
-
-$itemFormList->addRow(_('Allowed hosts'),
-	new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),
-	false, 'row_trapper_hosts');
+$itemFormList
+	->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new')
+	->addRow(_('Keep lost resources period (in days)'), new CTextBox('lifetime', $this->data['lifetime'], ZBX_TEXTBOX_SMALL_SIZE, false, 64))
+	->addRow(_('Allowed hosts'),
+		new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),
+		false, 'row_trapper_hosts');
 
 // append description to form list
-$description = new CTextArea('description', $this->data['description']);
-$description->addStyle('margin-top: 5px;');
+$description = (new CTextArea('description', $this->data['description']))
+	->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
 // status
@@ -280,9 +279,9 @@ $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 $conditionFormList = new CFormList();
 
 // type of calculation
-$formula = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
-$formula->setId('formula');
-$formula->setAttribute('placeholder', 'A or (B and C) &hellip;');
+$formula = (new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->setId('formula')
+	->setAttribute('placeholder', 'A or (B and C) &hellip;');
 if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
 }
@@ -326,14 +325,14 @@ foreach ($conditions as $i => $condition) {
 	];
 
 	// macro
-	$macro = new CTextBox('conditions['.$i.'][macro]', $condition['macro'], 30, false, 64);
-	$macro->addClass('macro');
-	$macro->setAttribute('placeholder', '{#MACRO}');
-	$macro->setAttribute('data-formulaid', $condition['formulaid']);
+	$macro = (new CTextBox('conditions['.$i.'][macro]', $condition['macro'], 30, false, 64))
+		->addClass('macro')
+		->setAttribute('placeholder', '{#MACRO}')
+		->setAttribute('data-formulaid', $condition['formulaid']);
 
 	// value
-	$value = new CTextBox('conditions['.$i.'][value]', $condition['value'], 40, false, 255);
-	$value->setAttribute('placeholder', _('regular expression'));
+	$value = (new CTextBox('conditions['.$i.'][value]', $condition['value'], 40, false, 255))
+		->setAttribute('placeholder', _('regular expression'));
 
 	// delete button
 	$deleteButtonCell = [
@@ -368,12 +367,12 @@ $conditionFormList->addRow(_('Filters'),
 
 
 // append tabs to form
-$itemTab = new CTabView();
+$itemTab = (new CTabView())
+	->addTab('itemTab', $this->data['caption'], $itemFormList)
+	->addTab('macroTab', _('Filters'), $conditionFormList);
 if (!hasRequest('form_refresh')) {
 	$itemTab->setSelected(0);
 }
-$itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
-$itemTab->addTab('macroTab', _('Filters'), $conditionFormList);
 
 // append buttons to form
 if (!empty($this->data['itemid'])) {

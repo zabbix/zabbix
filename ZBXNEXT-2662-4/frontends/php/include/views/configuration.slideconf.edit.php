@@ -33,11 +33,11 @@ if (!empty($this->data['slideshowid'])) {
 }
 
 // create slide form list
-$slideFormList = new CFormList('slideFormList');
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$slideFormList->addRow(_('Name'), $nameTextBox);
-$slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
+$nameTextBox = (new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->setAttribute('autofocus', 'autofocus');
+$slideFormList = (new CFormList('slideFormList'))
+	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
 
 // append slide table
 $slideTable = (new CTable())
@@ -61,8 +61,8 @@ foreach ($this->data['slides'] as $key => $slides) {
 		}
 	}
 
-	$delay = new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false);
-	$delay->setAttribute('placeholder', _('default'));
+	$delay = (new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false))
+		->setAttribute('placeholder', _('default'));
 
 	$removeButton = (new CButton('remove_'.$key, _('Remove')))
 		->onClick('javascript: removeSlide(this);')

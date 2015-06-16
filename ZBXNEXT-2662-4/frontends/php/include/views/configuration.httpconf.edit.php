@@ -95,16 +95,11 @@ $httpFormList->addRow(_('User agent string'),
 // append HTTP proxy to form list
 $httpProxyTextBox = new CTextBox('http_proxy', $this->data['http_proxy'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255);
 $httpProxyTextBox->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]');
-$httpFormList->addRow(_('HTTP proxy'), $httpProxyTextBox);
-
-// append variables to form list
-$httpFormList->addRow(_('Variables'), new CTextArea('variables', $this->data['variables']));
-
-// append headers to form list
-$httpFormList->addRow(_('Headers'), new CTextArea('headers', $this->data['headers']));
-
-// status
-$httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
+$httpFormList
+	->addRow(_('HTTP proxy'), $httpProxyTextBox)
+	->addRow(_('Variables'), new CTextArea('variables', $this->data['variables']))
+	->addRow(_('Headers'), new CTextArea('headers', $this->data['headers']))
+	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
 /*
  * Authentication tab
@@ -126,36 +121,27 @@ if ($authenticationInputsHidden) {
 	$httpAuthenticationPasswordTB->setAttribute('disabled', true);
 }
 
-$httpAuthenticationFormList->addRow(_('User'), $httpAuthenticationUserTB, $authenticationInputsHidden);
-$httpAuthenticationFormList->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden);
-
-// SSL verify peer checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify peer'),
-	(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
-);
-
-// SSL verify host checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify host'),
-	(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
-);
-
-// SSL certificate file
-$httpAuthenticationFormList->addRow(
-	_('SSL certificate file'),
-	new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
-);
-
-// SSL key file
-$httpAuthenticationFormList->addRow(
-	_('SSL key file'),
-	new CTextBox('ssl_key_file', $this->data['ssl_key_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
-);
-
-// SSL key password
-$httpAuthenticationFormList->addRow(
-	_('SSL key password'),
-	new CTextBox('ssl_key_password', $this->data['ssl_key_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64)
-);
+$httpAuthenticationFormList
+	->addRow(_('User'), $httpAuthenticationUserTB, $authenticationInputsHidden)
+	->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden)
+	->addRow(_('SSL verify peer'),
+		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
+	)
+	->addRow(_('SSL verify host'),
+		(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
+	)
+	->addRow(
+		_('SSL certificate file'),
+		new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
+	)
+	->addRow(
+		_('SSL key file'),
+		new CTextBox('ssl_key_file', $this->data['ssl_key_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
+	)
+	->addRow(
+		_('SSL key password'),
+		new CTextBox('ssl_key_password', $this->data['ssl_key_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64)
+	);
 
 /*
  * Step tab
@@ -259,13 +245,13 @@ $httpStepFormList->addRow(_('Steps'),
 );
 
 // append tabs to form
-$httpTab = new CTabView();
+$httpTab = (new CTabView())
+	->addTab('scenarioTab', _('Scenario'), $httpFormList)
+	->addTab('stepTab', _('Steps'), $httpStepFormList)
+	->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFormList);
 if (!$this->data['form_refresh']) {
 	$httpTab->setSelected(0);
 }
-$httpTab->addTab('scenarioTab', _('Scenario'), $httpFormList);
-$httpTab->addTab('stepTab', _('Steps'), $httpStepFormList);
-$httpTab->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFormList);
 
 // append buttons to form
 if (!empty($this->data['httptestid'])) {

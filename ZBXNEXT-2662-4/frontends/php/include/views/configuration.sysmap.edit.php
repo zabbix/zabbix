@@ -33,25 +33,25 @@ if (isset($this->data['sysmap']['sysmapid'])) {
 }
 
 // create sysmap form list
-$sysmapList = new CFormList();
+$nameTextBox = (new CTextBox('name', $this->data['sysmap']['name'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->setAttribute('autofocus', 'autofocus');
 
-$nameTextBox = new CTextBox('name', $this->data['sysmap']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$sysmapList->addRow(_('Name'), $nameTextBox);
-$sysmapList->addRow(_('Width'), new CNumericBox('width', $this->data['sysmap']['width'], 5));
-$sysmapList->addRow(_('Height'), new CNumericBox('height', $this->data['sysmap']['height'], 5));
+$sysmapList = (new CFormList())
+	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Width'), new CNumericBox('width', $this->data['sysmap']['width'], 5))
+	->addRow(_('Height'), new CNumericBox('height', $this->data['sysmap']['height'], 5));
 
 // append background image to form list
-$imageComboBox = new CComboBox('backgroundid', $this->data['sysmap']['backgroundid']);
-$imageComboBox->addItem(0, _('No image'));
+$imageComboBox = (new CComboBox('backgroundid', $this->data['sysmap']['backgroundid']))
+	->addItem(0, _('No image'));
 foreach ($this->data['images'] as $image) {
 	$imageComboBox->addItem($image['imageid'], $image['name']);
 }
 $sysmapList->addRow(_('Background image'), $imageComboBox);
 
 // append iconmapping to form list
-$iconMappingComboBox = new CComboBox('iconmapid', $this->data['sysmap']['iconmapid']);
-$iconMappingComboBox->addItem(0, _('<manual>'));
+$iconMappingComboBox = (new CComboBox('iconmapid', $this->data['sysmap']['iconmapid']))
+	->addItem(0, _('<manual>'));
 foreach ($this->data['iconMaps'] as $iconMap) {
 	$iconMappingComboBox->addItem($iconMap['iconmapid'], $iconMap['name']);
 }
@@ -137,10 +137,9 @@ $showUnackComboBox->setEnabled($this->data['config']['event_ack_enable']);
 if (!$this->data['config']['event_ack_enable']) {
 	$showUnackComboBox->setAttribute('title', _('Acknowledging disabled'));
 }
-$sysmapList->addRow(_('Problem display'), $showUnackComboBox);
-
-// append severity min to form list
-$sysmapList->addRow(_('Minimum trigger severity'), new CSeverity(['name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min']]));
+$sysmapList
+	->addRow(_('Problem display'), $showUnackComboBox)
+	->addRow(_('Minimum trigger severity'), new CSeverity(['name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min']]));
 
 // create url table
 $urlTable = (new CTable())
@@ -160,26 +159,25 @@ foreach ($this->data['sysmap']['urls'] as $url) {
 		->onClick('$("urlEntry_'.$i.'").remove();')
 		->addClass(ZBX_STYLE_BTN_LINK);
 
-	$urlRow = new CRow([$urlLabel, $urlLink, $urlEtype, $removeButton]);
-	$urlRow->setId('urlEntry_'.$i);
+	$urlRow = (new CRow([$urlLabel, $urlLink, $urlEtype, $removeButton]))->setId('urlEntry_'.$i);
 
 	$urlTable->addRow($urlRow);
 	$i++;
 }
 
 // append empty template row to url table
-$templateUrlLabel = new CTextBox('urls[#{id}][name]', '', 32);
-$templateUrlLabel->setAttribute('disabled', 'disabled');
-$templateUrlLink = new CTextBox('urls[#{id}][url]', '', 32);
-$templateUrlLink->setAttribute('disabled', 'disabled');
-$templateUrlEtype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
-$templateUrlEtype->setAttribute('disabled', 'disabled');
+$templateUrlLabel = (new CTextBox('urls[#{id}][name]', '', 32))
+	->setAttribute('disabled', 'disabled');
+$templateUrlLink = (new CTextBox('urls[#{id}][url]', '', 32))
+	->setAttribute('disabled', 'disabled');
+$templateUrlEtype = (new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types()))
+	->setAttribute('disabled', 'disabled');
 $templateRemoveButton = (new CButton(null, _('Remove')))
 	->onClick('$("entry_#{id}").remove();')
 	->addClass(ZBX_STYLE_BTN_LINK);
-$templateUrlRow = new CRow([$templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton]);
-$templateUrlRow->addStyle('display: none');
-$templateUrlRow->setId('urlEntryTpl');
+$templateUrlRow = (new CRow([$templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton]))
+	->addStyle('display: none')
+	->setId('urlEntryTpl');
 $urlTable->addRow($templateUrlRow);
 
 // append "add" button to url table
@@ -198,8 +196,7 @@ $sysmapList->addRow(_('URLs'),
 );
 
 // append sysmap to form
-$sysmapTab = new CTabView();
-$sysmapTab->addTab('sysmapTab', _('Map'), $sysmapList);
+$sysmapTab = (new CTabView())->addTab('sysmapTab', _('Map'), $sysmapList);
 
 // append buttons to form
 if (hasRequest('sysmapid') && getRequest('sysmapid') > 0) {

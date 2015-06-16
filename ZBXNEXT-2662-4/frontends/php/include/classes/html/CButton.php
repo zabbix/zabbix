@@ -36,6 +36,7 @@ class CButton extends CTag implements CButtonInterface {
 	 */
 	public function main() {
 		$this->addClass('main');
+		return $this;
 	}
 
 	/**

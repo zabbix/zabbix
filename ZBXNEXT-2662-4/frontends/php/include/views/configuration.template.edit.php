@@ -74,10 +74,12 @@ $templateList = new CFormList('hostlist');
 // FORM ITEM : Template name text box [  ]
 $template_nameTB = new CTextBox('template_name', $host, 54, false, 128);
 $template_nameTB->setAttribute('autofocus', 'autofocus');
-$templateList->addRow(_('Template name'), $template_nameTB);
 
 $visiblenameTB = new CTextBox('visiblename', $visiblename, 54, false, 128);
-$templateList->addRow(_('Visible name'), $visiblenameTB);
+
+$templateList
+	->addRow(_('Template name'), $template_nameTB)
+	->addRow(_('Visible name'), $visiblenameTB);
 
 $groupsTB = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
 
@@ -166,9 +168,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($applicationsList);
 
-		$listBox = new CListBox('applications', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($applicationsList);
+		$listBox = (new CListBox('applications', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($applicationsList);
 		$templateList->addRow(_('Applications'), $listBox);
 	}
 
@@ -189,9 +191,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($itemsList);
 
-		$listBox = new CListBox('items', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($itemsList);
+		$listBox = (new CListBox('items', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($itemsList);
 
 		$templateList->addRow(_('Items'), $listBox);
 	}
@@ -210,9 +212,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($triggersList);
 
-		$listBox = new CListBox('triggers', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($triggersList);
+		$listBox = (new CListBox('triggers', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($triggersList);
 
 		$templateList->addRow(_('Triggers'), $listBox);
 	}
@@ -231,9 +233,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($graphsList);
 
-		$listBox = new CListBox('graphs', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($graphsList);
+		$listBox = (new CListBox('graphs', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($graphsList);
 
 		$templateList->addRow(_('Graphs'), $listBox);
 	}
@@ -255,9 +257,9 @@ if ($data['form'] === 'full_clone') {
 		order_result($discoveryRuleList);
 		$hostDiscoveryRuleids = array_keys($discoveryRuleList);
 
-		$listBox = new CListBox('discoveryRules', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($discoveryRuleList);
+		$listBox = (new CListBox('discoveryRules', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($discoveryRuleList);
 
 		$templateList->addRow(_('Discovery rules'), $listBox);
 
@@ -278,9 +280,9 @@ if ($data['form'] === 'full_clone') {
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('itemsPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('itemsPrototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Item prototypes'), $listBox);
 		}
@@ -299,9 +301,9 @@ if ($data['form'] === 'full_clone') {
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('triggerprototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('triggerprototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Trigger prototypes'), $listBox);
 		}
@@ -320,9 +322,9 @@ if ($data['form'] === 'full_clone') {
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('graphPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('graphPrototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Graph prototypes'), $listBox);
 		}
@@ -341,9 +343,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($screensList);
 
-		$listBox = new CListBox('screens', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($screensList);
+		$listBox = (new CListBox('screens', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($screensList);
 
 		$templateList->addRow(_('Screens'), $listBox);
 	}
@@ -364,9 +366,9 @@ if ($data['form'] === 'full_clone') {
 
 		order_result($httpTestList);
 
-		$listBox = new CListBox('httpTests', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($httpTestList);
+		$listBox = (new CListBox('httpTests', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($httpTestList);
 		$templateList->addRow(_('Web scenarios'), $listBox);
 	}
 }

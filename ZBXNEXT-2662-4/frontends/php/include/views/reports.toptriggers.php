@@ -107,13 +107,15 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 	}
 }
 
-$severitiesTable->addRow($severitiesCol1);
-$severitiesTable->addRow($severitiesCol2);
+$severitiesTable->
+	addRow($severitiesCol1)
+	->addRow($severitiesCol2);
 
 $filterColumn1->addRow(_('Severity'), $severitiesTable);
 
-$filterForm->addColumn($filterColumn1);
-$filterForm->addColumn($filterColumn2);
+$filterForm
+	->addColumn($filterColumn1)
+	->addColumn($filterColumn2);
 
 $topTriggers->addItem($filterForm);
 
