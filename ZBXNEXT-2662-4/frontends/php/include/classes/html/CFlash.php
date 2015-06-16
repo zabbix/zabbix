@@ -45,16 +45,19 @@ class CFlash extends CTag {
 	public function setWidth($value) {
 		$this->attributes['width'] = $value;
 		$this->embededFlash->attributes['width'] = $value;
+		return $this;
 	}
 
 	public function setHeight($value) {
 		$this->attributes['height'] = $value;
 		$this->embededFlash->attributes['height'] = $value;
+		return $this;
 	}
 
 	public function setSrc($value) {
 		$this->srcParam->attributes['value'] = $value;
 		$this->embededFlash->attributes['src'] = $value;
+		return $this;
 	}
 
 	public function bodyToString() {

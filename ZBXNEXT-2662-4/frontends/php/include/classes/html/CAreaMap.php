@@ -27,11 +27,13 @@ class CAreaMap extends CTag {
 	}
 
 	public function addRectArea($x1, $y1, $x2, $y2, $href, $alt) {
-		return $this->addArea([$x1, $y1, $x2, $y2], $href, $alt, 'rect');
+		$this->addArea([$x1, $y1, $x2, $y2], $href, $alt, 'rect');
+		return $this;
 	}
 
 	public function addArea($coords, $href, $alt, $shape) {
-		return $this->addItem(new CArea($coords, $href, $alt, $shape));
+		$this->addItem(new CArea($coords, $href, $alt, $shape));
+		return $this;
 	}
 
 	public function addItem($value) {
@@ -39,6 +41,7 @@ class CAreaMap extends CTag {
 			return $this->error('Incorrect value for addItem "'.$value.'".');
 		}
 
-		return parent::addItem($value);
+		parent::addItem($value);
+		return $this;
 	}
 }

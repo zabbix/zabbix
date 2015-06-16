@@ -35,7 +35,6 @@ class CLink extends CTag {
 
 	public function removeSID() {
 		$this->use_sid = false;
-
 		return $this;
 	}
 
@@ -48,13 +47,11 @@ class CLink extends CTag {
 				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
 			}
 		}
-
 		return $url;
 	}
 
 	public function setTarget($value = null) {
 		$this->attributes['target'] = $value;
-
 		return $this;
 	}
 

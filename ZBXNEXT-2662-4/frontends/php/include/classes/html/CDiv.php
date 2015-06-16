@@ -30,5 +30,6 @@ class CDiv extends CTag {
 
 	public function useJQueryStyle() {
 		$this->addClass('jqueryinputset');
+		return $this;
 	}
 }

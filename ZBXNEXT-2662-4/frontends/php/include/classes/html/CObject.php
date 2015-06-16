@@ -44,10 +44,12 @@ class CObject {
 
 	public function show($destroy = true) {
 		echo $this->toString($destroy);
+		return $this;
 	}
 
 	public function destroy() {
 		$this->cleanItems();
+		return $this;
 	}
 
 	public function cleanItems() {

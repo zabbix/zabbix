@@ -37,6 +37,7 @@ class CHostsInfo extends CTable {
 			return $this->error('Incorrect value for SetOrientation "'.$value.'".');
 		}
 		$this->style = $value;
+		return $this;
 	}
 
 	public function bodyToString() {

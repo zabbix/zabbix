@@ -66,6 +66,7 @@ class CTweenBox {
 		else {
 			$this->rbox->addItem($value, $caption, null, $enabled);
 		}
+		return $this;
 	}
 
 	public function get($caption_l = null, $caption_r = null) {
@@ -107,6 +108,7 @@ class CTweenBox {
 		}
 		$tab = $this->get($caption_l, $caption_r);
 		$tab->show();
+		return $this;
 	}
 
 	public function toString() {

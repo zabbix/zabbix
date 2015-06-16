@@ -74,18 +74,22 @@ class CTextArea extends CTag {
 		else {
 			$this->removeAttribute('readonly');
 		}
+		return $this;
 	}
 
 	public function setValue($value = '') {
-		return $this->addItem($value);
+		$this->addItem($value);
+		return $this;
 	}
 
 	public function setRows($value) {
 		$this->setAttribute('rows', $value);
+		return $this;
 	}
 
 	public function setCols($value) {
 		$this->setAttribute('cols', $value);
+		return $this;
 	}
 
 	public function setMaxlength($maxlength) {
@@ -106,5 +110,6 @@ class CTextArea extends CTag {
 				}',
 			true);
 		}
+		return $this;
 	}
 }
