@@ -115,7 +115,6 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	//border-bottom: 1px solid darken($body-bg-color, 10%);
 	border-bottom: 1px solid $ui-border-color;
 	padding: 0 0 5px 0;
 }
@@ -135,9 +134,8 @@ h3 {
 
 h4 {
 	font-size: $font-h4-size;
-	color: lighten($font-color, 10%);
+	color: lighten($font-color, 13%);
 	line-height: $h4-line-height;
-	font-weight: bold;
 
 	span {
 		font-size: $font-body-size;
@@ -2049,6 +2047,7 @@ button[disabled] {
 	cursor: move;
 	position: relative;
 	padding: 8px 60px 8px 10px;
+	font-weight: bold;
 
 	ul {
 		position: absolute;
