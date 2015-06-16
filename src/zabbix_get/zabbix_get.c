@@ -32,7 +32,7 @@ const char	syslog_app_name[] = "zabbix_get";
 const char	*usage_message[] = {
 	"-s host-name-or-IP [-p port-number] [-I IP-address] -k item-key",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] [--tls-cert-issuer=certificate_issuer] [--tls-cert-subject=certificate_subject] --tls-cert-file=cert_file --tls-key-file=key_file -k item-key",
+	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=cert --tls-ca-file=ca_file [--tls-crl-file=crl_file] [--tls-agent-cert-issuer=certificate_issuer] [--tls-agent-cert-subject=certificate_subject] --tls-cert-file=cert_file --tls-key-file=key_file -k item-key",
 	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect=psk --tls-psk-identity=psk_identity --tls-psk-file=psk_file -k item-key",
 #endif
 	"-h",
@@ -67,9 +67,9 @@ const char	*help_message[] = {
 	"",
 	"  --tls-crl-file                     Full pathname of a file containing revoked certificates",
 	"",
-	"  --tls-cert-issuer                  Allowed server certificate issuer",
+	"  --tls-agent-cert-issuer            Allowed agent certificate issuer",
 	"",
-	"  --tls-cert-subject                 Allowed server certificate subject",
+	"  --tls-agent-cert-subject           Allowed agent certificate subject",
 	"",
 	"  --tls-cert-file                    Full pathname of a file containing the certificate or certificate chain",
 	"",
@@ -91,8 +91,8 @@ const char	*help_message[] = {
 	"",
 	"    zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" --tls-connect=cert \\",
 	"        --tls-ca-file=/home/zabbix/zabbix_ca_file \\",
-	"        --tls-cert-issuer=\"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
-	"        --tls-cert-subject=\"CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"        --tls-agent-cert-issuer=\"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"        --tls-agent-cert-subject=\"CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
 	"        --tls-cert-file=/home/zabbix/zabbix_get.crt \\",
 	"        --tls-key-file=/home/zabbix/zabbix_get.key",
 #endif
@@ -119,21 +119,21 @@ char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 /* long options */
 struct zbx_option	longopts[] =
 {
-	{"host",		1,	NULL,	's'},
-	{"port",		1,	NULL,	'p'},
-	{"key",			1,	NULL,	'k'},
-	{"source-address",	1,	NULL,	'I'},
-	{"help",		0,	NULL,	'h'},
-	{"version",		0,	NULL,	'V'},
-	{"tls-connect",		1,	NULL,	'1'},
-	{"tls-ca-file",		1,	NULL,	'2'},
-	{"tls-crl-file",	1,	NULL,	'3'},
-	{"tls-cert-issuer",	1,	NULL,	'4'},
-	{"tls-cert-subject",	1,	NULL,	'5'},
-	{"tls-cert-file",	1,	NULL,	'6'},
-	{"tls-key-file",	1,	NULL,	'7'},
-	{"tls-psk-identity",	1,	NULL,	'8'},
-	{"tls-psk-file",	1,	NULL,	'9'},
+	{"host",			1,	NULL,	's'},
+	{"port",			1,	NULL,	'p'},
+	{"key",				1,	NULL,	'k'},
+	{"source-address",		1,	NULL,	'I'},
+	{"help",			0,	NULL,	'h'},
+	{"version",			0,	NULL,	'V'},
+	{"tls-connect",			1,	NULL,	'1'},
+	{"tls-ca-file",			1,	NULL,	'2'},
+	{"tls-crl-file",		1,	NULL,	'3'},
+	{"tls-agent-cert-issuer",	1,	NULL,	'4'},
+	{"tls-agent-cert-subject",	1,	NULL,	'5'},
+	{"tls-cert-file",		1,	NULL,	'6'},
+	{"tls-key-file",		1,	NULL,	'7'},
+	{"tls-psk-identity",		1,	NULL,	'8'},
+	{"tls-psk-file",		1,	NULL,	'9'},
 	{NULL}
 };
 
