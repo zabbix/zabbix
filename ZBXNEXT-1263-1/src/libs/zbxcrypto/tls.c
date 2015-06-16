@@ -399,8 +399,8 @@ static void	zbx_parameter_not_empty(const char *param, const char *param_name)
  ******************************************************************************/
 static void	zbx_tls_validate_config(void)
 {
-	/* parse and validate 'TLSConnect' parameter used in zabbix_proxy.conf, zabbix_agentd.conf */
-	/* and '--tls-connect' parameter used in zabbix_get and zabbix_sender */
+	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
+	/* parameter (in zabbix_get and zabbix_sender) */
 
 	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
 		zbx_parameter_not_empty(CONFIG_TLS_CONNECT, "--tls-connect");
@@ -428,7 +428,7 @@ static void	zbx_tls_validate_config(void)
 		}
 	}
 
-	/* parse and validate 'TLSAccept' parameter used in zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf */
+	/* parse and validate 'TLSAccept' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) */
 
 	zbx_parameter_not_empty(CONFIG_TLS_ACCEPT, "TLSAccept");
 
@@ -672,7 +672,7 @@ static void	zbx_tls_validate_config(void)
 	{
 		/* 'TLSConnect' is the master parameter to be matched by certificate and PSK parameters. */
 		/* 'TLSConnect' will be silently ignored on agentd, if active checks are not configured */
-		/* (i.e. 'ServerActive' is not specified. */
+		/* (i.e. 'ServerActive' is not specified). */
 
 		if ((NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_PSK_FILE) && NULL == CONFIG_TLS_CONNECT)
 		{
@@ -2311,7 +2311,7 @@ void	zbx_tls_init_child(void)
 
 	zbx_tls_validate_config();
 
-	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	if (NULL != CONFIG_TLS_CA_FILE)
 	{
 		ca_cert = zbx_malloc(ca_cert, sizeof(x509_crt));
@@ -2340,7 +2340,7 @@ void	zbx_tls_init_child(void)
 				CONFIG_TLS_CA_FILE);
 	}
 
-	/* 'TLSCRLFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSCRLFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load CRL (certificate revocation list) file. */
 	if (NULL != CONFIG_TLS_CRL_FILE)
 	{
@@ -2370,7 +2370,7 @@ void	zbx_tls_init_child(void)
 				CONFIG_TLS_CRL_FILE);
 	}
 
-	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load certificate. */
 	if (NULL != CONFIG_TLS_CERT_FILE)
 	{
@@ -2400,7 +2400,7 @@ void	zbx_tls_init_child(void)
 				CONFIG_TLS_CERT_FILE);
 	}
 
-	/* 'TLSKeyFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSKeyFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load private key. */
 	if (NULL != CONFIG_TLS_KEY_FILE)
 	{
@@ -2423,7 +2423,7 @@ void	zbx_tls_init_child(void)
 				__function_name, (zbx_fs_size_t)pk_get_size(my_priv_key), pk_get_name(my_priv_key));
 	}
 
-	/* 'TLSPSKFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSPSKFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load pre-shared key. */
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
@@ -2431,8 +2431,8 @@ void	zbx_tls_init_child(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded pre-shared key", __function_name);
 	}
 
-	/* 'TLSPSKIdentity' parameter (in zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). Configure */
-	/* identity to be used with the pre-shared key. */
+	/* 'TLSPSKIdentity' parameter (in zabbix_proxy.conf, zabbix_agentd.conf). Configure identity to be used with */
+	/* the pre-shared key. */
 	if (NULL != CONFIG_TLS_PSK_IDENTITY)
 	{
 		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
@@ -2449,7 +2449,7 @@ void	zbx_tls_init_child(void)
 				cipher_count);
 	}
 
-	/* PSK can come from configuration file (in proxy, agentd, agent) and later from database (in server, proxy). */
+	/* PSK can come from configuration file (in proxy, agentd) and later from database (in server, proxy). */
 	/* Configure ciphersuites just in case they will be used. */
 	if (NULL != my_psk || 0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
 	{
@@ -2522,7 +2522,7 @@ void	zbx_tls_init_child(void)
 		}
 	}
 
-	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf) */
+	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf) */
 	if (NULL != CONFIG_TLS_CA_FILE)
 	{
 		if (0 < (res = gnutls_certificate_set_x509_trust_file(my_cert_creds, CONFIG_TLS_CA_FILE,
@@ -2544,7 +2544,7 @@ void	zbx_tls_init_child(void)
 		}
 	}
 
-	/* 'TLSCRLFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSCRLFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load CRL (certificate revocation list) file. */
 	if (NULL != CONFIG_TLS_CRL_FILE)
 	{
@@ -2567,8 +2567,8 @@ void	zbx_tls_init_child(void)
 		}
 	}
 
-	/* 'TLSCertFile' and 'TLSKeyFile' parameters (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, */
-	/* zabbix_agent.conf). Load certificate and private key. */
+	/* 'TLSCertFile' and 'TLSKeyFile' parameters (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
+	/* Load certificate and private key. */
 	if (NULL != CONFIG_TLS_CERT_FILE)
 	{
 		if (GNUTLS_E_SUCCESS != gnutls_certificate_set_x509_key_file(my_cert_creds, CONFIG_TLS_CERT_FILE,
@@ -2586,8 +2586,8 @@ void	zbx_tls_init_child(void)
 		}
 	}
 
-	/* 'TLSPSKIdentity' and 'TLSPSKFile' parameters used in zabbix_proxy.conf, zabbix_agentd.conf, */
-	/* zabbix_agent.conf. Load pre-shared key and identity to be used with the pre-shared key. */
+	/* 'TLSPSKIdentity' and 'TLSPSKFile' parameters (in zabbix_proxy.conf, zabbix_agentd.conf). */
+	/* Load pre-shared key and identity to be used with the pre-shared key. */
 
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
@@ -2742,7 +2742,7 @@ void	zbx_tls_init_child(void)
 	if (NULL != ctx_cert && NULL != ctx_psk && NULL == (ctx_all = SSL_CTX_new(method)))
 		goto out_method;
 
-	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf) */
+	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf) */
 	if (NULL != CONFIG_TLS_CA_FILE)
 	{
 		if (1 != SSL_CTX_load_verify_locations(ctx_cert, CONFIG_TLS_CA_FILE, NULL) ||
@@ -2766,7 +2766,7 @@ void	zbx_tls_init_child(void)
 			SSL_CTX_set_verify(ctx_all, SSL_VERIFY_PEER | SSL_VERIFY_FAIL_IF_NO_PEER_CERT, NULL);
 	}
 
-	/* 'TLSCRLFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSCRLFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load CRL (certificate revocation list) file. */
 	if (NULL != CONFIG_TLS_CRL_FILE)
 	{
@@ -2817,7 +2817,7 @@ void	zbx_tls_init_child(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CRL file", __function_name);
 	}
 
-	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load certificate. */
 	if (NULL != CONFIG_TLS_CERT_FILE)
 	{
@@ -2833,7 +2833,7 @@ void	zbx_tls_init_child(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate", __function_name);
 	}
 
-	/* 'TLSKeyFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf, zabbix_agent.conf). */
+	/* 'TLSKeyFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load private key. */
 	if (NULL != CONFIG_TLS_KEY_FILE)
 	{
@@ -2858,8 +2858,8 @@ void	zbx_tls_init_child(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded private key", __function_name);
 	}
 
-	/* 'TLSPSKIdentity' and 'TLSPSKFile' parameters used in zabbix_proxy.conf, zabbix_agentd.conf, */
-	/* zabbix_agent.conf. Load pre-shared key and identity to be used with the pre-shared key. */
+	/* 'TLSPSKIdentity' and 'TLSPSKFile' parameters (in zabbix_proxy.conf, zabbix_agentd.conf). */
+	/*  Load pre-shared key and identity to be used with the pre-shared key. */
 
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
@@ -2931,7 +2931,6 @@ void	zbx_tls_init_child(void)
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 			SSL_CTX_set_psk_server_callback(ctx_all, zbx_psk_server_cb);
 	}
-
 
 	if (NULL != ctx_cert)
 	{
