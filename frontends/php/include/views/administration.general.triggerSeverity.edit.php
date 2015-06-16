@@ -36,37 +36,37 @@ $headerDiv = (new CDiv(_('Custom severity')))
 $severityTab->addRow(SPACE, [$headerDiv, _('Colour')]);
 
 $severityNameTB0 = (new CTextBox('severity_name_0', $data['severity_name_0']))
-	->addStyle('width: 15em;')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 32);
 $severityColorTB0 = new CColor('severity_color_0', $data['severity_color_0']);
 $severityTab->addRow(_('Not classified'), [$severityNameTB0, SPACE, $severityColorTB0]);
 
 $severityNameTB1 = (new CTextBox('severity_name_1', $data['severity_name_1']))
-	->addStyle('width: 15em;')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 32);
 $severityColorTB1 = new CColor('severity_color_1', $data['severity_color_1']);
 $severityTab->addRow(_('Information'), [$severityNameTB1, SPACE, $severityColorTB1]);
 
 $severityNameTB2 = (new CTextBox('severity_name_2', $data['severity_name_2']))
-	->addStyle('width: 15em;')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 32);
 $severityColorTB2 = new CColor('severity_color_2', $data['severity_color_2']);
 $severityTab->addRow(_('Warning'), [$severityNameTB2, SPACE, $severityColorTB2]);
 
 $severityNameTB3 = (new CTextBox('severity_name_3', $data['severity_name_3']))
-	->addStyle('width: 15em;')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 32);
 $severityColorTB3 = new CColor('severity_color_3', $data['severity_color_3']);
 $severityTab->addRow(_('Average'), [$severityNameTB3, SPACE, $severityColorTB3]);
 
 $severityNameTB4 = (new CTextBox('severity_name_4', $data['severity_name_4']))
-	->addStyle('width: 15em;')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 32);
 $severityColorTB4 = new CColor('severity_color_4', $data['severity_color_4']);
 $severityTab->addRow(_('High'), [$severityNameTB4, SPACE, $severityColorTB4]);
 
 $severityNameTB5 = (new CTextBox('severity_name_5', $data['severity_name_5']))
-	->addStyle('width: 15em;')
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 32);
 $severityColorTB5 = new CColor('severity_color_5', $data['severity_color_5']);
 $severityTab->addRow(_('Disaster'), [$severityNameTB5, SPACE, $severityColorTB5]);

@@ -32,10 +32,12 @@ if (!empty($this->data['druleid'])) {
 }
 
 // create form list
-$nameTextBox = (new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE))
-	->setAttribute('autofocus', 'autofocus');
 $discoveryFormList = (new CFormList())
-	->addRow(_('Name'), $nameTextBox);
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['drule']['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	);
 
 // append proxy to form list
 $proxyComboBox = (new CComboBox('proxy_hostid', $this->data['drule']['proxy_hostid']))
@@ -43,9 +45,12 @@ $proxyComboBox = (new CComboBox('proxy_hostid', $this->data['drule']['proxy_host
 foreach ($this->data['proxies'] as $proxy) {
 	$proxyComboBox->addItem($proxy['proxyid'], $proxy['host']);
 }
+
 $discoveryFormList
 	->addRow(_('Discovery by proxy'), $proxyComboBox)
-	->addRow(_('IP range'), new CTextBox('iprange', $this->data['drule']['iprange'], ZBX_TEXTBOX_SMALL_SIZE))
+	->addRow(_('IP range'),
+		(new CTextBox('iprange', $this->data['drule']['iprange']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
 
 // append checks to form list

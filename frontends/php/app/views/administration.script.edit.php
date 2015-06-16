@@ -31,15 +31,14 @@ $scriptForm = (new CForm())
 
 $scriptFormList = new CFormList();
 
-$scriptFormList->addRow(
-	_('Name'),
-	(new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE))
+$scriptFormList->addRow(_('Name'),
+	(new CTextBox('name', $data['name']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
 		->setAttribute('placeholder', _('<Sub-menu/Sub-menu.../>Script'))
 );
 
-$scriptFormList->addRow(
-	_('Type'),
+$scriptFormList->addRow(_('Type'),
 	new CComboBox('type', $data['type'], null, [
 		ZBX_SCRIPT_TYPE_IPMI => _('IPMI'),
 		ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT => _('Script')
@@ -51,23 +50,19 @@ $typeRadioButton = (new CRadioButtonList('execute_on', $data['execute_on']))
 	->makeVertical()
 	->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 	->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
-$scriptFormList->addRow(
-	_('Execute on'),
+$scriptFormList->addRow(_('Execute on'),
 	(new CDiv($typeRadioButton))->addClass('objectgroup inlineblock border_dotted'),
 	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
 );
-$scriptFormList->addRow(
-	_('Commands'),
+$scriptFormList->addRow(_('Commands'),
 	new CTextArea('command', $data['command']),
 	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
 );
-$scriptFormList->addRow(
-	_('Command'),
-	new CTextBox('commandipmi', $data['commandipmi'], ZBX_TEXTBOX_STANDARD_SIZE),
+$scriptFormList->addRow(_('Command'),
+	(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	($data['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
 );
-$scriptFormList->addRow(
-	_('Description'),
+$scriptFormList->addRow(_('Description'),
 	new CTextArea('description', $data['description'])
 );
 
@@ -104,7 +99,7 @@ $scriptFormList->addRow(new CLabel(_('Enable confirmation'), 'enable_confirmatio
 
 $confirmationLabel = new CLabel(_('Confirmation text'), 'confirmation');
 $scriptFormList->addRow($confirmationLabel, [
-	new CTextBox('confirmation', $data['confirmation'], ZBX_TEXTBOX_STANDARD_SIZE),
+	(new CTextBox('confirmation', $data['confirmation']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	SPACE,
 	(new CButton('testConfirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
 ]);

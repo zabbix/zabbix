@@ -83,16 +83,25 @@ else {
 		->addVar('steps_names', getRequest('steps_names'));
 
 	$httpPopupFormList = (new CFormList())
-		->addRow(_('Name'), new CTextBox('name', getRequest('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, (bool) getRequest('templated'), 64))
-		->addRow(_('URL'), new CTextBox('url', getRequest('url', ''), ZBX_TEXTBOX_STANDARD_SIZE, false, null))
+		->addRow(_('Name'),
+			(new CTextBox('name', getRequest('name', ''), (bool) getRequest('templated'), 64))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+		->addRow(_('URL'),
+			(new CTextBox('url', getRequest('url', ''), false, null))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
 		->addRow(_('Post'), new CTextArea('posts', getRequest('posts', '')))
 		->addRow(_('Variables'), new CTextArea('variables', getRequest('variables', '')))
 		->addRow(_('Headers'), new CTextArea('headers', getRequest('headers', '')))
 		->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1))
 		->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1))
 		->addRow(_('Timeout'), new CNumericBox('timeout', getRequest('timeout', 15), 5))
-		->addRow(_('Required string'), new CTextBox('required', getRequest('required', ''), ZBX_TEXTBOX_STANDARD_SIZE))
-		->addRow(_('Required status codes'), new CTextBox('status_codes', getRequest('status_codes', ''), ZBX_TEXTBOX_STANDARD_SIZE));
+		->addRow(_('Required string'),
+			(new CTextBox('required', getRequest('required', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+		->addRow(_('Required status codes'),
+			(new CTextBox('status_codes', getRequest('status_codes', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
 
 	// append tabs to form
 	$httpPopupTab = new CTabView();

@@ -33,11 +33,12 @@ if (isset($this->data['sysmap']['sysmapid'])) {
 }
 
 // create sysmap form list
-$nameTextBox = (new CTextBox('name', $this->data['sysmap']['name'], ZBX_TEXTBOX_STANDARD_SIZE))
-	->setAttribute('autofocus', 'autofocus');
-
 $sysmapList = (new CFormList())
-	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['sysmap']['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow(_('Width'), new CNumericBox('width', $this->data['sysmap']['width'], 5))
 	->addRow(_('Height'), new CNumericBox('height', $this->data['sysmap']['height'], 5));
 
@@ -152,26 +153,28 @@ if (empty($this->data['sysmap']['urls'])) {
 }
 $i = 0;
 foreach ($this->data['sysmap']['urls'] as $url) {
-	$urlLabel = new CTextBox('urls['.$i.'][name]', $url['name'], 32);
-	$urlLink = new CTextBox('urls['.$i.'][url]', $url['url'], 32);
-	$urlEtype = new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types());
-	$removeButton = (new CButton(null, _('Remove')))
-		->onClick('$("urlEntry_'.$i.'").remove();')
-		->addClass(ZBX_STYLE_BTN_LINK);
-
-	$urlRow = (new CRow([$urlLabel, $urlLink, $urlEtype, $removeButton]))->setId('urlEntry_'.$i);
-
-	$urlTable->addRow($urlRow);
+	$urlTable->addRow(
+		(new CRow([
+			(new CTextBox('urls['.$i.'][name]', $url['name']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			(new CTextBox('urls['.$i.'][url]', $url['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types()),
+			(new CButton(null, _('Remove')))
+				->onClick('$("urlEntry_'.$i.'").remove();')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		]))->setId('urlEntry_'.$i)
+	);
 	$i++;
 }
 
 // append empty template row to url table
-$templateUrlLabel = (new CTextBox('urls[#{id}][name]', '', 32))
+$templateUrlLabel = (new CTextBox('urls[#{id}][name]', ''))
+	->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	->setAttribute('disabled', 'disabled');
-$templateUrlLink = (new CTextBox('urls[#{id}][url]', '', 32))
+$templateUrlLink = (new CTextBox('urls[#{id}][url]', ''))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('disabled', 'disabled');
-$templateUrlEtype = (new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types()))
-	->setAttribute('disabled', 'disabled');
+$templateUrlEtype = new CComboBox('urls[#{id}][elementtype]', null, null, sysmap_element_types());
+$templateUrlEtype->setAttribute('disabled', 'disabled');
 $templateRemoveButton = (new CButton(null, _('Remove')))
 	->onClick('$("entry_#{id}").remove();')
 	->addClass(ZBX_STYLE_BTN_LINK);

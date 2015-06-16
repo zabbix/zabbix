@@ -43,11 +43,16 @@ if ($data['userid'] != 0) {
 $userFormList = new CFormList('userFormList');
 
 if (!$data['is_profile']) {
-	$nameTextBox = new CTextBox('alias', $this->data['alias'], ZBX_TEXTBOX_STANDARD_SIZE);
-	$nameTextBox->setAttribute('autofocus', 'autofocus');
-	$userFormList->addRow(_('Alias'), $nameTextBox);
-	$userFormList->addRow(_x('Name', 'user first name'), new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE));
-	$userFormList->addRow(_('Surname'), new CTextBox('surname', $this->data['surname'], ZBX_TEXTBOX_STANDARD_SIZE));
+	$userFormList->addRow(_('Alias'), (new CTextBox('alias', $this->data['alias']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+	);
+	$userFormList->addRow(_x('Name', 'user first name'),
+		(new CTextBox('name', $this->data['name']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+	$userFormList->addRow(_('Surname'),
+		(new CTextBox('surname', $this->data['surname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 }
 
 // append user groups to form list
@@ -168,7 +173,9 @@ if ($this->data['alias'] != ZBX_GUEST_USER) {
 $userFormList
 	->addRow(_('Refresh (in seconds)'), new CNumericBox('refresh', $this->data['refresh'], 4))
 	->addRow(_('Rows per page'), new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))
-	->addRow(_('URL (after login)'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
+	->addRow(_('URL (after login)'),
+		(new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 /*
  * Media tab

@@ -34,10 +34,12 @@ if (!empty($this->data['screenid'])) {
 }
 
 // create screen form list
-$nameTextBox = (new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE))
-	->setAttribute('autofocus', 'autofocus');
 $screenFormList = (new CFormList())
-	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['name']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow(_('Columns'), new CNumericBox('hsize', $this->data['hsize'], 3))
 	->addRow(_('Rows'), new CNumericBox('vsize', $this->data['vsize'], 3));
 

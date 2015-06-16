@@ -38,12 +38,15 @@ else {
 /*
  * Action tab
  */
-$nameTextBox = (new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE))
-	->setAttribute('autofocus', 'autofocus');
-
 $actionFormList = (new CFormList())
-	->addRow(_('Name'), $nameTextBox)
-	->addRow(_('Default subject'), new CTextBox('def_shortdata', $this->data['action']['def_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['action']['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Default subject'),
+		(new CTextBox('def_shortdata', $this->data['action']['def_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
@@ -53,7 +56,9 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 			->onClick('javascript: submit();')
 	);
 	if ($this->data['action']['recovery_msg']) {
-		$actionFormList->addRow(_('Recovery subject'), new CTextBox('r_shortdata', $this->data['action']['r_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
+		$actionFormList->addRow(_('Recovery subject'),
+			(new CTextBox('r_shortdata', $this->data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
 		$actionFormList->addRow(_('Recovery message'), new CTextArea('r_longdata', $this->data['action']['r_longdata']));
 	}
 	else {
@@ -124,7 +129,8 @@ if ($this->data['action']['filter']['conditions']) {
 	}
 }
 
-$formula = (new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE))
+$formula = (new CTextBox('formula', $this->data['action']['filter']['formula']))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
 if ($this->data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
@@ -148,6 +154,7 @@ $conditionFormList->addRow(
 		(new CSpan(''))
 			->addClass($this->data['action']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION ? 'hidden' : '')
 			->setId('conditionLabel'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$formula
 	],
 	false,
@@ -240,7 +247,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_TRIGGER_NAME:
-		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_VALUE:
@@ -252,7 +259,8 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_TIME_PERIOD:
-		$condition = new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL, ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = (new CTextBox('new_condition[value]', ZBX_DEFAULT_INTERVAL))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_SEVERITY:
@@ -270,7 +278,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DRULE:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			new CTextBox('drule', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CTextBox('drule', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -282,7 +290,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_DCHECK:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			new CTextBox('dcheck', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CTextBox('dcheck', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -294,7 +302,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_PROXY:
 		$conditionFormList->addItem(new CVar('new_condition[value]', '0'));
 		$condition = [
-			new CTextBox('proxy', '', ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CTextBox('proxy', '', true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('btn1', _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -305,7 +313,8 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DHOST_IP:
-		$condition = new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = (new CTextBox('new_condition[value]', '192.168.0.1-127,192.168.2.1'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DSERVICE_TYPE:
@@ -316,7 +325,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DSERVICE_PORT:
-		$condition = new CTextBox('new_condition[value]', '0-1023,1024-49151', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = (new CTextBox('new_condition[value]', '0-1023,1024-49151'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DSTATUS:
@@ -338,15 +347,15 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DVALUE:
-		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_APPLICATION:
-		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_HOST_NAME:
-		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_EVENT_TYPE:
@@ -354,7 +363,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_HOST_METADATA:
-		$condition = new CTextBox('new_condition[value]', '', ZBX_TEXTBOX_STANDARD_SIZE);
+		$condition = (new CTextBox('new_condition[value]', ''))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	default:
@@ -698,7 +707,8 @@ if (!empty($this->data['new_operation'])) {
 			if (!$this->data['new_operation']['opmessage']['default_msg']) {
 				$newOperationsTable->addRow([
 					_('Subject'),
-					new CTextBox('new_operation[opmessage][subject]', $this->data['new_operation']['opmessage']['subject'], ZBX_TEXTBOX_STANDARD_SIZE)
+					(new CTextBox('new_operation[opmessage][subject]', $this->data['new_operation']['opmessage']['subject']))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				]);
 				$newOperationsTable->addRow([
 					_('Message'),
@@ -821,7 +831,8 @@ if (!empty($this->data['new_operation'])) {
 			);
 
 			$userScriptId = new CVar('new_operation[opcommand][scriptid]', $this->data['new_operation']['opcommand']['scriptid']);
-			$userScriptName = new CTextBox('new_operation[opcommand][script]', $this->data['new_operation']['opcommand']['script'], 32, true);
+			$userScriptName = (new CTextBox('new_operation[opcommand][script]', $this->data['new_operation']['opcommand']['script'], true))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 			$userScriptSelect = (new CButton('select_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY);
 
 			$userScript = (new CDiv([$userScriptId, $userScriptName, SPACE, $userScriptSelect]))
@@ -864,49 +875,57 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow(
 				[
 					_('User name'),
-					new CTextBox('new_operation[opcommand][username]', $this->data['new_operation']['opcommand']['username'], ZBX_TEXTBOX_SMALL_SIZE)
+					(new CTextBox('new_operation[opcommand][username]', $this->data['new_operation']['opcommand']['username']))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				],
 				'class_authentication_username hidden indent_both'
 			);
 			$newOperationsTable->addRow(
 				[
 					_('Public key file'),
-					new CTextBox('new_operation[opcommand][publickey]', $this->data['new_operation']['opcommand']['publickey'], ZBX_TEXTBOX_SMALL_SIZE)
+					(new CTextBox('new_operation[opcommand][publickey]', $this->data['new_operation']['opcommand']['publickey']))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				],
 				'class_authentication_publickey hidden indent_both'
 			);
 			$newOperationsTable->addRow(
 				[
 					_('Private key file'),
-					new CTextBox('new_operation[opcommand][privatekey]', $this->data['new_operation']['opcommand']['privatekey'], ZBX_TEXTBOX_SMALL_SIZE)
+					(new CTextBox('new_operation[opcommand][privatekey]', $this->data['new_operation']['opcommand']['privatekey']))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				],
 				'class_authentication_privatekey hidden indent_both'
 			);
 			$newOperationsTable->addRow(
 				[
 					_('Password'),
-					new CTextBox('new_operation[opcommand][password]', $this->data['new_operation']['opcommand']['password'], ZBX_TEXTBOX_SMALL_SIZE)
+					(new CTextBox('new_operation[opcommand][password]', $this->data['new_operation']['opcommand']['password']))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				],
 				'class_authentication_password hidden indent_both'
 			);
 
 			// set custom id because otherwise they are set based on name (sick!) and produce duplicate ids
-			$passphraseCB = new CTextBox('new_operation[opcommand][password]', $this->data['new_operation']['opcommand']['password'], ZBX_TEXTBOX_SMALL_SIZE);
-			$passphraseCB->setId('new_operation_opcommand_passphrase');
+			$passphraseCB = (new CTextBox('new_operation[opcommand][password]', $this->data['new_operation']['opcommand']['password']))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setId('new_operation_opcommand_passphrase');
 			$newOperationsTable->addRow([_('Key passphrase'), $passphraseCB], 'class_authentication_passphrase hidden');
 
 			// ssh && telnet
 			$newOperationsTable->addRow(
 				[
 					_('Port'),
-					new CTextBox('new_operation[opcommand][port]', $this->data['new_operation']['opcommand']['port'], ZBX_TEXTBOX_SMALL_SIZE)
+					(new CTextBox('new_operation[opcommand][port]', $this->data['new_operation']['opcommand']['port']))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				],
 				'class_opcommand_port hidden indent_both'
 			);
 
 			// command
 			$commandTextArea = new CTextArea('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command']);
-			$commandIpmiTextBox = (new CTextBox('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command'], ZBX_TEXTBOX_STANDARD_SIZE))
+
+			$commandIpmiTextBox = (new CTextBox('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setId('opcommand_command_ipmi');
 
 			$newOperationsTable

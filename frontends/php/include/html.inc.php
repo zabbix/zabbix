@@ -676,15 +676,11 @@ function getItemLifetimeIndicator($current_time, $ts_delete) {
  * @return array
  */
 function createDateSelector($name, $date, $relatedCalendar = null) {
-	$calendarIcon = (new CImg('images/general/bar/cal.gif', 'calendar', 16, 12))
-		->addClass('pointer');
 	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
 		'_calendar"].clndr.clndrshow(pos.top, pos.left);';
 	if ($relatedCalendar) {
 		$onClick .= ' CLNDR["'.$relatedCalendar.'_calendar"].clndr.clndrhide();';
 	}
-
-	$calendarIcon->onClick($onClick);
 
 	if (is_array($date)) {
 		$y = $date['y'];
@@ -701,30 +697,38 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 		$i = date('i', $date);
 	}
 
-	$day = new CTextBox($name.'_day', $d, 2, false, 2);
-	$day->setAttribute('style', 'text-align: right;');
-	$day->setAttribute('placeholder', _('dd'));
-	$day->onChange('validateDatePartBox(this, 1, 31, 2);');
-
-	$month = new CTextBox($name.'_month', $m, 2, false, 2);
-	$month->setAttribute('style', 'text-align: right;');
-	$month->setAttribute('placeholder', _('mm'));
-	$month->onChange('validateDatePartBox(this, 1, 12, 2);');
-
-	$year = new CNumericBox($name.'_year', $y, 4);
-	$year->setAttribute('placeholder', _('yyyy'));
-
-	$hour = new CTextBox($name.'_hour', $h, 2, false, 2);
-	$hour->setAttribute('style', 'text-align: right;');
-	$hour->setAttribute('placeholder', _('hh'));
-	$hour->onChange('validateDatePartBox(this, 0, 23, 2);');
-
-	$minute = new CTextBox($name.'_minute', $i, 2, false, 2);
-	$minute->setAttribute('style', 'text-align: right;');
-	$minute->setAttribute('placeholder', _('mm'));
-	$minute->onChange('validateDatePartBox(this, 0, 59, 2);');
-
-	$fields = [$year, '-', $month, '-', $day, ' ', $hour, ':', $minute, $calendarIcon];
+	$fields = [
+		(new CNumericBox($name.'_year', $y, 4))
+			->setAttribute('placeholder', _('yyyy')),
+		'-',
+		(new CTextBox($name.'_month', $m, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('mm'))
+			->onChange('validateDatePartBox(this, 1, 12, 2);'),
+		'-',
+		(new CTextBox($name.'_day', $d, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('dd'))
+			->onChange('validateDatePartBox(this, 1, 31, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox($name.'_hour', $h, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('hh'))
+			->onChange('validateDatePartBox(this, 0, 23, 2);'),
+		':',
+		(new CTextBox($name.'_minute', $i, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('mm'))
+			->onChange('validateDatePartBox(this, 0, 59, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CImg('images/general/bar/cal.gif', 'calendar', 16, 12))
+			->addClass('pointer')
+			->onClick($onClick)
+	];
 
 	zbx_add_post_js('create_calendar(null,'.
 		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.

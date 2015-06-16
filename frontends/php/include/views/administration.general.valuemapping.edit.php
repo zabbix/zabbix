@@ -37,7 +37,7 @@ $valueMappingForm = (new CForm())
 $valueMappingFormList = new CFormList('valueMappingFormList');
 
 // name
-$nameTextBox = new CTextBox('mapname', $this->data['mapname'], 40, false, 64);
+$nameTextBox = (new CTextBox('mapname', $this->data['mapname'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 $nameTextBox->setAttribute('autofocus', 'autofocus');
 $valueMappingFormList->addRow(_('Name'), $nameTextBox);
 

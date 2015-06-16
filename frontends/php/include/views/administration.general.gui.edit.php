@@ -48,10 +48,10 @@ $guiTab->addRow(_('Enable event acknowledges'),
 	(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)
 );
 $guiTab->addRow(_('Show events not older than (in days)'),
-	new CTextBox('event_expire', $data['event_expire'], 5)
+	(new CTextBox('event_expire', $data['event_expire']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 );
 $guiTab->addRow(_('Max count of events per trigger to show'),
-	new CTextBox('event_show_max', $data['event_show_max'], 5)
+	(new CTextBox('event_show_max', $data['event_show_max']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 );
 $guiTab->addRow(_('Show warning if Zabbix server is down'),
 	(new CCheckBox('server_check_interval', SERVER_CHECK_INTERVAL))

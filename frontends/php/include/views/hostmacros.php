@@ -54,7 +54,8 @@ else {
 
 	// fields
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64))
+		$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 64))
+			->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 			->setReadOnly(
 				$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & MACRO_TYPE_INHERITED))
 			)
@@ -78,7 +79,8 @@ else {
 			$macro_cell[] = new CVar('macros['.$i.'][type]', $macro['type']);
 		}
 
-		$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255))
+		$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))
+			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 			->setReadOnly(
 				$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & MACRO_TYPE_HOSTMACRO))
 			)

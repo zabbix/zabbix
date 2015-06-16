@@ -38,10 +38,12 @@ zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($dat
 /*
  * Expressions tab
  */
-$nameTextBox = (new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128))
-	->setAttribute('autofocus', 'autofocus');
-
-$exprTab = (new CFormList('exprTab'))->addRow(_('Name'), $nameTextBox);
+$exprTab = (new CFormList('exprTab'))
+	->addRow(_('Name'),
+		(new CTextBox('name', $data['name'], false, 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	);
 
 $exprTable = (new CTable())
 	->addClass('formElementTable')
@@ -68,7 +70,7 @@ $exprTab->addRow(
 
 $exprForm = (new CTable())
 	->addClass('formElementTable')
-	->addRow([_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)])
+	->addRow([_('Expression'), (new CTextBox('expressionNew'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)])
 	->addRow([_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())])
 	->addRow([_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())], null, 'delimiterNewRow')
 	->addRow([_('Case sensitive'), new CCheckBox('case_sensitiveNew')]);

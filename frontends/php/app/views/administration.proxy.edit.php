@@ -33,7 +33,8 @@ if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 
 // create form list
 $proxyFormList = new CFormList('proxyFormList');
-$nameTextBox = (new CTextBox('host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128))
+$nameTextBox = (new CTextBox('host', $data['host'], false, 128))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('autofocus', 'autofocus');
 $proxyFormList->addRow(_('Proxy name'), $nameTextBox);
 
@@ -58,10 +59,10 @@ $connectByComboBox = (new CRadioButtonList('useip', $data['useip']))
 	->useJQueryStyle();
 
 $interfaceTable->addRow([
-	new CTextBox('ip', $data['ip'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
-	new CTextBox('dns', $data['dns'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
+	(new CTextBox('ip', $data['ip'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
+	(new CTextBox('dns', $data['dns'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
 	$connectByComboBox,
-	new CTextBox('port', $data['port'], 18, false, 64)
+	(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 ]);
 $proxyFormList->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass('objectgroup inlineblock border_dotted'),
 	$data['status'] != HOST_STATUS_PROXY_PASSIVE);

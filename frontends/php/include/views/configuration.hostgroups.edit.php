@@ -31,10 +31,11 @@ if (isset($this->data['groupid'])) {
 
 // create hostgroup form list
 $hostGroupFormList = new CFormList('hostgroupFormList');
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE,
+$nameTextBox = (new CTextBox('name', $this->data['name'],
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 	64
-);
+))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 $nameTextBox->setAttribute('autofocus', 'autofocus');
 $hostGroupFormList->addRow(_('Group name'), $nameTextBox);
 

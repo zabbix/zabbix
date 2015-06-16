@@ -27,7 +27,7 @@ $filterColumn = new CFormList();
 $filterColumn->addRow(
 	_('Recipient'),
 	[
-		new CTextBox('alias', $this->data['alias'], 20),
+		(new CTextBox('alias', $this->data['alias']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('btn1', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)

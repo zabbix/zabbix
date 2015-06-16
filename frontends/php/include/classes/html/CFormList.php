@@ -50,7 +50,7 @@ class CFormList extends CList {
 			}
 		}
 
-		$label = new CLabel($term, $input_id);
+		$label = is_object($term) ? $term : new CLabel($term, $input_id);
 
 		$defaultClass = $hidden ? ZBX_STYLE_HIDDEN : null;
 
@@ -73,6 +73,7 @@ class CFormList extends CList {
 				(new CDiv($description))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
+
 		return $this;
 	}
 
@@ -84,6 +85,7 @@ class CFormList extends CList {
 			],
 			'formrow listInfo'
 		);
+
 		return $this;
 	}
 
@@ -95,6 +97,7 @@ class CFormList extends CList {
 		if ($value !== null) {
 			$this->addItem(new CVar($name, $value, $id));
 		}
+
 		return $this;
 	}
 }

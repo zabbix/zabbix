@@ -30,20 +30,20 @@ $widget = (new CWidget())
 		)
 	);
 
-// Filter
+// filter
 $filter = (new CFilter('web.hosts.filter.state'))
-	->addColumn(
-		(new CFormList())->addRow(_('Name like'), new CTextBox('filter_host', $data['filter']['host'], 20))
-	)
-	->addColumn(
-		(new CFormList())->addRow(_('DNS like'), new CTextBox('filter_dns', $data['filter']['dns'], 20))
-	)
-	->addColumn(
-		(new CFormList())->addRow(_('IP like'), new CTextBox('filter_ip', $data['filter']['ip'], 20))
-	)
-	->addColumn(
-		(new CFormList())->addRow(_('Port like'), new CTextBox('filter_port', $data['filter']['port'], 20))
-	);
+	->addColumn((new CFormList())->addRow(_('Name like'),
+		(new CTextBox('filter_host', $data['filter']['host']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('DNS like'),
+		(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('IP like'),
+		(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('Port like'),
+		(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	));
 
 $widget->addItem($filter);
 

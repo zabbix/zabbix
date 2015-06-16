@@ -96,7 +96,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[community]', 'snmp_community', _('Original')))
 			->setChecked(isset($this->data['visible']['community']))
 	],
-	new CTextBox('snmp_community', $this->data['snmp_community'], ZBX_TEXTBOX_SMALL_SIZE)
+	(new CTextBox('snmp_community', $this->data['snmp_community']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append snmpv3 contextname to form list
@@ -107,7 +107,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[contextname]', 'snmpv3_contextname', _('Original')))
 			->setChecked(isset($this->data['visible']['contextname']))
 	],
-	new CTextBox('snmpv3_contextname', $this->data['snmpv3_contextname'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('snmpv3_contextname', $this->data['snmpv3_contextname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append snmpv3 securityname to form list
@@ -118,7 +118,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[securityname]', 'snmpv3_securityname', _('Original')))
 			->setChecked(isset($this->data['visible']['securityname']))
 	],
-	new CTextBox('snmpv3_securityname', $this->data['snmpv3_securityname'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('snmpv3_securityname', $this->data['snmpv3_securityname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append snmpv3 securitylevel to form list
@@ -167,7 +167,8 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[authpassphrase]', 'snmpv3_authpassphrase', _('Original')))
 			->setChecked(isset($this->data['visible']['authpassphrase']))
 	],
-	new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append snmpv3 privprotocol to form list
@@ -201,7 +202,8 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[privpassphras]', 'snmpv3_privpassphrase', _('Original')))
 			->setChecked(isset($this->data['visible']['privpassphras']))
 	],
-	new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append port to form list
@@ -212,7 +214,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[port]', 'port', _('Original')))
 			->setChecked(isset($this->data['visible']['port']))
 	],
-	new CTextBox('port', $this->data['port'], ZBX_TEXTBOX_SMALL_SIZE)
+	(new CTextBox('port', $this->data['port']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 // append value type to form list
@@ -251,7 +253,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[units]', 'units', _('Original')))
 			->setChecked(isset($this->data['visible']['units']))
 	],
-	new CTextBox('units', $this->data['units'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('units', $this->data['units']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append authtype to form list
@@ -276,7 +278,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[username]', 'username', _('Original')))
 			->setChecked(isset($this->data['visible']['username']))
 	],
-	new CTextBox('username', $this->data['username'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('username', $this->data['username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 // append publickey to form list
@@ -287,7 +289,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[publickey]', 'publickey', _('Original')))
 			->setChecked(isset($this->data['visible']['publickey']))
 	],
-	new CTextBox('publickey', $this->data['publickey'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('publickey', $this->data['publickey']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 // append privatekey to form list
@@ -298,7 +300,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[privatekey]', 'privatekey', _('Original')))
 			->setChecked(isset($this->data['visible']['privatekey']))
 	],
-	new CTextBox('privatekey', $this->data['privatekey'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('privatekey', $this->data['privatekey']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 // append password
@@ -309,7 +311,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[password]', 'password', _('Original')))
 			->setChecked(isset($this->data['visible']['password']))
 	],
-	new CTextBox('password', $this->data['password'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('password', $this->data['password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 // append formula to form list
@@ -320,7 +322,9 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[formula]', 'formula', _('Original')))
 			->setChecked(isset($this->data['visible']['formula']))
 	],
-	new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('formula', $this->data['formula']))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		->setAttribute('style', 'text-align: right;')
 );
 
 // append delay to form list
@@ -388,7 +392,7 @@ $newFlexInt = (new CDiv([
 		SPACE,
 		_('Period'),
 		SPACE,
-		new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL, 20),
+		(new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		SPACE,
 		(new CSubmit('add_delay_flex', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 ]))
@@ -446,7 +450,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[logtimefmt]', 'logtimefmt', _('Original')))
 			->setChecked(isset($this->data['visible']['logtimefmt']))
 	],
-	new CTextBox('logtimefmt', $this->data['logtimefmt'], ZBX_TEXTBOX_SMALL_SIZE)
+	(new CTextBox('logtimefmt', $this->data['logtimefmt']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append delta to form list
@@ -492,7 +496,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[trapper_hosts]', 'trapper_hosts', _('Original')))
 			->setChecked(isset($this->data['visible']['trapper_hosts']))
 	],
-	new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE)
+	(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append applications to form list

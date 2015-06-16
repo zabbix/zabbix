@@ -86,13 +86,13 @@ $triggerDOFormList->addRow(BR());
 
 // Display OK triggers
 $okPeriodTextBox = (new CTextBox('ok_period', $data['ok_period']))
-	->addStyle('width: 4em;')
+	->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	->setAttribute('maxlength', '6');
 $triggerDOFormList->addRow(_('Display OK triggers for'), [$okPeriodTextBox, SPACE, _('seconds')]);
 
 // Triggers blink on status change
 $okPeriodTextBox = (new CTextBox('blink_period', $data['blink_period']))
-	->addStyle('width: 4em;')
+	->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	->setAttribute('maxlength', '6');
 $triggerDOFormList->addRow(_('On status change triggers blink for'), [$okPeriodTextBox, SPACE, _('seconds')]);
 

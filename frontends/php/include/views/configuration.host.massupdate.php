@@ -265,7 +265,7 @@ $ipmiFormList->addRow(
 		(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
 			->setChecked(isset($data['visible']['ipmi_username']))
 	],
-	new CTextBox('ipmi_username', $data['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE)
+	(new CTextBox('ipmi_username', $data['ipmi_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 $ipmiFormList->addRow(
@@ -275,7 +275,7 @@ $ipmiFormList->addRow(
 		(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
 			->setChecked(isset($data['visible']['ipmi_password']))
 	],
-	new CTextBox('ipmi_password', $data['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE)
+	(new CTextBox('ipmi_password', $data['ipmi_password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 $inventoryFormList = new CFormList('inventoryFormList');
@@ -306,10 +306,21 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 		$fieldInput->addStyle('width: 64em;');
 	}
 	else {
-		$fieldLength = $hostInventoryTable['fields'][$field]['length'];
-		$fieldInput = new CTextBox('host_inventory['.$field.']', $data['host_inventory'][$field]);
-		$fieldInput->setAttribute('maxlength', $fieldLength);
-		$fieldInput->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
+		$field_length = $hostInventoryTable['fields'][$field]['length'];
+
+		if ($field_length < 39) {
+			$width = ZBX_TEXTAREA_SMALL_WIDTH;
+		}
+		elseif ($field_length < 64) {
+			$width = ZBX_TEXTAREA_STANDARD_WIDTH;
+		}
+		else {
+			$width = ZBX_TEXTAREA_BIG_WIDTH;
+		}
+
+		$fieldInput = (new CTextBox('host_inventory['.$field.']', $data['host_inventory'][$field]))
+			->setWidth($width)
+			->setAttribute('maxlength', $field_length);
 	}
 
 	$inventoryFormList->addRow(
