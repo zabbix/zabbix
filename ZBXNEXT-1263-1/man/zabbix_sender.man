@@ -83,9 +83,9 @@ zabbix_sender \- Zabbix sender utility
 .I ca_file
 .RB [ \-\-tls\-crl\-file
 .IR crl_file ]
-.RB [ \-\-tls\-cert\-issuer
+.RB [ \-\-tls\-server\-cert\-issuer
 .IR certificate_issuer ]
-.RB [ \-\-tls\-cert\-subject
+.RB [ \-\-tls\-server\-cert\-subject
 .IR certificate_subject ]
 .B \-\-tls\-cert\-file
 .I cert_file
@@ -112,9 +112,9 @@ zabbix_sender \- Zabbix sender utility
 .I ca_file
 .RB [ \-\-tls\-crl\-file
 .IR crl_file ]
-.RB [ \-\-tls\-cert\-issuer
+.RB [ \-\-tls\-server\-cert\-issuer
 .IR certificate_issuer ]
-.RB [ \-\-tls\-cert\-subject
+.RB [ \-\-tls\-server\-cert\-subject
 .IR certificate_subject ]
 .B \-\-tls\-cert\-file
 .I cert_file
@@ -143,9 +143,9 @@ zabbix_sender \- Zabbix sender utility
 .I ca_file
 .RB [ \-\-tls\-crl\-file
 .IR crl_file ]
-.RB [ \-\-tls\-cert\-issuer
+.RB [ \-\-tls\-server\-cert\-issuer
 .IR certificate_issuer ]
-.RB [ \-\-tls\-cert\-subject
+.RB [ \-\-tls\-server\-cert\-subject
 .IR certificate_subject ]
 .B \-\-tls\-cert\-file
 .I cert_file
@@ -174,9 +174,9 @@ zabbix_sender \- Zabbix sender utility
 .I ca_file
 .RB [ \-\-tls\-crl\-file
 .IR crl_file ]
-.RB [ \-\-tls\-cert\-issuer
+.RB [ \-\-tls\-server\-cert\-issuer
 .IR certificate_issuer ]
-.RB [ \-\-tls\-cert\-subject
+.RB [ \-\-tls\-server\-cert\-subject
 .IR certificate_subject ]
 .B \-\-tls\-cert\-file
 .I cert_file
@@ -349,9 +349,9 @@ connect using TLS and a certificate
 Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
 .IP "\fB\-\-tls\-crl\-file\fR"
 Full pathname of a file containing revoked certificates.
-.IP "\fB\-\-tls\-cert\-issuer\fR"
+.IP "\fB\-\-tls\-server\-cert\-issuer\fR"
 Allowed server certificate issuer.
-.IP "\fB\-\-tls\-cert\-subject\fR"
+.IP "\fB\-\-tls\-server\-cert\-subject\fR"
 Allowed server certificate subject.
 .IP "\fB\-\-tls\-cert\-file\fR"
 Full pathname of a file containing the certificate or certificate chain.

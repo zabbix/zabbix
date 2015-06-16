@@ -475,12 +475,16 @@ static void	zbx_tls_validate_config(void)
 
 	/* either both a certificate and a private key must be defined or none of them */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+	if (0 != (program_type & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
 	{
 		zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "--tls-ca-file");
 		zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "--tls-crl-file");
-		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_ISSUER, "--tls-cert-issuer");
-		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_SUBJECT, "--tls-cert-subject");
+
+		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_ISSUER, 0 != (program_type & ZBX_PROGRAM_TYPE_SENDER) ?
+				"--tls-server-cert-issuer" : "--tls-agent-cert-issuer");
+		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_SUBJECT, 0 != (program_type & ZBX_PROGRAM_TYPE_SENDER) ?
+				"--tls-server-cert-subject" : "--tls-agent-cert-subject");
+
 		zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "--tls-cert-file");
 		zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "--tls-key-file");
 	}
@@ -577,10 +581,12 @@ static void	zbx_tls_validate_config(void)
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_ISSUER)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
+		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-cert-issuer\" is defined but "
-					"\"--tls-cert-file\" and \"--tls-key-file\" are not defined");
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" is defined but \"--tls-cert-file\" and"
+					" \"--tls-key-file\" are not defined",
+					0 != (program_type & ZBX_PROGRAM_TYPE_SENDER) ? "--tls-server-cert-issuer" :
+					"--tls-agent-cert-issuer");
 		}
 		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 		{
@@ -596,8 +602,10 @@ static void	zbx_tls_validate_config(void)
 	{
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-cert-subject\" is defined but "
-					"\"--tls-cert-file\" and \"--tls-key-file\" are not defined");
+			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" is defined but \"--tls-cert-file\" and"
+					" \"--tls-key-file\" are not defined",
+					0 != (program_type & ZBX_PROGRAM_TYPE_SENDER) ? "--tls-server-cert-subject" :
+					"--tls-agent-cert-subject");
 		}
 		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
 		{

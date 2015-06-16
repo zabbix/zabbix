@@ -22,9 +22,9 @@ zabbix_get \- Zabbix get utility
 .IR ca_file
 .RB [ \-\-tls\-crl\-file
 .IR crl_file ]
-.RB [ \-\-tls\-cert\-issuer
+.RB [ \-\-tls\-agent\-cert\-issuer
 .IR certificate_issuer ]
-.RB [ \-\-tls\-cert\-subject
+.RB [ \-\-tls\-agent\-cert\-subject
 .IR certificate_subject ]
 .B \-\-tls\-cert\-file
 .IR cert_file
@@ -85,10 +85,10 @@ connect using TLS and a certificate
 Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
 .IP "\fB\-\-tls\-crl\-file\fR"
 Full pathname of a file containing revoked certificates.
-.IP "\fB\-\-tls\-cert\-issuer\fR"
-Allowed server certificate issuer.
-.IP "\fB\-\-tls\-cert\-subject\fR"
-Allowed server certificate subject.
+.IP "\fB\-\-tls\-agent\-cert\-issuer\fR"
+Allowed agent certificate issuer.
+.IP "\fB\-\-tls\-agent\-cert\-subject\fR"
+Allowed agent certificate subject.
 .IP "\fB\-\-tls\-cert\-file\fR"
 Full pathname of a file containing the certificate or certificate chain.
 .IP "\fB\-\-tls\-key\-file\fR"
@@ -106,7 +106,7 @@ Output version information and exit.
 .br
 \fBzabbix_get \-s 127.0.0.1 \-p 10050 \-k "system.cpu.load[all,avg1]" \-\-tls\-connect=psk \-\-tls\-psk\-identity="PSK ID Zabbix agentd" \-\-tls\-psk\-file=/home/zabbix/zabbix_agentd.psk\fR
 .br
-\fBzabbix_get \-s 127.0.0.1 \-p 10050 \-k "system.cpu.load[all,avg1]" \-\-tls\-connect=cert \-\-tls\-ca\-file=/home/zabbix/zabbix_ca_file \-\-tls\-cert\-issuer="CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com" \-\-tls\-cert\-subject="CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com" \-\-tls\-cert\-file=/home/zabbix/zabbix_get.crt \-\-tls\-key\-file=/home/zabbix/zabbix_get.key
+\fBzabbix_get \-s 127.0.0.1 \-p 10050 \-k "system.cpu.load[all,avg1]" \-\-tls\-connect=cert \-\-tls\-ca\-file=/home/zabbix/zabbix_ca_file \-\-tls\-agent\-cert\-issuer="CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com" \-\-tls\-agent\-cert\-subject="CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com" \-\-tls\-cert\-file=/home/zabbix/zabbix_get.crt \-\-tls\-key\-file=/home/zabbix/zabbix_get.key
 .SH "SEE ALSO"
 .BR zabbix_agentd (8),
 .BR zabbix_proxy (8),
