@@ -41,6 +41,7 @@ class CButtonQMessage extends CSubmit {
 		}
 		$this->vars = $value;
 		$this->setAction(null);
+		return $this;
 	}
 
 	public function setMessage($value = null) {
@@ -57,6 +58,7 @@ class CButtonQMessage extends CSubmit {
 			false // do not add quotes to the string
 		);
 		$this->setAction(null);
+		return $this;
 	}
 
 	public function setAction($value = null) {
@@ -75,6 +77,7 @@ class CButtonQMessage extends CSubmit {
 		else {
 			$action = 'true';
 		}
-		return parent::onClick('if ('.$confirmation.') { return '.$action.'; } else { return false; }');
+		parent::onClick('if ('.$confirmation.') { return '.$action.'; } else { return false; }');
+		return $this;
 	}
 }

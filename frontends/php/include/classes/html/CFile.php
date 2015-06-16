@@ -30,7 +30,7 @@ class CFile extends CInput {
 		if (!is_string($value)) {
 			return $this->error('Incorrect value for setFile "'.$value.'".');
 		}
-
-		return $this->setAttribute('value', $value);
+		$this->setAttribute('value', $value);
+		return $this;
 	}
 }

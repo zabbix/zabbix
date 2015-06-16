@@ -35,5 +35,6 @@ class CJsScript extends CObject {
 		elseif (!is_null($value)) {
 			array_push($this->items, unpack_object($value));
 		}
+		return $this;
 	}
 }

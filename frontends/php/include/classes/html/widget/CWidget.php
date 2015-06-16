@@ -51,17 +51,13 @@ class CWidget {
 
 	public function setControls($controls) {
 		zbx_value2array($controls);
-
 		$this->controls = $controls;
-
 		return $this;
 	}
 
 	public function addHeader($left = SPACE, $right = SPACE) {
 		zbx_value2array($right);
-
 		$this->headers[] = ['left' => $left, 'right' => $right];
-
 		return $this;
 	}
 
@@ -69,7 +65,6 @@ class CWidget {
 		if (!is_null($items)) {
 			$this->body[] = $items;
 		}
-
 		return $this;
 	}
 
@@ -87,6 +82,7 @@ class CWidget {
 
 	public function show() {
 		echo $this->toString();
+		return $this;
 	}
 
 	public function toString() {

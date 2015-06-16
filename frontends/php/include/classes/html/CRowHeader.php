@@ -43,5 +43,6 @@ class CRowHeader extends CTag {
 		elseif (!is_null($item)) {
 			parent::addItem(new CColHeader($item));
 		}
+		return $this;
 	}
 }

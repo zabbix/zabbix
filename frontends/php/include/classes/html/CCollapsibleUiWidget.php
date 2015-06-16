@@ -56,6 +56,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 		$icons[] = $icon;
 
 		parent::setHeader($caption, $icons);
+		return $this;
 	}
 
 	/**
@@ -79,5 +80,6 @@ class CCollapsibleUiWidget extends CUiWidget {
 		$this->addItem($this->header);
 		$this->addItem($body);
 		$this->addItem($this->footer);
+		return $this;
 	}
 }

@@ -45,6 +45,7 @@ class CArea extends CTag {
 			$str_val .= $val.',';
 		}
 		$this->setAttribute('coords', trim($str_val, ','));
+		return $this;
 	}
 
 	public function setShape($value) {
@@ -52,6 +53,7 @@ class CArea extends CTag {
 			return $this->error('Incorrect value for setShape "'.$value.'".');
 		}
 		$this->setAttribute('shape', $value);
+		return $this;
 	}
 
 	public function setHref($value) {
@@ -59,6 +61,7 @@ class CArea extends CTag {
 			return $this->error('Incorrect value for setHref "'.$value.'".');
 		}
 		$this->setAttribute('href', $value);
+		return $this;
 	}
 
 	public function setAlt($value) {
@@ -66,5 +69,6 @@ class CArea extends CTag {
 			return $this->error('Incorrect value for setAlt "'.$value.'".');
 		}
 		$this->setAttribute('alt', $value);
+		return $this;
 	}
 }

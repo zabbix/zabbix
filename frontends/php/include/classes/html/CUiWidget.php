@@ -96,6 +96,7 @@ class CUiWidget extends CDiv {
 		if ($icons) {
 			$this->header->addItem(new CList($icons));
 		}
+		return $this;
 	}
 
 	/**
@@ -115,6 +116,7 @@ class CUiWidget extends CDiv {
 		$this->header = (new CDiv($table))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addClass('ui-widget-header header');
+		return $this;
 	}
 
 	/**
@@ -126,6 +128,7 @@ class CUiWidget extends CDiv {
 	public function setFooter($list) {
 		$this->footer = $list;
 		$this->footer->addClass('dashbrd-widget-foot');
+		return $this;
 	}
 
 	/**
@@ -141,6 +144,7 @@ class CUiWidget extends CDiv {
 		$this->addItem($this->header);
 		$this->addItem($body);
 		$this->addItem($this->footer);
+		return $this;
 	}
 
 	/**
