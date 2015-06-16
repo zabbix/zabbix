@@ -59,12 +59,12 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 		}
 	}
 	else {
-		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTBOX_STANDARD_SIZE, true);
+		$userComboBox = (new CTextBox('user', $this->data['user'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	$authenticationFormList->addRow(
 		_('LDAP host'),
-		new CTextBox('ldap_host', $this->data['config']['ldap_host'], ZBX_TEXTBOX_STANDARD_SIZE)
+		(new CTextBox('ldap_host', $this->data['config']['ldap_host']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Port'),
@@ -72,23 +72,22 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 	);
 	$authenticationFormList->addRow(
 		_('Base DN'),
-		new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn'], ZBX_TEXTBOX_STANDARD_SIZE)
+		(new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Search attribute'),
-		new CTextBox(
+		(new CTextBox(
 			'ldap_search_attribute',
 			(zbx_empty($this->data['config']['ldap_search_attribute']) && $this->data['form_refresh'] == 0)
 				? 'uid'
 				: $this->data['config']['ldap_search_attribute'],
-			ZBX_TEXTBOX_STANDARD_SIZE,
 			false,
 			128
-		)
+		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Bind DN'),
-		new CTextBox('ldap_bind_dn', $this->data['config']['ldap_bind_dn'], ZBX_TEXTBOX_STANDARD_SIZE)
+		(new CTextBox('ldap_bind_dn', $this->data['config']['ldap_bind_dn']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 	// bind password

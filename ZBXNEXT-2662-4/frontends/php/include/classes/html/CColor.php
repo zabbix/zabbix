@@ -27,6 +27,7 @@ class CColor extends CDiv {
 				->setTitle('#'.$value)
 				->onClick('javascript: show_color_picker("'.$name.'")'),
 			(new CTextBox($name, $value))
+				->setWidth(ZBX_TEXTAREA_COLOR_WIDTH)
 				->setAttribute('maxlength', 6)
 				->onChange('set_color_by_name("'.$name.'", this.value)')
 		]);

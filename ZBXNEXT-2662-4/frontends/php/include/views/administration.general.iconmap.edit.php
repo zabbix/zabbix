@@ -31,6 +31,7 @@ $widget = (new CWidget())
 $iconMapTab = new CFormList();
 
 $name = (new CTextBox('iconmap[name]', $this->data['iconmap']['name']))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('maxlength', 64)
 	->setAttribute('autofocus', 'autofocus');
 $iconMapTab->addRow(_('Name'), $name);
@@ -56,9 +57,11 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 		$this->data['inventoryList']
 	);
 
-	$expressionTextBox = new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']);
-	$expressionTextBox->setAttribute('maxlength', 64);
-	$expressionTextBox = [$expressionTextBox];
+	$expressionTextBox = [
+		(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('maxlength', 64)
+	];
 	if (isset($mapping['iconmappingid'])) {
 		$expressionTextBox[] = new CVar('iconmap[mappings]['.$i.'][iconmappingid]', $mapping['iconmappingid']);
 	}

@@ -39,7 +39,7 @@ $expressionFormList = new CFormList();
 
 // append item to form list
 $item = [
-	new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, true),
+	(new CTextBox('description', $this->data['description'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('select', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
@@ -78,15 +78,11 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 						|| substr($this->data['expr_type'], 0, 7) == 'iregexp'
 						|| (substr($this->data['expr_type'], 0, 3) == 'str' && substr($this->data['expr_type'], 0, 6) != 'strlen')))) {
 				if (isset($paramFunction['M'])) {
-					$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype']);
-
-					foreach ($paramFunction['M'] as $mid => $caption) {
-						$paramTypeElement->addItem($mid, $caption);
-					}
+					$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype'], null, $paramFunction['M']);
 				}
 				else {
 					$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
-					$paramTypeElement = SPACE._('Time');
+					$paramTypeElement = _('Time');
 				}
 			}
 
@@ -94,21 +90,25 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 					&& (substr($this->data['expr_type'], 0, 3) != 'str' || substr($this->data['expr_type'], 0, 6) == 'strlen')
 					&& substr($this->data['expr_type'], 0, 6) != 'regexp'
 					&& substr($this->data['expr_type'], 0, 7) != 'iregexp') {
-				$paramTypeElement = SPACE._('Time');
-				$paramField = new CTextBox('params['.$paramId.']', $paramValue, 10);
+				$paramTypeElement = _('Time');
+				$paramField = (new CTextBox('params['.$paramId.']', $paramValue))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
 			else {
 				$paramField = ($this->data['paramtype'] == PARAM_TYPE_COUNTS)
 					? new CNumericBox('params['.$paramId.']', (int) $paramValue, 10)
-					: new CTextBox('params['.$paramId.']', $paramValue, 10);
+					: (new CTextBox('params['.$paramId.']', $paramValue))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
 
-			$expressionFormList->addRow($paramFunction['C'], [$paramField, $paramTypeElement]);
+			$expressionFormList->addRow($paramFunction['C'], [
+				$paramField,
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$paramTypeElement
+			]);
 		}
 		else {
 			$expressionFormList->addRow($paramFunction['C'],
-				new CTextBox('params['.$paramId.']', $paramValue, $paramFunction['T'] == T_ZBX_DBL ? 10 : 30
-			));
+				(new CTextBox('params['.$paramId.']', $paramValue))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			);
 			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}
@@ -117,7 +117,7 @@ else {
 	$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 }
 
-$expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10));
+$expressionFormList->addRow('N', (new CTextBox('value', $this->data['value']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH));
 
 // append tabs to form
 $expressionTab = (new CTabView())->addTab('expressionTab', _('Trigger expression condition'), $expressionFormList);

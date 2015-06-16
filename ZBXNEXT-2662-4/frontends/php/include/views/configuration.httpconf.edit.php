@@ -49,7 +49,8 @@ if (!empty($this->data['templates'])) {
 }
 
 // Name
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['templated'], 64);
+$nameTextBox = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if (!$this->data['templated']) {
 	$nameTextBox->setAttribute('autofocus', 'autofocus');
 }
@@ -67,8 +68,10 @@ else {
 }
 
 // New application
-$httpFormList->addRow(_('New application'),
-	new CTextBox('new_application', $this->data['new_application'], ZBX_TEXTBOX_STANDARD_SIZE), false, null, 'new'
+$httpFormList->addRow(new CLabel(_('New application'), 'new_application'),
+	(new CSpan(
+		(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
 );
 
 // update interval
@@ -89,14 +92,17 @@ foreach ($userAgentsAll as $userAgentGroup => $userAgents) {
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 $httpFormList->addRow(_('User agent string'),
-	new CTextBox('agent_other', $this->data['agent_other'], ZBX_TEXTBOX_STANDARD_SIZE), false, 'row_agent_other'
+	(new CTextBox('agent_other', $this->data['agent_other']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	false, 'row_agent_other'
 );
 
 // append HTTP proxy to form list
-$httpProxyTextBox = new CTextBox('http_proxy', $this->data['http_proxy'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255);
-$httpProxyTextBox->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]');
 $httpFormList
-	->addRow(_('HTTP proxy'), $httpProxyTextBox)
+	->addRow(_('HTTP proxy'),
+		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]')
+	)
 	->addRow(_('Variables'), new CTextArea('variables', $this->data['variables']))
 	->addRow(_('Headers'), new CTextArea('headers', $this->data['headers']))
 	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
@@ -111,10 +117,12 @@ $httpAuthenticationFormList->addRow(_('HTTP authentication'),
 	new CComboBox('authentication', $this->data['authentication'], null, httptest_authentications())
 );
 
-$httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
-$httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
+$httpAuthenticationUserTB = (new CTextBox('http_user', $this->data['http_user'], false, 64))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+$httpAuthenticationPasswordTB = (new CTextBox('http_password', $this->data['http_password'], false, 64))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
-$authenticationInputsHidden = $this->data['authentication'] == HTTPTEST_AUTH_NONE;
+$authenticationInputsHidden = ($this->data['authentication'] == HTTPTEST_AUTH_NONE);
 
 if ($authenticationInputsHidden) {
 	$httpAuthenticationUserTB->setAttribute('disabled', true);
@@ -130,17 +138,15 @@ $httpAuthenticationFormList
 	->addRow(_('SSL verify host'),
 		(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
 	)
-	->addRow(
-		_('SSL certificate file'),
-		new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
+	->addRow(_('SSL certificate file'),
+		(new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(
-		_('SSL key file'),
-		new CTextBox('ssl_key_file', $this->data['ssl_key_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
+	->addRow(_('SSL key file'),
+		(new CTextBox('ssl_key_file', $this->data['ssl_key_file'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(
-		_('SSL key password'),
-		new CTextBox('ssl_key_password', $this->data['ssl_key_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64)
+	->addRow(_('SSL key password'),
+		(new CTextBox('ssl_key_password', $this->data['ssl_key_password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 /*

@@ -33,7 +33,8 @@
 		->addItem(
 			(new CForm('get', 'search.php'))
 				->addItem([
-					(new CTextBox('search', '', 20, false, 255))
+					(new CTextBox('search', '', false, 255))
+						->setWidth(ZBX_TEXTAREA_SEARCH_WIDTH)
 						->setAttribute('autocomplete', 'off')
 						->addClass('search'),
 					(new CSubmitButton(SPACE))->addClass('btn-search')

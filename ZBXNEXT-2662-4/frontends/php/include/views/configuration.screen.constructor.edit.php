@@ -129,7 +129,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Graph'), [
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
 	], false, null, ZBX_STYLE_NOWRAP);
@@ -176,7 +176,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Graph prototype'), [
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
 	], false, null, ZBX_STYLE_NOWRAP);
@@ -225,7 +225,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Item'), [
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
 	], false, null, ZBX_STYLE_NOWRAP);
@@ -272,7 +272,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Item prototype'), [
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
 	], false, null, ZBX_STYLE_NOWRAP);
@@ -299,7 +299,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Map'), [
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -350,7 +350,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	$screenFormList
 		->addVar('resourceid', $id)
 		->addRow(_('Item'), [
-			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
 		], false, null, ZBX_STYLE_NOWRAP)
@@ -485,7 +485,9 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOU
 				'&srcfld1=groupid&writeonly=1'
 		]
 	]));
-	$screenFormList->addRow(_('Application'), new CTextBox('application', $application, ZBX_TEXTBOX_STANDARD_SIZE, false, 255));
+	$screenFormList->addRow(_('Application'),
+		(new CTextBox('application', $application, false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 }
 
 /*
@@ -517,7 +519,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 
 	$screenFormList->addVar('resourceid', $id);
 	$screenFormList->addRow(_('Screen'), [
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -605,7 +607,7 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
 		}
 		$screenFormList->addRow(_('Item'), [
-			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
 		]);
@@ -653,7 +655,7 @@ elseif ($resourceType != SCREEN_RESOURCE_CLOCK) {
 }
 
 if (in_array($resourceType, [SCREEN_RESOURCE_URL])) {
-	$screenFormList->addRow(_('URL'), new CTextBox('url', $url, ZBX_TEXTBOX_STANDARD_SIZE));
+	$screenFormList->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 }
 else {
 	$screenFormList->addVar('url', '');

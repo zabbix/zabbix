@@ -26,17 +26,18 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.workingtime.php')))
 	);
 
-$wtTextBox = (new CTextBox('work_period', $data['work_period'], ZBX_TEXTBOX_STANDARD_SIZE))
-	->setAttribute('autofocus', 'autofocus');
-$workingTimeTab = (new CFormList())
-	->addRow(_('Working time'), $wtTextBox);
-
 $workingTimeView = (new CTabView())
-	->addTab('workingTime', _('Working time'), $workingTimeTab)
+	->addTab('workingTime', _('Working time'),
+		(new CFormList())
+			->addRow(_('Working time'),
+				(new CTextBox('work_period', $data['work_period']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+	)
 	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
 $workingTimeForm = (new CForm())
-	->setName('workingTimeForm')
 	->addItem($workingTimeView);
 
 $widget->addItem($workingTimeForm);

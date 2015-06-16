@@ -465,19 +465,21 @@ function getItemFilterForm(&$items) {
 	$snmpCommunityLabel = (new CSpan([bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER]))
 		->setId('filter_snmp_community_label');
 
-	$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpCommunityField = (new CTextBox('filter_snmp_community', $filter_snmp_community))
+		->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// SNMPv3 security name
 	$snmpSecurityLabel = (new CSpan([bold(_('Security name')), SPACE._('like').NAME_DELIMITER]))
 		->setId('filter_snmpv3_securityname_label');
 
-	$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpSecurityField = (new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname))
+		->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// SNMP OID
 	$snmpOidLabel = (new CSpan([bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER]))
 		->setId('filter_snmp_oid_label');
 
-	$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpOidField = (new CTextBox('filter_snmp_oid', $filter_snmp_oid))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// port
 	$portLabel = (new CSpan([bold(_('Port')), SPACE._('like').NAME_DELIMITER]))
@@ -562,7 +564,7 @@ function getItemFilterForm(&$items) {
 	// row 3
 	$filterColumn1->addRow(_('Application'),
 		[
-			new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
+			(new CTextBox('filter_application', $filter_application))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton(null, _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -585,7 +587,9 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 4
-	$filterColumn1->addRow(_('Name like'), new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE));
+	$filterColumn1->addRow(_('Name like'),
+		(new CTextBox('filter_name', $filter_name))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
 	$filterColumn2->addRow($snmpOidLabel, $snmpOidField);
 	$filterColumn3->addRow(_('Trends (in days)'), new CNumericBox('filter_trends', $filter_trends, 8, false, true));
 	$filterColumn4->addRow(_('Template'),
@@ -597,7 +601,9 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 5
-	$filterColumn1->addRow(_('Key like'), new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE));
+	$filterColumn1->addRow(_('Key like'),
+		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
 	$filterColumn2->addRow($portLabel, $portField);
 
 	$form->addColumn($filterColumn1);

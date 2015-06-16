@@ -21,7 +21,6 @@
 
 class CFormTable extends CForm {
 
-	private $align;
 	private $title;
 	private $tableclass = 'formtable';
 	protected $top_items = [];
@@ -58,11 +57,6 @@ class CFormTable extends CForm {
 	public function setName($value) {
 		$this->setAttribute('name', $value);
 		$this->setId(zbx_formatDomId($value));
-		return $this;
-	}
-
-	public function setAlign($value) {
-		$this->align = $value;
 		return $this;
 	}
 
@@ -140,7 +134,6 @@ class CFormTable extends CForm {
 		$tbl->addClass($this->tableclass);
 		$tbl->setCellSpacing(0);
 		$tbl->setCellPadding(1);
-		$tbl->setAlign($this->align);
 
 		// add first row
 		if (!is_null($this->title)) {

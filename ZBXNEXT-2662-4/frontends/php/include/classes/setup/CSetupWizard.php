@@ -217,12 +217,16 @@ class CSetupWizard extends CForm {
 			case ZBX_DB_SQLITE3:
 				$table->addRow(
 					_('Database file'),
-					new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'))
+					(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				break;
 
 			default:
-				$table->addRow(_('Database host'), new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost')));
+				$table->addRow(_('Database host'),
+					(new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				);
 
 				$port = new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 20, false, false, false);
 				$port->removeAttribute('style');
@@ -230,14 +234,25 @@ class CSetupWizard extends CForm {
 					[$port, ' ', (new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)]
 				);
 
-				$table->addRow(_('Database name'), new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')));
+				$table->addRow(_('Database name'),
+					(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				);
 
 				if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-					$table->addRow(_('Database schema'), new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')));
+					$table->addRow(_('Database schema'),
+						(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))
+							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					);
 				}
 
-				$table->addRow(_('User'), new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')));
-				$table->addRow(_('Password'), new CPassBox('password', $this->getConfig('DB_PASSWORD', '')));
+				$table->addRow(_('User'),
+					(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				);
+				$table->addRow(_('Password'),
+					new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))
+				);
 				break;
 		}
 
@@ -263,7 +278,10 @@ class CSetupWizard extends CForm {
 	function stage3() {
 		$table = new CFormList();
 
-		$table->addRow(_('Host'), new CTextBox('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost')));
+		$table->addRow(_('Host'),
+			(new CTextBox('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		);
 
 		$port = new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 20, false, false,
 			false
@@ -274,7 +292,10 @@ class CSetupWizard extends CForm {
 			$port
 		);
 
-		$table->addRow('Name', new CTextBox('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
+		$table->addRow('Name',
+			(new CTextBox('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		);
 
 		return [
 			new CTag('h1', true, _('Zabbix server details')),

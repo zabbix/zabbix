@@ -43,9 +43,11 @@ $triggersFormList = new CFormList('triggersFormList');
 if (!empty($this->data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $this->data['templates']);
 }
-$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$triggersFormList->addRow(_('Name'), $nameTextBox);
+$triggersFormList->addRow(_('Name'),
+	(new CTextBox('description', $this->data['description'], $this->data['limited']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+);
 
 // append expression to form list
 $expressionTextBox = new CTextArea(
@@ -241,10 +243,9 @@ if ($this->data['input_method'] == IM_TREE) {
 $triggersFormList
 	->addRow(_('Multiple PROBLEM events generation'),
 		(new CCheckBox('type'))->setChecked($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED)
-
 	)
 	->addRow(_('Description'), new CTextArea('comments', $this->data['comments']))
-	->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->addRow(_('URL'), (new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
 
 // append status to form list

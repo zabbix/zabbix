@@ -34,10 +34,12 @@ if (isset($this->data['imageid'])) {
 $imageForm->addVar('imagetype', $this->data['imagetype']);
 
 // append form list
-$nameTextBox = (new CTextBox('name', $this->data['imagename'], 64, false, 64))
-	->setAttribute('autofocus', 'autofocus');
 $imageFormList = (new CFormList('imageFormList'))
-	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['imagename'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
 	->addRow(_('Upload'), new CFile('image'));
 
 if (isset($this->data['imageid'])) {

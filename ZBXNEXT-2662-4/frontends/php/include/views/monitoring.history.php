@@ -135,7 +135,9 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		}
 
 		$filterColumn1->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton]);
-		$filterColumn1->addRow(_('Select rows with value like'), new CTextBox('filter', getRequest('filter', ''), ZBX_TEXTBOX_FILTER_SIZE));
+		$filterColumn1->addRow(_('Select rows with value like'),
+			(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		);
 
 		$filterTask = getRequest('filter_task', 0);
 

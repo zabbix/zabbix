@@ -78,7 +78,7 @@ if ($result) {
 
 		if (!is_array($info) && isset($definedErrorPhrases[$info])) {
 			$allowedTesting = false;
-			$control = new CTextBox($fname, $macrosData[$token['value']], 30);
+			$control = (new CTextBox($fname, $macrosData[$token['value']]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			$control->setAttribute('disabled', 'disabled');
 		}
 		else {
@@ -94,7 +94,7 @@ if ($result) {
 				}
 			}
 			else {
-				$control = new CTextBox($fname, $macrosData[$token['value']], 30);
+				$control = (new CTextBox($fname, $macrosData[$token['value']]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
 
 			$fields[$fname] = [$info['type'], O_OPT, null, $validation, 'isset({test_expression})',

@@ -376,7 +376,7 @@ $filterColumn1->addRow(
 $filterColumn1->addRow(
 	_('Application'),
 	[
-		new CTextBox('application', $filter['application']),
+		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -389,7 +389,7 @@ $filterColumn1->addRow(
 $filterColumn2 = new CFormList();
 $filterColumn2->addRow(
 	_('Name'),
-	new CTextBox('select', $filter['select'], 40)
+	(new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 );
 $filterColumn2->addRow(
 	_('Show items without data'),

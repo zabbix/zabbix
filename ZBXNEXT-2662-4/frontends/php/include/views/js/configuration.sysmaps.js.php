@@ -48,9 +48,9 @@
 				<td class="table-forms-td-left"><?= _('Area size') ?></td>
 				<td class="table-forms-td-right">
 					<label for="areaSizeWidth"><?= _('Width') ?></label>
-					<input id="areaSizeWidth" type="text" class="input text" name="width" value="200" size="5">
+					<input id="areaSizeWidth" type="text" class="input text" name="width" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
 					<label for="areaSizeHeight"><?= _('Height') ?></label>
-					<input id="areaSizeHeight" type="text" class="input text" name="height" value="200" size="5">
+					<input id="areaSizeHeight" type="text" class="input text" name="height" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
 				</td>
 			</tr>
 			<tr id="areaPlacingRow">
@@ -100,9 +100,10 @@
 			<tr id="triggerSelectRow">
 				<td class="table-forms-td-left"><?= _('Trigger') ?></td>
 				<td class="table-forms-td-right">
-					<input readonly="readonly" size="50" id="elementNameTrigger" name="elementName" class="input">
+					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameTrigger" name="elementName" class="text input" type="text">
+					<div class="form-input-margin"></div>
 					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
-					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?= _('Select') ?></span>
+					<button type="button" class="btn-grey" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?= _('Select') ?></button>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">

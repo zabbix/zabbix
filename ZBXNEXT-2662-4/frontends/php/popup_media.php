@@ -126,8 +126,8 @@ foreach ($types as $mediaTypeId => $type) {
 	$cmbType->addItem($mediaTypeId, $type['description']);
 }
 $frmMedia->addRow(_('Type'), $cmbType);
-$frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
-$frmMedia->addRow(_('When active'), new CTextBox('period', $period, 48));
+$frmMedia->addRow(_('Send to'), (new CTextBox('sendto', $sendto))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+$frmMedia->addRow(_('When active'), (new CTextBox('period', $period))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 
 $frm_row = [];
 

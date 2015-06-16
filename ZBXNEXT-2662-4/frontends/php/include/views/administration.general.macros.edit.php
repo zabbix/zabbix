@@ -35,11 +35,13 @@ $table = (new CTable())
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
-	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64))
+	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 64))
+		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass('macro')
 		->setAttribute('placeholder', '{$MACRO}');
 
-	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255))
+	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))
+		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('value'));
 
 	$button_cell = [

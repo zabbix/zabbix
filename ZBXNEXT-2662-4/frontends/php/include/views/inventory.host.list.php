@@ -47,7 +47,7 @@ $filterColumn->addRow(
 				1 => _('exactly')
 			]),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			new CTextBox('filter_field_value', $this->data['filterFieldValue'], 20)
+			(new CTextBox('filter_field_value', $this->data['filterFieldValue']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		]
 );
 

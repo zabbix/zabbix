@@ -69,17 +69,14 @@ natcasesort($templateIds);
 $frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
-$templateList = new CFormList('hostlist');
-
-// FORM ITEM : Template name text box [  ]
-$template_nameTB = new CTextBox('template_name', $host, 54, false, 128);
-$template_nameTB->setAttribute('autofocus', 'autofocus');
-
-$visiblenameTB = new CTextBox('visiblename', $visiblename, 54, false, 128);
-
-$templateList
-	->addRow(_('Template name'), $template_nameTB)
-	->addRow(_('Visible name'), $visiblenameTB);
+$templateList = (new CFormList('hostlist'))
+	->addRow(_('Template name'), (new CTextBox('template_name', $host, false, 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 $groupsTB = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
 
@@ -118,13 +115,17 @@ else {
 $templateList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
-$new_group = (new CTextBox('newgroup', $newgroup))->setAttribute('maxlength', 64);
+$new_group = (new CTextBox('newgroup', $newgroup))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('maxlength', 64);
 $new_group_label = _('New group');
 if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 	$new_group_label .= ' '._('(Only super admins can create groups)');
 	$new_group->setReadonly(true);
 }
-$templateList->addRow($new_group_label, (new CSpan($new_group))->addClass('form-new-group'));
+$templateList->addRow(new CLabel($new_group_label, 'newgroup'),
+	(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+);
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 $cmbGroups = new CComboBox('twb_groupid', $data['twb_groupid'], 'submit()');
