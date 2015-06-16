@@ -32,6 +32,7 @@ zbx_hash_t	zbx_hash_murmur2(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_sdbm(const void *data, size_t len, zbx_hash_t seed);
 zbx_hash_t	zbx_hash_djb2(const void *data, size_t len, zbx_hash_t seed);
 
+#define ZBX_DEFAULT_HASH_ALGO		zbx_hash_modfnv
 #define ZBX_DEFAULT_UINT64_HASH_ALGO	zbx_hash_modfnv
 #define ZBX_DEFAULT_STRING_HASH_ALGO	zbx_hash_modfnv
 
