@@ -115,7 +115,8 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	border-bottom: 1px solid darken($body-bg-color, 10%);
+	//border-bottom: 1px solid darken($body-bg-color, 10%);
+	border-bottom: 1px solid $ui-border-color;
 	padding: 0 0 5px 0;
 }
 
@@ -134,8 +135,9 @@ h3 {
 
 h4 {
 	font-size: $font-h4-size;
-	color: $font-color;
+	color: lighten($font-color, 10%);
 	line-height: $h4-line-height;
+	font-weight: bold;
 
 	span {
 		font-size: $font-body-size;
@@ -1456,6 +1458,7 @@ button {
 	padding: 0 11px;
 	min-height: 24px;
 	cursor: pointer;
+	outline: 0;
 	@include border-radius(2px);
 	@include transition(border-color, background-color .2s ease-out);
 
