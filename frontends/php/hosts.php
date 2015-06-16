@@ -828,8 +828,8 @@ elseif (hasRequest('form')) {
 		'inventory_items' => [],
 
 		// Encryption
-		'tls_accept' => getRequest('tls_accept', '1'),
-		'tls_connect' => getRequest('tls_connect', '1'),
+		'tls_accept' => getRequest('tls_accept', HOST_ENCRYPTION_NONE),
+		'tls_connect' => getRequest('tls_connect', HOST_ENCRYPTION_NONE),
 		'tls_issuer' => getRequest('tls_issuer', ''),
 		'tls_psk' => getRequest('tls_psk', ''),
 		'tls_psk_identity' => getRequest('tls_psk_identity', ''),
