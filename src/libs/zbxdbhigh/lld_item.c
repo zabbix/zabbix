@@ -238,7 +238,8 @@ static zbx_hash_t	lld_item_index_hash_func(const void *data)
 	zbx_lld_item_index_t	*item_index = (zbx_lld_item_index_t *)data;
 	zbx_hash_t		hash;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&item_index->parent_itemid);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&item_index->parent_itemid,
+			sizeof(item_index->parent_itemid), ZBX_DEFAULT_HASH_SEED);
 	return ZBX_DEFAULT_PTR_HASH_ALGO(&item_index->lld_row, sizeof(item_index->lld_row), hash);
 }
 
@@ -259,7 +260,8 @@ static zbx_hash_t	lld_application_index_hash_func(const void *data)
 	zbx_lld_application_index_t	*application_index = (zbx_lld_application_index_t *)data;
 	zbx_hash_t			hash;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&application_index->application_prototypeid);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&application_index->application_prototypeid,
+			sizeof(application_index->application_prototypeid), ZBX_DEFAULT_HASH_SEED);
 	return ZBX_DEFAULT_PTR_HASH_ALGO(&application_index->lld_row, sizeof(application_index->lld_row), hash);
 }
 
