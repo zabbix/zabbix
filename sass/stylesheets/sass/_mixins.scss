@@ -44,6 +44,6 @@
 
 @mixin btn-hover-active($font-color, $background) {
 	color: $font-color;
-	background-color: darken($background, 10%);
-	border-color: darken($background, 10%);
+	background-color: darken($background, 5%);
+	border-color: darken($background, 5%);
 }
