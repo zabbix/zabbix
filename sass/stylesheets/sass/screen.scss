@@ -2365,10 +2365,6 @@ button[disabled] {
 	padding: 0;
 	max-width: 250px;
 
-	.dashbrd-widget-head {
-		margin: -2px 0 -7px 0;
-	}
-
 	h4 {
 		display: inline-block;
 	}
@@ -2385,11 +2381,12 @@ button[disabled] {
 	}
 
 	.dashbrd-widget-head {
+		margin: 0;
+		padding: 6px 0 0 6px;
 
 		ul {
 			position: relative;
 			display: inline-block;
-			margin-left: 8px;
 
 			li {
 				float: none;
