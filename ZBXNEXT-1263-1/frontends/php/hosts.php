@@ -291,6 +291,20 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				? [] : getRequest('host_inventory', []);
 		}
 
+		if (array_key_exists('tls_connect', $visible) || array_key_exists('tls_accept', $visible)) {
+			if (array_key_exists('tls_connect', $visible)) {
+				$newValues['tls_connect'] = getRequest('tls_connect', HOST_ENCRYPTION_NONE);
+			}
+
+			if (array_key_exists('tls_accept', $visible)) {
+				$newValues['tls_accept'] = getRequest('tls_accept', HOST_ENCRYPTION_NONE);
+			}
+			$newValues['tls_psk_identity'] = getRequest('tls_psk_identity', '');
+			$newValues['tls_psk'] = getRequest('tls_psk', '');
+			$newValues['tls_issuer'] = getRequest('tls_issuer', '');
+			$newValues['tls_subject'] = getRequest('tls_subject', '');
+		}
+
 		$templateIds = [];
 		if (isset($visible['templates'])) {
 			$templateIds = $_REQUEST['templates'];
@@ -515,8 +529,8 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'ipmi_privilege' => getRequest('ipmi_privilege'),
 				'ipmi_username' => getRequest('ipmi_username'),
 				'ipmi_password' => getRequest('ipmi_password'),
-				'tls_accept' => getRequest('tls_accept'),
-				'tls_connect' => getRequest('tls_connect'),
+				'tls_accept' => getRequest('tls_accept', HOST_ENCRYPTION_NONE),
+				'tls_connect' => getRequest('tls_connect', HOST_ENCRYPTION_NONE),
 				'tls_issuer' => getRequest('tls_issuer'),
 				'tls_psk' => getRequest('tls_psk'),
 				'tls_psk_identity' => getRequest('tls_psk_identity'),
@@ -747,7 +761,13 @@ if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && ha
 		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
 		'host_inventory' => getRequest('host_inventory', []),
 		'templates' => getRequest('templates', []),
-		'inventories' => zbx_toHash(getHostInventories(), 'db_field')
+		'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
+		'tls_connect' => getRequest('tls_connect', HOST_ENCRYPTION_NONE),
+		'tls_accept' => getRequest('tls_accept', HOST_ENCRYPTION_NONE),
+		'tls_psk_identity' => getRequest('tls_psk_identity', ''),
+		'tls_psk' => getRequest('tls_psk', ''),
+		'tls_issuer' => getRequest('tls_issuer', ''),
+		'tls_subject' => getRequest('tls_subject', ''),
 	];
 
 	// sort templates
