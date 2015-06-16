@@ -28,50 +28,54 @@
 			redirect(url.getUrl(), 'post', 'action');
 		});
 
-		// trim spaces on sumbit
-		jQuery('#proxyForm').submit(function() {
-			jQuery('#host').val(jQuery.trim(jQuery('#host').val()));
-			jQuery('#ip').val(jQuery.trim(jQuery('#ip').val()));
-			jQuery('#dns').val(jQuery.trim(jQuery('#dns').val()));
-			jQuery('#port').val(jQuery.trim(jQuery('#port').val()));
-			jQuery('#description').val(jQuery.trim(jQuery('#description').val()));
-
-			var tls_accept = 0;
-
-			if (jQuery('#tls_in_none').is(":checked")) {
-				tls_accept += 1;
-			}
-			if (jQuery('#tls_in_psk').is(":checked")) {
-				tls_accept += 2;
-			}
-			if (jQuery('#tls_in_cert').is(":checked")) {
-				tls_accept += 4;
-			}
-
-			jQuery('#tls_accept').val(tls_accept);
-		});
-
 		jQuery('#status, #tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
 			var active = (jQuery('#status').val() == 5);
-				is_certificate = (!active && jQuery('#tls_connect').val() == 4) || (active && jQuery('#tls_in_cert').is(":checked")),
-				is_psk = (!active && jQuery('#tls_connect').val() == 2) || (active && jQuery('#tls_in_psk').is(":checked"));
+				is_certificate = (jQuery('#tls_connect').val() == 4) || jQuery('#tls_in_cert').is(":checked"),
+				is_psk = (jQuery('#tls_connect').val() == 2) || jQuery('#tls_in_psk').is(":checked");
 
 			if (is_certificate) {
-				jQuery('#tls_issuer, #tls_subject').prop('disabled', false);
+				jQuery('#tls_issuer, #tls_subject').closest('li').show();
 			}
 			else {
-				jQuery('#tls_issuer, #tls_subject').prop('disabled', true);
+				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
 			}
 
 			if (is_psk) {
-				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
 			}
 			else {
-				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', true);
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
 			}
 		});
 
 		// refresh field visibility on document load
-		jQuery('#status, #tls_connect, #tls_psk_out').trigger('change');
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
+			jQuery('#tls_in_none').prop('checked', true);
+		}
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
+			jQuery('#tls_in_psk').prop('checked', true);
+		}
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+			jQuery('#tls_in_cert').prop('checked', true);
+		}
+
+		jQuery('#tls_connect, #tls_psk_out').trigger('change');
+
+		// trim spaces on sumbit
+		jQuery('#proxyForm').submit(function() {
+			var tls_accept = 0x00;
+
+			if (jQuery('#tls_in_none').is(":checked")) {
+				tls_accept |= 0x01;
+			}
+			if (jQuery('#tls_in_psk').is(":checked")) {
+				tls_accept |= 0x02;
+			}
+			if (jQuery('#tls_in_cert').is(":checked")) {
+				tls_accept |= 0x04;
+			}
+
+			jQuery('#tls_accept').val(tls_accept);
+		});
 	});
 </script>

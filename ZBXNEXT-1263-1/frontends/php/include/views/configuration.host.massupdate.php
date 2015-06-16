@@ -27,6 +27,7 @@ $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 $hostView = new CForm();
 $hostView->setName('hostForm');
 $hostView->addVar('action', 'host.massupdate');
+$hostView->addVar('tls_accept', $data['tls_accept']);
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }
@@ -326,6 +327,46 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 	);
 }
 
+// Encryption
+$encryptionFormList = new CFormList('encryption');
+
+$encryptionFormList->addRow(
+	[
+		_('Connections to host'),
+		SPACE,
+		(new CVisibilityBox('visible[tls_connect]', 'tls_connect', _('Original')))
+			->setChecked(isset($data['visible']['tls_connect']))
+	],
+	new CComboBox('tls_connect', $data['tls_connect'], null, [
+		HOST_ENCRYPTION_NONE => _('No encryption'),
+		HOST_ENCRYPTION_PSK => _('PSK'),
+		HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
+	])
+);
+
+$from_host = (new CDiv([
+	[new CCheckBox('tls_in_none'), _('No encryption')],
+	BR(),
+	[new CCheckBox('tls_in_psk'), _('PSK')],
+	BR(),
+	[new CCheckBox('tls_in_cert'), _('Certificate')]
+]))->setId('fromHost');
+
+$encryptionFormList->addRow(
+	[
+		_('Connections from host'),
+		SPACE,
+		(new CVisibilityBox('visible[tls_accept]', 'fromHost', _('Original')))
+			->setChecked(isset($data['visible']['tls_accept']))
+	],
+	$from_host
+);
+
+$encryptionFormList->addRow(_('PSK identity'), new CTextBox('tls_psk_identity', $data['tls_psk_identity'], 64));
+$encryptionFormList->addRow(_('PSK'), new CTextBox('tls_psk', $data['tls_psk'], 64, false, 512));
+$encryptionFormList->addRow(_('Issuer'), new CTextBox('tls_issuer', $data['tls_issuer'], 64));
+$encryptionFormList->addRow(_('Subject'), new CTextBox('tls_subject', $data['tls_subject'], 64));
+
 // append tabs to form
 $hostTab = new CTabView();
 
@@ -337,6 +378,7 @@ $hostTab->addTab('hostTab', _('Host'), $hostFormList);
 $hostTab->addTab('templatesTab', _('Templates'), $templatesFormList);
 $hostTab->addTab('ipmiTab', _('IPMI'), $ipmiFormList);
 $hostTab->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
+$hostTab->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
 
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(
