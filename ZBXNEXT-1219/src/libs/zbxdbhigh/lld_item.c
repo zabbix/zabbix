@@ -1065,8 +1065,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  *             items           - [IN] items to save                           *
  *                                                                            *
  ******************************************************************************/
-static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, const
-		zbx_vector_ptr_t *items)
+static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
 {
 	const char			*__function_name = "lld_items_save";
 
@@ -1457,6 +1456,8 @@ static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_pro
 
 		zbx_db_insert_execute(&db_insert_idiscovery);
 		zbx_db_insert_clean(&db_insert_idiscovery);
+
+		zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -1471,7 +1472,7 @@ out:
  *             application_prototypes - [IN] the application prototypes       *
  *                                                                            *
  ******************************************************************************/
-static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *applications,
+static void	lld_applications_save(zbx_uint64_t hostid, zbx_vector_ptr_t *applications,
 		const zbx_vector_ptr_t *application_prototypes)
 {
 	const char			*__function_name = "lld_applications_save";
@@ -1623,6 +1624,8 @@ static void	lld_applications_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *a
 	{
 		zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
+
+		zbx_vector_ptr_sort(applications, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
 	if (0 != new_discoveries)
