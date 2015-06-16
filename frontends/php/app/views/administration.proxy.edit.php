@@ -27,7 +27,7 @@ $widget = (new CWidget())->setTitle(_('Proxies'));
 $proxyForm = new CForm();
 $proxyForm->setId('proxyForm');
 $proxyForm->addVar('proxyid', $data['proxyid']);
-$proxyForm->addVar('tls_accept', 0);
+$proxyForm->addVar('tls_accept', $data['tls_accept']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
 }
@@ -90,37 +90,22 @@ $proxyFormList->addRow(_('Description'), new CTextArea('description', $data['des
 // encryption tab
 $encryptionFormList = new CFormList('encryption');
 
-$encryptionOut = new CComboBox('tls_connect', $data['tls_connect']);
-$encryptionOut->addItem(HOST_ENCRYPTION_NONE, _('No encryption'));
-$encryptionOut->addItem(HOST_ENCRYPTION_PSK, _('PSK'));
-$encryptionOut->addItem(HOST_ENCRYPTION_CERTIFICATE, _('Certificate'));
-$encryptionFormList->addRow(_('Connections to proxy'), $encryptionOut);
-
-$encryptionIn = array();
-$encryptionIn1 = new CCheckBox('tls_in_none', ($data['tls_accept'] & 1) == 1);
-$encryptionIn[] = array($encryptionIn1, 'No encryption');
-$encryptionIn[] = BR();
-
-$encryptionIn2 = new CCheckBox('tls_in_psk', ($data['tls_accept'] & 2) == 2);
-$encryptionIn[] = array($encryptionIn2, 'PSK');
-$encryptionIn[] = BR();
-
-$encryptionIn3 = new CCheckBox('tls_in_cert', ($data['tls_accept'] & 4) == 4);
-$encryptionIn[] = array($encryptionIn3, 'Certificate');
-
-$encryptionFormList->addRow(_('Connections from proxy'), $encryptionIn);
-
-$encryptionOutIssuer = new CTextBox('tls_issuer', $data['tls_issuer'], 64);
-$encryptionFormList->addRow(_('Issuer'), $encryptionOutIssuer);
-
-$encryptionOutSubject = new CTextBox('tls_subject', $data['tls_subject'], 64);
-$encryptionFormList->addRow(_('Subject'), $encryptionOutSubject);
-
-$encryptionPSKIdentity = new CTextBox('tls_psk_identity', $data['tls_psk_identity'], 64);
-$encryptionFormList->addRow(_('PSK identity'), $encryptionPSKIdentity);
-
-$encryptionInPSK = new CTextBox('tls_psk', $data['tls_psk'], 64, false, 512);
-$encryptionFormList->addRow(_('PSK'), $encryptionInPSK);
+$encryptionFormList->addRow(_('Connections to host'), new CComboBox('tls_connect', $data['tls_connect'], null, [
+	HOST_ENCRYPTION_NONE => _('No encryption'),
+	HOST_ENCRYPTION_PSK => _('PSK'),
+	HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
+]));
+$encryptionFormList->addRow(_('Connections from host'), [
+	[new CCheckBox('tls_in_none'), _('No encryption')],
+	BR(),
+	[new CCheckBox('tls_in_psk'), _('PSK')],
+	BR(),
+	[new CCheckBox('tls_in_cert'), _('Certificate')]
+]);
+$encryptionFormList->addRow(_('PSK identity'), new CTextBox('tls_psk_identity', $data['tls_psk_identity'], 64));
+$encryptionFormList->addRow(_('PSK'), new CTextBox('tls_psk', $data['tls_psk'], 64, false, 512));
+$encryptionFormList->addRow(_('Issuer'), new CTextBox('tls_issuer', $data['tls_issuer'], 64));
+$encryptionFormList->addRow(_('Subject'), new CTextBox('tls_subject', $data['tls_subject'], 64));
 
 // append tabs to form
 $proxyTab = new CTabView();
