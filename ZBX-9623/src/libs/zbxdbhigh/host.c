@@ -3227,11 +3227,11 @@ void	DBdelete_host(zbx_uint64_t hostid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	zbx_vector_uint64_create(&htids);
-	zbx_vector_uint64_create(&itemids);
-
 	if (SUCCEED != DBlock_hostid(hostid))
 		goto out;
+
+	zbx_vector_uint64_create(&htids);
+	zbx_vector_uint64_create(&itemids);
 
 	/* delete web tests */
 	result = DBselect(

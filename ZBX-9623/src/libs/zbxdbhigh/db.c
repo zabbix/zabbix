@@ -2191,6 +2191,22 @@ void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vec
 	zbx_free(sql);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_record                                                    *
+ *                                                                            *
+ * Purpose: locks a record in a table by its primary key and an optional      *
+ *          constraint field                                                  *
+ *                                                                            *
+ * Parameters: table     - [IN] the target table                              *
+ *             id        - [IN] primary key value                             *
+ *             add_field - [IN] additional constraint field name (optional)   *
+ *             add_id    - [IN] constraint field value                        *
+ *                                                                            *
+ * Return value: SUCCEED - the record was successfully locked                 *
+ *               FAIL    - the table does not contain the specified record    *
+ *                                                                            *
+ ******************************************************************************/
 int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id)
 {
 	const char	*__function_name = "DBlock_record";
@@ -2198,15 +2214,12 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
 	DB_RESULT	result;
 	DB_ROW		row;
 	const ZBX_TABLE	*t;
-	int		ret = FAIL;
+	int		ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (0 == zbx_db_txn_level())
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "error: %s() called outside of transaction", __function_name);
-		THIS_SHOULD_NEVER_HAPPEN;
-	}
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
 
 	t = DBget_table(table);
 
@@ -2220,17 +2233,13 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
 				table, t->recid, id, add_field, add_id);
 	}
 
-	row = DBfetch(result);
+	if (NULL == (row = DBfetch(result)))
+		ret = FAIL;
+	else
+		ret = SUCCEED;
+
 	DBfree_result(result);
 
-	if (NULL == row)
-	{
-		/* no record with such id */
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
