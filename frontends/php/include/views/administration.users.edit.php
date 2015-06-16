@@ -165,9 +165,10 @@ if ($this->data['alias'] != ZBX_GUEST_USER) {
 	$userFormList->addRow(_('Auto-logout (min 90 seconds)'), [$autologoutCheckBox, $autologoutTextBox]);
 }
 
-$userFormList->addRow(_('Refresh (in seconds)'), new CNumericBox('refresh', $this->data['refresh'], 4));
-$userFormList->addRow(_('Rows per page'), new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6));
-$userFormList->addRow(_('URL (after login)'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
+$userFormList
+	->addRow(_('Refresh (in seconds)'), new CNumericBox('refresh', $this->data['refresh'], 4))
+	->addRow(_('Rows per page'), new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))
+	->addRow(_('URL (after login)'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
 
 /*
  * Media tab

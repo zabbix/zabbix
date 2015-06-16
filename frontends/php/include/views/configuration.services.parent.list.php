@@ -64,12 +64,14 @@ foreach ($this->data['db_pservices'] as $db_service) {
 		);
 	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorythm($db_service['algorithm']), $db_service['trigger']]);
 }
-$column = new CCol(
-	(new CButton('cancel', _('Cancel')))
-		->onClick('javascript: self.close();')
-		->setAttribute('style', 'text-align:right;')
+
+$servicesParentTable->setFooter(
+	new CCol(
+		(new CButton('cancel', _('Cancel')))
+			->onClick('javascript: self.close();')
+			->setAttribute('style', 'text-align:right;')
+	)
 );
-$servicesParentTable->setFooter($column);
 
 // append table to form
 $servicesParentForm->addItem($servicesParentTable);

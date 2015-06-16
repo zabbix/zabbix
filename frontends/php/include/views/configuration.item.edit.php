@@ -50,8 +50,8 @@ if (!empty($this->data['templates'])) {
 	$itemFormList->addRow(_('Parent items'), $this->data['templates']);
 }
 
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
+$nameTextBox = (new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']))
+	->setAttribute('autofocus', 'autofocus');
 $itemFormList->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
@@ -451,8 +451,8 @@ if (empty($this->data['parent_discoveryid'])) {
 }
 
 // append description to form list
-$description = new CTextArea('description', $this->data['description']);
-$description->addStyle('margin-top: 5px;');
+$description = (new CTextArea('description', $this->data['description']))
+	->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
 // status
@@ -460,8 +460,7 @@ $enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($th
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 // append tabs to form
-$itemTab = new CTabView();
-$itemTab->addTab('itemTab', $this->data['caption'], $itemFormList);
+$itemTab = (new CTabView())->addTab('itemTab', $this->data['caption'], $itemFormList);
 
 // append buttons to form
 if ($this->data['itemid'] != 0) {

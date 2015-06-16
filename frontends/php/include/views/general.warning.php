@@ -19,9 +19,9 @@
 **/
 
 
-$pageHeader = new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']');
-$pageHeader->addCssInit();
-$pageHeader->display();
+$pageHeader = (new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']'))
+	->addCssInit()
+	->display();
 
 $buttons = array_key_exists('buttons', $data)
 	? $data['buttons']

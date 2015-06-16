@@ -32,14 +32,13 @@ if (!empty($this->data['applicationid'])) {
 }
 
 // create form list
-$applicationFormList = new CFormList('applicationFormList');
-$nameTextBox = new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$applicationFormList->addRow(_('Name'), $nameTextBox);
+$nameTextBox = (new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->setAttribute('autofocus', 'autofocus');
+$applicationFormList = (new CFormList('applicationFormList'))
+	->addRow(_('Name'), $nameTextBox);
 
 // append tabs to form
-$applicationTab = new CTabView();
-$applicationTab->addTab('applicationTab', _('Application'), $applicationFormList);
+$applicationTab = (new CTabView())->addTab('applicationTab', _('Application'), $applicationFormList);
 
 // append buttons to form
 if (!empty($this->data['applicationid'])) {

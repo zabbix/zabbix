@@ -39,14 +39,15 @@ foreach ($data['alert_usrgrps'] as $usrgrp) {
 	$alertUserGroup->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
 }
 
-$otherTab->addRow(_('Refresh unsupported items (in sec)'),
-	new CNumericBox('refresh_unsupported', $data['refresh_unsupported'], 5)
-);
-$otherTab->addRow(_('Group for discovered hosts'), $discoveryGroup);
-$otherTab->addRow(_('User group for database down message'), $alertUserGroup);
-$otherTab->addRow(_('Log unmatched SNMP traps'),
-	(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
-);
+$otherTab
+	->addRow(_('Refresh unsupported items (in sec)'),
+		new CNumericBox('refresh_unsupported', $data['refresh_unsupported'], 5)
+	)
+	->addRow(_('Group for discovered hosts'), $discoveryGroup)
+	->addRow(_('User group for database down message'), $alertUserGroup)
+	->addRow(_('Log unmatched SNMP traps'),
+		(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
+	);
 
 $otherForm = (new CForm())
 	->setName('otherForm')

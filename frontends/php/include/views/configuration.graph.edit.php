@@ -49,18 +49,14 @@ $graphFormList = new CFormList('graphFormList');
 if (!empty($this->data['templates'])) {
 	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
 }
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$graphFormList->addRow(_('Name'), $nameTextBox);
-$graphFormList->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5));
-$graphFormList->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5));
-
-$graphFormList->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()));
-
-// append legend to form list
-$graphFormList->addRow(_('Show legend'),
-	(new CCheckBox('show_legend'))->setChecked($this->data['show_legend'] == 1)
-);
+$nameTextBox = (new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->setAttribute('autofocus', 'autofocus');
+$graphFormList
+	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5))
+	->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5))
+	->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))
+	->addRow(_('Show legend'), (new CCheckBox('show_legend'))->setChecked($this->data['show_legend'] == 1));
 
 // append graph types to form list
 if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED) {

@@ -34,11 +34,11 @@ if (isset($this->data['imageid'])) {
 $imageForm->addVar('imagetype', $this->data['imagetype']);
 
 // append form list
-$imageFormList = new CFormList('imageFormList');
-$nameTextBox = new CTextBox('name', $this->data['imagename'], 64, false, 64);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$imageFormList->addRow(_('Name'), $nameTextBox);
-$imageFormList->addRow(_('Upload'), new CFile('image'));
+$nameTextBox = (new CTextBox('name', $this->data['imagename'], 64, false, 64))
+	->setAttribute('autofocus', 'autofocus');
+$imageFormList = (new CFormList('imageFormList'))
+	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Upload'), new CFile('image'));
 
 if (isset($this->data['imageid'])) {
 	if ($this->data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
@@ -50,8 +50,8 @@ if (isset($this->data['imageid'])) {
 }
 
 // append tab
-$imageTab = new CTabView();
-$imageTab->addTab('imageTab', ($this->data['imagetype'] == IMAGE_TYPE_ICON) ? _('Icon') : _('Background'), $imageFormList);
+$imageTab = (new CTabView())
+	->addTab('imageTab', ($this->data['imagetype'] == IMAGE_TYPE_ICON) ? _('Icon') : _('Background'), $imageFormList);
 
 // append buttons
 if (isset($this->data['imageid'])) {

@@ -35,12 +35,12 @@ $table = (new CTable())
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
-	$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64);
-	$macro_input->addClass('macro');
-	$macro_input->setAttribute('placeholder', '{$MACRO}');
+	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64))
+		->addClass('macro')
+		->setAttribute('placeholder', '{$MACRO}');
 
-	$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
-	$value_input->setAttribute('placeholder', _('value'));
+	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255))
+		->setAttribute('placeholder', _('value'));
 
 	$button_cell = [
 		(new CButton('macros['.$i.'][remove]', _('Remove')))
@@ -70,9 +70,9 @@ $macros_form_list = (new CFormList('macrosFormList'))
 
 $tab_view = (new CTabView())->addTab('macros', _('Macros'), $macros_form_list);
 
-$saveButton = new CSubmit('update', _('Update'));
-$saveButton->setAttribute('data-removed-count', 0);
-$saveButton->main();
+$saveButton = (new CSubmit('update', _('Update')))
+	->setAttribute('data-removed-count', 0)
+	->main();
 
 $tab_view->setFooter(makeFormFooter($saveButton));
 

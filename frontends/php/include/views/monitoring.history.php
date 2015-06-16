@@ -207,9 +207,9 @@ if ($this->data['plaintext']) {
 	$historyWidget->addItem($plaintextSpan);
 }
 else {
-	$historyWidget->setTitle($header['left']);
-	$historyWidget->setControls($header['right']);
-	$historyWidget->addItem(BR());
+	$historyWidget->setTitle($header['left'])
+		->setControls($header['right'])
+		->addItem(BR());
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm->addNavigator();

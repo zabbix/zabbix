@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$userGroupComboBox = new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()');
-$userGroupComboBox->addItem(0, _('All'));
+$userGroupComboBox = (new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()'))
+	->addItem(0, _('All'));
 
 foreach ($this->data['userGroups'] as $userGroup) {
 	$userGroupComboBox->addItem($userGroup['usrgrpid'], $userGroup['name']);

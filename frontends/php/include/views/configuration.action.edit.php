@@ -38,13 +38,13 @@ else {
 /*
  * Action tab
  */
-$actionFormList = new CFormList();
-$nameTextBox = new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$actionFormList->addRow(_('Name'), $nameTextBox);
+$nameTextBox = (new CTextBox('name', $this->data['action']['name'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->setAttribute('autofocus', 'autofocus');
 
-$actionFormList->addRow(_('Default subject'), new CTextBox('def_shortdata', $this->data['action']['def_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE));
-$actionFormList->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
+$actionFormList = (new CFormList())
+	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Default subject'), new CTextBox('def_shortdata', $this->data['action']['def_shortdata'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$actionFormList->addRow(_('Recovery message'),
@@ -124,9 +124,9 @@ if ($this->data['action']['filter']['conditions']) {
 	}
 }
 
-$formula = new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE);
-$formula->setId('formula');
-$formula->setAttribute('placeholder', 'A or (B and C) &hellip;');
+$formula = (new CTextBox('formula', $this->data['action']['filter']['formula'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->setId('formula')
+	->setAttribute('placeholder', 'A or (B and C) &hellip;');
 if ($this->data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
 	$formula->addClass('hidden');
 }
@@ -361,20 +361,19 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = null;
 }
 
-$conditionTable = new CTable();
-$conditionTable->addRow([$conditionTypeComboBox, $conditionOperatorsComboBox, $condition]);
-$conditionTable->addRow([
-	(new CCol(
-		(new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-	))->setColSpan(3)
-]);
-
-$conditionFormList->addRow(_('New condition'),
-	(new CDiv($conditionTable))
-		->addClass('objectgroup')
-		->addClass('floatleft')
-		->addClass('border_dotted')
-);
+$conditionTable = (new CTable())
+	->addRow([$conditionTypeComboBox, $conditionOperatorsComboBox, $condition])
+	->addRow([
+		(new CCol(
+			(new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+		))->setColSpan(3)
+	])
+	->addRow(_('New condition'),
+		(new CDiv($conditionTable))
+			->addClass('objectgroup')
+			->addClass('floatleft')
+			->addClass('border_dotted')
+	);
 
 /*
  * Operation tab
@@ -527,30 +526,29 @@ if (!empty($this->data['new_operation'])) {
 			'javascript:'.$stepFrom->getAttribute('onchange').' if (this.value == 0) this.value = 1;'
 		);
 
-		$stepTo = new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5);
-		$stepTo->setAttribute('size', 6);
+		$stepTo = (new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5))
+			->setAttribute('size', 6);
 
-		$stepTable = new CTable();
-		$stepTable->addRow([_('From'), $stepFrom], 'indent_both');
-		$stepTable->addRow(
-			[
-				_('To'),
-				new CCol([$stepTo, SPACE, _('(0 - infinitely)')])
-			],
-			'indent_both'
-		);
-
-		$stepTable->addRow(
-			[
-				_('Step duration'),
-				new CCol([
-					new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 6),
-					SPACE,
-					_('(minimum 60 seconds, 0 - use action default)')
-				])
-			],
-			'indent_both'
-		);
+		$stepTable = (new CTable())
+			->addRow([_('From'), $stepFrom], 'indent_both')
+			->addRow(
+				[
+					_('To'),
+					new CCol([$stepTo, SPACE, _('(0 - infinitely)')])
+				],
+				'indent_both'
+			)
+			->addRow(
+				[
+					_('Step duration'),
+					new CCol([
+						new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 6),
+						SPACE,
+						_('(minimum 60 seconds, 0 - use action default)')
+					])
+				],
+				'indent_both'
+			);
 
 		$newOperationsTable->addRow([_('Step'), $stepTable]);
 	}
@@ -660,21 +658,22 @@ if (!empty($this->data['new_operation'])) {
 			$jsInsert .= 'addPopupValues('.zbx_jsvalue(['object' => 'userid', 'values' => $users]).');';
 			zbx_add_post_js($jsInsert);
 
-			$newOperationsTable->addRow([_('Send to User groups'),
-				(new CDiv($usrgrpList))
-					->addClass('objectgroup')
-					->addClass('inlineblock')
-					->addClass('border_dotted')
-			]);
-			$newOperationsTable->addRow([_('Send to Users'),
-				(new CDiv($userList))
-					->addClass('objectgroup')
-					->addClass('inlineblock')
-					->addClass('border_dotted')
-			]);
+			$newOperationsTable
+				->addRow([_('Send to User groups'),
+					(new CDiv($usrgrpList))
+						->addClass('objectgroup')
+						->addClass('inlineblock')
+						->addClass('border_dotted')
+				])
+				->addRow([_('Send to Users'),
+					(new CDiv($userList))
+						->addClass('objectgroup')
+						->addClass('inlineblock')
+						->addClass('border_dotted')
+				]);
 
-			$mediaTypeComboBox = new CComboBox('new_operation[opmessage][mediatypeid]', $this->data['new_operation']['opmessage']['mediatypeid']);
-			$mediaTypeComboBox->addItem(0, '- '._('All').' -');
+			$mediaTypeComboBox = (new CComboBox('new_operation[opmessage][mediatypeid]', $this->data['new_operation']['opmessage']['mediatypeid']))
+				->addItem(0, '- '._('All').' -');
 
 			$dbMediaTypes = DBfetchArray(DBselect('SELECT mt.mediatypeid,mt.description FROM media_type mt'));
 
@@ -684,16 +683,17 @@ if (!empty($this->data['new_operation'])) {
 				$mediaTypeComboBox->addItem($dbMediaType['mediatypeid'], $dbMediaType['description']);
 			}
 
-			$newOperationsTable->addRow([_('Send only to'), $mediaTypeComboBox]);
-			$newOperationsTable->addRow(
-				[
-					_('Default message'),
-					(new CCheckBox('new_operation[opmessage][default_msg]'))
-						->setChecked($this->data['new_operation']['opmessage']['default_msg'] == 1)
-						->onClick('javascript: submit();')
-				],
-				'indent_top'
-			);
+			$newOperationsTable
+				->addRow([_('Send only to'), $mediaTypeComboBox])
+				->addRow(
+					[
+						_('Default message'),
+						(new CCheckBox('new_operation[opmessage][default_msg]'))
+							->setChecked($this->data['new_operation']['opmessage']['default_msg'] == 1)
+							->onClick('javascript: submit();')
+					],
+					'indent_top'
+				);
 
 			if (!$this->data['new_operation']['opmessage']['default_msg']) {
 				$newOperationsTable->addRow([
@@ -906,21 +906,23 @@ if (!empty($this->data['new_operation'])) {
 
 			// command
 			$commandTextArea = new CTextArea('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command']);
-			$newOperationsTable->addRow([_('Commands'), $commandTextArea], 'class_opcommand_command hidden indent_both');
+			$commandIpmiTextBox = (new CTextBox('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command'], ZBX_TEXTBOX_STANDARD_SIZE))
+				->setId('opcommand_command_ipmi');
 
-			$commandIpmiTextBox = new CTextBox('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command'], ZBX_TEXTBOX_STANDARD_SIZE);
-			$commandIpmiTextBox->setId('opcommand_command_ipmi');
-			$newOperationsTable->addRow([_('Commands'), $commandIpmiTextBox], 'class_opcommand_command_ipmi hidden indent_both');
+			$newOperationsTable
+				->addRow([_('Commands'), $commandTextArea], 'class_opcommand_command hidden indent_both')
+				->addRow([_('Commands'), $commandIpmiTextBox], 'class_opcommand_command_ipmi hidden indent_both');
 			break;
 
 		case OPERATION_TYPE_HOST_ADD:
 		case OPERATION_TYPE_HOST_REMOVE:
 		case OPERATION_TYPE_HOST_ENABLE:
 		case OPERATION_TYPE_HOST_DISABLE:
-			$newOperationsTable->addItem(new CVar('new_operation[object]', 0));
-			$newOperationsTable->addItem(new CVar('new_operation[objectid]', 0));
-			$newOperationsTable->addItem(new CVar('new_operation[shortdata]', ''));
-			$newOperationsTable->addItem(new CVar('new_operation[longdata]', ''));
+			$newOperationsTable
+				->addItem(new CVar('new_operation[object]', 0))
+				->addItem(new CVar('new_operation[objectid]', 0))
+				->addItem(new CVar('new_operation[shortdata]', ''))
+				->addItem(new CVar('new_operation[longdata]', ''));
 			break;
 
 		case OPERATION_TYPE_GROUP_ADD:
@@ -929,28 +931,28 @@ if (!empty($this->data['new_operation'])) {
 				$this->data['new_operation']['opgroup'] = [];
 			}
 
-			$groupList = new CTable();
-			$groupList->setId('opGroupList');
-			$groupList->addRow((new CRow(
-				(new CCol(
-					new CMultiSelect([
-						'name' => 'discoveryHostGroup',
-						'objectName' => 'hostGroup',
-						'objectOptions' => ['editable' => true],
-						'popup' => [
-							'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
-								'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1'
-						]
-					]))
-				)->setColSpan(2))
-			)->setId('opGroupListFooter'));
-			$groupList->addRow(
-				(new CCol(
-					(new CButton('add', _('Add')))
-						->onClick('return addDiscoveryHostGroup();')
-						->addClass(ZBX_STYLE_BTN_LINK)
-				))->setColSpan(2)
-			);
+			$groupList = (new CTable())
+				->setId('opGroupList')
+				->addRow((new CRow(
+					(new CCol(
+						new CMultiSelect([
+							'name' => 'discoveryHostGroup',
+							'objectName' => 'hostGroup',
+							'objectOptions' => ['editable' => true],
+							'popup' => [
+								'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
+									'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1'
+							]
+						]))
+					)->setColSpan(2))
+				)->setId('opGroupListFooter'))
+				->addRow(
+					(new CCol(
+						(new CButton('add', _('Add')))
+							->onClick('return addDiscoveryHostGroup();')
+							->addClass(ZBX_STYLE_BTN_LINK)
+					))->setColSpan(2)
+				);
 
 			// load host groups
 			$groupIds = isset($this->data['new_operation']['opgroup'])
@@ -1208,13 +1210,13 @@ if (!empty($this->data['new_operation'])) {
 }
 
 // append tabs to form
-$actionTabs = new CTabView();
+$actionTabs = (new CTabView())
+	->addTab('actionTab', _('Action'), $actionFormList)
+	->addTab('conditionTab', _('Conditions'), $conditionFormList)
+	->addTab('operationTab', _('Operations'), $operationFormList);
 if (!hasRequest('form_refresh')) {
 	$actionTabs->setSelected(0);
 }
-$actionTabs->addTab('actionTab', _('Action'), $actionFormList);
-$actionTabs->addTab('conditionTab', _('Conditions'), $conditionFormList);
-$actionTabs->addTab('operationTab', _('Operations'), $operationFormList);
 
 // append buttons to form
 $others = [];

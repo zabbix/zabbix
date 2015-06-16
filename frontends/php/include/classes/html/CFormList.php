@@ -73,6 +73,7 @@ class CFormList extends CList {
 				(new CDiv($description))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
+		return $this;
 	}
 
 	public function addInfo($text, $label = null) {
@@ -83,6 +84,7 @@ class CFormList extends CList {
 			],
 			'formrow listInfo'
 		);
+		return $this;
 	}
 
 	public function toString($destroy = true) {
@@ -91,7 +93,8 @@ class CFormList extends CList {
 
 	public function addVar($name, $value, $id = null) {
 		if ($value !== null) {
-			return $this->addItem(new CVar($name, $value, $id));
+			$this->addItem(new CVar($name, $value, $id));
 		}
+		return $this;
 	}
 }

@@ -327,16 +327,15 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 }
 
 // append tabs to form
-$hostTab = new CTabView();
-
+$hostTab = (new CTabView())
+	->addTab('hostTab', _('Host'), $hostFormList)
+	->addTab('templatesTab', _('Templates'), $templatesFormList)
+	->addTab('ipmiTab', _('IPMI'), $ipmiFormList)
+	->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
 // reset the tab when opening the form for the first time
 if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
-$hostTab->addTab('hostTab', _('Host'), $hostFormList);
-$hostTab->addTab('templatesTab', _('Templates'), $templatesFormList);
-$hostTab->addTab('ipmiTab', _('IPMI'), $ipmiFormList);
-$hostTab->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
 
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(

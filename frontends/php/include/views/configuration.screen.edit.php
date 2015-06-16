@@ -34,16 +34,15 @@ if (!empty($this->data['screenid'])) {
 }
 
 // create screen form list
-$screenFormList = new CFormList();
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$screenFormList->addRow(_('Name'), $nameTextBox);
-$screenFormList->addRow(_('Columns'), new CNumericBox('hsize', $this->data['hsize'], 3));
-$screenFormList->addRow(_('Rows'), new CNumericBox('vsize', $this->data['vsize'], 3));
+$nameTextBox = (new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE))
+	->setAttribute('autofocus', 'autofocus');
+$screenFormList = (new CFormList())
+	->addRow(_('Name'), $nameTextBox)
+	->addRow(_('Columns'), new CNumericBox('hsize', $this->data['hsize'], 3))
+	->addRow(_('Rows'), new CNumericBox('vsize', $this->data['vsize'], 3));
 
 // append tabs to form
-$screenTab = new CTabView();
-$screenTab->addTab('screenTab', _('Screen'), $screenFormList);
+$screenTab = (new CTabView())->addTab('screenTab', _('Screen'), $screenFormList);
 
 // append buttons to form
 if (isset($this->data['screenid']))

@@ -31,19 +31,19 @@ $widget = (new CWidget())
 	);
 
 // Filter
-$filter = new CFilter('web.hosts.filter.state');
-$filterColumn1 = new CFormList();
-$filterColumn1->addRow(_('Name like'), new CTextBox('filter_host', $data['filter']['host'], 20));
-$filter->addColumn($filterColumn1);
-$filterColumn2 = new CFormList();
-$filterColumn2->addRow(_('DNS like'), new CTextBox('filter_dns', $data['filter']['dns'], 20));
-$filter->addColumn($filterColumn2);
-$filterColumn3 = new CFormList();
-$filterColumn3->addRow(_('IP like'), new CTextBox('filter_ip', $data['filter']['ip'], 20));
-$filter->addColumn($filterColumn3);
-$filterColumn4 = new CFormList();
-$filterColumn4->addRow(_('Port like'), new CTextBox('filter_port', $data['filter']['port'], 20));
-$filter->addColumn($filterColumn4);
+$filter = (new CFilter('web.hosts.filter.state'))
+	->addColumn(
+		(new CFormList())->addRow(_('Name like'), new CTextBox('filter_host', $data['filter']['host'], 20))
+	)
+	->addColumn(
+		(new CFormList())->addRow(_('DNS like'), new CTextBox('filter_dns', $data['filter']['dns'], 20))
+	)
+	->addColumn(
+		(new CFormList())->addRow(_('IP like'), new CTextBox('filter_ip', $data['filter']['ip'], 20))
+	)
+	->addColumn(
+		(new CFormList())->addRow(_('Port like'), new CTextBox('filter_port', $data['filter']['port'], 20))
+	);
 
 $widget->addItem($filter);
 

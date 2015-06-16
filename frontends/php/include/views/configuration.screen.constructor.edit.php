@@ -347,14 +347,15 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 				'&writeonly=1");');
 	}
 
-	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Item'), [
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
-	$screenFormList->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
+	$screenFormList
+		->addVar('resourceid', $id)
+		->addRow(_('Item'), [
+			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$selectButton
+		], false, null, ZBX_STYLE_NOWRAP)
+		->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3))
+		->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
 }
 
 /*

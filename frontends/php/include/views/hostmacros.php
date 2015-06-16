@@ -54,12 +54,12 @@ else {
 
 	// fields
 	foreach ($data['macros'] as $i => $macro) {
-		$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64);
-		$macro_input->setReadOnly(
-			$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & MACRO_TYPE_INHERITED))
-		);
-		$macro_input->addClass('macro');
-		$macro_input->setAttribute('placeholder', '{$MACRO}');
+		$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64))
+			->setReadOnly(
+				$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & MACRO_TYPE_INHERITED))
+			)
+			->addClass('macro')
+			->setAttribute('placeholder', '{$MACRO}');
 
 		$macro_cell = [$macro_input];
 		if (!$data['readonly']) {
@@ -78,11 +78,11 @@ else {
 			$macro_cell[] = new CVar('macros['.$i.'][type]', $macro['type']);
 		}
 
-		$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
-		$value_input->setReadOnly(
-			$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & MACRO_TYPE_HOSTMACRO))
-		);
-		$value_input->setAttribute('placeholder', _('value'));
+		$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255))
+			->setReadOnly(
+				$data['readonly'] || ($data['show_inherited_macros'] && !($macro['type'] & MACRO_TYPE_HOSTMACRO))
+			)
+			->setAttribute('placeholder', _('value'));
 
 		$row = [$macro_cell, '&rArr;', $value_input];
 
@@ -161,7 +161,8 @@ $show_inherited_macros_filter = [
 	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
 ];
 
-$macros_form_list->addRow(null, (new CDiv($show_inherited_macros_filter))->addClass('jqueryinputset')->addClass('radioset'));
-$macros_form_list->addRow(null, $table);
+$macros_form_list
+	->addRow(null, (new CDiv($show_inherited_macros_filter))->addClass('jqueryinputset')->addClass('radioset'))
+	->addRow(null, $table);
 
 return $macros_form_list;

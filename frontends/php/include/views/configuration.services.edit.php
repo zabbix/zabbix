@@ -39,10 +39,10 @@ if (isset($this->data['service'])) {
 }
 
 // create form list
-$servicesFormList = new CFormList('servicesFormList');
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$servicesFormList->addRow(_('Name'), $nameTextBox);
+$nameTextBox = (new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128))
+	->setAttribute('autofocus', 'autofocus');
+$servicesFormList = (new CFormList('servicesFormList'))
+	->addRow(_('Name'), $nameTextBox);
 
 // append parent link to form list
 $servicesFormList->addRow(_('Parent service'), [
@@ -235,14 +235,14 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	$servicesForm->addVar('new_service_time[to]', $serviceTimeTo);
 
 	// create calendar table
-	$timeCalendarTable = new CTable();
+	$noteTextBox = (new CTextBox('new_service_time[note]', '', ZBX_TEXTBOX_STANDARD_SIZE))
+		->setAttribute('placeholder', _('short description'));
+	$timeCalendarTable
+		->addRow([_('Note'), $noteTextBox])
+		->addRow([_('From'), createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')])
+		->addRow([_('Till'), createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')]);
 
-	$noteTextBox = new CTextBox('new_service_time[note]', '', ZBX_TEXTBOX_STANDARD_SIZE);
-	$noteTextBox->setAttribute('placeholder', _('short description'));
-	$timeCalendarTable->addRow([_('Note'), $noteTextBox]);
-	$timeCalendarTable->addRow([_('From'), createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')]);
-	$timeCalendarTable->addRow([_('Till'), createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')]);
-	$serviceTimeTable->addRow($timeCalendarTable);
+	$timeCalendarTable = (new CTable())->addRow($timeCalendarTable);
 }
 else {
 	$weekFromComboBox = new CComboBox('new_service_time[from_week]', isset($_REQUEST['new_service_time']['from_week'])
@@ -297,9 +297,10 @@ $servicesTab = new CTabView();
 if (!$this->data['form_refresh']) {
 	$servicesTab->setSelected(0);
 }
-$servicesTab->addTab('servicesTab', _('Service'), $servicesFormList);
-$servicesTab->addTab('servicesDependenciesTab', _('Dependencies'), $servicesDependenciesFormList);
-$servicesTab->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
+$servicesTab
+	->addTab('servicesTab', _('Service'), $servicesFormList)
+	->addTab('servicesDependenciesTab', _('Dependencies'), $servicesDependenciesFormList)
+	->addTab('servicesTimeTab', _('Time'), $servicesTimeFormList);
 
 // append buttons to form
 if ($service['serviceid']) {
