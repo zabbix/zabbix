@@ -50,16 +50,18 @@ if (isset($_REQUEST['groups'])) {
 	}
 }
 
-$replaceGroups = (new CDiv(new CMultiSelect([
-	'name' => 'groups[]',
-	'objectName' => 'hostGroup',
-	'objectOptions' => ['editable' => true],
-	'data' => $hostGroupsToReplace,
-	'popup' => [
-		'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
-			'&writeonly=1&multiselect=1'
-	]
-])))->setId('replaceGroups');
+$replaceGroups = (new CDiv(
+	(new CMultiSelect([
+		'name' => 'groups[]',
+		'objectName' => 'hostGroup',
+		'objectOptions' => ['editable' => true],
+		'data' => $hostGroupsToReplace,
+		'popup' => [
+			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
+				'&writeonly=1&multiselect=1'
+		]
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+))->setId('replaceGroups');
 
 $hostFormList->addRow(
 	[
@@ -101,18 +103,6 @@ if (isset($_REQUEST['new_groups'])) {
 	}
 }
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$newGroups = (new CDiv(new CMultiSelect([
-		'name' => 'new_groups[]',
-		'objectName' => 'hostGroup',
-		'objectOptions' => ['editable' => true],
-		'data' => $hostGroupsToAdd,
-		'addNew' => true,
-		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1'
-		]
-	])))->setId('newGroups');
-
 	$hostFormList->addRow(
 		[
 			_('Add new or existing host groups'),
@@ -120,29 +110,41 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
 				->setChecked(isset($data['visible']['new_groups']))
 		],
-		$newGroups
+		(new CDiv(
+			(new CMultiSelect([
+				'name' => 'new_groups[]',
+				'objectName' => 'hostGroup',
+				'objectOptions' => ['editable' => true],
+				'data' => $hostGroupsToAdd,
+				'addNew' => true,
+				'popup' => [
+					'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_'.
+						'&srcfld1=groupid&writeonly=1&multiselect=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->setId('newGroups')
 	);
 }
 else {
-	$newGroups = new CMultiSelect([
-		'name' => 'new_groups[]',
-		'objectName' => 'hostGroup',
-		'objectOptions' => ['editable' => true],
-		'data' => $hostGroupsToAdd,
-		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1'
-		]
-	]);
-
 	$hostFormList->addRow(
 		[
 			_('New host group'),
 			SPACE,
-			(new CVisibilityBox('visible[new_groups]', 'new_groups_', _('Original')))
+			(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
 				->setChecked(isset($data['visible']['new_groups']))
 		],
-		$newGroups
+		(new CDiv(
+			(new CMultiSelect([
+				'name' => 'new_groups[]',
+				'objectName' => 'hostGroup',
+				'objectOptions' => ['editable' => true],
+				'data' => $hostGroupsToAdd,
+				'popup' => [
+					'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_'.
+						'&srcfld1=groupid&writeonly=1&multiselect=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->setId('newGroups')
 	);
 }
 
@@ -199,7 +201,7 @@ $clearDiv = (new CDiv())->addStyle('clear: both;');
 
 $templatesDiv = (new CDiv(
 	[
-		new CMultiSelect([
+		(new CMultiSelect([
 			'name' => 'templates[]',
 			'objectName' => 'templates',
 			'data' => $data['linkedTemplates'],
@@ -207,7 +209,7 @@ $templatesDiv = (new CDiv(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostView->getName().
 					'&dstfld1=templates_&templated_hosts=1&multiselect=1'
 			]
-		]),
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		$clearDiv,
 		(new CDiv([
 			(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1),

@@ -187,7 +187,7 @@ foreach (get_operators_by_conditiontype($this->data['new_condition']['conditiont
 
 switch ($this->data['new_condition']['conditiontype']) {
 	case CONDITION_TYPE_HOST_GROUP:
-		$condition = new CMultiSelect([
+		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
 			'objectName' => 'hostGroup',
 			'objectOptions' => [
@@ -198,11 +198,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=groupid&writeonly=1&multiselect=1'
 			]
-		]);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TEMPLATE:
-		$condition = new CMultiSelect([
+		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
 			'objectName' => 'templates',
 			'objectOptions' => [
@@ -213,11 +213,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 					'&dstfld1=new_condition_value_&templated_hosts=1&multiselect=1&writeonly=1'
 			]
-		]);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_HOST:
-		$condition = new CMultiSelect([
+		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
 			'objectName' => 'hosts',
 			'objectOptions' => [
@@ -228,11 +228,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=hosts&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=hostid&writeonly=1&multiselect=1'
 			]
-		]);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER:
-		$condition = new CMultiSelect([
+		$condition = (new CMultiSelect([
 			'name' => 'new_condition[value][]',
 			'objectName' => 'triggers',
 			'objectOptions' => [
@@ -243,7 +243,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 				'parameters' => 'srctbl=triggers&dstfrm='.$actionForm->getName().'&dstfld1=new_condition_value_'.
 					'&srcfld1=triggerid&writeonly=1&multiselect=1&noempty=1'
 			]
-		]);
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		break;
 
 	case CONDITION_TYPE_TRIGGER_NAME:
@@ -955,7 +955,7 @@ if (!empty($this->data['new_operation'])) {
 				->setId('opGroupList')
 				->addRow((new CRow(
 					(new CCol(
-						new CMultiSelect([
+						(new CMultiSelect([
 							'name' => 'discoveryHostGroup',
 							'objectName' => 'hostGroup',
 							'objectOptions' => ['editable' => true],
@@ -963,8 +963,8 @@ if (!empty($this->data['new_operation'])) {
 								'parameters' => 'srctbl=host_groups&dstfrm='.$actionForm->getName().
 									'&dstfld1=discoveryHostGroup&srcfld1=groupid&writeonly=1&multiselect=1'
 							]
-						]))
-					)->setColSpan(2))
+						]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					))->setColSpan(2))
 				)->setId('opGroupListFooter'))
 				->addRow(
 					(new CCol(
@@ -1013,7 +1013,7 @@ if (!empty($this->data['new_operation'])) {
 			$templateList->setId('opTemplateList');
 			$templateList->addRow((new CRow(
 				(new CCol(
-					new CMultiSelect([
+					(new CMultiSelect([
 						'name' => 'discoveryTemplates',
 						'objectName' => 'templates',
 						'objectOptions' => ['editable' => true],
@@ -1021,8 +1021,8 @@ if (!empty($this->data['new_operation'])) {
 							'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$actionForm->getName().
 								'&dstfld1=discoveryTemplates&templated_hosts=1&multiselect=1&writeonly=1'
 						]
-					]))
-				)->setColSpan(2))
+					]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				))->setColSpan(2))
 			)->setId('opTemplateListFooter'));
 
 			$templateList->addRow(

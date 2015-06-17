@@ -377,18 +377,20 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 			}
 		}
 
-		$screenFormList->addRow(_('Group'), new CMultiSelect([
-			'name' => 'resourceid',
-			'objectName' => 'hostGroup',
-			'objectOptions' => ['editable' => true],
-			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
-			'defaultValue' => 0,
-			'selectedLimit' => 1,
-			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-					'&srcfld1=groupid&writeonly=1'
-			]
-		]));
+		$screenFormList->addRow(_('Group'),
+			(new CMultiSelect([
+				'name' => 'resourceid',
+				'objectName' => 'hostGroup',
+				'objectOptions' => ['editable' => true],
+				'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
+				'defaultValue' => 0,
+				'selectedLimit' => 1,
+				'popup' => [
+					'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+						'&srcfld1=groupid&writeonly=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
 	}
 	else {
 		if ($resourceId > 0) {
@@ -403,18 +405,20 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 			}
 		}
 
-		$screenFormList->addRow(_('Host'), new CMultiSelect([
-			'name' => 'resourceid',
-			'objectName' => 'hosts',
-			'objectOptions' => ['editable' => true],
-			'data' => $data ? [['id' => $data['hostid'], 'name' => $data['name']]] : null,
-			'defaultValue' => 0,
-			'selectedLimit' => 1,
-			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-					'&srcfld1=hostid&writeonly=1'
-			]
-		]));
+		$screenFormList->addRow(_('Host'),
+			(new CMultiSelect([
+				'name' => 'resourceid',
+				'objectName' => 'hosts',
+				'objectOptions' => ['editable' => true],
+				'data' => $data ? [['id' => $data['hostid'], 'name' => $data['name']]] : null,
+				'defaultValue' => 0,
+				'selectedLimit' => 1,
+				'popup' => [
+					'parameters' => 'srctbl=hosts&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+						'&srcfld1=hostid&writeonly=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
 	}
 
 	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
@@ -474,17 +478,19 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOU
 		}
 	}
 
-	$screenFormList->addRow(_('Group'), new CMultiSelect([
-		'name' => 'resourceid',
-		'objectName' => 'hostGroup',
-		'objectOptions' => ['editable' => true],
-		'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
-		'selectedLimit' => 1,
-		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-				'&srcfld1=groupid&writeonly=1'
-		]
-	]));
+	$screenFormList->addRow(_('Group'),
+		(new CMultiSelect([
+			'name' => 'resourceid',
+			'objectName' => 'hostGroup',
+			'objectOptions' => ['editable' => true],
+			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
+			'selectedLimit' => 1,
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+					'&srcfld1=groupid&writeonly=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 	$screenFormList->addRow(_('Application'),
 		(new CTextBox('application', $application, false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
@@ -547,18 +553,20 @@ elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_R
 		}
 	}
 
-	$screenFormList->addRow(_('Group'), new CMultiSelect([
-		'name' => 'resourceid',
-		'objectName' => 'hostGroup',
-		'objectOptions' => ['editable' => true],
-		'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
-		'defaultValue' => 0,
-		'selectedLimit' => 1,
-		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-				'&srcfld1=groupid&writeonly=1'
-		]
-	]));
+	$screenFormList->addRow(_('Group'),
+		(new CMultiSelect([
+			'name' => 'resourceid',
+			'objectName' => 'hostGroup',
+			'objectOptions' => ['editable' => true],
+			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
+			'defaultValue' => 0,
+			'selectedLimit' => 1,
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+					'&srcfld1=groupid&writeonly=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 }
 
 /*

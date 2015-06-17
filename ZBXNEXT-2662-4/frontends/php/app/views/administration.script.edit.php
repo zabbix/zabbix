@@ -78,7 +78,7 @@ $scriptFormList->addRow(_('Host group'), new CComboBox('hgstype', $data['hgstype
 	0 => _('All'),
 	1 => _('Selected')
 ]));
-$scriptFormList->addRow(null, new CMultiSelect([
+$scriptFormList->addRow(null, (new CMultiSelect([
 	'name' => 'groupid',
 	'selectedLimit' => 1,
 	'objectName' => 'hostGroup',
@@ -86,7 +86,7 @@ $scriptFormList->addRow(null, new CMultiSelect([
 	'popup' => [
 		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
 	]
-]), null, 'hostGroupSelection');
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), null, 'hostGroupSelection');
 
 // access
 $scriptFormList->addRow(_('Required host permissions'), new CComboBox('host_access', $data['host_access'], null, [
