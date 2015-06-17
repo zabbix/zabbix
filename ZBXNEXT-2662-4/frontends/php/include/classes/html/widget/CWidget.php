@@ -37,10 +37,8 @@ class CWidget {
 		$this->css_class = 'header_wide';
 	}
 
-	public function setClass($class = null) {
-		if (is_string($class)) {
-			$this->css_class = $class;
-		}
+	public function setClass($class) {
+		$this->css_class = $class;
 		return $this;
 	}
 

@@ -85,7 +85,6 @@ class CFormList extends CList {
 			],
 			'formrow listInfo'
 		);
-
 		return $this;
 	}
 
@@ -97,7 +96,6 @@ class CFormList extends CList {
 		if ($value !== null) {
 			$this->addItem(new CVar($name, $value, $id));
 		}
-
 		return $this;
 	}
 }

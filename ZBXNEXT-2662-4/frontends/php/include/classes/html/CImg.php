@@ -38,17 +38,11 @@ class CImg extends CTag {
 	}
 
 	public function setSrc($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetSrc "'.$value.'".');
-		}
 		$this->setAttribute('src', $value);
 		return $this;
 	}
 
 	public function setAltText($value = null) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetText "'.$value.'".');
-		}
 		$this->setAttribute('alt', $value);
 		return $this;
 	}
@@ -57,11 +51,10 @@ class CImg extends CTag {
 		if (is_null($value)) {
 			$this->deleteOption('usemap');
 		}
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetMap "'.$value.'".');
+		else {
+			$value = '#'.ltrim($value, '#');
+			$this->setAttribute('usemap', $value);
 		}
-		$value = '#'.ltrim($value, '#');
-		$this->setAttribute('usemap', $value);
 		return $this;
 	}
 
@@ -69,11 +62,8 @@ class CImg extends CTag {
 		if (is_null($value)) {
 			$this->removeAttribute('width');
 		}
-		elseif (is_numeric($value) || is_int($value)) {
-			$this->setAttribute('width', $value);
-		}
 		else {
-			$this->error('Incorrect value for SetWidth "'.$value.'".');
+			$this->setAttribute('width', $value);
 		}
 		return $this;
 	}
@@ -82,11 +72,8 @@ class CImg extends CTag {
 		if (is_null($value)) {
 			$this->removeAttribute('height');
 		}
-		elseif (is_numeric($value) || is_int($value)) {
-			$this->setAttribute('height', $value);
-		}
 		else {
-			$this->error('Incorrect value for SetHeight "'.$value.'".');
+			$this->setAttribute('height', $value);
 		}
 		return $this;
 	}

@@ -41,19 +41,6 @@ class CFormTable extends CForm {
 			->setColSpan(2);
 	}
 
-	public function setAction($value) {
-		if (is_string($value)) {
-			parent::setAction($value);
-		}
-		elseif (is_null($value)) {
-			parent::setAction($value);
-		}
-		else {
-			return $this->error('Incorrect value for setAction "'.$value.'".');
-		}
-		return $this;
-	}
-
 	public function setName($value) {
 		$this->setAttribute('name', $value);
 		$this->setId(zbx_formatDomId($value));

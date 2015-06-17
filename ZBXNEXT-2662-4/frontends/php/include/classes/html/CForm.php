@@ -51,12 +51,11 @@ class CForm extends CTag {
 
 	public function setEnctype($value = null) {
 		if (is_null($value)) {
-			return $this->removeAttribute('enctype');
+			$this->removeAttribute('enctype');
 		}
-		elseif (!is_string($value)) {
-			return $this->error('Incorrect value for SetEnctype "'.$value.'".');
+		else {
+			$this->setAttribute('enctype', $value);
 		}
-		$this->setAttribute('enctype', $value);
 		return $this;
 	}
 
@@ -64,7 +63,6 @@ class CForm extends CTag {
 		if (!is_null($value)) {
 			$this->addItem(new CVar($name, $value, $id));
 		}
-
 		return $this;
 	}
 }

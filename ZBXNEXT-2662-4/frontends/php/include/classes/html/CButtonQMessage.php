@@ -36,9 +36,6 @@ class CButtonQMessage extends CSubmit {
 	}
 
 	public function setVars($value = null) {
-		if (!is_string($value) && !is_null($value)) {
-			return $this->error('Incorrect value for setVars "'.$value.'".');
-		}
 		$this->vars = $value;
 		$this->setAction(null);
 		return $this;
@@ -47,9 +44,6 @@ class CButtonQMessage extends CSubmit {
 	public function setMessage($value = null) {
 		if (is_null($value)) {
 			$value = _('Are you sure you want perform this action?');
-		}
-		if (!is_string($value)) {
-			return $this->error(_s('Incorrect value for setMessage(): "%s".', $value));
 		}
 		// if message will contain single quotes, it will break everything, so it must be escaped
 		$this->msg = zbx_jsvalue(
@@ -63,7 +57,8 @@ class CButtonQMessage extends CSubmit {
 
 	public function setAction($value = null) {
 		if (!is_null($value)) {
-			return parent::onClick($value);
+			parent::onClick($value);
+			return $this;
 		}
 
 		global $page;

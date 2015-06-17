@@ -108,7 +108,6 @@ class CTag extends CObject {
 
 	public function setName($value) {
 		$this->setAttribute('name', $value);
-
 		return $this;
 	}
 
@@ -163,7 +162,7 @@ class CTag extends CObject {
 	 */
 	public function setHint($text, $spanClass = '', $freezeOnClick = true) {
 		if (empty($text)) {
-			return;
+			return $this;
 		}
 
 		encodeValues($text);
