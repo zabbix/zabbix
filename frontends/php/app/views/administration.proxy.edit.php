@@ -85,7 +85,9 @@ foreach ($data['all_hosts'] as $host) {
 	}
 }
 $proxyFormList->addRow(_('Hosts'), $hostsTweenBox->get(_('Proxy hosts'), _('Other hosts')));
-$proxyFormList->addRow(_('Description'), new CTextArea('description', $data['description']));
+$proxyFormList->addRow(_('Description'),
+	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // append tabs to form
 $proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxyFormList);

@@ -273,7 +273,9 @@ else {
 	);
 }
 
-$hostList->addRow(_('Description'), new CTextArea('description', $data['description']));
+$hostList->addRow(_('Description'),
+	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // Proxy
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
@@ -720,8 +722,8 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	}
 
 	if ($hostInventoryTable['fields'][$field_name]['type'] == DB::FIELD_TYPE_TEXT) {
-		$input = new CTextArea('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]);
-		$input->addStyle('width: 64em;');
+		$input = (new CTextArea('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
 	else {
 		$field_length = $hostInventoryTable['fields'][$field_name]['length'];

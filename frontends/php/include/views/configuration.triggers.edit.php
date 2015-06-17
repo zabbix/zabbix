@@ -53,15 +53,6 @@ $triggersFormList->addRow(_('Name'),
 );
 
 // append expression to form list
-$expressionTextBox = new CTextArea(
-	$this->data['expression_field_name'],
-	$this->data['expression_field_value'],
-	[
-		'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
-		'width' => ZBX_TEXTAREA_STANDARD_WIDTH,
-		'readonly' => $this->data['expression_field_readonly']
-	]
-);
 if ($this->data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $this->data['expression']);
 }
@@ -76,7 +67,17 @@ $addExpressionButton = (new CButton('insert', ($this->data['input_method'] == IM
 if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
-$expressionRow = [$expressionTextBox, (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), $addExpressionButton];
+$expressionRow = [
+	(new CTextArea(
+		$this->data['expression_field_name'],
+		$this->data['expression_field_value'],
+		[
+			'readonly' => $this->data['expression_field_readonly']
+		]
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	$addExpressionButton
+];
 
 if ($this->data['input_method'] == IM_TREE) {
 	// insert macro button
@@ -246,7 +247,9 @@ $triggersFormList
 	->addRow(_('Multiple PROBLEM events generation'),
 		(new CCheckBox('type'))->setChecked($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED)
 	)
-	->addRow(_('Description'), new CTextArea('comments', $this->data['comments']))
+	->addRow(_('Description'),
+		(new CTextArea('comments', $this->data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('URL'), (new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
 

@@ -94,7 +94,9 @@ $exprTab->addRow(
  * Test tab
  */
 $testTab = new CFormList('testTab');
-$testTab->addRow(_('Test string'), new CTextArea('test_string', $data['test_string']));
+$testTab->addRow(_('Test string'),
+	(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 $preloaderDiv = (new CDiv())
 	->addClass('preloader')
 	->setId('testPreloader')

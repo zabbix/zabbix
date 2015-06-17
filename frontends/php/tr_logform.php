@@ -351,7 +351,7 @@ if (hasRequest('sform')) {
 	$sev_select->addItems($severityNames);
 
 	$frmTRLog->addRow(_('Severity'), $sev_select);
-	$frmTRLog->addRow(_('Comments'), new CTextArea('comments', $comments));
+	$frmTRLog->addRow(_('Comments'), (new CTextArea('comments', $comments))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 	$frmTRLog->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 	$frmTRLog->addRow(_('Disabled'),
 		(new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_DISABLED)

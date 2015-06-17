@@ -47,7 +47,9 @@ $actionFormList = (new CFormList())
 	->addRow(_('Default subject'),
 		(new CTextBox('def_shortdata', $this->data['action']['def_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Default message'), new CTextArea('def_longdata', $this->data['action']['def_longdata']));
+	->addRow(_('Default message'),
+		(new CTextArea('def_longdata', $this->data['action']['def_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$actionFormList->addRow(_('Recovery message'),
@@ -59,7 +61,9 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 		$actionFormList->addRow(_('Recovery subject'),
 			(new CTextBox('r_shortdata', $this->data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		);
-		$actionFormList->addRow(_('Recovery message'), new CTextArea('r_longdata', $this->data['action']['r_longdata']));
+		$actionFormList->addRow(_('Recovery message'),
+			(new CTextArea('r_longdata', $this->data['action']['r_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
 	}
 	else {
 		$actionForm->addVar('r_shortdata', $this->data['action']['r_shortdata']);
@@ -713,7 +717,8 @@ if (!empty($this->data['new_operation'])) {
 				]);
 				$newOperationsTable->addRow([
 					_('Message'),
-					new CTextArea('new_operation[opmessage][message]', $this->data['new_operation']['opmessage']['message'])
+					(new CTextArea('new_operation[opmessage][message]', $this->data['new_operation']['opmessage']['message']))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				]);
 			}
 			else {
@@ -923,7 +928,9 @@ if (!empty($this->data['new_operation'])) {
 			);
 
 			// command
-			$commandTextArea = new CTextArea('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command']);
+			$commandTextArea =
+				(new CTextArea('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 			$commandIpmiTextBox = (new CTextBox('new_operation[opcommand][command]', $this->data['new_operation']['opcommand']['command']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

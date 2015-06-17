@@ -29,9 +29,10 @@ $commentForm = (new CForm())
 	->addVar('triggerid', $this->data['triggerid']);
 
 // create form list
-$commentTextArea = (new CTextArea('comments', CMacrosResolverHelper::resolveTriggerDescription($this->data['trigger']), [
-	'rows' => 25, 'width' => ZBX_TEXTAREA_BIG_WIDTH, 'readonly' => $this->data['isCommentExist']
-]))
+$commentTextArea = (new CTextArea('comments', CMacrosResolverHelper::resolveTriggerDescription($this->data['trigger']),
+	['rows' => 25, 'readonly' => $this->data['isCommentExist']]
+))
+	->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 	->setAttribute('autofocus', 'autofocus');
 
 $commentFormList = (new CFormList('commentFormList'))

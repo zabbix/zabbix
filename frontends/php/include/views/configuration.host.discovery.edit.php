@@ -193,14 +193,11 @@ $itemFormList->addRow(_('Password'),
 	false, 'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
-	new CTextArea('params_es', $this->data['params'], ['rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH]),
+	(new CTextArea('params_es', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	false, 'label_executed_script'
 );
 $itemFormList->addRow(_('SQL query'),
-	new CTextArea('params_ap',
-		$this->data['params'],
-		['rows' => ZBX_TEXTAREA_STANDARD_ROWS, 'width' => ZBX_TEXTAREA_STANDARD_WIDTH]
-	),
+	(new CTextArea('params_ap', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	false,
 	'label_params'
 );
@@ -277,9 +274,9 @@ $itemFormList
 	false, 'row_trapper_hosts');
 
 // append description to form list
-$description = (new CTextArea('description', $this->data['description']))
-	->addStyle('margin-top: 5px;');
-$itemFormList->addRow(_('Description'), $description);
+$itemFormList->addRow(_('Description'),
+	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // status
 $enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($this->data['status'] == ITEM_STATUS_ACTIVE);

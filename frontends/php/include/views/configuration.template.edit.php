@@ -151,7 +151,9 @@ $templateList->addRow(_('Hosts / templates'), $hostsTB->Get(_('In'), [
 	$cmbGroups
 ]));
 
-$templateList->addRow(_('Description'), new CTextArea('description', $this->data['description']));
+$templateList->addRow(_('Description'),
+	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // FULL CLONE {
 if ($data['form'] === 'full_clone') {
