@@ -2509,7 +2509,8 @@ static void	DBcopy_template_item_application_prototypes(zbx_uint64_t hostid, con
 	if (NULL == (row = DBfetch(result)))
 		goto out;
 
-	zbx_db_insert_prepare(&db_insert, "item_application_prototype", "application_prototypeid", "itemid", NULL);
+	zbx_db_insert_prepare(&db_insert, "item_application_prototype", "item_application_prototypeid",
+			"application_prototypeid", "itemid", NULL);
 
 	do
 	{
@@ -2518,7 +2519,7 @@ static void	DBcopy_template_item_application_prototypes(zbx_uint64_t hostid, con
 		ZBX_STR2UINT64(application_prototypeid, row[0]);
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		zbx_db_insert_add_values(&db_insert, application_prototypeid, itemid);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), application_prototypeid, itemid);
 	}
 	while (NULL != (row = DBfetch(result)));
 
