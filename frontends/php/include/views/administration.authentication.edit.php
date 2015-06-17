@@ -95,7 +95,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 		$authenticationForm->addVar('change_bind_password', 1);
 		$authenticationFormList->addRow(
 			_('Bind password'),
-			new CPassBox('ldap_bind_password', null, ZBX_TEXTBOX_SMALL_SIZE)
+			(new CPassBox('ldap_bind_password'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 	}
 	else {
@@ -107,7 +107,7 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 
 	$authenticationFormList->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']');
 	$authenticationFormList->addRow(_('Login'), $userComboBox);
-	$authenticationFormList->addRow(_('User password'), new CPassBox('user_password', null, ZBX_TEXTBOX_SMALL_SIZE));
+	$authenticationFormList->addRow(_('User password'), (new CPassBox('user_password'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH));
 }
 
 // append form list to tab

@@ -76,14 +76,16 @@ $mediaTypeFormList
 
 // create password field
 if ($data['passwd'] != '') {
-	$passwdButton = (new CButton('chPass_btn', _('Change password')))
-		->onClick('this.style.display="none"; $("passwd").enable().show().focus();');
-	$passwdBox = (new CPassBox('passwd', $data['passwd'], ZBX_TEXTBOX_SMALL_SIZE))
-		->addStyle('display: none;');
-	$passwdField = [$passwdButton, $passwdBox];
+	$passwdField = [
+		(new CButton('chPass_btn', _('Change password')))
+			->onClick('this.style.display="none"; $("passwd").show().focus();'),
+		(new CPassBox('passwd', $data['passwd']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->addStyle('display: none;')
+	];
 }
 else {
-	$passwdField = new CPassBox('passwd', '', ZBX_TEXTBOX_SMALL_SIZE);
+	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // append password field to form list

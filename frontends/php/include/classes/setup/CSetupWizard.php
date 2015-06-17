@@ -241,17 +241,15 @@ class CSetupWizard extends CForm {
 
 				if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
 					$table->addRow(_('Database schema'),
-						(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))
-							->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+						(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 					);
 				}
 
 				$table->addRow(_('User'),
-					(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))
-						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				$table->addRow(_('Password'),
-					new CPassBox('password', $this->getConfig('DB_PASSWORD', ''))
+					(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 				break;
 		}
