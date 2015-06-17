@@ -55,7 +55,7 @@ $scriptFormList->addRow(_('Execute on'),
 	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
 );
 $scriptFormList->addRow(_('Commands'),
-	new CTextArea('command', $data['command']),
+	(new CTextArea('command', $data['command']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
 );
 $scriptFormList->addRow(_('Command'),
@@ -63,7 +63,7 @@ $scriptFormList->addRow(_('Command'),
 	($data['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
 );
 $scriptFormList->addRow(_('Description'),
-	new CTextArea('description', $data['description'])
+	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // user groups

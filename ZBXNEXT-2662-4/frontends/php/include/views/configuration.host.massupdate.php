@@ -156,7 +156,7 @@ $hostFormList->addRow(
 		(new CVisibilityBox('visible[description]', 'description', _('Original')))
 			->setChecked(isset($data['visible']['description']))
 	],
-	new CTextArea('description', $data['description'])
+	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append proxy to form list
@@ -304,8 +304,8 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 	}
 
 	if ($hostInventoryTable['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT) {
-		$fieldInput = new CTextArea('host_inventory['.$field.']', $data['host_inventory'][$field]);
-		$fieldInput->addStyle('width: 64em;');
+		$fieldInput = (new CTextArea('host_inventory['.$field.']', $data['host_inventory'][$field]))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
 	else {
 		$field_length = $hostInventoryTable['fields'][$field]['length'];

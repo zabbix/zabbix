@@ -90,9 +90,13 @@ else {
 		->addRow(_('URL'),
 			(new CTextBox('url', getRequest('url', ''), false, null))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)
-		->addRow(_('Post'), new CTextArea('posts', getRequest('posts', '')))
-		->addRow(_('Variables'), new CTextArea('variables', getRequest('variables', '')))
-		->addRow(_('Headers'), new CTextArea('headers', getRequest('headers', '')))
+		->addRow(_('Post'), (new CTextArea('posts', getRequest('posts', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+		->addRow(_('Variables'),
+			(new CTextArea('variables', getRequest('variables', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+		->addRow(_('Headers'),
+			(new CTextArea('headers', getRequest('headers', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
 		->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1))
 		->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1))
 		->addRow(_('Timeout'), new CNumericBox('timeout', getRequest('timeout', 15), 5))

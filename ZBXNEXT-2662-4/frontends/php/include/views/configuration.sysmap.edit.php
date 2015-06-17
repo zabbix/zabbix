@@ -76,7 +76,9 @@ $sysmapList->addRow(_('Advanced labels'),
 
 // append hostgroup to form list
 $labelTypeHostgroupComboBox = new CComboBox('label_type_hostgroup', $this->data['sysmap']['label_type_hostgroup'], null, $this->data['labelTypesLimited']);
-$customLabelHostgroupTextArea = new CTextArea('label_string_hostgroup', $this->data['sysmap']['label_string_hostgroup']);
+$customLabelHostgroupTextArea =
+	(new CTextArea('label_string_hostgroup', $this->data['sysmap']['label_string_hostgroup']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if ($this->data['sysmap']['label_type_hostgroup'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelHostgroupTextArea->addClass('hidden');
 }
@@ -84,7 +86,8 @@ $sysmapList->addRow(_('Host group label type'), [$labelTypeHostgroupComboBox, BR
 
 // append host to form list
 $labelTypeHostComboBox = new CComboBox('label_type_host', $this->data['sysmap']['label_type_host'], null, $this->data['labelTypes']);
-$customLabelHostTextArea = new CTextArea('label_string_host', $this->data['sysmap']['label_string_host']);
+$customLabelHostTextArea = (new CTextArea('label_string_host', $this->data['sysmap']['label_string_host']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if ($this->data['sysmap']['label_type_host'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelHostTextArea->addClass('hidden');
 }
@@ -92,7 +95,8 @@ $sysmapList->addRow(_('Host label type'), [$labelTypeHostComboBox, BR(), $custom
 
 // append trigger to form list
 $labelTypeTriggerComboBox = new CComboBox('label_type_trigger', $this->data['sysmap']['label_type_trigger'], null, $this->data['labelTypesLimited']);
-$customLabelTriggerTextArea = new CTextArea('label_string_trigger', $this->data['sysmap']['label_string_trigger']);
+$customLabelTriggerTextArea = (new CTextArea('label_string_trigger', $this->data['sysmap']['label_string_trigger']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if ($this->data['sysmap']['label_type_trigger'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelTriggerTextArea->addClass('hidden');
 }
@@ -100,7 +104,8 @@ $sysmapList->addRow(_('Trigger label type'), [$labelTypeTriggerComboBox, BR(), $
 
 // append map to form list
 $labelTypeMapComboBox = new CComboBox('label_type_map', $this->data['sysmap']['label_type_map'], null, $this->data['labelTypesLimited']);
-$customLabelMapTextArea = new CTextArea('label_string_map', $this->data['sysmap']['label_string_map']);
+$customLabelMapTextArea = (new CTextArea('label_string_map', $this->data['sysmap']['label_string_map']))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if ($this->data['sysmap']['label_type_map'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelMapTextArea->addClass('hidden');
 }
@@ -108,7 +113,8 @@ $sysmapList->addRow(_('Map label type'), [$labelTypeMapComboBox, BR(), $customLa
 
 // append image to form list
 $labelTypeImageComboBox = new CComboBox('label_type_image', $this->data['sysmap']['label_type_image'], null, $this->data['labelTypesImage']);
-$customLabelImageTextArea = new CTextArea('label_string_image', $this->data['sysmap']['label_string_image']);
+$customLabelImageTextArea = (new CTextArea('label_string_image', $this->data['sysmap']['label_string_image']))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if ($this->data['sysmap']['label_type_image'] != MAP_LABEL_TYPE_CUSTOM) {
 	$customLabelImageTextArea->addClass('hidden');
 }

@@ -68,7 +68,7 @@
 					<label for="elementLabel"><?= _('Label') ?></label>
 				</td>
 				<td class="table-forms-td-right">
-					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr>
@@ -235,7 +235,7 @@
 					<label for="chkboxLabel"><?= _('Label') ?></label>
 				</td>
 				<td>
-					<textarea id="massLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+					<textarea id="massLabel" rows="4" name="label" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr>
@@ -353,7 +353,7 @@
 					<label for="linklabel"><?= _('Label') ?></label>
 				</td>
 				<td>
-					<textarea cols="48" rows="4" name="label" id="linklabel" class="input textarea_standard"></textarea>
+					<textarea cols="48" rows="4" name="label" id="linklabel" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr id="link-connect-to">

@@ -35,7 +35,6 @@ class CTextArea extends CTag {
 	 * @param string	$value
 	 * @param array		$options
 	 * @param int		$options['rows']
-	 * @param int		$options['width']
 	 * @param int		$options['maxlength']
 	 * @param boolean	$options['readonly']
 	 */
@@ -49,17 +48,6 @@ class CTextArea extends CTag {
 			$this->setReadonly($options['readonly']);
 		}
 		$this->addItem($value);
-
-		// set width
-		if (empty($options['width']) || $options['width'] == ZBX_TEXTAREA_STANDARD_WIDTH) {
-			$this->addClass('textarea_standard');
-		}
-		elseif ($options['width'] == ZBX_TEXTAREA_BIG_WIDTH) {
-			$this->addClass('textarea_big');
-		}
-		else {
-			$this->setAttribute('style', 'width: '.$options['width'].'px;');
-		}
 
 		// set maxlength
 		if (!empty($options['maxlength'])) {
@@ -110,6 +98,11 @@ class CTextArea extends CTag {
 				}',
 			true);
 		}
+		return $this;
+	}
+
+	public function setWidth($value) {
+		$this->setAttribute('style', 'width: '.$value.'px;');
 		return $this;
 	}
 }

@@ -591,8 +591,6 @@ if ($this->data['displayApplications']) {
 }
 
 // append description to form list
-$descriptionTextArea = new CTextArea('description', $this->data['description']);
-$descriptionTextArea->addStyle('margin-top: 5px;');
 $itemFormList->addRow(
 	[
 		_('Description'),
@@ -600,7 +598,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[description]', 'description', _('Original')))
 			->setChecked(isset($this->data['visible']['description']))
 	],
-	$descriptionTextArea
+	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 // append tabs to form
 $itemTab = new CTabView();

@@ -259,16 +259,12 @@ elseif (hasRequest('events')) {
 	}
 }
 
-$formList = new CFormList();
-
-$message = new CTextArea('message', '', [
-	'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
-	'width' => ZBX_TEXTAREA_BIG_WIDTH,
-	'maxlength' => 255
-]);
-$message->setAttribute('autofocus', 'autofocus');
-
-$formList->addRow(_('Message'), $message);
+$formList = (new CFormList())
+	->addRow(_('Message'),
+		(new CTextArea('message', '', ['maxlength' => 255]))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	);
 
 // append tabs to form
 $ackTab = new CTabView();

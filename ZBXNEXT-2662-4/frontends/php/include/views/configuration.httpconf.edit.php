@@ -103,8 +103,12 @@ $httpFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]')
 	)
-	->addRow(_('Variables'), new CTextArea('variables', $this->data['variables']))
-	->addRow(_('Headers'), new CTextArea('headers', $this->data['headers']))
+	->addRow(_('Variables'),
+		(new CTextArea('variables', $this->data['variables']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Headers'),
+		(new CTextArea('headers', $this->data['headers']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
 /*
