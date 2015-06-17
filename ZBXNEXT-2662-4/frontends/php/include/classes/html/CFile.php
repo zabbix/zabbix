@@ -21,13 +21,12 @@
 
 class CFile extends CInput {
 
-	public function __construct($name = 'file', $value = '') {
-		parent::__construct('file', $name, $value);
-		$this->setFile($value);
+	public function __construct($name = 'file') {
+		parent::__construct('file', $name);
 	}
 
-	public function setFile($value = '') {
-		$this->setAttribute('value', $value);
+	public function setWidth($value) {
+		$this->setAttribute('style', 'width: '.$value.'px;');
 		return $this;
 	}
 }

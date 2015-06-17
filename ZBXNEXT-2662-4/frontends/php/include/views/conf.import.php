@@ -80,7 +80,7 @@ foreach ($titles as $key => $title) {
 
 // form list
 $importFormList = (new CFormList('proxyFormList'))
-	->addRow(_('Import file'), new CFile('import_file'))
+	->addRow(_('Import file'), (new CFile('import_file'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Rules'), new CDiv($rulesTable));
 
 // tab

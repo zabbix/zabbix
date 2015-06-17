@@ -40,7 +40,7 @@ $imageFormList = (new CFormList('imageFormList'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Upload'), new CFile('image'));
+	->addRow(_('Upload'), (new CFile('image'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 
 if (isset($this->data['imageid'])) {
 	if ($this->data['imagetype'] == IMAGE_TYPE_BACKGROUND) {
