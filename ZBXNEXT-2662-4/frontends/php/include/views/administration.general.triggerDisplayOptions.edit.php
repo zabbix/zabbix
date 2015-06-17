@@ -51,10 +51,9 @@ $triggerDOFormList->addRow(
 $triggerDOFormList->addRow(
 	_('Acknowledged PROBLEM events'),
 	[
-		(new CDiv(
-			new CColor('problem_ack_color', $data['problem_ack_color'])))
-				->addClass('inlineblock')
-				->addClass('trigger_displaying_form_col'),
+		(new CDiv(new CColor('problem_ack_color', $data['problem_ack_color'])))
+			->addClass('inlineblock')
+			->addClass('trigger_displaying_form_col'),
 		(new CCheckBox('problem_ack_style'))->setChecked($data['problem_ack_style'] == 1)
 	]
 );
