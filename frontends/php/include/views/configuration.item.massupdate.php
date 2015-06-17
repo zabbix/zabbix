@@ -516,17 +516,18 @@ if ($this->data['displayApplications']) {
 		}
 	}
 
-	$replaceApp = (new CDiv(new CMultiSelect([
-		'name' => 'applications[]',
-		'objectName' => 'applications',
-		'objectOptions' => ['hostid' => $this->data['hostid']],
-		'data' => $appToReplace,
-		'popup' => [
-			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
-				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
-		]
-	])))
-		->setId('replaceApp');
+	$replaceApp = (new CDiv(
+		(new CMultiSelect([
+			'name' => 'applications[]',
+			'objectName' => 'applications',
+			'objectOptions' => ['hostid' => $this->data['hostid']],
+			'data' => $appToReplace,
+			'popup' => [
+				'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=applications_'.
+					'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))->setId('replaceApp');
 
 	$itemFormList->addRow(
 		[_('Replace applications'), SPACE,
@@ -566,18 +567,19 @@ if ($this->data['displayApplications']) {
 		}
 	}
 
-	$newApp = (new CDiv(new CMultiSelect([
-		'name' => 'new_applications[]',
-		'objectName' => 'applications',
-		'objectOptions' => ['hostid' => $this->data['hostid']],
-		'data' => $appToAdd,
-		'addNew' => true,
-		'popup' => [
-			'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
-				'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
-		]
-	])))
-		->setId('newApp');
+	$newApp = (new CDiv(
+		(new CMultiSelect([
+			'name' => 'new_applications[]',
+			'objectName' => 'applications',
+			'objectOptions' => ['hostid' => $this->data['hostid']],
+			'data' => $appToAdd,
+			'addNew' => true,
+			'popup' => [
+				'parameters' => 'srctbl=applications&dstfrm='.$itemForm->getName().'&dstfld1=new_applications_'.
+					'&srcfld1=applicationid&multiselect=1&noempty=1&hostid='.$this->data['hostid']
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))->setId('newApp');
 
 	$itemFormList->addRow(
 		[_('Add new or existing applications'), SPACE,

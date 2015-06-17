@@ -592,15 +592,17 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->addClass('formElementTable')
 		->setId('newTemplateTable');
 
-	$newTemplateTable->addRow([new CMultiSelect([
-		'name' => 'add_templates[]',
-		'objectName' => 'templates',
-		'ignored' => $ignoredTemplates,
-		'popup' => [
-			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-		]
-	])]);
+	$newTemplateTable->addRow([
+		(new CMultiSelect([
+			'name' => 'add_templates[]',
+			'objectName' => 'templates',
+			'ignored' => $ignoredTemplates,
+			'popup' => [
+				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]);
 
 	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 

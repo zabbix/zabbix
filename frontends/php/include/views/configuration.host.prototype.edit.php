@@ -184,20 +184,22 @@ foreach ($data['groups'] as $group) {
 		'name' => $group['name']
 	];
 }
-$groupList->addRow(_('Groups'), new CMultiSelect([
-	'name' => 'group_links[]',
-	'objectName' => 'hostGroup',
-	'objectOptions' => [
-		'editable' => true,
-		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
-	],
-	'data' => $groups,
-	'disabled' => (bool) $hostPrototype['templateid'],
-	'popup' => [
-		'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
-			'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
-	]
-]));
+$groupList->addRow(_('Groups'),
+	(new CMultiSelect([
+		'name' => 'group_links[]',
+		'objectName' => 'hostGroup',
+		'objectOptions' => [
+			'editable' => true,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		],
+		'data' => $groups,
+		'disabled' => (bool) $hostPrototype['templateid'],
+		'popup' => [
+			'parameters' => 'srctbl=host_groups&dstfrm='.$frmHost->getName().'&dstfld1=group_links_'.
+				'&srcfld1=groupid&writeonly=1&multiselect=1&normal_only=1'
+		]
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // new group prototypes
 $customGroupTable = (new CTable())
@@ -268,15 +270,17 @@ if (!$hostPrototype['templateid']) {
 		->setId('newTemplateTable')
 		->setAttribute('style', 'min-width: 400px;');
 
-	$newTemplateTable->addRow([new CMultiSelect([
-		'name' => 'add_templates[]',
-		'objectName' => 'templates',
-		'ignored' => $ignoreTemplates,
-		'popup' => [
-			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-		]
-	])]);
+	$newTemplateTable->addRow([
+		(new CMultiSelect([
+			'name' => 'add_templates[]',
+			'objectName' => 'templates',
+			'ignored' => $ignoreTemplates,
+			'popup' => [
+				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]);
 
 	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 

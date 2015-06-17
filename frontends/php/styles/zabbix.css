@@ -35,7 +35,7 @@ html {
   min-height: 100%; }
 
 body {
-  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, Tahoma, Verdana, sans-serif;
   font-size: 75%;
   line-height: 1.4em;
   color: #1f2c33;
@@ -98,7 +98,7 @@ a:active {
 h1 {
   font-size: 1.75em;
   line-height: 1.2em;
-  border-bottom: 1px solid #ced5da;
+  border-bottom: 1px solid #dfe4e7;
   padding: 0 0 5px 0; }
 
 h2 {
@@ -113,8 +113,8 @@ h3 {
   text-rendering: optimizeLegibility; }
 
 h4 {
-  font-size: 1.333em;
-  color: #1f2c33;
+  font-size: 1.167em;
+  color: #38505c;
   line-height: 1.2em; }
   h4 span {
     font-size: 75%;
@@ -951,7 +951,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
 
 .multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], textarea, select {
   border: 1px solid #acbbc2;
-  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
   color: #1f2c33;
   background-color: #fff;
@@ -973,11 +973,12 @@ button::-moz-focus-inner {
 button {
   color: #fff;
   background-color: #0275b8;
-  font-family: Arial, Tahoma, Verdana, sans-serif;
+  font-family: "Helvetica Neue", Helvetica, Arial, Tahoma, Verdana, sans-serif;
   border: 1px solid #0275b8;
   padding: 0 11px;
   min-height: 24px;
   cursor: pointer;
+  outline: 0;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px;
@@ -986,38 +987,32 @@ button {
   transition: border-color, background-color 0.2s ease-out; }
   button:hover {
     color: #fff;
-    background-color: #015586;
-    border-color: #015586;
-    outline: 0; }
+    background-color: #02659f;
+    border-color: #02659f; }
   button:focus {
     color: #fff;
-    background-color: #015586;
-    border-color: #015586;
-    outline: 0; }
+    background-color: #02659f;
+    border-color: #02659f; }
   button:active {
     color: #fff;
-    background-color: #015586;
-    border-color: #015586;
-    outline: 0; }
+    background-color: #02659f;
+    border-color: #02659f; }
 
 .btn-alt {
   color: #0275b8;
   background-color: transparent; }
   .btn-alt:hover {
     color: #fff;
-    background-color: #015586;
-    border-color: #015586;
-    outline: 0; }
+    background-color: #02659f;
+    border-color: #02659f; }
   .btn-alt:focus {
     color: #fff;
-    background-color: #015586;
-    border-color: #015586;
-    outline: 0; }
+    background-color: #02659f;
+    border-color: #02659f; }
   .btn-alt:active {
     color: #fff;
-    background-color: #015586;
-    border-color: #015586;
-    outline: 0; }
+    background-color: #02659f;
+    border-color: #02659f; }
 
 .btn-grey {
   color: #0275b8;
@@ -1405,7 +1400,8 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 .dashbrd-widget-head {
   cursor: move;
   position: relative;
-  padding: 8px 60px 8px 10px; }
+  padding: 8px 60px 8px 10px;
+  font-weight: bold; }
   .dashbrd-widget-head ul {
     position: absolute;
     top: 0;
@@ -1616,8 +1612,6 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 .notifications {
   padding: 0;
   max-width: 250px; }
-  .notifications .dashbrd-widget-head {
-    margin: -2px 0 -7px 0; }
   .notifications h4 {
     display: inline-block; }
   .notifications p {
@@ -1625,13 +1619,15 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   .notifications tr td:first-child {
     padding: 0;
     width: 3px; }
-  .notifications .dashbrd-widget-head ul {
-    position: relative;
-    display: inline-block;
-    margin-left: 8px; }
-    .notifications .dashbrd-widget-head ul li {
-      float: none;
+  .notifications .dashbrd-widget-head {
+    margin: 0;
+    padding: 6px 0 0 6px; }
+    .notifications .dashbrd-widget-head ul {
+      position: relative;
       display: inline-block; }
+      .notifications .dashbrd-widget-head ul li {
+        float: none;
+        display: inline-block; }
 
 /* Maps, Screens, Graphs */
 .box_on {

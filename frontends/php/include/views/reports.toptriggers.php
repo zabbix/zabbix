@@ -64,32 +64,28 @@ $filterColumn2->addRow(null,
 
 $filterColumn1->addRow(
 	'Host groups',
-	new CMultiSelect(
-		[
-			'name' => 'groupids[]',
-			'objectName' => 'hostGroup',
-			'data' => $this->data['multiSelectHostGroupData'],
-			'popup' => [
-				'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
-					'&srcfld1=groupid&multiselect=1'
-			]
+	(new CMultiSelect([
+		'name' => 'groupids[]',
+		'objectName' => 'hostGroup',
+		'data' => $this->data['multiSelectHostGroupData'],
+		'popup' => [
+			'parameters' => 'srctbl=host_groups&dstfrm='.$filterForm->getName().'&dstfld1=groupids_'.
+				'&srcfld1=groupid&multiselect=1'
 		]
-	)
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 
 $filterColumn1->addRow(
 	'Hosts',
-	new CMultiSelect(
-		[
-			'name' => 'hostids[]',
-			'objectName' => 'hosts',
-			'data' => $this->data['multiSelectHostData'],
-			'popup' => [
-				'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
-					'&real_hosts=1&multiselect=1'
-			]
+	(new CMultiSelect([
+		'name' => 'hostids[]',
+		'objectName' => 'hosts',
+		'data' => $this->data['multiSelectHostData'],
+		'popup' => [
+			'parameters' => 'srctbl=hosts&dstfrm='.$filterForm->getName().'&dstfld1=hostids_&srcfld1=hostid'.
+				'&real_hosts=1&multiselect=1'
 		]
-	)
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 
 // severities

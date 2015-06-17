@@ -504,7 +504,7 @@ function getItemFilterForm(&$items) {
 	}
 
 	$filterColumn1->addRow(_('Host group'),
-		new CMultiSelect([
+		(new CMultiSelect([
 			'name' => 'filter_groupid',
 			'selectedLimit' => 1,
 			'objectName' => 'hostGroup',
@@ -516,7 +516,7 @@ function getItemFilterForm(&$items) {
 				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
 					'&srcfld1=groupid&writeonly=1'
 			]
-		])
+		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
 	$filterColumn2->addRow(_('Type'), $cmbType);
@@ -541,7 +541,7 @@ function getItemFilterForm(&$items) {
 	}
 
 	$filterColumn1->addRow(_('Host'),
-		new CMultiSelect([
+		(new CMultiSelect([
 			'name' => 'filter_hostid',
 			'selectedLimit' => 1,
 			'objectName' => 'hosts',
@@ -554,7 +554,7 @@ function getItemFilterForm(&$items) {
 				'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
 					'&srcfld1=hostid&writeonly=1'
 			]
-		])
+		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
 	$filterColumn2->addRow($updateIntervalLabel, $updateIntervalInput);

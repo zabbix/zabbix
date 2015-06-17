@@ -348,7 +348,7 @@ $filterForm = new CFilter('web.latest.filter.state');
 $filterColumn1 = new CFormList();
 $filterColumn1->addRow(
 	_('Host groups'),
-	new CMultiSelect(
+	(new CMultiSelect(
 		[
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
@@ -357,11 +357,11 @@ $filterColumn1->addRow(
 				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'
 			]
-	])
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn1->addRow(
 		_('Hosts'),
-		new CMultiSelect(
+		(new CMultiSelect(
 			[
 				'name' => 'hostids[]',
 				'objectName' => 'hosts',
@@ -371,12 +371,12 @@ $filterColumn1->addRow(
 						'&real_hosts=1&multiselect=1'
 				]
 			]
-		)
+		))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn1->addRow(
 	_('Application'),
 	[
-		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -389,7 +389,7 @@ $filterColumn1->addRow(
 $filterColumn2 = new CFormList();
 $filterColumn2->addRow(
 	_('Name'),
-	(new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	(new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn2->addRow(
 	_('Show items without data'),
