@@ -33,32 +33,27 @@ class CIFrame extends CTag {
 
 	public function setSrc($value = null) {
 		if (is_null($value)) {
-			return $this->removeAttribute('src');
+			$this->removeAttribute('src');
 		}
-		elseif (!is_string($value)) {
-			return $this->error('Incorrect value for setSrc "'.$value.'".');
+		else {
+			$this->setAttribute('src', $value);
 		}
-		$this->setAttribute('src', $value);
 		return $this;
 	}
 
 	public function setWidth($value) {
 		if (is_null($value)) {
-			return $this->removeAttribute('width');
+			$this->removeAttribute('width');
 		}
-		elseif (!is_string($value)) {
-			return $this->error('Incorrect value for setWidth "'.$value.'".');
+		else {
+			$this->setAttribute('width', $value);
 		}
-		$this->setAttribute('width', $value);
 		return $this;
 	}
 
 	public function setHeight($value) {
 		if (is_null($value)) {
 			$this->removeAttribute('height');
-		}
-		elseif (!is_string($value)) {
-			$this->error('Incorrect value for setHeight "'.$value.'".');
 		}
 		else {
 			$this->setAttribute('height', $value);
@@ -69,10 +64,6 @@ class CIFrame extends CTag {
 	public function setScrolling($value) {
 		if (is_null($value)) {
 			$value = 'no';
-		}
-
-		if ($value !== 'no' && $value !== 'yes' && $value !== 'auto') {
-			return $this->error('Incorrect value for setScrolling "'.$value.'".');
 		}
 
 		$this->setAttribute('scrolling', $value);

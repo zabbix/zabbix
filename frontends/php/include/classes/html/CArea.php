@@ -49,25 +49,16 @@ class CArea extends CTag {
 	}
 
 	public function setShape($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for setShape "'.$value.'".');
-		}
 		$this->setAttribute('shape', $value);
 		return $this;
 	}
 
 	public function setHref($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for setHref "'.$value.'".');
-		}
 		$this->setAttribute('href', $value);
 		return $this;
 	}
 
 	public function setAlt($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for setAlt "'.$value.'".');
-		}
 		$this->setAttribute('alt', $value);
 		return $this;
 	}

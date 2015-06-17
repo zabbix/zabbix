@@ -33,9 +33,6 @@ class CHostsInfo extends CTable {
 	}
 
 	public function setOrientation($value) {
-		if ($value != STYLE_HORIZONTAL && $value != STYLE_VERTICAL) {
-			return $this->error('Incorrect value for SetOrientation "'.$value.'".');
-		}
 		$this->style = $value;
 		return $this;
 	}
