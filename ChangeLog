@@ -6,6 +6,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
 ...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)

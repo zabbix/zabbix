@@ -3227,6 +3227,9 @@ void	DBdelete_host(zbx_uint64_t hostid)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (SUCCEED != DBlock_hostid(hostid))
+		goto out;
+
 	zbx_vector_uint64_create(&htids);
 	zbx_vector_uint64_create(&itemids);
 
@@ -3276,7 +3279,7 @@ void	DBdelete_host(zbx_uint64_t hostid)
 
 	/* delete host */
 	DBexecute("delete from hosts where hostid=" ZBX_FS_UI64, hostid);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
