@@ -376,9 +376,10 @@ $conditionTable = (new CTable())
 		(new CCol(
 			(new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 		))->setColSpan(3)
-	])
-	->addRow(_('New condition'),
-		(new CDiv($conditionTable))
+	]);
+
+$conditionFormList->addRow(_('New condition'),
+	(new CDiv($conditionTable))
 			->addClass('objectgroup')
 			->addClass('floatleft')
 			->addClass('border_dotted')
