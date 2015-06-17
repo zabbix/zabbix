@@ -869,10 +869,6 @@ footer {
 	button {
 		margin: 10px 7px 0 7px;
 	}
-
-	//.multiselect {
-	//	width: 160px;
-	//}
 }
 
 .multiselect-wrapper {
@@ -885,8 +881,6 @@ footer {
 	@extend .multiselect-button;
 	position: relative;
 	margin-right: 3px;
-	//width: 312px;
-	//min-height: 22px;
 	min-height: 24px;
 
 	&.active {
@@ -898,7 +892,7 @@ footer {
 		background: none;
 		box-sizing: border-box;
 		width: 100%;
-		//padding-top: 2px;
+		padding-top: 2px;
 
 	}
 
@@ -1351,8 +1345,6 @@ input {
 }
 
 textarea {
-	//width: 300px;
-	//height: 50px;
 	padding: 4px 5px;
 	overflow: auto;
 	@extend %form-input-style;
