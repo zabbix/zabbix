@@ -43,8 +43,8 @@ catch (ConfigFileException $e) {
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:
-			(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))->
-				render();
+			(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))
+				->render();
 			exit;
 	}
 }

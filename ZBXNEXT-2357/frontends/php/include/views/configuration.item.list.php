@@ -20,28 +20,25 @@
 
 require_once dirname(__FILE__).'/js/configuration.item.list.js.php';
 
-$itemsWidget = (new CWidget('item-list'))->setTitle(_('Items'));
-
-// create new item button
-$createForm = (new CForm('get'))->cleanItems();
-$controls = new CList();
-
 if (empty($this->data['hostid'])) {
-	$createButton = new CSubmit('form', _('Create item (select host first)'));
-	$createButton->setEnabled(false);
-	$controls->addItem($createButton);
+	$create_button = (new CSubmit('form', _('Create item (select host first)')))->setEnabled(false);
 }
 else {
-	$createForm->addVar('hostid', $this->data['hostid']);
-	$controls->addItem(new CSubmit('form', _('Create item')));
+	$create_button = new CSubmit('form', _('Create item'));
 }
-$createForm->addItem($controls);
-$itemsWidget->setControls($createForm);
+
+$widget = (new CWidget())
+	->setTitle(_('Items'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('hostid', $this->data['hostid'])
+		->addItem((new CList())->addItem($create_button))
+	);
 
 if (!empty($this->data['hostid'])) {
-	$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid']));
+	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
-$itemsWidget->addItem($this->data['flicker']);
+$widget->addItem($this->data['flicker']);
 
 // create form
 $itemForm = new CForm();
@@ -51,13 +48,12 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create table
-$itemTable = new CTableInfo(
-	($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.')
-);
+$itemTable = (new CTableInfo())
+	->setNoDataMessage(($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.'));
 $itemTable->setHeader([
 	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")))->
-			addClass('cell-width'),
+		(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	_('Wizard'),
 	empty($this->data['filter_hostid']) ? _('Host') : null,
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
@@ -78,20 +74,20 @@ foreach ($this->data['items'] as $item) {
 	// description
 	$description = [];
 	if (!empty($item['template_host'])) {
-		$description[] = new CLink(
+		$description[] = (new CLink(
 			CHtml::encode($item['template_host']['name']),
-			'?hostid='.$item['template_host']['hostid'].'&filter_set=1',
-			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
-		);
+			'?hostid='.$item['template_host']['hostid'].'&filter_set=1'))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 
 	if (!empty($item['discoveryRule'])) {
-		$description[] = new CLink(
+		$description[] = (new CLink(
 			CHtml::encode($item['discoveryRule']['name']),
-			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid'],
-			ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_ORANGE
-		);
+			'disc_prototypes.php?parent_discoveryid='.$item['discoveryRule']['itemid']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER.$item['name_expanded'];
 	}
 	else {
@@ -102,37 +98,38 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	// status
-	$status = new CCol(new CLink(
+	$status = new CCol((new CLink(
 		itemIndicator($item['status'], $item['state']),
 		'?group_itemid='.$item['itemid'].
 			'&hostid='.$item['hostid'].
-			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable'),
-		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($item['status'], $item['state'])
-	));
+			'&action='.($item['status'] == ITEM_STATUS_DISABLED ? 'item.massenable' : 'item.massdisable')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(itemIndicatorStyle($item['status'], $item['state']))
+	);
 
 	// info
 	if ($data['showInfoColumn']) {
 		$infoIcons = [];
 
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($item['error'], ZBX_STYLE_RED);
-
-			$infoIcons[] = $info;
+			$infoIcons[] = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconerror')
+				->setHint($item['error'], ZBX_STYLE_RED);
 		}
 
 		// discovered item lifetime indicator
 		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
-			$deleteError = new CDiv(SPACE, 'status_icon iconwarning');
+			$info = (new CSpan('!'))->addClass(ZBX_STYLE_STATUS_YELLOW);
 
 			// Check if item should've been deleted in the past.
 			if ($currentTime > $item['itemDiscovery']['ts_delete']) {
-				$deleteError->setHint(_s(
+				$info->setHint(_s(
 					'The item is not discovered anymore and will be deleted the next time discovery rule is processed.'
 				));
 			}
 			else {
-				$deleteError->setHint(_s(
+				$info->setHint(_s(
 					'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 					zbx_date2age($item['itemDiscovery']['ts_delete']),
 					zbx_date2str(DATE_FORMAT, $item['itemDiscovery']['ts_delete']),
@@ -140,7 +137,7 @@ foreach ($this->data['items'] as $item) {
 				));
 			}
 
-			$infoIcons[] = $deleteError;
+			$infoIcons[] = $info;
 		}
 
 		if (!$infoIcons) {
@@ -165,16 +162,15 @@ foreach ($this->data['items'] as $item) {
 		$triggerDescription = [];
 		if ($trigger['templateid'] > 0) {
 			if (!isset($this->data['triggerRealHosts'][$trigger['triggerid']])) {
-				$triggerDescription[] = new CSpan('HOST', ZBX_STYLE_GREY);
+				$triggerDescription[] = (new CSpan('HOST'))->addClass(ZBX_STYLE_GREY);
 				$triggerDescription[] = ':';
 			}
 			else {
 				$realHost = reset($this->data['triggerRealHosts'][$trigger['triggerid']]);
-				$triggerDescription[] = new CLink(
+				$triggerDescription[] = (new CLink(
 					CHtml::encode($realHost['name']),
-					'triggers.php?hostid='.$realHost['hostid'],
-					ZBX_STYLE_GREY
-				);
+					'triggers.php?hostid='.$realHost['hostid']))
+					->addClass(ZBX_STYLE_GREY);
 				$triggerDescription[] = ':';
 			}
 		}
@@ -202,10 +198,8 @@ foreach ($this->data['items'] as $item) {
 			getSeverityCell($trigger['priority'], $this->data['config']),
 			$triggerDescription,
 			triggerExpression($trigger, true),
-			new CSpan(
-				triggerIndicator($trigger['status'], $trigger['state']),
-				triggerIndicatorStyle($trigger['status'], $trigger['state'])
-			),
+			(new CSpan(triggerIndicator($trigger['status'], $trigger['state'])))
+				->addClass(triggerIndicatorStyle($trigger['status'], $trigger['state']))
 		]);
 
 		$item['triggers'][$num] = $trigger;
@@ -213,8 +207,9 @@ foreach ($this->data['items'] as $item) {
 	unset($trigger);
 
 	if (!empty($item['triggers'])) {
-		$triggerInfo = new CSpan(_('Triggers'), ZBX_STYLE_LINK_ACTION.' link_menu');
-		$triggerInfo->setHint($triggerHintTable);
+		$triggerInfo = (new CSpan(_('Triggers')))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setHint($triggerHintTable);
 		$triggerInfo = [$triggerInfo];
 		$triggerInfo[] = CViewHelper::showNum(count($item['triggers']));
 
@@ -241,15 +236,16 @@ foreach ($this->data['items'] as $item) {
 			];
 		}
 
-		$menuIcon = new CIcon(_('Menu'), 'iconmenu_b');
-		$menuIcon->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
+		$menuIcon = (new CIcon(_('Menu')))
+			->addClass('iconmenu_b')
+			->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
 	}
 	else {
 		$menuIcon = SPACE;
 	}
 
-	$checkBox = new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']);
-	$checkBox->setEnabled(empty($item['discoveryRule']));
+	$checkBox = (new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']))
+		->setEnabled(empty($item['discoveryRule']));
 
 	$itemTable->addRow([
 		$checkBox,
@@ -290,6 +286,6 @@ $itemForm->addItem([
 ]);
 
 // append form to widget
-$itemsWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
-return $itemsWidget;
+return $widget;

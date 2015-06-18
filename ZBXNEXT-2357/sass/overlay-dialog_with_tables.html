@@ -1,17 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-		<meta charset="utf-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<title>Zabbix | Hosts</title>
-		<link rel="stylesheet" href="stylesheets/screen.css">
+	<meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>Zabbix | Hosts</title>
+        <!--<link rel="stylesheet" href="stylesheets/screen.css">-->
+        <link rel="stylesheet" href="stylesheets/dark-theme.css">
         <link rel="icon" href="favicon.ico">
         <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
         <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileColor" content="#d40000">
 	</head>
 <body>
 
@@ -27,8 +30,8 @@
       <li><div></div></li>
       <li><h3>Favourite slide shows</h3></li>
       <li><span class="action-menu-item selected">Add</span></li>
-      <li><span class="grey">Remove</span></li>
-      <li><span class="grey">Remove all</span></li>
+      <li><span class="action-menu-item-disabled">Remove</span></li>
+      <li><span class="action-menu-item-disabled">Remove all</span></li>
       </ul>
 <!--
       <ul class="action-menu" style="top: 58px; left: 840px">
@@ -36,7 +39,7 @@
       </ul>
 -->
       <div class="overlay-dialogue" style="top: 10px; left: 10px">
-      <span class="overlay-close-btn">&times;</span>
+      <span class="overlay-close-btn"></span>
             <table class="list-table">
             <thead>
             <tr>
@@ -91,11 +94,11 @@
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Host</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
+		<td class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></td>
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Application</label></td>
-		<td class="table-forms-td-right"><input type="text" id="HostName"> <button type="button" class="btn-grey">Select</button></td>
+		<td class="table-forms-td-right"><div class="form-input-margin"><input type="text" id="HostName"></div><button type="button" class="btn-grey">Select</button></td>
 		</tr>
 		<tr>
 		<!--<td class="table-forms-td-left"></td>-->
@@ -853,11 +856,11 @@
 		</tr>
 		<tr>
 		<td class="table-forms-td-left"><label for="HostName">Coordinates</label></td>
-		<td class="table-forms-td-right"><input type="number" id="HostName"> <label>X</label>&nbsp;&nbsp;<input type="number" id="HostName"> <label>Y</label></td>
+		<td class="table-forms-td-right"><div class="form-input-margin"><input type="number" id="HostName"><label>X</label></div><div class="form-input-margin"><input type="number" id="HostName"><label>Y</label></div></td>
 		</tr>
 		<tr>
 		<!--<td class="table-forms-td-left"></td>-->
-		<td class="table-forms-td-right" colspan="2"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><span class="form-remove-btn">&times;</span></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><span class="form-remove-btn">&times;</span></td></tr><tr><td><span class="link-action">Add</span></td><td></td></tr></tbody></table></fieldset></td>
+		<td class="table-forms-td-right" colspan="2"><fieldset><legend>URLs</legend><table><tbody><tr><td><label>Name</label></td><td><label>URL</label></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><input type="text" id="HostName"></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><button type="button" class="btn-link">Add</button></td><td></td></tr></tbody></table></fieldset></td>
 		</tr>
 		</tbody>
 	</table>
@@ -886,14 +889,14 @@
       </div>
 
       <div class="overlay-dialogue" style="top: 10px; left: 1050px">
-      <span class="overlay-close-btn">&times;</span>
+      <span class="overlay-close-btn"></span>
       <div class="dashbrd-widget-head"><h4>Execution confirmation</h4></div>
       <div class="overlay-dialogue-body">Some random confirmation text goes right here</div>
       <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Execute</button></div>
       </div>
 
        <div class="overlay-dialogue" style="top: 10px; left: 1350px">
-      <span class="overlay-close-btn">&times;</span>
+      <span class="overlay-close-btn"></span>
 <div class="color-picker">
 <div title="#000000" style="background: #000000" onclick="set_color(&quot;000000&quot;);"></div><div title="#111111" style="background: #111111" onclick="set_color(&quot;111111&quot;);"></div><div title="#222222" style="background: #222222" onclick="set_color(&quot;222222&quot;);"></div><div title="#333333" style="background: #333333" onclick="set_color(&quot;333333&quot;);"></div><div title="#444444" style="background: #444444" onclick="set_color(&quot;444444&quot;);"></div><div title="#555555" style="background: #555555" onclick="set_color(&quot;555555&quot;);"></div><div title="#666666" style="background: #666666" onclick="set_color(&quot;666666&quot;);"></div><div title="#777777" style="background: #777777" onclick="set_color(&quot;777777&quot;);"></div><div title="#888888" style="background: #888888" onclick="set_color(&quot;888888&quot;);"></div><div title="#999999" style="background: #999999" onclick="set_color(&quot;999999&quot;);"></div><div title="#AAAAAA" style="background: #AAAAAA" onclick="set_color(&quot;AAAAAA&quot;);"></div><div title="#BBBBBB" style="background: #BBBBBB" onclick="set_color(&quot;BBBBBB&quot;);"></div><div title="#CCCCCC" style="background: #CCCCCC" onclick="set_color(&quot;CCCCCC&quot;);"></div><div title="#DDDDDD" style="background: #DDDDDD" onclick="set_color(&quot;DDDDDD&quot;);"></div><div title="#EEEEEE" style="background: #EEEEEE" onclick="set_color(&quot;EEEEEE&quot;);"></div><div title="#FFFFFF" style="background: #FFFFFF" onclick="set_color(&quot;FFFFFF&quot;);"></div>
 </div>
@@ -978,31 +981,31 @@
 		</td>
 		</tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Label</label></td>
+		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label</label></td>
 		<td class="table-forms-td-right"><textarea id="VisibleName"></textarea></td>
 		</tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Label location</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Label location</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
 		<tr>
-		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Automatic icon selection</label></td>
+		<td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Automatic icon selection</label></td>
 		<td class="table-forms-td-right"><input type="checkbox"></td>
 		</tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Icon (default)</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (default)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Icon (problem)</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (problem)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Icon (maintenance)</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (maintenance)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
             <tr>
-            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox"> Icon (disabled)</label></td>
+            <td class="table-forms-td-left"><label for="VisibleName"><input type="checkbox">Icon (disabled)</label></td>
             <td class="table-forms-td-right"><select><option>Bottom</option></select></td>
             </tr>
 		</tbody>
@@ -1045,11 +1048,11 @@
             </tr>
             <tr>
             <td class="table-forms-td-left"><label for="VisibleName">Color (OK)</label></td>
-            <td class="table-forms-td-right"><input type="text"></td>
+            <td class="table-forms-td-right"><div class="input-color-picker"><div style="background-color: #00ffff"></div><input type="text"></div></td>
             </tr>
             <tr>
             <td class="table-forms-td-right" colspan="2">
-            <fieldset><legend>Link indicators</legend><table><tbody><tr><td><label>Triggers</label></td><td><label>Type</label></td><td><label>Color</label></td><td>&nbsp;</td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><span class="form-remove-btn">×</span></td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><span class="form-remove-btn">×</span></td></tr></tbody></table></fieldset>
+            <fieldset><legend>Link indicators</legend><table><tbody><tr><td><label>Triggers</label></td><td><label>Type</label></td><td><label>Color</label></td><td>&nbsp;</td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr><tr><td><label>Zabbix server: Disk I/O is overloaded on Zabbix server</label></td><td><select><option>Line</option></select></td><td><input type="text" id="HostName"></td><td><button type="button" class="btn-link">Remove</button></td></tr></tbody></table></fieldset>
             </td>
             </tr>
             

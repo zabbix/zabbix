@@ -20,14 +20,16 @@
 
 if ($this->data['parent_discoveryid'] == 0) {
 	$host = $this->data['host'];
+	$title = _('Items');
+}
+else {
+	$title = _('Item prototypes');
 }
 
-$itemWidget = (new CWidget())->setTitle($this->data['page_header']);
+$widget = (new CWidget())->setTitle($title);
 
 if (!empty($this->data['hostid'])) {
-	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid'],
-		isset($this->data['parent_discoveryid']) ? $this->data['parent_discoveryid'] : null
-	));
+	$widget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 
 // create form
@@ -63,16 +65,18 @@ else {
 	$itemFormList->addRow(_('Type'), new CComboBox('type', $this->data['type'], null, $this->data['types']));
 }
 
+$key_controls = [new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited'])];
+if (!$this->data['limited']) {
+	$key_controls[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$key_controls[] = (new CButton('keyButton', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.php?srctbl=help_items&srcfld1=key&dstfrm='.$itemForm->getName().
+			'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());');
+
+}
+
 // append key to form list
-$itemFormList->addRow(_('Key'), [
-	new CTextBox('key', $this->data['key'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']),
-	!$this->data['limited']
-		? new CButton('keyButton', _('Select'),
-			'return PopUp("popup.php?srctbl=help_items&srcfld1=key'.
-				'&dstfrm='.$itemForm->getName().'&dstfld1=key&itemtype="+jQuery("#type option:selected").val());',
-			'button-form')
-		: null
-]);
+$itemFormList->addRow(_('Key'), $key_controls);
 
 // append interfaces to form list
 if (!empty($this->data['interfaces'])) {
@@ -98,9 +102,10 @@ if (!empty($this->data['interfaces'])) {
 		$interfacesComboBox->addItem($interfaceGroup);
 	}
 
-	$span = new CSpan(_('No interface found'), ZBX_STYLE_RED);
-	$span->setAttribute('id', 'interface_not_defined');
-	$span->setAttribute('style', 'display: none;');
+	$span = (new CSpan(_('No interface found')))
+		->addClass(ZBX_STYLE_RED)
+		->setId('interface_not_defined')
+		->setAttribute('style', 'display: none;');
 
 	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], false, 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
@@ -130,13 +135,17 @@ $securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmp
 ]);
 $itemFormList->addRow(_('Security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
 $authProtocolRadioButton = [
-	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5),
+	(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5))
+		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
 	new CLabel(_('MD5'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
-	new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, null, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA),
+	(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA))
+		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA),
 	new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
 ];
 $itemFormList->addRow(_('Authentication protocol'),
-	new CDiv($authProtocolRadioButton, 'jqueryinputset radioset'),
+	(new CDiv($authProtocolRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset'),
 	false, 'row_snmpv3_authprotocol'
 );
 $itemFormList->addRow(_('Authentication passphrase'),
@@ -144,13 +153,17 @@ $itemFormList->addRow(_('Authentication passphrase'),
 	false, 'row_snmpv3_authpassphrase'
 );
 $privProtocolRadioButton = [
-	new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES),
+	(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES))
+		->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
 	new CLabel(_('DES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
-	new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, null, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES),
+	(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES))
+		->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES),
 	new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
 ];
 $itemFormList->addRow(_('Privacy protocol'),
-	new CDiv($privProtocolRadioButton, 'jqueryinputset radioset'),
+	(new CDiv($privProtocolRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset'),
 	false, 'row_snmpv3_privprotocol'
 );
 $itemFormList->addRow(_('Privacy passphrase'),
@@ -235,21 +248,22 @@ $multiplier = [];
 if ($this->data['limited']) {
 	$itemForm->addVar('multiplier', $this->data['multiplier']);
 
-	$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes':'no');
-	$multiplierCheckBox->setAttribute('disabled', 'disabled');
+	$multiplierCheckBox = (new CCheckBox('multiplier'))
+		->setChecked($this->data['multiplier'] == 1)
+		->setAttribute('disabled', 'disabled');
 	$multiplier[] = $multiplierCheckBox;
 
-	$multiplier[] = SPACE;
+	$multiplier[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE, true);
 	$formulaTextBox->setAttribute('style', 'text-align: right;');
 	$multiplier[] = $formulaTextBox;
 }
 else {
-	$multiplierCheckBox = new CCheckBox('multiplier', $this->data['multiplier'] == 1 ? 'yes': 'no',
-		'var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }', 1
-	);
+	$multiplierCheckBox = (new CCheckBox('multiplier'))
+		->setChecked($this->data['multiplier'] == 1)
+		->onClick('var editbx = document.getElementById(\'formula\'); if (editbx) { editbx.disabled = !this.checked; }');
 	$multiplier[] = $multiplierCheckBox;
-	$multiplier[] = SPACE;
+	$multiplier[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 	$formulaTextBox = new CTextBox('formula', $this->data['formula'], ZBX_TEXTBOX_SMALL_SIZE);
 	$formulaTextBox->setAttribute('style', 'text-align: right;');
 	$multiplier[] = $formulaTextBox;
@@ -259,11 +273,12 @@ $itemFormList->addRow(_('Use custom multiplier'), $multiplier, false, 'row_multi
 $itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
 
 // append delay flex to form list
-$delayFlexTable = (new CTable(_('No flexible intervals defined.')))->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 310px;')->
-	setAttribute('id', 'delayFlexTable')->
-	setHeader([_('Interval'), _('Period'), _('Action')]);
+$delayFlexTable = (new CTable())
+	->setNoDataMessage(_('No flexible intervals defined.'))
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 310px;')
+	->setId('delayFlexTable')
+	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
 $this->data['maxReached'] = false;
 foreach ($this->data['delay_flex'] as $delayFlex) {
@@ -276,9 +291,11 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	$row = new CRow([
 		$delayFlex['delay'],
 		$delayFlex['period'],
-		new CButton('remove', _('Remove'), 'javascript: removeDelayFlex('.$i.');', 'link_menu')
+		(new CButton('remove', _('Remove')))
+			->onClick('javascript: removeDelayFlex('.$i.');')
+			->addClass(ZBX_STYLE_BTN_LINK)
 	]);
-	$row->setAttribute('id', 'delayFlex_'.$i);
+	$row->setId('delayFlex_'.$i);
 	$delayFlexTable->addRow($row);
 
 	// limit count of intervals, 7 intervals by 30 symbols = 210 characters, db storage field is 256
@@ -289,7 +306,11 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 	}
 }
 $itemFormList->addRow(_('Flexible intervals'),
-	new CDiv($delayFlexTable, 'objectgroup inlineblock border_dotted ui-corner-all'), false, 'row_flex_intervals'
+	(new CDiv($delayFlexTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted'),
+	false, 'row_flex_intervals'
 );
 
 // append new flexible interval to form list
@@ -302,13 +323,14 @@ $newFlexInt = new CSpan([
 	SPACE,
 	new CTextBox('new_delay_flex[period]', $this->data['new_delay_flex']['period'], 20),
 	SPACE,
-	new CButton('add_delay_flex', _('Add'), null, 'button-form')
+	(new CButton('add_delay_flex', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 ]);
-$newFlexInt->setAttribute('id', 'row-new-delay-flex-fields');
+$newFlexInt->setId('row-new-delay-flex-fields');
 
-$maxFlexMsg = new CSpan(_('Maximum number of flexible intervals added'), ZBX_STYLE_RED);
-$maxFlexMsg->setAttribute('id', 'row-new-delay-flex-max-reached');
-$maxFlexMsg->setAttribute('style', 'display: none;');
+$maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
+	->addClass(ZBX_STYLE_RED)
+	->setId('row-new-delay-flex-max-reached')
+	->setAttribute('style', 'display: none;');
 
 $itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');
 
@@ -319,8 +341,8 @@ if ($data['config']['hk_history_global'] && $data['parent_discoveryid'] == 0
 
 	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
+		$link = (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+			->setAttribute('target', '_blank');
 		$keepHistory[] = $link;
 	}
 	else {
@@ -337,8 +359,8 @@ if ($data['config']['hk_trends_global'] && $data['parent_discoveryid'] == 0
 
 	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php');
-		$link->setAttribute('target', '_blank');
+		$link = (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
+			->setAttribute('target', '_blank');
 		$keepTrend[] = $link;
 	}
 	else {
@@ -384,8 +406,8 @@ else {
 		$valuemapComboBox->addItem($valuemap['valuemapid'], CHtml::encode($valuemap['name']));
 	}
 }
-$link = new CLink(_('show value mappings'), 'adm.valuemapping.php');
-$link->setAttribute('target', '_blank');
+$link = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))
+	->setAttribute('target', '_blank');
 $itemFormList->addRow(_('Show value'), [$valuemapComboBox, SPACE, $link], null, 'row_valuemap');
 $itemFormList->addRow(_('Allowed hosts'),
 	new CTextBox('trapper_hosts', $this->data['trapper_hosts'], ZBX_TEXTBOX_STANDARD_SIZE),
@@ -434,7 +456,7 @@ $description->addStyle('margin-top: 5px;');
 $itemFormList->addRow(_('Description'), $description);
 
 // status
-$enabledCheckBox = new CCheckBox('status', !$this->data['status'], null, ITEM_STATUS_ACTIVE);
+$enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($this->data['status'] != ITEM_STATUS_ACTIVE);
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 // append tabs to form
@@ -473,8 +495,8 @@ else {
 }
 
 $itemForm->addItem($itemTab);
-$itemWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
 require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
 
-return $itemWidget;
+return $widget;

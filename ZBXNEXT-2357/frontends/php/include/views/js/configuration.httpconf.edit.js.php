@@ -117,7 +117,7 @@
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
-			handle: 'span.ui-icon-arrowthick-2-n-s',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,
@@ -171,7 +171,7 @@
 
 		// http step edit pop up
 		<?php foreach ($this->data['steps'] as $i => $step): ?>
-			$('#name_<?php echo $i; ?>').click(function() {
+			$('#name_<?= $i ?>').click(function() {
 				// append existing step names
 				var stepNames = '';
 				var form = $(this).parents('form');
@@ -179,25 +179,25 @@
 					stepNames += '&steps_names[]=' + $(stepName).val();
 				});
 
-				return PopUp('popup_httpstep.php?dstfrm=httpForm&templated=<?php echo $this->data['templated']; ?>'
+				return PopUp('popup_httpstep.php?dstfrm=httpForm&templated=<?= $this->data['templated'] ?>'
 					+ '&list_name=steps&stepid=' + jQuery(this).attr('name_step')
-					+ '<?php echo url_param($step['name'], false, 'name'); ?>'
-					+ '<?php echo url_param($step['url'], false, 'url'); ?>'
-					+ '<?php echo url_param($step['posts'], false, 'posts'); ?>'
-					+ '<?php echo url_param($step['variables'], false, 'variables'); ?>'
-					+ '<?php echo url_param($step['timeout'], false, 'timeout'); ?>'
-					+ '<?php echo url_param($step['required'], false, 'required'); ?>'
-					+ '<?php echo url_param($step['status_codes'], false, 'status_codes'); ?>'
-					+ '<?php echo url_param($step['name'], false, 'old_name'); ?>'
-					+ '<?php echo url_param($step['headers'], false, 'headers'); ?>'
-					+ '<?php echo url_param($step['retrieve_mode'], false, 'retrieve_mode'); ?>'
-					+ '<?php echo url_param($step['follow_redirects'], false, 'follow_redirects'); ?>'
+					+ '<?= url_param($step['name'], false, 'name') ?>'
+					+ '<?= url_param($step['url'], false, 'url') ?>'
+					+ '<?= url_param($step['posts'], false, 'posts') ?>'
+					+ '<?= url_param($step['variables'], false, 'variables') ?>'
+					+ '<?= url_param($step['timeout'], false, 'timeout') ?>'
+					+ '<?= url_param($step['required'], false, 'required') ?>'
+					+ '<?= url_param($step['status_codes'], false, 'status_codes') ?>'
+					+ '<?= url_param($step['name'], false, 'old_name') ?>'
+					+ '<?= url_param($step['headers'], false, 'headers') ?>'
+					+ '<?= url_param($step['retrieve_mode'], false, 'retrieve_mode') ?>'
+					+ '<?= url_param($step['follow_redirects'], false, 'follow_redirects') ?>'
 					+ stepNames);
 			});
 		<?php endforeach ?>
 
 		$('#authentication').on('change', function() {
-			var httpFieldsDisabled = $(this).val() == <?php echo HTTPTEST_AUTH_NONE; ?>;
+			var httpFieldsDisabled = $(this).val() == <?= HTTPTEST_AUTH_NONE ?>;
 
 			$('#http_user').attr('disabled', httpFieldsDisabled);
 			$('#http_password').attr('disabled', httpFieldsDisabled);
@@ -213,7 +213,7 @@
 		});
 
 		<?php if (isset($this->data['agentVisibility']) && $this->data['agentVisibility']) { ?>
-			new CViewSwitcher('agent', 'change', <?php echo zbx_jsvalue($this->data['agentVisibility'], true); ?>);
+			new CViewSwitcher('agent', 'change', <?= zbx_jsvalue($this->data['agentVisibility'], true) ?>);
 		<?php } ?>
 
 		$('#agent').trigger('change');
