@@ -4906,8 +4906,6 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 
 	DBselect_uint64(sql, &itemids);
 
-	sleep(10);
-
 	DBdelete_items(&itemids);
 
 	zbx_vector_uint64_destroy(&itemids);
