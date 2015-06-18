@@ -276,12 +276,21 @@ class CProxy extends CApiService {
 				}
 			}
 
-			// encryption
-			if (array_key_exists('tls_psk', $proxy)
-					&& !preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $proxy['tls_psk'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
-				);
+			// psk validation
+			if ((array_key_exists('tls_connect', $proxy) && $proxy['tls_connect'] == HOST_ENCRYPTION_PSK)
+					|| (array_key_exists('tls_accept', $proxy)
+						&& ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
+				if (!array_key_exists('tls_psk_identity', $proxy) || zbx_empty($proxy['tls_psk_identity'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
+				}
+				if (!array_key_exists('tls_psk', $proxy) || zbx_empty($proxy['tls_psk'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
+				}
+				if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $proxy['tls_psk'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
+					);
+				}
 			}
 		}
 		unset($proxy);
