@@ -99,7 +99,9 @@ else {
 		)
 		->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1))
 		->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1))
-		->addRow(_('Timeout'), new CNumericBox('timeout', getRequest('timeout', 15), 5))
+		->addRow(_('Timeout'),
+			(new CNumericBox('timeout', getRequest('timeout', 15), 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		)
 		->addRow(_('Required string'),
 			(new CTextBox('required', getRequest('required', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		)

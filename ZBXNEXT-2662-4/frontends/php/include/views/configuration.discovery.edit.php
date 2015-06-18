@@ -51,7 +51,9 @@ $discoveryFormList
 	->addRow(_('IP range'),
 		(new CTextBox('iprange', $this->data['drule']['iprange']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
+	->addRow(_('Delay (in sec)'),
+		(new CNumericBox('delay', $this->data['drule']['delay'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 // append checks to form list
 $checkTable = (new CTable())

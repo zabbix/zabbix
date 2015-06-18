@@ -41,7 +41,8 @@ foreach ($data['alert_usrgrps'] as $usrgrp) {
 
 $otherTab
 	->addRow(_('Refresh unsupported items (in sec)'),
-		new CNumericBox('refresh_unsupported', $data['refresh_unsupported'], 5)
+		(new CNumericBox('refresh_unsupported', $data['refresh_unsupported'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Group for discovered hosts'), $discoveryGroup)
 	->addRow(_('User group for database down message'), $alertUserGroup)

@@ -202,7 +202,10 @@ $itemFormList->addRow(_('SQL query'),
 	'label_params'
 );
 
-$itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
+$itemFormList->addRow(_('Update interval (in sec)'),
+	(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+	false, 'row_delay'
+);
 
 // append delay flex to form list
 $delayFlexTable = (new CTable())
@@ -248,7 +251,8 @@ $itemFormList->addRow(_('Flexible intervals'),
 $newFlexInt = new CSpan([
 	_('Interval (in sec)'),
 	SPACE,
-	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, false, false, false),
+	(new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, false, false, false))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 	SPACE,
 	_('Period'),
 	SPACE,

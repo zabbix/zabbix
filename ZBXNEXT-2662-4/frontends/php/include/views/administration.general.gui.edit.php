@@ -39,10 +39,10 @@ $guiTab->addRow(_('Dropdown first entry'), [
 	_('remember selected')
 ]);
 $guiTab->addRow(_('Search/Filter elements limit'),
-	new CNumericBox('search_limit', $data['search_limit'], 6)
+	(new CNumericBox('search_limit', $data['search_limit'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 );
 $guiTab->addRow(_('Max count of elements to show inside table cell'),
-	new CNumericBox('max_in_table', $data['max_in_table'], 5)
+	(new CNumericBox('max_in_table', $data['max_in_table'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 );
 $guiTab->addRow(_('Enable event acknowledges'),
 	(new CCheckBox('event_ack_enable'))->setChecked($data['event_ack_enable'] == 1)

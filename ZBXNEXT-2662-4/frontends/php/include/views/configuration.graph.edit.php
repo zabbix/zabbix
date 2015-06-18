@@ -56,8 +56,12 @@ $graphFormList
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5))
-	->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5))
+	->addRow(_('Width'),
+		(new CNumericBox('width', $this->data['width'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Height'),
+		(new CNumericBox('height', $this->data['height'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
 	->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))
 	->addRow(_('Show legend'), (new CCheckBox('show_legend'))->setChecked($this->data['show_legend'] == 1));
 

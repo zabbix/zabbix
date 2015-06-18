@@ -335,7 +335,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[delay]', 'delay', _('Original')))
 			->setChecked(isset($this->data['visible']['delay']))
 	],
-	new CNumericBox('delay', $this->data['delay'], 5)
+	(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 );
 
 // append delay flex to form list
@@ -388,7 +388,8 @@ $itemFormList->addRow(
 $newFlexInt = (new CDiv([
 		_('Interval (in sec)'),
 		SPACE,
-		new CNumericBox('new_delay_flex[delay]', 50, 5),
+		(new CNumericBox('new_delay_flex[delay]', 50, 5, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		SPACE,
 		_('Period'),
 		SPACE,
@@ -413,7 +414,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[history]', 'history', _('Original')))
 			->setChecked(isset($this->data['visible']['history']))
 	],
-	new CNumericBox('history', $this->data['history'], 8)
+	(new CNumericBox('history', $this->data['history'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 );
 
 // append trends to form list
@@ -424,7 +425,7 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[trends]', 'trends', _('Original')))
 			->setChecked(isset($this->data['visible']['trends']))
 	],
-	new CNumericBox('trends', $this->data['trends'], 8)
+	(new CNumericBox('trends', $this->data['trends'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 );
 
 // append status to form list

@@ -228,11 +228,13 @@ class CSetupWizard extends CForm {
 						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 
-				$port = new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 20, false, false, false);
-				$port->removeAttribute('style');
-				$table->addRow(_('Database port'),
-					[$port, ' ', (new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)]
-				);
+				$table->addRow(_('Database port'), [
+					(new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, false, false, false))
+						->removeAttribute('style')
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
+				]);
 
 				$table->addRow(_('Database name'),
 					(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
@@ -281,13 +283,11 @@ class CSetupWizard extends CForm {
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		$port = new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 20, false, false,
-			false
-		);
-		$port->removeAttribute('style');
 		$table->addRow(
 			(new CCol('Port'))->addClass('header'),
-			$port
+			(new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 5, false, false, false))
+				->removeAttribute('style')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
 		$table->addRow('Name',
