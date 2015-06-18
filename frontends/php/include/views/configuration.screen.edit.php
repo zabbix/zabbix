@@ -40,8 +40,12 @@ $screenFormList = (new CFormList())
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Columns'), new CNumericBox('hsize', $this->data['hsize'], 3))
-	->addRow(_('Rows'), new CNumericBox('vsize', $this->data['vsize'], 3));
+	->addRow(_('Columns'),
+		(new CNumericBox('hsize', $this->data['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Rows'),
+		(new CNumericBox('vsize', $this->data['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 // append tabs to form
 $screenTab = (new CTabView())->addTab('screenTab', _('Screen'), $screenFormList);

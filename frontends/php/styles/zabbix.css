@@ -896,6 +896,8 @@ label input[type="checkbox"] {
 label input[type="radio"] {
   margin-right: 3px; }
 
+input[type="file"] {
+  padding: 1px 1px; }
 input[readonly] {
   color: #1f2c33 !important;
   cursor: text !important; }
@@ -948,7 +950,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
   padding: 4px 5px;
   zoom: 1; }
 
-.multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], textarea, select {
+.multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   border: 1px solid #acbbc2;
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
@@ -961,7 +963,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
   -webkit-transition: border-color 0.2s ease-out;
   -moz-transition: border-color 0.2s ease-out;
   transition: border-color 0.2s ease-out; }
-  .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, textarea:focus, select:focus {
+  .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
     border-color: #0275b8; }
 
 button::-moz-focus-inner {

@@ -699,6 +699,7 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 
 	$fields = [
 		(new CNumericBox($name.'_year', $y, 4))
+			->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
 			->setAttribute('placeholder', _('yyyy')),
 		'-',
 		(new CTextBox($name.'_month', $m, false, 2))

@@ -181,7 +181,10 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 		$selectButton
 	], false, null, ZBX_STYLE_NOWRAP);
 
-	$screenFormList->addRow(_('Max columns'), new CNumericBox('max_columns', $maxColumns, 3, false, false, false));
+	$screenFormList->addRow(_('Max columns'),
+		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 }
 
 /*
@@ -277,7 +280,10 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		$selectButton
 	], false, null, ZBX_STYLE_NOWRAP);
 
-	$screenFormList->addRow(_('Max columns'), new CNumericBox('max_columns', $maxColumns, 3, false, false, false));
+	$screenFormList->addRow(_('Max columns'),
+		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 }
 
 /*
@@ -354,7 +360,9 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
 		], false, null, ZBX_STYLE_NOWRAP)
-		->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3))
+		->addRow(_('Show lines'),
+			(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		)
 		->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
 }
 
@@ -421,7 +429,9 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
 		);
 	}
 
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
+	$screenFormList->addRow(_('Show lines'),
+		(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 	$screenFormList->addRow(
 		_('Sort triggers by'),
 		new CComboBox('sort_triggers', $sortTriggers, null, [
@@ -436,7 +446,9 @@ elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESO
  * Screen item: Action log
  */
 elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
+	$screenFormList->addRow(_('Show lines'),
+		(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 	$screenFormList->addRow(
 		_('Sort entries by'),
 		new CComboBox('sort_triggers', $sortTriggers, null, [
@@ -456,7 +468,9 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
  * Screen item: History of events
  */
 elseif ($resourceType == SCREEN_RESOURCE_EVENTS) {
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
+	$screenFormList->addRow(_('Show lines'),
+		(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 	$screenFormList->addVar('resourceid', 0);
 }
 
@@ -678,8 +692,12 @@ $resourcesWithWidthAndHeight = [
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 ];
 if (in_array($resourceType, $resourcesWithWidthAndHeight)) {
-	$screenFormList->addRow(_('Width'), new CNumericBox('width', $width, 5));
-	$screenFormList->addRow(_('Height'), new CNumericBox('height', $height, 5));
+	$screenFormList->addRow(_('Width'),
+		(new CNumericBox('width', $width, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
+	$screenFormList->addRow(_('Height'),
+		(new CNumericBox('height', $height, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 }
 else {
 	$screenFormList->addVar('width', 500);
@@ -735,8 +753,12 @@ $screenFormList->addRow(
 		->addClass('radioset'),
 	false, null, ZBX_STYLE_NOWRAP
 );
-$screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
-$screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
+$screenFormList->addRow(_('Column span'),
+	(new CNumericBox('colspan', $colspan, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+);
+$screenFormList->addRow(_('Row span'),
+	(new CNumericBox('rowspan', $rowspan, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+);
 
 // dynamic addon
 $resourcesWithDynamic = [

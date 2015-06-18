@@ -68,7 +68,8 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 	);
 	$authenticationFormList->addRow(
 		_('Port'),
-		new CNumericBox('ldap_port', $this->data['config']['ldap_port'], 5)
+		(new CNumericBox('ldap_port', $this->data['config']['ldap_port'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Base DN'),

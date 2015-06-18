@@ -39,7 +39,10 @@ $slideFormList = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
+	->addRow(_('Default delay (in seconds)'),
+		(new CNumericBox('delay', $this->data['delay'], 5, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 // append slide table
 $slideTable = (new CTable())
@@ -64,6 +67,7 @@ foreach ($this->data['slides'] as $key => $slides) {
 	}
 
 	$delay = (new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		->setAttribute('placeholder', _('default'));
 
 	$removeButton = (new CButton('remove_'.$key, _('Remove')))

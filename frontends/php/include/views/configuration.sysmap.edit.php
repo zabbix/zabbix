@@ -39,8 +39,14 @@ $sysmapList = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Width'), new CNumericBox('width', $this->data['sysmap']['width'], 5))
-	->addRow(_('Height'), new CNumericBox('height', $this->data['sysmap']['height'], 5));
+	->addRow(_('Width'),
+		(new CNumericBox('width', $this->data['sysmap']['width'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Height'),
+		(new CNumericBox('height', $this->data['sysmap']['height'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 // append background image to form list
 $imageComboBox = (new CComboBox('backgroundid', $this->data['sysmap']['backgroundid']))

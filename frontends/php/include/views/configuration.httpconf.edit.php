@@ -68,17 +68,18 @@ else {
 }
 
 // New application
-$httpFormList->addRow(new CLabel(_('New application'), 'new_application'),
-	(new CSpan(
-		(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
-);
-
-// update interval
-$httpFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
-
-// number of retries
-$httpFormList->addRow(_('Retries'), new CNumericBox('retries', $this->data['retries'], 2));
+$httpFormList
+	->addRow(new CLabel(_('New application'), 'new_application'),
+		(new CSpan(
+			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+	)
+	->addRow(_('Update interval (in sec)'),
+		(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Retries'),
+		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 $agentComboBox = new CComboBox('agent', $this->data['agent']);
 

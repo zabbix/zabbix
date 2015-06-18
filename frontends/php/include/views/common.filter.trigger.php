@@ -71,7 +71,8 @@ $column->addRow(_('Minimum trigger severity'),
 );
 
 // age less than
-$statusChangeDays = new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false);
+$statusChangeDays = (new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false))
+	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 if (!$filter['statusChange']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }

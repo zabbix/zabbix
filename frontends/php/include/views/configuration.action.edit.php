@@ -347,7 +347,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_DUPTIME:
-		$condition = new CNumericBox('new_condition[value]', 600, 15);
+		$condition = (new CNumericBox('new_condition[value]', 600, 15))->setWidth(ZBX_TEXTAREA_NUMERIC_BIG_WIDTH);
 		break;
 
 	case CONDITION_TYPE_DVALUE:
@@ -396,7 +396,8 @@ $operationFormList = new CFormList('operationlist');
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationFormList->addRow(_('Default operation step duration'), [
-		new CNumericBox('esc_period', $this->data['action']['esc_period'], 6),
+		(new CNumericBox('esc_period', $this->data['action']['esc_period'], 6))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 		' ('._('minimum 60 seconds').')']
 	);
 }
@@ -534,14 +535,13 @@ if (!empty($this->data['new_operation'])) {
 	}
 
 	if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-		$stepFrom = new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5);
-		$stepFrom->setAttribute('size', 6);
-		$stepFrom->onChange(
-			'javascript:'.$stepFrom->getAttribute('onchange').' if (this.value == 0) this.value = 1;'
-		);
+		$stepFrom = (new CNumericBox('new_operation[esc_step_from]', $this->data['new_operation']['esc_step_from'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
+
+		$stepFrom->onChange('javascript:'.$stepFrom->getAttribute('onchange').' if (this.value == 0) this.value = 1;');
 
 		$stepTo = (new CNumericBox('new_operation[esc_step_to]', $this->data['new_operation']['esc_step_to'], 5))
-			->setAttribute('size', 6);
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 
 		$stepTable = (new CTable())
 			->addRow([_('From'), $stepFrom], 'indent_both')
@@ -556,7 +556,8 @@ if (!empty($this->data['new_operation'])) {
 				[
 					_('Step duration'),
 					new CCol([
-						new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 6),
+						(new CNumericBox('new_operation[esc_period]', $this->data['new_operation']['esc_period'], 6))
+							->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 						SPACE,
 						_('(minimum 60 seconds, 0 - use action default)')
 					])

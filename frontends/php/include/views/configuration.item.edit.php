@@ -282,7 +282,10 @@ else {
 }
 $itemFormList->addRow(_('Use custom multiplier'), $multiplier, false, 'row_multiplier');
 
-$itemFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5), false, 'row_delay');
+$itemFormList->addRow(_('Update interval (in sec)'),
+	(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+	false, 'row_delay'
+);
 
 // append delay flex to form list
 $delayFlexTable = (new CTable())
@@ -329,7 +332,8 @@ $itemFormList->addRow(_('Flexible intervals'),
 $newFlexInt = new CSpan([
 	_('Interval (in sec)'),
 	SPACE,
-	new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, false, false, false),
+	(new CNumericBox('new_delay_flex[delay]', $this->data['new_delay_flex']['delay'], 5, false, false, false))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 	SPACE,
 	_('Period'),
 	SPACE,
@@ -348,7 +352,7 @@ $maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
 $itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');
 
 $keepHistory = [];
-$keepHistory[] =  new CNumericBox('history', $this->data['history'], 8);
+$keepHistory[] = (new CNumericBox('history', $this->data['history'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 if ($data['config']['hk_history_global'] && $data['parent_discoveryid'] == 0
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 
@@ -366,7 +370,7 @@ if ($data['config']['hk_history_global'] && $data['parent_discoveryid'] == 0
 $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = [];
-$keepTrend[] =  new CNumericBox('trends', $this->data['trends'], 8);
+$keepTrend[] = (new CNumericBox('trends', $this->data['trends'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 if ($data['config']['hk_trends_global'] && $data['parent_discoveryid'] == 0
 		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
 

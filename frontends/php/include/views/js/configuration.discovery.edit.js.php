@@ -57,7 +57,7 @@
 				<tr id="newCheckSecLevRow" class="hidden">
 					<td><label for="snmpv3_securitylevel"><?= _('Security level') ?></label></td>
 					<td>
-						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select" size="1">
+						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select">
 							<option value="0"><?= 'noAuthNoPriv' ?> </option>
 							<option value="1"><?= 'authNoPriv' ?> </option>
 							<option value="2"><?= 'authPriv' ?> </option>

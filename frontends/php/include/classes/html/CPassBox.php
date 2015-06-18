@@ -27,7 +27,7 @@ class CPassBox extends CInput {
 	}
 
 	public function setWidth($value) {
-		$this->setAttribute('style', 'width: '.$value.'px;');
+		$this->addStyle('width: '.$value.'px;');
 		return $this;
 	}
 }

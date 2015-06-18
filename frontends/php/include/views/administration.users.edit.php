@@ -158,11 +158,13 @@ $userFormList->addRow(_('Theme'), new CComboBox('theme', $this->data['theme'], n
 // append auto-login & auto-logout to form list
 $autologoutCheckBox = (new CCheckBox('autologout_visible'))->setChecked(isset($this->data['autologout']));
 if (isset($this->data['autologout'])) {
-	$autologoutTextBox = new CNumericBox('autologout', $this->data['autologout'], 4);
+	$autologoutTextBox = (new CNumericBox('autologout', $this->data['autologout'], 4))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 }
 else {
-	$autologoutTextBox = new CNumericBox('autologout', 900, 4);
-	$autologoutTextBox->setAttribute('disabled', 'disabled');
+	$autologoutTextBox = (new CNumericBox('autologout', 900, 4))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		->setAttribute('disabled', 'disabled');
 }
 
 if ($this->data['alias'] != ZBX_GUEST_USER) {
@@ -171,8 +173,13 @@ if ($this->data['alias'] != ZBX_GUEST_USER) {
 }
 
 $userFormList
-	->addRow(_('Refresh (in seconds)'), new CNumericBox('refresh', $this->data['refresh'], 4))
-	->addRow(_('Rows per page'), new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))
+	->addRow(_('Refresh (in seconds)'),
+		(new CNumericBox('refresh', $this->data['refresh'], 4))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Rows per page'),
+		(new CNumericBox('rows_per_page', $this->data['rows_per_page'], 6))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
 	->addRow(_('URL (after login)'),
 		(new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
@@ -253,7 +260,11 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList->addRow(_('Frontend messaging'),
 		(new CCheckBox('messages[enabled]'))->setChecked($this->data['messages']['enabled'] == 1)
 	);
-	$userMessagingFormList->addRow(_('Message timeout (seconds)'), new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5), false, 'timeout_row');
+	$userMessagingFormList->addRow(_('Message timeout (seconds)'),
+		(new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+		false, 'timeout_row'
+	);
 
 	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'],
 		'if (IE) { submit() }',
