@@ -276,22 +276,7 @@ class CProxy extends CApiService {
 				}
 			}
 
-			// psk validation
-			if ((array_key_exists('tls_connect', $proxy) && $proxy['tls_connect'] == HOST_ENCRYPTION_PSK)
-					|| (array_key_exists('tls_accept', $proxy)
-						&& ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
-				if (!array_key_exists('tls_psk_identity', $proxy) || zbx_empty($proxy['tls_psk_identity'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
-				}
-				if (!array_key_exists('tls_psk', $proxy) || zbx_empty($proxy['tls_psk'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
-				}
-				if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $proxy['tls_psk'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
-					);
-				}
-			}
+			$this->pskValidation($proxy);
 		}
 		unset($proxy);
 
@@ -665,5 +650,31 @@ class CProxy extends CApiService {
 		}
 
 		return $proxies;
+	}
+
+	/**
+	 * Validate PSK fields.
+	 *
+	 * @throws APIException		if incorrect encryption options
+	 *
+	 * @param array $data		proxy data array
+	 */
+	protected function pskValidation(array $data) {
+		// psk validation
+		if ((array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK)
+				|| (array_key_exists('tls_accept', $data)
+					&& ($data['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
+			if (!array_key_exists('tls_psk_identity', $data) || zbx_empty($data['tls_psk_identity'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
+			}
+			if (!array_key_exists('tls_psk', $data) || zbx_empty($data['tls_psk'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
+			}
+			if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $data['tls_psk'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
+				);
+			}
+		}
 	}
 }

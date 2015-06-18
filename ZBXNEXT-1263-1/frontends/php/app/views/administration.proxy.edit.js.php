@@ -30,8 +30,8 @@
 
 		jQuery('#status, #tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
 			var active = (jQuery('#status').val() == 5);
-				is_certificate = (jQuery('#tls_connect').val() == 4) || jQuery('#tls_in_cert').is(":checked"),
-				is_psk = (jQuery('#tls_connect').val() == 2) || jQuery('#tls_in_psk').is(":checked");
+				is_certificate = (jQuery('#tls_connect').val() == 4) || jQuery('#tls_in_cert').is(':checked'),
+				is_psk = (jQuery('#tls_connect').val() == 2) || jQuery('#tls_in_psk').is(':checked');
 
 			if (is_certificate) {
 				jQuery('#tls_issuer, #tls_subject').closest('li').show();
@@ -65,13 +65,13 @@
 		jQuery('#proxyForm').submit(function() {
 			var tls_accept = 0x00;
 
-			if (jQuery('#tls_in_none').is(":checked")) {
+			if (jQuery('#tls_in_none').is(':checked')) {
 				tls_accept |= 0x01;
 			}
-			if (jQuery('#tls_in_psk').is(":checked")) {
+			if (jQuery('#tls_in_psk').is(':checked')) {
 				tls_accept |= 0x02;
 			}
-			if (jQuery('#tls_in_cert').is(":checked")) {
+			if (jQuery('#tls_in_cert').is(':checked')) {
 				tls_accept |= 0x04;
 			}
 

@@ -634,23 +634,6 @@ class CHost extends CHostGeneral {
 				}
 				$hostNames['name'][$host['name']] = $update ? $host['hostid'] : 1;
 			}
-
-			// psk validation
-			if ((array_key_exists('tls_connect', $host) && $host['tls_connect'] == HOST_ENCRYPTION_PSK)
-					|| (array_key_exists('tls_accept', $host)
-						&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
-				if (!array_key_exists('tls_psk_identity', $host) || zbx_empty($host['tls_psk_identity'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
-				}
-				if (!array_key_exists('tls_psk', $host) || zbx_empty($host['tls_psk'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
-				}
-				if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $host['tls_psk'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
-					);
-				}
-			}
 		}
 		unset($host);
 
@@ -887,6 +870,8 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
+		$this->pskValidation($data);
+
 		// add new interfaces
 		if (!empty($data['interfaces'])) {
 			API::HostInterface()->massAdd([
@@ -959,6 +944,8 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot mass update visible host name.'));
 			}
 		}
+
+		$this->pskValidation($data);
 
 		if (isset($data['host'])) {
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])) {
@@ -1640,6 +1627,32 @@ class CHost extends CHostGeneral {
 	protected function checkPermissions(array $hostIds) {
 		if (!$this->isWritable($hostIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	/**
+	 * Validate PSK fields.
+	 *
+	 * @throws APIException		if incorrect encryption options
+	 *
+	 * @param array $data		host data array
+	 */
+	protected function pskValidation(array $data) {
+		// psk validation
+		if ((array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK)
+				|| (array_key_exists('tls_accept', $data)
+					&& ($data['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
+			if (!array_key_exists('tls_psk_identity', $data) || zbx_empty($data['tls_psk_identity'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
+			}
+			if (!array_key_exists('tls_psk', $data) || zbx_empty($data['tls_psk'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
+			}
+			if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $data['tls_psk'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
+				);
+			}
 		}
 	}
 }
