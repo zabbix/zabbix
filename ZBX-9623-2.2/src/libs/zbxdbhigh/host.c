@@ -4872,6 +4872,9 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (SUCCEED != DBlock_hostids(hostids))
+		goto out;
+
 	zbx_vector_uint64_create(&httptestids);
 	zbx_vector_uint64_create(&selementids);
 
@@ -4902,6 +4905,8 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid", hostids->values, hostids->values_num);
 
 	DBselect_uint64(sql, &itemids);
+
+	sleep(10);
 
 	DBdelete_items(&itemids);
 
@@ -4936,7 +4941,7 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&selementids);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
