@@ -157,8 +157,8 @@ class CHelpItems {
 					'description' => _('Hardware sensor reading. Returns float')
 				],
 				[
-					'key' => 'service_state[service]',
-					'description' => _('State of a service. Returns 0 - running; 1 - paused; 2 - start pending; 3 - pause pending; 4 - continue pending; 5 - stop pending; 6 - stopped; 7 - unknown; 255 - no such service')
+					'key' => 'service.info[service,<param>]',
+					'description' => _('Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description')
 				],
 				[
 					'key' => 'services[<type>,<state>,<exclude>]',
@@ -435,8 +435,8 @@ class CHelpItems {
 					'description' => _('Hardware sensor reading. Returns float')
 				],
 				[
-					'key' => 'service_state[service]',
-					'description' => _('State of a service. Returns 0 - running; 1 - paused; 2 - start pending; 3 - pause pending; 4 - continue pending; 5 - stop pending; 6 - stopped; 7 - unknown; 255 - no such service')
+					'key' => 'service.info[service,<param>]',
+					'description' => _('Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description')
 				],
 				[
 					'key' => 'services[<type>,<state>,<exclude>]',
