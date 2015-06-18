@@ -24,7 +24,7 @@ $widget = (new CWidget())->setTitle(_('Items'));
 $host = $this->data['host'];
 
 if (!empty($this->data['hostid'])) {
-	$itemWidget->addItem(get_header_host_table('items', $this->data['hostid']));
+	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
 }
 
 // create form
