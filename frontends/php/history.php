@@ -48,7 +48,6 @@ $fields = [
 	'action' =>			[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'","'.HISTORY_LATEST.'","'.HISTORY_BATCH_GRAPH.'"'), null],
 	'graphtype' =>      [T_ZBX_INT, O_OPT, null,   IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
 	// ajax
-	'filterState' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,	null],
 	'favobj' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,	null],
 	'favid' =>			[T_ZBX_INT, O_OPT, P_ACT,	null,	null],
 	// actions
@@ -64,10 +63,6 @@ check_fields($fields);
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.history.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'timeline') {
 		navigation_bar_calc('web.item.graph', $_REQUEST['favid'], true);

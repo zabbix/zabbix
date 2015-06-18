@@ -103,7 +103,7 @@ $pageHeader->addJsFile($path);
 $pageHeader->display();
 
 /*
- * Dispalying
+ * Displaying
  */
 $header = (new CTag('header', true, new CDiv((new CDiv())->addClass('signin-logo'))))
 	->setAttribute('role', 'banner');

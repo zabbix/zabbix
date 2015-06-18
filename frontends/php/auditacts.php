@@ -40,7 +40,6 @@ $fields = [
 	'period' =>		[T_ZBX_INT, O_OPT, null,	null,	null],
 	'stime' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
 	// ajax
-	'filterState' => [T_ZBX_INT, O_OPT, P_ACT, null,	null],
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,	null],
 	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,	null]
 ];
@@ -49,9 +48,6 @@ check_fields($fields);
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.auditacts.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (isset($_REQUEST['favobj'])) {
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {

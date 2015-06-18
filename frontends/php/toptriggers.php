@@ -36,17 +36,9 @@ $fields = [
 	'filter_from' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null],
 	'filter_till' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null],
 	'filter_rst' =>		[T_ZBX_STR,	O_OPT,	P_SYS,			null,	null],
-	'filter_set' =>		[T_ZBX_STR,	O_OPT,	P_SYS,			null,	null],
-	'filterState' =>	[T_ZBX_INT,	O_OPT,	P_ACT,			null,	null]
+	'filter_set' =>		[T_ZBX_STR,	O_OPT,	P_SYS,			null,	null]
 ];
 check_fields($fields);
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.toptriggers.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 
 $data['config'] = select_config();
 

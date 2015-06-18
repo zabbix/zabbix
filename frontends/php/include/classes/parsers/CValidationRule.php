@@ -58,6 +58,7 @@ class CValidationRule {
 							if (!$this->parseRequired($buffer, $pos, $rule)				// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseJson($buffer, $pos, $rule)			// json
+									&& !$this->parseInt32($buffer, $pos, $rule)			// int32
 									&& !$this->parseIn($buffer, $pos, $rule)			// in
 									&& !$this->parseId($buffer, $pos, $rule)			// id
 									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
@@ -175,6 +176,22 @@ class CValidationRule {
 
 		$pos += 4;
 		$rules['json'] = true;
+
+		return true;
+	}
+
+	/**
+	 * int32
+	 *
+	 * 'int32' => true
+	 */
+	private function parseInt32($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'int32', 5)) {
+			return false;
+		}
+
+		$pos += 5;
+		$rules['int32'] = true;
 
 		return true;
 	}

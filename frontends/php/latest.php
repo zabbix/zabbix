@@ -45,7 +45,6 @@ $fields = [
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	'favobj' =>				[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'toggle_ids' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'toggle_open_state' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
@@ -68,9 +67,6 @@ if (getRequest('hostids') && !API::Host()->isReadable(getRequest('hostids'))) {
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.latest.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (hasRequest('favobj')) {
 	if ($_REQUEST['favobj'] == 'toggle') {
 		// $_REQUEST['toggle_ids'] can be single id or list of ids,

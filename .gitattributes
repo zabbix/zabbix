@@ -29,6 +29,7 @@ frontends/php/app/controllers/CControllerMediatypeEdit.php -text
 frontends/php/app/controllers/CControllerMediatypeEnable.php -text
 frontends/php/app/controllers/CControllerMediatypeList.php -text
 frontends/php/app/controllers/CControllerMediatypeUpdate.php -text
+frontends/php/app/controllers/CControllerProfileUpdate.php -text
 frontends/php/app/controllers/CControllerProxyDelete.php -text
 frontends/php/app/controllers/CControllerProxyEdit.php -text
 frontends/php/app/controllers/CControllerProxyHostDisable.php -text

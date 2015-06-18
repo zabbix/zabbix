@@ -70,6 +70,7 @@ class CRouter {
 		'mediatype.enable'		=> ['CControllerMediatypeEnable',		null,					null],
 		'mediatype.list'		=> ['CControllerMediatypeList',		'layout.htmlpage',		'administration.mediatype.list'],
 		'mediatype.update'		=> ['CControllerMediatypeUpdate',		null,					null],
+		'profile.update'		=> ['CControllerProfileUpdate',		'layout.json',	null],
 		'proxy.create'			=> ['CControllerProxyCreate',			null,					null],
 		'proxy.delete'			=> ['CControllerProxyDelete',			null,					null],
 		'proxy.edit'			=> ['CControllerProxyEdit',			'layout.htmlpage',		'administration.proxy.edit'],
