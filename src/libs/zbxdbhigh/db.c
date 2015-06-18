@@ -2212,7 +2212,6 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
 	const char	*__function_name = "DBlock_record";
 
 	DB_RESULT	result;
-	DB_ROW		row;
 	const ZBX_TABLE	*t;
 	int		ret;
 
@@ -2233,7 +2232,7 @@ int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx
 				table, t->recid, id, add_field, add_id);
 	}
 
-	if (NULL == (row = DBfetch(result)))
+	if (NULL == DBfetch(result))
 		ret = FAIL;
 	else
 		ret = SUCCEED;
