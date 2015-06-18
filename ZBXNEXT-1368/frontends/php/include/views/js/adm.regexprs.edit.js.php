@@ -4,8 +4,9 @@
 		<td>#{type}</td>
 		<td>#{case_sensitive}</td>
 		<td class="nowrap">
-			<button class="button link_menu exprEdit" type="button" data-id="#{id}"><?php echo _('Edit'); ?></button>&nbsp;
-			<button class="button link_menu exprRemove" type="button" data-id="#{id}"><?php echo _('Remove'); ?></button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> exprEdit" type="button" data-id="#{id}"><?= _('Edit') ?></button>
+			&nbsp;
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> exprRemove" type="button" data-id="#{id}"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>
@@ -20,7 +21,7 @@
 
 <script type="text/x-jquery-tmpl" id="testCombinedTableRow">
 	<tr class="odd_row">
-		<td colspan="2"><?php echo _('Combined result'); ?></td>
+		<td colspan="2"><?= _('Combined result') ?></td>
 		<td><span class="bold #{resultClass}">#{result}</span></td>
 	</tr>
 </script>
@@ -105,25 +106,25 @@
 				var str;
 
 				switch (+this.data.expression_type) {
-					case <?php echo EXPRESSION_TYPE_INCLUDED; ?>:
-						str = <?php echo CJs::encodeJson(_('Character string included')); ?>;
+					case <?= EXPRESSION_TYPE_INCLUDED ?>:
+						str = <?= CJs::encodeJson(_('Character string included')) ?>;
 						break;
-					case <?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>:
-						str = <?php echo CJs::encodeJson(_('Any character string included')); ?>;
+					case <?= EXPRESSION_TYPE_ANY_INCLUDED ?>:
+						str = <?= CJs::encodeJson(_('Any character string included')) ?>;
 						break;
-					case <?php echo EXPRESSION_TYPE_NOT_INCLUDED; ?>:
-						str = <?php echo CJs::encodeJson(_('Character string not included')); ?>;
+					case <?= EXPRESSION_TYPE_NOT_INCLUDED ?>:
+						str = <?= CJs::encodeJson(_('Character string not included')) ?>;
 						break;
-					case <?php echo EXPRESSION_TYPE_TRUE; ?>:
-						str = <?php echo CJs::encodeJson(_('Result is TRUE')); ?>;
+					case <?= EXPRESSION_TYPE_TRUE ?>:
+						str = <?= CJs::encodeJson(_('Result is TRUE')) ?>;
 						break;
-					case <?php echo EXPRESSION_TYPE_FALSE; ?>:
-						str = <?php echo CJs::encodeJson(_('Result is FALSE')); ?>;
+					case <?= EXPRESSION_TYPE_FALSE ?>:
+						str = <?= CJs::encodeJson(_('Result is FALSE')) ?>;
 						break;
 				}
 
-				if (+this.data.expression_type === <?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>) {
-					str += ' (' + <?php echo CJs::encodeJson(_('delimiter')); ?> + '="' + this.data.exp_delimiter + '")';
+				if (+this.data.expression_type === <?= EXPRESSION_TYPE_ANY_INCLUDED ?>) {
+					str += ' (' + <?= CJs::encodeJson(_('delimiter')) ?> + '="' + this.data.exp_delimiter + '")';
 				}
 
 				return str;
@@ -136,10 +137,10 @@
 			 */
 			case2str: function() {
 				if (+this.data.case_sensitive) {
-					return <?php echo CJs::encodeJson(_('Yes')); ?>;
+					return <?= CJs::encodeJson(_('Yes')) ?>;
 				}
 				else {
-					return <?php echo CJs::encodeJson(_('No')); ?>;
+					return <?= CJs::encodeJson(_('No')) ?>;
 				}
 			},
 
@@ -212,14 +213,14 @@
 			 */
 			validateExpression: function(data) {
 				if (data.expression === '') {
-					alert(<?php echo CJs::encodeJson(_('Expression cannot be empty')); ?>);
+					alert(<?= CJs::encodeJson(_('Expression cannot be empty')) ?>);
 					return false;
 				}
 
 				for (var id in this.expressions) {
 					// if we update expression, no error if equals itself
 					if (id != this.selectedID && this.expressions[id].equals(data)) {
-						alert(<?php echo CJs::encodeJson(_('Identical expression already exists')); ?>);
+						alert(<?= CJs::encodeJson(_('Identical expression already exists')) ?>);
 						return false;
 					}
 				}
@@ -246,13 +247,13 @@
 					};
 					this.selectedID = null;
 
-					$('#saveExpression').text(<?php echo CJs::encodeJson(_('Add')); ?>);
+					$('#saveExpression').text(<?= CJs::encodeJson(_('Add')) ?>);
 				}
 				else {
 					data = this.expressions[id].data;
 					this.selectedID = id;
 
-					$('#saveExpression').text(<?php echo CJs::encodeJson(_('Update')); ?>);
+					$('#saveExpression').text(<?= CJs::encodeJson(_('Update')) ?>);
 				}
 
 				$('#expressionNew').val(data.expression);
@@ -362,14 +363,14 @@
 						result = response.data.errors[id];
 					}
 					else {
-						result = exprResult ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>;
+						result = exprResult ? <?= CJs::encodeJson(_('TRUE')) ?> : <?= CJs::encodeJson(_('FALSE')) ?>;
 					}
 
 					tplData = {
 						expression: expr.data.expression,
 						type: expr.type2str(),
 						result: result,
-						resultClass: exprResult ? <?php echo ZBX_STYLE_GREEN; ?> : <?php echo ZBX_STYLE_RED; ?>
+						resultClass: exprResult ? <?= ZBX_STYLE_GREEN ?> : <?= ZBX_STYLE_RED ?>
 					};
 
 					$('#testResultTable').append(this.testTableRowTpl.evaluate(tplData));
@@ -377,14 +378,14 @@
 
 				if (hasErrors) {
 					tplData = {
-						resultClass: <?php echo ZBX_STYLE_RED; ?>,
-						result: <?php echo CJs::encodeJson(_('UNKNOWN')); ?>
+						resultClass: <?= ZBX_STYLE_RED ?>,
+						result: <?= CJs::encodeJson(_('UNKNOWN')) ?>
 					};
 				}
 				else {
 					tplData = {
-						resultClass: response.data.final ? <?php echo ZBX_STYLE_GREEN; ?> : <?php echo ZBX_STYLE_RED; ?>,
-						result: response.data.final ? <?php echo CJs::encodeJson(_('TRUE')); ?> : <?php echo CJs::encodeJson(_('FALSE')); ?>
+						resultClass: response.data.final ? <?= ZBX_STYLE_GREEN ?> : <?= ZBX_STYLE_RED ?>,
+						result: response.data.final ? <?= CJs::encodeJson(_('TRUE')) ?> : <?= CJs::encodeJson(_('FALSE')) ?>
 					};
 				}
 
@@ -444,7 +445,7 @@
 		// it's needed because after clone all expressions should be added as new for cloned reg. exp
 		$('#clone').click(function() {
 			$('#regexpid, #clone, #delete').remove();
-			$('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
+			$('#update').button('option', 'label', <?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			$('#name').focus();
 
@@ -455,7 +456,7 @@
 
 		// handler for type select in form, show/hide delimiter select
 		$('#typeNew').change(function() {
-			if ($(this).val() === '<?php echo EXPRESSION_TYPE_ANY_INCLUDED; ?>') {
+			if ($(this).val() === '<?= EXPRESSION_TYPE_ANY_INCLUDED ?>') {
 				$('#delimiterNewRow').show();
 			}
 			else {

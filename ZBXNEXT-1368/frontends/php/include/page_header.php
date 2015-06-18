@@ -117,8 +117,8 @@ switch ($page['type']) {
 }
 
 // construct menu
-$main_menu = array();
-$sub_menus = array();
+$main_menu = [];
+$sub_menus = [];
 
 $denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
 
@@ -189,18 +189,18 @@ if (defined('ZBX_PAGE_NO_HEADER')) {
 }
 
 if (!defined('ZBX_PAGE_NO_MENU')) {
-	$pageMenu = new CView('layout.htmlpage.menu', array(
-		'menu' => array(
+	$pageMenu = new CView('layout.htmlpage.menu', [
+		'menu' => [
 			'main_menu' => $main_menu,
 			'sub_menus' => $sub_menus,
 			'selected' => $page['menu']
-		)
-	));
+		]
+	]);
 	echo $pageMenu->getOutput();
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {
-	echo '<article>';
+	echo '<div class="'.ZBX_STYLE_ARTICLE.'">';
 }
 
 // unset multiple variables

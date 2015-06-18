@@ -52,14 +52,14 @@ class CConditionFormula {
 	 *
 	 * @var array
 	 */
-	public $constants = array();
+	public $constants = [];
 
 	/**
 	 * Array of supported operators.
 	 *
 	 * @var array
 	 */
-	protected $allowedOperators = array('and', 'or');
+	protected $allowedOperators = ['and', 'or'];
 
 	/**
 	 * Current position on a parsed element.
@@ -78,7 +78,7 @@ class CConditionFormula {
 	public function parse($formula) {
 		$this->isValid = true;
 		$this->error = '';
-		$this->constants = array();
+		$this->constants = [];
 
 		$this->pos = 0;
 		$this->formula = $formula;

@@ -28,7 +28,7 @@ class CScript extends CApiService {
 
 	protected $tableName = 'scripts';
 	protected $tableAlias = 's';
-	protected $sortColumns = array('scriptid', 'name');
+	protected $sortColumns = ['scriptid', 'name'];
 
 	/**
 	 * Get scripts data.
@@ -49,19 +49,19 @@ class CScript extends CApiService {
 	 * @return array
 	 */
 	public function get(array $options) {
-		$result = array();
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('scripts' => 's.scriptid'),
-			'from'		=> array('scripts s'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['scripts' => 's.scriptid'],
+			'from'		=> ['scripts s'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'groupids'				=> null,
 			'hostids'				=> null,
 			'scriptids'				=> null,
@@ -84,7 +84,7 @@ class CScript extends CApiService {
 			'sortfield'				=> '',
 			'sortorder'				=> '',
 			'limit'					=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + permission check
@@ -118,10 +118,10 @@ class CScript extends CApiService {
 			zbx_value2array($options['hostids']);
 
 			// return scripts that are assigned to the hosts' groups or to no group
-			$hostGroups = API::HostGroup()->get(array(
-				'output' => array('groupid'),
+			$hostGroups = API::HostGroup()->get([
+				'output' => ['groupid'],
 				'hostids' => $options['hostids']
-			));
+			]);
 			$hostGroupIds = zbx_objectValues($hostGroups, 'groupid');
 
 			$sqlParts['where'][] = '('.dbConditionInt('s.groupid', $hostGroupIds).' OR s.groupid IS NULL)';
@@ -174,7 +174,7 @@ class CScript extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('groupid', 'host_access'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['groupid', 'host_access'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -207,7 +207,7 @@ class CScript extends CApiService {
 
 		$scriptIds = DB::insert('scripts', $scripts);
 
-		return array('scriptids' => $scriptIds);
+		return ['scriptids' => $scriptIds];
 	}
 
 	/**
@@ -230,21 +230,21 @@ class CScript extends CApiService {
 
 		$scripts = $this->unsetExecutionType($scripts);
 
-		$update = array();
+		$update = [];
 
 		foreach ($scripts as $script) {
 			$scriptId = $script['scriptid'];
 			unset($script['scriptid']);
 
-			$update[] = array(
+			$update[] = [
 				'values' => $script,
-				'where' => array('scriptid' => $scriptId)
-			);
+				'where' => ['scriptid' => $scriptId]
+			];
 		}
 
 		DB::update('scripts', $update);
 
-		return array('scriptids' => zbx_objectValues($scripts, 'scriptid'));
+		return ['scriptids' => zbx_objectValues($scripts, 'scriptid')];
 	}
 
 	/**
@@ -257,9 +257,9 @@ class CScript extends CApiService {
 	public function delete(array $scriptIds) {
 		$this->validateDelete($scriptIds);
 
-		DB::delete('scripts', array('scriptid' => $scriptIds));
+		DB::delete('scripts', ['scriptid' => $scriptIds]);
 
-		return array('scriptids' => $scriptIds);
+		return ['scriptids' => $scriptIds];
 	}
 
 	/**
@@ -276,12 +276,12 @@ class CScript extends CApiService {
 		$scriptId = $data['scriptid'];
 		$hostId = $data['hostid'];
 
-		$scripts = $this->get(array(
+		$scripts = $this->get([
 			'hostids' => $hostId,
 			'scriptids' => $scriptId,
-			'output' => array('scriptid'),
+			'output' => ['scriptid'],
 			'preservekeys' => true
-		));
+		]);
 
 		if (!isset($scripts[$scriptId])) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
@@ -292,10 +292,10 @@ class CScript extends CApiService {
 		$result = $zabbixServer->executeScript($scriptId, $hostId);
 		if ($result !== false) {
 			// return the result in a backwards-compatible format
-			return array(
+			return [
 				'response' => 'success',
 				'value' => $result
-			);
+			];
 		}
 		else {
 			self::exception(ZBX_API_ERROR_INTERNAL, $zabbixServer->getError());
@@ -312,27 +312,27 @@ class CScript extends CApiService {
 	public function getScriptsByHosts($hostIds) {
 		zbx_value2array($hostIds);
 
-		$scriptsByHost = array();
+		$scriptsByHost = [];
 
 		if (!$hostIds) {
 			return $scriptsByHost;
 		}
 
 		foreach ($hostIds as $hostId) {
-			$scriptsByHost[$hostId] = array();
+			$scriptsByHost[$hostId] = [];
 		}
 
-		$scripts = $this->get(array(
+		$scripts = $this->get([
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid'),
+			'selectHosts' => ['hostid'],
 			'hostids' => $hostIds,
 			'sortfield' => 'name',
 			'preservekeys' => true
-		));
+		]);
 
 		if ($scripts) {
 			// resolve macros
-			$macrosData = array();
+			$macrosData = [];
 			foreach ($scripts as $scriptId => $script) {
 				if (!empty($script['confirmation'])) {
 					foreach ($script['hosts'] as $host) {
@@ -343,10 +343,10 @@ class CScript extends CApiService {
 				}
 			}
 			if ($macrosData) {
-				$macrosData = CMacrosResolverHelper::resolve(array(
+				$macrosData = CMacrosResolverHelper::resolve([
 					'config' => 'scriptConfirmation',
 					'data' => $macrosData
-				));
+				]);
 			}
 
 			foreach ($scripts as $scriptId => $script) {
@@ -384,7 +384,7 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$dbFields = array('command' => null, 'name' => null);
+		$dbFields = ['command' => null, 'name' => null];
 
 		foreach ($scripts as $script) {
 			if (!check_db_fields($dbFields, $script)) {
@@ -421,11 +421,11 @@ class CScript extends CApiService {
 		$scripts = zbx_toHash($scripts, 'scriptid');
 		$scriptIds = array_keys($scripts);
 
-		$dbScripts = $this->get(array(
+		$dbScripts = $this->get([
 			'scriptids' => $scriptIds,
-			'output' => array('scriptid'),
+			'output' => ['scriptid'],
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($scripts as $script) {
 			if (!isset($dbScripts[$script['scriptid']])) {
@@ -460,12 +460,12 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete scripts. Empty input parameter "scriptids".'));
 		}
 
-		$dbScripts = $this->get(array(
+		$dbScripts = $this->get([
 			'scriptids' => $scriptIds,
 			'editable' => true,
-			'output' => array('name'),
+			'output' => ['name'],
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($scriptIds as $scriptId) {
 			if (isset($dbScripts[$scriptId])) {
@@ -475,13 +475,13 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete scripts. Script with scriptid "%1$s" does not exist.', $scriptId));
 		}
 
-		$actions = API::Action()->get(array(
+		$actions = API::Action()->get([
 			'scriptids' => $scriptIds,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'output' => array('actionid', 'name'),
-			'selectOperations' => array('opcommand')
-		));
+			'output' => ['actionid', 'name'],
+			'selectOperations' => ['opcommand']
+		]);
 
 		foreach ($actions as $action) {
 			foreach ($action['operations'] as $operation) {
@@ -507,10 +507,10 @@ class CScript extends CApiService {
 	 * @param string $method
 	 */
 	protected function validateMenuPath(array $scripts, $method) {
-		$dbScripts = $this->get(array(
-			'output' => array('scriptid', 'name'),
+		$dbScripts = $this->get([
+			'output' => ['scriptid', 'name'],
 			'nopermissions' => true
-		));
+		]);
 
 		foreach ($scripts as $script) {
 			if (!isset($script['name'])) {
@@ -543,7 +543,7 @@ class CScript extends CApiService {
 				array_pop($dbScriptFolders);
 
 				// script NAME cannot be a FOLDER for other scripts
-				$dbScriptFolderItems = array();
+				$dbScriptFolderItems = [];
 				foreach ($dbScriptFolders as $dbScriptFolder) {
 					$dbScriptFolderItems[] = $dbScriptFolder;
 
@@ -556,7 +556,7 @@ class CScript extends CApiService {
 				}
 
 				// script FOLDER cannot be a NAME for other scripts
-				$folderItems = array();
+				$folderItems = [];
 				foreach ($folders as $folder) {
 					$folderItems[] = $folder;
 
@@ -634,29 +634,29 @@ class CScript extends CApiService {
 		// adding groups
 		if ($options['selectGroups'] !== null && $options['selectGroups'] != API_OUTPUT_COUNT) {
 			foreach ($result as $scriptId => $script) {
-				$result[$scriptId]['groups'] = API::HostGroup()->get(array(
+				$result[$scriptId]['groups'] = API::HostGroup()->get([
 					'output' => $options['selectGroups'],
 					'groupids' => $script['groupid'] ? $script['groupid'] : null,
 					'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
-				));
+				]);
 			}
 		}
 
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
-			$processedGroups = array();
+			$processedGroups = [];
 
 			foreach ($result as $scriptId => $script) {
 				if (isset($processedGroups[$script['groupid'].'_'.$script['host_access']])) {
 					$result[$scriptId]['hosts'] = $result[$processedGroups[$script['groupid'].'_'.$script['host_access']]]['hosts'];
 				}
 				else {
-					$result[$scriptId]['hosts'] = API::Host()->get(array(
+					$result[$scriptId]['hosts'] = API::Host()->get([
 						'output' => $options['selectHosts'],
 						'groupids' => $script['groupid'] ? $script['groupid'] : null,
 						'hostids' => $options['hostids'] ? $options['hostids'] : null,
 						'editable' => ($script['host_access'] == PERM_READ_WRITE) ? true : null
-					));
+					]);
 
 					$processedGroups[$script['groupid'].'_'.$script['host_access']] = $scriptId;
 				}

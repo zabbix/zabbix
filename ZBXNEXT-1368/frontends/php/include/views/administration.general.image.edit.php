@@ -18,6 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$widget = (new CWidget())
+	->setTitle(_('Images'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.images.php')))
+	);
 
 $imageForm = new CForm('post', null, 'multipart/form-data');
 $imageForm->setName('imageForm');
@@ -30,7 +36,7 @@ $imageForm->addVar('imagetype', $this->data['imagetype']);
 // append form list
 $imageFormList = new CFormList('imageFormList');
 $nameTextBox = new CTextBox('name', $this->data['imagename'], 64, false, 64);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $imageFormList->addRow(_('Name'), $nameTextBox);
 $imageFormList->addRow(_('Upload'), new CFile('image'));
 
@@ -51,19 +57,21 @@ $imageTab->addTab('imageTab', ($this->data['imagetype'] == IMAGE_TYPE_ICON) ? _(
 if (isset($this->data['imageid'])) {
 	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CButtonDelete(_('Delete selected image?'), url_param('form').url_param('imageid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$imageTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 
 $imageForm->addItem($imageTab);
 
-return $imageForm;
+$widget->addItem($imageForm);
+
+return $widget;

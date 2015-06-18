@@ -39,11 +39,11 @@ class Manager extends CRegistryFactory {
 	public static function getInstance() {
 		if (!self::$instance) {
 			$class = __CLASS__;
-			self::$instance = new $class(array(
+			self::$instance = new $class([
 				'application' => 'CApplicationManager',
 				'history' => 'CHistoryManager',
 				'httptest' => 'CHttpTestManager'
-			));
+			]);
 		}
 
 		return self::$instance;

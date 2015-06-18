@@ -22,8 +22,8 @@
 abstract class CImportConverterTest extends PHPUnit_Framework_TestCase {
 
 	abstract protected function createConverter();
-	abstract protected function createSource(array $data = array());
-	abstract protected function createExpectedResult(array $data = array());
+	abstract protected function createSource(array $data = []);
+	abstract protected function createExpectedResult(array $data = []);
 
 	public function testConvertGeneral() {
 		$this->assertConvert($this->createExpectedResult(), $this->createSource());

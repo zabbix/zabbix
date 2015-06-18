@@ -14,7 +14,7 @@
 		});
 
 		jQuery('#algorithm').change(function() {
-			var statusDisabled = (jQuery(this).val() == <?php echo SERVICE_ALGORITHM_NONE ?>);
+			var statusDisabled = (jQuery(this).val() == <?= SERVICE_ALGORITHM_NONE ?>);
 			jQuery('#showsla, #trigger, #btn1, #goodsla').prop('disabled', statusDisabled);
 
 			if (!statusDisabled) {
@@ -70,11 +70,10 @@
 
 			// column "action"
 			var td = document.createElement('td');
-			var inputRemove = document.createElement('input');
-			inputRemove.setAttribute('type', 'button');
-			inputRemove.setAttribute('value', <?php echo CJs::encodeJson(_('Remove')); ?>);
-			inputRemove.setAttribute('class', 'link_menu');
+			var inputRemove = document.createElement('button');
+			inputRemove.setAttribute('class', '<?= ZBX_STYLE_BTN_LINK ?>');
 			inputRemove.setAttribute('onclick', 'javascript: removeDependentChild(\'' + serviceid + '\');');
+			inputRemove.appendChild(document.createTextNode(<?= CJs::encodeJson(_('Remove')) ?>));
 
 			td.appendChild(inputRemove);
 			tr.appendChild(td);

@@ -40,134 +40,134 @@ class testZBX6663 extends CWebTest {
 
 	// Returns test data
 	public static function zbx_data() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'link' => 'Applications',
 					'checkbox' => 'applications'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'link' => 'Items',
 					'checkbox' => 'items'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'link' => 'Triggers',
 					'checkbox' => 'triggers'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'link' => 'Graphs',
 					'checkbox' => 'graphs'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'link' => 'Discovery rules',
 					'checkbox' => 'items'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'discoveryRule' => 'Item prototypes',
 					'checkbox' => 'items'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'discoveryRule' => 'Trigger prototypes',
 					'checkbox' => 'triggers'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'discoveryRule' => 'Graph prototypes',
 					'checkbox' => 'graphs'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Host ZBX6663',
 					'link' => 'Web scenarios',
 					'checkbox' => 'httptests'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'link' => 'Applications',
 					'checkbox' => 'applications'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'link' => 'Items',
 					'checkbox' => 'items'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'link' => 'Triggers',
 					'checkbox' => 'triggers'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'link' => 'Graphs',
 					'checkbox' => 'graphs'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'link' => 'Discovery rules',
 					'checkbox' => 'items'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'discoveryRule' => 'Item prototypes',
 					'checkbox' => 'items'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'discoveryRule' => 'Trigger prototypes',
 					'checkbox' => 'triggers'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'discoveryRule' => 'Graph prototypes',
 					'checkbox' => 'graphs'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Template ZBX6663 First',
 					'link' => 'Web scenarios',
 					'checkbox' => 'httptests'
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 

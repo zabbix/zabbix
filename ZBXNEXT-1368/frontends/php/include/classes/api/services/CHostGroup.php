@@ -28,7 +28,7 @@ class CHostGroup extends CApiService {
 
 	protected $tableName = 'groups';
 	protected $tableAlias = 'g';
-	protected $sortColumns = array('groupid', 'name');
+	protected $sortColumns = ['groupid', 'name'];
 
 	/**
 	 * Get host groups.
@@ -38,19 +38,19 @@ class CHostGroup extends CApiService {
 	 * @return array
 	 */
 	public function get($params) {
-		$result = array();
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('groups' => 'g.groupid'),
-			'from'		=> array('groups' => 'groups g'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['groups' => 'g.groupid'],
+			'from'		=> ['groups' => 'groups g'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'groupids'					=> null,
 			'hostids'					=> null,
 			'templateids'				=> null,
@@ -92,7 +92,7 @@ class CHostGroup extends CApiService {
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $params);
 
 		// editable + PERMISSION CHECK
@@ -385,25 +385,25 @@ class CHostGroup extends CApiService {
 			}
 			$this->checkNoParameters(
 				$group,
-				array('internal'),
+				['internal'],
 				_('Cannot set "%1$s" for host group "%2$s".'),
 				$group['name']
 			);
 		}
 
 		// check host name duplicates in passed parameters
-		$collectionValidator = new CCollectionValidator(array(
+		$collectionValidator = new CCollectionValidator([
 			'uniqueField' => 'name',
 			'messageDuplicate' => _('Host group "%1$s" already exists.')
-		));
+		]);
 		$this->checkValidator($groups, $collectionValidator);
 
 		// check host name duplicates in DB
-		$dbHostGroups = API::getApiService()->select($this->tableName(), array(
-			'output' => array('name'),
-			'filter' => array('name' => zbx_objectValues($groups, 'name')),
+		$dbHostGroups = API::getApiService()->select($this->tableName(), [
+			'output' => ['name'],
+			'filter' => ['name' => zbx_objectValues($groups, 'name')],
 			'limit' => 1
-		));
+		]);
 
 		if ($dbHostGroups) {
 			$dbHostGroup = reset($dbHostGroups);
@@ -412,7 +412,7 @@ class CHostGroup extends CApiService {
 
 		$groupids = DB::insert('groups', $groups);
 
-		return array('groupids' => $groupids);
+		return ['groupids' => $groupids];
 	}
 
 	/**
@@ -433,12 +433,12 @@ class CHostGroup extends CApiService {
 		}
 
 		// permissions
-		$updGroups = $this->get(array(
-			'output' => array('groupid', 'flags', 'name'),
+		$updGroups = $this->get([
+			'output' => ['groupid', 'flags', 'name'],
 			'groupids' => $groupids,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 		foreach ($groups as $group) {
 			if (!isset($updGroups[$group['groupid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -447,26 +447,26 @@ class CHostGroup extends CApiService {
 			}
 			$this->checkNoParameters(
 				$group,
-				array('internal'),
+				['internal'],
 				_('Cannot update "%1$s" for host group "%2$s".'),
 				isset($group['name']) ? $group['name'] : $updGroups[$group['groupid']]['name']
 			);
 		}
 
 		// name duplicate check
-		$groupsNames = $this->get(array(
-			'filter' => array('name' => zbx_objectValues($groups, 'name')),
-			'output' => array('groupid', 'name'),
+		$groupsNames = $this->get([
+			'filter' => ['name' => zbx_objectValues($groups, 'name')],
+			'output' => ['groupid', 'name'],
 			'editable' => true,
 			'nopermissions' => true
-		));
+		]);
 		$groupsNames = zbx_toHash($groupsNames, 'name');
 
-		$updateDiscoveredValidator = new CUpdateDiscoveredValidator(array(
+		$updateDiscoveredValidator = new CUpdateDiscoveredValidator([
 			'messageAllowed' => _('Cannot update a discovered host group.')
-		));
+		]);
 
-		$update = array();
+		$update = [];
 		foreach ($groups as $group) {
 			if (isset($group['name'])) {
 				if (zbx_empty($group['name'])) {
@@ -481,19 +481,19 @@ class CHostGroup extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Host group "%1$s" already exists.', $group['name']));
 				}
 
-				$update[] = array(
-					'values' => array('name' => $group['name']),
-					'where' => array('groupid' => $group['groupid'])
-				);
+				$update[] = [
+					'values' => ['name' => $group['name']],
+					'where' => ['groupid' => $group['groupid']]
+				];
 			}
 
 			// prevents updating several groups with same name
-			$groupsNames[$group['name']] = array('groupid' => $group['groupid']);
+			$groupsNames[$group['name']] = ['groupid' => $group['groupid']];
 		}
 
 		DB::update('groups', $update);
 
-		return array('groupids' => $groupids);
+		return ['groupids' => $groupids];
 	}
 
 	/**
@@ -510,13 +510,13 @@ class CHostGroup extends CApiService {
 		}
 		sort($groupids);
 
-		$delGroups = $this->get(array(
+		$delGroups = $this->get([
 			'groupids' => $groupids,
 			'editable' => true,
-			'output' => array('groupid', 'name', 'internal'),
+			'output' => ['groupid', 'name', 'internal'],
 			'preservekeys' => true,
 			'nopermissions' => $nopermissions
-		));
+		]);
 		foreach ($groupids as $groupid) {
 			if (!isset($delGroups[$groupid])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
@@ -558,11 +558,11 @@ class CHostGroup extends CApiService {
 			}
 		}
 
-		$dbScripts = API::Script()->get(array(
+		$dbScripts = API::Script()->get([
 			'groupids' => $groupids,
-			'output' => array('scriptid', 'groupid'),
+			'output' => ['scriptid', 'groupid'],
 			'nopermissions' => true
-		));
+		]);
 
 		if (!empty($dbScripts)) {
 			foreach ($dbScripts as $script) {
@@ -578,26 +578,26 @@ class CHostGroup extends CApiService {
 		}
 
 		// delete screens items
-		$resources = array(
+		$resources = [
 			SCREEN_RESOURCE_HOSTGROUP_TRIGGERS,
 			SCREEN_RESOURCE_HOSTS_INFO,
 			SCREEN_RESOURCE_TRIGGERS_INFO,
 			SCREEN_RESOURCE_TRIGGERS_OVERVIEW,
 			SCREEN_RESOURCE_DATA_OVERVIEW
-		);
-		DB::delete('screens_items', array(
+		];
+		DB::delete('screens_items', [
 			'resourceid' => $groupids,
 			'resourcetype' => $resources
-		));
+		]);
 
 		// delete sysmap element
 		if (!empty($groupids)) {
-			DB::delete('sysmaps_elements', array('elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids));
+			DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 		}
 
 		// disable actions
 		// actions from conditions
-		$actionids = array();
+		$actionids = [];
 		$dbActions = DBselect(
 			'SELECT DISTINCT c.actionid'.
 			' FROM conditions c'.
@@ -620,22 +620,22 @@ class CHostGroup extends CApiService {
 		}
 
 		if (!empty($actionids)) {
-			$update = array();
-			$update[] = array(
-				'values' => array('status' => ACTION_STATUS_DISABLED),
-				'where' => array('actionid' => $actionids)
-			);
+			$update = [];
+			$update[] = [
+				'values' => ['status' => ACTION_STATUS_DISABLED],
+				'where' => ['actionid' => $actionids]
+			];
 			DB::update('actions', $update);
 		}
 
 		// delete action conditions
-		DB::delete('conditions', array(
+		DB::delete('conditions', [
 			'conditiontype' => CONDITION_TYPE_HOST_GROUP,
 			'value' => $groupids
-		));
+		]);
 
 		// delete action operation commands
-		$operationids = array();
+		$operationids = [];
 		$dbOperations = DBselect(
 			'SELECT DISTINCT og.operationid'.
 			' FROM opgroup og'.
@@ -644,12 +644,12 @@ class CHostGroup extends CApiService {
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
-		DB::delete('opgroup', array(
+		DB::delete('opgroup', [
 			'groupid' => $groupids
-		));
+		]);
 
 		// delete empty operations
-		$delOperationids = array();
+		$delOperationids = [];
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
@@ -660,26 +660,26 @@ class CHostGroup extends CApiService {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('operations', array('operationid' => $delOperationids));
+		DB::delete('operations', ['operationid' => $delOperationids]);
 
-		DB::delete('groups', array('groupid' => $groupids));
+		DB::delete('groups', ['groupid' => $groupids]);
 
-		DB::delete('profiles', array(
+		DB::delete('profiles', [
 			'idx' => 'web.dashconf.groups.groupids',
 			'value_id' => $groupids
-		));
+		]);
 
-		DB::delete('profiles', array(
+		DB::delete('profiles', [
 			'idx' => 'web.dashconf.groups.hide.groupids',
 			'value_id' => $groupids
-		));
+		]);
 
 		// TODO: remove audit
 		foreach ($groupids as $groupid) {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $delGroups[$groupid]['name'], 'groups', null, null);
 		}
 
-		return array('groupids' => $groupids);
+		return ['groupids' => $groupids];
 	}
 
 	/**
@@ -694,8 +694,8 @@ class CHostGroup extends CApiService {
 	 */
 	public function massAdd(array $data) {
 		$data['groups'] = zbx_toArray($data['groups']);
-		$data['hosts'] = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
-		$data['templates'] = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
+		$data['hosts'] = isset($data['hosts']) ? zbx_toArray($data['hosts']) : [];
+		$data['templates'] = isset($data['templates']) ? zbx_toArray($data['templates']) : [];
 
 		$this->validateMassAdd($data);
 
@@ -706,7 +706,7 @@ class CHostGroup extends CApiService {
 		$objectIds = array_merge($hostIds, $templateIds);
 		$objectIds = array_keys(array_flip($objectIds));
 
-		$linked = array();
+		$linked = [];
 		$linkedDb = DBselect(
 			'SELECT hg.hostid,hg.groupid'.
 			' FROM hosts_groups hg'.
@@ -717,19 +717,19 @@ class CHostGroup extends CApiService {
 			$linked[$pair['groupid']][$pair['hostid']] = 1;
 		}
 
-		$insert = array();
+		$insert = [];
 		foreach ($groupIds as $groupId) {
 			foreach ($objectIds as $objectId) {
 				if (isset($linked[$groupId][$objectId])) {
 					continue;
 				}
-				$insert[] = array('hostid' => $objectId, 'groupid' => $groupId);
+				$insert[] = ['hostid' => $objectId, 'groupid' => $groupId];
 			}
 		}
 
 		DB::insert('hosts_groups', $insert);
 
-		return array('groupids' => $groupIds);
+		return ['groupids' => $groupIds];
 	}
 
 	/**
@@ -744,20 +744,20 @@ class CHostGroup extends CApiService {
 	 */
 	public function massRemove(array $data) {
 		$data['groupids'] = zbx_toArray($data['groupids'], 'groupid');
-		$data['hostids'] = isset($data['hostids']) ? zbx_toArray($data['hostids']) : array();
-		$data['templateids'] = isset($data['templateids']) ? zbx_toArray($data['templateids']) : array();
+		$data['hostids'] = isset($data['hostids']) ? zbx_toArray($data['hostids']) : [];
+		$data['templateids'] = isset($data['templateids']) ? zbx_toArray($data['templateids']) : [];
 
 		$this->validateMassRemove($data);
 
 		$objectIds = array_merge($data['hostids'], $data['templateids']);
 		$objectIds = array_keys(array_flip($objectIds));
 
-		DB::delete('hosts_groups', array(
+		DB::delete('hosts_groups', [
 			'hostid' => $objectIds,
 			'groupid' => $data['groupids']
-		));
+		]);
 
-		return array('groupids' => $data['groupids']);
+		return ['groupids' => $data['groupids']];
 	}
 
 	/**
@@ -773,8 +773,8 @@ class CHostGroup extends CApiService {
 	 */
 	public function massUpdate(array $data) {
 		$data['groups'] = zbx_toArray($data['groups']);
-		$data['hosts'] = isset($data['hosts']) ? zbx_toArray($data['hosts']) : array();
-		$data['templates'] = isset($data['templates']) ? zbx_toArray($data['templates']) : array();
+		$data['hosts'] = isset($data['hosts']) ? zbx_toArray($data['hosts']) : [];
+		$data['templates'] = isset($data['templates']) ? zbx_toArray($data['templates']) : [];
 
 		$this->validateMassUpdate($data);
 
@@ -794,11 +794,11 @@ class CHostGroup extends CApiService {
 		));
 
 		// calculate new records
-		$replaceRecords = array();
-		$newRecords = array();
+		$replaceRecords = [];
+		$newRecords = [];
 
 		foreach ($groupIds as $groupId) {
-			$groupRecords = array();
+			$groupRecords = [];
 			foreach ($oldRecords as $oldRecord) {
 				if ($oldRecord['groupid'] == $groupId) {
 					$groupRecords[] = $oldRecord;
@@ -817,16 +817,16 @@ class CHostGroup extends CApiService {
 
 			$newHostIds = array_diff($objectIds, $groupHostIds);
 			foreach ($newHostIds as $newHostId) {
-				$newRecords[] = array(
+				$newRecords[] = [
 					'groupid' => $groupId,
 					'hostid' => $newHostId
-				);
+				];
 			}
 		}
 
 		DB::replace('hosts_groups', $oldRecords, array_merge($replaceRecords, $newRecords));
 
-		return array('groupids' => $groupIds);
+		return ['groupids' => $groupIds];
 	}
 
 	/**
@@ -844,22 +844,22 @@ class CHostGroup extends CApiService {
 		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 		$templateIds = zbx_objectValues($data['templates'], 'templateid');
 
-		$groupIdsToAdd = array();
+		$groupIdsToAdd = [];
 
 		if ($hostIds) {
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid'),
-				'selectGroups' => array('groupid'),
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid'],
+				'selectGroups' => ['groupid'],
 				'hostids' => $hostIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			$this->validateHostsPermissions($hostIds, $dbHosts);
 
-			$this->checkValidator($hostIds, new CHostNormalValidator(array(
+			$this->checkValidator($hostIds, new CHostNormalValidator([
 				'message' => _('Cannot update groups for discovered host "%1$s".')
-			)));
+			]));
 
 			foreach ($dbHosts as $dbHost) {
 				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
@@ -871,13 +871,13 @@ class CHostGroup extends CApiService {
 		}
 
 		if ($templateIds) {
-			$dbTemplates = API::Template()->get(array(
-				'output' => array('templateid'),
-				'selectGroups' => array('groupid'),
+			$dbTemplates = API::Template()->get([
+				'output' => ['templateid'],
+				'selectGroups' => ['groupid'],
 				'templateids' => $templateIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			$this->validateHostsPermissions($templateIds, $dbTemplates);
 
@@ -914,29 +914,29 @@ class CHostGroup extends CApiService {
 		$hostIds = zbx_objectValues($data['hosts'], 'hostid');
 		$templateIds = zbx_objectValues($data['templates'], 'templateid');
 
-		$dbGroups = $this->get(array(
-			'output' => array('groupid'),
-			'selectHosts' => array('hostid'),
-			'selectTemplates' => array('templateid'),
+		$dbGroups = $this->get([
+			'output' => ['groupid'],
+			'selectHosts' => ['hostid'],
+			'selectTemplates' => ['templateid'],
 			'groupids' => $groupIds
-		));
+		]);
 
 		if (!$dbGroups) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
 		// Collect group IDs that will added to given hosts and templates.
-		$groupIdsToAdd = array();
+		$groupIdsToAdd = [];
 
 		// Collect group IDs that will removed from given hosts and templates.
-		$groupIdsToRemove = array();
+		$groupIdsToRemove = [];
 
 		/*
 		 * When given hosts or templates belong to other groups and those group IDs are not passed in parameters,
 		 * those groups will be removed from given hosts and templates. Collect those host and template IDs
 		 * from groups that will be removed.
 		 */
-		$objectIds = array();
+		$objectIds = [];
 
 		// Collect both given host and template IDs.
 		$currentObjectIds = array_merge($hostIds, $templateIds);
@@ -945,26 +945,26 @@ class CHostGroup extends CApiService {
 		}
 
 		// Collect both host and template IDs that also belong to given groups, but are not given in parameters.
-		$objectIdsToRemove = array();
+		$objectIdsToRemove = [];
 
 		/*
 		 * New or existing hosts have been passed in parameters. First check write permissions to hosts
 		 * and if hosts are not discovered. Then check if groups should be added and/or removed from given hosts.
 		 */
 		if ($hostIds) {
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid'),
-				'selectGroups' => array('groupid'),
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid'],
+				'selectGroups' => ['groupid'],
 				'hostids' => $hostIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			$this->validateHostsPermissions($hostIds, $dbHosts);
 
-			$this->checkValidator($hostIds, new CHostNormalValidator(array(
+			$this->checkValidator($hostIds, new CHostNormalValidator([
 				'message' => _('Cannot update groups for discovered host "%1$s".')
-			)));
+			]));
 
 			foreach ($dbHosts as $dbHost) {
 				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
@@ -1003,13 +1003,13 @@ class CHostGroup extends CApiService {
 		 * Then check if groups should be added and/or removed from given templates.
 		 */
 		if ($templateIds) {
-			$dbTemplates = API::Template()->get(array(
-				'output' => array('templateid'),
-				'selectGroups' => array('groupid'),
+			$dbTemplates = API::Template()->get([
+				'output' => ['templateid'],
+				'selectGroups' => ['groupid'],
 				'templateids' => $templateIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			$this->validateHostsPermissions($templateIds, $dbTemplates);
 
@@ -1087,25 +1087,25 @@ class CHostGroup extends CApiService {
 	 *							templates is left without a host group
 	 */
 	protected function validateMassRemove(array $data) {
-		$groupIdsToRemove = array();
-		$hostIds = isset($data['hostids']) ? $data['hostids'] : array();
-		$templateIds = isset($data['templateids']) ? $data['templateids'] : array();
-		$objectIds = array();
+		$groupIdsToRemove = [];
+		$hostIds = isset($data['hostids']) ? $data['hostids'] : [];
+		$templateIds = isset($data['templateids']) ? $data['templateids'] : [];
+		$objectIds = [];
 
 		if ($hostIds) {
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid'),
-				'selectGroups' => array('groupid'),
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid'],
+				'selectGroups' => ['groupid'],
 				'hostids' => $hostIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			$this->validateHostsPermissions($hostIds, $dbHosts);
 
-			$this->checkValidator($hostIds, new CHostNormalValidator(array(
+			$this->checkValidator($hostIds, new CHostNormalValidator([
 				'message' => _('Cannot update groups for discovered host "%1$s".')
-			)));
+			]));
 
 			foreach ($dbHosts as $dbHost) {
 				$oldGroupIds = zbx_objectValues($dbHost['groups'], 'groupid');
@@ -1124,13 +1124,13 @@ class CHostGroup extends CApiService {
 		}
 
 		if ($templateIds) {
-			$dbTemplates = API::Template()->get(array(
-				'output' => array('templateid'),
-				'selectGroups' => array('groupid'),
+			$dbTemplates = API::Template()->get([
+				'output' => ['templateid'],
+				'selectGroups' => ['groupid'],
 				'templateids' => $templateIds,
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 
 			$this->validateHostsPermissions($templateIds, $dbTemplates);
 
@@ -1203,10 +1203,10 @@ class CHostGroup extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'groupids' => $ids,
 			'countOutput' => true
-		));
+		]);
 		return count($ids) == $count;
 	}
 
@@ -1227,11 +1227,11 @@ class CHostGroup extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'groupids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return count($ids) == $count;
 	}
@@ -1246,22 +1246,22 @@ class CHostGroup extends CApiService {
 		if ($options['selectHosts'] !== null) {
 			if ($options['selectHosts'] !== API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Host()->get(array(
+				$hosts = API::Host()->get([
 					'output' => $options['selectHosts'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
-				));
+				]);
 				if (!is_null($options['limitSelects'])) {
 					order_result($hosts, 'host');
 				}
 				$result = $relationMap->mapMany($result, $hosts, 'hosts', $options['limitSelects']);
 			}
 			else {
-				$hosts = API::Host()->get(array(
+				$hosts = API::Host()->get([
 					'groupids' => $groupIds,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$hosts = zbx_toHash($hosts, 'groupid');
 				foreach ($result as $groupid => $group) {
 					if (isset($hosts[$groupid])) {
@@ -1278,22 +1278,22 @@ class CHostGroup extends CApiService {
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] !== API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'groupid', 'hostid', 'hosts_groups');
-				$hosts = API::Template()->get(array(
+				$hosts = API::Template()->get([
 					'output' => $options['selectTemplates'],
 					'templateids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
-				));
+				]);
 				if (!is_null($options['limitSelects'])) {
 					order_result($hosts, 'host');
 				}
 				$result = $relationMap->mapMany($result, $hosts, 'templates', $options['limitSelects']);
 			}
 			else {
-				$hosts = API::Template()->get(array(
+				$hosts = API::Template()->get([
 					'groupids' => $groupIds,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$hosts = zbx_toHash($hosts, 'groupid');
 				foreach ($result as $groupid => $group) {
 					if (isset($hosts[$groupid])) {
@@ -1318,24 +1318,24 @@ class CHostGroup extends CApiService {
 			));
 			$relationMap = $this->createRelationMap($discoveryRules, 'groupid', 'parent_itemid');
 
-			$discoveryRules = API::DiscoveryRule()->get(array(
+			$discoveryRules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
 		// adding group discovery
 		if ($options['selectGroupDiscovery'] !== null) {
-			$groupDiscoveries = API::getApiService()->select('group_discovery', array(
-				'output' => $this->outputExtend($options['selectGroupDiscovery'], array('groupid')),
-				'filter' => array('groupid' => $groupIds),
+			$groupDiscoveries = API::getApiService()->select('group_discovery', [
+				'output' => $this->outputExtend($options['selectGroupDiscovery'], ['groupid']),
+				'filter' => ['groupid' => $groupIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($groupDiscoveries, 'groupid', 'groupid');
 
-			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, array('groupid'),
+			$groupDiscoveries = $this->unsetExtraFields($groupDiscoveries, ['groupid'],
 				$options['selectGroupDiscovery']
 			);
 			$result = $relationMap->mapOne($result, $groupDiscoveries, 'groupDiscovery');

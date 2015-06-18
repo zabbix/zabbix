@@ -22,16 +22,16 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationGeneralInstallation extends CWebTest {
 
-	private $failIfNotExistsInstall = array(
+	private $failIfNotExistsInstall = [
 		'1. Welcome',
 		'2. Check of pre-requisites',
 		'3. Configure DB connection',
 		'4. Zabbix server details',
-		'5. Pre-Installation summary',
+		'5. Pre-installation summary',
 		'6. Install'
-	);
+	];
 
-	private $failIfNotExistsPrereq = array(
+	private $failIfNotExistsPrereq = [
 		'PHP version',
 		'PHP option memory_limit',
 		'PHP option post_max_size',
@@ -55,16 +55,16 @@ class testFormAdministrationGeneralInstallation extends CWebTest {
 		'PHP session auto start',
 		'Current value',
 		'Required'
-	);
+	];
 
-	private $failIfNotExistsDBConf = array(
+	private $failIfNotExistsDBConf = [
 		'Database type',
 		'Database host',
 		'Database port',
 		'Database name',
 		'User',
 		'Password'
-	);
+	];
 
 	public function testInstallPage() {
 		$this->zbxTestLogin();

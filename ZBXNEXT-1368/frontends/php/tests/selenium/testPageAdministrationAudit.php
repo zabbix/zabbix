@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testPageAdministrationAudit extends CWebTest {
 
-	private $actions = array(
+	private $actions = [
 		-1 => 'All',
 		AUDIT_ACTION_LOGIN => 'Login',
 		AUDIT_ACTION_LOGOUT => 'Logout',
@@ -31,9 +31,9 @@ class testPageAdministrationAudit extends CWebTest {
 		AUDIT_ACTION_DELETE => 'Delete',
 		AUDIT_ACTION_ENABLE => 'Enable',
 		AUDIT_ACTION_DISABLE => 'Disable'
-	);
+	];
 
-	private $resourcetypes = array(
+	private $resourcetypes = [
 		-1 => 'All',
 		AUDIT_RESOURCE_ACTION => 'Action',
 		AUDIT_RESOURCE_APPLICATION => 'Application',
@@ -62,7 +62,7 @@ class testPageAdministrationAudit extends CWebTest {
 		AUDIT_RESOURCE_USER => 'User',
 		AUDIT_RESOURCE_USER_GROUP => 'User group',
 		AUDIT_RESOURCE_VALUE_MAP => 'Value map'
-	);
+	];
 
 	public function testPageAdministrationAudit_CheckLayout() {
 		$this->zbxTestLogin('auditlogs.php');
@@ -71,7 +71,7 @@ class testPageAdministrationAudit extends CWebTest {
 
 		$this->zbxTestTextPresent('AUDIT LOGS');
 		$this->zbxTestTextPresent('Logs');
-		$this->zbxTestTextPresent(array('Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details'));
+		$this->zbxTestTextPresent(['Time', 'User', 'IP', 'Resource', 'Action', 'ID', 'Description', 'Details']);
 
 		// input field "User"
 		$this->assertElementPresent('alias');
@@ -84,86 +84,86 @@ class testPageAdministrationAudit extends CWebTest {
 	}
 
 	public static function auditActions() {
-		return array(
-			array('action' => AUDIT_ACTION_LOGIN, 'resourcetype' => AUDIT_RESOURCE_USER),
-			array('action' => AUDIT_ACTION_LOGOUT, 'resourcetype' => AUDIT_RESOURCE_USER),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_USER),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_USER),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_USER),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_HOST),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_HOST),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_HOST),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_HOST_GROUP),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_HOST_GROUP),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_HOST_GROUP),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_IT_SERVICE),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_IT_SERVICE),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_IT_SERVICE),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_IMAGE),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_IMAGE),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_IMAGE),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_ITEM),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ITEM),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_ITEM),
-			array('action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_ITEM),
-			array('action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_ITEM),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_TRIGGER),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_TRIGGER),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_TRIGGER),
-			array('action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_TRIGGER),
-			array('action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_TRIGGER),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_GRAPH),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_GRAPH),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_GRAPH),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_ACTION),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ACTION),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_ACTION),
-			array('action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_ACTION),
-			array('action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_ACTION),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_APPLICATION),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_APPLICATION),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_APPLICATION),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE),
-			array('action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE),
-			array('action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MACRO),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MACRO),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MACRO),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MAINTENANCE),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MAINTENANCE),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MAINTENANCE),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MAP),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MAP),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MAP),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE),
-			array('action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE),
-			array('action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_REGEXP),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_REGEXP),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_REGEXP),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCENARIO),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO),
-			array('action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO),
-			array('action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCREEN),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCREEN),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCREEN),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCRIPT),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCRIPT),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCRIPT),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW),
-			array('action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP),
-			array('action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP),
-			array('action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ZABBIX_CONFIG)
-		);
+		return [
+			['action' => AUDIT_ACTION_LOGIN, 'resourcetype' => AUDIT_RESOURCE_USER],
+			['action' => AUDIT_ACTION_LOGOUT, 'resourcetype' => AUDIT_RESOURCE_USER],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_USER],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_USER],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_USER],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_HOST],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_HOST],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_HOST],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_HOST_GROUP],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_HOST_GROUP],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_HOST_GROUP],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_IT_SERVICE],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_IT_SERVICE],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_IT_SERVICE],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_IMAGE],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_IMAGE],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_IMAGE],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_ITEM],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ITEM],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_ITEM],
+			['action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_ITEM],
+			['action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_ITEM],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_TRIGGER],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_TRIGGER],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_TRIGGER],
+			['action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_TRIGGER],
+			['action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_TRIGGER],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_GRAPH],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_GRAPH],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_GRAPH],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_ACTION],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ACTION],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_ACTION],
+			['action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_ACTION],
+			['action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_ACTION],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_APPLICATION],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
+			['action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
+			['action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_DISCOVERY_RULE],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MACRO],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MACRO],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MACRO],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MAINTENANCE],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MAINTENANCE],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MAINTENANCE],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MAP],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MAP],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MAP],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE],
+			['action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE],
+			['action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_MEDIA_TYPE],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_REGEXP],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_REGEXP],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_REGEXP],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCENARIO],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO],
+			['action' => AUDIT_ACTION_DISABLE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO],
+			['action' => AUDIT_ACTION_ENABLE, 'resourcetype' => AUDIT_RESOURCE_SCENARIO],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCREEN],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCREEN],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCREEN],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SCRIPT],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SCRIPT],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SCRIPT],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_SLIDESHOW],
+			['action' => AUDIT_ACTION_ADD, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
+			['action' => AUDIT_ACTION_DELETE, 'resourcetype' => AUDIT_RESOURCE_VALUE_MAP],
+			['action' => AUDIT_ACTION_UPDATE, 'resourcetype' => AUDIT_RESOURCE_ZABBIX_CONFIG]
+		];
 	}
 
 	/**

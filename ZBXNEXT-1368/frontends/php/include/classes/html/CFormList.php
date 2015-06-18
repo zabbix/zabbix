@@ -22,13 +22,15 @@
 class CFormList extends CList {
 
 	protected $editable = true;
-	protected $formInputs = array('ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox');
+	protected $formInputs = ['ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox'];
 
 	public function __construct($id = null) {
-		parent::__construct(null, 'table-forms');
+		parent::__construct();
+
+		$this->addClass('table-forms');
 
 		if ($id) {
-			$this->attr('id', zbx_formatDomId($id));
+			$this->setId(zbx_formatDomId($id));
 		}
 	}
 
@@ -60,25 +62,25 @@ class CFormList extends CList {
 		}
 
 		if ($description === null) {
-			$this->addItem(array(
-				new CDiv(SPACE, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-				new CDiv($label, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)),
+			$this->addItem([
+				(new CDiv(SPACE))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv($label))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
 		else {
-			$this->addItem(array(
-				new CDiv($label, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-				new CDiv($description, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)),
+			$this->addItem([
+				(new CDiv($label))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv($description))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
 	}
 
 	public function addInfo($text, $label = null) {
 		$this->addItem(
-			array(
-				new CDiv($label ? $label : _('Info'), 'dt right listInfoLabel'),
-				new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText')
-			),
+			[
+				(new CDiv($label ? $label : _('Info')))->addClass('dt right listInfoLabel'),
+				(new CDiv($text))->addClass('objectgroup inlineblock border_dotted listInfoText')
+			],
 			'formrow listInfo'
 		);
 	}

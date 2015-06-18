@@ -35,14 +35,14 @@ class CScreenSimpleGraph extends CScreenBase {
 		$graphDims['width'] = $this->screenitem['width'];
 
 		// get time control
-		$timeControlData = array(
+		$timeControlData = [
 			'id' => $this->getDataId(),
 			'containerid' => $containerid,
 			'objDims' => $graphDims,
 			'loadImage' => 1,
 			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-		);
+		];
 
 		// host feature
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && !empty($this->hostid)) {
@@ -90,7 +90,7 @@ class CScreenSimpleGraph extends CScreenBase {
 				$item = new CLink(null, 'history.php?action='.HISTORY_GRAPH.'&itemids[]='.$resourceid.'&period='.$this->timeline['period'].
 						'&stime='.$this->timeline['stimeNow']);
 			}
-			$item->setAttribute('id', $containerid);
+			$item->setId($containerid);
 
 			return $this->getOutput($item);
 		}

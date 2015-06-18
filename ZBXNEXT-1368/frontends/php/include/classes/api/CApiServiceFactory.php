@@ -21,8 +21,8 @@
 
 class CApiServiceFactory extends CRegistryFactory {
 
-	public function __construct(array $objects = array()) {
-		parent::__construct(array_merge(array(
+	public function __construct(array $objects = []) {
+		parent::__construct(array_merge([
 			// a generic API class
 			'api' => 'CApiService',
 
@@ -68,6 +68,6 @@ class CApiServiceFactory extends CRegistryFactory {
 			'usermacro' => 'CUserMacro',
 			'usermedia' => 'CUserMedia',
 			'httptest' => 'CHttpTest'
-		), $objects));
+		], $objects));
 	}
 }
