@@ -314,9 +314,21 @@ int	SERVICE_INFO(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == h_srv)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find the specified service."));
+		int	ret;
+
+		if (ZBX_SRV_PARAM_STATE == param_type)
+		{
+			SET_UI64_RESULT(result, 255);
+			ret = SYSINFO_RET_OK;
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot find the specified service."));
+			ret = SYSINFO_RET_FAIL;
+		}
+
 		CloseServiceHandle(h_mgr);
-		return SYSINFO_RET_FAIL;
+		return ret;
 	}
 
 	if (ZBX_SRV_PARAM_STATE == param_type)
