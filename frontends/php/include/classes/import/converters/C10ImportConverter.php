@@ -98,15 +98,15 @@ class C10ImportConverter extends CConverter {
 			return $content;
 		}
 
-		$templates = array();
+		$templates = [];
 		foreach ($content['hosts'] as $i => $host) {
 			// skip hosts
 			if (isset($host['status']) && $host['status'] != HOST_STATUS_TEMPLATE) {
 				continue;
 			}
 
-			$template = array();
-			foreach (array('name', 'groups', 'items', 'templates', 'triggers', 'graphs', 'macros') as $key) {
+			$template = [];
+			foreach (['name', 'groups', 'items', 'templates', 'triggers', 'graphs', 'macros'] as $key) {
 				if (isset($host[$key])) {
 					$template[$key] = $host[$key];
 				}
@@ -218,12 +218,12 @@ class C10ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertHostInterfaces(array $host) {
-		$interfaces = array();
+		$interfaces = [];
 		$i = 0;
 
 		// create an agent interface from the host properties
 		if (isset($host['useip']) && isset($host['ip']) && isset($host['dns']) && isset($host['port'])) {
-			$agentInterface = array(
+			$agentInterface = [
 				'type' => INTERFACE_TYPE_AGENT,
 				'useip' => $host['useip'],
 				'ip' => $host['ip'],
@@ -231,13 +231,13 @@ class C10ImportConverter extends CConverter {
 				'port' => $host['port'],
 				'default' => INTERFACE_PRIMARY,
 				'interface_ref' => 'if'.$i
-			);
+			];
 			$interfaces[] = $agentInterface;
 			$i++;
 		}
 
 		$hasIpmiItem = false;
-		$snmpItems = array();
+		$snmpItems = [];
 
 		if (isset($host['items']) && $host['items']) {
 			foreach ($host['items'] as $item) {
@@ -256,7 +256,7 @@ class C10ImportConverter extends CConverter {
 
 			// if a least one IPMI item exists on a host, create an IPMI interface
 			if ($hasIpmiItem) {
-				$ipmiInterface = array(
+				$ipmiInterface = [
 					'type' => INTERFACE_TYPE_IPMI,
 					'useip' => INTERFACE_USE_IP,
 					'ip' => (array_key_exists('ipmi_ip', $host) && $host['ipmi_ip'] !== '')
@@ -266,20 +266,20 @@ class C10ImportConverter extends CConverter {
 						? $host['ipmi_port'] : '623',
 					'default' => INTERFACE_PRIMARY,
 					'interface_ref' => 'if'.$i
-				);
+				];
 				$interfaces[] = $ipmiInterface;
 				$i++;
 			}
 
 			// if SNMP item exist, create an SNMP interface for each SNMP item port.
 			if ($snmpItems) {
-				$snmpInterfaces = array();
+				$snmpInterfaces = [];
 				foreach ($snmpItems as $item) {
 					if (!isset($item['snmp_port']) || isset($snmpInterfaces[$item['snmp_port']])) {
 						continue;
 					}
 
-					$snmpInterface = array(
+					$snmpInterface = [
 						'type' => INTERFACE_TYPE_SNMP,
 						'useip' => $host['useip'],
 						'ip' => $host['ip'],
@@ -287,7 +287,7 @@ class C10ImportConverter extends CConverter {
 						'port' => $item['snmp_port'],
 						'default' => (count($snmpInterfaces)) ? INTERFACE_SECONDARY : INTERFACE_PRIMARY,
 						'interface_ref' => 'if'.$i
-					);
+					];
 					$snmpInterfaces[$item['snmp_port']] = $snmpInterface;
 					$interfaces[] = $snmpInterface;
 					$i++;
@@ -436,7 +436,7 @@ class C10ImportConverter extends CConverter {
 			return $content;
 		}
 
-		$groups = array();
+		$groups = [];
 
 		foreach ($content['groups'] as $group) {
 			$groups[$group['name']] = $group;
@@ -487,7 +487,7 @@ class C10ImportConverter extends CConverter {
 		}
 
 		// build a description-expression trigger index with references to the triggers in the content
-		$descriptionExpressionIndex = array();
+		$descriptionExpressionIndex = [];
 		foreach ($content['hosts'] as $hostKey => $host) {
 			if (!isset($host['triggers']) || !$host['triggers']) {
 				continue;
@@ -575,9 +575,9 @@ class C10ImportConverter extends CConverter {
 			return $content;
 		}
 
-		$existingTriggers = array();
+		$existingTriggers = [];
 
-		$filteredTriggers = array();
+		$filteredTriggers = [];
 		foreach ($content['triggers'] as $trigger) {
 			$name = $trigger['name'];
 			$expression = $trigger['expression'];
@@ -629,7 +629,7 @@ class C10ImportConverter extends CConverter {
 		foreach ($host['items'] as $item) {
 			if (isset($item['applications']) && $item['applications'] !== '') {
 				foreach ($item['applications'] as $application) {
-					$host['applications'][] = array('name' => $application);
+					$host['applications'][] = ['name' => $application];
 				}
 			}
 		}
@@ -725,10 +725,10 @@ class C10ImportConverter extends CConverter {
 			$host = $hostName;
 		}
 
-		$array[$key] = array(
+		$array[$key] = [
 			'host' => $host,
 			'key' => $this->itemKeyConverter->convert($itemKey)
-		);
+		];
 
 		return $array;
 	}
@@ -747,9 +747,9 @@ class C10ImportConverter extends CConverter {
 			return $content;
 		}
 
-		$existingGraphs = array();
+		$existingGraphs = [];
 
-		$filteredGraphs = array();
+		$filteredGraphs = [];
 		foreach ($content['graphs'] as $graph) {
 			$name = $graph['name'];
 			$graphItems = $graph['graph_items'];
@@ -895,7 +895,7 @@ class C10ImportConverter extends CConverter {
 	 * @return array    $target array with the new values
 	 */
 	protected function mergeTo(array $source, array $target, $key) {
-		$values = (isset($target[$key])) ? $target[$key] : array();
+		$values = (isset($target[$key])) ? $target[$key] : [];
 
 		foreach ($source as $sourceItem) {
 			if (!isset($sourceItem[$key]) || !$sourceItem[$key]) {

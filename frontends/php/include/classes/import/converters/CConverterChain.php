@@ -29,7 +29,7 @@ class CConverterChain  {
 	 *
 	 * @var CConverter[]
 	 */
-	protected $converters = array();
+	protected $converters = [];
 
 	/**
 	 * Convert the data starting from the converter given in $startFrom.

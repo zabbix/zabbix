@@ -18,27 +18,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$httpWidget = (new CWidget())->setTitle(_('Web monitoring'));
-
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addVar('hostid', $this->data['hostid']);
-
-$controls = new CList();
-$controls->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$controls->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-
 if (empty($this->data['hostid'])) {
-	$createButton = new CSubmit('form', _('Create web scenario (select host first)'));
-	$createButton->setEnabled(false);
-	$controls->addItem($createButton);
+	$create_button = (new CSubmit('form', _('Create web scenario (select host first)')))->setEnabled(false);
 }
 else {
-	$controls->addItem(new CSubmit('form', _('Create web scenario')));
-	$httpWidget->addItem(get_header_host_table('web', $this->data['hostid']));
+	$create_button = new CSubmit('form', _('Create web scenario'));
 }
 
-$createForm->addItem($controls);
-$httpWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Web monitoring'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('hostid', $this->data['hostid'])
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem([_('Host'), SPACE, $this->data['pageFilter']->getHostsCB()])
+			->addItem($create_button)
+		)
+	);
+
+if (!empty($this->data['hostid'])) {
+	$widget->addItem(get_header_host_table('web', $this->data['hostid']));
+}
 
 // create form
 $httpForm = new CForm();
@@ -46,10 +47,10 @@ $httpForm->setName('scenarios');
 $httpForm->addVar('hostid', $this->data['hostid']);
 
 $httpTable = new CTableInfo();
-$httpTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_httptests', null, "checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');"),
-		'cell-width'),
+$httpTable->setHeader([
+	(new CColHeader(
+		(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	($this->data['hostid'] == 0)
 		? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
 		: null,
@@ -62,16 +63,18 @@ $httpTable->setHeader(array(
 	_('Application'),
 	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 	$this->data['showInfoColumn'] ? _('Info') : null
-));
+]);
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $httpTests = $this->data['httpTests'];
 
 foreach ($httpTests as $httpTestId => $httpTest) {
-	$name = array();
+	$name = [];
 	if (isset($this->data['parentTemplates'][$httpTestId])) {
 		$template = $this->data['parentTemplates'][$httpTestId];
-		$name[] = new CLink($template['name'], '?groupid=0&hostid='.$template['id'], ZBX_STYLE_GREY);
+		$name[] = (new CLink($template['name'], '?groupid=0&hostid='.$template['id']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($httpTest['name'], '?form=update'.'&httptestid='.$httpTestId.'&hostid='.$httpTest['hostid']);
@@ -92,8 +95,10 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				)
 				: _s('Unknown step failed: %1$s', $lastData['error']);
 
-			$infoIcon = new CDiv(SPACE, 'status_icon iconerror');
-			$infoIcon->setHint($errorMessage, ZBX_STYLE_RED);
+			$infoIcon = (new CDiv(SPACE))
+				->addClass('status_icon')
+				->addClass('iconerror')
+				->setHint($errorMessage, ZBX_STYLE_RED);
 		}
 		else {
 			$infoIcon = '';
@@ -103,8 +108,8 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$infoIcon = null;
 	}
 
-	$httpTable->addRow(array(
-		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', null, null, $httpTest['httptestid']),
+	$httpTable->addRow([
+		new CCheckBox('group_httptestid['.$httpTest['httptestid'].']', $httpTest['httptestid']),
 		($this->data['hostid'] > 0) ? null : $httpTest['hostname'],
 		$name,
 		$httpTest['stepscnt'],
@@ -112,41 +117,41 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 		$httpTest['retries'],
 		httptest_authentications($httpTest['authentication']),
 		($httpTest['http_proxy'] !== '') ? _('Yes') : _('No'),
-		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '-',
-		new CLink(
+		($httpTest['applicationid'] != 0) ? $httpTest['application_name'] : '',
+		(new CLink(
 			httptest_status2str($httpTest['status']),
 			'?group_httptestid[]='.$httpTest['httptestid'].
 				'&hostid='.$httpTest['hostid'].
 				'&action='.($httpTest['status'] == HTTPTEST_STATUS_DISABLED
 					? 'httptest.massenable'
 					: 'httptest.massdisable'
-				),
-			ZBX_STYLE_LINK_ACTION.' '.httptest_status2style($httpTest['status'])
-		),
+				)))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(httptest_status2style($httpTest['status'])),
 		$infoIcon
-	));
+	]);
 }
 
 zbx_add_post_js('cookie.prefix = "'.$this->data['hostid'].'";');
 
 // append table to form
-$httpForm->addItem(array(
+$httpForm->addItem([
 	$httpTable,
 	$this->data['paging'],
 	new CActionButtonList('action', 'group_httptestid',
-		array(
-			'httptest.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')),
-			'httptest.massdisable' => array('name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')),
-			'httptest.massclearhistory' => array('name' => _('Clear history'),
+		[
+			'httptest.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected web scenarios?')],
+			'httptest.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected web scenarios?')],
+			'httptest.massclearhistory' => ['name' => _('Clear history'),
 				'confirm' => _('Delete history of selected web scenarios?')
-			),
-			'httptest.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?'))
-		),
+			],
+			'httptest.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected web scenarios?')]
+		],
 		$this->data['hostid']
 	)
-));
+]);
 
 // append form to widget
-$httpWidget->addItem($httpForm);
+$widget->addItem($httpForm);
 
-return $httpWidget;
+return $widget;

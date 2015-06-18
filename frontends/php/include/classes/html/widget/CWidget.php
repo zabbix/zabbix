@@ -31,18 +31,10 @@ class CWidget {
 	 *
 	 * @var array
 	 */
-	protected $body = array();
+	protected $body = [];
 
-	/**
-	 * The class of the root div element.
-	 *
-	 * @var string
-	 */
-	protected $rootClass;
-
-	public function __construct($rootClass = null) {
+	public function __construct() {
 		$this->css_class = 'header_wide';
-		$this->setRootClass($rootClass);
 	}
 
 	public function setClass($class = null) {
@@ -68,7 +60,7 @@ class CWidget {
 	public function addHeader($left = SPACE, $right = SPACE) {
 		zbx_value2array($right);
 
-		$this->headers[] = array('left' => $left, 'right' => $right);
+		$this->headers[] = ['left' => $left, 'right' => $right];
 
 		return $this;
 	}
@@ -82,7 +74,7 @@ class CWidget {
 	}
 
 	public function get() {
-		$widget = array();
+		$widget = [];
 		if ($this->title !== null || $this->controls !== null) {
 			$widget[] = $this->createTopHeader();
 		}
@@ -90,7 +82,7 @@ class CWidget {
 			$widget[] = $this->createHeader();
 		}
 
-		return array($widget, $this->body);
+		return [$widget, $this->body];
 	}
 
 	public function show() {
@@ -104,19 +96,19 @@ class CWidget {
 	}
 
 	private function createTopHeader() {
-		$body = array(new CTag('h1', 'yes', $this->title), $this->controls);
+		$body = [new CTag('h1', true, $this->title), $this->controls];
 
-		return new CDiv($body, 'header-title');
+		return (new CDiv($body))->addClass('header-title');
 	}
 
 	private function createHeader() {
 		$header = reset($this->headers);
 
-		$columnRights = array();
+		$columnRights = [];
 
 		if (!is_null($header['right'])) {
 			foreach ($header['right'] as $right) {
-				$columnRights[] = new CDiv($right, 'floatright');
+				$columnRights[] = (new CDiv($right))->addClass('floatright');
 			}
 		}
 
@@ -125,13 +117,15 @@ class CWidget {
 		}
 
 		// header table
-		$table = new CTable(null, $this->css_class.' maxwidth');
+		$table = (new CTable())
+			->addClass($this->css_class)
+			->addClass('maxwidth');
 		$table->setCellSpacing(0);
 		$table->setCellPadding(1);
 		$table->addRow($this->createHeaderRow($header['left'], $columnRights), 'first');
 
 		if ($this->css_class != 'header_wide') {
-			$table->addClass('ui-widget-header ui-corner-all');
+			$table->addClass('ui-widget-header');
 		}
 
 		foreach ($this->headers as $num => $header) {
@@ -144,16 +138,15 @@ class CWidget {
 	}
 
 	private function createHeaderRow($col1, $col2 = SPACE) {
-		$td_r = new CCol($col2, 'header_r right');
-		$row = array(new CCol($col1, 'header_l left'), $td_r);
+		$td_r = (new CCol($col2))
+			->addClass('header_r')
+			->addClass('right');
+		$row = [
+			(new CCol($col1))
+				->addClass('header_l')
+				->addClass('left'),
+			$td_r
+		];
 		return $row;
-	}
-
-	public function setRootClass($rootClass) {
-		$this->rootClass = $rootClass;
-	}
-
-	public function getRootClass() {
-		return $this->rootClass;
 	}
 }

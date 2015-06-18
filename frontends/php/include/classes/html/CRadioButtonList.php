@@ -34,7 +34,8 @@ class CRadioButtonList extends CDiv {
 		$this->name = $name;
 		$this->value = $value;
 		$this->orientation = self::ORIENTATION_HORIZONTAL;
-		parent::__construct(null, null, $name);
+		parent::__construct();
+		$this->setId($name);
 	}
 
 	public function addValue($name, $value, $checked = null, $id = null) {
@@ -44,14 +45,14 @@ class CRadioButtonList extends CDiv {
 			$id = zbx_formatDomId($this->name).'_'.$this->count;
 		}
 
-		$radio = new CInput('radio', $this->name, $value, null, $id);
+		$radio = (new CInput('radio', $this->name, $value))->setId($id);
 		if (strcmp($value, $this->value) == 0 || !is_null($checked) || $checked) {
-			$radio->attr('checked', 'checked');
+			$radio->setAttribute('checked', 'checked');
 		}
 
 		$label = new CLabel($name, $id);
 
-		$outerDiv = new CDiv(array($radio, $label));
+		$outerDiv = new CDiv([$radio, $label]);
 		if ($this->orientation == self::ORIENTATION_HORIZONTAL) {
 			$outerDiv->addClass('inlineblock');
 		}

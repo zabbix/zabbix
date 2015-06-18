@@ -39,7 +39,7 @@ class C10TriggerConverter extends CConverter {
 	protected $itemKeyConverter;
 
 	public function __construct() {
-		$this->functionMacroParser = new CFunctionMacroParser(array('18_simple_checks' => true));
+		$this->functionMacroParser = new CFunctionMacroParser(['18_simple_checks' => true]);
 		$this->itemKeyConverter = new C10ItemKeyConverter();
 	}
 

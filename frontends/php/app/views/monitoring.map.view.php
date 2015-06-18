@@ -27,10 +27,12 @@ $headerMapForm->cleanItems();
 $controls = new CList();
 
 if ($data['maps']) {
-	$mapTable = new CTable(null, 'map map-container');
-	$mapTable->setAttribute('style', 'margin-top: 4px;');
+	$mapTable = (new CTable())
+		->addClass('map')
+		->addClass('container')
+		->setAttribute('style', 'margin-top: 4px;');
 
-	$maps = array();
+	$maps = [];
 	foreach ($data['maps'] as $sysmapid => $map) {
 		$maps[$sysmapid] = $map['name'];
 	}
@@ -38,11 +40,11 @@ if ($data['maps']) {
 	$headerMapForm->addVar('action', 'map.view');
 	$headerMapForm->addVar('fullscreen', $data['fullscreen']);
 
-	$controls->addItem(array(_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)));
-	$controls->addItem(array(_('Minimum severity').SPACE, $data['pageFilter']->getSeveritiesMinCB()));
+	$controls->addItem([_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)]);
+	$controls->addItem([_('Minimum severity').SPACE, $data['pageFilter']->getSeveritiesMinCB()]);
 
 	// get map parent maps
-	$parentMaps = array();
+	$parentMaps = [];
 	foreach (getParentMaps($data['sysmapid']) as $parent) {
 		// check for permissions
 		if (isset($data['maps'][$parent['sysmapid']])) {
@@ -55,7 +57,7 @@ if ($data['maps']) {
 		$controls->addItem($parentMaps);
 	}
 
-	$actionMap = getActionMapBySysmap($data['map'], array('severity_min' => $data['severity_min']));
+	$actionMap = getActionMapBySysmap($data['map'], ['severity_min' => $data['severity_min']]);
 
 	$mapTable->addRow($actionMap);
 
@@ -63,20 +65,24 @@ if ($data['maps']) {
 	$imgMap->setMap($actionMap->getName());
 	$mapTable->addRow($imgMap);
 
-	$controls->addItem(get_icon('favourite', array(
+	$controls->addItem(get_icon('favourite', [
 		'fav' => 'web.favorite.sysmapids',
 		'elname' => 'sysmapid',
 		'elid' => $data['sysmapid']
-	)));
+	]));
 }
 else {
-	$mapTable = new CTable(_('No maps found.'), 'map map-container');
-	$mapTable->setAttribute('style', 'margin-top: 4px;');
+	$mapTable = (new CTable())
+		->setNoDataMessage(_('No maps found.'))
+		->addClass('map')
+		->addClass('map-container')
+		->setAttribute('style', 'margin-top: 4px;');
 }
 
-$controls->addItem(get_icon('fullscreen', array('fullscreen' => $data['fullscreen'])));
+$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
 $headerMapForm->addItem($controls);
-$mapWidget->setControls($headerMapForm)->
-	addItem((new CDiv(null, 'table-forms-container'))->addItem($mapTable))->
-	show();
+$mapWidget->setControls($headerMapForm)
+	->addItem((new CDiv())->addClass('table-forms-container'))
+	->addItem($mapTable)
+	->show();

@@ -56,16 +56,16 @@ class testPageItemPrototypes extends CWebTest {
 
 		// Header
 		$this->zbxTestTextPresent(
-			array('Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Applications', 'Status')
+			['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Applications', 'Status']
 		);
 		$this->zbxTestTextNotPresent('Error');
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 
-		$this->zbxTestDropdownHasOptions('action', array(
+		$this->zbxTestDropdownHasOptions('action', [
 			'Enable selected',
 			'Disable selected',
 			'Delete selected'
-		));
+		]);
 	}
 
 	/**

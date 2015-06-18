@@ -23,29 +23,16 @@ $pageHeader = new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 
 $pageHeader->addCssInit();
 $pageHeader->display();
 
-?>
-<body>
-<?php
+$buttons = array_key_exists('buttons', $data)
+	? $data['buttons']
+	: [(new CButton(null, _('Retry')))->onClick('document.location.reload();')];
 
-// check if a CWarning object is passed
-if (!$warning = $this->get('warning')) {
-	$message = $this->get('message');
+echo '<body>';
 
-	if (is_array($message) && isset($message['header'])) {
-		$message = array(bold($message['header']), BR(), $message['text']);
-	}
+(new CDiv(new CWarning($data['header'], $data['messages'], $buttons)))
+	->addClass(ZBX_STYLE_ARTICLE)
+	->show();
 
-	// if not - render a standard warning with a message
-	$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $message);
-	$warning->setButtons(array(new CButton('login', _('Retry'), 'document.location.reload();')));
-}
-
-$warning->show();
-
-?>
-<script type="text/javascript">
-	setTimeout('document.location.reload();', 30000);
-</script>
-
-</body>
-</html>
+echo get_js("setTimeout('document.location.reload();', 30000);");
+echo '</body>';
+echo '</html>';

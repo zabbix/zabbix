@@ -21,11 +21,9 @@
 
 class CRowHeader extends CTag {
 
-	public function __construct($item = null, $class = null, $id = null) {
-		parent::__construct('tr', 'yes');
+	public function __construct($item = null) {
+		parent::__construct('tr', true);
 		$this->addItem($item);
-		$this->attr('class', $class);
-		$this->attr('id', $id);
 	}
 
 	public function addItem($item) {

@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
-$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
+$widget = (new CWidget())->setTitle(_('Discovery rules'));
 
 // create form
 $discoveryForm = new CForm();
@@ -34,7 +34,7 @@ if (!empty($this->data['druleid'])) {
 // create form list
 $discoveryFormList = new CFormList();
 $nameTextBox = new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->attr('autofocus', 'autofocus');
+$nameTextBox->setAttribute('autofocus', 'autofocus');
 $discoveryFormList->addRow(_('Name'), $nameTextBox);
 
 // append proxy to form list
@@ -48,31 +48,39 @@ $discoveryFormList->addRow(_('IP range'), new CTextBox('iprange', $this->data['d
 $discoveryFormList->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
 
 // append checks to form list
-$checkTable = new CTable(null, 'formElementTable');
-$checkTable->addRow(new CRow(
-	new CCol(
-		new CButton('newCheck', _('New'), null, 'link_menu'),
-		null,
-		2
-	),
-	null,
-	'dcheckListFooter'
-));
+$checkTable = (new CTable())->addClass('formElementTable');
+$checkTable->addRow((
+	new CRow(
+		(new CCol(
+			(new CButton('newCheck', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
+		))->setColSpan(2)
+	)
+)->setId('dcheckListFooter'));
 $discoveryFormList->addRow(_('Checks'),
-	new CDiv($checkTable, 'objectgroup inlineblock border_dotted ui-corner-all', 'dcheckList'));
+	(new CDiv($checkTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+		->setId('dcheckList')
+);
 
 // append uniqueness criteria to form list
 $uniquenessCriteriaRadio = new CRadioButtonList('uniqueness_criteria', $this->data['drule']['uniqueness_criteria']);
 $uniquenessCriteriaRadio->addValue(SPACE._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
 $discoveryFormList->addRow(_('Device uniqueness criteria'),
-	new CDiv($uniquenessCriteriaRadio, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
+	(new CDiv($uniquenessCriteriaRadio))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+		->setId('uniqList')
+);
 
 // append status to form list
 $status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))
 	? true
 	: ($this->data['drule']['status'] == DRULE_STATUS_ACTIVE);
 
-$discoveryFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 1));
+$discoveryFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
 
 // append tabs to form
 $discoveryTabs = new CTabView();
@@ -83,21 +91,22 @@ if (isset($this->data['druleid']))
 {
 	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid')),
 			new CButtonCancel()
-		)
+		]
 	));
 }
 else {
 	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel())
+		[new CButtonCancel()]
 	));
 }
 
 $discoveryForm->addItem($discoveryTabs);
-$discoveryWidget->addItem($discoveryForm);
 
-return $discoveryWidget;
+$widget->addItem($discoveryForm);
+
+return $widget;

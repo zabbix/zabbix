@@ -23,12 +23,14 @@ class CComboBox extends CTag {
 
 	public $value;
 
-	public function __construct($name = 'combobox', $value = null, $action = null, array $items = array()) {
-		parent::__construct('select', 'yes');
-		$this->attr('id', zbx_formatDomId($name));
-		$this->attr('name', $name);
+	public function __construct($name = 'combobox', $value = null, $action = null, array $items = []) {
+		parent::__construct('select', true);
+		$this->setId(zbx_formatDomId($name));
+		$this->setAttribute('name', $name);
 		$this->value = $value;
-		$this->attr('onchange', $action);
+		if ($action !== null) {
+			$this->onChange($action);
+		}
 		$this->addItems($items);
 
 		// Prevent Firefox remembering selected option on page refresh.
@@ -97,7 +99,7 @@ class CComboBox extends CTag {
 			$this->removeAttribute('disabled');
 		}
 		else {
-			$this->attr('disabled', 'disabled');
+			$this->setAttribute('disabled', 'disabled');
 		}
 	}
 }
@@ -105,7 +107,7 @@ class CComboBox extends CTag {
 class COptGroup extends CTag {
 
 	public function __construct($label) {
-		parent::__construct('optgroup', 'yes');
+		parent::__construct('optgroup', true);
 		$this->setAttribute('label', $label);
 	}
 }

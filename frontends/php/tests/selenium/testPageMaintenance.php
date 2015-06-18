@@ -38,11 +38,11 @@ class testPageMaintenance extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF MAINTENANCE PERIODS');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
-		$this->zbxTestTextPresent(array('Name', 'Type', 'State', 'Description'));
+		$this->zbxTestTextPresent(['Name', 'Type', 'State', 'Description']);
 		$this->zbxTestTextPresent($maintenance['name']);
 		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NORMAL)	$this->zbxTestTextPresent('With data collection');
 		if ($maintenance['maintenance_type'] == MAINTENANCE_TYPE_NODATA)	$this->zbxTestTextPresent('No data collection');
-		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', ['Delete selected']);
 	}
 
 	/**

@@ -26,12 +26,15 @@ $filterForm = new CFilter('web.auditacts.filter.state');
 $filterColumn = new CFormList();
 $filterColumn->addRow(
 	_('Recipient'),
-	array (
+	[
 		new CTextBox('alias', $this->data['alias'], 20),
-		new CButton('btn1', _('Select'), 'return PopUp("popup.php?dstfrm=zbx_filter'.
-			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
-		)
-	)
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('btn1', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.php?dstfrm=zbx_filter'.
+				'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
+			)
+	]
 );
 
 $filterForm->addColumn($filterColumn);
@@ -44,7 +47,7 @@ $auditForm->setName('auditForm');
 
 // create table
 $auditTable = new CTableInfo();
-$auditTable->setHeader(array(
+$auditTable->setHeader([
 	_('Time'),
 	_('Action'),
 	_('Type'),
@@ -52,29 +55,29 @@ $auditTable->setHeader(array(
 	_('Message'),
 	_('Status'),
 	_('Info')
-));
+]);
 
 foreach ($this->data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
 
 	if ($alert['status'] == ALERT_STATUS_SENT) {
 		$status = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
-			? new CSpan(_('Sent'), ZBX_STYLE_GREEN)
-			: new CSpan(_('Executed'), ZBX_STYLE_GREEN);
+			? (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN)
+			: (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 	}
 	elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-		$status = new CSpan(array(
+		$status = (new CSpan([
 			_('In progress').':',
 			BR(),
 			_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-		), ZBX_STYLE_ORANGE);
+		]))->addClass(ZBX_STYLE_ORANGE);
 	}
 	else {
-		$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
+		$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 	}
 
 	$message = ($alert['alerttype'] == ALERT_TYPE_MESSAGE)
-		? array(
+		? [
 			bold(_('Subject').':'),
 			BR(),
 			$alert['subject'],
@@ -83,41 +86,43 @@ foreach ($this->data['alerts'] as $alert) {
 			bold(_('Message').':'),
 			BR(),
 			zbx_nl2br($alert['message'])
-		)
-		: array(
+		]
+		: [
 			bold(_('Command').':'),
 			BR(),
 			zbx_nl2br($alert['message'])
-		);
+		];
 
 	if (zbx_empty($alert['error'])) {
 		$info = '';
 	}
 	else {
-		$info = new CDiv(SPACE, 'status_icon iconerror');
-		$info->setHint($alert['error'], ZBX_STYLE_RED);
+		$info = (new CDiv(SPACE))
+			->addClass('status_icon')
+			->addClass('iconerror')
+			->setHint($alert['error'], ZBX_STYLE_RED);
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])
-		? array(bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), $alert['sendto'])
+		? [bold(getUserFullname($this->data['users'][$alert['userid']])), BR(), $alert['sendto']]
 		: $alert['sendto'];
 
-	$auditTable->addRow(array(
-		new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
-		new CCol($this->data['actions'][$alert['actionid']]['name']),
-		new CCol(($mediatype) ? $mediatype['description'] : '-'),
-		new CCol($recipient),
-		new CCol($message),
-		new CCol($status),
-		new CCol($info)
-	));
+	$auditTable->addRow([
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+		$this->data['actions'][$alert['actionid']]['name'],
+		($mediatype) ? $mediatype['description'] : '',
+		$recipient,
+		$message,
+		$status,
+		$info
+	]);
 }
 
 // append table to form
-$auditForm->addItem(array($auditTable, $this->data['paging']));
+$auditForm->addItem([$auditTable, $this->data['paging']]);
 
 // append navigation bar js
-$objData = array(
+$objData = [
 	'id' => 'timeline_1',
 	'domid' => 'events',
 	'loadSBox' => 0,
@@ -127,7 +132,7 @@ $objData = array(
 	'mainObject' => 1,
 	'periodFixed' => CProfile::get('web.auditacts.timelinefixed', 1),
 	'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-);
+];
 zbx_add_post_js('timeControl.addObject("events", '.zbx_jsvalue($data['timeline']).', '.zbx_jsvalue($objData).');');
 zbx_add_post_js('timeControl.processObjects();');
 
