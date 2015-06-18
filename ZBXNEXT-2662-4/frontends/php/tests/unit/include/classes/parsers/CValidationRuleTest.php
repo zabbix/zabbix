@@ -58,6 +58,11 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 					'fatal' => true
 				]
 			],
+			['int32', '',
+				[
+					'int32' => true
+				]
+			],
 			['db hosts.name', '',
 				[
 					'db' => [
@@ -82,6 +87,13 @@ class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 						'table' => 'interface',
 						'field' => 'ip'
 					]
+				]
+			],
+			['fatal|required|int32', '',
+				[
+					'fatal' => true,
+					'required' => true,
+					'int32' => true
 				]
 			],
 			['fatal|required|json', '',

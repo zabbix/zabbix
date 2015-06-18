@@ -52,8 +52,6 @@ $fields = [
 	'txt_select' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'inventory' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	// ajax
-	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","lastchange","priority"'),	null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -68,18 +66,6 @@ if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid'
 }
 if (getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.tr_status.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 /*
@@ -229,6 +215,7 @@ $triggerWidget->setControls($rightForm);
 $filterFormView = new CView('common.filter.trigger', [
 	'overview' => false,
 	'filter' => [
+		'filterid' => 'web.tr_status.filter.state',
 		'showTriggers' => $showTriggers,
 		'ackStatus' => $ackStatus,
 		'showEvents' => $showEvents,

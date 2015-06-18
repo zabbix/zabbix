@@ -41,9 +41,7 @@ $fields = [
 	'filter_rst'=>			[T_ZBX_STR,	O_OPT,	P_SYS,			null,		null],
 	'filter_set' =>			[T_ZBX_STR,	O_OPT,	P_SYS,			null,		null],
 	'filter_timesince' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null],
-	'filter_timetill' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null],
-	// ajax
-	'filterState' =>		[T_ZBX_INT,	O_OPT,	P_ACT,			null,		null]
+	'filter_timetill' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null]
 ];
 check_fields($fields);
 
@@ -78,17 +76,6 @@ else {
 }
 if (getRequest('triggerid') && !API::Trigger()->isReadable([$_REQUEST['triggerid']])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.avail_report.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 /*
