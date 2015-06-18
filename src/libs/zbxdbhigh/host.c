@@ -1896,12 +1896,14 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		id;
-	zbx_vector_uint64_t	applicationids, apptemplateids;
+	zbx_vector_uint64_t	applicationids, apptemplateids, druleids;
+	int			index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&applicationids);
 	zbx_vector_uint64_create(&apptemplateids);
+	zbx_vector_uint64_create(&druleids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.application_templateid,t.applicationid"
@@ -1926,23 +1928,96 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 	}
 	DBfree_result(result);
 
-	if (0 == apptemplateids.values_num)
-		goto out;
+	if (0 != apptemplateids.values_num)
+	{
+		zbx_vector_uint64_sort(&apptemplateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_uint64_sort(&apptemplateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_sort(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_uint64_sort(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&applicationids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		sql_offset = 0;
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from application_template where");
+		DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_templateid",
+				apptemplateids.values, apptemplateids.values_num);
+
+		DBexecute("%s", sql);
+
+		DBdelete_applications(&applicationids);
+	}
+
+	/* remove applications created by prototypes of the unlinked templates */
+
+	/* get the discovery rules */
 
 	sql_offset = 0;
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from application_template where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "application_templateid",
-			apptemplateids.values, apptemplateids.values_num);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select i.itemid from items i"
+			" left join items ti on i.templateid=ti.itemid"
+			" where i.hostid=" ZBX_FS_UI64
+				" and i.flags=%d and",
+			hostid, ZBX_FLAG_DISCOVERY_RULE);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
+	DBselect_uint64(sql, &druleids);
+
+	if (0 == druleids.values_num)
+		goto out;
+
+	/* get the applications discovered by those rules */
+
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select ad.applicationid"
+			" from application_discovery ad"
+			" left join application_prototype ap"
+				" on ap.application_prototypeid=ad.application_prototypeid"
+			" where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ap.itemid", druleids.values, druleids.values_num);
+
+	zbx_vector_uint64_clear(&applicationids);
+	DBselect_uint64(sql, &applicationids);
+
+	if (0 == applicationids.values_num)
+		goto out;
+
+	/* check if the applications are not discovered by other discovery rules */
+
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+			"select ad.applicationid"
+			" from application_discovery ad"
+			" left join application_prototype ap"
+				" on ad.application_prototypeid=ap.application_prototypeid"
+			" where not");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ap.itemid", druleids.values, druleids.values_num);
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ad.applicationid", applicationids.values,
+			applicationids.values_num);
+
+	result = DBselect("%s", sql);
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		ZBX_STR2UINT64(id, row[0]);
+
+		if (FAIL != (index = zbx_vector_uint64_bsearch(&applicationids, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+			zbx_vector_uint64_remove(&applicationids, index);
+	}
+
+	DBfree_result(result);
+
+	if (0 == applicationids.values_num)
+		goto out;
+
+	/* discovered applications must be always removed, that's why we are  */
+	/* doing it directly instead of using DBdelete_applications()         */
+	sql_offset = 0;
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "delete from applications where");
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "applicationid", applicationids.values
+			, applicationids.values_num);
 	DBexecute("%s", sql);
-
-	DBdelete_applications(&applicationids);
 out:
+	zbx_vector_uint64_destroy(&druleids);
 	zbx_vector_uint64_destroy(&apptemplateids);
 	zbx_vector_uint64_destroy(&applicationids);
 	zbx_free(sql);
