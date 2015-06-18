@@ -1066,7 +1066,7 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
  *                                                                            *
  * Parameters: hostid          - [IN] parent host id                          *
  *             item_prototypes - [IN] item prototypes                         *
- *             items           - [IN] items to save                           *
+ *             items           - [IN/OUT] items to save                       *
  *                                                                            *
  ******************************************************************************/
 static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_prototypes, zbx_vector_ptr_t *items)
@@ -1472,7 +1472,7 @@ out:
  * Function: lld_applications_save                                            *
  *                                                                            *
  * Parameters: hostid                 - [IN] host id                          *
- *             applications           - [IN] applications to save             *
+ *             applications           - [IN/OUT] applications to save         *
  *             application_prototypes - [IN] the application prototypes       *
  *                                                                            *
  ******************************************************************************/

@@ -441,6 +441,7 @@ function copyItems($srcHostId, $dstHostId) {
 
 	return API::Item()->create($srcItems);
 }
+
 /**
  * Copy applications to a different host.
  *
