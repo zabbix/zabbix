@@ -1325,6 +1325,11 @@ input {
 		@extend %form-input-style;
 	}
 
+	&[type="file"] {
+		padding: 1px 1px;
+		@extend %form-input-style;
+	}
+
 	&[type="checkbox"] {
 		@extend %form-check-radio-style;
 	}
