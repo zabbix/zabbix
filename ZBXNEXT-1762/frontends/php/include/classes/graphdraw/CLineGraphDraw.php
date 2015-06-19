@@ -1274,25 +1274,25 @@ class CLineGraphDraw extends CGraphDraw {
 		$timeInterval = ($this->gridPixels * $this->period) / $this->sizeX;
 		$intervals = [
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN],			// 1 hour and 1 minute
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_TWO_MIN],		// 1 hour and 2 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_FIVE_MIN],	// 1 hour and 5 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_FIFTEEN_MIN],	// 1 hour and 15 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_THIRTY_MIN],	// 1 hour and 30 minutes
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 2],		// 1 hour and 2 minutes
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 5],		// 1 hour and 5 minutes
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 15],	// 1 hour and 15 minutes
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 30],	// 1 hour and 30 minutes
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR],			// 1 day and 1 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_THREE_HOUR],	// 1 day and 3 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_SIX_HOUR],		// 1 day and 6 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_TWELVE_HOUR],	// 1 day and 12 hours
+			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 3],		// 1 day and 3 hours
+			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],		// 1 day and 6 hours
+			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],	// 1 day and 12 hours
 			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],			// 1 week and 1 day
-			['main' => SEC_PER_TWO_WEEK, 'sub' => SEC_PER_WEEK],	// 2 weeks and 1 week
-			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_HALF_MONTH],	// 30 days and 15 days
-			['main' => SEC_PER_HALF_YEAR, 'sub' => SEC_PER_MONTH],	// half year and 30 days
+			['main' => SEC_PER_WEEK * 2, 'sub' => SEC_PER_WEEK],	// 2 weeks and 1 week
+			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_DAY * 15],	// 30 days and 15 days
+			['main' => SEC_PER_MONTH * 6, 'sub' => SEC_PER_MONTH],	// half year and 30 days
 			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],		// 1 year and 30 days
-			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_HALF_YEAR],	// 1 year and 90 days
-			['main' => SEC_PER_FIVE_YEARS, 'sub' => SEC_PER_YEAR]	// 5 years and 1 year
+			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 6],	// 1 year and 180 days
+			['main' => SEC_PER_YEAR * 5, 'sub' => SEC_PER_YEAR]		// 5 years and 1 year
 		];
 
 		// default values
-		$distance = SEC_PER_FIVE_YEARS;
+		$distance = SEC_PER_YEAR * 5;
 		$mainInterval = 0;
 		$subInterval = 0;
 
@@ -1401,7 +1401,7 @@ class CLineGraphDraw extends CGraphDraw {
 			if ($subInterval == SEC_PER_YEAR) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 			}
-			elseif ($subInterval == SEC_PER_HALF_YEAR) {
+			elseif ($subInterval == SEC_PER_MONTH * 6) {
 				if ($i == $start) {
 					if (date('m', $this->stime) > 7) {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time), 1, date('Y', $previous_time) + 1);
@@ -1422,7 +1422,7 @@ class CLineGraphDraw extends CGraphDraw {
 			elseif ($subInterval == SEC_PER_MONTH) {
 				$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 			}
-			elseif ($subInterval == SEC_PER_HALF_MONTH) {
+			elseif ($subInterval == SEC_PER_DAY * 15) {
 				if ($i == $start) {
 					if (date('d', $this->stime) > 15) {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
@@ -1459,10 +1459,10 @@ class CLineGraphDraw extends CGraphDraw {
 				$format = YEAR_FORMAT;
 			}
 			elseif (date('d', $new_time) == 1 && date('H', $new_time) == 0 && date('i', $new_time) == 0
-					&& ($subInterval == SEC_PER_MONTH || $subInterval == SEC_PER_HALF_YEAR)) {
+					&& ($subInterval == SEC_PER_MONTH || $subInterval == SEC_PER_MONTH * 6)) {
 				$format = _('M');
 			}
-			elseif ((date('H', $new_time) == 0 && date('i', $new_time) == 0) || $subInterval > SEC_PER_TWELVE_HOUR) {
+			elseif ((date('H', $new_time) == 0 && date('i', $new_time) == 0) || $subInterval > SEC_PER_HOUR * 12) {
 				$format = _('m-d');
 			}
 			else {

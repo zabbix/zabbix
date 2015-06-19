@@ -907,22 +907,11 @@ define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
 define('SEC_PER_MIN',			60);
-define('SEC_PER_TWO_MIN',		120);
-define('SEC_PER_FIVE_MIN',		300);
-define('SEC_PER_FIFTEEN_MIN',	900);
-define('SEC_PER_THIRTY_MIN',	1800);
 define('SEC_PER_HOUR',			3600);
-define('SEC_PER_THREE_HOUR',	10800);
-define('SEC_PER_SIX_HOUR',		21600);
-define('SEC_PER_TWELVE_HOUR',	43200);
 define('SEC_PER_DAY',			86400);
-define('SEC_PER_WEEK',			604800);	// 7 * SEC_PER_DAY
-define('SEC_PER_TWO_WEEK',		1209600);	// 14 * SEC_PER_DAY
-define('SEC_PER_HALF_MONTH',	1296000);	// 15 * SEC_PER_DAY
-define('SEC_PER_MONTH',			2592000);	// 30 * SEC_PER_DAY
-define('SEC_PER_HALF_YEAR',		15552000);	// 180 * SEC_PER_DAY
-define('SEC_PER_YEAR',			31536000);	// 365 * SEC_PER_DAY
-define('SEC_PER_FIVE_YEARS',	157680000);	// 365 * 5 * SEC_PER_DAY
+define('SEC_PER_WEEK',			604800);
+define('SEC_PER_MONTH',			2592000);
+define('SEC_PER_YEAR',			31536000);
 
 define('ZBX_JAN_2038', 2145916800);
 
