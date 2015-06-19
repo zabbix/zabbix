@@ -1473,7 +1473,7 @@ class CLineGraphDraw extends CGraphDraw {
 			if (($subInterval < SEC_PER_HOUR && date('i', $new_time) == 0)
 					|| ($subInterval == SEC_PER_DAY && date('N', $new_time) == 7)
 					|| ($subInterval >= SEC_PER_HOUR && date('H', $new_time) == '00' && $subInterval < SEC_PER_DAY)
-					|| ($format === YEAR_FORMAT && $subInterval != SEC_PER_YEAR)) {
+					|| $format == YEAR_FORMAT) {
 				$this->drawMainPeriod($new_time, $format, $position);
 				continue;
 			}
