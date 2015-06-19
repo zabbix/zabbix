@@ -28,81 +28,64 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.triggerdisplayoptions.php')))
 	);
 
-$triggerDOFormList = new CFormList();
-
-$headerDiv = (new CDiv(_('Colour')))
-	->addClass('inlineblock')
-	->addClass('trigger_displaying_form_col')
-	->addStyle('margin-left: 2px;');
-$triggerDOFormList->addRow(SPACE, [$headerDiv, _('Blinking')]);
-
-// Unacknowledged problem events
-$triggerDOFormList->addRow(
-	_('Unacknowledged PROBLEM events'),
-	[
-		(new CDiv(new CColor('problem_unack_color', $data['problem_unack_color'])))
-			->addClass('inlineblock')
-			->addClass('trigger_displaying_form_col'),
-		(new CCheckBox('problem_unack_style'))->setChecked($data['problem_unack_style'] == 1)
-	]
-);
-
-// Acknowledged problem events
-$triggerDOFormList->addRow(
-	_('Acknowledged PROBLEM events'),
-	[
-		(new CDiv(new CColor('problem_ack_color', $data['problem_ack_color'])))
-			->addClass('inlineblock')
-			->addClass('trigger_displaying_form_col'),
-		(new CCheckBox('problem_ack_style'))->setChecked($data['problem_ack_style'] == 1)
-	]
-);
-
-// Unacknowledged recovery events
-$triggerDOFormList->addRow(
-	_('Unacknowledged OK events'),
-	[
-		(new CDiv(new CColor('ok_unack_color', $data['ok_unack_color'])))
-			->addClass('inlineblock')
-			->addClass('trigger_displaying_form_col'),
-		(new CCheckBox('ok_unack_style'))->setChecked($data['ok_unack_style'] == 1)
-	]
-);
-
-// Acknowledged recovery events
-$triggerDOFormList->addRow(
-	_('Acknowledged OK events'),
-	[
-		(new CDiv(new CColor('ok_ack_color', $data['ok_ack_color'])))
-			->addClass('inlineblock')
-			->addClass('trigger_displaying_form_col'),
-		(new CCheckBox('ok_ack_style'))->setChecked($data['ok_ack_style'] == 1)
-	]
-);
-
-// some air between the sections
-$triggerDOFormList->addRow(BR());
-
-// Display OK triggers
-$okPeriodTextBox = (new CTextBox('ok_period', $data['ok_period']))
-	->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-	->setAttribute('maxlength', '6');
-$triggerDOFormList->addRow(_('Display OK triggers for'), [$okPeriodTextBox, SPACE, _('seconds')]);
-
-// Triggers blink on status change
-$okPeriodTextBox = (new CTextBox('blink_period', $data['blink_period']))
-	->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-	->setAttribute('maxlength', '6');
-$triggerDOFormList->addRow(_('On status change triggers blink for'), [$okPeriodTextBox, SPACE, _('seconds')]);
-
-$severityView = (new CTabView())->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList);
+$triggerDOFormList = (new CFormList())
+	->addRow(_('Unacknowledged PROBLEM events'), [
+		new CColor('problem_unack_color', $data['problem_unack_color']),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		new CLabel([
+			(new CCheckBox('problem_unack_style'))->setChecked($data['problem_unack_style'] == 1),
+			_('blinking')
+		], 'problem_unack_style')
+	])
+	->addRow(_('Acknowledged PROBLEM events'), [
+		new CColor('problem_ack_color', $data['problem_ack_color']),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		new CLabel([
+			(new CCheckBox('problem_ack_style'))->setChecked($data['problem_ack_style'] == 1),
+			_('blinking')
+		], 'problem_ack_style')
+	])
+	->addRow(_('Unacknowledged OK events'), [
+		new CColor('ok_unack_color', $data['ok_unack_color']),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		new CLabel([
+			(new CCheckBox('ok_unack_style'))->setChecked($data['ok_unack_style'] == 1),
+			_('blinking')
+		], 'ok_unack_style')
+	])
+	->addRow(_('Acknowledged OK events'), [
+		new CColor('ok_ack_color', $data['ok_ack_color']),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		new CLabel([
+			(new CCheckBox('ok_ack_style'))->setChecked($data['ok_ack_style'] == 1),
+			_('blinking')
+		], 'ok_ack_style')
+	])
+	// some air between the sections
+	->addRow()
+	->addRow(_('Display OK triggers for'), [
+		(new CTextBox('ok_period', $data['ok_period']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('maxlength', '6'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		_('seconds')
+	])
+	->addRow(_('On status change triggers blink for'), [
+		(new CTextBox('blink_period', $data['blink_period']))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+			->setAttribute('maxlength', '6'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		_('seconds')
+	]);
 
 $severityForm = (new CForm())->setName('triggerDisplayOptions');
 
-$severityView->setFooter(makeFormFooter(
-	new CSubmit('update', _('Update')),
-	[new CButton('resetDefaults', _('Reset defaults'))]
-));
+$severityView = (new CTabView())
+	->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList)
+	->setFooter(makeFormFooter(
+		new CSubmit('update', _('Update')),
+		[new CButton('resetDefaults', _('Reset defaults'))]
+	));
 
 $severityForm->addItem($severityView);
 
