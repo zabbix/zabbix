@@ -45,13 +45,9 @@ class C20TriggerConverter extends CConverter {
 	 */
 	protected $itemKeyConverter;
 
-	/**
-	 * @param CFunctionMacroParser  $functionMacroParser
-	 * @param CMacroParser          $lldMacroParser
-	 */
 	public function __construct() {
 		$this->functionMacroParser = new CFunctionMacroParser();
-		$this->lldMacroParser = new CMacroParser('#');
+		$this->lldMacroParser = new CLLDMacroParser();
 		$this->itemKeyConverter = new C20ItemKeyConverter();
 	}
 

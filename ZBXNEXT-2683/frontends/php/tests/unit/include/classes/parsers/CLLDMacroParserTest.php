@@ -19,10 +19,10 @@
 **/
 
 
-class CMacroParserTest extends CParserTest {
+class CLLDMacroParserTest extends CParserTest {
 
 	protected function getParser() {
-		return new CMacroParser('#');
+		return new CLLDMacroParser();
 	}
 
 	public function validProvider() {

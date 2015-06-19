@@ -116,14 +116,14 @@ class CTriggerExpression {
 	/**
 	 * Parser for user macros.
 	 *
-	 * @var CMacroParser
+	 * @var CUserMacroParser
 	 */
 	protected $userMacroParser;
 
 	/**
 	 * Parser for LLD macros.
 	 *
-	 * @var CMacroParser
+	 * @var CLLDMacroParser
 	 */
 	protected $lldMacroParser;
 
@@ -155,8 +155,8 @@ class CTriggerExpression {
 		$this->notOperatorParser = new CSetParser(['not']);
 		$this->macroParser = new CSetParser(['{TRIGGER.VALUE}']);
 		$this->functionMacroParser = new CFunctionMacroParser();
-		$this->userMacroParser = new CMacroParser('$');
-		$this->lldMacroParser = new CMacroParser('#');
+		$this->userMacroParser = new CUserMacroParser();
+		$this->lldMacroParser = new CLLDMacroParser();
 	}
 
 	/**
@@ -490,25 +490,46 @@ class CTriggerExpression {
 	 * Parse the string using the given parser. If a match has been found, move the cursor to the last symbol of the
 	 * matched string.
 	 *
-	 * @param CParser   $parser
+	 * @param class		$parser			CUserMacroParser or CParser
 	 * @param int       $tokenType
 	 *
 	 * @return CParserResult|bool		CParserResult object if a match has been found, false otherwise
 	 */
-	protected function parseUsing(CParser $parser, $tokenType) {
+	protected function parseUsing($parser, $tokenType) {
 		$j = $this->pos;
 
-		$result = $parser->parse($this->expression, $j);
+		if ($parser instanceof CUserMacroParser) {
+			// Parse string as a part of a trigger expression.
+			$parser->parse($this->expression, $j, true);
 
-		if (!$result) {
+			if (!$parser->isValid()) {
+				return false;
+			}
+
+			$this->pos += $parser->getParseResult()->length - 1;
+
+			$this->result->addToken($tokenType, $parser->getParseResult()->match, $parser->getParseResult()->pos,
+				$parser->getParseResult()->length
+			);
+
+			return $parser->getParseResult();
+		}
+		elseif ($parser instanceof CParser) {
+			$result = $parser->parse($this->expression, $j);
+
+			if (!$result) {
+				return false;
+			}
+
+			$this->pos += $result->length - 1;
+
+			$this->result->addToken($tokenType, $result->match, $result->pos, $result->length);
+
+			return $result;
+		}
+		else {
 			return false;
 		}
-
-		$this->pos += $result->length - 1;
-
-		$this->result->addToken($tokenType, $result->match, $result->pos, $result->length);
-
-		return $result;
 	}
 
 	/**

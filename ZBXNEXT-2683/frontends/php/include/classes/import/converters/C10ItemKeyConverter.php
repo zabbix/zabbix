@@ -27,12 +27,12 @@ class C10ItemKeyConverter extends CConverter {
 	/**
 	 * Parser for user macros.
 	 *
-	 * @var CMacroParser
+	 * @var CUserMacroParser
 	 */
 	protected $userMacroParser;
 
 	public function __construct() {
-		$this->userMacroParser = new CMacroParser('$');
+		$this->userMacroParser = new CUserMacroParser();
 	}
 
 	public function convert($value) {
@@ -43,14 +43,16 @@ class C10ItemKeyConverter extends CConverter {
 		];
 
 		$parts = explode(',', $value);
+
 		if (count($parts) <= 2) {
 			$key = $parts[0];
 
 			if (isset($parts[1]) && $parts[1] !== '') {
-				// user macro
-				$result = $this->userMacroParser->parse($parts[1], 0);
+				// Parse user macro as a partf of an item key. It means there might be following symbols after macro.
+				$this->userMacroParser->parse($parts[1], 0, true);
 
-				if ($result !== false && !isset($parts[1][$result->length])) {
+				if ($this->userMacroParser->isValid()
+						&& !isset($parts[1][$this->userMacroParser->getParseResult()->length])) {
 					$port = ',,'.$parts[1];
 				}
 				// numeric parameter or empty parameter
@@ -82,5 +84,4 @@ class C10ItemKeyConverter extends CConverter {
 
 		return $value;
 	}
-
 }
