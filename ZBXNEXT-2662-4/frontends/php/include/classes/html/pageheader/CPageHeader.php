@@ -72,14 +72,6 @@ class CPageHeader {
 	}
 
 	/**
-	 * Add initial css files.
-	 */
-	public function addCssInit() {
-		$this->cssFiles[] = 'styles/zabbix.css';
-		return $this;
-	}
-
-	/**
 	 * Add css style to render in page head.
 	 *
 	 * @param string $style
@@ -124,7 +116,7 @@ class CPageHeader {
 	 */
 	public function display() {
 		echo <<<HTML
-<!doctype html>
+<!DOCTYPE html>
 <html>
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
@@ -139,13 +131,13 @@ HTML;
 			echo '<link rel="stylesheet" type="text/css" href="'.$path.'" />'."\n";
 		}
 
-		if (!empty($this->styles)) {
+		if ($this->styles) {
 			echo '<style type="text/css">';
 			echo implode("\n", $this->styles);
 			echo '</style>';
 		}
 
-		if (!empty($this->jsBefore)) {
+		if ($this->jsBefore) {
 			echo '<script>';
 			echo implode("\n", $this->jsBefore);
 			echo '</script>';
@@ -155,7 +147,7 @@ HTML;
 			echo '<script src="'.$path.'"></script>'."\n";
 		}
 
-		if (!empty($this->js)) {
+		if ($this->js) {
 			echo '<script>';
 			echo implode("\n", $this->js);
 			echo '</script>';

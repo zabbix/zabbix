@@ -248,6 +248,66 @@ static int	DBpatch_2050013(void)
 	return DBdrop_table("user_history");
 }
 
+static int      DBpatch_2050014(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+		"update config"
+		" set default_theme="
+			"case when default_theme in ('classic', 'originalblue')"
+			" then 'blue-theme'"
+			" else 'dark-theme' end"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int      DBpatch_2050015(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+		"update users"
+		" set theme=case when theme in ('classic', 'originalblue') then 'blue-theme' else 'dark-theme' end"
+		" where theme<>'default'"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int      DBpatch_2050016(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+		"update graph_theme set description='blue-theme',theme='blue-theme' where graphthemeid=1"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int      DBpatch_2050017(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+		"update graph_theme set description='dark-theme',theme='dark-theme' where graphthemeid=2"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int      DBpatch_2050018(void)
+{
+	if (ZBX_DB_OK <= DBexecute("delete from graph_theme where graphthemeid in (3,4)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -268,5 +328,10 @@ DBPATCH_ADD(2050010, 0, 1)
 DBPATCH_ADD(2050011, 0, 1)
 DBPATCH_ADD(2050012, 0, 1)
 DBPATCH_ADD(2050013, 0, 0)
+DBPATCH_ADD(2050014, 0, 1)
+DBPATCH_ADD(2050015, 0, 1)
+DBPATCH_ADD(2050016, 0, 1)
+DBPATCH_ADD(2050017, 0, 1)
+DBPATCH_ADD(2050018, 0, 1)
 
 DBPATCH_END()
