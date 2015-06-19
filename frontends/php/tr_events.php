@@ -36,15 +36,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 define('PAGE_SIZE', 100);
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'triggerid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']),
-	'eventid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
+$fields = [
+	'triggerid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
+	'eventid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
+	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// ajax
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	IN('"filter","hat"'), null),
-	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})')
-);
+	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	IN('"filter","hat"'), null],
+	'favref' =>		[T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'],
+	'favstate' =>	[T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})']
+];
 check_fields($fields);
 
 /*
@@ -60,11 +60,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 }
 
 // triggers
-$triggers = API::Trigger()->get(array(
+$triggers = API::Trigger()->get([
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => API_OUTPUT_EXTEND,
 	'triggerids' => getRequest('triggerid')
-));
+]);
 
 if (!$triggers) {
 	access_deny();
@@ -73,7 +73,7 @@ if (!$triggers) {
 $trigger = reset($triggers);
 
 // events
-$events = API::Event()->get(array(
+$events = API::Event()->get([
 	'output' => API_OUTPUT_EXTEND,
 	'select_alerts' => API_OUTPUT_EXTEND,
 	'select_acknowledges' => API_OUTPUT_EXTEND,
@@ -82,7 +82,7 @@ $events = API::Event()->get(array(
 	'object' => EVENT_OBJECT_TRIGGER,
 	'eventids' => getRequest('eventid'),
 	'objectids' => getRequest('triggerid')
-));
+]);
 
 $event = reset($events);
 
@@ -91,11 +91,9 @@ $event = reset($events);
  */
 $config = select_config();
 
-$eventWidget = (new CWidget())->
-	setTitle(_('Event for trigger').': "'.CMacrosResolverHelper::resolveTriggerName($trigger).'"')->
-	setControls((new CList())->
-		addItem(get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen'))))
-	);
+$eventWidget = (new CWidget())
+	->setTitle(_s('Event of trigger: "%1$s"', CMacrosResolverHelper::resolveTriggerName($trigger)))
+	->setControls((new CList())->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])));
 
 // trigger details
 $triggerDetailsWidget = new CUiWidget('hat_triggerdetails', make_trigger_details($trigger));
@@ -132,7 +130,7 @@ $eventHistoryWidget->setHeader(_('Event list [previous 20]'));
 
 $eventTab = new CTable();
 $eventTab->addRow([
-	new CDiv(array($triggerDetailsWidget, $eventDetailsWidget), 'column'),
+	(new CDiv([$triggerDetailsWidget, $eventDetailsWidget]))->addClass('column'),
 	new CDiv([$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget])
 ]);
 

@@ -36,7 +36,7 @@ class testPageQueueOverviewByProxy extends CWebTest {
 		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
 		$this->zbxTestTextPresent(
-			array(
+			[
 				'Proxy',
 				'5 seconds',
 				'10 seconds',
@@ -44,7 +44,7 @@ class testPageQueueOverviewByProxy extends CWebTest {
 				'1 minute',
 				'5 minutes',
 				'More than 10 minutes'
-			)
+			]
 		);
 		// Data
 		$this->zbxTestTextPresent($proxy['host']);

@@ -29,14 +29,14 @@ class CXmlValidator {
 	 *
 	 * @var CXmlValidator[]
 	 */
-	protected $versionValidators = array();
+	protected $versionValidators = [];
 
 	public function __construct() {
-		$this->versionValidators = array(
+		$this->versionValidators = [
 			'1.0' => 'C10XmlValidator',
 			'2.0' => 'C20XmlValidator',
 			'3.0' => 'C30XmlValidator'
-		);
+		];
 	}
 
 	/**
@@ -63,8 +63,8 @@ class CXmlValidator {
 			);
 		}
 
-		$data['zabbix_export'] = (new $this->versionValidators[$version]())->
-			validate($data['zabbix_export'], '/zabbix_export');
+		$data['zabbix_export'] = (new $this->versionValidators[$version]())
+			->validate($data['zabbix_export'], '/zabbix_export');
 
 		return $data;
 	}

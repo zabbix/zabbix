@@ -31,11 +31,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
 require_once dirname(__FILE__).'/include/func.inc.php';
 require_once dirname(__FILE__).'/include/classes/core/CHttpRequest.php';
 
-$allowed_content = array(
+$allowed_content = [
 	'application/json-rpc' => 'json-rpc',
 	'application/json' => 'json-rpc',
 	'application/jsonrequest' => 'json-rpc',
-);
+];
 $http_request = new CHttpRequest();
 $content_type = $http_request->header('Content-Type');
 $content_type = explode(';', $content_type);
@@ -66,14 +66,14 @@ catch (Exception $e) {
 	// decode input json request to get request's id
 	$jsonData = CJs::decodeJson($data);
 
-	$response = array(
+	$response = [
 		'jsonrpc' => '2.0',
-		'error' => array(
+		'error' => [
 			'code' => 1,
 			'message' => $e->getMessage()
-		),
+		],
 		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)
-	);
+	];
 
 	echo CJs::encodeJson($response);
 }

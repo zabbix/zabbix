@@ -198,6 +198,7 @@ frontends/php/images/gradients/sla_red.png -text
 frontends/php/images/gradients/sla_red15.png -text
 frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
+frontends/php/img/browser-sprite.png -text svneol=unset#image/png
 frontends/php/img/icon-sprite.png -text svneol=unset#image/png
 frontends/php/img/preload.gif -text svneol=unset#image/gif
 frontends/php/include/classes/helpers/CViewHelper.php -text
@@ -249,6 +250,7 @@ frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
 frontends/php/robots.txt svneol=native#text/plain
 frontends/php/styles/zabbix.css svneol=native#text/css
 frontends/php/tests/bootstrap.php.template -text
+frontends/php/tests/unit/include/classes/import/converters/C20ItemKeyConverterTest.php -text
 frontends/php/tests/unit/include/classes/import/formatters/hostAndTemplate.xml svneol=native#text/xml
 frontends/php/tests/unit/include/classes/import/formatters/map.xml svneol=native#text/xml
 frontends/php/tests/unit/include/classes/import/formatters/screen.xml svneol=native#text/xml
@@ -532,16 +534,24 @@ sass/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
 sass/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
+sass/browserwarning.html -text
 sass/dashboard.html -text
+sass/errors.html -text
 sass/favicon.ico -text svneol=unset#image/x-icon
+sass/forms-inventory.html -text
+sass/img/browser-sprite.png -text svneol=unset#image/png
 sass/img/icon-sprite.png -text svneol=unset#image/png
 sass/img/preload.gif -text svneol=unset#image/gif
-sass/overlay-dialog.html -text
+sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/overlay-dialog_with_tables.html -text
 sass/popup.html -text
 sass/screens-edit.html -text
 sass/setup.html -text
 sass/signin.html -text
+sass/stylesheets/sass/_colors.scss -text
+sass/stylesheets/sass/_fonts.scss -text
+sass/stylesheets/sass/_mixins.scss -text
+sass/stylesheets/sass/dark-theme.scss -text
 sass/touch-icon-192x192.png -text svneol=unset#image/png
 src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/README svneol=native#text/plain

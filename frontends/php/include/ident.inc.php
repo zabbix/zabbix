@@ -29,15 +29,15 @@ function getImageByIdent($ident) {
 	static $images;
 
 	if ($images === null) {
-		$images = array();
+		$images = [];
 
-		$dbImages = API::Image()->get(array(
-			'output' => array('imageid', 'name')
-		));
+		$dbImages = API::Image()->get([
+			'output' => ['imageid', 'name']
+		]);
 
 		foreach ($dbImages as $image) {
 			if (!isset($images[$image['name']])) {
-				$images[$image['name']] = array();
+				$images[$image['name']] = [];
 			}
 
 			$images[$image['name']][] = $image;

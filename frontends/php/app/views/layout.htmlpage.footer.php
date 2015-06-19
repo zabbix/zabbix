@@ -21,13 +21,11 @@
 
 show_messages();
 
-echo '</article>'."\n";
+// end of article div
+echo '</div>'."\n";
 
 if ($data['fullscreen'] == 0) {
-	echo '<footer>'."\n";
-	echo '<a href="http://www.zabbix.com" target="_blank" class="logo"></a>'."\n";
-	echo 'Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" target="_blank">Zabbix SIA</a>'."\n";
-	echo '</footer>'."\n";
+	makePageFooter()->show();
 }
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

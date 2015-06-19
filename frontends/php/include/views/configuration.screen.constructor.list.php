@@ -25,12 +25,12 @@ if (!empty($this->data['screen']['templateid'])) {
 }
 $screenWidget->addItem(BR());
 
-$screenBuilder = new CScreenBuilder(array(
+$screenBuilder = new CScreenBuilder([
 	'isFlickerfree' => false,
 	'screen' => $this->data['screen'],
 	'mode' => SCREEN_MODE_EDIT,
 	'updateProfile' => false
-));
+]);
 $screenWidget->addItem($screenBuilder->show());
 
 $screenBuilder->insertInitScreenJs($this->data['screenid']);

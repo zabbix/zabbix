@@ -22,79 +22,79 @@ class CRegexValidatorTest extends CValidatorTest
 {
 	public function validParamProvider()
 	{
-		return array(array(
-			array(
+		return [[
+			[
 				'messageInvalid' => 'Invalid regular expression'
-			)
-		));
+			]
+		]];
 	}
 
 	public function validValuesProvider()
 	{
-		return array(
-			array(array(), 'foobar'),
-			array(array(), '/foobar'),
-			array(array(), 'foobar/'),
-			array(array(), 'foobar/i'),
-			array(array(), '/'),
-			array(array(), ' '),
-			array(array(), '\\\\'),
-			array(array(), '[A-Z]+[0-9]{123}foo.*(bar|buz)[^A-K]{4}'),
-			array(array(), 'asd\('),
-			array(array(), '^Timestamp \[[0-9]{4}-[A-Za-z]{3}-[0-9]{1,2}\]: ERROR.*$'),
-			array(array(), '/[a-z]+'),
-			array(array(), '[a-z]+\ \[/'),
-			array(array(), '[a-f0-9]{32}/iu'),
-			array(array(), '[a-f0-9]{32}/i'),
-			array(array(), '/foo bar// me!/'),
-			array(array(), 1),
-			array(array(), 1.2)
-		);
+		return [
+			[[], 'foobar'],
+			[[], '/foobar'],
+			[[], 'foobar/'],
+			[[], 'foobar/i'],
+			[[], '/'],
+			[[], ' '],
+			[[], '\\\\'],
+			[[], '[A-Z]+[0-9]{123}foo.*(bar|buz)[^A-K]{4}'],
+			[[], 'asd\('],
+			[[], '^Timestamp \[[0-9]{4}-[A-Za-z]{3}-[0-9]{1,2}\]: ERROR.*$'],
+			[[], '/[a-z]+'],
+			[[], '[a-z]+\ \[/'],
+			[[], '[a-f0-9]{32}/iu'],
+			[[], '[a-f0-9]{32}/i'],
+			[[], '/foo bar// me!/'],
+			[[], 1],
+			[[], 1.2]
+		];
 	}
 
 	public function invalidValuesProvider()
 	{
-		return array(
-			array(
-				array('messageInvalid' => 'Not a string'),
-				array(),
+		return [
+			[
+				['messageInvalid' => 'Not a string'],
+				[],
 				'Not a string'
-			),
-			array(
-				array('messageInvalid' => 'Not a string'),
+			],
+			[
+				['messageInvalid' => 'Not a string'],
 				null,
 				'Not a string'
-			),
-			array(
-				array('messageInvalid' => 'Not a string'),
+			],
+			[
+				['messageInvalid' => 'Not a string'],
 				true,
 				'Not a string'
-			),
-			array(
-				array('messageRegex' => 'Incorrect regular expression "%1$s": "%2$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect regular expression "%1$s": "%2$s"'],
 				'[[',
 				'Incorrect regular expression "[[": "Compilation failed: missing terminating ] for character class at offset 2"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect regular expression "%1$s": "%2$s".'),
+			],
+			[
+				['messageRegex' => 'Incorrect regular expression "%1$s": "%2$s".'],
 				'asd(',
 				'Incorrect regular expression "asd(": "Compilation failed: missing ) at offset 4".'
-			)
-		);
+			]
+		];
 	}
 
 	public function invalidValuesWithObjectsProvider()
 	{
-		return array(
-			array(
-				array('messageRegex' => 'Incorrect regular expression "%2$s" for object "%1$s": "%3$s"'),
+		return [
+			[
+				['messageRegex' => 'Incorrect regular expression "%2$s" for object "%1$s": "%3$s"'],
 				'test[',
 				'Incorrect regular expression "test[" for object "object": "Compilation failed: missing terminating ] for character class at offset 5"'
-			)
-		);
+			]
+		];
 	}
 
-	protected function createValidator(array $params = array())
+	protected function createValidator(array $params = [])
 	{
 		return new CRegexValidator($params);
 	}

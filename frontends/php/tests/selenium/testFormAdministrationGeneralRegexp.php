@@ -31,7 +31,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Regular expressions');
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
-		$this->zbxTestTextPresent(array('Regular expressions', 'Name', 'Expressions'));
+		$this->zbxTestTextPresent(['Regular expressions', 'Name', 'Expressions']);
 
 		// clicking "New regular expression" button
 		$this->zbxTestClickWait('form');
@@ -59,18 +59,18 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		// result, r.name, r.test_string, e.expression, e.expression_type, e.exp_delimiter, e.case_sensitive
 		// type: 0-Character string included, 1-Any character string included, 2- Character string not included, 3-Result is TRUE, 4- Result is FALSE
-		return array(
-			array('TRUE', 'test_regexp1', 'first test string', 'first test string', 'Character string included', ',', 1),
-			array('FALSE', 'test_regexp1_2', 'first test string', 'first test string2', 'Character string included', ',', 1),
-			array('TRUE', 'test_regexp2', 'second test string', 'test string', 'Any character string included', '.', 0),
-			array('FALSE', 'test_regexp2_2', 'second test string', 'second string', 'Any character string included', '.', 0),
-			array('TRUE', 'test_regexp3', 'test', 'abcd test', 'Character string not included', '.', 0),
-			array('FALSE', 'test_regexp3_2', 'test', 'test', 'Character string not included', '.', 0),
-			array('TRUE', 'test_regexp4', 'abcd', 'abcd', 'Result is TRUE', '.', 0),
-			array('FALSE', 'test_regexp4_2', 'abcd', 'qwerty', 'Result is TRUE', '.', 0),
-			array('TRUE', 'test_regexp5', 'abcd', 'asdf', 'Result is FALSE', '.', 0),
-			array('FALSE', 'test_regexp5_2', 'abcd', 'abcd', 'Result is FALSE', '.', 0)
-		);
+		return [
+			['TRUE', 'test_regexp1', 'first test string', 'first test string', 'Character string included', ',', 1],
+			['FALSE', 'test_regexp1_2', 'first test string', 'first test string2', 'Character string included', ',', 1],
+			['TRUE', 'test_regexp2', 'second test string', 'test string', 'Any character string included', '.', 0],
+			['FALSE', 'test_regexp2_2', 'second test string', 'second string', 'Any character string included', '.', 0],
+			['TRUE', 'test_regexp3', 'test', 'abcd test', 'Character string not included', '.', 0],
+			['FALSE', 'test_regexp3_2', 'test', 'test', 'Character string not included', '.', 0],
+			['TRUE', 'test_regexp4', 'abcd', 'abcd', 'Result is TRUE', '.', 0],
+			['FALSE', 'test_regexp4_2', 'abcd', 'qwerty', 'Result is TRUE', '.', 0],
+			['TRUE', 'test_regexp5', 'abcd', 'asdf', 'Result is FALSE', '.', 0],
+			['FALSE', 'test_regexp5_2', 'abcd', 'abcd', 'Result is FALSE', '.', 0]
+		];
 	}
 
 	/**
@@ -103,9 +103,9 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 	public static function dataUpdate() {
 		// name
-		return array(
-			array('test_regexp1')
-		);
+		return [
+			['test_regexp1']
+		];
 	}
 
 	/**
@@ -127,7 +127,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckboxSelect('case_sensitiveNew');
 		$this->zbxTestClick('saveExpression');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent(array('ERROR: Cannot add regular expression', 'Regular expression', 'already exists.'));
+		$this->zbxTestTextPresent(['ERROR: Cannot add regular expression', 'Regular expression', 'already exists.']);
 	}
 
 	public function testFormAdministrationGeneralRegexp_AddIncorrect() {
@@ -139,7 +139,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 
 		$this->input_type('name', '1_regexp3');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Field "expressions" is mandatory.'));
+		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Field "expressions" is mandatory.']);
 	}
 
 	public function testFormAdministrationGeneralRegexp_Test() {
@@ -194,9 +194,9 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 	}
 
 	public static function dataDelete() {
-		return array(
-			array('test_regexp2')
-		);
+		return [
+			['test_regexp2']
+		];
 	}
 
 	/**
@@ -214,7 +214,7 @@ class testFormAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestClick('delete');
 		$this->getConfirmation();
 		$this->wait();
-		$this->zbxTestTextPresent(array('Regular expression deleted', 'CONFIGURATION OF REGULAR EXPRESSIONS', 'Regular expressions', 'Name', 'Expressions'));
+		$this->zbxTestTextPresent(['Regular expression deleted', 'CONFIGURATION OF REGULAR EXPRESSIONS', 'Regular expressions', 'Name', 'Expressions']);
 
 		// checking that regexp "test_regexp2" has been deleted from the DB
 		$sql = 'SELECT * FROM regexps r WHERE r.name='.zbx_dbstr($name);

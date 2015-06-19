@@ -19,6 +19,13 @@
 **/
 
 
+$widget = (new CWidget())
+	->setTitle(_('Other configuration parameters'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.other.php')))
+	);
+
 $otherTab = new CFormList();
 
 $discoveryGroup = new CComboBox('discovery_groupid', $data['discovery_groupid']);
@@ -38,7 +45,7 @@ $otherTab->addRow(_('Refresh unsupported items (in sec)'),
 $otherTab->addRow(_('Group for discovered hosts'), $discoveryGroup);
 $otherTab->addRow(_('User group for database down message'), $alertUserGroup);
 $otherTab->addRow(_('Log unmatched SNMP traps'),
-	new CCheckBox('snmptrap_logging', $data['snmptrap_logging'] == 1, null, 1)
+	(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
 );
 
 $otherView = new CTabView();
@@ -49,4 +56,6 @@ $otherForm->setName('otherForm');
 $otherView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 $otherForm->addItem($otherView);
 
-return $otherForm;
+$widget->addItem($otherForm);
+
+return $widget;

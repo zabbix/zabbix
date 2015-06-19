@@ -19,37 +19,37 @@
 **/
 
 
-$groups = API::HostGroup()->get(array(
-	'output' => array('groupid', 'name'),
+$groups = API::HostGroup()->get([
+	'output' => ['groupid', 'name'],
 	'groupids' => $data['filter']['groupids'],
 	'hostids' => isset($data['filter']['hostids']) ? $data['filter']['hostids'] : null,
 	'monitored_hosts' => true,
 	'with_monitored_httptests' => true,
 	'preservekeys' => true
-));
-CArrayHelper::sort($groups, array('name'));
+]);
+CArrayHelper::sort($groups, ['name']);
 
 $groupIds = array_keys($groups);
 
-$availableHosts = API::Host()->get(array(
-	'output' => array('hostid'),
+$availableHosts = API::Host()->get([
+	'output' => ['hostid'],
 	'groupids' => $groupIds,
 	'hostids' => isset($data['filter']['hostids']) ? $data['filter']['hostids'] : null,
-	'filter' => array('maintenance_status' => $data['filter']['maintenance']),
+	'filter' => ['maintenance_status' => $data['filter']['maintenance']],
 	'monitored_hosts' => true,
 	'preservekeys' => true
-));
+]);
 $availableHostIds = array_keys($availableHosts);
 
 $table = new CTableInfo();
-$table->setHeader(array(
+$table->setHeader([
 	_('Host group'),
 	_('Ok'),
 	_('Failed'),
 	_('Unknown')
-));
+]);
 
-$data = array();
+$data = [];
 
 // fetch links between HTTP tests and host groups
 $result = DbFetchArray(DBselect(
@@ -86,15 +86,14 @@ foreach ($result as $row) {
 
 foreach ($groups as $group) {
 	if (!empty($data[$group['groupid']])) {
-		$table->addRow(array(
+		$table->addRow([
 			new CLink($group['name'], 'httpmon.php?groupid='.$group['groupid'].'&hostid=0'),
-			new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok'], ZBX_STYLE_GREEN),
-			new CSpan(
-				empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed'],
-				empty($data[$group['groupid']]['failed']) ? ZBX_STYLE_GREEN : ZBX_STYLE_RED
-			),
-			new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown'], ZBX_STYLE_GREY)
-		));
+			(new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok']))->addClass(ZBX_STYLE_GREEN),
+			(new CSpan(empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed']))
+				->addClass(empty($data[$group['groupid']]['failed']) ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+			(new CSpan(empty($data[$group['groupid']]['unknown']) ? 0 : $data[$group['groupid']]['unknown']))
+				->addClass(ZBX_STYLE_GREY)
+		]);
 	}
 }
 
@@ -102,5 +101,5 @@ $script = new CJsScript(get_js(
 	'jQuery("#'.WIDGET_WEB_OVERVIEW.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
 ));
 
-$widget = new CDiv(array($table, $script));
+$widget = new CDiv([$table, $script]);
 $widget->show();

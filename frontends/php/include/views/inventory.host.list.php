@@ -21,7 +21,7 @@
 $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
 
 $rForm = new CForm('get');
-$rForm->addItem((new CList())->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB())));
+$rForm->addItem((new CList())->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]));
 $hostInventoryWidget->setControls($rForm);
 
 // filter
@@ -33,29 +33,28 @@ $filterColumn = new CFormList();
 $inventoryFields = getHostInventories(true); // 'true' means list should be ordered by title
 $inventoryFieldsComboBox = new CComboBox('filter_field', $this->data['filterField']);
 foreach ($inventoryFields as $inventoryField) {
-	$inventoryFieldsComboBox->addItem(
-		$inventoryField['db_field'],
-		$inventoryField['title']
-	);
+	$inventoryFieldsComboBox->addItem($inventoryField['db_field'], $inventoryField['title']);
 }
 
 $filterColumn->addRow(
 		_('Field'),
-		array(
+		[
 			$inventoryFieldsComboBox,
-			new CComboBox('filter_exact', $this->data['filterExact'], null, array(
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			new CComboBox('filter_exact', $this->data['filterExact'], null, [
 				0 => _('like'),
 				1 => _('exactly')
-			)),
+			]),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			new CTextBox('filter_field_value', $this->data['filterFieldValue'], 20)
-		)
+		]
 );
 
 $filterForm->addColumn($filterColumn);
 $hostInventoryWidget->addItem($filterForm);
 
 $table = new CTableInfo();
-$table->setHeader(array(
+$table->setHeader([
 	make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder']),
 	_('Group'),
 	make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder']),
@@ -64,22 +63,19 @@ $table->setHeader(array(
 	make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 foreach ($this->data['hosts'] as $host) {
-	$hostGroups = array();
+	$hostGroups = [];
 	foreach ($host['groups'] as $group) {
 		$hostGroups[] = $group['name'];
 	}
 	natsort($hostGroups);
 	$hostGroups = implode(', ', $hostGroups);
 
-	$row = array(
-		new CLink(
-			$host['name'],
-			'?hostid='.$host['hostid'].url_param('groupid'),
-			($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
-		),
+	$row = [
+		(new CLink($host['name'], '?hostid='.$host['hostid'].url_param('groupid')))
+			->addClass($host['status'] == HOST_STATUS_NOT_MONITORED ? 'not-monitored' : ''),
 		$hostGroups,
 		zbx_str2links($host['inventory']['name']),
 		zbx_str2links($host['inventory']['type']),
@@ -87,12 +83,12 @@ foreach ($this->data['hosts'] as $host) {
 		zbx_str2links($host['inventory']['serialno_a']),
 		zbx_str2links($host['inventory']['tag']),
 		zbx_str2links($host['inventory']['macaddress_a'])
-	);
+	];
 
 	$table->addRow($row);
 }
 
-$table = array($table, $this->data['paging']);
+$table = [$table, $this->data['paging']];
 $hostInventoryWidget->addItem($table);
 
 return $hostInventoryWidget;

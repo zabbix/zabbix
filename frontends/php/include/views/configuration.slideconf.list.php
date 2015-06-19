@@ -18,15 +18,14 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$slideWidget = (new CWidget())->setTitle(_('Slide shows'));
-
-// create new hostgroup button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create slide show')));
-$createForm->addItem($controls);
-$slideWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Slide shows'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(new CSubmit('form', _('Create slide show')))
+		)
+	);
 
 // create form
 $slideForm = new CForm();
@@ -34,34 +33,34 @@ $slideForm->setName('slideForm');
 
 // create table
 $slidesTable = new CTableInfo();
-$slidesTable->setHeader(array(
-	new CColHeader(
-		new CCheckBox('all_shows', null, "checkAll('".$slideForm->getName()."', 'all_shows', 'shows');"),
-		'cell-width'),
+$slidesTable->setHeader([
+	(new CColHeader(
+		(new CCheckBox('all_shows'))->onClick("checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH),
 	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
 	make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
-));
+]);
 
 foreach ($this->data['slides'] as $slide) {
-	$slidesTable->addRow(array(
-		new CCheckBox('shows['.$slide['slideshowid'].']', null, null, $slide['slideshowid']),
-		new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid'], 'action'),
+	$slidesTable->addRow([
+		new CCheckBox('shows['.$slide['slideshowid'].']', $slide['slideshowid']),
+		(new CLink($slide['name'], '?form=update&slideshowid='.$slide['slideshowid']))->addClass('action'),
 		convertUnitsS($slide['delay']),
 		$slide['cnt']
-	));
+	]);
 }
 
 // append table to form
-$slideForm->addItem(array(
+$slideForm->addItem([
 	$slidesTable,
 	$this->data['paging'],
-	new CActionButtonList('action', 'shows', array(
-		'slideshow.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected slide shows?'))
-	))
-));
+	new CActionButtonList('action', 'shows', [
+		'slideshow.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected slide shows?')]
+	])
+]);
 
 // append form to widget
-$slideWidget->addItem($slideForm);
+$widget->addItem($slideForm);
 
-return $slideWidget;
+return $widget;

@@ -27,20 +27,20 @@ $slideHeaderForm->setName('slideHeaderForm');
 
 $controls = new CList();
 $controls->addItem(new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);',
-	array(
+	[
 		'screens.php' => _('Screens'),
 		'slides.php' => _('Slide shows')
-	)
+	]
 ));
 
 if ($this->data['slideshows']) {
 	$favouriteIcon = $this->data['screen']
-		? get_icon('favourite', array(
+		? get_icon('favourite', [
 			'fav' => 'web.favorite.screenids',
 			'elname' => 'slideshowid',
 			'elid' => $this->data['elementId']
-		))
-		: new CIcon(_('Favourites'), 'iconplus');
+		])
+		: (new CIcon(_('Favourites')))->addClass('iconplus');
 
 	$refreshIcon = get_icon('screenconf');
 
@@ -49,9 +49,9 @@ if ($this->data['slideshows']) {
 			WIDGET_SLIDESHOW,
 			'x'.$this->data['refreshMultiplier'],
 			true,
-			array(
+			[
 				'elementid' => $this->data['elementId']
-			)
+			]
 		));
 	}
 
@@ -61,16 +61,16 @@ if ($this->data['slideshows']) {
 	foreach ($this->data['slideshows'] as $slideshow) {
 		$slideshowsComboBox->addItem($slideshow['slideshowid'], $slideshow['name']);
 	}
-	$controls->addItem(array(_('Slide show').SPACE, $slideshowsComboBox));
+	$controls->addItem([_('Slide show').SPACE, $slideshowsComboBox]);
 
 	if ($this->data['screen']) {
 		if (isset($this->data['isDynamicItems'])) {
-			$controls->addItem(array(SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
-			$controls->addItem(array(SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()));
+			$controls->addItem([SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()]);
+			$controls->addItem([SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()]);
 		}
 		$controls->addItem($favouriteIcon);
 		$controls->addItem($refreshIcon);
-		$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+		$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
 
@@ -78,12 +78,15 @@ if ($this->data['slideshows']) {
 		$formFilter->addNavigator();
 		$slideshowWidget->addItem($formFilter);
 
-		$slideshowWidget->addItem(new CDiv(new CDiv(null, 'preloader'), null, WIDGET_SLIDESHOW));
+		$slideshowWidget->addItem(
+			(new CDiv((new CDiv())->addClass('preloader')))
+				->setId(WIDGET_SLIDESHOW)
+		);
 	}
 	else {
 		$controls->addItem($favouriteIcon);
 		$controls->addItem($refreshIcon);
-		$controls->addItem(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])));
+		$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
 		$slideshowWidget->addItem(new CTableInfo());
@@ -91,11 +94,11 @@ if ($this->data['slideshows']) {
 }
 else {
 	$slideshowWidget->setControls(
-		array(
+		[
 			$slideHeaderForm,
 			SPACE,
-			get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
-		)
+			get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']])
+		]
 	);
 	$slideshowWidget->addItem(BR());
 	$slideshowWidget->addItem(new CTableInfo());

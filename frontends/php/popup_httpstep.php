@@ -29,29 +29,29 @@ define('ZBX_PAGE_NO_MENU', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'dstfrm' =>			array(T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null),
-	'stepid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,65535),	null),
-	'list_name' =>		array(T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,			'(isset({add}) || isset({update})) && isset({stepid})'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY.KEY_PARAM(), 'isset({add}) || isset({update})', _('Name')),
-	'url' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			'isset({add}) || isset({update})', _('URL')),
-	'posts' =>			array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'variables' =>		array(T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'),
-	'headers' =>		array(T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'),
-	'retrieve_mode' =>	array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'follow_redirects' => array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'timeout' =>		array(T_ZBX_INT, O_OPT, null,	BETWEEN(0,65535),	'isset({add}) || isset({update})', _('Timeout')),
-	'required' =>		array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'status_codes' =>	array(T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'),
-	'templated' =>		array(T_ZBX_STR, O_OPT, null, 	null, null),
-	'old_name'=>		array(T_ZBX_STR, O_OPT, null, 	null, null),
-	'steps_names'=>		array(T_ZBX_STR, O_OPT, null, 	null, null),
+$fields = [
+	'dstfrm' =>			[T_ZBX_STR, O_MAND, P_SYS,	NOT_EMPTY,			null],
+	'stepid' =>			[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0,65535),	null],
+	'list_name' =>		[T_ZBX_STR, O_OPT, P_SYS,	NOT_EMPTY,			'(isset({add}) || isset({update})) && isset({stepid})'],
+	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY.KEY_PARAM(), 'isset({add}) || isset({update})', _('Name')],
+	'url' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			'isset({add}) || isset({update})', _('URL')],
+	'posts' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
+	'variables' =>		[T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
+	'headers' =>		[T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
+	'retrieve_mode' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
+	'follow_redirects' => [T_ZBX_STR, O_OPT, null,	null,				null],
+	'timeout' =>		[T_ZBX_INT, O_OPT, null,	BETWEEN(0,65535),	'isset({add}) || isset({update})', _('Timeout')],
+	'required' =>		[T_ZBX_STR, O_OPT, null,	null,				null],
+	'status_codes' =>	[T_ZBX_STR, O_OPT, null,	null,				'isset({add}) || isset({update})'],
+	'templated' =>		[T_ZBX_STR, O_OPT, null, 	null, null],
+	'old_name'=>		[T_ZBX_STR, O_OPT, null, 	null, null],
+	'steps_names'=>		[T_ZBX_STR, O_OPT, null, 	null, null],
 	// actions
-	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
-	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,				null)
-);
+	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,			null],
+	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,				null]
+];
 check_fields($fields);
 
 
