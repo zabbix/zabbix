@@ -5,7 +5,7 @@
 #    Dmitry Borovikov                         Feb-13-2010
 #
 # Checks for mbed TLS (PolarSSL) library libpolarssl.  DEFAULT-ACTION is the string yes or no to
-# specify whether to default to --with-mbed-tls or --without-mbed-tls.
+# specify whether to default to --with-mbedtls or --without-mbedtls.
 # If not supplied, DEFAULT-ACTION is no.
 #
 # This macro #defines HAVE_POLARSSL if a required header files are
@@ -35,9 +35,9 @@ found_polarssl="yes",)
 
 AC_DEFUN([LIBPOLARSSL_CHECK_CONFIG],
 [
-  AC_ARG_WITH(mbed-tls,[
+  AC_ARG_WITH(mbedtls,[
 If you want to use encryption provided by mbed TLS (PolarSSL) libpolarssl library:
-AC_HELP_STRING([--with-mbed-tls@<:@=DIR@:>@],[use mbed TLS (PolarSSL) package @<:@default=no@:>@, DIR is the mbed TLS (PolarSSL) library libpolarssl install directory.])],
+AC_HELP_STRING([--with-mbedtls@<:@=DIR@:>@],[use mbed TLS (PolarSSL) package @<:@default=no@:>@, DIR is the mbed TLS (PolarSSL) library libpolarssl install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_polarssl="no"

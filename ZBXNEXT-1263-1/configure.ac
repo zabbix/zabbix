@@ -1348,7 +1348,7 @@ dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
 LIBPOLARSSL_CHECK_CONFIG([no])
 if test "x$want_polarssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbed-tls, --with-gnutls or --with-openssl).])
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
 	fi
 
 	if test "x$found_polarssl" != "xyes"; then
@@ -1377,7 +1377,7 @@ dnl Check for GnuTLS libgnutls [by default - skip]
 LIBGNUTLS_CHECK_CONFIG([no])
 if test "x$want_gnutls" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbed-tls, --with-gnutls or --with-openssl).])
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
 	fi
 
 	if test "x$found_gnutls" != "xyes"; then
@@ -1406,7 +1406,7 @@ dnl Check for OpenSSL libssl [by default - skip]
 LIBOPENSSL_CHECK_CONFIG([no])
 if test "x$want_openssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
-		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbed-tls, --with-gnutls or --with-openssl).])
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
 	fi
 
 	if test "x$found_openssl" != "xyes"; then
