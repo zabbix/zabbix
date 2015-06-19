@@ -548,6 +548,13 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
+int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
+
+#define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
+#define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
+#define DBlock_dcheckid(dcheckid, druleid)	DBlock_record("dchecks", dcheckid, "druleid", druleid)
+#define DBlock_hostids(ids)			DBlock_records("hosts", ids)
 
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 
