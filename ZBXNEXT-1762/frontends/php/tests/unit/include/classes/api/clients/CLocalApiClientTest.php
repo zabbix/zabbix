@@ -38,28 +38,28 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function incorrectCallProvider() {
-		return array(
+		return [
 			// incorrect api
-			array('Api', 'method', array(), 'token',
+			['Api', 'method', [], 'token',
 				ZBX_API_ERROR_PARAMETERS, 'Incorrect API "Api".'
-			),
+			],
 			// incorrect method
-			array('user', 'incorrectMethod', array(), 'token',
+			['user', 'incorrectMethod', [], 'token',
 				ZBX_API_ERROR_PARAMETERS, 'Incorrect method "user.incorrectMethod".'
-			),
+			],
 			// no auth token
-			array('user', 'get', array(), null,
+			['user', 'get', [], null,
 				ZBX_API_ERROR_NO_AUTH, 'Not authorised.'
-			),
+			],
 			// empty auth token
-			array('user', 'get', array(), '',
+			['user', 'get', [], '',
 				ZBX_API_ERROR_NO_AUTH, 'Not authorised.'
-			),
+			],
 			// unnecessary auth token
-			array('Apiinfo', 'Version', array(), '',
+			['Apiinfo', 'Version', [], '',
 				ZBX_API_ERROR_PARAMETERS, 'The "Apiinfo.Version" method must be called without the "auth" parameter.'
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -69,18 +69,18 @@ class CLocalApiClientTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testCallIncorrect($api, $method, array $params, $auth, $expectedErrorCode, $expectedErrorMessage) {
 		// setup a mock user API to authenticate the user
-		$userMock = $this->getMock('CUser', array('checkAuthentication'));
-		$userMock->expects($this->any())->method('checkAuthentication')->will($this->returnValue(array(
+		$userMock = $this->getMock('CUser', ['checkAuthentication']);
+		$userMock->expects($this->any())->method('checkAuthentication')->will($this->returnValue([
 			'debug_mode' => false
-		)));
+		]));
 
-		$this->client->setServiceFactory(new CRegistryFactory(array(
+		$this->client->setServiceFactory(new CRegistryFactory([
 			'host' => 'CHost',
 			'apiinfo' => 'CAPIInfo',
 			'user' => function() use ($userMock) {
 				return $userMock;
 			}
-		)));
+		]));
 
 		$response = $this->client->callMethod($api, $method, $params, $auth);
 		$this->assertTrue($response instanceof CApiClientResponse);

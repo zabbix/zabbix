@@ -29,7 +29,7 @@ class CAutoloader {
 	 *
 	 * @var array
 	 */
-	protected $includePaths = array();
+	protected $includePaths = [];
 
 	/**
 	 * Initializes object with array of include paths.
@@ -46,7 +46,7 @@ class CAutoloader {
 	 * @return bool
 	 */
 	public function register() {
-		return spl_autoload_register(array($this, 'loadClass'));
+		return spl_autoload_register([$this, 'loadClass']);
 	}
 
 	/**

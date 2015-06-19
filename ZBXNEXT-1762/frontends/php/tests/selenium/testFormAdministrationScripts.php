@@ -26,49 +26,49 @@ class testFormAdministrationScripts extends CWebTest {
 		// data - values for form inputs
 		// saveResult - if save action should be successful
 		// dbValues - values which should be in db if saveResult is true
-		$data = array(
-			array(
-				array(
-					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
-					array('name' => 'command', 'value' => 'run', 'type' => 'text')
-				),
+		$data = [
+			[
+				[
+					['name' => 'name', 'value' => 'script', 'type' => 'text'],
+					['name' => 'command', 'value' => 'run', 'type' => 'text']
+				],
 				true,
-				array(
+				[
 					'name' => 'script',
 					'command' => 'run'
-				)
-			),
-			array(
-				array(
-					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
-					array('name' => 'command', 'value' => 'run', 'type' => 'text'),
-					array('name' => 'type', 'value' => 'IPMI', 'type' => 'select')
-				),
+				]
+			],
+			[
+				[
+					['name' => 'name', 'value' => 'script', 'type' => 'text'],
+					['name' => 'command', 'value' => 'run', 'type' => 'text'],
+					['name' => 'type', 'value' => 'IPMI', 'type' => 'select']
+				],
 				true,
-				array(
+				[
 					'name' => 'script',
 					'command' => 'run',
 					'type' => 1
-				)
-			),
-			array(
-				array(
-					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
-					array('name' => 'command', 'value' => 'run', 'type' => 'text'),
-					array('name' => 'enableConfirmation', 'type' => 'check')
-				),
+				]
+			],
+			[
+				[
+					['name' => 'name', 'value' => 'script', 'type' => 'text'],
+					['name' => 'command', 'value' => 'run', 'type' => 'text'],
+					['name' => 'enableConfirmation', 'type' => 'check']
+				],
 				false,
-				array()
-			),
-			array(
-				array(
-					array('name' => 'name', 'value' => 'script', 'type' => 'text'),
-					array('name' => 'command', 'value' => '', 'type' => 'text')
-				),
+				[]
+			],
+			[
+				[
+					['name' => 'name', 'value' => 'script', 'type' => 'text'],
+					['name' => 'command', 'value' => '', 'type' => 'text']
+				],
 				false,
-				array()
-			)
-		);
+				[]
+			]
+		];
 		return $data;
 	}
 
@@ -79,40 +79,40 @@ class testFormAdministrationScripts extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF SCRIPTS');
 		$this->zbxTestTextPresent('Script');
 
-		$this->zbxTestTextPresent(array('Name'));
+		$this->zbxTestTextPresent(['Name']);
 		$this->assertElementPresent('name');
 
-		$this->zbxTestTextPresent(array('Type'));
+		$this->zbxTestTextPresent(['Type']);
 		$this->assertElementPresent('type');
 		$this->assertSelectHasOption('type', 'IPMI');
 		$this->assertSelectHasOption('type', 'Script');
 
-		$this->zbxTestTextPresent(array('Execute on', 'Zabbix agent', 'Zabbix server'));
+		$this->zbxTestTextPresent(['Execute on', 'Zabbix agent', 'Zabbix server']);
 		$this->assertElementPresent('execute_on_1');
 		$this->assertElementPresent('execute_on_2');
 
-		$this->zbxTestTextPresent(array('Commands'));
+		$this->zbxTestTextPresent(['Commands']);
 		$this->assertElementPresent('command');
 
-		$this->zbxTestTextPresent(array('Description'));
+		$this->zbxTestTextPresent(['Description']);
 		$this->assertElementPresent('description');
 
-		$this->zbxTestTextPresent(array('User group'));
+		$this->zbxTestTextPresent(['User group']);
 		$this->assertElementPresent('usrgrpid');
 
-		$this->zbxTestTextPresent(array('Host group'));
+		$this->zbxTestTextPresent(['Host group']);
 		$this->assertElementPresent('groupid');
 
-		$this->zbxTestTextPresent(array('Required host permissions'));
+		$this->zbxTestTextPresent(['Required host permissions']);
 		$this->assertElementPresent('access');
 		$this->assertSelectHasOption('access', 'Read');
 		$this->assertSelectHasOption('access', 'Write');
 
-		$this->zbxTestTextPresent(array('Enable confirmation'));
+		$this->zbxTestTextPresent(['Enable confirmation']);
 		$this->assertElementPresent('enableConfirmation');
 		$this->assertNotChecked('enableConfirmation');
 
-		$this->zbxTestTextPresent(array('Confirmation text'));
+		$this->zbxTestTextPresent(['Confirmation text']);
 		$this->assertElementPresent('confirmation');
 	}
 

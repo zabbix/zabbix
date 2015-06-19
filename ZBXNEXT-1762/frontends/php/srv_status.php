@@ -30,7 +30,7 @@ define('ZBX_PAGE_DO_REFRESH', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$periods = array(
+$periods = [
 	'today' => _('Today'),
 	'week' => _('This week'),
 	'month' => _('This month'),
@@ -39,29 +39,30 @@ $periods = array(
 	24 * 7 => _('Last 7 days'),
 	24 * 30 => _('Last 30 days'),
 	24 * DAY_IN_YEAR => _('Last 365 days')
-);
+];
 
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'serviceid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null),
-	'showgraph' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('1'),		'isset({serviceid})'),
-	'period' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","', array_keys($periods)).'"'),	null),
-	'fullscreen' => array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),		null)
-);
+$fields = [
+	'serviceid' =>	[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID,	null],
+	'showgraph' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('1'),		'isset({serviceid})'],
+	'period' =>		[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.implode('","', array_keys($periods)).'"'),	null],
+	'fullscreen' => [T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),		null]
+];
 check_fields($fields);
 
 if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
-	$service = API::Service()->get(array(
-		'output' => array('serviceid'),
+	$service = API::Service()->get([
+		'output' => ['serviceid'],
 		'serviceids' => getRequest('serviceid')
-	));
+	]);
 	$service = reset($service);
 
 	if ($service) {
-		$table = new CTable(null, 'chart');
-		$table->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')));
-		$table->show();
+		$table = (new CTable())
+			->addClass('chart')
+			->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')))
+			->show();
 	}
 	else {
 		access_deny();
@@ -93,15 +94,15 @@ else {
 	}
 
 	// fetch services
-	$services = API::Service()->get(array(
-		'output' => array('name', 'serviceid', 'showsla', 'goodsla', 'algorithm'),
-		'selectParent' => array('serviceid'),
-		'selectDependencies' => array('servicedownid', 'soft', 'linkid'),
-		'selectTrigger' => array('description', 'triggerid', 'expression'),
+	$services = API::Service()->get([
+		'output' => ['name', 'serviceid', 'showsla', 'goodsla', 'algorithm'],
+		'selectParent' => ['serviceid'],
+		'selectDependencies' => ['servicedownid', 'soft', 'linkid'],
+		'selectTrigger' => ['description', 'triggerid', 'expression'],
 		'preservekeys' => true,
 		'sortfield' => 'sortorder',
 		'sortorder' => ZBX_SORT_UP
-	));
+	]);
 
 	// expand trigger descriptions
 	$triggers = zbx_objectValues($services, 'trigger');
@@ -115,12 +116,12 @@ else {
 	unset($service);
 
 	// fetch sla
-	$slaData = API::Service()->getSla(array(
-		'intervals' => array(array(
+	$slaData = API::Service()->getSla([
+		'intervals' => [[
 			'from' => $period_start,
 			'to' => $period_end
-		))
-	));
+		]]
+	]);
 	// expand problem trigger descriptions
 	foreach ($slaData as &$serviceSla) {
 		foreach ($serviceSla['problems'] as &$problemTrigger) {
@@ -130,17 +131,17 @@ else {
 	}
 	unset($serviceSla);
 
-	$treeData = array();
+	$treeData = [];
 	createServiceMonitoringTree($services, $slaData, $period, $treeData);
 	$tree = new CServiceTree('service_status_tree',
 		$treeData,
-		array(
+		[
 			'caption' => _('Service'),
 			'status' => _('Status'),
 			'reason' => _('Reason'),
 			'sla' => _('Problem time'),
 			'sla2' => nbsp(_('SLA').' / '._('Acceptable SLA'))
-		)
+		]
 	);
 
 	if ($tree) {
@@ -154,17 +155,17 @@ else {
 			$period_combo->addItem($key, $val);
 		}
 		// controls
-		$r_form->addItem((new CList())->
-			addItem(array(_('Period').SPACE, $period_combo))->
-			addItem(get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])))
+		$r_form->addItem((new CList())
+			->addItem([_('Period').SPACE, $period_combo])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
 		);
 
-		$srv_wdgt = (new CWidget('service-list service-mon'))->
-			setTitle(_('IT services'))->
-			setControls($r_form)->
-			addItem(BR())->
-			addItem($tree->getHTML())->
-			show();
+		$srv_wdgt = (new CWidget())
+			->setTitle(_('IT services'))
+			->setControls($r_form)
+			->addItem(BR())
+			->addItem($tree->getHTML())
+			->show();
 	}
 	else {
 		error(_('Cannot format Tree. Check logic structure in service links.'));

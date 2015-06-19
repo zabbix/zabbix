@@ -24,7 +24,7 @@ global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 $pageHeader = new CPageHeader($data['page']['title']);
 $pageHeader->addCssInit();
 
-$scripts = array();
+$scripts = [];
 
 $css = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {
@@ -47,7 +47,7 @@ CSS;
 	}
 }
 $css = CHtml::encode($css);
-$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
+//$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
 
 $pageHeader->addJsFile('js/browsers.js');
 $pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');

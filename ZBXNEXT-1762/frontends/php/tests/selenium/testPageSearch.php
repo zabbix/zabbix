@@ -52,7 +52,7 @@ class testPageSearch extends CWebTest {
 		$this->wait();
 		$this->zbxTestCheckTitle('Search');
 		$this->zbxTestTextPresent('Displaying 0 of 0 found');
-		$this->zbxTestTextPresent(array('No hosts found.', 'No host groups found.', 'No templates found.'));
+		$this->zbxTestTextPresent(['No hosts found.', 'No host groups found.', 'No templates found.']);
 	}
 
 }

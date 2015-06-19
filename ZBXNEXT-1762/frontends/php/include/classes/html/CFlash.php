@@ -25,7 +25,7 @@ class CFlash extends CTag {
 	public $embededFlash;
 
 	public function __construct($src = null, $width = null, $height = null) {
-		parent::__construct('object', 'yes');
+		parent::__construct('object', true);
 		$this->attributes['classid'] = 'clsid:d27cdb6e-ae6d-11cf-96b8-444553540000';
 		$this->attributes['codebase'] = 'http://download.macromedia.com/pub/shockwave/cabs/flash/swflash.cab#version=6,0,0,0';
 		$this->attributes['align'] = 'middle';

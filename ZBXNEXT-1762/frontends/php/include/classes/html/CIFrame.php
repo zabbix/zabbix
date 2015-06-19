@@ -22,13 +22,13 @@
 class CIFrame extends CTag {
 
 	public function __construct($src = null, $width = '100%', $height = '100%', $scrolling = 'no', $id = 'iframe') {
-		parent::__construct('iframe', 'yes');
+		parent::__construct('iframe', true);
 
 		$this->setSrc($src);
 		$this->setWidth($width);
 		$this->setHeight($height);
 		$this->setScrolling($scrolling);
-		$this->setAttribute('id', $id);
+		$this->setId($id);
 	}
 
 	public function setSrc($value = null) {

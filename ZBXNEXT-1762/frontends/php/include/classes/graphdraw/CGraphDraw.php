@@ -27,7 +27,7 @@ abstract class CGraphDraw {
 		$this->fullSizeY = null;
 		$this->m_minY = null;
 		$this->m_maxY = null;
-		$this->data = array();
+		$this->data = [];
 		$this->items = null;
 		$this->min = null;
 		$this->max = null;
@@ -52,8 +52,8 @@ abstract class CGraphDraw {
 		$this->num = 0;
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
-		$this->axis_valuetype = array(); // overal items type (int/float)
-		$this->graphtheme = array(
+		$this->axis_valuetype = []; // overal items type (int/float)
+		$this->graphtheme = [
 			'description' => 'default',
 			'frontendtheme' => 'default.css',
 			'textcolor' => '202020',
@@ -69,38 +69,38 @@ abstract class CGraphDraw {
 			'righttpercentilecolor' => 'AA0000',
 			'legendview' => '1',
 			'gridview' => '1'
-		);
+		];
 		$this->applyGraphTheme();
 	}
 
 	public function initColors() {
 		// red, green, blue, alpha
-		$this->colorsrgb = array(
-			'Red'				=> array(255, 0, 0, 50),
-			'Dark Red'			=> array(150, 0, 0, 50),
-			'Green'				=> array(0, 255, 0, 50),
-			'Dark Green'		=> array(0, 150, 0, 50),
-			'Blue'				=> array(0, 0, 255, 50),
-			'Dark Blue'			=> array(0, 0, 150, 50),
-			'Yellow'			=> array(255, 255, 0, 50),
-			'Dark Yellow'		=> array(150, 150, 0, 50),
-			'Cyan'				=> array(0, 255, 255, 50),
-			'Dark Cyan'			=> array(0, 150, 150, 50),
-			'Black'				=> array(0, 0, 0, 50),
-			'Gray'				=> array(150, 150, 150, 50),
-			'White'				=> array(255, 255, 255),
-			'Dark Red No Alpha'	=> array(150, 0, 0),
-			'Black No Alpha'	=> array(0, 0, 0),
-			'HistoryMinMax'		=> array(90, 150, 185, 50),
-			'HistoryMax'		=> array(255, 100, 100, 50),
-			'HistoryMin'		=> array(50, 255, 50, 50),
-			'HistoryAvg'		=> array(50, 50, 50, 50),
-			'ValueMinMax'		=> array(255, 255, 150, 50),
-			'ValueMax'			=> array(255, 180, 180, 50),
-			'ValueMin'			=> array(100, 255, 100, 50),
-			'Not Work Period'	=> array(230, 230, 230),
-			'UnknownData'		=> array(130, 130, 130, 50)
-		);
+		$this->colorsrgb = [
+			'Red'				=> [255, 0, 0, 50],
+			'Dark Red'			=> [150, 0, 0, 50],
+			'Green'				=> [0, 255, 0, 50],
+			'Dark Green'		=> [0, 150, 0, 50],
+			'Blue'				=> [0, 0, 255, 50],
+			'Dark Blue'			=> [0, 0, 150, 50],
+			'Yellow'			=> [255, 255, 0, 50],
+			'Dark Yellow'		=> [150, 150, 0, 50],
+			'Cyan'				=> [0, 255, 255, 50],
+			'Dark Cyan'			=> [0, 150, 150, 50],
+			'Black'				=> [0, 0, 0, 50],
+			'Gray'				=> [150, 150, 150, 50],
+			'White'				=> [255, 255, 255],
+			'Dark Red No Alpha'	=> [150, 0, 0],
+			'Black No Alpha'	=> [0, 0, 0],
+			'HistoryMinMax'		=> [90, 150, 185, 50],
+			'HistoryMax'		=> [255, 100, 100, 50],
+			'HistoryMin'		=> [50, 255, 50, 50],
+			'HistoryAvg'		=> [50, 50, 50, 50],
+			'ValueMinMax'		=> [255, 255, 150, 50],
+			'ValueMax'			=> [255, 180, 180, 50],
+			'ValueMin'			=> [100, 255, 100, 50],
+			'Not Work Period'	=> [230, 230, 230],
+			'UnknownData'		=> [130, 130, 130, 50]
+		];
 
 		// i should rename no alpha to alpha at some point to get rid of some confusion
 		foreach ($this->colorsrgb as $name => $RGBA) {
@@ -118,9 +118,9 @@ abstract class CGraphDraw {
 	 * Load the graph theme from the database.
 	 */
 	public function applyGraphTheme() {
-		$theme = DB::find('graph_theme', array(
+		$theme = DB::find('graph_theme', [
 			'theme' => getUserTheme(CWebUser::$data)
-		));
+		]);
 		$theme = reset($theme);
 		if ($theme) {
 			$this->graphtheme = $theme;
@@ -275,11 +275,11 @@ abstract class CGraphDraw {
 			return $this->colors[$color];
 		}
 
-		$RGB = array(
+		$RGB = [
 			hexdec('0x'.substr($color, 0, 2)),
 			hexdec('0x'.substr($color, 2, 2)),
 			hexdec('0x'.substr($color, 4, 2))
-		);
+		];
 
 		if (isset($alfa) && function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
 				&& @imagecreatetruecolor(1, 1)) {
@@ -305,7 +305,7 @@ abstract class CGraphDraw {
 			$blue = (int)($blue * 0.6);
 		}
 
-		$RGB = array($red, $green, $blue);
+		$RGB = [$red, $green, $blue];
 
 		if (isset($alfa) && function_exists('imagecolorexactalpha') && function_exists('imagecreatetruecolor')
 				&& @imagecreatetruecolor(1, 1)) {

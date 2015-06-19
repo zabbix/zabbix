@@ -27,35 +27,31 @@ try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_SETUP);
 }
 catch (Exception $e) {
-	$warningView = new CView('general.warning', array(
-		'message' => array(
-			'header' => 'Configuration file error', 'text' => $e->getMessage()
-		)
-	));
-	$warningView->render();
+	(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))
+		->render();
 	exit;
 }
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'type' =>				array(T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'), null),
-	'server' =>				array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'port' =>				array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')),
-	'database' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')),
-	'user' =>				array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'password' =>			array(T_ZBX_STR, O_OPT, null,	null, 				null),
-	'schema' =>				array(T_ZBX_STR, O_OPT, null,	null, 				null),
-	'zbx_server' =>			array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'zbx_server_name' =>	array(T_ZBX_STR, O_OPT, null,	null,				null),
-	'zbx_server_port' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')),
+$fields = [
+	'type' =>				[T_ZBX_STR, O_OPT, null,	IN('"'.ZBX_DB_MYSQL.'","'.ZBX_DB_POSTGRESQL.'","'.ZBX_DB_ORACLE.'","'.ZBX_DB_DB2.'","'.ZBX_DB_SQLITE3.'"'), null],
+	'server' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
+	'port' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Database port')],
+	'database' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,			null, _('Database name')],
+	'user' =>				[T_ZBX_STR, O_OPT, null,	null,				null],
+	'password' =>			[T_ZBX_STR, O_OPT, null,	null, 				null],
+	'schema' =>				[T_ZBX_STR, O_OPT, null,	null, 				null],
+	'zbx_server' =>			[T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_name' =>	[T_ZBX_STR, O_OPT, null,	null,				null],
+	'zbx_server_port' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535),	null, _('Port')],
 	// actions
-	'save_config' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'retry' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'finish' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'next' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'back' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-);
+	'save_config' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'retry' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'finish' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'next' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'back' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+];
 
 // config
 $ZBX_CONFIG = ZBase::getInstance()->getSession();
@@ -109,25 +105,19 @@ $pageHeader->display();
 /*
  * Dispalying
  */
-$header = new CTag('header', 'yes', new CDiv(new CDiv(null, 'signin-logo')));
-$header->attr('role', 'banner');
+$header = (new CTag('header', true, new CDiv((new CDiv())->addClass('signin-logo'))))
+	->setAttribute('role', 'banner');
 
-$link = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, true);
-$link->setAttribute('target', '_blank');
-$sub_footer = new CDiv(array('Licensed under ', $link), 'signin-links');
+$link = (new CLink('GPL v2', 'http://www.zabbix.com/license.php'))
+	->removeSID()
+	->setAttribute('target', '_blank');
+$sub_footer = (new CDiv(['Licensed under ', $link]))->addClass('signin-links');
 
-$link = new CLink('Zabbix SIA', 'http://www.zabbix.com/', null, null, true);
-$link->setAttribute('target', '_blank');
-$footer = new CTag('footer', 'yes', array(
-	'Zabbix '.ZABBIX_VERSION.'. &copy; '.ZABBIX_COPYRIGHT_FROM.'&ndash;'.ZABBIX_COPYRIGHT_TO.', ',
-	$link
-));
-
-$body = new CTag('body', 'yes', array(
+$body = new CTag('body', true, [
 	$header,
-	new CTag('article', 'yes', array($ZBX_SETUP_WIZARD, $sub_footer)),
-	$footer
-));
+	(new CDiv([$ZBX_SETUP_WIZARD, $sub_footer]))->addClass(ZBX_STYLE_ARTICLE),
+	makePageFooter(false)
+]);
 
 $body->show();
 ?>

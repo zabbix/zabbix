@@ -22,9 +22,9 @@
 class CControllerMediatypeDelete extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'mediatypeids' =>	'required|array_db media_type.mediatypeid'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -40,11 +40,11 @@ class CControllerMediatypeDelete extends CController {
 			return false;
 		}
 
-		$mediatypes = API::Mediatype()->get(array(
+		$mediatypes = API::Mediatype()->get([
 			'mediatypeids' => $this->getInput('mediatypeids'),
 			'countOutput' => true,
 			'editable' => true
-		));
+		]);
 
 		return ($mediatypes == count($this->getInput('mediatypeids')));
 	}

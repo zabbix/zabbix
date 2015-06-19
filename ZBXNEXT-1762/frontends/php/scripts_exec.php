@@ -29,10 +29,10 @@ define('ZBX_PAGE_NO_MENU', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'hostid' =>		array(T_ZBX_INT, O_OPT, P_ACT, DB_ID, null),
-	'scriptid' =>	array(T_ZBX_INT, O_OPT, null, DB_ID, null)
-);
+$fields = [
+	'hostid' =>		[T_ZBX_INT, O_OPT, P_ACT, DB_ID, null],
+	'scriptid' =>	[T_ZBX_INT, O_OPT, null, DB_ID, null]
+];
 check_fields($fields);
 
 ob_flush();
@@ -41,15 +41,15 @@ flush();
 $scriptId = getRequest('scriptid');
 $hostId = getRequest('hostid');
 
-$data = array(
+$data = [
 	'message' => '',
 	'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptId)))
-);
+];
 
-$result = API::Script()->execute(array(
+$result = API::Script()->execute([
 	'hostid' => $hostId,
 	'scriptid' => $scriptId
-));
+]);
 
 $isErrorExist = false;
 

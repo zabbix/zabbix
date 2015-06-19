@@ -28,11 +28,11 @@ $page['file'] = 'report3.php';
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'serviceid' =>	array(T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,										null),
-	'period' =>		array(T_ZBX_STR, O_OPT,		null,	IN('"daily","weekly","monthly","yearly"'),	null),
-	'year' =>		array(T_ZBX_INT, O_OPT,		null,	null,										null)
-);
+$fields = [
+	'serviceid' =>	[T_ZBX_INT, O_MAND,	P_SYS,	DB_ID,										null],
+	'period' =>		[T_ZBX_STR, O_OPT,		null,	IN('"daily","weekly","monthly","yearly"'),	null],
+	'year' =>		[T_ZBX_INT, O_OPT,		null,	null,										null]
+];
 check_fields($fields);
 
 $period = getRequest('period', 'weekly');
@@ -40,10 +40,10 @@ $year = getRequest('year', date('Y'));
 
 define('YEAR_LEFT_SHIFT', 5);
 
-$service = API::Service()->get(array(
-	'output' => array('serviceid', 'name', 'showsla', 'goodsla'),
+$service = API::Service()->get([
+	'output' => ['serviceid', 'name', 'showsla', 'goodsla'],
 	'serviceids' => $_REQUEST['serviceid']
-));
+]);
 $service = reset($service);
 if (!$service) {
 	access_deny();
@@ -57,15 +57,15 @@ $form = new CForm();
 $form->setMethod('get');
 $form->addVar('serviceid', $_REQUEST['serviceid']);
 
-$controls->addItem(array(
+$controls->addItem([
 	SPACE._('Period').SPACE,
-	new CComboBox('period', $period, 'submit()', array(
+	new CComboBox('period', $period, 'submit()', [
 		'daily' => _('Daily'),
 		'weekly' => _('Weekly'),
 		'monthly' => _('Monthly'),
 		'yearly' => _('Yearly')
-	))
-));
+	])
+]);
 
 if ($period != 'yearly') {
 	$cmbYear = new CComboBox('year', $year, 'submit();');
@@ -73,7 +73,7 @@ if ($period != 'yearly') {
 	for ($y = (date('Y') - YEAR_LEFT_SHIFT); $y <= date('Y'); $y++) {
 		$cmbYear->addItem($y, $y);
 	}
-	$controls->addItem(array(SPACE._('Year').SPACE, $cmbYear));
+	$controls->addItem([SPACE._('Year').SPACE, $cmbYear]);
 }
 
 $form->addItem($controls);
@@ -81,7 +81,7 @@ $widget->setControls($form);
 
 $table = new CTableInfo();
 
-$header = array(_('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA'));
+$header = [_('Ok'), _('Problems'), _('Downtime'), _('SLA'), _('Acceptable SLA')];
 
 switch ($period) {
 	case 'yearly':
@@ -168,7 +168,7 @@ switch ($period) {
 
 $table->setHeader($header);
 
-$intervals = array();
+$intervals = [];
 for ($t = $from; $t <= $to; $t++) {
 	if (($start = get_time($t)) > time()) {
 		break;
@@ -178,34 +178,32 @@ for ($t = $from; $t <= $to; $t++) {
 		$end = time();
 	}
 
-	$intervals[] = array(
+	$intervals[] = [
 		'from' => $start,
 		'to' => $end
-	);
+	];
 }
 
-$sla = API::Service()->getSla(array(
+$sla = API::Service()->getSla([
 	'serviceids' => $service['serviceid'],
 	'intervals' => $intervals
-));
+]);
 $sla = reset($sla);
 
 foreach ($sla['sla'] as $intervalSla) {
-	$ok = new CSpan(
+	$ok = (new CSpan(
 		sprintf('%dd %dh %dm',
 			$intervalSla['okTime'] / SEC_PER_DAY,
 			($intervalSla['okTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
 			($intervalSla['okTime'] % SEC_PER_HOUR) / SEC_PER_MIN
-		), ZBX_STYLE_GREEN
-	);
+		)))->addClass(ZBX_STYLE_GREEN);
 
-	$problems = new CSpan(
+	$problems = (new CSpan(
 		sprintf('%dd %dh %dm',
 			$intervalSla['problemTime'] / SEC_PER_DAY,
 			($intervalSla['problemTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
 			($intervalSla['problemTime'] % SEC_PER_HOUR) /SEC_PER_MIN
-		), ZBX_STYLE_RED
-	);
+		)))->addClass(ZBX_STYLE_RED);
 
 	$downtime = sprintf('%dd %dh %dm',
 		$intervalSla['downtimeTime'] / SEC_PER_DAY,
@@ -213,17 +211,18 @@ foreach ($sla['sla'] as $intervalSla) {
 		($intervalSla['downtimeTime'] % SEC_PER_HOUR) / SEC_PER_MIN
 	);
 
-	$percentage = new CSpan(sprintf('%2.4f', $intervalSla['sla']), ($intervalSla['sla'] >= $service['goodsla'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED));
+	$percentage = (new CSpan(sprintf('%2.4f', $intervalSla['sla'])))
+		->addClass($intervalSla['sla'] >= $service['goodsla'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 
-	$table->addRow(array(
+	$table->addRow([
 		format_time($intervalSla['from']),
 		format_time2($intervalSla['to']),
-		$ok,
-		$problems,
-		new CSpan($downtime, ZBX_STYLE_GREY),
+		$intervalSla['okTime'] == 0 ? '' : $ok,
+		$intervalSla['problemTime'] == 0 ? '' : $problems,
+		$intervalSla['downtimeTime'] ==0 ? '' : (new CSpan($downtime))->addClass(ZBX_STYLE_GREY),
 		($service['showsla']) ? $percentage : '',
 		($service['showsla']) ? new CSpan($service['goodsla']) : ''
-	));
+	]);
 }
 $widget->addItem($table);
 $widget->show();
