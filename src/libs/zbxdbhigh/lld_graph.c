@@ -904,10 +904,10 @@ static void	lld_graphs_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *graphs, c
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs, int width, int height,
-		double yaxismin, double yaxismax, unsigned char show_work_period, unsigned char show_triggers,
-		unsigned char graphtype, unsigned char show_legend, unsigned char show_3d, double percent_left,
-		double percent_right, unsigned char ymin_type, unsigned char ymax_type)
+static void	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graphs, int width,
+		int height, double yaxismin, double yaxismax, unsigned char show_work_period,
+		unsigned char show_triggers, unsigned char graphtype, unsigned char show_legend, unsigned char show_3d,
+		double percent_left, double percent_right, unsigned char ymin_type, unsigned char ymax_type)
 {
 	const char		*__function_name = "lld_graphs_save";
 
@@ -966,6 +966,13 @@ static void	lld_graphs_save(zbx_uint64_t parent_graphid, zbx_vector_ptr_t *graph
 	}
 
 	DBbegin();
+
+	if (SUCCEED != DBlock_hostid(hostid))
+	{
+		/* the host was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
 
 	if (0 != new_graphs)
 	{
@@ -1327,7 +1334,7 @@ void	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_
 		lld_graphs_make(&gitems_proto, &graphs, &items, name_proto, ymin_itemid_proto, ymax_itemid_proto,
 				lld_rows);
 		lld_graphs_validate(hostid, &graphs, error);
-		lld_graphs_save(parent_graphid, &graphs, width, height, yaxismin, yaxismax, show_work_period,
+		lld_graphs_save(hostid, parent_graphid, &graphs, width, height, yaxismin, yaxismax, show_work_period,
 				show_triggers, graphtype, show_legend, show_3d, percent_left, percent_right,
 				ymin_type, ymax_type);
 
