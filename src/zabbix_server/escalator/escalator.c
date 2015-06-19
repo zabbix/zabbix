@@ -1487,14 +1487,17 @@ static int	process_escalations(int now, int *nextcheck)
 
 			sql_offset = 0;
 
-			if (SUCCEED != check_escalation(&escalation, &action, &error) && NULL == error)
+			if (SUCCEED != check_escalation(&escalation, &action, &error))
 			{
-				/* Dependable trigger in PROBLEM state. If escalation is cancelled we    */
-				/* process it normally otherwise we only apply nextcheck so this         */
-				/* escalation is processed after dependable trigger changes value to OK. */
-				DBrollback();
-				free_db_action(&action);
-				goto next;
+				/* Dependable trigger in PROBLEM state. If escalation is cancelled we process */
+				/* it normally in order to send notification about the error otherwise we     */
+				/* skip the escalation until dependable trigger changes value to OK.          */
+				if (NULL == error)
+				{
+					DBrollback();
+					free_db_action(&action);
+					goto next;
+				}
 			}
 
 			if (ESCALATION_STATUS_ACTIVE == escalation.status)
@@ -1502,7 +1505,7 @@ static int	process_escalations(int now, int *nextcheck)
 				if (escalation.nextcheck <= now)
 					execute_escalation(&escalation, &action, error);
 
-				/* execute recovery */
+				/* execute recovery if the same record has it */
 				if (ESCALATION_STATUS_COMPLETED != escalation.status && 0 != escalation.r_eventid)
 				{
 					escalation.status = ESCALATION_STATUS_RECOVERY;
