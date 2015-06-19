@@ -5101,6 +5101,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				DCrequeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:

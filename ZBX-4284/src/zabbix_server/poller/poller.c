@@ -671,6 +671,7 @@ static int	get_values(unsigned char poller_type)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
+			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
 					activate_host(&items[i], &last_available, &timespec);
 				break;
@@ -717,8 +718,7 @@ static int	get_values(unsigned char poller_type)
 			}
 
 		}
-		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i] ||
-				(0 != items[i].unreachable && HOST_AVAILABLE_FALSE != last_available))
+		else if (HOST_AVAILABLE_FALSE != last_available)
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
