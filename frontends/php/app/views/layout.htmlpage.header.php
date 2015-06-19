@@ -22,14 +22,13 @@
 global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 $pageHeader = new CPageHeader($data['page']['title']);
-$pageHeader->addCssInit();
 
 $scripts = [];
 
-$css = ZBX_DEFAULT_THEME;
+$theme = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {
 	$config = select_config();
-	$css = getUserTheme($data['user']);
+	$theme = getUserTheme($data['user']);
 
 	$severityCss = <<<CSS
 .disaster { background: #{$config['severity_color_5']} !important; }
@@ -46,8 +45,7 @@ CSS;
 		$scripts[] = 'servercheck.js';
 	}
 }
-$css = CHtml::encode($css);
-//$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
+$pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
 
 $pageHeader->addJsFile('js/browsers.js');
 $pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');

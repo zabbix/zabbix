@@ -18,9 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $pageHeader = (new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']'))
-	->addCssInit()
+	->addCssFile('styles/'.CHtml::encode($data['theme']).'.css')
 	->display();
 
 $buttons = array_key_exists('buttons', $data)

@@ -249,7 +249,8 @@ frontends/php/locale/vi/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
 frontends/php/robots.txt svneol=native#text/plain
-frontends/php/styles/zabbix.css svneol=native#text/css
+frontends/php/styles/blue-theme.css svneol=native#text/css
+frontends/php/styles/dark-theme.css svneol=native#text/css
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/unit/include/classes/import/converters/C20ItemKeyConverterTest.php -text
 frontends/php/tests/unit/include/classes/import/formatters/hostAndTemplate.xml svneol=native#text/xml

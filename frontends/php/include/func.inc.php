@@ -1658,6 +1658,8 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			];
 		}
 
+		$data['theme'] = getUserTheme(CWebUser::$data);
+
 		(new CView('general.warning', $data))->render();
 		exit;
 	}

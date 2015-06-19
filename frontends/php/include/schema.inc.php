@@ -2132,7 +2132,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
-				'default' => 'originalblue',
+				'default' => 'blue-theme',
 			],
 			'authentication_type' => [
 				'null' => false,
