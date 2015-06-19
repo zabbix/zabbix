@@ -95,42 +95,39 @@ $eventWidget = (new CWidget())
 	->setTitle(_s('Event of trigger: "%1$s"', CMacrosResolverHelper::resolveTriggerName($trigger)))
 	->setControls((new CList())->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])));
 
-// trigger details
-$triggerDetailsWidget = new CUiWidget('hat_triggerdetails', make_trigger_details($trigger));
-$triggerDetailsWidget->setHeader(_('Event source details'));
-
-// event details
-$eventDetailsWidget = new CUiWidget('hat_eventdetails', make_event_details($event, $trigger));
-$eventDetailsWidget->setHeader(_('Event details'));
-
 // if acknowledges are not disabled in configuration, let's show them
 if ($config['event_ack_enable']) {
-	$eventAcknowledgesWidget = new CCollapsibleUiWidget('hat_eventack', makeAckTab($event));
+	$eventAcknowledgesWidget = (new CCollapsibleUiWidget('hat_eventack', makeAckTab($event)))
+		->setHeader(_('Acknowledges'));
 	$eventAcknowledgesWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventack.state', true);
-	$eventAcknowledgesWidget->setHeader(_('Acknowledges'));
 }
 else {
 	$eventAcknowledgesWidget = null;
 }
 
 // actions messages
-$actionMessagesWidget = new CCollapsibleUiWidget('hat_eventactionmsgs', getActionMessages($event['alerts']));
+$actionMessagesWidget = (new CCollapsibleUiWidget('hat_eventactionmsgs', getActionMessages($event['alerts'])))
+	->setHeader(_('Message actions'));
 $actionMessagesWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventactionmsgs.state', true);
-$actionMessagesWidget->setHeader(_('Message actions'));
 
 // actions commands
-$actionCommandWidget = new CCollapsibleUiWidget('hat_eventactionmcmds', getActionCommands($event['alerts']));
+$actionCommandWidget = (new CCollapsibleUiWidget('hat_eventactionmcmds', getActionCommands($event['alerts'])))
+	->setHeader(_('Command actions'));
 $actionCommandWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventactioncmds.state', true);
-$actionCommandWidget->setHeader(_('Command actions'));
 
 // event history
-$eventHistoryWidget = new CCollapsibleUiWidget('hat_eventlist', make_small_eventlist($event));
+$eventHistoryWidget = (new CCollapsibleUiWidget('hat_eventlist', make_small_eventlist($event)))
+	->setHeader(_('Event list [previous 20]'));
 $eventHistoryWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventlist.state', true);
-$eventHistoryWidget->setHeader(_('Event list [previous 20]'));
 
 $eventTab = new CTable();
 $eventTab->addRow([
-	(new CDiv([$triggerDetailsWidget, $eventDetailsWidget]))->addClass('column'),
+	new CDiv([
+		(new CUiWidget('hat_triggerdetails', make_trigger_details($trigger)))
+			->setHeader(_('Event source details')),
+		(new CUiWidget('hat_eventdetails', make_event_details($event, $trigger)))
+			->setHeader(_('Event details'))
+	]),
 	new CDiv([$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget])
 ]);
 
