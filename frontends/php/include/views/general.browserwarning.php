@@ -25,7 +25,7 @@
 	<meta name="Author" content="Zabbix SIA" />
 	<meta charset="utf-8" />
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
-	<link rel="stylesheet" type="text/css" href="styles/zabbix.css" />
+	<link rel="stylesheet" type="text/css" href="styles/<?= ZBX_DEFAULT_THEME ?>.css" />
 </head>
 <body>
 	<div class="<?= ZBX_STYLE_ARTICLE ?>">

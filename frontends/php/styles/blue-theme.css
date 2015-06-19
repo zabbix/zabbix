@@ -599,6 +599,7 @@ footer, .footer {
 .filter-forms {
   margin: 0 auto;
   text-align: center;
+  white-space: nowrap;
   background-color: #fff; }
   .filter-forms .cell {
     text-align: left;
@@ -897,7 +898,7 @@ label input[type="radio"] {
   margin-right: 3px; }
 
 input[type="file"] {
-  padding: 1px 1px; }
+  padding: 1px; }
 input[readonly] {
   color: #1f2c33 !important;
   cursor: text !important; }
