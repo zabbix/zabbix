@@ -35,7 +35,7 @@ $table = (new CTable())
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
-	$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64);
+	$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 255);
 	$macro_input->addClass('macro');
 	$macro_input->setAttribute('placeholder', '{$MACRO}');
 

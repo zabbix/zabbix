@@ -49,7 +49,7 @@ class CFunctionMacroParser extends CParser {
 	/**
 	 * Parser for user macros.
 	 *
-	 * @var CMacroParser
+	 * @var CUserMacroParser
 	 */
 	protected $userMacroParser;
 
@@ -62,7 +62,7 @@ class CFunctionMacroParser extends CParser {
 		}
 
 		if ($this->options['18_simple_checks'] === true) {
-			$this->userMacroParser = new CMacroParser('$');
+			$this->userMacroParser = new CUserMacroParser();
 		}
 	}
 
@@ -76,27 +76,27 @@ class CFunctionMacroParser extends CParser {
 		$this->source = $source;
 		$this->pos = $startPos;
 
-		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] != '{'
+		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] !== '{'
 				|| ($host = $this->parseHost()) === null) {
 
 			return false;
 		}
 
-		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] != ':'
+		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] !== ':'
 				|| ($item = $this->parseItem()) === null) {
 
 			$this->pos--;
 			return false;
 		}
 
-		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] != '.'
+		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] !== '.'
 				|| !(list($function, $functionParamList) = $this->parseFunction())) {
 
 			$this->pos--;
 			return false;
 		}
 
-		if (!isset($this->source[$this->pos]) || $this->source[$this->pos] != '}') {
+		if (!isset($this->source[$this->pos]) || $this->source[$this->pos] !== '}') {
 			return false;
 		}
 
@@ -166,14 +166,14 @@ class CFunctionMacroParser extends CParser {
 		}
 		// for instance, tcp,22
 		elseif ($this->options['18_simple_checks'] === true
-				&& isset($this->source[$this->pos]) && $this->source[$this->pos] == ',') {
+				&& isset($this->source[$this->pos]) && $this->source[$this->pos] === ',') {
 			$this->pos++;
 
-			// user macro
-			$result = $this->userMacroParser->parse($this->source, $this->pos);
+			// Parse user macro as a part of a trigger expression.
+			$this->userMacroParser->parse($this->source, $this->pos, true);
 
-			if ($result !== false) {
-				$this->pos += $result->length;
+			if ($this->userMacroParser->isValid()) {
+				$this->pos += $this->userMacroParser->getParseResult()->length;
 			}
 			// numeric parameter or empty parameter
 			else {
@@ -184,14 +184,14 @@ class CFunctionMacroParser extends CParser {
 			}
 		}
 		// for instance, net.tcp.port[,80]
-		elseif (isset($this->source[$this->pos]) && $this->source[$this->pos] == '[') {
+		elseif (isset($this->source[$this->pos]) && $this->source[$this->pos] === '[') {
 			$level = 0;
 			$state = self::STATE_END;
 
 			while (isset($this->source[$this->pos])) {
 				if ($level == 0) {
 					// first square bracket + Zapcat compatibility
-					if ($state == self::STATE_END && $this->source[$this->pos] == '[') {
+					if ($state == self::STATE_END && $this->source[$this->pos] === '[') {
 						$state = self::STATE_NEW;
 					}
 					else {

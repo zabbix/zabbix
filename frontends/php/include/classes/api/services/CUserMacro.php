@@ -251,7 +251,6 @@ class CUserMacro extends CApiService {
 
 		foreach ($globalMacros as $globalMacro) {
 			$this->checkMacro($globalMacro);
-			$this->checkValue($globalMacro);
 			$this->checkUnsupportedFields('globalmacro', $globalMacro,
 				_s('Wrong fields for macro "%1$s".', $globalMacro['macro']));
 		}
@@ -309,7 +308,6 @@ class CUserMacro extends CApiService {
 
 		foreach ($exGlobalMacros as $exGlobalMacro) {
 			$this->checkMacro($exGlobalMacro);
-			$this->checkValue($exGlobalMacro);
 			$this->checkUnsupportedFields('globalmacro', $exGlobalMacro,
 				_s('Wrong fields for macro "%1$s".', $exGlobalMacro['macro']));
 		}
@@ -409,7 +407,6 @@ class CUserMacro extends CApiService {
 
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkMacro($hostMacro);
-			$this->checkValue($hostMacro);
 			$this->checkUnsupportedFields('hostmacro', $hostMacro,
 				_s('Wrong fields for macro "%1$s".', $hostMacro['macro']));
 		}
@@ -469,9 +466,9 @@ class CUserMacro extends CApiService {
 		foreach ($hostMacros as $hostMacro) {
 			$this->checkMacro($hostMacro);
 			$this->checkHostId($hostMacro);
-			$this->checkValue($hostMacro);
 			$this->checkUnsupportedFields('hostmacro', $hostMacro,
-				_s('Wrong fields for macro "%1$s".', $hostMacro['macro']));
+				_s('Wrong fields for macro "%1$s".', $hostMacro['macro'])
+			);
 		}
 
 		$this->checkDuplicateMacros($hostMacros);
@@ -623,24 +620,9 @@ class CUserMacro extends CApiService {
 		if (!isset($macro['macro']) || zbx_empty($macro['macro'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty macro.'));
 		}
-		if (mb_strlen($macro['macro']) > 64) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro name "%1$s" is too long, it should not exceed 64 chars.', $macro['macro']));
-		}
+
 		if (!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong macro "%1$s".', $macro['macro']));
-		}
-	}
-
-	/**
-	 * Validate the "value" field.
-	 *
-	 * @param array $macro
-	 *
-	 * @throws APIException if the field is too long.
-	 */
-	protected function checkValue(array $macro) {
-		if (isset($macro['value']) && mb_strlen($macro['value']) > 255) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" value is too long, it should not exceed 255 chars.', $macro['macro']));
 		}
 	}
 

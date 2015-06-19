@@ -20,25 +20,9 @@
 
 
 /**
- * A parser for custom macros.
+ * A parser for LLD macros.
  */
-class CMacroParser extends CParser {
-
-	/**
-	 * A character that must be present right after the opening curly brace.
-	 *
-	 * For example "$" for user macros like "{$MACRO}".
-	 *
-	 * @var string
-	 */
-	protected $prefixChar;
-
-	/**
-	 * @param string $prefixChar
-	 */
-	public function __construct($prefixChar) {
-		$this->prefixChar = $prefixChar;
-	}
+class CLLDMacroParser extends CParser {
 
 	/**
 	 * @param string    $source
@@ -49,13 +33,13 @@ class CMacroParser extends CParser {
 	public function parse($source, $startPos = 0) {
 		$this->pos = $startPos;
 
-		if (!isset($source[$this->pos]) || $source[$this->pos] != '{') {
+		if (!isset($source[$this->pos]) || $source[$this->pos] !== '{') {
 			return false;
 		}
 
 		$this->pos++;
 
-		if (!isset($source[$this->pos]) || $source[$this->pos] !== $this->prefixChar) {
+		if (!isset($source[$this->pos]) || $source[$this->pos] !== '#') {
 			return false;
 		}
 
@@ -73,13 +57,14 @@ class CMacroParser extends CParser {
 			$this->pos++;
 		}
 
-		if (!isset($source[$this->pos]) || $source[$this->pos] != '}') {
+		if (!isset($source[$this->pos]) || $source[$this->pos] !== '}') {
 			return false;
 		}
 
 		$macroLength = $this->pos - $startPos + 1;
 
 		$result = new CParserResult();
+
 		$result->source = $source;
 		$result->pos = $startPos;
 		$result->length = $macroLength;
