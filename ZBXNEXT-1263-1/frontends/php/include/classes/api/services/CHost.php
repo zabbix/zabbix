@@ -870,7 +870,9 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$this->pskValidation($data);
+		if (array_key_exists('hosts', $data)) {
+			$this->pskValidation($data['hosts']);
+		}
 
 		// add new interfaces
 		if (!empty($data['interfaces'])) {
