@@ -29,7 +29,6 @@
 #define ZBX_PROCSTAT_FLAGS_ZONE_CURRENT		0
 #define ZBX_PROCSTAT_FLAGS_ZONE_ALL		1
 
-
 /* process cpu utilization data */
 typedef struct
 {
@@ -48,16 +47,12 @@ typedef struct
 zbx_procstat_util_t;
 
 void	zbx_procstat_init();
-
 int	zbx_procstat_collector_enabled();
-
 int	zbx_procstat_enabled();
-
 int	zbx_procstat_get_util(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
 		int period, int type, double *value, char **errmsg);
-
 void	zbx_procstat_collect();
 
-#endif
+#endif	/* ZBX_PROCSTAT_COLLECTOR */
 
-#endif
+#endif	/* ZABBIX_PROCSTAT_H */
