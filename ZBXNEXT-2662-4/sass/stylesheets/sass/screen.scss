@@ -846,6 +846,7 @@ footer {
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
+	white-space: nowrap;
 	background-color: $ui-bg-color;
 
 	.cell {
@@ -1326,7 +1327,7 @@ input {
 	}
 
 	&[type="file"] {
-		padding: 1px 1px;
+		padding: 1px;
 		@extend %form-input-style;
 	}
 
