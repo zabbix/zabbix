@@ -98,8 +98,8 @@ $eventWidget = (new CWidget())
 // if acknowledges are not disabled in configuration, let's show them
 if ($config['event_ack_enable']) {
 	$eventAcknowledgesWidget = (new CCollapsibleUiWidget('hat_eventack', makeAckTab($event)))
-		->setHeader(_('Acknowledges'));
-	$eventAcknowledgesWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventack.state', true);
+		->setHeader(_('Acknowledges'))
+		->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventack.state', true));
 }
 else {
 	$eventAcknowledgesWidget = null;
@@ -107,18 +107,18 @@ else {
 
 // actions messages
 $actionMessagesWidget = (new CCollapsibleUiWidget('hat_eventactionmsgs', getActionMessages($event['alerts'])))
-	->setHeader(_('Message actions'));
-$actionMessagesWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventactionmsgs.state', true);
+	->setHeader(_('Message actions'))
+	->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventactionmsgs.state', true));
 
 // actions commands
 $actionCommandWidget = (new CCollapsibleUiWidget('hat_eventactionmcmds', getActionCommands($event['alerts'])))
-	->setHeader(_('Command actions'));
-$actionCommandWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventactioncmds.state', true);
+	->setHeader(_('Command actions'))
+	->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventactioncmds.state', true));
 
 // event history
 $eventHistoryWidget = (new CCollapsibleUiWidget('hat_eventlist', make_small_eventlist($event)))
-	->setHeader(_('Event list [previous 20]'));
-$eventHistoryWidget->open = (bool) CProfile::get('web.tr_events.hats.hat_eventlist.state', true);
+	->setHeader(_('Event list [previous 20]'))
+	->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventlist.state', true));
 
 $eventTab = new CTable();
 $eventTab->addRow([
