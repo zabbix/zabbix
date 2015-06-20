@@ -134,7 +134,7 @@ class CUiWidget extends CDiv {
 	/**
 	 * Build widget header, body and footer.
 	 */
-	public function build() {
+	protected function build() {
 		$body = (new CDiv($this->body))
 			->addClass('body')
 			->setId($this->id);
