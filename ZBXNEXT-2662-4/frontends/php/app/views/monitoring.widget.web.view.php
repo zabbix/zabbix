@@ -97,8 +97,8 @@ foreach ($groups as $group) {
 	}
 }
 
-$script = new CJsScript(get_js(
-	'jQuery("#'.WIDGET_WEB_OVERVIEW.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-));
-
-$widget = (new CDiv([$table, $script]))->show();
+echo (new CJson())->encode([
+	'header' => _('Web monitoring'),
+	'body' =>  (new CDiv($table))->toString(),
+	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+]);

@@ -56,8 +56,8 @@ foreach ($drules as $drule) {
 	]);
 }
 
-$script = new CJsScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'.
-	_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-));
-
-$widget = (new CDiv([$table, $script]))->show();
+echo (new CJson())->encode([
+	'header' =>  _('Discovery status'),
+	'body' =>  (new CDiv($table]))->toString(),
+	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+]);

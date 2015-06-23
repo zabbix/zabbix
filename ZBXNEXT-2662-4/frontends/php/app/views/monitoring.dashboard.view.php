@@ -98,25 +98,21 @@ $dashboardGrid[$col][$row] = $favouriteScreens;
 
 $widgets = [
 	WIDGET_SYSTEM_STATUS => [
-		'header' => _('System status'),
 		'action' => 'widget.system.view',
 		'col' => 1,
 		'row' => 1
 	],
 	WIDGET_HOST_STATUS => [
-		'header' => _('Host status'),
 		'action' => 'widget.hosts.view',
 		'col' => 1,
 		'row' => 2
 	],
 	WIDGET_LAST_ISSUES => [
-		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
 		'action' => 'widget.issues.view',
 		'col' => 1,
 		'row' => 3
 	],
 	WIDGET_WEB_OVERVIEW => [
-		'header' => _('Web monitoring'),
 		'action' => 'widget.web.view',
 		'col' => 1,
 		'row' => 4
@@ -125,7 +121,6 @@ $widgets = [
 
 if ($data['show_status_widget']) {
 	$widgets[WIDGET_ZABBIX_STATUS] = [
-		'header' => _('Status of Zabbix'),
 		'action' => 'widget.status.view',
 		'col' => 1,
 		'row' => 0
@@ -133,7 +128,6 @@ if ($data['show_status_widget']) {
 }
 if ($data['show_discovery_widget']) {
 	$widgets[WIDGET_DISCOVERY_STATUS] = [
-		'header' => _('Discovery status'),
 		'action' => 'widget.discovery.view',
 		'col' => 1,
 		'row' => 5
@@ -155,7 +149,7 @@ foreach ($widgets as $widgetid => $widget) {
 
 	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass('preloader')))
 		->setExpanded($expanded)
-		->setHeader($widget['header'], [$icon])
+		->setHeader(null, [$icon])
 		->setFooter(new CList([
 			(new CDiv())->addClass('textwhite')->setId($widgetid.'_footer')
 		]));
