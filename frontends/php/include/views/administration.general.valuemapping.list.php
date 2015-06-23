@@ -40,9 +40,11 @@ foreach ($this->data['valuemaps'] as $valuemap) {
 
 	$mappings = [];
 	foreach ($valuemap['maps'] as $map) {
-		$mappings[] = $map['value'].SPACE.'&rArr;'.SPACE.$map['newvalue'];
+		$mappings[] = $map['value'].' &rArr; '.$map['newvalue'];
 		$mappings[] = BR();
 	}
+	array_pop($mappings);
+
 	$valueMappingTable->addRow([
 		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
 		$mappings

@@ -26,7 +26,6 @@ $widget = (new CWidget())
 	);
 
 $imageForm = (new CForm('post', null, 'multipart/form-data'))
-	->setName('imageForm')
 	->addVar('form', $this->data['form']);
 if (isset($this->data['imageid'])) {
 	$imageForm->addVar('imageid', $this->data['imageid']);
