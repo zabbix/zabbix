@@ -464,11 +464,7 @@ function make_system_status($filter) {
 		$table->addRow($groupRow);
 	}
 
-	$script = new CJsScript(get_js(
-		'jQuery("#'.WIDGET_SYSTEM_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-	));
-
-	return new CDiv([$table, $script]);
+	return new CDiv($table);
 }
 
 function make_status_of_zbx() {
@@ -535,11 +531,7 @@ function make_status_of_zbx() {
 		}
 	}
 
-	$script = new CJsScript(get_js(
-		'jQuery("#'.WIDGET_ZABBIX_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-	));
-
-	return new CDiv([$table, $script]);
+	return new CDiv($table);
 }
 
 /**
@@ -798,14 +790,10 @@ function make_latest_issues(array $filter = []) {
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$script = new CJsScript(get_js(
-		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-	));
-
 	$infoDiv = (new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount)))
 		->addStyle('text-align: right; padding-right: 3px;');
 
-	return new CDiv([$table, $infoDiv, $script]);
+	return new CDiv([$table, $infoDiv]);
 }
 
 /**

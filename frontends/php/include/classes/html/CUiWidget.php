@@ -91,7 +91,9 @@ class CUiWidget extends CDiv {
 
 		$this->header = (new CDiv())->addClass('dashbrd-widget-head header');
 
-		$this->header->addItem(new CTag('h4', true, $caption));
+		$this->header->addItem(
+			(new CTag('h4', true, $caption))->setId($this->id.'_header')
+		);
 
 		if ($icons) {
 			$this->header->addItem(new CList($icons));
