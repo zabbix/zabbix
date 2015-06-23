@@ -77,13 +77,19 @@ class CFormList extends CList {
 		return $this;
 	}
 
-	public function addInfo($text, $label = null) {
+	public function addInfo($text) {
 		$this->addItem(
 			[
-				(new CDiv($label ? $label : _('Info')))->addClass('dt right listInfoLabel'),
-				(new CDiv($text))->addClass('objectgroup inlineblock border_dotted listInfoText')
-			],
-			'formrow listInfo'
+				(new CDiv(_('Info')))
+					->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT)
+					->addClass('listInfoLabel'),
+				(new CDiv($text))
+					->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+					->addClass('objectgroup')
+					->addClass('inlineblock')
+					->addClass('border_dotted')
+					->addClass('listInfoText')
+			]
 		);
 		return $this;
 	}

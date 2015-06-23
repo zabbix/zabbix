@@ -78,16 +78,15 @@ $triggerDOFormList = (new CFormList())
 		_('seconds')
 	]);
 
-$severityForm = (new CForm())->setName('triggerDisplayOptions');
-
-$severityView = (new CTabView())
-	->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList)
-	->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
-		[new CButton('resetDefaults', _('Reset defaults'))]
-	));
-
-$severityForm->addItem($severityView);
+$severityForm = (new CForm())
+	->addItem(
+		(new CTabView())
+			->addTab('triggerdo', _('Trigger displaying options'), $triggerDOFormList)
+			->setFooter(makeFormFooter(
+				new CSubmit('update', _('Update')),
+				[new CButton('resetDefaults', _('Reset defaults'))]
+			))
+	);
 
 $widget->addItem($severityForm);
 

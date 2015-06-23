@@ -70,7 +70,8 @@ class CTag extends CObject {
 			$value = $this->encode($value, $strategy);
 			$res .= ' '.$key.'="'.$value.'"';
 		}
-		$res .= ($this->paired) ? '>' : ' />';
+		$res .= '>';
+//		$res .= ($this->paired) ? '>' : ' />';
 
 		return $res;
 	}
