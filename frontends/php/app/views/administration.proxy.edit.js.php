@@ -2,8 +2,7 @@
 	jQuery(document).ready(function() {
 		// proxy mode: active or passive
 		jQuery('#status').change(function() {
-			var active = (jQuery(this).val() == 5);
-			if (active) {
+			if (jQuery(this).val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
 				jQuery('#ip').closest('li').hide();
 			}
 			else {
@@ -32,5 +31,8 @@
 			jQuery('#port').val(jQuery.trim(jQuery('#port').val()));
 			jQuery('#description').val(jQuery.trim(jQuery('#description').val()));
 		});
+
+		// refresh field visibility on document load
+		jQuery('#status').trigger('change');
 	});
 </script>
