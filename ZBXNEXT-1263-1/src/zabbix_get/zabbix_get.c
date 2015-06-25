@@ -436,5 +436,5 @@ out:
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
 #endif
-	return ret;
+	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }
