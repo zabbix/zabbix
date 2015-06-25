@@ -685,6 +685,7 @@ void	zbx_procstat_collect()
 	zbx_vector_ptr_t		queries;
 	zbx_vector_uint64_t		pids;
 	zbx_procstat_util_t		*stats, *putil;
+	zbx_timespec_t			snapshot_timestamp;
 
 	if (FAIL == zbx_procstat_enabled() || FAIL == procstat_running())
 		return;
@@ -785,6 +786,7 @@ void	zbx_procstat_collect()
 		stats[i].pid = pids.values[i];
 
 	zbx_proc_get_stats(stats, pids.values_num);
+	zbx_timespec(&snapshot_timestamp);
 
 	/* calculate the cpu utilization for queries since the last snapshot */
 	for (j = 0; j < queries.values_num; j++)
@@ -893,7 +895,7 @@ void	zbx_procstat_collect()
 
 		query->h_data[index].utime = qdata->utime;
 		query->h_data[index].stime = qdata->stime;
-		zbx_timespec(&query->h_data[index].timestamp);
+		query->h_data[index].timestamp = snapshot_timestamp;
 	}
 
 	header->pids_num = pids.values_num;
