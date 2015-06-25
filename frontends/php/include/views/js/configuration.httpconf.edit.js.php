@@ -147,10 +147,6 @@
 			start: function(e, ui) {
 				// fix placeholder not to change height while object is being dragged
 				$(ui.placeholder).height($(ui.helper).height());
-
-				if (IE8) {
-					$('#stepTab #httpFormList ul.formlist').find('li.formrow');
-				}
 			}
 		});
 

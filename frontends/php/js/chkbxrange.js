@@ -317,7 +317,7 @@ var chkbxRange = {
 	submitFooterButton: function(e) {
 		e = e || window.event;
 
-		var footerButton = IE8 ? jQuery(e.srcElement) : jQuery(e.target),
+		var footerButton = jQuery(e.target),
 			form = footerButton.closest('form'),
 			confirmText = footerButton.attr('confirm');
 		if (confirmText && !confirm(confirmText)) {
