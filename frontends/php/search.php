@@ -188,12 +188,30 @@ foreach ($hosts as $hnum => $host) {
 		// host
 		$hostCell = [(new CSpan($visibleName))->addClass($style)];
 
-		$applications_link = _('Applications').' ('.$host['applications'].')';
-		$items_link = _('Items').' ('.$host['items'].')';
-		$triggers_link = _('Triggers').' ('.$host['triggers'].')';
-		$graphs_link = _('Graphs').' ('.$host['graphs'].')';
-		$discoveryLink = _('Discovery').' ('.$host['discoveries'].')';
-		$httpTestsLink = _('Web').' ('.$host['httpTests'].')';
+		$applications_link = [
+			_('Applications'),
+			CViewHelper::showNum($host['applications'])
+		];
+		$items_link = [
+			_('Items'),
+			CViewHelper::showNum($host['items'])
+		];
+		$triggers_link = [
+			_('Triggers'),
+			CViewHelper::showNum($host['triggers'])
+		];
+		$graphs_link = [
+			_('Graphs'),
+			CViewHelper::showNum($host['graphs'])
+		];
+		$discoveryLink = [
+			_('Discovery'),
+			CViewHelper::showNum($host['discoveries'])
+		];
+		$httpTestsLink = [
+			_('Web'),
+			CViewHelper::showNum($host['httpTests'])
+		];
 	}
 
 	// display the host name only if it matches the search string and is different from the visible name
