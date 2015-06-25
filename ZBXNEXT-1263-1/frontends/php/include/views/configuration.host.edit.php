@@ -35,6 +35,7 @@ $frmHost = (new CForm())
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags'])
+	->addVar('tls_accept', $data['tls_accept'])
 	->setAttribute('id', 'hostForm');
 
 if ($data['hostid'] != 0) {
@@ -795,12 +796,12 @@ $encryptionFormList->addRow(_('Connections from host'), [
 	BR(),
 	[new CCheckBox('tls_in_cert'), _('Certificate')]
 ]);
-$encryptionFormList->addRow(_('PSK identity'), new CTextBox('tls_psk_identity', $data['tls_psk_identity'], 64, false,
+$encryptionFormList->addRow(_('PSK identity'), new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false,
 	128
 ));
-$encryptionFormList->addRow(_('PSK'), new CTextBox('tls_psk', $data['tls_psk'], 64, false, 512));
-$encryptionFormList->addRow(_('Issuer'), new CTextBox('tls_issuer', $data['tls_issuer'], 64, false, 1024));
-$encryptionFormList->addRow(_('Subject'), new CTextBox('tls_subject', $data['tls_subject'], 64, false, 1024));
+$encryptionFormList->addRow(_('PSK'), new CTextBox('tls_psk', $data['tls_psk'], false, 512));
+$encryptionFormList->addRow(_('Issuer'), new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024));
+$encryptionFormList->addRow(_('Subject'), new CTextBox('tls_subject', $data['tls_subject'], false, 1024));
 
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
 
