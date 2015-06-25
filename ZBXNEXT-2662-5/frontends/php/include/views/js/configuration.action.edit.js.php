@@ -221,14 +221,6 @@
 					}
 					break;
 			}
-
-			// IE8 hack to fix inline-block container resizing
-			if (IE8) {
-				inlineContainers = container.parents('.inlineblock').filter(function() {
-					return jQuery(this).css('display') == 'inline-block';
-				});
-				inlineContainers.last().addClass('ie8fix-inline').removeClass('ie8fix-inline');
-			}
 		}
 	}
 
@@ -245,10 +237,6 @@
 
 		row.find('*').remove();
 		row.remove();
-
-		if (IE8) {
-			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function removeOperationCondition(index) {
@@ -263,10 +251,6 @@
 		var rowParent = row.parent();
 
 		row.remove();
-
-		if (IE8) {
-			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function removeOpmsgUserRow(userid) {
@@ -274,10 +258,6 @@
 		var rowParent = row.parent();
 
 		row.remove();
-
-		if (IE8) {
-			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function removeOpGroupRow(groupid) {
@@ -445,9 +425,6 @@
 					height: 450
 				}
 			});
-			if (IE8) {
-				jQuery('.formElementTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-			}
 		}
 	}
 
