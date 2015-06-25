@@ -722,13 +722,6 @@ elseif ($srctbl == 'templates') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($templates as &$template) {
-		$name = (new CLink($template['name'], 'javascript:void(0);'))
-			->removeSID()
-			->setId('spanid'.$template['templateid']);
-
-		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
-			$parentId.');';
-
 		if ($multiselect) {
 			$checkBox = new CCheckBox('templates['.$template['templateid'].']', $template['templateid']);
 		}
@@ -739,10 +732,16 @@ elseif ($srctbl == 'templates') {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled(false);
 			}
-			$name->removeAttribute('class');
+			$name = $template['name'];
 		}
 		else {
-			$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($template['templateid']).', '.
+				$parentId.');';
+
+			$name = (new CLink($template['name'], 'javascript:void(0);'))
+				->removeSID()
+				->setId('spanid'.$template['templateid'])
+				->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 			$data[$template['templateid']] = [
 				'id' => $template['templateid'],
@@ -805,13 +804,6 @@ elseif ($srctbl == 'hosts') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hosts as &$host) {
-		$name = (new CLink($host['name'], 'javascript:void(0);'))
-			->removeSID()
-			->setId('spanid'.$host['hostid']);
-
-		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
-			$parentId.');';
-
 		if ($multiselect) {
 			$checkBox = new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']);
 		}
@@ -822,10 +814,16 @@ elseif ($srctbl == 'hosts') {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled(false);
 			}
-			$name->removeAttribute('class');
+			$name = $host['name'];
 		}
 		else {
-			$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
+				$parentId.');';
+
+			$name = (new CLink($host['name'], 'javascript:void(0);'))
+				->removeSID()
+				->setId('spanid'.$host['hostid'])
+				->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 			$data[$host['hostid']] = [
 				'id' => $host['hostid'],
@@ -889,13 +887,6 @@ elseif ($srctbl == 'host_templates') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hosts as &$host) {
-		$name = (new CLink($host['name'], 'javascript:void(0);'))
-			->removeSID()
-			->setId('spanid'.$host['hostid']);
-
-		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
-			$parentId.');';
-
 		if ($multiselect) {
 			$checkBox = new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']);
 		}
@@ -906,10 +897,16 @@ elseif ($srctbl == 'host_templates') {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled(false);
 			}
-			$name->removeAttribute('class');
+			$name = $host['name'];
 		}
 		else {
-			$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($host['hostid']).', '.
+				$parentId.');';
+
+			$name = (new CLink($host['name'], 'javascript:void(0);'))
+				->removeSID()
+				->setId('spanid'.$host['hostid'])
+				->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 			$data[$host['hostid']] = [
 				'id' => $host['hostid'],
@@ -969,12 +966,6 @@ elseif ($srctbl == 'host_groups') {
 	$parentId = $dstfld1 ? zbx_jsvalue($dstfld1) : 'null';
 
 	foreach ($hostgroups as &$hostgroup) {
-		$name = (new CLink($hostgroup['name'], 'javascript:void(0);'))
-			->removeSID()
-			->setId('spanid'.$hostgroup['groupid']);
-
-		$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
-			$parentId.');';
 		if ($multiselect) {
 			$checkBox = new CCheckBox('hostGroups['.$hostgroup['groupid'].']', $hostgroup['groupid']);
 		}
@@ -985,10 +976,16 @@ elseif ($srctbl == 'host_groups') {
 				$checkBox->setChecked(1);
 				$checkBox->setEnabled(false);
 			}
-			$name->removeAttribute('class');
+			$name = $hostgroup['name'];
 		}
 		else {
-			$name->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
+			$jsAction = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($hostgroup['groupid']).', '.
+				$parentId.');';
+
+			$name = (new CLink($hostgroup['name'], 'javascript:void(0);'))
+				->removeSID()
+				->setId('spanid'.$hostgroup['groupid'])
+				->onClick($jsAction.' jQuery(this).removeAttr("onclick");');
 
 			$data[$hostgroup['groupid']] = [
 				'id' => $hostgroup['groupid'],
@@ -1540,23 +1537,24 @@ elseif ($srctbl == 'sysmaps') {
 	order_result($sysmaps, 'name');
 
 	foreach ($sysmaps as $sysmap) {
-		$description = (new CLink($sysmap['name'], 'javascript:void(0);'))->removeSID();
-
-		if ($multiselect) {
-			$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($sysmap['sysmapid']).');';
-		}
-		else {
-			$values = [
-				$dstfld1 => $sysmap[$srcfld1],
-				$dstfld2 => $sysmap[$srcfld2]
-			];
-			$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
-		}
 		if (isset($excludeids[$sysmap['sysmapid']])) {
-			$description->removeAttribute('class');
+			$description = $sysmap['name'];
 		}
 		else {
-			$description->onClick($js_action.' jQuery(this).removeAttr("onclick");');
+			if ($multiselect) {
+				$js_action = 'javascript: addValue('.zbx_jsvalue($reference).', '.zbx_jsvalue($sysmap['sysmapid']).');';
+			}
+			else {
+				$values = [
+					$dstfld1 => $sysmap[$srcfld1],
+					$dstfld2 => $sysmap[$srcfld2]
+				];
+				$js_action = 'javascript: addValues('.zbx_jsvalue($dstfrm).', '.zbx_jsvalue($values).'); close_window(); return false;';
+			}
+
+			$description = (new CLink($sysmap['name'], 'javascript:void(0);'))
+				->removeSID()
+				->onClick($js_action.' jQuery(this).removeAttr("onclick");');
 		}
 
 		$table->addRow([
