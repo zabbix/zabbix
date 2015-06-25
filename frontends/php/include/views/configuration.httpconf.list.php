@@ -42,28 +42,28 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create form
-$httpForm = new CForm();
-$httpForm->setName('scenarios');
-$httpForm->addVar('hostid', $this->data['hostid']);
+$httpForm = (new CForm())
+	->setName('scenarios')
+	->addVar('hostid', $this->data['hostid']);
 
-$httpTable = new CTableInfo();
-$httpTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	($this->data['hostid'] == 0)
-		? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
-		: null,
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Number of steps'),
-	_('Update interval'),
-	_('Retries'),
-	_('Authentication'),
-	_('HTTP proxy'),
-	_('Application'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
-	$this->data['showInfoColumn'] ? _('Info') : null
-]);
+$httpTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_httptests'))->onClick("checkAll('".$httpForm->getName()."', 'all_httptests', 'group_httptestid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		($this->data['hostid'] == 0)
+			? make_sorting_header(_('Host'), 'hostname', $this->data['sort'], $this->data['sortorder'])
+			: null,
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Number of steps'),
+		_('Update interval'),
+		_('Retries'),
+		_('Authentication'),
+		_('HTTP proxy'),
+		_('Application'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
+		$this->data['showInfoColumn'] ? _('Info') : null
+	]);
 
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $httpTests = $this->data['httpTests'];
@@ -95,10 +95,7 @@ foreach ($httpTests as $httpTestId => $httpTest) {
 				)
 				: _s('Unknown step failed: %1$s', $lastData['error']);
 
-			$infoIcon = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconerror')
-				->setHint($errorMessage, ZBX_STYLE_RED);
+			$infoIcon = makeErrorIcon($errorMessage);
 		}
 		else {
 			$infoIcon = '';

@@ -22,7 +22,6 @@
 class CTable extends CTag {
 
 	public $headerClass;
-	public $footerClass;
 	protected $header;
 	protected $footer;
 	protected $colnum;
@@ -35,25 +34,21 @@ class CTable extends CTag {
 		$this->header = '';
 		$this->headerClass = null;
 		$this->footer = '';
-		$this->footerClass = null;
 		$this->colnum = 1;
 	}
 
 	public function setCellPadding($value) {
 		$this->attributes['cellpadding'] = strval($value);
-
 		return $this;
 	}
 
 	public function setCellSpacing($value) {
 		$this->attributes['cellspacing'] = strval($value);
-
 		return $this;
 	}
 
 	public function setNoDataMessage($message) {
 		$this->message = $message;
-
 		return $this;
 	}
 
@@ -111,24 +106,18 @@ class CTable extends CTag {
 
 		$value = new CTag('thead', true, $value);
 		$this->header = $value->toString();
-
 		return $this;
 	}
 
-	public function setFooter($value = null, $class = 'footer') {
-		if (is_null($class)) {
-			$class = $this->footerClass;
-		}
+	public function setFooter($value = null, $class = null) {
 		$this->footer = $this->prepareRow($value, $class);
 		$this->footer = $this->footer->toString();
-
 		return $this;
 	}
 
 	public function addRow($item, $class = null, $id = null) {
 		$item = $this->addItem($this->prepareRow($item, $class, $id));
 		++$this->rownum;
-
 		return $this;
 	}
 
