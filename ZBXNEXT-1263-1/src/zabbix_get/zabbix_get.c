@@ -263,7 +263,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 int	main(int argc, char **argv)
 {
 	unsigned short	port = ZBX_DEFAULT_AGENT_PORT;
-	int		ret = EXIT_SUCCESS, opt_k = 0, opt_p = 0, opt_s = 0, opt_i = 0;
+	int		ret = SUCCEED, opt_k = 0, opt_p = 0, opt_s = 0, opt_i = 0;
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
 #ifndef _WINDOWS
 	struct rlimit	limit;
@@ -436,8 +436,5 @@ out:
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
 #endif
-	if (FAIL == ret)
-		ret = EXIT_FAILURE;
-
 	return ret;
 }
