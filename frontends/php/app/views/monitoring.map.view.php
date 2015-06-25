@@ -21,8 +21,7 @@
 
 $mapWidget = (new CWidget())->setTitle(_('Maps'));
 
-$headerMapForm = new CForm('get');
-$headerMapForm->cleanItems();
+$headerMapForm = (new CForm('get'))->cleanItems();
 
 $controls = new CList();
 
@@ -37,11 +36,11 @@ if ($data['maps']) {
 		$maps[$sysmapid] = $map['name'];
 	}
 
-	$headerMapForm->addVar('action', 'map.view');
-	$headerMapForm->addVar('fullscreen', $data['fullscreen']);
+	$headerMapForm->addVar('action', 'map.view')
+		->addVar('fullscreen', $data['fullscreen']);
 
-	$controls->addItem([_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)]);
-	$controls->addItem([_('Minimum severity').SPACE, $data['pageFilter']->getSeveritiesMinCB()]);
+	$controls->addItem([_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)])
+		->addItem([_('Minimum severity').SPACE, $data['pageFilter']->getSeveritiesMinCB()]);
 
 	// get map parent maps
 	$parentMaps = [];
@@ -61,8 +60,8 @@ if ($data['maps']) {
 
 	$mapTable->addRow($actionMap);
 
-	$imgMap = new CImg('map.php?sysmapid='.$data['sysmapid'].'&severity_min='.$data['severity_min']);
-	$imgMap->setMap($actionMap->getName());
+	$imgMap = (new CImg('map.php?sysmapid='.$data['sysmapid'].'&severity_min='.$data['severity_min']))
+		->setMap($actionMap->getName());
 	$mapTable->addRow($imgMap);
 
 	$controls->addItem(get_icon('favourite', [

@@ -91,11 +91,14 @@ class CUiWidget extends CDiv {
 
 		$this->header = (new CDiv())->addClass('dashbrd-widget-head header');
 
-		$this->header->addItem(new CTag('h4', true, $caption));
+		$this->header->addItem(
+			(new CTag('h4', true, $caption))->setId($this->id.'_header')
+		);
 
 		if ($icons) {
 			$this->header->addItem(new CList($icons));
 		}
+		return $this;
 	}
 
 	/**
@@ -115,6 +118,7 @@ class CUiWidget extends CDiv {
 		$this->header = (new CDiv($table))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->addClass('ui-widget-header header');
+		return $this;
 	}
 
 	/**
@@ -126,14 +130,15 @@ class CUiWidget extends CDiv {
 	public function setFooter($list) {
 		$this->footer = $list;
 		$this->footer->addClass('dashbrd-widget-foot');
+		return $this;
 	}
 
 	/**
 	 * Build widget header, body and footer.
 	 */
-	public function build() {
+	protected function build() {
 		$body = (new CDiv($this->body))
-			->setClass('body')
+			->addClass('body')
 			->setId($this->id);
 
 		$this->cleanItems();
@@ -141,6 +146,7 @@ class CUiWidget extends CDiv {
 		$this->addItem($this->header);
 		$this->addItem($body);
 		$this->addItem($this->footer);
+		return $this;
 	}
 
 	/**

@@ -34,13 +34,13 @@ class CVar {
 
 	public function setValue($value) {
 		$this->var_container = [];
-		if (is_null($value)) {
-			return;
+		if ($value !== null) {
+			$this->parseValue($this->var_name, $value);
 		}
-		$this->parseValue($this->var_name, $value);
+		return $this;
 	}
 
-	public function parseValue($name, $value) {
+	private function parseValue($name, $value) {
 		if (is_array($value)) {
 			foreach ($value as $key => $item) {
 				if (is_null($item)) {

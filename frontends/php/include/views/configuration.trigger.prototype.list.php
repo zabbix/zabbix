@@ -42,21 +42,21 @@ $widget->addHeaderRowNumber(array(
 */
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$triggersTable = new CTableInfo();
-$triggersTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
-	_('Expression'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-]);
+$triggersTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
+		_('Expression'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 foreach ($this->data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];

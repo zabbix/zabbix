@@ -41,15 +41,15 @@ $widget = (new CWidget())
 $applicationForm = new CForm();
 
 // create table
-$applicationTable = new CTableInfo();
-$applicationTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_applications'))->onClick("checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	($this->data['hostid'] > 0) ? null : _('Host'),
-	make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Items')
-]);
+$applicationTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_applications'))->onClick("checkAll('".$applicationForm->getName()."', 'all_applications', 'applications');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		($this->data['hostid'] > 0) ? null : _('Host'),
+		make_sorting_header(_('Application'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Items')
+	]);
 
 foreach ($this->data['applications'] as $application) {
 	// inherited app, display the template list

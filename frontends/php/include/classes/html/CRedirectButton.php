@@ -51,5 +51,6 @@ class CRedirectButton extends CSimpleButton {
 		if ($confirmation !== null) {
 			$this->setAttribute('data-confirmation', $confirmation);
 		}
+		return $this;
 	}
 }
