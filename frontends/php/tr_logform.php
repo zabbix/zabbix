@@ -218,7 +218,9 @@ if (hasRequest('sform')) {
 
 	$keys = getRequest('keys', []);
 
-	$frmTRLog->addRow(_('Description'), new CTextBox('description', $description, 80));
+	$frmTRLog->addRow(_('Description'),
+		(new CTextBox('description', $description))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 	$itemName = '';
 
@@ -239,15 +241,17 @@ if (hasRequest('sform')) {
 		$itemName = $host['name'].NAME_DELIMITER.$dbItem['name_expanded'];
 	}
 
-	$ctb = new CTextBox('item', $itemName, 80);
-	$ctb->setId('item');
-	$ctb->setAttribute('disabled', 'disabled');
-
 	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
 		"&srctbl=items&srcfld1=itemid&srcfld2=name');";
-	$cbtn = (new CSubmit('select_item', _('Select')))->onClick($script);
 
-	$frmTRLog->addRow(_('Item'), [$ctb, $cbtn]);
+	$frmTRLog->addRow(_('Item'), [
+		(new CTextBox('item', $itemName))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('item')
+			->setAttribute('disabled', 'disabled'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CSubmit('select_item', _('Select')))->onClick($script)
+	]);
 	$frmTRLog->addVar('itemid', $itemid);
 
 
@@ -256,8 +260,9 @@ if (hasRequest('sform')) {
 	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
 	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
 
-	$ctb = new CTextBox('expression', '', 80);
-	$ctb->setId('logexpr');
+	$ctb = (new CTextBox('expression'))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setId('logexpr');
 
 	$cb = (new CButton('add_exp', _('Add')))->onClick('javascript: add_logexpr();');
 	$cbAdd = (new CButton('add_key_and', _('AND')))->onClick('javascript: add_keyword_and();');
@@ -278,15 +283,15 @@ if (hasRequest('sform')) {
 
 	$maxId = 0;
 	foreach ($expressions as $id => $expr) {
-		$imgup = new CImg('images/general/arrow_up.png', 'up', 12, 14);
-		$imgup->onClick('javascript: element_up("logtr'.$id.'");');
-		$imgup->onMouseover('javascript: this.style.cursor = "pointer";');
-		$imgup->addClass('updown');
+		$imgup = (new CImg('images/general/arrow_up.png', 'up', 12, 14))
+			->onClick('javascript: element_up("logtr'.$id.'");')
+			->onMouseover('javascript: this.style.cursor = "pointer";')
+			->addClass('updown');
 
-		$imgdn = new CImg('images/general/arrow_down.png', 'down', 12, 14);
-		$imgdn->onClick('javascript: element_down("logtr'.$id.'");');
-		$imgdn->onMouseover('javascript: this.style.cursor = "pointer";');
-		$imgdn->addClass('updown');
+		$imgdn = (new CImg('images/general/arrow_down.png', 'down', 12, 14))
+			->onClick('javascript: element_down("logtr'.$id.'");')
+			->onMouseover('javascript: this.style.cursor = "pointer";')
+			->addClass('updown');
 
 		$del_url = (new CSpan(_('Delete')))
 			->addClass('link')
@@ -346,8 +351,8 @@ if (hasRequest('sform')) {
 	$sev_select->addItems($severityNames);
 
 	$frmTRLog->addRow(_('Severity'), $sev_select);
-	$frmTRLog->addRow(_('Comments'), new CTextArea('comments', $comments));
-	$frmTRLog->addRow(_('URL'), new CTextBox('url', $url, 80));
+	$frmTRLog->addRow(_('Comments'), (new CTextArea('comments', $comments))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+	$frmTRLog->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 	$frmTRLog->addRow(_('Disabled'),
 		(new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_DISABLED)
 	);

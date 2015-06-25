@@ -22,7 +22,7 @@
 class CView {
 
 	/**
-	 * @var string - name of the template file without extension, for example 'general.search'
+	 * @var string - name of the template file without extension, for example 'configuration.item.edit'
 	 */
 	private $filePath;
 

@@ -52,8 +52,6 @@ $fields = [
 	'txt_select' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'inventory' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	// ajax
-	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","lastchange","priority"'),	null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -68,18 +66,6 @@ if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid'
 }
 if (getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.tr_status.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 /*
@@ -213,8 +199,8 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
  */
 $triggerWidget = (new CWidget())->setTitle(_('Status of triggers'));
 
-$rightForm = new CForm('get');
-$rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
+$rightForm = (new CForm('get'))
+	->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 $controls = new CList();
 $controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
@@ -229,6 +215,7 @@ $triggerWidget->setControls($rightForm);
 $filterFormView = new CView('common.filter.trigger', [
 	'overview' => false,
 	'filter' => [
+		'filterid' => 'web.tr_status.filter.state',
 		'showTriggers' => $showTriggers,
 		'ackStatus' => $ackStatus,
 		'showEvents' => $showEvents,
@@ -253,9 +240,9 @@ $triggerWidget->addItem($filterForm);
 /*
  * Form
  */
-$triggerForm = new CForm('get', 'acknow.php');
-$triggerForm->setName('tr_status');
-$triggerForm->addVar('backurl', $page['file']);
+$triggerForm = (new CForm('get', 'acknow.php'))
+	->setName('tr_status')
+	->addVar('backurl', $page['file']);
 
 /*
  * Table
@@ -277,21 +264,21 @@ else {
 	$showHideAllDiv = null;
 }
 
-$triggerTable = new CTableInfo();
-$triggerTable->setHeader([
-	$showHideAllDiv,
-	$config['event_ack_enable'] ? $headerCheckBox : null,
-	make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
-	_('Status'),
-	_('Info'),
-	make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
-	_('Age'),
-	$showEventColumn ? _('Duration') : null,
-	$config['event_ack_enable'] ? _('Ack') : null,
-	_('Host'),
-	make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
-	_('Description')
-]);
+$triggerTable = (new CTableInfo())
+	->setHeader([
+		$showHideAllDiv,
+		$config['event_ack_enable'] ? $headerCheckBox : null,
+		make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
+		_('Status'),
+		_('Info'),
+		make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
+		_('Age'),
+		$showEventColumn ? _('Duration') : null,
+		$config['event_ack_enable'] ? _('Ack') : null,
+		_('Host'),
+		make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
+		_('Description')
+	]);
 
 // get triggers
 $options = [
@@ -531,25 +518,25 @@ foreach ($triggers as $trigger) {
 	}
 
 	if (!empty($trigger['dependencies'])) {
-		$dependenciesTable = new CTableInfo();
-		$dependenciesTable->setAttribute('style', 'width: 200px;');
-		$dependenciesTable->addRow(bold(_('Depends on').':'));
+		$dependenciesTable = (new CTableInfo())
+			->setAttribute('style', 'width: 200px;')
+			->addRow(bold(_('Depends on').':'));
 
 		foreach ($trigger['dependencies'] as $dependency) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
-		$img = new CImg('images/general/arrow_down2.png', 'DEP_UP');
-		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-		$img->setHint($dependenciesTable);
+		$img = (new CImg('images/general/arrow_down2.png', 'DEP_UP'))
+			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			->setHint($dependenciesTable);
 
 		$description = [$img, SPACE, $description];
 	}
 
 	$dependency = false;
-	$dependenciesTable = new CTableInfo();
-	$dependenciesTable->setAttribute('style', 'width: 200px;');
-	$dependenciesTable->addRow(bold(_('Dependent').':'));
+	$dependenciesTable = (new CTableInfo())
+		->setAttribute('style', 'width: 200px;')
+		->addRow(bold(_('Dependent').':'));
 	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
@@ -560,9 +547,9 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($dependency) {
-		$img = new CImg('images/general/arrow_up2.png', 'DEP_UP');
-		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-		$img->setHint($dependenciesTable);
+		$img = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
+			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			->setHint($dependenciesTable);
 
 		$description = [$img, SPACE, $description];
 	}
@@ -698,10 +685,7 @@ foreach ($triggers as $trigger) {
 	// unknown triggers
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-		$unknown = (new CDiv(SPACE))
-			->addClass('status_icon')
-			->addClass('iconunknown')
-			->setHint($trigger['error'], ZBX_STYLE_RED);
+		$unknown = makeUnknownIcon($trigger['error']);
 	}
 
 	// comments

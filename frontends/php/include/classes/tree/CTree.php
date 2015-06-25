@@ -68,8 +68,8 @@ class CTree {
 	}
 
 	private function simpleHTML() {
-		$table = new CTableInfo();
-		$table->setHeader($this->makeHeaders());
+		$table = (new CTableInfo())
+			->setHeader($this->makeHeaders());
 
 		foreach ($this->tree as $id => $rows) {
 			$table->addRow($this->makeRow($id));

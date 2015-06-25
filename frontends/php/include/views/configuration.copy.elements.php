@@ -32,11 +32,11 @@ if (!empty($this->data['title'])) {
 }
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar($this->data['elements_field'], $this->data['elements']);
-$triggersForm->addVar('hostid', $this->data['hostid']);
-$triggersForm->addVar('action', $this->data['action']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar($this->data['elements_field'], $this->data['elements'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('action', $this->data['action']);
 
 // create form list
 $triggersFormList = new CFormList('triggersFormList');
@@ -109,12 +109,11 @@ if (empty($targets)) {
 $triggersFormList->addRow(_('Target'), $targets);
 
 // append tabs to form
-$triggersTab = new CTabView();
-
-$triggersTab->addTab('triggersTab',
-	_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
-	$triggersFormList
-);
+$triggersTab = (new CTabView())
+	->addTab('triggersTab',
+		_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
+		$triggersFormList
+	);
 
 // append buttons to form
 $triggersTab->setFooter(makeFormFooter(
