@@ -123,7 +123,7 @@ class ZBase {
 	/**
 	 * Initializes the application.
 	 */
-	public function run($mode = self::EXEC_MODE_DEFAULT) {
+	public function run($mode) {
 		$this->init();
 
 		$this->setMaintenanceMode();
@@ -150,7 +150,6 @@ class ZBase {
 					$this->initDB();
 					$this->authenticateUser();
 					$this->initLocales();
-					DBclose();
 				}
 				catch (ConfigFileException $e) {}
 				break;
@@ -263,10 +262,8 @@ class ZBase {
 	 */
 	public static function getThemes() {
 		return [
-			'classic' => _('Classic'),
-			'originalblue' => _('Original blue'),
-			'darkblue' => _('Black & Blue'),
-			'darkorange' => _('Dark orange')
+			'blue-theme' => _('Blue'),
+			'dark-theme' => _('Dark'),
 		];
 	}
 

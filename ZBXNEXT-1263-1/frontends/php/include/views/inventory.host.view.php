@@ -168,8 +168,9 @@ if ($ipmiInterfaceRows) {
 		$ipmiInterfacesTable->addClass('element-row');
 	}
 	else {
-		$ipmiInterfacesTable->addClass('element-row-first');
-		$ipmiInterfacesTable->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
+		$ipmiInterfacesTable
+			->addClass('element-row-first')
+			->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
 		$interfaceTableHeaderSet = true;
 	}
 
@@ -279,9 +280,9 @@ $overviewFormList->addRow(_('Configuration'), [
 	(new CSpan([$webLink, SPACE, '('.$this->data['host']['httpTests'].')']))->addClass('overview-link')
 ]);
 
-$hostInventoriesTab = new CTabView(['remember' => true]);
-$hostInventoriesTab->setSelected(0);
-$hostInventoriesTab->addTab('overviewTab', _('Overview'), $overviewFormList);
+$hostInventoriesTab = (new CTabView(['remember' => true]))
+	->setSelected(0)
+	->addTab('overviewTab', _('Overview'), $overviewFormList);
 
 /*
  * Details tab
@@ -311,10 +312,10 @@ if (!$inventoryValues) {
 $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 
 // append tabs and form
-$hostInventoriesForm = new CForm();
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel(url_param('groupid'))]));
 
-$hostInventoriesForm->addItem($hostInventoriesTab);
-$hostInventoryWidget->addItem($hostInventoriesForm);
+$hostInventoryWidget->addItem(
+	(new CForm())->addItem($hostInventoriesTab)
+);
 
 return $hostInventoryWidget;

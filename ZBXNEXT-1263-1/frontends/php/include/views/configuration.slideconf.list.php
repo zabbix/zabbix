@@ -28,19 +28,18 @@ $widget = (new CWidget())
 	);
 
 // create form
-$slideForm = new CForm();
-$slideForm->setName('slideForm');
+$slideForm = (new CForm())->setName('slideForm');
 
 // create table
-$slidesTable = new CTableInfo();
-$slidesTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_shows'))->onClick("checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
-]);
+$slidesTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_shows'))->onClick("checkAll('".$slideForm->getName()."', 'all_shows', 'shows');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Delay'), 'delay', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Number of slides'), 'cnt', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 foreach ($this->data['slides'] as $slide) {
 	$slidesTable->addRow([

@@ -21,20 +21,18 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$triggersWidget = new CWidget();
+$triggersWidget = (new CWidget())->setTitle(_('Triggers'));
 
 // append host summary to widget header
 if (!empty($data['hostid'])) {
 	$triggersWidget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
-$triggersWidget->setTitle(_('Triggers'));
-
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('hostid', $data['hostid']);
-$triggersForm->addVar('action', $data['action']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('hostid', $data['hostid'])
+	->addVar('action', $data['action']);
 
 foreach ($data['g_triggerid'] as $triggerid) {
 	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);

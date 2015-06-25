@@ -32,7 +32,7 @@
 	<h1>Dashboard</h1>
 	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
 	</div>
-		<ul class="object-group"><li><b><a href="">All hosts</a> / Zabbix server:</b></li><li class="green">Enabled</li><li><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></li><li><span class="status-red">z</span> <span class="status-red">snmp</span> <span class="status-red">jmx</span> <span class="status-red">ipmi</span></li><li><span class="status-grey">z</span> <span class="status-grey">snmp</span> <span class="status-grey">jmx</span> <span class="status-grey">ipmi</span></li><li><span><b><a href="">Discovery</a></b></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
+		<ul class="object-group"><li><b><a href="">All hosts</a> / Zabbix server:</b></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">z</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">z</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><span><b><a href="">Discovery</a></b></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
 	<div class="filter-btn-container">
 	<button type="button" class="filter-trigger filter-active">Filter<span class="arrow-up"></span></button>
 	</div>
@@ -44,7 +44,7 @@
 	<ul class="table-forms">
 	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right">
 	<div class="multiselect-wrapper">
-	<div class="multiselect">
+	<div class="multiselect" style="width: 160px">
       <div class="selected">
         <ul class="multiselect-list disabled">
           <li data-id=""><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn"></span></span></li><li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn"></span></span></li>
@@ -58,7 +58,7 @@
 	</li>
 	<li><div class="table-forms-td-left"><label for="Groups">Host group</label></div><div class="table-forms-td-right">
 	<div class="multiselect-wrapper">
-	<div class="multiselect">
+	<div class="multiselect" style="width: 160px">
       <div class="selected">
         <ul class="multiselect-list">
           <li data-id="" class="selected"><span class="subfilter-enabled">Discovered hosts<span class="subfilter-disable-btn"></span></span></li><li data-id=""><span class="subfilter-enabled">Linux servers<span class="subfilter-disable-btn"></span></span></li>
@@ -71,7 +71,7 @@
     </div>
 	</li>
 	<li><div class="table-forms-td-left"><label for="Groups">Host</label></div><div class="table-forms-td-right">
-	<div class="multiselect">
+	<div class="multiselect" style="width: 160px">
 	<div class="available" style="top: 23px">
 	<div class="multiselect-matches">More matches found</div>
 	<ul class="multiselect-suggest"><li class="suggest-hover"><span class="grey"><span class="suggest-found">Za</span>bbix servers</span></li><li><span class="grey"><span class="suggest-found">Za</span>bbix servers</span>df dsfsdf sfsdf sdfsdfsdf</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="grey"><span class="suggest-found">Za</span>bbix servers</span></li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server</li><li>Zabbix server</li><li>Zabbix server</li></ul>
@@ -108,7 +108,7 @@
 	</div>
 	</div>
 	<div class="filter-forms"><button type="button">Filter</button><button type="button" class="btn-alt">Reset</button></div>
-
+<!--
 <div id="scrollbar_cntr">
   <div class="scrollbar" style="width: 1500px">
     <div class="info" style="width: 1500px">
@@ -140,7 +140,7 @@
     </div>
   </div>
 </div>
-
+-->
 <table class="list-table">
      <thead>
         <tr><th><h4>Subfilter <span>affects only filtered data</span></h4></th></tr>
@@ -193,6 +193,8 @@
 				<th>Templates</th>
 				<th><a href="">Status</a></th>
 				<th>Availability</th>
+				<th>Encryption (I/O)</th>
+				<th></th>
 				<th></th>
 			</tr>
 		</thead>
@@ -210,8 +212,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-grey">z</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-grey">na</span></div><div class="status-container"><span class="status-green">na</span><span class="status-green">psk</span><span class="status-green">cert</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr class="row-selected">
 			    <td>root</td>
@@ -226,8 +230,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-red">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-green">cert</span><span class="status-green">psk</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td><div class="treeview"><span class="arrow-right"></span></div><a href="">Public Cloud Service</a></td>
@@ -242,8 +248,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-grey">z</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td><div class="treeview"><span class="arrow-down"></span></div><a href="">Business System</a></td>
@@ -258,8 +266,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-red">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-green">psk</span><span class="status-green">psk</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td style="padding-left: 2em;"><div class="treeview"><span class="arrow-right"></span></div><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
@@ -274,8 +284,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-green">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-green">cert</span><span class="status-green">psk</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td style="padding-left: 2em;"><div class="treeview"><span class="arrow-down"></span></div><a href="">CRM</a>-<a href="">CRM is unavailable by ICMP</a></td>
@@ -290,8 +302,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-green">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-green">cert</span><span class="status-green">psk</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td style="padding-left: 4em;"><a href="">ERP 2</a>-<a href="">ERP 2 is unavailable by ICMP</a></td>
@@ -306,8 +320,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-green">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-green">cert</span><span class="status-green">psk</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -322,8 +338,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-green">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-green">cert</span><span class="status-green">psk</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -338,8 +356,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-green">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-green">cert</span><span class="status-green">psk</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr class="row-selected">
 			    <td></td>
@@ -354,8 +374,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-green">ipmi</span></div></td>
+				<td></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -370,8 +392,10 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-green">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td><div class="status-container"><span class="status-green">cert</span><span class="status-green">cert</span></div></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr>
 			    <td></td>
@@ -386,11 +410,13 @@
 				<td>127.0.01: 10050</td>
 				<td><a href="" class="grey link-alt">Template App Zabbix Server</a>, <a href="" class="grey link-alt">Template OS Linux (Template Zabbix Agent)</a></td>
 				<td><a href="">Enabled</a></td>
-				<td><span class="status-green">z</span> <span class="status-green">snmp</span> <span class="status-green">jmx</span> <span class="status-green">ipmi</span></td>
+				<td><div class="status-container"><span class="status-green">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></td>
+				<td></td>
 				<td><span class="status-yellow"><b>!</b></span></td>
+				<td><span class="status-red"><b>&times;</b></span></td>
 			</tr>
 			<tr class="nothing-to-show">
-			    <td colspan="13">We couldn't find any results</td>
+			    <td colspan="15">We couldn't find any results</td>
 			</tr>
 		</tbody>
 	</table>
