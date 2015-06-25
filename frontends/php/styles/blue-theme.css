@@ -621,7 +621,8 @@ footer, .footer {
 .multiselect {
   position: relative;
   margin-right: 3px;
-  min-height: 24px; }
+  min-height: 24px;
+  white-space: normal; }
   .multiselect.active {
     border-color: #0275b8; }
   .multiselect input[type="text"] {
@@ -1549,6 +1550,17 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   .overlay-dialogue-footer button {
     margin: 0 0 0 14px; }
 
+.overlay-bg {
+  background-color: #fff;
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+  left: 0;
+  opacity: 0.35;
+  filter: alpha(opacity=35); }
+
 .pop-up {
   min-width: initial;
   margin-bottom: 0; }
@@ -1818,7 +1830,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
     font-size: 1.167em; }
 
 .msg-bad-global {
-  display: none;
+  display: block;
   position: fixed;
   bottom: 0;
   z-index: 10000;
