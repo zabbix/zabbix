@@ -2,8 +2,7 @@
 	jQuery(document).ready(function() {
 		// proxy mode: active or passive
 		jQuery('#status').change(function() {
-			var active = (jQuery(this).val() == 5);
-			if (active) {
+			if (jQuery(this).val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
 				jQuery('#ip').closest('li').hide();
 				jQuery('#tls_in_none').closest('li').removeClass('hidden');
 				jQuery('#tls_connect').closest('li').addClass('hidden');
@@ -77,5 +76,8 @@
 
 			jQuery('#tls_accept').val(tls_accept);
 		});
+
+		// refresh field visibility on document load
+		jQuery('#status').trigger('change');
 	});
 </script>

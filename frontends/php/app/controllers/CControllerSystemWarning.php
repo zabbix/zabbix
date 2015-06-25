@@ -34,6 +34,11 @@ class CControllerSystemWarning extends CController {
 	}
 
 	protected function doAction() {
+		$data = [
+			'theme' => getUserTheme(CWebUser::$data),
+			'messages' => []
+		];
+
 		if (isset($_SESSION['messages'])) {
 			$data['messages'] = $_SESSION['messages'];
 			unset($_SESSION['messages']);
