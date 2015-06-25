@@ -111,9 +111,9 @@ $period = getRequest('period', ZBX_DEFAULT_INTERVAL);
 
 $widget = (new CWidget())->setTitle(_('New media'));
 
-$form = new CForm();
-$form->addVar('media', $media);
-$form->addVar('dstfrm', $_REQUEST['dstfrm']);
+$form = (new CForm())
+	->addVar('media', $media)
+	->addVar('dstfrm', $_REQUEST['dstfrm']);
 
 $frmMedia = new CFormList(_('New media'));
 
@@ -126,8 +126,8 @@ foreach ($types as $mediaTypeId => $type) {
 	$cmbType->addItem($mediaTypeId, $type['description']);
 }
 $frmMedia->addRow(_('Type'), $cmbType);
-$frmMedia->addRow(_('Send to'), new CTextBox('sendto', $sendto, 48));
-$frmMedia->addRow(_('When active'), new CTextBox('period', $period, 48));
+$frmMedia->addRow(_('Send to'), (new CTextBox('sendto', $sendto))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+$frmMedia->addRow(_('When active'), (new CTextBox('period', $period))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 
 $frm_row = [];
 

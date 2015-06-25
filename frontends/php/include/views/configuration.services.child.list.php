@@ -24,22 +24,21 @@ include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 $servicesChildWidget = (new CWidget())->setTitle(_('IT service dependencies'));
 
 // create form
-$servicesChildForm = new CForm();
-$servicesChildForm->setName('servicesForm');
+$servicesChildForm = (new CForm())->setName('servicesForm');
 if (!empty($this->data['service'])) {
 	$servicesChildForm->addVar('serviceid', $this->data['service']['serviceid']);
 }
 
 // create table
-$servicesChildTable = new CTableInfo();
-$servicesChildTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_services'))->onClick("javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	_('Service'),
-	_('Status calculation'),
-	_('Trigger')
-]);
+$servicesChildTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_services'))->onClick("javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Service'),
+		_('Status calculation'),
+		_('Trigger')
+	]);
 
 $prefix = null;
 foreach ($this->data['db_cservices'] as $service) {

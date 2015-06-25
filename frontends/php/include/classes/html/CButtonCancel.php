@@ -38,6 +38,7 @@ class CButtonCancel extends CButton {
 		}
 		$uri = new CUrl($url);
 		$url = $uri->getUrl();
-		return $this->onClick("javascript: return redirect('".$url."');");
+		$this->onClick("javascript: return redirect('".$url."');");
+		return $this;
 	}
 }

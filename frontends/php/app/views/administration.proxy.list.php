@@ -31,24 +31,23 @@ $widget = (new CWidget())
 	);
 
 // create form
-$proxyForm = new CForm('get');
-$proxyForm->setName('proxyForm');
+$proxyForm = (new CForm('get'))->setName('proxyForm');
 
 // create table
-$proxyTable = new CTableInfo();
-$proxyTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_hosts'))
-			->onClick("checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),
-	_('Mode'),
-	_('Last seen (age)'),
-	_('Host count'),
-	_('Item count'),
-	_('Required performance (vps)'),
-	_('Hosts')
-]);
+$proxyTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_hosts'))
+				->onClick("checkAll('".$proxyForm->getName()."', 'all_hosts', 'proxyids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),
+		_('Mode'),
+		_('Last seen (age)'),
+		_('Host count'),
+		_('Item count'),
+		_('Required performance (vps)'),
+		_('Hosts')
+	]);
 
 foreach ($data['proxies'] as $proxy) {
 	$hosts = [];

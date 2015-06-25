@@ -22,21 +22,20 @@
 $discoveryWidget = (new CWidget())->setTitle(_('Status of discovery'));
 
 // create header form
-$controls = new CList();
-$controls->addItem([_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()]);
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
+$controls = (new CList())
+	->addItem([_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()])
+	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
-$discoveryHeaderForm = new CForm('get');
-$discoveryHeaderForm->setName('slideHeaderForm');
-$discoveryHeaderForm->addVar('action', 'discovery.view');
-$discoveryHeaderForm->addVar('fullscreen', $data['fullscreen']);
-$discoveryHeaderForm->addItem($controls);
-
-$discoveryWidget->setControls($discoveryHeaderForm);
+$discoveryWidget->setControls(
+	(new CForm('get'))
+		->setName('slideHeaderForm')
+		->addVar('action', 'discovery.view')
+		->addVar('fullscreen', $data['fullscreen'])
+		->addItem($controls)
+);
 
 // create table
-$discoveryTable = new CTableInfo();
-$discoveryTable->makeVerticalRotation();
+$discoveryTable = (new CTableInfo())->makeVerticalRotation();
 
 $discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $data['sort'], $data['sortorder']);
 $discoveredDeviceCol->addClass('left');
@@ -163,8 +162,7 @@ foreach ($data['drules'] as $drule) {
 				$class = $h_data['services'][$name]['class'];
 				$time = $h_data['services'][$name]['time'];
 
-				$hintTable = new CTableInfo();
-				$hintTable->setAttribute('style', 'width: auto;');
+				$hintTable = (new CTableInfo())->setAttribute('style', 'width: auto;');
 
 				if ($class == 'active') {
 					$hintTable->setHeader(_('Uptime'));

@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/js/configuration.host.massupdate.js.php';
 $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 
 // create form
-$hostView = new CForm();
-$hostView->setName('hostForm');
-$hostView->addVar('action', 'host.massupdate');
+$hostView = (new CForm())
+	->setName('hostForm')
+	->addVar('action', 'host.massupdate');
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }
@@ -50,16 +50,18 @@ if (isset($_REQUEST['groups'])) {
 	}
 }
 
-$replaceGroups = (new CDiv(new CMultiSelect([
-	'name' => 'groups[]',
-	'objectName' => 'hostGroup',
-	'objectOptions' => ['editable' => true],
-	'data' => $hostGroupsToReplace,
-	'popup' => [
-		'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
-			'&writeonly=1&multiselect=1'
-	]
-])))->setId('replaceGroups');
+$replaceGroups = (new CDiv(
+	(new CMultiSelect([
+		'name' => 'groups[]',
+		'objectName' => 'hostGroup',
+		'objectOptions' => ['editable' => true],
+		'data' => $hostGroupsToReplace,
+		'popup' => [
+			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=groups_&srcfld1=groupid'.
+				'&writeonly=1&multiselect=1'
+		]
+	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+))->setId('replaceGroups');
 
 $hostFormList->addRow(
 	[
@@ -101,18 +103,6 @@ if (isset($_REQUEST['new_groups'])) {
 	}
 }
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$newGroups = (new CDiv(new CMultiSelect([
-		'name' => 'new_groups[]',
-		'objectName' => 'hostGroup',
-		'objectOptions' => ['editable' => true],
-		'data' => $hostGroupsToAdd,
-		'addNew' => true,
-		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1'
-		]
-	])))->setId('newGroups');
-
 	$hostFormList->addRow(
 		[
 			_('Add new or existing host groups'),
@@ -120,29 +110,41 @@ if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
 			(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
 				->setChecked(isset($data['visible']['new_groups']))
 		],
-		$newGroups
+		(new CDiv(
+			(new CMultiSelect([
+				'name' => 'new_groups[]',
+				'objectName' => 'hostGroup',
+				'objectOptions' => ['editable' => true],
+				'data' => $hostGroupsToAdd,
+				'addNew' => true,
+				'popup' => [
+					'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_'.
+						'&srcfld1=groupid&writeonly=1&multiselect=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->setId('newGroups')
 	);
 }
 else {
-	$newGroups = new CMultiSelect([
-		'name' => 'new_groups[]',
-		'objectName' => 'hostGroup',
-		'objectOptions' => ['editable' => true],
-		'data' => $hostGroupsToAdd,
-		'popup' => [
-			'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_&srcfld1=groupid'.
-				'&writeonly=1&multiselect=1'
-		]
-	]);
-
 	$hostFormList->addRow(
 		[
 			_('New host group'),
 			SPACE,
-			(new CVisibilityBox('visible[new_groups]', 'new_groups_', _('Original')))
+			(new CVisibilityBox('visible[new_groups]', 'newGroups', _('Original')))
 				->setChecked(isset($data['visible']['new_groups']))
 		],
-		$newGroups
+		(new CDiv(
+			(new CMultiSelect([
+				'name' => 'new_groups[]',
+				'objectName' => 'hostGroup',
+				'objectOptions' => ['editable' => true],
+				'data' => $hostGroupsToAdd,
+				'popup' => [
+					'parameters' => 'srctbl=host_groups&dstfrm='.$hostView->getName().'&dstfld1=new_groups_'.
+						'&srcfld1=groupid&writeonly=1&multiselect=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->setId('newGroups')
 	);
 }
 
@@ -154,7 +156,7 @@ $hostFormList->addRow(
 		(new CVisibilityBox('visible[description]', 'description', _('Original')))
 			->setChecked(isset($data['visible']['description']))
 	],
-	new CTextArea('description', $data['description'])
+	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 // append proxy to form list
@@ -199,7 +201,7 @@ $clearDiv = (new CDiv())->addStyle('clear: both;');
 
 $templatesDiv = (new CDiv(
 	[
-		new CMultiSelect([
+		(new CMultiSelect([
 			'name' => 'templates[]',
 			'objectName' => 'templates',
 			'data' => $data['linkedTemplates'],
@@ -207,7 +209,7 @@ $templatesDiv = (new CDiv(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostView->getName().
 					'&dstfld1=templates_&templated_hosts=1&multiselect=1'
 			]
-		]),
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		$clearDiv,
 		(new CDiv([
 			(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1),
@@ -265,7 +267,7 @@ $ipmiFormList->addRow(
 		(new CVisibilityBox('visible[ipmi_username]', 'ipmi_username', _('Original')))
 			->setChecked(isset($data['visible']['ipmi_username']))
 	],
-	new CTextBox('ipmi_username', $data['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE)
+	(new CTextBox('ipmi_username', $data['ipmi_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 $ipmiFormList->addRow(
@@ -275,7 +277,7 @@ $ipmiFormList->addRow(
 		(new CVisibilityBox('visible[ipmi_password]', 'ipmi_password', _('Original')))
 			->setChecked(isset($data['visible']['ipmi_password']))
 	],
-	new CTextBox('ipmi_password', $data['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE)
+	(new CTextBox('ipmi_password', $data['ipmi_password']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 );
 
 $inventoryFormList = new CFormList('inventoryFormList');
@@ -302,14 +304,25 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 	}
 
 	if ($hostInventoryTable['fields'][$field]['type'] == DB::FIELD_TYPE_TEXT) {
-		$fieldInput = new CTextArea('host_inventory['.$field.']', $data['host_inventory'][$field]);
-		$fieldInput->addStyle('width: 64em;');
+		$fieldInput = (new CTextArea('host_inventory['.$field.']', $data['host_inventory'][$field]))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
 	else {
-		$fieldLength = $hostInventoryTable['fields'][$field]['length'];
-		$fieldInput = new CTextBox('host_inventory['.$field.']', $data['host_inventory'][$field]);
-		$fieldInput->setAttribute('maxlength', $fieldLength);
-		$fieldInput->addStyle('width: '.($fieldLength > 64 ? 64 : $fieldLength).'em;');
+		$field_length = $hostInventoryTable['fields'][$field]['length'];
+
+		if ($field_length < 39) {
+			$width = ZBX_TEXTAREA_SMALL_WIDTH;
+		}
+		elseif ($field_length < 64) {
+			$width = ZBX_TEXTAREA_STANDARD_WIDTH;
+		}
+		else {
+			$width = ZBX_TEXTAREA_BIG_WIDTH;
+		}
+
+		$fieldInput = (new CTextBox('host_inventory['.$field.']', $data['host_inventory'][$field]))
+			->setWidth($width)
+			->setAttribute('maxlength', $field_length);
 	}
 
 	$inventoryFormList->addRow(
@@ -327,16 +340,15 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 }
 
 // append tabs to form
-$hostTab = new CTabView();
-
+$hostTab = (new CTabView())
+	->addTab('hostTab', _('Host'), $hostFormList)
+	->addTab('templatesTab', _('Templates'), $templatesFormList)
+	->addTab('ipmiTab', _('IPMI'), $ipmiFormList)
+	->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
 // reset the tab when opening the form for the first time
 if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
-$hostTab->addTab('hostTab', _('Host'), $hostFormList);
-$hostTab->addTab('templatesTab', _('Templates'), $templatesFormList);
-$hostTab->addTab('ipmiTab', _('IPMI'), $ipmiFormList);
-$hostTab->addTab('inventoryTab', _('Inventory'), $inventoryFormList);
 
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(

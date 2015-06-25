@@ -29,20 +29,19 @@ $widget = (new CWidget())
 	);
 
 // create form
-$sysmapForm = new CForm();
-$sysmapForm->setName('frm_maps');
+$sysmapForm = (new CForm())->setName('frm_maps');
 
 // create table
-$sysmapTable = new CTableInfo();
-$sysmapTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_maps'))->onClick("checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
-	_('Map')
-]);
+$sysmapTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_maps'))->onClick("checkAll('".$sysmapForm->getName()."', 'all_maps', 'maps');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Width'), 'width', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Height'), 'height', $this->data['sort'], $this->data['sortorder']),
+		_('Map')
+	]);
 
 foreach ($this->data['maps'] as $map) {
 	$sysmapTable->addRow([

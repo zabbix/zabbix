@@ -39,7 +39,6 @@ $fields = [
 	'httptestid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
 	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// ajax
-	'filterState' => [T_ZBX_INT, O_OPT, P_ACT, null,		null],
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null]
 ];
@@ -48,9 +47,6 @@ check_fields($fields);
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.httpdetails.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (isset($_REQUEST['favobj'])) {
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
@@ -123,14 +119,14 @@ $widget = (new CWidget())
 	);
 
 // append table to widget
-$httpdetailsTable = new CTableInfo();
-$httpdetailsTable->setHeader([
-	_('Step'),
-	_('Speed'),
-	_('Response time'),
-	_('Response code'),
-	_('Status')
-]);
+$httpdetailsTable = (new CTableInfo())
+	->setHeader([
+		_('Step'),
+		_('Speed'),
+		_('Response time'),
+		_('Response code'),
+		_('Status')
+	]);
 
 $db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($httpTest['httptestid']).' ORDER BY no');
 
@@ -252,8 +248,8 @@ echo BR();
 // create graphs widget
 $graphsWidget = new CWidget();
 
-$filterForm = new CFilter('web.httpdetails.filter.state');
-$filterForm->addNavigator();
+$filterForm = (new CFilter('web.httpdetails.filter.state'))
+	->addNavigator();
 $graphsWidget->addItem($filterForm);
 
 $graphTable = (new CTableInfo())->setId('graph');

@@ -25,25 +25,30 @@ if (!empty($this->data['templateid'])) {
 }
 
 // create form
-$screenForm = new CForm();
-$screenForm->setName('screenForm');
-$screenForm->addVar('form', $this->data['form']);
+$screenForm = (new CForm())
+	->setName('screenForm')
+	->addVar('form', $this->data['form'])
+	->addVar('templateid', $this->data['templateid']);
 if (!empty($this->data['screenid'])) {
 	$screenForm->addVar('screenid', $this->data['screenid']);
 }
-$screenForm->addVar('templateid', $this->data['templateid']);
 
 // create screen form list
-$screenFormList = new CFormList();
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$screenFormList->addRow(_('Name'), $nameTextBox);
-$screenFormList->addRow(_('Columns'), new CNumericBox('hsize', $this->data['hsize'], 3));
-$screenFormList->addRow(_('Rows'), new CNumericBox('vsize', $this->data['vsize'], 3));
+$screenFormList = (new CFormList())
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['name']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Columns'),
+		(new CNumericBox('hsize', $this->data['hsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Rows'),
+		(new CNumericBox('vsize', $this->data['vsize'], 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 // append tabs to form
-$screenTab = new CTabView();
-$screenTab->addTab('screenTab', _('Screen'), $screenFormList);
+$screenTab = (new CTabView())->addTab('screenTab', _('Screen'), $screenFormList);
 
 // append buttons to form
 if (isset($this->data['screenid']))

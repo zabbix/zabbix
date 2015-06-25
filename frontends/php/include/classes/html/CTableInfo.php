@@ -71,7 +71,6 @@ class CTableInfo extends CTable {
 				}',
 			true);
 		}
-
 		return $string;
 	}
 
@@ -81,7 +80,6 @@ class CTableInfo extends CTable {
 	 */
 	public function makeVerticalRotation() {
 		$this->addMakeVerticalRotationJs = true;
-
 		return $this;
 	}
 }

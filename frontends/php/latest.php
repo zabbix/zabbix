@@ -45,7 +45,6 @@ $fields = [
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	'favobj' =>				[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'toggle_ids' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'toggle_open_state' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
@@ -68,9 +67,6 @@ if (getRequest('hostids') && !API::Host()->isReadable(getRequest('hostids'))) {
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.latest.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (hasRequest('favobj')) {
 	if ($_REQUEST['favobj'] == 'toggle') {
 		// $_REQUEST['toggle_ids'] can be single id or list of ids,
@@ -348,7 +344,7 @@ $filterForm = new CFilter('web.latest.filter.state');
 $filterColumn1 = new CFormList();
 $filterColumn1->addRow(
 	_('Host groups'),
-	new CMultiSelect(
+	(new CMultiSelect(
 		[
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
@@ -357,11 +353,11 @@ $filterColumn1->addRow(
 				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'
 			]
-	])
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn1->addRow(
 		_('Hosts'),
-		new CMultiSelect(
+		(new CMultiSelect(
 			[
 				'name' => 'hostids[]',
 				'objectName' => 'hosts',
@@ -371,12 +367,12 @@ $filterColumn1->addRow(
 						'&real_hosts=1&multiselect=1'
 				]
 			]
-		)
+		))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn1->addRow(
 	_('Application'),
 	[
-		new CTextBox('application', $filter['application']),
+		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('application_name', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -389,7 +385,7 @@ $filterColumn1->addRow(
 $filterColumn2 = new CFormList();
 $filterColumn2->addRow(
 	_('Name'),
-	new CTextBox('select', $filter['select'], 40)
+	(new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn2->addRow(
 	_('Show items without data'),
@@ -406,10 +402,10 @@ $filterForm->addColumn($filterColumn2);
 $widget->addItem($filterForm);
 // End of Filter
 
-$form = new CForm('GET', 'history.php');
-$form->setName('items');
+$form = (new CForm('GET', 'history.php'))
+	->setName('items')
 // set an ID for the hidden input so that it wouldn't conflict with the ID of the "Go" button list
-$form->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
+	->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
 
 // table
 $table = new CTableInfo();
@@ -583,9 +579,7 @@ foreach ($items as $key => $item){
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = (new CDiv())
-				->addClass('status_icon iconerror')
-				->setHint($item['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($item['error']);
 		}
 		else {
 			$info = '';
@@ -776,9 +770,7 @@ foreach ($items as $item) {
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = (new CDiv())
-				->addClass('status_icon iconerror')
-				->setHint($item['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($item['error']);
 		}
 		else {
 			$info = '';

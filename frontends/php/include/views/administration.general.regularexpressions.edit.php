@@ -28,54 +28,53 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.regexps.php')))
 	);
 
-$form = new CForm();
-$form->setId('zabbixRegExpForm');
-$form->addVar('form', 1);
-$form->addVar('regexpid', $data['regexpid']);
+$form = (new CForm())
+	->setId('zabbixRegExpForm')
+	->addVar('form', 1)
+	->addVar('regexpid', $data['regexpid']);
 
 zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($data['expressions'])).');');
 
 /*
  * Expressions tab
  */
-$exprTab = new CFormList('exprTab');
-$nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$exprTab->addRow(_('Name'), $nameTextBox);
-
 $exprTable = (new CTable())
-	->addClass('formElementTable')
-	->addClass('formWideTable')
 	->setId('exprTable')
 	->setHeader([
 		_('Expression'),
-		(new CCol(_('Expression type')))->addClass(ZBX_STYLE_NOWRAP),
-		(new CCol(_('Case sensitive')))->addClass(ZBX_STYLE_NOWRAP),
-		SPACE
+		(new CColHeader(_('Expression type'))),
+		(new CColHeader(_('Case sensitive'))),
+		''
 	])
 	->setFooter(
-		(new CButton('add', _('Add')))
+		(new CButton('new', _('New')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('exprAdd')
 	);
-$exprTab->addRow(
-	_('Expressions'),
-	(new CDiv($exprTable))
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-		->addClass('objectgroup')
-);
+
+$exprTab = (new CFormList('exprTab'))
+	->addRow(_('Name'),
+		(new CTextBox('name', $data['name'], false, 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(
+		_('Expressions'),
+		(new CDiv($exprTable))
+			->addClass('inlineblock')
+			->addClass('border_dotted')
+			->addClass('objectgroup')
+	);
 
 $exprForm = (new CTable())
-	->addClass('formElementTable')
-	->addRow([_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)])
+	->addRow([_('Expression'), (new CTextBox('expressionNew'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)])
 	->addRow([_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())])
 	->addRow([_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())], null, 'delimiterNewRow')
 	->addRow([_('Case sensitive'), new CCheckBox('case_sensitiveNew')]);
 
 $exprFormFooter = [
 	(new CButton('saveExpression', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-	SPACE,
+	' ',
 	(new CButton('cancelExpression', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
 ];
 $exprTab->addRow(
@@ -92,7 +91,9 @@ $exprTab->addRow(
  * Test tab
  */
 $testTab = new CFormList('testTab');
-$testTab->addRow(_('Test string'), new CTextArea('test_string', $data['test_string']));
+$testTab->addRow(_('Test string'),
+	(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 $preloaderDiv = (new CDiv())
 	->addClass('preloader')
 	->setId('testPreloader')

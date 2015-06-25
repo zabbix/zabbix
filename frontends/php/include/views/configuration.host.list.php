@@ -30,46 +30,46 @@ $widget = (new CWidget())
 		)
 	);
 
-// Filter
-$filter = new CFilter('web.hosts.filter.state');
-$filterColumn1 = new CFormList();
-$filterColumn1->addRow(_('Name like'), new CTextBox('filter_host', $data['filter']['host'], 20));
-$filter->addColumn($filterColumn1);
-$filterColumn2 = new CFormList();
-$filterColumn2->addRow(_('DNS like'), new CTextBox('filter_dns', $data['filter']['dns'], 20));
-$filter->addColumn($filterColumn2);
-$filterColumn3 = new CFormList();
-$filterColumn3->addRow(_('IP like'), new CTextBox('filter_ip', $data['filter']['ip'], 20));
-$filter->addColumn($filterColumn3);
-$filterColumn4 = new CFormList();
-$filterColumn4->addRow(_('Port like'), new CTextBox('filter_port', $data['filter']['port'], 20));
-$filter->addColumn($filterColumn4);
+// filter
+$filter = (new CFilter('web.hosts.filter.state'))
+	->addColumn((new CFormList())->addRow(_('Name like'),
+		(new CTextBox('filter_host', $data['filter']['host']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('DNS like'),
+		(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('IP like'),
+		(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('Port like'),
+		(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	));
 
 $widget->addItem($filter);
 
 // table hosts
-$form = new CForm();
-$form->setName('hosts');
+$form = (new CForm())->setName('hosts');
 
-$table = new CTableInfo();
-$table->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
-	_('Applications'),
-	_('Items'),
-	_('Triggers'),
-	_('Graphs'),
-	_('Discovery'),
-	_('Web'),
-	_('Interface'),
-	_('Templates'),
-	make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
-	_('Availability')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
+		_('Applications'),
+		_('Items'),
+		_('Triggers'),
+		_('Graphs'),
+		_('Discovery'),
+		_('Web'),
+		_('Interface'),
+		_('Templates'),
+		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
+		_('Availability'),
+		_('Info')
+	]);
 
-$currentTime = time();
+$current_time = time();
 
 foreach ($data['hosts'] as $host) {
 	$interface = reset($host['interfaces']);
@@ -171,6 +171,13 @@ foreach ($data['hosts'] as $host) {
 		$hostTemplates[] = $caption;
 	}
 
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
+		$lifetime_indicator = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
+	}
+	else {
+		$lifetime_indicator = '';
+	}
+
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
@@ -201,7 +208,8 @@ foreach ($data['hosts'] as $host) {
 		$hostInterface,
 		$hostTemplates,
 		$status,
-		getAvailabilityTable($host, $currentTime)
+		getHostAvailabilityTable($host),
+		$lifetime_indicator
 	]);
 }
 

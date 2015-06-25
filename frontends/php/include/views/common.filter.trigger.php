@@ -24,11 +24,10 @@ $overview = $this->data['overview'];
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = new CFilter('web.tr_status.filter.state');
-
-$filterForm->addVar('fullscreen', $filter['fullScreen']);
-$filterForm->addVar('groupid', $filter['groupId']);
-$filterForm->addVar('hostid', $filter['hostId']);
+$filterForm = (new CFilter($filter['filterid']))
+	->addVar('fullscreen', $filter['fullScreen'])
+	->addVar('groupid', $filter['groupId'])
+	->addVar('hostid', $filter['hostId']);
 
 $column = new CFormList();
 
@@ -72,7 +71,8 @@ $column->addRow(_('Minimum trigger severity'),
 );
 
 // age less than
-$statusChangeDays = new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false);
+$statusChangeDays = (new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false))
+	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 if (!$filter['statusChange']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
@@ -92,14 +92,16 @@ $column->addRow(_('Age less than'), [
 ]);
 
 // name
-$column->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
+$column->addRow(_('Filter by name'),
+	(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+);
 
 $application_name_url =
 	'popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1&dstfrm=zbx_filter';
 
 // application
 $column->addRow(_('Filter by application'), [
-	new CTextBox('application', $filter['application'], 40),
+	(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('application_name', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
@@ -124,7 +126,7 @@ $i = 0;
 foreach ($inventoryFilters as $field) {
 	$inventoryFilterTable->addRow([
 		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
-		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
+		(new CTextBox('inventory['.$i.'][value]', $field['value']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CButton('inventory['.$i.'][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')

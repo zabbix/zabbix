@@ -27,7 +27,7 @@ $filterColumn = new CFormList();
 $filterColumn->addRow(
 	_('Recipient'),
 	[
-		new CTextBox('alias', $this->data['alias'], 20),
+		(new CTextBox('alias', $this->data['alias']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('btn1', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -42,20 +42,19 @@ $filterForm->addNavigator();
 $auditWidget->addItem($filterForm);
 
 // create form
-$auditForm = new CForm('get');
-$auditForm->setName('auditForm');
+$auditForm = (new CForm('get'))->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo();
-$auditTable->setHeader([
-	_('Time'),
-	_('Action'),
-	_('Type'),
-	_('Recipient(s)'),
-	_('Message'),
-	_('Status'),
-	_('Info')
-]);
+$auditTable = (new CTableInfo())
+	->setHeader([
+		_('Time'),
+		_('Action'),
+		_('Type'),
+		_('Recipient(s)'),
+		_('Message'),
+		_('Status'),
+		_('Info')
+	]);
 
 foreach ($this->data['alerts'] as $alert) {
 	$mediatype = array_pop($alert['mediatypes']);
@@ -97,10 +96,7 @@ foreach ($this->data['alerts'] as $alert) {
 		$info = '';
 	}
 	else {
-		$info = (new CDiv(SPACE))
-			->addClass('status_icon')
-			->addClass('iconerror')
-			->setHint($alert['error'], ZBX_STYLE_RED);
+		$info = makeErrorIcon($alert['error']);
 	}
 
 	$recipient = (isset($alert['userid']) && $alert['userid'])

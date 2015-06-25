@@ -24,15 +24,15 @@ include('include/views/js/configuration.services.edit.js.php');
 $widget = (new CWidget())->setTitle(_('IT service parent'));
 
 // create form
-$servicesParentForm = new CForm();
-$servicesParentForm->setName('servicesForm');
+$servicesParentForm = (new CForm())
+	->setName('servicesForm');
 if (!empty($this->data['service'])) {
 	$servicesParentForm->addVar('serviceid', $this->data['service']['serviceid']);
 }
 
 // create table
-$servicesParentTable = new CTableInfo();
-$servicesParentTable->setHeader([_('Service'), _('Status calculation'), _('Trigger')]);
+$servicesParentTable = (new CTableInfo())
+	->setHeader([_('Service'), _('Status calculation'), _('Trigger')]);
 
 $prefix = null;
 
@@ -64,12 +64,14 @@ foreach ($this->data['db_pservices'] as $db_service) {
 		);
 	$servicesParentTable->addRow([[$prefix, $description], serviceAlgorythm($db_service['algorithm']), $db_service['trigger']]);
 }
-$column = new CCol(
-	(new CButton('cancel', _('Cancel')))
-		->onClick('javascript: self.close();')
-		->setAttribute('style', 'text-align:right;')
+
+$servicesParentTable->setFooter(
+	new CCol(
+		(new CButton('cancel', _('Cancel')))
+			->onClick('javascript: self.close();')
+			->setAttribute('style', 'text-align:right;')
+	)
 );
-$servicesParentTable->setFooter($column);
 
 // append table to form
 $servicesParentForm->addItem($servicesParentTable);

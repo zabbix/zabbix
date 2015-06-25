@@ -22,19 +22,20 @@
 $widget = (new CWidget())->setTitle(_('Host groups'));
 
 // create form
-$hostGroupForm = new CForm();
-$hostGroupForm->setName('hostgroupForm');
-$hostGroupForm->addVar('form', $this->data['form']);
+$hostGroupForm = (new CForm())
+	->setName('hostgroupForm')
+	->addVar('form', $this->data['form']);
 if (isset($this->data['groupid'])) {
 	$hostGroupForm->addVar('groupid', $this->data['groupid']);
 }
 
 // create hostgroup form list
 $hostGroupFormList = new CFormList('hostgroupFormList');
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE,
+$nameTextBox = (new CTextBox('name', $this->data['name'],
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 	64
-);
+))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 $nameTextBox->setAttribute('autofocus', 'autofocus');
 $hostGroupFormList->addRow(_('Group name'), $nameTextBox);
 

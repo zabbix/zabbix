@@ -20,9 +20,10 @@
 
 $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
 
-$rForm = new CForm('get');
-$rForm->addItem((new CList())->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]));
-$hostInventoryWidget->setControls($rForm);
+$hostInventoryWidget->setControls(
+	$rForm = (new CForm('get'))
+		->addItem((new CList())->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]))
+);
 
 // filter
 $filterForm = new CFilter('web.hostinventories.filter.state');
@@ -46,24 +47,24 @@ $filterColumn->addRow(
 				1 => _('exactly')
 			]),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-			new CTextBox('filter_field_value', $this->data['filterFieldValue'], 20)
+			(new CTextBox('filter_field_value', $this->data['filterFieldValue']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		]
 );
 
 $filterForm->addColumn($filterColumn);
 $hostInventoryWidget->addItem($filterForm);
 
-$table = new CTableInfo();
-$table->setHeader([
-	make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Group'),
-	make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'pr_type', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('OS'), 'pr_os', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'])
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		make_sorting_header(_('Host'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Group'),
+		make_sorting_header(_('Name'), 'pr_name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'pr_type', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('OS'), 'pr_os', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Serial number A'), 'pr_serialno_a', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Tag'), 'pr_tag', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('MAC address A'), 'pr_macaddress_a', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 foreach ($this->data['hosts'] as $host) {
 	$hostGroups = [];

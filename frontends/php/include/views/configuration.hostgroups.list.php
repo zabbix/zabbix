@@ -35,24 +35,23 @@ $widget = (new CWidget())
 	);
 
 // create form
-$hostGroupForm = new CForm();
-$hostGroupForm->setName('hostgroupForm');
+$hostGroupForm = (new CForm())->setName('hostgroupForm');
 
 // create table
-$hostGroupTable = new CTableInfo();
-$hostGroupTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_groups'))
-			->onClick("checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Hosts'),
-	_('Templates'),
-	_('Members'),
-	_('Info')
-]);
+$hostGroupTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_groups'))
+				->onClick("checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Hosts'),
+		_('Templates'),
+		_('Members'),
+		_('Info')
+	]);
 
-$currentTime = time();
+$current_time = time();
 
 foreach ($this->data['groups'] as $group) {
 	$hostsOutput = [];
@@ -121,20 +120,8 @@ foreach ($this->data['groups'] as $group) {
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
 
 	// info, discovered item lifetime indicator
-	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
-		$info = (new CSpan('!'))->addClass(ZBX_STYLE_STATUS_YELLOW);
-
-		// Check if host group should've been deleted in the past.
-		if ($currentTime > $group['groupDiscovery']['ts_delete']) {
-			$info->setHint(_s('The host group is not discovered anymore and will be deleted the next time discovery rule is processed.'));
-		}
-		else {
-			$info->setHint(_s('The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($group['groupDiscovery']['ts_delete']),
-				zbx_date2str(DATE_FORMAT, $group['groupDiscovery']['ts_delete']),
-				zbx_date2str(TIME_FORMAT, $group['groupDiscovery']['ts_delete'])
-			));
-		}
+	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete'] != 0) {
+		$info = getHostGroupLifetimeIndicator($current_time, $group['groupDiscovery']['ts_delete']);
 	}
 	else {
 		$info = '';

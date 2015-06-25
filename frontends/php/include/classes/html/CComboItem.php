@@ -33,7 +33,8 @@ class CComboItem extends CTag {
 	}
 
 	public function setValue($value) {
-		return $this->attributes['value'] = $value;
+		$this->attributes['value'] = $value;
+		return $this;
 	}
 
 	public function getValue() {
@@ -42,13 +43,17 @@ class CComboItem extends CTag {
 
 	public function setCaption($value = null) {
 		$this->addItem(nbsp($value));
+		return $this;
 	}
 
 	public function setSelected($value = 'yes') {
 		if ((is_string($value) && ($value == 'yes' || $value == 'selected' || $value == 'on')) || (is_int($value) && $value <> 0)) {
-			return $this->attributes['selected'] = 'selected';
+			$this->attributes['selected'] = 'selected';
 		}
-		$this->removeAttribute('selected');
+		else {
+			$this->removeAttribute('selected');
+		}
+		return $this;
 	}
 
 	/**
@@ -63,5 +68,6 @@ class CComboItem extends CTag {
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+		return $this;
 	}
 }

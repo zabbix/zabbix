@@ -31,21 +31,20 @@ $widget = (new CWidget())
 	);
 
 // create form
-$itemForm = new CForm();
-$itemForm->setName('hosts');
-$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+$itemForm = (new CForm())
+	->setName('hosts')
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$hostTable = new CTableInfo();
-
-$hostTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_hosts'))->onClick("checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Templates'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-]);
+$hostTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_hosts'))->onClick("checkAll('".$itemForm->getName()."', 'all_hosts', 'group_hostid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Templates'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 	// name

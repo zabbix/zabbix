@@ -26,13 +26,13 @@ $triggersWidget = (new CWidget())
 	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('form', $this->data['form']);
-$triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-$triggersForm->addVar('input_method', $this->data['input_method']);
-$triggersForm->addVar('toggle_input_method', '');
-$triggersForm->addVar('remove_expression', '');
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('form', $this->data['form'])
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+	->addVar('input_method', $this->data['input_method'])
+	->addVar('toggle_input_method', '')
+	->addVar('remove_expression', '');
 
 if ($this->data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $this->data['triggerid']);
@@ -43,20 +43,20 @@ $triggersFormList = new CFormList('triggersFormList');
 if (!empty($this->data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $this->data['templates']);
 }
-$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$triggersFormList->addRow(_('Name'), $nameTextBox);
+$triggersFormList->addRow(_('Name'),
+	(new CTextBox('description', $this->data['description'], $this->data['limited']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+);
 
 // append expression to form list
-$expressionTextBox = new CTextArea(
+$expressionTextBox = (new CTextArea(
 	$this->data['expression_field_name'],
 	$this->data['expression_field_value'],
 	[
-		'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
-		'width' => ZBX_TEXTAREA_STANDARD_WIDTH,
 		'readonly' => $this->data['expression_field_readonly']
 	]
-);
+))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if ($this->data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $this->data['expression']);
 }
@@ -164,8 +164,8 @@ if ($this->data['input_method'] == IM_TREE) {
 			}
 
 			if (!isset($e['expression']['levelErrors'])) {
-				$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
-				$errorImg->setHint(_('No errors found.'));
+				$errorImg = (new CImg('images/general/ok_icon.png', 'expression_no_errors'))
+					->setHint(_('No errors found.'));
 			}
 			else {
 				$allowedTesting = false;
@@ -238,12 +238,15 @@ if ($this->data['input_method'] == IM_TREE) {
 	$triggersFormList->addRow(SPACE, [$inputMethodToggle, BR()]);
 }
 
-$triggersFormList->addRow(_('Multiple PROBLEM events generation'),
-	(new CCheckBox('type'))->setChecked($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED)
-);
-$triggersFormList->addRow(_('Description'), new CTextArea('comments', $this->data['comments']));
-$triggersFormList->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
-$triggersFormList->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
+$triggersFormList
+	->addRow(_('Multiple PROBLEM events generation'),
+		(new CCheckBox('type'))->setChecked($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED)
+	)
+	->addRow(_('Description'),
+		(new CTextArea('comments', $this->data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('URL'), (new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
 
 // append status to form list
 if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {

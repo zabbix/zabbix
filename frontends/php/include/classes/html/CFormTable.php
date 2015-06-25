@@ -21,7 +21,6 @@
 
 class CFormTable extends CForm {
 
-	private $align;
 	private $title;
 	private $tableclass = 'formtable';
 	protected $top_items = [];
@@ -42,36 +41,15 @@ class CFormTable extends CForm {
 			->setColSpan(2);
 	}
 
-	public function setAction($value) {
-		if (is_string($value)) {
-			return parent::setAction($value);
-		}
-		elseif (is_null($value)) {
-			return parent::setAction($value);
-		}
-		else {
-			return $this->error('Incorrect value for setAction "'.$value.'".');
-		}
-	}
-
 	public function setName($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for setName "'.$value.'".');
-		}
 		$this->setAttribute('name', $value);
 		$this->setId(zbx_formatDomId($value));
-		return true;
-	}
-
-	public function setAlign($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for setAlign "'.$value.'".');
-		}
-		return $this->align = $value;
+		return $this;
 	}
 
 	public function setTitle($value = null) {
 		$this->title = $value;
+		return $this;
 	}
 
 	public function addRow($item1, $item2 = null, $class = null, $id = null) {
@@ -105,8 +83,7 @@ class CFormTable extends CForm {
 			$item1->setId(zbx_formatDomId($id));
 		}
 		array_push($this->center_items, $item1);
-
-		return $item1;
+		return $this;
 	}
 
 	public function addSpanRow($value, $class = null) {
@@ -120,10 +97,12 @@ class CFormTable extends CForm {
 			->addClass($class)
 			->setColSpan(2);
 		array_push($this->center_items, new CRow($col));
+		return $this;
 	}
 
 	public function addItemToBottomRow($value) {
 		$this->bottom_items->addItem($value);
+		return $this;
 	}
 
 	/**
@@ -133,6 +112,7 @@ class CFormTable extends CForm {
 	 */
 	public function setTableClass($class) {
 		$this->tableclass = $class;
+		return $this;
 	}
 
 	public function bodyToString() {
@@ -141,7 +121,6 @@ class CFormTable extends CForm {
 		$tbl->addClass($this->tableclass);
 		$tbl->setCellSpacing(0);
 		$tbl->setCellPadding(1);
-		$tbl->setAlign($this->align);
 
 		// add first row
 		if (!is_null($this->title)) {

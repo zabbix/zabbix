@@ -42,23 +42,23 @@ if ($this->data['hostid']) {
 }
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('hostid', $this->data['hostid']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('hostid', $this->data['hostid']);
 
 // create table
-$triggersTable = new CTableInfo();
-$triggersTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
-	($this->data['hostid'] == 0) ? _('Host') : null,
-	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
-	_('Expression'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
-	$this->data['showInfoColumn'] ? _('Info') : null
-]);
+$triggersTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
+		($this->data['hostid'] == 0) ? _('Host') : null,
+		make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
+		_('Expression'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
+		$this->data['showInfoColumn'] ? _('Info') : null
+	]);
 
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -137,10 +137,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	// info
 	if ($this->data['showInfoColumn']) {
 		if ($trigger['status'] == TRIGGER_STATUS_ENABLED && $trigger['error']) {
-			$info = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconerror')
-				->setHint($trigger['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($trigger['error']);
 		}
 		else {
 			$info = '';

@@ -38,52 +38,44 @@ class CImg extends CTag {
 	}
 
 	public function setSrc($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetSrc "'.$value.'".');
-		}
-		return $this->setAttribute('src', $value);
+		$this->setAttribute('src', $value);
+		return $this;
 	}
 
 	public function setAltText($value = null) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetText "'.$value.'".');
-		}
-		return $this->setAttribute('alt', $value);
+		$this->setAttribute('alt', $value);
+		return $this;
 	}
 
 	public function setMap($value = null) {
 		if (is_null($value)) {
 			$this->deleteOption('usemap');
 		}
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetMap "'.$value.'".');
+		else {
+			$value = '#'.ltrim($value, '#');
+			$this->setAttribute('usemap', $value);
 		}
-		$value = '#'.ltrim($value, '#');
-		return $this->setAttribute('usemap', $value);
+		return $this;
 	}
 
 	public function setWidth($value = null) {
 		if (is_null($value)) {
-			return $this->removeAttribute('width');
-		}
-		elseif (is_numeric($value) || is_int($value)) {
-			return $this->setAttribute('width', $value);
+			$this->removeAttribute('width');
 		}
 		else {
-			return $this->error('Incorrect value for SetWidth "'.$value.'".');
+			$this->setAttribute('width', $value);
 		}
+		return $this;
 	}
 
 	public function setHeight($value = null) {
 		if (is_null($value)) {
-			return $this->removeAttribute('height');
-		}
-		elseif (is_numeric($value) || is_int($value)) {
-			return $this->setAttribute('height', $value);
+			$this->removeAttribute('height');
 		}
 		else {
-			return $this->error('Incorrect value for SetHeight "'.$value.'".');
+			$this->setAttribute('height', $value);
 		}
+		return $this;
 	}
 
 	public function preload() {
@@ -105,5 +97,6 @@ class CImg extends CTag {
 		$this->addClass('preloader');
 		$this->setId($id.'preloader');
 		$this->setAttribute('src', 'styles/themes/'.getUserTheme(CWebUser::$data).'/images/preloader.gif');
+		return $this;
 	}
 }

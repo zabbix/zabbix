@@ -28,28 +28,27 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
 // create form
-$discoveryForm = new CForm();
-$discoveryForm->setName('discovery');
-$discoveryForm->addVar('hostid', $this->data['hostid']);
+$discoveryForm = (new CForm())
+	->setName('discovery')
+	->addVar('hostid', $this->data['hostid']);
 
 // create table
-$discoveryTable = new CTableInfo();
-
-$discoveryTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Items'),
-	_('Triggers'),
-	_('Graphs'),
-	($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
-	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
-	$data['showInfoColumn'] ? _('Info') : null
-]);
+$discoveryTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Items'),
+		_('Triggers'),
+		_('Graphs'),
+		($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
+		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
+		$data['showInfoColumn'] ? _('Info') : null
+	]);
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
@@ -82,10 +81,7 @@ foreach ($data['discoveries'] as $discovery) {
 	// info
 	if ($data['showInfoColumn']) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
-			$info = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconerror')
-				->setHint($discovery['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($discovery['error']);
 		}
 		else {
 			$info = '';

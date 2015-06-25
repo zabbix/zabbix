@@ -37,21 +37,20 @@ $widget = (new CWidget())
 	);
 
 // create form
-$actionForm = new CForm();
-$actionForm->setName('actionForm');
+$actionForm = (new CForm())->setName('actionForm');
 
 // create table
-$actionTable = new CTableInfo();
-$actionTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_items'))
-			->onClick("checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Conditions'),
-	_('Operations'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-]);
+$actionTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_items'))
+				->onClick("checkAll('".$actionForm->getName()."', 'all_items', 'g_actionid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Conditions'),
+		_('Operations'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 if ($this->data['actions']) {
 	$actionConditionStringValues = actionConditionValueToString($this->data['actions'], $this->data['config']);

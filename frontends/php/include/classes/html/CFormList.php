@@ -50,7 +50,7 @@ class CFormList extends CList {
 			}
 		}
 
-		$label = new CLabel($term, $input_id);
+		$label = is_object($term) ? $term : new CLabel($term, $input_id);
 
 		$defaultClass = $hidden ? ZBX_STYLE_HIDDEN : null;
 
@@ -73,16 +73,25 @@ class CFormList extends CList {
 				(new CDiv($description))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
+
+		return $this;
 	}
 
-	public function addInfo($text, $label = null) {
+	public function addInfo($text) {
 		$this->addItem(
 			[
-				(new CDiv($label ? $label : _('Info')))->addClass('dt right listInfoLabel'),
-				(new CDiv($text))->addClass('objectgroup inlineblock border_dotted listInfoText')
-			],
-			'formrow listInfo'
+				(new CDiv(_('Info')))
+					->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT)
+					->addClass('listInfoLabel'),
+				(new CDiv($text))
+					->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+					->addClass('objectgroup')
+					->addClass('inlineblock')
+					->addClass('border_dotted')
+					->addClass('listInfoText')
+			]
 		);
+		return $this;
 	}
 
 	public function toString($destroy = true) {
@@ -91,7 +100,8 @@ class CFormList extends CList {
 
 	public function addVar($name, $value, $id = null) {
 		if ($value !== null) {
-			return $this->addItem(new CVar($name, $value, $id));
+			$this->addItem(new CVar($name, $value, $id));
 		}
+		return $this;
 	}
 }

@@ -78,11 +78,7 @@
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
-		<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
-			<div id="lbl_items_#{number}_color" onclick="javascript: show_color_picker('items_#{number}_color');"></div>
-			<input type="text" id="items_#{number}_color" name="items[#{number}][color]"
-				onchange="javascript: set_color_by_name('items_#{number}_color', this.value);" maxlength="6" size="7">
-		</div>
+		<?= (new CColor('items[#{number}][color]', $data['problem_ack_color']))->toString() ?>
 	</td>
 	<td>
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>

@@ -34,9 +34,9 @@ class CScreenMap extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$image = new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].'&width='.$this->screenitem['width']
-			.'&height='.$this->screenitem['height'].'&curtime='.time());
-		$image->setId('map_'.$this->screenitem['screenitemid']);
+		$image = (new CImg('map.php?noedit=1&sysmapid='.$this->screenitem['resourceid'].'&width='.$this->screenitem['width']
+			.'&height='.$this->screenitem['height'].'&curtime='.time()))
+			->setId('map_'.$this->screenitem['screenitemid']);
 
 		if ($this->mode == SCREEN_MODE_PREVIEW) {
 			$sysmap = API::Map()->get([

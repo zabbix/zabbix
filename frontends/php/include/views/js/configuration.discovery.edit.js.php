@@ -30,35 +30,34 @@
 				<tr id="newCheckPortsRow" class="hidden">
 					<td><label for="ports"><?= _('Port range') ?></label></td>
 					<td>
-						<input type="text" id="ports" name="ports" value="" class="input text" size="16" maxlength="255">
+						<input type="text" id="ports" name="ports" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckCommunityRow" class="hidden">
 					<td><label for="snmp_community"><?= _('SNMP community') ?></label></td>
 					<td><input type="text" id="snmp_community" name="snmp_community" value="" class="input text"
-							size="20" maxlength="255"></td>
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255"></td>
 				</tr>
 				<tr id="newCheckKeyRow" class="hidden">
 					<td><label for="key_"><?= _('SNMP Key') ?></label></td>
 					<td>
-						<input type="text" id="key_" name="key_" value="" class="input text" size="20" maxlength="255">
+						<input type="text" id="key_" name="key_" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckContextRow" class="hidden">
 					<td><label for="snmpv3_contextname"><?= _('Context name') ?></label></td>
 					<td>
-						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" class="input text" size="20" maxlength="255">
+						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckSecNameRow" class="hidden">
 					<td><label for="snmpv3_securityname"><?= _('Security name') ?></label></td>
-					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				<tr id="newCheckSecLevRow" class="hidden">
 					<td><label for="snmpv3_securitylevel"><?= _('Security level') ?></label></td>
 					<td>
-						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select" size="1">
+						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select">
 							<option value="0"><?= 'noAuthNoPriv' ?> </option>
 							<option value="1"><?= 'authNoPriv' ?> </option>
 							<option value="2"><?= 'authPriv' ?> </option>
@@ -79,8 +78,7 @@
 				</tr>
 				<tr id="newCheckAuthPassRow" class="hidden">
 					<td><label for="snmpv3_authpassphrase"><?= _('Authentication passphrase') ?></label></td>
-					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				<tr id="newCheckPrivProtocolRow" class="hidden">
 					<td><label for="snmpv3_authprotocol"><?= _('Authentication protocol') ?></label></td>
@@ -96,8 +94,7 @@
 				</tr>
 				<tr id="newCheckPrivPassRow" class="hidden">
 					<td><label for="snmpv3_privpassphrase"><?= _('Privacy passphrase') ?></label></td>
-					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				</tbody>
 			</table>

@@ -30,23 +30,23 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
 	);
 
-$scriptsForm = new CForm();
-$scriptsForm->setName('scriptsForm');
-$scriptsForm->setId('scripts');
+$scriptsForm = (new CForm())
+	->setName('scriptsForm')
+	->setId('scripts');
 
-$scriptsTable = new CTableInfo();
-$scriptsTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
-	_('Type'),
-	_('Execute on'),
-	make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder']),
-	_('User group'),
-	_('Host group'),
-	_('Host access')
-]);
+$scriptsTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		_('Type'),
+		_('Execute on'),
+		make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder']),
+		_('User group'),
+		_('Host group'),
+		_('Host access')
+	]);
 
 foreach ($data['scripts'] as $script) {
 	switch ($script['type']) {
@@ -72,11 +72,11 @@ foreach ($data['scripts'] as $script) {
 		$scriptExecuteOn = '';
 	}
 
-	$name = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
-
 	$scriptsTable->addRow([
 		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		(new CCol(
+			new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid'])
+		))->addClass(ZBX_STYLE_NOWRAP),
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),

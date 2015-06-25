@@ -69,8 +69,8 @@ $header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['f
 
 // don't display the action form if we view multiple items on a graph
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
-	$actionForm = new CForm('get');
-	$actionForm->addVar('itemids', getRequest('itemids'));
+	$actionForm = (new CForm('get'))
+		->addVar('itemids', getRequest('itemids'));
 
 	if (isset($_REQUEST['filter_task'])) {
 		$actionForm->addVar('filter_task', $_REQUEST['filter_task']);
@@ -135,7 +135,9 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		}
 
 		$filterColumn1->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton]);
-		$filterColumn1->addRow(_('Select rows with value like'), new CTextBox('filter', getRequest('filter', ''), ZBX_TEXTBOX_FILTER_SIZE));
+		$filterColumn1->addRow(_('Select rows with value like'),
+			(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		);
 
 		$filterTask = getRequest('filter_task', 0);
 
@@ -207,9 +209,9 @@ if ($this->data['plaintext']) {
 	$historyWidget->addItem($plaintextSpan);
 }
 else {
-	$historyWidget->setTitle($header['left']);
-	$historyWidget->setControls($header['right']);
-	$historyWidget->addItem(BR());
+	$historyWidget->setTitle($header['left'])
+		->setControls($header['right'])
+		->addItem(BR());
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm->addNavigator();

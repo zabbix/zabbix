@@ -41,34 +41,33 @@ if (!empty($this->data['hostid'])) {
 $widget->addItem($this->data['flicker']);
 
 // create form
-$itemForm = new CForm();
-$itemForm->setName('items');
+$itemForm = (new CForm())->setName('items');
 if (!empty($this->data['hostid'])) {
 	$itemForm->addVar('hostid', $this->data['hostid']);
 }
 
 // create table
 $itemTable = (new CTableInfo())
-	->setNoDataMessage(($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.'));
-$itemTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	_('Wizard'),
-	empty($this->data['filter_hostid']) ? _('Host') : null,
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Triggers'),
-	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
-	_('Applications'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
-	$data['showInfoColumn'] ? _('Info') : null
-]);
+	->setNoDataMessage(($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.'))
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Wizard'),
+		empty($this->data['filter_hostid']) ? _('Host') : null,
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Triggers'),
+		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+		_('Applications'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
+		$data['showInfoColumn'] ? _('Info') : null
+	]);
 
-$currentTime = time();
+$current_time = time();
 
 foreach ($this->data['items'] as $item) {
 	// description
@@ -112,36 +111,15 @@ foreach ($this->data['items'] as $item) {
 		$infoIcons = [];
 
 		if ($item['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($item['error'])) {
-			$infoIcons[] = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconerror')
-				->setHint($item['error'], ZBX_STYLE_RED);
+			$infoIcons[] = makeErrorIcon($item['error']);
 		}
 
 		// discovered item lifetime indicator
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete']) {
-			$info = (new CSpan('!'))->addClass(ZBX_STYLE_STATUS_YELLOW);
-
-			// Check if item should've been deleted in the past.
-			if ($currentTime > $item['itemDiscovery']['ts_delete']) {
-				$info->setHint(_s(
-					'The item is not discovered anymore and will be deleted the next time discovery rule is processed.'
-				));
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
+			if ($infoIcons) {
+				$infoIcons[] = SPACE;
 			}
-			else {
-				$info->setHint(_s(
-					'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-					zbx_date2age($item['itemDiscovery']['ts_delete']),
-					zbx_date2str(DATE_FORMAT, $item['itemDiscovery']['ts_delete']),
-					zbx_date2str(TIME_FORMAT, $item['itemDiscovery']['ts_delete'])
-				));
-			}
-
-			$infoIcons[] = $info;
-		}
-
-		if (!$infoIcons) {
-			$infoIcons[] = '';
+			$infoIcons[] = getItemLifetimeIndicator($current_time, $item['itemDiscovery']['ts_delete']);
 		}
 	}
 	else {
@@ -149,13 +127,13 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	// triggers info
-	$triggerHintTable = new CTableInfo();
-	$triggerHintTable->setHeader([
-		_('Severity'),
-		_('Name'),
-		_('Expression'),
-		_('Status')
-	]);
+	$triggerHintTable = (new CTableInfo())
+		->setHeader([
+			_('Severity'),
+			_('Name'),
+			_('Expression'),
+			_('Status')
+		]);
 
 	foreach ($item['triggers'] as $num => &$trigger) {
 		$trigger = $this->data['itemTriggers'][$trigger['triggerid']];

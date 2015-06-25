@@ -574,38 +574,37 @@ else {
 
 	$config = select_config();
 
-	$frmForm = new CForm('get');
-	$frmForm->cleanItems();
-	$controls = new CList();
-	$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
-	$controls->addItem(new CSubmit('form', _('Create template')));
-	$controls->addItem(
-		(new CButton('form', _('Import')))
-			->onClick('redirect("conf.import.php?rules_preset=template")')
-	);
-	$frmForm->addItem($controls);
+	$controls = (new CList())
+		->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()])
+		->addItem(new CSubmit('form', _('Create template')))
+		->addItem(
+			(new CButton('form', _('Import')))
+				->onClick('redirect("conf.import.php?rules_preset=template")')
+		);
+	$frmForm = (new CForm('get'))
+		->cleanItems()
+		->addItem($controls);
 
 	$templateWidget->setControls($frmForm);
 
-	$form = new CForm();
-	$form->setName('templates');
+	$form = (new CForm())->setName('templates');
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
-		_('Applications'),
-		_('Items'),
-		_('Triggers'),
-		_('Graphs'),
-		_('Screens'),
-		_('Discovery'),
-		_('Web'),
-		_('Linked templates'),
-		_('Linked to')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			(new CColHeader(
+				(new CCheckBox('all_templates'))->onClick("checkAll('".$form->getName()."', 'all_templates', 'templates');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH),
+			make_sorting_header(_('Templates'), 'name', $sortField, $sortOrder),
+			_('Applications'),
+			_('Items'),
+			_('Triggers'),
+			_('Graphs'),
+			_('Screens'),
+			_('Discovery'),
+			_('Web'),
+			_('Linked templates'),
+			_('Linked to')
+		]);
 
 	// get templates
 	$templates = [];

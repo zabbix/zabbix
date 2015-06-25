@@ -21,16 +21,17 @@
 
 $screenWidget = new CWidget();
 
-$form = new CFilter('web.hostscreen.filter.state');
-$form->addVar('fullscreen', $this->data['fullscreen']);
-$form->addNavigator();
+$form = (new CFilter('web.hostscreen.filter.state'))
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addNavigator();
 
 $screenWidget->addItem($form);
 
 if (empty($this->data['screen']) || empty($this->data['host'])) {
-	$screenWidget->setTitle(_('Screens'));
-	$screenWidget->addItem(BR());
-	$screenWidget->addItem(new CTableInfo());
+	$screenWidget
+		->setTitle(_('Screens'))
+		->addItem(BR())
+		->addItem(new CTableInfo());
 
 	$screenBuilder = new CScreenBuilder();
 	CScreenBuilder::insertScreenStandardJs([
@@ -59,8 +60,9 @@ else {
 			$screenComboBox->addItem('host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$screen['screenid'], $screen['name']);
 		}
 
-		$controls->addItem($screenComboBox);
-		$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+		$controls
+			->addItem($screenComboBox)
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 		$screenWidget->setControls($controls);
 	}
 

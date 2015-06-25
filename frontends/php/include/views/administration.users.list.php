@@ -18,8 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$userGroupComboBox = new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()');
-$userGroupComboBox->addItem(0, _('All'));
+$userGroupComboBox = (new CComboBox('filter_usrgrpid', $_REQUEST['filter_usrgrpid'], 'submit()'))
+	->addItem(0, _('All'));
 
 foreach ($this->data['userGroups'] as $userGroup) {
 	$userGroupComboBox->addItem($userGroup['usrgrpid'], $userGroup['name']);
@@ -36,26 +36,25 @@ $widget = (new CWidget())
 	);
 
 // create form
-$usersForm = new CForm();
-$usersForm->setName('userForm');
+$usersForm = (new CForm())->setName('userForm');
 
 // create users table
-$usersTable = new CTableInfo();
-$usersTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_users'))->onClick("checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Alias'), 'alias', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_x('Name', 'user first name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Surname'), 'surname', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('User type'), 'type', $this->data['sort'], $this->data['sortorder']),
-	_('Groups'),
-	_('Is online?'),
-	_('Login'),
-	_('Frontend access'),
-	_('Debug mode'),
-	_('Status')
-]);
+$usersTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_users'))->onClick("checkAll('".$usersForm->getName()."', 'all_users', 'group_userid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Alias'), 'alias', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_x('Name', 'user first name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Surname'), 'surname', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('User type'), 'type', $this->data['sort'], $this->data['sortorder']),
+		_('Groups'),
+		_('Is online?'),
+		_('Login'),
+		_('Frontend access'),
+		_('Debug mode'),
+		_('Status')
+	]);
 
 foreach ($this->data['users'] as $user) {
 	$userId = $user['userid'];

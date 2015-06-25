@@ -385,7 +385,11 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 			new CLink($name, 'hosts.php?form=update&hostid='.$db_host['hostid'])
 		]);
 		$list->addItem($status);
-		$list->addItem(getAvailabilityTable($db_host, time()));
+		$list->addItem(getHostAvailabilityTable($db_host));
+
+		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
+			$list->addItem(getHostLifetimeIndicator(time(), $db_host['hostDiscovery']['ts_delete']));
+		}
 	}
 
 	/*
@@ -554,64 +558,112 @@ function makeFormFooter(CButtonInterface $main_button = null, array $other_butto
 /**
  * Returns zbx, snmp, jmx, ipmi availability status icons and the discovered host lifetime indicator.
  *
- * @param array  $host			an array of host data
- * @param string $currentTime	current Unix timestamp
+ * @param array $host		an array of host data
  *
  * @return CDiv
  */
-function getAvailabilityTable($host, $currentTime) {
-	$arr = ['zbx', 'snmp', 'jmx', 'ipmi'];
+function getHostAvailabilityTable($host) {
+	$container = (new CDiv())->addClass(ZBX_STYLE_STATUS_CONTAINER);
 
-	// for consistency in foreach loop
-	$host['zbx_available'] = $host['available'];
-	$host['zbx_error'] = $host['error'];
-
-	$ad = [];
-
-	foreach ($arr as $val) {
-		switch ($host[$val.'_available']) {
+	foreach (['zbx' => '', 'snmp' => 'snmp_', 'jmx' => 'jmx_', 'ipmi' => 'ipmi_'] as $type => $prefix) {
+		switch ($host[$prefix.'available']) {
 			case HOST_AVAILABLE_TRUE:
-				$ai = (new CSpan($val))->addClass('status-green');
+				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREEN);
 				break;
 			case HOST_AVAILABLE_FALSE:
-				$ai = (new CSpan($val))
-					->addClass('status-red')
-					->setHint($host[$val.'_error'], ZBX_STYLE_RED);
+				$ai = (new CSpan($type))
+					->addClass(ZBX_STYLE_STATUS_RED)
+					->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
-				$ai = (new CSpan($val))->addClass('status-grey');
+				$ai = (new CSpan($type))->addClass(ZBX_STYLE_STATUS_GREY);
 				break;
 		}
-		$ad[] = $ai;
-		$ad[] = ' ';
+		$container->addItem($ai);
 	}
 
-	// discovered host lifetime indicator
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete']) {
-		$info = (new CSpan('!'))->addClass(ZBX_STYLE_STATUS_YELLOW);
+	return $container;
+}
 
-		// Check if host should've been deleted in the past.
-		if ($currentTime > $host['hostDiscovery']['ts_delete']) {
-			$info->setHint(_s(
-				'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
-			));
-		}
-		else {
-			$info->setHint(_s(
-				'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($host['hostDiscovery']['ts_delete']),
-				zbx_date2str(DATE_FORMAT, $host['hostDiscovery']['ts_delete']),
-				zbx_date2str(TIME_FORMAT, $host['hostDiscovery']['ts_delete'])
-			));
-		}
-
-		$ad[] = $info;
-		$ad[] = ' ';
+/**
+ * Returns the discovered host group lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the host group
+ *
+ * @return CDiv
+ */
+function getHostGroupLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The host group is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
 	}
 
-	array_pop($ad);
+	return makeWarningIcon($warning);
+}
 
-	return $ad;
+/**
+ * Returns the discovered host lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the host
+ *
+ * @return CDiv
+ */
+function getHostLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
+	}
+
+	return makeWarningIcon($warning);
+}
+
+/**
+ * Returns the discovered item lifetime indicator.
+ *
+ * @param string $current_time	current Unix timestamp
+ * @param array  $ts_delete		deletion timestamp of the item
+ *
+ * @return CDiv
+ */
+function getItemLifetimeIndicator($current_time, $ts_delete) {
+	// Check if the element should've been deleted in the past.
+	if ($current_time > $ts_delete) {
+		$warning = _(
+			'The item is not discovered anymore and will be deleted the next time discovery rule is processed.'
+		);
+	}
+	else {
+		$warning = _s(
+			'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
+			zbx_date2age($ts_delete),
+			zbx_date2str(DATE_FORMAT, $ts_delete),
+			zbx_date2str(TIME_FORMAT, $ts_delete)
+		);
+	}
+
+	return makeWarningIcon($warning);
 }
 
 /**
@@ -624,15 +676,11 @@ function getAvailabilityTable($host, $currentTime) {
  * @return array
  */
 function createDateSelector($name, $date, $relatedCalendar = null) {
-	$calendarIcon = (new CImg('images/general/bar/cal.gif', 'calendar', 16, 12))
-		->addClass('pointer');
 	$onClick = 'var pos = getPosition(this); pos.top += 10; pos.left += 16; CLNDR["'.$name.
 		'_calendar"].clndr.clndrshow(pos.top, pos.left);';
 	if ($relatedCalendar) {
 		$onClick .= ' CLNDR["'.$relatedCalendar.'_calendar"].clndr.clndrhide();';
 	}
-
-	$calendarIcon->onClick($onClick);
 
 	if (is_array($date)) {
 		$y = $date['y'];
@@ -649,30 +697,39 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 		$i = date('i', $date);
 	}
 
-	$day = new CTextBox($name.'_day', $d, 2, false, 2);
-	$day->setAttribute('style', 'text-align: right;');
-	$day->setAttribute('placeholder', _('dd'));
-	$day->onChange('validateDatePartBox(this, 1, 31, 2);');
-
-	$month = new CTextBox($name.'_month', $m, 2, false, 2);
-	$month->setAttribute('style', 'text-align: right;');
-	$month->setAttribute('placeholder', _('mm'));
-	$month->onChange('validateDatePartBox(this, 1, 12, 2);');
-
-	$year = new CNumericBox($name.'_year', $y, 4);
-	$year->setAttribute('placeholder', _('yyyy'));
-
-	$hour = new CTextBox($name.'_hour', $h, 2, false, 2);
-	$hour->setAttribute('style', 'text-align: right;');
-	$hour->setAttribute('placeholder', _('hh'));
-	$hour->onChange('validateDatePartBox(this, 0, 23, 2);');
-
-	$minute = new CTextBox($name.'_minute', $i, 2, false, 2);
-	$minute->setAttribute('style', 'text-align: right;');
-	$minute->setAttribute('placeholder', _('mm'));
-	$minute->onChange('validateDatePartBox(this, 0, 59, 2);');
-
-	$fields = [$year, '-', $month, '-', $day, ' ', $hour, ':', $minute, $calendarIcon];
+	$fields = [
+		(new CNumericBox($name.'_year', $y, 4))
+			->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
+			->setAttribute('placeholder', _('yyyy')),
+		'-',
+		(new CTextBox($name.'_month', $m, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('mm'))
+			->onChange('validateDatePartBox(this, 1, 12, 2);'),
+		'-',
+		(new CTextBox($name.'_day', $d, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('dd'))
+			->onChange('validateDatePartBox(this, 1, 31, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CTextBox($name.'_hour', $h, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('hh'))
+			->onChange('validateDatePartBox(this, 0, 23, 2);'),
+		':',
+		(new CTextBox($name.'_minute', $i, false, 2))
+			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
+			->addStyle('text-align: right;')
+			->setAttribute('placeholder', _('mm'))
+			->onChange('validateDatePartBox(this, 0, 59, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CImg('images/general/bar/cal.gif', 'calendar', 16, 12))
+			->addClass('pointer')
+			->onClick($onClick)
+	];
 
 	zbx_add_post_js('create_calendar(null,'.
 		'["'.$name.'_day","'.$name.'_month","'.$name.'_year","'.$name.'_hour","'.$name.'_minute"],'.
@@ -734,4 +791,52 @@ function makeAdministrationGeneralMenu($selected)
 		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
 		'adm.other.php' => _('Other')
 	]);
+}
+
+/**
+ * Renders an error icon like [x] with error message
+ *
+ * @param string $error
+ *
+ * @return CSpan
+ */
+function makeErrorIcon($error)
+{
+	return (new CSpan(
+		(new CTag('b', true))->addItem('&times;')
+	))
+		->addClass(ZBX_STYLE_STATUS_RED)
+		->setHint($error, ZBX_STYLE_RED);
+}
+
+/**
+ * Renders an unknown icon like [?] with error message
+ *
+ * @param string $error
+ *
+ * @return CSpan
+ */
+function makeUnknownIcon($error)
+{
+	return (new CSpan(
+		(new CTag('b', true))->addItem('?')
+	))
+		->addClass(ZBX_STYLE_STATUS_GREY)
+		->setHint($error, ZBX_STYLE_RED);
+}
+
+/**
+ * Renders a warning icon like [!] with error message
+ *
+ * @param string $error
+ *
+ * @return CSpan
+ */
+function makeWarningIcon($error)
+{
+	return (new CSpan(
+		(new CTag('b', true))->addItem('!')
+	))
+		->addClass(ZBX_STYLE_STATUS_YELLOW)
+		->setHint($error);
 }

@@ -26,21 +26,20 @@ $widget = (new CWidget())
 	);
 
 // create form
-$discoveryForm = new CForm();
-$discoveryForm->setName('druleForm');
+$discoveryForm = (new CForm())->setName('druleForm');
 
 // create table
-$discoveryTable = new CTableInfo();
-$discoveryTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_drules'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('IP range'),
-	_('Delay'),
-	_('Checks'),
-	_('Status')
-]);
+$discoveryTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_drules'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('IP range'),
+		_('Delay'),
+		_('Checks'),
+		_('Status')
+	]);
 foreach ($data['drules'] as $drule) {
 	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
 

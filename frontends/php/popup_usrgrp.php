@@ -78,15 +78,16 @@ if(form){
 <?php
 	}
 
-	$form = new CForm();
-	$form->addVar('dstfrm', $dstfrm);
+	$form = (new CForm())
+		->setName('groups')
+		->addVar('dstfrm', $dstfrm);
 
-	$form->setName('groups');
-
-	$table = new CTableInfo();
-	$table->setHeader([
-		(new CCheckBox("all_groups"))->onClick("checkAll('".$form->getName()."','all_groups','new_groups');"),
-		_('Name')
+	$table = (new CTableInfo())
+		->setHeader([
+			(new CColHeader(
+				(new CCheckBox('all_groups'))->onClick("checkAll('".$form->getName()."','all_groups','new_groups');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH),
+			_('Name')
 		]);
 
 	$userGroups = DBfetchArray(DBselect(

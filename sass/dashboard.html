@@ -5,8 +5,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Zabbix | Hosts</title>
-		<!--<link rel="stylesheet" href="stylesheets/screen.css">-->
-		<link rel="stylesheet" href="stylesheets/dark-theme.css">
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
         <link rel="icon" href="favicon.ico">
         <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
@@ -232,7 +232,7 @@
 	<div id="" class="overlay-dialogue notifications" style="top: 128px; right: 13px">
 	<span class="overlay-close-btn"></span>
 	<div class="dashbrd-widget-head">
-	<h4>Notifications</h4><ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
+	<!--<h4>Notifications</h4>--><ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><!--<li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li>--><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><!--<li><button type="button" class="btn-sound-off" title="Sound off"></button></li>--></ul></div>
 	<table class="list-table">
 	<tr>
 	<td class="disaster-bg"></td>
@@ -279,69 +279,18 @@
 	</table>
 	</div>
 
-	<div style="top: 106px; left: 1584px; z-index: 100;" class="overlay-dialogue"><span class="overlay-close-btn"></span>
-	<!--<div class="table list-table">
-		<div class="row">
-		     <div class="cell normal-bg"></div>
-		     <div class="cell">Ok</div>
-		</div>
-		<div class="row">
-		     <div class="cell na-bg">Not classified</div>
-		     <div class="cell">Problem</div>
-		</div>
-		<div class="row">
-		     <div class="cell info-bg">Information</div>
-		     <div class="cell">Problem</div>
-		</div>
-		<div class="row">
-		     <div class="cell warning-bg">Warning</div>
-		     <div class="cell">Problem</div>
-		</div>
-		<div class="row">
-		     <div class="cell average-bg">Average</div>
-		     <div class="cell">Problem</div>
-		</div>
-		<div class="row">
-		     <div class="cell high-bg">High</div>
-		     <div class="cell">Problem</div>
-		</div>
-		<div class="row">
-		     <div class="cell disaster-bg">Disaster</div>
-		     <div class="cell">Problem</div>
-		</div>
-		<div class="row">
-			<div class="cell"><div class="table" style="width:100%"><div class="row"><div class="cell normal-bg">&nbsp;</div><div class="cell na-bg">&nbsp;</div><div class="cell info-bg">&nbsp;</div><div class="cell warning-bg">&nbsp;</div><div class="cell high-bg">&nbsp;</div><div class="cell disaster-bg">&nbsp;</div></div></div></div>
-			<div class="cell">Active less then</div>
-		</div>
-	</div>-->
+<div style="top: 106px; left: 1300px; z-index: 100;" class="overlay-dialogue"><span class="overlay-close-btn"></span>
+<table class="list-table">
+<tr><td class="normal-bg">&nbsp;</td><td>Ok</td></tr>
+<tr><td class="na-bg">Not classified</td><td>Problem</td></tr>
+<tr><td class="info-bg">Information</td><td>Problem</td></tr>
+<tr><td class="warning-bg">Warning</td><td>Problem</td></tr>
+<tr><td class="average-bg">Average</td><td>Problem</td></tr>
+<tr><td class="high-bg">High</td><td>Problem</td></tr>
+<tr><td class="disaster-bg">Disaster</td><td>Problem</td></tr>
+<tr><td><table style="visibility: visible; margin: -8px -10px" class="blink overview-mon-severities"><tr><td class="normal">&nbsp;</td><td class="na-bg">&nbsp;</td><td class="info-bg">&nbsp;</td><td class="warning-bg">&nbsp;</td><td class="average-bg">&nbsp;</td><td class="high-bg">&nbsp;</td><td class="disaster-bg">&nbsp;</td></tr></table></td><td>Age less than 30m</td></tr><tr><td>&nbsp;</td><td>No trigger</td></tr>
+</table>
+</div>
 
-<!--
-	<div class="normal-bg"></div>
-	<div class="na-bg">Not classified</div>
-	<div class="info-bg">Information</div>
-	<div class="warning-bg">Warning</div>
-	<div class="average-bg">Average</div>
-	<div class="high-bg">High</div>
-	<div class="disaster-bg">Disaster</div>
--->
-	<table class="list-table">
-	<tr><td class="normal-bg">&nbsp;</td><td>Ok</td></tr>
-	<tr><td class="na-bg">Not classified</td><td>Problem</td></tr>
-	<tr><td class="info-bg">Information</td><td>Problem</td></tr>
-	<tr><td class="warning-bg">Warning</td><td>Problem</td></tr>
-	<tr><td class="average-bg">Average</td><td>Problem</td></tr>
-	<tr><td class="high-bg">High</td><td>Problem</td></tr>
-	<tr><td class="disaster-bg">Disaster</td><td>Problem</td></tr>
-	<tr><td>
-
-	<table style="visibility: visible;" class="blink overview-mon-severities"><tr><td class="normal">&nbsp;</td><td class="na-bg">&nbsp;</td><td class="info-bg">&nbsp;</td><td class="warning-bg">&nbsp;</td><td class="average-bg">&nbsp;</td><td class="high-bg">&nbsp;</td><td class="disaster-bg">&nbsp;</td></tr></table>
-
-<!--
-	<div class="table" style="width:100%;box-sizing: border-box"><div class="row"><div class="cell normal-bg">&nbsp;</div><div class="cell na-bg">&nbsp;</div><div class="cell info-bg">&nbsp;</div><div class="cell warning-bg">&nbsp;</div><div class="cell high-bg">&nbsp;</div><div class="cell disaster-bg">&nbsp;</div></div></div>-->
-<!--
-	<div><div class="normal-bg" style="display: inline-block">&nbsp;</div><div class="na-bg" style="display: inline-block">&nbsp;</div><div class="info-bg" style="display: inline-block">&nbsp;</div><div class="warning-bg" style="display: inline-block">&nbsp;</div><div class="high-bg" style="display: inline-block">&nbsp;</div><div class="disaster-bg" style="display: inline-block">&nbsp;</div></div>-->
-	
-	</td><td>Age less than 30m</td></tr><tr><td>&nbsp;</td><td>No trigger</td></tr></table>
-	</div>
 </body>
 </html>

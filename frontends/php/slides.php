@@ -46,7 +46,6 @@ $fields = [
 	// ajax
 	'widgetRefresh' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
 	'widgetRefreshRate' => [T_ZBX_STR, O_OPT, P_ACT, null,	null],
-	'filterState' =>	[T_ZBX_INT, O_OPT, P_ACT, null,	null],
 	'favobj' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,	null],
 	'favid' =>			[T_ZBX_INT, O_OPT, P_ACT,	null,	null],
 	'upd_counter' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,	null]
@@ -130,10 +129,6 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 }
 
 // filter state
-if (hasRequest('filterState')) {
-	CProfile::update('web.slides.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
 if (hasRequest('favobj') && hasRequest('favid')) {
 	$favouriteObject = getRequest('favobj');
 	$favouriteId = getRequest('favid');

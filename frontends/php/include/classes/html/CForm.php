@@ -35,7 +35,8 @@ class CForm extends CTag {
 	}
 
 	public function setMethod($value = 'post') {
-		return $this->attributes['method'] = $value;
+		$this->attributes['method'] = $value;
+		return $this;
 	}
 
 	public function setAction($value) {
@@ -44,24 +45,24 @@ class CForm extends CTag {
 		if (is_null($value)) {
 			$value = isset($page['file']) ? $page['file'] : 'zabbix.php';
 		}
-		return $this->attributes['action'] = $value;
+		$this->attributes['action'] = $value;
+		return $this;
 	}
 
 	public function setEnctype($value = null) {
 		if (is_null($value)) {
-			return $this->removeAttribute('enctype');
+			$this->removeAttribute('enctype');
 		}
-		elseif (!is_string($value)) {
-			return $this->error('Incorrect value for SetEnctype "'.$value.'".');
+		else {
+			$this->setAttribute('enctype', $value);
 		}
-		return $this->setAttribute('enctype', $value);
+		return $this;
 	}
 
 	public function addVar($name, $value, $id = null) {
 		if (!is_null($value)) {
 			$this->addItem(new CVar($name, $value, $id));
 		}
-
 		return $this;
 	}
 }

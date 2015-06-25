@@ -51,6 +51,7 @@ class CTabView extends CDiv {
 
 	public function setSelected($selected) {
 		$this->selectedTab = $selected;
+		return $this;
 	}
 
 	/**
@@ -62,16 +63,19 @@ class CTabView extends CDiv {
 	 */
 	public function setDisabled($disabled) {
 		$this->disabledTabs = $disabled;
+		return $this;
 	}
 
 	public function addTab($id, $header, $body) {
 		$this->headers[$id] = $header;
 		$this->tabs[$id] = new CDiv($body);
 		$this->tabs[$id]->setId(zbx_formatDomId($id));
+		return $this;
 	}
 
 	public function setFooter($footer) {
 		$this->footer = $footer;
+		return $this;
 	}
 
 	public function toString($destroy = true) {

@@ -31,22 +31,21 @@ $widget = (new CWidget())
 	);
 
 // create form
-$mediaTypeForm = new CForm();
-$mediaTypeForm->setName('mediaTypesForm');
+$mediaTypeForm = (new CForm())->setName('mediaTypesForm');
 
 // create table
-$mediaTypeTable = new CTableInfo();
-$mediaTypeTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_media_types'))
-			->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
-	make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
-	_('Status'),
-	_('Used in actions'),
-	_('Details')
-]);
+$mediaTypeTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_media_types'))
+				->onClick("checkAll('".$mediaTypeForm->getName()."', 'all_media_types', 'mediatypeids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'description', $data['sort'], $data['sortorder']),
+		make_sorting_header(_('Type'), 'type', $data['sort'], $data['sortorder']),
+		_('Status'),
+		_('Used in actions'),
+		_('Details')
+	]);
 
 foreach ($data['mediatypes'] as $mediaType) {
 	switch ($mediaType['typeid']) {
