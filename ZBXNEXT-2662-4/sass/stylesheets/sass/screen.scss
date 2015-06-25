@@ -883,6 +883,7 @@ footer {
 	position: relative;
 	margin-right: 3px;
 	min-height: 24px;
+	white-space: normal;
 
 	&.active {
 		border-color: $form-border-focus-color;
@@ -2251,6 +2252,17 @@ button[disabled] {
 	}
 }
 
+.overlay-bg {
+	background-color: $white;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	@include opacity(0.35);
+}
+
 .pop-up {
 	min-width: initial;
 	margin-bottom: 0;
@@ -2684,7 +2696,7 @@ td.disaster-bg {
 }
 
 .msg-bad-global {
-	display: none;
+	display: block;
 	position: fixed;
 	bottom: 0;
 	z-index: 10000;
