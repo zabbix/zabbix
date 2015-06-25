@@ -263,7 +263,8 @@ $ZBX_MENU = [
 			],
 			[
 				'url' => 'users.php',
-				'label' => _('Users')
+				'label' => _('Users'),
+				'sub_pages' => ['popup_usrgrp.php']
 			],
 			[
 				'url' => 'zabbix.php',

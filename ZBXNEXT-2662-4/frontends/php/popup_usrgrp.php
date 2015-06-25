@@ -84,7 +84,9 @@ if(form){
 
 	$table = (new CTableInfo())
 		->setHeader([
-			(new CCheckBox("all_groups"))->onClick("checkAll('".$form->getName()."','all_groups','new_groups');"),
+			(new CColHeader(
+				(new CCheckBox('all_groups'))->onClick("checkAll('".$form->getName()."','all_groups','new_groups');")
+			))->addClass(ZBX_STYLE_CELL_WIDTH),
 			_('Name')
 		]);
 
