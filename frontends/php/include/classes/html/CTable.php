@@ -22,7 +22,6 @@
 class CTable extends CTag {
 
 	public $headerClass;
-	public $footerClass;
 	protected $header;
 	protected $footer;
 	protected $colnum;
@@ -35,7 +34,6 @@ class CTable extends CTag {
 		$this->header = '';
 		$this->headerClass = null;
 		$this->footer = '';
-		$this->footerClass = null;
 		$this->colnum = 1;
 	}
 
@@ -111,10 +109,7 @@ class CTable extends CTag {
 		return $this;
 	}
 
-	public function setFooter($value = null, $class = 'footer') {
-		if (is_null($class)) {
-			$class = $this->footerClass;
-		}
+	public function setFooter($value = null, $class = null) {
 		$this->footer = $this->prepareRow($value, $class);
 		$this->footer = $this->footer->toString();
 		return $this;
