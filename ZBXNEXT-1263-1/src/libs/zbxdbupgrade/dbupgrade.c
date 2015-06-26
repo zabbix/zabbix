@@ -24,6 +24,7 @@
 #include "sysinfo.h"
 #include "zbxdbupgrade.h"
 #include "dbupgrade.h"
+#include "zbxself.h"
 
 typedef struct
 {
@@ -709,7 +710,7 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): UNKNOWN."
 				" Required mandatory version: %08d.",
-				zbx_program_type_string(program_type), required);
+				get_program_type_string(program_type), required);
 		zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");
 
 		goto out;
@@ -741,7 +742,7 @@ int	DBcheck_version(void)
 		zabbix_log(LOG_LEVEL_CRIT, "The %s does not match Zabbix database."
 				" Current database version (mandatory/optional): %08d/%08d."
 				" Required mandatory version: %08d.",
-				zbx_program_type_string(program_type), db_mandatory, db_optional, required);
+				get_program_type_string(program_type), db_mandatory, db_optional, required);
 #ifdef HAVE_SQLITE3
 		if (required > db_mandatory)
 			zabbix_log(LOG_LEVEL_CRIT, "Zabbix does not support SQLite3 database upgrade.");

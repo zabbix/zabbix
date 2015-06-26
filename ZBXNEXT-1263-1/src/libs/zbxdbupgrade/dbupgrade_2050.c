@@ -348,6 +348,7 @@ static int	DBpatch_2050024(void)
 	const ZBX_FIELD field = {"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
+}
 
 #endif
 
