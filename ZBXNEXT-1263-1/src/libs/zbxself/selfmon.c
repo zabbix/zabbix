@@ -248,7 +248,12 @@ const char	*get_program_type_string(unsigned char program_type)
 		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
 			return "proxy";
 		case ZBX_PROGRAM_TYPE_AGENTD:
+		case ZBX_PROGRAM_TYPE_AGENT:
 			return "agent";
+		case ZBX_PROGRAM_TYPE_SENDER:
+			return "sender";
+		case ZBX_PROGRAM_TYPE_GET:
+			return "get";
 		default:
 			return "unknown";
 	}
