@@ -1395,7 +1395,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$element_size = imageTextSize(7, 90, 'WWW');
 		$position = 0;
 
-		for ($i = $start; $i <= $this->grid['horizontal']['sub']['linecount']; $i++) {
+		for ($i = $start; $i <= $this->grid['horizontal']['sub']['linecount'] + 1; $i++) {
 			$previous_time = isset($new_time) ? $new_time : $this->stime;
 
 			if ($subInterval == SEC_PER_YEAR) {
@@ -1404,7 +1404,7 @@ class CLineGraphDraw extends CGraphDraw {
 			elseif ($subInterval == SEC_PER_MONTH * 6) {
 				if ($i == $start) {
 					if (date('m', $this->stime) > 7) {
-						$new_time = mktime(0, 0, 0, date('m', $previous_time), 1, date('Y', $previous_time) + 1);
+						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
 					else {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
