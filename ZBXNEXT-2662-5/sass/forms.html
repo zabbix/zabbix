@@ -56,10 +56,9 @@
 		<li>
 		<div class="table-forms-td-left"><label>Agent interfaces</label></div><div class="table-forms-td-right">
 		<div class="table-forms-separator">
-		<table><tbody>
-		<tr>
-		<td>&nbsp;</td><td><label for="IpAddress">IP address</label></td><td><label for="DnsName">DNS name</label></td><td><label>Connect to</label</td><td><label for="Port">Port</label></td><td><label>Default</label></td><td>&nbsp;</td>	
-		</tr>
+		<table>
+		<thead><tr><th></th><th>IP address</th><th>DNS name</th><th>Connect to</th><th>Port</th><th>Default</th><th></th></tr></thead>
+		<tbody>
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon disabled"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch paging-selected">IP</span><span class="radio-switch">DNS</span></div><input type="radio" style="display: none"><input type="radio" style="display: none"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link" disabled>Remove</button></td>
 		</tr>
@@ -85,15 +84,10 @@
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label for="jmx">JMX interfaces</label></div><div class="table-forms-td-right">
-		<div class="table-forms-separator">
-		<table><tbody>
-		<tr><td><button type="button" class="btn-link">Add</button></td></tr>
-		</tbody></table></div></div>
+		<div class="table-forms-separator"><button type="button" class="btn-link">Add</button></div></div>
 		</li>
 		<li><div class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></div><div class="table-forms-td-right">
-		<table><tbody>
-		<tr><td><div class="table-forms-separator"><button type="button" class="btn-link">Add</button></div></td></tr>
-		</tbody></table></div>
+		<div class="table-forms-separator"><button type="button" class="btn-link">Add</button></div></div>
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label for="descr">Description</label></div><div class="table-forms-td-right"><textarea name="" id="descr"></textarea></div>
