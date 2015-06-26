@@ -24,6 +24,10 @@
 
 #include "checks_agent.h"
 
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	extern unsigned char	program_type;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: get_value_agent                                                  *
@@ -77,8 +81,6 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			tls_arg2 = item->host.tls_psk;
 		}
 #else
-		extern unsigned char	program_type;
-
 		zbx_snprintf(buffer, sizeof(buffer), "A TLS connection is configured to be used with agent but support"
 				" for TLS was not compiled into %s.", get_program_type_string(program_type));
 		SET_MSG_RESULT(result, strdup(buffer));
@@ -140,7 +142,9 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, strdup(buffer));
 		ret = NETWORK_ERROR;
 	}
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 out:
+#endif
 	zbx_tcp_close(&s);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);

@@ -33,6 +33,8 @@
 
 #define ZBX_IMAGE_FILE_MACHINE	IMAGE_FILE_MACHINE_AMD64
 
+extern const char	*progname;
+
 static void	print_register(const char *name, unsigned __int64 value)
 {
 	zabbix_log(LOG_LEVEL_CRIT, "%-7s = %16I64x = %20I64u = %20I64d", name, value, value, value);
@@ -143,9 +145,8 @@ static void	print_backtrace(CONTEXT *pctx)
 
 	if (0 != GetModuleFileNameEx(hProcess, NULL, szProcessName, ARRSIZE(szProcessName)))
 	{
-		char			*ptr;
-		extern const char	*progname;
-		int			path_alloc = 0, path_offset = 0;
+		char	*ptr;
+		int	path_alloc = 0, path_offset = 0;
 
 		process_name = zbx_unicode_to_utf8(szProcessName);
 
