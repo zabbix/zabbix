@@ -23,6 +23,9 @@ $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Proxies'));
 
+$tabs = (new CTabView())
+	->setSelected(0);
+
 $proxyForm = (new CForm())
 	->setId('proxyForm')
 	->addVar('proxyid', $data['proxyid']);
@@ -114,21 +117,20 @@ $encryptionFormList->addRow(_('Subject'),
 		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 
-// append tabs to form
-$proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxyFormList);
-$proxyTab = (new CTabView())->addTab('proxyTab', _('Encryption'), $encryptionFormList);
+$tabs->addTab('proxyTab', _('Proxy'), $proxyFormList);
+$tabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
 
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
 
 if ($data['proxyid'] == 0) {
-	$proxyTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmitButton(_('Add'), 'action', 'proxy.create'),
 		[$cancelButton]
 	));
 }
 else {
-	$proxyTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmitButton(_('Update'), 'action', 'proxy.update'),
 		[
 			(new CSimpleButton(_('Clone')))->setId('clone'),
@@ -141,5 +143,5 @@ else {
 	));
 }
 
-$proxyForm->addItem($proxyTab);
+$proxyForm->addItem($tabs);
 $widget->addItem($proxyForm)->show();
