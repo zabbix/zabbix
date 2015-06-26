@@ -1238,9 +1238,8 @@ footer {
 
 .table-forms-separator {
 	display: inline-block;
-	padding: 0 0 5px 5px;
-	margin: 0 0 0 -5px;
-	border-bottom: 1px dashed $form-border-color;
+	padding: 5px;
+	border: 1px solid $table-border-color;
 }
 
 .drag-drop-area {
@@ -2832,11 +2831,25 @@ a.overlay-close-btn {
 	}
 }
 
+//.preloader {
+//	background: url(../img/preload.gif) no-repeat 0 0;
+//	width: 32px;
+//	height: 32px;
+//	margin: 0 auto;
+//}
+
 .preloader {
-	background: url(../img/preload.gif) no-repeat 0 0;
-	width: 32px;
-	height: 32px;
+	border-radius: 50%;
+	width: 24px;
+	height: 24px;
 	margin: 0 auto;
+	border: 2px solid #ccd5d9;
+	border-bottom: 2px solid #0275b8;
+	animation: load 0.5s infinite linear;
+}
+
+@keyframes load {
+	to { @include rotate(360); }
 }
 
 $browsers: (
@@ -2892,3 +2905,18 @@ $browsers: (
 	padding: 10px 0 0 0;
 	text-align: center;
 }
+
+.loader {
+  margin: 0 auto;
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  border: 2px solid #ccd5d9;
+  border-bottom: 2px solid #0275b8;
+  animation: load 0.5s infinite linear;
+}
+
+@keyframes load {
+  to { transform: rotate(360deg); }
+}
+
