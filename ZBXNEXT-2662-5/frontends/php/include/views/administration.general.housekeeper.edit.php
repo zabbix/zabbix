@@ -29,139 +29,102 @@ $widget = (new CWidget())
 	);
 
 $houseKeeperTab = (new CFormList())
-	->addRow(_('Events and alerts'),
-		new CDiv(
-			(new CTable())
-				->addClass('border_dotted')
-				->addClass('objectgroup')
-				->addClass('element-row')
-				->addRow([
-					new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
-					(new CCheckBox('hk_events_mode'))->setChecked($data['hk_events_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Trigger data storage period (in days)'), 'hk_events_trigger'),
-					(new CNumericBox('hk_events_trigger', $data['hk_events_trigger'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_events_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Internal data storage period (in days)'), 'hk_events_internal'),
-					(new CNumericBox('hk_events_internal', $data['hk_events_internal'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_events_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Network discovery data storage period (in days)'), 'hk_events_discovery'),
-					(new CNumericBox('hk_events_discovery', $data['hk_events_discovery'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_events_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Auto-registration data storage period (in days)'), 'hk_events_autoreg'),
-					(new CNumericBox('hk_events_autoreg', $data['hk_events_autoreg'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_events_mode'] == 1)
-				])
-		)
+	->addRow(new CTag('h4', true, _('Events and alerts')))
+	->addRow(
+		new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
+		(new CCheckBox('hk_events_mode'))->setChecked($data['hk_events_mode'] == 1)
 	)
-	->addRow(_('IT services'),
-		new CDiv(
-			(new CTable())
-				->addClass('border_dotted')
-				->addClass('objectgroup')
-				->addClass('element-row')
-				->addRow([
-					new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
-					(new CCheckBox('hk_services_mode'))->setChecked($data['hk_services_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Data storage period (in days)'), 'hk_services'),
-					(new CNumericBox('hk_services', $data['hk_services'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_services_mode'] == 1)
-				])
-		)
+	->addRow(
+		new CLabel(_('Trigger data storage period (in days)'), 'hk_events_trigger'),
+		(new CNumericBox('hk_events_trigger', $data['hk_events_trigger'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_events_mode'] == 1)
 	)
-	->addRow(_('Audit'),
-		new CDiv(
-			(new CTable())
-				->addClass('border_dotted')
-				->addClass('objectgroup')
-				->addClass('element-row')
-				->addRow([
-					new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
-					(new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Data storage period (in days)'), 'hk_audit'),
-					(new CNumericBox('hk_audit', $data['hk_audit'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_audit_mode'] == 1)
-				])
-		)
+	->addRow(
+		new CLabel(_('Internal data storage period (in days)'), 'hk_events_internal'),
+		(new CNumericBox('hk_events_internal', $data['hk_events_internal'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_events_mode'] == 1)
 	)
-	->addRow(_('User sessions'),
-		new CDiv(
-			(new CTable())
-				->addClass('border_dotted')
-				->addClass('objectgroup')
-				->addClass('element-row')
-				->addRow([
-					new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
-					(new CCheckBox('hk_sessions_mode'))->setChecked($data['hk_sessions_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Data storage period (in days)'), 'hk_sessions'),
-					(new CNumericBox('hk_sessions', $data['hk_sessions'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_sessions_mode'] == 1)
-				])
-		)
+	->addRow(
+		new CLabel(_('Network discovery data storage period (in days)'), 'hk_events_discovery'),
+		(new CNumericBox('hk_events_discovery', $data['hk_events_discovery'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_events_mode'] == 1)
 	)
-	->addRow(_('History'),
-		new CDiv(
-			(new CTable())
-				->addClass('border_dotted')
-				->addClass('objectgroup')
-				->addClass('element-row')
-				->addRow([
-					new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
-					(new CCheckBox('hk_history_mode'))->setChecked($data['hk_history_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Override item history period'), 'hk_history_global'),
-					(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Data storage period (in days)'), 'hk_history'),
-					(new CNumericBox('hk_history', $data['hk_history'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_history_global'] == 1)
-				])
-		)
+	->addRow(
+		new CLabel(_('Auto-registration data storage period (in days)'), 'hk_events_autoreg'),
+		(new CNumericBox('hk_events_autoreg', $data['hk_events_autoreg'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_events_mode'] == 1)
 	)
-	->addRow(_('Trends'),
-		new CDiv(
-			(new CTable())
-				->addClass('border_dotted')
-				->addClass('objectgroup')
-				->addClass('element-row')
-				->addRow([
-					new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
-					(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Override item trend period'), 'hk_trends_global'),
-					(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1)
-				])
-				->addRow([
-					new CLabel(_('Data storage period (in days)'), 'hk_trends'),
-					(new CNumericBox('hk_trends', $data['hk_trends'], 5))
-						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-						->setEnabled($data['hk_trends_global'] == 1)
-				])
-		)
+	->addRow()
+	->addRow(new CTag('h4', true, _('IT services')))
+	->addRow(
+		new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
+		(new CCheckBox('hk_services_mode'))->setChecked($data['hk_services_mode'] == 1)
+	)
+	->addRow(
+		new CLabel(_('Data storage period (in days)'), 'hk_services'),
+		(new CNumericBox('hk_services', $data['hk_services'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_services_mode'] == 1)
+	)
+	->addRow()
+	->addRow(new CTag('h4', true, _('Audit')))
+	->addRow(
+		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
+		(new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1)
+	)
+	->addRow(
+		new CLabel(_('Data storage period (in days)'), 'hk_audit'),
+		(new CNumericBox('hk_audit', $data['hk_audit'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_audit_mode'] == 1)
+	)
+	->addRow()
+	->addRow(new CTag('h4', true, _('User sessions')))
+	->addRow(
+		new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
+		(new CCheckBox('hk_sessions_mode'))->setChecked($data['hk_sessions_mode'] == 1)
+	)
+	->addRow(
+		new CLabel(_('Data storage period (in days)'), 'hk_sessions'),
+		(new CNumericBox('hk_sessions', $data['hk_sessions'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_sessions_mode'] == 1)
+	)
+	->addRow()
+	->addRow(new CTag('h4', true, _('History')))
+	->addRow(
+		new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
+		(new CCheckBox('hk_history_mode'))->setChecked($data['hk_history_mode'] == 1)
+	)
+	->addRow(
+		new CLabel(_('Override item history period'), 'hk_history_global'),
+		(new CCheckBox('hk_history_global'))->setChecked($data['hk_history_global'] == 1)
+	)
+	->addRow(
+		new CLabel(_('Data storage period (in days)'), 'hk_history'),
+		(new CNumericBox('hk_history', $data['hk_history'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_history_global'] == 1)
+	)
+	->addRow()
+	->addRow(new CTag('h4', true, _('Trends')))
+	->addRow(
+		new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),
+		(new CCheckBox('hk_trends_mode'))->setChecked($data['hk_trends_mode'] == 1)
+	)
+	->addRow(
+		new CLabel(_('Override item trend period'), 'hk_trends_global'),
+		(new CCheckBox('hk_trends_global'))->setChecked($data['hk_trends_global'] == 1)
+	)
+	->addRow(
+		new CLabel(_('Data storage period (in days)'), 'hk_trends'),
+		(new CNumericBox('hk_trends', $data['hk_trends'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			->setEnabled($data['hk_trends_global'] == 1)
 	);
 
 $houseKeeperView = (new CTabView())

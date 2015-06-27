@@ -855,6 +855,8 @@ footer, .footer {
         vertical-align: middle; }
         .table-forms .table-forms-td-right td.center .btn-grey {
           margin: 3px 0; }
+  .table-forms h4 {
+    margin-bottom: -5px; }
 
 .center {
   text-align: center; }
