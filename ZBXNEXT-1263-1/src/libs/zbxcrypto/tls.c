@@ -3157,8 +3157,8 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	}
 
 	/* set up TLS context */
+
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(ssl_context));
-	memset(s->tls_ctx, 0, sizeof(ssl_context));
 
 	if (0 != (res = ssl_init(s->tls_ctx)))
 	{
@@ -3837,8 +3837,8 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* set up TLS context */
+
 	s->tls_ctx = zbx_malloc(s->tls_ctx, sizeof(ssl_context));
-	memset(s->tls_ctx, 0, sizeof(ssl_context));
 
 	if (0 != (res = ssl_init(s->tls_ctx)))
 	{
