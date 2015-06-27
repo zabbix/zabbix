@@ -36,7 +36,7 @@ extern pid_t	*threads;
 extern int	threads_num;
 
 #ifdef HAVE_SIGQUEUE
-	extern unsigned char	program_type;
+extern unsigned char	program_type;
 #endif
 
 extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,

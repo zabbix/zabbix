@@ -25,7 +25,7 @@
 #include "checks_agent.h"
 
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	extern unsigned char	program_type;
+extern unsigned char	program_type;
 #endif
 
 /******************************************************************************
