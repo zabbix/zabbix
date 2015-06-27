@@ -1323,24 +1323,11 @@ class CLineGraphDraw extends CGraphDraw {
 			$offsetX = ($offset * $this->sizeX) / $this->period;
 		}
 
-		$lineCount = floor(($this->period-$offset) / $subInterval);
-
-		$startI = 0;
-		if ($offsetX < 12) {
-			$startI++;
-		}
-
-		while (($this->sizeX - ($offsetX + ($lineCount * $intervalX))) < 12) {
-			$lineCount--;
-		}
-
 		$sub = &$this->grid['horizontal']['sub'];
 		$sub['interval'] = $subInterval;
-		$sub['linecount'] = $lineCount;
 		$sub['intervalx'] = $intervalX;
 		$sub['offset'] = $offset;
 		$sub['offsetx'] = $offsetX;
-		$sub['start'] = $startI;
 
 		// main
 		$intervalX = ($mainInterval * $this->sizeX) / $this->period;
@@ -1359,24 +1346,11 @@ class CLineGraphDraw extends CGraphDraw {
 			$offsetX = $offset * ($this->sizeX / $this->period);
 		}
 
-		$lineCount = floor(($this->period-$offset) / $mainInterval);
-
-		$startI = 0;
-		if ($offsetX < 12) {
-			$startI++;
-		}
-
-		while (($this->sizeX - ($offsetX + ($lineCount * $intervalX))) < 12) {
-			$lineCount--;
-		}
-
 		$main = &$this->grid['horizontal']['main'];
 		$main['interval'] = $mainInterval;
-		$main['linecount'] = $lineCount;
 		$main['intervalx'] = $intervalX;
 		$main['offset'] = $offset;
 		$main['offsetx'] = $offsetX;
-		$main['start'] = $startI;
 	}
 
 	private function drawBetweenData() {
@@ -1386,23 +1360,25 @@ class CLineGraphDraw extends CGraphDraw {
 		$mainInterval = $this->grid['horizontal']['main']['interval'];
 		$mainIntervalX = $this->grid['horizontal']['main']['intervalx'];
 		$mainOffset = $this->grid['horizontal']['main']['offset'];
-		$start = $this->grid['horizontal']['sub']['start'];
 
-		if ($subInterval == $mainInterval) {
+		if ($subInterval == $mainInterval || ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX))
+				|| ($mainIntervalX < (ceil($mainInterval / $subInterval + 1) * $element_size['width']))) {
 			return;
 		}
 
 		$element_size = imageTextSize(7, 90, 'WWW');
 		$position = 0;
 
-		for ($i = $start; $i <= $this->grid['horizontal']['sub']['linecount'] + 1; $i++) {
+		$i = 1;
+
+		while ($this->stime + $i * $subInterval + $subOffset < $this->to_time) {
 			$previous_time = isset($new_time) ? $new_time : $this->stime;
 
 			if ($subInterval == SEC_PER_YEAR) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 			}
 			elseif ($subInterval == SEC_PER_MONTH * 6) {
-				if ($i == $start) {
+				if ($i == 1) {
 					if (date('m', $this->stime) > 7) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
@@ -1423,7 +1399,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 			}
 			elseif ($subInterval == SEC_PER_DAY * 15) {
-				if ($i == $start) {
+				if ($i == 1) {
 					if (date('d', $this->stime) > 15) {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 					}
@@ -1450,9 +1426,12 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$position += $timeIntervalX;
 
-			if ($i == $start && $position < $element_size['width']) {
+			if (($i == 1 && $position < $element_size['width']) || $new_time >= $this->to_time) {
+				$i++;
 				continue;
 			}
+
+			$i++;
 
 			if (date('d', $new_time) == 1 && date('m', $new_time) == 1 && date('H', $new_time) == 0
 					&& date('i', $new_time) == 0) {
@@ -1475,13 +1454,6 @@ class CLineGraphDraw extends CGraphDraw {
 					|| ($subInterval >= SEC_PER_HOUR && date('H', $new_time) == '00' && $subInterval < SEC_PER_DAY)
 					|| $format == YEAR_FORMAT) {
 				$this->drawMainPeriod($new_time, $format, $position);
-				continue;
-			}
-
-			if ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX)) {
-				continue;
-			}
-			elseif ($mainIntervalX < (ceil($mainInterval / $subInterval + 1) * $element_size['width'])) {
 				continue;
 			}
 
