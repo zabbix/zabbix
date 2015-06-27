@@ -202,10 +202,7 @@ $groupList->addRow(_('Groups'),
 );
 
 // new group prototypes
-$customGroupTable = (new CTable())
-	->setNoDataMessage(SPACE)
-	->addClass('formElementTable')
-	->setId('tbl_group_prototypes');
+$customGroupTable = (new CTable())->setId('tbl_group_prototypes');
 
 // buttons
 $addButton = (new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK);
@@ -216,27 +213,39 @@ $buttonRow = (new CRow())
 	->addItem($buttonColumn);
 
 $customGroupTable->addRow($buttonRow);
-$groupDiv = (new CDiv($customGroupTable))
-	->addClass('objectgroup')
-	->addClass('border_dotted')
-	->addClass('group-prototypes');
-$groupList->addRow(_('Group prototypes'), $groupDiv);
+$groupList->addRow(_('Group prototypes'), (new CDiv($customGroupTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 $divTabs->addTab('groupTab', _('Groups'), $groupList);
 
 // templates
 $tmplList = new CFormList();
 
-// create linked template table
-$linkedTemplateTable = (new CTable())
-	->setNoDataMessage(_('No templates linked.'))
-	->addClass('formElementTable')
-	->setId('linkedTemplateTable')
-	->setAttribute('style', 'min-width: 400px;')
-	->setHeader([_('Name'), _('Action')]);
+if ($hostPrototype['templateid']) {
+	$linkedTemplateTable = (new CTable())
+		->setNoDataMessage(_('No templates linked.'))
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setHeader([_('Name')]);
 
-$ignoreTemplates = [];
-if ($hostPrototype['templates']) {
+	foreach ($hostPrototype['templates'] as $template) {
+		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
+
+		$linkedTemplateTable->addRow([$templateLink]);
+	}
+
+	$tmplList->addRow(_('Linked templates'),
+		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	);
+}
+else {
+	$ignoreTemplates = [];
+
+	$linkedTemplateTable = (new CTable())
+		->setNoDataMessage(_('No templates linked.'))
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setHeader([_('Name'), _('Action')]);
+
 	foreach ($hostPrototype['templates'] as $template) {
 		$tmplList->addVar('templates['.$template['templateid'].']', $template['templateid']);
 		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
@@ -244,52 +253,33 @@ if ($hostPrototype['templates']) {
 
 		$linkedTemplateTable->addRow([
 			$templateLink,
-			!$hostPrototype['templateid'] ? (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK) : '',
+			(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK)
 		]);
 
 		$ignoreTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(
-		_('Linked templates'),
-		(new CDiv($linkedTemplateTable))
-			->addClass('objectgroup')
-			->addClass('inlineblock')
-			->addClass('border_dotted')
+	$tmplList->addRow(_('Linked templates'),
+		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
-}
-// for inherited prototypes with no templates display a text message
-elseif ($hostPrototype['templateid']) {
-	$tmplList->addRow(_('No templates linked.'));
-}
 
-// create new linked template table
-if (!$hostPrototype['templateid']) {
+	// create new linked template table
 	$newTemplateTable = (new CTable())
-		->addClass('formElementTable')
-		->setId('newTemplateTable')
-		->setAttribute('style', 'min-width: 400px;');
+		->addRow([
+			(new CMultiSelect([
+				'name' => 'add_templates[]',
+				'objectName' => 'templates',
+				'ignored' => $ignoreTemplates,
+				'popup' => [
+					'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+						'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		])
+		->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
-	$newTemplateTable->addRow([
-		(new CMultiSelect([
-			'name' => 'add_templates[]',
-			'objectName' => 'templates',
-			'ignored' => $ignoreTemplates,
-			'popup' => [
-				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	]);
-
-	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
-
-	$tmplList->addRow(
-		_('Link new templates'),
-		(new CDiv($newTemplateTable))
-			->addClass('objectgroup')
-			->addClass('inlineblock')
-			->addClass('border_dotted')
+	$tmplList->addRow(_('Link new templates'),
+		(new CDiv($newTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
 }
 

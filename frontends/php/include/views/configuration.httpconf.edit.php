@@ -159,7 +159,6 @@ $httpAuthenticationFormList
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
 	->setId('httpStepTable')
 	->setHeader([
 		(new CColHeader(''))->setWidth('15'),
@@ -167,7 +166,7 @@ $stepsTable = (new CTable())
 		(new CColHeader(_('Name')))->setWidth('150'),
 		(new CColHeader(_('Timeout')))->setWidth('50'),
 		(new CColHeader(_('URL')))->setWidth('200'),
-		(new CColHeader(_('Required')))->setWidth('50'),
+		(new CColHeader(_('Required')))->setWidth('75'),
 		(new CColHeader(_('Status codes')))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->setWidth('90'),
@@ -249,10 +248,7 @@ if (!$this->data['templated']) {
 }
 
 $httpStepFormList->addRow(_('Steps'),
-	(new CDiv($stepsTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+	(new CDiv($stepsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 // append tabs to form
