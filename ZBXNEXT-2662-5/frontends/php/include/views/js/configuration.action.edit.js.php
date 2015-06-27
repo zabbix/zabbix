@@ -78,7 +78,7 @@
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
 <div id="opcmdEditForm">
-	<table class="objectgroup border_dotted inlineblock" style="min-width: 310px;">
+	<table class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: 310px;">
 		<tbody>
 		<tr>
 			<td><?= _('Target') ?></td>
@@ -112,7 +112,7 @@
 <tr id="operationTypeScriptElements" class="hidden">
 	<td><?= CHtml::encode(_('Execute on')) ?></td>
 	<td>
-		<div class="objectgroup inlineblock border_dotted" id="uniqList">
+		<div class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" id="uniqList">
 			<div>
 				<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
 				<label for="execute_on_agent"><?= CHtml::encode(_('Zabbix agent')) ?></label>

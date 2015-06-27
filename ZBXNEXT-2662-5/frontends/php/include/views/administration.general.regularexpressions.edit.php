@@ -40,6 +40,7 @@ zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($dat
  */
 $exprTable = (new CTable())
 	->setId('exprTable')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([
 		_('Expression'),
 		(new CColHeader(_('Expression type'))),
@@ -58,13 +59,7 @@ $exprTab = (new CFormList('exprTab'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(
-		_('Expressions'),
-		(new CDiv($exprTable))
-			->addClass('inlineblock')
-			->addClass('border_dotted')
-			->addClass('objectgroup')
-	);
+	->addRow(_('Expressions'), (new CDiv($exprTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 $exprForm = (new CTable())
 	->addRow([_('Expression'), (new CTextBox('expressionNew'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)])
@@ -74,15 +69,13 @@ $exprForm = (new CTable())
 
 $exprFormFooter = [
 	(new CButton('saveExpression', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-	' ',
-	(new CButton('cancelExpression', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+	(new CButton('cancelExpression', _('Cancel')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addStyle('margin-left: 8px')
 ];
 $exprTab->addRow(
 	null,
-	(new CDiv([$exprForm, $exprFormFooter]))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted'),
+	(new CDiv([$exprForm, $exprFormFooter]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 	true,
 	'exprForm'
 );

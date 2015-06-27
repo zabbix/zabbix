@@ -35,7 +35,6 @@ $houseKeeperTab = (new CFormList())
 				->addClass('border_dotted')
 				->addClass('objectgroup')
 				->addClass('element-row')
-				->addClass('element-row-first')
 				->addRow([
 					new CLabel(_('Enable internal housekeeping'), 'hk_events_mode'),
 					(new CCheckBox('hk_events_mode'))->setChecked($data['hk_events_mode'] == 1)

@@ -50,8 +50,7 @@ $iconMapTable = (new CTable())
 order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 0;
 foreach ($this->data['iconmap']['mappings'] as $mapping) {
-	$numSpan = (new CSpan(($i + 1).':'))
-		->addClass('rowNum');
+	$numSpan = (new CSpan(($i + 1).':'))->addClass('rowNum');
 
 	$profileLinksComboBox = new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link'], null,
 		$this->data['inventoryList']
@@ -120,13 +119,7 @@ $iconPreviewImage = (new CImg('imgstore.php?iconid='.$this->data['iconmap']['def
 $iconMapTable->addRow([(new CCol(_('Default')))->setColSpan(4), $iconsComboBox, $iconPreviewImage]);
 // </default icon row>
 
-$iconMapTab->addRow(
-	_('Mappings'),
-	(new CDiv($iconMapTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-);
+$iconMapTab->addRow(_('Mappings'), (new CDiv($iconMapTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);
 

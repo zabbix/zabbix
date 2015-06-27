@@ -518,9 +518,9 @@ foreach ($triggers as $trigger) {
 	}
 
 	if (!empty($trigger['dependencies'])) {
-		$dependenciesTable = (new CTableInfo())
-			->setAttribute('style', 'width: 200px;')
-			->addRow(bold(_('Depends on').':'));
+		$dependenciesTable = (new CTable())
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addRow(_('Depends on').':');
 
 		foreach ($trigger['dependencies'] as $dependency) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
@@ -534,9 +534,9 @@ foreach ($triggers as $trigger) {
 	}
 
 	$dependency = false;
-	$dependenciesTable = (new CTableInfo())
-		->setAttribute('style', 'width: 200px;')
-		->addRow(bold(_('Dependent').':'));
+	$dependenciesTable = (new CTable())
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->addRow(_('Dependent').':');
 	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 

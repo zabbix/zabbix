@@ -55,9 +55,7 @@ $triggersFormList->addRow(
 // append dependencies to form list
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
-	->setId('dependenciesTable')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
@@ -95,12 +93,11 @@ $addButton = (new CButton('add_dep_trigger', _('Add')))
 $addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
 	->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
 		'&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1");')
-	->addClass(ZBX_STYLE_BTN_LINK);
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addStyle('margin-left: 8px');
 
-$dependenciesDiv = (new CDiv([$dependenciesTable, $addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
+$dependenciesDiv = (new CDiv([$dependenciesTable, $addButton, $addPrototypeButton]))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setId('dependencies_div');
 
 $triggersFormList->addRow(

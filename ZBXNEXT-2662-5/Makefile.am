@@ -67,4 +67,3 @@ css:
 	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
 	cp sass/img/icon-sprite.png frontends/php/img/
 	cp sass/img/browser-sprite.png frontends/php/img/
-	cp sass/img/preload.gif frontends/php/img/
