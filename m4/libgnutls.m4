@@ -54,31 +54,31 @@ AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>
      AC_MSG_CHECKING(for GnuTLS support)
      if test "x$_libgnutls_dir" = "xno"; then
        if test -f /usr/include/gnutls/gnutls.h; then
-         GNUTLS_CFLAGS=-I/usr/include/gnutls
+         GNUTLS_CFLAGS=-I/usr/include
          GNUTLS_LDFLAGS=-L/usr/lib
          GNUTLS_LIBS="-lgnutls"
          found_gnutls="yes"
        elif test -f /usr/local/include/gnutls/gnutls.h; then
-         GNUTLS_CFLAGS=-I/usr/local/include/gnutls
+         GNUTLS_CFLAGS=-I/usr/local/include
          GNUTLS_LDFLAGS=-L/usr/local/lib
          GNUTLS_LIBS="-lgnutls"
          found_gnutls="yes"
        else #libraries are not found in default directories
          found_gnutls="no"
          AC_MSG_RESULT(no)
-       fi # test -f /usr/include/gnutls/gnutls.h; then
-     else # test "x$_libgnutls_dir" = "xno"; then
+       fi
+     else
        if test -f $_libgnutls_dir/include/gnutls/gnutls.h; then
-	 GNUTLS_CFLAGS=-I$_libgnutls_dir/include/gnutls
+         GNUTLS_CFLAGS=-I$_libgnutls_dir/include
          GNUTLS_LDFLAGS=-L$_libgnutls_dir/lib
          GNUTLS_LIBS="-lgnutls"
          found_gnutls="yes"
-       else #if test -f $_libgnutls_dir/include/gnutls/gnutls.h; then
+       else
          found_gnutls="no"
          AC_MSG_RESULT(no)
-       fi #test -f $_libgnutls_dir/include/gnutls/gnutls.h; then
-     fi #if test "x$_libgnutls_dir" = "xno"; then
-  fi # if test "x$want_gnutls" = "xyes"; then
+       fi
+     fi
+  fi
 
   if test "x$found_gnutls" = "xyes"; then
     am_save_cflags="$CFLAGS"
