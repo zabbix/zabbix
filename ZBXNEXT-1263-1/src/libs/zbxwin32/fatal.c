@@ -25,15 +25,15 @@
 
 #pragma comment(lib, "DbgHelp.lib")
 
-#define STACKWALK_MAX_NAMELEN 4096
+#define STACKWALK_MAX_NAMELEN	4096
 
 #define ZBX_LSHIFT(value, bits)	(((unsigned __int64)value) << bits)
+
+extern const char	*progname;
 
 #ifdef _M_X64
 
 #define ZBX_IMAGE_FILE_MACHINE	IMAGE_FILE_MACHINE_AMD64
-
-extern const char	*progname;
 
 static void	print_register(const char *name, unsigned __int64 value)
 {
