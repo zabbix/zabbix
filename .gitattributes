@@ -544,6 +544,7 @@ sass/forms-housekeeper.html -text
 sass/forms-inventory.html -text
 sass/img/browser-sprite.png -text svneol=unset#image/png
 sass/img/icon-sprite.png -text svneol=unset#image/png
+sass/img/profile.svg -text svneol=unset#image/svg%2Bxml
 sass/img_source/icons.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/overlay-dialog_with_tables.html -text

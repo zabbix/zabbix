@@ -327,6 +327,11 @@ ul.top-nav-icons {
 		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -66px;
 	}
 
+	.top-nav-profile-svg {
+		background: $main-nav-bg-color url(../img/profile.svg) no-repeat 0 0;
+		fill: $white;
+	}
+
 	.top-nav-signout {
 		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -91px;
 		width: 44px;
