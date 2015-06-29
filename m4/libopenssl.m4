@@ -1,11 +1,11 @@
-# OpenSSL CHECK_CONFIG ([DEFAULT-ACTION])
+# OpenSSL LIBOPENSSL_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 # Derived from libssh2.m4 written by
 #    Alexander Vladishev                      Oct-26-2009
 #    Dmitry Borovikov                         Feb-13-2010
 #
-# Checks for OpenSSL library libssl. DEFAULT-ACTION is the string yes or no to
-# specify whether to default to --with-openssl or --without-openssl.
+# Checks for OpenSSL library libssl.  DEFAULT-ACTION is the string yes or
+# no to specify whether to default to --with-openssl or --without-openssl.
 # If not supplied, DEFAULT-ACTION is no.
 #
 # This macro #defines HAVE_OPENSSL if a required header files are
@@ -46,8 +46,8 @@ found_openssl="yes",)
 AC_DEFUN([LIBOPENSSL_CHECK_CONFIG],
 [
   AC_ARG_WITH(openssl,[
-If you want to use encryption provided by OpenSSL libssl and libcrypto libraries:
-AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@:>@, DIR is the OpenSSL libraries libssl and libcrypto install directory.])],
+If you want to use encryption provided by OpenSSL library:
+AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@:>@, DIR is the libssl and libcrypto install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_openssl="no"
@@ -81,7 +81,7 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
        fi
      else						# search in the specified OpenSSL directory
        if test -f $_libopenssl_dir/include/openssl/ssl.h -a -f $_libopenssl_dir/include/openssl/crypto.h; then
-	 OPENSSL_CFLAGS=-I$_libopenssl_dir/include
+         OPENSSL_CFLAGS=-I$_libopenssl_dir/include
          OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
