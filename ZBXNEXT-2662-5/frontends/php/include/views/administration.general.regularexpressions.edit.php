@@ -33,25 +33,62 @@ $form = (new CForm())
 	->addVar('form', 1)
 	->addVar('regexpid', $data['regexpid']);
 
-zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($data['expressions'])).');');
-
 /*
  * Expressions tab
  */
 $exprTable = (new CTable())
-	->setId('exprTable')
+	->setId('tbl_expr')
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([
+		_('Expression type'),
 		_('Expression'),
-		(new CColHeader(_('Expression type'))),
-		(new CColHeader(_('Case sensitive'))),
+		_('Delimiter'),
+		_('Case sensitive'),
 		''
-	])
-	->setFooter(
-		(new CButton('new', _('New')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('exprAdd')
+	]);
+
+foreach ($data['expressions'] as $i => $expression) {
+	$exp_delimiter = new CComboBox('expressions['.$i.'][exp_delimiter]', $expression['exp_delimiter'], null,
+		expressionDelimiters()
 	);
+
+	if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
+		$exp_delimiter->addStyle('display: none;');
+	}
+
+	$row = [
+		(new CComboBox('expressions['.$i.'][expression_type]', $expression['expression_type'], null,
+			expression_type2str()
+		))->onChange('onChangeExpressionType(this, '.$i.')'),
+		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$exp_delimiter,
+		(new CCheckBox('expressions['.$i.'][case_sensitive]', '1'))->setChecked($expression['case_sensitive'])
+	];
+
+	$button_cell = [
+		(new CButton('expressions['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	];
+	if (array_key_exists('expressionid', $expression)) {
+		$button_cell[] = new CVar('expressions['.$i.'][expressionid]', $expression['expressionid']);
+	}
+
+	$row[] = $button_cell;
+
+	$exprTable->addRow(
+		(new CRow($row))
+			->addClass('form_row')
+			->setAttribute('data-index', $i)
+	);
+}
+
+$exprTable->setFooter(
+	(new CButton('expression_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+);
 
 $exprTab = (new CFormList('exprTab'))
 	->addRow(_('Name'),
@@ -61,42 +98,23 @@ $exprTab = (new CFormList('exprTab'))
 	)
 	->addRow(_('Expressions'), (new CDiv($exprTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
-$exprForm = (new CTable())
-	->addRow([_('Expression'), (new CTextBox('expressionNew'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)])
-	->addRow([_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())])
-	->addRow([_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())], null, 'delimiterNewRow')
-	->addRow([_('Case sensitive'), new CCheckBox('case_sensitiveNew')]);
-
-$exprFormFooter = [
-	(new CButton('saveExpression', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-	(new CButton('cancelExpression', _('Cancel')))
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addStyle('margin-left: 8px')
-];
-$exprTab->addRow(
-	null,
-	(new CDiv([$exprForm, $exprFormFooter]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
-	true,
-	'exprForm'
-);
-
 /*
  * Test tab
  */
-$testTab = new CFormList('testTab');
-$testTab->addRow(_('Test string'),
-	(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-);
-$preloaderDiv = (new CDiv())
-	->addClass('preloader')
-	->setId('testPreloader')
-	->addStyle('display: none');
-$testTab->addRow(SPACE, [new CButton('testExpression', _('Test expressions')), $preloaderDiv]);
+$testTab = (new CFormList())
+	->addRow(_('Test string'),
+		(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT));
 
-$tabExp = (new CTableInfo())
-	->setId('testResultTable')
-	->setHeader([_('Expression'), _('Expression type'), _('Result')]);
-$testTab->addRow(_('Result'), $tabExp);
+$testTab->addRow(_('Result'), [
+	(new CDiv(
+		(new CTable())
+			->setId('testResultTable')
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setHeader([_('Expression type'), _('Expression'), _('Result')])
+	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+]);
 
 $regExpView = new CTabView();
 if (!$data['form_refresh']) {
