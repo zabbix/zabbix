@@ -1345,20 +1345,20 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 fi
 
 dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
-LIBPOLARSSL_CHECK_CONFIG([no])
-if test "x$want_polarssl" = "xyes"; then
+LIBMBEDTLS_CHECK_CONFIG([no])
+if test "x$want_mbedtls" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
 		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
 	fi
 
-	if test "x$found_polarssl" != "xyes"; then
+	if test "x$found_mbedtls" != "xyes"; then
 		AC_MSG_ERROR([mbed TLS (PolarSSL) library libpolarssl not found])
 	else
 		have_tls="mbed TLS"
 	fi
-	TLS_CFLAGS="$POLARSSL_CFLAGS"
-	TLS_LDFLAGS="$POLARSSL_LDFLAGS"
-	TLS_LIBS="$POLARSSL_LIBS"
+	TLS_CFLAGS="$MBEDTLS_CFLAGS"
+	TLS_LDFLAGS="$MBEDTLS_LDFLAGS"
+	TLS_LIBS="$MBEDTLS_LIBS"
 fi
 
 dnl Check for GnuTLS libgnutls [by default - skip]
