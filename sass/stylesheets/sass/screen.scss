@@ -316,29 +316,28 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -18px;
+		//background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -18px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -36px;
 	}
 
-	.top-nav-print {
-		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -42px;
-	}
+	//.top-nav-print {
+	//	background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -42px;
+	//}
 
 	.top-nav-profile {
-		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -66px;
-	}
-
-	.top-nav-profile-svg {
-		background: $main-nav-bg-color url(../img/profile.svg) no-repeat 0 0;
-		fill: $white;
+		//background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -66px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -108px;
 	}
 
 	.top-nav-signout {
-		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -91px;
+		//background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -91px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -144px;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat -41px -138px;
+		//background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat -41px -138px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
 	    width: auto;
 		padding: 0 12px 0 27px;
 	}
@@ -1545,7 +1544,8 @@ button {
 }
 
 .btn-search {
-	background: darken($main-nav-bg-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+	//background: darken($main-nav-bg-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
 	position: absolute;
 	border: none;
 	top: 7px;
@@ -1599,14 +1599,22 @@ button {
 }
 
 $icon-buttons: (
-	conf: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px,
-	max: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px,
-	min: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px,
-	add-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px,
-	remove-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px,
-	action: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px,
-	info: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px,
-	reset: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px
+	//conf: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px,
+	//max: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px,
+	//min: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px,
+	//add-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px,
+	//remove-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px,
+	//action: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px,
+	//info: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px,
+	//reset: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px
+	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
+	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
+	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -263px, // Fine tune this icon
+	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
+	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -331px,
+	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px, // Fine tune this icon
+	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -439px
 
 );
 
@@ -1618,8 +1626,15 @@ $icon-buttons: (
 }
 
 $icon-widget-buttons: (
-	widget-action: url(../img/icon-sprite.png) no-repeat 3px -262px,
-	widget-collapse: url(../img/icon-sprite.png) no-repeat 2px -214px,
+	//widget-action: url(../img/icon-sprite.png) no-repeat 3px -262px,
+	//widget-collapse: url(../img/icon-sprite.png) no-repeat 2px -214px,
+	//widget-expand: url(../img/icon-sprite.png) no-repeat 2px -238px,
+	//alarm-on: url(../img/icon-sprite.png) no-repeat -45px -191px,
+	//alarm-off: url(../img/icon-sprite.png) no-repeat -45px -239px,
+	//sound-on: url(../img/icon-sprite.png) no-repeat -45px -216px,
+	//sound-off: url(../img/icon-sprite.png) no-repeat -45px -264px
+	widget-action: url(../img/icon-sprite.svg) no-repeat -3px -616px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -4px -652px,
 	widget-expand: url(../img/icon-sprite.png) no-repeat 2px -238px,
 	alarm-on: url(../img/icon-sprite.png) no-repeat -45px -191px,
 	alarm-off: url(../img/icon-sprite.png) no-repeat -45px -239px,
