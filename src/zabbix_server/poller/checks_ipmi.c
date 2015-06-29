@@ -83,11 +83,14 @@ typedef struct zbx_ipmi_host_s
 	ipmi_con_t		*con;
 	int			domain_up;
 	int			done;
+	time_t			lastaccess;
+	unsigned int		domain_id;
 	char			*err;
 	struct zbx_ipmi_host_s	*next;
 }
 zbx_ipmi_host_t;
 
+static unsigned int	domain_id = 0;
 static zbx_ipmi_host_t	*hosts = NULL;
 static os_handler_t	*os_hnd;
 
@@ -182,6 +185,7 @@ static zbx_ipmi_host_t	*allocate_ipmi_host(const char *ip, int port, int authtyp
 	h->privilege = privilege;
 	h->username = strdup(username);
 	h->password = strdup(password);
+	h->domain_id = domain_id++;
 
 	h->next = hosts;
 	hosts = h;
@@ -1062,14 +1066,15 @@ int	free_ipmi_handler(void)
 	return SUCCEED;
 }
 
-static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, int privilege, const char *username, const char *password)
+static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, int privilege, const char *username,
+		const char *password)
 {
 	const char		*__function_name = "init_ipmi_host";
 	zbx_ipmi_host_t		*h;
 	int			ret;
 	ipmi_open_option_t	options[4];
 	struct timeval		tv;
-	char			*addrs[1], *ports[1];
+	char			*addrs[1], *ports[1], *domain_name = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'[%s]:%d'", __function_name, ip, port);
 
@@ -1122,7 +1127,10 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	options[3].option = IPMI_OPEN_OPTION_LOCAL_ONLY;	/* scan only local resources */
 	options[3].ival = 1;
 
-	if (0 != (ret = ipmi_open_domain("", &h->con, 1, setup_done, h, domain_up, h, options, ARRSIZE(options), NULL)))
+	domain_name = zbx_dsprintf(NULL, "%d", h->domain_id);
+
+	if (0 != (ret = ipmi_open_domain(domain_name, &h->con, 1, setup_done, h, domain_up, h, options,
+			ARRSIZE(options), NULL)))
 	{
 		h->err = zbx_dsprintf(h->err, "Cannot connect to IPMI host [%s]:%d. ipmi_open_domain() failed: %s",
 				h->ip, h->port, zbx_strerror(ret));
@@ -1136,12 +1144,132 @@ static zbx_ipmi_host_t	*init_ipmi_host(const char *ip, int port, int authtype, i
 	while (0 == h->done)
 		os_hnd->perform_one_op(os_hnd, &tv);
 out:
+	zbx_free(domain_name);
 	zbx_free(addrs[0]);
 	zbx_free(ports[0]);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%p", __function_name, h);
 
 	return h;
+}
+
+ipmi_domain_id_t	domain_id_ptr;
+int			domain_close_ok;
+
+/* callback function invoked from OpenIPMI */
+static void	domains_iterate_cb(ipmi_domain_t *domain, void *cb_data)
+{
+	char	name[IPMI_DOMAIN_NAME_LEN], *domain_name = cb_data;
+
+	ipmi_domain_get_name(domain, name, sizeof(name));
+
+	if (0 == strcmp(domain_name, name))
+		domain_id_ptr = ipmi_domain_convert_to_id(domain);
+}
+
+/* callback function invoked from OpenIPMI */
+static void	domain_close_cb(ipmi_domain_t *domain, void *cb_data)
+{
+	int		ret;
+	zbx_ipmi_host_t *h = cb_data;
+
+	if (0 != (ret = ipmi_domain_close(domain, domain_closed, h)))
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot close IPMI domain: [0x%x]", ret);
+	else
+		domain_close_ok = 1;
+}
+
+static int	free_inactive_host(zbx_ipmi_host_t *h)
+{
+	const char	*__function_name = "free_inactive_host";
+	int		i, ret = FAIL;
+	char		*domain_name;
+	struct timeval	tv;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): %s", __function_name, h->ip);
+
+	domain_name = zbx_dsprintf(NULL, "%d", h->domain_id);
+
+	ipmi_domain_iterate_domains(domains_iterate_cb, domain_name);
+
+	zbx_free(domain_name);
+
+	h->done = 0;
+	domain_close_ok = 0;
+	ipmi_domain_pointer_cb(domain_id_ptr, domain_close_cb, h);
+
+	if (1 == domain_close_ok)
+	{
+		tv.tv_sec = 10;
+		tv.tv_usec = 0;
+
+		while (0 == h->done)
+			os_hnd->perform_one_op(os_hnd, &tv);
+
+		h->con->close_connection(h->con);
+
+		for (i = 0; i < h->control_count; i++)
+		{
+			zbx_free(h->controls[i].c_name);
+			zbx_free(h->controls[i].val);
+		}
+
+		zbx_free(h->sensors);
+		zbx_free(h->controls);
+		zbx_free(h->ip);
+		zbx_free(h->username);
+		zbx_free(h->password);
+		zbx_free(h->err);
+		zbx_free(h);
+
+		ret = SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+	return ret;
+}
+
+void	check_inactive_hosts(time_t last_check)
+{
+	const char	*__function_name = "check_inactive_hosts";
+	zbx_ipmi_host_t *h = hosts, *prev = NULL, *host, *tmp;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	while (NULL != h)
+	{
+		host = h;
+
+		if ((last_check - h->lastaccess > SEC_PER_DAY))
+		{
+			if(prev == NULL)
+			{
+				tmp = hosts;
+				hosts = hosts->next;
+			}
+			else
+			{
+				tmp = prev->next;
+				prev->next = h->next;
+			}
+
+			h = h->next;
+
+			if (SUCCEED != free_inactive_host(host))
+			{
+				if(prev == NULL)
+					hosts = tmp;
+				else
+					prev->next = tmp;
+			}
+			continue;
+		}
+
+		prev = h;
+		h = h->next;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
 int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
@@ -1161,6 +1289,8 @@ int	get_value_ipmi(DC_ITEM *item, AGENT_RESULT *value)
 
 	h = init_ipmi_host(item->interface.addr, item->interface.port, item->host.ipmi_authtype,
 			item->host.ipmi_privilege, item->host.ipmi_username, item->host.ipmi_password);
+
+	h->lastaccess = time(NULL);
 
 	if (0 == h->domain_up)
 	{
