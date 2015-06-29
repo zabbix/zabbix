@@ -2699,16 +2699,20 @@ td.disaster-bg {
 }
 
 .msg-bad-global {
-	display: block;
+	display: none;
 	position: fixed;
 	bottom: 0;
 	z-index: 10000;
 	width: 100%;
 	padding: 7px 5px;
 	text-align: center;
-	background-color: $light-yellow;
-	color: $font-color;
-	border-top: 1px solid $yellow;
+	//background-color: $light-yellow;
+	//color: $font-color;
+	color: darken($alt-yellow,45%);
+	background-color: $alt-yellow;
+	//color: darken($alt-orange,45%);
+	//background-color: $alt-orange;
+	border-top: 1px solid darken($alt-yellow,5%);
 }
 
 .msg-global {
