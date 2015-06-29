@@ -471,14 +471,14 @@ class CPageFilter {
 					$host_groupids = zbx_objectValues($host['groups'], 'groupid');
 
 					foreach ($host_groupids as $host_groupid) {
-						if (isset($this->data['groups'][$host_groupid])) {
+						if (array_key_exists($host_groupid, $this->data['groups'])) {
 							$groupid = $host_groupid;
 							break;
 						}
 					}
 
-					// If host group does not exist in the group list, set it to NONE
-					if (!isset($this->data['groups'][$groupid])) {
+					// If host group does not exist in the group list, set it to NONE.
+					if (!array_key_exists($groupid, $this->data['groups'])) {
 						$groupid = 0;
 					}
 				}
