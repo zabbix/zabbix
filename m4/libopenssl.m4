@@ -66,12 +66,12 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
      AC_MSG_CHECKING(for OpenSSL support)
      if test "x$_libopenssl_dir" = "xno"; then		# if OpenSSL directory is not specified
        if test -f /usr/include/openssl/ssl.h -a -f /usr/include/openssl/crypto.h; then
-         OPENSSL_CFLAGS=-I/usr/include/openssl
+         OPENSSL_CFLAGS=-I/usr/include
          OPENSSL_LDFLAGS=-L/usr/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
        elif test -f /usr/local/include/openssl/ssl.h -a -f /usr/local/include/openssl/crypto.h; then
-         OPENSSL_CFLAGS=-I/usr/local/include/openssl
+         OPENSSL_CFLAGS=-I/usr/local/include
          OPENSSL_LDFLAGS=-L/usr/local/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
@@ -81,7 +81,7 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
        fi
      else						# search in the specified OpenSSL directory
        if test -f $_libopenssl_dir/include/openssl/ssl.h -a -f $_libopenssl_dir/include/openssl/crypto.h; then
-	 OPENSSL_CFLAGS=-I$_libopenssl_dir/include/openssl
+	 OPENSSL_CFLAGS=-I$_libopenssl_dir/include
          OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
