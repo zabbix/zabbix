@@ -201,6 +201,7 @@ frontends/php/images/gradients/table_head2_bb.gif -text
 frontends/php/images/gradients/table_head_bb.gif -text
 frontends/php/img/browser-sprite.png -text svneol=unset#image/png
 frontends/php/img/icon-sprite.png -text svneol=unset#image/png
+frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
 frontends/php/img/preload.gif -text svneol=unset#image/gif
 frontends/php/include/classes/helpers/CViewHelper.php -text
 frontends/php/include/classes/html/CColHeader.php -text

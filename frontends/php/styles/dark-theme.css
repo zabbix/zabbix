@@ -222,16 +222,14 @@ ul.top-nav-icons {
       opacity: 1;
       filter: alpha(opacity=100); }
   ul.top-nav-icons .top-nav-help {
-    background: #2b2b2b url(../img/icon-sprite.png) no-repeat 7px -18px; }
-  ul.top-nav-icons .top-nav-print {
-    background: #2b2b2b url(../img/icon-sprite.png) no-repeat 7px -42px; }
+    background: url(../img/icon-sprite.svg) no-repeat 1px -36px; }
   ul.top-nav-icons .top-nav-profile {
-    background: #2b2b2b url(../img/icon-sprite.png) no-repeat 7px -66px; }
+    background: url(../img/icon-sprite.svg) no-repeat 1px -108px; }
   ul.top-nav-icons .top-nav-signout {
-    background: #2b2b2b url(../img/icon-sprite.png) no-repeat 7px -91px;
+    background: url(../img/icon-sprite.svg) no-repeat 1px -144px;
     width: 44px; }
   ul.top-nav-icons .top-nav-zbbshare {
-    background: #2b2b2b url(../img/icon-sprite.png) no-repeat -41px -138px;
+    background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
     width: auto;
     padding: 0 12px 0 27px; }
   ul.top-nav-icons form {
@@ -1048,7 +1046,7 @@ button {
   border-radius: 0; }
 
 .btn-search {
-  background: #1e1e1e url(../img/icon-sprite.png) no-repeat 1px -1px;
+  background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
   position: absolute;
   border: none;
   top: 7px;
@@ -1087,34 +1085,34 @@ button {
     border-top-color: #fff; }
 
 .btn-conf {
-  background: #69808d url(../img/icon-sprite.png) no-repeat -1px -145px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -187px; }
 
 .btn-max {
-  background: #69808d url(../img/icon-sprite.png) no-repeat -1px -169px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -223px; }
 
 .btn-min {
-  background: #69808d url(../img/icon-sprite.png) no-repeat -1px -193px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -263px; }
 
 .btn-add-fav {
-  background: #69808d url(../img/icon-sprite.png) no-repeat -49px -1px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -295px; }
 
 .btn-remove-fav {
-  background: #69808d url(../img/icon-sprite.png) no-repeat -49px -25px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -331px; }
 
 .btn-action {
-  background: #69808d url(../img/icon-sprite.png) no-repeat -49px -49px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -367px; }
 
 .btn-info {
-  background: #69808d url(../img/icon-sprite.png) no-repeat -49px -73px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -403px; }
 
 .btn-reset {
-  background: #69808d url(../img/icon-sprite.png) no-repeat -49px -97px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -439px; }
 
 .btn-widget-action {
-  background: url(../img/icon-sprite.png) no-repeat 3px -262px; }
+  background: url(../img/icon-sprite.svg) no-repeat -3px -616px; }
 
 .btn-widget-collapse {
-  background: url(../img/icon-sprite.png) no-repeat 2px -214px; }
+  background: url(../img/icon-sprite.svg) no-repeat -4px -652px; }
 
 .btn-widget-expand {
   background: url(../img/icon-sprite.png) no-repeat 2px -238px; }
@@ -1831,16 +1829,16 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
     font-size: 1.167em; }
 
 .msg-bad-global {
-  display: block;
+  display: none;
   position: fixed;
   bottom: 0;
   z-index: 10000;
   width: 100%;
   padding: 7px 5px;
   text-align: center;
-  background-color: #2f280a;
-  color: #f2f2f2;
-  border-top: 1px solid #372d01; }
+  color: #734d00;
+  background-color: #ffc859;
+  border-top: 1px solid #ffc040; }
 
 .msg-global {
   text-align: left;

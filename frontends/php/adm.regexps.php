@@ -125,6 +125,18 @@ if (hasRequest('add') || hasRequest('update')) {
 	];
 	$expressions = getRequest('expressions', []);
 
+	foreach ($expressions as $i => &$expression) {
+		if (!array_key_exists('case_sensitive', $expression)) {
+			$expression['case_sensitive'] = 0;
+		}
+
+		if ($expression['expression'] === '' && $expression['expression_type'] == EXPRESSION_TYPE_INCLUDED
+				&& $expression['case_sensitive'] == 0) {
+			unset($expressions[$i]);
+		}
+	}
+	unset($expression);
+
 	DBstart();
 
 	if (hasRequest('update')) {
