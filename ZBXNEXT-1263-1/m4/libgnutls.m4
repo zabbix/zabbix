@@ -1,12 +1,12 @@
-# GnuTLS CHECK_CONFIG ([DEFAULT-ACTION])
+# GnuTLS LIBGNUTLS_CHECK_CONFIG ([DEFAULT-ACTION])
 # ----------------------------------------------------------
 # Derived from libssh2.m4 written by
 #    Alexander Vladishev                      Oct-26-2009
 #    Dmitry Borovikov                         Feb-13-2010
 #
-# Checks for GnuTLS library libgnutls.  DEFAULT-ACTION is the string yes or no to
-# specify whether to default to --with-gnutls or --without-gnutls.
-# If not supplied, DEFAULT-ACTION is no.
+# Checks for GnuTLS library libgnutls.  DEFAULT-ACTION is the string
+# yes or no to specify whether to default to --with-gnutls or
+# --without-gnutls. If not supplied, DEFAULT-ACTION is no.
 #
 # This macro #defines HAVE_GNUTLS if a required header files are
 # found, and sets @GNUTLS_LDFLAGS@, @GNUTLS_CFLAGS@ and @GNUTLS_LIBS@
@@ -34,8 +34,8 @@ found_gnutls="yes",)
 AC_DEFUN([LIBGNUTLS_CHECK_CONFIG],
 [
   AC_ARG_WITH(gnutls,[
-If you want to use encryption provided by GnuTLS libgnutls library:
-AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>@, DIR is the GnuTLS library libgnutls install directory.])],
+If you want to use encryption provided by GnuTLS library:
+AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>@, DIR is the libgnutls install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_gnutls="no"
