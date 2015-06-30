@@ -1638,8 +1638,8 @@ $icon-widget-buttons: (
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
-	sound-on: url(../img/icon-sprite.png) no-repeat -45px -216px,
-	sound-off: url(../img/icon-sprite.png) no-repeat -45px -264px
+	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
 );
 
 @each $icon-widget-buttons, $bgimage in $icon-widget-buttons {
@@ -2136,7 +2136,8 @@ button[disabled] {
 		}
 
 		&.selected {
-			background: url(../img/icon-sprite.png) no-repeat -46px -169px;
+			//background: url(../img/icon-sprite.png) no-repeat -46px -169px;
+			background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
 
 			&:hover {
 				background-color: $action-hover-color;
