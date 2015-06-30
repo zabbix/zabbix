@@ -44,6 +44,6 @@ $(TARGETDIR)\zabbix_sender.h: $(SOURCEDIR)\zabbix_sender.h
 	copy $(SOURCEDIR)\zabbix_sender.h $(TARGETDIR)
 
 post-build: $(TARGETDIR)\zabbix_sender.h
-	del $(TARGETDIR)\zabbix_sender.exp 2>NUL
-	
+	del $(TARGETDIR)\zabbix_sender.exp 2>nul
+
 !INCLUDE Makefile_targets.inc

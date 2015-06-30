@@ -1,7 +1,7 @@
 !IF "$(TLS)" != ""
 
-!IF "$(TLS)" != "polarssl" && "$(TLS)" != "gnutls" && "$(TLS)" != "openssl"
-!ERROR Specified TLS target "$(TLS)" is not supported (supported: polarssl, gnutls, openssl).
+!IF "$(TLS)" != "mbedtls" && "$(TLS)" != "gnutls" && "$(TLS)" != "openssl"
+!ERROR Specified TLS target "$(TLS)" is not supported (supported: mbedtls, gnutls, openssl).
 !ENDIF
 
 !IF "$(TLSINCDIR)" == ""
@@ -38,8 +38,8 @@ ADDMSG = You may specify path to library using TLSLIB="\somepath\lib\some.lib"
 !ENDIF
 !ENDIF
 
-### PolarSSL ###
-!IF "$(TLS)" == "polarssl"
+### mbed TLS ###
+!IF "$(TLS)" == "mbedtls"
 !IF "$(TLSLIBDIR)" != ""
 TLSLIB = $(TLSLIBDIR)\mbedtls.lib
 !ENDIF

@@ -7,7 +7,7 @@ ADD_INCS = /I ..\..\..\src\zabbix_agent
 ADD_CFLAGS = $(ADD_CFLAGS) /D WITH_AGENT_METRICS /D WITH_COMMON_METRICS /D WITH_SPECIFIC_METRICS \
 	/D WITH_HOSTNAME_METRIC /D WITH_SIMPLE_METRICS /Zi /Fd$(PDBPATH)
 ADD_LFLAGS = $(ADD_LFLAGS) /PDB:$(PDBPATH)
-	
+
 !INCLUDE Makefile_macros.inc
 
 OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
