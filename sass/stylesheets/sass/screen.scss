@@ -1593,11 +1593,11 @@ button {
 $icon-buttons: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
-	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px, // Fine tune this icon
+	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
 	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -331px,
 	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
-	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px, // Fine tune this icon
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px,
 	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -439px
 
 );
@@ -2703,12 +2703,8 @@ td.disaster-bg {
 	width: 100%;
 	padding: 7px 5px;
 	text-align: center;
-	//background-color: $light-yellow;
-	//color: $font-color;
 	color: darken($alt-yellow,45%);
 	background-color: $alt-yellow;
-	//color: darken($alt-orange,45%);
-	//background-color: $alt-orange;
 	border-top: 1px solid darken($alt-yellow,5%);
 }
 
@@ -2835,13 +2831,6 @@ a.overlay-close-btn {
 		padding-left: 25px;
 	}
 }
-
-//.preloader {
-//	background: url(../img/preload.gif) no-repeat 0 0;
-//	width: 32px;
-//	height: 32px;
-//	margin: 0 auto;
-//}
 
 .preloader {
 	border-radius: 50%;
