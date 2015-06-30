@@ -115,19 +115,18 @@ ZBX_THREAD_LOCAL char				info_buf[256];
 #endif
 
 #if defined(HAVE_POLARSSL)
-/******************************************************************************
- *                                                                            *
- * Function: zbx_make_personalization_string                                  *
- *                                                                            *
- * Purpose: provide additional entropy for initialization of crypto library   *
- *                                                                            *
- * Comments:                                                                  *
- *     For more information about why and how to use personalization strings  *
- *     see                                                                    *
- *     https://polarssl.org/module-level-design-rng                           *
- *     http://csrc.nist.gov/publications/nistpubs/800-90A/SP800-90A.pdf       *
- *                                                                            *
- ******************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Function: zbx_make_personalization_string                                      *
+ *                                                                                *
+ * Purpose: provide additional entropy for initialization of crypto library       *
+ *                                                                                *
+ * Comments:                                                                      *
+ *     For more information about why and how to use personalization strings see  *
+ *     https://polarssl.org/module-level-design-rng                               *
+ *     http://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-90Ar1.pdf *
+ *                                                                                *
+ **********************************************************************************/
 static void	zbx_make_personalization_string(unsigned char pers[64])
 {
 	long int	thread_id;
