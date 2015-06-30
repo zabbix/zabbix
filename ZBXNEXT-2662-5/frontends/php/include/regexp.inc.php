@@ -125,7 +125,7 @@ function validateRegexp($expressions) {
 			$expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
 
 			if (!$validator->validate($expression['expression'])) {
-				throw new \Exception($validator->getError());
+				throw new Exception($validator->getError());
 			}
 		}
 	}
