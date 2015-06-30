@@ -35,5 +35,5 @@ clean:
 $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
 	$(LINKER) $(OBJS) $(RESOURCE_RES) /OUT:$(PROGNAME) $(LFLAGS) $(LIBS)
 	$(MT) /outputresource:"$(PROGNAME);#1" /manifest $(TARGETNAME).manifest /nologo
-	
+
 !INCLUDE Makefile_targets.inc
