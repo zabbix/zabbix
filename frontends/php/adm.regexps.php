@@ -129,11 +129,6 @@ if (hasRequest('add') || hasRequest('update')) {
 		if (!array_key_exists('case_sensitive', $expression)) {
 			$expression['case_sensitive'] = 0;
 		}
-
-		if ($expression['expression'] === '' && $expression['expression_type'] == EXPRESSION_TYPE_INCLUDED
-				&& $expression['case_sensitive'] == 0) {
-			unset($expressions[$i]);
-		}
 	}
 	unset($expression);
 
@@ -232,7 +227,14 @@ if (isset($_REQUEST['form'])) {
 	else {
 		$data['name'] = getRequest('name', '');
 		$data['test_string'] = getRequest('test_string', '');
-		$data['expressions'] = getRequest('expressions', []);
+		$data['expressions'] = getRequest('expressions', [
+			[
+				'expression' => '',
+				'expression_type' => EXPRESSION_TYPE_INCLUDED,
+				'exp_delimiter' => ',',
+				'case_sensitive' => 0
+			]
+		]);
 	}
 
 	$view = new CView('administration.general.regularexpressions.edit', $data);
