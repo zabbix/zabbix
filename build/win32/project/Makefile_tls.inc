@@ -18,7 +18,7 @@
 !ENDIF
 !ELSEIF "$(TLS)" == "gnutls"
 !IF "$(TLSLIB)" == ""
-!ERROR Please specify full path to static GnuTLS library e. g. TLSLIB="\somepath\some.lib"
+!ERROR Please specify full path to static GnuTLS library (e. g. TLSLIB="\somepath\some.lib").
 !ENDIF
 !ELSE
 !IF ("$(TLSLIBDIR)" == "" && "$(TLSLIB)" == "") || ("$(TLSLIBDIR)" != "" && "$(TLSLIB)" != "")
