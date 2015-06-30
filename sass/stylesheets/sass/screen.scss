@@ -524,7 +524,9 @@ footer {
 	height: 25px;
 	margin: 0 auto;
 	margin-bottom: 10px;
-	background: url(../img/icon-sprite.png) no-repeat 0 -360px;
+	//background: url(../img/icon-sprite.png) no-repeat 0 -360px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -712px;
+	background-size: 94px;
 }
 
 /* Tables */
@@ -1080,7 +1082,8 @@ footer {
 	.center {
 		width: 22px;
 		height: 22px;
-		background: url(../img/icon-sprite.png) no-repeat center -121px;
+		//background: url(../img/icon-sprite.png) no-repeat center -121px;
+		background: url(../img/icon-sprite.svg) no-repeat -4px -799px;
 		margin: 0 auto;
 	}
 }
@@ -1801,7 +1804,8 @@ button[disabled] {
 }
 
 .help-icon {
-	background: url(../img/icon-sprite.png) no-repeat 0 -312px;
+	//background: url(../img/icon-sprite.png) no-repeat 0 -312px;
+	background: url(../img/icon-sprite.svg) no-repeat -6px -726px;
 	display: block;
 	position: absolute;
 	top: 0;
@@ -1819,7 +1823,8 @@ button[disabled] {
 .drag-icon {
 	margin-left: -9px;
 	cursor: move;
-	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
+	//background: url(../img/icon-sprite.png) no-repeat 0 -288px;
+	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
 
@@ -1994,7 +1999,8 @@ button[disabled] {
 	margin-bottom: 25px;
 	width: 114px;
 	height: 30px;
-	background: url(../img/icon-sprite.png) no-repeat 0 -391px;
+	//background: url(../img/icon-sprite.png) no-repeat 0 -391px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
 }
 
 .signin-links {
