@@ -316,27 +316,19 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		//background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -18px;
 		background: url(../img/icon-sprite.svg) no-repeat 1px -36px;
 	}
 
-	//.top-nav-print {
-	//	background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -42px;
-	//}
-
 	.top-nav-profile {
-		//background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -66px;
 		background: url(../img/icon-sprite.svg) no-repeat 1px -108px;
 	}
 
 	.top-nav-signout {
-		//background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat 7px -91px;
 		background: url(../img/icon-sprite.svg) no-repeat 1px -144px;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		//background: $main-nav-bg-color url(../img/icon-sprite.png) no-repeat -41px -138px;
 		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
 	    width: auto;
 		padding: 0 12px 0 27px;
@@ -524,7 +516,6 @@ footer {
 	height: 25px;
 	margin: 0 auto;
 	margin-bottom: 10px;
-	//background: url(../img/icon-sprite.png) no-repeat 0 -360px;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -712px;
 	background-size: 94px;
 }
@@ -1082,7 +1073,6 @@ footer {
 	.center {
 		width: 22px;
 		height: 22px;
-		//background: url(../img/icon-sprite.png) no-repeat center -121px;
 		background: url(../img/icon-sprite.svg) no-repeat -4px -799px;
 		margin: 0 auto;
 	}
@@ -1547,7 +1537,6 @@ button {
 }
 
 .btn-search {
-	//background: darken($main-nav-bg-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
 	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
 	position: absolute;
 	border: none;
@@ -1602,17 +1591,9 @@ button {
 }
 
 $icon-buttons: (
-	//conf: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px,
-	//max: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px,
-	//min: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px,
-	//add-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px,
-	//remove-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px,
-	//action: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px,
-	//info: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px,
-	//reset: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
-	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -263px, // Fine tune this icon
+	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px, // Fine tune this icon
 	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
 	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -331px,
 	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
@@ -1629,13 +1610,6 @@ $icon-buttons: (
 }
 
 $icon-widget-buttons: (
-	//widget-action: url(../img/icon-sprite.png) no-repeat 3px -262px,
-	//widget-collapse: url(../img/icon-sprite.png) no-repeat 2px -214px,
-	//widget-expand: url(../img/icon-sprite.png) no-repeat 2px -238px,
-	//alarm-on: url(../img/icon-sprite.png) no-repeat -45px -191px,
-	//alarm-off: url(../img/icon-sprite.png) no-repeat -45px -239px,
-	//sound-on: url(../img/icon-sprite.png) no-repeat -45px -216px,
-	//sound-off: url(../img/icon-sprite.png) no-repeat -45px -264px
 	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -3px -652px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
@@ -1804,7 +1778,6 @@ button[disabled] {
 }
 
 .help-icon {
-	//background: url(../img/icon-sprite.png) no-repeat 0 -312px;
 	background: url(../img/icon-sprite.svg) no-repeat -6px -726px;
 	display: block;
 	position: absolute;
@@ -1823,7 +1796,6 @@ button[disabled] {
 .drag-icon {
 	margin-left: -9px;
 	cursor: move;
-	//background: url(../img/icon-sprite.png) no-repeat 0 -288px;
 	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
@@ -1999,7 +1971,6 @@ button[disabled] {
 	margin-bottom: 25px;
 	width: 114px;
 	height: 30px;
-	//background: url(../img/icon-sprite.png) no-repeat 0 -391px;
 	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
 }
 
@@ -2142,7 +2113,6 @@ button[disabled] {
 		}
 
 		&.selected {
-			//background: url(../img/icon-sprite.png) no-repeat -46px -169px;
 			background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
 
 			&:hover {
