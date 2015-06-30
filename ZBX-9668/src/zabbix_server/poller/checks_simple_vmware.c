@@ -210,7 +210,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 
 	perfcounter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
 
-	if (0 == perfcounter->values.values_num)
+	if (0 == (perfcounter->state & ZBX_VMWARE_COUNTER_READY))
 	{
 		ret = SYSINFO_RET_OK;
 		goto out;

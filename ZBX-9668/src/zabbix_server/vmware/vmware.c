@@ -341,6 +341,9 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 		{
 			counter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
 			vmware_vector_ptr_pair_shared_clean(&counter->values);
+
+			if (0 != (counter->state & ZBX_VMWARE_COUNTER_UPDATING))
+				counter->state = ZBX_VMWARE_COUNTER_READY;
 		}
 	}
 }
@@ -3136,6 +3139,8 @@ static void	vmware_service_update_perf(zbx_vmware_service_t *service)
 			zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:metricId><ns0:counterId>" ZBX_FS_UI64
 					"</ns0:counterId><ns0:instance>*</ns0:instance></ns0:metricId>",
 					counter->counterid);
+
+			counter->state |= ZBX_VMWARE_COUNTER_UPDATING;
 		}
 
 		zbx_snprintf_alloc(&tmp, &tmp_alloc, &tmp_offset, "<ns0:intervalId>%d</ns0:intervalId></ns0:querySpec>",
