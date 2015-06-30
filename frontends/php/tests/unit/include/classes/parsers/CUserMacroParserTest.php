@@ -30,6 +30,9 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 		$this->userMacroParser = new CUserMacroParser();
 	}
 
+	/**
+	 * Test against valid macros and compare the macro name, context and the result set
+	 */
 	public function testValidProvider() {
 		return [
 			// normal macros
@@ -73,6 +76,9 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 		];
 	}
 
+	/**
+	 * Test against invalid macros and compare the error message.
+	 */
 	public function testInvalidProvider() {
 		return [
 			['{', 'unexpected end of macro'],
@@ -111,7 +117,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider testValidProvider
 	 *
-	 * @param $string
+	 * @param $source		source string to parse
+	 * @param $macro_name	expected macro name
+	 * @param $context		expected context string
+	 * @param $result		expected prase result from CParserResult
 	 */
 	public function testParseValid($source, $macro_name, $context, $result) {
 		$this->userMacroParser->parse($source, 0, false);
@@ -126,7 +135,8 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 	/**
 	 * @dataProvider testInvalidProvider
 	 *
-	 * @param $string
+	 * @param $source		source string to parse
+	 * @param $error		expected error message
 	 */
 	public function testParseInvalid($source, $error) {
 		$this->userMacroParser->parse($source, 0, false);

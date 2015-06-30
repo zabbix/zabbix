@@ -298,9 +298,15 @@ class CUserMacro extends CApiService {
 		// validate macros
 		$this->checkGlobalMacrosPermissions(_('Only Super Admins can update global macros.'));
 
+		$required_fields = ['globalmacroid'];
+
 		foreach ($globalMacros as $globalMacro) {
-			if (!isset($globalMacro['globalmacroid']) || zbx_empty($globalMacro['globalmacroid'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Invalid method parameters.'));
+			$missing_keys = checkRequiredKeys($globalMacro, $required_fields);
+
+			if ($missing_keys) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('User macro missing parameters: %1$s', implode(', ', $missing_keys))
+				);
 			}
 		}
 
@@ -556,9 +562,7 @@ class CUserMacro extends CApiService {
 	 */
 	public function replaceMacros(array $macros) {
 		$hostIds = array_keys($macros);
-		if (!API::Host()->isWritable($hostIds)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
+		$this->checkHostPermissions($hostIds);
 
 		$dbMacros = API::Host()->get([
 			'hostids' => $hostIds,
@@ -612,17 +616,27 @@ class CUserMacro extends CApiService {
 	 * Validates the "macro" field.
 	 *
 	 * @param array $macro
+	 * @param string $macro['macro']
 	 *
-	 * @throws APIException if the field is empty, too long or doesn't match the ZBX_PREG_EXPRESSION_USER_MACROS
-	 * regex.
+	 * @throws APIException if the field is not valid.
 	 */
 	protected function checkMacro(array $macro) {
-		if (!isset($macro['macro']) || zbx_empty($macro['macro'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty macro.'));
+		$required_fields = ['macro'];
+
+		$missing_keys = checkRequiredKeys($macro, $required_fields);
+		if ($missing_keys) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('User macro missing parameters: %1$s', implode(', ', $missing_keys))
+			);
 		}
 
-		if (!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $macro['macro'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong macro "%1$s".', $macro['macro']));
+		$parser = new CUserMacroParser();
+		$parser->parse($macro['macro']);
+
+		if (!$parser->isValid()) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Invalid macro "%1$s": %2$s.', $macro['macro'], $parser->getError())
+			);
 		}
 	}
 
@@ -661,20 +675,30 @@ class CUserMacro extends CApiService {
 	 * @throws APIException if the given macros contain duplicates
 	 *
 	 * @param array $macros
-	 *
-	 * @return void
 	 */
 	protected function checkDuplicateMacros(array $macros) {
-		$existingMacros = [];
-		foreach ($macros as $macro) {
-			// global macros don't have hostid
-			$hostid = isset($macro['hostid']) ? $macro['hostid'] : 1;
+		$existing_macros = [];
+		$parser = new CUserMacroParser();
 
-			if (isset($existingMacros[$hostid][$macro['macro']])) {
+		foreach ($macros as $macro) {
+			// Global macros don't have a 'hostid'.
+			$hostid = array_key_exists('hostid', $macro) ? $macro['hostid'] : 1;
+
+			$parser->parse($macro['macro']);
+
+			$name = $parser->getMacroName();
+			$context = $parser->getContext();
+
+			/*
+			 * Macros with same name can have different contexts. A macro with no context is not the same
+			 * as a macro with an empty context.
+			 */
+			if (isset($existing_macros[$hostid][$name])
+					&& in_array($context, $existing_macros[$hostid][$name], true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
 			}
 
-			$existingMacros[$hostid][$macro['macro']] = 1;
+			$existing_macros[$hostid][$name][] = $context;
 		}
 	}
 
@@ -740,22 +764,66 @@ class CUserMacro extends CApiService {
 	 * the "globalmacroid" field is set, the method will only fail, if a macro with a different globalmacroid exists.
 	 * Assumes the "macro", "hostmacroid" fields are valid.
 	 *
-	 * @param array $globalMacros
+	 * @param array $macros
+	 * @param int $macros[]['globalmacroid']
+	 * @param string $macros[]['macro']
+	 * @param string $macros[]['value']
 	 *
-	 * @throws APIException if any of the given macros already exist
+	 * @throws APIException if any of the given macros already exist.
 	 */
-	protected function checkIfGlobalMacrosDontRepeat(array $globalMacros) {
-		$nameMacro = zbx_toHash($globalMacros, 'macro');
-		$macroNames = zbx_objectValues($globalMacros, 'macro');
-		if ($macroNames) {
-			$dbMacros = API::getApiService()->select('globalmacro', [
-				'filter' => ['macro' => $macroNames],
-				'output' => ['globalmacroid', 'macro']
+	protected function checkIfGlobalMacrosDontRepeat(array $macros) {
+		$names = [];
+		$parser = new CUserMacroParser();
+
+		// Parse each macro, get unique names and, if context exists, narrow down the search.
+		foreach ($macros as $macro) {
+			$parser->parse($macro['macro']);
+
+			$name = $parser->getMacroName();
+			$context = $parser->getContext();
+
+			if ($context === null) {
+				$names['{$'.$name] = true;
+			}
+			else {
+				$names['{$'.$name.':'] = true;
+			}
+		}
+
+		// When updating with empty array, don't select any data from database.
+		if ($names) {
+			$db_macros = API::getApiService()->select('globalmacro', [
+				'output' => ['globalmacroid', 'macro'],
+				'search' => ['macro' => array_keys($names)],
+				'searchByAny' => true
 			]);
-			foreach ($dbMacros as $dbMacro) {
-				$macro = $nameMacro[$dbMacro['macro']];
-				if (!isset($macro['globalmacroid']) || bccomp($macro['globalmacroid'], $dbMacro['globalmacroid']) != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $dbMacro['macro']));
+		}
+
+		$existing_macros = [];
+
+		// Collect existing unique macro names and their contexts.
+		foreach ($db_macros as $db_macro) {
+			$parser->parse($db_macro['macro']);
+
+			$name = $parser->getMacroName();
+			$context = $parser->getContext();
+
+			$existing_macros[$name][$db_macro['globalmacroid']] = $context;
+		}
+
+		// Check each macro name and context. Context must not be the same and ID should be different.
+		foreach ($macros as $macro) {
+			$parser->parse($macro['macro']);
+
+			$name = $parser->getMacroName();
+			$context = $parser->getContext();
+
+			if (array_key_exists($name, $existing_macros) && in_array($context, $existing_macros[$name], true)) {
+				foreach ($existing_macros[$name] as $id => $existing_macro_context) {
+					if ((!array_key_exists('globalmacroid', $macro) || bccomp($macro['globalmacroid'], $id) != 0)
+							&& $context === $existing_macro_context) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" already exists.', $macro['macro']));
+					}
 				}
 			}
 		}

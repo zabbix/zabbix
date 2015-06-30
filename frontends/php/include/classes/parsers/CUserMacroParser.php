@@ -288,13 +288,16 @@ class CUserMacroParser {
 	}
 
 	/**
-	 * Get macro context from source.
+	 * Get macro context from source. If macro does not contain context, return null. Return string other otherwise.
 	 *
-	 * @return string
+	 * @return null|string
 	 */
 	public function getContext() {
 		if ($this->is_valid) {
-			if ($this->context_start == $this->context_end) {
+			if (!$this->context_start) {
+				return null;
+			}
+			elseif ($this->context_start == $this->context_end) {
 				return '';
 			}
 			else {
