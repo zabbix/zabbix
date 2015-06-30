@@ -121,15 +121,30 @@ function validateRegexp($expressions) {
 	]);
 
 	foreach ($expressions as $expression) {
-		if ($expression['expression_type'] == EXPRESSION_TYPE_TRUE ||
-			$expression['expression_type'] == EXPRESSION_TYPE_FALSE) {
+		switch ($expression['expression_type']) {
+			case EXPRESSION_TYPE_TRUE:
+			case EXPRESSION_TYPE_FALSE:
+				if (!$validator->validate($expression['expression'])) {
+					throw new Exception($validator->getError());
+				}
+				break;
 
-			if (!$validator->validate($expression['expression'])) {
-				throw new Exception($validator->getError());
-			}
+			case EXPRESSION_TYPE_INCLUDED:
+			case EXPRESSION_TYPE_NOT_INCLUDED:
+				if ($expression['expression'] === '') {
+					throw new Exception(_('Expression cannot be empty'));
+				}
+				break;
+
+			case EXPRESSION_TYPE_ANY_INCLUDED:
+				foreach (explode($expression['exp_delimiter'], $expression['expression']) as $string) {
+					if ($expression['expression'] === '') {
+						throw new Exception(_('Expression cannot be empty'));
+					}
+				}
+				break;
 		}
 	}
-
 }
 
 /**
