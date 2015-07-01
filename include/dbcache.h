@@ -216,8 +216,8 @@ typedef struct
 	char		tls_arg1[HOST_TLS_PSK_IDENTITY_LEN_MAX];
 #endif
 #if HOST_TLS_SUBJECT_LEN_MAX > HOST_TLS_PSK_LEN_MAX
-	char		tls_arg2[HOST_TLS_SUBJECT_LEN_MAX];	/* for passing 'tls_subject' or 'tls_psk' depending */
-								/* on value of 'tls_connect' */
+	char		tls_arg2[HOST_TLS_SUBJECT_LEN_MAX];	/* for passing 'tls_subject' or 'tls_psk' */
+								/* depending on value of 'tls_connect' */
 #else
 	char		tls_arg2[HOST_TLS_PSK_LEN_MAX];
 #endif
