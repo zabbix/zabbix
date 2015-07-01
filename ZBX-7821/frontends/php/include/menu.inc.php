@@ -263,7 +263,8 @@ $ZBX_MENU = [
 			],
 			[
 				'url' => 'users.php',
-				'label' => _('Users')
+				'label' => _('Users'),
+				'sub_pages' => ['popup_usrgrp.php']
 			],
 			[
 				'url' => 'zabbix.php',
@@ -393,8 +394,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		else {
 			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
 		}
-		$mmenu_entry = new CListItem(new CLink($menu['label'], $menu_url), $menu_class);
-		$mmenu_entry->setAttribute('id', $label);
+		$mmenu_entry = (new CListItem(new CLink($menu['label'], $menu_url)))
+			->addClass($menu_class)
+			->setId($label);
 // click to navigate to other sections, uncomment for old-style navigation
 //		$mmenu_entry->onMouseover('javascript: MMenu.mouseOver(\''.$label.'\');');
 //		$mmenu_entry->onMouseover('javascript: MMenu.mouseOut();');

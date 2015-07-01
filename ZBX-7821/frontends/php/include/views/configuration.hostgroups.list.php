@@ -19,102 +19,92 @@
 **/
 
 
-$hostGroupWidget = (new CWidget())->setTitle(_('Host groups'));
-
-// create new hostgroup button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-
-$controls = new CList();
-
 if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-	$tmpItem = new CSubmit('form', _('Create host group'));
+	$create_button = new CSubmit('form', _('Create host group'));
 }
 else {
-	$tmpItem = new CSubmit('form', _('Create host group').SPACE._('(Only super admins can create groups)'));
-	$tmpItem->setEnabled(false);
+	$create_button = (new CSubmit('form', _('Create host group').' '._('(Only super admins can create groups)')))
+		->setEnabled(false);
 }
-$controls->addItem($tmpItem);
-$createForm->addItem($controls);
 
-$hostGroupWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Host groups'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())->addItem($create_button))
+	);
 
 // create form
-$hostGroupForm = new CForm();
-$hostGroupForm->setName('hostgroupForm');
+$hostGroupForm = (new CForm())->setName('hostgroupForm');
 
 // create table
-$hostGroupTable = new CTableInfo();
-$hostGroupTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_groups', null, "checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")))->
-		addClass('cell-width'),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Hosts'),
-	_('Templates'),
-	_('Members'),
-	_('Info')
-]);
+$hostGroupTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_groups'))
+				->onClick("checkAll('".$hostGroupForm->getName()."', 'all_groups', 'groups');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Hosts'),
+		_('Templates'),
+		_('Members'),
+		_('Info')
+	]);
 
-$currentTime = time();
+$current_time = time();
 
 foreach ($this->data['groups'] as $group) {
 	$hostsOutput = [];
-	$i = 0;
+	$n = 0;
 
 	foreach ($group['templates'] as $template) {
-		$i++;
+		$n++;
 
-		if ($i > $this->data['config']['max_in_table']) {
+		if ($n > $this->data['config']['max_in_table']) {
 			$hostsOutput[] = ' &hellip;';
 
 			break;
 		}
 
-		$url = 'templates.php?form=update&templateid='.$template['templateid'].'&groupid='.$group['groupid'];
-
-		if ($i > 1) {
+		if ($n > 1) {
 			$hostsOutput[] = ', ';
 		}
 
-		$hostsOutput[] = new CLink($template['name'], $url, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+		$url = 'templates.php?form=update&templateid='.$template['templateid'].'&groupid='.$group['groupid'];
+
+		$hostsOutput[] = (new CLink($template['name'], $url))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 	}
 
-	if ($group['hosts'] && $i < $this->data['config']['max_in_table']) {
-		if ($hostsOutput) {
-			$hostsOutput[] = BR();
-			$hostsOutput[] = BR();
+	if ($group['templates'] && $group['hosts']) {
+		$hostsOutput[] = BR();
+		$hostsOutput[] = BR();
+	}
+
+	$n = 0;
+
+	foreach ($group['hosts'] as $host) {
+		$n++;
+
+		if ($n > $this->data['config']['max_in_table']) {
+			$hostsOutput[] = ' &hellip;';
+
+			break;
 		}
 
-		$n = 0;
-
-		foreach ($group['hosts'] as $host) {
-			$i++;
-			$n++;
-
-			if ($i > $this->data['config']['max_in_table']) {
-				$hostsOutput[] = ' &hellip;';
-
-				break;
-			}
-
-			switch ($host['status']) {
-				case HOST_STATUS_NOT_MONITORED:
-					$style = ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED;
-					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
-					break;
-
-				default:
-					$style = null;
-					$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
-			}
-
-			if ($n > 1) {
-				$hostsOutput[] = ', ';
-			}
-
-			$hostsOutput[] = new CLink($host['name'], $url, $style);
+		if ($n > 1) {
+			$hostsOutput[] = ', ';
 		}
+
+		$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
+		$link = (new CLink($host['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
+
+		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$link->addClass(ZBX_STYLE_RED);
+		}
+
+		$hostsOutput[] = $link;
 	}
 
 	$hostCount = $this->data['groupCounts'][$group['groupid']]['hosts'];
@@ -123,40 +113,28 @@ foreach ($this->data['groups'] as $group) {
 	// name
 	$name = [];
 	if ($group['discoveryRule']) {
-		$name[] = new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid'], ZBX_STYLE_ORANGE);
+		$name[] = (new CLink($group['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$group['discoveryRule']['itemid']))
+			->addClass(ZBX_STYLE_ORANGE);
 		$name[] = NAME_DELIMITER;
 	}
 	$name[] = new CLink($group['name'], 'hostgroups.php?form=update&groupid='.$group['groupid']);
 
 	// info, discovered item lifetime indicator
-	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete']) {
-		$info = new CDiv(SPACE, 'status_icon iconwarning');
-
-		// Check if host group should've been deleted in the past.
-		if ($currentTime > $group['groupDiscovery']['ts_delete']) {
-			$info->setHint(_s(
-				'The host group is not discovered anymore and will be deleted the next time discovery rule is processed.'
-			));
-		}
-		else {
-			$info->setHint(_s(
-				'The host group is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-				zbx_date2age($group['groupDiscovery']['ts_delete']),
-				zbx_date2str(DATE_FORMAT, $group['groupDiscovery']['ts_delete']),
-				zbx_date2str(TIME_FORMAT, $group['groupDiscovery']['ts_delete'])
-			));
-		}
+	if ($group['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $group['groupDiscovery']['ts_delete'] != 0) {
+		$info = getHostGroupLifetimeIndicator($current_time, $group['groupDiscovery']['ts_delete']);
 	}
 	else {
 		$info = '';
 	}
 
 	$hostGroupTable->addRow([
-		new CCheckBox('groups['.$group['groupid'].']', null, null, $group['groupid']),
+		new CCheckBox('groups['.$group['groupid'].']', $group['groupid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		[new CLink(_('Hosts'), 'hosts.php?groupid='.$group['groupid']), CViewHelper::showNum($hostCount)],
-		[new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY),
-				CViewHelper::showNum($templateCount)],
+		[
+			(new CLink(_('Templates'), 'templates.php?groupid='.$group['groupid'])),
+			CViewHelper::showNum($templateCount)
+		],
 		empty($hostsOutput) ? '' : $hostsOutput,
 		$info
 	]);
@@ -176,6 +154,6 @@ $hostGroupForm->addItem([
 ]);
 
 // append form to widget
-$hostGroupWidget->addItem($hostGroupForm);
+$widget->addItem($hostGroupForm);
 
-return $hostGroupWidget;
+return $widget;

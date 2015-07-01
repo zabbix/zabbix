@@ -15,21 +15,16 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 			<input type="hidden" name="conditions[#{rowNum}][formulaid]" value="#{formulaId}">
 		</td>
 		<td>
-			<input class="input text macro" type="text" id="conditions_#{rowNum}_macro"
-				name="conditions[#{rowNum}][macro]" size="30" maxlength="64" placeholder="{#MACRO}"
-				data-formulaid="#{formulaId}">
+			<input class="input text macro" type="text" id="conditions_#{rowNum}_macro" name="conditions[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{#MACRO}" data-formulaid="#{formulaId}">
 		</td>
 		<td>
-			<span><?php echo _('matches') ?></span>
+			<span><?= _('matches') ?></span>
 		</td>
 		<td>
-			<input class="input text" type="text" id="conditions_#{rowNum}_value" name="conditions[#{rowNum}][value]"
-				size="40" maxlength="255" placeholder="<?php echo _('regular expression') ?>">
+			<input class="input text" type="text" id="conditions_#{rowNum}_value" name="conditions[#{rowNum}][value]" style="width: <?= ZBX_TEXTAREA_MACRO_VALUE_WIDTH ?>px" maxlength="255" placeholder="<?= _('regular expression') ?>">
 		</td>
 		<td>
-			<button class="button link_menu element-table-remove" type="button" id="conditions_#{rowNum}_remove" name="conditions_#{rowNum}_remove">
-				<?php echo _('Remove'); ?>
-			</button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove" type="button" id="conditions_#{rowNum}_remove" name="conditions_#{rowNum}_remove"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>
@@ -52,7 +47,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 			$('#conditions')
 				.dynamicRows({
 					template: '#condition-row',
-					counter: <?php echo CJs::encodeJson($counter) ?>,
+					counter: <?= CJs::encodeJson($counter) ?>,
 					dataCallback: function(data) {
 						data.formulaId = num2letter(data.rowNum);
 
@@ -70,7 +65,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				});
 
 			$('#evaltype').change(function() {
-				var custom = ($(this).val() == <?php echo CONDITION_EVAL_TYPE_EXPRESSION ?>);
+				var custom = ($(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
 				$('#expression').toggleClass('hidden', custom);
 				$('#formula').toggleClass('hidden', !custom);
 				if (!custom) {

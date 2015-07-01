@@ -19,47 +19,36 @@
 **/
 
 
-$itemsWidget = new CWidget();
-$itemsWidget->setTitle([
-	_('Item prototypes of').SPACE,
-	new CSpan($this->data['discovery_rule']['name'], ZBX_STYLE_GREEN)
-]);
-
-// create new item button
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create item prototype')));
-$createForm->addItem($controls);
-
-$itemsWidget->setControls($createForm);
-
-// header
-$itemsWidget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
+$widget = (new CWidget())
+	->setTitle(_('Item prototypes'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create item prototype'))))
+	)
+	->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
-$itemForm = new CForm();
-$itemForm->setName('items');
-$itemForm->addVar('hostid', $this->data['hostid']);
-$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+$itemForm = (new CForm())
+	->setName('items')
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$itemTable = new CTableInfo();
-
-$itemTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")))->
-		addClass('cell-width'),
-	make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
-	_('Applications'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-]);
+$itemTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+		_('Applications'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 foreach ($this->data['items'] as $item) {
 	$description = [];
@@ -67,7 +56,9 @@ foreach ($this->data['items'] as $item) {
 		$template_host = get_realhost_by_itemid($item['templateid']);
 		$templateDiscoveryRuleId = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'], $template_host['hostid']);
 
-		$description[] = new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+		$description[] = (new CLink($template_host['name'], '?parent_discoveryid='.$templateDiscoveryRuleId))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 	$description[] = new CLink(
@@ -75,16 +66,16 @@ foreach ($this->data['items'] as $item) {
 		'?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$this->data['parent_discoveryid']
 	);
 
-	$status = new CLink(
+	$status = (new CLink(
 		itemIndicator($item['status']),
 		'?group_itemid='.$item['itemid'].
 			'&parent_discoveryid='.$this->data['parent_discoveryid'].
 			'&action='.($item['status'] == ITEM_STATUS_DISABLED
 				? 'itemprototype.massenable'
 				: 'itemprototype.massdisable'
-			),
-		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($item['status'])
-	);
+			)))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(itemIndicatorStyle($item['status']));
 
 	if (!empty($item['applications'])) {
 		order_result($item['applications'], 'name');
@@ -100,7 +91,7 @@ foreach ($this->data['items'] as $item) {
 	}
 
 	$itemTable->addRow([
-		new CCheckBox('group_itemid['.$item['itemid'].']', null, null, $item['itemid']),
+		new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']),
 		$description,
 		$item['key_'],
 		($item['delay'] !== '') ? convertUnitsS($item['delay']) : '',
@@ -135,6 +126,6 @@ $itemForm->addItem([
 ]);
 
 // append form to widget
-$itemsWidget->addItem($itemForm);
+$widget->addItem($itemForm);
 
-return $itemsWidget;
+return $widget;

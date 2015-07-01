@@ -21,19 +21,20 @@
 
 $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 
-$mediaTypeWidget = (new CWidget())->setTitle(_('Media types'));
+$widget = (new CWidget())->setTitle(_('Media types'));
 
 // create form
-$mediaTypeForm = new CForm();
-$mediaTypeForm->setAttribute('id', 'mediaTypeForm');
-$mediaTypeForm->addVar('form', 1);
-$mediaTypeForm->addVar('mediatypeid', $data['mediatypeid']);
+$mediaTypeForm = (new CForm())
+	->setId('mediaTypeForm')
+	->addVar('form', 1)
+	->addVar('mediatypeid', $data['mediatypeid']);
 
 // create form list
-$mediaTypeFormList = new CFormList('mediaTypeFormList');
-$nameTextBox = new CTextBox('description', $data['description'], ZBX_TEXTBOX_STANDARD_SIZE, false, 100);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$mediaTypeFormList->addRow(_('Name'), $nameTextBox);
+$nameTextBox = (new CTextBox('description', $data['description'], false, 100))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('autofocus', 'autofocus');
+$mediaTypeFormList = (new CFormList('mediaTypeFormList'))
+	->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
 $cmbType = new CComboBox('type', $data['type'], null, [
@@ -44,52 +45,74 @@ $cmbType = new CComboBox('type', $data['type'], null, [
 ]);
 $cmbType->addItemsInGroup(_('Commercial'), [MEDIA_TYPE_EZ_TEXTING => _('Ez Texting')]);
 $cmbTypeRow = [$cmbType];
-$ez_texting_link = new CLink('https://app.eztexting.com', 'https://app.eztexting.com/', null, null, 'nosid');
-$ez_texting_link->setAttribute('id', 'eztext_link');
-$ez_texting_link->setTarget('_blank');
+$ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztexting.com/'))
+	->removeSID()
+	->setId('eztext_link')
+	->setTarget('_blank');
 $cmbTypeRow[] = $ez_texting_link;
 
-$mediaTypeFormList->addRow(_('Type'), $cmbTypeRow);
-
-$mediaTypeFormList->addRow(_('SMTP server'), new CTextBox('smtp_server', $data['smtp_server'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
-$mediaTypeFormList->addRow(_('SMTP helo'), new CTextBox('smtp_helo', $data['smtp_helo'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
-$mediaTypeFormList->addRow(_('SMTP email'), new CTextBox('smtp_email', $data['smtp_email'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
-$mediaTypeFormList->addRow(_('Script name'), new CTextBox('exec_path', $data['exec_path'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EXEC);
-$mediaTypeFormList->addRow(_('GSM modem'), new CTextBox('gsm_modem', $data['gsm_modem'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_SMS);
+$mediaTypeFormList
+	->addRow(_('Type'), $cmbTypeRow)
+	->addRow(_('SMTP server'),
+		(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('SMTP helo'),
+		(new CTextBox('smtp_helo', $data['smtp_helo']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('SMTP email'),
+		(new CTextBox('smtp_email', $data['smtp_email']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('Script name'),
+		(new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_EXEC
+	)
+	->addRow(_('GSM modem'),
+		(new CTextBox('gsm_modem', $data['gsm_modem']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_SMS
+	);
 
 // create password field
 if ($data['passwd'] != '') {
-	$passwdButton = new CButton('chPass_btn', _('Change password'), 'this.style.display="none"; $("passwd").enable().show().focus();');
-	$passwdBox = new CPassBox('passwd', $data['passwd'], ZBX_TEXTBOX_SMALL_SIZE);
-	$passwdBox->addStyle('display: none;');
-	$passwdField = [$passwdButton, $passwdBox];
+	$passwdField = [
+		(new CButton('chPass_btn', _('Change password')))
+			->onClick('this.style.display="none"; $("passwd").show().focus();'),
+		(new CPassBox('passwd', $data['passwd']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->addStyle('display: none;')
+	];
 }
 else {
-	$passwdField = new CPassBox('passwd', '', ZBX_TEXTBOX_SMALL_SIZE);
+	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // append password field to form list
-$mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('jabber_username', $data['jabber_username'], ZBX_TEXTBOX_STANDARD_SIZE));
-$mediaTypeFormList->addRow(_('Username'), new CTextBox('eztext_username', $data['eztext_username'], ZBX_TEXTBOX_STANDARD_SIZE));
-$mediaTypeFormList->addRow(_('Password'), $passwdField);
-$mediaTypeFormList->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, [
-	EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
-	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
-]));
-
-$mediaTypeFormList->addRow(_('Enabled'), new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE == $data['status'], null, MEDIA_TYPE_STATUS_ACTIVE));
+$mediaTypeFormList
+	->addRow(_('Jabber identifier'),
+		(new CTextBox('jabber_username', $data['jabber_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	->addRow(_('Username'),
+		(new CTextBox('eztext_username', $data['eztext_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	->addRow(_('Password'), $passwdField)
+	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, [
+		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
+		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
+	]))
+	->addRow(_('Enabled'),
+		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
+	);
 
 // append form list to tab
-$mediaTypeTab = new CTabView();
-$mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
+$mediaTypeTab = (new CTabView())->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 
 // append buttons to form
-$cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list');
-$cancelButton->setAttribute('id', 'cancel');
+$cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list'))->setId('cancel');
 
 if ($data['mediatypeid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'mediatype.create');
-	$addButton->setAttribute('id', 'add');
+	$addButton = (new CSubmitButton(_('Add'), 'action', 'mediatype.create'))->setId('add');
 
 	$mediaTypeTab->setFooter(makeFormFooter(
 		$addButton,
@@ -97,15 +120,13 @@ if ($data['mediatypeid'] == 0) {
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'mediatype.update');
-	$updateButton->setAttribute('id', 'update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
+	$updateButton = (new CSubmitButton(_('Update'), 'action', 'mediatype.update'))->setId('update');
+	$cloneButton = (new CSimpleButton(_('Clone')))->setId('clone');
+	$deleteButton = (new CRedirectButton(_('Delete'),
 		'zabbix.php?action=mediatype.delete&sid='.$data['sid'].'&mediatypeids[]='.$data['mediatypeid'],
 		_('Delete media type?')
-	);
-	$deleteButton->setAttribute('id', 'delete');
+	))
+		->setId('delete');
 
 	$mediaTypeTab->setFooter(makeFormFooter(
 		$updateButton,
@@ -121,4 +142,4 @@ else {
 $mediaTypeForm->addItem($mediaTypeTab);
 
 // append form to widget
-$mediaTypeWidget->addItem($mediaTypeForm)->show();
+$widget->addItem($mediaTypeForm)->show();

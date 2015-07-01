@@ -190,8 +190,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 
 		$url .= '?'.http_build_query($queryParams);
 
-		$img = new CImg($url);
-		$img->preload();
+		$img = (new CImg($url))->preload();
 
 		return new CSpan($img);
 	}

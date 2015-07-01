@@ -70,7 +70,6 @@ $fields = [
 	'filter_rst'=>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set'=>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// ajax
-	'filterState' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	'favobj'=>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid'=>			[T_ZBX_INT, O_OPT, P_ACT,	null,		null]
 ];
@@ -92,9 +91,6 @@ if (getRequest('triggerid') && !API::Trigger()->isReadable([getRequest('triggeri
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.events.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (hasRequest('favobj')) {
 	// saving fixed/dynamic setting to profile
 	if ('timelinefixedperiod' == getRequest('favobj')) {
@@ -277,14 +273,13 @@ else {
 	$csvDisabled = true;
 
 	// header
-	$frmForm = new CForm();
+	$frmForm = (new CForm())
+		->addVar('stime', $stime, 'stime_csv')
+		->addVar('period', $period, 'period_csv')
+		->addVar('page', getPageNumber(), 'page_csv');
 	if (hasRequest('source')) {
 		$frmForm->addVar('source', getRequest('source'), 'source_csv');
 	}
-	$frmForm->addVar('stime', $stime, 'stime_csv');
-	$frmForm->addVar('period', $period, 'period_csv');
-	$frmForm->addVar('page', getPageNumber(), 'page_csv');
-
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if ($triggerId) {
@@ -328,9 +323,9 @@ else {
 	$filterForm = new CFilter('web.events.filter.state');
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-		$filterForm->addVar('triggerid', $triggerId);
-		$filterForm->addVar('stime', $stime);
-		$filterForm->addVar('period', $period);
+		$filterForm->addVar('triggerid', $triggerId)
+			->addVar('stime', $stime)
+			->addVar('period', $period);
 
 		if ($triggerId > 0) {
 			$dbTrigger = API::Trigger()->get([
@@ -359,9 +354,11 @@ else {
 		$filterColumn->addRow(
 			_('Trigger'),
 			[
-				new CTextBox('trigger', $trigger, 96, true),
-				new CButton('btn1', _('Select'),
-					'return PopUp("popup.php?'.
+				(new CTextBox('trigger', $trigger, true))->setWidth(ZBX_TEXTAREA_FILTER_BIG_WIDTH),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				(new CButton('btn1', _('Select')))
+					->addClass(ZBX_STYLE_BTN_GREY)
+					->onClick('return PopUp("popup.php?'.
 						'dstfrm=zbx_filter'.
 						'&dstfld1=triggerid'.
 						'&dstfld2=trigger'.
@@ -373,7 +370,7 @@ else {
 						'&with_monitored_triggers=1'.
 						($pageFilter->hostid ? '&only_hostid='.$pageFilter->hostid : '').
 						'");'
-				)
+					)
 			]
 		);
 
@@ -782,10 +779,11 @@ else {
 					];
 				}
 				else {
-					$triggerDescription = new CSpan($description, ZBX_STYLE_LINK_ACTION.' link_menu');
-					$triggerDescription->setMenuPopup(
-						CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
-					);
+					$triggerDescription = (new CSpan($description))
+						->addClass(ZBX_STYLE_LINK_ACTION)
+						->setMenuPopup(
+							CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
+						);
 
 					// acknowledge
 					$ack = getEventAckState($event, $page['file']);
@@ -804,15 +802,15 @@ else {
 					$hostName = null;
 
 					if (getRequest('hostid', 0) == 0) {
-						$hostName = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
-						$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+						$hostName = (new CSpan($host['name']))
+							->addClass(ZBX_STYLE_LINK_ACTION)
+							->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 					}
 
 					$table->addRow([
-						new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
-							'action'
-						),
+						(new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
+								'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']))
+							->addClass('action'),
 						$hostName,
 						$triggerDescription,
 						$statusSpan,

@@ -39,7 +39,6 @@ $fields = [
 	'httptestid' =>	[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
 	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
 	// ajax
-	'filterState' => [T_ZBX_INT, O_OPT, P_ACT, null,		null],
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null]
 ];
@@ -48,9 +47,6 @@ check_fields($fields);
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.httpdetails.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (isset($_REQUEST['favobj'])) {
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
@@ -109,25 +105,28 @@ $itemHistory = Manager::History()->getLast($items);
 /*
  * Display
  */
-$httpdetailsWidget = (new CWidget())->
-	setTitle(
-		_('DETAILS OF WEB SCENARIO').':'.SPACE.
+$widget = (new CWidget())
+	->setTitle(
+		_('DETAILS OF WEB SCENARIO').': '.
 		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
+	)
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(get_icon('reset', ['id' => getRequest('httptestid')]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+		)
 	);
-$controls = new CList();
-$controls->addItem(get_icon('reset', ['id' => getRequest('httptestid')]));
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]));
-$httpdetailsWidget->setControls($controls);
 
 // append table to widget
-$httpdetailsTable = new CTableInfo();
-$httpdetailsTable->setHeader([
-	_('Step'),
-	_('Speed'),
-	_('Response time'),
-	_('Response code'),
-	_('Status')
-]);
+$httpdetailsTable = (new CTableInfo())
+	->setHeader([
+		_('Step'),
+		_('Speed'),
+		_('Response time'),
+		_('Response code'),
+		_('Status')
+	]);
 
 $db_httpsteps = DBselect('SELECT * FROM httpstep WHERE httptestid='.zbx_dbstr($httpTest['httptestid']).' ORDER BY no');
 
@@ -215,7 +214,7 @@ while ($httpstep_data = DBfetch($db_httpsteps)) {
 		$speed,
 		$respTime,
 		$resp,
-		new CSpan($status['msg'], $status['style'])
+		(new CSpan($status['msg']))->addClass($status['style'])
 	]);
 }
 
@@ -239,22 +238,21 @@ $httpdetailsTable->addRow([
 	SPACE,
 	bold(($totalTime['value']) ? formatHistoryValue($totalTime['value'], $totalTime) : UNKNOWN_VALUE),
 	SPACE,
-	new CSpan($status['msg'], $status['style'].' bold')
+	(new CSpan($status['msg']))->addClass($status['style'])->addClass('bold')
 ]);
 
-$httpdetailsWidget->addItem($httpdetailsTable)->show();
+$widget->addItem($httpdetailsTable)->show();
 
 echo BR();
 
 // create graphs widget
 $graphsWidget = new CWidget();
 
-$filterForm = new CFilter('web.httpdetails.filter.state');
-$filterForm->addNavigator();
+$filterForm = (new CFilter('web.httpdetails.filter.state'))
+	->addNavigator();
 $graphsWidget->addItem($filterForm);
 
-$graphTable = new CTableInfo();
-$graphTable->setAttribute('id', 'graph');
+$graphTable = (new CTableInfo())->setId('graph');
 
 // dims
 $graphDims = getGraphDims();
@@ -286,9 +284,12 @@ $src = 'chart3.php?height=150'.
 	'&profileIdx='.$graphInScreen->profileIdx.
 	'&profileIdx2='.$graphInScreen->profileIdx2;
 
-$graphInContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_in');
-$graphInContainer->setAttribute('style', 'position: relative');
-$graphInContainer->setAttribute('data-timestamp', time());
+$graphInContainer = (new CDiv(new CLink(null, $src)))
+	->addClass('flickerfreescreen')
+	->setId('flickerfreescreen_graph_in')
+	->setAttribute('style', 'position: relative')
+	->setAttribute('data-timestamp', time());
+
 $graphTable->addRow([bold(_('Speed')), $graphInContainer]);
 
 $timeControlData = [
@@ -327,9 +328,12 @@ $src = 'chart3.php?height=150'.
 	'&profileIdx='.$graphTimeScreen->profileIdx.
 	'&profileIdx2='.$graphTimeScreen->profileIdx2;
 
-$graphTimeContainer = new CDiv(new CLink(null, $src), 'flickerfreescreen', 'flickerfreescreen_graph_time');
-$graphTimeContainer->setAttribute('style', 'position: relative');
-$graphTimeContainer->setAttribute('data-timestamp', time());
+$graphTimeContainer = (new CDiv(new CLink(null, $src)))
+	->addClass('flickerfreescreen')
+	->setId('flickerfreescreen_graph_time')
+	->setAttribute('style', 'position: relative')
+	->setAttribute('data-timestamp', time());
+
 $graphTable->addRow([bold(_('Response time')), $graphTimeContainer]);
 
 $timeControlData = [

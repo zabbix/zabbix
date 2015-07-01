@@ -18,44 +18,26 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$form = new CForm();
-$form->setName('regularExpressionsForm');
+$widget = (new CWidget())
+	->setTitle(_('Regular expressions'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.regexps.php'))
+			->addItem(new CSubmit('form', _('New regular expression')))
+		)
+	);
 
-$regExpTable = new CTableInfo();
-$regExpTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_regexps', null, "checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")))->
-		addClass('cell-width'),
-	_('Name'),
-	_('Expressions')
-]);
+$form = (new CForm())->setName('regularExpressionsForm');
 
-$regExpWidget = (new CWidget())->setTitle(_('Regular expressions'));
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-$controls->addItem(new CSubmit('form', _('New regular expression')));
-
-$regExpForm = new CForm();
-$regExpForm->cleanItems();
-
-$regExpForm->addItem($controls);
-$regExpWidget->setControls($regExpForm);
+$regExpTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_regexps'))->onClick("checkAll('regularExpressionsForm', 'all_regexps', 'regexpids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Name'),
+		_('Expressions')
+	]);
 
 $expressions = [];
 $values = [];
@@ -80,7 +62,7 @@ foreach($data['db_exps'] as $exp) {
 }
 foreach($data['regexps'] as $regexpid => $regexp) {
 	$regExpTable->addRow([
-		new CCheckBox('regexpids['.$regexp['regexpid'].']', null, null, $regexp['regexpid']),
+		new CCheckBox('regexpids['.$regexp['regexpid'].']', $regexp['regexpid']),
 		new CLink($regexp['name'], 'adm.regexps.php?form=update'.'&regexpid='.$regexp['regexpid']),
 		isset($expressions[$regexpid]) ? $expressions[$regexpid] : ''
 	]);
@@ -95,6 +77,6 @@ $form->addItem([
 ]);
 
 // append form to widget
-$regExpWidget->addItem($form);
+$widget->addItem($form);
 
-return $regExpWidget;
+return $widget;

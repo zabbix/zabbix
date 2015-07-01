@@ -1,14 +1,14 @@
 <script type="text/x-jquery-tmpl" id="mappingRow">
 	<tr>
 		<td>
-			<input class="input text " type="text" name="mappings[#{mappingNum}][value]" value="#{value}" size="20" maxlength="64">
+			<input class="input text " type="text" name="mappings[#{mappingNum}][value]" value="#{value}" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="64">
 		</td>
 		<td>&rArr;</td>
 		<td>
-			<input class="input text" type="text" name="mappings[#{mappingNum}][newvalue]" value="#{newvalue}" size="30" maxlength="64">
+			<input class="input text" type="text" name="mappings[#{mappingNum}][newvalue]" value="#{newvalue}" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="64">
 		</td>
 		<td>
-			<button type="button" class="button link_menu removeMapping"><?php echo _('Remove'); ?></button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> removeMapping" type="button"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>

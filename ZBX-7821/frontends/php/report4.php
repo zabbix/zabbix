@@ -70,8 +70,7 @@ if (zbx_empty($media_types)) {
 	$widget->addItem($table)->show();
 }
 else {
-	$table = new CTableInfo();
-	$table->makeVerticalRotation();
+	$table = (new CTableInfo())->makeVerticalRotation();
 
 	// fetch the year of the first alert
 	if (($firstAlert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'))) && $firstAlert['clock']) {
@@ -82,12 +81,10 @@ else {
 		$minYear = date('Y');
 	}
 
-	$form = new CForm();
-	$form->setMethod('get');
+	$form = (new CForm())->setMethod('get');
 
 	$controls = new CList();
 
-	$controls->addItem(SPACE._('Media type').SPACE);
 	$cmbMedia = new CComboBox('media_type', $media_type, 'submit()');
 	$cmbMedia->addItem(0, _('all'));
 
@@ -99,23 +96,21 @@ else {
 			unset($media_types[$media_type_id]);
 		}
 	}
-	$controls->addItem($cmbMedia);
+	$controls->addItem([_('Media type'), SPACE, $cmbMedia]);
 
-	$controls->addItem(SPACE._('Period').SPACE);
-	$controls->addItem(new CComboBox('period', $period, 'submit()', [
+	$controls->addItem([_('Period'), SPACE, new CComboBox('period', $period, 'submit()', [
 		'daily' => _('Daily'),
 		'weekly' => _('Weekly'),
 		'monthly' => _('Monthly'),
 		'yearly' => _('Yearly')
-	]));
+	])]);
 
 	if ($period != 'yearly') {
-		$controls->addItem(SPACE._('Year').SPACE);
 		$cmbYear = new CComboBox('year', $year, 'submit();');
 		for ($y = $minYear; $y <= date('Y'); $y++) {
 			$cmbYear->addItem($y, $y);
 		}
-		$controls->addItem($cmbYear);
+		$controls->addItem([_('Year'), SPACE, $cmbYear]);
 	}
 
 	$form->addItem($controls);

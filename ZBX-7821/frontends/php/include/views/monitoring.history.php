@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/js/monitoring.history.js.php';
 
-$historyWidget = new CWidget('history');
+$historyWidget = new CWidget();
 
 $header = [
 	'left' => _n('%1$s item', '%1$s items', count($this->data['items'])),
@@ -69,8 +69,8 @@ $header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['f
 
 // don't display the action form if we view multiple items on a graph
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
-	$actionForm = new CForm('get');
-	$actionForm->addVar('itemids', getRequest('itemids'));
+	$actionForm = (new CForm('get'))
+		->addVar('itemids', getRequest('itemids'));
 
 	if (isset($_REQUEST['filter_task'])) {
 		$actionForm->addVar('filter_task', $_REQUEST['filter_task']);
@@ -125,8 +125,9 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 			$itemListbox->addItem($item['id'], $item['name']);
 		}
 
-		$addItemButton = new CButton('add_log', _('Add'), "return PopUp('popup.php?multiselect=1&real_hosts=1".
-				'&reference=itemid&srctbl=items&value_types[]='.$this->data['value_type']."&srcfld1=itemid');");
+		$addItemButton = (new CButton('add_log', _('Add')))
+			->onClick("return PopUp('popup.php?multiselect=1&real_hosts=1".
+					'&reference=itemid&srctbl=items&value_types[]='.$this->data['value_type']."&srcfld1=itemid');");
 		$deleteItemButton = null;
 
 		if (count($this->data['items']) > 1) {
@@ -134,7 +135,9 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		}
 
 		$filterColumn1->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton]);
-		$filterColumn1->addRow(_('Select rows with value like'), new CTextBox('filter', getRequest('filter', ''), ZBX_TEXTBOX_FILTER_SIZE));
+		$filterColumn1->addRow(_('Select rows with value like'),
+			(new CTextBox('filter', getRequest('filter', '')))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+		);
 
 		$filterTask = getRequest('filter_task', 0);
 
@@ -190,7 +193,7 @@ $screen = CScreenBuilder::getScreen([
 
 // append plaintext to widget
 if ($this->data['plaintext']) {
-	$plaintextSpan = new CSpan(null, 'textblackwhite');
+	$plaintextSpan = (new CSpan())->addClass('textblackwhite');
 
 	foreach ($headerPlaintext as $text) {
 		$plaintextSpan->addItem([new CJsScript($text), BR()]);
@@ -206,9 +209,9 @@ if ($this->data['plaintext']) {
 	$historyWidget->addItem($plaintextSpan);
 }
 else {
-	$historyWidget->setTitle($header['left']);
-	$historyWidget->setControls($header['right']);
-	$historyWidget->addItem(BR());
+	$historyWidget->setTitle($header['left'])
+		->setControls($header['right'])
+		->addItem(BR());
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm->addNavigator();
@@ -224,13 +227,11 @@ else {
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
 
 			$graphType = [
-				new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, null, 'graphtype_'.GRAPH_TYPE_NORMAL,
-					($this->data['graphtype'] == GRAPH_TYPE_NORMAL)
-				),
+				(new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, ($this->data['graphtype'] == GRAPH_TYPE_NORMAL)))
+					->setId('graphtype_'.GRAPH_TYPE_NORMAL),
 				new CLabel(_('Normal'), 'graphtype_'.GRAPH_TYPE_NORMAL),
-				new CRadioButton('graphtype', GRAPH_TYPE_STACKED, null, 'graphtype_'.GRAPH_TYPE_STACKED,
-					($this->data['graphtype'] == GRAPH_TYPE_STACKED)
-				),
+				(new CRadioButton('graphtype', GRAPH_TYPE_STACKED, ($this->data['graphtype'] == GRAPH_TYPE_STACKED)))
+					->setId('graphtype_'.GRAPH_TYPE_STACKED),
 				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
 			];
 			$filterColumn1->addRow(_('Graph type'), $graphType);
@@ -243,9 +244,9 @@ else {
 		$filterForm->addNavigator();
 		$historyWidget->addItem($filterForm);
 
-		$historyTable = (new CTable())->
-			addClass('maxwidth')->
-			addRow($screen->get());
+		$historyTable = (new CTable())
+			->addClass('maxwidth')
+			->addRow($screen->get());
 		$historyWidget->addItem($historyTable);
 
 		CScreenBuilder::insertScreenStandardJs([

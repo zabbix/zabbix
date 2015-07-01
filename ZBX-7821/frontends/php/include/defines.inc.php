@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'2.5.0');
 define('ZABBIX_API_VERSION',	'2.5.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050012);
+define('ZABBIX_DB_VERSION',		2050018);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -924,9 +924,26 @@ define('ZBX_MAX_PORT_NUMBER', 65535);
 define('ZBX_TEXTBOX_STANDARD_SIZE',		50);
 define('ZBX_TEXTBOX_SMALL_SIZE',		25);
 define('ZBX_TEXTBOX_FILTER_SIZE',		20);
-define('ZBX_TEXTAREA_STANDARD_WIDTH',	312);
-define('ZBX_TEXTAREA_BIG_WIDTH',		524);
-define('ZBX_TEXTAREA_STANDARD_ROWS',	7);
+
+define('ZBX_TEXTAREA_MACRO_WIDTH',				200);
+define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		250);
+define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
+define('ZBX_TEXTAREA_FILTER_SMALL_WIDTH',		150);
+define('ZBX_TEXTAREA_FILTER_STANDARD_WIDTH',	300);
+define('ZBX_TEXTAREA_FILTER_BIG_WIDTH',			524);
+define('ZBX_TEXTAREA_TINY_WIDTH',				75);
+define('ZBX_TEXTAREA_SMALL_WIDTH',				150);
+define('ZBX_TEXTAREA_SEARCH_WIDTH',				200);
+define('ZBX_TEXTAREA_STANDARD_WIDTH',			300);
+define('ZBX_TEXTAREA_BIG_WIDTH',				524);
+define('ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH',	75);
+define('ZBX_TEXTAREA_NUMERIC_BIG_WIDTH',		150);
+define('ZBX_TEXTAREA_2DIGITS_WIDTH',			35);	// please use for date selector only
+define('ZBX_TEXTAREA_4DIGITS_WIDTH',			50);	// please use for date selector only
+define('ZBX_TEXTAREA_INTERFACE_IP_WIDTH',		225);
+define('ZBX_TEXTAREA_INTERFACE_DNS_WIDTH',		175);
+define('ZBX_TEXTAREA_INTERFACE_PORT_WIDTH',		100);
+define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
 
 // widgets
 define('WIDGET_DISCOVERY_STATUS',	'dscvry');
@@ -953,7 +970,7 @@ define('ZBX_VALID_WARNING',	2);
 define('THEME_DEFAULT', 'default');
 
 // the default theme
-define('ZBX_DEFAULT_THEME', 'originalblue');
+define('ZBX_DEFAULT_THEME', 'blue-theme');
 
 define('ZABBIX_HOMEPAGE', 'http://www.zabbix.com');
 define('ZBX_DEFAULT_URL', 'zabbix.php?action=dashboard.view');
@@ -991,23 +1008,38 @@ define('HISTORY_LATEST', 'showlatest');
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
+define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ARTICLE', 'article');
-define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_BTN_ADD_FAV', 'btn-add-fav');
+define('ZBX_STYLE_BTN_ALT', 'btn-alt');
 define('ZBX_STYLE_BTN_CONF', 'btn-conf');
 define('ZBX_STYLE_BTN_GREY', 'btn-grey');
 define('ZBX_STYLE_BTN_INFO', 'btn-info');
+define('ZBX_STYLE_BTN_LINK', 'btn-link');
 define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
 define('ZBX_STYLE_BTN_RESET', 'btn-reset');
+define('ZBX_STYLE_CELL', 'cell');
+define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
+define('ZBX_STYLE_CENTER', 'center');
+define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
+define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
+define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
+define('ZBX_STYLE_DRAG_DROP_AREA', 'drag-drop-area');
+define('ZBX_STYLE_TABLE_FORMS_SEPARATOR', 'table-forms-separator');
+define('ZBX_STYLE_FLOAT_LEFT', 'float-left');
+define('ZBX_STYLE_FORM_INPUT_MARGIN', 'form-input-margin');
+define('ZBX_STYLE_FORM_NEW_GROUP', 'form-new-group');
+define('ZBX_STYLE_FOOTER', 'footer');
 define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
+define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
@@ -1015,14 +1047,24 @@ define('ZBX_STYLE_NA_BG', 'na-bg');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_ORANGE', 'orange');
+define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
+define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_RED', 'red');
+define('ZBX_STYLE_ROW', 'row');
 define('ZBX_STYLE_SELECT_MULTIPLE', 'select-multiple');
+define('ZBX_STYLE_SELECTED', 'selected');
+define('ZBX_STYLE_STATUS_CONTAINER', 'status-container');
+define('ZBX_STYLE_STATUS_GREEN', 'status-green');
+define('ZBX_STYLE_STATUS_GREY', 'status-grey');
+define('ZBX_STYLE_STATUS_RED', 'status-red');
+define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
-define('ZBX_STYLE_TABLE_FORMS_TR_NEW', 'table-forms-tr-new');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
+define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
