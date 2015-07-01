@@ -229,31 +229,80 @@
 	</div>
 	<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
 
-	<div id="" class="overlay-dialogue notifications" style="top: 128px; right: 13px">
+	<div id="" class="overlay-dialogue notif" style="top: 128px; right: 13px">
 	<span class="overlay-close-btn"></span>
 	<div class="dashbrd-widget-head">
-	<!--<h4>Notifications</h4>--><ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
+	<ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
+	<ul class="notif-body">
+		<li><div class="notif-indic disaster-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic high-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic average-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic warning-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+	</ul>
+<!--
 	<table class="list-table">
 	<tr>
 	<td class="disaster-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<td><h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
 	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
 	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
 	</tr>
 	<tr>
 	<td class="high-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<td><h4>Problem <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
 	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
 	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
 	</tr>
 	<tr>
 	<td class="average-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<td><h4>Problem <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
 	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
 	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
 	</tr>
 	<tr>
 	<td class="warning-bg"></td>
+	<td><h4>Problem <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
+	</tr>
+	<tr>
+	<td class="normal-bg"></td>
 	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
 	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
 	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
@@ -265,18 +314,12 @@
 	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
 	</tr>
 	<tr>
-	<td class="info-bg"></td>
+	<td class="normal-bg"></td>
 	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
 	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
 	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
 	</tr>
-	<tr>
-	<td class="na-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	</table>
+	</table>-->
 	</div>
 
 <div style="top: 106px; left: 1300px; z-index: 100;" class="overlay-dialogue"><span class="overlay-close-btn"></span>

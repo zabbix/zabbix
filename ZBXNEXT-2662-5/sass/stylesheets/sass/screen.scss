@@ -2239,8 +2239,9 @@ button[disabled] {
 	}
 
 	.dashbrd-widget-head {
-		margin: -15px -15px 6px -15px;
-		padding: 12px 30px 12px 15px;
+		margin: -10px -10px 6px -10px;
+		//margin: -15px -15px 6px -15px;
+		//padding: 12px 30px 12px 15px;
 	}
 
 	.maps-container {
@@ -2381,28 +2382,13 @@ button[disabled] {
 	}
 }
 
-.notifications {
-	padding: 0;
+/* Problem notification overlay */
+.notif {
 	max-width: 250px;
 
-	h4 {
-		display: inline-block;
-	}
-
-	p {
-		margin: 0.35em 0 0 0;
-	}
-
-	tr {
-		td:first-child {
-			padding: 0;
-			width: 3px;
-		}
-	}
-
 	.dashbrd-widget-head {
-		margin: 0;
-		padding: 6px 0 0 6px;
+		margin: -11px 0 7px -9px;
+		padding: 0;
 
 		ul {
 			position: relative;
@@ -2415,6 +2401,38 @@ button[disabled] {
 		}
 	}
 
+}
+
+.notif-body {
+
+	h4 {
+		display: block;
+		max-width: 250px;
+		padding-bottom: 0.083em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	p {
+		margin: 0.35em 0 0 0;
+	}
+
+	li {
+		padding: 0 0 15px 19px;
+
+		&:last-child {
+			padding-bottom: 0;
+		}
+	}
+}
+
+.notif-indic {
+	width: 14px;
+	height: 14px;
+	@include border-radius(2px);
+	position: absolute;
+	margin: 2px 0 0 -19px;
 }
 
 /* Maps, Screens, Graphs */
