@@ -342,11 +342,6 @@ abstract class CItemGeneral extends CApiService {
 						_('Type of information must be "Numeric (unsigned)" or "Numeric (float)" for aggregate items.'));
 			}
 
-			// log
-			if ($fullItem['value_type'] != ITEM_VALUE_TYPE_LOG && str_in_array($itemKey->getKeyId(), ['log', 'logrt', 'eventlog'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be "Log" for log key.'));
-			}
-
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
 				$nextCheck = calculateItemNextCheck(0, $fullItem['delay'], $fullItem['delay_flex'], time());
