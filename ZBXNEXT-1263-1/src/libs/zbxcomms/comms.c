@@ -191,10 +191,6 @@ static void	zbx_socket_clean(zbx_socket_t *s)
 	memset(s, 0, sizeof(zbx_socket_t));
 
 	s->buf_type = ZBX_BUF_TYPE_STAT;
-
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	s->tls_ctx = NULL;
-#endif
 }
 
 /******************************************************************************
@@ -374,7 +370,6 @@ static int	zbx_socket_connect(zbx_socket_t *s, const struct sockaddr *addr, sock
 		return FAIL;
 	}
 #endif
-
 	s->connection_type = ZBX_TCP_SEC_UNENCRYPTED;
 
 	return SUCCEED;
@@ -597,7 +592,7 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 		if (ZBX_PROTO_ERROR == (res = ZBX_TCP_WRITE(s->socket, buf, len)))
 		{
 			zbx_set_socket_strerror("ZBX_TCP_WRITE() failed: %s",
-					strerror_from_system((unsigned long)zbx_socket_last_error()));
+					strerror_from_system(zbx_socket_last_error()));
 		}
 
 		return res;
@@ -623,8 +618,8 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 
 			return ZBX_PROTO_ERROR;
 		}
-		else
-			return (ssize_t)res;
+
+		return (ssize_t)res;
 #elif defined(HAVE_GNUTLS)
 		ssize_t	res;
 
@@ -643,16 +638,12 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 #endif
 			return ZBX_PROTO_ERROR;
 		}
-		else
-			return (ssize_t)res;
+
+		return res;
 #elif defined(HAVE_OPENSSL)
 		int	res;
 
-		if (0 < (res = SSL_write(s->tls_ctx, buf, (int)len)))
-		{
-			return (ssize_t)res;	/* success */
-		}
-		else
+		if (0 >= (res = SSL_write(s->tls_ctx, buf, (int)len)))
 		{
 			/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
 			/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
@@ -664,8 +655,6 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 			if (0 == res && SSL_ERROR_ZERO_RETURN == error_code)
 			{
 				zbx_set_socket_strerror("connection closed during write");
-
-				return ZBX_PROTO_ERROR;
 			}
 			else
 			{
@@ -673,15 +662,17 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 				size_t	error_alloc = 0, error_offset = 0;
 
 				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
-				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS write returned error code "
-						"%d:", error_code);
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS write returned error code"
+						" %d:", error_code);
 				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
 				zbx_set_socket_strerror("%s: %s", error, info_buf);
 				zbx_free(error);
-
-				return ZBX_PROTO_ERROR;
 			}
+
+			return ZBX_PROTO_ERROR;
 		}
+
+		return (ssize_t)res;
 #endif
 	}
 #endif
@@ -1178,7 +1169,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	if (1 == recv(s->socket, &buf, 1, MSG_PEEK) && '\x16' == buf)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (0 != (tls_accept & ZBX_TCP_SEC_TLS_CERT) || 0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
+		if (0 != (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 		{
 			char	*error = NULL;
 
@@ -1192,13 +1183,12 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 		}
 		else
 		{
-			zbx_set_socket_strerror("from %s: TLS connections are not allowed by configuration.",
-					get_ip_by_socket(s));
+			zbx_set_socket_strerror("from %s: TLS connections are not allowed", get_ip_by_socket(s));
 			zbx_tcp_unaccept(s);
 			return FAIL;
 		}
 #else
-		zbx_set_socket_strerror("from %s: support for TLS was not compiled in.", get_ip_by_socket(s));
+		zbx_set_socket_strerror("from %s: support for TLS was not compiled in", get_ip_by_socket(s));
 		zbx_tcp_unaccept(s);
 		return FAIL;
 #endif
@@ -1207,7 +1197,7 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 	{
 		if (0 == (tls_accept & ZBX_TCP_SEC_UNENCRYPTED))
 		{
-			zbx_set_socket_strerror("from %s: unencrypted connections are not allowed.",
+			zbx_set_socket_strerror("from %s: unencrypted connections are not allowed",
 					get_ip_by_socket(s));
 			zbx_tcp_unaccept(s);
 			return FAIL;
@@ -1416,11 +1406,10 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 		if (ZBX_PROTO_ERROR == (res = ZBX_TCP_READ(s->socket, buf, len)))
 		{
 			zbx_set_socket_strerror("ZBX_TCP_READ() failed: %s",
-					strerror_from_system((unsigned long)zbx_socket_last_error()));
+					strerror_from_system(zbx_socket_last_error()));
 		}
 
 		return res;
-
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	}
 	else	/* TLS connection */
@@ -1443,8 +1432,8 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 
 			return ZBX_PROTO_ERROR;
 		}
-		else
-			return (ssize_t)res;
+
+		return (ssize_t)res;
 #elif defined(HAVE_GNUTLS)
 		ssize_t	res;
 
@@ -1464,16 +1453,12 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 #endif
 			return ZBX_PROTO_ERROR;
 		}
-		else
-			return (ssize_t)res;
+
+		return res;
 #elif defined(HAVE_OPENSSL)
 		int	res;
 
-		if (0 < (res = SSL_read(s->tls_ctx, buf, len)))
-		{
-			return (ssize_t)res;	/* success */
-		}
-		else
+		if (0 >= (res = SSL_read(s->tls_ctx, buf, (int)len)))
 		{
 			/* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
 			/* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
@@ -1485,8 +1470,6 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 			if (0 == res && SSL_ERROR_ZERO_RETURN == error_code)
 			{
 				zbx_set_socket_strerror("connection closed during read");
-
-				return ZBX_PROTO_ERROR;
 			}
 			else
 			{
@@ -1494,15 +1477,17 @@ static ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len)
 				size_t	error_alloc = 0, error_offset = 0;
 
 				info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
-				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS read returned error code "
-						"%d:", error_code);
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "TLS read returned error code"
+						" %d:", error_code);
 				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
 				zbx_set_socket_strerror("%s: %s", error, info_buf);
 				zbx_free(error);
-
-				return ZBX_PROTO_ERROR;
 			}
+
+			return ZBX_PROTO_ERROR;
 		}
+
+		return (ssize_t)res;
 #endif
 	}
 #endif
@@ -1704,7 +1689,6 @@ char	*get_ip_by_socket(zbx_socket_t *s)
 #else
 	zbx_snprintf(host, sizeof(host), "%s", inet_ntoa(sa.sin_addr));
 #endif
-
 out:
 	if (NULL != error_message)
 	{

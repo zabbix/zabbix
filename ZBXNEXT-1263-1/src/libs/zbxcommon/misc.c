@@ -351,7 +351,7 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
  *                                                                                      *
  * Function: zbx_guaranteed_memset                                                      *
  *                                                                                      *
- * Purpose: for overwriting sensitive data in memory.                                   *
+ * Purpose: For overwriting sensitive data in memory.                                   *
  *          Similar to memset() but should not be optimized out by a compiler.          *
  *                                                                                      *
  * Derived from:                                                                        *
@@ -364,7 +364,7 @@ void	*zbx_guaranteed_memset(void *v, int c, size_t n)
 {
 	volatile signed char	*p = (volatile signed char *)v;
 
-	while (n--)
+	while (0 != n--)
 		*p++ = (signed char)c;
 
 	return v;

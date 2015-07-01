@@ -171,12 +171,6 @@ static char	shortopts[] =
 	;
 /* end of COMMAND LINE OPTIONS */
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-#	define TLS_FEATURE_STATUS	"YES"
-#else
-#	define TLS_FEATURE_STATUS	" NO"
-#endif
-
 static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
@@ -826,12 +820,19 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	define TLS_FEATURE_STATUS	"YES"
+#else
+#	define TLS_FEATURE_STATUS	" NO"
+#endif
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
 
 #ifndef _WINDOWS
