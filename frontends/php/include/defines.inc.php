@@ -949,9 +949,6 @@ define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
 // decoration borders
 define('ZBX_HOST_INTERFACE_WIDTH',				750);
 
-// dialogs
-define('ZBX_HOST_MODAL_DIALOG_MIN_WIDTH',		250);
-
 // widgets
 define('WIDGET_DISCOVERY_STATUS',	'dscvry');
 define('WIDGET_FAVOURITE_GRAPHS',	'favgrph');
@@ -1032,7 +1029,6 @@ define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
-define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
 define('ZBX_STYLE_DRAG_ICON', 'drag-icon');
@@ -1056,10 +1052,6 @@ define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
-define('ZBX_STYLE_OVERLAY_BG', 'overlay-bg');
-define('ZBX_STYLE_OVERLAY_DIALOGUE', 'overlay-dialogue');
-define('ZBX_STYLE_OVERLAY_DIALOGUE_BODY', 'overlay-dialogue-body');
-define('ZBX_STYLE_OVERLAY_DIALOGUE_FOOTER', 'overlay-dialogue-footer');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_ROW', 'row');
