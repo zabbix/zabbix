@@ -84,7 +84,6 @@ $params = array(
 		'ip' => $search
 	),
 	'limit' => $rows_per_page,
-	'selectGroups' => API_OUTPUT_EXTEND,
 	'selectInterfaces' => API_OUTPUT_EXTEND,
 	'selectItems' => API_OUTPUT_COUNT,
 	'selectTriggers' => API_OUTPUT_COUNT,
@@ -155,8 +154,7 @@ foreach ($hosts as $hnum => $host) {
 
 	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? 'on' : null;
 
-	$group = reset($host['groups']);
-	$link = 'groupid='.$group['groupid'].'&hostid='.$hostid;
+	$link = 'hostid='.$hostid;
 
 	// highlight visible name
 	$visibleName = make_decoration($host['name'], $search);
@@ -217,7 +215,7 @@ foreach ($hosts as $hnum => $host) {
 		$hostCell,
 		$hostip,
 		$hostdns,
-		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$group['groupid'].'&hostids[]='.$hostid),
+		new CLink(_('Latest data'), 'latest.php?filter_set=1&hostids[]='.$hostid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),

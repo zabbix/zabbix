@@ -390,11 +390,12 @@ class CPageFilter {
 		$this->data['groups'] = API::HostGroup()->get($options);
 
 		// select remembered selection
-		if ($groupId === null && $this->_profileIds['groupid']) {
+		if ($groupId === null && $this->config['DDRemember']) {
 			// set group only if host is in group or hostid is not set
 			$host = null;
 			$template = null;
 			if ($hostId) {
+				// Profile ID can contain zero, hence no host will be selected.
 				$host = API::Host()->get(array(
 					'output' => array('hostid'),
 					'hostids' => $hostId,
@@ -414,16 +415,40 @@ class CPageFilter {
 			}
 		}
 
-		// nonexisting or unset $groupid
+		// nonexisting or unset $groupId
 		if ((!isset($this->data['groups'][$groupId]) && $groupId > 0) || $groupId === null) {
 			// for popup select first group in the list
 			if ($this->config['popupDD'] && $this->data['groups']) {
 				reset($this->data['groups']);
 				$groupId = key($this->data['groups']);
 			}
-			// otherwise groupid = 0 for 'Dropdown first entry' option ALL or NONE
+			// Otherwise for 'Dropdown first entry' option ALL or NONE.
 			else {
+				// If no group will be found for host use the default the option ALL (or NONE depending on config).
 				$groupId = 0;
+
+				// For 'Dropdown first entry' option NONE, select the first possible group when the host is given.
+				if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE && $hostId) {
+					$hosts = API::Host()->get(array(
+						'output' => array('hostid'),
+						'selectGroups' => array('groupid'),
+						'hostids' => array($hostId)
+					));
+					$host = reset($hosts);
+					$host_groupids = zbx_objectValues($host['groups'], 'groupid');
+
+					foreach ($host_groupids as $host_groupid) {
+						if (array_key_exists($host_groupid, $this->data['groups'])) {
+							$groupId = $host_groupid;
+							break;
+						}
+					}
+
+					// If host group does not exist in the group list, set it to NONE.
+					if (!array_key_exists($groupId, $this->data['groups'])) {
+						$groupId = 0;
+					}
+				}
 			}
 		}
 
