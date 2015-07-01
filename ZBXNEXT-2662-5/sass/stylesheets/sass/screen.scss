@@ -1594,7 +1594,7 @@ button {
 	}
 }
 
-$icon-buttons: (
+$icon-btn: (
 	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
 	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
 	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
@@ -1606,34 +1606,42 @@ $icon-buttons: (
 
 );
 
-@each $icon-buttons, $bgimage in $icon-buttons {
-    .btn-#{$icon-buttons} {
+@each $icon-btn, $bgimage in $icon-btn {
+    .btn-#{$icon-btn} {
         background: $bgimage;
         @extend %button-icon-size;
     }
 }
 
-$icon-widget-buttons: (
+$icon-widget-btn: (
 	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
 	widget-collapse: url(../img/icon-sprite.svg) no-repeat -3px -652px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
+	wizard-action: url(../img/icon-sprite.svg) no-repeat -10px -622px,
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
 	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
 	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
 	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
 );
 
-@each $icon-widget-buttons, $bgimage in $icon-widget-buttons {
-    .btn-#{$icon-widget-buttons} {
+@each $icon-widget-btn, $bgimage in $icon-widget-btn {
+    .btn-#{$icon-widget-btn} {
         background: $bgimage;
         @extend %btn-widget;
+
+        @if $icon-widget-btn == 'wizard-action' {
+        	height: 12px!important;
+        }
     }
 }
+
+
 
 %btn-widget {
 	border: none;
 	width: 30px;
 	height: 28px;
+	min-height: 0;
 	padding: 0;
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
