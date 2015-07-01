@@ -6,7 +6,7 @@
 		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 	</td>
 	<td>
-		<button type="button" class="button link_menu" name="remove" onclick="removeOpGroupRow('#{groupid}');"><?php echo _('Remove'); ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpGroupRow('#{groupid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -18,7 +18,7 @@
 		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
 	</td>
 	<td>
-		<button type="button" class="button link_menu" name="remove" onclick="removeOpTemplateRow('#{templateid}');"><?php echo _('Remove'); ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpTemplateRow('#{templateid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -31,7 +31,7 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<button type="button" class="button link_menu" name="remove" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');"><?php echo _('Remove'); ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -43,7 +43,7 @@
 		<span>#{fullname}</span>
 	</td>
 	<td>
-		<button type="button" class="button link_menu" name="remove" onclick="removeOpmsgUserRow('#{userid}');"><?php echo _('Remove'); ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUserRow('#{userid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -57,7 +57,7 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<button type="button" class="button link_menu" name="remove" onclick="removeOpCmdRow('#{groupid}', 'groupid');"><?php echo _('Remove'); ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{groupid}', 'groupid');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -71,22 +71,22 @@
 		<span>#{name}</span>
 	</td>
 	<td>
-		<button type="button" class="button link_menu" name="remove" onclick="removeOpCmdRow('#{hostid}', 'hostid');"><?php echo _('Remove'); ?></button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{hostid}', 'hostid');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
 <div id="opcmdEditForm">
-	<table class="objectgroup border_dotted ui-corner-all inlineblock" style="min-width: 310px;">
+	<table class="objectgroup border_dotted inlineblock" style="min-width: 310px;">
 		<tbody>
 		<tr>
-			<td><?php echo _('Target'); ?></td>
+			<td><?= _('Target') ?></td>
 			<td>
 				<select name="opCmdTarget" class="input select">
-					<option value="current"><?php echo CHtml::encode(_('Current host')); ?></option>
-					<option value="host"><?php echo CHtml::encode(_('Host')); ?></option>
-					<option value="hostGroup"><?php echo CHtml::encode(_('Host group')); ?></option>
+					<option value="current"><?= CHtml::encode(_('Current host')) ?></option>
+					<option value="host"><?= CHtml::encode(_('Host')) ?></option>
+					<option value="hostGroup"><?= CHtml::encode(_('Host group')) ?></option>
 				</select>
 			</td>
 			<td style="padding-left: 0;">
@@ -97,8 +97,9 @@
 		</tr>
 		<tr>
 			<td colspan="3">
-				<button type="button" class="button link_menu" name="save">#{operationName}</button>&nbsp;
-				<button type="button" class="button link_menu" name="cancel"><?php echo CHtml::encode(_('Cancel')); ?></button>
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="save">#{operationName}</button>
+				&nbsp;
+				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="cancel"><?= CHtml::encode(_('Cancel')) ?></button>
 			</td>
 		</tr>
 		</tbody>
@@ -109,16 +110,16 @@
 <!-- Script -->
 <script type="text/x-jquery-tmpl" id="operationTypesTPL">
 <tr id="operationTypeScriptElements" class="hidden">
-	<td><?php echo CHtml::encode(_('Execute on')); ?></td>
+	<td><?= CHtml::encode(_('Execute on')) ?></td>
 	<td>
-		<div class="objectgroup inlineblock border_dotted ui-corner-all" id="uniqList">
+		<div class="objectgroup inlineblock border_dotted" id="uniqList">
 			<div>
 				<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
-				<label for="execute_on_agent"><?php echo CHtml::encode(_('Zabbix agent')); ?></label>
+				<label for="execute_on_agent"><?= CHtml::encode(_('Zabbix agent')) ?></label>
 			</div>
 			<div>
 				<input type="radio" id="execute_on_server" name="execute_on" value="1" class="input radio">
-				<label for="execute_on_server"><?php echo CHtml::encode(_('Zabbix server')); ?></label>
+				<label for="execute_on_server"><?= CHtml::encode(_('Zabbix server')) ?></label>
 			</div>
 		</div>
 	</td>
@@ -127,11 +128,11 @@
 
 <script type="text/javascript">
 	var ZBX_SCRIPT_TYPES = {
-		script: <?php echo ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT; ?>,
-		ipmi: <?php echo ZBX_SCRIPT_TYPE_IPMI; ?>,
-		telnet: <?php echo ZBX_SCRIPT_TYPE_TELNET; ?>,
-		ssh: <?php echo ZBX_SCRIPT_TYPE_SSH; ?>,
-		userscript: <?php echo ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT; ?>
+		script: <?= ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT ?>,
+		ipmi: <?= ZBX_SCRIPT_TYPE_IPMI ?>,
+		telnet: <?= ZBX_SCRIPT_TYPE_TELNET ?>,
+		ssh: <?= ZBX_SCRIPT_TYPE_SSH ?>,
+		userscript: <?= ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT ?>
 	};
 
 	/**
@@ -196,7 +197,7 @@
 				case 'groupid':
 					tpl = new Template(jQuery('#opCmdGroupRowTPL').html());
 
-					value.objectCaption = <?php echo CJs::encodeJson(_('Host group').NAME_DELIMITER); ?>;
+					value.objectCaption = <?= CJs::encodeJson(_('Host group').NAME_DELIMITER) ?>;
 
 					container = jQuery('#opCmdListFooter');
 					if (jQuery('#opCmdGroupRow_' + value.groupid).length == 0) {
@@ -208,10 +209,10 @@
 					tpl = new Template(jQuery('#opCmdHostRowTPL').html());
 
 					if (value.hostid.toString() != '0') {
-						value.objectCaption = <?php echo CJs::encodeJson(_('Host').NAME_DELIMITER); ?>;
+						value.objectCaption = <?= CJs::encodeJson(_('Host').NAME_DELIMITER) ?>;
 					}
 					else {
-						value.name = <?php echo CJs::encodeJson(_('Current host')); ?>;
+						value.name = <?= CJs::encodeJson(_('Current host')) ?>;
 					}
 
 					container = jQuery('#opCmdListFooter');
@@ -308,7 +309,7 @@
 		objectTPL.objectid = 0;
 		objectTPL.name = '';
 		objectTPL.target = 'current';
-		objectTPL.operationName = <?php echo CJs::encodeJson(_('Add')); ?>;
+		objectTPL.operationName = <?= CJs::encodeJson(_('Add')) ?>;
 
 		tpl = new Template(jQuery('#opcmdEditFormTPL').html());
 		jQuery('#opCmdList').after(tpl.evaluate(objectTPL));
@@ -335,7 +336,7 @@
 			object.opcommand_grpid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
 			if (empty(values)) {
-				alert(<?php echo CJs::encodeJson(_('You did not specify host group for operation.')); ?>);
+				alert(<?= CJs::encodeJson(_('You did not specify host group for operation.')) ?>);
 
 				return true;
 			}
@@ -368,7 +369,7 @@
 			object.opcommand_hstid = jQuery(objectForm).find('input[name="opCmdId"]').val();
 
 			if (object.target != 'current' && empty(values)) {
-				alert(<?php echo CJs::encodeJson(_('You did not specify host for operation.')); ?>);
+				alert(<?= CJs::encodeJson(_('You did not specify host for operation.')) ?>);
 
 				return true;
 			}
@@ -506,7 +507,7 @@
 	function showOpTypeAuth() {
 		var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
 
-		if (currentOpTypeAuth === <?php echo ITEM_AUTHTYPE_PASSWORD; ?>) {
+		if (currentOpTypeAuth === <?= ITEM_AUTHTYPE_PASSWORD ?>) {
 			jQuery('#operationlist .class_authentication_publickey').toggleClass('hidden', true);
 			jQuery('#new_operation_opcommand_publickey').prop('disabled', true);
 			jQuery('#operationlist .class_authentication_privatekey').toggleClass('hidden', true);
@@ -529,7 +530,7 @@
 	}
 
 	function processTypeOfCalculation() {
-		if(jQuery('#evaltype').val() == <?php echo CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+		if(jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
 			jQuery('#conditionLabel').hide();
 			jQuery('#formula').show();
 		}
@@ -627,7 +628,7 @@
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
-			jQuery('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
+			jQuery('#update').button('option', 'label', <?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
 			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/;

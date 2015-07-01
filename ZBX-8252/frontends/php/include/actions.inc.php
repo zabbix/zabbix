@@ -1117,16 +1117,16 @@ function getActionMessages(array $alerts) {
 		'preservekeys' => true
 	]);
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		_('Time'),
-		_('Type'),
-		_('Status'),
-		_('Retries left'),
-		_('Recipient(s)'),
-		_('Message'),
-		_('Info')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Time'),
+			_('Type'),
+			_('Status'),
+			_('Retries left'),
+			_('Recipient(s)'),
+			_('Message'),
+			_('Info')
+		]);
 
 	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
@@ -1149,16 +1149,16 @@ function getActionMessages(array $alerts) {
 		}
 
 		if ($alert['status'] == ALERT_STATUS_SENT) {
-			$status = new CSpan(_('sent'), ZBX_STYLE_GREEN);
-			$retries = new CSpan(SPACE, ZBX_STYLE_GREEN);
+			$status = (new CSpan(_('sent')))->addClass(ZBX_STYLE_GREEN);
+			$retries = (new CSpan(SPACE))->addClass(ZBX_STYLE_GREEN);
 		}
 		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
-			$retries = new CSpan(ALERT_MAX_RETRIES - $alert['retries'], ZBX_STYLE_ORANGE);
+			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
+			$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_ORANGE);
 		}
 		else {
-			$status = new CSpan(_('not sent'), ZBX_STYLE_RED);
-			$retries = new CSpan(0, ZBX_STYLE_RED);
+			$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
+			$retries = (new CSpan('0'))->addClass(ZBX_STYLE_RED);
 		}
 
 		$recipient = $alert['userid']
@@ -1180,8 +1180,7 @@ function getActionMessages(array $alerts) {
 			$info = '';
 		}
 		else {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($alert['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($alert['error']);
 		}
 
 		$table->addRow([
@@ -1213,13 +1212,13 @@ function getActionMessages(array $alerts) {
  * @return CTableInfo
  */
 function getActionCommands(array $alerts) {
-	$table = new CTableInfo();
-	$table->setHeader([
-		_('Time'),
-		_('Status'),
-		_('Command'),
-		_('Error')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Time'),
+			_('Status'),
+			_('Command'),
+			_('Error')
+		]);
 
 	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_COMMAND) {
@@ -1241,19 +1240,21 @@ function getActionCommands(array $alerts) {
 
 		switch ($alert['status']) {
 			case ALERT_STATUS_SENT:
-				$status = new CSpan(_('executed'), ZBX_STYLE_GREEN);
+				$status = (new CSpan(_('executed')))->addClass(ZBX_STYLE_GREEN);
 				break;
 
 			case ALERT_STATUS_NOT_SENT:
-				$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
+				$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
 				break;
 
 			default:
-				$status = new CSpan(_('not sent'), ZBX_STYLE_RED);
+				$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
 				break;
 		}
 
-		$error = $alert['error'] ? new CSpan($alert['error'], ZBX_STYLE_RED) : new CSpan(SPACE, ZBX_STYLE_GREEN);
+		$error = $alert['error']
+			? (new CSpan($alert['error']))->addClass(ZBX_STYLE_RED)
+			: (new CSpan(SPACE))->addClass(ZBX_STYLE_GREEN);
 
 		$table->addRow([
 			new CCol($time),
@@ -1267,12 +1268,12 @@ function getActionCommands(array $alerts) {
 }
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
-	$tab_hint = new CTableInfo();
-	$tab_hint->setHeader([
-		_('User'),
-		_('Details'),
-		_('Status')
-	]);
+	$tab_hint = (new CTableInfo())
+		->setHeader([
+			_('User'),
+			_('Details'),
+			_('Status')
+		]);
 
 	$sql = 'SELECT a.alertid,mt.description,u.alias,u.name,u.surname,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
 			' FROM events e,alerts a'.
@@ -1287,13 +1288,13 @@ function get_actions_hint_by_eventid($eventid, $status = null) {
 
 	while ($row = DBfetch($result)) {
 		if ($row['status'] == ALERT_STATUS_SENT) {
-			$status = new CSpan(_('Sent'), ZBX_STYLE_GREEN);
+			$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
 		}
 		elseif ($row['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
+			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
 		}
 		else {
-			$status = new CSpan(_('not sent'), ZBX_STYLE_RED);
+			$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
 		}
 
 		switch ($row['alerttype']) {
@@ -1372,26 +1373,33 @@ function getEventActionsStatus($eventIds) {
 
 		// display
 		if ($notSendCount > 0) {
-			$status = new CSpan(_('In progress'), ZBX_STYLE_ORANGE);
+			$status = (new CSpan(_('In progress')))-addClass(ZBX_STYLE_ORANGE);
 		}
 		elseif ($mixed == ALERT_STATUS_SENT) {
-			$status = new CSpan(_('Ok'), ZBX_STYLE_GREEN);
+			$status = (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
 		}
 		elseif ($mixed == ALERT_STATUS_FAILED) {
-			$status = new CSpan(_('Failed'), ZBX_STYLE_RED);
+			$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
 		}
 		else {
-			$columnLeft = (new CCol(($sendCount > 0) ? new CSpan($sendCount, ZBX_STYLE_GREEN) : SPACE))->
-				setAttribute('width', '10');
+			$columnLeft = (new CCol(($sendCount > 0)
+				? (new CSpan($sendCount))->addClass(ZBX_STYLE_GREEN)
+				: SPACE)
+			)
+				->setAttribute('width', '10');
 
-			$columnRight = (new CCol(($failedCount > 0) ? new CSpan($failedCount, ZBX_STYLE_RED) : SPACE))->
-				setAttribute('width', '10');
+			$columnRight = (new CCol(($failedCount > 0)
+				? (new CSpan($failedCount))->addClass(ZBX_STYLE_RED)
+				: SPACE)
+			)
+				->setAttribute('width', '10');
 
 			$status = new CRow([$columnLeft, $columnRight]);
 		}
 
-		$actions[$eventId] = new CTable(' - ');
-		$actions[$eventId]->addRow($status);
+		$actions[$eventId] = (new CTable())
+			->setNoDataMessage(' - ')
+			->addRow($status);
 	}
 
 	return $actions;
@@ -1424,8 +1432,10 @@ function getEventActionsStatHints($eventIds) {
 				$style = ZBX_STYLE_RED;
 			}
 
-			$hint = new CSpan($alert['cnt'], ZBX_STYLE_LINK_ACTION.' '.$style);
-			$hint->setHint(get_actions_hint_by_eventid($alert['eventid'], $alert['status']));
+			$hint = (new CSpan($alert['cnt']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass($style)
+				->setHint(get_actions_hint_by_eventid($alert['eventid'], $alert['status']));
 
 			$actions[$alert['eventid']][$alert['status']] = $hint;
 		}

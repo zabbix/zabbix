@@ -13,6 +13,8 @@
         <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
         <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileColor" content="#d40000">
 	</head>
 <body>
 	<header role="banner">
@@ -197,7 +199,7 @@
 	</ul>
 
 	<div class="overlay-dialogue" style="top: 520px; left: 700px">
-	<span class="overlay-close-btn">&times;</span>
+	<span class="overlay-close-btn"></span>
 		<table class="list-table">
 		<thead>
 		<tr>
@@ -228,10 +230,9 @@
 	<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
 
 	<div id="" class="overlay-dialogue notifications" style="top: 128px; right: 13px">
-	<span class="overlay-close-btn">&times;</span>
+	<span class="overlay-close-btn"></span>
 	<div class="dashbrd-widget-head">
-	<h4>Notifications</h4><ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
-
+	<!--<h4>Notifications</h4>--><ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><!--<li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li>--><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><!--<li><button type="button" class="btn-sound-off" title="Sound off"></button></li>--></ul></div>
 	<table class="list-table">
 	<tr>
 	<td class="disaster-bg"></td>
@@ -277,8 +278,19 @@
 	</tr>
 	</table>
 	</div>
-<!--
-<div id="zbx_messages" class="messagecontainer ui-draggable" style="opacity: 0.9; top: 104px;"><div class="header"><h3 class="headertext move">Messages</h3><div class="controls"><ul class="" style="float: right;"><li class="linear"><div title="Snooze" class="iconsnooze menu_icon shadow"></div></li><li class="linear"><div title="Mute/Unmute" class="iconsound menu_icon shadow"></div></li><li class="linear"><div title="Clear" class="iconclose menu_icon shadow"></div></li></ul></div></div><ul class=""><li class="listItem"><div class="message" style="background-color: rgb(170, 255, 170);"><div class="messagebox"><span class="title">Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></span><br><span class="body">Details: <a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></span><br><span class="body">Date: <b><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></b></span></div></div></li></ul></div>
--->
+
+<div style="top: 106px; left: 1300px; z-index: 100;" class="overlay-dialogue"><span class="overlay-close-btn"></span>
+<table class="list-table">
+<tr><td class="normal-bg">&nbsp;</td><td>Ok</td></tr>
+<tr><td class="na-bg">Not classified</td><td>Problem</td></tr>
+<tr><td class="info-bg">Information</td><td>Problem</td></tr>
+<tr><td class="warning-bg">Warning</td><td>Problem</td></tr>
+<tr><td class="average-bg">Average</td><td>Problem</td></tr>
+<tr><td class="high-bg">High</td><td>Problem</td></tr>
+<tr><td class="disaster-bg">Disaster</td><td>Problem</td></tr>
+<tr><td><table style="visibility: visible; margin: -8px -10px" class="blink overview-mon-severities"><tr><td class="normal">&nbsp;</td><td class="na-bg">&nbsp;</td><td class="info-bg">&nbsp;</td><td class="warning-bg">&nbsp;</td><td class="average-bg">&nbsp;</td><td class="high-bg">&nbsp;</td><td class="disaster-bg">&nbsp;</td></tr></table></td><td>Age less than 30m</td></tr><tr><td>&nbsp;</td><td>No trigger</td></tr>
+</table>
+</div>
+
 </body>
 </html>

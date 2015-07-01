@@ -1358,7 +1358,7 @@ function zbx_str2links($text) {
 	$start = 0;
 	foreach ($matches[0] as $match) {
 		$result[] = mb_substr($text, $start, $match[1] - $start);
-		$result[] = new CLink($match[0], $match[0], null, null, true);
+		$result[] = (new CLink($match[0], $match[0]))->removeSID();
 		$start = $match[1] + mb_strlen($match[0]);
 	}
 	$result[] = mb_substr($text, $start, mb_strlen($text));
@@ -1394,10 +1394,10 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$arrow = null;
 	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$arrow = new CSpan(null, 'arrow-down');
+			$arrow = (new CSpan())->addClass('arrow-down');
 		}
 		else {
-			$arrow = new CSpan(null, 'arrow-up');
+			$arrow = (new CSpan())->addClass('arrow-up');
 		}
 	}
 
@@ -1510,30 +1510,34 @@ function getPagingLine(&$items, $sortorder) {
 	$url = CUrlFactory::getContextUrl();
 	if ($startPage > 1) {
 		$url->setArgument('page', 1);
-		$tags[] = new CLink(_('First'), $url->getUrl(), null, null, true);
+		$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
 	}
 
 	if ($currentPage > 1) {
 		$url->setArgument('page', $currentPage - 1);
-		$tags[] = new CLink(new CSpan(null, 'arrow-left'), $url->getUrl(), null, null, true);
+		$tags[] = (new CLink(
+			(new CSpan())->addClass('arrow-left'), $url->getUrl()
+		))->removeSID();
 	}
 
 	for ($p = $startPage; $p <= $endPage; $p++) {
 		$url->setArgument('page', $p);
-		$tags[] = new CLink($p, $url->getUrl(), $p == $currentPage ? 'paging-selected' : null, null, true);
+		$tags[] = (new CLink($p, $url->getUrl()))
+			->addClass($p == $currentPage ? 'paging-selected' : null)
+			->removeSID();
 	}
 
 	if ($currentPage < $pagesCount) {
 		$url->setArgument('page', $currentPage + 1);
-		$tags[] = new CLink(new CSpan(null, 'arrow-right'), $url->getUrl(), null, null, true);
+		$tags[] = (new CLink((new CSpan())->addClass('arrow-right'), $url->getUrl()))->removeSID();
 	}
 
 	if ($p < $pagesCount) {
 		$url->setArgument('page', $pagesCount);
-		$tags[] = new CLink(_('Last'), $url->getUrl(), null, null, true);
+		$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
 	}
 
-	return new CDiv($tags, 'table-paging');
+	return (new CDiv($tags))->addClass('table-paging');
 }
 
 /************* MATH *************/
@@ -1634,13 +1638,11 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
-				$data['buttons'][] = new CButton('login', _('Login'),
-					'javascript: document.location = "index.php?request='.$url.'";', 'button'
-				);
+				$data['buttons'][] = (new CButton('login', _('Login')))
+					->onClick('javascript: document.location = "index.php?request='.$url.'";');
 			}
-			$data['buttons'][] = new CButton('back', _('Go to dashboard'),
-				'javascript: document.location = "zabbix.php?action=dashboard.view"', 'button'
-			);
+			$data['buttons'][] = (new CButton('back', _('Go to dashboard')))
+				->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"');
 		}
 		// if the user is not logged in - offer to login
 		else {
@@ -1651,10 +1653,12 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
 				],
 				'buttons' => [
-					new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'button')
+					(new CButton('login', _('Login')))->onClick('javascript: document.location = "index.php?request='.$url.'";')
 				]
 			];
 		}
+
+		$data['theme'] = getUserTheme(CWebUser::$data);
 
 		(new CView('general.warning', $data))->render();
 		exit;
@@ -1686,20 +1690,27 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 
 function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
 {
-	$msg_box = new CDiv($title, $good ? 'msg-good' : 'msg-bad', $show_close_box ? 'global-message' : null);
+	$msg_box = (new CDiv($title))
+		->addClass($good ? 'msg-good' : 'msg-bad');
+
+	if ($show_close_box) {
+		$msg_box->setId('global-message');
+	}
 
 	if ($messages) {
-		$msg_details = new CDiv(null, 'msg-details');
+		$msg_details = (new CDiv())->addClass('msg-details');
 
 		if ($title !== null) {
-			$link = new CLink(_('Details'), null, ZBX_STYLE_LINK_ACTION, null, true);
-			$link->setAttribute('onclick', 'javascript: showHide("msg-messages", IE ? "block" : "");');
+			$link = (new CLink(_('Details')))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->removeSID()
+				->onClick('javascript: showHide("msg-messages", IE ? "block" : "");');
 			$msg_details->addItem($link);
 		}
 
 		$list = new CList();
 		if ($title !== null) {
-			$list->setAttribute('id', 'msg-messages');
+			$list->setId('msg-messages');
 
 			if (!$show_details) {
 				$list->setAttribute('style', 'display: none;');
@@ -1714,10 +1725,10 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	}
 
 	if ($title !== null && $show_close_box) {
-		$close = new CLink('×', null, 'overlay-close-btn', null, true);
-		$close->setAttribute('onclick', 'javascript: showHide("global-message", IE ? "block" : "");');
-		$close->setAttribute('title', _('Close'));
-		$msg_box->addItem($close);
+		$msg_box->addItem((new CSpan())
+			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
+			->onClick('javascript: showHide("global-message", IE ? "block" : "");')
+			->setAttribute('title', _('Close')));
 	}
 
 	return $msg_box;

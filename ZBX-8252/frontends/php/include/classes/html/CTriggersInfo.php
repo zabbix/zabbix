@@ -21,22 +21,19 @@
 
 class CTriggersInfo extends CTable {
 
-	public $style;
+	private $style = STYLE_HORIZONTAL;
 	private $groupid;
-	private $hostid;
 
-	public function __construct($groupid = null, $hostid = null, $style = STYLE_HORIZONTAL) {
-		$this->style = null;
-
+	public function __construct($groupid) {
 		parent::__construct();
+
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
-		$this->setOrientation($style);
-		$this->groupid = is_null($groupid) ? 0 : $groupid;
-		$this->hostid = is_null($hostid) ? 0 : $hostid;
+		$this->groupid = $groupid;
 	}
 
 	public function setOrientation($value) {
 		$this->style = $value;
+		return $this;
 	}
 
 	public function bodyToString() {
@@ -51,15 +48,12 @@ class CTriggersInfo extends CTable {
 		$triggersOkState = 0;
 
 		$options = [
+			'output' => ['triggerid'],
 			'monitored' => true,
-			'skipDependent' => true,
-			'output' => ['triggerid']
+			'skipDependent' => true
 		];
 
-		if ($this->hostid > 0) {
-			$options['hostids'] = $this->hostid;
-		}
-		elseif ($this->groupid > 0) {
+		if ($this->groupid != 0) {
 			$options['groupids'] = $this->groupid;
 		}
 		$triggers = API::Trigger()->get($options);
@@ -98,7 +92,7 @@ class CTriggersInfo extends CTable {
 			);
 		}
 
-		if (STYLE_HORIZONTAL == $this->style) {
+		if ($this->style == STYLE_HORIZONTAL) {
 			$this->addRow($severityCells);
 		}
 		else {

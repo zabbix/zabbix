@@ -713,8 +713,9 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		foreach ($hostNames as $hostId => $hostName) {
 			$host = $hosts[$hostId];
 
-			$name = new CSpan($host['name'], ZBX_STYLE_LINK_ACTION.' link_menu');
-			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
+			$name = (new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
 			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $ithosts) {
@@ -749,7 +750,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	}
 
 	if ($value != UNKNOWN_VALUE) {
-		$value = new CSpan($value, 'link');
+		$value = (new CSpan($value))->addClass('link');
 	}
 
 	$column = (new CCol([$value, $ack]))->addClass($css);
