@@ -134,7 +134,7 @@ h3 {
 
 h4 {
 	font-size: $font-h4-size;
-	color: lighten($font-color, 13%);
+	color: lighten($font-color, 15%);
 	line-height: $h4-line-height;
 
 	span {
@@ -297,9 +297,9 @@ ul.top-nav-icons {
 
 	a {
 		display: block;
-		width: 38px;
-		height: 36px;
-		line-height: 36px;
+		width: 3.4545454545454546em;//38px;
+		height: 3.272727272727273em;//36px;
+		line-height: 3.272727272727273em;//36px;
 		color: $white;
 		font-size: $font-h3-size;
 		text-decoration: none;
@@ -316,20 +316,24 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		background: url(../img/icon-sprite.svg) no-repeat 1px -36px;
+		background: url(../img/icon-sprite.svg) no-repeat 0.09090909090909091em -3.272727272727273em;//1px -36px;
+		background-size: 10.363636363636363em 81.27272727272728em;
 	}
 
 	.top-nav-profile {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -108px;
+		background-size: 10.363636363636363em 81.27272727272728em;
 	}
 
 	.top-nav-signout {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -144px;
+		background-size: 10.363636363636363em 81.27272727272728em;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
+		background-size: 10.363636363636363em 81.27272727272728em;
 	    width: auto;
 		padding: 0 12px 0 27px;
 	}
@@ -1631,7 +1635,6 @@ $icon-widget-buttons: (
 	width: 30px;
 	height: 28px;
 	padding: 0;
-	background-color: $ui-bg-color;
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
 
@@ -1696,7 +1699,7 @@ $icon-widget-buttons: (
 }
 
 %btn-widget-hover-active {
-	background-color: $ui-bg-color;
+	background-color: $transparent;
 	@include opacity(1);
 }
 
