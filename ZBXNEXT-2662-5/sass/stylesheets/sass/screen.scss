@@ -2902,18 +2902,3 @@ $browsers: (
 	padding: 10px 0 0 0;
 	text-align: center;
 }
-
-.loader {
-  margin: 0 auto;
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  border: 2px solid #ccd5d9;
-  border-bottom: 2px solid #0275b8;
-  animation: load 0.5s infinite linear;
-}
-
-@keyframes load {
-  to { transform: rotate(360deg); }
-}
-
