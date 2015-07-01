@@ -362,8 +362,7 @@ footer, .footer {
   height: 25px;
   margin: 0 auto;
   margin-bottom: 10px;
-  background: url(../img/icon-sprite.svg) no-repeat 0 -712px;
-  background-size: 94px; }
+  background: url(../img/icon-sprite.png) no-repeat 0 -360px; }
 
 /* Tables */
 .list-table {
@@ -765,7 +764,7 @@ footer, .footer {
   .icon .center {
     width: 22px;
     height: 22px;
-    background: url(../img/icon-sprite.svg) no-repeat -4px -799px;
+    background: url(../img/icon-sprite.png) no-repeat center -121px;
     margin: 0 auto; }
 
 .ghost {
@@ -1092,7 +1091,7 @@ button {
   background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -223px; }
 
 .btn-min {
-  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -259px; }
+  background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -263px; }
 
 .btn-add-fav {
   background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -295px; }
@@ -1110,25 +1109,25 @@ button {
   background: #69808d url(../img/icon-sprite.svg) no-repeat -7px -439px; }
 
 .btn-widget-action {
-  background: url(../img/icon-sprite.svg) no-repeat -2px -616px; }
+  background: url(../img/icon-sprite.svg) no-repeat -3px -616px; }
 
 .btn-widget-collapse {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -652px; }
+  background: url(../img/icon-sprite.svg) no-repeat -4px -652px; }
 
 .btn-widget-expand {
-  background: url(../img/icon-sprite.svg) no-repeat -5px -688px; }
+  background: url(../img/icon-sprite.png) no-repeat 2px -238px; }
 
 .btn-alarm-on {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -545px; }
+  background: url(../img/icon-sprite.png) no-repeat -45px -191px; }
 
 .btn-alarm-off {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -581px; }
+  background: url(../img/icon-sprite.png) no-repeat -45px -239px; }
 
 .btn-sound-on {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -473px; }
+  background: url(../img/icon-sprite.png) no-repeat -45px -216px; }
 
 .btn-sound-off {
-  background: url(../img/icon-sprite.svg) no-repeat -3px -509px; }
+  background: url(../img/icon-sprite.png) no-repeat -45px -264px; }
 
 .btn-widget-action, .btn-widget-collapse, .btn-widget-expand, .btn-alarm-on, .btn-alarm-off, .btn-sound-on, .btn-sound-off {
   border: none;
@@ -1228,7 +1227,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   display: inline-block; }
 
 .help-icon {
-  background: url(../img/icon-sprite.svg) no-repeat -6px -726px;
+  background: url(../img/icon-sprite.png) no-repeat 0 -312px;
   display: block;
   position: absolute;
   top: 0;
@@ -1246,7 +1245,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 .drag-icon {
   margin-left: -9px;
   cursor: move;
-  background: url(../img/icon-sprite.svg) no-repeat -6px -762px; }
+  background: url(../img/icon-sprite.png) no-repeat 0 -288px; }
 
 /* Sign in, Installation */
 .setup-container {
@@ -1359,7 +1358,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   margin-bottom: 25px;
   width: 114px;
   height: 30px;
-  background: url(../img/icon-sprite.svg) no-repeat 0 -864px; }
+  background: url(../img/icon-sprite.png) no-repeat 0 -391px; }
 
 .signin-links {
   width: 100%;
@@ -1457,7 +1456,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
     .action-menu .action-menu-item:active {
       background-color: #454545; }
     .action-menu .action-menu-item.selected {
-      background: url(../img/icon-sprite.svg) no-repeat -5px -835px; }
+      background: url(../img/icon-sprite.png) no-repeat -46px -169px; }
       .action-menu .action-menu-item.selected:hover {
         background-color: #454545; }
       .action-menu .action-menu-item.selected:active {
