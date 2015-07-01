@@ -22,7 +22,7 @@
 class CArea extends CTag {
 
 	public function __construct($coords, $href, $alt, $shape) {
-		parent::__construct('area', 'no');
+		parent::__construct('area');
 		$this->setCoords($coords);
 		$this->setShape($shape);
 		$this->setHref($href);
@@ -45,26 +45,21 @@ class CArea extends CTag {
 			$str_val .= $val.',';
 		}
 		$this->setAttribute('coords', trim($str_val, ','));
+		return $this;
 	}
 
 	public function setShape($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for setShape "'.$value.'".');
-		}
 		$this->setAttribute('shape', $value);
+		return $this;
 	}
 
 	public function setHref($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for setHref "'.$value.'".');
-		}
 		$this->setAttribute('href', $value);
+		return $this;
 	}
 
 	public function setAlt($value) {
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for setAlt "'.$value.'".');
-		}
 		$this->setAttribute('alt', $value);
+		return $this;
 	}
 }

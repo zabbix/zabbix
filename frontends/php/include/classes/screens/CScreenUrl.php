@@ -34,7 +34,7 @@ class CScreenUrl extends CScreenBase {
 			);
 		}
 		elseif ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid == 0) {
-			return $this->getOutput(new CTableInfo(_('No host selected.')));
+			return $this->getOutput((new CTableInfo())->setNoDataMessage(_('No host selected.')));
 		}
 
 		$resolveHostMacros = ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen);

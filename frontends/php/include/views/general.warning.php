@@ -18,18 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-$pageHeader = new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']');
-$pageHeader->addCssInit();
-$pageHeader->display();
+$pageHeader = (new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']'))
+	->addCssFile('styles/'.CHtml::encode($data['theme']).'.css')
+	->display();
 
 $buttons = array_key_exists('buttons', $data)
 	? $data['buttons']
-	: [new CButton(null, _('Retry'), 'document.location.reload();')];
+	: [(new CButton(null, _('Retry')))->onClick('document.location.reload();')];
 
 echo '<body>';
 
-(new CDiv(new CWarning($data['header'], $data['messages'], $buttons), ZBX_STYLE_ARTICLE))->show();
+(new CDiv(new CWarning($data['header'], $data['messages'], $buttons)))
+	->addClass(ZBX_STYLE_ARTICLE)
+	->show();
 
 echo get_js("setTimeout('document.location.reload();', 30000);");
 echo '</body>';

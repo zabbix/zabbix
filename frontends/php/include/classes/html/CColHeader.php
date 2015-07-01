@@ -22,19 +22,17 @@
 class CColHeader extends CTag {
 
 	public function __construct($item = null) {
-		parent::__construct('th', 'yes');
+		parent::__construct('th', true);
 		$this->addItem($item);
-	}
-
-	public function setAlign($value) {
-		$this->setAttribute('align', $value);
 	}
 
 	public function setColSpan($value) {
 		$this->setAttribute('colspan', $value);
+		return $this;
 	}
 
 	public function setWidth($value) {
 		$this->setAttribute('width', $value);
+		return $this;
 	}
 }

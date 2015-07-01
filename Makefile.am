@@ -61,9 +61,9 @@ gettext:
 	frontends/php/locale/make_mo.sh
 
 css:
-	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/styles/zabbix.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/styles/blue-theme.css
 	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
-	cp frontends/php/styles/zabbix.css sass/stylesheets/screen.css
+	cp frontends/php/styles/blue-theme.css sass/stylesheets/screen.css
 	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
 	cp sass/img/icon-sprite.png frontends/php/img/
 	cp sass/img/browser-sprite.png frontends/php/img/

@@ -311,20 +311,20 @@ else {
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1
 		]);
-		$applicationIds = zbx_objectValues($applications, 'applicationid');
+		$applicationids = zbx_objectValues($applications, 'applicationid');
 
 		// get applications
 		$data['applications'] = API::Application()->get([
-			'applicationids' => $applicationIds,
 			'output' => API_OUTPUT_EXTEND,
+			'selectHost' => ['hostid', 'name'],
 			'selectItems' => ['itemid'],
-			'selectHost' => ['hostid', 'name']
+			'applicationids' => $applicationids
 		]);
 
 		order_result($data['applications'], $sortField, $sortOrder);
 
 		// fetch template application source parents
-		$applicationSourceParentIds = getApplicationSourceParentIds($applicationIds);
+		$applicationSourceParentIds = getApplicationSourceParentIds($applicationids);
 		$parentAppIds = [];
 
 		foreach ($applicationSourceParentIds as $applicationParentIds) {

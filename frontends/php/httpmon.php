@@ -71,27 +71,26 @@ $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-$r_form = new CForm('get');
-$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
-
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
-$controls->addItem([_('Host').SPACE, $pageFilter->getHostsCB()]);
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]));
-
-$r_form->addItem($controls);
-
-$httpmon_wdgt = (new CWidget())->setTitle(_('Web monitoring'))->setControls($r_form);
+$widget = (new CWidget())
+	->setTitle(_('Web monitoring'))
+	->setControls((new CForm('get'))
+		->addVar('fullscreen', $_REQUEST['fullscreen'])
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()])
+			->addItem([_('Host'), SPACE, $pageFilter->getHostsCB()])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+		)
+	);
 
 // TABLE
-$table = new CTableInfo();
-$table->SetHeader([
-	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
-	make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
-	_('Number of steps'),
-	_('Last check'),
-	_('Status')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		_('Number of steps'),
+		_('Last check'),
+		_('Status')
+	]);
 $paging = null;
 
 
@@ -167,20 +166,21 @@ if ($pageFilter->hostsSelected) {
 		}
 		// no history data exists
 		else {
-			$lastcheck = new CSpan(_('Never'), ZBX_STYLE_RED);
+			$lastcheck = (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED);
 			$status['msg'] = _('Unknown');
 			$status['style'] = ZBX_STYLE_GREY;
 		}
 
-		$cpsan = new CSpan($httpTest['hostname'],
-			($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
-		);
+		$cpsan = new CSpan($httpTest['hostname']);
+		if ($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) {
+			$cpsan->addClass('not-monitored');
+		};
 		$table->addRow(new CRow([
 			($_REQUEST['hostid'] > 0) ? null : $cpsan,
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],
 			$lastcheck,
-			new CSpan($status['msg'], $status['style'])
+			(new CSpan($status['msg']))->addClass($status['style'])
 		]));
 	}
 }
@@ -189,7 +189,7 @@ else {
 	getPagingLine($tmp, $sortOrder);
 }
 
-$httpmon_wdgt->addItem([$table, $paging])->show();
+$widget->addItem([$table, $paging])->show();
 
 
 require_once dirname(__FILE__).'/include/page_footer.php';

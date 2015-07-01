@@ -1,14 +1,14 @@
 <script type="text/x-jquery-tmpl" id="macroRow">
 	<tr class="form_row">
 		<td>
-			<input class="input text macro" type="text" id="macros_#{rowNum}_macro" name="macros[#{rowNum}][macro]" size="30" maxlength="64" placeholder="{$MACRO}">
+			<input class="input text macro" type="text" id="macros_#{rowNum}_macro" name="macros[#{rowNum}][macro]" style="width: <?= ZBX_TEXTAREA_MACRO_WIDTH ?>px" maxlength="64" placeholder="{$MACRO}">
 		</td>
 		<td>&rArr;</td>
 		<td>
-			<input class="input text" type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" size="40" maxlength="255" placeholder="<?= _('value') ?>">
+			<input class="input text" type="text" id="macros_#{rowNum}_value" name="macros[#{rowNum}][value]" style="width: <?= ZBX_TEXTAREA_MACRO_VALUE_WIDTH ?>px" maxlength="255" placeholder="<?= _('value') ?>">
 		</td>
 		<td>
-			<button class="button link_menu element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?= _('Remove') ?></button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove" type="button" id="macros_#{rowNum}_remove" name="macros[#{rowNum}][remove]"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>
