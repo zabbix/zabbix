@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="screenRowTPL">
 <tr class="sortable" id="slides_#{rowId}">
-	<td class='td-drag-icon'>
-		<div class="drag-icon"></div>
+	<td class="<?= ZBX_STYLE_TD_DRAG_ICON ?>">
+		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
 		<input id="slides_#{rowId}_screenid" name="slides[#{rowId}][screenid]" type="hidden" value="#{screenid}" />
 		<input id="slides_#{rowId}_slideid" name="slides[#{rowId}][slideid]" type="hidden" value="" />
 	</td>
@@ -10,14 +10,10 @@
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]"
-			placeholder="<?php echo CHtml::encode(_('default')); ?>" value="" size="5" maxlength="5"
-			onchange="validateNumericBox(this, true, false);" style="text-align: right;">
+		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?= CHtml::encode(_('default')); ?>" value="" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right; width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px">
 	</td>
 	<td>
-		<button type="button" class="button link_menu" id="remove_#{rowId}" remove_slide="#{rowId}" onclick="removeSlide(this);">
-			<?php echo _('Remove') ?>
-		</button>
+		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="remove_#{rowId}" remove_slide="#{rowId}" onclick="removeSlide(this);"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -132,7 +128,7 @@
 			items: 'tbody tr.sortable',
 			axis: 'y',
 			cursor: 'move',
-			handle: 'div.drag-icon',
+			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			tolerance: 'pointer',
 			opacity: 0.6,
 			update: recalculateSortOrder,

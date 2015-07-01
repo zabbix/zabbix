@@ -379,7 +379,9 @@ var hintBox = {
 		}
 
 		if (isStatic) {
-			var close_link = jQuery('<span class="overlay-close-btn">×</a>')
+			var close_link = jQuery('<span>', {
+					'class': 'overlay-close-btn'}
+				)
 				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
@@ -562,7 +564,7 @@ function create_color_picker() {
 	}
 
 	color_picker = document.createElement('div');
-	color_picker.setAttribute('id', 'color_picker');
+	color_picker.setAttribute('class', 'overlay-dialogue');
 	color_picker.innerHTML = color_table;
 	document.body.appendChild(color_picker);
 	hide_color_picker();
@@ -613,30 +615,16 @@ function rm4favorites(object, objectid) {
 /**
  * Toggles filter state and updates title and icons accordingly.
  *
- * @param {int} 	id					Id of filter in DOM
- * @param {string} 	titleWhenVisible	Title to set when filter is visible
- * @param {string} 	titleWhenHidden		Title to set when filter is collapsed
+ * @param {idx} 	idx					User profile index
+ * @param {int} 	value_int			Integer value
  */
-function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
-	var state = showHide(id);
-
-	switchElementClass('flicker_icon_l', 'dbl_arrow_up', 'dbl_arrow_down');
-	switchElementClass('flicker_icon_r', 'dbl_arrow_up', 'dbl_arrow_down');
-
-	var title = state ? titleWhenVisible : titleWhenHidden;
-
-	jQuery('#flicker_title').html(title);
-
-	sendAjaxData(location.href, {
+function updateUserProfile(idx, value_int) {
+	sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
-			filterState: state
+			idx: idx,
+			value_int: value_int
 		}
 	});
-
-	// resize multiselects in the flicker
-	if (jQuery('.multiselect').length > 0 && state == 1) {
-		jQuery('.multiselect', jQuery('#' + id)).multiSelect('resize');
-	}
 }
 
 function changeWidgetState(obj, widgetId) {

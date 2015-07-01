@@ -440,6 +440,12 @@ else {
 	]);
 	order_result($data['groups'], $sortField, $sortOrder);
 
+	foreach ($data['groups'] as &$group) {
+		order_result($group['hosts'], 'name');
+		order_result($group['templates'], 'name');
+	}
+	unset($group);
+
 	// render view
 	$hostgroupView = new CView('configuration.hostgroups.list', $data);
 	$hostgroupView->render();

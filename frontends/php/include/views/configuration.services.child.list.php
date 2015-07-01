@@ -24,33 +24,33 @@ include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 $servicesChildWidget = (new CWidget())->setTitle(_('IT service dependencies'));
 
 // create form
-$servicesChildForm = new CForm();
-$servicesChildForm->setName('servicesForm');
+$servicesChildForm = (new CForm())->setName('servicesForm');
 if (!empty($this->data['service'])) {
 	$servicesChildForm->addVar('serviceid', $this->data['service']['serviceid']);
 }
 
 // create table
-$servicesChildTable = new CTableInfo();
-$servicesChildTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');")))->
-		addClass('cell-width'),
-	_('Service'),
-	_('Status calculation'),
-	_('Trigger')
-]);
+$servicesChildTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_services'))->onClick("javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Service'),
+		_('Status calculation'),
+		_('Trigger')
+	]);
 
 $prefix = null;
 foreach ($this->data['db_cservices'] as $service) {
-	$description = (new CLink($service['name'], '#', 'service-name'))->
-		setAttribute('id', 'service-name-'.$service['serviceid'])->
-		setAttribute('data-name', $service['name'])->
-		setAttribute('data-serviceid', $service['serviceid'])->
-		setAttribute('data-trigger', $service['trigger']);
+	$description = (new CLink($service['name'], '#'))
+		->addClass('service-name')
+		->setId('service-name-'.$service['serviceid'])
+		->setAttribute('data-name', $service['name'])
+		->setAttribute('data-serviceid', $service['serviceid'])
+		->setAttribute('data-trigger', $service['trigger']);
 
-	$cb = new CCheckBox('services['.$service['serviceid'].']', null, null, $service['serviceid']);
-	$cb->addClass('service-select');
+	$cb = (new CCheckBox('services['.$service['serviceid'].']', $service['serviceid']))
+		->addClass('service-select');
 
 	$servicesChildTable->addRow([
 		$cb,

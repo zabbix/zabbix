@@ -68,6 +68,8 @@ class CRowTest extends CTagTest {
 	}
 
 	public function createTag($items = null, $class = null, $id = null) {
-		return new CRow($items, $class, $id);
+		return (new CRow($items))
+			->addClass($class)
+			->setId($id);
 	}
 }

@@ -19,8 +19,9 @@
 **/
 
 
-$screenWidget = (new CWidget())->setTitle(_('Screens'))->
-	addItem((new CFilter('web.screens.filter.state'))->addNavigator());
+$screenWidget = (new CWidget())
+	->setTitle(_('Screens'))
+	->addItem((new CFilter('web.screens.filter.state'))->addNavigator());
 
 // header form
 $headerForm = new CForm();
@@ -85,13 +86,15 @@ else {
 		$_REQUEST['groupid'] = $pageFilter->groupid;
 		$_REQUEST['hostid'] = $pageFilter->hostid;
 
-		$controls->addItem([ _('Group').SPACE, $pageFilter->getGroupsCB()]);
-		$controls->addItem([ _('Host').SPACE, $pageFilter->getHostsCB()]);
+		$controls
+			->addItem([ _('Group').SPACE, $pageFilter->getGroupsCB()])
+			->addItem([ _('Host').SPACE, $pageFilter->getHostsCB()]);
 	}
 
 	// page header
-	$controls->addItem(get_icon('favourite', ['fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid']]));
-	$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+	$controls
+		->addItem(get_icon('favourite', ['fav' => 'web.favorite.screenids', 'elname' => 'screenid', 'elid' => $screen['screenid']]))
+		->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 
 	$headerForm->addItem($controls);
 

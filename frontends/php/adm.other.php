@@ -62,31 +62,6 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$cnf_wdgt = (new CWidget())->setTitle(_('Other configuration parameters'));
-
-$form = (new CForm())->cleanItems();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.other.php', 'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-
-$form->addItem($controls);
-
-$cnf_wdgt->setControls($form);
-
 $config = select_config();
 
 if (hasRequest('form_refresh')) {
@@ -116,7 +91,8 @@ order_result($data['discovery_groups'], 'name');
 $data['alert_usrgrps'] = DBfetchArray(DBselect('SELECT u.usrgrpid,u.name FROM usrgrp u'));
 order_result($data['alert_usrgrps'], 'name');
 
-$otherForm = new CView('administration.general.other.edit', $data);
-$cnf_wdgt->addItem($otherForm->render())->show();
+$view = new CView('administration.general.other.edit', $data);
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

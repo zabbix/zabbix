@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+..FGI..... [ZBXNEXT-1368] added Windows service discovery and service.info[] item; thanks to Ryan Armstrong for patch (asaveljevs, igors)
 ..F....... [ZBX-8297] removed "Triggers info" top line from Monitoring > Triggers page fullscreen view (Ivo)
 A.FGI..PS. [ZBXNEXT-786] renamed net.tcp.service[ntp] and net.tcp.service.perf[ntp] to net.udp.service[ntp] and net.udp.service.perf[ntp] (asaveljevs, Oleg, Sasha)
 A.F.....S. [ZBXNEXT-1229] added support of trigger prototype dependencies (Ivo, Sasha)
@@ -37,6 +38,9 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+..F....... [ZBX-8252] renamed "Retries" to "Attempts" in web scenario edit form and list view (Ivo)
+........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
+A.F....... [ZBX-9540] fixed import/export of the "Host time" clock screen element (sasha)
 ...G...... [ZBX-9142] made vm.memory.size[available] read MemAvailable from /proc/meminfo on Linux kernels 3.14 and above (asaveljevs)
 A.F.I..... [ZBX-9414] fixed sorting, displaying and filtering by trends and interval in items, item prototypes and discovery rules (Ivo)
 ..F....... [ZBXNEXT-2791] synchronised item key helper descriptions and return values from the Zabbix manual (Richlv)
@@ -87,6 +91,8 @@ A.F....... [ZBX-1357] updated Dutch translation; thanks to Zabbix translators (R
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-9381] removed 'groupid' parameter from global search URLs sometimes causing inaccessible forms due to insufficient permissions (Ivo)
+........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ........S. [ZBX-8949] fixed possible deadlocks when deleting items on systems with MySQL backend (wiper)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9595] added variable initialization for correct operation of system.swap.*[,pages] items (igors)
@@ -719,6 +725,8 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translat
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-9381] removed 'groupid' parameter from global search URLs sometimes causing inaccessible forms due to insufficient permissions (Ivo)
+........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ........S. [ZBX-8949] fixed possible deadlocks when deleting items on systems with MySQL backend (wiper)
 ...G...... [ZBX-8969] fixed "system.uname" and "system.sw.arch" returning bad values on HP-UX (asaveljevs, wiper)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
@@ -1972,6 +1980,7 @@ New features:
 A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
 ...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)

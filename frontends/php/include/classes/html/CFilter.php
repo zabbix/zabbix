@@ -27,20 +27,23 @@ class CFilter extends CTag {
 	private $footer = null;
 	private $navigator = false;
 	private $name = 'zbx_filter';
+	private $opened = true;
 
 	public function __construct($filterid) {
-		parent::__construct('div', 'yes');
-		$this->setAttribute('class', 'filter-container');
-		$this->setAttribute('id', 'filter-space');
+		parent::__construct('div', true);
+		$this->addClass('filter-container');
+		$this->setId('filter-space');
 		$this->filterid = $filterid;
 		$this->columns = [];
 
-		$this->form = new CForm('get');
-		$this->form->setAttribute('name', $this->name);
-		$this->form->setAttribute('id', $this->name);
-		$this->form->addVar('ddreset', 1);
-		$this->form->addVar('uncheck', 1);
+		$this->form = (new CForm('get'))
+			->setAttribute('name', $this->name)
+			->setId('id', $this->name)
+			->addVar('ddreset', 1)
+			->addVar('uncheck', 1);
 
+		// filter is opened by default
+		$this->opened = (CProfile::get($this->filterid, 1) == 1);
 	}
 
 	public function getName() {
@@ -48,37 +51,67 @@ class CFilter extends CTag {
 	}
 
 	public function addColumn($column) {
-		$this->columns[] = new CDiv($column, 'cell');
+		$this->columns[] = (new CDiv($column))->addClass('cell');
+		return $this;
 	}
 
 	public function setFooter($footer) {
 		$this->footer = $footer;
+		return $this;
 	}
 
 	public function addNavigator() {
 		$this->navigator = true;
+		return $this;
 	}
 
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+		return $this;
 	}
 
 	private function getHeader() {
-		$switch = new CDiv(null, 'filter-btn-container');
-		$button = new CSimpleButton([_('Filter'), new CSpan(null, 'arrow-up', 'filter-arrow')], 'filter-trigger filter-active');
-		$button->setAttribute('id', 'filter-mode');
-		$button->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
-		$switch->addItem($button);
+		$span = (new CSpan())->setId('filter-arrow');
+
+		if ($this->opened) {
+			$span->addClass('arrow-up');
+			$button = (new CSimpleButton(
+				[_('Filter'), $span]
+			))
+				->addClass('filter-trigger')
+				->addClass('filter-active')
+				->setId('filter-mode');
+		}
+		else {
+			$span->addClass('arrow-down');
+			$button = (new CSimpleButton(
+				[_('Filter'), $span]
+			))
+				->addClass('filter-trigger')
+				->setId('filter-mode');
+			$this->setAttribute('style', 'display: none;');
+		}
+
+		$button->onClick('javascript:
+			jQuery("#filter-space").toggle();
+			jQuery("#filter-mode").toggleClass("filter-active");
+			jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");
+			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-down") ? 0 : 1);'
+		);
+
+		$switch = (new CDiv())
+			->addClass('filter-btn-container')
+			->addItem($button);
 
 		return $switch;
 	}
 
 	private function getTable() {
-		$row = new CDiv(null, 'row');
+		$row = (new CDiv())->addClass('row');
 		foreach ($this->columns as $column) {
 			$row->addItem($column);
 		}
-		$table = new CDiv(null, 'table filter-forms');
+		$table = (new CDiv())->addClass('table filter-forms');
 
 		$table->addItem($row);
 
@@ -90,18 +123,18 @@ class CFilter extends CTag {
 			return null;
 		}
 
-		$buttons = new CDiv(null, 'filter-forms');
+		$buttons = (new CDiv())->addClass('filter-forms');
 
 		$url = new cUrl();
 		$url->removeArgument('sid');
 		$url->removeArgument('filter_set');
 		$url->setArgument('filter_rst', 1);
-		$resetButton = new CRedirectButton(_('Reset'), $url->getUrl());
-		$resetButton->addClass('btn-alt');
-		$resetButton->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
+		$resetButton = (new CRedirectButton(_('Reset'), $url->getUrl()))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
-		$filterButton = new CSubmit('filter_set', _('Filter'));
-		$filterButton->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
+		$filterButton = (new CSubmit('filter_set', _('Filter')))
+			->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
 		$buttons->addItem($filterButton);
 		$buttons->addItem($resetButton);
@@ -121,7 +154,7 @@ class CFilter extends CTag {
 		$this->form->addItem($this->getButtons());
 
 		if($this->navigator) {
-			$this->form->addItem(new CDiv(null, null, 'scrollbar_cntr'));
+			$this->form->addItem((new CDiv())->setId('scrollbar_cntr'));
 		}
 		if($this->footer !== null) {
 			$this->form->addItem($this->footer);

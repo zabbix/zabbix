@@ -59,10 +59,10 @@ if (isset($_REQUEST['serviceid']) && isset($_REQUEST['showgraph'])) {
 	$service = reset($service);
 
 	if ($service) {
-		$table = (new CTable())->
-			addClass('chart')->
-			addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')))->
-			show();
+		$table = (new CTable())
+			->addClass('chart')
+			->addRow(new CImg('chart5.php?serviceid='.$service['serviceid'].url_param('path')))
+			->show();
 	}
 	else {
 		access_deny();
@@ -146,26 +146,26 @@ else {
 
 	if ($tree) {
 		// creates form for choosing a preset interval
-		$r_form = new CForm('get');
-		$r_form->setAttribute('name', 'period_choice');
-		$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
+		$r_form = (new CForm('get'))
+			->setAttribute('name', 'period_choice')
+			->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$period_combo = new CComboBox('period', $period, 'javascript: submit();');
 		foreach ($periods as $key => $val) {
 			$period_combo->addItem($key, $val);
 		}
 		// controls
-		$r_form->addItem((new CList())->
-			addItem([_('Period').SPACE, $period_combo])->
-			addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+		$r_form->addItem((new CList())
+			->addItem([_('Period').SPACE, $period_combo])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
 		);
 
-		$srv_wdgt = (new CWidget('service-list service-mon'))->
-			setTitle(_('IT services'))->
-			setControls($r_form)->
-			addItem(BR())->
-			addItem($tree->getHTML())->
-			show();
+		$srv_wdgt = (new CWidget())
+			->setTitle(_('IT services'))
+			->setControls($r_form)
+			->addItem(BR())
+			->addItem($tree->getHTML())
+			->show();
 	}
 	else {
 		error(_('Cannot format Tree. Check logic structure in service links.'));

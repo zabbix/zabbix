@@ -157,8 +157,8 @@ class CHelpItems {
 					'description' => _('Hardware sensor reading. Returns float')
 				],
 				[
-					'key' => 'service_state[service]',
-					'description' => _('State of a service. Returns 0 - running; 1 - paused; 2 - start pending; 3 - pause pending; 4 - continue pending; 5 - stop pending; 6 - stopped; 7 - unknown; 255 - no such service')
+					'key' => 'service.info[service,<param>]',
+					'description' => _('Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description')
 				],
 				[
 					'key' => 'services[<type>,<state>,<exclude>]',
@@ -435,8 +435,8 @@ class CHelpItems {
 					'description' => _('Hardware sensor reading. Returns float')
 				],
 				[
-					'key' => 'service_state[service]',
-					'description' => _('State of a service. Returns 0 - running; 1 - paused; 2 - start pending; 3 - pause pending; 4 - continue pending; 5 - stop pending; 6 - stopped; 7 - unknown; 255 - no such service')
+					'key' => 'service.info[service,<param>]',
+					'description' => _('Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description')
 				],
 				[
 					'key' => 'services[<type>,<state>,<exclude>]',
@@ -633,12 +633,12 @@ class CHelpItems {
 				[
 					'key' => 'net.udp.service[service,<ip>,<port>]',
 					'description' => _('Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running')
-				),
-				array(
+				],
+				[
 					'key' => 'net.udp.service.perf[service,<ip>,<port>]',
 					'description' => _('Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service')
-				),
-				array(
+				],
+				[
 					'key' => 'vmware.cluster.status[<url>,<name>]',
 					'description' => _('VMware cluster status, <url> - VMware service URL, <name> - VMware cluster name')
 				],

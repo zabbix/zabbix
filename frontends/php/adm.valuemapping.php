@@ -122,63 +122,29 @@ catch (Exception $e) {
 /*
  * Display
  */
-$valueMapWidget = (new CWidget())->setTitle(_('Value mapping'));
-
-$valueMapForm = new CForm();
-$valueMapForm->cleanItems();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.valuemapping.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-
-if (!isset($_REQUEST['form'])) {
-	$controls->addItem(new CSubmit('form', _('Create value map')));
-}
-
-$valueMapForm->addItem($controls);
-$valueMapWidget->setControls($valueMapForm);
-
 if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form', 1),
-		'form_refresh' => getRequest('form_refresh', 0),
-		'valuemapid' => getRequest('valuemapid'),
-		'mappings' => [],
-		'mapname' => '',
-		'confirmMessage' => null,
-		'add_value' => getRequest('add_value'),
-		'add_newvalue' => getRequest('add_newvalue')
+		'valuemapid' => getRequest('valuemapid', 0),
+		'confirmMessage' => null
 	];
 
-	if (isset($data['valuemapid'])) {
+	if ($data['valuemapid'] != 0 && !hasRequest('form_refresh')) {
 		$data['mapname'] = $dbValueMap['name'];
+		$data['mappings'] = DBfetchArray(DBselect(
+			'SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.zbx_dbstr($data['valuemapid'])
+		));
 
-		if (empty($data['form_refresh'])) {
-			$data['mappings'] = DBfetchArray(DBselect(
-				'SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.zbx_dbstr($data['valuemapid'])
-			));
-		}
-		else {
-			$data['mapname'] = getRequest('mapname', '');
-			$data['mappings'] = getRequest('mappings', []);
-		}
+		order_result($data['mappings'], 'value');
+	}
+	else {
+		$data['mapname'] = getRequest('mapname', '');
+		$data['mappings'] = getRequest('mappings', []);
+	}
 
+	if ($data['valuemapid'] != 0) {
 		$valueMapCount = DBfetch(DBselect(
-			'SELECT COUNT(i.itemid) AS cnt FROM items i WHERE i.valuemapid='.zbx_dbstr($data['valuemapid'])
+			'SELECT COUNT(*) AS cnt FROM items i WHERE i.valuemapid='.zbx_dbstr($data['valuemapid'])
 		));
 
 		$data['confirmMessage'] = $valueMapCount['cnt']
@@ -187,14 +153,7 @@ if (isset($_REQUEST['form'])) {
 			: _('Delete selected value mapping?');
 	}
 
-	if (empty($data['valuemapid']) && !empty($data['form_refresh'])) {
-		$data['mapname'] = getRequest('mapname', '');
-		$data['mappings'] = getRequest('mappings', []);
-	}
-
-	order_result($data['mappings'], 'value');
-
-	$valueMapForm = new CView('administration.general.valuemapping.edit', $data);
+	$view = new CView('administration.general.valuemapping.edit', $data);
 }
 else {
 	$data = [
@@ -218,9 +177,10 @@ else {
 		];
 	}
 
-	$valueMapForm = new CView('administration.general.valuemapping.list', $data);
+	$view = new CView('administration.general.valuemapping.list', $data);
 }
 
-$valueMapWidget->addItem($valueMapForm->render())->show();
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

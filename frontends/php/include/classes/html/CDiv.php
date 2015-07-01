@@ -21,14 +21,8 @@
 
 class CDiv extends CTag {
 
-	public function __construct($items = null, $class = null, $id = null) {
-		parent::__construct('div', 'yes');
-		if ($class !== null) {
-			$this->addClass($class);
-		}
-		if ($id) {
-			$this->setAttribute('id', zbx_formatDomId($id));
-		}
+	public function __construct($items = null) {
+		parent::__construct('div', true);
 		$this->addItem($items);
 
 		return $this;
@@ -36,5 +30,6 @@ class CDiv extends CTag {
 
 	public function useJQueryStyle() {
 		$this->addClass('jqueryinputset');
+		return $this;
 	}
 }

@@ -33,7 +33,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 *
 	 * @var bool
 	 */
-	public $open = true;
+	private $expanded = true;
 
 	/**
 	 * Sets the header and adds a default expand-collapse icon.
@@ -42,30 +42,32 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 * @param array              $icons
 	 */
 	public function setHeader($caption = null, array $icons = []) {
-		$icon = new CRedirectButton(SPACE, null);
-		if($this->open) {
-			$icon->addClass(ZBX_STYLE_BTN_WIDGET_COLLAPSE);
-			$icon->setTitle(_('Hide'));
+		$icon = (new CRedirectButton(SPACE, null))
+			->setId($this->id.'_icon')
+			->onClick('changeWidgetState(this, "'.$this->id.'");');
+		if($this->expanded) {
+			$icon->addClass(ZBX_STYLE_BTN_WIDGET_COLLAPSE)
+				->setTitle(_('Hide'));
 		}
 		else {
-			$icon->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND);
-			$icon->setTitle(_('Open'));
+			$icon->addClass(ZBX_STYLE_BTN_WIDGET_EXPAND)
+				->setTitle(_('Open'));
 		}
-		$icon->onClick('changeWidgetState(this, "'.$this->id.'");');
-		$icon->setAttribute('id', $this->id.'_icon');
 		$icons[] = $icon;
 
 		parent::setHeader($caption, $icons);
+		return $this;
 	}
 
 	/**
 	 * Display the widget in expanded or collapsed state.
 	 */
-	public function build() {
-		$body = new CDiv($this->body, 'body');
-		$body->setAttribute('id', $this->id);
+	protected function build() {
+		$body = (new CDiv($this->body))
+			->addClass('body')
+			->setId($this->id);
 
-		if (!$this->open) {
+		if (!$this->expanded) {
 			$body->setAttribute('style', 'display: none;');
 
 			if ($this->footer) {
@@ -78,5 +80,16 @@ class CCollapsibleUiWidget extends CUiWidget {
 		$this->addItem($this->header);
 		$this->addItem($body);
 		$this->addItem($this->footer);
+		return $this;
+	}
+
+	/**
+	 * Sets expanded or collapsed state of the widget.
+	 *
+	 * @param bool
+	 */
+	public function setExpanded($expanded) {
+		$this->expanded = $expanded;
+		return $this;
 	}
 }

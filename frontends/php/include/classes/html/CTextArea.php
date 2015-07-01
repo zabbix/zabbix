@@ -35,31 +35,19 @@ class CTextArea extends CTag {
 	 * @param string	$value
 	 * @param array		$options
 	 * @param int		$options['rows']
-	 * @param int		$options['width']
 	 * @param int		$options['maxlength']
 	 * @param boolean	$options['readonly']
 	 */
 	public function __construct($name = 'textarea', $value = '', $options = []) {
-		parent::__construct('textarea', 'yes');
-		$this->setAttribute('class', 'input');
-		$this->setAttribute('id', zbx_formatDomId($name));
+		parent::__construct('textarea', true);
+		$this->addClass('input');
+		$this->setId(zbx_formatDomId($name));
 		$this->setAttribute('name', $name);
 		$this->setAttribute('rows', !empty($options['rows']) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
 		if (isset($options['readonly'])) {
 			$this->setReadonly($options['readonly']);
 		}
 		$this->addItem($value);
-
-		// set width
-		if (empty($options['width']) || $options['width'] == ZBX_TEXTAREA_STANDARD_WIDTH) {
-			$this->addClass('textarea_standard');
-		}
-		elseif ($options['width'] == ZBX_TEXTAREA_BIG_WIDTH) {
-			$this->addClass('textarea_big');
-		}
-		else {
-			$this->setAttribute('style', 'width: '.$options['width'].'px;');
-		}
 
 		// set maxlength
 		if (!empty($options['maxlength'])) {
@@ -74,18 +62,22 @@ class CTextArea extends CTag {
 		else {
 			$this->removeAttribute('readonly');
 		}
+		return $this;
 	}
 
 	public function setValue($value = '') {
-		return $this->addItem($value);
+		$this->addItem($value);
+		return $this;
 	}
 
 	public function setRows($value) {
 		$this->setAttribute('rows', $value);
+		return $this;
 	}
 
 	public function setCols($value) {
 		$this->setAttribute('cols', $value);
+		return $this;
 	}
 
 	public function setMaxlength($maxlength) {
@@ -106,5 +98,11 @@ class CTextArea extends CTag {
 				}',
 			true);
 		}
+		return $this;
+	}
+
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+		return $this;
 	}
 }

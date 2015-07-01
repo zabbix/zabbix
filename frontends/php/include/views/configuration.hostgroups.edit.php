@@ -19,22 +19,23 @@
 **/
 
 
-$hostGroupWidget = (new CWidget())->setTitle(_('Host groups'));
+$widget = (new CWidget())->setTitle(_('Host groups'));
 
 // create form
-$hostGroupForm = new CForm();
-$hostGroupForm->setName('hostgroupForm');
-$hostGroupForm->addVar('form', $this->data['form']);
+$hostGroupForm = (new CForm())
+	->setName('hostgroupForm')
+	->addVar('form', $this->data['form']);
 if (isset($this->data['groupid'])) {
 	$hostGroupForm->addVar('groupid', $this->data['groupid']);
 }
 
 // create hostgroup form list
 $hostGroupFormList = new CFormList('hostgroupFormList');
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE,
+$nameTextBox = (new CTextBox('name', $this->data['name'],
 	($this->data['groupid'] && $this->data['group']['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
 	64
-);
+))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 $nameTextBox->setAttribute('autofocus', 'autofocus');
 $hostGroupFormList->addRow(_('Group name'), $nameTextBox);
 
@@ -73,16 +74,21 @@ if ($this->data['groupid'] == 0) {
 	));
 }
 else {
-	$deleteButton = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
+	$clone_button = new CSubmit('clone', _('Clone'));
+	if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
+		$clone_button->setAttribute('disabled', 'disabled');
+	}
+
+	$delete_button = new CButtonDelete(_('Delete selected group?'), url_param('form').url_param('groupid'));
 	if (!isset($this->data['deletableHostGroups'][$this->data['groupid']])) {
-		$deleteButton->setAttribute('disabled', 'disabled');
+		$delete_button->setAttribute('disabled', 'disabled');
 	}
 
 	$hostGroupTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CSubmit('clone', _('Clone')),
-			$deleteButton,
+			$clone_button,
+			$delete_button,
 			new CButtonCancel()
 		]
 	));
@@ -90,6 +96,6 @@ else {
 
 $hostGroupForm->addItem($hostGroupTab);
 
-$hostGroupWidget->addItem($hostGroupForm);
+$widget->addItem($hostGroupForm);
 
-return $hostGroupWidget;
+return $widget;
