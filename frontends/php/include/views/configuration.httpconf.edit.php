@@ -77,7 +77,7 @@ $httpFormList
 	->addRow(_('Update interval (in sec)'),
 		(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
-	->addRow(_('Retries'),
+	->addRow(_('Attempts'),
 		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
