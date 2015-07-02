@@ -1887,13 +1887,11 @@ button[disabled] {
 
 	&::-webkit-scrollbar-track {
 		background-color: $scrollbar-track-color;
-		@include border-radius(6px);
 	}
 
 	&::-webkit-scrollbar-thumb {
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid $scrollbar-track-color;
-		@include border-radius(6px);
 	}
 }
 
@@ -2418,11 +2416,11 @@ button[disabled] {
 	}
 
 	p {
-		margin: 0.35em 0 0 0;
+		margin: 0.25em 0 0 0;
 	}
 
 	li {
-		padding: 0 0 15px 19px;
+		padding: 0 0 15px 17px;
 
 		&:last-child {
 			padding-bottom: 0;
@@ -2431,12 +2429,12 @@ button[disabled] {
 }
 
 .notif-indic {
-	width: 14px;
-	height: 14px;
-	@include border-radius(2px);
-	//position: absolute;
+	display: inline-block;
+	width: 12px;
+	height: 12px;
 	float: left;
-	margin: 2px 0 0 -19px;
+	margin: 2px 0 0 -17px;
+	@include border-radius(2px);
 }
 
 /* Maps, Screens, Graphs */
