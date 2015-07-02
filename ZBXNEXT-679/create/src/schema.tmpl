@@ -486,7 +486,7 @@ FIELD		|alert_usrgrpid	|t_id		|	|NULL		|0			|1|usrgrp	|usrgrpid	|RESTRICT
 FIELD		|event_ack_enable|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|event_expire	|t_integer	|'7'	|NOT NULL	|ZBX_NODATA
 FIELD		|event_show_max	|t_integer	|'100'	|NOT NULL	|ZBX_NODATA
-FIELD		|default_theme	|t_varchar(128)	|'originalblue'|NOT NULL	|ZBX_NODATA
+FIELD		|default_theme	|t_varchar(128)	|'blue-theme'|NOT NULL	|ZBX_NODATA
 FIELD		|authentication_type|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_host	|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|ldap_port	|t_integer	|389	|NOT NULL	|ZBX_NODATA
@@ -1254,21 +1254,6 @@ FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
 FIELD		|parent_triggerid|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid	|RESTRICT
 INDEX		|1		|parent_triggerid
 
-TABLE|user_history|userhistoryid|0
-FIELD		|userhistoryid	|t_id		|	|NOT NULL	|0
-FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
-FIELD		|title1		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|url1		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|title2		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|url2		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|title3		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|url3		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|title4		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|url4		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|title5		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|url5		|t_varchar(255)	|''	|NOT NULL	|0
-UNIQUE		|1		|userid
-
 TABLE|application_template|application_templateid|ZBX_DATA
 FIELD		|application_templateid|t_id	|	|NOT NULL	|0
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0			|1|applications
@@ -1287,4 +1272,4 @@ INDEX		|1		|itemid
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050017	|2050017
+ROW		|2050023	|2050023

@@ -23,32 +23,30 @@ if ($data['uncheck']) {
 	uncheckTableRows();
 }
 
-$scriptsWidget = (new CWidget())->setTitle(_('Scripts'));
+$widget = (new CWidget())
+	->setTitle(_('Scripts'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit')))
+	);
 
-$createForm = new CForm('get');
-$controls = new CList();
-$controls->addItem(new CRedirectButton(_('Create script'), 'zabbix.php?action=script.edit'));
+$scriptsForm = (new CForm())
+	->setName('scriptsForm')
+	->setId('scripts');
 
-$createForm->addItem($controls);
-$scriptsWidget->setControls($createForm);
-
-$scriptsForm = new CForm();
-$scriptsForm->setName('scriptsForm');
-$scriptsForm->setAttribute('id', 'scripts');
-
-$scriptsTable = new CTableInfo();
-$scriptsTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_scripts', null, "checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")))->
-		addClass('cell-width'),
-	make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
-	_('Type'),
-	_('Execute on'),
-	make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder']),
-	_('User group'),
-	_('Host group'),
-	_('Host access')
-]);
+$scriptsTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_scripts'))->onClick("checkAll('".$scriptsForm->getName()."', 'all_scripts', 'scriptids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
+		_('Type'),
+		_('Execute on'),
+		make_sorting_header(_('Commands'), 'command', $data['sort'], $data['sortorder']),
+		_('User group'),
+		_('Host group'),
+		_('Host access')
+	]);
 
 foreach ($data['scripts'] as $script) {
 	switch ($script['type']) {
@@ -74,11 +72,11 @@ foreach ($data['scripts'] as $script) {
 		$scriptExecuteOn = '';
 	}
 
-	$name = new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid']);
-
 	$scriptsTable->addRow([
-		new CCheckBox('scriptids['.$script['scriptid'].']', 'no', null, $script['scriptid']),
-		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
+		new CCheckBox('scriptids['.$script['scriptid'].']', $script['scriptid']),
+		(new CCol(
+			new CLink($script['name'], 'zabbix.php?action=script.edit&scriptid='.$script['scriptid'])
+		))->addClass(ZBX_STYLE_NOWRAP),
 		$scriptType,
 		$scriptExecuteOn,
 		zbx_nl2br(htmlspecialchars($script['command'], ENT_COMPAT, 'UTF-8')),
@@ -98,4 +96,4 @@ $scriptsForm->addItem([
 ]);
 
 // append form to widget
-$scriptsWidget->addItem($scriptsForm)->show();
+$widget->addItem($scriptsForm)->show();

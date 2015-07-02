@@ -21,12 +21,9 @@
 
 class CLabel extends CTag {
 
-	public function __construct($label, $for = null, $id = null) {
-		parent::__construct('label', 'yes', $label);
+	public function __construct($label, $for = null) {
+		parent::__construct('label', true, $label);
 
-		if ($id !== null) {
-			$this->setAttribute('id', zbx_formatDomId($id));
-		}
 		if ($for !== null) {
 			$this->setAttribute('for', zbx_formatDomId($for));
 		}

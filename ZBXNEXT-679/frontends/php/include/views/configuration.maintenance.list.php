@@ -18,51 +18,49 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$maintenanceWidget = (new CWidget())->setTitle(_('Maintenance periods'));
-
-// create new maintenance button
-$createForm = (new CForm('get'))->cleanItems();
-$controls = new CList();
-$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
-$controls->addItem(new CSubmit('form', _('Create maintenance period')));
-$createForm->addItem($controls);
-$maintenanceWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Maintenance periods'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem(new CSubmit('form', _('Create maintenance period')))
+		));
 
 // create form
-$maintenanceForm = new CForm();
-$maintenanceForm->setName('maintenanceForm');
+$maintenanceForm = (new CForm())->setName('maintenanceForm');
 
 // create table
-$maintenanceTable = new CTableInfo();
-$maintenanceTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_maintenances', null, "checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")))->
-		addClass('cell-width'),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Active till'), 'active_till', $this->data['sort'], $this->data['sortorder']),
-	_('State'),
-	_('Description')
-]);
+$maintenanceTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_maintenances'))->onClick("checkAll('".$maintenanceForm->getName()."', 'all_maintenances', 'maintenanceids');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'maintenance_type', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Active since'), 'active_since', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Active till'), 'active_till', $this->data['sort'], $this->data['sortorder']),
+		_('State'),
+		_('Description')
+	]);
 
 foreach ($this->data['maintenances'] as $maintenance) {
 	$maintenanceid = $maintenance['maintenanceid'];
 
 	switch ($maintenance['status']) {
 		case MAINTENANCE_STATUS_EXPIRED:
-			$maintenanceStatus = new CSpan(_x('Expired', 'maintenance status'), ZBX_STYLE_RED);
+			$maintenanceStatus = (new CSpan(_x('Expired', 'maintenance status')))->addClass(ZBX_STYLE_RED);
 			break;
 		case MAINTENANCE_STATUS_APPROACH:
-			$maintenanceStatus = new CSpan(_x('Approaching', 'maintenance status'), ZBX_STYLE_ORANGE);
+			$maintenanceStatus = (new CSpan(_x('Approaching', 'maintenance status')))->addClass(ZBX_STYLE_ORANGE);
 			break;
 		case MAINTENANCE_STATUS_ACTIVE:
-			$maintenanceStatus = new CSpan(_x('Active', 'maintenance status'), ZBX_STYLE_GREEN);
+			$maintenanceStatus = (new CSpan(_x('Active', 'maintenance status')))->addClass(ZBX_STYLE_GREEN);
 			break;
 	}
 
 	$maintenanceTable->addRow([
-		new CCheckBox('maintenanceids['.$maintenanceid.']', null, null, $maintenanceid),
+		new CCheckBox('maintenanceids['.$maintenanceid.']', $maintenanceid),
 		new CLink($maintenance['name'], 'maintenance.php?form=update&maintenanceid='.$maintenanceid),
 		$maintenance['maintenance_type'] ? _('No data collection') : _('With data collection'),
 		zbx_date2str(DATE_TIME_FORMAT, $maintenance['active_since']),
@@ -82,6 +80,6 @@ $maintenanceForm->addItem([
 ]);
 
 // append form to widget
-$maintenanceWidget->addItem($maintenanceForm);
+$widget->addItem($maintenanceForm);
 
-return $maintenanceWidget;
+return $widget;

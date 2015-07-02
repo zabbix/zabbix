@@ -29,13 +29,4 @@ interface CButtonInterface {
 	 */
 	public function main();
 
-	/**
-	 * Set button-specific class.
-	 *
-	 * This method will not affect other classes of the element.
-	 *
-	 * @param string $class
-	 */
-	public function setButtonClass($class);
-
 }

@@ -31,21 +31,21 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'regexpids' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
-	'regexpid' =>				[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
-	'name' =>					[T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
-	'test_string' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({add}) || isset({update})', _('Test string')],
-	'expressions' =>			[T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({add}) || isset({update})'],
+	'regexpids' =>		[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
+	'regexpid' =>		[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
+	'name' =>			[T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
+	'test_string' =>	[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	'isset({add}) || isset({update})', _('Test string')],
+	'expressions' =>	[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	'isset({add}) || isset({update})'],
 	// actions
-	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"regexp.massdelete"'),	null],
-	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
-	'form_refresh' =>			[T_ZBX_INT, O_OPT, null,		null,	null],
+	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"regexp.massdelete"'),	null],
+	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,		null,	null],
 	// ajax
-	'output' =>					[T_ZBX_STR, O_OPT, P_ACT,		null,	null],
-	'ajaxaction' =>				[T_ZBX_STR, O_OPT, P_ACT,		null,	null],
-	'ajaxdata' =>				[T_ZBX_STR, O_OPT, P_ACT|P_NO_TRIM,		null,	null]
+	'output' =>			[T_ZBX_STR, O_OPT, P_ACT,		null,	null],
+	'ajaxaction' =>		[T_ZBX_STR, O_OPT, P_ACT,		null,	null],
+	'ajaxdata' =>		[T_ZBX_STR, O_OPT, P_ACT|P_NO_TRIM,		null,	null]
 ];
 check_fields($fields);
 
@@ -210,14 +210,12 @@ if (isset($_REQUEST['form'])) {
 
 		$data['name'] = $regExp['name'];
 		$data['test_string'] = $regExp['test_string'];
-
-		$dbExpressions = DBselect(
+		$data['expressions'] = DBfetchArray(DBselect(
 			'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
 			' FROM expressions e'.
 			' WHERE e.regexpid='.zbx_dbstr($_REQUEST['regexpid']).
 			' ORDER BY e.expression_type'
-		);
-		$data['expressions'] = DBfetchArray($dbExpressions);
+		));
 	}
 	else {
 		$data['name'] = getRequest('name', '');
@@ -225,9 +223,7 @@ if (isset($_REQUEST['form'])) {
 		$data['expressions'] = getRequest('expressions', []);
 	}
 
-	$regExpView = new CView('administration.general.regularexpressions.edit', $data);
-	$regExpView->render();
-	$regExpView->show();
+	$view = new CView('administration.general.regularexpressions.edit', $data);
 }
 else {
 	$data = [
@@ -253,9 +249,10 @@ else {
 		' ORDER BY e.expression_type'
 	));
 
-	$regExpView = new CView('administration.general.regularexpressions.list', $data);
-	$regExpView->render();
-	$regExpView->show();
+	$view = new CView('administration.general.regularexpressions.list', $data);
 }
+
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

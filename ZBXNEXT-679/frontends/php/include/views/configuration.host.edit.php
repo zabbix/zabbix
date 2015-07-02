@@ -21,24 +21,20 @@
 
 require_once dirname(__FILE__).'/js/configuration.host.edit.js.php';
 
-$widgetClass = 'host-edit';
-if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$widgetClass .= ' host-edit-discovered';
-}
-$hostWidget = (new CWidget($widgetClass))->setTitle(_('Hosts'))->
-	addItem(get_header_host_table('', $data['hostid']));
+$widget = (new CWidget())
+	->setTitle(_('Hosts'))
+	->addItem(get_header_host_table('', $data['hostid']));
 
 $divTabs = new CTabView();
 if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
 
-$frmHost = new CForm();
-$frmHost->setName('web.hosts.host.php.');
-
-$frmHost->addVar('form', $data['form']);
-$frmHost->addVar('clear_templates', $data['clear_templates']);
-$frmHost->addVar('flags', $data['flags']);
+$frmHost = (new CForm())
+	->setName('web.hosts.host.php.')
+	->addVar('form', $data['form'])
+	->addVar('clear_templates', $data['clear_templates'])
+	->addVar('flags', $data['flags']);
 
 if ($data['hostid'] != 0) {
 	$frmHost->addVar('hostid', $data['hostid']);
@@ -56,21 +52,22 @@ $hostList = new CFormList('hostlist');
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$hostList->addRow(
 		_('Discovered by'),
-		new CLink($data['discoveryRule']['name'],
-			'host_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid'],
-			'highlight underline weight_normal'
-		)
+		(new CLink($data['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid']))
+			->addClass('highlight')
+			->addClass('underline')
+			->addClass('weight_normal')
 	);
 }
 
-$host_input = new CTextBox(
-	'host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128
+$hostList->addRow(_('Host name'),
+	(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
 );
-$host_input->setAttribute('autofocus', 'autofocus');
-$hostList->addRow(_('Host name'), $host_input);
 
 $hostList->addRow(_('Visible name'),
-	new CTextBox('visiblename', $data['visiblename'], ZBX_TEXTBOX_STANDARD_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128)
+	(new CTextBox('visiblename', $data['visiblename'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
@@ -90,14 +87,17 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$hostList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
-	$newgroupTB = new CTextBox('newgroup', $data['newgroup'], ZBX_TEXTBOX_SMALL_SIZE);
-	$newgroupTB->setAttribute('maxlength', 64);
-	$tmp_label = _('New group');
+	$new_group = (new CTextBox('newgroup', $data['newgroup']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('maxlength', 64);
+	$new_group_label = _('New group');
 	if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-		$tmp_label .= ' '._('(Only super admins can create groups)');
-		$newgroupTB->setReadonly(true);
+		$new_group_label .= ' '._('(Only super admins can create groups)');
+		$new_group->setReadonly(true);
 	}
-	$hostList->addRow(new CLabel($tmp_label, 'newgroup'), $newgroupTB, null, null, ZBX_STYLE_TABLE_FORMS_TR_NEW);
+	$hostList->addRow(new CLabel($new_group_label, 'newgroup'),
+		(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+	);
 }
 else {
 	// groups for discovered hosts
@@ -120,82 +120,73 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		? 'hostInterfacesManager.add('.CJs::encodeJson($data['interfaces']).');'
 		: 'hostInterfacesManager.addNew("agent");');
 
-	// table for agent interfaces with footer
-	$ifTab = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'agentInterfaces')->
-		setAttribute('data-type', 'agent');
+	// Zabbix agent interfaces
+	$ifTab = (new CTable())
+		->setId('agentInterfaces')
+		->setHeader([
+			new CColHeader(),
+			new CColHeader(_('IP address')),
+			new CColHeader(_('DNS name')),
+			new CColHeader(_('Connect to')),
+			new CColHeader(_('Port')),
+			(new CColHeader(_('Default')))->setColSpan(2)
+		])
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton('addAgentInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(7)
+		]))->setId('agentInterfacesFooter'));
 
-	// headers with sizes
-	$iconLabel = (new CCol(' '))->addClass('interface-drag-control');
-	$ipLabel = (new CCol(_('IP address')))->addClass('interface-ip');
-	$dnsLabel = (new CCol(_('DNS name')))->addClass('interface-dns');
-	$connectToLabel = (new CCol(_('Connect to')))->addClass('interface-connect-to');
-	$portLabel = (new CCol(_('Port')))->addClass('interface-port');
-	$defaultLabel = (new CCol(_('Default')))->addClass('interface-default')->setColSpan(2);
-	$ifTab->addRow([$iconLabel, $ipLabel, $dnsLabel, $connectToLabel, $portLabel, $defaultLabel]);
+	$hostList->addRow(_('Agent interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'agent')
+	);
 
-	$helpTextWhenDragInterfaceAgent = new CSpan(_('Drag here to change the type of the interface to "agent" type.'));
-	$helpTextWhenDragInterfaceAgent->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addAgentInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
-	$buttonCol->addItem($helpTextWhenDragInterfaceAgent);
+	// SNMP interfaces
+	$ifTab = (new CTable())
+		->setId('SNMPInterfaces')
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton('addSNMPInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(7)
+		]))->setId('SNMPInterfacesFooter'));
 
-	$buttonRow = (new CRow([$buttonCol]))->setId('agentInterfacesFooter');
+	$hostList->addRow(_('SNMP interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'snmp')
+	);
 
-	$ifTab->addRow($buttonRow);
+	// JMX interfaces
+	$ifTab = (new CTable())
+		->setId('JMXInterfaces')
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton('addJMXInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(7)
+		]))->setId('JMXInterfacesFooter'));
 
-	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row interface-row-first');
+	$hostList->addRow(_('JMX interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'jmx')
+	);
 
-	// table for SNMP interfaces with footer
-	$ifTab = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'SNMPInterfaces')->
-		setAttribute('data-type', 'snmp');
+	// IPMI interfaces
+	$ifTab = (new CTable())
+		->setId('IPMIInterfaces')
+		->addRow((new CRow([
+			(new CCol(
+				(new CButton('addIPMIInterface', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(7)
+		]))->setId('IPMIInterfacesFooter'));
 
-	$helpTextWhenDragInterfaceSNMP = new CSpan(_('Drag here to change the type of the interface to "SNMP" type.'));
-	$helpTextWhenDragInterfaceSNMP->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addSNMPInterface', _('Add'), null, 'link_menu')))->addClass('interface-add-control')->setColSpan(7);
-	$buttonCol->addItem($helpTextWhenDragInterfaceSNMP);
-
-	$buttonRow = (new CRow([$buttonCol]))->setId('SNMPInterfacesFooter');
-
-	$ifTab->addRow($buttonRow);
-
-	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted inlineblock objectgroup interface-group'), false, null, 'interface-row');
-
-	// table for JMX interfaces with footer
-	$ifTab = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'JMXInterfaces')->
-		setAttribute('data-type', 'jmx');
-	$helpTextWhenDragInterfaceJMX = new CSpan(_('Drag here to change the type of the interface to "JMX" type.'));
-	$helpTextWhenDragInterfaceJMX->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addJMXInterface', _('Add'), null, 'link_menu')))->
-		addClass('interface-add-control')->
-		setColSpan(7);
-	$buttonCol->addItem($helpTextWhenDragInterfaceJMX);
-
-	$buttonRow = (new CRow([$buttonCol]))->setId('JMXInterfacesFooter');
-	$ifTab->addRow($buttonRow);
-
-	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
-
-	// table for IPMI interfaces with footer
-	$ifTab = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'IPMIInterfaces')->
-		setAttribute('data-type', 'ipmi');
-	$helpTextWhenDragInterfaceIPMI = new CSpan(_('Drag here to change the type of the interface to "IPMI" type.'));
-	$helpTextWhenDragInterfaceIPMI->addClass('dragHelpText');
-	$buttonCol = (new CCol(new CButton('addIPMIInterface', _('Add'), null, 'link_menu')))->
-		addClass('interface-add-control')->
-		setColSpan(7);
-	$buttonCol->addItem($helpTextWhenDragInterfaceIPMI);
-
-	$buttonRow = (new CRow([$buttonCol]))->setId('IPMIInterfacesFooter');
-
-	$ifTab->addRow($buttonRow);
-	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup inlineblock interface-group'), false, null, 'interface-row');
+	$hostList->addRow(_('IPMI interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'ipmi')
+	);
 }
 // interfaces for discovered hosts
 else {
@@ -208,76 +199,83 @@ else {
 
 	$hostList->addVar('interfaces', $data['interfaces']);
 
-	// table for agent interfaces with footer
-	$ifTab = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'agentInterfaces')->
-		setAttribute('data-type', 'agent');
-
-	// header
-	$ifTab->addRow([
-		(new CCol())->addClass('interface-drag-control'),
-		(new CCol(_('IP address')))->addClass('interface-ip'),
-		(new CCol(_('DNS name')))->addClass('interface-dns'),
-		(new CCol(_('Connect to')))->addClass('interface-connect-to'),
-		(new CCol(_('Port')))->addClass('interface-port'),
-		(new CCol(_('Default')))->addClass('interface-default'),
-		(new CCol())->addClass('interface-control')
-	]);
+	// Zabbix agent interfaces
+	$ifTab = (new CTable())
+		->setId('agentInterfaces')
+		->setHeader([
+			new CColHeader(),
+			new CColHeader(_('IP address')),
+			new CColHeader(_('DNS name')),
+			new CColHeader(_('Connect to')),
+			new CColHeader(_('Port')),
+			(new CColHeader(_('Default')))->setColSpan(2)
+		]);
 
 	$row = (new CRow())->setId('agentInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_AGENT])) {
-		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(5));
+	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No agent interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
 
-	$hostList->addRow(_('Agent interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-first');
+	$hostList->addRow(_('Agent interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'agent')
+	);
 
-	// table for SNMP interfaces with footer
-	$ifTab = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'SNMPInterfaces')->
-		setAttribute('data-type', 'snmp');
+	// SNMP interfaces
+	$ifTab = (new CTable())->setId('SNMPInterfaces');
 
 	$row = (new CRow())->setId('SNMPInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_SNMP])) {
-		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(5));
+	if (!array_key_exists(INTERFACE_TYPE_SNMP, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No SNMP interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('SNMP interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
-	// table for JMX interfaces with footer
-	$ifTab = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'JMXInterfaces')->
-		setAttribute('data-type', 'jmx');
+	$hostList->addRow(_('SNMP interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'snmp')
+	);
+
+	// JMX interfaces
+	$ifTab = (new CTable())->setId('JMXInterfaces');
 
 	$row = (new CRow())->setId('JMXInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_JMX])) {
-		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(5));
+	if (!array_key_exists(INTERFACE_TYPE_JMX, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No JMX interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('JMX interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row');
 
-	// table for IPMI interfaces with footer
-	$ifTab = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'IPMIInterfaces')->
-		setAttribute('data-type', 'ipmi');
+	$hostList->addRow(_('JMX interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'jmx')
+	);
+
+	// IPMI interfaces
+	$ifTab = (new CTable())->setId('IPMIInterfaces');
 
 	$row = (new CRow())->setId('IPMIInterfacesFooter');
-	if (!isset($existingInterfaceTypes[INTERFACE_TYPE_IPMI])) {
-		$row->addItem((new CCol())->addClass('interface-drag-control'));
-		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(5));
+	if (!array_key_exists(INTERFACE_TYPE_IPMI, $existingInterfaceTypes)) {
+		$row->addItem(new CCol());
+		$row->addItem((new CCol(_('No IPMI interfaces found.')))->setColSpan(6));
 	}
 	$ifTab->addRow($row);
-	$hostList->addRow(_('IPMI interfaces'), new CDiv($ifTab, 'border_dotted objectgroup interface-group'), false, null, 'interface-row interface-row-last');
+
+	$hostList->addRow(_('IPMI interfaces'),
+		(new CDiv($ifTab))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-type', 'ipmi')
+	);
 }
 
-$hostList->addRow(_('Description'), new CTextArea('description', $data['description']));
+$hostList->addRow(_('Description'),
+	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // Proxy
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
@@ -285,13 +283,14 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$proxy->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
 }
 else {
-	$proxy = new CTextBox(null, $data['proxy_hostid'] != 0 ? $data['proxies'][$data['proxy_hostid']] : _('(no proxy)'), null, true);
+	$proxy = (new CTextBox(null, $data['proxy_hostid'] != 0 ? $data['proxies'][$data['proxy_hostid']] : _('(no proxy)'), true))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	$hostList->addVar('proxy_hostid', $data['proxy_hostid']);
 }
 $hostList->addRow(_('Monitored by proxy'), $proxy);
 
 $hostList->addRow(_('Enabled'),
-	new CCheckBox('status', ($data['status'] == HOST_STATUS_MONITORED), null, HOST_STATUS_MONITORED)
+	(new CCheckBox('status', HOST_STATUS_MONITORED))->setChecked($data['status'] == HOST_STATUS_MONITORED)
 );
 
 if ($data['clone_hostid'] != 0) {
@@ -550,9 +549,10 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 $tmplList = new CFormList();
 
 // create linked template table
-$linkedTemplateTable = (new CTable(_('No templates linked.')))->
-	addClass('formElementTable')->
-	setAttribute('id', 'linkedTemplateTable');
+$linkedTemplateTable = (new CTable())
+	->setNoDataMessage(_('No templates linked.'))
+	->addClass('formElementTable')
+	->setId('linkedTemplateTable');
 
 // templates for normal hosts
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
@@ -561,15 +561,15 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-		$templateLink->setTarget('_blank');
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
 
-		$unlinkButton = new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu');
+		$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
 		if (array_key_exists($template['templateid'], $data['original_templates'])) {
-			$unlinkAndClearButton = new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'),
-				null, 'link_menu'
-			);
-			$unlinkAndClearButton->addStyle('margin-left: 8px');
+			$unlinkAndClearButton =
+				(new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addStyle('margin-left: 8px');
 		}
 		else {
 			$unlinkAndClearButton = null;
@@ -581,29 +581,39 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+	$tmplList->addRow(_('Linked templates'),
+		(new CDiv($linkedTemplateTable))
+			->addClass('template-link-block')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	);
 
 	// create new linked template table
-	$newTemplateTable = (new CTable())->
-		addClass('formElementTable')->
-		setAttribute('id', 'newTemplateTable');
+	$newTemplateTable = (new CTable())
+		->addClass('formElementTable')
+		->setId('newTemplateTable');
 
-	$newTemplateTable->addRow([new CMultiSelect([
-		'name' => 'add_templates[]',
-		'objectName' => 'templates',
-		'ignored' => $ignoredTemplates,
-		'popup' => [
-			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-		]
-	])]);
+	$newTemplateTable->addRow([
+		(new CMultiSelect([
+			'name' => 'add_templates[]',
+			'objectName' => 'templates',
+			'ignored' => $ignoredTemplates,
+			'popup' => [
+				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]);
 
-	$newTemplateTable->addRow([new CSubmit('add_template', _('Add'), null, 'link_menu')]);
+	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
-	$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+	$tmplList->addRow(_('Link new templates'),
+		(new CDiv($newTemplateTable))
+			->addClass('template-link-block')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	);
 }
 // templates for discovered hosts
@@ -611,14 +621,18 @@ else {
 	$linkedTemplateTable->setHeader([_('Name')]);
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-		$templateLink->setTarget('_blank');
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
 
 		$linkedTemplateTable->addRow($templateLink, null, 'conditions_'.$template['templateid']);
 	}
 
-	$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable,
-		'template-link-block objectgroup inlineblock border_dotted ui-corner-all')
+	$tmplList->addRow(_('Linked templates'),
+		(new CDiv($linkedTemplateTable))
+			->addClass('template-link-block')
+			->addClass('objectgroup')
+			->addClass('inlineblock')
+			->addClass('border_dotted')
 	);
 }
 
@@ -627,28 +641,36 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 /*
  * IPMI
  */
-$ipmiList = new CFormList();
-
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$cmbIPMIAuthtype = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
 	$cmbIPMIPrivilege = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
 }
 else {
 	$cmbIPMIAuthtype = [
-		new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['ipmi_authtype']), ZBX_TEXTBOX_SMALL_SIZE, true),
+		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['ipmi_authtype']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_authtype', $data['ipmi_authtype'])
 	];
 	$cmbIPMIPrivilege = [
-		new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['ipmi_privilege']), ZBX_TEXTBOX_SMALL_SIZE, true),
+		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['ipmi_privilege']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_privilege', $data['ipmi_privilege'])
 	];
 }
 
-$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
-$ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
-$ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $data['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)));
-$ipmiList->addRow(_('Password'), new CTextBox('ipmi_password', $data['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)));
-$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
+$divTabs->addTab('ipmiTab', _('IPMI'),
+	(new CFormList())
+		->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype)
+		->addRow(_('Privilege level'), $cmbIPMIPrivilege)
+		->addRow(_('Username'),
+			(new CTextBox('ipmi_username', $data['ipmi_username'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		)
+		->addRow(_('Password'),
+			(new CTextBox('ipmi_password', $data['ipmi_password'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		)
+);
 
 /*
  * Macros
@@ -663,27 +685,28 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $inventoryFormList = new CFormList('inventorylist');
 
 // radio buttons for inventory type choice
-$inventoryDisabledBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, null,
-	'host_inventory_radio_'.HOST_INVENTORY_DISABLED, ($data['inventory_mode'] == HOST_INVENTORY_DISABLED)
-);
-$inventoryDisabledBtn->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
+$inventoryDisabledBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, ($data['inventory_mode'] == HOST_INVENTORY_DISABLED)))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_DISABLED)
+	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
 
-$inventoryManualBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, null,
-	'host_inventory_radio_'.HOST_INVENTORY_MANUAL, ($data['inventory_mode'] == HOST_INVENTORY_MANUAL)
-);
-$inventoryManualBtn->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
+$inventoryManualBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, ($data['inventory_mode'] == HOST_INVENTORY_MANUAL)))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_MANUAL)
+	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
 
-$inventoryAutomaticBtn = new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, null,
-	'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC, ($data['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)
-);
-$inventoryAutomaticBtn->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
+$inventoryAutomaticBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, ($data['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)))
+	->setId('host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
+	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
 
 $inventoryTypeRadioButton = [
 	$inventoryDisabledBtn, new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
 	$inventoryManualBtn, new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
 	$inventoryAutomaticBtn, new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
 ];
-$inventoryFormList->addRow(null, new CDiv($inventoryTypeRadioButton, 'jqueryinputset radioset'));
+$inventoryFormList->addRow(null,
+	(new CDiv($inventoryTypeRadioButton))
+		->addClass('jqueryinputset')
+		->addClass('radioset')
+);
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$inventoryFormList->addVar('inventory_mode', $data['inventory_mode']);
 }
@@ -699,14 +722,25 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	}
 
 	if ($hostInventoryTable['fields'][$field_name]['type'] == DB::FIELD_TYPE_TEXT) {
-		$input = new CTextArea('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]);
-		$input->addStyle('width: 64em;');
+		$input = (new CTextArea('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
 	else {
 		$field_length = $hostInventoryTable['fields'][$field_name]['length'];
-		$input = new CTextBox('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]);
-		$input->setAttribute('maxlength', $field_length);
-		$input->addStyle('width: '.($field_length > 64 ? 64 : $field_length).'em;');
+
+		if ($field_length < 39) {
+			$width = ZBX_TEXTAREA_SMALL_WIDTH;
+		}
+		elseif ($field_length < 64) {
+			$width = ZBX_TEXTAREA_STANDARD_WIDTH;
+		}
+		else {
+			$width = ZBX_TEXTAREA_BIG_WIDTH;
+		}
+
+		$input = (new CTextBox('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]))
+			->setWidth($width)
+			->setAttribute('maxlength', $field_length);
 	}
 
 	if ($data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
@@ -717,10 +751,10 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	if (array_key_exists($inventoryNo, $data['inventory_items'])) {
 		$name = $data['inventory_items'][$inventoryNo]['name_expanded'];
 
-		$link = new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']);
-		$link->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
+		$link = (new CLink($name, 'items.php?form=update&itemid='.$data['inventory_items'][$inventoryNo]['itemid']))
+			->setAttribute('title', _s('This field is automatically populated by item "%s".', $name));
 
-		$inventory_item = new CSpan([' &larr; ', $link], 'populating_item');
+		$inventory_item = (new CSpan([' &larr; ', $link]))->addClass('populating_item');
 		if ($data['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
 			// those links are visible only in automatic mode
 			$inventory_item->addStyle('display: none');
@@ -735,14 +769,12 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	else {
 		$inventory_item = null;
 	}
-	$input->addStyle('float: left;');
 
 	$inventoryFormList->addRow($inventoryInfo['title'], [$input, $inventory_item]);
 }
 
 // clearing the float
-$clearFixDiv = new CDiv();
-$clearFixDiv->addStyle('clear: both;');
+$clearFixDiv = (new CDiv())->addStyle('clear: both;');
 $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
@@ -771,6 +803,6 @@ else {
 
 $frmHost->addItem($divTabs);
 
-$hostWidget->addItem($frmHost);
+$widget->addItem($frmHost);
 
-return $hostWidget;
+return $widget;

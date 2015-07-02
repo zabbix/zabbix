@@ -63,7 +63,7 @@ class CScreenHostgroupTriggers extends CScreenBase {
 			]);
 			$hostgroup = reset($hostgroup);
 
-			$item = new CSpan(_('Group').NAME_DELIMITER.$hostgroup['name'], 'white');
+			$item = (new CSpan(_('Group').NAME_DELIMITER.$hostgroup['name']))->addClass('white');
 			$params['groupids'] = $hostgroup['groupid'];
 		}
 		else {

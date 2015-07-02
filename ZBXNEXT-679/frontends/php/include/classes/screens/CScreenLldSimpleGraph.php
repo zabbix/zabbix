@@ -126,8 +126,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 
 		$src = 'chart3.php?'.http_build_query($queryParams);
 
-		$img = new CImg($src);
-		$img->preload();
+		$img = (new CImg($src))->preload();
 
 		return new CSpan($img);
 	}

@@ -18,40 +18,40 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
-
-// create new discovery rule button
-$createForm = (new CForm('get'))->cleanItems()->
-	addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))));
-$discoveryWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Discovery rules'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	);
 
 // create form
-$discoveryForm = new CForm();
-$discoveryForm->setName('druleForm');
+$discoveryForm = (new CForm())->setName('druleForm');
 
 // create table
-$discoveryTable = new CTableInfo();
-$discoveryTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_drules', null, "checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")))->
-		addClass('cell-width'),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('IP range'),
-	_('Delay'),
-	_('Checks'),
-	_('Status')
-]);
+$discoveryTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_drules'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_drules', 'g_druleid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('IP range'),
+		_('Delay'),
+		_('Checks'),
+		_('Status')
+	]);
 foreach ($data['drules'] as $drule) {
 	array_push($drule['description'], new CLink($drule['name'], '?form=update&druleid='.$drule['druleid']));
 
-	$status = new CCol(new CLink(
+	$status = new CCol((new CLink(
 		discovery_status2str($drule['status']),
-		'?g_druleid[]='.$drule['druleid'].'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable'),
-		ZBX_STYLE_LINK_ACTION.' '.discovery_status2style($drule['status'])
-	));
+		'?g_druleid[]='.$drule['druleid'].'&action='.($drule['status'] == DRULE_STATUS_ACTIVE ? 'drule.massdisable' : 'drule.massenable')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(discovery_status2style($drule['status']))
+	);
 
 	$discoveryTable->addRow([
-		new CCheckBox('g_druleid['.$drule['druleid'].']', null, null, $drule['druleid']),
+		new CCheckBox('g_druleid['.$drule['druleid'].']', $drule['druleid']),
 		$drule['description'],
 		$drule['iprange'],
 		convertUnitsS($drule['delay']),
@@ -72,6 +72,6 @@ $discoveryForm->addItem([
 ]);
 
 // append form to widget
-$discoveryWidget->addItem($discoveryForm);
+$widget->addItem($discoveryForm);
 
-return $discoveryWidget;
+return $widget;

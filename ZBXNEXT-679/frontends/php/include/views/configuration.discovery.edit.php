@@ -21,57 +21,78 @@
 
 require_once dirname(__FILE__).'/js/configuration.discovery.edit.js.php';
 
-$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
+$widget = (new CWidget())->setTitle(_('Discovery rules'));
 
 // create form
-$discoveryForm = new CForm();
-$discoveryForm->setName('discoveryForm');
-$discoveryForm->addVar('form', $this->data['form']);
+$discoveryForm = (new CForm())
+	->setName('discoveryForm')
+	->addVar('form', $this->data['form']);
 if (!empty($this->data['druleid'])) {
 	$discoveryForm->addVar('druleid', $this->data['druleid']);
 }
 
 // create form list
-$discoveryFormList = new CFormList();
-$nameTextBox = new CTextBox('name', $this->data['drule']['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$discoveryFormList->addRow(_('Name'), $nameTextBox);
+$discoveryFormList = (new CFormList())
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['drule']['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	);
 
 // append proxy to form list
-$proxyComboBox = new CComboBox('proxy_hostid', $this->data['drule']['proxy_hostid']);
-$proxyComboBox->addItem(0, _('No proxy'));
+$proxyComboBox = (new CComboBox('proxy_hostid', $this->data['drule']['proxy_hostid']))
+	->addItem(0, _('No proxy'));
 foreach ($this->data['proxies'] as $proxy) {
 	$proxyComboBox->addItem($proxy['proxyid'], $proxy['host']);
 }
-$discoveryFormList->addRow(_('Discovery by proxy'), $proxyComboBox);
-$discoveryFormList->addRow(_('IP range'), new CTextBox('iprange', $this->data['drule']['iprange'], ZBX_TEXTBOX_SMALL_SIZE));
-$discoveryFormList->addRow(_('Delay (in sec)'), new CNumericBox('delay', $this->data['drule']['delay'], 8));
+
+$discoveryFormList
+	->addRow(_('Discovery by proxy'), $proxyComboBox)
+	->addRow(_('IP range'),
+		(new CTextBox('iprange', $this->data['drule']['iprange']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Delay (in sec)'),
+		(new CNumericBox('delay', $this->data['drule']['delay'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 // append checks to form list
-$checkTable = (new CTable())->addClass('formElementTable');
-$checkTable->addRow((new CRow(
-	(new CCol(new CButton('newCheck', _('New'), null, 'link_menu')))->
-		setColSpan(2)))->setId('dcheckListFooter')
-);
+$checkTable = (new CTable())
+	->addClass('formElementTable')
+	->addRow((
+		new CRow(
+			(new CCol(
+				(new CButton('newCheck', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->setColSpan(2)
+		)
+	)->setId('dcheckListFooter'));
 $discoveryFormList->addRow(_('Checks'),
-	new CDiv($checkTable, 'objectgroup inlineblock border_dotted ui-corner-all', 'dcheckList'));
+	(new CDiv($checkTable))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+		->setId('dcheckList')
+);
 
 // append uniqueness criteria to form list
-$uniquenessCriteriaRadio = new CRadioButtonList('uniqueness_criteria', $this->data['drule']['uniqueness_criteria']);
-$uniquenessCriteriaRadio->addValue(SPACE._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
+$uniquenessCriteriaRadio = (new CRadioButtonList('uniqueness_criteria', $this->data['drule']['uniqueness_criteria']))
+	->addValue(SPACE._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
 $discoveryFormList->addRow(_('Device uniqueness criteria'),
-	new CDiv($uniquenessCriteriaRadio, 'objectgroup inlineblock border_dotted ui-corner-all', 'uniqList'));
+	(new CDiv($uniquenessCriteriaRadio))
+		->addClass('objectgroup')
+		->addClass('inlineblock')
+		->addClass('border_dotted')
+		->setId('uniqList')
+);
 
 // append status to form list
 $status = (empty($this->data['druleid']) && empty($this->data['form_refresh']))
 	? true
 	: ($this->data['drule']['status'] == DRULE_STATUS_ACTIVE);
 
-$discoveryFormList->addRow(_('Enabled'), new CCheckBox('status', $status, null, 1));
+$discoveryFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked($status));
 
 // append tabs to form
-$discoveryTabs = new CTabView();
-$discoveryTabs->addTab('druleTab', _('Discovery rule'), $discoveryFormList);
+$discoveryTabs = (new CTabView())->addTab('druleTab', _('Discovery rule'), $discoveryFormList);
 
 // append buttons to form
 if (isset($this->data['druleid']))
@@ -93,6 +114,7 @@ else {
 }
 
 $discoveryForm->addItem($discoveryTabs);
-$discoveryWidget->addItem($discoveryForm);
 
-return $discoveryWidget;
+$widget->addItem($discoveryForm);
+
+return $widget;

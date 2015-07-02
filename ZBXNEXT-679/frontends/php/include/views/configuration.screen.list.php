@@ -18,42 +18,42 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$screenWidget = (new CWidget())->setTitle(_('Screens'));
+$widget = (new CWidget())->setTitle(_('Screens'));
 
-// create new screen button
-$createForm = (new CForm('get'))->cleanItems();
-$controls = new CList();
-$controls->addItem(new CSubmit('form', _('Create screen')));
+$createForm = (new CForm('get'))
+	->cleanItems();
+
+$controls = (new CList())
+	->addItem(new CSubmit('form', _('Create screen')));
 if (!empty($this->data['templateid'])) {
 	$createForm->addVar('templateid', $this->data['templateid']);
-	$screenWidget->addItem(get_header_host_table('screens', $this->data['templateid']));
+	$widget->addItem(get_header_host_table('screens', $this->data['templateid']));
 }
 else {
-	$controls->addItem(new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=screen")'));
+	$controls->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=screen")'));
 }
 $createForm->addItem($controls);
-$screenWidget->setControls($createForm);
+$widget->setControls($createForm);
 
 // create form
-$screenForm = new CForm();
-$screenForm->setName('screenForm');
-
-$screenForm->addVar('templateid', $this->data['templateid']);
+$screenForm = (new CForm())
+	->setName('screenForm')
+	->addVar('templateid', $this->data['templateid']);
 
 // create table
-$screenTable = new CTableInfo();
-$screenTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_screens', null, "checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")))->
-		addClass('cell-width'),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Dimension (cols x rows)'),
-	_('Screen')
-]);
+$screenTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_screens'))->onClick("checkAll('".$screenForm->getName()."', 'all_screens', 'screens');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Dimension (cols x rows)'),
+		_('Screen')
+	]);
 
 foreach ($this->data['screens'] as $screen) {
 	$screenTable->addRow([
-		new CCheckBox('screens['.$screen['screenid'].']', null, null, $screen['screenid']),
+		new CCheckBox('screens['.$screen['screenid'].']', $screen['screenid']),
 		new CLink($screen['name'], '?form=update&screenid='.$screen['screenid'].url_param('templateid')),
 		$screen['hsize'].' x '.$screen['vsize'],
 		new CLink(_('Edit'), 'screenedit.php?screenid='.$screen['screenid'].url_param('templateid'))
@@ -75,6 +75,6 @@ $screenForm->addItem([
 ]);
 
 // append form to widget
-$screenWidget->addItem($screenForm);
+$widget->addItem($screenForm);
 
-return $screenWidget;
+return $widget;

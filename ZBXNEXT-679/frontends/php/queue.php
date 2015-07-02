@@ -62,19 +62,18 @@ if ($zabbixServer->getError()) {
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
 
-// create filter form
-$form = new CForm('get');
-$cmbMode = (new CComboBox('config', $config, 'submit();'))->
-	addItem(QUEUE_OVERVIEW, _('Overview'))->
-	addItem(QUEUE_OVERVIEW_BY_PROXY, _('Overview by proxy'))->
-	addItem(QUEUE_DETAILS, _('Details'));
-// controls
-$form->addItem((new CList())->
-	addItem($cmbMode)
-);
-
-// display table
-$queueWidget = (new CWidget())->setTitle(_('Queue of items to be updated'))->setControls($form);
+$widget = (new CWidget())
+	->setTitle(_('Queue of items to be updated'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem((new CComboBox('config', $config, 'submit();'))
+				->addItem(QUEUE_OVERVIEW, _('Overview'))
+				->addItem(QUEUE_OVERVIEW_BY_PROXY, _('Overview by proxy'))
+				->addItem(QUEUE_DETAILS, _('Details'))
+			)
+		)
+	);
 
 $table = new CTableInfo();
 
@@ -276,7 +275,7 @@ elseif ($config == QUEUE_DETAILS) {
 	}
 }
 
-$queueWidget->addItem($table)->show();
+$widget->addItem($table)->show();
 
 // display the table footer
 if ($config == QUEUE_OVERVIEW_BY_PROXY) {

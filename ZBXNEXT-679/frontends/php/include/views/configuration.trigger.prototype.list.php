@@ -18,22 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$triggersWidget = (new CWidget())->
-	setTitle(
-		[_('Trigger prototypes of').SPACE, new CSpan($this->data['discovery_rule']['name'], 'parent-discovery')]
-	)->
-	addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
-// create new application button
-$createForm = (new CForm('get'))->cleanItems();
-$createForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
-
-$createForm->addItem((new CList())->addItem(new CSubmit('form', _('Create trigger prototype'))));
-
-$triggersWidget->setControls($createForm);
+$widget = (new CWidget())
+	->setTitle(_('Trigger prototypes'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('parent_discoveryid', $this->data['parent_discoveryid'])
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create trigger prototype'))))
+	)
+	->addItem(get_header_host_table('triggers', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 /*
-$triggersWidget->addHeaderRowNumber(array(
+$widget->addHeaderRowNumber(array(
 	'[ ',
 	new CLink(
 		$this->data['showdisabled'] ? _('Hide disabled trigger prototypes') : _('Show disabled trigger prototypes'),
@@ -46,21 +42,21 @@ $triggersWidget->addHeaderRowNumber(array(
 */
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$triggersTable = new CTableInfo();
-$triggersTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_triggers', null, "checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")))->
-		addClass('cell-width'),
-	make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
-	_('Expression'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-]);
+$triggersTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_triggers'))->onClick("checkAll('".$triggersForm->getName()."', 'all_triggers', 'g_triggerid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Severity'), 'priority', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Name'), 'description', $this->data['sort'], $this->data['sortorder']),
+		_('Expression'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 foreach ($this->data['triggers'] as $trigger) {
 	$triggerid = $trigger['triggerid'];
@@ -75,7 +71,7 @@ foreach ($this->data['triggers'] as $trigger) {
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
-			$description[] = new CSpan(_('Template'), ZBX_STYLE_GREY);
+			$description[] = (new CSpan(_('Template')))->addClass(ZBX_STYLE_GREY);
 			$description[] = NAME_DELIMITER;
 		}
 		else {
@@ -85,11 +81,11 @@ foreach ($this->data['triggers'] as $trigger) {
 			$tpl_disc_ruleid = get_realrule_by_itemid_and_hostid($this->data['parent_discoveryid'],
 				$real_host['hostid']
 			);
-			$description[] = new CLink(
+			$description[] = (new CLink(
 				CHtml::encode($real_host['name']),
-				'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid,
-				ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY
-			);
+				'trigger_prototypes.php?parent_discoveryid='.$tpl_disc_ruleid))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY);
 
 			$description[] = NAME_DELIMITER;
 		}
@@ -115,30 +111,28 @@ foreach ($this->data['triggers'] as $trigger) {
 			);
 
 			if ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$triggerDependencies[] = new CLink(
+				$triggerDependencies[] = (new CLink(
 					$depTriggerDescription,
 					'trigger_prototypes.php?form=update'.url_param('parent_discoveryid').
-						'&triggerid='.$depTrigger['triggerid'],
-					triggerIndicatorStyle($depTrigger['status'])
-				);
+						'&triggerid='.$depTrigger['triggerid']))
+					->addClass(triggerIndicatorStyle($depTrigger['status']));
 			}
 			elseif ($depTrigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-				$triggerDependencies[] = new CLink(
+				$triggerDependencies[] = (new CLink(
 					$depTriggerDescription,
-					'triggers.php?form=update&triggerid='.$depTrigger['triggerid'],
-					triggerIndicatorStyle($depTrigger['status'])
-				);
+					'triggers.php?form=update&triggerid='.$depTrigger['triggerid']))
+					->addClass(triggerIndicatorStyle($depTrigger['status']));
 			}
 
 			$triggerDependencies[] = BR();
 		}
 		array_pop($triggerDependencies);
 
-		$description = array_merge($description, [new CDiv($triggerDependencies, 'dependencies')]);
+		$description = array_merge($description, [(new CDiv($triggerDependencies))->addClass('dependencies')]);
 	}
 
 	// status
-	$status = new CLink(
+	$status = (new CLink(
 		triggerIndicator($trigger['status']),
 		'trigger_prototypes.php?'.
 			'action='.($trigger['status'] == TRIGGER_STATUS_DISABLED
@@ -146,12 +140,12 @@ foreach ($this->data['triggers'] as $trigger) {
 				: 'triggerprototype.massdisable'
 			).
 			'&g_triggerid='.$triggerid.
-			'&parent_discoveryid='.$this->data['parent_discoveryid'],
-		ZBX_STYLE_LINK_ACTION.' '.triggerIndicatorStyle($trigger['status'])
-	);
+			'&parent_discoveryid='.$this->data['parent_discoveryid']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(triggerIndicatorStyle($trigger['status']));
 
 	// checkbox
-	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', null, null, $triggerid);
+	$checkBox = new CCheckBox('g_triggerid['.$triggerid.']', $triggerid);
 
 	$triggersTable->addRow([
 		$checkBox,
@@ -186,6 +180,6 @@ $triggersForm->addItem([
 ]);
 
 // append form to widget
-$triggersWidget->addItem($triggersForm);
+$widget->addItem($triggersForm);
 
-return $triggersWidget;
+return $widget;
