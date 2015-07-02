@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,6 +70,7 @@ ZBX_THREAD_SENDVAL_TLS_ARGS;
 
 void	zbx_tls_pass_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
+
 #endif
 
 int	zbx_tls_init_parent(void);
