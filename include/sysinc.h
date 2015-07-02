@@ -385,6 +385,9 @@
 #	if 0x071004 >= LIBCURL_VERSION_NUM	/* version 7.16.4 */
 #		define CURLOPT_KEYPASSWD	CURLOPT_SSLKEYPASSWD
 #	endif
+#	if 0x071400 <= LIBCURL_VERSION_NUM	/* version 7.20.0 */
+#		define HAVE_SMTP_AUTHENTICATION	1
+#	endif
 #	define ZBX_CURLOPT_MAXREDIRS	10L
 #endif
 
