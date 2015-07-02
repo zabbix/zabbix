@@ -639,6 +639,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translat
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+..F....... [ZBX-8895] improved trigger count calculation and removed unnecessary query, thanks to Alexey Pustovalov (Krists)
 ..F....... [ZBX-9381] removed 'groupid' parameter from global search URLs sometimes causing inaccessible forms due to insufficient permissions (Ivo)
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ........S. [ZBX-8949] fixed possible deadlocks when deleting items on systems with MySQL backend (wiper)
