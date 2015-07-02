@@ -843,10 +843,10 @@ static ZBX_DC_HOST	*DCfind_proxy(const char *host)
 
 	host_p_local.host = host;
 
-	if (NULL != (host_p = zbx_hashset_search(&config->hosts_p, &host_p_local)))
-		return host_p->host_ptr;
-	else
+	if (NULL == (host_p = zbx_hashset_search(&config->hosts_p, &host_p_local)))
 		return NULL;
+	else
+		return host_p->host_ptr;
 }
 
 static int	DCstrpool_replace(int found, const char **curr, const char *new)
@@ -1058,7 +1058,6 @@ static void	DCsync_hosts(DB_RESULT result)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	ZBX_DC_PSK		*psk_i, psk_i_local;
 #endif
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&ids);
@@ -1140,7 +1139,10 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* maintain 'config->psks' in configuration cache */
 
+		/*****************************************************************************/
+		/*                                                                           */
 		/* cases to cover (PSKid means PSK identity):                                */
+		/*                                                                           */
 		/*                                  Incoming data record                     */
 		/*                                  /                   \                    */
 		/*                                new                   new                  */
@@ -1197,6 +1199,8 @@ static void	DCsync_hosts(DB_RESULT result)
 		/*                            new PSKid                                      */
 		/*                                |                                          */
 		/*                               done                                        */
+		/*                                                                           */
+		/*****************************************************************************/
 
 		/* Detect errors: PSK identity without PSK value or vice versa. This should have been prevented by */
 		/* validation in frontend or API. Do not update cache in case of error. */
@@ -1246,42 +1250,38 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* non-empty new PSKid and value */
 
-		if (1 == found)
+		if (1 == found && NULL != host->tls_dc_psk)	/* 'host' record has non-empty PSK */
 		{
-			if (NULL != host->tls_dc_psk)		/* 'host' record has non-empty PSK */
+			if (0 == strcmp(host->tls_dc_psk->tls_psk_identity, row[28]))	/* new PSKid same as */
+											/* old PSKid */
 			{
-				if (0 == strcmp(host->tls_dc_psk->tls_psk_identity, row[28]))	/* new PSKid same as */
-												/* old PSKid */
+				if (0 != strcmp(host->tls_dc_psk->tls_psk, row[29]))	/* new PSK value */
+											/* differs from old */
 				{
-					if (0 != strcmp(host->tls_dc_psk->tls_psk, row[29]))	/* new PSK value */
-												/* differs from old */
-					{
-						/* change underlying PSK value and 'config->psks' is updated, too */
-						DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[29]);
-						zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"",
-								row[28]);
-					}
-
-					goto done;
+					/* change underlying PSK value and 'config->psks' is updated, too */
+					DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[29]);
+					zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[28]);
 				}
 
-				/* New PSKid differs from old PSKid. Unlink and delete old PSK. */
-
-				psk_i_local.tls_psk_identity = host->tls_dc_psk->tls_psk_identity;
-
-				if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)) &&
-						0 == --(psk_i->refcount))
-				{
-					zbx_strpool_release(psk_i->tls_psk_identity);
-					zbx_strpool_release(psk_i->tls_psk);
-					zbx_hashset_remove(&config->psks, &psk_i_local);
-				}
-
-				host->tls_dc_psk = NULL;
+				goto done;
 			}
+
+			/* New PSKid differs from old PSKid. Unlink and delete old PSK. */
+
+			psk_i_local.tls_psk_identity = host->tls_dc_psk->tls_psk_identity;
+
+			if (NULL != (psk_i = zbx_hashset_search(&config->psks, &psk_i_local)) &&
+					0 == --(psk_i->refcount))
+			{
+				zbx_strpool_release(psk_i->tls_psk_identity);
+				zbx_strpool_release(psk_i->tls_psk);
+				zbx_hashset_remove(&config->psks, &psk_i_local);
+			}
+
+			host->tls_dc_psk = NULL;
 		}
 
-		/* New PSK identity already stored ? */
+		/* new PSK identity already stored? */
 
 		psk_i_local.tls_psk_identity = row[28];
 
@@ -1308,8 +1308,8 @@ static void	DCsync_hosts(DB_RESULT result)
 		host->tls_dc_psk = zbx_hashset_insert(&config->psks, &psk_i_local, sizeof(ZBX_DC_PSK));
 done:
 #endif
-		host->tls_connect = (unsigned char)atoi(row[24]);
-		host->tls_accept = (unsigned char)atoi(row[25]);
+		ZBX_STR2UCHAR(host->tls_connect, row[24]);
+		ZBX_STR2UCHAR(host->tls_accept, row[25]);
 
 		if (0 == found)
 		{
@@ -3906,7 +3906,6 @@ void	init_configuration_cache(void)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	CREATE_HASHSET_EXT(config->psks, __config_psk_hash, __config_psk_compare);
 #endif
-
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
 	{
 		zbx_vector_ptr_create_ext(&config->time_triggers[i],
@@ -4139,7 +4138,7 @@ static void	DCget_host(DC_HOST *dst_host, const ZBX_DC_HOST *src_host)
  ******************************************************************************/
 int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 {
-	int			res = FAIL;
+	int			ret = FAIL;
 	const ZBX_DC_HOST	*dc_host;
 
 	LOCK_CACHE;
@@ -4147,12 +4146,12 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 	if (NULL != (dc_host = zbx_hashset_search(&config->hosts, &hostid)))
 	{
 		DCget_host(host, dc_host);
-		res = SUCCEED;
+		ret = SUCCEED;
 	}
 
 	UNLOCK_CACHE;
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
@@ -4240,15 +4239,15 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 		else
 		{
 			UNLOCK_CACHE;
-			*error = zbx_dsprintf(*error, "active proxy \"%s\" is connecting with PSK but there is no PSK "
-					"in DB for this proxy", host);
+			*error = zbx_dsprintf(*error, "active proxy \"%s\" is connecting with PSK but there is no PSK"
+					" in the database for this proxy", host);
 			return FAIL;
 		}
 	}
 #endif
-	UNLOCK_CACHE;
-
 	*hostid = dc_host->hostid;
+
+	UNLOCK_CACHE;
 
 	return SUCCEED;
 }
@@ -5182,7 +5181,7 @@ int	DCconfig_get_suggested_snmp_vars(zbx_uint64_t interfaceid, int *bulk)
  ******************************************************************************/
 int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid, unsigned char type)
 {
-	int			res = FAIL;
+	int			ret = FAIL;
 	const ZBX_DC_INTERFACE	*dc_interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
 
@@ -5198,11 +5197,11 @@ int	DCconfig_get_interface_by_type(DC_INTERFACE *interface, zbx_uint64_t hostid,
 
 	DCget_interface(interface, dc_interface);
 
-	res = SUCCEED;
+	ret = SUCCEED;
 unlock:
 	UNLOCK_CACHE;
 
-	return res;
+	return ret;
 }
 
 /******************************************************************************
