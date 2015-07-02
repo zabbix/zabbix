@@ -134,7 +134,7 @@ h3 {
 
 h4 {
 	font-size: $font-h4-size;
-	color: lighten($font-color, 15%);
+	color: $font-color;
 	line-height: $h4-line-height;
 
 	span {
@@ -317,23 +317,19 @@ ul.top-nav-icons {
 
 	.top-nav-help {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -36px;
-		//background-size: 10.363636363636363em 81.27272727272728em;
 	}
 
 	.top-nav-profile {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -108px;
-		//background-size: 10.363636363636363em 81.27272727272728em;
 	}
 
 	.top-nav-signout {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -144px;
-		//background-size: 10.363636363636363em 81.27272727272728em;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
 		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
-		//background-size: 10.363636363636363em 81.27272727272728em;
 	    width: auto;
 		padding: 0 12px 0 27px;
 	}
@@ -2057,6 +2053,10 @@ button[disabled] {
 	position: relative;
 	padding: 8px 60px 8px 10px;
 	font-weight: bold;
+
+	h4 {
+		color: h4-widget-color($font-color);
+	}
 
 	ul {
 		position: absolute;
