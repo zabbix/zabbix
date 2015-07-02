@@ -372,7 +372,7 @@ else {
 					else {
 						// Both rules stop discovering application. Find maximum clock.
 						unset($application['applicationDiscovery']);
-						$application['applicationDiscovery'] = max($ts_delete);
+						$application['applicationDiscovery']['ts_delete'] = max($ts_delete);
 					}
 				}
 				else {
