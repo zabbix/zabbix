@@ -21,15 +21,9 @@
 
 class CRowHeader extends CTag {
 
-	public function __construct($item = null, $class = null, $id = null) {
-		parent::__construct('tr', 'yes');
+	public function __construct($item = null) {
+		parent::__construct('tr', true);
 		$this->addItem($item);
-		if ($class !== null) {
-			$this->setAttribute('class', $class);
-		}
-		if ($id !== null) {
-			$this->setAttribute('id', $id);
-		}
 	}
 
 	public function addItem($item) {
@@ -49,5 +43,6 @@ class CRowHeader extends CTag {
 		elseif (!is_null($item)) {
 			parent::addItem(new CColHeader($item));
 		}
+		return $this;
 	}
 }

@@ -80,11 +80,13 @@ class CImageTextTable {
 			$this->table[$numrow] = [];
 		}
 		$this->table[$numrow][] = $cell;
+		return $this;
 	}
 
 	public function addRow($row) {
 		$this->table[$this->numrows] = $row;
 		$this->numrows++;
+		return $this;
 	}
 
 	public function draw() {
@@ -133,6 +135,7 @@ class CImageTextTable {
 			}
 			$coly += $height;
 		}
+		return $this;
 	}
 
 	/**

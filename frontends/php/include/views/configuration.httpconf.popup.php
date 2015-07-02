@@ -21,7 +21,7 @@
 
 include('include/views/js/configuration.httpconf.popup.js.php');
 
-$httpPopupWidget = new CWidget('httptest-popup');
+$httpPopupWidget = new CWidget();
 
 $result = false;
 if (hasRequest('add') || hasRequest('update')) {
@@ -74,29 +74,40 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 	}
 }
 else {
-	$httpPopupForm = new CForm();
-	$httpPopupForm->addVar('dstfrm', getRequest('dstfrm'));
-	$httpPopupForm->addVar('stepid', getRequest('stepid'));
-	$httpPopupForm->addVar('list_name', getRequest('list_name'));
-	$httpPopupForm->addVar('templated', getRequest('templated'));
-	$httpPopupForm->addVar('old_name', getRequest('old_name'));
-	$httpPopupForm->addVar('steps_names', getRequest('steps_names'));
+	$httpPopupForm = (new CForm())
+		->addVar('dstfrm', getRequest('dstfrm'))
+		->addVar('stepid', getRequest('stepid'))
+		->addVar('list_name', getRequest('list_name'))
+		->addVar('templated', getRequest('templated'))
+		->addVar('old_name', getRequest('old_name'))
+		->addVar('steps_names', getRequest('steps_names'));
 
-	$httpPopupFormList = new CFormList();
-	$httpPopupFormList->addRow(_('Name'), new CTextBox('name', getRequest('name', ''), ZBX_TEXTBOX_STANDARD_SIZE, (bool) getRequest('templated'), 64));
-	$httpPopupFormList->addRow(_('URL'), new CTextBox('url', getRequest('url', ''), ZBX_TEXTBOX_STANDARD_SIZE, false, null));
-	$httpPopupFormList->addRow(_('Post'), new CTextArea('posts', getRequest('posts', '')));
-	$httpPopupFormList->addRow(_('Variables'), new CTextArea('variables', getRequest('variables', '')));
-
-	$httpPopupFormList->addRow(_('Headers'), new CTextArea('headers', getRequest('headers', '')));
-
-	$httpPopupFormList->addRow(_('Follow redirects'), new CCheckBox('follow_redirects', $followRedirects, null, true));
-
-	$httpPopupFormList->addRow(_('Retrieve only headers'), new CCheckBox('retrieve_mode', $retrieveMode, null, true));
-
-	$httpPopupFormList->addRow(_('Timeout'), new CNumericBox('timeout', getRequest('timeout', 15), 5));
-	$httpPopupFormList->addRow(_('Required string'), new CTextBox('required', getRequest('required', ''), ZBX_TEXTBOX_STANDARD_SIZE));
-	$httpPopupFormList->addRow(_('Required status codes'), new CTextBox('status_codes', getRequest('status_codes', ''), ZBX_TEXTBOX_STANDARD_SIZE));
+	$httpPopupFormList = (new CFormList())
+		->addRow(_('Name'),
+			(new CTextBox('name', getRequest('name', ''), (bool) getRequest('templated'), 64))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+		->addRow(_('URL'),
+			(new CTextBox('url', getRequest('url', ''), false, null))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+		->addRow(_('Post'), (new CTextArea('posts', getRequest('posts', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+		->addRow(_('Variables'),
+			(new CTextArea('variables', getRequest('variables', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+		->addRow(_('Headers'),
+			(new CTextArea('headers', getRequest('headers', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+		->addRow(_('Follow redirects'), (new CCheckBox('follow_redirects'))->setChecked($followRedirects == 1))
+		->addRow(_('Retrieve only headers'), (new CCheckBox('retrieve_mode'))->setChecked($retrieveMode == 1))
+		->addRow(_('Timeout'),
+			(new CNumericBox('timeout', getRequest('timeout', 15), 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		)
+		->addRow(_('Required string'),
+			(new CTextBox('required', getRequest('required', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+		->addRow(_('Required status codes'),
+			(new CTextBox('status_codes', getRequest('status_codes', '')))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
 
 	// append tabs to form
 	$httpPopupTab = new CTabView();

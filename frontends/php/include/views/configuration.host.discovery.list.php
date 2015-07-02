@@ -18,43 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-$discoveryWidget = (new CWidget())->setTitle(_('Discovery rules'));
-
-// create new discovery rule button
-$createForm = new CForm('get');
-$createForm->cleanItems();
-$controls = new CList();
-$createForm->addVar('hostid', $this->data['hostid']);
-$controls->addItem(new CSubmit('form', _('Create discovery rule')));
-$createForm->addItem($controls);
-$discoveryWidget->setControls($createForm);
-
-// header
-$discoveryWidget->addItem(get_header_host_table('discoveries', $this->data['hostid']));
+$widget = (new CWidget())
+	->setTitle(_('Discovery rules'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addVar('hostid', $this->data['hostid'])
+		->addItem((new CList())->addItem(new CSubmit('form', _('Create discovery rule'))))
+	)
+	->addItem(get_header_host_table('discoveries', $this->data['hostid']));
 
 // create form
-$discoveryForm = new CForm();
-$discoveryForm->setName('discovery');
-$discoveryForm->addVar('hostid', $this->data['hostid']);
+$discoveryForm = (new CForm())
+	->setName('discovery')
+	->addVar('hostid', $this->data['hostid']);
 
 // create table
-$discoveryTable = new CTableInfo();
-
-$discoveryTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_items', null, "checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")))->
-		addClass('cell-width'),
-	make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
-	_('Items'),
-	_('Triggers'),
-	_('Graphs'),
-	($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
-	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
-	$data['showInfoColumn'] ? _('Info') : null
-]);
+$discoveryTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_items'))->onClick("checkAll('".$discoveryForm->getName()."', 'all_items', 'g_hostdruleid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $this->data['sort'], $this->data['sortorder']),
+		_('Items'),
+		_('Triggers'),
+		_('Graphs'),
+		($data['host']['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) ? _('Hosts') : null,
+		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
+		$data['showInfoColumn'] ? _('Info') : null
+	]);
 
 foreach ($data['discoveries'] as $discovery) {
 	// description
@@ -63,29 +57,31 @@ foreach ($data['discoveries'] as $discovery) {
 	if ($discovery['templateid']) {
 		$dbTemplate = get_realhost_by_itemid($discovery['templateid']);
 
-		$description[] = new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREY);
+		$description[] = (new CLink($dbTemplate['name'], '?hostid='.$dbTemplate['hostid']))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREY);
 		$description[] = NAME_DELIMITER;
 	}
 
 	$description[] = new CLink($discovery['name_expanded'], '?form=update&itemid='.$discovery['itemid']);
 
 	// status
-	$status = new CLink(
+	$status = (new CLink(
 		itemIndicator($discovery['status'], $discovery['state']),
 		'?hostid='.$_REQUEST['hostid'].
 			'&g_hostdruleid='.$discovery['itemid'].
 			'&action='.($discovery['status'] == ITEM_STATUS_DISABLED
 				? 'discoveryrule.massenable'
 				: 'discoveryrule.massdisable'
-			),
-		ZBX_STYLE_LINK_ACTION.' '.itemIndicatorStyle($discovery['status'], $discovery['state'])
-	);
+			))
+		)
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->addClass(itemIndicatorStyle($discovery['status'], $discovery['state']));
 
 	// info
 	if ($data['showInfoColumn']) {
 		if ($discovery['status'] == ITEM_STATUS_ACTIVE && !zbx_empty($discovery['error'])) {
-			$info = new CDiv(SPACE, 'status_icon iconerror');
-			$info->setHint($discovery['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($discovery['error']);
 		}
 		else {
 			$info = '';
@@ -105,7 +101,7 @@ foreach ($data['discoveries'] as $discovery) {
 	}
 
 	$discoveryTable->addRow([
-		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', null, null, $discovery['itemid']),
+		new CCheckBox('g_hostdruleid['.$discovery['itemid'].']', $discovery['itemid']),
 		$description,
 		[
 			new CLink(
@@ -160,6 +156,6 @@ $discoveryForm->addItem([
 ]);
 
 // append form to widget
-$discoveryWidget->addItem($discoveryForm);
+$widget->addItem($discoveryForm);
 
-return $discoveryWidget;
+return $widget;

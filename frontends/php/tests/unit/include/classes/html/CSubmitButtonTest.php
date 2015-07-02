@@ -25,33 +25,33 @@ class CSubmitButtonTest extends CTagTest {
 		return [
 			[
 				['caption'],
-				'<button class="button button-plain shadow ui-corner-all" type="submit">caption</button>'
+				'<button type="submit">caption</button>'
 			],
 			[
 				['caption', 'button'],
-				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button">caption</button>'
+				'<button type="submit" name="button">caption</button>'
 			],
 			[
 				['caption', 'button[value]'],
-				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button[value]">caption</button>'
+				'<button type="submit" name="button[value]">caption</button>'
 			],
 			[
 				['caption', 'button', 'value'],
-				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button" value="value">caption</button>'
+				'<button type="submit" name="button" value="value">caption</button>'
 			],
 			[
 				['caption', 'button', 'value', 'my-class'],
-				'<button class="button my-class" type="submit" name="button" value="value">caption</button>'
+				'<button class="my-class" type="submit" name="button" value="value">caption</button>'
 			],
 			// caption encoding
 			[
 				['</button>'],
-				'<button class="button button-plain shadow ui-corner-all" type="submit">&lt;/button&gt;</button>'
+				'<button type="submit">&lt;/button&gt;</button>'
 			],
 			// parameter encoding
 			[
 				['caption', 'button', 'button"&"'],
-				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button" value="button&quot;&amp;&quot;">caption</button>'
+				'<button type="submit" name="button" value="button&quot;&amp;&quot;">caption</button>'
 			],
 		];
 	}
@@ -63,7 +63,7 @@ class CSubmitButtonTest extends CTagTest {
 	 *
 	 * @return CSubmitButton
 	 */
-	protected function createTag($name = null, $value = null, $caption = null, $class = 'button-plain shadow ui-corner-all') {
-		return new CSubmitButton($name, $value, $caption, $class);
+	protected function createTag($name = null, $value = null, $caption = null) {
+		return new CSubmitButton($name, $value, $caption);
 	}
 }

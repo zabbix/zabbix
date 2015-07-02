@@ -20,9 +20,8 @@
 
 include dirname(__FILE__).'/js/conf.import.js.php';
 
-$rulesTable = (new CTable())->
-	addClass('formElementTable')->
-	setHeader([SPACE, _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
+$rulesTable = (new CTable())
+	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
 
 $titles = [
 	'groups' => _('Groups'),
@@ -39,31 +38,36 @@ $titles = [
 	'maps' => _('Maps'),
 	'images' => _('Images')
 ];
+
 $rules = $this->get('rules');
+
 foreach ($titles as $key => $title) {
 	$cbExist = null;
 	$cbMissed = null;
 	$cbDeleted = null;
 
 	if (isset($rules[$key]['updateExisting'])) {
-		$cbExist = new CCheckBox('rules['.$key.'][updateExisting]', $rules[$key]['updateExisting'], null, 1);
+		$cbExist = (new CCheckBox('rules['.$key.'][updateExisting]'))
+			->setChecked($rules[$key]['updateExisting'] == 1);
 
 		if ($key == 'images') {
 			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 				continue;
 			}
 
-			$cbExist->setAttribute('onclick', 'if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
+			$cbExist->onClick('if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
 		}
 	}
 
 	if (isset($rules[$key]['createMissing'])) {
-		$cbMissed = new CCheckBox('rules['.$key.'][createMissing]', $rules[$key]['createMissing'], null, 1);
+		$cbMissed = (new CCheckBox('rules['.$key.'][createMissing]'))
+			->setChecked($rules[$key]['createMissing'] == 1);
 	}
 
 	if (isset($rules[$key]['deleteMissing'])) {
-		$cbDeleted = new CCheckBox('rules['.$key.'][deleteMissing]', $rules[$key]['deleteMissing'], null, 1);
-		$cbDeleted->setAttribute('class', 'input checkbox pointer deleteMissing');
+		$cbDeleted = (new CCheckBox('rules['.$key.'][deleteMissing]'))
+			->setChecked($rules[$key]['deleteMissing'] == 1)
+			->addClass('input checkbox pointer deleteMissing');
 	}
 
 	$rulesTable->addRow([
@@ -75,13 +79,12 @@ foreach ($titles as $key => $title) {
 }
 
 // form list
-$importFormList = new CFormList('proxyFormList');
-$importFormList->addRow(_('Import file'), new CFile('import_file'));
-$importFormList->addRow(_('Rules'), new CDiv($rulesTable, 'border_dotted objectgroup inlineblock'));
+$importFormList = (new CFormList('proxyFormList'))
+	->addRow(_('Import file'), (new CFile('import_file'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Rules'), new CDiv($rulesTable));
 
 // tab
-$importTab = new CTabView();
-$importTab->addTab('importTab', _('Import'), $importFormList);
+$importTab = (new CTabView())->addTab('importTab', _('Import'), $importFormList);
 
 // form
 $importForm = new CForm('post', null, 'multipart/form-data');

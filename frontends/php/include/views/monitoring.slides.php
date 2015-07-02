@@ -22,8 +22,8 @@
 $slideshowWidget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create header form
-$slideHeaderForm = new CForm('get');
-$slideHeaderForm->setName('slideHeaderForm');
+$slideHeaderForm = (new CForm('get'))
+	->setName('slideHeaderForm');
 
 $controls = new CList();
 $controls->addItem(new CComboBox('config', 'slides.php', 'redirect(this.options[this.selectedIndex].value);',
@@ -40,7 +40,7 @@ if ($this->data['slideshows']) {
 			'elname' => 'slideshowid',
 			'elid' => $this->data['elementId']
 		])
-		: new CIcon(_('Favourites'), 'iconplus');
+		: (new CIcon(_('Favourites')))->addClass('iconplus');
 
 	$refreshIcon = get_icon('screenconf');
 
@@ -68,25 +68,30 @@ if ($this->data['slideshows']) {
 			$controls->addItem([SPACE, _('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()]);
 			$controls->addItem([SPACE, _('Host'), SPACE, $this->data['pageFilter']->getHostsCB()]);
 		}
-		$controls->addItem($favouriteIcon);
-		$controls->addItem($refreshIcon);
-		$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+		$controls
+			->addItem($favouriteIcon)
+			->addItem($refreshIcon)
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 		$slideHeaderForm->addItem($controls);
 		$slideshowWidget->setControls($slideHeaderForm);
 
-		$formFilter = new CFilter('web.slides.filter.state');
-		$formFilter->addNavigator();
+		$formFilter = (new CFilter('web.slides.filter.state'))
+			->addNavigator();
 		$slideshowWidget->addItem($formFilter);
 
-		$slideshowWidget->addItem(new CDiv(new CDiv(null, 'preloader'), null, WIDGET_SLIDESHOW));
+		$slideshowWidget->addItem(
+			(new CDiv((new CDiv())->addClass('preloader')))
+				->setId(WIDGET_SLIDESHOW)
+		);
 	}
 	else {
-		$controls->addItem($favouriteIcon);
-		$controls->addItem($refreshIcon);
-		$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+		$controls
+			->addItem($favouriteIcon)
+			->addItem($refreshIcon)
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 		$slideHeaderForm->addItem($controls);
-		$slideshowWidget->setControls($slideHeaderForm);
-		$slideshowWidget->addItem(new CTableInfo());
+		$slideshowWidget->setControls($slideHeaderForm)
+			->addItem(new CTableInfo());
 	}
 }
 else {

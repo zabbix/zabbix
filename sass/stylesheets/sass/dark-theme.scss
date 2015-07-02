@@ -1,119 +1,94 @@
-$white: #fff;
-$transparent: transparent;
+// NOTIFICATION & ALERT
+$red: #e45959;
+$light-red: #503434;
+$lighter-red: #473232;
+
+$yellow: #372d01;
+$light-yellow: #2f280a;
+$lighter-yellow: #2f280a;
+
+$green: #59db8f;
+$light-green: #344e3f;
+$lighter-green: #32453a;
 
 
 // MAIN
-$main-color: #2d3135;//#768d99;//#2d3135;//#5c5c5c;//#0275b8;
-$font-color: #e6e8f3;//#d1dade;//#1f2c33;
-$font-alt-color: #72757b;//#768d99;//#7d7d7d;
-$body-bg-color: #000;//#0d1114;//#ebeef0;
+$main-nav-bg-color: #2b2b2b;
+$main-subnav-bg-color: #454545;
+$main-subnav-bg-selected-color: #2e2e2e;
+$main-color: #2d3135;
+$font-color: #f2f2f2;
+$font-alt-color: #737373;;
+$body-bg-color: #0e1012;
 
 
 // UI
-$ui-bg-color: #2d3135;//#303030;//#2e2f30;//#fff;
-$ui-bg-selected-color: #acbbc2;
-$ui-hover-color: #222529;//#383c40;//#383d42;//#242424;//#e8f4fa;
+$ui-bg-color: #2b2b2b;
+$ui-bg-selected-color: #4f4f4f;
+$ui-hover-color: #333;
+$ui-border-color: #303030;
 
-$action-hover-color: #222529;//#383c40;//#383d42;//#242424;//#ebebeb;
-$action-border-color: #383c40;//#383d42;//#3d3d3d;//#ccd5d9;
+$action-hover-color: #454545;
+$action-border-color: #383838;
+$action-shadow-color: rgba(0,0,0,0.5);
 
-$table-border-color: #383c40;//#383d42;//#3d3d3d;//#ebeef0;
+$table-border-color: #383838;
+
+$ui-tab-bg-selected-color: #69808d;
 
 
 // FORMS
-$form-font-color: #e6e8f3;//#d1dade;//#1f2c33;
-$form-bg-color: #383d42;//#242424;//#303030;#242424;//#fff;
-$form-border-color: #44474c;//#3d3d3d;//#636363;//#4a4a4a;//#3d3d3d;//#acbbc2;
-$form-border-focus-color: #5b5e64;//#4f5358;//#4a4a4a;//#7d7d7d;//#0275b8; //NEW
+$form-font-color: #e1e3ed;
+$form-bg-color: #333;;
+$form-border-color: #4f4f4f;
+$form-border-focus-color: #768d99;
 
-$form-disabled-font-color: #525252;//#d1dade;//#1f2c33;
-$form-disabled-bg-color: transparent; //#ebebeb; //NEW
-$form-disabled-border-color: #3d3d3d; //NEW
+$form-disabled-font-color: #525252;
+$form-disabled-bg-color: #2b2b2b;
+$form-disabled-border-color: #3d3d3d;
 
+$scrollbar-track-color: #1f1f1f;
+$scrollbar-thumb-color: #383838;
 
 
 // BUTTONS
-$btn-font-color: #e6e8f3;//#fff;
-$btn-hover-color: #e6e8f3;//#fff;
-$btn-active-color: #e6e8f3;//#fff;
-$btn-bg-color: #6c818c;//#44474c;//#5c5c5c;//#0275b8;
+$btn-font-color: #f2f2f2;
+$btn-bg-color: #69808d;
+$btn-border-color: #768d99;
 
-$btn-alt-font-color: #768d99;//#0275b8;
-$btn-alt-hover-color: #768d99;//#0275b8;
-$btn-alt-active-color: #768d99;//#0275b8;
+$btn-alt-font-color: #768d99;
 $btn-alt-bg-color: transparent;
-$btn-alt-border-color: $btn-bg-color;
+$btn-alt-border-color: $btn-border-color;
 
-$btn-form-font-color: #d1dade;//#2782b8;//#0275b8;
-$btn-form-hover-color: #0275b8;
-$btn-form-active-color: #0275b8;
-$btn-form-bg-color: #242424;//transparent;
-$btn-form-border-color: #3d3d3d;//$form-border-color;
+$btn-form-font-color: #f2f2f2;
+$btn-form-bg-color: $form-bg-color;
+$btn-form-border-color: $form-border-color;
 
-$btn-disabled-font-color: #acbbc2;
-$btn-disabled-hover-color: #acbbc2;
-$btn-disabled-active-color: #acbbc2;
+$btn-disabled-font-color: #525252;
 $btn-disabled-bg-color: transparent;
-$btn-disabled-border-color: #ccd5d9;
+$btn-disabled-border-color: #3d3d3d;
 
 
 // LINKS
-$link-color: #3d93c4;//#2782b8; //#0275b8;
-$link-hover-color: #3d93c4; //#0275b8;
-$link-active-color: #3d93c4; //#0275b8;
-$link-visited-color: #3d93c4;//#2782b8; //#0275b8;
+$link-color: #4796c4;
+$link-hover-color: #4796c4;
+$link-active-color: #4796c4;
+$link-visited-color: #4796c4;
 
-$link-main-nav-color: #b9bbc4;//#bfdced;
-$link-main-nav-hover-color: #e6e8f3;//#fff;
-$link-main-nav-active-color: #e6e8f3;//#fff;
-$link-main-nav-visited-color: #e6e8f3;//#bfdced;
+$link-main-nav-color: rgba(255,255,255,0.75);
+$link-main-nav-hover-color: rgba(255,255,255,1);
+$link-main-nav-active-color: rgba(255,255,255,1);
+$link-main-nav-visited-color: rgba(255,255,255,0.75);
 
-$link-main-subnav-color: #bfced7;
-$link-main-subnav-hover-color: #fff;
-$link-main-subnav-active-color: #fff;
-$link-main-subnav-visited-color: #bfced7;
+$link-main-subnav-color: rgba(255,255,255,0.75);
+$link-main-subnav-hover-color: rgba(255,255,255,1);
+$link-main-subnav-active-color: rgba(255,255,255,1);
+$link-main-subnav-visited-color: rgba(255,255,255,0.75);
 
 
-
-// Important! @import string should always be last
+// Important! @import string should come after variables
 @import 'screen.scss';
 
-.dashbrd-widget {
-	@extend %no-shadow;
-}
-
-.list-table {
-	@extend %no-shadow;
-}
-
-.table-paging {
-	@extend %no-shadow;
-}
-
-.table-forms-container {
-	@extend %no-shadow;
-}
-
-.filter-container {
-	@include box-shadow(none);	
-}
-
-%no-shadow {
-	@include box-shadow(none);
-}
-
-.available {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
-}
-
-.search-suggest {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
-}
-
-.action-menu {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
-}
-
-.overlay-dialogue {
-	@include box-shadow(0 6px 10px 0 rgba(0,0,0,0.4));
+h4 {
+	color: darken($font-color, 8%);
 }
