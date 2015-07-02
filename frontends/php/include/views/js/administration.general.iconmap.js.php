@@ -14,7 +14,7 @@
 		</select>
 	</td>
 	<td>
-		<input class="input text" id="iconmap_mappings_#{iconmappingid}_expression" name="iconmap[mappings][#{iconmappingid}][expression]" value="" size="20" maxlength="64" type="text" />
+		<input class="input text" id="iconmap_mappings_#{iconmappingid}_expression" name="iconmap[mappings][#{iconmappingid}][expression]" value="" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="64" type="text" />
 	</td>
 	<td>
 		<select class="mappingIcon" id="iconmap_mappings_#{iconmappingid}_iconid" name="iconmap[mappings][#{iconmappingid}][iconid]" autocomplete="off">

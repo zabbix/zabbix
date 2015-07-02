@@ -37,10 +37,8 @@ class CWidget {
 		$this->css_class = 'header_wide';
 	}
 
-	public function setClass($class = null) {
-		if (is_string($class)) {
-			$this->css_class = $class;
-		}
+	public function setClass($class) {
+		$this->css_class = $class;
 		return $this;
 	}
 
@@ -51,17 +49,13 @@ class CWidget {
 
 	public function setControls($controls) {
 		zbx_value2array($controls);
-
 		$this->controls = $controls;
-
 		return $this;
 	}
 
 	public function addHeader($left = SPACE, $right = SPACE) {
 		zbx_value2array($right);
-
 		$this->headers[] = ['left' => $left, 'right' => $right];
-
 		return $this;
 	}
 
@@ -69,7 +63,6 @@ class CWidget {
 		if (!is_null($items)) {
 			$this->body[] = $items;
 		}
-
 		return $this;
 	}
 
@@ -87,6 +80,7 @@ class CWidget {
 
 	public function show() {
 		echo $this->toString();
+		return $this;
 	}
 
 	public function toString() {

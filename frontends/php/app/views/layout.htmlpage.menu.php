@@ -28,40 +28,43 @@
 		->addClass('top-nav-container')
 		->setId('mmenu');
 
-	$icons = (new CList())->addClass('top-nav-icons');
+	$icons = (new CList())
+		->addClass('top-nav-icons')
+		->addItem(
+			(new CForm('get', 'search.php'))
+				->addItem([
+					(new CTextBox('search', '', false, 255))
+						->setWidth(ZBX_TEXTAREA_SEARCH_WIDTH)
+						->setAttribute('autocomplete', 'off')
+						->addClass('search'),
+					(new CSubmitButton(SPACE))->addClass('btn-search')
+				])
+		)
+		->addItem(
+			(new CLink('Share', 'https://share.zabbix.com/'))
+				->addClass('top-nav-zbbshare')
+				->removeSID()
+				->setAttribute('target', '_blank')
+				->setAttribute('title', _('Zabbix Share'))
+		)
+		->addItem(
+			(new CLink(SPACE, 'http://www.zabbix.com/documentation/'))
+				->addClass('top-nav-help')
+				->removeSID()
+				->setAttribute('target', '_blank')
+				->setAttribute('title', _('Help'))
+		)
+		->addItem(
+			(new CLink(SPACE, 'profile.php'))
+				->addClass('top-nav-profile')
+				->setAttribute('title', _('Profile'))
+		)
+		->addItem(
+			(new CLink(SPACE, 'index.php?reconnect=1'))
+				->addClass('top-nav-signout')
+				->setAttribute('title', _('Sign out'))
+		);
 
-	$form = new CForm('get', 'search.php');
-	$search = new CTextBox('search', '', 20, false, 255);
-	$search->setAttribute('autocomplete', 'off');
-	$search->addClass('search');
-
-	$button = (new CSubmitButton(SPACE))->addClass('btn-search');
-	$form->addItem([$search, $button]);
-	$icons->addItem($form);
-
-	$zshare = (new CLink('Share', 'https://share.zabbix.com/'))
-		->addClass('top-nav-zbbshare')
-		->removeSID()
-		->setAttribute('target', '_blank')
-		->setAttribute('title', _('Zabbix Share'));
-	$icons->addItem($zshare);
-
-	$help = (new CLink(SPACE, 'http://www.zabbix.com/documentation/'))
-		->addClass('top-nav-help')
-		->removeSID()
-		->setAttribute('target', '_blank')
-		->setAttribute('title', _('Help'));
-	$icons->addItem($help);
-
-	$profile = (new CLink(SPACE, 'profile.php'))
-		->addClass('top-nav-profile')
-		->setAttribute('title', _('Profile'));
-	$icons->addItem($profile);
-
-	$signout = (new CLink(SPACE, 'index.php?reconnect=1'))
-		->addClass('top-nav-signout')
-		->setAttribute('title', _('Sign out'));
-	$icons->addItem($signout);
 	$top_menu->addItem($icons);
 
 	$page_menu_div->addItem($top_menu);
@@ -120,7 +123,9 @@
 
 	$menu_divs[] = $sub_menu_div;
 
-	$page_menu_div->addItem($menu_divs);
-	$page_menu_div->addItem($sub_menu_table);
-	$page_menu->addItem($page_menu_div);
-	$page_menu->show();
+	$page_menu_div
+		->addItem($menu_divs)
+		->addItem($sub_menu_table);
+	$page_menu
+		->addItem($page_menu_div)
+		->show();

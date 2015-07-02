@@ -75,4 +75,9 @@ class CMultiSelect extends CTag {
 
 		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).');');
 	}
+
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+		return $this;
+	}
 }

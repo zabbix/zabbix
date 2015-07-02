@@ -125,29 +125,26 @@ catch (Exception $e) {
 if (isset($_REQUEST['form'])) {
 	$data = [
 		'form' => getRequest('form', 1),
-		'valuemapid' => getRequest('valuemapid'),
-		'mappings' => [],
-		'mapname' => '',
-		'confirmMessage' => null,
-		'add_value' => getRequest('add_value'),
-		'add_newvalue' => getRequest('add_newvalue')
+		'valuemapid' => getRequest('valuemapid', 0),
+		'confirmMessage' => null
 	];
 
-	if (isset($data['valuemapid'])) {
+	if ($data['valuemapid'] != 0 && !hasRequest('form_refresh')) {
 		$data['mapname'] = $dbValueMap['name'];
+		$data['mappings'] = DBfetchArray(DBselect(
+			'SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.zbx_dbstr($data['valuemapid'])
+		));
 
-		if (empty($data['form_refresh'])) {
-			$data['mappings'] = DBfetchArray(DBselect(
-				'SELECT m.mappingid,m.value,m.newvalue FROM mappings m WHERE m.valuemapid='.zbx_dbstr($data['valuemapid'])
-			));
-		}
-		else {
-			$data['mapname'] = getRequest('mapname', '');
-			$data['mappings'] = getRequest('mappings', []);
-		}
+		order_result($data['mappings'], 'value');
+	}
+	else {
+		$data['mapname'] = getRequest('mapname', '');
+		$data['mappings'] = getRequest('mappings', []);
+	}
 
+	if ($data['valuemapid'] != 0) {
 		$valueMapCount = DBfetch(DBselect(
-			'SELECT COUNT(i.itemid) AS cnt FROM items i WHERE i.valuemapid='.zbx_dbstr($data['valuemapid'])
+			'SELECT COUNT(*) AS cnt FROM items i WHERE i.valuemapid='.zbx_dbstr($data['valuemapid'])
 		));
 
 		$data['confirmMessage'] = $valueMapCount['cnt']
@@ -155,13 +152,6 @@ if (isset($_REQUEST['form'])) {
 					'Delete selected value mapping? It is used for %d items!', $valueMapCount['cnt'])
 			: _('Delete selected value mapping?');
 	}
-
-	if (empty($data['valuemapid']) && !empty($data['form_refresh'])) {
-		$data['mapname'] = getRequest('mapname', '');
-		$data['mappings'] = getRequest('mappings', []);
-	}
-
-	order_result($data['mappings'], 'value');
 
 	$view = new CView('administration.general.valuemapping.edit', $data);
 }

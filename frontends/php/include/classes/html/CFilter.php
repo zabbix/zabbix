@@ -27,6 +27,7 @@ class CFilter extends CTag {
 	private $footer = null;
 	private $navigator = false;
 	private $name = 'zbx_filter';
+	private $opened = true;
 
 	public function __construct($filterid) {
 		parent::__construct('div', true);
@@ -35,12 +36,14 @@ class CFilter extends CTag {
 		$this->filterid = $filterid;
 		$this->columns = [];
 
-		$this->form = new CForm('get');
-		$this->form->setAttribute('name', $this->name);
-		$this->form->setId('id', $this->name);
-		$this->form->addVar('ddreset', 1);
-		$this->form->addVar('uncheck', 1);
+		$this->form = (new CForm('get'))
+			->setAttribute('name', $this->name)
+			->setId('id', $this->name)
+			->addVar('ddreset', 1)
+			->addVar('uncheck', 1);
 
+		// filter is opened by default
+		$this->opened = (CProfile::get($this->filterid, 1) == 1);
 	}
 
 	public function getName() {
@@ -49,30 +52,56 @@ class CFilter extends CTag {
 
 	public function addColumn($column) {
 		$this->columns[] = (new CDiv($column))->addClass('cell');
+		return $this;
 	}
 
 	public function setFooter($footer) {
 		$this->footer = $footer;
+		return $this;
 	}
 
 	public function addNavigator() {
 		$this->navigator = true;
+		return $this;
 	}
 
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+		return $this;
 	}
 
 	private function getHeader() {
-		$switch = (new CDiv())->addClass('filter-btn-container');
-		$button = (new CSimpleButton(
-			[_('Filter'), (new CSpan())->addClass('arrow-up')->setId('filter-arrow')]
-		))
-			->addClass('filter-trigger')
-			->addClass('filter-active')
-			->setId('filter-mode')
-			->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
-		$switch->addItem($button);
+		$span = (new CSpan())->setId('filter-arrow');
+
+		if ($this->opened) {
+			$span->addClass('arrow-up');
+			$button = (new CSimpleButton(
+				[_('Filter'), $span]
+			))
+				->addClass('filter-trigger')
+				->addClass('filter-active')
+				->setId('filter-mode');
+		}
+		else {
+			$span->addClass('arrow-down');
+			$button = (new CSimpleButton(
+				[_('Filter'), $span]
+			))
+				->addClass('filter-trigger')
+				->setId('filter-mode');
+			$this->setAttribute('style', 'display: none;');
+		}
+
+		$button->onClick('javascript:
+			jQuery("#filter-space").toggle();
+			jQuery("#filter-mode").toggleClass("filter-active");
+			jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");
+			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-down") ? 0 : 1);'
+		);
+
+		$switch = (new CDiv())
+			->addClass('filter-btn-container')
+			->addItem($button);
 
 		return $switch;
 	}

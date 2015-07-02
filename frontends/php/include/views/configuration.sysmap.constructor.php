@@ -59,8 +59,8 @@ $menu = (new CList())
 	->addItem((new CSubmit('update', _('Update')))->setAttribute('id', 'sysmap_update'));
 
 // create map
-$backgroundImage = new CImg('images/general/tree/zero.gif', 'Sysmap');
-$backgroundImage->setId('sysmap_img', $this->data['sysmap']['width'], $this->data['sysmap']['height']);
+$backgroundImage = (new CImg('images/general/tree/zero.gif', 'Sysmap'))
+	->setId('sysmap_img', $this->data['sysmap']['width'], $this->data['sysmap']['height']);
 
 $backgroundImageTable = new CTable();
 $backgroundImageTable->addRow($backgroundImage);

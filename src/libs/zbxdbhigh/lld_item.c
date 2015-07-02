@@ -1102,6 +1102,13 @@ static void	lld_items_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *item_pro
 	if (0 == new_items && 0 == upd_items)
 		goto out;
 
+	if (SUCCEED != DBlock_hostid(hostid))
+	{
+		/* the host was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
+
 	if (0 != new_items)
 	{
 		itemid = DBget_maxid_num("items", new_items);

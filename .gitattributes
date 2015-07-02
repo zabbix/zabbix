@@ -29,6 +29,7 @@ frontends/php/app/controllers/CControllerMediatypeEdit.php -text
 frontends/php/app/controllers/CControllerMediatypeEnable.php -text
 frontends/php/app/controllers/CControllerMediatypeList.php -text
 frontends/php/app/controllers/CControllerMediatypeUpdate.php -text
+frontends/php/app/controllers/CControllerProfileUpdate.php -text
 frontends/php/app/controllers/CControllerProxyDelete.php -text
 frontends/php/app/controllers/CControllerProxyEdit.php -text
 frontends/php/app/controllers/CControllerProxyHostDisable.php -text
@@ -248,7 +249,8 @@ frontends/php/locale/vi/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
 frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
 frontends/php/robots.txt svneol=native#text/plain
-frontends/php/styles/zabbix.css svneol=native#text/css
+frontends/php/styles/blue-theme.css svneol=native#text/css
+frontends/php/styles/dark-theme.css svneol=native#text/css
 frontends/php/tests/bootstrap.php.template -text
 frontends/php/tests/unit/include/classes/import/converters/C20ItemKeyConverterTest.php -text
 frontends/php/tests/unit/include/classes/import/formatters/hostAndTemplate.xml svneol=native#text/xml
@@ -542,6 +544,7 @@ sass/forms-inventory.html -text
 sass/img/browser-sprite.png -text svneol=unset#image/png
 sass/img/icon-sprite.png -text svneol=unset#image/png
 sass/img/preload.gif -text svneol=unset#image/gif
+sass/img_source/icons.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/overlay-dialog_with_tables.html -text
 sass/popup.html -text

@@ -29,27 +29,26 @@ $widget = (new CWidget())
 	->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 
 // create form
-$itemForm = new CForm();
-$itemForm->setName('items');
-$itemForm->addVar('hostid', $this->data['hostid']);
-$itemForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
+$itemForm = (new CForm())
+	->setName('items')
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 // create table
-$itemTable = new CTableInfo();
-
-$itemTable->setHeader([
-	(new CColHeader(
-		(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
-	))->addClass(ZBX_STYLE_CELL_WIDTH),
-	make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
-	make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
-	_('Applications'),
-	make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
-]);
+$itemTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'),'name', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Key'), 'key_', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Interval'), 'delay', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('History'), 'history', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Trends'), 'trends', $this->data['sort'], $this->data['sortorder']),
+		make_sorting_header(_('Type'), 'type', $this->data['sort'], $this->data['sortorder']),
+		_('Applications'),
+		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder'])
+	]);
 
 foreach ($this->data['items'] as $item) {
 	$description = [];

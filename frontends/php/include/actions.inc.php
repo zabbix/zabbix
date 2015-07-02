@@ -1117,16 +1117,16 @@ function getActionMessages(array $alerts) {
 		'preservekeys' => true
 	]);
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		_('Time'),
-		_('Type'),
-		_('Status'),
-		_('Retries left'),
-		_('Recipient(s)'),
-		_('Message'),
-		_('Info')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Time'),
+			_('Type'),
+			_('Status'),
+			_('Retries left'),
+			_('Recipient(s)'),
+			_('Message'),
+			_('Info')
+		]);
 
 	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
@@ -1180,10 +1180,7 @@ function getActionMessages(array $alerts) {
 			$info = '';
 		}
 		else {
-			$info = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconerror')
-				->setHint($alert['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($alert['error']);
 		}
 
 		$table->addRow([
@@ -1215,13 +1212,13 @@ function getActionMessages(array $alerts) {
  * @return CTableInfo
  */
 function getActionCommands(array $alerts) {
-	$table = new CTableInfo();
-	$table->setHeader([
-		_('Time'),
-		_('Status'),
-		_('Command'),
-		_('Error')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Time'),
+			_('Status'),
+			_('Command'),
+			_('Error')
+		]);
 
 	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_COMMAND) {
@@ -1271,12 +1268,12 @@ function getActionCommands(array $alerts) {
 }
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
-	$tab_hint = new CTableInfo();
-	$tab_hint->setHeader([
-		_('User'),
-		_('Details'),
-		_('Status')
-	]);
+	$tab_hint = (new CTableInfo())
+		->setHeader([
+			_('User'),
+			_('Details'),
+			_('Status')
+		]);
 
 	$sql = 'SELECT a.alertid,mt.description,u.alias,u.name,u.surname,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
 			' FROM events e,alerts a'.

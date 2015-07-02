@@ -362,7 +362,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 			DBbegin();
 
-			if (SUCCEED != discovery_verify_dcheck(drule->druleid, dcheck->dcheckid))
+			if (SUCCEED != DBlock_dcheckid(dcheck->dcheckid, drule->druleid))
 			{
 				DBrollback();
 
@@ -530,7 +530,7 @@ static void	process_rule(DB_DRULE *drule)
 
 			DBbegin();
 
-			if (SUCCEED != discovery_verify_drule(drule->druleid))
+			if (SUCCEED != DBlock_druleid(drule->druleid))
 			{
 				DBrollback();
 

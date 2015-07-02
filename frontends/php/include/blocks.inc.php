@@ -464,22 +464,18 @@ function make_system_status($filter) {
 		$table->addRow($groupRow);
 	}
 
-	$script = new CJsScript(get_js(
-		'jQuery("#'.WIDGET_SYSTEM_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-	));
-
-	return new CDiv([$table, $script]);
+	return new CDiv($table);
 }
 
 function make_status_of_zbx() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		_('Parameter'),
-		_('Value'),
-		_('Details')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Parameter'),
+			_('Value'),
+			_('Details')
+		]);
 
 	show_messages(); // because in function get_status(); function clear_messages() is called when fsockopen() fails.
 	$status = get_status();
@@ -535,11 +531,7 @@ function make_status_of_zbx() {
 		}
 	}
 
-	$script = new CJsScript(get_js(
-		'jQuery("#'.WIDGET_ZABBIX_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-	));
-
-	return new CDiv([$table, $script]);
+	return new CDiv($table);
 }
 
 /**
@@ -673,16 +665,16 @@ function make_latest_issues(array $filter = []) {
 			->addStyle('float: left');
 	}
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? [$hostHeaderDiv, $sortDiv] : _('Host'),
-		($showSortIndicator && ($filter['sortfield'] === 'priority')) ? [$issueHeaderDiv, $sortDiv] : _('Issue'),
-		($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? [$lastChangeHeaderDiv, $sortDiv] : _('Last change'),
-		_('Age'),
-		_('Info'),
-		$config['event_ack_enable'] ? _('Ack') : null,
-		_('Actions')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? [$hostHeaderDiv, $sortDiv] : _('Host'),
+			($showSortIndicator && ($filter['sortfield'] === 'priority')) ? [$issueHeaderDiv, $sortDiv] : _('Issue'),
+			($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? [$lastChangeHeaderDiv, $sortDiv] : _('Last change'),
+			_('Age'),
+			_('Info'),
+			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Actions')
+		]);
 
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
@@ -730,10 +722,7 @@ function make_latest_issues(array $filter = []) {
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconunknown')
-				->setHint($trigger['error'], ZBX_STYLE_RED);
+			$unknown = makeUnknownIcon($trigger['error']);
 		}
 
 		// trigger has events
@@ -801,14 +790,10 @@ function make_latest_issues(array $filter = []) {
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$script = new CJsScript(get_js(
-		'jQuery("#'.WIDGET_LAST_ISSUES.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-	));
-
 	$infoDiv = (new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount)))
 		->addStyle('text-align: right; padding-right: 3px;');
 
-	return new CDiv([$table, $infoDiv, $script]);
+	return new CDiv([$table, $infoDiv]);
 }
 
 /**
@@ -824,15 +809,15 @@ function make_latest_issues(array $filter = []) {
  * @return CTableInfo
  */
 function makeTriggersPopup(array $triggers, array $ackParams, array $actions, array $config) {
-	$popupTable = new CTableInfo();
-	$popupTable->setHeader([
-		_('Host'),
-		_('Issue'),
-		_('Age'),
-		_('Info'),
-		$config['event_ack_enable'] ? _('Ack') : null,
-		_('Actions')
-	]);
+	$popupTable = (new CTableInfo())
+		->setHeader([
+			_('Host'),
+			_('Issue'),
+			_('Age'),
+			_('Info'),
+			$config['event_ack_enable'] ? _('Ack') : null,
+			_('Actions')
+		]);
 
 	CArrayHelper::sort($triggers, [['field' => 'lastchange', 'order' => ZBX_SORT_DOWN]]);
 
@@ -842,10 +827,7 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		// unknown triggers
 		$unknown = SPACE;
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-			$unknown = (new CDiv(SPACE))
-				->addClass('status_icon')
-				->addClass('iconunknown')
-				->setHint($trigger['error'], ZBX_STYLE_RED);
+			$unknown = makeUnknownIcon($trigger['error']);
 		}
 
 		// ack
