@@ -4562,6 +4562,9 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+	if (SUCCEED != DBlock_hostids(hostids))
+		goto out;
+
 	zbx_vector_uint64_create(&httptestids);
 	zbx_vector_uint64_create(&selementids);
 
@@ -4626,7 +4629,7 @@ void	DBdelete_hosts(zbx_vector_uint64_t *hostids)
 	zbx_free(sql);
 
 	zbx_vector_uint64_destroy(&selementids);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

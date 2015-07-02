@@ -18,17 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 $chartsWidget = (new CWidget())->setTitle(_('Graphs'));
 
-$chartForm = new CForm('get');
-$chartForm->addVar('fullscreen', $this->data['fullscreen']);
-
-$controls = new CList();
-
-$controls->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()]);
-$controls->addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()]);
-$controls->addItem([_('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()]);
+$controls = (new CList())
+	->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])
+	->addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()])
+	->addItem([_('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()]);
 
 if ($this->data['graphid']) {
 	$controls->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid']]));
@@ -39,11 +34,13 @@ else {
 	$controls->addItem([get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']])]);
 }
 
-$chartForm->addItem($controls);
+$chartForm = (new CForm('get'))
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addItem($controls);
 $chartsWidget->setControls($chartForm);
 
-$filterForm = new CFilter('web.charts.filter.state');
-$filterForm->addNavigator();
+$filterForm = (new CFilter('web.charts.filter.state'))
+	->addNavigator();
 $chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {

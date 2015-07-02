@@ -26,7 +26,7 @@ $filterForm = new CFilter('web.auditlogs.filter.state');
 
 $filterColumn = new CFormList();
 $filterColumn->addRow(_('User'), [
-	new CTextBox('alias', $this->data['alias'], 20),
+	(new CTextBox('alias', $this->data['alias']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)
@@ -46,26 +46,25 @@ $filterColumn->addRow(_('Resource'), new CComboBox('resourcetype', $this->data['
 	[-1 => _('All')] + audit_resource2str()
 ));
 
-$filterForm->addColumn($filterColumn);
-$filterForm->addNavigator();
+$filterForm->addColumn($filterColumn)
+	->addNavigator();
 $auditWidget->addItem($filterForm);
 
 // create form
-$auditForm = new CForm('get');
-$auditForm->setName('auditForm');
+$auditForm = (new CForm('get'))->setName('auditForm');
 
 // create table
-$auditTable = new CTableInfo();
-$auditTable->setHeader([
-	_('Time'),
-	_('User'),
-	_('IP'),
-	_('Resource'),
-	_('Action'),
-	_('ID'),
-	_('Description'),
-	_('Details')
-]);
+$auditTable = (new CTableInfo())
+	->setHeader([
+		_('Time'),
+		_('User'),
+		_('IP'),
+		_('Resource'),
+		_('Action'),
+		_('ID'),
+		_('Description'),
+		_('Details')
+	]);
 foreach ($this->data['actions'] as $action) {
 	$details = [];
 	if (is_array($action['details'])) {

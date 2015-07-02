@@ -79,13 +79,12 @@ foreach ($titles as $key => $title) {
 }
 
 // form list
-$importFormList = new CFormList('proxyFormList');
-$importFormList->addRow(_('Import file'), new CFile('import_file'));
-$importFormList->addRow(_('Rules'), new CDiv($rulesTable));
+$importFormList = (new CFormList('proxyFormList'))
+	->addRow(_('Import file'), (new CFile('import_file'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Rules'), new CDiv($rulesTable));
 
 // tab
-$importTab = new CTabView();
-$importTab->addTab('importTab', _('Import'), $importFormList);
+$importTab = (new CTabView())->addTab('importTab', _('Import'), $importFormList);
 
 // form
 $importForm = new CForm('post', null, 'multipart/form-data');

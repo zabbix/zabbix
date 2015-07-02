@@ -33,7 +33,6 @@ class CTriggersInfo extends CTable {
 
 	public function setOrientation($value) {
 		$this->style = $value;
-
 		return $this;
 	}
 

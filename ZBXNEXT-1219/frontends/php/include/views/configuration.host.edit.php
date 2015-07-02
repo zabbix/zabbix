@@ -30,12 +30,11 @@ if (!hasRequest('form_refresh')) {
 	$divTabs->setSelected(0);
 }
 
-$frmHost = new CForm();
-$frmHost->setName('web.hosts.host.php.');
-
-$frmHost->addVar('form', $data['form']);
-$frmHost->addVar('clear_templates', $data['clear_templates']);
-$frmHost->addVar('flags', $data['flags']);
+$frmHost = (new CForm())
+	->setName('web.hosts.host.php.')
+	->addVar('form', $data['form'])
+	->addVar('clear_templates', $data['clear_templates'])
+	->addVar('flags', $data['flags']);
 
 if ($data['hostid'] != 0) {
 	$frmHost->addVar('hostid', $data['hostid']);
@@ -60,14 +59,15 @@ if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	);
 }
 
-$host_input = new CTextBox(
-	'host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128
+$hostList->addRow(_('Host name'),
+	(new CTextBox('host', $data['host'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
 );
-$host_input->setAttribute('autofocus', 'autofocus');
-$hostList->addRow(_('Host name'), $host_input);
 
 $hostList->addRow(_('Visible name'),
-	new CTextBox('visiblename', $data['visiblename'], ZBX_TEXTBOX_STANDARD_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128)
+	(new CTextBox('visiblename', $data['visiblename'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
@@ -87,14 +87,17 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$hostList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
-	$newgroupTB = new CTextBox('newgroup', $data['newgroup'], ZBX_TEXTBOX_SMALL_SIZE);
-	$newgroupTB->setAttribute('maxlength', 64);
-	$tmp_label = _('New group');
+	$new_group = (new CTextBox('newgroup', $data['newgroup']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('maxlength', 64);
+	$new_group_label = _('New group');
 	if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-		$tmp_label .= ' '._('(Only super admins can create groups)');
-		$newgroupTB->setReadonly(true);
+		$new_group_label .= ' '._('(Only super admins can create groups)');
+		$new_group->setReadonly(true);
 	}
-	$hostList->addRow(new CLabel($tmp_label, 'newgroup'), $newgroupTB, null, null, ZBX_STYLE_TABLE_FORMS_TR_NEW);
+	$hostList->addRow(new CLabel($new_group_label, 'newgroup'),
+		(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+	);
 }
 else {
 	// groups for discovered hosts
@@ -270,7 +273,9 @@ else {
 	);
 }
 
-$hostList->addRow(_('Description'), new CTextArea('description', $data['description']));
+$hostList->addRow(_('Description'),
+	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // Proxy
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
@@ -278,7 +283,8 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$proxy->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
 }
 else {
-	$proxy = new CTextBox(null, $data['proxy_hostid'] != 0 ? $data['proxies'][$data['proxy_hostid']] : _('(no proxy)'), null, true);
+	$proxy = (new CTextBox(null, $data['proxy_hostid'] != 0 ? $data['proxies'][$data['proxy_hostid']] : _('(no proxy)'), true))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	$hostList->addVar('proxy_hostid', $data['proxy_hostid']);
 }
 $hostList->addRow(_('Monitored by proxy'), $proxy);
@@ -589,15 +595,17 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->addClass('formElementTable')
 		->setId('newTemplateTable');
 
-	$newTemplateTable->addRow([new CMultiSelect([
-		'name' => 'add_templates[]',
-		'objectName' => 'templates',
-		'ignored' => $ignoredTemplates,
-		'popup' => [
-			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-		]
-	])]);
+	$newTemplateTable->addRow([
+		(new CMultiSelect([
+			'name' => 'add_templates[]',
+			'objectName' => 'templates',
+			'ignored' => $ignoredTemplates,
+			'popup' => [
+				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	]);
 
 	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
@@ -634,28 +642,36 @@ $divTabs->addTab('templateTab', _('Templates'), $tmplList);
 /*
  * IPMI
  */
-$ipmiList = new CFormList();
-
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 	$cmbIPMIAuthtype = new CListBox('ipmi_authtype', $data['ipmi_authtype'], 7, null, ipmiAuthTypes());
 	$cmbIPMIPrivilege = new CListBox('ipmi_privilege', $data['ipmi_privilege'], 5, null, ipmiPrivileges());
 }
 else {
 	$cmbIPMIAuthtype = [
-		new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['ipmi_authtype']), ZBX_TEXTBOX_SMALL_SIZE, true),
+		(new CTextBox('ipmi_authtype_name', ipmiAuthTypes($data['ipmi_authtype']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_authtype', $data['ipmi_authtype'])
 	];
 	$cmbIPMIPrivilege = [
-		new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['ipmi_privilege']), ZBX_TEXTBOX_SMALL_SIZE, true),
+		(new CTextBox('ipmi_privilege_name', ipmiPrivileges($data['ipmi_privilege']), true))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		new CVar('ipmi_privilege', $data['ipmi_privilege'])
 	];
 }
 
-$ipmiList->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype);
-$ipmiList->addRow(_('Privilege level'), $cmbIPMIPrivilege);
-$ipmiList->addRow(_('Username'), new CTextBox('ipmi_username', $data['ipmi_username'], ZBX_TEXTBOX_SMALL_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)));
-$ipmiList->addRow(_('Password'), new CTextBox('ipmi_password', $data['ipmi_password'], ZBX_TEXTBOX_SMALL_SIZE, ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)));
-$divTabs->addTab('ipmiTab', _('IPMI'), $ipmiList);
+$divTabs->addTab('ipmiTab', _('IPMI'),
+	(new CFormList())
+		->addRow(_('Authentication algorithm'), $cmbIPMIAuthtype)
+		->addRow(_('Privilege level'), $cmbIPMIPrivilege)
+		->addRow(_('Username'),
+			(new CTextBox('ipmi_username', $data['ipmi_username'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		)
+		->addRow(_('Password'),
+			(new CTextBox('ipmi_password', $data['ipmi_password'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		)
+);
 
 /*
  * Macros
@@ -707,14 +723,25 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	}
 
 	if ($hostInventoryTable['fields'][$field_name]['type'] == DB::FIELD_TYPE_TEXT) {
-		$input = new CTextArea('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]);
-		$input->addStyle('width: 64em;');
+		$input = (new CTextArea('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH);
 	}
 	else {
 		$field_length = $hostInventoryTable['fields'][$field_name]['length'];
-		$input = new CTextBox('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]);
-		$input->setAttribute('maxlength', $field_length);
-		$input->addStyle('width: '.($field_length > 64 ? 64 : $field_length).'em;');
+
+		if ($field_length < 39) {
+			$width = ZBX_TEXTAREA_SMALL_WIDTH;
+		}
+		elseif ($field_length < 64) {
+			$width = ZBX_TEXTAREA_STANDARD_WIDTH;
+		}
+		else {
+			$width = ZBX_TEXTAREA_BIG_WIDTH;
+		}
+
+		$input = (new CTextBox('host_inventory['.$field_name.']', $data['host_inventory'][$field_name]))
+			->setWidth($width)
+			->setAttribute('maxlength', $field_length);
 	}
 
 	if ($data['inventory_mode'] == HOST_INVENTORY_DISABLED) {
@@ -743,7 +770,6 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	else {
 		$inventory_item = null;
 	}
-	$input->addStyle('float: left;');
 
 	$inventoryFormList->addRow($inventoryInfo['title'], [$input, $inventory_item]);
 }

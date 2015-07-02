@@ -357,18 +357,18 @@ function getItemFilterForm(&$items) {
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-	$form = new CFilter('web.items.filter.state');
-	$form->addVar('subfilter_hosts', $subfilter_hosts);
-	$form->addVar('subfilter_apps', $subfilter_apps);
-	$form->addVar('subfilter_types', $subfilter_types);
-	$form->addVar('subfilter_value_types', $subfilter_value_types);
-	$form->addVar('subfilter_status', $subfilter_status);
-	$form->addVar('subfilter_state', $subfilter_state);
-	$form->addVar('subfilter_templated_items', $subfilter_templated_items);
-	$form->addVar('subfilter_with_triggers', $subfilter_with_triggers);
-	$form->addVar('subfilter_history', $subfilter_history);
-	$form->addVar('subfilter_trends', $subfilter_trends);
-	$form->addVar('subfilter_interval', $subfilter_interval);
+	$form = (new CFilter('web.items.filter.state'))
+		->addVar('subfilter_hosts', $subfilter_hosts)
+		->addVar('subfilter_apps', $subfilter_apps)
+		->addVar('subfilter_types', $subfilter_types)
+		->addVar('subfilter_value_types', $subfilter_value_types)
+		->addVar('subfilter_status', $subfilter_status)
+		->addVar('subfilter_state', $subfilter_state)
+		->addVar('subfilter_templated_items', $subfilter_templated_items)
+		->addVar('subfilter_with_triggers', $subfilter_with_triggers)
+		->addVar('subfilter_history', $subfilter_history)
+		->addVar('subfilter_trends', $subfilter_trends)
+		->addVar('subfilter_interval', $subfilter_interval);
 
 	$filterColumn1 = new CFormList();
 	$filterColumn2 = new CFormList();
@@ -452,7 +452,8 @@ function getItemFilterForm(&$items) {
 	// update interval
 	$updateIntervalLabel = (new CSpan(_('Update interval (in sec)')))->setId('filter_delay_label');
 
-	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
+	$updateIntervalInput = (new CNumericBox('filter_delay', $filter_delay, 5, false, true))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 
 	// data type
 	$dataTypeLabel = (new CSpan(bold(_('Data type').NAME_DELIMITER)))->setId('filter_data_type_label');
@@ -462,28 +463,23 @@ function getItemFilterForm(&$items) {
 	$dataTypeInput->addItems(item_data_type2str());
 
 	// SNMP community
-	$snmpCommunityLabel = (new CSpan([bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER]))
-		->setId('filter_snmp_community_label');
-
-	$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpCommunityLabel = (new CSpan(_('SNMP community like')))->setId('filter_snmp_community_label');
+	$snmpCommunityField = (new CTextBox('filter_snmp_community', $filter_snmp_community))
+		->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// SNMPv3 security name
-	$snmpSecurityLabel = (new CSpan([bold(_('Security name')), SPACE._('like').NAME_DELIMITER]))
-		->setId('filter_snmpv3_securityname_label');
-
-	$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpSecurityLabel = (new CSpan(_('Security name like')))->setId('filter_snmpv3_securityname_label');
+	$snmpSecurityField = (new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname))
+		->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// SNMP OID
-	$snmpOidLabel = (new CSpan([bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER]))
-		->setId('filter_snmp_oid_label');
-
-	$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpOidLabel = (new CSpan(_('SNMP OID like')))->setId('filter_snmp_oid_label');
+	$snmpOidField = (new CTextBox('filter_snmp_oid', $filter_snmp_oid))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// port
-	$portLabel = (new CSpan([bold(_('Port')), SPACE._('like').NAME_DELIMITER]))
-		->setId('filter_port_label');
-
-	$portField = new CNumericBox('filter_port', $filter_port, 5, false, true);
+	$portLabel = (new CSpan(_('Port like')))->setId('filter_port_label');
+	$portField = (new CNumericBox('filter_port', $filter_port, 5, false, true))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 
 	// row 1
 	$groupFilter = null;
@@ -502,7 +498,7 @@ function getItemFilterForm(&$items) {
 	}
 
 	$filterColumn1->addRow(_('Host group'),
-		new CMultiSelect([
+		(new CMultiSelect([
 			'name' => 'filter_groupid',
 			'selectedLimit' => 1,
 			'objectName' => 'hostGroup',
@@ -514,7 +510,7 @@ function getItemFilterForm(&$items) {
 				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
 					'&srcfld1=groupid&writeonly=1'
 			]
-		])
+		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
 	$filterColumn2->addRow(_('Type'), $cmbType);
@@ -539,7 +535,7 @@ function getItemFilterForm(&$items) {
 	}
 
 	$filterColumn1->addRow(_('Host'),
-		new CMultiSelect([
+		(new CMultiSelect([
 			'name' => 'filter_hostid',
 			'selectedLimit' => 1,
 			'objectName' => 'hosts',
@@ -552,7 +548,7 @@ function getItemFilterForm(&$items) {
 				'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
 					'&srcfld1=hostid&writeonly=1'
 			]
-		])
+		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
 	);
 
 	$filterColumn2->addRow($updateIntervalLabel, $updateIntervalInput);
@@ -562,7 +558,7 @@ function getItemFilterForm(&$items) {
 	// row 3
 	$filterColumn1->addRow(_('Application'),
 		[
-			new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
+			(new CTextBox('filter_application', $filter_application))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton(null, _('Select')))
 				->addClass(ZBX_STYLE_BTN_GREY)
@@ -575,7 +571,10 @@ function getItemFilterForm(&$items) {
 		]
 	);
 	$filterColumn2->addRow([$snmpCommunityLabel, $snmpSecurityLabel], [$snmpCommunityField, $snmpSecurityField]);
-	$filterColumn3->addRow(_('History (in days)'), new CNumericBox('filter_history', $filter_history, 8, false, true));
+	$filterColumn3->addRow(_('History (in days)'),
+		(new CNumericBox('filter_history', $filter_history, 8, false, true))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 	$filterColumn4->addRow(_('Triggers'),
 		new CComboBox('filter_with_triggers', $filter_with_triggers, null, [
 			-1 => _('all'),
@@ -585,9 +584,14 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 4
-	$filterColumn1->addRow(_('Name like'), new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE));
+	$filterColumn1->addRow(_('Name like'),
+		(new CTextBox('filter_name', $filter_name))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
 	$filterColumn2->addRow($snmpOidLabel, $snmpOidField);
-	$filterColumn3->addRow(_('Trends (in days)'), new CNumericBox('filter_trends', $filter_trends, 8, false, true));
+	$filterColumn3->addRow(_('Trends (in days)'),
+		(new CNumericBox('filter_trends', $filter_trends, 8, false, true))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 	$filterColumn4->addRow(_('Template'),
 		new CComboBox('filter_templated_items', $filter_templated_items, null, [
 			-1 => _('all'),
@@ -597,7 +601,9 @@ function getItemFilterForm(&$items) {
 	);
 
 	// row 5
-	$filterColumn1->addRow(_('Key like'), new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE));
+	$filterColumn1->addRow(_('Key like'),
+		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
 	$filterColumn2->addRow($portLabel, $portField);
 
 	$form->addColumn($filterColumn1);
@@ -1698,14 +1704,20 @@ function get_timeperiod_form() {
 		$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
 		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
 		$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
-		$tblPeriod->addRow([_('Every day(s)'), new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3)]);
+		$tblPeriod->addRow([_('Every day(s)'),
+			(new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		]);
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
 		$tblPeriod->addItem(new CVar('new_timeperiod[month]', bindec($bit_month)));
 		$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
 		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
 		$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
-		$tblPeriod->addRow([_('Every week(s)'), new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2)]);
+		$tblPeriod->addRow([_('Every week(s)'),
+			(new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		]);
 
 		$tabDays = new CTable();
 		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')]);
@@ -1788,7 +1800,10 @@ function get_timeperiod_form() {
 		}
 		else {
 			$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
-			$tblPeriod->addRow([_('Day of month'), new CNumericBox('new_timeperiod[day]', $new_timeperiod['day'], 2)]);
+			$tblPeriod->addRow([_('Day of month'),
+				(new CNumericBox('new_timeperiod[day]', $new_timeperiod['day'], 2))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			]);
 		}
 	}
 	else {
@@ -1820,10 +1835,12 @@ function get_timeperiod_form() {
 
 	if ($new_timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
 		$tblPeriod->addRow([_('At (hour:minute)'), [
-			new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2),
+			(new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			':',
-			new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2)]]
-		);
+			(new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		]]);
 	}
 
 	$perHours = new CComboBox('new_timeperiod[period_hours]', $new_timeperiod['period_hours'], null, range(0, 23));
@@ -1831,7 +1848,8 @@ function get_timeperiod_form() {
 	$tblPeriod->addRow([
 		_('Maintenance period length'),
 		[
-			new CNumericBox('new_timeperiod[period_days]', $new_timeperiod['period_days'], 3),
+			(new CNumericBox('new_timeperiod[period_days]', $new_timeperiod['period_days'], 3))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			_('Days').SPACE.SPACE,
 			$perHours,
 			_('Hours').SPACE.SPACE,

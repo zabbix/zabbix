@@ -39,22 +39,24 @@ foreach ($data['alert_usrgrps'] as $usrgrp) {
 	$alertUserGroup->addItem($usrgrp['usrgrpid'], $usrgrp['name']);
 }
 
-$otherTab->addRow(_('Refresh unsupported items (in sec)'),
-	new CNumericBox('refresh_unsupported', $data['refresh_unsupported'], 5)
-);
-$otherTab->addRow(_('Group for discovered hosts'), $discoveryGroup);
-$otherTab->addRow(_('User group for database down message'), $alertUserGroup);
-$otherTab->addRow(_('Log unmatched SNMP traps'),
-	(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
-);
+$otherTab
+	->addRow(_('Refresh unsupported items (in sec)'),
+		(new CNumericBox('refresh_unsupported', $data['refresh_unsupported'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Group for discovered hosts'), $discoveryGroup)
+	->addRow(_('User group for database down message'), $alertUserGroup)
+	->addRow(_('Log unmatched SNMP traps'),
+		(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)
+	);
 
-$otherView = new CTabView();
-$otherView->addTab('other', _('Other parameters'), $otherTab);
-
-$otherForm = new CForm();
-$otherForm->setName('otherForm');
-$otherView->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
-$otherForm->addItem($otherView);
+$otherForm = (new CForm())
+	->setName('otherForm')
+	->addItem(
+		(new CTabView())
+			->addTab('other', _('Other parameters'), $otherTab)
+			->setFooter(makeFormFooter(new CSubmit('update', _('Update'))))
+	);
 
 $widget->addItem($otherForm);
 
