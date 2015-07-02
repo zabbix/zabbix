@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -828,6 +828,13 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 		goto out;
 
 	DBbegin();
+
+	if (SUCCEED != DBlock_hostid(hostid))
+	{
+		/* the host was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
 
 	if (0 != new_items)
 	{

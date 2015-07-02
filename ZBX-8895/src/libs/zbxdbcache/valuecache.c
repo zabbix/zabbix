@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ static time_t (*vc_time)(time_t *) = time;
 
 static zbx_mem_info_t	*vc_mem = NULL;
 
-static ZBX_MUTEX	vc_lock;
+static ZBX_MUTEX	vc_lock = ZBX_MUTEX_NULL;
 
 /* flag indicating that the cache was explicitly locked by this process */
 static int	vc_locked = 0;
@@ -748,7 +748,7 @@ static void	vc_update_statistics(zbx_vc_item_t *item, int hits, int misses)
  ******************************************************************************/
 static void	vc_warn_low_memory()
 {
-	int		now;
+	int	now;
 
 	now = ZBX_VC_TIME();
 
@@ -1726,7 +1726,8 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 
 				sindex = schunk->last_value;
 			}
-		} while (0 < zbx_timespec_compare(&schunk->slots[sindex].timestamp, &value->timestamp));
+		}
+		while (0 < zbx_timespec_compare(&schunk->slots[sindex].timestamp, &value->timestamp));
 	}
 	else
 	{
@@ -2289,8 +2290,8 @@ out:
 static int	vch_item_get_value(zbx_vc_item_t *item, const zbx_timespec_t *ts, zbx_history_record_t *value,
 		int *found)
 {
-	int			index, ret = FAIL, hits = 0, misses = 0, now;
-	zbx_vc_chunk_t		*chunk;
+	int		index, ret = FAIL, hits = 0, misses = 0, now;
+	zbx_vc_chunk_t	*chunk;
 
 	now = ZBX_VC_TIME();
 	*found = 0;
@@ -2427,9 +2428,9 @@ void	zbx_vc_init(void)
 	}
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
-	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, __vc_mem_malloc_func, __vc_mem_realloc_func,
-			__vc_mem_free_func);
+	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE,
+			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
 
 	if (NULL == vc_cache->items.slots)
 	{
@@ -2437,7 +2438,8 @@ void	zbx_vc_init(void)
 		exit(EXIT_FAILURE);
 	}
 
-	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE, vc_strpool_hash_func, vc_strpool_compare_func,
+	zbx_hashset_create_ext(&vc_cache->strpool, VC_STRPOOL_INIT_SIZE,
+			vc_strpool_hash_func, vc_strpool_compare_func, NULL,
 			__vc_mem_malloc_func, __vc_mem_realloc_func, __vc_mem_free_func);
 
 	if (NULL == vc_cache->strpool.slots)
@@ -2637,7 +2639,8 @@ out:
 
 		vc_try_lock();
 
-		vc_cache->db_queries += queries;
+		if (NULL != vc_cache)
+			vc_cache->db_queries += queries;
 
 		if (SUCCEED == ret)
 			vc_update_statistics(NULL, 0, values->values_num);
@@ -2726,7 +2729,8 @@ out:
 
 		vc_try_lock();
 
-		vc_cache->db_queries += queries;
+		if (NULL != vc_cache)
+			vc_cache->db_queries += queries;
 
 		if (SUCCEED == ret)
 		{

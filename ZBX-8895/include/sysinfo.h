@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -187,7 +187,6 @@ int	parse_item_key(const char *itemkey, AGENT_REQUEST *request);
 
 zbx_log_t	*add_log_result(AGENT_RESULT *result, const char *value);
 void		set_log_result_empty(AGENT_RESULT *result);
-zbx_uint64_t	get_log_result_lastlogsize(AGENT_RESULT *result);
 
 void	unquote_key_param(char *param);
 void	quote_key_param(char **param, int forced);

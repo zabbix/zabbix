@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,9 +37,6 @@ extern char	ZBX_PG_ESCAPE_BACKSLASH;
 /*      SSS - source nodeid (in which node was the ID created) */
 /*      DDDDDDDDDDD - the ID itself                            */
 /***************************************************************/
-
-extern int	txn_level;
-extern int	txn_error;
 
 /******************************************************************************
  *                                                                            *
@@ -126,7 +123,6 @@ int	DBconnect(int flag)
 	int		err;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() flag:%d", __function_name, flag);
-
 
 	while (ZBX_DB_OK != (err = zbx_db_connect(CONFIG_DBHOST, CONFIG_DBUSER, CONFIG_DBPASSWORD,
 			CONFIG_DBNAME, CONFIG_DBSCHEMA, CONFIG_DBSOCKET, CONFIG_DBPORT)))
@@ -2272,7 +2268,7 @@ void	zbx_db_insert_add_values_dyn(zbx_db_insert_t *self, const zbx_db_value_t **
 #ifdef HAVE_ORACLE
 				row[i].str = NULL;
 				zbx_strncpy_alloc(&row[i].str, &str_alloc, &str_offset, value->str,
-						zbx_strlen_utf8_n(value->str, field->length));
+						zbx_strlen_utf8_nchars(value->str, field->length));
 #else
 				row[i].str = DBdyn_escape_string_len(value->str, field->length);
 #endif
@@ -2625,3 +2621,104 @@ void	zbx_db_insert_autoincrement(zbx_db_insert_t *self, const char *field_name)
 	exit(FAIL);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_record                                                    *
+ *                                                                            *
+ * Purpose: locks a record in a table by its primary key and an optional      *
+ *          constraint field                                                  *
+ *                                                                            *
+ * Parameters: table     - [IN] the target table                              *
+ *             id        - [IN] primary key value                             *
+ *             add_field - [IN] additional constraint field name (optional)   *
+ *             add_id    - [IN] constraint field value                        *
+ *                                                                            *
+ * Return value: SUCCEED - the record was successfully locked                 *
+ *               FAIL    - the table does not contain the specified record    *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id)
+{
+	const char	*__function_name = "DBlock_record";
+
+	DB_RESULT	result;
+	const ZBX_TABLE	*t;
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == zbx_db_txn_level())
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
+
+	t = DBget_table(table);
+
+	if (NULL == add_field)
+	{
+		result = DBselect("select null from %s where %s=" ZBX_FS_UI64 ZBX_FOR_UPDATE, table, t->recid, id);
+	}
+	else
+	{
+		result = DBselect("select null from %s where %s=" ZBX_FS_UI64 " and %s=" ZBX_FS_UI64 ZBX_FOR_UPDATE,
+				table, t->recid, id, add_field, add_id);
+	}
+
+	if (NULL == DBfetch(result))
+		ret = FAIL;
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_records                                                   *
+ *                                                                            *
+ * Purpose: locks a records in a table by its primary key                     *
+ *                                                                            *
+ * Parameters: table     - [IN] the target table                              *
+ *             ids       - [IN] primary key values                            *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - the table does not contain any of the specified    *
+ *                         records                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
+{
+	const char	*__function_name = "DBlock_records";
+
+	DB_RESULT	result;
+	const ZBX_TABLE	*t;
+	int		ret;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == zbx_db_txn_level())
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
+
+	t = DBget_table(table);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select null from %s where", table);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, t->recid, ids->values, ids->values_num);
+
+	result = DBselect("%s" ZBX_FOR_UPDATE, sql);
+
+	if (NULL == DBfetch(result))
+		ret = FAIL;
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}

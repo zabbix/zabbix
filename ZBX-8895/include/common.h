@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1004,7 +1004,8 @@ char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
-size_t	zbx_strlen_utf8_n(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nchars(const char *text, size_t utf8_maxlen);
+size_t	zbx_strlen_utf8_nbytes(const char *text, size_t maxlen);
 
 int	zbx_is_utf8(const char *text);
 #define ZBX_UTF8_REPLACE_CHAR	'?'
@@ -1066,5 +1067,7 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 
 #define ZBX_SESSION_ACTIVE	0
 #define ZBX_SESSION_PASSIVE	1
+
+char	*zbx_dyn_escape_shell_single_quote(const char *text);
 
 #endif

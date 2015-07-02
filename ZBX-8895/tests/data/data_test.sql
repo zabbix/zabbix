@@ -688,7 +688,6 @@ INSERT INTO items (itemid, name, key_, hostid, interfaceid, delay, value_type, p
 INSERT INTO triggers (triggerid, description, value, state, lastchange, comments) VALUES (15517, 'trigger host.host:{HOST.HOST} | host.host2:{HOST.HOST2} | host.name:{HOST.NAME} | item.value:{ITEM.VALUE} | item.value1:{ITEM.VALUE1} | item.lastvalue:{ITEM.LASTVALUE} | host.ip:{HOST.IP} | host.dns:{HOST.DNS} | host.conn:{HOST.CONN}', 0, 1, '1339761311', '');
 INSERT INTO functions (functionid, itemid, triggerid, function, parameter) VALUES (15946, 24338, 15517, 'last', '0');
 
-
 -- inheritance testing
 INSERT INTO hosts (hostid, host, name, status) VALUES (15000, 'Inheritance test template'  , 'Inheritance test template'  , 3);
 INSERT INTO hosts (hostid, host, name, status) VALUES (15002, 'Inheritance test template 2', 'Inheritance test template 2', 3);
@@ -1312,3 +1311,18 @@ INSERT INTO functions (functionid,itemid,triggerid,function,parameter) VALUES (1
 INSERT INTO sysmaps (sysmapid,name,width,height,backgroundid,label_type,label_location,highlight,expandproblem,markelements,show_unack,grid_size,grid_show,grid_align,label_format,label_type_host,label_type_hostgroup,label_type_trigger,label_type_map,label_type_image,label_string_host,label_string_hostgroup,label_string_trigger,label_string_map,label_string_image,iconmapid,expand_macros,severity_min) VALUES (5,'testZBX6840',800,600,NULL,0,0,0,0,0,0,50,1,1,0,2,2,2,2,2,'','','','','',NULL,0,0);
 INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (8,5,10084,0,19,NULL,'Host element (Zabbix Server)',-1,413,268,NULL,NULL,0,0,200,200,0,0);
 INSERT INTO sysmaps_elements (selementid,sysmapid,elementid,elementtype,iconid_off,iconid_on,label,label_location,x,y,iconid_disabled,iconid_maintenance,elementsubtype,areatype,width,height,viewtype,use_iconmap) VALUES (9,5,16026,2,15,NULL,'Trigger element (zbx6840)',-1,213,218,NULL,NULL,0,0,200,200,0,0);
+
+-- testPageHistory_CheckLayout
+
+INSERT INTO hosts (hostid, host, name, status) VALUES (15003, 'testPageHistory_CheckLayout', 'testPageHistory_CheckLayout', 0);
+INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (15003, 15003, 4);
+INSERT INTO interface (interfaceid, hostid, type, ip, useip, port, main) VALUES (15005, 15003, 1, '127.0.0.1', 1, '10050', 1);
+
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type, data_type, name, key_, delay, history, trends, status, units, valuemapid, flags) VALUES (15085, 15003, 15005, 0, 3, 0, 'item_testPageHistory_CheckLayout_Numeric_Unsigned', 'numeric_unsigned[item_testpagehistory_checklayout]', 30, 90, 365, 0, '', NULL, 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history, trends, status, units, valuemapid, flags) VALUES (15086, 15003, 15005, 0, 0,    'item_testPageHistory_CheckLayout_Numeric_Float'   , 'numeric_float[item_testpagehistory_checklayout]'   , 30, 90, 365, 0, '', NULL, 0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15087, 15003, 15005, 0, 1,    'item_testPageHistory_CheckLayout_Character'       , 'character[item_testpagehistory_checklayout]'       , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15088, 15003, 15005, 0, 4,    'item_testPageHistory_CheckLayout_Text'            , 'text[item_testpagehistory_checklayout]'            , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15089, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Log'             , 'log[item_testpagehistory_checklayout]'             , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15090, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Log_2'           , 'log[item_testpagehistory_checklayout, 2]'          , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15091, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Eventlog'        , 'eventlog[item_testpagehistory_checklayout]'        , 30, 90,      0,           0);
+INSERT INTO items (itemid, hostid, interfaceid, type, value_type,            name, key_, delay, history,         status,                    flags) VALUES (15092, 15003, 15005, 0, 2,    'item_testPageHistory_CheckLayout_Eventlog_2'      , 'eventlog[item_testpagehistory_checklayout, 2]'     , 30, 90,      0,           0);

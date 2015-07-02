@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2317,6 +2317,9 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 	else
 		ret = SUCCEED;
 
+	if (SUCCEED == ret && 0 != proxy_hostid)
+		DCconfig_set_proxy_timediff(proxy_hostid, &proxy_timediff);
+
 	p = NULL;
 	while (SUCCEED == ret && NULL != (p = zbx_json_next(&jp_data, p)))	/* iterate the item key entries */
 	{
@@ -2344,7 +2347,7 @@ int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
 				}
 			}
 			else
-				av->ts.ns = -1;
+				av->ts.ns = proxy_timediff.ns;
 		}
 		else
 			zbx_timespec(&av->ts);
@@ -2505,9 +2508,8 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 					drule.druleid);
 
 			if (NULL != (row = DBfetch(result)))
-			{
 				ZBX_STR2UINT64(drule.unique_dcheckid, row[0]);
-			}
+
 			DBfree_result(result);
 
 			last_druleid = drule.druleid;
@@ -2525,12 +2527,37 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 				zbx_date2str(itemtime), zbx_time2str(itemtime), ip, dns, port, dcheck.key_, value);
 
 		DBbegin();
-		if (-1 == dcheck.type)
-			discovery_update_host(&dhost, ip, status, itemtime);
-		else
-			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
-		DBcommit();
 
+		if (-1 == dcheck.type)
+		{
+			if (SUCCEED != DBlock_druleid(drule.druleid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "druleid:" ZBX_FS_UI64 " does not exist", drule.druleid);
+
+				goto next;
+			}
+
+			discovery_update_host(&dhost, ip, status, itemtime);
+		}
+		else
+		{
+			if (SUCCEED != DBlock_dcheckid(dcheck.dcheckid, drule.druleid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " either does not exist or does not"
+						" belong to druleid:" ZBX_FS_UI64, dcheck.dcheckid, drule.druleid);
+
+				goto next;
+			}
+
+			discovery_update_service(&drule, &dcheck, &dhost, ip, dns, port, status, value, itemtime);
+		}
+
+		DBcommit();
+next:
 		continue;
 json_parse_error:
 		zabbix_log(LOG_LEVEL_WARNING, "invalid discovery data: %s", zbx_json_strerror());

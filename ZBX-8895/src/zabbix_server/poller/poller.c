@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -624,7 +624,7 @@ static int	get_values(unsigned char poller_type)
 	/* retrieve item values */
 	if (SUCCEED == is_snmp_type(items[0].type))
 	{
-#ifdef HAVE_SNMP
+#ifdef HAVE_NETSNMP
 		/* SNMP checks use their own timeouts */
 		get_values_snmp(items, results, errcodes, num);
 #else
@@ -697,7 +697,22 @@ static int	get_values(unsigned char poller_type)
 			items[i].state = ITEM_STATE_NORMAL;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, &results[i], &timespec,
 					items[i].state, NULL);
-			lastlogsizes[i] = get_log_result_lastlogsize(&results[i]);
+
+			if (0 != ISSET_LOG(&results[i]))
+			{
+				if (NULL != results[i].logs[0])
+				{
+					size_t	j;
+
+					for (j = 1; NULL != results[i].logs[j]; j++)
+						;
+
+					lastlogsizes[i] = results[i].logs[j - 1]->lastlogsize;
+				}
+				else
+					lastlogsizes[i] = items[i].lastlogsize;
+			}
+
 		}
 		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
 		{

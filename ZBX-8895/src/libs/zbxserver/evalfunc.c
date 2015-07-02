@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2014 Zabbix SIA
+** Copyright (C) 2001-2015 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1467,7 +1467,7 @@ static int	evaluate_STR(char *value, DC_ITEM *item, const char *function, const 
 		goto out;
 	}
 
-	/* at this point the value type can be only str, tex or log */
+	/* at this point the value type can be only str, text or log */
 	if (ITEM_VALUE_TYPE_LOG == item->value_type)
 	{
 		for (i = 0; i < values.values_num; i++)
