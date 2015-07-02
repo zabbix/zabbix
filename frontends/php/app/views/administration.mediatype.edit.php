@@ -51,10 +51,40 @@ $ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztextin
 	->setTarget('_blank');
 $cmbTypeRow[] = $ez_texting_link;
 
+$connections = [
+	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_NONE,
+		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE
+	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_NONE),
+	new CLabel(_('None'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_NONE),
+	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_STARTTLS,
+		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS
+	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_STARTTLS),
+	new CLabel(_('STARTTLS'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_STARTTLS),
+	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_SSL_TLS,
+		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS
+	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_SSL_TLS),
+	new CLabel(_('SSL/TLS'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_SSL_TLS)
+];
+
+$authentication = [
+	(new CRadioButton('smtp_authentication', SMTP_AUTHENTICATION_NONE,
+		$data['smtp_authentication'] == SMTP_AUTHENTICATION_NONE
+	))->setId('smtp_authentication_'.SMTP_AUTHENTICATION_NONE),
+	new CLabel(_('None'), 'smtp_authentication_'.SMTP_AUTHENTICATION_NONE),
+	(new CRadioButton('smtp_authentication', SMTP_AUTHENTICATION_NORMAL,
+		$data['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
+	))->setId('smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL),
+	new CLabel(_('Normal password'), 'smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL)
+];
+
 $mediaTypeFormList
 	->addRow(_('Type'), $cmbTypeRow)
-	->addRow(_('SMTP server'),
-		(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	->addRow(_('SMTP server'), [
+			(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			_('Port'),
+			(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		],
 		$data['type'] != MEDIA_TYPE_EMAIL
 	)
 	->addRow(_('SMTP helo'),
@@ -64,6 +94,21 @@ $mediaTypeFormList
 	->addRow(_('SMTP email'),
 		(new CTextBox('smtp_email', $data['smtp_email']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('Connection security'),
+		$connections, $data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('SSL verify peer'),
+		(new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer']),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('SSL verify host'),
+		(new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host']),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('Authentication'), $authentication, $data['type'] != MEDIA_TYPE_EMAIL)
+	->addRow(_('Username'),
+		(new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Script name'),
 		(new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),

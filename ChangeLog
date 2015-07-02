@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+ADF.I..PS. [ZBXNEXT-679] implement SMTP authentication support (asaveljevs, Oleg)
 ..FGI..... [ZBXNEXT-1368] added Windows service discovery and service.info[] item; thanks to Ryan Armstrong for patch (asaveljevs, igors)
 ..F....... [ZBX-8297] removed "Triggers info" top line from Monitoring > Triggers page fullscreen view (Ivo)
 A.FGI..PS. [ZBXNEXT-786] renamed net.tcp.service[ntp] and net.tcp.service.perf[ntp] to net.udp.service[ntp] and net.udp.service.perf[ntp] (asaveljevs, Oleg, Sasha)
