@@ -156,6 +156,7 @@ class CControllerMediatypeEdit extends CController {
 			'gsm_modem',
 			'jabber_username',
 			'eztext_username',
+			'smtp_username',
 			'passwd',
 			'status'
 		]);
