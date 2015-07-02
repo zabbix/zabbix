@@ -3185,11 +3185,8 @@ void	DCsync_configuration(void)
 	csec = zbx_time() - sec;
 
 	sec = zbx_time();
-	/* DBselect is a macro and embedding a directive within macro arguments is not portable. Therefore a */
-	/* repeated SQL query. */
-	if (NULL == (host_result =
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			DBselect(
+	if (NULL == (host_result = DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"errors_from,available,disable_until,snmp_errors_from,"
@@ -3204,7 +3201,7 @@ void	DCsync_configuration(void)
 			HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE,
 			ZBX_FLAG_DISCOVERY_PROTOTYPE)))
 #else
-			DBselect(
+	if (NULL == (host_result = DBselect(
 			"select hostid,proxy_hostid,host,ipmi_authtype,ipmi_privilege,ipmi_username,"
 				"ipmi_password,maintenance_status,maintenance_type,maintenance_from,"
 				"errors_from,available,disable_until,snmp_errors_from,"
