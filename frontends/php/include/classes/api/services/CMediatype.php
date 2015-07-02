@@ -46,7 +46,6 @@ class CMediatype extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userType = self::$userData['type'];
 
 		$sqlParts = [
 			'select'	=> ['media_type' => 'mt.mediatypeid'],
@@ -82,7 +81,7 @@ class CMediatype extends CApiService {
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
-		if (USER_TYPE_SUPER_ADMIN == $userType) {
+		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
 		}
 		elseif (is_null($options['editable']) && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
 		}
@@ -164,12 +163,12 @@ class CMediatype extends CApiService {
 	/**
 	 * Validates the input parameters for the create() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $mediatypes
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $mediatypes) {
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
 		}
 
@@ -180,16 +179,14 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
 			}
 
-			$mediatype_exist = API::getApiService()->select('media_type', [
+			$mediatype_exists = API::getApiService()->select('media_type', [
 				'output' => ['description'],
 				'filter' => ['description' => $mediatype['description']]
 			]);
 
-			$mediatype_description = $mediatype['description'];
-
-			if ($mediatype_exist) {
+			if ($mediatype_exists) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.',
-					$mediatype_description
+					$mediatype['description']
 				));
 			}
 
@@ -212,12 +209,12 @@ class CMediatype extends CApiService {
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @throws APIException if the input is invalid
-	 *
 	 * @param array $mediatypes
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array $mediatypes) {
-		if (USER_TYPE_SUPER_ADMIN != self::$userData['type']) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can edit media types.'));
 		}
 
@@ -279,6 +276,7 @@ class CMediatype extends CApiService {
 	 * @param string	$mediatypes['username']				username
 	 * @param string	$mediatypes['passwd']				password
 	 * @param int		$mediatypes['status']				media type status
+	 *
 	 * @return array
 	 */
 	public function create($mediatypes) {
@@ -311,6 +309,7 @@ class CMediatype extends CApiService {
 	 * @param string	$mediatypes['username']				username
 	 * @param string	$mediatypes['passwd']				password
 	 * @param int		$mediatypes['status']				media type status
+	 *
 	 * @return array
 	 */
 	public function update($mediatypes) {
