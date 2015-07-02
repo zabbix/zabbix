@@ -221,6 +221,7 @@
 		</tbody>
 		</table>
 	</div>
+
 <div class="preloader"></div>
 	</div>
 	<div class="footer">
@@ -275,65 +276,50 @@
 		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
 		</li>
 	</ul>
-<!--
-	<table class="list-table">
-	<tr>
-	<td class="disaster-bg"></td>
-	<td><h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="high-bg"></td>
-	<td><h4>Problem <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="average-bg"></td>
-	<td><h4>Problem <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="warning-bg"></td>
-	<td><h4>Problem <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="normal-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="normal-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="normal-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	</table>-->
 	</div>
 
-<div style="top: 106px; left: 1300px; z-index: 100;" class="overlay-dialogue"><span class="overlay-close-btn"></span>
-<table class="list-table">
-<tr><td class="normal-bg">&nbsp;</td><td>Ok</td></tr>
-<tr><td class="na-bg">Not classified</td><td>Problem</td></tr>
-<tr><td class="info-bg">Information</td><td>Problem</td></tr>
-<tr><td class="warning-bg">Warning</td><td>Problem</td></tr>
-<tr><td class="average-bg">Average</td><td>Problem</td></tr>
-<tr><td class="high-bg">High</td><td>Problem</td></tr>
-<tr><td class="disaster-bg">Disaster</td><td>Problem</td></tr>
-<tr><td><table style="visibility: visible; margin: -8px -10px" class="blink overview-mon-severities"><tr><td class="normal">&nbsp;</td><td class="na-bg">&nbsp;</td><td class="info-bg">&nbsp;</td><td class="warning-bg">&nbsp;</td><td class="average-bg">&nbsp;</td><td class="high-bg">&nbsp;</td><td class="disaster-bg">&nbsp;</td></tr></table></td><td>Age less than 30m</td></tr><tr><td>&nbsp;</td><td>No trigger</td></tr>
-</table>
+<div style="top: 128px; left: 1400px" class="overlay-dialogue"><span class="overlay-close-btn"></span>
+	<ul class="notif-body">
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>OK</h4>
+		<p></p>
+		</li>
+		<li><div class="notif-indic na-bg"></div>
+		<h4>Not classified</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic info-bg"></div>
+		<h4>Information</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic warning-bg"></div>
+		<h4>Warning</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic average-bg"></div>
+		<h4>Average</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic high-bg"></div>
+		<h4>High</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic disaster-bg"></div>
+		<h4>Disaster</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic-container">
+		<div class="notif-indic normal-bg"></div>
+		<div class="notif-indic na-bg"></div>
+		<div class="notif-indic info-bg"></div>
+		<div class="notif-indic warning-bg"></div>
+		<div class="notif-indic average-bg"></div
+		><div class="notif-indic high-bg"></div>
+		<div class="notif-indic disaster-bg"></div>
+		</div>
+		<h4>Age less then 30 m</h4>
+		</li>
+	</ul>
 </div>
-
 </body>
 </html>

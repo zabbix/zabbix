@@ -2420,7 +2420,7 @@ button[disabled] {
 	}
 
 	li {
-		padding: 0 0 15px 17px;
+		padding: 0 0 10px 17px;
 
 		&:last-child {
 			padding-bottom: 0;
@@ -2429,12 +2429,19 @@ button[disabled] {
 }
 
 .notif-indic {
-	display: inline-block;
 	width: 12px;
 	height: 12px;
 	float: left;
 	margin: 2px 0 0 -17px;
-	@include border-radius(2px);
+	@include border-radius(50%);
+}
+
+.notif-indic-container {
+	float: left;
+
+	.notif-indic {
+		float: none;
+	}
 }
 
 /* Maps, Screens, Graphs */
