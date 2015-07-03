@@ -800,8 +800,6 @@ class CItemPrototype extends CItemGeneral {
 				)
 			]);
 
-			$application_prototypeids = zbx_objectValues($db_item_application_prototypes, 'application_prototypeid');
-
 			$this->deleteApplicationPrototypes(zbx_objectValues($db_item_application_prototypes,
 				'application_prototypeid'
 			));
