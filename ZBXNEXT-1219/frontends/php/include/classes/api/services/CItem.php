@@ -644,56 +644,7 @@ class CItem extends CItemGeneral {
 			'resourcetype' => [SCREEN_RESOURCE_SIMPLE_GRAPH, SCREEN_RESOURCE_PLAIN_TEXT, SCREEN_RESOURCE_CLOCK]
 		]);
 
-		/*
-		 * Collect only discovered items to that will be deleted. Deleting a normal item, linkage between
-		 * discovered applications is not checked and those applications are left alone.
-		 */
-		$discovered_items_to_delete = [];
-		$discovered_applications = [];
-
-		foreach ($delItems as $delItem) {
-			if ($delItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				$discovered_items_to_delete[$delItem['itemid']] = true;
-			}
-		}
-
-		if ($discovered_items_to_delete) {
-			/*
-			 * Find discovered applications for created items. Chain-delete discovered items (for example deleting
-			 * an item prototype) and re-check if discovered applications are no longer linked to other items.
-			 * In case applications are still linked to normal items, leave them be.
-			 */
-			$discovered_applications = API::Application()->get([
-				'output' => [],
-				'itemids' => array_keys($discovered_items_to_delete),
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
-				'preservekeys' => true
-			]);
-		}
-
 		DB::delete('items', ['itemid' => $itemIds]);
-
-		if ($discovered_items_to_delete && $discovered_applications) {
-			// Check if discovered applications are no longer linked to other items.
-			$discovered_applications = API::Application()->get([
-				'output' => ['applicationid'],
-				'selectItems' => ['itemid'],
-				'applicationids' => array_keys($discovered_applications),
-				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
-			]);
-
-			$applications_to_delete = [];
-
-			foreach ($discovered_applications as $discovered_application) {
-				if (!$discovered_application['items']) {
-					$applications_to_delete[$discovered_application['applicationid']] = true;
-				}
-			}
-
-			if ($applications_to_delete) {
-				API::Application()->delete(array_keys($applications_to_delete), true);
-			}
-		}
 
 		DB::delete('profiles', [
 			'idx' => 'web.favorite.graphids',
