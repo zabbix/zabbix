@@ -128,12 +128,12 @@ switch ($data['method']) {
 						'time' => $event['clock'],
 						'priority' => $priority,
 						'sound' => $sound,
-						'color' => getSeverityColor($trigger['priority'], $event['value']),
+						'severity_style' => getSeverityStyle($trigger['priority'], $event['value'] == TRIGGER_VALUE_TRUE),
 						'title' => $title.' [url='.$url_tr_status.']'.$host['name'].'[/url]',
 						'body' => [
-							_('Details').': [url='.$url_events.']'.$trigger['description'].'[/url]',
-							_('Date').': [b][url='.$url_tr_events.']'.
-								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']).'[/url][/b]',
+							'[url='.$url_events.']'.$trigger['description'].'[/url]',
+							'[url='.$url_tr_events.']'.
+								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']).'[/url]',
 						],
 						'timeout' => $msgsettings['timeout']
 					];
