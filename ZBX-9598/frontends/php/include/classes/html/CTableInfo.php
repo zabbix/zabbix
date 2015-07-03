@@ -21,20 +21,19 @@
 
 class CTableInfo extends CTable {
 
-	public function __construct($message = null) {
-		if ($message === null) {
-			$message = _('No data found');
-		}
-		parent::__construct($message, ZBX_STYLE_LIST_TABLE);
+	public function __construct() {
+		parent::__construct();
+		$this->addClass(ZBX_STYLE_LIST_TABLE);
+		$this->setNoDataMessage(_('No data found'));
 		$this->addMakeVerticalRotationJs = false;
 	}
 
 	public function toString($destroy = true) {
-		$tableId = $this->getAttribute('id');
+		$tableId = $this->getId();
 
 		if(!$tableId) {
 			$tableId = uniqid('t');
-			$this->setAttribute('id', $tableId);
+			$this->setId($tableId);
 		}
 
 		$string = parent::toString($destroy);
@@ -72,7 +71,6 @@ class CTableInfo extends CTable {
 				}',
 			true);
 		}
-
 		return $string;
 	}
 
@@ -82,5 +80,6 @@ class CTableInfo extends CTable {
 	 */
 	public function makeVerticalRotation() {
 		$this->addMakeVerticalRotationJs = true;
+		return $this;
 	}
 }

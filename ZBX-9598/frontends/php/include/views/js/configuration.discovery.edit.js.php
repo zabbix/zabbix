@@ -4,14 +4,10 @@
 			<span class="bold">#{name}</span>
 		</td>
 		<td>
-			<button type="button" class="button link_menu" onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');">
-				<?php echo _('Edit'); ?>
-			</button>
+			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');"><?= _('Edit') ?></button>
 		</td>
 		<td>
-			<button type="button" class="button link_menu" onclick="javascript: removeDCheckRow('#{dcheckid}');">
-				<?php echo _('Remove'); ?>
-			</button>
+			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" onclick="javascript: removeDCheckRow('#{dcheckid}');"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>
@@ -24,98 +20,91 @@
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
-		<div class="objectgroup inlineblock border_dotted ui-corner-all">
+		<div class="objectgroup inlineblock border_dotted">
 			<table class="formElementTable">
 				<tbody>
 				<tr>
-					<td><label for="type"><?php echo _('Check type'); ?></label></td>
+					<td><label for="type"><?= _('Check type') ?></label></td>
 					<td><select id="type" name="type" class="input select"></select></td>
 				</tr>
 				<tr id="newCheckPortsRow" class="hidden">
-					<td><label for="ports"><?php echo _('Port range'); ?></label></td>
+					<td><label for="ports"><?= _('Port range') ?></label></td>
 					<td>
-						<input type="text" id="ports" name="ports" value="" class="input text" size="16" maxlength="255">
+						<input type="text" id="ports" name="ports" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckCommunityRow" class="hidden">
-					<td><label for="snmp_community"><?php echo _('SNMP community'); ?></label></td>
+					<td><label for="snmp_community"><?= _('SNMP community') ?></label></td>
 					<td><input type="text" id="snmp_community" name="snmp_community" value="" class="input text"
-							size="20" maxlength="255"></td>
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255"></td>
 				</tr>
 				<tr id="newCheckKeyRow" class="hidden">
-					<td><label for="key_"><?php echo _('SNMP Key'); ?></label></td>
+					<td><label for="key_"><?= _('SNMP Key') ?></label></td>
 					<td>
-						<input type="text" id="key_" name="key_" value="" class="input text" size="20" maxlength="255">
+						<input type="text" id="key_" name="key_" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckContextRow" class="hidden">
-					<td><label for="snmpv3_contextname"><?php echo _('Context name'); ?></label></td>
+					<td><label for="snmpv3_contextname"><?= _('Context name') ?></label></td>
 					<td>
-						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" class="input text" size="20" maxlength="255">
+						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckSecNameRow" class="hidden">
-					<td><label for="snmpv3_securityname"><?php echo _('Security name'); ?></label></td>
-					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><label for="snmpv3_securityname"><?= _('Security name') ?></label></td>
+					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				<tr id="newCheckSecLevRow" class="hidden">
-					<td><label for="snmpv3_securitylevel"><?php echo _('Security level'); ?></label></td>
+					<td><label for="snmpv3_securitylevel"><?= _('Security level') ?></label></td>
 					<td>
-						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select" size="1">
-							<option value="0"><?php echo 'noAuthNoPriv'; ?> </option>
-							<option value="1"><?php echo 'authNoPriv'; ?> </option>
-							<option value="2"><?php echo 'authPriv'; ?> </option>
+						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select">
+							<option value="0"><?= 'noAuthNoPriv' ?> </option>
+							<option value="1"><?= 'authNoPriv' ?> </option>
+							<option value="2"><?= 'authPriv' ?> </option>
 						</select>
 					</td>
 				</tr>
 				<tr id="newCheckAuthProtocolRow" class="hidden">
-					<td><label for="snmpv3_authprotocol"><?php echo _('Authentication protocol'); ?></label></td>
+					<td><label for="snmpv3_authprotocol"><?= _('Authentication protocol') ?></label></td>
 					<td>
 						<div class="jqueryinputset radioset">
 							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_0" type="radio" checked="checked"
-								value="<?php echo ITEM_AUTHPROTOCOL_MD5; ?>" />
+								value="<?= ITEM_AUTHPROTOCOL_MD5 ?>" />
 							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_1" type="radio"
-								value="<?php echo ITEM_AUTHPROTOCOL_SHA; ?>" />
-							<label for="snmpv3_authprotocol_0"><?php echo _('MD5'); ?></label><label for="snmpv3_authprotocol_1"><?php echo _('SHA'); ?></label>
+								value="<?= ITEM_AUTHPROTOCOL_SHA ?>" />
+							<label for="snmpv3_authprotocol_0"><?= _('MD5') ?></label><label for="snmpv3_authprotocol_1"><?= _('SHA') ?></label>
 						</div>
 					</td>
 				</tr>
 				<tr id="newCheckAuthPassRow" class="hidden">
-					<td><label for="snmpv3_authpassphrase"><?php echo _('Authentication passphrase'); ?></label></td>
-					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><label for="snmpv3_authpassphrase"><?= _('Authentication passphrase') ?></label></td>
+					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				<tr id="newCheckPrivProtocolRow" class="hidden">
-					<td><label for="snmpv3_authprotocol"><?php echo _('Authentication protocol'); ?></label></td>
+					<td><label for="snmpv3_authprotocol"><?= _('Authentication protocol') ?></label></td>
 					<td>
 						<div class="jqueryinputset radioset">
 							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_0" type="radio" checked="checked"
-								value="<?php echo ITEM_PRIVPROTOCOL_DES; ?>" />
+								value="<?= ITEM_PRIVPROTOCOL_DES ?>" />
 							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_1" type="radio"
-								value="<?php echo ITEM_PRIVPROTOCOL_AES; ?>" />
-							<label for="snmpv3_privprotocol_0"><?php echo _('DES'); ?></label><label for="snmpv3_privprotocol_1"><?php echo _('AES'); ?></label>
+								value="<?= ITEM_PRIVPROTOCOL_AES ?>" />
+							<label for="snmpv3_privprotocol_0"><?= _('DES') ?></label><label for="snmpv3_privprotocol_1"><?= _('AES') ?></label>
 						</div>
 					</td>
 				</tr>
 				<tr id="newCheckPrivPassRow" class="hidden">
-					<td><label for="snmpv3_privpassphrase"><?php echo _('Privacy passphrase'); ?></label></td>
-					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><label for="snmpv3_privpassphrase"><?= _('Privacy passphrase') ?></label></td>
+					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				</tbody>
 			</table>
 			<table class="formElementTable">
 				<tr>
 					<td>
-						<button type="button" id="add_new_dcheck" name="add_new_dcheck" class="button link_menu">
-							<?php echo _('Add') ?>
-						</button>
+						<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" id="add_new_dcheck" name="add_new_dcheck"><?= _('Add') ?></button>
 					</td>
 					<td>
-						<button type="button" id="cancel_new_dcheck" name="cancel_new_dcheck" class="button link_menu">
-							<?php echo _('Cancel') ?>
-						</button>
+						<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" id="cancel_new_dcheck" name="cancel_new_dcheck"><?= _('Cancel') ?></button>
 					</td>
 				</tr>
 			</table>
@@ -124,22 +113,22 @@
 </script>
 <script type="text/javascript">
 	var ZBX_SVC = {
-		ssh: <?php echo SVC_SSH; ?>,
-		ldap: <?php echo SVC_LDAP; ?>,
-		smtp: <?php echo SVC_SMTP; ?>,
-		ftp: <?php echo SVC_FTP; ?>,
-		http: <?php echo SVC_HTTP; ?>,
-		pop: <?php echo SVC_POP; ?>,
-		nntp: <?php echo SVC_NNTP; ?>,
-		imap: <?php echo SVC_IMAP; ?>,
-		tcp: <?php echo SVC_TCP; ?>,
-		agent: <?php echo SVC_AGENT; ?>,
-		snmpv1: <?php echo SVC_SNMPv1; ?>,
-		snmpv2: <?php echo SVC_SNMPv2c; ?>,
-		snmpv3: <?php echo SVC_SNMPv3; ?>,
-		icmp: <?php echo SVC_ICMPPING; ?>,
-		https: <?php echo SVC_HTTPS; ?>,
-		telnet: <?php echo SVC_TELNET; ?>
+		ssh: <?= SVC_SSH ?>,
+		ldap: <?= SVC_LDAP ?>,
+		smtp: <?= SVC_SMTP ?>,
+		ftp: <?= SVC_FTP ?>,
+		http: <?= SVC_HTTP ?>,
+		pop: <?= SVC_POP ?>,
+		nntp: <?= SVC_NNTP ?>,
+		imap: <?= SVC_IMAP ?>,
+		tcp: <?= SVC_TCP ?>,
+		agent: <?= SVC_AGENT ?>,
+		snmpv1: <?= SVC_SNMPv1 ?>,
+		snmpv2: <?= SVC_SNMPv2c ?>,
+		snmpv3: <?= SVC_SNMPv3 ?>,
+		icmp: <?= SVC_ICMPPING ?>,
+		https: <?= SVC_HTTPS ?>,
+		telnet: <?= SVC_TELNET ?>
 	};
 
 	var ZBX_CHECKLIST = {};
@@ -170,22 +159,22 @@
 
 	function discoveryCheckTypeToString(svcPort) {
 		var defPorts = {};
-		defPorts[ZBX_SVC.ftp] = <?php echo CJs::encodeJson(_('FTP')); ?>;
-		defPorts[ZBX_SVC.http] = <?php echo CJs::encodeJson(_('HTTP')); ?>;
-		defPorts[ZBX_SVC.https] = <?php echo CJs::encodeJson(_('HTTPS')); ?>;
-		defPorts[ZBX_SVC.icmp] = <?php echo CJs::encodeJson(_('ICMP ping')); ?>;
-		defPorts[ZBX_SVC.imap] = <?php echo CJs::encodeJson(_('IMAP')); ?>;
-		defPorts[ZBX_SVC.tcp] = <?php echo CJs::encodeJson(_('TCP')); ?>;
-		defPorts[ZBX_SVC.ldap] = <?php echo CJs::encodeJson(_('LDAP')); ?>;
-		defPorts[ZBX_SVC.nntp] = <?php echo CJs::encodeJson(_('NNTP')); ?>;
-		defPorts[ZBX_SVC.pop] = <?php echo CJs::encodeJson(_('POP')); ?>;
-		defPorts[ZBX_SVC.snmpv1] = <?php echo CJs::encodeJson(_('SNMPv1 agent')); ?>;
-		defPorts[ZBX_SVC.snmpv2] = <?php echo CJs::encodeJson(_('SNMPv2 agent')); ?>;
-		defPorts[ZBX_SVC.snmpv3] = <?php echo CJs::encodeJson(_('SNMPv3 agent')); ?>;
-		defPorts[ZBX_SVC.smtp] = <?php echo CJs::encodeJson(_('SMTP')); ?>;
-		defPorts[ZBX_SVC.ssh] = <?php echo CJs::encodeJson(_('SSH')); ?>;
-		defPorts[ZBX_SVC.telnet] = <?php echo CJs::encodeJson(_('Telnet')); ?>;
-		defPorts[ZBX_SVC.agent] = <?php echo CJs::encodeJson(_('Zabbix agent')); ?>;
+		defPorts[ZBX_SVC.ftp] = <?= CJs::encodeJson(_('FTP')) ?>;
+		defPorts[ZBX_SVC.http] = <?= CJs::encodeJson(_('HTTP')) ?>;
+		defPorts[ZBX_SVC.https] = <?= CJs::encodeJson(_('HTTPS')) ?>;
+		defPorts[ZBX_SVC.icmp] = <?= CJs::encodeJson(_('ICMP ping')) ?>;
+		defPorts[ZBX_SVC.imap] = <?= CJs::encodeJson(_('IMAP')) ?>;
+		defPorts[ZBX_SVC.tcp] = <?= CJs::encodeJson(_('TCP')) ?>;
+		defPorts[ZBX_SVC.ldap] = <?= CJs::encodeJson(_('LDAP')) ?>;
+		defPorts[ZBX_SVC.nntp] = <?= CJs::encodeJson(_('NNTP')) ?>;
+		defPorts[ZBX_SVC.pop] = <?= CJs::encodeJson(_('POP')) ?>;
+		defPorts[ZBX_SVC.snmpv1] = <?= CJs::encodeJson(_('SNMPv1 agent')) ?>;
+		defPorts[ZBX_SVC.snmpv2] = <?= CJs::encodeJson(_('SNMPv2 agent')) ?>;
+		defPorts[ZBX_SVC.snmpv3] = <?= CJs::encodeJson(_('SNMPv3 agent')) ?>;
+		defPorts[ZBX_SVC.smtp] = <?= CJs::encodeJson(_('SMTP')) ?>;
+		defPorts[ZBX_SVC.ssh] = <?= CJs::encodeJson(_('SSH')) ?>;
+		defPorts[ZBX_SVC.telnet] = <?= CJs::encodeJson(_('Telnet')) ?>;
+		defPorts[ZBX_SVC.agent] = <?= CJs::encodeJson(_('Zabbix agent')) ?>;
 
 		if (typeof svcPort === 'undefined') {
 			return defPorts;
@@ -193,7 +182,7 @@
 
 		svcPort = parseInt(svcPort, 10);
 
-		return isset(svcPort, defPorts) ? defPorts[svcPort] : <?php echo CJs::encodeJson(_('Unknown')); ?>;
+		return isset(svcPort, defPorts) ? defPorts[svcPort] : <?= CJs::encodeJson(_('Unknown')) ?>;
 	}
 
 	function toggleInputs(id, state) {
@@ -356,7 +345,7 @@
 
 			// rename button to "update"
 			if (isUpdate) {
-				jQuery('#add_new_dcheck').text(<?php echo CJs::encodeJson(_('Update')); ?>);
+				jQuery('#add_new_dcheck').text(<?= CJs::encodeJson(_('Update')) ?>);
 			}
 
 			// button "remove" form
@@ -434,8 +423,8 @@
 
 		if (isset(dcheckType, keyRowTypes)) {
 			var caption = (dcheckType == ZBX_SVC.agent)
-				? <?php echo CJs::encodeJson(_('Key')); ?>
-				: <?php echo CJs::encodeJson(_('SNMP OID')); ?>;
+				? <?= CJs::encodeJson(_('Key')) ?>
+				: <?= CJs::encodeJson(_('SNMP OID')) ?>;
 
 			jQuery('#newCheckKeyRow label').text(caption);
 		}
@@ -489,15 +478,15 @@
 		secNameRowTypes[ZBX_SVC.snmpv3] = true;
 
 		var showAuthProtocol = (isset(dcheckType, secNameRowTypes)
-			&& (dcheckSecLevType == <?php echo ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV; ?>
-				|| dcheckSecLevType == <?php echo ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV; ?>));
+			&& (dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>
+				|| dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>));
 		var showAuthPass = (isset(dcheckType, secNameRowTypes)
-			&& (dcheckSecLevType == <?php echo ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV; ?>
-				|| dcheckSecLevType == <?php echo ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV; ?>));
+			&& (dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>
+				|| dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>));
 		var showPrivProtocol = (isset(dcheckType, secNameRowTypes)
-			&& dcheckSecLevType == <?php echo ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV; ?>);
+			&& dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>);
 		var showPrivPass = (isset(dcheckType, secNameRowTypes)
-			&& dcheckSecLevType == <?php echo ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV; ?>);
+			&& dcheckSecLevType == <?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>);
 
 		toggleInputs('newCheckAuthProtocolRow', showAuthProtocol);
 		toggleInputs('newCheckAuthPassRow', showAuthPass);
@@ -547,9 +536,9 @@
 						&& (typeof dCheck['snmpv3_contextname'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_contextname'] === dCheck['snmpv3_contextname'])) {
 					showModalWindow(
-						t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
-						<?php echo CJs::encodeJson(_('Check already exists.')); ?>,
-						[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
+						t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
+						<?= CJs::encodeJson(_('Check already exists.')) ?>,
+						[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
 							jQuery(this).dialog('destroy');
 						}}]
 					);
@@ -576,11 +565,11 @@
 			case ZBX_SVC.snmpv1:
 			case ZBX_SVC.snmpv2:
 				if (dCheck.snmp_community == '') {
-					validationErrors.push(<?php echo CJs::encodeJson(_('Incorrect SNMP community.')); ?>);
+					validationErrors.push(<?= CJs::encodeJson(_('Incorrect SNMP community.')) ?>);
 				}
 			case ZBX_SVC.snmpv3:
 				if (dCheck.key_ == '') {
-					validationErrors.push(<?php echo CJs::encodeJson(_('Incorrect SNMP OID.')); ?>);
+					validationErrors.push(<?= CJs::encodeJson(_('Incorrect SNMP OID.')) ?>);
 				}
 				break;
 		}
@@ -611,9 +600,9 @@
 				},
 				error: function() {
 					showModalWindow(
-						t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
-						<?php echo CJs::encodeJson(_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')); ?>,
-						[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
+						t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
+						<?= CJs::encodeJson(_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')) ?>,
+						[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
 							jQuery(this).dialog('destroy');
 						}}]
 					);
@@ -628,9 +617,9 @@
 
 			if (validationErrors.length) {
 				showModalWindow(
-					t(<?php echo CJs::encodeJson(_('Discovery check error')); ?>),
+					t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
 					validationErrors.join('\n'),
-					[{text: t(<?php echo CJs::encodeJson(_('Close')); ?>), click: function() {
+					[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
 						jQuery(this).dialog('destroy');
 					}}]
 				);
@@ -657,13 +646,13 @@
 	}
 
 	jQuery(document).ready(function() {
-		addPopupValues(<?php echo zbx_jsvalue(array_values($this->data['drule']['dchecks'])); ?>);
+		addPopupValues(<?= zbx_jsvalue(array_values($this->data['drule']['dchecks'])) ?>);
 
-		jQuery("input:radio[name='uniqueness_criteria'][value=<?php echo zbx_jsvalue($this->data['drule']['uniqueness_criteria']); ?>]").attr('checked', 'checked');
+		jQuery("input:radio[name='uniqueness_criteria'][value=<?= zbx_jsvalue($this->data['drule']['uniqueness_criteria']) ?>]").attr('checked', 'checked');
 
 		jQuery('#newCheck').click(showNewCheckForm);
 		jQuery('#clone').click(function() {
-			jQuery('#update').button('option', 'label', <?php echo CJs::encodeJson(_('Add')); ?>)
+			jQuery('#update').button('option', 'label', <?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');

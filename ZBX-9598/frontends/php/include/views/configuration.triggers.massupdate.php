@@ -21,20 +21,18 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$triggersWidget = new CWidget();
+$triggersWidget = (new CWidget())->setTitle(_('Triggers'));
 
 // append host summary to widget header
 if (!empty($data['hostid'])) {
 	$triggersWidget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
-$triggersWidget->setTitle(_('Triggers'));
-
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('hostid', $data['hostid']);
-$triggersForm->addVar('action', $data['action']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('hostid', $data['hostid'])
+	->addVar('action', $data['action']);
 
 foreach ($data['g_triggerid'] as $triggerid) {
 	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);
@@ -52,17 +50,19 @@ $severityDiv = new CSeverity([
 
 $triggersFormList->addRow(
 	[_('Severity'), SPACE,
-		new CVisibilityBox('visible[priority]', isset($data['visible']['priority']), 'priority_div', _('Original')),
+		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
+			->setChecked(isset($data['visible']['priority']))
 	],
 	$severityDiv
 );
 
 // append dependencies to form list
-$dependenciesTable = (new CTable(_('No dependencies defined.')))->
-	addClass('formElementTable')->
-	setAttribute('style', 'min-width: 500px;')->
-	setAttribute('id', 'dependenciesTable')->
-	setHeader([_('Name'), _('Action')]);
+$dependenciesTable = (new CTable())
+	->setNoDataMessage(_('No dependencies defined.'))
+	->addClass('formElementTable')
+	->setAttribute('style', 'min-width: 500px;')
+	->setId('dependenciesTable')
+	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
 	$triggersForm->addVar('dependencies[]', $dependency['triggerid'], 'dependencies_'.$dependency['triggerid']);
@@ -72,43 +72,42 @@ foreach ($data['dependencies'] as $dependency) {
 	);
 
 	if ($dependency['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
-		$description = new CLink($depTriggerDescription,
+		$description = (new CLink($depTriggerDescription,
 			'triggers.php?form=update&triggerid='.$dependency['triggerid']
-		);
-		$description->setAttribute('target', '_blank');
+		))->setAttribute('target', '_blank');
 	}
 	else {
 		$description = $depTriggerDescription;
 	}
 
-	$row = new CRow([$description, new CButton('remove', _('Remove'),
-		'javascript: removeDependency(\''.$dependency['triggerid'].'\');',
-		'link_menu'
-	)]);
+	$row = new CRow([$description,
+		(new CButton('remove', _('Remove')))
+			->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]);
 
-	$row->setAttribute('id', 'dependency_'.$dependency['triggerid']);
+	$row->setId('dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
 }
 
-$dependenciesDiv = new CDiv(
+$dependenciesDiv = (new CDiv(
 	[
 		$dependenciesTable,
-		new CButton('btn1', _('Add'),
-			'return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-				'&with_triggers=1&noempty=1");',
-			'link_menu'
-		)
-	],
-	'objectgroup inlineblock border_dotted ui-corner-all'
-);
-$dependenciesDiv->setAttribute('id', 'dependencies_div');
+		(new CButton('btn1', _('Add')))
+			->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+					'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
+					'&with_triggers=1&noempty=1");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]))
+	->addClass('objectgroup')
+	->addClass('inlineblock')
+	->addClass('border_dotted')
+	->setId('dependencies_div');
 
 $triggersFormList->addRow(
 	[_('Replace dependencies'), SPACE,
-		new CVisibilityBox('visible[dependencies]', isset($data['visible']['dependencies']), 'dependencies_div',
-			_('Original')
-		)
+		(new CVisibilityBox('visible[dependencies]', 'dependencies_div', _('Original')))
+			->setChecked(isset($data['visible']['dependencies']))
 	],
 	$dependenciesDiv
 );

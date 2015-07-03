@@ -451,7 +451,7 @@ class testFormWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='delay']/@size", 5);
 		$this->assertAttribute("//input[@id='delay']/@value", 60);
 
-		$this->zbxTestTextPresent('Retries');
+		$this->zbxTestTextPresent('Attempts');
 		$this->assertVisible('retries');
 		$this->assertAttribute("//input[@id='retries']/@maxlength", 2);
 		$this->assertAttribute("//input[@id='retries']/@size", 2);

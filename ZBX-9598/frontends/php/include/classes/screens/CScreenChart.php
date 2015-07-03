@@ -90,7 +90,13 @@ class CScreenChart extends CScreenBase {
 				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
-			return $this->getOutput(new CDiv(null, 'center', $containerId), true, ['graphid' => $this->graphid]);
+			return $this->getOutput(
+				(new CDiv())
+					->addClass('center')
+					->setId($containerId),
+				true,
+				['graphid' => $this->graphid]
+			);
 		}
 	}
 }

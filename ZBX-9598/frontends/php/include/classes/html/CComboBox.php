@@ -24,12 +24,12 @@ class CComboBox extends CTag {
 	public $value;
 
 	public function __construct($name = 'combobox', $value = null, $action = null, array $items = []) {
-		parent::__construct('select', 'yes');
-		$this->setAttribute('id', zbx_formatDomId($name));
+		parent::__construct('select', true);
+		$this->setId(zbx_formatDomId($name));
 		$this->setAttribute('name', $name);
 		$this->value = $value;
 		if ($action !== null) {
-			$this->setAttribute('onchange', $action);
+			$this->onChange($action);
 		}
 		$this->addItems($items);
 
@@ -39,6 +39,7 @@ class CComboBox extends CTag {
 
 	public function setValue($value = null) {
 		$this->value = $value;
+		return $this;
 	}
 
 	public function addItems(array $items) {
@@ -46,6 +47,7 @@ class CComboBox extends CTag {
 			$selected = (int) (strcmp($value, $this->value) == 0);
 			parent::addItem(new CComboItem($value, $caption, $selected));
 		}
+		return $this;
 	}
 
 	public function addItemsInGroup($label, $items) {
@@ -55,6 +57,7 @@ class CComboBox extends CTag {
 			$group->addItem(new CComboItem($value, $caption, $selected));
 		}
 		parent::addItem($group);
+		return $this;
 	}
 
 	public function addItem($value, $caption = '', $selected = null, $enabled = true, $class = null) {
@@ -85,7 +88,6 @@ class CComboBox extends CTag {
 
 			parent::addItem($citem);
 		}
-
 		return $this;
 	}
 
@@ -101,13 +103,14 @@ class CComboBox extends CTag {
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+		return $this;
 	}
 }
 
 class COptGroup extends CTag {
 
 	public function __construct($label) {
-		parent::__construct('optgroup', 'yes');
+		parent::__construct('optgroup', true);
 		$this->setAttribute('label', $label);
 	}
 }
