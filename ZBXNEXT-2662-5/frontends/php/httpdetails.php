@@ -107,7 +107,7 @@ $itemHistory = Manager::History()->getLast($items);
  */
 $widget = (new CWidget())
 	->setTitle(
-		_('DETAILS OF WEB SCENARIO').': '.
+		_('Details of web scenario').': '.
 		CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name'])
 	)
 	->setControls((new CForm())
