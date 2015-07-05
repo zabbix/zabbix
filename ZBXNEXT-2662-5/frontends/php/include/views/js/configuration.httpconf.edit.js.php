@@ -193,25 +193,21 @@
 		<?php endforeach ?>
 
 		$('#authentication').on('change', function() {
-			var httpFieldsDisabled = $(this).val() == <?= HTTPTEST_AUTH_NONE ?>;
+			var httpFieldsDisabled = ($(this).val() == <?= HTTPTEST_AUTH_NONE ?>);
 
-			$('#http_user').attr('disabled', httpFieldsDisabled);
-			$('#http_password').attr('disabled', httpFieldsDisabled);
-
-			if (httpFieldsDisabled) {
-				$('#http_user').closest('li').addClass('hidden');
-				$('#http_password').closest('li').addClass('hidden');
-			}
-			else {
-				$('#http_user').closest('li').removeClass('hidden');
-				$('#http_password').closest('li').removeClass('hidden');
-			}
+			$('#http_user')
+				.attr('disabled', httpFieldsDisabled)
+				.closest('li').toggle(!httpFieldsDisabled);
+			$('#http_password')
+				.attr('disabled', httpFieldsDisabled)
+				.closest('li').toggle(!httpFieldsDisabled);
 		});
 
-		<?php if (isset($this->data['agentVisibility']) && $this->data['agentVisibility']) { ?>
+		<?php if (isset($this->data['agentVisibility']) && $this->data['agentVisibility']): ?>
 			new CViewSwitcher('agent', 'change', <?= zbx_jsvalue($this->data['agentVisibility'], true) ?>);
-		<?php } ?>
+		<?php endif ?>
 
 		$('#agent').trigger('change');
+		$('#authentication').trigger('change');
 	});
 </script>
