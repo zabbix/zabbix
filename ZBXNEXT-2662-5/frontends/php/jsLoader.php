@@ -63,7 +63,6 @@ $availableJScripts = [
 	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
-	'activity-indicator.js' => 'vendors/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -237,7 +236,6 @@ if (empty($_GET['files'])) {
 		'prototype.js',
 		'jquery.js',
 		'jquery-ui.js',
-		'activity-indicator.js',
 		'common.js',
 		'class.cdebug.js',
 		'class.cdate.js',
