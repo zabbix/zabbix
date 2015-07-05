@@ -48,14 +48,6 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 		$item['name_expanded']
 	];
 	$headerPlaintext[] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
-
-	if ($this->data['action'] == HISTORY_GRAPH) {
-		$header['right']->addItem(get_icon('favourite', [
-			'fav' => 'web.favorite.graphids',
-			'elid' => $item['itemid'],
-			'elname' => 'itemid'
-		]));
-	}
 }
 elseif (count($hostNames) == 1) {
 	$header['left'] = [
@@ -64,8 +56,6 @@ elseif (count($hostNames) == 1) {
 		$header['left']
 	];
 }
-
-$header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 
 // don't display the action form if we view multiple items on a graph
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
@@ -91,11 +81,26 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 	$actionForm->addItem(new CComboBox('action', $this->data['action'], 'submit()', $actions));
 
 	if ($this->data['action'] != HISTORY_GRAPH) {
-		$actionForm->addItem([' ', new CSubmit('plaintext', _('As plain text'))]);
+		$actionForm->addItem([
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			new CSubmit('plaintext', _('As plain text'))
+		]);
 	}
 
 	$header['right']->addItem($actionForm);
 }
+
+if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
+	if ($this->data['action'] == HISTORY_GRAPH) {
+		$header['right']->addItem(get_icon('favourite', [
+			'fav' => 'web.favorite.graphids',
+			'elid' => $item['itemid'],
+			'elname' => 'itemid'
+		]));
+	}
+}
+
+$header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 
 // create filter
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {

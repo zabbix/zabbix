@@ -39,8 +39,9 @@ if ($data['maps']) {
 	$headerMapForm->addVar('action', 'map.view')
 		->addVar('fullscreen', $data['fullscreen']);
 
-	$controls->addItem([_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)])
-		->addItem([_('Minimum severity').SPACE, $data['pageFilter']->getSeveritiesMinCB()]);
+	$controls
+		->addItem([_('Map'), SPACE, new CComboBox('sysmapid', $data['sysmapid'], 'submit()', $maps)])
+		->addItem([_('Minimum severity'), SPACE, $data['pageFilter']->getSeveritiesMinCB()]);
 
 	// get map parent maps
 	$parentMaps = [];
