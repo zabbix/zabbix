@@ -43,7 +43,7 @@ $host = reset($item['hosts']);
 
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 	$header['left'] = [
-		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
+		$host['name'],
 		NAME_DELIMITER,
 		$item['name_expanded']
 	];
@@ -51,7 +51,7 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 }
 elseif (count($hostNames) == 1) {
 	$header['left'] = [
-		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
+		$host['name'],
 		NAME_DELIMITER,
 		$header['left']
 	];
