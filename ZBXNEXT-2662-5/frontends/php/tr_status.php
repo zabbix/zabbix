@@ -555,7 +555,7 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = (new CSpan($description))->addClass('pointer');
+	$triggerDescription = new CSpan($description);
 
 	// host js menu
 	$hostList = [];
@@ -569,7 +569,7 @@ foreach ($triggers as $trigger) {
 		}
 
 		$hostName = (new CSpan($triggerHost['name']))
-			->addClass(ZBX_STYLE_BTN_ACTION)
+			->addClass(ZBX_STYLE_LINK_ACTION)
 			->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
 
 		// add maintenance icon with hint if host is in maintenance
@@ -593,7 +593,6 @@ foreach ($triggers as $trigger) {
 				}
 
 				$maintenanceIcon->setHint($hint);
-				$maintenanceIcon->addClass('pointer');
 			}
 
 			$hostName->addItem($maintenanceIcon);
@@ -603,10 +602,6 @@ foreach ($triggers as $trigger) {
 		$hostList[] = ', ';
 	}
 	array_pop($hostList);
-
-	// host
-	$hostColumn = new CCol($hostList);
-	$hostColumn->addStyle('white-space: normal;');
 
 	// status
 	$statusSpan = new CSpan(trigger_value2str($trigger['value']));
@@ -709,7 +704,7 @@ foreach ($triggers as $trigger) {
 		empty($trigger['lastchange']) ? '' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
-		$hostColumn,
+		$hostList,
 		$triggerDescription,
 		$comments
 	], 'even_row');

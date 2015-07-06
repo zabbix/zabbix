@@ -72,7 +72,6 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 
 	$iconPreviewImage = (new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 		'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
-		->addClass('pointer')
 		->addClass('preview')
 		->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid']);
 
@@ -112,7 +111,6 @@ $iconsComboBox->addClass('mappingIcon');
 
 $iconPreviewImage = (new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'].
 	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
-	->addClass('pointer')
 	->addClass('preview')
 	->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
 
