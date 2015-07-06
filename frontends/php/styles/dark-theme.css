@@ -73,11 +73,11 @@ a:active {
 
 .link-alt:link {
   text-decoration: none;
-  border-bottom: 1px solid rgba(118, 141, 153, 0.3);
+  border-bottom: 1px solid rgba(118, 141, 153, 0.35);
   cursor: pointer; }
 .link-alt:visited {
   text-decoration: none;
-  border-bottom: 1px solid rgba(118, 141, 153, 0.3);
+  border-bottom: 1px solid rgba(118, 141, 153, 0.35);
   cursor: pointer; }
 .link-alt:hover {
   text-decoration: none;
@@ -1627,7 +1627,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 
 /* Problem notification overlay */
 .notif {
-  max-width: 250px; }
+  width: 250px; }
   .notif .dashbrd-widget-head {
     margin: -11px 0 7px -9px;
     padding: 0; }
@@ -1652,18 +1652,18 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   .notif-body p {
     margin: 0.25em 0 0 0; }
   .notif-body li {
-    padding: 0 0 10px 17px; }
+    padding: 0 0 10px 19px; }
     .notif-body li:last-child {
       padding-bottom: 0; }
 
 .notif-indic {
-  width: 12px;
-  height: 12px;
+  width: 14px;
+  height: 14px;
   float: left;
-  margin: 2px 0 0 -17px;
-  -webkit-border-radius: 50%;
-  -moz-border-radius: 50%;
-  border-radius: 50%; }
+  margin: 2px 0 0 -19px;
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px; }
 
 .notif-indic-container {
   float: left; }
@@ -1975,9 +1975,9 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   width: 24px;
   height: 24px;
   margin: 0 auto;
-  border: 2px solid #ccd5d9;
-  border-bottom: 2px solid #0275b8;
-  animation: load 0.5s infinite linear; }
+  border: 3px solid #ccd5d9;
+  border-bottom: 3px solid #0275b8;
+  animation: load 0.8s infinite linear; }
 
 @keyframes load {
   to {
