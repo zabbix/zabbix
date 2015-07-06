@@ -136,6 +136,10 @@ ol {
 p {
   margin: 0 0 0.7em 0; }
 
+code {
+  font-family: monospace;
+  font-size: 1.333em; }
+
 /* Main Navigation */
 nav, .nav {
   background-color: #013e62; }
