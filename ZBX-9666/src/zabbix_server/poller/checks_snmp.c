@@ -31,6 +31,7 @@ typedef struct
 	char		*addr;
 	unsigned short	port;
 	char		*oid;
+	char		*community_context;
 	zbx_hashset_t	*mappings;
 }
 zbx_snmpidx_main_key_t;
@@ -53,6 +54,7 @@ static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 	hash = ZBX_DEFAULT_STRING_HASH_FUNC(main_key->addr);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(&main_key->port, sizeof(main_key->port), hash);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(main_key->oid, strlen(main_key->oid), hash);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(main_key->community_context, strlen(main_key->community_context), hash);
 
 	return hash;
 }
@@ -67,6 +69,9 @@ static int	__snmpidx_main_key_compare(const void *d1, const void *d2)
 	if (0 != (ret = strcmp(main_key1->addr, main_key2->addr)))
 		return ret;
 
+	if (0 != (ret = strcmp(main_key1->community_context, main_key2->community_context)))
+		return ret;
+
 	ZBX_RETURN_IF_NOT_EQUAL(main_key1->port, main_key2->port);
 
 	return strcmp(main_key1->oid, main_key2->oid);
@@ -78,6 +83,7 @@ static void	__snmpidx_main_key_clean(void *data)
 
 	zbx_free(main_key->addr);
 	zbx_free(main_key->oid);
+	zbx_free(main_key->community_context);
 	zbx_hashset_destroy(main_key->mappings);
 	zbx_free(main_key->mappings);
 }
@@ -123,6 +129,11 @@ static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, cha
 	main_key_local.port = item->interface.port;
 	main_key_local.oid = oid;
 
+	if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type)
+		main_key_local.community_context = item->snmp_community;
+	else if (ITEM_TYPE_SNMPv3 == item->type)
+		main_key_local.community_context = item->snmpv3_contextname;
+
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
 		goto end;
 
@@ -158,10 +169,20 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 	main_key_local.port = item->interface.port;
 	main_key_local.oid = oid;
 
+	if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type)
+		main_key_local.community_context = item->snmp_community;
+	else if (ITEM_TYPE_SNMPv3 == item->type)
+		main_key_local.community_context = item->snmpv3_contextname;
+
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
 	{
 		main_key_local.addr = zbx_strdup(NULL, item->interface.addr);
 		main_key_local.oid = zbx_strdup(NULL, oid);
+
+		if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type)
+			main_key_local.community_context = zbx_strdup(NULL, item->snmp_community);
+		else if (ITEM_TYPE_SNMPv3 == item->type)
+			main_key_local.community_context = zbx_strdup(NULL, item->snmpv3_contextname);
 
 		main_key_local.mappings = zbx_malloc(NULL, sizeof(zbx_hashset_t));
 		zbx_hashset_create_ext(main_key_local.mappings, 100,
@@ -201,6 +222,11 @@ static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 	main_key_local.addr = item->interface.addr;
 	main_key_local.port = item->interface.port;
 	main_key_local.oid = (char *)oid;
+
+	if (ITEM_TYPE_SNMPv1 == item->type || ITEM_TYPE_SNMPv2c == item->type)
+		main_key_local.community_context = item->snmp_community;
+	else if (ITEM_TYPE_SNMPv3 == item->type)
+		main_key_local.community_context = item->snmpv3_contextname;
 
 	if (NULL == (main_key = zbx_hashset_search(&snmpidx, &main_key_local)))
 		goto end;
