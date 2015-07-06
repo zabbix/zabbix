@@ -2656,10 +2656,15 @@ void	zbx_tls_init_child(void)
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
 	if (NULL != my_cert_creds)
 	{
-		/* SECURE256 is currently an alias for SECURE192. Use SECURE256 to enable compilation with GnuTLS */
-		/* 2.8.x. used on RHEL6. */
-		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_cert, "SECURE192:+SECURE128:"
-				"-VERS-TLS-ALL:+VERS-TLS1.2:-CTYPE-ALL:+CTYPE-X.509:-SHA1", NULL)))
+		/* first try what is supported by GnuTLS 3.3.15, if that fails try what is supported by GnuTLS 3.1.18 */
+		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_cert, "NONE:+VERS-TLS1.2:+ECDHE-RSA:"
+				"+DHE-RSA:+RSA:+AES-256-GCM:+AES-128-GCM:+AES-256-CBC:+AES-128-CBC:+CAMELLIA-256-GCM:"
+				"+CAMELLIA-128-GCM:+CAMELLIA-256-CBC:+CAMELLIA-128-CBC:+AEAD:+SHA384:+SHA256:+SHA1:"
+				"+CURVE-ALL:+COMP-NULL:+SIGN-ALL:+CTYPE-X.509", NULL)) &&
+				GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_cert, "NONE:+VERS-TLS1.2:"
+				"+ECDHE-RSA:+DHE-RSA:+RSA:+AES-256-GCM:+AES-128-GCM:+AES-256-CBC:+AES-128-CBC:"
+				"+CAMELLIA-256-CBC:+CAMELLIA-128-CBC:+AEAD:+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:"
+				"+SIGN-ALL:+CTYPE-X.509", NULL)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_cert' failed: %d: %s",
 					res, gnutls_strerror(res));
@@ -2673,9 +2678,14 @@ void	zbx_tls_init_child(void)
 	if (NULL != my_psk_client_creds || NULL != my_psk_server_creds ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
 	{
-		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_psk, "SECURE192:+SECURE128:"
-				"-VERS-TLS-ALL:+VERS-TLS1.2:-CTYPE-ALL:-ECDHE-ECDSA:-ECDHE-RSA:-RSA:-DHE-RSA:-DHE-DSS:"
-				"+DHE-PSK:+ECDHE-PSK:+RSA-PSK:+PSK:-SHA1", NULL)))
+		/* first try what is supported by GnuTLS 3.3.15, if that fails try what is supported by GnuTLS 3.1.18 */
+		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_psk, "NONE:+VERS-TLS1.2:+ECDHE-PSK:"
+				"+DHE-PSK:+RSA-PSK:+PSK:+AES-256-GCM:+AES-128-GCM:+AES-256-CBC:+AES-128-CBC:"
+				"+CAMELLIA-256-GCM:+CAMELLIA-128-GCM:+CAMELLIA-256-CBC:+CAMELLIA-128-CBC:+AEAD:+SHA384:"
+				"+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL", NULL)) &&
+				GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_psk, "NONE:+VERS-TLS1.2:"
+				"+ECDHE-PSK:+DHE-PSK:+PSK:+AES-256-GCM:+AES-128-GCM:+AES-256-CBC:+AES-128-CBC:+AEAD:"
+				"+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL", NULL)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_psk' failed: %d: %s",
 					res, gnutls_strerror(res));
@@ -2689,9 +2699,16 @@ void	zbx_tls_init_child(void)
 	if (NULL != my_cert_creds && (NULL != my_psk_client_creds || NULL != my_psk_server_creds ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))))
 	{
-		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_all, "SECURE192:+SECURE128:"
-				"-VERS-TLS-ALL:+VERS-TLS1.2:-CTYPE-ALL:+CTYPE-X.509:+DHE-PSK:+ECDHE-PSK:+RSA-PSK:+PSK:"
-				"-SHA1" , NULL)))
+		/* first try what is supported by GnuTLS 3.3.15, if that fails try what is supported by GnuTLS 3.1.18 */
+		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_all, "NONE:+VERS-TLS1.2:+ECDHE-RSA:"
+				"+DHE-RSA:+RSA:+ECDHE-PSK:+DHE-PSK:+RSA-PSK:+PSK:+AES-256-GCM:+AES-128-GCM:"
+				"+AES-256-CBC:+AES-128-CBC:+CAMELLIA-256-GCM:+CAMELLIA-128-GCM:+CAMELLIA-256-CBC:"
+				"+CAMELLIA-128-CBC:+AEAD:+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:"
+				"+CTYPE-X.509", NULL)) &&
+				GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_all, "NONE:+VERS-TLS1.2:"
+				"+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-PSK:+DHE-PSK:+PSK:+AES-256-GCM:+AES-128-GCM:"
+				"+AES-256-CBC:+AES-128-CBC:+AEAD:+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:"
+				"+CTYPE-X.509", NULL)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_all' failed: %d: %s",
 					res, gnutls_strerror(res));
