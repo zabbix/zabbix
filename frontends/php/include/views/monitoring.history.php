@@ -215,8 +215,7 @@ if ($this->data['plaintext']) {
 }
 else {
 	$historyWidget->setTitle($header['left'])
-		->setControls($header['right'])
-		->addItem(BR());
+		->setControls($header['right']);
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm->addNavigator();
