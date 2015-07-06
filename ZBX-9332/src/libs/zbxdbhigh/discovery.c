@@ -22,59 +22,6 @@
 #include "log.h"
 #include "events.h"
 
-/******************************************************************************
- *                                                                            *
- * Functions: discovery_verify_drule                                          *
- *                                                                            *
- * Purpose: make sure that drule was not deleted during discovery             *
- *                                                                            *
- ******************************************************************************/
-int	discovery_verify_drule(zbx_uint64_t druleid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-
-	result = DBselect("select null from drules where druleid=" ZBX_FS_UI64 ZBX_FOR_UPDATE, druleid);
-
-	if (NULL != (row = DBfetch(result)))
-		ret = SUCCEED;
-
-	DBfree_result(result);
-
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Functions: discovery_verify_dcheck                                         *
- *                                                                            *
- * Purpose: make sure that dcheck was not deleted during discovery and that   *
- *          it still belongs to the same drule                                *
- *                                                                            *
- ******************************************************************************/
-int	discovery_verify_dcheck(zbx_uint64_t druleid, zbx_uint64_t dcheckid)
-{
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		ret = FAIL;
-
-	result = DBselect(
-			"select null"
-			" from dchecks"
-			" where druleid=" ZBX_FS_UI64
-				" and dcheckid=" ZBX_FS_UI64
-			ZBX_FOR_UPDATE,
-			druleid, dcheckid);
-
-	if (NULL != (row = DBfetch(result)))
-		ret = SUCCEED;
-
-	DBfree_result(result);
-
-	return ret;
-}
-
 static DB_RESULT	discovery_get_dhost_by_value(zbx_uint64_t dcheckid, const char *value)
 {
 	DB_RESULT	result;

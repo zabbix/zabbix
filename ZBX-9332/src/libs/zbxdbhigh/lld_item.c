@@ -829,6 +829,13 @@ static void	lld_items_save(zbx_uint64_t hostid, zbx_uint64_t parent_itemid, zbx_
 
 	DBbegin();
 
+	if (SUCCEED != DBlock_hostid(hostid))
+	{
+		/* the host was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
+
 	if (0 != new_items)
 	{
 		itemid = DBget_maxid_num("items", new_items);
