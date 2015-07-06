@@ -1631,8 +1631,6 @@ $icon-widget-btn: (
     }
 }
 
-
-
 %btn-widget {
 	border: none;
 	width: 30px;
@@ -2381,7 +2379,7 @@ button[disabled] {
 
 /* Problem notification overlay */
 .notif {
-	max-width: 250px;
+	width: 250px;
 
 	.dashbrd-widget-head {
 		margin: -11px 0 7px -9px;
@@ -2420,7 +2418,7 @@ button[disabled] {
 	}
 
 	li {
-		padding: 0 0 10px 17px;
+		padding: 0 0 10px 19px;
 
 		&:last-child {
 			padding-bottom: 0;
@@ -2429,11 +2427,11 @@ button[disabled] {
 }
 
 .notif-indic {
-	width: 12px;
-	height: 12px;
+	width: 14px;
+	height: 14px;
 	float: left;
-	margin: 2px 0 0 -17px;
-	@include border-radius(50%);
+	margin: 2px 0 0 -19px;
+	@include border-radius(2px);
 }
 
 .notif-indic-container {
@@ -2875,9 +2873,9 @@ a.overlay-close-btn {
 	width: 24px;
 	height: 24px;
 	margin: 0 auto;
-	border: 2px solid #ccd5d9;
-	border-bottom: 2px solid #0275b8;
-	animation: load 0.5s infinite linear;
+	border: 3px solid #ccd5d9;
+	border-bottom: 3px solid #0275b8;
+	animation: load 0.8s infinite linear;
 }
 
 @keyframes load {
