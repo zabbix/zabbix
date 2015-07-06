@@ -1952,9 +1952,11 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select i.itemid from items i"
-			" left join items ti on i.templateid=ti.itemid"
+			" left join items ti"
+				" on i.templateid=ti.itemid"
 			" where i.hostid=" ZBX_FS_UI64
-				" and i.flags=%d and",
+				" and i.flags=%d"
+				" and",
 			hostid, ZBX_FLAG_DISCOVERY_RULE);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
@@ -2003,7 +2005,6 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 		if (FAIL != (index = zbx_vector_uint64_bsearch(&applicationids, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 			zbx_vector_uint64_remove(&applicationids, index);
 	}
-
 	DBfree_result(result);
 
 	if (0 == applicationids.values_num)
