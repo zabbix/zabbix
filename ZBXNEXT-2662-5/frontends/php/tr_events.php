@@ -92,7 +92,7 @@ $event = reset($events);
 $config = select_config();
 
 $eventWidget = (new CWidget())
-	->setTitle(_s('Event of trigger: "%1$s"', CMacrosResolverHelper::resolveTriggerName($trigger)))
+	->setTitle(_('Event details'))
 	->setControls((new CList())->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])));
 
 // if acknowledges are not disabled in configuration, let's show them
