@@ -727,7 +727,6 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 			->onChange('validateDatePartBox(this, 0, 59, 2);'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CImg('images/general/bar/cal.gif', 'calendar', 16, 12))
-			->addClass('pointer')
 			->onClick($onClick)
 	];
 
