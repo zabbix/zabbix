@@ -249,7 +249,7 @@ int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 	char	*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
 	char	buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
 	int	nbytes, f = -1, ret = SYSINFO_RET_FAIL;
-	size_t	start_line, end_line, current_line = 0;
+	size_t	start_line = 0, end_line = 0, current_line = 0;
 	double	ts;
 
 	ts = zbx_time();
