@@ -169,6 +169,11 @@ p {
 	margin: 0 0 0.7em 0;
 }
 
+code {
+	font-family: $font-stack-mono;
+	font-size: $font-mono-size;
+}
+
 /* Main Navigation */
 nav {
 	background-color: $main-subnav-bg-color;
