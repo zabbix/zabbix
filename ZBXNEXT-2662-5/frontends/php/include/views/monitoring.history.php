@@ -198,20 +198,17 @@ $screen = CScreenBuilder::getScreen([
 
 // append plaintext to widget
 if ($this->data['plaintext']) {
-	$plaintextSpan = (new CSpan())->addClass('textblackwhite');
-
 	foreach ($headerPlaintext as $text) {
-		$plaintextSpan->addItem([new CJsScript($text), BR()]);
+		$historyWidget->addItem([new CSpan($text), BR()]);
 	}
 
 	$screen = $screen->get();
 
-	$pre = new CTag('pre', true);
+	$pre = new CPre();
 	foreach ($screen as $text) {
-		$pre->addItem(new CJsScript($text));
+		$pre->addItem([$text, BR()]);
 	}
-	$plaintextSpan->addItem($pre);
-	$historyWidget->addItem($plaintextSpan);
+	$historyWidget->addItem($pre);
 }
 else {
 	$historyWidget->setTitle($header['left'])
@@ -247,17 +244,14 @@ else {
 
 		$filterForm->addNavigator();
 		$historyWidget->addItem($filterForm);
-
-		$historyTable = (new CTable())
-			->addClass('maxwidth')
-			->addRow($screen->get());
-		$historyWidget->addItem($historyTable);
-
-		CScreenBuilder::insertScreenStandardJs([
-			'timeline' => $screen->timeline,
-			'profileIdx' => $screen->profileIdx
-		]);
 	}
+
+	$historyWidget->addItem($screen->get());
+
+	CScreenBuilder::insertScreenStandardJs([
+		'timeline' => $screen->timeline,
+		'profileIdx' => $screen->profileIdx
+	]);
 }
 
 return $historyWidget;
