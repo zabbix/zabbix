@@ -2045,6 +2045,7 @@ button[disabled] {
 	.debug-output {
 		margin: 0 10px;
 		max-height: 300px;
+		border-color: $table-border-color;
 	}
 }
 
@@ -2452,10 +2453,10 @@ button[disabled] {
 }
 
 .notif-indic-container {
-	float: left;
+	//float: left;
 
 	.notif-indic {
-		float: none;
+		//float: none;
 	}
 }
 
@@ -2493,7 +2494,7 @@ button[disabled] {
 	padding: 11px;
 	margin: 0 13px;
 	background-color: $lighter-yellow;
-	border: 1px solid lighten($lighter-yellow, 2%);
+	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
 }
 
@@ -2503,7 +2504,7 @@ button[disabled] {
 	right: 13px;
 	z-index: 1000;
 	padding: 4px 11px;
-	background-color: rgba($body-bg-color,0.8);
+	background-color: rgba($body-bg-color,0.7);
 	@include border-radius(2px);
 }
 
