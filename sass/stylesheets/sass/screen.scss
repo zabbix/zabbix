@@ -2497,6 +2497,20 @@ button[disabled] {
 	bottom: 13px;
 	right: 13px;
 	z-index: 1000;
+	@include opacity(0.5);
+	@include transition(opacity .2s ease-out);
+
+	&:hover {
+		@include opacity(1);
+	}
+
+	&:focus {
+		@include opacity(1);
+	}
+
+	&:active  {
+		@include opacity(1);
+	}
 }
 
 /* Alerts */
