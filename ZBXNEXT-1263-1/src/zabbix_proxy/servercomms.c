@@ -70,21 +70,26 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every "
-					"%d second(s)", CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_socket_strerror(),
+			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every"
+					" %d second(s)", CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_socket_strerror(),
 					retry_interval);
+
 			lastlogtime = (int)time(NULL);
+
 			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT,
 					timeout, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 			{
 				now = (int)time(NULL);
+
 				if (60 <= now - lastlogtime)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
 					lastlogtime = now;
 				}
+
 				sleep(retry_interval);
 			}
+
 			zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
 		}
 	}

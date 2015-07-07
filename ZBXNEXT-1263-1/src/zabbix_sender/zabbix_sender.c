@@ -539,6 +539,7 @@ static void    zbx_load_config(const char *config_file)
 	zbx_free(cfg_active_hosts);
 
 	zbx_fill_from_config_file(&ZABBIX_HOSTNAME, cfg_hostname);
+
 	zbx_fill_from_config_file(&CONFIG_TLS_CONNECT, cfg_tls_connect);
 	zbx_fill_from_config_file(&CONFIG_TLS_CA_FILE, cfg_tls_ca_file);
 	zbx_fill_from_config_file(&CONFIG_TLS_CRL_FILE, cfg_tls_crl_file);
@@ -662,8 +663,8 @@ static void	parse_commandline(int argc, char **argv)
 			case '7':
 			case '8':
 			case '9':
-				zbx_error("TLS parameters cannot be used: Zabbix sender was compiled without TLS "
-						"support.");
+				zbx_error("TLS parameters cannot be used: Zabbix sender was compiled without TLS"
+						" support.");
 				exit(EXIT_FAILURE);
 				break;
 #endif

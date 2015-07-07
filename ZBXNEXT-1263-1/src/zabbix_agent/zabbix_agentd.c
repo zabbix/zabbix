@@ -737,7 +737,6 @@ static void	zbx_load_config(int requirement)
 #ifdef _WINDOWS
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 #endif
-
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
 	set_defaults();

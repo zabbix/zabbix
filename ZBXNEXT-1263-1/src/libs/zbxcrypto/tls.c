@@ -78,7 +78,7 @@ ZBX_THREAD_LOCAL static size_t		my_psk_identity_len	= 0;
 /* Pointer to DCget_psk_by_identity() initialized at runtime. This is a workaround for linking. */
 /* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
 /* but other components (e.g. agent) do not link dbconfig.o. */
-size_t			(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t) = NULL;
+size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t) = NULL;
 #endif
 
 #if defined(HAVE_POLARSSL)

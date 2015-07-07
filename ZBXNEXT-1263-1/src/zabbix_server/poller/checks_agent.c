@@ -83,7 +83,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 #else
 		zbx_snprintf(buffer, sizeof(buffer), "A TLS connection is configured to be used with agent but support"
 				" for TLS was not compiled into %s.", get_program_type_string(program_type));
-		SET_MSG_RESULT(result, strdup(buffer));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, buffer));
 		ret = NETWORK_ERROR;
 		goto out;
 #endif
