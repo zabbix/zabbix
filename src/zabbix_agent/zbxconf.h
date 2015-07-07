@@ -52,8 +52,8 @@ extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
 extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
 extern char	*CONFIG_TLS_CERT_FILE;
 extern char	*CONFIG_TLS_KEY_FILE;
-extern char	*CONFIG_TLS_PSK_FILE;
 extern char	*CONFIG_TLS_PSK_IDENTITY;
+extern char	*CONFIG_TLS_PSK_FILE;
 #endif
 
 void	load_aliases(char **lines);

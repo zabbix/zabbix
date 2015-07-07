@@ -231,8 +231,8 @@ char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
 char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
-char	*CONFIG_TLS_PSK_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -646,9 +646,9 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
-			PARM_OPT,	0,			0},
 		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
 		{NULL}

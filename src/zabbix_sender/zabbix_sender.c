@@ -147,8 +147,8 @@ char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
 char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
-char	*CONFIG_TLS_PSK_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 /* COMMAND LINE OPTIONS */
 
@@ -500,9 +500,9 @@ static void    zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&cfg_tls_key_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&cfg_tls_psk_file,			TYPE_STRING,
-			PARM_OPT,	0,			0},
 		{"TLSPSKIdentity",		&cfg_tls_psk_identity,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&cfg_tls_psk_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{NULL}
 	};
@@ -547,8 +547,8 @@ static void    zbx_load_config(const char *config_file)
 	zbx_fill_from_config_file(&CONFIG_TLS_SERVER_CERT_SUBJECT, cfg_tls_server_cert_subject);
 	zbx_fill_from_config_file(&CONFIG_TLS_CERT_FILE, cfg_tls_cert_file);
 	zbx_fill_from_config_file(&CONFIG_TLS_KEY_FILE, cfg_tls_key_file);
-	zbx_fill_from_config_file(&CONFIG_TLS_PSK_FILE, cfg_tls_psk_file);
 	zbx_fill_from_config_file(&CONFIG_TLS_PSK_IDENTITY, cfg_tls_psk_identity);
+	zbx_fill_from_config_file(&CONFIG_TLS_PSK_FILE, cfg_tls_psk_file);
 }
 
 static void	parse_commandline(int argc, char **argv)
