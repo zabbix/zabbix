@@ -67,8 +67,8 @@ extern char				*CONFIG_TLS_SERVER_CERT_ISSUER;
 extern char				*CONFIG_TLS_SERVER_CERT_SUBJECT;
 extern char				*CONFIG_TLS_CERT_FILE;
 extern char				*CONFIG_TLS_KEY_FILE;
-extern char				*CONFIG_TLS_PSK_FILE;
 extern char				*CONFIG_TLS_PSK_IDENTITY;
+extern char				*CONFIG_TLS_PSK_FILE;
 
 ZBX_THREAD_LOCAL static char		*my_psk			= NULL;
 ZBX_THREAD_LOCAL static size_t		my_psk_len		= 0;
@@ -618,13 +618,13 @@ static void	zbx_tls_validate_config(void)
 
 	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
 	{
-		zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "--tls-psk-file");
 		zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "--tls-psk-identity");
+		zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "--tls-psk-file");
 	}
 	else
 	{
-		zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "TLSPSKFile");
 		zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "TLSPSKIdentity");
+		zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "TLSPSKFile");
 	}
 
 	if (NULL != CONFIG_TLS_PSK_FILE && NULL == CONFIG_TLS_PSK_IDENTITY)

@@ -720,9 +720,9 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
-			PARM_OPT,	0,			0},
 		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
 		{NULL}
