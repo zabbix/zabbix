@@ -1,6 +1,6 @@
 // TYPOGRAPHY
 $font-stack: Arial, Tahoma, Verdana, sans-serif;
-$font-stack-mono: monospace;
+$font-stack-mono: "Courier New", Courier, monospace;
 
 $font-body-size: 75%; // Default 1em/12px
 $body-line-height: 1.4em;
@@ -18,7 +18,7 @@ $h4-line-height: 1.2em;
 
 $font-top-nav-size: 1.167em; // 14px
 
-$font-mono-size: 1.333em; // 16px
+$font-mono-size: 1em; // 12px
 
 $font-setup-title: 7em; // 84px
 $setup-title-line-height: 0.75em;

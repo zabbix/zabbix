@@ -169,9 +169,12 @@ p {
 	margin: 0 0 0.7em 0;
 }
 
-code {
+pre {
+	display: block;
 	font-family: $font-stack-mono;
 	font-size: $font-mono-size;
+	white-space: pre-wrap;
+	word-wrap: break-word;
 }
 
 /* Main Navigation */
@@ -2034,6 +2037,10 @@ button[disabled] {
 			}
 		}
 	}
+
+	.debug-output {
+		margin: 0 10px;
+	}
 }
 
 %nothing-to-show {
@@ -2472,6 +2479,17 @@ button[disabled] {
 			border: none;
 		}
 	}
+}
+
+/* Debug */
+.debug-output {
+	max-height: 300px;
+	overflow-y: auto;
+	padding: 11px;
+	margin: 0 13px;
+	background-color: $lighter-yellow;
+	border: 1px solid darken($lighter-yellow, 20%);
+	@extend %webkit-scrollbar;
 }
 
 /* Alerts */
