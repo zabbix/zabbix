@@ -192,6 +192,9 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			'main_menu' => $main_menu,
 			'sub_menus' => $sub_menus,
 			'selected' => $page['menu']
+		],
+		'user' => [
+			'is_guest' => CWebUser::isGuest()
 		]
 	]);
 	echo $pageMenu->getOutput();

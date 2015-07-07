@@ -127,6 +127,9 @@ sup {
 b, strong {
   font-weight: bold; }
 
+em {
+  font-style: italic; }
+
 ol {
   list-style: decimal;
   list-style-position: inside; }
@@ -1395,7 +1398,8 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
     .dashbrd-widget .list-table tbody tr:last-child td {
       border-bottom: 1px solid #383838; }
   .dashbrd-widget .debug-output {
-    margin: 0 10px; }
+    margin: 0 10px;
+    max-height: 300px; }
 
 .list-table tbody tr.nothing-to-show {
   text-align: center;
@@ -1698,18 +1702,23 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 
 /* Debug */
 .debug-output {
-  max-height: 300px;
+  max-height: 600px;
   overflow-y: auto;
   padding: 11px;
   margin: 0 13px;
   background-color: #2f280a;
-  border: 1px solid black; }
+  border: 1px solid #372f0c; }
 
 .btn-debug {
   position: fixed;
   bottom: 13px;
   right: 13px;
-  z-index: 1000; }
+  z-index: 1000;
+  padding: 4px 11px;
+  background-color: rgba(14, 16, 18, 0.8);
+  -webkit-border-radius: 2px;
+  -moz-border-radius: 2px;
+  border-radius: 2px; }
 
 /* Alerts */
 .green, a.green {
