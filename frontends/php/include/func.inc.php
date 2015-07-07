@@ -934,10 +934,10 @@ function zbx_arrayFindDuplicates(array $array) {
 /************* STRING *************/
 function zbx_nl2br($str) {
 	$str_res = [];
-	$str_arr = explode("\n", $str);
-	foreach ($str_arr as $id => $str_line) {
+	foreach (explode("\n", $str) as $str_line) {
 		array_push($str_res, $str_line, BR());
 	}
+	array_pop($str_res);
 
 	return $str_res;
 }
@@ -1160,7 +1160,7 @@ function zbx_value2array(&$values) {
 	}
 }
 
-// creates chain of relation parent -> childs, for all chain levels
+// creates chain of relation parent -> child, for all chain levels
 function createParentToChildRelation(&$chain, $link, $parentField, $childField) {
 	if (!isset($chain[$link[$parentField]])) {
 		$chain[$link[$parentField]] = [];

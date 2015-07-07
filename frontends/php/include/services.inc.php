@@ -37,8 +37,8 @@ function serviceAlgorythm($algorythm = null) {
 	}
 }
 
-function get_service_childs($serviceid, $soft = 0) {
-	$childs = [];
+function get_service_children($serviceid, $soft = 0) {
+	$children = [];
 
 	$result = DBselect(
 		'SELECT sl.servicedownid'.
@@ -47,10 +47,10 @@ function get_service_childs($serviceid, $soft = 0) {
 			($soft ? '' : ' AND sl.soft=0')
 	);
 	while ($row = DBfetch($result)) {
-		$childs[] = $row['servicedownid'];
-		$childs = array_merge($childs, get_service_childs($row['servicedownid']));
+		$children[] = $row['servicedownid'];
+		$children = array_merge($children, get_service_children($row['servicedownid']));
 	}
-	return $childs;
+	return $children;
 }
 
 /**
