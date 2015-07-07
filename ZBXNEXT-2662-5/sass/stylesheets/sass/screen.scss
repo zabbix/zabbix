@@ -2492,6 +2492,13 @@ button[disabled] {
 	@extend %webkit-scrollbar;
 }
 
+.btn-debug {
+	position: fixed;
+	bottom: 13px;
+	right: 13px;
+	z-index: 1000;
+}
+
 /* Alerts */
 .green {
 	color: $green;
