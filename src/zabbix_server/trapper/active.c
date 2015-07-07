@@ -98,8 +98,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 
 			if (0 == (tls_accept & sock->connection_type))
 			{
-				zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host "
-						"\"%s\"", zbx_tls_connection_type_name(sock->connection_type), host);
+				zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
+						" \"%s\"", zbx_tls_connection_type_name(sock->connection_type), host);
 				goto done;
 			}
 
@@ -120,16 +120,16 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 				/* simplified match, not compliant with RFC 4517, 4518 */
 				if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
 				{
-					zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for "
-							"host \"%s\"", host);
+					zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for"
+							" host \"%s\"", host);
 					goto done;
 				}
 
 				/* simplified match, not compliant with RFC 4517, 4518 */
 				if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
 				{
-					zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for "
-							"host \"%s\"", host);
+					zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for"
+							" host \"%s\"", host);
 					goto done;
 				}
 			}

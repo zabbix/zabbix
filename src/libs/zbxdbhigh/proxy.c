@@ -104,13 +104,12 @@ static zbx_history_table_t areg = {
  * Return value:                                                              *
  *     SUCCEED - proxy ID was found in database                               *
  *     FAIL    - an error occurred (e.g. an unknown proxy, the proxy is       *
- *               configured in passive mode or access denied                  *
+ *               configured in passive mode or access denied)                 *
  *                                                                            *
  ******************************************************************************/
 int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_socket_t *sock,
 		char **error)
 {
-	zbx_uint64_t		hostid_tmp;
 	char			*ch_error;
 	zbx_tls_conn_attr_t	attr;
 
@@ -134,10 +133,8 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		return FAIL;
 	}
 
-	if (SUCCEED != DCcheck_proxy_permissions(host, &attr, &hostid_tmp, error))
+	if (SUCCEED != DCcheck_proxy_permissions(host, &attr, hostid, error))
 		return FAIL;
-
-	*hostid = hostid_tmp;
 
 	return SUCCEED;
 }
@@ -2293,9 +2290,9 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 
 				if (0 == ((unsigned int)items[i].host.tls_accept & sock->connection_type))
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "connection of type \"%s\" is not allowed for "
-							"host \"%s\" item \"%s\" (not every rejected item might be "
-							"reported)",
+					zabbix_log(LOG_LEVEL_WARNING, "connection of type \"%s\" is not allowed for"
+							" host \"%s\" item \"%s\" (not every rejected item might be"
+							" reported)",
 							zbx_tls_connection_type_name(sock->connection_type),
 							items[i].host.host, items[i].key_orig);
 					flag_host_allow = 0;
@@ -2344,10 +2341,10 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 							0 != memcmp(items[i].host.tls_psk_identity, attr.psk_identity,
 							attr.psk_identity_len))
 					{
-						zabbix_log(LOG_LEVEL_WARNING, "false PSK identity for host \"%s\" item "
-								"\"%s\" (not every rejected item might be reported). "
-								"Configured identity: \"%s\". Received identity: "
-								"\"%s\"", items[i].host.host, items[i].key_orig,
+						zabbix_log(LOG_LEVEL_WARNING, "false PSK identity for host \"%s\" item"
+								" \"%s\" (not every rejected item might be reported):"
+								" configured identity \"%s\", received identity \"%s\"",
+								items[i].host.host, items[i].key_orig,
 								items[i].host.tls_psk_identity, attr.psk_identity);
 						flag_host_allow = 0;
 						continue;

@@ -354,8 +354,8 @@ int	main(int argc, char **argv)
 			case '7':
 			case '8':
 			case '9':
-				zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS "
-						"support.");
+				zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS"
+						" support.");
 				exit(EXIT_FAILURE);
 				break;
 #endif
