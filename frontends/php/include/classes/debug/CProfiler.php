@@ -29,20 +29,6 @@ class CProfiler {
 	protected $slowSqlQueryTime = 0.01;
 
 	/**
-	 * Determines time for sum of all script sql query times to be considered slow.
-	 *
-	 * @var float
-	 */
-	protected $slowTotalSqlTime = 0.5;
-
-	/**
-	 * Determines time for script execution time to be considered slow.
-	 *
-	 * @var float
-	 */
-	protected $slowScriptTime = 1.0;
-
-	/**
 	 * Contains all api requests info.
 	 *
 	 * @var array
@@ -122,77 +108,76 @@ class CProfiler {
 	public function show() {
 		global $DB;
 
-		$debug_str = '<a name="debug"></a>';
-		$debug_str .= '******************** '._('Script profiler').' ********************'.'<br>';
-
-		$totalScriptTime = $this->stopTime - $this->startTime;
-		$totalTimeStr = _s('Total time: %s', round($totalScriptTime, 6));
-		if ($totalTimeStr > $this->slowScriptTime) {
-			$totalTimeStr = '<b>'.$totalTimeStr.'</b>';
-		}
-		$debug_str .= $totalTimeStr.'<br>';
-
-		$sqlTotalTimeStr = _s('Total SQL time: %s', $this->sqlTotalTime);
-		if ($sqlTotalTimeStr > $this->slowTotalSqlTime) {
-			$sqlTotalTimeStr = '<b>'.$sqlTotalTimeStr.'</b>';
-		}
-		$debug_str .= $sqlTotalTimeStr.'<br>';
+		$debug = [];
+		$debug[] = (new CLink())
+			->setAttribute('name', 'debug')
+			->removeSid();
+		$debug[] = '******************** '._('Script profiler').' ********************';
+		$debug[] = BR();
+		$debug[] = _s('Total time: %1$s', round($this->stopTime - $this->startTime, 6));
+		$debug[] = BR();
+		$debug[] = _s('Total SQL time: %1$s', $this->sqlTotalTime);
+		$debug[] = BR();
 
 		if (isset($DB) && isset($DB['SELECT_COUNT'])) {
-			$debug_str .= _s('SQL count: %s (selects: %s | executes: %s)',
-				count($this->sqlQueryLog), $DB['SELECT_COUNT'], $DB['EXECUTE_COUNT']).'<br>';
+			$debug[] = _s('SQL count: %1$s (selects: %2$s | executes: %3$s)',
+				count($this->sqlQueryLog), $DB['SELECT_COUNT'], $DB['EXECUTE_COUNT']);
+			$debug[] = BR();
 		}
 
-		$debug_str .= _s('Peak memory usage: %s', mem2str($this->getMemoryPeak())).'<br>';
-		$debug_str .= _s('Memory limit: %s', ini_get('memory_limit')).'<br>';
-
-		$debug_str .= '<br>';
+		$debug[] = _s('Peak memory usage: %1$s', mem2str($this->getMemoryPeak()));
+		$debug[] = BR();
+		$debug[] = _s('Memory limit: %1$s', ini_get('memory_limit'));
+		$debug[] = BR();
+		$debug[] = BR();
 
 		foreach ($this->apiLog as $i => $apiCall) {
-			$debug_str .= '<div style="border-bottom: 1px dotted gray; margin-bottom: 20px;">';
 			list($class, $method, $params, $result, $file, $line) = $apiCall;
-			// api method
-			$debug_str .= '<div style="padding-bottom: 10px;">';
-			$debug_str .= ($i + 1).'. <b>'.$class.'.'.$method.'</b>'.(($file !== null) ? ' ['.$file.':'.$line.']' : '');
-			$debug_str .= '</div>';
-			// parameters
-			$debug_str .= '<table><tr><td style="width: 300px" valign="top">Parameters:';
-			$debug_str .= '<pre>'.print_r(CHtml::encode($params), true).'</pre>';
-			$debug_str .= '</td>';
-			// result
-			$debug_str .= '<td valign="top">Result:<pre>'.print_r(CHtml::encode($result), true).'</pre></td>';
 
-			$debug_str .= '</tr></table>';
-			$debug_str .= '</div>';
+			// api method
+			$debug[] = ($i + 1).'. ';
+			$debug[] = new CTag('b', true, $class.'.'.$method);
+			$debug[] = ($file !== null ? ' ['.$file.':'.$line.']' : null);
+			$debug[] = BR();
+			$debug[] = BR();
+
+			// parameters, result
+			$debug[] = (new CTable())
+				->addRow([
+					[_('Parameters').':', BR(), print_r($params, true)],
+					[_('Result').':', BR(), print_r($result, true)]
+				]);
+
+			$debug[] = BR();
 		}
 
-		$debug_str .= '<br>';
+		$debug[] = BR();
 
 		foreach ($this->sqlQueryLog as $query) {
 			$time = $query[0];
-			$sql = htmlspecialchars($query[1], ENT_QUOTES, 'UTF-8');
 
-			if (strpos($sql, 'SELECT ') !== false) {
-				$sqlString = '<span style="color: green; font-size: 1.2em;">'.$sql.'</span>';
-			}
-			else {
-				$sqlString = '<span style="color: blue; font-size: 1.2em;">'.$sql.'</span>';
-			}
-			$sqlString = 'SQL ('.$time.'): '.$sqlString.'<br>';
+			$sql = [
+				'SQL ('.$time.'): ',
+				(new CSpan($query[1]))
+					->addClass(substr($query[1], 0, 6) === 'SELECT' ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+				BR()
+			];
+
 			if ($time > $this->slowSqlQueryTime) {
-				$sqlString = '<b>'.$sqlString.'</b>';
+				$sql = new CTag('b', true, $sql);
 			}
-			$debug_str .= $sqlString;
+			$debug[] = $sql;
 
-			$callStackString = '<span style="font-style: italic;">'.$this->formatCallStack($query[2]).'</span>'.'<br>'.'<br>';
-			$debug_str .= rtrim($callStackString, '-> ').'</span>'.'<br>'.'<br>';
+			$debug[] = (new CSpan($this->formatCallStack($query[2])))->addStyle('font-style: italic;');
+			$debug[] = BR();
+			$debug[] = BR();
 		}
 
-		$debug = (new CDiv())
-			->addClass('textcolorstyles')
+		$debug = (new CPre())
+			->addClass(ZBX_STYLE_DEBUG_OUTPUT)
 			->setAttribute('name', 'zbx_debug_info')
-			->setAttribute('style', 'display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;')
-			->addItem([BR(), new CJsScript($debug_str), BR()])
+			->addStyle('display: none;')
+			->addItem($debug)
 			->show();
 	}
 

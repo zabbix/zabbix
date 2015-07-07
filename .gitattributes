@@ -54,7 +54,6 @@ frontends/php/app/views/layout.htmlpage.footer.php -text
 frontends/php/app/views/layout.htmlpage.header.php -text
 frontends/php/app/views/layout.htmlpage.menu.php -text
 frontends/php/app/views/layout.htmlpage.php -text
-frontends/php/app/views/layout.htmlpage.top.php -text
 frontends/php/app/views/layout.javascript.php -text
 frontends/php/app/views/layout.json.php -text
 frontends/php/app/views/layout.warning.php -text

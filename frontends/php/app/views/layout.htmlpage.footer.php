@@ -31,6 +31,7 @@ if ($data['fullscreen'] == 0) {
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
 	CProfiler::getInstance()->stop();
 	CProfiler::getInstance()->show();
+	makeDebugButton()->show();
 }
 
 insertPagePostJs();
