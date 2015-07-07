@@ -308,6 +308,41 @@ static int      DBpatch_2050018(void)
 	return FAIL;
 }
 
+static int	DBpatch_2050019(void)
+{
+	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050020(void)
+{
+	const ZBX_FIELD	field = {"smtp_security", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050021(void)
+{
+	const ZBX_FIELD	field = {"smtp_verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050022(void)
+{
+	const ZBX_FIELD	field = {"smtp_verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050023(void)
+{
+	const ZBX_FIELD	field = {"smtp_authentication", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -333,5 +368,10 @@ DBPATCH_ADD(2050015, 0, 1)
 DBPATCH_ADD(2050016, 0, 1)
 DBPATCH_ADD(2050017, 0, 1)
 DBPATCH_ADD(2050018, 0, 1)
+DBPATCH_ADD(2050019, 0, 1)
+DBPATCH_ADD(2050020, 0, 1)
+DBPATCH_ADD(2050021, 0, 1)
+DBPATCH_ADD(2050022, 0, 1)
+DBPATCH_ADD(2050023, 0, 1)
 
 DBPATCH_END()
