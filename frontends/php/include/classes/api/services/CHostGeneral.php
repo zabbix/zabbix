@@ -591,13 +591,20 @@ abstract class CHostGeneral extends CHostBase {
 			]);
 
 			if ($clear) {
-				// delete inherited applications that are no longer linked to any templates
+				// Delete inherited applications that are no longer linked to any templates and items.
+				$applicationids = zbx_objectValues($applicationTemplates, 'applicationid');
+
 				$applications = DBfetchArray(DBselect(
 					'SELECT a.applicationid'.
 					' FROM applications a'.
 						' LEFT JOIN application_template at ON a.applicationid=at.applicationid '.
-					' WHERE '.dbConditionInt('a.applicationid', zbx_objectValues($applicationTemplates, 'applicationid')).
-						' AND at.applicationid IS NULL'
+					' WHERE '.dbConditionInt('a.applicationid', $applicationids).
+						' AND at.applicationid IS NULL'.
+						' AND NOT EXISTS ('.
+							'SELECT ia.applicationid'.
+							' FROM items_applications ia'.
+							' WHERE '.dbConditionInt('ia.applicationid', $applicationids).
+						')'
 				));
 				$result = API::Application()->delete(zbx_objectValues($applications, 'applicationid'), true);
 				if (!$result) {
