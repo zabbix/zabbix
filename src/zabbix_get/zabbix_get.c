@@ -58,9 +58,9 @@ const char	*help_message[] = {
 	"TLS connection options:",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"  --tls-connect                      How to connect to agent. Values:",
-	"                                         unencrypted - connect without encryption",
-	"                                         psk         - connect using TLS and a pre-shared key",
-	"                                         cert        - connect using TLS and a certificate",
+	"                                       unencrypted - connect without encryption",
+	"                                       psk         - connect using TLS and a pre-shared key",
+	"                                       cert        - connect using TLS and a certificate",
 	"",
 	"  --tls-ca-file                      Full pathname of a file containing the top-level CA(s) certificates for",
 	"                                     peer certificate verification",
@@ -83,18 +83,18 @@ const char	*help_message[] = {
 #endif
 	"",
 	"Example(s):",
-	"    zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\"",
+	"  zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\"",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"",
-	"    zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" --tls-connect=psk \\",
-	"        --tls-psk-identity=\"PSK ID Zabbix agentd\" --tls-psk-file=/home/zabbix/zabbix_agentd.psk ",
+	"  zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" --tls-connect=psk \\",
+	"    --tls-psk-identity=\"PSK ID Zabbix agentd\" --tls-psk-file=/home/zabbix/zabbix_agentd.psk",
 	"",
-	"    zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" --tls-connect=cert \\",
-	"        --tls-ca-file=/home/zabbix/zabbix_ca_file \\",
-	"        --tls-agent-cert-issuer=\"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
-	"        --tls-agent-cert-subject=\"CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
-	"        --tls-cert-file=/home/zabbix/zabbix_get.crt \\",
-	"        --tls-key-file=/home/zabbix/zabbix_get.key",
+	"  zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" --tls-connect=cert \\",
+	"    --tls-ca-file=/home/zabbix/zabbix_ca_file \\",
+	"    --tls-agent-cert-issuer=\"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"    --tls-agent-cert-subject=\"CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"    --tls-cert-file=/home/zabbix/zabbix_get.crt \\",
+	"    --tls-key-file=/home/zabbix/zabbix_get.key",
 #endif
 	NULL	/* end of text */
 };

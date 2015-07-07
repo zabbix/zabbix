@@ -94,9 +94,9 @@ const char	*help_message[] = {
 	"TLS connection options:",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"  --tls-connect                        How to connect to server or proxy. Values:",
-	"                                           unencrypted - connect without encryption",
-	"                                           psk         - connect using TLS and a pre-shared key",
-	"                                           cert        - connect using TLS and a certificate",
+	"                                         unencrypted - connect without encryption",
+	"                                         psk         - connect using TLS and a pre-shared key",
+	"                                         cert        - connect using TLS and a certificate",
 	"",
 	"  --tls-ca-file                        Full pathname of a file containing the top-level CA(s) certificates for",
 	"                                       peer certificate verification",
@@ -119,18 +119,18 @@ const char	*help_message[] = {
 #endif
 	"",
 	"Example(s):",
-	"    zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43",
+	"  zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43",
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"",
-	"    zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 --tls-connect=psk \\",
-	"        --tls-psk-identity=\"PSK ID Zabbix agentd\" --tls-psk-file=/home/zabbix/zabbix_agentd.psk",
+	"  zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 --tls-connect=psk \\",
+	"    --tls-psk-identity=\"PSK ID Zabbix agentd\" --tls-psk-file=/home/zabbix/zabbix_agentd.psk",
 	"",
-	"    zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 --tls-connect=cert \\",
-	"        --tls-ca-file=/home/zabbix/zabbix_ca_file \\",
-	"        --tls-server-cert-issuer=\"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
-	"        --tls-server-cert-subject=\"CN=Zabbix proxy,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
-	"        --tls-cert-file=/home/zabbix/zabbix_agentd.crt \\",
-	"        --tls-key-file=/home/zabbix/zabbix_agentd.key",
+	"  zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 --tls-connect=cert \\",
+	"    --tls-ca-file=/home/zabbix/zabbix_ca_file \\",
+	"    --tls-server-cert-issuer=\"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"    --tls-server-cert-subject=\"CN=Zabbix proxy,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"    --tls-cert-file=/home/zabbix/zabbix_agentd.crt \\",
+	"    --tls-key-file=/home/zabbix/zabbix_agentd.key",
 #endif
 	NULL	/* end of text */
 };
@@ -969,8 +969,8 @@ int	main(int argc, char **argv)
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
 			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS "
-				"support.");
+		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
+				" support.");
 		goto exit;
 	}
 #endif
@@ -1023,8 +1023,8 @@ int	main(int argc, char **argv)
 			{
 				if (NULL == ZABBIX_HOSTNAME)
 				{
-					zabbix_log(LOG_LEVEL_CRIT, "[line %d] '-' encountered as 'Hostname', "
-							"but no default hostname was specified", total_count);
+					zabbix_log(LOG_LEVEL_CRIT, "[line %d] '-' encountered as 'Hostname',"
+							" but no default hostname was specified", total_count);
 					ret = FAIL;
 					break;
 				}

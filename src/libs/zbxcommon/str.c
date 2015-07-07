@@ -85,7 +85,7 @@ void	usage(void)
 		printf("usage:\n");
 
 	while (NULL != *p)
-		printf("       %s %s\n", progname, *p++);
+		printf("  %s %s\n", progname, *p++);
 }
 
 /******************************************************************************
