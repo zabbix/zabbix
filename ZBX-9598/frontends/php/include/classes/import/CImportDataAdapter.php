@@ -71,9 +71,9 @@ class CImportDataAdapter {
 
 	/**
 	 * Recursive function to convert hex string \x%x format to ASCII characters. The escaped strings \\x
-	 * are translated to \x.
+	 * are translated to \x and \\ to \.
 	 *
-	 * Exaple: abc\\x1b\x1b\\x1bdef -> abc\x1b&#27;\x1bdef
+	 * Exaple: abc\\\\x1b\x1b\\x1bdef -> abc\\x1b&#27;\x1bdef
 	 * where \\x1b is an escaped string and \x1b is ASCII control character.
 	 *
 	 * @param array $data		array containing import data
@@ -81,29 +81,44 @@ class CImportDataAdapter {
 	 * @return array
 	 */
 	protected function hexToAscii(array $data) {
-		foreach ($data as &$value) {
-			if (is_array($value)) {
-				$value = $this->hexToAscii($value);
+		foreach ($data as &$string) {
+			if (is_array($string)) {
+				$string = $this->hexToAscii($string);
 			}
 			else {
-				// convert all \x%x to ASCII characters except if \x is preceding with another \
-				$value = preg_replace_callback('/(?<!\\\)\\\x[a-zA-Z0-9]{1,2}/',
-					function ($matches) {
-						foreach ($matches as &$match) {
-							$match = chr(hexdec(str_replace('\x', '', $match)));
+				$i = 0;
+				$new_string = '';
+
+				while (isset($string[$i])) {
+					if ($string[$i] === '\\') {
+						if (isset($string[$i+1])) {
+							if ($string[$i+1] === '\\') {
+								$new_string .= '\\';
+								$i++;
+							}
+							elseif ($string[$i+1] === 'x' && isset($string[$i+3])) {
+								$new_string .= chr(hexdec($string[$i+2].$string[$i+3]));
+								$i += 3;
+							}
+							else {
+								$new_string .= $string[$i];
+							}
 						}
-						unset($match);
+						else {
+							$new_string .= $string[$i];
+						}
+					}
+					else {
+						$new_string .= $string[$i];
+					}
 
-						return $matches[0];
-					},
-					$value
-				);
+					$i++;
+				}
 
-				// convert all \\x to \x
-				$value = preg_replace('/\\\\\\\x/', '\\\x', $value);
+				$string = $new_string;
 			}
 		}
-		unset($value);
+		unset($string);
 
 		return $data;
 	}

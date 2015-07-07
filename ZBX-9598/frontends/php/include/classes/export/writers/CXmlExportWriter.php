@@ -69,14 +69,19 @@ class CXmlExportWriter extends CExportWriter {
 				$value = $this->controlCharsToHex($value);
 			}
 			else {
-				// convert all \x to \\x
-				$value = preg_replace('/\\\x/', '\\\\\x', $value);
+				// convert all \ to \\
+				$value = str_replace('\\', '\\\\', $value);
 
 				// convert control characters to \x%x
 				$value = preg_replace_callback('/[\x{00}-\x{08}]|[\x{0B}]|[\x{0C}]|[\x{0E}-\x{1F}]/',
 					function ($matches) {
 						foreach ($matches as &$match) {
-							$match = '\x'.dechex(ord($match));
+							if (ord($match) < 16) {
+								$match = '\x0'.dechex(ord($match));
+							}
+							else {
+								$match = '\x'.dechex(ord($match));
+							}
 						}
 						unset($match);
 
