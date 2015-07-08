@@ -76,10 +76,6 @@ $top_menu->addItem($icons);
 $page_menu_div->addItem($top_menu);
 
 // 2nd level menu
-$sub_menu_table = (new CTable())
-	->addClass('sub_menu')
-	->addClass('maxwidth')
-	->addClass('ui-widget-header');
 $menu_divs = [];
 $menu_selected = false;
 foreach ($data['menu']['sub_menus'] as $label => $sub_menu) {
@@ -129,9 +125,7 @@ $sub_menu_div = (new CDiv(SPACE))
 
 $menu_divs[] = $sub_menu_div;
 
-$page_menu_div
-	->addItem($menu_divs)
-	->addItem($sub_menu_table);
+$page_menu_div->addItem($menu_divs);
 $page_menu
 	->addItem($page_menu_div)
 	->show();
