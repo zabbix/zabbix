@@ -709,7 +709,6 @@ function make_latest_issues(array $filter = []) {
 				}
 
 				$maintenanceIcon->setHint($hint);
-				$maintenanceIcon->addClass('pointer');
 			}
 
 			$hostName->addClass('left-to-icon-maintenance-abs');
@@ -755,7 +754,7 @@ function make_latest_issues(array $filter = []) {
 			$description = (new CLink($description, $trigger['url']))->removeSID();
 		}
 		else {
-			$description = (new CSpan($description))->addClass('pointer');
+			$description = new CSpan($description);
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 		if ($trigger['lastEvent']) {

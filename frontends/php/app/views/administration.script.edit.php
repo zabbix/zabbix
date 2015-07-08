@@ -51,7 +51,7 @@ $typeRadioButton = (new CRadioButtonList('execute_on', $data['execute_on']))
 	->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
 	->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
 $scriptFormList->addRow(_('Execute on'),
-	(new CDiv($typeRadioButton))->addClass('objectgroup inlineblock border_dotted'),
+	(new CDiv($typeRadioButton))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
 );
 $scriptFormList->addRow(_('Commands'),

@@ -31,10 +31,6 @@
 		}
 
 		recalculateSortOrder();
-
-		if (IE8) {
-			jQuery('#slideTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function recalculateSortOrder() {
@@ -107,10 +103,6 @@
 		if (initSize < 2) {
 			initSortable();
 		}
-
-		if (IE8) {
-			jQuery('#slideTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function initSortable() {
@@ -144,7 +136,7 @@
 				});
 
 				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixels to right
-				if (SF || IE8) {
+				if (SF) {
 					// move back draggable element to proper position
 					ui.css('left', (ui.offset().left - 4) + 'px');
 				}
