@@ -754,14 +754,14 @@ function make_latest_issues(array $filter = []) {
 			$description = (new CLink($description, $trigger['url']))->removeSID();
 		}
 		else {
-			$description = new CSpan($description);
+			$description = (new CSpan($description))->addClass(ZBX_STYLE_LINK_ACTION);
 		}
-		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 		if ($trigger['lastEvent']) {
 			$description->setHint(
 				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', false
 			);
 		}
+		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 
 		// clock
 		$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),
