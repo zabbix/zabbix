@@ -192,7 +192,7 @@ class CScreenHistory extends CScreenBase {
 									$color = ZBX_STYLE_GREEN;
 									break;
 								case MARK_COLOR_BLUE:
-									$color = 'blue';
+									$color = ZBX_STYLE_BLUE;
 									break;
 							}
 						}

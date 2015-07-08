@@ -159,7 +159,7 @@ class CProfiler {
 			$sql = [
 				'SQL ('.$time.'): ',
 				(new CSpan($query[1]))
-					->addClass(substr($query[1], 0, 6) === 'SELECT' ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+					->addClass(substr($query[1], 0, 6) === 'SELECT' ? ZBX_STYLE_GREEN : ZBX_STYLE_BLUE),
 				BR()
 			];
 
@@ -168,7 +168,7 @@ class CProfiler {
 			}
 			$debug[] = $sql;
 
-			$debug[] = (new CSpan($this->formatCallStack($query[2])))->addStyle('font-style: italic;');
+			$debug[] = $this->formatCallStack($query[2]);
 			$debug[] = BR();
 			$debug[] = BR();
 		}
