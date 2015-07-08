@@ -168,7 +168,7 @@ static void	polarssl_debug_cb(void *tls_ctx, int level, const char *str)
 	/* remove '\n' from the end of debug message */
 	zbx_strlcpy(msg, str, sizeof(msg));
 	zbx_rtrim(msg, "\n");
-	zabbix_log(LOG_LEVEL_DEBUG, "PolarSSL debug: level=%d \"%s\"", level, msg);
+	zabbix_log(LOG_LEVEL_TRACE, "PolarSSL debug: level=%d \"%s\"", level, msg);
 }
 #elif defined(HAVE_GNUTLS)
 /******************************************************************************
@@ -188,7 +188,7 @@ static void	zbx_gnutls_debug_cb(int level, const char* str)
 	/* remove '\n' from the end of debug message */
 	zbx_strlcpy(msg, str, sizeof(msg));
 	zbx_rtrim(msg, "\n");
-	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS debug: level=%d \"%s\"", level, msg);
+	zabbix_log(LOG_LEVEL_TRACE, "GnuTLS debug: level=%d \"%s\"", level, msg);
 }
 
 #if GNUTLS_VERSION_NUMBER >= 0x030000
