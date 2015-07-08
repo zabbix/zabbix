@@ -600,7 +600,7 @@ abstract class CHostGeneral extends CHostBase {
 						' LEFT JOIN application_template at ON a.applicationid=at.applicationid '.
 					' WHERE '.dbConditionInt('a.applicationid', $applicationids).
 						' AND at.applicationid IS NULL'.
-						' AND NOT EXISTS ('.
+						' AND a.applicationid NOT IN ('.
 							'SELECT ia.applicationid'.
 							' FROM items_applications ia'.
 							' WHERE '.dbConditionInt('ia.applicationid', $applicationids).
