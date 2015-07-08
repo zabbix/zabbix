@@ -1591,7 +1591,7 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 
 		c = (zbx_uint64_t)(unsigned char)(*str - '0');
 
-		if (20 <= ++len && (max_uint64 - c) / 10 < value_uint64)
+		if (ZBX_MAX_UINT64_LEN <= ++len || (max_uint64 - c) / 10 < value_uint64)
 			return FAIL;	/* maximum value exceeded */
 
 		value_uint64 = value_uint64 * 10 + c;
