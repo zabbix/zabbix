@@ -1886,21 +1886,6 @@ button[disabled] {
 	@extend %webkit-scrollbar;
 }
 
-%webkit-scrollbar {
-	&::-webkit-scrollbar {
-		width: 9px;
-	}
-
-	&::-webkit-scrollbar-track {
-		background-color: $scrollbar-track-color;
-	}
-
-	&::-webkit-scrollbar-thumb {
-		background-color: $scrollbar-thumb-color;
-		border: 1px solid $scrollbar-track-color;
-	}
-}
-
 .setup-title {
 	color: $font-alt-color;
 	height: 350px;
@@ -2541,6 +2526,14 @@ a.grey {
 	@extend .grey;
 }
 
+.blue {
+	color: $blue;
+}
+
+a.blue {
+	@extend .blue;
+}
+
 .status-container {
 	display: inline-block;
 	white-space: nowrap;
@@ -2973,4 +2966,19 @@ $browsers: (
 	margin: 25px 0 0 0;
 	padding: 10px 0 0 0;
 	text-align: center;
+}
+
+%webkit-scrollbar {
+	&::-webkit-scrollbar {
+		width: 9px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background-color: $scrollbar-track-color;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background-color: $scrollbar-thumb-color;
+		border: 1px solid $scrollbar-track-color;
+	}
 }
