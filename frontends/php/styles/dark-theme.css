@@ -1399,7 +1399,8 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
       border-bottom: 1px solid #383838; }
   .dashbrd-widget .debug-output {
     margin: 0 10px;
-    max-height: 300px; }
+    max-height: 300px;
+    border-color: #383838; }
 
 .list-table tbody tr.nothing-to-show {
   text-align: center;
@@ -1678,11 +1679,6 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   -moz-border-radius: 2px;
   border-radius: 2px; }
 
-.notif-indic-container {
-  float: left; }
-  .notif-indic-container .notif-indic {
-    float: none; }
-
 /* Maps, Screens, Graphs */
 .box_on {
   position: absolute;
@@ -1707,7 +1703,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   padding: 11px;
   margin: 0 13px;
   background-color: #2f280a;
-  border: 1px solid #372f0c; }
+  border: 1px solid #303030; }
 
 .btn-debug {
   position: fixed;
@@ -1715,7 +1711,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   right: 13px;
   z-index: 1000;
   padding: 4px 11px;
-  background-color: rgba(14, 16, 18, 0.8);
+  background-color: rgba(14, 16, 18, 0.7);
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
