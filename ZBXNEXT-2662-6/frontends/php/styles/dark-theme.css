@@ -1408,7 +1408,6 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   padding-left: 10px; }
 
 .dashbrd-widget-head {
-  cursor: move;
   position: relative;
   padding: 8px 60px 8px 10px;
   font-weight: bold; }
@@ -1671,6 +1670,15 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   -moz-border-radius: 2px;
   border-radius: 2px; }
 
+.notif-indic-container {
+  border-top: 1px solid #383838;
+  margin: 0 0 0 -19px;
+  padding: 14px 0 0 0; }
+  .notif-indic-container .notif-indic {
+    float: none;
+    display: inline-block;
+    margin: 0 2px 0 0; }
+
 /* Maps, Screens, Graphs */
 .box_on {
   position: absolute;
@@ -1688,7 +1696,12 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   .dashed-border td td {
     border: none; }
 
-#selection-box {
+.graph-selection {
+  position: absolute;
+  z-index: 4;
+  overflow: hidden;
+  width: 1px;
+  height: 1px;
   background-color: rgba(55, 45, 1, 0.4);
   border: 1px solid rgba(55, 45, 1, 0.4); }
 
