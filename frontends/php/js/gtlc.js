@@ -1771,6 +1771,7 @@ var sbox = Class.create({
 			this.box.height = this.areaHeight;
 
 			this.dom_box.setAttribute('id', 'selection_box');
+			this.dom_box.className = 'graph-selection';
 			this.dom_box.style.top = this.box.top + 'px';
 			this.dom_box.style.left = this.box.left + 'px';
 			this.dom_box.style.height = this.areaHeight + 'px';
