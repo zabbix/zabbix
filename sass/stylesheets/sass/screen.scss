@@ -2492,7 +2492,7 @@ button[disabled] {
 	max-height: 600px;
 	overflow-y: auto;
 	padding: 11px;
-	margin: 0 13px;
+	margin: 10px 13px 0 13px;
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
@@ -2502,7 +2502,7 @@ button[disabled] {
 	position: fixed;
 	bottom: 13px;
 	right: 13px;
-	z-index: 1000;
+	z-index: 10000;
 	padding: 4px 11px;
 	background-color: rgba($body-bg-color,0.7);
 	@include border-radius(2px);
