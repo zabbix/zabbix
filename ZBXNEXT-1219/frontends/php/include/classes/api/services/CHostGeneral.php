@@ -597,7 +597,7 @@ abstract class CHostGeneral extends CHostBase {
 				$applications = DBfetchArray(DBselect(
 					'SELECT a.applicationid'.
 					' FROM applications a'.
-						' LEFT JOIN application_template at ON a.applicationid=at.applicationid '.
+						' LEFT JOIN application_template at ON a.applicationid=at.applicationid'.
 					' WHERE '.dbConditionInt('a.applicationid', $applicationids).
 						' AND at.applicationid IS NULL'.
 						' AND a.applicationid NOT IN ('.
