@@ -31,7 +31,7 @@ class CFilter extends CTag {
 
 	public function __construct($filterid) {
 		parent::__construct('div', true);
-		$this->addClass('filter-container');
+		$this->addClass(ZBX_STYLE_FILTER_CONTAINER);
 		$this->setId('filter-space');
 		$this->filterid = $filterid;
 		$this->columns = [];
@@ -51,7 +51,7 @@ class CFilter extends CTag {
 	}
 
 	public function addColumn($column) {
-		$this->columns[] = (new CDiv($column))->addClass('cell');
+		$this->columns[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
 		return $this;
 	}
 
@@ -74,20 +74,20 @@ class CFilter extends CTag {
 		$span = (new CSpan())->setId('filter-arrow');
 
 		if ($this->opened) {
-			$span->addClass('arrow-up');
+			$span->addClass(ZBX_STYLE_ARROW_UP);
 			$button = (new CSimpleButton(
 				[_('Filter'), $span]
 			))
-				->addClass('filter-trigger')
-				->addClass('filter-active')
+				->addClass(ZBX_STYLE_FILTER_TRIGGER)
+				->addClass(ZBX_STYLE_FILTER_ACTIVE)
 				->setId('filter-mode');
 		}
 		else {
-			$span->addClass('arrow-down');
+			$span->addClass(ZBX_STYLE_ARROW_DOWN);
 			$button = (new CSimpleButton(
 				[_('Filter'), $span]
 			))
-				->addClass('filter-trigger')
+				->addClass(ZBX_STYLE_FILTER_TRIGGER)
 				->setId('filter-mode');
 			$this->setAttribute('style', 'display: none;');
 		}
@@ -100,30 +100,34 @@ class CFilter extends CTag {
 		);
 
 		$switch = (new CDiv())
-			->addClass('filter-btn-container')
+			->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER)
 			->addItem($button);
 
 		return $switch;
 	}
 
 	private function getTable() {
-		$row = (new CDiv())->addClass('row');
-		foreach ($this->columns as $column) {
-			$row->addItem($column);
-		}
-		$table = (new CDiv())->addClass('table filter-forms');
-
-		$table->addItem($row);
-
-		return $table;
-	}
-
-	private function getButtons() {
-		if (count($this->columns) == 0) {
+		if (!$this->columns) {
 			return null;
 		}
 
-		$buttons = (new CDiv())->addClass('filter-forms');
+		$row = (new CDiv())->addClass(ZBX_STYLE_ROW);
+		foreach ($this->columns as $column) {
+			$row->addItem($column);
+		}
+
+		return (new CDiv())
+			->addClass(ZBX_STYLE_TABLE)
+			->addClass(ZBX_STYLE_FILTER_FORMS)
+			->addItem($row);
+	}
+
+	private function getButtons() {
+		if (!$this->columns) {
+			return null;
+		}
+
+		$buttons = (new CDiv())->addClass(ZBX_STYLE_FILTER_FORMS);
 
 		$url = new cUrl();
 		$url->removeArgument('sid');

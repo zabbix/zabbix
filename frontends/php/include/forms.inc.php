@@ -163,21 +163,21 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.dbConditionInt('r.groupid', $group_ids));
 
 		// deny beat all, read-write beat read
-		$tmp_permitions = [];
+		$tmp_permissions = [];
 		while ($db_right = DBfetch($db_rights)) {
-			if (isset($tmp_permitions[$db_right['id']]) && $tmp_permitions[$db_right['id']] != PERM_DENY) {
-				$tmp_permitions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
+			if (isset($tmp_permissions[$db_right['id']]) && $tmp_permissions[$db_right['id']] != PERM_DENY) {
+				$tmp_permissions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
 					? PERM_DENY
-					: max($tmp_permitions[$db_right['id']], $db_right['permission']);
+					: max($tmp_permissions[$db_right['id']], $db_right['permission']);
 			}
 			else {
-				$tmp_permitions[$db_right['id']] = $db_right['permission'];
+				$tmp_permissions[$db_right['id']] = $db_right['permission'];
 			}
 		}
 
 		$data['user_rights'] = [];
-		foreach ($tmp_permitions as $id => $permition) {
-			array_push($data['user_rights'], ['id' => $id, 'permission' => $permition]);
+		foreach ($tmp_permissions as $id => $permission) {
+			array_push($data['user_rights'], ['id' => $id, 'permission' => $permission]);
 		}
 	}
 

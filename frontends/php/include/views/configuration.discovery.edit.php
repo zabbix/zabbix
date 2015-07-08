@@ -57,19 +57,18 @@ $discoveryFormList
 
 // append checks to form list
 $checkTable = (new CTable())
-	->addClass('formElementTable')
-	->addRow((
-		new CRow(
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setFooter(
+		(new CRow(
 			(new CCol(
 				(new CButton('newCheck', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
 			))->setColSpan(2)
-		)
-	)->setId('dcheckListFooter'));
+		))->setId('dcheckListFooter')
+	);
+
 $discoveryFormList->addRow(_('Checks'),
 	(new CDiv($checkTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('dcheckList')
 );
 
@@ -78,9 +77,7 @@ $uniquenessCriteriaRadio = (new CRadioButtonList('uniqueness_criteria', $this->d
 	->addValue(SPACE._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
 $discoveryFormList->addRow(_('Device uniqueness criteria'),
 	(new CDiv($uniquenessCriteriaRadio))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setId('uniqList')
 );
 
