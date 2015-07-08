@@ -1123,8 +1123,8 @@ jQuery(function($) {
 						if (display !== 'block') {
 							$('ul:first', item[0])
 								.css({
-									'left': pos.left + li.outerWidth(),
-									'top': pos.top,
+									'top': pos.top - 6,
+									'left': pos.left + li.outerWidth() + 14,
 									'display': 'block'
 								});
 						}

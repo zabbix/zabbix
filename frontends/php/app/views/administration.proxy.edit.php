@@ -75,7 +75,7 @@ $proxyFormList = (new CFormList('proxyFormList'))
 		HOST_STATUS_PROXY_ACTIVE => _('Active'),
 		HOST_STATUS_PROXY_PASSIVE => _('Passive')
 	]))
-	->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass('objectgroup inlineblock border_dotted'))
+	->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
 	->addRow(_('Hosts'), $hostsTweenBox->get(_('Proxy hosts'), _('Other hosts')))
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

@@ -138,15 +138,14 @@ $triggersFormList->addRow(_('Expression'), $expressionRow);
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable = (new CTable())
-		->addClass('formElementTable')
 		->setAttribute('style', 'min-width: 500px;')
-		->setId('exp_list');
-	$expressionTable->setHeader([
-		$this->data['limited'] ? null : _('Target'),
-		_('Expression'),
-		_('Error'),
-		$this->data['limited'] ? null : _('Action')
-	]);
+		->setId('exp_list')
+		->setHeader([
+			$this->data['limited'] ? null : _('Target'),
+			_('Expression'),
+			_('Error'),
+			$this->data['limited'] ? null : _('Action')
+		]);
 
 	$allowedTesting = true;
 	if (!empty($this->data['eHTMLTree'])) {
@@ -228,10 +227,7 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		(new CDiv([$expressionTable, $testButton]))
-			->addClass('objectgroup')
-			->addClass('inlineblock')
-			->addClass('border_dotted')
+		(new CDiv([$expressionTable, $testButton]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	]);
 
 	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))
@@ -275,9 +271,7 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
-	->setId('dependenciesTable')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($this->data['db_dependencies'] as $dependency) {
@@ -314,10 +308,7 @@ $dependenciesFormList->addRow(
 				->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
 					'&with_triggers=1&noempty=1");')
 				->addClass(ZBX_STYLE_BTN_LINK)
-		]))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+		]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 
