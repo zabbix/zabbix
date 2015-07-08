@@ -21,38 +21,54 @@
 zbx_add_post_js('jqBlink.blink();');
 
 // hint table
-$hintTable = (new CTableInfo())
-	->addRow([(new CCol())->addClass(getSeverityStyle(null, false)), _('OK')]);
+$help_hint = (new CList())
+	->addClass(ZBX_STYLE_NOTIF_BODY)
+	->addStyle('min-width: '.ZBX_OVERVIEW_HELP_MIN_WIDTH.'px')
+	->addItem([
+		(new CDiv())
+			->addClass(ZBX_STYLE_NOTIF_INDIC)
+			->addClass(getSeverityStyle(null, false)),
+		(new CTag('p', true, _('OK')))->addClass(ZBX_STYLE_GREY)
+	]);
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
+	$help_hint->addItem([
+		(new CDiv())
+			->addClass(ZBX_STYLE_NOTIF_INDIC)
+			->addClass(getSeverityStyle($severity)),
+		new CTag('h4', true, getSeverityName($severity, $data['config'])),
+		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
+	]);
 }
 
 // blinking preview in help popup (only if blinking is enabled)
-if ($this->data['config']['blink_period'] > 0) {
-	$row = new CRow();
-	$row->addItem((new CCol())->addClass(getSeverityStyle(null, false)));
-	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-		$row->addItem((new CCol())->addClass(getSeverityStyle($i)));
+if ($data['config']['blink_period'] > 0) {
+	$indic_container = (new CDiv())
+		->addClass(ZBX_STYLE_NOTIF_INDIC_CONTAINER)
+		->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_NOTIF_INDIC)
+				->addClass(getSeverityStyle(null, false))
+				->addClass('blink')
+		);
+	for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
+		$indic_container->addItem(
+			(new CDiv())
+				->addClass(ZBX_STYLE_NOTIF_INDIC)
+				->addClass(getSeverityStyle($severity))
+				->addClass('blink')
+			);
 	}
-	$col = (new CTable())
-		->setNoDataMessage('')
-		->addClass('blink')
-		->addClass('overview-mon-severities')
-		->addRow($row);
-
-	// double div necassary for FireFox
-	$col = new CCol(
-		(new CDiv(new CDiv($col)))->addClass('overview-mon-severities-container')
+	$indic_container->addItem(
+		(new CTag('p', true, _s('Age less than %s', convertUnitsS($data['config']['blink_period']))))
+			->addClass(ZBX_STYLE_GREY)
 	);
 
-	$hintTable->addRow([$col, _s('Age less than %s', convertUnitsS($this->data['config']['blink_period']))]);
+	$help_hint->addItem($indic_container);
 }
-
-$hintTable->addRow([new CCol(SPACE), _('No trigger')]);
 
 // header right
 $help = get_icon('overviewhelp');
-$help->setHint($hintTable);
+$help->setHint($help_hint);
 
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
@@ -92,7 +108,7 @@ $filterFormView = new CView('common.filter.trigger', [
 		'groupId' => $this->data['groupid'],
 		'fullScreen' => $this->data['fullscreen']
 	],
-	'config' => $this->data['config']
+	'config' => $data['config']
 ]);
 $filterForm = $filterFormView->render();
 

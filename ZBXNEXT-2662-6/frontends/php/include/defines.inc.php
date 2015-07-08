@@ -956,6 +956,9 @@ define('ZBX_TEXTAREA_STANDARD_ROWS',			7);
 // decoration borders
 define('ZBX_HOST_INTERFACE_WIDTH',				750);
 
+// overviews help
+define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
+
 // widgets
 define('WIDGET_DISCOVERY_STATUS',	'dscvry');
 define('WIDGET_FAVOURITE_GRAPHS',	'favgrph');
@@ -1066,6 +1069,9 @@ define('ZBX_STYLE_LINK_ALT', 'link-alt');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
 define('ZBX_STYLE_NA_BG', 'na-bg');
 define('ZBX_STYLE_NORMAL_BG', 'normal-bg');
+define('ZBX_STYLE_NOTIF_BODY', 'notif-body');
+define('ZBX_STYLE_NOTIF_INDIC', 'notif-indic');
+define('ZBX_STYLE_NOTIF_INDIC_CONTAINER', 'notif-indic-container');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');

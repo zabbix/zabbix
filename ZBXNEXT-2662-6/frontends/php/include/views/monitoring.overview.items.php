@@ -20,15 +20,27 @@
 
 
 // hint table
-$hintTable = new CTableInfo();
+$help_hint = (new CList())
+	->addClass(ZBX_STYLE_NOTIF_BODY)
+	->addStyle('min-width: '.ZBX_OVERVIEW_HELP_MIN_WIDTH.'px');
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
+	$help_hint->addItem([
+		(new CDiv())
+			->addClass(ZBX_STYLE_NOTIF_INDIC)
+			->addClass(getSeverityStyle($severity)),
+		new CTag('h4', true, getSeverityName($severity, $data['config'])),
+		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
+	]);
 }
-$hintTable->addRow([new CCol(SPACE), _('OK or no trigger')]);
+$help_hint->addItem([
+	(new CDiv())
+		->addClass(ZBX_STYLE_NOTIF_INDIC_CONTAINER),
+	new CTag('h4', true, _('OK or no trigger')),
+]);
 
 // header right
 $help = get_icon('overviewhelp');
-$help->setHint($hintTable);
+$help->setHint($help_hint);
 
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
