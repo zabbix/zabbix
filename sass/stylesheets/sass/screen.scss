@@ -2472,6 +2472,11 @@ button[disabled] {
 	}
 }
 
+#selection-box {
+	background-color: rgba($yellow,0.4);
+	border: 1px solid rgba($yellow,0.4);
+}
+
 /* Debug */
 .debug-output {
 	max-height: 600px;
