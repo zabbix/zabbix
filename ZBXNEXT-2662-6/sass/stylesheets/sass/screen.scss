@@ -2050,7 +2050,7 @@ button[disabled] {
 }
 
 .dashbrd-widget-head {
-	cursor: move;
+	//cursor: move;
 	position: relative;
 	padding: 8px 60px 8px 10px;
 	font-weight: bold;
@@ -2438,10 +2438,14 @@ button[disabled] {
 }
 
 .notif-indic-container {
-	//float: left;
+	border-top: 1px solid $table-border-color;
+	margin: 0 0 0 -19px;
+	padding: 14px 0 0 0;
 
 	.notif-indic {
-		//float: none;
+		float: none;
+		display: inline-block;
+		margin: 0 2px 0 0;
 	}
 }
 
@@ -2473,6 +2477,11 @@ button[disabled] {
 }
 
 .graph-selection {
+	position: absolute;
+	z-index: 4;
+	overflow: hidden;
+	width: 1px;
+	height: 1px;
 	background-color: rgba($yellow,0.4);
 	border: 1px solid rgba($yellow,0.4);
 }
