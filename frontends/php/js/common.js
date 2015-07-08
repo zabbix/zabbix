@@ -123,10 +123,9 @@ function cancelEvent(e) {
 		e = window.event;
 	}
 
-	if (!IE8) {
-		e.stopPropagation();
-		e.preventDefault();
-	}
+	e.stopPropagation();
+	e.preventDefault();
+
 	if (IE) {
 		e.cancelBubble = true;
 		e.returnValue = false;

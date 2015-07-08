@@ -1597,7 +1597,7 @@ var sbox = Class.create({
 		jQuery(this.grphobj).off();
 		jQuery(this.dom_obj).off();
 
-		if (IE8 || IE9 || IE10) {
+		if (IE9 || IE10) {
 			jQuery(this.grphobj).mousedown(jQuery.proxy(this.mouseDown, this));
 			jQuery(this.grphobj).mousemove(jQuery.proxy(this.mouseMove, this));
 			jQuery(this.grphobj).click(function() {

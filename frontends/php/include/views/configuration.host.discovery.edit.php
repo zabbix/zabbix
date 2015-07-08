@@ -210,8 +210,7 @@ $itemFormList->addRow(_('Update interval (in sec)'),
 // append delay flex to form list
 $delayFlexTable = (new CTable())
 	->setNoDataMessage(_('No flexible intervals defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 310px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setId('delayFlexTable')
 	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
@@ -239,11 +238,7 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		break;
 	}
 }
-$itemFormList->addRow(_('Flexible intervals'),
-	(new CDiv($delayFlexTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted'),
+$itemFormList->addRow(_('Flexible intervals'), (new CDiv($delayFlexTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 	false, 'row_flex_intervals'
 );
 
@@ -321,7 +316,7 @@ $conditionTable = (new CTable())
 	->setNoDataMessage('')
 	->addClass('formElementTable')
 	->setId('conditions')
-	->addRow([_('Label'), _('Macro'), SPACE, _('Regular expression'), SPACE]);
+	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), '']);
 
 $conditions = $this->data['conditions'];
 if (!$conditions) {
@@ -362,26 +357,13 @@ foreach ($conditions as $i => $condition) {
 	$conditionTable->addRow($row, 'form_row');
 }
 
-$buttonColumn = new CCol(
+$conditionTable->setFooter(new CCol(
 	(new CButton('macro_add', _('Add')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->addClass('element-table-add')
-);
-$buttonColumn->setAttribute('colspan', 5);
+));
 
-$buttonRow = (new CRow())
-	->setId('row_new_macro')
-	->addItem($buttonColumn);
-
-$conditionTable->addRow($buttonRow);
-
-$conditionFormList->addRow(_('Filters'),
-	(new CDiv($conditionTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-);
-
+$conditionFormList->addRow(_('Filters'), (new CDiv($conditionTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // append tabs to form
 $itemTab = (new CTabView())

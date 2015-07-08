@@ -22,8 +22,6 @@
 class CTweenBox {
 
 	public function __construct(&$form, $name, $value = null, $size = 10) {
-		zbx_add_post_js('if (IE7) $$("select option[disabled]").each(function(e) { e.setStyle({color: "gray"}); });');
-
 		$this->form = &$form;
 		$this->name = $name.'_tweenbox';
 		$this->varname = $name;

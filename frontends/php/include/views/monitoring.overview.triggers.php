@@ -22,7 +22,7 @@ zbx_add_post_js('jqBlink.blink();');
 
 // hint table
 $hintTable = (new CTableInfo())
-	->addRow([(new CCol(SPACE))->addClass('normal'), _('OK')]);
+	->addRow([(new CCol())->addClass(getSeverityStyle(null, false)), _('OK')]);
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
 }
@@ -30,9 +30,9 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 // blinking preview in help popup (only if blinking is enabled)
 if ($this->data['config']['blink_period'] > 0) {
 	$row = new CRow();
-	$row->addItem((new CCol(SPACE))->addClass('normal'));
+	$row->addItem((new CCol())->addClass(getSeverityStyle(null, false)));
 	for ($i = 0; $i < TRIGGER_SEVERITY_COUNT; $i++) {
-		$row->addItem((new CCol(SPACE))->addClass(getSeverityStyle($i)));
+		$row->addItem((new CCol())->addClass(getSeverityStyle($i)));
 	}
 	$col = (new CTable())
 		->setNoDataMessage('')

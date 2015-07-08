@@ -19,21 +19,10 @@
 **/
 
 
-class CCheckBox extends CInput {
+class CPre extends CTag {
 
-	public function __construct($name = 'checkbox', $value = '1') {
-		parent::__construct('checkbox', $name, $value);
-		$this->addClass('checkbox');
-		$this->setChecked(false);
-	}
-
-	public function setChecked($checked) {
-		if ($checked) {
-			$this->attributes['checked'] = 'checked';
-		}
-		else {
-			$this->removeAttribute('checked');
-		}
-		return $this;
+	public function __construct($items = null) {
+		parent::__construct('pre', true);
+		$this->addItem($items);
 	}
 }
