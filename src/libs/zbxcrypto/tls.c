@@ -2656,15 +2656,10 @@ void	zbx_tls_init_child(void)
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
 	if (NULL != my_cert_creds)
 	{
-		/* first try what is supported by GnuTLS 3.3.15, if that fails try what is supported by GnuTLS 3.1.18 */
+		/* this should work with GnuTLS 3.1.18 - 3.3.15 */
 		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_cert, "NONE:+VERS-TLS1.2:+ECDHE-RSA:"
-				"+DHE-RSA:+RSA:+AES-256-GCM:+AES-128-GCM:+AES-256-CBC:+AES-128-CBC:+CAMELLIA-256-GCM:"
-				"+CAMELLIA-128-GCM:+CAMELLIA-256-CBC:+CAMELLIA-128-CBC:+AEAD:+SHA384:+SHA256:+SHA1:"
-				"+CURVE-ALL:+COMP-NULL:+SIGN-ALL:+CTYPE-X.509", NULL)) &&
-				GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_cert, "NONE:+VERS-TLS1.2:"
-				"+ECDHE-RSA:+DHE-RSA:+RSA:+AES-256-GCM:+AES-128-GCM:+AES-256-CBC:+AES-128-CBC:"
-				"+CAMELLIA-256-CBC:+CAMELLIA-128-CBC:+AEAD:+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:"
-				"+SIGN-ALL:+CTYPE-X.509", NULL)))
+				"+RSA:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:"
+				"+CTYPE-X.509", NULL)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_cert' failed: %d: %s",
 					res, gnutls_strerror(res));
@@ -2678,14 +2673,10 @@ void	zbx_tls_init_child(void)
 	if (NULL != my_psk_client_creds || NULL != my_psk_server_creds ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
 	{
-		/* first try what is supported by GnuTLS 3.3.15, if that fails try what is supported by GnuTLS 3.1.18 */
+		/* this should work with GnuTLS 3.1.18 - 3.3.15 */
 		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_psk, "NONE:+VERS-TLS1.2:+ECDHE-PSK:"
-				"+DHE-PSK:+RSA-PSK:+PSK:+AES-256-GCM:+AES-128-GCM:+AES-256-CBC:+AES-128-CBC:"
-				"+CAMELLIA-256-GCM:+CAMELLIA-128-GCM:+CAMELLIA-256-CBC:+CAMELLIA-128-CBC:+AEAD:+SHA384:"
-				"+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL", NULL)) &&
-				GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_psk, "NONE:+VERS-TLS1.2:"
-				"+ECDHE-PSK:+DHE-PSK:+PSK:+AES-256-GCM:+AES-128-GCM:+AES-256-CBC:+AES-128-CBC:+AEAD:"
-				"+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL", NULL)))
+				"+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL",
+				NULL)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_psk' failed: %d: %s",
 					res, gnutls_strerror(res));
@@ -2699,16 +2690,10 @@ void	zbx_tls_init_child(void)
 	if (NULL != my_cert_creds && (NULL != my_psk_client_creds || NULL != my_psk_server_creds ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))))
 	{
-		/* first try what is supported by GnuTLS 3.3.15, if that fails try what is supported by GnuTLS 3.1.18 */
+		/* this should work with GnuTLS 3.1.18 - 3.3.15 */
 		if (GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_all, "NONE:+VERS-TLS1.2:+ECDHE-RSA:"
-				"+DHE-RSA:+RSA:+ECDHE-PSK:+DHE-PSK:+RSA-PSK:+PSK:+AES-256-GCM:+AES-128-GCM:"
-				"+AES-256-CBC:+AES-128-CBC:+CAMELLIA-256-GCM:+CAMELLIA-128-GCM:+CAMELLIA-256-CBC:"
-				"+CAMELLIA-128-CBC:+AEAD:+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:"
-				"+CTYPE-X.509", NULL)) &&
-				GNUTLS_E_SUCCESS != (res = gnutls_priority_init(&ciphersuites_all, "NONE:+VERS-TLS1.2:"
-				"+ECDHE-RSA:+DHE-RSA:+RSA:+ECDHE-PSK:+DHE-PSK:+PSK:+AES-256-GCM:+AES-128-GCM:"
-				"+AES-256-CBC:+AES-128-CBC:+AEAD:+SHA384:+SHA256:+SHA1:+CURVE-ALL:+COMP-NULL:+SIGN-ALL:"
-				"+CTYPE-X.509", NULL)))
+				"+RSA:+ECDHE-PSK:+PSK:+AES-128-GCM:+AES-128-CBC:+AEAD:+SHA256:+SHA1:+CURVE-ALL:"
+				"+COMP-NULL:+SIGN-ALL:+CTYPE-X.509", NULL)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "gnutls_priority_init() for 'ciphersuites_all' failed: %d: %s",
 					res, gnutls_strerror(res));
@@ -2903,9 +2888,8 @@ void	zbx_tls_init_child(void)
 		goto out;
 	}
 
-	if (NULL != ctx_psk &&
-			1 != SSL_CTX_set_cipher_list(ctx_psk, "DEFAULT:!EXPORT:!RC4:!SRP:!DES:!DSS:!SEED:!DH:!RSA:"
-			"!ECDH:!KRB5"))
+	/* OpenSSL 1.0.1e - 1.0.2c support very few PSK ciphersuites */
+	if (NULL != ctx_psk && 1 != SSL_CTX_set_cipher_list(ctx_psk, "PSK-AES128-CBC-SHA"))
 	{
 		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
 		goto out;
