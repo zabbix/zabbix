@@ -1,5 +1,5 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
-	<div class="dashbrd-widget-head">
+	<div class="dashbrd-widget-head <?= ZBX_STYLE_CURSOR_MOVE ?>">
 		<h4 id="formDragHandler">Map element</h4>
 	</div>
 	<form id="selementForm" name="selementForm">
