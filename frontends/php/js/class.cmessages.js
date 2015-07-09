@@ -390,7 +390,7 @@ var CMessageList = Class.create({
 
 		// header
 		this.dom.header = document.createElement('div');
-		this.dom.header.className = 'dashbrd-widget-head';
+		this.dom.header.className = 'dashbrd-widget-head cursor-move';
 		this.dom.container.appendChild(this.dom.header);
 
 		// controls
