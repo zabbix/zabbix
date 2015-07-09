@@ -1776,7 +1776,6 @@ var sbox = Class.create({
 			this.dom_box.style.left = this.box.left + 'px';
 			this.dom_box.style.height = this.areaHeight + 'px';
 			this.dom_box.style.width = '1px';
-			this.dom_box.style.zIndex = 98;
 
 			this.start_event.top = this.mouse_event.top;
 			this.start_event.left = this.mouse_event.left;
