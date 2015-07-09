@@ -77,30 +77,32 @@ a {
 }
 
 .link-alt {
+	text-decoration: none;
+	cursor: pointer;
 
 	&:link {
-		text-decoration: none;
+		//text-decoration: none;
 		border-bottom: 1px solid rgba(118,141,153,0.35);
-		cursor: pointer;
+		//cursor: pointer;
 	}
 
 	&:visited {
-		text-decoration: none;
+		//text-decoration: none;
 		border-bottom: 1px solid rgba(118,141,153,0.35);
-		cursor: pointer;
+		//cursor: pointer;
 	}
 
 	&:hover {
-		text-decoration: none;
+		//text-decoration: none;
 		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//cursor: pointer;
 		color: $link-hover-color;
 	}
 
 	&:focus {
-		text-decoration: none;
+		//text-decoration: none;
 		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//cursor: pointer;
 		color: $link-hover-color;
 	}
 
@@ -3010,4 +3012,8 @@ $browsers: (
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid $scrollbar-track-color;
 	}
+}
+
+.cursor-move {
+	cursor: move;
 }
