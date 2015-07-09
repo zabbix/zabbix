@@ -235,7 +235,7 @@ nav {
 		&.selected {
 			position: relative;
 
-			&:after{
+			&::after{
 				content:'';
 				position: absolute;
 				bottom: -1px;
@@ -2139,21 +2139,17 @@ button[disabled] {
 			background-color: $action-hover-color;
 		}
 
-		.selected {
-			display: block;
-			width: 24px;
-			height: 24px;
-			position: absolute;
-			left: 0;
-			background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
+		&.selected {
 
-			//&:hover {
-			//	background-color: $action-hover-color;
-			//}
-
-			//&:active {
-			//	background-color: $action-hover-color;
-			//}
+			&::before {
+				display: block;
+				width: 24px;
+				height: 24px;
+				position: absolute;
+				left: 0;
+				content: '';
+				background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
+			}
 		}
 
 		.arrow-right {
@@ -2833,7 +2829,7 @@ td.disaster-bg {
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
 
-	&:before {
+	&::before {
 		content:"\00d7";
 	}
 
