@@ -2478,10 +2478,8 @@ button[disabled] {
 
 .graph-selection {
 	position: absolute;
-	z-index: 4;
+	z-index: 98;
 	overflow: hidden;
-	width: 1px;
-	height: 1px;
 	background-color: rgba($yellow,0.4);
 	border: 1px solid rgba($yellow,0.4);
 }
