@@ -2139,16 +2139,21 @@ button[disabled] {
 			background-color: $action-hover-color;
 		}
 
-		&.selected {
+		.selected {
+			display: block;
+			width: 24px;
+			height: 24px;
+			position: absolute;
+			left: 0;
 			background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
 
-			&:hover {
-				background-color: $action-hover-color;
-			}
+			//&:hover {
+			//	background-color: $action-hover-color;
+			//}
 
-			&:active {
-				background-color: $action-hover-color;
-			}
+			//&:active {
+			//	background-color: $action-hover-color;
+			//}
 		}
 
 		.arrow-right {
