@@ -77,7 +77,7 @@ $httpFormList
 	->addRow(_('Update interval (in sec)'),
 		(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
-	->addRow(_('Retries'),
+	->addRow(_('Attempts'),
 		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
@@ -122,21 +122,15 @@ $httpAuthenticationFormList->addRow(_('HTTP authentication'),
 	new CComboBox('authentication', $this->data['authentication'], null, httptest_authentications())
 );
 
-$httpAuthenticationUserTB = (new CTextBox('http_user', $this->data['http_user'], false, 64))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-$httpAuthenticationPasswordTB = (new CTextBox('http_password', $this->data['http_password'], false, 64))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
-
-$authenticationInputsHidden = ($this->data['authentication'] == HTTPTEST_AUTH_NONE);
-
-if ($authenticationInputsHidden) {
-	$httpAuthenticationUserTB->setAttribute('disabled', true);
-	$httpAuthenticationPasswordTB->setAttribute('disabled', true);
-}
-
 $httpAuthenticationFormList
-	->addRow(_('User'), $httpAuthenticationUserTB, $authenticationInputsHidden)
-	->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden)
+	->addRow(_('User'),
+		(new CTextBox('http_user', $this->data['http_user'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Password'),
+		(new CTextBox('http_password', $this->data['http_password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
 	->addRow(_('SSL verify peer'),
 		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
 	)
@@ -159,19 +153,18 @@ $httpAuthenticationFormList
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
 	->setId('httpStepTable')
 	->setHeader([
-		(new CColHeader(''))->setWidth('15'),
-		(new CColHeader(''))->setWidth('15'),
+		(new CColHeader())->setWidth('15'),
+		(new CColHeader())->setWidth('15'),
 		(new CColHeader(_('Name')))->setWidth('150'),
 		(new CColHeader(_('Timeout')))->setWidth('50'),
 		(new CColHeader(_('URL')))->setWidth('200'),
-		(new CColHeader(_('Required')))->setWidth('50'),
+		(new CColHeader(_('Required')))->setWidth('75'),
 		(new CColHeader(_('Status codes')))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->setWidth('90'),
-		(new CColHeader(''))->setWidth('50')
+		(new CColHeader())->setWidth('50')
 	]);
 
 $i = 1;
@@ -196,7 +189,8 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		->addClass('rowNum')
 		->setId('current_step_'.$stepid);
 
-	$name = (new CSpan($step['name'], 'link'))
+	$name = (new CLink($step['name'], 'javascript:void(0);'))
+		->removeSID()
 		->setId('name_'.$stepid)
 		->setAttribute('name_step', $stepid);
 
@@ -211,7 +205,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 
 	if ($this->data['templated']) {
-		$removeButton = SPACE;
+		$removeButton = '';
 		$dragHandler = '';
 	}
 	else {
@@ -249,10 +243,7 @@ if (!$this->data['templated']) {
 }
 
 $httpStepFormList->addRow(_('Steps'),
-	(new CDiv($stepsTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+	(new CDiv($stepsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 // append tabs to form

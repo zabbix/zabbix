@@ -20,23 +20,25 @@
 
 
 function getSeverityStyle($severity, $type = true) {
-	$styles = [
-		TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG,
-		TRIGGER_SEVERITY_HIGH => ZBX_STYLE_HIGH_BG,
-		TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
-		TRIGGER_SEVERITY_WARNING => ZBX_STYLE_WARNING_BG,
-		TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG
-	];
-
 	if (!$type) {
 		return ZBX_STYLE_NORMAL_BG;
 	}
-	elseif (isset($styles[$severity])) {
-		return $styles[$severity];
-	}
-	else {
-		return '';
+
+	switch ($severity) {
+		case TRIGGER_SEVERITY_DISASTER:
+			return ZBX_STYLE_DISASTER_BG;
+		case TRIGGER_SEVERITY_HIGH:
+			return ZBX_STYLE_HIGH_BG;
+		case TRIGGER_SEVERITY_AVERAGE:
+			return ZBX_STYLE_AVERAGE_BG;
+		case TRIGGER_SEVERITY_WARNING:
+			return ZBX_STYLE_WARNING_BG;
+		case TRIGGER_SEVERITY_INFORMATION:
+			return ZBX_STYLE_INFO_BG;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return ZBX_STYLE_NA_BG;
+		default:
+			return null;
 	}
 }
 
@@ -1153,10 +1155,10 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 
 	if ($trigger) {
 		$style = 'cursor: pointer; ';
+		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
 
 		// problem trigger
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$css = getSeverityStyle($trigger['priority']);
 			$ack = null;
 
 			if ($config['event_ack_enable'] == 1) {
@@ -1180,10 +1182,6 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 					}
 				}
 			}
-		}
-		// ok trigger
-		else {
-			$css = 'normal';
 		}
 
 		// dependency: triggers on which depends this

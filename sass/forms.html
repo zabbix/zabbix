@@ -20,7 +20,7 @@
 	<header role="banner">
 		<div class="nav" role="navigation">
 			<div class="top-nav-container">
-			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -55,11 +55,10 @@
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label>Agent interfaces</label></div><div class="table-forms-td-right">
-		<div class="table-forms-separator">
-		<table><tbody>
-		<tr>
-		<td>&nbsp;</td><td><label for="IpAddress">IP address</label></td><td><label for="DnsName">DNS name</label></td><td><label>Connect to</label</td><td><label for="Port">Port</label></td><td><label>Default</label></td><td>&nbsp;</td>	
-		</tr>
+		<div class="table-forms-separator" style="width: 750px">
+		<table>
+		<thead><tr><th></th><th>IP address</th><th>DNS name</th><th>Connect to</th><th>Port</th><th>Default</th><th></th></tr></thead>
+		<tbody>
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon disabled"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch paging-selected">IP</span><span class="radio-switch">DNS</span></div><input type="radio" style="display: none"><input type="radio" style="display: none"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link" disabled>Remove</button></td>
 		</tr>
@@ -71,7 +70,7 @@
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label for="snmp">SNMP interfaces</label></div><div class="table-forms-td-right">
-		<div class="table-forms-separator drag-drop-area">
+		<div class="table-forms-separator drag-drop-area" style="width: 750px">
 		<table><tbody>
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><br><label for="BulkReq1"><input type="checkbox" id="BulkReq1" checked>Use bulk requests</label></td><td><input type="text" id="DnsName"></td><td><div><span class="radio-switch paging-selected">IP</span><span class="radio-switch">DNS</span></div><input type="radio" style="display: none"><input type="radio" style="display: none"></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
@@ -85,15 +84,10 @@
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label for="jmx">JMX interfaces</label></div><div class="table-forms-td-right">
-		<div class="table-forms-separator">
-		<table><tbody>
-		<tr><td><button type="button" class="btn-link">Add</button></td></tr>
-		</tbody></table></div></div>
+		<div class="table-forms-separator" style="width: 750px"><button type="button" class="btn-link">Add</button></div></div>
 		</li>
 		<li><div class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></div><div class="table-forms-td-right">
-		<table><tbody>
-		<tr><td><div class="table-forms-separator"><button type="button" class="btn-link">Add</button></div></td></tr>
-		</tbody></table></div>
+		<div class="table-forms-separator" style="width: 750px"><button type="button" class="btn-link">Add</button></div></div>
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label for="descr">Description</label></div><div class="table-forms-td-right"><textarea name="" id="descr"></textarea></div>

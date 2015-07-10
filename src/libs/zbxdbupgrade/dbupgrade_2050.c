@@ -310,40 +310,76 @@ static int      DBpatch_2050018(void)
 
 static int	DBpatch_2050019(void)
 {
+	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050020(void)
+{
+	const ZBX_FIELD	field = {"smtp_security", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050021(void)
+{
+	const ZBX_FIELD	field = {"smtp_verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050022(void)
+{
+	const ZBX_FIELD	field = {"smtp_verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050023(void)
+{
+	const ZBX_FIELD	field = {"smtp_authentication", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+
+static int	DBpatch_2050024(void)
+{
 	const ZBX_FIELD field = {"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050020(void)
+static int	DBpatch_2050025(void)
 {
 	const ZBX_FIELD field = {"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050021(void)
+static int	DBpatch_2050026(void)
 {
 	const ZBX_FIELD field = {"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050022(void)
+static int	DBpatch_2050027(void)
 {
 	const ZBX_FIELD field = {"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050023(void)
+static int	DBpatch_2050028(void)
 {
 	const ZBX_FIELD field = {"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050024(void)
+static int	DBpatch_2050029(void)
 {
 	const ZBX_FIELD field = {"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -381,5 +417,10 @@ DBPATCH_ADD(2050021, 0, 1)
 DBPATCH_ADD(2050022, 0, 1)
 DBPATCH_ADD(2050023, 0, 1)
 DBPATCH_ADD(2050024, 0, 1)
+DBPATCH_ADD(2050025, 0, 1)
+DBPATCH_ADD(2050026, 0, 1)
+DBPATCH_ADD(2050027, 0, 1)
+DBPATCH_ADD(2050028, 0, 1)
+DBPATCH_ADD(2050029, 0, 1)
 
 DBPATCH_END()
