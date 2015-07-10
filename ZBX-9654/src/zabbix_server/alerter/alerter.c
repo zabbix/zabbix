@@ -69,7 +69,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 	int 	res = FAIL;
 
-	zabbix_log(LOG_LEVEL_ERR, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
 
 	if (MEDIA_TYPE_EMAIL == mediatype->type)
@@ -140,11 +140,20 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 		zabbix_log(LOG_LEVEL_ERR, "alert ID [" ZBX_FS_UI64 "]: %s", alert->alertid, error);
 	}
 
-	zabbix_log(LOG_LEVEL_ERR, "End of %s():%s", __function_name, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(res));
 
 	return res;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: alerter_thread                                                   *
+ *                                                                            *
+ * Purpose: maitain alerter worker threads                                    *
+ *                                                                            *
+ * Author: Sandis Neilands                                                    *
+ *                                                                            *
+ ******************************************************************************/
 ZBX_THREAD_ENTRY(alerter_thread, args)
 {
 	process_type = ((zbx_thread_args_t *)args)->process_type;
@@ -156,24 +165,24 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	for (;;)
 	{
+		int		workers_running = 0, workers_started = 0, workers_terminated = 0;
+		double		sec;
 		DB_RESULT	result;
 		DB_ROW		row;
-		pid_t pid;
-		int status;
+		pid_t		pid;
+		int		status;
 
-		zabbix_log(LOG_LEVEL_ERR, "iteration started");
+		sec = zbx_time();
 
-		/* Kill zombies first. */
+		zbx_setproctitle("%s [terminating defunct workers]", get_process_type_string(process_type));
+
+		/* Reap zombies first. */
 		while (0 < (pid = waitpid(-1, &status, WNOHANG)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "reaped worker pid: %d", pid);
 			for (zbx_alerter_worker_t *w = workers; NULL != w; w = w->next)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "examining worker id: %s pid: %d", w->id, w->pid);
 				if (pid == w->pid)
 				{
-					zabbix_log(LOG_LEVEL_ERR, "pid == w->pid");
-
 					/* Remove zombie worker. */
 					if (w->next)
 						w->next->prev = w->prev;
@@ -184,22 +193,26 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 					if (w == workers)
 						workers = w->next;
 
-					zabbix_log(LOG_LEVEL_ERR, "removing worker id: %s pid: %d", w->id, w->pid);
-
 					zbx_free(w->id);
 					zbx_free(w);
+
+					workers_terminated++;
 
 					break;
 				}
 			}
 		}
 
-		if (-1 == pid)
+		if (-1 == pid && ECHILD != errno)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "waitpid: %s", strerror(errno));
 		}
 
+		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
+
+		zbx_setproctitle("%s [updating list of workers]", get_process_type_string(process_type));
 
 		result = DBselect(
 				"select mt.mediatypeid from media_type mt where status = %d",
@@ -214,7 +227,6 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			{
 				if (0 == strcmp(w->id, row[0]))
 				{
-					zabbix_log(LOG_LEVEL_ERR, "found worker id: %s pid: %d", w->id, w->pid);
 					break;
 				}
 			}
@@ -234,12 +246,13 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 				workers = w;
 
 				w->id = zbx_strdup(w->id, row[0]);
-				zabbix_log(LOG_LEVEL_ERR, "added worker id: %s pid: %d", w->id, w->pid);
 			}
 		}
 
 		DBfree_result(result);
 		DBclose();
+
+		zbx_setproctitle("%s [starting workers]", get_process_type_string(process_type));
 
 		/* Start the new workers. */
 		for (zbx_alerter_worker_t *w = workers; NULL != w; w = w->next)
@@ -247,19 +260,26 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			if (0 == w->pid)
 			{
 				w->pid = zbx_thread_start(alerter_worker_thread, w->id);
-				zabbix_log(LOG_LEVEL_ERR, "started worker id: %s pid: %d", w->id, w->pid);
+				workers_started++;
 			}
 		}
 
-		zabbix_log(LOG_LEVEL_ERR, "iteration ended");
+		/* Count total number of workers running. */
+		for (zbx_alerter_worker_t *w = workers; NULL != w; w = w->next, workers_running++);
 
-		zbx_sleep_loop(30);
+		sec = zbx_time() - sec;
+		zbx_setproctitle("%s [workers (%d running): %d started, %d terminated in " ZBX_FS_DBL " sec, idle %d sec]",
+				get_process_type_string(process_type),
+				workers_running, workers_started, workers_terminated,
+				sec, CONFIG_SENDER_FREQUENCY);
+
+		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: main_alerter_loop                                                *
+ * Function: alerter_worker                                                   *
  *                                                                            *
  * Purpose: periodically check table alerts and send notifications if needed  *
  *                                                                            *
@@ -285,11 +305,9 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 	{
 		int mediatype_still_active = 0;
 
-		zabbix_log(LOG_LEVEL_ERR, "worker id: %s pid: %d", mediatypeid, getpid());
-
 		zbx_setproctitle("%s [checking mediatype]", get_process_type_string(process_type));
 		result = DBselect(
-				"select mt.mediatypeid from media_type mt where status = %d and mt.mediatypeid = %s",
+				"select mt.mediatypeid from media_type mt where mt.status = %d and mt.mediatypeid = %s",
 				MEDIA_STATUS_ACTIVE,
 				mediatypeid);
 
@@ -329,7 +347,6 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 
 		while (NULL != (row = DBfetch(result)))
 		{
-
 			ZBX_STR2UINT64(alert.alertid, row[0]);
 			ZBX_STR2UINT64(alert.mediatypeid, row[1]);
 			alert.sendto = row[2];
@@ -353,8 +370,6 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 			ZBX_STR2UCHAR(mediatype.smtp_verify_host, row[19]);
 			ZBX_STR2UCHAR(mediatype.smtp_authentication, row[20]);
 
-			zabbix_log(LOG_LEVEL_ERR, "worker id: %s pid: %d row[1]: %s row[6]: %s a: %zu m: %zu", mediatypeid, getpid(), row[1], row[6], alert.mediatypeid, mediatype.mediatypeid);
-
 			alert.retries = atoi(row[21]);
 
 			*error = '\0';
@@ -362,7 +377,7 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 
 			if (SUCCEED == res)
 			{
-				zabbix_log(LOG_LEVEL_ERR, "alert ID [" ZBX_FS_UI64 "] was sent successfully",
+				zabbix_log(LOG_LEVEL_DEBUG, "alert ID [" ZBX_FS_UI64 "] was sent successfully",
 						alert.alertid);
 				DBexecute("update alerts set status=%d,error='' where alertid=" ZBX_FS_UI64,
 						ALERT_STATUS_SENT, alert.alertid);
@@ -370,7 +385,7 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_ERR, "error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
+				zabbix_log(LOG_LEVEL_DEBUG, "error sending alert ID [" ZBX_FS_UI64 "]", alert.alertid);
 
 				error_esc = DBdyn_escape_string_len(error, ALERT_ERROR_LEN);
 
@@ -393,6 +408,7 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 			}
 
 		}
+
 		DBfree_result(result);
 
 		sec = zbx_time() - sec;
