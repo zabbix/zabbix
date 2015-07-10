@@ -50,6 +50,12 @@ static zbx_alerter_worker_t	*workers;
 
 ZBX_THREAD_ENTRY(alerter_worker_thread, args);
 
+static void add_worker(char *mediatypeid, char *description, pid_t pid);
+static void remove_worker(zbx_alerter_worker_t *w);
+static int count_workers(void);
+static zbx_alerter_worker_t *find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid);
+static zbx_alerter_worker_t *find_next_worker_by_mediatypeid(zbx_alerter_worker_t *from, char *mediatypeid);
+
 /******************************************************************************
  *                                                                            *
  * Function: execute_action                                                   *
@@ -173,100 +179,60 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 		DB_ROW		row;
 		pid_t		pid;
 		int		status;
+		zbx_alerter_worker_t	*w;
 
 		sec = zbx_time();
 
+		/*
+		 * Reap zombies.
+		 */
 		zbx_setproctitle("%s [terminating defunct workers]", get_process_type_string(process_type));
 
-		/* Reap zombies first. */
 		while (0 < (pid = waitpid(-1, &status, WNOHANG)))
 		{
-			for (zbx_alerter_worker_t *w = workers; NULL != w; w = w->next)
+			if (NULL != (w = find_next_worker_by_pid(workers, pid)))
 			{
-				if (pid == w->w_pid)
-				{
-					/* Remove zombie worker. */
-					if (w->next)
-						w->next->prev = w->prev;
-
-					if (w->prev)
-						w->prev->next = w->next;
-
-					if (w == workers)
-						workers = w->next;
-
-					zbx_free(w->w_mediatypeid);
-					zbx_free(w->w_description);
-					zbx_free(w);
-
-					workers_terminated++;
-
-					break;
-				}
+				remove_worker(w);
+				workers_terminated++;
 			}
 		}
 
 		if (-1 == pid && ECHILD != errno)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "waitpid: %s", strerror(errno));
-		}
+			zabbix_log(LOG_LEVEL_ERR, "waitpid() failed with unexpected reason: %s", strerror(errno));
 
+		/*
+		 * Update list of workers.
+		 */
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
-
 		zbx_setproctitle("%s [updating list of workers]", get_process_type_string(process_type));
-
 		result = DBselect("select mt.mediatypeid, mt.description from media_type mt");
 
 		while (NULL != (row = DBfetch(result)))
-		{
-			zbx_alerter_worker_t *w;
-
-			/* Find the worker. */
-			for (w = workers; NULL != w; w = w->next)
-			{
-				if (0 == strcmp(w->w_mediatypeid, row[0]))
-					break;
-			}
-
-			if (NULL == w) /* Worker not found, add it. */
-			{
-				w = zbx_calloc(w, 1, sizeof(zbx_alerter_worker_t));
-
-				if (NULL != workers)
-				{
-					w->prev = NULL;
-					w->next = workers;
-
-					workers->prev = w;
-				}
-
-				workers = w;
-
-				w->w_mediatypeid = zbx_strdup(w->w_mediatypeid, row[0]);
-				w->w_description = zbx_strdup(w->w_description, row[1]);
-			}
-		}
+			if (NULL == (w = find_next_worker_by_mediatypeid(workers, row[0])))
+				add_worker(row[0], row[1], 0);
 
 		DBfree_result(result);
 		DBclose();
 
+		/*
+		 * Start the new workers.
+		 */
 		zbx_setproctitle("%s [starting workers]", get_process_type_string(process_type));
 
-		/* Start the new workers. */
-		for (zbx_alerter_worker_t *w = workers; NULL != w; w = w->next)
+		w = workers;
+		while (NULL != (w = find_next_worker_by_pid(w, 0)))
 		{
-			if (0 == w->w_pid)
-			{
-				thread_args.args = w;
-				w->w_pid = zbx_thread_start(alerter_worker_thread, &thread_args);
-				workers_started++;
-			}
+			thread_args.args = w;
+			w->w_pid = zbx_thread_start(alerter_worker_thread, &thread_args);
+			workers_started++;
+			w = w->next;
 		}
 
-		/* Count total number of workers running. */
-		for (zbx_alerter_worker_t *w = workers; NULL != w; w = w->next, workers_running++);
+		/*
+		 * Sleep till the next iteration.
+		 */
+		workers_running = count_workers();
 
 		sec = zbx_time() - sec;
 		zbx_setproctitle("%s [workers (%d running): %d started, %d terminated in " ZBX_FS_DBL " sec, idle %d sec]",
@@ -425,4 +391,75 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
+}
+
+static void add_worker(char *mediatypeid, char *description, pid_t pid)
+{
+	zbx_alerter_worker_t	*w = NULL;
+
+	w = zbx_calloc(w, 1, sizeof(zbx_alerter_worker_t));
+
+	if (NULL != workers)
+	{
+		w->prev = NULL;
+		w->next = workers;
+
+		workers->prev = w;
+	}
+
+	workers = w;
+
+	w->w_mediatypeid = zbx_strdup(w->w_mediatypeid, mediatypeid);
+	w->w_description = zbx_strdup(w->w_description, description);
+	w->w_pid = pid;
+}
+
+static void remove_worker(zbx_alerter_worker_t *w)
+{
+	if (w->next)
+		w->next->prev = w->prev;
+
+	if (w->prev)
+		w->prev->next = w->next;
+
+	if (w == workers)
+		workers = w->next;
+
+	zbx_free(w->w_mediatypeid);
+	zbx_free(w->w_description);
+	zbx_free(w);
+}
+
+static int count_workers(void)
+{
+	zbx_alerter_worker_t	*w;
+	int count = 0;
+
+	for (w = workers; NULL != w; w = w->next, count++);
+
+	return count;
+}
+
+static zbx_alerter_worker_t *find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid)
+{
+	zbx_alerter_worker_t	*w;
+	zbx_alerter_worker_t	*found = NULL;
+
+	for (w = from; NULL != w && NULL == found; w = w->next)
+		if (pid == w->w_pid)
+			found = w;
+
+	return found;
+}
+
+static zbx_alerter_worker_t *find_next_worker_by_mediatypeid(zbx_alerter_worker_t *from, char *mediatypeid)
+{
+	zbx_alerter_worker_t	*w;
+	zbx_alerter_worker_t	*found = NULL;
+
+	for (w = from; NULL != w && NULL == found; w = w->next)
+		if (0 == strcmp(w->w_mediatypeid, mediatypeid))
+			found = w;
+
+	return found;
 }
