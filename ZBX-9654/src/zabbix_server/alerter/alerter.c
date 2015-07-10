@@ -32,18 +32,20 @@
 
 #define	ALARM_ACTION_TIMEOUT	40
 
-extern unsigned char	process_type, daemon_type;
-extern int		server_num, process_num;
-
 typedef struct zbx_alerter_worker_s
 {
-	char	*id;
-	pid_t	pid;
+	char	*w_mediatypeid;
+	char	*w_description;
+	pid_t	w_pid;
 	struct zbx_alerter_worker_s *prev;
 	struct zbx_alerter_worker_s *next;
 }
 zbx_alerter_worker_t;
 
+extern unsigned char	process_type, daemon_type;
+extern int		server_num, process_num;
+
+static zbx_thread_args_t	thread_args;
 static zbx_alerter_worker_t	*workers;
 
 ZBX_THREAD_ENTRY(alerter_worker_thread, args);
@@ -181,7 +183,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 		{
 			for (zbx_alerter_worker_t *w = workers; NULL != w; w = w->next)
 			{
-				if (pid == w->pid)
+				if (pid == w->w_pid)
 				{
 					/* Remove zombie worker. */
 					if (w->next)
@@ -193,7 +195,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 					if (w == workers)
 						workers = w->next;
 
-					zbx_free(w->id);
+					zbx_free(w->w_mediatypeid);
 					zbx_free(w);
 
 					workers_terminated++;
@@ -225,7 +227,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			/* Find the worker. */
 			for (w = workers; NULL != w; w = w->next)
 			{
-				if (0 == strcmp(w->id, row[0]))
+				if (0 == strcmp(w->w_mediatypeid, row[0]))
 				{
 					break;
 				}
@@ -245,7 +247,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 				workers = w;
 
-				w->id = zbx_strdup(w->id, row[0]);
+				w->w_mediatypeid = zbx_strdup(w->w_mediatypeid, row[0]);
 			}
 		}
 
@@ -257,9 +259,10 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 		/* Start the new workers. */
 		for (zbx_alerter_worker_t *w = workers; NULL != w; w = w->next)
 		{
-			if (0 == w->pid)
+			if (0 == w->w_pid)
 			{
-				w->pid = zbx_thread_start(alerter_worker_thread, w->id);
+				thread_args.args = w;
+				w->w_pid = zbx_thread_start(alerter_worker_thread, &thread_args);
 				workers_started++;
 			}
 		}
@@ -295,36 +298,29 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 	DB_ROW		row;
 	DB_ALERT	alert;
 	DB_MEDIATYPE	mediatype;
-	char		*mediatypeid = args;
+	zbx_alerter_worker_t	*worker = ((zbx_thread_args_t *)args)->args;
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s (worker) [connecting to the database]", get_process_type_string(process_type));
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		int mediatype_still_active = 0;
-
-		zbx_setproctitle("%s [checking mediatype]", get_process_type_string(process_type));
+		zbx_setproctitle("%s (worker) [checking mediatype]", get_process_type_string(process_type));
 		result = DBselect(
 				"select mt.mediatypeid from media_type mt where mt.status = %d and mt.mediatypeid = %s",
 				MEDIA_STATUS_ACTIVE,
-				mediatypeid);
+				worker->w_mediatypeid);
 
-		while (NULL != (row = DBfetch(result)))
+		if (NULL == (row = DBfetch(result)))
 		{
-			mediatype_still_active = 1;
-		}
-
-		if (0 == mediatype_still_active)
-		{
-			zabbix_log(LOG_LEVEL_ERR, "mediatype no longer active (worker id: %s pid: %d)", mediatypeid, getpid());
+			zabbix_log(LOG_LEVEL_ERR, "mediatype no longer active (worker id: %s pid: %d)", worker->w_mediatypeid, getpid());
 			zbx_thread_exit(EXIT_SUCCESS);
 		}
 
 		DBfree_result(result);
 
-		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
+		zbx_setproctitle("%s (worker) [sending alerts]", get_process_type_string(process_type));
 
 		sec = zbx_time();
 
@@ -343,7 +339,7 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 				" order by a.alertid",
 				ALERT_STATUS_NOT_SENT,
 				ALERT_TYPE_MESSAGE,
-				mediatypeid);
+				worker->w_mediatypeid);
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -413,7 +409,7 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, idle %d sec]",
+		zbx_setproctitle("%s (worker) [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), alerts_success, alerts_fail, sec,
 				CONFIG_SENDER_FREQUENCY);
 
