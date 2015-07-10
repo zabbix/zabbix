@@ -217,9 +217,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		zbx_setproctitle("%s [updating list of workers]", get_process_type_string(process_type));
 
-		result = DBselect(
-				"select mt.mediatypeid, mt.description from media_type mt where status = %d",
-				MEDIA_STATUS_ACTIVE);
+		result = DBselect("select mt.mediatypeid, mt.description from media_type mt");
 
 		while (NULL != (row = DBfetch(result)))
 		{
@@ -300,6 +298,9 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 	DB_MEDIATYPE	mediatype;
 	zbx_alerter_worker_t	*worker = ((zbx_thread_args_t *)args)->args;
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s worker: started for handling media type '%s'",
+			get_process_type_string(process_type), worker->w_description);
+
 	zbx_setproctitle("%s [connecting to the database]: '%s'", get_process_type_string(process_type), worker->w_description);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
@@ -308,17 +309,24 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 	{
 		zbx_setproctitle("%s [updating status]: '%s'", get_process_type_string(process_type), worker->w_description);
 		result = DBselect(
-				"select mt.mediatypeid, mt.description from media_type mt where mt.status = %d and mt.mediatypeid = %s",
-				MEDIA_STATUS_ACTIVE,
+				"select mt.mediatypeid, mt.description from media_type mt where mt.mediatypeid = %s",
 				worker->w_mediatypeid);
 
 		if (NULL == (row = DBfetch(result)))
 		{
-			zabbix_log(LOG_LEVEL_ERR, "mediatype no longer active (worker id: %s pid: %d)", worker->w_mediatypeid, getpid());
+			zabbix_log(LOG_LEVEL_INFORMATION, "%s worker: quitting (alerts might be orphaned) - media type '%s' deleted",
+					get_process_type_string(process_type), worker->w_description);
+
 			zbx_thread_exit(EXIT_SUCCESS);
 		}
 
-		worker->w_description = zbx_strdup(worker->w_description, row[1]);
+		if (0 != strcmp(worker->w_description, row[1]))
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "%s worker: media type '%s' renamed to '%s'",
+					get_process_type_string(process_type), worker->w_description, row[1]);
+
+			worker->w_description = zbx_strdup(worker->w_description, row[1]);
+		}
 
 		DBfree_result(result);
 
