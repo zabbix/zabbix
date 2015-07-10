@@ -1791,17 +1791,9 @@ button[disabled] {
 	}
 }
 
-.input-icon-wrapper {
-	position: relative;
-	display: inline-block;
-}
-
 .help-icon {
 	background: url(../img/icon-sprite.svg) no-repeat -6px -726px;
-	display: block;
 	position: absolute;
-	top: 0;
-	right: -26px;
 	@extend %button-icon-size;
 	@include opacity(0.75);
 	@include transition(opacity .2s ease-out);
@@ -1814,10 +1806,7 @@ button[disabled] {
 
 .cal-icon {
 	background: url(../img/icon-sprite.svg) no-repeat -42px -834px;
-	display: block;
 	position: absolute;
-	top: 0;
-	right: -26px;
 	@extend %button-icon-size;
 	@include opacity(0.75);
 	@include transition(opacity .2s ease-out);
