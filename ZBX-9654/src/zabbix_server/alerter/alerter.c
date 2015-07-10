@@ -196,6 +196,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 						workers = w->next;
 
 					zbx_free(w->w_mediatypeid);
+					zbx_free(w->w_description);
 					zbx_free(w);
 
 					workers_terminated++;
@@ -217,7 +218,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 		zbx_setproctitle("%s [updating list of workers]", get_process_type_string(process_type));
 
 		result = DBselect(
-				"select mt.mediatypeid from media_type mt where status = %d",
+				"select mt.mediatypeid, mt.description from media_type mt where status = %d",
 				MEDIA_STATUS_ACTIVE);
 
 		while (NULL != (row = DBfetch(result)))
@@ -228,9 +229,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 			for (w = workers; NULL != w; w = w->next)
 			{
 				if (0 == strcmp(w->w_mediatypeid, row[0]))
-				{
 					break;
-				}
 			}
 
 			if (NULL == w) /* Worker not found, add it. */
@@ -248,6 +247,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 				workers = w;
 
 				w->w_mediatypeid = zbx_strdup(w->w_mediatypeid, row[0]);
+				w->w_description = zbx_strdup(w->w_description, row[1]);
 			}
 		}
 
@@ -300,15 +300,15 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 	DB_MEDIATYPE	mediatype;
 	zbx_alerter_worker_t	*worker = ((zbx_thread_args_t *)args)->args;
 
-	zbx_setproctitle("%s (worker) [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s [connecting to the database]: '%s'", get_process_type_string(process_type), worker->w_description);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s (worker) [checking mediatype]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [updating status]: '%s'", get_process_type_string(process_type), worker->w_description);
 		result = DBselect(
-				"select mt.mediatypeid from media_type mt where mt.status = %d and mt.mediatypeid = %s",
+				"select mt.mediatypeid, mt.description from media_type mt where mt.status = %d and mt.mediatypeid = %s",
 				MEDIA_STATUS_ACTIVE,
 				worker->w_mediatypeid);
 
@@ -318,9 +318,11 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 			zbx_thread_exit(EXIT_SUCCESS);
 		}
 
+		worker->w_description = zbx_strdup(worker->w_description, row[1]);
+
 		DBfree_result(result);
 
-		zbx_setproctitle("%s (worker) [sending alerts]", get_process_type_string(process_type));
+		zbx_setproctitle("%s [sending alerts]: '%s'", get_process_type_string(process_type), worker->w_description);
 
 		sec = zbx_time();
 
@@ -409,9 +411,9 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s (worker) [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, idle %d sec]",
+		zbx_setproctitle("%s [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, idle %d sec]: '%s'",
 				get_process_type_string(process_type), alerts_success, alerts_fail, sec,
-				CONFIG_SENDER_FREQUENCY);
+				CONFIG_SENDER_FREQUENCY, worker->w_description);
 
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
