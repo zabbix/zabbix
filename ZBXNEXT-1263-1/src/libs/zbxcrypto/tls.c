@@ -758,11 +758,10 @@ static int	zbx_is_ciphersuite_cert(const int *p)
 
 	/* PolarSSL function ssl_ciphersuite_uses_psk() is not used here because it can be unavailable in some */
 	/* installations. */
-	if (NULL != (info = ssl_ciphersuite_from_id(*p)) && POLARSSL_KEY_EXCHANGE_PSK != info->key_exchange &&
-			POLARSSL_KEY_EXCHANGE_DHE_PSK != info->key_exchange &&
-			POLARSSL_KEY_EXCHANGE_ECDHE_PSK != info->key_exchange &&
-			POLARSSL_KEY_EXCHANGE_RSA_PSK != info->key_exchange &&
-			POLARSSL_CIPHER_ARC4_128 != info->cipher && 0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
+	if (NULL != (info = ssl_ciphersuite_from_id(*p)) && (POLARSSL_KEY_EXCHANGE_ECDHE_RSA == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_RSA == info->key_exchange) &&
+			(POLARSSL_CIPHER_AES_128_GCM == info->cipher || POLARSSL_CIPHER_AES_128_CBC == info->cipher) &&
+			0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
 			(ZBX_TLS_MIN_MAJOR_VER > info->min_major_ver || (ZBX_TLS_MIN_MAJOR_VER == info->min_major_ver &&
 			ZBX_TLS_MIN_MINOR_VER >= info->min_minor_ver)) &&
 			(ZBX_TLS_MAX_MAJOR_VER < info->max_major_ver || (ZBX_TLS_MAX_MAJOR_VER == info->max_major_ver &&
@@ -792,11 +791,10 @@ static int	zbx_is_ciphersuite_psk(const int *p)
 {
 	const ssl_ciphersuite_t	*info;
 
-	if (NULL != (info = ssl_ciphersuite_from_id(*p)) && (POLARSSL_KEY_EXCHANGE_PSK == info->key_exchange ||
-			POLARSSL_KEY_EXCHANGE_DHE_PSK == info->key_exchange ||
-			POLARSSL_KEY_EXCHANGE_ECDHE_PSK == info->key_exchange ||
-			POLARSSL_KEY_EXCHANGE_RSA_PSK == info->key_exchange) &&
-			POLARSSL_CIPHER_ARC4_128 != info->cipher && 0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
+	if (NULL != (info = ssl_ciphersuite_from_id(*p)) && (POLARSSL_KEY_EXCHANGE_ECDHE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_PSK == info->key_exchange) &&
+			(POLARSSL_CIPHER_AES_128_GCM == info->cipher || POLARSSL_CIPHER_AES_128_CBC == info->cipher) &&
+			0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
 			(ZBX_TLS_MIN_MAJOR_VER > info->min_major_ver || (ZBX_TLS_MIN_MAJOR_VER == info->min_major_ver &&
 			ZBX_TLS_MIN_MINOR_VER >= info->min_minor_ver)) &&
 			(ZBX_TLS_MAX_MAJOR_VER < info->max_major_ver || (ZBX_TLS_MAX_MAJOR_VER == info->max_major_ver &&
@@ -826,8 +824,12 @@ static int	zbx_is_ciphersuite_all(const int *p)
 {
 	const ssl_ciphersuite_t	*info;
 
-	if (NULL != (info = ssl_ciphersuite_from_id(*p)) &&
-			POLARSSL_CIPHER_ARC4_128 != info->cipher && 0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
+	if (NULL != (info = ssl_ciphersuite_from_id(*p)) && (POLARSSL_KEY_EXCHANGE_ECDHE_RSA == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_RSA == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_ECDHE_PSK == info->key_exchange ||
+			POLARSSL_KEY_EXCHANGE_PSK == info->key_exchange) &&
+			(POLARSSL_CIPHER_AES_128_GCM == info->cipher || POLARSSL_CIPHER_AES_128_CBC == info->cipher) &&
+			0 == (info->flags & POLARSSL_CIPHERSUITE_WEAK) &&
 			(ZBX_TLS_MIN_MAJOR_VER > info->min_major_ver || (ZBX_TLS_MIN_MAJOR_VER == info->min_major_ver &&
 			ZBX_TLS_MIN_MINOR_VER >= info->min_minor_ver)) &&
 			(ZBX_TLS_MAX_MAJOR_VER < info->max_major_ver || (ZBX_TLS_MAX_MAJOR_VER == info->max_major_ver &&
