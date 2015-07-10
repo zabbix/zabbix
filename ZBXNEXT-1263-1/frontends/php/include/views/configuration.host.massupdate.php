@@ -223,9 +223,7 @@ $templatesDiv = (new CDiv(
 		]))->addClass('floatleft')
 	]
 ))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setId('templateDiv');
 
 $templatesFormList->addRow(

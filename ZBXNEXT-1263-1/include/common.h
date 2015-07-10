@@ -574,6 +574,15 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define MEDIA_TYPE_STATUS_ACTIVE	0
 #define MEDIA_TYPE_STATUS_DISABLED	1
 
+/* SMTP security options */
+#define SMTP_SECURITY_NONE	0
+#define SMTP_SECURITY_STARTTLS	1
+#define SMTP_SECURITY_SSL	2
+
+/* SMTP authentication options */
+#define SMTP_AUTHENTICATION_NONE		0
+#define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
+
 /* operation types */
 #define OPERATION_TYPE_MESSAGE		0
 #define OPERATION_TYPE_COMMAND		1

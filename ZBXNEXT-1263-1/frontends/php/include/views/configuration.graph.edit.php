@@ -241,7 +241,6 @@ else {
 
 // append items to form list
 $itemsTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
 	->setId('itemsTable')
 	->setHeader([
 		(new CColHeader())->setWidth(15),
@@ -279,11 +278,12 @@ if ($this->data['parent_discoveryid']) {
 			url_param('parent_discoveryid').
 			($this->data['normal_only'] ? '&normal_only=1' : '').
 			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
-		->addClass(ZBX_STYLE_BTN_LINK);
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addStyle('margin-left: 8px');
 }
 $itemsTable->addRow(
 	(new CRow(
-		(new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))->setColSpan(8)
+		(new CCol([$addButton, $addPrototypeButton]))->setColSpan(8)
 	))->setId('itemButtonsRow')
 );
 
@@ -305,13 +305,7 @@ foreach ($this->data['items'] as $n => $item) {
 	);
 }
 
-$graphFormList->addRow(
-	_('Items'),
-	(new CDiv($itemsTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-);
+$graphFormList->addRow(_('Items'), (new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // append tabs to form
 $graphTab = new CTabView();

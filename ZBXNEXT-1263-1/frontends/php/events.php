@@ -303,12 +303,12 @@ else {
 			$frmForm->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
 		}
 
-		$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
-		$controls->addItem([_('Host').SPACE, $pageFilter->getHostsCB()]);
+		$controls->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()]);
+		$controls->addItem([_('Host'), SPACE, $pageFilter->getHostsCB()]);
 	}
 
 	if ($allow_discovery) {
-		$controls->addItem([_('Source').SPACE, new CComboBox('source', $source, 'submit()', [
+		$controls->addItem([_('Source'), SPACE, new CComboBox('source', $source, 'submit()', [
 			EVENT_SOURCE_TRIGGERS => _('Trigger'),
 			EVENT_SOURCE_DISCOVERY => _('Discovery')
 		])]);

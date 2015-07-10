@@ -112,8 +112,9 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
 		(new CCol([
 			(new CSubmit('edit_timeperiodid['.$id.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-			SPACE.SPACE,
-			(new CSubmit('del_timeperiodid['.$id.']', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
+			(new CSubmit('del_timeperiodid['.$id.']', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addStyle('margin-left: 8px')
 		]))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	if (isset($timeperiod['timeperiodid'])) {
@@ -130,10 +131,7 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
-$periodsDiv = (new CDiv($maintenancePeriodTable))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted');
+$periodsDiv = (new CDiv($maintenancePeriodTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
 if (!isset($_REQUEST['new_timeperiod'])) {
 	$periodsDiv->addItem((new CSubmit('new_timeperiod', _('New')))->addClass(ZBX_STYLE_BTN_LINK));
 }
@@ -149,15 +147,13 @@ if (isset($_REQUEST['new_timeperiod'])) {
 
 	$footer = [
 		(new CSubmit('add_timeperiod', $saveLabel))->addClass(ZBX_STYLE_BTN_LINK),
-		SPACE.SPACE,
-		(new CSubmit('cancel_new_timeperiod', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+		(new CSubmit('cancel_new_timeperiod', _('Cancel')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addStyle('margin-left: 8px')
 	];
 
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		(new CDiv([get_timeperiod_form(), $footer]))
-			->addClass('objectgroup')
-			->addClass('inlineblock')
-			->addClass('border_dotted')
+		(new CDiv([get_timeperiod_form(), $footer]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
 }
 

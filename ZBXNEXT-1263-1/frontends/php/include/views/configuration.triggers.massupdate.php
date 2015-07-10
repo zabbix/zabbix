@@ -59,9 +59,7 @@ $triggersFormList->addRow(
 // append dependencies to form list
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
-	->setId('dependenciesTable')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
@@ -90,18 +88,15 @@ foreach ($data['dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$dependenciesDiv = (new CDiv(
-	[
-		$dependenciesTable,
-		(new CButton('btn1', _('Add')))
-			->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-					'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-					'&with_triggers=1&noempty=1");')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
+$dependenciesDiv = (new CDiv([
+	$dependenciesTable,
+	(new CButton('btn1', _('Add')))
+		->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
+				'&with_triggers=1&noempty=1");')
+		->addClass(ZBX_STYLE_BTN_LINK)
+]))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setId('dependencies_div');
 
 $triggersFormList->addRow(
