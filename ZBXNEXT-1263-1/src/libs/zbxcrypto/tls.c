@@ -2881,14 +2881,12 @@ void	zbx_tls_init_child(void)
 
 	/* set up ciphersuites */
 
-	if (NULL != ctx_cert &&
-			1 != SSL_CTX_set_cipher_list(ctx_cert, "DEFAULT:!EXPORT:!RC4:!SRP:!DES:!DSS:!SEED:!KRB5:!PSK"))
+	if (NULL != ctx_cert && 1 != SSL_CTX_set_cipher_list(ctx_cert, "EECDH+aRSA+AES128:RSA+aRSA+AES128"))
 	{
 		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of certificate ciphersuites:");
 		goto out;
 	}
 
-	/* OpenSSL 1.0.1e - 1.0.2c support very few PSK ciphersuites */
 	if (NULL != ctx_psk && 1 != SSL_CTX_set_cipher_list(ctx_psk, "PSK-AES128-CBC-SHA"))
 	{
 		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
@@ -2896,7 +2894,7 @@ void	zbx_tls_init_child(void)
 	}
 
 	if (NULL != ctx_all &&
-			1 != SSL_CTX_set_cipher_list(ctx_all, "DEFAULT:!EXPORT:!RC4:!SRP:!DES:!DSS:!SEED:!KRB5"))
+			1 != SSL_CTX_set_cipher_list(ctx_all, "EECDH+aRSA+AES128:RSA+aRSA+AES128:PSK-AES128-CBC-SHA"))
 	{
 		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of all ciphersuites:");
 		goto out;
