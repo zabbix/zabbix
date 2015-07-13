@@ -1334,7 +1334,6 @@ static void	zbx_read_psk_file(void)
 	char		*p;
 	int		len_bin;
 	unsigned int	i;
-	zbx_stat_t	stat_buf;
 	char		buf[HOST_TLS_PSK_LEN_MAX + 2];	/* up to 512 bytes of hex-digits, maybe 1-2 bytes for '\n', */
 							/* 1 byte for terminating '\0' */
 	char		buf_bin[HOST_TLS_PSK_LEN/2];	/* up to 256 bytes of binary PSK */
@@ -1345,26 +1344,9 @@ static void	zbx_read_psk_file(void)
 		goto out;
 	}
 
-	/* fgets() produces a confusing error message "[2] No such file or directory" if reading from an empty file. */
-	/* To avoid the confusing message get the file size and deal with this situation separately. */
-
-	if (0 != zbx_stat(CONFIG_TLS_PSK_FILE, &stat_buf))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot obtain information for file \"%s\": %s", CONFIG_TLS_PSK_FILE,
-				zbx_strerror(errno));
-		goto out;
-	}
-
-	if (0 == stat_buf.st_size)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "PSK file \"%s\" is empty", CONFIG_TLS_PSK_FILE);
-		goto out;
-	}
-
 	if (NULL == fgets(buf, (int)sizeof(buf), f))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\": %s", CONFIG_TLS_PSK_FILE,
-				zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_CRIT, "cannot read from file \"%s\" or file empty", CONFIG_TLS_PSK_FILE);
 		goto out;
 	}
 
