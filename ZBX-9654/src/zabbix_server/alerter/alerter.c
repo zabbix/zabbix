@@ -53,7 +53,7 @@ int				workers_running, workers_started, workers_terminated;
 
 ZBX_THREAD_ENTRY(alerter_worker_thread, args);
 
-static void reap_zombies(void);
+static void remove_defunct_workers(void);
 static void add_and_update_workers(void);
 static void start_new_workers(void);
 static void add_worker(char *mediatypeid, char *description, pid_t pid);
@@ -177,6 +177,8 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  *             removes it from the list of workers.                           *
  *           * The main alerter thread starts a replacement worker if a       *
  *             worker quits unexpectedly.                                     *
+ *           * Media type disabling has no effect on alert sending of already *
+ *             existing alerts for that media type.                           *
  *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(alerter_thread, args)
@@ -195,7 +197,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 		workers_running = workers_started = workers_terminated = 0;
 		sec = zbx_time();
 
-		reap_zombies();
+		remove_defunct_workers();
 		add_and_update_workers();
 		start_new_workers();
 
@@ -373,14 +375,14 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 
 /******************************************************************************
  *                                                                            *
- * Function: reap_zombies                                                     *
+ * Function: remove_defunct_workers                                           *
  *                                                                            *
  * Purpose: remove from the workers' list those workers that have quitted     *
  *                                                                            *
  * Author: Sandis Neilands                                                    *
  *                                                                            *
  ******************************************************************************/
-static void reap_zombies(void)
+static void remove_defunct_workers(void)
 {
 	pid_t			pid;
 	int			status;
@@ -426,15 +428,10 @@ static void add_and_update_workers(void)
 	result = DBselect("select mt.mediatypeid, mt.description from media_type mt");
 
 	while (NULL != (row = DBfetch(result)))
-	{
-		if (NULL == (w = find_next_worker_by_mediatypeid(workers, row[0]))) {
+		if (NULL == (w = find_next_worker_by_mediatypeid(workers, row[0])))
 			add_worker(row[0], row[1], WORKER_NOT_RUNNING_PID);
-		}
 		else if (0 != strcmp(w->w_description, row[1]))
-		{
 			w->w_description = zbx_strdup(w->w_description, row[1]);
-		}
-	}
 
 	DBfree_result(result);
 	DBclose();
@@ -475,7 +472,6 @@ static void add_worker(char *mediatypeid, char *description, pid_t pid)
 	{
 		w->prev = NULL;
 		w->next = workers;
-
 		workers->prev = w;
 	}
 
