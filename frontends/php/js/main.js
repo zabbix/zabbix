@@ -918,11 +918,10 @@ jQuery(function ($) {
 
 			// insert spans
 			cellsToRotate.each(function() {
-				var cell = $(this);
-
-				var text = $('<span>', {
-					text: cell.html()
-				});
+				var cell = $(this),
+					text = $('<span>', {
+						text: cell.html()
+					}).css({'white-space': 'nowrap'});
 
 				if (IE) {
 					text.css({'font-family': 'monospace'});
