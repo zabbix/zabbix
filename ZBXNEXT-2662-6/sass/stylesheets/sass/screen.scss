@@ -471,6 +471,7 @@ ul.top-nav-icons {
 		li {
 			display: block;
 			float: left;
+			position: relative;
 			padding: 0 0 0 14px;
 		}
 	}
@@ -2630,7 +2631,7 @@ a.blue {
 	min-width: 0.7em;
 	line-height: 1em;
 	display: inline-block;
-	cursor: default;
+	//cursor: default;
 	@include border-radius(2px); 
 }
 
@@ -2704,6 +2705,17 @@ td.disaster-bg {
 
 %found-bg {
 	background-color: $lighter-yellow;
+}
+
+.active-indic {
+	width: 8px;
+	height: 8px;
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	border: 2px solid $body-bg-color;
+	background-color: darken(desaturate($alt-green, 10%), 16%);
+	@include border-radius(50%);
 }
 
 .msg-good {
