@@ -1022,6 +1022,7 @@ define('HISTORY_LATEST', 'showlatest');
 define('MAP_DEFAULT_ICON', 'Server_(96)');
 
 // CSS styles
+define('ZBX_STYLE_ACTIVE_INDIC', 'active-indic');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ARTICLE', 'article');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
@@ -1044,6 +1045,7 @@ define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
+define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
