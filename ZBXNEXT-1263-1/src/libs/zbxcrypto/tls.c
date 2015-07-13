@@ -1487,7 +1487,8 @@ static size_t	zbx_print_rdn_value(const unsigned char *value, size_t len, unsign
 					if ((0x20 == (*p_in & 0x70) && ('"' == *p_in || '+' == *p_in || ',' == *p_in))
 							|| (0x30 == (*p_in & 0x70) && (';' == *p_in || '<' == *p_in ||
 							'>' == *p_in)) || '\\' == *p_in ||
-							(' ' == *p_in && (value == p_in || (value + len - 1) == p_in)))
+							(' ' == *p_in && (value == p_in || (value + len - 1) == p_in))
+							|| ('#' == *p_in && value == p_in))
 					{
 						*p_out++ = '\\';
 					}
