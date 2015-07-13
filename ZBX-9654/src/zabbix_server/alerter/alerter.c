@@ -31,6 +31,8 @@
 #include "alerter.h"
 
 #define	ALARM_ACTION_TIMEOUT	40
+#define WAITPID_WAIT_ANY	(-1)
+#define WORKER_NOT_RUNNING_PID	0
 
 typedef struct zbx_alerter_worker_s
 {
@@ -47,9 +49,13 @@ extern int		server_num, process_num;
 
 static zbx_thread_args_t	thread_args;
 static zbx_alerter_worker_t	*workers;
+int				workers_running, workers_started, workers_terminated;
 
 ZBX_THREAD_ENTRY(alerter_worker_thread, args);
 
+static void reap_zombies(void);
+static void add_and_update_workers(void);
+static void start_new_workers(void);
 static void add_worker(char *mediatypeid, char *description, pid_t pid);
 static void remove_worker(zbx_alerter_worker_t *w);
 static int count_workers(void);
@@ -161,6 +167,17 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
  *                                                                            *
  * Author: Sandis Neilands                                                    *
  *                                                                            *
+ * Comments: Information about workers stored in doubly linked list. Each     *
+ *           worker corresponds to a configured media type. The workers are   *
+ *           identified by mediatypeid field of the mediatype database table. *
+ *                                                                            *
+ *           * Upon media type addition a main alerter thread starts a new    *
+ *             worker thread.                                                 *
+ *           * Worker quits upon media type deletion and main alerter thread  *
+ *             removes it from the list of workers.                           *
+ *           * The main alerter thread starts a replacement worker if a       *
+ *             worker quits unexpectedly.                                     *
+ *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(alerter_thread, args)
 {
@@ -173,69 +190,20 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 	for (;;)
 	{
-		int		workers_running = 0, workers_started = 0, workers_terminated = 0;
-		double		sec;
-		DB_RESULT	result;
-		DB_ROW		row;
-		pid_t		pid;
-		int		status;
-		zbx_alerter_worker_t	*w;
+		double	sec;
 
+		workers_running = workers_started = workers_terminated = 0;
 		sec = zbx_time();
 
-		/*
-		 * Reap zombies.
-		 */
-		zbx_setproctitle("%s [terminating defunct workers]", get_process_type_string(process_type));
+		reap_zombies();
+		add_and_update_workers();
+		start_new_workers();
 
-		while (0 < (pid = waitpid(-1, &status, WNOHANG)))
-		{
-			if (NULL != (w = find_next_worker_by_pid(workers, pid)))
-			{
-				remove_worker(w);
-				workers_terminated++;
-			}
-		}
-
-		if (-1 == pid && ECHILD != errno)
-			zabbix_log(LOG_LEVEL_ERR, "waitpid() failed with unexpected reason: %s", strerror(errno));
-
-		/*
-		 * Update list of workers.
-		 */
-		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
-		DBconnect(ZBX_DB_CONNECT_NORMAL);
-		zbx_setproctitle("%s [updating list of workers]", get_process_type_string(process_type));
-		result = DBselect("select mt.mediatypeid, mt.description from media_type mt");
-
-		while (NULL != (row = DBfetch(result)))
-			if (NULL == (w = find_next_worker_by_mediatypeid(workers, row[0])))
-				add_worker(row[0], row[1], 0);
-
-		DBfree_result(result);
-		DBclose();
-
-		/*
-		 * Start the new workers.
-		 */
-		zbx_setproctitle("%s [starting workers]", get_process_type_string(process_type));
-
-		w = workers;
-		while (NULL != (w = find_next_worker_by_pid(w, 0)))
-		{
-			thread_args.args = w;
-			w->w_pid = zbx_thread_start(alerter_worker_thread, &thread_args);
-			workers_started++;
-			w = w->next;
-		}
-
-		/*
-		 * Sleep till the next iteration.
-		 */
 		workers_running = count_workers();
 
 		sec = zbx_time() - sec;
-		zbx_setproctitle("%s [workers (%d running): %d started, %d terminated in " ZBX_FS_DBL " sec, idle %d sec]",
+		zbx_setproctitle("%s [workers (%d running): "
+				"%d started, %d terminated in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type),
 				workers_running, workers_started, workers_terminated,
 				sec, CONFIG_SENDER_FREQUENCY);
@@ -252,6 +220,10 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
+ * Comments: Quits if the corresponding media type is deleted from the        *
+ *           configuration. Updates worker description if the corresponding   *
+ *           media type name has changed.                                     *
+ *                                                                            *
  ******************************************************************************/
 ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 {
@@ -267,20 +239,24 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s worker: started for handling media type '%s'",
 			get_process_type_string(process_type), worker->w_description);
 
-	zbx_setproctitle("%s [connecting to the database]: '%s'", get_process_type_string(process_type), worker->w_description);
+	zbx_setproctitle("%s [connecting to the database]: '%s'",
+			get_process_type_string(process_type), worker->w_description);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [updating status]: '%s'", get_process_type_string(process_type), worker->w_description);
+		zbx_setproctitle("%s [updating status]: '%s'",
+				get_process_type_string(process_type), worker->w_description);
+
 		result = DBselect(
 				"select mt.mediatypeid, mt.description from media_type mt where mt.mediatypeid = %s",
 				worker->w_mediatypeid);
 
 		if (NULL == (row = DBfetch(result)))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "%s worker: quitting (alerts might be orphaned) - media type '%s' deleted",
+			zabbix_log(LOG_LEVEL_INFORMATION, "%s worker: quitting (alerts might be orphaned) - "
+					"media type '%s' deleted",
 					get_process_type_string(process_type), worker->w_description);
 
 			zbx_thread_exit(EXIT_SUCCESS);
@@ -296,7 +272,8 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 
 		DBfree_result(result);
 
-		zbx_setproctitle("%s [sending alerts]: '%s'", get_process_type_string(process_type), worker->w_description);
+		zbx_setproctitle("%s [sending alerts]: '%s'",
+				get_process_type_string(process_type), worker->w_description);
 
 		sec = zbx_time();
 
@@ -365,13 +342,14 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 
 				if (ALERT_MAX_RETRIES > alert.retries)
 				{
-					DBexecute("update alerts set retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
-							alert.retries, error_esc, alert.alertid);
+					DBexecute("update alerts set retries=%d,error='%s' where alertid="
+							ZBX_FS_UI64, alert.retries, error_esc, alert.alertid);
 				}
 				else
 				{
-					DBexecute("update alerts set status=%d,retries=%d,error='%s' where alertid=" ZBX_FS_UI64,
-							ALERT_STATUS_FAILED, alert.retries, error_esc, alert.alertid);
+					DBexecute("update alerts set status=%d,retries=%d,error='%s' where alertid="
+							ZBX_FS_UI64, ALERT_STATUS_FAILED, alert.retries, error_esc,
+							alert.alertid);
 				}
 
 				zbx_free(error_esc);
@@ -390,6 +368,100 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 				CONFIG_SENDER_FREQUENCY, worker->w_description);
 
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: reap_zombies                                                     *
+ *                                                                            *
+ * Purpose: remove from the workers' list those workers that have quitted     *
+ *                                                                            *
+ * Author: Sandis Neilands                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void reap_zombies(void)
+{
+	pid_t			pid;
+	int			status;
+	zbx_alerter_worker_t	*w;
+
+	zbx_setproctitle("%s [terminating defunct workers]", get_process_type_string(process_type));
+
+	while (0 < (pid = waitpid(WAITPID_WAIT_ANY, &status, WNOHANG)))
+	{
+		if (NULL != (w = find_next_worker_by_pid(workers, pid)))
+		{
+			remove_worker(w);
+			workers_terminated++;
+		}
+	}
+
+	if (-1 == pid && ECHILD != errno)
+		zabbix_log(LOG_LEVEL_ERR, "waitpid() failed with unexpected reason: %s", strerror(errno));
+
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: add_and_update_workers                                           *
+ *                                                                            *
+ * Purpose: add newly configured workers to the list, update description of   *
+ *          the existing workers                                              *
+ *                                                                            *
+ * Author: Sandis Neilands                                                    *
+ *                                                                            *
+ * Comments: workers not started in this function, see start_new_workers()    *
+ *                                                                            *
+ ******************************************************************************/
+static void add_and_update_workers(void)
+{
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_alerter_worker_t	*w;
+
+	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	DBconnect(ZBX_DB_CONNECT_NORMAL);
+	zbx_setproctitle("%s [updating list of workers]", get_process_type_string(process_type));
+	result = DBselect("select mt.mediatypeid, mt.description from media_type mt");
+
+	while (NULL != (row = DBfetch(result)))
+	{
+		if (NULL == (w = find_next_worker_by_mediatypeid(workers, row[0]))) {
+			add_worker(row[0], row[1], WORKER_NOT_RUNNING_PID);
+		}
+		else if (0 != strcmp(w->w_description, row[1]))
+		{
+			w->w_description = zbx_strdup(w->w_description, row[1]);
+		}
+	}
+
+	DBfree_result(result);
+	DBclose();
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: start_new_workers                                                *
+ *                                                                            *
+ * Purpose: start workers that are marked with WORKER_NOT_RUNNING_PID.        *
+ *                                                                            *
+ * Author: Sandis Neilands                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void start_new_workers(void)
+{
+	zbx_alerter_worker_t	*w;
+
+	zbx_setproctitle("%s [starting workers]", get_process_type_string(process_type));
+
+	w = workers;
+	while (NULL != (w = find_next_worker_by_pid(w, WORKER_NOT_RUNNING_PID)))
+	{
+		thread_args.args = w;
+		w->w_pid = zbx_thread_start(alerter_worker_thread, &thread_args);
+		workers_started++;
+		w = w->next;
 	}
 }
 
