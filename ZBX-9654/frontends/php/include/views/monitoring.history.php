@@ -43,29 +43,19 @@ $host = reset($item['hosts']);
 
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 	$header['left'] = [
-		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
+		$host['name'],
 		NAME_DELIMITER,
 		$item['name_expanded']
 	];
 	$headerPlaintext[] = $host['name'].NAME_DELIMITER.$item['name_expanded'];
-
-	if ($this->data['action'] == HISTORY_GRAPH) {
-		$header['right']->addItem(get_icon('favourite', [
-			'fav' => 'web.favorite.graphids',
-			'elid' => $item['itemid'],
-			'elname' => 'itemid'
-		]));
-	}
 }
 elseif (count($hostNames) == 1) {
 	$header['left'] = [
-		new CLink($host['name'], 'latest.php?filter_set=1&hostids[]='.$item['hostid']),
+		$host['name'],
 		NAME_DELIMITER,
 		$header['left']
 	];
 }
-
-$header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 
 // don't display the action form if we view multiple items on a graph
 if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
@@ -91,11 +81,26 @@ if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
 	$actionForm->addItem(new CComboBox('action', $this->data['action'], 'submit()', $actions));
 
 	if ($this->data['action'] != HISTORY_GRAPH) {
-		$actionForm->addItem([' ', new CSubmit('plaintext', _('As plain text'))]);
+		$actionForm->addItem([
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			new CSubmit('plaintext', _('As plain text'))
+		]);
 	}
 
 	$header['right']->addItem($actionForm);
 }
+
+if ($this->data['action'] != HISTORY_BATCH_GRAPH) {
+	if ($this->data['action'] == HISTORY_GRAPH) {
+		$header['right']->addItem(get_icon('favourite', [
+			'fav' => 'web.favorite.graphids',
+			'elid' => $item['itemid'],
+			'elname' => 'itemid'
+		]));
+	}
+}
+
+$header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 
 // create filter
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
@@ -193,25 +198,21 @@ $screen = CScreenBuilder::getScreen([
 
 // append plaintext to widget
 if ($this->data['plaintext']) {
-	$plaintextSpan = (new CSpan())->addClass('textblackwhite');
-
 	foreach ($headerPlaintext as $text) {
-		$plaintextSpan->addItem([new CJsScript($text), BR()]);
+		$historyWidget->addItem([new CSpan($text), BR()]);
 	}
 
 	$screen = $screen->get();
 
-	$pre = new CTag('pre', true);
+	$pre = new CPre();
 	foreach ($screen as $text) {
-		$pre->addItem(new CJsScript($text));
+		$pre->addItem([$text, BR()]);
 	}
-	$plaintextSpan->addItem($pre);
-	$historyWidget->addItem($plaintextSpan);
+	$historyWidget->addItem($pre);
 }
 else {
 	$historyWidget->setTitle($header['left'])
-		->setControls($header['right'])
-		->addItem(BR());
+		->setControls($header['right']);
 
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
 		$filterForm->addNavigator();
@@ -243,17 +244,14 @@ else {
 
 		$filterForm->addNavigator();
 		$historyWidget->addItem($filterForm);
-
-		$historyTable = (new CTable())
-			->addClass('maxwidth')
-			->addRow($screen->get());
-		$historyWidget->addItem($historyTable);
-
-		CScreenBuilder::insertScreenStandardJs([
-			'timeline' => $screen->timeline,
-			'profileIdx' => $screen->profileIdx
-		]);
 	}
+
+	$historyWidget->addItem($screen->get());
+
+	CScreenBuilder::insertScreenStandardJs([
+		'timeline' => $screen->timeline,
+		'profileIdx' => $screen->profileIdx
+	]);
 }
 
 return $historyWidget;

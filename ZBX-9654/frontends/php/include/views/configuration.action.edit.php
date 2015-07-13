@@ -81,9 +81,8 @@ $conditionFormList = new CFormList();
 
 // create condition table
 $conditionTable = (new CTable(_('No conditions defined.')))
-	->addClass('formElementTable')
 	->setId('conditionTable')
-	->setAttribute('style', 'min-width: 350px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
 
 $i = 0;
@@ -164,12 +163,7 @@ $conditionFormList->addRow(
 	false,
 	'conditionRow'
 );
-$conditionFormList->addRow(_('Conditions'),
-	(new CDiv($conditionTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-);
+$conditionFormList->addRow(_('Conditions'), (new CDiv($conditionTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // append new condition to form list
 $conditionTypeComboBox = new CComboBox('new_condition[conditiontype]', $this->data['new_condition']['conditiontype'], 'submit()');
@@ -382,12 +376,7 @@ $conditionTable = (new CTable())
 		))->setColSpan(3)
 	]);
 
-$conditionFormList->addRow(_('New condition'),
-	(new CDiv($conditionTable))
-			->addClass('objectgroup')
-			->addClass('floatleft')
-			->addClass('border_dotted')
-	);
+$conditionFormList->addRow(_('New condition'), (new CDiv($conditionTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 /*
  * Operation tab
@@ -405,8 +394,7 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 // create operation table
 $operationsTable = (new CTable())
 	->setNoDataMessage(_('No operations defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 600px;');
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')]);
 	$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
@@ -516,10 +504,7 @@ if (empty($this->data['new_operation'])) {
 }
 
 $operationFormList->addRow(_('Action operations'),
-	(new CDiv([$operationsTable, $footer]))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+	(new CDiv([$operationsTable, $footer]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 // create new operation table
@@ -617,8 +602,7 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$usrgrpList = (new CTable())
-				->addClass('formElementTable')
-				->setAttribute('style', 'min-width: 310px;')
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->setId('opmsgUsrgrpList')
 				->setHeader([_('User group'), _('Action')]);
 
@@ -631,9 +615,8 @@ if (!empty($this->data['new_operation'])) {
 			);
 
 			$userList = (new CTable())
-				->addClass('formElementTable')
 				->setHeader([_('User'), _('Action')])
-				->setAttribute('style', 'min-width: 310px;')
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->setId('opmsgUserList');
 
 			$addUserBtn = (new CButton('add', _('Add')))
@@ -674,18 +657,8 @@ if (!empty($this->data['new_operation'])) {
 			zbx_add_post_js($jsInsert);
 
 			$newOperationsTable
-				->addRow([_('Send to User groups'),
-					(new CDiv($usrgrpList))
-						->addClass('objectgroup')
-						->addClass('inlineblock')
-						->addClass('border_dotted')
-				])
-				->addRow([_('Send to Users'),
-					(new CDiv($userList))
-						->addClass('objectgroup')
-						->addClass('inlineblock')
-						->addClass('border_dotted')
-				]);
+				->addRow([_('Send to User groups'), (new CDiv($usrgrpList))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)])
+				->addRow([_('Send to Users'), (new CDiv($userList))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)]);
 
 			$mediaTypeComboBox = (new CComboBox('new_operation[opmessage][mediatypeid]', $this->data['new_operation']['opmessage']['mediatypeid']))
 				->addItem(0, '- '._('All').' -');
@@ -766,8 +739,7 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$cmdList = (new CTable())
-				->addClass('formElementTable')
-				->setAttribute('style', 'min-width: 310px;')
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->setHeader([_('Target'), _('Action')]);
 
 			$addCmdBtn = (new CButton('add', _('New')))
@@ -818,9 +790,7 @@ if (!empty($this->data['new_operation'])) {
 
 			// target list
 			$cmdList = (new CDiv($cmdList))
-				->addClass('objectgroup')
-				->addClass('inlineblock')
-				->addClass('border_dotted')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setId('opCmdList');
 			$newOperationsTable->addRow([_('Target list'), $cmdList], 'indent_top');
 
@@ -842,9 +812,13 @@ if (!empty($this->data['new_operation'])) {
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 			$userScriptSelect = (new CButton('select_opcommand_script', _('Select')))->addClass(ZBX_STYLE_BTN_GREY);
 
-			$userScript = (new CDiv([$userScriptId, $userScriptName, SPACE, $userScriptSelect]))
+			$userScript = (new CDiv([
+				$userScriptId,
+				$userScriptName,
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$userScriptSelect
+			]))
 				->addClass('class_opcommand_userscript')
-				->addClass('border_dotted')
 				->addClass('hidden');
 
 			$newOperationsTable->addRow([_('Type'), [$typeComboBox, SPACE, $userScript]], 'indent_bottom');
@@ -856,9 +830,7 @@ if (!empty($this->data['new_operation'])) {
 			$executeOnRadioButton->addValue(SPACE._('Zabbix server').SPACE, ZBX_SCRIPT_EXECUTE_ON_SERVER);
 			$newOperationsTable->addRow([_('Execute on'),
 					(new CDiv($executeOnRadioButton))
-						->addClass('objectgroup')
-						->addClass('border_dotted')
-						->addClass('inlineblock')
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				], 'class_opcommand_execute_on hidden indent_both'
 			);
 
@@ -1003,12 +975,7 @@ if (!empty($this->data['new_operation'])) {
 				? _('Add to host groups')
 				: _('Remove from host groups');
 
-			$newOperationsTable->addRow([$caption,
-				(new CDiv($groupList))
-						->addClass('objectgroup')
-						->addClass('border_dotted')
-						->addClass('inlineblock')
-			]);
+			$newOperationsTable->addRow([$caption, (new CDiv($groupList))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)]);
 			break;
 
 		case OPERATION_TYPE_TEMPLATE_ADD:
@@ -1062,10 +1029,9 @@ if (!empty($this->data['new_operation'])) {
 				? _('Link with templates')
 				: _('Unlink from templates');
 
-			$newOperationsTable->addRow([$caption,
-				(new CDiv($templateList))
-						->addClass('objectgroup')
-						->addClass('border_dotted')
+			$newOperationsTable->addRow([
+				$caption,
+				(new CDiv($templateList))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			]);
 			break;
 	}
@@ -1158,10 +1124,7 @@ if (!empty($this->data['new_operation'])) {
 			))->setColspan(3));
 		}
 		$newOperationsTable->addRow([_('Conditions'),
-			(new CDiv($operationConditionsTable))
-				->addClass('objectgroup')
-				->addClass('inlineblock')
-				->addClass('border_dotted')
+			(new CDiv($operationConditionsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		], 'indent_top');
 	}
 
@@ -1218,22 +1181,18 @@ if (!empty($this->data['new_operation'])) {
 
 		$newOperationsTable->addRow([_('Operation condition'),
 			(new CDiv([$newOperationConditionTable, $newOperationConditionFooter]))
-				->addClass('objectgroup')
-				->addClass('inlineblock')
-				->addClass('border_dotted')
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		]);
 	}
 
 	$footer = [
 		(new CSubmit('add_operation', (isset($this->data['new_operation']['id'])) ? _('Update') : _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-		SPACE.SPACE,
-		(new CSubmit('cancel_new_operation', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+		(new CSubmit('cancel_new_operation', _('Cancel')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addStyle('margin-left: 8px')
 	];
 	$operationFormList->addRow(_('Operation details'),
-		(new CDiv([$newOperationsTable, $footer]))
-			->addClass('objectgroup')
-			->addClass('floatleft')
-			->addClass('border_dotted')
+		(new CDiv([$newOperationsTable, $footer]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
 }
 

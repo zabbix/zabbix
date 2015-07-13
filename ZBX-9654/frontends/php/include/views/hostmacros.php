@@ -44,12 +44,12 @@ else {
 		else {
 			$link = null;
 		}
-		$table->addRow([_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
+		$table->setHeader([_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
 			[_('Global value'), $link]
 		]);
 	}
 	else {
-		$table->addRow([_('Macro'), '', _('Value'), $actions_col]);
+		$table->setHeader([_('Macro'), '', _('Value'), $actions_col]);
 	}
 
 	// fields
@@ -142,14 +142,11 @@ else {
 
 	// buttons
 	if (!$data['readonly']) {
-		$buttons_column = new CCol(
+		$table->setFooter(new CCol(
 			(new CButton('macro_add', _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-add')
-		);
-		$buttons_column->setAttribute('colspan', 5);
-
-		$table->addRow(new CRow($buttons_column, null, 'row_new_macro'));
+		));
 	}
 }
 

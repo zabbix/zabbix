@@ -46,7 +46,7 @@ $slideFormList = (new CFormList())
 
 // append slide table
 $slideTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setId('slideTable')
 	->setHeader([
 		(new CColHeader())->setWidth(15),
@@ -102,11 +102,7 @@ $addButtonColumn = (new CCol(
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
-$slideFormList->addRow(_('Slides'), (new CDiv($slideTable))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
-);
+$slideFormList->addRow(_('Slides'), (new CDiv($slideTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // append tabs to form
 $slideTab = new CTabView();
