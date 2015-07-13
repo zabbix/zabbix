@@ -26,8 +26,8 @@ $dashboard = (new CWidget())
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
-			->addItem(get_icon('dashconf'))
-			->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+			->addItem(get_icon('dashconf', ['enabled' => $data['filter_enabled']]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	);
 
@@ -73,11 +73,6 @@ $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
 $dashboardGrid[$col][$row] = $favouriteMaps;
 
 // favourite screens
-$icon = (new CIcon(_('Menu')))
-	->addClass('iconmenu')
-	->setId('favouriteScreens')
-	->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
-
 $icon = (new CRedirectButton(SPACE, null))
 	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
 	->setTitle(_('Action'))
