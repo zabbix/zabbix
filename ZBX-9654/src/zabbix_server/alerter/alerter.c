@@ -39,8 +39,8 @@ typedef struct zbx_alerter_worker_s
 	char	*w_mediatypeid;
 	char	*w_description;
 	pid_t	w_pid;
-	struct zbx_alerter_worker_s *prev;
-	struct zbx_alerter_worker_s *next;
+	struct zbx_alerter_worker_s	*prev;
+	struct zbx_alerter_worker_s	*next;
 }
 zbx_alerter_worker_t;
 
@@ -51,16 +51,15 @@ static zbx_thread_args_t	thread_args;
 static zbx_alerter_worker_t	*workers;
 int				workers_running, workers_started, workers_terminated;
 
-ZBX_THREAD_ENTRY(alerter_worker_thread, args);
-
 static void	remove_defunct_workers(void);
 static void	add_and_update_workers(void);
 static void	start_new_workers(void);
 static void	add_worker(char *mediatypeid, char *description, pid_t pid);
 static void	remove_worker(zbx_alerter_worker_t *w);
 static int	count_workers(void);
-static zbx_alerter_worker_t *	find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid);
-static zbx_alerter_worker_t *	find_next_worker_by_mediatypeid(zbx_alerter_worker_t *from, char *mediatypeid);
+static zbx_alerter_worker_t	*find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid);
+static zbx_alerter_worker_t	*find_next_worker_by_mediatypeid(zbx_alerter_worker_t *from, char *mediatypeid);
+static ZBX_THREAD_ENTRY(alerter_worker_thread, args);
 
 /******************************************************************************
  *                                                                            *
@@ -227,7 +226,7 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
  *           media type name has changed.                                     *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(alerter_worker_thread, args)
+static ZBX_THREAD_ENTRY(alerter_worker_thread, args)
 {
 	char		error[MAX_STRING_LEN], *error_esc;
 	int		res, alerts_success, alerts_fail;
