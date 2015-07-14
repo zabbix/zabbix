@@ -32,6 +32,7 @@
 #	include <polarssl/error.h>
 #	include <polarssl/debug.h>
 #	include <polarssl/oid.h>
+#	include <polarssl/version.h>
 #elif defined(HAVE_GNUTLS)
 #	include <gnutls/gnutls.h>
 #	include <gnutls/x509.h>
@@ -99,6 +100,7 @@ ZBX_THREAD_LOCAL static gnutls_psk_server_credentials_t		my_psk_server_creds	= N
 ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_cert	= NULL;
 ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_psk	= NULL;
 ZBX_THREAD_LOCAL static gnutls_priority_t			ciphersuites_all	= NULL;
+static int							init_done 		= 0;
 #elif defined(HAVE_OPENSSL)
 ZBX_THREAD_LOCAL static const SSL_METHOD	*method			= NULL;
 ZBX_THREAD_LOCAL static SSL_CTX			*ctx_cert		= NULL;
@@ -110,6 +112,7 @@ ZBX_THREAD_LOCAL static char			*psk_identity_for_cb	= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
 ZBX_THREAD_LOCAL static char			*psk_for_cb		= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_len_for_cb		= 0;
+static int					init_done 		= 0;
 /* buffer for messages produced by zbx_openssl_info_cb() */
 ZBX_THREAD_LOCAL char				info_buf[256];
 #endif
@@ -2249,38 +2252,73 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_tls_init_parent                                              *
+ * Function: zbx_tls_library_init                                             *
  *                                                                            *
- * Purpose: initialize TLS library in a parent process                        *
+ * Purpose: initialize TLS library, log library version                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tls_init_parent(void)
+static void	zbx_tls_library_init(void)
 {
-	const char	*__function_name = "zbx_tls_init_parent";
-	int		ret = SUCCEED;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-#if defined(_WINDOWS)
-	/* on MS Windows initialize crypto libraries in parent thread */
-#if defined(HAVE_GNUTLS)
+#if defined(HAVE_POLARSSL)
+	zabbix_log(LOG_LEVEL_DEBUG, "mbed TLS library (version %s)", POLARSSL_VERSION_STRING_FULL);
+#elif defined(HAVE_GNUTLS)
 	if (GNUTLS_E_SUCCESS != gnutls_global_init())
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize GnuTLS library");
 		exit(EXIT_FAILURE);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library v.%s initialized", gnutls_check_version(NULL));
+	init_done = 1;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library (version %s) initialized", gnutls_check_version(NULL));
 #elif defined(HAVE_OPENSSL)
 	SSL_load_error_strings();
 	ERR_load_BIO_strings();
 	SSL_library_init();             /* always returns "1" */
-#endif
-#endif
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	init_done = 1;
 
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", SSLeay_version(SSLEAY_VERSION));
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_library_deinit                                           *
+ *                                                                            *
+ * Purpose: deinitialize TLS library                                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_library_deinit(void)
+{
+#if defined(HAVE_GNUTLS)
+	if (1 == init_done)
+	{
+		init_done = 0;
+		gnutls_global_deinit();
+	}
+#elif defined(HAVE_OPENSSL)
+	if (1 == init_done)
+	{
+		init_done = 0;
+		RAND_cleanup();         /* erase PRNG state */
+		ERR_free_strings();
+	}
+#endif
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_tls_init_parent                                              *
+ *                                                                            *
+ * Purpose: initialize TLS library in a parent process                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_init_parent(void)
+{
+#if defined(_WINDOWS)
+	zbx_tls_library_init();		/* on MS Windows initialize crypto libraries in parent thread */
+#endif
 }
 
 /******************************************************************************
@@ -2302,6 +2340,9 @@ void	zbx_tls_init_child(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_tls_validate_config();
+#if !defined(_WINDOWS)
+	zbx_tls_library_init();		/* on UNIX/GNU/Linux initialize crypto libraries in child processes */
+#endif
 
 	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	if (NULL != CONFIG_TLS_CA_FILE)
@@ -2493,14 +2534,8 @@ void	zbx_tls_init_child(void)
 
 	zbx_tls_validate_config();
 #if !defined(_WINDOWS)
-	if (GNUTLS_E_SUCCESS != gnutls_global_init())
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize GnuTLS library");
-		exit(EXIT_FAILURE);
-	}
+	zbx_tls_library_init();		/* on UNIX/GNU/Linux initialize crypto libraries in child processes */
 #endif
-	zabbix_log(LOG_LEVEL_DEBUG, "GnuTLS library v.%s initialized", gnutls_check_version(NULL));
-
 	/* need to allocate certificate credentials store ? */
 
 	if (NULL != CONFIG_TLS_CERT_FILE)
@@ -2700,9 +2735,7 @@ void	zbx_tls_init_child(void)
 
 	zbx_tls_validate_config();
 #if !defined(_WINDOWS)
-	SSL_load_error_strings();
-	ERR_load_BIO_strings();
-	SSL_library_init();		/* always returns "1" */
+	zbx_tls_library_init();		/* on UNIX/GNU/Linux initialize crypto libraries in child processes */
 #endif
 	if (1 != RAND_status())		/* protect against not properly seeded PRNG */
 	{
@@ -3058,7 +3091,9 @@ void	zbx_tls_free(void)
 		zbx_free(my_psk);
 	}
 
-	gnutls_global_deinit();
+#if !defined(_WINDOWS)
+	zbx_tls_library_deinit();
+#endif
 #elif defined(HAVE_OPENSSL)
 	if (NULL != ctx_cert)
 		SSL_CTX_free(ctx_cert);
@@ -3079,8 +3114,9 @@ void	zbx_tls_free(void)
 		zbx_free(my_psk);
 	}
 
-	RAND_cleanup();		/* erase PRNG state */
-	ERR_free_strings();
+#if !defined(_WINDOWS)
+	zbx_tls_library_deinit();
+#endif
 #endif
 }
 
