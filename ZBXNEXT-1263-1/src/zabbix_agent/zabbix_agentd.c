@@ -1024,6 +1024,10 @@ void	zbx_on_exit(void)
 
 	zbx_free_service_resources();
 
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	zbx_tls_free();
+	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
+#endif
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif

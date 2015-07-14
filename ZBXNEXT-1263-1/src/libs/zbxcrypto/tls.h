@@ -73,7 +73,8 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 
 #endif
 
-int	zbx_tls_init_parent(void);
+void	zbx_tls_library_deinit(void);
+void	zbx_tls_init_parent(void);
 void	zbx_tls_init_child(void);
 void	zbx_tls_free(void);
 
