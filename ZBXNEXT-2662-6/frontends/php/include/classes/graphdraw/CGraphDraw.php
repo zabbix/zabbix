@@ -169,10 +169,6 @@ abstract class CGraphDraw {
 		$this->sizeY = $value;
 	}
 
-	public function setBorder($border) {
-		$this->border = $border;
-	}
-
 	public function getLastValue($num) {
 		$data = &$this->data[$this->items[$num]['itemid']][$this->items[$num]['calc_type']];
 
@@ -210,16 +206,6 @@ abstract class CGraphDraw {
 				$this->getColor($this->graphtheme['graphbordercolor'], 0)
 			);
 		}
-	}
-
-	public function drawSmallRectangle() {
-		dashedRectangle($this->im,
-			$this->shiftXleft + $this->shiftXCaption - 1,
-			$this->shiftY - 1,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption - 1,
-			$this->sizeY + $this->shiftY + 1,
-			$this->getColor('Black No Alpha')
-		);
 	}
 
 	public function period2str($period) {
