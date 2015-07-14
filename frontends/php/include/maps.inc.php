@@ -1035,6 +1035,8 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			}
 		}
 
+		$last_event = false;
+
 		foreach ($selement['triggers'] as $triggerId) {
 			$trigger = $allTriggers[$triggerId];
 
@@ -1051,8 +1053,12 @@ function getSelementsInfo($sysmap, array $options = array()) {
 							$i['priority'] = $trigger['priority'];
 						}
 
-						if ($trigger['lastEvent'] && !$trigger['lastEvent']['acknowledged']) {
-							$i['problem_unack']++;
+						if ($trigger['lastEvent']) {
+							if (!$trigger['lastEvent']['acknowledged']) {
+								$i['problem_unack']++;
+							}
+
+							$last_event = $last_event || true;
 						}
 					}
 
@@ -1061,7 +1067,8 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			}
 		}
 
-		$i['ack'] = (bool) !($i['problem_unack']);
+		// If there are no events, problems cannot be unacknowledged. Hide the green line in this case.
+		$i['ack'] = ($last_event) ? (bool) !($i['problem_unack']) : false;
 
 		if ($sysmap['expandproblem'] && $i['problem'] == 1) {
 			if (!isset($lastProblemId)) {
