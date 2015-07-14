@@ -177,7 +177,7 @@ class CScreenBase {
 				'updateProfile' => $this->updateProfile,
 				'period' => !empty($options['period']) ? $options['period'] : null,
 				'stime' => !empty($options['stime']) ? $options['stime'] : null,
-				'requestTime' => isset($options['requestTime']) ? $options['requestTime'] : null
+				'requestTime' => array_key_exists('requestTime', $options) ? $options['requestTime'] : null
 			]);
 		}
 
@@ -361,7 +361,7 @@ class CScreenBase {
 		}
 
 		// Get user set time from URL when request was formed or get current time if page is beeing freshly loaded.
-		$time = isset($options['requestTime']) ? $options['requestTime'] : time();
+		$time = array_key_exists('requestTime', $options) ? $options['requestTime'] : time();
 		$usertime = null;
 		$stimeNow = null;
 		$isNow = 0;

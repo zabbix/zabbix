@@ -188,8 +188,8 @@ switch ($data['method']) {
 			'stime' => !empty($data['stime']) ? $data['stime'] : null,
 			'profileIdx' => !empty($data['profileIdx']) ? $data['profileIdx'] : null,
 			'profileIdx2' => !empty($data['profileIdx2']) ? $data['profileIdx2'] : null,
-			'updateProfile' => isset($data['updateProfile']) ? $data['updateProfile'] : null,
-			'requestTime' => isset($data['requestTime']) ? $data['requestTime'] : null
+			'updateProfile' => array_key_exists('updateProfile', $data) ? $data['updateProfile'] : null,
+			'requestTime' => array_key_exists('requestTime', $data) ? $data['requestTime'] : null
 		];
 		if ($options['resourcetype'] == SCREEN_RESOURCE_HISTORY) {
 			$options['itemids'] = !empty($data['itemids']) ? $data['itemids'] : null;
