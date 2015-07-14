@@ -53,14 +53,14 @@ int				workers_running, workers_started, workers_terminated;
 
 ZBX_THREAD_ENTRY(alerter_worker_thread, args);
 
-static void remove_defunct_workers(void);
-static void add_and_update_workers(void);
-static void start_new_workers(void);
-static void add_worker(char *mediatypeid, char *description, pid_t pid);
-static void remove_worker(zbx_alerter_worker_t *w);
-static int count_workers(void);
-static zbx_alerter_worker_t *find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid);
-static zbx_alerter_worker_t *find_next_worker_by_mediatypeid(zbx_alerter_worker_t *from, char *mediatypeid);
+static void	remove_defunct_workers(void);
+static void	add_and_update_workers(void);
+static void	start_new_workers(void);
+static void	add_worker(char *mediatypeid, char *description, pid_t pid);
+static void	remove_worker(zbx_alerter_worker_t *w);
+static int	count_workers(void);
+static zbx_alerter_worker_t *	find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid);
+static zbx_alerter_worker_t *	find_next_worker_by_mediatypeid(zbx_alerter_worker_t *from, char *mediatypeid);
 
 /******************************************************************************
  *                                                                            *
@@ -382,7 +382,7 @@ ZBX_THREAD_ENTRY(alerter_worker_thread, args)
  * Author: Sandis Neilands                                                    *
  *                                                                            *
  ******************************************************************************/
-static void remove_defunct_workers(void)
+static void	remove_defunct_workers(void)
 {
 	pid_t			pid;
 	int			status;
@@ -416,7 +416,7 @@ static void remove_defunct_workers(void)
  * Comments: workers not started in this function, see start_new_workers()    *
  *                                                                            *
  ******************************************************************************/
-static void add_and_update_workers(void)
+static void	add_and_update_workers(void)
 {
 	DB_RESULT		result;
 	DB_ROW			row;
@@ -446,7 +446,7 @@ static void add_and_update_workers(void)
  * Author: Sandis Neilands                                                    *
  *                                                                            *
  ******************************************************************************/
-static void start_new_workers(void)
+static void	start_new_workers(void)
 {
 	zbx_alerter_worker_t	*w;
 
@@ -462,7 +462,7 @@ static void start_new_workers(void)
 	}
 }
 
-static void add_worker(char *mediatypeid, char *description, pid_t pid)
+static void	add_worker(char *mediatypeid, char *description, pid_t pid)
 {
 	zbx_alerter_worker_t	*w = NULL;
 
@@ -482,7 +482,7 @@ static void add_worker(char *mediatypeid, char *description, pid_t pid)
 	w->w_pid = pid;
 }
 
-static void remove_worker(zbx_alerter_worker_t *w)
+static void	remove_worker(zbx_alerter_worker_t *w)
 {
 	if (w->next)
 		w->next->prev = w->prev;
@@ -498,7 +498,7 @@ static void remove_worker(zbx_alerter_worker_t *w)
 	zbx_free(w);
 }
 
-static int count_workers(void)
+static int	count_workers(void)
 {
 	zbx_alerter_worker_t	*w;
 	int count = 0;
@@ -508,7 +508,7 @@ static int count_workers(void)
 	return count;
 }
 
-static zbx_alerter_worker_t *find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid)
+static zbx_alerter_worker_t *	find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid)
 {
 	zbx_alerter_worker_t	*w;
 	zbx_alerter_worker_t	*found = NULL;
@@ -520,7 +520,7 @@ static zbx_alerter_worker_t *find_next_worker_by_pid(zbx_alerter_worker_t *from,
 	return found;
 }
 
-static zbx_alerter_worker_t *find_next_worker_by_mediatypeid(zbx_alerter_worker_t *from, char *mediatypeid)
+static zbx_alerter_worker_t *	find_next_worker_by_mediatypeid(zbx_alerter_worker_t *from, char *mediatypeid)
 {
 	zbx_alerter_worker_t	*w;
 	zbx_alerter_worker_t	*found = NULL;
