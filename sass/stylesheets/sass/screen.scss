@@ -618,6 +618,7 @@ footer {
 	}
 
 	td {
+		position: relative;
 		padding: 8px 5px 8px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
@@ -626,6 +627,10 @@ footer {
 	.vertical_rotation_inner {
 		white-space: nowrap;
 		@include rotate(270);
+	}
+
+	.icon-help {
+		top: 0.3em;
 	} 
 }
 
@@ -2954,8 +2959,8 @@ a.overlay-close-btn {
 	width: 24px;
 	height: 24px;
 	margin: 0 auto;
-	border: 3px solid #ccd5d9;
-	border-bottom: 3px solid #0275b8;
+	border: 2px solid #ccd5d9;
+	border-bottom: 2px solid #0275b8;
 	animation: load 0.8s infinite linear;
 }
 
