@@ -1040,7 +1040,7 @@ define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
 define('ZBX_STYLE_BTN_RESET', 'btn-reset');
-define('ZBX_STYLE_CAL_ICON', 'cal-icon');
+define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');

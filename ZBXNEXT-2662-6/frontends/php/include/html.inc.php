@@ -719,9 +719,8 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 			->addStyle('text-align: right;')
 			->setAttribute('placeholder', _('mm'))
 			->onChange('validateDatePartBox(this, 0, 59, 2);'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSpan())
-			->addClass(ZBX_STYLE_CAL_ICON)
+		(new CButton())
+			->addClass(ZBX_STYLE_ICON_CAL)
 			->onClick($onClick)
 	];
 
