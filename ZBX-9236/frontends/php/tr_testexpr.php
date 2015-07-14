@@ -45,10 +45,10 @@ define('NO_LINK_IN_TESTING', true);
 list($outline, $eHTMLTree) = analyzeExpression($expression);
 
 // test data (create table, create check fields)
-$dataTable = (new CTable())->
-	addClass('tableinfo')->
-	setAttribute('id', 'data_list')->
-	setHeader([_('Expression Variable Elements'), _('Result type'), _('Value')]);
+$dataTable = (new CTable())
+	->addClass('tableinfo')
+	->setId('data_list')
+	->setHeader([_('Expression Variable Elements'), _('Result type'), _('Value')]);
 
 $datas = [];
 $fields = [];
@@ -78,7 +78,7 @@ if ($result) {
 
 		if (!is_array($info) && isset($definedErrorPhrases[$info])) {
 			$allowedTesting = false;
-			$control = new CTextBox($fname, $macrosData[$token['value']], 30);
+			$control = (new CTextBox($fname, $macrosData[$token['value']]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			$control->setAttribute('disabled', 'disabled');
 		}
 		else {
@@ -94,7 +94,7 @@ if ($result) {
 				}
 			}
 			else {
-				$control = new CTextBox($fname, $macrosData[$token['value']], 30);
+				$control = (new CTextBox($fname, $macrosData[$token['value']]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
 
 			$fields[$fname] = [$info['type'], O_OPT, null, $validation, 'isset({test_expression})',
@@ -131,11 +131,9 @@ $testForm->setTableClass('formlongtable formtable');
 $testForm->addVar('expression', $expression);
 $testForm->addRow(_('Test data'), $dataTable);
 
-$resultTable = (new CTable())->
-	addClass('tableinfo')->
-	setAttribute('id', 'result_list');
-$resultTable->setOddRowClass('even_row');
-$resultTable->setEvenRowClass('even_row');
+$resultTable = (new CTable())
+	->addClass('tableinfo')
+	->setId('result_list');
 $resultTable->setHeader([_('Expression'), _('Result')]);
 
 ksort($rplcts, SORT_NUMERIC);
@@ -155,8 +153,7 @@ foreach ($eHTMLTree as $e) {
 		}
 	}
 
-	$col = (new CCol($result))->
-		setAttribute('style', $style);
+	$col = (new CCol($result))->setAttribute('style', $style);
 
 	$resultTable->addRow(new CRow([$e['list'], $col]));
 }
@@ -190,7 +187,9 @@ if (!$allowedTesting) {
 
 $testForm->addItemToBottomRow($testButton);
 $testForm->addItemToBottomRow(SPACE);
-$testForm->addItemToBottomRow(new CButton('close', _('Close'), 'javascript: self.close();'));
+$testForm->addItemToBottomRow(
+	(new CButton('close', _('Close')))->onClick('javascript: self.close();')
+);
 $testForm->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

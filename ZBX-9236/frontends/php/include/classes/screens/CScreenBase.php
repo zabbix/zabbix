@@ -265,10 +265,14 @@ class CScreenBase {
 		}
 
 		if ($this->mode == SCREEN_MODE_EDIT) {
-			$div = new CDiv([$item, BR(), new CLink(_('Change'), $this->action)], 'flickerfreescreen', $this->getScreenId());
+			$div = (new CDiv([$item, BR(), new CLink(_('Change'), $this->action)]))
+				->addClass('flickerfreescreen')
+				->setId($this->getScreenId());
 		}
 		else {
-			$div = new CDiv($item, 'flickerfreescreen', $this->getScreenId());
+			$div = (new CDiv($item))
+				->addClass('flickerfreescreen')
+				->setId($this->getScreenId());
 		}
 
 		$div->setAttribute('data-timestamp', $this->timestamp);

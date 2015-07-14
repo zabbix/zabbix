@@ -66,7 +66,7 @@ var chkbxRange = {
 			this.update(this.pageGoName);
 		}
 
-		this.footerButtons = jQuery('.button.footerButton');
+		this.footerButtons = jQuery('button.footerButton');
 		var thisChkbxRange = this;
 		this.footerButtons.each(function() {
 			addListener(this, 'click', thisChkbxRange.submitFooterButton.bindAsEventListener(thisChkbxRange), false);
@@ -257,7 +257,7 @@ var chkbxRange = {
 		var selectedCountSpan = jQuery('#selectedCount');
 		selectedCountSpan.text(count + ' ' + selectedCountSpan.text().split(' ')[1]);
 
-		jQuery('.button.footerButton').prop('disabled', count == 0);
+		jQuery('button.footerButton').prop('disabled', count == 0);
 	},
 
 	// check if all checkboxes are selected and select main checkbox, else disable checkbox, select options and button
@@ -317,7 +317,7 @@ var chkbxRange = {
 	submitFooterButton: function(e) {
 		e = e || window.event;
 
-		var footerButton = IE8 ? jQuery(e.srcElement) : jQuery(e.target),
+		var footerButton = jQuery(e.target),
 			form = footerButton.closest('form'),
 			confirmText = footerButton.attr('confirm');
 		if (confirmText && !confirm(confirmText)) {

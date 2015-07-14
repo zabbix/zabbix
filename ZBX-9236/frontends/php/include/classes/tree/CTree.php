@@ -68,8 +68,8 @@ class CTree {
 	}
 
 	private function simpleHTML() {
-		$table = new CTableInfo();
-		$table->setHeader($this->makeHeaders());
+		$table = (new CTableInfo())
+			->setHeader($this->makeHeaders());
 
 		foreach ($this->tree as $id => $rows) {
 			$table->addRow($this->makeRow($id));
@@ -82,7 +82,7 @@ class CTree {
 
 		$tr = new CRow();
 		$tr->addItem($td);
-		$tr->setAttribute('id', 'id_'.$id);
+		$tr->setId('id_'.$id);
 		$tr->setAttribute('style', $this->tree[$id]['parentid'] != '0' ? 'display: none;' : '');
 
 		foreach ($this->fields as $value) {
@@ -109,9 +109,11 @@ class CTree {
 		$td->setAttribute('style', 'padding-left:'. (2 * $level) .'em;');
 
 		if ($id != 0 && array_key_exists('childnodes', $this->tree[$id])) {
-			$div = new CDiv(new CSpan(null, 'arrow-right'), 'treeview');
-			$div->setAttribute('onclick', $this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);');
-			$div->setAttribute('id', 'idi_'.$id);
+			$div = (new CDiv((new CSpan())->addClass('arrow-right')))
+				->addClass('treeview')
+				->onClick($this->treename.'.closeSNodeX("'.$id.'", this.getElementsByTagName(\'span\')[0]);')
+				->setId('idi_'.$id);
+
 			$td->addItem($div);
 		}
 

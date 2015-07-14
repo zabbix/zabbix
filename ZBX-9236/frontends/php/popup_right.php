@@ -44,16 +44,15 @@ $permission = getRequest('permission', PERM_DENY);
 show_table_header(permission2str($permission));
 
 // host groups
-$hostGroupForm = new CForm();
-$hostGroupForm->setAttribute('id', 'groups');
+$hostGroupForm = (new CForm())->setId('groups');
 
-$hostGroupTable = new CTableInfo();
-$hostGroupTable->setHeader([
-	(new CColHeader(
-		new CCheckBox('all_groups', null, 'checkAll(this.checked)')))->
-		addClass('cell-width'),
-	_('Name')
-]);
+$hostGroupTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_groups'))->onClick('checkAll(this.checked)')
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Name')
+	]);
 
 $hostGroups = API::HostGroup()->get([
 	'output' => ['groupid', 'name']
@@ -62,15 +61,20 @@ $hostGroups = API::HostGroup()->get([
 order_result($hostGroups, 'name');
 
 foreach ($hostGroups as $hostGroup) {
-	$hostGroupCheckBox = new CCheckBox();
-	$hostGroupCheckBox->setAttribute('data-id', $hostGroup['groupid']);
-	$hostGroupCheckBox->setAttribute('data-name', $hostGroup['name']);
-	$hostGroupCheckBox->setAttribute('data-permission', $permission);
-
-	$hostGroupTable->addRow(new CCol([$hostGroupCheckBox, $hostGroup['name']]));
+	$hostGroupTable->addRow([
+		(new CCheckBox())
+			->setAttribute('data-id', $hostGroup['groupid'])
+			->setAttribute('data-name', $hostGroup['name'])
+			->setAttribute('data-permission', $permission),
+		$hostGroup['name']
+	]);
 }
 
-$hostGroupTable->setFooter((new CCol(new CButton('select', _('Select'), 'addGroups("'.$dstfrm.'")')))->addClass('right'));
+$hostGroupTable->setFooter(
+	(new CCol(
+		(new CButton('select', _('Select')))->onClick('addGroups("'.$dstfrm.'")')
+	))
+);
 
 $hostGroupForm->addItem($hostGroupTable);
 $hostGroupForm->show();

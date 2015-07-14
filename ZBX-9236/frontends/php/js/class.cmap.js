@@ -150,13 +150,6 @@ ZABBIX.apps.map = (function($) {
 				});
 			}
 
-			// for some reason IE8 does not catch clicks if there is no background color and alpha opacity is 0
-			if (IE8) {
-				this.container.css({
-					backgroundColor: 'white'
-				});
-			}
-
 			if (IE || GK) {
 				this.base64image = false;
 				this.mapimg = $('#sysmap_img');
@@ -1277,7 +1270,7 @@ ZABBIX.apps.map = (function($) {
 				popup: {
 					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
 						'&srcfld1=hostid&writeonly=1',
-					buttonClass: 'button link_menu'
+					buttonClass: 'btn-grey'
 				}
 			});
 
@@ -1293,7 +1286,7 @@ ZABBIX.apps.map = (function($) {
 				popup: {
 					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
 						'&srcfld1=groupid&writeonly=1',
-					buttonClass: 'button link_menu'
+					buttonClass: 'btn-grey'
 				}
 			});
 

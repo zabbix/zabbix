@@ -36,11 +36,10 @@ $frm_title = _('Template');
 if ($data['templateId'] != 0) {
 	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
-$frmHost = new CForm();
-$frmHost->setName('tpl_for');
-
-$frmHost->addVar('form', $data['form']);
-$frmHost->addVar('groupid', $data['groupId']);
+$frmHost = (new CForm())
+	->setName('tpl_for')
+	->addVar('form', $data['form'])
+	->addVar('groupid', $data['groupId']);
 
 if ($data['templateId'] != 0) {
 	$frmHost->addVar('templateid', $data['templateId']);
@@ -70,15 +69,14 @@ natcasesort($templateIds);
 $frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
-$templateList = new CFormList('hostlist');
-
-// FORM ITEM : Template name text box [  ]
-$template_nameTB = new CTextBox('template_name', $host, 54, false, 128);
-$template_nameTB->setAttribute('autofocus', 'autofocus');
-$templateList->addRow(_('Template name'), $template_nameTB);
-
-$visiblenameTB = new CTextBox('visiblename', $visiblename, 54, false, 128);
-$templateList->addRow(_('Visible name'), $visiblenameTB);
+$templateList = (new CFormList('hostlist'))
+	->addRow(_('Template name'), (new CTextBox('template_name', $host, false, 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 $groupsTB = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
 
@@ -117,14 +115,17 @@ else {
 $templateList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
-$newgroupTB = new CTextBox('newgroup', $newgroup);
-$newgroupTB->setAttribute('maxlength', 64);
-$tmp_label = _('New group');
+$new_group = (new CTextBox('newgroup', $newgroup))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('maxlength', 64);
+$new_group_label = _('New group');
 if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-	$tmp_label .= SPACE._('(Only super admins can create groups)');
-	$newgroupTB->setReadonly(true);
+	$new_group_label .= ' '._('(Only super admins can create groups)');
+	$new_group->setReadonly(true);
 }
-$templateList->addRow(SPACE, [$tmp_label, BR(), $newgroupTB], null, null, 'new');
+$templateList->addRow(new CLabel($new_group_label, 'newgroup'),
+	(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+);
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 $cmbGroups = new CComboBox('twb_groupid', $data['twb_groupid'], 'submit()');
@@ -150,7 +151,9 @@ $templateList->addRow(_('Hosts / templates'), $hostsTB->Get(_('In'), [
 	$cmbGroups
 ]));
 
-$templateList->addRow(_('Description'), new CTextArea('description', $this->data['description']));
+$templateList->addRow(_('Description'),
+	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // FULL CLONE {
 if ($data['form'] === 'full_clone') {
@@ -168,9 +171,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($applicationsList);
 
-		$listBox = new CListBox('applications', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($applicationsList);
+		$listBox = (new CListBox('applications', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($applicationsList);
 		$templateList->addRow(_('Applications'), $listBox);
 	}
 
@@ -191,9 +194,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($itemsList);
 
-		$listBox = new CListBox('items', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($itemsList);
+		$listBox = (new CListBox('items', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($itemsList);
 
 		$templateList->addRow(_('Items'), $listBox);
 	}
@@ -212,9 +215,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($triggersList);
 
-		$listBox = new CListBox('triggers', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($triggersList);
+		$listBox = (new CListBox('triggers', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($triggersList);
 
 		$templateList->addRow(_('Triggers'), $listBox);
 	}
@@ -233,9 +236,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($graphsList);
 
-		$listBox = new CListBox('graphs', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($graphsList);
+		$listBox = (new CListBox('graphs', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($graphsList);
 
 		$templateList->addRow(_('Graphs'), $listBox);
 	}
@@ -257,9 +260,9 @@ if ($data['form'] === 'full_clone') {
 		order_result($discoveryRuleList);
 		$hostDiscoveryRuleids = array_keys($discoveryRuleList);
 
-		$listBox = new CListBox('discoveryRules', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($discoveryRuleList);
+		$listBox = (new CListBox('discoveryRules', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($discoveryRuleList);
 
 		$templateList->addRow(_('Discovery rules'), $listBox);
 
@@ -280,9 +283,9 @@ if ($data['form'] === 'full_clone') {
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('itemsPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('itemsPrototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Item prototypes'), $listBox);
 		}
@@ -301,9 +304,9 @@ if ($data['form'] === 'full_clone') {
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('triggerprototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('triggerprototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Trigger prototypes'), $listBox);
 		}
@@ -322,9 +325,9 @@ if ($data['form'] === 'full_clone') {
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('graphPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('graphPrototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Graph prototypes'), $listBox);
 		}
@@ -343,9 +346,9 @@ if ($data['form'] === 'full_clone') {
 		}
 		order_result($screensList);
 
-		$listBox = new CListBox('screens', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($screensList);
+		$listBox = (new CListBox('screens', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($screensList);
 
 		$templateList->addRow(_('Screens'), $listBox);
 	}
@@ -366,9 +369,9 @@ if ($data['form'] === 'full_clone') {
 
 		order_result($httpTestList);
 
-		$listBox = new CListBox('httpTests', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($httpTestList);
+		$listBox = (new CListBox('httpTests', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($httpTestList);
 		$templateList->addRow(_('Web scenarios'), $listBox);
 	}
 }
@@ -383,67 +386,56 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // TEMPLATES{
 $tmplList = new CFormList();
 
-// create linked template table
-$linkedTemplateTable = (new CTable(_('No templates linked.')))->
-	addClass('formElementTable');
-$linkedTemplateTable->setAttribute('id', 'linkedTemplateTable');
-$linkedTemplateTable->setHeader([_('Name'), _('Action')]);
-
 $ignoredTemplates = [];
+
+$linkedTemplateTable = (new CTable())
+	->setNoDataMessage(_('No templates linked.'))
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
-	$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-	$templateLink->setTarget('_blank');
+	$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+		->setTarget('_blank');
 
-	$unlinkButton = new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu');
-	$unlinkAndClearButton = new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null,
-		'link_menu'
-	);
-	$unlinkAndClearButton->addStyle('margin-left: 8px');
+	$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
+	if (isset($data['original_templates'][$template['templateid']]) && !$cloneOrFullClone) {
+		$unlinkAndClearButton =
+			(new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addStyle('margin-left: 8px');
+	}
+	else {
+		$unlinkAndClearButton = null;
+	}
 
-	$linkedTemplateTable->addRow(
-		[
-			$templateLink,
-			[
-				$unlinkButton,
-				(isset($data['original_templates'][$template['templateid']]) && !$cloneOrFullClone)
-					? $unlinkAndClearButton
-					: null
-			]
-		],
-		null,
+	$linkedTemplateTable->addRow([$templateLink, [$unlinkButton, $unlinkAndClearButton]], null,
 		'conditions_'.$template['templateid']
 	);
 
 	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
-$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
-
-// create new linked template table
-$newTemplateTable = (new CTable())->
-	addClass('formElementTable');
-$newTemplateTable->setAttribute('id', 'newTemplateTable');
-$newTemplateTable->setAttribute('style', 'min-width: 400px;');
-
-$newTemplateTable->addRow([new CMultiSelect([
-	'name' => 'add_templates[]',
-	'objectName' => 'templates',
-	'ignored' => $ignoredTemplates,
-	'popup' => [
-		'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-			'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-	]
-])]);
-
-$newTemplateTable->addRow(
-	[
-		new CSubmit('add_template', _('Add'), null, 'link_menu')
-	]
+$tmplList->addRow(_('Linked templates'),
+	(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
-$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
+// create new linked template table
+$newTemplateTable = (new CTable())
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'add_templates[]',
+			'objectName' => 'templates',
+			'ignored' => $ignoredTemplates,
+			'popup' => [
+				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	])
+	->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
+
+$tmplList->addRow(_('Link new templates'), (new CDiv($newTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES

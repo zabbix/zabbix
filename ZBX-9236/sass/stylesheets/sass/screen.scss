@@ -25,6 +25,7 @@ a {
 	&:link {
 		text-decoration: none;
 		color: $link-color;
+		outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
@@ -34,6 +35,11 @@ a {
 	}
 
 	&:hover {
+		border-bottom: 1px solid rgba(2,117,184,0.5);
+		color: $link-hover-color;
+	}
+
+	&:focus {
 		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
 	}
@@ -74,17 +80,24 @@ a {
 
 	&:link {
 		text-decoration: none;
-		border-bottom: 1px solid rgba(118,141,153,0.3);
+		border-bottom: 1px solid rgba(118,141,153,0.35);
 		cursor: pointer;
 	}
 
 	&:visited {
 		text-decoration: none;
-		border-bottom: 1px solid rgba(118,141,153,0.3);
+		border-bottom: 1px solid rgba(118,141,153,0.35);
 		cursor: pointer;
 	}
 
 	&:hover {
+		text-decoration: none;
+		border-bottom: 1px solid rgba(2,117,184,0.5);
+		cursor: pointer;
+		color: $link-hover-color;
+	}
+
+	&:focus {
 		text-decoration: none;
 		border-bottom: 1px solid rgba(2,117,184,0.5);
 		cursor: pointer;
@@ -102,7 +115,7 @@ a {
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	border-bottom: 1px solid darken($body-bg-color, 10%);
+	border-bottom: 1px solid $ui-border-color;
 	padding: 0 0 5px 0;
 }
 
@@ -121,6 +134,7 @@ h3 {
 
 h4 {
 	font-size: $font-h4-size;
+	color: $font-color;
 	line-height: $h4-line-height;
 
 	span {
@@ -142,6 +156,10 @@ strong {
 	@extend b;
 }
 
+em {
+	font-style: italic;
+}
+
 ol {
 	list-style: decimal;
 	list-style-position: inside;
@@ -155,9 +173,17 @@ p {
 	margin: 0 0 0.7em 0;
 }
 
+pre {
+	display: block;
+	font-family: $font-stack-mono;
+	font-size: $font-mono-size;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
 /* Main Navigation */
 nav {
-	background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 
 	a {
 
@@ -170,6 +196,10 @@ nav {
 		}
 
 		&:hover {
+			@extend %no-border;
+		}
+
+		&:focus {
 			@extend %no-border;
 		}
 
@@ -191,12 +221,12 @@ nav {
 	height: 36px;
 	line-height: 35px;
 	position: relative;
-	background-color: $main-color;
+	background-color: $main-nav-bg-color;
 }
 
 .top-nav {
 	font-size: $font-top-nav-size;
-	background-color: $main-color;
+	background-color: $main-nav-bg-color;
 
 	li {
 		display: block;
@@ -218,7 +248,7 @@ nav {
 				line-height: 0;
 				border-left: 7px solid transparent;
 				border-right: 7px solid transparent;
-				border-bottom: 7px solid darken($main-color, 17%);
+				border-bottom: 7px solid $main-subnav-bg-color;
 			}
 
 			a, a:hover {
@@ -228,12 +258,28 @@ nav {
 	}
 
 	a {
-		padding: 10px 13px 10px 13px;
+		padding: 10px 13px;
 		color: $link-main-nav-color;
 		text-decoration: none;
 
+		&:link {
+			color: $link-main-nav-color;
+		}
+
+		&:visited {
+			color: $link-main-nav-visited-color;
+		}
+
 		&:hover {
 			color: $link-main-nav-hover-color;
+		}
+
+		&:focus {
+			color: $link-main-nav-active-color;
+		}
+
+		&:active {
+			color: $link-main-nav-active-color;
 		}
 	}
 }
@@ -275,27 +321,27 @@ ul.top-nav-icons {
 		&:hover {
 			@include opacity(1);
 		}
+
+		&:focus {
+			@include opacity(1);
+		}
     }
 
 	.top-nav-help {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -18px;
-	}
-
-	.top-nav-print {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -42px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -36px;
 	}
 
 	.top-nav-profile {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -66px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -108px;
 	}
 
 	.top-nav-signout {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -91px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -144px;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		background: $main-color url(../img/icon-sprite.png) no-repeat -41px -138px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
 	    width: auto;
 		padding: 0 12px 0 27px;
 	}
@@ -305,9 +351,9 @@ ul.top-nav-icons {
 	}
 
 	input {
-		background-color: darken($main-color, 5%);
-		border: 1px solid darken($main-color, 6%);
-		width: 167px;
+		background-color: darken($main-nav-bg-color, 5%);
+		border: 1px solid darken($main-nav-bg-color, 6%);
+		width: 198px;
 		margin: 6px 7px 0 0;
 		color: $white;
 		padding: 4px 24px 4px 5px;
@@ -315,7 +361,7 @@ ul.top-nav-icons {
 		@include transition(border-color .2s ease-out);
 
 		&:focus {
-			border-color: darken($main-color, 10%);
+			border-color: darken($main-nav-bg-color, 10%);
 			@include opacity(1);
 		}
 
@@ -328,11 +374,11 @@ ul.top-nav-icons {
 .top-subnav-container {
 	height: 36px;
 	line-height: 36px;
-	background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 }
 
 .top-subnav {
-	background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 
 	li {
 		display: block;
@@ -343,21 +389,31 @@ ul.top-nav-icons {
 
 .top-subnav a {
 	padding: 5px 8px;
-	color: $link-main-subnav-color;
+
+	&:link {
+		color: $link-main-subnav-color;
+	}
+
+	&:visited {
+		color: $link-main-subnav-visited-color;
+	}
 
 	&:hover {
 		color: $link-main-subnav-hover-color;
-		text-decoration: none;
+	}
+
+	&:focus {
+		color: $link-main-subnav-active-color;
 	}
 
 	&:active {
-		text-decoration: none;
+		color: $link-main-subnav-active-color;
 	}
 
 	&.selected {
-		@include border-radius(2px);
-		background-color: darken($main-color, 7%);
+		background-color: $main-subnav-bg-selected-color;
 		color: $link-main-subnav-active-color;
+		@include border-radius(2px);
 	}
 }
 
@@ -430,10 +486,14 @@ article {
 	li {
 		display: inline-block;
 		margin: 0 14px 0 0;
+		vertical-align: middle;
 	}
 
 	.selected {
-		font-weight: bold;
+		background-color: $ui-bg-color;
+		padding: 4px 9px;
+		border: 1px solid $ui-border-color;
+		@include border-radius(2px);
 	}
 
 	.arrow-right {
@@ -468,14 +528,15 @@ footer {
 	height: 25px;
 	margin: 0 auto;
 	margin-bottom: 10px;
-	background: url(../img/icon-sprite.png) no-repeat 0 -360px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -712px;
+	background-size: 94px;
 }
 
 /* Tables */
 .list-table {
 	width: 100%;
     background-color: $ui-bg-color;
-    @include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+    border: 1px solid $ui-border-color;
 	
 	thead th {
 		font-size: $font-h3-size;
@@ -517,9 +578,14 @@ footer {
 	    		background-color: $ui-hover-color
 	    	}
 
+	    	&:focus {
+	    		text-decoration: none;
+	    		background-color: $ui-hover-color
+	    	}
+
 	    	&:active {
 	    		text-decoration: none;
-	    		background-color: darken($ui-hover-color, 5%);
+	    		background-color: $ui-hover-color
 	    	}	    
 	    }
 	}
@@ -559,9 +625,9 @@ footer {
 .table-paging {
 	text-align: center;
 	background-color: $ui-bg-color;
+	margin-top: -1px;
 	padding: 7px 5px;
-	border-top: 1px solid $table-border-color;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	border: 1px solid $ui-border-color;
 
 	a {
 		@extend %paging-btn;
@@ -585,7 +651,7 @@ footer {
 %paging-btn {
 	display: inline-block;
 	margin-left: -1px;
-	padding: 3px 14px;
+	padding: 3px 11px;
 	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $link-color;
@@ -596,9 +662,17 @@ footer {
 		background-color: $ui-hover-color;
 	}
 
+	&:focus {
+		color: $link-hover-color;
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+		position: relative;
+	}
+
 	&:active {
 		color: $link-active-color;
-		background-color: darken($ui-hover-color, 5%);
+		background-color: $ui-hover-color;
+		position: relative;
 	}
 
 	&:first-child {
@@ -618,8 +692,16 @@ footer {
 			background-color: darken($ui-bg-selected-color, 5%);
 		}
 
+		&:focus {
+			background-color: darken($ui-bg-selected-color, 5%);
+			border-color: $form-border-focus-color;
+			position: relative;
+		}
+
 		&:active {
-			background-color: darken($ui-bg-selected-color, 10%);
+			background-color: darken($ui-bg-selected-color, 5%);
+			border-color: $form-border-focus-color;
+			position: relative;
 		}
 	}
 }
@@ -641,8 +723,13 @@ footer {
 		background-color: $ui-hover-color;
 	}
 
+	&:focus {
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
 	&:active {
-		background-color: darken($ui-hover-color, 5%);
+		background-color: $ui-hover-color;
 	}
 }
 
@@ -666,7 +753,15 @@ footer {
 		border-left-color: $link-color;
 	}
 
+	&:focus .arrow-right {
+		border-left-color: $link-color;
+	}
+
 	&:hover .arrow-down {
+		border-top-color: $link-color;
+	}
+
+	&:focus .arrow-down {
 		border-top-color: $link-color;
 	}
 }
@@ -712,19 +807,19 @@ footer {
 	padding: 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	border: 1px solid $ui-border-color;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
 	}
 
 	.filter-forms {
-		padding: 0 10px 0px 10px;
+		padding: 0 10px;
 	}
 
-	.list-table {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
+	.list-table {                                       
 		margin-bottom: -10px;
-		@include box-shadow(none);
+		border: none;
 
 		thead {
 
@@ -760,6 +855,7 @@ footer {
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
+	white-space: nowrap;
 	background-color: $ui-bg-color;
 
 	.cell {
@@ -783,14 +879,11 @@ footer {
 	button {
 		margin: 10px 7px 0 7px;
 	}
-
-	.multiselect {
-		width: 165px;
-	}
 }
 
 .multiselect-wrapper {
 	position: relative;
+	vertical-align: top;
 }
 
 .multiselect {
@@ -798,8 +891,8 @@ footer {
 	@extend .multiselect-button;
 	position: relative;
 	margin-right: 3px;
-	width: 312px;
-	min-height: 22px;
+	min-height: 24px;
+	white-space: normal;
 
 	&.active {
 		border-color: $form-border-focus-color;
@@ -826,38 +919,32 @@ footer {
 			&.selected {
 
 				.subfilter-enabled {
-					background-color: darken($ui-bg-selected-color, 10%);
+					background-color: lighten($ui-bg-selected-color, 10%);
 				}
 
 				.subfilter-disable-btn {
-					background-color: darken($ui-bg-selected-color, 10%);
+					background-color: lighten($ui-bg-selected-color, 10%);
 					@include opacity(1);
 
 					&:active {
-						background-color: darken($ui-bg-selected-color, 15%);
+						background-color: lighten($ui-bg-selected-color, 10%);
 						@include opacity(1);
 					}
 				}
 			}
 		}
 	}
+}
 
-	.disabled {
-		@include opacity(0.5);
-
-		.subfilter-disable-btn {
-			cursor: default;
-			color: lighten($ui-bg-selected-color, 10%);
-			background-color: $ui-bg-selected-color;
-		}
-	}
+.multiselect-button {
+	float: left;
 }
 
 .multiselect-suggest {
 	padding: 0 5px;
 	white-space: normal;
 	color: $font-alt-color;
-	background-color: $ui-bg-color;
+	background-color: $form-bg-color;
 
 	li {
 		display: block;
@@ -894,7 +981,7 @@ footer {
 	max-height: 400px;
 	overflow-y: auto;
 	@extend %webkit-scrollbar;
-	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
+	@include box-shadow(0 6px 10px 0 $action-shadow-color);
 }
 
 .suggest-found {
@@ -902,10 +989,6 @@ footer {
 }
 
 // Timeline
-.multiselect-button {
-	float: left;
-}
-
 .scrollbar {
 	position: relative;
 	margin: 0 auto;
@@ -919,8 +1002,8 @@ footer {
 
 .sublevel {
 	height: 22px;
-	border: 1px solid $form-disabled-bg-color;
-	background-color: $form-disabled-bg-color;
+	border: 1px solid $action-hover-color;
+	background-color: $action-hover-color;
 	margin: 5px 0;
 	@include border-radius(2px);
 	
@@ -938,7 +1021,7 @@ footer {
 	}
 
 	.btn-grey {
-		background-color: $ui-bg-color;
+		background-color: $btn-form-bg-color;
 		margin-top: -1px;
 	}
 }
@@ -967,14 +1050,6 @@ footer {
 	left: 28px;
 	height: 24px;
 	margin: 5px 0;
-
-	.arrow-left {
-		border-right-color: $font-alt-color;
-	}
-
-	.arrow-right {
-		border-left-color: $font-alt-color;
-	}
 }
 
 .bar {
@@ -988,22 +1063,29 @@ footer {
 .icon {
 	position: relative;
 	height: 22px;
-	background-color: $btn-form-bg-color;
-	cursor: move;
+	background-color: $form-bg-color;
+	border-color: $form-border-color;
 	@include border-radius(2px);
+	@include transition(background-color .2s ease-out);
 
 	&:hover {
 		background-color: $ui-hover-color;
 	}
 
+	&:focus {
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
+
 	&:active {
-		background-color: darken($ui-hover-color, 5%);
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
 	}
 
 	.center {
 		width: 22px;
 		height: 22px;
-		background: url(../img/icon-sprite.png) no-repeat center -121px;
+		background: url(../img/icon-sprite.svg) no-repeat -4px -799px;
 		margin: 0 auto;
 	}
 }
@@ -1150,13 +1232,16 @@ footer {
 			 &.center {
 			 	text-align: center;
 			 	vertical-align: middle;
-			 }
 
-			.btn-grey {
-				margin: 5px 0;
-				display: block;
-			}
+			 	.btn-grey {
+			 		margin: 3px 0;
+			 	}
+			 }
 		}
+	}
+
+	h4 {
+		margin-bottom: -5px;
 	}
 }
 
@@ -1166,9 +1251,8 @@ footer {
 
 .table-forms-separator {
 	display: inline-block;
-	padding: 0 0 5px 5px;
-	margin: 0 0 0 -5px;
-	border-bottom: 1px dashed $form-border-color;
+	padding: 5px;
+	border: 1px solid $table-border-color;
 }
 
 .drag-drop-area {
@@ -1177,7 +1261,7 @@ footer {
 
 .margin-top {
 	display: block;
-	margin: 0px 0 0 0;
+	margin: 4px 0 0 0;
 }
 
 .form-new-group {
@@ -1255,6 +1339,11 @@ input {
 		@extend %form-input-style;
 	}
 
+	&[type="file"] {
+		padding: 1px;
+		@extend %form-input-style;
+	}
+
 	&[type="checkbox"] {
 		@extend %form-check-radio-style;
 	}
@@ -1275,11 +1364,10 @@ input {
 }
 
 textarea {
-	width: 300px;
-	height: 50px;
-	padding: 5px 0 0 5px;
+	padding: 4px 5px;
 	overflow: auto;
 	@extend %form-input-style;
+	@extend %webkit-scrollbar;
 
 	&[disabled] {
 		@extend %form-disabled;
@@ -1296,8 +1384,10 @@ select {
 	padding: 3px 3px 3px 0;
 	background-color: $form-bg-color;
 	@extend %form-input-style;
+	@extend %webkit-scrollbar;
 
 	&.select-multiple {
+		padding: 4px 5px;
 		width: 300px;
 		height: auto;
 	}
@@ -1314,13 +1404,20 @@ select {
 }
 
 fieldset {
-	border: 1px solid lighten($form-border-color, 10%);
+	border: 1px solid $table-border-color;
 	padding: 0 10px 10px 15px;
 }
 
 legend {
 	margin-left: -5px;
 	padding: 0 5px 0 5px;
+	text-transform: $font-transform;
+	font-size: $font-h3-size;
+}
+
+.form-input-margin {
+	display: inline-block;
+	margin: 0 3px 0 0;
 }
 
 %form-check-radio-style {
@@ -1338,6 +1435,7 @@ legend {
 
 %form-input-height-padding {
 	padding: 4px 5px;
+	zoom: 1;
 }
 
 %form-input-style {
@@ -1346,6 +1444,8 @@ legend {
 	font-size: $font-form-size;
 	color: $font-color;
 	background-color: $form-bg-color;
+	outline: 0;
+	@include box-sizing(border-box);
 	@include transition(border-color .2s ease-out);
 
 	&:focus {
@@ -1355,361 +1455,219 @@ legend {
 
 button::-moz-focus-inner {
 	padding: 0;
+	border: 0;
+	vertical-align: middle;
 }
 
 button {
-	@include border-radius(2px);
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
 	font-family: $font-stack;
 	border: 1px solid $btn-bg-color;
 	padding: 0 11px;
 	min-height: 24px;
-	vertical-align: middle;
 	cursor: pointer;
+	outline: 0;
+	@include border-radius(2px);
 	@include transition(border-color, background-color .2s ease-out);
 
 	&:hover {
-		@extend %button-hover;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
 	&:active {
-		@extend %button-active;
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
+	}
+}
+
+.btn-alt {
+	color: $btn-alt-font-color;
+	background-color: $btn-alt-bg-color;
+
+	&:hover {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
-	&.btn-alt {
-		@extend button;
-		color: $btn-alt-font-color;
-		background-color: $btn-alt-bg-color;
-
-		&:hover {
-			@extend %button-hover;
-		}
-
-		&:active {
-			@extend %button-active;
-		}
+	&:focus {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
 
-	&.btn-conf {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@extend %button-hover;
-		}
-
-		&:active {
-			@extend %button-active;
-		}
+	&:active {
+		@include btn-hover-active($btn-font-color, $btn-bg-color);
 	}
+}
 
-	&.btn-max {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@extend %button-hover;
-		}
+.btn-grey {
+	color: $btn-form-font-color;
+	background-color: $btn-form-bg-color;
+	border-color: $btn-form-border-color;
+	vertical-align: top;
 
-		&:active {
-			@extend %button-active;
-		}
-	}
-
-	&.btn-min {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@extend %button-hover;
-		}
-
-		&:active {
-			@extend %button-active;
-		}
-	}
-
-	&.btn-add-fav {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@extend %button-hover;
-		}
-
-		&:active {
-			@extend %button-active;
-		}
-	}
-
-	&.btn-remove-fav {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@extend %button-hover;
-		}
-
-		&:active {
-			@extend %button-active;
-		}
-	}
-
-	&.btn-action {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@extend %button-hover;
-		}
-
-		&:active {
-			@extend %button-active;
-		}
-	}
-
-	&.btn-info {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@extend %button-hover;
-		}
-
-		&:active {
-			@extend %button-active;
-		}
-	}
-
-	&.btn-reset {
-		background: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px;
-		@extend %button-icon-size;
-		
-		&:hover {
-			@extend %button-hover;
-		}
-
-		&:active {
-			@extend %button-active;
-		}
-	}
-
-
-	&.btn-search {
-		background: darken($main-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
-		position: absolute;
-		border: none;
-		top: 7px;
-		right: 8px;
-		width: 24px;
-		min-height: 22px;
-		padding: 0;
-		@include opacity(0.75);
-		@include transition(opacity .2s ease-out);
-		
-		&:hover {
-			@extend %btn-search-hover-focus;
-		}
-
-		&:active {
-			@extend %btn-search-hover-focus;
-		}
-
-		&:focus {
-			@extend %btn-search-hover-focus;
-		}
-	}
-
-    &.btn-widget-action {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 3px -262px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-widget-collapse {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 2px -214px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-widget-expand {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat 2px -238px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-alarm-on {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -191px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-alarm-off {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -239px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-    &.btn-sound-on {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -216px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    }
-
-     &.btn-sound-off {
-    	border: 0;
-    	background: $ui-bg-color url(../img/icon-sprite.png) no-repeat -45px -264px;
-		@extend %button-widget-icon-size;
-		@include opacity(0.5);
-		@include transition(opacity .2s ease-out);
-
-		&:hover {
-			@extend %btn-widget-hover-active;
-		}
-
-		&:active {
-			@extend %btn-widget-hover-active;
-		}
-    } 
-
-	&.btn-grey {
+	&:hover {
 		color: $btn-form-font-color;
-		background-color: $btn-form-bg-color;
+		background-color: $ui-hover-color;
 		border-color: $btn-form-border-color;
-
-		&:hover {
-			color: $btn-form-hover-color;
-			background-color: $ui-hover-color;
-			border-color: $btn-form-border-color;
-		}
-
-		&:active {
-			color: $btn-form-font-color;
-			background-color: darken($ui-hover-color, 5%);
-		}
-
-		.arrow-left {
-			border-right-color: $btn-form-font-color;
-
-		}
-
-		.arrow-right {
-			border-left-color: $btn-form-font-color;
-
-		}
 	}
 
-	&.filter-trigger {
-		position: relative;
-		@include border-radius(2px 2px 0 0);
-		padding-right: 21px;
-		min-width: 94px;
+	&:focus {
+		color: $btn-form-font-color;
+		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
+	}
 
-		&.filter-active {
-			background-color: $ui-bg-color;
-			border: none;
-			color: $link-color;
-			@include box-shadow(0 -1px 1px 0 rgba(118,141,153,0.08));
+	&:active {
+		color: $btn-form-font-color;
+		background-color: $ui-hover-color;
+	}
+}
 
-			.arrow-up {
-				position: absolute;
-				top: 50%;
-				margin: 0 0 0 4px;
-				border-bottom-color: $link-color;
-			}
-		}
+.btn-link {
+	background-color: $transparent;
+	border: none;
+	color: $link-color;
+	font-size: inherit;
+	border-bottom: 1px dotted $link-color;
+	padding: 0;
+	min-height: inherit;
+	@include border-radius(0);
 
-		.arrow-down {
+	&:hover {
+		@extend .btn-link;
+	}
+
+	&:focus {
+		@extend .btn-link;
+	}
+
+	&:active {
+		@extend .btn-link;
+	}
+}
+
+.btn-search {
+	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
+	position: absolute;
+	border: none;
+	top: 7px;
+	right: 8px;
+	width: 24px;
+	min-height: 22px;
+	padding: 0;
+	@include opacity(0.75);
+	@include transition(opacity .2s ease-out);
+
+	&:hover {
+		@extend %btn-search-hover-focus;
+	}
+
+	&:active {
+		@extend %btn-search-hover-focus;
+	}
+
+	&:focus {
+		@extend %btn-search-hover-focus;
+	}
+}
+
+.filter-trigger {
+	position: relative;
+	padding-right: 21px;
+	min-width: 94px;
+	@include border-radius(2px 2px 0 0);
+
+	&.filter-active {
+		color: $link-color;
+		background-color: $ui-bg-color;
+		border: 1px solid $ui-border-color;
+		border-bottom: none;
+		margin-bottom: -1px;
+
+		.arrow-up {
 			position: absolute;
 			top: 50%;
 			margin: 0 0 0 4px;
-			border-top-color: $white;
+			border-bottom-color: $link-color;
 		}
+	}
+
+	.arrow-down {
+		position: absolute;
+		top: 50%;
+		margin: 0 0 0 4px;
+		border-top-color: $white;
 	}
 }
 
-%button-hover {
-	color: $btn-hover-color;
-	background-color: darken($btn-bg-color, 5%);
-	border-color: darken($btn-bg-color, 5%);
+$icon-btn: (
+	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
+	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
+	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
+	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
+	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -331px,
+	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px,
+	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -439px
+
+);
+
+@each $icon-btn, $bgimage in $icon-btn {
+    .btn-#{$icon-btn} {
+        background: $bgimage;
+        @extend %button-icon-size;
+    }
 }
 
-%button-active {
-	color: $btn-active-color;
-	background-color: darken($btn-bg-color, 17%);
-	border-color: darken($btn-bg-color, 17%);
+$icon-widget-btn: (
+	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -3px -652px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
+	wizard-action: url(../img/icon-sprite.svg) no-repeat -10px -622px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
+);
+
+@each $icon-widget-btn, $bgimage in $icon-widget-btn {
+    .btn-#{$icon-widget-btn} {
+        background: $bgimage;
+        @extend %btn-widget;
+
+        @if $icon-widget-btn == 'wizard-action' {
+        	height: 12px!important;
+        }
+    }
+}
+
+%btn-widget {
+	border: none;
+	width: 30px;
+	height: 28px;
+	min-height: 0;
+	padding: 0;
+	@include opacity(0.5);
+	@include transition(opacity .2s ease-out);
+
+	&:hover {
+		@extend %btn-widget-hover-active;
+	}
+
+	&:focus {
+		@extend %btn-widget-hover-active;
+	}
+
+	&:active {
+		@extend %btn-widget-hover-active;
+	}
 }
 
 %button-icon-size {
 	width: 24px;
 	height: 24px;
-	padding: 0;
-}
-
-%button-widget-icon-size {
-	width: 30px;
-	height: 28px;
 	padding: 0;
 }
 
@@ -1726,13 +1684,36 @@ button {
 	border-color: $form-disabled-border-color;
 }
 
+.disabled {
+	cursor: default !important;
+	@include opacity(0.4);
+
+	.subfilter-disable-btn {
+		cursor: default;
+		color: darken($ui-bg-selected-color, 15%);
+		background-color: $ui-bg-selected-color;
+
+		&:hover {
+			color: darken($ui-bg-selected-color, 15%);
+		}
+
+		&:focus {
+			color: darken($ui-bg-selected-color, 15%);
+		}
+
+		&:active {
+			color: darken($ui-bg-selected-color, 15%);
+		}
+	}
+}
+
 %btn-search-hover-focus {
-	background-color: darken($main-color, 5%);
+	background-color: darken($main-nav-bg-color, 5%);
 	@include opacity(1);
 }
 
 %btn-widget-hover-active {
-	background-color: $ui-bg-color;
+	background-color: $transparent;
 	@include opacity(1);
 }
 
@@ -1780,6 +1761,14 @@ button[disabled] {
 			&:hover {
 				background-color: $ui-hover-color;
 			}
+
+			&:focus {
+				background-color: $ui-hover-color;
+			}
+
+			&:active {
+				background-color: $ui-hover-color;
+			}
 		} 
 
 		&.ui-tabs-active:first-child {
@@ -1787,20 +1776,14 @@ button[disabled] {
 		}
 
 		&.ui-tabs-active {
-			//border-left: 1px solid $table-border-color;
-			//border-right: 1px solid $table-border-color;
 			a {
-				//padding: 8px 13px 11px 13px;
 				padding: 8px 13px 9px 13px;
 				font-weight: bold;
 				background-color: $ui-bg-color;
 				color: $font-color;
 				text-decoration: none;
 				cursor: default;
-				//border-top: 3px solid $primary-blue;
-				//border-top: 3px solid $main-color;
-				//border-bottom: 3px solid $white;
-				border-bottom: 3px solid $main-color;
+				border-bottom: 3px solid $ui-tab-bg-selected-color;
 			}
 		}
 	}
@@ -1812,7 +1795,7 @@ button[disabled] {
 }
 
 .help-icon {
-	background: url(../img/icon-sprite.png) no-repeat 0 -312px;
+	background: url(../img/icon-sprite.svg) no-repeat -6px -726px;
 	display: block;
 	position: absolute;
 	top: 0;
@@ -1830,7 +1813,7 @@ button[disabled] {
 .drag-icon {
 	margin-left: -9px;
 	cursor: move;
-	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
+	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
 
@@ -1844,7 +1827,7 @@ button[disabled] {
 	padding: 20px 28px;
 	vertical-align: top;
 	position: relative;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	border: 1px solid $ui-border-color;
 
 	h1 {
 		border: none;
@@ -1865,7 +1848,7 @@ button[disabled] {
 			padding: 4px 0 4px 28px;
 
 			&.setup-left-current {
-				border-left: 3px solid $main-color;
+				border-left: 3px solid $ui-tab-bg-selected-color;
 				color: $font-alt-color;
 				padding-left: 25px;
 			}
@@ -1884,7 +1867,7 @@ button[disabled] {
 	overflow-y: auto;
 
 	.list-table {
-		@include box-shadow(none);
+		border: none;
 	}
 
 	.table-forms-td-left {
@@ -1905,13 +1888,16 @@ button[disabled] {
 
 %webkit-scrollbar {
 	&::-webkit-scrollbar {
-		width: 6px;
+		width: 9px;
 	}
+
 	&::-webkit-scrollbar-track {
-		background-color: $form-disabled-bg-color;
+		background-color: $scrollbar-track-color;
 	}
+
 	&::-webkit-scrollbar-thumb {
-		background-color: $form-border-color;
+		background-color: $scrollbar-thumb-color;
+		border: 1px solid $scrollbar-track-color;
 	}
 }
 
@@ -1954,7 +1940,7 @@ button[disabled] {
 	width: 322px;
 	margin: 0 auto;
 	padding: 20px 28px 0 28px;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	border: 1px solid $ui-border-color;
 
 	h1 {
 		border: none;
@@ -2001,7 +1987,7 @@ button[disabled] {
 	margin-bottom: 25px;
 	width: 114px;
 	height: 30px;
-	background: url(../img/icon-sprite.png) no-repeat 0 -391px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
 }
 
 .signin-links {
@@ -2014,7 +2000,6 @@ button[disabled] {
 %signin-input {
 	padding: 10px 5px;
 	width: 100%;
-	@include box-sizing(border-box);
 }
 
 /* Dashboard */
@@ -2036,10 +2021,10 @@ button[disabled] {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background-color: $ui-bg-color;
-	@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
+	border: 1px solid $ui-border-color;
 
 	.list-table {
-		@include box-shadow(none);
+		border: none;
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -2055,6 +2040,12 @@ button[disabled] {
 				border-bottom: 1px solid $table-border-color;
 			}
 		}
+	}
+
+	.debug-output {
+		margin: 0 10px;
+		max-height: 300px;
+		border-color: $table-border-color;
 	}
 }
 
@@ -2077,6 +2068,11 @@ button[disabled] {
 	cursor: move;
 	position: relative;
 	padding: 8px 60px 8px 10px;
+	font-weight: bold;
+
+	h4 {
+		color: h4-widget-color($font-color);
+	}
 
 	ul {
 		position: absolute;
@@ -2110,7 +2106,8 @@ button[disabled] {
 	min-width: 166px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
-	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
+	border-bottom-color: darken($action-border-color, 1%);
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
 	li {
 		display: block;
@@ -2142,7 +2139,7 @@ button[disabled] {
 		}
 
 		&.selected {
-			background: url(../img/icon-sprite.png) no-repeat -46px -169px;
+			background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
 
 			&:hover {
 				background-color: $action-hover-color;
@@ -2185,10 +2182,10 @@ button[disabled] {
 	padding: 0 5px;
 	min-width: 16px;
 	color: $font-alt-color;
-	background-color: $ui-bg-color;
+	background-color: $form-bg-color;
 	border: 1px solid $action-border-color;
 	border-top: none;
-	@include box-shadow(0 6px 10px 0 rgba(118,141,153,0.3));
+	@include box-shadow(0 6px 10px 0 $action-shadow-color);
 
 	li {
 		display: block;
@@ -2212,10 +2209,11 @@ button[disabled] {
 	padding: 15px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
-	@include box-shadow(0 5px 20px 0 rgba(118,141,153,0.3));
+	border-bottom-color: darken($action-border-color, 1%);
+	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
 	.list-table {
-		@include box-shadow(none);
+		border: none;
 
 		th {
 			@extend %dashbrd-widget-td;
@@ -2256,14 +2254,14 @@ button[disabled] {
 	}
 
 	.dashbrd-widget-head {
-		margin: -15px -15px 6px -15px;
-		padding: 12px 30px 12px 15px;
+		margin: -10px -10px 6px -10px;
 	}
 
 	.maps-container {
 		max-height: 128px;
 		overflow-y: auto;
 		margin-left: -10px;
+		@extend %webkit-scrollbar;
 	}
 }
 
@@ -2277,6 +2275,17 @@ button[disabled] {
 	button {
 		margin: 0 0 0 14px;
 	}
+}
+
+.overlay-bg {
+	background-color: $white;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	@include opacity(0.35);
 }
 
 .pop-up {
@@ -2348,6 +2357,7 @@ button[disabled] {
 
 	.btn-grey {
 		border: none;
+		background-color: $transparent;
 	}
 }
 
@@ -2371,7 +2381,7 @@ button[disabled] {
 	text-align: center;
 
 	input[type="text"] {
-		width: 22px;
+		width: 32px;
 	}
 }
 
@@ -2385,35 +2395,17 @@ button[disabled] {
 	}
 }
 
-.notifications {
-	padding: 0;
-	max-width: 250px;
+/* Problem notification overlay */
+.notif {
+	width: 250px;
 
 	.dashbrd-widget-head {
-		margin: -2px 0 -7px 0;
-	}
-
-	h4 {
-		display: inline-block;
-	}
-
-	p {
-		margin: 0.35em 0 0 0;
-	}
-
-	tr {
-		td:first-child {
-			padding: 0;
-			width: 3px;
-		}
-	}
-
-	.dashbrd-widget-head {
+		margin: -11px 0 7px -9px;
+		padding: 0;
 
 		ul {
 			position: relative;
 			display: inline-block;
-			margin-left: 8px;
 
 			li {
 				float: none;
@@ -2422,6 +2414,50 @@ button[disabled] {
 		}
 	}
 
+}
+
+.notif-body {
+	max-height: 600px;
+	padding: 0 5px 0 0;
+	overflow-y: auto;
+	@extend %webkit-scrollbar;
+
+	h4 {
+		display: block;
+		max-width: 250px;
+		padding-bottom: 0.083em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	p {
+		margin: 0.25em 0 0 0;
+	}
+
+	li {
+		padding: 0 0 10px 19px;
+
+		&:last-child {
+			padding-bottom: 0;
+		}
+	}
+}
+
+.notif-indic {
+	width: 14px;
+	height: 14px;
+	float: left;
+	margin: 2px 0 0 -19px;
+	@include border-radius(2px);
+}
+
+.notif-indic-container {
+	//float: left;
+
+	.notif-indic {
+		//float: none;
+	}
 }
 
 /* Maps, Screens, Graphs */
@@ -2443,12 +2479,33 @@ button[disabled] {
 .dashed-border {
 
 	td {
-		border: 1px dashed $form-border-color;
+		border: 1px dashed $table-border-color;
 
 		td {
 			border: none;
 		}
 	}
+}
+
+/* Debug */
+.debug-output {
+	max-height: 600px;
+	overflow-y: auto;
+	padding: 11px;
+	margin: 0 13px;
+	background-color: $lighter-yellow;
+	border: 1px solid $ui-border-color;
+	@extend %webkit-scrollbar;
+}
+
+.btn-debug {
+	position: fixed;
+	bottom: 13px;
+	right: 13px;
+	z-index: 1000;
+	padding: 4px 11px;
+	background-color: rgba($body-bg-color,0.7);
+	@include border-radius(2px);
 }
 
 /* Alerts */
@@ -2484,37 +2541,64 @@ a.grey {
 	@extend .grey;
 }
 
+.status-container {
+	display: inline-block;
+	white-space: nowrap;
+	margin: 2px 3px 2px 0;
+
+	&:last-child {
+		margin: 0;
+	}
+
+	span {
+		@include border-radius(0);
+
+		&:only-child {
+			@include border-radius(2px)
+		}
+
+		&:first-child:not(:only-child) {
+			@include border-radius(2px 0 0 2px);
+		}
+
+		&:last-child:not(:only-child) {
+			@include border-radius(0 2px 2px 0);
+		}
+	}
+}
+
 .status-green {
-    border: 1px solid darken(desaturate($alt-green, 10%), 18%);
+    border: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	background-color: darken(desaturate($alt-green, 10%), 16%);
 	@extend %status;
 }
 
 .status-red {
-	border: 1px solid darken(desaturate($alt-red, 10%), 7%);
+	border: 1px solid darken(desaturate($alt-red, 10%), 9%);
 	background-color: darken(desaturate($alt-red, 10%), 5%);
 	@extend %status;
 }
 
 .status-grey {
-	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 10%);
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
 	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
 	@extend %status;
 }
 
 .status-yellow {
-	border: 1px solid darken(desaturate($alt-yellow, 10%), 18%);
+	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
 	background-color: darken(desaturate($alt-yellow, 10%), 16%);
 	@extend %status;
 }
 
 %status {
-	padding: 0 3px;
+	padding: 2px 3px 1px 3px;
 	color: $white;
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
-	min-width: 1em;
+	min-width: 0.7em;
+	line-height: 1em;
 	display: inline-block;
 	cursor: default;
 	@include border-radius(2px); 
@@ -2654,9 +2738,7 @@ td.disaster-bg {
 	}
 
 	ul {
-		//margin: 8px 0 0 0;
 		border-top-width: 1px;
-		//border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
@@ -2696,10 +2778,9 @@ td.disaster-bg {
 	width: 100%;
 	padding: 7px 5px;
 	text-align: center;
-	background-color: $light-yellow;
-	color: $font-color;
-	border-top: 1px solid $yellow;
-	@include box-shadow(-1px 0 2px 0 rgba(118,141,153,0.15));
+	color: darken($alt-yellow,45%);
+	background-color: $alt-yellow;
+	border-top: 1px solid darken($alt-yellow,5%);
 }
 
 .msg-global {
@@ -2726,7 +2807,16 @@ td.disaster-bg {
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
 
+	&:before {
+		content:"\00d7";
+	}
+
 	&:hover {
+		@include opacity(1);
+		text-decoration: none;
+	}
+
+	&:focus {
 		@include opacity(1);
 		text-decoration: none;
 	}
@@ -2750,14 +2840,6 @@ a.overlay-close-btn {
 	@extend .overlay-close-btn; 
 }
 
-.form-remove-btn {
-	@extend %close-icon;
-}
-
-a.form-remove-btn {
-	@extend .form-remove-btn;
-}
-
 .subfilter-disable-btn {
 	width: 18px;
 	height: 18px;
@@ -2766,18 +2848,22 @@ a.form-remove-btn {
 	position: absolute;
 	top: 0;
 	right: -12px;
-	color: $white;
+	color: darken($ui-bg-selected-color, 40%);
 	background-color: $ui-bg-selected-color;
 	@extend %close-icon;
 	@include border-radius(2px);
 	@include opacity(1);
 
 	&:hover {
-		background-color: darken($ui-bg-selected-color, 5%);
+		color: darken($ui-bg-selected-color, 65%);
+	}
+
+	&:focus {
+		color: darken($ui-bg-selected-color, 55%);
 	}
 
 	&:active {
-		background-color: darken($ui-bg-selected-color, 10%);
+		color: darken($ui-bg-selected-color, 55%);
 	}
 }
 
@@ -2804,14 +2890,37 @@ a.form-remove-btn {
 	}
 }
 
-.preloader {
-	background: url(../img/preload.gif) 0 0;
-	width: 32px;
-	height: 32px;
-	margin: 0 auto;
+.input-color-picker {
+	position: relative;
+	display: inline-block;
+
+	div {
+		position: absolute;
+		top: 2px;
+		left: 2px;
+		width: 20px;
+		height: 20px;
+	}
+
+	input[type="text"] {
+		padding-left: 25px;
+	}
 }
 
-// IMAGE MAPS
+.preloader {
+	border-radius: 50%;
+	width: 24px;
+	height: 24px;
+	margin: 0 auto;
+	border: 3px solid #ccd5d9;
+	border-bottom: 3px solid #0275b8;
+	animation: load 0.8s infinite linear;
+}
+
+@keyframes load {
+	to { @include rotate(360); }
+}
+
 $browsers: (
 	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
 	ff: url(../img/browser-sprite.png) no-repeat -66px 0px,

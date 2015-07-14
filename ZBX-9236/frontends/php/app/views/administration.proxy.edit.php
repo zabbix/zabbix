@@ -21,49 +21,31 @@
 
 $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
-$proxyWidget = (new CWidget())->setTitle(_('Proxies'));
+$widget = (new CWidget())->setTitle(_('Proxies'));
 
-// create form
-$proxyForm = new CForm();
-$proxyForm->setAttribute('id', 'proxyForm');
-$proxyForm->addVar('proxyid', $data['proxyid']);
+$proxyForm = (new CForm())
+	->setId('proxyForm')
+	->addVar('proxyid', $data['proxyid']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
 }
 
-// create form list
-$proxyFormList = new CFormList('proxyFormList');
-$nameTextBox = new CTextBox('host', $data['host'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$proxyFormList->addRow(_('Proxy name'), $nameTextBox);
-
-// append status to form list
-$proxyFormList->addRow(_('Proxy mode'), new CComboBox('status', $data['status'], null, [
-	HOST_STATUS_PROXY_ACTIVE => _('Active'),
-	HOST_STATUS_PROXY_PASSIVE => _('Passive')
-]));
-
-$interfaceTable = new CTable(null, 'formElementTable');
-$interfaceTable->addRow([
-	_('IP address'),
-	_('DNS name'),
-	_('Connect to'),
-	_('Port')
-]);
-
-$connectByComboBox = new CRadioButtonList('useip', $data['useip']);
-$connectByComboBox->addValue(_('IP'), 1);
-$connectByComboBox->addValue(_('DNS'), 0);
-$connectByComboBox->useJQueryStyle();
-
-$interfaceTable->addRow([
-	new CTextBox('ip', $data['ip'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
-	new CTextBox('dns', $data['dns'], ZBX_TEXTBOX_SMALL_SIZE, false, 64),
-	$connectByComboBox,
-	new CTextBox('port', $data['port'], 18, false, 64)
-]);
-$proxyFormList->addRow(_('Interface'), new CDiv($interfaceTable, 'objectgroup inlineblock border_dotted ui-corner-all'),
-	$data['status'] != HOST_STATUS_PROXY_PASSIVE);
+$interfaceTable = (new CTable())
+	->addClass('formElementTable')
+	->setHeader([
+		_('IP address'),
+		_('DNS name'),
+		_('Connect to'),
+		_('Port')
+	])
+	->addRow([
+		(new CTextBox('ip', $data['ip'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
+		(new CTextBox('dns', $data['dns'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
+		(new CRadioButtonList('useip', $data['useip']))
+			->addValue(_('IP'), 1)
+			->addValue(_('DNS'), 0),
+		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+	]);
 
 // append hosts to form list
 $hostsTweenBox = new CTweenBox($proxyForm, 'proxy_hostids', $data['proxy_hostids']);
@@ -82,46 +64,48 @@ foreach ($data['all_hosts'] as $host) {
 		);
 	}
 }
-$proxyFormList->addRow(_('Hosts'), $hostsTweenBox->get(_('Proxy hosts'), _('Other hosts')));
-$proxyFormList->addRow(_('Description'), new CTextArea('description', $data['description']));
+
+$proxyFormList = (new CFormList('proxyFormList'))
+	->addRow(_('Proxy name'),
+		(new CTextBox('host', $data['host'], false, 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Proxy mode'), new CComboBox('status', $data['status'], null, [
+		HOST_STATUS_PROXY_ACTIVE => _('Active'),
+		HOST_STATUS_PROXY_PASSIVE => _('Passive')
+	]))
+	->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
+	->addRow(_('Hosts'), $hostsTweenBox->get(_('Proxy hosts'), _('Other hosts')))
+	->addRow(_('Description'),
+		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 // append tabs to form
-$proxyTab = new CTabView();
-$proxyTab->addTab('proxyTab', _('Proxy'), $proxyFormList);
+$proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxyFormList);
 
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
-$cancelButton->setAttribute('id', 'cancel');
 
 if ($data['proxyid'] == 0) {
-	$addButton = new CSubmitButton(_('Add'), 'action', 'proxy.create');
-	$addButton->setAttribute('id', 'add');
-
 	$proxyTab->setFooter(makeFormFooter(
-		$addButton,
+		new CSubmitButton(_('Add'), 'action', 'proxy.create'),
 		[$cancelButton]
 	));
 }
 else {
-	$updateButton = new CSubmitButton(_('Update'), 'action', 'proxy.update');
-	$updateButton->setAttribute('id', 'update');
-	$cloneButton = new CSimpleButton(_('Clone'));
-	$cloneButton->setAttribute('id', 'clone');
-	$deleteButton = new CRedirectButton(_('Delete'),
-		'zabbix.php?action=proxy.delete&sid='.$data['sid'].'&proxyids[]='.$data['proxyid'],
-		_('Delete proxy?')
-	);
-	$deleteButton->setAttribute('id', 'delete');
-
 	$proxyTab->setFooter(makeFormFooter(
-		$updateButton,
+		new CSubmitButton(_('Update'), 'action', 'proxy.update'),
 		[
-			$cloneButton,
-			$deleteButton,
+			(new CSimpleButton(_('Clone')))->setId('clone'),
+			new CRedirectButton(_('Delete'),
+				'zabbix.php?action=proxy.delete&sid='.$data['sid'].'&proxyids[]='.$data['proxyid'],
+				_('Delete proxy?')
+			),
 			$cancelButton
 		]
 	));
 }
 
 $proxyForm->addItem($proxyTab);
-$proxyWidget->addItem($proxyForm)->show();
+$widget->addItem($proxyForm)->show();

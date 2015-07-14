@@ -1,35 +1,37 @@
 <script type="text/x-jquery-tmpl" id="hostInterfaceRow">
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
-	<td class="interface-drag-control"></td>
+	<td class="interface-drag-control <?= ZBX_STYLE_TD_DRAG_ICON ?>">
+		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+	</td>
 	<td class="interface-ip">
-		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}" />
-		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}" />
-		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}" />
-		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" maxlength="64" value="#{iface.ip}" />
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}">
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}">
+		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
+		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_IP_WIDTH ?>px" maxlength="64" value="#{iface.ip}">
 		<div class="interface-bulk">
-			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk} />
+			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
 			<label for="interfaces[#{iface.interfaceid}][bulk]"><?= _('Use bulk requests') ?></label>
 		</div>
 	</td>
 	<td class="interface-dns">
-		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" maxlength="64" value="#{iface.dns}" />
+		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_DNS_WIDTH ?>px" maxlength="64" value="#{iface.dns}">
 	</td>
 	<td class="interface-connect-to">
 		<div class="jqueryinputset radioset">
-			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip} />
-			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns} />
+			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip}>
+			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns}>
 			<label for="radio_ip_#{iface.interfaceid}"><?= _('IP') ?></label><label for="radio_dns_#{iface.interfaceid}"><?= _('DNS') ?></label>
 		</div>
 	</td>
 	<td class="interface-port">
-		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" maxlength="64" value="#{iface.port}" />
+		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_PORT_WIDTH ?>px" maxlength="64" value="#{iface.port}">
 	</td>
 	<td class="interface-default">
-		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}" />
+		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
 	<td class="interface-control">
-		<button type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" class="button link_menu remove" #{*attrs.disabled}><?= _('Remove') ?></button>
+		<button class="<?= ZBX_STYLE_BTN_LINK ?> remove" type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" #{*attrs.disabled}><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
@@ -122,32 +124,35 @@
 		}
 
 		function addDraggableIcon(domElement) {
-			domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s move"></span>');
 			domElement.draggable({
-				helper: 'clone',
-				handle: 'span.ui-icon-arrowthick-2-n-s',
+				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				revert: 'invalid',
+				start: function(event, ui) {
+					jQuery(this).css({'z-index': '1000'})
+				},
 				stop: function(event, ui) {
 					var hostInterfaceId = jQuery(this).data('interfaceid');
 					resetMainInterfaces();
 					resetUseipInterface(hostInterfaceId)
+
+					jQuery(this).css({'z-index': ''})
 				}
 			});
 		}
 
 		function addNotDraggableIcon(domElement) {
-			domElement.children().first().append('<span class="ui-icon ui-icon-arrowthick-2-n-s state-disabled"></span>');
-			jQuery('.ui-icon', domElement).hover(
-				function (event) {
-					jQuery('<div>' + <?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?> + '</div>')
-						.css({position: 'absolute', opacity: 1, padding: '2px'})
-						.addClass('ui-state-highlight')
-						.appendTo(event.target.parentNode);
-				},
-				function (event) {
-					jQuery(event.target).next().remove();
-				}
-			)
+			jQuery('td.<?= ZBX_STYLE_TD_DRAG_ICON ?> div.<?= ZBX_STYLE_DRAG_ICON ?>', domElement)
+				.addClass('<?= ZBX_STYLE_DISABLED ?>')
+				.hover(
+					function (event) {
+						hintBox.showHint(event, this,
+							<?= CJs::encodeJson(_('Interface is used by items that require this type of the interface.')) ?>
+						);
+					},
+					function (event) {
+						hintBox.hideHint(event, this);
+					}
+				);
 		}
 
 		function getDomElementsAttrsForInterface(hostInterface) {
@@ -340,10 +345,10 @@
 		jQuery('#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces').parent().droppable({
 			tolerance: 'pointer',
 			drop: function(event, ui) {
-				var hostInterfaceTypeName = jQuery('.formElementTable', this).data('type'),
+				var hostInterfaceTypeName = jQuery(this).data('type'),
 					hostInterfaceId = ui.draggable.data('interfaceid');
 
-				ui.helper.remove();
+				ui.helper.css({'left': '', 'top': ''});
 
 				if (getHostInterfaceNumericType(hostInterfaceTypeName) == <?= INTERFACE_TYPE_SNMP ?>) {
 					if (jQuery('.interface-bulk', jQuery('#hostInterfaceRow_' + hostInterfaceId)).length == 0) {
@@ -379,13 +384,11 @@
 			},
 			activate: function(event, ui) {
 				if (!jQuery(this).find(ui.draggable).length) {
-					jQuery(this).addClass('dropArea');
-					jQuery('span.dragHelpText', this).toggle();
+					jQuery(this).addClass('<?= ZBX_STYLE_DRAG_DROP_AREA ?>');
 				}
 			},
 			deactivate: function(event, ui) {
-				jQuery(this).removeClass('dropArea');
-				jQuery('span.dragHelpText', this).toggle(false);
+				jQuery(this).removeClass('<?= ZBX_STYLE_DRAG_DROP_AREA ?>');
 			}
 		});
 

@@ -13,12 +13,14 @@
         <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
         <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileColor" content="#d40000">
 	</head>
 <body>
 	<header role="banner">
 		<div class="nav" role="navigation">
 			<div class="top-nav-container">
-			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><li><a href="" class="top-nav-print" title="Print"></a></li><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -73,6 +75,13 @@
 		<div class="dashbrd-widget-head">
 		<h4>Status of Zabbix</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
 		</div>
+		<pre class="debug-output">In computing, a stack trace (also called stack backtrace[1] or stack traceback[2]) is a report of the active stack frames at a certain point in time during the execution of a program. When a program is run, memory is dynamically allocated in commonly two places; the stack and the heap. Memory is contiguously allocated on a stack but not on a heap, thus reflective of their names. Stack also refers to a programming construct, thus to differentiate it, this stack is referred as the program's runtime stack. Technically, once a block of memory has been allocated on the stack, it cannot be easily removed as there can be other blocks of memory that were allocated before it. Each time a function is called in a program, a block of memory is allocated on top of the runtime stack called the activation record. At a high level, an activation record allocates memory for the function's parameters and local variables declared in the function.
+
+		Programmers commonly use stack tracing during interactive and post-mortem debugging. End-users may see a stack trace displayed as part of an error message, which the user can then report to a programmer. A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.</pre>
 		<table class="list-table">
 		<thead>
 		<tr>
@@ -83,7 +92,7 @@
 		</thead>
 		<tbody>
 			<tr>
-				<td>Zabbix server is running</td><td><span class="green">Yes</span></td><td>Localhost: 10051</td>
+				<td><pre>Zabbix server is running</pre></td><td><span class="green">Yes</span></td><td>Localhost: 10051</td>
 			</tr>
 			<tr>
 				<td>Number of hosts (enabled/disabled/templates)</td><td>25</td><td><span class="green">2</span>/<span class="red">0</span>/<span class="grey">23</span></td>
@@ -197,7 +206,7 @@
 	</ul>
 
 	<div class="overlay-dialogue" style="top: 520px; left: 700px">
-	<span class="overlay-close-btn">&times;</span>
+	<span class="overlay-close-btn"></span>
 		<table class="list-table">
 		<thead>
 		<tr>
@@ -219,66 +228,127 @@
 		</tbody>
 		</table>
 	</div>
-<div class="preloader"></div>
+
 	</div>
 	<div class="footer">
 	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
 	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
 	</div>
+
+	<pre class="debug-output">In computing, a stack trace (also called stack backtrace[1] or stack traceback[2]) is a report of the active stack frames at a certain point in time during the execution of a program. When a program is run, memory is dynamically allocated in commonly two places; the stack and the heap. Memory is contiguously allocated on a stack but not on a heap, thus reflective of their names. Stack also refers to a programming construct, thus to differentiate it, this stack is referred as the program's runtime stack. Technically, once a block of memory has been allocated on the stack, it cannot be easily removed as there can be other blocks of memory that were allocated before it. Each time a function is called in a program, a block of memory is allocated on top of the runtime stack called the activation record. At a high level, an activation record allocates memory for the function's parameters and local variables declared in the function.
+
+		Programmers commonly use stack tracing during interactive and post-mortem debugging. End-users may see a stack trace displayed as part of an error message, which the user can then report to a programmer. A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack traceA stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack traceA stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace.
+		A stack trace allows tracking the sequence of nested functions called - up to the point where the stack trace is generated. In a post-mortem scenario this extends up to the function where the failure occurred (but was not necessarily caused). Sibling function calls do not appear in a stack trace</pre>
+
 	<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
 
-	<div id="" class="overlay-dialogue notifications" style="top: 128px; right: 13px">
-	<span class="overlay-close-btn">&times;</span>
+	<div id="" class="overlay-dialogue notif" style="top: 128px; right: 13px">
+	<span class="overlay-close-btn"></span>
 	<div class="dashbrd-widget-head">
-	<h4>Notifications</h4><ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
-
-	<table class="list-table">
-	<tr>
-	<td class="disaster-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="high-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="average-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="warning-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="normal-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="info-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	<tr>
-	<td class="na-bg"></td>
-	<td><h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
-	<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
-	<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p></td>
-	</tr>
-	</table>
+	<ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
+	<ul class="notif-body">
+		<li><div class="notif-indic disaster-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic high-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic average-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic warning-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+	</ul>
 	</div>
-<!--
-<div id="zbx_messages" class="messagecontainer ui-draggable" style="opacity: 0.9; top: 104px;"><div class="header"><h3 class="headertext move">Messages</h3><div class="controls"><ul class="" style="float: right;"><li class="linear"><div title="Snooze" class="iconsnooze menu_icon shadow"></div></li><li class="linear"><div title="Mute/Unmute" class="iconsound menu_icon shadow"></div></li><li class="linear"><div title="Clear" class="iconclose menu_icon shadow"></div></li></ul></div></div><ul class=""><li class="listItem"><div class="message" style="background-color: rgb(170, 255, 170);"><div class="messagebox"><span class="title">Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></span><br><span class="body">Details: <a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></span><br><span class="body">Date: <b><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></b></span></div></div></li></ul></div>
--->
+
+<div style="top: 128px; left: 1400px" class="overlay-dialogue"><span class="overlay-close-btn"></span>
+	<ul class="notif-body">
+		</li>
+		<li><div class="notif-indic na-bg"></div>
+		<h4>Not classified</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic info-bg"></div>
+		<h4>Information</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic warning-bg"></div>
+		<h4>Warning</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic average-bg"></div>
+		<h4>Average</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic high-bg"></div>
+		<h4>High</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic disaster-bg"></div>
+		<h4>Disaster</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic-container">
+		<div class="notif-indic normal-bg"></div>
+		<div class="notif-indic na-bg"></div>
+		<div class="notif-indic info-bg"></div>
+		<div class="notif-indic warning-bg"></div>
+		<div class="notif-indic average-bg"></div
+		><div class="notif-indic high-bg"></div>
+		<div class="notif-indic disaster-bg"></div>
+		</div>
+		<h4>Age less then 30 m</h4>
+		</li>
+	</ul>
+</div>
+
+<div class="btn-debug"><a href="">Hide Debug</a></div>
 </body>
 </html>

@@ -20,23 +20,25 @@
 
 
 function getSeverityStyle($severity, $type = true) {
-	$styles = [
-		TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG,
-		TRIGGER_SEVERITY_HIGH => ZBX_STYLE_HIGH_BG,
-		TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
-		TRIGGER_SEVERITY_WARNING => ZBX_STYLE_WARNING_BG,
-		TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG
-	];
-
 	if (!$type) {
 		return ZBX_STYLE_NORMAL_BG;
 	}
-	elseif (isset($styles[$severity])) {
-		return $styles[$severity];
-	}
-	else {
-		return '';
+
+	switch ($severity) {
+		case TRIGGER_SEVERITY_DISASTER:
+			return ZBX_STYLE_DISASTER_BG;
+		case TRIGGER_SEVERITY_HIGH:
+			return ZBX_STYLE_HIGH_BG;
+		case TRIGGER_SEVERITY_AVERAGE:
+			return ZBX_STYLE_AVERAGE_BG;
+		case TRIGGER_SEVERITY_WARNING:
+			return ZBX_STYLE_WARNING_BG;
+		case TRIGGER_SEVERITY_INFORMATION:
+			return ZBX_STYLE_INFO_BG;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return ZBX_STYLE_NA_BG;
+		default:
+			return null;
 	}
 }
 
@@ -639,22 +641,20 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 						}
 
 						if ($functionData['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $functionData['type'] == ITEM_TYPE_HTTPTEST) {
-							$link = new CSpan($functionData['host'].':'.$functionData['key_'], $style);
+							$link = (new CSpan($functionData['host'].':'.$functionData['key_']))->addClass($style);
 						}
 						elseif ($functionData['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-							$link = new CLink(
-								$functionData['host'].':'.$functionData['key_'],
-								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].'&parent_discoveryid='.
-									$trigger['discoveryRuleid'],
-								ZBX_STYLE_LINK_ALT.' '.$style
-							);
+							$link = (new CLink($functionData['host'].':'.$functionData['key_'],
+								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].
+								'&parent_discoveryid='.$trigger['discoveryRuleid']))
+								->addClass(ZBX_STYLE_LINK_ALT)
+								->addClass($style);
 						}
 						else {
-							$link = new CLink(
-								$functionData['host'].':'.$functionData['key_'],
-								'items.php?form=update&itemid='.$functionData['itemid'],
-								ZBX_STYLE_LINK_ALT.' '.$style
-							);
+							$link = (new CLink($functionData['host'].':'.$functionData['key_'],
+								'items.php?form=update&itemid='.$functionData['itemid']))
+								->addClass(ZBX_STYLE_LINK_ALT)
+								->addClass($style);
 						}
 
 						$expressionExpanded[] = ['{', $link,'.', bold($functionData['function'].'('), $functionData['parameter'], bold(')'), '}'];
@@ -667,7 +667,7 @@ function explode_exp($expressionCompressed, $html = false, $resolveMacro = false
 
 			if ($error) {
 				if ($html) {
-					$expressionExpanded[] = new CSpan('*ERROR*', 'on');
+					$expressionExpanded[] = (new CSpan('*ERROR*'))->addClass('on');
 				}
 				else {
 					$expressionExpanded .= '*ERROR*';
@@ -771,16 +771,16 @@ function triggerExpression($trigger, $html = false) {
 					}
 
 					if ($function_data['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $function_data['type'] == ITEM_TYPE_HTTPTEST) {
-						$link = new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_']), $style);
+						$link = (new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_'])))->addClass($style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-							$trigger['discoveryRuleid'], $style);
+							$trigger['discoveryRuleid']))->addClass($style);
 					}
 					else {
-						$link = new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
-							'items.php?form=update&itemid='.$function_data['itemid'], $style);
+						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+							'items.php?form=update&itemid='.$function_data['itemid']))->addClass($style);
 					}
 					array_push(
 						$exp,
@@ -1115,7 +1115,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		foreach ($hostNames as $hostId => $hostName) {
-			$name = new CSpan($hostName, ZBX_STYLE_LINK_ACTION.' link_menu');
+			$name = (new CSpan($hostName))->addClass(ZBX_STYLE_LINK_ACTION);
 			$name->setMenuPopup(CMenuPopupHelper::getHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
@@ -1155,10 +1155,10 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 
 	if ($trigger) {
 		$style = 'cursor: pointer; ';
+		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
 
 		// problem trigger
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$css = getSeverityStyle($trigger['priority']);
 			$ack = null;
 
 			if ($config['event_ack_enable'] == 1) {
@@ -1183,18 +1183,14 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 				}
 			}
 		}
-		// ok trigger
-		else {
-			$css = 'normal';
-		}
 
 		// dependency: triggers on which depends this
 		$triggerId = empty($trigger['triggerid']) ? 0 : $trigger['triggerid'];
 
 		// trigger dependency DOWN
-		$dependencyTable = new CTableInfo();
-		$dependencyTable->setAttribute('style', 'width: 200px;');
-		$dependencyTable->addRow(bold(_('Depends on').':'));
+		$dependencyTable = (new CTableInfo())
+			->setAttribute('style', 'width: 200px;')
+			->addRow(bold(_('Depends on').':'));
 
 		$isDependencyFound = false;
 		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_down='.zbx_dbstr($triggerId));
@@ -1204,17 +1200,17 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = new CImg('images/general/arrow_down2.png', 'DEP_DOWN');
-			$icon->setAttribute('style', 'vertical-align: middle; border: 0px;');
-			$icon->setHint($dependencyTable, '', false);
+			$icon = (new CImg('images/general/arrow_down2.png', 'DEP_DOWN'))
+				->setAttribute('style', 'vertical-align: middle; border: 0px;')
+				->setHint($dependencyTable, '', false);
 
 			$desc[] = $icon;
 		}
 
 		// trigger dependency UP
-		$dependencyTable = new CTableInfo();
-		$dependencyTable->setAttribute('style', 'width: 200px;');
-		$dependencyTable->addRow(bold(_('Dependent').':'));
+		$dependencyTable = (new CTableInfo())
+			->setAttribute('style', 'width: 200px;')
+			->addRow(bold(_('Dependent').':'));
 
 		$isDependencyFound = false;
 		$dbDependencies = DBselect('SELECT td.* FROM trigger_depends td WHERE td.triggerid_up='.zbx_dbstr($triggerId));
@@ -1224,9 +1220,9 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = new CImg('images/general/arrow_up2.png', 'DEP_UP');
-			$icon->setAttribute('style', 'vertical-align: middle; border: none;');
-			$icon->setHint($dependencyTable, '', false);
+			$icon = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
+				->setAttribute('style', 'vertical-align: middle; border: none;')
+				->setHint($dependencyTable, '', false);
 
 			$desc[] = $icon;
 		}
@@ -1449,24 +1445,28 @@ function make_trigger_details($trigger) {
 	}
 	array_pop($hostNames);
 
-	$table = new CTableInfo();
-	$table->addRow([
-		new CCol(_n('Host', 'Hosts', count($hosts))),
-		new CCol($hostNames)
-	]);
-	$table->addRow([
-		new CCol(_('Trigger')),
-		new CCol(CMacrosResolverHelper::resolveTriggerName($trigger))
-	]);
-	$table->addRow([_('Severity'), getSeverityCell($trigger['priority'], $config)]);
-	$table->addRow([
-		new CCol(_('Expression')),
-		new CCol(explode_exp($trigger['expression'], true, true))
-	]);
-	$table->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
-		? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')]);
-	$table->addRow([_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
-		? (new CCol(_('No')))->addCLass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))]);
+	$table = (new CTableInfo())
+		->addRow([
+			new CCol(_n('Host', 'Hosts', count($hosts))),
+			new CCol($hostNames)
+		])
+		->addRow([
+			new CCol(_('Trigger')),
+			new CCol(CMacrosResolverHelper::resolveTriggerName($trigger))
+		])
+		->addRow([
+			_('Severity'),
+			getSeverityCell($trigger['priority'], $config)
+		])
+		->addRow([
+			new CCol(_('Expression')),
+			new CCol(explode_exp($trigger['expression'], true, true))
+		])
+		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
+			? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')])
+		->addRow([_('Disabled'), ((TRIGGER_STATUS_ENABLED == $trigger['status'])
+			? (new CCol(_('No')))->addClass(ZBX_STYLE_GREEN) : (new CCol(_('Yes')))->addClass(ZBX_STYLE_RED))
+		]);
 
 	return $table;
 }
@@ -1561,8 +1561,8 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 					$expressionId = 'expr_'.$element['id'];
 
 					$url = new CSpan($element['expression'], 'link');
-					$url->setAttribute('id', $expressionId);
-					$url->setAttribute('onclick', 'javascript: copy_expression("'.$expressionId.'");');
+					$url->setId($expressionId);
+					$url->onClick('javascript: copy_expression("'.$expressionId.'");');
 				}
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;

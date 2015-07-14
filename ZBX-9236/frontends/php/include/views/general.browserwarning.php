@@ -25,7 +25,7 @@
 	<meta name="Author" content="Zabbix SIA" />
 	<meta charset="utf-8" />
 	<link rel="shortcut icon" href="images/general/zabbix.ico" />
-	<link rel="stylesheet" type="text/css" href="styles/zabbix.css" />
+	<link rel="stylesheet" type="text/css" href="styles/<?= ZBX_DEFAULT_THEME ?>.css" />
 </head>
 <body>
 	<div class="<?= ZBX_STYLE_ARTICLE ?>">
@@ -62,7 +62,7 @@
 	</div>
 	<div class="<?= ZBX_STYLE_FOOTER ?>">
 		<a class="logo" target="_blank" href="http://www.zabbix.com"></a>
-		&copy; 2001&ndash;2015, <a target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
+		&copy; 2001&ndash;2015, <a class="<?= ZBX_STYLE_GREY ?> <?= ZBX_STYLE_LINK_ALT ?>" target="_blank" href="http://www.zabbix.com/">Zabbix SIA</a>
 	</div>
 </body>
 </html>

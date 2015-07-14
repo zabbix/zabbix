@@ -30,10 +30,15 @@ setlocale(LC_CTYPE, [
 require_once dirname(__FILE__).'/classes/core/Z.php';
 
 try {
-	Z::getInstance()->run();
+	Z::getInstance()->run(ZBase::EXEC_MODE_DEFAULT);
 }
 catch (DBException $e) {
-	(new CView('general.warning', ['header' => 'Database error', 'messages' => [$e->getMessage()]]))->render();
+	(new CView('general.warning', [
+		'header' => 'Database error',
+		'messages' => [$e->getMessage()],
+		'theme' => ZBX_DEFAULT_THEME
+	]))->render();
+
 	exit;
 }
 catch (ConfigFileException $e) {
@@ -43,13 +48,22 @@ catch (ConfigFileException $e) {
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:
-			(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))->
-				render();
+			(new CView('general.warning', [
+				'header' => 'Configuration file error',
+				'messages' => [$e->getMessage()],
+				'theme' => ZBX_DEFAULT_THEME
+			]))->render();
+
 			exit;
 	}
 }
 catch (Exception $e) {
-	(new CView('general.warning', ['header' => $e->getMessage(), 'messages' => []]))->render();
+	(new CView('general.warning', [
+		'header' => $e->getMessage(),
+		'messages' => [],
+		'theme' => ZBX_DEFAULT_THEME
+	]))->render();
+
 	exit;
 }
 

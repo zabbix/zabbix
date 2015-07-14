@@ -26,7 +26,7 @@ $scriptForm = new CForm();
 $scriptTab = new CTabView();
 $scriptTab->addTab('scriptTab', _s(
 	'Result of "%s"', $this->data['info']['name']),
-	new CSpan($this->data['message'], 'pre fixedfont')
+	(new CSpan($this->data['message']))->addClass('pre')->addClass('fixedfont')
 );
 $scriptForm->addItem($scriptTab);
 

@@ -25,10 +25,12 @@ class CFormList extends CList {
 	protected $formInputs = ['ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox'];
 
 	public function __construct($id = null) {
-		parent::__construct([], 'table-forms');
+		parent::__construct();
+
+		$this->addClass('table-forms');
 
 		if ($id) {
-			$this->setAttribute('id', zbx_formatDomId($id));
+			$this->setId(zbx_formatDomId($id));
 		}
 	}
 
@@ -48,7 +50,7 @@ class CFormList extends CList {
 			}
 		}
 
-		$label = new CLabel($term, $input_id);
+		$label = is_object($term) ? $term : new CLabel($term, $input_id);
 
 		$defaultClass = $hidden ? ZBX_STYLE_HIDDEN : null;
 
@@ -61,26 +63,30 @@ class CFormList extends CList {
 
 		if ($description === null) {
 			$this->addItem([
-				new CDiv(SPACE, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-				new CDiv($label, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
+				(new CDiv(SPACE))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv($label))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
 		else {
 			$this->addItem([
-				new CDiv($label, ZBX_STYLE_TABLE_FORMS_TD_LEFT),
-				new CDiv($description, ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
+				(new CDiv($label))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv($description))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
 				$class, $id);
 		}
+
+		return $this;
 	}
 
-	public function addInfo($text, $label = null) {
+	public function addInfo($text) {
 		$this->addItem(
 			[
-				new CDiv($label ? $label : _('Info'), 'dt right listInfoLabel'),
-				new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText')
-			],
-			'formrow listInfo'
+				(new CDiv(_('Info')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv(
+					(new CDiv($text))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+			]
 		);
+		return $this;
 	}
 
 	public function toString($destroy = true) {
@@ -89,7 +95,8 @@ class CFormList extends CList {
 
 	public function addVar($name, $value, $id = null) {
 		if ($value !== null) {
-			return $this->addItem(new CVar($name, $value, $id));
+			$this->addItem(new CVar($name, $value, $id));
 		}
+		return $this;
 	}
 }

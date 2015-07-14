@@ -43,7 +43,9 @@ $fields = [
 	'httptestid'      => [T_ZBX_INT, O_NO,  P_SYS, DB_ID,                   'isset({form}) && {form} == "update"'],
 	'name'            => [T_ZBX_STR, O_OPT, null,  NOT_EMPTY,               'isset({add}) || isset({update})', _('Name')],
 	'delay'           => [T_ZBX_INT, O_OPT, null,  BETWEEN(1, SEC_PER_DAY), 'isset({add}) || isset({update})', _('Update interval (in sec)')],
-	'retries'         => [T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})', _('Retries')],
+	'retries'         => [T_ZBX_INT, O_OPT, null,  BETWEEN(1, 10),          'isset({add}) || isset({update})',
+		_('Attempts')
+	],
 	'status'          => [T_ZBX_STR, O_OPT, null,  null,                    null],
 	'agent'           => [T_ZBX_STR, O_OPT, null, null,                     'isset({add}) || isset({update})'],
 	'agent_other'     => [T_ZBX_STR, O_OPT, null, null,
@@ -482,11 +484,12 @@ if (isset($_REQUEST['form'])) {
 
 			if (!empty($dbTest)) {
 				if (!idcmp($data['httptestid'], $dbTest['httptestid'])) {
-					$data['templates'][] = new CLink(
+					$data['templates'][] = (new CLink(
 						$dbTest['name'],
-						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid'],
-						'highlight underline weight_normal'
-					);
+						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];

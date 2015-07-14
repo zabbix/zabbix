@@ -53,9 +53,9 @@ $widget = (new CWidget())->setTitle(_('IT services availability report').':'.SPA
 
 $controls = new CList();
 
-$form = new CForm();
-$form->setMethod('get');
-$form->addVar('serviceid', $_REQUEST['serviceid']);
+$form = (new CForm())
+	->setMethod('get')
+	->addVar('serviceid', $_REQUEST['serviceid']);
 
 $controls->addItem([
 	SPACE._('Period').SPACE,
@@ -191,21 +191,19 @@ $sla = API::Service()->getSla([
 $sla = reset($sla);
 
 foreach ($sla['sla'] as $intervalSla) {
-	$ok = new CSpan(
+	$ok = (new CSpan(
 		sprintf('%dd %dh %dm',
 			$intervalSla['okTime'] / SEC_PER_DAY,
 			($intervalSla['okTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
 			($intervalSla['okTime'] % SEC_PER_HOUR) / SEC_PER_MIN
-		), ZBX_STYLE_GREEN
-	);
+		)))->addClass(ZBX_STYLE_GREEN);
 
-	$problems = new CSpan(
+	$problems = (new CSpan(
 		sprintf('%dd %dh %dm',
 			$intervalSla['problemTime'] / SEC_PER_DAY,
 			($intervalSla['problemTime'] % SEC_PER_DAY) / SEC_PER_HOUR,
 			($intervalSla['problemTime'] % SEC_PER_HOUR) /SEC_PER_MIN
-		), ZBX_STYLE_RED
-	);
+		)))->addClass(ZBX_STYLE_RED);
 
 	$downtime = sprintf('%dd %dh %dm',
 		$intervalSla['downtimeTime'] / SEC_PER_DAY,
@@ -213,14 +211,15 @@ foreach ($sla['sla'] as $intervalSla) {
 		($intervalSla['downtimeTime'] % SEC_PER_HOUR) / SEC_PER_MIN
 	);
 
-	$percentage = new CSpan(sprintf('%2.4f', $intervalSla['sla']), ($intervalSla['sla'] >= $service['goodsla'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED));
+	$percentage = (new CSpan(sprintf('%2.4f', $intervalSla['sla'])))
+		->addClass($intervalSla['sla'] >= $service['goodsla'] ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 
 	$table->addRow([
 		format_time($intervalSla['from']),
 		format_time2($intervalSla['to']),
 		$intervalSla['okTime'] == 0 ? '' : $ok,
 		$intervalSla['problemTime'] == 0 ? '' : $problems,
-		$intervalSla['downtimeTime'] ==0 ? '' : new CSpan($downtime, ZBX_STYLE_GREY),
+		$intervalSla['downtimeTime'] ==0 ? '' : (new CSpan($downtime))->addClass(ZBX_STYLE_GREY),
 		($service['showsla']) ? $percentage : '',
 		($service['showsla']) ? new CSpan($service['goodsla']) : ''
 	]);

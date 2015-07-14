@@ -21,88 +21,100 @@
 
 require_once dirname(__FILE__).'/js/adm.regexprs.edit.js.php';
 
-$regExpWidget = (new CWidget())->setTitle(_('Regular expressions'));
+$widget = (new CWidget())
+	->setTitle(_('Regular expressions'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.regexps.php')))
+	);
 
-$headerForm = new CForm();
-$headerForm->cleanItems();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.regexps.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-
-$headerForm->addItem($controls);
-
-$regExpWidget->setControls($headerForm);
-
-$form = new CForm();
-$form->setAttribute('id', 'zabbixRegExpForm');
-$form->addVar('form', 1);
-$form->addVar('regexpid', $data['regexpid']);
-
-zbx_add_post_js('zabbixRegExp.addExpressions('.CJs::encodeJson(array_values($data['expressions'])).');');
+$form = (new CForm())
+	->setId('zabbixRegExpForm')
+	->addVar('form', 1)
+	->addVar('regexpid', $data['regexpid']);
 
 /*
  * Expressions tab
  */
-$exprTab = new CFormList('exprTab');
-$nameTextBox = new CTextBox('name', $data['name'], ZBX_TEXTBOX_STANDARD_SIZE, false, 128);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$exprTab->addRow(_('Name'), $nameTextBox);
+$exprTable = (new CTable())
+	->setId('tbl_expr')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setHeader([
+		_('Expression type'),
+		_('Expression'),
+		_('Delimiter'),
+		_('Case sensitive'),
+		''
+	]);
 
-$exprTable = (new CTable())->
-	addClass('formElementTable')->
-	addClass('formWideTable');
-$exprTable->setAttribute('id', 'exprTable');
-$exprTable->setHeader([
-	_('Expression'),
-	(new CCol(_('Expression type')))->addClass(ZBX_STYLE_NOWRAP),
-	(new CCol(_('Case sensitive')))->addClass(ZBX_STYLE_NOWRAP),
-	SPACE
-]);
-$exprTable->setFooter(new CButton('add', _('Add'), null, 'link_menu exprAdd'));
-$exprTab->addRow(_('Expressions'), new CDiv($exprTable, 'inlineblock border_dotted objectgroup'));
+foreach ($data['expressions'] as $i => $expression) {
+	$exp_delimiter = new CComboBox('expressions['.$i.'][exp_delimiter]', $expression['exp_delimiter'], null,
+		expressionDelimiters()
+	);
 
-$exprForm = (new CTable())->
-	addClass('formElementTable')->
-	addRow([_('Expression'), new CTextBox('expressionNew', null, ZBX_TEXTBOX_STANDARD_SIZE)])->
-	addRow([_('Expression type'), new CComboBox('typeNew', null, null, expression_type2str())])->
-	addRow([_('Delimiter'), new CComboBox('delimiterNew', null, null, expressionDelimiters())], null, 'delimiterNewRow')->
-	addRow([_('Case sensitive'), new CCheckBox('case_sensitiveNew')]);
+	if ($expression['expression_type'] != EXPRESSION_TYPE_ANY_INCLUDED) {
+		$exp_delimiter->addStyle('display: none;');
+	}
 
-$exprFormFooter = [
-	new CButton('saveExpression', _('Add'), null, 'link_menu'),
-	SPACE,
-	new CButton('cancelExpression', _('Cancel'), null, 'link_menu')
-];
-$exprTab->addRow(null, new CDiv([$exprForm, $exprFormFooter], 'objectgroup inlineblock border_dotted'), true, 'exprForm');
+	$row = [
+		(new CComboBox('expressions['.$i.'][expression_type]', $expression['expression_type'], null,
+			expression_type2str()
+		))->onChange('onChangeExpressionType(this, '.$i.')'),
+		(new CTextBox('expressions['.$i.'][expression]', $expression['expression'], false, 255))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$exp_delimiter,
+		(new CCheckBox('expressions['.$i.'][case_sensitive]', '1'))->setChecked($expression['case_sensitive'])
+	];
+
+	$button_cell = [
+		(new CButton('expressions['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	];
+	if (array_key_exists('expressionid', $expression)) {
+		$button_cell[] = new CVar('expressions['.$i.'][expressionid]', $expression['expressionid']);
+	}
+
+	$row[] = $button_cell;
+
+	$exprTable->addRow(
+		(new CRow($row))
+			->addClass('form_row')
+			->setAttribute('data-index', $i)
+	);
+}
+
+$exprTable->setFooter(
+	(new CButton('expression_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+);
+
+$exprTab = (new CFormList('exprTab'))
+	->addRow(_('Name'),
+		(new CTextBox('name', $data['name'], false, 128))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Expressions'), (new CDiv($exprTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 /*
  * Test tab
  */
-$testTab = new CFormList('testTab');
-$testTab->addRow(_('Test string'), new CTextArea('test_string', $data['test_string']));
-$preloaderDiv = new CDiv(null, 'preloader', 'testPreloader');
-$preloaderDiv->addStyle('display: none');
-$testTab->addRow(SPACE, [new CButton('testExpression', _('Test expressions')), $preloaderDiv]);
+$testTab = (new CFormList())
+	->addRow(_('Test string'),
+		(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT));
 
-$tabExp = new CTableInfo();
-$tabExp->setAttribute('id', 'testResultTable');
-$tabExp->setHeader([_('Expression'), _('Expression type'), _('Result')]);
-$testTab->addRow(_('Result'), $tabExp);
+$testTab->addRow(_('Result'), [
+	(new CDiv(
+		(new CTable())
+			->setId('testResultTable')
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setHeader([_('Expression type'), _('Expression'), _('Result')])
+	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+]);
 
 $regExpView = new CTabView();
 if (!$data['form_refresh']) {
@@ -133,6 +145,7 @@ else {
 }
 
 $form->addItem($regExpView);
-$regExpWidget->addItem($form);
 
-return $regExpWidget;
+$widget->addItem($form);
+
+return $widget;
