@@ -47,8 +47,8 @@ if ($json['method'] == 'proxymap.get') {
       elseif (preg_match('/(\D{3})(\d{2})/', $proxy_name, $m)) {
          $site = strtolower($m[1]);
          $num  = $m[2];
-         // HACK: Override phx2 hostname
-         $site = ($site == 'phx' ? 'phx2' : $site);
+         // HACK: Override phx2 hostname (now phx7)
+         $site = ($site == 'phx' ? 'phx7' : $site);
          $proxy_fqdn = 'zabbix-proxy'.$num.'.'.$site.'.llnw.net';
       }
       else {
