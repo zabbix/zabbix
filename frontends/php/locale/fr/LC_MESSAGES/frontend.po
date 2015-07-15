@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-15 15:51+0300\n"
-"PO-Revision-Date: 2014-02-03 09:00+0300\n"
-"Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
+"POT-Creation-Date: 2015-07-15 15:55+0300\n"
+"PO-Revision-Date: 2015-06-28 18:18+0300\n"
+"Last-Translator: antonin <antonin.sommier@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391410834.0\n"
+"X-POOTLE-MTIME: 1435508300.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -1060,7 +1060,7 @@ msgstr "CONFIGURATION DES HÔTES"
 
 #: adm.housekeeper.php:141
 msgid "CONFIGURATION OF HOUSEKEEPING"
-msgstr "CONFIGURATION DU MÉNAGE AUTOMATIQUE"
+msgstr "CONFIGURATION DU NETTOYAGE AUTOMATIQUE"
 
 #: adm.iconmapping.php:130
 msgid "CONFIGURATION OF ICON MAPPING"
@@ -1186,7 +1186,7 @@ msgstr "CONFIGURATION DE ZABBIX"
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:447
 msgid "CPU info - lists full info for all CPUs by default"
-msgstr "Information du processeur - liste toutes les informations pour tous les processeurs par défaut"
+msgstr "Charge du/des processeur(s). Le processeur et le mode sont optionnels. Si le processeur manque, tous sont utilisés. Si le mode manque, avg1 est utilisé. Notez que cela n'est pas le pourcentage."
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:423
@@ -2108,7 +2108,7 @@ msgstr "Impossible d'inclure le fichier de vue \"%s\"."
 
 #: popup_trexpr.php:786
 msgid "Cannot insert trigger expression"
-msgstr ""
+msgstr "Impossible d'insérer l'expression du déclencheur"
 
 #: api/classes/CUser.php:738
 msgid "Cannot insert user media."
@@ -4052,7 +4052,7 @@ msgstr "Supprimer le service sélectionné ?"
 
 #: include/views/configuration.triggers.edit.php:318
 msgid "Delete trigger prototype?"
-msgstr "Supprimer le prototypé de déclencheur ?"
+msgstr "Supprimer le prototype de déclencheur ?"
 
 #: include/views/configuration.triggers.edit.php:318
 msgid "Delete trigger?"
@@ -4444,7 +4444,7 @@ msgstr "Règle de découverte"
 #: api/classes/CDiscoveryRule.php:40
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "La règle de découverte \"%1$s\" existe déjà sur \"%2$s\""
+msgstr "La règle de découverte \"%1$s\" existe déjà sur \"%2$s\", hérité d'un autre modèle."
 
 #: api/classes/CDiscoveryRule.php:41
 #, c-format
@@ -4898,6 +4898,7 @@ msgid "Enable selected hosts?"
 msgstr "Activer les hôtes sélectionnés ?"
 
 #: include/views/configuration.item.prototype.list.php:113
+#, fuzzy
 msgid "Enable selected item prototypes?"
 msgstr "Activer les prototypes d'éléments sélectionnés ?"
 
@@ -4910,6 +4911,7 @@ msgid "Enable selected media types?"
 msgstr "Activer les types de média sélectionnés ?"
 
 #: include/views/configuration.triggers.list.php:267
+#, fuzzy
 msgid "Enable selected trigger prototypes?"
 msgstr "Activer les prototypes de déclencheurs sélectionnés ?"
 
@@ -5060,7 +5062,7 @@ msgstr "Erreur d'exécution SQL [%1$s] dans [%2$s]."
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:571
 msgid "Execute WMI query and return the first selected object."
-msgstr ""
+msgstr "Exécuter requête WMI et retourner le premier objet sélectionné."
 
 #: include/views/administration.script.edit.php:56
 #: include/views/administration.script.list.php:41
@@ -5433,7 +5435,7 @@ msgstr "Fonction"
 #: popup_trexpr.php:707
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "La fonction \"%1$s\" ne peut pas être utilisés avec l'élément sélectionné \"%2$s\""
 
 #: include/func.inc.php:678
 msgctxt "Giga short"
@@ -5645,12 +5647,12 @@ msgstr "Prototype de graphique"
 #: api/classes/CGraphPrototype.php:799
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Le prototype de graphique \"%1$s\" contient les prototypes d'éléments de plusieurs règles de découverte."
 
 #: api/classes/CGraphPrototype.php:805
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "Le prototype de graphique \"%1$s\" doit avoir au moins un prototype d'élément."
 
 #: api/classes/CGraphPrototype.php:38
 #, c-format
@@ -7099,7 +7101,7 @@ msgstr "Fonction incorrecte utilisée"
 #: api/classes/CScreenItem.php:607
 #, c-format
 msgid "Incorrect graph ID \"%1$s\" provided for screen element."
-msgstr "ID de grapihque incorrect \"%1$s\" fourni pour l'élément d'écran."
+msgstr "ID de graphique \"%1$s\" incorrect fourni pour l'élément d'écran."
 
 #: api/classes/CHostPrototype.php:396 api/classes/CHostPrototype.php:403
 msgid "Incorrect group prototype ID."
@@ -9019,32 +9021,32 @@ msgstr "Minimiser"
 #: include/classes/class.frontendsetup.php:117
 #, c-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")."
-msgstr "La limite de mémoire PHP minimum requise est %s (configuration option \"memory_limit\")."
+msgstr "La limite de mémoire PHP minimum requise est %s (option de configuration \"memory_limit\")."
 
 #: include/classes/class.frontendsetup.php:151
 #, c-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")."
-msgstr "La taille de fichier téléversé PHP minimum requise est %s (configuration option \"upload_max_filesize\")."
+msgstr "La taille minimale des fichiers téléversés via PHP requise est %s (option de configuration \"upload_max_filesize\")."
 
 #: include/classes/class.frontendsetup.php:99
 #, c-format
 msgid "Minimum required PHP version is %s."
-msgstr "La version de PHP minimale requise est %s."
+msgstr "La version minimale requise de PHP est %s."
 
 #: include/classes/class.frontendsetup.php:168
 #, c-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")."
-msgstr "La limite de temps d'exécution des scripts PHP minimale requise est %s (option de configuration \"max_execution_time\")."
+msgstr "La limite de temps d'exécution minimale requise des scripts PHP est %s (option de configuration \"max_execution_time\")."
 
 #: include/classes/class.frontendsetup.php:185
 #, c-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")."
-msgstr "La limite de temps d'analyse des scripts PHP minimale requise est %s (option de configuration \"max_input_time\")."
+msgstr "La limite de temps d'analyse minimale requise des scripts PHP est %s (option de configuration \"max_input_time\")."
 
 #: include/classes/class.frontendsetup.php:134
 #, c-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")."
-msgstr "La taille minimale des \"post\" PHP requise est %s (option de configuration \"post_max_size\")."
+msgstr "La taille minimale requise des \"post\" PHP est %s (option de configuration \"post_max_size\")."
 
 #: include/views/monitoring.maps.php:40
 msgid "Minimum severity"
@@ -9059,7 +9061,7 @@ msgstr[1] "La période minimale à afficher est %1$s heures."
 
 #: include/views/configuration.sysmap.edit.php:132 tr_status.php:310
 msgid "Minimum trigger severity"
-msgstr "Sévérité de déclencheur minimale"
+msgstr "Sévérité minimale de déclencheur"
 
 #: popup_trexpr.php:279
 msgid "Minimum value for period T is < N"
@@ -9089,16 +9091,16 @@ msgstr "Le champ \"%1$s\" manque dans la condition d'action."
 #: include/reports.inc.php:489
 #, c-format
 msgid "Missing \"%1$s\" field for item."
-msgstr "Le champ \"%1$s\" manque dans l'élément."
+msgstr "Le champ \"%1$s\" manquant pour l'élément."
 
 #: include/reports.inc.php:587
 #, c-format
 msgid "Missing \"%1$s\" field for period."
-msgstr "Le champ \"%1$s\" manque dans la période."
+msgstr "Le champ \"%1$s\" manquant pour la durée."
 
 #: api/classes/CGraphGeneral.php:76
 msgid "Missing \"gitemid\" field for item."
-msgstr "Le champ \"gitemid\" manque dans l'élément."
+msgstr "Le champ \"gitemid\" manquant pour l'élément."
 
 #: api/classes/CGraphGeneral.php:497 api/classes/CGraphGeneral.php:616
 msgid "Missing \"itemid\" field for item."
@@ -9106,7 +9108,7 @@ msgstr "Champ \"itemid\" manquant pour l'élément."
 
 #: api/classes/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
-msgstr "Le champ \"nom\" manque dans le prototype de graphique."
+msgstr "Le champ \"nom\" manquant pour le prototype de graphique."
 
 #: api/classes/CGraph.php:39
 msgid "Missing \"name\" field for graph."
@@ -9176,16 +9178,19 @@ msgid "Monitoring"
 msgstr "Surveillance"
 
 #: include/classes/items/CHelpItems.php:327
+#, fuzzy
 msgid "Monitoring of Windows event logs. pattern, severity, eventid - regular expressions"
-msgstr "Supervision des journaux d'événements de Windows. pattern, severity, eventid - expression rationnelles"
+msgstr "Supervision des journaux d'événements de Windows. pattern, severity, eventid - expression régulières"
 
 #: include/classes/items/CHelpItems.php:343
+#, fuzzy
 msgid "Monitoring of log file with rotation. fileformat - [path][regexp], pattern - regular expression"
-msgstr "Supervision de fichiers de journalisation avec rotation. fileformat - [chemin][regexp], pattern - expression rationnelle"
+msgstr "Supervision de fichiers de journalisation avec rotation. fileformat - [chemin][regexp], pattern - expression régulières"
 
 #: include/classes/items/CHelpItems.php:339
+#, fuzzy
 msgid "Monitoring of log file. pattern - regular expression"
-msgstr "Supervision de fichier de journalisation. pattern - expression rationnelle"
+msgstr "Supervision de fichier de journalisation. pattern - expression régulière"
 
 #: include/forms.inc.php:1725 report3.php:106 report4.php:155 report5.php:46
 msgid "Month"
@@ -9339,22 +9344,23 @@ msgstr "Période de stockage des données de découverte réseau (en jours)"
 
 #: adm.housekeeper.php:40
 msgid "Network discovery event and alert data storage period"
-msgstr ""
+msgstr "Durrée de stockage des données d'événement et alerte des découvertes résaux"
 
 #: adm.housekeeper.php:107
 #, c-format
 msgid "Network discovery event and alert data storage period (in days) \"%1$s\"."
-msgstr ""
+msgstr "Durée de stockage des données d'événement et alerte des découvertes réseaux (en jours) \"%1$s\"."
 
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:359
+#, fuzzy
 msgid "Network interface input statistic. Integer value. If mode is missing bytes is used."
-msgstr ""
+msgstr "Statistiques d'entrée de l'interface réseaux. Valeur entière. Si le mode est octets manquants est utilisé."
 
 #: include/classes/items/CHelpItems.php:105
 #: include/classes/items/CHelpItems.php:367
 msgid "Network interface output statistic. Integer value. If mode is missing bytes is used."
-msgstr ""
+msgstr "Statistiques de sortie de l'interface réseau. Valeur entière. Si le mode est octets manquants est utilisé."
 
 #: sysmaps.php:171
 msgid "Network map added"
@@ -9452,27 +9458,27 @@ msgstr "Non"
 #: api/classes/CGraphPrototype.php:41
 #, c-format
 msgid "No \"%1$s\" given for graph prototype."
-msgstr "\"%1$s\" non fourni dans le prototype de graphique."
+msgstr "\"%1$s\" non fourni pour le prototype de graphique."
 
 #: api/classes/CGraph.php:41
 #, c-format
 msgid "No \"%1$s\" given for graph."
-msgstr "\"%1$s\" non fourni dans le graphique."
+msgstr "\"%1$s\" non fourni pour le graphique."
 
 #: api/classes/CHostPrototype.php:457
 #, c-format
 msgid "No \"%1$s\" given for host prototype."
-msgstr "\"%1$s\" non fourni dans le prototype d'hôte."
+msgstr "\"%1$s\" non fourni pour le prototype d'hôte."
 
 #: api/classes/CScreen.php:487
 #, c-format
 msgid "No \"%1$s\" given for screen."
-msgstr ""
+msgstr "\"%1$s\" non fourni pour l'écran."
 
 #: api/classes/CTemplateScreen.php:603
 #, c-format
 msgid "No \"%1$s\" given for template screen."
-msgstr ""
+msgstr "\"%1$s\" non fourni pour le modèle d'écran."
 
 #: api/classes/CHostPrototype.php:208
 #, c-format
@@ -9492,7 +9498,7 @@ msgstr "Aucun champ \"ymin_type\" pour le graphique \"%s\"."
 #: include/views/configuration.host.edit.php:411
 #: include/views/configuration.host.prototype.edit.php:143
 msgid "No IPMI interfaces found."
-msgstr ""
+msgstr "Aucune interface IPMI trouvée."
 
 #: include/views/configuration.services.child.list.php:35
 msgid "No IT services found."
@@ -9530,7 +9536,7 @@ msgstr "Aucune ressource accessible"
 
 #: include/acknow.inc.php:48
 msgid "No acknowledges found."
-msgstr ""
+msgstr "Aucun acquittement trouvé."
 
 #: include/actions.inc.php:825 include/actions.inc.php:904
 #: include/actions.inc.php:961 include/classes/screens/CScreenActions.php:121
@@ -9621,7 +9627,7 @@ msgstr "Aucun périphérique découvert trouvé."
 #: api/classes/CHostPrototype.php:112
 #, c-format
 msgid "No discovery rule ID given for host prototype \"%1$s\"."
-msgstr ""
+msgstr "Aucun ID de règle de découverte fourni pour le prototype d'hôte \"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:444
 msgid "No discovery rule IDs given."
@@ -10319,8 +10325,9 @@ msgid "Number of processes. <name> and <user> same as in proc.mem item. <state> 
 msgstr ""
 
 #: include/classes/items/CHelpItems.php:643
+#, fuzzy
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
-msgstr ""
+msgstr "Nombre de processus. <name> and <user> similaires dans l'élément proc.mem. <state> tous (default), éxécuté, arrêté, zomb.<cmdline> filtre par ligne de commandes (supporte regex). Exemple : proc.num[apache2,www-data]. Dans Windows, seul <name> et <user> sont supportés."
 
 #: include/classes/items/CHelpItems.php:647
 msgid "Number of processor threads on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -10413,7 +10420,7 @@ msgstr "Nombre de valeurs stockées dans la table HISTORY_UINT."
 
 #: include/classes/items/CHelpItems.php:879
 msgid "Number of values stored in table TRENDS."
-msgstr ""
+msgstr "Nombre de valeurs stockées dans la table TRENDS."
 
 #: include/classes/items/CHelpItems.php:883
 msgid "Number of values stored in table TRENDS_UINT."
@@ -10774,14 +10781,16 @@ msgstr "Autres"
 
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:355
+#, fuzzy
 msgid "Out-of-window collision. Collisions count."
-msgstr ""
+msgstr "Collision par fenêtre. Collisions comptées."
 
 #: include/views/configuration.item.edit.php:362
 #: include/views/configuration.item.edit.php:383
+#, fuzzy
 msgctxt "item_form"
 msgid "Overridden by"
-msgstr ""
+msgstr "Redéfinie par"
 
 #: include/views/administration.general.housekeeper.edit.php:132
 msgid "Override item history period"
@@ -10873,7 +10882,7 @@ msgstr "gettext pour PHP"
 
 #: include/classes/class.frontendsetup.php:552
 msgid "PHP gettext extension missing (PHP configuration parameter --with-gettext). Translations will not be available."
-msgstr ""
+msgstr "L'extension PHP gettext est manquante (paramètre de configuration de PHP --with-gettext). Les traductions ne seront pas disponibles."
 
 #: include/classes/class.frontendsetup.php:436
 msgid "PHP libxml"
