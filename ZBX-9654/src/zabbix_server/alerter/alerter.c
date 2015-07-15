@@ -507,7 +507,7 @@ static int	count_workers(void)
 	return count;
 }
 
-static zbx_alerter_worker_ti	*find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid)
+static zbx_alerter_worker_t	*find_next_worker_by_pid(zbx_alerter_worker_t *from, pid_t pid)
 {
 	zbx_alerter_worker_t	*w;
 	zbx_alerter_worker_t	*found = NULL;
