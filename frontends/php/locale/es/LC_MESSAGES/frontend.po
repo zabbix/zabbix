@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-15 15:51+0300\n"
-"PO-Revision-Date: 2014-10-17 22:56+0300\n"
-"Last-Translator: Saúl <saulortega.co@gmail.com>\n"
+"POT-Creation-Date: 2015-07-15 15:55+0300\n"
+"PO-Revision-Date: 2015-06-24 17:06+0300\n"
+"Last-Translator: Roberto <rampmaster@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1413579365.0\n"
+"X-POOTLE-MTIME: 1435158380.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -2203,9 +2203,9 @@ msgid "Cannot send command, check connection with Zabbix server \"%1$s\"."
 msgstr "No se pudo enviar la instrucción. Verifique la conexión con el servidor Zabbix \"%1$s\"."
 
 #: api/classes/CHostGroup.php:493
-#, c-format
+#, fuzzy, c-format
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "No se pudo establecer \"%1$s\" para el grupo de host \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:242
 #, c-format
@@ -2308,7 +2308,7 @@ msgstr "No se puede actualizar el \"%1$s\" de una acción \"%2$s\"."
 #: api/classes/CHostGroup.php:535
 #, c-format
 msgid "Cannot update \"%1$s\" for host group \"%2$s\"."
-msgstr ""
+msgstr "No se puede actualizar el \"%1$s\" del grupo de equipos \"%2$s\"."
 
 #: api/classes/CItemGeneral.php:206
 #, c-format
@@ -4254,12 +4254,13 @@ msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
 msgstr "Si hay diferencia entre el valor más reciente y el que lo precede, entonces N=1; de lo contrario, N=0."
 
 #: popup_trexpr.php:235
+#, fuzzy
 msgid "Difference between last and preceding values, then N NOT 1, 0 - otherwise"
-msgstr ""
+msgstr "Si hay diferencias entre el valor más reciente y el que lo precede, entonces N NO 1, por lo tanto 0 "
 
 #: popup_trexpr.php:195
 msgid "Difference between last and previous value is < N"
-msgstr ""
+msgstr "Diferencias entre el valor más reciente y el anterior es < N"
 
 #: popup_trexpr.php:203
 msgid "Difference between last and previous value is = N"
@@ -5999,7 +6000,7 @@ msgstr "Alta"
 #: jsLoader.php:107 jsLoader.php:203 latest.php:356 latest.php:357
 #: latest.php:451 latest.php:624
 msgid "History"
-msgstr "Histórico (días)"
+msgstr "Histórico"
 
 #: jsLoader.php:108
 msgid "History and simple graphs"
@@ -6086,7 +6087,7 @@ msgstr "Alineación horizontal"
 #: popup.php:520 popup.php:537 popup.php:1141 queue.php:204 report2.php:364
 #: report2.php:400 report5.php:59 tr_status.php:260 tr_status.php:377
 msgid "Host"
-msgstr "Equipo/Plantilla"
+msgstr "Equipo"
 
 #: api/classes/CHost.php:1124 api/classes/CTemplate.php:512
 #, c-format
@@ -10499,7 +10500,7 @@ msgstr "O"
 
 #: include/hosts.inc.php:125 include/views/inventory.host.list.php:81
 msgid "OS"
-msgstr "Sistema Operativo"
+msgstr "SO"
 
 #: include/hosts.inc.php:130
 msgid "OS (Full details)"
@@ -10533,7 +10534,7 @@ msgstr "Octubre"
 #: include/views/configuration.sysmap.constructor.php:38
 #: include/views/configuration.sysmap.constructor.php:44 jsLoader.php:143
 msgid "Off"
-msgstr "INACTIVO"
+msgstr "Inactivo"
 
 #: include/actions.inc.php:1072 include/blocks.inc.php:1108
 #: include/classes/class.ctriggersinfo.php:134
@@ -10545,7 +10546,7 @@ msgstr "Ok"
 #: include/views/configuration.sysmap.constructor.php:38
 #: include/views/configuration.sysmap.constructor.php:44 jsLoader.php:142
 msgid "On"
-msgstr "ACTIVO"
+msgstr "Activo"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:111
 msgid "On status change triggers blink for"
@@ -11804,7 +11805,7 @@ msgstr "Resultado es FALSO"
 
 #: include/regexp.inc.php:195 include/views/js/adm.regexprs.edit.js.php:118
 msgid "Result is TRUE"
-msgstr "RESULTADO is VERDADERO"
+msgstr "Resultado es VERDADERO"
 
 #: include/views/general.script.execute.php:28
 #, c-format
