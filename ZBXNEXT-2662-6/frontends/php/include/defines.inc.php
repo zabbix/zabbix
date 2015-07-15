@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'2.5.0');
 define('ZABBIX_API_VERSION',	'2.5.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050023);
+define('ZABBIX_DB_VERSION',		2050029);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -1040,6 +1040,9 @@ define('ZBX_STYLE_BTN_MAX', 'btn-max');
 define('ZBX_STYLE_BTN_MIN', 'btn-min');
 define('ZBX_STYLE_BTN_REMOVE_FAV', 'btn-remove-fav');
 define('ZBX_STYLE_BTN_RESET', 'btn-reset');
+define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
+define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
+define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
@@ -1096,9 +1099,6 @@ define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
-define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
-define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
-define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
