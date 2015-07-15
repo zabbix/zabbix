@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:53+0200\n"
+"POT-Creation-Date: 2015-07-15 15:51+0300\n"
 "PO-Revision-Date: 2014-01-05 18:51+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -241,7 +241,7 @@ msgstr "Допустимий рівень SLA"
 msgid "Access denied!"
 msgstr "Доступ заборонено!"
 
-#: include/func.inc.php:2088
+#: include/func.inc.php:2094
 msgid "Access denied."
 msgstr "Доступ заборонено."
 
@@ -257,7 +257,7 @@ msgstr "Обліковий запис заблоковано на %s секун�
 msgid "Ack"
 msgstr "Підтверджено"
 
-#: acknow.php:230 jsLoader.php:199 tr_status.php:713
+#: acknow.php:230 jsLoader.php:199 tr_status.php:712
 msgid "Acknowledge"
 msgstr "Підтвердити"
 
@@ -277,7 +277,7 @@ msgstr "Підтвердити та повернутись"
 msgid "Acknowledge status"
 msgstr "Статус підтвердження"
 
-#: include/events.inc.php:189 tr_status.php:375 tr_status.php:724
+#: include/events.inc.php:189 tr_status.php:375 tr_status.php:723
 msgid "Acknowledged"
 msgstr "Підтверджено"
 
@@ -454,7 +454,7 @@ msgstr "Активно до"
 #: include/views/js/configuration.sysmaps.js.php:398
 #: include/views/monitoring.history.php:100 popup_bitem.php:166
 #: popup_media.php:141 popup_period.php:134 tr_logform.php:293
-#: tr_status.php:768
+#: tr_status.php:767
 msgid "Add"
 msgstr "Додати"
 
@@ -678,7 +678,7 @@ msgstr "Група елементів даних з ID \"%1$s\" недоступ
 #: include/views/configuration.template.edit.php:246
 #: include/views/inventory.host.view.php:227 popup.php:56 search.php:140
 #: search.php:166 search.php:192 search.php:382 search.php:405 search.php:435
-#: templates.php:493 templates.php:553
+#: templates.php:493 templates.php:554
 msgid "Applications"
 msgstr "Групи елементів даних"
 
@@ -1018,7 +1018,7 @@ msgstr "Світліше"
 msgid "Bulgarian (bg_BG)"
 msgstr "Болгарська (bg_BG)"
 
-#: tr_status.php:855
+#: tr_status.php:854
 msgid "Bulk acknowledge"
 msgstr "Масове підтвердження"
 
@@ -3840,7 +3840,7 @@ msgstr "Видалити"
 msgid "Delete and clear"
 msgstr "Видалити та очистити"
 
-#: templates.php:655
+#: templates.php:656
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
 msgstr "Видалити та очистити вибрані шаблони? (УВАГА: всі приєднані вузли мережі буде очищено!)"
 
@@ -3957,7 +3957,7 @@ msgstr "Видалити скрипт?"
 #: include/views/configuration.screen.list.php:72
 #: include/views/configuration.slideconf.list.php:58
 #: include/views/configuration.sysmap.list.php:64
-#: include/views/configuration.triggers.list.php:285 templates.php:651
+#: include/views/configuration.triggers.list.php:285 templates.php:652
 msgid "Delete selected"
 msgstr "Видалити вибрані"
 
@@ -4071,7 +4071,7 @@ msgstr "Видалити вибрані скрипти?"
 msgid "Delete selected slide shows?"
 msgstr "Видалити вибрані слайд-шоу?"
 
-#: templates.php:652
+#: templates.php:653
 msgid "Delete selected templates?"
 msgstr "Видалити вибрані шаблони?"
 
@@ -4104,7 +4104,7 @@ msgstr[1] "Видалити вибране перетворення значен
 msgstr[2] "Видалити вибране перетворення значення? Воно використовується в %d елементах даних!"
 msgstr[3] "Видалити вибране перетворення значення? Воно використовується в %d елементах даних!"
 
-#: templates.php:654
+#: templates.php:655
 msgid "Delete selected with linked elements"
 msgstr "Видалити вибране із приєднаними елементами"
 
@@ -4221,14 +4221,14 @@ msgstr "Заборонено"
 msgid "Dependencies"
 msgstr "Залежності"
 
-#: include/triggers.inc.php:1407 tr_status.php:612
+#: include/triggers.inc.php:1407 tr_status.php:611
 msgid "Dependent"
 msgstr "Залежність"
 
 #: include/triggers.inc.php:1387
 #: include/views/configuration.services.edit.php:114
 #: include/views/configuration.triggers.list.php:171 popup.php:1083
-#: tr_status.php:596
+#: tr_status.php:595
 msgid "Depends on"
 msgstr "Залежить від"
 
@@ -4250,7 +4250,7 @@ msgid "Description"
 msgstr "Опис"
 
 #: include/actions.inc.php:966 include/blocks.inc.php:743
-#: include/func.inc.php:2204
+#: include/func.inc.php:2210
 #: include/views/administration.auditlogs.list.php:92
 #: include/views/administration.mediatypes.list.php:44
 #: include/views/configuration.action.edit.php:361
@@ -4478,7 +4478,7 @@ msgstr "Виявлений пристрій"
 #: include/views/inventory.host.view.php:232
 #: include/views/inventory.host.view.php:242 search.php:144 search.php:182
 #: search.php:196 search.php:387 search.php:425 search.php:440
-#: templates.php:498 templates.php:563
+#: templates.php:498 templates.php:564
 msgid "Discovery"
 msgstr "Виявлення"
 
@@ -4585,7 +4585,7 @@ msgstr "Стан виявлення"
 msgid "Display OK triggers for"
 msgstr "Відображати тригери ОК протягом"
 
-#: include/func.inc.php:1892
+#: include/func.inc.php:1898
 msgid "Displaying"
 msgstr "Відображено"
 
@@ -4737,7 +4737,7 @@ msgctxt "Exa short"
 msgid "E"
 msgstr "Е"
 
-#: include/func.inc.php:2173
+#: include/func.inc.php:2179
 msgid "ERROR"
 msgstr "ПОМИЛКА"
 
@@ -5179,7 +5179,7 @@ msgid "Exploded"
 msgstr "Розширений круговий"
 
 #: hosts.php:1016 include/views/configuration.screen.list.php:70
-#: include/views/configuration.sysmap.list.php:63 templates.php:650
+#: include/views/configuration.sysmap.list.php:63 templates.php:651
 msgid "Export selected"
 msgstr "Експортувати вибране"
 
@@ -5425,7 +5425,7 @@ msgstr "Фінська (fi_FI)"
 msgid "First"
 msgstr "Перший"
 
-#: include/func.inc.php:1837
+#: include/func.inc.php:1843
 msgctxt "page navigation"
 msgid "First"
 msgstr "Перша"
@@ -5619,8 +5619,8 @@ msgstr "Глобальні скрипти"
 #: include/views/configuration.screen.list.php:76
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:67
-#: include/views/configuration.triggers.list.php:292 templates.php:657
-#: tr_status.php:857
+#: include/views/configuration.triggers.list.php:292 templates.php:658
+#: tr_status.php:856
 msgid "Go"
 msgstr "Виконати"
 
@@ -5628,7 +5628,7 @@ msgstr "Виконати"
 msgid "Go to"
 msgstr "Перейти до"
 
-#: include/func.inc.php:2106
+#: include/func.inc.php:2112
 msgid "Go to dashboard"
 msgstr ""
 
@@ -5802,7 +5802,7 @@ msgstr "Графік з таким же іменем, але іншого тип
 #: include/views/inventory.host.view.php:241 popup.php:92 search.php:137
 #: search.php:143 search.php:178 search.php:195 search.php:211 search.php:270
 #: search.php:324 search.php:385 search.php:417 search.php:438
-#: templates.php:496 templates.php:559
+#: templates.php:496 templates.php:560
 msgid "Graphs"
 msgstr "Графіки"
 
@@ -6784,7 +6784,7 @@ msgstr "Іконки"
 msgid "Identical expression already exists"
 msgstr ""
 
-#: include/func.inc.php:2096 include/func.inc.php:2116
+#: include/func.inc.php:2102 include/func.inc.php:2122
 msgid "If you think this message is wrong, please consult your administrators about getting the necessary permissions."
 msgstr "Якщо Ви вважаєте це повідомлення помилковим, то зверніться до Вашого адміністратора для отримання необхідних прав доступу."
 
@@ -8060,7 +8060,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:239 latest.php:300 popup.php:72
 #: queue.php:101 report6.php:44 search.php:141 search.php:170 search.php:193
 #: search.php:383 search.php:409 search.php:436 templates.php:494
-#: templates.php:555
+#: templates.php:556
 msgid "Items"
 msgstr "Елементи даних"
 
@@ -8258,7 +8258,7 @@ msgstr "Мова"
 msgid "Last"
 msgstr "Останній"
 
-#: include/func.inc.php:1877
+#: include/func.inc.php:1883
 msgctxt "page navigation"
 msgid "Last"
 msgstr "Остання"
@@ -8550,7 +8550,7 @@ msgstr "Записувати не співпадаючі SNMP трапи"
 msgid "Logged in as"
 msgstr "Підключено до системи як"
 
-#: auditlogs.php:143 include/func.inc.php:2102 include/func.inc.php:2119
+#: auditlogs.php:143 include/func.inc.php:2108 include/func.inc.php:2125
 #: include/menu.inc.php:282 include/page_header.php:227
 #: include/views/administration.auditlogs.list.php:43
 #: include/views/administration.authentication.edit.php:111
@@ -8756,11 +8756,11 @@ msgstr "Тип сервісу"
 msgid "Maintenance updated"
 msgstr "Сервіс оновлено"
 
-#: include/blocks.inc.php:965 tr_status.php:662
+#: include/blocks.inc.php:965 tr_status.php:661
 msgid "Maintenance with data collection"
 msgstr "Сервіс зі збором даних"
 
-#: include/blocks.inc.php:964 tr_status.php:661
+#: include/blocks.inc.php:964 tr_status.php:660
 msgid "Maintenance without data collection"
 msgstr "Сервіс без збору даних"
 
@@ -8911,7 +8911,7 @@ msgid "Max count of events per trigger to show"
 msgstr "Макс. кількість подій у тригера для відображення"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2206
+#: include/func.inc.php:2212
 msgid "Maximize"
 msgstr "Розгорнути"
 
@@ -9122,7 +9122,7 @@ msgid "Middle"
 msgstr "Посередині"
 
 #: include/classes/class.cwidget.php:124 include/classes/class.cwidget.php:127
-#: include/func.inc.php:2206
+#: include/func.inc.php:2212
 msgid "Minimize"
 msgstr "Згорнути"
 
@@ -9548,13 +9548,13 @@ msgstr "Новий період послуги"
 msgid "Next"
 msgstr "Далі"
 
-#: include/func.inc.php:1870
+#: include/func.inc.php:1876
 msgctxt "page navigation"
 msgid "Next"
 msgstr "Наступна"
 
 #: events.php:839 include/events.inc.php:362 include/events.inc.php:380
-#: include/func.inc.php:2436 include/triggers.inc.php:1635
+#: include/func.inc.php:2442 include/triggers.inc.php:1635
 #: include/views/administration.users.list.php:77
 #: include/views/administration.users.list.php:80
 #: include/views/js/adm.regexprs.edit.js.php:142
@@ -9753,7 +9753,7 @@ msgstr "Не обрано жодного елементу!"
 msgid "No errors found."
 msgstr "Помилок не знайдено."
 
-#: include/blocks.inc.php:1010 include/blocks.inc.php:1533 tr_status.php:734
+#: include/blocks.inc.php:1010 include/blocks.inc.php:1533 tr_status.php:733
 msgid "No events"
 msgstr "Подій немає"
 
@@ -10074,7 +10074,7 @@ msgstr "Немає прав доступу до системи."
 #: api/classes/CUserMacro.php:589 api/classes/CUserMacro.php:698
 #: api/classes/CUser.php:680 api/classes/CUser.php:859
 #: api/classes/CUser.php:879 api/classes/CUser.php:938
-#: api/classes/CUser.php:1363 include/func.inc.php:2076
+#: api/classes/CUser.php:1363 include/func.inc.php:2082
 msgid "No permissions to referred object or it does not exist!"
 msgstr "Немає прав доступу до запитуваного об'єкту або він не існує!"
 
@@ -11337,7 +11337,7 @@ msgstr "Попередній перегляд"
 msgid "Previous"
 msgstr "Назад"
 
-#: include/func.inc.php:1843
+#: include/func.inc.php:1849
 msgctxt "page navigation"
 msgid "Previous"
 msgstr "Попередня"
@@ -11597,11 +11597,11 @@ msgstr "Тема про відновлення"
 msgid "Refresh (in seconds)"
 msgstr "Оновлювати екран (секунди)"
 
-#: include/func.inc.php:1951
+#: include/func.inc.php:1957
 msgid "Refresh time in seconds"
 msgstr "Інтервал оновлення в секундах"
 
-#: include/func.inc.php:1955
+#: include/func.inc.php:1961
 msgid "Refresh time multiplier"
 msgstr "Множник інтервалу оновлення"
 
@@ -12391,7 +12391,7 @@ msgstr "Комплексний екран оновлено"
 #: include/views/monitoring.screen.php:77
 #: include/views/monitoring.slides.php:29 popup.php:84 popup.php:100
 #: search.php:138 search.php:212 search.php:386 search.php:421 search.php:439
-#: templates.php:497 templates.php:561
+#: templates.php:497 templates.php:562
 msgid "Screens"
 msgstr "Комплексні екрани"
 
@@ -12750,7 +12750,7 @@ msgstr "Ім'я важливості не може бути пустим."
 #: include/reports.inc.php:456
 #: include/views/configuration.application.list.php:63
 #: include/views/js/configuration.sysmaps.js.php:26 report2.php:422
-#: tr_status.php:768 tr_status.php:773
+#: tr_status.php:767 tr_status.php:772
 msgid "Show"
 msgstr "Відобразити"
 
@@ -14043,7 +14043,7 @@ msgstr "Значення тригера"
 #: include/views/monitoring.overview.php:27 jsLoader.php:115 popup.php:60
 #: search.php:135 search.php:142 search.php:174 search.php:194 search.php:209
 #: search.php:268 search.php:322 search.php:384 search.php:413 search.php:437
-#: templates.php:495 templates.php:557 tr_status.php:267
+#: templates.php:495 templates.php:558 tr_status.php:267
 msgid "Triggers"
 msgstr "Тригери"
 
@@ -14233,7 +14233,7 @@ msgstr "США (160 символів)"
 msgid "USER PROFILE"
 msgstr "ПРОФІЛЬ КОРИСТУВАЧА"
 
-#: include/func.inc.php:2621
+#: include/func.inc.php:2627
 msgid "UTF-8"
 msgstr "UTF-8"
 
@@ -15168,7 +15168,7 @@ msgstr "Вибачте, але досягнуто максимум для зап
 #: include/views/inventory.host.view.php:243 search.php:139 search.php:145
 #: search.php:186 search.php:197 search.php:213 search.php:271 search.php:325
 #: search.php:388 search.php:429 search.php:441 templates.php:499
-#: templates.php:565
+#: templates.php:566
 msgid "Web"
 msgstr "Веб"
 
@@ -15512,7 +15512,7 @@ msgstr "Щороку"
 
 #: events.php:839 include/blocks.inc.php:751
 #: include/classes/class.cserverinfo.php:33 include/events.inc.php:365
-#: include/events.inc.php:383 include/func.inc.php:2436
+#: include/events.inc.php:383 include/func.inc.php:2442
 #: include/triggers.inc.php:1635
 #: include/views/administration.users.list.php:76
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -15532,7 +15532,7 @@ msgstr "Ви не можете вибрати деякі з мов, тому щ�
 msgid "You are not allowed to alter privileges for user \"%s\"."
 msgstr "Вам не дозволено змінювати привілеї користувача \"%s\"."
 
-#: include/func.inc.php:2112
+#: include/func.inc.php:2118
 msgid "You are not logged in."
 msgstr "Ви не увійшли в систему."
 
@@ -15583,15 +15583,15 @@ msgstr "У вас немає повноважень для оновлення і
 msgid "You do not have permissions to update user or user does not exist."
 msgstr "У вас немає повноважень для оновлення користувача або користувач не існує."
 
-#: include/func.inc.php:2094
+#: include/func.inc.php:2100
 msgid "You have no permissions to access this page."
 msgstr ""
 
-#: include/func.inc.php:2114
+#: include/func.inc.php:2120
 msgid "You must login to view this page."
 msgstr "Ви маєте увійти в систему для перегляду цієї сторінки."
 
-#: include/func.inc.php:2090
+#: include/func.inc.php:2096
 msgid "Your are logged in as"
 msgstr ""
 
@@ -15830,8 +15830,8 @@ msgstr "d.m.Y H:i"
 #: include/translateDefines.inc.php:46
 #: include/views/administration.auditacts.list.php:123
 #: include/views/administration.auditlogs.list.php:106 jsrpc.php:137
-#: latest.php:417 latest.php:589 tr_status.php:264 tr_status.php:699
-#: tr_status.php:817
+#: latest.php:417 latest.php:589 tr_status.php:264 tr_status.php:698
+#: tr_status.php:816
 msgid "d M Y H:i:s"
 msgstr "d.m.Y H:i:s"
 
@@ -15914,7 +15914,7 @@ msgstr "виконано"
 msgid "fixed"
 msgstr "фіксов."
 
-#: include/func.inc.php:1902
+#: include/func.inc.php:1908
 msgid "found"
 msgstr "знайдених"
 
@@ -16095,7 +16095,7 @@ msgid "now"
 msgstr "зараз"
 
 #: include/blocks.inc.php:376 include/blocks.inc.php:720
-#: include/func.inc.php:1899
+#: include/func.inc.php:1905
 msgid "of"
 msgstr "із"
 
@@ -16202,7 +16202,7 @@ msgstr "перетворення значень"
 msgid "template ID \"%1$s\" is passed %2$s times"
 msgstr "шаблон з ID \"%1$s\" передано %2$s разів"
 
-#: include/func.inc.php:1895
+#: include/func.inc.php:1901
 msgid "to"
 msgstr "до"
 
