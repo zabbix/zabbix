@@ -25,30 +25,30 @@ body {
 a {
 
 	&:link {
-		text-decoration: none;
 		color: $link-color;
+		text-decoration: none;
 		outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
 	&:visited {
-		text-decoration: none;
 		color: $link-visited-color;
+		text-decoration: none;
 	}
 
 	&:hover {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:focus {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:active {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-active-color;
+		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
 }
 
@@ -84,35 +84,35 @@ a {
 
 	&:link {
 		//text-decoration: none;
-		border-bottom: 1px solid rgba(118,141,153,0.35);
+		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
 		//cursor: pointer;
 	}
 
 	&:visited {
 		//text-decoration: none;
-		border-bottom: 1px solid rgba(118,141,153,0.35);
+		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
 		//cursor: pointer;
 	}
 
 	&:hover {
 		//text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		//cursor: pointer;
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		//cursor: pointer;
 	}
 
 	&:focus {
 		//text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		//cursor: pointer;
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		//cursor: pointer;
 	}
 
 	&:active {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//text-decoration: none;
 		color: $link-active-color;
+		border-bottom: 1px solid rgba($link-active-color, 0.5);
+		//cursor: pointer;
 	}
 }
 
@@ -630,7 +630,7 @@ footer {
 	}
 
 	.icon-help {
-		top: 0.3em;
+		top: 0.35em;
 	} 
 }
 

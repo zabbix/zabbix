@@ -31,7 +31,7 @@ $ui-border-color: #303030;
 
 $action-hover-color: #454545;
 $action-border-color: #383838;
-$action-shadow-color: rgba(0,0,0,0.5);
+$action-shadow-color: rgba(#000, 0.5);
 
 $table-border-color: #383838;
 
@@ -76,15 +76,15 @@ $link-hover-color: #4796c4;
 $link-active-color: #4796c4;
 $link-visited-color: #4796c4;
 
-$link-main-nav-color: rgba(255,255,255,0.75);
-$link-main-nav-hover-color: rgba(255,255,255,1);
-$link-main-nav-active-color: rgba(255,255,255,1);
-$link-main-nav-visited-color: rgba(255,255,255,0.75);
+$link-main-nav-color: rgba(#fff, 0.75);
+$link-main-nav-hover-color: rgba(#fff, 1);
+$link-main-nav-active-color: rgba(#fff, 1);
+$link-main-nav-visited-color: rgba(#fff, 0.75);
 
-$link-main-subnav-color: rgba(255,255,255,0.75);
-$link-main-subnav-hover-color: rgba(255,255,255,1);
-$link-main-subnav-active-color: rgba(255,255,255,1);
-$link-main-subnav-visited-color: rgba(255,255,255,0.75);
+$link-main-subnav-color: rgba(#fff, 0.75);
+$link-main-subnav-hover-color: rgba(#fff, 1);
+$link-main-subnav-active-color: rgba(#fff, 1);
+$link-main-subnav-visited-color: rgba(#fff, 0.75);
 
 
 // Important! @import string should come after variables
