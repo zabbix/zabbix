@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-15 16:24+0300\n"
-"PO-Revision-Date: 2014-10-24 21:58+0300\n"
-"Last-Translator: Luis <luislopez72@gmail.com>\n"
+"POT-Creation-Date: 2015-07-15 20:17+0300\n"
+"PO-Revision-Date: 2015-06-08 17:38+0300\n"
+"Last-Translator: Roberto <rampmaster@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1414180685.0\n"
+"X-POOTLE-MTIME: 1433777889.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -43,8 +43,8 @@ msgstr[1] "%1$d días"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d de %2$d incidiencia es mostrada"
+msgstr[1] "%1$d de %2$d incidiencias son mostradas"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -55,8 +55,8 @@ msgstr "%1$s (año %2$s)"
 #, c-format
 msgid "%1$s ITEM"
 msgid_plural "%1$s ITEMS"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s ITEM"
+msgstr[1] "%1$s ITEMS"
 
 #: latest.php:694 latest.php:873
 #, c-format
@@ -85,8 +85,8 @@ msgstr[1] "%1$s minutos"
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s intento restante"
+msgstr[1] "%1$s intentos restantes"
 
 #: jsLoader.php:222 jsLoader.php:223
 #, c-format
@@ -603,9 +603,8 @@ msgstr "Agente"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:315
-#, fuzzy
 msgid "Agent host name defined in the configuration file. String value."
-msgstr "Nombre del host definido en el archivo de configuración del Agente. Valor: Cadena (string)"
+msgstr "Nombre del host definido en el archivo de configuración del Agente. Valor: Cadena o string."
 
 #: include/views/configuration.host.edit.php:306
 #: include/views/configuration.host.edit.php:390
@@ -1037,11 +1036,11 @@ msgstr "Bind passwd"
 
 #: popup_trexpr.php:511
 msgid "Bitwise AND of last (most recent) T value and mask is = N"
-msgstr "Operación Y binaria de los últimos (más recientes) T valores y la máscara es = NOperación Y binaria de los últimos (más recientes) T valores y la máscara es = N"
+msgstr "Operación binaria Y de los últimos (más recientes) T valores y la máscara es = N"
 
 #: popup_trexpr.php:516
 msgid "Bitwise AND of last (most recent) T value and mask is NOT N"
-msgstr "Operación Y binaria de los últimos (más recientes) T valores y la máscara NO es NOperación Y binaria de los últimos (más recientes) T valores y la máscara NO es N"
+msgstr "Operación binaria Y de los últimos (más recientes) T valores y la máscara es NO N"
 
 #: include/classes/core/ZBase.php:251
 msgid "Black & Blue"
@@ -6180,7 +6179,7 @@ msgstr "Alta"
 #: jsLoader.php:203 latest.php:477 latest.php:478 latest.php:583
 #: latest.php:770
 msgid "History"
-msgstr "Histórico (días)"
+msgstr "Histórico"
 
 #: httpconf.php:175 httpconf.php:425 items.php:532 items.php:539 items.php:793
 #: items.php:805
@@ -11050,7 +11049,7 @@ msgstr "Original"
 
 #: include/classes/core/ZBase.php:250
 msgid "Original blue"
-msgstr "Azul (Original)"
+msgstr "Azul Original"
 
 #: adm.gui.php:105 adm.housekeeper.php:136 adm.iconmapping.php:120
 #: adm.images.php:145 adm.macros.php:168 adm.other.php:120 adm.regexps.php:211
@@ -14054,7 +14053,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.list.php:51 items.php:165
 #: latest.php:480 latest.php:481
 msgid "Trends"
-msgstr "Tendencias (días)"
+msgstr "Tendencias"
 
 #: events.php:332 events.php:374 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
@@ -14795,7 +14794,7 @@ msgstr ""
 #: include/forms.inc.php:428 include/views/configuration.httpconf.list.php:66
 #: items.php:163
 msgid "Update interval"
-msgstr "Refrescar cada (s)"
+msgstr "Intervalo de actualización"
 
 #: disc_prototypes.php:47 host_discovery.php:54 httpconf.php:45
 #: include/views/configuration.host.discovery.edit.php:192

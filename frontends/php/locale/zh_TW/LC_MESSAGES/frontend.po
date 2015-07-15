@@ -5,17 +5,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-15 16:24+0300\n"
-"PO-Revision-Date: 2012-11-06 15:57+0800\n"
-"Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
+"POT-Creation-Date: 2015-07-15 20:17+0300\n"
+"PO-Revision-Date: 2015-06-12 06:10+0300\n"
+"Last-Translator: Hammer <lhy719@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1434082251.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -24,7 +25,7 @@ msgstr ""
 #: maintenance.php:163 services.php:194 services.php:208
 #, c-format
 msgid "\"%s\" must be between 1970.01.01 and 2038.01.18."
-msgstr "\"%s\"必須是在1970.01.01和2038.01.18之間."
+msgstr "\"%s\"必須在1970.01.01和2038.01.18之間."
 
 #: include/profiles.inc.php:97
 msgid "\"Display OK triggers\" needs to be \"0\" or a positive integer."
@@ -32,19 +33,19 @@ msgstr "\"顯示[正常]的觸發器\" 必須為 \"0\" 或正整數."
 
 #: include/profiles.inc.php:102
 msgid "\"Triggers blink on status change\" needs to be \"0\" or a positive integer."
-msgstr "\"觸發器閃爍狀態改變時\" 必須為 \"0\" 或正整數."
+msgstr "\"狀態改變時觸發器閃爍\" 必須為 \"0\" 或正整數."
 
 #: include/func.inc.php:453
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
+msgstr[0] "%1$d 天"
 
 #: include/blocks.inc.php:1125
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
+msgstr[0] "顯示%2$d中的%1$d筆事件"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -61,39 +62,39 @@ msgstr[0] ""
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] "%1$s 項"
+msgstr[0] "%1$s 項目"
 
 #: include/views/configuration.item.edit.php:327
 #: include/views/configuration.item.edit.php:343
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
+msgstr[0] "%1$s 天"
 
 #: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
+msgstr[0] "%1$s 分鐘"
 
 #: include/classes/screens/CScreenActions.php:151
 #: include/views/administration.auditacts.list.php:90
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
+msgstr[0] "尚有%1$s次重試"
 
 #: jsLoader.php:222 jsLoader.php:223
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
+msgstr[0] "%1$s 秒"
 
 #: include/page_header.php:344
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
+msgstr[0] "已記錄%4$s次登入失敗。最後一次是於%2$s %3$s，從%1$s嚐試登入。"
 
 #: include/views/monitoring.discovery.php:133
 #, c-format
@@ -105,44 +106,44 @@ msgstr[0] "%d個裝置"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.action.edit.php:483
 msgid "(0 - infinitely)"
-msgstr "(0 -無限地)"
+msgstr "(0 - 無限)"
 
 #: include/views/configuration.host.edit.php:255
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:159
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(只有超級管理員可以新增群組)"
 
 #: include/forms.inc.php:580 include/forms.inc.php:595
 msgid "(in days)"
-msgstr "(日計)"
+msgstr "(以日計)"
 
 #: include/forms.inc.php:428
 msgid "(in sec)"
-msgstr "(秒計)"
+msgstr "(以秒計)"
 
 #: include/views/configuration.action.edit.php:494
 msgid "(minimum 60 seconds, 0 - use action default)"
-msgstr "(最少 60 秒, 0 為預設值)"
+msgstr "(最少 60 秒, 0 表採用預設值)"
 
 #: include/views/configuration.host.edit.php:437
 #: include/views/configuration.host.edit.php:458
 #: include/views/configuration.host.massupdate.php:162
 #: include/views/configuration.host.prototype.edit.php:153
 msgid "(no proxy)"
-msgstr "(無系統代理程式)"
+msgstr "(沒有代理伺服器)"
 
 #: include/classes/setup/CSetupWizard.php:244
 msgid "(with warnings)"
-msgstr ""
+msgstr "(存有警示)"
 
 #: include/blocks.inc.php:1329
 msgid "-"
-msgstr ""
+msgstr "-"
 
 #: acknow.php:134
 msgid "----[BULK ACKNOWLEDGE]----"
@@ -158,7 +159,7 @@ msgstr "0 或 1"
 
 #: queue.php:105 queue.php:153
 msgid "1 minute"
-msgstr "1分"
+msgstr "1 分鐘"
 
 #: queue.php:103 queue.php:151
 msgid "10 seconds"
@@ -194,14 +195,14 @@ msgstr "<手冊>"
 
 #: include/views/administration.auditacts.list.php:31
 msgid "ACTION LOG"
-msgstr ""
+msgstr "回應記錄"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:194
 msgid "ALARM ACKNOWLEDGES"
@@ -213,27 +214,27 @@ msgstr "且"
 
 #: include/views/administration.auditlogs.list.php:31
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "稽查記錄"
 
 #: report2.php:163
 msgid "AVAILABILITY REPORT"
-msgstr "系統可用性統計"
+msgstr "系統可用性統計報表"
 
 #: popup_trexpr.php:129
 msgid "Absolute difference between last and previous value is < N"
-msgstr "最末和前一個值之前的絕對差異是 < N"
+msgstr "最後和前一個值的差異之絕對值 < N"
 
 #: popup_trexpr.php:137
 msgid "Absolute difference between last and previous value is = N"
-msgstr "最末和前一個值之前的絕對差異是 = N"
+msgstr "最後和前一個值的差異之絕對值 = N"
 
 #: popup_trexpr.php:133
 msgid "Absolute difference between last and previous value is > N"
-msgstr "最末和前一個值之前的絕對差異是 > N"
+msgstr "最後和前一個值的差異之絕對值 > N"
 
 #: popup_trexpr.php:141
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr "最末和前一個值之前的絕對差異不是 N"
+msgstr "最後和前一個值的差異之絕對值 不是 N"
 
 #: report3.php:83 srv_status.php:143
 msgid "Acceptable SLA"
@@ -241,11 +242,11 @@ msgstr "可接受的SLA"
 
 #: sysmap.php:76
 msgid "Access denied!"
-msgstr "存取被拒!"
+msgstr "拒絕存取!"
 
 #: include/func.inc.php:1681
 msgid "Access denied."
-msgstr ""
+msgstr "拒絕存取。"
 
 #: include/classes/api/services/CUser.php:988
 #, c-format
@@ -264,7 +265,7 @@ msgstr "知悉"
 
 #: acknow.php:160
 msgid "Acknowledge added"
-msgstr "已加知悉"
+msgstr "已註記知悉"
 
 #: acknow.php:199 acknow.php:232
 msgid "Acknowledge alarm by"
@@ -284,11 +285,11 @@ msgstr "已知悉"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:83
 msgid "Acknowledged OK events"
-msgstr "已知悉正常事件"
+msgstr "已知悉「正常」事件"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "已知悉問題事件"
+msgstr "已知悉「問題」事件"
 
 #: acknow.php:27 tr_events.php:114
 msgid "Acknowledges"
@@ -296,7 +297,7 @@ msgstr "知悉"
 
 #: include/views/configuration.sysmap.edit.php:127
 msgid "Acknowledging disabled"
-msgstr "無權知悉"
+msgstr "取消知悉"
 
 #: include/audit.inc.php:28 include/classes/screens/CScreenActions.php:129
 #: include/views/administration.auditacts.list.php:70
@@ -326,7 +327,7 @@ msgstr "無權知悉"
 #: include/views/configuration.triggers.massupdate.php:88 tr_logform.php:274
 #: tr_logform.php:278
 msgid "Action"
-msgstr "動作"
+msgstr "回應作業"
 
 #: include/classes/api/services/CAction.php:1910
 #: include/classes/api/services/CAction.php:1925
@@ -334,13 +335,13 @@ msgstr "動作"
 #: include/classes/api/services/CAction.php:2057
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "回應作業 \"%1$s\" 已存在。"
 
 #: include/classes/api/services/CAction.php:1905
 #: include/classes/api/services/CAction.php:2004
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
-msgstr "動作\"%1$s\"已有不正確值達\"esc_period\" (最少%2$s秒)."
+msgstr "回應作業\"%1$s\"已有不正確值達\"esc_period\" (最少%2$s秒)."
 
 #: include/classes/api/services/CAction.php:2079
 #, c-format

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-15 16:24+0300\n"
-"PO-Revision-Date: 2015-03-17 21:31+0300\n"
+"POT-Creation-Date: 2015-07-15 20:17+0300\n"
+"PO-Revision-Date: 2015-05-29 17:37+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1426620660.0\n"
+"X-POOTLE-MTIME: 1432913875.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -6795,7 +6795,7 @@ msgstr "Ícone (manutenção)"
 
 #: include/views/js/configuration.sysmaps.js.php:275
 msgid "Icon (problem)"
-msgstr "Ícone (problema)"
+msgstr "Ícone (incidente)"
 
 #: include/views/configuration.sysmap.edit.php:64
 msgid "Icon highlight"
@@ -9525,7 +9525,7 @@ msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1466
 msgid "Multiple PROBLEM events"
-msgstr "Multiplos eventos de PROBLEMA"
+msgstr "Multiplos eventos de INCIDENTE"
 
 #: include/views/configuration.triggers.edit.php:250
 msgid "Multiple PROBLEM events generation"
@@ -11316,7 +11316,7 @@ msgstr "POP"
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
-msgstr "PROBLEMA"
+msgstr "INCIDENTE"
 
 #: include/validate.inc.php:400
 msgid "Page received incorrect data"
@@ -11664,7 +11664,7 @@ msgstr "Provavelmente o módulo php-ldap está ausente."
 #: include/views/common.filter.trigger.php:40
 #: include/views/js/configuration.sysmaps.js.php:143
 msgid "Problem"
-msgstr "Problema"
+msgstr "Incidente"
 
 #: include/views/configuration.sysmap.edit.php:129
 #: include/views/monitoring.dashconf.php:112
@@ -11673,7 +11673,7 @@ msgstr "Exibição de incidentes"
 
 #: jsrpc.php:117
 msgid "Problem on"
-msgstr "Problema em"
+msgstr "Incidente em"
 
 #: srv_status.php:142
 msgid "Problem time"
@@ -11685,7 +11685,7 @@ msgstr "Incidente, se todos os filhos tem incidentes"
 
 #: include/services.inc.php:24
 msgid "Problem, if at least one child has a problem"
-msgstr "Problema, se pelo menos um filho tem problema"
+msgstr "Incidente, se pelo menos um filho tem incidente"
 
 #: chart4.php:163 include/maps.inc.php:503 include/maps.inc.php:586
 #: include/maps.inc.php:677 report2.php:395 report3.php:83
