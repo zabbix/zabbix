@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
 "PO-Revision-Date: 2014-10-10 10:32+0300\n"
 "Last-Translator: maxhq <jens@jebecs.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1537,7 +1537,6 @@ msgid "Cannot delete maintenance"
 msgstr "Kann Wartung nicht löschen"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Kann Medien-Typ nicht löschen"
@@ -1548,7 +1547,6 @@ msgid "Cannot delete network map"
 msgstr "Kann Karte nicht löschen"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Kann Proxy nicht löschen"
@@ -1565,7 +1563,6 @@ msgid "Cannot delete screen"
 msgstr "Kann Tafel nicht löschen"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Kann Skript nicht löschen"
@@ -8959,7 +8956,6 @@ msgid "Media type added"
 msgstr "Medientyp hinzugefügt"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Medientyp gelöscht"
@@ -11205,7 +11201,6 @@ msgid "Proxy added"
 msgstr "Proxy angelegt"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Proxy gelöscht"
@@ -12057,7 +12052,6 @@ msgid "Script command cannot be empty."
 msgstr ""
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Skript gelöscht"

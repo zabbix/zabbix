@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
-"PO-Revision-Date: 2012-05-04 10:10+0200\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
+"PO-Revision-Date: 2014-10-03 08:43+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
 "Language: el\n"
@@ -16,7 +16,8 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Pootle 2.1.4\n"
+"X-Generator: Pootle 2.5.0\n"
+"X-POOTLE-MTIME: 1412318596.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -1534,7 +1535,6 @@ msgid "Cannot delete maintenance"
 msgstr "Αδύνατη η διαγραφή συντήρησης"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Αδύνατη η διαγραφή τύπου μέσων"
@@ -1545,7 +1545,6 @@ msgid "Cannot delete network map"
 msgstr "Αδύνατη η διαγραφή χάρτη δικτύου"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Αδύνατη η διαγραφή διαμεσολαβητή"
@@ -1563,7 +1562,6 @@ msgid "Cannot delete screen"
 msgstr "Αδύνατη η διαγραφή οθόνης"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Αδύνατη η διαγραφή δέσμης ενεργειών"
@@ -8938,7 +8936,6 @@ msgid "Media type added"
 msgstr "Τύπος μέσων προστέθηκε"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Τύπος μέσων διεγράφη"
@@ -11176,7 +11173,6 @@ msgid "Proxy added"
 msgstr "Διαμεσολαβητής προστέθηκε"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Διαμεσολαβητής διεγράφη"
@@ -12024,7 +12020,6 @@ msgid "Script command cannot be empty."
 msgstr ""
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Δέσμη ενεργειών διεγράφη"
