@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
-"PO-Revision-Date: 2015-02-26 14:29+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
+"PO-Revision-Date: 2015-06-03 11:22+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1424953787.0\n"
+"X-POOTLE-MTIME: 1433323378.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -576,12 +576,12 @@ msgstr "Agente"
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:335
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Verificação de disponibilidade do agente. Se retornar nulo - indisponível; 1 - Disponível"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:331
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Nome do host do agente. Retorna um texto"
 
 #: include/views/configuration.host.edit.php:140
 #: include/views/configuration.host.edit.php:225
@@ -1080,17 +1080,17 @@ msgstr "CONFIGURAÇÃO DE TRIGGERS"
 #: include/classes/items/CHelpItems.php:201
 #: include/classes/items/CHelpItems.php:479
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "Informação da CPU. Retorna texto ou número inteiro"
 
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:455
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "Carga da CPU. Retorna um ponto flutuante (número)"
 
 #: include/classes/items/CHelpItems.php:189
 #: include/classes/items/CHelpItems.php:467
 msgid "CPU utilisation in percent. Returns float"
-msgstr ""
+msgstr "Percentual de utilização da CPU. Retorna um ponto flutuante (número)"
 
 #: include/views/configuration.services.edit.php:71 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1529,7 +1529,6 @@ msgid "Cannot delete maintenance"
 msgstr "Não foi possível remover período de manutenção"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Não foi possível remover tipo de mídia"
@@ -1540,7 +1539,6 @@ msgid "Cannot delete network map"
 msgstr "Não foi possível remover mapa de rede"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Não foi possível remover proxy"
@@ -1557,7 +1555,6 @@ msgid "Cannot delete screen"
 msgstr "Não foi possível excluir a tela"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Não foi possível remover script"
@@ -1991,7 +1988,7 @@ msgstr[1] "Não foi possível importar o template \"%1$s\", vinculado com os tem
 #: include/classes/mvc/CView.php:219
 #, c-format
 msgid "Cannot include JS file \"%s\"."
-msgstr ""
+msgstr "Não foi possível incluir o arquivo JS \"%s\"."
 
 #: include/classes/mvc/CView.php:141
 #, c-format
@@ -2498,7 +2495,7 @@ msgstr "Chassi"
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:475
 msgid "Chassis information. Returns string"
-msgstr ""
+msgstr "Informação do chassi. Retorna um texto"
 
 #: include/views/js/configuration.discovery.edit.js.php:538
 msgid "Check already exists."
@@ -2532,17 +2529,17 @@ msgstr "Checagens"
 #: include/classes/items/CHelpItems.php:85
 #: include/classes/items/CHelpItems.php:363
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
-msgstr ""
+msgstr "Verifica se o serviço do DNS está em execução. Retorna 0 - DNS fora (servidor não respondeu ou a resolução de nome falhou); 1 - DNS em execução"
 
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:555
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
-msgstr ""
+msgstr "Verifica se o arquivo existe. Retorna 0 - arquivo não existe; 1 - O arquivo existe (tanto para arquivos normais quanto para links)"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:395
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
-msgstr ""
+msgstr "Verifica se é possível estabelecer uma conexão TCP com a porta especificada. Retorna 0 - não foi possível conectar; 1 - Foi possível a conexão"
 
 #: include/classes/items/CHelpItems.php:615
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
@@ -2552,23 +2549,23 @@ msgstr "Verifica se o servidor responde à requisições ICMP ping. 0 - ICMP pin
 #: include/classes/items/CHelpItems.php:399
 #: include/classes/items/CHelpItems.php:627
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "Verifica se o serviço está em execução e aceitando conexões TCP. Retorna: 0 - serviço não está em execução; 1 - serviço em execução"
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:411
 #: include/classes/items/CHelpItems.php:635
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "Verifica se o serviço está em execução e respondendo a requisições UDP. Retorna: 0 - serviço não está em execução; 1 - serviço em execução"
 
 #: include/classes/items/CHelpItems.php:113
 #: include/classes/items/CHelpItems.php:391
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "Verifica se determinada porta TCP está em modo de ESCUTA. Retorna: 0 - não está em modo de escuta; 1 - está em modo de escuta"
 
 #: include/classes/items/CHelpItems.php:129
 #: include/classes/items/CHelpItems.php:407
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "Verifica se determinada porta UDP está em modo de ESCUTA. Retorna: 0 - não está em modo de escuta; 1 - está em modo de escuta"
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:403
@@ -3068,7 +3065,7 @@ msgstr "Contador"
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:463
 msgid "Count of context switches. Returns integer"
-msgstr ""
+msgstr "Número de trocas de contexto. Retorna: número inteiro"
 
 #: include/views/configuration.action.list.php:35
 msgid "Create action"
@@ -3767,7 +3764,7 @@ msgstr "Remover período de manutenção?"
 
 #: app/views/administration.mediatype.edit.php:172
 msgid "Delete media type?"
-msgstr ""
+msgstr "Excluir o tipo de mídia?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
@@ -4099,7 +4096,7 @@ msgstr "Descrição atualizada"
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:527
 msgid "Detailed host information. Returns string"
-msgstr ""
+msgstr "Informação detalhada do host. Retorna: texto"
 
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1234
 #: include/blocks.inc.php:477 include/func.inc.php:1704
@@ -4121,7 +4118,7 @@ msgstr "Dispositivo"
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:451
 msgid "Device interrupts. Returns integer"
-msgstr ""
+msgstr "Interrupções do dispositivo. Retorna: número inteiro"
 
 #: discoveryconf.php:40 include/views/configuration.discovery.edit.php:78
 msgid "Device uniqueness criteria"
@@ -4170,7 +4167,7 @@ msgstr "Diferença entre o último valor e seu predecessor é NÃO É N"
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:431
 msgid "Different information about specific process(es). Returns float"
-msgstr ""
+msgstr "Informações diversas sobre um processo específico. Retorna: ponto flutuante"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -4426,17 +4423,18 @@ msgstr "Status autobusca"
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:539
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr ""
+msgstr "Estatísticas de leitura de disco. Retorna: inteiro - se o tipo for setores, operações ou bytes; ponto flutuante - se o tipo for sps, ops, bps"
 
+# Is a free disk space or used disk space ???
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:583
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Espaço em disco em bytes ou em percentual do total. Retorna: inteiro para bytes; ponto flutuante para percentual"
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:543
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr ""
+msgstr "Estatísticas de gravação de disco. Retorna: inteiro - se o tipo for setores, operações ou bytes; ponto flutuante - se o tipo for sps, ops, bps"
 
 #: adm.triggerdisplayoptions.php:43
 #: include/views/administration.general.triggerDisplayOptions.edit.php:66
@@ -4969,7 +4967,7 @@ msgstr "Lista de eventos [20 anteriores]"
 
 #: include/classes/items/CHelpItems.php:343
 msgid "Event log monitoring. Returns log"
-msgstr ""
+msgstr "Monitoração do log de eventos. Retorna: log"
 
 #: include/views/configuration.action.list.php:27
 msgid "Event source"
@@ -5018,7 +5016,7 @@ msgstr "Erro de execução de SQL: [%1$s] em [%2$s]."
 #: include/classes/items/CHelpItems.php:325
 #: include/classes/items/CHelpItems.php:603
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Executa requisição WMI retornando o primeiro objeto selecionado. Retorna: inteiro, ponto flutuante, caracter ou texto (dependendo da requisição)"
 
 #: app/views/administration.script.edit.php:53
 #: app/views/administration.script.list.php:44
@@ -5160,7 +5158,7 @@ msgstr "Falha de Auditoria"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
-msgstr ""
+msgstr "Erro fatal, favor reportar ao time Zabbix"
 
 #: app/views/monitoring.dashboard.view.php:48 jsLoader.php:191
 msgid "Favourite graphs"
@@ -5245,7 +5243,7 @@ msgstr "O campo \"nome\" é obrigatório."
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:547
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
-msgstr ""
+msgstr "Verificação \"checksum\", calculada pelo algoritmo UNIX cksum. Retorna: número inteiro"
 
 #: include/classes/api/services/CImage.php:562
 msgid "File format is unsupported."
@@ -5264,12 +5262,12 @@ msgstr "O arquivo se referencia a uma visão que não existe. Tentou localizar \
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:571
 msgid "File size (in bytes). Returns integer"
-msgstr ""
+msgstr "Tamanho do arquivo (em bytes). Retorna: número inteiro"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:575
 msgid "File time information. Returns integer (Unix timestamp)"
-msgstr ""
+msgstr "Horário do arquivo. Retorna: timestamp UNIX (número inteiro)"
 
 #: include/graphs.inc.php:57
 msgid "Filled region"
@@ -5314,17 +5312,17 @@ msgstr "Localizar a string V no último (mais recente) valor. N NÃO É 1 - se e
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:567
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
-msgstr ""
+msgstr "Busca um texto em um arquivo. Retorna: 0 - não localizou; 1 - Localizou"
 
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:563
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "Busca um texto em um arquivo. Retorna a linha que contêm o texto pesquisado, ou como for especificado no parâmetro opcional <output>"
 
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:599
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "Busca um texto em uma página web. Retorna a linha que contêm o texto pesquisado, ou como for especificado no parâmetro opcional <output>"
 
 #: include/classes/setup/CSetupWizard.php:118
 msgid "Finish"
@@ -5458,7 +5456,7 @@ msgstr "Alemão (de_DE)"
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:591
 msgid "Get content of web page. Returns web page source as text"
-msgstr ""
+msgstr "Recupera o conteúdo de uma página web. Retorna: o texto com código fonte da página"
 
 #: include/triggers.inc.php:1599 tr_testexpr.php:35
 msgid "Given expression is not a macro"
@@ -5838,7 +5836,7 @@ msgstr "Hardware (visão detalhada)"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:435
 msgid "Hardware sensor reading. Returns float"
-msgstr ""
+msgstr "Sensor de leitura de hardware. Retorna: número em ponto flutuante"
 
 #: include/views/configuration.httpconf.edit.php:110
 #: include/views/configuration.httpconf.popup.php:97
@@ -6739,7 +6737,7 @@ msgstr "Incluir"
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:375
 msgid "Incoming traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Retorna estatísticas de tráfego de uma interface. Retorna: número inteiro"
 
 #: include/classes/api/services/CService.php:1129
 #, c-format
@@ -8453,22 +8451,22 @@ msgstr "A lista está vazia"
 #: include/classes/items/CHelpItems.php:209
 #: include/classes/items/CHelpItems.php:487
 msgid "Listing of MAC addresses. Returns string"
-msgstr ""
+msgstr "Lista dos endereços MAC. Retorna: texto"
 
 #: include/classes/items/CHelpItems.php:205
 #: include/classes/items/CHelpItems.php:483
 msgid "Listing of PCI or USB devices. Returns text"
-msgstr ""
+msgstr "Lista de dispositivos USB ou PCI. Retorna: texto"
 
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:511
 msgid "Listing of installed packages. Returns text"
-msgstr ""
+msgstr "Lista de pacotes instalados. Retorna: texto"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:443
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
-msgstr ""
+msgstr "Lista de serviços. Retorna: 0 - se vazia; texto - lista de serviços separados por quebra de linha"
 
 #: include/locales.inc.php:69
 msgid "Lithuanian (lt_LT)"
@@ -8477,7 +8475,7 @@ msgstr "Lituano (lt_LT)"
 #: include/classes/items/CHelpItems.php:317
 #: include/classes/items/CHelpItems.php:595
 msgid "Loading time of full web page (in seconds). Returns float"
-msgstr ""
+msgstr "Tempo para carga completa de uma página web (em segundos). Retorna: ponto flutuante"
 
 #: include/classes/screens/CScreenHistory.php:148
 #: include/views/configuration.screen.constructor.edit.php:610
@@ -8504,11 +8502,11 @@ msgstr "Log"
 
 #: include/classes/items/CHelpItems.php:359
 msgid "Log file monitoring with log rotation support. Returns log"
-msgstr ""
+msgstr "Monitoração de arquivo de log com suporte a rotação. Retorna: log"
 
 #: include/classes/items/CHelpItems.php:355
 msgid "Log file monitoring. Returns log"
-msgstr ""
+msgstr "Monitoração de log. Retorna: log"
 
 #: popup_trexpr.php:478
 msgid "Log severity of the last log entry is < N"
@@ -8622,7 +8620,7 @@ msgstr "MD5"
 #: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:559
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
-msgstr ""
+msgstr "Verificação checksum MD5. Retorna: texto (hash MD5 do arquivo)"
 
 #: include/audit.inc.php:49
 #: include/views/administration.general.macros.edit.php:34
@@ -8875,12 +8873,12 @@ msgstr "A quantidade máxima de intervalos flexíveis foi alcançada"
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:347
 msgid "Maximum number of opened files supported by OS. Returns integer"
-msgstr ""
+msgstr "Número máximo de arquivos abertos suportado pelo S.O.. Retorna: inteiro"
 
 #: include/classes/items/CHelpItems.php:81
 #: include/classes/items/CHelpItems.php:351
 msgid "Maximum number of processes supported by OS. Returns integer"
-msgstr ""
+msgstr "Quantidade máxima de processos suportada pelo S.O.. Retorna: número inteiro"
 
 #: include/classes/screens/CScreenBase.php:352 include/graphs.inc.php:415
 #, c-format
@@ -8937,7 +8935,6 @@ msgid "Media type added"
 msgstr "Tipo de mídia adicionado"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Tipo de mídia excluído"
@@ -8982,12 +8979,12 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:587
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Tamanho da memória em bytes ou em percentual relativo ao total. Retorna: inteiro para bytes; ponto flutuante para percentual"
 
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:423
 msgid "Memory used by process in bytes. Returns integer"
-msgstr ""
+msgstr "Memória utilizada pelo processo em bytes. Retorna: número inteiro"
 
 #: app/views/monitoring.dashboard.view.php:76
 #: include/views/configuration.item.list.php:217
@@ -9329,7 +9326,7 @@ msgstr "Período de retenção de dados de eventos e alertas da descoberta de re
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:379
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
-msgstr ""
+msgstr "Lista das interfaces de rede (incluindo o tipo da interface, status, endereço IPv4 e descrição). Retorna: texto"
 
 #: sysmaps.php:174
 msgid "Network map added"
@@ -10068,7 +10065,7 @@ msgstr "Agora"
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:459
 msgid "Number of CPUs. Returns integer"
-msgstr ""
+msgstr "Número de CPUs. Retorna: número inteiro"
 
 #: include/blocks.inc.php:488 include/blocks.inc.php:489
 msgid "Number of hosts (enabled/disabled/templates)"
@@ -10097,7 +10094,7 @@ msgstr "Quantidade de hosts monitorados"
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:371
 msgid "Number of out-of-window collisions. Returns integer"
-msgstr ""
+msgstr "Número de colisões fora da janela. Retorna: número inteiro"
 
 #: include/classes/items/CHelpItems.php:683
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -10174,7 +10171,7 @@ msgstr "Número de usuários (online)"
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:535
 msgid "Number of users logged in. Returns integer"
-msgstr ""
+msgstr "Número de usuários conectados. Retorna: número inteiro"
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Number of values stored in table HISTORY."
@@ -10211,7 +10208,7 @@ msgstr "Número de máquinas virtuais no hypervisor VMware, <url> - URL de servi
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:579
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr ""
+msgstr "Quantidade ou percentual de inodes. Retorna: inteiro para quantidade; ponto flutuante para percentual"
 
 #: include/forms.inc.php:427 include/items.inc.php:123
 #: include/triggers.inc.php:2047 include/views/configuration.item.edit.php:236
@@ -10425,7 +10422,7 @@ msgstr "Ópera"
 #: include/classes/items/CHelpItems.php:229
 #: include/classes/items/CHelpItems.php:507
 msgid "Operating system information. Returns string"
-msgstr ""
+msgstr "Informação sobre o sistema operacional. Retorna: texto"
 
 #: actionconf.php:295
 #, c-format
@@ -10568,7 +10565,7 @@ msgstr "Outros"
 #: include/classes/items/CHelpItems.php:105
 #: include/classes/items/CHelpItems.php:383
 msgid "Outgoing traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Estatísticas de saída de tráfego na interface de rede. Retorna: número inteiro"
 
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.edit.php:372
@@ -10895,7 +10892,7 @@ msgstr "Linha percentual (direita)"
 #: include/classes/items/CHelpItems.php:89
 #: include/classes/items/CHelpItems.php:367
 msgid "Performs a DNS query. Returns character string with the required type of information"
-msgstr ""
+msgstr "Executa uma consulta DNS. Retorna: texto com o tipo de informação requisitado"
 
 #: include/views/configuration.host.discovery.edit.php:215
 #: include/views/configuration.host.discovery.edit.php:252
@@ -11176,7 +11173,6 @@ msgid "Proxy added"
 msgstr "Proxy adicionado"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Proxy removido"
@@ -11600,7 +11596,7 @@ msgstr "Receber apenas cabeçalho"
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:551
 msgid "Retrieving contents of a file. Returns text"
-msgstr ""
+msgstr "Recupera o conteúdo de um arquivo. Retorna: texto"
 
 #: include/views/general.warning.php:27
 msgid "Retry"
@@ -11710,7 +11706,7 @@ msgstr "Executar comandos remotos nos hosts"
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:495
 msgid "Run specified command on the host. Returns text result of the command"
-msgstr ""
+msgstr "Executa um comando no host. Retorna: texto com o resultado do comando"
 
 #: include/locales.inc.php:75
 msgid "Russian (ru_RU)"
@@ -12022,10 +12018,9 @@ msgstr "Script adicionado"
 #: include/classes/api/services/CScript.php:398
 #: include/classes/api/services/CScript.php:442
 msgid "Script command cannot be empty."
-msgstr ""
+msgstr "O comando do script não pode ser nulo."
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Script removido"
@@ -12049,7 +12044,7 @@ msgstr "O nome de script \"%1$s\" já é utilizado no menu para o script \"%2$s\
 #: include/classes/api/services/CScript.php:395
 #: include/classes/api/services/CScript.php:437
 msgid "Script name cannot be empty."
-msgstr ""
+msgstr "O nome do script não pode ser nulo."
 
 #: include/classes/debug/CProfiler.php:115
 msgid "Script profiler"
@@ -12622,7 +12617,7 @@ msgstr "Software - Aplicação E"
 #: include/classes/items/CHelpItems.php:225
 #: include/classes/items/CHelpItems.php:503
 msgid "Software architecture information. Returns string"
-msgstr ""
+msgstr "Informação sobre a arquitetura de software. Retorna: texto"
 
 #: include/views/configuration.screen.constructor.edit.php:453
 msgid "Sort entries by"
@@ -12830,7 +12825,7 @@ msgstr "Sucesso na Auditoria"
 #: include/classes/items/CHelpItems.php:109
 #: include/classes/items/CHelpItems.php:387
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Sumarização das estatísticas de entrada e saída da interface de rede. Retorna: número inteiro"
 
 #: popup_trexpr.php:370
 msgid "Sum of values of a period T is < N"
@@ -12869,17 +12864,17 @@ msgstr "Sobrenome"
 #: include/classes/items/CHelpItems.php:237
 #: include/classes/items/CHelpItems.php:515
 msgid "Swap in (from device into memory) statistics. Returns integer"
-msgstr ""
+msgstr "Estatísticas de envio de dados do swap para a memória. Retorna: número inteiro"
 
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:519
 msgid "Swap out (from memory onto device) statistics. Returns integer"
-msgstr ""
+msgstr "Estatísticas de envio de dados da memória para o swap. Retorna: número inteiro"
 
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:523
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Tamanho do espaço do swap em bytes ou percentual relativo ao total. Retorna: inteiro para bytes; ponto flutuante para percentual"
 
 #: include/locales.inc.php:78
 msgid "Swedish (sv_SE)"
@@ -12892,7 +12887,7 @@ msgstr "A mudança do método de autenticação irá invalidar todas as sessões
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:447
 msgid "System boot time. Returns integer (Unix timestamp)"
-msgstr ""
+msgstr "Tempo desde a carga do sistema. Retorna: timestamp UNIX (número inteiro)"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:155
 msgid "System default"
@@ -12905,12 +12900,12 @@ msgstr "Erro de sistema."
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:471
 msgid "System host name. Returns string"
-msgstr ""
+msgstr "Nome do host. Retorna: texto"
 
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:499
 msgid "System statistics. Returns integer or float"
-msgstr ""
+msgstr "Estatísticas do sistema. Retorna: número inteiro ou ponto flutuante"
 
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
 msgid "System status"
@@ -12919,12 +12914,12 @@ msgstr "Status do sistema"
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:491
 msgid "System time. Returns integer with type as utc; string - with type as local"
-msgstr ""
+msgstr "Horário do sistema. Retorna: número inteiro - se o tipo for UTC; Texto - se o tipo for local"
 
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:531
 msgid "System uptime in seconds. Returns integer"
-msgstr ""
+msgstr "Tempo desde a carga do sistema. Retorna: número inteiro"
 
 #: jsLoader.php:127
 msgctxt "Thursday short"
@@ -13175,7 +13170,7 @@ msgstr "O grupo de host não foi mais descoberto e será excluído em %1$s (às 
 
 #: include/html.inc.php:600
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "O grupo de hosts não foi descoberto mais e será excluído na próxima vez que a regra de descoberta for processada."
 
 #: include/html.inc.php:632
 #, c-format
@@ -13184,7 +13179,7 @@ msgstr "O host não foi mais descoberto e será excluído em %1$s (às %2$s de %
 
 #: include/html.inc.php:627
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "O host não foi mais descoberto e será excluído na próxima vez que a auto-busca for processada."
 
 #: include/classes/api/services/CImage.php:392
 #, c-format
@@ -13207,12 +13202,12 @@ msgstr "O item não foi mais encontrado e será excluído em %1$s (às %2$s de %
 
 #: include/html.inc.php:654
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "O item não foi mais descoberto e será excluído na próxima vez que a auto-busca for processada."
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:427
 msgid "The number of processes. Returns integer"
-msgstr ""
+msgstr "Número de processos. Retorna: número inteiro"
 
 #: include/classes/core/CJsonRpc.php:175
 msgid "The received JSON is not a valid JSON-RPC Request."
@@ -14792,7 +14787,7 @@ msgstr "Um mapeamento de valores deve possuir, no mínimo, um mapeamento."
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:419
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Valor de um contador de performance do Windows. Retorna: inteiro, ponto flutuante ou texto (dependendo da requisição)"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:345
 msgid "Value: no data"
@@ -14818,7 +14813,7 @@ msgstr "Detalhado"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:339
 msgid "Version of Zabbix agent. Returns string"
-msgstr ""
+msgstr "Versão do agente Zabbix. Retorna: texto"
 
 #: include/views/configuration.screen.constructor.edit.php:652
 msgid "Vertical"

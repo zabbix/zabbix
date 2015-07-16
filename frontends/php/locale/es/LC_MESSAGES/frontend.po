@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
 "PO-Revision-Date: 2014-10-18 05:18+0300\n"
 "Last-Translator: Saúl <saulortega.co@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1528,7 +1528,6 @@ msgid "Cannot delete maintenance"
 msgstr "No es posible eliminar el periodo de mantenimiento"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "No es posible eliminar el tipo de medio"
@@ -1539,7 +1538,6 @@ msgid "Cannot delete network map"
 msgstr "No es posible eliminar el mapa de red"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "No es posible eliminar el proxy"
@@ -1556,7 +1554,6 @@ msgid "Cannot delete screen"
 msgstr "No es posible eliminar la pantalla"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "No es posible eliminar el script"
@@ -8944,7 +8941,6 @@ msgid "Media type added"
 msgstr ""
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Tipo de medio eliminado"

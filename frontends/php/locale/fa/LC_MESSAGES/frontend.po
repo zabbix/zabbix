@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
 "PO-Revision-Date: 2014-04-13 14:12+0300\n"
 "Last-Translator: Mohammad <mohammadsharifi666@gmail.com>\n"
 "Language-Team: none\n"
@@ -1513,7 +1513,6 @@ msgid "Cannot delete maintenance"
 msgstr "دوره نگهداری نمی‌تواند حذف شود"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "نوع رسانه نمی تواند حذف شود"
@@ -1523,7 +1522,6 @@ msgid "Cannot delete network map"
 msgstr "نقشه شبکه نمی تواند حذف شود"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "پروکسی نمی تواند حذف شود"
@@ -1538,7 +1536,6 @@ msgid "Cannot delete screen"
 msgstr "صفحه نمایش نمی تواند حذف شود"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "اسکریپت نمی تواند حذف شود"

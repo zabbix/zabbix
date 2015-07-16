@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
 "PO-Revision-Date: 2015-03-16 17:02+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1528,7 +1528,6 @@ msgid "Cannot delete maintenance"
 msgstr "Impossibile rimuovere manutenzione"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Impossibile rimuovere il tipo di supporto"
@@ -1539,7 +1538,6 @@ msgid "Cannot delete network map"
 msgstr "Impossibile rimuovere la mappa di rete"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Impossibile rimuovere il proxy"
@@ -1556,7 +1554,6 @@ msgid "Cannot delete screen"
 msgstr "Impossibile rimuovere la schermata"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Impossibile rimuovere lo script"
@@ -8926,7 +8923,6 @@ msgid "Media type added"
 msgstr "Tipi di supporto aggiunti"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Tipo di supporto rimosso"
@@ -11161,7 +11157,6 @@ msgid "Proxy added"
 msgstr "Proxy aggiunto"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Proxy rimosso"
@@ -12008,7 +12003,6 @@ msgid "Script command cannot be empty."
 msgstr ""
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Percorso menu Script \"%1$s\" già utilizzato come nome script \"%2$s\"."
