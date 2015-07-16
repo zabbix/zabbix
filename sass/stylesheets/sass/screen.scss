@@ -565,6 +565,13 @@ footer {
 	    	border-bottom-color: $font-alt-color;
 	    }
 
+	    .arrow-right {
+	    	//position: absolute;
+	    	//top: 45%;
+	    	margin: 0 0 0 4px;
+	    	border-left-color: $font-alt-color;
+	    }
+
 	    .arrow-down {
 	    	position: absolute;
 	    	top: 45%;
@@ -618,7 +625,6 @@ footer {
 	}
 
 	td {
-		position: relative;
 		padding: 8px 5px 8px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
@@ -628,10 +634,6 @@ footer {
 		white-space: nowrap;
 		@include rotate(270);
 	}
-
-	.icon-help {
-		top: 0.35em;
-	} 
 }
 
 .table-paging {
@@ -1804,6 +1806,17 @@ button[disabled] {
 	}
 }
 
+.icon-help-position {
+	position: relative;
+	padding: 8px 5px;
+
+	button {
+		position: absolute;
+		top: 3px;
+		left: -3px;
+	}
+}
+
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
@@ -2656,7 +2669,7 @@ td.na-bg {
 	border-left: none;
 
 	~ td.na-bg {
-		border-left: 1px dotted $ui-bg-color;
+		border-left: 1px dotted $table-border-color;
 	}
 }
 
