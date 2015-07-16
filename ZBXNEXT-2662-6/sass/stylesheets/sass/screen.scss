@@ -753,6 +753,7 @@ footer {
 	height: 18px;
 	line-height: 18px;
 	text-align: center;
+	margin-left: -2px;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -818,7 +819,7 @@ footer {
 }
 
 .filter-container {
-	padding: 10px 0;
+	padding: 15px 0 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
@@ -1595,7 +1596,7 @@ button {
 	@include border-radius(2px 2px 0 0);
 
 	&.filter-active {
-		color: $link-color;
+		color: $font-color;
 		background-color: $ui-bg-color;
 		border: 1px solid $ui-border-color;
 		border-bottom: none;
@@ -1605,7 +1606,7 @@ button {
 			position: absolute;
 			top: 45%;
 			margin: 0 0 0 6px;
-			border-bottom-color: $link-color;
+			border-bottom-color: $font-color;
 		}
 	}
 
