@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
-"PO-Revision-Date: 2015-02-15 09:23+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
+"PO-Revision-Date: 2015-06-15 23:40+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1423985023.0\n"
+"X-POOTLE-MTIME: 1434404454.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -587,12 +587,12 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:335
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Kontrola dostupnosti agenta. Vráti nič - nedostupný, 1 - dostupný"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:331
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Meno hosta. Vráti reťazec"
 
 #: include/views/configuration.host.edit.php:140
 #: include/views/configuration.host.edit.php:225
@@ -1094,17 +1094,17 @@ msgstr "NASTAVENIE SPÚŠŤAČOV"
 #: include/classes/items/CHelpItems.php:201
 #: include/classes/items/CHelpItems.php:479
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "CPU informácie. Vráti reťazec alebo celé číslo"
 
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:455
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "CPU load. Vráti desatinné číslo"
 
 #: include/classes/items/CHelpItems.php:189
 #: include/classes/items/CHelpItems.php:467
 msgid "CPU utilisation in percent. Returns float"
-msgstr ""
+msgstr "CPU utilizácia v percentách. Vráti desatinné číslo"
 
 #: include/views/configuration.services.edit.php:71 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1545,7 +1545,6 @@ msgid "Cannot delete maintenance"
 msgstr "Nie je možné zmazať plánovanú odstávku"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Nie je možné zmazať typ média"
@@ -1557,7 +1556,6 @@ msgid "Cannot delete network map"
 msgstr "Nie je možné zmazať mapu siete"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Nie je možné zmazať proxy"
@@ -1576,7 +1574,6 @@ msgid "Cannot delete screen"
 msgstr "Nie je možné zmazať obrazovku"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Nie je možné zmazať skript"
@@ -2037,7 +2034,7 @@ msgstr[2] "Nie je možné importovať šablónu \"%1$s\", prepojené šablóny \
 #: include/classes/mvc/CView.php:219
 #, c-format
 msgid "Cannot include JS file \"%s\"."
-msgstr ""
+msgstr "Nie je možné vložiť JS súbor \"%s\"."
 
 #: include/classes/mvc/CView.php:141
 #, c-format
@@ -2544,7 +2541,7 @@ msgstr "Šasi"
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:475
 msgid "Chassis information. Returns string"
-msgstr ""
+msgstr "Informácie o šasi. Vráti reťazec"
 
 #: include/views/js/configuration.discovery.edit.js.php:538
 msgid "Check already exists."
@@ -2578,17 +2575,17 @@ msgstr "Kontroly"
 #: include/classes/items/CHelpItems.php:85
 #: include/classes/items/CHelpItems.php:363
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
-msgstr ""
+msgstr "Kontrola DNS. Vráti 0 - DNS je nedostupné (server neodpovedal alebo DNS preklad zlyhal), 1 - DNS je dostupné"
 
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:555
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
-msgstr ""
+msgstr "Kontrola existencie súboru. Vráti 0 - nenájdený, 1 - súbor alebo linka (symbolická alebo hard) k súboru existuje"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:395
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
-msgstr ""
+msgstr "Kontrola úspešného TCP spojenia na zadaný port. Vráti 0 - neúspešné, 1 - úspešné"
 
 #: include/classes/items/CHelpItems.php:615
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
@@ -2598,23 +2595,23 @@ msgstr "Kontrola, či je server dostupný cez ICMP ping. 0 - ICMP ping zlyhal. 1
 #: include/classes/items/CHelpItems.php:399
 #: include/classes/items/CHelpItems.php:627
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "Kontrola, či služba akceptuje TCP spojenia. 0 - služba je nedostupná, 1 - služba je dostupná"
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:411
 #: include/classes/items/CHelpItems.php:635
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "Kontrola, či služba akceptuje UDP žiadosti. 0 - služba je nedostupná, 1 - služba je dostupná"
 
 #: include/classes/items/CHelpItems.php:113
 #: include/classes/items/CHelpItems.php:391
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "Kontrola, či TCP port je v LISTEN stave. 0 - nie je v LISTEN stave, 1 - je v LISTEN stave"
 
 #: include/classes/items/CHelpItems.php:129
 #: include/classes/items/CHelpItems.php:407
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "Kontrola, či UDP port je v LISTEN stave. 0 - nie je v LISTEN stave, 1 - je v LISTEN stave"
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:403
@@ -3116,7 +3113,7 @@ msgstr "Počet"
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:463
 msgid "Count of context switches. Returns integer"
-msgstr ""
+msgstr "Počet kontextových prepnutí. Vráti celé číslo"
 
 #: include/views/configuration.action.list.php:35
 msgid "Create action"
@@ -3815,7 +3812,7 @@ msgstr "Zmazať servisné okno?"
 
 #: app/views/administration.mediatype.edit.php:172
 msgid "Delete media type?"
-msgstr ""
+msgstr "Zmazať typ média?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
@@ -4147,7 +4144,7 @@ msgstr "Poznámka aktualizovaná"
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:527
 msgid "Detailed host information. Returns string"
-msgstr ""
+msgstr "Detailné informácie o hostovi. Vráti reťazec"
 
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1234
 #: include/blocks.inc.php:477 include/func.inc.php:1704
@@ -4169,7 +4166,7 @@ msgstr "Zariadenie"
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:451
 msgid "Device interrupts. Returns integer"
-msgstr ""
+msgstr "Prerušenia zariadenia. Vráti celé číslo"
 
 #: discoveryconf.php:40 include/views/configuration.discovery.edit.php:78
 msgid "Device uniqueness criteria"
@@ -4218,7 +4215,7 @@ msgstr "Rozdiel medzi poslednou a jej predchádzajúcou hodnotou je NOT N"
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:431
 msgid "Different information about specific process(es). Returns float"
-msgstr ""
+msgstr "Rozličné informácie o špecifických procesoch. Vráti desatinné číslo"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -4476,17 +4473,17 @@ msgstr "Stav zisťovania"
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:539
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr ""
+msgstr "Čítacie štatistiky disku. Vráti celé číslo pre položky v sektoroch, operáciách, bytoch alebo desatinné číslo pre položky v sps, ops, bsp"
 
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:583
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Voľné miesto na disku v bytoch alebo v percentách. Vráti celé číslo pre byty alebo desatinné číslo pre percentá"
 
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:543
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr ""
+msgstr "Zapisovacie štatistiky disku. Vráti celé číslo pre položky v sektoroch, operáciách, bytoch alebo desatinné číslo pre položky v sps, ops, bsp"
 
 #: adm.triggerdisplayoptions.php:43
 #: include/views/administration.general.triggerDisplayOptions.edit.php:66
@@ -5019,7 +5016,7 @@ msgstr "Zoznam udalostí [posledných 20]"
 
 #: include/classes/items/CHelpItems.php:343
 msgid "Event log monitoring. Returns log"
-msgstr ""
+msgstr "Monitoring logu udalostí. Vráti log"
 
 #: include/views/configuration.action.list.php:27
 msgid "Event source"
@@ -5068,7 +5065,7 @@ msgstr "SQL chyba pri spustení [%1$s] v [%2$s]."
 #: include/classes/items/CHelpItems.php:325
 #: include/classes/items/CHelpItems.php:603
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Spustí WMI dotaz a vráti prvý vybraný objekt. Vráti celé, desatinné číslo, reťazec alebo text (závisí od dotazu)"
 
 #: app/views/administration.script.edit.php:53
 #: app/views/administration.script.list.php:44
@@ -5210,7 +5207,7 @@ msgstr "Neúspešný audit"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
-msgstr ""
+msgstr "Fatálna chyba, prosím reportuje ju Zabbix tímu"
 
 #: app/views/monitoring.dashboard.view.php:48 jsLoader.php:191
 msgid "Favourite graphs"
@@ -5295,7 +5292,7 @@ msgstr "Pole \"name\" je vyžadované."
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:547
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
-msgstr ""
+msgstr "Kontrolný súčet súboru kalkulovaný UNIX cksum algoritmom. Vráti celé číslo"
 
 #: include/classes/api/services/CImage.php:562
 msgid "File format is unsupported."
@@ -5314,12 +5311,12 @@ msgstr "Súbor poskytnutý pre pohľad neexistuje. Nenašiel som \"%s\"."
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:571
 msgid "File size (in bytes). Returns integer"
-msgstr ""
+msgstr "Veľkosť súboru (v bytoch). Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:575
 msgid "File time information. Returns integer (Unix timestamp)"
-msgstr ""
+msgstr "Informácie o čase súboru. Vráti celé číslo (Unix časová pečiatka)"
 
 #: include/graphs.inc.php:57
 msgid "Filled region"
@@ -5364,17 +5361,17 @@ msgstr "Nájdi reťazec V v poslednej hodnote. N NOT 1 - ak sa nájde, 0 - inak"
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:567
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
-msgstr ""
+msgstr "Nájdi reťazec v súbore. Vráti 0 - nenájdený, 1 - nájdený"
 
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:563
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "Nájdi reťazec v súbore. Vráti riadok obsahujúci vybraný reťazec alebo výstup definovaný vo voliteľnom výstupnom parametri"
 
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:599
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "Nájdi reťazec vo web stránke. Vráti vybraný reťazec alebo výstup definovaný vo voliteľnom výstupnom parametri"
 
 #: include/classes/setup/CSetupWizard.php:118
 msgid "Finish"
@@ -5508,7 +5505,7 @@ msgstr "Nemecky (de_DE)"
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:591
 msgid "Get content of web page. Returns web page source as text"
-msgstr ""
+msgstr "Získať obsah web stránky. Vráti zdrojový kód web stránky ako text"
 
 #: include/triggers.inc.php:1599 tr_testexpr.php:35
 msgid "Given expression is not a macro"
@@ -5889,7 +5886,7 @@ msgstr "Hardvér (podrobne)"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:435
 msgid "Hardware sensor reading. Returns float"
-msgstr ""
+msgstr "Čítanie hardvérového senzoru. Vráti desatinné číslo"
 
 #: include/views/configuration.httpconf.edit.php:110
 #: include/views/configuration.httpconf.popup.php:97
@@ -6795,7 +6792,7 @@ msgstr "Vrátane"
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:375
 msgid "Incoming traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Štatistika príchodzej prevádzky na sieťovom rozhraní. Vráti celé číslo"
 
 #: include/classes/api/services/CService.php:1129
 #, c-format
@@ -8506,22 +8503,22 @@ msgstr "Zoznam je prázdny"
 #: include/classes/items/CHelpItems.php:209
 #: include/classes/items/CHelpItems.php:487
 msgid "Listing of MAC addresses. Returns string"
-msgstr ""
+msgstr "Zoznam MAC adries. Vráti reťazec"
 
 #: include/classes/items/CHelpItems.php:205
 #: include/classes/items/CHelpItems.php:483
 msgid "Listing of PCI or USB devices. Returns text"
-msgstr ""
+msgstr "Zoznam PCI a USB zariadení. Vráti text"
 
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:511
 msgid "Listing of installed packages. Returns text"
-msgstr ""
+msgstr "Zoznam nainštalovaných balíčkov. Vráti text"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:443
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
-msgstr ""
+msgstr "Zoznam služieb. Vráti 0 - ak nie sú žiadne služby alebo text - zoznam služieb oddelených novým riadkom"
 
 #: include/locales.inc.php:69
 msgid "Lithuanian (lt_LT)"
@@ -8530,7 +8527,7 @@ msgstr "Litovsky (lt_LT)"
 #: include/classes/items/CHelpItems.php:317
 #: include/classes/items/CHelpItems.php:595
 msgid "Loading time of full web page (in seconds). Returns float"
-msgstr ""
+msgstr "Načítanie celej web stránky (v sekundách). Vráti desatinné číslo"
 
 #: include/classes/screens/CScreenHistory.php:148
 #: include/views/configuration.screen.constructor.edit.php:610
@@ -8557,11 +8554,11 @@ msgstr "Log"
 
 #: include/classes/items/CHelpItems.php:359
 msgid "Log file monitoring with log rotation support. Returns log"
-msgstr ""
+msgstr "Log monitoring s podporou rotovania log súboru. Vráti log"
 
 #: include/classes/items/CHelpItems.php:355
 msgid "Log file monitoring. Returns log"
-msgstr ""
+msgstr "Log monitoring. Vráti log"
 
 #: popup_trexpr.php:478
 msgid "Log severity of the last log entry is < N"
@@ -8675,7 +8672,7 @@ msgstr "MD5"
 #: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:559
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
-msgstr ""
+msgstr "MD5 kontrolný súčet súboru. Vráti reťazec (MD5 hash súboru)"
 
 #: include/audit.inc.php:49
 #: include/views/administration.general.macros.edit.php:34
@@ -8927,12 +8924,12 @@ msgstr "Maximálne číslo flexibilných intervalov bolo pridané"
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:347
 msgid "Maximum number of opened files supported by OS. Returns integer"
-msgstr ""
+msgstr "Maximálny počet otvorených súborov podporovaný OS. Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:81
 #: include/classes/items/CHelpItems.php:351
 msgid "Maximum number of processes supported by OS. Returns integer"
-msgstr ""
+msgstr "Maximálny počet procesov podporovaný OS. Vráti celé číslo"
 
 #: include/classes/screens/CScreenBase.php:352 include/graphs.inc.php:415
 #, c-format
@@ -8990,7 +8987,6 @@ msgid "Media type added"
 msgstr "Typ média pridaný"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Typ média zmazaný"
@@ -9038,12 +9034,12 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:587
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Veľkosť pamäte v bytoch alebo v percentách. Vráti celé číslo pre byty alebo desatinné číslo pre percentá"
 
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:423
 msgid "Memory used by process in bytes. Returns integer"
-msgstr ""
+msgstr "Pamäť použitá procesom v bytoch. Vráti celé číslo"
 
 #: app/views/monitoring.dashboard.view.php:76
 #: include/views/configuration.item.list.php:217
@@ -9386,7 +9382,7 @@ msgstr "Perióda uloženia údajov udalostí a poplachov zisťovania sietí (v d
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:379
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
-msgstr ""
+msgstr "Zoznam sieťových rozhraní (zahŕňa typ rozhrania, status, IPv4 adresu, popis). Vráti text"
 
 #: sysmaps.php:174
 msgid "Network map added"
@@ -10121,7 +10117,7 @@ msgstr "Teraz"
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:459
 msgid "Number of CPUs. Returns integer"
-msgstr ""
+msgstr "Počet procesorov. Vráti celé číslo"
 
 #: include/blocks.inc.php:488 include/blocks.inc.php:489
 msgid "Number of hosts (enabled/disabled/templates)"
@@ -10150,7 +10146,7 @@ msgstr "Počet monitorovaných hostov"
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:371
 msgid "Number of out-of-window collisions. Returns integer"
-msgstr ""
+msgstr "Počet out-of-window kolízií. Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:683
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -10227,7 +10223,7 @@ msgstr "Počet používateľov (prihlásených)"
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:535
 msgid "Number of users logged in. Returns integer"
-msgstr ""
+msgstr "Počet prihlásených používateľov. Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:859
 msgid "Number of values stored in table HISTORY."
@@ -10264,7 +10260,7 @@ msgstr "Počet virtuálnych serverov na VMware hypervízorovi, <url> - URL VMwar
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:579
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr ""
+msgstr "Počet alebo percento voľných inodov. Vráti celé číslo pre počet alebo desatinné číslo pre percento"
 
 #: include/forms.inc.php:427 include/items.inc.php:123
 #: include/triggers.inc.php:2047 include/views/configuration.item.edit.php:236
@@ -10478,7 +10474,7 @@ msgstr "Opera"
 #: include/classes/items/CHelpItems.php:229
 #: include/classes/items/CHelpItems.php:507
 msgid "Operating system information. Returns string"
-msgstr ""
+msgstr "Informácie o operačnom systéme. Vráti reťazec"
 
 #: actionconf.php:295
 #, c-format
@@ -10621,7 +10617,7 @@ msgstr "Ďalšie"
 #: include/classes/items/CHelpItems.php:105
 #: include/classes/items/CHelpItems.php:383
 msgid "Outgoing traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Štatistika odchodzej prevádzky na sieťovom rozhraní. Vráti celé číslo"
 
 #: include/views/configuration.item.edit.php:354
 #: include/views/configuration.item.edit.php:372
@@ -10948,7 +10944,7 @@ msgstr "Percentilová čiara (vpravo)"
 #: include/classes/items/CHelpItems.php:89
 #: include/classes/items/CHelpItems.php:367
 msgid "Performs a DNS query. Returns character string with the required type of information"
-msgstr ""
+msgstr "Vykonať DNS dotaz. Vráti reťazec s požadovaným typom informácie"
 
 #: include/views/configuration.host.discovery.edit.php:215
 #: include/views/configuration.host.discovery.edit.php:252
@@ -11229,7 +11225,6 @@ msgid "Proxy added"
 msgstr "Proxy pridaná"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Proxy zmazaná"
@@ -11655,7 +11650,7 @@ msgstr "Sťahovať len hlavičky"
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:551
 msgid "Retrieving contents of a file. Returns text"
-msgstr ""
+msgstr "Získať obsah súboru. Vráti text"
 
 #: include/views/general.warning.php:27
 msgid "Retry"
@@ -11765,7 +11760,7 @@ msgstr "Spusti vzdialené príkazy na hostoch"
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:495
 msgid "Run specified command on the host. Returns text result of the command"
-msgstr ""
+msgstr "Spustiť špecifikovaný príkaz na hostovi. Vráti textový výstup prikazu"
 
 #: include/locales.inc.php:75
 msgid "Russian (ru_RU)"
@@ -12075,10 +12070,9 @@ msgstr "Skript pridaný"
 #: include/classes/api/services/CScript.php:398
 #: include/classes/api/services/CScript.php:442
 msgid "Script command cannot be empty."
-msgstr ""
+msgstr "Skript nemôže byť prázdny."
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Skript zmazaný"
@@ -12103,7 +12097,7 @@ msgstr "Skript s menom \"%1$s\" už existuje v menu ceste pre skript \"%2$s\"."
 #: include/classes/api/services/CScript.php:395
 #: include/classes/api/services/CScript.php:437
 msgid "Script name cannot be empty."
-msgstr ""
+msgstr "Meno skriptu nemôže byť prázdne."
 
 #: include/classes/debug/CProfiler.php:115
 msgid "Script profiler"
@@ -12676,7 +12670,7 @@ msgstr "Softvér aplikácia E"
 #: include/classes/items/CHelpItems.php:225
 #: include/classes/items/CHelpItems.php:503
 msgid "Software architecture information. Returns string"
-msgstr ""
+msgstr "Softvérová architektúra. Vráti reťazec"
 
 #: include/views/configuration.screen.constructor.edit.php:453
 msgid "Sort entries by"
@@ -12884,7 +12878,7 @@ msgstr "Audit úspešný"
 #: include/classes/items/CHelpItems.php:109
 #: include/classes/items/CHelpItems.php:387
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Suma príchodzej a odchodzej prevádzky na sieťovom rozhraní. Vráti celé číslo"
 
 #: popup_trexpr.php:370
 msgid "Sum of values of a period T is < N"
@@ -12923,17 +12917,17 @@ msgstr "Priezvisko"
 #: include/classes/items/CHelpItems.php:237
 #: include/classes/items/CHelpItems.php:515
 msgid "Swap in (from device into memory) statistics. Returns integer"
-msgstr ""
+msgstr "Swap in štatistika (zo zariadenie do pamäte). Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:519
 msgid "Swap out (from memory onto device) statistics. Returns integer"
-msgstr ""
+msgstr "Swap out štatistika (z pamäte do zariadenia). Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:523
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Veľkosť voľného swap miesta v bytoch alebo v percentách. Vráti celé číslo pre byty alebo desatinné číslo pre percentá"
 
 #: include/locales.inc.php:78
 msgid "Swedish (sv_SE)"
@@ -12946,7 +12940,7 @@ msgstr "Prepnutie autentifikačnej metódy spôsobí ukončenie všetkých seden
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:447
 msgid "System boot time. Returns integer (Unix timestamp)"
-msgstr ""
+msgstr "Čas štartu systému. Vráti celé číslo (Unix časová pečiatka)"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:155
 msgid "System default"
@@ -12959,12 +12953,12 @@ msgstr "Sytémová chyba."
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:471
 msgid "System host name. Returns string"
-msgstr ""
+msgstr "Systémové meno hosta. Vráti reťazec"
 
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:499
 msgid "System statistics. Returns integer or float"
-msgstr ""
+msgstr "Štatistika systému. Vráti celé alebo desatinné číslo"
 
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
 msgid "System status"
@@ -12973,12 +12967,12 @@ msgstr "Stav systému"
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:491
 msgid "System time. Returns integer with type as utc; string - with type as local"
-msgstr ""
+msgstr "Systémový čas. Vráti celé číslo pre UTC čas alebo reťazec pre lokálny čas"
 
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:531
 msgid "System uptime in seconds. Returns integer"
-msgstr ""
+msgstr "Doba prevádzky v sekundách. Vráti celé číslo"
 
 #: jsLoader.php:127
 msgctxt "Thursday short"
@@ -13229,7 +13223,7 @@ msgstr "Skupina už nie je zisťovaná a bude zmazaná %1$s (na %2$s v %3$s)."
 
 #: include/html.inc.php:600
 msgid "The host group is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Skupina už nie je zisťovaná a bude zmazaná počas ďalšieho spustenia zisťovania."
 
 #: include/html.inc.php:632
 #, c-format
@@ -13238,7 +13232,7 @@ msgstr "Host už nie je zisťovaný a bude zmazaný %1$s (na %2$s v %3$s)."
 
 #: include/html.inc.php:627
 msgid "The host is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Host už nie je zisťovaný a bude zmazaný počas ďalšieho spustenia zisťovania."
 
 #: include/classes/api/services/CImage.php:392
 #, c-format
@@ -13263,12 +13257,12 @@ msgstr "Položka už nie je zistená a bude zmazaná v %1$s (%2$s na %3$s)."
 
 #: include/html.inc.php:654
 msgid "The item is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Položka už nie je zisťovaná a bude zmazaná počas ďalšieho spustenia zisťovania."
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:427
 msgid "The number of processes. Returns integer"
-msgstr ""
+msgstr "Počet procesov. Vráti celé číslo"
 
 #: include/classes/core/CJsonRpc.php:175
 msgid "The received JSON is not a valid JSON-RPC Request."
@@ -14853,7 +14847,7 @@ msgstr "Mapovanie hodnôt musí mať najmenej jedno mapovanie."
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:419
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Hodnota Windows čítača výkonu. Vráti celé, desatinné číslo, reťazec alebo text (závisí na dotaze)"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:345
 msgid "Value: no data"
@@ -14879,7 +14873,7 @@ msgstr "Rozvláčny"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:339
 msgid "Version of Zabbix agent. Returns string"
-msgstr ""
+msgstr "Verzia Zabbix agenta. Vráti reťazec"
 
 #: include/views/configuration.screen.constructor.edit.php:652
 msgid "Vertical"

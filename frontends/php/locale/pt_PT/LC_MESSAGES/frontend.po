@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1530,7 +1530,6 @@ msgid "Cannot delete maintenance"
 msgstr "Não foi possível eliminar período de manutenção"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Não foi possível eliminar tipo de média"
@@ -1541,7 +1540,6 @@ msgid "Cannot delete network map"
 msgstr "Não foi possível eliminar mapa de rede"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Não foi possível eliminar proxy"
@@ -1558,7 +1556,6 @@ msgid "Cannot delete screen"
 msgstr "Não foi possível eliminar ecrã"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Não foi possível eliminar script"
@@ -8931,7 +8928,6 @@ msgid "Media type added"
 msgstr "Tipo de média adicionado"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Tipo de média eliminado"
@@ -11168,7 +11164,6 @@ msgid "Proxy added"
 msgstr "Proxy adicionado"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Proxy eliminado"
@@ -12015,7 +12010,6 @@ msgid "Script command cannot be empty."
 msgstr ""
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Script eliminado"

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
-"PO-Revision-Date: 2015-04-08 06:11+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
+"PO-Revision-Date: 2015-07-08 08:15+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1428466260.0\n"
+"X-POOTLE-MTIME: 1436336104.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -563,12 +563,12 @@ msgstr "エージェント"
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:335
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "エージェントの状態チェック。エージェントが利用可能な場合は「1」を返し、利用不可なら何も返さない。"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:331
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "エージェントのホスト名。文字列値を返す。"
 
 #: include/views/configuration.host.edit.php:140
 #: include/views/configuration.host.edit.php:225
@@ -1064,17 +1064,17 @@ msgstr "トリガーの設定"
 #: include/classes/items/CHelpItems.php:201
 #: include/classes/items/CHelpItems.php:479
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "CPU情報。文字列値または整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:455
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "CPUの負荷。浮動小数点値を返す。"
 
 #: include/classes/items/CHelpItems.php:189
 #: include/classes/items/CHelpItems.php:467
 msgid "CPU utilisation in percent. Returns float"
-msgstr ""
+msgstr "パーセント単位のCPU使用率。浮動小数点値を返す。"
 
 #: include/views/configuration.services.edit.php:71 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1511,7 +1511,6 @@ msgid "Cannot delete maintenance"
 msgstr "メンテナンスを削除できません"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "メディアタイプを削除できません"
@@ -1521,7 +1520,6 @@ msgid "Cannot delete network map"
 msgstr "ネットワークマップを削除できません"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "プロキシを削除できません"
@@ -1536,7 +1534,6 @@ msgid "Cannot delete screen"
 msgstr "スクリーンを削除できません"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "スクリプトを削除できません"
@@ -1942,7 +1939,7 @@ msgstr[0] "テンプレート\"%1$s\"をインポートできません。リン�
 #: include/classes/mvc/CView.php:219
 #, c-format
 msgid "Cannot include JS file \"%s\"."
-msgstr ""
+msgstr "JSファイル\"%s\"を読み込めません。"
 
 #: include/classes/mvc/CView.php:141
 #, c-format
@@ -2449,7 +2446,7 @@ msgstr "シャーシ"
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:475
 msgid "Chassis information. Returns string"
-msgstr ""
+msgstr "シャーシ情報。文字列値を返す。"
 
 #: include/views/js/configuration.discovery.edit.js.php:538
 msgid "Check already exists."
@@ -2483,43 +2480,43 @@ msgstr "チェック"
 #: include/classes/items/CHelpItems.php:85
 #: include/classes/items/CHelpItems.php:363
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
-msgstr ""
+msgstr "DNSサービス起動チェック。DNSがダウン(サーバーが応答しないかDNSの名前解決に失敗)している場合は「0」を返し、DNSが起動している場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:555
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
-msgstr ""
+msgstr "ファイル存在チェック。ファイルが存在しない場合は「0」を返し、通常のファイルが存在するか存在する通常のファイルへのリンク(シンボリックでもハードでも)があれば「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:395
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
-msgstr ""
+msgstr "指定されたポートでのTCP接続性チェック。接続できない場合は「0」を返し、接続できる場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:615
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
-msgstr "サーバーがICMP pingでアクセス可能かチェック。0 - ICMP pingに失敗。1 - ICMP pingに成功。"
+msgstr "サーバーがICMP pingでアクセス可能かチェック。ICMP pingに失敗した場合は「0」を返し、ICMP pingに成功した場合は「1」を返す。zabbix_serverプロセスの1つがPingerFrequency秒ごとに1度のICMP pingを実行する。"
 
 #: include/classes/items/CHelpItems.php:121
 #: include/classes/items/CHelpItems.php:399
 #: include/classes/items/CHelpItems.php:627
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "サービス起動とTCP接続性チェック。サービスが停止している場合は「0」を返し、サービスが起動している場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:411
 #: include/classes/items/CHelpItems.php:635
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "サービス起動とUDP応答性チェック。サービスが停止している場合は「0」を返し、サービスが起動している場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:113
 #: include/classes/items/CHelpItems.php:391
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "指定したTCPのポート番号が待ち受け状態になっているかチェック。待ち受け状態ではない場合は「0」を返し、待ち受け状態である場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:129
 #: include/classes/items/CHelpItems.php:407
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "指定したUDPのポート番号が待ち受け状態になっているかチェック。待ち受け状態ではない場合は「0」を返し、待ち受け状態である場合は「1」を返す。"
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:403
@@ -3718,7 +3715,7 @@ msgstr "メンテナンス期間を削除しますか？"
 
 #: app/views/administration.mediatype.edit.php:172
 msgid "Delete media type?"
-msgstr ""
+msgstr "メディアタイプを削除しますか？"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
@@ -8863,7 +8860,6 @@ msgid "Media type added"
 msgstr "メディアタイプを追加しました"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "メディアタイプを削除しました"
@@ -11094,7 +11090,6 @@ msgid "Proxy added"
 msgstr "プロキシを追加しました"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "プロキシを削除しました"
@@ -11936,10 +11931,9 @@ msgstr "スクリプトを追加しました"
 #: include/classes/api/services/CScript.php:398
 #: include/classes/api/services/CScript.php:442
 msgid "Script command cannot be empty."
-msgstr ""
+msgstr "スクリプトコマンドは必須項目です。"
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "スクリプトを削除しました"
@@ -11962,7 +11956,7 @@ msgstr "スクリプト名\"%1$s\"はスクリプト\"%2$s\"のメニューパ�
 #: include/classes/api/services/CScript.php:395
 #: include/classes/api/services/CScript.php:437
 msgid "Script name cannot be empty."
-msgstr ""
+msgstr "スクリプト名は必須項目です。"
 
 #: include/classes/debug/CProfiler.php:115
 msgid "Script profiler"
