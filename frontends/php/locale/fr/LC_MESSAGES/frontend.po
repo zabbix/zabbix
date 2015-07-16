@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
-"PO-Revision-Date: 2013-11-10 21:47+0300\n"
-"Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
+"PO-Revision-Date: 2015-06-27 21:59+0300\n"
+"Last-Translator: antonin <antonin.sommier@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1384112843.0\n"
+"X-POOTLE-MTIME: 1435435141.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -1531,7 +1531,6 @@ msgid "Cannot delete maintenance"
 msgstr "Impossible de supprimer une maintenance"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Impossible de supprimer le type de média"
@@ -1542,7 +1541,6 @@ msgid "Cannot delete network map"
 msgstr "Impossible de supprimer la carte"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Impossible de supprimer le proxy"
@@ -1559,7 +1557,6 @@ msgid "Cannot delete screen"
 msgstr "Impossible de supprimer l'écran"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Impossible de supprimer le script"
@@ -2760,17 +2757,17 @@ msgstr "Condition"
 #: include/classes/api/services/CAction.php:1761
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for action \"%1$s\"."
-msgstr ""
+msgstr "La condition \"%2$s\" n'est pas utilisée dans la formule \"%3$s\" pour l'action \"%1$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:829
 #, c-format
 msgid "Condition \"%2$s\" is not used in formula \"%3$s\" for discovery rule \"%1$s\"."
-msgstr ""
+msgstr "La condition \"%2$s\" n'est pas utilisée dans la formule \"%3$s\" pour la règle de découverte \"%1$s\"."
 
 #: include/classes/api/services/CAction.php:1760
 #, c-format
 msgid "Condition \"%2$s\" used in formula \"%3$s\" for action \"%1$s\" is not defined."
-msgstr ""
+msgstr "La condition \"%2$s\" utilisée dans la formule \"%3$s\" pour l'action \"%1$s\" n'est pas définie."
 
 #: include/classes/api/services/CDiscoveryRule.php:828
 #, c-format
@@ -3310,7 +3307,7 @@ msgstr ""
 #: include/views/configuration.action.edit.php:149
 #: include/views/configuration.host.discovery.edit.php:304
 msgid "Custom expression"
-msgstr ""
+msgstr "Personnaliser l'expression"
 
 #: charts.php:26
 msgid "Custom graphs"
@@ -3698,7 +3695,7 @@ msgstr "Supprimer"
 
 #: include/views/js/conf.import.js.php:5
 msgid "Delete all elements that are not present in the XML file?"
-msgstr ""
+msgstr "Supprimer tous les éléments non présents dans le fichier XML ?"
 
 #: include/views/configuration.template.edit.php:470 templates.php:763
 msgid "Delete and clear"
@@ -5181,11 +5178,11 @@ msgstr "Écrans favoris"
 
 #: jsLoader.php:194
 msgid "Favourite simple graphs"
-msgstr ""
+msgstr "Graphiques simples favoris"
 
 #: jsLoader.php:195
 msgid "Favourite slide shows"
-msgstr ""
+msgstr "Diaporamas favoris"
 
 #: include/views/monitoring.slides.php:43
 msgid "Favourites"
@@ -5296,8 +5293,9 @@ msgid "Filter by host group"
 msgstr "Filtrer par groupe d'hôte"
 
 #: include/views/common.filter.trigger.php:145
+#, fuzzy
 msgid "Filter by host inventory"
-msgstr ""
+msgstr "Filtrer par inventaire hôte"
 
 #: include/views/common.filter.trigger.php:95
 msgid "Filter by name"
@@ -5429,7 +5427,7 @@ msgstr "Fonction"
 #: popup_trexpr.php:730
 #, c-format
 msgid "Function \"%1$s\" cannot be used with selected item \"%2$s\""
-msgstr ""
+msgstr "La fonction \"%1$s\" ne peut pas être utilisés avec l'élément sélectionné \"%2$s\""
 
 #: app/views/administration.mediatype.edit.php:117
 #: app/views/administration.mediatype.list.php:64
@@ -5579,12 +5577,12 @@ msgstr "Prototype de graphique"
 #: include/classes/api/services/CGraphPrototype.php:790
 #, c-format
 msgid "Graph prototype \"%1$s\" contains item prototypes from multiple discovery rules."
-msgstr ""
+msgstr "Le prototype de graphique \"%1$s\" contient les prototypes d'éléments de plusieurs règles de découverte."
 
 #: include/classes/api/services/CGraphPrototype.php:796
 #, c-format
 msgid "Graph prototype \"%1$s\" must have at least one item prototype."
-msgstr ""
+msgstr "Le prototype de graphique \"%1$s\" doit avoir au moins un prototype d'élément."
 
 #: include/classes/api/services/CGraphPrototype.php:38
 #, c-format
@@ -5606,7 +5604,7 @@ msgstr ""
 
 #: include/classes/screens/CScreenLldGraph.php:169
 msgid "Graph prototype not found."
-msgstr ""
+msgstr "Prototype de graphique introuvable."
 
 #: graphs.php:227
 msgid "Graph prototype updated"
@@ -8935,7 +8933,6 @@ msgid "Media type added"
 msgstr "Type de média ajouté"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Type média supprimé"
@@ -11173,7 +11170,6 @@ msgid "Proxy added"
 msgstr "Proxy ajouté"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Proxy supprimé"
@@ -12021,7 +12017,6 @@ msgid "Script command cannot be empty."
 msgstr ""
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Script supprimé"

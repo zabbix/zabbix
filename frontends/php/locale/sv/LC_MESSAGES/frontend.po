@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
-"PO-Revision-Date: 2014-02-02 00:19+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
+"PO-Revision-Date: 2015-05-08 10:24+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391293183.0\n"
+"X-POOTLE-MTIME: 1431073489.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -8916,7 +8916,6 @@ msgid "Media type added"
 msgstr ""
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Mediatyp borttagen"

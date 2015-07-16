@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1534,7 +1534,6 @@ msgid "Cannot delete maintenance"
 msgstr "Не може да се изтрие поддръжката"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Не може да се изтрие метод на уведомление"
@@ -1545,7 +1544,6 @@ msgid "Cannot delete network map"
 msgstr "Не може да се изтрие картата на мрежата"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "Не може да се изтрие проксито"
@@ -1562,7 +1560,6 @@ msgid "Cannot delete screen"
 msgstr "Не може да се изтрие екрана"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "Не може да се изтрие скрипта"
@@ -8948,7 +8945,6 @@ msgid "Media type added"
 msgstr "Метод на уведомление добавено"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "Метод на уведомление изтрито"
@@ -11190,7 +11186,6 @@ msgid "Proxy added"
 msgstr "Прокси добавено"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "Прокси изтрито"
@@ -12040,7 +12035,6 @@ msgid "Script command cannot be empty."
 msgstr ""
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "Скрипт изтрит"

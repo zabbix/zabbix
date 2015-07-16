@@ -5,17 +5,18 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 13:51+0300\n"
-"PO-Revision-Date: 2012-11-06 15:57+0800\n"
-"Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
+"POT-Creation-Date: 2015-07-16 14:24+0300\n"
+"PO-Revision-Date: 2012-11-06 09:39+0300\n"
+"Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_TW\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
-"X-Generator: Pootle 2.1.6\n"
+"X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
+"X-POOTLE-MTIME: 1352187591.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -1516,7 +1517,6 @@ msgid "Cannot delete maintenance"
 msgstr "無法刪除維修"
 
 #: app/controllers/CControllerMediatypeDelete.php:65
-#, fuzzy
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "無法刪除示警媒介類型"
@@ -1526,7 +1526,6 @@ msgid "Cannot delete network map"
 msgstr "無法刪除網路拓墣圖"
 
 #: app/controllers/CControllerProxyDelete.php:65
-#, fuzzy
 msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] "無法刪除系統代理程式"
@@ -1541,7 +1540,6 @@ msgid "Cannot delete screen"
 msgstr "無法刪除篩選"
 
 #: app/controllers/CControllerScriptDelete.php:75
-#, fuzzy
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] "無法删除脚本"
@@ -8872,7 +8870,6 @@ msgid "Media type added"
 msgstr "示警媒介類型已新增"
 
 #: app/controllers/CControllerMediatypeDelete.php:62
-#, fuzzy
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] "示警媒介類型已刪除"
@@ -11105,7 +11102,6 @@ msgid "Proxy added"
 msgstr "系統代理程式已新增"
 
 #: app/controllers/CControllerProxyDelete.php:62
-#, fuzzy
 msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] "系統代理程式已刪除"
@@ -11950,7 +11946,6 @@ msgid "Script command cannot be empty."
 msgstr ""
 
 #: app/controllers/CControllerScriptDelete.php:72
-#, fuzzy
 msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] "脚本已删除"
