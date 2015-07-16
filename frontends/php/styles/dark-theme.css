@@ -291,22 +291,22 @@ ul.top-nav-icons {
 .arrow-up {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-bottom: 4px solid #f2f2f2; }
+  border-bottom: 6px solid #f2f2f2; }
 
 .arrow-down {
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 4px solid #f2f2f2; }
+  border-top: 6px solid #f2f2f2; }
 
 .arrow-left {
   border-bottom: 4px solid transparent;
   border-top: 4px solid transparent;
-  border-right: 4px solid #f2f2f2; }
+  border-right: 6px solid #f2f2f2; }
 
 .arrow-right {
   border-bottom: 4px solid transparent;
   border-top: 4px solid transparent;
-  border-left: 4px solid #f2f2f2; }
+  border-left: 6px solid #f2f2f2; }
 
 .arrow-up, .arrow-down, .arrow-left, .arrow-right {
   width: 0;
@@ -388,12 +388,15 @@ footer, .footer {
     color: #737373; }
     .list-table thead th .arrow-up {
       position: absolute;
-      top: 45%;
+      top: 43%;
       margin: 0 0 0 4px;
       border-bottom-color: #737373; }
+    .list-table thead th .arrow-right {
+      margin: 0 0 0 4px;
+      border-left-color: #737373; }
     .list-table thead th .arrow-down {
       position: absolute;
-      top: 45%;
+      top: 43%;
       margin: 0 0 0 4px;
       border-top-color: #737373; }
     .list-table thead th a {
@@ -423,7 +426,6 @@ footer, .footer {
     .list-table tbody tr:last-child td {
       border-bottom: none; }
   .list-table td {
-    position: relative;
     padding: 8px 5px 8px 5px;
     vertical-align: middle;
     border-bottom: 1px solid #383838; }
@@ -433,8 +435,6 @@ footer, .footer {
     -moz-transform: rotate(270deg);
     -ms-transform: rotate(270deg);
     transform: rotate(270deg); }
-  .list-table .icon-help {
-    top: 0.35em; }
 
 .table-paging {
   text-align: center;
@@ -442,10 +442,6 @@ footer, .footer {
   margin-top: -1px;
   padding: 7px 5px;
   border: 1px solid #303030; }
-  .table-paging .arrow-left {
-    border-right-color: #4796c4; }
-  .table-paging .arrow-right {
-    border-left-color: #4796c4; }
 
 .radio-switch {
   cursor: pointer;
@@ -457,20 +453,20 @@ footer, .footer {
   padding: 3px 11px;
   border: 1px solid #4f4f4f;
   text-decoration: none;
-  color: #4796c4;
+  color: #f2f2f2;
   -webkit-transition: background-color 0.2s ease-out;
   -moz-transition: background-color 0.2s ease-out;
   transition: background-color 0.2s ease-out; }
   .table-paging a:hover, .radio-switch:hover {
-    color: #4796c4;
+    color: #f2f2f2;
     background-color: #333; }
   .table-paging a:focus, .radio-switch:focus {
-    color: #4796c4;
+    color: #f2f2f2;
     background-color: #333;
     border-color: #768d99;
     position: relative; }
   .table-paging a:active, .radio-switch:active {
-    color: #4796c4;
+    color: #f2f2f2;
     background-color: #333;
     position: relative; }
   .table-paging a:first-child, .radio-switch:first-child {
@@ -523,7 +519,8 @@ footer, .footer {
   width: 18px;
   height: 18px;
   line-height: 18px;
-  text-align: center; }
+  text-align: center;
+  margin-left: -2px; }
   .treeview .arrow-right {
     border-left-color: #737373; }
   .treeview .arrow-down {
@@ -567,7 +564,7 @@ footer, .footer {
   text-align: center; }
 
 .filter-container, .table-forms-container, .browser-warning-container {
-  padding: 10px 0;
+  padding: 15px 0 10px 0;
   margin: 0 0 10px 0;
   background-color: #2b2b2b;
   border: 1px solid #303030; }
@@ -1075,20 +1072,20 @@ button {
   -moz-border-radius: 2px 2px 0 0;
   border-radius: 2px 2px 0 0; }
   .filter-trigger.filter-active {
-    color: #4796c4;
+    color: #f2f2f2;
     background-color: #2b2b2b;
     border: 1px solid #303030;
     border-bottom: none;
     margin-bottom: -1px; }
     .filter-trigger.filter-active .arrow-up {
       position: absolute;
-      top: 50%;
-      margin: 0 0 0 4px;
-      border-bottom-color: #4796c4; }
+      top: 45%;
+      margin: 0 0 0 6px;
+      border-bottom-color: #f2f2f2; }
   .filter-trigger .arrow-down {
     position: absolute;
-    top: 50%;
-    margin: 0 0 0 4px;
+    top: 45%;
+    margin: 0 0 0 6px;
     border-top-color: #fff; }
 
 .btn-conf {
@@ -1232,6 +1229,14 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
       text-decoration: none;
       cursor: default;
       border-bottom: 3px solid #69808d; }
+
+.icon-help-position {
+  position: relative;
+  padding: 8px 5px; }
+  .icon-help-position button {
+    position: absolute;
+    top: 3px;
+    left: -3px; }
 
 .icon-help {
   background: transparent url(../img/icon-sprite.svg) no-repeat -6px -726px; }
@@ -1810,7 +1815,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td.disaster-bg {
   border-left: none; }
   td.na-bg ~ td.na-bg, td.normal-bg ~ td.na-bg, td.info-bg ~ td.na-bg, td.average-bg ~ td.na-bg, td.warning-bg ~ td.na-bg, td.high-bg ~ td.na-bg, td.disaster-bg ~ td.na-bg, td.na-bg ~ td.normal-bg, td.normal-bg ~ td.normal-bg, td.info-bg ~ td.normal-bg, td.average-bg ~ td.normal-bg, td.warning-bg ~ td.normal-bg, td.high-bg ~ td.normal-bg, td.disaster-bg ~ td.normal-bg, td.na-bg ~ td.info-bg, td.normal-bg ~ td.info-bg, td.info-bg ~ td.info-bg, td.average-bg ~ td.info-bg, td.warning-bg ~ td.info-bg, td.high-bg ~ td.info-bg, td.disaster-bg ~ td.info-bg, td.na-bg ~ td.average-bg, td.normal-bg ~ td.average-bg, td.info-bg ~ td.average-bg, td.average-bg ~ td.average-bg, td.warning-bg ~ td.average-bg, td.high-bg ~ td.average-bg, td.disaster-bg ~ td.average-bg, td.na-bg ~ td.warning-bg, td.normal-bg ~ td.warning-bg, td.info-bg ~ td.warning-bg, td.average-bg ~ td.warning-bg, td.warning-bg ~ td.warning-bg, td.high-bg ~ td.warning-bg, td.disaster-bg ~ td.warning-bg, td.na-bg ~ td.high-bg, td.normal-bg ~ td.high-bg, td.info-bg ~ td.high-bg, td.average-bg ~ td.high-bg, td.warning-bg ~ td.high-bg, td.high-bg ~ td.high-bg, td.disaster-bg ~ td.high-bg, td.na-bg ~ td.disaster-bg, td.normal-bg ~ td.disaster-bg, td.info-bg ~ td.disaster-bg, td.average-bg ~ td.disaster-bg, td.warning-bg ~ td.disaster-bg, td.high-bg ~ td.disaster-bg, td.disaster-bg ~ td.disaster-bg {
-    border-left: 1px dotted #2b2b2b; }
+    border-left: 1px dotted #383838; }
 
 .normal-bg {
   color: #0e4123; }

@@ -467,7 +467,12 @@ if ($filter['showDetails']) {
 
 	$table->addClass('latest-details');
 	$table->setHeader([
-		(new CColHeader((new CDiv())->addClass('app-list-toggle-all icon-plus-9x9')))
+		(new CColHeader(
+			(new CDiv())
+				->addClass(ZBX_STYLE_TREEVIEW)
+				->addClass('app-list-toggle-all')
+				->addItem(new CSpan())
+		))
 			->addClass(ZBX_STYLE_CELL_WIDTH),
 		$checkAllCheckboxCol,
 		$hostHeader,
@@ -485,8 +490,12 @@ if ($filter['showDetails']) {
 }
 else {
 	$table->setHeader([
-		(new CColHeader((new CDiv())->addClass('app-list-toggle-all icon-plus-9x9')))
-			->addClass(ZBX_STYLE_CELL_WIDTH),
+		(new CColHeader(
+			(new CDiv())
+				->addClass(ZBX_STYLE_TREEVIEW)
+				->addClass('app-list-toggle-all')
+				->addItem(new CSpan())
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		$checkAllCheckboxCol,
 		$hostHeader,
 		$nameHeader,
@@ -649,15 +658,7 @@ foreach ($applications as $appid => $dbApp) {
 
 	$appRows = $tab_rows[$appid];
 
-	$openState = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
-
-	$toggle = (new CDiv())
-		->addClass('app-list-toggle icon-plus-9x9')
-		->setAttribute('data-app-id', $dbApp['applicationid'])
-		->setAttribute('data-open-state', $openState);
-	if ($openState) {
-		$toggle->addClass('icon-minus-9x9');
-	}
+	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
 	$hostName = null;
 
@@ -672,22 +673,21 @@ foreach ($applications as $appid => $dbApp) {
 
 	// add toggle row
 	$table->addRow([
-		$toggle,
+		(new CDiv())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->addClass('app-list-toggle')
+			->setAttribute('data-app-id', $dbApp['applicationid'])
+			->setAttribute('data-open-state', $open_state)
+			->addItem(new CSpan()),
 		'',
 		$hostName,
-		new CCol([
-				bold($dbApp['name']),
-				' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
-			], null, $filter['showDetails'] ? 10 : 5)
-	], 'odd_row');
+		(new CCol([bold($dbApp['name']), ' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')']))
+			->setColSpan($filter['showDetails'] ? 10 : 5)
+	]);
 
 	// add toggle sub rows
 	foreach ($appRows as $row) {
 		$row->setAttribute('parent_app_id', $dbApp['applicationid']);
-		$row->addClass('odd_row');
-		if (!$openState) {
-			$row->addClass('hidden');
-		}
 		$table->addRow($row);
 	}
 }
@@ -830,15 +830,7 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 	$appRows = $tab_rows[$hostId];
 
-	$openState = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
-
-	$toggle = (new CDiv())
-		->addClass('app-list-toggle icon-plus-9x9')
-		->setAttribute('data-app-id', '0_'.$host['hostid'])
-		->setAttribute('data-open-state', $openState);
-	if ($openState) {
-		$toggle->addClass('icon-minus-9x9');
-	}
+	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
 	$hostName = null;
 
@@ -853,25 +845,21 @@ foreach ($hosts as $hostId => $dbHost) {
 
 	// add toggle row
 	$table->addRow([
-		$toggle,
+		(new CDiv())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->addClass('app-list-toggle')
+			->setAttribute('data-app-id', '0_'.$host['hostid'])
+			->setAttribute('data-open-state', $open_state)
+			->addItem(new CSpan()),
 		'',
 		$hostName,
-		new CCol(
-			[
-				bold('- '.('other').' -'),
-				' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
-			],
-			null, $filter['showDetails'] ? 10 : 5
-		)
-	], 'odd_row');
+		(new CCol([bold('- '.('other').' -'), ' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')']))
+			->setColSpan($filter['showDetails'] ? 10 : 5)
+	]);
 
 	// add toggle sub rows
 	foreach($appRows as $row) {
 		$row->setAttribute('parent_app_id', '0_'.$host['hostid']);
-		$row->addClass('odd_row');
-		if (!$openState) {
-			$row->addClass('hidden');
-		}
 		$table->addRow($row);
 	}
 }
