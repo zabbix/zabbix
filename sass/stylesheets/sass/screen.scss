@@ -427,28 +427,28 @@ ul.top-nav-icons {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-bottom: 4px solid $font-color;
+	border-bottom: 6px solid $font-color;
 }
 
 .arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-top: 4px solid $font-color;
+	border-top: 6px solid $font-color;
 }
 
 .arrow-left {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-right: 4px solid $font-color;
+	border-right: 6px solid $font-color;
 }
 
 .arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-left: 4px solid $font-color;
+	border-left: 6px solid $font-color;
 }
 
 %arrow {
@@ -560,21 +560,19 @@ footer {
 
 	    .arrow-up {
 	    	position: absolute;
-	    	top: 45%;
+	    	top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-bottom-color: $font-alt-color;
 	    }
 
 	    .arrow-right {
-	    	//position: absolute;
-	    	//top: 45%;
 	    	margin: 0 0 0 4px;
 	    	border-left-color: $font-alt-color;
 	    }
 
 	    .arrow-down {
 	    	position: absolute;
-	    	top: 45%;
+	    	top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-top-color: $font-alt-color;
 	    }
@@ -647,13 +645,13 @@ footer {
 		@extend %paging-btn;
 	}
 
-	.arrow-left {
-		border-right-color: $link-color;
-	}
+	//.arrow-left {
+	//	border-right-color: $link-color;
+	//}
 
-	.arrow-right {
-		border-left-color: $link-color;
-	}
+	//.arrow-right {
+	//	border-left-color: $link-color;
+	//}
 }
 
 .radio-switch {
@@ -668,23 +666,23 @@ footer {
 	padding: 3px 11px;
 	border: 1px solid $form-border-color;
 	text-decoration: none;
-	color: $link-color;
+	color: $font-color;
 	@include transition(background-color .2s ease-out);
 
 	&:hover {
-		color: $link-hover-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 	}
 
 	&:focus {
-		color: $link-hover-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-focus-color;
 		position: relative;
 	}
 
 	&:active {
-		color: $link-active-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 		position: relative;
 	}
@@ -1605,16 +1603,16 @@ button {
 
 		.arrow-up {
 			position: absolute;
-			top: 50%;
-			margin: 0 0 0 4px;
+			top: 45%;
+			margin: 0 0 0 6px;
 			border-bottom-color: $link-color;
 		}
 	}
 
 	.arrow-down {
 		position: absolute;
-		top: 50%;
-		margin: 0 0 0 4px;
+		top: 45%;
+		margin: 0 0 0 6px;
 		border-top-color: $white;
 	}
 }
