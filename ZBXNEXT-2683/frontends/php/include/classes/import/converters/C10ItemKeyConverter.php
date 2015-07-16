@@ -24,17 +24,6 @@
  */
 class C10ItemKeyConverter extends CConverter {
 
-	/**
-	 * Parser for user macros.
-	 *
-	 * @var CUserMacroParser
-	 */
-	protected $userMacroParser;
-
-	public function __construct() {
-		$this->userMacroParser = new CUserMacroParser();
-	}
-
 	public function convert($value) {
 		$keys = ['tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh'];
 
@@ -48,11 +37,10 @@ class C10ItemKeyConverter extends CConverter {
 			$key = $parts[0];
 
 			if (isset($parts[1]) && $parts[1] !== '') {
-				// Parse user macro as a partf of an item key. It means there might be following symbols after macro.
-				$this->userMacroParser->parse($parts[1], 0, true);
+				$parser = new CUserMacroParser($parts[1], false);
+				$macros = $parser->getMacros();
 
-				if ($this->userMacroParser->isValid()
-						&& !isset($parts[1][$this->userMacroParser->getParseResult()->length])) {
+				if ($macros && !isset($parts[1][$macros[0]['positions']['length']])) {
 					$port = ',,'.$parts[1];
 				}
 				// numeric parameter or empty parameter

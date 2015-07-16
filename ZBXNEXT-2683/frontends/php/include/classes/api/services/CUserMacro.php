@@ -643,8 +643,7 @@ class CUserMacro extends CApiService {
 			);
 		}
 
-		$parser = new CUserMacroParser();
-		$parser->parse($macro['macro']);
+		$parser = new CUserMacroParser($macro['macro']);
 
 		if (!$parser->isValid()) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -692,27 +691,26 @@ class CUserMacro extends CApiService {
 	 */
 	protected function checkDuplicateMacros(array $macros) {
 		$existing_macros = [];
-		$parser = new CUserMacroParser();
 
 		foreach ($macros as $macro) {
 			// Global macros don't have a 'hostid'.
 			$hostid = array_key_exists('hostid', $macro) ? $macro['hostid'] : 1;
 
-			$parser->parse($macro['macro']);
+			$parse_result = (new CUserMacroParser($macro['macro']))->getMacros()[0];
 
-			$name = $parser->getMacroName();
-			$context = $parser->getContext();
+			$macro_name = $parse_result['macro_name'];
+			$context = $parse_result['context'];
 
 			/*
 			 * Macros with same name can have different contexts. A macro with no context is not the same
 			 * as a macro with an empty context.
 			 */
-			if (isset($existing_macros[$hostid][$name])
-					&& in_array($context, $existing_macros[$hostid][$name], true)) {
+			if (isset($existing_macros[$hostid][$macro_name])
+					&& in_array($context, $existing_macros[$hostid][$macro_name], true)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Macro "%1$s" is not unique.', $macro['macro']));
 			}
 
-			$existing_macros[$hostid][$name][] = $context;
+			$existing_macros[$hostid][$macro_name][] = $context;
 		}
 	}
 
@@ -730,19 +728,19 @@ class CUserMacro extends CApiService {
 	 */
 	protected function checkIfHostMacrosDontRepeat(array $hostmacros) {
 		$macro_names = [];
-		$parser = new CUserMacroParser();
 
 		// Parse each macro, get unique names and, if context exists, narrow down the search.
 		foreach ($hostmacros as $hostmacro) {
-			$parser->parse($hostmacro['macro']);
+			$parse_result = (new CUserMacroParser($hostmacro['macro']))->getMacros()[0];
 
-			$macro_name = $parser->getMacroName();
-			$context = $parser->getContext();
+			$macro_name = $parse_result['macro_name'];
+			$context = $parse_result['context'];
 
 			if ($context === null) {
 				$macro_names['{$'.$macro_name] = true;
 			}
 			else {
+				// Narrow down the search for macros with contexts.
 				$macro_names['{$'.$macro_name.':'] = true;
 			}
 		}
@@ -761,10 +759,10 @@ class CUserMacro extends CApiService {
 
 		// Collect existing unique macro names and their contexts for each host.
 		foreach ($db_hostmacros as $db_hostmacro) {
-			$parser->parse($db_hostmacro['macro']);
+			$parse_result = (new CUserMacroParser($db_hostmacro['macro']))->getMacros()[0];
 
-			$macro_name = $parser->getMacroName();
-			$context = $parser->getContext();
+			$macro_name = $parse_result['macro_name'];
+			$context = $parse_result['context'];
 
 			$existing_macros[$db_hostmacro['hostid']][$macro_name][$db_hostmacro['hostmacroid']] = $context;
 		}
@@ -773,10 +771,10 @@ class CUserMacro extends CApiService {
 		foreach ($hostmacros as $hostmacro) {
 			$hostid = $hostmacro['hostid'];
 
-			$parser->parse($hostmacro['macro']);
+			$parse_result = (new CUserMacroParser($hostmacro['macro']))->getMacros()[0];
 
-			$macro_name = $parser->getMacroName();
-			$context = $parser->getContext();
+			$macro_name = $parse_result['macro_name'];
+			$context = $parse_result['context'];
 
 			if (array_key_exists($macro_name, $existing_macros[$hostid])
 					&& in_array($context, $existing_macros[$hostid][$macro_name], true)) {
@@ -833,19 +831,19 @@ class CUserMacro extends CApiService {
 	 */
 	protected function checkIfGlobalMacrosDontRepeat(array $globalmacros) {
 		$macro_names = [];
-		$parser = new CUserMacroParser();
 
 		// Parse each macro, get unique names and, if context exists, narrow down the search.
 		foreach ($globalmacros as $globalmacro) {
-			$parser->parse($globalmacro['macro']);
+			$parse_result = (new CUserMacroParser($globalmacro['macro']))->getMacros()[0];
 
-			$macro_name = $parser->getMacroName();
-			$context = $parser->getContext();
+			$macro_name = $parse_result['macro_name'];
+			$context = $parse_result['context'];
 
 			if ($context === null) {
 				$macro_names['{$'.$macro_name] = true;
 			}
 			else {
+				// Narrow down the search for macros with contexts.
 				$macro_names['{$'.$macro_name.':'] = true;
 			}
 		}
@@ -863,20 +861,20 @@ class CUserMacro extends CApiService {
 
 		// Collect existing unique macro names and their contexts.
 		foreach ($db_macros as $db_macro) {
-			$parser->parse($db_macro['macro']);
+			$parse_result = (new CUserMacroParser($db_macro['macro']))->getMacros()[0];
 
-			$macro_name = $parser->getMacroName();
-			$context = $parser->getContext();
+			$macro_name = $parse_result['macro_name'];
+			$context = $parse_result['context'];
 
 			$existing_macros[$macro_name][$db_macro['globalmacroid']] = $context;
 		}
 
 		// Compare each macro name and context to existing one.
 		foreach ($globalmacros as $globalmacro) {
-			$parser->parse($globalmacro['macro']);
+			$parse_result = (new CUserMacroParser($globalmacro['macro']))->getMacros()[0];
 
-			$macro_name = $parser->getMacroName();
-			$context = $parser->getContext();
+			$macro_name = $parse_result['macro_name'];
+			$context = $parse_result['context'];
 
 			if (array_key_exists($macro_name, $existing_macros)
 					&& in_array($context, $existing_macros[$macro_name], true)) {

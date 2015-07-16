@@ -47,22 +47,11 @@ class CFunctionMacroParser extends CParser {
 	public $options = ['18_simple_checks' => false];
 
 	/**
-	 * Parser for user macros.
-	 *
-	 * @var CUserMacroParser
-	 */
-	protected $userMacroParser;
-
-	/**
 	 * @param array $options
 	 */
 	public function __construct($options = []) {
 		if (array_key_exists('18_simple_checks', $options)) {
 			$this->options['18_simple_checks'] = $options['18_simple_checks'];
-		}
-
-		if ($this->options['18_simple_checks'] === true) {
-			$this->userMacroParser = new CUserMacroParser();
 		}
 	}
 
@@ -78,20 +67,17 @@ class CFunctionMacroParser extends CParser {
 
 		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] !== '{'
 				|| ($host = $this->parseHost()) === null) {
-
 			return false;
 		}
 
 		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] !== ':'
 				|| ($item = $this->parseItem()) === null) {
-
 			$this->pos--;
 			return false;
 		}
 
 		if (!isset($this->source[$this->pos]) || $this->source[$this->pos++] !== '.'
 				|| !(list($function, $functionParamList) = $this->parseFunction())) {
-
 			$this->pos--;
 			return false;
 		}
@@ -169,11 +155,10 @@ class CFunctionMacroParser extends CParser {
 				&& isset($this->source[$this->pos]) && $this->source[$this->pos] === ',') {
 			$this->pos++;
 
-			// Parse user macro as a part of a trigger expression.
-			$this->userMacroParser->parse($this->source, $this->pos, true);
+			$macros = (new CUserMacroParser($this->source, false, $this->pos))->getMacros();
 
-			if ($this->userMacroParser->isValid()) {
-				$this->pos += $this->userMacroParser->getParseResult()->length;
+			if ($macros) {
+				$this->pos += $macros[0]['positions']['length'];
 			}
 			// numeric parameter or empty parameter
 			else {

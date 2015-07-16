@@ -568,10 +568,19 @@ class CHostInterface extends CApiService {
 	 * @throws APIException if the field is invalid.
 	 *
 	 * @param array $interface
+	 * @param string $interface['dns']
 	 */
 	protected function checkDns(array $interface) {
-		if (!empty($interface['dns']) && !preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect interface DNS parameter "%s" provided.', $interface['dns']));
+		if ($interface['dns'] === '') {
+			return;
+		}
+
+		$parser = new CUserMacroParser($interface['dns']);
+
+		if (!preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns']) && !$parser->isValid()) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect interface DNS parameter "%s" provided.', $interface['dns'])
+			);
 		}
 	}
 
@@ -581,14 +590,16 @@ class CHostInterface extends CApiService {
 	 * @throws APIException if the field is invalid.
 	 *
 	 * @param array $interface
+	 * @param string $interface['ip']
 	 */
 	protected function checkIp(array $interface) {
 		if ($interface['ip'] === '') {
 			return;
 		}
 
-		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/', $interface['ip'])
-				|| preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $interface['ip'])) {
+		$parser = new CUserMacroParser($interface['ip']);
+
+		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/', $interface['ip']) || $parser->isValid()) {
 			return;
 		}
 

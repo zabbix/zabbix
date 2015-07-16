@@ -108,6 +108,27 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Find user macros.
+	 *
+	 * @param array  $texts
+	 *
+	 * @return array
+	 */
+	protected function findUserMacros(array $texts) {
+		$result = [];
+
+		foreach ($texts as $text) {
+			$macros = (new CUserMacroParser($text, false))->getMacros();
+
+			foreach ($macros as $macro) {
+				$result[$macro['match']] = true;
+			}
+		}
+
+		return array_keys($result);
+	}
+
+	/**
 	 * Find macros with function position.
 	 *
 	 * @param string $pattern
@@ -477,23 +498,41 @@ class CMacrosResolverGeneral {
 		/*
 		 * Global macros
 		 */
-		$dbGlobalMacros = API::UserMacro()->get([
+		$db_globalmacros = API::UserMacro()->get([
 			'output' => ['macro', 'value'],
 			'globalmacro' => true
 		]);
 
-		if ($dbGlobalMacros) {
-			$dbGlobalMacros = zbx_toHash($dbGlobalMacros, 'macro');
-
+		if ($db_globalmacros) {
 			$allMacrosResolved = true;
 
 			foreach ($data as &$element) {
 				foreach ($element['macros'] as $macro => &$value) {
+					$parse_result = (new CUserMacroParser($macro))->getMacros()[0];
+
+					$macro_name = $parse_result['macro_name'];
+					$context = $parse_result['context'];
+
 					if ($value === null) {
-						if (isset($dbGlobalMacros[$macro])) {
-							$value = $dbGlobalMacros[$macro]['value'];
+						foreach ($db_globalmacros as $db_globalmacro) {
+							$parse_result = (new CUserMacroParser($db_globalmacro['macro']))->getMacros()[0];
+
+							$db_globalmacro_name = $parse_result['macro_name'];
+							$db_globalmacro_context = $parse_result['context'];
+
+							if ($macro_name === $db_globalmacro_name) {
+								if ($db_globalmacro_context === null) {
+									$value = $db_globalmacro['value'];
+								}
+
+								if ($context === $db_globalmacro_context) {
+									$value = $db_globalmacro['value'];
+									break;
+								}
+							}
 						}
-						else {
+
+						if ($value === null) {
 							$allMacrosResolved = false;
 						}
 					}
@@ -535,9 +574,33 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function getHostUserMacros(array $hostIds, $macro, array $hostTemplates, array $hostMacros) {
+		$parse_result = (new CUserMacroParser($macro))->getMacros()[0];
+
+		$macro_name = $parse_result['macro_name'];
+		$context = $parse_result['context'];
+		$value = null;
+
 		foreach ($hostIds as $hostId) {
-			if (isset($hostMacros[$hostId]) && isset($hostMacros[$hostId][$macro])) {
-				return $hostMacros[$hostId][$macro];
+			if (array_key_exists($hostId, $hostMacros)) {
+				foreach ($hostMacros[$hostId] as $hostmacro => $hostmacro_value) {
+					$parser->parse($hostmacro, 0, false);
+
+					$hostmacro_name = $parser->getMacroName();
+					$hostmacro_context = $parser->getContext();
+
+					if ($macro_name === $hostmacro_name) {
+						if ($hostmacro_context === null) {
+							$value = $hostmacro_value;
+						}
+
+						if ($context === $hostmacro_context) {
+							$value = $hostmacro_value;
+							break;
+						}
+					}
+				}
+
+				return $value;
 			}
 		}
 

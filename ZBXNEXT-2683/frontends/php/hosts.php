@@ -476,12 +476,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				}
 			}
 
-			// transform macros to uppercase {$aaa} => {$AAA}
-			foreach ($macros as &$macro) {
-				$macro['macro'] = mb_strtoupper($macro['macro']);
-			}
-			unset($macro);
-
 			// new group
 			$groups = getRequest('groups', []);
 			$newGroup = getRequest('newgroup');

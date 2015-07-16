@@ -22,62 +22,543 @@
 class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 
 	/**
-	 * @var CUserMacroParser
-	 */
-	protected $userMacroParser;
-
-	public function setUp() {
-		$this->userMacroParser = new CUserMacroParser();
-	}
-
-	/**
-	 * Test against valid macros and compare the macro name, context and the result set
+	 * An array of valid macros and parsed results.
 	 */
 	public function testValidProvider() {
 		return [
 			// normal macros
-			['{$MACRO}', 'MACRO', '', ['source' => '{$MACRO}', 'match' => '{$MACRO}', 'pos' => 0, 'length' => 8]],
-			['{$MACRO_}', 'MACRO_', '', ['source' => '{$MACRO_}', 'match' => '{$MACRO_}', 'pos' => 0, 'length' => '9']],
-			['{$MACRO_12}', 'MACRO_12', '', ['source' => '{$MACRO_12}', 'match' => '{$MACRO_12}', 'pos' => 0, 'length' => '11']],
-			['{$MACRO_1.2}', 'MACRO_1.2', '', ['source' => '{$MACRO_1.2}', 'match' => '{$MACRO_1.2}', 'pos' => 0, 'length' => '12']],
-			// context based macros
-			['{$MACRO:}', 'MACRO', '', ['source' => '{$MACRO:}', 'match' => '{$MACRO:}', 'pos' => 0, 'length' => '10']],
-			['{$MACRO: }', 'MACRO', '', ['source' => '{$MACRO: }', 'match' => '{$MACRO: }', 'pos' => 0, 'length' => '11']],
-			['{$MACRO:   }', 'MACRO', '', ['source' => '{$MACRO:   }', 'match' => '{$MACRO:   }', 'pos' => 0, 'length' => '13']],
-			['{$MACRO:\'\'}', 'MACRO', '\'\'', ['source' => '{$MACRO:\'\'}', 'match' => '{$MACRO:\'\'}', 'pos' => 0, 'length' => '12']],
-			['{$MACRO:A }', 'MACRO', 'A ', ['source' => '{$MACRO:A }', 'match' => '{$MACRO:A }', 'pos' => 0, 'length' => '12']],
-			['{$MACRO:A}', 'MACRO', 'A', ['source' => '{$MACRO:A}', 'match' => '{$MACRO:A}', 'pos' => 0, 'length' => '11']],
-			['{$MACRO:A"}', 'MACRO', 'A"', ['source' => '{$MACRO:A"}', 'match' => '{$MACRO:A"}', 'pos' => 0, 'length' => '12']],
-			['{$MACRO:context}', 'MACRO', 'context', ['source' => '{$MACRO:context}', 'match' => '{$MACRO:context}', 'pos' => 0, 'length' => '17']],
-			['{$MACRO:<context>}', 'MACRO', '<context>', ['source' => '{$MACRO:<context>}', 'match' => '{$MACRO:<context>}', 'pos' => 0, 'length' => '19']],
-			['{$MACRO:\"}', 'MACRO', '\"', ['source' => '{$MACRO:\"}', 'match' => '{$MACRO:\"}', 'pos' => 0, 'length' => '12']],
-			['{$MACRO:{}', 'MACRO', '{', ['source' => '{$MACRO:{}', 'match' => '{$MACRO:{}', 'pos' => 0, 'length' => '11']],
-			['{$MACRO:\}', 'MACRO', '\\', ['source' => '{$MACRO:\}', 'match' => '{$MACRO:\}', 'pos' => 0, 'length' => '11']],
-			['{$MACRO:\\}', 'MACRO', '\\', ['source' => '{$MACRO:\\}', 'match' => '{$MACRO:\\}', 'pos' => 0, 'length' => '11']],
-			['{$MACRO:\"\}', 'MACRO', '\"\\', ['source' => '{$MACRO:\"\}', 'match' => '{$MACRO:\"\}', 'pos' => 0, 'length' => '13']],
-			['{$MACRO:abc"def}', 'MACRO', 'abc"def', ['source' => '{$MACRO:abc"def}', 'match' => '{$MACRO:abc"def}', 'pos' => 0, 'length' => '17']],
-			['{$MACRO:abc"def"}', 'MACRO', 'abc"def"', ['source' => '{$MACRO:abc"def"}', 'match' => '{$MACRO:abc"def"}', 'pos' => 0, 'length' => '18']],
-			['{$MACRO:abc"def"ghi}', 'MACRO', 'abc"def"ghi', ['source' => '{$MACRO:abc"def"ghi}', 'match' => '{$MACRO:abc"def"ghi}', 'pos' => 0, 'length' => '21']],
-			['{$MACRO:abc"\}', 'MACRO', 'abc"\\', ['source' => '{$MACRO:abc"\}', 'match' => '{$MACRO:abc"\}', 'pos' => 0, 'length' => '15']],
+			[
+				'{$MACRO}',
+				[[
+					'match' => '{$MACRO}',
+					'macro' => '{$MACRO}',
+					'positions' => [
+						'start' => 0,
+						'end' => 7,
+						'length' => 8
+					],
+					'macro_name' => 'MACRO',
+					'context' => null,
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO_}',
+				[[
+					'match' => '{$MACRO_}',
+					'macro' => '{$MACRO_}',
+					'positions' => [
+						'start' => 0,
+						'end' => 8,
+						'length' => 9
+					],
+					'macro_name' => 'MACRO_',
+					'context' => null,
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO_12}',
+				[[
+					'match' => '{$MACRO_12}',
+					'macro' => '{$MACRO_12}',
+					'positions' => [
+						'start' => 0,
+						'end' => 10,
+						'length' => 11
+					],
+					'macro_name' => 'MACRO_12',
+					'context' => null,
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO_1.2}',
+				[[
+					'match' => '{$MACRO_1.2}',
+					'macro' => '{$MACRO_1.2}',
+					'positions' => [
+						'start' => 0,
+						'end' => 11,
+						'length' => 12
+					],
+					'macro_name' => 'MACRO_1.2',
+					'context' => null,
+					'context_is_quoted' => false
+				]]
+			],
+			// context based unquoted macros
+			[
+				'{$MACRO:}',
+				[[
+					'match' => '{$MACRO:}',
+					'macro' => '{$MACRO:}',
+					'positions' => [
+						'start' => 0,
+						'end' => 8,
+						'length' => 9
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO: }',
+				[[
+					'match' => '{$MACRO: }',
+					'macro' => '{$MACRO:}',
+					'positions' => [
+						'start' => 0,
+						'end' => 9,
+						'length' => 10
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:   }',
+				[[
+					'match' => '{$MACRO:   }',
+					'macro' => '{$MACRO:}',
+					'positions' => [
+						'start' => 0,
+						'end' => 11,
+						'length' => 12
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:\'\'}',
+				[[
+					'match' => '{$MACRO:\'\'}',
+					'macro' => '{$MACRO:\'\'}',
+					'positions' => [
+						'start' => 0,
+						'end' => 10,
+						'length' => 11
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\'\'',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:A }',
+				[[
+					'match' => '{$MACRO:A }',
+					'macro' => '{$MACRO:A }',
+					'positions' => [
+						'start' => 0,
+						'end' => 10,
+						'length' => 11
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'A ',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:A}',
+				[[
+					'match' => '{$MACRO:A}',
+					'macro' => '{$MACRO:A}',
+					'positions' => [
+						'start' => 0,
+						'end' => 9,
+						'length' => 10
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'A',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:A"}',
+				[[
+					'match' => '{$MACRO:A"}',
+					'macro' => '{$MACRO:A"}',
+					'positions' => [
+						'start' => 0,
+						'end' => 10,
+						'length' => 11
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'A"',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:context}',
+				[[
+					'match' => '{$MACRO:context}',
+					'macro' => '{$MACRO:context}',
+					'positions' => [
+						'start' => 0,
+						'end' => 15,
+						'length' => 16
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'context',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:<context>}',
+				[[
+					'match' => '{$MACRO:<context>}',
+					'macro' => '{$MACRO:<context>}',
+					'positions' => [
+						'start' => 0,
+						'end' => 17,
+						'length' => 18
+					],
+					'macro_name' => 'MACRO',
+					'context' => '<context>',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:\"}',
+				[[
+					'match' => '{$MACRO:\"}',
+					'macro' => '{$MACRO:\"}',
+					'positions' => [
+						'start' => 0,
+						'end' => 10,
+						'length' => 11
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\"',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:{}',
+				[[
+					'match' => '{$MACRO:{}',
+					'macro' => '{$MACRO:{}',
+					'positions' => [
+						'start' => 0,
+						'end' => 9,
+						'length' => 10
+					],
+					'macro_name' => 'MACRO',
+					'context' => '{',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:\}',
+				[[
+					'match' => '{$MACRO:\}',
+					'macro' => '{$MACRO:\}',
+					'positions' => [
+						'start' => 0,
+						'end' => 9,
+						'length' => 10
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\\',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:\\\\}',
+				[[
+					'match' => '{$MACRO:\\\\}',
+					'macro' => '{$MACRO:\\\\}',
+					'positions' => [
+						'start' => 0,
+						'end' => 10,
+						'length' => 11
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\\\\',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:\"\}',
+				[[
+					'match' => '{$MACRO:\"\}',
+					'macro' => '{$MACRO:\"\}',
+					'positions' => [
+						'start' => 0,
+						'end' => 11,
+						'length' => 12
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\"\\',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:abc"def}',
+				[[
+					'match' => '{$MACRO:abc"def}',
+					'macro' => '{$MACRO:abc"def}',
+					'positions' => [
+						'start' => 0,
+						'end' => 15,
+						'length' => 16
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc"def',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:abc"def"}',
+				[[
+					'match' => '{$MACRO:abc"def"}',
+					'macro' => '{$MACRO:abc"def"}',
+					'positions' => [
+						'start' => 0,
+						'end' => 16,
+						'length' => 17
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc"def"',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:abc"def"ghi}',
+				[[
+					'match' => '{$MACRO:abc"def"ghi}',
+					'macro' => '{$MACRO:abc"def"ghi}',
+					'positions' => [
+						'start' => 0,
+						'end' => 19,
+						'length' => 20
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc"def"ghi',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'{$MACRO:abc"\\}',
+				[[
+					'match' => '{$MACRO:abc"\\}',
+					'macro' => '{$MACRO:abc"\\}',
+					'positions' => [
+						'start' => 0,
+						'end' => 13,
+						'length' => 14
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc"\\',
+					'context_is_quoted' => false
+				]]
+			],
 			// context based quoted macros
-			['{$MACRO:""}', 'MACRO', '', ['source' => '{$MACRO:""}', 'match' => '{$MACRO:""}', 'pos' => 0, 'length' => '12']],
-			['{$MACRO: " " }', 'MACRO', ' ', ['source' => '{$MACRO: " " }', 'match' => '{$MACRO: " " }', 'pos' => 0, 'length' => '15']],
-			['{$MACRO: ""}', 'MACRO', '', ['source' => '{$MACRO: ""}', 'match' => '{$MACRO: ""}', 'pos' => 0, 'length' => '13']],
-			['{$MACRO:"" }', 'MACRO', '', ['source' => '{$MACRO:"" }', 'match' => '{$MACRO:"" }', 'pos' => 0, 'length' => '13']],
-			['{$MACRO: "    " }', 'MACRO', '    ', ['source' => '{$MACRO: "    " }', 'match' => '{$MACRO: "    " }', 'pos' => 0, 'length' => '18']],
-			['{$MACRO:    "    "      }', 'MACRO', '    ', ['source' => '{$MACRO:    "    "      }', 'match' => '{$MACRO:    "    "      }', 'pos' => 0, 'length' => '26']],
-			['{$MACRO:    ""      }', 'MACRO', '', ['source' => '{$MACRO:    ""      }', 'match' => '{$MACRO:    ""      }', 'pos' => 0, 'length' => '22']],
-			['{$MACRO:"A" }', 'MACRO', 'A', ['source' => '{$MACRO:"A" }', 'match' => '{$MACRO:"A" }', 'pos' => 0, 'length' => '14']],
-			['{$MACRO:"{#MACRO}"}', 'MACRO', '{#MACRO}', ['source' => '{$MACRO:"{#MACRO}"}', 'match' => '{$MACRO:"{#MACRO}"}', 'pos' => 0, 'length' => '20']],
-			['{$MACRO:"\abc"}', 'MACRO', '\abc', ['source' => '{$MACRO:"\abc"}', 'match' => '{$MACRO:"\abc"}', 'pos' => 0, 'length' => '16']],
-			['{$MACRO:"abc\def"}', 'MACRO', 'abc\def', ['source' => '{$MACRO:"abc\def"}', 'match' => '{$MACRO:"abc\def"}', 'pos' => 0, 'length' => '19']],
-			['{$MACRO:"\abc\    "}', 'MACRO', '\abc\    ', ['source' => '{$MACRO:"\abc\    "}', 'match' => '{$MACRO:"\abc\    "}', 'pos' => 0, 'length' => '21']],
-			['{$MACRO:"\\""}', 'MACRO', '\"', ['source' => '{$MACRO:"\\""}', 'match' => '{$MACRO:"\\""}', 'pos' => 0, 'length' => '14']],
+			[
+				'{$MACRO:""}',
+				[[
+					'match' => '{$MACRO:""}',
+					'macro' => '{$MACRO:""}',
+					'positions' => [
+						'start' => 0,
+						'end' => 10,
+						'length' => 11
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO: " " }',
+				[[
+					'match' => '{$MACRO: " " }',
+					'macro' => '{$MACRO:" "}',
+					'positions' => [
+						'start' => 0,
+						'end' => 13,
+						'length' => 14
+					],
+					'macro_name' => 'MACRO',
+					'context' => ' ',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO: ""}',
+				[[
+					'match' => '{$MACRO: ""}',
+					'macro' => '{$MACRO:""}',
+					'positions' => [
+						'start' => 0,
+						'end' => 11,
+						'length' => 12
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:"" }',
+				[[
+					'match' => '{$MACRO:"" }',
+					'macro' => '{$MACRO:""}',
+					'positions' => [
+						'start' => 0,
+						'end' => 11,
+						'length' => 12
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO: "    " }',
+				[[
+					'match' => '{$MACRO: "    " }',
+					'macro' => '{$MACRO:"    "}',
+					'positions' => [
+						'start' => 0,
+						'end' => 16,
+						'length' => 17
+					],
+					'macro_name' => 'MACRO',
+					'context' => '    ',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:    "    "      }',
+				[[
+					'match' => '{$MACRO:    "    "      }',
+					'macro' => '{$MACRO:"    "}',
+					'positions' => [
+						'start' => 0,
+						'end' => 24,
+						'length' => 25
+					],
+					'macro_name' => 'MACRO',
+					'context' => '    ',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:    ""      }',
+				[[
+					'match' => '{$MACRO:    ""      }',
+					'macro' => '{$MACRO:""}',
+					'positions' => [
+						'start' => 0,
+						'end' => 20,
+						'length' => 21
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:"A" }',
+				[[
+					'match' => '{$MACRO:"A" }',
+					'macro' => '{$MACRO:"A"}',
+					'positions' => [
+						'start' => 0,
+						'end' => 12,
+						'length' => 13
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'A',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:"{#MACRO}"}',
+				[[
+					'match' => '{$MACRO:"{#MACRO}"}',
+					'macro' => '{$MACRO:"{#MACRO}"}',
+					'positions' => [
+						'start' => 0,
+						'end' => 18,
+						'length' => 19
+					],
+					'macro_name' => 'MACRO',
+					'context' => '{#MACRO}',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:"\abc"}',
+				[[
+					'match' => '{$MACRO:"\abc"}',
+					'macro' => '{$MACRO:"\abc"}',
+					'positions' => [
+						'start' => 0,
+						'end' => 14,
+						'length' => 15
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\abc',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:"abc\def"}',
+				[[
+					'match' => '{$MACRO:"abc\def"}',
+					'macro' => '{$MACRO:"abc\def"}',
+					'positions' => [
+						'start' => 0,
+						'end' => 17,
+						'length' => 18
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc\def',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:"\abc\    "}',
+				[[
+					'match' => '{$MACRO:"\abc\    "}',
+					'macro' => '{$MACRO:"\abc\    "}',
+					'positions' => [
+						'start' => 0,
+						'end' => 19,
+						'length' => 20
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\abc\    ',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'{$MACRO:"\\""}',
+				[[
+					'match' => '{$MACRO:"\\""}',
+					'macro' => '{$MACRO:"\\""}',
+					'positions' => [
+						'start' => 0,
+						'end' => 12,
+						'length' => 13
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\"',
+					'context_is_quoted' => true
+				]]
+			]
 		];
 	}
 
 	/**
-	 * Test against invalid macros and compare the error message.
+	 * An array of invalid macros and error messages.
 	 */
 	public function testInvalidProvider() {
 		return [
@@ -95,10 +576,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 			['{$MACR\'O}', 'incorrect syntax near "\'O}"'],
 			["{\$MACR'O}", 'incorrect syntax near "\'O}"'],
 			['{$MACRo}', 'incorrect syntax near "o}"'],
-			['{$MACRO}:', 'incorrect syntax near "}:"'],
+			['{$MACRO}:', 'incorrect syntax near ":"'],
 			['{$MACRO:{#MACRO}}', 'incorrect syntax near "}"'],
 			['{$MACRO:"}', 'unexpected end of macro'],
-			['{$MACRO:""A""}', 'incorrect syntax near """}"'],
+			['{$MACRO:""A""}', 'incorrect syntax near "A""}"'],
 			['{$MACRO:"\}', 'unexpected end of macro'],
 			['{$MACRO:"\"}', 'unexpected end of macro'],
 			['{$MACRO:A}}', 'incorrect syntax near "}"'],
@@ -115,36 +596,281 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * An array of strings containing none or multiple macros and parsed results.
+	 */
+	public function testMixedProvider() {
+		return [
+			[
+				'{$MACRO1}{$MACRO2}',
+				[[
+					'match' => '{$MACRO1}',
+					'macro' => '{$MACRO1}',
+					'positions' => [
+						'start' => 0,
+						'end' => 8,
+						'length' => 9
+					],
+					'macro_name' => 'MACRO1',
+					'context' => null,
+					'context_is_quoted' => false
+				],
+				[
+					'match' => '{$MACRO2}',
+					'macro' => '{$MACRO2}',
+					'positions' => [
+						'start' => 9,
+						'end' => 17,
+						'length' => 9
+					],
+					'macro_name' => 'MACRO2',
+					'context' => null,
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'abc"def"ghi{$MACRO}',
+				[[
+					'match' => '{$MACRO}',
+					'macro' => '{$MACRO}',
+					'positions' => [
+						'start' => 11,
+						'end' => 18,
+						'length' => 8
+					],
+					'macro_name' => 'MACRO',
+					'context' => null,
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'abc"def"ghi{$MACRO:""}',
+				[[
+					'match' => '{$MACRO:""}',
+					'macro' => '{$MACRO:""}',
+					'positions' => [
+						'start' => 11,
+						'end' => 21,
+						'length' => 11
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'abc"def"ghi{$MACRO:\""}',
+				[[
+					'match' => '{$MACRO:\""}',
+					'macro' => '{$MACRO:\""}',
+					'positions' => [
+						'start' => 11,
+						'end' => 22,
+						'length' => 12
+					],
+					'macro_name' => 'MACRO',
+					'context' => '\""',
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'abc"def\"ghi{$MACRO:""}',
+				[]
+			],
+			[
+				'abc"def{$MACRO:\""}',
+				[]
+			],
+			[
+				'abc"def{$MACRO:\"\"}',
+				[[
+					'match' => '{$MACRO:\"\"}',
+					'macro' => '{$MACRO:""}',
+					'positions' => [
+						'start' => 7,
+						'end' => 19,
+						'length' => 13
+					],
+					'macro_name' => 'MACRO',
+					'context' => '',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'abc"def{$MACRO:\"abc\"}',
+				[[
+					'match' => '{$MACRO:\"abc\"}',
+					'macro' => '{$MACRO:"abc"}',
+					'positions' => [
+						'start' => 7,
+						'end' => 22,
+						'length' => 16
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'abc"def{$MACRO69:\"abc\"def\"\"}',
+				[]
+			],
+			[
+				'abc"def{$MACRO:\\"abc\\\\"defgh\\\\"\\"}',
+				[[
+					'match' => '{$MACRO:\\"abc\\\\"defgh\\\\"\\"}',
+					'macro' => '{$MACRO:"abc\\"defgh\\""}',
+					'positions' => [
+						'start' => 7,
+						'end' => 33,
+						'length' => 27
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc"defgh"',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'"def{$MACRO:\"abc\\\\"defxyz\\\\"\"}',
+				[[
+					'match' => '{$MACRO:\"abc\\\\"defxyz\\\\"\"}',
+					'macro' => '{$MACRO:"abc\"defxyz\""}',
+					'positions' => [
+						'start' => 4,
+						'end' => 31,
+						'length' => 28
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc"defxyz"',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'     "def{$MACRO:\"abc\\\\"qwerty\\\\"\"}',
+				[[
+					'match' => '{$MACRO:\"abc\\\\"qwerty\\\\"\"}',
+					'macro' => '{$MACRO:"abc\"qwerty\""}',
+					'positions' => [
+						'start' => 9,
+						'end' => 36,
+						'length' => 28
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc"qwerty"',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'     "def{$MACRO:     \"abc\\\\"def\\\\"\"}',
+				[[
+					'match' => '{$MACRO:     \"abc\\\\"def\\\\"\"}',
+					'macro' => '{$MACRO:"abc\"def\""}',
+					'positions' => [
+						'start' => 9,
+						'end' => 38,
+						'length' => 30
+					],
+					'macro_name' => 'MACRO',
+					'context' => 'abc"def"',
+					'context_is_quoted' => true
+				]]
+			],
+			[
+				'a  abc"def"ghi{$MACRO}{$MACRO}test',
+				[[
+					'match' => '{$MACRO}',
+					'macro' => '{$MACRO}',
+					'positions' => [
+						'start' => 14,
+						'end' => 21,
+						'length' => 8
+					],
+					'macro_name' => 'MACRO',
+					'context' => null,
+					'context_is_quoted' => false
+				],
+				[
+					'match' => '{$MACRO}',
+					'macro' => '{$MACRO}',
+					'positions' => [
+						'start' => 22,
+						'end' => 29,
+						'length' => 8
+					],
+					'macro_name' => 'MACRO',
+					'context' => null,
+					'context_is_quoted' => false
+				]]
+			],
+			[
+				'a  abc"defghi{$MACRO1}{}{{{$:${$${$MACRO2:\"\"}   ',
+				[[
+					'match' => '{$MACRO1}',
+					'macro' => '{$MACRO1}',
+					'positions' => [
+						'start' => 13,
+						'end' => 21,
+						'length' => 9
+					],
+					'macro_name' => 'MACRO1',
+					'context' => null,
+					'context_is_quoted' => false
+				],
+				[
+					'match' => '{$MACRO2:\"\"}',
+					'macro' => '{$MACRO2:""}',
+					'positions' => [
+						'start' => 33,
+						'end' => 46,
+						'length' => 14
+					],
+					'macro_name' => 'MACRO2',
+					'context' => '',
+					'context_is_quoted' => true
+				]]
+			]
+		];
+	}
+
+	/**
 	 * @dataProvider testValidProvider
 	 *
-	 * @param $source		source string to parse
-	 * @param $macro_name	expected macro name
-	 * @param $context		expected context string
-	 * @param $result		expected prase result from CParserResult
+	 * @param string $source		source string to parse
+	 * @param array $result			expected resulting array
 	 */
-	public function testParseValid($source, $macro_name, $context, $result) {
-		$this->userMacroParser->parse($source, 0, false);
+	public function testParseValid($source, $result) {
+		$parser = new CUserMacroParser($source);
 
-		$this->assertTrue($this->userMacroParser->isValid());
-		$this->assertEmpty($this->userMacroParser->getError());
-		$this->assertEquals($macro_name, $this->userMacroParser->getMacroName());
-		$this->assertEquals($context, $this->userMacroParser->getContext());
-		$this->assertEquals($result, (array) $this->userMacroParser->getParseResult());
+		$this->assertTrue($parser->isValid());
+		$this->assertEmpty($parser->getError());
+		$this->assertEquals($result, $parser->getMacros());
 	}
 
 	/**
 	 * @dataProvider testInvalidProvider
 	 *
-	 * @param $source		source string to parse
-	 * @param $error		expected error message
+	 * @param string $source		source string to parse
+	 * @param string $error		expected error message
 	 */
 	public function testParseInvalid($source, $error) {
-		$this->userMacroParser->parse($source, 0, false);
+		$parser = new CUserMacroParser($source);
 
-		$this->assertFalse($this->userMacroParser->isValid());
-		$this->assertEquals($error, $this->userMacroParser->getError());
-		$this->assertEmpty($this->userMacroParser->getMacroName());
-		$this->assertEmpty($this->userMacroParser->getContext());
-		$this->assertFalse($this->userMacroParser->getParseResult());
+		$this->assertFalse($parser->isValid());
+		$this->assertEquals($error, $parser->getError());
+		$this->assertEmpty($parser->getMacros());
+	}
+
+	/**
+	 * @dataProvider testMixedProvider
+	 *
+	 * @param string $source
+	 * @param array $result
+	 */
+
+	public function testMixed($source, $result) {
+		$parser = new CUserMacroParser($source, false);
+
+		$this->assertFalse($parser->isValid());
+		$this->assertEmpty($parser->getError());
+		$this->assertEquals($result, $parser->getMacros());
 	}
 }

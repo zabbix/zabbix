@@ -173,12 +173,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		// macros
 		$macros = getRequest('macros', []);
 
-		foreach ($macros as &$macro) {
-			// transform macros to uppercase {$aaa} => {$AAA}
-			$macro['macro'] = mb_strtoupper($macro['macro']);
-		}
-		unset($macro);
-
 		// groups
 		$groups = getRequest('groups', []);
 		$groups = zbx_toObject($groups, 'groupid');

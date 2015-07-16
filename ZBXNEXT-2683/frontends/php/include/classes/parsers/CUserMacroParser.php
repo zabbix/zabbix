@@ -24,40 +24,16 @@
  */
 class CUserMacroParser {
 
-	// possible parsing states
-	const STATE_UNQUOTED_OPEN = 0;
-	const STATE_UNQUOTED_PROGRESS = 1;
-	const STATE_QUOTED_OPEN = 2;
-	const STATE_QUOTED_CLOSED = 3;
-	const STATE_MACRO_CLOSED = 4;
-
-	/**
-	 * Set to true if the macro is valid.
-	 *
-	 * @var bool
-	 */
-	private $is_valid;
-
-	/**
-	 * Postion indicator, where macro name ends. Either before } or :
-	 *
-	 * @var int
-	 */
-	private $macro_name_end;
-
-	/**
-	 * Sarting postion indicator, where macro context starts. If context is quoted, starts after first ".
-	 *
-	 * @var int
-	 */
-	private $context_start;
-
-	/**
-	 * Ending position indicator, where the macro context ends. If context is quoted, ends after second ".
-	 *
-	 * @var int
-	 */
-	private $context_end;
+	// Possible parsing states.
+	const STATE_NEW = 0;
+	const STATE_MACRO_NEW = 1;
+	const STATE_MACRO_BEGIN = 2;
+	const STATE_MACRO_PROGRESS = 3;
+	const STATE_MACRO_END = 4;
+	const STATE_CONTEXT_NEW = 5;
+	const STATE_CONTEXT_UNQUOTED_PROGRESS = 6;
+	const STATE_CONTEXT_QUOTED_PROGRESS = 7;
+	const STATE_CONTEXT_QUOTED_PROGRESS_END = 8;
 
 	/**
 	 * Source string.
@@ -67,200 +43,568 @@ class CUserMacroParser {
 	private $source;
 
 	/**
-	 * Error message if the macro is invalid.
-	 *
-	 * @var string
-	 */
-	private $error;
-
-	/**
 	 * Current position on a parsed element.
 	 *
 	 * @var integer
 	 */
-	private $pos;
+	private $pos = 0;
 
 	/**
-	 * Parsed result string
+	 * Set to true if the macro is valid.
 	 *
-	 * @var CParserResult
+	 * @var bool
 	 */
-	private $parse_result;
+	private $is_valid = false;
 
 	/**
-	 * @param string    $source			source string to be parsed
-	 * @param int       $start_pos		position in string to start from
-	 * @param bool		$part			true if macro is a part of item key or trigger expression
+	 * Error message if the macro is invalid.
+	 *
+	 * @var string
 	 */
-	public function parse($source, $start_pos, $part) {
+	private $error = '';
+
+	/**
+	 * Stores all macros found in string.
+	 *
+	 * @var array
+	 */
+	private $macros = [];
+
+	public function __construct($source, $validate = true, $pos = 0) {
+		$this->validate = $validate;
+		$this->pos = $pos;
+
+		$this->parse($source);
+	}
+
+	/**
+	 * Parse the given source string. There can be none or multiple macros in string, with contexts, quoted contexts and
+	 * without. If $this->validate was set to true, string should be validated and it must find one single macro.
+	 * No characters are allowed before or after macro, and contexts should be properly quoted. When $this->validate is
+	 * set to false, it does not validate the source sting, it just finds all valid macros in string. The source string,
+	 * however, may contain quotes before the macro. If a macro has a quoted context, the context is escaped with
+	 * backslashes. For example "{$MACRO:\"abc\"} will be considered a valid macro with quoted context. The valid macros
+	 * store additional information where they begin, length, name, context etc.
+	 *
+	 * @param string $source	Source string that needs to be parsed.
+	 */
+
+	private function parse($source) {
 		$this->source = $source;
-		$this->pos = $start_pos;
 
-		// Check macro opening curly brace.
-		if (!isset($this->source[$this->pos]) || $this->source[$this->pos] !== '{') {
-			$this->setError();
-			return;
-		}
-		$this->pos++;
+		/*
+		 * If there are macros, populate the array with data:
+		 * $macros[]['match'] - full match with all the escaped quotes
+		 * $macros[]['macro'] - matches only macro with context and trims spaces
+		 * $macros[]['poitions']['start'] - starting position of the macro
+		 * $macros[]['poitions']['end'] - ending position of macro
+		 * $macros[]['poitions']['length'] - macro length (with context)
+		 * $macros[]['macro_name'] - only macro name
+		 * $macros[]['context'] - context with no quotes
+		 * $macros[]['context_is_quoted'] - is the context quoted or not
+		 */
+		$this->macros = [];
 
-		// Check if this is a user macro that starts with $.
-		if (!isset($this->source[$this->pos]) || $this->source[$this->pos] !== '$') {
-			$this->setError();
-			return;
-		}
-		$this->pos++;
+		// True when there is a quote before macro. For example abd"def{MACRO}
+		$quoted_string = false;
 
-		// Make sure there is at least one valid macro character.
-		if (!isset($this->source[$this->pos]) || !$this->isMacroChar($this->source[$this->pos])) {
-			$this->setError();
-			return;
-		}
-		$this->pos++;
+		// Macro counter.
+		$i = 0;
 
-		// Skip the remaining macro chars.
-		while (isset($this->source[$this->pos]) && $this->isMacroChar($this->source[$this->pos])) {
-			$this->pos++;
-		}
+		// Starting state of new string.
+		$state = self::STATE_NEW;
 
-		// Parse macro context if present.
-		if (isset($this->source[$this->pos]) && $this->source[$this->pos] === ':') {
-			$state = self::STATE_UNQUOTED_OPEN;
-			$this->macro_name_end = $this->pos - 1;
+		while (isset($this->source[$this->pos])) {
+			// Macro was closed, but there is another character.
 
-			while (isset($this->source[++$this->pos])) {
-				switch ($this->source[$this->pos]) {
-					case '"';
-						// A alosing curly brace was alrady met and no quotes are allowed after it. Must fail with error.
-						if ($state == self::STATE_MACRO_CLOSED) {
-							$this->setError();
-							return;
-						}
+			if ($state == self::STATE_MACRO_END) {
+				// Encountered a char after closed macro
 
-						// A quoted context string has already met and there can be no more quotes. Must fail with error.
-						if ($state == self::STATE_QUOTED_CLOSED) {
-							$this->setError();
-							return;
-						}
+				if ($this->validate) {
+					// There must be no chars after a closed macro. End with error and also remove previous result.
+					unset($this->macros[$i-1]);
 
-						/*
-						 * If a quote is not escaped with backslash, it is a closing quote for context string.
-						 * Other quotes after this one will fail, becouse we have already closed it.
-						 */
-						if ($state == self::STATE_QUOTED_OPEN && $this->source[$this->pos - 1] !== '\\') {
-							$state = self::STATE_QUOTED_CLOSED;
-
-							$this->context_end = $this->pos;
-						}
-
-						// There was an unqoted context, but once we found the first ", it means this will be a quoted context.
-						if ($state == self::STATE_UNQUOTED_OPEN) {
-							$state = self::STATE_QUOTED_OPEN;
-
-							$this->context_start = $this->pos + 1;
-						}
-						break;
-
-					case '}':
-						// Closing curly brace was alrady met and no other curly braces are allowed. Must fail with error.
-						if ($state == self::STATE_MACRO_CLOSED) {
-							$this->setError();
-							return;
-						}
-
-						// A quoted context string was closed. Close the macro with curly brace.
-						if ($state == self::STATE_QUOTED_CLOSED) {
-							$state = self::STATE_MACRO_CLOSED;
-						}
-
-						/*
-						 * Context string was still in open stage. It means no symbols have been found yet. Untill now.
-						 * Capture only start of a context, but don't change the state yet.
-						 */
-						if ($state == self::STATE_UNQUOTED_OPEN) {
-							$this->context_start = $this->pos;
-						}
-
-						/*
-						 * There was an unqoted string and macro is now closed. There should be no more characters after
-						 * this.
-						 */
-						if ($state == self::STATE_UNQUOTED_OPEN || $state == self::STATE_UNQUOTED_PROGRESS) {
-							$state = self::STATE_MACRO_CLOSED;
-
-							$this->context_end = $this->pos;
-						}
-
-						// Otherwise a quoted string just contains a } which is not the end of the macro.
-						break;
-
-					case ' ':
-						// Closing curly brace was alrady met and no spaces are allowed after it. Must fail with error.
-						if ($state == self::STATE_MACRO_CLOSED) {
-							$this->setError();
-							return;
-						}
-						break;
-
-					default:
-						// Closing curly brace was alrady met and no other characters are allowed. Must fail with error.
-						if ($state == self::STATE_MACRO_CLOSED) {
-							$this->setError();
-							return;
-						}
-
-						/*
-						 * An unquoted context was open and is now in progress. It has met a character other than space.
-						 * And it means that following quotes will not be considered a quoted string anymore, but a part
-						 * of unquoted context string.
-						 */
-						if ($state == self::STATE_UNQUOTED_OPEN) {
-							$state = self::STATE_UNQUOTED_PROGRESS;
-
-							$this->context_start = $this->pos;
-						}
+					$this->setError();
+					return;
+				}
+				else {
+					// Continue to parse it as normal string and find new macros.
+					$state = self::STATE_NEW;
 				}
 			}
 
+			if (!array_key_exists($i, $this->macros)) {
+				$this->macros[$i] = [
+					'match' => '',
+					'macro' => '',
+					'context' => '',
+					'macro_name' => '',
+					'positions' => ['start' => 0, 'end' => 0, 'length' => 0],
+					'context_is_quoted' => false
+				];
+			}
 
-			if ($state != self::STATE_MACRO_CLOSED) {
+			switch ($state) {
+				case self::STATE_NEW:
+					// Encountered some character at the beginning of string or we are just looking for a new macro.
+					switch ($this->source[$this->pos]) {
+						case '{':
+							// Possible that this will be a new macro. Capture starting position and concatenate chars.
+							$this->macros[$i]['match'] = $this->source[$this->pos];
+							$this->macros[$i]['macro'] = $this->source[$this->pos];
+							$this->macros[$i]['positions']['start'] = $this->pos;
+
+							$state = self::STATE_MACRO_NEW;
+							break;
+
+						case '"';
+							if ($this->validate) {
+								// There must be { at this position.
+								unset($this->macros[$i]);
+								$this->setError();
+								return;
+							}
+							else {
+								/*
+								 * In a string there is a quote, so it's possible that macro with quoted context will
+								 * look something like this: abc"def{$MACRO:\"abc\"}
+								 */
+								if (isset($this->source[$this->pos-1]) && $this->source[$this->pos-1] !== '\\') {
+									if ($quoted_string) {
+										/*
+										 * There was already a quote, and this is the second one. Close and start over.
+										 * possile valid macro can looke like this: abc"def"ghi{$MACRO:"abc"}
+										 */
+										$quoted_string = false;
+									}
+									else {
+										// No quotes have been encountered before and this is the first.
+										$quoted_string = true;
+									}
+								}
+								else {
+									// This is not an escaped quote.
+									$quoted_string = true;
+								}
+							}
+							break;
+
+						default:
+							if ($this->validate) {
+								// There must be { at this position.
+								unset($this->macros[$i]);
+								$this->setError();
+								return;
+							}
+
+							// Else it just skips all other chars untill finds where macro begins.
+							break;
+					}
+					break;
+
+				case self::STATE_MACRO_NEW:
+					switch ($this->source[$this->pos]) {
+						case '$':
+							// Even greater potential that following chars will me a real macro.
+							$this->macros[$i]['match'] .= $this->source[$this->pos];
+							$this->macros[$i]['macro'] .= $this->source[$this->pos];
+
+							$state = self::STATE_MACRO_BEGIN;
+							break;
+
+						default:
+							// Found something else after {, so this macro is not valid. Remove it from result.
+							unset($this->macros[$i]);
+
+							if ($this->validate) {
+								// There must be $ after {.
+								$this->setError();
+								return;
+							}
+							break;
+					}
+					break;
+
+				case self::STATE_MACRO_BEGIN:
+					// Now after {$ the next char should be macro char. Otherwise it is not a valid macro.
+					if ($this->isMacroChar($this->source[$this->pos])) {
+						$this->macros[$i]['macro_name'] = $this->source[$this->pos];
+						$this->macros[$i]['match'] .= $this->source[$this->pos];
+						$this->macros[$i]['macro'] .= $this->source[$this->pos];
+
+						if ($state != self::STATE_MACRO_PROGRESS) {
+							$state = self::STATE_MACRO_PROGRESS;
+						}
+					}
+					else {
+						unset($this->macros[$i]);
+
+						if ($this->validate) {
+							// There must be at least one valid macro char after {$.
+							$this->setError();
+							return;
+						}
+						else {
+							/*
+							 * After {$ there was something else. This is not a valid macro. Reset and look for macros
+							 * in the rest of the string.
+							 */
+							$state = self::STATE_NEW;
+						}
+					}
+					break;
+
+				case self::STATE_MACRO_PROGRESS:
+					if ($this->isMacroChar($this->source[$this->pos])) {
+						// The following chars are macro chars. Everthing is going fine so far.
+						$this->macros[$i]['macro_name'] .= $this->source[$this->pos];
+						$this->macros[$i]['match'] .= $this->source[$this->pos];
+						$this->macros[$i]['macro'] .= $this->source[$this->pos];
+					}
+					else {
+						// First non macro char.
+						switch ($this->source[$this->pos]) {
+							case ':':
+								// {$MACRO:
+								$this->macros[$i]['match'] .= $this->source[$this->pos];
+								$this->macros[$i]['macro'] .= $this->source[$this->pos];
+
+								$state = self::STATE_CONTEXT_NEW;
+								break;
+
+							case '}':
+								// {$MACRO} - The macro ended with no context at all.
+								$this->macros[$i]['context'] = null;
+								$this->macros[$i]['context_is_quoted'] = false;
+								$this->macros[$i]['match'] .= $this->source[$this->pos];
+								$this->macros[$i]['macro'] .= $this->source[$this->pos];
+								$this->macros[$i]['positions']['end'] = $this->pos;
+								$this->macros[$i]['positions']['length'] = $this->pos - $this->macros[$i]['positions']['start'] + 1;
+
+								// Start the next macro, because this one is closed and is valid.
+								$i++;
+
+								$state = self::STATE_MACRO_END;
+								break;
+
+							default:
+								// Found other invalid characers in macro name. This is not valid macro.
+								unset($this->macros[$i]);
+
+								if ($this->validate) {
+									$this->setError();
+									return;
+								}
+								else {
+									$state = self::STATE_NEW;
+								}
+								break;
+						}
+					}
+					break;
+
+				case self::STATE_CONTEXT_NEW:
+					// The new context is started, this is the first symbol after :
+					switch ($this->source[$this->pos]) {
+						case '}':
+							// The macro ended with empty context. Example: {$MACRO:}
+							$this->macros[$i]['context'] = '';
+							$this->macros[$i]['match'] .= $this->source[$this->pos];
+							$this->macros[$i]['macro'] .= $this->source[$this->pos];
+							$this->macros[$i]['positions']['end'] = $this->pos;
+							$this->macros[$i]['positions']['length'] = $this->pos - $this->macros[$i]['positions']['start'] + 1;
+							$this->macros[$i]['context_is_quoted'] = false;
+
+							// Start the next macro, because this one is closed and is valid.
+							$i++;
+
+							$state = self::STATE_MACRO_END;
+							break;
+
+						case '"':
+							// Examples: abc{$MACRO:" or abc"{$MACRO:"
+							if ($quoted_string) {
+								// A quote has been encountered before macro. For example: abc"{$MACRO:"
+								$quoted_string = false;
+								unset($this->macros[$i]);
+
+								// Continue to parse string as normal string, because this was not a valid macro.
+								$state = self::STATE_NEW;
+							}
+							else {
+								/*
+								 * There were no quotes before macro and this is the first quote in context.
+								 * For example: abc{$MACRO:"
+								 */
+								$this->macros[$i]['context'] = '';
+								$this->macros[$i]['match'] .= $this->source[$this->pos];
+								$this->macros[$i]['macro'] .= $this->source[$this->pos];
+								$this->macros[$i]['context_is_quoted'] = true;
+
+								$state = self::STATE_CONTEXT_QUOTED_PROGRESS;
+							}
+							break;
+
+						case ' ':
+							/*
+							 * In an empty context, there is an empty space, and it is trimmed from result.
+							 * For example '{$MACRO:    '
+							 */
+							$this->macros[$i]['match'] .= ' ';
+							break;
+
+						case '\\':
+							/*
+							 * A backslash and following chars, determines the next state now and not after ".
+							 * Examples: {$MACRO:\ or "{$MACRO:\ or "{$MACRO:\\ or "{$MACRO:\"
+							 */
+							if ($quoted_string) {
+								// Example: "{$MACRO:\
+								if (isset($this->source[$this->pos+1]) && $this->source[$this->pos+1] === '"') {
+									// Example: "{$MACRO:\"
+									$this->macros[$i]['context'] = '';
+									$this->macros[$i]['match'] .= $this->source[$this->pos].$this->source[$this->pos+1];
+									$this->macros[$i]['macro'] .= $this->source[$this->pos+1];
+									$this->macros[$i]['context_is_quoted'] = true;
+
+									// Skip next char, since it's "
+									$this->pos++;
+
+									$state = self::STATE_CONTEXT_QUOTED_PROGRESS;
+								}
+								else {
+									// Example: "{$MACRO:\\
+									$this->macros[$i]['context'] = $this->source[$this->pos];
+									$this->macros[$i]['match'] .= $this->source[$this->pos];
+									$this->macros[$i]['macro'] .= $this->source[$this->pos];
+									$this->macros[$i]['context_is_quoted'] = false;
+
+									$state = self::STATE_CONTEXT_UNQUOTED_PROGRESS;
+								}
+							}
+							else {
+								// Example: {$MACRO:\
+								$this->macros[$i]['context'] = $this->source[$this->pos];
+								$this->macros[$i]['match'] .= $this->source[$this->pos];
+								$this->macros[$i]['macro'] .= $this->source[$this->pos];
+								$this->macros[$i]['context_is_quoted'] = false;
+
+								$state = self::STATE_CONTEXT_UNQUOTED_PROGRESS;
+							}
+							break;
+
+						default:
+							// Example: {$MACRO:a
+							$this->macros[$i]['context'] = $this->source[$this->pos];
+							$this->macros[$i]['match'] .= $this->source[$this->pos];
+							$this->macros[$i]['macro'] .= $this->source[$this->pos];
+							$this->macros[$i]['context_is_quoted'] = false;
+
+							$state = self::STATE_CONTEXT_UNQUOTED_PROGRESS;
+							break;
+					}
+					break;
+
+				case self::STATE_CONTEXT_UNQUOTED_PROGRESS:
+					// n-th char in unquoted context {$MACRO:aaaa
+
+					switch ($this->source[$this->pos]) {
+						case '}':
+							// Example: {$MACRO:aaaa}
+							$this->macros[$i]['match'] .= $this->source[$this->pos];
+							$this->macros[$i]['macro'] .= $this->source[$this->pos];
+							$this->macros[$i]['positions']['end'] = $this->pos;
+							$this->macros[$i]['positions']['length'] = $this->pos - $this->macros[$i]['positions']['start'] + 1;
+
+							// Start the next macro, because this one is closed and is valid.
+							$i++;
+
+							$state = self::STATE_MACRO_END;
+							break;
+
+						case '"':
+							// Examples: abc{$MACRO:def" or abc"{$MACRO:def"
+							if ($quoted_string) {
+								// Examples: abc"{$MACRO:def" or abc"{$MACRO:def\"
+								if ($this->source[$this->pos-1] === '\\') {
+									/*
+									 * Quote is escaped but it is still unquoted context, since we encountered other
+									 * chars before the (escaped) quote. Example: abc"{$MACRO:def\"
+									 */
+									$this->macros[$i]['context'] .= $this->source[$this->pos];
+									$this->macros[$i]['match'] .= $this->source[$this->pos];
+									$this->macros[$i]['macro'] .= $this->source[$this->pos];
+								}
+								else {
+									/*
+									 * Quote is not escaped, it closes the string. Renders the macro invalid.
+									 * Example: abc"{$MACRO:def"
+									 */
+									$quoted_string = false;
+									unset($this->macros[$i]);
+
+									$state = self::STATE_NEW;
+								}
+							}
+							else {
+								// Example: abc{$MACRO:def"
+								$this->macros[$i]['context'] .= $this->source[$this->pos];
+								$this->macros[$i]['match'] .= $this->source[$this->pos];
+								$this->macros[$i]['macro'] .= $this->source[$this->pos];
+							}
+							break;
+
+						default:
+							// Example: {$MACRO:aaaaaaaaabbbbbbb
+							$this->macros[$i]['context'] .= $this->source[$this->pos];
+							$this->macros[$i]['match'] .= $this->source[$this->pos];
+							$this->macros[$i]['macro'] .= $this->source[$this->pos];
+							break;
+					}
+					break;
+
+				case self::STATE_CONTEXT_QUOTED_PROGRESS:
+					switch ($this->source[$this->pos]) {
+						case '"':
+							// That's a second quote in a quoted context, that probably closes the context. Or not.
+							if ($this->source[$this->pos-1] === '\\') {
+								if ($quoted_string) {
+									// Examples: "{$MACRO:\"abc\" or "{$MACRO:\"abc\\"
+									if ($this->source[$this->pos-2] === '\\') {
+										/*
+										 * Context has escaped quote inside it. Example: "{$MACRO:\"abc\\"
+										 * if there would be no quote before macro, it would look like {$MACRO:"abc\"
+										 */
+										$this->macros[$i]['context'] = substr($this->macros[$i]['context'], 0, -2);
+										$this->macros[$i]['context'] .= $this->source[$this->pos];
+										$this->macros[$i]['match'] .= $this->source[$this->pos];
+										$this->macros[$i]['macro'] = substr($this->macros[$i]['macro'], 0, -1);
+										$this->macros[$i]['macro'] .= $this->source[$this->pos];
+									}
+									else {
+										// Example: "{$MACRO:\"abc\"
+										$this->macros[$i]['match'] .= $this->source[$this->pos];
+										$this->macros[$i]['macro'] = substr($this->macros[$i]['macro'], 0, -1);
+										$this->macros[$i]['macro'] .= $this->source[$this->pos];
+										$this->macros[$i]['context'] = substr($this->macros[$i]['context'], 0, -1);
+
+										$state = self::STATE_CONTEXT_QUOTED_PROGRESS_END;
+									}
+								}
+								else {
+									// Example: {$MACRO:"\"
+									$this->macros[$i]['context'] .= $this->source[$this->pos];
+									$this->macros[$i]['match'] .= $this->source[$this->pos];
+									$this->macros[$i]['macro'] .= $this->source[$this->pos];
+								}
+							}
+							else {
+								if ($quoted_string) {
+									// Example: "{$MACRO:\""
+									$quoted_string = false;
+									unset($this->macros[$i]);
+
+									$state = self::STATE_NEW;
+								}
+								else {
+									// Example: {$MACRO:"abc"
+									$this->macros[$i]['match'] .= $this->source[$this->pos];
+									$this->macros[$i]['macro'] .= $this->source[$this->pos];
+
+									$state = self::STATE_CONTEXT_QUOTED_PROGRESS_END;
+								}
+							}
+							break;
+
+						default:
+							$this->macros[$i]['match'] .= $this->source[$this->pos];
+							$this->macros[$i]['macro'] .= $this->source[$this->pos];
+							$this->macros[$i]['context'] .= $this->source[$this->pos];
+							break;
+					}
+					break;
+
+				case self::STATE_CONTEXT_QUOTED_PROGRESS_END:
+					switch ($this->source[$this->pos]) {
+						case '}':
+							// Examples: {$MACRO:"abc"} or "{$MACRO:\"abc\"}
+							$this->macros[$i]['match'] .= $this->source[$this->pos];
+							$this->macros[$i]['macro'] .= $this->source[$this->pos];
+							$this->macros[$i]['positions']['end'] = $this->pos;
+							$this->macros[$i]['positions']['length'] = $this->pos - $this->macros[$i]['positions']['start'] + 1;
+
+							$i++;
+
+							$state = self::STATE_MACRO_END;
+							break;
+
+						case ' ':
+							// Spaces after quoted context are allowed. They are not counted towards context.
+							$this->macros[$i]['match'] .= $this->source[$this->pos];
+							break;
+
+						case '"':
+							// Example: {$MACRO:"abc"" or "{$MACRO:\"abc\""
+							if ($quoted_string) {
+								// Examples: "{$MACRO:\"abc\"" or "{$MACRO:\"abc\"\"
+								if ($this->source[$this->pos-1] !== '\\') {
+									$quoted_string = false;
+								}
+							}
+							// Else it is for example: {$MACRO:"abc""
+
+							unset($this->macros[$i]);
+
+							if ($this->validate) {
+								$this->setError();
+								return;
+							}
+							else {
+								$state = self::STATE_NEW;
+							}
+							break;
+
+						default:
+							/*
+							 * Encountered other character after quoted context.
+							 * Examples: {$MACRO:"abc"a or "{$MACRO:\"abc\"a
+							 */
+							unset($this->macros[$i]);
+
+							if ($this->validate) {
+								$this->setError();
+								return;
+							}
+							else {
+								$state = self::STATE_NEW;
+							}
+							break;
+					}
+					break;
+			}
+
+			$this->pos++;
+		}
+
+		// Check trailing chars after valid macro.
+		if ($state != self::STATE_MACRO_END) {
+			unset($this->macros[$i]);
+
+			if ($this->validate) {
 				$this->setError();
 				return;
 			}
 		}
-		// Otherwise look for closing curly brace. This is a macro with no context.
-		elseif (!isset($this->source[$this->pos]) || $this->source[$this->pos] !== '}') {
-			$this->setError();
-			return;
-		}
-		/*
-		 * If macro comes as a part of item or trigger, it has trailing characters. Otherwise anything follows a closing
-		 * curly brace for marco with no context, the macro is invalid.
-		 */
-		elseif (!$part && isset($this->source[$this->pos + 1])) {
-			$this->setError();
-			return;
-		}
-		else {
-			$this->macro_name_end = $this->pos;
-		}
 
-		$this->is_valid = true;
-		$macro_length = $this->pos - $start_pos + 1;
-
-		// prepare result
-		$result = new CParserResult();
-		$result->source = $this->source;
-		$result->pos = $start_pos;
-		$result->length = $macro_length;
-		$result->match = substr($this->source, $start_pos, $macro_length);
-
-		$this->parse_result = $result;
+		if ($this->validate) {
+			$this->is_valid = true;
+		}
 	}
 
 	/**
-	 * Returns true if the char is allowed in the macro, false otherwise
+	 * Returns true if the char is allowed in the macro, false otherwise.
 	 *
-	 * @param string    $c
+	 * @param string $c
 	 *
 	 * @return bool
 	 */
@@ -273,40 +617,12 @@ class CUserMacroParser {
 	}
 
 	/**
-	 * Get macro name without curly braces.
+	 * Get an array valid macros.
 	 *
-	 * @return string
+	 * @return array
 	 */
-	public function getMacroName() {
-		if ($this->is_valid) {
-			$name = substr($this->source, 2, $this->macro_name_end - 1);
-			return str_replace('}', '', $name);
-		}
-		else {
-			return '';
-		}
-	}
-
-	/**
-	 * Get macro context from source. If macro does not contain context, return null. Return string other otherwise.
-	 *
-	 * @return null|string
-	 */
-	public function getContext() {
-		if ($this->is_valid) {
-			if (!$this->context_start) {
-				return null;
-			}
-			elseif ($this->context_start == $this->context_end) {
-				return '';
-			}
-			else {
-				return substr($this->source, $this->context_start, $this->context_end - $this->context_start);
-			}
-		}
-		else {
-			return '';
-		}
+	public function getMacros() {
+		return $this->macros;
 	}
 
 	/**
@@ -336,7 +652,7 @@ class CUserMacroParser {
 	}
 
 	/**
-	 * Get the error message.
+	 * Get the error message for invalid macro.
 	 */
 	public function getError() {
 		return $this->error;
@@ -347,19 +663,5 @@ class CUserMacroParser {
 	 */
 	public function isValid() {
 		return $this->is_valid;
-	}
-
-	/**
-	 * Get the result of parsed result or return false in case of an error.
-	 *
-	 * @return bool|CParserResult
-	 */
-	public function getParseResult() {
-		if ($this->is_valid) {
-			return $this->parse_result;
-		}
-		else {
-			return false;
-		}
 	}
 }
