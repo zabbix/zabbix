@@ -294,7 +294,9 @@ class CFunctionValidator extends CValidator {
 			}
 
 			// user macro
-			if (preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value['functionParamList'][$aNum])) {
+			$parser = new CUserMacroParser($value['functionParamList'][$aNum]);
+
+			if ($parser->isValid()) {
 				continue;
 			}
 

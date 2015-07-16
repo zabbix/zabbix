@@ -222,7 +222,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$dbInterfaceTexts = [$dbInterface['ip'], $dbInterface['dns']];
 
 					if ($this->findMacros(self::PATTERN_HOST, $dbInterfaceTexts)
-							|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $dbInterfaceTexts)) {
+							|| $this->findUserMacros($dbInterfaceTexts)) {
 						$saveCurrentConfig = $this->config;
 
 						$dbInterfaceMacros = $this->resolve([
@@ -307,7 +307,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 							// Resolving macros to AGENT main interface. If interface is AGENT macros stay unresolved.
 							if ($interface['type'] != INTERFACE_TYPE_AGENT) {
 								if ($this->findMacros(self::PATTERN_HOST, [$macros[$hostId][$interfaceMacro]])
-										|| $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, [$macros[$hostId][$interfaceMacro]])) {
+										|| $this->findUserMacros([$macros[$hostId][$interfaceMacro]])) {
 									// attention recursion!
 									$macrosInMacros = $this->resolveTexts([$hostId => [$macros[$hostId][$interfaceMacro]]]);
 									$macros[$hostId][$interfaceMacro] = $macrosInMacros[$hostId][0];
@@ -327,7 +327,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$userMacrosData = [];
 
 			foreach ($data as $hostId => $texts) {
-				$userMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, $texts);
+				$userMacros = $this->findUserMacros($texts);
 
 				foreach ($userMacros as $userMacro) {
 					if (!isset($userMacrosData[$hostId])) {
@@ -352,11 +352,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// replace macros to value
 		if ($macros) {
-			$pattern = '/'.self::PATTERN_HOST.'|'.self::PATTERN_HOST_ID.'|'.self::PATTERN_INTERFACE.'|'.
-				ZBX_PREG_EXPRESSION_USER_MACROS.'/';
+			$pattern = '/'.self::PATTERN_HOST.'|'.self::PATTERN_HOST_ID.'|'.self::PATTERN_INTERFACE.'/';
 
 			foreach ($data as $hostId => $texts) {
-				if (isset($macros[$hostId])) {
+				if (array_key_exists($hostId, $macros)) {
 					foreach ($texts as $tnum => $text) {
 						preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE);
 
@@ -368,6 +367,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						}
 
 						$data[$hostId][$tnum] = $text;
+					}
+
+					foreach ($texts as $tnum => $text) {
+						$parser = new CUserMacroParser($text);
+
+						if ($parser->isValid()) {
+							$data[$hostId][$tnum] = $macros[$hostId][$parser->getMacros()[0]['match']];
+						}
 					}
 				}
 			}
@@ -415,7 +422,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// find macros
 		foreach ($triggers as $triggerId => $trigger) {
 			if ($userMacrosAvailable) {
-				$userMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, [$trigger[$source]]);
+				$userMacros = $this->findUserMacros([$trigger[$source]]);
 
 				if ($userMacros) {
 					if (!isset($userMacrosData[$triggerId])) {
@@ -574,7 +581,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					? array_merge($macroValues[$triggerId], $userMacro['macros'])
 					: $userMacro['macros'];
 			}
-			$patterns[] = ZBX_PREG_EXPRESSION_USER_MACROS;
 		}
 
 		if ($referenceMacrosAvailable) {
@@ -587,7 +593,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		$pattern = '/'.implode('|', $patterns).'/';
 
-		// replace macros to value
+		// Replace macros to values.
 		foreach ($triggers as $triggerId => $trigger) {
 			preg_match_all($pattern, $trigger[$source], $matches, PREG_OFFSET_CAPTURE);
 
@@ -599,6 +605,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			$triggers[$triggerId][$source] = $trigger[$source];
+		}
+
+		foreach ($triggers as $triggerId => $trigger) {
+			$macros = (new CUserMacroParser($trigger[$source]))->getMacros();
+
+			foreach ($macros as $macro) {
+				substr_replace($trigger[$source], $macroValues[$triggerId][$macro['match']],
+					$macro['positions']['start'], $macro['positions']['length']
+				);
+			}
 		}
 
 		return $triggers;
@@ -876,7 +892,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 		unset($item);
 
-		$macros = $itemsWithReferenceMacros = $itemsWithUnResolvedKeys = [];
+		$macros = [];
+		$itemsWithUnResolvedKeys = [];
+		$itemsWithReferenceMacros = [];
 
 		// reference macros - $1..$9
 		foreach ($items as $key => $item) {
@@ -928,8 +946,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// user macros
 		$userMacros = [];
 
+		// Find user macros in strings.
 		foreach ($items as $item) {
-			$matchedMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, [$item['name_expanded']]);
+			$matchedMacros = $this->findUserMacros([$item['name_expanded']]);
 
 			if ($matchedMacros) {
 				foreach ($matchedMacros as $macro) {
@@ -945,26 +964,29 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
+		// Get values for user macros.
 		if ($userMacros) {
 			$userMacros = $this->getUserMacros($userMacros);
 
 			foreach ($items as $key => $item) {
-				if (isset($userMacros[$item['hostid']])) {
-					$macros[$key]['macros'] = isset($macros[$key])
+				if (array_key_exists($item['hostid'], $userMacros)) {
+					$macros[$key]['macros'] = array_key_exists($key, $macros)
 						? zbx_array_merge($macros[$key]['macros'], $userMacros[$item['hostid']]['macros'])
 						: $userMacros[$item['hostid']]['macros'];
 				}
 			}
 		}
 
-		// replace macros to value
+		// Replace macros to values.
 		if ($macros) {
 			foreach ($macros as $key => $macroData) {
-				$items[$key]['name_expanded'] = str_replace(
-					array_keys($macroData['macros']),
-					array_values($macroData['macros']),
-					$items[$key]['name_expanded']
-				);
+				$exact_macros = (new CUserMacroParser($items[$key]['name_expanded'], false))->getMacros();
+
+				foreach ($exact_macros as $exact_macro) {
+					substr_replace($items[$key]['name_expanded'], $macroData['macros'][$exact_macro],
+						$exact_macro['positions']['start'], $exact_macro['positions']['length']
+					);
+				}
 			}
 		}
 
@@ -988,7 +1010,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 		unset($item);
 
-		$macros = $itemIds = [];
+		$macros = [];
+		$itemIds = [];
 
 		// host, ip macros
 		foreach ($items as $key => $item) {
@@ -1020,7 +1043,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			]);
 
 			foreach ($macros as $key => $macroData) {
-				if (isset($dbItems[$macroData['itemid']])) {
+				if (array_key_exists($macroData['itemid'], $dbItems)) {
 					$host = reset($dbItems[$macroData['itemid']]['hosts']);
 					$interface = reset($dbItems[$macroData['itemid']]['interfaces']);
 
@@ -1068,18 +1091,22 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$userMacros = [];
 
 		foreach ($items as $item) {
-			$matchedMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, [$item['key_expanded']]);
+			$itemKey = new CItemKey($item['key_expanded']);
 
-			if ($matchedMacros) {
-				foreach ($matchedMacros as $macro) {
-					if (!isset($userMacros[$item['hostid']])) {
-						$userMacros[$item['hostid']] = [
-							'hostids' => [$item['hostid']],
-							'macros' => []
-						];
+			if ($itemKey->isValid()) {
+				foreach ($itemKey->getParameters() as $n => $keyParameter) {
+					$matchedMacros = $this->findUserMacros([$keyParameter]);
+
+					foreach ($matchedMacros as $macro) {
+						if (!array_key_exists($item['hostid'], $userMacros)) {
+							$userMacros[$item['hostid']] = [
+								'hostids' => [$item['hostid']],
+								'macros' => []
+							];
+						}
+
+						$userMacros[$item['hostid']]['macros'][$macro] = null;
 					}
-
-					$userMacros[$item['hostid']]['macros'][$macro] = null;
 				}
 			}
 		}
@@ -1099,11 +1126,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// replace macros to value
 		if ($macros) {
 			foreach ($macros as $key => $macroData) {
-				$items[$key]['key_expanded'] = str_replace(
-					array_keys($macroData['macros']),
-					array_values($macroData['macros']),
-					$items[$key]['key_expanded']
-				);
+				$exact_macros = (new CUserMacroParser($items[$key]['key_expanded'], false))->getMacros();
+
+				foreach ($exact_macros as $exact_macro) {
+					substr_replace($items[$key]['key_expanded'], $macroData['macros'][$exact_macro],
+						$exact_macro['positions']['start'], $exact_macro['positions']['length']
+					);
+				}
 			}
 		}
 
@@ -1132,7 +1161,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$userMacros = [];
 
 		foreach ($data as $function) {
-			$matchedMacros = $this->findMacros(ZBX_PREG_EXPRESSION_USER_MACROS, [$function['parameter_expanded']]);
+			$matchedMacros = $this->findUserMacros([$function['parameter_expanded']]);
 
 			if ($matchedMacros) {
 				foreach ($matchedMacros as $macro) {

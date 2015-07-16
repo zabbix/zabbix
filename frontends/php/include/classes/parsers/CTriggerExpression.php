@@ -114,13 +114,6 @@ class CTriggerExpression {
 	protected $functionMacroParser;
 
 	/**
-	 * Parser for user macros.
-	 *
-	 * @var CUserMacroParser
-	 */
-	protected $userMacroParser;
-
-	/**
 	 * Parser for LLD macros.
 	 *
 	 * @var CLLDMacroParser
@@ -155,7 +148,6 @@ class CTriggerExpression {
 		$this->notOperatorParser = new CSetParser(['not']);
 		$this->macroParser = new CSetParser(['{TRIGGER.VALUE}']);
 		$this->functionMacroParser = new CFunctionMacroParser();
-		$this->userMacroParser = new CUserMacroParser();
 		$this->lldMacroParser = new CLLDMacroParser();
 	}
 
@@ -490,7 +482,7 @@ class CTriggerExpression {
 	 * Parse the string using the given parser. If a match has been found, move the cursor to the last symbol of the
 	 * matched string.
 	 *
-	 * @param class		$parser			CUserMacroParser or CParser
+	 * @param class		$parser			CParser
 	 * @param int       $tokenType
 	 *
 	 * @return CParserResult|bool		CParserResult object if a match has been found, false otherwise
@@ -498,38 +490,17 @@ class CTriggerExpression {
 	protected function parseUsing($parser, $tokenType) {
 		$j = $this->pos;
 
-		if ($parser instanceof CUserMacroParser) {
-			// Parse string as a part of a trigger expression.
-			$parser->parse($this->expression, $j, true);
+		$result = $parser->parse($this->expression, $j);
 
-			if (!$parser->isValid()) {
-				return false;
-			}
-
-			$this->pos += $parser->getParseResult()->length - 1;
-
-			$this->result->addToken($tokenType, $parser->getParseResult()->match, $parser->getParseResult()->pos,
-				$parser->getParseResult()->length
-			);
-
-			return $parser->getParseResult();
-		}
-		elseif ($parser instanceof CParser) {
-			$result = $parser->parse($this->expression, $j);
-
-			if (!$result) {
-				return false;
-			}
-
-			$this->pos += $result->length - 1;
-
-			$this->result->addToken($tokenType, $result->match, $result->pos, $result->length);
-
-			return $result;
-		}
-		else {
+		if (!$result) {
 			return false;
 		}
+
+		$this->pos += $result->length - 1;
+
+		$this->result->addToken($tokenType, $result->match, $result->pos, $result->length);
+
+		return $result;
 	}
 
 	/**
@@ -545,17 +516,14 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseConstant() {
-		if ($this->parseFunctionMacro() || $this->parseNumber()
-				|| $this->parseUsing($this->macroParser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)
-				|| $this->parseUsing($this->userMacroParser, CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
-
+		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseUserMacro()
+				|| $this->parseUsing($this->macroParser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)) {
 			return true;
 		}
 
 		// LLD macro support for trigger prototypes
-		if (($this->options['lldmacros']
-			&& $this->parseUsing($this->lldMacroParser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO))) {
-
+		if ($this->options['lldmacros']
+				&& $this->parseUsing($this->lldMacroParser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
 			return true;
 		}
 
@@ -630,7 +598,6 @@ class CTriggerExpression {
 		$suffix = null;
 		if (isset($this->expression[$j])
 				&& strpos(ZBX_BYTE_SUFFIXES.ZBX_TIME_SUFFIXES, $this->expression[$j]) !== false) {
-
 			$suffix = $this->expression[$j];
 			$j++;
 		}
@@ -642,12 +609,31 @@ class CTriggerExpression {
 			substr($this->expression, $this->pos, $numberLength),
 			$this->pos,
 			$numberLength,
-			[
-				'suffix' => $suffix
-			]
+			['suffix' => $suffix]
 		);
 
 		$this->pos = $j - 1;
+
+		return true;
+	}
+
+	/**
+	 * Parse user macros in trigger expression.
+	 *
+	 * @return bool
+	 */
+	private function parseUserMacro() {
+		$macros = (new CUserMacroParser($this->expression, false, $j))->getMacros();
+
+		if (!$macros) {
+			return false;
+		}
+
+		$this->pos += $macros[0]['positions']['length'] - 1;
+
+		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO,
+			$macros[0]['match'], $macros[0]['positions']['start'], $macros[0]['positions']['length']
+		);
 
 		return true;
 	}

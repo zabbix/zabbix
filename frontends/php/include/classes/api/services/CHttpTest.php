@@ -728,7 +728,9 @@ class CHttpTest extends CApiService {
 	 * @return bool
 	 */
 	protected  function checkStatusCode($statusCodeRange) {
-		if ($statusCodeRange === '' || preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $statusCodeRange)) {
+		$parser = new CUserMacroParser($statusCodeRange);
+
+		if ($statusCodeRange === '' || $parser->isValid()) {
 			return true;
 		}
 		else {

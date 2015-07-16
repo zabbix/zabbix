@@ -1353,8 +1353,14 @@ class CAction extends CApiService {
 								self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s".', $operation['opcommand']['port']));
 							}
 						}
-						elseif (!preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $operation['opcommand']['port'])) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect action operation port "%s".', $operation['opcommand']['port']));
+						else {
+							$parser = new CUserMacroParser($operation['opcommand']['port']);
+
+							if (!$parser->isValid()) {
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Incorrect action operation port "%s".', $operation['opcommand']['port'])
+								);
+							}
 						}
 					}
 
