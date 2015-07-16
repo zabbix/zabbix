@@ -1207,7 +1207,8 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		if ('\0' != *row[28] && '\0' == *row[29])
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "empty PSK value for identity \"%s\"", row[28]);
+			zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host \"%s\""
+					" (hostid %s)", row[28], row[2], row[0]);
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto done;
 		}
@@ -1216,7 +1217,8 @@ static void	DCsync_hosts(DB_RESULT result)
 		{
 			if ('\0' != *row[29])
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "empty PSK identity with non-empty value");
+				zabbix_log(LOG_LEVEL_WARNING, "empty PSK identity with non-empty PSK configured for"
+						" host \"%s\" (hostid %s)", row[2], row[0]);
 				THIS_SHOULD_NEVER_HAPPEN;
 				goto done;
 			}
