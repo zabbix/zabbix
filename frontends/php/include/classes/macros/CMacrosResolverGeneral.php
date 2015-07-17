@@ -121,7 +121,7 @@ class CMacrosResolverGeneral {
 			$macros = (new CUserMacroParser($text, false))->getMacros();
 
 			foreach ($macros as $macro) {
-				$result[$macro['match']] = true;
+				$result[$macro['macro']] = true;
 			}
 		}
 
@@ -499,10 +499,10 @@ class CMacrosResolverGeneral {
 
 		foreach ($data as $element) {
 			foreach ($element['macros'] as $macro => $value) {
-				$parse_result = (new CUserMacroParser($macro))->getMacros()[0];
+				$parsed_macro = (new CUserMacroParser($macro))->getMacros()[0];
 
-				$macro_name = $parse_result['macro_name'];
-				$context = $parse_result['context'];
+				$macro_name = $parsed_macro['macro_name'];
+				$context = $parsed_macro['context'];
 
 				if ($context === null) {
 					$macro_names['{$'.$macro_name] = true;
@@ -527,17 +527,17 @@ class CMacrosResolverGeneral {
 
 			foreach ($data as &$element) {
 				foreach ($element['macros'] as $macro => &$value) {
-					$parse_result = (new CUserMacroParser($macro))->getMacros()[0];
+					$parsed_macro = (new CUserMacroParser($macro))->getMacros()[0];
 
-					$macro_name = $parse_result['macro_name'];
-					$context = $parse_result['context'];
+					$macro_name = $parsed_macro['macro_name'];
+					$context = $parsed_macro['context'];
 
 					if ($value === null) {
 						foreach ($db_globalmacros as $db_globalmacro) {
-							$parse_result = (new CUserMacroParser($db_globalmacro['macro']))->getMacros()[0];
+							$parsed_macro = (new CUserMacroParser($db_globalmacro['macro']))->getMacros()[0];
 
-							$db_globalmacro_name = $parse_result['macro_name'];
-							$db_globalmacro_context = $parse_result['context'];
+							$db_globalmacro_name = $parsed_macro['macro_name'];
+							$db_globalmacro_context = $parsed_macro['context'];
 
 							if ($macro_name === $db_globalmacro_name) {
 								if ($db_globalmacro_context === null) {
@@ -593,20 +593,20 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function getHostUserMacros(array $hostIds, $macro, array $hostTemplates, array $hostMacros) {
-		$parse_result = (new CUserMacroParser($macro))->getMacros()[0];
+		$parsed_macro = (new CUserMacroParser($macro))->getMacros()[0];
 
-		$macro_name = $parse_result['macro_name'];
-		$context = $parse_result['context'];
+		$macro_name = $parsed_macro['macro_name'];
+		$context = $parsed_macro['context'];
 
 		$value = null;
 
 		foreach ($hostIds as $hostId) {
 			if (array_key_exists($hostId, $hostMacros)) {
 				foreach ($hostMacros[$hostId] as $hostmacro => $hostmacro_value) {
-					$parse_result = (new CUserMacroParser($hostmacro))->getMacros()[0];
+					$parsed_macro = (new CUserMacroParser($hostmacro))->getMacros()[0];
 
-					$hostmacro_name = $parse_result['macro_name'];
-					$hostmacro_context = $parse_result['context'];
+					$hostmacro_name = $parsed_macro['macro_name'];
+					$hostmacro_context = $parsed_macro['context'];
 
 					if ($macro_name === $hostmacro_name) {
 						if ($hostmacro_context === null) {
