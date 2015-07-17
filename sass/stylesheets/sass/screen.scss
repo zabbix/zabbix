@@ -580,6 +580,13 @@ footer {
 	    	border-top-color: $font-alt-color;
 	    }
 
+	    .treeview {
+
+	    	span {
+	    		margin: 0;
+	    	}
+	    }
+
 	    a {
 	    	display: block;
 	    	position: relative;
@@ -763,7 +770,7 @@ footer {
 	}
 
 	.arrow-down {
-		margin-bottom: 2px;
+		margin: 0 0 2px 0;
 		border-top-color: $font-alt-color;
 	}
 
