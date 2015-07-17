@@ -118,10 +118,10 @@ class CUserMacroParser {
 			// Macro was closed, but there is another character.
 
 			if ($state == self::STATE_MACRO_END) {
-				// Encountered a char after closed macro
+				// Encountered a character after closed macro
 
 				if ($this->validate) {
-					// There must be no chars after a closed macro. End with error and also remove previous result.
+					// There must be no characters after a closed macro. End with error and remove the previous result.
 					unset($this->macros[$i-1]);
 
 					$this->setError();
@@ -137,9 +137,9 @@ class CUserMacroParser {
 				$this->macros[$i] = [
 					'match' => '',
 					'macro' => '',
-					'context' => '',
-					'macro_name' => '',
 					'positions' => ['start' => 0, 'end' => 0, 'length' => 0],
+					'macro_name' => '',
+					'context' => '',
 					'context_is_quoted' => false
 				];
 			}
@@ -183,7 +183,7 @@ class CUserMacroParser {
 									}
 								}
 								else {
-									// This is not an escaped quote.
+									// That is the first character in string, so it is not escaped with backslash.
 									$quoted_string = true;
 								}
 							}
@@ -221,6 +221,8 @@ class CUserMacroParser {
 								$this->setError();
 								return;
 							}
+
+							$state = self::STATE_NEW;
 							break;
 					}
 					break;
@@ -244,13 +246,12 @@ class CUserMacroParser {
 							$this->setError();
 							return;
 						}
-						else {
-							/*
-							 * After {$ there was something else. This is not a valid macro. Reset and look for macros
-							 * in the rest of the string.
-							 */
-							$state = self::STATE_NEW;
-						}
+
+						/*
+						 * After {$ there was something else. This is not a valid macro. Reset and look for macros
+						 * in the rest of the string.
+						 */
+						$state = self::STATE_NEW;
 					}
 					break;
 
@@ -295,9 +296,8 @@ class CUserMacroParser {
 									$this->setError();
 									return;
 								}
-								else {
-									$state = self::STATE_NEW;
-								}
+
+								$state = self::STATE_NEW;
 								break;
 						}
 					}
@@ -559,9 +559,8 @@ class CUserMacroParser {
 								$this->setError();
 								return;
 							}
-							else {
-								$state = self::STATE_NEW;
-							}
+
+							$state = self::STATE_NEW;
 							break;
 
 						default:
@@ -575,9 +574,8 @@ class CUserMacroParser {
 								$this->setError();
 								return;
 							}
-							else {
-								$state = self::STATE_NEW;
-							}
+
+							$state = self::STATE_NEW;
 							break;
 					}
 					break;

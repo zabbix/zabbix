@@ -434,33 +434,33 @@ class CMacrosResolverGeneral {
 		$hostMacros = [];
 
 		do {
-			$dbHosts = API::Host()->get([
-				'hostids' => $hostIds,
-				'templated_hosts' => true,
+			$db_hosts = API::Host()->get([
 				'output' => ['hostid'],
 				'selectParentTemplates' => ['templateid'],
-				'selectMacros' => ['macro', 'value']
+				'selectMacros' => ['macro', 'value'],
+				'hostids' => $hostIds,
+				'templated_hosts' => true
 			]);
 
 			$hostIds = [];
 
-			if ($dbHosts) {
-				foreach ($dbHosts as $dbHost) {
-					$hostTemplates[$dbHost['hostid']] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
+			if ($db_hosts) {
+				foreach ($db_hosts as $db_host) {
+					$hostTemplates[$db_host['hostid']] = zbx_objectValues($db_host['parentTemplates'], 'templateid');
 
-					foreach ($dbHost['macros'] as $dbMacro) {
-						if (!isset($hostMacros[$dbHost['hostid']])) {
-							$hostMacros[$dbHost['hostid']] = [];
+					foreach ($db_host['macros'] as $db_macro) {
+						if (!array_key_exists($db_host['hostid'], $hostMacros)) {
+							$hostMacros[$db_host['hostid']] = [];
 						}
 
-						$hostMacros[$dbHost['hostid']][$dbMacro['macro']] = $dbMacro['value'];
+						$hostMacros[$db_host['hostid']][$db_macro['macro']] = $db_macro['value'];
 					}
 				}
 
-				foreach ($dbHosts as $dbHost) {
-					// only unprocessed templates will be populated
-					foreach ($hostTemplates[$dbHost['hostid']] as $templateId) {
-						if (!isset($hostTemplates[$templateId])) {
+				foreach ($db_hosts as $db_host) {
+					// Only unprocessed templates will be populated.
+					foreach ($hostTemplates[$db_host['hostid']] as $templateId) {
+						if (!array_key_exists($templateId, $hostTemplates)) {
 							$hostIds[$templateId] = $templateId;
 						}
 					}
@@ -495,11 +495,30 @@ class CMacrosResolverGeneral {
 			return $data;
 		}
 
-		/*
-		 * Global macros
-		 */
+		$macro_names = [];
+
+		foreach ($data as $element) {
+			foreach ($element['macros'] as $macro => $value) {
+				$parse_result = (new CUserMacroParser($macro))->getMacros()[0];
+
+				$macro_name = $parse_result['macro_name'];
+				$context = $parse_result['context'];
+
+				if ($context === null) {
+					$macro_names['{$'.$macro_name] = true;
+				}
+				else {
+					// Narrow down the search for macros with contexts.
+					$macro_names['{$'.$macro_name.':'] = true;
+				}
+			}
+		}
+
+		// Find values in global macros.
 		$db_globalmacros = API::UserMacro()->get([
 			'output' => ['macro', 'value'],
+			'search' => ['macro' => array_keys($macro_names)],
+			'searchByAny' => true,
 			'globalmacro' => true
 		]);
 
@@ -578,15 +597,16 @@ class CMacrosResolverGeneral {
 
 		$macro_name = $parse_result['macro_name'];
 		$context = $parse_result['context'];
+
 		$value = null;
 
 		foreach ($hostIds as $hostId) {
 			if (array_key_exists($hostId, $hostMacros)) {
 				foreach ($hostMacros[$hostId] as $hostmacro => $hostmacro_value) {
-					$parser->parse($hostmacro, 0, false);
+					$parse_result = (new CUserMacroParser($hostmacro))->getMacros()[0];
 
-					$hostmacro_name = $parser->getMacroName();
-					$hostmacro_context = $parser->getContext();
+					$hostmacro_name = $parse_result['macro_name'];
+					$hostmacro_context = $parse_result['context'];
 
 					if ($macro_name === $hostmacro_name) {
 						if ($hostmacro_context === null) {

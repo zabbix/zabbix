@@ -948,19 +948,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Find user macros in strings.
 		foreach ($items as $item) {
-			$matchedMacros = $this->findUserMacros([$item['name_expanded']]);
+			$matchedMacros = (new CUserMacroParser($item['name_expanded'], false))->getMacros();
 
-			if ($matchedMacros) {
-				foreach ($matchedMacros as $macro) {
-					if (!isset($userMacros[$item['hostid']])) {
-						$userMacros[$item['hostid']] = [
-							'hostids' => [$item['hostid']],
-							'macros' => []
-						];
-					}
-
-					$userMacros[$item['hostid']]['macros'][$macro] = null;
+			foreach ($matchedMacros as $macro) {
+				if (!array_key_exists($item['hostid'], $userMacros)) {
+					$userMacros[$item['hostid']] = [
+						'hostids' => [$item['hostid']],
+						'macros' => []
+					];
 				}
+
+				$userMacros[$item['hostid']]['macros'][$macro['macro']] = null;
 			}
 		}
 
@@ -977,14 +975,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		// Replace macros to values.
+		// Replace macros to values one by one.
 		if ($macros) {
 			foreach ($macros as $key => $macroData) {
-				$exact_macros = (new CUserMacroParser($items[$key]['name_expanded'], false))->getMacros();
-
-				foreach ($exact_macros as $exact_macro) {
-					substr_replace($items[$key]['name_expanded'], $macroData['macros'][$exact_macro],
-						$exact_macro['positions']['start'], $exact_macro['positions']['length']
+				while ($exact_macros = (new CUserMacroParser($items[$key]['name_expanded'], false))->getMacros()) {
+					$items[$key]['name_expanded'] = substr_replace($items[$key]['name_expanded'],
+						$macroData['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
+						$exact_macros[0]['positions']['length']
 					);
 				}
 			}
@@ -1077,7 +1074,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 								break;
 
 							case '{HOST.CONN}':
-								$macros[$key]['macros'][$macro] = $interface['useip'] ? $interface['ip'] : $interface['dns'];
+								$macros[$key]['macros'][$macro] = $interface['useip']
+									? $interface['ip']
+									: $interface['dns'];
 								break;
 						}
 					}
@@ -1094,19 +1093,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$itemKey = new CItemKey($item['key_expanded']);
 
 			if ($itemKey->isValid()) {
-				foreach ($itemKey->getParameters() as $n => $keyParameter) {
-					$matchedMacros = $this->findUserMacros([$keyParameter]);
+				$matchedMacros = (new CUserMacroParser($item['key_expanded'], false))->getMacros();
 
-					foreach ($matchedMacros as $macro) {
-						if (!array_key_exists($item['hostid'], $userMacros)) {
-							$userMacros[$item['hostid']] = [
-								'hostids' => [$item['hostid']],
-								'macros' => []
-							];
-						}
-
-						$userMacros[$item['hostid']]['macros'][$macro] = null;
+				foreach ($matchedMacros as $macro) {
+					if (!array_key_exists($item['hostid'], $userMacros)) {
+						$userMacros[$item['hostid']] = [
+							'hostids' => [$item['hostid']],
+							'macros' => []
+						];
 					}
+
+					$userMacros[$item['hostid']]['macros'][$macro['macro']] = null;
 				}
 			}
 		}
@@ -1123,14 +1120,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		// replace macros to value
+		// Replace macros to value one by one.
 		if ($macros) {
 			foreach ($macros as $key => $macroData) {
-				$exact_macros = (new CUserMacroParser($items[$key]['key_expanded'], false))->getMacros();
-
-				foreach ($exact_macros as $exact_macro) {
-					substr_replace($items[$key]['key_expanded'], $macroData['macros'][$exact_macro],
-						$exact_macro['positions']['start'], $exact_macro['positions']['length']
+				while ($exact_macros = (new CUserMacroParser($items[$key]['key_expanded'], false))->getMacros()) {
+					$items[$key]['key_expanded'] = substr_replace($items[$key]['key_expanded'],
+						$macroData['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
+						$exact_macros[0]['positions']['length']
 					);
 				}
 			}
