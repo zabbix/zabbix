@@ -695,25 +695,32 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 		(new CNumericBox($name.'_year', $y, 4))
 			->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
 			->setAttribute('placeholder', _('yyyy')),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		'-',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox($name.'_month', $m, false, 2))
 			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 			->addStyle('text-align: right;')
 			->setAttribute('placeholder', _('mm'))
 			->onChange('validateDatePartBox(this, 1, 12, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		'-',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox($name.'_day', $d, false, 2))
 			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 			->addStyle('text-align: right;')
 			->setAttribute('placeholder', _('dd'))
 			->onChange('validateDatePartBox(this, 1, 31, 2);'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox($name.'_hour', $h, false, 2))
 			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 			->addStyle('text-align: right;')
 			->setAttribute('placeholder', _('hh'))
 			->onChange('validateDatePartBox(this, 0, 23, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		':',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox($name.'_minute', $i, false, 2))
 			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 			->addStyle('text-align: right;')
