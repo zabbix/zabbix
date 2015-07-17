@@ -614,10 +614,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		foreach ($triggers as $triggerid => &$trigger) {
 			while ($exact_macros = (new CUserMacroParser($trigger[$source], false))->getMacros()) {
-				$trigger[$source] = substr_replace($trigger[$source],
-					$macro_values[$triggerid][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
-					$exact_macros[0]['positions']['length']
-				);
+				// Unresolved values stay as macros. Break the loop if cannot be resolved.
+				if (array_key_exists($exact_macros[0]['macro'], $macro_values[$triggerid])
+						&& $macro_values[$triggerid][$exact_macros[0]['macro']] !== $exact_macros[0]['macro']) {
+					$trigger[$source] = substr_replace($trigger[$source],
+						$macro_values[$triggerid][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
+						$exact_macros[0]['positions']['length']
+					);
+				}
+				else {
+					break;
+				}
 			}
 		}
 		unset($trigger);
@@ -982,12 +989,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Replace macros to values one by one.
 		if ($macros) {
-			foreach ($macros as $key => $macroData) {
+			foreach ($macros as $key => $macro_data) {
 				while ($exact_macros = (new CUserMacroParser($items[$key]['name_expanded'], false))->getMacros()) {
-					$items[$key]['name_expanded'] = substr_replace($items[$key]['name_expanded'],
-						$macroData['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
-						$exact_macros[0]['positions']['length']
-					);
+					// Unresolved values stay as macros. Break the loop if cannot be resolved.
+					if (array_key_exists($exact_macros[0]['macro'], $macro_data['macros'])
+							&& $macro_data['macros'][$exact_macros[0]['macro']] !== $exact_macros[0]['macro']) {
+						$items[$key]['name_expanded'] = substr_replace($items[$key]['name_expanded'],
+							$macro_data['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
+							$exact_macros[0]['positions']['length']
+						);
+					}
+					else {
+						break;
+					}
 				}
 			}
 		}
@@ -1044,10 +1058,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				'preservekeys' => true
 			]);
 
-			foreach ($macros as $key => $macroData) {
-				if (array_key_exists($macroData['itemid'], $dbItems)) {
-					$host = reset($dbItems[$macroData['itemid']]['hosts']);
-					$interface = reset($dbItems[$macroData['itemid']]['interfaces']);
+			foreach ($macros as $key => $macro_data) {
+				if (array_key_exists($macro_data['itemid'], $dbItems)) {
+					$host = reset($dbItems[$macro_data['itemid']]['hosts']);
+					$interface = reset($dbItems[$macro_data['itemid']]['interfaces']);
 
 					// if item without interface or template item, resolve interface related macros to *UNKNOWN*
 					if (!$interface) {
@@ -1058,7 +1072,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						];
 					}
 
-					foreach ($macroData['macros'] as $macro => $value) {
+					foreach ($macro_data['macros'] as $macro => $value) {
 						switch ($macro) {
 							case '{HOST.NAME}':
 								$macros[$key]['macros'][$macro] = $host['name'];
@@ -1127,12 +1141,19 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 		// Replace macros to value one by one.
 		if ($macros) {
-			foreach ($macros as $key => $macroData) {
+			foreach ($macros as $key => $macro_data) {
 				while ($exact_macros = (new CUserMacroParser($items[$key]['key_expanded'], false))->getMacros()) {
-					$items[$key]['key_expanded'] = substr_replace($items[$key]['key_expanded'],
-						$macroData['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
-						$exact_macros[0]['positions']['length']
-					);
+					// Unresolved values stay as macros. Break the loop if cannot be resolved.
+					if (array_key_exists($exact_macros[0]['macro'], $macro_data['macros'])
+							&& $macro_data['macros'][$exact_macros[0]['macro']] !== $exact_macros[0]['macro']) {
+						$items[$key]['key_expanded'] = substr_replace($items[$key]['key_expanded'],
+							$macro_data['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
+							$exact_macros[0]['positions']['length']
+						);
+					}
+					else {
+						break;
+					}
 				}
 			}
 		}
@@ -1159,45 +1180,53 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macros = [];
 
 		// user macros
-		$userMacros = [];
+		$usermacros = [];
 
 		foreach ($data as $function) {
 			$matched_macros = $this->findUserMacros([$function['parameter_expanded']]);
 
 			if ($matched_macros) {
 				foreach ($matched_macros as $matched_macro) {
-					if (!array_key_exists($function['hostid'], $userMacros)) {
-						$userMacros[$function['hostid']] = [
+					if (!array_key_exists($function['hostid'], $usermacros)) {
+						$usermacros[$function['hostid']] = [
 							'hostids' => [$function['hostid']],
 							'macros' => []
 						];
 					}
 
-					$userMacros[$function['hostid']]['macros'][$matched_macro] = null;
+					$usermacros[$function['hostid']]['macros'][$matched_macro] = null;
 				}
 			}
 		}
 
-		if ($userMacros) {
-			$userMacros = $this->getUserMacros($userMacros);
+		if ($usermacros) {
+			$usermacros = $this->getUserMacros($usermacros);
 
 			foreach ($data as $key => $function) {
-				if (isset($userMacros[$function['hostid']])) {
-					$macros[$key]['macros'] = isset($macros[$key])
-						? zbx_array_merge($macros[$key]['macros'], $userMacros[$function['hostid']]['macros'])
-						: $userMacros[$function['hostid']]['macros'];
+				if (array_key_exists($function['hostid'], $usermacros)) {
+					$macros[$key]['macros'] = array_key_exists($key, $macros)
+						? zbx_array_merge($macros[$key]['macros'], $usermacros[$function['hostid']]['macros'])
+						: $usermacros[$function['hostid']]['macros'];
 				}
 			}
 		}
 
-		// replace macros to value
+		// Replace macros to value one by one.
 		if ($macros) {
-			foreach ($macros as $key => $macroData) {
-				$data[$key]['parameter_expanded'] = str_replace(
-					array_keys($macroData['macros']),
-					array_values($macroData['macros']),
-					$data[$key]['parameter_expanded']
-				);
+			foreach ($macros as $key => $macro_data) {
+				while ($exact_macros = (new CUserMacroParser($data[$key]['parameter_expanded'], false))->getMacros()) {
+					// Unresolved values stay as macros. Break the loop if cannot be resolved.
+					if (array_key_exists($exact_macros[0]['macro'], $macro_data['macros'])
+							&& $macro_data['macros'][$exact_macros[0]['macro']] !== $exact_macros[0]['macro']) {
+						$data[$key]['parameter_expanded'] = substr_replace($data[$key]['parameter_expanded'],
+							$macro_data['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
+							$exact_macros[0]['positions']['length']
+						);
+					}
+					else {
+						break;
+					}
+				}
 			}
 		}
 

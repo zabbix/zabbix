@@ -488,9 +488,9 @@ class CTriggerExpression {
 	 * @return CParserResult|bool		CParserResult object if a match has been found, false otherwise
 	 */
 	protected function parseUsing($parser, $tokenType) {
-		$j = $this->pos;
+		$pos = $this->pos;
 
-		$result = $parser->parse($this->expression, $j);
+		$result = $parser->parse($this->expression, $pos);
 
 		if (!$result) {
 			return false;
@@ -623,7 +623,9 @@ class CTriggerExpression {
 	 * @return bool
 	 */
 	private function parseUserMacro() {
-		$macros = (new CUserMacroParser($this->expression, false, $j))->getMacros();
+		$pos = $this->pos;
+
+		$macros = (new CUserMacroParser($this->expression, false, $pos))->getMacros();
 
 		if (!$macros) {
 			return false;
@@ -631,8 +633,8 @@ class CTriggerExpression {
 
 		$this->pos += $macros[0]['positions']['length'] - 1;
 
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO,
-			$macros[0]['match'], $macros[0]['positions']['start'], $macros[0]['positions']['length']
+		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO, $macros[0]['match'],
+			$macros[0]['positions']['start'], $macros[0]['positions']['length']
 		);
 
 		return true;
