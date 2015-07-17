@@ -395,6 +395,8 @@ footer, .footer {
     .list-table thead th .arrow-down {
       margin: 0 0 0 4px;
       border-top-color: #737373; }
+    .list-table thead th .treeview span {
+      margin: 0; }
     .list-table thead th a {
       display: block;
       position: relative;
@@ -520,7 +522,7 @@ footer, .footer {
   .treeview .arrow-right {
     border-left-color: #737373; }
   .treeview .arrow-down {
-    margin-bottom: 2px;
+    margin: 0 0 2px 0;
     border-top-color: #737373; }
   .treeview:hover .arrow-right {
     border-left-color: #4796c4; }
