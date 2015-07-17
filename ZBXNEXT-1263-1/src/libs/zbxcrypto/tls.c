@@ -2382,18 +2382,9 @@ void	zbx_tls_init_child(void)
 
 		if (0 != (res = x509_crl_parse_file(crl, CONFIG_TLS_CRL_FILE)))
 		{
-			if (0 > res)
-			{
-				zbx_tls_error_msg(res, "", &err_msg);
-				zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %s", CONFIG_TLS_CRL_FILE,
-						err_msg);
-				zbx_free(err_msg);
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot parse %d certificate(s) in CRL file \"%s\"", res,
-						CONFIG_TLS_CRL_FILE);
-			}
+			zbx_tls_error_msg(res, "", &err_msg);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot parse CRL file \"%s\": %s", CONFIG_TLS_CRL_FILE, err_msg);
+			zbx_free(err_msg);
 
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
