@@ -758,13 +758,15 @@ class CUserMacro extends CApiService {
 		$existing_macros = [];
 
 		// Collect existing unique macro names and their contexts for each host.
-		foreach ($db_hostmacros as $db_hostmacro) {
-			$parse_result = (new CUserMacroParser($db_hostmacro['macro']))->getMacros()[0];
+		if ($db_hostmacros) {
+			foreach ($db_hostmacros as $db_hostmacro) {
+				$parse_result = (new CUserMacroParser($db_hostmacro['macro']))->getMacros()[0];
 
-			$macro_name = $parse_result['macro_name'];
-			$context = $parse_result['context'];
+				$macro_name = $parse_result['macro_name'];
+				$context = $parse_result['context'];
 
-			$existing_macros[$db_hostmacro['hostid']][$macro_name][$db_hostmacro['hostmacroid']] = $context;
+				$existing_macros[$db_hostmacro['hostid']][$macro_name][$db_hostmacro['hostmacroid']] = $context;
+			}
 		}
 
 		// Compare each macro name and context to existing one.
@@ -860,13 +862,15 @@ class CUserMacro extends CApiService {
 		$existing_macros = [];
 
 		// Collect existing unique macro names and their contexts.
-		foreach ($db_macros as $db_macro) {
-			$parse_result = (new CUserMacroParser($db_macro['macro']))->getMacros()[0];
+		if ($db_macros) {
+			foreach ($db_macros as $db_macro) {
+				$parse_result = (new CUserMacroParser($db_macro['macro']))->getMacros()[0];
 
-			$macro_name = $parse_result['macro_name'];
-			$context = $parse_result['context'];
+				$macro_name = $parse_result['macro_name'];
+				$context = $parse_result['context'];
 
-			$existing_macros[$macro_name][$db_macro['globalmacroid']] = $context;
+				$existing_macros[$macro_name][$db_macro['globalmacroid']] = $context;
+			}
 		}
 
 		// Compare each macro name and context to existing one.
