@@ -4255,8 +4255,10 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 			if (NULL == (peer_cert = zbx_get_peer_cert(s->tls_ctx, error)) ||
 					SUCCEED != zbx_log_peer_cert(peer_cert, error))
-
 			{
+				if (NULL != peer_cert)
+					gnutls_x509_crt_deinit(peer_cert);
+
 				zbx_tls_close(s);
 				goto out1;
 			}
@@ -4699,6 +4701,7 @@ int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_issuer() failed: %d %s", res,
 					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(peer_cert);
 			return FAIL;
 		}
 
@@ -4706,6 +4709,7 @@ int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "zbx_x509_dn_gets() failed: %s", error);
 			zbx_free(error);
+			gnutls_x509_crt_deinit(peer_cert);
 			return FAIL;
 		}
 
@@ -4713,6 +4717,7 @@ int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_subject() failed: %d %s", res,
 					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(peer_cert);
 			return FAIL;
 		}
 
@@ -4720,6 +4725,7 @@ int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "zbx_x509_dn_gets() failed: %s", error);
 			zbx_free(error);
+			gnutls_x509_crt_deinit(peer_cert);
 			return FAIL;
 		}
 
