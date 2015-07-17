@@ -547,6 +547,7 @@ footer {
 	
 	thead th {
 		font-size: $font-h3-size;
+		color: $font-alt-color;
 		text-transform: $font-transform;
 		letter-spacing: 0.0688em;
 		text-rendering: optimizeLegibility;
@@ -556,23 +557,25 @@ footer {
 	    vertical-align: bottom;
 	    border-bottom: 2px solid $table-border-color;
 	    text-align: left;
-	    color: $font-alt-color;
+	    //position: relative;
 
 	    .arrow-up {
-	    	position: absolute;
-	    	top: 43%;
+	    	//position: absolute;
+	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-bottom-color: $font-alt-color;
 	    }
 
 	    .arrow-right {
+	    	//position: absolute;
+	    	//top: 39%;
 	    	margin: 0 0 0 4px;
 	    	border-left-color: $font-alt-color;
 	    }
 
 	    .arrow-down {
-	    	position: absolute;
-	    	top: 43%;
+	    	//position: absolute;
+	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-top-color: $font-alt-color;
 	    }
