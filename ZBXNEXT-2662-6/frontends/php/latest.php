@@ -413,96 +413,53 @@ if ($filterSet) {
 	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
 }
 
+$toggle_all = (new CColHeader(
+	(new CDiv())
+		->addClass(ZBX_STYLE_TREEVIEW)
+		->addClass('app-list-toggle-all')
+		->addItem(new CSpan())
+))->addClass(ZBX_STYLE_CELL_WIDTH);
+
+$check_all = (new CColHeader(
+	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
+))->addClass(ZBX_STYLE_CELL_WIDTH);
+
 if ($singleHostSelected) {
 	$hostHeader = null;
 	$hostColumn = null;
 }
 else {
 	$hostHeader = make_sorting_header(_('Host'), 'host', $sortField, $sortOrder);
-	$hostHeader->addClass('latest-host '.($filter['showDetails'] ? 'with-details' : 'no-details'));
-	$hostHeader->setAttribute('title', _('Host'));
-
 	$hostColumn = '';
 }
 
-$nameHeader = make_sorting_header(_('Name'), 'name', $sortField, $sortOrder);
-$nameHeader->setAttribute('title', _('Name'));
-
-$lastCheckHeader = make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder);
-$lastCheckHeader->addClass('latest-lastcheck');
-$lastCheckHeader->setAttribute('title', _('Last check'));
-
-$lastValueHeader = (new CColHeader(new CSpan(_('Last value'))))
-	->addClass('latest-lastvalue')
-	->setAttribute('title', _('Last value'));
-
-$lastDataHeader = (new CColHeader(new CSpan(_x('Change', 'noun in latest data'))))
-	->addClass('latest-data')
-	->setAttribute('title', _x('Change', 'noun in latest data'));
-
-$checkAllCheckbox = (new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');");
-
-$checkAllCheckboxCol = (new CColHeader($checkAllCheckbox))->addClass(ZBX_STYLE_CELL_WIDTH);
-
 if ($filter['showDetails']) {
-	$intervalHeader = (new CColHeader(_('Interval')))
-		->addClass('latest-interval')
-		->setAttribute('title', _('Interval'));
-
-	$historyHeader = (new CColHeader(_('History')))
-		->addClass('latest-history')
-		->setAttribute('title', _('History'));
-
-	$trendsHeader = (new CColHeader(_('Trends')))
-		->addClass('latest-trends')
-		->setAttribute('title', _('Trends'));
-
-	$typeHeader = (new CColHeader(_('Type')))
-		->addClass('latest-type')
-		->setAttribute('title', _('Type'));
-
-	$infoHeader = (new CColHeader(_('Info')))
-		->addClass('latest-info')
-		->setAttribute('title', _('Info'));
-
-	$table->addClass('latest-details');
 	$table->setHeader([
-		(new CColHeader(
-			(new CDiv())
-				->addClass(ZBX_STYLE_TREEVIEW)
-				->addClass('app-list-toggle-all')
-				->addItem(new CSpan())
-		))
-			->addClass(ZBX_STYLE_CELL_WIDTH),
-		$checkAllCheckboxCol,
+		$toggle_all,
+		$check_all,
 		$hostHeader,
-		$nameHeader,
-		$intervalHeader,
-		$historyHeader,
-		$trendsHeader,
-		$typeHeader,
-		$lastCheckHeader,
-		$lastValueHeader,
-		$lastDataHeader,
-		(new CColHeader())->addClass('latest-actions'),
-		$infoHeader
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		_('Interval'),
+		_('History'),
+		_('Trends'),
+		_('Type'),
+		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder),
+		_('Last value'),
+		_x('Change', 'noun in latest data'),
+		'',
+		_('Info')
 	]);
 }
 else {
 	$table->setHeader([
-		(new CColHeader(
-			(new CDiv())
-				->addClass(ZBX_STYLE_TREEVIEW)
-				->addClass('app-list-toggle-all')
-				->addItem(new CSpan())
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		$checkAllCheckboxCol,
+		$toggle_all,
+		$check_all,
 		$hostHeader,
-		$nameHeader,
-		$lastCheckHeader,
-		$lastValueHeader,
-		$lastDataHeader,
-		(new CColHeader())->addClass('latest-actions')
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder),
+		_('Last value'),
+		_x('Change', 'noun in latest data'),
+		''
 	]);
 }
 
