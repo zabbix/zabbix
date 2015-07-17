@@ -472,7 +472,7 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
-	<tr id="urlrow_#{selementurlid}" class="even_row">
+	<tr id="urlrow_#{selementurlid}">
 		<td><input class="input" name="url_#{selementurlid}_name" type="text" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" value="#{name}"></td>
 		<td>
 			<input class="input" name="url_#{selementurlid}_url" type="text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" value="#{url}">

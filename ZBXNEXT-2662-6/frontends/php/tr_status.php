@@ -707,7 +707,7 @@ foreach ($triggers as $trigger) {
 		$hostList,
 		$triggerDescription,
 		$comments
-	], 'even_row');
+	]);
 
 	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
 		$i = 1;
@@ -752,7 +752,6 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
 				$emptyColumn]))
-					->addClass('odd_row')
 					->setAttribute('data-parentid', $trigger['triggerid'])
 					->addStyle('display: none;');
 			$triggerTable->addRow($row);
