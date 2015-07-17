@@ -28,7 +28,8 @@ $help_hint = (new CList())
 		(new CDiv())
 			->addClass(ZBX_STYLE_NOTIF_INDIC)
 			->addClass(getSeverityStyle(null, false)),
-		(new CTag('p', true, _('OK')))->addClass(ZBX_STYLE_GREY)
+		new CTag('h4', true, _('OK')),
+		(new CTag('p', true, ''))->addClass(ZBX_STYLE_GREY)
 	]);
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$help_hint->addItem([
