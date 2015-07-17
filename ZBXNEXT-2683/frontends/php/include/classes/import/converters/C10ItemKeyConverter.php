@@ -37,8 +37,7 @@ class C10ItemKeyConverter extends CConverter {
 			$key = $parts[0];
 
 			if (isset($parts[1]) && $parts[1] !== '') {
-				$parser = new CUserMacroParser($parts[1], false);
-				$macros = $parser->getMacros();
+				$macros = (new CUserMacroParser($parts[1], false))->getMacros();
 
 				if ($macros && !isset($parts[1][$macros[0]['positions']['length']])) {
 					$port = ',,'.$parts[1];
