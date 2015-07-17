@@ -2810,6 +2810,7 @@ void	zbx_tls_init_child(void)
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load CRL(s) from file \"%s\":",
 					CONFIG_TLS_CRL_FILE);
+			fclose(f);
 			goto out;
 		}
 
@@ -2828,12 +2829,25 @@ void	zbx_tls_init_child(void)
 			goto out;
 		}
 
-		param = X509_VERIFY_PARAM_new();
-		X509_VERIFY_PARAM_set_flags(param, X509_V_FLAG_CRL_CHECK_ALL);
+		if (NULL == (param = X509_VERIFY_PARAM_new()))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot create CRL verification"
+					" parameter");
+			goto out;
+		}
+
+		if (1 != X509_VERIFY_PARAM_set_flags(param, X509_V_FLAG_CRL_CHECK_ALL))
+		{
+			X509_VERIFY_PARAM_free(param);
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set flag to CRL verification"
+					" parameter");
+			goto out;
+		}
 
 		if ((NULL != ctx_cert && 1 != SSL_CTX_set1_param(ctx_cert, param)) ||
 				(NULL != ctx_all && 1 != SSL_CTX_set1_param(ctx_all, param)))
 		{
+			X509_VERIFY_PARAM_free(param);
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set CRL verification flag:");
 			goto out;
 		}
