@@ -376,6 +376,7 @@ footer, .footer {
   border: 1px solid #303030; }
   .list-table thead th {
     font-size: 0.917em;
+    color: #737373;
     text-transform: uppercase;
     letter-spacing: 0.0688em;
     text-rendering: optimizeLegibility;
@@ -384,19 +385,14 @@ footer, .footer {
     padding: 8px 5px 7px 5px;
     vertical-align: bottom;
     border-bottom: 2px solid #383838;
-    text-align: left;
-    color: #737373; }
+    text-align: left; }
     .list-table thead th .arrow-up {
-      position: absolute;
-      top: 43%;
       margin: 0 0 0 4px;
       border-bottom-color: #737373; }
     .list-table thead th .arrow-right {
       margin: 0 0 0 4px;
       border-left-color: #737373; }
     .list-table thead th .arrow-down {
-      position: absolute;
-      top: 43%;
       margin: 0 0 0 4px;
       border-top-color: #737373; }
     .list-table thead th a {
