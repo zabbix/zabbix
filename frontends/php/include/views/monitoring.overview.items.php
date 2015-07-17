@@ -32,11 +32,6 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
 	]);
 }
-$help_hint->addItem([
-	(new CDiv())
-		->addClass(ZBX_STYLE_NOTIF_INDIC_CONTAINER),
-	new CTag('h4', true, _('OK or no trigger')),
-]);
 
 // header right
 $help = get_icon('overviewhelp');
