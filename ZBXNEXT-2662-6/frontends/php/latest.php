@@ -424,45 +424,41 @@ $check_all = (new CColHeader(
 	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
 ))->addClass(ZBX_STYLE_CELL_WIDTH);
 
-if ($singleHostSelected) {
-	$hostHeader = null;
-	$hostColumn = null;
-}
-else {
-	$hostHeader = make_sorting_header(_('Host'), 'host', $sortField, $sortOrder);
-	$hostColumn = '';
-}
-
 if ($filter['showDetails']) {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		$hostHeader,
+		$singleHostSelected
+			? null
+			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 13%'),
 		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
-		_('Interval'),
-		_('History'),
-		_('Trends'),
-		_('Type'),
-		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder),
-		_('Last value'),
-		_x('Change', 'noun in latest data'),
-		'',
-		_('Info')
+		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
+		(new CColHeader(_('History')))->addStyle('width: 5%'),
+		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
+		(new CColHeader(_('Type')))->addStyle('width: 8%'),
+		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
+		(new CColHeader(_x('Change', 'noun in latest data')))->addStyle('width: 10%'),
+		(new CColHeader())->addStyle('width: 5%'),
+		(new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH)
 	]);
 }
 else {
 	$table->setHeader([
 		$toggle_all,
 		$check_all,
-		$hostHeader,
+		$singleHostSelected
+			? null
+			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 17%'),
 		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
-		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder),
-		_('Last value'),
-		_x('Change', 'noun in latest data'),
-		''
+		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
+		(new CColHeader(_x('Change', 'noun in latest data')))->addStyle('width: 10%'),
+		(new CColHeader())->addStyle('width: 5%')
 	]);
 }
 
+$hostColumn = $singleHostSelected ? null : '';
 $tab_rows = [];
 
 $config = select_config();
@@ -533,7 +529,7 @@ foreach ($items as $key => $item){
 		$checkbox->setEnabled(false);
 	}
 
-	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : '';
+	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	if ($filter['showDetails']) {
 		// item key
@@ -563,19 +559,20 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol((new CDiv([$item['name_expanded'], BR(), $itemKey]))->addClass($stateCss.' item')),
-			new CCol((new CSpan(
+			(new CCol(new CDiv([$item['name_expanded'], BR(), $itemKey])))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $item['delay']))
-					->addClass($stateCss)
-			),
-			new CCol((new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($stateCss)),
-			new CCol((new CSpan($trendValue))->addClass($stateCss)),
-			new CCol((new CSpan(item_type2str($item['type'])))->addClass($stateCss)),
-			new CCol((new CSpan($lastClock))->addClass($stateCss)),
-			new CCol((new CSpan($lastValue))->addClass($stateCss)),
-			new CCol((new CSpan($change))->addClass($stateCss)),
+					: $item['delay']
+			))->addClass($state_css),
+			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
+			(new CCol($trendValue))->addClass($state_css),
+			(new CCol(item_type2str($item['type'])))->addClass($state_css),
+			(new CCol($lastClock))->addClass($state_css),
+			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($change))->addClass($state_css),
 			$actions,
 			$info
 		]);
@@ -585,10 +582,12 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol((new CSpan($item['name_expanded']))->addClass($stateCss)->addClass('item')),
-			new CCol((new CSpan($lastClock))->addClass($stateCss)),
-			new CCol((new CSpan($lastValue))->addClass($stateCss)),
-			new CCol((new CSpan($change))->addClass($stateCss)),
+			(new CCol($item['name_expanded']))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($lastClock))->addClass($state_css),
+			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($change))->addClass($state_css),
 			$actions
 		]);
 	}
@@ -714,7 +713,7 @@ foreach ($items as $item) {
 		$checkbox->setEnabled(false);
 	}
 
-	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : '';
+	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$host = $hosts[$item['hostid']];
 	if ($filter['showDetails']) {
@@ -745,20 +744,21 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol((new CDiv([$item['name_expanded'], BR(), $itemKey]))->addClass($stateCss.' item')),
-			new CCol((new CSpan(
+			(new CCol(new CDiv([$item['name_expanded'], BR(), $itemKey])))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $item['delay']))
-					->addClass($stateCss)
-			),
-			new CCol((new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($stateCss)),
-			new CCol((new CSpan($trendValue))->addClass($stateCss)),
-			new CCol((new CSpan(item_type2str($item['type'])))->addClass($stateCss)),
-			new CCol((new CSpan($lastClock))->addClass($stateCss)),
-			new CCol((new CSpan($lastValue))->addClass($stateCss)),
-			new CCol((new CSpan($change))->addClass($stateCss)),
-			(new CCol($actions))->addClass($stateCss),
+					: $item['delay']
+			))->addClass($state_css),
+			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
+			(new CCol($trendValue))->addClass($state_css),
+			(new CCol(item_type2str($item['type'])))->addClass($state_css),
+			(new CCol($lastClock))->addClass($state_css),
+			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($change))->addClass($state_css),
+			$actions,
 			$info
 		]);
 	}
@@ -767,11 +767,13 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol((new CSpan($item['name_expanded']))->addClass($stateCss)->addClass('item')),
-			new CCol((new CSpan($lastClock))->addClass($stateCss)),
-			new CCol((new CSpan($lastValue))->addClass($stateCss)),
-			new CCol((new CSpan($change))->addClass($stateCss)),
-			(new CCol($actions))->addClass($stateCss)
+			(new CCol($item['name_expanded']))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($lastClock))->addClass($state_css),
+			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($change))->addClass($state_css),
+			$actions
 		]);
 	}
 
