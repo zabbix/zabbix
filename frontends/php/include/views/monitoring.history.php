@@ -109,7 +109,7 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		$filterColumn1 = new CFormList();
 		$filterForm->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {
-			$filterForm->addVar('itemids[]', $itemId, 'filter_itemids_'.$itemId);
+			$filterForm->addVar('itemids['.$itemId.']', $itemId);
 		}
 
 		$itemListbox = new CListBox('cmbitemlist[]');
@@ -136,7 +136,10 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		$deleteItemButton = null;
 
 		if (count($this->data['items']) > 1) {
-			$deleteItemButton = new CSubmit('remove_log', _('Remove selected'));
+			$deleteItemButton = [
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				new CButton('remove_log', _('Remove selected'))
+			];
 		}
 
 		$filterColumn1->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton]);
