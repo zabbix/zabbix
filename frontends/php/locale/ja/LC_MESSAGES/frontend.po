@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-16 14:24+0300\n"
-"PO-Revision-Date: 2015-07-08 08:15+0300\n"
+"PO-Revision-Date: 2015-07-17 08:51+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1436336104.0\n"
+"X-POOTLE-MTIME: 1437115860.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -21,7 +21,7 @@ msgstr ""
 #: include/classes/import/validators/C30XmlValidator.php:857
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" で指定してください"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -66,7 +66,7 @@ msgstr[0] "%1$s日"
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
+msgstr[0] "%1$sアイテム"
 
 #: jsLoader.php:223 jsLoader.php:224 jsLoader.php:225 jsLoader.php:226
 #, c-format
@@ -132,7 +132,7 @@ msgstr "----[障害対応コメントの一括処理]----"
 
 #: include/classes/setup/CSetupWizard.php:236
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - デフォルトのポート番号を使用"
 
 #: include/triggers.inc.php:2071 include/triggers.inc.php:2072
 #: include/triggers.inc.php:2073 include/triggers.inc.php:2075
@@ -152,7 +152,7 @@ msgstr "10秒"
 
 #: include/views/reports.toptriggers.php:24 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "障害発生数上位100項目"
 
 #: queue.php:106 queue.php:167
 msgid "30 seconds"
@@ -215,7 +215,7 @@ msgstr "SLAの許容値"
 
 #: include/func.inc.php:1631
 msgid "Access denied"
-msgstr ""
+msgstr "アクセスは拒否されました"
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -587,7 +587,7 @@ msgstr "アグリゲートチェックは監視対象のホスト上でエージ
 
 #: acknow.php:194
 msgid "Alarm acknowledgements"
-msgstr ""
+msgstr "アラーム確認"
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:46
 #: include/views/administration.users.list.php:47 popup.php:625 users.php:43
@@ -622,7 +622,7 @@ msgstr "すべてのグループ"
 
 #: include/html.inc.php:383
 msgid "All hosts"
-msgstr ""
+msgstr "すべてのホスト"
 
 #: jsLoader.php:152
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -630,7 +630,7 @@ msgstr "すべてのリンクに\"名前\"と\"URL\"を設定する必要があ�
 
 #: include/html.inc.php:344
 msgid "All templates"
-msgstr ""
+msgstr "すべてのテンプレート"
 
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:424
@@ -640,7 +640,7 @@ msgstr "許可されたホスト"
 
 #: include/classes/setup/CSetupWizard.php:385
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "代わりに、手動でインストールすることができます:"
 
 #: include/triggers.inc.php:1524
 #: include/views/configuration.action.edit.php:147
@@ -819,7 +819,7 @@ msgstr "少なくともMySQL、PostgreSQL、Oracle、SQLite3、IBM DB2のうち1
 #: httpconf.php:47 include/views/configuration.httpconf.edit.php:80
 #: include/views/configuration.httpconf.list.php:60
 msgid "Attempts"
-msgstr ""
+msgstr "試行回数"
 
 #: include/menu.inc.php:141
 #: include/views/administration.general.housekeeper.edit.php:74
@@ -970,7 +970,7 @@ msgstr "期間Tの値の平均値 NOT N"
 #: include/classes/setup/CSetupWizard.php:121
 #: include/classes/setup/CSetupWizard.php:342
 msgid "Back"
-msgstr ""
+msgstr "戻る"
 
 #: include/views/administration.general.image.edit.php:55
 #: include/views/administration.general.image.list.php:39
@@ -1327,7 +1327,7 @@ msgstr "トリガーのプロトタイプを複製できません"
 
 #: include/classes/setup/CSetupWizard.php:262
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "データベースに接続できません。"
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
@@ -9478,7 +9478,7 @@ msgstr "データ収集なし"
 
 #: include/classes/html/CTableInfo.php:27
 msgid "No data found"
-msgstr ""
+msgstr "データがありません"
 
 #: popup_trexpr.php:536
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
