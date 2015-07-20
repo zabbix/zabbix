@@ -559,7 +559,7 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			(new CCol(new CDiv([$item['name_expanded'], BR(), $itemKey])))
+			(new CCol([$item['name_expanded'], BR(), $itemKey]))
 				->addClass($state_css)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 			(new CCol(
@@ -719,7 +719,7 @@ foreach ($items as $item) {
 	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? (new CSpan($item['key_expanded']))->addClass('enabled')
+			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
 			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
 				->addClass(ZBX_STYLE_LINK_ALT)
 				->addClass(ZBX_STYLE_GREEN);
@@ -744,7 +744,7 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			(new CCol(new CDiv([$item['name_expanded'], BR(), $itemKey])))
+			(new CCol([$item['name_expanded'], BR(), $itemKey]))
 				->addClass($state_css)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 			(new CCol(
