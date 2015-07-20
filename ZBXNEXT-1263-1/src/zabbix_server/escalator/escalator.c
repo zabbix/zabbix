@@ -1321,7 +1321,7 @@ static void	check_escalation(const DB_ESCALATION *escalation, DB_ACTION *action,
 	}
 	DBfree_result(result);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error: %s", __function_name, ZBX_NULL2STR(*error));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() error:'%s'", __function_name, ZBX_NULL2STR(*error));
 }
 
 static void	execute_escalation(DB_ESCALATION *escalation)
