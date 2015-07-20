@@ -1833,9 +1833,6 @@ int	evaluate_function(char *value, DB_ITEM *item, const char *function, const ch
 	int		ret;
 	struct tm	*tm = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() function:'%s.%s(%s)'", __function_name,
-			zbx_host_key_string_by_item(item), function, parameter);
-
 	*value = '\0';
 
 	if (0 == strcmp(function, "last") || 0 == strcmp(function, "prev"))

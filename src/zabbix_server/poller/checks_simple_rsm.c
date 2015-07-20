@@ -726,7 +726,7 @@ static int	zbx_get_ns_ip_values(ldns_resolver *res, const char *ns, const char *
 		}
 
 		/* the AUTHORITY section should contain at least one NS RR for the last label in  */
-		/* PREFIX, e.g. "icann-test" when querying for "blahblah.icann-test.example.") */
+		/* PREFIX, e.g. "icann-test" when querying for "blahblah.icann-test.example." */
 		if (SUCCEED != zbx_get_last_label(testname, &last_label, err, err_size))
 		{
 			*rtt = ZBX_EC_DNS_NS_EREPLY;
@@ -1528,7 +1528,7 @@ int	check_rsm_dns(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	/* from this point item will not become NOT_SUPPORTED */
+	/* from this point item will not become NOTSUPPORTED */
 	ret = SYSINFO_RET_OK;
 
 	/* get DNSKEY records */
@@ -2255,7 +2255,7 @@ int	check_rsm_rdds(DC_ITEM *item, const char *keyname, const char *params, AGENT
 		goto out;
 	}
 
-	/* from this point item will not become NOT_SUPPORTED */
+	/* from this point item will not become NOTSUPPORTED */
 	ret = SYSINFO_RET_OK;
 
 	/* choose random host */
@@ -3568,7 +3568,7 @@ int	check_rsm_epp(DC_ITEM *item, const char *keyname, const char *params, AGENT_
 		goto out;
 	}
 
-	/* from this point item will not become NOT_SUPPORTED */
+	/* from this point item will not become NOTSUPPORTED */
 	ret = SYSINFO_RET_OK;
 
 	if (SUCCEED != rsm_ssl_init())
