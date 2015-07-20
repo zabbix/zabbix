@@ -3073,7 +3073,11 @@ $browser-logos: (
 //  background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
 //}
 .overflow-ellipsis {
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
+	table-layout: fixed;
+
+	th, td {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 }
