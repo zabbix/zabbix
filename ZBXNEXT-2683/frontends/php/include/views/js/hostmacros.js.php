@@ -46,5 +46,21 @@
 					.text(<?= CJs::encodeJson(_('Remove')) ?>);
 			}
 		});
+
+		// Convert macro names to uppercase.
+		$('#tbl_macros').on('blur', 'input.macro', function() {
+			var macro = $(this).val(),
+				end = macro.indexOf(':');
+
+			if (end == -1) {
+				$(this).val(macro.toUpperCase());
+			}
+			else {
+				var macro_part = macro.substr(0, end),
+					context_part = macro.substr(end, macro.length);
+
+				$(this).val(macro_part.toUpperCase() + context_part);
+			}
+		});
 	});
 </script>
