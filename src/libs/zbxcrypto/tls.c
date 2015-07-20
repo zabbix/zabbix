@@ -71,10 +71,10 @@ extern char				*CONFIG_TLS_KEY_FILE;
 extern char				*CONFIG_TLS_PSK_IDENTITY;
 extern char				*CONFIG_TLS_PSK_FILE;
 
-ZBX_THREAD_LOCAL static char		*my_psk			= NULL;
-ZBX_THREAD_LOCAL static size_t		my_psk_len		= 0;
 ZBX_THREAD_LOCAL static char		*my_psk_identity	= NULL;
 ZBX_THREAD_LOCAL static size_t		my_psk_identity_len	= 0;
+ZBX_THREAD_LOCAL static char		*my_psk			= NULL;
+ZBX_THREAD_LOCAL static size_t		my_psk_len		= 0;
 
 /* Pointer to DCget_psk_by_identity() initialized at runtime. This is a workaround for linking. */
 /* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where DCget_psk_by_identity() resides */
@@ -184,7 +184,7 @@ static void	polarssl_debug_cb(void *tls_ctx, int level, const char *str)
  *     This is a callback function, its arguments are defined in GnuTLS.      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_gnutls_debug_cb(int level, const char* str)
+static void	zbx_gnutls_debug_cb(int level, const char *str)
 {
 	char	msg[1024];
 
@@ -205,7 +205,7 @@ static void	zbx_gnutls_debug_cb(int level, const char* str)
  *     This is a callback function, its arguments are defined in GnuTLS.      *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_gnutls_audit_cb(gnutls_session_t session, const char* str)
+static void	zbx_gnutls_audit_cb(gnutls_session_t session, const char *str)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "GnuTLS audit: \"%s\"", str);
 }
@@ -225,27 +225,6 @@ static void	zbx_gnutls_audit_cb(gnutls_session_t session, const char* str)
  ******************************************************************************/
 static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 {
-	const char	*direction, *rw, *handshake;
-
-	if (0 != (where & SSL_ST_CONNECT))
-		direction = " connect";
-	else if (0 != (where & SSL_ST_ACCEPT))
-		direction = " accept";
-	else
-		direction = "";
-
-	if (0 != (where & SSL_CB_READ))
-		rw = " read";
-	else if (0 != (where & SSL_CB_WRITE))
-		rw = " write";
-	else
-		rw = "";
-
-	if (0 != (where & SSL_CB_EXIT))
-		handshake = " handshake";
-	else
-		handshake = "";
-
 	/* There was an idea of using SSL_CB_LOOP and SSL_state_string_long() to write state changes into Zabbix log */
 	/* if logging level is LOG_LEVEL_TRACE. Unfortunately if OpenSSL for security is compiled without SSLv3 */
 	/* (i.e. OPENSSL_NO_SSL3 is defined) then SSL_state_string_long() does not provide descriptions of many */
@@ -259,6 +238,27 @@ static void	zbx_openssl_info_cb(const SSL *ssl, int where, int ret)
 #endif
 	if (0 != (where & SSL_CB_ALERT))	/* alert sent or received */
 	{
+		const char	*handshake, *direction, *rw;
+
+		if (0 != (where & SSL_CB_EXIT))
+			handshake = " handshake";
+		else
+			handshake = "";
+
+		if (0 != (where & SSL_ST_CONNECT))
+			direction = " connect";
+		else if (0 != (where & SSL_ST_ACCEPT))
+			direction = " accept";
+		else
+			direction = "";
+
+		if (0 != (where & SSL_CB_READ))
+			rw = " read";
+		else if (0 != (where & SSL_CB_WRITE))
+			rw = " write";
+		else
+			rw = "";
+
 		zbx_snprintf(info_buf, sizeof(info_buf), "TLS%s%s%s %s alert \"%s\"", handshake, direction, rw,
 				SSL_alert_type_string_long(ret), SSL_alert_desc_string_long(ret));
 	}
@@ -706,7 +706,7 @@ static void	zbx_tls_validate_config(void)
 		}
 	}
 
-	/* agentd, agent and passive proxy specific validation */
+	/* agentd and passive proxy specific validation */
 
 	if (0 != (program_type & (ZBX_PROGRAM_TYPE_AGENTD | ZBX_PROGRAM_TYPE_PROXY_PASSIVE)))
 	{
@@ -856,14 +856,14 @@ static int	zbx_is_ciphersuite_all(const int *p)
  ******************************************************************************/
 static unsigned int	zbx_ciphersuites(int type, int **suites)
 {
-	const int		*supported_suites, *p;
-	int			*q;
-	unsigned int		count = 0;
+	const int	*supported_suites, *p;
+	int		*q;
+	unsigned int	count = 0;
 
 	supported_suites = ssl_list_ciphersuites();
 
 	/* count available relevant ciphersuites */
-	for (p = supported_suites; *p != 0; p++)
+	for (p = supported_suites; 0 != *p; p++)
 	{
 		if (ZBX_TLS_CIPHERSUITE_CERT == type)
 		{
@@ -887,7 +887,7 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
 	*suites = zbx_malloc(*suites, (count + 1) * sizeof(int));
 
 	/* copy the ciphersuites into array */
-	for (p = supported_suites, q = *suites; *p != 0; p++)
+	for (p = supported_suites, q = *suites; 0 != *p; p++)
 	{
 		if (ZBX_TLS_CIPHERSUITE_CERT == type)
 		{
@@ -920,8 +920,8 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
  * Function: zbx_psk_hex2bin                                                  *
  *                                                                            *
  * Purpose:                                                                   *
- *    convert a pre-shared key from a textual representation (ASCII hex digit *
- *    string) to a binary representation (byte string)                        *
+ *     convert a pre-shared key from a textual representation (ASCII hex      *
+ *     digit string) to a binary representation (byte string)                 *
  *                                                                            *
  * Parameters:                                                                *
  *     p_hex   - [IN] null-terminated input PSK hex-string                    *
@@ -929,7 +929,7 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
  *     buf_len - [IN] output buffer size                                      *
  *                                                                            *
  * Return value:                                                              *
- *     Number of PSK bytes written into ' buf' on successful conversion.      *
+ *     Number of PSK bytes written into 'buf' on successful conversion.       *
  *     -1 - an error occurred.                                                *
  *                                                                            *
  * Comments:                                                                  *
@@ -938,8 +938,8 @@ static unsigned int	zbx_ciphersuites(int type, int **suites)
  ******************************************************************************/
 static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int buf_len)
 {
-	unsigned char		*q, hi, lo;
-	int			len = 0;
+	unsigned char	*q, hi, lo;
+	int		len = 0;
 
 	q = buf;
 
@@ -974,7 +974,7 @@ static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int b
  * Function: zbx_psk_cb                                                       *
  *                                                                            *
  * Purpose:                                                                   *
- *    find and set the requested pre-shared key upon PolarSSL request         *
+ *     find and set the requested pre-shared key upon PolarSSL request        *
  *                                                                            *
  * Parameters:                                                                *
  *     par              - [IN] not used                                       *
@@ -984,8 +984,8 @@ static int	zbx_psk_hex2bin(const unsigned char *p_hex, unsigned char *buf, int b
  *     psk_identity_len - [IN] size of 'psk_identity'                         *
  *                                                                            *
  * Return value:                                                              *
- *      0  - required PSK successfully found and set                          *
- *     -1 - an error occurred.                                                *
+ *     0  - required PSK successfully found and set                           *
+ *     -1 - an error occurred                                                 *
  *                                                                            *
  * Comments:                                                                  *
  *     A callback function, its arguments are defined in PolarSSL.            *
@@ -1000,7 +1000,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 	size_t		psk_len = 0;
 	int		psk_bin_len;
 	unsigned char	tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX], tls_psk_hex[HOST_TLS_PSK_LEN_MAX],
-			psk_buf[HOST_TLS_PSK_LEN/2];
+			psk_buf[HOST_TLS_PSK_LEN / 2];
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
@@ -1029,7 +1029,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 		tls_psk_identity[psk_identity_len] = '\0';
 
 		/* call the function DCget_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache(tls_psk_identity, tls_psk_hex, HOST_TLS_PSK_LEN_MAX))
+		if (0 < find_psk_in_cache(tls_psk_identity, tls_psk_hex, sizeof(tls_psk_hex)))
 		{
 			/* convert PSK to binary form */
 			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
@@ -1058,16 +1058,12 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 		int 	res;
 
 		if (0 == (res = ssl_set_psk(tls_ctx, psk, psk_len, psk_identity, psk_identity_len)))
-		{
 			return 0;
-		}
-		else
-		{
-			zbx_tls_error_msg(res, "", &err_msg);
-			zabbix_log(LOG_LEVEL_WARNING, "cannot set PSK for PSK identity \"%.*s\": %s", psk_identity_len,
-					psk_identity, err_msg);
-			zbx_free(err_msg);
-		}
+
+		zbx_tls_error_msg(res, "", &err_msg);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set PSK for PSK identity \"%.*s\": %s", psk_identity_len,
+				psk_identity, err_msg);
+		zbx_free(err_msg);
 	}
 
 	return -1;
@@ -1078,7 +1074,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
  * Function: zbx_psk_cb                                                       *
  *                                                                            *
  * Purpose:                                                                   *
- *    find and set the requested pre-shared key upon GnuTLS request           *
+ *     find and set the requested pre-shared key upon GnuTLS request          *
  *                                                                            *
  * Parameters:                                                                *
  *     session      - [IN] not used                                           *
@@ -1087,8 +1083,8 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
  *     key          - [OUT pre-shared key allocated and set                   *
  *                                                                            *
  * Return value:                                                              *
- *      0  - required PSK successfully found and set                          *
- *     -1 - an error occurred.                                                *
+ *     0  - required PSK successfully found and set                           *
+ *     -1 - an error occurred                                                 *
  *                                                                            *
  * Comments:                                                                  *
  *     A callback function, its arguments are defined in GnuTLS.              *
@@ -1101,7 +1097,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 	char		*psk;
 	size_t		psk_len = 0;
 	int		psk_bin_len;
-	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN/2];
+	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN / 2];
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK identity: \"%s\"", __function_name, psk_identity);
@@ -1118,7 +1114,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 		/* search the required PSK in configuration cache */
 
 		/* call the function DCget_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, HOST_TLS_PSK_LEN_MAX))
+		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, sizeof(tls_psk_hex)))
 		{
 			/* convert PSK to binary form */
 			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
@@ -1165,7 +1161,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
  * Function: zbx_psk_client_cb                                                *
  *                                                                            *
  * Purpose:                                                                   *
- *    set pre-shared key for outgoing TLS connection upon OpenSSL request     *
+ *     set pre-shared key for outgoing TLS connection upon OpenSSL request    *
  *                                                                            *
  * Parameters:                                                                *
  *     ssl              - [IN] not used                                       *
@@ -1177,7 +1173,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
  *                                                                            *
  * Return value:                                                              *
  *     > 0 - length of PSK in bytes                                           *
- *       0 - an error occurred.                                               *
+ *       0 - an error occurred                                                *
  *                                                                            *
  * Comments:                                                                  *
  *     A callback function, its arguments are defined in OpenSSL.             *
@@ -1224,7 +1220,7 @@ static unsigned int	zbx_psk_client_cb(SSL *ssl, const char *hint, char *identity
  * Function: zbx_psk_server_cb                                                *
  *                                                                            *
  * Purpose:                                                                   *
- *    set pre-shared key for incoming TLS connection upon OpenSSL request     *
+ *     set pre-shared key for incoming TLS connection upon OpenSSL request    *
  *                                                                            *
  * Parameters:                                                                *
  *     ssl              - [IN] not used                                       *
@@ -1248,7 +1244,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 	char		*psk_loc;
 	size_t		psk_len = 0;
 	int		psk_bin_len;
-	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN/2];
+	unsigned char	tls_psk_hex[HOST_TLS_PSK_LEN_MAX], psk_buf[HOST_TLS_PSK_LEN / 2];
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK identity: \"%s\"", __function_name, identity);
@@ -1265,7 +1261,7 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 		/* search the required PSK in configuration cache */
 
 		/* call the function DCget_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache((const unsigned char *)identity, tls_psk_hex, HOST_TLS_PSK_LEN_MAX))
+		if (0 < find_psk_in_cache((const unsigned char *)identity, tls_psk_hex, sizeof(tls_psk_hex)))
 		{
 			/* convert PSK to binary form */
 			if (0 >= (psk_bin_len = zbx_psk_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
@@ -1309,14 +1305,13 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 }
 #endif
 
-
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_read_psk_file                                                *
  *                                                                            *
  * Purpose:                                                                   *
- *     Read a pre-shared key from a configured file and convert it from       *
+ *     read a pre-shared key from a configured file and convert it from       *
  *     textual representation (ASCII hex digit string) to a binary            *
  *     representation (byte string)                                           *
  *                                                                            *
@@ -1336,10 +1331,9 @@ static void	zbx_read_psk_file(void)
 	size_t		len;
 	char		*p;
 	int		len_bin;
-	unsigned int	i;
 	char		buf[HOST_TLS_PSK_LEN_MAX + 2];	/* up to 512 bytes of hex-digits, maybe 1-2 bytes for '\n', */
 							/* 1 byte for terminating '\0' */
-	char		buf_bin[HOST_TLS_PSK_LEN/2];	/* up to 256 bytes of binary PSK */
+	char		buf_bin[HOST_TLS_PSK_LEN / 2];	/* up to 256 bytes of binary PSK */
 
 	if (NULL == (f = fopen(CONFIG_TLS_PSK_FILE, "r")))
 	{
@@ -1382,9 +1376,7 @@ static void	zbx_read_psk_file(void)
 
 	my_psk_len = (size_t)len_bin;
 	my_psk = zbx_malloc(my_psk, my_psk_len);
-
-	for (i = 0; i < my_psk_len; i++)
-		my_psk[i] = buf_bin[i];
+	memcpy(my_psk, buf_bin, my_psk_len);
 
 	return;
 out:
@@ -1428,7 +1420,7 @@ static void	zbx_log_ciphersuites(const char *title, const SSL *ctx)
  * Function: zbx_print_rdn_value                                              *
  *                                                                            *
  * Purpose:                                                                   *
- *     Print an RDN (relative distinguished name) value into buffer           *
+ *     print an RDN (relative distinguished name) value into buffer           *
  *                                                                            *
  * Parameters:                                                                *
  *     value - [IN] pointer to RDN value                                      *
@@ -1439,7 +1431,7 @@ static void	zbx_log_ciphersuites(const char *title, const SSL *ctx)
  *                   Initially '*error' must be NULL.                         *
  *                                                                            *
  * Return value:                                                              *
- *     Number of bytes written into 'buf'                                     *
+ *     number of bytes written into 'buf'                                     *
  *     '*error' is not NULL if an error occured                               *
  *                                                                            *
  ******************************************************************************/
@@ -1822,7 +1814,7 @@ small_buf:
  *     error   - [OUT] dynamically allocated memory with error message        *
  *                                                                            *
  * Return value:                                                              *
- *     Pointer to peer certificate - success                                  *
+ *     pointer to peer certificate - success                                  *
  *     NULL - an error occurred                                               *
  *                                                                            *
  * Comments:                                                                  *
@@ -1832,7 +1824,7 @@ small_buf:
  ******************************************************************************/
 static gnutls_x509_crt_t	zbx_get_peer_cert(const gnutls_session_t session, char **error)
 {
-	const char		*__function_name = "zbx_get_peer_cert";
+	const char	*__function_name = "zbx_get_peer_cert";
 
 	if (GNUTLS_CRT_X509 == gnutls_certificate_type_get(session))
 	{
@@ -1862,7 +1854,7 @@ static gnutls_x509_crt_t	zbx_get_peer_cert(const gnutls_session_t session, char 
 			return NULL;
 		}
 
-		/* the 1st element of list is peer certificate */
+		/* the 1st element of the list is peer certificate */
 
 		if (GNUTLS_E_SUCCESS != (res = gnutls_x509_crt_import(cert, &cert_list[0], GNUTLS_X509_FMT_DER)))
 		{
@@ -1918,9 +1910,9 @@ static int	zbx_log_peer_cert(const char *function_name, const x509_crt *cert, ch
 #elif defined(HAVE_GNUTLS)
 static int	zbx_log_peer_cert(const gnutls_x509_crt_t cert, char **error)
 {
-	const char		*__function_name = "zbx_log_peer_cert";
-	int			res;
-	gnutls_datum_t		cert_print;
+	const char	*__function_name = "zbx_log_peer_cert";
+	int		res;
+	gnutls_datum_t	cert_print;
 
 	if (GNUTLS_E_SUCCESS != (res = gnutls_x509_crt_print(cert, GNUTLS_CRT_PRINT_ONELINE, &cert_print)))
 	{
@@ -1992,9 +1984,9 @@ static int	zbx_verify_peer_cert(const gnutls_session_t session, char **error)
  *     get certificate issuer and subject as strings                          *
  *                                                                            *
  * Parameters:                                                                *
- *     cert         - [IN] certificate                                        *
- *     issuer       - [OUT] dynamically allocated memory with issuer string   *
- *     subject      - [OUT] dynamically allocated memory with subject string  *
+ *     cert    - [IN] certificate                                             *
+ *     issuer  - [OUT] dynamically allocated memory with issuer string        *
+ *     subject - [OUT] dynamically allocated memory with subject string       *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED or FAIL                                                        *
@@ -2073,10 +2065,8 @@ out:
  *                                                                            *
  * Parameters:                                                                *
  *     cert         - [IN] certificate to verify                              *
- *     issuer       - [IN] required issuer (don't care if NULL or empty       *
- *                         string)                                            *
- *     subject      - [IN] required subject (don't care if NULL or empty      *
- *                         string)                                            *
+ *     issuer       - [IN] required issuer (ignore if NULL or empty string)   *
+ *     subject      - [IN] required subject (ignore if NULL or empty string)  *
  *     peer_issuer  - [IN] issuer of peer certificate                         *
  *     peer_subject - [IN] subject of peer certificate                        *
  *     error        - [OUT] dynamically allocated memory with error message   *
@@ -2124,7 +2114,6 @@ static int	zbx_verify_issuer_subject(const char *peer_issuer, const char *peer_s
 		if (0 != strcmp(tls_subject, subject))	/* simplified match, not compliant with RFC 4517, 4518 */
 			subject_mismatch = 1;
 	}
-
 #elif defined(HAVE_GNUTLS)
 	if (NULL != issuer && '\0' != *issuer)
 	{
@@ -2343,7 +2332,6 @@ void	zbx_tls_init_child(void)
 #if !defined(_WINDOWS)
 	zbx_tls_library_init();		/* on UNIX/GNU/Linux initialize crypto libraries in child processes */
 #endif
-
 	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	if (NULL != CONFIG_TLS_CA_FILE)
 	{
@@ -2448,7 +2436,7 @@ void	zbx_tls_init_child(void)
 				CONFIG_TLS_KEY_FILE);
 	}
 
-	/* 'TLSPSKFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
+	/* 'TLSPSKFile' parameter (in zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load pre-shared key. */
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
@@ -2456,8 +2444,8 @@ void	zbx_tls_init_child(void)
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK from file \"%s\"", __function_name, CONFIG_TLS_PSK_FILE);
 	}
 
-	/* 'TLSPSKIdentity' parameter (in zabbix_proxy.conf, zabbix_agentd.conf). Configure identity to be used with */
-	/* the pre-shared key. */
+	/* 'TLSPSKIdentity' parameter (in zabbix_proxy.conf, zabbix_agentd.conf). */
+	/* Configure identity to be used with the pre-shared key. */
 	if (NULL != CONFIG_TLS_PSK_IDENTITY)
 	{
 		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
@@ -2529,11 +2517,11 @@ void	zbx_tls_init_child(void)
 #if !defined(_WINDOWS)
 	zbx_tls_library_init();		/* on UNIX/GNU/Linux initialize crypto libraries in child processes */
 #endif
-	/* need to allocate certificate credentials store ? */
+	/* need to allocate certificate credentials store? */
 
 	if (NULL != CONFIG_TLS_CERT_FILE)
 	{
-		if (0 != (res = gnutls_certificate_allocate_credentials(&my_cert_creds)))
+		if (GNUTLS_E_SUCCESS != (res = gnutls_certificate_allocate_credentials(&my_cert_creds)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "gnutls_certificate_allocate_credentials() failed: %d: %s", res,
 					gnutls_strerror(res));
@@ -2611,7 +2599,6 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSPSKIdentity' and 'TLSPSKFile' parameters (in zabbix_proxy.conf, zabbix_agentd.conf). */
 	/* Load pre-shared key and identity to be used with the pre-shared key. */
-
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
 		gnutls_datum_t	key;
@@ -2630,7 +2617,7 @@ void	zbx_tls_init_child(void)
 		if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_AGENTD |
 				ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
 		{
-			if (0 != (res = gnutls_psk_allocate_client_credentials(&my_psk_client_creds)))
+			if (GNUTLS_E_SUCCESS != (res = gnutls_psk_allocate_client_credentials(&my_psk_client_creds)))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "gnutls_psk_allocate_client_credentials() failed: %d: %s",
 						res, gnutls_strerror(res));
@@ -2660,8 +2647,8 @@ void	zbx_tls_init_child(void)
 			}
 
 			/* Apparently GnuTLS does not provide API for setting up static server credentials (with a */
-			/* fixed PSK identity and key) for a passive proxy, agent and agentd. The only possibility */
-			/* seems to set up credentials dynamically for each incoming connection using a callback */
+			/* fixed PSK identity and key) for a passive proxy and agentd. The only possibility seems to */
+			/* be to set up credentials dynamically for each incoming connection using a callback */
 			/* function. */
 			gnutls_psk_set_server_credentials_function(my_psk_server_creds, zbx_psk_cb);
 		}
@@ -2686,7 +2673,7 @@ void	zbx_tls_init_child(void)
 		}
 	}
 
-	/* PSK can come from configuration file (in proxy, agentd, agent) and later from database (in server, proxy). */
+	/* PSK can come from configuration file (in proxy, agentd) and later from database (in server, proxy). */
 	/* Configure ciphersuites just in case they will be used. */
 	if (NULL != my_psk_client_creds || NULL != my_psk_server_creds ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
@@ -2753,7 +2740,7 @@ void	zbx_tls_init_child(void)
 	if (NULL != CONFIG_TLS_CERT_FILE && NULL == (ctx_cert = SSL_CTX_new(method)))
 		goto out_method;
 
-	/* Create context for PSK-only authentication. PSK can come from configuration file (in proxy, agentd, agent) */
+	/* Create context for PSK-only authentication. PSK can come from configuration file (in proxy, agentd) */
 	/* and later from database (in server, proxy). */
 	if ((NULL != CONFIG_TLS_PSK_FILE ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))) &&
@@ -2796,7 +2783,7 @@ void	zbx_tls_init_child(void)
 	/* Load CRL (certificate revocation list) file. */
 	if (NULL != CONFIG_TLS_CRL_FILE)
 	{
-		FILE	*f;
+		FILE			*f;
 		X509_VERIFY_PARAM	*param;
 
 		if (NULL == (f = fopen(CONFIG_TLS_CRL_FILE, "r")))
@@ -2900,7 +2887,6 @@ void	zbx_tls_init_child(void)
 
 	/* 'TLSPSKIdentity' and 'TLSPSKFile' parameters (in zabbix_proxy.conf, zabbix_agentd.conf). */
 	/*  Load pre-shared key and identity to be used with the pre-shared key. */
-
 	if (NULL != CONFIG_TLS_PSK_FILE)
 	{
 		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
@@ -3144,18 +3130,18 @@ void	zbx_tls_free(void)
  * Purpose: establish a TLS connection over an established TCP connection     *
  *                                                                            *
  * Parameters:                                                                *
- *     s           - [IN]  socket with opened connection                      *
+ *     s           - [IN] socket with opened connection                       *
  *     error       - [OUT] dynamically allocated memory with error message    *
- *     tls_connect - [IN]  how to connect. Allowed values:                    *
- *                         ZBX_TCP_SEC_TLS_CERT, ZBX_TCP_SEC_TLS_PSK.         *
- *     tls_arg1    - [IN]  required issuer of peer certificate (may be NULL   *
- *                         or empty string if not important) or PSK identity  *
- *                         to connect with depending on value of              *
- *                         'tls_connect'.                                     *
- *     tls_arg2    - [IN]  required subject of peer certificate (may be NULL  *
- *                         or empty string if not important) or PSK           *
- *                         (in hex-string) to connect with depending on value *
- *                         of 'tls_connect'.                                  *
+ *     tls_connect - [IN] how to connect. Allowed values:                     *
+ *                        ZBX_TCP_SEC_TLS_CERT, ZBX_TCP_SEC_TLS_PSK.          *
+ *     tls_arg1    - [IN] required issuer of peer certificate (may be NULL    *
+ *                        or empty string if not important) or PSK identity   *
+ *                        to connect with depending on value of               *
+ *                        'tls_connect'.                                      *
+ *     tls_arg2    - [IN] required subject of peer certificate (may be NULL   *
+ *                        or empty string if not important) or PSK            *
+ *                        (in hex-string) to connect with depending on value  *
+ *                        of 'tls_connect'.                                   *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
@@ -3250,8 +3236,8 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 		if (NULL == tls_arg2)	/* PSK is not set from DB */
 		{
-			/* set up the PSK from a configuration file (in agentd, agent (always) and a case in active */
-			/* proxy when it connects to server) */
+			/* set up the PSK from a configuration file (always in agentd and a case in active proxy */
+			/* when it connects to server) */
 
 			if (0 != (res = ssl_set_psk(s->tls_ctx, (const unsigned char *)my_psk, my_psk_len,
 				(const unsigned char *)my_psk_identity, my_psk_identity_len)))
@@ -3268,7 +3254,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 			/* passive checks, for a server when it connects to a passive proxy) */
 
 			int	psk_len;
-			char	psk_buf[HOST_TLS_PSK_LEN/2];
+			char	psk_buf[HOST_TLS_PSK_LEN / 2];
 
 			if (0 >= (psk_len = zbx_psk_hex2bin((unsigned char *)tls_arg2, (unsigned char *)psk_buf,
 					sizeof(psk_buf))))
@@ -3360,12 +3346,12 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		}
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
 			ssl_get_version(s->tls_ctx), ssl_get_ciphersuite(s->tls_ctx));
 
 	return SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
 }
@@ -3441,8 +3427,8 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 		if (NULL == tls_arg2)	/* PSK is not set from DB */
 		{
-			/* set up the PSK from a configuration file (in agentd, agent (always) and a case in active */
-			/* proxy when it connects to server) */
+			/* set up the PSK from a configuration file (always in agentd and a case in active proxy */
+			/* when it connects to server) */
 
 			if (GNUTLS_E_SUCCESS != (res = gnutls_credentials_set(s->tls_ctx, GNUTLS_CRD_PSK,
 					my_psk_client_creds)))
@@ -3459,10 +3445,9 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 			gnutls_datum_t	key;
 			int		psk_len;
-			unsigned char	psk_buf[HOST_TLS_PSK_LEN/2];
+			unsigned char	psk_buf[HOST_TLS_PSK_LEN / 2];
 
-			if (0 >= (psk_len = zbx_psk_hex2bin((unsigned char *)tls_arg2, psk_buf,
-					sizeof(psk_buf))))
+			if (0 >= (psk_len = zbx_psk_hex2bin((unsigned char *)tls_arg2, psk_buf, sizeof(psk_buf))))
 			{
 				*error = zbx_strdup(*error, "invalid PSK");
 				goto out;
@@ -3613,7 +3598,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T "-"
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T "-"
 				ZBX_FS_SIZE_T ")", __function_name,
 				gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx)),
 				gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx)),
@@ -3642,7 +3627,7 @@ out1:
 	if (NULL != peer_cert)
 		gnutls_x509_crt_deinit(peer_cert);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
 }
@@ -3652,7 +3637,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	const char	*__function_name = "zbx_tls_connect";
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
-	char		psk_buf[HOST_TLS_PSK_LEN/2];
+	char		psk_buf[HOST_TLS_PSK_LEN / 2];
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect)
 	{
@@ -3693,9 +3678,9 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 		if (NULL == tls_arg2)	/* PSK is not set from DB */
 		{
-			/* Set up PSK global variables from a configuration file (always in agentd, agent and a */
-			/* case when active proxy connects to server). Here we set it only in case of active proxy */
-			/* because for other programs it already has been set in zbx_tls_init_child(). */
+			/* Set up PSK global variables from a configuration file (always in agentd and a case when */
+			/* active proxy connects to server). Here we set it only in case of active proxy */
+			/* because for other programs it has already been set in zbx_tls_init_child(). */
 
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
 			{
@@ -3751,24 +3736,21 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		{
 			case SSL_ERROR_NONE:		/* handshake successful */
 				break;
-			case SSL_ERROR_ZERO_RETURN:	/* TLS connection has been closed */
+			case SSL_ERROR_ZERO_RETURN:
 				*error = zbx_strdup(*error, "TLS connection has been closed during handshake");
 				goto out;
-				break;
 			case SSL_ERROR_SYSCALL:
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake returned"
 						" SSL_ERROR_SYSCALL:");
 				zbx_tls_error_msg(error, &error_alloc, &error_offset);
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, ": %s", info_buf);
 				goto out;
-				break;
 			case SSL_ERROR_SSL:
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake returned"
 						" SSL_ERROR_SSL:");
 				zbx_tls_error_msg(error, &error_alloc, &error_offset);
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, ": %s", info_buf);
 				goto out;
-				break;
 			default:
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake returned error"
 						" code %d", error_code);
@@ -3825,7 +3807,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
 				SSL_get_version(s->tls_ctx), SSL_get_cipher(s->tls_ctx));
 	}
 
@@ -3838,7 +3820,7 @@ out:	/* an error occured */
 		s->tls_ctx = NULL;
 	}
 out1:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
 }
@@ -3851,11 +3833,11 @@ out1:
  * Purpose: establish a TLS connection over an accepted TCP connection        *
  *                                                                            *
  * Parameters:                                                                *
- *     s          - [IN]  socket with opened connection                       *
+ *     s          - [IN] socket with opened connection                        *
  *     error      - [OUT] dynamically allocated memory with error message     *
- *     tls_accept - [IN]  type of connection to accept. Can be be either      *
- *                        ZBX_TCP_SEC_TLS_CERT or ZBX_TCP_SEC_TLS_PSK, or     *
- *                        a bitwise 'OR' of both.                             *
+ *     tls_accept - [IN] type of connection to accept. Can be be either       *
+ *                       ZBX_TCP_SEC_TLS_CERT or ZBX_TCP_SEC_TLS_PSK, or      *
+ *                       a bitwise 'OR' of both.                              *
  *                                                                            *
  * Return value:                                                              *
  *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
@@ -3998,7 +3980,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		}
 	}
 
-	/* Is this TLS conection using certificate or PSK ? */
+	/* Is this TLS conection using certificate or PSK? */
 
 	info = ssl_ciphersuite_from_id(s->tls_ctx->session->ciphersuite);
 
@@ -4044,13 +4026,13 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
 				ssl_get_version(s->tls_ctx), ssl_get_ciphersuite(s->tls_ctx));
 	}
 
 	return SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
 }
@@ -4107,7 +4089,8 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		{
 			/* For server or proxy a PSK can come from configuration file or database. */
 			/* Set up a callback function for finding the requested PSK. */
-			if (0 != (res = gnutls_psk_allocate_server_credentials(&s->tls_psk_server_creds)))
+			if (GNUTLS_E_SUCCESS != (res = gnutls_psk_allocate_server_credentials(
+					&s->tls_psk_server_creds)))
 			{
 				*error = zbx_dsprintf(*error, "gnutls_psk_allocate_server_credentials() for"
 						" tls_psk_server_creds failed: %d %s", res, gnutls_strerror(res));
@@ -4234,19 +4217,19 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): gnutls_handshake() returned: %d %s", __function_name, res,
-					gnutls_strerror(res));
+			zabbix_log(LOG_LEVEL_WARNING, "%s(): gnutls_handshake() returned: %d %s",
+					__function_name, res, gnutls_strerror(res));
 
 			if (0 != gnutls_error_is_fatal(res))
 			{
 				*error = zbx_dsprintf(*error, "%s(): gnutls_handshake() failed: %d %s",
-					__function_name, res, gnutls_strerror(res));
+						__function_name, res, gnutls_strerror(res));
 				goto out;
 			}
 		}
 	}
 
-	/* Is this TLS conection using certificate or PSK ? */
+	/* Is this TLS conection using certificate or PSK? */
 
 	if (GNUTLS_CRD_CERTIFICATE == (creds = gnutls_auth_get_type(s->tls_ctx)))
 	{
@@ -4306,7 +4289,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T "-"
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s-%s-%s-" ZBX_FS_SIZE_T "-"
 				ZBX_FS_SIZE_T ")", __function_name,
 				gnutls_protocol_get_name(gnutls_protocol_get_version(s->tls_ctx)),
 				gnutls_kx_get_name(gnutls_kx_get(s->tls_ctx)),
@@ -4332,14 +4315,15 @@ out:	/* an error occured */
 		s->tls_psk_server_creds = NULL;
 	}
 out1:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
 }
 #elif defined(HAVE_OPENSSL)
 int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 {
-	const char	*__function_name = "zbx_tls_accept", *cipher_name;
+	const char	*__function_name = "zbx_tls_accept";
+	const char	*cipher_name;
 	int		ret = FAIL, res;
 	size_t		error_alloc = 0, error_offset = 0;
 
@@ -4348,7 +4332,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	if ((ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK) == (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 	{
 		/* common case in trapper - be ready for all types of incoming connections but possible also in */
-		/* agentd/agent listener */
+		/* agentd listener */
 
 		if (NULL != ctx_all)
 		{
@@ -4364,6 +4348,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		{
 			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "not ready for both certificate and"
 					" PSK-based incoming connection:");
+
 			if (NULL == ctx_cert)
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, " certificate not loaded");
 
@@ -4405,7 +4390,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "not ready for certificate-based incoming connection: certificate"
+			*error = zbx_strdup(*error, "not ready for certificate-based incoming connection: certificate"
 					" not loaded");
 			goto out;
 		}
@@ -4424,7 +4409,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		}
 		else
 		{
-			*error = zbx_dsprintf(*error, "not ready for PSK-based incoming connection: PSK not loaded");
+			*error = zbx_strdup(*error, "not ready for PSK-based incoming connection: PSK not loaded");
 			goto out;
 		}
 	}
@@ -4463,7 +4448,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		goto out;
 	}
 
-	/* Is this TLS conection using certificate or PSK ? */
+	/* Is this TLS conection using certificate or PSK? */
 
 	cipher_name = SSL_get_cipher(s->tls_ctx);
 
@@ -4471,7 +4456,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_PSK;
 	}
-	else if (0 != strncmp("NONE", cipher_name, 4))		/* is there a better method to find cipher type ? */
+	else if (0 != strncmp("NONE", cipher_name, 4))		/* is there a better method to find cipher type? */
 	{
 		s->connection_type = ZBX_TCP_SEC_TLS_CERT;
 
@@ -4479,7 +4464,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		{
 			/* log peer certificate information for debugging */
 
-			X509	*peer_cert = NULL;
+			X509	*peer_cert;
 			char	*issuer = NULL, *subject = NULL;
 			int	err = 0;
 
@@ -4520,7 +4505,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): SUCCEED (established %s %s)", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED (established %s %s)", __function_name,
 				SSL_get_version(s->tls_ctx), cipher_name);
 	}
 
@@ -4532,7 +4517,7 @@ out:
 		s->tls_ctx = NULL;
 	}
 out1:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s:%s", __function_name, zbx_result_string(ret),
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s error:'%s'", __function_name, zbx_result_string(ret),
 			ZBX_NULL2EMPTY_STR(*error));
 	return ret;
 }
@@ -4628,14 +4613,17 @@ void	zbx_tls_close(zbx_socket_t *s)
  ******************************************************************************/
 const char	*zbx_tls_connection_type_name(unsigned int type)
 {
-	if (ZBX_TCP_SEC_UNENCRYPTED == type)
-		return "unencrypted";
-	else if (ZBX_TCP_SEC_TLS_CERT == type)
-		return "TLS with certificate";
-	else if (ZBX_TCP_SEC_TLS_PSK == type)
-		return "TLS with PSK";
-	else
-		return "unknown";
+	switch (type)
+	{
+		case ZBX_TCP_SEC_UNENCRYPTED:
+			return "unencrypted";
+		case ZBX_TCP_SEC_TLS_CERT:
+			return "TLS with certificate";
+		case ZBX_TCP_SEC_TLS_PSK:
+			return "TLS with PSK";
+		default:
+			return "unknown";
+	}
 }
 
 /******************************************************************************
@@ -4746,7 +4734,7 @@ int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 #elif defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
 	{
-		X509	*peer_cert = NULL;
+		X509	*peer_cert;
 		char	*issuer = NULL, *subject = NULL;
 		int	err = 0;
 

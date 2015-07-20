@@ -509,7 +509,7 @@ void	zbx_remove_chars(register char *str, const char *charlist)
  * Purpose: Copy src to string dst of size siz. At most siz - 1 characters    *
  *          will be copied. Always null terminates (unless siz == 0).         *
  *                                                                            *
- * Return value : the number of characters copied (excluding the null byte)   *
+ * Return value: the number of characters copied (excluding the null byte)    *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
