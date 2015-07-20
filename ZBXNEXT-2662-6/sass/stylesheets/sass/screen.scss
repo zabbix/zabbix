@@ -553,6 +553,7 @@ footer {
 		text-rendering: optimizeLegibility;
 		height: 100%;
 		overflow: hidden;
+		white-space: nowrap;
 	    padding: 8px 5px 7px 5px;
 	    vertical-align: bottom;
 	    border-bottom: 2px solid $table-border-color;
@@ -3063,6 +3064,12 @@ $browser-logos: (
 	cursor: move;
 }
 
+%overflow-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
 //.tick-icon {
 //	display: block;
 //  width: 24px;
@@ -3075,9 +3082,15 @@ $browser-logos: (
 .overflow-ellipsis {
 	table-layout: fixed;
 
-	th, td {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
+	td {
+		@extend %overflow-ellipsis;
+	}
+
+	th {
+		@extend %overflow-ellipsis;
+
+		a {
+			@extend %overflow-ellipsis;
+		}
 	}
 }
