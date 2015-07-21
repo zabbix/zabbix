@@ -1186,9 +1186,12 @@ function getItemFormData(array $item = [], array $options = []) {
 			$data['applications'] = array_unique(zbx_array_merge($data['applications'], get_applications_by_itemid($data['itemid'])));
 
 			if ($data['parent_discoveryid'] != 0) {
-				// Get a list of application prototypes assigned to item prototype.
+				/*
+				 * Get a list of application prototypes assigned to item prototype. Don't select distinct names,
+				 * since database can be accidentally created case insensitive.
+				 */
 				$application_prototypes = DBfetchArray(DBselect(
-					'SELECT DISTINCT ap.name'.
+					'SELECT ap.name'.
 					' FROM application_prototype ap,item_application_prototype iap'.
 					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
 						' AND ap.itemid='.zbx_dbstr($data['parent_discoveryid']).
