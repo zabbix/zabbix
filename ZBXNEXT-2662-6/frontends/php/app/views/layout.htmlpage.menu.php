@@ -61,7 +61,7 @@ if (!$data['user']['is_guest']) {
 	$icons->addItem(
 		(new CLink(SPACE, 'profile.php'))
 			->addClass('top-nav-profile')
-			->setAttribute('title', _('Profile'))
+			->setAttribute('title', getUserFullname($data['user']))
 	);
 }
 

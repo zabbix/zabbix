@@ -194,7 +194,10 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			'selected' => $page['menu']
 		],
 		'user' => [
-			'is_guest' => CWebUser::isGuest()
+			'is_guest' => CWebUser::isGuest(),
+			'alias' => CWebUser::$data['alias'],
+			'name' => CWebUser::$data['name'],
+			'surname' => CWebUser::$data['surname']
 		]
 	]);
 	echo $pageMenu->getOutput();
