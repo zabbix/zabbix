@@ -255,13 +255,14 @@ $headerCheckBox = ($showEventColumn)
 	? (new CCheckBox('all_events'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_events', 'events');")
 	: (new CCheckBox('all_triggers'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
 
-if ($showEvents != EVENTS_OPTION_NOEVENT) {
-	$showHideAllDiv = (new CDiv(SPACE))
-		->addClass('filterclosed')
-		->setId($switcherName);
+if ($showEvents == EVENTS_OPTION_NOEVENT) {
+	$showHideAllDiv = null;
 }
 else {
-	$showHideAllDiv = null;
+	$showHideAllDiv = (new CDiv())
+		->addClass(ZBX_STYLE_TREEVIEW)
+		->setId($switcherName)
+		->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT));
 }
 
 $triggerTable = (new CTableInfo())
@@ -659,16 +660,17 @@ foreach ($triggers as $trigger) {
 	}
 
 	// open or close
-	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
-		$openOrCloseDiv = (new CDiv(SPACE))
-			->addClass('filterclosed')
-			->setAttribute('data-switcherid', $trigger['triggerid']);
-	}
-	elseif ($showEvents == EVENTS_OPTION_NOEVENT) {
+	if ($showEvents == EVENTS_OPTION_NOEVENT) {
 		$openOrCloseDiv = null;
 	}
+	elseif ($trigger['events']) {
+		$openOrCloseDiv = (new CDiv())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->setAttribute('data-switcherid', $trigger['triggerid'])
+			->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT));
+	}
 	else {
-		$openOrCloseDiv = SPACE;
+		$openOrCloseDiv = '';
 	}
 
 	// severity
