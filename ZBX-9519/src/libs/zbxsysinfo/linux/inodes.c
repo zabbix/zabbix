@@ -80,7 +80,7 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else if (0 == strcmp(mode, "used"))
 	{
 		validate(result, s, f_files);
-		validate(result, s, f_free);
+		validate(result, s, f_ffree);
 		SET_UI64_RESULT(result, s.f_files - s.f_ffree);
 	}
 	else if (0 == strcmp(mode, "pfree"))
