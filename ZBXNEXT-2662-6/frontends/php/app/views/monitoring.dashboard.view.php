@@ -146,7 +146,7 @@ foreach ($widgets as $widgetid => $widget) {
 		->setExpanded($expanded)
 		->setHeader(null, [$icon], true)
 		->setFooter(new CList([
-			(new CDiv())->addClass('textwhite')->setId($widgetid.'_footer')
+			(new CListItem())->setId($widgetid.'_footer')
 		]));
 
 	$widgetRefreshParams[$widgetid] = [
