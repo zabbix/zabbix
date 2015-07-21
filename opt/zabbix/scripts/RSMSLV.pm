@@ -2386,11 +2386,6 @@ sub slv_exit
 {
 	my $rv = shift;
 
-	if (defined($pidfile))
-	{
-		$pidfile->remove() or wrn("cannot remove pid file ", $pidfile->file());
-	}
-
 	exit($rv);
 }
 
@@ -2408,17 +2403,10 @@ sub exit_if_running
 	return if ($pidfile->pid == $$);
 
 	# pid file exists and has valid pid
-	if (my $pid = $pidfile->running())
-	{
-		fail("already running (pid:$pid)");
-	}
+	my $pid = $pidfile->running();
+	fail("already running (pid:$pid)") if ($pid);
 
-	# pid file exists but the pid in it is invalid
-	$pidfile->remove() or fail("cannot remove pid file ", $pidfile->file);
-
-	$pidfile = File::Pid->new({ file => $filename });
-	fail("cannot lock script") unless (defined($pidfile));
-
+	$pidfile->pid($$);
 	$pidfile->write() or fail("cannot write to a pid file ", $pidfile->file);
 }
 
