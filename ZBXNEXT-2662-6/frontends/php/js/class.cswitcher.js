@@ -74,7 +74,7 @@ var CSwitcher = Class.create({
 
 		var switcherid = obj.getAttribute('data-switcherid'),
 			state = (obj.firstChild.className == 'arrow-right' ? 1 : 0),
-			state_all = 0;
+			state_all = (state == 1 ? 1 : 0);
 
 		obj.firstChild.className = (state == 1 ? 'arrow-down' : 'arrow-right');
 
@@ -93,9 +93,13 @@ var CSwitcher = Class.create({
 					elements[j].style.display = (state == 1 ? '' : 'none');
 				}
 			}
+		}
 
-			if (this.switchers[toggle_switcherid]['state'] == 1) {
-				state_all = 1;
+		if (state_all != 1) {
+			for (var i in this.switchers) {
+				if (this.switchers[i]['state'] == 1) {
+					state_all = 1;
+				}
 			}
 		}
 
