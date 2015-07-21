@@ -1329,7 +1329,6 @@ static void	zbx_read_psk_file(void)
 {
 	FILE		*f;
 	size_t		len;
-	char		*p;
 	int		len_bin;
 	char		buf[HOST_TLS_PSK_LEN_MAX + 2];	/* up to 512 bytes of hex-digits, maybe 1-2 bytes for '\n', */
 							/* 1 byte for terminating '\0' */
@@ -1353,8 +1352,9 @@ static void	zbx_read_psk_file(void)
 		goto out;
 	}
 
-	if (NULL != (p = strchr(buf, '\n')))
-		*p = '\0';
+	/* Thanks to Tim Cas for this one-liner from */
+	/* http://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input */
+	buf[strcspn(buf, "\r\n")] = '\0';
 
 	if (0 == (len = strlen(buf)))
 	{
