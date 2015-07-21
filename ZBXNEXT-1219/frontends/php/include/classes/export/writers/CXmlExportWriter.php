@@ -112,7 +112,7 @@ class CXmlExportWriter extends CExportWriter {
 			'urls' => 'url',
 			'selements' => 'selement',
 			'links' => 'link',
-			'linktriggers' => 'linktrigger',
+			'linktriggers' => 'linktrigger'
 		];
 
 		return isset($map[$name]) ? $map[$name] : false;

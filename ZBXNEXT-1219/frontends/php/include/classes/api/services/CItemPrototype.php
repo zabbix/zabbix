@@ -285,7 +285,7 @@ class CItemPrototype extends CItemGeneral {
 				$item['formula'] = '1';
 			}
 
-			if (isset($item['applicationPrototypes']) && is_array($item['applicationPrototypes'])
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
 					&& $item['applicationPrototypes']) {
 				// Check that "name" field exists for application prototypes.
 				foreach ($item['applicationPrototypes'] as $application_prototype) {
@@ -373,7 +373,7 @@ class CItemPrototype extends CItemGeneral {
 
 		foreach ($items as $item) {
 			// 'applicationPrototypes' is an array of 'name' properties and it should not be empty.
-			if (isset($item['applicationPrototypes']) && is_array($item['applicationPrototypes'])
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
 					&& $item['applicationPrototypes']) {
 				// Get only application prototypes that already exist with this name in this discovery rule.
 				$db_application_prototypes = DBfetchArray(DBselect(
@@ -484,7 +484,7 @@ class CItemPrototype extends CItemGeneral {
 		$itemids_with_application_prototypes = [];
 
 		foreach ($items as $item) {
-			if (isset($item['applicationPrototypes']) && is_array($item['applicationPrototypes'])
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
 					&& !array_key_exists('ruleid', $item)) {
 				$itemids_with_application_prototypes[$item['itemid']] = true;
 			}
@@ -505,7 +505,7 @@ class CItemPrototype extends CItemGeneral {
 			 * "applicationPrototypes" is an array of "name" properties. It can also be an empty array in case
 			 * application prototypes should be unlinked from item prototypes.
 			 */
-			if (isset($item['applicationPrototypes']) && is_array($item['applicationPrototypes'])) {
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])) {
 				// Get discovery rule ID for current item prototype, if it is not yet set.
 				if (array_key_exists('ruleid', $item)) {
 					$discovery_ruleid = $item['ruleid'];
@@ -663,7 +663,7 @@ class CItemPrototype extends CItemGeneral {
 			'itemids' => $itemids,
 			'output' => ['name'],
 			'selectHosts' => ['name'],
-			'nopermissions' => true,
+			'nopermissions' => true
 		]);
 
 		foreach ($itemHosts as $item) {
@@ -1100,7 +1100,7 @@ class CItemPrototype extends CItemGeneral {
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}

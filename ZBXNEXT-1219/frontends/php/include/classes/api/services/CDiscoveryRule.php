@@ -659,7 +659,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectHosts' => ['name'],
 			'selectFilter' => ['evaltype'],
 			'nopermissions' => true,
-			'preservekeys' => true,
+			'preservekeys' => true
 		]);
 
 		$data = [];

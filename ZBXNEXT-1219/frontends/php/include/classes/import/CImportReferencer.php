@@ -841,7 +841,7 @@ class CImportReferencer {
 			$dbIconMaps = API::IconMap()->get([
 				'filter' => ['name' => $this->iconMaps],
 				'output' => ['iconmapid', 'name'],
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 			foreach ($dbIconMaps as $iconMap) {
 				$this->iconMapsRefs[$iconMap['name']] = $iconMap['iconmapid'];
@@ -860,7 +860,7 @@ class CImportReferencer {
 			$dbMaps = API::Map()->get([
 				'filter' => ['name' => $this->maps],
 				'output' => ['sysmapid', 'name'],
-				'preservekeys' => true,
+				'preservekeys' => true
 			]);
 			foreach ($dbMaps as $dbMap) {
 				$this->mapsRefs[$dbMap['name']] = $dbMap['sysmapid'];

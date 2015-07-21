@@ -333,7 +333,7 @@ abstract class CHostGeneral extends CHostBase {
 		$items = [
 			ZBX_FLAG_DISCOVERY_NORMAL => [],
 			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
 		while ($item = DBfetch($dbItems)) {
 			$items[$item['flags']][$item['itemid']] = [
@@ -479,7 +479,7 @@ abstract class CHostGeneral extends CHostBase {
 		$dbGraphs = DBSelect($sql);
 		$graphs = [
 			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
 		while ($graph = DBfetch($dbGraphs)) {
 			$graphs[$graph['flags']][$graph['graphid']] = [
