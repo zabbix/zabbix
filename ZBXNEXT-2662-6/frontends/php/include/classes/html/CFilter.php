@@ -28,6 +28,7 @@ class CFilter extends CTag {
 	private $navigator = false;
 	private $name = 'zbx_filter';
 	private $opened = true;
+	private $show_buttons = true;
 
 	public function __construct($filterid) {
 		parent::__construct('div', true);
@@ -57,6 +58,11 @@ class CFilter extends CTag {
 
 	public function setFooter($footer) {
 		$this->footer = $footer;
+		return $this;
+	}
+
+	public function removeButtons() {
+		$this->show_buttons = false;
 		return $this;
 	}
 
@@ -127,21 +133,22 @@ class CFilter extends CTag {
 			return null;
 		}
 
-		$buttons = (new CDiv())->addClass(ZBX_STYLE_FILTER_FORMS);
-
-		$url = new cUrl();
+		$url = new CUrl();
 		$url->removeArgument('sid');
 		$url->removeArgument('filter_set');
 		$url->setArgument('filter_rst', 1);
-		$resetButton = (new CRedirectButton(_('Reset'), $url->getUrl()))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
-		$filterButton = (new CSubmit('filter_set', _('Filter')))
-			->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
-
-		$buttons->addItem($filterButton);
-		$buttons->addItem($resetButton);
+		return (new CDiv())
+			->addClass(ZBX_STYLE_FILTER_FORMS)
+			->addItem(
+				(new CSubmit('filter_set', _('Filter')))
+					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+			)
+			->addItem(
+				(new CRedirectButton(_('Reset'), $url->getUrl()))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+			);
 
 		return $buttons;
 	}
@@ -155,7 +162,9 @@ class CFilter extends CTag {
 	public function endToString() {
 		$this->form->addItem($this->getTable());
 
-		$this->form->addItem($this->getButtons());
+		if ($this->show_buttons) {
+			$this->form->addItem($this->getButtons());
+		}
 
 		if($this->navigator) {
 			$this->form->addItem((new CDiv())->setId('scrollbar_cntr'));
