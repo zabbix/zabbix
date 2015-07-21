@@ -98,6 +98,18 @@ SELECT COUNT(itemid) as count, state, key_
 ```
 
 
+### Hostgroup exclusion
+
+(i.e. all hosts not in the `llnw-hg_cs-synced-hosts` -> 100100000000223)
+
+```sql
+SELECT hostid, host, name
+ FROM hosts
+ WHERE hostid NOT IN (SELECT hostid FROM hosts_groups WHERE groupid='100100000000223')
+ AND name NOT LIKE 'llnw-template_%';
+```
+
+
 ## Zabbix UI apache access log insights
 
 ### Number of accesses grouped by client type and IP
