@@ -132,6 +132,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
+		global $DB;
+
 		if (!empty($DB['DB'])) {
 			$config = select_config();
 			$theme = getUserTheme(CWebUser::$data);
