@@ -268,15 +268,13 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	sigset_t		mask, orig_mask;
 	struct tm		tm_local;
 #endif
+	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
+		return;
 
 #ifndef _WINDOWS
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR1);
 #endif
-
-	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
-		return;
-
 	if (LOG_TYPE_FILE == log_type)
 	{
 #ifndef _WINDOWS
