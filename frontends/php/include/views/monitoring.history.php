@@ -225,11 +225,9 @@ else {
 		if(!isset($filterForm)) {
 			$filterForm = new CFilter('web.history.filter.state');
 		}
-		$filterColumn1 = new CFormList();
 
 		// display the graph type filter for graphs with multiple items
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
-
 			$graphType = [
 				(new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, ($this->data['graphtype'] == GRAPH_TYPE_NORMAL)))
 					->setId('graphtype_'.GRAPH_TYPE_NORMAL),
@@ -238,8 +236,10 @@ else {
 					->setId('graphtype_'.GRAPH_TYPE_STACKED),
 				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
 			];
-			$filterColumn1->addRow(_('Graph type'), $graphType);
-			$filterForm->addColumn($filterColumn1);
+			$filterForm->addColumn(
+				(new CFormList())->addRow(_('Graph type'), $graphType)
+			);
+			$filterForm->removeButtons();
 
 			$filterForm->addVar('action', $this->data['action']);
 			$filterForm->addVar('itemids', $this->data['itemids']);
