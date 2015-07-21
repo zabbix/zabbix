@@ -295,6 +295,12 @@ class CItemPrototype extends CItemGeneral {
 						));
 					}
 
+					if ($application_prototype['name'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Empty application prototype name in item prototype "%1$s".', $item['name']
+						));
+					}
+
 					if (array_key_exists('templateid', $application_prototype)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
 							'Cannot set "templateid" field for application prototype in item prototype "%1$s".',
