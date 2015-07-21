@@ -320,7 +320,7 @@ class CConfigurationImport {
 				$itemsRefs[$expression['host']][$expression['item']] = $expression['item'];
 			}
 
-			if (isset($trigger['dependencies'])) {
+			if (array_key_exists('dependencies', $trigger)) {
 				foreach ($trigger['dependencies'] as $dependency) {
 					$triggersRefs[$dependency['name']][$dependency['expression']] = $dependency['expression'];
 				}
