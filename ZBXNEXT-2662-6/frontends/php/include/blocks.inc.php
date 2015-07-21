@@ -430,34 +430,30 @@ function make_system_status($filter) {
 			if ($unackTriggersNum) {
 				$unackTriggersNum = (new CSpan($unackTriggersNum))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->addClass(ZBX_STYLE_RED)
 					->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions, $config));
 			}
 
 			switch ($filter['extAck']) {
 				case EXTACK_OPTION_ALL:
-					$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, !$allTriggersNum));
+					$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, $data['count'] == 0));
 					break;
 
 				case EXTACK_OPTION_UNACK:
-					$groupRow->addItem(getSeverityCell($severity, $config, $unackTriggersNum, !$unackTriggersNum));
+					$groupRow->addItem(getSeverityCell($severity, $config, $unackTriggersNum,
+						$data['count_unack'] == 0
+					));
 					break;
 
 				case EXTACK_OPTION_BOTH:
-					if ($unackTriggersNum) {
-						$span = new CSpan(SPACE._('of').SPACE);
-						$unackTriggersNum = new CSpan($unackTriggersNum);
+					if ($data['count_unack'] != 0) {
+						$groupRow->addItem(getSeverityCell($severity, $config, [
+							$unackTriggersNum, ' '._('of').' ', $allTriggersNum
+						]));
 					}
 					else {
-						$span = null;
-						$unackTriggersNum = null;
+						$groupRow->addItem(getSeverityCell($severity, $config, $allTriggersNum, $data['count'] == 0));
 					}
-
-					$groupRow->addItem(getSeverityCell($severity,
-						$config,
-						[$unackTriggersNum, $span, $allTriggersNum],
-						!$allTriggersNum
-					));
+					break;
 			}
 		}
 
