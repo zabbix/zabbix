@@ -1637,7 +1637,7 @@ sub __update_false_positives
 		" from auditlog".
 		" where resourcetype=".AUDIT_RESOURCE_INCIDENT.
 			" and clock>$last_audit".
-		" group by eventid");
+		" group by details");
 
 	foreach my $row_ref (@$rows_ref)
 	{
