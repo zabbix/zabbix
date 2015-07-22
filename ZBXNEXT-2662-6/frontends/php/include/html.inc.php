@@ -41,18 +41,14 @@ function bold($str) {
 	if (is_array($str)) {
 		foreach ($str as $key => $val) {
 			if (is_string($val)) {
-				$b = new CTag('strong', true);
-				$b->addItem($val);
-				$str[$key] = $b;
+				$str[$key] = new CTag('b', true, $val);
 			}
 		}
+
+		return $str;
 	}
-	else {
-		$b = new CTag('strong', true, '');
-		$b->addItem($str);
-		$str = $b;
-	}
-	return $str;
+
+	return new CTag('b', true, $str);
 }
 
 function make_decoration($haystack, $needle, $class = null) {
@@ -802,9 +798,7 @@ function makeAdministrationGeneralMenu($selected)
  */
 function makeErrorIcon($error)
 {
-	return (new CSpan(
-		(new CTag('b', true))->addItem('&times;')
-	))
+	return (new CSpan(bold('&times;')))
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_RED);
 }
@@ -818,9 +812,7 @@ function makeErrorIcon($error)
  */
 function makeUnknownIcon($error)
 {
-	return (new CSpan(
-		(new CTag('b', true))->addItem('?')
-	))
+	return (new CSpan(bold('?')))
 		->addClass(ZBX_STYLE_STATUS_GREY)
 		->setHint($error, ZBX_STYLE_RED);
 }
@@ -834,9 +826,7 @@ function makeUnknownIcon($error)
  */
 function makeWarningIcon($error)
 {
-	return (new CSpan(
-		(new CTag('b', true))->addItem('!')
-	))
+	return (new CSpan(bold('!')))
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error);
 }
