@@ -464,7 +464,7 @@ var CScrollBar = Class.create({
 
 	size: {
 		scrollline:		null,	// scroll line width
-		barminwidth:	21		// bar minimal width
+		barminwidth:	40		// bar minimal width
 	},
 
 	position: {
@@ -494,7 +494,7 @@ var CScrollBar = Class.create({
 
 			// variable initialization
 			this.ghostBox = new CGhostBox(this.dom.ghost);
-			this.size.scrollline = width - 36; // border (17 * 2) + 2 = 36
+			this.size.scrollline = jQuery(this.dom.overlevel).width();
 			this.px2sec = (timeControl.timeline.endtime() - timeControl.timeline.starttime()) / this.size.scrollline;
 
 			// additional dom objects
@@ -670,13 +670,13 @@ var CScrollBar = Class.create({
 		if (width < this.size.barminwidth) {
 			width = this.size.barminwidth;
 		}
+		else if (width + 2 > this.size.scrollline) {
+			width = this.size.scrollline - 2;
+		}
 
 		// left min
-		if ((right - width) < 0) {
-			if (width < this.size.barminwidth) {
-				width = this.size.barminwidth;
-			}
-			right = width;
+		if ((right - width - 2) < 0) {
+			right = width + 2;
 
 			// actual bar dimensions shouldn't be over side limits
 			rightSide = right;
@@ -684,9 +684,6 @@ var CScrollBar = Class.create({
 
 		// right max
 		if (right > this.size.scrollline) {
-			if (width < this.size.barminwidth) {
-				width = this.size.barminwidth;
-			}
 			right = this.size.scrollline;
 
 			// actual bar dimensions shouldn't be over side limits
@@ -700,7 +697,7 @@ var CScrollBar = Class.create({
 
 		// set actual bar position
 		this.dom.bar.style.width = width + 'px';
-		this.dom.bar.style.left = (right - width) + 'px';
+		this.dom.bar.style.left = (right - jQuery(this.dom.bar).outerWidth()) + 'px';
 
 		// set timeline to given dimensions
 		this.position.bar.left = rightSide - periodWidth;
@@ -726,8 +723,8 @@ var CScrollBar = Class.create({
 		this.dom.ghost.style.width = dims.width + 'px';
 
 		// arrows
-		this.dom.left_arr.style.left = (dims.left - 4) + 'px';
-		this.dom.right_arr.style.left = (dims.left + dims.width - 3) + 'px';
+		this.dom.left_arr.style.left = (dims.left + 1) + 'px';
+		this.dom.right_arr.style.left = (dims.left + 1 + dims.width - jQuery(this.dom.right_arr).outerWidth()) + 'px';
 
 		this.position.ghost = getDimensions(this.dom.ghost);
 	},
@@ -863,13 +860,8 @@ var CScrollBar = Class.create({
 
 	// <left arr>
 	make_left_arr_dragable: function(element) {
-		var pD = {
-			left: jQuery(this.dom.overlevel).offset().left,
-			width: jQuery(this.dom.overlevel).width()
-		};
-
 		jQuery(element).draggable({
-			containment: [pD.left - 4, 0, pD.width + pD.left - 4, 0],
+			containment: 'parent',
 			axis: 'x',
 			start: this.leftArrowDragStart.bind(this),
 			drag: this.leftArrowDragChange.bind(this),
@@ -913,13 +905,8 @@ var CScrollBar = Class.create({
 
 	// <right arr>
 	make_right_arr_dragable: function(element) {
-		var pD = {
-			left: jQuery(this.dom.overlevel).offset().left,
-			width: jQuery(this.dom.overlevel).width()
-		};
-
 		jQuery(element).draggable({
-			containment: [pD.left - 4, 0, pD.width + pD.left - 5, 0],
+			containment: 'parent',
 			axis: 'x',
 			start: this.rightArrowDragStart.bind(this),
 			drag: this.rightArrowDragChange.bind(this),
@@ -1024,8 +1011,8 @@ var CScrollBar = Class.create({
 		var left = (this.ghostBox.sideToMove == 0 && this.ghostBox.flip >= 0) || (this.ghostBox.sideToMove == 1 && this.ghostBox.flip < 0);
 
 		// hack for bars most right position
-		if (dim.right == this.size.scrollline) {
-			if (dim.width != this.position.bar.width) {
+		if (dim.right + 2 == this.size.scrollline) {
+			if (dim.width + 2 != this.position.bar.width) {
 				this.position.bar.width = dim.width;
 				timeControl.timeline.period(new_period);
 			}
@@ -1326,10 +1313,12 @@ var CScrollBar = Class.create({
 		addListener(this.dom.right, 'click', this.navigateRight.bindAsEventListener(this), true);
 
 		// <overlevel>
+		var overlevel_width = width - jQuery(this.dom.left).outerWidth() - jQuery(this.dom.right).outerWidth() + 2;
+
 		this.dom.overlevel = document.createElement('div');
 		this.dom.scrollbar.appendChild(this.dom.overlevel);
 		this.dom.overlevel.className = 'overlevel';
-		$(this.dom.overlevel).setStyle({width: (width - 34) + 'px'});
+		$(this.dom.overlevel).setStyle({width: overlevel_width + 'px'});
 
 		this.dom.bar = document.createElement('div');
 		this.dom.overlevel.appendChild(this.dom.bar);
@@ -1386,63 +1375,6 @@ var CScrollBar = Class.create({
 		this.dom.subline.appendChild(this.dom.info_period);
 		this.dom.info_period.className = 'info_period';
 		this.dom.info_period.appendChild(document.createTextNode('0h 0m'));
-
-		/*
-		<div class="scrollbar">
-			<div class="info">
-				<div class="zoom">
-					<span class="text">Zoom:</span>
-					<span class="links">
-						<span class="link">1h</span>
-						<span class="link">2h</span>
-						<span class="link">3h</span>
-						<span class="link">6h</span>
-						<span class="link">12h</span>
-						<span class="link">1d</span>
-						<span class="link">5d</span>
-						<span class="link">1w</span>
-						<span class="link">1m</span>
-						<span class="link">3m</span>
-						<span class="link">6m</span>
-						<span class="link">YTD</span>
-						<span class="link">1y</span>
-					</span>
-				</div>
-				<div class="gmenu"></div>
-				<div class="timeline">
-					<span class="info_right">30.06.2009 16:35:08</span>
-					<span class="info_sep1"> - </span>
-					<span class="info_left">30.06.2009 16:35:00</span>
-				</div>
-			</div>
-			<div class="sublevel">
-				<div class="left"></div>
-				<div class="right"></div>
-				<div class="bg">
-				</div>
-			</div>
-			<div class="overlevel">
-				<div class="bar">
-					<div class="icon">
-						<div class="center"></div>
-					</div>
-				</div>
-				<div class="ghost">
-					<div class="left_arr"></div>
-					<div class="right_arr"></div>
-				</div>
-			</div>
-			<div class="subline">
-				<div class="nav_links"></div>
-				<div class="info_period">0h 0m</div>
-				<div class="period">
-					(
-					<span class="period_state">fixed</span>
-					)
-				</div>
-			</div>
-		</div>
-		*/
 	}
 });
 
@@ -1474,6 +1406,10 @@ var CGhostBox = Class.create({
 		}
 	},
 
+	size: {
+		barminwidth:	40		// bar minimal width
+	},
+
 	startResize: function(side) {
 		var dimensions = getDimensions(this.box);
 
@@ -1497,27 +1433,27 @@ var CGhostBox = Class.create({
 
 		// resize from the left
 		if (this.sideToMove == 0) {
-			this.flip =  this.start.rightSide - (this.start.leftSide + px);
-			if (this.flip < 0) {
-				this.current.leftSide = this.start.rightSide;
-				this.current.rightSide = this.start.rightSide + Math.abs(this.flip);
+			var width = this.start.rightSide - this.start.leftSide - px;
+
+			if (width < this.size.barminwidth) {
+				this.current.leftSide = this.start.rightSide - this.size.barminwidth;
 			}
 			else {
 				this.current.leftSide = this.start.leftSide + px;
-				this.current.rightSide = this.start.rightSide;
 			}
+			this.current.rightSide = this.start.rightSide;
 		}
 		// resize from the right
 		else if (this.sideToMove == 1) {
-			this.flip = (this.start.rightSide + px) - this.start.leftSide;
-			if (this.flip < 0) {
-				this.current.leftSide = this.start.leftSide - Math.abs(this.flip);
-				this.current.rightSide = this.start.leftSide;
+			var width = this.start.rightSide - this.start.leftSide + px;
+
+			if (width < this.size.barminwidth) {
+				this.current.rightSide = this.start.leftSide + this.size.barminwidth;
 			}
 			else {
-				this.current.leftSide = this.start.leftSide;
 				this.current.rightSide = this.start.rightSide + px;
 			}
+			this.current.leftSide = this.start.leftSide;
 		}
 
 		this.current.width = this.current.rightSide - this.current.leftSide;

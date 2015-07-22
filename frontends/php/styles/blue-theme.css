@@ -382,6 +382,7 @@ footer, .footer {
     text-rendering: optimizeLegibility;
     height: 100%;
     overflow: hidden;
+    white-space: nowrap;
     padding: 8px 5px 7px 5px;
     vertical-align: bottom;
     border-bottom: 2px solid #ebeef0;
@@ -424,7 +425,7 @@ footer, .footer {
     .list-table tbody tr:last-child td {
       border-bottom: none; }
   .list-table td {
-    padding: 8px 5px 8px 5px;
+    padding: 8px 5px;
     vertical-align: middle;
     border-bottom: 1px solid #ebeef0; }
   .list-table .vertical_rotation_inner {
@@ -732,7 +733,7 @@ footer, .footer {
 .overlevel {
   position: absolute;
   top: 14px;
-  left: 28px;
+  left: 30px;
   height: 24px;
   margin: 5px 0; }
 
@@ -765,9 +766,9 @@ footer, .footer {
     background-color: #eef7ff;
     border-color: #0275b8; }
   .icon .center {
-    width: 22px;
+    width: 10px;
     height: 22px;
-    background: url(../img/icon-sprite.svg) no-repeat -4px -799px;
+    background: url(../img/icon-sprite.svg) no-repeat -13px -799px;
     margin: 0 auto; }
 
 .ghost {
@@ -1147,7 +1148,7 @@ button {
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
 
-.btn-conf, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .drag-icon {
+.btn-conf, .btn-max, .btn-min, .btn-add-fav, .btn-remove-fav, .btn-action, .btn-info, .btn-reset, .icon-help, .icon-cal, .icon-mainten, .drag-icon {
   width: 24px;
   height: 24px;
   padding: 0; }
@@ -1242,7 +1243,10 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 .icon-cal {
   background: transparent url(../img/icon-sprite.svg) no-repeat -42px -834px; }
 
-.icon-help, .icon-cal {
+.icon-mainten {
+  background: transparent url(../img/icon-sprite.svg) no-repeat -45px -802px; }
+
+.icon-help, .icon-cal, .icon-mainten {
   border: none;
   position: absolute;
   cursor: pointer;
@@ -1251,15 +1255,15 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   -webkit-transition: opacity 0.2s ease-out;
   -moz-transition: opacity 0.2s ease-out;
   transition: opacity 0.2s ease-out; }
-  .icon-help:hover, .icon-cal:hover {
+  .icon-help:hover, .icon-cal:hover, .icon-mainten:hover {
     opacity: 1;
     filter: alpha(opacity=100);
     background-color: transparent; }
-  .icon-help:focus, .icon-cal:focus {
+  .icon-help:focus, .icon-cal:focus, .icon-mainten:focus {
     opacity: 1;
     filter: alpha(opacity=100);
     background-color: transparent; }
-  .icon-help:active, .icon-cal:active {
+  .icon-help:active, .icon-cal:active, .icon-mainten:active {
     opacity: 1;
     filter: alpha(opacity=100);
     background-color: transparent; }
@@ -1862,7 +1866,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   .msg-good .overlay-close-btn {
     color: #429e47; }
   .msg-good ul {
-    border-top-color: #a5d6a7; }
+    border-top: 1px solid #a5d6a7; }
   .msg-good button {
     background-color: #fff;
     color: #2a502c;
@@ -1892,10 +1896,12 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
     left: 15px;
     margin-bottom: 20px; }
   .msg-details ul {
+    margin: 8px 0 0 0;
     border-top-width: 1px;
+    border-top-style: dashed;
     font-size: 0.85em; }
     .msg-details ul li {
-      margin: 0.4em 0 0.4em 0; }
+      margin: 0.5em 0 0 0; }
 
 .msg-buttons {
   text-align: right;
@@ -1921,9 +1927,9 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   bottom: 0;
   z-index: 10000;
   width: 100%;
-  padding: 7px 5px;
+  padding: 5px 5px;
   text-align: center;
-  color: #734d00;
+  color: #593c00;
   background-color: #ffc859;
   border-top: 1px solid #ffc040; }
 
@@ -2098,7 +2104,23 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .cursor-move {
   cursor: move; }
 
-.overflow-ellipsis {
+.cursor-pointer {
+  cursor: pointer; }
+
+.overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
+
+.tick-icon {
+  display: block;
+  width: 24px;
+  height: 24px;
+  position: absolute;
+  top: 3px;
+  left: -3px;
+  background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
+  background-size: auto; }
+
+.overflow-ellipsis {
+  table-layout: fixed; }
