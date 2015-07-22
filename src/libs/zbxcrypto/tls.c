@@ -1352,9 +1352,7 @@ static void	zbx_read_psk_file(void)
 		goto out;
 	}
 
-	/* Thanks to Tim Cas for this one-liner from */
-	/* http://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input */
-	buf[strcspn(buf, "\r\n")] = '\0';
+	buf[strcspn(buf, "\r\n")] = '\0';	/* discard newline at the end of string */
 
 	if (0 == (len = strlen(buf)))
 	{
