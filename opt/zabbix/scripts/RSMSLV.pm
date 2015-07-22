@@ -92,6 +92,8 @@ my @_sender_values;	# used to send values to Zabbix server
 
 my $POD2USAGE_FILE;	# usage message file
 
+my $global_sql;
+
 sub get_macro_minns
 {
 	return __get_macro('{$RSM.DNS.AVAIL.MINNS}');
@@ -713,7 +715,7 @@ sub handle_db_error
 {
 	my $msg = shift;
 
-	fail("database error: $msg");
+	fail("database error: $msg (query was: $global_sql)");
 }
 
 sub db_connect
@@ -722,9 +724,9 @@ sub db_connect
 		not defined($config->{'db'}) or
 		not defined($config->{'db'}->{'name'}));
 
-	$dbh = DBI->connect('DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'},
-		$config->{'db'}->{'user'},
-		$config->{'db'}->{'password'},
+	$global_sql = 'DBI:mysql:'.$config->{'db'}->{'name'}.':'.$config->{'db'}->{'host'};
+
+	$dbh = DBI->connect($global_sql, $config->{'db'}->{'user'}, $config->{'db'}->{'password'},
 		{
 			PrintError  => 0,
 			HandleError => \&handle_db_error,
@@ -738,12 +740,12 @@ sub db_connect
 
 sub db_select
 {
-	my $query = shift;
+	$global_sql = shift;
 
-	my $sth = $dbh->prepare($query)
-		or fail("cannot prepare [$query]: ", $dbh->errstr);
+	my $sth = $dbh->prepare($global_sql)
+		or fail("cannot prepare [$global_sql]: ", $dbh->errstr);
 
-	dbg("[$query]");
+	dbg("[$global_sql]");
 
 	my ($start, $exe, $fetch, $total);
 	if (opt('warnslow'))
@@ -752,7 +754,7 @@ sub db_select
 	}
 
 	$sth->execute()
-		or fail("cannot execute [$query]: ", $sth->errstr);
+		or fail("cannot execute [$global_sql]: ", $sth->errstr);
 
 	if (opt('warnslow'))
 	{
@@ -770,7 +772,7 @@ sub db_select
 		{
 			$fetch = $now - $exe;
 			$exe = $exe - $start;
-			wrn("slow query: [$query] took ", sprintf("%.3f seconds (execute:%.3f fetch:%.3f)", $total, $exe, $fetch));
+			wrn("slow query: [$global_sql] took ", sprintf("%.3f seconds (execute:%.3f fetch:%.3f)", $total, $exe, $fetch));
 		}
 	}
 
