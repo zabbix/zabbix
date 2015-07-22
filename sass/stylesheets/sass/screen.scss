@@ -634,7 +634,7 @@ footer {
 	}
 
 	td {
-		padding: 8px 5px 8px 5px;
+		padding: 8px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
@@ -1073,7 +1073,7 @@ footer {
 .overlevel {
 	position: absolute;
 	top: 14px;
-	left: 28px;
+	left: 30px;
 	height: 24px;
 	margin: 5px 0;
 }
@@ -1109,9 +1109,9 @@ footer {
 	}
 
 	.center {
-		width: 22px;
+		width: 10px;
 		height: 22px;
-		background: url(../img/icon-sprite.svg) no-repeat -4px -799px;
+		background: url(../img/icon-sprite.svg) no-repeat -13px -799px;
 		margin: 0 auto;
 	}
 }
@@ -1827,15 +1827,29 @@ button[disabled] {
 	}
 }
 
+//.icon-mainten {
+	//background: url(../img/icon-sprite.svg) no-repeat -45px -803px;
+	//display: inline-block;
+	//width: 15px;
+	//height: 13px;
+	//cursor: pointer;
+//}
+
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
+	mainten: url(../img/icon-sprite.svg) no-repeat -45px -802px
 );
 
 @each $form-icon-btn, $bgimage in $form-icon-btn {
     .icon-#{$form-icon-btn} {
         background: $transparent $bgimage;
         @extend %form-icon-btn;
+
+//        @if $form-icon-btn == 'mainten' {
+//        	width: 15px;
+//        	height: 13px;
+//        }
     }
 }
 
@@ -2761,7 +2775,7 @@ td.disaster-bg {
 	}
 
 	ul {
-		border-top-color: $light-green;
+		border-top: 1px solid $light-green;
 	}
 
 	button {
@@ -2808,14 +2822,15 @@ td.disaster-bg {
 	}
 
 	ul {
+		margin: 8px 0 0 0;
 		border-top-width: 1px;
+		border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
-			margin: 0.4em 0 0.4em 0; 
+			margin: 0.5em 0 0 0; 
 		}
 	}
-
 }
 
 .msg-buttons {
@@ -2846,9 +2861,9 @@ td.disaster-bg {
 	bottom: 0;
 	z-index: 10000;
 	width: 100%;
-	padding: 7px 5px;
+	padding: 5px 5px;
 	text-align: center;
-	color: darken($alt-yellow,45%);
+	color: darken($alt-yellow,50%);
 	background-color: $alt-yellow;
 	border-top: 1px solid darken($alt-yellow,5%);
 }
@@ -3064,21 +3079,28 @@ $browser-logos: (
 	cursor: move;
 }
 
+.cursor-pointer {
+	cursor: pointer;
+}
+
 %overflow-ellipsis {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
 
-//.tick-icon {
-//	display: block;
-//  width: 24px;
-//  height: 24px;
-//  position: absolute;
-//  top: 3px;
-//  left: -3px;
-//  background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
-//}
+.tick-icon {
+	display: block;
+	width: 24px;
+	height: 24px;
+	position: absolute;
+	top: 3px;
+	left: -3px;
+	background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
+	//background-size: auto 200%;
+	background-size: auto ;
+}
+
 .overflow-ellipsis {
 	table-layout: fixed;
 
