@@ -166,10 +166,11 @@ class CFilter extends CTag {
 			$this->form->addItem($this->getButtons());
 		}
 
-		if($this->navigator) {
+		if ($this->navigator) {
 			$this->form->addItem((new CDiv())->setId('scrollbar_cntr'));
 		}
-		if($this->footer !== null) {
+
+		if ($this->footer !== null) {
 			$this->form->addItem($this->footer);
 		}
 
