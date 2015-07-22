@@ -1152,7 +1152,7 @@ function getActionMessages(array $alerts) {
 			$status,
 			$retries,
 			$recipient,
-			[new CTag('b', true, $alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
+			[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
 			$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
 		]);
 	}

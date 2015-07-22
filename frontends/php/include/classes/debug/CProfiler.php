@@ -136,7 +136,7 @@ class CProfiler {
 
 			// api method
 			$debug[] = ($i + 1).'. ';
-			$debug[] = new CTag('b', true, $class.'.'.$method);
+			$debug[] = bold($class.'.'.$method);
 			$debug[] = ($file !== null ? ' ['.$file.':'.$line.']' : null);
 			$debug[] = BR();
 			$debug[] = BR();
@@ -164,7 +164,7 @@ class CProfiler {
 			];
 
 			if ($time > $this->slowSqlQueryTime) {
-				$sql = new CTag('b', true, $sql);
+				$sql = bold($sql);
 			}
 			$debug[] = $sql;
 
