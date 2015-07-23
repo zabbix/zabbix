@@ -760,11 +760,11 @@ footer {
 
 .treeview {
 	display: inline-block;
-	width: 18px;
+	width: 16px;
 	height: 18px;
 	line-height: 18px;
 	text-align: center;
-	margin-left: -2px;
+	//margin-left: -2px;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -1829,8 +1829,9 @@ button[disabled] {
 
 $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -46px -731px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -46px -767px
+	depend-up: url(../img/icon-sprite.svg) no-repeat -46px -730px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -46px -766px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -5px -835px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -2784,7 +2785,7 @@ td.disaster-bg {
 	}
 
 	ul {
-		border-top: 1px solid $light-green;
+		border-top-color: $light-green;
 	}
 
 	button {
@@ -2831,13 +2832,19 @@ td.disaster-bg {
 	}
 
 	ul {
-		margin: 8px 0 0 0;
-		border-top-width: 1px;
-		border-top-style: dashed;
+		//margin: 8px 0 0 0;
+		//border-top-width: 1px;
+		//border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
-			margin: 0.5em 0 0 0; 
+			margin: 0.25em 0 0.25em 0; 
+		}
+
+		&.msg-details-border {
+			margin: 8px 0 0 0;
+			border-top-width: 1px;
+			border-top-style: dashed;
 		}
 	}
 }
@@ -3096,18 +3103,6 @@ $browser-logos: (
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
-}
-
-.tick-icon {
-	display: block;
-	width: 24px;
-	height: 24px;
-	position: absolute;
-	top: 3px;
-	left: -3px;
-	background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
-	//background-size: auto 200%;
-	background-size: auto ;
 }
 
 .overflow-ellipsis {
