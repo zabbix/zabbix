@@ -408,7 +408,7 @@ $form = (new CForm('GET', 'history.php'))
 	->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
 
 // table
-$table = new CTableInfo();
+$table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 if ($filterSet) {
 	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
 }
@@ -418,11 +418,11 @@ $toggle_all = (new CColHeader(
 		->addClass(ZBX_STYLE_TREEVIEW)
 		->addClass('app-list-toggle-all')
 		->addItem(new CSpan())
-))->addClass(ZBX_STYLE_CELL_WIDTH);
+))->addStyle('width: 18px');
 
 $check_all = (new CColHeader(
 	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
-))->addClass(ZBX_STYLE_CELL_WIDTH);
+))->addStyle('width: 15px');
 
 if ($filter['showDetails']) {
 	$table->setHeader([
@@ -440,7 +440,7 @@ if ($filter['showDetails']) {
 		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
 		(new CColHeader(_x('Change', 'noun in latest data')))->addStyle('width: 10%'),
 		(new CColHeader())->addStyle('width: 5%'),
-		(new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH)
+		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 }
 else {
@@ -559,9 +559,7 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			(new CCol([$item['name_expanded'], BR(), $itemKey]))
-				->addClass($state_css)
-				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
 			(new CCol(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -582,9 +580,7 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			(new CCol($item['name_expanded']))
-				->addClass($state_css)
-				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($item['name_expanded']))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
@@ -744,9 +740,7 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			(new CCol([$item['name_expanded'], BR(), $itemKey]))
-				->addClass($state_css)
-				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
 			(new CCol(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
@@ -767,9 +761,7 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			(new CCol($item['name_expanded']))
-				->addClass($state_css)
-				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($item['name_expanded']))->addClass($state_css),
 			(new CCol($lastClock))->addClass($state_css),
 			(new CCol($lastValue))->addClass($state_css),
 			(new CCol($change))->addClass($state_css),
