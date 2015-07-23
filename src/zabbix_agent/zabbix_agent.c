@@ -48,7 +48,8 @@ int		process_num;
 int		server_num	= 0;
 
 const char	*help_message[] = {
-	"A Zabbix executable for monitoring of various server parameters, to be started upon request by inetd.",
+	"A Zabbix executable for monitoring of various server parameters, to be started",
+	"upon request by inetd.",
 	"",
 	"Options:",
 	"  -c --config config-file  Absolute path to the configuration file",
