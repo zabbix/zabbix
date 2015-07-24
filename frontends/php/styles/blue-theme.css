@@ -515,11 +515,10 @@ footer, .footer {
 
 .treeview {
   display: inline-block;
-  width: 18px;
+  width: 16px;
   height: 18px;
   line-height: 18px;
-  text-align: center;
-  margin-left: -2px; }
+  text-align: center; }
   .treeview .arrow-right {
     border-left-color: #768d99; }
   .treeview .arrow-down {
@@ -696,6 +695,7 @@ footer, .footer {
 .scrollbar {
   position: relative;
   margin: 0 auto;
+  margin-bottom: 10px;
   line-height: 1em;
   height: 52px; }
   .scrollbar .selected, .scrollbar .calendar .selected:hover, .calendar .scrollbar .selected:hover {
@@ -1247,6 +1247,9 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 .icon-depend-down {
   background: url(../img/icon-sprite.svg) no-repeat -46px -767px; }
 
+.icon-ackn {
+  background: url(../img/icon-sprite.svg) no-repeat -5px -835px; }
+
 .icon-help {
   background: transparent url(../img/icon-sprite.svg) no-repeat -6px -726px; }
 
@@ -1275,10 +1278,10 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
     filter: alpha(opacity=100);
     background-color: transparent; }
 
-.icon-maint, .icon-depend-up, .icon-depend-down {
+.icon-maint, .icon-depend-up, .icon-depend-down, .icon-ackn {
   display: inline-block;
   cursor: pointer;
-  width: 16px;
+  width: 14px;
   height: 14px; }
 
 .drag-icon {
@@ -1879,7 +1882,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   .msg-good .overlay-close-btn {
     color: #429e47; }
   .msg-good ul {
-    border-top: 1px solid #a5d6a7; }
+    border-top-color: #a5d6a7; }
   .msg-good button {
     background-color: #fff;
     color: #2a502c;
@@ -1909,12 +1912,13 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
     left: 15px;
     margin-bottom: 20px; }
   .msg-details ul {
-    margin: 8px 0 0 0;
-    border-top-width: 1px;
-    border-top-style: dashed;
     font-size: 0.85em; }
     .msg-details ul li {
-      margin: 0.5em 0 0 0; }
+      margin: 0.25em 0 0.25em 0; }
+    .msg-details ul.msg-details-border {
+      margin: 8px 0 0 0;
+      border-top-width: 1px;
+      border-top-style: dashed; }
 
 .msg-buttons {
   text-align: right;
@@ -2125,15 +2129,10 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   text-overflow: ellipsis;
   white-space: nowrap; }
 
-.tick-icon {
-  display: block;
-  width: 24px;
-  height: 24px;
-  position: absolute;
-  top: 3px;
-  left: -3px;
-  background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
-  background-size: auto; }
-
 .overflow-ellipsis {
   table-layout: fixed; }
+
+.rel-container {
+  position: relative;
+  display: inline-block;
+  padding-right: 14px; }

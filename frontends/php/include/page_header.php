@@ -178,7 +178,7 @@ CSS;
 	$pageHeader->display();
 ?>
 <body>
-<div class="msg-bad-global" id="msg-bad-global"></div>
+<div class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></div>
 <?php
 }
 
