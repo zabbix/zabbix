@@ -505,6 +505,24 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 	$triggerIdsDown[$row['triggerid_up']][] = intval($row['triggerid_down']);
 }
 
+$maintenanceids = [];
+
+foreach ($triggers as $trigger) {
+	foreach ($trigger['hosts'] as $host) {
+		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			$maintenanceids[$host['maintenanceid']] = true;
+		}
+	}
+}
+
+if ($maintenanceids) {
+	$maintenances = API::Maintenance()->get([
+		'maintenanceids' => array_keys($maintenanceids),
+		'output' => ['name', 'description'],
+		'preservekeys' => true
+	]);
+}
+
 foreach ($triggers as $trigger) {
 	$description = (new CSpan($trigger['description']))
 		->addClass(ZBX_STYLE_LINK_ACTION)
@@ -560,46 +578,44 @@ foreach ($triggers as $trigger) {
 
 	// host js menu
 	$hostList = [];
-	foreach ($trigger['hosts'] as $triggerHost) {
+	foreach ($trigger['hosts'] as $host) {
 		// fetch scripts for the host js menu
 		$scripts = [];
-		if (isset($scriptsByHosts[$triggerHost['hostid']])) {
-			foreach ($scriptsByHosts[$triggerHost['hostid']] as $script) {
+		if (isset($scriptsByHosts[$host['hostid']])) {
+			foreach ($scriptsByHosts[$host['hostid']] as $script) {
 				$scripts[] = $script;
 			}
 		}
 
-		$hostName = (new CSpan($triggerHost['name']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
+		$host_name = [
+			(new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$host['hostid']], $scripts))
+		];
 
 		// add maintenance icon with hint if host is in maintenance
-		if ($triggerHost['maintenance_status']) {
-			$maintenanceIcon = (new CDiv())->addClass('icon-maintenance-inline');
+		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			$maintenance_icon = (new CSpan())->addClass(ZBX_STYLE_ICON_MAINT);
 
-			$maintenances = API::Maintenance()->get([
-				'maintenanceids' => $triggerHost['maintenanceid'],
-				'output' => API_OUTPUT_EXTEND,
-				'limit' => 1
-			]);
+			if (array_key_exists($host['maintenanceid'], $maintenances)) {
+				$maintenance = $maintenances[$host['maintenanceid']];
 
-			if ($maintenance = reset($maintenances)) {
-				$hint = $maintenance['name'].' ['.($triggerHost['maintenance_type']
+				$hint = $maintenance['name'].' ['.($host['maintenance_type']
 					? _('Maintenance without data collection')
 					: _('Maintenance with data collection')).']';
 
-				if (isset($maintenance['description'])) {
-					// double quotes mandatory
+				if ($maintenance['description']) {
 					$hint .= "\n".$maintenance['description'];
 				}
 
-				$maintenanceIcon->setHint($hint);
+				$maintenance_icon->setHint($hint);
 			}
 
-			$hostName->addItem($maintenanceIcon);
+			$host_name[] = $maintenance_icon;
+			$host_name = (new CSpan($host_name))->addClass(ZBX_STYLE_REL_CONTAINER);
 		}
 
-		$hostList[] = $hostName;
+		$hostList[] = $host_name;
 		$hostList[] = ', ';
 	}
 	array_pop($hostList);
