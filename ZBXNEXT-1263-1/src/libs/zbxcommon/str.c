@@ -69,7 +69,8 @@ void	version(void)
  *                                                                            *
  * Function: usage                                                            *
  *                                                                            *
- * Purpose: print application parameters on stdout                            *
+ * Purpose: print application parameters on stdout with layout suitable for   *
+ *          80-column terminal                                                *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -79,13 +80,49 @@ void	version(void)
  ******************************************************************************/
 void	usage(void)
 {
+#define ZBX_MAXCOL	79
+#define ZBX_SPACE1	"  "			/* left margin for the first line */
+#define ZBX_SPACE2	"                "	/* left margin for subsequent lines */
 	const char	**p = usage_message;
 
 	if (NULL != *p)
 		printf("usage:\n");
 
 	while (NULL != *p)
-		printf("  %s %s\n", progname, *p++);
+	{
+		size_t	pos;
+
+		printf("%s%s", ZBX_SPACE1, progname);
+
+		if (ZBX_MAXCOL <= (pos = strlen(ZBX_SPACE1) + strlen(progname)))
+			printf("\n");
+
+		while (NULL != *p)
+		{
+			size_t	len;
+
+			len = strlen(*p);
+
+			if (ZBX_MAXCOL > (pos + len))
+			{
+				pos += len + 1;
+				printf(" %s", *p);
+			}
+			else
+			{
+				pos = strlen(ZBX_SPACE2) + len;
+				printf("\n%s%s", ZBX_SPACE2, *p);
+			}
+
+			p++;
+		}
+
+		printf("\n");
+		p++;
+	}
+#undef ZBX_MAXCOL
+#undef ZBX_SPACE1
+#undef ZBX_SPACE2
 }
 
 /******************************************************************************
