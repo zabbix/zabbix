@@ -1842,7 +1842,6 @@ $var-icons: (
 
         @if $var-icons == 'maint' {
         	position: absolute;
-        	right: -16px;
         }
     }
 }
@@ -1886,7 +1885,7 @@ $form-icon-btn: (
 %var-icons {
 	display: inline-block;
 	cursor: pointer;
-	width: 16px;
+	width: 14px;
 	height: 14px;
 }
 
@@ -3125,4 +3124,6 @@ $browser-logos: (
 
 .rel-container {
 	position: relative;
+	display: inline-block;
+	padding-right: 14px;
 }
