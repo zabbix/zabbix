@@ -33,11 +33,11 @@ const char	*progname = NULL;
 const char	title_message[] = "zabbix_agent";
 const char	syslog_app_name[] = "zabbix_agent";
 const char	*usage_message[] = {
-	"[-c config-file]",
-	"[-c config-file] -p",
-	"[-c config-file] -t item-key",
-	"-h",
-	"-V",
+	"[-c config-file]", NULL,
+	"[-c config-file]", "-p", NULL,
+	"[-c config-file]", "-t item-key", NULL,
+	"-h", NULL,
+	"-V", NULL,
 	NULL	/* end of text */
 };
 

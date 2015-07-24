@@ -30,13 +30,16 @@ const char	*progname = NULL;
 const char	title_message[] = "zabbix_get";
 const char	syslog_app_name[] = "zabbix_get";
 const char	*usage_message[] = {
-	"-s host-name-or-IP [-p port-number] [-I IP-address] -k item-key",
+	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "-k item-key", NULL,
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect cert --tls-ca-file CA-file [--tls-crl-file CRL-file] [--tls-agent-cert-issuer cert-issuer] [--tls-agent-cert-subject cert-subject] --tls-cert-file cert-file --tls-key-file key-file -k item-key",
-	"-s host-name-or-IP [-p port-number] [-I IP-address] --tls-connect psk --tls-psk-identity PSK-identity --tls-psk-file PSK-file -k item-key",
+	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "--tls-connect cert", "--tls-ca-file CA-file",
+	"[--tls-crl-file CRL-file]", "[--tls-agent-cert-issuer cert-issuer]", "[--tls-agent-cert-subject cert-subject]",
+	"--tls-cert-file cert-file", "--tls-key-file key-file", "-k item-key", NULL,
+	"-s host-name-or-IP", "[-p port-number]", "[-I IP-address]", "--tls-connect psk",
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "-k item-key", NULL,
 #endif
-	"-h",
-	"-V",
+	"-h", NULL,
+	"-V", NULL,
 	NULL	/* end of text */
 };
 

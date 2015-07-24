@@ -58,10 +58,10 @@ const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
 const char	*usage_message[] = {
-	"[-c config-file]",
-	"[-c config-file] -R runtime-option",
-	"-h",
-	"-V",
+	"[-c config-file]", NULL,
+	"[-c config-file]", "-R runtime-option", NULL,
+	"-h", NULL,
+	"-V", NULL,
 	NULL	/* end of text */
 };
 

@@ -82,19 +82,19 @@ const char	syslog_app_name[] = "zabbix_agentd";
 
 /* application USAGE message */
 const char	*usage_message[] = {
-	"[-c config-file]",
-	"[-c config-file] -p",
-	"[-c config-file] -t item-key",
+	"[-c config-file]", NULL,
+	"[-c config-file]", "-p", NULL,
+	"[-c config-file]", "-t item-key", NULL,
 #ifdef _WINDOWS
-	"[-c config-file] -i [-m]",
-	"[-c config-file] -d [-m]",
-	"[-c config-file] -s [-m]",
-	"[-c config-file] -x [-m]",
+	"[-c config-file]", "-i", "[-m]", NULL,
+	"[-c config-file]", "-d", "[-m]", NULL,
+	"[-c config-file]", "-s", "[-m]", NULL,
+	"[-c config-file]", "-x", "[-m]", NULL,
 #else
-	"[-c config-file] -R runtime-option",
+	"[-c config-file]", "-R runtime-option", NULL,
 #endif
-	"-h",
-	"-V",
+	"-h", NULL,
+	"-V", NULL,
 	NULL	/* end of text */
 };
 /* end of application USAGE message */
