@@ -843,23 +843,23 @@ footer {
 		padding: 0 10px;
 	}
 
-	.list-table {                                       
-		margin-bottom: -10px;
-		border: none;
+	//.list-table {                                       
+	//	margin-bottom: -10px;
+	//	border: none;
 
-		thead {
+	//	thead {
 
-			th {
-				font-size: $font-form-size;
-				text-transform: none;
-				text-rendering: auto;
-				letter-spacing: normal;
-				color: initial;
-				padding: 8px 5px 5px 5px;
-				border-bottom-width: 1px;
-			}
-		}
-	}
+	//		th {
+	//			font-size: $font-form-size;
+	//			text-transform: none;
+	//			text-rendering: auto;
+	//			letter-spacing: normal;
+	//			color: initial;
+	//			padding: 8px 5px 5px 5px;
+	//			border-bottom-width: 1px;
+	//		}
+	//	}
+	//}
 }
 
 .subfilter-enabled {
@@ -1817,19 +1817,8 @@ button[disabled] {
 	}
 }
 
-.icon-help-position {
-	position: relative;
-	padding: 8px 5px;
-
-	button {
-		position: absolute;
-		top: 3px;
-		left: -3px;
-	}
-}
-
 $var-icons: (
-	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
+	maint: url(../img/icon-sprite.svg) no-repeat -49px -802px,
 	depend-up: url(../img/icon-sprite.svg) no-repeat -46px -731px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -46px -767px,
 	ackn: url(../img/icon-sprite.svg) no-repeat -5px -835px
@@ -1884,7 +1873,6 @@ $form-icon-btn: (
 
 %var-icons {
 	display: inline-block;
-	cursor: pointer;
 	width: 14px;
 	height: 14px;
 }
@@ -3124,6 +3112,12 @@ $browser-logos: (
 
 .rel-container {
 	position: relative;
-	display: inline-block;
-	padding-right: 14px;
+	//display: inline-block;
+	//padding-right: 14px;
+	padding: 8px 14px 8px 5px;
+
+  .icon-help {
+  	top: 3px;
+  	left: -3px;
+  }
 }
