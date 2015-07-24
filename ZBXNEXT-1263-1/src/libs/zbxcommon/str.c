@@ -82,7 +82,7 @@ void	usage(void)
 {
 #define ZBX_MAXCOL	79
 #define ZBX_SPACE1	"  "			/* left margin for the first line */
-#define ZBX_SPACE2	"                "	/* left margin for subsequent lines */
+#define ZBX_SPACE2	"               "	/* left margin for subsequent lines */
 	const char	**p = usage_message;
 
 	if (NULL != *p)
@@ -93,13 +93,17 @@ void	usage(void)
 		size_t	pos;
 
 		printf("%s%s", ZBX_SPACE1, progname);
-
-		if (ZBX_MAXCOL <= (pos = strlen(ZBX_SPACE1) + strlen(progname)))
-			printf("\n");
+		pos = strlen(ZBX_SPACE1) + strlen(progname);
 
 		while (NULL != *p)
 		{
 			size_t	len;
+
+			if (ZBX_MAXCOL <= pos)
+			{
+				printf("\n%s", ZBX_SPACE2);
+				pos = strlen(ZBX_SPACE2);
+			}
 
 			len = strlen(*p);
 
@@ -110,8 +114,8 @@ void	usage(void)
 			}
 			else
 			{
-				pos = strlen(ZBX_SPACE2) + len;
-				printf("\n%s%s", ZBX_SPACE2, *p);
+				pos = strlen(ZBX_SPACE2) + len + 1;
+				printf("\n%s %s", ZBX_SPACE2, *p);
 			}
 
 			p++;
