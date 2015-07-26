@@ -1007,12 +1007,9 @@ var CScrollBar = Class.create({
 			new_period = this.roundTime(new_period) - this.getTZOffset(new_period);
 		}
 
-		var right = (this.ghostBox.sideToMove == 1 && this.ghostBox.flip >= 0) || (this.ghostBox.sideToMove == 0 && this.ghostBox.flip < 0);
-		var left = (this.ghostBox.sideToMove == 0 && this.ghostBox.flip >= 0) || (this.ghostBox.sideToMove == 1 && this.ghostBox.flip < 0);
-
 		// hack for bars most right position
 		if (dim.right + 2 == this.size.scrollline) {
-			if (dim.width + 2 != this.position.bar.width) {
+			if (dim.width != this.position.bar.width) {
 				this.position.bar.width = dim.width;
 				timeControl.timeline.period(new_period);
 			}
@@ -1020,10 +1017,10 @@ var CScrollBar = Class.create({
 			timeControl.timeline.setNow();
 		}
 		else {
-			if (right) {
+			if (this.ghostBox.sideToMove == 1) {
 				new_usertime = this.ghostBox.userstartime + new_period;
 			}
-			else if (left) {
+			else if (this.ghostBox.sideToMove == 0) {
 				new_usertime = this.ghostBox.userstartime;
 			}
 
@@ -1381,8 +1378,7 @@ var CScrollBar = Class.create({
 var CGhostBox = Class.create({
 
 	box:		null, // resized dom object
-	sideToMove:	null, // 0 - left side, 1 - right side
-	flip:		null, // if flip < 0, ghost is fliped
+	sideToMove:	-1, // 0 - left side, 1 - right side
 
 	// resize start position
 	start: {
@@ -1406,15 +1402,10 @@ var CGhostBox = Class.create({
 		}
 	},
 
-	size: {
-		barminwidth:	40		// bar minimal width
-	},
-
 	startResize: function(side) {
 		var dimensions = getDimensions(this.box);
 
 		this.sideToMove = side;
-		this.flip = 0;
 		this.start.width = dimensions.width;
 		this.start.leftSide = dimensions.left;
 		this.start.rightSide = dimensions.right;
@@ -1423,20 +1414,18 @@ var CGhostBox = Class.create({
 
 	endResize: function() {
 		this.sideToMove = -1;
-		this.flip = 0;
 		this.box.style.zIndex = 0;
 	},
 
 	calcResizeByPX: function(px) {
 		px = parseInt(px, 10);
-		this.flip = 0;
 
 		// resize from the left
 		if (this.sideToMove == 0) {
 			var width = this.start.rightSide - this.start.leftSide - px;
 
-			if (width < this.size.barminwidth) {
-				this.current.leftSide = this.start.rightSide - this.size.barminwidth;
+			if (width < 0) {
+				this.current.leftSide = this.start.rightSide;
 			}
 			else {
 				this.current.leftSide = this.start.leftSide + px;
@@ -1447,8 +1436,8 @@ var CGhostBox = Class.create({
 		else if (this.sideToMove == 1) {
 			var width = this.start.rightSide - this.start.leftSide + px;
 
-			if (width < this.size.barminwidth) {
-				this.current.rightSide = this.start.leftSide + this.size.barminwidth;
+			if (width < 0) {
+				this.current.rightSide = this.start.leftSide;
 			}
 			else {
 				this.current.rightSide = this.start.rightSide + px;
