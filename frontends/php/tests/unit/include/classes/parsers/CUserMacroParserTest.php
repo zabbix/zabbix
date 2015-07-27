@@ -34,12 +34,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO}',
 					'positions' => [
 						'start' => 0,
-						'end' => 7,
 						'length' => 8
 					],
 					'macro_name' => 'MACRO',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				]]
 			],
 			[
@@ -49,12 +47,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO_}',
 					'positions' => [
 						'start' => 0,
-						'end' => 8,
 						'length' => 9
 					],
 					'macro_name' => 'MACRO_',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				]]
 			],
 			[
@@ -64,12 +60,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO_12}',
 					'positions' => [
 						'start' => 0,
-						'end' => 10,
 						'length' => 11
 					],
 					'macro_name' => 'MACRO_12',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				]]
 			],
 			[
@@ -79,12 +73,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO_1.2}',
 					'positions' => [
 						'start' => 0,
-						'end' => 11,
 						'length' => 12
 					],
 					'macro_name' => 'MACRO_1.2',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				]]
 			],
 			// context based unquoted macros
@@ -95,12 +87,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:}',
 					'positions' => [
 						'start' => 0,
-						'end' => 8,
 						'length' => 9
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => false
+					'context' => ''
 				]]
 			],
 			[
@@ -110,12 +100,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:}',
 					'positions' => [
 						'start' => 0,
-						'end' => 9,
 						'length' => 10
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => false
+					'context' => ''
 				]]
 			],
 			[
@@ -125,12 +113,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:}',
 					'positions' => [
 						'start' => 0,
-						'end' => 11,
 						'length' => 12
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => false
+					'context' => ''
 				]]
 			],
 			[
@@ -140,12 +126,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:\'\'}',
 					'positions' => [
 						'start' => 0,
-						'end' => 10,
 						'length' => 11
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\'\'',
-					'context_is_quoted' => false
+					'context' => '\'\''
 				]]
 			],
 			[
@@ -155,12 +139,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:A }',
 					'positions' => [
 						'start' => 0,
-						'end' => 10,
 						'length' => 11
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'A ',
-					'context_is_quoted' => false
+					'context' => 'A '
 				]]
 			],
 			[
@@ -170,12 +152,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:A}',
 					'positions' => [
 						'start' => 0,
-						'end' => 9,
 						'length' => 10
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'A',
-					'context_is_quoted' => false
+					'context' => 'A'
 				]]
 			],
 			[
@@ -185,12 +165,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:A"}',
 					'positions' => [
 						'start' => 0,
-						'end' => 10,
 						'length' => 11
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'A"',
-					'context_is_quoted' => false
+					'context' => 'A"'
 				]]
 			],
 			[
@@ -200,12 +178,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:context}',
 					'positions' => [
 						'start' => 0,
-						'end' => 15,
 						'length' => 16
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'context',
-					'context_is_quoted' => false
+					'context' => 'context'
 				]]
 			],
 			[
@@ -215,12 +191,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:<context>}',
 					'positions' => [
 						'start' => 0,
-						'end' => 17,
 						'length' => 18
 					],
 					'macro_name' => 'MACRO',
-					'context' => '<context>',
-					'context_is_quoted' => false
+					'context' => '<context>'
 				]]
 			],
 			[
@@ -230,12 +204,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:\"}',
 					'positions' => [
 						'start' => 0,
-						'end' => 10,
 						'length' => 11
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\"',
-					'context_is_quoted' => false
+					'context' => '\"'
 				]]
 			],
 			[
@@ -245,12 +217,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:{}',
 					'positions' => [
 						'start' => 0,
-						'end' => 9,
 						'length' => 10
 					],
 					'macro_name' => 'MACRO',
-					'context' => '{',
-					'context_is_quoted' => false
+					'context' => '{'
 				]]
 			],
 			[
@@ -260,12 +230,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:\}',
 					'positions' => [
 						'start' => 0,
-						'end' => 9,
 						'length' => 10
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\\',
-					'context_is_quoted' => false
+					'context' => '\\'
 				]]
 			],
 			[
@@ -275,12 +243,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:\\\\}',
 					'positions' => [
 						'start' => 0,
-						'end' => 10,
 						'length' => 11
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\\\\',
-					'context_is_quoted' => false
+					'context' => '\\\\'
 				]]
 			],
 			[
@@ -290,12 +256,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:\"\}',
 					'positions' => [
 						'start' => 0,
-						'end' => 11,
 						'length' => 12
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\"\\',
-					'context_is_quoted' => false
+					'context' => '\"\\'
 				]]
 			],
 			[
@@ -305,12 +269,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:abc"def}',
 					'positions' => [
 						'start' => 0,
-						'end' => 15,
 						'length' => 16
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc"def',
-					'context_is_quoted' => false
+					'context' => 'abc"def'
 				]]
 			],
 			[
@@ -320,12 +282,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:abc"def"}',
 					'positions' => [
 						'start' => 0,
-						'end' => 16,
 						'length' => 17
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc"def"',
-					'context_is_quoted' => false
+					'context' => 'abc"def"'
 				]]
 			],
 			[
@@ -335,12 +295,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:abc"def"ghi}',
 					'positions' => [
 						'start' => 0,
-						'end' => 19,
 						'length' => 20
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc"def"ghi',
-					'context_is_quoted' => false
+					'context' => 'abc"def"ghi'
 				]]
 			],
 			[
@@ -350,12 +308,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:abc"\\}',
 					'positions' => [
 						'start' => 0,
-						'end' => 13,
 						'length' => 14
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc"\\',
-					'context_is_quoted' => false
+					'context' => 'abc"\\'
 				]]
 			],
 			// context based quoted macros
@@ -366,12 +322,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:""}',
 					'positions' => [
 						'start' => 0,
-						'end' => 10,
 						'length' => 11
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => true
+					'context' => ''
 				]]
 			],
 			[
@@ -381,12 +335,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:" "}',
 					'positions' => [
 						'start' => 0,
-						'end' => 13,
 						'length' => 14
 					],
 					'macro_name' => 'MACRO',
-					'context' => ' ',
-					'context_is_quoted' => true
+					'context' => ' '
 				]]
 			],
 			[
@@ -396,12 +348,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:""}',
 					'positions' => [
 						'start' => 0,
-						'end' => 11,
 						'length' => 12
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => true
+					'context' => ''
 				]]
 			],
 			[
@@ -411,12 +361,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:""}',
 					'positions' => [
 						'start' => 0,
-						'end' => 11,
 						'length' => 12
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => true
+					'context' => ''
 				]]
 			],
 			[
@@ -426,12 +374,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"    "}',
 					'positions' => [
 						'start' => 0,
-						'end' => 16,
 						'length' => 17
 					],
 					'macro_name' => 'MACRO',
-					'context' => '    ',
-					'context_is_quoted' => true
+					'context' => '    '
 				]]
 			],
 			[
@@ -441,12 +387,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"    "}',
 					'positions' => [
 						'start' => 0,
-						'end' => 24,
 						'length' => 25
 					],
 					'macro_name' => 'MACRO',
-					'context' => '    ',
-					'context_is_quoted' => true
+					'context' => '    '
 				]]
 			],
 			[
@@ -456,12 +400,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:""}',
 					'positions' => [
 						'start' => 0,
-						'end' => 20,
 						'length' => 21
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => true
+					'context' => ''
 				]]
 			],
 			[
@@ -471,12 +413,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"A"}',
 					'positions' => [
 						'start' => 0,
-						'end' => 12,
 						'length' => 13
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'A',
-					'context_is_quoted' => true
+					'context' => 'A'
 				]]
 			],
 			[
@@ -486,12 +426,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"{#MACRO}"}',
 					'positions' => [
 						'start' => 0,
-						'end' => 18,
 						'length' => 19
 					],
 					'macro_name' => 'MACRO',
-					'context' => '{#MACRO}',
-					'context_is_quoted' => true
+					'context' => '{#MACRO}'
 				]]
 			],
 			[
@@ -501,12 +439,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"\abc"}',
 					'positions' => [
 						'start' => 0,
-						'end' => 14,
 						'length' => 15
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\abc',
-					'context_is_quoted' => true
+					'context' => '\abc'
 				]]
 			],
 			[
@@ -516,12 +452,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"abc\def"}',
 					'positions' => [
 						'start' => 0,
-						'end' => 17,
 						'length' => 18
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc\def',
-					'context_is_quoted' => true
+					'context' => 'abc\def'
 				]]
 			],
 			[
@@ -531,12 +465,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"\abc\    "}',
 					'positions' => [
 						'start' => 0,
-						'end' => 19,
 						'length' => 20
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\abc\    ',
-					'context_is_quoted' => true
+					'context' => '\abc\    '
 				]]
 			],
 			[
@@ -546,12 +478,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"\\""}',
 					'positions' => [
 						'start' => 0,
-						'end' => 12,
 						'length' => 13
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\"',
-					'context_is_quoted' => true
+					'context' => '\"'
 				]]
 			]
 		];
@@ -607,24 +537,20 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO1}',
 					'positions' => [
 						'start' => 0,
-						'end' => 8,
 						'length' => 9
 					],
 					'macro_name' => 'MACRO1',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				],
 				[
 					'match' => '{$MACRO2}',
 					'macro' => '{$MACRO2}',
 					'positions' => [
 						'start' => 9,
-						'end' => 17,
 						'length' => 9
 					],
 					'macro_name' => 'MACRO2',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				]]
 			],
 			[
@@ -634,12 +560,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO}',
 					'positions' => [
 						'start' => 11,
-						'end' => 18,
 						'length' => 8
 					],
 					'macro_name' => 'MACRO',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				]]
 			],
 			[
@@ -649,12 +573,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:""}',
 					'positions' => [
 						'start' => 11,
-						'end' => 21,
 						'length' => 11
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => true
+					'context' => ''
 				]]
 			],
 			[
@@ -664,12 +586,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:\""}',
 					'positions' => [
 						'start' => 11,
-						'end' => 22,
 						'length' => 12
 					],
 					'macro_name' => 'MACRO',
-					'context' => '\""',
-					'context_is_quoted' => false
+					'context' => '\""'
 				]]
 			],
 			[
@@ -687,12 +607,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:""}',
 					'positions' => [
 						'start' => 7,
-						'end' => 19,
 						'length' => 13
 					],
 					'macro_name' => 'MACRO',
-					'context' => '',
-					'context_is_quoted' => true
+					'context' => ''
 				]]
 			],
 			[
@@ -702,12 +620,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"abc"}',
 					'positions' => [
 						'start' => 7,
-						'end' => 22,
 						'length' => 16
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc',
-					'context_is_quoted' => true
+					'context' => 'abc'
 				]]
 			],
 			[
@@ -721,12 +637,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"abc\\"defgh\\""}',
 					'positions' => [
 						'start' => 7,
-						'end' => 33,
 						'length' => 27
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc"defgh"',
-					'context_is_quoted' => true
+					'context' => 'abc"defgh"'
 				]]
 			],
 			[
@@ -736,12 +650,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"abc\"defxyz\""}',
 					'positions' => [
 						'start' => 4,
-						'end' => 31,
 						'length' => 28
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc"defxyz"',
-					'context_is_quoted' => true
+					'context' => 'abc"defxyz"'
 				]]
 			],
 			[
@@ -751,12 +663,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"abc\"qwerty\""}',
 					'positions' => [
 						'start' => 9,
-						'end' => 36,
 						'length' => 28
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc"qwerty"',
-					'context_is_quoted' => true
+					'context' => 'abc"qwerty"'
 				]]
 			],
 			[
@@ -766,12 +676,10 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO:"abc\"def\""}',
 					'positions' => [
 						'start' => 9,
-						'end' => 38,
 						'length' => 30
 					],
 					'macro_name' => 'MACRO',
-					'context' => 'abc"def"',
-					'context_is_quoted' => true
+					'context' => 'abc"def"'
 				]]
 			],
 			[
@@ -781,24 +689,20 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO}',
 					'positions' => [
 						'start' => 14,
-						'end' => 21,
 						'length' => 8
 					],
 					'macro_name' => 'MACRO',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				],
 				[
 					'match' => '{$MACRO}',
 					'macro' => '{$MACRO}',
 					'positions' => [
 						'start' => 22,
-						'end' => 29,
 						'length' => 8
 					],
 					'macro_name' => 'MACRO',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				]]
 			],
 			[
@@ -808,24 +712,20 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro' => '{$MACRO1}',
 					'positions' => [
 						'start' => 13,
-						'end' => 21,
 						'length' => 9
 					],
 					'macro_name' => 'MACRO1',
-					'context' => null,
-					'context_is_quoted' => false
+					'context' => null
 				],
 				[
 					'match' => '{$MACRO2:\"\"}',
 					'macro' => '{$MACRO2:""}',
 					'positions' => [
 						'start' => 33,
-						'end' => 46,
 						'length' => 14
 					],
 					'macro_name' => 'MACRO2',
-					'context' => '',
-					'context_is_quoted' => true
+					'context' => ''
 				]]
 			]
 		];

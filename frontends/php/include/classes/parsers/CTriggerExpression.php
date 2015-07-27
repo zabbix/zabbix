@@ -482,15 +482,15 @@ class CTriggerExpression {
 	 * Parse the string using the given parser. If a match has been found, move the cursor to the last symbol of the
 	 * matched string.
 	 *
-	 * @param class		$parser			CParser
+	 * @param CParser   $parser
 	 * @param int       $tokenType
 	 *
 	 * @return CParserResult|bool		CParserResult object if a match has been found, false otherwise
 	 */
-	protected function parseUsing($parser, $tokenType) {
-		$pos = $this->pos;
+	protected function parseUsing(CParser $parser, $tokenType) {
+		$j = $this->pos;
 
-		$result = $parser->parse($this->expression, $pos);
+		$result = $parser->parse($this->expression, $j);
 
 		if (!$result) {
 			return false;

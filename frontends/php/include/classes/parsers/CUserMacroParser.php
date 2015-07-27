@@ -97,11 +97,9 @@ class CUserMacroParser {
 		 * $macros[]['match'] - full match with all the escaped quotes
 		 * $macros[]['macro'] - matches only macro with context and trims spaces
 		 * $macros[]['poitions']['start'] - starting position of the macro
-		 * $macros[]['poitions']['end'] - ending position of macro
 		 * $macros[]['poitions']['length'] - macro length (with context)
 		 * $macros[]['macro_name'] - only macro name
 		 * $macros[]['context'] - context with no quotes
-		 * $macros[]['context_is_quoted'] - is the context quoted or not
 		 */
 		$this->macros = [];
 
@@ -137,10 +135,9 @@ class CUserMacroParser {
 				$this->macros[$i] = [
 					'match' => '',
 					'macro' => '',
-					'positions' => ['start' => 0, 'end' => 0, 'length' => 0],
+					'positions' => ['start' => 0, 'length' => 0],
 					'macro_name' => '',
-					'context' => '',
-					'context_is_quoted' => false
+					'context' => ''
 				];
 			}
 
@@ -276,11 +273,10 @@ class CUserMacroParser {
 							case '}':
 								// {$MACRO} - The macro ended with no context at all.
 								$this->macros[$i]['context'] = null;
-								$this->macros[$i]['context_is_quoted'] = false;
 								$this->macros[$i]['match'] .= $this->source[$this->pos];
 								$this->macros[$i]['macro'] .= $this->source[$this->pos];
-								$this->macros[$i]['positions']['end'] = $this->pos;
-								$this->macros[$i]['positions']['length'] = $this->pos - $this->macros[$i]['positions']['start'] + 1;
+								$this->macros[$i]['positions']['length'] =
+									$this->pos - $this->macros[$i]['positions']['start'] + 1;
 
 								// Start the next macro, because this one is closed and is valid.
 								$i++;
@@ -311,9 +307,8 @@ class CUserMacroParser {
 							$this->macros[$i]['context'] = '';
 							$this->macros[$i]['match'] .= $this->source[$this->pos];
 							$this->macros[$i]['macro'] .= $this->source[$this->pos];
-							$this->macros[$i]['positions']['end'] = $this->pos;
-							$this->macros[$i]['positions']['length'] = $this->pos - $this->macros[$i]['positions']['start'] + 1;
-							$this->macros[$i]['context_is_quoted'] = false;
+							$this->macros[$i]['positions']['length'] =
+								$this->pos - $this->macros[$i]['positions']['start'] + 1;
 
 							// Start the next macro, because this one is closed and is valid.
 							$i++;
@@ -339,7 +334,6 @@ class CUserMacroParser {
 								$this->macros[$i]['context'] = '';
 								$this->macros[$i]['match'] .= $this->source[$this->pos];
 								$this->macros[$i]['macro'] .= $this->source[$this->pos];
-								$this->macros[$i]['context_is_quoted'] = true;
 
 								$state = self::STATE_CONTEXT_QUOTED_PROGRESS;
 							}
@@ -365,7 +359,6 @@ class CUserMacroParser {
 									$this->macros[$i]['context'] = '';
 									$this->macros[$i]['match'] .= $this->source[$this->pos].$this->source[$this->pos+1];
 									$this->macros[$i]['macro'] .= $this->source[$this->pos+1];
-									$this->macros[$i]['context_is_quoted'] = true;
 
 									// Skip next char, since it's "
 									$this->pos++;
@@ -377,7 +370,6 @@ class CUserMacroParser {
 									$this->macros[$i]['context'] = $this->source[$this->pos];
 									$this->macros[$i]['match'] .= $this->source[$this->pos];
 									$this->macros[$i]['macro'] .= $this->source[$this->pos];
-									$this->macros[$i]['context_is_quoted'] = false;
 
 									$state = self::STATE_CONTEXT_UNQUOTED_PROGRESS;
 								}
@@ -387,7 +379,6 @@ class CUserMacroParser {
 								$this->macros[$i]['context'] = $this->source[$this->pos];
 								$this->macros[$i]['match'] .= $this->source[$this->pos];
 								$this->macros[$i]['macro'] .= $this->source[$this->pos];
-								$this->macros[$i]['context_is_quoted'] = false;
 
 								$state = self::STATE_CONTEXT_UNQUOTED_PROGRESS;
 							}
@@ -398,7 +389,6 @@ class CUserMacroParser {
 							$this->macros[$i]['context'] = $this->source[$this->pos];
 							$this->macros[$i]['match'] .= $this->source[$this->pos];
 							$this->macros[$i]['macro'] .= $this->source[$this->pos];
-							$this->macros[$i]['context_is_quoted'] = false;
 
 							$state = self::STATE_CONTEXT_UNQUOTED_PROGRESS;
 							break;
@@ -413,8 +403,8 @@ class CUserMacroParser {
 							// Example: {$MACRO:aaaa}
 							$this->macros[$i]['match'] .= $this->source[$this->pos];
 							$this->macros[$i]['macro'] .= $this->source[$this->pos];
-							$this->macros[$i]['positions']['end'] = $this->pos;
-							$this->macros[$i]['positions']['length'] = $this->pos - $this->macros[$i]['positions']['start'] + 1;
+							$this->macros[$i]['positions']['length'] =
+								$this->pos - $this->macros[$i]['positions']['start'] + 1;
 
 							// Start the next macro, because this one is closed and is valid.
 							$i++;
@@ -530,8 +520,8 @@ class CUserMacroParser {
 							// Examples: {$MACRO:"abc"} or "{$MACRO:\"abc\"}
 							$this->macros[$i]['match'] .= $this->source[$this->pos];
 							$this->macros[$i]['macro'] .= $this->source[$this->pos];
-							$this->macros[$i]['positions']['end'] = $this->pos;
-							$this->macros[$i]['positions']['length'] = $this->pos - $this->macros[$i]['positions']['start'] + 1;
+							$this->macros[$i]['positions']['length'] =
+								$this->pos - $this->macros[$i]['positions']['start'] + 1;
 
 							$i++;
 
