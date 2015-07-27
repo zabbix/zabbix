@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+........S. [ZBX-4344] added functionality to stop processing escalations if dependent trigger fires (dimir)
 ADF.I..PS. [ZBXNEXT-679] implement SMTP authentication support (asaveljevs, Oleg)
 ..FGI..... [ZBXNEXT-1368] added Windows service discovery and service.info[] item; thanks to Ryan Armstrong for patch (asaveljevs, igors)
 ..F....... [ZBX-8297] removed "Triggers info" top line from Monitoring > Triggers page fullscreen view (Ivo)
