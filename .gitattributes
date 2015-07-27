@@ -88,8 +88,6 @@ frontends/php/images/general/tr_top_right.gif -text
 frontends/php/images/general/tr_top_right_bottom.gif -text
 frontends/php/images/general/tree/zero.gif -text
 frontends/php/images/general/zabbix.ico -text
-frontends/php/images/general/zabbix_bb.ico -text
-frontends/php/images/general/zabbix_ob.ico -text
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
 frontends/php/images/gradients/gradient.png -text
 frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
