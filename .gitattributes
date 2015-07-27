@@ -85,12 +85,6 @@ frontends/php/images/general/bar/left.png -text
 frontends/php/images/general/bar/left_arr.png -text
 frontends/php/images/general/bar/right.png -text
 frontends/php/images/general/bar/right_arr.png -text
-frontends/php/images/general/browserwarning/background.png -text
-frontends/php/images/general/browserwarning/chrome.png -text
-frontends/php/images/general/browserwarning/firefox.png -text
-frontends/php/images/general/browserwarning/ie.png -text
-frontends/php/images/general/browserwarning/opera.png -text
-frontends/php/images/general/browserwarning/safari.png -text
 frontends/php/images/general/bttn/arrowdown.png -text
 frontends/php/images/general/bttn/arrowleft.png -text
 frontends/php/images/general/bttn/arrowright.png -text
@@ -111,14 +105,9 @@ frontends/php/images/general/bttn/snooze.png -text
 frontends/php/images/general/bttn/sound.png -text
 frontends/php/images/general/bttn/up.png -text
 frontends/php/images/general/error2.png -text
-frontends/php/images/general/login/background.png -text
-frontends/php/images/general/login/glow.png -text
-frontends/php/images/general/login/logo.png -text
 frontends/php/images/general/no_icon.png -text
 frontends/php/images/general/ok_icon.png -text
 frontends/php/images/general/plus.png -text
-frontends/php/images/general/setup/background.png -text
-frontends/php/images/general/setup/welcome_screen.png -text
 frontends/php/images/general/tick.png -text
 frontends/php/images/general/tr_space.gif -text
 frontends/php/images/general/tr_top_bottom.gif -text
