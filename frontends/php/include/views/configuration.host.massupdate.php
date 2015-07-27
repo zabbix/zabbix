@@ -341,12 +341,12 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 // Encryption
 $encryptionFormList = new CFormList('encryption');
 
-$encryptionFormList->addRow(
-	[
+$encryptionFormList->addRow([
 		_('Connections to host'),
 		SPACE,
 		(new CVisibilityBox('visible[tls_connect]', 'tls_connect', _('Original')))
 			->setChecked(isset($data['visible']['tls_connect']))
+			->setAttribute('autocomplete', 'off')
 	],
 	new CComboBox('tls_connect', $data['tls_connect'], null, [
 		HOST_ENCRYPTION_NONE => _('No encryption'),
@@ -356,27 +356,35 @@ $encryptionFormList->addRow(
 );
 
 $from_host = (new CDiv([
-	[new CCheckBox('tls_in_none'), _('No encryption')],
+	[(new CCheckBox('tls_in_none'))->setAttribute('autocomplete', 'off'), _('No encryption')],
 	BR(),
-	[new CCheckBox('tls_in_psk'), _('PSK')],
+	[(new CCheckBox('tls_in_psk'))->setAttribute('autocomplete', 'off'), _('PSK')],
 	BR(),
-	[new CCheckBox('tls_in_cert'), _('Certificate')]
+	[(new CCheckBox('tls_in_cert'))->setAttribute('autocomplete', 'off'), _('Certificate')]
 ]))->setId('fromHost');
 
-$encryptionFormList->addRow(
-	[
+$encryptionFormList->addRow([
 		_('Connections from host'),
 		SPACE,
 		(new CVisibilityBox('visible[tls_accept]', 'fromHost', _('Original')))
 			->setChecked(isset($data['visible']['tls_accept']))
+			->setAttribute('autocomplete', 'off')
 	],
 	$from_host
 );
 
-$encryptionFormList->addRow(_('PSK identity'), new CTextBox('tls_psk_identity', $data['tls_psk_identity'], 64));
-$encryptionFormList->addRow(_('PSK'), new CTextBox('tls_psk', $data['tls_psk'], 64, false, 512));
-$encryptionFormList->addRow(_('Issuer'), new CTextBox('tls_issuer', $data['tls_issuer'], 64));
-$encryptionFormList->addRow(_('Subject'), new CTextBox('tls_subject', $data['tls_subject'], 64));
+$encryptionFormList->addRow(_('PSK identity'),
+	(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+);
+$encryptionFormList->addRow(_('PSK'),
+	(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+);
+$encryptionFormList->addRow(_('Issuer'),
+	(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+);
+$encryptionFormList->addRow(_('Subject'),
+	(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+);
 
 // append tabs to form
 $hostTab = (new CTabView())
