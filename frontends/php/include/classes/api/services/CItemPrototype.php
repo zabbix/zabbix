@@ -528,9 +528,9 @@ class CItemPrototype extends CItemGeneral {
 				));
 
 				// Gather all item application prototype records in $old_records for each item.
-				foreach ($db_item_application_prototypes as $item_application_prototype) {
-					$id = $item_application_prototype['item_application_prototypeid'];
-					$application_prototypeid = $item_application_prototype['application_prototypeid'];
+				foreach ($db_item_application_prototypes as $db_item_application_prototype) {
+					$id = $db_item_application_prototype['item_application_prototypeid'];
+					$application_prototypeid = $db_item_application_prototype['application_prototypeid'];
 
 					$old_records[$id] = [
 						'item_application_prototypeid' => $id,
@@ -552,8 +552,12 @@ class CItemPrototype extends CItemGeneral {
 						' AND '.dbConditionString('ap.name', array_keys($application_prototypes))
 				));
 
+				$names = [];
+				foreach ($db_application_prototypes as $db_application_prototype) {
+					$names[] = (string) $db_application_prototype['name'];
+				}
+
 				$db_application_prototypes = zbx_toHash($db_application_prototypes, 'name');
-				$names = array_keys($db_application_prototypes);
 
 				// New application prototype names that need to be created in database.
 				$application_prototypes_to_create = [];
@@ -567,7 +571,7 @@ class CItemPrototype extends CItemGeneral {
 				 * Otherwise application prototypes are deleted or stay unchanged.
 				 */
 				foreach ($application_prototypes as $application_prototype) {
-					if (!in_array($application_prototype['name'], $names)) {
+					if (!in_array((string) $application_prototype['name'], $names, true)) {
 						$application_prototypes_to_create[] = [
 							'itemid' => $discovery_ruleid,
 							'name' => $application_prototype['name'],
@@ -579,7 +583,7 @@ class CItemPrototype extends CItemGeneral {
 					elseif (array_key_exists('templateid', $application_prototype)) {
 						$db_application_prototype = $db_application_prototypes[$application_prototype['name']];
 
-						if ($db_application_prototype != $application_prototype['templateid']) {
+						if ($db_application_prototype['templateid'] != $application_prototype['templateid']) {
 							$id = $db_application_prototype['application_prototypeid'];
 
 							$application_prototypes_to_update[$id] = $application_prototype['templateid'];
@@ -588,9 +592,9 @@ class CItemPrototype extends CItemGeneral {
 				}
 
 				// Collect already existing application prototype IDs.
-				foreach ($db_application_prototypes as $application_prototype) {
-					$application_prototypeid = $application_prototype['application_prototypeid'];
-					$new_application_prototype = $application_prototypes[$application_prototype['name']];
+				foreach ($db_application_prototypes as $db_application_prototype) {
+					$application_prototypeid = $db_application_prototype['application_prototypeid'];
+					$new_application_prototype = $application_prototypes[$db_application_prototype['name']];
 
 					$templateid = array_key_exists('templateid', $new_application_prototype)
 						? $new_application_prototype['templateid']
