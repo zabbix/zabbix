@@ -78,13 +78,6 @@ frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrow_down.png -text
 frontends/php/images/general/arrow_up.png -text
-frontends/php/images/general/bar/bar_bg.png -text
-frontends/php/images/general/bar/bar_middle.png -text
-frontends/php/images/general/bar/bg.png -text
-frontends/php/images/general/bar/left.png -text
-frontends/php/images/general/bar/left_arr.png -text
-frontends/php/images/general/bar/right.png -text
-frontends/php/images/general/bar/right_arr.png -text
 frontends/php/images/general/error2.png -text
 frontends/php/images/general/no_icon.png -text
 frontends/php/images/general/ok_icon.png -text
