@@ -82,18 +82,23 @@ class CUiWidget extends CDiv {
 	 * @param string|array|CTag $caption
 	 * @param array             $icons
 	 */
-	public function setHeader($caption = null, array $icons = []) {
+	public function setHeader($caption = null, array $icons = [], $cursor_move = false) {
 		zbx_value2array($icons);
 
 		if ($caption === null && $icons !== null) {
 			$caption = SPACE;
 		}
 
-		$this->header = (new CDiv())->addClass('dashbrd-widget-head header');
+		$this->header = (new CDiv())
+			->addClass('dashbrd-widget-head')
+			->addClass('header')
+			->addItem(
+				(new CTag('h4', true, $caption))->setId($this->id.'_header')
+			);
 
-		$this->header->addItem(
-			(new CTag('h4', true, $caption))->setId($this->id.'_header')
-		);
+		if ($cursor_move) {
+			$this->header->addClass(ZBX_STYLE_CURSOR_MOVE);
+		}
 
 		if ($icons) {
 			$this->header->addItem(new CList($icons));

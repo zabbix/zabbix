@@ -109,7 +109,7 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		$filterColumn1 = new CFormList();
 		$filterForm->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {
-			$filterForm->addVar('itemids[]', $itemId, 'filter_itemids_'.$itemId);
+			$filterForm->addVar('itemids['.$itemId.']', $itemId);
 		}
 
 		$itemListbox = new CListBox('cmbitemlist[]');
@@ -136,7 +136,10 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		$deleteItemButton = null;
 
 		if (count($this->data['items']) > 1) {
-			$deleteItemButton = new CSubmit('remove_log', _('Remove selected'));
+			$deleteItemButton = [
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				new CButton('remove_log', _('Remove selected'))
+			];
 		}
 
 		$filterColumn1->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton]);
@@ -222,11 +225,9 @@ else {
 		if(!isset($filterForm)) {
 			$filterForm = new CFilter('web.history.filter.state');
 		}
-		$filterColumn1 = new CFormList();
 
 		// display the graph type filter for graphs with multiple items
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
-
 			$graphType = [
 				(new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, ($this->data['graphtype'] == GRAPH_TYPE_NORMAL)))
 					->setId('graphtype_'.GRAPH_TYPE_NORMAL),
@@ -235,8 +236,10 @@ else {
 					->setId('graphtype_'.GRAPH_TYPE_STACKED),
 				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
 			];
-			$filterColumn1->addRow(_('Graph type'), $graphType);
-			$filterForm->addColumn($filterColumn1);
+			$filterForm->addColumn(
+				(new CFormList())->addRow(_('Graph type'), $graphType)
+			);
+			$filterForm->removeButtons();
 
 			$filterForm->addVar('action', $this->data['action']);
 			$filterForm->addVar('itemids', $this->data['itemids']);
