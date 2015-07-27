@@ -38,7 +38,6 @@ $fields = [
 	'from' =>			[T_ZBX_INT, O_OPT, null,	'{} >= 0',	null],
 	'width' =>			[T_ZBX_INT, O_OPT, null,	'{} > 0',	null],
 	'height' =>			[T_ZBX_INT, O_OPT, null,	'{} > 0',	null],
-	'border' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 ];
 check_fields($fields);
@@ -109,9 +108,6 @@ if (isset($_REQUEST['width'])) {
 }
 if (isset($_REQUEST['height'])) {
 	$graph->setHeight($_REQUEST['height']);
-}
-if (isset($_REQUEST['border'])) {
-	$graph->setBorder(0);
 }
 
 foreach ($items as $item) {
