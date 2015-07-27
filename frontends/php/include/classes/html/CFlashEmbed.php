@@ -36,13 +36,16 @@ class CFlashEmbed extends CTag {
 
 	public function setWidth($value) {
 		$this->attributes['width']  = $value;
+		return $this;
 	}
 
 	public function setHeight($value) {
 		$this->attributes['height'] = $value;
+		return $this;
 	}
 
 	public function setSrc($value) {
 		$this->attributes['src'] = $value;
+		return $this;
 	}
 }

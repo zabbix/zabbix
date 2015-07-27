@@ -129,13 +129,14 @@ if ($denied_page_requested) {
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($pageTitle);
-	$pageHeader->addCssInit();
 
-	$css = ZBX_DEFAULT_THEME;
+	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
+		global $DB;
+
 		if (!empty($DB['DB'])) {
 			$config = select_config();
-			$css = getUserTheme(CWebUser::$data);
+			$theme = getUserTheme(CWebUser::$data);
 
 			$severityCss = <<<CSS
 .disaster { background: #{$config['severity_color_5']} !important; }
@@ -154,8 +155,7 @@ CSS;
 			}
 		}
 	}
-	$css = CHtml::encode($css);
-//	$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
+	$pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
 
 	if ($page['file'] == 'sysmap.php') {
 		$pageHeader->addCssFile('imgstore.php?css=1&output=css');
@@ -178,7 +178,7 @@ CSS;
 	$pageHeader->display();
 ?>
 <body>
-<div class="msg-bad-global" id="msg-bad-global"></div>
+<div class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></div>
 <?php
 }
 
@@ -194,6 +194,12 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			'main_menu' => $main_menu,
 			'sub_menus' => $sub_menus,
 			'selected' => $page['menu']
+		],
+		'user' => [
+			'is_guest' => CWebUser::isGuest(),
+			'alias' => CWebUser::$data['alias'],
+			'name' => CWebUser::$data['name'],
+			'surname' => CWebUser::$data['surname']
 		]
 	]);
 	echo $pageMenu->getOutput();

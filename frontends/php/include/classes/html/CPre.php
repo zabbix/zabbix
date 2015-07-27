@@ -19,14 +19,10 @@
 **/
 
 
-$searchForm = new CForm('get','search.php');
+class CPre extends CTag {
 
-$searchBox = new CTextBox('search', getRequest('search'));
-$searchBox->setAttribute('autocomplete', 'off');
-$searchBox->addClass('search');
-$searchForm->addItem($searchBox);
-
-$searchBtn = (new CSubmit('searchbttn', _('Search')))->addClass('jqueryinput');
-$searchForm->addItem($searchBtn);
-
-return (new CDiv($searchForm))->addClass('zbx_search')->setId('zbx_search');
+	public function __construct($items = null) {
+		parent::__construct('pre', true);
+		$this->addItem($items);
+	}
+}

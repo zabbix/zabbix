@@ -27,12 +27,12 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create form
-$httpForm = new CForm();
-$httpForm->setName('httpForm');
-$httpForm->addVar('form', $this->data['form']);
-$httpForm->addVar('hostid', $this->data['hostid']);
-$httpForm->addVar('steps', $this->data['steps']);
-$httpForm->addVar('templated', $this->data['templated']);
+$httpForm = (new CForm())
+	->setName('httpForm')
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('steps', $this->data['steps'])
+	->addVar('templated', $this->data['templated']);
 
 if (!empty($this->data['httptestid'])) {
 	$httpForm->addVar('httptestid', $this->data['httptestid']);
@@ -49,7 +49,8 @@ if (!empty($this->data['templates'])) {
 }
 
 // Name
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['templated'], 64);
+$nameTextBox = (new CTextBox('name', $this->data['name'], $this->data['templated'], 64))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 if (!$this->data['templated']) {
 	$nameTextBox->setAttribute('autofocus', 'autofocus');
 }
@@ -67,15 +68,18 @@ else {
 }
 
 // New application
-$httpFormList->addRow(_('New application'),
-	new CTextBox('new_application', $this->data['new_application'], ZBX_TEXTBOX_STANDARD_SIZE), false, null, 'new'
-);
-
-// update interval
-$httpFormList->addRow(_('Update interval (in sec)'), new CNumericBox('delay', $this->data['delay'], 5));
-
-// number of retries
-$httpFormList->addRow(_('Retries'), new CNumericBox('retries', $this->data['retries'], 2));
+$httpFormList
+	->addRow(new CLabel(_('New application'), 'new_application'),
+		(new CSpan(
+			(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+	)
+	->addRow(_('Update interval (in sec)'),
+		(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Attempts'),
+		(new CNumericBox('retries', $this->data['retries'], 2))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 $agentComboBox = new CComboBox('agent', $this->data['agent']);
 
@@ -89,22 +93,24 @@ foreach ($userAgentsAll as $userAgentGroup => $userAgents) {
 $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 $httpFormList->addRow(_('User agent string'),
-	new CTextBox('agent_other', $this->data['agent_other'], ZBX_TEXTBOX_STANDARD_SIZE), false, 'row_agent_other'
+	(new CTextBox('agent_other', $this->data['agent_other']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	false, 'row_agent_other'
 );
 
 // append HTTP proxy to form list
-$httpProxyTextBox = new CTextBox('http_proxy', $this->data['http_proxy'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255);
-$httpProxyTextBox->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]');
-$httpFormList->addRow(_('HTTP proxy'), $httpProxyTextBox);
-
-// append variables to form list
-$httpFormList->addRow(_('Variables'), new CTextArea('variables', $this->data['variables']));
-
-// append headers to form list
-$httpFormList->addRow(_('Headers'), new CTextArea('headers', $this->data['headers']));
-
-// status
-$httpFormList->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
+$httpFormList
+	->addRow(_('HTTP proxy'),
+		(new CTextBox('http_proxy', $this->data['http_proxy'], false, 255))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('placeholder', 'http://[user[:password]@]proxy.example.com[:port]')
+	)
+	->addRow(_('Variables'),
+		(new CTextArea('variables', $this->data['variables']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Headers'),
+		(new CTextArea('headers', $this->data['headers']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Enabled'), (new CCheckBox('status'))->setChecked(!$this->data['status']));
 
 /*
  * Authentication tab
@@ -116,65 +122,49 @@ $httpAuthenticationFormList->addRow(_('HTTP authentication'),
 	new CComboBox('authentication', $this->data['authentication'], null, httptest_authentications())
 );
 
-$httpAuthenticationUserTB = new CTextBox('http_user', $this->data['http_user'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
-$httpAuthenticationPasswordTB = new CTextBox('http_password', $this->data['http_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64);
-
-$authenticationInputsHidden = $this->data['authentication'] == HTTPTEST_AUTH_NONE;
-
-if ($authenticationInputsHidden) {
-	$httpAuthenticationUserTB->setAttribute('disabled', true);
-	$httpAuthenticationPasswordTB->setAttribute('disabled', true);
-}
-
-$httpAuthenticationFormList->addRow(_('User'), $httpAuthenticationUserTB, $authenticationInputsHidden);
-$httpAuthenticationFormList->addRow(_('Password'), $httpAuthenticationPasswordTB, $authenticationInputsHidden);
-
-// SSL verify peer checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify peer'),
-	(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
-);
-
-// SSL verify host checkbox
-$httpAuthenticationFormList->addRow(_('SSL verify host'),
-	(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
-);
-
-// SSL certificate file
-$httpAuthenticationFormList->addRow(
-	_('SSL certificate file'),
-	new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
-);
-
-// SSL key file
-$httpAuthenticationFormList->addRow(
-	_('SSL key file'),
-	new CTextBox('ssl_key_file', $this->data['ssl_key_file'], ZBX_TEXTBOX_STANDARD_SIZE, false, 255)
-);
-
-// SSL key password
-$httpAuthenticationFormList->addRow(
-	_('SSL key password'),
-	new CTextBox('ssl_key_password', $this->data['ssl_key_password'], ZBX_TEXTBOX_STANDARD_SIZE, false, 64)
-);
+$httpAuthenticationFormList
+	->addRow(_('User'),
+		(new CTextBox('http_user', $this->data['http_user'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('Password'),
+		(new CTextBox('http_password', $this->data['http_password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('SSL verify peer'),
+		(new CCheckBox('verify_peer'))->setChecked($this->data['verify_peer'] == 1)
+	)
+	->addRow(_('SSL verify host'),
+		(new CCheckBox('verify_host'))->setChecked($this->data['verify_host'] == 1)
+	)
+	->addRow(_('SSL certificate file'),
+		(new CTextBox('ssl_cert_file', $this->data['ssl_cert_file'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('SSL key file'),
+		(new CTextBox('ssl_key_file', $this->data['ssl_key_file'], false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('SSL key password'),
+		(new CTextBox('ssl_key_password', $this->data['ssl_key_password'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 /*
  * Step tab
  */
 $httpStepFormList = new CFormList('httpFormList');
 $stepsTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
 	->setId('httpStepTable')
 	->setHeader([
-		(new CColHeader(''))->setWidth('15'),
-		(new CColHeader(''))->setWidth('15'),
+		(new CColHeader())->setWidth('15'),
+		(new CColHeader())->setWidth('15'),
 		(new CColHeader(_('Name')))->setWidth('150'),
 		(new CColHeader(_('Timeout')))->setWidth('50'),
 		(new CColHeader(_('URL')))->setWidth('200'),
-		(new CColHeader(_('Required')))->setWidth('50'),
+		(new CColHeader(_('Required')))->setWidth('75'),
 		(new CColHeader(_('Status codes')))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->setWidth('90'),
-		(new CColHeader(''))->setWidth('50')
+		(new CColHeader())->setWidth('50')
 	]);
 
 $i = 1;
@@ -199,7 +189,8 @@ foreach ($this->data['steps'] as $stepid => $step) {
 		->addClass('rowNum')
 		->setId('current_step_'.$stepid);
 
-	$name = (new CSpan($step['name'], 'link'))
+	$name = (new CLink($step['name'], 'javascript:void(0);'))
+		->removeSID()
 		->setId('name_'.$stepid)
 		->setAttribute('name_step', $stepid);
 
@@ -214,7 +205,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 
 	if ($this->data['templated']) {
-		$removeButton = SPACE;
+		$removeButton = '';
 		$dragHandler = '';
 	}
 	else {
@@ -252,20 +243,17 @@ if (!$this->data['templated']) {
 }
 
 $httpStepFormList->addRow(_('Steps'),
-	(new CDiv($stepsTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+	(new CDiv($stepsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 // append tabs to form
-$httpTab = new CTabView();
+$httpTab = (new CTabView())
+	->addTab('scenarioTab', _('Scenario'), $httpFormList)
+	->addTab('stepTab', _('Steps'), $httpStepFormList)
+	->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFormList);
 if (!$this->data['form_refresh']) {
 	$httpTab->setSelected(0);
 }
-$httpTab->addTab('scenarioTab', _('Scenario'), $httpFormList);
-$httpTab->addTab('stepTab', _('Steps'), $httpStepFormList);
-$httpTab->addTab('authenticationTab', _('Authentication'), $httpAuthenticationFormList);
 
 // append buttons to form
 if (!empty($this->data['httptestid'])) {

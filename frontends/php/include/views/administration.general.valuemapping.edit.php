@@ -28,41 +28,37 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
 	);
 
-$valueMappingForm = new CForm();
-$valueMappingForm->setName('valueMappingForm');
-$valueMappingForm->addVar('form', $this->data['form']);
-$valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
+$valueMappingForm = (new CForm())
+	->setName('valueMappingForm')
+	->addVar('form', $this->data['form']);
 
-// create form list
-$valueMappingFormList = new CFormList('valueMappingFormList');
+if ($this->data['valuemapid'] != 0) {
+	$valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
+}
 
-// name
-$nameTextBox = new CTextBox('mapname', $this->data['mapname'], 40, false, 64);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$valueMappingFormList->addRow(_('Name'), $nameTextBox);
+$valueMappingFormList = (new CFormList())
+	->addRow(_('Name'),
+		(new CTextBox('mapname', $this->data['mapname'], false, 64))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	);
 
 // mappings
 $mappingsTable = (new CTable())
-	->setNoDataMessage(SPACE)
-	->addClass('formElementTable')
+	->setNoDataMessage(null)
 	->setId('mappingsTable')
 	->addRow([_('Value'), SPACE, _('Mapped to'), SPACE])
 	->addRow((new CCol(
 		(new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	))->setColSpan(4));
-$valueMappingFormList->addRow(_('Mappings'),
-	(new CDiv($mappingsTable))
-		->addClass('border_dotted')
-		->addClass('inlineblock')
-		->addClass('objectgroup')
-);
+$valueMappingFormList->addRow(_('Mappings'), (new CDiv($mappingsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // add mappings to form by js
-if (empty($this->data['mappings'])) {
-	zbx_add_post_js('mappingsManager.addNew();');
+if ($this->data['mappings']) {
+	zbx_add_post_js('mappingsManager.addExisting('.zbx_jsvalue($this->data['mappings']).');');
 }
 else {
-	zbx_add_post_js('mappingsManager.addExisting('.zbx_jsvalue($this->data['mappings']).');');
+	zbx_add_post_js('mappingsManager.addNew();');
 }
 
 // append tab
@@ -70,7 +66,7 @@ $valueMappingTab = new CTabView();
 $valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormList);
 
 // append buttons
-if (!empty($this->data['valuemapid'])) {
+if ($this->data['valuemapid'] != 0) {
 	$valueMappingTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[

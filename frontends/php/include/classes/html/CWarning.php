@@ -23,9 +23,14 @@ class CWarning extends CDiv {
 
 	public function __construct($header, $messages = [], $buttons = []) {
 		parent::__construct($header);
-		$this->addClass('msg-bad msg-global');
+		$this->addClass(ZBX_STYLE_MSG_BAD);
+		$this->addClass('msg-global');
 		if ($messages) {
-			parent::addItem((new CDiv(new CList($messages)))->addClass('msg-details'));
+			parent::addItem(
+				(new CDiv(
+					(new CList($messages))->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
+				))->addClass(ZBX_STYLE_MSG_DETAILS)
+			);
 		}
 		parent::addItem((new CDiv($buttons))->addClass('msg-buttons'));
 	}
