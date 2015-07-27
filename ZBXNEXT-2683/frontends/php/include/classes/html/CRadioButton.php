@@ -43,5 +43,6 @@ class CRadioButton extends CTag {
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+		return $this;
 	}
 }

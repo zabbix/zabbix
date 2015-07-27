@@ -104,8 +104,6 @@ $fields = [
 	'filter_ip' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
 	'filter_dns' =>		[T_ZBX_STR, O_OPT, null,		null,			null],
 	'filter_port' =>	[T_ZBX_STR, O_OPT, null,		null,			null],
-	// ajax
-	'filterState' =>	[T_ZBX_INT, O_OPT, P_ACT,		null,			null],
 	// sort and sortorder
 	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name","status"'),						null],
 	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -120,17 +118,6 @@ if (getRequest('groupid') && !API::HostGroup()->isWritable([$_REQUEST['groupid']
 }
 if (getRequest('hostid') && !API::Host()->isWritable([$_REQUEST['hostid']])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.hosts.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 $hostIds = getRequest('hosts', []);

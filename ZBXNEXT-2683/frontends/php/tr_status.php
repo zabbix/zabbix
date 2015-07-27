@@ -52,8 +52,6 @@ $fields = [
 	'txt_select' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'inventory' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	// ajax
-	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","lastchange","priority"'),	null],
 	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -68,18 +66,6 @@ if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid'
 }
 if (getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.tr_status.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 /*
@@ -213,8 +199,8 @@ CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR
  */
 $triggerWidget = (new CWidget())->setTitle(_('Status of triggers'));
 
-$rightForm = new CForm('get');
-$rightForm->addVar('fullscreen', $_REQUEST['fullscreen']);
+$rightForm = (new CForm('get'))
+	->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 $controls = new CList();
 $controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
@@ -229,6 +215,7 @@ $triggerWidget->setControls($rightForm);
 $filterFormView = new CView('common.filter.trigger', [
 	'overview' => false,
 	'filter' => [
+		'filterid' => 'web.tr_status.filter.state',
 		'showTriggers' => $showTriggers,
 		'ackStatus' => $ackStatus,
 		'showEvents' => $showEvents,
@@ -253,9 +240,9 @@ $triggerWidget->addItem($filterForm);
 /*
  * Form
  */
-$triggerForm = new CForm('get', 'acknow.php');
-$triggerForm->setName('tr_status');
-$triggerForm->addVar('backurl', $page['file']);
+$triggerForm = (new CForm('get', 'acknow.php'))
+	->setName('tr_status')
+	->addVar('backurl', $page['file']);
 
 /*
  * Table
@@ -268,30 +255,31 @@ $headerCheckBox = ($showEventColumn)
 	? (new CCheckBox('all_events'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_events', 'events');")
 	: (new CCheckBox('all_triggers'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
 
-if ($showEvents != EVENTS_OPTION_NOEVENT) {
-	$showHideAllDiv = (new CDiv(SPACE))
-		->addClass('filterclosed')
-		->setId($switcherName);
-}
-else {
+if ($showEvents == EVENTS_OPTION_NOEVENT) {
 	$showHideAllDiv = null;
 }
+else {
+	$showHideAllDiv = (new CDiv())
+		->addClass(ZBX_STYLE_TREEVIEW)
+		->setId($switcherName)
+		->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT));
+}
 
-$triggerTable = new CTableInfo();
-$triggerTable->setHeader([
-	$showHideAllDiv,
-	$config['event_ack_enable'] ? $headerCheckBox : null,
-	make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
-	_('Status'),
-	_('Info'),
-	make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
-	_('Age'),
-	$showEventColumn ? _('Duration') : null,
-	$config['event_ack_enable'] ? _('Ack') : null,
-	_('Host'),
-	make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
-	_('Description')
-]);
+$triggerTable = (new CTableInfo())
+	->setHeader([
+		$showHideAllDiv,
+		$config['event_ack_enable'] ? $headerCheckBox : null,
+		make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
+		_('Status'),
+		_('Info'),
+		make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
+		_('Age'),
+		$showEventColumn ? _('Duration') : null,
+		$config['event_ack_enable'] ? _('Ack') : null,
+		_('Host'),
+		make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
+		_('Description')
+	]);
 
 // get triggers
 $options = [
@@ -517,6 +505,24 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 	$triggerIdsDown[$row['triggerid_up']][] = intval($row['triggerid_down']);
 }
 
+$maintenanceids = [];
+
+foreach ($triggers as $trigger) {
+	foreach ($trigger['hosts'] as $host) {
+		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			$maintenanceids[$host['maintenanceid']] = true;
+		}
+	}
+}
+
+if ($maintenanceids) {
+	$maintenances = API::Maintenance()->get([
+		'maintenanceids' => array_keys($maintenanceids),
+		'output' => ['name', 'description'],
+		'preservekeys' => true
+	]);
+}
+
 foreach ($triggers as $trigger) {
 	$description = (new CSpan($trigger['description']))
 		->addClass(ZBX_STYLE_LINK_ACTION)
@@ -531,25 +537,25 @@ foreach ($triggers as $trigger) {
 	}
 
 	if (!empty($trigger['dependencies'])) {
-		$dependenciesTable = new CTableInfo();
-		$dependenciesTable->setAttribute('style', 'width: 200px;');
-		$dependenciesTable->addRow(bold(_('Depends on').':'));
+		$dependenciesTable = (new CTable())
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addRow(_('Depends on').':');
 
 		foreach ($trigger['dependencies'] as $dependency) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
-		$img = new CImg('images/general/arrow_down2.png', 'DEP_UP');
-		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-		$img->setHint($dependenciesTable);
+		$img = (new CImg('images/general/arrow_down2.png', 'DEP_UP'))
+			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			->setHint($dependenciesTable);
 
 		$description = [$img, SPACE, $description];
 	}
 
 	$dependency = false;
-	$dependenciesTable = new CTableInfo();
-	$dependenciesTable->setAttribute('style', 'width: 200px;');
-	$dependenciesTable->addRow(bold(_('Dependent').':'));
+	$dependenciesTable = (new CTable())
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->addRow(_('Dependent').':');
 	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
@@ -560,66 +566,59 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($dependency) {
-		$img = new CImg('images/general/arrow_up2.png', 'DEP_UP');
-		$img->setAttribute('style', 'vertical-align: middle; border: 0px;');
-		$img->setHint($dependenciesTable);
+		$img = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
+			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			->setHint($dependenciesTable);
 
 		$description = [$img, SPACE, $description];
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = (new CSpan($description))->addClass('pointer');
+	$triggerDescription = new CSpan($description);
 
 	// host js menu
 	$hostList = [];
-	foreach ($trigger['hosts'] as $triggerHost) {
+	foreach ($trigger['hosts'] as $host) {
 		// fetch scripts for the host js menu
 		$scripts = [];
-		if (isset($scriptsByHosts[$triggerHost['hostid']])) {
-			foreach ($scriptsByHosts[$triggerHost['hostid']] as $script) {
+		if (isset($scriptsByHosts[$host['hostid']])) {
+			foreach ($scriptsByHosts[$host['hostid']] as $script) {
 				$scripts[] = $script;
 			}
 		}
 
-		$hostName = (new CSpan($triggerHost['name']))
-			->addClass(ZBX_STYLE_BTN_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
+		$host_name = [
+			(new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$host['hostid']], $scripts))
+		];
 
 		// add maintenance icon with hint if host is in maintenance
-		if ($triggerHost['maintenance_status']) {
-			$maintenanceIcon = (new CDiv())->addClass('icon-maintenance-inline');
+		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			$maintenance_icon = (new CSpan())->addClass(ZBX_STYLE_ICON_MAINT);
 
-			$maintenances = API::Maintenance()->get([
-				'maintenanceids' => $triggerHost['maintenanceid'],
-				'output' => API_OUTPUT_EXTEND,
-				'limit' => 1
-			]);
+			if (array_key_exists($host['maintenanceid'], $maintenances)) {
+				$maintenance = $maintenances[$host['maintenanceid']];
 
-			if ($maintenance = reset($maintenances)) {
-				$hint = $maintenance['name'].' ['.($triggerHost['maintenance_type']
+				$hint = $maintenance['name'].' ['.($host['maintenance_type']
 					? _('Maintenance without data collection')
 					: _('Maintenance with data collection')).']';
 
-				if (isset($maintenance['description'])) {
-					// double quotes mandatory
+				if ($maintenance['description']) {
 					$hint .= "\n".$maintenance['description'];
 				}
 
-				$maintenanceIcon->setHint($hint);
-				$maintenanceIcon->addClass('pointer');
+				$maintenance_icon->setHint($hint);
 			}
 
-			$hostName->addItem($maintenanceIcon);
+			$host_name[] = $maintenance_icon;
+			$host_name = (new CSpan($host_name))->addClass(ZBX_STYLE_REL_CONTAINER);
 		}
 
-		$hostList[] = $hostName;
+		$hostList[] = $host_name;
 		$hostList[] = ', ';
 	}
 	array_pop($hostList);
-
-	// host
-	$hostColumn = new CCol($hostList);
-	$hostColumn->addStyle('white-space: normal;');
 
 	// status
 	$statusSpan = new CSpan(trigger_value2str($trigger['value']));
@@ -677,16 +676,17 @@ foreach ($triggers as $trigger) {
 	}
 
 	// open or close
-	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
-		$openOrCloseDiv = (new CDiv(SPACE))
-			->addClass('filterclosed')
-			->setAttribute('data-switcherid', $trigger['triggerid']);
-	}
-	elseif ($showEvents == EVENTS_OPTION_NOEVENT) {
+	if ($showEvents == EVENTS_OPTION_NOEVENT) {
 		$openOrCloseDiv = null;
 	}
+	elseif ($trigger['events']) {
+		$openOrCloseDiv = (new CDiv())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->setAttribute('data-switcherid', $trigger['triggerid'])
+			->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT));
+	}
 	else {
-		$openOrCloseDiv = SPACE;
+		$openOrCloseDiv = '';
 	}
 
 	// severity
@@ -698,10 +698,7 @@ foreach ($triggers as $trigger) {
 	// unknown triggers
 	$unknown = SPACE;
 	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-		$unknown = (new CDiv(SPACE))
-			->addClass('status_icon')
-			->addClass('iconunknown')
-			->setHint($trigger['error'], ZBX_STYLE_RED);
+		$unknown = makeUnknownIcon($trigger['error']);
 	}
 
 	// comments
@@ -725,10 +722,10 @@ foreach ($triggers as $trigger) {
 		empty($trigger['lastchange']) ? '' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
-		$hostColumn,
+		$hostList,
 		$triggerDescription,
 		$comments
-	], 'even_row');
+	]);
 
 	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
 		$i = 1;
@@ -773,7 +770,6 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
 				$emptyColumn]))
-					->addClass('odd_row')
 					->setAttribute('data-parentid', $trigger['triggerid'])
 					->addStyle('display: none;');
 			$triggerTable->addRow($row);

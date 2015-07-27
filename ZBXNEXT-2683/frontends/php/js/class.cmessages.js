@@ -60,14 +60,12 @@ var CMessageList = Class.create({
 		this.updateSettings();
 		this.createContainer();
 
-		addListener(this.dom.closeAll, 'click', this.closeAllMessages.bindAsEventListener(this));
-		addListener(this.dom.snooze, 'click', this.stopSound.bindAsEventListener(this));
-		addListener(this.dom.mute, 'click', this.mute.bindAsEventListener(this));
+		addListener(this.dom.container.close, 'click', this.closeAllMessages.bindAsEventListener(this));
+		addListener(this.dom.snooze.button, 'click', this.snooze.bindAsEventListener(this));
+		addListener(this.dom.mute.button, 'click', this.mute.bindAsEventListener(this));
 
 		jQuery(this.dom.container).draggable({
-			handle: this.dom.header,
-			axis: 'y',
-			containment: [0, 0, 0, 1600]
+			handle: this.dom.header
 		});
 	},
 
@@ -102,7 +100,7 @@ var CMessageList = Class.create({
 		this.sounds.repeat = settings['sounds.repeat'];
 		this.sounds.mute = settings['sounds.mute'];
 		if (this.sounds.mute == 1) {
-			this.dom.mute.className = 'iconmute menu_icon shadow';
+			this.dom.mute.button.className = 'btn-sound-off';
 		}
 
 		if (settings.enabled != 1) {
@@ -153,12 +151,28 @@ var CMessageList = Class.create({
 		return this.messageList[this.msgcounter];
 	},
 
-	mute: function(e) {
+	snooze: function(e) {
 		e = e || window.event;
 		var icon = Event.element(e);
-		var newClass = switchElementClass(icon, 'iconmute', 'iconsound');
 
-		if (newClass == 'iconmute') {
+		if (jQuery(icon).hasClass('btn-alarm-on')) {
+			jQuery(icon).removeClass('btn-alarm-on');
+			jQuery(icon).addClass('btn-alarm-off');
+		}
+
+		icon.blur();
+
+		this.stopSound();
+	},
+
+	mute: function(e) {
+		e = e || window.event;
+		var icon = Event.element(e),
+			newClass = switchElementClass(icon, 'btn-sound-off', 'btn-sound-on');
+
+		icon.blur();
+
+		if (newClass == 'btn-sound-off') {
 			var action = 'message.mute';
 			this.sounds.mute = 1;
 
@@ -182,6 +196,11 @@ var CMessageList = Class.create({
 	},
 
 	playSound: function() {
+		if (jQuery(this.dom.snooze.button).hasClass('btn-alarm-off')) {
+			jQuery(this.dom.snooze.button).removeClass('btn-alarm-off');
+			jQuery(this.dom.snooze.button).addClass('btn-alarm-on');
+		}
+
 		if (this.sounds.mute != 0) {
 			return true;
 		}
@@ -353,73 +372,69 @@ var CMessageList = Class.create({
 			return false;
 		}
 
+		// container
 		this.dom.container = document.createElement('div');
 		doc_body.appendChild(this.dom.container);
 
-		// container
 		this.dom.container.setAttribute('id', 'zbx_messages');
-		this.dom.container.className = 'messagecontainer';
+		this.dom.container.className = 'overlay-dialogue notif';
+		this.dom.container.style.right = '0px';
+		this.dom.container.style.top = '115px';
 		$(this.dom.container).hide();
+
+		// close all
+		this.dom.container.close = document.createElement('span');
+		this.dom.container.close.className = 'overlay-close-btn';
+		this.dom.container.close.setAttribute('title', locale['S_CLEAR']);
+		this.dom.container.appendChild(this.dom.container.close);
 
 		// header
 		this.dom.header = document.createElement('div');
+		this.dom.header.className = 'dashbrd-widget-head cursor-move';
 		this.dom.container.appendChild(this.dom.header);
-		this.dom.header.className = 'header';
-
-		// text
-		this.dom.caption = document.createElement('h3');
-		this.dom.caption.className = 'headertext move';
-		this.dom.caption.appendChild(document.createTextNode(locale['S_MESSAGES']));
-		this.dom.header.appendChild(this.dom.caption);
 
 		// controls
-		this.dom.controls = document.createElement('div');
+		this.dom.controls = document.createElement('ul');
 		this.dom.header.appendChild(this.dom.controls);
-		this.dom.controls.className = 'controls';
-
-		// buttons list
-		this.dom.controlList = new CList().node;
-		this.dom.controls.appendChild(this.dom.controlList);
-		this.dom.controlList.style.cssFloat = 'right';
 
 		// snooze
-		this.dom.snooze = document.createElement('div');
-		this.dom.snooze.setAttribute('title', locale['S_SNOOZE']);
-		this.dom.snooze.className = 'iconsnooze menu_icon shadow';
-		this.dom.controlList.addItem(this.dom.snooze, 'linear');
+		this.dom.snooze = document.createElement('li');
+		this.dom.controls.appendChild(this.dom.snooze);
+
+		this.dom.snooze.button = document.createElement('button');
+		this.dom.snooze.button.setAttribute('title', locale['S_SNOOZE']);
+		this.dom.snooze.button.className = 'btn-alarm-on';
+		this.dom.snooze.appendChild(this.dom.snooze.button);
 
 		// mute
-		this.dom.mute = document.createElement('div');
-		this.dom.mute.setAttribute('title', locale['S_MUTE'] + '/' + locale['S_UNMUTE']);
-		this.dom.mute.className = 'iconsound menu_icon shadow';
-		this.dom.controlList.addItem(this.dom.mute, 'linear');
+		this.dom.mute = document.createElement('li');
+		this.dom.controls.appendChild(this.dom.mute);
 
-		// close all
-		this.dom.closeAll = document.createElement('div');
-		this.dom.closeAll.setAttribute('title', locale['S_CLEAR']);
-		this.dom.closeAll.className = 'iconclose menu_icon shadow';
-		this.dom.controlList.addItem(this.dom.closeAll, 'linear');
+		this.dom.mute.button = document.createElement('button');
+		this.dom.mute.button.setAttribute('title', locale['S_MUTE'] + '/' + locale['S_UNMUTE']);
+		this.dom.mute.button.className = 'btn-sound-on';
+		this.dom.mute.appendChild(this.dom.mute.button);
 
 		// message list
-		this.dom.list = new CList().node;
+		this.dom.list = new CList('notif-body').node;
 		this.dom.container.appendChild(this.dom.list);
 	}
 });
 
 var CMessage = Class.create({
-	list:		null,		// link to message list containing this message
-	messageid:	null,		// msg id
-	caption:	'unknown',	// msg caption (events, actions, infos.. e.t.c.)
-	sourceid:	null,		// caption + sourceid = identifier for server
-	type:		0,			// 1 - sound, 2 - text, 3 - sound & text, 4 - notdefined
-	priority:	0,			// msg priority ASC
-	sound:		null,		// msg sound
-	color:		'ffffff',	// msg color
-	time:		0,			// msg time arrival
-	title:		'No title',	// msg header
-	body:		['No text'],// msg details
-	timeout:	60,			// msg timeout
-	dom:		{},			// msg dom links
+	list:			null,			// link to message list containing this message
+	messageid:		null,			// msg id
+	caption:		'unknown',		// msg caption (events, actions, infos.. e.t.c.)
+	sourceid:		null,			// caption + sourceid = identifier for server
+	type:			0,				// 1 - sound, 2 - text, 3 - sound & text, 4 - notdefined
+	priority:		0,				// msg priority ASC
+	sound:			null,			// msg sound
+	severity_style:	'normal-bg',	// msg severity style
+	time:			0,				// msg time arrival
+	title:			'No title',		// msg header
+	body:			['No text'],	// msg details
+	timeout:		60,				// msg timeout
+	dom:			{},				// msg dom links
 
 	initialize: function(messageList, message) {
 		this.messageid = message.messageid;
@@ -454,37 +469,22 @@ var CMessage = Class.create({
 	createMessage: function() {
 		// message
 		this.dom.message = document.createElement('div');
-		this.dom.message.className = 'message';
-		this.dom.message.style.backgroundColor = '#' + this.color;
+		this.dom.message.className = 'notif-indic ' + this.severity_style;
 
 		// li
-		this.dom.listItem = new CListItem(this.dom.message, 'listItem').node;
+		this.dom.listItem = new CListItem(this.dom.message).node;
 		$(this.list.dom.list).insert({'top': this.dom.listItem});
 
-		// message box
-		this.dom.messageBox = document.createElement('div');
-		this.dom.message.appendChild(this.dom.messageBox);
-		this.dom.messageBox.className = 'messagebox';
-
 		// title
-		this.dom.title = document.createElement('span');
-		this.dom.messageBox.appendChild(this.dom.title);
+		this.dom.title = document.createElement('h4');
+		this.dom.listItem.appendChild(this.dom.title);
 		$(this.dom.title).update(BBCode.Parse(this.title));
-		this.dom.title.className = 'title';
 
 		// body
-		if (!is_array(this.body)) {
-			this.body = [this.body];
-		}
 		for (var i = 0; i < this.body.length; i++) {
-			if (!isset(i, this.body) || empty(this.body[i])) {
-				continue;
-			}
-			this.dom.messageBox.appendChild(document.createElement('br'));
-			this.dom.body = document.createElement('span');
-			this.dom.messageBox.appendChild(this.dom.body);
+			this.dom.body = document.createElement('p');
+			this.dom.listItem.appendChild(this.dom.body);
 			$(this.dom.body).update(BBCode.Parse(this.body[i]));
-			this.dom.body.className = 'body';
 		}
 	},
 
@@ -522,9 +522,10 @@ var CList = Class.create(CNode, {
 	items: [],
 
 	initialize: function($super, className) {
-		className = className || '';
 		$super('ul');
-		this.setClass(this.classNames);
+		if (!empty(className)) {
+			this.setClass(className);
+		}
 		Object.extend(this.node, this);
 	},
 
@@ -542,10 +543,11 @@ var CListItem = Class.create(CNode, {
 	items: [],
 
 	initialize: function($super, item, className) {
-		className = className || '';
 		item = item || null;
 		$super('li');
-		this.setClass(className);
+		if (!empty(className)) {
+			this.setClass(className);
+		}
 		this.addItem(item);
 	},
 
