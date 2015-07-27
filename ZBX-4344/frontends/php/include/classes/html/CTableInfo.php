@@ -45,18 +45,12 @@ class CTableInfo extends CTable {
 
 					table.makeVerticalRotation();
 
-					if (IE8) {
-						jQuery(".vertical_rotation_inner", table).css({
-							filter: "progid:DXImageTransform.Microsoft.BasicImage(rotation=2)"
-						});
-					}
-					else if (IE9) {
+					if (IE9) {
 						jQuery(".vertical_rotation_inner", table).css({
 							"-ms-transform": "rotate(270deg)"
 						});
 					}
-
-					if (!IE9) {
+					else {
 						jQuery(".vertical_rotation_inner", table).css({
 							"writing-mode": "tb-rl"
 						});
@@ -71,7 +65,6 @@ class CTableInfo extends CTable {
 				}',
 			true);
 		}
-
 		return $string;
 	}
 
@@ -81,7 +74,6 @@ class CTableInfo extends CTable {
 	 */
 	public function makeVerticalRotation() {
 		$this->addMakeVerticalRotationJs = true;
-
 		return $this;
 	}
 }

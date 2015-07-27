@@ -1,4 +1,4 @@
-// NOTIFICATION & ALERT COLORS
+// NOTIFICATION & ALERT
 $red: #e33734 !default;
 $light-red: #ed9898 !default;
 $lighter-red: #fccacf !default;
@@ -14,6 +14,8 @@ $green: #429e47 !default;
 $light-green: #a5d6a7 !default;
 $lighter-green: #c5e3c6 !default;
 
+$blue: #1e87e3 !default;
+
 $alt-red: #e45959;
 $alt-orange: #ffa059;
 $alt-yellow: #ffc859;
@@ -26,6 +28,9 @@ $transparent: transparent;
 
 
 // MAIN
+$main-nav-bg-color: #0275b8 !default;
+$main-subnav-bg-color: #013e62 !default;
+$main-subnav-bg-selected-color: #026dab !default;
 $main-color: #0275b8 !default;
 $font-color: #1f2c33 !default;
 $font-alt-color: #768d99 !default;
@@ -40,9 +45,11 @@ $ui-border-color: #dfe4e7 !default;
 
 $action-hover-color: #ebebeb !default;
 $action-border-color: #ccd5d9 !default;
-$action-shadow-color: rgba(118,141,153,0.4) !default;
+$action-shadow-color: rgba(#768d99, 0.5) !default;
 
 $table-border-color: #ebeef0 !default;
+
+$ui-tab-bg-selected-color: #0275b8 !default;
 
 
 // FORMS
@@ -55,6 +62,9 @@ $form-disabled-font-color: #acbbc2 !default;
 $form-disabled-bg-color: #ebebeb !default;
 $form-disabled-border-color: #ccd5d9 !default;
 
+$scrollbar-track-color: #ebebeb !default;
+$scrollbar-thumb-color: #ccd5d9 !default;
+
 
 // BUTTONS
 $btn-font-color: #fff !default;
@@ -65,8 +75,8 @@ $btn-alt-font-color: #0275b8 !default;
 $btn-alt-bg-color: transparent !default;
 $btn-alt-border-color: $btn-bg-color !default;
 
-$btn-form-font-color: #0275b8 !default;
-$btn-form-bg-color: transparent !default;
+$btn-form-font-color: #1f2c33 !default;
+$btn-form-bg-color: $form-bg-color !default;
 $btn-form-border-color: $form-border-color !default;
 
 $btn-disabled-font-color: #acbbc2 !default;
@@ -80,12 +90,14 @@ $link-hover-color: #0275b8 !default;
 $link-active-color: #0275b8 !default;
 $link-visited-color: #0275b8 !default;
 
-$link-main-nav-color: #bfdced !default;
-$link-main-nav-hover-color: #fff !default;
-$link-main-nav-active-color: #fff !default;
-$link-main-nav-visited-color: #bfdced !default;
+$link-alt-underline-color: #768d99 !default;
 
-$link-main-subnav-color: #bfced7 !default;
-$link-main-subnav-hover-color: #fff !default;
-$link-main-subnav-active-color: #fff !default;
-$link-main-subnav-visited-color: #bfced7 !default;
+$link-main-nav-color: rgba(#fff, 0.75) !default;
+$link-main-nav-hover-color: rgba(#fff, 1) !default;
+$link-main-nav-active-color: rgba(#fff, 1) !default;
+$link-main-nav-visited-color: rgba(#fff, 0.75) !default;
+
+$link-main-subnav-color: rgba(#fff, 0.75) !default;
+$link-main-subnav-hover-color: rgba(#fff, 1) !default;
+$link-main-subnav-active-color: rgba(#fff, 1) !default;
+$link-main-subnav-visited-color: rgba(#fff, 0.75) !default;

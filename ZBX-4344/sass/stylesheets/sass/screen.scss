@@ -11,8 +11,10 @@ html {
 }
 
 body {
-	font-family: $font-stack;
-	font-size: $font-body-size;
+	font: {
+		family: $font-stack;
+		size: $font-body-size;
+	}
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
@@ -23,30 +25,30 @@ body {
 a {
 
 	&:link {
-		text-decoration: none;
 		color: $link-color;
+		text-decoration: none;
 		outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
 	&:visited {
-		text-decoration: none;
 		color: $link-visited-color;
+		text-decoration: none;
 	}
 
 	&:hover {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:focus {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:active {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-active-color;
+		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
 }
 
@@ -77,45 +79,47 @@ a {
 }
 
 .link-alt {
+	text-decoration: none;
+	cursor: pointer;
 
 	&:link {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(118,141,153,0.3);
-		cursor: pointer;
+		//text-decoration: none;
+		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
+		//cursor: pointer;
 	}
 
 	&:visited {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(118,141,153,0.3);
-		cursor: pointer;
+		//text-decoration: none;
+		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
+		//cursor: pointer;
 	}
 
 	&:hover {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//text-decoration: none;
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		//cursor: pointer;
 	}
 
 	&:focus {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//text-decoration: none;
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		//cursor: pointer;
 	}
 
 	&:active {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//text-decoration: none;
 		color: $link-active-color;
+		border-bottom: 1px solid rgba($link-active-color, 0.5);
+		//cursor: pointer;
 	}
 }
 
 h1 {
 	font-size: $font-h1-size;
 	line-height: $h1-line-height;
-	border-bottom: 1px solid darken($body-bg-color, 10%);
+	border-bottom: 1px solid $ui-border-color;
 	padding: 0 0 5px 0;
 }
 
@@ -134,6 +138,7 @@ h3 {
 
 h4 {
 	font-size: $font-h4-size;
+	color: $font-color;
 	line-height: $h4-line-height;
 
 	span {
@@ -155,6 +160,10 @@ strong {
 	@extend b;
 }
 
+em {
+	font-style: italic;
+}
+
 ol {
 	list-style: decimal;
 	list-style-position: inside;
@@ -168,9 +177,19 @@ p {
 	margin: 0 0 0.7em 0;
 }
 
+pre {
+	font: {
+		family: $font-stack-mono;
+		size: $font-mono-size;
+	}
+	display: block;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
 /* Main Navigation */
 nav {
-	background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 
 	a {
 
@@ -208,12 +227,12 @@ nav {
 	height: 36px;
 	line-height: 35px;
 	position: relative;
-	background-color: $main-color;
+	background-color: $main-nav-bg-color;
 }
 
 .top-nav {
 	font-size: $font-top-nav-size;
-	background-color: $main-color;
+	background-color: $main-nav-bg-color;
 
 	li {
 		display: block;
@@ -222,7 +241,7 @@ nav {
 		&.selected {
 			position: relative;
 
-			&:after{
+			&::after{
 				content:'';
 				position: absolute;
 				bottom: -1px;
@@ -235,7 +254,7 @@ nav {
 				line-height: 0;
 				border-left: 7px solid transparent;
 				border-right: 7px solid transparent;
-				border-bottom: 7px solid darken($main-color, 17%);
+				border-bottom: 7px solid $main-subnav-bg-color;
 			}
 
 			a, a:hover {
@@ -249,12 +268,24 @@ nav {
 		color: $link-main-nav-color;
 		text-decoration: none;
 
+		&:link {
+			color: $link-main-nav-color;
+		}
+
+		&:visited {
+			color: $link-main-nav-visited-color;
+		}
+
 		&:hover {
 			color: $link-main-nav-hover-color;
 		}
 
 		&:focus {
-			color: $link-main-nav-hover-color;
+			color: $link-main-nav-active-color;
+		}
+
+		&:active {
+			color: $link-main-nav-active-color;
 		}
 	}
 }
@@ -303,24 +334,20 @@ ul.top-nav-icons {
     }
 
 	.top-nav-help {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -18px;
-	}
-
-	.top-nav-print {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -42px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -36px;
 	}
 
 	.top-nav-profile {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -66px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -108px;
 	}
 
 	.top-nav-signout {
-		background: $main-color url(../img/icon-sprite.png) no-repeat 7px -91px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -144px;
 		width: 44px;
 	}
 
 	.top-nav-zbbshare {
-		background: $main-color url(../img/icon-sprite.png) no-repeat -41px -138px;
+		background: url(../img/icon-sprite.svg) no-repeat 1px -72px;
 	    width: auto;
 		padding: 0 12px 0 27px;
 	}
@@ -330,8 +357,8 @@ ul.top-nav-icons {
 	}
 
 	input {
-		background-color: darken($main-color, 5%);
-		border: 1px solid darken($main-color, 6%);
+		background-color: darken($main-nav-bg-color, 5%);
+		border: 1px solid darken($main-nav-bg-color, 6%);
 		width: 198px;
 		margin: 6px 7px 0 0;
 		color: $white;
@@ -340,7 +367,7 @@ ul.top-nav-icons {
 		@include transition(border-color .2s ease-out);
 
 		&:focus {
-			border-color: darken($main-color, 10%);
+			border-color: darken($main-nav-bg-color, 10%);
 			@include opacity(1);
 		}
 
@@ -353,11 +380,11 @@ ul.top-nav-icons {
 .top-subnav-container {
 	height: 36px;
 	line-height: 36px;
-	background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 }
 
 .top-subnav {
-	background-color: darken($main-color, 17%);
+	background-color: $main-subnav-bg-color;
 
 	li {
 		display: block;
@@ -368,24 +395,29 @@ ul.top-nav-icons {
 
 .top-subnav a {
 	padding: 5px 8px;
-	color: $link-main-subnav-color;
+
+	&:link {
+		color: $link-main-subnav-color;
+	}
+
+	&:visited {
+		color: $link-main-subnav-visited-color;
+	}
 
 	&:hover {
 		color: $link-main-subnav-hover-color;
-		text-decoration: none;
 	}
 
 	&:focus {
-		color: $link-main-subnav-hover-color;
-		text-decoration: none;
+		color: $link-main-subnav-active-color;
 	}
 
 	&:active {
-		text-decoration: none;
+		color: $link-main-subnav-active-color;
 	}
 
 	&.selected {
-		background-color: darken($main-color, 7%);
+		background-color: $main-subnav-bg-selected-color;
 		color: $link-main-subnav-active-color;
 		@include border-radius(2px);
 	}
@@ -395,28 +427,28 @@ ul.top-nav-icons {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-bottom: 4px solid $font-color;
+	border-bottom: 6px solid $font-color;
 }
 
 .arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-top: 4px solid $font-color;
+	border-top: 6px solid $font-color;
 }
 
 .arrow-left {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-right: 4px solid $font-color;
+	border-right: 6px solid $font-color;
 }
 
 .arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-left: 4px solid $font-color;
+	border-left: 6px solid $font-color;
 }
 
 %arrow {
@@ -439,6 +471,7 @@ ul.top-nav-icons {
 		li {
 			display: block;
 			float: left;
+			position: relative;
 			padding: 0 0 0 14px;
 		}
 	}
@@ -466,8 +499,6 @@ article {
 	.selected {
 		background-color: $ui-bg-color;
 		padding: 4px 9px;
-		//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-		//@include box-shadow(0 0 0 1px $ui-shadow-color);
 		border: 1px solid $ui-border-color;
 		@include border-radius(2px);
 	}
@@ -504,42 +535,57 @@ footer {
 	height: 25px;
 	margin: 0 auto;
 	margin-bottom: 10px;
-	background: url(../img/icon-sprite.png) no-repeat 0 -360px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -712px;
+	background-size: 94px;
 }
 
 /* Tables */
 .list-table {
 	width: 100%;
     background-color: $ui-bg-color;
-    //@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-    //@include box-shadow(0 0 0 1px $ui-shadow-color);
     border: 1px solid $ui-border-color;
 	
 	thead th {
 		font-size: $font-h3-size;
+		color: $font-alt-color;
 		text-transform: $font-transform;
 		letter-spacing: 0.0688em;
 		text-rendering: optimizeLegibility;
 		height: 100%;
 		overflow: hidden;
+		white-space: nowrap;
 	    padding: 8px 5px 7px 5px;
 	    vertical-align: bottom;
 	    border-bottom: 2px solid $table-border-color;
 	    text-align: left;
-	    color: $font-alt-color;
+	    //position: relative;
 
 	    .arrow-up {
-	    	position: absolute;
-	    	top: 45%;
+	    	//position: absolute;
+	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-bottom-color: $font-alt-color;
 	    }
 
+	    .arrow-right {
+	    	//position: absolute;
+	    	//top: 39%;
+	    	margin: 0 0 0 4px;
+	    	border-left-color: $font-alt-color;
+	    }
+
 	    .arrow-down {
-	    	position: absolute;
-	    	top: 45%;
+	    	//position: absolute;
+	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-top-color: $font-alt-color;
+	    }
+
+	    .treeview {
+
+	    	span {
+	    		margin: 0;
+	    	}
 	    }
 
 	    a {
@@ -588,7 +634,7 @@ footer {
 	}
 
 	td {
-		padding: 8px 5px 8px 5px;
+		padding: 8px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
@@ -596,7 +642,7 @@ footer {
 	.vertical_rotation_inner {
 		white-space: nowrap;
 		@include rotate(270);
-	} 
+	}
 }
 
 .table-paging {
@@ -604,22 +650,19 @@ footer {
 	background-color: $ui-bg-color;
 	margin-top: -1px;
 	padding: 7px 5px;
-	//border-top: 1px solid $table-border-color;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	a {
 		@extend %paging-btn;
 	}
 
-	.arrow-left {
-		border-right-color: $link-color;
-	}
+	//.arrow-left {
+	//	border-right-color: $link-color;
+	//}
 
-	.arrow-right {
-		border-left-color: $link-color;
-	}
+	//.arrow-right {
+	//	border-left-color: $link-color;
+	//}
 }
 
 .radio-switch {
@@ -634,23 +677,23 @@ footer {
 	padding: 3px 11px;
 	border: 1px solid $form-border-color;
 	text-decoration: none;
-	color: $link-color;
+	color: $font-color;
 	@include transition(background-color .2s ease-out);
 
 	&:hover {
-		color: $link-hover-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 	}
 
 	&:focus {
-		color: $link-hover-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-focus-color;
 		position: relative;
 	}
 
 	&:active {
-		color: $link-active-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 		position: relative;
 	}
@@ -687,6 +730,10 @@ footer {
 }
 
 .treeview-plus {
+	font: {
+		size: $font-top-nav-size;
+		weight: bold;
+	}
 	display: inline-block;
 	background-color: $ui-bg-color;
 	border: 1px solid $form-border-color;
@@ -695,8 +742,6 @@ footer {
 	height: 10px;
 	line-height: 10px;
 	text-align: center;
-	font-size: $font-top-nav-size;
-	font-weight: bold;
 	@include border-radius(2px);
 
 	&:hover {
@@ -715,17 +760,18 @@ footer {
 
 .treeview {
 	display: inline-block;
-	width: 18px;
+	width: 16px;
 	height: 18px;
 	line-height: 18px;
 	text-align: center;
+	//margin-left: -2px;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
 	}
 
 	.arrow-down {
-		margin-bottom: 2px;
+		margin: 0 0 2px 0;
 		border-top-color: $font-alt-color;
 	}
 
@@ -784,11 +830,9 @@ footer {
 }
 
 .filter-container {
-	padding: 10px 0;
+	padding: 15px 0 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	.table {
@@ -796,27 +840,26 @@ footer {
 	}
 
 	.filter-forms {
-		padding: 0 10px 0px 10px;
+		padding: 0 10px;
 	}
 
-	.list-table {                                       
-		margin-bottom: -10px;
-		//@include box-shadow(none);
-		border: none;
+	//.list-table {                                       
+	//	margin-bottom: -10px;
+	//	border: none;
 
-		thead {
+	//	thead {
 
-			th {
-				font-size: $font-form-size;
-				text-transform: none;
-				text-rendering: auto;
-				letter-spacing: normal;
-				color: initial;
-				padding: 8px 5px 5px 5px;
-				border-bottom-width: 1px;
-			}
-		}
-	}
+	//		th {
+	//			font-size: $font-form-size;
+	//			text-transform: none;
+	//			text-rendering: auto;
+	//			letter-spacing: normal;
+	//			color: initial;
+	//			padding: 8px 5px 5px 5px;
+	//			border-bottom-width: 1px;
+	//		}
+	//	}
+	//}
 }
 
 .subfilter-enabled {
@@ -838,6 +881,7 @@ footer {
 .filter-forms {
 	margin: 0 auto;
 	text-align: center;
+	white-space: nowrap;
 	background-color: $ui-bg-color;
 
 	.cell {
@@ -861,10 +905,6 @@ footer {
 	button {
 		margin: 10px 7px 0 7px;
 	}
-
-	.multiselect {
-		width: 165px;
-	}
 }
 
 .multiselect-wrapper {
@@ -877,8 +917,8 @@ footer {
 	@extend .multiselect-button;
 	position: relative;
 	margin-right: 3px;
-	width: 312px;
-	min-height: 22px;
+	min-height: 24px;
+	white-space: normal;
 
 	&.active {
 		border-color: $form-border-focus-color;
@@ -905,15 +945,15 @@ footer {
 			&.selected {
 
 				.subfilter-enabled {
-					background-color: darken($ui-bg-selected-color, 10%);
+					background-color: lighten($ui-bg-selected-color, 10%);
 				}
 
 				.subfilter-disable-btn {
-					background-color: darken($ui-bg-selected-color, 10%);
+					background-color: lighten($ui-bg-selected-color, 10%);
 					@include opacity(1);
 
 					&:active {
-						background-color: darken($ui-bg-selected-color, 10%);
+						background-color: lighten($ui-bg-selected-color, 10%);
 						@include opacity(1);
 					}
 				}
@@ -930,7 +970,7 @@ footer {
 	padding: 0 5px;
 	white-space: normal;
 	color: $font-alt-color;
-	background-color: $ui-bg-color;
+	background-color: $form-bg-color;
 
 	li {
 		display: block;
@@ -978,6 +1018,7 @@ footer {
 .scrollbar {
 	position: relative;
 	margin: 0 auto;
+	margin-bottom: 10px;
 	line-height: 1em;
 	height: 52px;
 
@@ -1007,7 +1048,7 @@ footer {
 	}
 
 	.btn-grey {
-		background-color: $ui-bg-color;
+		background-color: $btn-form-bg-color;
 		margin-top: -1px;
 	}
 }
@@ -1033,7 +1074,7 @@ footer {
 .overlevel {
 	position: absolute;
 	top: 14px;
-	left: 28px;
+	left: 30px;
 	height: 24px;
 	margin: 5px 0;
 }
@@ -1051,7 +1092,6 @@ footer {
 	height: 22px;
 	background-color: $form-bg-color;
 	border-color: $form-border-color;
-	cursor: move;
 	@include border-radius(2px);
 	@include transition(background-color .2s ease-out);
 
@@ -1070,9 +1110,9 @@ footer {
 	}
 
 	.center {
-		width: 22px;
+		width: 10px;
 		height: 22px;
-		background: url(../img/icon-sprite.png) no-repeat center -121px;
+		background: url(../img/icon-sprite.svg) no-repeat -13px -799px;
 		margin: 0 auto;
 	}
 }
@@ -1226,6 +1266,10 @@ footer {
 			 }
 		}
 	}
+
+	h4 {
+		margin-bottom: -5px;
+	}
 }
 
 .center {
@@ -1234,9 +1278,8 @@ footer {
 
 .table-forms-separator {
 	display: inline-block;
-	padding: 0 0 5px 5px;
-	margin: 0 0 0 -5px;
-	border-bottom: 1px dashed $form-border-color;
+	padding: 5px;
+	border: 1px solid $table-border-color;
 }
 
 .drag-drop-area {
@@ -1249,7 +1292,6 @@ footer {
 }
 
 .form-new-group {
-	diplay: inline-block;
 	border: 5px solid $lighter-green;
 	padding: 4px 0;
 	margin-left: -5px;
@@ -1323,6 +1365,11 @@ input {
 		@extend %form-input-style;
 	}
 
+	&[type="file"] {
+		padding: 1px;
+		@extend %form-input-style;
+	}
+
 	&[type="checkbox"] {
 		@extend %form-check-radio-style;
 	}
@@ -1343,8 +1390,6 @@ input {
 }
 
 textarea {
-	width: 300px;
-	height: 50px;
 	padding: 4px 5px;
 	overflow: auto;
 	@extend %form-input-style;
@@ -1385,13 +1430,15 @@ select {
 }
 
 fieldset {
-	border: 1px solid lighten($form-border-color, 10%);
+	border: 1px solid $table-border-color;
 	padding: 0 10px 10px 15px;
 }
 
 legend {
 	margin-left: -5px;
 	padding: 0 5px 0 5px;
+	text-transform: $font-transform;
+	font-size: $font-h3-size;
 }
 
 .form-input-margin {
@@ -1418,9 +1465,11 @@ legend {
 }
 
 %form-input-style {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	border: 1px solid $form-border-color;
-	font-family: $font-stack;
-	font-size: $font-form-size;
 	color: $font-color;
 	background-color: $form-bg-color;
 	outline: 0;
@@ -1439,13 +1488,14 @@ button::-moz-focus-inner {
 }
 
 button {
+	font-family: $font-stack;
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
-	font-family: $font-stack;
 	border: 1px solid $btn-bg-color;
 	padding: 0 11px;
 	min-height: 24px;
 	cursor: pointer;
+	outline: 0;
 	@include border-radius(2px);
 	@include transition(border-color, background-color .2s ease-out);
 
@@ -1527,7 +1577,7 @@ button {
 }
 
 .btn-search {
-	background: darken($main-color, 5%) url(../img/icon-sprite.png) no-repeat 1px -1px;
+	background: url(../img/icon-sprite.svg) no-repeat -5px -7px;
 	position: absolute;
 	border: none;
 	top: 7px;
@@ -1558,61 +1608,66 @@ button {
 	@include border-radius(2px 2px 0 0);
 
 	&.filter-active {
-		color: $link-color;
+		color: $font-color;
 		background-color: $ui-bg-color;
 		border: 1px solid $ui-border-color;
 		border-bottom: none;
 		margin-bottom: -1px;
-		//@include box-shadow(0 -1px 1px 0 $action-shadow-color);
 
 		.arrow-up {
 			position: absolute;
-			top: 50%;
-			margin: 0 0 0 4px;
-			border-bottom-color: $link-color;
+			top: 45%;
+			margin: 0 0 0 6px;
+			border-bottom-color: $font-color;
 		}
 	}
 
 	.arrow-down {
 		position: absolute;
-		top: 50%;
-		margin: 0 0 0 4px;
+		top: 45%;
+		margin: 0 0 0 6px;
 		border-top-color: $white;
 	}
 }
 
-$icon-buttons: (
-	conf: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -145px,
-	max: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -169px,
-	min: $btn-bg-color url(../img/icon-sprite.png) no-repeat -1px -193px,
-	add-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -1px,
-	remove-fav: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -25px,
-	action: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -49px,
-	info: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -73px,
-	reset: $btn-bg-color url(../img/icon-sprite.png) no-repeat -49px -97px
+$icon-btn: (
+	conf: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -187px,
+	max: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -223px,
+	min: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -259px,
+	add-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -295px,
+	remove-fav: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -331px,
+	action: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -367px,
+	info: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -403px,
+	reset: $btn-bg-color url(../img/icon-sprite.svg) no-repeat -7px -439px
 
 );
 
-@each $icon-buttons, $bgimage in $icon-buttons {
-    .btn-#{$icon-buttons} {
+@each $icon-btn, $bgimage in $icon-btn {
+    .btn-#{$icon-btn} {
         background: $bgimage;
+        @extend %button-icon-size;
     }
 }
 
-$icon-widget-buttons: (
-	widget-action: url(../img/icon-sprite.png) no-repeat 3px -262px,
-	widget-collapse: url(../img/icon-sprite.png) no-repeat 2px -214px,
-	widget-expand: url(../img/icon-sprite.png) no-repeat 2px -238px,
-	alarm-on: url(../img/icon-sprite.png) no-repeat -45px -191px,
-	alarm-off: url(../img/icon-sprite.png) no-repeat -45px -239px,
-	sound-on: url(../img/icon-sprite.png) no-repeat -45px -216px,
-	sound-off: url(../img/icon-sprite.png) no-repeat -45px -264px
+$icon-widget-btn: (
+	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
+	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
+	wizard-action: url(../img/icon-sprite.svg) no-repeat -10px -622px,
+	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
+	alarm-off: url(../img/icon-sprite.svg) no-repeat -3px -581px,
+	sound-on: url(../img/icon-sprite.svg) no-repeat -3px -473px,
+	sound-off: url(../img/icon-sprite.svg) no-repeat -3px -509px
 );
 
-@each $icon-widget-buttons, $bgimage in $icon-widget-buttons {
-    .btn-#{$icon-widget-buttons} {
+@each $icon-widget-btn, $bgimage in $icon-widget-btn {
+    .btn-#{$icon-widget-btn} {
         background: $bgimage;
         @extend %btn-widget;
+
+        @if $icon-widget-btn == 'wizard-action' {
+        	height: 12px!important;
+        }
     }
 }
 
@@ -1620,8 +1675,8 @@ $icon-widget-buttons: (
 	border: none;
 	width: 30px;
 	height: 28px;
+	min-height: 0;
 	padding: 0;
-	background-color: $ui-bg-color;
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
 
@@ -1681,12 +1736,12 @@ $icon-widget-buttons: (
 }
 
 %btn-search-hover-focus {
-	background-color: darken($main-color, 5%);
+	background-color: darken($main-nav-bg-color, 5%);
 	@include opacity(1);
 }
 
 %btn-widget-hover-active {
-	background-color: $ui-bg-color;
+	background-color: $transparent;
 	@include opacity(1);
 }
 
@@ -1749,50 +1804,83 @@ button[disabled] {
 		}
 
 		&.ui-tabs-active {
-			//border-left: 1px solid $table-border-color;
-			//border-right: 1px solid $table-border-color;
 			a {
-				//padding: 8px 13px 11px 13px;
 				padding: 8px 13px 9px 13px;
 				font-weight: bold;
 				background-color: $ui-bg-color;
 				color: $font-color;
 				text-decoration: none;
 				cursor: default;
-				//border-top: 3px solid $primary-blue;
-				//border-top: 3px solid $main-color;
-				//border-bottom: 3px solid $white;
-				border-bottom: 3px solid $main-color;
+				border-bottom: 3px solid $ui-tab-bg-selected-color;
 			}
 		}
 	}
 }
 
-.input-help-wrapper {
-	position: relative;
-	display: inline-block;
+$var-icons: (
+	maint: url(../img/icon-sprite.svg) no-repeat -49px -802px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -46px -731px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -46px -767px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -5px -835px
+);
+
+@each $var-icons, $bgimage in $var-icons {
+    .icon-#{$var-icons} {
+    	background: $bgimage;
+        @extend %var-icons;
+
+        @if $var-icons == 'maint' {
+        	position: absolute;
+        }
+    }
 }
 
-.help-icon {
-	background: url(../img/icon-sprite.png) no-repeat 0 -312px;
-	display: block;
+$form-icon-btn: (
+	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
+	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
+);
+
+@each $form-icon-btn, $bgimage in $form-icon-btn {
+    .icon-#{$form-icon-btn} {
+        background: $transparent $bgimage;
+        @extend %form-icon-btn;
+    }
+}
+
+%form-icon-btn {
+	border: none;
 	position: absolute;
-	top: 0;
-	right: -26px;
+	cursor: pointer;
 	@extend %button-icon-size;
 	@include opacity(0.75);
 	@include transition(opacity .2s ease-out);
 
 	&:hover {
-		cursor: pointer;
 		@include opacity(1);
+		background-color: $transparent;
 	}
+
+	&:focus {
+		@include opacity(1);
+		background-color: $transparent;
+	}
+
+	&:active {
+		@include opacity(1);
+		background-color: $transparent;
+	}
+}
+
+%var-icons {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
 }
 
 .drag-icon {
 	margin-left: -9px;
 	cursor: move;
-	background: url(../img/icon-sprite.png) no-repeat 0 -288px;
+	background: url(../img/icon-sprite.svg) no-repeat -6px -762px;
 	@extend %button-icon-size;
 }
 
@@ -1806,8 +1894,6 @@ button[disabled] {
 	padding: 20px 28px;
 	vertical-align: top;
 	position: relative;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	h1 {
@@ -1829,7 +1915,7 @@ button[disabled] {
 			padding: 4px 0 4px 28px;
 
 			&.setup-left-current {
-				border-left: 3px solid $main-color;
+				border-left: 3px solid $ui-tab-bg-selected-color;
 				color: $font-alt-color;
 				padding-left: 25px;
 			}
@@ -1848,7 +1934,6 @@ button[disabled] {
 	overflow-y: auto;
 
 	.list-table {
-		//@include box-shadow(none);
 		border: none;
 	}
 
@@ -1866,20 +1951,6 @@ button[disabled] {
 	}
 
 	@extend %webkit-scrollbar;
-}
-
-%webkit-scrollbar {
-	&::-webkit-scrollbar {
-		width: 6px;
-
-	}
-	&::-webkit-scrollbar-track {
-		background-color: $form-disabled-bg-color;
-	}
-	&::-webkit-scrollbar-thumb {
-		background-color: $form-border-color;
-		@include border-radius(2px);
-	}
 }
 
 .setup-title {
@@ -1921,8 +1992,6 @@ button[disabled] {
 	width: 322px;
 	margin: 0 auto;
 	padding: 20px 28px 0 28px;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	h1 {
@@ -1970,7 +2039,7 @@ button[disabled] {
 	margin-bottom: 25px;
 	width: 114px;
 	height: 30px;
-	background: url(../img/icon-sprite.png) no-repeat 0 -391px;
+	background: url(../img/icon-sprite.svg) no-repeat 0 -864px;
 }
 
 .signin-links {
@@ -1983,7 +2052,6 @@ button[disabled] {
 %signin-input {
 	padding: 10px 5px;
 	width: 100%;
-	//@include box-sizing(border-box);
 }
 
 /* Dashboard */
@@ -2005,12 +2073,9 @@ button[disabled] {
 	min-width: 250px;
 	margin: 0 10px 10px 0;
 	background-color: $ui-bg-color;
-	//@include box-shadow(0 1px 1px 0 rgba(118,141,153,0.2));
-	//@include box-shadow(0 0 0 1px $ui-shadow-color);
 	border: 1px solid $ui-border-color;
 
 	.list-table {
-		//@include box-shadow(none);
 		border: none;
 
 		th {
@@ -2027,6 +2092,12 @@ button[disabled] {
 				border-bottom: 1px solid $table-border-color;
 			}
 		}
+	}
+
+	.debug-output {
+		margin: 0 10px;
+		max-height: 300px;
+		border-color: $table-border-color;
 	}
 }
 
@@ -2046,9 +2117,14 @@ button[disabled] {
 }
 
 .dashbrd-widget-head {
-	cursor: move;
+	//cursor: move;
 	position: relative;
 	padding: 8px 60px 8px 10px;
+	font-weight: bold;
+
+	h4 {
+		color: h4-widget-color($font-color);
+	}
 
 	ul {
 		position: absolute;
@@ -2115,14 +2191,15 @@ button[disabled] {
 		}
 
 		&.selected {
-			background: url(../img/icon-sprite.png) no-repeat -46px -169px;
 
-			&:hover {
-				background-color: $action-hover-color;
-			}
-
-			&:active {
-				background-color: $action-hover-color;
+			&::before {
+				display: block;
+				width: 24px;
+				height: 24px;
+				position: absolute;
+				left: 0;
+				content: '';
+				background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
 			}
 		}
 
@@ -2158,7 +2235,7 @@ button[disabled] {
 	padding: 0 5px;
 	min-width: 16px;
 	color: $font-alt-color;
-	background-color: $ui-bg-color;
+	background-color: $form-bg-color;
 	border: 1px solid $action-border-color;
 	border-top: none;
 	@include box-shadow(0 6px 10px 0 $action-shadow-color);
@@ -2189,7 +2266,6 @@ button[disabled] {
 	@include box-shadow(0 4px 20px 0 $action-shadow-color);
 
 	.list-table {
-		//@include box-shadow(none);
 		border: none;
 
 		th {
@@ -2231,8 +2307,7 @@ button[disabled] {
 	}
 
 	.dashbrd-widget-head {
-		margin: -15px -15px 6px -15px;
-		padding: 12px 30px 12px 15px;
+		margin: -10px -10px 6px -10px;
 	}
 
 	.maps-container {
@@ -2253,6 +2328,17 @@ button[disabled] {
 	button {
 		margin: 0 0 0 14px;
 	}
+}
+
+.overlay-bg {
+	background-color: $white;
+	width: 100%;
+	height: 100%;
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	@include opacity(0.35);
 }
 
 .pop-up {
@@ -2324,6 +2410,7 @@ button[disabled] {
 
 	.btn-grey {
 		border: none;
+		background-color: $transparent;
 	}
 }
 
@@ -2361,35 +2448,17 @@ button[disabled] {
 	}
 }
 
-.notifications {
-	padding: 0;
-	max-width: 250px;
+/* Problem notification overlay */
+.notif {
+	width: 250px;
 
 	.dashbrd-widget-head {
-		margin: -2px 0 -7px 0;
-	}
-
-	h4 {
-		display: inline-block;
-	}
-
-	p {
-		margin: 0.35em 0 0 0;
-	}
-
-	tr {
-		td:first-child {
-			padding: 0;
-			width: 3px;
-		}
-	}
-
-	.dashbrd-widget-head {
+		margin: -11px 0 7px -9px;
+		padding: 0;
 
 		ul {
 			position: relative;
 			display: inline-block;
-			margin-left: 8px;
 
 			li {
 				float: none;
@@ -2398,6 +2467,54 @@ button[disabled] {
 		}
 	}
 
+}
+
+.notif-body {
+	max-height: 600px;
+	padding: 0 5px 0 0;
+	overflow-y: auto;
+	@extend %webkit-scrollbar;
+
+	h4 {
+		display: block;
+		max-width: 250px;
+		padding-bottom: 0.083em;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
+	p {
+		margin: 0.25em 0 0 0;
+	}
+
+	li {
+		padding: 0 0 10px 19px;
+
+		&:last-child {
+			padding-bottom: 0;
+		}
+	}
+}
+
+.notif-indic {
+	width: 14px;
+	height: 14px;
+	float: left;
+	margin: 2px 0 0 -19px;
+	@include border-radius(2px);
+}
+
+.notif-indic-container {
+	border-top: 1px solid $table-border-color;
+	margin: 0 0 0 -19px;
+	padding: 14px 0 0 0;
+
+	.notif-indic {
+		float: none;
+		display: inline-block;
+		margin: 0 2px 0 0;
+	}
 }
 
 /* Maps, Screens, Graphs */
@@ -2419,12 +2536,41 @@ button[disabled] {
 .dashed-border {
 
 	td {
-		border: 1px dashed $form-border-color;
+		border: 1px dashed $table-border-color;
 
 		td {
 			border: none;
 		}
 	}
+}
+
+.graph-selection {
+	position: absolute;
+	z-index: 98;
+	overflow: hidden;
+	background-color: rgba($yellow,0.4);
+	border: 1px solid rgba($yellow,0.4);
+}
+
+/* Debug */
+.debug-output {
+	max-height: 600px;
+	overflow-y: auto;
+	padding: 11px;
+	margin: 10px 13px 0 13px;
+	background-color: $lighter-yellow;
+	border: 1px solid $ui-border-color;
+	@extend %webkit-scrollbar;
+}
+
+.btn-debug {
+	position: fixed;
+	bottom: 13px;
+	right: 13px;
+	z-index: 10000;
+	padding: 4px 11px;
+	background-color: rgba($body-bg-color,0.7);
+	@include border-radius(2px);
 }
 
 /* Alerts */
@@ -2460,26 +2606,60 @@ a.grey {
 	@extend .grey;
 }
 
+.blue {
+	color: $blue;
+}
+
+a.blue {
+	@extend .blue;
+}
+
+.status-container {
+	display: inline-block;
+	white-space: nowrap;
+	margin: 2px 3px 2px 0;
+
+	&:last-child {
+		margin: 0;
+	}
+
+	span {
+		@include border-radius(0);
+
+		&:only-child {
+			@include border-radius(2px)
+		}
+
+		&:first-child:not(:only-child) {
+			@include border-radius(2px 0 0 2px);
+		}
+
+		&:last-child:not(:only-child) {
+			@include border-radius(0 2px 2px 0);
+		}
+	}
+}
+
 .status-green {
-    border: 1px solid darken(desaturate($alt-green, 10%), 18%);
+    border: 1px solid darken(desaturate($alt-green, 10%), 20%);
 	background-color: darken(desaturate($alt-green, 10%), 16%);
 	@extend %status;
 }
 
 .status-red {
-	border: 1px solid darken(desaturate($alt-red, 10%), 7%);
+	border: 1px solid darken(desaturate($alt-red, 10%), 9%);
 	background-color: darken(desaturate($alt-red, 10%), 5%);
 	@extend %status;
 }
 
 .status-grey {
-	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 10%);
+	border: 1px solid darken(desaturate($alt-blue-grey, 10%), 12%);
 	background-color: darken(desaturate($alt-blue-grey, 10%), 8%);
 	@extend %status;
 }
 
 .status-yellow {
-	border: 1px solid darken(desaturate($alt-yellow, 10%), 18%);
+	border: 1px solid darken(desaturate($alt-yellow, 10%), 20%);
 	background-color: darken(desaturate($alt-yellow, 10%), 16%);
 	@extend %status;
 }
@@ -2490,10 +2670,9 @@ a.grey {
 	font-size: $font-h3-size;
 	text-transform: $font-transform;
 	text-align: center;
-	min-width: 1em;
+	min-width: 0.7em;
 	line-height: 1em;
 	display: inline-block;
-	cursor: default;
 	@include border-radius(2px); 
 }
 
@@ -2513,7 +2692,7 @@ td.na-bg {
 	border-left: none;
 
 	~ td.na-bg {
-		border-left: 1px dotted $ui-bg-color;
+		border-left: 1px dotted $table-border-color;
 	}
 }
 
@@ -2567,6 +2746,17 @@ td.disaster-bg {
 
 %found-bg {
 	background-color: $lighter-yellow;
+}
+
+.active-indic {
+	width: 8px;
+	height: 8px;
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	border: 2px solid $body-bg-color;
+	background-color: darken(desaturate($alt-green, 10%), 16%);
+	@include border-radius(50%);
 }
 
 .msg-good {
@@ -2631,14 +2821,21 @@ td.disaster-bg {
 	}
 
 	ul {
-		border-top-width: 1px;
+		//margin: 8px 0 0 0;
+		//border-top-width: 1px;
+		//border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
-			margin: 0.4em 0 0.4em 0; 
+			margin: 0.25em 0 0.25em 0; 
+		}
+
+		&.msg-details-border {
+			margin: 8px 0 0 0;
+			border-top-width: 1px;
+			border-top-style: dashed;
 		}
 	}
-
 }
 
 .msg-buttons {
@@ -2669,11 +2866,11 @@ td.disaster-bg {
 	bottom: 0;
 	z-index: 10000;
 	width: 100%;
-	padding: 7px 5px;
+	padding: 5px 5px;
 	text-align: center;
-	background-color: $light-yellow;
-	color: $font-color;
-	border-top: 1px solid $yellow;
+	color: darken($alt-yellow,50%);
+	background-color: $alt-yellow;
+	border-top: 1px solid darken($alt-yellow,5%);
 }
 
 .msg-global {
@@ -2700,7 +2897,7 @@ td.disaster-bg {
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
 
-	&:before {
+	&::before {
 		content:"\00d7";
 	}
 
@@ -2785,6 +2982,7 @@ a.overlay-close-btn {
 
 .input-color-picker {
 	position: relative;
+	display: inline-block;
 
 	div {
 		position: absolute;
@@ -2800,13 +2998,20 @@ a.overlay-close-btn {
 }
 
 .preloader {
-	background: url(../img/preload.gif) no-repeat 0 0;
-	width: 32px;
-	height: 32px;
+	border-radius: 50%;
+	width: 24px;
+	height: 24px;
 	margin: 0 auto;
+	border: 2px solid #ccd5d9;
+	border-bottom: 2px solid #0275b8;
+	animation: load 0.8s infinite linear;
 }
 
-$browsers: (
+@keyframes load {
+	to { @include rotate(360); }
+}
+
+$browser-logos: (
 	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
 	ff: url(../img/browser-sprite.png) no-repeat -66px 0px,
 	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
@@ -2815,7 +3020,7 @@ $browsers: (
 
 );
 
-@each $browser, $bgimage in $browsers {
+@each $browser, $bgimage in $browser-logos {
     .browser-logo-#{$browser} {
         background: $bgimage;
         @extend %browser-logo-style;
@@ -2858,4 +3063,61 @@ $browsers: (
 	margin: 25px 0 0 0;
 	padding: 10px 0 0 0;
 	text-align: center;
+}
+
+%webkit-scrollbar {
+	&::-webkit-scrollbar {
+		width: 9px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background-color: $scrollbar-track-color;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background-color: $scrollbar-thumb-color;
+		border: 1px solid $scrollbar-track-color;
+	}
+}
+
+.cursor-move {
+	cursor: move;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+%overflow-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.overflow-ellipsis {
+	table-layout: fixed;
+
+	td {
+		@extend %overflow-ellipsis;
+	}
+
+	th {
+		@extend %overflow-ellipsis;
+
+		a {
+			@extend %overflow-ellipsis;
+		}
+	}
+}
+
+.rel-container {
+	position: relative;
+	//display: inline-block;
+	//padding-right: 14px;
+	padding: 8px 14px 8px 5px;
+
+  .icon-help {
+  	top: 3px;
+  	left: -3px;
+  }
 }

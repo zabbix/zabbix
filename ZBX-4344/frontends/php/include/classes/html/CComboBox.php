@@ -39,6 +39,7 @@ class CComboBox extends CTag {
 
 	public function setValue($value = null) {
 		$this->value = $value;
+		return $this;
 	}
 
 	public function addItems(array $items) {
@@ -46,6 +47,7 @@ class CComboBox extends CTag {
 			$selected = (int) (strcmp($value, $this->value) == 0);
 			parent::addItem(new CComboItem($value, $caption, $selected));
 		}
+		return $this;
 	}
 
 	public function addItemsInGroup($label, $items) {
@@ -55,6 +57,7 @@ class CComboBox extends CTag {
 			$group->addItem(new CComboItem($value, $caption, $selected));
 		}
 		parent::addItem($group);
+		return $this;
 	}
 
 	public function addItem($value, $caption = '', $selected = null, $enabled = true, $class = null) {
@@ -85,7 +88,6 @@ class CComboBox extends CTag {
 
 			parent::addItem($citem);
 		}
-
 		return $this;
 	}
 
@@ -101,6 +103,7 @@ class CComboBox extends CTag {
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
+		return $this;
 	}
 }
 

@@ -23,17 +23,23 @@ class CControllerMediatypeCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' =>				'required|db media_type.type       |in '.implode(',', array_keys(media_type2str())),
-			'description' =>		'         db media_type.description|not_empty',
-			'smtp_server' =>		'         db media_type.smtp_server',
-			'smtp_helo' =>			'         db media_type.smtp_helo',
-			'smtp_email' =>			'         db media_type.smtp_email',
-			'exec_path' =>			'         db media_type.exec_path',
-			'gsm_modem' =>			'         db media_type.gsm_modem',
-			'jabber_username' =>	'         db media_type.username',
-			'eztext_username' =>	'         db media_type.username',
-			'passwd' =>				'         db media_type.passwd',
-			'status' =>				'         db media_type.status     |in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
+			'type' =>					'required|db media_type.type|in '.implode(',', array_keys(media_type2str())),
+			'description' =>			'db media_type.description|not_empty',
+			'smtp_server' =>			'db media_type.smtp_server',
+			'smtp_port' =>				'db media_type.smtp_port',
+			'smtp_helo' =>				'db media_type.smtp_helo',
+			'smtp_email' =>				'db media_type.smtp_email',
+			'smtp_security' =>			'db media_type.smtp_security|in '.SMTP_CONNECTION_SECURITY_NONE.','.SMTP_CONNECTION_SECURITY_STARTTLS.','.SMTP_CONNECTION_SECURITY_SSL_TLS,
+			'smtp_verify_peer' =>		'db media_type.smtp_verify_peer|in 0,1',
+			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
+			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
+			'exec_path' =>				'db media_type.exec_path',
+			'gsm_modem' =>				'db media_type.gsm_modem',
+			'jabber_username' =>		'db media_type.username',
+			'eztext_username' =>		'db media_type.username',
+			'smtp_username' =>			'db media_type.username',
+			'passwd' =>					'db media_type.passwd',
+			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED,
 		];
 
 		$ret = $this->validateInput($fields);
@@ -66,7 +72,13 @@ class CControllerMediatypeCreate extends CController {
 
 		switch($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
-				$this->getInputs($mediatype, ['smtp_server', 'smtp_helo', 'smtp_email']);
+				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
+					'smtp_security', 'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication',
+					'passwd'
+				]);
+				if ($this->hasInput('smtp_username')) {
+					$mediatype['username'] = $this->getInput('smtp_username');
+				}
 				break;
 			case MEDIA_TYPE_EXEC:
 				$this->getInputs($mediatype, ['exec_path']);
