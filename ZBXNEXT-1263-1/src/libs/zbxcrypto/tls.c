@@ -2237,6 +2237,7 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
 }
 #endif
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_library_init                                             *
@@ -2276,7 +2277,9 @@ static void	zbx_tls_library_init(void)
 	zabbix_log(LOG_LEVEL_DEBUG, "OpenSSL library (version %s) initialized", SSLeay_version(SSLEAY_VERSION));
 #endif
 }
+#endif
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_library_deinit                                           *
@@ -2301,7 +2304,9 @@ void	zbx_tls_library_deinit(void)
 	}
 #endif
 }
+#endif
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_init_parent                                              *
@@ -2315,6 +2320,7 @@ void	zbx_tls_init_parent(void)
 	zbx_tls_library_init();		/* on MS Windows initialize crypto libraries in parent thread */
 #endif
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -3006,6 +3012,7 @@ out:
 }
 #endif
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_free                                                     *
@@ -3128,6 +3135,7 @@ void	zbx_tls_free(void)
 #endif
 #endif
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -4529,6 +4537,7 @@ out1:
 }
 #endif
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_tls_close                                                    *
@@ -4609,6 +4618,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 	}
 #endif
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
