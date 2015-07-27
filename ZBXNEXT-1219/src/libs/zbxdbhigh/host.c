@@ -1896,14 +1896,12 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_uint64_t		id;
-	zbx_vector_uint64_t	applicationids, apptemplateids, druleids;
-	int			index;
+	zbx_vector_uint64_t	applicationids, apptemplateids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	zbx_vector_uint64_create(&applicationids);
 	zbx_vector_uint64_create(&apptemplateids);
-	zbx_vector_uint64_create(&druleids);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.application_templateid,t.applicationid"
@@ -1945,11 +1943,46 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 		DBdelete_applications(&applicationids);
 	}
 
-	/* remove applications created by prototypes of the unlinked templates */
+	zbx_vector_uint64_destroy(&apptemplateids);
+	zbx_vector_uint64_destroy(&applicationids);
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBdelete_template_discovered_applications                        *
+ *                                                                            *
+ * Purpose: delete host applications that belong to an unlinked template      *
+ *                                                                            *
+ * Parameters: hostid      - [IN] host identificator from database            *
+ *             templateids - [IN] array of template IDs                       *
+ *                                                                            *
+ * Author: Eugene Grigorjev                                                   *
+ *                                                                            *
+ * Comments: !!! Don't forget to sync the code with PHP !!!                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	DBdelete_template_discovered_applications(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids)
+{
+	const char		*__function_name = "DBdelete_template_discovered_applications";
+
+	DB_RESULT		result;
+	DB_ROW			row;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		id;
+	zbx_vector_uint64_t	applicationids, lld_ruleids;
+	int			index;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_create(&applicationids);
+	zbx_vector_uint64_create(&lld_ruleids);
 
 	/* get the discovery rules */
 
-	sql_offset = 0;
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select i.itemid from items i"
 			" left join items ti"
@@ -1960,10 +1993,13 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 			hostid, ZBX_FLAG_DISCOVERY_RULE);
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ti.hostid", templateids->values, templateids->values_num);
 
-	DBselect_uint64(sql, &druleids);
+	DBselect_uint64(sql, &lld_ruleids);
 
-	if (0 == druleids.values_num)
+	if (0 == lld_ruleids.values_num)
 		goto out;
+
+	zbx_vector_uint64_sort(&lld_ruleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(&lld_ruleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* get the applications discovered by those rules */
 
@@ -1974,7 +2010,7 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 			" left join application_prototype ap"
 				" on ap.application_prototypeid=ad.application_prototypeid"
 			" where");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ap.itemid", druleids.values, druleids.values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ap.itemid", lld_ruleids.values, lld_ruleids.values_num);
 
 	zbx_vector_uint64_clear(&applicationids);
 	DBselect_uint64(sql, &applicationids);
@@ -1991,7 +2027,7 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 			" left join application_prototype ap"
 				" on ad.application_prototypeid=ap.application_prototypeid"
 			" where not");
-	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ap.itemid", druleids.values, druleids.values_num);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ap.itemid", lld_ruleids.values, lld_ruleids.values_num);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
 	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, "ad.applicationid", applicationids.values,
 			applicationids.values_num);
@@ -2018,8 +2054,7 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
 			, applicationids.values_num);
 	DBexecute("%s", sql);
 out:
-	zbx_vector_uint64_destroy(&druleids);
-	zbx_vector_uint64_destroy(&apptemplateids);
+	zbx_vector_uint64_destroy(&lld_ruleids);
 	zbx_vector_uint64_destroy(&applicationids);
 	zbx_free(sql);
 
@@ -2394,7 +2429,7 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 
 	char			*sql = NULL;
 	size_t			sql_alloc = 128, sql_offset = 0;
-	zbx_vector_uint64_t	templateids, discoveredappids;
+	zbx_vector_uint64_t	templateids;
 	int			i, index, res = SUCCEED;
 	char			error[MAX_STRING_LEN];
 
@@ -2426,14 +2461,20 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 		goto clean;
 	}
 
-	zbx_vector_uint64_create(&discoveredappids);
-
 	DBdelete_template_httptests(hostid, del_templateids);
 	DBdelete_template_graphs(hostid, del_templateids);
 	DBdelete_template_triggers(hostid, del_templateids);
 	DBdelete_template_host_prototypes(hostid, del_templateids);
-	DBdelete_template_applications(hostid, del_templateids);
+
+	/* Removing items will remove discovery rules and all application discovery records */
+	/* related to them. Because of that discovered applications must be removed before  */
+	/* removing items.                                                                  */
+	DBdelete_template_discovered_applications(hostid, del_templateids);
 	DBdelete_template_items(hostid, del_templateids);
+
+	/* normal applications must be removed after items are removed to cleanup */
+	/* unlinked applications                                                  */
+	DBdelete_template_applications(hostid, del_templateids);
 
 	sql = zbx_malloc(sql, sql_alloc);
 
@@ -2447,7 +2488,6 @@ int	DBdelete_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *del_tem
 	DBexecute("%s", sql);
 
 	zbx_free(sql);
-	zbx_vector_uint64_destroy(&discoveredappids);
 clean:
 	zbx_vector_uint64_destroy(&templateids);
 
