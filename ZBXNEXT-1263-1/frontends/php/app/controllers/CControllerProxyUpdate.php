@@ -75,8 +75,9 @@ class CControllerProxyUpdate extends CController {
 	protected function doAction() {
 		$proxy = [];
 
-		$this->getInputs($proxy, ['proxyid', 'host', 'description', 'status', 'tls_accept', 'tls_connect',
-			'tls_issuer', 'tls_psk', 'tls_psk_identity', 'tls_subject']);
+		$this->getInputs($proxy, ['proxyid', 'host', 'status', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
+			'tls_subject', 'tls_psk_identity', 'tls_psk'
+		]);
 
 		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
 			$proxy['interface'] = [];

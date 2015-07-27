@@ -28,8 +28,9 @@ $tabs = (new CTabView())
 
 $proxyForm = (new CForm())
 	->setId('proxyForm')
-	->addVar('proxyid', $data['proxyid']);
-$proxyForm->addVar('tls_accept', $data['tls_accept']);
+	->addVar('proxyid', $data['proxyid'])
+	->addVar('tls_accept', $data['tls_accept']);
+
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
 }
@@ -101,20 +102,16 @@ $encryptionFormList->addRow(_('Connections from proxy'), [
 	[new CCheckBox('tls_in_cert'), _('Certificate')]
 ]);
 $encryptionFormList->addRow(_('PSK identity'),
-	(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 $encryptionFormList->addRow(_('PSK'),
-	(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 $encryptionFormList->addRow(_('Issuer'),
-	(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 $encryptionFormList->addRow(_('Subject'),
-	(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 
 $tabs->addTab('proxyTab', _('Proxy'), $proxyFormList);

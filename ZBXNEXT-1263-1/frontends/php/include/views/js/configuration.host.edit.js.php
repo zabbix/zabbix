@@ -343,17 +343,17 @@
 		});
 
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
-			var is_certificate = jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?> || jQuery('#tls_in_cert').is(':checked'),
-				is_psk = jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?> || jQuery('#tls_in_psk').is(':checked');
-
-			if (is_certificate) {
+			// If certificate is selected or checked.
+			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
+					|| jQuery('#tls_in_cert').is(':checked')) {
 				jQuery('#tls_issuer, #tls_subject').closest('li').show();
 			}
 			else {
 				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
 			}
 
-			if (is_psk) {
+			// If PSK is selected or checked.
+			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?> || jQuery('#tls_in_psk').is(':checked')) {
 				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
 			}
 			else {
@@ -453,7 +453,7 @@
 			jQuery('#mass_clear_tpls').prop('disabled', !this.checked);
 		}).change();
 
-		// refresh field visibility on document load
+		// Refresh field visibility on document load.
 		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
 			jQuery('#tls_in_none').prop('checked', true);
 		}
@@ -464,19 +464,20 @@
 			jQuery('#tls_in_cert').prop('checked', true);
 		}
 
-		jQuery('#tls_connect, #tls_psk_out').trigger('change');
+		jQuery('#tls_connect').trigger('change');
 
+		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
 		jQuery('#hostForm').submit(function() {
 			var tls_accept = 0x00;
 
 			if (jQuery('#tls_in_none').is(':checked')) {
-				tls_accept |= 0x01;
+				tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
 			}
 			if (jQuery('#tls_in_psk').is(':checked')) {
-				tls_accept |= 0x02;
+				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
 			}
 			if (jQuery('#tls_in_cert').is(':checked')) {
-				tls_accept |= 0x04;
+				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
 			}
 
 			jQuery('#tls_accept').val(tls_accept);
