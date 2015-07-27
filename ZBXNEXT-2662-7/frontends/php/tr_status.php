@@ -524,17 +524,7 @@ if ($maintenanceids) {
 }
 
 foreach ($triggers as $trigger) {
-	$description = (new CSpan($trigger['description']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
-
-	if ($showDetails) {
-		$description = [
-			$description,
-			BR(),
-			(new CDiv(explode_exp($trigger['expression'], true, true)))->addClass('trigger-expression')
-		];
-	}
+	$description = [];
 
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = (new CTable())
@@ -545,11 +535,10 @@ foreach ($triggers as $trigger) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
-		$img = (new CImg('images/general/arrow_down2.png', 'DEP_UP'))
-			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+		$description[] = (new CSpan())
+			->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint($dependenciesTable);
-
-		$description = [$img, SPACE, $description];
 	}
 
 	$dependency = false;
@@ -566,15 +555,21 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($dependency) {
-		$img = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
-			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+		$description[] = (new CSpan())
+			->addClass(ZBX_STYLE_ICON_DEPEND_UP)
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint($dependenciesTable);
-
-		$description = [$img, SPACE, $description];
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = new CSpan($description);
+	$description[] = (new CSpan($trigger['description']))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+
+	if ($showDetails) {
+		$description[] = BR();
+		$description[] = (new CDiv(explode_exp($trigger['expression'], true, true)))->addClass('trigger-expression');
+	}
 
 	// host js menu
 	$hostList = [];
@@ -722,7 +717,7 @@ foreach ($triggers as $trigger) {
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
 		$hostList,
-		$triggerDescription,
+		$description,
 		$comments
 	]);
 

@@ -1146,7 +1146,9 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @return CCol
  */
 function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
-	$ack = $css = $style = null;
+	$ack = null;
+	$css = null;
+	$style = null;
 	$desc = [];
 	$acknowledge = [];
 
@@ -1200,11 +1202,9 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = (new CImg('images/general/arrow_down2.png', 'DEP_DOWN'))
-				->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			$desc[] = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
 				->setHint($dependencyTable, '', false);
-
-			$desc[] = $icon;
 		}
 
 		// trigger dependency UP
@@ -1220,17 +1220,15 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
-				->setAttribute('style', 'vertical-align: middle; border: none;')
+			$desc[] = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_DEPEND_UP)
 				->setHint($dependencyTable, '', false);
-
-			$desc[] = $icon;
 		}
 	}
 
-	$column = ((is_array($desc) && count($desc) > 0) || $ack)
+	$column = ($desc || $ack)
 		? (new CCol([$desc, $ack]))->addClass($css)->addClass('hosts')
-		: (new CCol(SPACE))->addClass($css)->addClass('hosts');
+		: (new CCol())->addClass($css)->addClass('hosts');
 
 	$column->setAttribute('style', $style);
 
