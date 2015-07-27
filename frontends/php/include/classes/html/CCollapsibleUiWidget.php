@@ -41,7 +41,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 * @param string|array|CTag $caption
 	 * @param array              $icons
 	 */
-	public function setHeader($caption = null, array $icons = []) {
+	public function setHeader($caption = null, array $icons = [], $cursor_move = false) {
 		$icon = (new CRedirectButton(SPACE, null))
 			->setId($this->id.'_icon')
 			->onClick('changeWidgetState(this, "'.$this->id.'");');
@@ -55,7 +55,8 @@ class CCollapsibleUiWidget extends CUiWidget {
 		}
 		$icons[] = $icon;
 
-		parent::setHeader($caption, $icons);
+		parent::setHeader($caption, $icons, $cursor_move);
+
 		return $this;
 	}
 
