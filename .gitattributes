@@ -118,14 +118,6 @@ frontends/php/images/general/dbl_arrow_up2.png -text
 frontends/php/images/general/error.png -text
 frontends/php/images/general/error2.png -text
 frontends/php/images/general/error3.png -text
-frontends/php/images/general/ipmi_available.png -text
-frontends/php/images/general/ipmi_available_bb.png -text
-frontends/php/images/general/ipmi_unavailable.png -text
-frontends/php/images/general/ipmi_unknown.png -text
-frontends/php/images/general/jmx_available.png -text
-frontends/php/images/general/jmx_available_bb.png -text
-frontends/php/images/general/jmx_unavailable.png -text
-frontends/php/images/general/jmx_unknown.png -text
 frontends/php/images/general/login/background.png -text
 frontends/php/images/general/login/glow.png -text
 frontends/php/images/general/login/logo.png -text
@@ -139,10 +131,6 @@ frontends/php/images/general/ok_icon_bb.png -text
 frontends/php/images/general/plus.png -text
 frontends/php/images/general/setup/background.png -text
 frontends/php/images/general/setup/welcome_screen.png -text
-frontends/php/images/general/snmp_available.png -text
-frontends/php/images/general/snmp_available_bb.png -text
-frontends/php/images/general/snmp_unavailable.png -text
-frontends/php/images/general/snmp_unknown.png -text
 frontends/php/images/general/sort_down.png -text
 frontends/php/images/general/sort_down_blue.png -text
 frontends/php/images/general/sort_down_od.png -text
@@ -167,15 +155,10 @@ frontends/php/images/general/warning2.png -text
 frontends/php/images/general/wrench12transp.png -text
 frontends/php/images/general/zabbix.ico -text
 frontends/php/images/general/zabbix.png -text svneol=unset#unset
-frontends/php/images/general/zabbix_available.png -text
-frontends/php/images/general/zabbix_available_bb.png -text
 frontends/php/images/general/zabbix_bb.ico -text
 frontends/php/images/general/zabbix_bb.png -text
 frontends/php/images/general/zabbix_ob.ico -text
 frontends/php/images/general/zabbix_od.png -text
-frontends/php/images/general/zabbix_unavailable.png -text
-frontends/php/images/general/zabbix_unknown.png -text
-frontends/php/images/general/zero.png -text
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
 frontends/php/images/gradients/gradient.png -text
 frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
