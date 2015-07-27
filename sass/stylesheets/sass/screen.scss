@@ -843,23 +843,23 @@ footer {
 		padding: 0 10px;
 	}
 
-	//.list-table {                                       
-	//	margin-bottom: -10px;
-	//	border: none;
+	.list-table {                                       
+		margin-bottom: -10px;
+		border: none;
 
-	//	thead {
+		thead {
 
-	//		th {
-	//			font-size: $font-form-size;
-	//			text-transform: none;
-	//			text-rendering: auto;
-	//			letter-spacing: normal;
-	//			color: initial;
-	//			padding: 8px 5px 5px 5px;
-	//			border-bottom-width: 1px;
-	//		}
-	//	}
-	//}
+			th {
+				font-size: $font-form-size;
+				text-transform: none;
+				text-rendering: auto;
+				letter-spacing: normal;
+				color: initial;
+				padding: 8px 5px 5px 5px;
+				border-bottom-width: 1px;
+			}
+		}
+	}
 }
 
 .subfilter-enabled {
