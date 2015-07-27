@@ -179,6 +179,13 @@ static void	get_signal_handler(int sig)
 	if (SIGALRM == sig)
 		zbx_error("Timeout while executing operation");
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	/* It would be nice to deinitialize crypto libraries if process is terminated by signal. Unfortunately */
+	/* currently doing it would introduce a small possibility of dead-lock. We do not want hanging 'zabbix_get'. */
+#if 0
+	zbx_tls_free();
+#endif
+#endif
 	exit(EXIT_FAILURE);
 }
 
@@ -449,6 +456,9 @@ out:
 	zbx_free(source_ip);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
+#if defined(_WINDOWS)
+	zbx_tls_library_deinit();
+#endif
 #endif
 	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }
