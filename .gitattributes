@@ -111,10 +111,6 @@ frontends/php/images/general/bttn/snooze.png -text
 frontends/php/images/general/bttn/sound.png -text
 frontends/php/images/general/bttn/up.png -text
 frontends/php/images/general/chart.png -text
-frontends/php/images/general/dbl_arrow_down.png -text
-frontends/php/images/general/dbl_arrow_down2.png -text
-frontends/php/images/general/dbl_arrow_up.png -text
-frontends/php/images/general/dbl_arrow_up2.png -text
 frontends/php/images/general/error.png -text
 frontends/php/images/general/error2.png -text
 frontends/php/images/general/error3.png -text
@@ -154,11 +150,8 @@ frontends/php/images/general/warning.png -text
 frontends/php/images/general/warning2.png -text
 frontends/php/images/general/wrench12transp.png -text
 frontends/php/images/general/zabbix.ico -text
-frontends/php/images/general/zabbix.png -text svneol=unset#unset
 frontends/php/images/general/zabbix_bb.ico -text
-frontends/php/images/general/zabbix_bb.png -text
 frontends/php/images/general/zabbix_ob.ico -text
-frontends/php/images/general/zabbix_od.png -text
 frontends/php/images/gradients/button.gif -text svneol=unset#unset
 frontends/php/images/gradients/gradient.png -text
 frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
