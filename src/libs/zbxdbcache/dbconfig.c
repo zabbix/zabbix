@@ -3570,7 +3570,7 @@ void	init_configuration_cache()
 	CREATE_HASHSET_EXT(config->hosts_h, __config_host_h_hash, __config_host_h_compare, 10);
 	CREATE_HASHSET_EXT(config->gmacros_m, __config_gmacro_m_hash, __config_gmacro_m_compare, 0);
 	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare, 0);
-	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare, 0);
+	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare, 10);
 	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare, 0);
 	CREATE_HASHSET_EXT(config->regexps, __config_regexp_hash, __config_regexp_compare, 0);
 
