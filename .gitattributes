@@ -88,22 +88,6 @@ frontends/php/images/general/tr_top_right.gif -text
 frontends/php/images/general/tr_top_right_bottom.gif -text
 frontends/php/images/general/tree/zero.gif -text
 frontends/php/images/general/zabbix.ico -text
-frontends/php/images/gradients/button.gif -text svneol=unset#unset
-frontends/php/images/gradients/gradient.png -text
-frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
-frontends/php/images/gradients/header_link_blue.png -text svneol=unset#image/png
-frontends/php/images/gradients/menu_not_active.gif -text svneol=unset#unset
-frontends/php/images/gradients/menu_not_active2.gif -text
-frontends/php/images/gradients/menu_not_active_bb.gif -text
-frontends/php/images/gradients/menu_not_active_blue.png -text svneol=unset#image/png
-frontends/php/images/gradients/sla_blue.png -text
-frontends/php/images/gradients/sla_blue15.png -text
-frontends/php/images/gradients/sla_green.png -text
-frontends/php/images/gradients/sla_green15.png -text
-frontends/php/images/gradients/sla_red.png -text
-frontends/php/images/gradients/sla_red15.png -text
-frontends/php/images/gradients/table_head2_bb.gif -text
-frontends/php/images/gradients/table_head_bb.gif -text
 frontends/php/img/browser-sprite.png -text svneol=unset#image/png
 frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
 frontends/php/include/classes/helpers/CViewHelper.php -text
