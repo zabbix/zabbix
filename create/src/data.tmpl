@@ -333,6 +333,7 @@ ROW   |12        |VMware VirtualMachinePowerState      |
 ROW   |13        |VMware status                        |
 ROW   |15        |Value cache operating mode           |
 ROW   |3         |Windows service state                |
+ROW   |16        |Windows service startup type         |
 ROW   |10        |Zabbix agent ping status             |
 
 TABLE |items
@@ -2173,11 +2174,10 @@ ROW   |1816   |545    |23022 |5       |0        |00C800|0        |2       |0   |
 ROW   |1818   |546    |23158 |5       |0        |00C800|0        |2       |0   |
 
 TABLE |graph_theme
-FIELDS|graphthemeid|description  |theme       |backgroundcolor|graphcolor|graphbordercolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|gridview|legendview|
-ROW   |1           |Original Blue|originalblue|F0F0F0         |FFFFFF    |333333          |CCCCCC   |AAAAAA       |000000         |222222   |AA4444        |11CC11             |CC1111              |E0E0E0          |1       |1         |
-ROW   |2           |Black & Blue |darkblue    |333333         |0A0A0A    |888888          |222222   |4F4F4F       |EFEFEF         |0088FF   |CC4444        |1111FF             |FF1111              |1F1F1F          |1       |1         |
-ROW   |3           |Dark orange  |darkorange  |333333         |0A0A0A    |888888          |222222   |4F4F4F       |EFEFEF         |DFDFDF   |FF5500        |FF5500             |FF1111              |1F1F1F          |1       |1         |
-ROW   |4           |Classic      |classic     |F0F0F0         |FFFFFF    |333333          |CCCCCC   |AAAAAA       |000000         |222222   |AA4444        |11CC11             |CC1111              |E0E0E0          |1       |1         |
+FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|gridview|legendview|
+ROW   |1           |blue-theme|FFFFFF         |FFFFFF    |CCCCCC   |AAAAAA       |ACBBC2         |1F2C33   |E33734        |429E47             |E33734              |EBEEF0          |1       |1         |
+ROW   |2           |dark-theme|2B2B2B         |2B2B2B    |222222   |4F4F4F       |4F4F4F         |F2F2F2   |E45959        |59DB8f             |E45959              |333333          |1       |1         |
+
 
 TABLE |globalmacro
 FIELDS|globalmacroid|macro            |value |
@@ -3120,6 +3120,11 @@ ROW   |80       |14        |1    |in maintenance    |
 ROW   |81       |14        |2    |no data collection|
 ROW   |82       |15        |0    |Normal            |
 ROW   |83       |15        |1    |Low memory        |
+ROW   |84       |16        |0    |Automatic         |
+ROW   |85       |16        |1    |Automatic delayed |
+ROW   |86       |16        |2    |Manual            |
+ROW   |87       |16        |3    |Disabled          |
+ROW   |88       |16        |4    |Unknown           |
 
 TABLE |sysmaps
 FIELDS|sysmapid|name         |width|height|backgroundid|label_type|label_location|highlight|expandproblem|markelements|show_unack|grid_size|grid_show|grid_align|label_format|label_type_host|label_type_hostgroup|label_type_trigger|label_type_map|label_type_image|label_string_host|label_string_hostgroup|label_string_trigger|label_string_map|label_string_image|iconmapid|expand_macros|severity_min|

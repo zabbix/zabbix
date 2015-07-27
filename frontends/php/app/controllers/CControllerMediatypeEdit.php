@@ -29,18 +29,24 @@ class CControllerMediatypeEdit extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'mediatypeid' =>		'db media_type.mediatypeid',
-			'type' =>				'db media_type.type       |in '.implode(',', array_keys(media_type2str())),
-			'description' =>		'db media_type.description',
-			'smtp_server' =>		'db media_type.smtp_server',
-			'smtp_helo' =>			'db media_type.smtp_helo',
-			'smtp_email' =>			'db media_type.smtp_email',
-			'exec_path' =>			'db media_type.exec_path',
-			'gsm_modem' =>			'db media_type.gsm_modem',
-			'jabber_username' =>	'db media_type.username',
-			'eztext_username' =>	'db media_type.username',
-			'passwd' =>				'db media_type.passwd',
-			'status' =>				'db media_type.status     |in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
+			'mediatypeid' =>			'db media_type.mediatypeid',
+			'type' =>					'db media_type.type|in '.implode(',', array_keys(media_type2str())),
+			'description' =>			'db media_type.description',
+			'smtp_server' =>			'db media_type.smtp_server',
+			'smtp_port' =>				'db media_type.smtp_port',
+			'smtp_helo' =>				'db media_type.smtp_helo',
+			'smtp_email' =>				'db media_type.smtp_email',
+			'smtp_security' =>			'db media_type.smtp_security|in '.SMTP_CONNECTION_SECURITY_NONE.','.SMTP_CONNECTION_SECURITY_STARTTLS.','.SMTP_CONNECTION_SECURITY_SSL_TLS,
+			'smtp_verify_peer' =>		'db media_type.smtp_verify_peer|in 0,1',
+			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
+			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
+			'exec_path' =>				'db media_type.exec_path',
+			'gsm_modem' =>				'db media_type.gsm_modem',
+			'jabber_username' =>		'db media_type.username',
+			'eztext_username' =>		'db media_type.username',
+			'smtp_username' =>			'db media_type.username',
+			'passwd' =>					'db media_type.passwd',
+			'status' =>					'db media_type.status|in '.MEDIA_TYPE_STATUS_ACTIVE.','.MEDIA_TYPE_STATUS_DISABLED
 		];
 
 		$ret = $this->validateInput($fields);
@@ -59,8 +65,9 @@ class CControllerMediatypeEdit extends CController {
 
 		if ($this->hasInput('mediatypeid')) {
 			$mediatypes = API::Mediatype()->get([
-				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_helo', 'smtp_email',
-					'exec_path', 'gsm_modem', 'username', 'passwd', 'status'
+				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
+					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -84,12 +91,18 @@ class CControllerMediatypeEdit extends CController {
 			'type' => MEDIA_TYPE_EMAIL,
 			'description' => '',
 			'smtp_server' => 'localhost',
+			'smtp_port' => '25',
 			'smtp_helo' => 'localhost',
 			'smtp_email' => 'zabbix@localhost',
+			'smtp_security' => '0',
+			'smtp_verify_peer' => '0',
+			'smtp_verify_host' => '0',
+			'smtp_authentication' => '0',
 			'exec_path' => '',
 			'gsm_modem' => '/dev/ttyS0',
 			'jabber_username' => 'user@server',
 			'eztext_username' => '',
+			'smtp_username' => '',
 			'passwd' => '',
 			'status' => MEDIA_TYPE_STATUS_ACTIVE
 		];
@@ -100,14 +113,23 @@ class CControllerMediatypeEdit extends CController {
 			$data['type'] = $this->mediatype['type'];
 			$data['description'] = $this->mediatype['description'];
 			$data['smtp_server'] = $this->mediatype['smtp_server'];
+			$data['smtp_port'] = $this->mediatype['smtp_port'];
 			$data['smtp_helo'] = $this->mediatype['smtp_helo'];
 			$data['smtp_email'] = $this->mediatype['smtp_email'];
+			$data['smtp_security'] = $this->mediatype['smtp_security'];
+			$data['smtp_verify_peer'] = $this->mediatype['smtp_verify_peer'];
+			$data['smtp_verify_host'] = $this->mediatype['smtp_verify_host'];
+			$data['smtp_authentication'] = $this->mediatype['smtp_authentication'];
 			$data['exec_path'] = $this->mediatype['exec_path'];
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
 			$data['passwd'] = $this->mediatype['passwd'];
 			$data['status'] = $this->mediatype['status'];
 
 			switch ($data['type']) {
+				case MEDIA_TYPE_EMAIL:
+					$data['smtp_username'] = $this->mediatype['username'];
+					break;
+
 				case MEDIA_TYPE_JABBER:
 					$data['jabber_username'] = $this->mediatype['username'];
 					break;
@@ -123,12 +145,18 @@ class CControllerMediatypeEdit extends CController {
 			'type',
 			'description',
 			'smtp_server',
+			'smtp_port',
 			'smtp_helo',
 			'smtp_email',
+			'smtp_security',
+			'smtp_verify_peer',
+			'smtp_verify_host',
+			'smtp_authentication',
 			'exec_path',
 			'gsm_modem',
 			'jabber_username',
 			'eztext_username',
+			'smtp_username',
 			'passwd',
 			'status'
 		]);

@@ -934,10 +934,10 @@ function zbx_arrayFindDuplicates(array $array) {
 /************* STRING *************/
 function zbx_nl2br($str) {
 	$str_res = [];
-	$str_arr = explode("\n", $str);
-	foreach ($str_arr as $id => $str_line) {
+	foreach (explode("\n", $str) as $str_line) {
 		array_push($str_res, $str_line, BR());
 	}
+	array_pop($str_res);
 
 	return $str_res;
 }
@@ -1160,7 +1160,7 @@ function zbx_value2array(&$values) {
 	}
 }
 
-// creates chain of relation parent -> childs, for all chain levels
+// creates chain of relation parent -> child, for all chain levels
 function createParentToChildRelation(&$chain, $link, $parentField, $childField) {
 	if (!isset($chain[$link[$parentField]])) {
 		$chain[$link[$parentField]] = [];
@@ -1394,10 +1394,10 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$arrow = null;
 	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$arrow = (new CSpan())->addClass('arrow-down');
+			$arrow = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);
 		}
 		else {
-			$arrow = (new CSpan())->addClass('arrow-up');
+			$arrow = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
 		}
 	}
 
@@ -1658,6 +1658,8 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 			];
 		}
 
+		$data['theme'] = getUserTheme(CWebUser::$data);
+
 		(new CView('general.warning', $data))->render();
 		exit;
 	}
@@ -1689,14 +1691,14 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
 {
 	$msg_box = (new CDiv($title))
-		->addClass($good ? 'msg-good' : 'msg-bad');
+		->addClass($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD);
 
 	if ($show_close_box) {
 		$msg_box->setId('global-message');
 	}
 
 	if ($messages) {
-		$msg_details = (new CDiv())->addClass('msg-details');
+		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS);
 
 		if ($title !== null) {
 			$link = (new CLink(_('Details')))
@@ -1708,7 +1710,9 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 
 		$list = new CList();
 		if ($title !== null) {
-			$list->setId('msg-messages');
+			$list
+				->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
+				->setId('msg-messages');
 
 			if (!$show_details) {
 				$list->setAttribute('style', 'display: none;');

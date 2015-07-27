@@ -146,9 +146,9 @@ else {
 
 	if ($tree) {
 		// creates form for choosing a preset interval
-		$r_form = new CForm('get');
-		$r_form->setAttribute('name', 'period_choice');
-		$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
+		$r_form = (new CForm('get'))
+			->setAttribute('name', 'period_choice')
+			->addVar('fullscreen', $_REQUEST['fullscreen']);
 
 		$period_combo = new CComboBox('period', $period, 'javascript: submit();');
 		foreach ($periods as $key => $val) {
@@ -156,7 +156,7 @@ else {
 		}
 		// controls
 		$r_form->addItem((new CList())
-			->addItem([_('Period').SPACE, $period_combo])
+			->addItem([_('Period'), SPACE, $period_combo])
 			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
 		);
 

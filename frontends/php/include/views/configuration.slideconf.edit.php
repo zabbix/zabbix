@@ -24,24 +24,29 @@ require_once dirname(__FILE__).'/js/configuration.slideconf.edit.js.php';
 $widget = (new CWidget())->setTitle(_('Slide shows'));
 
 // create form
-$slideForm = new CForm();
-$slideForm->setName('slideForm');
-$slideForm->addVar('form', $this->data['form']);
-$slideForm->addVar('slides', $this->data['slides_without_delay']);
+$slideForm = (new CForm())
+	->setName('slideForm')
+	->addVar('form', $this->data['form'])
+	->addVar('slides', $this->data['slides_without_delay']);
 if (!empty($this->data['slideshowid'])) {
 	$slideForm->addVar('slideshowid', $this->data['slideshowid']);
 }
 
 // create slide form list
-$slideFormList = new CFormList('slideFormList');
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$slideFormList->addRow(_('Name'), $nameTextBox);
-$slideFormList->addRow(_('Default delay (in seconds)'), new CNumericBox('delay', $this->data['delay'], 5, false, false, false));
+$slideFormList = (new CFormList())
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Default delay (in seconds)'),
+		(new CNumericBox('delay', $this->data['delay'], 5, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 
 // append slide table
 $slideTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setId('slideTable')
 	->setHeader([
 		(new CColHeader())->setWidth(15),
@@ -61,8 +66,9 @@ foreach ($this->data['slides'] as $key => $slides) {
 		}
 	}
 
-	$delay = new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false);
-	$delay->setAttribute('placeholder', _('default'));
+	$delay = (new CNumericBox('slides['.$key.'][delay]', !empty($slides['delay']) ? $slides['delay'] : '', 5, false, true, false))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		->setAttribute('placeholder', _('default'));
 
 	$removeButton = (new CButton('remove_'.$key, _('Remove')))
 		->onClick('javascript: removeSlide(this);')
@@ -96,11 +102,7 @@ $addButtonColumn = (new CCol(
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
-$slideFormList->addRow(_('Slides'), (new CDiv($slideTable))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
-);
+$slideFormList->addRow(_('Slides'), (new CDiv($slideTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // append tabs to form
 $slideTab = new CTabView();

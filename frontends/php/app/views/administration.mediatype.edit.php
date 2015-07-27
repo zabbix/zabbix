@@ -24,16 +24,17 @@ $this->includeJSfile('app/views/administration.mediatype.edit.js.php');
 $widget = (new CWidget())->setTitle(_('Media types'));
 
 // create form
-$mediaTypeForm = new CForm();
-$mediaTypeForm->setId('mediaTypeForm');
-$mediaTypeForm->addVar('form', 1);
-$mediaTypeForm->addVar('mediatypeid', $data['mediatypeid']);
+$mediaTypeForm = (new CForm())
+	->setId('mediaTypeForm')
+	->addVar('form', 1)
+	->addVar('mediatypeid', $data['mediatypeid']);
 
 // create form list
-$mediaTypeFormList = new CFormList('mediaTypeFormList');
-$nameTextBox = new CTextBox('description', $data['description'], ZBX_TEXTBOX_STANDARD_SIZE, false, 100);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$mediaTypeFormList->addRow(_('Name'), $nameTextBox);
+$nameTextBox = (new CTextBox('description', $data['description'], false, 100))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('autofocus', 'autofocus');
+$mediaTypeFormList = (new CFormList('mediaTypeFormList'))
+	->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
 $cmbType = new CComboBox('type', $data['type'], null, [
@@ -50,42 +51,107 @@ $ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztextin
 	->setTarget('_blank');
 $cmbTypeRow[] = $ez_texting_link;
 
-$mediaTypeFormList->addRow(_('Type'), $cmbTypeRow);
+$connections = [
+	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_NONE,
+		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE
+	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_NONE),
+	new CLabel(_('None'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_NONE),
+	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_STARTTLS,
+		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS
+	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_STARTTLS),
+	new CLabel(_('STARTTLS'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_STARTTLS),
+	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_SSL_TLS,
+		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS
+	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_SSL_TLS),
+	new CLabel(_('SSL/TLS'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_SSL_TLS)
+];
 
-$mediaTypeFormList->addRow(_('SMTP server'), new CTextBox('smtp_server', $data['smtp_server'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
-$mediaTypeFormList->addRow(_('SMTP helo'), new CTextBox('smtp_helo', $data['smtp_helo'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
-$mediaTypeFormList->addRow(_('SMTP email'), new CTextBox('smtp_email', $data['smtp_email'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EMAIL);
-$mediaTypeFormList->addRow(_('Script name'), new CTextBox('exec_path', $data['exec_path'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_EXEC);
-$mediaTypeFormList->addRow(_('GSM modem'), new CTextBox('gsm_modem', $data['gsm_modem'], ZBX_TEXTBOX_STANDARD_SIZE), $data['type'] != MEDIA_TYPE_SMS);
+$authentication = [
+	(new CRadioButton('smtp_authentication', SMTP_AUTHENTICATION_NONE,
+		$data['smtp_authentication'] == SMTP_AUTHENTICATION_NONE
+	))->setId('smtp_authentication_'.SMTP_AUTHENTICATION_NONE),
+	new CLabel(_('None'), 'smtp_authentication_'.SMTP_AUTHENTICATION_NONE),
+	(new CRadioButton('smtp_authentication', SMTP_AUTHENTICATION_NORMAL,
+		$data['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
+	))->setId('smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL),
+	new CLabel(_('Normal password'), 'smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL)
+];
+
+$mediaTypeFormList
+	->addRow(_('Type'), $cmbTypeRow)
+	->addRow(_('SMTP server'), [
+			(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			_('Port'),
+			(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		],
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('SMTP helo'),
+		(new CTextBox('smtp_helo', $data['smtp_helo']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('SMTP email'),
+		(new CTextBox('smtp_email', $data['smtp_email']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('Connection security'),
+		$connections, $data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('SSL verify peer'),
+		(new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer']),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('SSL verify host'),
+		(new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host']),
+		$data['type'] != MEDIA_TYPE_EMAIL
+	)
+	->addRow(_('Authentication'), $authentication, $data['type'] != MEDIA_TYPE_EMAIL)
+	->addRow(_('Username'),
+		(new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	->addRow(_('Script name'),
+		(new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_EXEC
+	)
+	->addRow(_('GSM modem'),
+		(new CTextBox('gsm_modem', $data['gsm_modem']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		$data['type'] != MEDIA_TYPE_SMS
+	);
 
 // create password field
 if ($data['passwd'] != '') {
-	$passwdButton = (new CButton('chPass_btn', _('Change password')))
-		->onClick('this.style.display="none"; $("passwd").enable().show().focus();');
-	$passwdBox = new CPassBox('passwd', $data['passwd'], ZBX_TEXTBOX_SMALL_SIZE);
-	$passwdBox->addStyle('display: none;');
-	$passwdField = [$passwdButton, $passwdBox];
+	$passwdField = [
+		(new CButton('chPass_btn', _('Change password')))
+			->onClick('this.style.display="none"; $("passwd").show().focus();'),
+		(new CPassBox('passwd', $data['passwd']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->addStyle('display: none;')
+	];
 }
 else {
-	$passwdField = new CPassBox('passwd', '', ZBX_TEXTBOX_SMALL_SIZE);
+	$passwdField = (new CPassBox('passwd'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 
 // append password field to form list
-$mediaTypeFormList->addRow(_('Jabber identifier'), new CTextBox('jabber_username', $data['jabber_username'], ZBX_TEXTBOX_STANDARD_SIZE));
-$mediaTypeFormList->addRow(_('Username'), new CTextBox('eztext_username', $data['eztext_username'], ZBX_TEXTBOX_STANDARD_SIZE));
-$mediaTypeFormList->addRow(_('Password'), $passwdField);
-$mediaTypeFormList->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, [
-	EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
-	EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
-]));
-
-$mediaTypeFormList->addRow(_('Enabled'),
-	(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
-);
+$mediaTypeFormList
+	->addRow(_('Jabber identifier'),
+		(new CTextBox('jabber_username', $data['jabber_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	->addRow(_('Username'),
+		(new CTextBox('eztext_username', $data['eztext_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+	)
+	->addRow(_('Password'), $passwdField)
+	->addRow(_('Message text limit'), new CComboBox('eztext_limit', $data['exec_path'], null, [
+		EZ_TEXTING_LIMIT_USA => _('USA (160 characters)'),
+		EZ_TEXTING_LIMIT_CANADA => _('Canada (136 characters)')
+	]))
+	->addRow(_('Enabled'),
+		(new CCheckBox('status', MEDIA_TYPE_STATUS_ACTIVE))->setChecked(MEDIA_TYPE_STATUS_ACTIVE == $data['status'])
+	);
 
 // append form list to tab
-$mediaTypeTab = new CTabView();
-$mediaTypeTab->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
+$mediaTypeTab = (new CTabView())->addTab('mediaTypeTab', _('Media type'), $mediaTypeFormList);
 
 // append buttons to form
 $cancelButton = (new CRedirectButton(_('Cancel'), 'zabbix.php?action=mediatype.list'))->setId('cancel');

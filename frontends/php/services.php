@@ -276,7 +276,7 @@ if (isset($_REQUEST['pservices'])) {
 
 	if (isset($service)) {
 		// unset unavailable parents
-		$childServicesIds = get_service_childs($service['serviceid']);
+		$childServicesIds = get_service_children($service['serviceid']);
 		$childServicesIds[] = $service['serviceid'];
 		foreach ($childServicesIds as $childServiceId) {
 			unset($parentServices[$childServiceId]);
@@ -317,7 +317,7 @@ elseif (isset($_REQUEST['cservices'])) {
 
 	if (isset($service)) {
 		// unset unavailable parents
-		$childServicesIds = get_service_childs($service['serviceid']);
+		$childServicesIds = get_service_children($service['serviceid']);
 		$childServicesIds[] = $service['serviceid'];
 		foreach ($childServicesIds as $childServiceId) {
 			unset($childServices[$childServiceId]);

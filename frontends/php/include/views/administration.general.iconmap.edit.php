@@ -30,13 +30,14 @@ $widget = (new CWidget())
 
 $iconMapTab = new CFormList();
 
-$name = new CTextBox('iconmap[name]', $this->data['iconmap']['name']);
-$name->setAttribute('maxlength', 64);
-$name->setAttribute('autofocus', 'autofocus');
+$name = (new CTextBox('iconmap[name]', $this->data['iconmap']['name']))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('maxlength', 64)
+	->setAttribute('autofocus', 'autofocus');
 $iconMapTab->addRow(_('Name'), $name);
 
-$iconMapForm = new CForm();
-$iconMapForm->addVar('form', 1);
+$iconMapForm = (new CForm())
+	->addVar('form', 1);
 if (isset($this->data['iconmapid'])) {
 	$iconMapForm->addVar('iconmapid', $this->data['iconmap']['iconmapid']);
 }
@@ -49,16 +50,17 @@ $iconMapTable = (new CTable())
 order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 0;
 foreach ($this->data['iconmap']['mappings'] as $mapping) {
-	$numSpan = (new CSpan(($i + 1).':'))
-		->addClass('rowNum');
+	$numSpan = (new CSpan(($i + 1).':'))->addClass('rowNum');
 
 	$profileLinksComboBox = new CComboBox('iconmap[mappings]['.$i.'][inventory_link]', $mapping['inventory_link'], null,
 		$this->data['inventoryList']
 	);
 
-	$expressionTextBox = new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']);
-	$expressionTextBox->setAttribute('maxlength', 64);
-	$expressionTextBox = [$expressionTextBox];
+	$expressionTextBox = [
+		(new CTextBox('iconmap[mappings]['.$i.'][expression]', $mapping['expression']))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAttribute('maxlength', 64)
+	];
 	if (isset($mapping['iconmappingid'])) {
 		$expressionTextBox[] = new CVar('iconmap[mappings]['.$i.'][iconmappingid]', $mapping['iconmappingid']);
 	}
@@ -70,8 +72,8 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 
 	$iconPreviewImage = (new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 		'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
-		->addClass('pointer')
 		->addClass('preview')
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid']);
 
 	$iconMapTable->addRow(
@@ -110,20 +112,14 @@ $iconsComboBox->addClass('mappingIcon');
 
 $iconPreviewImage = (new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'].
 	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
-	->addClass('pointer')
+	->addClass(ZBX_STYLE_CURSOR_POINTER)
 	->addClass('preview')
 	->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
 
 $iconMapTable->addRow([(new CCol(_('Default')))->setColSpan(4), $iconsComboBox, $iconPreviewImage]);
 // </default icon row>
 
-$iconMapTab->addRow(
-	_('Mappings'),
-	(new CDiv($iconMapTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-);
+$iconMapTab->addRow(_('Mappings'), (new CDiv($iconMapTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);
 
