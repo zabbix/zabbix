@@ -77,12 +77,7 @@ frontends/php/audio/no_sound.wav -text
 frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrow_down.png -text
-frontends/php/images/general/arrow_down2.png -text
 frontends/php/images/general/arrow_up.png -text
-frontends/php/images/general/arrow_up2.png -text
-frontends/php/images/general/bar/arrow_down.gif -text
-frontends/php/images/general/bar/arrow_sm.gif -text
-frontends/php/images/general/bar/arrow_up.gif -text
 frontends/php/images/general/bar/bar_bg.png -text
 frontends/php/images/general/bar/bar_middle.png -text
 frontends/php/images/general/bar/bg.png -text
