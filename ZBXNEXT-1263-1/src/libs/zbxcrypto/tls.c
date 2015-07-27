@@ -2328,7 +2328,7 @@ void	zbx_tls_init_child(void)
 
 	zbx_tls_validate_config();
 #if !defined(_WINDOWS)
-	zbx_tls_library_init();		/* on UNIX/GNU/Linux initialize crypto libraries in child processes */
+	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
 	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
 	if (NULL != CONFIG_TLS_CA_FILE)
@@ -2513,7 +2513,7 @@ void	zbx_tls_init_child(void)
 
 	zbx_tls_validate_config();
 #if !defined(_WINDOWS)
-	zbx_tls_library_init();		/* on UNIX/GNU/Linux initialize crypto libraries in child processes */
+	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
 	/* need to allocate certificate credentials store? */
 
@@ -2718,7 +2718,7 @@ void	zbx_tls_init_child(void)
 
 	zbx_tls_validate_config();
 #if !defined(_WINDOWS)
-	zbx_tls_library_init();		/* on UNIX/GNU/Linux initialize crypto libraries in child processes */
+	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
 	if (1 != RAND_status())		/* protect against not properly seeded PRNG */
 	{
