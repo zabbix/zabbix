@@ -696,14 +696,14 @@ function make_latest_issues(array $filter = []) {
 	foreach ($triggers as $trigger) {
 		$host = $hosts[$trigger['hostid']];
 
-		$host_name = [
-			(new CSpan($host['name']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]))
-		];
+		$host_name = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$maintenance_icon = (new CSpan())->addClass(ZBX_STYLE_ICON_MAINT);
+			$maintenance_icon = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_MAINT)
+				->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 			if (array_key_exists($host['maintenanceid'], $maintenances)) {
 				$maintenance = $maintenances[$host['maintenanceid']];
@@ -719,9 +719,7 @@ function make_latest_issues(array $filter = []) {
 				$maintenance_icon->setHint($hint);
 			}
 
-			$host_name[] = (new CSpan($maintenance_icon))
-				->addClass(ZBX_STYLE_REL_CONTAINER)
-				->addClass(ZBX_STYLE_CURSOR_POINTER);
+			$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 		}
 
 		// unknown triggers
