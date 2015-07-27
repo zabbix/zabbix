@@ -3530,8 +3530,8 @@ void	init_configuration_cache()
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
 	config->time_triggers = (zbx_vector_ptr_t *)(config + 1);
 
-#define CREATE_HASHSET(hashset, hashset_size)	CREATE_HASHSET_EXT(hashset, ZBX_DEFAULT_UINT64_HASH_FUNC,	\
-		ZBX_DEFAULT_UINT64_COMPARE_FUNC, hashset_size)
+#define CREATE_HASHSET(hashset, hashset_size)	CREATE_HASHSET_EXT(hashset, hashset_size,			\
+		ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
 
 #define CREATE_HASHSET_EXT(hashset, hashset_size, hash_func, compare_func)					\
 														\
@@ -3566,13 +3566,13 @@ void	init_configuration_cache()
 	CREATE_HASHSET(config->interface_snmpitems, 0);
 	CREATE_HASHSET(config->expressions, 0);
 
-	CREATE_HASHSET_EXT(config->items_hk, __config_item_hk_hash, __config_item_hk_compare, 100);
-	CREATE_HASHSET_EXT(config->hosts_h, __config_host_h_hash, __config_host_h_compare, 10);
-	CREATE_HASHSET_EXT(config->gmacros_m, __config_gmacro_m_hash, __config_gmacro_m_compare, 0);
-	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare, 0);
-	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare, 10);
-	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare, 0);
-	CREATE_HASHSET_EXT(config->regexps, __config_regexp_hash, __config_regexp_compare, 0);
+	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
+	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
+	CREATE_HASHSET_EXT(config->gmacros_m, 0, __config_gmacro_m_hash, __config_gmacro_m_compare);
+	CREATE_HASHSET_EXT(config->hmacros_hm, 0, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
+	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
+	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash, __config_interface_addr_compare);
+	CREATE_HASHSET_EXT(config->regexps, 0, __config_regexp_hash, __config_regexp_compare);
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
 	{
