@@ -89,7 +89,6 @@ function add_logexpr() {
 	var tr = document.createElement('tr');
 	document.getElementById('exp_list').firstChild.appendChild(tr);
 
-	tr.setAttribute(classattr, 'even_row');
 	tr.setAttribute('id', 'logtr' + logexpr_count);
 
 	var td = document.createElement('td');
@@ -187,10 +186,6 @@ function processExpressionList() {
 	actions.show();
 	actions.first().hide();
 	actions.last().hide();
-
-	rows = jQuery('#exp_list tr').not(':first');
-	rows.filter(':even').attr('class', 'even_row');
-	rows.filter(':odd').attr('class', 'odd_row');
 }
 
 function element_up(elementid) {
@@ -312,7 +307,6 @@ function add_keyword(bt_type) {
 	var tr = document.createElement('tr');
 	document.getElementById('key_list').firstChild.appendChild(tr);
 
-	tr.setAttribute(classattr, 'even_row');
 	tr.setAttribute('id', 'keytr' + key_count);
 
 	// keyword
