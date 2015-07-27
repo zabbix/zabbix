@@ -570,6 +570,17 @@ footer, .footer {
     border-bottom: 1px solid #ebeef0; }
   .filter-container .filter-forms, .table-forms-container .filter-forms, .browser-warning-container .filter-forms {
     padding: 0 10px; }
+  .filter-container .list-table, .table-forms-container .list-table, .browser-warning-container .list-table {
+    margin-bottom: -10px;
+    border: none; }
+    .filter-container .list-table thead th, .table-forms-container .list-table thead th, .browser-warning-container .list-table thead th {
+      font-size: 1em;
+      text-transform: none;
+      text-rendering: auto;
+      letter-spacing: normal;
+      color: initial;
+      padding: 8px 5px 5px 5px;
+      border-bottom-width: 1px; }
 
 .subfilter-enabled {
   display: inline-block;
@@ -1219,7 +1230,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
       border-bottom: 3px solid #0275b8; }
 
 .icon-maint {
-  background: url(../img/icon-sprite.svg) no-repeat -49px -802px;
+  background: url(../img/icon-sprite.svg) no-repeat -47px -802px;
   position: absolute; }
 
 .icon-depend-up {
@@ -2114,7 +2125,8 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 
 .rel-container {
   position: relative;
-  padding: 8px 14px 8px 5px; }
+  display: inline-block;
+  padding-right: 14px; }
   .rel-container .icon-help {
     top: 3px;
     left: -3px; }
