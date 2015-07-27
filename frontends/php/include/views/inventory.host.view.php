@@ -53,8 +53,9 @@ if ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 		$maintenance_icon->setHint($hint);
 	}
 
-	$host_name[] = $maintenance_icon;
-	$host_name = (new CSpan($host_name))->addClass(ZBX_STYLE_REL_CONTAINER);
+	$host_name[] = (new CSpan($maintenance_icon))
+		->addClass(ZBX_STYLE_REL_CONTAINER)
+		->addClass(ZBX_STYLE_CURSOR_POINTER);
 }
 
 $overviewFormList->addRow(_('Host name'), $host_name);
