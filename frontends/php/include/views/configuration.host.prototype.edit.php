@@ -38,7 +38,8 @@ if (!isset($_REQUEST['form_refresh'])) {
 $frmHost = (new CForm())
 	->setName('hostPrototypeForm.')
 	->addVar('form', getRequest('form', 1))
-	->addVar('parent_discoveryid', $discoveryRule['itemid']);
+	->addVar('parent_discoveryid', $discoveryRule['itemid'])
+	->addVar('tls_accept', $parentHost['tls_accept']);
 
 $hostList = new CFormList('hostlist');
 
@@ -355,6 +356,46 @@ $clearFixDiv = (new CDiv())->addStyle('clear: both;');
 $inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+
+// Encryption
+$encryptionFormList = new CFormList('encryption');
+
+$encryptionFormList->addRow(_('Connections to host'),
+	(new CComboBox('tls_connect', $parentHost['tls_connect'], null, [
+		HOST_ENCRYPTION_NONE => _('No encryption'),
+		HOST_ENCRYPTION_PSK => _('PSK'),
+		HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
+	]))->setAttribute('disabled', 'disabled')
+);
+$encryptionFormList->addRow(_('Connections from host'), [
+	[(new CCheckBox('tls_in_none'))->setAttribute('disabled', 'disabled'), _('No encryption')],
+	BR(),
+	[(new CCheckBox('tls_in_psk'))->setAttribute('disabled', 'disabled'), _('PSK')],
+	BR(),
+	[(new CCheckBox('tls_in_cert'))->setAttribute('disabled', 'disabled'), _('Certificate')]
+]);
+$encryptionFormList->addRow(_('PSK identity'),
+	(new CTextBox('tls_psk_identity', $parentHost['tls_psk_identity'], false, 128))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		->setAttribute('disabled', 'disabled')
+);
+$encryptionFormList->addRow(_('PSK'),
+	(new CTextBox('tls_psk', $parentHost['tls_psk'], false, 512))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		->setAttribute('disabled', 'disabled')
+);
+$encryptionFormList->addRow(_('Issuer'),
+	(new CTextBox('tls_issuer', $parentHost['tls_issuer'], false, 1024))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		->setAttribute('disabled', 'disabled')
+);
+$encryptionFormList->addRow(_('Subject'),
+	(new CTextBox('tls_subject', $parentHost['tls_subject'], false, 1024))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+		->setAttribute('disabled', 'disabled')
+);
+
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
 
 /*
  * footer
