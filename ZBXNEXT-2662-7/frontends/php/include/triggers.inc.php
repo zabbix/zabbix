@@ -1180,7 +1180,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 					}
 
 					if ($event['acknowledged'] == 1) {
-						$ack = new CImg('images/general/tick.png', 'ack');
+						$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 					}
 				}
 			}
