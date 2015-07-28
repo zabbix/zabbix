@@ -1237,6 +1237,9 @@ exit:
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
+#if defined(_WINDOWS)
+	zbx_tls_library_deinit();
+#endif
 #endif
 	zabbix_close_log();
 
