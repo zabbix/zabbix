@@ -18,8 +18,8 @@
 **/
 
 #include "common.h"
-#include "log.h"
 #include "ipc.h"
+#include "log.h"
 
 extern char	*CONFIG_FILE;
 
@@ -37,7 +37,7 @@ extern char	*CONFIG_FILE;
  *                              access                                        *
  *             copy_func - [IN] the function used to copy shared memory       *
  *                              contents during reallocation                  *
- *             errmsg    - [IN] the error message                             *
+ *             errmsg    - [OUT] the error message                            *
  *                                                                            *
  * Return value: SUCCEED - the dynamic shared memory segment was created      *
  *                         successfully.                                      *
@@ -95,7 +95,7 @@ out:
  * Purpose: destroys dynamic shared memory segment                            *
  *                                                                            *
  * Parameters: shm    - [IN] the dynamic shared memory data                   *
- *             errmsg - [IN] the error message                                *
+ *             errmsg - [OUT] the error message                               *
  *                                                                            *
  * Return value: SUCCEED - the dynamic shared memory segment was destroyed    *
  *                         successfully.                                      *
@@ -114,7 +114,7 @@ int	zbx_dshm_destroy(zbx_dshm_t *shm, char **errmsg)
 
 	if (ZBX_NONEXISTENT_SHMID != shm->shmid)
 	{
-		if (-1 == shmctl(shm->shmid, IPC_RMID, 0))
+		if (-1 == shmctl(shm->shmid, IPC_RMID, NULL))
 		{
 			*errmsg = zbx_dsprintf(*errmsg, "cannot remove shared memory: %s", zbx_strerror(errno));
 			goto out;
@@ -158,7 +158,7 @@ void	zbx_dshm_unlock(zbx_dshm_t *shm)
  * Parameters: shm     - [IN] the dynamic shared memory data                  *
  *             shm_ref - [IN/OUT] a local reference to dynamic shared memory  *
  *                                segment                                     *
- *             errmsg - [IN] the error message                                *
+ *             errmsg - [OUT] the error message                               *
  *                                                                            *
  * Return value: SUCCEED - the local reference to dynamic shared memory       *
  *                         segment was validated successfully and contains    *
@@ -194,6 +194,7 @@ int	zbx_dshm_validate_ref(const zbx_dshm_t *shm, zbx_dshm_ref_t *shm_ref, char *
 		if ((void *)(-1) == (shm_ref->addr = shmat(shm->shmid, NULL, 0)))
 		{
 			*errmsg = zbx_dsprintf(*errmsg, "cannot attach shared memory: %s", zbx_strerror(errno));
+			shm_ref->addr = NULL;
 			goto out;
 		}
 
@@ -215,8 +216,8 @@ out:
  *          to store the requested size of data                               *
  *                                                                            *
  * Parameters: shm      - [IN/OUT] the dynamic shared memory data             *
- *             shm_size - [IN] the number of bytes to reserve                 *
- *             errmsg   - [IN] the error message                              *
+ *             size     - [IN] the number of bytes to reserve                 *
+ *             errmsg   - [OUT] the error message                             *
  *                                                                            *
  * Return value:                                                              *
  *    SUCCEED - either the dynamic shared memory segment has enough free      *
@@ -302,3 +303,4 @@ out:
 
 	return ret;
 }
+

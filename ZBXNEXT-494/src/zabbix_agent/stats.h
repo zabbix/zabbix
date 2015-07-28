@@ -22,11 +22,14 @@
 
 #include "threads.h"
 #include "mutexs.h"
+
 #ifndef _WINDOWS
 #	include "diskdevices.h"
-#       include "ipc.h"
+#	include "ipc.h"
 #endif
+
 #include "cpustat.h"
+
 #ifdef _AIX
 #	include "vmstats.h"
 #endif

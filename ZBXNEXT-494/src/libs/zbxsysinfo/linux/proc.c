@@ -1074,7 +1074,7 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SUCCEED != zbx_procstat_enabled())
+	if (SUCCEED != zbx_procstat_collector_started())
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Collector is not started."));
 		return SYSINFO_RET_FAIL;

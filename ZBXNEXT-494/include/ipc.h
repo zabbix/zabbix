@@ -43,15 +43,11 @@
 key_t	zbx_ftok(char *path, int id);
 int	zbx_shmget(key_t key, size_t size);
 
-
-/* dynamic shared memory support */
-struct zbx_dshm_t;
-
 /* data copying callback function prototype */
-typedef void (*zbx_shm_copy_func_t)(void *dst, size_t size_dst, void *src);
+typedef void (*zbx_shm_copy_func_t)(void *dst, size_t size_dst, const void *src);
 
 /* dynamic shared memory data structure */
-typedef struct zbx_dshm_t
+typedef struct
 {
 	/* shared memory segment identifier */
 	int			shmid;
