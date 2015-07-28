@@ -95,7 +95,9 @@ function add_logexpr() {
 	tr.appendChild(td);
 	td.appendChild(document.createTextNode(expression));
 
-	jQuery('.formlongtable.formtable').before(jQuery('<input>', {
+	var form = jQuery('form[name=sform]');
+
+	form.prepend(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][value]',
 		type: 'hidden',
 		value: expression
@@ -106,7 +108,7 @@ function add_logexpr() {
 
 	td.appendChild(document.createTextNode(expr_t.options[expr_t.selectedIndex].text));
 
-	jQuery('.formlongtable.formtable').before(jQuery('<input>', {
+	form.prepend(jQuery('<input>', {
 		name: 'expressions[' + logexpr_count + '][type]',
 		type: 'hidden',
 		value: expr_t.value
@@ -140,9 +142,9 @@ function add_logexpr() {
 	var td = document.createElement('td');
 	tr.appendChild(td);
 
-	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: if (confirm("' + locale['S_DELETE_EXPRESSION_Q'] + '")) { remove_expression("logtr' + logexpr_count + '"); }');
-	url.setAttribute(classattr, 'action');
+	var url = document.createElement('button');
+	url.setAttribute('onclick', 'javascript: remove_expression("logtr' + logexpr_count + '");');
+	url.setAttribute(classattr, 'btn-link');
 	url.appendChild(document.createTextNode(locale['S_DELETE']));
 
 	td.appendChild(url);
@@ -268,22 +270,23 @@ function swapNodesNames(n1, n2) {
 }
 
 function closeForm(page) {
-	try {
-		// set header confirmation message to opener
-		var msg = IE ? document.getElementById('page_msg').innerText : document.getElementById('page_msg').textContent;
-		window.opener.location.replace(page + '?msg=' + encodeURI(msg));
-	}
-	catch (e) {
-		throw(e);
-	}
+//	try {
+//		// set header confirmation message to opener
+//		var msg = IE ? document.getElementById('global-message').innerText : document.getElementById('global-message').textContent;
+//		window.opener.location.replace(page + '?msg=' + encodeURI(msg));
+		window.opener.location.reload(true);
+//	}
+//	catch (e) {
+//		throw(e);
+//	}
 
-	if (IE) {
-		// close current popup after 1s, wait when opener window is refreshed (IE7 issue)
-		window.setTimeout(function() { window.self.close(); }, 1000);
-	}
-	else {
+//	if (IE) {
+//		// close current popup after 1s, wait when opener window is refreshed (IE7 issue)
+//		window.setTimeout(function() { window.self.close(); }, 1000);
+//	}
+//	else {
 		window.self.close();
-	}
+//	}
 }
 
 function add_keyword(bt_type) {
@@ -339,9 +342,9 @@ function add_keyword(bt_type) {
 	var td = document.createElement('td');
 	tr.appendChild(td);
 
-	var url = document.createElement('a');
-	url.setAttribute('href', 'javascript: if(confirm("' + locale['S_DELETE_KEYWORD_Q'] + '")) remove_keyword("keytr' + key_count + '");');
-	url.setAttribute(classattr, 'action');
+	var url = document.createElement('button');
+	url.setAttribute('onclick', 'javascript: remove_keyword("keytr' + key_count + '");');
+	url.setAttribute(classattr, 'btn-link');
 	url.appendChild(document.createTextNode(locale['S_DELETE']));
 
 	td.appendChild(url);

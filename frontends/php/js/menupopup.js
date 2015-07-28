@@ -763,8 +763,8 @@ function getMenuPopupTriggerLog(options) {
 			openWinCentered(
 				'tr_logform.php?sform=1&itemid=' + options.itemid,
 				'TriggerLog',
-				760,
-				540,
+				950,
+				650,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 
@@ -787,8 +787,8 @@ function getMenuPopupTriggerLog(options) {
 					openWinCentered(
 						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
 						'TriggerLog',
-						760,
-						540,
+						950,
+						650,
 						'titlebar=no, resizable=yes, scrollbars=yes'
 					);
 
