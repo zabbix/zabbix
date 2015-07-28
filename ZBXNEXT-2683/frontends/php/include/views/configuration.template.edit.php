@@ -37,7 +37,7 @@ if ($data['templateId'] != 0) {
 	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
 $frmHost = (new CForm())
-	->setName('tpl_for')
+	->setName('templatesForm')
 	->addVar('form', $data['form'])
 	->addVar('groupid', $data['groupId']);
 
