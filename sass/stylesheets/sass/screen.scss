@@ -1824,47 +1824,6 @@ $var-icons: (
     }
 }
 
-
-//.icon-maint{
-//	margin: 0 18px 0 0;
-
-//	&::before {
-//		display: inline-block;
-//		width: 18px;
-//		height: 18px;
-//		position: absolute;
-//		content: '';
-//		background: url(../img/icon-sprite.svg) no-repeat -46px -802px;
-//	}
-//}
-
-//.icon-depend-down {
-//	margin: 0 18px 0 0;
-
-//	&::before {
-//		display: inline-block;
-//		width: 18px;
-//		height: 18px;
-//		position: absolute;
-//		content: '';
-//		background: url(../img/icon-sprite.svg) no-repeat -49px -767px;
-//	}
-//}
-
-//.icon-depend-up {
-//	margin: 0 18px 0 0;
-
-//	&::before {
-//		display: inline-block;
-//		width: 18px;
-//		height: 18px;
-//		position: absolute;
-//		content: '';
-//		background: url(../img/icon-sprite.svg) no-repeat -49px -731px;
-//	}
-//}
-
-
 $form-icon-btn: (
 	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
 	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
@@ -2149,7 +2108,6 @@ $form-icon-btn: (
 }
 
 .dashbrd-widget-head {
-	//cursor: move;
 	position: relative;
 	padding: 8px 60px 8px 10px;
 	font-weight: bold;
@@ -2858,9 +2816,6 @@ td.disaster-bg {
 	}
 
 	ul {
-		//margin: 8px 0 0 0;
-		//border-top-width: 1px;
-		//border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
