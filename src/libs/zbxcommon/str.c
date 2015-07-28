@@ -3343,6 +3343,12 @@ void	zbx_trim_str_list(char *list, char delimiter)
  * Purpose:                                                                   *
  *     compares two strings where any of them can be a NULL pointer           *
  *                                                                            *
+ * Parameters: same as strcmp() except NULL values are allowed                *
+ *                                                                            *
+ * Return value: same as strcmp()                                             *
+ *                                                                            *
+ * Comments: NULL is less than any string                                     *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_strcmp_null(const char *s1, const char *s2)
 {

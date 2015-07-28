@@ -317,7 +317,7 @@ static void	procstat_reattach()
  *             src      - [IN] the source segment                             *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_copy_data(void *dst, size_t size_dst, void *src)
+static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 {
 	const char		*__function_name = "procstat_copy_data";
 
@@ -534,13 +534,13 @@ static void	procstat_free_query_data(zbx_procstat_query_data_t *data)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_procstat_enabled                                             *
+ * Function: zbx_procstat_collector_started                                             *
  *                                                                            *
  * Purpose: checks if processor statistics collector is enabled (the main     *
  *          collector has been initialized)                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_procstat_enabled()
+int	zbx_procstat_collector_started()
 {
 	if (NULL == collector)
 		return FAIL;
@@ -687,7 +687,7 @@ void	zbx_procstat_collect()
 	zbx_procstat_util_t		*stats, *putil;
 	zbx_timespec_t			snapshot_timestamp;
 
-	if (FAIL == zbx_procstat_enabled() || FAIL == procstat_running())
+	if (FAIL == zbx_procstat_collector_started() || FAIL == procstat_running())
 		return;
 
 	/* build local copy of the process cpu utilization queries and */

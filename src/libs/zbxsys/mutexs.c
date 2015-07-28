@@ -18,8 +18,9 @@
 **/
 
 #include "common.h"
-#include "mutexs.h"
+#include "ipc.h"
 #include "log.h"
+#include "mutexs.h"
 
 #ifndef _WINDOWS
 #	if !HAVE_SEMUN
@@ -290,3 +291,4 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 	return SUCCEED;
 }
+
