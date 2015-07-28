@@ -1,5 +1,9 @@
 <script type="text/javascript">
 	jQuery(function() {
+		var tls_connect = jQuery('#tls_connect').val(),
+			tls_in_psk = jQuery('#tls_in_psk').is(':checked'),
+			tls_in_cert = jQuery('#tls_in_cert').is(':checked');
+
 		jQuery('#mass_replace_tpls').on('change', function() {
 			jQuery('#mass_clear_tpls').prop('disabled', !this.checked);
 		}).change();
@@ -8,34 +12,12 @@
 			jQuery('.formrow-inventory').toggle(jQuery(this).val() !== '<?php echo HOST_INVENTORY_DISABLED; ?>');
 		}).change();
 
-		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert, #visible_tls_connect, #visible_tls_accept').change(function() {
-			/*
-			 * If visiblity for "Connections to host" is checked and certificate is selected or
-			 * visiblity for "Connections from host" is checked and certificate is checked.
-			 */
-			if ((jQuery('#visible_tls_connect').is(':checked')
-					&& jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>)
-					|| (jQuery('#visible_tls_accept').is(':checked')
-					&& jQuery('#tls_in_cert').is(':checked'))) {
-				jQuery('#tls_issuer, #tls_subject').closest('li').show();
-			}
-			else {
-				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
-			}
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+			tls_connect = jQuery('#tls_connect').val();
+			tls_in_psk = jQuery('#tls_in_psk').is(':checked');
+			tls_in_cert = jQuery('#tls_in_cert').is(':checked');
 
-			/*
-			 * If visiblity for "Connections to host" is checked and PSK is selected or
-			 * visiblity for "Connections from host" is checked and PSK is checked.
-			 */
-			if ((jQuery('#visible_tls_accept').is(':checked')
-					&& jQuery('#tls_in_psk').is(':checked'))
-					|| (jQuery('#visible_tls_connect').is(':checked')
-					&& jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?>)) {
-				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
-			}
-			else {
-				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
-			}
+			toggleEncryptionFields();
 		});
 
 		// Refresh field visibility on document load.
@@ -49,7 +31,11 @@
 			jQuery('#tls_in_cert').prop('checked', true);
 		}
 
-		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert, #visible_tls_connect, #visible_tls_accept').trigger('change');
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').trigger('change');
+
+		jQuery('#visible_tls_connect, #visible_tls_accept').change(function() {
+			toggleEncryptionFields();
+		});
 
 		jQuery('#hostForm').submit(function() {
 			var tls_accept = 0x00;
@@ -66,5 +52,23 @@
 
 			jQuery('#tls_accept').val(tls_accept);
 		});
+
+		function toggleEncryptionFields() {
+			if ((jQuery('#visible_tls_connect').is(':checked') && tls_connect == <?= HOST_ENCRYPTION_CERTIFICATE ?>)
+					|| (jQuery('#visible_tls_accept').is(':checked') && tls_in_cert)) {
+				jQuery('#tls_issuer, #tls_subject').closest('li').show();
+			}
+			else {
+				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
+			}
+
+			if ((jQuery('#visible_tls_accept').is(':checked') && tls_in_psk)
+					|| (jQuery('#visible_tls_connect').is(':checked')  && tls_connect == <?= HOST_ENCRYPTION_PSK ?>)) {
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
+			}
+			else {
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
+			}
+		}
 	});
 </script>
