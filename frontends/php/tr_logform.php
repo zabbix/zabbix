@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
-$page['title'] = _('Trigger wizard');
+$page['title'] = _('Trigger');
 $page['file'] = 'tr_logform.php';
 $page['scripts'] = ['tr_logform.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -171,7 +171,7 @@ if (hasRequest('add') || hasRequest('update')) {
 //------------------------ <FORM> ---------------------------
 
 if (hasRequest('sform')) {
-	$widget = (new CWidget())->setTitle(_('Trigger wizard'));
+	$widget = (new CWidget())->setTitle(_('Trigger'));
 
 	$form = (new CForm())
 		->setName('sform')
