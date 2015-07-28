@@ -6280,10 +6280,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  *                                                                            *
  * Purpose: return the number of active items                                 *
  *                                                                            *
+ * Parameters: hostid - [IN] the host id, pass 0 to specify all hosts         *
+ *                                                                            *
  * Return value: the number of active items                                   *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_count()
+int	DCget_item_count(zbx_uint64_t hostid)
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
@@ -6301,6 +6303,9 @@ int	DCget_item_count()
 			continue;
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
+			continue;
+
+		if (0 != hostid && hostid != dc_item->hostid)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -6323,10 +6328,12 @@ int	DCget_item_count()
  *                                                                            *
  * Purpose: return the number of active unsupported items                     *
  *                                                                            *
+ * Parameters: hostid - [IN] the host id, pass 0 to specify all hosts         *
+ *                                                                            *
  * Return value: the number of active unsupported items                       *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_unsupported_count()
+int	DCget_item_unsupported_count(zbx_uint64_t hostid)
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
@@ -6344,6 +6351,9 @@ int	DCget_item_unsupported_count()
 			continue;
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
+			continue;
+
+		if (0 != hostid && hostid != dc_item->hostid)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
