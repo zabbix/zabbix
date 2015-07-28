@@ -540,6 +540,8 @@ class CHost extends CHostGeneral {
 						);
 					}
 				}
+
+				$this->pskValidation($host);
 			}
 		}
 
@@ -868,10 +870,6 @@ class CHost extends CHostGeneral {
 		// check permissions
 		if (!$this->isWritable($hostIds)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
-		}
-
-		if (array_key_exists('hosts', $data)) {
-			$this->pskValidation($data['hosts']);
 		}
 
 		// add new interfaces
