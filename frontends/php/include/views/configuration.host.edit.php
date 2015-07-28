@@ -31,7 +31,7 @@ if (!hasRequest('form_refresh')) {
 }
 
 $frmHost = (new CForm())
-	->setName('web.hosts.host.php.')
+	->setName('hostsForm')
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
 	->addVar('flags', $data['flags']);
