@@ -78,9 +78,7 @@ frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrow_down.png -text
 frontends/php/images/general/arrow_up.png -text
-frontends/php/images/general/error2.png -text
 frontends/php/images/general/no_icon.png -text
-frontends/php/images/general/ok_icon.png -text
 frontends/php/images/general/tick.png -text
 frontends/php/images/general/tr_space.gif -text
 frontends/php/images/general/tr_top_bottom.gif -text
