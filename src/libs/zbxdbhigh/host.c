@@ -1959,8 +1959,6 @@ static void	DBdelete_template_applications(zbx_uint64_t hostid, const zbx_vector
  * Parameters: hostid      - [IN] host identificator from database            *
  *             templateids - [IN] array of template IDs                       *
  *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
  * Comments: !!! Don't forget to sync the code with PHP !!!                   *
  *                                                                            *
  ******************************************************************************/
@@ -1997,9 +1995,6 @@ static void	DBdelete_template_discovered_applications(zbx_uint64_t hostid, const
 
 	if (0 == lld_ruleids.values_num)
 		goto out;
-
-	zbx_vector_uint64_sort(&lld_ruleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(&lld_ruleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	/* get the applications discovered by those rules */
 
