@@ -27,20 +27,24 @@ class CFilter extends CTag {
 	private $footer = null;
 	private $navigator = false;
 	private $name = 'zbx_filter';
+	private $opened = true;
+	private $show_buttons = true;
 
 	public function __construct($filterid) {
 		parent::__construct('div', true);
-		$this->addClass('filter-container');
+		$this->addClass(ZBX_STYLE_FILTER_CONTAINER);
 		$this->setId('filter-space');
 		$this->filterid = $filterid;
 		$this->columns = [];
 
-		$this->form = new CForm('get');
-		$this->form->setAttribute('name', $this->name);
-		$this->form->setId('id', $this->name);
-		$this->form->addVar('ddreset', 1);
-		$this->form->addVar('uncheck', 1);
+		$this->form = (new CForm('get'))
+			->setAttribute('name', $this->name)
+			->setId('id', $this->name)
+			->addVar('ddreset', 1)
+			->addVar('uncheck', 1);
 
+		// filter is opened by default
+		$this->opened = (CProfile::get($this->filterid, 1) == 1);
 	}
 
 	public function getName() {
@@ -48,67 +52,103 @@ class CFilter extends CTag {
 	}
 
 	public function addColumn($column) {
-		$this->columns[] = (new CDiv($column))->addClass('cell');
+		$this->columns[] = (new CDiv($column))->addClass(ZBX_STYLE_CELL);
+		return $this;
 	}
 
 	public function setFooter($footer) {
 		$this->footer = $footer;
+		return $this;
+	}
+
+	public function removeButtons() {
+		$this->show_buttons = false;
+		return $this;
 	}
 
 	public function addNavigator() {
 		$this->navigator = true;
+		return $this;
 	}
 
 	public function addVar($name, $value) {
 		$this->form->addVar($name, $value);
+		return $this;
 	}
 
 	private function getHeader() {
-		$switch = (new CDiv())->addClass('filter-btn-container');
-		$button = (new CSimpleButton(
-			[_('Filter'), (new CSpan())->addClass('arrow-up')->setId('filter-arrow')]
-		))
-			->addClass('filter-trigger')
-			->addClass('filter-active')
-			->setId('filter-mode')
-			->onClick('javascript: jQuery("#filter-space").toggle(); jQuery("#filter-mode").toggleClass("filter-active"); jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");');
-		$switch->addItem($button);
+		$span = (new CSpan())->setId('filter-arrow');
+
+		if ($this->opened) {
+			$span->addClass(ZBX_STYLE_ARROW_UP);
+			$button = (new CSimpleButton(
+				[_('Filter'), $span]
+			))
+				->addClass(ZBX_STYLE_FILTER_TRIGGER)
+				->addClass(ZBX_STYLE_FILTER_ACTIVE)
+				->setId('filter-mode');
+		}
+		else {
+			$span->addClass(ZBX_STYLE_ARROW_DOWN);
+			$button = (new CSimpleButton(
+				[_('Filter'), $span]
+			))
+				->addClass(ZBX_STYLE_FILTER_TRIGGER)
+				->setId('filter-mode');
+			$this->setAttribute('style', 'display: none;');
+		}
+
+		$button->onClick('javascript:
+			jQuery("#filter-space").toggle();
+			jQuery("#filter-mode").toggleClass("filter-active");
+			jQuery("#filter-arrow").toggleClass("arrow-up arrow-down");
+			updateUserProfile("'.$this->filterid.'", jQuery("#filter-arrow").hasClass("arrow-down") ? 0 : 1);'
+		);
+
+		$switch = (new CDiv())
+			->addClass(ZBX_STYLE_FILTER_BTN_CONTAINER)
+			->addItem($button);
 
 		return $switch;
 	}
 
 	private function getTable() {
-		$row = (new CDiv())->addClass('row');
-		foreach ($this->columns as $column) {
-			$row->addItem($column);
-		}
-		$table = (new CDiv())->addClass('table filter-forms');
-
-		$table->addItem($row);
-
-		return $table;
-	}
-
-	private function getButtons() {
-		if (count($this->columns) == 0) {
+		if (!$this->columns) {
 			return null;
 		}
 
-		$buttons = (new CDiv())->addClass('filter-forms');
+		$row = (new CDiv())->addClass(ZBX_STYLE_ROW);
+		foreach ($this->columns as $column) {
+			$row->addItem($column);
+		}
 
-		$url = new cUrl();
+		return (new CDiv())
+			->addClass(ZBX_STYLE_TABLE)
+			->addClass(ZBX_STYLE_FILTER_FORMS)
+			->addItem($row);
+	}
+
+	private function getButtons() {
+		if (!$this->columns) {
+			return null;
+		}
+
+		$url = new CUrl();
 		$url->removeArgument('sid');
 		$url->removeArgument('filter_set');
 		$url->setArgument('filter_rst', 1);
-		$resetButton = (new CRedirectButton(_('Reset'), $url->getUrl()))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
 
-		$filterButton = (new CSubmit('filter_set', _('Filter')))
-			->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();');
-
-		$buttons->addItem($filterButton);
-		$buttons->addItem($resetButton);
+		return (new CDiv())
+			->addClass(ZBX_STYLE_FILTER_FORMS)
+			->addItem(
+				(new CSubmit('filter_set', _('Filter')))
+					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+			)
+			->addItem(
+				(new CRedirectButton(_('Reset'), $url->getUrl()))
+					->addClass(ZBX_STYLE_BTN_ALT)
+					->onClick('javascript: chkbxRange.clearSelectedOnFilterChange();')
+			);
 
 		return $buttons;
 	}
@@ -122,12 +162,15 @@ class CFilter extends CTag {
 	public function endToString() {
 		$this->form->addItem($this->getTable());
 
-		$this->form->addItem($this->getButtons());
+		if ($this->show_buttons) {
+			$this->form->addItem($this->getButtons());
+		}
 
-		if($this->navigator) {
+		if ($this->navigator) {
 			$this->form->addItem((new CDiv())->setId('scrollbar_cntr'));
 		}
-		if($this->footer !== null) {
+
+		if ($this->footer !== null) {
 			$this->form->addItem($this->footer);
 		}
 

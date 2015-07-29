@@ -191,9 +191,7 @@ ob_end_flush();
  * Display
  */
 
-$widget = (new CWidget())->setTitle(_('Alarm acknowledgements').SPACE.($bulk ? 'Bulk acknowledge ' : $eventTriggerName));
-
-echo BR();
+$widget = (new CWidget())->setTitle(_('Alarm acknowledgements').': '.($bulk ? 'Bulk acknowledge ' : $eventTriggerName));
 
 $acknowledgesTable = null;
 if ($bulk) {
@@ -209,8 +207,8 @@ else {
 	);
 
 	if ($acknowledges) {
-		$acknowledgesTable = new CTableInfo();
-		$acknowledgesTable->setHeader([_('Time'), _('User'), _('Message')]);
+		$acknowledgesTable = (new CTableInfo())
+			->setHeader([_('Time'), _('User'), _('Message')]);
 
 		while ($acknowledge = DBfetch($acknowledges)) {
 			$acknowledgesTable->addRow([
@@ -233,10 +231,9 @@ else {
 	}
 }
 
-$form = new CForm();
-
 $backURL = getRequest('backurl');
-$form->addVar('backurl', $backURL);
+
+$form = (new CForm())->addVar('backurl', $backURL);
 
 if ($backURL === 'tr_events.php' || $backURL === 'events.php') {
 	$form->addVar('triggerid', getRequest('triggerid'));
@@ -260,16 +257,12 @@ elseif (hasRequest('events')) {
 	}
 }
 
-$formList = new CFormList();
-
-$message = new CTextArea('message', '', [
-	'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
-	'width' => ZBX_TEXTAREA_BIG_WIDTH,
-	'maxlength' => 255
-]);
-$message->setAttribute('autofocus', 'autofocus');
-
-$formList->addRow(_('Message'), $message);
+$formList = (new CFormList())
+	->addRow(_('Message'),
+		(new CTextArea('message', '', ['maxlength' => 255]))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	);
 
 // append tabs to form
 $ackTab = new CTabView();

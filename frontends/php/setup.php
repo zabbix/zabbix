@@ -27,8 +27,12 @@ try {
 	Z::getInstance()->run(ZBase::EXEC_MODE_SETUP);
 }
 catch (Exception $e) {
-	(new CView('general.warning', ['header' => 'Configuration file error', 'messages' => [$e->getMessage()]]))
-		->render();
+	(new CView('general.warning', [
+		'header' => $e->getMessage(),
+		'messages' => [],
+		'theme' => ZBX_DEFAULT_THEME
+	]))->render();
+
 	exit;
 }
 
@@ -80,30 +84,29 @@ elseif (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
 
+$theme = CWebUser::$data ? getUserTheme(CWebUser::$data) : ZBX_DEFAULT_THEME;
+
+DBclose();
+
 /*
  * Setup wizard
  */
 $ZBX_SETUP_WIZARD = new CSetupWizard($ZBX_CONFIG);
-
-// page title
-$pageHeader = new CPageHeader(_('Installation'));
-$pageHeader->addCssInit();
-//$pageHeader->addJsFile('js/jquery/jquery.js');
-//$pageHeader->addJsFile('js/functions.js');
-$pageHeader->addJsFile('js/browsers.js');
 
 // if init fails due to missing configuration, set user as guest with default en_GB language
 if (!CWebUser::$data) {
 	CWebUser::setDefault();
 }
 
-$path = 'jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'];
-$pageHeader->addJsFile($path);
-
-$pageHeader->display();
+// page title
+$pageHeader = (new CPageHeader(_('Installation')))
+	->addCssFile('styles/'.CHtml::encode($theme).'.css')
+	->addJsFile('js/browsers.js')
+	->addJsFile('jsLoader.php?ver='.ZABBIX_VERSION.'&amp;lang='.CWebUser::$data['lang'])
+	->display();
 
 /*
- * Dispalying
+ * Displaying
  */
 $header = (new CTag('header', true, new CDiv((new CDiv())->addClass('signin-logo'))))
 	->setAttribute('role', 'banner');

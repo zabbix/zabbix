@@ -1,5 +1,5 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
-	<div class="dashbrd-widget-head">
+	<div class="dashbrd-widget-head <?= ZBX_STYLE_CURSOR_MOVE ?>">
 		<h4 id="formDragHandler">Map element</h4>
 	</div>
 	<form id="selementForm" name="selementForm">
@@ -11,7 +11,7 @@
 					<label for="elementType"><?= _('Type') ?></label>
 				</td>
 				<td class="table-forms-td-right">
-					<select size="1" class="input select" name="elementtype" id="elementType">
+					<select class="input select" name="elementtype" id="elementType">
 						<option value="<?= SYSMAP_ELEMENT_TYPE_HOST ?>"><?= _('Host') ?></option>
 						<option value="<?= SYSMAP_ELEMENT_TYPE_MAP ?>"><?= _('Map') ?></option>
 						<option value="<?= SYSMAP_ELEMENT_TYPE_TRIGGER ?>"><?= _('Trigger') ?></option>
@@ -48,9 +48,9 @@
 				<td class="table-forms-td-left"><?= _('Area size') ?></td>
 				<td class="table-forms-td-right">
 					<label for="areaSizeWidth"><?= _('Width') ?></label>
-					<input id="areaSizeWidth" type="text" class="input text" name="width" value="200" size="5">
+					<input id="areaSizeWidth" type="text" class="input text" name="width" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
 					<label for="areaSizeHeight"><?= _('Height') ?></label>
-					<input id="areaSizeHeight" type="text" class="input text" name="height" value="200" size="5">
+					<input id="areaSizeHeight" type="text" class="input text" name="height" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
 				</td>
 			</tr>
 			<tr id="areaPlacingRow">
@@ -68,7 +68,7 @@
 					<label for="elementLabel"><?= _('Label') ?></label>
 				</td>
 				<td class="table-forms-td-right">
-					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr>
@@ -88,34 +88,34 @@
 			<tr id="hostGroupSelectRow">
 				<td class="table-forms-td-left"><?= _('Host group') ?></td>
 				<td class="table-forms-td-right">
-					<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
+					<div id="elementNameHostGroup" class="multiselect" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
 				<td class="table-forms-td-left"><?= _('Host') ?></td>
 				<td class="table-forms-td-right">
-					<div id="elementNameHost" class="multiselect" style="width: 312px;"></div>
+					<div id="elementNameHost" class="multiselect" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></div>
 				</td>
 			</tr>
 			<tr id="triggerSelectRow">
 				<td class="table-forms-td-left"><?= _('Trigger') ?></td>
 				<td class="table-forms-td-right">
-					<input readonly="readonly" size="50" id="elementNameTrigger" name="elementName" class="input">
 					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
-					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?= _('Select') ?></span>
+					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameTrigger" name="elementName" class="text input" type="text">
+					<button type="button" class="btn-grey" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?= _('Select') ?></button>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">
 				<td class="table-forms-td-left"><?= _('Map') ?></td>
 				<td class="table-forms-td-right">
-					<input readonly="readonly" size="32" id="elementNameMap" name="elementName" class="input">
-					<span class="link" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}")'><?= _('Select') ?></span>
+					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameMap" name="elementName" class="input" type="text">
+					<button type="button" class="btn-grey" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}")'><?= _('Select') ?></button>
 				</td>
 			</tr>
 			<tr id="application-select-row">
 				<td class="table-forms-td-left"><?= _('Application') ?></td>
 				<td class="table-forms-td-right">
-					<input id="application" name="application" class="input text" size="32" type="text">
+					<input id="application" name="application" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" type="text">
 					<button class="<?= ZBX_STYLE_BTN_GREY ?>" id="application-select" type="button"><?= _('Select') ?></button>
 				</td>
 			</tr>
@@ -163,9 +163,9 @@
 			<tr>
 				<td class="table-forms-td-left"><?= _('Coordinates') ?></td>
 				<td class="table-forms-td-right">
-					<input id="x" type="number" maxlength="5" value="0" size="5" name="x" class="input">
+					<input id="x" type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" name="x" class="input">
 					<label for="x"><?= _('X') ?></label>
-					<input type="number" maxlength="5" value="0" size="5" id="y" name="y" class="input">
+					<input type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" id="y" name="y" class="input">
 					<label for="y"><?= _('Y') ?></label>
 				</td>
 			</tr>
@@ -234,7 +234,7 @@
 					<label for="chkboxLabel"><?= _('Label') ?></label>
 				</td>
 				<td>
-					<textarea id="massLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+					<textarea id="massLabel" rows="4" name="label" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr>
@@ -352,7 +352,7 @@
 					<label for="linklabel"><?= _('Label') ?></label>
 				</td>
 				<td>
-					<textarea cols="48" rows="4" name="label" id="linklabel" class="input textarea_standard"></textarea>
+					<textarea cols="48" rows="4" name="label" id="linklabel" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr id="link-connect-to">
@@ -368,7 +368,7 @@
 					<label for="drawtype"><?= _('Type (OK)') ?></label>
 				</td>
 				<td>
-					<select size="1" class="input select" name="drawtype" id="drawtype">
+					<select class="input select" name="drawtype" id="drawtype">
 						<option value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>"><?= _('Line') ?></option>
 						<option value="<?= GRAPH_ITEM_DRAWTYPE_BOLD_LINE ?>"><?= _('Bold line') ?></option>
 						<option value="<?= GRAPH_ITEM_DRAWTYPE_DOT ?>"><?= _('Dot') ?></option>
@@ -381,8 +381,10 @@
 					<label for="color"><?= _('Colour (OK)') ?></label>
 				</td>
 				<td>
-					<input maxlength="6" size="7" id="color" name="color" class="input colorpicker">
-					<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
+					<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
+						<div name="lbl_color" id="lbl_color" style="background: #{color}" title="#{color}" onclick="javascript: show_color_picker('color')"></div>
+						<input id="color" name="color" value="#{color}" class="input colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('color', this.value)" type="text">
+					</div>
 				</td>
 			</tr>
 			<tr>
@@ -458,8 +460,10 @@
 			</select>
 		</td>
 		<td>
-			<input maxlength="6" value="#{color}" size="7" id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" class="input colorpicker">
-			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
+			<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
+				<div name="lbl_linktrigger_#{linktriggerid}_color" id="lbl_linktrigger_#{linktriggerid}_color" style="background: #{color}" title="#{color}" onclick="javascript: show_color_picker('linktrigger_#{linktriggerid}_color')"></div>
+				<input id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" value="#{color}" class="input colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('linktrigger_#{linktriggerid}_color', this.value)" type="text">
+			</div>
 		</td>
 		<td>
 			<button class="<?= ZBX_STYLE_BTN_LINK ?> triggerRemove" type="button" data-linktriggerid="#{linktriggerid}"><?= _('Remove') ?></button>
@@ -468,10 +472,10 @@
 </script>
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
-	<tr id="urlrow_#{selementurlid}" class="even_row">
-		<td><input class="input" name="url_#{selementurlid}_name" type="text" size="16" value="#{name}"></td>
+	<tr id="urlrow_#{selementurlid}">
+		<td><input class="input" name="url_#{selementurlid}_name" type="text" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" value="#{name}"></td>
 		<td>
-			<input class="input" name="url_#{selementurlid}_url" type="text" size="32" value="#{url}">
+			<input class="input" name="url_#{selementurlid}_url" type="text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" value="#{url}">
 			<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?= _('Remove') ?></button>
 		</td>
 	</tr>

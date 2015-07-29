@@ -8,8 +8,8 @@
 		jQuery('#visible_type, #visible_interface').click(function() {
 			// if no item type is selected, reset the interfaces to default
 			if (!jQuery('#visible_type').is(':checked')) {
-				var itemIntefaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
-				organizeInterfaces(itemIntefaceTypes[<?php echo CJs::encodeJson($data['initial_item_type']) ?>]);
+				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
+				organizeInterfaces(itemInterfaceTypes[<?php echo CJs::encodeJson($data['initial_item_type']) ?>]);
 			}
 			else {
 				jQuery('#type').trigger('change');
@@ -19,8 +19,8 @@
 		jQuery('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemIntefaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
-				organizeInterfaces(itemIntefaceTypes[parseInt(jQuery(this).val())]);
+				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
+				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
 			})
 			.trigger('change');
 

@@ -21,20 +21,18 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
 
-$triggersWidget = new CWidget();
+$triggersWidget = (new CWidget())->setTitle(_('Triggers'));
 
 // append host summary to widget header
 if (!empty($data['hostid'])) {
 	$triggersWidget->addItem(get_header_host_table('triggers', $data['hostid']));
 }
 
-$triggersWidget->setTitle(_('Triggers'));
-
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('hostid', $data['hostid']);
-$triggersForm->addVar('action', $data['action']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('hostid', $data['hostid'])
+	->addVar('action', $data['action']);
 
 foreach ($data['g_triggerid'] as $triggerid) {
 	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);
@@ -61,9 +59,7 @@ $triggersFormList->addRow(
 // append dependencies to form list
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
-	->setId('dependenciesTable')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
@@ -92,18 +88,15 @@ foreach ($data['dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$dependenciesDiv = (new CDiv(
-	[
-		$dependenciesTable,
-		(new CButton('btn1', _('Add')))
-			->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-					'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-					'&with_triggers=1&noempty=1");')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
+$dependenciesDiv = (new CDiv([
+	$dependenciesTable,
+	(new CButton('btn1', _('Add')))
+		->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
+				'&with_triggers=1&noempty=1");')
+		->addClass(ZBX_STYLE_BTN_LINK)
+]))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setId('dependencies_div');
 
 $triggersFormList->addRow(

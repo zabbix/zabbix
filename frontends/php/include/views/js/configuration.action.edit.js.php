@@ -78,7 +78,7 @@
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
 <div id="opcmdEditForm">
-	<table class="objectgroup border_dotted inlineblock" style="min-width: 310px;">
+	<table class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: 310px;">
 		<tbody>
 		<tr>
 			<td><?= _('Target') ?></td>
@@ -112,7 +112,7 @@
 <tr id="operationTypeScriptElements" class="hidden">
 	<td><?= CHtml::encode(_('Execute on')) ?></td>
 	<td>
-		<div class="objectgroup inlineblock border_dotted" id="uniqList">
+		<div class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" id="uniqList">
 			<div>
 				<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
 				<label for="execute_on_agent"><?= CHtml::encode(_('Zabbix agent')) ?></label>
@@ -221,14 +221,6 @@
 					}
 					break;
 			}
-
-			// IE8 hack to fix inline-block container resizing
-			if (IE8) {
-				inlineContainers = container.parents('.inlineblock').filter(function() {
-					return jQuery(this).css('display') == 'inline-block';
-				});
-				inlineContainers.last().addClass('ie8fix-inline').removeClass('ie8fix-inline');
-			}
 		}
 	}
 
@@ -245,10 +237,6 @@
 
 		row.find('*').remove();
 		row.remove();
-
-		if (IE8) {
-			rowParent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function removeOperationCondition(index) {
@@ -263,10 +251,6 @@
 		var rowParent = row.parent();
 
 		row.remove();
-
-		if (IE8) {
-			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function removeOpmsgUserRow(userid) {
@@ -274,10 +258,6 @@
 		var rowParent = row.parent();
 
 		row.remove();
-
-		if (IE8) {
-			rowParent.closest('table').parent().closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function removeOpGroupRow(groupid) {
@@ -445,9 +425,6 @@
 					height: 450
 				}
 			});
-			if (IE8) {
-				jQuery('.formElementTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-			}
 		}
 	}
 

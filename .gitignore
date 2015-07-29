@@ -97,6 +97,10 @@ misc/images/pngcrushoutput.txt
 /nbproject
 sass/.sass-cache
 sass/forms_with_tables.html
+sass/img/man.svg
+sass/img/reload.svg
+sass/img/tomato.png
+sass/img/tomato.svg
 sass/overlay-dialog.html
 sass/stylesheets/*.css
 sass/stylesheets/*.map

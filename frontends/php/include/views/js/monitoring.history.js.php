@@ -15,7 +15,7 @@
 			create_var('zbx_filter', 'itemids[' + list.values[i].itemid + ']', list.values[i].itemid, false);
 		}
 
-		$('zbx_filter').submit();
+		jQuery('form[name=zbx_filter]').submit();
 	}
 
 	jQuery(function($){
@@ -29,7 +29,7 @@
 				var self = $(this);
 
 				if ($('option', obj).length > 1) {
-					$('#filter_itemids_' + self.val()).remove();
+					$('form[name=zbx_filter] #itemids_' + self.val()).remove();
 					self.remove();
 				}
 				else {
@@ -37,6 +37,8 @@
 					return false;
 				}
 			});
+
+			$('form[name=zbx_filter]').submit();
 		});
 
 		$('input[name="graphtype"]').change(function() {
