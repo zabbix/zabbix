@@ -24,21 +24,27 @@ class CControllerProxyUpdate extends CController {
 	protected function checkInput() {
 		$fields = [
 			'proxyid' =>		'fatal|required|db       hosts.hostid',
-			'host' =>			'               db       hosts.host',
-			'status' =>			'               db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
-			'interfaceid' =>    '               db       interface.interfaceid',
-			'dns' =>			'               db       interface.dns',
-			'ip' =>				'               db       interface.ip',
-			'useip' =>			'               db       interface.useip  |in 0,1',
-			'port' =>			'               db       interface.port',
-			'proxy_hostids' =>	'               array_db hosts.hostid',
-			'description' =>	'               db       hosts.description',
-			'tls_accept' => 	'               db       hosts.tls_accept     |in 0,1,2,3,4,5,6,7',
-			'tls_connect' => 	'               db       hosts.tls_connect    |in 0,1,2,3,4,5,6,7',
-			'tls_issuer' => 	'               db       hosts.tls_issuer',
-			'tls_psk' =>		'               db       hosts.tls_psk',
-			'tls_psk_identity'=>'               db       hosts.tls_psk_identity',
-			'tls_subject' => 	'               db       hosts.tls_subject'
+			'host' =>			'db       hosts.host',
+			'status' =>			'db       hosts.status     |in '.HOST_STATUS_PROXY_ACTIVE.','.HOST_STATUS_PROXY_PASSIVE,
+			'interfaceid' =>    'db       interface.interfaceid',
+			'dns' =>			'db       interface.dns',
+			'ip' =>				'db       interface.ip',
+			'useip' =>			'db       interface.useip  |in 0,1',
+			'port' =>			'db       interface.port',
+			'proxy_hostids' =>	'array_db hosts.hostid',
+			'description' =>	'db       hosts.description',
+			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+				HOST_ENCRYPTION_CERTIFICATE,
+			'tls_accept' => 	'db       hosts.tls_accept     |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK).','.
+				HOST_ENCRYPTION_PSK.','.
+				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_CERTIFICATE).','.
+				(HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE).','.
+				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE),
+			'tls_issuer' => 	'db       hosts.tls_issuer',
+			'tls_psk' =>		'db       hosts.tls_psk',
+			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
+			'tls_subject' => 	'db       hosts.tls_subject'
 		];
 
 		$ret = $this->validateInput($fields);

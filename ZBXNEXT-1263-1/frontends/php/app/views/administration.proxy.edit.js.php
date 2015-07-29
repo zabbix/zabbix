@@ -79,7 +79,7 @@
 				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
 			}
 
-			jQuery('#tls_accept').val(tls_accept);
+			jQuery('#tls_accept').val(tls_accept == 0 ? 1 : tls_accept);
 		});
 
 		// Refresh field visibility on document load.

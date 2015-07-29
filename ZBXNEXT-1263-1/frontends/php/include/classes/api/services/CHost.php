@@ -541,7 +541,7 @@ class CHost extends CHostGeneral {
 					}
 				}
 
-				$this->pskValidation($host);
+				$this->encryptionValidation($host);
 			}
 		}
 
@@ -947,7 +947,7 @@ class CHost extends CHostGeneral {
 			}
 		}
 
-		$this->pskValidation($data);
+		$this->encryptionValidation($data);
 
 		if (isset($data['host'])) {
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])) {
@@ -1633,13 +1633,24 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Validate PSK fields.
+	 * Validate connections from host and PSK fields.
 	 *
 	 * @throws APIException		if incorrect encryption options
 	 *
 	 * @param array $data		host data array
 	 */
-	protected function pskValidation(array $data) {
+	protected function encryptionValidation(array $data) {
+		// connections from host validation
+		$available_encryption_types = [
+			HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, (HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK),
+			HOST_ENCRYPTION_PSK, (HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_CERTIFICATE),
+			(HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE),
+			(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE)
+		];
+		if (array_key_exists('tls_accept', $data) && !in_array($data['tls_accept'], $available_encryption_types)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from host field.'));
+		}
+
 		// psk validation
 		if ((array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK)
 				|| (array_key_exists('tls_accept', $data)
