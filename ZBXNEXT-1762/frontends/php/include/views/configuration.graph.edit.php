@@ -31,36 +31,39 @@ else {
 }
 
 // create form
-$graphForm = new CForm();
-$graphForm->setName('graphForm');
-$graphForm->addVar('form', $this->data['form']);
-$graphForm->addVar('hostid', $this->data['hostid']);
+$graphForm = (new CForm())
+	->setName('graphForm')
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('ymin_itemid', $this->data['ymin_itemid'])
+	->addVar('ymax_itemid', $this->data['ymax_itemid']);
 if (!empty($this->data['parent_discoveryid'])) {
 	$graphForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 }
 if (!empty($this->data['graphid'])) {
 	$graphForm->addVar('graphid', $this->data['graphid']);
 }
-$graphForm->addVar('ymin_itemid', $this->data['ymin_itemid']);
-$graphForm->addVar('ymax_itemid', $this->data['ymax_itemid']);
 
 // create form list
 $graphFormList = new CFormList('graphFormList');
 if (!empty($this->data['templates'])) {
 	$graphFormList->addRow(_('Parent graphs'), $this->data['templates']);
 }
-$nameTextBox = new CTextBox('name', $this->data['name'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$graphFormList->addRow(_('Name'), $nameTextBox);
-$graphFormList->addRow(_('Width'), new CNumericBox('width', $this->data['width'], 5));
-$graphFormList->addRow(_('Height'), new CNumericBox('height', $this->data['height'], 5));
 
-$graphFormList->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()));
-
-// append legend to form list
-$graphFormList->addRow(_('Show legend'),
-	(new CCheckBox('show_legend'))->setChecked($this->data['show_legend'] == 1)
-);
+$graphFormList
+	->addRow(_('Name'),
+		(new CTextBox('name', $this->data['name']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Width'),
+		(new CNumericBox('width', $this->data['width'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Height'),
+		(new CNumericBox('height', $this->data['height'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	)
+	->addRow(_('Graph type'), new CComboBox('graphtype', $this->data['graphtype'], 'submit()', graphType()))
+	->addRow(_('Show legend'), (new CCheckBox('show_legend'))->setChecked($this->data['show_legend'] == 1));
 
 // append graph types to form list
 if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED) {
@@ -73,34 +76,34 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL) {
 		// percent left
-		$percentLeftTextBox = new CTextBox('percent_left', $this->data['percent_left'], 6, false, 7);
+		$percentLeftTextBox = (new CTextBox('percent_left', $this->data['percent_left'], false, 7))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentLeftCheckbox = (new CCheckBox('visible[percent_left]'))
 			->setChecked(true)
 			->onClick('javascript: showHideVisible("percent_left");');
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_left'])) {
-			$percentLeftTextBox->setAttribute('style', '');
 			$percentLeftCheckbox->setChecked(1);
 		}
 		elseif ($this->data['percent_left'] == 0) {
-			$percentLeftTextBox->setAttribute('style', 'visibility: hidden;');
+			$percentLeftTextBox->addStyle('visibility: hidden;');
 			$percentLeftCheckbox->setChecked(0);
 		}
 
 		$graphFormList->addRow(_('Percentile line (left)'), [$percentLeftCheckbox, SPACE, $percentLeftTextBox]);
 
 		// percent right
-		$percentRightTextBox = new CTextBox('percent_right', $this->data['percent_right'], 6, false, 7);
+		$percentRightTextBox = (new CTextBox('percent_right', $this->data['percent_right'], false, 7))
+			->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 		$percentRightCheckbox = (new CCheckBox('visible[percent_right]'))
 			->setChecked(true)
 			->onClick('javascript: showHideVisible("percent_right");');
 
 		if(isset($this->data['visible']) && isset($this->data['visible']['percent_right'])) {
-			$percentRightTextBox->setAttribute('style', '');
 			$percentRightCheckbox->setChecked(1);
 		}
 		elseif ($this->data['percent_right'] == 0) {
-			$percentRightTextBox->setAttribute('style', 'visibility: hidden;');
+			$percentRightTextBox->addStyle('visibility: hidden;');
 			$percentRightCheckbox->setChecked(0);
 		}
 
@@ -117,7 +120,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	if ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = new CTextBox('yaxismin', $this->data['yaxismin'], 7);
+		$yaxisMinData[] = (new CTextBox('yaxismin', $this->data['yaxismin']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismin', $this->data['yaxismin']);
@@ -133,7 +136,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMinData[] = new CTextBox('ymin_name', $ymin_name, 36, true);
+		$yaxisMinData[] = (new CTextBox('ymin_name', $ymin_name, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		$yaxisMinData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMinData[] = (new CButton('yaxis_min', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -178,7 +181,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 
 	if ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = new CTextBox('yaxismax', $this->data['yaxismax'], 7);
+		$yaxisMaxData[] = (new CTextBox('yaxismax', $this->data['yaxismax']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH);
 	}
 	elseif ($this->data['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 		$graphForm->addVar('yaxismax', $this->data['yaxismax']);
@@ -194,7 +197,7 @@ if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] ==
 		}
 
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$yaxisMaxData[] = new CTextBox('ymax_name', $ymax_name, 36, true);
+		$yaxisMaxData[] = (new CTextBox('ymax_name', $ymax_name, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 		$yaxisMaxData[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		$yaxisMaxData[] = (new CButton('yaxis_max', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -238,7 +241,6 @@ else {
 
 // append items to form list
 $itemsTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
 	->setId('itemsTable')
 	->setHeader([
 		(new CColHeader())->setWidth(15),
@@ -276,11 +278,12 @@ if ($this->data['parent_discoveryid']) {
 			url_param('parent_discoveryid').
 			($this->data['normal_only'] ? '&normal_only=1' : '').
 			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
-		->addClass(ZBX_STYLE_BTN_LINK);
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addStyle('margin-left: 8px');
 }
 $itemsTable->addRow(
 	(new CRow(
-		(new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))->setColSpan(8)
+		(new CCol([$addButton, $addPrototypeButton]))->setColSpan(8)
 	))->setId('itemButtonsRow')
 );
 
@@ -302,13 +305,7 @@ foreach ($this->data['items'] as $n => $item) {
 	);
 }
 
-$graphFormList->addRow(
-	_('Items'),
-	(new CDiv($itemsTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-);
+$graphFormList->addRow(_('Items'), (new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // append tabs to form
 $graphTab = new CTabView();
@@ -323,13 +320,11 @@ $graphTab->addTab(
 /*
  * Preview tab
  */
-$chartImage = new CImg('chart3.php?period=3600');
-$chartImage->preload();
+$chartImage = (new CImg('chart3.php?period=3600'))->preload();
 
 $graphPreviewTable = (new CTable())
 	->addClass('center')
-	->addClass('maxwidth');
-$graphPreviewTable->addRow((new CDiv($chartImage))->setId('previewChar'));
+	->addRow((new CDiv($chartImage))->setId('previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 
 // append buttons to form

@@ -20,15 +20,22 @@
 
 
 // hint table
-$hintTable = new CTableInfo();
+$help_hint = (new CList())
+	->addClass(ZBX_STYLE_NOTIF_BODY)
+	->addStyle('min-width: '.ZBX_OVERVIEW_HELP_MIN_WIDTH.'px');
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$hintTable->addRow([getSeverityCell($severity, $this->data['config']), _('PROBLEM')]);
+	$help_hint->addItem([
+		(new CDiv())
+			->addClass(ZBX_STYLE_NOTIF_INDIC)
+			->addClass(getSeverityStyle($severity)),
+		new CTag('h4', true, getSeverityName($severity, $data['config'])),
+		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
+	]);
 }
-$hintTable->addRow([new CCol(SPACE), _('OK or no trigger')]);
 
 // header right
 $help = get_icon('overviewhelp');
-$help->setHint($hintTable);
+$help->setHint($help_hint);
 
 $widget = (new CWidget())
 	->setTitle(_('Overview'))
@@ -50,16 +57,16 @@ $widget = (new CWidget())
 	);
 
 // filter
-$filter = new CFilter('web.overview.filter.state');
-$filter->addVar('fullscreen', $this->data['fullscreen']);
-$filter->addVar('groupid', $this->data['groupid']);
-$filter->addVar('hostid', $this->data['hostid']);
+$filter = (new CFilter('web.overview.filter.state'))
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addVar('groupid', $this->data['groupid'])
+	->addVar('hostid', $this->data['hostid']);
 
 $column = new CFormList();
 
 // application
 $column->addRow(_('Filter by application'), [
-	new CTextBox('application', $this->data['filter']['application'], 40),
+	(new CTextBox('application', $this->data['filter']['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('application_name', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)

@@ -70,7 +70,6 @@ $fields = [
 	'filter_rst'=>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set'=>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// ajax
-	'filterState' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	'favobj'=>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid'=>			[T_ZBX_INT, O_OPT, P_ACT,	null,		null]
 ];
@@ -92,9 +91,6 @@ if (getRequest('triggerid') && !API::Trigger()->isReadable([getRequest('triggeri
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.events.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (hasRequest('favobj')) {
 	// saving fixed/dynamic setting to profile
 	if ('timelinefixedperiod' == getRequest('favobj')) {
@@ -277,14 +273,13 @@ else {
 	$csvDisabled = true;
 
 	// header
-	$frmForm = new CForm();
+	$frmForm = (new CForm())
+		->addVar('stime', $stime, 'stime_csv')
+		->addVar('period', $period, 'period_csv')
+		->addVar('page', getPageNumber(), 'page_csv');
 	if (hasRequest('source')) {
 		$frmForm->addVar('source', getRequest('source'), 'source_csv');
 	}
-	$frmForm->addVar('stime', $stime, 'stime_csv');
-	$frmForm->addVar('period', $period, 'period_csv');
-	$frmForm->addVar('page', getPageNumber(), 'page_csv');
-
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
 		if ($triggerId) {
@@ -308,12 +303,12 @@ else {
 			$frmForm->addVar('triggerid', getRequest('triggerid'), 'triggerid_filter');
 		}
 
-		$controls->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()]);
-		$controls->addItem([_('Host').SPACE, $pageFilter->getHostsCB()]);
+		$controls->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()]);
+		$controls->addItem([_('Host'), SPACE, $pageFilter->getHostsCB()]);
 	}
 
 	if ($allow_discovery) {
-		$controls->addItem([_('Source').SPACE, new CComboBox('source', $source, 'submit()', [
+		$controls->addItem([_('Source'), SPACE, new CComboBox('source', $source, 'submit()', [
 			EVENT_SOURCE_TRIGGERS => _('Trigger'),
 			EVENT_SOURCE_DISCOVERY => _('Discovery')
 		])]);
@@ -328,9 +323,9 @@ else {
 	$filterForm = new CFilter('web.events.filter.state');
 
 	if ($source == EVENT_SOURCE_TRIGGERS) {
-		$filterForm->addVar('triggerid', $triggerId);
-		$filterForm->addVar('stime', $stime);
-		$filterForm->addVar('period', $period);
+		$filterForm->addVar('triggerid', $triggerId)
+			->addVar('stime', $stime)
+			->addVar('period', $period);
 
 		if ($triggerId > 0) {
 			$dbTrigger = API::Trigger()->get([
@@ -359,7 +354,7 @@ else {
 		$filterColumn->addRow(
 			_('Trigger'),
 			[
-				new CTextBox('trigger', $trigger, 96, true),
+				(new CTextBox('trigger', $trigger, true))->setWidth(ZBX_TEXTAREA_FILTER_BIG_WIDTH),
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 				(new CButton('btn1', _('Select')))
 					->addClass(ZBX_STYLE_BTN_GREY)

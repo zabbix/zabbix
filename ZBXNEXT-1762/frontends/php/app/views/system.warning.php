@@ -18,10 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
-
-$pageHeader = new CPageHeader(_('Fatal error, please report to the Zabbix team'));
-$pageHeader->addCssInit();
-$pageHeader->display();
+$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team')))
+	->addCssFile('styles/'.CHtml::encode($data['theme']).'.css')
+	->display();
 
 $buttons = [
 	(new CButton('back', _('Go to dashboard')))

@@ -243,6 +243,159 @@ static int	DBpatch_2050012(void)
 	return ret;
 }
 
+static int	DBpatch_2050013(void)
+{
+	return DBdrop_table("user_history");
+}
+
+static int      DBpatch_2050014(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+		"update config"
+		" set default_theme="
+			"case when default_theme in ('classic', 'originalblue')"
+			" then 'blue-theme'"
+			" else 'dark-theme' end"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int      DBpatch_2050015(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+		"update users"
+		" set theme=case when theme in ('classic', 'originalblue') then 'blue-theme' else 'dark-theme' end"
+		" where theme<>'default'"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int      DBpatch_2050016(void)
+{
+	return SUCCEED;
+}
+
+static int      DBpatch_2050017(void)
+{
+	return SUCCEED;
+}
+
+static int      DBpatch_2050018(void)
+{
+	return SUCCEED;
+}
+
+static int	DBpatch_2050019(void)
+{
+	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050020(void)
+{
+	const ZBX_FIELD	field = {"smtp_security", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050021(void)
+{
+	const ZBX_FIELD	field = {"smtp_verify_peer", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050022(void)
+{
+	const ZBX_FIELD	field = {"smtp_verify_host", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050023(void)
+{
+	const ZBX_FIELD	field = {"smtp_authentication", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050024(void)
+{
+	return DBdrop_table("graph_theme");
+}
+
+static int	DBpatch_2050025(void)
+{
+	const ZBX_TABLE table =
+		{"graph_theme",	"graphthemeid",	0,
+			{
+				{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"backgroundcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"graphcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"maingridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridbordercolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"textcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"highlightcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"leftpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"rightpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"nonworktimecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"legendview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050026(void)
+{
+	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
+}
+
+static int	DBpatch_2050027(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (1,'blue-theme','FFFFFF','FFFFFF','CCCCCC','AAAAAA','ACBBC2','1F2C33','E33734',"
+				"'429E47','E33734','EBEEF0',1,1)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2050028(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (2,'dark-theme','2B2B2B','2B2B2B','222222','4F4F4F','4F4F4F','F2F2F2','E45959',"
+				"'59DB8f','E45959','333333',1,1)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2050029(void)
+{
+	const ZBX_FIELD	field = {"default_theme", "blue-theme", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -262,5 +415,22 @@ DBPATCH_ADD(2050009, 0, 1)
 DBPATCH_ADD(2050010, 0, 1)
 DBPATCH_ADD(2050011, 0, 1)
 DBPATCH_ADD(2050012, 0, 1)
+DBPATCH_ADD(2050013, 0, 0)
+DBPATCH_ADD(2050014, 0, 1)
+DBPATCH_ADD(2050015, 0, 1)
+DBPATCH_ADD(2050016, 0, 1)
+DBPATCH_ADD(2050017, 0, 1)
+DBPATCH_ADD(2050018, 0, 1)
+DBPATCH_ADD(2050019, 0, 1)
+DBPATCH_ADD(2050020, 0, 1)
+DBPATCH_ADD(2050021, 0, 1)
+DBPATCH_ADD(2050022, 0, 1)
+DBPATCH_ADD(2050023, 0, 1)
+DBPATCH_ADD(2050024, 0, 1)
+DBPATCH_ADD(2050025, 0, 1)
+DBPATCH_ADD(2050026, 0, 1)
+DBPATCH_ADD(2050027, 0, 1)
+DBPATCH_ADD(2050028, 0, 1)
+DBPATCH_ADD(2050029, 0, 1)
 
 DBPATCH_END()

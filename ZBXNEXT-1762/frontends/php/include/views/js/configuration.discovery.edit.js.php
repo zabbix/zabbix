@@ -1,15 +1,21 @@
 <script type="text/x-jquery-tmpl" id="dcheckRowTPL">
-	<tr id="dcheckRow_#{dcheckid}">
-		<td id="dcheckCell_#{dcheckid}">
-			<span class="bold">#{name}</span>
-		</td>
-		<td>
-			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');"><?= _('Edit') ?></button>
-		</td>
-		<td>
-			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" onclick="javascript: removeDCheckRow('#{dcheckid}');"><?= _('Remove') ?></button>
-		</td>
-	</tr>
+	<?= (new CRow([
+			(new CCol(
+				(new CSpan('#{name}'))->addClass('bold')
+			))->setId('dcheckCell_#{dcheckid}'),
+			[
+				(new CButton(null, _('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick("javascript: showNewCheckForm(null, null, '#{dcheckid}');"),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick("javascript: removeDCheckRow('#{dcheckid}');")
+					->addStyle('margin-left: 8px')
+			]
+		]))
+			->setId('dcheckRow_#{dcheckid}')
+			->toString()
+	?>
 </script>
 <script type="text/x-jquery-tmpl" id="uniqRowTPL">
 	<div id="uniqueness_criteria_row_#{dcheckid}">
@@ -20,8 +26,8 @@
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
-		<div class="objectgroup inlineblock border_dotted">
-			<table class="formElementTable">
+		<div class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>">
+			<table>
 				<tbody>
 				<tr>
 					<td><label for="type"><?= _('Check type') ?></label></td>
@@ -30,35 +36,34 @@
 				<tr id="newCheckPortsRow" class="hidden">
 					<td><label for="ports"><?= _('Port range') ?></label></td>
 					<td>
-						<input type="text" id="ports" name="ports" value="" class="input text" size="16" maxlength="255">
+						<input type="text" id="ports" name="ports" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckCommunityRow" class="hidden">
 					<td><label for="snmp_community"><?= _('SNMP community') ?></label></td>
 					<td><input type="text" id="snmp_community" name="snmp_community" value="" class="input text"
-							size="20" maxlength="255"></td>
+							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255"></td>
 				</tr>
 				<tr id="newCheckKeyRow" class="hidden">
 					<td><label for="key_"><?= _('SNMP Key') ?></label></td>
 					<td>
-						<input type="text" id="key_" name="key_" value="" class="input text" size="20" maxlength="255">
+						<input type="text" id="key_" name="key_" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckContextRow" class="hidden">
 					<td><label for="snmpv3_contextname"><?= _('Context name') ?></label></td>
 					<td>
-						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" class="input text" size="20" maxlength="255">
+						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckSecNameRow" class="hidden">
 					<td><label for="snmpv3_securityname"><?= _('Security name') ?></label></td>
-					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				<tr id="newCheckSecLevRow" class="hidden">
 					<td><label for="snmpv3_securitylevel"><?= _('Security level') ?></label></td>
 					<td>
-						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select" size="1">
+						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select">
 							<option value="0"><?= 'noAuthNoPriv' ?> </option>
 							<option value="1"><?= 'authNoPriv' ?> </option>
 							<option value="2"><?= 'authPriv' ?> </option>
@@ -79,8 +84,7 @@
 				</tr>
 				<tr id="newCheckAuthPassRow" class="hidden">
 					<td><label for="snmpv3_authpassphrase"><?= _('Authentication passphrase') ?></label></td>
-					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				<tr id="newCheckPrivProtocolRow" class="hidden">
 					<td><label for="snmpv3_authprotocol"><?= _('Authentication protocol') ?></label></td>
@@ -96,12 +100,11 @@
 				</tr>
 				<tr id="newCheckPrivPassRow" class="hidden">
 					<td><label for="snmpv3_privpassphrase"><?= _('Privacy passphrase') ?></label></td>
-					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value=""
-							class="input text" size="20" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				</tbody>
 			</table>
-			<table class="formElementTable">
+			<table>
 				<tr>
 					<td>
 						<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" id="add_new_dcheck" name="add_new_dcheck"><?= _('Add') ?></button>
@@ -316,10 +319,6 @@
 
 			jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
 		}
-
-		if (IE8) {
-			jQuery('#dcheckList').find('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function showNewCheckForm(e, dcheckType, dcheckId) {
@@ -501,10 +500,6 @@
 		}
 		if (showPrivProtocol) {
 			jQuery('#newCheckPrivProtocolRow .jqueryinputset').buttonset();
-		}
-
-		if (IE8) {
-			jQuery('#type').closest('li').addClass('ie8fix-inline').removeClass('ie8fix-inline');
 		}
 	}
 

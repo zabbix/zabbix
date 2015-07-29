@@ -29,13 +29,13 @@ if (!empty($this->data['hostid'])) {
 }
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar('form', $this->data['form']);
-$triggersForm->addVar('hostid', $this->data['hostid']);
-$triggersForm->addVar('input_method', $this->data['input_method']);
-$triggersForm->addVar('toggle_input_method', '');
-$triggersForm->addVar('remove_expression', '');
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('input_method', $this->data['input_method'])
+	->addVar('toggle_input_method', '')
+	->addVar('remove_expression', '');
 
 if ($data['triggerid'] !== null) {
 	$triggersForm->addVar('triggerid', $this->data['triggerid']);
@@ -46,20 +46,13 @@ $triggersFormList = new CFormList('triggersFormList');
 if (!empty($this->data['templates'])) {
 	$triggersFormList->addRow(_('Parent triggers'), $this->data['templates']);
 }
-$nameTextBox = new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, $this->data['limited']);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$triggersFormList->addRow(_('Name'), $nameTextBox);
+$triggersFormList->addRow(_('Name'),
+	(new CTextBox('description', $this->data['description'], $this->data['limited']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+);
 
 // append expression to form list
-$expressionTextBox = new CTextArea(
-	$this->data['expression_field_name'],
-	$this->data['expression_field_value'],
-	[
-		'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
-		'width' => ZBX_TEXTAREA_STANDARD_WIDTH,
-		'readonly' => $this->data['expression_field_readonly']
-	]
-);
 if ($this->data['expression_field_readonly']) {
 	$triggersForm->addVar('expression', $this->data['expression']);
 }
@@ -74,7 +67,17 @@ $addExpressionButton = (new CButton('insert', ($this->data['input_method'] == IM
 if ($this->data['limited']) {
 	$addExpressionButton->setAttribute('disabled', 'disabled');
 }
-$expressionRow = [$expressionTextBox, (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN), $addExpressionButton];
+$expressionRow = [
+	(new CTextArea(
+		$this->data['expression_field_name'],
+		$this->data['expression_field_value'],
+		[
+			'readonly' => $this->data['expression_field_readonly']
+		]
+	))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	$addExpressionButton
+];
 
 if ($this->data['input_method'] == IM_TREE) {
 	// insert macro button
@@ -135,15 +138,14 @@ $triggersFormList->addRow(_('Expression'), $expressionRow);
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable = (new CTable())
-		->addClass('formElementTable')
 		->setAttribute('style', 'min-width: 500px;')
-		->setId('exp_list');
-	$expressionTable->setHeader([
-		$this->data['limited'] ? null : _('Target'),
-		_('Expression'),
-		_('Error'),
-		$this->data['limited'] ? null : _('Action')
-	]);
+		->setId('exp_list')
+		->setHeader([
+			$this->data['limited'] ? null : _('Target'),
+			_('Expression'),
+			_('Error'),
+			$this->data['limited'] ? null : _('Action')
+		]);
 
 	$allowedTesting = true;
 	if (!empty($this->data['eHTMLTree'])) {
@@ -166,8 +168,8 @@ if ($this->data['input_method'] == IM_TREE) {
 			}
 
 			if (!isset($e['expression']['levelErrors'])) {
-				$errorImg = new CImg('images/general/ok_icon.png', 'expression_no_errors');
-				$errorImg->setHint(_('No errors found.'));
+				$errorImg = (new CImg('images/general/ok_icon.png', 'expression_no_errors'))
+					->setHint(_('No errors found.'));
 			}
 			else {
 				$allowedTesting = false;
@@ -225,10 +227,7 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		(new CDiv([$expressionTable, $testButton]))
-			->addClass('objectgroup')
-			->addClass('inlineblock')
-			->addClass('border_dotted')
+		(new CDiv([$expressionTable, $testButton]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	]);
 
 	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))
@@ -240,12 +239,15 @@ if ($this->data['input_method'] == IM_TREE) {
 	$triggersFormList->addRow(SPACE, [$inputMethodToggle, BR()]);
 }
 
-$triggersFormList->addRow(_('Multiple PROBLEM events generation'),
-	(new CCheckBox('type'))->setChecked($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED)
-);
-$triggersFormList->addRow(_('Description'), new CTextArea('comments', $this->data['comments']));
-$triggersFormList->addRow(_('URL'), new CTextBox('url', $this->data['url'], ZBX_TEXTBOX_STANDARD_SIZE));
-$triggersFormList->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
+$triggersFormList
+	->addRow(_('Multiple PROBLEM events generation'),
+		(new CCheckBox('type'))->setChecked($this->data['type'] == TRIGGER_MULT_EVENT_ENABLED)
+	)
+	->addRow(_('Description'),
+		(new CTextArea('comments', $this->data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	)
+	->addRow(_('URL'), (new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
 
 // append status to form list
 if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
@@ -269,9 +271,7 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
-	->setId('dependenciesTable')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($this->data['db_dependencies'] as $dependency) {
@@ -308,10 +308,7 @@ $dependenciesFormList->addRow(
 				->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
 					'&with_triggers=1&noempty=1");')
 				->addClass(ZBX_STYLE_BTN_LINK)
-		]))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+		]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 

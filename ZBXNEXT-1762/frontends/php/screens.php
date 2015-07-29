@@ -47,7 +47,6 @@ $fields = [
 	'reset' =>		[T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null],
 	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null],
 	// ajax
-	'filterState' => [T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null]
 ];
@@ -88,10 +87,6 @@ if (getRequest('elementid')) {
 /*
  * Filter
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.screens.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
 if (isset($_REQUEST['favobj'])) {
 	if (getRequest('favobj') === 'timeline' && hasRequest('elementid') && hasRequest('period')) {
 		navigation_bar_calc('web.screens', $_REQUEST['elementid'], true);

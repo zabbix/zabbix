@@ -22,8 +22,6 @@
 class CTweenBox {
 
 	public function __construct(&$form, $name, $value = null, $size = 10) {
-		zbx_add_post_js('if (IE7) $$("select option[disabled]").each(function(e) { e.setStyle({color: "gray"}); });');
-
 		$this->form = &$form;
 		$this->name = $name.'_tweenbox';
 		$this->varname = $name;
@@ -66,6 +64,7 @@ class CTweenBox {
 		else {
 			$this->rbox->addItem($value, $caption, null, $enabled);
 		}
+		return $this;
 	}
 
 	public function get($caption_l = null, $caption_r = null) {
@@ -107,6 +106,7 @@ class CTweenBox {
 		}
 		$tab = $this->get($caption_l, $caption_r);
 		$tab->show();
+		return $this;
 	}
 
 	public function toString() {

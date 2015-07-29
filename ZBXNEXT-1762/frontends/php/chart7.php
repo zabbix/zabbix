@@ -32,7 +32,6 @@ $fields = [
 	'period' =>		[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
 	'from' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
 	'stime' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
-	'border' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null],
 	'name' =>		[T_ZBX_STR, O_OPT, null,		null,				null],
 	'width' =>		[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
 	'height' =>		[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
@@ -103,9 +102,6 @@ if ($isDataValid) {
 	}
 	if (isset($_REQUEST['stime'])) {
 		$graph->setSTime($_REQUEST['stime']);
-	}
-	if (isset($_REQUEST['border'])) {
-		$graph->setBorder(0);
 	}
 	$graph->setWidth(getRequest('width', 400));
 	$graph->setHeight(getRequest('height', 300));

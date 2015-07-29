@@ -48,18 +48,22 @@ class CFlashClock extends CFlash {
 
 	public function setTimeType($value) {
 		$this->timeType = $value;
+		return $this;
 	}
 
 	public function setTimeZone($value) {
 		$this->timeZone = $value;
+		return $this;
 	}
 
 	public function setTimeOffset($value) {
 		$this->timeOffset = $value;
+		return $this;
 	}
 
 	public function setTimeError($value) {
 		$this->timeError = $value;
+		return $this;
 	}
 
 	public function bodyToString() {

@@ -22,10 +22,10 @@
 $dashconfWidget = (new CWidget())->setTitle(_('Dashboard'));
 
 // create form
-$dashconfForm = new CForm();
-$dashconfForm->setName('dashconf');
-$dashconfForm->setId('dashform');
-$dashconfForm->addVar('filterEnable', $this->data['isFilterEnable']);
+$dashconfForm = (new CForm())
+	->setName('dashconf')
+	->setId('dashform')
+	->addVar('filterEnable', $this->data['isFilterEnable']);
 
 // create form list
 $dashconfFormList = new CFormList('dashconfFormList');
@@ -58,7 +58,7 @@ if (!$this->data['isFilterEnable']) {
 $dashconfFormList->addRow(_('Host groups'), $hostGroupsComboBox);
 
 if ($this->data['grpswitch']) {
-	$dashconfFormList->addRow(_('Show selected groups'), new CMultiSelect([
+	$dashconfFormList->addRow(_('Show selected groups'), (new CMultiSelect([
 		'name' => 'groupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['groups'],
@@ -67,8 +67,8 @@ if ($this->data['grpswitch']) {
 			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=groupids_'.
 				'&srcfld1=groupid&multiselect=1'
 		]
-	]));
-	$dashconfFormList->addRow(_('Hide selected groups'), new CMultiSelect([
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH));
+	$dashconfFormList->addRow(_('Hide selected groups'), (new CMultiSelect([
 		'name' => 'hidegroupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['hideGroups'],
@@ -77,7 +77,7 @@ if ($this->data['grpswitch']) {
 			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=hidegroupids_'.
 				'&srcfld1=groupid&multiselect=1'
 		]
-	]));
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH));
 }
 
 // append host in maintenance checkbox to form list

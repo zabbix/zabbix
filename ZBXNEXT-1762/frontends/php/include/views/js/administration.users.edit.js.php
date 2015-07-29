@@ -22,12 +22,12 @@
 					jQuery('#triggers_row input[type=checkbox]').prop('checked', true);
 				}
 
-				// enable/disable childs fields
+				// enable/disable child fields
 				jQuery('#messagingTab .input, #messagingTab .button').prop('disabled', !this.checked);
 				jQuery('#messages_enabled').prop('disabled', false);
 			});
 
-			// initial state: enable/disable childs fields
+			// initial state: enable/disable child fields
 			jQuery('#messagingTab .input, #messagingTab .button').prop('disabled',
 				!jQuery('#messages_enabled').is(':checked')
 			);

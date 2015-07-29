@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -180,8 +179,6 @@ $fields = [
 	'subfilter_interval' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_history' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'subfilter_trends' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
-	// ajax
-	'filterState' =>			[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	// sort and sortorder
 	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS,
 									IN('"delay","history","key_","name","status","trends","type"'),
@@ -241,17 +238,6 @@ if ($filterGroupId && !API::HostGroup()->isWritable([$filterGroupId])) {
 $filterHostId = getRequest('filter_hostid');
 if ($filterHostId && !API::Host()->isWritable([$filterHostId])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.items.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 if (!empty($hosts)) {

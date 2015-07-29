@@ -444,6 +444,8 @@ var hintBox = {
 			wHeight = jQuery(window).height(),
 			scrollTop = jQuery(window).scrollTop(),
 			scrollLeft = jQuery(window).scrollLeft(),
+			hint_width = jQuery(target.hintBoxItem).outerWidth(),
+			hint_height = jQuery(target.hintBoxItem).outerHeight(),
 			top, left;
 
 		// uses stored clientX on afterload positioning when there is no event
@@ -453,25 +455,25 @@ var hintBox = {
 		}
 
 		// doesn't fit in the screen horizontally
-		if (target.hintBoxItem.width() + 10 > wWidth) {
+		if (hint_width + 10 > wWidth) {
 			left = scrollLeft + 2;
 		}
 		// 10px to right if fit
-		else if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+		else if (wWidth - target.clientX - 10 > hint_width) {
 			left = scrollLeft + target.clientX + 10;
 		}
 		// 10px from screen right side
 		else {
-			left = scrollLeft + wWidth - 10 - target.hintBoxItem.width();
+			left = scrollLeft + wWidth - 10 - hint_width;
 		}
 
 		// 10px below if fit
-		if (wHeight - target.clientY - target.hintBoxItem.height() - 10 > 0) {
+		if (wHeight - target.clientY - hint_height - 10 > 0) {
 			top = scrollTop + target.clientY + 10;
 		}
 		// 10px above if fit
-		else if (target.clientY - target.hintBoxItem.height() - 10 > 0) {
-			top = scrollTop + target.clientY - target.hintBoxItem.height() - 10;
+		else if (target.clientY - hint_height - 10 > 0) {
+			top = scrollTop + target.clientY - hint_height - 10;
 		}
 		// 10px below as fallback
 		else {
@@ -479,21 +481,21 @@ var hintBox = {
 		}
 
 		// fallback if doesn't fit verticaly but could fit if aligned to right or left
-		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
-				&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
+		if ((top - scrollTop + hint_height > wHeight)
+				&& (target.clientX - 10 > hint_width || wWidth - target.clientX - 10 > hint_width)) {
 
 			// align to left if fit
-			if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+			if (wWidth - target.clientX - 10 > hint_width) {
 				left = scrollLeft + target.clientX + 10;
 			}
 			// align to right
 			else {
-				left = scrollLeft + target.clientX - target.hintBoxItem.width() - 10;
+				left = scrollLeft + target.clientX - hint_width - 10;
 			}
 
 			// 10px from bottom if fit
-			if (wHeight - 10 > target.hintBoxItem.height()) {
-				top = scrollTop + wHeight - target.hintBoxItem.height() - 10;
+			if (wHeight - 10 > hint_height) {
+				top = scrollTop + wHeight - hint_height - 10;
 			}
 			// 10px from top
 			else {
@@ -615,30 +617,16 @@ function rm4favorites(object, objectid) {
 /**
  * Toggles filter state and updates title and icons accordingly.
  *
- * @param {int} 	id					Id of filter in DOM
- * @param {string} 	titleWhenVisible	Title to set when filter is visible
- * @param {string} 	titleWhenHidden		Title to set when filter is collapsed
+ * @param {idx} 	idx					User profile index
+ * @param {int} 	value_int			Integer value
  */
-function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
-	var state = showHide(id);
-
-	switchElementClass('flicker_icon_l', 'dbl_arrow_up', 'dbl_arrow_down');
-	switchElementClass('flicker_icon_r', 'dbl_arrow_up', 'dbl_arrow_down');
-
-	var title = state ? titleWhenVisible : titleWhenHidden;
-
-	jQuery('#flicker_title').html(title);
-
-	sendAjaxData(location.href, {
+function updateUserProfile(idx, value_int) {
+	sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
-			filterState: state
+			idx: idx,
+			value_int: value_int
 		}
 	});
-
-	// resize multiselects in the flicker
-	if (jQuery('.multiselect').length > 0 && state == 1) {
-		jQuery('.multiselect', jQuery('#' + id)).multiSelect('resize');
-	}
 }
 
 function changeWidgetState(obj, widgetId) {
@@ -930,11 +918,10 @@ jQuery(function ($) {
 
 			// insert spans
 			cellsToRotate.each(function() {
-				var cell = $(this);
-
-				var text = $('<span>', {
-					text: cell.html()
-				});
+				var cell = $(this),
+					text = $('<span>', {
+						text: cell.html()
+					}).css({'white-space': 'nowrap'});
 
 				if (IE) {
 					text.css({'font-family': 'monospace'});
