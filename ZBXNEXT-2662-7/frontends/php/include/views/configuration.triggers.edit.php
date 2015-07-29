@@ -210,7 +210,7 @@ if ($this->data['input_method'] == IM_TREE) {
 
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick('openWinCentered("tr_testexpr.php?expression=" + encodeURIComponent(this.form.elements["expression"].value),'.
-		'"ExpressionTest", 850, 400, "titlebar=no, resizable=yes, scrollbars=yes"); return false;')
+		'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;')
 		->addClass(ZBX_STYLE_BTN_LINK);
 	if (!$allowedTesting) {
 		$testButton->setAttribute('disabled', 'disabled');
