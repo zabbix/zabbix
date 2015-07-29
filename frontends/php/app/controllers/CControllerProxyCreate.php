@@ -31,8 +31,14 @@ class CControllerProxyCreate extends CController {
 			'port' =>			'db       interface.port',
 			'proxy_hostids' =>	'array_db hosts.hostid',
 			'description' =>	'db       hosts.description',
-			'tls_accept' => 	'db       hosts.tls_accept     |in 0,1,2,3,4,5,6,7',
-			'tls_connect' => 	'db       hosts.tls_connect    |in 0,1,2,3,4,5,6,7',
+			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+				HOST_ENCRYPTION_CERTIFICATE,
+			'tls_accept' => 	'db       hosts.tls_accept     |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK).','.
+				HOST_ENCRYPTION_PSK.','.
+				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_CERTIFICATE).','.
+				(HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE).','.
+				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE),
 			'tls_issuer' => 	'db       hosts.tls_issuer',
 			'tls_psk' =>		'db       hosts.tls_psk',
 			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
