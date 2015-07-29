@@ -1237,17 +1237,17 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
 .icon-depend-up {
   margin: 0 18px 0 0; }
   .icon-depend-up::before {
-    background: url(../img/icon-sprite.svg) no-repeat -49px -731px; }
+    background: url(../img/icon-sprite.svg) no-repeat -49px -730px; }
 
 .icon-depend-down {
   margin: 0 18px 0 0; }
   .icon-depend-down::before {
-    background: url(../img/icon-sprite.svg) no-repeat -49px -767px; }
+    background: url(../img/icon-sprite.svg) no-repeat -49px -766px; }
 
 .icon-ackn {
   margin: 0 18px 0 0; }
   .icon-ackn::before {
-    background: url(../img/icon-sprite.svg) no-repeat -10px -837px; }
+    background: url(../img/icon-sprite.svg) no-repeat -45px -693px; }
 
 .icon-help {
   background: transparent url(../img/icon-sprite.svg) no-repeat -6px -726px; }
