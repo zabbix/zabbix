@@ -46,8 +46,7 @@ list($outline, $eHTMLTree) = analyzeExpression($expression);
 
 // test data (create table, create check fields)
 $dataTable = (new CTable())
-	->addClass('tableinfo')
-	->setId('data_list')
+	->setAttribute('style', 'min-width: 700px;')
 	->setHeader([_('Expression Variable Elements'), _('Result type'), _('Value')]);
 
 $datas = [];
@@ -71,6 +70,8 @@ if ($result) {
 			continue;
 		}
 
+		$row = (new CRow())->addItem($token['value']);
+
 		$fname = 'test_data_'.md5($token['value']);
 		$macrosData[$token['value']] = getRequest($fname, '');
 
@@ -78,8 +79,11 @@ if ($result) {
 
 		if (!is_array($info) && isset($definedErrorPhrases[$info])) {
 			$allowedTesting = false;
-			$control = (new CTextBox($fname, $macrosData[$token['value']]))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
-			$control->setAttribute('disabled', 'disabled');
+			$row->addItem(
+				(new CCol($definedErrorPhrases[$info]))
+					->addClass(ZBX_STYLE_RED)
+					->setColspan(2)
+			);
 		}
 		else {
 			$validation = $info['validation'];
@@ -100,13 +104,12 @@ if ($result) {
 			$fields[$fname] = [$info['type'], O_OPT, null, $validation, 'isset({test_expression})',
 				$token['value']
 			];
+
+			$row->addItem($info['value_type']);
+			$row->addItem($control);
 		}
 
-		$resultType = (is_array($info) || !isset($definedErrorPhrases[$info]))
-			? $info['value_type']
-			: (new CCol($definedErrorPhrases[$info]))->addClass('disaster');
-
-		$dataTable->addRow(new CRow([$token['value'], $resultType, $control]));
+		$dataTable->addRow($row);
 	}
 }
 
@@ -126,70 +129,65 @@ else {
 }
 
 // form
-$testForm = new CFormTable(_('Test'), 'tr_testexpr.php');
-$testForm->setTableClass('formlongtable formtable');
-$testForm->addVar('expression', $expression);
-$testForm->addRow(_('Test data'), $dataTable);
+$widget = (new CWidget())->setTitle(_('Test'));
+
+$form = (new CForm())
+	->addVar('expression', $expression);
+
+$form_list = (new CFormList())
+	->addRow(_('Test data'), (new CDiv($dataTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 $resultTable = (new CTable())
-	->addClass('tableinfo')
-	->setId('result_list');
-$resultTable->setHeader([_('Expression'), _('Result')]);
+	->setAttribute('style', 'min-width: 700px;')
+	->setHeader([_('Expression'), _('Result')]);
 
 ksort($rplcts, SORT_NUMERIC);
 
 foreach ($eHTMLTree as $e) {
-	$result = '-';
-	$style = 'text-align: center;';
+	$result = '';
 
 	if ($allowedTesting && $test && isset($e['expression'])) {
 		if (evalExpressionData($e['expression']['value'], $macrosData)) {
 			$result = 'TRUE';
-			$style = 'background-color: #ccf; color: #00f;';
+			$style = ZBX_STYLE_GREEN;
 		}
 		else {
 			$result = 'FALSE';
-			$style = 'background-color: #fcc; color: #f00;';
+			$style = ZBX_STYLE_RED;
 		}
 	}
 
-	$col = (new CCol($result))->setAttribute('style', $style);
-
-	$resultTable->addRow(new CRow([$e['list'], $col]));
+	$resultTable->addRow([$e['list'], (new CCol($result))->addClass($style)]);
 }
 
-$result = '-';
-$style = 'text-align: center;';
+$result = '';
 
 if ($allowedTesting && $test) {
 	if (evalExpressionData($expression, $macrosData)) {
 		$result = 'TRUE';
-		$style = 'background-color: #ccf; color: #00f;';
+		$style = ZBX_STYLE_GREEN;
 	}
 	else {
 		$result = 'FALSE';
-		$style = 'background-color: #fcc; color: #f00;';
+		$style = ZBX_STYLE_RED;
 	}
 }
 
-$col = new CCol($result);
-$col->setAttribute('style', $style);
+$resultTable->setFooter([$outline, (new CCol($result))->addClass($style)], $resultTable->headerClass);
 
-$resultTable->setFooter([$outline, $col], $resultTable->headerClass);
+$form_list->addRow(_('Result'), (new CDiv($resultTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
-$testForm->addRow(_('Result'), $resultTable);
+$tab = (new CTabView())->addTab('test_tab', null, $form_list);
 
-// action buttons
-$testButton = new CSubmit('test_expression', _('Test'));
-if (!$allowedTesting) {
-	$testButton->setAttribute('disabled', 'disabled');
-}
+$tab->setFooter(makeFormFooter(
+	(new CSubmit('test_expression', _('Test')))->setEnabled($allowedTesting),
+	[(new CButton('close', _('Close')))->onClick('javascript: self.close();')]
+));
 
-$testForm->addItemToBottomRow($testButton);
-$testForm->addItemToBottomRow(SPACE);
-$testForm->addItemToBottomRow(
-	(new CButton('close', _('Close')))->onClick('javascript: self.close();')
-);
-$testForm->show();
+$form->addItem($tab);
+
+$widget
+	->addItem($form)
+	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

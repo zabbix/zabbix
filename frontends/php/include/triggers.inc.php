@@ -1553,7 +1553,7 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				}
 
 				if (defined('NO_LINK_IN_TESTING')) {
-					$url = new CSpan($element['expression']);
+					$url = $element['expression'];
 				}
 				else {
 					$expressionId = 'expr_'.$element['id'];
