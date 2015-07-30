@@ -50,7 +50,7 @@
 				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
 			}
 
-			jQuery('#tls_accept').val(tls_accept);
+			jQuery('#tls_accept').val(tls_accept == 0 ? 1 : tls_accept);
 		});
 
 		function toggleEncryptionFields() {
@@ -63,7 +63,7 @@
 			}
 
 			if ((jQuery('#visible_tls_accept').is(':checked') && tls_in_psk)
-					|| (jQuery('#visible_tls_connect').is(':checked')  && tls_connect == <?= HOST_ENCRYPTION_PSK ?>)) {
+					|| (jQuery('#visible_tls_connect').is(':checked') && tls_connect == <?= HOST_ENCRYPTION_PSK ?>)) {
 				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
 			}
 			else {

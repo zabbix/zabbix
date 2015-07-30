@@ -1641,13 +1641,18 @@ class CHost extends CHostGeneral {
 	 */
 	protected function encryptionValidation(array $data) {
 		// connections from host validation
-		$available_encryption_types = [
+		$available_connect_types = [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE];
+		$available_accept_types = [
 			HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, (HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK),
-			HOST_ENCRYPTION_PSK, (HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_CERTIFICATE),
+			HOST_ENCRYPTION_CERTIFICATE, (HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_CERTIFICATE),
 			(HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE),
 			(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE)
 		];
-		if (array_key_exists('tls_accept', $data) && !in_array($data['tls_accept'], $available_encryption_types)) {
+
+		if (array_key_exists('tls_connect', $data) && !in_array($data['tls_accept'], $available_connect_types)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to host field.'));
+		}
+		if (array_key_exists('tls_accept', $data) && !in_array($data['tls_accept'], $available_accept_types)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from host field.'));
 		}
 
