@@ -65,5 +65,5 @@ foreach ($data['javascript']['files'] as $path) {
 
 $pageHeader->display();
 
-echo '<body class="'.$css.'">';
+echo '<body>';
 echo '<div class="'.ZBX_STYLE_MSG_BAD_GLOBAL.'" id="msg-bad-global"></div>';
