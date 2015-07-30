@@ -617,7 +617,8 @@ footer, .footer {
 
 .multiselect-wrapper {
   position: relative;
-  vertical-align: top; }
+  vertical-align: top;
+  display: inline-block; }
 
 .multiselect {
   position: relative;
