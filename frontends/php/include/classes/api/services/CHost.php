@@ -1649,7 +1649,7 @@ class CHost extends CHostGeneral {
 			(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE)
 		];
 
-		if (array_key_exists('tls_connect', $data) && !in_array($data['tls_accept'], $available_connect_types)) {
+		if (array_key_exists('tls_connect', $data) && !in_array($data['tls_connect'], $available_connect_types)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to host field.'));
 		}
 		if (array_key_exists('tls_accept', $data) && !in_array($data['tls_accept'], $available_accept_types)) {
