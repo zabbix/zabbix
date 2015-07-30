@@ -1736,7 +1736,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	return $msg_box;
 }
 
-function show_messages($bool = true, $okmsg = null, $errmsg = null) {
+function show_messages($good = true, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
 	if (!defined('PAGE_HEADER_LOADED')) {
@@ -1751,63 +1751,60 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 
 	$imageMessages = [];
 
-	if (!$bool && !is_null($errmsg)) {
-		$msg = $errmsg;
-	}
-	elseif ($bool && !is_null($okmsg)) {
-		$msg = $okmsg;
+	$title = $good ? $okmsg : $errmsg;
+	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
+
+	$ZBX_MESSAGES = [];
+
+	if ($good == true) {
+		foreach ($messages as $message) {
+			if ($message['type'] === 'error') {
+				$good = false;
+				break;
+			}
+		}
 	}
 
-	if (isset($msg)) {
-		switch ($page['type']) {
-			case PAGE_TYPE_IMAGE:
-				// save all of the messages in an array to display them later in an image
+	switch ($page['type']) {
+		case PAGE_TYPE_IMAGE:
+			if ($title !== null) {
 				$imageMessages[] = [
-					'text' => $msg,
-					'color' => (!$bool) ? ['R' => 255, 'G' => 0, 'B' => 0] : ['R' => 34, 'G' => 51, 'B' => 68]
+					'text' => $title,
+					'color' => (!$good) ? ['R' => 255, 'G' => 0, 'B' => 0] : ['R' => 34, 'G' => 51, 'B' => 68]
 				];
-				break;
-			case PAGE_TYPE_XML:
-				echo htmlspecialchars($msg)."\n";
-				break;
-			case PAGE_TYPE_HTML:
-			default:
-				$messages = (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) ? $ZBX_MESSAGES : [];
-				$msg_box = makeMessageBox($bool, $messages, $msg);
-
-				$msg_box->show();
-				break;
-		}
-	}
-
-	if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
-		if ($page['type'] == PAGE_TYPE_IMAGE) {
-			foreach ($ZBX_MESSAGES as $msg) {
-				// save all of the messages in an array to display them later in an image
-				if ($msg['type'] == 'error') {
-					$imageMessages[] = [
-						'text' => $msg['message'],
-						'color' => ['R' => 255, 'G' => 55, 'B' => 55]
-					];
-				}
-				else {
-					$imageMessages[] = [
-						'text' => $msg['message'],
-						'color' => ['R' => 155, 'G' => 155, 'B' => 55]
-					];
-				}
 			}
-		}
-		elseif ($page['type'] == PAGE_TYPE_XML) {
-			foreach ($ZBX_MESSAGES as $msg) {
-				echo '['.$msg['type'].'] '.$msg['message']."\n";
+
+			foreach ($messages as $message) {
+				$imageMessages[] = [
+					'text' => $message['message'],
+					'color' => $message['type'] == 'error'
+						? ['R' => 255, 'G' => 55, 'B' => 55]
+						: ['R' => 155, 'G' => 155, 'B' => 55]
+				];
 			}
-		}
-		$ZBX_MESSAGES = null;
+			break;
+		case PAGE_TYPE_XML:
+			if ($title !== null) {
+				echo htmlspecialchars($title)."\n";
+			}
+
+			foreach ($messages as $message) {
+				echo '['.$message['type'].'] '.$message['message']."\n";
+			}
+			break;
+		case PAGE_TYPE_HTML:
+		default:
+			if ($title !== null) {
+				makeMessageBox($good, $messages, $title)->show();
+			}
+			else if ($messages) {
+				makeMessageBox($good, $messages)->show();
+			}
+			break;
 	}
 
 	// draw an image with the messages
-	if ($page['type'] == PAGE_TYPE_IMAGE && count($imageMessages) > 0) {
+	if ($imageMessages) {
 		$imageFontSize = 8;
 
 		// calculate the size of the text
@@ -1874,9 +1871,6 @@ function error($msgs) {
 
 	$msgs = zbx_toArray($msgs);
 	foreach ($msgs as $msg) {
-		if (isset(CWebUser::$data['debug_mode']) && !is_object($msg) && !CWebUser::$data['debug_mode']) {
-			$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
-		}
 		array_push($ZBX_MESSAGES, ['type' => 'error', 'message' => $msg]);
 	}
 }
