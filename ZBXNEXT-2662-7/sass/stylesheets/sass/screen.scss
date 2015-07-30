@@ -544,7 +544,7 @@ footer {
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-	    padding: 8px 5px 7px 5px;
+	    padding: 8px 5px 6px 5px;
 	    vertical-align: bottom;
 	    border-bottom: 2px solid $table-border-color;
 	    text-align: left;
@@ -1184,7 +1184,20 @@ footer {
 			display: block;
 		}
 	}
-	
+
+	th {
+		font-size: $font-h3-size;
+		color: $font-alt-color;
+		text-transform: $font-transform;
+		letter-spacing: 0.0688em;
+		text-rendering: optimizeLegibility;
+		padding: 0 10px 0 0;
+
+		&:last-child {
+			padding: 0;
+		}
+	}
+
 	tfoot {
 
 		.table-forms-td-right {
