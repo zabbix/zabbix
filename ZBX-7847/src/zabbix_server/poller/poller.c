@@ -808,7 +808,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
 		{
 			last_ipmi_host_check = time(NULL);
-			check_inactive_hosts(last_ipmi_host_check);
+			delete_inactive_ipmi_hosts(last_ipmi_host_check);
 		}
 
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
