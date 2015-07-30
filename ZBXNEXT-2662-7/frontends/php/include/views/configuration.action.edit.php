@@ -53,14 +53,22 @@ $actionFormList = (new CFormList())
 
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
 	$actionFormList->addRow(_('Recovery message'),
-		(new CCheckBox('recovery_msg'))->setChecked($this->data['action']['recovery_msg'] == 1)
+		(new CCheckBox('recovery_msg'))
+			->setChecked($this->data['action']['recovery_msg'] == 1)
+			->onClick('javascript: submit();')
 	);
-	$actionFormList->addRow(_('Recovery subject'),
-		(new CTextBox('r_shortdata', $this->data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
-	$actionFormList->addRow(_('Recovery message'),
-		(new CTextArea('r_longdata', $this->data['action']['r_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+	if ($this->data['action']['recovery_msg']) {
+		$actionFormList->addRow(_('Recovery subject'),
+			(new CTextBox('r_shortdata', $this->data['action']['r_shortdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
+		$actionFormList->addRow(_('Recovery message'),
+			(new CTextArea('r_longdata', $this->data['action']['r_longdata']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
+	}
+	else {
+		$actionForm->addVar('r_shortdata', $this->data['action']['r_shortdata']);
+		$actionForm->addVar('r_longdata', $this->data['action']['r_longdata']);
+	}
 }
 $actionFormList->addRow(_('Enabled'),
 	(new CCheckBox('status', ACTION_STATUS_ENABLED))->setChecked($this->data['action']['status'] == ACTION_STATUS_ENABLED)
@@ -74,7 +82,7 @@ $conditionFormList = new CFormList();
 // create condition table
 $conditionTable = (new CTable(_('No conditions defined.')))
 	->setId('conditionTable')
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setHeader([_('Label'), _('Name'), _('Action')]);
 
 $i = 0;
@@ -128,6 +136,9 @@ $formula = (new CTextBox('formula', $this->data['action']['filter']['formula']))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setId('formula')
 	->setAttribute('placeholder', 'A or (B and C) &hellip;');
+if ($this->data['action']['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
+	$formula->addClass('hidden');
+}
 
 $calculationTypeComboBox = new CComboBox('evaltype', $this->data['action']['filter']['evaltype'],
 	'processTypeOfCalculation()',
@@ -143,12 +154,14 @@ $conditionFormList->addRow(
 	_('Type of calculation'),
 	[
 		$calculationTypeComboBox,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan(''))
 			->addClass($this->data['action']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION ? 'hidden' : '')
 			->setId('conditionLabel'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$formula
-	]
+	],
+	false,
+	'conditionRow'
 );
 $conditionFormList->addRow(_('Conditions'), (new CDiv($conditionTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
@@ -257,7 +270,7 @@ switch ($this->data['new_condition']['conditiontype']) {
 		break;
 
 	case CONDITION_TYPE_MAINTENANCE:
-		$condition = _('maintenance');
+		$condition = new CCol(_('maintenance'));
 		break;
 
 	case CONDITION_TYPE_DRULE:
@@ -356,20 +369,11 @@ switch ($this->data['new_condition']['conditiontype']) {
 }
 
 $conditionTable = (new CTable())
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	->addRow(new CCol(
-	[
-		$conditionTypeComboBox,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$conditionOperatorsComboBox,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$condition
-	])
-	)
+	->addRow([$conditionTypeComboBox, $conditionOperatorsComboBox, $condition])
 	->addRow([
-		new CCol(
+		(new CCol(
 			(new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-		)//->setColSpan(3)
+		))->setColSpan(3)
 	]);
 
 $conditionFormList->addRow(_('New condition'), (new CDiv($conditionTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
