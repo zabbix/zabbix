@@ -21,8 +21,6 @@
 
 include('include/views/js/configuration.services.edit.js.php');
 
-global $ZBX_MESSAGES;
-
 $service = $this->data['service'];
 
 $widget = (new CWidget())->setTitle(_('IT services'));

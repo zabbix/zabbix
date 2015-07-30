@@ -1726,7 +1726,7 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_box->addItem($msg_details);
 	}
 
-	if ($title !== null && $show_close_box) {
+	if ($show_close_box) {
 		$msg_box->addItem((new CSpan())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
 			->onClick('javascript: showHide("global-message", IE ? "block" : "");')
@@ -1754,16 +1754,11 @@ function show_messages($good = true, $okmsg = null, $errmsg = null) {
 	$title = $good ? $okmsg : $errmsg;
 	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 
-	$ZBX_MESSAGES = [];
-
 	if ($good == true) {
-		foreach ($messages as $message) {
-			if ($message['type'] === 'error') {
-				$good = false;
-				break;
-			}
-		}
+		$good = !hasErrorMesssages();
 	}
+
+	$ZBX_MESSAGES = [];
 
 	switch ($page['type']) {
 		case PAGE_TYPE_IMAGE:
@@ -1795,10 +1790,10 @@ function show_messages($good = true, $okmsg = null, $errmsg = null) {
 		case PAGE_TYPE_HTML:
 		default:
 			if ($title !== null) {
-				makeMessageBox($good, $messages, $title)->show();
+				makeMessageBox($good, $messages, $title, true, !$good)->show();
 			}
 			else if ($messages) {
-				makeMessageBox($good, $messages)->show();
+				makeMessageBox($good, $messages, null, true, !$good)->show();
 			}
 			break;
 	}
@@ -1853,41 +1848,46 @@ function show_error_message($msg) {
 function info($msgs) {
 	global $ZBX_MESSAGES;
 
-	zbx_value2array($msgs);
-	if (is_null($ZBX_MESSAGES)) {
+	if (!isset($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = [];
 	}
+
+	zbx_value2array($msgs);
+
 	foreach ($msgs as $msg) {
-		array_push($ZBX_MESSAGES, ['type' => 'info', 'message' => $msg]);
+		$ZBX_MESSAGES[] = ['type' => 'info', 'message' => $msg];
 	}
 }
 
 function error($msgs) {
 	global $ZBX_MESSAGES;
 
-	if (is_null($ZBX_MESSAGES)) {
+	if (!isset($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = [];
 	}
 
 	$msgs = zbx_toArray($msgs);
+
 	foreach ($msgs as $msg) {
-		array_push($ZBX_MESSAGES, ['type' => 'error', 'message' => $msg]);
+		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg];
 	}
 }
 
 function clear_messages($count = null) {
 	global $ZBX_MESSAGES;
 
-	$result = [];
-	if (!is_null($count)) {
+	if ($count != null) {
+		$result = [];
+
 		while ($count-- > 0) {
 			array_unshift($result, array_pop($ZBX_MESSAGES));
 		}
 	}
 	else {
 		$result = $ZBX_MESSAGES;
-		$ZBX_MESSAGES = null;
+		$ZBX_MESSAGES = [];
 	}
+
 	return $result;
 }
 
@@ -2133,7 +2133,7 @@ function imageOut(&$image, $format = null) {
 function hasErrorMesssages() {
 	global $ZBX_MESSAGES;
 
-	if ($ZBX_MESSAGES !== null) {
+	if (isset($ZBX_MESSAGES)) {
 		foreach ($ZBX_MESSAGES as $message) {
 			if ($message['type'] === 'error') {
 				return true;
