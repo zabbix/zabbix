@@ -58,6 +58,8 @@ typedef struct
 	unsigned char	state;
 	unsigned char	locked;
 	unsigned char	status;
+	/* trigger functionality, see TRIGGER_FUNCTIONAL_* defines */
+	unsigned char	functional;
 }
 ZBX_DC_TRIGGER;
 
@@ -1840,6 +1842,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		}
 
 		trigger->topoindex = 1;
+
+		/* reset trigger functionality, it will be updated during function synchronization */
+		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -2063,6 +2068,30 @@ static void	DCsync_functions(DB_RESULT result)
 	{
 		zbx_vector_ptr_sort(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		zbx_vector_ptr_uniq(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	}
+
+	/* disable functionality for triggers with expression containing */
+	/* disabled or not monitored items                               */
+	for (i = 0; i < itemtrigs.values_num; i++)
+	{
+		trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[i].second;
+
+		if (TRIGGER_FUNCTIONAL_TRUE == trigger->functional)
+		{
+			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
+
+			if (ITEM_STATUS_DISABLED != item->status)
+			{
+				ZBX_DC_HOST	*host;
+
+				host = zbx_hashset_search(&config->hosts, &item->hostid);
+
+				if (HOST_STATUS_NOT_MONITORED != host->status)
+					continue;
+			}
+
+			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
+		}
 	}
 
 	/* update links from items to triggers */
@@ -5381,7 +5410,8 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
 					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
 					TRIGGER_STATE_NORMAL == next_trigger->state &&
-					TRIGGER_STATUS_ENABLED == next_trigger->status)
+					TRIGGER_STATUS_ENABLED == next_trigger->status &&
+					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
 			{
 				return FAIL;
 			}
