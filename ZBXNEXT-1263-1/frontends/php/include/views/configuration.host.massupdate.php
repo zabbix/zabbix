@@ -27,7 +27,8 @@ $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 $hostView = (new CForm())
 	->setName('hostForm')
 	->addVar('action', 'host.massupdate')
-	->addVar('tls_accept', $data['tls_accept']);
+	->addVar('tls_accept', $data['tls_accept'])
+	->setAttribute('id', 'hostForm');
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }
