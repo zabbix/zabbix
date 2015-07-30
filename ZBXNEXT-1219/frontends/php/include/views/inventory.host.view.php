@@ -26,63 +26,117 @@ $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
  */
 $overviewFormList = new CFormList();
 
-$hostSpan = (new CSpan($this->data['host']['host']))
-	->addClass(ZBX_STYLE_LINK_ACTION)
-	->setMenuPopup(CMenuPopupHelper::getHost(
-		$this->data['host'],
-		$this->data['hostScripts'][$this->data['host']['hostid']],
-		false
-	));
+$host_name = [
+	(new CSpan($this->data['host']['host']))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->setMenuPopup(CMenuPopupHelper::getHost(
+			$this->data['host'],
+			$this->data['hostScripts'][$this->data['host']['hostid']],
+			false
+		))
+];
 
-$hostName = ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
-	? [$hostSpan, SPACE, (new CDiv())->addClass('icon-maintenance-inline')]
-	: $hostSpan;
+if ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+	$maintenance_icon = (new CSpan())->addClass(ZBX_STYLE_ICON_MAINT);
 
-$overviewFormList->addRow(_('Host name'), $hostName);
+	if (array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
+		$maintenance = $data['maintenances'][$data['host']['maintenanceid']];
+
+		$hint = $maintenance['name'].' ['.($data['host']['maintenance_type']
+			? _('Maintenance without data collection')
+			: _('Maintenance with data collection')).']';
+
+		if ($maintenance['description']) {
+			$hint .= "\n".$maintenance['description'];
+		}
+
+		$maintenance_icon->setHint($hint);
+	}
+
+	$host_name[] = $maintenance_icon;
+	$host_name = (new CSpan($host_name))->addClass(ZBX_STYLE_REL_CONTAINER);
+}
+
+$overviewFormList->addRow(_('Host name'), $host_name);
 
 if ($this->data['host']['host'] !== $this->data['host']['name']) {
 	$overviewFormList->addRow(_('Visible name'), (new CSpan($this->data['host']['name']))->addClass('text-field'));
 }
 
-$agentInterfaceRows = $snmpInterfaceRows = $ipmiInterfaceRows = $jmxInterfaceRows = [];
+$agentInterfaceRows = [];
+$snmpInterfaceRows = [];
+$ipmiInterfaceRows = [];
+$jmxInterfaceRows = [];
 
 foreach ($this->data['host']['interfaces'] as $interface) {
-	$spanClass = $interface['main'] ? ' default_interface' : '';
+	$spanClass = $interface['main'] ? 'default_interface' : null;
 
 	switch ($interface['type']) {
 		case INTERFACE_TYPE_AGENT:
 			$agentInterfaceRows[] = new CRow([
-				(new CDiv($interface['ip']))->addClass('ip'.$spanClass),
-				(new CDiv($interface['dns']))->addClass('dns'.$spanClass),
-				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))->addClass('useip'.$spanClass),
-				(new CDiv($interface['port']))->addClass('port'.$spanClass)
+				(new CDiv($interface['ip']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
+					->addClass($spanClass),
+				(new CDiv($interface['dns']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
+					->addClass($spanClass),
+				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH)
+					->addClass($spanClass),
+				(new CDiv($interface['port']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+					->addClass($spanClass)
 			]);
 			break;
 
 		case INTERFACE_TYPE_SNMP:
 			$snmpInterfaceRows[] = new CRow([
-				(new CDiv($interface['ip']))->addClass('ip'.$spanClass),
-				(new CDiv($interface['dns']))->addClass('dns'.$spanClass),
-				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))->addClass('useip'.$spanClass),
-				(new CDiv($interface['port']))->addClass('port'.$spanClass)
+				(new CDiv($interface['ip']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
+					->addClass($spanClass),
+				(new CDiv($interface['dns']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
+					->addClass($spanClass),
+				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH)
+					->addClass($spanClass),
+				(new CDiv($interface['port']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+					->addClass($spanClass)
 			]);
 			break;
 
 		case INTERFACE_TYPE_IPMI:
 			$ipmiInterfaceRows[] = new CRow([
-				(new CDiv($interface['ip']))->addClass('ip'.$spanClass),
-				(new CDiv($interface['dns']))->addClass('dns'.$spanClass),
-				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))->addClass('useip'.$spanClass),
-				(new CDiv($interface['port']))->addClass('port'.$spanClass)
+				(new CDiv($interface['ip']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
+					->addClass($spanClass),
+				(new CDiv($interface['dns']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
+					->addClass($spanClass),
+				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH)
+					->addClass($spanClass),
+				(new CDiv($interface['port']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+					->addClass($spanClass)
 			]);
 			break;
 
 		case INTERFACE_TYPE_JMX:
 			$jmxInterfaceRows[] = new CRow([
-				(new CDiv($interface['ip']))->addClass('ip'.$spanClass),
-				(new CDiv($interface['dns']))->addClass('dns'.$spanClass),
-				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))->addClass('useip'.$spanClass),
-				(new CDiv($interface['port']))->addClass('port'.$spanClass)
+				(new CDiv($interface['ip']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
+					->addClass($spanClass),
+				(new CDiv($interface['dns']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
+					->addClass($spanClass),
+				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH)
+					->addClass($spanClass),
+				(new CDiv($interface['port']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+					->addClass($spanClass)
 			]);
 			break;
 	}
@@ -92,93 +146,61 @@ $interfaceTableHeaderSet = false;
 
 // Agent interface
 if ($agentInterfaceRows) {
-	$agentInterfacesTable = (new CTable())
-		->addClass('formElementTable')
-		->addClass('border_dotted')
-		->addClass('objectgroup')
-		->addClass('element-row-first')
-		->addClass('interfaces')
-		->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
+	$ifTab = (new CTable())->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
 	$interfaceTableHeaderSet = true;
 
 	foreach ($agentInterfaceRows as $interface) {
-		$agentInterfacesTable->addRow($interface);
+		$ifTab->addRow($interface);
 	}
 
-	$overviewFormList->addRow(_('Agent interfaces'), new CDiv($agentInterfacesTable));
+	$overviewFormList->addRow(_('Agent interfaces'), (new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 }
 
 // SNMP interface
 if ($snmpInterfaceRows) {
-	$snmpInterfacesTable = (new CTable())
-		->addClass('formElementTable')
-		->addClass('border')
-		->addClass('dotted')
-		->addClass('objectgroup')
-		->addClass('interfaces');
+	$ifTab = (new CTable());
 
-	if ($interfaceTableHeaderSet) {
-		$snmpInterfacesTable->addClass('element-row');
-	}
-	else {
-		$snmpInterfacesTable->addClass('element-row-first');
-		$snmpInterfacesTable->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
+	if (!$interfaceTableHeaderSet) {
+		$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
 		$interfaceTableHeaderSet = true;
 	}
 
 	foreach ($snmpInterfaceRows as $interface) {
-		$snmpInterfacesTable->addRow($interface);
+		$ifTab->addRow($interface);
 	}
 
-	$overviewFormList->addRow(_('SNMP interfaces'), new CDiv($snmpInterfacesTable));
+	$overviewFormList->addRow(_('SNMP interfaces'), (new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 }
 
 // JMX interface
 if ($jmxInterfaceRows) {
-	$jmxInterfacesTable = (new CTable())
-		->addClass('formElementTable')
-		->addClass('border_dotted')
-		->addClass('objectgroup')
-		->addClass('interfaces');
+	$ifTab = (new CTable());
 
-	if ($interfaceTableHeaderSet) {
-		$jmxInterfacesTable->addClass('element-row');
-	}
-	else {
-		$jmxInterfacesTable->addClass('element-row-first');
-		$jmxInterfacesTable->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
+	if (!$interfaceTableHeaderSet) {
+		$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
+		$interfaceTableHeaderSet = true;
 	}
 
 	foreach ($jmxInterfaceRows as $interface) {
-		$jmxInterfacesTable->addRow($interface);
+		$ifTab->addRow($interface);
 	}
 
-	$overviewFormList->addRow(_('JMX interfaces'), new CDiv($jmxInterfacesTable));
+	$overviewFormList->addRow(_('JMX interfaces'), (new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 }
 
 // IPMI interface
 if ($ipmiInterfaceRows) {
-	$ipmiInterfacesTable = (new CTable())
-		->addClass('formElementTable')
-		->addClass('border_dotted')
-		->addClass('objectgroup')
-		->addClass('interfaces');
+	$ifTab = (new CTable());
 
-	if ($interfaceTableHeaderSet) {
-		$ipmiInterfacesTable->addClass('element-row');
-	}
-	else {
-		$ipmiInterfacesTable
-			->addClass('element-row-first')
-			->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
-		$interfaceTableHeaderSet = true;
+	if (!$interfaceTableHeaderSet) {
+		$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
 	}
 
 	foreach ($ipmiInterfaceRows as $interface) {
-		$ipmiInterfacesTable->addRow($interface);
+		$ifTab->addRow($interface);
 	}
 
-	$overviewFormList->addRow(_('IPMI interfaces'), new CDiv($ipmiInterfacesTable));
+	$overviewFormList->addRow(_('IPMI interfaces'), (new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 }
 
 // inventory (OS, Hardware, Software)

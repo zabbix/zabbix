@@ -141,6 +141,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'agent')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// SNMP interfaces
@@ -156,6 +157,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'snmp')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// JMX interfaces
@@ -171,6 +173,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'jmx')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// IPMI interfaces
@@ -186,6 +189,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'ipmi')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 }
 // interfaces for discovered hosts
@@ -222,6 +226,7 @@ else {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'agent')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// SNMP interfaces
@@ -238,6 +243,7 @@ else {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'snmp')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// JMX interfaces
@@ -254,6 +260,7 @@ else {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'jmx')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// IPMI interfaces
@@ -270,6 +277,7 @@ else {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'ipmi')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 }
 
@@ -549,23 +557,23 @@ $divTabs->addTab('hostTab', _('Host'), $hostList);
 // templates
 $tmplList = new CFormList();
 
-// create linked template table
-$linkedTemplateTable = (new CTable())
-	->setNoDataMessage(_('No templates linked.'))
-	->addClass('formElementTable')
-	->setId('linkedTemplateTable');
-
 // templates for normal hosts
 if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
-	$linkedTemplateTable->setHeader([_('Name'), _('Action')]);
 	$ignoredTemplates = [];
+
+	$linkedTemplateTable = (new CTable())
+		->setNoDataMessage(_('No templates linked.'))
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setHeader([_('Name'), _('Action')]);
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-			->setTarget('_blank');
+		$templateLink =
+			(new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+				->setTarget('_blank');
 
-		$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
+		$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))
+			->addClass(ZBX_STYLE_BTN_LINK);
 		if (array_key_exists($template['templateid'], $data['original_templates'])) {
 			$unlinkAndClearButton =
 				(new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
@@ -579,47 +587,40 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		$linkedTemplateTable->addRow([$templateLink, [$unlinkButton, $unlinkAndClearButton]], null,
 			'conditions_'.$template['templateid']
 		);
+
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))
-			->addClass('template-link-block')
-			->addClass('objectgroup')
-			->addClass('inlineblock')
-			->addClass('border_dotted')
+		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
 
 	// create new linked template table
 	$newTemplateTable = (new CTable())
-		->addClass('formElementTable')
-		->setId('newTemplateTable');
-
-	$newTemplateTable->addRow([
-		(new CMultiSelect([
-			'name' => 'add_templates[]',
-			'objectName' => 'templates',
-			'ignored' => $ignoredTemplates,
-			'popup' => [
-				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	]);
-
-	$newTemplateTable->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
+		->addRow([
+			(new CMultiSelect([
+				'name' => 'add_templates[]',
+				'objectName' => 'templates',
+				'ignored' => $ignoredTemplates,
+				'popup' => [
+					'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+						'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		])
+		->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
 	$tmplList->addRow(_('Link new templates'),
-		(new CDiv($newTemplateTable))
-			->addClass('template-link-block')
-			->addClass('objectgroup')
-			->addClass('inlineblock')
-			->addClass('border_dotted')
+		(new CDiv($newTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
 }
 // templates for discovered hosts
 else {
-	$linkedTemplateTable->setHeader([_('Name')]);
+	$linkedTemplateTable = (new CTable())
+		->setNoDataMessage(_('No templates linked.'))
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setHeader([_('Name')]);
+
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
 		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
@@ -629,11 +630,7 @@ else {
 	}
 
 	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))
-			->addClass('template-link-block')
-			->addClass('objectgroup')
-			->addClass('inlineblock')
-			->addClass('border_dotted')
+		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	);
 }
 

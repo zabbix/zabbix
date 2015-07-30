@@ -556,7 +556,7 @@ jQuery(function($) {
 					}
 
 					// show loading indicator..
-					obj.append($('<div>', {'class': 'loading'})
+					obj.append($('<div>', {'class': 'preloader'})
 						.css({
 							width: '24px',
 							height: '24px',
@@ -566,15 +566,6 @@ jQuery(function($) {
 							left: item.position().left + Math.round(item.width() / 2) - 12
 						})
 					);
-					obj.find('.loading').activity({
-						segments: 12,
-						steps: 3,
-						opacity: 0.3,
-						width: 2,
-						space: 0,
-						length: 5,
-						color: '#0b0b0b'
-					});
 
 					timer.isShadowed = true;
 				}
@@ -591,7 +582,7 @@ jQuery(function($) {
 					return;
 				}
 
-				obj.find('.loading').remove();
+				obj.find('.preloader').remove();
 				obj.find('.shadow').remove();
 				obj.find(item.prop('nodeName')).fadeTo(0, 1);
 
@@ -621,10 +612,10 @@ jQuery(function($) {
 				}
 
 				// loading indicator
-				var loading = obj.find('.loading');
+				var preloader = obj.find('.preloader');
 
-				if (loading.length > 0) {
-					loading.css({
+				if (preloader.length > 0) {
+					preloader.css({
 						top: item.position().top + Math.round(item.height() / 2) - 12,
 						left: item.position().left + Math.round(item.width() / 2) - 12
 					});

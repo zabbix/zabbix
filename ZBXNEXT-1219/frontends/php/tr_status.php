@@ -255,13 +255,14 @@ $headerCheckBox = ($showEventColumn)
 	? (new CCheckBox('all_events'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_events', 'events');")
 	: (new CCheckBox('all_triggers'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
 
-if ($showEvents != EVENTS_OPTION_NOEVENT) {
-	$showHideAllDiv = (new CDiv(SPACE))
-		->addClass('filterclosed')
-		->setId($switcherName);
+if ($showEvents == EVENTS_OPTION_NOEVENT) {
+	$showHideAllDiv = null;
 }
 else {
-	$showHideAllDiv = null;
+	$showHideAllDiv = (new CDiv())
+		->addClass(ZBX_STYLE_TREEVIEW)
+		->setId($switcherName)
+		->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT));
 }
 
 $triggerTable = (new CTableInfo())
@@ -504,6 +505,24 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 	$triggerIdsDown[$row['triggerid_up']][] = intval($row['triggerid_down']);
 }
 
+$maintenanceids = [];
+
+foreach ($triggers as $trigger) {
+	foreach ($trigger['hosts'] as $host) {
+		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			$maintenanceids[$host['maintenanceid']] = true;
+		}
+	}
+}
+
+if ($maintenanceids) {
+	$maintenances = API::Maintenance()->get([
+		'maintenanceids' => array_keys($maintenanceids),
+		'output' => ['name', 'description'],
+		'preservekeys' => true
+	]);
+}
+
 foreach ($triggers as $trigger) {
 	$description = (new CSpan($trigger['description']))
 		->addClass(ZBX_STYLE_LINK_ACTION)
@@ -518,9 +537,9 @@ foreach ($triggers as $trigger) {
 	}
 
 	if (!empty($trigger['dependencies'])) {
-		$dependenciesTable = (new CTableInfo())
-			->setAttribute('style', 'width: 200px;')
-			->addRow(bold(_('Depends on').':'));
+		$dependenciesTable = (new CTable())
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+			->addRow(_('Depends on').':');
 
 		foreach ($trigger['dependencies'] as $dependency) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
@@ -534,9 +553,9 @@ foreach ($triggers as $trigger) {
 	}
 
 	$dependency = false;
-	$dependenciesTable = (new CTableInfo())
-		->setAttribute('style', 'width: 200px;')
-		->addRow(bold(_('Dependent').':'));
+	$dependenciesTable = (new CTable())
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->addRow(_('Dependent').':');
 	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
@@ -555,58 +574,51 @@ foreach ($triggers as $trigger) {
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = (new CSpan($description))->addClass('pointer');
+	$triggerDescription = new CSpan($description);
 
 	// host js menu
 	$hostList = [];
-	foreach ($trigger['hosts'] as $triggerHost) {
+	foreach ($trigger['hosts'] as $host) {
 		// fetch scripts for the host js menu
 		$scripts = [];
-		if (isset($scriptsByHosts[$triggerHost['hostid']])) {
-			foreach ($scriptsByHosts[$triggerHost['hostid']] as $script) {
+		if (isset($scriptsByHosts[$host['hostid']])) {
+			foreach ($scriptsByHosts[$host['hostid']] as $script) {
 				$scripts[] = $script;
 			}
 		}
 
-		$hostName = (new CSpan($triggerHost['name']))
-			->addClass(ZBX_STYLE_BTN_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getHost($hosts[$triggerHost['hostid']], $scripts));
+		$host_name = [
+			(new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$host['hostid']], $scripts))
+		];
 
 		// add maintenance icon with hint if host is in maintenance
-		if ($triggerHost['maintenance_status']) {
-			$maintenanceIcon = (new CDiv())->addClass('icon-maintenance-inline');
+		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+			$maintenance_icon = (new CSpan())->addClass(ZBX_STYLE_ICON_MAINT);
 
-			$maintenances = API::Maintenance()->get([
-				'maintenanceids' => $triggerHost['maintenanceid'],
-				'output' => API_OUTPUT_EXTEND,
-				'limit' => 1
-			]);
+			if (array_key_exists($host['maintenanceid'], $maintenances)) {
+				$maintenance = $maintenances[$host['maintenanceid']];
 
-			if ($maintenance = reset($maintenances)) {
-				$hint = $maintenance['name'].' ['.($triggerHost['maintenance_type']
+				$hint = $maintenance['name'].' ['.($host['maintenance_type']
 					? _('Maintenance without data collection')
 					: _('Maintenance with data collection')).']';
 
-				if (isset($maintenance['description'])) {
-					// double quotes mandatory
+				if ($maintenance['description']) {
 					$hint .= "\n".$maintenance['description'];
 				}
 
-				$maintenanceIcon->setHint($hint);
-				$maintenanceIcon->addClass('pointer');
+				$maintenance_icon->setHint($hint);
 			}
 
-			$hostName->addItem($maintenanceIcon);
+			$host_name[] = $maintenance_icon;
+			$host_name = (new CSpan($host_name))->addClass(ZBX_STYLE_REL_CONTAINER);
 		}
 
-		$hostList[] = $hostName;
+		$hostList[] = $host_name;
 		$hostList[] = ', ';
 	}
 	array_pop($hostList);
-
-	// host
-	$hostColumn = new CCol($hostList);
-	$hostColumn->addStyle('white-space: normal;');
 
 	// status
 	$statusSpan = new CSpan(trigger_value2str($trigger['value']));
@@ -664,16 +676,17 @@ foreach ($triggers as $trigger) {
 	}
 
 	// open or close
-	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
-		$openOrCloseDiv = (new CDiv(SPACE))
-			->addClass('filterclosed')
-			->setAttribute('data-switcherid', $trigger['triggerid']);
-	}
-	elseif ($showEvents == EVENTS_OPTION_NOEVENT) {
+	if ($showEvents == EVENTS_OPTION_NOEVENT) {
 		$openOrCloseDiv = null;
 	}
+	elseif ($trigger['events']) {
+		$openOrCloseDiv = (new CDiv())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->setAttribute('data-switcherid', $trigger['triggerid'])
+			->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT));
+	}
 	else {
-		$openOrCloseDiv = SPACE;
+		$openOrCloseDiv = '';
 	}
 
 	// severity
@@ -709,10 +722,10 @@ foreach ($triggers as $trigger) {
 		empty($trigger['lastchange']) ? '' : zbx_date2age($trigger['lastchange']),
 		$showEventColumn ? SPACE : null,
 		$ackColumn,
-		$hostColumn,
+		$hostList,
 		$triggerDescription,
 		$comments
-	], 'even_row');
+	]);
 
 	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
 		$i = 1;
@@ -757,7 +770,6 @@ foreach ($triggers as $trigger) {
 				zbx_date2age($nextClock, $event['clock']),
 				($config['event_ack_enable']) ? $ack : null,
 				$emptyColumn]))
-					->addClass('odd_row')
 					->setAttribute('data-parentid', $trigger['triggerid'])
 					->addStyle('display: none;');
 			$triggerTable->addRow($row);

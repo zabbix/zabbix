@@ -287,8 +287,7 @@ $itemFormList->addRow(_('Update interval (in sec)'),
 // append delay flex to form list
 $delayFlexTable = (new CTable())
 	->setNoDataMessage(_('No flexible intervals defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 310px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setId('delayFlexTable')
 	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
@@ -317,11 +316,7 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		break;
 	}
 }
-$itemFormList->addRow(_('Flexible intervals'),
-	(new CDiv($delayFlexTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted'),
+$itemFormList->addRow(_('Flexible intervals'), (new CDiv($delayFlexTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
 	false, 'row_flex_intervals'
 );
 

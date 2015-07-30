@@ -41,18 +41,14 @@ function bold($str) {
 	if (is_array($str)) {
 		foreach ($str as $key => $val) {
 			if (is_string($val)) {
-				$b = new CTag('strong', true);
-				$b->addItem($val);
-				$str[$key] = $b;
+				$str[$key] = new CTag('b', true, $val);
 			}
 		}
+
+		return $str;
 	}
-	else {
-		$b = new CTag('strong', true, '');
-		$b->addItem($str);
-		$str = $b;
-	}
-	return $str;
+
+	return new CTag('b', true, $str);
 }
 
 function make_decoration($haystack, $needle, $class = null) {
@@ -163,8 +159,7 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 
 	$table = (new CTable())
 		->addClass('ui-widget-header')
-		->addClass('header')
-		->addClass('maxwidth');
+		->addClass('header');
 	$table->setCellSpacing(0);
 	$table->setCellPadding(1);
 	$table->addRow([
@@ -224,35 +219,30 @@ function get_icon($type, $params = []) {
 			return $icon;
 
 		case 'dashconf':
-
 			$icon = (new CRedirectButton(SPACE, 'dashconf.php'))
 				->addClass(ZBX_STYLE_BTN_CONF)
 				->setTitle(_('Configure'));
 
+			if ($params['enabled']) {
+				$icon = [$icon, (new CDiv())->addClass(ZBX_STYLE_ACTIVE_INDIC)];
+			}
+
 			return $icon;
 
 		case 'screenconf':
-
-			$icon = (new CRedirectButton(SPACE, null))
+			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_CONF)
 				->setTitle(_('Refresh time'));
 
-			return $icon;
-
 		case 'overviewhelp':
-
-			$icon = (new CRedirectButton(SPACE, null))
+			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_INFO);
 
-			return $icon;
-
 		case 'reset':
-			$icon = (new CRedirectButton(SPACE, null))
+			return (new CRedirectButton(SPACE, null))
 				->addClass(ZBX_STYLE_BTN_RESET)
 				->setTitle(_('Reset'))
 				->onClick('timeControl.objectReset();');
-
-			return $icon;
 	}
 
 	return null;
@@ -701,33 +691,39 @@ function createDateSelector($name, $date, $relatedCalendar = null) {
 		(new CNumericBox($name.'_year', $y, 4))
 			->setWidth(ZBX_TEXTAREA_4DIGITS_WIDTH)
 			->setAttribute('placeholder', _('yyyy')),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		'-',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox($name.'_month', $m, false, 2))
 			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 			->addStyle('text-align: right;')
 			->setAttribute('placeholder', _('mm'))
 			->onChange('validateDatePartBox(this, 1, 12, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		'-',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox($name.'_day', $d, false, 2))
 			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 			->addStyle('text-align: right;')
 			->setAttribute('placeholder', _('dd'))
 			->onChange('validateDatePartBox(this, 1, 31, 2);'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox($name.'_hour', $h, false, 2))
 			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 			->addStyle('text-align: right;')
 			->setAttribute('placeholder', _('hh'))
 			->onChange('validateDatePartBox(this, 0, 23, 2);'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		':',
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox($name.'_minute', $i, false, 2))
 			->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 			->addStyle('text-align: right;')
 			->setAttribute('placeholder', _('mm'))
 			->onChange('validateDatePartBox(this, 0, 59, 2);'),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CImg('images/general/bar/cal.gif', 'calendar', 16, 12))
-			->addClass('pointer')
+		(new CButton())
+			->addClass(ZBX_STYLE_ICON_CAL)
 			->onClick($onClick)
 	];
 
@@ -802,9 +798,7 @@ function makeAdministrationGeneralMenu($selected)
  */
 function makeErrorIcon($error)
 {
-	return (new CSpan(
-		(new CTag('b', true))->addItem('&times;')
-	))
+	return (new CSpan(bold('&times;')))
 		->addClass(ZBX_STYLE_STATUS_RED)
 		->setHint($error, ZBX_STYLE_RED);
 }
@@ -818,9 +812,7 @@ function makeErrorIcon($error)
  */
 function makeUnknownIcon($error)
 {
-	return (new CSpan(
-		(new CTag('b', true))->addItem('?')
-	))
+	return (new CSpan(bold('?')))
 		->addClass(ZBX_STYLE_STATUS_GREY)
 		->setHint($error, ZBX_STYLE_RED);
 }
@@ -834,9 +826,27 @@ function makeUnknownIcon($error)
  */
 function makeWarningIcon($error)
 {
-	return (new CSpan(
-		(new CTag('b', true))->addItem('!')
-	))
+	return (new CSpan(bold('!')))
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
 		->setHint($error);
+}
+
+/**
+ * Renders a debug button
+ *
+ * @return CButton
+ */
+function makeDebugButton()
+{
+	return (new CDiv(
+		(new CLink(_('Debug'), '#debug'))
+			->removeSid()
+			->onClick("javascript: if (!isset('state', this)) { this.state = 'none'; }".
+				"this.state = (this.state == 'none' ? 'block' : 'none');".
+				"jQuery(this)".
+					".text(this.state == 'none' ? ".CJs::encodeJson(_('Debug'))." : ".CJs::encodeJson(_('Hide debug')).")".
+					".blur();".
+				"showHideByName('zbx_debug_info', this.state);"
+			)
+	))->addClass(ZBX_STYLE_BTN_DEBUG);
 }

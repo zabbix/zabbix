@@ -1,15 +1,21 @@
 <script type="text/x-jquery-tmpl" id="dcheckRowTPL">
-	<tr id="dcheckRow_#{dcheckid}">
-		<td id="dcheckCell_#{dcheckid}">
-			<span class="bold">#{name}</span>
-		</td>
-		<td>
-			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" onclick="javascript: showNewCheckForm(null, null, '#{dcheckid}');"><?= _('Edit') ?></button>
-		</td>
-		<td>
-			<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" onclick="javascript: removeDCheckRow('#{dcheckid}');"><?= _('Remove') ?></button>
-		</td>
-	</tr>
+	<?= (new CRow([
+			(new CCol(
+				(new CSpan('#{name}'))->addClass('bold')
+			))->setId('dcheckCell_#{dcheckid}'),
+			[
+				(new CButton(null, _('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick("javascript: showNewCheckForm(null, null, '#{dcheckid}');"),
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick("javascript: removeDCheckRow('#{dcheckid}');")
+					->addStyle('margin-left: 8px')
+			]
+		]))
+			->setId('dcheckRow_#{dcheckid}')
+			->toString()
+	?>
 </script>
 <script type="text/x-jquery-tmpl" id="uniqRowTPL">
 	<div id="uniqueness_criteria_row_#{dcheckid}">
@@ -20,8 +26,8 @@
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
-		<div class="objectgroup inlineblock border_dotted">
-			<table class="formElementTable">
+		<div class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>">
+			<table>
 				<tbody>
 				<tr>
 					<td><label for="type"><?= _('Check type') ?></label></td>
@@ -98,7 +104,7 @@
 				</tr>
 				</tbody>
 			</table>
-			<table class="formElementTable">
+			<table>
 				<tr>
 					<td>
 						<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" id="add_new_dcheck" name="add_new_dcheck"><?= _('Add') ?></button>
@@ -313,10 +319,6 @@
 
 			jQuery('#uniqueness_criteria_row_' + dcheckid).remove();
 		}
-
-		if (IE8) {
-			jQuery('#dcheckList').find('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function showNewCheckForm(e, dcheckType, dcheckId) {
@@ -498,10 +500,6 @@
 		}
 		if (showPrivProtocol) {
 			jQuery('#newCheckPrivProtocolRow .jqueryinputset').buttonset();
-		}
-
-		if (IE8) {
-			jQuery('#type').closest('li').addClass('ie8fix-inline').removeClass('ie8fix-inline');
 		}
 	}
 

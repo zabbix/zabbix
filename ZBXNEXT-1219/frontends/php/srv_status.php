@@ -156,7 +156,7 @@ else {
 		}
 		// controls
 		$r_form->addItem((new CList())
-			->addItem([_('Period').SPACE, $period_combo])
+			->addItem([_('Period'), SPACE, $period_combo])
 			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
 		);
 
