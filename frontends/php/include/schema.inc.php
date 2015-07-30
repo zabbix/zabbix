@@ -713,6 +713,12 @@ return [
 				'length' => 255,
 				'default' => '',
 			],
+			'flags' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
 		],
 	],
 	'httptest' => [
@@ -5764,6 +5770,102 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => '',
+			],
+		],
+	],
+	'application_prototype' => [
+		'key' => 'application_prototypeid',
+		'fields' => [
+			'application_prototypeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
+			'templateid' => [
+				'null' => true,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'application_prototype',
+				'ref_field' => 'application_prototypeid',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+		],
+	],
+	'item_application_prototype' => [
+		'key' => 'item_application_prototypeid',
+		'fields' => [
+			'item_application_prototypeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'application_prototypeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'application_prototype',
+				'ref_field' => 'application_prototypeid',
+			],
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid',
+			],
+		],
+	],
+	'application_discovery' => [
+		'key' => 'application_discoveryid',
+		'fields' => [
+			'application_discoveryid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+			],
+			'applicationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'applications',
+				'ref_field' => 'applicationid',
+			],
+			'application_prototypeid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'application_prototype',
+				'ref_field' => 'application_prototypeid',
+			],
+			'name' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
+			'lastcheck' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
 			],
 		],
 	],
