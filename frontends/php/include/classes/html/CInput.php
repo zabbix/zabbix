@@ -29,6 +29,8 @@ class CInput extends CTag {
 		$this->setId(zbx_formatDomId($name));
 		$this->setAttribute('name', $name);
 		$this->setAttribute('value', $value);
+		$this->addClass($type);
+		$this->addClass('input');
 		return $this;
 	}
 

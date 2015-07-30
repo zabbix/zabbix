@@ -507,16 +507,21 @@
 	}
 
 	function processTypeOfCalculation() {
-		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
-			labels = jQuery('#conditionTable .label');
+		if(jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
+			jQuery('#conditionLabel').hide();
+			jQuery('#formula').show();
+		}
+		else {
+			jQuery('#conditionLabel').show();
+			jQuery('#formula').hide();
+		}
 
-		jQuery('#evaltype').closest('li').toggle(labels.length > 1);
-		jQuery('#conditionLabel').toggle(!show_formula);
-		jQuery('#formula').toggle(show_formula);
+		var labels = jQuery('#conditionTable .label');
 
 		if (labels.length > 1) {
-			var conditions = [];
+			jQuery('#conditionRow').css('display', '');
 
+			var conditions = [];
 			labels.each(function(index, label) {
 				label = jQuery(label);
 
@@ -527,6 +532,9 @@
 			});
 
 			jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
+		}
+		else {
+			jQuery('#conditionRow').css('display', 'none');
 		}
 	}
 
@@ -594,15 +602,6 @@
 	}
 
 	jQuery(document).ready(function() {
-		jQuery('#recovery_msg').on('change', function() {
-			var recovery_msg = jQuery(this).is(':checked');
-
-			jQuery('#r_shortdata').closest('li').toggle(recovery_msg);
-			jQuery('#r_longdata').closest('li').toggle(recovery_msg);
-		});
-
-		jQuery('#recovery_msg').trigger('change');
-
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
