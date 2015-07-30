@@ -95,8 +95,7 @@ $servicesFormList->addRow(_('Sort order (0->999)'), (new CTextBox('sortorder', $
  */
 $servicesChildTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width:500px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 	->setId('service_children')
 	->setHeader([_('Services'), _('Soft'), _('Trigger'), _('Action')]);
 foreach ($this->data['children'] as $child) {
@@ -127,10 +126,7 @@ $servicesDependenciesFormList->addRow(
 		(new CButton('add_child_service', _('Add')))
 			->onClick("javascript: openWinCentered('services.php?cservices=1".url_param('serviceid')."', 'ZBX_Services_List', 640, 520, 'scrollbars=1, toolbar=0, menubar=0, resizable=0');")
 			->addClass(ZBX_STYLE_BTN_LINK)
-		]))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+	]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 /*
@@ -139,8 +135,7 @@ $servicesDependenciesFormList->addRow(
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = (new CTable())
 	->setNoDataMessage(_('No times defined. Work 24x7.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setHeader([_('Type'), _('Interval'), _('Note'), _('Action')]);
 
 $i = 0;
@@ -180,12 +175,8 @@ foreach ($this->data['times'] as $serviceTime) {
 	$servicesTimeTable->addRow($row);
 	$i++;
 }
-$servicesTimeFormList->addRow(
-	_('Service times'),
-	(new CDiv($servicesTimeTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+$servicesTimeFormList->addRow(_('Service times'),
+	(new CDiv($servicesTimeTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 // create service time table
@@ -288,16 +279,12 @@ $timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_ser
 		SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
 	]
 );
-$servicesTimeFormList->addRow(
-	_('New service time'),
+$servicesTimeFormList->addRow(_('New service time'),
 	(new CDiv([
 		new CDiv($timeTypeComboBox, 'time-type-combobox'),
 		$serviceTimeTable,
 		(new CButton('add_service_time', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-	]))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
+	]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 );
 
 /*

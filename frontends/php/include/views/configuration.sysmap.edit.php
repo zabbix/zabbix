@@ -157,8 +157,7 @@ $sysmapList
 // create url table
 $urlTable = (new CTable())
 	->setNoDataMessage(_('No URLs defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setHeader([_('Name'), _('URL'), _('Element'), SPACE]);
 if (empty($this->data['sysmap']['urls'])) {
 	$this->data['sysmap']['urls'][] = ['name' => '', 'url' => '', 'elementtype' => 0];
@@ -203,12 +202,7 @@ $addButtonColumn = (new CCol($addButton))->setColSpan(4);
 $urlTable->addRow($addButtonColumn);
 
 // append url table to form list
-$sysmapList->addRow(_('URLs'),
-	(new CDiv($urlTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-);
+$sysmapList->addRow(_('URLs'), (new CDiv($urlTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // append sysmap to form
 $sysmapTab = (new CTabView())->addTab('sysmapTab', _('Map'), $sysmapList);
