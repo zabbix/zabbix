@@ -1222,38 +1222,27 @@ void	delete_inactive_ipmi_hosts(time_t last_check)
 {
 	const char	*__function_name = "delete_inactive_ipmi_hosts";
 
-	zbx_ipmi_host_t	*h = hosts, *prev = NULL, *host, *tmp;
+	zbx_ipmi_host_t	*h = hosts, *prev = NULL, *next;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	while (NULL != h)
 	{
-		host = h;
-
 		if (last_check - h->lastaccess > SEC_PER_DAY)
 		{
-			if (NULL == prev)
-			{
-				tmp = hosts;
-				hosts = hosts->next;
-			}
-			else
-			{
-				tmp = prev->next;
-				prev->next = h->next;
-			}
+			next = h->next;
 
-			h = h->next;
-
-			if (SUCCEED != close_inactive_host(host))
+			if (SUCCEED == close_inactive_host(h))
 			{
 				if (NULL == prev)
-					hosts = tmp;
+					hosts = next;
 				else
-					prev->next = tmp;
-			}
+					prev->next = next;
 
-			continue;
+				h = next;
+
+				continue;
+			}
 		}
 
 		prev = h;
