@@ -55,7 +55,7 @@ $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
 $dashboardGrid[$col][$row] = $favouriteGraphs;
 
 // favourite maps
-$icon = (new CRedirectButton(null))
+$icon = (new CButton(null))
 	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
 	->setTitle(_('Action'))
 	->setId('favouriteMaps')
@@ -146,7 +146,7 @@ foreach ($widgets as $widgetid => $widget) {
 		->setExpanded($expanded)
 		->setHeader(null, [$icon], true)
 		->setFooter(new CList([
-			(new CListItem())->setId($widgetid.'_footer')
+			(new CListItem(''))->setId($widgetid.'_footer')
 		]));
 
 	$widgetRefreshParams[$widgetid] = [
