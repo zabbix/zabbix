@@ -276,21 +276,6 @@ static int      DBpatch_2050015(void)
 	return FAIL;
 }
 
-static int      DBpatch_2050016(void)
-{
-	return SUCCEED;
-}
-
-static int      DBpatch_2050017(void)
-{
-	return SUCCEED;
-}
-
-static int      DBpatch_2050018(void)
-{
-	return SUCCEED;
-}
-
 static int	DBpatch_2050019(void)
 {
 	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -326,12 +311,19 @@ static int	DBpatch_2050023(void)
 	return DBadd_field("media_type", &field);
 }
 
-static int	DBpatch_2050024(void)
+static int	DBpatch_2050029(void)
+{
+	const ZBX_FIELD	field = {"default_theme", "blue-theme", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050030(void)
 {
 	return DBdrop_table("graph_theme");
 }
 
-static int	DBpatch_2050025(void)
+static int	DBpatch_2050031(void)
 {
 	const ZBX_TABLE table =
 		{"graph_theme",	"graphthemeid",	0,
@@ -358,16 +350,16 @@ static int	DBpatch_2050025(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2050026(void)
+static int	DBpatch_2050032(void)
 {
 	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
 }
 
-static int	DBpatch_2050027(void)
+static int	DBpatch_2050033(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"insert into graph_theme"
-			" values (1,'blue-theme','FFFFFF','FFFFFF','CCCCCC','AAAAAA','ACBBC2','1F2C33','E33734',"
+			" values (1,'blue-theme','FFFFFF','FFFFFF','EBEEF0','ACBBC2','ACBBC2','1F2C33','E33734',"
 				"'429E47','E33734','EBEEF0',1,1)"))
 	{
 		return SUCCEED;
@@ -376,24 +368,17 @@ static int	DBpatch_2050027(void)
 	return FAIL;
 }
 
-static int	DBpatch_2050028(void)
+static int	DBpatch_2050034(void)
 {
 	if (ZBX_DB_OK <= DBexecute(
 			"insert into graph_theme"
-			" values (2,'dark-theme','2B2B2B','2B2B2B','222222','4F4F4F','4F4F4F','F2F2F2','E45959',"
-				"'59DB8f','E45959','333333',1,1)"))
+			" values (2,'dark-theme','2B2B2B','2B2B2B','383838','4F4F4F','4F4F4F','F2F2F2','E45959',"
+				"'59DB8F','E45959','333333',1,1)"))
 	{
 		return SUCCEED;
 	}
 
 	return FAIL;
-}
-
-static int	DBpatch_2050029(void)
-{
-	const ZBX_FIELD	field = {"default_theme", "blue-theme", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
-
-	return DBset_default("config", &field);
 }
 
 #endif
@@ -418,19 +403,16 @@ DBPATCH_ADD(2050012, 0, 1)
 DBPATCH_ADD(2050013, 0, 0)
 DBPATCH_ADD(2050014, 0, 1)
 DBPATCH_ADD(2050015, 0, 1)
-DBPATCH_ADD(2050016, 0, 1)
-DBPATCH_ADD(2050017, 0, 1)
-DBPATCH_ADD(2050018, 0, 1)
 DBPATCH_ADD(2050019, 0, 1)
 DBPATCH_ADD(2050020, 0, 1)
 DBPATCH_ADD(2050021, 0, 1)
 DBPATCH_ADD(2050022, 0, 1)
 DBPATCH_ADD(2050023, 0, 1)
-DBPATCH_ADD(2050024, 0, 1)
-DBPATCH_ADD(2050025, 0, 1)
-DBPATCH_ADD(2050026, 0, 1)
-DBPATCH_ADD(2050027, 0, 1)
-DBPATCH_ADD(2050028, 0, 1)
 DBPATCH_ADD(2050029, 0, 1)
+DBPATCH_ADD(2050030, 0, 1)
+DBPATCH_ADD(2050031, 0, 1)
+DBPATCH_ADD(2050032, 0, 1)
+DBPATCH_ADD(2050033, 0, 1)
+DBPATCH_ADD(2050034, 0, 1)
 
 DBPATCH_END()
