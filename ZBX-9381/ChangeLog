@@ -1,6 +1,9 @@
-Changes for 2.2.10
+Changes for 2.2.10rc2
 
-2.2.10rc1 was released as 2.2.10 without any changes
+New features:
+
+Bug fixes:
+........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.10rc1
@@ -1270,6 +1273,8 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
+........S. [ZBX-9657] fixed timeout error being recognized as success when executing scripts on nodes (wiper)
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
