@@ -3015,6 +3015,21 @@ out:
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_tls_free_on_signal                                           *
+ *                                                                            *
+ * Purpose: TLS cleanup for using in signal handlers                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_free_on_signal(void)
+{
+	if (NULL != my_psk)
+		zbx_guaranteed_memset(my_psk, 0, my_psk_len);
+}
+#endif
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_tls_free                                                     *
  *                                                                            *
  * Purpose: release TLS library resources allocated in zbx_tls_init_parent()  *
