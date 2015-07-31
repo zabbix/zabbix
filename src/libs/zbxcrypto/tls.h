@@ -77,5 +77,6 @@ void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(void);
 void	zbx_tls_init_child(void);
 void	zbx_tls_free(void);
+void	zbx_tls_free_on_signal(void);
 
 #endif	/* ZABBIX_TLS_H */

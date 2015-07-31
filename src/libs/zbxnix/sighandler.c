@@ -46,7 +46,7 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	print_fatal_info(sig, siginfo, context);
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();		/* overwrite crypto data in memory */
+	zbx_tls_free_on_signal();
 #endif
 	exit(EXIT_FAILURE);
 }
@@ -86,7 +86,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				SIG_CHECKED_FIELD(siginfo, si_code));
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_free();		/* overwrite crypto data in memory */
+		zbx_tls_free_on_signal();
 #endif
 		exit(EXIT_FAILURE);
 	}
@@ -105,7 +105,7 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 					SIG_CHECKED_FIELD(siginfo, si_code));
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			zbx_tls_free();		/* overwrite crypto data in memory */
+			zbx_tls_free_on_signal();
 #endif
 			zbx_on_exit();
 		}
@@ -126,7 +126,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	if (!SIG_PARENT_PROCESS)
 	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_free();		/* overwrite crypto data in memory */
+		zbx_tls_free_on_signal();
 #endif
 		exit(EXIT_FAILURE);
 	}
@@ -138,7 +138,7 @@ static void	child_signal_handler(int sig, siginfo_t *siginfo, void *context)
 				SIG_CHECKED_FIELD(siginfo, si_pid), SIG_CHECKED_FIELD(siginfo, si_status));
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_free();		/* overwrite crypto data in memory */
+		zbx_tls_free_on_signal();
 #endif
 		zbx_on_exit();
 	}
