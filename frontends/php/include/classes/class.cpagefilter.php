@@ -433,10 +433,10 @@ class CPageFilter {
 		// select remembered selection
 		if ($groupid === null && $this->config['DDRemember'] && $this->_profileIds['groupid']) {
 			// set group only if host is in group or hostid is not set
-			if ($hostid) {
-				$host = null;
-				$template = null;
+			$host = null;
+			$template = null;
 
+			if ($hostid) {
 				$host = API::Host()->get(array(
 					'nodeids' => $this->config['all_nodes'] ? get_current_nodeid() : null,
 					'output' => array('hostid'),
