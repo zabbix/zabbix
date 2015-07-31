@@ -251,11 +251,11 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 	try {
 		DBstart();
 
-		// filter only normal hosts, ignore discovered
+		// filter only normal and discovery created hosts
 		$hosts = API::Host()->get([
 			'output' => ['hostid'],
 			'hostids' => $hostIds,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 		]);
 		$hosts = ['hosts' => $hosts];
 
