@@ -2551,7 +2551,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 
 		if (-1 == dcheck.type)
 		{
-			if (SUCCEED != discovery_verify_drule(drule.druleid))
+			if (SUCCEED != DBlock_druleid(drule.druleid))
 			{
 				DBrollback();
 
@@ -2564,7 +2564,7 @@ void	process_dhis_data(struct zbx_json_parse *jp)
 		}
 		else
 		{
-			if (SUCCEED != discovery_verify_dcheck(drule.druleid, dcheck.dcheckid))
+			if (SUCCEED != DBlock_dcheckid(dcheck.dcheckid, drule.druleid))
 			{
 				DBrollback();
 

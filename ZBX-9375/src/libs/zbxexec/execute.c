@@ -373,7 +373,7 @@ int	zbx_execute(const char *command, char **buffer, char *error, size_t max_erro
 close:
 	if (NULL != job)
 	{
-		/* terminate the child process and it's childs */
+		/* terminate the child process and its children */
 		if (0 == TerminateJobObject(job, 0))
 			zabbix_log(LOG_LEVEL_ERR, "failed to terminate job [%s]: %s", cmd, strerror_from_system(GetLastError()));
 		CloseHandle(job);

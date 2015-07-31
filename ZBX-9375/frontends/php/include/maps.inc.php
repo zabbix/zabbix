@@ -949,15 +949,12 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	if (!empty($triggerIdToSelementIds)) {
 		$triggerOptions = array(
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'selectLastEvent' => array('acknowledged'),
 			'triggerids' => array_keys($triggerIdToSelementIds),
 			'filter' => array('state' => null),
 			'nopermissions' => true,
 			'preservekeys' => true
 		);
-
-		if ($showUnacknowledged) {
-			$triggerOptions['selectLastEvent'] = array('acknowledged');
-		}
 
 		$triggers = API::Trigger()->get($triggerOptions);
 
@@ -974,6 +971,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 	if (!empty($subSysmapTriggerIdToSelementIds)) {
 		$triggerOptions = array(
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
+			'selectLastEvent' => array('acknowledged'),
 			'triggerids' => array_keys($subSysmapTriggerIdToSelementIds),
 			'filter' => array('state' => null),
 			'skipDependent' => true,
@@ -981,10 +979,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'preservekeys' => true,
 			'only_true' => true
 		);
-
-		if ($showUnacknowledged) {
-			$triggerOptions['selectLastEvent'] = array('acknowledged');
-		}
 
 		$triggers = API::Trigger()->get($triggerOptions);
 
@@ -1010,6 +1004,7 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'output' => array('triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'),
 			'selectHosts' => array('hostid'),
 			'selectItems' => array('itemid'),
+			'selectLastEvent' => array('acknowledged'),
 			'hostids' => $monitoredHostIds,
 			'filter' => array('state' => null),
 			'monitored' => true,
@@ -1018,10 +1013,6 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			'preservekeys' => true,
 			'only_true' => true
 		);
-
-		if ($showUnacknowledged) {
-			$triggerOptions['selectLastEvent'] = array('acknowledged');
-		}
 
 		$triggersFromMonitoredHosts = API::Trigger()->get($triggerOptions);
 
@@ -1074,6 +1065,8 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			}
 		}
 
+		$last_event = false;
+
 		foreach ($selement['triggers'] as $triggerId) {
 			$trigger = $allTriggers[$triggerId];
 
@@ -1089,10 +1082,14 @@ function getSelementsInfo($sysmap, array $options = array()) {
 						if ($i['priority'] < $trigger['priority']) {
 							$i['priority'] = $trigger['priority'];
 						}
-					}
 
-					if ($showUnacknowledged && $trigger['lastEvent'] && !$trigger['lastEvent']['acknowledged']) {
-						$i['problem_unack']++;
+						if ($trigger['lastEvent']) {
+							if (!$trigger['lastEvent']['acknowledged']) {
+								$i['problem_unack']++;
+							}
+
+							$last_event = $last_event || true;
+						}
 					}
 
 					$i['latelyChanged'] |= ((time() - $trigger['lastchange']) < $config['blink_period']);
@@ -1100,7 +1097,8 @@ function getSelementsInfo($sysmap, array $options = array()) {
 			}
 		}
 
-		$i['ack'] = (bool) !($i['problem_unack']);
+		// If there are no events, problems cannot be unacknowledged. Hide the green line in this case.
+		$i['ack'] = ($last_event) ? (bool) !($i['problem_unack']) : false;
 
 		if ($sysmap['expandproblem'] && $i['problem'] == 1) {
 			if (!isset($lastProblemId)) {
