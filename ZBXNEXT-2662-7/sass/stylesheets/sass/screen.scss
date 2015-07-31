@@ -2821,6 +2821,11 @@ td.disaster-bg {
 .msg-details {
 	font-size: $font-form-size;
 	text-align: left;
+	max-height: 300px;
+	margin: 0 5px 0 0;
+    padding: 0 5px 0 0;
+    overflow-y: auto;
+    @extend %webkit-scrollbar;
 
 	.link-action {
 		position: absolute;
@@ -2833,7 +2838,17 @@ td.disaster-bg {
 		font-size: $font-msg-reset-size;
 
 		li {
-			margin: 0.25em 0 0.25em 0; 
+			margin: .5em 0 .5em 1em;
+
+			&::before {
+				content: '\2013';
+				float: left;
+				margin-left: -1em;
+			}
+
+			&:only-child {
+				margin-left: 0;
+			} 
 		}
 
 		&.msg-details-border {
