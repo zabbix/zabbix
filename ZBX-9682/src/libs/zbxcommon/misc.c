@@ -1583,10 +1583,6 @@ int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uin
 	if ('\0' == *str || 0 == n || sizeof(zbx_uint64_t) < size || (0 == size && NULL != value))
 		return FAIL;
 
-	/* ignore leading zeroes */
-	while ('0' == *str)
-		str++;
-
 	while ('\0' != *str && 0 < n--)
 	{
 		if (0 == isdigit(*str))
