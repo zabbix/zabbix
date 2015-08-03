@@ -55,8 +55,6 @@
  * 4) updates cpu utilization values for queries.
  * 5) saves the last cpu utilization snapshot
  *
- * Internal workings.
- *
  * Initialisation.
  * * procstat_init() initialises procstat dshm structure but doesn't allocate memory from the system
  *   (zbx_dshm_create() called with size 0).
@@ -68,6 +66,13 @@
  * * Ensure that memory segment has enough free space with procstat_dshm_has_enough_space() before
  *   allocating space within segment with procstat_alloc() or functions that use it.
  * * Reserve more space if needed with zbx_dshm_reserve().
+ *
+ * Synchronisation.
+ * * agentd processes share a single instance of ZBX_COLLECTOR_DATA (*collector) containing reference
+ *   to shared procstat memory segment.
+ * * Each agentd process also holds local reference to procstat shared memory segment.
+ * * The system keeps the shared memory segment untill the last process detaches from it.
+ * * Synchronise both references with procstat_reattach() before using procstat shared memory segment.
  */
 
 /* the main collector data */
@@ -918,6 +923,8 @@ static void	procstat_save_cpu_util_snapshot_in_queries(zbx_vector_ptr_t queries,
 	}
 
 	header->pids_num = pids.values_num;
+
+	/* check for free space done at the beginning of the function */
 	memcpy(PROCSTAT_SNAPSHOT(procstat_ref.addr), stats, sizeof(zbx_procstat_util_t) * pids.values_num);
 
 	zbx_dshm_unlock(&collector->procstat);

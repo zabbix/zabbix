@@ -1060,11 +1060,11 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		period = SEC_PER_MIN;
 	}
-	else if ( 0 == strcmp(tmp, "avg5"))
+	else if (0 == strcmp(tmp, "avg5"))
 	{
 		period = SEC_PER_MIN * 5;
 	}
-	else if ( 0 == strcmp(tmp, "avg15"))
+	else if (0 == strcmp(tmp, "avg15"))
 	{
 		period = SEC_PER_MIN * 15;
 	}
