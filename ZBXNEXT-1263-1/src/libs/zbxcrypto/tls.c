@@ -2336,10 +2336,19 @@ void	zbx_tls_init_child(void)
 	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
 	unsigned int	cipher_count;
+	sigset_t	mask, orig_mask;
 	unsigned char	pers[64];	/* personalization string obtained from SHA-512 in SHA-384 mode */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+#ifndef _WINDOWS
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
+	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+#endif
 	zbx_tls_validate_config();
 #if !defined(_WINDOWS)
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -2515,6 +2524,9 @@ void	zbx_tls_init_child(void)
 
 	zbx_guaranteed_memset(pers, 0, sizeof(pers));
 
+#ifndef _WINDOWS
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 #elif defined(HAVE_GNUTLS)
@@ -2522,9 +2534,18 @@ void	zbx_tls_init_child(void)
 {
 	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
+	sigset_t	mask, orig_mask;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+#ifndef _WINDOWS
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
+	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+#endif
 	zbx_tls_validate_config();
 #if !defined(_WINDOWS)
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -2719,6 +2740,9 @@ void	zbx_tls_init_child(void)
 		}
 	}
 
+#ifndef _WINDOWS
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 #elif defined(HAVE_OPENSSL)
@@ -2727,9 +2751,18 @@ void	zbx_tls_init_child(void)
 	const char	*__function_name = "zbx_tls_init_child";
 	char		*error = NULL;
 	size_t		error_alloc = 0, error_offset = 0;
+	sigset_t	mask, orig_mask;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
+#ifndef _WINDOWS
+	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGTERM to */
+	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
+	/* SIGTERM and unblock it when TLS parameters are good and libraries are initialized. */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+#endif
 	zbx_tls_validate_config();
 #if !defined(_WINDOWS)
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
@@ -2997,6 +3030,9 @@ void	zbx_tls_init_child(void)
 		SSL_CTX_clear_options(ctx_all, SSL_OP_LEGACY_SERVER_CONNECT);
 	}
 
+#ifndef _WINDOWS
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 
 	return;
