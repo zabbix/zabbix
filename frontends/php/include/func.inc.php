@@ -1694,7 +1694,8 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		->addClass($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD);
 
 	if ($show_close_box) {
-		$msg_box->setId('global-message');
+		$id = $good ? 'global-message-good' : 'global-message-bad';
+		$msg_box->setId($id);
 	}
 
 	if ($messages) {
@@ -1729,14 +1730,14 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 	if ($show_close_box) {
 		$msg_box->addItem((new CSpan())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('javascript: showHide("global-message", IE ? "block" : "");')
+			->onClick('javascript: showHide("'.$id.'", IE ? "block" : "");')
 			->setAttribute('title', _('Close')));
 	}
 
 	return $msg_box;
 }
 
-function show_messages($good = true, $okmsg = null, $errmsg = null) {
+function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
 	if (!defined('PAGE_HEADER_LOADED')) {
@@ -1754,11 +1755,19 @@ function show_messages($good = true, $okmsg = null, $errmsg = null) {
 	$title = $good ? $okmsg : $errmsg;
 	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 
-	if ($good == true) {
-		$good = !hasErrorMesssages();
-	}
-
 	$ZBX_MESSAGES = [];
+
+	$info_messages = [];
+	$error_messages = [];
+
+	foreach ($messages as $message) {
+		if ($message['type'] === 'error') {
+			$error_messages[] = $message;
+		}
+		else {
+			$info_messages[] = $message;
+		}
+	}
 
 	switch ($page['type']) {
 		case PAGE_TYPE_IMAGE:
@@ -1789,11 +1798,14 @@ function show_messages($good = true, $okmsg = null, $errmsg = null) {
 			break;
 		case PAGE_TYPE_HTML:
 		default:
-			if ($title !== null) {
-				makeMessageBox($good, $messages, $title, true, !$good)->show();
-			}
-			else if ($messages) {
-				makeMessageBox($good, $messages, null, true, !$good)->show();
+			if ($title || $info_messages || $error_messages) {
+				$top_messages = $good ? $info_messages : $error_messages;
+				$bottom_messages = $good ? $error_messages : $info_messages;
+
+				makeMessageBox($good, $top_messages, $title, true, !$good)->show();
+				if ($bottom_messages) {
+					makeMessageBox(!$good, $bottom_messages)->show();
+				}
 			}
 			break;
 	}

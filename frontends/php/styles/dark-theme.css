@@ -383,7 +383,7 @@ footer, .footer {
     height: 100%;
     overflow: hidden;
     white-space: nowrap;
-    padding: 8px 5px 7px 5px;
+    padding: 8px 5px 6px 5px;
     vertical-align: bottom;
     border-bottom: 2px solid #383838;
     text-align: left; }
@@ -819,6 +819,15 @@ footer, .footer {
     display: table-row; }
   .table-forms .multiselect-suggest li, .table-forms .multiselect-matches li {
     display: block; }
+  .table-forms th {
+    font-size: 0.917em;
+    color: #737373;
+    text-transform: uppercase;
+    letter-spacing: 0.0688em;
+    text-rendering: optimizeLegibility;
+    padding: 0 10px 0 0; }
+    .table-forms th:last-child {
+      padding: 0; }
   .table-forms tfoot .table-forms-td-right, .table-forms .tfoot-buttons .table-forms-td-right {
     padding-top: 5px; }
   .table-forms tfoot button, .table-forms .tfoot-buttons button {
@@ -883,7 +892,7 @@ footer, .footer {
 
 .list-check-radio li {
   display: block;
-  padding: 0 0 0.7em 0; }
+  padding: 0.3em 0 0.3em 0; }
 .list-check-radio label {
   padding: 0 0 0 16px;
   display: inline-block;
@@ -1742,7 +1751,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   overflow-y: auto;
   padding: 11px;
   margin: 10px 13px 0 13px;
-  background-color: #2f280a;
+  background-color: #38300c;
   border: 1px solid #303030; }
 
 .btn-debug {
@@ -1863,7 +1872,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   background-color: #e45959; }
 
 .list-table tbody tr.row-selected, .suggest-found, .drag-drop-area {
-  background-color: #2f280a; }
+  background-color: #38300c; }
 
 .active-indic {
   width: 8px;
@@ -1909,7 +1918,10 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 
 .msg-details {
   font-size: 1em;
-  text-align: left; }
+  text-align: left;
+  max-height: 300px;
+  padding: 0 5px 0 0;
+  overflow-y: auto; }
   .msg-details .link-action {
     position: absolute;
     top: 7px;
@@ -1918,7 +1930,13 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   .msg-details ul {
     font-size: 0.85em; }
     .msg-details ul li {
-      margin: 0.25em 0 0.25em 0; }
+      margin: .5em 0 .5em 1em; }
+      .msg-details ul li::before {
+        content: '\2013';
+        float: left;
+        margin-left: -1em; }
+      .msg-details ul li:only-child {
+        margin-left: 0; }
     .msg-details ul.msg-details-border {
       margin: 8px 0 0 0;
       border-top-width: 1px;
@@ -2114,13 +2132,13 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   padding: 10px 0 0 0;
   text-align: center; }
 
-.available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar {
+.available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .msg-details::-webkit-scrollbar {
   width: 9px; }
-.available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track {
+.available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .msg-details::-webkit-scrollbar-track {
   background-color: #1f1f1f; }
-.available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb {
+.available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .msg-details::-webkit-scrollbar-thumb {
   background-color: #383838;
-  border: 1px solid #1f1f1f; }
+  border: 1px solid #2b2b2b; }
 
 .cursor-move {
   cursor: move; }
