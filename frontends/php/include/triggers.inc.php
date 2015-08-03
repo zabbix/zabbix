@@ -1053,6 +1053,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 						|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
 							&& $trigger['priority'] > $data[$trigger['description']][$host['name']]['priority']))) {
 				$data[$trigger['description']][$host['name']] = array(
+					'groupid' => $trigger['groupid'],
 					'hostid' => $host['hostid'],
 					'triggerid' => $trigger['triggerid'],
 					'value' => $trigger['value'],

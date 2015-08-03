@@ -117,11 +117,31 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 
 	$triggers = API::Trigger()->get(array(
 		'output' => array('triggerid'),
+		'selectHosts' => array('hostid', 'status'),
 		'triggerids' => $triggerIds,
-		'selectHosts' => array('status'),
 		'preservekeys' => true,
 		'nopermissions' => true
 	));
+
+	// Find monitored hosts and get groups that those hosts belong to.
+	$monitoredHostIds = array();
+
+	foreach ($triggers as $trigger) {
+		foreach ($trigger['hosts'] as $host) {
+			if ($host['status'] == HOST_STATUS_MONITORED) {
+				$monitoredHostIds[$host['hostid']] = true;
+			}
+		}
+	}
+
+	if ($monitoredHostIds) {
+		$monitoredHosts = API::Host()->get(array(
+			'output' => array('hostid'),
+			'selectGroups' => array('groupid'),
+			'hostids' => array_keys($monitoredHostIds),
+			'preservekeys' => true
+		));
+	}
 
 	foreach ($sysmap['selements'] as $elem) {
 		$back = get_png_by_selement($mapInfo[$elem['selementid']]);
@@ -174,18 +194,28 @@ function getActionMapBySysmap($sysmap, array $options = array()) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$gotos['events'] = array(
-					'triggerid' => $elem['elementid']
-				);
-
 				$gotos['showEvents'] = false;
+
 				if (isset($triggers[$elem['elementid']])) {
-					foreach ($triggers[$elem['elementid']]['hosts'] as $host) {
+					$trigger = $triggers[$elem['elementid']];
+
+					foreach ($trigger['hosts'] as $host) {
 						if ($host['status'] == HOST_STATUS_MONITORED) {
 							$gotos['showEvents'] = true;
+
+							// Pass a monitored 'hostid' and corresponding first 'groupid' to menu pop-up "Events" link.
+							$gotos['events']['hostid'] = $host['hostid'];
+							$gotos['events']['groupid'] = $monitoredHosts[$host['hostid']]['groups'][0]['groupid'];
 							break;
 						}
+						else {
+							// Unmonitored will have disabled "Events" link and there is no 'groupid' or 'hostid'.
+							$gotos['events']['hostid'] = 0;
+							$gotos['events']['groupid'] = 0;
+						}
 					}
+
+					$gotos['events']['triggerid'] = $elem['elementid'];
 				}
 				break;
 

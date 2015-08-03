@@ -521,6 +521,13 @@ while ($row = DBfetch($dbTriggerDependencies)) {
 }
 
 foreach ($triggers as $trigger) {
+	/*
+	 * At this point "all" or one group is selected. And same goes for hosts. It is safe to pass 'groupid' and 'hostid'
+	 * to trigger menu pop-up, so it properly redirects to Events page. Mind that 'DDRemember' option will be ignored.
+	 */
+	$trigger['groupid'] = $pageFilter->groupid;
+	$trigger['hostid'] = $pageFilter->hostid;
+
 	$description = new CSpan($trigger['description'], 'link_menu');
 	$description->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
 
