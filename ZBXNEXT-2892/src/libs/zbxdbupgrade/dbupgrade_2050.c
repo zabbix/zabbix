@@ -533,6 +533,12 @@ static int	DBpatch_2050045(void)
 	return DBadd_field("applications", &field);
 }
 
+static int	DBpatch_2050046(void)
+{
+	const ZBX_FIELD	field = {"iprange", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("drules", &field);
+}
 #endif
 
 DBPATCH_START(2050)
@@ -585,5 +591,6 @@ DBPATCH_ADD(2050042, 0, 1)
 DBPATCH_ADD(2050043, 0, 1)
 DBPATCH_ADD(2050044, 0, 1)
 DBPATCH_ADD(2050045, 0, 1)
+DBPATCH_ADD(2050046, 0, 1)
 
 DBPATCH_END()
