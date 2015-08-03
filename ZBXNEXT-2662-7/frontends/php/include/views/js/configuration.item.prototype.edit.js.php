@@ -26,14 +26,6 @@ zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'va
 zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'valuemapid');
 zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'row_valuemap');
 zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'valuemap_name');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_STR, 'inventory_link');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_STR, 'row_inventory_link');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_TEXT, 'inventory_link');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_TEXT, 'row_inventory_link');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'inventory_link');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_FLOAT, 'row_inventory_link');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'inventory_link');
-zbx_subarray_push($this->data['valueTypeVisibility'], ITEM_VALUE_TYPE_UINT64, 'row_inventory_link');
 
 $this->data['dataTypeVisibility'] = [];
 zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_DECIMAL, 'units');
@@ -95,21 +87,5 @@ zbx_subarray_push($this->data['dataTypeVisibility'], ITEM_DATA_TYPE_HEXADECIMAL,
 				displayKeyButton();
 			})
 			.trigger('change');
-
-		// Whenever non-numeric type is changed back to numeric type, set the default value in "trends" field.
-		jQuery('#value_type').on('focus', function () {
-			old_value = jQuery(this).val();
-		}).change(function() {
-			var new_value = jQuery(this).val(),
-				trends = jQuery('#trends');
-
-			if ((old_value == <?= ITEM_VALUE_TYPE_STR ?> || old_value == <?= ITEM_VALUE_TYPE_LOG ?>
-					|| old_value == <?= ITEM_VALUE_TYPE_TEXT ?>)
-					&& ((new_value == <?= ITEM_VALUE_TYPE_FLOAT ?>
-					|| new_value == <?= ITEM_VALUE_TYPE_UINT64 ?>)
-					&& trends.val() == 0)) {
-				trends.val(<?= DAY_IN_YEAR ?>);
-			}
-		});
 	});
 </script>

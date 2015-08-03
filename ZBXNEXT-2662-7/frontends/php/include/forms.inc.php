@@ -1011,6 +1011,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		]);
 		$discoveryRule = reset($discoveryRule);
 		$data['hostid'] = $discoveryRule['hostid'];
+
+		$data['new_application_prototype'] = getRequest('new_application_prototype', '');
+		$data['application_prototypes'] = getRequest('application_prototypes', array());
 	}
 	else {
 		$data['hostid'] = getRequest('hostid', 0);
@@ -1150,6 +1153,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['new_application'] = getRequest('new_application', '');
 
+		if ($data['parent_discoveryid'] != 0) {
+			$data['new_application_prototype'] = getRequest('new_application_prototype', '');
+		}
+
 		if (!$data['is_discovery_rule']) {
 			$data['formula'] = $data['item']['formula'];
 		}
@@ -1175,7 +1182,27 @@ function getItemFormData(array $item = [], array $options = []) {
 					array_push($data['delay_flex'], ['delay' => $arr_of_delay[0], 'period' => $arr_of_delay[1]]);
 				}
 			}
+
 			$data['applications'] = array_unique(zbx_array_merge($data['applications'], get_applications_by_itemid($data['itemid'])));
+
+			if ($data['parent_discoveryid'] != 0) {
+				/*
+				 * Get a list of application prototypes assigned to item prototype. Don't select distinct names,
+				 * since database can be accidentally created case insensitive.
+				 */
+				$application_prototypes = DBfetchArray(DBselect(
+					'SELECT ap.name'.
+					' FROM application_prototype ap,item_application_prototype iap'.
+					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
+						' AND ap.itemid='.zbx_dbstr($data['parent_discoveryid']).
+						' AND iap.itemid='.zbx_dbstr($data['itemid'])
+				));
+
+				// Merge form submitted data with data existing in DB to find diff and correctly display ListBox.
+				$data['application_prototypes'] = array_unique(
+					zbx_array_merge($data['application_prototypes'], zbx_objectValues($application_prototypes, 'name'))
+				);
+			}
 		}
 	}
 
@@ -1186,9 +1213,25 @@ function getItemFormData(array $item = [], array $options = []) {
 	$data['db_applications'] = DBfetchArray(DBselect(
 		'SELECT DISTINCT a.applicationid,a.name'.
 		' FROM applications a'.
-		' WHERE a.hostid='.zbx_dbstr($data['hostid'])
+		' WHERE a.hostid='.zbx_dbstr($data['hostid']).
+			($data['parent_discoveryid'] ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
 	));
 	order_result($data['db_applications'], 'name');
+
+	if ($data['parent_discoveryid'] != 0) {
+		// Make the application prototype list no appearing empty, but filling it with "-None-" as first element.
+		if (count($data['application_prototypes']) == 0) {
+			$data['application_prototypes'][] = 0;
+		}
+
+		// Get a list of application prototypes by discovery rule.
+		$data['db_application_prototypes'] = DBfetchArray(DBselect(
+			'SELECT ap.application_prototypeid,ap.name'.
+			' FROM application_prototype ap'.
+			' WHERE ap.itemid='.zbx_dbstr($data['parent_discoveryid'])
+		));
+		order_result($data['db_application_prototypes'], 'name');
+	}
 
 	// interfaces
 	$data['interfaces'] = API::HostInterface()->get([
