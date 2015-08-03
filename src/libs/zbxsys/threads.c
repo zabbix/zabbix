@@ -55,10 +55,21 @@ int	zbx_fork()
  ******************************************************************************/
 int	zbx_child_fork()
 {
-	pid_t	pid;
+	pid_t		pid;
+	sigset_t	mask, orig_mask;
 
+#ifndef _WINDOWS
+	/* block SIGTERM and SIGCHLD during fork to avoid deadlock (we've seen one in __unregister_atfork()) */
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGTERM);
+	sigaddset(&mask, SIGCHLD);
+	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
+#endif
 	pid = zbx_fork();
 
+#ifndef _WINDOWS
+	sigprocmask(SIG_SETMASK, &orig_mask, NULL);
+#endif
 	/* ignore SIGCHLD to avoid problems with exiting scripts in zbx_execute() and other cases */
 	if (0 == pid)
 		signal(SIGCHLD, SIG_DFL);

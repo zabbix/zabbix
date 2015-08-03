@@ -274,6 +274,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 #ifndef _WINDOWS
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR1);
+	/* block SIGTERM to prevent deadlock on log file mutex */
+	sigaddset(&mask, SIGTERM);
 #endif
 	if (LOG_TYPE_FILE == log_type)
 	{
