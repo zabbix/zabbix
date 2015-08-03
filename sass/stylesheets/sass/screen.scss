@@ -33,7 +33,7 @@ a {
 
 	&:visited {
 		color: $link-visited-color;
-		text-decoration: none;
+		text-decoration: none; 
 	}
 
 	&:hover {
@@ -548,25 +548,18 @@ footer {
 	    vertical-align: bottom;
 	    border-bottom: 2px solid $table-border-color;
 	    text-align: left;
-	    //position: relative;
 
 	    .arrow-up {
-	    	//position: absolute;
-	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-bottom-color: $font-alt-color;
 	    }
 
 	    .arrow-right {
-	    	//position: absolute;
-	    	//top: 39%;
 	    	margin: 0 0 0 4px;
 	    	border-left-color: $font-alt-color;
 	    }
 
 	    .arrow-down {
-	    	//position: absolute;
-	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-top-color: $font-alt-color;
 	    }
@@ -645,14 +638,6 @@ footer {
 	a {
 		@extend %paging-btn;
 	}
-
-	//.arrow-left {
-	//	border-right-color: $link-color;
-	//}
-
-	//.arrow-right {
-	//	border-left-color: $link-color;
-	//}
 }
 
 .radio-switch {
@@ -754,7 +739,6 @@ footer {
 	height: 18px;
 	line-height: 18px;
 	text-align: center;
-	//margin-left: -2px;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -1306,7 +1290,7 @@ footer {
 
 	li {
 		display: block;
-		padding: 0 0 0.7em 0;
+		padding: 0.3em 0 0.3em 0;
 	}
 
 	label {
@@ -2822,7 +2806,6 @@ td.disaster-bg {
 	font-size: $font-form-size;
 	text-align: left;
 	max-height: 300px;
-	margin: 0 5px 0 0;
     padding: 0 5px 0 0;
     overflow-y: auto;
     @extend %webkit-scrollbar;
@@ -3097,7 +3080,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar-thumb {
 		background-color: $scrollbar-thumb-color;
-		border: 1px solid $scrollbar-track-color;
+		border: 1px solid darken($scrollbar-thumb-color,5%);
 	}
 }
 
