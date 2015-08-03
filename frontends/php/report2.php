@@ -199,7 +199,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	// report by template
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		// trigger options
-		if (!empty($_REQUEST['filter_hostid']) || !$config['dropdown_first_entry']) {
+		if (!empty($_REQUEST['filter_hostid'])) {
 			$hosts = API::Host()->get([
 				'output' => ['hostid'],
 				'templateids' => $_REQUEST['filter_hostid']
@@ -342,10 +342,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$filterColumn1->addRow(_('Host'), $hostsComboBox);
 
 		// trigger options
-		if (!empty($_REQUEST['filter_groupid']) || !$config['dropdown_first_entry']) {
+		if (!empty($_REQUEST['filter_groupid'])) {
 			$triggerOptions['groupids'] = $_REQUEST['filter_groupid'];
 		}
-		if (!empty($_REQUEST['filter_hostid']) && isset($hosts[$_REQUEST['filter_hostid']]) || !$config['dropdown_first_entry']) {
+		if (!empty($_REQUEST['filter_hostid']) && isset($hosts[$_REQUEST['filter_hostid']])) {
 			$triggerOptions['hostids'] = $_REQUEST['filter_hostid'];
 		}
 	}
@@ -385,8 +385,9 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$triggerTable->addRow([
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
 				? $trigger['hosts'][0]['name'] : null,
-			new CLink($trigger['description'], 'events.php?filter_set=1&triggerid='.$trigger['triggerid'].
-				'&source='.EVENT_SOURCE_TRIGGERS
+			new CLink($trigger['description'], 'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.
+				'&hostid='.$trigger['hosts'][0]['hostid'].
+				'&triggerid='.$trigger['triggerid']
 			),
 			$availability['true'] == 0 ? '' : (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
 			$availability['false'] == 0 ? '' : (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
