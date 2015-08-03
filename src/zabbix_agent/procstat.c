@@ -594,8 +594,8 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 {
 	zbx_procstat_header_t		*header;
 	time_t				now;
-	int				*query_offset;
 	zbx_procstat_query_t		*query;
+	zbx_procstat_query_t		*next;
 	zbx_procstat_query_data_t	*qdata;
 	int				ret = FAIL;
 
@@ -609,17 +609,16 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 		goto out;
 
 	now = time(NULL);
-	query_offset = &header->active_queries;
 	zbx_vector_ptr_create(queries_ptr);
 
 	for (query = PROCSTAT_QUERY_FIRST(procstat_ref.addr); NULL != query;
-			query = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query))
+			query = next)
 	{
+		next = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query);
+
 		if (SEC_PER_DAY < now - query->last_accessed)
 		{
-			*query_offset = query->next;
 			procstat_free_query(procstat_ref.addr, query);
-
 			continue;
 		}
 
@@ -644,8 +643,6 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 		/* is incremented at the end of every data gathering cycle. We can be sure that       */
 		/* our local copy will match the queries in shared memory having the same runid.      */
 		query->runid = runid;
-
-		query_offset = &query->next;
 	}
 
 	ret = SUCCEED;
