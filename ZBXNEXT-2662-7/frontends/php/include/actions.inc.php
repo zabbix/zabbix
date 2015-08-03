@@ -413,8 +413,8 @@ function getActionOperationDescriptions(array $actions) {
 	$userIds = [];
 	$usrGrpIds = [];
 	$hostIds = [];
-	$groupIds = [];
-	$templateIds = [];
+	$groupids = [];
+	$templateids = [];
 
 	foreach ($actions as $i => $action) {
 		$result[$i] = [];
@@ -454,22 +454,22 @@ function getActionOperationDescriptions(array $actions) {
 
 					if (isset($operation['opcommand_grp']) && $operation['opcommand_grp']) {
 						foreach ($operation['opcommand_grp'] as $hostGroup) {
-							$groupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
+							$groupids[$hostGroup['groupid']] = true;
 						}
 					}
 					break;
 
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
-					foreach ($operation['opgroup'] as $hostGroup) {
-						$groupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
+					foreach ($operation['groupids'] as $groupid) {
+						$groupids[$groupid] = true;
 					}
 					break;
 
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					foreach ($operation['optemplate'] as $template) {
-						$templateIds[$template['templateid']] = $template['templateid'];
+					foreach ($operation['templateids'] as $templateid) {
+						$templateids[$templateid] = true;
 					}
 					break;
 			}
@@ -520,18 +520,18 @@ function getActionOperationDescriptions(array $actions) {
 		]);
 	}
 
-	if ($groupIds) {
+	if ($groupids) {
 		$hostGroups = API::HostGroup()->get([
 			'output' => ['name'],
-			'groupids' => $groupIds,
+			'groupids' => array_keys($groupids),
 			'preservekeys' => true
 		]);
 	}
 
-	if ($templateIds) {
+	if ($templateids) {
 		$templates = API::Template()->get([
 			'output' => ['name'],
-			'templateids' => $templateIds,
+			'templateids' => array_keys($templateids),
 			'preservekeys' => true
 		]);
 	}
@@ -646,9 +646,9 @@ function getActionOperationDescriptions(array $actions) {
 				case OPERATION_TYPE_GROUP_REMOVE:
 					$hostGroupList = [];
 
-					foreach ($operation['opgroup'] as $hostGroup) {
-						if (isset($hostGroups[$hostGroup['groupid']])) {
-							$hostGroupList[] = $hostGroups[$hostGroup['groupid']]['name'];
+					foreach ($operation['groupids'] as $groupid) {
+						if (array_key_exists($groupid, $hostGroups)) {
+							$hostGroupList[] = $hostGroups[$groupid]['name'];
 						}
 					}
 
@@ -668,9 +668,9 @@ function getActionOperationDescriptions(array $actions) {
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					$templateList = [];
 
-					foreach ($operation['optemplate'] as $template) {
-						if (isset($templates[$template['templateid']])) {
-							$templateList[] = $templates[$template['templateid']]['name'];
+					foreach ($operation['templateids'] as $templateid) {
+						if (array_key_exists($templateid, $templates)) {
+							$templateList[] = $templates[$templateid]['name'];
 						}
 					}
 
@@ -742,13 +742,15 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 					? $defaultMessage['subject']
 					: $operation['opmessage']['subject'];
 
-				$result[$key][] = [bold(_('Subject').': '), BR(), zbx_nl2br($subject)];
-
 				$message = (isset($operation['opmessage']['default_msg']) && $operation['opmessage']['default_msg'])
 					? $defaultMessage['message']
 					: $operation['opmessage']['message'];
 
-				$result[$key][] = [bold(_('Message').': '), BR(), zbx_nl2br($message)];
+				$result[$key][] = [
+					bold(_('Subject').': '), BR(), zbx_nl2br($subject),
+					BR(), BR(),
+					bold(_('Message').': '), BR(), zbx_nl2br($message)
+				];
 				break;
 
 			case OPERATION_TYPE_COMMAND:
