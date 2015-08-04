@@ -1353,6 +1353,8 @@ if test "x$want_mbedtls" = "xyes"; then
 
 	if test "x$found_mbedtls" != "xyes"; then
 		AC_MSG_ERROR([mbed TLS (PolarSSL) library libpolarssl not found])
+	elif test "x$accept_mbedtls_version" != "xyes"; then
+		AC_MSG_ERROR([mbed TLS (PolarSSL) library version requirement not met (>= 1.3.9)])
 	else
 		have_tls="mbed TLS"
 	fi

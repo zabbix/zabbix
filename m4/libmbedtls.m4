@@ -33,6 +33,33 @@ AC_TRY_LINK(
 found_mbedtls="yes",)
 ])dnl
 
+AC_DEFUN([LIBMBEDTLS_ACCEPT_VERSION],
+[
+	# Zabbix minimal supported version of libmbedtls:
+	minimal_mbedtls_version_major=1
+	minimal_mbedtls_version_minor=3
+	minimal_mbedtls_version_patch=9
+
+	# get version
+	found_mbedtls_version_major=`cat $1 | $EGREP \#define.*POLARSSL_VERSION_MAJOR | $AWK '{print @S|@3;}'`
+	found_mbedtls_version_minor=`cat $1 | $EGREP \#define.*POLARSSL_VERSION_MINOR | $AWK '{print @S|@3;}'`
+	found_mbedtls_version_patch=`cat $1 | $EGREP \#define.*POLARSSL_VERSION_PATCH | $AWK '{print @S|@3;}'`
+
+	if test $((found_mbedtls_version_major)) -gt $((minimal_mbedtls_version_major)); then
+		accept_mbedtls_version="yes"
+	elif test $((found_mbedtls_version_major)) -lt $((minimal_mbedtls_version_major)); then
+		accept_mbedtls_version="no"
+	elif test $((found_mbedtls_version_minor)) -gt $((minimal_mbedtls_version_minor)); then
+		accept_mbedtls_version="yes"
+	elif test $((found_mbedtls_version_minor)) -lt $((minimal_mbedtls_version_minor)); then
+		accept_mbedtls_version="no"
+	elif test $((found_mbedtls_version_patch)) -ge $((minimal_mbedtls_version_patch)); then
+		accept_mbedtls_version="yes"
+	else
+		accept_mbedtls_version="no"
+	fi;
+])dnl
+
 AC_DEFUN([LIBMBEDTLS_CHECK_CONFIG],
 [
   AC_ARG_WITH(mbedtls,[
@@ -49,6 +76,7 @@ AC_HELP_STRING([--with-mbedtls@<:@=DIR@:>@],[use mbed TLS (PolarSSL) package @<:
 	    want_mbedtls="yes"
 	    _libmbedtls_dir=$withval
 	fi
+	accept_mbedtls_version="no"
     ],[want_mbedtls=ifelse([$1],,[no],[$1])]
   )
 
@@ -56,26 +84,29 @@ AC_HELP_STRING([--with-mbedtls@<:@=DIR@:>@],[use mbed TLS (PolarSSL) package @<:
      AC_MSG_CHECKING(for mbed TLS (PolarSSL) support)
 
      if test "x$_libmbedtls_dir" = "xno"; then
-       if test -f /usr/local/include/polarssl/ssl.h; then
+       if test -f /usr/local/include/polarssl/version.h; then
          MBEDTLS_CFLAGS=-I/usr/local/include
          MBEDTLS_LDFLAGS=-L/usr/local/lib
          MBEDTLS_LIBS="-lpolarssl"
          found_mbedtls="yes"
-       elif test -f /usr/include/polarssl/ssl.h; then
+         LIBMBEDTLS_ACCEPT_VERSION([/usr/local/include/polarssl/version.h])
+       elif test -f /usr/include/polarssl/version.h; then
          MBEDTLS_CFLAGS=-I/usr/include
          MBEDTLS_LDFLAGS=-L/usr/lib
          MBEDTLS_LIBS="-lpolarssl"
          found_mbedtls="yes"
+         LIBMBEDTLS_ACCEPT_VERSION([/usr/include/polarssl/version.h])
        else			# libraries are not found in default directories
          found_mbedtls="no"
          AC_MSG_RESULT(no)
        fi
      else
-       if test -f $_libmbedtls_dir/include/polarssl/ssl.h; then
+       if test -f $_libmbedtls_dir/include/polarssl/version.h; then
          MBEDTLS_CFLAGS=-I$_libmbedtls_dir/include
          MBEDTLS_LDFLAGS=-L$_libmbedtls_dir/lib
          MBEDTLS_LIBS="-lpolarssl"
          found_mbedtls="yes"
+         LIBMBEDTLS_ACCEPT_VERSION([$_libmbedtls_dir/include/polarssl/version.h])
        else
          found_mbedtls="no"
          AC_MSG_RESULT(no)
