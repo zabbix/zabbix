@@ -21,16 +21,20 @@
 #include "sysinfo.h"
 #include "log.h"
 
+#define get_string(field)	#field
+
 #define validate(result, structure, field)								\
 													\
 do													\
 {													\
 	if (__UINT64_C(0xffffffffffffffff) == structure.field)						\
 	{												\
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Value "#structure"."#field" is unknown."));	\
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain filesystem information:"		\
+				" value of " get_string(field) " is unknown."));			\
 		return SYSINFO_RET_FAIL;								\
 	}												\
-} while(0)
+}													\
+while(0)
 
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
