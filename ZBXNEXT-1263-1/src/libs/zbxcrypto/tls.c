@@ -2248,6 +2248,7 @@ int	zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error)
  *     Some crypto libraries require initialization. On Unix the              *
  *     initialization is done separately in each child process which uses     *
  *     crypto libraries. On MS Windows it is done in the first thread.        *
+ *                                                                            *
  *     Flag 'init_done' is used to prevent library deinitialzation on exit if *
  *     it was not yet initialized (can happen if termination signal is        *
  *     received).                                                             *
