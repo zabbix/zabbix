@@ -712,22 +712,20 @@ function getActionOperationDescriptions(array $actions) {
 function getActionOperationHints(array $operations, array $defaultMessage) {
 	$result = [];
 
-	$scriptIds = [];
+	$scriptids = [];
+	$scripts = [];
 
 	foreach ($operations as $operation) {
 		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
 				&& $operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-			$scriptId = $operation['opcommand']['scriptid'];
-			$scriptIds[$scriptId] = $scriptId;
+			$scriptids[$operation['opcommand']['scriptid']] = true;
 		}
 	}
 
-	$scripts = [];
-
-	if ($scriptIds) {
+	if ($scriptids) {
 		$scripts = API::Script()->get([
 			'output' => ['name'],
-			'scriptids' => $scriptIds,
+			'scriptids' => array_keys($scriptids),
 			'preservekeys' => true
 		]);
 	}
@@ -746,11 +744,7 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 					? $defaultMessage['message']
 					: $operation['opmessage']['message'];
 
-				$result[$key][] = [
-					bold(_('Subject').': '), BR(), zbx_nl2br($subject),
-					BR(), BR(),
-					bold(_('Message').': '), BR(), zbx_nl2br($message)
-				];
+				$result[$key][] = [bold($subject), BR(), BR(), zbx_nl2br($message)];
 				break;
 
 			case OPERATION_TYPE_COMMAND:
