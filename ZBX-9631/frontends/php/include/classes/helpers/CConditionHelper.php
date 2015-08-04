@@ -146,6 +146,11 @@ class CConditionHelper {
 	 * @return string
 	 */
 	public static function replaceLetterIds($formula, array $ids) {
+
+		// sort ids array descending by key name and length
+		$keys = array_map('strlen', array_keys($ids));
+		array_multisort($keys, SORT_DESC, $ids);
+
 		foreach ($ids as $formulaId => $id) {
 			$formula = str_replace($formulaId, '{'.$id.'}', $formula);
 		}
