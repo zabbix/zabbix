@@ -1266,8 +1266,10 @@ footer {
 
 .table-forms-separator {
 	display: inline-block;
+	min-width: 300px;
 	padding: 5px;
 	border: 1px solid $table-border-color;
+	@include box-sizing(border-box);
 }
 
 .drag-drop-area {
