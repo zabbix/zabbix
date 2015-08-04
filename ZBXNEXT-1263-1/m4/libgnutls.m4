@@ -31,6 +31,33 @@ AC_TRY_LINK(
 found_gnutls="yes",)
 ])dnl
 
+AC_DEFUN([LIBGNUTLS_ACCEPT_VERSION],
+[
+	# Zabbix minimal supported version of libgnutls:
+	minimal_gnutls_version_major=3
+	minimal_gnutls_version_minor=1
+	minimal_gnutls_version_patch=18
+
+	# get version
+	found_gnutls_version_major=`cat $1 | $EGREP \#define.*GNUTLS_VERSION_MAJOR | $AWK '{print @S|@3;}'`
+	found_gnutls_version_minor=`cat $1 | $EGREP \#define.*GNUTLS_VERSION_MINOR | $AWK '{print @S|@3;}'`
+	found_gnutls_version_patch=`cat $1 | $EGREP \#define.*GNUTLS_VERSION_PATCH | $AWK '{print @S|@3;}'`
+
+	if test $((found_gnutls_version_major)) -gt $((minimal_gnutls_version_major)); then
+		accept_gnutls_version="yes"
+	elif test $((found_gnutls_version_major)) -lt $((minimal_gnutls_version_major)); then
+		accept_gnutls_version="no"
+	elif test $((found_gnutls_version_minor)) -gt $((minimal_gnutls_version_minor)); then
+		accept_gnutls_version="yes"
+	elif test $((found_gnutls_version_minor)) -lt $((minimal_gnutls_version_minor)); then
+		accept_gnutls_version="no"
+	elif test $((found_gnutls_version_patch)) -ge $((minimal_gnutls_version_patch)); then
+		accept_gnutls_version="yes"
+	else
+		accept_gnutls_version="no"
+	fi;
+])dnl
+
 AC_DEFUN([LIBGNUTLS_CHECK_CONFIG],
 [
   AC_ARG_WITH(gnutls,[
@@ -47,6 +74,7 @@ AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>
 	    want_gnutls="yes"
 	    _libgnutls_dir=$withval
 	fi
+	accept_gnutls_version="no"
     ],[want_gnutls=ifelse([$1],,[no],[$1])]
   )
 
@@ -58,11 +86,13 @@ AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>
          GNUTLS_LDFLAGS=-L/usr/lib
          GNUTLS_LIBS="-lgnutls"
          found_gnutls="yes"
+         LIBGNUTLS_ACCEPT_VERSION([/usr/include/gnutls/gnutls.h])
        elif test -f /usr/local/include/gnutls/gnutls.h; then
          GNUTLS_CFLAGS=-I/usr/local/include
          GNUTLS_LDFLAGS=-L/usr/local/lib
          GNUTLS_LIBS="-lgnutls"
          found_gnutls="yes"
+         LIBGNUTLS_ACCEPT_VERSION([/usr/local/include/gnutls/gnutls.h])
        else #libraries are not found in default directories
          found_gnutls="no"
          AC_MSG_RESULT(no)
@@ -73,6 +103,7 @@ AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>
          GNUTLS_LDFLAGS=-L$_libgnutls_dir/lib
          GNUTLS_LIBS="-lgnutls"
          found_gnutls="yes"
+         LIBGNUTLS_ACCEPT_VERSION([$_libgnutls_dir/include/gnutls/gnutls.h])
        else
          found_gnutls="no"
          AC_MSG_RESULT(no)
