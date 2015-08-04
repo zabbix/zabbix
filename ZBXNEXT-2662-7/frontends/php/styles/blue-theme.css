@@ -876,7 +876,10 @@ footer, .footer {
 .table-forms-separator {
   display: inline-block;
   padding: 5px;
-  border: 1px solid #ebeef0; }
+  border: 1px solid #ebeef0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box; }
 
 .margin-top {
   display: block;
@@ -890,20 +893,26 @@ footer, .footer {
   -moz-border-radius: 2px;
   border-radius: 2px; }
 
-.list-check-radio li {
+.list-check-radio li, .list-hor-check-radio li {
   display: block;
-  padding: 0.3em 0 0.3em 0; }
-.list-check-radio label {
+  padding: 0.3em 0; }
+.list-check-radio label, .list-hor-check-radio label {
   padding: 0 0 0 16px;
   display: inline-block;
   text-indent: -13px;
   max-width: 600px; }
-  .list-check-radio label input[type="checkbox"] {
+  .list-check-radio label input[type="checkbox"], .list-hor-check-radio label input[type="checkbox"] {
     left: -3px;
     margin: 0; }
-  .list-check-radio label input[type="radio"] {
+  .list-check-radio label input[type="radio"], .list-hor-check-radio label input[type="radio"] {
     left: -3px;
     margin: 0; }
+
+.list-hor-check-radio li {
+  display: inline-block;
+  margin-right: 15px; }
+  .list-hor-check-radio li:last-child {
+    margin-right: 0; }
 
 label input[type="checkbox"] {
   margin-right: 3px; }
@@ -2013,7 +2022,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 
 .overlay-close-btn, a.overlay-close-btn {
   position: absolute;
-  z-index: 10000;
+  z-index: 1000;
   top: 0;
   right: 0;
   -webkit-border-radius: 0 0 0 2px;
