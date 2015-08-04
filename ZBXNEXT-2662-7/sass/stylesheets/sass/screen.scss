@@ -1290,7 +1290,7 @@ footer {
 
 	li {
 		display: block;
-		padding: 0.3em 0 0.3em 0;
+		padding: 0.3em 0;
 	}
 
 	label {
@@ -1309,6 +1309,16 @@ footer {
 			margin: 0;
 		}
 	}
+}
+
+.list-hor-check-radio {
+	@extend .list-check-radio;
+
+	li {
+		display: inline-block;
+		margin: 0 15px 0 0;
+	}
+
 }
 
 label {
@@ -2923,7 +2933,7 @@ td.disaster-bg {
 
 .overlay-close-btn {
 	position: absolute;
-	z-index: 10000;
+	z-index: 1000;
 	top: 0;
 	right: 0;
 	@extend %close-icon;
