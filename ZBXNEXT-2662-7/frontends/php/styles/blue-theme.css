@@ -1751,8 +1751,8 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   position: absolute;
   z-index: 98;
   overflow: hidden;
-  background-color: rgba(250, 214, 52, 0.4);
-  border: 1px solid rgba(250, 214, 52, 0.4); }
+  background-color: rgba(250, 214, 52, 0.5);
+  border: 1px solid rgba(250, 214, 52, 0.5); }
 
 /* Debug */
 .debug-output {

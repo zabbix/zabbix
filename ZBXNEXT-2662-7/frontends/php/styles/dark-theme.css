@@ -1751,8 +1751,8 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   position: absolute;
   z-index: 98;
   overflow: hidden;
-  background-color: rgba(55, 45, 1, 0.4);
-  border: 1px solid rgba(55, 45, 1, 0.4); }
+  background-color: rgba(66, 54, 1, 0.5);
+  border: 1px solid rgba(66, 54, 1, 0.5); }
 
 /* Debug */
 .debug-output {
@@ -1760,7 +1760,7 @@ input[disabled], input[readonly], textarea[disabled], textarea[readonly], select
   overflow-y: auto;
   padding: 11px;
   margin: 10px 13px 0 13px;
-  background-color: #38300c;
+  background-color: #2f280a;
   border: 1px solid #303030; }
 
 .btn-debug {
@@ -1881,7 +1881,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   background-color: #e45959; }
 
 .list-table tbody tr.row-selected, .suggest-found, .drag-drop-area {
-  background-color: #38300c; }
+  background-color: #2f280a; }
 
 .active-indic {
   width: 8px;
