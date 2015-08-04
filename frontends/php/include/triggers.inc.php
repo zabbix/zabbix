@@ -774,13 +774,21 @@ function triggerExpression($trigger, $html = false) {
 						$link = (new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_'])))->addClass($style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+						$link = (new CLink(
+							$function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-							$trigger['discoveryRuleid']))->addClass($style);
+							$trigger['discoveryRuleid']
+						))
+							->addClass(ZBX_STYLE_LINK_ALT)
+							->addClass($style);
 					}
 					else {
-						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
-							'items.php?form=update&itemid='.$function_data['itemid']))->addClass($style);
+						$link = (new CLink(
+							$function_data['host'].':'.CHtml::encode($function_data['key_']),
+							'items.php?form=update&itemid='.$function_data['itemid']
+						))
+							->addClass(ZBX_STYLE_LINK_ALT)
+							->addClass($style);
 					}
 					array_push(
 						$exp,
