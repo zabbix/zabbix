@@ -540,9 +540,9 @@ static void	procstat_add(const char *procname, const char *username, const char 
 			exit(EXIT_FAILURE);
 		}
 
-		/* Header initialised in procstat_copy_data() which is called back from zbx_dshm_reserve(). */
-
+		/* header initialised in procstat_copy_data() which is called back from zbx_dshm_reserve() */
 		procstat_reattach();
+		header = (zbx_procstat_header_t *)procstat_ref.addr;
 	}
 
 	query_offset = procstat_alloc_query(procstat_ref.addr);
