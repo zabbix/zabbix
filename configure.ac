@@ -1372,6 +1372,8 @@ if test "x$want_gnutls" = "xyes"; then
 
 	if test "x$found_gnutls" != "xyes"; then
 		AC_MSG_ERROR([GnuTLS library libgnutls not found])
+	elif test "x$accept_gnutls_version" != "xyes"; then
+		AC_MSG_ERROR([GnuTLS library version requirement not met (>= 3.1.18)])
 	else
 		have_tls="GnuTLS"
 	fi
