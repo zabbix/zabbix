@@ -101,11 +101,11 @@ typedef struct
 #define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER		__UINT64_C(0x00000040)	/* hosts.ipmi_username field should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS		__UINT64_C(0x00000080)	/* hosts.ipmi_password field should be updated */
 #define ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT		__UINT64_C(0x00000100)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_connect field should be updated */
-#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_connect field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT		__UINT64_C(0x00000200)	/* hosts.tls_accept field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER		__UINT64_C(0x00000400)	/* hosts.tls_issuer field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_SUBJECT		__UINT64_C(0x00000800)	/* hosts.tls_subject field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK_IDENTITY	__UINT64_C(0x00001000)	/* hosts.tls_psk_identity field should be updated */
+#define ZBX_FLAG_LLD_HOST_UPDATE_TLS_PSK		__UINT64_C(0x00002000)	/* hosts.tls_psk field should be updated */
 
 #define ZBX_FLAG_LLD_HOST_UPDATE									\
 		(ZBX_FLAG_LLD_HOST_UPDATE_HOST | ZBX_FLAG_LLD_HOST_UPDATE_NAME |			\
@@ -1606,7 +1606,7 @@ static void	lld_templates_make(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hos
  *                                                                            *
  * Parameters: hosts            - [IN] list of hosts;                         *
  *                                     should be sorted by hostid             *
- *             status           - [IN] initial host satatus                   *
+ *             status           - [IN] initial host status                    *
  *             del_hostgroupids - [IN] host groups which should be deleted    *
  *             del_hostmacroids - [IN] host macros which should be deleted    *
  *                                                                            *
@@ -1626,9 +1626,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	zbx_lld_interface_t	*interface;
 	zbx_vector_uint64_t	upd_host_inventory_hostids, del_host_inventory_hostids, del_interfaceids;
 	zbx_uint64_t		hostid = 0, hostgroupid = 0, hostmacroid = 0, interfaceid = 0;
-	char			*sql1 = NULL, *sql2 = NULL, *host_esc, *name_esc, *host_proto_esc,
-				*ipmi_username_esc, *ipmi_password_esc, *value_esc, *ip_esc, *dns_esc,
-				*port_esc;
+	char			*sql1 = NULL, *sql2 = NULL, *value_esc;
 	size_t			sql1_alloc = 0, sql1_offset = 0,
 				sql2_alloc = 0, sql2_offset = 0;
 	zbx_db_insert_t		db_insert, db_insert_hdiscovery, db_insert_hinventory, db_insert_hgroups,
@@ -1713,8 +1711,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				"ipmi_privilege", "ipmi_username", "ipmi_password", "status", "flags", "tls_connect",
 				"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk", NULL);
 
-		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host",
-				NULL);
+		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host", NULL);
 	}
 
 	if (0 != new_host_inventories)
@@ -1782,22 +1779,22 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				zbx_strcpy_alloc(&sql1, &sql1_alloc, &sql1_offset, "update hosts set ");
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 				{
-					host_esc = DBdyn_escape_string(host->host);
+					value_esc = DBdyn_escape_string(host->host);
 
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "host='%s'", host_esc);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "host='%s'", value_esc);
 					d = ",";
 
-					zbx_free(host_esc);
+					zbx_free(value_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_NAME))
 				{
-					name_esc = DBdyn_escape_string(host->name);
+					value_esc = DBdyn_escape_string(host->name);
 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-							"%sname='%s'", d, name_esc);
+							"%sname='%s'", d, value_esc);
 					d = ",";
 
-					zbx_free(name_esc);
+					zbx_free(value_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_PROXY))
 				{
@@ -1819,35 +1816,34 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_USER))
 				{
-					ipmi_username_esc = DBdyn_escape_string(ipmi_username);
+					value_esc = DBdyn_escape_string(ipmi_username);
 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-							"%sipmi_username='%s'", d, ipmi_username_esc);
+							"%sipmi_username='%s'", d, value_esc);
 					d = ",";
 
-					zbx_free(ipmi_username_esc);
+					zbx_free(value_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_IPMI_PASS))
 				{
-					ipmi_password_esc = DBdyn_escape_string(ipmi_password);
+					value_esc = DBdyn_escape_string(ipmi_password);
 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
-							"%sipmi_password='%s'", d, ipmi_password_esc);
+							"%sipmi_password='%s'", d, value_esc);
+					d = ",";
 
-					zbx_free(ipmi_password_esc);
+					zbx_free(value_esc);
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_CONNECT))
 				{
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_connect=%d", d, tls_connect);
-
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_ACCEPT))
 				{
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_accept=%d", d, tls_accept);
-
 					d = ",";
 				}
 				if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_TLS_ISSUER))
@@ -1886,7 +1882,6 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 							"%stls_psk='%s'", d, value_esc);
-					d = ",";
 
 					zbx_free(value_esc);
 				}
@@ -1899,15 +1894,15 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 
 			if (0 != (host->flags & ZBX_FLAG_LLD_HOST_UPDATE_HOST))
 			{
-				host_proto_esc = DBdyn_escape_string(host_proto);
+				value_esc = DBdyn_escape_string(host_proto);
 
 				zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset,
 						"update host_discovery"
 						" set host='%s'"
 						" where hostid=" ZBX_FS_UI64 ";\n",
-						host_proto_esc, host->hostid);
+						value_esc, host->hostid);
 
-				zbx_free(host_proto_esc);
+				zbx_free(value_esc);
 			}
 		}
 
@@ -1951,24 +1946,24 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_IP))
 				{
-					ip_esc = DBdyn_escape_string(interface->ip);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sip='%s'", d, ip_esc);
-					zbx_free(ip_esc);
+					value_esc = DBdyn_escape_string(interface->ip);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sip='%s'", d, value_esc);
+					zbx_free(value_esc);
 					d = ",";
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_DNS))
 				{
-					dns_esc = DBdyn_escape_string(interface->dns);
-					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdns='%s'", d, dns_esc);
-					zbx_free(dns_esc);
+					value_esc = DBdyn_escape_string(interface->dns);
+					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sdns='%s'", d, value_esc);
+					zbx_free(value_esc);
 					d = ",";
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_PORT))
 				{
-					port_esc = DBdyn_escape_string(interface->port);
+					value_esc = DBdyn_escape_string(interface->port);
 					zbx_snprintf_alloc(&sql1, &sql1_alloc, &sql1_offset, "%sport='%s'",
-							d, port_esc);
-					zbx_free(port_esc);
+							d, value_esc);
+					zbx_free(value_esc);
 					d = ",";
 				}
 				if (0 != (interface->flags & ZBX_FLAG_LLD_INTERFACE_UPDATE_BULK))
@@ -2816,12 +2811,12 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, zbx_vector_ptr_t *lld_rows, char 
 	{
 		ZBX_DBROW2UINT64(proxy_hostid, row[0]);
 		ipmi_authtype = (char)atoi(row[1]);
-		ipmi_privilege = (unsigned char)atoi(row[2]);
+		ZBX_STR2UCHAR(ipmi_privilege, row[2]);
 		ipmi_username = zbx_strdup(NULL, row[3]);
 		ipmi_password = zbx_strdup(NULL, row[4]);
 
-		tls_connect = atoi(row[5]);
-		tls_accept = atoi(row[6]);
+		ZBX_STR2UCHAR(tls_connect, row[5]);
+		ZBX_STR2UCHAR(tls_accept, row[6]);
 		tls_issuer = zbx_strdup(NULL, row[7]);
 		tls_subject = zbx_strdup(NULL, row[8]);
 		tls_psk_identity = zbx_strdup(NULL, row[9]);
