@@ -814,7 +814,7 @@ static void	lld_applications_make(zbx_uint64_t parent_itemid, zbx_vector_ptr_t *
  *                                                                            *
  * Parameters: hostid         - [IN] parent host id                           *
  *             parent_itemid  - [IN] item prototype id                        *
- *             status         - [IN] initial item satatus                     *
+ *             status         - [IN] initial item status                      *
  *             del_itemappids - [IN] items_applications which should be       *
  *                                   deleted                                  *
  *                                                                            *
