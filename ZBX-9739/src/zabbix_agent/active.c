@@ -1323,15 +1323,20 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 			else
 			{
-				pvalue = GET_MSG_RESULT(&result);
+				const char	*perror;
+
+				if (0 != ISSET_MSG(&result))
+					perror = *GET_MSG_RESULT(&result);
+				else
+					perror = "Item is not supported.";
 
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 
-				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
-						active_metrics[i].key);
+				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s",
+						active_metrics[i].key, perror);
 
 				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
-						*pvalue, ITEM_STATE_NOTSUPPORTED,
+						perror, ITEM_STATE_NOTSUPPORTED,
 						NULL, NULL, NULL,
 						NULL, NULL, NULL, 0);
 			}
