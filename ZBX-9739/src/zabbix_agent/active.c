@@ -1328,7 +1328,7 @@ static void	process_active_checks(char *server, unsigned short port)
 				if (0 != ISSET_MSG(&result))
 					perror = *GET_MSG_RESULT(&result);
 				else
-					perror = "Item is not supported.";
+					perror = ZBX_NOTSUPPORTED_MSG;
 
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 
