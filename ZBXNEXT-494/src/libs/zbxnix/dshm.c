@@ -248,10 +248,7 @@ int	zbx_dshm_reserve(zbx_dshm_t *shm, size_t size, char **errmsg)
 		goto out;
 	}
 
-	if (shm->size < 64 * ZBX_KIBIBYTE || shm->size / 2 < size)
-		shm_size = shm->size + size;
-	else
-		shm_size = shm->size + shm->size / 2;
+	shm_size = shm->size + ZBX_SIZE_T_ALIGN8(size);
 
 	/* attach to the old segment if possible */
 	if (ZBX_NONEXISTENT_SHMID != shm->shmid && (void *)(-1) == (addr_old = shmat(shm->shmid, NULL, 0)))
