@@ -87,10 +87,7 @@ typedef struct
 	int	pids_num;
 
 	/* a linked list of active queries (offset of the first active query) */
-	int	active_queries;
-
-	/* a linked list of free queries (offset of the first free query) */
-	int	free_queries;
+	int	queries;
 
 	/* the total size of the allocated queries and strings */
 	int	size_allocated;
@@ -110,7 +107,7 @@ zbx_procstat_header_t;
 		(PROCSTAT_NULL_OFFSET == offset ? NULL : PROCSTAT_PTR(base, offset))
 
 #define PROCSTAT_QUERY_FIRST(base)									\
-		(zbx_procstat_query_t*)PROCSTAT_PTR_NULL(base, ((zbx_procstat_header_t *)base)->active_queries)
+		(zbx_procstat_query_t*)PROCSTAT_PTR_NULL(base, ((zbx_procstat_header_t *)base)->queries)
 
 #define PROCSTAT_QUERY_NEXT(base, query)								\
 		(zbx_procstat_query_t*)PROCSTAT_PTR_NULL(base, query->next)
@@ -248,63 +245,6 @@ static int	procstat_alloc(void *base, size_t size)
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_alloc_query                                             *
- *                                                                            *
- * Purpose: allocates memory in the shared memory segment to store process    *
- *          cpu utilization query (calls exit() if segment is too small)      *
- *                                                                            *
- * Parameters: base - [IN] the procstat shared memory segment                 *
- *                                                                            *
- * Return value: The offset of allocated data from the end of data segment    *
- *               (positive value).                                            *
- *               PROCSTAT_NULL_OFFSET if there was not enough free space.     *
- *                                                                            *
- ******************************************************************************/
-static int	procstat_alloc_query(void *base)
-{
-	zbx_procstat_header_t	*header = (zbx_procstat_header_t *)base;
-	int			offset = header->free_queries;
-
-	if (PROCSTAT_NULL_OFFSET != offset)
-	{
-		zbx_procstat_query_t	*query;
-
-		query = (zbx_procstat_query_t *)PROCSTAT_PTR(base, offset);
-		header->free_queries = query->next;
-	}
-	else
-	{
-		offset = procstat_alloc(base, sizeof(zbx_procstat_query_t));
-	}
-
-	return offset;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: procstat_free_query                                              *
- *                                                                            *
- * Purpose: frees process cpu utilization query                               *
- *                                                                            *
- * Parameters: base  - [IN] the procstat shared memory segment                *
- *             query - [IN] the process cpu utilization query to remove       *
- *                                                                            *
- * Comments: The query will be simply moved from 'active' list to 'free' list *
- *                                                                            *
- ******************************************************************************/
-static void	procstat_free_query(void *base, zbx_procstat_query_t *query)
-{
-	zbx_procstat_header_t	*header = (zbx_procstat_header_t *)base;
-
-	if (header->active_queries == PROCSTAT_OFFSET(base, query))
-		header->active_queries = query->next;
-
-	query->next = header->free_queries;
-	header->free_queries = PROCSTAT_OFFSET(base, query);
-}
-
-/******************************************************************************
- *                                                                            *
  * Function: procstat_strdup                                                  *
  *                                                                            *
  * Purpose: allocates required memory in procstat memory segment and copies   *
@@ -373,7 +313,7 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 {
 	const char		*__function_name = "procstat_copy_data";
 
-	int			offset, size_snapshot, *query_offset;
+	int			offset, size_snapshot, *query_offset, now;
 	zbx_procstat_header_t	*hsrc = (zbx_procstat_header_t *)src;
 	zbx_procstat_header_t	*hdst = (zbx_procstat_header_t *)dst;
 	zbx_procstat_query_t	*qsrc, *qdst = NULL;
@@ -382,18 +322,23 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 
 	hdst->size = size_dst;
 	hdst->size_allocated = PROCSTAT_ALIGNED_HEADER_SIZE;
-	hdst->free_queries = PROCSTAT_NULL_OFFSET;
-	hdst->active_queries = PROCSTAT_NULL_OFFSET;
+	hdst->queries = PROCSTAT_NULL_OFFSET;
+
+	now = time(NULL);
 
 	if (NULL != src)
 	{
-		query_offset = &hdst->active_queries;
+		query_offset = &hdst->queries;
 
 		/* copy queries */
 		for (qsrc = PROCSTAT_QUERY_FIRST(src); NULL != qsrc; qsrc = PROCSTAT_QUERY_NEXT(src, qsrc))
 		{
+			/* don't copy queries not used during the last day */
+			if (SEC_PER_DAY < now - qsrc->last_accessed)
+				continue;
+
 			/* the new shared memory segment must have enough space */
-			offset = procstat_alloc_query(dst);
+			offset = procstat_alloc(dst, sizeof(zbx_procstat_query_t));
 
 			qdst = (zbx_procstat_query_t *)PROCSTAT_PTR(dst, offset);
 
@@ -524,8 +469,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 	header = (zbx_procstat_header_t *)procstat_ref.addr;
 
 	/* reserve space for a new query only if there are no freed queries */
-	if (NULL == header || PROCSTAT_NULL_OFFSET == header->free_queries)
-		size += ZBX_SIZE_T_ALIGN8(sizeof(zbx_procstat_query_t));
+	size += ZBX_SIZE_T_ALIGN8(sizeof(zbx_procstat_query_t));
 
 	if (NULL == header || FAIL == procstat_dshm_has_enough_space(header, size))
 	{
@@ -543,7 +487,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 		header = (zbx_procstat_header_t *)procstat_ref.addr;
 	}
 
-	query_offset = procstat_alloc_query(procstat_ref.addr);
+	query_offset = procstat_alloc(procstat_ref.addr, sizeof(zbx_procstat_query_t));
 
 	/* initialize the created query */
 	query = (zbx_procstat_query_t *)PROCSTAT_PTR_NULL(procstat_ref.addr, query_offset);
@@ -555,8 +499,8 @@ static void	procstat_add(const char *procname, const char *username, const char 
 	query->cmdline = procstat_strdup(procstat_ref.addr, cmdline);
 	query->flags = flags;
 	query->last_accessed = time(NULL);
-	query->next = header->active_queries;
-	header->active_queries = query_offset;
+	query->next = header->queries;
+	header->queries = query_offset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -598,7 +542,6 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 	zbx_procstat_header_t		*header;
 	time_t				now;
 	zbx_procstat_query_t		*query;
-	zbx_procstat_query_t		*next;
 	zbx_procstat_query_data_t	*qdata;
 	int				ret = FAIL;
 
@@ -608,22 +551,18 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 
 	header = (zbx_procstat_header_t *)procstat_ref.addr;
 
-	if (PROCSTAT_NULL_OFFSET == header->active_queries)
+	if (PROCSTAT_NULL_OFFSET == header->queries)
 		goto out;
 
 	now = time(NULL);
 	zbx_vector_ptr_create(queries_ptr);
 
 	for (query = PROCSTAT_QUERY_FIRST(procstat_ref.addr); NULL != query;
-			query = next)
+			query = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query))
 	{
-		next = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query);
-
+		/* skip unused queries */
 		if (SEC_PER_DAY < now - query->last_accessed)
-		{
-			procstat_free_query(procstat_ref.addr, query);
 			continue;
-		}
 
 		qdata = (zbx_procstat_query_data_t *)zbx_malloc(NULL, sizeof(zbx_procstat_query_data_t));
 		zbx_vector_uint64_create(&qdata->pids);
