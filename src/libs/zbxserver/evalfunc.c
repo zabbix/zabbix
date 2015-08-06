@@ -1868,6 +1868,253 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_FORECAST                                                *
+ *                                                                            *
+ * Purpose: evaluate function 'forecast' for the item                         *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
+		char **error)
+{
+	const char			*__function_name = "evaluate_FORECAST";
+	char				*fit = NULL *mode = NULL;
+	double				*t = NULL, *x = NULL, prediction;
+	int				nparams, time, time_flag, arg2, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+		goto out;
+
+	if (5 < (nparams = num_param(parameters)))
+		goto out;
+
+	if (2 > nparams)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &time, &time_flag) ||
+			ZBX_FLAG_SEC != time_flag)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 2, &arg2, &flag) || 0 == arg2)
+		goto out;
+
+	if (3 <= nparams)
+	{
+		int	time_shift, time_shift_flag;
+
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 3, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		{
+			goto out;
+		}
+
+		now -= time_shift;
+		time += time_shift;
+	}
+
+	if (4 <= nparams)
+	{
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 4, &fit))
+			goto out;
+	}
+	else
+	{
+		fit = zbx_strdup(NULL, "");
+	}
+
+	if (5 == nparams)
+	{
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 5, &mode))
+			goto out;
+	}
+	else
+	{
+		mode = zbx_strdup(NULL, "");
+	}
+
+	if (ZBX_FLAG_SEC == flag)
+		seconds = arg2;
+	else
+		nvalues = arg2;
+
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		history_value_t	result = {0};
+
+		t = zbx_malloc(t, values.values_num * sizeof(double));
+		x = zbx_malloc(x, values.values_num * sizeof(double));
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			for (i = 0; i < values.values_num; i++)
+			{
+				t[i] = values.values[i].timestamp.sec + 1.0e-9 * values.values[i].timestamp.ns;
+				x[i] = values.values[i].value.dbl;
+			}
+		}
+		else
+		{
+			for (i = 0; i < values.values_num; i++)
+			{
+				t[i] = values.values[i].timestamp.sec + 1.0e-9 * values.values[i].timestamp.ns;
+				x[i] = values.values[i].value.ui64;
+			}
+		}
+
+		if (SUCCEED != zbx_forecast(t, x, values.values_num, now, time, fit, mode, &prediction, error))
+			goto out;
+
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, prediction);
+
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "no data available");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zbx_free(fit);
+	zbx_free(mode);
+
+	zbx_free(t);
+	zbx_free(x);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_TIMELEFT                                                *
+ *                                                                            *
+ * Purpose: evaluate function 'timeleft' for the item                         *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
+		char **error)
+{
+	const char			*__function_name = "evaluate_TIMELEFT";
+	char				*fit = NULL;
+	double				*t = NULL, *x = NULL, threshold, timeleft;
+	int				nparams, arg2, flag, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift = 0;
+	zbx_vector_history_record_t	values;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+		goto out;
+
+	if (4 < (nparams = num_param(parameters)))
+		goto out;
+
+	if (2 > nparams)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 1, &threshold))
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 2, &arg2, &flag) || 0 == arg2)
+		goto out;
+
+	if (3 <= nparams)
+	{
+		int	time_shift_flag;
+
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 3, &time_shift,
+				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		{
+			goto out;
+		}
+	}
+
+	if (4 == nparams)
+	{
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 4, &fit))
+			goto out;
+	}
+	else
+	{
+		fit = zbx_strdup(NULL, "");
+	}
+
+	if (ZBX_FLAG_SEC == flag)
+		seconds = arg2;
+	else
+		nvalues = arg2;
+
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
+		goto out;
+
+	if (0 < values.values_num)
+	{
+		history_value_t	result = {0};
+
+		t = zbx_malloc(t, values.values_num * sizeof(double));
+		x = zbx_malloc(x, values.values_num * sizeof(double));
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			for (i = 0; i < values.values_num; i++)
+			{
+				t[i] = values.values[i].timestamp.sec + 1.0e-9 * values.values[i].timestamp.ns;
+				x[i] = values.values[i].value.dbl;
+			}
+		}
+		else
+		{
+			for (i = 0; i < values.values_num; i++)
+			{
+				t[i] = values.values[i].timestamp.sec + 1.0e-9 * values.values[i].timestamp.ns;
+				x[i] = values.values[i].value.ui64;
+			}
+		}
+
+		if (SUCCEED != zbx_timeleft(t, x, values.values_num, now, threshold, fit, &timeleft, error))
+			goto out;
+
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, timeleft);
+
+		ret = SUCCEED;
+	}
+	else
+		*error = zbx_strdup(*error, "no data available");
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zbx_free(fit);
+
+	zbx_free(t);
+	zbx_free(x);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_function                                                *
  *                                                                            *
  * Purpose: evaluate function                                                 *
@@ -2001,6 +2248,14 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	else if (0 == strcmp(function, "band"))
 	{
 		ret = evaluate_BAND(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "forecast"))
+	{
+		ret = evaluate_FORECAST(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "timeleft"))
+	{
+		ret = evaluate_TIMELEFT(value, item, function, parameter, now);
 	}
 	else
 	{
@@ -2404,7 +2659,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		{
 			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
 		}
-		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum", function, ','))
+		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function, ','))
 		{
 			switch (item.value_type)
 			{
@@ -2415,6 +2670,10 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 				default:
 					;
 			}
+		}
+		else if (SUCCEED == str_in_list("timeleft", function, ','))
+		{
+			add_value_suffix(value, MAX_BUFFER_LEN, "s", ITEM_VALUE_TYPE_FLOAT);
 		}
 	}
 
