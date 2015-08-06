@@ -442,12 +442,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'hostid' => $hostId,
 				'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
 				'description' => getRequest('description', ''),
-				'tls_connect' => getRequest('tls_connect', 1),
-				'tls_accept' => getRequest('tls_accept', 1),
-				'tls_issuer' => getRequest('tls_issuer'),
-				'tls_subject' => getRequest('tls_subject'),
-				'tls_psk_identity' => getRequest('tls_psk_identity'),
-				'tls_psk' => getRequest('tls_psk'),
 				'inventory' => (getRequest('inventory_mode') == HOST_INVENTORY_DISABLED)
 					? []
 					: getRequest('host_inventory', [])

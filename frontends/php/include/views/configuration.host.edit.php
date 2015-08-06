@@ -781,29 +781,35 @@ $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
 // Encryption
 $encryptionFormList = new CFormList('encryption');
 
-$encryptionFormList->addRow(_('Connections to host'), new CComboBox('tls_connect', $data['tls_connect'], null, [
-	HOST_ENCRYPTION_NONE => _('No encryption'),
-	HOST_ENCRYPTION_PSK => _('PSK'),
-	HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
-]));
+$encryptionFormList->addRow(_('Connections to host'),
+	(new CComboBox('tls_connect', $data['tls_connect'], null, [
+		HOST_ENCRYPTION_NONE => _('No encryption'),
+		HOST_ENCRYPTION_PSK => _('PSK'),
+		HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
+	]))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+);
 $encryptionFormList->addRow(_('Connections from host'), [
-	[new CCheckBox('tls_in_none'), _('No encryption')],
+	[(new CCheckBox('tls_in_none'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('No encryption')],
 	BR(),
-	[new CCheckBox('tls_in_psk'), _('PSK')],
+	[(new CCheckBox('tls_in_psk'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('PSK')],
 	BR(),
-	[new CCheckBox('tls_in_cert'), _('Certificate')]
+	[(new CCheckBox('tls_in_cert'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('Certificate')]
 ]);
 $encryptionFormList->addRow(_('PSK identity'),
-	(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 128))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 $encryptionFormList->addRow(_('PSK'),
-	(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CTextBox('tls_psk', $data['tls_psk'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 512))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 $encryptionFormList->addRow(_('Issuer'),
-	(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CTextBox('tls_issuer', $data['tls_issuer'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 1024))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 $encryptionFormList->addRow(_('Subject'),
-	(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CTextBox('tls_subject', $data['tls_subject'], ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED), 1024))
+		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
 );
 
 $divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
