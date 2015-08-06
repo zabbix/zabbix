@@ -98,10 +98,6 @@ const char	*help_message[] = {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"",
 	"  zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" \\",
-	"    --tls-connect psk --tls-psk-identity \"PSK ID Zabbix agentd\" \\",
-	"    --tls-psk-file /home/zabbix/zabbix_agentd.psk",
-	"",
-	"  zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" \\",
 	"    --tls-connect cert --tls-ca-file /home/zabbix/zabbix_ca_file \\",
 	"    --tls-agent-cert-issuer \\",
 	"    \"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
@@ -109,6 +105,10 @@ const char	*help_message[] = {
 	"    \"CN=server1,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
 	"    --tls-cert-file /home/zabbix/zabbix_get.crt \\",
 	"    --tls-key-file /home/zabbix/zabbix_get.key",
+	"",
+	"  zabbix_get -s 127.0.0.1 -p " ZBX_DEFAULT_AGENT_PORT_STR " -k \"system.cpu.load[all,avg1]\" \\",
+	"    --tls-connect psk --tls-psk-identity \"PSK ID Zabbix agentd\" \\",
+	"    --tls-psk-file /home/zabbix/zabbix_agentd.psk",
 #endif
 	NULL	/* end of text */
 };
