@@ -327,4 +327,11 @@ unsigned int	zbx_isqrt32(unsigned int value);
 
 int	evaluate(double *value, const char *expression, char *error, int max_error_len);
 
+/* forecasting */
+
+int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit, char *mode, double *result,
+	char **error);
+int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char *fit, double *result,
+	char **error);
+
 #endif
