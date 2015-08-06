@@ -23,8 +23,8 @@
 static const char	copyright_message[] =
 	"Copyright (C) 2015 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
-	"This is free software: you are free to change and redistribute it according to the license.\n"
-	"There is NO WARRANTY, to the extent permitted by law.";
+	"This is free software: you are free to change and redistribute it according to\n"
+	"the license. There is NO WARRANTY, to the extent permitted by law.";
 
 static const char	help_message_footer[] =
 	"Report bugs to: <https://support.zabbix.com>\n"
@@ -33,9 +33,10 @@ static const char	help_message_footer[] =
 
 /******************************************************************************
  *                                                                            *
- * Function: app_title                                                        *
+ * Function: version                                                          *
  *                                                                            *
- * Purpose: print title of application on stdout                              *
+ * Purpose: print version and compilation time of application on stdout       *
+ *          by application request with parameter '-V'                        *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -43,24 +44,9 @@ static const char	help_message_footer[] =
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-static void	app_title(void)
-{
-	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: version                                                          *
- *                                                                            *
- * Purpose: print version and compilation time of application on stdout       *
- *          by application request with parameter '-v'                        *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- ******************************************************************************/
 void	version(void)
 {
-	app_title();
+	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
 }
@@ -93,28 +79,22 @@ void	usage(void)
 		size_t	pos;
 
 		printf("%s%s", ZBX_SPACE1, progname);
-		pos = strlen(ZBX_SPACE1) + strlen(progname);
+		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(progname);
 
 		while (NULL != *p)
 		{
 			size_t	len;
 
-			if (ZBX_MAXCOL <= pos)
-			{
-				printf("\n%s", ZBX_SPACE2);
-				pos = strlen(ZBX_SPACE2);
-			}
-
 			len = strlen(*p);
 
-			if (ZBX_MAXCOL > (pos + len))
+			if (ZBX_MAXCOL > pos + len)
 			{
 				pos += len + 1;
 				printf(" %s", *p);
 			}
 			else
 			{
-				pos = strlen(ZBX_SPACE2) + len + 1;
+				pos = ZBX_CONST_STRLEN(ZBX_SPACE2) + len + 1;
 				printf("\n%s %s", ZBX_SPACE2, *p);
 			}
 
