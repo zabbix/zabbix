@@ -157,7 +157,7 @@ void	init_collector_data()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	cpu_count = zbx_get_cpu_num();
-	sz = sizeof(ZBX_COLLECTOR_DATA);
+	sz = ZBX_SIZE_T_ALIGN8(sizeof(ZBX_COLLECTOR_DATA));
 
 #ifdef _WINDOWS
 	sz_cpu = sizeof(PERF_COUNTER_DATA *) * (cpu_count + 1);
@@ -165,7 +165,7 @@ void	init_collector_data()
 	collector = zbx_malloc(collector, sz + sz_cpu);
 	memset(collector, 0, sz + sz_cpu);
 
-	collector->cpus.cpu_counter = (PERF_COUNTER_DATA **)(collector + 1);
+	collector->cpus.cpu_counter = (PERF_COUNTER_DATA **)((char *)collector + sz);
 	collector->cpus.count = cpu_count;
 #else
 	sz_cpu = sizeof(ZBX_SINGLE_CPU_STAT_DATA) * (cpu_count + 1);
@@ -188,7 +188,7 @@ void	init_collector_data()
 		exit(EXIT_FAILURE);
 	}
 
-	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)(collector + 1);
+	collector->cpus.cpu = (ZBX_SINGLE_CPU_STAT_DATA *)((char *)collector + sz);
 	collector->cpus.count = cpu_count;
 	collector->diskstat_shmid = ZBX_NONEXISTENT_SHMID;
 
