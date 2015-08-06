@@ -132,8 +132,8 @@ static int	zbx_transpose_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 
 static void	zbx_matrix_swap_rows(zbx_matrix_t *m, int r1, int r2)
 {
-	int	i;
 	double	tmp;
+	int	i;
 
 	for (i = 0; i < m->columns; ++i)
 	{
@@ -162,9 +162,8 @@ static void	zbx_matrix_add_rows_with_factor(zbx_matrix_t *m, int dest, int src, 
 static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 {
 	zbx_matrix_t	*l;
-	int		i, j, k, n;
 	double		pivot, factor, det;
-	int		res;
+	int		i, j, k, n, res;
 
 	if (!ZBX_VALID_MATRIX(m))
 	{
@@ -296,8 +295,8 @@ out:
 
 static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t *result, char **error)
 {
-	int	i, j, k;
 	double	element;
+	int	i, j, k;
 
 	if (!ZBX_VALID_MATRIX(left) || !ZBX_VALID_MATRIX(right))
 	{
@@ -340,10 +339,7 @@ static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent,
 	/* coefficients = inverse( transpose( independent ) * independent ) * transpose( independent ) * dependent */
 	/*                |<------------------left_part------------------>|   |<-----------right_part----------->| */
 	/*           we change order of matrix multiplication to reduce operation count and memory usage           */
-	zbx_matrix_t	*independent_transposed;
-	zbx_matrix_t	*to_be_inverted;
-	zbx_matrix_t	*left_part;
-	zbx_matrix_t	*right_part;
+	zbx_matrix_t	*independent_transposed, *to_be_inverted, *left_part, *right_part;
 	int		res;
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&independent_transposed) ||
@@ -444,8 +440,8 @@ static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char
 
 static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, char **error)
 {
-	int	i, j, k;
 	double	element;
+	int	i, j, k;
 
 	if (NULL == t || 0 >= n)
 	{
@@ -528,8 +524,7 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 
 static int	zbx_regression(double *t, double *x, int n, char *fit, zbx_matrix_t *coefficients, char **error)
 {
-	zbx_matrix_t	*independent;
-	zbx_matrix_t	*dependent;
+	zbx_matrix_t	*independent, *dependent;
 	int		res;
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&independent) ||
@@ -570,9 +565,8 @@ out:
 
 static double	zbx_polynomial_value(double t, zbx_matrix_t *coefficients)
 {
+	double	pow = 1.0, res = 0.0;
 	int	i;
-	double	pow = 1.0;
-	double	res = 0.0;
 
 	for (i = 0; i < coefficients->rows; ++i, pow *= t)
 		res += ZBX_MATRIX_EL(coefficients, i, 0) * pow;
@@ -582,9 +576,8 @@ static double	zbx_polynomial_value(double t, zbx_matrix_t *coefficients)
 
 static double	zbx_polynomial_antiderivative(double t, zbx_matrix_t *coefficients)
 {
+	double	pow = t, res = 0.0;
 	int	i;
-	double	pow = t;
-	double	res = 0.0;
 
 	for (i = 0; i < coefficients->rows; ++i, pow *= t)
 		res += ZBX_MATRIX_EL(coefficients, i, 0) * pow / (i + 1);
@@ -636,16 +629,10 @@ while(0)
 
 static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots, char **error)
 {
-	zbx_matrix_t	*denominator_multiplicands;
-	zbx_matrix_t	*updates;
-	double		z[2], mult[2], denominator[2], zpower[2], polynomial[2];
-	double		lower_bound, upper_bound, radius;
-	double		temp;
-	int		i, j, iteration = 0;
-	int		res, roots_ok = 0, root_init = 0;
-	int		degree;
-	double		highest_degree_coefficient;
-	double		max_update, min_distance, residual;
+	zbx_matrix_t	*denominator_multiplicands, *updates;
+	double		z[2], mult[2], denominator[2], zpower[2], polynomial[2], highest_degree_coefficient,
+			lower_bound, upper_bound, radius, max_update, min_distance, residual, temp;
+	int		i, j, degree, res, iteration = 0, roots_ok = 0, root_init = 0;
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
@@ -851,11 +838,9 @@ out:
 static int	zbx_polynomial_minmax(double now, double time, char *mode, zbx_matrix_t *coefficients, double *result,
 		char **error)
 {
-	zbx_matrix_t	*derivative;
-	zbx_matrix_t	*derivative_roots;
+	zbx_matrix_t	*derivative, *derivative_roots;
 	double		min, max, tmp;
-	int		i;
-	int		res;
+	int		i, res;
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
@@ -934,11 +919,9 @@ out:
 static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *coefficients, double *result,
 		char **error)
 {
-	zbx_matrix_t	*shifted_coefficients;
-	zbx_matrix_t	*roots;
+	zbx_matrix_t	*shifted_coefficients, *roots;
 	double		tmp;
-	int		i, no_root = 1;
-	int		res;
+	int		i, res, no_root = 1;
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
