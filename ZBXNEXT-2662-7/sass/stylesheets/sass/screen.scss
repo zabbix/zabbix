@@ -1326,6 +1326,59 @@ footer {
 
 }
 
+.radio-segmented {
+
+	li {
+		display: inline-block;
+		margin: 0 -1px 0 0;
+
+		&:first-child label {
+			@include border-radius(2px 0 0 2px);
+		}
+
+		&:last-child label {
+			@include border-radius(0 2px 2px 0);
+		}
+	}
+
+	label {
+		padding: 4px 11px;
+		border: 1px solid $form-border-color;
+		@include transition(background-color .2s ease-out);
+	}
+
+	input[type="radio"] {
+		position: absolute;
+		clip: rect(1px, 1px, 1px, 1px);
+
+		+ label {
+			color: $font-color;
+			border-color: $form-border-color;
+			background-color: $form-bg-color;
+
+			&:hover {
+				background-color: $ui-hover-color;
+			}
+
+			&:focus {
+				background-color: $ui-hover-color;
+				border: 1px solid $form-border-focus-color;
+				position: relative;
+			}
+
+			&:active {
+				background-color: $ui-hover-color;
+			}
+		}
+
+		&:checked + label {
+			color: $white;
+			border-color: $form-border-color;
+			background-color: $ui-bg-selected-color;
+		}
+	}
+}
+
 label {
 	input[type="checkbox"] {
 		margin-right: 3px;
@@ -3132,4 +3185,17 @@ $browser-logos: (
 .rel-container {
 	position: relative;
 	display: inline-block;
+}
+
+.server-name {
+	position: absolute;
+	z-index: 100;
+	top: 36px;
+	right: 13px;
+	padding: 2px 4px;
+	max-width: 180px;
+	display: inline-block;
+	border-top: 1px solid darken($lighter-yellow, 45%);
+	background-color: $lighter-yellow;
+	@extend %overflow-ellipsis;
 }
