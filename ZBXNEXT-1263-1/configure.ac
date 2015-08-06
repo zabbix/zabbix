@@ -1391,6 +1391,8 @@ if test "x$want_openssl" = "xyes"; then
 
 	if test "x$found_openssl" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library libssl not found])
+	elif test "x$accept_openssl_version" != "xyes"; then
+		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
 		have_tls="OpenSSL"
 	fi
