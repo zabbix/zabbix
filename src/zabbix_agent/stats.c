@@ -228,6 +228,10 @@ void	free_collector_data()
 	if (NULL == collector)
 		return;
 
+#ifdef ZBX_PROCSTAT_COLLECTOR
+	zbx_procstat_destroy(&collector->procstat);
+#endif
+
 	if (ZBX_NONEXISTENT_SHMID != collector->diskstat_shmid)
 	{
 		if (-1 == shmctl(collector->diskstat_shmid, IPC_RMID, 0))
