@@ -978,6 +978,28 @@ void	zbx_procstat_init()
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_procstat_destroy                                             *
+ *                                                                            *
+ * Purpose: destroys process statistics collector                             *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_procstat_destroy()
+{
+	char	*errmsg = NULL;
+
+	if (SUCCEED != zbx_dshm_destroy(&collector->procstat, &errmsg))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot free resources allocated by process data collector: %s", errmsg);
+		zbx_free(errmsg);
+	}
+
+	procstat_ref.shmid = ZBX_NONEXISTENT_SHMID;
+	procstat_ref.addr = NULL;
+}
+
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_procstat_get_util                                            *
  *                                                                            *
  * Purpose: gets process cpu utilization                                      *
