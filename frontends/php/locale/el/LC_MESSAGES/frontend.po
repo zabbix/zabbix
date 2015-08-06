@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-18 12:31+0300\n"
+"POT-Creation-Date: 2015-08-06 12:00+0300\n"
 "PO-Revision-Date: 2014-01-20 10:54+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -15612,7 +15612,7 @@ msgstr "[Λάθος τιμή μήνα: \"%s\" ]"
 msgid "agent"
 msgstr "αντιπρόσωπος"
 
-#: include/classes/class.cpagefilter.php:916
+#: include/classes/class.cpagefilter.php:940
 #: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
@@ -15733,7 +15733,7 @@ msgstr "ημέρες"
 msgid "dd"
 msgstr "ηη"
 
-#: include/classes/class.cpagefilter.php:780 include/setup.inc.php:420
+#: include/classes/class.cpagefilter.php:804 include/setup.inc.php:420
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:14
 msgid "default"
@@ -15951,8 +15951,8 @@ msgstr "όχι ώς"
 msgid "not running"
 msgstr "δεν λειτουργεί"
 
-#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:833
-#: include/classes/class.cpagefilter.php:916 include/forms.inc.php:1168
+#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:857
+#: include/classes/class.cpagefilter.php:940 include/forms.inc.php:1168
 msgid "not selected"
 msgstr "δεν επιλέχθηκε"
 
