@@ -43,6 +43,23 @@ AC_TRY_LINK(
 found_openssl="yes",)
 ])dnl
 
+AC_DEFUN([LIBOPENSSL_ACCEPT_VERSION],
+[
+	# Zabbix minimal supported version of OpenSSL.
+	# Version numbering scheme is described in /usr/include/openssl/opensslv.h. Specify version number without the
+	# last byte (status). E.g., version 1.0.1 is 0x1000100f, but without the last byte it is 0x1000100.
+	minimal_openssl_version=0x1000100
+
+	# get version
+	found_openssl_version=`$AWK '/^\#[ \t]*define[ \t]+OPENSSL_VERSION_NUMBER[ \t]/ {gsub(/^.*OPENSSL_VERSION_NUMBER[ \t]+/,""); gsub(/L[ \t]*$/,""); gsub(/[0-9abcdef]$/,""); print;}' "$1"`
+
+	if test $((found_openssl_version)) -ge $((minimal_openssl_version)); then
+		accept_openssl_version="yes"
+	else
+		accept_openssl_version="no"
+	fi;
+])dnl
+
 AC_DEFUN([LIBOPENSSL_CHECK_CONFIG],
 [
   AC_ARG_WITH(openssl,[
@@ -59,6 +76,7 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
 	    want_openssl="yes"
 	    _libopenssl_dir=$withval
 	fi
+	accept_openssl_version="no"
     ],[want_openssl=ifelse([$1],,[no],[$1])]
   )
 
@@ -70,11 +88,13 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
          OPENSSL_LDFLAGS=-L/usr/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
+         LIBOPENSSL_ACCEPT_VERSION([/usr/include/openssl/opensslv.h])
        elif test -f /usr/local/include/openssl/ssl.h -a -f /usr/local/include/openssl/crypto.h; then
          OPENSSL_CFLAGS=-I/usr/local/include
          OPENSSL_LDFLAGS=-L/usr/local/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
+         LIBOPENSSL_ACCEPT_VERSION([/usr/local/include/openssl/opensslv.h])
        else						# libraries are not found in default directories
          found_openssl="no"
          AC_MSG_RESULT(no)
@@ -85,8 +105,9 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
          OPENSSL_LDFLAGS=-L$_libopenssl_dir/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
+         LIBOPENSSL_ACCEPT_VERSION([$_libopenssl_dir/include/openssl/opensslv.h])
        else						# libraries are not found in specified directories
-         found_libssl="no"
+         found_openssl="no"
          AC_MSG_RESULT(no)
        fi
      fi
