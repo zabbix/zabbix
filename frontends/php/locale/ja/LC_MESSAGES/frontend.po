@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:15+0300\n"
-"PO-Revision-Date: 2015-03-23 04:29+0300\n"
+"POT-Creation-Date: 2015-08-06 12:16+0300\n"
+"PO-Revision-Date: 2015-08-06 03:08+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1427077783.0\n"
+"X-POOTLE-MTIME: 1438823309.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -13567,7 +13567,7 @@ msgstr "テンプレートを追加しました"
 
 #: include/classes/api/services/CHostBase.php:294
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "テンプレートは複数のテンプレートとリンクすることはできません(他のテンプレート経由でも不可)。"
+msgstr "他のテンプレートを介しても同じテンプレートを複数回リンクすることはできません。"
 
 #: templates.php:374 templates.php:388 templates.php:413
 msgid "Template deleted"

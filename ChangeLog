@@ -2,7 +2,7 @@ Changes for 2.4.6rc1
 
 New features:
 A.F....... [ZBX-1357] enabled Czech locale to be displayed by default (Richlv)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (Taiwan), Czech, Dutch and Spanish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Chinese (Taiwan), Czech, Dutch, Japanese and Spanish translations; thanks to Zabbix translators (Richlv)
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 
 Bug fixes:
@@ -639,6 +639,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.10rc2
 
 New features:
+A.F....... [ZBX-1357] updated Japanese translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
@@ -1909,7 +1910,7 @@ Changes for 2.0.15rc1
 New features:
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
-A.F....... [ZBX-1357] updated Czech and Polish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech, Japanese and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
