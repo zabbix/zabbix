@@ -4,14 +4,12 @@
 		jQuery('#status').change(function() {
 			if (jQuery(this).val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
 				jQuery('#ip').closest('li').hide();
-				jQuery('#tls_in_none').closest('li').removeClass('hidden');
-				jQuery('#tls_connect').closest('li').addClass('hidden');
 			}
 			else {
 				jQuery('#ip').closest('li').show();
-				jQuery('#tls_in_none').closest('li').addClass('hidden');
-				jQuery('#tls_connect').closest('li').removeClass('hidden');
 			}
+
+			toggleEncryptionFieldsByStatus();
 		});
 
 		// clone button, special processing because of list of hosts
@@ -28,22 +26,7 @@
 		});
 
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
-			// If certificate is selected or checked.
-			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
-					|| jQuery('#tls_in_cert').is(':checked')) {
-				jQuery('#tls_issuer, #tls_subject').closest('li').show();
-			}
-			else {
-				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
-			}
-
-			// If PSK is selected or checked.
-			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?> || jQuery('#tls_in_psk').is(':checked')) {
-				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
-			}
-			else {
-				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
-			}
+			toggleEncryptionAdditionalFields();
 		});
 
 		// Refresh field visibility on document load.
@@ -84,5 +67,43 @@
 
 		// Refresh field visibility on document load.
 		jQuery('#status').trigger('change');
+		toggleEncryptionFieldsByStatus();
+
+		function toggleEncryptionFieldsByStatus() {
+			if (jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
+				jQuery('#tls_connect').prop('disabled', true);
+				jQuery('#tls_in_none, #tls_in_psk, #tls_in_cert').prop('disabled', false);
+			}
+			else {
+				jQuery('#tls_connect').prop('disabled', false);
+				jQuery('#tls_in_none, #tls_in_psk, #tls_in_cert').prop('disabled', true);
+			}
+
+			toggleEncryptionAdditionalFields();
+		}
+
+		function toggleEncryptionAdditionalFields() {
+			// If certificate is selected or checked.
+			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
+					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
+					|| (jQuery('#tls_in_cert').is(':checked'))
+					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
+				jQuery('#tls_issuer, #tls_subject').closest('li').show();
+			}
+			else {
+				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
+			}
+
+			// If PSK is selected or checked.
+			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?>
+					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
+					|| (jQuery('#tls_in_psk').is(':checked'))
+					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
+			}
+			else {
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
+			}
+		}
 	});
 </script>
