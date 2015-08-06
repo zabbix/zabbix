@@ -102,9 +102,7 @@ zbx_procstat_header_t;
 
 #define PROCSTAT_NULL_OFFSET		0
 
-#define PROCSTAT_ALIGNED_SIZE(size)	(((size) + 7) & ~7)
-
-#define PROCSTAT_ALIGNED_HEADER_SIZE	PROCSTAT_ALIGNED_SIZE(sizeof(zbx_procstat_header_t))
+#define PROCSTAT_ALIGNED_HEADER_SIZE	ZBX_SIZE_T_ALIGN8(sizeof(zbx_procstat_header_t))
 
 #define PROCSTAT_PTR(base, offset)	((char *)base + offset)
 
@@ -234,7 +232,7 @@ static int	procstat_alloc(void *base, size_t size)
 	zbx_procstat_header_t	*header = (zbx_procstat_header_t *)base;
 	int			offset;
 
-	size = PROCSTAT_ALIGNED_SIZE(size);
+	size = ZBX_SIZE_T_ALIGN8(size);
 
 	if (FAIL == procstat_dshm_has_enough_space(header, size))
 	{
@@ -510,13 +508,13 @@ static void	procstat_add(const char *procname, const char *username, const char 
 
 	/* reserve space for process attributes */
 	if (NULL != procname)
-		size += PROCSTAT_ALIGNED_SIZE(strlen(procname) + 1);
+		size += ZBX_SIZE_T_ALIGN8(strlen(procname) + 1);
 
 	if (NULL != username)
-		size += PROCSTAT_ALIGNED_SIZE(strlen(username) + 1);
+		size += ZBX_SIZE_T_ALIGN8(strlen(username) + 1);
 
 	if (NULL != cmdline)
-		size += PROCSTAT_ALIGNED_SIZE(strlen(cmdline) + 1);
+		size += ZBX_SIZE_T_ALIGN8(strlen(cmdline) + 1);
 
 	/* reserve space for process cpu utilization snapshot */
 	size += sizeof(zbx_procstat_util_t) * 32;
@@ -527,7 +525,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 
 	/* reserve space for a new query only if there are no freed queries */
 	if (NULL == header || PROCSTAT_NULL_OFFSET == header->free_queries)
-		size += PROCSTAT_ALIGNED_SIZE(sizeof(zbx_procstat_query_t));
+		size += ZBX_SIZE_T_ALIGN8(sizeof(zbx_procstat_query_t));
 
 	if (NULL == header || FAIL == procstat_dshm_has_enough_space(header, size))
 	{
