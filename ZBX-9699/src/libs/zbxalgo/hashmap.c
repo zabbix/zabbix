@@ -29,6 +29,8 @@ static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *s
 
 #define ARRAY_GROWTH_FACTOR	2 /* because the number of slot entries is usually small, with 3/2 they grow too slow */
 
+#define ZBX_HASHMAP_DEFAULT_SLOTS	10
+
 /* private hashmap functions */
 
 static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *slot)
@@ -43,6 +45,23 @@ static void	__hashmap_ensure_free_entry(zbx_hashmap_t *hm, ZBX_HASHMAP_SLOT_T *s
 	{
 		slot->entries_alloc = MAX(slot->entries_alloc + 1, slot->entries_alloc * ARRAY_GROWTH_FACTOR);
 		slot->entries = hm->mem_realloc_func(slot->entries, slot->entries_alloc * sizeof(ZBX_HASHMAP_ENTRY_T));
+	}
+}
+
+static void	zbx_hashmap_init_slots(zbx_hashmap_t *hm, size_t init_size)
+{
+	hm->num_data = 0;
+
+	if (0 < init_size)
+	{
+		hm->num_slots = next_prime(init_size);
+		hm->slots = hm->mem_malloc_func(NULL, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
+		memset(hm->slots, 0, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
+	}
+	else
+	{
+		hm->num_slots = 0;
+		hm->slots = NULL;
 	}
 }
 
@@ -65,17 +84,13 @@ void	zbx_hashmap_create_ext(zbx_hashmap_t *hm, size_t init_size,
 				zbx_mem_realloc_func_t mem_realloc_func,
 				zbx_mem_free_func_t mem_free_func)
 {
-	hm->num_data = 0;
-	hm->num_slots = next_prime(init_size);
-
-	hm->slots = mem_malloc_func(NULL, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
-	memset(hm->slots, 0, hm->num_slots * sizeof(ZBX_HASHMAP_SLOT_T));
-
 	hm->hash_func = hash_func;
 	hm->compare_func = compare_func;
 	hm->mem_malloc_func = mem_malloc_func;
 	hm->mem_realloc_func = mem_realloc_func;
 	hm->mem_free_func = mem_free_func;
+
+	zbx_hashmap_init_slots(hm, init_size);
 }
 
 void	zbx_hashmap_destroy(zbx_hashmap_t *hm)
@@ -89,8 +104,11 @@ void	zbx_hashmap_destroy(zbx_hashmap_t *hm)
 	hm->num_data = 0;
 	hm->num_slots = 0;
 
-	hm->mem_free_func(hm->slots);
-	hm->slots = NULL;
+	if (NULL != hm->slots)
+	{
+		hm->mem_free_func(hm->slots);
+		hm->slots = NULL;
+	}
 
 	hm->hash_func = NULL;
 	hm->compare_func = NULL;
@@ -125,6 +143,9 @@ void	zbx_hashmap_set(zbx_hashmap_t *hm, zbx_uint64_t key, int value)
 	int			i;
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
+
+	if (0 == hm->num_slots)
+		zbx_hashmap_init_slots(hm, ZBX_HASHMAP_DEFAULT_SLOTS);
 
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
@@ -188,6 +209,9 @@ void	zbx_hashmap_remove(zbx_hashmap_t *hm, zbx_uint64_t key)
 	int			i;
 	zbx_hash_t		hash;
 	ZBX_HASHMAP_SLOT_T	*slot;
+
+	if (0 == hm->num_slots)
+		return;
 
 	hash = hm->hash_func(&key);
 	slot = &hm->slots[hash % hm->num_slots];
