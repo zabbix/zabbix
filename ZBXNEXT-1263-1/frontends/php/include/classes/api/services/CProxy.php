@@ -670,10 +670,10 @@ class CProxy extends CApiService {
 		];
 
 		if (array_key_exists('tls_connect', $data) && !in_array($data['tls_connect'], $available_connect_types)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to host field.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to proxy field.'));
 		}
 		if (array_key_exists('tls_accept', $data) && !in_array($data['tls_accept'], $available_accept_types)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from host field.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from proxy field.'));
 		}
 
 		// psk validation
@@ -687,9 +687,9 @@ class CProxy extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
 			}
 			if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $data['tls_psk'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _(
+					'Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters.'
+				));
 			}
 		}
 	}
