@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 1 "2015\-06\-10" Zabbix
+.TH ZABBIX_SENDER 1 "2015\-08\-06" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility
@@ -119,7 +119,7 @@ zabbix_sender \- Zabbix sender utility
 .B \-\-tls\-cert\-file
 .I cert\-file
 .B \-\-tls\-key\-file
-.I key_file
+.I key\-file
 .RB [ \-T ]
 .RB [ \-r ]
 .B \-i
@@ -327,7 +327,7 @@ If target item has triggers referencing it, all timestamps must be in an increas
 Send values one by one as soon as they are received.
 This can be used when reading from standard input.
 .IP "\fB\-\-tls\-connect\fR \fIvalue\fR"
-How to connect to agent. Values:\fR
+How to connect to server or proxy. Values:\fR
 .SS
 .RS 12
 .TP 12
@@ -392,7 +392,7 @@ Send \fB342.45\fR as the value for \fBmysql.queries\fR item in \fBMonitored Host
 Send \fB342.45\fR as the value for \fBmysql.queries\fR item in \fBMonitored Host\fR host to server with IP \fB192.168.1.113\fR using TLS with certificate.
 .RE
 
-\fBzabbix_sender \-z 192.168.1.113  \-s "Monitored Host" \-k mysql.queries \-o 342.45 \-\-tls\-connect psk \-\-tls\-psk\-identity "PSK ID Zabbix sender" \-\-tls\-psk\-file /home/zabbix/zabbix_agentd.psk\fR
+\fBzabbix_sender \-z 192.168.1.113  \-s "Monitored Host" \-k mysql.queries \-o 342.45 \-\-tls\-connect psk \-\-tls\-psk\-identity "PSK ID Zabbix agentd" \-\-tls\-psk\-file /home/zabbix/zabbix_agentd.psk\fR
 .br
 .RS
 Send \fB342.45\fR as the value for \fBmysql.queries\fR item in \fBMonitored Host\fR host to server with IP \fB192.168.1.113\fR using TLS with pre-shared key (PSK).
