@@ -39,7 +39,7 @@ class CControllerProxyEdit extends CController {
 			'description' =>	'db       hosts.description',
 			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				HOST_ENCRYPTION_CERTIFICATE,
-			'tls_accept' => 	'db       hosts.tls_accept     |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+			'tls_accept' => 	'db       hosts.tls_accept     |in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK).','.
 				HOST_ENCRYPTION_CERTIFICATE.','.
 				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_CERTIFICATE).','.
