@@ -296,7 +296,7 @@ First entry from the \fBServerActive\fR parameter is used.
 .IP "\fB\-z\fR, \fB\-\-zabbix\-server\fR \fIserver\fR"
 Hostname or IP address of Zabbix server.
 If a host is monitored by a proxy, proxy hostname or IP address should be used instead.
-When used together with \fB\-\-config\fR, overrides first entry of \fBServerActive\fR parameter specified in agentd configuration file.
+When used together with \fB\-\-config\fR, overrides the first entry of \fBServerActive\fR parameter specified in agentd configuration file.
 .IP "\fB\-p\fR, \fB\-\-port\fR \fIport\fR"
 Specify port number of Zabbix server trapper running on the server.
 Default is 10051.
