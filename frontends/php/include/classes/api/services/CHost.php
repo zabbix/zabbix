@@ -1667,9 +1667,9 @@ class CHost extends CHostGeneral {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
 			}
 			if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $data['tls_psk'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('Incorrect value used for PSK field. Only hexadecimal characters are supported.')
-				);
+				self::exception(ZBX_API_ERROR_PARAMETERS, _(
+					'Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters.'
+				));
 			}
 		}
 	}
