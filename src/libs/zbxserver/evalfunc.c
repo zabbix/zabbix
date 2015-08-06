@@ -1883,7 +1883,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 		char **error)
 {
 	const char			*__function_name = "evaluate_FORECAST";
-	char				*fit = NULL *mode = NULL;
+	char				*fit = NULL, *mode = NULL;
 	double				*t = NULL, *x = NULL, prediction;
 	int				nparams, time, time_flag, arg2, flag, i, ret = FAIL, seconds = 0, nvalues = 0;
 	zbx_vector_history_record_t	values;
@@ -2251,11 +2251,11 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	}
 	else if (0 == strcmp(function, "forecast"))
 	{
-		ret = evaluate_FORECAST(value, item, function, parameter, now);
+		ret = evaluate_FORECAST(value, item, function, parameter, now, error);
 	}
 	else if (0 == strcmp(function, "timeleft"))
 	{
-		ret = evaluate_TIMELEFT(value, item, function, parameter, now);
+		ret = evaluate_TIMELEFT(value, item, function, parameter, now, error);
 	}
 	else
 	{
