@@ -281,14 +281,6 @@ $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 $conditionFormList = new CFormList();
 
 // type of calculation
-$formula = (new CTextBox('formula', $this->data['formula']))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setId('formula')
-	->setAttribute('placeholder', 'A or (B and C) &hellip;');
-
-if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
-	$formula->addClass('hidden');
-}
 $conditionFormList->addRow(_('Type of calculation'),
 	[
 		new CComboBox('evaltype', $this->data['evaltype'], null, [
@@ -297,12 +289,15 @@ $conditionFormList->addRow(_('Type of calculation'),
 			CONDITION_EVAL_TYPE_OR => _('Or'),
 			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 		]),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan(''))
-			->addClass($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION ? 'hidden' : '')
 			->setId('expression'),
-		$formula
+		(new CTextBox('formula', $this->data['formula']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('formula')
+			->setAttribute('placeholder', 'A or (B and C) &hellip;')
 	],
-	(count($this->data['conditions']) < 2), 'conditionRow'
+	'conditionRow'
 );
 
 // macros
