@@ -198,7 +198,7 @@ else {
 	// sort alerts in chronological order so we could easily iterate through them later
 	CArrayHelper::sort($alerts, ['clock']);
 
-	$table->setHeader($header, 'vertical_header');
+	$table->setHeader($header);
 	foreach ($intervals as $from => $till) {
 		// interval start
 		$row = [zbx_date2str($dateFormat, $from)];
