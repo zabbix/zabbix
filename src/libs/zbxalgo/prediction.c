@@ -209,17 +209,11 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 	if (ZBX_MATH_OK != zbx_identity_matrix(r, n, error))
 		return ZBX_MATH_FAIL;
 
-	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&l))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_matrix_struct_alloc(&l)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_matrix_copy(l, m, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_matrix_copy(l, m, error)))
 		goto out;
-	}
 
 	/* Gauss-Jordan elimination with partial (row) pivoting */
 	for (i = 0; i < n; ++i)
@@ -335,37 +329,21 @@ static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent,
 		goto out;
 	}
 
-	if (ZBX_MATH_OK != zbx_transpose_matrix(independent, independent_transposed, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_transpose_matrix(independent, independent_transposed, error)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_matrix_mult(independent_transposed, independent, to_be_inverted, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_matrix_mult(independent_transposed, independent, to_be_inverted, error)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_inverse_matrix(to_be_inverted, left_part, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_inverse_matrix(to_be_inverted, left_part, error)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_matrix_mult(independent_transposed, dependent, right_part, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_matrix_mult(independent_transposed, dependent, right_part, error)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_matrix_mult(left_part, right_part, coefficients, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_matrix_mult(left_part, right_part, coefficients, error)))
 		goto out;
-	}
 
-	res = ZBX_MATH_OK;
 out:
 	zbx_matrix_free(independent_transposed);
 	zbx_matrix_free(to_be_inverted);
@@ -490,25 +468,15 @@ static int	zbx_regression(double *t, double *x, int n, char *fit, zbx_matrix_t *
 		goto out;
 	}
 
-	if (ZBX_MATH_OK != zbx_fill_independent(t, n, fit, independent, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_fill_independent(t, n, fit, independent, error)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_fill_dependent(x, n, fit, dependent, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_fill_dependent(x, n, fit, dependent, error)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_least_squares(independent, dependent, coefficients, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_least_squares(independent, dependent, coefficients, error)))
 		goto out;
-	}
 
-	res = ZBX_MATH_OK;
 out:
 	zbx_matrix_free(independent);
 	zbx_matrix_free(dependent);
@@ -805,17 +773,11 @@ static int	zbx_polynomial_minmax(double now, double time, char *mode, zbx_matrix
 		goto out;
 	}
 
-	if (ZBX_MATH_OK != zbx_derive_polynomial(coefficients, derivative, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_derive_polynomial(coefficients, derivative, error)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_polynomial_roots(derivative, derivative_roots, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_polynomial_roots(derivative, derivative_roots, error)))
 		goto out;
-	}
 
 	/* choose min and max among now, now + time and derivative roots inbetween (these are potential local extrema) */
 	/* we ignore imaginary part of roots, this means that more calculations will be made, */
@@ -856,7 +818,6 @@ static int	zbx_polynomial_minmax(double now, double time, char *mode, zbx_matrix
 	else /* if (0 == strcmp(mode, "delta")) */
 		*result = max - min;
 
-	res = ZBX_MATH_OK;
 out:
 	zbx_matrix_free(derivative);
 	zbx_matrix_free(derivative_roots);
@@ -883,19 +844,13 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 		goto out;
 	}
 
-	if (ZBX_MATH_OK != zbx_matrix_copy(shifted_coefficients, coefficients, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_matrix_copy(shifted_coefficients, coefficients, error)))
 		goto out;
-	}
 
 	ZBX_MATRIX_EL(shifted_coefficients, 0, 0) -= threshold;
 
-	if (ZBX_MATH_OK != zbx_polynomial_roots(shifted_coefficients, roots, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_polynomial_roots(shifted_coefficients, roots, error)))
 		goto out;
-	}
 
 	/* choose the closest root right from now or set result to -1 otherwise */
 	/* if zbx_polynomial_value(tmp) is not close enough to zero it must be a complex root and must be skipped */
@@ -924,7 +879,6 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 	else
 		*result -= now;
 
-	res = ZBX_MATH_OK;
 out:
 	zbx_matrix_free(shifted_coefficients);
 	zbx_matrix_free(roots);
@@ -977,17 +931,11 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 	double		left, right;
 	int		res;
 
-	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&coefficients))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_matrix_struct_alloc(&coefficients)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_regression(t, x, n, fit, coefficients, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, coefficients, error)))
 		goto out;
-	}
 
 	if ('\0' == *mode || 0 == strcmp(mode, "value"))
 	{
@@ -1107,27 +1055,19 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 	double		current;
 	int		res;
 
-	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&coefficients))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_matrix_struct_alloc(&coefficients)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_regression(t, x, n, fit, coefficients, error))
-	{
-		res = ZBX_MATH_FAIL;
+	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, coefficients, error)))
 		goto out;
-	}
 
-	if (ZBX_MATH_OK != zbx_calculate_value(now, coefficients, fit, &current, error))
+	if (ZBX_MATH_OK != (res = zbx_calculate_value(now, coefficients, fit, &current, error)))
 	{
-		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 	else if (current == threshold)
 	{
 		*result = 0.0;
-		res = ZBX_MATH_OK;
 		goto out;
 	}
 
@@ -1135,7 +1075,6 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 	{
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) /
 				ZBX_MATRIX_EL(coefficients, 1, 0) - now : -1.0);
-		res = ZBX_MATH_OK;
 	}
 	else if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
 	{
@@ -1145,19 +1084,16 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 	{
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (log(threshold) -
 				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now : -1.0);
-		res = ZBX_MATH_OK;
 	}
 	else if (0 == strcmp(fit, "logarithmic"))
 	{
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((threshold -
 				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : -1.0);
-		res = ZBX_MATH_OK;
 	}
 	else if (0 == strcmp(fit, "power"))
 	{
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((log(threshold) -
 				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : -1.0);
-		res = ZBX_MATH_OK;
 	}
 	else
 	{
