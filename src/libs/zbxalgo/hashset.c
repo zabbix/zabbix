@@ -313,9 +313,6 @@ void	zbx_hashset_iter_reset(zbx_hashset_t *hs, zbx_hashset_iter_t *iter)
 
 void	*zbx_hashset_iter_next(zbx_hashset_iter_t *iter)
 {
-	if (0 == iter->hashset->num_slots)
-		return NULL;
-
 	if (ITER_FINISH == iter->slot)
 		return NULL;
 
