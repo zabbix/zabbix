@@ -1757,18 +1757,6 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 
 	$ZBX_MESSAGES = [];
 
-	$info_messages = [];
-	$error_messages = [];
-
-	foreach ($messages as $message) {
-		if ($message['type'] === 'error') {
-			$error_messages[] = $message;
-		}
-		else {
-			$info_messages[] = $message;
-		}
-	}
-
 	switch ($page['type']) {
 		case PAGE_TYPE_IMAGE:
 			if ($title !== null) {
@@ -1798,14 +1786,8 @@ function show_messages($good = false, $okmsg = null, $errmsg = null) {
 			break;
 		case PAGE_TYPE_HTML:
 		default:
-			if ($title || $info_messages || $error_messages) {
-				$top_messages = $good ? $info_messages : $error_messages;
-				$bottom_messages = $good ? $error_messages : $info_messages;
-
-				makeMessageBox($good, $top_messages, $title, true, !$good)->show();
-				if ($bottom_messages) {
-					makeMessageBox(!$good, $bottom_messages)->show();
-				}
+			if ($title || $messages) {
+				makeMessageBox($good, $messages, $title, true, !$good)->show();
 			}
 			break;
 	}

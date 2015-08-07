@@ -26,6 +26,7 @@ $widget = (new CWidget())->setTitle(_('Scripts'));
 
 $scriptForm = (new CForm())
 	->setId('scriptForm')
+	->setName('scripts')
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
