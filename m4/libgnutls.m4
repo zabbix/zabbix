@@ -81,18 +81,18 @@ AC_HELP_STRING([--with-gnutls@<:@=DIR@:>@],[use GnuTLS package @<:@default=no@:>
   if test "x$want_gnutls" = "xyes"; then
      AC_MSG_CHECKING(for GnuTLS support)
      if test "x$_libgnutls_dir" = "xno"; then
-       if test -f /usr/include/gnutls/gnutls.h; then
-         GNUTLS_CFLAGS=-I/usr/include
-         GNUTLS_LDFLAGS=-L/usr/lib
-         GNUTLS_LIBS="-lgnutls"
-         found_gnutls="yes"
-         LIBGNUTLS_ACCEPT_VERSION([/usr/include/gnutls/gnutls.h])
-       elif test -f /usr/local/include/gnutls/gnutls.h; then
+       if test -f /usr/local/include/gnutls/gnutls.h; then
          GNUTLS_CFLAGS=-I/usr/local/include
          GNUTLS_LDFLAGS=-L/usr/local/lib
          GNUTLS_LIBS="-lgnutls"
          found_gnutls="yes"
          LIBGNUTLS_ACCEPT_VERSION([/usr/local/include/gnutls/gnutls.h])
+       elif test -f /usr/include/gnutls/gnutls.h; then
+         GNUTLS_CFLAGS=-I/usr/include
+         GNUTLS_LDFLAGS=-L/usr/lib
+         GNUTLS_LIBS="-lgnutls"
+         found_gnutls="yes"
+         LIBGNUTLS_ACCEPT_VERSION([/usr/include/gnutls/gnutls.h])
        else #libraries are not found in default directories
          found_gnutls="no"
          AC_MSG_RESULT(no)

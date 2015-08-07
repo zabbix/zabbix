@@ -83,18 +83,18 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
   if test "x$want_openssl" = "xyes"; then
      AC_MSG_CHECKING(for OpenSSL support)
      if test "x$_libopenssl_dir" = "xno"; then		# if OpenSSL directory is not specified
-       if test -f /usr/include/openssl/ssl.h -a -f /usr/include/openssl/crypto.h; then
-         OPENSSL_CFLAGS=-I/usr/include
-         OPENSSL_LDFLAGS=-L/usr/lib
-         OPENSSL_LIBS="-lssl -lcrypto"
-         found_openssl="yes"
-         LIBOPENSSL_ACCEPT_VERSION([/usr/include/openssl/opensslv.h])
-       elif test -f /usr/local/include/openssl/ssl.h -a -f /usr/local/include/openssl/crypto.h; then
+       if test -f /usr/local/include/openssl/ssl.h -a -f /usr/local/include/openssl/crypto.h; then
          OPENSSL_CFLAGS=-I/usr/local/include
          OPENSSL_LDFLAGS=-L/usr/local/lib
          OPENSSL_LIBS="-lssl -lcrypto"
          found_openssl="yes"
          LIBOPENSSL_ACCEPT_VERSION([/usr/local/include/openssl/opensslv.h])
+       elif test -f /usr/include/openssl/ssl.h -a -f /usr/include/openssl/crypto.h; then
+         OPENSSL_CFLAGS=-I/usr/include
+         OPENSSL_LDFLAGS=-L/usr/lib
+         OPENSSL_LIBS="-lssl -lcrypto"
+         found_openssl="yes"
+         LIBOPENSSL_ACCEPT_VERSION([/usr/include/openssl/opensslv.h])
        else						# libraries are not found in default directories
          found_openssl="no"
          AC_MSG_RESULT(no)
