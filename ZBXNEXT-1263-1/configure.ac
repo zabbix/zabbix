@@ -1382,7 +1382,7 @@ if test "x$want_gnutls" = "xyes"; then
 	TLS_LIBS="$GNUTLS_LIBS"
 fi
 
-dnl Check for OpenSSL libssl [by default - skip]
+dnl Check for OpenSSL libssl and libcrypto [by default - skip]
 LIBOPENSSL_CHECK_CONFIG([no])
 if test "x$want_openssl" = "xyes"; then
 	if test "x$have_tls" != "xno"; then
@@ -1390,7 +1390,7 @@ if test "x$want_openssl" = "xyes"; then
 	fi
 
 	if test "x$found_openssl" != "xyes"; then
-		AC_MSG_ERROR([OpenSSL library libssl not found])
+		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
 	elif test "x$accept_openssl_version" != "xyes"; then
 		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
 	else
