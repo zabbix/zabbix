@@ -702,7 +702,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		foreach ($hostNames as $hostName) {
 			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
 		}
-		$table->setHeader($header, 'vertical_header');
+		$table->setHeader($header);
 
 		foreach ($items as $descr => $ithosts) {
 			$tableRow = [nbsp($descr)];
@@ -719,7 +719,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		foreach ($items as $descr => $ithosts) {
 			$header[] = (new CColHeader($descr))->addClass('vertical_rotation');
 		}
-		$table->setHeader($header, 'vertical_header');
+		$table->setHeader($header);
 
 		foreach ($hostNames as $hostId => $hostName) {
 			$host = $hosts[$hostId];

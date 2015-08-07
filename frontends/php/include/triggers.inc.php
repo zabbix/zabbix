@@ -1093,7 +1093,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		foreach ($hostNames as $hostName) {
 			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
 		}
-		$triggerTable->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader($header);
 
 		// data
 		foreach ($data as $description => $triggerHosts) {
@@ -1118,7 +1118,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$header[] = (new CColHeader($description))->addClass('vertical_rotation');
 		}
 
-		$triggerTable->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader($header);
 
 		// data
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
