@@ -3530,13 +3530,14 @@ void	init_configuration_cache()
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
 	config->time_triggers = (zbx_vector_ptr_t *)(config + 1);
 
-#define CREATE_HASHSET(hashset, hashset_size)	CREATE_HASHSET_EXT(hashset, hashset_size,			\
-		ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
+#define CREATE_HASHSET(hashset, hashset_size)									\
+														\
+	CREATE_HASHSET_EXT(hashset, hashset_size, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
 
 #define CREATE_HASHSET_EXT(hashset, hashset_size, hash_func, compare_func)					\
 														\
 	zbx_hashset_create_ext(&hashset, hashset_size, hash_func, compare_func, NULL,				\
-				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
+			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
 	CREATE_HASHSET(config->items, 100);
 	CREATE_HASHSET(config->numitems, 0);
