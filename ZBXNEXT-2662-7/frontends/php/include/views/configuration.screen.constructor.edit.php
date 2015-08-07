@@ -132,7 +132,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 }
 
 /*
@@ -179,7 +179,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 
 	$screenFormList->addRow(_('Max columns'),
 		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
@@ -231,7 +231,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 }
 
 /*
@@ -278,7 +278,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 
 	$screenFormList->addRow(_('Max columns'),
 		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
@@ -312,7 +312,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 			->onClick('javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&writeonly=1");')
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 }
 
 /*
@@ -359,7 +359,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
-		], false, null, ZBX_STYLE_NOWRAP)
+		])
 		->addRow(_('Show lines'),
 			(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		)
@@ -546,7 +546,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 			->onClick('javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&writeonly=1&screenid='.$_REQUEST['screenid'].'");')
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 }
 
 /*

@@ -221,7 +221,7 @@ if ($this->data['input_method'] == IM_TREE) {
 	}
 
 	$wrapOutline = new CSpan([$this->data['outline']]);
-	$triggersFormList->addRow(SPACE, [
+	$triggersFormList->addRow(null, [
 		$wrapOutline,
 		BR(),
 		BR(),
@@ -236,7 +236,7 @@ if ($this->data['input_method'] == IM_TREE) {
 			'document.getElementById("toggle_input_method").value=1;'.
 			'document.getElementById("input_method").value='.IM_ESTABLISHED.';'.
 			'document.forms["'.$triggersForm->getName().'"].submit();');
-	$triggersFormList->addRow(SPACE, [$inputMethodToggle, BR()]);
+	$triggersFormList->addRow(null, [$inputMethodToggle, BR()]);
 }
 
 $triggersFormList
