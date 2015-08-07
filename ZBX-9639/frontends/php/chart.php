@@ -36,11 +36,11 @@ $fields = array(
 	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
 	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{}>=0',	null),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
+	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{}>29',	null),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
 	'border' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
 );
-check_fields($fields);
+$isDataValid = check_fields($fields);
 
 /*
  * Permissions
@@ -63,31 +63,33 @@ if (empty($dbItems)) {
 /*
  * Display
  */
-$timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.screens'),
-	'profileIdx2' => get_request('profileIdx2'),
-	'updateProfile' => get_request('updateProfile', true),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
-));
+if ($isDataValid) {
+	$timeline = CScreenBase::calculateTime(array(
+			'profileIdx' => get_request('profileIdx', 'web.screens'),
+			'profileIdx2' => get_request('profileIdx2'),
+			'updateProfile' => get_request('updateProfile', true),
+			'period' => get_request('period'),
+			'stime' => get_request('stime')
+	));
 
-$graph = new CChart();
-$graph->setPeriod($timeline['period']);
-$graph->setSTime($timeline['stime']);
+	$graph = new CChart();
+	$graph->setPeriod($timeline['period']);
+	$graph->setSTime($timeline['stime']);
 
-if (isset($_REQUEST['from'])) {
-	$graph->setFrom($_REQUEST['from']);
+	if (isset($_REQUEST['from'])) {
+		$graph->setFrom($_REQUEST['from']);
+	}
+	if (isset($_REQUEST['width'])) {
+		$graph->setWidth($_REQUEST['width']);
+	}
+	if (isset($_REQUEST['height'])) {
+		$graph->setHeight($_REQUEST['height']);
+	}
+	if (isset($_REQUEST['border'])) {
+		$graph->setBorder(0);
+	}
+	$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
+	$graph->draw();
 }
-if (isset($_REQUEST['width'])) {
-	$graph->setWidth($_REQUEST['width']);
-}
-if (isset($_REQUEST['height'])) {
-	$graph->setHeight($_REQUEST['height']);
-}
-if (isset($_REQUEST['border'])) {
-	$graph->setBorder(0);
-}
-$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
-$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

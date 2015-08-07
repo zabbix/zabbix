@@ -37,10 +37,11 @@ $fields = array(
 	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'border' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
-	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
+	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>29',	null),
 	'height' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null)
 );
-check_fields($fields);
+
+$isDataValid = check_fields($fields);
 
 /*
  * Permissions
@@ -72,72 +73,74 @@ $host = reset($host);
 /*
  * Display
  */
-$timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.screens'),
-	'profileIdx2' => get_request('profileIdx2'),
-	'updateProfile' => get_request('updateProfile', true),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
-));
+if ($isDataValid) {
+	$timeline = CScreenBase::calculateTime(array(
+		'profileIdx' => get_request('profileIdx', 'web.screens'),
+		'profileIdx2' => get_request('profileIdx2'),
+		'updateProfile' => get_request('updateProfile', true),
+		'period' => get_request('period'),
+		'stime' => get_request('stime')
+	));
 
-CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
+	CProfile::update('web.screens.graphid', $_REQUEST['graphid'], PROFILE_TYPE_ID);
 
-$chartHeader = '';
-if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
-	$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, ': ');
-}
-$chartHeader .= $host['name'].': '.$dbGraph['name'];
+	$chartHeader = '';
+	if (id2nodeid($dbGraph['graphid']) != get_current_nodeid()) {
+		$chartHeader = get_node_name_by_elid($dbGraph['graphid'], true, ': ');
+	}
+	$chartHeader .= $host['name'].': '.$dbGraph['name'];
 
-$graph = new CChart($dbGraph['graphtype']);
-$graph->setHeader($chartHeader);
-$graph->setPeriod($timeline['period']);
-$graph->setSTime($timeline['stime']);
+	$graph = new CChart($dbGraph['graphtype']);
+	$graph->setHeader($chartHeader);
+	$graph->setPeriod($timeline['period']);
+	$graph->setSTime($timeline['stime']);
 
-if (isset($_REQUEST['border'])) {
-	$graph->setBorder(0);
-}
+	if (isset($_REQUEST['border'])) {
+		$graph->setBorder(0);
+	}
 
-$width = get_request('width', 0);
-if ($width <= 0) {
-	$width = $dbGraph['width'];
-}
+	$width = get_request('width', 0);
+	if ($width <= 0) {
+		$width = $dbGraph['width'];
+	}
 
-$height = get_request('height', 0);
-if ($height <= 0) {
-	$height = $dbGraph['height'];
-}
+	$height = get_request('height', 0);
+	if ($height <= 0) {
+		$height = $dbGraph['height'];
+	}
 
-$graph->showLegend($dbGraph['show_legend']);
-$graph->showWorkPeriod($dbGraph['show_work_period']);
-$graph->showTriggers($dbGraph['show_triggers']);
-$graph->setWidth($width);
-$graph->setHeight($height);
-$graph->setYMinAxisType($dbGraph['ymin_type']);
-$graph->setYMaxAxisType($dbGraph['ymax_type']);
-$graph->setYAxisMin($dbGraph['yaxismin']);
-$graph->setYAxisMax($dbGraph['yaxismax']);
-$graph->setYMinItemId($dbGraph['ymin_itemid']);
-$graph->setYMaxItemId($dbGraph['ymax_itemid']);
-$graph->setLeftPercentage($dbGraph['percent_left']);
-$graph->setRightPercentage($dbGraph['percent_right']);
+	$graph->showLegend($dbGraph['show_legend']);
+	$graph->showWorkPeriod($dbGraph['show_work_period']);
+	$graph->showTriggers($dbGraph['show_triggers']);
+	$graph->setWidth($width);
+	$graph->setHeight($height);
+	$graph->setYMinAxisType($dbGraph['ymin_type']);
+	$graph->setYMaxAxisType($dbGraph['ymax_type']);
+	$graph->setYAxisMin($dbGraph['yaxismin']);
+	$graph->setYAxisMax($dbGraph['yaxismax']);
+	$graph->setYMinItemId($dbGraph['ymin_itemid']);
+	$graph->setYMaxItemId($dbGraph['ymax_itemid']);
+	$graph->setLeftPercentage($dbGraph['percent_left']);
+	$graph->setRightPercentage($dbGraph['percent_right']);
 
-$dbGraphItems = DBselect(
-	'SELECT gi.*'.
-	' FROM graphs_items gi'.
-	' WHERE gi.graphid='.$dbGraph['graphid'].
-	' ORDER BY gi.sortorder, gi.itemid DESC'
-);
-while ($dbGraphItem = DBfetch($dbGraphItems)) {
-	$graph->addItem(
-		$dbGraphItem['itemid'],
-		$dbGraphItem['yaxisside'],
-		$dbGraphItem['calc_fnc'],
-		$dbGraphItem['color'],
-		$dbGraphItem['drawtype'],
-		$dbGraphItem['type']
+	$dbGraphItems = DBselect(
+		'SELECT gi.*'.
+		' FROM graphs_items gi'.
+		' WHERE gi.graphid='.$dbGraph['graphid'].
+		' ORDER BY gi.sortorder, gi.itemid DESC'
 	);
-}
+	while ($dbGraphItem = DBfetch($dbGraphItems)) {
+		$graph->addItem(
+			$dbGraphItem['itemid'],
+			$dbGraphItem['yaxisside'],
+			$dbGraphItem['calc_fnc'],
+			$dbGraphItem['color'],
+			$dbGraphItem['drawtype'],
+			$dbGraphItem['type']
+		);
+	}
 
-$graph->draw();
+	$graph->draw();
+}
 
 require_once dirname(__FILE__).'/include/page_footer.php';
