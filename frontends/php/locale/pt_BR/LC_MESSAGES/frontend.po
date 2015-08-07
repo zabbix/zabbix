@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-07 11:23+0300\n"
-"PO-Revision-Date: 2015-06-03 11:22+0300\n"
+"POT-Creation-Date: 2015-08-07 13:41+0300\n"
+"PO-Revision-Date: 2015-07-30 20:39+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1433323378.0\n"
+"X-POOTLE-MTIME: 1438281598.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -21,7 +21,7 @@ msgstr ""
 #: include/classes/import/validators/C30XmlValidator.php:867
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" é aguardado"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -43,8 +43,8 @@ msgstr[1] "%1$d dias"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] "%1$d de %2$d problema exibido"
-msgstr[1] "%1$d de %2$d problemas exibidos"
+msgstr[0] "%1$d de %2$d incidente exibido"
+msgstr[1] "%1$d de %2$d incidentes exibidos"
 
 #: chart4.php:89 chart5.php:83
 #, c-format
@@ -70,8 +70,8 @@ msgstr[1] "%1$s dias"
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s item"
+msgstr[1] "%1$s itens"
 
 #: jsLoader.php:223 jsLoader.php:224 jsLoader.php:225 jsLoader.php:226
 #, c-format
@@ -142,7 +142,7 @@ msgstr "----[RECONHECIMENTO EM MASSA]----"
 
 #: include/classes/setup/CSetupWizard.php:236
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - usar a porta padrão"
 
 #: include/triggers.inc.php:2072 include/triggers.inc.php:2073
 #: include/triggers.inc.php:2074 include/triggers.inc.php:2076
@@ -162,7 +162,7 @@ msgstr "10 segundos"
 
 #: include/views/reports.toptriggers.php:24 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 triggers mais ativas"
 
 #: queue.php:106 queue.php:167
 msgid "30 seconds"
@@ -226,7 +226,7 @@ msgstr "SLA Aceitável"
 
 #: include/func.inc.php:1631
 msgid "Access denied"
-msgstr ""
+msgstr "Acesso negado"
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -604,7 +604,7 @@ msgstr "Verificações agregadas não requerem nenhum agente rodando no host mon
 
 #: acknow.php:194
 msgid "Alarm acknowledgements"
-msgstr ""
+msgstr "Reconhecimento de alarmes"
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:46
 #: include/views/administration.users.list.php:47 popup.php:625 users.php:43
@@ -639,7 +639,7 @@ msgstr "Todos os grupos"
 
 #: include/html.inc.php:373
 msgid "All hosts"
-msgstr ""
+msgstr "Todos os hosts"
 
 #: jsLoader.php:152
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -647,7 +647,7 @@ msgstr "Todos os links devem ter \"Nome\" e \"URL\" definidos"
 
 #: include/html.inc.php:334
 msgid "All templates"
-msgstr ""
+msgstr "Todos os templates"
 
 #: include/views/configuration.host.discovery.edit.php:271
 #: include/views/configuration.item.edit.php:427
@@ -658,7 +658,7 @@ msgstr "Hosts permitidos"
 
 #: include/classes/setup/CSetupWizard.php:385
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Alternativamente, você pode instalar manualmente:"
 
 #: include/triggers.inc.php:1525
 #: include/views/configuration.action.edit.php:147
@@ -848,7 +848,7 @@ msgstr "No mínimo um destes bancos de dados deverá ser suportado: MySQL, Postg
 #: httpconf.php:47 include/views/configuration.httpconf.edit.php:80
 #: include/views/configuration.httpconf.list.php:60
 msgid "Attempts"
-msgstr ""
+msgstr "Tentativas"
 
 #: include/menu.inc.php:141
 #: include/views/administration.general.housekeeper.edit.php:74
@@ -1002,7 +1002,7 @@ msgstr "Média do valor de um período T é NÃO É N"
 #: include/classes/setup/CSetupWizard.php:121
 #: include/classes/setup/CSetupWizard.php:342
 msgid "Back"
-msgstr ""
+msgstr "Retornar"
 
 #: include/views/administration.general.image.edit.php:55
 #: include/views/administration.general.image.list.php:39
@@ -1051,7 +1051,7 @@ msgstr "Bloqueado"
 
 #: include/classes/core/ZBase.php:265
 msgid "Blue"
-msgstr ""
+msgstr "Azul"
 
 #: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:373
 #: include/views/js/configuration.sysmaps.js.php:457
@@ -1364,7 +1364,7 @@ msgstr "Não foi possível clonar protótipos da trigger."
 
 #: include/classes/setup/CSetupWizard.php:262
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Não foi possível conectar ao banco de dados."
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
@@ -1403,7 +1403,7 @@ msgstr "Não é possível criar dependência entre uma trigger e ela mesma."
 
 #: include/classes/api/services/CTriggerPrototype.php:1018
 msgid "Cannot create dependency on trigger prototype itself."
-msgstr ""
+msgstr "Não é possível criar dependência entre um protótipo de trigger e sí próprio."
 
 #: discoveryconf.php:154
 msgid "Cannot create discovery rule"
@@ -1433,7 +1433,7 @@ msgstr "Não foi possível criar o template."
 
 #: include/classes/setup/CSetupWizard.php:383
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Não foi possível criar o arquivo de configuração."
 
 #: include/classes/api/services/CUser.php:1317
 #, c-format
@@ -2546,7 +2546,7 @@ msgstr "Verifique a expressão a partir de \"%1$s\"."
 #: include/classes/setup/CSetupWizard.php:39
 #: include/classes/setup/CSetupWizard.php:202
 msgid "Check of pre-requisites"
-msgstr ""
+msgstr "Verificação de pré-requisitos"
 
 #: include/classes/api/services/CItemGeneral.php:293
 #: include/classes/api/services/CItemGeneral.php:300
@@ -2608,13 +2608,13 @@ msgstr "Verifica se determinada porta UDP está em modo de ESCUTA. Retorna: 0 - 
 #: include/classes/items/CHelpItems.php:403
 #: include/classes/items/CHelpItems.php:631
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
-msgstr ""
+msgstr "Verifica a performance de um serviço TCP. Retornos possíveis: 0 - serviço indisponível; <segundos> - tempo utilizado, em segundos, para se conectar ao serviço"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:415
 #: include/classes/items/CHelpItems.php:639
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
-msgstr ""
+msgstr "Verifica a performance de um serviço UDP. Retornos possíveis: 0 - serviço indisponível; <segundos> - tempo utilizado, em segundos, para se conectar ao serviço"
 
 #: include/classes/api/services/CDRule.php:349
 msgid "Checks should be unique."
@@ -2826,7 +2826,7 @@ msgstr "Configuração de estatísticas de cache. Cache - buffer (modos: pfree, 
 #: include/classes/setup/CSetupWizard.php:401
 #, c-format
 msgid "Configuration file \"%1$s\" created."
-msgstr ""
+msgstr "O arquivo de configuração \"%1$s\" foi criado."
 
 #: conf.import.php:25
 msgid "Configuration import"
@@ -2987,12 +2987,12 @@ msgstr "Configuração atualizada"
 
 #: include/html.inc.php:224
 msgid "Configure"
-msgstr ""
+msgstr "Configurar"
 
 #: include/classes/setup/CSetupWizard.php:43
 #: include/classes/setup/CSetupWizard.php:269
 msgid "Configure DB connection"
-msgstr ""
+msgstr "Configura a conexão com o DB"
 
 #: app/views/administration.script.edit.php:100
 msgid "Confirmation text"
@@ -3000,7 +3000,7 @@ msgstr "Mensagem de confirmação"
 
 #: include/classes/setup/CSetupWizard.php:398
 msgid "Congratulations! You have successfully installed Zabbix frontend."
-msgstr ""
+msgstr "Parabéns! Você instalou com sucesso a interface web do Zabbix."
 
 #: app/views/administration.proxy.edit.php:38
 #: include/views/configuration.host.edit.php:130
@@ -3016,7 +3016,7 @@ msgstr "Connectado a"
 
 #: app/views/administration.mediatype.edit.php:98
 msgid "Connection security"
-msgstr ""
+msgstr "Segurança de conexão"
 
 #: include/classes/server/CZabbixServer.php:207
 #, c-format
@@ -3391,7 +3391,7 @@ msgstr "D"
 #: include/classes/import/validators/C10XmlValidator.php:344
 msgctxt "XML date format"
 msgid "DD.MM.YY"
-msgstr ""
+msgstr "DD.MM.YY"
 
 #: include/views/configuration.host.discovery.edit.php:148
 #: include/views/configuration.item.edit.php:160
@@ -3421,7 +3421,7 @@ msgstr "DNS"
 
 #: include/views/configuration.host.list.php:38
 msgid "DNS like"
-msgstr ""
+msgstr "DNS como"
 
 #: app/views/administration.proxy.edit.php:37
 #: include/views/configuration.host.edit.php:129
@@ -3445,7 +3445,7 @@ msgstr "Diário"
 
 #: include/classes/core/ZBase.php:266
 msgid "Dark"
-msgstr ""
+msgstr "Escuro"
 
 #: app/controllers/CControllerDashboardView.php:66
 #: app/views/monitoring.dashboard.view.php:25 include/menu.inc.php:34
@@ -4527,7 +4527,7 @@ msgstr "Fora"
 
 #: include/classes/setup/CSetupWizard.php:387
 msgid "Download the configuration file"
-msgstr ""
+msgstr "Receber a configuração"
 
 #: app/views/monitoring.discovery.view.php:46
 #: app/views/monitoring.discovery.view.php:171
@@ -4567,7 +4567,7 @@ msgstr "Dependências duplicadas na trigger \"%1$s\"."
 #: include/classes/api/services/CTriggerPrototype.php:1249
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Dependência duplicada no protótipo de trigger \"%1$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:197
 #, c-format
@@ -4646,7 +4646,7 @@ msgstr "Editar trigger"
 
 #: include/views/hostmacros.php:47
 msgid "Effective value"
-msgstr ""
+msgstr "Valor real"
 
 #: include/views/configuration.sysmap.edit.php:161
 msgid "Element"
@@ -5101,7 +5101,7 @@ msgstr "Expandir macros"
 
 #: include/views/configuration.sysmap.edit.php:76
 msgid "Expand single problem"
-msgstr "Expandir problemas singulares"
+msgstr "Expandir incidentes singulares"
 
 #: include/classes/core/CJsonRpc.php:90
 #, c-format
@@ -5533,7 +5533,7 @@ msgstr "Scripts globais"
 
 #: include/views/hostmacros.php:48
 msgid "Global value"
-msgstr ""
+msgstr "Valor global"
 
 #: jsLoader.php:200
 msgid "Go to"
@@ -5932,7 +5932,7 @@ msgstr "Esconder tudo"
 
 #: include/html.inc.php:847
 msgid "Hide debug"
-msgstr ""
+msgstr "Ocultar depuração"
 
 #: include/views/monitoring.history.php:154
 msgid "Hide selected"
@@ -5957,7 +5957,7 @@ msgstr "Histórico"
 
 #: include/forms.inc.php:574
 msgid "History (in days)"
-msgstr ""
+msgstr "Histórico (em dias)"
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:439 httpconf.php:451
 #: items.php:531 items.php:538 items.php:792 items.php:804
@@ -6191,7 +6191,7 @@ msgstr "Tipo do rótulo do host"
 
 #: include/views/hostmacros.php:157
 msgid "Host macros"
-msgstr ""
+msgstr "Macros de host"
 
 #: include/actions.inc.php:94
 msgid "Host metadata"
@@ -6455,7 +6455,7 @@ msgstr "O IP e o DNS não podem ser nulos ao mesmo tempo na interface."
 
 #: include/views/configuration.host.list.php:41
 msgid "IP like"
-msgstr ""
+msgstr "IP similar"
 
 #: include/views/configuration.discovery.edit.php:51
 #: include/views/configuration.discovery.list.php:38
@@ -6568,7 +6568,7 @@ msgstr "Ícone (manutenção)"
 
 #: include/views/js/configuration.sysmaps.js.php:276
 msgid "Icon (problem)"
-msgstr "Ícone (problema)"
+msgstr "Ícone (incidente)"
 
 #: include/views/configuration.sysmap.edit.php:70
 msgid "Icon highlight"
@@ -7283,7 +7283,7 @@ msgstr "O máximo de colunas informado é inválido para o elemento da tela."
 #: include/classes/api/services/CMediatype.php:253
 #, c-format
 msgid "Incorrect media type port \"%1$s\" provided."
-msgstr ""
+msgstr "Foi informada uma porta incorreta \"%1$s\" para o tipo de mídia."
 
 #: include/classes/api/services/CScript.php:532
 #, c-format
@@ -7603,14 +7603,15 @@ msgstr "Informação"
 msgid "Information"
 msgstr "Informação"
 
+# Rihards, its very strange this message... I dont understand what is the message here...
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:439
 msgid "Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description"
-msgstr ""
+msgstr "Informacoes sobre o servico. Retorna um inteiro com parametro <state> ou <startup>; uma string com o parametro <displayname>, <path> ou <user>; texto com parametro <description>"
 
 #: include/views/hostmacros.php:160
 msgid "Inherited and host macros"
-msgstr ""
+msgstr "Herdado e macros de host"
 
 #: include/views/configuration.triggers.expression.php:128
 msgid "Insert"
@@ -7624,7 +7625,7 @@ msgstr "Insira a expressão"
 #: include/classes/setup/CSetupWizard.php:55
 #: include/classes/setup/CSetupWizard.php:406
 msgid "Install"
-msgstr ""
+msgstr "Instalação"
 
 #: setup.php:102
 msgid "Installation"
@@ -7767,7 +7768,7 @@ msgstr "Requisição inválida."
 #: include/classes/import/validators/CXmlValidator.php:62
 #, c-format
 msgid "Invalid XML tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Tag XML inválida \"%1$s\":%2$s."
 
 #: maintenance.php:144 maintenance.php:158 services.php:187 services.php:201
 #, c-format
@@ -8228,7 +8229,7 @@ msgstr "A chave \"%1$s\" não encontrou correspondência <grpmax|grpmin|grpsum|g
 
 #: include/forms.inc.php:604
 msgid "Key like"
-msgstr ""
+msgstr "Chave como"
 
 #: include/views/configuration.action.edit.php:891
 #: include/views/js/common.item.edit.js.php:190
@@ -8504,7 +8505,7 @@ msgstr "Vínculos para o elemento selecionado"
 
 #: acknow.php:271
 msgid "List"
-msgstr ""
+msgstr "Lista"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -8996,7 +8997,7 @@ msgstr "Tipo de mídia"
 #: include/classes/api/services/CMediatype.php:239
 #, c-format
 msgid "Media type \"%1$s\" already exists."
-msgstr ""
+msgstr "O tipo de mídia \"%1$s\" já existe."
 
 #: app/controllers/CControllerMediatypeCreate.php:115
 msgid "Media type added"
@@ -9042,7 +9043,7 @@ msgstr "Membros"
 #: include/classes/debug/CProfiler.php:130
 #, c-format
 msgid "Memory limit: %1$s"
-msgstr ""
+msgstr "Limite de memória: %1$s"
 
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:587
@@ -9264,7 +9265,7 @@ msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1467
 msgid "Multiple PROBLEM events"
-msgstr "Multiplos eventos de PROBLEMA"
+msgstr "Multiplos eventos de INCIDENTE"
 
 #: include/views/configuration.trigger.prototype.edit.php:238
 #: include/views/configuration.triggers.edit.php:243
@@ -9379,7 +9380,7 @@ msgstr "O nome do protótipo de grupo \"%1$s\" deve conter macros."
 
 #: include/forms.inc.php:587 include/views/configuration.host.list.php:35
 msgid "Name like"
-msgstr ""
+msgstr "Nome como"
 
 #: include/views/administration.general.housekeeper.edit.php:50
 msgid "Network discovery data storage period (in days)"
@@ -9485,7 +9486,7 @@ msgstr "Novo horário de serviço"
 #: include/classes/setup/CSetupWizard.php:271
 #: include/classes/setup/CSetupWizard.php:342
 msgid "Next step"
-msgstr ""
+msgstr "Próximo passo"
 
 #: events.php:783 include/events.inc.php:355 include/events.inc.php:374
 #: include/func.inc.php:1953 include/triggers.inc.php:1469
@@ -9634,7 +9635,7 @@ msgstr "Sem coleta de dados"
 
 #: include/classes/html/CTableInfo.php:27
 msgid "No data found"
-msgstr ""
+msgstr "Dado não encontrado"
 
 #: popup_trexpr.php:536
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
@@ -10054,7 +10055,7 @@ msgstr "Normal"
 
 #: app/views/administration.mediatype.edit.php:77
 msgid "Normal password"
-msgstr ""
+msgstr "Senha normal"
 
 #: include/html.inc.php:215
 msgid "Normal view"
@@ -10204,7 +10205,7 @@ msgstr "Número de segundos desde a época é NÃO É N"
 
 #: include/views/configuration.slideconf.list.php:41
 msgid "Number of slides"
-msgstr ""
+msgstr "Quantidade de slides"
 
 #: include/views/reports.toptriggers.php:124
 msgid "Number of status changes"
@@ -10489,7 +10490,7 @@ msgstr "Somente triggers de hosts ativados e dependentes de itens ativados são 
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
 msgid "Open"
-msgstr ""
+msgstr "Abrir"
 
 #: include/httptest.inc.php:294
 msgid "Opera"
@@ -10839,7 +10840,7 @@ msgstr "POP"
 #: include/views/monitoring.overview.items.php:32
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
-msgstr "PROBLEMA"
+msgstr "INCIDENTE"
 
 #: include/validate.inc.php:389
 msgid "Page received incorrect data"
@@ -10851,7 +10852,7 @@ msgstr "Parâmetro"
 
 #: include/classes/debug/CProfiler.php:147
 msgid "Parameters"
-msgstr ""
+msgstr "Parâmetros"
 
 #: include/views/configuration.host.discovery.edit.php:43
 #: include/views/configuration.host.prototype.edit.php:58
@@ -10938,7 +10939,7 @@ msgstr "Senha não pode ser vazia"
 #: include/classes/debug/CProfiler.php:128
 #, c-format
 msgid "Peak memory usage: %1$s"
-msgstr ""
+msgstr "Pico de utilização de memória: %1$s"
 
 #: popup_trexpr.php:100
 msgid "Percentage"
@@ -11033,16 +11034,16 @@ msgstr "Executar som"
 #: include/classes/setup/CSetupWizard.php:342
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
-msgstr ""
+msgstr "Por favor verifique os parâmetros de configuração. Se tudo estiver correto pressione o botão \"%1$s\", ou pressione o botão \"%2$s\" para modificar parâmetros de configuração."
 
 #: include/classes/setup/CSetupWizard.php:271
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
-msgstr ""
+msgstr "Por favor crie o banco de dados manualmente e informe os parâmetros de conexão para a base. Pressione o botão \"%1$s\" quando estiver pronto."
 
 #: include/classes/setup/CSetupWizard.php:301
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
-msgstr ""
+msgstr "Por favor informe o nome ou IP e a porta do servidor Zabbix, assim como um nome para esta instalação (opcional)."
 
 #: jsLoader.php:147
 msgid "Please select two elements"
@@ -11082,7 +11083,7 @@ msgstr "A porta não pode ser nula na interface do host."
 
 #: include/forms.inc.php:480 include/views/configuration.host.list.php:44
 msgid "Port like"
-msgstr ""
+msgstr "Porta como"
 
 #: include/views/js/configuration.discovery.edit.js.php:37
 msgid "Port range"
@@ -11107,7 +11108,7 @@ msgstr "Post"
 #: include/classes/setup/CSetupWizard.php:51
 #: include/classes/setup/CSetupWizard.php:340
 msgid "Pre-installation summary"
-msgstr ""
+msgstr "Sumário da pré-instalação"
 
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:114
@@ -11195,16 +11196,16 @@ msgstr "Provavelmente o módulo php-ldap está ausente."
 #: include/views/common.filter.trigger.php:37
 #: include/views/js/configuration.sysmaps.js.php:143
 msgid "Problem"
-msgstr "Problema"
+msgstr "Incidente"
 
 #: include/views/configuration.sysmap.edit.php:154
 #: include/views/monitoring.dashconf.php:113
 msgid "Problem display"
-msgstr "Exibição de problemas"
+msgstr "Exibição de incidentes"
 
 #: jsrpc.php:116
 msgid "Problem on"
-msgstr "Problema em"
+msgstr "Incidente em"
 
 #: srv_status.php:142
 msgid "Problem time"
@@ -11212,16 +11213,16 @@ msgstr "Tempo com incidente"
 
 #: include/services.inc.php:25
 msgid "Problem, if all children have problems"
-msgstr "Problema, se todos os filhos tem problemas"
+msgstr "Incidente, se todos os filhos tem incidentes"
 
 #: include/services.inc.php:24
 msgid "Problem, if at least one child has a problem"
-msgstr "Problema, se pelo menos um filho tem problema"
+msgstr "Incidente, se pelo menos um filho tem incidente"
 
 #: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:369 report3.php:84
 msgid "Problems"
-msgstr "Problemas"
+msgstr "Incidentes"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:254
@@ -11305,7 +11306,7 @@ msgstr "Fila"
 
 #: queue.php:66
 msgid "Queue of items to be updated"
-msgstr ""
+msgstr "Fila de itens a atualizar"
 
 #: include/hosts.inc.php:37
 msgid "RMCP+"
@@ -11864,7 +11865,7 @@ msgstr "SNMP OID"
 
 #: include/forms.inc.php:476
 msgid "SNMP OID like"
-msgstr ""
+msgstr "OID SNMP como"
 
 #: disc_prototypes.php:100 host_discovery.php:78
 #: include/views/configuration.host.discovery.edit.php:109
@@ -11877,7 +11878,7 @@ msgstr "Comunidade SNMP"
 
 #: include/forms.inc.php:466
 msgid "SNMP community like"
-msgstr ""
+msgstr "Comunidade SNMP como"
 
 #: include/views/configuration.host.edit.php:156
 #: include/views/configuration.host.edit.php:242
@@ -11912,7 +11913,7 @@ msgstr "Agente SNMPv3"
 #: include/classes/debug/CProfiler.php:123
 #, c-format
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
-msgstr ""
+msgstr "Total de SQL: %1$s (seleções: %2$s | execuções: %3$s)"
 
 #: include/items.inc.php:1296
 #: include/views/configuration.host.discovery.edit.php:199
@@ -11966,11 +11967,11 @@ msgstr "Verificação de par SSL"
 
 #: app/views/administration.mediatype.edit.php:66
 msgid "SSL/TLS"
-msgstr ""
+msgstr "SSL/TLS"
 
 #: app/views/administration.mediatype.edit.php:62
 msgid "STARTTLS"
-msgstr ""
+msgstr "STARTTLS"
 
 #: include/httptest.inc.php:301
 msgid "Safari"
@@ -11988,7 +11989,7 @@ msgstr "Sábado"
 #: include/classes/setup/CSetupWizard.php:388
 #, c-format
 msgid "Save it as \"%1$s\""
-msgstr ""
+msgstr "Salvar como \"%1$s\""
 
 #: include/views/configuration.httpconf.edit.php:251
 msgid "Scenario"
@@ -12224,7 +12225,7 @@ msgstr "Nome de segurança"
 
 #: include/forms.inc.php:471
 msgid "Security name like"
-msgstr ""
+msgstr "Nome de segurança como"
 
 #: events.php:359 include/classes/html/CMultiSelect.php:54
 #: include/forms.inc.php:563
@@ -12555,7 +12556,7 @@ msgstr "Conectar-se"
 
 #: app/views/layout.htmlpage.menu.php:71
 msgid "Sign out"
-msgstr ""
+msgstr "Desconectar"
 
 #: include/views/js/configuration.graph.edit.js.php:31
 msgid "Simple"
@@ -12898,7 +12899,7 @@ msgstr "Estilo"
 
 #: include/forms.inc.php:620
 msgid "Subfilter"
-msgstr ""
+msgstr "Subfiltro"
 
 #: include/actions.inc.php:745
 #: include/views/administration.auditacts.list.php:80
@@ -13146,7 +13147,7 @@ msgstr "Template atualizado"
 
 #: include/views/hostmacros.php:47
 msgid "Template value"
-msgstr ""
+msgstr "Valor do template"
 
 #: include/classes/api/services/CTemplate.php:995
 #, c-format
@@ -13484,12 +13485,12 @@ msgstr "Total"
 #: include/classes/debug/CProfiler.php:119
 #, c-format
 msgid "Total SQL time: %1$s"
-msgstr ""
+msgstr "Tempo total do SQL: %1$s"
 
 #: include/classes/debug/CProfiler.php:117
 #, c-format
 msgid "Total time: %1$s"
-msgstr ""
+msgstr "Tempo total: %1$s"
 
 #: include/page_footer.php:46
 msgid "Transaction has not been closed. Aborting..."
@@ -13532,7 +13533,7 @@ msgstr "Estatísticas"
 
 #: include/forms.inc.php:591
 msgid "Trends (in days)"
-msgstr ""
+msgstr "Médias (em dias)"
 
 #: events.php:312 events.php:355 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
@@ -13667,7 +13668,7 @@ msgstr "O protótipo de trigger \"%1$s\" contêm protótipos de item de múltipl
 #: include/classes/import/CConfigurationImport.php:1109
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
-msgstr ""
+msgstr "O protótipo de trigger \"%1$s\" depende da trigger \"%2$s\", que não existe."
 
 #: include/classes/api/services/CTriggerPrototype.php:1453
 #, c-format
@@ -13680,7 +13681,7 @@ msgstr "Protótipo de trigger adicionado"
 
 #: include/classes/api/services/CTriggerPrototype.php:1184
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
-msgstr ""
+msgstr "O protótipo de trigger não pode depender de uma trigger da qual ele tenha sido herdado."
 
 #: trigger_prototypes.php:238
 msgid "Trigger prototype deleted"
@@ -13974,11 +13975,11 @@ msgstr "Ucraniano (uk_UA)"
 
 #: include/classes/core/CConfigFile.php:140
 msgid "Unable to create the configuration file."
-msgstr ""
+msgstr "Não foi possível criar o arquivo de configuração."
 
 #: include/classes/core/CConfigFile.php:137
 msgid "Unable to overwrite the existing configuration file."
-msgstr ""
+msgstr "Não foi possível sobrescrever o arquivo de configuração existente."
 
 #: include/classes/db/DbBackend.php:63
 msgid "Unable to select configuration."
@@ -14493,7 +14494,7 @@ msgstr "Grupo de usuários que receberá a mensagem de banco de dados indisponí
 #: include/profiles.inc.php:194
 #, c-format
 msgid "User group for database down message \"%1$s\"."
-msgstr "Grupo para mensagens de problemas com o banco de dados \"%1$s\"."
+msgstr "Grupo para mensagens sobre incidentes com o banco de dados \"%1$s\"."
 
 #: include/menu.inc.php:262
 #: include/views/administration.usergroups.edit.php:22
@@ -15091,11 +15092,11 @@ msgstr "Semanal"
 
 #: include/classes/setup/CSetupWizard.php:35
 msgid "Welcome"
-msgstr ""
+msgstr "Bem vindo"
 
 #: include/classes/setup/CSetupWizard.php:152
 msgid "Welcome to"
-msgstr ""
+msgstr "Bem vindo a"
 
 #: popup_media.php:130
 msgid "When active"
@@ -15122,7 +15123,7 @@ msgstr "Com últimos eventos não reconhecidos"
 
 #: app/views/monitoring.widget.hosts.view.php:26
 msgid "With problems"
-msgstr "Com problemas"
+msgstr "Com incidentes"
 
 #: include/forms.inc.php:581 include/forms.inc.php:803
 #: include/forms.inc.php:917
@@ -15135,7 +15136,7 @@ msgstr "Com eventos não reconhecidos"
 
 #: app/views/monitoring.widget.hosts.view.php:25
 msgid "Without problems"
-msgstr "Sem problemas"
+msgstr "Sem incidentes"
 
 #: include/forms.inc.php:582 include/forms.inc.php:800
 msgid "Without triggers"
@@ -15301,7 +15302,7 @@ msgstr "d-m-Y H:i:s"
 #: include/classes/import/validators/C30XmlValidator.php:867
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
-msgstr ""
+msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: report3.php:76 report3.php:90 report4.php:113 report4.php:132
 msgid "Year"
@@ -15327,7 +15328,7 @@ msgstr "Ontem"
 #: include/func.inc.php:1633
 #, c-format
 msgid "You are logged in as \"%1$s\"."
-msgstr ""
+msgstr "Você está autenticado como \"%1$s\"."
 
 #: include/views/administration.users.edit.php:144
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
@@ -15340,7 +15341,7 @@ msgstr "Você não tem permissão para alterar os privilégios para o usuário \
 
 #: include/func.inc.php:1650
 msgid "You are not logged in"
-msgstr ""
+msgstr "Você não está autenticado em"
 
 #: popup.php:486
 msgid "You can not switch hosts for current selection."
@@ -15418,7 +15419,7 @@ msgstr "Administrador Zabbix"
 
 #: app/views/layout.htmlpage.menu.php:50
 msgid "Zabbix Share"
-msgstr ""
+msgstr "Zabbix Share"
 
 #: include/users.inc.php:56
 msgid "Zabbix Super Admin"
@@ -15482,7 +15483,7 @@ msgstr "Zabbix Server IP ou porta não estão definidas!"
 #: include/classes/setup/CSetupWizard.php:47
 #: include/classes/setup/CSetupWizard.php:299
 msgid "Zabbix server details"
-msgstr ""
+msgstr "Detalhes do servidor Zabbix"
 
 #: include/classes/html/CServerInfo.php:40
 msgid "Zabbix server info"
@@ -15529,11 +15530,11 @@ msgstr "[Valor errado para o mês: \"%s\" ]"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:172
 msgid "a character string is expected"
-msgstr ""
+msgstr "um texto é esperado"
 
 #: include/forms.inc.php:621
 msgid "affects only filtered data"
-msgstr ""
+msgstr "afeta somente a área com filtro"
 
 #: include/hosts.inc.php:462
 msgid "agent"
@@ -15561,7 +15562,7 @@ msgstr "todas as mídias"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:186
 msgid "an array is expected"
-msgstr ""
+msgstr "um array é aguardado"
 
 #: include/views/monitoring.history.php:164
 msgid "as Blue"
@@ -15596,7 +15597,7 @@ msgstr "méd"
 #: include/views/administration.general.triggerDisplayOptions.edit.php:53
 #: include/views/administration.general.triggerDisplayOptions.edit.php:61
 msgid "blinking"
-msgstr ""
+msgstr "piscando"
 
 #: include/classes/parsers/CConditionFormula.php:188
 #, c-format
@@ -15605,7 +15606,7 @@ msgstr "verifique a expressão a partir de \"%1$s\""
 
 #: include/views/hostmacros.php:40
 msgid "configure"
-msgstr ""
+msgstr "configurar"
 
 #: include/func.inc.php:552 jsLoader.php:99
 msgctxt "day short"
@@ -15703,7 +15704,7 @@ msgstr "hh"
 #: include/classes/import/validators/C10XmlValidator.php:361
 msgctxt "XML time format"
 msgid "hh.mm"
-msgstr ""
+msgstr "hh.mm"
 
 #: include/classes/api/services/CMap.php:361
 msgid "host"
@@ -15988,7 +15989,7 @@ msgstr "template ID \"%1$s\" foi definido %2$s vezes"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:115
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr ""
+msgstr "a tag \"%1$s\" está ausente"
 
 #: include/classes/api/services/CMap.php:362 include/events.inc.php:34
 #: include/events.inc.php:63
@@ -16007,7 +16008,7 @@ msgstr "final inesperado da chave"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129
 #, c-format
 msgid "unexpected tag \"%1$s\""
-msgstr ""
+msgstr "tag inesperada \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:223
 #: include/classes/setup/CFrontendSetup.php:403
@@ -16017,7 +16018,7 @@ msgstr "desconhecido"
 
 #: include/classes/import/validators/CXmlValidator.php:62
 msgid "unsupported version number"
-msgstr ""
+msgstr "número de versão não suportado"
 
 #: include/views/administration.general.macros.edit.php:45
 #: include/views/hostmacros.php:87
