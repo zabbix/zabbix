@@ -929,6 +929,26 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 	double		left, right;
 	int		res;
 
+	if (1 == n)
+	{
+		if ('\0' == *mode || 0 == strcmp(mode, "value") || 0 == strcmp(mode, "max") ||
+				0 == strcmp(mode, "min") || 0 == strcmp(mode, "avg"))
+		{
+			*result = x[0];
+			return ZBX_MATH_OK;
+		}
+		else if (0 == strcmp(mode, "delta"))
+		{
+			*result = 0.0;
+			return ZBX_MATH_OK;
+		}
+		else
+		{
+			*error = zbx_strdup(*error, "invalid 'mode' parameter");
+			return ZBX_MATH_FAIL;
+		}
+	}
+
 	if (ZBX_MATH_OK != (res = zbx_matrix_struct_alloc(&coefficients)))
 		goto out;
 
@@ -1052,6 +1072,12 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 	zbx_matrix_t	*coefficients = NULL;
 	double		current;
 	int		res;
+
+	if (1 == n)
+	{
+		*result = (x[0] == threshold ? 0.0 : -1.0);
+		return ZBX_MATH_OK;
+	}
 
 	if (ZBX_MATH_OK != (res = zbx_matrix_struct_alloc(&coefficients)))
 		goto out;
