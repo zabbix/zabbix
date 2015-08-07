@@ -303,7 +303,6 @@ $conditionFormList->addRow(_('Type of calculation'),
 // macros
 $conditionTable = (new CTable())
 	->setNoDataMessage('')
-	->addClass('formElementTable')
 	->setId('conditions')
 	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
