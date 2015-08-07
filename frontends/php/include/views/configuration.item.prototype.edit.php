@@ -103,25 +103,25 @@ if (!empty($this->data['interfaces'])) {
 		->setId('interface_not_defined')
 		->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], false, 'interface_row');
+	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
 	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $this->data['limited']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmp_oid'
+	'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
 	(new CTextBox('snmpv3_contextname', $this->data['snmpv3_contextname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmpv3_contextname'
+	'row_snmpv3_contextname'
 );
 $itemFormList->addRow(_('SNMP community'),
 	(new CTextBox('snmp_community', $this->data['snmp_community'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmp_community'
+	'row_snmp_community'
 );
 $itemFormList->addRow(_('Security name'),
 	(new CTextBox('snmpv3_securityname', $this->data['snmpv3_securityname'], false, 64))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmpv3_securityname'
+	'row_snmpv3_securityname'
 );
 
 // append snmpv3 security level to form list
@@ -130,7 +130,7 @@ $securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmp
 	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
 	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
 ]);
-$itemFormList->addRow(_('Security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
+$itemFormList->addRow(_('Security level'), $securityLevelComboBox, 'row_snmpv3_securitylevel');
 $itemFormList->addRow(_('Authentication protocol'),
 	(new CDiv(
 		(new CRadioButtonList('snmpv3_authprotocol', (int) $this->data['snmpv3_authprotocol']))
@@ -139,12 +139,12 @@ $itemFormList->addRow(_('Authentication protocol'),
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;'),
-	false, 'row_snmpv3_authprotocol'
+	'row_snmpv3_authprotocol'
 );
 $itemFormList->addRow(_('Authentication passphrase'),
 	(new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase'], false, 64))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmpv3_authpassphrase'
+	'row_snmpv3_authpassphrase'
 );
 $itemFormList->addRow(_('Privacy protocol'),
 	(new CDiv(
@@ -154,20 +154,20 @@ $itemFormList->addRow(_('Privacy protocol'),
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;'),
-	false, 'row_snmpv3_privprotocol'
+	'row_snmpv3_privprotocol'
 );
 $itemFormList->addRow(_('Privacy passphrase'),
 	(new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase'], false, 64))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmpv3_privpassphrase'
+	'row_snmpv3_privpassphrase'
 );
 $itemFormList->addRow(_('Port'),
-	(new CTextBox('port', $this->data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), false, 'row_port'
+	(new CTextBox('port', $this->data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
 );
 $itemFormList->addRow(_('IPMI sensor'),
 	(new CTextBox('ipmi_sensor', $this->data['ipmi_sensor'], $this->data['limited'], 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_ipmi_sensor'
+	'row_ipmi_sensor'
 );
 
 // append authentication method to form list
@@ -175,35 +175,35 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 	ITEM_AUTHTYPE_PASSWORD => _('Password'),
 	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 ]);
-$itemFormList->addRow(_('Authentication method'), $authTypeComboBox, false, 'row_authtype');
+$itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
 $itemFormList->addRow(_('User name'),
 	(new CTextBox('username', $this->data['username'], false, 64))
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	false, 'row_username'
+	'row_username'
 );
 $itemFormList->addRow(_('Public key file'),
 	(new CTextBox('publickey', $this->data['publickey'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	false, 'row_publickey'
+	'row_publickey'
 );
 $itemFormList->addRow(_('Private key file'),
 	(new CTextBox('privatekey', $this->data['privatekey'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	false, 'row_privatekey'
+	'row_privatekey'
 );
 $itemFormList->addRow(_('Password'),
 	(new CTextBox('password', $this->data['password'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	false, 'row_password'
+	'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
 	(new CTextArea('params_es', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'label_executed_script'
+	'label_executed_script'
 );
 $itemFormList->addRow(_('SQL query'),
 	(new CTextArea('params_ap', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'label_params'
+	'label_params'
 );
 $itemFormList->addRow(_('Formula'),
 	(new CTextArea('params_f', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'label_formula'
+	'label_formula'
 );
 
 // append value type to form list
@@ -233,10 +233,10 @@ if ($this->data['limited']) {
 else {
 	$dataType = new CComboBox('data_type', $this->data['data_type'], null,  item_data_type2str());
 }
-$itemFormList->addRow(_('Data type'), $dataType, false, 'row_data_type');
+$itemFormList->addRow(_('Data type'), $dataType, 'row_data_type');
 $itemFormList->addRow(_('Units'),
 	(new CTextBox('units', $this->data['units'], $this->data['limited']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_units'
+	'row_units'
 );
 
 // append multiplier to form list
@@ -264,11 +264,11 @@ else {
 			->setAttribute('style', 'text-align: right;')
 	];
 }
-$itemFormList->addRow(_('Use custom multiplier'), $multiplier, false, 'row_multiplier');
+$itemFormList->addRow(_('Use custom multiplier'), $multiplier, 'row_multiplier');
 
 $itemFormList->addRow(_('Update interval (in sec)'),
 	(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-	false, 'row_delay'
+	'row_delay'
 );
 
 // append delay flex to form list
@@ -307,7 +307,7 @@ $itemFormList->addRow(_('Flexible intervals'),
 	(new CDiv($delayFlexTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-	false, 'row_flex_intervals'
+	'row_flex_intervals'
 );
 
 // append new flexible interval to form list
@@ -331,7 +331,7 @@ $maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
 	->setId('row-new-delay-flex-max-reached')
 	->setAttribute('style', 'display: none;');
 
-$itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');
+$itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], 'row_new_delay_flex', 'new');
 
 $keepHistory = [];
 $keepHistory[] = (new CNumericBox('history', $this->data['history'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
@@ -339,12 +339,12 @@ $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = [];
 $keepTrend[] = (new CNumericBox('trends', $this->data['trends'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
-$itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, false, 'row_trends');
+$itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, 'row_trends');
 
 $itemFormList->addRow(_('Log time format'),
 	(new CTextBox('logtimefmt', $this->data['logtimefmt'], $this->data['limited'], 64))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_logtimefmt'
+	'row_logtimefmt'
 );
 
 // append delta to form list
@@ -361,7 +361,7 @@ if ($this->data['limited']) {
 else {
 	$deltaComboBox= new CComboBox('delta', $this->data['delta'], null, $deltaOptions);
 }
-$itemFormList->addRow(_('Store value'), $deltaComboBox, false, 'row_delta');
+$itemFormList->addRow(_('Store value'), $deltaComboBox, 'row_delta');
 
 // append valuemap to form list
 if ($this->data['limited']) {
@@ -383,7 +383,7 @@ $link = (new CLink(_('show value mappings'), 'adm.valuemapping.php'))
 $itemFormList->addRow(_('Show value'), [$valuemapComboBox, SPACE, $link], null, 'row_valuemap');
 $itemFormList->addRow(_('Allowed hosts'),
 	(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_trapper_hosts');
+	'row_trapper_hosts');
 
 // append applications to form list
 $itemFormList->addRow(new CLabel(_('New application'), 'new_application'),

@@ -82,7 +82,6 @@ if ($this->data['displayInterfaces']) {
 	$itemFormList->addRow(
 		[_('Host interface'), SPACE, $interfaceVisBox],
 		(new CDiv([$interfacesComboBox, $span]))->setId('interfaceDiv'),
-		false,
 		'interface_row'
 	);
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
@@ -392,7 +391,7 @@ $maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
 	->setId('row-new-delay-flex-max-reached')
 	->setAttribute('style', 'display: none;');
 
-$itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new');
+$itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], 'row_new_delay_flex', 'new');
 
 // append history to form list
 $itemFormList->addRow(

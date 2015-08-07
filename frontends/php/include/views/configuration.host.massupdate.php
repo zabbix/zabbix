@@ -327,7 +327,7 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 				_('Original')
 			))->setChecked(isset($data['visible'][$field]))
 		],
-		$fieldInput, false, null, 'formrow-inventory'
+		$fieldInput, null, 'formrow-inventory'
 	);
 }
 

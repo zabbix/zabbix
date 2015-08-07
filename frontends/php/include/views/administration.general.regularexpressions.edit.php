@@ -108,18 +108,17 @@ $testTab = (new CFormList())
 	->addRow(_('Test string'),
 		(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT));
-
-$testTab->addRow(_('Result'), [
-	(new CDiv(
-		(new CTable())
-			->setId('testResultTable')
-			->setAttribute('style', 'width: 100%;')
-			->setHeader([_('Expression type'), _('Expression'), _('Result')])
-	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-]);
+	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT))
+	->addRow(_('Result'),
+		(new CDiv(
+			(new CTable())
+				->setId('testResultTable')
+				->setAttribute('style', 'width: 100%;')
+				->setHeader([_('Expression type'), _('Expression'), _('Result')])
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 
 $regExpView = new CTabView();
 if (!$data['form_refresh']) {

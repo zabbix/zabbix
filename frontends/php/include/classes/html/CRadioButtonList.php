@@ -45,7 +45,7 @@ class CRadioButtonList extends CList {
 		$this->values[] = [
 			'name' => $name,
 			'value' => $value,
-			'id' => zbx_formatDomId($id),
+			'id' => ($id === null ? null : zbx_formatDomId($id)),
 			'on_change' => $on_change
 		];
 

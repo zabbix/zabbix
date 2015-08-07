@@ -53,16 +53,13 @@ $scriptFormList->addRow(_('Execute on'),
 			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
 	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 );
 $scriptFormList->addRow(_('Commands'),
-	(new CTextArea('command', $data['command']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
+	(new CTextArea('command', $data['command']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 $scriptFormList->addRow(_('Command'),
-	(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	($data['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
+	(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 $scriptFormList->addRow(_('Description'),
 	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -88,7 +85,7 @@ $scriptFormList->addRow(null, (new CMultiSelect([
 	'popup' => [
 		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
 	]
-]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), null, 'hostGroupSelection');
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection');
 
 // access
 $scriptFormList->addRow(_('Required host permissions'), new CComboBox('host_access', $data['host_access'], null, [
