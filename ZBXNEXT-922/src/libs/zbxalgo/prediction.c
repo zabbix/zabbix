@@ -392,8 +392,9 @@ static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char
 
 static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, char **error)
 {
-	double	element;
-	int	i, j, k;
+	double		element;
+	int		i, j;
+	unsigned int	k;
 
 	if ('\0' == *fit || 0 == strcmp(fit, "linear") || 0 == strcmp(fit, "exponential"))
 	{
@@ -419,14 +420,11 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 	}
 	else if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
 	{
-		if (1 != sscanf(fit + strlen("polynomial"), "%d", &k))
+		if (SUCCEED != is_uint_range(fit + strlen("polynomial"), &k, 1, 6))
 		{
-			*error = zbx_strdup(*error, "cannot read degree of polynomial");
+			*error = zbx_strdup(*error, "polynomial degree is invalid");
 			return ZBX_MATH_FAIL;
 		}
-
-		if (0 >= k)
-			return ZBX_MATH_FAIL;
 
 		if (k > n - 1)
 			k = n - 1;
