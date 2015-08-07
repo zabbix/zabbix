@@ -1205,12 +1205,7 @@ function getActionCommands(array $alerts) {
 }
 
 function get_actions_hint_by_eventid($eventid, $status = null) {
-	$tab_hint = (new CTableInfo())
-		->setHeader([
-			_('User'),
-			_('Details'),
-			_('Status')
-		]);
+	$tab_hint = (new CTableInfo())->setHeader([_('User'), _('Details'), _('Status')]);
 
 	$sql = 'SELECT a.alertid,mt.description,u.alias,u.name,u.surname,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
 			' FROM events e,alerts a'.
