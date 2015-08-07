@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-07 11:23+0300\n"
-"PO-Revision-Date: 2015-06-15 23:40+0300\n"
+"POT-Creation-Date: 2015-08-07 13:41+0300\n"
+"PO-Revision-Date: 2015-07-29 14:45+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1434404454.0\n"
+"X-POOTLE-MTIME: 1438173940.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -1016,7 +1016,7 @@ msgstr "Priemerná hodnota za čas T NIE JE N"
 #: include/classes/setup/CSetupWizard.php:121
 #: include/classes/setup/CSetupWizard.php:342
 msgid "Back"
-msgstr ""
+msgstr "Späť"
 
 #: include/views/administration.general.image.edit.php:55
 #: include/views/administration.general.image.list.php:39
@@ -1065,7 +1065,7 @@ msgstr "Blokovaný"
 
 #: include/classes/core/ZBase.php:265
 msgid "Blue"
-msgstr ""
+msgstr "Modrá"
 
 #: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:373
 #: include/views/js/configuration.sysmaps.js.php:457
