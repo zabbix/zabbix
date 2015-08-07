@@ -74,8 +74,8 @@ $conditionFormList = new CFormList();
 // create condition table
 $conditionTable = (new CTable(_('No conditions defined.')))
 	->setId('conditionTable')
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	->setHeader([_('Label'), _('Name'), (new CColHeader(_('Action')))->addStyle('width: 75px')]);
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Label'), _('Name'), _('Action')]);
 
 $i = 0;
 
@@ -109,13 +109,12 @@ if ($this->data['action']['filter']['conditions']) {
 				getConditionDescription($condition['conditiontype'], $condition['operator'],
 					$actionConditionStringValues[0][$cIdx]
 				),
-				[
+				(new CCol([
 					(new CButton('remove', _('Remove')))
 						->onClick('javascript: removeCondition('.$i.');')
 						->addClass(ZBX_STYLE_BTN_LINK),
 					new CVar('conditions['.$i.']', $condition)
-				],
-				new CVar('conditions[' . $i . '][formulaid]', $label)
+				]))->addClass(ZBX_STYLE_NOWRAP)
 			],
 			null, 'conditions_'.$i
 		);
@@ -145,7 +144,11 @@ $conditionFormList->addRow(_('Type of calculation'), [
 	(new CSpan())->setId('conditionLabel'),
 	$formula
 ]);
-$conditionFormList->addRow(_('Conditions'), (new CDiv($conditionTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$conditionFormList->addRow(_('Conditions'),
+	(new CDiv($conditionTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 // append new condition to form list
 $conditionTypeComboBox = new CComboBox('new_condition[conditiontype]', $this->data['new_condition']['conditiontype'], 'submit()');
@@ -350,24 +353,26 @@ switch ($this->data['new_condition']['conditiontype']) {
 		$condition = null;
 }
 
-$conditionTable = (new CTable())
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	->addRow(new CCol(
-	[
-		$conditionTypeComboBox,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$conditionOperatorsComboBox,
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		$condition
-	])
-	)
-	->addRow([
-		new CCol(
-			(new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-		)//->setColSpan(3)
-	]);
-
-$conditionFormList->addRow(_('New condition'), (new CDiv($conditionTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$conditionFormList->addRow(_('New condition'),
+	(new CDiv(
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->addRow(
+				new CCol([
+					$conditionTypeComboBox,
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$conditionOperatorsComboBox,
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					$condition
+				])
+			)
+			->addRow(
+				(new CSubmit('add_condition', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+			)
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 /*
  * Operation tab
@@ -385,19 +390,13 @@ if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsou
 // create operation table
 $operationsTable = (new CTable())
 	->setNoDataMessage(_('No operations defined.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
+	->setAttribute('style', 'width: 100%;');
 if ($this->data['eventsource'] == EVENT_SOURCE_TRIGGERS || $this->data['eventsource'] == EVENT_SOURCE_INTERNAL) {
-	$operationsTable->setHeader([
-		_('Steps'),
-		_('Details'),
-		_('Start in'),
-		_('Duration (sec)'),
-		(new CColHeader(_('Action')))->addStyle('width: 100px')
-	]);
+	$operationsTable->setHeader([_('Steps'), _('Details'), _('Start in'), _('Duration (sec)'), _('Action')]);
 	$delay = count_operations_delay($this->data['action']['operations'], $this->data['action']['esc_period']);
 }
 else {
-	$operationsTable->setHeader([_('Details'), (new CColHeader(_('Action')))->addStyle('width: 100px')]);
+	$operationsTable->setHeader([_('Details'), _('Action')]);
 }
 
 if ($this->data['action']['operations']) {
@@ -451,7 +450,7 @@ if ($this->data['action']['operations']) {
 				$details,
 				$esc_delay_txt,
 				$esc_period_txt,
-				[
+				(new CCol([
 					(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
 					SPACE, SPACE,
 					[
@@ -460,13 +459,13 @@ if ($this->data['action']['operations']) {
 							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('operations['.$operationid.']', $operation)
 					]
-				]
+				]))->addClass(ZBX_STYLE_NOWRAP)
 			];
 		}
 		else {
 			$operationRow = [
 				$details,
-				[
+				(new CCol([
 					(new CSubmit('edit_operationid['.$operationid.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
 					SPACE, SPACE,
 					[
@@ -475,7 +474,7 @@ if ($this->data['action']['operations']) {
 							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('operations['.$operationid.']', $operation)
 					]
-				]
+				]))->addClass(ZBX_STYLE_NOWRAP)
 			];
 		}
 		$operationsTable->addRow($operationRow, null, 'operations_'.$operationid);
@@ -495,18 +494,21 @@ if ($this->data['action']['operations']) {
 	}
 }
 
-$footer = [];
+$footer = null;
 if (empty($this->data['new_operation'])) {
-	$footer[] = (new CSubmit('new_operation', _('New')))->addClass(ZBX_STYLE_BTN_LINK);
+	$footer = (new CSubmit('new_operation', _('New')))->addClass(ZBX_STYLE_BTN_LINK);
 }
 
 $operationFormList->addRow(_('Action operations'),
-	(new CDiv([$operationsTable, $footer]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	(new CDiv([$operationsTable, $footer]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // create new operation table
 if (!empty($this->data['new_operation'])) {
 	$newOperationsTable = (new CTable())
+		->setAttribute('style', 'width: 100%;')
 		->addItem(new CVar('new_operation[actionid]', $this->data['actionid']));
 
 	if (isset($this->data['new_operation']['id'])) {
@@ -586,8 +588,8 @@ if (!empty($this->data['new_operation'])) {
 			}
 
 			$usrgrpList = (new CTable())
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-				->setHeader([_('User group'), (new CColHeader(_('Action')))->addStyle('width: 75px')]);
+				->setAttribute('style', 'width: 100%;')
+				->setHeader([_('User group'), _('Action')]);
 
 			$addUsrgrpBtn = (new CButton(null, _('Add')))
 				->onClick('return PopUp("popup.php?dstfrm=action.edit&srctbl=usrgrp&srcfld1=usrgrpid&srcfld2=name&multiselect=1")')
@@ -599,8 +601,8 @@ if (!empty($this->data['new_operation'])) {
 			);
 
 			$userList = (new CTable())
-				->setHeader([_('User'), (new CColHeader(_('Action')))->addStyle('width: 75px')])
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+				->setAttribute('style', 'width: 100%;')
+				->setHeader([_('User'), _('Action')]);
 
 			$addUserBtn = (new CButton(null, _('Add')))
 				->onClick('return PopUp("popup.php?dstfrm=action.edit&srctbl=users&srcfld1=userid&srcfld2=fullname&multiselect=1")')
@@ -642,8 +644,16 @@ if (!empty($this->data['new_operation'])) {
 			zbx_add_post_js($jsInsert);
 
 			$newOperationsTable
-				->addRow([_('Send to User groups'), (new CDiv($usrgrpList))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)])
-				->addRow([_('Send to Users'), (new CDiv($userList))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)]);
+				->addRow([_('Send to User groups'),
+					(new CDiv($usrgrpList))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				])
+				->addRow([_('Send to Users'),
+					(new CDiv($userList))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				]);
 
 			$mediaTypeComboBox = (new CComboBox('new_operation[opmessage][mediatypeid]', $this->data['new_operation']['opmessage']['mediatypeid']))
 				->addItem(0, '- '._('All').' -');
@@ -709,17 +719,6 @@ if (!empty($this->data['new_operation'])) {
 				}
 			}
 
-			$cmdList = (new CTable())
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-				->setHeader([_('Target'), _('Action')]);
-
-			$addCmdBtn = (new CButton('add', _('New')))
-				->onClick('javascript: showOpCmdForm(0);')
-				->addClass(ZBX_STYLE_BTN_LINK);
-			$cmdList->addRow((new CRow(
-				(new CCol($addCmdBtn))->setColSpan(3)))->setId('opCmdListFooter')
-			);
-
 			// add participations
 			if (!isset($this->data['new_operation']['opcommand_grp'])) {
 				$this->data['new_operation']['opcommand_grp'] = [];
@@ -760,10 +759,25 @@ if (!empty($this->data['new_operation'])) {
 			zbx_add_post_js($jsInsert);
 
 			// target list
-			$cmdList = (new CDiv($cmdList))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setId('opCmdList');
-			$newOperationsTable->addRow([_('Target list'), $cmdList]);
+			$newOperationsTable->addRow([_('Target list'),
+				(new CDiv(
+					(new CTable())
+						->setAttribute('style', 'width: 100%;')
+						->setHeader([_('Target'), _('Action')])
+						->addRow(
+							(new CRow(
+								(new CCol(
+									(new CButton('add', _('New')))
+										->onClick('javascript: showOpCmdForm(0);')
+										->addClass(ZBX_STYLE_BTN_LINK)
+								))->setColSpan(3)
+							))->setId('opCmdListFooter')
+						)
+				))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+					->setId('opCmdList')
+			]);
 
 			// type
 			$typeComboBox = new CComboBox('new_operation[opcommand][type]',
@@ -791,12 +805,16 @@ if (!empty($this->data['new_operation'])) {
 			$newOperationsTable->addRow([_('Script name'), $userScript]);
 
 			// script
-			$executeOnRadioButton = new CRadioButtonList('new_operation[opcommand][execute_on]', $this->data['new_operation']['opcommand']['execute_on']);
-			$executeOnRadioButton->makeVertical();
-			$executeOnRadioButton->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT);
-			$executeOnRadioButton->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
 			$newOperationsTable->addRow([_('Execute on'),
-				(new CDiv($executeOnRadioButton))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				(new CDiv(
+					(new CRadioButtonList('new_operation[opcommand][execute_on]',
+						(int) $this->data['new_operation']['opcommand']['execute_on']
+					))
+						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+				))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			]);
 
 			// ssh
@@ -912,9 +930,9 @@ if (!empty($this->data['new_operation'])) {
 
 		$operationConditionsTable = (new CTable())
 			->setNoDataMessage(_('No conditions defined.'))
+			->setAttribute('style', 'width: 100%;')
 			->setId('operationConditionTable')
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-			->setHeader([_('Label'), _('Name'), (new CColHeader(_('Action')))->addStyle('width: 75px')]);
+			->setHeader([_('Label'), _('Name'), _('Action')]);
 
 		$i = 0;
 
@@ -947,14 +965,14 @@ if (!empty($this->data['new_operation'])) {
 					getConditionDescription($opcondition['conditiontype'], $opcondition['operator'],
 						$operationConditionStringValues[$cIdx]
 					),
-					[
+					(new CCol([
 						(new CButton('remove', _('Remove')))
 							->onClick('javascript: removeOperationCondition('.$i.');')
 							->addClass(ZBX_STYLE_BTN_LINK),
 						new CVar('new_operation[opconditions]['.$i.'][conditiontype]', $opcondition['conditiontype']),
 						new CVar('new_operation[opconditions]['.$i.'][operator]', $opcondition['operator']),
 						new CVar('new_operation[opconditions]['.$i.'][value]', $opcondition['value'])
-					]
+					]))->addClass(ZBX_STYLE_NOWRAP)
 				],
 				null, 'opconditions_'.$i
 			);
@@ -984,14 +1002,16 @@ if (!empty($this->data['new_operation'])) {
 			))->setColspan(3));
 		}
 		$newOperationsTable->addRow([_('Conditions'),
-			(new CDiv($operationConditionsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			(new CDiv($operationConditionsTable))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		]);
 	}
 
 	// append new operation condition to form list
 	if (isset($_REQUEST['new_opcondition'])) {
 		$newOperationConditionTable = (new CTable())
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;');
+			->setAttribute('style', 'width: 100%;');
 
 		$allowedOpConditions = get_opconditions_by_eventsource($this->data['eventsource']);
 
@@ -1045,6 +1065,7 @@ if (!empty($this->data['new_operation'])) {
 		$newOperationsTable->addRow([_('Operation condition'),
 			(new CDiv([$newOperationConditionTable, $newOperationConditionFooter]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		]);
 	}
 
@@ -1055,7 +1076,9 @@ if (!empty($this->data['new_operation'])) {
 			->addStyle('margin-left: 8px')
 	];
 	$operationFormList->addRow(_('Operation details'),
-		(new CDiv([$newOperationsTable, $footer]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv([$newOperationsTable, $footer]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 

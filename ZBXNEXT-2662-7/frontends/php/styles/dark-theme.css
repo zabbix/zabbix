@@ -914,6 +914,43 @@ footer, .footer {
   .list-hor-check-radio li:last-child {
     margin-right: 0; }
 
+.radio-segmented li {
+  display: inline-block;
+  margin: 0 -1px 0 0; }
+  .radio-segmented li:first-child label {
+    -webkit-border-radius: 2px 0 0 2px;
+    -moz-border-radius: 2px 0 0 2px;
+    border-radius: 2px 0 0 2px; }
+  .radio-segmented li:last-child label {
+    -webkit-border-radius: 0 2px 2px 0;
+    -moz-border-radius: 0 2px 2px 0;
+    border-radius: 0 2px 2px 0; }
+.radio-segmented label {
+  padding: 4px 11px;
+  border: 1px solid #4f4f4f;
+  -webkit-transition: background-color 0.2s ease-out;
+  -moz-transition: background-color 0.2s ease-out;
+  transition: background-color 0.2s ease-out; }
+.radio-segmented input[type="radio"] {
+  position: absolute;
+  clip: rect(1px, 1px, 1px, 1px); }
+  .radio-segmented input[type="radio"] + label {
+    color: #f2f2f2;
+    border-color: #4f4f4f;
+    background-color: #333; }
+    .radio-segmented input[type="radio"] + label:hover {
+      background-color: #333; }
+    .radio-segmented input[type="radio"] + label:focus {
+      background-color: #333;
+      border: 1px solid #768d99;
+      position: relative; }
+    .radio-segmented input[type="radio"] + label:active {
+      background-color: #333; }
+  .radio-segmented input[type="radio"]:checked + label {
+    color: #fff;
+    border-color: #4f4f4f;
+    background-color: #4f4f4f; }
+
 label input[type="checkbox"] {
   margin-right: 3px; }
 label input[type="radio"] {
@@ -2155,7 +2192,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .cursor-pointer {
   cursor: pointer; }
 
-.overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -2166,3 +2203,14 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .rel-container {
   position: relative;
   display: inline-block; }
+
+.server-name {
+  position: absolute;
+  z-index: 100;
+  top: 36px;
+  right: 13px;
+  padding: 2px 4px;
+  max-width: 180px;
+  display: inline-block;
+  border-top: 1px solid black;
+  background-color: #2f280a; }

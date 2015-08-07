@@ -6,7 +6,7 @@
 			[
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick("javascript: showNewCheckForm(null, null, '#{dcheckid}');"),
+					->onClick("javascript: showNewCheckForm(null, '#{dcheckid}');"),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->onClick("javascript: removeDCheckRow('#{dcheckid}');")
@@ -18,11 +18,15 @@
 	?>
 </script>
 <script type="text/x-jquery-tmpl" id="uniqRowTPL">
-	<div id="uniqueness_criteria_row_#{dcheckid}">
-		<input type="radio" id="uniqueness_criteria_#{dcheckid}" name="uniqueness_criteria" class="input radio"
-			value="#{dcheckid}" />
-		<label for="uniqueness_criteria_#{dcheckid}">#{name}</label>
-	</div>
+	<?=	(new CListItem(
+		(new CLabel(
+			[
+				(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))->setId('uniqueness_criteria_#{dcheckid}'),
+				'#{name}'
+			],
+			'uniqueness_criteria_#{dcheckid}'
+		))
+	))->toString() ?>
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
@@ -33,74 +37,74 @@
 					<td><label for="type"><?= _('Check type') ?></label></td>
 					<td><select id="type" name="type" class="input select"></select></td>
 				</tr>
-				<tr id="newCheckPortsRow" class="hidden">
+				<tr id="newCheckPortsRow">
 					<td><label for="ports"><?= _('Port range') ?></label></td>
 					<td>
 						<input type="text" id="ports" name="ports" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
-				<tr id="newCheckCommunityRow" class="hidden">
+				<tr id="newCheckCommunityRow">
 					<td><label for="snmp_community"><?= _('SNMP community') ?></label></td>
 					<td><input type="text" id="snmp_community" name="snmp_community" value="" class="input text"
 							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255"></td>
 				</tr>
-				<tr id="newCheckKeyRow" class="hidden">
+				<tr id="newCheckKeyRow">
 					<td><label for="key_"><?= _('SNMP Key') ?></label></td>
 					<td>
-						<input type="text" id="key_" name="key_" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+						<input type="text" id="key_" name="key_" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
-				<tr id="newCheckContextRow" class="hidden">
+				<tr id="newCheckContextRow">
 					<td><label for="snmpv3_contextname"><?= _('Context name') ?></label></td>
 					<td>
-						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+						<input type="text" id="snmpv3_contextname" name="snmpv3_contextname" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
-				<tr id="newCheckSecNameRow" class="hidden">
+				<tr id="newCheckSecNameRow">
 					<td><label for="snmpv3_securityname"><?= _('Security name') ?></label></td>
-					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_securityname" name="snmpv3_securityname" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
-				<tr id="newCheckSecLevRow" class="hidden">
+				<tr id="newCheckSecLevRow">
 					<td><label for="snmpv3_securitylevel"><?= _('Security level') ?></label></td>
 					<td>
-						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel" class="input select">
+						<select id="snmpv3_securitylevel" name="snmpv3_securitylevel">
 							<option value="0"><?= 'noAuthNoPriv' ?> </option>
 							<option value="1"><?= 'authNoPriv' ?> </option>
 							<option value="2"><?= 'authPriv' ?> </option>
 						</select>
 					</td>
 				</tr>
-				<tr id="newCheckAuthProtocolRow" class="hidden">
-					<td><label for="snmpv3_authprotocol"><?= _('Authentication protocol') ?></label></td>
-					<td>
-						<div class="jqueryinputset radioset">
-							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_0" type="radio" checked="checked"
-								value="<?= ITEM_AUTHPROTOCOL_MD5 ?>" />
-							<input name="snmpv3_authprotocol" id="snmpv3_authprotocol_1" type="radio"
-								value="<?= ITEM_AUTHPROTOCOL_SHA ?>" />
-							<label for="snmpv3_authprotocol_0"><?= _('MD5') ?></label><label for="snmpv3_authprotocol_1"><?= _('SHA') ?></label>
-						</div>
-					</td>
-				</tr>
-				<tr id="newCheckAuthPassRow" class="hidden">
+				<?= (new CRow([
+					_('Authentication protocol'),
+					(new CDiv(
+						(new CRadioButtonList('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5))
+							->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
+							->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
+					))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
+				]))
+					->setId('newCheckAuthProtocolRow')
+					->toString() ?>
+				<tr id="newCheckAuthPassRow">
 					<td><label for="snmpv3_authpassphrase"><?= _('Authentication passphrase') ?></label></td>
-					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
-				<tr id="newCheckPrivProtocolRow" class="hidden">
-					<td><label for="snmpv3_authprotocol"><?= _('Authentication protocol') ?></label></td>
-					<td>
-						<div class="jqueryinputset radioset">
-							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_0" type="radio" checked="checked"
-								value="<?= ITEM_PRIVPROTOCOL_DES ?>" />
-							<input name="snmpv3_privprotocol" id="snmpv3_privprotocol_1" type="radio"
-								value="<?= ITEM_PRIVPROTOCOL_AES ?>" />
-							<label for="snmpv3_privprotocol_0"><?= _('DES') ?></label><label for="snmpv3_privprotocol_1"><?= _('AES') ?></label>
-						</div>
-					</td>
-				</tr>
-				<tr id="newCheckPrivPassRow" class="hidden">
+				<?= (new CRow([
+					_('Privacy protocol'),
+					(new CDiv(
+						(new CRadioButtonList('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES))
+							->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
+							->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
+					))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
+				]))
+					->setId('newCheckPrivProtocolRow')
+					->toString() ?>
+				<tr id="newCheckPrivPassRow">
 					<td><label for="snmpv3_privpassphrase"><?= _('Privacy passphrase') ?></label></td>
-					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
+					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				</tbody>
 			</table>
@@ -291,7 +295,7 @@
 					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').text(value['name']);
 				}
 				else {
-					jQuery('#uniqList').append(uniqRowTpl.evaluate(value));
+					jQuery('#uniqueness_criteria').append(uniqRowTpl.evaluate(value));
 				}
 			}
 			else {
@@ -321,7 +325,7 @@
 		}
 	}
 
-	function showNewCheckForm(e, dcheckType, dcheckId) {
+	function showNewCheckForm(e, dcheckId) {
 		var isUpdate = (typeof dcheckId !== 'undefined');
 
 		// remove existing form
@@ -494,13 +498,6 @@
 		toggleInputs('newCheckAuthPassRow', showAuthPass);
 		toggleInputs('newCheckPrivProtocolRow', showPrivProtocol);
 		toggleInputs('newCheckPrivPassRow', showPrivPass);
-
-		if (showAuthProtocol) {
-			jQuery('#newCheckAuthProtocolRow .jqueryinputset').buttonset();
-		}
-		if (showPrivProtocol) {
-			jQuery('#newCheckPrivProtocolRow .jqueryinputset').buttonset();
-		}
 	}
 
 	function saveNewDCheckForm(dcheckId) {
@@ -650,7 +647,8 @@
 
 		jQuery('#newCheck').click(showNewCheckForm);
 		jQuery('#clone').click(function() {
-			jQuery('#update').button('option', 'label', <?= CJs::encodeJson(_('Add')) ?>)
+			jQuery('#update')
+				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 			jQuery('#druleid, #delete, #clone').remove();
 			jQuery('#form').val('clone');

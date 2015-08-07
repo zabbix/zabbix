@@ -283,13 +283,13 @@ if (hasRequest('sform')) {
 
 	$keyTable = (new CTable())
 		->setId('key_list')
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setHeader([_('Keyword'), _('Type'), (new CColHeader(_('Action')))->addStyle('width: 100px')]);
+		->setAttribute('style', 'width: 100%;')
+		->setHeader([_('Keyword'), _('Type'), _('Action')]);
 
 	$table = (new CTable())
 		->setId('exp_list')
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-		->setHeader([_('Expression'), _('Type'), _('Position'), (new CColHeader(_('Action')))->addStyle('width: 100px')]);
+		->setAttribute('style', 'width: 100%;')
+		->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
 
 	$maxId = 0;
 	foreach ($expressions as $id => $expr) {
@@ -343,8 +343,16 @@ if (hasRequest('sform')) {
 
 	zbx_add_post_js('key_count='.($maxId + 1).';');
 
-	$form_list->addRow(null, (new CDiv($keyTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
-	$form_list->addRow(null, (new CDiv($table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+	$form_list->addRow(null,
+		(new CDiv($keyTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+	$form_list->addRow(null,
+		(new CDiv($table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 
 	$sev_select = new CComboBox('priority', $priority);
 

@@ -137,18 +137,6 @@ $itemFormList->addRow(
 );
 
 // append snmpv3 authprotocol to form list
-$authProtocol = (new CDiv(
-	[
-		(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5))
-			->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
-		new CLabel(_('MD5'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
-		(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA))
-		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA),
-		new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
-]))
-	->addClass('jqueryinputset')
-	->addClass('radioset')
-	->setId('authprotocol_div');
 $itemFormList->addRow(
 	[
 		_('Authentication protocol'),
@@ -156,7 +144,14 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[authprotocol]', 'authprotocol_div', _('Original')))
 			->setChecked(isset($this->data['visible']['authprotocol']))
 	],
-	$authProtocol
+	(new CDiv(
+		(new CRadioButtonList('snmpv3_authprotocol', (int) $this->data['snmpv3_authprotocol']))
+			->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
+			->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
+		->setId('authprotocol_div')
 );
 
 // append snmpv3 authpassphrase to form list
@@ -172,18 +167,6 @@ $itemFormList->addRow(
 );
 
 // append snmpv3 privprotocol to form list
-$privProtocol = (new CDiv(
-	[
-		(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES))
-			->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
-		new CLabel(_('DES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
-		(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES))
-			->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES),
-		new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
-]))
-	->addClass('jqueryinputset')
-	->addClass('radioset')
-	->setId('privprotocol_div');
 $itemFormList->addRow(
 	[
 		_('Privacy protocol'),
@@ -191,7 +174,14 @@ $itemFormList->addRow(
 		(new CVisibilityBox('visible[privprotocol]', 'privprotocol_div', _('Original')))
 			->setChecked(isset($this->data['visible']['privprotocol']))
 	],
-	$privProtocol
+	(new CDiv(
+		(new CRadioButtonList('snmpv3_privprotocol', (int) $this->data['snmpv3_privprotocol']))
+			->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
+			->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
+		->setId('privprotocol_div')
 );
 
 // append snmpv3 privpassphrase to form list
@@ -341,7 +331,7 @@ $itemFormList->addRow(
 // append delay flex to form list
 $delayFlexTable = (new CTable())
 	->setNoDataMessage(_('No flexible intervals defined.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setId('delayFlexTable')
 	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
@@ -378,6 +368,7 @@ $itemFormList->addRow(
 	],
 	(new CDiv($delayFlexTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('delayFlexDiv')
 );
 

@@ -192,15 +192,8 @@ $hostFormList->addRow(
 $templatesFormList = new CFormList('templatesFormList');
 
 // append templates table to from list
-$templatesTable = (new CTable())
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
-	->setId('template_table');
-
-$clearDiv = (new CDiv())->addStyle('clear: both;');
-
-$templatesDiv = (new CDiv(
-	[
+$newTemplateTable = (new CTable())
+	->addRow([
 		(new CMultiSelect([
 			'name' => 'templates[]',
 			'objectName' => 'templates',
@@ -209,8 +202,9 @@ $templatesDiv = (new CDiv(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostView->getName().
 					'&dstfld1=templates_&templated_hosts=1&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		$clearDiv,
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	])
+	->addRow([
 		(new CDiv([
 			(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1),
 			SPACE,
@@ -220,10 +214,7 @@ $templatesDiv = (new CDiv(
 			SPACE,
 			_('Clear when unlinking')
 		]))->addClass('floatleft')
-	]
-))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setId('templateDiv');
+	]);
 
 $templatesFormList->addRow(
 	[
@@ -232,7 +223,10 @@ $templatesFormList->addRow(
 		(new CVisibilityBox('visible[templates]', 'templateDiv', _('Original')))
 			->setChecked(isset($data['visible']['templates']))
 	],
-	$templatesDiv
+	(new CDiv($newTemplateTable))
+		->setId('templateDiv')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 $ipmiFormList = new CFormList('ipmiFormList');

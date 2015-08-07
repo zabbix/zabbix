@@ -5,7 +5,7 @@
 		<input name="new_operation[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
 		<span>#{name}</span>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -17,7 +17,7 @@
 		<input name="new_operation[opmessage_usr][#{userid}][userid]" type="hidden" value="#{userid}" />
 		<span>#{fullname}</span>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUserRow('#{userid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -31,7 +31,7 @@
 		#{objectCaption}
 		<span>#{name}</span>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{groupid}', 'groupid');"><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -45,7 +45,7 @@
 		#{objectCaption}
 		<span>#{name}</span>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{hostid}', 'hostid');"><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -55,8 +55,8 @@
 <tr>
 	<td></td>
 	<td>
-		<div id="opcmdEditForm" class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>">
-			<table style="min-width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
+		<div id="opcmdEditForm" class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
+			<table style="width: 100%;">
 				<tbody>
 				<tr>
 					<?= (new CCol([

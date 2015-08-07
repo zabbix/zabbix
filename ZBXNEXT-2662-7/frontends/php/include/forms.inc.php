@@ -1768,15 +1768,15 @@ function get_timeperiod_form() {
 		]);
 		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
-		$tblPeriod->addRow([_('Date'), [
-			(new CRadioButton('new_timeperiod[month_date_type]', '0', !$new_timeperiod['month_date_type']))
-				->onChange('submit()'),
-			_('Day'),
-			SPACE,
-			(new CRadioButton('new_timeperiod[month_date_type]', '1', $new_timeperiod['month_date_type']))
-				->onChange('submit()'),
-			_('Day of week')]]
-		);
+		$tblPeriod->addRow([_('Date'),
+			(new CDiv(
+				(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
+					->addValue(_('Day'), 0, null, 'submit()')
+					->addValue(_('Day of week'), 1, null, 'submit()')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
+		]);
 
 		if ($new_timeperiod['month_date_type'] > 0) {
 			$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
@@ -1840,7 +1840,9 @@ function get_timeperiod_form() {
 		$tblPeriod->addRow([_('At (hour:minute)'), [
 			(new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			':',
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		]]);

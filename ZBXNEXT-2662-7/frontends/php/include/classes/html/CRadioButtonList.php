@@ -19,61 +19,73 @@
 **/
 
 
-class CRadioButtonList extends CDiv {
+class CRadioButtonList extends CList {
 
 	const ORIENTATION_HORIZONTAL = 'horizontal';
 	const ORIENTATION_VERTICAL = 'vertical';
 
-	protected $count;
 	protected $name;
 	protected $value;
 	protected $orientation;
+	protected $enabled;
+	protected $values;
 
-	public function __construct($name = 'radio', $value = 'yes') {
-		$this->count = 0;
+	public function __construct($name, $value) {
+		parent::__construct();
+
 		$this->name = $name;
 		$this->value = $value;
 		$this->orientation = self::ORIENTATION_HORIZONTAL;
-		parent::__construct();
+		$this->enabled = true;
+		$this->values = [];
 		$this->setId(zbx_formatDomId($name));
 	}
 
-	public function addValue($name, $value, $checked = null, $id = null) {
-		$this->count++;
+	public function addValue($name, $value, $id = null, $on_change = null) {
+		$this->values[] = [
+			'name' => $name,
+			'value' => $value,
+			'id' => zbx_formatDomId($id),
+			'on_change' => $on_change
+		];
 
-		if (is_null($id)) {
-			$id = zbx_formatDomId($this->name).'_'.$this->count;
-		}
-
-		$radio = (new CInput('radio', $this->name, $value))->setId($id);
-		if (strcmp($value, $this->value) == 0 || !is_null($checked) || $checked) {
-			$radio->setAttribute('checked', 'checked');
-		}
-
-		$label = new CLabel($name, $id);
-
-		$outerDiv = new CDiv([$radio, $label]);
-		if ($this->orientation == self::ORIENTATION_HORIZONTAL) {
-			$outerDiv->addClass('inlineblock');
-		}
-
-		parent::addItem($outerDiv);
-		return $this;
-	}
-
-	public function makeHorizaontal() {
-		$this->orientation = self::ORIENTATION_HORIZONTAL;
 		return $this;
 	}
 
 	public function makeVertical() {
 		$this->orientation = self::ORIENTATION_VERTICAL;
+
 		return $this;
 	}
 
-	public function useJQueryStyle() {
-		parent::useJQueryStyle();
-		$this->addClass('radioset');
+	public function setEnabled($enabled) {
+		$this->enabled = $enabled;
+
 		return $this;
+	}
+
+	public function toString($destroy = true) {
+		$this->addClass($this->orientation == self::ORIENTATION_HORIZONTAL
+			? ZBX_STYLE_LIST_HOR_CHECK_RADIO
+			: ZBX_STYLE_LIST_CHECK_RADIO
+		);
+
+		foreach ($this->values as $key => $value) {
+			if ($value['id'] === null) {
+				$value['id'] = zbx_formatDomId($this->name).'_'.$key;
+			}
+
+			$radio = (new CInput('radio', $this->name, $value['value']))
+				->setEnabled($this->enabled)
+				->onChange($value['on_change'])
+				->setId($value['id']);
+			if ($value['value'] === $this->value) {
+				$radio->setAttribute('checked', 'checked');
+			}
+
+			parent::addItem(new CLabel([$radio, $value['name']], $value['id']));
+		}
+
+		return parent::toString($destroy);
 	}
 }

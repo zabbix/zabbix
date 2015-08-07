@@ -133,7 +133,7 @@ $triggersFormList->addRow(_('Expression'), $expressionRow);
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable = (new CTable())
-		->setAttribute('style', 'min-width: 500px;')
+		->setAttribute('style', 'width: 100%;')
 		->setId('exp_list')
 		->setHeader([
 			$this->data['limited'] ? null : _('Target'),
@@ -194,8 +194,9 @@ if ($this->data['input_method'] == IM_TREE) {
 				unset($obj);
 			}
 
-			$row = new CRow([$triggerCheckbox, $e['list'], isset($deleteUrl) ? $deleteUrl : null, $errorImg]);
-			$expressionTable->addRow($row);
+			$expressionTable->addRow(
+				new CRow([$triggerCheckbox, $e['list'], isset($deleteUrl) ? $deleteUrl : null, $errorImg])
+			);
 		}
 	}
 	else {
@@ -219,7 +220,9 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		(new CDiv([$expressionTable, $testButton]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv([$expressionTable, $testButton]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
 	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))
@@ -239,7 +242,7 @@ $triggersFormList
 		(new CTextArea('comments', $this->data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('URL'), (new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
+	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $this->data['priority']]));
 
 // append status to form list
 if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
@@ -265,7 +268,7 @@ $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($this->data['db_dependencies'] as $dependency) {
@@ -306,7 +309,13 @@ $addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addStyle('margin-left: 8px');
 $dependenciesFormList->addRow(_('Dependencies'),
-	(new CDiv([$dependenciesTable, $addButton, $addPrototypeButton]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	(new CDiv([
+		$dependenciesTable,
+		$addButton,
+		$addPrototypeButton
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 

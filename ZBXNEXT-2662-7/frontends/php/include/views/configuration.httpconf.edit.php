@@ -164,7 +164,7 @@ $stepsTable = (new CTable())
 		(new CColHeader(_('Status codes')))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->setWidth('90'),
-		(new CColHeader())->setWidth('50')
+		(new CColHeader(_('Action')))->setWidth('50')
 	]);
 
 $i = 1;

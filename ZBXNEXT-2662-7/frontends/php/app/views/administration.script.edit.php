@@ -46,12 +46,14 @@ $scriptFormList->addRow(_('Type'),
 );
 
 // execute on
-$typeRadioButton = (new CRadioButtonList('execute_on', $data['execute_on']))
-	->makeVertical()
-	->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-	->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
 $scriptFormList->addRow(_('Execute on'),
-	(new CDiv($typeRadioButton))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
+	(new CDiv(
+		(new CRadioButtonList('execute_on', (int) $data['execute_on']))
+			->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
 	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
 );
 $scriptFormList->addRow(_('Commands'),

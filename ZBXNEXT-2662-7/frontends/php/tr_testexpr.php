@@ -46,7 +46,7 @@ list($outline, $eHTMLTree) = analyzeExpression($expression);
 
 // test data (create table, create check fields)
 $dataTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Expression Variable Elements'), _('Result type'), _('Value')]);
 
 $datas = [];
@@ -135,16 +135,21 @@ $form = (new CForm())
 	->addVar('expression', $expression);
 
 $form_list = (new CFormList())
-	->addRow(_('Test data'), (new CDiv($dataTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+	->addRow(_('Test data'),
+		(new CDiv($dataTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 
 $resultTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Expression'), _('Result')]);
 
 ksort($rplcts, SORT_NUMERIC);
 
 foreach ($eHTMLTree as $e) {
 	$result = '';
+	$style = null;
 
 	if ($allowedTesting && $test && isset($e['expression'])) {
 		if (evalExpressionData($e['expression']['value'], $macrosData)) {
@@ -175,7 +180,11 @@ if ($allowedTesting && $test) {
 
 $resultTable->setFooter([$outline, (new CCol($result))->addClass($style)], $resultTable->headerClass);
 
-$form_list->addRow(_('Result'), (new CDiv($resultTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$form_list->addRow(_('Result'),
+	(new CDiv($resultTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 $tab = (new CTabView())->addTab('test_tab', null, $form_list);
 

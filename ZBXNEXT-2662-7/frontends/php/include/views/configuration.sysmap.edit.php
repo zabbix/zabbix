@@ -152,13 +152,13 @@ if (!$this->data['config']['event_ack_enable']) {
 }
 $sysmapList
 	->addRow(_('Problem display'), $showUnackComboBox)
-	->addRow(_('Minimum trigger severity'), new CSeverity(['name' => 'severity_min', 'value' => $this->data['sysmap']['severity_min']]));
+	->addRow(_('Minimum trigger severity'), new CSeverity(['name' => 'severity_min', 'value' => (int) $this->data['sysmap']['severity_min']]));
 
 // create url table
 $urlTable = (new CTable())
 	->setNoDataMessage(_('No URLs defined.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-	->setHeader([_('Name'), _('URL'), _('Element'), SPACE]);
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Name'), _('URL'), _('Element'), _('Action')]);
 if (empty($this->data['sysmap']['urls'])) {
 	$this->data['sysmap']['urls'][] = ['name' => '', 'url' => '', 'elementtype' => 0];
 }
@@ -169,9 +169,11 @@ foreach ($this->data['sysmap']['urls'] as $url) {
 			(new CTextBox('urls['.$i.'][name]', $url['name']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 			(new CTextBox('urls['.$i.'][url]', $url['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			new CComboBox('urls['.$i.'][elementtype]', $url['elementtype'], null, sysmap_element_types()),
-			(new CButton(null, _('Remove')))
-				->onClick('$("urlEntry_'.$i.'").remove();')
-				->addClass(ZBX_STYLE_BTN_LINK)
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->onClick('$("urlEntry_'.$i.'").remove();')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]))->setId('urlEntry_'.$i)
 	);
 	$i++;
@@ -202,7 +204,11 @@ $addButtonColumn = (new CCol($addButton))->setColSpan(4);
 $urlTable->addRow($addButtonColumn);
 
 // append url table to form list
-$sysmapList->addRow(_('URLs'), (new CDiv($urlTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$sysmapList->addRow(_('URLs'),
+	(new CDiv($urlTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 // append sysmap to form
 $sysmapTab = (new CTabView())->addTab('sysmapTab', _('Map'), $sysmapList);
