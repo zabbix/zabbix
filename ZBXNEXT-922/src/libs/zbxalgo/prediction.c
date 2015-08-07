@@ -51,7 +51,7 @@ static int	zbx_matrix_alloc(zbx_matrix_t *m, int rows, int columns, char **error
 {
 	if (0 >= rows || 0 >= columns)
 	{
-		*error = zbx_strdup(*error, "zbx_matrix_alloc: invalid number of rows or columns");
+		*error = zbx_strdup(*error, "invalid matrix dimensions");
 		return ZBX_MATH_FAIL;
 	}
 
@@ -76,15 +76,12 @@ static int	zbx_matrix_copy(zbx_matrix_t *dest, zbx_matrix_t *src, char **error)
 {
 	if (!ZBX_VALID_MATRIX(src))
 	{
-		*error = zbx_strdup(*error, "zbx_matrix_copy: source matrix is not valid");
+		*error = zbx_strdup(*error, "source matrix is not valid");
 		return ZBX_MATH_FAIL;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_alloc(dest, src->rows, src->columns, error))
-	{
-		*error = zbx_strdup(*error, "zbx_matrix_copy: cannot allocate memory for destination matrix elements");
 		return ZBX_MATH_FAIL;
-	}
 
 	memcpy(dest->elements, src->elements, sizeof(double) * src->rows * src->columns);
 	return ZBX_MATH_OK;
@@ -95,10 +92,7 @@ static int	zbx_identity_matrix(zbx_matrix_t *m, int n, char **error)
 	int	i, j;
 
 	if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, n, error))
-	{
-		*error = zbx_strdup(*error, "zbx_identity_matrix: cannot allocate memory for matrix elements");
 		return ZBX_MATH_FAIL;
-	}
 
 	for (i = 0; i < n; ++i)
 		for (j = 0; j < n; ++j)
@@ -113,15 +107,12 @@ static int	zbx_transpose_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 
 	if (!ZBX_VALID_MATRIX(m))
 	{
-		*error = zbx_strdup(*error, "zbx_transpose_matrix: matrix is not valid");
+		*error = zbx_strdup(*error, "matrix to transpose is not valid");
 		return ZBX_MATH_FAIL;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_alloc(r, m->columns, m->rows, error))
-	{
-		*error = zbx_strdup(*error, "zbx_transpose_matrix: cannot allocate memory for transposed matrix elements");
 		return ZBX_MATH_FAIL;
-	}
 
 	for (i = 0; i < r->rows; ++i)
 		for (j = 0; j < r->columns; ++j)
@@ -167,13 +158,13 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 
 	if (!ZBX_VALID_MATRIX(m))
 	{
-		*error = zbx_strdup(*error, "zbx_inverse_matrix: matrix is not valid");
+		*error = zbx_strdup(*error, "matrix to invert is not valid");
 		return ZBX_MATH_FAIL;
 	}
 
 	if (m->rows != m->columns)
 	{
-		*error = zbx_strdup(*error, "zbx_inverse_matrix: matrix is not square");
+		*error = zbx_strdup(*error, "matrix to invert is not square");
 		return ZBX_MATH_FAIL;
 	}
 
@@ -182,14 +173,11 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 	if (1 == n)
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(r, 1, 1, error))
-		{
-			*error = zbx_strdup(*error, "zbx_inverse_matrix: cannot create inversed matrix");
 			return ZBX_MATH_FAIL;
-		}
 
 		if (0.0 == ZBX_MATRIX_EL(m, 0, 0))
 		{
-			*error = zbx_strdup(*error, "zbx_inverse_matrix: matrix is singular");
+			*error = zbx_strdup(*error, "matrix is singular");
 			res = ZBX_MATH_FAIL;
 			goto out;
 		}
@@ -201,15 +189,12 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 	if (2 == n)
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(r, 2, 2, error))
-		{
-			*error = zbx_strdup(*error, "zbx_inverse_matrix: cannot create inversed matrix");
 			return ZBX_MATH_FAIL;
-		}
 
 		if (0.0 == (det = ZBX_MATRIX_EL(m, 0, 0) * ZBX_MATRIX_EL(m, 1, 1) -
 				ZBX_MATRIX_EL(m, 0, 1) * ZBX_MATRIX_EL(m, 1, 0)))
 		{
-			*error = zbx_strdup(*error, "zbx_inverse_matrix: matrix is singular");
+			*error = zbx_strdup(*error, "matrix is singular");
 			res = ZBX_MATH_FAIL;
 			goto out;
 		}
@@ -222,21 +207,16 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 	}
 
 	if (ZBX_MATH_OK != zbx_identity_matrix(r, n, error))
-	{
-		*error = zbx_strdup(*error, "zbx_inverse_matrix: cannot create identity matrix");
 		return ZBX_MATH_FAIL;
-	}
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&l))
 	{
-		*error = zbx_strdup(*error, "zbx_inverse_matrix: cannot create temporary matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_copy(l, m, error))
 	{
-		*error = zbx_strdup(*error, "zbx_inverse_matrix: cannot copy matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -258,7 +238,7 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 
 		if (0.0 == pivot)
 		{
-			*error = zbx_strdup(*error, "zbx_inverse_matrix: matrix is singular");
+			*error = zbx_strdup(*error, "matrix is singular");
 			res = ZBX_MATH_FAIL;
 			goto out;
 		}
@@ -307,21 +287,18 @@ static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t
 
 	if (!ZBX_VALID_MATRIX(left) || !ZBX_VALID_MATRIX(right))
 	{
-		*error = zbx_strdup(*error, "zbx_matrix_mult: input matrices are not valid");
+		*error = zbx_strdup(*error, "matrices to multiplicate are not valid");
 		return ZBX_MATH_FAIL;
 	}
 
 	if (left->columns != right->rows)
 	{
-		*error = zbx_strdup(*error, "zbx_matrix_mult: matrices of incompatible dimensions");
+		*error = zbx_strdup(*error, "matrices to multiplicate are of incompatible dimensions");
 		return ZBX_MATH_FAIL;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_alloc(result, left->rows, right->columns, error))
-	{
-		*error = zbx_strdup(*error, "zbx_matrix_mult: cannot create result matrix");
 		return ZBX_MATH_FAIL;
-	}
 
 	for (i = 0; i < result->rows; ++i)
 	{
@@ -354,42 +331,36 @@ static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent,
 			ZBX_MATH_OK != zbx_matrix_struct_alloc(&left_part) ||
 			ZBX_MATH_OK != zbx_matrix_struct_alloc(&right_part))
 	{
-		*error = zbx_strdup(*error, "zbx_least_squares: cannot create matrices for calculations");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_transpose_matrix(independent, independent_transposed, error))
 	{
-		*error = zbx_strdup(*error, "zbx_least_squares: failed to transpose independent variable matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_mult(independent_transposed, independent, to_be_inverted, error))
 	{
-		*error = zbx_strdup(*error, "zbx_least_squares: failed to multiply transposed independent variable matrix and independent variable matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_inverse_matrix(to_be_inverted, left_part, error))
 	{
-		*error = zbx_strdup(*error, "zbx_least_squares: failed to inverse matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_mult(independent_transposed, dependent, right_part, error))
 	{
-		*error = zbx_strdup(*error, "zbx_least_squares: failed to multiply transposed independent variable matrix and dependent variable matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_mult(left_part, right_part, coefficients, error))
 	{
-		*error = zbx_strdup(*error, "zbx_least_squares: failed to perform final matrix multiplication");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -407,20 +378,11 @@ static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char
 {
 	int	i;
 
-	if (NULL == x || 0 >= n)
-	{
-		*error = zbx_strdup(*error, "zbx_fill_dependent: no input data provided");
-		return ZBX_MATH_FAIL;
-	}
-
 	if ('\0' == *fit || 0 == strcmp(fit, "linear") || 0 == strncmp(fit, "polynomial", strlen("polynomial")) ||
 			0 == strcmp(fit, "logarithmic"))
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 1, error))
-		{
-			*error = zbx_strdup(*error, "zbx_fill_dependent: cannot create matrix");
 			return ZBX_MATH_FAIL;
-		}
 
 		for (i = 0; i < n; ++i)
 			ZBX_MATRIX_EL(m, i, 0) = x[i];
@@ -428,16 +390,13 @@ static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char
 	else if (0 == strcmp(fit, "exponential") || 0 == strcmp(fit, "power"))
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 1, error))
-		{
-			*error = zbx_strdup(*error, "zbx_fill_dependent: cannot create matrix");
 			return ZBX_MATH_FAIL;
-		}
 
 		for (i = 0; i < n; ++i)
 		{
 			if (0.0 >= x[i])
 			{
-				*error = zbx_strdup(*error, "zbx_fill_dependent: data contains negative or zero values");
+				*error = zbx_strdup(*error, "data contains negative or zero values");
 				return ZBX_MATH_FAIL;
 			}
 
@@ -446,7 +405,7 @@ static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char
 	}
 	else
 	{
-		*error = zbx_strdup(*error, "zbx_fill_dependent: invalid 'fit' parameter");
+		*error = zbx_strdup(*error, "invalid 'fit' parameter");
 		return ZBX_MATH_FAIL;
 	}
 
@@ -458,19 +417,10 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 	double	element;
 	int	i, j, k;
 
-	if (NULL == t || 0 >= n)
-	{
-		*error = zbx_strdup(*error, "zbx_fill_independent: no input data provided");
-		return ZBX_MATH_FAIL;
-	}
-
 	if ('\0' == *fit || 0 == strcmp(fit, "linear") || 0 == strcmp(fit, "exponential"))
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 2, error))
-		{
-			*error = zbx_strdup(*error, "zbx_fill_independent: cannot create matrix");
 			return ZBX_MATH_FAIL;
-		}
 
 		for (i = 0; i < n; ++i)
 		{
@@ -481,10 +431,7 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 	else if (0 == strcmp(fit, "logarithmic") || 0 == strcmp(fit, "power"))
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 2, error))
-		{
-			*error = zbx_strdup(*error, "zbx_fill_independent: cannot create matrix");
 			return ZBX_MATH_FAIL;
-		}
 
 		for (i = 0; i < n; ++i)
 		{
@@ -496,7 +443,7 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 	{
 		if (1 != sscanf(fit + strlen("polynomial"), "%d", &k))
 		{
-			*error = zbx_strdup(*error, "zbx_fill_independent: cannot read degree of polynomial");
+			*error = zbx_strdup(*error, "cannot read degree of polynomial");
 			return ZBX_MATH_FAIL;
 		}
 
@@ -507,10 +454,7 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 			k = n - 1;
 
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, k+1, error))
-		{
-			*error = zbx_strdup(*error, "zbx_fill_independent: cannot create matrix");
 			return ZBX_MATH_FAIL;
-		}
 
 		for (i = 0; i < n; ++i)
 		{
@@ -527,7 +471,7 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 	}
 	else
 	{
-		*error = zbx_strdup(*error, "zbx_fill_independent: invalid 'fit' parameter");
+		*error = zbx_strdup(*error, "invalid 'fit' parameter");
 		return ZBX_MATH_FAIL;
 	}
 
@@ -542,28 +486,24 @@ static int	zbx_regression(double *t, double *x, int n, char *fit, zbx_matrix_t *
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&independent) ||
 			ZBX_MATH_OK != zbx_matrix_struct_alloc(&dependent))
 	{
-		*error = zbx_strdup(*error, "zbx_regression: cannot create matrices");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_fill_independent(t, n, fit, independent, error))
 	{
-		*error = zbx_strdup(*error, "zbx_regression: failed to fill independent variable matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_fill_dependent(x, n, fit, dependent, error))
 	{
-		*error = zbx_strdup(*error, "zbx_regression: failed to fill dependent variable matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_least_squares(independent, dependent, coefficients, error))
 	{
-		*error = zbx_strdup(*error, "zbx_regression: failed to perform least squares minimization");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -603,15 +543,12 @@ static int	zbx_derive_polynomial(zbx_matrix_t *polynomial, zbx_matrix_t *derivat
 
 	if (!ZBX_VALID_MATRIX(polynomial))
 	{
-		*error = zbx_strdup(*error, "zbx_derive_polynomial: polynomial is not valid");
+		*error = zbx_strdup(*error, "polynomial to derive is not valid");
 		return ZBX_MATH_FAIL;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_alloc(derivative, (polynomial->rows > 1 ? polynomial->rows - 1 : 1), 1, error))
-	{
-		*error = zbx_strdup(*error, "zbx_derive_polynomial: cannot allocate memory for derivative");
 		return ZBX_MATH_FAIL;
-	}
 
 	for (i = 1; i < polynomial->rows; ++i)
 		ZBX_MATRIX_EL(derivative, i - 1, 0) = ZBX_MATRIX_EL(polynomial, i, 0) * i;
@@ -648,7 +585,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_roots: polynomial is not valid");
+		*error = zbx_strdup(*error, "polynomial to find roots of is not valid");
 		return ZBX_MATH_FAIL;
 	}
 
@@ -662,7 +599,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 	{
 		if (0.0 == highest_degree_coefficient)
 		{
-			*error = zbx_strdup(*error, "zbx_polynomial_roots: every number is a root, cannot return anything meaningful");
+			*error = zbx_strdup(*error, "every number is a root, cannot return anything meaningful");
 			return ZBX_MATH_FAIL;
 		}
 
@@ -672,10 +609,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 	if (1 == degree)
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(roots, 1, 2, error))
-		{
-			*error = zbx_strdup(*error, "zbx_polynomial_roots: cannot allocate memory for roots");
 			return ZBX_MATH_FAIL;
-		}
 
 		Re(ZBX_MATRIX_ROW(roots, 0)) = -ZBX_MATRIX_EL(coefficients, 0, 0) / ZBX_MATRIX_EL(coefficients, 1, 0);
 		Im(ZBX_MATRIX_ROW(roots, 0)) = 0.0;
@@ -686,10 +620,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 	if (2 == degree)
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(roots, 2, 2, error))
-		{
-			*error = zbx_strdup(*error, "zbx_polynomial_roots: cannot allocate memory for roots");
 			return ZBX_MATH_FAIL;
-		}
 
 		if (0.0 < (temp = ZBX_MATRIX_EL(coefficients, 1, 0) * ZBX_MATRIX_EL(coefficients, 1, 0) -
 				4 * ZBX_MATRIX_EL(coefficients, 2, 0) * ZBX_MATRIX_EL(coefficients, 0, 0)))
@@ -714,7 +645,6 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&denominator_multiplicands) ||
 			ZBX_MATH_OK != zbx_matrix_struct_alloc(&updates))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_roots: cannot create denominator multiplicands and updates");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -723,8 +653,8 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 			ZBX_MATH_OK != zbx_matrix_alloc(denominator_multiplicands, degree, 2, error) ||
 			ZBX_MATH_OK != zbx_matrix_alloc(updates, degree, 2, error))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_roots: cannot allocate memory for roots, denominator multiplicands and updates");
-		return ZBX_MATH_FAIL;
+		res = ZBX_MATH_FAIL;
+		goto out;
 	}
 
 	/* compute bounds for the roots */
@@ -864,28 +794,25 @@ static int	zbx_polynomial_minmax(double now, double time, char *mode, zbx_matrix
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_minmax: polynomial is not valid");
+		*error = zbx_strdup(*error, "polynomial to find extrema of is not valid");
 		return ZBX_MATH_FAIL;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&derivative) ||
 			ZBX_MATH_OK != zbx_matrix_struct_alloc(&derivative_roots))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_minmax: cannot create derivative and derivative root structures");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_derive_polynomial(coefficients, derivative, error))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_minmax: cannot find polynomial derivative");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_polynomial_roots(derivative, derivative_roots, error))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_minmax: failed to find polinomial derivative roots");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -945,21 +872,19 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_timeleft: polynomial is not valid");
+		*error = zbx_strdup(*error, "polynomial is not valid");
 		return ZBX_MATH_FAIL;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&shifted_coefficients) ||
 			ZBX_MATH_OK != zbx_matrix_struct_alloc(&roots))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_timeleft: cannot create shifted polynomial and root structures");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_matrix_copy(shifted_coefficients, coefficients, error))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_timeleft: cannot copy coefficients");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -968,7 +893,6 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 
 	if (ZBX_MATH_OK != zbx_polynomial_roots(shifted_coefficients, roots, error))
 	{
-		*error = zbx_strdup(*error, "zbx_polynomial_timeleft: failed to find polynomial roots");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -1013,7 +937,7 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, char *fit, 
 {
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
-		*error = zbx_strdup(*error, "zbx_calculate_value: coefficients are not valid");
+		*error = zbx_strdup(*error, "coefficients are not valid");
 		return ZBX_MATH_FAIL;
 	}
 
@@ -1039,7 +963,7 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, char *fit, 
 	}
 	else
 	{
-		*error = zbx_strdup(*error, "zbx_calculate_value: invalid 'fit' parameter");
+		*error = zbx_strdup(*error, "invalid 'fit' parameter");
 		return ZBX_MATH_FAIL;
 	}
 
@@ -1055,14 +979,12 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&coefficients))
 	{
-		*error = zbx_strdup(*error, "zbx_forecast: cannot create coefficient matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_regression(t, x, n, fit, coefficients, error))
 	{
-		*error = zbx_strdup(*error, "zbx_forecast: fit procedure failed");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -1086,7 +1008,7 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 		}
 		else
 		{
-			*error = zbx_strdup(*error, "zbx_forecast: invalid 'mode' parameter");
+			*error = zbx_strdup(*error, "invalid 'mode' parameter");
 			res = ZBX_MATH_FAIL;
 		}
 
@@ -1100,7 +1022,6 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 		if (ZBX_MATH_OK != zbx_calculate_value(now, coefficients, fit, &left, error) ||
 				ZBX_MATH_OK != zbx_calculate_value(now + time, coefficients, fit, &right, error))
 		{
-			*error = zbx_strdup(*error, "zbx_calculate_value: failed to calculate values on boundaries");
 			res = ZBX_MATH_FAIL;
 			goto out;
 		}
@@ -1143,7 +1064,7 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 		}
 		else
 		{
-			*error = zbx_strdup(*error, "zbx_forecast: invalid 'mode' parameter");
+			*error = zbx_strdup(*error, "invalid 'mode' parameter");
 			res = ZBX_MATH_FAIL;
 			goto out;
 		}
@@ -1168,12 +1089,12 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 			goto out;
 		}
 
-		*error = zbx_strdup(*error, "zbx_forecast: invalid 'mode' parameter");
+		*error = zbx_strdup(*error, "invalid 'mode' parameter");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
-	*error = zbx_strdup(*error, "zbx_forecast: invalid 'fit' parameter");
+	*error = zbx_strdup(*error, "invalid 'fit' parameter");
 	res = ZBX_MATH_FAIL;
 out:
 	zbx_matrix_free(coefficients);
@@ -1188,21 +1109,18 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&coefficients))
 	{
-		*error = zbx_strdup(*error, "zbx_timeleft: cannot create coefficient matrix");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_regression(t, x, n, fit, coefficients, error))
 	{
-		*error = zbx_strdup(*error, "zbx_timeleft: fit procedure failed");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
 
 	if (ZBX_MATH_OK != zbx_calculate_value(now, coefficients, fit, &current, error))
 	{
-		*error = zbx_strdup(*error, "zbx_timeleft: failed to calculate current value");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
@@ -1243,7 +1161,7 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 	}
 	else
 	{
-		*error = zbx_strdup(*error, "zbx_timeleft: invalid 'fit' parameter");
+		*error = zbx_strdup(*error, "invalid 'fit' parameter");
 		res = ZBX_MATH_FAIL;
 		goto out;
 	}
