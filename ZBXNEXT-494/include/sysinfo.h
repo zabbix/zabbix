@@ -276,4 +276,11 @@ typedef struct
 }
 MODE_FUNCTION;
 
+/* the fields used by proc queries */
+#define ZBX_SYSINFO_PROC_NONE		0x0000
+#define ZBX_SYSINFO_PROC_PID		0x0001
+#define ZBX_SYSINFO_PROC_NAME		0x0002
+#define ZBX_SYSINFO_PROC_CMDLINE	0x0004
+#define ZBX_SYSINFO_PROC_USER		0x0008
+
 #endif
