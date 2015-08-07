@@ -187,6 +187,13 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 			return ZBX_MATH_FAIL;
 		}
 
+		if (0.0 == ZBX_MATRIX_EL(m, 0, 0))
+		{
+			*error = zbx_strdup(*error, "zbx_inverse_matrix: matrix is singular");
+			res = ZBX_MATH_FAIL;
+			goto out;
+		}
+
 		ZBX_MATRIX_EL(r, 0, 0) = 1.0 / ZBX_MATRIX_EL(m, 0, 0);
 		return ZBX_MATH_OK;
 	}
@@ -251,7 +258,7 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 
 		if (0.0 == pivot)
 		{
-			*error = zbx_strdup(*error, "zbx_inverse_matrix: matrix is not inversible");
+			*error = zbx_strdup(*error, "zbx_inverse_matrix: matrix is singular");
 			res = ZBX_MATH_FAIL;
 			goto out;
 		}
@@ -427,7 +434,15 @@ static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char
 		}
 
 		for (i = 0; i < n; ++i)
+		{
+			if (0.0 >= x[i])
+			{
+				*error = zbx_strdup(*error, "zbx_fill_dependent: data contains negative or zero values");
+				return ZBX_MATH_FAIL;
+			}
+
 			ZBX_MATRIX_EL(m, i, 0) = log(x[i]);
+		}
 	}
 	else
 	{
@@ -676,7 +691,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 			return ZBX_MATH_FAIL;
 		}
 
-		if (0.0 <= (temp = ZBX_MATRIX_EL(coefficients, 1, 0) * ZBX_MATRIX_EL(coefficients, 1, 0) -
+		if (0.0 < (temp = ZBX_MATRIX_EL(coefficients, 1, 0) * ZBX_MATRIX_EL(coefficients, 1, 0) -
 				4 * ZBX_MATRIX_EL(coefficients, 2, 0) * ZBX_MATRIX_EL(coefficients, 0, 0)))
 		{
 			temp = (0 < ZBX_MATRIX_EL(coefficients, 1, 0) ?
@@ -795,11 +810,19 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 			roots_ok = roots_ok && (ZBX_MATH_EPSILON > residual);
 
 			/* divide polynomial value by denominator */
-			temp = Re(denominator) * Re(denominator) + Im(denominator) * Im(denominator);
-			Re(ZBX_MATRIX_ROW(updates, i)) = (Re(polynomial) * Re(denominator) +
-					Im(polynomial) * Im(denominator)) / temp;
-			Im(ZBX_MATRIX_ROW(updates, i)) = (Im(polynomial) * Re(denominator) -
-					Re(polynomial) * Im(denominator)) / temp;
+			if (0.0 != (temp = Re(denominator) * Re(denominator) + Im(denominator) * Im(denominator)))
+			{
+				Re(ZBX_MATRIX_ROW(updates, i)) = (Re(polynomial) * Re(denominator) +
+						Im(polynomial) * Im(denominator)) / temp;
+				Im(ZBX_MATRIX_ROW(updates, i)) = (Im(polynomial) * Re(denominator) -
+						Re(polynomial) * Im(denominator)) / temp;
+			}
+			else /* Denominator is zero iff two or more root approximations are equal. */
+				/* Since root approximations are initially different their equality means that they */
+				/* converged to a multiple root (hopefully) and no updates are required in this case. */
+			{
+				Re(ZBX_MATRIX_ROW(updates, i)) = Im(ZBX_MATRIX_ROW(updates, i)) = 0.0;
+			}
 
 			temp = ZBX_MATRIX_EL(updates, i, 0) * ZBX_MATRIX_EL(updates, i, 0) +
 					ZBX_MATRIX_EL(updates, i, 1) * ZBX_MATRIX_EL(updates, i, 1);
@@ -1077,15 +1100,26 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 		else if (0 == strcmp(mode, "avg"))
 		{
 			if ('\0' == *fit || 0 == strcmp(fit, "linear"))
+			{
 				*result = 0.5 * (left + right);
+			}
 			else if (0 == strcmp(fit, "exponential"))
+			{
 				*result = (right - left) / time / ZBX_MATRIX_EL(coefficients, 1, 0);
+			}
 			else if (0 == strcmp(fit, "logarithmic"))
+			{
 				*result = right + ZBX_MATRIX_EL(coefficients, 1, 0) *
 						(log(1.0 + time / now) * now / time - 1.0);
+			}
 			else /* if (0 == strcmp(fit, "power")) */
-				*result = (right * (now + time) - left * now) / time /
-						(ZBX_MATRIX_EL(coefficients, 1, 0) + 1.0);
+			{
+				if (-1.0 != ZBX_MATRIX_EL(coefficients, 1, 0))
+					*result = (right * (now + time) - left * now) / time /
+							(ZBX_MATRIX_EL(coefficients, 1, 0) + 1.0);
+				else
+					*result = exp(ZBX_MATRIX_EL(coefficients, 0, 0)) * log(1.0 + time / now) / time;
+			}
 		}
 		else
 		{
@@ -1161,7 +1195,8 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 
 	if ('\0' == *fit || 0 == strcmp(fit, "linear"))
 	{
-		*result = (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now;
+		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) /
+				ZBX_MATRIX_EL(coefficients, 1, 0) - now : -1.0);
 		res = ZBX_MATH_OK;
 	}
 	else if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
@@ -1170,17 +1205,20 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 	}
 	else if (0 == strcmp(fit, "exponential"))
 	{
-		*result = (log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now;
+		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (log(threshold) -
+				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now : -1.0);
 		res = ZBX_MATH_OK;
 	}
 	else if (0 == strcmp(fit, "logarithmic"))
 	{
-		*result = exp((threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now;
+		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((threshold -
+				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : -1.0);
 		res = ZBX_MATH_OK;
 	}
 	else if (0 == strcmp(fit, "power"))
 	{
-		*result = exp((log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now;
+		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((log(threshold) -
+				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : -1.0);
 		res = ZBX_MATH_OK;
 	}
 	else
@@ -1190,7 +1228,7 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 		goto out;
 	}
 
-	if (isnan(*result) || isinf(*result) || *result < 0)
+	if (*result < 0 || *result != *result)
 		*result = -1.0;
 
 out:
