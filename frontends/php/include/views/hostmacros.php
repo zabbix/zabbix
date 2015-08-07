@@ -42,8 +42,8 @@ else {
 		else {
 			$link = null;
 		}
-		$table->setHeader([_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
-			[_('Global value'), $link]
+		$table->setHeader([
+			_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '', [_('Global value'), $link]
 		]);
 	}
 	else {

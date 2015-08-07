@@ -253,10 +253,9 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 
 		$table = (new CTable())
 			->setNoDataMessage(_('No accessible resources'))
-			->addClass('right_table')
 			->addClass('calculated');
 		if (!$isHeaderDisplayed) {
-			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')], 'header');
+			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')]);
 			$isHeaderDisplayed = true;
 		}
 		$table->addRow($row);

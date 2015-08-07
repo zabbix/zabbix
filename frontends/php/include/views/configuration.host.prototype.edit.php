@@ -88,13 +88,13 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ifTab = (new CTable())
 		->setId('agentInterfaces')
 		->setHeader([
-		new CColHeader(),
-		new CColHeader(_('IP address')),
-		new CColHeader(_('DNS name')),
-		new CColHeader(_('Connect to')),
-		new CColHeader(_('Port')),
-		(new CColHeader(_('Default')))->setColSpan(2)
-	]);
+			'',
+			_('IP address'),
+			_('DNS name'),
+			_('Connect to'),
+			_('Port'),
+			(new CColHeader(_('Default')))->setColSpan(2)
+		]);
 
 	$row = (new CRow())->setId('agentInterfacesFooter');
 	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
