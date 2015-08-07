@@ -105,7 +105,7 @@ $header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['f
 // create filter
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
-		$filterForm = new CFilter();
+		$filterForm = new CFilter('web.history.filter.state');
 		$filterColumn1 = new CFormList();
 		$filterForm->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {

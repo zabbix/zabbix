@@ -2214,3 +2214,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   display: inline-block;
   border-top: 1px solid #cebd0a;
   background-color: #fcf7c2; }
+
+.list-hor-min-width li {
+  display: inline-block;
+  min-width: 2em; }
