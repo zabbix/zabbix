@@ -3199,3 +3199,11 @@ $browser-logos: (
 	background-color: $lighter-yellow;
 	@extend %overflow-ellipsis;
 }
+
+.list-hor-min-width {
+
+	li {
+		display: inline-block;
+		min-width: 2em;
+	}
+}
