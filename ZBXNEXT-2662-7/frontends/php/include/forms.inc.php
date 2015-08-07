@@ -1579,7 +1579,7 @@ function getTriggerFormData($exprAction) {
 }
 
 function get_timeperiod_form() {
-	$tblPeriod = (new CTable())->addClass('formElementTable');
+	$tblPeriod = new CTable();
 
 	// init new_timeperiod variable
 	$new_timeperiod = getRequest('new_timeperiod', []);

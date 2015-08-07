@@ -31,7 +31,6 @@ if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 }
 
 $interfaceTable = (new CTable())
-	->addClass('formElementTable')
 	->setHeader([
 		_('IP address'),
 		_('DNS name'),
