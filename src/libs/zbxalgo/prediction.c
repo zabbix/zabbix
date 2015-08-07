@@ -1073,6 +1073,26 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 		goto out;
 	}
 
+	if (0.0 == time)
+	{
+		if (0 == strcmp(mode, "max") || 0 == strcmp(mode, "min") || 0 == strcmp(mode, "avg"))
+		{
+			res = zbx_calculate_value(now + time, coefficients, fit, result, error);
+		}
+		else if (0 == strcmp(mode, "delta"))
+		{
+			*result = 0.0;
+			res = ZBX_MATH_OK;
+		}
+		else
+		{
+			*error = zbx_strdup(*error, "zbx_forecast: invalid 'mode' parameter");
+			res = ZBX_MATH_FAIL;
+		}
+
+		goto out;
+	}
+
 	if ('\0' == *fit || 0 == strcmp(fit, "linear") || 0 == strcmp(fit, "exponential") ||
 			0 == strcmp(fit, "logarithmic") || 0 == strcmp(fit, "power"))
 	{
