@@ -24,21 +24,12 @@ AC_DEFUN([LIBOPENSSL_TRY_LINK],
 AC_TRY_LINK(
 [
 #include <openssl/ssl.h>
+#include <openssl/bio.h>
 ],
 [
-	SSL_library_init();
-],
-found_openssl="yes",)
-])dnl
-
-AC_DEFUN([LIBCRYPTO_TRY_LINK],
-[
-AC_TRY_LINK(
-[
-#include <openssl/crypto.h>
-],
-[
-	CRYPTO_memcmp("A", "B", 1);
+	/* check that both libssl and libcrypto are available */
+	SSL_library_init();	/* a function from libssl */
+	BIO_new(BIO_s_mem());	/* a function from libcrypto */
 ],
 found_openssl="yes",)
 ])dnl
@@ -124,14 +115,13 @@ AC_HELP_STRING([--with-openssl@<:@=DIR@:>@],[use OpenSSL package @<:@default=no@
 
     found_openssl="no"
     LIBOPENSSL_TRY_LINK([no])
-    LIBCRYPTO_TRY_LINK([no])
 
     CFLAGS="$am_save_cflags"
     LDFLAGS="$am_save_ldflags"
     LIBS="$am_save_libs"
 
     if test "x$found_openssl" = "xyes"; then
-      AC_DEFINE([HAVE_OPENSSL], 1, [Define to 1 if you have the 'libssl' library (-lssl)])
+      AC_DEFINE([HAVE_OPENSSL], 1, [Define to 1 if you have 'libssl' and 'libcrypto' libraries (-lssl -libcrypto)])
       AC_MSG_RESULT(yes)
     else
       AC_MSG_RESULT(no)
