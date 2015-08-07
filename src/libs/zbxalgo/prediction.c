@@ -37,7 +37,7 @@ typedef struct
 
 static int	zbx_matrix_struct_alloc(zbx_matrix_t **pm)
 {
-	if (NULL == (*pm = (zbx_matrix_t *)malloc(sizeof(zbx_matrix_t))))
+	if (NULL == (*pm = (zbx_matrix_t *)zbx_malloc(*pm, sizeof(zbx_matrix_t))))
 		return ZBX_MATH_FAIL;
 
 	(*pm)->rows = 0;
@@ -58,7 +58,7 @@ static int	zbx_matrix_alloc(zbx_matrix_t *m, int rows, int columns, char **error
 	m->rows = rows;
 	m->columns = columns;
 
-	if(NULL == (m->elements = (double *)malloc(sizeof(double) * rows * columns)))
+	if(NULL == (m->elements = (double *)zbx_malloc(m->elements, sizeof(double) * rows * columns)))
 		return ZBX_MATH_FAIL;
 
 	return ZBX_MATH_OK;
@@ -66,10 +66,10 @@ static int	zbx_matrix_alloc(zbx_matrix_t *m, int rows, int columns, char **error
 
 static void	zbx_matrix_free(zbx_matrix_t *m)
 {
-	if (NULL != m && NULL != m->elements)
-		free(m->elements);
+	if (NULL != m)
+		zbx_free(m->elements);
 
-	free(m);
+	zbx_free(m);
 }
 
 static int	zbx_matrix_copy(zbx_matrix_t *dest, zbx_matrix_t *src, char **error)
@@ -161,7 +161,7 @@ static void	zbx_matrix_add_rows_with_factor(zbx_matrix_t *m, int dest, int src, 
 
 static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r, char **error)
 {
-	zbx_matrix_t	*l;
+	zbx_matrix_t	*l = NULL;
 	double		pivot, factor, det;
 	int		i, j, k, n, res;
 
@@ -339,7 +339,7 @@ static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent,
 	/* coefficients = inverse( transpose( independent ) * independent ) * transpose( independent ) * dependent */
 	/*                |<------------------left_part------------------>|   |<-----------right_part----------->| */
 	/*           we change order of matrix multiplication to reduce operation count and memory usage           */
-	zbx_matrix_t	*independent_transposed, *to_be_inverted, *left_part, *right_part;
+	zbx_matrix_t	*independent_transposed = NULL, *to_be_inverted = NULL, *left_part = NULL, *right_part = NULL;
 	int		res;
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&independent_transposed) ||
@@ -521,7 +521,7 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 
 static int	zbx_regression(double *t, double *x, int n, char *fit, zbx_matrix_t *coefficients, char **error)
 {
-	zbx_matrix_t	*independent, *dependent;
+	zbx_matrix_t	*independent = NULL, *dependent = NULL;
 	int		res;
 
 	if (ZBX_MATH_OK != zbx_matrix_struct_alloc(&independent) ||
@@ -626,7 +626,7 @@ while(0)
 
 static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots, char **error)
 {
-	zbx_matrix_t	*denominator_multiplicands, *updates;
+	zbx_matrix_t	*denominator_multiplicands = NULL, *updates = NULL;
 	double		z[2], mult[2], denominator[2], zpower[2], polynomial[2], highest_degree_coefficient,
 			lower_bound, upper_bound, radius, max_update, min_distance, residual, temp;
 	int		i, j, degree, res, iteration = 0, roots_ok = 0, root_init = 0;
@@ -835,7 +835,7 @@ out:
 static int	zbx_polynomial_minmax(double now, double time, char *mode, zbx_matrix_t *coefficients, double *result,
 		char **error)
 {
-	zbx_matrix_t	*derivative, *derivative_roots;
+	zbx_matrix_t	*derivative = NULL, *derivative_roots = NULL;
 	double		min, max, tmp;
 	int		i, res;
 
@@ -916,7 +916,7 @@ out:
 static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *coefficients, double *result,
 		char **error)
 {
-	zbx_matrix_t	*shifted_coefficients, *roots;
+	zbx_matrix_t	*shifted_coefficients = NULL, *roots = NULL;
 	double		tmp;
 	int		i, res, no_root = 1;
 
@@ -1026,7 +1026,7 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, char *fit, 
 int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit, char *mode, double *result,
 	char **error)
 {
-	zbx_matrix_t	*coefficients;
+	zbx_matrix_t	*coefficients = NULL;
 	double		left, right;
 	int		res;
 
@@ -1128,7 +1128,7 @@ out:
 
 int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char *fit, double *result, char **error)
 {
-	zbx_matrix_t	*coefficients;
+	zbx_matrix_t	*coefficients = NULL;
 	double		current;
 	int		res;
 
