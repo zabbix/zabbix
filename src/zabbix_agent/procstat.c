@@ -83,9 +83,6 @@ static zbx_dshm_ref_t	procstat_ref;
 
 typedef struct
 {
-	/* the number of processes in process statistics snapshot */
-	int	pids_num;
-
 	/* a linked list of active queries (offset of the first active query) */
 	int	queries;
 
@@ -111,10 +108,6 @@ zbx_procstat_header_t;
 
 #define PROCSTAT_QUERY_NEXT(base, query)								\
 		(zbx_procstat_query_t*)PROCSTAT_PTR_NULL(base, query->next)
-
-#define PROCSTAT_SNAPSHOT(base)										\
-		((zbx_procstat_util_t *)((char *)base + ((zbx_procstat_header_t *)base)->size - 	\
-				((zbx_procstat_header_t *)base)->pids_num * sizeof(zbx_procstat_util_t)))
 
 #define PROCSTAT_OFFSET(base, ptr) ((char *)ptr - (char *)base)
 
@@ -181,10 +174,19 @@ typedef struct
 }
 zbx_procstat_query_data_t;
 
+
+static zbx_procstat_util_t	*procstat_snapshot;
+static int			procstat_snapshot_num;
+
 /* external functions used by procstat collector */
-int	zbx_proc_get_pids(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
-		zbx_vector_uint64_t *pids);
-void	zbx_proc_get_stats(zbx_procstat_util_t *procs, int procs_num);
+int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags);
+
+int	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
+		const char *cmdline, zbx_uint64_t flags, zbx_vector_uint64_t *pids);
+
+void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num);
+
+void	zbx_proc_free_processes(zbx_vector_ptr_t *processes);
 
 /******************************************************************************
  *                                                                            *
@@ -204,7 +206,7 @@ static int	procstat_dshm_has_enough_space(void *base, size_t size)
 {
 	zbx_procstat_header_t   *header = (zbx_procstat_header_t *)base;
 
-	if (header->size > size + header->size_allocated + header->pids_num * sizeof(zbx_procstat_util_t))
+	if (header->size >= size + header->size_allocated)
 		return SUCCEED;
 
 	return FAIL;
@@ -313,8 +315,7 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 {
 	const char		*__function_name = "procstat_copy_data";
 
-	int			offset, size_snapshot, *query_offset, now;
-	zbx_procstat_header_t	*hsrc = (zbx_procstat_header_t *)src;
+	int			offset, *query_offset;
 	zbx_procstat_header_t	*hdst = (zbx_procstat_header_t *)dst;
 	zbx_procstat_query_t	*qsrc, *qdst = NULL;
 
@@ -324,8 +325,6 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 	hdst->size_allocated = PROCSTAT_ALIGNED_HEADER_SIZE;
 	hdst->queries = PROCSTAT_NULL_OFFSET;
 
-	now = time(NULL);
-
 	if (NULL != src)
 	{
 		query_offset = &hdst->queries;
@@ -333,10 +332,6 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 		/* copy queries */
 		for (qsrc = PROCSTAT_QUERY_FIRST(src); NULL != qsrc; qsrc = PROCSTAT_QUERY_NEXT(src, qsrc))
 		{
-			/* don't copy queries not used during the last day */
-			if (SEC_PER_DAY < now - qsrc->last_accessed)
-				continue;
-
 			/* the new shared memory segment must have enough space */
 			offset = procstat_alloc(dst, sizeof(zbx_procstat_query_t));
 
@@ -351,15 +346,7 @@ static void	procstat_copy_data(void *dst, size_t size_dst, const void *src)
 			*query_offset = offset;
 			query_offset = &qdst->next;
 		}
-
-		/* copy process cpu utilization snapshot */
-		hdst->pids_num = hsrc->pids_num;
-		size_snapshot = hsrc->pids_num * sizeof(zbx_procstat_util_t);
-		memcpy((char *)dst + hdst->size - size_snapshot, (char *)src + hsrc->size - size_snapshot,
-				size_snapshot);
 	}
-	else
-		hdst->pids_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -461,17 +448,13 @@ static void	procstat_add(const char *procname, const char *username, const char 
 	if (NULL != cmdline)
 		size += ZBX_SIZE_T_ALIGN8(strlen(cmdline) + 1);
 
-	/* reserve space for process cpu utilization snapshot */
-	size += sizeof(zbx_procstat_util_t) * 32;
-
 	/* procstat_add() is called when the shared memory reference has already been validated - */
 	/* no need to call procstat_reattach()                                                    */
-	header = (zbx_procstat_header_t *)procstat_ref.addr;
 
 	/* reserve space for a new query only if there are no freed queries */
 	size += ZBX_SIZE_T_ALIGN8(sizeof(zbx_procstat_query_t));
 
-	if (NULL == header || FAIL == procstat_dshm_has_enough_space(header, size))
+	if (NULL == procstat_ref.addr || FAIL == procstat_dshm_has_enough_space(procstat_ref.addr, size))
 	{
 		if (FAIL == zbx_dshm_reserve(&collector->procstat, size, &errmsg))
 		{
@@ -484,8 +467,9 @@ static void	procstat_add(const char *procname, const char *username, const char 
 
 		/* header initialised in procstat_copy_data() which is called back from zbx_dshm_reserve() */
 		procstat_reattach();
-		header = (zbx_procstat_header_t *)procstat_ref.addr;
 	}
+
+	header = (zbx_procstat_header_t *)procstat_ref.addr;
 
 	query_offset = procstat_alloc(procstat_ref.addr, sizeof(zbx_procstat_query_t));
 
@@ -530,9 +514,8 @@ static void	procstat_free_query_data(zbx_procstat_query_data_t *data)
  *             runid       - [IN] marker for queries to be processed in the   *
  *                                current collector iteration                 *
  *                                                                            *
- * Return value: SUCCEED - unused queries removed, the rest of the queries    *
- *                         copied from shared memory segment to local vector  *
- *               FAIL    - no active quueries                                 *
+ * Return value: The flags defining the process properties to be retrieved.   *
+ *               See ZBX_SYSINFO_PROC_ defines.                               *
  *                                                                            *
  * Comments: updates queries (runid) in shared memory segment                 *
  *                                                                            *
@@ -543,7 +526,7 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 	time_t				now;
 	zbx_procstat_query_t		*query;
 	zbx_procstat_query_data_t	*qdata;
-	int				ret = FAIL;
+	int				flags = ZBX_SYSINFO_PROC_NONE, *pnext_query;
 
 	zbx_dshm_lock(&collector->procstat);
 
@@ -554,27 +537,39 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 	if (PROCSTAT_NULL_OFFSET == header->queries)
 		goto out;
 
+	flags = ZBX_SYSINFO_PROC_PID;
+
 	now = time(NULL);
-	zbx_vector_ptr_create(queries_ptr);
+	pnext_query = &header->queries;
 
 	for (query = PROCSTAT_QUERY_FIRST(procstat_ref.addr); NULL != query;
 			query = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query))
 	{
-		/* skip unused queries */
+		/* remove unused queries, the data is still allocated until the next resize */
 		if (SEC_PER_DAY < now - query->last_accessed)
+		{
+			*pnext_query = query->next;
 			continue;
+		}
 
 		qdata = (zbx_procstat_query_data_t *)zbx_malloc(NULL, sizeof(zbx_procstat_query_data_t));
 		zbx_vector_uint64_create(&qdata->pids);
 
 		/* store the reference to query attributes, which is guaranteed to be */
 		/* valid until we call process_reattach()                             */
-		qdata->procname = PROCSTAT_PTR_NULL(procstat_ref.addr, query->procname);
-		qdata->username = PROCSTAT_PTR_NULL(procstat_ref.addr, query->username);
-		qdata->cmdline = PROCSTAT_PTR_NULL(procstat_ref.addr, query->cmdline);
+		if (NULL != (qdata->procname = PROCSTAT_PTR_NULL(procstat_ref.addr, query->procname)))
+			flags |= ZBX_SYSINFO_PROC_NAME;
+
+		if (NULL != (qdata->username = PROCSTAT_PTR_NULL(procstat_ref.addr, query->username)))
+			flags |= ZBX_SYSINFO_PROC_USER;
+
+		if (NULL != (qdata->cmdline = PROCSTAT_PTR_NULL(procstat_ref.addr, query->cmdline)))
+			flags |= ZBX_SYSINFO_PROC_CMDLINE;
+
 		qdata->flags = query->flags;
 		qdata->utime = 0;
 		qdata->stime = 0;
+		qdata->error = 0;
 
 		zbx_vector_ptr_append(queries_ptr, qdata);
 
@@ -585,18 +580,19 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 		/* is incremented at the end of every data gathering cycle. We can be sure that       */
 		/* our local copy will match the queries in shared memory having the same runid.      */
 		query->runid = runid;
-	}
 
-	ret = SUCCEED;
+		pnext_query = &query->next;
+	}
 
 out:
 	zbx_dshm_unlock(&collector->procstat);
-	return ret;
+
+	return flags;
 }
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_get_pids_matching_query_attributes                      *
+ * Function: procstat_scan_query_pids                                         *
  *                                                                            *
  * Purpose: for every query gets the pids of processes matching query         *
  *          attributes                                                        *
@@ -606,21 +602,20 @@ out:
  * Return value: total number of pids saved in all queries                    *
  *                                                                            *
  ******************************************************************************/
-static int	procstat_get_pids_matching_query_attributes(zbx_vector_ptr_t queries)
+static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_ptr_t *processes)
 {
 	zbx_procstat_query_data_t	*qdata;
 	int				i;
 	int				pids_num = 0;
 
-	for (i = 0; i < queries.values_num; i++)
+	for (i = 0; i < queries->values_num; i++)
 	{
-		qdata = (zbx_procstat_query_data_t *)queries.values[i];
+		qdata = (zbx_procstat_query_data_t *)queries->values[i];
 
-		qdata->error = zbx_proc_get_pids(qdata->procname, qdata->username, qdata->cmdline, qdata->flags,
+		zbx_proc_get_matching_pids(processes, qdata->procname, qdata->username, qdata->cmdline, qdata->flags,
 				&qdata->pids);
 
-		if (SUCCEED == qdata->error)
-			pids_num += qdata->pids.values_num;
+		pids_num += qdata->pids.values_num;
 	}
 
 	return pids_num;
@@ -628,39 +623,34 @@ static int	procstat_get_pids_matching_query_attributes(zbx_vector_ptr_t queries)
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_build_unique_pids                                       *
+ * Function: procstat_get_monitored_pids                                      *
  *                                                                            *
  * Purpose: creates a list of unique pids that are monitored by current data  *
  *          gathering cycle                                                   *
  *                                                                            *
- * Parameters: pids_ptr - [OUT] the list of unique pids                       *
- *             queries  - [IN] local, working copy of queries                 *
- *             pids_num - [IN] total number of pids saved in all queries      *
+ * Parameters: pids    - [OUT] a sorted vector of unique pids                 *
+ *             queries - [IN] local, working copy of queries                  *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_build_unique_pids(zbx_vector_uint64_t *pids_ptr,
-			zbx_vector_ptr_t queries, int pids_num)
+static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vector_ptr_t *queries)
 {
 	zbx_procstat_query_data_t	*qdata;
 	int i;
 
-	zbx_vector_uint64_create(pids_ptr);
-	zbx_vector_uint64_reserve(pids_ptr, pids_num);
-
-	for (i = 0; i < queries.values_num; i++)
+	for (i = 0; i < queries->values_num; i++)
 	{
-		qdata = (zbx_procstat_query_data_t *)queries.values[i];
+		qdata = (zbx_procstat_query_data_t *)queries->values[i];
 
 		if (SUCCEED != qdata->error)
 			continue;
 
-		memcpy(pids_ptr->values + pids_ptr->values_num, qdata->pids.values,
+		memcpy(pids->values + pids->values_num, qdata->pids.values,
 			sizeof(zbx_uint64_t) * qdata->pids.values_num);
-		pids_ptr->values_num += qdata->pids.values_num;
+		pids->values_num += qdata->pids.values_num;
 	}
 
-	zbx_vector_uint64_sort(pids_ptr, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(pids_ptr, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_sort(pids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(pids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
 /******************************************************************************
@@ -669,27 +659,24 @@ static void	procstat_build_unique_pids(zbx_vector_uint64_t *pids_ptr,
  *                                                                            *
  * Purpose: gets cpu utilization data snapshot for the monitored processes    *
  *                                                                            *
- * Parameters: stats_ptr - [OUT] current reading of the per-pid cpu usage     *
+ * Parameters: stats - [OUT] current reading of the per-pid cpu usage         *
  *                               statistics (array, items correspond to pids) *
- *             pids      - [IN]  pids (unique) for which to collect data in   *
- *                               this iteration                               *
+ *             pids  - [IN]  pids (unique) for which to collect data in this  *
+ *                               iteration                                    *
  *                                                                            *
  * Return value: timestamp of the snapshot                                    *
  *                                                                            *
  ******************************************************************************/
-static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_t **stats_ptr,
-				zbx_vector_uint64_t pids)
+static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_t *stats,
+				zbx_vector_uint64_t *pids)
 {
 	zbx_timespec_t			snapshot_timestamp;
 	int				i;
 
-	*stats_ptr = (zbx_procstat_util_t *)zbx_malloc(NULL, sizeof(zbx_procstat_util_t) * pids.values_num);
-	memset(*stats_ptr, 0, sizeof(zbx_procstat_util_t) * pids.values_num);
+	for (i = 0; i < pids->values_num; i++)
+		stats[i].pid = pids->values[i];
 
-	for (i = 0; i < pids.values_num; i++)
-		(*stats_ptr)[i].pid = pids.values[i];
-
-	zbx_proc_get_stats(*stats_ptr, pids.values_num);
+	zbx_proc_get_process_stats(stats, pids->values_num);
 
 	zbx_timespec(&snapshot_timestamp);
 
@@ -711,19 +698,16 @@ static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_
  *                            statistics (array, items correspond to pids)    *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t queries,
-			zbx_vector_uint64_t pids, const zbx_procstat_util_t *stats)
+static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
+			zbx_vector_uint64_t *pids, const zbx_procstat_util_t *stats)
 {
 	zbx_procstat_query_data_t	*qdata;
 	zbx_procstat_util_t		*putil;
 	int				j, i;
 
-	for (j = 0; j < queries.values_num; j++)
+	for (j = 0; j < queries->values_num; j++)
 	{
-		qdata = (zbx_procstat_query_data_t *)queries.values[j];
-
-		if (SUCCEED != qdata->error)
-			continue;
+		qdata = (zbx_procstat_query_data_t *)queries->values[j];
 
 		/* sum the cpu utilization for processes that are present in current */
 		/* and last process cpu utilization snapshot                         */
@@ -732,14 +716,11 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t queries,
 			zbx_uint64_t	starttime, utime, stime;
 
 			/* find the process utilization data in current snapshot */
-			putil = (zbx_procstat_util_t *)bsearch(&qdata->pids.values[i], stats, pids.values_num,
+			putil = (zbx_procstat_util_t *)bsearch(&qdata->pids.values[i], stats, pids->values_num,
 					sizeof(zbx_procstat_util_t), ZBX_DEFAULT_INT_COMPARE_FUNC);
 
-			if (SUCCEED == qdata->error && SUCCEED != putil->error)
-			{
-				qdata->error = putil->error;
-				break;
-			}
+			if (SUCCEED != putil->error)
+				continue;
 
 			utime = putil->utime;
 			stime = putil->stime;
@@ -748,7 +729,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t queries,
 
 			/* find the process utilization data in last snapshot */
 			putil = (zbx_procstat_util_t *)bsearch(&qdata->pids.values[i],
-					PROCSTAT_SNAPSHOT(procstat_ref.addr), pids.values_num,
+					procstat_snapshot, procstat_snapshot_num,
 					sizeof(zbx_procstat_util_t), ZBX_DEFAULT_INT_COMPARE_FUNC);
 
 			if (NULL == putil || putil->starttime != starttime)
@@ -769,10 +750,6 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t queries,
  *                                                                            *
  * Parameters: queries - [IN] local, working copy of queries (utime, stime    *
  *                            and error must be set)                          *
- *             pids    - [IN] pids (unique) for which data is collected in    *
- *                            this iteration                                  *
- *             stats   - [IN] current reading of the per-pid cpu usage        *
- *                            statistics (array, items correspond to pids)    *
  *             runid   - [IN] marker for queries to be processed in the       *
  *                            current collector iteration                     *
  *             snapshot_timestamp - [IN] timestamp of the current snapshot    *
@@ -782,37 +759,17 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t queries,
  *           memory segment                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_save_cpu_util_snapshot_in_queries(zbx_vector_ptr_t queries,
-			zbx_vector_uint64_t pids, zbx_procstat_util_t *stats,
-			int runid, zbx_timespec_t snapshot_timestamp)
+static void	procstat_save_cpu_util_snapshot_in_queries(zbx_vector_ptr_t *queries, int runid,
+		zbx_timespec_t snapshot_timestamp)
 {
-	zbx_procstat_header_t		*header;
 	zbx_procstat_query_t		*query;
 	zbx_procstat_query_data_t	*qdata;
 	int				index;
 	int				i;
-	char				*errmsg = NULL;
 
 	zbx_dshm_lock(&collector->procstat);
 
 	procstat_reattach();
-	header = (zbx_procstat_header_t *)procstat_ref.addr;
-
-	if (header->size - header->size_allocated < pids.values_num * sizeof(zbx_procstat_util_t))
-	{
-		if (FAIL == zbx_dshm_reserve(&collector->procstat, pids.values_num * sizeof(zbx_procstat_util_t) * 1.5,
-				&errmsg))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot reserve memory in process data collector: %s", errmsg);
-			zbx_free(errmsg);
-			zbx_dshm_unlock(&collector->procstat);
-
-			exit(EXIT_FAILURE);
-		}
-
-		procstat_reattach();
-		header = (zbx_procstat_header_t *)procstat_ref.addr;
-	}
 
 	for (query = PROCSTAT_QUERY_FIRST(procstat_ref.addr), i = 0; NULL != query;
 			query = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query))
@@ -820,13 +777,13 @@ static void	procstat_save_cpu_util_snapshot_in_queries(zbx_vector_ptr_t queries,
 		if (runid != query->runid)
 			continue;
 
-		if (i >= queries.values_num)
+		if (i >= queries->values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 		}
 
-		qdata = (zbx_procstat_query_data_t *)queries.values[i++];
+		qdata = (zbx_procstat_query_data_t *)queries->values[i++];
 
 		if (SUCCEED != (query->error = qdata->error))
 			continue;
@@ -858,11 +815,6 @@ static void	procstat_save_cpu_util_snapshot_in_queries(zbx_vector_ptr_t queries,
 		query->h_data[index].stime = qdata->stime;
 		query->h_data[index].timestamp = snapshot_timestamp;
 	}
-
-	header->pids_num = pids.values_num;
-
-	/* check for free space done at the beginning of the function */
-	memcpy(PROCSTAT_SNAPSHOT(procstat_ref.addr), stats, sizeof(zbx_procstat_util_t) * pids.values_num);
 
 	zbx_dshm_unlock(&collector->procstat);
 }
@@ -1036,8 +988,14 @@ void	zbx_procstat_collect()
 	/* number of (non-unique) pids that match queries */
 	int				pids_num = 0;
 
+	/* flags specifying what process properties must be retrieved */
+	int				flags;
+
 	/* local, working copy of queries */
 	zbx_vector_ptr_t		queries;
+
+	/* data about all processes on system */
+	zbx_vector_ptr_t		processes;
 
 	/* pids (unique) for which to collect data in this iteration */
 	zbx_vector_uint64_t		pids;
@@ -1051,21 +1009,38 @@ void	zbx_procstat_collect()
 	if (FAIL == zbx_procstat_collector_started() || FAIL == procstat_running())
 		goto out;
 
-	if (FAIL == procstat_build_local_query_vector(&queries, runid))
-		goto out;
+	zbx_vector_ptr_create(&queries);
+	zbx_vector_ptr_create(&processes);
+	zbx_vector_uint64_create(&pids);
 
-	pids_num = procstat_get_pids_matching_query_attributes(queries);
+	if (ZBX_SYSINFO_PROC_NONE == (flags = procstat_build_local_query_vector(&queries, runid)))
+		goto clean;
 
-	procstat_build_unique_pids(&pids, queries, pids_num);
+	if (SUCCEED != zbx_proc_get_processes(&processes, flags))
+		goto clean;
 
-	snapshot_timestamp = procstat_get_cpu_util_snapshot_for_pids(&stats, pids);
+	pids_num = procstat_scan_query_pids(&queries, &processes);
 
-	procstat_calculate_cpu_util_for_queries(queries, pids, stats);
+	zbx_vector_uint64_reserve(&pids, pids_num);
+	procstat_get_monitored_pids(&pids, &queries);
 
-	procstat_save_cpu_util_snapshot_in_queries(queries, pids, stats, runid, snapshot_timestamp);
+	stats = (zbx_procstat_util_t *)zbx_malloc(NULL, sizeof(zbx_procstat_util_t) * pids.values_num);
+	snapshot_timestamp = procstat_get_cpu_util_snapshot_for_pids(stats, &pids);
 
-	zbx_free(stats);
+	procstat_calculate_cpu_util_for_queries(&queries, &pids, stats);
+
+	procstat_save_cpu_util_snapshot_in_queries(&queries, runid, snapshot_timestamp);
+
+	/* replace the current snapshot with the new stats */
+	zbx_free(procstat_snapshot);
+	procstat_snapshot = stats;
+	procstat_snapshot_num = pids.values_num;
+clean:
 	zbx_vector_uint64_destroy(&pids);
+
+	zbx_proc_free_processes(&processes);
+	zbx_vector_ptr_destroy(&processes);
+
 	zbx_vector_ptr_clear_ext(&queries, (zbx_mem_free_func_t)procstat_free_query_data);
 	zbx_vector_ptr_destroy(&queries);
 
