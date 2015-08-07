@@ -37,12 +37,12 @@ $fields = array(
 	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,		null,		null),
 	'border' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
-	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
+	'width' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>29',	null),
 	'height' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	'{}>0',		null),
 	'graph3d' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null),
 	'legend' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),	null)
 );
-check_fields($fields);
+$isDataValid = check_fields($fields);
 
 /*
  * Permissions
@@ -68,55 +68,54 @@ $host = reset($db_data['hosts']);
 /*
  * Display
  */
-$timeline = CScreenBase::calculateTime(array(
-	'profileIdx' => get_request('profileIdx', 'web.screens'),
-	'profileIdx2' => get_request('profileIdx2'),
-	'updateProfile' => get_request('updateProfile', true),
-	'period' => get_request('period'),
-	'stime' => get_request('stime')
-));
+if ($isDataValid) {
+	$timeline = CScreenBase::calculateTime(array(
+			'profileIdx' => get_request('profileIdx', 'web.screens'),
+			'profileIdx2' => get_request('profileIdx2'),
+			'updateProfile' => get_request('updateProfile', true),
+			'period' => get_request('period'),
+			'stime' => get_request('stime')
+	));
 
-$graph = new CPie($db_data['graphtype']);
-$graph->setPeriod($timeline['period']);
-$graph->setSTime($timeline['stime']);
+	$graph = new CPie($db_data['graphtype']);
+	$graph->setPeriod($timeline['period']);
+	$graph->setSTime($timeline['stime']);
 
-if (isset($_REQUEST['border'])) {
-	$graph->setBorder(0);
-}
+	if (isset($_REQUEST['border'])) {
+		$graph->setBorder(0);
+	}
 
-$width = get_request('width', 0);
-if ($width <= 0) {
-	$width = $db_data['width'];
-}
+	$width = get_request('width', 0);
+	if ($width <= 0) {
+		$width = $db_data['width'];
+	}
 
-$height = get_request('height', 0);
-if ($height <= 0) {
-	$height = $db_data['height'];
-}
+	$height = get_request('height', 0);
+	if ($height <= 0) {
+		$height = $db_data['height'];
+	}
 
-$graph->setWidth($width);
-$graph->setHeight($height);
-$graph->setHeader($host['host'].': '.$db_data['name']);
+	$graph->setWidth($width);
+	$graph->setHeight($height);
+	$graph->setHeader($host['host'] . ': ' . $db_data['name']);
 
-if ($db_data['show_3d']) {
-	$graph->switchPie3D();
-}
-$graph->showLegend($db_data['show_legend']);
+	if ($db_data['show_3d']) {
+		$graph->switchPie3D();
+	}
+	$graph->showLegend($db_data['show_legend']);
 
-$result = DBselect(
-	'SELECT gi.*'.
-	' FROM graphs_items gi'.
-	' WHERE gi.graphid='.$db_data['graphid'].
-	' ORDER BY gi.sortorder,gi.itemid DESC'
-);
-while ($db_data = DBfetch($result)) {
-	$graph->addItem(
-		$db_data['itemid'],
-		$db_data['calc_fnc'],
-		$db_data['color'],
-		$db_data['type']
+	$result = DBselect(
+		'SELECT gi.*' .
+		' FROM graphs_items gi' .
+		' WHERE gi.graphid=' . $db_data['graphid'] .
+		' ORDER BY gi.sortorder,gi.itemid DESC'
 	);
+	while ($db_data = DBfetch($result)) {
+		$graph->addItem(
+			$db_data['itemid'], $db_data['calc_fnc'], $db_data['color'], $db_data['type']
+		);
+	}
+	$graph->draw();
 }
-$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
