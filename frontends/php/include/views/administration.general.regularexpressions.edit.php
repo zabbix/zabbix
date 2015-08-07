@@ -38,13 +38,13 @@ $form = (new CForm())
  */
 $exprTable = (new CTable())
 	->setId('tbl_expr')
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([
 		_('Expression type'),
 		_('Expression'),
 		_('Delimiter'),
 		_('Case sensitive'),
-		''
+		_('Action')
 	]);
 
 foreach ($data['expressions'] as $i => $expression) {
@@ -96,7 +96,10 @@ $exprTab = (new CFormList('exprTab'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Expressions'), (new CDiv($exprTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+	->addRow(_('Expressions'), (new CDiv($exprTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 
 /*
  * Test tab
@@ -111,9 +114,11 @@ $testTab->addRow(_('Result'), [
 	(new CDiv(
 		(new CTable())
 			->setId('testResultTable')
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			->setAttribute('style', 'width: 100%;')
 			->setHeader([_('Expression type'), _('Expression'), _('Result')])
-	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 ]);
 
 $regExpView = new CTabView();

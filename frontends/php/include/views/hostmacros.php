@@ -150,18 +150,16 @@ else {
 	}
 }
 
-$show_inherited_macros_filter = [
-	(new CRadioButton('show_inherited_macros', '0', !$data['show_inherited_macros']))
-		->setId('hide_inherited_macros')
-		->onChange('this.form.submit()'),
-	new CLabel(_('Host macros'), 'hide_inherited_macros'),
-	(new CRadioButton('show_inherited_macros', '1', $data['show_inherited_macros']))
-		->onChange('this.form.submit()'),
-	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
-];
-
 $macros_form_list
-	->addRow(null, (new CDiv($show_inherited_macros_filter))->addClass('jqueryinputset')->addClass('radioset'))
+	->addRow(null,
+		(new CDiv(
+			(new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+				->addValue(_('Host macros'), 0, null, 'this.form.submit()')
+				->addValue(_('Inherited and host macros'), 1, null, 'this.form.submit()')
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	)
 	->addRow(null, $table);
 
 return $macros_form_list;

@@ -138,7 +138,7 @@ $triggersFormList->addRow(_('Expression'), $expressionRow);
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable = (new CTable())
-		->setAttribute('style', 'min-width: 500px;')
+		->setAttribute('style', 'width: 100%;')
 		->setId('exp_list')
 		->setHeader([
 			$this->data['limited'] ? null : _('Target'),
@@ -199,8 +199,9 @@ if ($this->data['input_method'] == IM_TREE) {
 				unset($obj);
 			}
 
-			$row = new CRow([$triggerCheckbox, $e['list'], isset($deleteUrl) ? $deleteUrl : null, $errorImg]);
-			$expressionTable->addRow($row);
+			$expressionTable->addRow(
+				new CRow([$triggerCheckbox, $e['list'], isset($deleteUrl) ? $deleteUrl : null, $errorImg])
+			);
 		}
 	}
 	else {
@@ -224,7 +225,9 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		(new CDiv([$expressionTable, $testButton]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv([$expressionTable, $testButton]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
 	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))
@@ -244,7 +247,7 @@ $triggersFormList
 		(new CTextArea('comments', $this->data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('URL'), (new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
+	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $this->data['priority']]));
 
 // append status to form list
 if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
@@ -268,7 +271,7 @@ $triggersTab->addTab('triggersTab', _('Trigger'), $triggersFormList);
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($this->data['db_dependencies'] as $dependency) {
@@ -286,26 +289,28 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 		$description = $depTriggerDescription;
 	}
 
-	$row = new CRow([$description,
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-
-	$row->setId('dependency_'.$dependency['triggerid']);
-	$dependenciesTable->addRow($row);
+	$dependenciesTable->addRow(
+		(new CRow([
+			$description,
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->setId('dependency_'.$dependency['triggerid'])
+	);
 }
 
-$dependenciesFormList->addRow(
-	_('Dependencies'),
-	(new CDiv(
-		[
-			$dependenciesTable,
-			(new CButton('bnt1', _('Add')))
-				->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-					'&with_triggers=1&noempty=1");')
-				->addClass(ZBX_STYLE_BTN_LINK)
-		]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+$dependenciesFormList->addRow(_('Dependencies'),
+	(new CDiv([
+		$dependenciesTable,
+		(new CButton('bnt1', _('Add')))
+			->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
+				'&with_triggers=1&noempty=1");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 

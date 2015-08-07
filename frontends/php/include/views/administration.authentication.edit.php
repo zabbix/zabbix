@@ -43,9 +43,14 @@ $configTypeRadioButton = [
 	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
 ];
 $authenticationFormList->addRow(_('Default authentication'),
-	(new CDiv($configTypeRadioButton))
-		->addClass('jqueryinputset')
-		->addClass('radioset')
+	(new CDiv(
+		(new CRadioButtonList('config', (int) $this->data['config']['authentication_type']))
+			->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL, null, 'submit()')
+			->addValue(_('LDAP'), ZBX_AUTH_LDAP, null, 'submit()')
+			->addValue(_('HTTP'), ZBX_AUTH_HTTP, null, 'submit()')
+	))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 );
 
 // append LDAP fields to form list
