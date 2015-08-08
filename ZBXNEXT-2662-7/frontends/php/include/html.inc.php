@@ -158,18 +158,14 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 	}
 
 	$table = (new CTable())
-		->addClass('ui-widget-header')
-		->addClass('header');
-	$table->setCellSpacing(0);
-	$table->setCellPadding(1);
-	$table->addRow([
-		(new CCol($columnLeft))
-			->addClass('header_l')
-			->addClass('left'),
-		(new CCol($rights))
-			->addClass('header_r')
-			->addClass('right')
-	]);
+		->addRow([
+			(new CCol($columnLeft))
+				->addClass('header_l')
+				->addClass('left'),
+			(new CCol($rights))
+				->addClass('header_r')
+				->addClass('right')
+		]);
 
 	return $table;
 }
