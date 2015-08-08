@@ -559,6 +559,7 @@ function getHostAvailabilityTable($host) {
 			case HOST_AVAILABLE_FALSE:
 				$ai = (new CSpan($type))
 					->addClass(ZBX_STYLE_STATUS_RED)
+					->addClass(ZBX_STYLE_CURSOR_POINTER)
 					->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
