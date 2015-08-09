@@ -19,9 +19,14 @@
 **/
 
 
-global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
+global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
 
-$pageHeader = new CPageHeader($data['page']['title']);
+$page_title = $data['page']['title'];
+if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
+	$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title;
+}
+
+$pageHeader = new CPageHeader($page_title);
 
 $scripts = [];
 
