@@ -62,10 +62,6 @@ my $total_sec;
 my $sql_time = 0.0;
 my $sql_count = 0;
 
-my $total_sec;
-my $sql_time = 0.0;
-my $sql_count = 0;
-
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld
@@ -754,12 +750,6 @@ sub db_select
 		$sec = time();
 	}
 
-	my $sec;
-	if (opt('stats'))
-	{
-		$sec = time();
-	}
-
 	my $sth = $dbh->prepare($global_sql)
 		or fail("cannot prepare [$global_sql]: ", $dbh->errstr);
 
@@ -799,12 +789,6 @@ sub db_select
 		my $rows = scalar(@$rows_ref);
 
 		dbg("$rows row", ($rows != 1 ? "s" : ""));
-	}
-
-	if (opt('stats'))
-	{
-		$sql_time += time() - $sec;
-		$sql_count++;
 	}
 
 	if (opt('stats'))
