@@ -1117,10 +1117,9 @@ function getActionMessages(array $alerts) {
 		'preservekeys' => true
 	]);
 
-	$table = (new CTableInfo())
-		->setHeader([
-			_('Step'), _('Time'), _('Type'), _('Status'), _('Retries left'), _('Recipient(s)'), _('Message'), _('Info')
-		]);
+	$table = (new CTableInfo())->setHeader([
+		_('Step'), _('Time'), _('Type'), _('Status'), _('Retries left'), _('Recipient(s)'), _('Message'), _('Info')
+	]);
 
 	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
@@ -1131,7 +1130,7 @@ function getActionMessages(array $alerts) {
 
 		if ($alert['status'] == ALERT_STATUS_SENT) {
 			$status = (new CSpan(_('sent')))->addClass(ZBX_STYLE_GREEN);
-			$retries = (new CSpan(SPACE))->addClass(ZBX_STYLE_GREEN);
+			$retries = '';
 		}
 		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
 			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
@@ -1146,33 +1145,15 @@ function getActionMessages(array $alerts) {
 			? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 			: $alert['sendto'];
 
-		$message = [
-			bold(_('Subject').NAME_DELIMITER),
-			br(),
-			$alert['subject'],
-			br(),
-			br(),
-			bold(_('Message').NAME_DELIMITER)
-		];
-
-		array_push($message, BR(), zbx_nl2br($alert['message']));
-
-		if (zbx_empty($alert['error'])) {
-			$info = '';
-		}
-		else {
-			$info = makeErrorIcon($alert['error']);
-		}
-
 		$table->addRow([
 			$alert['esc_step'],
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-			new CCol((isset($mediaType['description']) ? $mediaType['description'] : '')),
-			new CCol($status),
-			new CCol($retries),
-			new CCol($recipient),
-			new CCol($message),
-			new CCol($info)
+			isset($mediaType['description']) ? $mediaType['description'] : '',
+			$status,
+			$retries,
+			$recipient,
+			[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
+			$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
 		]);
 	}
 

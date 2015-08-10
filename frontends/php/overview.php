@@ -238,6 +238,12 @@ if ($type == SHOW_TRIGGERS) {
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
 
+	// Pass already filtered 'groupid' to menu pop-up "Events" link.
+	foreach ($triggers as &$trigger) {
+		$trigger['groupid'] = $data['pageFilter']->groupid;
+	}
+	unset($trigger);
+
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;
 	$data['triggers'] = $triggers;
