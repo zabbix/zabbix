@@ -858,6 +858,10 @@ class CHostGroup extends CZBXAPI {
 			'operationid' => $delOperationids,
 		));
 
+		DB::delete('opcommand_grp', array(
+			'groupid' => $groupids
+		));
+
 		// host groups
 		DB::delete('groups', array(
 			'groupid' => $groupids
