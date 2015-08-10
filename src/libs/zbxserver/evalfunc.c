@@ -1959,7 +1959,8 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				t[i] = values.values[i].timestamp.sec + 1.0e-9 * values.values[i].timestamp.ns;
+				t[i] = values.values[i].timestamp.sec - values.values[0].timestamp.sec +
+					1.0e-9 * (values.values[i].timestamp.ns - values.values[0].timestamp.ns + 1);
 				x[i] = values.values[i].value.dbl;
 			}
 		}
@@ -1967,12 +1968,14 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				t[i] = values.values[i].timestamp.sec + 1.0e-9 * values.values[i].timestamp.ns;
+				t[i] = values.values[i].timestamp.sec - values.values[0].timestamp.sec +
+					1.0e-9 * (values.values[i].timestamp.ns - values.values[0].timestamp.ns + 1);
 				x[i] = values.values[i].value.ui64;
 			}
 		}
 
-		if (SUCCEED != zbx_forecast(t, x, values.values_num, now, time, fit, mode, &prediction, error))
+		if (SUCCEED != zbx_forecast(t, x, values.values_num, now - values.values[0].timestamp.sec -
+				1.0e-9 * (values.values[0].timestamp.ns + 1), time, fit, mode, &prediction, error))
 			goto out;
 
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, prediction);
@@ -2091,7 +2094,8 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 			}
 		}
 
-		if (SUCCEED != zbx_timeleft(t, x, values.values_num, now, threshold, fit, &timeleft, error))
+		if (SUCCEED != zbx_timeleft(t, x, values.values_num, now - values.values[0].timestamp.sec -
+				1.0e-9 * (values.values[0].timestamp.ns + 1), threshold, fit, &timeleft, error))
 			goto out;
 
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, timeleft);
