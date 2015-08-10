@@ -62,6 +62,10 @@ my $total_sec;
 my $sql_time = 0.0;
 my $sql_count = 0;
 
+my $total_sec;
+my $sql_time = 0.0;
+my $sql_count = 0;
+
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld
@@ -416,7 +420,7 @@ sub get_tlds
 	if ($service eq 'DNS')
 	{
 		$sql =
-			"select h.host".
+			"select h.host,h.hostid".
 			" from hosts h,hosts_groups hg,groups g".
 			" where h.hostid=hg.hostid".
 				" and hg.groupid=g.groupid".
@@ -426,7 +430,7 @@ sub get_tlds
 	else
 	{
 		$sql =
-			"select h.host".
+			"select h.host,h.hostid".
 			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
 			" where h.hostid=hg.hostid".
 				" and hg.groupid=g.groupid".
@@ -438,17 +442,15 @@ sub get_tlds
 				" and h.status=0";
 	}
 
-	$sql .= " order by h.host";
-
 	my $rows_ref = db_select($sql);
 
-	my @tlds;
+	my %tlds;
 	foreach my $row_ref (@$rows_ref)
 	{
-		push(@tlds, $row_ref->[0]);
+		$tlds{$row_ref->[0]} = $row_ref->[1];
 	}
 
-	return \@tlds;
+	return \%tlds;
 }
 
 # Returns a reference to hash of all probes (host => hostid).
@@ -752,6 +754,12 @@ sub db_select
 		$sec = time();
 	}
 
+	my $sec;
+	if (opt('stats'))
+	{
+		$sec = time();
+	}
+
 	my $sth = $dbh->prepare($global_sql)
 		or fail("cannot prepare [$global_sql]: ", $dbh->errstr);
 
@@ -791,6 +799,12 @@ sub db_select
 		my $rows = scalar(@$rows_ref);
 
 		dbg("$rows row", ($rows != 1 ? "s" : ""));
+	}
+
+	if (opt('stats'))
+	{
+		$sql_time += time() - $sec;
+		$sql_count++;
 	}
 
 	if (opt('stats'))
@@ -1170,7 +1184,7 @@ sub get_probe_times
 
 # Translate probe names to hostids of appropriate tld hosts.
 #
-# E. g., we have hosts (host/hostid):
+# E. g., in the database we have the following hosts (host/hostid):
 #   "Probe2"		1
 #   "Probe12"		2
 #   "ORG Probe2"	100
@@ -1791,6 +1805,9 @@ sub sql_time_condition
 	my $from = shift;
 	my $till = shift;
 
+	$from = int($from) if (defined($from));
+	$till = int($till) if (defined($till));
+
 	if (defined($from) and not defined($till))
 	{
 		return "clock>=$from";
@@ -1844,13 +1861,16 @@ sub get_incidents
 	my (@incidents, $rows_ref, $row_ref);
 
 	$rows_ref = db_select(
-		"select distinct t.triggerid".
+		"select t.triggerid".
 		" from triggers t,functions f".
 		" where t.triggerid=f.triggerid".
 			" and f.itemid=$itemid".
 			" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
 
-	my $rows = scalar(@$rows_ref);
+	# select distinct is slow
+	my @uniq_rows = do { my %seen; grep { !$seen{$_->[0]}++ } @$rows_ref };
+
+	my $rows = scalar(@uniq_rows);
 
 	unless ($rows == 1)
 	{
@@ -1858,7 +1878,7 @@ sub get_incidents
 		return \@incidents;
 	}
 
-	my $triggerid = $rows_ref->[0]->[0];
+	my $triggerid = $uniq_rows[0]->[0];
 
 	my $last_trigger_value = TRIGGER_VALUE_FALSE;
 
@@ -1910,15 +1930,21 @@ sub get_incidents
 
 	# now check for incidents within given period
 	$rows_ref = db_select(
-		"select eventid,clock,value,false_positive".
+		"select eventid,clock,value,false_positive,ns".
 		" from events".
 		" where object=".EVENT_OBJECT_TRIGGER.
 			" and source=".EVENT_SOURCE_TRIGGERS.
 			" and objectid=$triggerid".
-			" and ".sql_time_condition($from, $till).
-		" order by clock,ns");
+			" and ".sql_time_condition($from, $till));
 
-	foreach my $row_ref (@$rows_ref)
+	# order by clock,ns (slower in sql)
+	my @sorted_rows = sort
+	{
+		$a->[1] <=> $b->[1] ||	# order by clock (the result is -1, 0 ,1)
+		$a->[4] <=> $b->[4];	# order by ns if clock is the same
+	} @$rows_ref;
+
+	foreach my $row_ref (@sorted_rows)
 	{
 		my $eventid = $row_ref->[0];
 		my $clock = $row_ref->[1];
@@ -2629,7 +2655,8 @@ sub usage
 # Internal subs #
 #################
 
-my $program = $0; $program =~ s,.*/,,g;
+my $program = $0;
+$program =~ s,.*/,,g;
 my $logopt = 'pid';
 my $facility = 'user';
 my $prev_tld = "";

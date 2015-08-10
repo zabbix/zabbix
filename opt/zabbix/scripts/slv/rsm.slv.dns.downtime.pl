@@ -31,7 +31,7 @@ my %tld_items;
 my $tlds_ref = get_tlds();
 
 # just collect itemids
-foreach (@$tlds_ref)
+foreach (sort(keys(%$tlds_ref)))
 {
 	$tld = $_; # set global variable here
 

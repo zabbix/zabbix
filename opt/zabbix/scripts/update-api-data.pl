@@ -3,11 +3,16 @@
 use lib '/opt/zabbix/scripts';
 
 use strict;
+use warnings;
 use RSM;
 use RSMSLV;
 use ApiHelper;
+use Parallel;
 use JSON::XS;
 use Data::Dumper;
+use Time::HiRes qw(time);
+
+use constant MAX_PIDS => 64;
 
 use constant JSON_RDDS_SUBSERVICE => 'subService';
 use constant JSON_RDDS_43 => 'RDDS43';
@@ -20,15 +25,18 @@ use constant AUDIT_RESOURCE_INCIDENT => 32;
 
 parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n');
 
-# do not write any logs
-setopt('nolog');
-
 exit_if_running();
 
 if (opt('debug'))
 {
 	dbg("command-line parameters:");
 	dbg("$_ => ", getopt($_)) foreach (optkeys());
+}
+
+my $sec;
+if (opt('stats'))
+{
+	$sec = time();
 }
 
 set_slv_config(get_rsm_config());
@@ -126,12 +134,21 @@ if (exists($services_hash{'epp'}))
 
 my $now = time();
 
+if (opt('stats'))
+{
+	printf("stats: config prepare took %s\n", format_stats_time($now - $sec));
+	$sec = $now;
+}
+
 my $tlds_ref;
 if (opt('tld'))
 {
 	fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
 
-	$tlds_ref = [ getopt('tld') ];
+	my $tld = getopt('tld');
+	my $tld_hostid = get_hostid($tld);
+
+	$tlds_ref->{$tld} = $tld_hostid;
 }
 else
 {
@@ -155,11 +172,11 @@ my $probes_from;
 my $probes_till;
 
 my $tlds_processed = 0;
-foreach (@$tlds_ref)
+foreach (keys(%$tlds_ref))
 {
-	$tlds_processed++;
-
 	last if (opt('limit') && $tlds_processed == getopt('limit'));
+
+	$tlds_processed++;
 
 	# NB! This is needed in order to set the value globally.
 	$tld = $_;
@@ -285,6 +302,7 @@ foreach (@$tlds_ref)
 			next;
 		}
 
+		$servicedata->{$tld}->{'hostid'} = $tlds_ref->{$tld};
 		$servicedata->{$tld}->{$service}->{'from'} = $from;
 		$servicedata->{$tld}->{$service}->{'till'} = $till;
 		$servicedata->{$tld}->{$service}->{'lastclock'} = $lastclock;
@@ -294,6 +312,35 @@ foreach (@$tlds_ref)
 
 fail("cannot calculate beginning of the period") unless(defined($probes_from));
 fail("cannot calculate end of the period") unless(defined($probes_till));
+
+my $sec_avail_keys;
+if (opt('stats'))
+{
+	$sec_avail_keys = time();
+}
+
+my @a = sort(values(%$servicedata));
+my @h = map {$_->{'hostid'}} @a;
+my $tld_hostids_str = join(',', @h);
+
+$rows_ref = db_select("select hostid,key_,itemid from items where key_ like 'rsm.slv.%.avail' and hostid in ($tld_hostids_str)");
+my $avail_keys;
+
+foreach my $row_ref (@$rows_ref)
+{
+	my $service = (split(/\./, $row_ref->[1]))[2];
+
+	# TLD hostid and service availability itemid mapping, e. g. hostid->dns->itemid
+	$avail_keys->{$row_ref->[0]}->{$service} = $row_ref->[2];
+}
+
+if (opt('stats'))
+{
+	my $t = time();
+	printf("stats: avail_keys generation took %s\n", format_stats_time($t - $sec_avail_keys));
+	printf("stats: TLD data prepare took %s\n", format_stats_time($t - $sec));
+	$sec = $t;
+}
 
 my $all_probes_ref = get_probes();
 
@@ -308,12 +355,33 @@ if (opt('probe'))
 
 my $probe_times_ref = get_probe_times($probes_from, $probes_till, $probe_avail_limit, $all_probes_ref);
 
-foreach (keys(%$servicedata))
+if (opt('stats'))
+{
+	my $t = time();
+	printf("stats: probes prepare took %s\n", format_stats_time($t - $sec));
+	$sec = $t;
+}
+
+my @tlds = sort(keys(%$servicedata));
+
+my $pid_count = MAX_PIDS < scalar(@tlds) ? MAX_PIDS : scalar(@tlds);
+
+start_children($pid_count, \&__parent_exit, SUCCESS);
+
+db_connect();
+
+for (my $i = 0; $i < scalar(@tlds); $i++)
 {
 	# NB! This is needed in order to set the value globally.
-	$tld = $_;
+	$tld = $tlds[$i];
+
+	next unless ($i % $pid_count == get_pidnum());
+
+	dbg("child#", get_pidnum(), " started to handle $tld");
 
 	my $ah_tld = ah_get_api_tld($tld);
+
+	my $tld_hostid = $servicedata->{$tld}->{'hostid'};
 
 	foreach my $service (@services)
 	{
@@ -322,25 +390,13 @@ foreach (keys(%$servicedata))
 		my $lastclock = $servicedata->{$tld}->{$service}->{'lastclock'};
 		my $continue_file = $servicedata->{$tld}->{$service}->{'continue_file'};
 
-		my $hostid = get_hostid($tld);
 		my $avail_key = "rsm.slv.$service.avail";
-		my $avail_itemid = get_itemid_by_hostid($hostid, $avail_key);
+		#my $avail_itemid = get_itemid_by_hostid($tld_hostid, $avail_key);
+		my $avail_itemid = $avail_keys->{$tld_hostid}->{$service};
 
-		if ($avail_itemid < 0)
+		if (!$avail_itemid)
 		{
-			if ($avail_itemid == E_ID_NONEXIST)
-			{
-				wrn("configuration error: service $service enabled but item \"$avail_key\" not found");
-			}
-			elsif ($avail_itemid == E_ID_MULTIPLE)
-			{
-				wrn("configuration error: multiple items with key \"$avail_key\" found");
-			}
-			else
-			{
-				wrn("cannot get ID of $service item ($avail_key): unknown error");
-			}
-
+			wrn("configuration error: service $service enabled but item \"$avail_key\" not found");
 			next;
 		}
 
@@ -898,12 +954,22 @@ foreach (keys(%$servicedata))
 # unset TLD (for the logs)
 $tld = undef;
 
-unless (opt('dry-run'))
+sub __parent_exit
 {
-	__update_false_positives();
-}
+	unless (opt('dry-run'))
+	{
+		db_connect();
 
-slv_exit(SUCCESS);
+		__update_false_positives();
+	}
+
+	if (opt('stats'))
+	{
+		printf("stats: TLD data processing took %s (TLDs: %d)\n", format_stats_time(time() - $sec), $tlds_processed);
+	}
+
+	slv_exit(SUCCESS);
+}
 
 # values are organized like this:
 # {
@@ -1265,29 +1331,35 @@ sub __get_dns_itemids
 	my $tld = shift;
 	my $probe = shift;
 
+	my $hosts;
+
+	my $host_cond = ($probe ? "host='$tld $probe'" : "host like '$tld %'");
+
+	my $rows_ref = db_select("select hostid,host from hosts where $host_cond");
+
+	foreach my $row_ref (@$rows_ref)
+	{
+		$hosts->{$row_ref->[0]} = $row_ref->[1];
+	}
+
+	my $hostids_str = join(',', keys(%$hosts));
+
 	my @keys;
 	push(@keys, "'" . $key . $_ . "]'") foreach (@$nsips_ref);
-
 	my $keys_str = join(',', @keys);
 
-	my $host_value = ($probe ? "$tld $probe" : "$tld %");
-
-	my $rows_ref = db_select(
-		"select h.host,i.itemid,i.key_".
-		" from items i,hosts h".
-		" where i.hostid=h.hostid".
-			" and h.host like '$host_value'".
-			" and i.templateid is not null".
-			" and i.key_ in ($keys_str)");
+	$rows_ref = db_select("select hostid,itemid,key_ from items where templateid is not null and hostid in ($hostids_str) and key_ in ($keys_str)");
 
 	my %result;
 
 	my $tld_length = length($tld) + 1; # white space
 	foreach my $row_ref (@$rows_ref)
 	{
-		my $host = $row_ref->[0];
+		my $hostid = $row_ref->[0];
 		my $itemid = $row_ref->[1];
 		my $key = $row_ref->[2];
+
+		my $host = $hosts->{$hostid};
 
 		# remove TLD from host name to get just the Probe name
 		my $_probe = ($probe ? $probe : substr($host, $tld_length));
@@ -1295,7 +1367,7 @@ sub __get_dns_itemids
 		$result{$_probe}->{$itemid} = get_nsip_from_key($key);
 	}
 
-	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
+	wrn("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
 
 	return \%result;
 }
@@ -1429,7 +1501,7 @@ sub __get_itemids_by_complete_key
 		$result{$_probe}->{$itemid} = $key;
 	}
 
-	fail("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
+	wrn("cannot find items ($keys_str) at host ($tld *)") if (scalar(keys(%result)) == 0);
 
 	return \%result;
 }
@@ -1468,7 +1540,7 @@ sub __get_itemids_by_incomplete_key
 		$result{$_probe}->{$itemid} = $key;
 	}
 
-	fail("cannot find items ('", join("','", @_), "') at host ($tld *)") if (scalar(keys(%result)) == 0);
+	wrn("cannot find items ('", join("','", @_), "') at host ($tld *)") if (scalar(keys(%result)) == 0);
 
 	return \%result;
 }
@@ -1498,20 +1570,25 @@ sub __get_status_itemids
 
 	my $rows_ref = db_select($sql);
 
-	fail("no items matching '$key' found at host '$tld %'") if (scalar(@$rows_ref) == 0);
-
 	my %result;
 
-	my $tld_length = length($tld) + 1; # white space
-	foreach my $row_ref (@$rows_ref)
+	if (scalar(@$rows_ref) == 0)
 	{
-		my $host = $row_ref->[0];
-		my $itemid = $row_ref->[1];
+		wrn("no items matching '$key' found at host '$tld %'");
+	}
+	else
+	{
+		my $tld_length = length($tld) + 1; # white space
+		foreach my $row_ref (@$rows_ref)
+		{
+			my $host = $row_ref->[0];
+			my $itemid = $row_ref->[1];
 
-		# remove TLD from host name to get just the Probe name
-		my $probe = substr($host, $tld_length);
+			# remove TLD from host name to get just the Probe name
+			my $probe = substr($host, $tld_length);
 
-		$result{$probe} = $itemid;
+			$result{$probe} = $itemid;
+		}
 	}
 
 	return \%result;
@@ -1582,7 +1659,11 @@ sub __get_probe_statuses
 				}
 			}
 
-			fail("internal error: Probe of item (itemid:$itemid) not found") unless (defined($probe));
+			unless (defined($probe))
+			{
+				wrn("internal error: Probe of item (itemid:$itemid) not found");
+				return \%result;
+			}
 
 			push(@{$result{$probe}}, {'value' => $value, 'clock' => $clock});
 		}

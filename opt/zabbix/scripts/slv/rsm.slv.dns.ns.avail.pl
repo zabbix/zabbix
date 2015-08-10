@@ -30,7 +30,7 @@ my ($from, $till, $value_ts) = get_interval_bounds($interval);
 my $tlds_ref = get_tlds();
 my @tlds;
 
-foreach (@$tlds_ref)
+foreach (sort(keys(%$tlds_ref)))
 {
 	$tld = $_; # set global variable here
 

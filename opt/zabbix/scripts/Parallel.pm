@@ -9,10 +9,13 @@ use Exporter qw(import);
 use Time::HiRes qw(time);
 use Data::Dumper;
 
-our @EXPORT = qw(fork_without_pipe fork_with_pipe handle_children print_children children_running set_max_children);
+our @EXPORT = qw(fork_without_pipe fork_with_pipe handle_children print_children children_running set_max_children
+		start_children is_parent get_pidnum);
 
 my $MAX_CHILDREN = 64;
 my %PIDS;
+my $PIDNUM = 0;
+my $PARENT = 1;
 
 sub ts_str
 {
@@ -55,6 +58,7 @@ sub fork_without_pipe
 	{
 		# child
 		undef(%PIDS);
+		$PARENT = 0;
 	}
 
 	return $pid;
@@ -86,6 +90,7 @@ sub fork_with_pipe
 
 	# child
 	undef(%PIDS);
+	$PARENT = 0;
 
 	my $fh = $pipe->writer();
 
@@ -96,7 +101,16 @@ sub fork_with_pipe
 
 sub handle_children
 {
-	my $t0 = time();
+	my $debug = shift;
+
+	my $t0;
+
+	if ($debug)
+	{
+		$t0 = time();
+
+		printf("%s In handle_children()\n", ts_str($t0));
+	}
 
 	foreach my $pid (keys(%PIDS))
 	{
@@ -111,10 +125,13 @@ sub handle_children
 		delete($PIDS{$pid}) unless ($PIDS{$pid}{'alive'});
 	}
 
-	my $t1 = time();
-	my $diff = $t1 - $t0;
+	if ($debug)
+	{
+		my $t1 = time();
+		my $diff = $t1 - $t0;
 
-	#printf("%s handle_children() took %f s\n", ts_str($1), $diff) if ($diff > 0.001);
+		printf("%s End of handle_children(): took %f s\n", ts_str($1), $t1 - $t0);
+	}
 }
 
 sub print_children
@@ -156,6 +173,62 @@ sub children_running
 sub set_max_children
 {
 	$MAX_CHILDREN = shift;
+}
+
+sub start_children
+{
+	my $max_pids = shift;
+	my $exit_func = shift;
+	my $debug = shift;
+
+	set_max_children($max_pids);
+
+	while ($PIDNUM < $max_pids)
+	{
+		my $pid = fork_without_pipe();
+
+		if (!defined($pid))
+		{
+			# max children reached, make sure to handle_children()
+			die("ERROR! max children reached!");
+			return;
+		}
+		elsif ($pid)
+		{
+			# parent
+			$PIDNUM++;
+		}
+		else
+		{
+			# child
+			print("child#$PIDNUM (pid:$$) forked\n") if ($debug);
+			$PARENT = 0;
+			return;
+		}
+	}
+
+	if ($PARENT != 0)
+	{
+		# daddy should leave last
+		while (children_running() != 0)
+		{
+			handle_children(0);
+		}
+
+		$exit_func->();
+	}
+}
+
+sub is_parent
+{
+	return $PARENT;
+}
+
+sub get_pidnum
+{
+	return undef if ($PARENT != 0);
+
+	return $PIDNUM;
 }
 
 1;

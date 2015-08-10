@@ -35,7 +35,7 @@ my $tlds_ref = get_tlds();
 
 init_values();
 
-foreach (@$tlds_ref)
+foreach (sort(keys(%$tlds_ref)))
 {
 	$tld = $_;
 

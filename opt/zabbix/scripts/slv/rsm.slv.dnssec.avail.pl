@@ -41,7 +41,7 @@ while ($period > 0)
 
 	init_values();
 
-	foreach (@$tlds_ref)
+	foreach (sort(keys(%$tlds_ref)))
 	{
 		$tld = $_;
 
