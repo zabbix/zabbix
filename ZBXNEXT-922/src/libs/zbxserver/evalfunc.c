@@ -1888,6 +1888,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	int				nparams, time, time_flag, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0,
 					time_shift = 0;
 	zbx_vector_history_record_t	values;
+	zbx_timespec_t			zero_time;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1955,12 +1956,15 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 		t = zbx_malloc(t, values.values_num * sizeof(double));
 		x = zbx_malloc(x, values.values_num * sizeof(double));
 
+		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
+		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
+
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				t[i] = values.values[i].timestamp.sec - values.values[0].timestamp.sec +
-					1.0e-9 * (values.values[i].timestamp.ns - values.values[0].timestamp.ns + 1);
+				t[i] = values.values[i].timestamp.sec - zero_time.sec + 1.0e-9 *
+						(values.values[i].timestamp.ns - zero_time.ns + 1);
 				x[i] = values.values[i].value.dbl;
 			}
 		}
@@ -1968,14 +1972,14 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				t[i] = values.values[i].timestamp.sec - values.values[0].timestamp.sec +
-					1.0e-9 * (values.values[i].timestamp.ns - values.values[0].timestamp.ns + 1);
+				t[i] = values.values[i].timestamp.sec - zero_time.sec + 1.0e-9 *
+						(values.values[i].timestamp.ns - zero_time.ns + 1);
 				x[i] = values.values[i].value.ui64;
 			}
 		}
 
-		if (SUCCEED != zbx_forecast(t, x, values.values_num, now - values.values[0].timestamp.sec -
-				1.0e-9 * (values.values[0].timestamp.ns + 1), time, fit, mode, &prediction, error))
+		if (SUCCEED != zbx_forecast(t, x, values.values_num, now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1),
+				time, fit, mode, &prediction, error))
 			goto out;
 
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, prediction);
@@ -2019,6 +2023,7 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 	double				*t = NULL, *x = NULL, threshold, timeleft;
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift = 0;
 	zbx_vector_history_record_t	values;
+	zbx_timespec_t			zero_time;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2075,12 +2080,15 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 		t = zbx_malloc(t, values.values_num * sizeof(double));
 		x = zbx_malloc(x, values.values_num * sizeof(double));
 
+		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
+		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
+
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				t[i] = values.values[i].timestamp.sec - values.values[0].timestamp.sec +
-					1.0e-9 * (values.values[i].timestamp.ns - values.values[0].timestamp.ns + 1);
+				t[i] = values.values[i].timestamp.sec - zero_time.sec + 1.0e-9 *
+						(values.values[i].timestamp.ns - zero_time.ns + 1);
 				x[i] = values.values[i].value.dbl;
 			}
 		}
@@ -2088,14 +2096,14 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				t[i] = values.values[i].timestamp.sec - values.values[0].timestamp.sec +
-					1.0e-9 * (values.values[i].timestamp.ns - values.values[0].timestamp.ns + 1);
+				t[i] = values.values[i].timestamp.sec - zero_time.sec + 1.0e-9 *
+						(values.values[i].timestamp.ns - zero_time.ns + 1);
 				x[i] = values.values[i].value.ui64;
 			}
 		}
 
-		if (SUCCEED != zbx_timeleft(t, x, values.values_num, now - values.values[0].timestamp.sec -
-				1.0e-9 * (values.values[0].timestamp.ns + 1), threshold, fit, &timeleft, error))
+		if (SUCCEED != zbx_timeleft(t, x, values.values_num, now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1),
+				threshold, fit, &timeleft, error))
 			goto out;
 
 		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, timeleft);
