@@ -399,6 +399,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	char		service[8], *error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
+	{
+		zbx_set_socket_strerror("Support for TLS was not compiled in.");
+		return FAIL;
+	}
+#endif
 	ZBX_SOCKET_START();
 
 	zbx_socket_clean(s);
@@ -457,23 +464,16 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		goto out;
 	}
 
-	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
-	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
-		{
-			zbx_tcp_close(s);
-			zbx_set_socket_strerror("%s", error);
-			zbx_free(error);
-			goto out;
-		}
-#else
+	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
+			SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
+	{
 		zbx_tcp_close(s);
-		zbx_set_socket_strerror("Support for TLS was not compiled in.");
+		zbx_set_socket_strerror("%s", error);
+		zbx_free(error);
 		goto out;
-#endif
 	}
-
+#endif
 	ret = SUCCEED;
 out:
 	if (NULL != ai)
@@ -493,6 +493,13 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	char		*error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
+	{
+		zbx_set_socket_strerror("Support for TLS was not compiled in.");
+		return FAIL;
+	}
+#endif
 	ZBX_SOCKET_START();
 
 	zbx_socket_clean(s);
@@ -554,23 +561,16 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 		return FAIL;
 	}
 
-	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
-	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
-		{
-			zbx_tcp_close(s);
-			zbx_set_socket_strerror("%s", error);
-			zbx_free(error);
-			return FAIL;
-		}
-#else
+	if ((ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect) &&
+			SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
+	{
 		zbx_tcp_close(s);
-		zbx_set_socket_strerror("Support for TLS was not compiled in.");
+		zbx_set_socket_strerror("%s", error);
+		zbx_free(error);
 		return FAIL;
-#endif
 	}
-
+#endif
 	return SUCCEED;
 }
 #endif	/* HAVE_IPV6 */
