@@ -174,8 +174,9 @@ typedef struct
 }
 zbx_procstat_query_data_t;
 
-
+/* the process cpu utilization snapshot */
 static zbx_procstat_util_t	*procstat_snapshot;
+/* the number of processes in process cpu utilization snapshot */
 static int			procstat_snapshot_num;
 
 /* external functions used by procstat collector */
@@ -628,14 +629,18 @@ static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_
  * Purpose: creates a list of unique pids that are monitored by current data  *
  *          gathering cycle                                                   *
  *                                                                            *
- * Parameters: pids    - [OUT] a sorted vector of unique pids                 *
- *             queries - [IN] local, working copy of queries                  *
+ * Parameters: pids     - [OUT] a sorted vector of unique pids                *
+ *             queries  - [IN] local, working copy of queries                 *
+ *             pids_num - [IN] the total number of pids monitored by queries  *
+ *                             (might contain duplicated pids)                *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vector_ptr_t *queries)
+static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vector_ptr_t *queries, int pids_num)
 {
 	zbx_procstat_query_data_t	*qdata;
 	int i;
+
+	zbx_vector_uint64_reserve(pids, pids_num);
 
 	for (i = 0; i < queries->values_num; i++)
 	{
@@ -645,7 +650,7 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
 			continue;
 
 		memcpy(pids->values + pids->values_num, qdata->pids.values,
-			sizeof(zbx_uint64_t) * qdata->pids.values_num);
+				sizeof(zbx_uint64_t) * qdata->pids.values_num);
 		pids->values_num += qdata->pids.values_num;
 	}
 
@@ -719,7 +724,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 			putil = (zbx_procstat_util_t *)bsearch(&qdata->pids.values[i], stats, pids->values_num,
 					sizeof(zbx_procstat_util_t), ZBX_DEFAULT_INT_COMPARE_FUNC);
 
-			if (SUCCEED != putil->error)
+			if (NULL == putil || SUCCEED != putil->error)
 				continue;
 
 			utime = putil->utime;
@@ -732,7 +737,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 					procstat_snapshot, procstat_snapshot_num,
 					sizeof(zbx_procstat_util_t), ZBX_DEFAULT_INT_COMPARE_FUNC);
 
-			if (NULL == putil || putil->starttime != starttime)
+			if (NULL == putil || SUCCEED != putil->error || putil->starttime != starttime)
 				continue;
 
 			qdata->utime += utime - putil->utime;
@@ -743,7 +748,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
 
 /******************************************************************************
  *                                                                            *
- * Function: procstat_save_cpu_util_snapshot_in_queries                       *
+ * Function: procstat_update_query_statistics                                 *
  *                                                                            *
  * Purpose: updates cpu utilization and saves the new snapshot for queries in *
  *          shared memory segment                                             *
@@ -759,7 +764,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
  *           memory segment                                                   *
  *                                                                            *
  ******************************************************************************/
-static void	procstat_save_cpu_util_snapshot_in_queries(zbx_vector_ptr_t *queries, int runid,
+static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runid,
 		zbx_timespec_t snapshot_timestamp)
 {
 	zbx_procstat_query_t		*query;
@@ -1021,15 +1026,14 @@ void	zbx_procstat_collect()
 
 	pids_num = procstat_scan_query_pids(&queries, &processes);
 
-	zbx_vector_uint64_reserve(&pids, pids_num);
-	procstat_get_monitored_pids(&pids, &queries);
+	procstat_get_monitored_pids(&pids, &queries, pids_num);
 
 	stats = (zbx_procstat_util_t *)zbx_malloc(NULL, sizeof(zbx_procstat_util_t) * pids.values_num);
 	snapshot_timestamp = procstat_get_cpu_util_snapshot_for_pids(stats, &pids);
 
 	procstat_calculate_cpu_util_for_queries(&queries, &pids, stats);
 
-	procstat_save_cpu_util_snapshot_in_queries(&queries, runid, snapshot_timestamp);
+	procstat_update_query_statistics(&queries, runid, snapshot_timestamp);
 
 	/* replace the current snapshot with the new stats */
 	zbx_free(procstat_snapshot);
