@@ -318,13 +318,13 @@ class C20ImportConverter extends CConverter {
 		foreach ($graphs as &$graph) {
 			$graph['graph_items'] = $this->convertGraphItems($graph['graph_items']);
 
-			if (zbx_is_int($graph['ymin_type_1'])) {
+			if ( isset($graph['ymin_type_1']) && zbx_is_int($graph['ymin_type_1']) ) {
 				if ($graph['ymin_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 					$graph['ymin_item_1']['key'] = $this->itemKeyConverter->convert($graph['ymin_item_1']['key']);
 				}
 			}
 
-			if (zbx_is_int($graph['ymax_type_1'])) {
+			if ( isset($graph['ymax_type_1']) && zbx_is_int($graph['ymax_type_1']) ) {
 				if ($graph['ymax_type_1'] == GRAPH_YAXIS_TYPE_ITEM_VALUE) {
 					$graph['ymax_item_1']['key'] = $this->itemKeyConverter->convert($graph['ymax_item_1']['key']);
 				}
