@@ -1885,7 +1885,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	const char			*__function_name = "evaluate_FORECAST";
 	char				*fit = NULL, *mode = NULL;
 	double				*t = NULL, *x = NULL, prediction;
-	int				nparams, time, time_flag, arg2, flag, i, ret = FAIL, seconds = 0, nvalues = 0,
+	int				nparams, time, time_flag, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0,
 					time_shift = 0;
 	zbx_vector_history_record_t	values;
 
@@ -1899,21 +1899,21 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	if (5 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (2 > nparams)
+	if (3 > nparams)
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &time, &time_flag) ||
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 3, &time, &time_flag) ||
 			ZBX_FLAG_SEC != time_flag)
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 2, &arg2, &flag) || 0 == arg2)
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (3 <= nparams)
 	{
 		int	time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 3, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -1941,9 +1941,9 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	}
 
 	if (ZBX_FLAG_SEC == flag)
-		seconds = arg2;
+		seconds = arg1;
 	else
-		nvalues = arg2;
+		nvalues = arg1;
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
 		goto out;
@@ -2014,7 +2014,7 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 	const char			*__function_name = "evaluate_TIMELEFT";
 	char				*fit = NULL;
 	double				*t = NULL, *x = NULL, threshold, timeleft;
-	int				nparams, arg2, flag, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift = 0;
+	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift = 0;
 	zbx_vector_history_record_t	values;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -2027,20 +2027,20 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 	if (4 < (nparams = num_param(parameters)))
 		goto out;
 
-	if (2 > nparams)
+	if (3 > nparams)
 		goto out;
 
-	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 1, &threshold))
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &threshold))
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 2, &arg2, &flag) || 0 == arg2)
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (3 <= nparams)
 	{
 		int	time_shift_flag;
 
-		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 3, &time_shift,
+		if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 				&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
 		{
 			goto out;
@@ -2058,9 +2058,9 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 	}
 
 	if (ZBX_FLAG_SEC == flag)
-		seconds = arg2;
+		seconds = arg1;
 	else
-		nvalues = arg2;
+		nvalues = arg1;
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
 		goto out;
