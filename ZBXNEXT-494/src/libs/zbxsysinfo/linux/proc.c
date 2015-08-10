@@ -883,7 +883,7 @@ out:
  ******************************************************************************/
 static char	*proc_get_process_cmdline(pid_t pid)
 {
-	char	tmp[MAX_STRING_LEN], *cmdline, *arg;
+	char	tmp[MAX_STRING_LEN], *cmdline, *ptr;
 	int	fd, n;
 	size_t	cmdline_alloc = ZBX_KIBIBYTE, cmdline_offset = 0;
 
@@ -901,16 +901,26 @@ static char	*proc_get_process_cmdline(pid_t pid)
 		if (cmdline_offset == cmdline_alloc)
 		{
 			cmdline_alloc *= 2;
-			cmdline = realloc(cmdline, cmdline_alloc);
+			cmdline = zbx_realloc(cmdline, cmdline_alloc);
 		}
 	}
 
 	close(fd);
 
-	cmdline[cmdline_offset] = '\0';
-
-	for (arg = cmdline; '\0' != *arg; arg = arg + strlen(arg))
-		*arg++ = ' ';
+	if (0 != cmdline_offset)
+	{
+		for (ptr = cmdline;; ptr++)
+		{
+			if ('\0' == *ptr)
+			{
+				if ('\0' == ptr[1])
+					break;
+				*ptr = ' ';
+			}
+		}
+	}
+	else
+		zbx_free(cmdline);
 
 	return cmdline;
 }
@@ -1080,7 +1090,6 @@ static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
  * Purpose: checks if the process user matches filter                         *
  *                                                                            *
  ******************************************************************************/
-
 static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo)
 {
 	if (NULL == usrinfo)
@@ -1104,7 +1113,7 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
 	if (NULL == cmdline)
 		return SUCCEED;
 
-	if (NULL != zbx_regexp_match(proc->cmdline, cmdline, NULL))
+	if (NULL != proc->cmdline && NULL != zbx_regexp_match(proc->cmdline, cmdline, NULL))
 		return SUCCEED;
 
 	return FAIL;
@@ -1143,6 +1152,9 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
  *             flags     - [IN] the flags specifying the process properties   *
  *                              that must be returned                         *
  *                                                                            *
+ * Return value: SUCCEED - the system processes were retrieved successfully   *
+ *               FAIL    - failed to open /proc directory                     *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
@@ -1158,10 +1170,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
 
 	if (NULL == (dir = opendir("/proc")))
-	{
-		ret = -errno;
 		goto out;
-	}
 
 	while (NULL != (entries = readdir(dir)))
 	{
@@ -1180,14 +1189,17 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 		if (0 != (flags & (ZBX_SYSINFO_PROC_CMDLINE | ZBX_SYSINFO_PROC_NAME)))
 			proc->cmdline = proc_get_process_cmdline(pid);
 
-		if (0 != (flags & ZBX_SYSINFO_PROC_NAME) && NULL != proc->cmdline)
+		if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
 		{
 			proc->name = proc_get_process_name(pid);
 
-			if (NULL == (arg0 = strrchr(proc->cmdline, '/')))
-				proc->name_arg0 = zbx_strdup(NULL, proc->cmdline);
-			else
-				proc->name_arg0 = zbx_strdup(NULL, arg0 + 1);
+			if (NULL != proc->cmdline)
+			{
+				if (NULL == (arg0 = strrchr(proc->cmdline, '/')))
+					proc->name_arg0 = zbx_strdup(NULL, proc->cmdline);
+				else
+					proc->name_arg0 = zbx_strdup(NULL, arg0 + 1);
+			}
 		}
 
 		zbx_vector_ptr_append(processes, proc);
@@ -1247,7 +1259,7 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 
 	if (NULL != username)
 	{
-		/* in the case of invalid user there are no matching processes, set empty result */
+		/* in the case of invalid user there are no matching processes, return empty vector */
 		if (NULL == (usrinfo = getpwnam(username)))
 			goto out;
 	}

@@ -378,7 +378,6 @@ static int	proc_match_name(const zbx_sysinfo_proc_t *proc, const char *procname)
  * Purpose: checks if the process user matches filter                         *
  *                                                                            *
  ******************************************************************************/
-
 static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo)
 {
 	if (NULL == usrinfo)
@@ -402,7 +401,7 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
 	if (NULL == cmdline)
 		return SUCCEED;
 
-	if (NULL != zbx_regexp_match(proc->cmdline, cmdline, NULL))
+	if (NULL != proc->cmdline && NULL != zbx_regexp_match(proc->cmdline, cmdline, NULL))
 		return SUCCEED;
 
 	return FAIL;
@@ -412,9 +411,9 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
 #ifdef HAVE_ZONE_H
 /******************************************************************************
  *                                                                            *
- * Function: proc_match_user                                                  *
+ * Function: proc_match_zone                                                  *
  *                                                                            *
- * Purpose: checks if the process user matches filter                         *
+ * Purpose: checks if the process zone matches filter                         *
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, zoneid_t zoneid)
@@ -516,6 +515,9 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
  *             flags     - [IN] the flags specifying the process properties   *
  *                              that must be returned                         *
  *                                                                            *
+ * Return value: SUCCEED - the system processes were retrieved successfully   *
+ *               FAIL    - failed to open /proc directory                     *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 {
@@ -532,10 +534,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
 
 	if (NULL == (dir = opendir("/proc")))
-	{
-		ret = -errno;
 		goto out;
-	}
 
 	while (NULL != (entries = readdir(dir)))
 	{
@@ -600,7 +599,7 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_proc_get_pids                                                *
+ * Function: zbx_proc_get_matching_pids                                       *
  *                                                                            *
  * Purpose: get pids matching the specified process name, user name and       *
  *          command line                                                      *
@@ -634,7 +633,7 @@ int	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *pr
 
 	if (NULL != username)
 	{
-		/* in the case of invalid user there are no matching processes, set empty result */
+		/* in the case of invalid user there are no matching processes, return empty vector */
 		if (NULL == (usrinfo = getpwnam(username)))
 		{
 			ret = SUCCEED;
