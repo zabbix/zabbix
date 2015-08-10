@@ -2076,7 +2076,8 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				t[i] = values.values[i].timestamp.sec + 1.0e-9 * values.values[i].timestamp.ns;
+				t[i] = values.values[i].timestamp.sec - values.values[0].timestamp.sec +
+					1.0e-9 * (values.values[i].timestamp.ns - values.values[0].timestamp.ns + 1);
 				x[i] = values.values[i].value.dbl;
 			}
 		}
@@ -2084,7 +2085,8 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 		{
 			for (i = 0; i < values.values_num; i++)
 			{
-				t[i] = values.values[i].timestamp.sec + 1.0e-9 * values.values[i].timestamp.ns;
+				t[i] = values.values[i].timestamp.sec - values.values[0].timestamp.sec +
+					1.0e-9 * (values.values[i].timestamp.ns - values.values[0].timestamp.ns + 1);
 				x[i] = values.values[i].value.ui64;
 			}
 		}
