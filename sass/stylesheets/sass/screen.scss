@@ -3200,5 +3200,9 @@ $browser-logos: (
 	li {
 		display: inline-block;
 		min-width: 2em;
+
+		&:last-child {
+			min-width: auto;
+		}
 	}
 }
