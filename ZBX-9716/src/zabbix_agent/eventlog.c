@@ -51,8 +51,8 @@ static	LPCWSTR RENDER_ITEMS[] = {
 #define	EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
 /* open event logger and return number of records */
-static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint64_t *pNumRecords,
-		zbx_uint64_t *pLatestRecord)
+static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, PDWORD pNumRecords,
+		PDWORD pLatestRecord)
 {
 	const char	*__function_name = "zbx_open_eventlog";
 	TCHAR		reg_path[MAX_PATH];
@@ -76,13 +76,13 @@ static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint6
 	if (NULL == (*eventlog_handle = OpenEventLog(NULL, wsource)))	/* open log file */
 		goto out;
 
-	if (0 == GetNumberOfEventLogRecords(*eventlog_handle, (unsigned long*)pNumRecords))	/* get number of records */
+	if (0 == GetNumberOfEventLogRecords(*eventlog_handle, pNumRecords))	/* get number of records */
 		goto out;
 
-	if (0 == GetOldestEventLogRecord(*eventlog_handle, (unsigned long*)pLatestRecord))
+	if (0 == GetOldestEventLogRecord(*eventlog_handle, pLatestRecord))
 		goto out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() pNumRecords:%ld pLatestRecord:%ld",
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() pNumRecords:%lu pLatestRecord:%lu",
 			__function_name, *pNumRecords, *pLatestRecord);
 
 	ret = SUCCEED;
@@ -267,7 +267,7 @@ static void	zbx_translate_message_params(char **message, HINSTANCE hLib)
 #define MAX_INSERT_STRS 100
 
 /* get Nth error from event log. 1 is the first. */
-static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, long which, char **out_source,
+static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, DWORD which, char **out_source,
 		char **out_message, unsigned short *out_severity, unsigned long *out_timestamp,
 		unsigned long *out_eventid)
 {
@@ -281,7 +281,7 @@ static int	zbx_get_eventlog_message(LPCTSTR wsource, HANDLE eventlog_handle, lon
 	long		i, err = 0;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:%ld", __function_name, which);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:%lu", __function_name, which);
 
 	*out_source = NULL;
 	*out_message = NULL;
@@ -399,8 +399,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 	int		ret = FAIL;
 	HANDLE		eventlog_handle;
 	LPTSTR		wsource;
-	zbx_uint64_t	FirstID, LastID;
-	register long	i;
+	DWORD		FirstID, LastID, i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:" ZBX_FS_UI64,
 			__function_name, source, *lastlogsize);
@@ -435,7 +434,7 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 		else if (*lastlogsize >= FirstID)
 			FirstID = (long)*lastlogsize + 1;
 
-		for (i = (long)FirstID; i < LastID; i++)
+		for (i = FirstID; i < LastID; i++)
 		{
 			if (SUCCEED == zbx_get_eventlog_message(wsource, eventlog_handle, i, out_source, out_message,
 					out_severity, out_timestamp, out_eventid))
@@ -596,7 +595,7 @@ static int	zbx_get_handle_eventlog6(LPCWSTR wsource, zbx_uint64_t *lastlogsize, 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), previous lastlogsize:" ZBX_FS_UI64, __function_name, *lastlogsize);
 
 	/* start building the query */
-	tmp_str = zbx_dsprintf(NULL, "Event/System[EventRecordID>%ld]", *lastlogsize);
+	tmp_str = zbx_dsprintf(NULL, "Event/System[EventRecordID>" ZBX_FS_UI64 "]", *lastlogsize);
 	event_query = zbx_utf8_to_unicode(tmp_str);
 
 	/* create massive query for an event on a local computer*/
@@ -627,7 +626,7 @@ int	initialize_eventlog6(const char *source, zbx_uint64_t *lastlogsize, zbx_uint
 	LPWSTR		wsource = NULL;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' previous lastlogsize:%ld",
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' previous lastlogsize:" ZBX_FS_UI64,
 			__function_name, source, *lastlogsize);
 
 	if (NULL == source || '\0' == *source)
