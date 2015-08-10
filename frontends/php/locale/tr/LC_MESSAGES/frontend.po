@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-18 12:31+0300\n"
+"POT-Creation-Date: 2015-08-06 12:00+0300\n"
 "PO-Revision-Date: 2014-03-24 15:26+0300\n"
 "Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: American English <>\n"
@@ -15604,7 +15604,7 @@ msgstr "[Ay için yanlış değer: \"%s\" ]"
 msgid "agent"
 msgstr "ajan"
 
-#: include/classes/class.cpagefilter.php:916
+#: include/classes/class.cpagefilter.php:940
 #: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
@@ -15725,7 +15725,7 @@ msgstr "gün"
 msgid "dd"
 msgstr ""
 
-#: include/classes/class.cpagefilter.php:780 include/setup.inc.php:420
+#: include/classes/class.cpagefilter.php:804 include/setup.inc.php:420
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:14
 msgid "default"
@@ -15942,8 +15942,8 @@ msgstr "benzer değil"
 msgid "not running"
 msgstr "çalışmayan"
 
-#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:833
-#: include/classes/class.cpagefilter.php:916 include/forms.inc.php:1168
+#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:857
+#: include/classes/class.cpagefilter.php:940 include/forms.inc.php:1168
 msgid "not selected"
 msgstr "Seçilen yok"
 

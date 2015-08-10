@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-18 12:31+0300\n"
+"POT-Creation-Date: 2015-08-06 12:00+0300\n"
 "PO-Revision-Date: 2015-02-13 00:45+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -15674,7 +15674,7 @@ msgstr "[Nesprávna hodnota pre mesiac: \"%s\" ]"
 msgid "agent"
 msgstr "agent"
 
-#: include/classes/class.cpagefilter.php:916
+#: include/classes/class.cpagefilter.php:940
 #: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
@@ -15795,7 +15795,7 @@ msgstr "dní"
 msgid "dd"
 msgstr "dd"
 
-#: include/classes/class.cpagefilter.php:780 include/setup.inc.php:420
+#: include/classes/class.cpagefilter.php:804 include/setup.inc.php:420
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:14
 msgid "default"
@@ -16012,8 +16012,8 @@ msgstr "nie ako"
 msgid "not running"
 msgstr "nebeží"
 
-#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:833
-#: include/classes/class.cpagefilter.php:916 include/forms.inc.php:1168
+#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:857
+#: include/classes/class.cpagefilter.php:940 include/forms.inc.php:1168
 msgid "not selected"
 msgstr "nie je vybratý"
 

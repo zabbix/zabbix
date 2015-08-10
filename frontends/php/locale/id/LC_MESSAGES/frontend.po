@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-18 12:31+0300\n"
+"POT-Creation-Date: 2015-08-06 12:00+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -15536,7 +15536,7 @@ msgstr "[Nilai yang salah untuk bulan: \"%s\" ]"
 msgid "agent"
 msgstr "agen"
 
-#: include/classes/class.cpagefilter.php:916
+#: include/classes/class.cpagefilter.php:940
 #: include/classes/graphdraw/CLineGraphDraw.php:1852
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
@@ -15657,7 +15657,7 @@ msgstr "hari"
 msgid "dd"
 msgstr "dd"
 
-#: include/classes/class.cpagefilter.php:780 include/setup.inc.php:420
+#: include/classes/class.cpagefilter.php:804 include/setup.inc.php:420
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:14
 msgid "default"
@@ -15874,8 +15874,8 @@ msgstr "tidak seperti"
 msgid "not running"
 msgstr "tidak berjalan"
 
-#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:833
-#: include/classes/class.cpagefilter.php:916 include/forms.inc.php:1168
+#: hostinventoriesoverview.php:70 include/classes/class.cpagefilter.php:857
+#: include/classes/class.cpagefilter.php:940 include/forms.inc.php:1168
 msgid "not selected"
 msgstr "tidak dipilih"
 
