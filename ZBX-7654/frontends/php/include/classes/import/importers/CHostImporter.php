@@ -249,20 +249,22 @@ class CHostImporter extends CImporter {
 			// match completely, ignoring hosts from XML with set interfaceids and ignoring hosts
 			// from DB with reused interfaceids
 			foreach ($xmlHost['interfaces'] as &$xmlHostInterface) {
-				foreach ($dbHostInterfaces[$xmlHostId] as $dbHostInterface) {
-					$dbHostInterfaceId = $dbHostInterface['interfaceid'];
+				if ( isset($dbHostInterfaces[$xmlHostId]) && is_array($dbHostInterfaces[$xmlHostId]) ) {
+					foreach ($dbHostInterfaces[$xmlHostId] as $dbHostInterface) {
+						$dbHostInterfaceId = $dbHostInterface['interfaceid'];
 
-					if (!isset($xmlHostInterface['interfaceid']) && !isset($reusedInterfaceIds[$dbHostInterfaceId])
-							&& $dbHostInterface['ip'] == $xmlHostInterface['ip']
-							&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
-							&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
-							&& $dbHostInterface['port'] == $xmlHostInterface['port']
-							&& $dbHostInterface['type'] == $xmlHostInterface['type']
-							&& (!isset($xmlHostInterface['bulk'])
-								|| $dbHostInterface['bulk'] == $xmlHostInterface['bulk'])) {
-						$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
-						$reusedInterfaceIds[$dbHostInterfaceId] = true;
-						break;
+						if (!isset($xmlHostInterface['interfaceid']) && !isset($reusedInterfaceIds[$dbHostInterfaceId])
+								&& $dbHostInterface['ip'] == $xmlHostInterface['ip']
+								&& $dbHostInterface['dns'] == $xmlHostInterface['dns']
+								&& $dbHostInterface['useip'] == $xmlHostInterface['useip']
+								&& $dbHostInterface['port'] == $xmlHostInterface['port']
+								&& $dbHostInterface['type'] == $xmlHostInterface['type']
+								&& (!isset($xmlHostInterface['bulk'])
+									|| $dbHostInterface['bulk'] == $xmlHostInterface['bulk'])) {
+							$xmlHostInterface['interfaceid'] = $dbHostInterfaceId;
+							$reusedInterfaceIds[$dbHostInterfaceId] = true;
+							break;
+						}
 					}
 				}
 			}
