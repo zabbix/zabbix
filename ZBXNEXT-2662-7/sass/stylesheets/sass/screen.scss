@@ -288,6 +288,7 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
+		background-color: $main-nav-bg-color;
 
 		.search-suggest {
 			min-width: 186px;
@@ -1329,6 +1330,7 @@ footer {
 .radio-segmented {
 
 	li {
+		position: relative;
 		display: inline-block;
 		margin: 0 -1px 0 0;
 
@@ -3188,16 +3190,9 @@ $browser-logos: (
 }
 
 .server-name {
-	position: absolute;
-	z-index: 100;
-	top: 36px;
-	right: 13px;
-	padding: 2px 4px;
+	font-size: $font-msg-reset-size;
 	max-width: 180px;
-	display: inline-block;
-	border-top: 1px solid darken($lighter-yellow, 45%);
-	background-color: $lighter-yellow;
-	@extend %overflow-ellipsis;
+	padding: 4px 7px;
 }
 
 .list-hor-min-width {
