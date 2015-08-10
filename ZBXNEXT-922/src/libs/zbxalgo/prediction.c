@@ -547,7 +547,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 	zbx_matrix_t	*denominator_multiplicands = NULL, *updates = NULL;
 	double		z[2], mult[2], denominator[2], zpower[2], polynomial[2], highest_degree_coefficient,
 			lower_bound, upper_bound, radius, max_update, min_distance, residual, temp;
-	int		i, j, degree, res, iteration = 0, roots_ok = 0, root_init = 0;
+	int		i, j, degree, first_nonzero, res, iteration = 0, roots_ok = 0, root_init = 0;
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
@@ -623,21 +623,25 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 		goto out;
 	}
 
+	/* if n lower coefficients are zeros, zero is a root of multiplicity n */
+	for (first_nonzero = 0; 0.0 == ZBX_MATRIX_EL(coefficients, first_nonzero, 0); ++first_nonzero)
+		Re(ZBX_MATRIX_ROW(roots, first_nonzero)) = Im(ZBX_MATRIX_ROW(roots, first_nonzero)) = 0.0;
+
 	/* compute bounds for the roots */
 	upper_bound = lower_bound = 1.0;
 
-	for (i = 0; i < degree; ++i)
+	for (i = first_nonzero; i < degree; ++i)
 	{
 		if (upper_bound < fabs(ZBX_MATRIX_EL(coefficients, i, 0) / highest_degree_coefficient))
 			upper_bound = fabs(ZBX_MATRIX_EL(coefficients, i, 0) / highest_degree_coefficient);
 
-		if (lower_bound < fabs(ZBX_MATRIX_EL(coefficients, i + 1, 0) / ZBX_MATRIX_EL(coefficients, 0, 0)))
-			lower_bound = fabs(ZBX_MATRIX_EL(coefficients, i + 1, 0) / ZBX_MATRIX_EL(coefficients, 0, 0));
+		if (lower_bound < fabs(ZBX_MATRIX_EL(coefficients, i + 1, 0) /
+				ZBX_MATRIX_EL(coefficients, first_nonzero, 0)))
+			lower_bound = fabs(ZBX_MATRIX_EL(coefficients, i + 1, 0) /
+					ZBX_MATRIX_EL(coefficients, first_nonzero, 0));
 	}
 
-	lower_bound = 1.0 / lower_bound;
-
-	radius = 1.0;
+	radius = lower_bound = 1.0 / lower_bound;
 
 	/* Weierstrass (Durand-Kerner) method */
 	while (ZBX_MAX_ITERATIONS >= ++iteration && !roots_ok)
@@ -648,10 +652,12 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 
 			if (radius <= upper_bound)
 			{
-				for (i = 0; i < degree; ++i)
+				for (i = 0; i < degree - first_nonzero; ++i)
 				{
-					Re(ZBX_MATRIX_ROW(roots, i)) = radius * cos((2.0 * M_PI * (i + 0.25)) / degree);
-					Im(ZBX_MATRIX_ROW(roots, i)) = radius * sin((2.0 * M_PI * (i + 0.25)) / degree);
+					Re(ZBX_MATRIX_ROW(roots, i)) = radius * cos((2.0 * M_PI * (i + 0.25)) /
+							(degree - first_nonzero));
+					Im(ZBX_MATRIX_ROW(roots, i)) = radius * sin((2.0 * M_PI * (i + 0.25)) /
+							(degree - first_nonzero));
 				}
 			}
 			else
@@ -664,7 +670,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 		max_update = 0.0;
 		min_distance = HUGE_VAL;
 
-		for (i = 0; i < degree; ++i)
+		for (i = first_nonzero; i < degree; ++i)
 		{
 			Re(z) = Re(ZBX_MATRIX_ROW(roots, i));
 			Im(z) = Im(ZBX_MATRIX_ROW(roots, i));
@@ -673,7 +679,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 			Re(denominator) = highest_degree_coefficient;
 			Im(denominator) = 0.0;
 
-			for (j = 0; j < degree; ++j)
+			for (j = first_nonzero; j < degree; ++j)
 			{
 				if (j == i)
 					continue;
@@ -693,10 +699,10 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 			/* calculate complex value of polynomial for z */
 			Re(zpower) = 1.0;
 			Im(zpower) = 0.0;
-			Re(polynomial) = ZBX_MATRIX_EL(coefficients, 0, 0);
+			Re(polynomial) = ZBX_MATRIX_EL(coefficients, first_nonzero, 0);
 			Im(polynomial) = 0.0;
 
-			for (j = 1; j <= degree; ++j)
+			for (j = first_nonzero + 1; j <= degree; ++j)
 			{
 				ZBX_COMPLEX_MULT(zpower, z, mult);
 				Re(polynomial) += Re(zpower) * ZBX_MATRIX_EL(coefficients, j, 0);
@@ -734,7 +740,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 		else
 			root_init = 1;
 
-		for (i = 0; i < degree; ++i)
+		for (i = first_nonzero; i < degree; ++i)
 		{
 			Re(ZBX_MATRIX_ROW(roots, i)) -= Re(ZBX_MATRIX_ROW(updates, i));
 			Im(ZBX_MATRIX_ROW(roots, i)) -= Im(ZBX_MATRIX_ROW(updates, i));
