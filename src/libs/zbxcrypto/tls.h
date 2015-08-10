@@ -20,7 +20,8 @@
 #ifndef ZABBIX_TLS_H
 #define ZABBIX_TLS_H
 
-#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#if defined(_WINDOWS)
 
 /* Typical thread is long-running, if necessary, it initializes TLS for itself. Zabbix sender is an exception. If */
 /* data is sent from a file or in real time then sender's 'main' thread starts the 'send_value' thread for each   */
@@ -70,13 +71,12 @@ ZBX_THREAD_SENDVAL_TLS_ARGS;
 
 void	zbx_tls_pass_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
-
-#endif
+#endif	/* #if defined(_WINDOWS) */
 
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(void);
 void	zbx_tls_init_child(void);
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);
-
+#endif	/* #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL) */
 #endif	/* ZABBIX_TLS_H */

@@ -20,9 +20,11 @@
 #ifndef ZABBIX_TLS_TCP_H
 #define ZABBIX_TLS_TCP_H
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, char *tls_arg1, char *tls_arg2);
 int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept);
 void	zbx_tls_close(zbx_socket_t *s);
+#endif
 
 #if defined(HAVE_OPENSSL)
 void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_offset);
