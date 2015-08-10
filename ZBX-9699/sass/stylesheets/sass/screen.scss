@@ -11,8 +11,10 @@ html {
 }
 
 body {
-	font-family: $font-stack;
-	font-size: $font-body-size;
+	font: {
+		family: $font-stack;
+		size: $font-body-size;
+	}
 	line-height: $body-line-height;
 	color: $font-color;
 	background-color: $body-bg-color;
@@ -23,30 +25,30 @@ body {
 a {
 
 	&:link {
-		text-decoration: none;
 		color: $link-color;
+		text-decoration: none;
 		outline: 0;
 		@include transition(color .2s ease-out);
 	}
 
 	&:visited {
-		text-decoration: none;
 		color: $link-visited-color;
+		text-decoration: none;
 	}
 
 	&:hover {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:focus {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
 	&:active {
-		border-bottom: 1px solid rgba(2,117,184,0.5);
 		color: $link-active-color;
+		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
 }
 
@@ -77,38 +79,40 @@ a {
 }
 
 .link-alt {
+	text-decoration: none;
+	cursor: pointer;
 
 	&:link {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(118,141,153,0.35);
-		cursor: pointer;
+		//text-decoration: none;
+		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
+		//cursor: pointer;
 	}
 
 	&:visited {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(118,141,153,0.35);
-		cursor: pointer;
+		//text-decoration: none;
+		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
+		//cursor: pointer;
 	}
 
 	&:hover {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//text-decoration: none;
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		//cursor: pointer;
 	}
 
 	&:focus {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//text-decoration: none;
 		color: $link-hover-color;
+		border-bottom: 1px solid rgba($link-hover-color, 0.5);
+		//cursor: pointer;
 	}
 
 	&:active {
-		text-decoration: none;
-		border-bottom: 1px solid rgba(2,117,184,0.5);
-		cursor: pointer;
+		//text-decoration: none;
 		color: $link-active-color;
+		border-bottom: 1px solid rgba($link-active-color, 0.5);
+		//cursor: pointer;
 	}
 }
 
@@ -174,9 +178,11 @@ p {
 }
 
 pre {
+	font: {
+		family: $font-stack-mono;
+		size: $font-mono-size;
+	}
 	display: block;
-	font-family: $font-stack-mono;
-	font-size: $font-mono-size;
 	white-space: pre-wrap;
 	word-wrap: break-word;
 }
@@ -235,7 +241,7 @@ nav {
 		&.selected {
 			position: relative;
 
-			&:after{
+			&::after{
 				content:'';
 				position: absolute;
 				bottom: -1px;
@@ -421,28 +427,28 @@ ul.top-nav-icons {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-bottom: 4px solid $font-color;
+	border-bottom: 6px solid $font-color;
 }
 
 .arrow-down {
 	@extend %arrow;
 	border-left: 4px solid transparent;
 	border-right: 4px solid transparent;
-	border-top: 4px solid $font-color;
+	border-top: 6px solid $font-color;
 }
 
 .arrow-left {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-right: 4px solid $font-color;
+	border-right: 6px solid $font-color;
 }
 
 .arrow-right {
 	@extend %arrow;
 	border-bottom: 4px solid transparent;
 	border-top: 4px solid transparent;
-	border-left: 4px solid $font-color;
+	border-left: 6px solid $font-color;
 }
 
 %arrow {
@@ -465,6 +471,7 @@ ul.top-nav-icons {
 		li {
 			display: block;
 			float: left;
+			position: relative;
 			padding: 0 0 0 14px;
 		}
 	}
@@ -540,29 +547,45 @@ footer {
 	
 	thead th {
 		font-size: $font-h3-size;
+		color: $font-alt-color;
 		text-transform: $font-transform;
 		letter-spacing: 0.0688em;
 		text-rendering: optimizeLegibility;
 		height: 100%;
 		overflow: hidden;
+		white-space: nowrap;
 	    padding: 8px 5px 7px 5px;
 	    vertical-align: bottom;
 	    border-bottom: 2px solid $table-border-color;
 	    text-align: left;
-	    color: $font-alt-color;
+	    //position: relative;
 
 	    .arrow-up {
-	    	position: absolute;
-	    	top: 45%;
+	    	//position: absolute;
+	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-bottom-color: $font-alt-color;
 	    }
 
+	    .arrow-right {
+	    	//position: absolute;
+	    	//top: 39%;
+	    	margin: 0 0 0 4px;
+	    	border-left-color: $font-alt-color;
+	    }
+
 	    .arrow-down {
-	    	position: absolute;
-	    	top: 45%;
+	    	//position: absolute;
+	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-top-color: $font-alt-color;
+	    }
+
+	    .treeview {
+
+	    	span {
+	    		margin: 0;
+	    	}
 	    }
 
 	    a {
@@ -611,7 +634,7 @@ footer {
 	}
 
 	td {
-		padding: 8px 5px 8px 5px;
+		padding: 8px 5px;
 		vertical-align: middle;
 		border-bottom: 1px solid $table-border-color;
 	}
@@ -619,7 +642,7 @@ footer {
 	.vertical_rotation_inner {
 		white-space: nowrap;
 		@include rotate(270);
-	} 
+	}
 }
 
 .table-paging {
@@ -633,13 +656,13 @@ footer {
 		@extend %paging-btn;
 	}
 
-	.arrow-left {
-		border-right-color: $link-color;
-	}
+	//.arrow-left {
+	//	border-right-color: $link-color;
+	//}
 
-	.arrow-right {
-		border-left-color: $link-color;
-	}
+	//.arrow-right {
+	//	border-left-color: $link-color;
+	//}
 }
 
 .radio-switch {
@@ -654,23 +677,23 @@ footer {
 	padding: 3px 11px;
 	border: 1px solid $form-border-color;
 	text-decoration: none;
-	color: $link-color;
+	color: $font-color;
 	@include transition(background-color .2s ease-out);
 
 	&:hover {
-		color: $link-hover-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 	}
 
 	&:focus {
-		color: $link-hover-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 		border-color: $form-border-focus-color;
 		position: relative;
 	}
 
 	&:active {
-		color: $link-active-color;
+		color: $font-color;
 		background-color: $ui-hover-color;
 		position: relative;
 	}
@@ -707,6 +730,10 @@ footer {
 }
 
 .treeview-plus {
+	font: {
+		size: $font-top-nav-size;
+		weight: bold;
+	}
 	display: inline-block;
 	background-color: $ui-bg-color;
 	border: 1px solid $form-border-color;
@@ -715,8 +742,6 @@ footer {
 	height: 10px;
 	line-height: 10px;
 	text-align: center;
-	font-size: $font-top-nav-size;
-	font-weight: bold;
 	@include border-radius(2px);
 
 	&:hover {
@@ -735,17 +760,18 @@ footer {
 
 .treeview {
 	display: inline-block;
-	width: 18px;
+	width: 16px;
 	height: 18px;
 	line-height: 18px;
 	text-align: center;
+	//margin-left: -2px;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
 	}
 
 	.arrow-down {
-		margin-bottom: 2px;
+		margin: 0 0 2px 0;
 		border-top-color: $font-alt-color;
 	}
 
@@ -804,7 +830,7 @@ footer {
 }
 
 .filter-container {
-	padding: 10px 0;
+	padding: 15px 0 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
@@ -817,23 +843,23 @@ footer {
 		padding: 0 10px;
 	}
 
-	.list-table {                                       
-		margin-bottom: -10px;
-		border: none;
+	//.list-table {                                       
+	//	margin-bottom: -10px;
+	//	border: none;
 
-		thead {
+	//	thead {
 
-			th {
-				font-size: $font-form-size;
-				text-transform: none;
-				text-rendering: auto;
-				letter-spacing: normal;
-				color: initial;
-				padding: 8px 5px 5px 5px;
-				border-bottom-width: 1px;
-			}
-		}
-	}
+	//		th {
+	//			font-size: $font-form-size;
+	//			text-transform: none;
+	//			text-rendering: auto;
+	//			letter-spacing: normal;
+	//			color: initial;
+	//			padding: 8px 5px 5px 5px;
+	//			border-bottom-width: 1px;
+	//		}
+	//	}
+	//}
 }
 
 .subfilter-enabled {
@@ -992,6 +1018,7 @@ footer {
 .scrollbar {
 	position: relative;
 	margin: 0 auto;
+	margin-bottom: 10px;
 	line-height: 1em;
 	height: 52px;
 
@@ -1047,7 +1074,7 @@ footer {
 .overlevel {
 	position: absolute;
 	top: 14px;
-	left: 28px;
+	left: 30px;
 	height: 24px;
 	margin: 5px 0;
 }
@@ -1083,9 +1110,9 @@ footer {
 	}
 
 	.center {
-		width: 22px;
+		width: 10px;
 		height: 22px;
-		background: url(../img/icon-sprite.svg) no-repeat -4px -799px;
+		background: url(../img/icon-sprite.svg) no-repeat -13px -799px;
 		margin: 0 auto;
 	}
 }
@@ -1265,7 +1292,6 @@ footer {
 }
 
 .form-new-group {
-	diplay: inline-block;
 	border: 5px solid $lighter-green;
 	padding: 4px 0;
 	margin-left: -5px;
@@ -1439,9 +1465,11 @@ legend {
 }
 
 %form-input-style {
+	font: {
+		family: $font-stack;
+		size: $font-form-size;
+	}
 	border: 1px solid $form-border-color;
-	font-family: $font-stack;
-	font-size: $font-form-size;
 	color: $font-color;
 	background-color: $form-bg-color;
 	outline: 0;
@@ -1460,9 +1488,9 @@ button::-moz-focus-inner {
 }
 
 button {
+	font-family: $font-stack;
 	color: $btn-font-color;
 	background-color: $btn-bg-color;
-	font-family: $font-stack;
 	border: 1px solid $btn-bg-color;
 	padding: 0 11px;
 	min-height: 24px;
@@ -1580,7 +1608,7 @@ button {
 	@include border-radius(2px 2px 0 0);
 
 	&.filter-active {
-		color: $link-color;
+		color: $font-color;
 		background-color: $ui-bg-color;
 		border: 1px solid $ui-border-color;
 		border-bottom: none;
@@ -1588,16 +1616,16 @@ button {
 
 		.arrow-up {
 			position: absolute;
-			top: 50%;
-			margin: 0 0 0 4px;
-			border-bottom-color: $link-color;
+			top: 45%;
+			margin: 0 0 0 6px;
+			border-bottom-color: $font-color;
 		}
 	}
 
 	.arrow-down {
 		position: absolute;
-		top: 50%;
-		margin: 0 0 0 4px;
+		top: 45%;
+		margin: 0 0 0 6px;
 		border-top-color: $white;
 	}
 }
@@ -1623,7 +1651,7 @@ $icon-btn: (
 
 $icon-widget-btn: (
 	widget-action: url(../img/icon-sprite.svg) no-repeat -2px -616px,
-	widget-collapse: url(../img/icon-sprite.svg) no-repeat -3px -652px,
+	widget-collapse: url(../img/icon-sprite.svg) no-repeat -5px -652px,
 	widget-expand: url(../img/icon-sprite.svg) no-repeat -5px -688px,
 	wizard-action: url(../img/icon-sprite.svg) no-repeat -10px -622px,
 	alarm-on: url(../img/icon-sprite.svg) no-repeat -3px -545px,
@@ -1789,25 +1817,64 @@ button[disabled] {
 	}
 }
 
-.input-help-wrapper {
-	position: relative;
-	display: inline-block;
+$var-icons: (
+	maint: url(../img/icon-sprite.svg) no-repeat -49px -802px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -46px -731px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -46px -767px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -5px -835px
+);
+
+@each $var-icons, $bgimage in $var-icons {
+    .icon-#{$var-icons} {
+    	background: $bgimage;
+        @extend %var-icons;
+
+        @if $var-icons == 'maint' {
+        	position: absolute;
+        }
+    }
 }
 
-.help-icon {
-	background: url(../img/icon-sprite.svg) no-repeat -6px -726px;
-	display: block;
+$form-icon-btn: (
+	help: url(../img/icon-sprite.svg) no-repeat -6px -726px,
+	cal: url(../img/icon-sprite.svg) no-repeat -42px -834px,
+);
+
+@each $form-icon-btn, $bgimage in $form-icon-btn {
+    .icon-#{$form-icon-btn} {
+        background: $transparent $bgimage;
+        @extend %form-icon-btn;
+    }
+}
+
+%form-icon-btn {
+	border: none;
 	position: absolute;
-	top: 0;
-	right: -26px;
+	cursor: pointer;
 	@extend %button-icon-size;
 	@include opacity(0.75);
 	@include transition(opacity .2s ease-out);
 
 	&:hover {
-		cursor: pointer;
 		@include opacity(1);
+		background-color: $transparent;
 	}
+
+	&:focus {
+		@include opacity(1);
+		background-color: $transparent;
+	}
+
+	&:active {
+		@include opacity(1);
+		background-color: $transparent;
+	}
+}
+
+%var-icons {
+	display: inline-block;
+	width: 14px;
+	height: 14px;
 }
 
 .drag-icon {
@@ -1884,21 +1951,6 @@ button[disabled] {
 	}
 
 	@extend %webkit-scrollbar;
-}
-
-%webkit-scrollbar {
-	&::-webkit-scrollbar {
-		width: 9px;
-	}
-
-	&::-webkit-scrollbar-track {
-		background-color: $scrollbar-track-color;
-	}
-
-	&::-webkit-scrollbar-thumb {
-		background-color: $scrollbar-thumb-color;
-		border: 1px solid $scrollbar-track-color;
-	}
 }
 
 .setup-title {
@@ -2065,7 +2117,7 @@ button[disabled] {
 }
 
 .dashbrd-widget-head {
-	cursor: move;
+	//cursor: move;
 	position: relative;
 	padding: 8px 60px 8px 10px;
 	font-weight: bold;
@@ -2139,14 +2191,15 @@ button[disabled] {
 		}
 
 		&.selected {
-			background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
 
-			&:hover {
-				background-color: $action-hover-color;
-			}
-
-			&:active {
-				background-color: $action-hover-color;
+			&::before {
+				display: block;
+				width: 24px;
+				height: 24px;
+				position: absolute;
+				left: 0;
+				content: '';
+				background: url(../img/icon-sprite.svg) no-repeat -5px -835px;
 			}
 		}
 
@@ -2453,10 +2506,14 @@ button[disabled] {
 }
 
 .notif-indic-container {
-	//float: left;
+	border-top: 1px solid $table-border-color;
+	margin: 0 0 0 -19px;
+	padding: 14px 0 0 0;
 
 	.notif-indic {
-		//float: none;
+		float: none;
+		display: inline-block;
+		margin: 0 2px 0 0;
 	}
 }
 
@@ -2487,12 +2544,20 @@ button[disabled] {
 	}
 }
 
+.graph-selection {
+	position: absolute;
+	z-index: 98;
+	overflow: hidden;
+	background-color: rgba($yellow,0.4);
+	border: 1px solid rgba($yellow,0.4);
+}
+
 /* Debug */
 .debug-output {
 	max-height: 600px;
 	overflow-y: auto;
 	padding: 11px;
-	margin: 0 13px;
+	margin: 10px 13px 0 13px;
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
@@ -2502,7 +2567,7 @@ button[disabled] {
 	position: fixed;
 	bottom: 13px;
 	right: 13px;
-	z-index: 1000;
+	z-index: 10000;
 	padding: 4px 11px;
 	background-color: rgba($body-bg-color,0.7);
 	@include border-radius(2px);
@@ -2539,6 +2604,14 @@ a.orange {
 
 a.grey {
 	@extend .grey;
+}
+
+.blue {
+	color: $blue;
+}
+
+a.blue {
+	@extend .blue;
 }
 
 .status-container {
@@ -2600,7 +2673,6 @@ a.grey {
 	min-width: 0.7em;
 	line-height: 1em;
 	display: inline-block;
-	cursor: default;
 	@include border-radius(2px); 
 }
 
@@ -2620,7 +2692,7 @@ td.na-bg {
 	border-left: none;
 
 	~ td.na-bg {
-		border-left: 1px dotted $ui-bg-color;
+		border-left: 1px dotted $table-border-color;
 	}
 }
 
@@ -2674,6 +2746,17 @@ td.disaster-bg {
 
 %found-bg {
 	background-color: $lighter-yellow;
+}
+
+.active-indic {
+	width: 8px;
+	height: 8px;
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	border: 2px solid $body-bg-color;
+	background-color: darken(desaturate($alt-green, 10%), 16%);
+	@include border-radius(50%);
 }
 
 .msg-good {
@@ -2738,14 +2821,21 @@ td.disaster-bg {
 	}
 
 	ul {
-		border-top-width: 1px;
+		//margin: 8px 0 0 0;
+		//border-top-width: 1px;
+		//border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
-			margin: 0.4em 0 0.4em 0; 
+			margin: 0.25em 0 0.25em 0; 
+		}
+
+		&.msg-details-border {
+			margin: 8px 0 0 0;
+			border-top-width: 1px;
+			border-top-style: dashed;
 		}
 	}
-
 }
 
 .msg-buttons {
@@ -2776,9 +2866,9 @@ td.disaster-bg {
 	bottom: 0;
 	z-index: 10000;
 	width: 100%;
-	padding: 7px 5px;
+	padding: 5px 5px;
 	text-align: center;
-	color: darken($alt-yellow,45%);
+	color: darken($alt-yellow,50%);
 	background-color: $alt-yellow;
 	border-top: 1px solid darken($alt-yellow,5%);
 }
@@ -2807,7 +2897,7 @@ td.disaster-bg {
 	@include opacity(0.5);
 	@include transition(opacity .2s ease-out);
 
-	&:before {
+	&::before {
 		content:"\00d7";
 	}
 
@@ -2912,8 +3002,8 @@ a.overlay-close-btn {
 	width: 24px;
 	height: 24px;
 	margin: 0 auto;
-	border: 3px solid #ccd5d9;
-	border-bottom: 3px solid #0275b8;
+	border: 2px solid #ccd5d9;
+	border-bottom: 2px solid #0275b8;
 	animation: load 0.8s infinite linear;
 }
 
@@ -2921,7 +3011,7 @@ a.overlay-close-btn {
 	to { @include rotate(360); }
 }
 
-$browsers: (
+$browser-logos: (
 	chrome: url(../img/browser-sprite.png) no-repeat 0 0,
 	ff: url(../img/browser-sprite.png) no-repeat -66px 0px,
 	ie: url(../img/browser-sprite.png) no-repeat 0 -66px,
@@ -2930,7 +3020,7 @@ $browsers: (
 
 );
 
-@each $browser, $bgimage in $browsers {
+@each $browser, $bgimage in $browser-logos {
     .browser-logo-#{$browser} {
         background: $bgimage;
         @extend %browser-logo-style;
@@ -2973,4 +3063,61 @@ $browsers: (
 	margin: 25px 0 0 0;
 	padding: 10px 0 0 0;
 	text-align: center;
+}
+
+%webkit-scrollbar {
+	&::-webkit-scrollbar {
+		width: 9px;
+	}
+
+	&::-webkit-scrollbar-track {
+		background-color: $scrollbar-track-color;
+	}
+
+	&::-webkit-scrollbar-thumb {
+		background-color: $scrollbar-thumb-color;
+		border: 1px solid $scrollbar-track-color;
+	}
+}
+
+.cursor-move {
+	cursor: move;
+}
+
+.cursor-pointer {
+	cursor: pointer;
+}
+
+%overflow-ellipsis {
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.overflow-ellipsis {
+	table-layout: fixed;
+
+	td {
+		@extend %overflow-ellipsis;
+	}
+
+	th {
+		@extend %overflow-ellipsis;
+
+		a {
+			@extend %overflow-ellipsis;
+		}
+	}
+}
+
+.rel-container {
+	position: relative;
+	//display: inline-block;
+	//padding-right: 14px;
+	padding: 8px 14px 8px 5px;
+
+  .icon-help {
+  	top: 3px;
+  	left: -3px;
+  }
 }

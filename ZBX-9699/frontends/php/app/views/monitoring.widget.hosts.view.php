@@ -271,7 +271,6 @@ foreach ($groups as $group) {
 			}
 			$lastUnack_count = (new CSpan($hosts_data[$group['groupid']]['lastUnack']))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED)
 				->setHint($table_inf);
 		}
 		else {
@@ -349,7 +348,7 @@ foreach ($groups as $group) {
 			$group_row->addItem($hosts_data[$group['groupid']]['lastUnack'] + $hosts_data[$group['groupid']]['ok']);
 			break;
 		case EXTACK_OPTION_BOTH:
-			$unackspan = $lastUnack_count ? new CSpan([$lastUnack_count, SPACE._('of').SPACE]) : null;
+			$unackspan = $lastUnack_count ? [$lastUnack_count, ' '._('of').' '] : null;
 			$group_row->addItem((new CCol([$unackspan, $problematic_count]))
 				->addClass(getSeverityStyle(
 					$highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']
