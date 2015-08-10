@@ -635,7 +635,9 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 			lower_bound = fabs(ZBX_MATRIX_EL(coefficients, i + 1, 0) / ZBX_MATRIX_EL(coefficients, 0, 0));
 	}
 
-	radius = lower_bound = 1.0 / lower_bound;
+	lower_bound = 1.0 / lower_bound;
+
+	radius = 1.0;
 
 	/* Weierstrass (Durand-Kerner) method */
 	while (ZBX_MAX_ITERATIONS >= ++iteration && !roots_ok)
