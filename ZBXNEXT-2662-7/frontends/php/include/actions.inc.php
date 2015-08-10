@@ -1125,7 +1125,7 @@ function getActionMessages(array $alerts) {
 		$mediaType = array_pop($alert['mediatypes']);
 
 		if ($alert['status'] == ALERT_STATUS_SENT) {
-			$status = (new CSpan(_('sent')))->addClass(ZBX_STYLE_GREEN);
+			$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
 			$retries = '';
 		}
 		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
@@ -1133,7 +1133,7 @@ function getActionMessages(array $alerts) {
 			$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_ORANGE);
 		}
 		else {
-			$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
+			$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 			$retries = (new CSpan('0'))->addClass(ZBX_STYLE_RED);
 		}
 
@@ -1180,7 +1180,7 @@ function getActionCommands(array $alerts) {
 
 		switch ($alert['status']) {
 			case ALERT_STATUS_SENT:
-				$status = (new CSpan(_('executed')))->addClass(ZBX_STYLE_GREEN);
+				$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 				break;
 
 			case ALERT_STATUS_NOT_SENT:
@@ -1188,7 +1188,7 @@ function getActionCommands(array $alerts) {
 				break;
 
 			default:
-				$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
+				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 				break;
 		}
 
@@ -1204,187 +1204,142 @@ function getActionCommands(array $alerts) {
 	return $table;
 }
 
-function get_actions_hint_by_eventid($eventid, $status = null) {
-	$tab_hint = (new CTableInfo())->setHeader([_('User'), _('Details'), _('Status')]);
+function makeActionHints($alerts, $mediatypes, $users, $status) {
+	$table = (new CTableInfo())->setHeader([_('User'), _('Details'), _('Status'), _('Info')]);
 
-	$sql = 'SELECT a.alertid,mt.description,u.alias,u.name,u.surname,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
-			' FROM events e,alerts a'.
-				' LEFT JOIN users u ON u.userid=a.userid'.
-				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.zbx_dbstr($eventid).
-				(is_null($status)?'':' AND a.status='.zbx_dbstr($status)).
-				' AND e.eventid=a.eventid'.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-			' ORDER BY a.alertid';
-	$result = DBselect($sql, 30);
+	foreach ($alerts as $alert) {
+		switch ($status) {
+			case ALERT_STATUS_NOT_SENT:
+				$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
+				break;
 
-	while ($row = DBfetch($result)) {
-		if ($row['status'] == ALERT_STATUS_SENT) {
-			$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
-		}
-		elseif ($row['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
-		}
-		else {
-			$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
+			case ALERT_STATUS_SENT:
+				$status_str = (new CSpan($alert['alerttype'] == ALERT_TYPE_COMMAND ? _('Executed') : _('Sent')))
+					->addClass(ZBX_STYLE_GREEN);
+				break;
+
+			default:
+				$status_str = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 		}
 
-		switch ($row['alerttype']) {
+		switch ($alert['alerttype']) {
 			case ALERT_TYPE_MESSAGE:
-				$message = empty($row['description']) ? '' : $row['description'];
+				$user = array_key_exists($alert['userid'], $users) ? getUserFullname($users[$alert['userid']]) : '';
+				$message = array_key_exists($alert['mediatypeid'], $mediatypes)
+					? $mediatypes[$alert['mediatypeid']]['description']
+					: '';
 				break;
 			case ALERT_TYPE_COMMAND:
-				$message = [bold(_('Command').NAME_DELIMITER)];
-				$msg = explode("\n", $row['message']);
-				foreach ($msg as $m) {
-					array_push($message, BR(), $m);
-				}
+				$user = '';
+				$message = [bold(_('Command').NAME_DELIMITER), BR(), zbx_nl2br($alert['message'])];
 				break;
 			default:
+				$user = '';
 				$message = '';
 		}
 
-		if (!$row['alias']) {
-			$row['alias'] = ' - ';
-		}
-		else {
-			$fullname = '';
-			if ($row['name']) {
-				$fullname = $row['name'];
-			}
-			if ($row['surname']) {
-				$fullname .= $fullname ? ' '.$row['surname'] : $row['surname'];
-			}
-			if ($fullname) {
-				$row['alias'] .= ' ('.$fullname.')';
-			}
+		$table->addRow([$user, $message, $status_str, $alert['error'] === '' ? '' : makeErrorIcon($alert['error'])]);
+	}
+
+	return $table;
+}
+
+function makeEventsActions($eventids) {
+	if (!$eventids) {
+		return [];
+	}
+
+	$result = DBselect(
+		'SELECT a.eventid,a.mediatypeid,a.userid,a.message,a.status,a.alerttype,a.error'.
+		' FROM alerts a'.
+		' WHERE '.dbConditionInt('a.eventid', $eventids).
+			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+		' ORDER BY a.alertid'
+	);
+
+	$events = [];
+	$userids = [];
+	$mediatypeids = [];
+
+	while ($row = DBfetch($result)) {
+		if (!array_key_exists($row['eventid'], $events)) {
+			$events[$row['eventid']] = [
+				ALERT_STATUS_NOT_SENT => [],
+				ALERT_STATUS_SENT => [],
+				ALERT_STATUS_FAILED => []
+			];
 		}
 
-		$tab_hint->addRow([
-			$row['alias'],
-			$message,
-			$status
+		$event = [
+			'alerttype' => $row['alerttype'],
+			'error' => $row['error']
+		];
+
+		switch ($event['alerttype']) {
+			case ALERT_TYPE_COMMAND:
+				$event['message'] = $row['message'];
+				break;
+
+			case ALERT_TYPE_MESSAGE:
+				$event['mediatypeid'] = $row['mediatypeid'];
+				$event['userid'] = $row['userid'];
+
+				if ($event['mediatypeid'] != 0) {
+					$mediatypeids[$row['mediatypeid']] = true;
+				}
+
+				if ($event['userid'] != 0) {
+					$userids[$row['userid']] = true;
+				}
+				break;
+		}
+
+		$events[$row['eventid']][$row['status']][] = $event;
+	}
+
+	if ($mediatypeids) {
+		$mediatypes = API::Mediatype()->get([
+			'output' => ['description'],
+			'mediatypeids' => array_keys($mediatypeids),
+			'preservekeys' => true
 		]);
 	}
 
-	return $tab_hint;
-}
-
-function getEventActionsStatus($eventIds) {
-	if (empty($eventIds)) {
-		return [];
+	if ($userids) {
+		$users = API::User()->get([
+			'output' => ['alias', 'name', 'surname'],
+			'userids' => array_keys($userids),
+			'preservekeys' => true
+		]);
 	}
 
-	$actions = [];
-
-	$alerts = DBselect(
-		'SELECT a.eventid,a.status,COUNT(a.alertid) AS cnt'.
-		' FROM alerts a'.
-		' WHERE a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-			' AND '.dbConditionInt('a.eventid', $eventIds).
-		' GROUP BY eventid,status'
-	);
-
-	while ($alert = DBfetch($alerts)) {
-		$actions[$alert['eventid']][$alert['status']] = $alert['cnt'];
+	foreach ($events as $eventid => &$event) {
+		$event = (new CList([
+			count($event[ALERT_STATUS_SENT]) != 0
+				? (new CSpan(count($event[ALERT_STATUS_SENT])))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_GREEN)
+					->setHint(makeActionHints($event[ALERT_STATUS_SENT], $mediatypes, $users, ALERT_STATUS_SENT))
+				: '',
+			count($event[ALERT_STATUS_NOT_SENT]) != 0
+				? (new CSpan(count($event[ALERT_STATUS_NOT_SENT])))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_ORANGE)
+					->setHint(
+						makeActionHints($event[ALERT_STATUS_NOT_SENT], $mediatypes, $users, ALERT_STATUS_NOT_SENT)
+					)
+				: '',
+			count($event[ALERT_STATUS_FAILED]) != 0
+				? (new CSpan(count($event[ALERT_STATUS_FAILED])))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_RED)
+					->setHint(makeActionHints($event[ALERT_STATUS_FAILED], $mediatypes, $users, ALERT_STATUS_FAILED))
+				: ''
+		]))->addClass(ZBX_STYLE_LIST_HOR_MIN_WIDTH);
 	}
+	unset($event);
 
-	foreach ($actions as $eventId => $action) {
-		$sendCount = isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : 0;
-		$notSendCount = isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : 0;
-		$failedCount = isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : 0;
-
-		// calculate total
-		$mixed = 0;
-		if ($sendCount > 0) {
-			$mixed += ALERT_STATUS_SENT;
-		}
-		if ($failedCount > 0) {
-			$mixed += ALERT_STATUS_FAILED;
-		}
-
-		// display
-		if ($notSendCount > 0) {
-			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
-		}
-		elseif ($mixed == ALERT_STATUS_SENT) {
-			$status = (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
-		}
-		elseif ($mixed == ALERT_STATUS_FAILED) {
-			$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
-		}
-		else {
-			$columnLeft = (new CCol(($sendCount > 0)
-				? (new CSpan($sendCount))->addClass(ZBX_STYLE_GREEN)
-				: SPACE)
-			)
-				->setAttribute('width', '10');
-
-			$columnRight = (new CCol(($failedCount > 0)
-				? (new CSpan($failedCount))->addClass(ZBX_STYLE_RED)
-				: SPACE)
-			)
-				->setAttribute('width', '10');
-
-			$status = new CRow([$columnLeft, $columnRight]);
-		}
-
-		$actions[$eventId] = (new CTable())
-			->setNoDataMessage(' - ')
-			->addRow($status);
-	}
-
-	return $actions;
-}
-
-function getEventActionsStatHints($eventIds) {
-	if (empty($eventIds)) {
-		return [];
-	}
-
-	$actions = [];
-
-	$alerts = DBselect(
-		'SELECT a.eventid,a.status,COUNT(a.alertid) AS cnt'.
-		' FROM alerts a'.
-		' WHERE a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-			' AND '.dbConditionInt('a.eventid', $eventIds).
-		' GROUP BY eventid,status'
-	);
-
-	while ($alert = DBfetch($alerts)) {
-		if ($alert['cnt'] > 0) {
-			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$style = ZBX_STYLE_GREEN;
-			}
-			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-				$style = ZBX_STYLE_ORANGE;
-			}
-			else {
-				$style = ZBX_STYLE_RED;
-			}
-
-			$hint = (new CSpan($alert['cnt']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass($style)
-				->setHint(get_actions_hint_by_eventid($alert['eventid'], $alert['status']));
-
-			$actions[$alert['eventid']][$alert['status']] = $hint;
-		}
-	}
-
-	foreach ($actions as &$action) {
-		$action = [
-			isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : '',
-			' ',
-			isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : '',
-			' ',
-			isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : ''
-		];
-	}
-	unset($action);
-
-	return $actions;
+	return $events;
 }
 
 /**

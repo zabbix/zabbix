@@ -361,7 +361,7 @@ function make_system_status($filter) {
 	}
 
 	// actions
-	$actions = getEventActionsStatus($eventIds);
+	$actions = makeEventsActions($eventIds);
 
 	// triggers
 	foreach ($triggers as $trigger) {
@@ -641,7 +641,7 @@ function make_latest_issues(array $filter = []) {
 	]);
 
 	// actions
-	$actions = getEventActionsStatHints($eventIds);
+	$actions = makeEventsActions($eventIds);
 
 	// ack params
 	$ackParams = isset($filter['screenid']) ? ['screenid' => $filter['screenid']] : [];
