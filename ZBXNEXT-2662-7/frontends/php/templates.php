@@ -398,7 +398,7 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['template.ma
 
 	$result = true;
 
-	if (getRequest('action') == 'action.massdelete') {
+	if (getRequest('action') === 'template.massdelete') {
 		$result = API::Template()->massUpdate([
 			'templates' => zbx_toObject($templates, 'templateid'),
 			'hosts' => []
@@ -707,11 +707,11 @@ else {
 
 			$link = (new CLink($linkedToObject['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
 
-			if ($linkedToObject['status'] == HOST_STATUS_NOT_MONITORED) {
-				$link->addClass(ZBX_STYLE_RED);
-			}
-			elseif ($linkedToObject['status'] == HOST_STATUS_TEMPLATE) {
+			if ($linkedToObject['status'] == HOST_STATUS_TEMPLATE) {
 				$link->addClass(ZBX_STYLE_GREY);
+			}
+			else {
+				$link->addClass($linkedToObject['status'] == HOST_STATUS_MONITORED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 			}
 
 			$linkedToOutput[] = $link;
