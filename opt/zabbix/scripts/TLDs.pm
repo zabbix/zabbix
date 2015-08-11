@@ -18,7 +18,7 @@ our @EXPORT = qw(zbx_connect check_api_error get_proxies_list
 		set_proxy_status
 		get_application_id get_items_like set_tld_type get_triggers_by_items
 		add_dependency
-		create_cron_jobs
+		create_cron_items
 		pfail);
 
 our ($zabbix, $result);
@@ -46,8 +46,8 @@ sub check_api_error($) {
 sub get_proxies_list {
     my $proxies_list;
 
-    $proxies_list = $zabbix->get('proxy',{'output' => ['proxyid', 'host', 'status'], 'selectInterfaces' => ['ip'],
-					  'preservekeys' => 1 });
+    $proxies_list = $zabbix->get('proxy',{'output' => ['proxyid', 'host'], 'selectInterfaces' => ['ip'],
+					  'filter' => {'status' => HOST_STATUS_PROXY_PASSIVE}, 'preservekeys' => 1 });
 
     return $proxies_list;
 }
@@ -816,41 +816,19 @@ sub set_tld_type($$) {
 	return true;
 }
 
-sub create_cron_jobs($) {
+sub create_cron_items($) {
     my $slv_path = shift;
+
+    my $rv = opendir DIR, $slv_path;
 
     my $errlog = '/var/log/zabbix/rsm.slv.err';
 
-    my $slv_file;
-
-    my $rv = opendir DIR, "/etc/cron.d";
-
-    pfail("cannot open /etc/cron.d") unless ($rv);
-
-    # first remove current entries
-    while (($slv_file = readdir DIR)) {
-	next unless ($slv_file =~ /^rsm\.slv\..*\.pl$/);
-
-	$slv_file = "/etc/cron.d/$slv_file";
-
-	system("/bin/rm -f $slv_file");
-    }
-
-    my $avail_shift = 30;
-    my $avail_step = 5;
-    my $avail_limit = 60;
-    my $rollweek_shift = 0;
-    my $rollweek_step = 5;
-    my $rollweek_limit = 30;
-
-    my $avail_cur = $avail_shift;
-    my $rollweek_cur = $rollweek_shift;
-    
-    $rv = opendir DIR, $slv_path;
-
     pfail("cannot open $slv_path") unless ($rv);
 
-    # set up what's needed
+    my $avail_shift = 30;
+    my $rollweek_shift = 0;
+
+    my $slv_file;
     while (($slv_file = readdir DIR)) {
 	next unless ($slv_file =~ /^rsm\.slv\..*\.pl$/);
 
@@ -862,13 +840,13 @@ sub create_cron_jobs($) {
 	    system("echo '* * * * * root $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
 	} elsif ($slv_file =~ /\.slv\..*\.avail\.pl$/) {
 	    # separate rollweek and avail by some delay
-	    system("echo '* * * * * root sleep $avail_cur; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
-	    $avail_cur += $avail_step;
-	    $avail_cur = $avail_shift if ($avail_cur >= $avail_limit);
+	    system("echo '* * * * * root sleep $avail_shift; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
+	    $avail_shift += 5;
+	    $avail_shift = 30 unless ($avail_shift < 60);
 	} else {
-	    system("echo '* * * * * root sleep $rollweek_cur; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
-	    $rollweek_cur += $rollweek_step;
-	    $rollweek_cur = $rollweek_shift if ($rollweek_cur >= $rollweek_limit);
+	    system("echo '* * * * * root sleep $rollweek_shift; $slv_path/$slv_file >> $errlog 2>&1' > /etc/cron.d/$slv_file");
+	    $rollweek_shift += 5;
+	    $rollweek_shift = 0 unless ($rollweek_shift < 30);
 	}
     }
 }

@@ -58,10 +58,6 @@ use constant RESULT_TIMESTAMP_SHIFT => 29; # seconds (shift back from upper time
 
 our ($result, $dbh, $tld);
 
-my $total_sec;
-my $sql_time = 0.0;
-my $sql_count = 0;
-
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld
@@ -82,8 +78,8 @@ our @EXPORT = qw($result $dbh $tld
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
 		get_tld_by_trigger truncate_from alerts_enabled
-		dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt
-		setopt optkeys ts_str write_file usage);
+		dbg info wrn fail slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt setopt optkeys
+		ts_str write_file usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -416,7 +412,7 @@ sub get_tlds
 	if ($service eq 'DNS')
 	{
 		$sql =
-			"select h.host,h.hostid".
+			"select h.host".
 			" from hosts h,hosts_groups hg,groups g".
 			" where h.hostid=hg.hostid".
 				" and hg.groupid=g.groupid".
@@ -426,7 +422,7 @@ sub get_tlds
 	else
 	{
 		$sql =
-			"select h.host,h.hostid".
+			"select h.host".
 			" from hosts h,hosts_groups hg,groups g,hosts h2,hostmacro hm".
 			" where h.hostid=hg.hostid".
 				" and hg.groupid=g.groupid".
@@ -438,15 +434,17 @@ sub get_tlds
 				" and h.status=0";
 	}
 
+	$sql .= " order by h.host";
+
 	my $rows_ref = db_select($sql);
 
-	my %tlds;
+	my @tlds;
 	foreach my $row_ref (@$rows_ref)
 	{
-		$tlds{$row_ref->[0]} = $row_ref->[1];
+		push(@tlds, $row_ref->[0]);
 	}
 
-	return \%tlds;
+	return \@tlds;
 }
 
 # Returns a reference to hash of all probes (host => hostid).
@@ -744,12 +742,6 @@ sub db_select
 {
 	$global_sql = shift;
 
-	my $sec;
-	if (opt('stats'))
-	{
-		$sec = time();
-	}
-
 	my $sth = $dbh->prepare($global_sql)
 		or fail("cannot prepare [$global_sql]: ", $dbh->errstr);
 
@@ -789,12 +781,6 @@ sub db_select
 		my $rows = scalar(@$rows_ref);
 
 		dbg("$rows row", ($rows != 1 ? "s" : ""));
-	}
-
-	if (opt('stats'))
-	{
-		$sql_time += time() - $sec;
-		$sql_count++;
 	}
 
 	return $rows_ref;
@@ -1168,7 +1154,7 @@ sub get_probe_times
 
 # Translate probe names to hostids of appropriate tld hosts.
 #
-# E. g., in the database we have the following hosts (host/hostid):
+# E. g., we have hosts (host/hostid):
 #   "Probe2"		1
 #   "Probe12"		2
 #   "ORG Probe2"	100
@@ -1789,9 +1775,6 @@ sub sql_time_condition
 	my $from = shift;
 	my $till = shift;
 
-	$from = int($from) if (defined($from));
-	$till = int($till) if (defined($till));
-
 	if (defined($from) and not defined($till))
 	{
 		return "clock>=$from";
@@ -1845,24 +1828,21 @@ sub get_incidents
 	my (@incidents, $rows_ref, $row_ref);
 
 	$rows_ref = db_select(
-		"select t.triggerid".
+		"select distinct t.triggerid".
 		" from triggers t,functions f".
 		" where t.triggerid=f.triggerid".
 			" and f.itemid=$itemid".
 			" and t.priority=".TRIGGER_SEVERITY_NOT_CLASSIFIED);
 
-	# select distinct is slow
-	my @uniq_rows = do { my %seen; grep { !$seen{$_->[0]}++ } @$rows_ref };
-
-	my $rows = scalar(@uniq_rows);
+	my $rows = scalar(@$rows_ref);
 
 	unless ($rows == 1)
 	{
-		wrn("configuration error: item $itemid must have one not classified trigger (found: $rows)");
+		wrn("item $itemid must have one not classified trigger (found: $rows)");
 		return \@incidents;
 	}
 
-	my $triggerid = $uniq_rows[0]->[0];
+	my $triggerid = $rows_ref->[0]->[0];
 
 	my $last_trigger_value = TRIGGER_VALUE_FALSE;
 
@@ -1914,21 +1894,15 @@ sub get_incidents
 
 	# now check for incidents within given period
 	$rows_ref = db_select(
-		"select eventid,clock,value,false_positive,ns".
+		"select eventid,clock,value,false_positive".
 		" from events".
 		" where object=".EVENT_OBJECT_TRIGGER.
 			" and source=".EVENT_SOURCE_TRIGGERS.
 			" and objectid=$triggerid".
-			" and ".sql_time_condition($from, $till));
+			" and ".sql_time_condition($from, $till).
+		" order by clock,ns");
 
-	# order by clock,ns (slower in sql)
-	my @sorted_rows = sort
-	{
-		$a->[1] <=> $b->[1] ||	# order by clock (the result is -1, 0 ,1)
-		$a->[4] <=> $b->[4];	# order by ns if clock is the same
-	} @$rows_ref;
-
-	foreach my $row_ref (@sorted_rows)
+	foreach my $row_ref (@$rows_ref)
 	{
 		my $eventid = $row_ref->[0];
 		my $clock = $row_ref->[1];
@@ -1999,14 +1973,6 @@ sub get_downtime
 	my $total = scalar(@$incidents);
 	my $downtime = 0;
 
-	my $sec;
-	if (opt('stats'))
-	{
-		$sec = time();
-	}
-
-	my $fetches = 0;
-
 	foreach (@$incidents)
 	{
 		my $false_positive = $_->{'false_positive'};
@@ -2032,8 +1998,6 @@ sub get_downtime
 
 		foreach my $row_ref (@$rows_ref)
 		{
-			$fetches++;
-
 			my $value = $row_ref->[0];
 			my $clock = $row_ref->[1];
 
@@ -2055,17 +2019,7 @@ sub get_downtime
 		$downtime += $period_till - $prevclock if ($prevvalue == DOWN);
 	}
 
-	$downtime /= 60;	# minutes;
-
-	if (opt('stats'))
-	{
-		my $sec_cur = time() - $sec;
-		$sql_time += $sec_cur;
-
-		info(sprintf("down:%dm time:%.3fs fetches:%d", $downtime, $sec_cur, $fetches));
-	}
-
-	return $downtime;
+	return $downtime / 60; # minutes
 }
 
 sub get_downtime_prepare
@@ -2077,19 +2031,8 @@ sub get_downtime_prepare
 			" and clock between ? and ?".
 		" order by clock";
 
-	my $sec;
-	if (opt('stats'))
-	{
-		$sec = time();
-	}
-
 	my $sth = $dbh->prepare($query)
 		or fail("cannot prepare [$query]: ", $dbh->errstr);
-
-	if (opt('stats'))
-	{
-		$sql_time += time() - $sec;
-	}
 
 	dbg("[$query]");
 
@@ -2125,14 +2068,6 @@ sub get_downtime_execute
 	my $total = scalar(@$incidents);
 	my $downtime = 0;
 
-	my $sec;
-	if (opt('stats'))
-	{
-		$sec = time();
-	}
-
-	my $fetches = 0;
-
 	foreach (@$incidents)
 	{
 		my $false_positive = $_->{'false_positive'};
@@ -2161,8 +2096,6 @@ sub get_downtime_execute
 
 		while ($sth->fetch)
 		{
-			$fetches++;
-
 			# In case of multiple values per second treat them as one. Up value prioritized.
 			if ($prevclock == $clock)
 			{
@@ -2178,23 +2111,12 @@ sub get_downtime_execute
 		}
 
 		# leftover of downtime
-		$downtime += $period_till - $prevclock if ($prevvalue == DOWN);
+		$downtime += $period_till - $prevclock if ($prevclock != 0 and $prevvalue == DOWN);
 
 		$sth->finish();
-		$sql_count++;
 	}
 
-	$downtime /= 60;	# minutes;
-
-	if (opt('stats'))
-	{
-		my $sec_cur = time() - $sec;
-		$sql_time += $sec_cur;
-
-		info(sprintf("down:%dm time:%.3fs fetches:%d", $downtime, $sec_cur, $fetches));
-	}
-
-	return $downtime;
+	return $downtime / 60; # minutes
 }
 
 sub avail_result_msg
@@ -2462,31 +2384,9 @@ sub alerts_enabled
 	return E_FAIL;
 }
 
-sub format_stats_time
-{
-	my $time = shift;
-
-	my $m = int($time / 60);
-	my $s = $time - $m * 60;
-
-	return sprintf("%dm %ds", $m, $s) if ($m != 0);
-
-	return sprintf("%.3lfs", $s);
-}
-
 sub slv_exit
 {
 	my $rv = shift;
-
-	if (SUCCESS == $rv && opt('stats'))
-	{
-		my $sql_str = format_stats_time($sql_time);
-		$sql_str .= " ($sql_count queries)";
-
-		my $total_str = format_stats_time(time() - $total_sec);
-
-		print("stats: total:$total_str sql:$sql_str\n");
-	}
 
 	exit($rv);
 }
@@ -2548,7 +2448,7 @@ sub trim
 
 sub parse_opts
 {
-	if (!GetOptions(\%OPTS, 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', 'stats!', @_))
+	if (!GetOptions(\%OPTS, 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', @_))
 	{
 		pod2usage(-verbose => 0, -input => $POD2USAGE_FILE);
 	}
@@ -2559,8 +2459,6 @@ sub parse_opts
 	}
 
 	setopt('nolog') if (opt('dry-run') || opt('debug'));
-
-	$total_sec = time() if (opt('stats'));
 }
 
 sub parse_avail_opts
@@ -2639,8 +2537,7 @@ sub usage
 # Internal subs #
 #################
 
-my $program = $0;
-$program =~ s,.*/,,g;
+my $program = $0; $program =~ s,.*/,,g;
 my $logopt = 'pid';
 my $facility = 'user';
 my $prev_tld = "";

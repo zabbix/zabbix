@@ -1,16 +1,16 @@
 #!/usr/bin/perl
 #
-# DNSSEC rolling week
+# RDDS rolling week
 
-	use lib '/opt/zabbix/scripts';
+use lib '/opt/zabbix/scripts';
 
 use strict;
 use warnings;
 use RSM;
 use RSMSLV;
 
-my $cfg_key_in = 'rsm.slv.dnssec.avail';
-my $cfg_key_out = 'rsm.slv.dnssec.rollweek';
+my $cfg_key_in = 'rsm.slv.epp.avail';
+my $cfg_key_out = 'rsm.slv.epp.rollweek';
 
 parse_opts();
 exit_if_running();
@@ -20,10 +20,10 @@ set_slv_config(get_rsm_config());
 db_connect();
 
 my ($from, $till, $value_ts) = get_rollweek_bounds();
-my $interval = get_macro_dns_udp_delay($from);
-my $cfg_sla = get_macro_dns_rollweek_sla();
+my $interval = get_macro_epp_delay($from);
+my $cfg_sla = get_macro_epp_rollweek_sla();
 
-my $tlds_ref = get_tlds();
+my $tlds_ref = get_tlds('EPP');
 
 init_values();
 

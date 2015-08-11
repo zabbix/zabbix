@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 #
-# RDDS availability
+# EPP availability
 
 use lib '/opt/zabbix/scripts';
 
@@ -9,8 +9,8 @@ use warnings;
 use RSM;
 use RSMSLV;
 
-my $cfg_key_in = 'rsm.rdds[{$RSM.TLD}';
-my $cfg_key_out = 'rsm.slv.rdds.avail';
+my $cfg_key_in = 'rsm.epp[{$RSM.TLD}';
+my $cfg_key_out = 'rsm.slv.epp.avail';
 
 parse_avail_opts();
 exit_if_running();
@@ -19,14 +19,14 @@ set_slv_config(get_rsm_config());
 
 db_connect();
 
-my $interval = get_macro_rdds_delay();
-my $cfg_minonline = get_macro_rdds_probe_online();
+my $interval = get_macro_epp_delay();
+my $cfg_minonline = get_macro_epp_probe_online();
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
 my $clock = (opt('from') ? getopt('from') : time());
 my $period = (opt('period') ? getopt('period') : 1);
 
-my $tlds_ref = get_tlds('RDDS');
+my $tlds_ref = get_tlds('EPP');
 
 while ($period > 0)
 {

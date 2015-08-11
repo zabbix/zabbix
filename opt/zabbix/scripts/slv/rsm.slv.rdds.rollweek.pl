@@ -27,7 +27,7 @@ my $tlds_ref = get_tlds('RDDS');
 
 init_values();
 
-foreach (sort(keys(%$tlds_ref)))
+foreach (@$tlds_ref)
 {
     $tld = $_;
 

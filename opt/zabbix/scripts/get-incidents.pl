@@ -24,20 +24,9 @@ db_connect();
 my $from = getopt('from');
 my $till = getopt('till');
 
-my $tlds_ref;
-if (opt('tld'))
-{
-        my $tld = getopt('tld');
-        my $tld_hostid = get_hostid($tld);
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds();
 
-        $tlds_ref->{$tld} = $tld_hostid;
-}   
-else
-{
-        $tlds_ref = get_tlds();
-}
-
-foreach (sort(keys(%$tlds_ref)))
+foreach (@$tlds_ref)
 {
 	$tld = $_;
 

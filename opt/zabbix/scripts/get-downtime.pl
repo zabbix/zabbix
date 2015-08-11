@@ -63,20 +63,9 @@ unless (defined($from) and defined($till))
 	$till = $bounds[1] unless (defined($till));
 }
 
-my $tlds_ref;
-if (opt('tld'))
-{
-        my $tld = getopt('tld');
-        my $tld_hostid = get_hostid($tld);
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
 
-        $tlds_ref->{$tld} = $tld_hostid;
-}   
-else
-{
-        $tlds_ref = get_tlds($service_type);
-}
-
-foreach (sort(keys(%$tlds_ref)))
+foreach (@$tlds_ref)
 {
 	$tld = $_;
 

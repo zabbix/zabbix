@@ -122,21 +122,9 @@ else
 my $probe_avail_limit = get_macro_probe_avail_limit();
 my $probes_ref = get_probes($service_type);
 my $probe_times_ref = get_probe_times($from, $till, $probe_avail_limit, $probes_ref);
+my $tlds_ref = opt('tld') ? [ getopt('tld') ] : get_tlds($service_type);
 
-my $tlds_ref;
-if (opt('tld'))
-{
-        my $tld = getopt('tld');
-        my $tld_hostid = get_hostid($tld);
-
-        $tlds_ref->{$tld} = $tld_hostid;
-}
-else
-{
-	$tlds_ref = get_tlds($service_type);
-}
-
-foreach (sort(keys(%$tlds_ref)))
+foreach (@$tlds_ref)
 {
 	$tld = $_;
 
