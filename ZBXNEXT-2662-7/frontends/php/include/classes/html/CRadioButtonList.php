@@ -24,11 +24,12 @@ class CRadioButtonList extends CList {
 	const ORIENTATION_HORIZONTAL = 'horizontal';
 	const ORIENTATION_VERTICAL = 'vertical';
 
-	protected $name;
-	protected $value;
-	protected $orientation;
-	protected $enabled;
-	protected $values;
+	private $name;
+	private $value;
+	private $orientation;
+	private $enabled;
+	private $values;
+	private $modern;
 
 	public function __construct($name, $value) {
 		parent::__construct();
@@ -38,6 +39,7 @@ class CRadioButtonList extends CList {
 		$this->orientation = self::ORIENTATION_HORIZONTAL;
 		$this->enabled = true;
 		$this->values = [];
+		$this->modern = false;
 		$this->setId(zbx_formatDomId($name));
 	}
 
@@ -64,11 +66,22 @@ class CRadioButtonList extends CList {
 		return $this;
 	}
 
+	public function setModern($modern) {
+		$this->modern = $modern;
+
+		return $this;
+	}
+
 	public function toString($destroy = true) {
-		$this->addClass($this->orientation == self::ORIENTATION_HORIZONTAL
-			? ZBX_STYLE_LIST_HOR_CHECK_RADIO
-			: ZBX_STYLE_LIST_CHECK_RADIO
-		);
+		if ($this->modern) {
+			$this->addClass('radio-segmented');
+		}
+		else {
+			$this->addClass($this->orientation == self::ORIENTATION_HORIZONTAL
+				? ZBX_STYLE_LIST_HOR_CHECK_RADIO
+				: ZBX_STYLE_LIST_CHECK_RADIO
+			);
+		}
 
 		foreach ($this->values as $key => $value) {
 			if ($value['id'] === null) {
@@ -83,7 +96,12 @@ class CRadioButtonList extends CList {
 				$radio->setAttribute('checked', 'checked');
 			}
 
-			parent::addItem(new CLabel([$radio, $value['name']], $value['id']));
+			if ($this->modern) {
+				parent::addItem([$radio, new CLabel($value['name'], $value['id'])]);
+			}
+			else {
+				parent::addItem(new CLabel([$radio, $value['name']], $value['id']));
+			}
 		}
 
 		return parent::toString($destroy);

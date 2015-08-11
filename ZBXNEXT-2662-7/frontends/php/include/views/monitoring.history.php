@@ -230,12 +230,10 @@ else {
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
 			$filterForm->addColumn(
 				(new CFormList())->addRow(_('Graph type'),
-					(new CDiv(
-						(new CRadioButtonList('graphtype', (int) $this->data['graphtype']))
-							->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
-							->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
-					))
-						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					(new CRadioButtonList('graphtype', (int) $this->data['graphtype']))
+						->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
+						->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
+						->setModern(true)
 				)
 			);
 			$filterForm->removeButtons();

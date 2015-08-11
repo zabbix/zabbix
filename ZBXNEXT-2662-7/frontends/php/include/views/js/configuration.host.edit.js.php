@@ -20,6 +20,7 @@
 		(new CRadioButtonList('interfaces[#{iface.interfaceid}][useip]', null))
 			->addValue(_('IP'), INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
 			->addValue(_('DNS'), INTERFACE_USE_DNS, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']')
+			->setModern(true)
 	))->toString() ?>
 	<td class="interface-port">
 		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_PORT_WIDTH ?>px" maxlength="64" value="#{iface.port}">

@@ -1768,13 +1768,10 @@ function get_timeperiod_form() {
 		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
 		$tblPeriod->addRow([_('Date'),
-			(new CDiv(
-				(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
-					->addValue(_('Day'), 0, null, 'submit()')
-					->addValue(_('Day of week'), 1, null, 'submit()')
-			))
-				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
+			(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
+				->addValue(_('Day'), 0, null, 'submit()')
+				->addValue(_('Day of week'), 1, null, 'submit()')
+				->setModern(true)
 		]);
 
 		if ($new_timeperiod['month_date_type'] > 0) {

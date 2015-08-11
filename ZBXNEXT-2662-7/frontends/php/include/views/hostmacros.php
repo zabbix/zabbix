@@ -150,13 +150,10 @@ else {
 
 $macros_form_list
 	->addRow(null,
-		(new CDiv(
-			(new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
-				->addValue(_('Host macros'), 0, null, 'this.form.submit()')
-				->addValue(_('Inherited and host macros'), 1, null, 'this.form.submit()')
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		(new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+			->addValue(_('Host macros'), 0, null, 'this.form.submit()')
+			->addValue(_('Inherited and host macros'), 1, null, 'this.form.submit()')
+			->setModern(true)
 	)
 	->addRow(null, $table);
 

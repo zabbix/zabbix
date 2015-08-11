@@ -147,10 +147,8 @@ $itemFormList->addRow(
 		(new CRadioButtonList('snmpv3_authprotocol', (int) $this->data['snmpv3_authprotocol']))
 			->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
 			->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
-	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
-		->setId('authprotocol_div')
+			->setModern(true)
+	))->setId('authprotocol_div')
 );
 
 // append snmpv3 authpassphrase to form list
@@ -177,9 +175,8 @@ $itemFormList->addRow(
 		(new CRadioButtonList('snmpv3_privprotocol', (int) $this->data['snmpv3_privprotocol']))
 			->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
 			->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
+			->setModern(true)
 	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
 		->setId('privprotocol_div')
 );
 
