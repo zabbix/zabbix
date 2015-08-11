@@ -769,7 +769,8 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	if (isset($ithosts[$hostName])) {
 		$column
 			->setMenuPopup(CMenuPopupHelper::getHistory($item))
-			->addClass(ZBX_STYLE_CURSOR_POINTER);
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->addClass(ZBX_STYLE_NOWRAP);
 	}
 
 	$tableRow[] = $column;
