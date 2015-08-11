@@ -324,17 +324,35 @@ $proxy_mon_templateid = create_probe_health_tmpl();
 foreach my $proxyid (sort keys %{$proxies}) {
     my $probe_name = $proxies->{$proxyid}->{'host'};
 
+    my $status = HOST_STATUS_MONITORED;
+
     print $proxyid."\n";
     print $proxies->{$proxyid}->{'host'}."\n";
 
+    my $probe_status = $proxies->{$proxyid}->{'status'};
+
+    if ($probe_status == HOST_STATUS_PROXY_ACTIVE) {
+	$status = HOST_STATUS_NOT_MONITORED;
+    }
+
     my $proxy_groupid = create_group($probe_name);
 
-    my $probe_templateid = create_probe_template($probe_name);
+    my $probe_templateid;
+
+    if ($probe_status == HOST_STATUS_PROXY_ACTIVE) {
+	$probe_templateid = create_probe_template($probe_name, 0, 0, 0, 0);
+    }
+    else {
+	$probe_templateid = create_probe_template($probe_name);
+    }
+
+
     my $probe_status_templateid = create_probe_status_template($probe_name, $probe_templateid, $root_servers_macros);
 
     create_host({'groups' => [{'groupid' => $proxy_groupid}, {'groupid' => $probes_groupid}],
                                           'templates' => [{'templateid' => $probe_status_templateid}],
                                           'host' => $probe_name,
+                                          'status' => $status,
                                           'proxy_hostid' => $proxyid,
                                           'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true,
 							    'ip'=> '127.0.0.1',
@@ -344,6 +362,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
     my $hostid = create_host({'groups' => [{'groupid' => $probes_mon_groupid}],
                                           'templates' => [{'templateid' => $proxy_mon_templateid}],
                                           'host' => $probe_name.' - mon',
+                                          'status' => $status,
                                           'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true,
                                                             'ip'=> $proxies->{$proxyid}->{'interfaces'}[0]->{'ip'},
                                                             'dns' => '', 'port' => '10050'}]
@@ -354,6 +373,7 @@ foreach my $proxyid (sort keys %{$proxies}) {
     create_host({'groups' => [{'groupid' => $tld_groupid}, {'groupid' => $proxy_groupid}],
                                           'templates' => [{'templateid' => $main_templateid}, {'templateid' => $probe_templateid}],
                                           'host' => $OPTS{'tld'}.' '.$probe_name,
+                                          'status' => $status,
                                           'proxy_hostid' => $proxyid,
                                           'interfaces' => [{'type' => 1, 'main' => true, 'useip' => true, 'ip'=> '127.0.0.1', 'dns' => '', 'port' => '10050'}]});
 }
