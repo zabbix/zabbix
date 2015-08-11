@@ -51,19 +51,18 @@ static	LPCWSTR RENDER_ITEMS[] = {
 #define	EVENTLOG_REG_PATH TEXT("SYSTEM\\CurrentControlSet\\Services\\EventLog\\")
 
 /* open event logger and return number of records */
-static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, PDWORD pNumRecords,
-		PDWORD pLatestRecord)
+static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint64_t *FirstID,
+		zbx_uint64_t *LastID)
 {
 	const char	*__function_name = "zbx_open_eventlog";
 	TCHAR		reg_path[MAX_PATH];
 	HKEY		hk = NULL;
+	DWORD		dwNumRecords, dwOldestRecord;
 	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	*eventlog_handle = NULL;
-	*pNumRecords = 0;
-	*pLatestRecord = 0;
 
 	/* Get path to eventlog */
 	zbx_wsnprintf(reg_path, MAX_PATH, EVENTLOG_REG_PATH TEXT("%s"), wsource);
@@ -76,14 +75,19 @@ static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, PDWORD pN
 	if (NULL == (*eventlog_handle = OpenEventLog(NULL, wsource)))	/* open log file */
 		goto out;
 
-	if (0 == GetNumberOfEventLogRecords(*eventlog_handle, pNumRecords))	/* get number of records */
+	if (0 == GetNumberOfEventLogRecords(*eventlog_handle, &dwNumRecords) ||
+			0 == GetOldestEventLogRecord(*eventlog_handle, &dwOldestRecord))
+	{
+		CloseEventLog(*eventlog_handle);
+		*eventlog_handle = NULL;
 		goto out;
+	}
 
-	if (0 == GetOldestEventLogRecord(*eventlog_handle, pLatestRecord))
-		goto out;
+	*FirstID = dwOldestRecord;
+	*LastID = dwOldestRecord + dwNumRecords - 1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() pNumRecords:%lu pLatestRecord:%lu",
-			__function_name, *pNumRecords, *pLatestRecord);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64 " numIDs:%d",
+			__function_name, zbx_result_string(ret), *FirstID, *LastID, dwNumRecords);
 
 	ret = SUCCEED;
 out:
@@ -399,10 +403,19 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 	int		ret = FAIL;
 	HANDLE		eventlog_handle;
 	LPTSTR		wsource;
-	DWORD		FirstID, LastID, i;
+	zbx_uint64_t	i, FirstID, LastID;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:" ZBX_FS_UI64,
-			__function_name, source, *lastlogsize);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:'%s' lastlogsize:" ZBX_FS_UI64, __function_name, source,
+			*lastlogsize);
+
+	/* From MSDN documentation:                                                                         */
+	/* The RecordNumber member of EVENTLOGRECORD contains the record number for the event log record.   */
+	/* The very first record written to an event log is record number 1, and other records are          */
+	/* numbered sequentially. If the record number reaches ULONG_MAX, the next record number will be 0, */
+	/* not 1; however, you use zero to seek to the record.                                              */
+	/*                                                                                                  */
+	/* This RecordNumber wraparound is handled simply by using 64bit integer to calculate record        */
+	/* numbers and then converting to DWORD values.                                                     */
 
 	*out_timestamp = 0;
 	*out_source = NULL;
@@ -418,39 +431,51 @@ int	process_eventlog(const char *source, zbx_uint64_t *lastlogsize, unsigned lon
 
 	wsource = zbx_utf8_to_unicode(source);
 
-	if (SUCCEED == zbx_open_eventlog(wsource, &eventlog_handle,
-			&LastID /* number */, &FirstID /* oldest */))
+	if (SUCCEED != zbx_open_eventlog(wsource, &eventlog_handle, &FirstID, &LastID))
 	{
-		LastID += FirstID;
-
-		if (1 == skip_old_data)
-		{
-			*lastlogsize = LastID - 1;
-			zabbix_log(LOG_LEVEL_DEBUG, "skipping existing data: lastlogsize:" ZBX_FS_UI64, *lastlogsize);
-		}
-
-		if (*lastlogsize > LastID)
-			*lastlogsize = FirstID;
-		else if (*lastlogsize >= FirstID)
-			FirstID = (long)*lastlogsize + 1;
-
-		for (i = FirstID; i < LastID; i++)
-		{
-			if (SUCCEED == zbx_get_eventlog_message(wsource, eventlog_handle, i, out_source, out_message,
-					out_severity, out_timestamp, out_eventid))
-			{
-				*lastlogsize = i;
-				break;
-			}
-		}
-		zbx_close_eventlog(eventlog_handle);
-
-		ret = SUCCEED;
-	}
-	else
 		zabbix_log(LOG_LEVEL_ERR, "cannot open eventlog '%s': %s", source,
 				strerror_from_system(GetLastError()));
+		goto out;
+	}
 
+	if (1 == skip_old_data)
+	{
+		*lastlogsize = LastID;
+		zabbix_log(LOG_LEVEL_DEBUG, "skipping existing data: lastlogsize:" ZBX_FS_UI64, *lastlogsize);
+		goto finish;
+	}
+
+	/* Having lastlogsize greater than LastID means that there was oldest event record */
+	/* (FirstID) wraparound. In this case we must also wrap the lastlogsize value.     */
+	if (*lastlogsize > LastID)
+		*lastlogsize = (DWORD)*lastlogsize;
+
+	/* if the lastlogsize is still outside log record interval reset it to the oldest record number, */
+	/* otherwise set FirstID to the next record after lastlogsize, which is the first event record   */
+	/* to read                                                                                       */
+	if (*lastlogsize > LastID || *lastlogsize < FirstID)
+		*lastlogsize = FirstID;
+	else
+		FirstID = *lastlogsize + 1;
+
+	for (i = FirstID; i <= LastID; i++)
+	{
+		/* convert to DWORD to handle possible event record number wraparound */
+		DWORD	dwRecordNumber = (DWORD)i;
+
+		if (SUCCEED == zbx_get_eventlog_message(wsource, eventlog_handle, dwRecordNumber, out_source,
+				out_message, out_severity, out_timestamp, out_eventid))
+		{
+			/* storing full (not truncated to DWORD) lastlogsize value makes  */
+			/* easier to do event record number calculations during next call */
+			*lastlogsize = i;
+			break;
+		}
+	}
+finish:
+	zbx_close_eventlog(eventlog_handle);
+	ret = SUCCEED;
+out:
 	zbx_free(wsource);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
