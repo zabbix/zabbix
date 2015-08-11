@@ -1157,7 +1157,6 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$ack = null;
 	$css = null;
-	$style = null;
 	$desc = [];
 	$acknowledge = [];
 
@@ -1165,7 +1164,6 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$config = select_config();
 
 	if ($trigger) {
-		$style = 'cursor: pointer; ';
 		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
 
 		// problem trigger
@@ -1235,11 +1233,13 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 	}
 
-	$column = ($desc || $ack)
-		? (new CCol([$desc, $ack]))->addClass($css)->addClass('hosts')
-		: (new CCol())->addClass($css)->addClass('hosts');
+	$column = new CCol([$desc, $ack]);
 
-	$column->setAttribute('style', $style);
+	if ($css !== null) {
+		$column
+			->addClass($css)
+			->addClass(ZBX_STYLE_CURSOR_POINTER);
+	}
 
 	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
 		$column->addClass('blink');
