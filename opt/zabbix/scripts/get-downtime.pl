@@ -63,6 +63,7 @@ unless (defined($from) and defined($till))
 	$till = $bounds[1] unless (defined($till));
 }
 
+my $tlds_ref;
 if (opt('tld'))
 {
         my $tld = getopt('tld');
@@ -72,7 +73,7 @@ if (opt('tld'))
 }   
 else
 {
-        my $tlds_ref = get_tlds($service_type);
+        $tlds_ref = get_tlds($service_type);
 }
 
 foreach (sort(keys(%$tlds_ref)))

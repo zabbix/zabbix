@@ -24,6 +24,7 @@ db_connect();
 my $from = getopt('from');
 my $till = getopt('till');
 
+my $tlds_ref;
 if (opt('tld'))
 {
         my $tld = getopt('tld');
@@ -33,7 +34,7 @@ if (opt('tld'))
 }   
 else
 {
-        my $tlds_ref = get_tlds();
+        $tlds_ref = get_tlds();
 }
 
 foreach (sort(keys(%$tlds_ref)))
