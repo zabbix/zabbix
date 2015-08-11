@@ -58,6 +58,10 @@ use constant RESULT_TIMESTAMP_SHIFT => 29; # seconds (shift back from upper time
 
 our ($result, $dbh, $tld);
 
+my $total_sec;
+my $sql_time = 0.0;
+my $sql_count = 0;
+
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld
@@ -78,8 +82,8 @@ our @EXPORT = qw($result $dbh $tld
 		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
 		get_tld_by_trigger truncate_from alerts_enabled
-		dbg info wrn fail slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt setopt optkeys
-		ts_str write_file usage);
+		dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt
+		setopt optkeys ts_str write_file usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -742,6 +746,12 @@ sub db_select
 {
 	$global_sql = shift;
 
+	my $sec;
+	if (opt('stats'))
+	{
+		$sec = time();
+	}
+
 	my $sth = $dbh->prepare($global_sql)
 		or fail("cannot prepare [$global_sql]: ", $dbh->errstr);
 
@@ -781,6 +791,12 @@ sub db_select
 		my $rows = scalar(@$rows_ref);
 
 		dbg("$rows row", ($rows != 1 ? "s" : ""));
+	}
+
+	if (opt('stats'))
+	{
+		$sql_time += time() - $sec;
+		$sql_count++;
 	}
 
 	return $rows_ref;
@@ -1973,6 +1989,14 @@ sub get_downtime
 	my $total = scalar(@$incidents);
 	my $downtime = 0;
 
+	my $sec;
+	if (opt('stats'))
+	{
+		$sec = time();
+	}
+
+	my $fetches = 0;
+
 	foreach (@$incidents)
 	{
 		my $false_positive = $_->{'false_positive'};
@@ -1998,6 +2022,8 @@ sub get_downtime
 
 		foreach my $row_ref (@$rows_ref)
 		{
+			$fetches++;
+
 			my $value = $row_ref->[0];
 			my $clock = $row_ref->[1];
 
@@ -2019,7 +2045,17 @@ sub get_downtime
 		$downtime += $period_till - $prevclock if ($prevvalue == DOWN);
 	}
 
-	return $downtime / 60; # minutes
+	$downtime /= 60;	# minutes;
+
+	if (opt('stats'))
+	{
+		my $sec_cur = time() - $sec;
+		$sql_time += $sec_cur;
+
+		info(sprintf("down:%dm time:%.3fs fetches:%d", $downtime, $sec_cur, $fetches));
+	}
+
+	return $downtime;
 }
 
 sub get_downtime_prepare
@@ -2031,8 +2067,19 @@ sub get_downtime_prepare
 			" and clock between ? and ?".
 		" order by clock";
 
+	my $sec;
+	if (opt('stats'))
+	{
+		$sec = time();
+	}
+
 	my $sth = $dbh->prepare($query)
 		or fail("cannot prepare [$query]: ", $dbh->errstr);
+
+	if (opt('stats'))
+	{
+		$sql_time += time() - $sec;
+	}
 
 	dbg("[$query]");
 
@@ -2068,6 +2115,14 @@ sub get_downtime_execute
 	my $total = scalar(@$incidents);
 	my $downtime = 0;
 
+	my $sec;
+	if (opt('stats'))
+	{
+		$sec = time();
+	}
+
+	my $fetches = 0;
+
 	foreach (@$incidents)
 	{
 		my $false_positive = $_->{'false_positive'};
@@ -2096,6 +2151,8 @@ sub get_downtime_execute
 
 		while ($sth->fetch)
 		{
+			$fetches++;
+
 			# In case of multiple values per second treat them as one. Up value prioritized.
 			if ($prevclock == $clock)
 			{
@@ -2111,12 +2168,23 @@ sub get_downtime_execute
 		}
 
 		# leftover of downtime
-		$downtime += $period_till - $prevclock if ($prevclock != 0 and $prevvalue == DOWN);
+		$downtime += $period_till - $prevclock if ($prevvalue == DOWN);
 
 		$sth->finish();
+		$sql_count++;
 	}
 
-	return $downtime / 60; # minutes
+	$downtime /= 60;	# minutes;
+
+	if (opt('stats'))
+	{
+		my $sec_cur = time() - $sec;
+		$sql_time += $sec_cur;
+
+		info(sprintf("down:%dm time:%.3fs fetches:%d", $downtime, $sec_cur, $fetches));
+	}
+
+	return $downtime;
 }
 
 sub avail_result_msg
@@ -2384,9 +2452,31 @@ sub alerts_enabled
 	return E_FAIL;
 }
 
+sub format_stats_time
+{
+	my $time = shift;
+
+	my $m = int($time / 60);
+	my $s = $time - $m * 60;
+
+	return sprintf("%dm %ds", $m, $s) if ($m != 0);
+
+	return sprintf("%.3lfs", $s);
+}
+
 sub slv_exit
 {
 	my $rv = shift;
+
+	if (SUCCESS == $rv && opt('stats'))
+	{
+		my $sql_str = format_stats_time($sql_time);
+		$sql_str .= " ($sql_count queries)";
+
+		my $total_str = format_stats_time(time() - $total_sec);
+
+		print("stats: total:$total_str sql:$sql_str\n");
+	}
 
 	exit($rv);
 }
@@ -2448,7 +2538,7 @@ sub trim
 
 sub parse_opts
 {
-	if (!GetOptions(\%OPTS, 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', @_))
+	if (!GetOptions(\%OPTS, 'help!', 'dry-run!', 'warnslow=f', 'nolog!', 'debug!', 'stats!', @_))
 	{
 		pod2usage(-verbose => 0, -input => $POD2USAGE_FILE);
 	}
@@ -2459,6 +2549,8 @@ sub parse_opts
 	}
 
 	setopt('nolog') if (opt('dry-run') || opt('debug'));
+
+	$total_sec = time() if (opt('stats'));
 }
 
 sub parse_avail_opts

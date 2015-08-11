@@ -18,7 +18,7 @@ use constant PROBE_NORESULT_STR => 'No result';
 
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 
-parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s');
+parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n');
 
 # do not write any logs
 setopt('nolog');
@@ -154,8 +154,13 @@ dbg("config_minclock:$config_minclock");
 my $probes_from;
 my $probes_till;
 
+my $tlds_processed = 0;
 foreach (@$tlds_ref)
 {
+	$tlds_processed++;
+
+	last if (opt('limit') && $tlds_processed == getopt('limit'));
+
 	# NB! This is needed in order to set the value globally.
 	$tld = $_;
 
