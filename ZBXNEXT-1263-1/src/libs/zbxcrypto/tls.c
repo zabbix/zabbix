@@ -194,7 +194,6 @@ static void	zbx_gnutls_debug_cb(int level, const char *str)
 	zabbix_log(LOG_LEVEL_TRACE, "GnuTLS debug: level=%d \"%s\"", level, msg);
 }
 
-#if GNUTLS_VERSION_NUMBER >= 0x030000
 /******************************************************************************
  *                                                                            *
  * Function: zbx_gnutls_audit_cb                                              *
@@ -209,7 +208,6 @@ static void	zbx_gnutls_audit_cb(gnutls_session_t session, const char *str)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "GnuTLS audit: \"%s\"", str);
 }
-#endif
 #endif	/* defined(HAVE_GNUTLS) */
 
 #if defined(HAVE_OPENSSL)
@@ -3561,10 +3559,8 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	else
 		gnutls_global_set_log_level(0);		/* restore default log level */
 
-#if GNUTLS_VERSION_NUMBER >= 0x030000
 	/* set our own callback function to log issues into Zabbix log */
 	gnutls_global_set_audit_log_function(zbx_gnutls_audit_cb);
-#endif
 
 	/* on MS Windows gl_fd_to_handle() may be necessary to convert s->socket */
 	gnutls_transport_set_ptr(s->tls_ctx, (gnutls_transport_ptr_t)s->socket);
@@ -4233,10 +4229,8 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 	else
 		gnutls_global_set_log_level(0);		/* restore default log level */
 
-#if GNUTLS_VERSION_NUMBER >= 0x030000
 	/* set our own callback function to log issues into Zabbix log */
 	gnutls_global_set_audit_log_function(zbx_gnutls_audit_cb);
-#endif
 
 	/* on MS Windows gl_fd_to_handle() may be necessary to convert s->socket */
 	gnutls_transport_set_ptr(s->tls_ctx, (gnutls_transport_ptr_t)s->socket);
