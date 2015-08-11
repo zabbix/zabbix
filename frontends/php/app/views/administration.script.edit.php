@@ -48,13 +48,10 @@ $scriptFormList->addRow(_('Type'),
 
 // execute on
 $scriptFormList->addRow(_('Execute on'),
-	(new CDiv(
-		(new CRadioButtonList('execute_on', (int) $data['execute_on']))
-			->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-			->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
-	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	(new CRadioButtonList('execute_on', (int) $data['execute_on']))
+		->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+		->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+		->setModern(true)
 );
 $scriptFormList->addRow(_('Commands'),
 	(new CTextArea('command', $data['command']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

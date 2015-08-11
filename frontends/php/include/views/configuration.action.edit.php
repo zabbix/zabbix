@@ -806,15 +806,12 @@ if (!empty($this->data['new_operation'])) {
 
 			// script
 			$newOperationsTable->addRow([_('Execute on'),
-				(new CDiv(
-					(new CRadioButtonList('new_operation[opcommand][execute_on]',
-						(int) $this->data['new_operation']['opcommand']['execute_on']
-					))
-						->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-						->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+				(new CRadioButtonList('new_operation[opcommand][execute_on]',
+					(int) $this->data['new_operation']['opcommand']['execute_on']
 				))
-					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+					->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+					->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+					->setModern(true)
 			]);
 
 			// ssh

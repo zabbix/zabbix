@@ -76,13 +76,10 @@
 				</tr>
 				<?= (new CRow([
 					_('Authentication protocol'),
-					(new CDiv(
-						(new CRadioButtonList('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5))
-							->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
-							->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
-					))
-						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
+					(new CRadioButtonList('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5))
+						->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
+						->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
+						->setModern(true)
 				]))
 					->setId('newCheckAuthProtocolRow')
 					->toString() ?>
@@ -92,13 +89,10 @@
 				</tr>
 				<?= (new CRow([
 					_('Privacy protocol'),
-					(new CDiv(
-						(new CRadioButtonList('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES))
-							->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
-							->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
-					))
-						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_SMALL_WIDTH.'px;')
+					(new CRadioButtonList('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES))
+						->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
+						->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
+						->setModern(true)
 				]))
 					->setId('newCheckPrivProtocolRow')
 					->toString() ?>

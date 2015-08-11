@@ -690,15 +690,12 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 $inventoryFormList = new CFormList('inventorylist');
 
 $inventoryFormList->addRow(null,
-	(new CDiv(
-		(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
-			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
-			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
-			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
-	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
+		->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+		->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+		->setModern(true)
 );
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$inventoryFormList->addVar('inventory_mode', $data['inventory_mode']);

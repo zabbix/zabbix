@@ -339,15 +339,12 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 $inventoryMode = (isset($hostPrototype['inventory']['inventory_mode'])) ? $hostPrototype['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
 $inventoryFormList = (new CFormList('inventorylist'))
 	->addRow(null,
-		(new CDiv(
-			(new CRadioButtonList('inventory_mode', (int) $inventoryMode))
-				->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
-				->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
-				->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-				->setEnabled($hostPrototype['templateid'] == 0)
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		(new CRadioButtonList('inventory_mode', (int) $inventoryMode))
+			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+			->setEnabled($hostPrototype['templateid'] == 0)
+			->setModern(true)
 	);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);

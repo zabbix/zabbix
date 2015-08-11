@@ -644,24 +644,18 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
  */
 if (in_array($resourceType, [SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO])) {
 	$screenFormList->addRow(_('Style'),
-		(new CDiv(
-			(new CRadioButtonList('style', (int) $style))
-				->addValue(_('Horizontal'), STYLE_HORIZONTAL)
-				->addValue(_('Vertical'), STYLE_VERTICAL)
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		(new CRadioButtonList('style', (int) $style))
+			->addValue(_('Horizontal'), STYLE_HORIZONTAL)
+			->addValue(_('Vertical'), STYLE_VERTICAL)
+			->setModern(true)
 	);
 }
 elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
 	$screenFormList->addRow(_('Hosts location'),
-		(new CDiv(
-			(new CRadioButtonList('style', (int) $style))
-				->addValue(_('Left'), STYLE_LEFT)
-				->addValue(_('Top'), STYLE_TOP)
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		(new CRadioButtonList('style', (int) $style))
+			->addValue(_('Left'), STYLE_LEFT)
+			->addValue(_('Top'), STYLE_TOP)
+			->setModern(true)
 	);
 }
 elseif ($resourceType != SCREEN_RESOURCE_CLOCK) {
@@ -707,14 +701,11 @@ $resourcesWithHAlign = [
 ];
 if (in_array($resourceType, $resourcesWithHAlign)) {
 	$screenFormList->addRow(_('Horizontal align'),
-		(new CDiv(
-			(new CRadioButtonList('halign', (int) $halign))
-				->addValue(_('Left'), HALIGN_LEFT)
-				->addValue(_('Center'), HALIGN_CENTER)
-				->addValue(_('Right'), HALIGN_RIGHT)
-		))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		(new CRadioButtonList('halign', (int) $halign))
+			->addValue(_('Left'), HALIGN_LEFT)
+			->addValue(_('Center'), HALIGN_CENTER)
+			->addValue(_('Right'), HALIGN_RIGHT)
+			->setModern(true)
 	);
 }
 else {
@@ -722,14 +713,11 @@ else {
 }
 
 $screenFormList->addRow(_('Vertical align'),
-	(new CDiv(
-		(new CRadioButtonList('valign', (int) $valign))
-			->addValue(_('Top'), VALIGN_TOP)
-			->addValue(_('Middle'), VALIGN_MIDDLE)
-			->addValue(_('Bottom'), VALIGN_BOTTOM)
-	))
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	(new CRadioButtonList('valign', (int) $valign))
+		->addValue(_('Top'), VALIGN_TOP)
+		->addValue(_('Middle'), VALIGN_MIDDLE)
+		->addValue(_('Bottom'), VALIGN_BOTTOM)
+		->setModern(true)
 );
 $screenFormList->addRow(_('Column span'),
 	(new CNumericBox('colspan', $colspan, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
