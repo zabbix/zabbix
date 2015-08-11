@@ -602,7 +602,8 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 		{
 			Re(ZBX_MATRIX_ROW(roots, 0)) = Re(ZBX_MATRIX_ROW(roots, 1)) =
 					-0.5 * ZBX_MATRIX_EL(coefficients, 1, 0) / ZBX_MATRIX_EL(coefficients, 2, 0);
-			Im(ZBX_MATRIX_ROW(roots, 0)) = -(Im(ZBX_MATRIX_ROW(roots, 1)) = sqrt(-temp));
+			Im(ZBX_MATRIX_ROW(roots, 0)) = -(Im(ZBX_MATRIX_ROW(roots, 1)) = 0.5 * sqrt(-temp)) /
+					ZBX_MATRIX_EL(coefficients, 2, 0);
 		}
 
 		return ZBX_MATH_OK;
@@ -648,8 +649,6 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 	{
 		if (0 == root_init)
 		{
-			radius *= 2.0;
-
 			if (radius <= upper_bound)
 			{
 				for (i = 0; i < degree - first_nonzero; ++i)
@@ -659,6 +658,8 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 					Im(ZBX_MATRIX_ROW(roots, i)) = radius * sin((2.0 * M_PI * (i + 0.25)) /
 							(degree - first_nonzero));
 				}
+
+				radius *= 2.0;
 			}
 			else
 			{
