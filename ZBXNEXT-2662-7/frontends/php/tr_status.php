@@ -680,7 +680,7 @@ foreach ($triggers as $trigger) {
 	if ($showEvents == EVENTS_OPTION_NOEVENT) {
 		$openOrCloseDiv = null;
 	}
-	elseif ($trigger['events']) {
+	elseif (array_key_exists('events', $trigger) && $trigger['events']) {
 		$openOrCloseDiv = (new CDiv())
 			->addClass(ZBX_STYLE_TREEVIEW)
 			->setAttribute('data-switcherid', $trigger['triggerid'])
