@@ -109,7 +109,7 @@ my $rv = GetOptions(\%OPTS,
 		    "get-nsservers-list!",
 		    "update-nsservers!",
 		    "list-services!",
-		    "only-cron!",
+		    "setup-cron!",
 		    "verbose!",
 		    "quiet!",
 		    "help|?");
@@ -129,8 +129,9 @@ my $config = get_rsm_config();
 pfail("SLV scripts path is not specified. Please check configuration file") unless defined $config->{'slv'}->{'path'};
 
 #### Creating cron objects ####
-if (defined($OPTS{'only-cron'})) {
-    create_cron_items($config->{'slv'}->{'path'});
+if (defined($OPTS{'setup-cron'})) {
+    create_cron_jobs($config->{'slv'}->{'path'});
+    print("cron jobs created successfully\n");
     exit;
 }
 
@@ -358,9 +359,6 @@ foreach my $proxyid (sort keys %{$proxies}) {
 }
 
 create_probe_status_host($probes_mon_groupid);
-
-#### Creating cron objects ####
-create_cron_items($config->{'slv'}->{'path'});
 
 exit;
 
@@ -1547,8 +1545,8 @@ Other options
 		(default: $cfg_default_rdds_ns_string)
         --rdds-test-prefix=STRING
 		domain test prefix for RDDS monitoring (needed only if rdds servers specified)
-        --only-cron
-		only create cron jobs and exit
+        --setup-cron
+		create cron jobs and exit
 	--epp
 		Action with EPP
 		(default: no)
@@ -1567,7 +1565,7 @@ exit(1);
 sub validate_input {
     my $msg = "";
 
-    return if (defined($OPTS{'only-cron'}));
+    return if (defined($OPTS{'setup-cron'}));
 
     $msg  = "TLD must be specified (--tld)\n" if (!defined($OPTS{'tld'}) and !defined($OPTS{'get-nsservers-list'}) and !defined($OPTS{'list-services'}));
 

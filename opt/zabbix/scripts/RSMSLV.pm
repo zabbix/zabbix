@@ -1858,7 +1858,7 @@ sub get_incidents
 
 	unless ($rows == 1)
 	{
-		wrn("item $itemid must have one not classified trigger (found: $rows)");
+		wrn("configuration error: item $itemid must have one not classified trigger (found: $rows)");
 		return \@incidents;
 	}
 

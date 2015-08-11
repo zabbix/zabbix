@@ -391,7 +391,6 @@ for (my $i = 0; $i < scalar(@tlds); $i++)
 		my $continue_file = $servicedata->{$tld}->{$service}->{'continue_file'};
 
 		my $avail_key = "rsm.slv.$service.avail";
-		#my $avail_itemid = get_itemid_by_hostid($tld_hostid, $avail_key);
 		my $avail_itemid = $avail_keys->{$tld_hostid}->{$service};
 
 		if (!$avail_itemid)
