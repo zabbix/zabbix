@@ -2198,3 +2198,23 @@ fail:
 
 	return res;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_coredump_disable                                             *
+ *                                                                            *
+ * Purpose: disable core dump                                                 *
+ *                                                                            *
+ * Return value: SUCCEED - core dump disabled                                 *
+ *               FAIL - error                                                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_coredump_disable(void)
+{
+	struct rlimit	limit;
+
+	limit.rlim_cur = 0;
+	limit.rlim_max = 0;
+
+	return 0 == setrlimit(RLIMIT_CORE, &limit) ? SUCCEED : FAIL;
+}
