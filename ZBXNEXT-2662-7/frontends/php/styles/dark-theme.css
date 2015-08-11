@@ -197,7 +197,8 @@ ul.top-nav-icons {
   right: 0; }
   ul.top-nav-icons li {
     display: block;
-    float: left; }
+    float: left;
+    background-color: #2b2b2b; }
     ul.top-nav-icons li .search-suggest {
       min-width: 186px; }
       ul.top-nav-icons li .search-suggest li {
@@ -915,6 +916,7 @@ footer, .footer {
     margin-right: 0; }
 
 .radio-segmented li {
+  position: relative;
   display: inline-block;
   margin: 0 -1px 0 0; }
   .radio-segmented li:first-child label {
@@ -2192,7 +2194,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .cursor-pointer {
   cursor: pointer; }
 
-.overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a, .server-name {
+.overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -2205,16 +2207,12 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   display: inline-block; }
 
 .server-name {
-  position: absolute;
-  z-index: 100;
-  top: 36px;
-  right: 13px;
-  padding: 2px 4px;
+  font-size: 0.85em;
   max-width: 180px;
-  display: inline-block;
-  border-top: 1px solid black;
-  background-color: #2f280a; }
+  padding: 4px 7px; }
 
 .list-hor-min-width li {
   display: inline-block;
   min-width: 2em; }
+  .list-hor-min-width li:last-child {
+    min-width: auto; }
