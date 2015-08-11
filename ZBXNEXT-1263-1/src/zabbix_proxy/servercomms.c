@@ -38,27 +38,21 @@ extern char	*CONFIG_TLS_PSK_IDENTITY;
 int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 {
 	int	res, lastlogtime, now;
-	char	*tls_arg1, *tls_arg2;
+	char	*tls_arg1 = NULL, *tls_arg2 = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d]",
 			CONFIG_SERVER, CONFIG_SERVER_PORT, timeout);
 
-	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
-	{
-		tls_arg1 = NULL;
-		tls_arg2 = NULL;
-	}
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
 	{
 		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
 		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
 	}
-	else	/* ZBX_TCP_SEC_TLS_PSK */
-	{
-		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
-	}
+	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
+
+	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif
 	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout,
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))

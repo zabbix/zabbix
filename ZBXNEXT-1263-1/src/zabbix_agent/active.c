@@ -490,7 +490,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 	ZBX_THREAD_LOCAL static int	last_ret = SUCCEED;
 	int				ret;
-	char				*tls_arg1, *tls_arg2;
+	char				*tls_arg1 = NULL, *tls_arg2 = NULL;
 	zbx_socket_t			s;
 	struct zbx_json			json;
 
@@ -561,22 +561,16 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
 
-	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
-	{
-		tls_arg1 = NULL;
-		tls_arg2 = NULL;
-	}
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
 	{
 		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
 		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
 	}
-	else	/* ZBX_TCP_SEC_TLS_PSK */
-	{
-		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
-	}
+	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
+
+	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
@@ -682,7 +676,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	const char			*__function_name = "send_buffer";
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
 	int				ret = SUCCEED, i, now;
-	char				*tls_arg1, *tls_arg2;
+	char				*tls_arg1 = NULL, *tls_arg2 = NULL;
 	zbx_timespec_t			ts;
 	const char			*err_send_step = "";
 	zbx_socket_t			s;
@@ -742,22 +736,16 @@ static int	send_buffer(const char *host, unsigned short port)
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
 
-	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
-	{
-		tls_arg1 = NULL;
-		tls_arg2 = NULL;
-	}
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
 	{
 		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
 		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
 	}
-	else	/* ZBX_TCP_SEC_TLS_PSK */
-	{
-		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
-		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
-	}
+	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
+
+	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
 			configured_tls_connect_mode, tls_arg1, tls_arg2)))
