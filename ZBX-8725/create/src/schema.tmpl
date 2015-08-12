@@ -171,6 +171,7 @@ TABLE|applications|applicationid|ZBX_DATA
 FIELD		|applicationid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|2		|hostid,name
 
 TABLE|httptest|httptestid|ZBX_DATA
@@ -618,23 +619,20 @@ INDEX		|2		|graphid
 
 TABLE|graph_theme|graphthemeid|ZBX_DATA
 FIELD		|graphthemeid	|t_id		|	|NOT NULL	|0
-FIELD		|description	|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|theme		|t_varchar(64)	|''	|NOT NULL	|0
-FIELD		|backgroundcolor|t_varchar(6)	|'F0F0F0'|NOT NULL	|0
-FIELD		|graphcolor	|t_varchar(6)	|'FFFFFF'|NOT NULL	|0
-FIELD		|graphbordercolor|t_varchar(6)	|'222222'|NOT NULL	|0
-FIELD		|gridcolor	|t_varchar(6)	|'CCCCCC'|NOT NULL	|0
-FIELD		|maingridcolor	|t_varchar(6)	|'AAAAAA'|NOT NULL	|0
-FIELD		|gridbordercolor|t_varchar(6)	|'000000'|NOT NULL	|0
-FIELD		|textcolor	|t_varchar(6)	|'202020'|NOT NULL	|0
-FIELD		|highlightcolor	|t_varchar(6)	|'AA4444'|NOT NULL	|0
-FIELD		|leftpercentilecolor|t_varchar(6)|'11CC11'|NOT NULL	|0
-FIELD		|rightpercentilecolor|t_varchar(6)|'CC1111'|NOT NULL	|0
-FIELD		|nonworktimecolor|t_varchar(6)	|'CCCCCC'|NOT NULL	|0
-FIELD		|gridview	|t_integer	|1	|NOT NULL	|0
-FIELD		|legendview	|t_integer	|1	|NOT NULL	|0
-UNIQUE		|1		|description
-INDEX		|2		|theme
+FIELD		|backgroundcolor|t_varchar(6)	|''	|NOT NULL	|0
+FIELD		|graphcolor	|t_varchar(6)	|''	|NOT NULL	|0
+FIELD		|gridcolor	|t_varchar(6)	|''	|NOT NULL	|0
+FIELD		|maingridcolor	|t_varchar(6)	|''	|NOT NULL	|0
+FIELD		|gridbordercolor|t_varchar(6)	|''	|NOT NULL	|0
+FIELD		|textcolor	|t_varchar(6)	|''	|NOT NULL	|0
+FIELD		|highlightcolor	|t_varchar(6)	|''	|NOT NULL	|0
+FIELD		|leftpercentilecolor|t_varchar(6)|''	|NOT NULL	|0
+FIELD		|rightpercentilecolor|t_varchar(6)|''	|NOT NULL	|0
+FIELD		|nonworktimecolor|t_varchar(6)	|''	|NOT NULL	|0
+FIELD		|gridview	|t_integer	|'1'	|NOT NULL	|0
+FIELD		|legendview	|t_integer	|'1'	|NOT NULL	|0
+UNIQUE		|1		|theme
 
 TABLE|globalmacro|globalmacroid|ZBX_DATA
 FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
@@ -1269,7 +1267,32 @@ FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|itemid
 
+TABLE|application_prototype|application_prototypeid|ZBX_DATA
+FIELD		|application_prototypeid|t_id	|	|NOT NULL	|0
+FIELD		|itemid		|t_id		|	|NOT NULL	|0			|1|items
+FIELD		|templateid	|t_id		|	|NULL		|0			|2|application_prototype|application_prototypeid
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|itemid
+INDEX		|2		|templateid
+
+TABLE|item_application_prototype|item_application_prototypeid|ZBX_DATA
+FIELD		|item_application_prototypeid|t_id|	|NOT NULL	|0
+FIELD		|application_prototypeid|t_id	|	|NOT NULL	|0			|1|application_prototype
+FIELD		|itemid		|t_id		|	|NOT NULL	|0			|2|items
+UNIQUE		|1		|application_prototypeid,itemid
+INDEX		|2		|itemid
+
+TABLE|application_discovery|application_discoveryid|ZBX_DATA
+FIELD		|application_discoveryid|t_id	|	|NOT NULL	|0
+FIELD		|applicationid	|t_id		|	|NOT NULL	|0			|1|applications
+FIELD		|application_prototypeid|t_id	|	|NOT NULL	|0			|2|application_prototype
+FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
+FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
+INDEX		|1		|applicationid
+INDEX		|2		|application_prototypeid
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050023	|2050023
+ROW		|2050045	|2050045

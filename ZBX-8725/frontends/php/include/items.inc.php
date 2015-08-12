@@ -442,21 +442,32 @@ function copyItems($srcHostId, $dstHostId) {
 	return API::Item()->create($srcItems);
 }
 
-function copyApplications($srcHostId, $dstHostId) {
-	$apps_to_clone = API::Application()->get([
-		'hostids' => $srcHostId,
-		'output' => API_OUTPUT_EXTEND,
-		'inherited' => false
+/**
+ * Copy applications to a different host.
+ *
+ * @param string $source_hostid
+ * @param string $destination_hostid
+ *
+ * @return bool
+ */
+function copyApplications($source_hostid, $destination_hostid) {
+	$applications_to_create = API::Application()->get([
+		'output' => ['name'],
+		'hostids' => [$source_hostid],
+		'inherited' => false,
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 	]);
-	if (empty($apps_to_clone)) {
+
+	if (!$applications_to_create) {
 		return true;
 	}
 
-	foreach ($apps_to_clone as &$app) {
-		$app['hostid'] = $dstHostId;
-		unset($app['applicationid'], $app['templateid']);
+	foreach ($applications_to_create as &$application) {
+		$application['hostid'] = $destination_hostid;
+		unset($application['applicationid'], $application['templateid']);
 	}
-	return API::Application()->create($apps_to_clone);
+
+	return (bool) API::Application()->create($applications_to_create);
 }
 
 function activate_item($itemids) {
