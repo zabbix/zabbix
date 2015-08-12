@@ -191,8 +191,6 @@ class CConditionFormula {
 			$this->isValid = false;
 		}
 
-		$this->constants = array_unique($this->constants);
-
 		return $this->isValid;
 	}
 
@@ -214,7 +212,10 @@ class CConditionFormula {
 		}
 
 		$constant = substr($this->formula, $start, $this->pos - $start);
-		$this->constants[] = $constant;
+		$this->constants[] = array(
+			'value' => $constant,
+			'pos' => $start
+		);
 
 		$this->pos--;
 
