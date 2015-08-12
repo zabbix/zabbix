@@ -65,11 +65,17 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
+	{
 		SET_UI64_RESULT(result, s.f_files);
+	}
 	else if (0 == strcmp(mode, "free"))
+	{
 		SET_UI64_RESULT(result, s.ZBX_FFREE);
+	}
 	else if (0 == strcmp(mode, "used"))
+	{
 		SET_UI64_RESULT(result, s.f_files - s.f_ffree);
+	}
 	else if (0 == strcmp(mode, "pfree"))
 	{
 		total = s.f_files;
@@ -91,7 +97,9 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 		total -= s.f_ffree - s.f_favail;
 #endif
 		if (0 != total)
+		{
 			SET_DBL_RESULT(result, 100.0 - (double)(100.0 * s.ZBX_FFREE) / total);
+		}
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
