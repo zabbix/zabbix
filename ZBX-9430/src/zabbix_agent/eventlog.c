@@ -737,7 +737,7 @@ static int	zbx_get_eventlog_message6(LPCWSTR wsource, zbx_uint64_t *which, unsig
 	const zbx_uint64_t	failure_audit = 0x10000000000000;
 	int			ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() lastlogsize:" ZBX_FS_UI64, __function_name, *which);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() EventRecordID:" ZBX_FS_UI64, __function_name, *which);
 
 	if (NULL == *query)
 	{
@@ -745,16 +745,29 @@ static int	zbx_get_eventlog_message6(LPCWSTR wsource, zbx_uint64_t *which, unsig
 		goto out;
 	}
 
-	/* get the entries and allocate required space */
-	renderedContent = zbx_malloc(renderedContent, size);
+	/* get the entries */
 	if (TRUE != EvtNext(*query, 1, &event_bookmark, INFINITE, 0, &require))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "EvtNext failed: %s, lastlogsize:" ZBX_FS_UI64,
+		/* The event reading query had less items than we calculated before. */
+		/* Either the eventlog was cleaned or our calculations were wrong.   */
+		/* Either way we can safely abort the query by setting NULL value    */
+		/* and returning success, which is interpreted as empty eventlog.    */
+		if (ERROR_NO_MORE_ITEMS == GetLastError())
+		{
+			ret = SUCCEED;
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "EvtNext failed: %s, EventRecordID:" ZBX_FS_UI64,
 				strerror_from_system(GetLastError()), *which);
+		}
 		goto out;
 	}
 
 	/* obtain the information from the selected events */
+
+	renderedContent = zbx_malloc(renderedContent, size);
+
 	if (TRUE != EvtRender(*render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
 			&require, &bookmarkedCount) )
 	{
@@ -907,7 +920,10 @@ int	process_eventlog6(const char *source, zbx_uint64_t *lastlogsize, unsigned lo
 		if (SUCCEED == zbx_get_eventlog_message6(wsource, &i, out_severity, out_timestamp, out_provider,
 				out_source, out_message, out_eventid, render_context, query, keywords))
 		{
-			*lastlogsize = i;
+			/* update lastlogsize only if we really did read eventlog message */
+			if (NULL != *out_message)
+				*lastlogsize = i;
+
 			ret = SUCCEED;
 			goto out;
 		}
