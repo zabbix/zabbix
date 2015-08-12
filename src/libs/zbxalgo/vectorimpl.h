@@ -134,7 +134,7 @@ void	zbx_vector_ ## __id ## _uniq(zbx_vector_ ## __id ## _t *vector, zbx_compare
 	}													\
 }														\
 														\
-int	zbx_vector_ ## __id ## _nearestindex(zbx_vector_ ## __id ## _t *vector, const __type value,		\
+int	zbx_vector_ ## __id ## _nearestindex(const zbx_vector_ ## __id ## _t *vector, const __type value,	\
 									zbx_compare_func_t compare_func)	\
 {														\
 	int	lo = 0, hi = vector->values_num, mid, c;							\
@@ -160,7 +160,7 @@ int	zbx_vector_ ## __id ## _nearestindex(zbx_vector_ ## __id ## _t *vector, cons
 	return hi;												\
 }														\
 														\
-int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, const __type value,			\
+int	zbx_vector_ ## __id ## _bsearch(const zbx_vector_ ## __id ## _t *vector, const __type value,		\
 									zbx_compare_func_t compare_func)	\
 {														\
 	__type	*ptr;												\
@@ -173,7 +173,7 @@ int	zbx_vector_ ## __id ## _bsearch(zbx_vector_ ## __id ## _t *vector, const __t
 		return FAIL;											\
 }														\
 														\
-int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, const __type value, int *index,	\
+int	zbx_vector_ ## __id ## _lsearch(const zbx_vector_ ## __id ## _t *vector, const __type value, int *index,\
 									zbx_compare_func_t compare_func)	\
 {														\
 	while (*index < vector->values_num)									\
@@ -196,7 +196,7 @@ int	zbx_vector_ ## __id ## _lsearch(zbx_vector_ ## __id ## _t *vector, const __t
 	return FAIL;												\
 }														\
 														\
-int	zbx_vector_ ## __id ## _search(zbx_vector_ ## __id ## _t *vector, const __type value,			\
+int	zbx_vector_ ## __id ## _search(const zbx_vector_ ## __id ## _t *vector, const __type value,		\
 									zbx_compare_func_t compare_func)	\
 {														\
 	int	index;												\

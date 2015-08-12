@@ -19,19 +19,18 @@
 **/
 
 
-$widget = (new CWidget())->setTitle(_('Items'));
-
-$host = $this->data['host'];
+$widget = (new CWidget())->setTitle(_('Item prototypes'));
 
 if (!empty($this->data['hostid'])) {
-	$widget->addItem(get_header_host_table('items', $this->data['hostid']));
+	$widget->addItem(get_header_host_table('items', $this->data['hostid'], $this->data['parent_discoveryid']));
 }
 
 // create form
 $itemForm = (new CForm())
 	->setName('itemForm')
 	->addVar('form', $this->data['form'])
-	->addVar('hostid', $this->data['hostid']);
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
 
 if (!empty($this->data['itemid'])) {
 	$itemForm->addVar('itemid', $this->data['itemid']);
@@ -60,6 +59,7 @@ else {
 	$itemFormList->addRow(_('Type'), new CComboBox('type', $this->data['type'], null, $this->data['types']));
 }
 
+// append key to form list
 $key_controls = [
 	(new CTextBox('key', $this->data['key'], $this->data['limited']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 ];
@@ -72,7 +72,6 @@ if (!$this->data['limited']) {
 
 }
 
-// append key to form list
 $itemFormList->addRow(_('Key'), $key_controls);
 
 // append interfaces to form list
@@ -345,44 +344,10 @@ $itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], fa
 
 $keepHistory = [];
 $keepHistory[] = (new CNumericBox('history', $this->data['history'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
-
-if ($data['config']['hk_history_global']
-		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
-	$keepHistory[] = ' '._x('Overridden by', 'item_form').' ';
-
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
-			->setAttribute('target', '_blank');
-		$keepHistory[] = $link;
-	}
-	else {
-		$keepHistory[] = _x('global housekeeping settings', 'item_form');
-	}
-
-	$keepHistory[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_history']).')';
-}
-
 $itemFormList->addRow(_('History storage period (in days)'), $keepHistory);
 
 $keepTrend = [];
 $keepTrend[] = (new CNumericBox('trends', $this->data['trends'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
-
-if ($data['config']['hk_trends_global']
-		&& ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED)) {
-	$keepTrend[] = ' '._x('Overridden by', 'item_form').' ';
-
-	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-		$link = (new CLink(_x('global housekeeping settings', 'item_form'), 'adm.housekeeper.php'))
-			->setAttribute('target', '_blank');
-		$keepTrend[] = $link;
-	}
-	else {
-		$keepTrend[] = _x('global housekeeping settings', 'item_form');
-	}
-
-	$keepTrend[] = ' ('._n('%1$s day', '%1$s days', $data['config']['hk_trends']).')';
-}
-
 $itemFormList->addRow(_('Trend storage period (in days)'), $keepTrend, false, 'row_trends');
 
 $itemFormList->addRow(_('Log time format'),
@@ -399,7 +364,8 @@ $deltaOptions = [
 ];
 if ($this->data['limited']) {
 	$itemForm->addVar('delta', $this->data['delta']);
-	$deltaComboBox = (new CTextBox('delta_name', $deltaOptions[$this->data['delta']], true))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
+	$deltaComboBox = (new CTextBox('delta_name', $deltaOptions[$this->data['delta']], true))
+		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 else {
 	$deltaComboBox= new CComboBox('delta', $this->data['delta'], null, $deltaOptions);
@@ -428,6 +394,7 @@ $itemFormList->addRow(_('Allowed hosts'),
 	(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 	false, 'row_trapper_hosts');
 
+// append applications to form list
 $itemFormList->addRow(new CLabel(_('New application'), 'new_application'),
 	(new CSpan(
 		(new CTextBox('new_application', $this->data['new_application']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -441,28 +408,20 @@ foreach ($this->data['db_applications'] as $application) {
 }
 $itemFormList->addRow(_('Applications'), $applicationComboBox);
 
-// append populate host to form list
-$hostInventoryFieldComboBox = new CComboBox('inventory_link');
-$hostInventoryFieldComboBox->addItem(0, '-'._('None').'-', $this->data['inventory_link'] == '0' ? 'yes' : null);
+// Append application prototypes to form list.
+$itemFormList->addRow(new CLabel(_('New application prototype'), 'new_application_prototype'),
+	(new CSpan(
+		(new CTextBox('new_application_prototype', $data['new_application_prototype']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+);
 
-// a list of available host inventory fields
-foreach ($this->data['possibleHostInventories'] as $fieldNo => $fieldInfo) {
-	if (isset($this->data['alreadyPopulated'][$fieldNo])) {
-		$enabled = isset($this->data['item']['inventory_link'])
-			? $this->data['item']['inventory_link'] == $fieldNo
-			: $this->data['inventory_link'] == $fieldNo && !hasRequest('clone');
-	}
-	else {
-		$enabled = true;
-	}
-	$hostInventoryFieldComboBox->addItem(
-		$fieldNo,
-		$fieldInfo['title'],
-		$this->data['inventory_link'] == $fieldNo && $enabled ? 'yes' : null,
-		$enabled
-	);
+$application_prototype_listbox = new CListBox('application_prototypes[]', $data['application_prototypes'], 6);
+$application_prototype_listbox->addItem(0, '-'._('None').'-');
+foreach ($data['db_application_prototypes'] as $application_prototype) {
+	$application_prototype_listbox->addItem($application_prototype['name'], $application_prototype['name']);
 }
-$itemFormList->addRow(_('Populates host inventory field'), $hostInventoryFieldComboBox, false, 'row_inventory_link');
+$itemFormList->addRow(_('Application prototypes'), $application_prototype_listbox);
 
 // append description to form list
 $itemFormList->addRow(_('Description'),
@@ -481,32 +440,26 @@ $itemTab = (new CTabView())->addTab('itemTab', $this->data['caption'], $itemForm
 if ($this->data['itemid'] != 0) {
 	$buttons = [new CSubmit('clone', _('Clone'))];
 
-	if ($host['status'] == HOST_STATUS_MONITORED || $host['status'] == HOST_STATUS_NOT_MONITORED) {
-		$buttons[] = new CButtonQMessage(
-			'del_history',
-			_('Clear history and trends'),
-			_('History clearing can take a long time. Continue?')
+	if (!$this->data['limited']) {
+		$buttons[] = new CButtonDelete(_('Delete item prototype?'),
+			url_params(['form', 'groupid', 'itemid', 'parent_discoveryid', 'hostid'])
 		);
 	}
 
-	if (!$this->data['limited']) {
-		$buttons[] = new CButtonDelete(_('Delete item?'), url_params(['form', 'groupid', 'itemid', 'hostid']));
-	}
-
-	$buttons[] = new CButtonCancel(url_param('groupid').url_param('hostid'));
+	$buttons[] = new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'));
 
 	$itemTab->setFooter(makeFormFooter(new CSubmit('update', _('Update')), $buttons));
 }
 else {
 	$itemTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		[new CButtonCancel(url_param('groupid').url_param('hostid'))]
+		[new CButtonCancel(url_param('groupid').url_param('parent_discoveryid').url_param('hostid'))]
 	));
 }
 
 $itemForm->addItem($itemTab);
 $widget->addItem($itemForm);
 
-require_once dirname(__FILE__).'/js/configuration.item.edit.js.php';
+require_once dirname(__FILE__).'/js/configuration.item.prototype.edit.js.php';
 
 return $widget;

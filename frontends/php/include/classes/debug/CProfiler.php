@@ -136,7 +136,7 @@ class CProfiler {
 
 			// api method
 			$debug[] = ($i + 1).'. ';
-			$debug[] = new CTag('b', true, $class.'.'.$method);
+			$debug[] = bold($class.'.'.$method);
 			$debug[] = ($file !== null ? ' ['.$file.':'.$line.']' : null);
 			$debug[] = BR();
 			$debug[] = BR();
@@ -159,16 +159,16 @@ class CProfiler {
 			$sql = [
 				'SQL ('.$time.'): ',
 				(new CSpan($query[1]))
-					->addClass(substr($query[1], 0, 6) === 'SELECT' ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+					->addClass(substr($query[1], 0, 6) === 'SELECT' ? ZBX_STYLE_GREEN : ZBX_STYLE_BLUE),
 				BR()
 			];
 
 			if ($time > $this->slowSqlQueryTime) {
-				$sql = new CTag('b', true, $sql);
+				$sql = bold($sql);
 			}
 			$debug[] = $sql;
 
-			$debug[] = (new CSpan($this->formatCallStack($query[2])))->addStyle('font-style: italic;');
+			$debug[] = $this->formatCallStack($query[2]);
 			$debug[] = BR();
 			$debug[] = BR();
 		}
