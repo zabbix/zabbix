@@ -942,16 +942,25 @@ footer, .footer {
     background-color: #fff; }
     .radio-segmented input[type="radio"] + label:hover {
       background-color: #eef7ff; }
-    .radio-segmented input[type="radio"] + label:focus {
-      background-color: #eef7ff;
-      border: 1px solid #0275b8;
-      position: relative; }
     .radio-segmented input[type="radio"] + label:active {
-      background-color: #eef7ff; }
+      color: #fff;
+      border-color: #acbbc2;
+      background-color: #acbbc2; }
+  .radio-segmented input[type="radio"]:focus + label {
+    border-color: #0275b8;
+    background-color: #eef7ff;
+    position: relative;
+    z-index: 1; }
   .radio-segmented input[type="radio"]:checked + label {
     color: #fff;
     border-color: #acbbc2;
     background-color: #acbbc2; }
+  .radio-segmented input[type="radio"]:checked:focus + label {
+    border-color: #0275b8;
+    position: relative;
+    z-index: 1; }
+  .radio-segmented input[type="radio"]:checked[disabled] + label {
+    background-color: #d8dfe2; }
 
 label input[type="checkbox"] {
   margin-right: 3px; }
@@ -1092,7 +1101,8 @@ button {
     border-color: #0275b8; }
   .btn-grey:active {
     color: #1f2c33;
-    background-color: #eef7ff; }
+    background-color: #eef7ff;
+    border-color: #0275b8; }
 
 .btn-link, .btn-link:hover, .btn-link:focus, .btn-link:active {
   background-color: transparent;
@@ -1217,7 +1227,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border-color: #ccd5d9;
   cursor: default; }
 
-input[disabled], input[readonly], textarea[disabled], textarea[readonly], select[disabled], select[readonly] {
+.radio-segmented input[type="radio"][disabled] + label, input[disabled], input[readonly], textarea[disabled], textarea[readonly], select[disabled], select[readonly] {
   color: #acbbc2;
   background-color: #ebebeb;
   border-color: #ccd5d9; }
