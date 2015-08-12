@@ -575,7 +575,7 @@ else {
 	$config = select_config();
 
 	$controls = (new CList())
-		->addItem([_('Group').SPACE, $pageFilter->getGroupsCB()])
+		->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()])
 		->addItem(new CSubmit('form', _('Create template')))
 		->addItem(
 			(new CButton('form', _('Import')))
