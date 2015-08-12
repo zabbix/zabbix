@@ -319,11 +319,21 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
 	const unsigned int	bits[] = { BADCERT_EXPIRED, BADCERT_REVOKED, BADCERT_CN_MISMATCH,
 				BADCERT_NOT_TRUSTED, BADCRL_NOT_TRUSTED,
 				BADCRL_EXPIRED, BADCERT_MISSING, BADCERT_SKIP_VERIFY, BADCERT_OTHER,
-				BADCERT_FUTURE, BADCRL_FUTURE, 0 };
+				BADCERT_FUTURE, BADCRL_FUTURE,
+#if POLARSSL_VERSION_NUMBER >= 0x01030B00	/* 1.3.11 */
+				BADCERT_KEY_USAGE, BADCERT_EXT_KEY_USAGE, BADCERT_NS_CERT_TYPE,
+#endif
+				0 };
 	const char		*msgs[] = { "expired", "revoked", "Common Name mismatch",
 				"self-signed or not signed by trusted CA", "CRL not signed by trusted CA",
 				"CRL expired", "certificate missing", "verification skipped", "other reason",
-				"validity starts in future", "CRL validity starts in future" };
+				"validity starts in future", "CRL validity starts in future"
+#if POLARSSL_VERSION_NUMBER >= 0x01030B00	/* 1.3.11 */
+				, "actual use does not match keyUsage extension",
+				"actual use does not match extendedKeyUsage extension",
+				"actual use does not match nsCertType extension"
+#endif
+				};
 	int			i = 0, k = 0;
 
 	*error = zbx_strdup(*error, "invalid peer certificate: ");
