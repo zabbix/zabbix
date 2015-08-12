@@ -96,6 +96,7 @@ Changes for 2.4.7rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-9739] fixed agent crash when active check fails without setting error message (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.6
