@@ -218,7 +218,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		tmp = get_rparam(&request, 2);
 
-		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<host>,"available"] */
+		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<type>,"available"] */
 		{
 			tmp = get_rparam(&request, 1);
 
@@ -240,7 +240,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(tmp, "maintenance"))	/* zabbix["host",,"maintenance"] */
 		{
-			/* this item always processed by server */
+			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
 			{
 				error = zbx_strdup(error, "Invalid second parameter.");
@@ -254,7 +254,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(tmp, "items"))	/* zabbix["host",,"items"] */
 		{
-			/* this item always processed by server */
+			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
 			{
 				error = zbx_strdup(error, "Invalid second parameter.");
@@ -265,7 +265,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
 		{
-			/* this item always processed by server */
+			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
 			{
 				error = zbx_strdup(error, "Invalid second parameter.");
@@ -285,7 +285,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		int	lastaccess;
 
-		/* this item always processed by server */
+		/* this item is always processed by server */
 
 		if (3 != nparams)
 		{
