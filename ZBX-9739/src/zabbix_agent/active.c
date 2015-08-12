@@ -912,6 +912,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		else
 			is_logrt = -1;
 
+		/* log or logrt */
 		if (-1 != is_logrt)
 		{
 			int		err, rc;
@@ -1033,7 +1034,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			zbx_free(err_msg_dyn);
 		}
-		/* special processing for eventlog */
+		/* eventlog */
 		else if (0 == strncmp(active_metrics[i].key, "eventlog[", 9))
 		{
 			ret = FAIL;
@@ -1306,6 +1307,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						NULL, NULL, NULL, 0);
 			}
 		}
+		/* other (not log, logrt or eventlog) */
 		else
 		{
 			if (SUCCEED == process(active_metrics[i].key, 0, &result))

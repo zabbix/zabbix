@@ -387,11 +387,11 @@ zbx_graph_yaxis_types_t;
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
-/* Zabbix Agent non-critical error */
-#define ZBX_ERROR		"ZBX_ERROR"
-
-/* the error message for unsupported items without specific error messages */
+/* the error message for not supported items when reason is unknown */
 #define ZBX_NOTSUPPORTED_MSG	"Unknown error."
+
+/* Zabbix Agent non-critical error (agents older than 2.0) */
+#define ZBX_ERROR		"ZBX_ERROR"
 
 /* media types */
 typedef enum
