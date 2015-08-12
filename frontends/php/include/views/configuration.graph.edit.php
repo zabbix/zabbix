@@ -324,7 +324,6 @@ $chartImage = (new CImg('chart3.php?period=3600'))->preload();
 
 $graphPreviewTable = (new CTable())
 	->addClass('center')
-	->addClass('maxwidth')
 	->addRow((new CDiv($chartImage))->setId('previewChar'));
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 

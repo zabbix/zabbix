@@ -192,7 +192,7 @@ class CScreenHistory extends CScreenBase {
 									$color = ZBX_STYLE_GREEN;
 									break;
 								case MARK_COLOR_BLUE:
-									$color = 'blue';
+									$color = ZBX_STYLE_BLUE;
 									break;
 							}
 						}
@@ -205,16 +205,17 @@ class CScreenHistory extends CScreenBase {
 
 						if ($useLogItem) {
 							$row[] = ($data['timestamp'] == 0)
-								? '-'
+								? ''
 								: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['timestamp']);
 
 							// if this is a eventLog item, showing additional info
 							if ($useEventLogItem) {
-								$row[] = ($data['source'] === '') ? '-' : $data['source'];
+								$row[] = ($data['source'] === '') ? '' : $data['source'];
 								$row[] = ($data['severity'] == 0)
-								? '-'
-								: (new CCol(get_item_logtype_description($data['severity'])))->addClass(get_item_logtype_style($data['severity']));
-								$row[] = ($data['logeventid'] == 0) ? '-' : $data['logeventid'];
+									? ''
+									: (new CCol(get_item_logtype_description($data['severity'])))
+										->addClass(get_item_logtype_style($data['severity']));
+								$row[] = ($data['logeventid'] == 0) ? '' : $data['logeventid'];
 							}
 						}
 

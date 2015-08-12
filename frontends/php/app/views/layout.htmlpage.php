@@ -55,7 +55,10 @@ function local_generateHeader($data) {
 				'selected' => $page['menu']
 			],
 			'user' => [
-				'is_guest' => CWebUser::isGuest()
+				'is_guest' => CWebUser::isGuest(),
+				'alias' => CWebUser::$data['alias'],
+				'name' => CWebUser::$data['name'],
+				'surname' => CWebUser::$data['surname']
 			]
 		]);
 		echo $pageMenu->getOutput();

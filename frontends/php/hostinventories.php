@@ -81,7 +81,7 @@ if ($hostId > 0) {
 
 	// overview tab
 	$data['host'] = API::Host()->get([
-		'output' => ['hostid', 'host', 'name', 'status', 'maintenance_status', 'description'],
+		'output' => ['hostid', 'host', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type', 'description'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
@@ -99,6 +99,14 @@ if ($hostId > 0) {
 
 	// resolve macros
 	$data['host']['interfaces'] = CMacrosResolverHelper::resolveHostInterfaces($data['host']['interfaces']);
+
+	if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+		$data['maintenances'] = API::Maintenance()->get([
+			'maintenanceids' => [$data['host']['maintenanceid']],
+			'output' => ['name', 'description'],
+			'preservekeys' => true
+		]);
+	}
 
 	// get permissions
 	$userType = CWebUser::getType();

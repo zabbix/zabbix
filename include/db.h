@@ -324,17 +324,6 @@ DB_MEDIATYPE;
 
 typedef struct
 {
-	zbx_uint64_t	actionid;
-	char		*shortdata;
-	char		*longdata;
-	int		esc_period;
-	unsigned char	eventsource;
-	unsigned char	recovery_msg;
-}
-DB_ACTION;
-
-typedef struct
-{
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
 	char		*value;
