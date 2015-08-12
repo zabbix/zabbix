@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-15 16:24+0300\n"
-"PO-Revision-Date: 2015-03-23 04:29+0300\n"
+"POT-Creation-Date: 2015-08-06 12:16+0300\n"
+"PO-Revision-Date: 2015-08-06 03:08+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1427077783.0\n"
+"X-POOTLE-MTIME: 1438823309.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -146,11 +146,11 @@ msgstr "-"
 msgid "----[BULK ACKNOWLEDGE]----"
 msgstr "----[障害対応コメントの一括処理]----"
 
-#: include/triggers.inc.php:2070 include/triggers.inc.php:2071
-#: include/triggers.inc.php:2072 include/triggers.inc.php:2074
-#: include/triggers.inc.php:2076 include/triggers.inc.php:2079
-#: include/triggers.inc.php:2082 include/triggers.inc.php:2083
-#: include/triggers.inc.php:2095
+#: include/triggers.inc.php:2071 include/triggers.inc.php:2072
+#: include/triggers.inc.php:2073 include/triggers.inc.php:2075
+#: include/triggers.inc.php:2077 include/triggers.inc.php:2080
+#: include/triggers.inc.php:2083 include/triggers.inc.php:2084
+#: include/triggers.inc.php:2096
 msgid "0 or 1"
 msgstr "0または1"
 
@@ -256,7 +256,7 @@ msgstr "アカウントは%s秒間ブロックされています"
 msgid "Ack"
 msgstr "コメントあり"
 
-#: acknow.php:233 jsLoader.php:181 tr_status.php:650
+#: acknow.php:233 jsLoader.php:181 tr_status.php:657
 msgid "Acknowledge"
 msgstr "障害対応コメント"
 
@@ -276,7 +276,7 @@ msgstr "コメントを入力して戻る"
 msgid "Acknowledge status"
 msgstr "障害対応コメントのステータス"
 
-#: include/events.inc.php:182 tr_status.php:295 tr_status.php:661
+#: include/events.inc.php:182 tr_status.php:295 tr_status.php:668
 msgid "Acknowledged"
 msgstr "障害対応済"
 
@@ -494,7 +494,7 @@ msgstr "終了日時"
 #: include/views/js/configuration.sysmaps.js.php:404
 #: include/views/monitoring.history.php:131 jsLoader.php:182
 #: popup_bitem.php:179 popup_media.php:137 popup_period.php:148
-#: tr_logform.php:263 tr_logform.php:350 tr_status.php:705
+#: tr_logform.php:263 tr_logform.php:350 tr_status.php:712
 msgid "Add"
 msgstr "追加"
 
@@ -650,7 +650,7 @@ msgstr "許可されたホスト"
 msgid "Amount of memory size in bytes. If mode is missing total is used."
 msgstr "バイト単位でのメモリサイズ、もしくは全体からのパーセント表示。modeが指定されない場合はtotalが利用される。"
 
-#: include/triggers.inc.php:1523
+#: include/triggers.inc.php:1524
 #: include/views/configuration.action.edit.php:120
 #: include/views/configuration.action.edit.php:988
 #: include/views/configuration.host.discovery.edit.php:278
@@ -1057,7 +1057,7 @@ msgstr "明るく"
 msgid "Bulgarian (bg_BG)"
 msgstr "ブルガリア語 (bg_BG)"
 
-#: tr_status.php:790
+#: tr_status.php:797
 msgid "Bulk acknowledge"
 msgstr "障害対応コメントの一括処理"
 
@@ -2617,7 +2617,7 @@ msgid "Change password"
 msgstr "パスワード変更"
 
 #: include/forms.inc.php:403 include/items.inc.php:125
-#: include/triggers.inc.php:2047 include/views/configuration.item.edit.php:213
+#: include/triggers.inc.php:2048 include/views/configuration.item.edit.php:213
 #: include/views/configuration.item.massupdate.php:210
 msgid "Character"
 msgstr "文字列"
@@ -3496,8 +3496,8 @@ msgstr "DES"
 msgid "DETAILS OF SCENARIO"
 msgstr "シナリオの名前"
 
-#: include/maps.inc.php:463 include/maps.inc.php:545 include/maps.inc.php:633
-#: include/maps.inc.php:723
+#: include/maps.inc.php:493 include/maps.inc.php:575 include/maps.inc.php:663
+#: include/maps.inc.php:753
 msgid "DISABLED"
 msgstr "無効"
 
@@ -4180,14 +4180,14 @@ msgstr "拒否"
 msgid "Dependencies"
 msgstr "依存関係"
 
-#: include/triggers.inc.php:1218 tr_status.php:554
+#: include/triggers.inc.php:1219 tr_status.php:561
 msgid "Dependent"
 msgstr "依存先"
 
-#: include/triggers.inc.php:1198
+#: include/triggers.inc.php:1199
 #: include/views/configuration.services.edit.php:117
 #: include/views/configuration.triggers.list.php:166 popup.php:1030
-#: tr_status.php:538
+#: tr_status.php:545
 msgid "Depends on"
 msgstr "依存先"
 
@@ -4410,8 +4410,8 @@ msgstr "選択したWebシナリオを無効にしますか？"
 #: auditlogs.php:142 dashboard.php:295 hosts.php:995
 #: include/discovery.inc.php:121 include/html.inc.php:336
 #: include/httptest.inc.php:46 include/items.inc.php:155
-#: include/items.inc.php:209 include/triggers.inc.php:1467
-#: include/triggers.inc.php:2304 include/users.inc.php:85
+#: include/items.inc.php:209 include/triggers.inc.php:1468
+#: include/triggers.inc.php:2305 include/users.inc.php:85
 #: include/views/administration.mediatypes.list.php:100
 #: include/views/administration.usergroups.list.php:58
 #: include/views/administration.usergroups.list.php:83
@@ -5030,7 +5030,7 @@ msgstr "選択したWebシナリオを有効にしますか？"
 #: auditlogs.php:139 dashboard.php:295 hosts.php:987
 #: include/discovery.inc.php:120 include/html.inc.php:332
 #: include/httptest.inc.php:45 include/items.inc.php:154
-#: include/items.inc.php:206 include/triggers.inc.php:2301
+#: include/items.inc.php:206 include/triggers.inc.php:2302
 #: include/views/administration.mediatypes.edit.php:95
 #: include/views/administration.mediatypes.list.php:99
 #: include/views/administration.usergroups.edit.php:64
@@ -5111,7 +5111,7 @@ msgstr "イベントの障害対応コメントが無効です"
 msgid "Event details"
 msgstr "イベント詳細"
 
-#: include/triggers.inc.php:1465
+#: include/triggers.inc.php:1466
 msgid "Event generation"
 msgstr "イベント生成"
 
@@ -5225,7 +5225,7 @@ msgstr "選択をエクスポート"
 msgid "Export to CSV"
 msgstr "CSVエクスポート"
 
-#: include/triggers.inc.php:1462
+#: include/triggers.inc.php:1463
 #: include/views/administration.general.iconmap.edit.php:41
 #: include/views/administration.general.regularexpressions.edit.php:42
 #: include/views/administration.general.regularexpressions.edit.php:51
@@ -5634,7 +5634,7 @@ msgstr "Webページ全体を取得するタイミングを取得。デフォル
 msgid "Giga"
 msgstr "ギガ"
 
-#: include/triggers.inc.php:1598 tr_testexpr.php:35
+#: include/triggers.inc.php:1599 tr_testexpr.php:35
 msgid "Given expression is not a macro"
 msgstr "設定した条件式はマクロではありません"
 
@@ -5672,7 +5672,7 @@ msgstr "グローバルスクリプト"
 #: include/views/configuration.slideconf.list.php:61
 #: include/views/configuration.sysmap.list.php:68
 #: include/views/configuration.triggers.list.php:314 latest.php:895
-#: templates.php:677 tr_status.php:792
+#: templates.php:677 tr_status.php:799
 msgid "Go"
 msgstr "実行"
 
@@ -6179,7 +6179,7 @@ msgstr "横位置"
 #: include/classes/screens/CScreenHostTriggers.php:127
 #: include/classes/setup/CSetupWizard.php:365 include/forms.inc.php:537
 #: include/html.inc.php:343 include/maps.inc.php:24
-#: include/triggers.inc.php:1107 include/triggers.inc.php:1453
+#: include/triggers.inc.php:1108 include/triggers.inc.php:1454
 #: include/views/configuration.application.list.php:45
 #: include/views/configuration.application.list.php:58
 #: include/views/configuration.graph.list.php:54
@@ -6851,7 +6851,7 @@ msgid "If you think this message is wrong, please consult your administrators ab
 msgstr "このメッセージが間違っている場合は、必要な権限を得るために管理者に問い合わせてください"
 
 #: image.php:26 include/audit.inc.php:37 include/maps.inc.php:28
-#: include/maps.inc.php:745
+#: include/maps.inc.php:775
 #: include/views/administration.general.image.edit.php:39
 #: include/views/administration.general.image.edit.php:42
 #: include/views/js/configuration.sysmaps.js.php:21 jsLoader.php:145
@@ -7292,7 +7292,7 @@ msgid "Incorrect follow redirects value for step \"%1$s\" of web scenario \"%2$s
 msgstr "Webシナリオ\"%2$s\"のステップ\"%1$s\"のリダイレクトをたどる値が正しくありません。"
 
 #: include/classes/triggers/CTextTriggerConstructor.php:113
-#: include/triggers.inc.php:1599 tr_testexpr.php:36
+#: include/triggers.inc.php:1600 tr_testexpr.php:36
 msgid "Incorrect function is used"
 msgstr "間違った関数が利用されています"
 
@@ -8693,7 +8693,7 @@ msgid "Location longitude"
 msgstr "経度"
 
 #: include/forms.inc.php:404 include/items.inc.php:127
-#: include/triggers.inc.php:2048 include/views/configuration.item.edit.php:214
+#: include/triggers.inc.php:2049 include/views/configuration.item.edit.php:214
 #: include/views/configuration.item.massupdate.php:211
 msgid "Log"
 msgstr "ログ"
@@ -8807,7 +8807,7 @@ msgstr "MACアドレスA"
 msgid "MAC address B"
 msgstr "MACアドレスB"
 
-#: include/maps.inc.php:537
+#: include/maps.inc.php:567
 msgid "MAINTENANCE"
 msgstr "メンテナンス"
 
@@ -8882,7 +8882,7 @@ msgstr "マクロ"
 msgid "Macros updated"
 msgstr "マクロを更新しました"
 
-#: include/audit.inc.php:47 include/maps.inc.php:622 include/maps.inc.php:712
+#: include/audit.inc.php:47 include/maps.inc.php:652 include/maps.inc.php:742
 #: include/menu.inc.php:181
 #: include/views/configuration.maintenance.edit.php:185
 #: include/views/js/configuration.sysmaps.js.php:150
@@ -8938,11 +8938,11 @@ msgstr "メンテナンスタイプ"
 msgid "Maintenance updated"
 msgstr "メンテナンスを更新しました"
 
-#: include/blocks.inc.php:1033 tr_status.php:602
+#: include/blocks.inc.php:1033 tr_status.php:609
 msgid "Maintenance with data collection"
 msgstr "データ収集ありのメンテナンス"
 
-#: include/blocks.inc.php:1032 tr_status.php:601
+#: include/blocks.inc.php:1032 tr_status.php:608
 msgid "Maintenance without data collection"
 msgstr "データ収集なしのメンテナンス"
 
@@ -9447,7 +9447,7 @@ msgstr "障害発生数上位100項目"
 msgid "Mozilla Firefox"
 msgstr "Mozilla Firefox"
 
-#: include/triggers.inc.php:1466
+#: include/triggers.inc.php:1467
 msgid "Multiple PROBLEM events"
 msgstr "障害イベントを継続して生成"
 
@@ -9669,8 +9669,8 @@ msgctxt "page navigation"
 msgid "Next"
 msgstr "次へ"
 
-#: events.php:796 include/events.inc.php:355 include/events.inc.php:373
-#: include/func.inc.php:2029 include/triggers.inc.php:1468
+#: events.php:802 include/events.inc.php:355 include/events.inc.php:373
+#: include/func.inc.php:2029 include/triggers.inc.php:1469
 #: include/views/administration.users.list.php:76
 #: include/views/administration.users.list.php:79
 #: include/views/configuration.httpconf.list.php:122
@@ -9895,7 +9895,7 @@ msgstr "ディスカバリルールが設定されていません。"
 msgid "No errors found."
 msgstr "エラーはありません。"
 
-#: include/blocks.inc.php:1078 include/blocks.inc.php:1320 tr_status.php:671
+#: include/blocks.inc.php:1078 include/blocks.inc.php:1320 tr_status.php:678
 msgid "No events"
 msgstr "イベントはありません"
 
@@ -10388,7 +10388,7 @@ msgstr "トリガーID\"%1$s\"を持つトリガーは存在しません。"
 msgid "No triggers defined."
 msgstr "トリガーが設定されていません。"
 
-#: include/triggers.inc.php:1070
+#: include/triggers.inc.php:1071
 #: include/views/configuration.triggers.list.php:97
 #: include/views/monitoring.overview.triggers.php:116 popup.php:967
 #: report2.php:391 report5.php:56 tr_status.php:285
@@ -10430,7 +10430,7 @@ msgid "None"
 msgstr "なし"
 
 #: include/graphs.inc.php:24 include/items.inc.php:180
-#: include/triggers.inc.php:1465 include/views/monitoring.history.php:242
+#: include/triggers.inc.php:1466 include/views/monitoring.history.php:242
 #: popup.php:1372
 msgid "Normal"
 msgstr "ノーマル"
@@ -10667,14 +10667,14 @@ msgid "Number of virtual machines on VMware hypervisor, <url> - VMware service U
 msgstr "VMwareハイパーバイザー上の仮想マシン数、<url> - VMwareサービスURL、<uuid> - VMwareハイパーバイザーのホスト名"
 
 #: include/forms.inc.php:402 include/items.inc.php:123
-#: include/triggers.inc.php:2046 include/views/configuration.item.edit.php:212
+#: include/triggers.inc.php:2047 include/views/configuration.item.edit.php:212
 #: include/views/configuration.item.massupdate.php:209
 msgid "Numeric (float)"
 msgstr "数値 (浮動小数)"
 
-#: include/triggers.inc.php:2045 include/triggers.inc.php:2061
-#: include/triggers.inc.php:2065 include/triggers.inc.php:2075
-#: include/triggers.inc.php:2080 include/triggers.inc.php:2084
+#: include/triggers.inc.php:2046 include/triggers.inc.php:2062
+#: include/triggers.inc.php:2066 include/triggers.inc.php:2076
+#: include/triggers.inc.php:2081 include/triggers.inc.php:2085
 msgid "Numeric (integer 64bit)"
 msgstr "数値 (整数)"
 
@@ -10693,8 +10693,8 @@ msgstr "OEM"
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
 #: include/classes/setup/CSetupWizard.php:516
-#: include/classes/tree/CServiceTree.php:45 include/maps.inc.php:471
-#: include/maps.inc.php:553 include/maps.inc.php:643 include/maps.inc.php:733
+#: include/classes/tree/CServiceTree.php:45 include/maps.inc.php:501
+#: include/maps.inc.php:583 include/maps.inc.php:673 include/maps.inc.php:763
 #: include/triggers.inc.php:154
 #: include/views/monitoring.overview.triggers.php:38
 msgid "OK"
@@ -10922,7 +10922,7 @@ msgstr "アクションの実行内容"
 msgid "Operator"
 msgstr "オペレータ"
 
-#: include/triggers.inc.php:1523
+#: include/triggers.inc.php:1524
 #: include/views/configuration.action.edit.php:121
 #: include/views/configuration.action.edit.php:989
 #: include/views/configuration.host.discovery.edit.php:279
@@ -11232,7 +11232,7 @@ msgstr "PHP xmlwriterモジュールが存在しません。"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:455 include/triggers.inc.php:155
+#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11580,7 +11580,7 @@ msgstr "特権レベル"
 msgid "Probably php-ldap module is missing."
 msgstr "php-ldapモジュールが見つかりません。"
 
-#: include/maps.inc.php:509 include/maps.inc.php:592 include/maps.inc.php:683
+#: include/maps.inc.php:539 include/maps.inc.php:622 include/maps.inc.php:713
 #: include/views/common.filter.trigger.php:40
 #: include/views/js/configuration.sysmaps.js.php:143
 msgid "Problem"
@@ -11607,8 +11607,8 @@ msgstr "すべての子に障害があった場合に障害として検知"
 msgid "Problem, if at least one child has a problem"
 msgstr "子に一つでも障害があった場合に障害として検知"
 
-#: chart4.php:163 include/maps.inc.php:503 include/maps.inc.php:586
-#: include/maps.inc.php:677 report2.php:395 report3.php:83
+#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "障害"
 
@@ -12882,7 +12882,7 @@ msgstr "セッションが切断されました。再度ログインしてくだ
 
 #: events.php:474 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
-#: include/triggers.inc.php:1460 include/views/configuration.item.list.php:159
+#: include/triggers.inc.php:1461 include/views/configuration.item.list.php:159
 #: include/views/configuration.triggers.edit.php:253
 #: include/views/configuration.triggers.list.php:100
 #: include/views/configuration.triggers.massupdate.php:69 popup.php:972
@@ -12902,8 +12902,8 @@ msgstr "深刻度を設定してください。"
 #: include/reports.inc.php:126 include/reports.inc.php:259
 #: include/reports.inc.php:440
 #: include/views/configuration.application.list.php:60
-#: include/views/js/configuration.sysmaps.js.php:26 report2.php:419
-#: tr_status.php:705 tr_status.php:710
+#: include/views/js/configuration.sysmaps.js.php:26 report2.php:420
+#: tr_status.php:712 tr_status.php:717
 msgid "Show"
 msgstr "表示"
 
@@ -13567,7 +13567,7 @@ msgstr "テンプレートを追加しました"
 
 #: include/classes/api/services/CHostBase.php:294
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "テンプレートは複数のテンプレートとリンクすることはできません(他のテンプレート経由でも不可)。"
+msgstr "他のテンプレートを介しても同じテンプレートを複数回リンクすることはできません。"
 
 #: templates.php:374 templates.php:388 templates.php:413
 msgid "Template deleted"
@@ -13683,7 +13683,7 @@ msgid "Test string"
 msgstr "テスト文字列"
 
 #: include/forms.inc.php:405 include/items.inc.php:129
-#: include/triggers.inc.php:2049 include/views/configuration.item.edit.php:215
+#: include/triggers.inc.php:2050 include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:212
 msgid "Text"
 msgstr "テキスト"
@@ -13984,7 +13984,7 @@ msgstr "トレンド"
 
 #: events.php:332 events.php:374 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
-#: include/maps.inc.php:26 include/triggers.inc.php:1457
+#: include/maps.inc.php:26 include/triggers.inc.php:1458
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
 #: include/views/configuration.services.edit.php:92
@@ -14194,7 +14194,7 @@ msgstr "トリガーの値"
 
 #: hosts.php:863 hosts.php:955 include/forms.inc.php:582
 #: include/html.inc.php:410 include/html.inc.php:414 include/menu.inc.php:51
-#: include/triggers.inc.php:1082
+#: include/triggers.inc.php:1083
 #: include/views/configuration.action.list.php:33
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.host.edit.php:534
@@ -14425,7 +14425,7 @@ msgstr "選択した設定は行えません"
 msgid "Unable to upload file because \"file_uploads\" is disabled."
 msgstr "\"file_uploads\"が無効のためファイルをアップロードできません。"
 
-#: include/maps.inc.php:520 include/maps.inc.php:603 include/maps.inc.php:694
+#: include/maps.inc.php:550 include/maps.inc.php:633 include/maps.inc.php:724
 msgid "Unacknowledged"
 msgstr "未対応"
 
@@ -14482,7 +14482,7 @@ msgstr "単位"
 #: include/perm.inc.php:53 include/regexp.inc.php:221
 #: include/screens.inc.php:57 include/triggers.inc.php:62
 #: include/triggers.inc.php:165 include/triggers.inc.php:184
-#: include/triggers.inc.php:2301 include/triggers.inc.php:2307
+#: include/triggers.inc.php:2302 include/triggers.inc.php:2308
 #: include/users.inc.php:66 include/users.inc.php:88
 #: include/views/js/configuration.discovery.edit.js.php:192
 msgid "Unknown"
@@ -14501,11 +14501,11 @@ msgstr "不明なエラー"
 msgid "Unknown function."
 msgstr "不明な関数。"
 
-#: include/triggers.inc.php:1597 popup_trexpr.php:616 tr_testexpr.php:34
+#: include/triggers.inc.php:1598 popup_trexpr.php:616 tr_testexpr.php:34
 msgid "Unknown host item, no such item in selected host"
 msgstr "不明なアイテム。選択したホストにそのようなアイテムは存在しません"
 
-#: include/triggers.inc.php:1596 tr_testexpr.php:33
+#: include/triggers.inc.php:1597 tr_testexpr.php:33
 msgid "Unknown host, no such host present in system"
 msgstr "不明なホスト。そのようなホストは存在しません"
 
@@ -15732,10 +15732,10 @@ msgstr "年"
 msgid "Yearly"
 msgstr "毎年"
 
-#: events.php:796 include/blocks.inc.php:814
+#: events.php:802 include/blocks.inc.php:814
 #: include/classes/html/CServerInfo.php:32 include/events.inc.php:358
 #: include/events.inc.php:376 include/func.inc.php:2029
-#: include/triggers.inc.php:1468
+#: include/triggers.inc.php:1469
 #: include/views/administration.users.list.php:75
 #: include/views/configuration.httpconf.list.php:122
 #: include/views/js/adm.regexprs.edit.js.php:139
@@ -15963,7 +15963,7 @@ msgid "agent"
 msgstr "エージェント"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1858
-#: include/classes/pagefilter/CPageFilter.php:763
+#: include/classes/pagefilter/CPageFilter.php:776
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -16043,7 +16043,7 @@ msgstr "日"
 msgid "dd"
 msgstr "dd"
 
-#: include/classes/pagefilter/CPageFilter.php:661
+#: include/classes/pagefilter/CPageFilter.php:674
 #: include/classes/setup/CSetupWizard.php:420
 #: include/views/configuration.slideconf.edit.php:66
 #: include/views/js/configuration.slideconf.edit.js.php:14
@@ -16266,8 +16266,8 @@ msgid "not running"
 msgstr "停止中"
 
 #: hostinventoriesoverview.php:77
-#: include/classes/pagefilter/CPageFilter.php:701
-#: include/classes/pagefilter/CPageFilter.php:763 include/forms.inc.php:1108
+#: include/classes/pagefilter/CPageFilter.php:714
+#: include/classes/pagefilter/CPageFilter.php:776 include/forms.inc.php:1108
 #: include/views/monitoring.screen.php:88 slides.php:225
 msgid "not selected"
 msgstr "選択されていません"
