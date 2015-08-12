@@ -212,6 +212,11 @@ class C30XmlValidator {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
+									'application_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'name' =>						['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 										'name' =>					['type' => XML_STRING]
 									]],
@@ -525,6 +530,11 @@ class C30XmlValidator {
 									'applications' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application', 'rules' => [
 										'application' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'application_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'name' =>						['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [

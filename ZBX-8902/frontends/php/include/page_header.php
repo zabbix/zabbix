@@ -132,6 +132,8 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
+		global $DB;
+
 		if (!empty($DB['DB'])) {
 			$config = select_config();
 			$theme = getUserTheme(CWebUser::$data);
@@ -176,7 +178,7 @@ CSS;
 	$pageHeader->display();
 ?>
 <body>
-<div class="msg-bad-global" id="msg-bad-global"></div>
+<div class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></div>
 <?php
 }
 
@@ -194,7 +196,10 @@ if (!defined('ZBX_PAGE_NO_MENU')) {
 			'selected' => $page['menu']
 		],
 		'user' => [
-			'is_guest' => CWebUser::isGuest()
+			'is_guest' => CWebUser::isGuest(),
+			'alias' => CWebUser::$data['alias'],
+			'name' => CWebUser::$data['name'],
+			'surname' => CWebUser::$data['surname']
 		]
 	]);
 	echo $pageMenu->getOutput();
