@@ -1362,21 +1362,34 @@ footer {
 				background-color: $ui-hover-color;
 			}
 
-			&:focus {
-				background-color: $ui-hover-color;
-				border: 1px solid $form-border-focus-color;
-				position: relative;
-			}
-
 			&:active {
-				background-color: $ui-hover-color;
+				color: $white;
+				border-color: $form-border-color;
+				background-color: $ui-bg-selected-color;
 			}
+		}
+
+		&:focus + label {
+			border-color: $form-border-focus-color;
+			background-color: $ui-hover-color;
+			position: relative;
+			z-index: 1;
 		}
 
 		&:checked + label {
 			color: $white;
 			border-color: $form-border-color;
-			background-color: $ui-bg-selected-color;
+			background-color: $ui-bg-selected-color;	
+		}
+
+		&:checked:focus + label {
+			border-color: $form-border-focus-color;	
+			position: relative;
+			z-index: 1;
+		}
+
+		&[disabled] + label {
+			@extend %form-disabled;
 		}
 	}
 }
@@ -1608,6 +1621,7 @@ button {
 	&:active {
 		color: $btn-form-font-color;
 		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
 	}
 }
 
