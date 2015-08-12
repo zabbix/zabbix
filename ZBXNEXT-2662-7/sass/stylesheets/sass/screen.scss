@@ -1388,6 +1388,10 @@ footer {
 			z-index: 1;
 		}
 
+		&:checked[disabled] + label {
+			background-color: lighten($ui-bg-selected-color, 15%);
+		}
+
 		&[disabled] + label {
 			@extend %form-disabled;
 		}
