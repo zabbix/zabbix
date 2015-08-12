@@ -1478,7 +1478,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			const char	*perror;
 
-			perror = (NULL != error ? error : ZBX_NOTSUPPORTED);
+			perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
 
 			metric->state = ITEM_STATE_NOTSUPPORTED;
 			metric->refresh_unsupported = 0;

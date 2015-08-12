@@ -557,7 +557,7 @@ class CItem extends CItemGeneral {
 		$itemIds = array_keys(array_flip($itemIds));
 
 		$delItems = $this->get([
-			'output' => ['name', 'templateid', 'flags'],
+			'output' => ['itemid', 'name', 'templateid', 'flags'],
 			'selectHosts' => ['name'],
 			'itemids' => $itemIds,
 			'editable' => true,
@@ -645,6 +645,7 @@ class CItem extends CItemGeneral {
 		]);
 
 		DB::delete('items', ['itemid' => $itemIds]);
+
 		DB::delete('profiles', [
 			'idx' => 'web.favorite.graphids',
 			'source' => 'itemid',
