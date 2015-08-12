@@ -190,6 +190,10 @@ abstract class CItemGeneral extends CZBXAPI {
 				foreach ($this->fieldRules as $field => $rules) {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
+						// put back the old value
+						if ( isset($dbItems[$item['itemid']][$field]) && isset($fullItem[$field]) ) {
+							$fullItem[$field] = $dbItems[$item['itemid']][$field];
+						}
 					}
 				}
 
