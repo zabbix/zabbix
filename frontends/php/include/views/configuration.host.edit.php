@@ -307,7 +307,8 @@ if ($data['clone_hostid'] != 0) {
 		'output' => ['name'],
 		'hostids' => [$data['clone_hostid']],
 		'inherited' => false,
-		'preservekeys' => true
+		'preservekeys' => true,
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 	]);
 
 	if ($hostApps) {

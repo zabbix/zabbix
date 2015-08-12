@@ -572,6 +572,10 @@ class CConfigurationExportBuilder {
 				'logtimefmt' => $item['logtimefmt']
 			];
 
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
+			}
+
 			if (isset($item['interface_ref'])) {
 				$data['interface_ref'] = $item['interface_ref'];
 			}
