@@ -161,7 +161,7 @@
 				checked_main: ''
 			};
 
-			if (hostInterface.items) {
+			if (hostInterface.items && (0 < hostInterface.items)) {
 				attrs.disabled = 'disabled="disabled"';
 			}
 
