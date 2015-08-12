@@ -146,8 +146,9 @@ class CConditionHelper {
 	 * @return string
 	 */
 	public static function replaceLetterIds($formula, array $ids) {
-		$parser = new CConditionFormula();
-		$formula = $parser->replaceLettersIds($formula, $ids);
+		foreach ($ids as $formulaId => $id) {
+			$formula = str_replace($formulaId, '{'.$id.'}', $formula);
+		}
 
 		return $formula;
 	}
