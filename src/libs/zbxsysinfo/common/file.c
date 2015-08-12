@@ -109,7 +109,7 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	char		*filename;
-	int		ret = SYSINFO_RET_FAIL, file_exists = -1;
+	int		ret = SYSINFO_RET_FAIL, file_exists;
 
 	if (1 < request->nparam)
 	{
@@ -126,15 +126,21 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (0 == zbx_stat(filename, &buf))
-		file_exists = S_ISREG(buf.st_mode) ? 1 : 0;
-	else if (errno == ENOENT)
-		file_exists = 0;
-
-	if (-1 != file_exists)
 	{
-		SET_UI64_RESULT(result, file_exists);
-		ret = SYSINFO_RET_OK;
+		file_exists = S_ISREG(buf.st_mode) ? 1 : 0;
 	}
+	else if (errno == ENOENT)
+	{
+		file_exists = 0;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
+		goto err;
+	}
+
+	SET_UI64_RESULT(result, file_exists);
+	ret = SYSINFO_RET_OK;
 err:
 	return ret;
 }
@@ -189,7 +195,10 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 		goto err;
+	}
 
 	if (CONFIG_TIMEOUT < zbx_time() - ts)
 	{
