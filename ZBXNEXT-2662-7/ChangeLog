@@ -41,6 +41,9 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+...G...... [ZBX-9519] fixed vfs.fs.inode[] behaviour in case of CephFS (dimir, gleb)
+.......PS. [ZBX-8902] made messages 'database is down...' and 'database connection re-established' appear in log at DebugLevel=2 (gleb)
+...G...PS. [ZBX-8725] enabled setting DebugLevel=5 in configuration files (gleb)
 .......PS. [ZBX-9699] optimized initial cache allocation parameters so that server in default configuration would start with minimum cache settings (igors, wiper)
 A......... [ZBX-7821] removed restriction to have log type information for items with key "log", "logrt" and "eventlog" (Ivo)
 ..F....... [ZBX-8252] renamed "Retries" to "Attempts" in web scenario edit form and list view (Ivo)
@@ -87,6 +90,14 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 .D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
 ...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.7rc1
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-9739] fixed agent crash when active check fails without setting error message (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 2.4.6
@@ -730,6 +741,13 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.11rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 2.2.10
@@ -2004,6 +2022,13 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.16rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 2.0.15
