@@ -1,3 +1,0 @@
-graphs_items graphid graphid graphs flags 4
-items_applications itemid itemid items flags 4
-functions triggerid triggerid triggers flags 4
