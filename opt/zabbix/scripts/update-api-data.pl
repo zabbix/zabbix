@@ -142,12 +142,7 @@ my $servicedata;	# hash with various data of TLD service
 
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
-# Get the minimum clock from the item that is collected once a day, this way
-# "min(clock)" won't take too much time (see function __get_min_clock() for details)
-my $rows_ref = db_select("select itemid from items where key_='rsm.configvalue[RSM.SLV.DNS.TCP.RTT]'");
-my $config_itemid = $rows_ref->[0]->[0];
-$rows_ref = db_select("select min(clock) from history_uint where itemid=$config_itemid");
-my $config_minclock = $rows_ref->[0]->[0];
+my $config_minclock = __get_config_minclock();
 
 dbg("config_minclock:$config_minclock");
 
@@ -1750,7 +1745,7 @@ sub __get_min_clock
 {
 	my $tld = shift;
 	my $service = shift;
-	my $minclock = shift;
+	my $config_minclock = shift;
 
 	my $key_condition;
 	if ($service eq 'dns' or $service eq 'dnssec')
@@ -1780,14 +1775,14 @@ sub __get_min_clock
 
 	my $ret = 0;
 
-	while ($ret == 0 && $minclock < $now)
+	while ($ret == 0 && $config_minclock <= $now)
 	{
-		$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$minclock");
+		$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$config_minclock");
 
 		$ret = $rows_ref->[0]->[0] if ($rows_ref->[0]->[0]);
 
 		# move half of a day forward
-		$minclock += 43200;
+		$config_minclock += 43200;
 	}
 
 	return $ret;
@@ -1831,6 +1826,25 @@ sub __no_status_result
 		" at some point. In order to fix this problem please run".
 		"\n  $avail_key.pl --from $clock".
 		"\nmanually to add missing service availability result.");
+}
+
+sub __get_config_minclock
+{
+	my $config_key = 'rsm.configvalue[RSM.SLV.DNS.TCP.RTT]';
+
+	# Get the minimum clock from the item that is collected once a day, this way
+	# "min(clock)" won't take too much time (see function __get_min_clock() for details).
+	my $rows_ref = db_select("select itemid from items where key_='$config_key'");
+
+	fail("item $config_key not found in Zabbix configuration") unless (scalar(@$rows_ref) == 1);
+
+	my $config_itemid = $rows_ref->[0]->[0];
+
+	$rows_ref = db_select("select min(clock) from history_uint where itemid=$config_itemid");
+
+	my $minclock = ($rows_ref->[0]->[0] ? $rows_ref->[0]->[0] : $now);
+
+	return $minclock;
 }
 
 __END__
