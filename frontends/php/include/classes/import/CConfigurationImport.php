@@ -242,8 +242,10 @@ class CConfigurationImport {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
 
-			foreach ($host['macros'] as $macro) {
-				$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+			if (!empty($host['macros'])) {
+				foreach ($host['macros'] as $macro) {
+					$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
+				}
 			}
 
 			if (!empty($host['templates'])) {
