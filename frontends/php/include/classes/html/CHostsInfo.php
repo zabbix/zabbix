@@ -107,7 +107,7 @@ class CHostsInfo extends CTable {
 			$header_str .= _('All groups');
 		}
 
-		$header = (new CCol($header_str))->addClass('header');
+		$header = new CCol($header_str);
 		if ($this->style == STYLE_HORIZONTAL) {
 			$header->setColspan(4);
 		}

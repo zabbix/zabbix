@@ -29,11 +29,7 @@ $widget = (new CWidget())
 		)
 	);
 
-$valueMappingTable = (new CTableInfo())
-	->setHeader([
-		_('Name'),
-		_('Value map')
-	]);
+$valueMappingTable = (new CTableInfo())->setHeader([_('Name'), _('Value map')]);
 
 foreach ($this->data['valuemaps'] as $valuemap) {
 	order_result($valuemap['maps'], 'value');

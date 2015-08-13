@@ -55,7 +55,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 					}
 				})
 				.bind('tableupdate.dynamicRows', function(event, options) {
-					$('#conditionRow').toggleClass('hidden', ($(options.row, $(this)).length <= 1));
+					$('#conditionRow').toggle($(options.row, $(this)).length > 1);
 				})
 				.bind('rowremove.dynamicRows', function() {
 					updateExpression();
@@ -65,13 +65,16 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 				});
 
 			$('#evaltype').change(function() {
-				var custom = ($(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
-				$('#expression').toggleClass('hidden', custom);
-				$('#formula').toggleClass('hidden', !custom);
-				if (!custom) {
+				var show_formula = ($(this).val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>);
+
+				$('#expression').toggle(!show_formula);
+				$('#formula').toggle(show_formula);
+				if (show_formula) {
 					updateExpression();
 				}
 			});
+
+			$('#evaltype').trigger('change');
 
 			updateExpression();
 		});
