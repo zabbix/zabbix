@@ -98,7 +98,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	char		*msg = NULL;
 #endif
-	int		ret, local_request_failed = 0;
+	int		ret;
 	zbx_socket_t	s;
 
 	assert(args);
@@ -124,8 +124,6 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 		if (SUCCEED == (ret = zbx_tcp_accept(&s, configured_tls_accept_modes)))
 		{
-			local_request_failed = 0;     /* reset consecutive errors counter */
-
 			zbx_setproctitle("listener #%d [processing request]", process_num);
 
 			if (SUCCEED == (ret = zbx_tcp_check_security(&s, CONFIG_HOSTS_ALLOWED, 0)))
@@ -148,20 +146,14 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (NULL != msg)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s", msg);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s", msg);
 			zbx_free(msg);
 		}
 		else
 #endif
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "failed to accept an incoming connection: %s",
+			zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming connection: %s",
 					zbx_socket_strerror());
-		}
-
-		if (local_request_failed++ > 1000)
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "too many failures to accept an incoming connection");
-			local_request_failed = 0;
 		}
 
 		if (ZBX_IS_RUNNING())
