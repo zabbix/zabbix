@@ -913,7 +913,7 @@ class CHost extends CHostGeneral {
 				self::exception();
 			}
 
-			if ( isset($host['inventory']) && !empty($host['inventory'])) {
+			if (!empty($host['inventory'])) {
 				$hostInventory = $host['inventory'];
 				$hostInventory['hostid'] = $hostid;
 				$hostInventory['inventory_mode'] = isset($host['inventory_mode'])

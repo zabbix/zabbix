@@ -226,7 +226,7 @@ class CConfigurationImport {
 				$groupsRefs[$group['name']] = $group['name'];
 			}
 
-			if ( isset($host['macros']) && !empty($host['macros']) ) {
+			if (!empty($host['macros'])) {
 				foreach ($host['macros'] as $macro) {
 					$macrosRefs[$host['host']][$macro['macro']] = $macro['macro'];
 				}
