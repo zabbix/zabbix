@@ -41,6 +41,8 @@ A.F....... [ZBXNEXT-1821] added "Zabbix" as default user agent, updated outdated
 ...G...... [ZBXNEXT-2325] added CPU guest and guest priority metrics to system.cpu.util[] item, supported on Linux kernels starting from 2.6.24 and 2.6.33 respectively (Juris)
 
 Bug fixes:
+A......... [ZBX-7654] fixed "Undefined index" importing graphs from 1.8 version (Sasha, Gunars)
+..F....... [ZBX-9608] improved the aggregate item key description in the frontend (Gunars)
 ...G...... [ZBX-9519] fixed vfs.fs.inode[] behaviour in case of CephFS (dimir, gleb)
 .......PS. [ZBX-8902] made messages 'database is down...' and 'database connection re-established' appear in log at DebugLevel=2 (gleb)
 ...G...PS. [ZBX-8725] enabled setting DebugLevel=5 in configuration files (gleb)
@@ -97,6 +99,9 @@ Changes for 2.4.7rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-9631] fixed "Undefined offset" in the actions conditions and lld rule filters when using a custom expression with more than 26 elements (Gunars, Sasha)
+..F....... [ZBX-7492] fixed "Undefined index" when importing host without macros (Gunars)
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 ...G...... [ZBX-9739] fixed agent crash when active check fails without setting error message (wiper)
 
 --------------------------------------------------------------------------------
@@ -748,6 +753,8 @@ Changes for 2.2.11rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-7492] fixed "Undefined index" when importing host without macros (Gunars)
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.10
@@ -2029,6 +2036,7 @@ Changes for 2.0.16rc1
 New features:
 
 Bug fixes:
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.15
