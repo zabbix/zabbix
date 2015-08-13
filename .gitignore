@@ -41,7 +41,6 @@ frontends/php/.htpasswd
 frontends/php/.idea
 frontends/php/.project
 frontends/php/conf/zabbix.conf.php
-frontends/php/conf/zabbix.conf.php.bckp
 frontends/php/images/general/*.db
 frontends/php/images/general/tree/*.db
 frontends/php/include/views/.administration.script.edit.php.swp
