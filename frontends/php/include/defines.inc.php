@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'2.5.0');
 define('ZABBIX_API_VERSION',	'2.5.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050045);
+define('ZABBIX_DB_VERSION',		2050050);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -928,10 +928,6 @@ define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
 // input fields
-define('ZBX_TEXTBOX_STANDARD_SIZE',		50);
-define('ZBX_TEXTBOX_SMALL_SIZE',		25);
-define('ZBX_TEXTBOX_FILTER_SIZE',		20);
-
 define('ZBX_TEXTAREA_MACRO_WIDTH',				200);
 define('ZBX_TEXTAREA_MACRO_VALUE_WIDTH',		250);
 define('ZBX_TEXTAREA_COLOR_WIDTH',				96);
@@ -1044,8 +1040,7 @@ define('ZBX_STYLE_BTN_RESET', 'btn-reset');
 define('ZBX_STYLE_BTN_WIDGET_ACTION', 'btn-widget-action');
 define('ZBX_STYLE_BTN_WIDGET_COLLAPSE', 'btn-widget-collapse');
 define('ZBX_STYLE_BTN_WIDGET_EXPAND', 'btn-widget-expand');
-define('ZBX_STYLE_ICON_CAL', 'icon-cal');
-define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
+define('ZBX_STYLE_BTN_WIZARD_ACTION', 'btn-wizard-action');
 define('ZBX_STYLE_CELL', 'cell');
 define('ZBX_STYLE_CELL_WIDTH', 'cell-width');
 define('ZBX_STYLE_CENTER', 'center');
@@ -1071,10 +1066,18 @@ define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
+define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
+define('ZBX_STYLE_ICON_CAL', 'icon-cal');
+define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
+define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
+define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
 define('ZBX_STYLE_LINK_ALT', 'link-alt');
+define('ZBX_STYLE_LIST_HOR_CHECK_RADIO', 'list-hor-check-radio');
+define('ZBX_STYLE_LIST_HOR_MIN_WIDTH', 'list-hor-min-width');
+define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
@@ -1109,6 +1112,7 @@ define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
 define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
+define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
 
 // server variables
