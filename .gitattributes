@@ -74,6 +74,7 @@ frontends/php/audio/alarm_information.wav -text
 frontends/php/audio/alarm_ok.wav -text
 frontends/php/audio/alarm_warning.wav -text
 frontends/php/audio/no_sound.wav -text
+frontends/php/favicon.ico -text svneol=unset#image/x-icon
 frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrow_down.png -text
@@ -84,9 +85,14 @@ frontends/php/images/general/tr_top_bottom.gif -text
 frontends/php/images/general/tr_top_right.gif -text
 frontends/php/images/general/tr_top_right_bottom.gif -text
 frontends/php/images/general/tree/zero.gif -text
-frontends/php/images/general/zabbix.ico -text
+frontends/php/img/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
+frontends/php/img/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
+frontends/php/img/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
+frontends/php/img/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
 frontends/php/img/browser-sprite.png -text svneol=unset#image/png
 frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
+frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
+frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/include/classes/helpers/CViewHelper.php -text
 frontends/php/include/classes/html/CColHeader.php -text
 frontends/php/include/classes/html/CFilter.php -text
