@@ -834,19 +834,9 @@ jQuery(function($) {
 	}
 
 	function resizeSelectedText(item, text, obj, options) {
-		var t = text.text();
-		var l = t.length;
-
-		if (l > 20) {
-			text.text(t.substring(0, l) + '...');
-		}
-/*		var text_paddings = text.innerWidth() - text.width(),
+		var text_paddings = text.innerWidth() - text.width(),
 			item_margins = item.outerWidth(true) - item.width(),
 			max_width = $('.selected ul', obj).width() - item_margins - text_paddings;
-
-		if (max_width < 0) {
-			max_width = 100;
-		}
 
 		if (text.width() > max_width) {
 			var t = text.text();
@@ -856,7 +846,7 @@ jQuery(function($) {
 				text.text(t.substring(0, --l) + '...');
 			}
 			while (text.width() > max_width)
-		}*/
+		}
 	}
 
 	function resizeAllSelectedTexts(obj, options, values) {
