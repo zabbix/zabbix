@@ -3,7 +3,7 @@ Changes for 2.0.16rc1
 New features:
 
 Bug fixes:
-.........T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.15
