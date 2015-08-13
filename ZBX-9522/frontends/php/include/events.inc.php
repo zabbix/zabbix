@@ -384,7 +384,9 @@ function getLastEvents($options) {
 
 	$sortClock = array();
 	$sortEvent = array();
-	foreach ($events as $enum => $event) {
+
+	$enum = 0;
+	foreach ($events as $event) {
 		if (!isset($triggers[$event['objectid']])) {
 			continue;
 		}
@@ -397,7 +399,71 @@ function getLastEvents($options) {
 		//expanding description for the state where event was
 		$merged_event = array_merge($event, $triggers[$event['objectid']]);
 		$events[$enum]['trigger']['description'] = CEventHelper::expandDescription($merged_event);
+		$enum++;
 	}
+
+	// Select events that are still required to display.
+	if ($options['eventids']) {
+		if ($events) {
+			$new_eventids = array();
+
+			// Skip the overlapping events so they don't duplicate.
+			$eventids = zbx_objectValues($events, 'eventid');
+			foreach ($options['eventids'] as $eventid) {
+				if (!in_array($eventid, $eventids)) {
+					$new_eventids[] = $eventid;
+				}
+			}
+		}
+		else {
+			$new_eventids = $options['eventids'];
+		}
+
+		if ($new_eventids) {
+			$old_events = API::Event()->get(array(
+				'output' => API_OUTPUT_EXTEND,
+				'eventids' => $new_eventids,
+				'sortfield' => 'eventid',
+				'sortorder' => ZBX_SORT_DOWN
+			));
+
+			if ($old_events) {
+				$old_triggerids = array();
+
+				foreach ($old_events as $old_event) {
+					$old_triggerids[] = $old_event['objectid'];
+				}
+
+				$old_triggers = API::Trigger()->get(array(
+					'output' => array('triggerid', 'expression', 'description', 'priority'),
+					'selectHosts' => array('hostid', 'host'),
+					'triggerids' => $old_triggerids,
+					'sortfield' => 'lastchange',
+					'sortorder' => ZBX_SORT_DOWN,
+					'limit' => $options['triggerLimit']
+				));
+				$old_triggers = zbx_toHash($old_triggers, 'triggerid');
+
+				foreach ($old_events as $old_event) {
+					if (!array_key_exists($old_event['objectid'], $old_triggers)) {
+						continue;
+					}
+
+					$events[$enum] = $old_event;
+					$events[$enum]['trigger'] = $old_triggers[$old_event['objectid']];
+					$events[$enum]['host'] = reset($events[$enum]['trigger']['hosts']);
+					$sortClock[$enum] = $old_event['clock'];
+					$sortEvent[$enum] = $old_event['eventid'];
+
+					// Expanding description for the state where event was.
+					$old_merged_event = array_merge($old_event, $events[$enum]['trigger']);
+					$events[$enum]['trigger']['description'] = CEventHelper::expandDescription($old_merged_event);
+					$enum++;
+				}
+			}
+		}
+	}
+
 	array_multisort($sortClock, SORT_DESC, $sortEvent, SORT_DESC, $events);
 
 	return $events;

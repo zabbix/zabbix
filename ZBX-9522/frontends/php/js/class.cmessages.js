@@ -40,6 +40,7 @@ var CMessageList = Class.create(CDebug, {
 	messageList:		{},		// list of received messages
 	messagePipe:		[],		// messageid pipe line
 	messageLast:		{},		// last message's sourceid by caption
+	messageSettings:	{},		// message settings object. Used to get messageSettings.timeout when adding new message
 	effectTimeout:		1000,	// effect time out
 	dom:				{},		// dom object links
 	sounds: {					// sound playback settings
@@ -99,6 +100,7 @@ var CMessageList = Class.create(CDebug, {
 
 	setSettings: function(settings) {
 		this.debug('setSettings');
+		this.messageSettings = settings;
 		this.sounds.repeat = settings['sounds.repeat'];
 		this.sounds.mute = settings['sounds.mute'];
 		if (this.sounds.mute == 1) {
@@ -130,6 +132,39 @@ var CMessageList = Class.create(CDebug, {
 		this.debug('addMessage');
 		newMessage = newMessage || {};
 
+		var messages = cookie.read('messages'),
+			message_exists = false,
+			time_till = null,
+			msgcount = 0;
+
+		if (messages != null) {
+			/*
+			 * For some reason JSON.stringify creates escaped strings like "[{\"sourceid\": \"278513\" ...}]"
+			 * so string is parsed twice till it is converted to an object.
+			 */
+			messages = JSON.parse(messages);
+			messages = JSON.parse(messages);
+
+			while (isset(msgcount, messages)) {
+				msgcount++;
+			}
+
+			for (var i = 0; i < msgcount; i++) {
+				if (newMessage.sourceid == messages[i].sourceid) {
+					message_exists = true;
+					time_till = messages[i].time_till;
+					break;
+				}
+			}
+		}
+
+		if (message_exists) {
+			newMessage.time_till = time_till;
+		}
+		else {
+			newMessage.time_till = parseInt(new Date().getTime() / 1000) + parseInt(this.messageSettings.timeout);
+		}
+
 		while (isset(this.msgcounter, this.messageList)) {
 			this.msgcounter++;
 		}
@@ -151,6 +186,18 @@ var CMessageList = Class.create(CDebug, {
 		};
 
 		jQuery(this.dom.container).fadeTo('fast', 0.9);
+
+		var messages_to_save = [];
+
+		for (var messageid in this.messageList) {
+			messages_to_save[messages_to_save.length] = {
+				'sourceid': this.messageList[messageid].sourceid,
+				'time': this.messageList[messageid].time,
+				'time_till': this.messageList[messageid].time_till
+			}
+		}
+
+		cookie.create('messages', JSON.stringify(messages_to_save));
 
 		return this.messageList[this.msgcounter];
 	},
@@ -256,7 +303,21 @@ var CMessageList = Class.create(CDebug, {
 		if (this.messagePipe.length < 1) {
 			this.messagePipe = [];
 			this.messageList = {};
+			cookie.erase('messages');
 			setTimeout(Element.hide.bind(Element, this.dom.container), this.effectTimeout);
+		}
+		else {
+			var messages_to_save = [];
+
+			for (var messageid in this.messageList) {
+				messages_to_save[messages_to_save.length] = {
+					'sourceid': this.messageList[messageid].sourceid,
+					'time': this.messageList[messageid].time,
+					'time_till': this.messageList[messageid].time_till
+				}
+			}
+
+			cookie.create('messages', JSON.stringify(messages_to_save));
 		}
 	},
 
@@ -296,19 +357,21 @@ var CMessageList = Class.create(CDebug, {
 		}
 
 		this.stopSound();
+		cookie.erase('messages');
 	},
 
 	timeoutMessages: function() {
 		this.debug('timeoutMessages');
-		var now = parseInt(new Date().getTime() / 1000);
-		var timeout = 0;
+		var now = parseInt(new Date().getTime() / 1000),
+			timeout = 0;
 
 		for (var messageid in this.messageList) {
 			if (empty(this.messageList[messageid])) {
 				continue;
 			}
 			var msg = this.messageList[messageid];
-			if ((msg.time + parseInt(msg.timeout, 10)) < now) {
+
+			if (now >= msg.time_till) {
 				setTimeout(this.closeMessage.bind(this, messageid, true), 500 * timeout);
 				timeout++;
 			}
@@ -317,16 +380,81 @@ var CMessageList = Class.create(CDebug, {
 
 	getServerMessages: function() {
 		this.debug('getServerMessages');
-		var now = parseInt(new Date().getTime() / 1000);
+
+		var now = parseInt(new Date().getTime() / 1000),
+			messages = cookie.read('messages'),
+			messages_to_save = [],
+			msgcount = 0,
+			messageids = [],
+			last_event_time = 0;
+
+		if (messages != null) {
+			/*
+			 * For some reason JSON.stringify creates escaped strings like "[{\"sourceid\": \"278513\" ...}]"
+			 * so string is parsed twice till it is converted to an object.
+			 */
+			messages = JSON.parse(messages);
+			messages = JSON.parse(messages);
+
+			while (isset(msgcount, messages)) {
+				msgcount++;
+			}
+		}
+
+		if (msgcount > 0) {
+			/*
+			 * A code "for (var messageid in messages)" is unrealiable, since messages[0] is the object we need,
+			 * but it also contains non-empty messages[1] (and more) with function calls and it messeses with iteration.
+			 */
+			for (var i = 0; i < msgcount; i++) {
+				// Find the time for last event.
+				if (messages[i].time > last_event_time) {
+					last_event_time = messages[i].time;
+				}
+
+				/*
+				 * Check if the message still has some time to live. If so, re-save those messages cookie
+				 * and gather event IDs. Those IDs will be used in RPC call to get older messages.
+				 * In the same RPC call, we shall get new messages that haven't been displayed yet.
+				 */
+				if (now < messages[i].time_till) {
+					messageids[messageids.length] = messages[i].sourceid;
+					messages_to_save[messages_to_save.length] = messages[i];
+				}
+			}
+
+			cookie.create('messages', JSON.stringify(messages_to_save));
+		}
+		else {
+			cookie.erase('messages');
+		}
+
 		if (!this.ready || ((this.lastupdate + this.updateFrequency) > now)) {
 			return true;
 		}
 		this.ready = false;
+
+		var messageLast = {};
+
+		/*
+		 * If page has been fully refreshed, get last event based on cookie if possible. Even after the cookie has beed
+		 * deleted (while the page has not been refreshed yet), we still know when was the last time event happened.
+		 * If the page was not refreshed, use the orignal object.
+		 */
+		if (this.lastupdate == 0 && last_event_time > 0) {
+			messageLast = {'events': {'time': last_event_time}};
+		}
+		else {
+			messageLast = this.messageLast;
+		}
+
 		var rpcRequest = {
 			'method': 'message.get',
 			'params': {
 				'messageListId': this.messageListId,
-				'messageLast': this.messageLast
+				'messageLast': messageLast,
+				'lastupdate': this.lastupdate,
+				'eventids': messageids.toString()
 			},
 			'onSuccess': this.serverRespond.bind(this),
 			'onFailure': function() {
@@ -420,7 +548,8 @@ var CMessage = Class.create(CDebug, {
 	priority:	0,			// msg priority ASC
 	sound:		null,		// msg sound
 	color:		'ffffff',	// msg color
-	time:		0,			// msg time arrival
+	time:		0,			// event time
+	time_till:	0,			// how long till the message will become outdated
 	title:		'No title',	// msg header
 	body:		['No text'],// msg details
 	timeout:	60,			// msg timeout

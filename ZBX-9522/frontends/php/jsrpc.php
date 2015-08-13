@@ -79,19 +79,46 @@ switch ($data['method']) {
 			break;
 		}
 
-		// timeout
-		$timeout = time() - $msgsettings['timeout'];
+		// On a full page refresh $lastMsgTime can be 0, if no cookie exists or a number if cookie exists.
 		$lastMsgTime = 0;
 		if (isset($data['params']['messageLast']['events'])) {
 			$lastMsgTime = $data['params']['messageLast']['events']['time'];
 		}
 
+		/*
+		 * If cookie exists, collect the events that are still required to display. In the mean time query will also
+		 * collect the new events depeding on the last event time ($lastMsgTime).
+		 */
+		$eventids = array();
+		if (array_key_exists('eventids', $data['params'])) {
+			$eventids = array_filter(explode(',', $data['params']['eventids']));
+		}
+
+		/*
+		 * On a full page refresh 'lastupdate' is 0, otherwise it is the last RPC call time.
+		 * 'last.clock' is the last event time + 1 second and updates only when 'message.closeAll' is called.
+		 */
+		if ($data['params']['lastupdate'] == 0) {
+			/*
+			 * Events with short timeouts can happen in between full page refresh. Since RPC calls are made each
+			 * 60 seconds, get events during the last minute or get messages if not yet timed out.
+			 */
+			$timeout = ($msgsettings['timeout'] < 60) ? 60 : $msgsettings['timeout'];
+			$lastChangeSince = max(array($lastMsgTime, $msgsettings['last.clock'], time() - $timeout));
+		}
+		else {
+			$lastChangeSince = max(array($lastMsgTime, $msgsettings['last.clock'],
+				$data['params']['lastupdate'] - $msgsettings['timeout']
+			));
+		}
+
 		$options = array(
 			'nodeids' => get_current_nodeid(true),
-			'lastChangeSince' => max(array($lastMsgTime, $msgsettings['last.clock'], $timeout)),
+			'lastChangeSince' => $lastChangeSince,
 			'value' => array(TRIGGER_VALUE_TRUE, TRIGGER_VALUE_FALSE),
 			'priority' => array_keys($msgsettings['triggers.severities']),
-			'triggerLimit' => 15
+			'triggerLimit' => 15,
+			'eventids' => $eventids
 		);
 		if (!$msgsettings['triggers.recovery']) {
 			$options['value'] = array(TRIGGER_VALUE_TRUE);
