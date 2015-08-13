@@ -2768,6 +2768,12 @@ a.blue {
 .na-bg {
 	color: darken($alt-blue-grey,45%);
 	background-color: $alt-blue-grey;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .na-bg;
+		}
+	}
 }
 td.na-bg {
 	border-left: none;
@@ -2788,6 +2794,12 @@ td.normal-bg {
 .info-bg {
 	color: darken($alt-dark-blue,45%);
 	background-color: $alt-dark-blue;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .info-bg;
+		}
+	}
 }
 td.info-bg {
 	@extend td.na-bg;
@@ -2796,6 +2808,12 @@ td.info-bg {
 .average-bg {
 	color: darken($alt-orange,45%);
 	background-color: $alt-orange;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .average-bg;
+		}
+	}
 }
 td.average-bg {
 	@extend td.na-bg;
@@ -2804,6 +2822,12 @@ td.average-bg {
 .warning-bg {
 	color: darken($alt-yellow,45%);
 	background-color: $alt-yellow;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .warning-bg;
+		}
+	}
 }
 td.warning-bg {
 	@extend td.na-bg;
@@ -2812,6 +2836,12 @@ td.warning-bg {
 .high-bg {
 	color: darken($alt-dark-orange,45%);
 	background-color: $alt-dark-orange;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .high-bg;
+		}
+	}
 }
 td.high-bg {
 	@extend td.na-bg;
@@ -2820,6 +2850,12 @@ td.high-bg {
 .disaster-bg {
 	color: darken($alt-red,45%);
 	background-color: $alt-red;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .disaster-bg;
+		}
+	}
 }
 td.disaster-bg {
 	@extend td.na-bg;
