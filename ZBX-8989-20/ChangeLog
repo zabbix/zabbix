@@ -1,11 +1,26 @@
+Changes for 2.0.16rc1
+
+New features:
+
+Bug fixes:
+.........T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows
+
+--------------------------------------------------------------------------------
+Changes for 2.0.15
+
+2.0.15rc1 was released as 2.0.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.15rc1
 
 New features:
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
-A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech, Japanese and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
+........S. [ZBX-9657] fixed timeout error being recognized as success when executing scripts on nodes (wiper)
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
