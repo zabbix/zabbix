@@ -149,7 +149,6 @@ jQuery(function($) {
 
 	// create jquery buttons
 	$('.jqueryinput').button();
-	$('.jqueryinputset').buttonset();
 
 	// redirect buttons
 	$('button[data-url]').click(function() {

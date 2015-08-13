@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 
@@ -92,9 +91,7 @@ if ($httptestid = getRequest('httptestid', false)) {
 		$items[] = ['itemid' => $item['itemid'], 'color' => $itemColor];
 	}
 
-	$httpTest = get_httptest_by_httptestid($httptestid);
-
-	$name = CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name']);
+	$name = getRequest('name', '');
 }
 elseif ($items = getRequest('items', [])) {
 	asort_by_key($items, 'sortorder');

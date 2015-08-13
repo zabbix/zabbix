@@ -104,9 +104,7 @@ $tranStrings = [
 		'Cancel' => _('Cancel'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation'),
-		'S_DELETE' => _('Delete'),
-		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
-		'S_DELETE_EXPRESSION_Q' => _('Delete expression?')
+		'S_DELETE' => _('Delete')
 	],
 	'class.calendar.js' => [
 		'S_JANUARY' => _('January'),

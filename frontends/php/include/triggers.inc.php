@@ -774,13 +774,21 @@ function triggerExpression($trigger, $html = false) {
 						$link = (new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_'])))->addClass($style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+						$link = (new CLink(
+							$function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-							$trigger['discoveryRuleid']))->addClass($style);
+							$trigger['discoveryRuleid']
+						))
+							->addClass(ZBX_STYLE_LINK_ALT)
+							->addClass($style);
 					}
 					else {
-						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
-							'items.php?form=update&itemid='.$function_data['itemid']))->addClass($style);
+						$link = (new CLink(
+							$function_data['host'].':'.CHtml::encode($function_data['key_']),
+							'items.php?form=update&itemid='.$function_data['itemid']
+						))
+							->addClass(ZBX_STYLE_LINK_ALT)
+							->addClass($style);
 					}
 					array_push(
 						$exp,
@@ -1085,7 +1093,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		foreach ($hostNames as $hostName) {
 			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
 		}
-		$triggerTable->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader($header);
 
 		// data
 		foreach ($data as $description => $triggerHosts) {
@@ -1110,7 +1118,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$header[] = (new CColHeader($description))->addClass('vertical_rotation');
 		}
 
-		$triggerTable->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader($header);
 
 		// data
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
@@ -1147,7 +1155,8 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  * @return CCol
  */
 function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
-	$ack = $css = $style = null;
+	$ack = null;
+	$css = null;
 	$desc = [];
 	$acknowledge = [];
 
@@ -1155,7 +1164,6 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$config = select_config();
 
 	if ($trigger) {
-		$style = 'cursor: pointer; ';
 		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
 
 		// problem trigger
@@ -1179,7 +1187,7 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 					}
 
 					if ($event['acknowledged'] == 1) {
-						$ack = new CImg('images/general/tick.png', 'ack');
+						$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 					}
 				}
 			}
@@ -1201,11 +1209,9 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = (new CImg('images/general/arrow_down2.png', 'DEP_DOWN'))
-				->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			$desc[] = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
 				->setHint($dependencyTable, '', false);
-
-			$desc[] = $icon;
 		}
 
 		// trigger dependency UP
@@ -1221,19 +1227,19 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
-				->setAttribute('style', 'vertical-align: middle; border: none;')
+			$desc[] = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_DEPEND_UP)
 				->setHint($dependencyTable, '', false);
-
-			$desc[] = $icon;
 		}
 	}
 
-	$column = ((is_array($desc) && count($desc) > 0) || $ack)
-		? (new CCol([$desc, $ack]))->addClass($css)->addClass('hosts')
-		: (new CCol(SPACE))->addClass($css)->addClass('hosts');
+	$column = new CCol([$desc, $ack]);
 
-	$column->setAttribute('style', $style);
+	if ($css !== null) {
+		$column
+			->addClass($css)
+			->addClass(ZBX_STYLE_CURSOR_POINTER);
+	}
 
 	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
 		$column->addClass('blink');
@@ -1556,14 +1562,15 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				}
 
 				if (defined('NO_LINK_IN_TESTING')) {
-					$url = new CSpan($element['expression']);
+					$url = $element['expression'];
 				}
 				else {
 					$expressionId = 'expr_'.$element['id'];
 
-					$url = new CSpan($element['expression'], 'link');
-					$url->setId($expressionId);
-					$url->onClick('javascript: copy_expression("'.$expressionId.'");');
+					$url = (new CSpan($element['expression']))
+						->addClass(ZBX_STYLE_LINK_ACTION)
+						->setId($expressionId)
+						->onClick('javascript: copy_expression("'.$expressionId.'");');
 				}
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;
