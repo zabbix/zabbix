@@ -3,6 +3,7 @@ Changes for 2.4.7rc1
 New features:
 
 Bug fixes:
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 ...G...... [ZBX-9739] fixed agent crash when active check fails without setting error message (wiper)
 
 --------------------------------------------------------------------------------
@@ -654,6 +655,7 @@ Changes for 2.2.11rc1
 New features:
 
 Bug fixes:
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 
 --------------------------------------------------------------------------------
 Changes for 2.2.10
@@ -1935,6 +1937,7 @@ Changes for 2.0.16rc1
 New features:
 
 Bug fixes:
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 
 --------------------------------------------------------------------------------
 Changes for 2.0.15
