@@ -71,7 +71,7 @@ $severityTab = (new CFormList())
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		new CColor('severity_color_5', $data['severity_color_5'])
 	])
-	->addRow()
+	->addRow(null)
 	->addInfo(_('Custom severity names affect all locales and require manual translation!'));
 
 $severityForm = (new CForm())

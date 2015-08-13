@@ -26,18 +26,18 @@ $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
  */
 $overviewFormList = new CFormList();
 
-$host_name = [
-	(new CSpan($this->data['host']['host']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getHost(
-			$this->data['host'],
-			$this->data['hostScripts'][$this->data['host']['hostid']],
-			false
-		))
-];
+$host_name = (new CSpan($this->data['host']['host']))
+	->addClass(ZBX_STYLE_LINK_ACTION)
+	->setMenuPopup(CMenuPopupHelper::getHost(
+		$this->data['host'],
+		$this->data['hostScripts'][$this->data['host']['hostid']],
+		false
+	));
 
 if ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-	$maintenance_icon = (new CSpan())->addClass(ZBX_STYLE_ICON_MAINT);
+	$maintenance_icon = (new CSpan())
+		->addClass(ZBX_STYLE_ICON_MAINT)
+		->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 	if (array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
 		$maintenance = $data['maintenances'][$data['host']['maintenanceid']];
@@ -53,8 +53,7 @@ if ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 		$maintenance_icon->setHint($hint);
 	}
 
-	$host_name[] = $maintenance_icon;
-	$host_name = (new CSpan($host_name))->addClass(ZBX_STYLE_REL_CONTAINER);
+	$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 }
 
 $overviewFormList->addRow(_('Host name'), $host_name);
