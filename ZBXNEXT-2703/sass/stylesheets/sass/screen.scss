@@ -33,7 +33,7 @@ a {
 
 	&:visited {
 		color: $link-visited-color;
-		text-decoration: none;
+		text-decoration: none; 
 	}
 
 	&:hover {
@@ -83,36 +83,26 @@ a {
 	cursor: pointer;
 
 	&:link {
-		//text-decoration: none;
 		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
-		//cursor: pointer;
 	}
 
 	&:visited {
-		//text-decoration: none;
 		border-bottom: 1px solid rgba($link-alt-underline-color, 0.35);
-		//cursor: pointer;
 	}
 
 	&:hover {
-		//text-decoration: none;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
-		//cursor: pointer;
 	}
 
 	&:focus {
-		//text-decoration: none;
 		color: $link-hover-color;
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
-		//cursor: pointer;
 	}
 
 	&:active {
-		//text-decoration: none;
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, 0.5);
-		//cursor: pointer;
 	}
 }
 
@@ -298,6 +288,7 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
+		background-color: $main-nav-bg-color;
 
 		.search-suggest {
 			min-width: 186px;
@@ -554,29 +545,22 @@ footer {
 		height: 100%;
 		overflow: hidden;
 		white-space: nowrap;
-	    padding: 8px 5px 7px 5px;
+	    padding: 8px 5px 6px 5px;
 	    vertical-align: bottom;
 	    border-bottom: 2px solid $table-border-color;
 	    text-align: left;
-	    //position: relative;
 
 	    .arrow-up {
-	    	//position: absolute;
-	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-bottom-color: $font-alt-color;
 	    }
 
 	    .arrow-right {
-	    	//position: absolute;
-	    	//top: 39%;
 	    	margin: 0 0 0 4px;
 	    	border-left-color: $font-alt-color;
 	    }
 
 	    .arrow-down {
-	    	//position: absolute;
-	    	//top: 43%;
 	    	margin: 0 0 0 4px;
 	    	border-top-color: $font-alt-color;
 	    }
@@ -655,14 +639,6 @@ footer {
 	a {
 		@extend %paging-btn;
 	}
-
-	//.arrow-left {
-	//	border-right-color: $link-color;
-	//}
-
-	//.arrow-right {
-	//	border-left-color: $link-color;
-	//}
 }
 
 .radio-switch {
@@ -764,7 +740,6 @@ footer {
 	height: 18px;
 	line-height: 18px;
 	text-align: center;
-	//margin-left: -2px;
 
 	.arrow-right {
 		border-left-color: $font-alt-color;
@@ -843,23 +818,23 @@ footer {
 		padding: 0 10px;
 	}
 
-	//.list-table {                                       
-	//	margin-bottom: -10px;
-	//	border: none;
+	.list-table {                                       
+		margin-bottom: -10px;
+		border: none;
 
-	//	thead {
+		thead {
 
-	//		th {
-	//			font-size: $font-form-size;
-	//			text-transform: none;
-	//			text-rendering: auto;
-	//			letter-spacing: normal;
-	//			color: initial;
-	//			padding: 8px 5px 5px 5px;
-	//			border-bottom-width: 1px;
-	//		}
-	//	}
-	//}
+			th {
+				font-size: $font-form-size;
+				text-transform: none;
+				text-rendering: auto;
+				letter-spacing: normal;
+				color: initial;
+				padding: 8px 5px 5px 5px;
+				border-bottom-width: 1px;
+			}
+		}
+	}
 }
 
 .subfilter-enabled {
@@ -910,6 +885,7 @@ footer {
 .multiselect-wrapper {
 	position: relative;
 	vertical-align: top;
+	display: inline-block;
 }
 
 .multiselect {
@@ -1193,7 +1169,20 @@ footer {
 			display: block;
 		}
 	}
-	
+
+	th {
+		font-size: $font-h3-size;
+		color: $font-alt-color;
+		text-transform: $font-transform;
+		letter-spacing: 0.0688em;
+		text-rendering: optimizeLegibility;
+		padding: 0 10px 0 0;
+
+		&:last-child {
+			padding: 0;
+		}
+	}
+
 	tfoot {
 
 		.table-forms-td-right {
@@ -1280,6 +1269,7 @@ footer {
 	display: inline-block;
 	padding: 5px;
 	border: 1px solid $table-border-color;
+	@include box-sizing(border-box);
 }
 
 .drag-drop-area {
@@ -1302,7 +1292,7 @@ footer {
 
 	li {
 		display: block;
-		padding: 0 0 0.7em 0;
+		padding: 0.3em 0;
 	}
 
 	label {
@@ -1319,6 +1309,91 @@ footer {
 		input[type="radio"] {
 			left: -3px;
 			margin: 0;
+		}
+	}
+}
+
+.list-hor-check-radio {
+	@extend .list-check-radio;
+
+	li {
+		display: inline-block;
+		margin-right: 15px;
+
+		&:last-child {
+			margin-right: 0;
+		}
+	}
+
+}
+
+.radio-segmented {
+
+	li {
+		position: relative;
+		display: inline-block;
+		margin: 0 -1px 0 0;
+
+		&:first-child label {
+			@include border-radius(2px 0 0 2px);
+		}
+
+		&:last-child label {
+			@include border-radius(0 2px 2px 0);
+		}
+	}
+
+	label {
+		padding: 4px 11px;
+		border: 1px solid $form-border-color;
+		@include transition(background-color .2s ease-out);
+	}
+
+	input[type="radio"] {
+		position: absolute;
+		clip: rect(1px, 1px, 1px, 1px);
+
+		+ label {
+			color: $font-color;
+			border-color: $form-border-color;
+			background-color: $form-bg-color;
+
+			&:hover {
+				background-color: $ui-hover-color;
+			}
+
+			&:active {
+				color: $white;
+				border-color: $form-border-color;
+				background-color: $ui-bg-selected-color;
+			}
+		}
+
+		&:focus + label {
+			border-color: $form-border-focus-color;
+			background-color: $ui-hover-color;
+			position: relative;
+			z-index: 1;
+		}
+
+		&:checked + label {
+			color: $white;
+			border-color: $form-border-color;
+			background-color: $ui-bg-selected-color;	
+		}
+
+		&:checked:focus + label {
+			border-color: $form-border-focus-color;	
+			position: relative;
+			z-index: 1;
+		}
+
+		&:checked[disabled] + label {
+			background-color: lighten($ui-bg-selected-color, 15%);
+		}
+
+		&[disabled] + label {
+			@extend %form-disabled;
 		}
 	}
 }
@@ -1550,6 +1625,7 @@ button {
 	&:active {
 		color: $btn-form-font-color;
 		background-color: $ui-hover-color;
+		border-color: $form-border-focus-color;
 	}
 }
 
@@ -1818,20 +1894,19 @@ button[disabled] {
 }
 
 $var-icons: (
-	maint: url(../img/icon-sprite.svg) no-repeat -49px -802px,
-	depend-up: url(../img/icon-sprite.svg) no-repeat -46px -731px,
-	depend-down: url(../img/icon-sprite.svg) no-repeat -46px -767px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -5px -835px
+	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
+	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
+	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
+	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
 );
 
 @each $var-icons, $bgimage in $var-icons {
     .icon-#{$var-icons} {
-    	background: $bgimage;
-        @extend %var-icons;
-
-        @if $var-icons == 'maint' {
-        	position: absolute;
-        }
+    	margin: 0 18px 0 0;
+    	&::before {
+    		background: $bgimage;
+    		@extend %var-icons;
+    	}
     }
 }
 
@@ -1873,8 +1948,10 @@ $form-icon-btn: (
 
 %var-icons {
 	display: inline-block;
-	width: 14px;
-	height: 14px;
+	width: 18px;
+	height: 18px;
+	position: absolute;
+	content: '';
 }
 
 .drag-icon {
@@ -2117,7 +2194,6 @@ $form-icon-btn: (
 }
 
 .dashbrd-widget-head {
-	//cursor: move;
 	position: relative;
 	padding: 8px 60px 8px 10px;
 	font-weight: bold;
@@ -2530,6 +2606,11 @@ $form-icon-btn: (
 		text-align: center;
 		vertical-align: middle;
 		padding: 3px;
+
+		td {
+			text-align: left;
+			padding: initial;
+		}
 	}
 }
 
@@ -2548,8 +2629,8 @@ $form-icon-btn: (
 	position: absolute;
 	z-index: 98;
 	overflow: hidden;
-	background-color: rgba($yellow,0.4);
-	border: 1px solid rgba($yellow,0.4);
+	background-color: rgba($yellow,0.5);
+	border: 1px solid rgba($yellow,0.5);
 }
 
 /* Debug */
@@ -2687,6 +2768,12 @@ a.blue {
 .na-bg {
 	color: darken($alt-blue-grey,45%);
 	background-color: $alt-blue-grey;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .na-bg;
+		}
+	}
 }
 td.na-bg {
 	border-left: none;
@@ -2707,6 +2794,12 @@ td.normal-bg {
 .info-bg {
 	color: darken($alt-dark-blue,45%);
 	background-color: $alt-dark-blue;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .info-bg;
+		}
+	}
 }
 td.info-bg {
 	@extend td.na-bg;
@@ -2715,6 +2808,12 @@ td.info-bg {
 .average-bg {
 	color: darken($alt-orange,45%);
 	background-color: $alt-orange;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .average-bg;
+		}
+	}
 }
 td.average-bg {
 	@extend td.na-bg;
@@ -2723,6 +2822,12 @@ td.average-bg {
 .warning-bg {
 	color: darken($alt-yellow,45%);
 	background-color: $alt-yellow;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .warning-bg;
+		}
+	}
 }
 td.warning-bg {
 	@extend td.na-bg;
@@ -2731,6 +2836,12 @@ td.warning-bg {
 .high-bg {
 	color: darken($alt-dark-orange,45%);
 	background-color: $alt-dark-orange;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .high-bg;
+		}
+	}
 }
 td.high-bg {
 	@extend td.na-bg;
@@ -2739,6 +2850,12 @@ td.high-bg {
 .disaster-bg {
 	color: darken($alt-red,45%);
 	background-color: $alt-red;
+
+	input[type="radio"] {
+		&:checked + label {
+			@extend .disaster-bg;
+		}
+	}
 }
 td.disaster-bg {
 	@extend td.na-bg;
@@ -2812,6 +2929,10 @@ td.disaster-bg {
 .msg-details {
 	font-size: $font-form-size;
 	text-align: left;
+	max-height: 300px;
+    padding: 0 5px 0 0;
+    overflow-y: auto;
+    @extend %webkit-scrollbar;
 
 	.link-action {
 		position: absolute;
@@ -2821,13 +2942,20 @@ td.disaster-bg {
 	}
 
 	ul {
-		//margin: 8px 0 0 0;
-		//border-top-width: 1px;
-		//border-top-style: dashed;
 		font-size: $font-msg-reset-size;
 
 		li {
-			margin: 0.25em 0 0.25em 0; 
+			margin: .5em 0 .5em 1em;
+
+			&::before {
+				content: '\2013';
+				float: left;
+				margin-left: -1em;
+			}
+
+			&:only-child {
+				margin-left: 0;
+			} 
 		}
 
 		&.msg-details-border {
@@ -2919,7 +3047,7 @@ td.disaster-bg {
 
 .overlay-close-btn {
 	position: absolute;
-	z-index: 10000;
+	z-index: 1000;
 	top: 0;
 	right: 0;
 	@extend %close-icon;
@@ -3076,7 +3204,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar-thumb {
 		background-color: $scrollbar-thumb-color;
-		border: 1px solid $scrollbar-track-color;
+		border: 1px solid darken($scrollbar-thumb-color,5%);
 	}
 }
 
@@ -3112,12 +3240,23 @@ $browser-logos: (
 
 .rel-container {
 	position: relative;
-	//display: inline-block;
-	//padding-right: 14px;
-	padding: 8px 14px 8px 5px;
+	display: inline-block;
+}
 
-  .icon-help {
-  	top: 3px;
-  	left: -3px;
-  }
+.server-name {
+	font-size: $font-msg-reset-size;
+	max-width: 180px;
+	padding: 4px 7px;
+}
+
+.list-hor-min-width {
+
+	li {
+		display: inline-block;
+		min-width: 2em;
+
+		&:last-child {
+			min-width: auto;
+		}
+	}
 }

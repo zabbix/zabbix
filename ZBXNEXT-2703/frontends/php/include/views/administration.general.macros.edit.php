@@ -29,7 +29,6 @@ $widget = (new CWidget())
 	);
 
 $table = (new CTable())
-	->addClass('formElementTable')
 	->setId('tbl_macros')
 	->setHeader([_('Macro'), '', _('Value'), '']);
 
