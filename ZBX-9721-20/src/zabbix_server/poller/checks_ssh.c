@@ -204,8 +204,6 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 				rc = libssh2_userauth_publickey_fromfile(session, item->username, publickey,
 						privatekey, item->password);
-				zbx_free(publickey);
-				zbx_free(privatekey);
 
 				if (0 != rc)
 				{
@@ -324,6 +322,8 @@ tcp_close:
 	zbx_tcp_close(&s);
 
 close:
+	zbx_free(publickey);
+	zbx_free(privatekey);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
