@@ -1,3 +1,16 @@
+Changes for 2.2.11rc1
+
+New features:
+
+Bug fixes:
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.10
+
+2.2.10rc2 was released as 2.2.10 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.10rc2
 
 New features:
@@ -1265,6 +1278,19 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.16rc1
+
+New features:
+
+Bug fixes:
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.15
+
+2.0.15rc1 was released as 2.0.15 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.15rc1
