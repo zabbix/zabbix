@@ -954,11 +954,8 @@ class CChart extends CGraphDraw {
 			$start_i++;
 		}
 
-		// Check variables to avoid infinite loop.
-		if ( ($intervalX!=0) || (($this->sizeX - $offsetX) > 11) ) {
-			while (($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 12) {
-				$vline_count--;
-			}
+		while (($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 12) {
+			$vline_count--;
 		}
 
 		$sub = &$this->grid['horizontal']['sub'];
@@ -993,11 +990,8 @@ class CChart extends CGraphDraw {
 			$start_i++;
 		}
 
-		// Check variables to avoid infinite loop.
-		if ( ($intervalX!=0) || (($this->sizeX - $offsetX) > 11) ) {
-			while (($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 12) {
-				$vline_count--;
-			}
+		while (($this->sizeX - ($offsetX + ($vline_count*$intervalX))) < 12) {
+			$vline_count--;
 		}
 
 		$main = &$this->grid['horizontal']['main'];

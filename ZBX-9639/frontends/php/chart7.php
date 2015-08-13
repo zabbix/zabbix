@@ -41,7 +41,9 @@ $fields = array(
 	'legend' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null),
 	'items' =>		array(T_ZBX_STR, O_OPT, null,		null,				null)
 );
-$isDataValid = check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 $items = get_request('items', array());
 asort_by_key($items, 'sortorder');
@@ -82,38 +84,36 @@ foreach ($items as $item) {
 /*
  * Display
  */
-if ($isDataValid) {
-	navigation_bar_calc();
+navigation_bar_calc();
 
-	$graph = new CPie(get_request('graphtype', GRAPH_TYPE_NORMAL));
-	$graph->setHeader(get_request('name', ''));
+$graph = new CPie(get_request('graphtype', GRAPH_TYPE_NORMAL));
+$graph->setHeader(get_request('name', ''));
 
-	if (!empty($_REQUEST['graph3d'])) {
-		$graph->switchPie3D();
-	}
-	$graph->showLegend(get_request('legend', 0));
-
-	unset($host);
-
-	if (isset($_REQUEST['period'])) {
-		$graph->setPeriod($_REQUEST['period']);
-	}
-	if (isset($_REQUEST['from'])) {
-		$graph->setFrom($_REQUEST['from']);
-	}
-	if (isset($_REQUEST['stime'])) {
-		$graph->setSTime($_REQUEST['stime']);
-	}
-	if (isset($_REQUEST['border'])) {
-		$graph->setBorder(0);
-	}
-	$graph->setWidth(get_request('width', 400));
-	$graph->setHeight(get_request('height', 300));
-
-	foreach ($items as $item) {
-		$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
-	}
-	$graph->draw();
+if (!empty($_REQUEST['graph3d'])) {
+	$graph->switchPie3D();
 }
+$graph->showLegend(get_request('legend', 0));
+
+unset($host);
+
+if (isset($_REQUEST['period'])) {
+	$graph->setPeriod($_REQUEST['period']);
+}
+if (isset($_REQUEST['from'])) {
+	$graph->setFrom($_REQUEST['from']);
+}
+if (isset($_REQUEST['stime'])) {
+	$graph->setSTime($_REQUEST['stime']);
+}
+if (isset($_REQUEST['border'])) {
+	$graph->setBorder(0);
+}
+$graph->setWidth(get_request('width', 400));
+$graph->setHeight(get_request('height', 300));
+
+foreach ($items as $item) {
+	$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
+}
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -40,7 +40,9 @@ $fields = array(
 	'height' =>			array(T_ZBX_INT, O_OPT, null,	'{}>0',		null),
 	'border' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null)
 );
-$isDataValid = check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 /*
  * Permissions
@@ -63,33 +65,31 @@ if (empty($dbItems)) {
 /*
  * Display
  */
-if ($isDataValid) {
-	$timeline = CScreenBase::calculateTime(array(
-			'profileIdx' => get_request('profileIdx', 'web.screens'),
-			'profileIdx2' => get_request('profileIdx2'),
-			'updateProfile' => get_request('updateProfile', true),
-			'period' => get_request('period'),
-			'stime' => get_request('stime')
-	));
+$timeline = CScreenBase::calculateTime(array(
+	'profileIdx' => get_request('profileIdx', 'web.screens'),
+	'profileIdx2' => get_request('profileIdx2'),
+	'updateProfile' => get_request('updateProfile', true),
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
+));
 
-	$graph = new CChart();
-	$graph->setPeriod($timeline['period']);
-	$graph->setSTime($timeline['stime']);
+$graph = new CChart();
+$graph->setPeriod($timeline['period']);
+$graph->setSTime($timeline['stime']);
 
-	if (isset($_REQUEST['from'])) {
-		$graph->setFrom($_REQUEST['from']);
-	}
-	if (isset($_REQUEST['width'])) {
-		$graph->setWidth($_REQUEST['width']);
-	}
-	if (isset($_REQUEST['height'])) {
-		$graph->setHeight($_REQUEST['height']);
-	}
-	if (isset($_REQUEST['border'])) {
-		$graph->setBorder(0);
-	}
-	$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
-	$graph->draw();
+if (isset($_REQUEST['from'])) {
+	$graph->setFrom($_REQUEST['from']);
 }
+if (isset($_REQUEST['width'])) {
+	$graph->setWidth($_REQUEST['width']);
+}
+if (isset($_REQUEST['height'])) {
+	$graph->setHeight($_REQUEST['height']);
+}
+if (isset($_REQUEST['border'])) {
+	$graph->setBorder(0);
+}
+$graph->addItem($_REQUEST['itemid'], GRAPH_YAXIS_SIDE_DEFAULT, CALC_FNC_ALL);
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
