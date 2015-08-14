@@ -3242,6 +3242,7 @@ $browser-logos: (
 
 .overflow-ellipsis {
 	table-layout: fixed;
+	@extend %overflow-ellipsis;
 
 	td {
 		@extend %overflow-ellipsis;
