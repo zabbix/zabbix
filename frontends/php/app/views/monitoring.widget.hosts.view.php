@@ -51,9 +51,8 @@ CArrayHelper::sort($hosts, ['name']);
 
 // get triggers
 $triggers = API::Trigger()->get([
-	'output' => ['triggerid', 'priority'],
+	'output' => ['triggerid', 'description', 'priority'],
 	'selectHosts' => ['hostid'],
-	'search' => ($data['filter']['trigger_name'] !== '') ? ['description' => $data['filter']['trigger_name']] : null,
 	'filter' => [
 		'priority' => $data['filter']['severity'],
 		'value' => TRIGGER_VALUE_TRUE
@@ -66,9 +65,6 @@ if ($data['filter']['extAck']) {
 	$triggers_unack = API::Trigger()->get([
 		'output' => ['triggerid'],
 		'selectHosts' => ['hostid'],
-		'search' => ($data['filter']['trigger_name'] !== '')
-			? ['description' => $data['filter']['trigger_name']]
-			: null,
 		'filter' => [
 			'priority' => $data['filter']['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -120,7 +116,7 @@ foreach ($triggers as $trigger) {
 
 			foreach ($host['groups'] as $gnum => $group) {
 				if (!isset($highest_severity2[$group['groupid']])) {
-					$highest_severity2[$group['groupid']] = 0;
+					$highest_severity2[$group['groupid']] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 				}
 
 				if ($trigger['priority'] > $highest_severity2[$group['groupid']]) {
@@ -161,7 +157,7 @@ foreach ($triggers as $trigger) {
 
 		foreach ($host['groups'] as $gnum => $group) {
 			if (!isset($highest_severity[$group['groupid']])) {
-				$highest_severity[$group['groupid']] = 0;
+				$highest_severity[$group['groupid']] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 			}
 
 			if ($trigger['priority'] > $highest_severity[$group['groupid']]) {
@@ -198,7 +194,7 @@ foreach ($hosts as $host) {
 		$groups[$group['groupid']]['hosts'][$host['hostid']] = ['hostid' => $host['hostid']];
 
 		if (!isset($highest_severity[$group['groupid']])) {
-			$highest_severity[$group['groupid']] = 0;
+			$highest_severity[$group['groupid']] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 
 		if (!isset($hosts_data[$group['groupid']])) {
@@ -207,6 +203,84 @@ foreach ($hosts as $host) {
 
 		if (!isset($problematic_host_list[$host['hostid']])) {
 			$hosts_data[$group['groupid']]['ok']++;
+		}
+	}
+}
+
+// Apply post filtering of triggers by name.
+if ($data['filter']['trigger_name'] !== '') {
+	// Reset highest severities in case it changes.
+	foreach ($hosts as $host) {
+		foreach ($host['groups'] as $group) {
+			$highest_severity[$group['groupid']] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+			$highest_severity2[$group['groupid']] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+		}
+	}
+
+	foreach ($triggers as $trigger) {
+		// Use case insensitive search and remove all problem counters, if trigger name does not match the filter.
+		if (stripos($trigger['description'], $data['filter']['trigger_name']) === false) {
+			foreach ($trigger['hosts'] as $trigger_host) {
+				if (array_key_exists($trigger_host['hostid'], $hosts)) {
+					$host = $hosts[$trigger_host['hostid']];
+
+					if ($data['filter']['extAck'] && isset($hosts_with_unack_triggers[$host['hostid']])) {
+						if (array_key_exists($trigger['triggerid'], $triggers_unack)) {
+							$lastUnack_host_list[$host['hostid']]['severities'][$trigger['priority']]--;
+
+							$severity_problems = 0;
+							foreach ($lastUnack_host_list[$host['hostid']]['severities'] as $severity) {
+								if ($severity != 0) {
+									$severity_problems++;
+								}
+							}
+
+							if ($severity_problems == 0) {
+								unset($lastUnack_host_list[$host['hostid']]);
+							}
+						}
+
+						foreach ($host['groups'] as $group) {
+							if ($trigger['priority'] > $highest_severity2[$group['groupid']]) {
+								$highest_severity2[$group['groupid']] = $trigger['priority'];
+							}
+
+							if (array_key_exists($host['hostid'], $hosts_data[$group['groupid']]['hostids_unack'])
+									&& !array_key_exists($host['hostid'], $lastUnack_host_list)) {
+								$hosts_data[$group['groupid']]['lastUnack']--;
+								unset($hosts_data[$group['groupid']]['hostids_unack'][$host['hostid']]);
+							}
+						}
+					}
+
+					if (array_key_exists($host['hostid'], $problematic_host_list)) {
+						$problematic_host_list[$host['hostid']]['severities'][$trigger['priority']]--;
+
+						$severity_problems = 0;
+						foreach ($problematic_host_list[$host['hostid']]['severities'] as $severity) {
+							if ($severity != 0) {
+								$severity_problems++;
+							}
+						}
+
+						if ($severity_problems == 0) {
+							unset($problematic_host_list[$host['hostid']]);
+						}
+					}
+
+					foreach ($host['groups'] as $group) {
+						if ($trigger['priority'] > $highest_severity[$group['groupid']]) {
+							$highest_severity[$group['groupid']] = $trigger['priority'];
+						}
+
+						if (array_key_exists($host['hostid'], $hosts_data[$group['groupid']]['hostids_all'])
+								&& !array_key_exists($host['hostid'], $problematic_host_list)) {
+							$hosts_data[$group['groupid']]['problematic']--;
+							unset($hosts_data[$group['groupid']]['hostids_all'][$host['hostid']]);
+						}
+					}
+				}
+			}
 		}
 	}
 }
