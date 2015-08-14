@@ -191,7 +191,7 @@ abstract class CItemGeneral extends CZBXAPI {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
 						// put back the old value
-						if ( isset($dbItems[$item['itemid']][$field]) && isset($fullItem[$field]) ) {
+						if (array_key_exists($field, $dbItems[$item['itemid']]) && array_key_exists($field, $fullItem)) {
 							$fullItem[$field] = $dbItems[$item['itemid']][$field];
 						}
 					}
