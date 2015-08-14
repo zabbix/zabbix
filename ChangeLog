@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-4284] improved handling of timeouting items on reachable hosts (wiper)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ..F....... [ZBX-7492] fixed "Undefined index" when importing host without macros (Gunars)
 ....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
