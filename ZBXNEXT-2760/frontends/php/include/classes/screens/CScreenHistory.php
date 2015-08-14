@@ -141,17 +141,15 @@ class CScreenHistory extends CScreenBase {
 
 				if (empty($this->plaintext)) {
 					$historyTable = (new CTableInfo())
-						->setHeader(
-							[
-								_('Timestamp'),
-								$isManyItems ? _('Item') : null,
-								$useLogItem ? _('Local time') : null,
-								($useEventLogItem && $useLogItem) ? _('Source') : null,
-								($useEventLogItem && $useLogItem) ? _('Severity') : null,
-								($useEventLogItem && $useLogItem) ? _('Event ID') : null,
-								_('Value')
-							]
-						);
+						->setHeader([
+							_('Timestamp'),
+							$isManyItems ? _('Item') : null,
+							$useLogItem ? _('Local time') : null,
+							($useEventLogItem && $useLogItem) ? _('Source') : null,
+							($useEventLogItem && $useLogItem) ? _('Severity') : null,
+							($useEventLogItem && $useLogItem) ? _('Event ID') : null,
+							_('Value')
+						]);
 				}
 
 				if ($this->filter !== '' && in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {

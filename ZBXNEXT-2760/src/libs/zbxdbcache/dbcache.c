@@ -2864,7 +2864,9 @@ static void	init_trend_cache()
 
 	cache->trends_num = 0;
 
-#define INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on trends size? */
+#define INIT_HASHSET_SIZE	100	/* Should be calculated dynamically based on trends size? */
+					/* Still does not make sense to have it more than initial */
+					/* item hashset size in configuration cache.              */
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
 			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,

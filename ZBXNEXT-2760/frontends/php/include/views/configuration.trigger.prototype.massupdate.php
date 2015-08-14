@@ -35,27 +35,24 @@ foreach ($data['g_triggerid'] as $triggerid) {
 	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);
 }
 
-$triggersFormList = new CFormList('triggersFormList');
-
-// append severity to form list
-$severityDiv = new CSeverity([
-	'id' => 'priority_div',
-	'name' => 'priority',
-	'value' => $data['priority']
-]);
-
-$triggersFormList->addRow(
-	[_('Severity'), SPACE,
-		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
-			->setChecked(isset($data['visible']['priority']))
-	],
-	$severityDiv
-);
+$triggersFormList = (new CFormList('triggersFormList'))
+	->addRow(
+		[_('Severity'), SPACE,
+			(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
+				->setChecked(isset($data['visible']['priority']))
+		],
+		(new CDiv(
+			new CSeverity([
+				'name' => 'priority',
+				'value' => $data['priority']
+			])
+		))->setId('priority_div')
+	);
 
 // append dependencies to form list
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
@@ -77,9 +74,11 @@ foreach ($data['dependencies'] as $dependency) {
 	}
 
 	$row = new CRow([$description,
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CCol(
+			(new CButton('remove', _('Remove')))
+				->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 
 	$row->setId('dependency_'.$dependency['triggerid']);
@@ -98,6 +97,7 @@ $addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype
 
 $dependenciesDiv = (new CDiv([$dependenciesTable, $addButton, $addPrototypeButton]))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setId('dependencies_div');
 
 $triggersFormList->addRow(

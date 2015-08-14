@@ -222,7 +222,7 @@ function make_small_eventlist($startEvent) {
 	];
 	CArrayHelper::sort($events, $sortFields);
 
-	$actions = getEventActionsStatHints(zbx_objectValues($events, 'eventid'));
+	$actions = makeEventsActions(zbx_objectValues($events, 'eventid'));
 
 	foreach ($events as $event) {
 		$lclock = $clock;
