@@ -1,6 +1,7 @@
 Changes for 2.2.11rc1
 
 New features:
+A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of large log files (gleb)
