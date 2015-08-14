@@ -60,9 +60,15 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
 
 		/* send requests using old protocol */
-		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, buffer)))
-			ret = SUCCEED_OR_FAIL(received_len = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0));
+		if (SUCCEED != zbx_tcp_send_raw(&s, buffer))
+			ret = NETWORK_ERROR;
+		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			ret = SUCCEED;
+		else
+			ret = TIMEOUT_ERROR;
 	}
+	else
+		ret = NETWORK_ERROR;
 
 	if (SUCCEED == ret)
 	{
@@ -104,9 +110,11 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		zbx_snprintf(buffer, sizeof(buffer), "Get value from agent failed: %s",
 				zbx_tcp_strerror());
 		SET_MSG_RESULT(result, strdup(buffer));
-		ret = NETWORK_ERROR;
 	}
+
 	zbx_tcp_close(&s);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
