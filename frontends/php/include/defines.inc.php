@@ -1095,6 +1095,7 @@ define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
+define('ZBX_STYLE_RADIO_SEGMENTED', 'radio-segmented');
 define('ZBX_STYLE_RED', 'red');
 define('ZBX_STYLE_REL_CONTAINER', 'rel-container');
 define('ZBX_STYLE_ROW', 'row');
