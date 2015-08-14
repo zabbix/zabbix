@@ -98,7 +98,7 @@ class CControllerWidgetHostsView extends CController {
 			$severity = CProfile::get('web.dashconf.triggers.severity', null);
 			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
 			$filter['severity'] = zbx_toHash($filter['severity']);
-			$filter['trigger_name'] = CProfile::get('web.dashconf.triggers.name');
+			$filter['trigger_name'] = CProfile::get('web.dashconf.triggers.name', '');
 
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}

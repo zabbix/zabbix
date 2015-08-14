@@ -92,7 +92,7 @@ if (hasRequest('update')) {
 		CProfile::update('web.dashconf.triggers.severity',
 			implode(';', array_keys(getRequest('trgSeverity', []))), PROFILE_TYPE_STR
 		);
-		CProfile::update('web.dashconf.triggers.name', getRequest('trigger_name'), PROFILE_TYPE_STR);
+		CProfile::update('web.dashconf.triggers.name', getRequest('trigger_name', ''), PROFILE_TYPE_STR);
 
 		// events
 		CProfile::update('web.dashconf.events.extAck', getRequest('extAck', 0), PROFILE_TYPE_INT);
@@ -121,7 +121,7 @@ if (hasRequest('form_refresh')) {
 
 	$data['severity'] = getRequest('trgSeverity', []);
 	$data['severity'] = array_keys($data['severity']);
-	$data['trigger_name'] = getRequest('trigger_name');
+	$data['trigger_name'] = getRequest('trigger_name', '');
 
 	// groups
 	$data['grpswitch'] = getRequest('grpswitch', 0);
@@ -137,7 +137,7 @@ else {
 
 	$data['severity'] = CProfile::get('web.dashconf.triggers.severity', '0;1;2;3;4;5');
 	$data['severity'] = zbx_empty($data['severity']) ? [] : explode(';', $data['severity']);
-	$data['trigger_name'] = CProfile::get('web.dashconf.triggers.name');
+	$data['trigger_name'] = CProfile::get('web.dashconf.triggers.name', '');
 
 	// groups
 	$data['grpswitch'] = CProfile::get('web.dashconf.groups.grpswitch', 0);
