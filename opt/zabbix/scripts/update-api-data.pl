@@ -310,7 +310,7 @@ foreach (keys(%$servicedata))
 
 	my $ah_tld = ah_get_api_tld($tld);
 
-	foreach my $service (@services)
+	foreach my $service (keys(%{$servicedata->{$tld}}))
 	{
 		my $from = $servicedata->{$tld}->{$service}->{'from'};
 		my $till = $servicedata->{$tld}->{$service}->{'till'};
