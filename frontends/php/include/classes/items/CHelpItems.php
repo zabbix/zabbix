@@ -875,6 +875,14 @@ class CHelpItems {
 					'description' => _('Number of values stored in table HISTORY_UINT.')
 				],
 				[
+					'key' => 'zabbix[host,,items]',
+					'description' => _('Number of enabled items on the host.')
+				],
+				[
+					'key' => 'zabbix[host,,items_unsupported]',
+					'description' => _('Number of unsupported items on the host.')
+				],
+				[
 					'key' => 'zabbix[host,,maintenance]',
 					'description' => _('Returns current maintenance status of the host.')
 				],
