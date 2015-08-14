@@ -229,7 +229,7 @@ foreach ($groups as $group) {
 
 			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 				$header[] = ($data['filter']['severity'] === null || isset($data['filter']['severity'][$severity]))
-					? (new CColHeader(getSeverityName($severity, $data['config'])))->addClass(ZBX_STYLE_NOWAP)
+					? getSeverityName($severity, $data['config'])
 					: null;
 			}
 
