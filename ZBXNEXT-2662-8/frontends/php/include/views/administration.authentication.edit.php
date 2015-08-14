@@ -28,20 +28,6 @@ $authenticationForm = (new CForm())->setName('authenticationForm');
 $authenticationFormList = new CFormList('authenticationList');
 
 // append config radio buttons to form list
-$configTypeRadioButton = [
-	(new CRadioButton('config', ZBX_AUTH_INTERNAL, ($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL)))
-		->setId('config_'.ZBX_AUTH_INTERNAL)
-		->onChange('submit()'),
-	new CLabel(_x('Internal', 'authentication'), 'config_'.ZBX_AUTH_INTERNAL),
-	(new CRadioButton('config', ZBX_AUTH_LDAP, ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP)))
-		->setId('config_'.ZBX_AUTH_LDAP)
-		->onChange('submit()'),
-	new CLabel(_('LDAP'), 'config_'.ZBX_AUTH_LDAP),
-	(new CRadioButton('config', ZBX_AUTH_HTTP, ($this->data['config']['authentication_type'] == ZBX_AUTH_HTTP)))
-		->setId('config_'.ZBX_AUTH_HTTP)
-		->onChange('submit()'),
-	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
-];
 $authenticationFormList->addRow(_('Default authentication'),
 	(new CRadioButtonList('config', (int) $this->data['config']['authentication_type']))
 		->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL, null, 'submit()')
