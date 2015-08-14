@@ -283,8 +283,7 @@ class CSetupWizard extends CForm {
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		$table->addRow(
-			(new CCol('Port'))->addClass('header'),
+		$table->addRow(_('Port'),
 			(new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 5, false, false, false))
 				->removeAttribute('style')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

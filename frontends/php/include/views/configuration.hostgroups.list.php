@@ -48,7 +48,7 @@ $hostGroupTable = (new CTableInfo())
 		_('Hosts'),
 		_('Templates'),
 		_('Members'),
-		_('Info')
+		(new CColHeader(_('Info')))->addClass(ZBX_STYLE_CELL_WIDTH)
 	]);
 
 $current_time = time();
@@ -98,13 +98,9 @@ foreach ($this->data['groups'] as $group) {
 		}
 
 		$url = 'hosts.php?form=update&hostid='.$host['hostid'].'&groupid='.$group['groupid'];
-		$link = (new CLink($host['name'], $url))->addClass(ZBX_STYLE_LINK_ALT);
-
-		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
-			$link->addClass(ZBX_STYLE_RED);
-		}
-
-		$hostsOutput[] = $link;
+		$hostsOutput[] = (new CLink($host['name'], $url))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass($host['status'] == HOST_STATUS_MONITORED ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 	}
 
 	$hostCount = $this->data['groupCounts'][$group['groupid']]['hosts'];

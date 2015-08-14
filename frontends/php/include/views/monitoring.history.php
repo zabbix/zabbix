@@ -105,7 +105,7 @@ $header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['f
 // create filter
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
-		$filterForm = new CFilter();
+		$filterForm = new CFilter('web.history.filter.state');
 		$filterColumn1 = new CFormList();
 		$filterForm->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {
@@ -228,16 +228,13 @@ else {
 
 		// display the graph type filter for graphs with multiple items
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
-			$graphType = [
-				(new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, ($this->data['graphtype'] == GRAPH_TYPE_NORMAL)))
-					->setId('graphtype_'.GRAPH_TYPE_NORMAL),
-				new CLabel(_('Normal'), 'graphtype_'.GRAPH_TYPE_NORMAL),
-				(new CRadioButton('graphtype', GRAPH_TYPE_STACKED, ($this->data['graphtype'] == GRAPH_TYPE_STACKED)))
-					->setId('graphtype_'.GRAPH_TYPE_STACKED),
-				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
-			];
 			$filterForm->addColumn(
-				(new CFormList())->addRow(_('Graph type'), $graphType)
+				(new CFormList())->addRow(_('Graph type'),
+					(new CRadioButtonList('graphtype', (int) $this->data['graphtype']))
+						->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
+						->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
+						->setModern(true)
+				)
 			);
 			$filterForm->removeButtons();
 

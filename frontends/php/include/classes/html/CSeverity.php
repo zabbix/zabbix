@@ -19,83 +19,76 @@
 **/
 
 
-class CSeverity extends CTag {
+class CSeverity extends CList {
+
+	const CONTROL_CLASS_NAME = 'trigger-severity-radio';
 
 	/**
-	 * @param string $options['id']
 	 * @param string $options['name']
 	 * @param int    $options['value']
 	 */
 	public function __construct(array $options = []) {
-		parent::__construct('div', true);
-		$this->setId(isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
-		$this->addClass('jqueryinputset radioset control-severity');
+		parent::__construct();
 
-		if (!isset($options['value'])) {
+		$id = zbx_formatDomId($options['name']);
+
+		$this->addClass(ZBX_STYLE_LIST_HOR_CHECK_RADIO);
+		$this->addClass(self::CONTROL_CLASS_NAME);
+		$this->setId($id);
+
+		if (!array_key_exists('value', $options)) {
 			$options['value'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 
-		$items = [];
-		$jsIds = '';
-		$jsLabels = '';
 		$config = select_config();
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$items[] = (new CRadioButton(
-				$options['name'],
-				$severity,
-				($options['value'] == $severity)
-			))->setId($options['name'].'_'.$severity);
-
-			$css = getSeverityStyle($severity);
-
-			$label = (new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity))
-				->setId($options['name'].'_label_'.$severity)
-				->setAttribute('data-severity', $severity)
-				->setAttribute('data-severity-style', $css);
-
-			if ($options['value'] == $severity) {
-				$label->setAttribute('aria-pressed', 'true')
-					->addClass($css);
-			}
-			else {
-				$label->setAttribute('aria-pressed', 'false');
+			$radio = (new CInput('radio', $options['name'], $severity))
+				->setId(zbx_formatDomId($options['name'].'_'.$severity));
+			if ($severity === $options['value']) {
+				$radio->setAttribute('checked', 'checked');
 			}
 
-			$items[] = $label;
-
-			$jsIds .= ', #'.$options['name'].'_'.$severity;
-			$jsLabels .= ', #'.$options['name'].'_label_'.$severity;
+			parent::addItem(
+				(new CListItem(
+					new CLabel([$radio, getSeverityName($severity, $config)], $options['name'].'_'.$severity)
+				))
+					->setAttribute('data-severity-style', getSeverityStyle($severity))
+					->setAttribute('area-pressed', $severity === $options['value'] ? 'true' : 'false')
+			);
 		}
 
-		if ($jsIds) {
-			$jsIds = substr($jsIds, 2);
-			$jsLabels = substr($jsLabels, 2);
+		static $js_initialized = false;
+
+		if (!$js_initialized) {
+			insert_js(
+				'jQuery(".'.self::CONTROL_CLASS_NAME.' li").mouseenter(function() {'."\n".
+				'	jQuery(".'.self::CONTROL_CLASS_NAME.' li").each(function() {'."\n".
+				'		var obj = jQuery(this);'."\n".
+				''."\n".
+				'		if (obj.attr("area-pressed") == "false") {'."\n".
+				'			obj.removeClass(obj.data("severity-style"));'."\n".
+				'		}'."\n".
+				'	});'."\n".
+				''."\n".
+				'	var obj = jQuery(this);'."\n".
+				''."\n".
+				'	obj.addClass(obj.data("severity-style"));'."\n".
+				'})'."\n".
+				'.mouseleave(function() {'."\n".
+				'	jQuery(".'.self::CONTROL_CLASS_NAME.' [area-pressed=\"true\"]").trigger("mouseenter");'."\n".
+				'});'."\n".
+				''."\n".
+				'jQuery(".'.self::CONTROL_CLASS_NAME.' input[type=\"radio\"]").change(function() {'."\n".
+				'	jQuery(".'.self::CONTROL_CLASS_NAME.' input[type=\"radio\"]").not(":checked").closest("li").attr("area-pressed", "false");'."\n".
+				'	jQuery(".'.self::CONTROL_CLASS_NAME.' input[type=\"radio\"]:checked").closest("li").attr("area-pressed", "true");'."\n".
+				'	jQuery(".'.self::CONTROL_CLASS_NAME.' li[area-pressed=\"true\"]").trigger("mouseenter");'."\n".
+				'});'."\n".
+				''."\n".
+				'jQuery(".'.self::CONTROL_CLASS_NAME.' input[type=\"radio\"]:checked").trigger("change");'
+			, true);
+
+			$js_initialized = true;
 		}
-
-		$this->addItem($items);
-
-		insert_js('
-			jQuery("'.$jsLabels.'").mouseenter(function() {
-				jQuery("'.$jsLabels.'").each(function() {
-					var obj = jQuery(this);
-
-					if (obj.attr("aria-pressed") == "false") {
-						obj.removeClass("ui-state-hover " + obj.data("severityStyle"));
-					}
-				});
-
-				var obj = jQuery(this);
-
-				obj.addClass(obj.data("severityStyle"));
-			})
-			.mouseleave(function() {
-				jQuery("#'.$this->getAttribute('id').' [aria-pressed=\"true\"]").trigger("mouseenter");
-			});
-
-			jQuery("'.$jsIds.'").change(function() {
-				jQuery("#'.$this->getAttribute('id').' [aria-pressed=\"true\"]").trigger("mouseenter");
-			});'
-		, true);
 	}
 }
