@@ -809,152 +809,167 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
  *                                                                            *
  * Function: lld_item_make                                                    *
  *                                                                            *
- * Purpose: updates an existing item or creates a new one based on item       *
- *          prototype and lld data row                                        *
+ * Purpose: creates a new item  based on item prototype and lld data row      *
+ *                                                                            *
+ * Parameters: item_prototype - [IN] the item prototype                       *
+ *             lld_row        - [IN] the lld row                              *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_lld_item_t	*lld_item_make(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row)
+{
+	const char		*__function_name = "lld_item_make";
+
+	zbx_lld_item_t		*item;
+	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	item = zbx_malloc(NULL, sizeof(zbx_lld_item_t));
+
+	item->itemid = 0;
+	item->parent_itemid = item_prototype->itemid;
+	item->lastcheck = 0;
+	item->ts_delete = 0;
+	item->key_proto = NULL;
+
+	item->name = zbx_strdup(NULL, item_prototype->name);
+	item->name_proto = NULL;
+	substitute_discovery_macros(&item->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->name, ZBX_WHITESPACE);
+
+	item->key = zbx_strdup(NULL, item_prototype->key);
+	item->key_orig = NULL;
+	substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+
+	item->units = zbx_strdup(NULL, item_prototype->units);
+	item->units_orig = NULL;
+	substitute_discovery_macros(&item->units, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->units, ZBX_WHITESPACE);
+
+	item->params = zbx_strdup(NULL, item_prototype->params);
+	item->params_orig = NULL;
+	substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->params, ZBX_WHITESPACE);
+
+	item->ipmi_sensor = zbx_strdup(NULL, item_prototype->ipmi_sensor);
+	item->ipmi_sensor_orig = NULL;
+	substitute_discovery_macros(&item->ipmi_sensor, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
+
+	item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
+	item->snmp_oid_orig = NULL;
+	substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+	zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
+
+	item->description = zbx_strdup(NULL, item_prototype->description);
+	item->description_orig = NULL;
+	substitute_discovery_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(item->description, ZBX_WHITESPACE);
+
+	item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
+	item->lld_row = lld_row;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+	return item;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: lld_item_update                                                  *
+ *                                                                            *
+ * Purpose: updates an existing item based on item prototype and lld data row *
  *                                                                            *
  * Parameters: item_prototype - [IN] the item prototype                       *
  *             lld_row        - [IN] the lld row                              *
  *             item           - [IN] an existing item or NULL                 *
- *             items          - [IN/OUT] sorted list of items                 *
  *                                                                            *
  ******************************************************************************/
-static void	lld_item_make(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
-		zbx_lld_item_t *item, zbx_vector_ptr_t *items)
+static void	lld_item_update(const zbx_lld_item_prototype_t *item_prototype, const zbx_lld_row_t *lld_row,
+		zbx_lld_item_t *item)
 {
-	const char		*__function_name = "lld_item_make";
+	const char		*__function_name = "lld_item_update";
 
 	char			*buffer = NULL;
 	struct zbx_json_parse	*jp_row = (struct zbx_json_parse *)&lld_row->jp_row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (NULL == item)	/* new item was discovered */
+	buffer = zbx_strdup(buffer, item_prototype->name);
+	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->name, buffer))
 	{
-		item = zbx_malloc(NULL, sizeof(zbx_lld_item_t));
+		item->name_proto = item->name;
+		item->name = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_NAME;
+	}
 
-		item->itemid = 0;
-		item->parent_itemid = item_prototype->itemid;
-		item->lastcheck = 0;
-		item->ts_delete = 0;
-		item->key_proto = NULL;
-
-		item->name = zbx_strdup(NULL, item_prototype->name);
-		item->name_proto = NULL;
-		substitute_discovery_macros(&item->name, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(item->name, ZBX_WHITESPACE);
-
+	if (0 != strcmp(item->key_proto, item_prototype->key))
+	{
+		item->key_orig = item->key;
 		item->key = zbx_strdup(NULL, item_prototype->key);
-		item->key_orig = NULL;
 		substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-
-		item->units = zbx_strdup(NULL, item_prototype->units);
-		item->units_orig = NULL;
-		substitute_discovery_macros(&item->units, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(item->units, ZBX_WHITESPACE);
-
-		item->params = zbx_strdup(NULL, item_prototype->params);
-		item->params_orig = NULL;
-		substitute_discovery_macros(&item->params, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(item->params, ZBX_WHITESPACE);
-
-		item->ipmi_sensor = zbx_strdup(NULL, item_prototype->ipmi_sensor);
-		item->ipmi_sensor_orig = NULL;
-		substitute_discovery_macros(&item->ipmi_sensor, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		/* zbx_lrtrim(item->ipmi_sensor, ZBX_WHITESPACE); is not missing here */
-
-		item->snmp_oid = zbx_strdup(NULL, item_prototype->snmp_oid);
-		item->snmp_oid_orig = NULL;
-		substitute_key_macros(&item->snmp_oid, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
-		zbx_lrtrim(item->snmp_oid, ZBX_WHITESPACE);
-
-		item->description = zbx_strdup(NULL, item_prototype->description);
-		item->description_orig = NULL;
-		substitute_discovery_macros(&item->description, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(item->description, ZBX_WHITESPACE);
-
-		item->flags = ZBX_FLAG_LLD_ITEM_DISCOVERED;
-
-		zbx_vector_ptr_append(items, item);
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
 	}
-	else  /* an item was rediscovered */
+
+	buffer = zbx_strdup(buffer, item_prototype->units);
+	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->units, buffer))
 	{
-		buffer = zbx_strdup(buffer, item_prototype->name);
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->name, buffer))
-		{
-			item->name_proto = item->name;
-			item->name = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_NAME;
-		}
-
-		if (0 != strcmp(item->key_proto, item_prototype->key))
-		{
-			item->key_orig = item->key;
-			item->key = zbx_strdup(NULL, item_prototype->key);
-			substitute_key_macros(&item->key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_KEY;
-		}
-
-		buffer = zbx_strdup(buffer, item_prototype->units);
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->units, buffer))
-		{
-			item->units_orig = item->units;
-			item->units = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_UNITS;
-		}
-
-		buffer = zbx_strdup(buffer, item_prototype->params);
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->params, buffer))
-		{
-			item->params_orig = item->params;
-			item->params = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS;
-		}
-
-		buffer = zbx_strdup(buffer, item_prototype->ipmi_sensor);
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
-		if (0 != strcmp(item->ipmi_sensor, buffer))
-		{
-			item->ipmi_sensor_orig = item->ipmi_sensor;
-			item->ipmi_sensor = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR;
-		}
-
-		buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
-		substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->snmp_oid, buffer))
-		{
-			item->snmp_oid_orig = item->snmp_oid;
-			item->snmp_oid = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID;
-		}
-
-		buffer = zbx_strdup(buffer, item_prototype->description);
-		substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
-		zbx_lrtrim(buffer, ZBX_WHITESPACE);
-		if (0 != strcmp(item->description, buffer))
-		{
-			item->description_orig = item->description;
-			item->description = buffer;
-			buffer = NULL;
-			item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION;
-		}
-
-		item->flags |= ZBX_FLAG_LLD_ITEM_DISCOVERED;
+		item->units_orig = item->units;
+		item->units = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_UNITS;
 	}
 
+	buffer = zbx_strdup(buffer, item_prototype->params);
+	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->params, buffer))
+	{
+		item->params_orig = item->params;
+		item->params = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_PARAMS;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->ipmi_sensor);
+	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	/* zbx_lrtrim(buffer, ZBX_WHITESPACE); is not missing here */
+	if (0 != strcmp(item->ipmi_sensor, buffer))
+	{
+		item->ipmi_sensor_orig = item->ipmi_sensor;
+		item->ipmi_sensor = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_IPMI_SENSOR;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->snmp_oid);
+	substitute_key_macros(&buffer, NULL, NULL, jp_row, MACRO_TYPE_SNMP_OID, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->snmp_oid, buffer))
+	{
+		item->snmp_oid_orig = item->snmp_oid;
+		item->snmp_oid = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_SNMP_OID;
+	}
+
+	buffer = zbx_strdup(buffer, item_prototype->description);
+	substitute_discovery_macros(&buffer, jp_row, ZBX_MACRO_ANY, NULL, 0);
+	zbx_lrtrim(buffer, ZBX_WHITESPACE);
+	if (0 != strcmp(item->description, buffer))
+	{
+		item->description_orig = item->description;
+		item->description = buffer;
+		buffer = NULL;
+		item->flags |= ZBX_FLAG_LLD_ITEM_UPDATE_DESCRIPTION;
+	}
+
+	item->flags |= ZBX_FLAG_LLD_ITEM_DISCOVERED;
 	item->lld_row = lld_row;
 
 	zbx_free(buffer);
@@ -1046,12 +1061,17 @@ static void	lld_items_make(const zbx_vector_ptr_t *item_prototypes, const zbx_ve
 		{
 			item_index_local.lld_row = (zbx_lld_row_t *)lld_rows->values[j];
 
-			if (NULL != (item_index = zbx_hashset_search(items_index, &item_index_local)))
-				item = item_index->item;
-			else
-				item = NULL;
+			if (NULL == (item_index = zbx_hashset_search(items_index, &item_index_local)))
+			{
+				item = lld_item_make(item_prototype, item_index_local.lld_row);
 
-			lld_item_make(item_prototype, item_index_local.lld_row, item, items);
+				/* add the created item to items vector and update index */
+				zbx_vector_ptr_append(items, item);
+				item_index_local.item = item;
+				zbx_hashset_insert(items_index, &item_index_local, sizeof(item_index_local));
+			}
+			else
+				lld_item_update(item_prototype, item_index_local.lld_row, item_index->item);
 		}
 	}
 
@@ -2134,7 +2154,7 @@ static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx
 
 			item_link = (zbx_lld_item_link_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_link_t));
 
-			item_link->parent_itemid = item_index->item->parent_itemid;;
+			item_link->parent_itemid = item_index->item->parent_itemid;
 			item_link->itemid = item_index->item->itemid;
 
 			zbx_vector_ptr_append(&item_index_local.lld_row->item_links, item_link);
