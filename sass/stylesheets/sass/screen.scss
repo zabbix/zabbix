@@ -1842,6 +1842,11 @@ button[disabled] {
 	}
 }
 
+.selected-item-count {
+	display: inline-block;
+	margin: 0 14px 0 0;
+}
+
 .tabs-nav-container {
 	height: 36px;
 	line-height: 36px;
