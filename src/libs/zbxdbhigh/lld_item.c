@@ -1683,7 +1683,10 @@ static int	lld_item_application_validate(const zbx_lld_item_application_t *item_
 	if (FAIL == (index = zbx_vector_ptr_bsearch(applications, &item_application->application_ref.applicationid,
 			ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
+		/* Applications vector contains only discovered applications and */
+		/* apparently the item was linked to non-discovered application. */
+		/* Item-application links to normal application must be removed  */
+		/* if not discovered.                                            */
 		return FAIL;
 	}
 
@@ -2135,8 +2138,6 @@ static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx
 			item_link->itemid = item_index->item->itemid;
 
 			zbx_vector_ptr_append(&item_index_local.lld_row->item_links, item_link);
-
-			break;
 		}
 	}
 }
