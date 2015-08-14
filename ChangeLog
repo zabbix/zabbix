@@ -3,7 +3,7 @@ Changes for 2.4.7rc1
 New features:
 
 Bug fixes:
-...G...... [ZBX-9721] fixed agent log message for log[] item in case of large log files (gleb)
+...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ..F....... [ZBX-9631] fixed "Undefined offset" in the actions conditions and lld rule filters when using a custom expression with more than 26 elements (Gunars, Sasha)
 ..F....... [ZBX-7492] fixed "Undefined index" when importing host without macros (Gunars)
 ....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
@@ -659,7 +659,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...G...... [ZBX-9721] fixed agent log message for log[] item in case of large log files (gleb)
+...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ..F....... [ZBX-7492] fixed "Undefined index" when importing host without macros (Gunars)
 ....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 
@@ -1944,7 +1944,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-...G...... [ZBX-9721] fixed agent log message for log[] item in case of large log files (gleb)
+...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 
 --------------------------------------------------------------------------------
