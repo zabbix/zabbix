@@ -320,7 +320,7 @@ static int	host_get_availability(const DC_HOST *dc_host, unsigned char type, zbx
 	return SUCCEED;
 }
 
-static void	activate_host(DC_ITEM *item, int *available, zbx_timespec_t *ts)
+static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 {
 	const char		*__function_name = "activate_host";
 
@@ -673,7 +673,7 @@ static int	get_values(unsigned char poller_type)
 			case AGENT_ERROR:
 			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
-					activate_host(&items[i], &last_available, &timespec);
+					activate_host(&items[i], &timespec, &last_available);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:

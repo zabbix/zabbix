@@ -109,5 +109,7 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 	zbx_tcp_close(&s);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
 	return ret;
 }
