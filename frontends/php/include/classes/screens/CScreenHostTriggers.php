@@ -34,6 +34,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'hostids' => null,
 			'screenid' => $this->screenid,
 			'maintenance' => null,
+			'trigger_name' => '',
 			'severity' => null,
 			'limit' => $this->screenitem['elements'],
 			'backUrl' => $this->pageFile

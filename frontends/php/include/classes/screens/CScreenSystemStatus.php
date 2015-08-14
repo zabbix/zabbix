@@ -38,6 +38,7 @@ class CScreenSystemStatus extends CScreenBase {
 			'groupids' => null,
 			'hostids' => null,
 			'maintenance' => null,
+			'trigger_name' => '',
 			'severity' => null,
 			'limit' => null,
 			'extAck' => 0,
