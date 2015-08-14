@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:00+0300\n"
+"POT-Creation-Date: 2015-08-14 11:01+0300\n"
 "PO-Revision-Date: 2014-06-10 10:47+0300\n"
 "Last-Translator: flo <florian.koch1981@googlemail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1977,7 +1977,7 @@ msgstr "Kann Host \"%1$s\" nicht finden, der in Karte \"%2$s\" verwendet wird."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Kann Host \"%1$s\" nicht finden, der in Tafel \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:764
+#: include/classes/import/CConfigurationImport.php:766
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Kann Rechnergruppe \"%1$s\" für Rechnerprototyp \"%2$s\" der Erkennungsregel \"%3$s\" auf \"%4$s\" nicht finden."
@@ -1989,8 +1989,8 @@ msgstr "Kann Rechnergruppe \"%1$s\" für Rechnerprototyp \"%2$s\" der Erkennungs
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Kann für den Datenpunktschlüssel \"%2$s\" die Hostschnittstelle auf \"%1$s\" nicht finden."
 
-#: include/classes/import/CConfigurationImport.php:927
-#: include/classes/import/CConfigurationImport.php:1039
+#: include/classes/import/CConfigurationImport.php:929
+#: include/classes/import/CConfigurationImport.php:1041
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Kann System oder Vorlage \"%1$s\" nicht finden, die in Graph \"%2$s\" benutzt wird."
@@ -2006,22 +2006,22 @@ msgstr "Kann Symbol \"%1$s\" nicht finden, das in Karte \"%2$s\" verwendet wird.
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Symbolzuordnung \"%1$s\" nicht finden, die in Karte \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:1023
+#: include/classes/import/CConfigurationImport.php:1025
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Kann Element \"%1$s\" auf \"%2$s\" benutzt als der Y axis MAX wert des Schaubildes \"%3$s\" nicht finden."
 
-#: include/classes/import/CConfigurationImport.php:912
+#: include/classes/import/CConfigurationImport.php:914
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1005
+#: include/classes/import/CConfigurationImport.php:1007
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:892
+#: include/classes/import/CConfigurationImport.php:894
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
@@ -2059,7 +2059,7 @@ msgstr "Kann keine Objekte finden namens"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Kann Tafel \"%1$s\" nicht finden, die in Tafel \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:783
+#: include/classes/import/CConfigurationImport.php:785
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2072,12 +2072,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Auslöser \"%1$s\" nicht finden, der in Karte \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:597
+#: include/classes/import/CConfigurationImport.php:599
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:735
+#: include/classes/import/CConfigurationImport.php:737
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -7834,7 +7834,7 @@ msgstr "Datenpunkt \"%1$s\" existiert nicht in Vorlage \"%2$s\"."
 msgid "Item \"%1$s\" does not exist."
 msgstr "Datenpunkt \"%1$s\" existiert nicht."
 
-#: include/classes/import/CConfigurationImport.php:582
+#: include/classes/import/CConfigurationImport.php:584
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Datenpunkt \"%1$s\" auf \"%2$s\": Kategorie \"%3$s\" existiert nicht."
@@ -9909,8 +9909,8 @@ msgstr ""
 msgid "No operations defined."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:954
-#: include/classes/import/CConfigurationImport.php:1068
+#: include/classes/import/CConfigurationImport.php:956
+#: include/classes/import/CConfigurationImport.php:1070
 #: include/classes/import/CXmlImport18.php:1548
 #, c-format
 msgid "No permission for graph \"%1$s\"."
@@ -13781,8 +13781,8 @@ msgstr "Auslöser"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Auslöser \"%1$s\" existiert bereits für \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1106
-#: include/classes/import/CConfigurationImport.php:1142
+#: include/classes/import/CConfigurationImport.php:1108
+#: include/classes/import/CConfigurationImport.php:1144
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Auslöser \"%1$s\" hängt ab von Auslöser \"%2$s\", welcher nicht existiert."

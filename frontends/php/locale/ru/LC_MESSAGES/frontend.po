@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:00+0300\n"
+"POT-Creation-Date: 2015-08-14 11:01+0300\n"
 "PO-Revision-Date: 2014-11-03 10:13+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1999,7 +1999,7 @@ msgstr "Не удалось найти узел сети \"%1$s\" использ
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти узел сети \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:764
+#: include/classes/import/CConfigurationImport.php:766
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти группу узлов сети \"%1$s\" для прототипа узла сети \"%2$s\" из правила обнаружения \"%3$s\" у \"%4$s\"."
@@ -2011,8 +2011,8 @@ msgstr "Не удалось найти группу узлов сети \"%1$s\"
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
 msgstr "Не удалось найти интерфейс у узла сети \"%1$s\" для ключа элемента данных \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:927
-#: include/classes/import/CConfigurationImport.php:1039
+#: include/classes/import/CConfigurationImport.php:929
+#: include/classes/import/CConfigurationImport.php:1041
 #, c-format
 msgid "Cannot find host or template \"%1$s\" used in graph \"%2$s\"."
 msgstr "Не удалось найти узел сети или шаблон \"%1$s\" указанный в графике \"%2$s\"."
@@ -2028,22 +2028,22 @@ msgstr "Не удалось найти иконку \"%1$s\" используе�
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти иконку \"%1$s\" используемую на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1023
+#: include/classes/import/CConfigurationImport.php:1025
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как МАКС значение Y для графика \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:912
+#: include/classes/import/CConfigurationImport.php:914
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как МАКС значение У для прототипа графика \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1005
+#: include/classes/import/CConfigurationImport.php:1007
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как МИН значение Y оси для графика \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:892
+#: include/classes/import/CConfigurationImport.php:894
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Не удалось найти элемент данных \"%1$s\" у \"%2$s\", используемый как МИН значение У для прототипа графика \"%3$s\" правила обнаружения \"%4$s\" у \"%5$s\"."
@@ -2081,7 +2081,7 @@ msgstr "Не удалось найти объекты с именем"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Не удалось найти комплексный экран \"%1$s\" используемый в комплексном экране \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:783
+#: include/classes/import/CConfigurationImport.php:785
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти шаблон \"%1$s\" для прототипа узлов сети \"%2$s\" правила обнаружения \"%3$s\" у \"%4$s\"."
@@ -2094,12 +2094,12 @@ msgstr "Не удалось найти шаблон \"%1$s\" для протот
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Не удалось найти триггер \"%1$s\" используемый на карте сети \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:597
+#: include/classes/import/CConfigurationImport.php:599
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\", используемое элементом данных \"%2$s\" у \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:735
+#: include/classes/import/CConfigurationImport.php:737
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти преобразование значений \"%1$s\", используемое прототипом элементов данных \"%2$s\" правила обнаружения \"%3$s\" у \"%4$s\"."
@@ -7838,7 +7838,7 @@ msgstr "Элемент данных \"%1$s\" не существует у шаб
 msgid "Item \"%1$s\" does not exist."
 msgstr "Элемент данных \"%1$s\" не существует."
 
-#: include/classes/import/CConfigurationImport.php:582
+#: include/classes/import/CConfigurationImport.php:584
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Элемент данных \"%1$s\" в \"%2$s\": группа элементов данных \"%3$s\" не существует."
@@ -9924,8 +9924,8 @@ msgstr "Оповещения не найдены."
 msgid "No operations defined."
 msgstr "Операторы не заданы."
 
-#: include/classes/import/CConfigurationImport.php:954
-#: include/classes/import/CConfigurationImport.php:1068
+#: include/classes/import/CConfigurationImport.php:956
+#: include/classes/import/CConfigurationImport.php:1070
 #: include/classes/import/CXmlImport18.php:1548
 #, c-format
 msgid "No permission for graph \"%1$s\"."
@@ -13774,8 +13774,8 @@ msgstr "Триггер"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Триггер \"%1$s\" уже существует у \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1106
-#: include/classes/import/CConfigurationImport.php:1142
+#: include/classes/import/CConfigurationImport.php:1108
+#: include/classes/import/CConfigurationImport.php:1144
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Триггер \"%1$s\" зависит от триггера \"%2$s\", который не существует."
