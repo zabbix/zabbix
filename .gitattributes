@@ -562,6 +562,484 @@ src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
 src/zabbix_java/tests/junit-4.8.2.jar -text
 tests/data/README -text
 tests/templates/sqlite3.init -text
+trunk/ChangeLog.legend -text
+trunk/bin/win32/dev/zabbix_sender.dll -text
+trunk/bin/win32/dev/zabbix_sender.lib -text
+trunk/bin/win32/zabbix_agentd.exe -text
+trunk/bin/win32/zabbix_get.exe -text
+trunk/bin/win32/zabbix_sender.exe -text
+trunk/bin/win64/dev/zabbix_sender.dll -text
+trunk/bin/win64/dev/zabbix_sender.lib -text
+trunk/bin/win64/zabbix_agentd.exe -text
+trunk/bin/win64/zabbix_get.exe -text
+trunk/bin/win64/zabbix_sender.exe -text
+trunk/build/win32/project/Makefile_sender_dll -text
+trunk/build/win32/project/Makefile_sender_dll_x64 -text
+trunk/create/src/data.tmpl -text
+trunk/frontends/php/app/.htaccess -text
+trunk/frontends/php/app/controllers/CControllerDashboardFavourite.php -text
+trunk/frontends/php/app/controllers/CControllerDashboardSort.php -text
+trunk/frontends/php/app/controllers/CControllerDashboardView.php -text
+trunk/frontends/php/app/controllers/CControllerDashboardWidget.php -text
+trunk/frontends/php/app/controllers/CControllerDiscoveryView.php -text
+trunk/frontends/php/app/controllers/CControllerFavouriteCreate.php -text
+trunk/frontends/php/app/controllers/CControllerFavouriteDelete.php -text
+trunk/frontends/php/app/controllers/CControllerMapView.php -text
+trunk/frontends/php/app/controllers/CControllerMediatypeCreate.php -text
+trunk/frontends/php/app/controllers/CControllerMediatypeDelete.php -text
+trunk/frontends/php/app/controllers/CControllerMediatypeDisable.php -text
+trunk/frontends/php/app/controllers/CControllerMediatypeEdit.php -text
+trunk/frontends/php/app/controllers/CControllerMediatypeEnable.php -text
+trunk/frontends/php/app/controllers/CControllerMediatypeList.php -text
+trunk/frontends/php/app/controllers/CControllerMediatypeUpdate.php -text
+trunk/frontends/php/app/controllers/CControllerProfileUpdate.php -text
+trunk/frontends/php/app/controllers/CControllerProxyDelete.php -text
+trunk/frontends/php/app/controllers/CControllerProxyEdit.php -text
+trunk/frontends/php/app/controllers/CControllerProxyHostDisable.php -text
+trunk/frontends/php/app/controllers/CControllerProxyHostEnable.php -text
+trunk/frontends/php/app/controllers/CControllerProxyUpdate.php -text
+trunk/frontends/php/app/controllers/CControllerReportStatus.php -text
+trunk/frontends/php/app/controllers/CControllerScriptCreate.php -text
+trunk/frontends/php/app/controllers/CControllerScriptDelete.php -text
+trunk/frontends/php/app/controllers/CControllerScriptEdit.php -text
+trunk/frontends/php/app/controllers/CControllerScriptList.php -text
+trunk/frontends/php/app/controllers/CControllerScriptUpdate.php -text
+trunk/frontends/php/app/controllers/CControllerSystemWarning.php -text
+trunk/frontends/php/app/controllers/CControllerWidgetDiscoveryView.php -text
+trunk/frontends/php/app/controllers/CControllerWidgetHostsView.php -text
+trunk/frontends/php/app/controllers/CControllerWidgetIssuesView.php -text
+trunk/frontends/php/app/controllers/CControllerWidgetStatusView.php -text
+trunk/frontends/php/app/controllers/CControllerWidgetSystemView.php -text
+trunk/frontends/php/app/controllers/CControllerWidgetWebView.php -text
+trunk/frontends/php/app/views/administration.mediatype.edit.js.php -text
+trunk/frontends/php/app/views/administration.proxy.edit.js.php -text
+trunk/frontends/php/app/views/layout.htmlpage.footer.php -text
+trunk/frontends/php/app/views/layout.htmlpage.header.php -text
+trunk/frontends/php/app/views/layout.htmlpage.menu.php -text
+trunk/frontends/php/app/views/layout.htmlpage.php -text
+trunk/frontends/php/app/views/layout.javascript.php -text
+trunk/frontends/php/app/views/layout.json.php -text
+trunk/frontends/php/app/views/layout.warning.php -text
+trunk/frontends/php/app/views/layout.widget.php -text
+trunk/frontends/php/app/views/monitoring.dashboard.view.php -text
+trunk/frontends/php/app/views/monitoring.widget.discovery.view.php -text
+trunk/frontends/php/app/views/monitoring.widget.hosts.view.php -text
+trunk/frontends/php/app/views/monitoring.widget.issues.view.php -text
+trunk/frontends/php/app/views/monitoring.widget.status.view.php -text
+trunk/frontends/php/app/views/monitoring.widget.system.view.php -text
+trunk/frontends/php/app/views/monitoring.widget.web.view.php -text
+trunk/frontends/php/app/views/report.status.php -text
+trunk/frontends/php/app/views/system.warning.php -text
+trunk/frontends/php/audio/alarm_average.wav -text
+trunk/frontends/php/audio/alarm_disaster.wav -text
+trunk/frontends/php/audio/alarm_high.wav -text
+trunk/frontends/php/audio/alarm_information.wav -text
+trunk/frontends/php/audio/alarm_ok.wav -text
+trunk/frontends/php/audio/alarm_warning.wav -text
+trunk/frontends/php/audio/no_sound.wav -text
+trunk/frontends/php/favicon.ico -text svneol=unset#image/x-icon
+trunk/frontends/php/fonts/DejaVuSans.ttf -text
+trunk/frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
+trunk/frontends/php/images/general/arrow_down.png -text
+trunk/frontends/php/images/general/arrow_up.png -text
+trunk/frontends/php/images/general/no_icon.png -text
+trunk/frontends/php/images/general/tr_space.gif -text
+trunk/frontends/php/images/general/tr_top_bottom.gif -text
+trunk/frontends/php/images/general/tr_top_right.gif -text
+trunk/frontends/php/images/general/tr_top_right_bottom.gif -text
+trunk/frontends/php/images/general/tree/zero.gif -text
+trunk/frontends/php/img/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
+trunk/frontends/php/img/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
+trunk/frontends/php/img/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
+trunk/frontends/php/img/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
+trunk/frontends/php/img/browser-sprite.png -text svneol=unset#image/png
+trunk/frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
+trunk/frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
+trunk/frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
+trunk/frontends/php/include/classes/helpers/CViewHelper.php -text
+trunk/frontends/php/include/classes/html/CColHeader.php -text
+trunk/frontends/php/include/classes/html/CFilter.php -text
+trunk/frontends/php/include/classes/html/CRowHeader.php -text
+trunk/frontends/php/include/classes/html/CSup.php -text
+trunk/frontends/php/include/classes/mvc/CController.php -text
+trunk/frontends/php/include/classes/mvc/CControllerResponse.php -text
+trunk/frontends/php/include/classes/mvc/CControllerResponseData.php -text
+trunk/frontends/php/include/classes/mvc/CControllerResponseFatal.php -text
+trunk/frontends/php/include/classes/mvc/CControllerResponseRedirect.php -text
+trunk/frontends/php/include/classes/mvc/CRouter.php -text
+trunk/frontends/php/include/classes/validators/CNewValidator.php -text
+trunk/frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
+trunk/frontends/php/js/menupopup.js -text svneol=unset#text/plain
+trunk/frontends/php/js/multiselect.js -text svneol=unset#text/plain
+trunk/frontends/php/js/servercheck.js -text
+trunk/frontends/php/locale/bg/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/de/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/el/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/en_US/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/es/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/fa/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/fi/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/fr/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/hu/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/id/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/it/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/ja/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/ko/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/lt/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/lv/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/nl/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/pl/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/pt_BR/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/pt_PT/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/ro/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/ru/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/sk/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/sv/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/tr/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/uk/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/vi/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/zh_CN/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/locale/zh_TW/LC_MESSAGES/frontend.po -text
+trunk/frontends/php/robots.txt svneol=native#text/plain
+trunk/frontends/php/styles/blue-theme.css svneol=native#text/css
+trunk/frontends/php/styles/dark-theme.css svneol=native#text/css
+trunk/frontends/php/tests/bootstrap.php.template -text
+trunk/frontends/php/tests/unit/include/classes/import/converters/C20ItemKeyConverterTest.php -text
+trunk/frontends/php/tests/unit/include/classes/import/formatters/hostAndTemplate.xml svneol=native#text/xml
+trunk/frontends/php/tests/unit/include/classes/import/formatters/map.xml svneol=native#text/xml
+trunk/frontends/php/tests/unit/include/classes/import/formatters/screen.xml svneol=native#text/xml
+trunk/frontends/php/tests/unit/include/classes/import/xml/host18.xml svneol=native#text/xml
+trunk/frontends/php/tests/unit/include/classes/import/xml/hostAndTemplate.xml svneol=native#text/xml
+trunk/frontends/php/tests/unit/include/classes/import/xml/map.xml svneol=native#text/xml
+trunk/frontends/php/tests/unit/include/classes/import/xml/screen.xml svneol=native#text/xml
+trunk/man/zabbix_agentd.man -text
+trunk/man/zabbix_get.man -text
+trunk/man/zabbix_proxy.man -text
+trunk/man/zabbix_sender.man -text
+trunk/man/zabbix_server.man -text
+trunk/misc/clock/clock.fla -text
+trunk/misc/images/README -text
+trunk/misc/images/README.dev -text
+trunk/misc/images/images_oracle_end.txt svneol=native#text/plain
+trunk/misc/images/images_oracle_start.txt svneol=native#text/plain
+trunk/misc/images/png_classic/Hub.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Hub_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Network.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Network_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Notebook.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Notebook_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Phone.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Phone_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Printer.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Printer_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/README -text
+trunk/misc/images/png_classic/Router.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Router_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Satellite.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Satellite_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Server.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Server_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/UPS.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/UPS_small.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Workstation.png -text svneol=unset#image/png
+trunk/misc/images/png_classic/Workstation_small.png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Cloud_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Cloud_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Cloud_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Cloud_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Cloud_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_symbol_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_symbol_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_symbol_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_symbol_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Crypto-router_symbol_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_2D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_2D_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_2D_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_2D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_2D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_3D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_3D_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_3D_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_3D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Disk_array_3D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Firewall_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Firewall_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Firewall_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Firewall_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Firewall_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/House_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/House_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/House_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/House_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/House_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Hub_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Hub_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Hub_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Hub_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Hub_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_symbol_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_symbol_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_symbol_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_symbol_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/IP_PBX_symbol_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Modem_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Modem_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Modem_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Modem_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Modem_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_adapter_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_adapter_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_adapter_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_adapter_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Network_adapter_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Notebook_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Notebook_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Notebook_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Notebook_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Notebook_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/PBX_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/PBX_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/PBX_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/PBX_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/PBX_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Phone_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Phone_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Phone_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Phone_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Phone_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Printer_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Printer_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Printer_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Printer_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Printer_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rack_42_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rack_42_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rack_42_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rack_42_with_door_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rack_42_with_door_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rack_42_with_door_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_1U_server_2D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_1U_server_2D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_1U_server_2D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_1U_server_3D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_1U_server_3D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_1U_server_3D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_2U_server_2D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_2U_server_2D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_2U_server_2D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_2U_server_3D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_2U_server_3D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_2U_server_3D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_3U_server_2D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_3U_server_2D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_3U_server_2D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_3U_server_3D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_3U_server_3D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_3U_server_3D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_4U_server_2D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_4U_server_2D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_4U_server_2D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_4U_server_3D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_4U_server_3D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_4U_server_3D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_5U_server_2D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_5U_server_2D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_5U_server_2D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_5U_server_3D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_5U_server_3D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Rackmountable_5U_server_3D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_symbol_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_symbol_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_symbol_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_symbol_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Router_symbol_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/SAN_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/SAN_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/SAN_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/SAN_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/SAN_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_antenna_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_antenna_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_antenna_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_antenna_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Satellite_antenna_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Server_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Server_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Server_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Server_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Server_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Switch_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Switch_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Switch_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Switch_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Switch_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_2D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_2D_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_2D_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_2D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_2D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_3D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_3D_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_3D_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_3D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/UPS_rackmountable_3D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Video_terminal_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Video_terminal_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Video_terminal_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Video_terminal_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Video_terminal_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Workstation_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Workstation_(24).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Workstation_(48).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Workstation_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Workstation_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Zabbix_server_2D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Zabbix_server_2D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Zabbix_server_2D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Zabbix_server_3D_(128).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Zabbix_server_3D_(64).png -text svneol=unset#image/png
+trunk/misc/images/png_modern/Zabbix_server_3D_(96).png -text svneol=unset#image/png
+trunk/misc/images/png_to_sql.sh svneol=native#text/x-sh
+trunk/misc/images/png_to_xml.sh svneol=native#text/x-sh
+trunk/misc/images/strip_inkscape_attributes.xslt svneol=native#text/xml
+trunk/misc/images/svg/elements/Cloud.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Crypto-router.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Crypto-router_symbol.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Disk_array_2D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Disk_array_3D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Firewall.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/House.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Hub.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/IP_PBX.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/IP_PBX_symbol.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Modem.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Network.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Network_adapter.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Notebook.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/PBX.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Phone.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Printer.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_1U_server_2D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_1U_server_3D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_2U_server_2D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_2U_server_3D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_3U_server_2D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_3U_server_3D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_4U_server_2D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_4U_server_3D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_5U_server_2D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Rackmountable_5U_server_3D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Router.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Router_symbol.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/SAN.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Satellite.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Satellite_antenna.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Server.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Switch.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/UPS.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/UPS_rackmountable_2D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/UPS_rackmountable_3D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Video_terminal.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Workstation.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Zabbix_server_2D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/elements/Zabbix_server_3D.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/equipment_rack/Rack_42.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg/equipment_rack/Rack_42_with_door.svg -text svneol=native#image/svg%2Bxml
+trunk/misc/images/svg_to_png.sh svneol=native#text/x-sh
+trunk/misc/init.d/README -text
+trunk/misc/init.d/aix/zabbix_agentd svneol=native#text/x-sh
+trunk/misc/init.d/fedora/core5/zabbix_agentd -text
+trunk/misc/init.d/freebsd/zabbix_agentd -text
+trunk/misc/init.d/freebsd/zabbix_server -text
+trunk/misc/init.d/tru64/zabbix_server -text
+trunk/sass/adm-images.html -text
+trunk/sass/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
+trunk/sass/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
+trunk/sass/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
+trunk/sass/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
+trunk/sass/browserwarning.html -text
+trunk/sass/dashboard.html -text
+trunk/sass/errors.html -text
+trunk/sass/favicon.ico -text svneol=unset#image/x-icon
+trunk/sass/forms-housekeeper.html -text
+trunk/sass/forms-inventory.html -text
+trunk/sass/img/browser-sprite.png -text svneol=unset#image/png
+trunk/sass/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
+trunk/sass/img_source/icons-sprite.ai -text
+trunk/sass/img_source/icons.ai -text
+trunk/sass/ms-tile-144x144.png -text svneol=unset#image/png
+trunk/sass/overlay-dialog_with_tables.html -text
+trunk/sass/popup.html -text
+trunk/sass/screens-edit.html -text
+trunk/sass/setup.html -text
+trunk/sass/signin.html -text
+trunk/sass/stylesheets/sass/_colors.scss -text
+trunk/sass/stylesheets/sass/_fonts.scss -text
+trunk/sass/stylesheets/sass/_mixins.scss -text
+trunk/sass/stylesheets/sass/dark-theme.scss -text
+trunk/sass/touch-icon-192x192.png -text svneol=unset#image/png
+trunk/src/libs/zbxsysinfo/win32/wmi.cpp -text
+trunk/src/zabbix_java/lib/README svneol=native#text/plain
+trunk/src/zabbix_java/lib/android-json-4.3_r3.1.jar -text
+trunk/src/zabbix_java/lib/logback-classic-0.9.27.jar -text
+trunk/src/zabbix_java/lib/logback-core-0.9.27.jar -text
+trunk/src/zabbix_java/lib/slf4j-api-1.6.1.jar -text
+trunk/src/zabbix_java/tests/junit-4.8.2.jar -text
+trunk/tests/data/README -text
+trunk/tests/templates/sqlite3.init -text
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Notebook_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Phone_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Printer_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Router_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Satellite_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Server_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/UPS_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Workstation_small.png -text svneol=unset#image/png
+trunk/upgrades/dbpatches/2.2/README -text
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Hub_small.png -text svneol=unset#image/png
 upgrades/dbpatches/1.1/1.0_to_1.1alpha1/mysql/Network.png -text svneol=unset#image/png
