@@ -1800,6 +1800,15 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   .dashed-border td td {
     border: none; }
 
+.top {
+  vertical-align: top; }
+
+.bottom {
+  vertical-align: bottom; }
+
+.left {
+  text-align: left; }
+
 .graph-selection {
   position: absolute;
   z-index: 98;
@@ -2208,7 +2217,7 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
 .cursor-pointer {
   cursor: pointer; }
 
-.overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
+.overflow-ellipsis, .overflow-ellipsis td, .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
