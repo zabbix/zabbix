@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
-"PO-Revision-Date: 2015-07-22 11:20+0300\n"
+"POT-Creation-Date: 2015-08-14 21:05+0300\n"
+"PO-Revision-Date: 2015-08-11 08:36+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1437556822.0\n"
+"X-POOTLE-MTIME: 1439275003.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -617,7 +617,7 @@ msgstr "Jméno Agent host je definované v konfiguračím souboru. Hodnota retě
 #: include/views/configuration.host.prototype.edit.php:107
 #: include/views/inventory.host.view.php:103
 msgid "Agent interfaces"
-msgstr "Agentova rozhraní"
+msgstr "Agent rozhraní"
 
 #: hosts.php:59
 msgid "Agent or SNMP or JMX or IPMI interface"
@@ -7459,7 +7459,7 @@ msgstr "Neplatný obrázkový index."
 #: include/classes/api/services/CScreen.php:365
 #: include/classes/api/services/CTemplateScreen.php:544
 msgid "Incorrect input parameters."
-msgstr "Neplatný parametr DNS pro rozhraní \"%s\"."
+msgstr "Neplatné vstupní parametry."
 
 #: include/classes/api/services/CHostInterface.php:595
 #, c-format
@@ -13609,7 +13609,7 @@ msgstr "Čt"
 #: jsLoader.php:126
 msgctxt "Tuesday short"
 msgid "T"
-msgstr "\"%1$s.%2$s\" metoda musí být volaná bez \"auth\" parametru."
+msgstr "Út"
 
 #: include/discovery.inc.php:64
 #: include/views/js/configuration.discovery.edit.js.php:174
