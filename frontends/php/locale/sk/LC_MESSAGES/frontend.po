@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-15 10:02+0300\n"
-"PO-Revision-Date: 2015-07-29 14:45+0300\n"
+"POT-Creation-Date: 2015-08-15 11:14+0300\n"
+"PO-Revision-Date: 2015-08-13 00:15+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1438173940.0\n"
+"X-POOTLE-MTIME: 1439417729.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -21,7 +21,7 @@ msgstr ""
 #: include/classes/import/validators/C30XmlValidator.php:867
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" je očakávaná"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -74,9 +74,9 @@ msgstr[2] "%1$s dní"
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s položka"
+msgstr[1] "%1$s položky"
+msgstr[2] "%1$s položiek"
 
 #: jsLoader.php:221 jsLoader.php:222 jsLoader.php:223 jsLoader.php:224
 #, c-format
@@ -148,7 +148,7 @@ msgstr "----[HROMADNÉ POTVRDENIE]----"
 
 #: include/classes/setup/CSetupWizard.php:236
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - použiť predvolený port"
 
 #: include/triggers.inc.php:2079 include/triggers.inc.php:2080
 #: include/triggers.inc.php:2081 include/triggers.inc.php:2083
@@ -168,7 +168,7 @@ msgstr "10 sekúnd"
 
 #: include/views/reports.toptriggers.php:24 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 najčastejších spúšťačov"
 
 #: queue.php:106 queue.php:167
 msgid "30 seconds"
@@ -232,7 +232,7 @@ msgstr "Akceptovateľná SLA"
 
 #: include/func.inc.php:1631
 msgid "Access denied"
-msgstr ""
+msgstr "Prístup zamietnutý"
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -615,7 +615,7 @@ msgstr "Agregované kontroly nevyžadujú spustenie agenta na monitorovanom host
 
 #: acknow.php:194
 msgid "Alarm acknowledgements"
-msgstr ""
+msgstr "Potvrdenia alarmov"
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:46
 #: include/views/administration.users.list.php:47 popup.php:625 users.php:43
@@ -650,7 +650,7 @@ msgstr "Všetky skupiny"
 
 #: include/html.inc.php:369
 msgid "All hosts"
-msgstr ""
+msgstr "Všetky hosty"
 
 #: jsLoader.php:150
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -658,7 +658,7 @@ msgstr "Všetky linky by mali mať zadefinované \"Meno\" a \"URL\""
 
 #: include/html.inc.php:330
 msgid "All templates"
-msgstr ""
+msgstr "Všetky šablóny"
 
 #: include/views/configuration.host.discovery.edit.php:259
 #: include/views/configuration.item.edit.php:413
@@ -669,7 +669,7 @@ msgstr "Povolené hosty"
 
 #: include/classes/setup/CSetupWizard.php:384
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Eventuálne to môžete napísať manuálne:"
 
 #: include/triggers.inc.php:1531
 #: include/views/configuration.action.edit.php:135
@@ -730,7 +730,7 @@ msgstr "Chyba aplikácie."
 
 #: include/views/configuration.item.prototype.edit.php:409
 msgid "Application prototypes"
-msgstr ""
+msgstr "Prototypy aplikácií"
 
 #: applications.php:110
 msgid "Application updated"
@@ -862,7 +862,7 @@ msgstr "Najmenej jedna databáza z MySQL, PostgreSQL, Oracle, SQLite3 alebo IBM 
 #: httpconf.php:47 include/views/configuration.httpconf.edit.php:80
 #: include/views/configuration.httpconf.list.php:60
 msgid "Attempts"
-msgstr ""
+msgstr "Pokusy"
 
 #: include/menu.inc.php:141
 #: include/views/administration.general.housekeeper.edit.php:74
@@ -1164,7 +1164,7 @@ msgstr "Nie je možné potvrdiť udalosť"
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
-msgstr ""
+msgstr "Nie je možné pridať zistenú aplikáciu \"%1$s\" k web scenáru."
 
 #: include/classes/api/services/CGraph.php:725
 #: include/classes/api/services/CGraph.php:739
@@ -1374,7 +1374,7 @@ msgstr "Nie je možné klonovať prototypy spúšťačov."
 
 #: include/classes/setup/CSetupWizard.php:262
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Nie je možné sa spojiť s databázou."
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
@@ -1409,11 +1409,11 @@ msgstr "Nie je možné vytvoriť zacyklené závislosti."
 
 #: include/classes/api/services/CTrigger.php:1309
 msgid "Cannot create dependency on trigger itself."
-msgstr "Nie je možné vytvoriť závislosť spúšťača na sebe samom."
+msgstr "Nie je možné vytvoriť závislosť prototypu spúšťača na sebe samom."
 
 #: include/classes/api/services/CTriggerPrototype.php:1018
 msgid "Cannot create dependency on trigger prototype itself."
-msgstr ""
+msgstr "Nie je možné vytvoriť závislosť prototypu spúšťača na sebe samom."
 
 #: discoveryconf.php:154
 msgid "Cannot create discovery rule"
@@ -1443,7 +1443,7 @@ msgstr "Nie je možné vytvoriť šablónu."
 
 #: include/classes/setup/CSetupWizard.php:382
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Nie je možné vytvoriť konfiguračný súbor."
 
 #: include/classes/api/services/CUser.php:1317
 #, c-format
@@ -1469,7 +1469,7 @@ msgstr "Nie je možné zmazať závislosť"
 #: include/classes/api/services/CApplication.php:415
 #, c-format
 msgid "Cannot delete discovered application \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné zmazať zistenú aplikáciu \"%1$s\"."
 
 #: include/classes/api/services/CGraph.php:554
 #, c-format
@@ -2153,7 +2153,7 @@ msgstr "Nie je možné poslať príkaz, skontrolujte spojenie so Zabbix serverom
 #: include/classes/api/services/CApplication.php:302
 #, c-format
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné nastaviť \"%1$s\" pre aplikáciu \"%2$s\"."
 
 #: include/classes/api/services/CHostGroup.php:389
 #, c-format
@@ -2173,7 +2173,7 @@ msgstr "Nie je možné nastaviť \"%1$s\" pre spúšťač \"%2$s\"."
 #: include/classes/api/services/CItemPrototype.php:306
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné nastaviť \"templateid\" pre prototyp aplikácie v prototype položky \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:350
 #, c-format
@@ -2259,7 +2259,7 @@ msgstr "Nie je možné aktualizovať \"%1$s\" pre akciu \"%2$s\"."
 #: include/classes/api/services/CApplication.php:296
 #, c-format
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať \"%1$s\" pre aplikáciu \"%2$s\"."
 
 #: include/classes/api/services/CHostGroup.php:451
 #, c-format
@@ -2349,7 +2349,7 @@ msgstr "Nie je možné aktualizovať poznámku"
 #: include/classes/api/services/CApplication.php:314
 #, c-format
 msgid "Cannot update discovered application \"%1$s\"."
-msgstr ""
+msgstr "Nie je možné aktualizovať zistenú aplikáciu \"%1$s\"."
 
 #: discoveryconf.php:147 host_discovery.php:291
 msgid "Cannot update discovery rule"
@@ -2588,7 +2588,7 @@ msgstr "Skontrolujte časť výrazu začínajúcu od \"%1$s\"."
 #: include/classes/setup/CSetupWizard.php:39
 #: include/classes/setup/CSetupWizard.php:202
 msgid "Check of pre-requisites"
-msgstr ""
+msgstr "Kontrola požiadaviek"
 
 #: include/classes/api/services/CItemGeneral.php:293
 #: include/classes/api/services/CItemGeneral.php:300
@@ -2868,7 +2868,7 @@ msgstr "Nastavenie cache štatistík. Cache - buffer (módy: pfree, total, used,
 #: include/classes/setup/CSetupWizard.php:400
 #, c-format
 msgid "Configuration file \"%1$s\" created."
-msgstr ""
+msgstr "Konfiguračný súbor \"%1$s\" vytvorený."
 
 #: conf.import.php:25
 msgid "Configuration import"
@@ -3029,12 +3029,12 @@ msgstr "Nastavenie bolo aktulizované"
 
 #: include/html.inc.php:220
 msgid "Configure"
-msgstr ""
+msgstr "Konfigurovať"
 
 #: include/classes/setup/CSetupWizard.php:43
 #: include/classes/setup/CSetupWizard.php:269
 msgid "Configure DB connection"
-msgstr ""
+msgstr "Konfigurovať pripojenie DB"
 
 #: app/views/administration.script.edit.php:97
 msgid "Confirmation text"
@@ -3042,7 +3042,7 @@ msgstr "Potvrdzujúci text"
 
 #: include/classes/setup/CSetupWizard.php:397
 msgid "Congratulations! You have successfully installed Zabbix frontend."
-msgstr ""
+msgstr "Gratulácia! Práve ste úspešne nainštalovali Zabbix frontend."
 
 #: app/views/administration.proxy.edit.php:37
 #: include/views/configuration.host.edit.php:130
@@ -3058,7 +3058,7 @@ msgstr "Pripojiť k"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Connection security"
-msgstr ""
+msgstr "Bezpečnosť pripojenia"
 
 #: include/classes/server/CZabbixServer.php:207
 #, c-format
@@ -3435,7 +3435,7 @@ msgstr "D"
 #: include/classes/import/validators/C10XmlValidator.php:344
 msgctxt "XML date format"
 msgid "DD.MM.YY"
-msgstr ""
+msgstr "DD.MM.YY"
 
 #: include/views/configuration.host.discovery.edit.php:140
 #: include/views/configuration.item.edit.php:149
@@ -4566,7 +4566,7 @@ msgstr "Nedostupné"
 
 #: include/classes/setup/CSetupWizard.php:386
 msgid "Download the configuration file"
-msgstr ""
+msgstr "Stiahnuť konfiguračný súbor"
 
 #: app/views/monitoring.discovery.view.php:46
 #: app/views/monitoring.discovery.view.php:171
@@ -5569,7 +5569,7 @@ msgstr "Globálne skripty"
 
 #: include/views/hostmacros.php:46
 msgid "Global value"
-msgstr ""
+msgstr "Globálna hodnota"
 
 #: jsLoader.php:198
 msgid "Go to"
@@ -5970,7 +5970,7 @@ msgstr "Skryť všetky"
 
 #: include/html.inc.php:844
 msgid "Hide debug"
-msgstr ""
+msgstr "Skryť debug"
 
 #: include/views/monitoring.history.php:154
 msgid "Hide selected"
@@ -5995,7 +5995,7 @@ msgstr "História"
 
 #: include/forms.inc.php:573
 msgid "History (in days)"
-msgstr ""
+msgstr "História (v dňoch)"
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:439 httpconf.php:451
 #: items.php:531 items.php:538 items.php:792 items.php:804
@@ -7669,7 +7669,7 @@ msgstr "Vložiť výraz"
 #: include/classes/setup/CSetupWizard.php:55
 #: include/classes/setup/CSetupWizard.php:405
 msgid "Install"
-msgstr ""
+msgstr "Inštalovať"
 
 #: setup.php:102
 msgid "Installation"
@@ -7811,7 +7811,7 @@ msgstr "Neplatná požiadavka."
 #: include/classes/import/validators/CXmlValidator.php:62
 #, c-format
 msgid "Invalid XML tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Neplatný XML tag \"%1$s\": %2$s."
 
 #: maintenance.php:144 maintenance.php:158 services.php:187 services.php:201
 #, c-format
@@ -9526,7 +9526,7 @@ msgstr "Nový čas služby"
 #: include/classes/setup/CSetupWizard.php:271
 #: include/classes/setup/CSetupWizard.php:341
 msgid "Next step"
-msgstr ""
+msgstr "Ďalší krok"
 
 #: events.php:783 include/events.inc.php:355 include/events.inc.php:374
 #: include/func.inc.php:1941 include/triggers.inc.php:1475
@@ -10530,7 +10530,7 @@ msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na m
 
 #: include/classes/html/CCollapsibleUiWidget.php:54
 msgid "Open"
-msgstr ""
+msgstr "Rozbaliť"
 
 #: include/httptest.inc.php:294
 msgid "Opera"
@@ -10892,7 +10892,7 @@ msgstr "Parameter"
 
 #: include/classes/debug/CProfiler.php:156
 msgid "Parameters"
-msgstr ""
+msgstr "Parametre"
 
 #: include/views/configuration.host.discovery.edit.php:43
 #: include/views/configuration.host.prototype.edit.php:58
@@ -10979,7 +10979,7 @@ msgstr "Heslo nemôže byť prázdne"
 #: include/classes/debug/CProfiler.php:137
 #, c-format
 msgid "Peak memory usage: %1$s"
-msgstr ""
+msgstr "Maximálne využitie pamäte: %1$s"
 
 #: popup_trexpr.php:100
 msgid "Percentage"
@@ -12013,11 +12013,11 @@ msgstr "SSL verifikácia certifikátu hosta"
 
 #: app/views/administration.mediatype.edit.php:68
 msgid "SSL/TLS"
-msgstr ""
+msgstr "SSL/TLS"
 
 #: app/views/administration.mediatype.edit.php:67
 msgid "STARTTLS"
-msgstr ""
+msgstr "STARTTLS"
 
 #: include/httptest.inc.php:301
 msgid "Safari"
@@ -13580,7 +13580,7 @@ msgstr "Trendy"
 
 #: include/forms.inc.php:590
 msgid "Trends (in days)"
-msgstr ""
+msgstr "Trendy (v dňoch)"
 
 #: events.php:312 events.php:355 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
@@ -15142,11 +15142,11 @@ msgstr "Týždenne"
 
 #: include/classes/setup/CSetupWizard.php:35
 msgid "Welcome"
-msgstr ""
+msgstr "Vitajte"
 
 #: include/classes/setup/CSetupWizard.php:152
 msgid "Welcome to"
-msgstr ""
+msgstr "Vitajte"
 
 #: popup_media.php:130
 msgid "When active"
@@ -15352,7 +15352,7 @@ msgstr "d.m.Y H:i:s"
 #: include/classes/import/validators/C30XmlValidator.php:867
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
-msgstr ""
+msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: report3.php:76 report3.php:90 report4.php:113 report4.php:133
 msgid "Year"
@@ -15468,7 +15468,7 @@ msgstr "Zabbix administrátor"
 
 #: app/views/layout.htmlpage.menu.php:50
 msgid "Zabbix Share"
-msgstr ""
+msgstr "Zabbix Share"
 
 #: include/users.inc.php:56
 msgid "Zabbix Super Admin"
@@ -15747,7 +15747,7 @@ msgstr "hh"
 #: include/classes/import/validators/C10XmlValidator.php:361
 msgctxt "XML time format"
 msgid "hh.mm"
-msgstr ""
+msgstr "hh.mm"
 
 #: include/classes/api/services/CMap.php:361
 msgid "host"
@@ -16050,7 +16050,7 @@ msgstr "neznámy"
 
 #: include/classes/import/validators/CXmlValidator.php:62
 msgid "unsupported version number"
-msgstr ""
+msgstr "nepodporované číslo verzie"
 
 #: include/views/administration.general.macros.edit.php:44
 #: include/views/hostmacros.php:85
