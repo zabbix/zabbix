@@ -323,8 +323,12 @@ $graphTab->addTab(
 $chartImage = (new CImg('chart3.php?period=3600'))->preload();
 
 $graphPreviewTable = (new CTable())
-	->addClass('center')
-	->addRow((new CDiv($chartImage))->setId('previewChar'));
+	->addStyle('width: 100%;')
+	->addRow(
+		(new CRow(
+			(new CDiv($chartImage))->setId('previewChar')
+		))->addClass(ZBX_STYLE_CENTER)
+	);
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 
 // append buttons to form
