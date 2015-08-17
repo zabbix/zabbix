@@ -518,6 +518,35 @@ static int	DBpatch_2050050(void)
 	return FAIL;
 }
 
+static int	DBpatch_2050051(void)
+{
+	const ZBX_FIELD field = {"default_inventory_mode", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_2050052(void)
+{
+	const ZBX_TABLE table =
+			{"opinventory", "operationid", 0,
+				{
+					{"operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"inventory_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050053(void)
+{
+	const ZBX_FIELD	field = {"operationid", NULL, "operations", "operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("opinventory", 1, &field);
+}
 #endif
 
 DBPATCH_START(2050)
@@ -567,5 +596,8 @@ DBPATCH_ADD(2050047, 0, 1)
 DBPATCH_ADD(2050048, 0, 1)
 DBPATCH_ADD(2050049, 0, 1)
 DBPATCH_ADD(2050050, 0, 1)
+DBPATCH_ADD(2050051, 0, 1)
+DBPATCH_ADD(2050052, 0, 1)
+DBPATCH_ADD(2050053, 0, 1)
 
 DBPATCH_END()
