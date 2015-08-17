@@ -126,7 +126,7 @@ foreach ($inventoryFields as $field) {
 }
 
 if (isset($_REQUEST['form'])) {
-	if ($data['form_refresh'] || ($_REQUEST['form'] === 'clone')) {
+	if (hasRequest('form_refresh') || ($_REQUEST['form'] === 'clone')) {
 		$data['iconmap'] = getRequest('iconmap');
 	}
 	elseif (isset($_REQUEST['iconmapid'])) {

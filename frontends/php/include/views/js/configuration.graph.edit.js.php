@@ -27,7 +27,7 @@
 	<!-- type -->
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
 		<td>
-			<select id="items_#{number}_type" name="items[#{number}][type]" class="input select">
+			<select id="items_#{number}_type" name="items[#{number}][type]">
 				<option value="<?= GRAPH_ITEM_SIMPLE ?>"><?= _('Simple') ?></option>
 				<option value="<?= GRAPH_ITEM_SUM ?>"><?= _('Graph sum') ?></option>
 			</select>
@@ -36,7 +36,7 @@
 
 	<!-- function -->
 	<td>
-		<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]" class="input select">
+		<select id="items_#{number}_calc_fnc" name="items[#{number}][calc_fnc]">
 		<?php if ($this->data['graphtype'] == GRAPH_TYPE_PIE || $this->data['graphtype'] == GRAPH_TYPE_EXPLODED): ?>
 			<option value="<?= CALC_FNC_MIN ?>"><?= _('min') ?></option>
 			<option value="<?= CALC_FNC_AVG ?>"><?= _('avg') ?></option>
@@ -56,7 +56,7 @@
 	<!-- drawtype -->
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL): ?>
 		<td>
-			<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]" class="input select">
+			<select id="items_#{number}_drawtype" name="items[#{number}][drawtype]">
 			<?php foreach (graph_item_drawtypes() as $drawtype): ?>
 				<option value="<?= $drawtype ?>"><?= graph_item_drawtype2str($drawtype) ?></option>
 			<?php endforeach ?>
@@ -69,7 +69,7 @@
 	<!-- yaxisside -->
 	<?php if ($this->data['graphtype'] == GRAPH_TYPE_NORMAL || $this->data['graphtype'] == GRAPH_TYPE_STACKED): ?>
 		<td>
-			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" class="input select">
+			<select id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]">
 				<option value="<?= GRAPH_YAXIS_SIDE_LEFT ?>"><?= _('Left') ?></option>
 				<option value="<?= GRAPH_YAXIS_SIDE_RIGHT ?>"><?= _('Right') ?></option>
 			</select>
@@ -78,7 +78,7 @@
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
-		<?= (new CColor('items[#{number}][color]', $data['problem_ack_color']))->toString() ?>
+		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
 	</td>
 	<td>
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
@@ -343,14 +343,19 @@
 				}
 			});
 
-			$('#previewTab img')
-				.attr('src', 'styles/themes/<?= getUserTheme(CWebUser::$data) ?>/images/preloader.gif')
-				.width(80)
-				.height(12);
+			var image = $('#previewChar img');
+
+			if (image.length != 0) {
+				image.remove();
+			}
+
+			$('#previewChar')
+				.attr('class', 'preloader');
 
 			$('<img />').attr('src', name + '?period=3600' + src).load(function() {
-				$('#previewChar img').remove();
-				$('#previewChar').append($(this));
+				$('#previewChar')
+					.removeAttr('class')
+					.append($(this));
 			});
 		});
 

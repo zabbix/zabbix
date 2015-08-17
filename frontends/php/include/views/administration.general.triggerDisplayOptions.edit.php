@@ -61,8 +61,7 @@ $triggerDOFormList = (new CFormList())
 			_('blinking')
 		], 'ok_ack_style')
 	])
-	// some air between the sections
-	->addRow()
+	->addRow(null)
 	->addRow(_('Display OK triggers for'), [
 		(new CTextBox('ok_period', $data['ok_period']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
