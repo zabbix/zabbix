@@ -343,14 +343,19 @@
 				}
 			});
 
-			$('#previewTab img')
-				.attr('src', 'styles/themes/<?= getUserTheme(CWebUser::$data) ?>/images/preloader.gif')
-				.width(80)
-				.height(12);
+			var image = $('#previewChar img');
+
+			if (image.length != 0) {
+				image.remove();
+			}
+
+			$('#previewChar')
+				.attr('class', 'preloader');
 
 			$('<img />').attr('src', name + '?period=3600' + src).load(function() {
-				$('#previewChar img').remove();
-				$('#previewChar').append($(this));
+				$('#previewChar')
+					.removeAttr('class')
+					.append($(this));
 			});
 		});
 
