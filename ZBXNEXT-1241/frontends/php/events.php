@@ -750,7 +750,7 @@ else {
 			}
 
 			// actions
-			$actions = getEventActionsStatus(zbx_objectValues($events, 'eventid'));
+			$actions = makeEventsActions(zbx_objectValues($events, 'eventid'));
 
 			// events
 			foreach ($events as $event) {
@@ -770,7 +770,7 @@ else {
 					: zbx_date2age($event['clock']);
 
 				// action
-				$action = isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ' - ';
+				$action = isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : '';
 
 				if ($csvExport) {
 					$csvRows[] = [

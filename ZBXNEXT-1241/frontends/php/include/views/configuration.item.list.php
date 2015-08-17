@@ -214,12 +214,12 @@ foreach ($this->data['items'] as $item) {
 			];
 		}
 
-		$menuIcon = (new CIcon(_('Menu')))
-			->addClass('iconmenu_b')
+		$menuIcon = (new CButton(null))
+			->addClass(ZBX_STYLE_BTN_WIZARD_ACTION)
 			->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
 	}
 	else {
-		$menuIcon = SPACE;
+		$menuIcon = '';
 	}
 
 	$checkBox = (new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']))

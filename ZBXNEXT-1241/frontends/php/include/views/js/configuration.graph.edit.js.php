@@ -78,7 +78,7 @@
 		<input type="hidden" id="items_#{number}_yaxisside" name="items[#{number}][yaxisside]" value="#{yaxisside}">
 	<?php endif ?>
 	<td>
-		<?= (new CColor('items[#{number}][color]', $data['problem_ack_color']))->toString() ?>
+		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
 	</td>
 	<td>
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>

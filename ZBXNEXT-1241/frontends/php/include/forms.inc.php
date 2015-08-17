@@ -253,10 +253,9 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 
 		$table = (new CTable())
 			->setNoDataMessage(_('No accessible resources'))
-			->addClass('right_table')
 			->addClass('calculated');
 		if (!$isHeaderDisplayed) {
-			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')], 'header');
+			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')]);
 			$isHeaderDisplayed = true;
 		}
 		$table->addRow($row);
@@ -1579,7 +1578,7 @@ function getTriggerFormData($exprAction) {
 }
 
 function get_timeperiod_form() {
-	$tblPeriod = (new CTable())->addClass('formElementTable');
+	$tblPeriod = new CTable();
 
 	// init new_timeperiod variable
 	$new_timeperiod = getRequest('new_timeperiod', []);
@@ -1768,15 +1767,12 @@ function get_timeperiod_form() {
 		]);
 		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
-		$tblPeriod->addRow([_('Date'), [
-			(new CRadioButton('new_timeperiod[month_date_type]', '0', !$new_timeperiod['month_date_type']))
-				->onChange('submit()'),
-			_('Day'),
-			SPACE,
-			(new CRadioButton('new_timeperiod[month_date_type]', '1', $new_timeperiod['month_date_type']))
-				->onChange('submit()'),
-			_('Day of week')]]
-		);
+		$tblPeriod->addRow([_('Date'),
+			(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
+				->addValue(_('Day'), 0, null, 'submit()')
+				->addValue(_('Day of week'), 1, null, 'submit()')
+				->setModern(true)
+		]);
 
 		if ($new_timeperiod['month_date_type'] > 0) {
 			$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
@@ -1840,7 +1836,9 @@ function get_timeperiod_form() {
 		$tblPeriod->addRow([_('At (hour:minute)'), [
 			(new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			':',
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		]]);

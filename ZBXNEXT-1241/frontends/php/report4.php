@@ -117,10 +117,11 @@ else {
 	$widget->setControls($form);
 
 	$header = [];
-	$db_users = DBselect('SELECT u.* FROM users u ORDER BY u.alias,u.userid');
+	$users = [];
+	$db_users = DBselect('SELECT u.userid,u.alias,u.name,u.surname FROM users u ORDER BY u.alias,u.userid');
 	while ($user_data = DBfetch($db_users)) {
-		$header[] = (new CColHeader($user_data['alias']))->addClass('vertical_rotation');
-		$users[$user_data['userid']] = $user_data['alias'];
+		$header[] = (new CColHeader(getUserFullname($user_data)))->addClass('vertical_rotation');
+		$users[] = $user_data['userid'];
 	}
 
 	$intervals = [];
@@ -198,7 +199,7 @@ else {
 	// sort alerts in chronological order so we could easily iterate through them later
 	CArrayHelper::sort($alerts, ['clock']);
 
-	$table->setHeader($header, 'vertical_header');
+	$table->setHeader($header);
 	foreach ($intervals as $from => $till) {
 		// interval start
 		$row = [zbx_date2str($dateFormat, $from)];
@@ -210,7 +211,7 @@ else {
 
 		// counting alert count for each user and media type
 		$summary = [];
-		foreach ($users as $userid => $alias) {
+		foreach ($users as $userid) {
 			$summary[$userid] = [];
 			$summary[$userid]['total'] = 0;
 			$summary[$userid]['medias'] = [];
