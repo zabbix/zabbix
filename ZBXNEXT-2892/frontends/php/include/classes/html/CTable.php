@@ -21,7 +21,6 @@
 
 class CTable extends CTag {
 
-	public $headerClass;
 	protected $header;
 	protected $footer;
 	protected $colnum;
@@ -32,7 +31,6 @@ class CTable extends CTag {
 		parent::__construct('table', true);
 		$this->rownum = 0;
 		$this->header = '';
-		$this->headerClass = null;
 		$this->footer = '';
 		$this->colnum = 1;
 	}
@@ -87,20 +85,9 @@ class CTable extends CTag {
 		return $item;
 	}
 
-	public function setHeader($value = null, $class = null) {
-		if (is_null($class)) {
-			$class = $this->headerClass;
-		}
-		if (is_object($value) && strtolower(get_class($value)) === 'crow') {
-			if ($class !== null) {
-				$value->addClass($class);
-			}
-		}
-		else {
-			$value = new CRowHeader($value, $class);
-			if ($class !== null) {
-				$value->addClass($class);
-			}
+	public function setHeader($value = null) {
+		if (!is_object($value) || strtolower(get_class($value)) !== 'crow') {
+			$value = new CRowHeader($value);
 		}
 		$this->colnum = $value->itemsCount();
 

@@ -681,6 +681,8 @@ class C10ImportConverter extends CConverter {
 			$graph = CArrayHelper::renameKeys($graph, [
 				'graphtype' => 'type',
 				'graph_elements' => 'graph_items',
+				'ymin_type' => 'ymin_type_1',
+				'ymax_type' => 'ymax_type_1',
 				'ymin_item_key' => 'ymin_item_1',
 				'ymax_item_key' => 'ymax_item_1'
 			]);

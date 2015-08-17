@@ -11,7 +11,7 @@
 					<label for="elementType"><?= _('Type') ?></label>
 				</td>
 				<td class="table-forms-td-right">
-					<select class="input select" name="elementtype" id="elementType">
+					<select name="elementtype" id="elementType">
 						<option value="<?= SYSMAP_ELEMENT_TYPE_HOST ?>"><?= _('Host') ?></option>
 						<option value="<?= SYSMAP_ELEMENT_TYPE_MAP ?>"><?= _('Map') ?></option>
 						<option value="<?= SYSMAP_ELEMENT_TYPE_TRIGGER ?>"><?= _('Trigger') ?></option>
@@ -24,10 +24,10 @@
 				<td class="table-forms-td-left"><?= _('Show') ?></td>
 				<td class="table-forms-td-right">
 					<div class="groupingContent">
-						<input id="subtypeHostGroup" type="radio" class="input radio" name="elementsubtype" value="0" checked="checked">
+						<input id="subtypeHostGroup" type="radio" name="elementsubtype" value="0" checked="checked">
 						<label for="subtypeHostGroup"><?= _('Host group') ?></label>
 						<br />
-						<input id="subtypeHostGroupElements" type="radio" class="input radio" name="elementsubtype" value="1">
+						<input id="subtypeHostGroupElements" type="radio" name="elementsubtype" value="1">
 						<label for="subtypeHostGroupElements"><?= _('Host group elements') ?></label>
 					</div>
 				</td>
@@ -36,10 +36,10 @@
 				<td class="table-forms-td-left"><?= _('Area type') ?></td>
 				<td class="table-forms-td-right">
 					<div class="groupingContent">
-						<input id="areaTypeAuto" type="radio" class="input radio" name="areatype" value="0" checked="checked">
+						<input id="areaTypeAuto" type="radio" name="areatype" value="0" checked="checked">
 						<label for="areaTypeAuto"><?= _('Fit to map') ?></label>
 						<br />
-						<input id="areaTypeCustom" type="radio" class="input radio" name="areatype" value="1">
+						<input id="areaTypeCustom" type="radio" name="areatype" value="1">
 						<label for="areaTypeCustom"><?= _('Custom size') ?></label>
 					</div>
 				</td>
@@ -48,9 +48,9 @@
 				<td class="table-forms-td-left"><?= _('Area size') ?></td>
 				<td class="table-forms-td-right">
 					<label for="areaSizeWidth"><?= _('Width') ?></label>
-					<input id="areaSizeWidth" type="text" class="input text" name="width" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
+					<input id="areaSizeWidth" type="text" name="width" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
 					<label for="areaSizeHeight"><?= _('Height') ?></label>
-					<input id="areaSizeHeight" type="text" class="input text" name="height" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
+					<input id="areaSizeHeight" type="text" name="height" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
 				</td>
 			</tr>
 			<tr id="areaPlacingRow">
@@ -58,7 +58,7 @@
 					<label for="areaPlacing"><?= _('Placing algorithm') ?></label>
 				</td>
 				<td class="table-forms-td-right">
-					<select id="areaPlacing" class="input select">
+					<select id="areaPlacing">
 						<option value="<?= SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID ?>"><?= _('Grid') ?></option>
 					</select>
 				</td>
@@ -68,7 +68,7 @@
 					<label for="elementLabel"><?= _('Label') ?></label>
 				</td>
 				<td class="table-forms-td-right">
-					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
+					<textarea id="elementLabel" cols="56" rows="4" name="label" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr>
@@ -76,7 +76,7 @@
 					<label for="label_location"><?= _('Label location') ?></label>
 				</td>
 				<td class="table-forms-td-right">
-					<select id="label_location" class="input select" name="label_location">
+					<select id="label_location" name="label_location">
 						<option value="<?= MAP_LABEL_LOC_DEFAULT ?>"><?= _('Default') ?></option>
 						<option value="<?= MAP_LABEL_LOC_BOTTOM ?>"><?= _('Bottom') ?></option>
 						<option value="<?= MAP_LABEL_LOC_LEFT ?>"><?= _('Left') ?></option>
@@ -101,21 +101,21 @@
 				<td class="table-forms-td-left"><?= _('Trigger') ?></td>
 				<td class="table-forms-td-right">
 					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
-					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameTrigger" name="elementName" class="text input" type="text">
-					<button type="button" class="btn-grey" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?= _('Select') ?></button>
+					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameTrigger" name="elementName" type="text">
+					<button type="button" class="<?= ZBX_STYLE_BTN_GREY ?>" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?= _('Select') ?></button>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">
 				<td class="table-forms-td-left"><?= _('Map') ?></td>
 				<td class="table-forms-td-right">
-					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameMap" name="elementName" class="input" type="text">
+					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameMap" name="elementName" type="text">
 					<button type="button" class="btn-grey" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}")'><?= _('Select') ?></button>
 				</td>
 			</tr>
 			<tr id="application-select-row">
 				<td class="table-forms-td-left"><?= _('Application') ?></td>
 				<td class="table-forms-td-right">
-					<input id="application" name="application" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" type="text">
+					<input id="application" name="application" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" type="text">
 					<button class="<?= ZBX_STYLE_BTN_GREY ?>" id="application-select" type="button"><?= _('Select') ?></button>
 				</td>
 			</tr>
@@ -129,7 +129,7 @@
 							<tr id="useIconMapRow">
 								<td colspan="2">
 									<label for="use_iconmap" id=use_iconmapLabel>
-										<input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox" value="1">
+										<input type="checkbox" name="use_iconmap" id="use_iconmap" value="1">
 										<?= _('Automatic icon selection') ?>
 									</label>
 								</td>
@@ -137,21 +137,21 @@
 							<tr>
 								<td>
 									<label for="iconid_off"><?= _('Default') ?></label>
-									<select class="input select" name="iconid_off" id="iconid_off"></select>
+									<select name="iconid_off" id="iconid_off"></select>
 								</td>
 								<td id="iconProblemRow">
 									<label for="iconid_on"><?= _('Problem') ?></label>
-									<select class="input select" name="iconid_on" id="iconid_on"></select>
+									<select name="iconid_on" id="iconid_on"></select>
 								</td>
 							</tr>
 							<tr>
 								<td id="iconMainetnanceRow">
 									<label for="iconid_maintenance"><?= _('Maintenance') ?></label>
-									<select class="input select" name="iconid_maintenance" id="iconid_maintenance"></select>
+									<select name="iconid_maintenance" id="iconid_maintenance"></select>
 								</td>
 								<td id="iconDisabledRow">
 									<label for="iconid_disabled"><?= _('Disabled') ?></label>
-									<select class="input select" name="iconid_disabled" id="iconid_disabled"></select>
+									<select name="iconid_disabled" id="iconid_disabled"></select>
 								</td>
 							</tr>
 							</tbody>
@@ -163,9 +163,9 @@
 			<tr>
 				<td class="table-forms-td-left"><?= _('Coordinates') ?></td>
 				<td class="table-forms-td-right">
-					<input id="x" type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" name="x" class="input">
+					<input id="x" type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" name="x">
 					<label for="x"><?= _('X') ?></label>
-					<input type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" id="y" name="y" class="input">
+					<input type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" id="y" name="y">
 					<label for="y"><?= _('Y') ?></label>
 				</td>
 			</tr>
@@ -197,7 +197,7 @@
 			</tbody>
 			<tfoot>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
+				<td colspan="2">
 					<button class="element-edit-control" id="elementApply" type="button"><?= _('Apply') ?></button>
 					<button class="element-edit-control" id="elementRemove" type="button"><?= _('Remove') ?></button>
 					<button id="elementClose" type="button"><?= _('Close') ?></button>
@@ -210,7 +210,7 @@
 
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
 	<form id="massForm">
-		<table class="formtable">
+		<table>
 			<tbody>
 			<tr class="header">
 				<td id="massDragHandler" colspan="2" class="form_row_first move">
@@ -222,7 +222,7 @@
 				<td colspan="2">
 					<?= _('Selected elements') ?>:
 					<div id="elements-selected">
-						<table class="tableinfo">
+						<table>
 							<tbody id="massList"></tbody>
 						</table>
 					</div>
@@ -230,20 +230,20 @@
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox">
+					<input type="checkbox" name="chkbox_label" id="chkboxLabel">
 					<label for="chkboxLabel"><?= _('Label') ?></label>
 				</td>
 				<td>
-					<textarea id="massLabel" rows="4" name="label" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
+					<textarea id="massLabel" rows="4" name="label" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox">
+					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation">
 					<label for="chkboxLabelLocation"><?= _('Label location') ?></label>
 				</td>
 				<td>
-					<select id="massLabelLocation" class="input select" name="label_location">
+					<select id="massLabelLocation" name="label_location">
 						<option value="<?= MAP_LABEL_LOC_DEFAULT ?>"><?= _('Default') ?></option>
 						<option value="<?= MAP_LABEL_LOC_BOTTOM ?>"><?= _('Bottom') ?></option>
 						<option value="<?= MAP_LABEL_LOC_LEFT ?>"><?= _('Left') ?></option>
@@ -254,51 +254,51 @@
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap" class="checkbox">
+					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap">
 					<label for="chkboxMassUseIconmap"><?= _('Automatic icon selection') ?></label>
 				</td>
 				<td>
-					<input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1">
+					<input type="checkbox" name="use_iconmap" id="massUseIconmap" value="1">
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff" class="checkbox">
+					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff">
 					<label for="chkboxMassIconidOff"><?= _('Icon (default)') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="iconid_off" id="massIconidOff"></select>
+					<select name="iconid_off" id="massIconidOff"></select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn" class="checkbox">
+					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn">
 					<label for="chkboxMassIconidOn"><?= _('Icon (problem)') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="iconid_on" id="massIconidOn"></select>
+					<select name="iconid_on" id="massIconidOn"></select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance" class="checkbox">
+					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance">
 					<label for="chkboxMassIconidMaintenance"><?= _('Icon (maintenance)') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="iconid_maintenance" id="massIconidMaintenance"></select>
+					<select name="iconid_maintenance" id="massIconidMaintenance"></select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled" class="checkbox">
+					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled">
 					<label for="chkboxMassIconidDisabled"><?= _('Icon (disabled)') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="iconid_disabled" id="massIconidDisabled"></select>
+					<select name="iconid_disabled" id="massIconidDisabled"></select>
 				</td>
 			</tr>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
+				<td colspan="2">
 					<button class="element-edit-control" id="massApply" type="button"><?= _('Apply') ?></button>
 					<button class="element-edit-control" id="massRemove" type="button"><?= _('Remove') ?></button>
 					<button id="massClose" type="button"><?= _('Close') ?></button>
@@ -318,7 +318,7 @@
 
 <script type="text/x-jquery-tmpl" id="linkFormTpl">
 	<div id="mapLinksContainer">
-		<table id="element-links" class="tableinfo element-links">
+		<table id="element-links" class="element-links">
 			<caption><?= _('Links for the selected element') ?></caption>
 			<thead>
 			<tr class="header">
@@ -329,7 +329,7 @@
 			</thead>
 			<tbody></tbody>
 		</table>
-		<table id="mass-element-links" class="tableinfo element-links">
+		<table id="mass-element-links" class="element-links">
 			<caption><?= _('Links between the selected elements') ?></caption>
 			<thead>
 			<tr class="header">
@@ -345,14 +345,14 @@
 	<form id="linkForm" name="linkForm">
 		<input type="hidden" name="selementid1">
 
-		<table class="formtable">
+		<table>
 			<tbody>
 			<tr>
 				<td>
 					<label for="linklabel"><?= _('Label') ?></label>
 				</td>
 				<td>
-					<textarea cols="48" rows="4" name="label" id="linklabel" class="input" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
+					<textarea cols="48" rows="4" name="label" id="linklabel" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr id="link-connect-to">
@@ -360,7 +360,7 @@
 					<label for="selementid2"><?= _('Connect to') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="selementid2" id="selementid2"></select>
+					<select name="selementid2" id="selementid2"></select>
 				</td>
 			</tr>
 			<tr>
@@ -368,7 +368,7 @@
 					<label for="drawtype"><?= _('Type (OK)') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="drawtype" id="drawtype">
+					<select name="drawtype" id="drawtype">
 						<option value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>"><?= _('Line') ?></option>
 						<option value="<?= GRAPH_ITEM_DRAWTYPE_BOLD_LINE ?>"><?= _('Bold line') ?></option>
 						<option value="<?= GRAPH_ITEM_DRAWTYPE_DOT ?>"><?= _('Dot') ?></option>
@@ -383,7 +383,7 @@
 				<td>
 					<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
 						<div name="lbl_color" id="lbl_color" style="background: #{color}" title="#{color}" onclick="javascript: show_color_picker('color')"></div>
-						<input id="color" name="color" value="#{color}" class="input colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('color', this.value)" type="text">
+						<input id="color" name="color" value="#{color}" class="colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('color', this.value)" type="text">
 					</div>
 				</td>
 			</tr>
@@ -413,7 +413,7 @@
 				</td>
 			</tr>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
+				<td colspan="2">
 					<button id="formLinkApply" type="button"><?= _('Apply') ?></button>
 					<button id="formLinkRemove" type="button"><?= _('Remove') ?></button>
 					<button id="formLinkClose" type="button"><?= _('Close') ?></button>
@@ -452,7 +452,7 @@
 			<input type="hidden" name="linktrigger_#{linktriggerid}_desc_exp" value="#{desc_exp}" />
 			<input type="hidden" name="linktrigger_#{linktriggerid}_triggerid" value="#{triggerid}" />
 			<input type="hidden" name="linktrigger_#{linktriggerid}_linktriggerid" value="#{linktriggerid}" />
-			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype" class="input select">
+			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype">
 				<option value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>"><?= _('Line') ?></option>
 				<option value="<?= GRAPH_ITEM_DRAWTYPE_BOLD_LINE ?>"><?= _('Bold line') ?></option>
 				<option value="<?= GRAPH_ITEM_DRAWTYPE_DOT ?>"><?= _('Dot') ?></option>
@@ -462,7 +462,7 @@
 		<td>
 			<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
 				<div name="lbl_linktrigger_#{linktriggerid}_color" id="lbl_linktrigger_#{linktriggerid}_color" style="background: #{color}" title="#{color}" onclick="javascript: show_color_picker('linktrigger_#{linktriggerid}_color')"></div>
-				<input id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" value="#{color}" class="input colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('linktrigger_#{linktriggerid}_color', this.value)" type="text">
+				<input id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" value="#{color}" class="colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('linktrigger_#{linktriggerid}_color', this.value)" type="text">
 			</div>
 		</td>
 		<td>
@@ -473,9 +473,9 @@
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
 	<tr id="urlrow_#{selementurlid}">
-		<td><input class="input" name="url_#{selementurlid}_name" type="text" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" value="#{name}"></td>
+		<td><input name="url_#{selementurlid}_name" type="text" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" value="#{name}"></td>
 		<td>
-			<input class="input" name="url_#{selementurlid}_url" type="text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" value="#{url}">
+			<input name="url_#{selementurlid}_url" type="text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" value="#{url}">
 			<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?= _('Remove') ?></button>
 		</td>
 	</tr>

@@ -404,9 +404,7 @@ $widget->addItem($filterForm);
 
 $form = (new CForm('GET', 'history.php'))
 	->setName('items')
-// set an ID for the hidden input so that it wouldn't conflict with the ID of the "Go" button list
-	->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
-
+	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 // table
 $table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
 if ($filterSet) {

@@ -94,7 +94,7 @@ $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 $httpFormList->addRow(_('User agent string'),
 	(new CTextBox('agent_other', $this->data['agent_other']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_agent_other'
+	'row_agent_other'
 );
 
 // append HTTP proxy to form list
@@ -164,7 +164,7 @@ $stepsTable = (new CTable())
 		(new CColHeader(_('Status codes')))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->setWidth('90'),
-		(new CColHeader())->setWidth('50')
+		(new CColHeader(_('Action')))->setWidth('50')
 	]);
 
 $i = 1;
