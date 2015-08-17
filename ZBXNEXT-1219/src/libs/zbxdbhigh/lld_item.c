@@ -707,7 +707,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 		zbx_hashset_insert(&items_keys, &item->key, sizeof(char *));
 	}
 
-	/* check new and updated keys for duplicates in discovered items */
+	/* check new and updated keys for duplicated keys in discovered items */
 	for (i = 0; i < items->values_num; i++)
 	{
 		item = (zbx_lld_item_t *)items->values[i];
