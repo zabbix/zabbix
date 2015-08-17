@@ -344,7 +344,7 @@ function invalid_url($msg = null) {
 
 	// backup messages before including page_header.php
 	$temp = $ZBX_MESSAGES;
-	$ZBX_MESSAGES = null;
+	$ZBX_MESSAGES = [];
 
 	require_once dirname(__FILE__).'/page_header.php';
 

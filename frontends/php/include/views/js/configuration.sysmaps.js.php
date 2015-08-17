@@ -197,7 +197,7 @@
 			</tbody>
 			<tfoot>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
+				<td colspan="2">
 					<button class="element-edit-control" id="elementApply" type="button"><?= _('Apply') ?></button>
 					<button class="element-edit-control" id="elementRemove" type="button"><?= _('Remove') ?></button>
 					<button id="elementClose" type="button"><?= _('Close') ?></button>
@@ -210,7 +210,7 @@
 
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
 	<form id="massForm">
-		<table class="formtable">
+		<table>
 			<tbody>
 			<tr class="header">
 				<td id="massDragHandler" colspan="2" class="form_row_first move">
@@ -222,7 +222,7 @@
 				<td colspan="2">
 					<?= _('Selected elements') ?>:
 					<div id="elements-selected">
-						<table class="tableinfo">
+						<table>
 							<tbody id="massList"></tbody>
 						</table>
 					</div>
@@ -298,7 +298,7 @@
 				</td>
 			</tr>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
+				<td colspan="2">
 					<button class="element-edit-control" id="massApply" type="button"><?= _('Apply') ?></button>
 					<button class="element-edit-control" id="massRemove" type="button"><?= _('Remove') ?></button>
 					<button id="massClose" type="button"><?= _('Close') ?></button>
@@ -318,7 +318,7 @@
 
 <script type="text/x-jquery-tmpl" id="linkFormTpl">
 	<div id="mapLinksContainer">
-		<table id="element-links" class="tableinfo element-links">
+		<table id="element-links" class="element-links">
 			<caption><?= _('Links for the selected element') ?></caption>
 			<thead>
 			<tr class="header">
@@ -329,7 +329,7 @@
 			</thead>
 			<tbody></tbody>
 		</table>
-		<table id="mass-element-links" class="tableinfo element-links">
+		<table id="mass-element-links" class="element-links">
 			<caption><?= _('Links between the selected elements') ?></caption>
 			<thead>
 			<tr class="header">
@@ -345,7 +345,7 @@
 	<form id="linkForm" name="linkForm">
 		<input type="hidden" name="selementid1">
 
-		<table class="formtable">
+		<table>
 			<tbody>
 			<tr>
 				<td>
@@ -413,7 +413,7 @@
 				</td>
 			</tr>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
+				<td colspan="2">
 					<button id="formLinkApply" type="button"><?= _('Apply') ?></button>
 					<button id="formLinkRemove" type="button"><?= _('Remove') ?></button>
 					<button id="formLinkClose" type="button"><?= _('Close') ?></button>

@@ -69,7 +69,6 @@ class CActionButtonList extends CObject {
 		foreach ($buttonsData as $action=> $buttonData) {
 			$this->buttons[$action] = (new CSubmit($actionName, $buttonData['name']))
 				->addClass(ZBX_STYLE_BTN_ALT)
-				->addClass('footerButton')
 				->removeAttribute('id')
 				->setAttribute('value', $action);
 

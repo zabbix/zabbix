@@ -21,7 +21,7 @@
 include dirname(__FILE__).'/js/conf.import.js.php';
 
 $rulesTable = (new CTable())
-	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
+	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')]);
 
 $titles = [
 	'groups' => _('Groups'),
@@ -39,16 +39,14 @@ $titles = [
 	'images' => _('Images')
 ];
 
-$rules = $this->get('rules');
-
 foreach ($titles as $key => $title) {
 	$cbExist = null;
 	$cbMissed = null;
 	$cbDeleted = null;
 
-	if (isset($rules[$key]['updateExisting'])) {
+	if (array_key_exists('updateExisting', $data['rules'][$key])) {
 		$cbExist = (new CCheckBox('rules['.$key.'][updateExisting]'))
-			->setChecked($rules[$key]['updateExisting'] == 1);
+			->setChecked($data['rules'][$key]['updateExisting']);
 
 		if ($key == 'images') {
 			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
@@ -59,27 +57,27 @@ foreach ($titles as $key => $title) {
 		}
 	}
 
-	if (isset($rules[$key]['createMissing'])) {
+	if (array_key_exists('createMissing', $data['rules'][$key])) {
 		$cbMissed = (new CCheckBox('rules['.$key.'][createMissing]'))
-			->setChecked($rules[$key]['createMissing'] == 1);
+			->setChecked($data['rules'][$key]['createMissing']);
 	}
 
-	if (isset($rules[$key]['deleteMissing'])) {
+	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
 		$cbDeleted = (new CCheckBox('rules['.$key.'][deleteMissing]'))
-			->setChecked($rules[$key]['deleteMissing'] == 1)
-			->addClass('input checkbox pointer deleteMissing');
+			->setChecked($data['rules'][$key]['deleteMissing'])
+			->addClass('deleteMissing');
 	}
 
 	$rulesTable->addRow([
 		$title,
-		(new CCol($cbExist))->addClass('center'),
-		(new CCol($cbMissed))->addClass('center'),
-		(new CCol($cbDeleted))->addClass('center')
+		(new CCol($cbExist))->addClass(ZBX_STYLE_CENTER),
+		(new CCol($cbMissed))->addClass(ZBX_STYLE_CENTER),
+		(new CCol($cbDeleted))->addClass(ZBX_STYLE_CENTER)
 	]);
 }
 
 // form list
-$importFormList = (new CFormList('proxyFormList'))
+$importFormList = (new CFormList())
 	->addRow(_('Import file'), (new CFile('import_file'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Rules'), new CDiv($rulesTable));
 
@@ -87,15 +85,16 @@ $importFormList = (new CFormList('proxyFormList'))
 $importTab = (new CTabView())->addTab('importTab', _('Import'), $importFormList);
 
 // form
-$importForm = new CForm('post', null, 'multipart/form-data');
 $importTab->setFooter(makeFormFooter(
 	new CSubmit('import', _('Import')),
-	[new CButtonCancel()]
+	[new CRedirectButton(_('Cancel'), $data['backurl'])]
 ));
 
-$importForm->addItem($importTab);
+$form = (new CForm('post', null, 'multipart/form-data'))
+	->addVar('backurl', $data['backurl'])
+	->addItem($importTab);
 
 // widget
-$importWidget = (new CWidget())->addItem($importForm);
+$importWidget = (new CWidget())->addItem($form);
 
 return $importWidget;
