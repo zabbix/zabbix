@@ -809,7 +809,7 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
  *                                                                            *
  * Function: lld_item_make                                                    *
  *                                                                            *
- * Purpose: creates a new item  based on item prototype and lld data row      *
+ * Purpose: creates a new item based on item prototype and lld data row       *
  *                                                                            *
  * Parameters: item_prototype - [IN] the item prototype                       *
  *             lld_row        - [IN] the lld row                              *
@@ -2270,9 +2270,6 @@ static void	lld_item_application_prototypes_get(const zbx_vector_ptr_t *item_pro
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		item_application_prototype = (zbx_lld_item_application_ref_t *)zbx_malloc(NULL,
-				sizeof(zbx_lld_item_application_ref_t));
-
 		ZBX_STR2UINT64(application_prototypeid, row[0]);
 
 		if (FAIL == (index = zbx_vector_ptr_search(application_prototypes, &application_prototypeid,
@@ -2281,6 +2278,9 @@ static void	lld_item_application_prototypes_get(const zbx_vector_ptr_t *item_pro
 			THIS_SHOULD_NEVER_HAPPEN;
 			continue;
 		}
+
+		item_application_prototype = (zbx_lld_item_application_ref_t *)zbx_malloc(NULL,
+				sizeof(zbx_lld_item_application_ref_t));
 
 		item_application_prototype->application_prototype = application_prototypes->values[index];
 		item_application_prototype->applicationid = 0;
