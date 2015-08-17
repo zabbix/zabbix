@@ -2152,6 +2152,9 @@ static void	lld_item_links_populate(const zbx_vector_ptr_t *item_prototypes, zbx
 			if (NULL == (item_index = zbx_hashset_search(items_index, &item_index_local)))
 				continue;
 
+			if (0 == (item_index->item->flags & ZBX_FLAG_LLD_ITEM_DISCOVERED))
+				continue;
+
 			item_link = (zbx_lld_item_link_t *)zbx_malloc(NULL, sizeof(zbx_lld_item_link_t));
 
 			item_link->parent_itemid = item_index->item->parent_itemid;
