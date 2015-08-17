@@ -58,7 +58,7 @@ $houseKeeperTab = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setEnabled($data['hk_events_mode'] == 1)
 	)
-	->addRow()
+	->addRow(null)
 	->addRow(new CTag('h4', true, _('IT services')))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_services_mode'),
@@ -70,7 +70,7 @@ $houseKeeperTab = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setEnabled($data['hk_services_mode'] == 1)
 	)
-	->addRow()
+	->addRow(null)
 	->addRow(new CTag('h4', true, _('Audit')))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
@@ -82,7 +82,7 @@ $houseKeeperTab = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setEnabled($data['hk_audit_mode'] == 1)
 	)
-	->addRow()
+	->addRow(null)
 	->addRow(new CTag('h4', true, _('User sessions')))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_sessions_mode'),
@@ -94,7 +94,7 @@ $houseKeeperTab = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setEnabled($data['hk_sessions_mode'] == 1)
 	)
-	->addRow()
+	->addRow(null)
 	->addRow(new CTag('h4', true, _('History')))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_history_mode'),
@@ -110,7 +110,7 @@ $houseKeeperTab = (new CFormList())
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setEnabled($data['hk_history_global'] == 1)
 	)
-	->addRow()
+	->addRow(null)
 	->addRow(new CTag('h4', true, _('Trends')))
 	->addRow(
 		new CLabel(_('Enable internal housekeeping'), 'hk_trends_mode'),

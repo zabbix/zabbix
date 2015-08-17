@@ -46,7 +46,7 @@ function get_last_event_by_triggerid($triggerId) {
  */
 function makeAckTab($event) {
 	$acknowledgeTable = (new CTableInfo())
-		->setHeader([_('Time'), _('User'), _('Comments')]);
+		->setHeader([_('Time'), _('User'), _('Message')]);
 
 	if (!empty($event['acknowledges']) && is_array($event['acknowledges'])) {
 		foreach ($event['acknowledges'] as $acknowledge) {

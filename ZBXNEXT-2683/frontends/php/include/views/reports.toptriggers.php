@@ -125,6 +125,20 @@ $table = (new CTableInfo())
 	]);
 
 foreach ($this->data['triggers'] as $trigger) {
+	foreach ($trigger['hosts'] as $host) {
+		if ($host['status'] == HOST_STATUS_MONITORED) {
+			// Pass a monitored 'hostid' and corresponding first 'groupid' to menu pop-up "Events" link.
+			$trigger['hostid'] = $host['hostid'];
+			$trigger['groupid'] = $data['monitored_hosts'][$trigger['hostid']]['groups'][0]['groupid'];
+			break;
+		}
+		else {
+			// Unmonitored will have disabled "Events" link and there is no 'groupid' or 'hostid'.
+			$trigger['hostid'] = 0;
+			$trigger['groupid'] = 0;
+		}
+	}
+
 	$hostId = $trigger['hosts'][0]['hostid'];
 
 	$hostName = (new CSpan($trigger['hosts'][0]['name']))

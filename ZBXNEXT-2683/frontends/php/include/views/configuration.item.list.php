@@ -48,7 +48,6 @@ if (!empty($this->data['hostid'])) {
 
 // create table
 $itemTable = (new CTableInfo())
-	->setNoDataMessage(($this->data['filterSet']) ? null : _('Specify some filter condition to see the items.'))
 	->setHeader([
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$itemForm->getName()."', 'all_items', 'group_itemid');")
@@ -66,6 +65,10 @@ $itemTable = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $this->data['sort'], $this->data['sortorder']),
 		$data['showInfoColumn'] ? _('Info') : null
 	]);
+
+if (!$this->data['filterSet']) {
+	$itemTable->setNoDataMessage(_('Specify some filter condition to see the items.'));
+}
 
 $current_time = time();
 
@@ -214,12 +217,12 @@ foreach ($this->data['items'] as $item) {
 			];
 		}
 
-		$menuIcon = (new CIcon(_('Menu')))
-			->addClass('iconmenu_b')
+		$menuIcon = (new CButton(null))
+			->addClass(ZBX_STYLE_BTN_WIZARD_ACTION)
 			->setMenuPopup(CMenuPopupHelper::getTriggerLog($item['itemid'], $item['name'], $triggers));
 	}
 	else {
-		$menuIcon = SPACE;
+		$menuIcon = '';
 	}
 
 	$checkBox = (new CCheckBox('group_itemid['.$item['itemid'].']', $item['itemid']))
