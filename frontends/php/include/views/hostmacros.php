@@ -120,18 +120,29 @@ else {
 					->setAttribute('target', '_blank');
 				$row[] = '&lArr;';
 				$row[] = (new CDiv([$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"']))
-					->addClass('macro-value');
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
 			}
 			else {
-				array_push($row, '', (new CDiv())->addClass('macro-value'));
+				array_push($row, '',
+					(new CDiv())
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				);
 			}
 
 			if (array_key_exists('global', $macro)) {
 				$row[] = '&lArr;';
-				$row[] = (new CDiv('"'.$macro['global']['value'].'"'))->addClass('macro-value');
+				$row[] = (new CDiv('"'.$macro['global']['value'].'"'))
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
 			}
 			else {
-				array_push($row, '', (new CDiv())->addClass('macro-value'));
+				array_push($row, '',
+					(new CDiv())
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				);
 			}
 		}
 

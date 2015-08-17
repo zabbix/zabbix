@@ -277,7 +277,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 	if (!$db_host) {
 		$options = [
-			'output' => ['templateid', 'name'],
+			'output' => ['templateid', 'name', 'flags'],
 			'templateids' => [$hostid],
 			'editable' => true
 		];

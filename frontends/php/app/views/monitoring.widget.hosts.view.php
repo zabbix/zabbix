@@ -218,7 +218,7 @@ foreach ($groups as $group) {
 		'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 	);
 	$group_row->addItem($name);
-	$group_row->addItem((new CCol($hosts_data[$group['groupid']]['ok']))->addClass('normal'));
+	$group_row->addItem((new CCol($hosts_data[$group['groupid']]['ok']))->addClass(ZBX_STYLE_NORMAL_BG));
 
 	if ($data['filter']['extAck']) {
 		if ($hosts_data[$group['groupid']]['lastUnack']) {
@@ -229,7 +229,7 @@ foreach ($groups as $group) {
 
 			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 				$header[] = ($data['filter']['severity'] === null || isset($data['filter']['severity'][$severity]))
-					? (new CColHeader(getSeverityName($severity, $data['config'])))->addClass(ZBX_STYLE_NOWAP)
+					? getSeverityName($severity, $data['config'])
 					: null;
 			}
 
