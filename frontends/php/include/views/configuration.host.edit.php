@@ -307,7 +307,8 @@ if ($data['clone_hostid'] != 0) {
 		'output' => ['name'],
 		'hostids' => [$data['clone_hostid']],
 		'inherited' => false,
-		'preservekeys' => true
+		'preservekeys' => true,
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 	]);
 
 	if ($hostApps) {
@@ -562,7 +563,7 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$linkedTemplateTable = (new CTable())
 		->setNoDataMessage(_('No templates linked.'))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
 	foreach ($data['linked_templates'] as $template) {
@@ -583,15 +584,18 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 			$unlinkAndClearButton = null;
 		}
 
-		$linkedTemplateTable->addRow([$templateLink, [$unlinkButton, $unlinkAndClearButton]], null,
-			'conditions_'.$template['templateid']
-		);
+		$linkedTemplateTable->addRow([
+			$templateLink,
+			(new CCol([$unlinkButton, $unlinkAndClearButton]))->addClass(ZBX_STYLE_NOWRAP)
+		], null, 'conditions_'.$template['templateid']);
 
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($linkedTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
 	// create new linked template table
@@ -610,14 +614,16 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
 	$tmplList->addRow(_('Link new templates'),
-		(new CDiv($newTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($newTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 // templates for discovered hosts
 else {
 	$linkedTemplateTable = (new CTable())
 		->setNoDataMessage(_('No templates linked.'))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
 	foreach ($data['linked_templates'] as $template) {
@@ -629,7 +635,9 @@ else {
 	}
 
 	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($linkedTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 
@@ -681,28 +689,13 @@ $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
 $inventoryFormList = new CFormList('inventorylist');
 
-// radio buttons for inventory type choice
-$inventoryDisabledBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, ($data['inventory_mode'] == HOST_INVENTORY_DISABLED)))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_DISABLED)
-	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
-
-$inventoryManualBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, ($data['inventory_mode'] == HOST_INVENTORY_MANUAL)))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_MANUAL)
-	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
-
-$inventoryAutomaticBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, ($data['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
-	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
-
-$inventoryTypeRadioButton = [
-	$inventoryDisabledBtn, new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
-	$inventoryManualBtn, new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
-	$inventoryAutomaticBtn, new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
-];
 $inventoryFormList->addRow(null,
-	(new CDiv($inventoryTypeRadioButton))
-		->addClass('jqueryinputset')
-		->addClass('radioset')
+	(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
+		->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+		->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+		->setModern(true)
 );
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$inventoryFormList->addVar('inventory_mode', $data['inventory_mode']);
@@ -769,10 +762,6 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 
 	$inventoryFormList->addRow($inventoryInfo['title'], [$input, $inventory_item]);
 }
-
-// clearing the float
-$clearFixDiv = (new CDiv())->addStyle('clear: both;');
-$inventoryFormList->addRow('', $clearFixDiv);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
 

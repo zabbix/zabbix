@@ -296,7 +296,8 @@ else {
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'hostid' => $pageFilter->hostid,
-		'groupid' => $pageFilter->groupid
+		'groupid' => $pageFilter->groupid,
+		'showInfoColumn' => false
 	];
 
 	if ($pageFilter->hostsSelected) {
@@ -304,9 +305,9 @@ else {
 
 		// get application ids
 		$applications = API::Application()->get([
+			'output' => ['applicationid'],
 			'hostids' => ($pageFilter->hostid > 0) ? $pageFilter->hostid : null,
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
-			'output' => ['applicationid'],
 			'editable' => true,
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1
@@ -315,9 +316,12 @@ else {
 
 		// get applications
 		$data['applications'] = API::Application()->get([
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
 			'selectHost' => ['hostid', 'name'],
 			'selectItems' => ['itemid'],
+			'selectHost' => ['hostid', 'name'],
+			'selectDiscoveryRule' => ['itemid', 'name'],
+			'selectApplicationDiscovery' => ['ts_delete'],
 			'applicationids' => $applicationids
 		]);
 
@@ -348,6 +352,50 @@ else {
 					}
 				}
 			}
+		}
+
+		/*
+		 * Calculate the 'ts_delete' which will display the of warning icon and hint telling when application will be
+		 * deleted. Also we need only 'ts_delete' for view, so get rid of the multidimensional array inside
+		 * 'applicationDiscovery' property.
+		 */
+		foreach ($data['applications'] as &$application) {
+			if ($application['applicationDiscovery']) {
+				if (count($application['applicationDiscovery']) > 1) {
+					$ts_delete = zbx_objectValues($application['applicationDiscovery'], 'ts_delete');
+
+					if (min($ts_delete) == 0) {
+						// One rule stops discovering application, but other rule continues to discover it.
+						unset($application['applicationDiscovery']);
+						$application['applicationDiscovery']['ts_delete'] = 0;
+					}
+					else {
+						// Both rules stop discovering application. Find maximum clock.
+						unset($application['applicationDiscovery']);
+						$application['applicationDiscovery']['ts_delete'] = max($ts_delete);
+					}
+				}
+				else {
+					// Application is discovered by one rule.
+					$ts_delete = $application['applicationDiscovery'][0]['ts_delete'];
+					unset($application['applicationDiscovery']);
+					$application['applicationDiscovery']['ts_delete'] = $ts_delete;
+				}
+			}
+		}
+
+		// Info column is show when all hosts are selected or current host is not a template.
+		if ($pageFilter->hostid > 0) {
+			$hosts = API::Host()->get([
+				'output' => ['status'],
+				'hostids' => [$pageFilter->hostid]
+			]);
+
+			$data['showInfoColumn'] = $hosts
+				&& ($hosts[0]['status'] == HOST_STATUS_MONITORED || $hosts[0]['status'] == HOST_STATUS_NOT_MONITORED);
+		}
+		else {
+			$data['showInfoColumn'] = true;
 		}
 	}
 	else {

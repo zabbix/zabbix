@@ -263,7 +263,7 @@ if ($this->data['is_profile']) {
 	$userMessagingFormList->addRow(_('Message timeout (seconds)'),
 		(new CNumericBox('messages[timeout]', $this->data['messages']['timeout'], 5))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-		false, 'timeout_row'
+		'timeout_row'
 	);
 
 	$repeatSound = new CComboBox('messages[sounds.repeat]', $this->data['messages']['sounds.repeat'],
@@ -274,7 +274,7 @@ if ($this->data['is_profile']) {
 			-1 => _('Message timeout')
 		]
 	);
-	$userMessagingFormList->addRow(_('Play sound'), $repeatSound, false, 'repeat_row');
+	$userMessagingFormList->addRow(_('Play sound'), $repeatSound, 'repeat_row');
 
 	$soundList = new CComboBox('messages[sounds.recovery]', $this->data['messages']['sounds.recovery']);
 	foreach ($zbxSounds as $filename => $file) {
@@ -338,7 +338,7 @@ if ($this->data['is_profile']) {
 		zbx_subarray_push($msgVisibility, 1, 'messages[sounds.'.$severity.']');
 	}
 
-	$userMessagingFormList->addRow(_('Trigger severity'), $triggersTable, false, 'triggers_row');
+	$userMessagingFormList->addRow(_('Trigger severity'), $triggersTable, 'triggers_row');
 }
 
 // append form lists to tab

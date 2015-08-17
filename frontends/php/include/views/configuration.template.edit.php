@@ -390,7 +390,7 @@ $ignoredTemplates = [];
 
 $linkedTemplateTable = (new CTable())
 	->setNoDataMessage(_('No templates linked.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['linkedTemplates'] as $template) {
@@ -417,7 +417,9 @@ foreach ($data['linkedTemplates'] as $template) {
 }
 
 $tmplList->addRow(_('Linked templates'),
-	(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	(new CDiv($linkedTemplateTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // create new linked template table
@@ -435,7 +437,11 @@ $newTemplateTable = (new CTable())
 	])
 	->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
-$tmplList->addRow(_('Link new templates'), (new CDiv($newTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$tmplList->addRow(_('Link new templates'),
+	(new CDiv($newTemplateTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES

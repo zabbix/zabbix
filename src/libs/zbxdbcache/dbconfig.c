@@ -108,6 +108,7 @@ typedef struct
 	unsigned char	location;
 	unsigned char	flags;
 	unsigned char	status;
+	unsigned char	unreachable;
 }
 ZBX_DC_ITEM;
 
@@ -1978,6 +1979,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
+			item->unreachable = 0;
 		}
 		else
 		{
@@ -3497,6 +3499,7 @@ static int	__config_heap_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	if (SUCCEED != is_snmp_type(i1->type))
 	{
@@ -3523,6 +3526,7 @@ static int	__config_pinger_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
 
 	return 0;
@@ -3553,6 +3557,7 @@ static int	__config_java_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	return __config_java_item_compare(i1, i2);
 }
@@ -3625,50 +3630,50 @@ void	init_configuration_cache()
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
 	config->time_triggers = (zbx_vector_ptr_t *)(config + 1);
 
-#define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on config_size? */
+#define CREATE_HASHSET(hashset, hashset_size)									\
+														\
+	CREATE_HASHSET_EXT(hashset, hashset_size, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
 
-#define CREATE_HASHSET(hashset)	CREATE_HASHSET_EXT(hashset, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
+#define CREATE_HASHSET_EXT(hashset, hashset_size, hash_func, compare_func)					\
+														\
+	zbx_hashset_create_ext(&hashset, hashset_size, hash_func, compare_func, NULL,				\
+			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
-#define CREATE_HASHSET_EXT(hashset, hash_func, compare_func)								\
-															\
-	zbx_hashset_create_ext(&hashset, INIT_HASHSET_SIZE, hash_func, compare_func, NULL,				\
-				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
+	CREATE_HASHSET(config->items, 100);
+	CREATE_HASHSET(config->numitems, 0);
+	CREATE_HASHSET(config->snmpitems, 0);
+	CREATE_HASHSET(config->ipmiitems, 0);
+	CREATE_HASHSET(config->flexitems, 0);
+	CREATE_HASHSET(config->trapitems, 0);
+	CREATE_HASHSET(config->logitems, 0);
+	CREATE_HASHSET(config->dbitems, 0);
+	CREATE_HASHSET(config->sshitems, 0);
+	CREATE_HASHSET(config->telnetitems, 0);
+	CREATE_HASHSET(config->simpleitems, 0);
+	CREATE_HASHSET(config->jmxitems, 0);
+	CREATE_HASHSET(config->calcitems, 0);
+	CREATE_HASHSET(config->deltaitems, 0);
+	CREATE_HASHSET(config->functions, 100);
+	CREATE_HASHSET(config->triggers, 100);
+	CREATE_HASHSET(config->trigdeps, 0);
+	CREATE_HASHSET(config->hosts, 10);
+	CREATE_HASHSET(config->proxies, 0);
+	CREATE_HASHSET(config->host_inventories, 0);
+	CREATE_HASHSET(config->ipmihosts, 0);
+	CREATE_HASHSET(config->htmpls, 0);
+	CREATE_HASHSET(config->gmacros, 0);
+	CREATE_HASHSET(config->hmacros, 0);
+	CREATE_HASHSET(config->interfaces, 10);
+	CREATE_HASHSET(config->interface_snmpitems, 0);
+	CREATE_HASHSET(config->expressions, 0);
 
-	CREATE_HASHSET(config->items);
-	CREATE_HASHSET(config->numitems);
-	CREATE_HASHSET(config->snmpitems);
-	CREATE_HASHSET(config->ipmiitems);
-	CREATE_HASHSET(config->flexitems);
-	CREATE_HASHSET(config->trapitems);
-	CREATE_HASHSET(config->logitems);
-	CREATE_HASHSET(config->dbitems);
-	CREATE_HASHSET(config->sshitems);
-	CREATE_HASHSET(config->telnetitems);
-	CREATE_HASHSET(config->simpleitems);
-	CREATE_HASHSET(config->jmxitems);
-	CREATE_HASHSET(config->calcitems);
-	CREATE_HASHSET(config->deltaitems);
-	CREATE_HASHSET(config->functions);
-	CREATE_HASHSET(config->triggers);
-	CREATE_HASHSET(config->trigdeps);
-	CREATE_HASHSET(config->hosts);
-	CREATE_HASHSET(config->proxies);
-	CREATE_HASHSET(config->host_inventories);
-	CREATE_HASHSET(config->ipmihosts);
-	CREATE_HASHSET(config->htmpls);
-	CREATE_HASHSET(config->gmacros);
-	CREATE_HASHSET(config->hmacros);
-	CREATE_HASHSET(config->interfaces);
-	CREATE_HASHSET(config->interface_snmpitems);
-	CREATE_HASHSET(config->expressions);
-
-	CREATE_HASHSET_EXT(config->items_hk, __config_item_hk_hash, __config_item_hk_compare);
-	CREATE_HASHSET_EXT(config->hosts_h, __config_host_h_hash, __config_host_h_compare);
-	CREATE_HASHSET_EXT(config->gmacros_m, __config_gmacro_m_hash, __config_gmacro_m_compare);
-	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
-	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare);
-	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare);
-	CREATE_HASHSET_EXT(config->regexps, __config_regexp_hash, __config_regexp_compare);
+	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
+	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
+	CREATE_HASHSET_EXT(config->gmacros_m, 0, __config_gmacro_m_hash, __config_gmacro_m_compare);
+	CREATE_HASHSET_EXT(config->hmacros_hm, 0, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
+	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
+	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash, __config_interface_addr_compare);
+	CREATE_HASHSET_EXT(config->regexps, 0, __config_regexp_hash, __config_regexp_compare);
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
 	{
@@ -3717,8 +3722,6 @@ void	init_configuration_cache()
 					__config_mem_free_func);
 
 	config->config = NULL;
-
-#undef	INIT_HASHSET_SIZE
 
 #undef	CREATE_HASHSET
 #undef	CREATE_HASHSET_EXT
@@ -3962,6 +3965,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
+	dst_item->unreachable = src_item->unreachable;
 
 	dst_item->db_state = src_item->db_state;
 	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
@@ -4953,7 +4957,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 		if (0 == (disable_until = DCget_disable_until(dc_item, dc_host)))
 		{
-			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
+			/* move reachable items on reachable hosts to normal pollers */
+			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type && 0 == dc_item->unreachable)
 			{
 				old_poller_type = dc_item->poller_type;
 				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
@@ -5227,6 +5232,8 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, lastclock);
 
+	dc_item->unreachable = 0;
+
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
 
@@ -5245,6 +5252,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *
 
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+
+	dc_item->unreachable = 1;
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
@@ -5310,6 +5319,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				DCrequeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:
@@ -6417,10 +6427,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  *                                                                            *
  * Purpose: return the number of active items                                 *
  *                                                                            *
+ * Parameters: hostid - [IN] the host id, pass 0 to specify all hosts         *
+ *                                                                            *
  * Return value: the number of active items                                   *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_count()
+int	DCget_item_count(zbx_uint64_t hostid)
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
@@ -6438,6 +6450,9 @@ int	DCget_item_count()
 			continue;
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
+			continue;
+
+		if (0 != hostid && hostid != dc_item->hostid)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -6460,10 +6475,12 @@ int	DCget_item_count()
  *                                                                            *
  * Purpose: return the number of active unsupported items                     *
  *                                                                            *
+ * Parameters: hostid - [IN] the host id, pass 0 to specify all hosts         *
+ *                                                                            *
  * Return value: the number of active unsupported items                       *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_unsupported_count()
+int	DCget_item_unsupported_count(zbx_uint64_t hostid)
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
@@ -6481,6 +6498,9 @@ int	DCget_item_unsupported_count()
 			continue;
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
+			continue;
+
+		if (0 != hostid && hostid != dc_item->hostid)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))

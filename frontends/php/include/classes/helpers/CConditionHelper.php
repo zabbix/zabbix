@@ -140,14 +140,23 @@ class CConditionHelper {
 	/**
 	 * Replace formula IDs with numeric IDs using the pairs given in $ids.
 	 *
+	 * Notes:
+	 *     - $formula must be valid before the function call
+	 *     - $ids must contain all constants used in the $formula
+	 *
 	 * @param string 	$formula
 	 * @param array 	$ids		array of formula ID - numeric ID pairs
 	 *
 	 * @return string
 	 */
 	public static function replaceLetterIds($formula, array $ids) {
-		foreach ($ids as $formulaId => $id) {
-			$formula = str_replace($formulaId, '{'.$id.'}', $formula);
+		$parser = new CConditionFormula();
+		$parser->parse($formula);
+
+		foreach (array_reverse($parser->constants) as $constant) {
+			$formula = substr_replace($formula, '{'.$ids[$constant['value']].'}', $constant['pos'],
+				strlen($constant['value'])
+			);
 		}
 
 		return $formula;
