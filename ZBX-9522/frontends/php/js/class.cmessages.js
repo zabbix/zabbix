@@ -303,7 +303,7 @@ var CMessageList = Class.create(CDebug, {
 		if (this.messagePipe.length < 1) {
 			this.messagePipe = [];
 			this.messageList = {};
-			cookie.erase('messages');
+
 			setTimeout(Element.hide.bind(Element, this.dom.container), this.effectTimeout);
 		}
 		else {
@@ -357,7 +357,6 @@ var CMessageList = Class.create(CDebug, {
 		}
 
 		this.stopSound();
-		cookie.erase('messages');
 	},
 
 	timeoutMessages: function() {
@@ -423,7 +422,12 @@ var CMessageList = Class.create(CDebug, {
 				}
 			}
 
-			cookie.create('messages', JSON.stringify(messages_to_save));
+			if (messages_to_save.length > 0) {
+				cookie.create('messages', JSON.stringify(messages_to_save));
+			}
+			else {
+				cookie.erase('messages');
+			}
 		}
 		else {
 			cookie.erase('messages');
@@ -439,7 +443,7 @@ var CMessageList = Class.create(CDebug, {
 		/*
 		 * If page has been fully refreshed, get last event based on cookie if possible. Even after the cookie has beed
 		 * deleted (while the page has not been refreshed yet), we still know when was the last time event happened.
-		 * If the page was not refreshed, use the orignal object.
+		 * If the page was not refreshed, use the original object.
 		 */
 		if (this.lastupdate == 0 && last_event_time > 0) {
 			messageLast = {'events': {'time': last_event_time}};
