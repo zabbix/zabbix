@@ -320,13 +320,11 @@ $graphTab->addTab(
 /*
  * Preview tab
  */
-$chartImage = (new CImg('chart3.php?period=3600'))->preload();
-
 $graphPreviewTable = (new CTable())
 	->addStyle('width: 100%;')
 	->addRow(
 		(new CRow(
-			(new CDiv($chartImage))->setId('previewChar')
+			(new CDiv())->setId('previewChar')
 		))->addClass(ZBX_STYLE_CENTER)
 	);
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
