@@ -654,8 +654,9 @@ jQuery(function($) {
 	function addSelected(item, obj, values, options) {
 		if (typeof(values.selected[item.id]) == 'undefined') {
 			removeDefaultValue(obj, options);
-
 			values.selected[item.id] = item;
+
+			var prefix = typeof(item.prefix) == 'undefined' ? '' : item.prefix;
 
 			// add hidden input
 			obj.append($('<input>', {
@@ -663,22 +664,8 @@ jQuery(function($) {
 				name: (options.addNew && item.isNew) ? options.name + '[new]' : options.name,
 				value: item.id,
 				'data-name': item.name,
-				'data-prefix': item.prefix
+				'data-prefix': prefix
 			}));
-
-			// add list item
-			var li = $('<li>', {
-				'data-id': item.id
-			});
-
-			var text = $('<span>', {
-				'class': 'subfilter-enabled',
-				text: empty(item.prefix) ? item.name : item.prefix + item.name
-			});
-
-			$('.selected ul', obj).append(li.append(text));
-
-			resizeSelectedText(li, text, obj, options);
 
 			var close_btn = $('<span>', {
 				'class': 'subfilter-disable-btn'
@@ -690,7 +677,21 @@ jQuery(function($) {
 				});
 			}
 
-			text.append(close_btn);
+			var li = $('<li>', {
+				'data-id': item.id
+			}).append(
+				$('<span>', {
+					'class': 'subfilter-enabled'
+				})
+					.append($('<span>', {
+						text: prefix + item.name
+					}))
+					.append(close_btn)
+			);
+
+			$('.selected ul', obj).append(li);
+
+			resizeSelectedText(li, obj);
 
 			// set readonly
 			if (options.selectedLimit != 0 && $('.selected li', obj).length >= options.selectedLimit) {
@@ -833,27 +834,29 @@ jQuery(function($) {
 		$('input[type="text"]', obj).val('');
 	}
 
-	function resizeSelectedText(item, text, obj, options) {
-		var text_paddings = text.innerWidth() - text.width(),
-			item_margins = item.outerWidth(true) - item.width(),
-			max_width = $('.selected ul', obj).width() - item_margins - text_paddings;
+	function resizeSelectedText(li, obj) {
+		var	li_margins = li.outerWidth(true) - li.width(),
+			span = $('span.subfilter-enabled', li),
+			span_paddings = span.outerWidth(true) - span.width(),
+			max_width = $('.selected ul', obj).width() - li_margins - span_paddings,
+			text = $('span:first-child', span);
 
 		if (text.width() > max_width) {
 			var t = text.text();
 			var l = t.length;
 
-			do {
+			while (text.width() > max_width && l != 0) {
 				text.text(t.substring(0, --l) + '...');
 			}
-			while (text.width() > max_width)
 		}
 	}
 
 	function resizeAllSelectedTexts(obj, options, values) {
 		$('.selected li', obj).each(function() {
-			var item = $(this),
-				id = item.data('id'),
-				text = $(item.children()[0]),
+			var li = $(this),
+				id = li.data('id'),
+				span = $('span.subfilter-enabled', li),
+				text = $('span:first-child', span),
 				t = empty(values.selected[id].prefix)
 					? values.selected[id].name
 					: values.selected[id].prefix + values.selected[id].name;
@@ -861,7 +864,7 @@ jQuery(function($) {
 			// rewrite previous text to original
 			text.text(t);
 
-			resizeSelectedText(item, text, obj, options);
+			resizeSelectedText(li, obj);
 		});
 	}
 
