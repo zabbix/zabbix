@@ -24,7 +24,7 @@ class CTableInfo extends CTable {
 	public function __construct() {
 		parent::__construct();
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
-		$this->setNoDataMessage(_('No data found'));
+		$this->setNoDataMessage(_('No data found.'));
 		$this->addMakeVerticalRotationJs = false;
 	}
 

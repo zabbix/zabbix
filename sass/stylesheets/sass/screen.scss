@@ -1842,6 +1842,11 @@ button[disabled] {
 	}
 }
 
+.selected-item-count {
+	display: inline-block;
+	margin: 0 14px 0 0;
+}
+
 .tabs-nav-container {
 	height: 36px;
 	line-height: 36px;
@@ -2625,6 +2630,19 @@ $form-icon-btn: (
 	}
 }
 
+.top {
+	vertical-align: top;
+}
+
+.bottom {
+	vertical-align: bottom;
+}
+
+.left {
+	text-align: left;
+}
+
+
 .graph-selection {
 	position: absolute;
 	z-index: 98;
@@ -3224,6 +3242,7 @@ $browser-logos: (
 
 .overflow-ellipsis {
 	table-layout: fixed;
+	@extend %overflow-ellipsis;
 
 	td {
 		@extend %overflow-ellipsis;
