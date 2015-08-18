@@ -4,7 +4,7 @@ define('DEFAULT_SRC_FILE', dirname(__FILE__).'/../src/schema.tmpl');
 define('DEFAULT_DEST_FILE', dirname(__FILE__).'/../src/schema.inc.php');
 
 function parse_schema($path) {
-	$schema = array();
+	$schema = [];
 	$lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
 	foreach ($lines as $line) {
@@ -17,7 +17,7 @@ function parse_schema($path) {
 				$str = explode('|', $rest_line);
 				$table = trim($str[0]);
 				$key = trim($str[1]);
-				$schema[$table] = array('key' => $key, 'fields' => array());
+				$schema[$table] = ['key' => $key, 'fields' => []];
 				break;
 			case 'FIELD':
 				$str = explode('|', $rest_line);
@@ -68,10 +68,10 @@ function parse_schema($path) {
 						break;
 				}
 
-				$data = array(
+				$data = [
 					'null' => ($null == 'NULL' ? 'true' : 'false'),
 					'type' => $type
-				);
+				];
 
 				if ($length) {
 					$data['length'] = $length;
@@ -94,22 +94,22 @@ function parse_schema($path) {
 
 	$str = "<?php\n";
 
-	$str .= 'return array('."\n";
+	$str .= 'return ['."\n";
 	foreach ($schema as $table => $data) {
-		$str .= "\t'$table' => array(\n";
+		$str .= "\t'$table' => [\n";
 		$str .= "\t\t'key' => '{$data['key']}',\n";
-		$str .= "\t\t'fields' => array(\n";
+		$str .= "\t\t'fields' => [\n";
 		foreach ($data['fields'] as $field => $fieldata) {
-			$str .= "\t\t\t'$field' => array(\n";
+			$str .= "\t\t\t'$field' => [\n";
 			foreach ($fieldata as $name => $val) {
 				$str .= "\t\t\t\t'$name' => $val,\n";
 			}
-			$str .= "\t\t\t),\n";
+			$str .= "\t\t\t],\n";
 		}
-		$str .= "\t\t),\n";
-		$str .= "\t),\n";
+		$str .= "\t\t],\n";
+		$str .= "\t],\n";
 	}
-	$str .= ");\n";
+	$str .= "];\n";
 
 	$str .= "?>\n";
 

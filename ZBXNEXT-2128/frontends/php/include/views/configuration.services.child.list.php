@@ -21,46 +21,45 @@
 
 include(dirname(__FILE__).'/js/configuration.services.child.list.js.php');
 
-$servicesChildWidget = new CWidget();
-$servicesChildWidget->addPageHeader(_('IT service dependencies'));
+$servicesChildWidget = (new CWidget())->setTitle(_('IT service dependencies'));
 
 // create form
-$servicesChildForm = new CForm();
-$servicesChildForm->setName('servicesForm');
+$servicesChildForm = (new CForm())->setName('servicesForm');
 if (!empty($this->data['service'])) {
 	$servicesChildForm->addVar('serviceid', $this->data['service']['serviceid']);
 }
 
 // create table
-$servicesChildTable = new CTableInfo(_('No IT services found.'));
-$servicesChildTable->setHeader(array(
-	new CCheckBox('all_services', null, "javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');"),
-	_('Service'),
-	_('Status calculation'),
-	_('Trigger')
-));
+$servicesChildTable = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_services'))->onClick("javascript: checkAll('".$servicesChildForm->getName()."', 'all_services', 'services');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		_('Service'),
+		_('Status calculation'),
+		_('Trigger')
+	]);
 
 $prefix = null;
 foreach ($this->data['db_cservices'] as $service) {
-	$description = new CLink($service['name'], '#', 'service-name');
-	$description->setAttributes(array(
-		'id' => 'service-name-'.$service['serviceid'],
-		'data-name' => $service['name'],
-		'data-serviceid' => $service['serviceid'],
-		'data-trigger' => $service['trigger']
-	));
+	$description = (new CLink($service['name'], '#'))
+		->addClass('service-name')
+		->setId('service-name-'.$service['serviceid'])
+		->setAttribute('data-name', $service['name'])
+		->setAttribute('data-serviceid', $service['serviceid'])
+		->setAttribute('data-trigger', $service['trigger']);
 
-	$cb = new CCheckBox('services['.$service['serviceid'].']', null, null, $service['serviceid']);
-	$cb->addClass('service-select');
+	$cb = (new CCheckBox('services['.$service['serviceid'].']', $service['serviceid']))
+		->addClass('service-select');
 
-	$servicesChildTable->addRow(array(
+	$servicesChildTable->addRow([
 		$cb,
-		array($prefix, $description),
+		[$prefix, $description],
 		serviceAlgorythm($service['algorithm']),
-		$service['trigger'])
+		$service['trigger']]
 	);
 }
-$servicesChildTable->setFooter(new CCol(new CButton('select', _('Select')), 'right'));
+$servicesChildTable->setFooter((new CCol(new CButton('select', _('Select'))))->addClass('right'));
 
 // append table to form
 $servicesChildForm->addItem($servicesChildTable);

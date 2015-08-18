@@ -25,8 +25,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['file'] = 'history.php';
 $page['title'] = _('History');
-$page['hist_arg'] = array('itemids', 'period', 'stime', 'action', 'graphtype');
-$page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 if (isset($_REQUEST['plaintext'])) {
@@ -37,38 +36,33 @@ define('ZBX_PAGE_DO_JS_REFRESH', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'itemids' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	'isset({favobj})'),
-	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
-	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
-	'filter_task' =>	array(T_ZBX_STR, O_OPT, null,	IN(FILTER_TASK_SHOW.','.FILTER_TASK_HIDE.','.FILTER_TASK_MARK.','.FILTER_TASK_INVERT_MARK), null),
-	'filter' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
-	'mark_color' =>		array(T_ZBX_STR, O_OPT, null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null),
-	'cmbitemlist' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,	null),
-	'plaintext' =>		array(T_ZBX_STR, O_OPT, null,	null,	null),
-	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'","'.HISTORY_LATEST.'","'.HISTORY_BATCH_GRAPH.'"'), null),
-	'graphtype' =>      array(T_ZBX_INT, O_OPT, null,   IN(array(GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED)), null),
+$fields = [
+	'itemids' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,	'isset({favobj})'],
+	'period' =>			[T_ZBX_INT, O_OPT, null,	null,	null],
+	'stime' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
+	'filter_task' =>	[T_ZBX_STR, O_OPT, null,	IN(FILTER_TASK_SHOW.','.FILTER_TASK_HIDE.','.FILTER_TASK_MARK.','.FILTER_TASK_INVERT_MARK), null],
+	'filter' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
+	'mark_color' =>		[T_ZBX_STR, O_OPT, null,	IN(MARK_COLOR_RED.','.MARK_COLOR_GREEN.','.MARK_COLOR_BLUE), null],
+	'cmbitemlist' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,	null],
+	'plaintext' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
+	'action' =>			[T_ZBX_STR, O_OPT, P_SYS,	IN('"'.HISTORY_GRAPH.'","'.HISTORY_VALUES.'","'.HISTORY_LATEST.'","'.HISTORY_BATCH_GRAPH.'"'), null],
+	'graphtype' =>      [T_ZBX_INT, O_OPT, null,   IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
 	// ajax
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
-	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
-	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
+	'favobj' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,	null],
+	'favid' =>			[T_ZBX_INT, O_OPT, P_ACT,	null,	null],
 	// actions
-	'reset' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_copy_to' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,	null),
-	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null)
-);
+	'reset' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
+	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'form_copy_to' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
+	'fullscreen' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null]
+];
 check_fields($fields);
 
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.history.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
 if (isset($_REQUEST['favobj'])) {
 	if ($_REQUEST['favobj'] == 'timeline') {
 		navigation_bar_calc('web.item.graph', $_REQUEST['favid'], true);
@@ -93,13 +87,13 @@ $_REQUEST['action'] = getRequest('action', HISTORY_GRAPH);
 /*
  * Display
  */
-$items = API::Item()->get(array(
+$items = API::Item()->get([
 	'itemids' => getRequest('itemids'),
 	'webitems' => true,
-	'selectHosts' => array('name'),
-	'output' => array('itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid'),
+	'selectHosts' => ['name'],
+	'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid'],
 	'preservekeys' => true
-));
+]);
 
 foreach (getRequest('itemids') as $itemid) {
 	if (!isset($items[$itemid])) {
@@ -111,7 +105,7 @@ $items = CMacrosResolverHelper::resolveItemNames($items);
 
 $item = reset($items);
 
-$data = array(
+$data = [
 	'itemids' => getRequest('itemids'),
 	'items' => $items,
 	'value_type' => $item['value_type'],
@@ -119,11 +113,11 @@ $data = array(
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime'),
 	'plaintext' => isset($_REQUEST['plaintext']),
-	'iv_string' => array(ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1),
-	'iv_numeric' => array(ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1),
+	'iv_string' => [ITEM_VALUE_TYPE_LOG => 1, ITEM_VALUE_TYPE_TEXT => 1],
+	'iv_numeric' => [ITEM_VALUE_TYPE_FLOAT => 1, ITEM_VALUE_TYPE_UINT64 => 1],
 	'fullscreen' => $_REQUEST['fullscreen'],
 	'graphtype' => getRequest('graphtype', GRAPH_TYPE_NORMAL)
-);
+];
 
 // render view
 $historyView = new CView('monitoring.history', $data);

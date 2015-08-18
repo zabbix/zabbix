@@ -19,55 +19,19 @@
 **/
 
 
-class CWarning extends CTable {
+class CWarning extends CDiv {
 
-	protected $header;
-	protected $message;
-	protected $alignment;
-	protected $paddings;
-	protected $buttons;
-
-	public function __construct($header, $message = null) {
-		parent::__construct(null, 'warningTable');
-		$this->setAlign('center');
-		$this->header = $header;
-		$this->message = $message;
-		$this->alignment = null;
-		$this->paddings = null;
-		$this->buttons = array();
-	}
-
-	public function setAlignment($alignment) {
-		$this->alignment = $alignment;
-	}
-
-	public function setPaddings($padding) {
-		$this->paddings = $padding;
-	}
-
-	public function setButtons($buttons = array()) {
-		$this->buttons = is_array($buttons) ? $buttons : array($buttons);
-	}
-
-	public function show($destroy = true) {
-		$this->setHeader($this->header, 'header');
-
-		$cssClass = 'content';
-		if (!empty($this->alignment)) {
-			$cssClass .= ' '.$this->alignment;
+	public function __construct($header, $messages = [], $buttons = []) {
+		parent::__construct($header);
+		$this->addClass(ZBX_STYLE_MSG_BAD);
+		$this->addClass('msg-global');
+		if ($messages) {
+			parent::addItem(
+				(new CDiv(
+					(new CList($messages))->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
+				))->addClass(ZBX_STYLE_MSG_DETAILS)
+			);
 		}
-
-		if (!empty($this->paddings)) {
-			$this->addRow($this->paddings);
-			$this->addRow(new CSpan($this->message), $cssClass);
-			$this->addRow($this->paddings);
-		}
-		else {
-			$this->addRow(new CSpan($this->message), $cssClass);
-		}
-
-		$this->setFooter(new CDiv($this->buttons, 'buttons'), 'footer');
-
-		parent::show($destroy);
+		parent::addItem((new CDiv($buttons))->addClass('msg-buttons'));
 	}
 }

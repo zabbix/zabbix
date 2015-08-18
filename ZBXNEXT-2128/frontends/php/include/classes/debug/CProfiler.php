@@ -29,32 +29,18 @@ class CProfiler {
 	protected $slowSqlQueryTime = 0.01;
 
 	/**
-	 * Determines time for sum of all script sql query times to be considered slow.
-	 *
-	 * @var float
-	 */
-	protected $slowTotalSqlTime = 0.5;
-
-	/**
-	 * Determines time for script execution time to be considered slow.
-	 *
-	 * @var float
-	 */
-	protected $slowScriptTime = 1.0;
-
-	/**
 	 * Contains all api requests info.
 	 *
 	 * @var array
 	 */
-	protected $apiLog = array();
+	protected $apiLog = [];
 
 	/**
 	 * Contains SQL queries info.
 	 *
 	 * @var array
 	 */
-	protected $sqlQueryLog = array();
+	protected $sqlQueryLog = [];
 
 	/**
 	 * Total time of all performed sql queries.
@@ -85,6 +71,13 @@ class CProfiler {
 	private static $instance;
 
 	/**
+	 * Root directory path
+	 *
+	 * @var string
+	 */
+	private $root_dir;
+
+	/**
 	 * @static
 	 *
 	 * @return CProfiler
@@ -100,7 +93,9 @@ class CProfiler {
 	/**
 	 * Private constructor.
 	 */
-	private function __construct() {}
+	private function __construct() {
+		$this->root_dir = realpath(dirname(__FILE__).'/../../..');
+	}
 
 	/**
 	 * Start script profiling.
@@ -122,77 +117,77 @@ class CProfiler {
 	public function show() {
 		global $DB;
 
-		$debug_str = '<a name="debug"></a>';
-		$debug_str .= '******************** '._('Script profiler').' ********************'.'<br>';
-
-		$totalScriptTime = $this->stopTime - $this->startTime;
-		$totalTimeStr = _s('Total time: %s', round($totalScriptTime, 6));
-		if ($totalTimeStr > $this->slowScriptTime) {
-			$totalTimeStr = '<b>'.$totalTimeStr.'</b>';
-		}
-		$debug_str .= $totalTimeStr.'<br>';
-
-		$sqlTotalTimeStr = _s('Total SQL time: %s', $this->sqlTotalTime);
-		if ($sqlTotalTimeStr > $this->slowTotalSqlTime) {
-			$sqlTotalTimeStr = '<b>'.$sqlTotalTimeStr.'</b>';
-		}
-		$debug_str .= $sqlTotalTimeStr.'<br>';
+		$debug = [];
+		$debug[] = (new CLink())
+			->setAttribute('name', 'debug')
+			->removeSid();
+		$debug[] = '******************** '._('Script profiler').' ********************';
+		$debug[] = BR();
+		$debug[] = _s('Total time: %1$s', round($this->stopTime - $this->startTime, 6));
+		$debug[] = BR();
+		$debug[] = _s('Total SQL time: %1$s', $this->sqlTotalTime);
+		$debug[] = BR();
 
 		if (isset($DB) && isset($DB['SELECT_COUNT'])) {
-			$debug_str .= _s('SQL count: %s (selects: %s | executes: %s)',
-				count($this->sqlQueryLog), $DB['SELECT_COUNT'], $DB['EXECUTE_COUNT']).'<br>';
+			$debug[] = _s('SQL count: %1$s (selects: %2$s | executes: %3$s)',
+				count($this->sqlQueryLog), $DB['SELECT_COUNT'], $DB['EXECUTE_COUNT']);
+			$debug[] = BR();
 		}
 
-		$debug_str .= _s('Peak memory usage: %s', mem2str($this->getMemoryPeak())).'<br>';
-		$debug_str .= _s('Memory limit: %s', ini_get('memory_limit')).'<br>';
-
-		$debug_str .= '<br>';
+		$debug[] = _s('Peak memory usage: %1$s', mem2str($this->getMemoryPeak()));
+		$debug[] = BR();
+		$debug[] = _s('Memory limit: %1$s', ini_get('memory_limit'));
+		$debug[] = BR();
+		$debug[] = BR();
 
 		foreach ($this->apiLog as $i => $apiCall) {
-			$debug_str .= '<div style="border-bottom: 1px dotted gray; margin-bottom: 20px;">';
 			list($class, $method, $params, $result, $file, $line) = $apiCall;
-			// api method
-			$debug_str .= '<div style="padding-bottom: 10px;">';
-			$debug_str .= ($i + 1).'. <b>'.$class.'.'.$method.'</b>'.(($file !== null) ? ' ['.$file.':'.$line.']' : '');
-			$debug_str .= '</div>';
-			// parameters
-			$debug_str .= '<table><tr><td style="width: 300px" valign="top">Parameters:';
-			$debug_str .= '<pre>'.print_r(CHtml::encode($params), true).'</pre>';
-			$debug_str .= '</td>';
-			// result
-			$debug_str .= '<td valign="top">Result:<pre>'.print_r(CHtml::encode($result), true).'</pre></td>';
 
-			$debug_str .= '</tr></table>';
-			$debug_str .= '</div>';
+			// api method
+			$debug[] = ($i + 1).'. ';
+			$debug[] = bold($class.'.'.$method);
+			$debug[] = ($file !== null ? ' ['.$file.':'.$line.']' : null);
+			$debug[] = BR();
+			$debug[] = BR();
+
+			// parameters, result
+			$debug[] = (new CTable())
+				->addRow([
+					[_('Parameters').':', BR(), print_r($params, true)],
+					[_('Result').':', BR(), print_r($result, true)]
+				]);
+
+			$debug[] = BR();
 		}
 
-		$debug_str .= '<br>';
+		$debug[] = BR();
 
 		foreach ($this->sqlQueryLog as $query) {
 			$time = $query[0];
-			$sql = htmlspecialchars($query[1], ENT_QUOTES, 'UTF-8');
 
-			if (strpos($sql, 'SELECT ') !== false) {
-				$sqlString = '<span style="color: green; font-size: 1.2em;">'.$sql.'</span>';
-			}
-			else {
-				$sqlString = '<span style="color: blue; font-size: 1.2em;">'.$sql.'</span>';
-			}
-			$sqlString = 'SQL ('.$time.'): '.$sqlString.'<br>';
+			$sql = [
+				'SQL ('.$time.'): ',
+				(new CSpan($query[1]))
+					->addClass(substr($query[1], 0, 6) === 'SELECT' ? ZBX_STYLE_GREEN : ZBX_STYLE_BLUE),
+				BR()
+			];
+
 			if ($time > $this->slowSqlQueryTime) {
-				$sqlString = '<b>'.$sqlString.'</b>';
+				$sql = bold($sql);
 			}
-			$debug_str .= $sqlString;
+			$debug[] = $sql;
 
-			$callStackString = '<span style="font-style: italic;">'.$this->formatCallStack($query[2]).'</span>'.'<br>'.'<br>';
-			$debug_str .= rtrim($callStackString, '-> ').'</span>'.'<br>'.'<br>';
+			$debug[] = $this->formatCallStack($query[2]);
+			$debug[] = BR();
+			$debug[] = BR();
 		}
 
-		$debug = new CDiv(null, 'textcolorstyles');
-		$debug->attr('name', 'zbx_debug_info');
-		$debug->attr('style', 'display: none; overflow: auto; width: 95%; border: 1px #777777 solid; margin: 4px; padding: 4px;');
-		$debug->addItem(array(BR(), new CJsScript($debug_str), BR()));
-		$debug->show();
+		$debug = (new CPre())
+			->addClass(ZBX_STYLE_DEBUG_OUTPUT)
+			->setAttribute('name', 'zbx_debug_info')
+			->addStyle('display: none;')
+			->addItem($debug)
+			->show();
 	}
 
 	/**
@@ -210,11 +205,11 @@ class CProfiler {
 		$time = round($time, 6);
 
 		$this->sqlTotalTime += $time;
-		$this->sqlQueryLog[] = array(
+		$this->sqlQueryLog[] = [
 			$time,
 			$sql,
 			array_slice(debug_backtrace(), 1)
-		);
+		];
 	}
 
 	/**
@@ -245,14 +240,14 @@ class CProfiler {
 			$line = null;
 		}
 
-		$this->apiLog[] = array(
+		$this->apiLog[] = [
 			$class,
 			$method,
 			$params,
 			$result,
 			$file,
 			$line
-		);
+		];
 	}
 
 	/**
@@ -282,8 +277,8 @@ class CProfiler {
 			array_shift($callStack);
 		}
 
-		$callStackString = '';
-		$callWithFile = array();
+		$functions = [];
+		$callWithFile = [];
 
 		$callStack = array_reverse($callStack);
 		$firstCall = reset($callStack);
@@ -291,11 +286,12 @@ class CProfiler {
 		foreach ($callStack as $call) {
 			// do not show the call to the error handler function
 			if ($call['function'] != 'zbx_err_handler') {
-				if (isset($call['class'])) {
-					$callStackString .= $call['class'].$call['type'];
+				if (array_key_exists('class', $call)) {
+					$functions[] = $call['class'].$call['type'].$call['function'].'()';
 				}
-
-				$callStackString .= $call['function'].'() &rarr; ';
+				else {
+					$functions[] = $call['function'].'()';
+				}
 			}
 
 			// if the error is caused by an incorrect function call - the location of that call is contained in
@@ -303,18 +299,25 @@ class CProfiler {
 			// if it's caused by something else (like an undefined index) - the location of the call is contained in the
 			// call to the error handler function
 			// to display the location we use the last call where this information is present
-			if (isset($call['file'])) {
+			if (array_key_exists('file', $call)) {
 				$callWithFile = $call;
 			}
 		}
 
-		if ($callStackString) {
-			$path = pathinfo($firstCall['file']);
-			$callStackString = $path['basename'].':'.$firstCall['line'] . ' &rarr; '.rtrim($callStackString, '&rarr; ');
+		$callStackString = '';
+
+		if ($functions) {
+			$callStackString .= pathinfo($firstCall['file'], PATHINFO_BASENAME).':'.$firstCall['line'].' &rarr; '.
+				implode(' &rarr; ', $functions);
 		}
 
 		if ($callWithFile) {
-			$callStackString .= ' in '.$callWithFile['file'].':'.$callWithFile['line'];
+			$file_name = $callWithFile['file'];
+
+			if (substr_compare($file_name, $this->root_dir, 0, strlen($this->root_dir)) === 0) {
+				$file_name = substr($file_name, strlen($this->root_dir) + 1);
+			}
+			$callStackString .= ' in '.$file_name.':'.$callWithFile['line'];
 		}
 
 		return $callStackString;

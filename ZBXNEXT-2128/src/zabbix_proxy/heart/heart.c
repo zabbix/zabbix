@@ -36,7 +36,7 @@ extern int		server_num, process_num;
  ******************************************************************************/
 static int	send_heartbeat(void)
 {
-	zbx_sock_t	sock;
+	zbx_socket_t	sock;
 	struct zbx_json	j;
 	int		ret = SUCCEED;
 	char		*error = NULL;

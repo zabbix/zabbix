@@ -9,13 +9,13 @@ function do_post_request($url, $data){
 	$header .= "Content-Length: ".strlen($data)."\r\n";
 	$header .= "\r\n";
 
-	$params = array(
-		'http' => array(
+	$params = [
+		'http' => [
 			'method' => 'post',
 			'content' => $data,
 			'header' => $header,
-		)
-	);
+		]
+	];
 
 	$ctx = stream_context_create($params);
 
@@ -69,12 +69,12 @@ function do_post_request($url, $data){
 <?php
 
 if(isset($_REQUEST['apicall'])){
-	$data = array(
+	$data = [
 		'jsonrpc' => '2.0',
 		'method' => 'user.login',
-		'params' => array('user'=>$user, 'password'=>$pswd),
+		'params' => ['user'=>$user, 'password'=>$pswd],
 		'id'=> 1
-	);
+	];
 
 	$data = json_encode($data);
 
@@ -96,13 +96,13 @@ if(isset($_REQUEST['apicall'])){
 </div>
 
 <?php
-	$data = array(
+	$data = [
 		'jsonrpc' => '2.0',
 		'method' => $_REQUEST['apimethod'],
 		'params' => json_decode($_REQUEST['apiparams'], true),
 		'auth' => $auth,
 		'id'=> 2
-	);
+	];
 	$data = json_encode($data);
 	$response = do_post_request($url, $data);
 ?>

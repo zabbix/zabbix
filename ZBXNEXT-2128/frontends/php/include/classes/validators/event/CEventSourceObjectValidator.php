@@ -26,23 +26,23 @@ class CEventSourceObjectValidator extends CValidator {
 	 *
 	 * @var array
 	 */
-	public $pairs = array(
-		EVENT_SOURCE_TRIGGERS => array(
+	public $pairs = [
+		EVENT_SOURCE_TRIGGERS => [
 			EVENT_OBJECT_TRIGGER => 1
-		),
-		EVENT_SOURCE_DISCOVERY => array(
+		],
+		EVENT_SOURCE_DISCOVERY => [
 			EVENT_OBJECT_DHOST => 1,
 			EVENT_OBJECT_DSERVICE => 1
-		),
-		EVENT_SOURCE_AUTO_REGISTRATION => array(
+		],
+		EVENT_SOURCE_AUTO_REGISTRATION => [
 			EVENT_OBJECT_AUTOREGHOST => 1
-		),
-		EVENT_SOURCE_INTERNAL => array(
+		],
+		EVENT_SOURCE_INTERNAL => [
 			EVENT_OBJECT_TRIGGER => 1,
 			EVENT_OBJECT_ITEM => 1,
 			EVENT_OBJECT_LLDRULE => 1
-		)
-	);
+		]
+	];
 
 	/**
 	 * Checks if the given source-object pair is valid.

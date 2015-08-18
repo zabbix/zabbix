@@ -100,7 +100,7 @@ class CLocalApiClient extends CApiClient {
 			}
 
 			// call API method
-			$result = call_user_func_array(array($this->serviceFactory->getObject($api), $method), array($params));
+			$result = call_user_func_array([$this->serviceFactory->getObject($api), $method], [$params]);
 
 			// if the method was called successfully - commit the transaction
 			if ($newTransaction) {
@@ -146,7 +146,7 @@ class CLocalApiClient extends CApiClient {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorised.'));
 		}
 
-		$user = $this->serviceFactory->getObject('user')->checkAuthentication(array($auth));
+		$user = $this->serviceFactory->getObject('user')->checkAuthentication([$auth]);
 		$this->debug = $user['debug_mode'];
 	}
 
@@ -173,7 +173,7 @@ class CLocalApiClient extends CApiClient {
 		$apiService = $this->serviceFactory->getObject($api);
 
 		// validate the method
-		$availableMethods = array();
+		$availableMethods = [];
 		foreach (get_class_methods($apiService) as $serviceMethod) {
 			// the comparison must be case insensitive
 			$availableMethods[strtolower($serviceMethod)] = true;

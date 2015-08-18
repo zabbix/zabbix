@@ -26,33 +26,28 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 
 $page['title'] = _('Action log');
 $page['file'] = 'auditacts.php';
-$page['hist_arg'] = array();
-$page['scripts'] = array('class.calendar.js', 'gtlc.js');
+$page['scripts'] = ['class.calendar.js', 'gtlc.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
+$fields = [
 	// filter
-	'filter_rst' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'filter_set' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'alias' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'period' =>		array(T_ZBX_INT, O_OPT, null,	null,	null),
-	'stime' =>		array(T_ZBX_STR, O_OPT, null,	null,	null),
+	'filter_rst' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'filter_set' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'alias' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'period' =>		[T_ZBX_INT, O_OPT, null,	null,	null],
+	'stime' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
 	// ajax
-	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT, null,	null),
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
-);
+	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,	null],
+	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,	null]
+];
 check_fields($fields);
 
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.auditacts.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (isset($_REQUEST['favobj'])) {
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
@@ -84,22 +79,22 @@ elseif (hasRequest('filter_rst')) {
  */
 $effectivePeriod = navigation_bar_calc('web.auditacts.timeline', 0, true);
 
-$data = array(
+$data = [
 	'stime' => getRequest('stime'),
 	'alias' => CProfile::get('web.auditacts.filter.alias', ''),
-	'users' => array(),
-	'alerts' => array(),
+	'users' => [],
+	'alerts' => [],
 	'paging' => null
-);
+];
 
 $userId = null;
 
 if ($data['alias']) {
-	$data['users'] = API::User()->get(array(
-		'output' => array('userid', 'alias', 'name', 'surname'),
-		'filter' => array('alias' => $data['alias']),
+	$data['users'] = API::User()->get([
+		'output' => ['userid', 'alias', 'name', 'surname'],
+		'filter' => ['alias' => $data['alias']],
 		'preservekeys' => true
-	));
+	]);
 
 	if ($data['users']) {
 		$user = reset($data['users']);
@@ -116,11 +111,11 @@ if (!$data['alias'] || $data['users']) {
 
 	// fetch alerts for different objects and sources and combine them in a single stream
 	foreach (eventSourceObjects() as $eventSource) {
-		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get(array(
-			'output' => array('alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
+		$data['alerts'] = array_merge($data['alerts'], API::Alert()->get([
+			'output' => ['alertid', 'actionid', 'userid', 'clock', 'sendto', 'subject', 'message', 'status',
 				'retries', 'error', 'alerttype'
-			),
-			'selectMediatypes' => array('mediatypeid', 'description'),
+			],
+			'selectMediatypes' => ['mediatypeid', 'description'],
 			'userids' => $userId,
 			'time_from' => $from,
 			'time_till' => $till,
@@ -129,25 +124,25 @@ if (!$data['alias'] || $data['users']) {
 			'sortfield' => 'alertid',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => $config['search_limit'] + 1
-		)));
+		]));
 	}
 
-	CArrayHelper::sort($data['alerts'], array(
-		array('field' => 'alertid', 'order' => ZBX_SORT_DOWN)
-	));
+	CArrayHelper::sort($data['alerts'], [
+		['field' => 'alertid', 'order' => ZBX_SORT_DOWN]
+	]);
 
 	$data['alerts'] = array_slice($data['alerts'], 0, $config['search_limit'] + 1);
 
 	// paging
-	$data['paging'] = getPagingLine($data['alerts']);
+	$data['paging'] = getPagingLine($data['alerts'], ZBX_SORT_DOWN);
 
 	// get users
 	if (!$data['alias']) {
-		$data['users'] = API::User()->get(array(
-			'output' => array('userid', 'alias', 'name', 'surname'),
+		$data['users'] = API::User()->get([
+			'output' => ['userid', 'alias', 'name', 'surname'],
 			'userids' => zbx_objectValues($data['alerts'], 'userid'),
 			'preservekeys' => true
-		));
+		]);
 	}
 }
 
@@ -167,19 +162,19 @@ $minStartTime = ($firstAlert) ? $firstAlert['clock'] : null;
 
 // get actions names
 if ($data['alerts']) {
-	$data['actions'] = API::Action()->get(array(
-		'output' => array('actionid', 'name'),
+	$data['actions'] = API::Action()->get([
+		'output' => ['actionid', 'name'],
 		'actionids' => array_unique(zbx_objectValues($data['alerts'], 'actionid')),
 		'preservekeys' => true
-	));
+	]);
 }
 
 // timeline
-$data['timeline'] = array(
+$data['timeline'] = [
 	'period' => $effectivePeriod,
 	'starttime' => date(TIMESTAMP_FORMAT, $minStartTime),
 	'usertime' => $data['stime'] ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
-);
+];
 
 // render view
 $auditView = new CView('administration.auditacts.list', $data);

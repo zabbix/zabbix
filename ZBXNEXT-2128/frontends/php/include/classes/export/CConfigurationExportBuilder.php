@@ -21,16 +21,17 @@
 
 class CConfigurationExportBuilder {
 
-	const EXPORT_VERSION = '2.0';
-
 	/**
 	 * @var array
 	 */
-	protected $data = array();
+	protected $data = [];
 
+	/**
+	 * @param $version  current export version
+	 */
 	public function __construct() {
-		$this->data['version'] = self::EXPORT_VERSION;
-		$this->data['date'] = date('Y-m-d\TH:i:s\Z', time() - date('Z'));
+		$this->data['version'] = ZABBIX_EXPORT_VERSION;
+		$this->data['date'] = date(DATE_TIME_FORMAT_SECONDS_XML, time() - date('Z'));
 	}
 
 	/**
@@ -39,7 +40,7 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	public function getExport() {
-		return array('zabbix_export' => $this->data);
+		return ['zabbix_export' => $this->data];
 	}
 
 	/**
@@ -59,10 +60,10 @@ class CConfigurationExportBuilder {
 	public function buildTemplates(array $templates) {
 		order_result($templates, 'host');
 
-		$this->data['templates'] = array();
+		$this->data['templates'] = [];
 
 		foreach ($templates as $template) {
-			$this->data['templates'][] = array(
+			$this->data['templates'][] = [
 				'template' => $template['host'],
 				'name' => $template['name'],
 				'description' => $template['description'],
@@ -73,7 +74,7 @@ class CConfigurationExportBuilder {
 				'macros' => $this->formatMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
 				'screens' => $this->formatScreens($template['screens'])
-			);
+			];
 		}
 	}
 
@@ -85,12 +86,12 @@ class CConfigurationExportBuilder {
 	public function buildHosts(array $hosts) {
 		order_result($hosts, 'host');
 
-		$this->data['hosts'] = array();
+		$this->data['hosts'] = [];
 
 		foreach ($hosts as $host) {
 			$host = $this->createInterfaceReferences($host);
 
-			$this->data['hosts'][] = array(
+			$this->data['hosts'][] = [
 				'host' => $host['host'],
 				'name' => $host['name'],
 				'description' => $host['description'],
@@ -108,7 +109,7 @@ class CConfigurationExportBuilder {
 				'discovery_rules' => $this->formatDiscoveryRules($host['discoveryRules']),
 				'macros' => $this->formatMacros($host['macros']),
 				'inventory' => $this->formatHostInventory($host['inventory'])
-			);
+			];
 		}
 	}
 
@@ -145,14 +146,14 @@ class CConfigurationExportBuilder {
 	 * @param array $images
 	 */
 	public function buildImages(array $images) {
-		$this->data['images'] = array();
+		$this->data['images'] = [];
 
 		foreach ($images as $image) {
-			$this->data['images'][] = array(
+			$this->data['images'][] = [
 				'name' => $image['name'],
 				'imagetype' => $image['imagetype'],
 				'encodedImage' => $image['encodedImage']
-			);
+			];
 		}
 	}
 
@@ -164,10 +165,10 @@ class CConfigurationExportBuilder {
 	public function buildMaps(array $maps) {
 		order_result($maps, 'name');
 
-		$this->data['maps'] = array();
+		$this->data['maps'] = [];
 
 		foreach ($maps as $map) {
-			$this->data['maps'][] = array(
+			$this->data['maps'][] = [
 				'name' => $map['name'],
 				'width' => $map['width'],
 				'height' => $map['height'],
@@ -198,7 +199,7 @@ class CConfigurationExportBuilder {
 				'urls' => $this->formatMapUrls($map['urls']),
 				'selements' => $this->formatMapElements($map['selements']),
 				'links' => $this->formatMapLinks($map['links'])
-			);
+			];
 		}
 	}
 
@@ -211,10 +212,10 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function createInterfaceReferences(array $host) {
-		$references = array(
+		$references = [
 			'num' => 1,
-			'refs' => array()
-		);
+			'refs' => []
+		];
 
 		// create interface references
 		foreach ($host['interfaces'] as &$interface) {
@@ -257,12 +258,12 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatDiscoveryRules(array $discoveryRules) {
-		$result = array();
+		$result = [];
 
 		order_result($discoveryRules, 'name');
 
 		foreach ($discoveryRules as $discoveryRule) {
-			$data = array(
+			$data = [
 				'name' => $discoveryRule['name'],
 				'type' => $discoveryRule['type'],
 				'snmp_community' => $discoveryRule['snmp_community'],
@@ -294,7 +295,7 @@ class CConfigurationExportBuilder {
 				'trigger_prototypes' => $this->formatTriggers($discoveryRule['triggerPrototypes']),
 				'graph_prototypes' => $this->formatGraphs($discoveryRule['graphPrototypes']),
 				'host_prototypes' => $this->formatHostPrototypes($discoveryRule['hostPrototypes'])
-			);
+			];
 
 			if (isset($discoveryRule['interface_ref'])) {
 				$data['interface_ref'] = $discoveryRule['interface_ref'];
@@ -327,12 +328,12 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatGraphs(array $graphs) {
-		$result = array();
+		$result = [];
 
 		order_result($graphs, 'name');
 
 		foreach ($graphs as $graph) {
-			$result[] = array(
+			$result[] = [
 				'name' => $graph['name'],
 				'width' => $graph['width'],
 				'height' => $graph['height'],
@@ -350,7 +351,7 @@ class CConfigurationExportBuilder {
 				'ymin_item_1' => $graph['ymin_itemid'],
 				'ymax_item_1' => $graph['ymax_itemid'],
 				'graph_items' => $this->formatGraphItems($graph['gitems'])
-			);
+			];
 		}
 
 		return $result;
@@ -364,19 +365,19 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatHostPrototypes(array $hostPrototypes) {
-		$result = array();
+		$result = [];
 
 		order_result($hostPrototypes, 'host');
 
 		foreach ($hostPrototypes as $hostPrototype) {
-			$result[] = array(
+			$result[] = [
 				'host' => $hostPrototype['host'],
 				'name' => $hostPrototype['name'],
 				'status' => $hostPrototype['status'],
 				'group_links' => $this->formatGroupLinks($hostPrototype['groupLinks']),
 				'group_prototypes' => $this->formatGroupPrototypes($hostPrototype['groupPrototypes']),
 				'templates' => $this->formatTemplateLinkage($hostPrototype['templates'])
-			);
+			];
 		}
 
 		return $result;
@@ -390,12 +391,12 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatGroupLinks(array $groupLinks) {
-		$result = array();
+		$result = [];
 
 		foreach ($groupLinks as $groupLink) {
-			$result[] = array(
+			$result[] = [
 				'group' => $groupLink['groupid'],
-			);
+			];
 		}
 
 		return $result;
@@ -409,12 +410,12 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatGroupPrototypes(array $groupPrototypes) {
-		$result = array();
+		$result = [];
 
 		foreach ($groupPrototypes as $groupPrototype) {
-			$result[] = array(
+			$result[] = [
 				'name' => $groupPrototype['name']
-			);
+			];
 		}
 
 		return $result;
@@ -428,14 +429,14 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatTemplateLinkage(array $templates) {
-		$result = array();
+		$result = [];
 
 		order_result($templates, 'host');
 
 		foreach ($templates as $template) {
-			$result[] = array(
+			$result[] = [
 				'name' => $template['host']
-			);
+			];
 		}
 
 		return $result;
@@ -449,26 +450,21 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatTriggers(array $triggers) {
-		$result = array();
+		$result = [];
 
-		order_result($triggers, 'description');
+		CArrayHelper::sort($triggers, ['description', 'expression']);
 
 		foreach ($triggers as $trigger) {
-			$tr = array(
+			$result[] = [
 				'expression' => $trigger['expression'],
 				'name' => $trigger['description'],
 				'url' => $trigger['url'],
 				'status' => $trigger['status'],
 				'priority' => $trigger['priority'],
 				'description' => $trigger['comments'],
-				'type' => $trigger['type']
-			);
-
-			if (isset($trigger['dependencies'])) {
-				$tr['dependencies'] = $this->formatDependencies($trigger['dependencies']);
-			}
-
-			$result[] = $tr;
+				'type' => $trigger['type'],
+				'dependencies' => $this->formatDependencies($trigger['dependencies'])
+			];
 		}
 
 		return $result;
@@ -482,12 +478,12 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatHostInterfaces(array $interfaces) {
-		$result = array();
+		$result = [];
 
 		order_result($interfaces, 'ip');
 
 		foreach ($interfaces as $interface) {
-			$result[] = array(
+			$result[] = [
 				'default' => $interface['main'],
 				'type' => $interface['type'],
 				'useip' => $interface['useip'],
@@ -496,7 +492,7 @@ class CConfigurationExportBuilder {
 				'port' => $interface['port'],
 				'bulk' => $interface['bulk'],
 				'interface_ref' => $interface['interface_ref']
-			);
+			];
 		}
 
 		return $result;
@@ -510,14 +506,14 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatGroups(array $groups) {
-		$result = array();
+		$result = [];
 
 		order_result($groups, 'name');
 
 		foreach ($groups as $group) {
-			$result[] = array(
+			$result[] = [
 				'name' => $group['name']
-			);
+			];
 		}
 
 		return $result;
@@ -531,12 +527,12 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatItems(array $items) {
-		$result = array();
+		$result = [];
 
 		order_result($items, 'name');
 
 		foreach ($items as $item) {
-			$data = array(
+			$data = [
 				'name' => $item['name'],
 				'type' => $item['type'],
 				'snmp_community' => $item['snmp_community'],
@@ -574,7 +570,11 @@ class CConfigurationExportBuilder {
 				'applications' => $this->formatApplications($item['applications']),
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt']
-			);
+			];
+
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
+			}
 
 			if (isset($item['interface_ref'])) {
 				$data['interface_ref'] = $item['interface_ref'];
@@ -594,14 +594,14 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatApplications(array $applications) {
-		$result = array();
+		$result = [];
 
 		order_result($applications, 'name');
 
 		foreach ($applications as $application) {
-			$result[] = array(
+			$result[] = [
 				'name' => $application['name']
-			);
+			];
 		}
 
 		return $result;
@@ -615,15 +615,15 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatMacros(array $macros) {
-		$result = array();
+		$result = [];
 
 		$macros = order_macros($macros, 'macro');
 
 		foreach ($macros as $macro) {
-			$result[] = array(
+			$result[] = [
 				'macro' => $macro['macro'],
 				'value' => $macro['value']
-			);
+			];
 		}
 
 		return $result;
@@ -637,17 +637,17 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatScreens(array $screens) {
-		$result = array();
+		$result = [];
 
 		order_result($screens, 'name');
 
 		foreach ($screens as $screen) {
-			$result[] = array(
+			$result[] = [
 				'name' => $screen['name'],
 				'hsize' => $screen['hsize'],
 				'vsize' => $screen['vsize'],
 				'screen_items' => $this->formatScreenItems($screen['screenitems'])
-			);
+			];
 		}
 
 		return $result;
@@ -661,13 +661,15 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatDependencies(array $dependencies) {
-		$result = array();
+		$result = [];
+
+		CArrayHelper::sort($dependencies, ['description', 'expression']);
 
 		foreach ($dependencies as $dependency) {
-			$result[] = array(
+			$result[] = [
 				'name' => $dependency['description'],
 				'expression' => $dependency['expression']
-			);
+			];
 		}
 
 		return $result;
@@ -681,10 +683,10 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatScreenItems(array $screenItems) {
-		$result = array();
+		$result = [];
 
 		foreach ($screenItems as $screenItem) {
-			$result[] = array(
+			$result[] = [
 				'resourcetype' => $screenItem['resourcetype'],
 				'width' => $screenItem['width'],
 				'height' => $screenItem['height'],
@@ -702,7 +704,7 @@ class CConfigurationExportBuilder {
 				'resource' => $screenItem['resourceid'],
 				'max_columns' => $screenItem['max_columns'],
 				'application' => $screenItem['application']
-			);
+			];
 		}
 
 		return $result;
@@ -716,10 +718,10 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatGraphItems(array $graphItems) {
-		$result = array();
+		$result = [];
 
 		foreach ($graphItems as $graphItem) {
-			$result[] = array(
+			$result[] = [
 				'sortorder'=> $graphItem['sortorder'],
 				'drawtype'=> $graphItem['drawtype'],
 				'color'=> $graphItem['color'],
@@ -727,7 +729,7 @@ class CConfigurationExportBuilder {
 				'calc_fnc'=> $graphItem['calc_fnc'],
 				'type'=> $graphItem['type'],
 				'item'=> $graphItem['itemid']
-			);
+			];
 		}
 
 		return $result;
@@ -741,14 +743,14 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatMapUrls(array $urls) {
-		$result = array();
+		$result = [];
 
 		foreach ($urls as $url) {
-			$result[] = array(
+			$result[] = [
 				'name' => $url['name'],
 				'url' => $url['url'],
 				'elementtype' => $url['elementtype']
-			);
+			];
 		}
 
 		return $result;
@@ -762,13 +764,13 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatMapElementUrls(array $urls) {
-		$result = array();
+		$result = [];
 
 		foreach ($urls as $url) {
-			$result[] = array(
+			$result[] = [
 				'name' => $url['name'],
 				'url' => $url['url']
-			);
+			];
 		}
 
 		return $result;
@@ -782,17 +784,17 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatMapLinks(array $links) {
-		$result = array();
+		$result = [];
 
 		foreach ($links as $link) {
-			$result[] = array(
+			$result[] = [
 				'drawtype' => $link['drawtype'],
 				'color' => $link['color'],
 				'label' => $link['label'],
 				'selementid1' => $link['selementid1'],
 				'selementid2' => $link['selementid2'],
 				'linktriggers' => $this->formatMapLinkTriggers($link['linktriggers'])
-			);
+			];
 		}
 
 		return $result;
@@ -806,14 +808,14 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatMapLinkTriggers(array $linktriggers) {
-		$result = array();
+		$result = [];
 
 		foreach ($linktriggers as $linktrigger) {
-			$result[] = array(
+			$result[] = [
 				'drawtype' => $linktrigger['drawtype'],
 				'color' => $linktrigger['color'],
 				'trigger' => $linktrigger['triggerid']
-			);
+			];
 		}
 
 		return $result;
@@ -827,10 +829,10 @@ class CConfigurationExportBuilder {
 	 * @return array
 	 */
 	protected function formatMapElements(array $elements) {
-		$result = array();
+		$result = [];
 
 		foreach ($elements as $element) {
-			$result[] = array(
+			$result[] = [
 				'elementtype' => $element['elementtype'],
 				'label' => $element['label'],
 				'label_location' => $element['label_location'],
@@ -850,7 +852,7 @@ class CConfigurationExportBuilder {
 				'icon_maintenance' => $element['iconid_maintenance'],
 				'application' => $element['application'],
 				'urls' => $this->formatMapElementUrls($element['urls'])
-			);
+			];
 		}
 
 		return $result;

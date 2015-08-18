@@ -50,11 +50,11 @@ function getUserTheme($userData) {
  * @return string
  */
 function user_type2str($userType = null) {
-	$userTypes = array(
+	$userTypes = [
 		USER_TYPE_ZABBIX_USER => _('Zabbix User'),
 		USER_TYPE_ZABBIX_ADMIN => _('Zabbix Admin'),
 		USER_TYPE_SUPER_ADMIN => _('Zabbix Super Admin')
-	);
+	];
 
 	if ($userType === null) {
 		return $userTypes;
@@ -79,11 +79,11 @@ function user_auth_type2str($authType) {
 		$authType = getUserGuiAccess(CWebUser::$data['userid']);
 	}
 
-	$authUserType = array(
+	$authUserType = [
 		GROUP_GUI_ACCESS_SYSTEM => _('System default'),
 		GROUP_GUI_ACCESS_INTERNAL => _x('Internal', 'user type'),
 		GROUP_GUI_ACCESS_DISABLED => _('Disabled')
-	);
+	];
 
 	return isset($authUserType[$authType]) ? $authUserType[$authType] : _('Unknown');
 }
@@ -111,7 +111,7 @@ function unblock_user_login($userIds) {
 function get_userid_by_usrgrpid($userGroupIds) {
 	zbx_value2array($userGroupIds);
 
-	$userIds = array();
+	$userIds = [];
 
 	$dbUsers = DBselect(
 		'SELECT DISTINCT u.userid'.
@@ -139,28 +139,6 @@ function granted2update_group($userGroupIds) {
 	$users = get_userid_by_usrgrpid($userGroupIds);
 
 	return !isset($users[CWebUser::$data['userid']]);
-}
-
-/**
- * Check if user can be appended to group.
- *
- * @param string $userId
- * @param string $userGroupId
- *
- * @return bool
- */
-function granted2move_user($userId, $userGroupId) {
-	$group = API::UserGroup()->get(array(
-		'usrgrpids' => $userGroupId,
-		'output' => API_OUTPUT_EXTEND
-	));
-	$group = reset($group);
-
-	if ($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED || $group['users_status'] == GROUP_STATUS_DISABLED) {
-		return (bccomp(CWebUser::$data['userid'], $userId) != 0);
-	}
-
-	return true;
 }
 
 /**

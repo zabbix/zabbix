@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Acknowledges');
 $page['file'] = 'acknow.php';
-$page['hist_arg'] = array('eventid');
 
 ob_start();
 
@@ -35,20 +34,20 @@ require_once dirname(__FILE__).'/include/page_header.php';
 $bulk = (getRequest('action', '') == 'trigger.bulkacknowledge');
 
 //	VAR		TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'eventid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'triggers' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'triggerid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'screenid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'events' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'message' =>		array(T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save}) || isset({saveandreturn})'),
-	'backurl' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
+$fields = [
+	'eventid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'triggers' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'triggerid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'screenid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'events' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'message' =>		[T_ZBX_STR, O_OPT, null,	$bulk ? null : NOT_EMPTY, 'isset({save}) || isset({saveandreturn})'],
+	'backurl' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
-	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"trigger.bulkacknowledge"'),	null),
-	'saveandreturn' =>	array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
-	'save' =>			array(T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null)
-);
+	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"trigger.bulkacknowledge"'),	null],
+	'saveandreturn' =>	[T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null],
+	'save' =>			[T_ZBX_STR, O_OPT, P_ACT|P_SYS, null,	null],
+	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null]
+];
 check_fields($fields);
 
 $_REQUEST['backurl'] = getRequest('backurl', 'tr_status.php');
@@ -59,7 +58,7 @@ $_REQUEST['backurl'] = getRequest('backurl', 'tr_status.php');
 if (isset($_REQUEST['cancel'])) {
 	ob_end_clean();
 
-	if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
+	if (in_array($_REQUEST['backurl'], ['tr_events.php', 'events.php'])) {
 		redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].
 			'&source='.EVENT_SOURCE_TRIGGERS
 		);
@@ -83,21 +82,21 @@ if (!isset($_REQUEST['events']) && !isset($_REQUEST['eventid']) && !isset($_REQU
 	require_once dirname(__FILE__).'/include/page_footer.php';
 }
 elseif (getRequest('eventid')) {
-	$event = API::Event()->get(array(
+	$event = API::Event()->get([
 		'eventids' => getRequest('eventid'),
-		'output' => array('eventid'),
+		'output' => ['eventid'],
 		'limit' => 1
-	));
+	]);
 	if (!$event) {
 		access_deny();
 	}
 }
 elseif (getRequest('triggers')) {
-	$trigger = API::Trigger()->get(array(
+	$trigger = API::Trigger()->get([
 		'triggerids' => getRequest('triggers'),
-		'output' => array('triggerid'),
+		'output' => ['triggerid'],
 		'limit' => 1
-	));
+	]);
 	if (!$trigger) {
 		access_deny();
 	}
@@ -113,11 +112,11 @@ $eventTriggerName = null;
 $bulk = !isset($_REQUEST['eventid']);
 
 if (!$bulk) {
-	$events = API::Event()->get(array(
+	$events = API::Event()->get([
 		'eventids' => $_REQUEST['eventid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectRelatedObject' => API_OUTPUT_EXTEND
-	));
+	]);
 
 	if ($events) {
 		$event = reset($events);
@@ -138,21 +137,21 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 		$_REQUEST['events'] = zbx_toObject($_REQUEST['events'], 'eventid');
 	}
 	elseif (isset($_REQUEST['triggers'])) {
-		$_REQUEST['events'] = API::Event()->get(array(
+		$_REQUEST['events'] = API::Event()->get([
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => $_REQUEST['triggers'],
-			'output' => array('eventid'),
+			'output' => ['eventid'],
 			'acknowledged' => EVENT_NOT_ACKNOWLEDGED
-		));
+		]);
 	}
 
 	DBstart();
 
-	$result = API::Event()->acknowledge(array(
+	$result = API::Event()->acknowledge([
 		'eventids' => zbx_objectValues($_REQUEST['events'], 'eventid'),
 		'message' => $_REQUEST['message']
-	));
+	]);
 
 	if ($result) {
 		$eventAcknowledged = true;
@@ -169,7 +168,7 @@ if (isset($_REQUEST['save']) || isset($_REQUEST['saveandreturn'])) {
 	if (isset($_REQUEST['saveandreturn'])) {
 		ob_end_clean();
 
-		if (in_array($_REQUEST['backurl'], array('tr_events.php', 'events.php'))) {
+		if (in_array($_REQUEST['backurl'], ['tr_events.php', 'events.php'])) {
 			redirect($_REQUEST['backurl'].'?eventid='.$_REQUEST['eventid'].'&triggerid='.$_REQUEST['triggerid'].
 				'&source='.EVENT_SOURCE_TRIGGERS
 			);
@@ -191,10 +190,10 @@ ob_end_flush();
 /*
  * Display
  */
-show_table_header(array(_('ALARM ACKNOWLEDGES').NAME_DELIMITER, ($bulk ? ' BULK ACKNOWLEDGE ' : $eventTriggerName)));
 
-echo BR();
+$widget = (new CWidget())->setTitle(_('Alarm acknowledgements').': '.($bulk ? 'Bulk acknowledge ' : $eventTriggerName));
 
+$acknowledgesTable = null;
 if ($bulk) {
 	$title = _('Acknowledge alarm by');
 	$saveAndReturnLabel = _('Acknowledge and return');
@@ -208,19 +207,17 @@ else {
 	);
 
 	if ($acknowledges) {
-		$acknowledgesTable = new CTable(null, 'ack_msgs');
-		$acknowledgesTable->setAlign('center');
+		$acknowledgesTable = (new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader([_('Time'), _('User'), _('Message')]);
 
 		while ($acknowledge = DBfetch($acknowledges)) {
-			$acknowledgesTable->addRow(array(
-				new CCol(getUserFullname($acknowledge), 'user'),
-				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']), 'time')),
-				'title'
-			);
-			$acknowledgesTable->addRow(new CCol(zbx_nl2br($acknowledge['message']), null, 2), 'msg');
+			$acknowledgesTable->addRow([
+				(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock'])))->addClass(ZBX_STYLE_NOWRAP),
+				(new CCol(getUserFullname($acknowledge)))->addClass(ZBX_STYLE_NOWRAP),
+				zbx_nl2br($acknowledge['message'])
+			]);
 		}
-
-		$acknowledgesTable->show();
 	}
 
 	if ($eventAcknowledged) {
@@ -235,49 +232,73 @@ else {
 	}
 }
 
-$messageTable = new CFormTable($title.' "'.getUserFullname(CWebUser::$data).'"');
-$messageTable->addClass('acknowledge-edit');
-
 $backURL = getRequest('backurl');
-$messageTable->addVar('backurl', $backURL);
+
+$form = (new CForm())->addVar('backurl', $backURL);
 
 if ($backURL === 'tr_events.php' || $backURL === 'events.php') {
-	$messageTable->addVar('triggerid', getRequest('triggerid'));
-	$messageTable->addVar('source', EVENT_SOURCE_TRIGGERS);
+	$form->addVar('triggerid', getRequest('triggerid'));
+	$form->addVar('source', EVENT_SOURCE_TRIGGERS);
 }
 elseif ($backURL === 'screenedit.php' || $backURL === 'screens.php') {
-	$messageTable->addVar('screenid', $_REQUEST['screenid']);
+	$form->addVar('screenid', $_REQUEST['screenid']);
 }
 
 if (hasRequest('eventid')) {
-	$messageTable->addVar('eventid', getRequest('eventid'));
+	$form->addVar('eventid', getRequest('eventid'));
 }
 elseif (hasRequest('triggers')) {
 	foreach (getRequest('triggers') as $triggerId) {
-		$messageTable->addVar('triggers['.$triggerId.']', $triggerId);
+		$form->addVar('triggers['.$triggerId.']', $triggerId);
 	}
 }
 elseif (hasRequest('events')) {
 	foreach (getRequest('events') as $eventId) {
-		$messageTable->addVar('events['.$eventId.']', $eventId);
+		$form->addVar('events['.$eventId.']', $eventId);
 	}
 }
 
-$message = new CTextArea('message', '', array(
-	'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
-	'width' => ZBX_TEXTAREA_BIG_WIDTH,
-	'maxlength' => 255
-));
-$message->attr('autofocus', 'autofocus');
-
-$messageTable->addRow(_('Message'), $message);
-$messageTable->addItemToBottomRow(new CSubmit('saveandreturn', $saveAndReturnLabel));
-
-if (!$bulk) {
-	$messageTable->addItemToBottomRow(new CSubmit('save', $saveLabel));
+// append tabs to form
+$ackTab = new CTabView();
+$ackTab->addTab('ackTab', _('Acknowledge'),
+	(new CFormList())
+		->addRow(_('Message'),
+			(new CTextArea('message', '', ['maxlength' => 255]))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+		)
+);
+if ($acknowledgesTable !== null) {
+	$ackTab->addTab('ackListTab', _('List'),
+		(new CFormList())
+			->addRow(null,
+				(new CDiv($acknowledgesTable))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			)
+	);
 }
 
-$messageTable->addItemToBottomRow(new CButtonCancel(url_params(array('backurl', 'eventid', 'triggerid', 'screenid'))));
-$messageTable->show();
+if (!$bulk) {
+	$ackTab->setFooter(makeFormFooter(
+		new CSubmit('saveandreturn', $saveAndReturnLabel),
+		[
+			new CSubmit('save', $saveLabel),
+			new CButtonCancel(url_params(['backurl', 'eventid', 'triggerid', 'screenid']))
+		]
+	));
+}
+else {
+	$ackTab->setFooter(makeFormFooter(
+		new CSubmit('saveandreturn', $saveAndReturnLabel),
+		[
+			new CButtonCancel(url_params(['backurl', 'eventid', 'triggerid', 'screenid']))
+		]
+	));
+}
+
+$form->addItem($ackTab);
+$widget->addItem($form);
+$widget->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -19,17 +19,27 @@
 **/
 
 
-$workingTimeTab = new CFormList('scriptsTab');
-$wtTextBox = new CTextBox('work_period', $data['work_period'], ZBX_TEXTBOX_STANDARD_SIZE);
-$wtTextBox->attr('autofocus', 'autofocus');
-$workingTimeTab->addRow(_('Working time'), $wtTextBox);
+$widget = (new CWidget())
+	->setTitle(_('Working time'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.workingtime.php')))
+	);
 
-$workingTimeView = new CTabView();
-$workingTimeView->addTab('workingTime', _('Working time'), $workingTimeTab);
+$workingTimeView = (new CTabView())
+	->addTab('workingTime', _('Working time'),
+		(new CFormList())
+			->addRow(_('Working time'),
+				(new CTextBox('work_period', $data['work_period']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+	)
+	->setFooter(makeFormFooter(new CSubmit('update', _('Update'))));
 
-$workingTimeForm = new CForm();
-$workingTimeForm->setName('workingTimeForm');
-$workingTimeForm->addItem($workingTimeView);
-$workingTimeForm->addItem(makeFormFooter(new CSubmit('update', _('Update'))));
+$workingTimeForm = (new CForm())
+	->addItem($workingTimeView);
 
-return $workingTimeForm;
+$widget->addItem($workingTimeForm);
+
+return $widget;

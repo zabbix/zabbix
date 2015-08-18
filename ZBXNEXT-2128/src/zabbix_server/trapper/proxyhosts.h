@@ -25,7 +25,7 @@
 
 extern int	CONFIG_TIMEOUT;
 
-void	recv_host_availability(zbx_sock_t *sock, struct zbx_json_parse *jp);
-void	send_host_availability(zbx_sock_t *sock);
+void	recv_host_availability(zbx_socket_t *sock, struct zbx_json_parse *jp);
+void	send_host_availability(zbx_socket_t *sock);
 
 #endif

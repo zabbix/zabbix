@@ -22,8 +22,9 @@
 class CTabView extends CDiv {
 
 	protected $id = 'tabs';
-	protected $tabs = array();
-	protected $headers = array();
+	protected $tabs = [];
+	protected $headers = [];
+	protected $footer = null;
 	protected $selectedTab = null;
 
 	/**
@@ -31,9 +32,9 @@ class CTabView extends CDiv {
 	 *
 	 * @var array
 	 */
-	protected $disabledTabs = array();
+	protected $disabledTabs = [];
 
-	public function __construct($data = array()) {
+	public function __construct($data = []) {
 		if (isset($data['id'])) {
 			$this->id = $data['id'];
 		}
@@ -44,12 +45,13 @@ class CTabView extends CDiv {
 			$this->setDisabled($data['disabled']);
 		}
 		parent::__construct();
-		$this->attr('id', zbx_formatDomId($this->id));
-		$this->attr('class', 'tabs');
+		$this->setId(zbx_formatDomId($this->id));
+		$this->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER);
 	}
 
 	public function setSelected($selected) {
 		$this->selectedTab = $selected;
+		return $this;
 	}
 
 	/**
@@ -61,34 +63,34 @@ class CTabView extends CDiv {
 	 */
 	public function setDisabled($disabled) {
 		$this->disabledTabs = $disabled;
+		return $this;
 	}
 
 	public function addTab($id, $header, $body) {
 		$this->headers[$id] = $header;
 		$this->tabs[$id] = new CDiv($body);
-		$this->tabs[$id]->attr('id', zbx_formatDomId($id));
+		$this->tabs[$id]->setId(zbx_formatDomId($id));
+		return $this;
+	}
+
+	public function setFooter($footer) {
+		$this->footer = $footer;
+		return $this;
 	}
 
 	public function toString($destroy = true) {
+		// No header if we have only one Tab
 		if (count($this->tabs) == 1) {
-			$this->setAttribute('class', 'min-width ui-tabs ui-widget ui-widget-content ui-corner-all widget');
-
-			$header = reset($this->headers);
-			$header = new CDiv($header);
-			$header->addClass('ui-corner-all ui-widget-header header');
-			$header->setAttribute('id', 'tab_'.key($this->headers));
-			$this->addItem($header);
-
 			$tab = reset($this->tabs);
-			$tab->addClass('ui-tabs ui-tabs-panel ui-widget ui-widget-content ui-corner-all widget');
 			$this->addItem($tab);
 		}
 		else {
-			$headersList = new CList();
+			$headersList = (new CList())->addClass(ZBX_STYLE_TABS_NAV);
 
 			foreach ($this->headers as $id => $header) {
-				$tabLink = new CLink($header, '#'.$id, null, null, false);
-				$tabLink->setAttribute('id', 'tab_'.$id);
+				$tabLink = (new CLink($header, '#'.$id))
+					->removeSID()
+					->setId('tab_'.$id);
 				$headersList->addItem($tabLink);
 			}
 
@@ -118,6 +120,8 @@ class CTabView extends CDiv {
 				.css("visibility", "visible");'
 			);
 		}
+
+		$this->addItem($this->footer);
 
 		return parent::toString($destroy);
 	}

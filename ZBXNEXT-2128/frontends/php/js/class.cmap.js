@@ -150,13 +150,6 @@ ZABBIX.apps.map = (function($) {
 				});
 			}
 
-			// for some reason IE8 does not catch clicks if there is no background color and alpha opacity is 0
-			if (IE8) {
-				this.container.css({
-					backgroundColor: 'white'
-				});
-			}
-
 			if (IE || GK) {
 				this.base64image = false;
 				this.mapimg = $('#sysmap_img');
@@ -202,7 +195,10 @@ ZABBIX.apps.map = (function($) {
 			}
 
 			// create container for forms
-			this.formContainer = $('<div></div>', {id: 'map-window'})
+			this.formContainer = $('<div></div>', {
+					id: 'map-window',
+					class: 'overlay-dialogue',
+					style: 'display:none; position:absolute; top: 50px; left: 500px'})
 				.appendTo('body')
 				.draggable({
 					containment: [0, 0, 3200, 3200]
@@ -556,8 +552,7 @@ ZABBIX.apps.map = (function($) {
 
 					PopUp('popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'
 						+ '&with_applications=1&dstfrm=selementForm'
-						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : ''),
-						450, 450
+						+ ((data.length > 0 && $('#elementType').val() == '4') ? '&hostid='+ data[0].id : '')
 					);
 				});
 
@@ -854,7 +849,7 @@ ZABBIX.apps.map = (function($) {
 			this.sysmap.data.selements[this.id] = this.data;
 
 			// create dom
-			this.domNode = $('<div></div>')
+			this.domNode = $('<div></div>', {style: 'position:absolute'})
 				.appendTo(this.sysmap.container)
 				.addClass('pointer sysmap_element')
 				.attr('data-id', this.id);
@@ -1275,9 +1270,7 @@ ZABBIX.apps.map = (function($) {
 				popup: {
 					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
 						'&srcfld1=hostid&writeonly=1',
-					width: 450,
-					height: 450,
-					buttonClass: 'button link_menu'
+					buttonClass: 'btn-grey'
 				}
 			});
 
@@ -1293,9 +1286,7 @@ ZABBIX.apps.map = (function($) {
 				popup: {
 					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
 						'&srcfld1=groupid&writeonly=1',
-					width: 450,
-					height: 450,
-					buttonClass: 'button link_menu'
+					buttonClass: 'btn-grey'
 				}
 			});
 
@@ -1704,9 +1695,6 @@ ZABBIX.apps.map = (function($) {
 				for (i = 0, ln = list.length; i < ln; i++) {
 					$(tpl.evaluate(list[i])).appendTo('#massList');
 				}
-
-				$('#massList tr:nth-child(odd)').addClass('odd_row');
-				$('#massList tr:nth-child(even)').addClass('even_row');
 			}
 		};
 
@@ -2021,8 +2009,6 @@ ZABBIX.apps.map = (function($) {
 						$(rowTpl.evaluate(list[i])).appendTo(linkTable.find('tbody'));
 					}
 
-					linkTable.find('tbody tr:nth-child(odd)').addClass('odd_row');
-					linkTable.find('tbody tr:nth-child(even)').addClass('even_row');
 					linkTable.show();
 				}
 				else {

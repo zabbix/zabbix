@@ -15,7 +15,7 @@ libspecsysinfo_a_SOURCES = \
 	linux.c \
 	memory.c \
 	net.c \
-	proc.c \
+	proc.c proc.h \
 	sensors.c \
 	software.c software.h \
 	system.c \

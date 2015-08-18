@@ -30,18 +30,18 @@
  * @return array
  */
 function getUserFormData($userId, array $config, $isProfile = false) {
-	$data = array(
+	$data = [
 		'is_profile' => $isProfile,
 		'config' => $config
-	);
+	];
 
 	if ($userId != 0 && (!hasRequest('form_refresh') || hasRequest('register'))) {
-		$users = API::User()->get(array(
-			'output' => array('alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'theme', 'refresh',
+		$users = API::User()->get([
+			'output' => ['alias', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'theme', 'refresh',
 				'rows_per_page', 'type'
-			),
+			],
 			'userids' => $userId
-		));
+		]);
 		$user = reset($users);
 
 		$data['alias']			= $user['alias'];
@@ -59,14 +59,14 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['user_type']		= $user['type'];
 		$data['messages'] 		= getMessageSettings();
 
-		$userGroups = API::UserGroup()->get(array(
-			'output' => array('usrgrpid'),
+		$userGroups = API::UserGroup()->get([
+			'output' => ['usrgrpid'],
 			'userids' => $userId
-		));
+		]);
 		$userGroup = zbx_objectValues($userGroups, 'usrgrpid');
 		$data['user_groups']	= zbx_toHash($userGroup);
 
-		$data['user_medias'] = array();
+		$data['user_medias'] = [];
 		$dbMedia = DBselect('SELECT m.mediaid,m.mediatypeid,m.period,m.sendto,m.severity,m.active'.
 				' FROM media m'.
 				' WHERE m.userid='.zbx_dbstr($userId)
@@ -93,12 +93,12 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		$data['refresh']		= getRequest('refresh', 30);
 		$data['rows_per_page']	= getRequest('rows_per_page', 50);
 		$data['user_type']		= getRequest('user_type', USER_TYPE_ZABBIX_USER);
-		$data['user_groups']	= getRequest('user_groups', array());
+		$data['user_groups']	= getRequest('user_groups', []);
 		$data['change_password']= getRequest('change_password');
-		$data['user_medias']	= getRequest('user_medias', array());
+		$data['user_medias']	= getRequest('user_medias', []);
 
 		// set messages
-		$data['messages'] = getRequest('messages', array());
+		$data['messages'] = getRequest('messages', []);
 		if (!isset($data['messages']['enabled'])) {
 			$data['messages']['enabled'] = 0;
 		}
@@ -109,7 +109,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 			$data['messages']['triggers.recovery'] = 0;
 		}
 		if (!isset($data['messages']['triggers.severities'])) {
-			$data['messages']['triggers.severities'] = array();
+			$data['messages']['triggers.severities'] = [];
 		}
 		$data['messages'] = array_merge(getMessageSettings(), $data['messages']);
 	}
@@ -131,7 +131,7 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 
 	// set media types
 	if (!empty($data['user_medias'])) {
-		$mediaTypeDescriptions = array();
+		$mediaTypeDescriptions = [];
 		$dbMediaTypes = DBselect(
 			'SELECT mt.mediatypeid,mt.description FROM media_type mt WHERE '.
 				dbConditionInt('mt.mediatypeid', zbx_objectValues($data['user_medias'], 'mediatypeid'))
@@ -145,46 +145,46 @@ function getUserFormData($userId, array $config, $isProfile = false) {
 		}
 		unset($media);
 
-		CArrayHelper::sort($data['user_medias'], array('description', 'sendto'));
+		CArrayHelper::sort($data['user_medias'], ['description', 'sendto']);
 	}
 
 	// set user rights
 	if (!$data['is_profile']) {
-		$data['groups'] = API::UserGroup()->get(array(
-			'output' => array('usrgrpid', 'name'),
+		$data['groups'] = API::UserGroup()->get([
+			'output' => ['usrgrpid', 'name'],
 			'usrgrpids' => $data['user_groups']
-		));
+		]);
 		order_result($data['groups'], 'name');
 
 		$group_ids = array_values($data['user_groups']);
 		if (count($group_ids) == 0) {
-			$group_ids = array(-1);
+			$group_ids = [-1];
 		}
 		$db_rights = DBselect('SELECT r.* FROM rights r WHERE '.dbConditionInt('r.groupid', $group_ids));
 
 		// deny beat all, read-write beat read
-		$tmp_permitions = array();
+		$tmp_permissions = [];
 		while ($db_right = DBfetch($db_rights)) {
-			if (isset($tmp_permitions[$db_right['id']]) && $tmp_permitions[$db_right['id']] != PERM_DENY) {
-				$tmp_permitions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
+			if (isset($tmp_permissions[$db_right['id']]) && $tmp_permissions[$db_right['id']] != PERM_DENY) {
+				$tmp_permissions[$db_right['id']] = ($db_right['permission'] == PERM_DENY)
 					? PERM_DENY
-					: max($tmp_permitions[$db_right['id']], $db_right['permission']);
+					: max($tmp_permissions[$db_right['id']], $db_right['permission']);
 			}
 			else {
-				$tmp_permitions[$db_right['id']] = $db_right['permission'];
+				$tmp_permissions[$db_right['id']] = $db_right['permission'];
 			}
 		}
 
-		$data['user_rights'] = array();
-		foreach ($tmp_permitions as $id => $permition) {
-			array_push($data['user_rights'], array('id' => $id, 'permission' => $permition));
+		$data['user_rights'] = [];
+		foreach ($tmp_permissions as $id => $permission) {
+			array_push($data['user_rights'], ['id' => $id, 'permission' => $permission]);
 		}
 	}
 
 	return $data;
 }
 
-function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
+function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER, $rightsFormList = null) {
 	// group
 	$lists['group']['label']		= _('Host groups');
 	$lists['group']['read_write']	= new CListBox('groups_write', null, 15);
@@ -247,13 +247,15 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 				$sLabel = $item;
 			}
 			else {
-				$row->addItem(new CCol($item, $class));
+				$row->addItem((new CCol($item))->addClass($class));
 			}
 		}
 
-		$table = new CTable(_('No accessible resources'), 'right_table calculated');
+		$table = (new CTable())
+			->setNoDataMessage(_('No accessible resources'))
+			->addClass('calculated');
 		if (!$isHeaderDisplayed) {
-			$table->setHeader(array(_('Read-write'), _('Read only'), _('Deny')), 'header');
+			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')]);
 			$isHeaderDisplayed = true;
 		}
 		$table->addRow($row);
@@ -262,53 +264,59 @@ function getPermissionsFormList($rights = array(), $user_type = USER_TYPE_ZABBIX
 	return $rightsFormList;
 }
 
-function prepareSubfilterOutput($data, $subfilter, $subfilterName) {
+function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 	order_result($data, 'name');
 
-	$output = array();
+	$output = [new CTag('h3', true, $label)];
 
 	foreach ($data as $id => $element) {
 		$element['name'] = nbsp(CHtml::encode($element['name']));
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
-			$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_enabled');
-			$span->onClick(CHtml::encode(
-				'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
-				'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
-			));
-			$output[] = $span;
+			$link = (new CLink($element['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN)
+				->onClick(CHtml::encode(
+					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+					'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
+				));
+			$output[] = $link;
+			$output[] = new CSup(SPACE.$element['count']);
 		}
 
 		// isn't activated
 		else {
 			// subfilter has 0 items
 			if ($element['count'] == 0) {
-				$span = new CSpan($element['name'].SPACE.'('.$element['count'].')', 'subfilter_inactive');
-				$output[] = $span;
+				$output[] = (new CLink($element['name']))
+					->addClass( ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_GREY);
+				$output[] = new CSup(SPACE.$element['count']);
 			}
 			else {
 				// this level has no active subfilters
 				$nspan = $subfilter
-					? new CSpan(SPACE.'(+'.$element['count'].')', 'subfilter_active')
-					: new CSpan(SPACE.'('.$element['count'].')', 'subfilter_active');
+					? new CSup(SPACE.'+'.$element['count'])
+					: new CSup(SPACE.$element['count']);
 
-				$span = new CSpan($element['name'], 'subfilter_disabled');
-				$span->onClick(CHtml::encode(
-					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
-					'create_var("zbx_filter", '.
-						CJs::encodeJson($subfilterName.'['.$id.']').', '.
-						CJs::encodeJson($id).', '.
-						'true'.
-					');'
-				));
+				$link = (new CLink($element['name']))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->onClick(CHtml::encode(
+						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+						'create_var("zbx_filter", '.
+							CJs::encodeJson($subfilterName.'['.$id.']').', '.
+							CJs::encodeJson($id).', '.
+							'true'.
+						');'
+					));
 
-				$output[] = $span;
+				$output[] = $link;
 				$output[] = $nspan;
 			}
 		}
 
-		$output[] = ', ';
+		$output[] = '&nbsp;&nbsp;&nbsp;';
 	}
 
 	array_pop($output);
@@ -348,27 +356,30 @@ function getItemFilterForm(&$items) {
 	$subfilter_trends			= $_REQUEST['subfilter_trends'];
 	$subfilter_interval			= $_REQUEST['subfilter_interval'];
 
-	$form = new CForm('get');
-	$form->setAttribute('name', 'zbx_filter');
-	$form->setAttribute('id', 'zbx_filter');
-	$form->addVar('subfilter_hosts', $subfilter_hosts);
-	$form->addVar('subfilter_apps', $subfilter_apps);
-	$form->addVar('subfilter_types', $subfilter_types);
-	$form->addVar('subfilter_value_types', $subfilter_value_types);
-	$form->addVar('subfilter_status', $subfilter_status);
-	$form->addVar('subfilter_state', $subfilter_state);
-	$form->addVar('subfilter_templated_items', $subfilter_templated_items);
-	$form->addVar('subfilter_with_triggers', $subfilter_with_triggers);
-	$form->addVar('subfilter_history', $subfilter_history);
-	$form->addVar('subfilter_trends', $subfilter_trends);
-	$form->addVar('subfilter_interval', $subfilter_interval);
+	$form = (new CFilter('web.items.filter.state'))
+		->addVar('subfilter_hosts', $subfilter_hosts)
+		->addVar('subfilter_apps', $subfilter_apps)
+		->addVar('subfilter_types', $subfilter_types)
+		->addVar('subfilter_value_types', $subfilter_value_types)
+		->addVar('subfilter_status', $subfilter_status)
+		->addVar('subfilter_state', $subfilter_state)
+		->addVar('subfilter_templated_items', $subfilter_templated_items)
+		->addVar('subfilter_with_triggers', $subfilter_with_triggers)
+		->addVar('subfilter_history', $subfilter_history)
+		->addVar('subfilter_trends', $subfilter_trends)
+		->addVar('subfilter_interval', $subfilter_interval);
+
+	$filterColumn1 = new CFormList();
+	$filterColumn2 = new CFormList();
+	$filterColumn3 = new CFormList();
+	$filterColumn4 = new CFormList();
 
 	// type select
-	$fTypeVisibility = array();
+	$fTypeVisibility = [];
 	$cmbType = new CComboBox('filter_type', $filter_type);
-	$cmbType->setAttribute('id', 'filter_type');
+	$cmbType->setId('filter_type');
 	$cmbType->addItem(-1, _('all'));
-	foreach (array('filter_delay_label', 'filter_delay') as $vItem) {
+	foreach (['filter_delay_label', 'filter_delay'] as $vItem) {
 		zbx_subarray_push($fTypeVisibility, -1, $vItem);
 	}
 
@@ -386,18 +397,18 @@ function getItemFilterForm(&$items) {
 		switch ($typeNum) {
 			case ITEM_TYPE_SNMPV1:
 			case ITEM_TYPE_SNMPV2C:
-				$snmp_types = array(
+				$snmp_types = [
 					'filter_snmp_community_label', 'filter_snmp_community',
 					'filter_snmp_oid_label', 'filter_snmp_oid',
 					'filter_port_label', 'filter_port'
-				);
+				];
 				foreach ($snmp_types as $vItem) {
 					zbx_subarray_push($fTypeVisibility, $typeNum, $vItem);
 				}
 				break;
 			case ITEM_TYPE_SNMPV3:
-				foreach (array('filter_snmpv3_securityname_label', 'filter_snmpv3_securityname', 'filter_snmp_oid_label',
-					'filter_snmp_oid', 'filter_port_label', 'filter_port') as $vItem) {
+				foreach (['filter_snmpv3_securityname_label', 'filter_snmpv3_securityname', 'filter_snmp_oid_label',
+					'filter_snmp_oid', 'filter_port_label', 'filter_port'] as $vItem) {
 					zbx_subarray_push($fTypeVisibility, $typeNum, $vItem);
 				}
 				break;
@@ -407,7 +418,7 @@ function getItemFilterForm(&$items) {
 	zbx_add_post_js("var filterTypeSwitcher = new CViewSwitcher('filter_type', 'change', ".zbx_jsvalue($fTypeVisibility, true).');');
 
 	// type of information select
-	$fVTypeVisibility = array();
+	$fVTypeVisibility = [];
 
 	$cmbValType = new CComboBox('filter_value_type', $filter_value_type);
 	$cmbValType->addItem(-1, _('all'));
@@ -417,7 +428,7 @@ function getItemFilterForm(&$items) {
 	$cmbValType->addItem(ITEM_VALUE_TYPE_LOG, _('Log'));
 	$cmbValType->addItem(ITEM_VALUE_TYPE_TEXT, _('Text'));
 
-	foreach (array('filter_data_type_label','filter_data_type') as $vItem) {
+	foreach (['filter_data_type_label','filter_data_type'] as $vItem) {
 		zbx_subarray_push($fVTypeVisibility, ITEM_VALUE_TYPE_UINT64, $vItem);
 	}
 
@@ -426,228 +437,205 @@ function getItemFilterForm(&$items) {
 	// status select
 	$cmbStatus = new CComboBox('filter_status', $filter_status);
 	$cmbStatus->addItem(-1, _('all'));
-	foreach (array(ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED) as $status) {
+	foreach ([ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED] as $status) {
 		$cmbStatus->addItem($status, item_status2str($status));
 	}
 
 	// state select
 	$cmbState = new CComboBox('filter_state', $filter_state);
 	$cmbState->addItem(-1, _('all'));
-	foreach (array(ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED) as $state) {
+	foreach ([ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED] as $state) {
 		$cmbState->addItem($state, itemState($state));
 	}
 
 	// update interval
-	$updateIntervalLabel = new CSpan(array(bold(_('Update interval')), ' '._('(in sec)')));
-	$updateIntervalLabel->setAttribute('id', 'filter_delay_label');
+	$updateIntervalLabel = (new CSpan(_('Update interval (in sec)')))->setId('filter_delay_label');
 
-	$updateIntervalInput = new CNumericBox('filter_delay', $filter_delay, 5, false, true);
+	$updateIntervalInput = (new CNumericBox('filter_delay', $filter_delay, 5, false, true))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 
 	// data type
-	$dataTypeLabel = new CSpan(bold(_('Data type').NAME_DELIMITER));
-	$dataTypeLabel->setAttribute('id', 'filter_data_type_label');
+	$dataTypeLabel = (new CSpan(bold(_('Data type').NAME_DELIMITER)))->setId('filter_data_type_label');
 
 	$dataTypeInput = new CComboBox('filter_data_type', $filter_data_type);
 	$dataTypeInput->addItem(-1, _('all'));
 	$dataTypeInput->addItems(item_data_type2str());
 
-	// filter table
-	$table = new CTable('', 'filter');
-	$table->setCellPadding(0);
-	$table->setCellSpacing(0);
-
 	// SNMP community
-	$snmpCommunityLabel = new CSpan(array(bold(_('SNMP community')), SPACE._('like').NAME_DELIMITER));
-	$snmpCommunityLabel->setAttribute('id', 'filter_snmp_community_label');
-
-	$snmpCommunityField = new CTextBox('filter_snmp_community', $filter_snmp_community, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpCommunityLabel = (new CSpan(_('SNMP community like')))->setId('filter_snmp_community_label');
+	$snmpCommunityField = (new CTextBox('filter_snmp_community', $filter_snmp_community))
+		->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// SNMPv3 security name
-	$snmpSecurityLabel = new CSpan(array(bold(_('Security name')), SPACE._('like').NAME_DELIMITER));
-	$snmpSecurityLabel->setAttribute('id', 'filter_snmpv3_securityname_label');
-
-	$snmpSecurityField = new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpSecurityLabel = (new CSpan(_('Security name like')))->setId('filter_snmpv3_securityname_label');
+	$snmpSecurityField = (new CTextBox('filter_snmpv3_securityname', $filter_snmpv3_securityname))
+		->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// SNMP OID
-	$snmpOidLabel = new CSpan(array(bold(_('SNMP OID')), SPACE._('like').NAME_DELIMITER));
-	$snmpOidLabel->setAttribute('id', 'filter_snmp_oid_label');
-
-	$snmpOidField = new CTextBox('filter_snmp_oid', $filter_snmp_oid, ZBX_TEXTBOX_FILTER_SIZE);
+	$snmpOidLabel = (new CSpan(_('SNMP OID like')))->setId('filter_snmp_oid_label');
+	$snmpOidField = (new CTextBox('filter_snmp_oid', $filter_snmp_oid))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH);
 
 	// port
-	$portLabel = new CSpan(array(bold(_('Port')), SPACE._('like').NAME_DELIMITER));
-	$portLabel->setAttribute('id', 'filter_port_label');
-
-	$portField = new CNumericBox('filter_port', $filter_port, 5, false, true);
+	$portLabel = (new CSpan(_('Port like')))->setId('filter_port_label');
+	$portField = (new CNumericBox('filter_port', $filter_port, 5, false, true))
+		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 
 	// row 1
 	$groupFilter = null;
 	if (!empty($filter_groupId)) {
-		$getHostInfo = API::HostGroup()->get(array(
+		$getHostInfo = API::HostGroup()->get([
 			'groupids' => $filter_groupId,
-			'output' => array('name')
-		));
+			'output' => ['name']
+		]);
 		$getHostInfo = reset($getHostInfo);
 		if (!empty($getHostInfo)) {
-			$groupFilter[] = array(
+			$groupFilter[] = [
 				'id' => $getHostInfo['groupid'],
 				'name' => $getHostInfo['name']
-			);
+			];
 		}
 	}
 
-	$table->addRow(array(
-		new CCol(bold(_('Host group')), 'label col1'),
-		new CCol(array(
-			new CMultiSelect(array(
-				'name' => 'filter_groupid',
-				'selectedLimit' => 1,
-				'objectName' => 'hostGroup',
-				'objectOptions' => array(
-					'editable' => true
-				),
-				'data' => $groupFilter,
-				'popup' => array(
-					'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
-						'&srcfld1=groupid&writeonly=1',
-					'width' => 450,
-					'height' => 450
-				)
-			))
-		), 'col1'),
-		new CCol(bold(_('Type')), 'label col2'),
-		new CCol($cmbType, 'col2'),
-		new CCol(bold(_('Type of information')), 'label col3'),
-		new CCol($cmbValType, 'col3'),
-		new CCol(bold(_('State')), 'label'),
-		new CCol($cmbState, 'col4')
-	), 'item-list-row');
+	$filterColumn1->addRow(_('Host group'),
+		(new CMultiSelect([
+			'name' => 'filter_groupid',
+			'selectedLimit' => 1,
+			'objectName' => 'hostGroup',
+			'objectOptions' => [
+				'editable' => true
+			],
+			'data' => $groupFilter,
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$form->getName().'&dstfld1=filter_groupid'.
+					'&srcfld1=groupid&writeonly=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
+
+	$filterColumn2->addRow(_('Type'), $cmbType);
+	$filterColumn3->addRow(_('Type of information'), $cmbValType);
+	$filterColumn4->addRow(_('State'), $cmbState);
+
 	// row 2
 	$hostFilterData = null;
 	if (!empty($filter_hostId)) {
-		$getHostInfo = API::Host()->get(array(
+		$getHostInfo = API::Host()->get([
 			'hostids' => $filter_hostId,
 			'templated_hosts' => true,
-			'output' => array('name')
-		));
+			'output' => ['name']
+		]);
 		$getHostInfo = reset($getHostInfo);
 		if (!empty($getHostInfo)) {
-			$hostFilterData[] = array(
+			$hostFilterData[] = [
 				'id' => $getHostInfo['hostid'],
 				'name' => $getHostInfo['name']
-			);
+			];
 		}
 	}
 
-	$table->addRow(array(
-		new CCol(bold(_('Host')), 'label'),
-		new CCol(array(
-			new CMultiSelect(array(
-				'name' => 'filter_hostid',
-				'selectedLimit' => 1,
-				'objectName' => 'hosts',
-				'objectOptions' => array(
-					'editable' => true,
-					'templated_hosts' => true
-				),
-				'data' => $hostFilterData,
-				'popup' => array(
-					'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
-						'&srcfld1=hostid&writeonly=1',
-					'width' => 450,
-					'height' => 450
-				)
-			))
-		), 'col1'),
-		new CCol($updateIntervalLabel, 'label'),
-		new CCol($updateIntervalInput),
-		new CCol($dataTypeLabel, 'label'),
-		new CCol($dataTypeInput),
-		new CCol(bold(_('Status')), 'label col4'),
-		new CCol($cmbStatus, 'col4')
-	), 'item-list-row');
+	$filterColumn1->addRow(_('Host'),
+		(new CMultiSelect([
+			'name' => 'filter_hostid',
+			'selectedLimit' => 1,
+			'objectName' => 'hosts',
+			'objectOptions' => [
+				'editable' => true,
+				'templated_hosts' => true
+			],
+			'data' => $hostFilterData,
+			'popup' => [
+				'parameters' => 'srctbl=host_templates&dstfrm='.$form->getName().'&dstfld1=filter_hostid'.
+					'&srcfld1=hostid&writeonly=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
+
+	$filterColumn2->addRow($updateIntervalLabel, $updateIntervalInput);
+	$filterColumn3->addRow($dataTypeLabel, $dataTypeInput);
+	$filterColumn4->addRow(_('Status'), $cmbStatus);
+
 	// row 3
-	$table->addRow(array(
-		new CCol(bold(_('Application')), 'label'),
-		new CCol(array(
-			new CTextBox('filter_application', $filter_application, ZBX_TEXTBOX_FILTER_SIZE),
-			new CButton('btn_app', _('Select'),
-				'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
-					'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
-					'&with_applications=1'.
-					'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
-					.', 550, 450, "application");',
-				'button-form'
-			)
-		), 'col1'),
-		new CCol(array($snmpCommunityLabel, $snmpSecurityLabel), 'label'),
-		new CCol(array($snmpCommunityField, $snmpSecurityField)),
-		new CCol(array(bold(_('History')), ' '._('(in days)')), 'label'),
-		new CCol(new CNumericBox('filter_history', $filter_history, 8, false, true)),
-		new CCol(bold(_('Triggers')), 'label'),
-		new CCol(new CComboBox('filter_with_triggers', $filter_with_triggers, null, array(
+	$filterColumn1->addRow(_('Application'),
+		[
+			(new CTextBox('filter_application', $filter_application))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CButton(null, _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick(
+					'return PopUp("popup.php?srctbl=applications&srcfld1=name'.
+						'&dstfrm='.$form->getName().'&dstfld1=filter_application'.
+						'&with_applications=1'.
+						'" + (jQuery("input[name=\'filter_hostid\']").length > 0 ? "&hostid="+jQuery("input[name=\'filter_hostid\']").val() : "")'
+						.', 0, 0, "application");')
+		]
+	);
+	$filterColumn2->addRow([$snmpCommunityLabel, $snmpSecurityLabel], [$snmpCommunityField, $snmpSecurityField]);
+	$filterColumn3->addRow(_('History (in days)'),
+		(new CNumericBox('filter_history', $filter_history, 8, false, true))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
+	$filterColumn4->addRow(_('Triggers'),
+		new CComboBox('filter_with_triggers', $filter_with_triggers, null, [
 			-1 => _('all'),
 			1 => _('With triggers'),
 			0 => _('Without triggers')
-		)))
-	), 'item-list-row');
+		])
+	);
+
 	// row 4
-	$table->addRow(array(
-		new CCol(array(bold(_('Name')), ' '._('like')), 'label'),
-		new CCol(new CTextBox('filter_name', $filter_name, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
-		new CCol($snmpOidLabel, 'label'),
-		new CCol($snmpOidField),
-		new CCol(array(bold(_('Trends')), ' '._('(in days)')), 'label'),
-		new CCol(new CNumericBox('filter_trends', $filter_trends, 8, false, true)),
-		new CCol(bold(_('Template')), 'label'),
-		new CCol(new CComboBox('filter_templated_items', $filter_templated_items, null, array(
+	$filterColumn1->addRow(_('Name like'),
+		(new CTextBox('filter_name', $filter_name))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
+	$filterColumn2->addRow($snmpOidLabel, $snmpOidField);
+	$filterColumn3->addRow(_('Trends (in days)'),
+		(new CNumericBox('filter_trends', $filter_trends, 8, false, true))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
+	$filterColumn4->addRow(_('Template'),
+		new CComboBox('filter_templated_items', $filter_templated_items, null, [
 			-1 => _('all'),
 			1 => _('Templated items'),
 			0 => _('Not Templated items'),
-		)))
-	), 'item-list-row');
+		])
+	);
+
 	// row 5
-	$table->addRow(array(
-		new CCol(array(bold(_('Key')), ' '._('like')), 'label'),
-		new CCol(new CTextBox('filter_key', $filter_key, ZBX_TEXTBOX_FILTER_SIZE), 'col1'),
-		new CCol($portLabel, 'label'),
-		new CCol($portField),
-		new CCol(null, 'label'),
-		new CCol(),
-		new CCol(null, 'label'),
-		new CCol()
-	), 'item-list-row');
+	$filterColumn1->addRow(_('Key like'),
+		(new CTextBox('filter_key', $filter_key))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	);
+	$filterColumn2->addRow($portLabel, $portField);
 
-	$filter = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
-	$filter->main();
-
-	$reset = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();', 'jqueryinput shadow');
-
-	$div_buttons = new CDiv(array($filter, $reset));
-	$div_buttons->setAttribute('style', 'padding: 4px 0px;');
-
-	$footer = new CCol($div_buttons, 'controls', 8);
-
-	$table->addRow($footer);
-	$form->addItem($table);
+	$form->addColumn($filterColumn1);
+	$form->addColumn($filterColumn2);
+	$form->addColumn($filterColumn3);
+	$form->addColumn($filterColumn4);
 
 	// subfilters
-	$table_subfilter = new CTable(null, 'filter sub-filter');
+	$table_subfilter = new CTableInfo();
+	$table_subfilter->addRow(
+		[
+			new CTag('h4', true,
+				[
+					_('Subfilter').SPACE,
+					new CSpan(_('affects only filtered data'))
+				]
+			)]
+	);
 
 	// array contains subfilters and number of items in each
-	$item_params = array(
-		'hosts' => array(),
-		'applications' => array(),
-		'types' => array(),
-		'value_types' => array(),
-		'status' => array(),
-		'state' => array(),
-		'templated_items' => array(),
-		'with_triggers' => array(),
-		'history' => array(),
-		'trends' => array(),
-		'interval' => array()
-	);
+	$item_params = [
+		'hosts' => [],
+		'applications' => [],
+		'types' => [],
+		'value_types' => [],
+		'status' => [],
+		'state' => [],
+		'templated_items' => [],
+		'with_triggers' => [],
+		'history' => [],
+		'trends' => [],
+		'interval' => []
+	];
 
 	// generate array with values for subfilters of selected items
 	foreach ($items as $item) {
@@ -656,7 +644,7 @@ function getItemFilterForm(&$items) {
 			$host = reset($item['hosts']);
 
 			if (!isset($item_params['hosts'][$host['hostid']])) {
-				$item_params['hosts'][$host['hostid']] = array('name' => $host['name'], 'count' => 0);
+				$item_params['hosts'][$host['hostid']] = ['name' => $host['name'], 'count' => 0];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -675,7 +663,7 @@ function getItemFilterForm(&$items) {
 		if (!empty($item['applications'])) {
 			foreach ($item['applications'] as $application) {
 				if (!isset($item_params['applications'][$application['name']])) {
-					$item_params['applications'][$application['name']] = array('name' => $application['name'], 'count' => 0);
+					$item_params['applications'][$application['name']] = ['name' => $application['name'], 'count' => 0];
 				}
 			}
 		}
@@ -705,7 +693,7 @@ function getItemFilterForm(&$items) {
 		// types
 		if ($filter_type == -1) {
 			if (!isset($item_params['types'][$item['type']])) {
-				$item_params['types'][$item['type']] = array('name' => item_type2str($item['type']), 'count' => 0);
+				$item_params['types'][$item['type']] = ['name' => item_type2str($item['type']), 'count' => 0];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -722,10 +710,10 @@ function getItemFilterForm(&$items) {
 		// value types
 		if ($filter_value_type == -1) {
 			if (!isset($item_params['value_types'][$item['value_type']])) {
-				$item_params['value_types'][$item['value_type']] = array(
+				$item_params['value_types'][$item['value_type']] = [
 					'name' => itemValueTypeString($item['value_type']),
 					'count' => 0
-				);
+				];
 			}
 
 			$show_item = true;
@@ -743,10 +731,10 @@ function getItemFilterForm(&$items) {
 		// status
 		if ($filter_status == -1) {
 			if (!isset($item_params['status'][$item['status']])) {
-				$item_params['status'][$item['status']] = array(
+				$item_params['status'][$item['status']] = [
 					'name' => item_status2str($item['status']),
 					'count' => 0
-				);
+				];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -763,10 +751,10 @@ function getItemFilterForm(&$items) {
 		// state
 		if ($filter_state == -1) {
 			if (!isset($item_params['state'][$item['state']])) {
-				$item_params['state'][$item['state']] = array(
+				$item_params['state'][$item['state']] = [
 					'name' => itemState($item['state']),
 					'count' => 0
-				);
+				];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -783,10 +771,10 @@ function getItemFilterForm(&$items) {
 		// template
 		if ($filter_templated_items == -1) {
 			if ($item['templateid'] == 0 && !isset($item_params['templated_items'][0])) {
-				$item_params['templated_items'][0] = array('name' => _('Not Templated items'), 'count' => 0);
+				$item_params['templated_items'][0] = ['name' => _('Not Templated items'), 'count' => 0];
 			}
 			elseif ($item['templateid'] > 0 && !isset($item_params['templated_items'][1])) {
-				$item_params['templated_items'][1] = array('name' => _('Templated items'), 'count' => 0);
+				$item_params['templated_items'][1] = ['name' => _('Templated items'), 'count' => 0];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -808,10 +796,10 @@ function getItemFilterForm(&$items) {
 		// with triggers
 		if ($filter_with_triggers == -1) {
 			if (count($item['triggers']) == 0 && !isset($item_params['with_triggers'][0])) {
-				$item_params['with_triggers'][0] = array('name' => _('Without triggers'), 'count' => 0);
+				$item_params['with_triggers'][0] = ['name' => _('Without triggers'), 'count' => 0];
 			}
 			elseif (count($item['triggers']) > 0 && !isset($item_params['with_triggers'][1])) {
-				$item_params['with_triggers'][1] = array('name' => _('With triggers'), 'count' => 0);
+				$item_params['with_triggers'][1] = ['name' => _('With triggers'), 'count' => 0];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -832,17 +820,20 @@ function getItemFilterForm(&$items) {
 
 		// trends
 		if (zbx_empty($filter_trends)) {
-			if (!isset($item_params['trends'][$item['trends']])) {
-				$item_params['trends'][$item['trends']] = array('name' => $item['trends'], 'count' => 0);
+			if (!isset($item_params['trends'][$item['trends']]) && $item['trends'] !== '') {
+				$item_params['trends'][$item['trends']] = ['name' => $item['trends'], 'count' => 0];
 			}
+
 			$show_item = true;
+
 			foreach ($item['subfilters'] as $name => $value) {
-				if ($name == 'subfilter_trends') {
+				if ($name === 'subfilter_trends') {
 					continue;
 				}
 				$show_item &= $value;
 			}
-			if ($show_item) {
+
+			if ($show_item && $item['trends'] !== '') {
 				$item_params['trends'][$item['trends']]['count']++;
 			}
 		}
@@ -850,7 +841,7 @@ function getItemFilterForm(&$items) {
 		// history
 		if (zbx_empty($filter_history)) {
 			if (!isset($item_params['history'][$item['history']])) {
-				$item_params['history'][$item['history']] = array('name' => $item['history'], 'count' => 0);
+				$item_params['history'][$item['history']] = ['name' => $item['history'], 'count' => 0];
 			}
 			$show_item = true;
 			foreach ($item['subfilters'] as $name => $value) {
@@ -866,17 +857,20 @@ function getItemFilterForm(&$items) {
 
 		// interval
 		if (zbx_empty($filter_delay) && $filter_type != ITEM_TYPE_TRAPPER) {
-			if (!isset($item_params['interval'][$item['delay']])) {
-				$item_params['interval'][$item['delay']] = array('name' => $item['delay'], 'count' => 0);
+			if (!isset($item_params['interval'][$item['delay']]) && $item['delay'] !== '') {
+				$item_params['interval'][$item['delay']] = ['name' => $item['delay'], 'count' => 0];
 			}
+
 			$show_item = true;
+
 			foreach ($item['subfilters'] as $name => $value) {
-				if ($name == 'subfilter_interval') {
+				if ($name === 'subfilter_interval') {
 					continue;
 				}
 				$show_item &= $value;
 			}
-			if ($show_item) {
+
+			if ($show_item && $item['delay'] !== '') {
 				$item_params['interval'][$item['delay']]['count']++;
 			}
 		}
@@ -884,62 +878,61 @@ function getItemFilterForm(&$items) {
 
 	// output
 	if (zbx_empty($filter_hostId) && count($item_params['hosts']) > 1) {
-		$hosts_output = prepareSubfilterOutput($item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
-		$table_subfilter->addRow(array(_('Hosts'), $hosts_output));
+		$hosts_output = prepareSubfilterOutput(_('Hosts'), $item_params['hosts'], $subfilter_hosts, 'subfilter_hosts');
+		$table_subfilter->addRow($hosts_output);
 	}
 
 	if (!empty($item_params['applications']) && count($item_params['applications']) > 1) {
-		$application_output = prepareSubfilterOutput($item_params['applications'], $subfilter_apps, 'subfilter_apps');
-		$table_subfilter->addRow(array(_('Applications'), $application_output));
+		$application_output = prepareSubfilterOutput(_('Applications'), $item_params['applications'], $subfilter_apps, 'subfilter_apps');
+		$table_subfilter->addRow([$application_output]);
 	}
 
 	if ($filter_type == -1 && count($item_params['types']) > 1) {
-		$type_output = prepareSubfilterOutput($item_params['types'], $subfilter_types, 'subfilter_types');
-		$table_subfilter->addRow(array(_('Types'), $type_output));
+		$type_output = prepareSubfilterOutput(_('Types'), $item_params['types'], $subfilter_types, 'subfilter_types');
+		$table_subfilter->addRow([$type_output]);
 	}
 
 	if ($filter_value_type == -1 && count($item_params['value_types']) > 1) {
-		$value_types_output = prepareSubfilterOutput($item_params['value_types'], $subfilter_value_types, 'subfilter_value_types');
-		$table_subfilter->addRow(array(_('Type of information'), $value_types_output));
+		$value_types_output = prepareSubfilterOutput(_('Type of information'), $item_params['value_types'], $subfilter_value_types, 'subfilter_value_types');
+		$table_subfilter->addRow([$value_types_output]);
 	}
 
 	if ($filter_status == -1 && count($item_params['status']) > 1) {
-		$status_output = prepareSubfilterOutput($item_params['status'], $subfilter_status, 'subfilter_status');
-		$table_subfilter->addRow(array(_('Status'), $status_output));
+		$status_output = prepareSubfilterOutput(_('Status'), $item_params['status'], $subfilter_status, 'subfilter_status');
+		$table_subfilter->addRow([$status_output]);
 	}
 
 	if ($filter_state == -1 && count($item_params['state']) > 1) {
-		$state_output = prepareSubfilterOutput($item_params['state'], $subfilter_state, 'subfilter_state');
-		$table_subfilter->addRow(array(_('State'), $state_output));
+		$state_output = prepareSubfilterOutput(_('State'), $item_params['state'], $subfilter_state, 'subfilter_state');
+		$table_subfilter->addRow([$state_output]);
 	}
 
 	if ($filter_templated_items == -1 && count($item_params['templated_items']) > 1) {
-		$templated_items_output = prepareSubfilterOutput($item_params['templated_items'], $subfilter_templated_items, 'subfilter_templated_items');
-		$table_subfilter->addRow(array(_('Template'), $templated_items_output));
+		$templated_items_output = prepareSubfilterOutput(_('Template'), $item_params['templated_items'], $subfilter_templated_items, 'subfilter_templated_items');
+		$table_subfilter->addRow([$templated_items_output]);
 	}
 
 	if ($filter_with_triggers == -1 && count($item_params['with_triggers']) > 1) {
-		$with_triggers_output = prepareSubfilterOutput($item_params['with_triggers'], $subfilter_with_triggers, 'subfilter_with_triggers');
-		$table_subfilter->addRow(array(_('With triggers'), $with_triggers_output));
+		$with_triggers_output = prepareSubfilterOutput(_('With triggers'), $item_params['with_triggers'], $subfilter_with_triggers, 'subfilter_with_triggers');
+		$table_subfilter->addRow([$with_triggers_output]);
 	}
 
 	if (zbx_empty($filter_history) && count($item_params['history']) > 1) {
-		$history_output = prepareSubfilterOutput($item_params['history'], $subfilter_history, 'subfilter_history');
-		$table_subfilter->addRow(array(_('History'), $history_output));
+		$history_output = prepareSubfilterOutput(_('History'), $item_params['history'], $subfilter_history, 'subfilter_history');
+		$table_subfilter->addRow([$history_output]);
 	}
 
 	if (zbx_empty($filter_trends) && (count($item_params['trends']) > 1)) {
-		$trends_output = prepareSubfilterOutput($item_params['trends'], $subfilter_trends, 'subfilter_trends');
-		$table_subfilter->addRow(array(_('Trends'), $trends_output));
+		$trends_output = prepareSubfilterOutput(_('Trends'), $item_params['trends'], $subfilter_trends, 'subfilter_trends');
+		$table_subfilter->addRow([$trends_output]);
 	}
 
 	if (zbx_empty($filter_delay) && $filter_type != ITEM_TYPE_TRAPPER && count($item_params['interval']) > 1) {
-		$interval_output = prepareSubfilterOutput($item_params['interval'], $subfilter_interval, 'subfilter_interval');
-		$table_subfilter->addRow(array(_('Interval'), $interval_output));
+		$interval_output = prepareSubfilterOutput(_('Interval'), $item_params['interval'], $subfilter_interval, 'subfilter_interval');
+		$table_subfilter->addRow([$interval_output]);
 	}
 
-	$form->addItem(new CDiv(_('Subfilter [affects only filtered data!]'), 'thin_header'));
-	$form->addItem($table_subfilter);
+	$form->setFooter($table_subfilter);
 
 	return $form;
 }
@@ -952,8 +945,8 @@ function getItemFilterForm(&$items) {
  *
  * @return array
  */
-function getItemFormData(array $item = array(), array $options = array()) {
-	$data = array(
+function getItemFormData(array $item = [], array $options = []) {
+	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'is_discovery_rule' => !empty($options['is_discovery_rule']),
@@ -982,9 +975,9 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		'delta' => getRequest('delta', 0),
 		'trends' => getRequest('trends', DAY_IN_YEAR),
 		'new_application' => getRequest('new_application', ''),
-		'applications' => getRequest('applications', array()),
-		'delay_flex' => getRequest('delay_flex', array()),
-		'new_delay_flex' => getRequest('new_delay_flex', array('delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL)),
+		'applications' => getRequest('applications', []),
+		'delay_flex' => getRequest('delay_flex', []),
+		'new_delay_flex' => getRequest('new_delay_flex', ['delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL]),
 		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
 		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
 		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', 0),
@@ -1005,18 +998,21 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		'possibleHostInventories' => null,
 		'alreadyPopulated' => null,
 		'initial_item_type' => null,
-		'templates' => array()
-	);
+		'templates' => []
+	];
 
 	// hostid
 	if (!empty($data['parent_discoveryid'])) {
-		$discoveryRule = API::DiscoveryRule()->get(array(
+		$discoveryRule = API::DiscoveryRule()->get([
 			'itemids' => $data['parent_discoveryid'],
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true
-		));
+		]);
 		$discoveryRule = reset($discoveryRule);
 		$data['hostid'] = $discoveryRule['hostid'];
+
+		$data['new_application_prototype'] = getRequest('new_application_prototype', '');
+		$data['application_prototypes'] = getRequest('application_prototypes', array());
 	}
 	else {
 		$data['hostid'] = getRequest('hostid', 0);
@@ -1041,17 +1037,17 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		// get templates
 		$itemid = $item['itemid'];
 		do {
-			$params = array(
+			$params = [
 				'itemids' => $itemid,
-				'output' => array('itemid', 'templateid'),
-				'selectHosts' => array('name')
-			);
+				'output' => ['itemid', 'templateid'],
+				'selectHosts' => ['name']
+			];
 			if ($data['is_discovery_rule']) {
 				$item = API::DiscoveryRule()->get($params);
 			}
 			else {
-				$params['selectDiscoveryRule'] = array('itemid');
-				$params['filter'] = array('flags' => null);
+				$params['selectDiscoveryRule'] = ['itemid'];
+				$params['filter'] = ['flags' => null];
 				$item = API::Item()->get($params);
 			}
 			$item = reset($item);
@@ -1064,17 +1060,26 @@ function getItemFormData(array $item = array(), array $options = array()) {
 					}
 					// discovery rule
 					elseif ($data['is_discovery_rule']) {
-						$data['templates'][] = new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// item prototype
 					elseif ($item['discoveryRule']) {
-						$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
 					else {
-						$data['templates'][] = new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid'], 'highlight underline weight_normal');
+						$data['templates'][] = (new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid']))
+							->addClass('highlight')
+							->addClass('underline')
+							->addClass('weight_normal');
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 				}
@@ -1100,11 +1105,11 @@ function getItemFormData(array $item = array(), array $options = array()) {
 	// hostname
 	if (empty($data['is_discovery_rule']) && empty($data['hostname'])) {
 		if (!empty($data['hostid'])) {
-			$hostInfo = API::Host()->get(array(
+			$hostInfo = API::Host()->get([
 				'hostids' => $data['hostid'],
-				'output' => array('name'),
+				'output' => ['name'],
 				'templated_hosts' => true
-			));
+			]);
 			$hostInfo = reset($hostInfo);
 			$data['hostname'] = $hostInfo['name'];
 		}
@@ -1147,6 +1152,10 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['new_application'] = getRequest('new_application', '');
 
+		if ($data['parent_discoveryid'] != 0) {
+			$data['new_application_prototype'] = getRequest('new_application_prototype', '');
+		}
+
 		if (!$data['is_discovery_rule']) {
 			$data['formula'] = $data['item']['formula'];
 		}
@@ -1169,10 +1178,30 @@ function getItemFormData(array $item = array(), array $options = array()) {
 					if (!isset($arr_of_delay[0]) || !isset($arr_of_delay[1])) {
 						continue;
 					}
-					array_push($data['delay_flex'], array('delay' => $arr_of_delay[0], 'period' => $arr_of_delay[1]));
+					array_push($data['delay_flex'], ['delay' => $arr_of_delay[0], 'period' => $arr_of_delay[1]]);
 				}
 			}
+
 			$data['applications'] = array_unique(zbx_array_merge($data['applications'], get_applications_by_itemid($data['itemid'])));
+
+			if ($data['parent_discoveryid'] != 0) {
+				/*
+				 * Get a list of application prototypes assigned to item prototype. Don't select distinct names,
+				 * since database can be accidentally created case insensitive.
+				 */
+				$application_prototypes = DBfetchArray(DBselect(
+					'SELECT ap.name'.
+					' FROM application_prototype ap,item_application_prototype iap'.
+					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
+						' AND ap.itemid='.zbx_dbstr($data['parent_discoveryid']).
+						' AND iap.itemid='.zbx_dbstr($data['itemid'])
+				));
+
+				// Merge form submitted data with data existing in DB to find diff and correctly display ListBox.
+				$data['application_prototypes'] = array_unique(
+					zbx_array_merge($data['application_prototypes'], zbx_objectValues($application_prototypes, 'name'))
+				);
+			}
 		}
 	}
 
@@ -1183,15 +1212,31 @@ function getItemFormData(array $item = array(), array $options = array()) {
 	$data['db_applications'] = DBfetchArray(DBselect(
 		'SELECT DISTINCT a.applicationid,a.name'.
 		' FROM applications a'.
-		' WHERE a.hostid='.zbx_dbstr($data['hostid'])
+		' WHERE a.hostid='.zbx_dbstr($data['hostid']).
+			($data['parent_discoveryid'] ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
 	));
 	order_result($data['db_applications'], 'name');
 
+	if ($data['parent_discoveryid'] != 0) {
+		// Make the application prototype list no appearing empty, but filling it with "-None-" as first element.
+		if (count($data['application_prototypes']) == 0) {
+			$data['application_prototypes'][] = 0;
+		}
+
+		// Get a list of application prototypes by discovery rule.
+		$data['db_application_prototypes'] = DBfetchArray(DBselect(
+			'SELECT ap.application_prototypeid,ap.name'.
+			' FROM application_prototype ap'.
+			' WHERE ap.itemid='.zbx_dbstr($data['parent_discoveryid'])
+		));
+		order_result($data['db_application_prototypes'], 'name');
+	}
+
 	// interfaces
-	$data['interfaces'] = API::HostInterface()->get(array(
+	$data['interfaces'] = API::HostInterface()->get([
 		'hostids' => $data['hostid'],
 		'output' => API_OUTPUT_EXTEND
-	));
+	]);
 
 	// valuemapid
 	if ($data['limited']) {
@@ -1212,11 +1257,11 @@ function getItemFormData(array $item = array(), array $options = array()) {
 		$data['possibleHostInventories'] = getHostInventories();
 
 		// get already populated fields by other items
-		$data['alreadyPopulated'] = API::item()->get(array(
-			'output' => array('inventory_link'),
-			'filter' => array('hostid' => $data['hostid']),
+		$data['alreadyPopulated'] = API::item()->get([
+			'output' => ['inventory_link'],
+			'filter' => ['hostid' => $data['hostid']],
 			'nopermissions' => true
-		));
+		]);
 		$data['alreadyPopulated'] = zbx_toHash($data['alreadyPopulated'], 'inventory_link');
 	}
 
@@ -1242,18 +1287,18 @@ function getItemFormData(array $item = array(), array $options = array()) {
 }
 
 function getCopyElementsFormData($elementsField, $title = null) {
-	$data = array(
+	$data = [
 		'title' => $title,
 		'elements_field' => $elementsField,
-		'elements' => getRequest($elementsField, array()),
+		'elements' => getRequest($elementsField, []),
 		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_HOST_GROUP),
 		'copy_groupid' => getRequest('copy_groupid', 0),
-		'copy_targetid' => getRequest('copy_targetid', array()),
+		'copy_targetid' => getRequest('copy_targetid', []),
 		'hostid' => getRequest('hostid', 0),
-		'groups' => array(),
-		'hosts' => array(),
-		'templates' => array()
-	);
+		'groups' => [],
+		'hosts' => [],
+		'templates' => []
+	];
 
 	// validate elements
 	if (empty($data['elements']) || !is_array($data['elements'])) {
@@ -1264,14 +1309,14 @@ function getCopyElementsFormData($elementsField, $title = null) {
 
 	if ($data['copy_type'] == COPY_TYPE_TO_HOST_GROUP) {
 		// get groups
-		$data['groups'] = API::HostGroup()->get(array(
-			'output' => array('groupid', 'name')
-		));
+		$data['groups'] = API::HostGroup()->get([
+			'output' => ['groupid', 'name']
+		]);
 		order_result($data['groups'], 'name');
 	}
 	else {
 		// hosts or templates
-		$params = array('output' => array('name', 'groupid'));
+		$params = ['output' => ['name', 'groupid']];
 
 		if ($data['copy_type'] == COPY_TYPE_TO_HOST) {
 			$params['real_hosts'] = true;
@@ -1290,17 +1335,17 @@ function getCopyElementsFormData($elementsField, $title = null) {
 		}
 
 		if ($data['copy_type'] == COPY_TYPE_TO_TEMPLATE) {
-			$data['templates'] = API::Template()->get(array(
-				'output' => array('name', 'templateid'),
+			$data['templates'] = API::Template()->get([
+				'output' => ['name', 'templateid'],
 				'groupids' => $data['copy_groupid']
-			));
+			]);
 			order_result($data['templates'], 'name');
 		}
 		elseif ($data['copy_type'] == COPY_TYPE_TO_HOST) {
-			$data['hosts'] = API::Host()->get(array(
-				'output' => array('name', 'hostid'),
+			$data['hosts'] = API::Host()->get([
+				'output' => ['name', 'hostid'],
 				'groupids' => $data['copy_groupid']
-			));
+			]);
 			order_result($data['hosts'], 'name');
 		}
 	}
@@ -1309,36 +1354,46 @@ function getCopyElementsFormData($elementsField, $title = null) {
 }
 
 function getTriggerMassupdateFormData() {
-	$data = array(
-		'visible' => getRequest('visible', array()),
+	$data = [
+		'visible' => getRequest('visible', []),
 		'priority' => getRequest('priority', ''),
-		'dependencies' => getRequest('dependencies', array()),
+		'dependencies' => getRequest('dependencies', []),
 		'massupdate' => getRequest('massupdate', 1),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'g_triggerid' => getRequest('g_triggerid', array()),
+		'g_triggerid' => getRequest('g_triggerid', []),
 		'priority' => getRequest('priority', 0),
 		'config' => select_config(),
 		'hostid' => getRequest('hostid', 0)
-	);
+	];
 
-	// get dependencies
-	$data['dependencies'] = API::Trigger()->get(array(
-		'triggerids' => $data['dependencies'],
-		'output' => array('triggerid', 'flags', 'description'),
-		'preservekeys' => true,
-		'selectHosts' => array('hostid', 'name')
-	));
-	foreach ($data['dependencies'] as &$dependency) {
-		if (count($dependency['hosts']) > 1) {
-			order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+	if ($data['dependencies']) {
+		$dependencyTriggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description', 'flags'],
+			'selectHosts' => ['hostid', 'name'],
+			'triggerids' => $data['dependencies'],
+			'preservekeys' => true
+		]);
+
+		if ($data['parent_discoveryid']) {
+			$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
+				'output' => ['triggerid', 'description', 'flags'],
+				'selectHosts' => ['hostid', 'name'],
+				'triggerids' => $data['dependencies'],
+				'preservekeys' => true
+			]);
+			$data['dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
 		}
+		else {
+			$data['dependencies'] = $dependencyTriggers;
+		}
+	}
 
-		$dependency['hosts'] = array_values($dependency['hosts']);
-		$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
+	foreach ($data['dependencies'] as &$dependency) {
+		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
 	}
 	unset($dependency);
 
-	order_result($data['dependencies'], 'description');
+	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
 
 	return $data;
 }
@@ -1351,12 +1406,12 @@ function getTriggerMassupdateFormData() {
  * @return array
  */
 function getTriggerFormData($exprAction) {
-	$data = array(
+	$data = [
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh'),
 		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'dependencies' => getRequest('dependencies', array()),
-		'db_dependencies' => array(),
+		'dependencies' => getRequest('dependencies', []),
+		'db_dependencies' => [],
 		'triggerid' => getRequest('triggerid'),
 		'expression' => getRequest('expression', ''),
 		'expr_temp' => getRequest('expr_temp', ''),
@@ -1368,17 +1423,17 @@ function getTriggerFormData($exprAction) {
 		'url' => getRequest('url', ''),
 		'input_method' => getRequest('input_method', IM_ESTABLISHED),
 		'limited' => false,
-		'templates' => array(),
+		'templates' => [],
 		'hostid' => getRequest('hostid', 0)
-	);
+	];
 
 	if (!empty($data['triggerid'])) {
 		// get trigger
-		$options = array(
+		$options = [
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid'),
+			'selectHosts' => ['hostid'],
 			'triggerids' => $data['triggerid']
-		);
+		];
 		$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
 		$data['trigger'] = reset($trigger);
 
@@ -1404,11 +1459,10 @@ function getTriggerFormData($exprAction) {
 					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 				}
 
-				$data['templates'][] = new CLink(
-					CHtml::encode($db_triggers['name']),
-					$link,
-					'highlight underline weight_normal'
-				);
+				$data['templates'][] = (new CLink(CHtml::encode($db_triggers['name']), $link))
+					->addClass('highlight')
+					->addClass('underline')
+					->addClass('weight_normal');
 				$data['templates'][] = SPACE.'&rArr;'.SPACE;
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
@@ -1420,7 +1474,7 @@ function getTriggerFormData($exprAction) {
 
 		// select first host from triggers if gived not match
 		$hosts = $data['trigger']['hosts'];
-		if (count($hosts) > 0 && !in_array(array('hostid' => $data['hostid']), $hosts)) {
+		if (count($hosts) > 0 && !in_array(['hostid' => $data['hostid']], $hosts)) {
 			$host = reset($hosts);
 			$data['hostid'] = $host['hostid'];
 		}
@@ -1490,33 +1544,44 @@ function getTriggerFormData($exprAction) {
 		$data['expression_field_readonly'] = $data['limited'];
 	}
 
-	if (empty($data['parent_discoveryid'])) {
-		$data['db_dependencies'] = API::Trigger()->get(array(
+	if ($data['dependencies']) {
+		$dependencyTriggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description', 'flags'],
+			'selectHosts' => ['hostid', 'name'],
 			'triggerids' => $data['dependencies'],
-			'output' => array('triggerid', 'flags', 'description'),
-			'preservekeys' => true,
-			'selectHosts' => array('hostid', 'name')
-		));
-		foreach ($data['db_dependencies'] as &$dependency) {
-			if (count($dependency['hosts']) > 1) {
-				order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
-			}
+			'preservekeys' => true
+		]);
 
-			$dependency['hosts'] = array_values($dependency['hosts']);
-			$dependency['hostid'] = $dependency['hosts'][0]['hostid'];
+		if ($data['parent_discoveryid']) {
+			$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
+				'output' => ['triggerid', 'description', 'flags'],
+				'selectHosts' => ['hostid', 'name'],
+				'triggerids' => $data['dependencies'],
+				'preservekeys' => true
+			]);
+
+			$data['db_dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
 		}
-		unset($dependency);
-
-		order_result($data['db_dependencies'], 'description');
+		else {
+			$data['db_dependencies'] = $dependencyTriggers;
+		}
 	}
+
+	foreach ($data['db_dependencies'] as &$dependency) {
+		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
+	}
+	unset($dependency);
+
+	order_result($data['db_dependencies'], 'description');
+
 	return $data;
 }
 
 function get_timeperiod_form() {
-	$tblPeriod = new CTable(null, 'formElementTable');
+	$tblPeriod = new CTable();
 
 	// init new_timeperiod variable
-	$new_timeperiod = getRequest('new_timeperiod', array());
+	$new_timeperiod = getRequest('new_timeperiod', []);
 	$new = is_array($new_timeperiod);
 
 	if (is_array($new_timeperiod)) {
@@ -1528,7 +1593,7 @@ function get_timeperiod_form() {
 		}
 	}
 	if (!is_array($new_timeperiod)) {
-		$new_timeperiod = array();
+		$new_timeperiod = [];
 		$new_timeperiod['timeperiod_type'] = TIMEPERIOD_TYPE_ONETIME;
 	}
 	if (!isset($new_timeperiod['every'])) {
@@ -1633,7 +1698,7 @@ function get_timeperiod_form() {
 	$cmbType->addItem(TIMEPERIOD_TYPE_WEEKLY, _('Weekly'));
 	$cmbType->addItem(TIMEPERIOD_TYPE_MONTHLY, _('Monthly'));
 
-	$tblPeriod->addRow(array(_('Period type'), $cmbType));
+	$tblPeriod->addRow([_('Period type'), $cmbType]);
 
 	if ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_DAILY) {
 		$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
@@ -1641,68 +1706,73 @@ function get_timeperiod_form() {
 		$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
 		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
 		$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
-		$tblPeriod->addRow(array(_('Every day(s)'), new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3)));
+		$tblPeriod->addRow([_('Every day(s)'),
+			(new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 3))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		]);
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_WEEKLY) {
 		$tblPeriod->addItem(new CVar('new_timeperiod[month]', bindec($bit_month)));
 		$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
 		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
 		$tblPeriod->addItem(new CVar('new_timeperiod[month_date_type]', $new_timeperiod['month_date_type']));
-		$tblPeriod->addRow(array(_('Every week(s)'), new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2)));
+		$tblPeriod->addRow([_('Every week(s)'),
+			(new CNumericBox('new_timeperiod[every]', $new_timeperiod['every'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		]);
 
 		$tabDays = new CTable();
-		$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_mo]', $dayofweek[0], null, 1), _('Monday')));
-		$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_tu]', $dayofweek[1], null, 1), _('Tuesday')));
-		$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_we]', $dayofweek[2], null, 1), _('Wednesday')));
-		$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_th]', $dayofweek[3], null, 1), _('Thursday')));
-		$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_fr]', $dayofweek[4], null, 1), _('Friday')));
-		$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_sa]', $dayofweek[5], null, 1), _('Saturday')));
-		$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_su]', $dayofweek[6], null, 1), _('Sunday')));
-		$tblPeriod->addRow(array(_('Day of week'), $tabDays));
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')]);
+		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')]);
+		$tblPeriod->addRow([_('Day of week'), $tabDays]);
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
 		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
 
 		$tabMonths = new CTable();
-		$tabMonths->addRow(array(
-			new CCheckBox('new_timeperiod[month_jan]', $month[0], null, 1), _('January'),
+		$tabMonths->addRow([
+			(new CCheckBox('new_timeperiod[month_jan]'))->setChecked($month[0] == 1), _('January'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_jul]', $month[6], null, 1), _('July')
-		));
-		$tabMonths->addRow(array(
-			new CCheckBox('new_timeperiod[month_feb]', $month[1], null, 1), _('February'),
+			(new CCheckBox('new_timeperiod[month_jul]'))->setChecked($month[6] == 1), _('July')
+		]);
+		$tabMonths->addRow([
+			(new CCheckBox('new_timeperiod[month_feb]'))->setChecked($month[1] == 1), _('February'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_aug]', $month[7], null, 1), _('August')
-		));
-		$tabMonths->addRow(array(
-			new CCheckBox('new_timeperiod[month_mar]', $month[2], null, 1), _('March'),
+			(new CCheckBox('new_timeperiod[month_aug]'))->setChecked($month[7] == 1), _('August')
+		]);
+		$tabMonths->addRow([
+			(new CCheckBox('new_timeperiod[month_mar]'))->setChecked($month[2] == 1), _('March'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_sep]', $month[8], null, 1), _('September')
-		));
-		$tabMonths->addRow(array(
-			new CCheckBox('new_timeperiod[month_apr]', $month[3], null, 1), _('April'),
+			(new CCheckBox('new_timeperiod[month_sep]'))->setChecked($month[8] == 1), _('September')
+		]);
+		$tabMonths->addRow([
+			(new CCheckBox('new_timeperiod[month_apr]'))->setChecked($month[3] == 1), _('April'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_oct]', $month[9], null, 1), _('October')
-		));
-		$tabMonths->addRow(array(
-			new CCheckBox('new_timeperiod[month_may]', $month[4], null, 1), _('May'),
+			(new CCheckBox('new_timeperiod[month_oct]'))->setChecked($month[9] == 1), _('October')
+		]);
+		$tabMonths->addRow([
+			(new CCheckBox('new_timeperiod[month_may]'))->setChecked($month[4] == 1), _('May'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_nov]', $month[10], null, 1), _('November')
-		));
-		$tabMonths->addRow(array(
-			new CCheckBox('new_timeperiod[month_jun]', $month[5], null, 1), _('June'),
+			(new CCheckBox('new_timeperiod[month_nov]'))->setChecked($month[10] == 1), _('November')
+		]);
+		$tabMonths->addRow([
+			(new CCheckBox('new_timeperiod[month_jun]'))->setChecked($month[5] == 1), _('June'),
 			SPACE, SPACE,
-			new CCheckBox('new_timeperiod[month_dec]', $month[11], null, 1), _('December')
-		));
-		$tblPeriod->addRow(array(_('Month'), $tabMonths));
+			(new CCheckBox('new_timeperiod[month_dec]'))->setChecked($month[11] == 1), _('December')
+		]);
+		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
-		$tblPeriod->addRow(array(_('Date'), array(
-			new CRadioButton('new_timeperiod[month_date_type]', '0', null, null, !$new_timeperiod['month_date_type'], 'submit()'),
-			_('Day'),
-			SPACE,
-			new CRadioButton('new_timeperiod[month_date_type]', '1', null, null, $new_timeperiod['month_date_type'], 'submit()'),
-			_('Day of week')))
-		);
+		$tblPeriod->addRow([_('Date'),
+			(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
+				->addValue(_('Day'), 0, null, 'submit()')
+				->addValue(_('Day of week'), 1, null, 'submit()')
+				->setModern(true)
+		]);
 
 		if ($new_timeperiod['month_date_type'] > 0) {
 			$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
@@ -1714,23 +1784,25 @@ function get_timeperiod_form() {
 			$cmbCount->addItem(4, _('Fourth'));
 			$cmbCount->addItem(5, _('Last'));
 
-			$td = new CCol($cmbCount);
-			$td->setColSpan(2);
+			$td = (new CCol($cmbCount))->setColSpan(2);
 
 			$tabDays = new CTable();
 			$tabDays->addRow($td);
-			$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_mo]', $dayofweek[0], null, 1), _('Monday')));
-			$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_tu]', $dayofweek[1], null, 1), _('Tuesday')));
-			$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_we]', $dayofweek[2], null, 1), _('Wednesday')));
-			$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_th]', $dayofweek[3], null, 1), _('Thursday')));
-			$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_fr]', $dayofweek[4], null, 1), _('Friday')));
-			$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_sa]', $dayofweek[5], null, 1), _('Saturday')));
-			$tabDays->addRow(array(new CCheckBox('new_timeperiod[dayofweek_su]', $dayofweek[6], null, 1), _('Sunday')));
-			$tblPeriod->addRow(array(_('Day of week'), $tabDays));
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')]);
+			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')]);
+			$tblPeriod->addRow([_('Day of week'), $tabDays]);
 		}
 		else {
 			$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
-			$tblPeriod->addRow(array(_('Day of month'), new CNumericBox('new_timeperiod[day]', $new_timeperiod['day'], 2)));
+			$tblPeriod->addRow([_('Day of month'),
+				(new CNumericBox('new_timeperiod[day]', $new_timeperiod['day'], 2))
+					->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+			]);
 		}
 	}
 	else {
@@ -1744,42 +1816,47 @@ function get_timeperiod_form() {
 		$tblPeriod->addItem(new CVar('new_timeperiod[dayofweek]', bindec($bit_dayofweek)));
 
 		if (isset($_REQUEST['add_timeperiod'])) {
-			$date = array(
+			$date = [
 				'y' => getRequest('new_timeperiod_start_date_year'),
 				'm' => getRequest('new_timeperiod_start_date_month'),
 				'd' => getRequest('new_timeperiod_start_date_day'),
 				'h' => getRequest('new_timeperiod_start_date_hour'),
 				'i' => getRequest('new_timeperiod_start_date_minute')
-			);
+			];
 		}
 		else {
 			$date = zbxDateToTime($new_timeperiod['start_date']
 				? $new_timeperiod['start_date'] : date(TIMESTAMP_FORMAT_ZERO_TIME, time()));
 		}
 
-		$tblPeriod->addRow(array(_('Date'), createDateSelector('new_timeperiod_start_date', $date)));
+		$tblPeriod->addRow([_('Date'), createDateSelector('new_timeperiod_start_date', $date)]);
 	}
 
 	if ($new_timeperiod['timeperiod_type'] != TIMEPERIOD_TYPE_ONETIME) {
-		$tblPeriod->addRow(array(_('At (hour:minute)'), array(
-			new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2),
+		$tblPeriod->addRow([_('At (hour:minute)'), [
+			(new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			':',
-			new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2)))
-		);
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			(new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		]]);
 	}
 
 	$perHours = new CComboBox('new_timeperiod[period_hours]', $new_timeperiod['period_hours'], null, range(0, 23));
 	$perMinutes = new CComboBox('new_timeperiod[period_minutes]', $new_timeperiod['period_minutes'], null, range(0, 59));
-	$tblPeriod->addRow(array(
+	$tblPeriod->addRow([
 		_('Maintenance period length'),
-		array(
-			new CNumericBox('new_timeperiod[period_days]', $new_timeperiod['period_days'], 3),
+		[
+			(new CNumericBox('new_timeperiod[period_days]', $new_timeperiod['period_days'], 3))
+				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
 			_('Days').SPACE.SPACE,
 			$perHours,
 			_('Hours').SPACE.SPACE,
 			$perMinutes,
 			_('Minutes')
-	)));
+	]]);
 
 	return $tblPeriod;
 }

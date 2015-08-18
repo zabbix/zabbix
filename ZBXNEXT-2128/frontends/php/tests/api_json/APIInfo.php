@@ -23,14 +23,14 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 class API_JSON_APIInfo extends CZabbixTest {
 
 	public function testAPIInfo_VersionWithAuth() {
-		$result = $this->api_acall('apiinfo.version', array(), $debug);
+		$result = $this->api_acall('apiinfo.version', [], $debug);
 
 		$this->assertTrue(isset($result['result']), $debug);
 		$this->assertSame($result['result'], '2.5.0');
 	}
 
 	public function testAPIInfo_VersionWithoutAuth() {
-		$result = $this->api_call('apiinfo.version', array(), $debug);
+		$result = $this->api_call('apiinfo.version', [], $debug);
 
 		$this->assertTrue(isset($result['result']), $debug);
 		$this->assertSame($result['result'], '2.5.0');

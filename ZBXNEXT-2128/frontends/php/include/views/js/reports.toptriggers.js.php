@@ -1,6 +1,6 @@
 <script type="text/javascript">
 	/**
-	 * Set predefined time period in "Most busy triggers top 100" page filter.
+	 * Set predefined time period in "100 busiest triggers" page filter.
 	 *
 	 * @param int period
 	 */

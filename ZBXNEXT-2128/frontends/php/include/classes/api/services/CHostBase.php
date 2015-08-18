@@ -48,7 +48,7 @@ abstract class CHostBase extends CApiService {
 		// check if someone passed duplicate templates in the same query
 		$templateIdDuplicates = zbx_arrayFindDuplicates($templateIds);
 		if (!zbx_empty($templateIdDuplicates)) {
-			$duplicatesFound = array();
+			$duplicatesFound = [];
 			foreach ($templateIdDuplicates as $value => $count) {
 				$duplicatesFound[] = _s('template ID "%1$s" is passed %2$s times', $value, $count);
 			}
@@ -60,11 +60,11 @@ abstract class CHostBase extends CApiService {
 
 		// check if any templates linked to targets have more than one unique item key/application
 		foreach ($targetIds as $targetid) {
-			$linkedTpls = API::Template()->get(array(
+			$linkedTpls = API::Template()->get([
 				'nopermissions' => true,
-				'output' => array('templateid'),
+				'output' => ['templateid'],
 				'hostids' => $targetid
-			));
+			]);
 
 			$templateIdsAll = array_merge($templateIds, zbx_objectValues($linkedTpls, 'templateid'));
 
@@ -76,17 +76,17 @@ abstract class CHostBase extends CApiService {
 					' HAVING COUNT(i.itemid)>1'
 			);
 			if ($dbItem = DBfetch($dbItems)) {
-				$dbItemHost = API::Item()->get(array(
-					'output' => array('hostid'),
-					'filter' => array('key_' => $dbItem['key_']),
+				$dbItemHost = API::Item()->get([
+					'output' => ['hostid'],
+					'filter' => ['key_' => $dbItem['key_']],
 					'templateids' => $templateIdsAll
-				));
+				]);
 				$dbItemHost = reset($dbItemHost);
 
-				$template = API::Template()->get(array(
-					'output' => array('name'),
+				$template = API::Template()->get([
+					'output' => ['name'],
 					'templateids' => $dbItemHost['hostid']
-				));
+				]);
 
 				$template = reset($template);
 
@@ -98,15 +98,15 @@ abstract class CHostBase extends CApiService {
 
 		// get DB templates which exists in all targets
 		$res = DBselect('SELECT * FROM hosts_templates WHERE '.dbConditionInt('hostid', $targetIds));
-		$mas = array();
+		$mas = [];
 		while ($row = DBfetch($res)) {
 			if (!isset($mas[$row['templateid']])) {
-				$mas[$row['templateid']] = array();
+				$mas[$row['templateid']] = [];
 			}
 			$mas[$row['templateid']][$row['hostid']] = 1;
 		}
 		$targetIdCount = count($targetIds);
-		$commonDBTemplateIds = array();
+		$commonDBTemplateIds = [];
 		foreach ($mas as $templateId => $targetList) {
 			if (count($targetList) == $targetIdCount) {
 				$commonDBTemplateIds[] = $templateId;
@@ -116,7 +116,7 @@ abstract class CHostBase extends CApiService {
 		// check if there are any template with triggers which depends on triggers in templates which will be not linked
 		$commonTemplateIds = array_unique(array_merge($commonDBTemplateIds, $templateIds));
 		foreach ($templateIds as $templateid) {
-			$triggerids = array();
+			$triggerids = [];
 			$dbTriggers = get_triggers_by_hostid($templateid);
 			while ($trigger = DBfetch($dbTriggers)) {
 				$triggerids[$trigger['triggerid']] = $trigger['triggerid'];
@@ -133,10 +133,10 @@ abstract class CHostBase extends CApiService {
 				' AND '.dbConditionInt('h.hostid', $commonTemplateIds, true).
 				' AND h.status='.HOST_STATUS_TEMPLATE;
 			if ($dbDepHost = DBfetch(DBselect($sql))) {
-				$tmpTpls = API::Template()->get(array(
+				$tmpTpls = API::Template()->get([
 					'templateids' => $templateid,
 					'output'=> API_OUTPUT_EXTEND
-				));
+				]);
 				$tmpTpl = reset($tmpTpls);
 
 				self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -150,22 +150,22 @@ abstract class CHostBase extends CApiService {
 				' WHERE '.dbConditionInt('ht.hostid', $targetIds).
 				' AND '.dbConditionInt('ht.templateid', $templateIds)
 		);
-		$linked = array();
+		$linked = [];
 		while ($row = DBfetch($res)) {
 			if (!isset($linked[$row['hostid']])) {
-				$linked[$row['hostid']] = array();
+				$linked[$row['hostid']] = [];
 			}
 			$linked[$row['hostid']][$row['templateid']] = 1;
 		}
 
 		// add template linkages, if problems rollback later
-		$hostsLinkageInserts = array();
+		$hostsLinkageInserts = [];
 		foreach ($targetIds as $targetid) {
 			foreach ($templateIds as $templateid) {
 				if (isset($linked[$targetid]) && isset($linked[$targetid][$templateid])) {
 					continue;
 				}
-				$hostsLinkageInserts[] = array('hostid' => $targetid, 'templateid' => $templateid);
+				$hostsLinkageInserts[] = ['hostid' => $targetid, 'templateid' => $templateid];
 			}
 		}
 		DB::insert('hosts_templates', $hostsLinkageInserts);
@@ -197,13 +197,13 @@ abstract class CHostBase extends CApiService {
 		);
 
 		// build linkage graph and prepare list for $rootList generation
-		$graph = array();
-		$hasParentList = array();
-		$hasChildList = array();
-		$all = array();
+		$graph = [];
+		$hasParentList = [];
+		$hasChildList = [];
+		$all = [];
 		while ($row = DBfetch($res)) {
 			if (!isset($graph[$row['hostid']])) {
-				$graph[$row['hostid']] = array();
+				$graph[$row['hostid']] = [];
 			}
 			$graph[$row['hostid']][] = $row['templateid'];
 			$hasParentList[$row['templateid']] = $row['templateid'];
@@ -213,7 +213,7 @@ abstract class CHostBase extends CApiService {
 		}
 
 		// get list of templates without parents
-		$rootList = array();
+		$rootList = [];
 		foreach ($hasChildList as $parentId) {
 			if (!isset($hasParentList[$parentId])) {
 				$rootList[] = $parentId;
@@ -221,9 +221,9 @@ abstract class CHostBase extends CApiService {
 		}
 
 		// search cycles and double linkages in rooted parts of graph
-		$visited = array();
+		$visited = [];
 		foreach ($rootList as $root) {
-			$path = array();
+			$path = [];
 
 			// raise exception on cycle or double linkage
 			$this->checkCircularAndDoubleLinkage($graph, $root, $path, $visited);
@@ -238,33 +238,33 @@ abstract class CHostBase extends CApiService {
 	}
 
 	protected function unlink($templateids, $targetids = null) {
-		$cond = array('templateid' => $templateids);
+		$cond = ['templateid' => $templateids];
 		if (!is_null($targetids)) {
 			$cond['hostid'] =  $targetids;
 		}
 		DB::delete('hosts_templates', $cond);
 
 		if (!is_null($targetids)) {
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'hostids' => $targetids,
-				'output' => array('hostid', 'host'),
+				'output' => ['hostid', 'host'],
 				'nopermissions' => true,
-			));
+			]);
 		}
 		else{
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'templateids' => $templateids,
-				'output' => array('hostid', 'host'),
+				'output' => ['hostid', 'host'],
 				'nopermissions' => true,
-			));
+			]);
 		}
 
 		if (!empty($hosts)) {
-			$templates = API::Template()->get(array(
+			$templates = API::Template()->get([
 				'templateids' => $templateids,
-				'output' => array('hostid', 'host'),
+				'output' => ['hostid', 'host'],
 				'nopermissions' => true,
-			));
+			]);
 
 			$hosts = implode(', ', zbx_objectValues($hosts, 'host'));
 			$templates = implode(', ', zbx_objectValues($templates, 'host'));

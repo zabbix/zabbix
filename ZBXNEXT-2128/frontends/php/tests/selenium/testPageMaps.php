@@ -38,9 +38,9 @@ class testPageMaps extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF NETWORK MAPS');
 		$this->zbxTestTextPresent('Displaying');
 		$this->zbxTestTextNotPresent('Displaying 0');
-		$this->zbxTestTextPresent(array('Name', 'Width', 'Height', 'Edit'));
-		$this->zbxTestTextPresent(array($map['name'], $map['width'], $map['height']));
-		$this->zbxTestDropdownHasOptions('action', array('Delete selected', 'Export selected'));
+		$this->zbxTestTextPresent(['Name', 'Width', 'Height', 'Edit']);
+		$this->zbxTestTextPresent([$map['name'], $map['width'], $map['height']]);
+		$this->zbxTestDropdownHasOptions('action', ['Delete selected', 'Export selected']);
 	}
 
 	/**

@@ -650,18 +650,3 @@ function showModalWindow(title, text, buttons) {
 			}
 		});
 }
-
-/**
- * Disable setup step button.
- *
- * @param string buttonId
- */
-function disableSetupStepButton(buttonId) {
-	jQuery(buttonId)
-		.addClass('ui-state-disabled')
-		.addClass('ui-button-disabled')
-		.attr('disabled', 'disabled')
-		.attr('aria-disabled', 'true');
-
-	jQuery('.info_bar .ok').remove();
-}

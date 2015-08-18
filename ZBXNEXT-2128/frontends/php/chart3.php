@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/graphs.inc.php';
 
@@ -28,54 +27,54 @@ $page['type'] = PAGE_TYPE_IMAGE;
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
-	'stime' =>			array(T_ZBX_INT, O_OPT, P_NZERO,	null,				null),
-	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'httptestid' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	null,				null),
-	'http_item_type' =>	array(T_ZBX_INT, O_OPT, null,		null,				null),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null),
-	'height' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null),
-	'ymin_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
-	'ymax_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
-	'ymin_itemid' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				null),
-	'ymax_itemid' =>	array(T_ZBX_INT, O_OPT, null,		DB_ID,				null),
-	'legend' =>			array(T_ZBX_INT, O_OPT, null,		IN('0,1'),			null),
-	'showworkperiod' =>	array(T_ZBX_INT, O_OPT, null,		IN('0,1'),			null),
-	'showtriggers' =>	array(T_ZBX_INT, O_OPT, null,		IN('0,1'),			null),
-	'graphtype' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1'),			null),
-	'yaxismin' =>		array(T_ZBX_DBL, O_OPT, null,		null,				null),
-	'yaxismax' =>		array(T_ZBX_DBL, O_OPT, null,		null,				null),
-	'percent_left' =>	array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
-	'percent_right' =>	array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
-	'items' =>			array(T_ZBX_STR, O_OPT, null,		null,				null)
-);
+$fields = [
+	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
+	'stime' =>			[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
+	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,		null,				null],
+	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,		null,				null],
+	'httptestid' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
+	'http_item_type' =>	[T_ZBX_INT, O_OPT, null,		null,				null],
+	'name' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
+	'height' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
+	'ymin_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
+	'ymax_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
+	'ymin_itemid' =>	[T_ZBX_INT, O_OPT, null,		DB_ID,				null],
+	'ymax_itemid' =>	[T_ZBX_INT, O_OPT, null,		DB_ID,				null],
+	'legend' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'showworkperiod' =>	[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'showtriggers' =>	[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'graphtype' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'yaxismin' =>		[T_ZBX_DBL, O_OPT, null,		null,				null],
+	'yaxismax' =>		[T_ZBX_DBL, O_OPT, null,		null,				null],
+	'percent_left' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
+	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
+	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null]
+];
 $isDataValid = check_fields($fields);
 
 if ($httptestid = getRequest('httptestid', false)) {
-	if (!API::HttpTest()->isReadable(array($_REQUEST['httptestid']))) {
+	if (!API::HttpTest()->isReadable([$_REQUEST['httptestid']])) {
 		access_deny();
 	}
 
-	$color = array(
+	$color = [
 		'current' => 0,
-		0 => array('next' => '1'),
-		1 => array('color' => 'Red', 'next' => '2'),
-		2 => array('color' => 'Dark Green', 'next' => '3'),
-		3 => array('color' => 'Blue', 'next' => '4'),
-		4 => array('color' => 'Dark Yellow', 'next' => '5'),
-		5 => array('color' => 'Cyan', 'next' => '6'),
-		6 => array('color' => 'Gray', 'next' => '7'),
-		7 => array('color' => 'Dark Red', 'next' => '8'),
-		8 => array('color' => 'Green', 'next' => '9'),
-		9 => array('color' => 'Dark Blue', 'next' => '10'),
-		10 => array('color' => 'Yellow', 'next' => '11'),
-		11 => array('color' => 'Black', 'next' => '1')
-	);
+		0 => ['next' => '1'],
+		1 => ['color' => 'Red', 'next' => '2'],
+		2 => ['color' => 'Dark Green', 'next' => '3'],
+		3 => ['color' => 'Blue', 'next' => '4'],
+		4 => ['color' => 'Dark Yellow', 'next' => '5'],
+		5 => ['color' => 'Cyan', 'next' => '6'],
+		6 => ['color' => 'Gray', 'next' => '7'],
+		7 => ['color' => 'Dark Red', 'next' => '8'],
+		8 => ['color' => 'Green', 'next' => '9'],
+		9 => ['color' => 'Dark Blue', 'next' => '10'],
+		10 => ['color' => 'Yellow', 'next' => '11'],
+		11 => ['color' => 'Black', 'next' => '1']
+	];
 
-	$items = array();
+	$items = [];
 
 	$dbItems = DBselect(
 		'SELECT i.itemid'.
@@ -89,25 +88,23 @@ if ($httptestid = getRequest('httptestid', false)) {
 	while ($item = DBfetch($dbItems)) {
 		$itemColor = $color[$color['current'] = $color[$color['current']]['next']]['color'];
 
-		$items[] = array('itemid' => $item['itemid'], 'color' => $itemColor);
+		$items[] = ['itemid' => $item['itemid'], 'color' => $itemColor];
 	}
 
-	$httpTest = get_httptest_by_httptestid($httptestid);
-
-	$name = CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name']);
+	$name = getRequest('name', '');
 }
-elseif ($items = getRequest('items', array())) {
+elseif ($items = getRequest('items', [])) {
 	asort_by_key($items, 'sortorder');
 
-	$dbItems = API::Item()->get(array(
+	$dbItems = API::Item()->get([
 		'itemids' => zbx_objectValues($items, 'itemid'),
-		'output' => array('itemid'),
-		'filter' => array(
-			'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
-		),
+		'output' => ['itemid'],
+		'filter' => [
+			'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+		],
 		'webitems' => true,
 		'preservekeys' => true
-	));
+	]);
 
 	foreach ($items as $item) {
 		if (!isset($dbItems[$item['itemid']])) {
@@ -128,12 +125,12 @@ if ($isDataValid) {
 	$profileIdx = getRequest('profileIdx', 'web.httptest');
 	$profileIdx2 = getRequest('httptestid', getRequest('profileIdx2'));
 
-	$timeline = CScreenBase::calculateTime(array(
+	$timeline = CScreenBase::calculateTime([
 		'profileIdx' => $profileIdx,
 		'profileIdx2' => $profileIdx2,
 		'period' => getRequest('period'),
 		'stime' => getRequest('stime')
-	));
+	]);
 
 	CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
 

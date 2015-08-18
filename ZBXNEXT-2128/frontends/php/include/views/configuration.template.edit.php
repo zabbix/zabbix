@@ -27,20 +27,19 @@ if (!isset($_REQUEST['form_refresh'])) {
 $host = getRequest('template_name', '');
 $visiblename = getRequest('visiblename', '');
 $newgroup = getRequest('newgroup', '');
-$templateIds = getRequest('templates', array());
-$clear_templates = getRequest('clear_templates', array());
-$macros = getRequest('macros', array());
+$templateIds = getRequest('templates', []);
+$clear_templates = getRequest('clear_templates', []);
+$macros = getRequest('macros', []);
 
 $frm_title = _('Template');
 
 if ($data['templateId'] != 0) {
 	$frm_title .= SPACE.' ['.$this->data['dbTemplate']['name'].']';
 }
-$frmHost = new CForm();
-$frmHost->setName('tpl_for');
-
-$frmHost->addVar('form', $data['form']);
-$frmHost->addVar('groupid', $data['groupId']);
+$frmHost = (new CForm())
+	->setName('tpl_for')
+	->addVar('form', $data['form'])
+	->addVar('groupid', $data['groupId']);
 
 if ($data['templateId'] != 0) {
 	$frmHost->addVar('templateid', $data['templateId']);
@@ -55,9 +54,14 @@ if ($data['templateId'] != 0 && !hasRequest('form_refresh')) {
 		$visiblename = '';
 	}
 
-	$macros = order_macros($this->data['dbTemplate']['macros'], 'macro');
+	$macros = $this->data['dbTemplate']['macros'];
 	$templateIds = $this->data['original_templates'];
 }
+
+if ($data['show_inherited_macros']) {
+	$macros = mergeInheritedMacros($macros, getInheritedMacros($templateIds));
+}
+$macros = array_values(order_macros($macros, 'macro'));
 
 $clear_templates = array_intersect($clear_templates, array_keys($this->data['original_templates']));
 $clear_templates = array_diff($clear_templates, array_keys($templateIds));
@@ -65,22 +69,21 @@ natcasesort($templateIds);
 $frmHost->addVar('clear_templates', $clear_templates);
 
 // TEMPLATE WIDGET {
-$templateList = new CFormList('hostlist');
-
-// FORM ITEM : Template name text box [  ]
-$template_nameTB = new CTextBox('template_name', $host, 54, false, 128);
-$template_nameTB->attr('autofocus', 'autofocus');
-$templateList->addRow(_('Template name'), $template_nameTB);
-
-$visiblenameTB = new CTextBox('visiblename', $visiblename, 54, false, 128);
-$templateList->addRow(_('Visible name'), $visiblenameTB);
+$templateList = (new CFormList('hostlist'))
+	->addRow(_('Template name'), (new CTextBox('template_name', $host, false, 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setAttribute('autofocus', 'autofocus')
+	)
+	->addRow(_('Visible name'), (new CTextBox('visiblename', $visiblename, false, 128))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 
 $groupsTB = new CTweenBox($frmHost, 'groups', $data['groupIds'], 10);
 
 if ($data['form'] === 'update') {
 	// Add existing template groups to list and, depending on permissions show name as enabled or disabled.
 
-	$groupsInList = array();
+	$groupsInList = [];
 
 	foreach ($data['groupsAll'] as $group) {
 		if (isset($data['groupIds'][$group['groupid']])) {
@@ -112,14 +115,17 @@ else {
 $templateList->addRow(_('Groups'), $groupsTB->get(_('In groups'), _('Other groups')));
 
 // FORM ITEM : new group text box [  ]
-$newgroupTB = new CTextBox('newgroup', $newgroup);
-$newgroupTB->setAttribute('maxlength', 64);
-$tmp_label = _('New group');
+$new_group = (new CTextBox('newgroup', $newgroup))
+	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	->setAttribute('maxlength', 64);
+$new_group_label = _('New group');
 if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-	$tmp_label .= SPACE._('(Only super admins can create groups)');
-	$newgroupTB->setReadonly(true);
+	$new_group_label .= ' '._('(Only super admins can create groups)');
+	$new_group->setReadonly(true);
 }
-$templateList->addRow(SPACE, array($tmp_label, BR(), $newgroupTB), null, null, 'new');
+$templateList->addRow(new CLabel($new_group_label, 'newgroup'),
+	(new CSpan($new_group))->addClass(ZBX_STYLE_FORM_NEW_GROUP)
+);
 
 // FORM ITEM : linked Hosts tween box [  ] [  ]
 $cmbGroups = new CComboBox('twb_groupid', $data['twb_groupid'], 'submit()');
@@ -140,220 +146,222 @@ foreach ($data['hostsAll'] as $host) {
 	$hostsTB->addItem($host['hostid'], $host['name'], true, isset($data['hostsAllowed'][$host['hostid']]));
 }
 
-$templateList->addRow(_('Hosts / templates'), $hostsTB->Get(_('In'), array(
+$templateList->addRow(_('Hosts / templates'), $hostsTB->Get(_('In'), [
 	_('Other | group').SPACE,
 	$cmbGroups
-)));
+]));
 
-$templateList->addRow(_('Description'), new CTextArea('description', $this->data['description']));
+$templateList->addRow(_('Description'),
+	(new CTextArea('description', $this->data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // FULL CLONE {
 if ($data['form'] === 'full_clone') {
 	// template applications
-	$templateApps = API::Application()->get(array(
+	$templateApps = API::Application()->get([
 		'hostids' => $data['templateId'],
 		'inherited' => false,
 		'output' => API_OUTPUT_EXTEND,
 		'preservekeys' => true
-	));
+	]);
 	if (!empty($templateApps)) {
-		$applicationsList = array();
+		$applicationsList = [];
 		foreach ($templateApps as $tplAppId => $templateApp) {
 			$applicationsList[$tplAppId] = $templateApp['name'];
 		}
 		order_result($applicationsList);
 
-		$listBox = new CListBox('applications', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($applicationsList);
+		$listBox = (new CListBox('applications', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($applicationsList);
 		$templateList->addRow(_('Applications'), $listBox);
 	}
 
 	// items
-	$hostItems = API::Item()->get(array(
+	$hostItems = API::Item()->get([
 		'hostids' => $data['templateId'],
 		'inherited' => false,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'output' => array('itemid', 'key_', 'name', 'hostid')
-	));
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+		'output' => ['itemid', 'key_', 'name', 'hostid']
+	]);
 
 	if ($hostItems) {
 		$hostItems = CMacrosResolverHelper::resolveItemNames($hostItems);
 
-		$itemsList = array();
+		$itemsList = [];
 		foreach ($hostItems as $hostItem) {
 			$itemsList[$hostItem['itemid']] = $hostItem['name_expanded'];
 		}
 		order_result($itemsList);
 
-		$listBox = new CListBox('items', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($itemsList);
+		$listBox = (new CListBox('items', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($itemsList);
 
 		$templateList->addRow(_('Items'), $listBox);
 	}
 
 // Triggers
-	$hostTriggers = API::Trigger()->get(array(
+	$hostTriggers = API::Trigger()->get([
 		'inherited' => false,
 		'hostids' => $data['templateId'],
 		'output' => API_OUTPUT_EXTEND,
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL))
-	));
+		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]]
+	]);
 	if (!empty($hostTriggers)) {
-		$triggersList = array();
+		$triggersList = [];
 		foreach ($hostTriggers as $hostTrigger) {
 			$triggersList[$hostTrigger['triggerid']] = $hostTrigger['description'];
 		}
 		order_result($triggersList);
 
-		$listBox = new CListBox('triggers', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($triggersList);
+		$listBox = (new CListBox('triggers', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($triggersList);
 
 		$templateList->addRow(_('Triggers'), $listBox);
 	}
 
 // Graphs
-	$hostGraphs = API::Graph()->get(array(
+	$hostGraphs = API::Graph()->get([
 		'inherited' => false,
 		'hostids' => $data['templateId'],
-		'filter' => array('flags' => array(ZBX_FLAG_DISCOVERY_NORMAL)),
+		'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
 		'output' => API_OUTPUT_EXTEND,
-	));
+	]);
 	if (!empty($hostGraphs)) {
-		$graphsList = array();
+		$graphsList = [];
 		foreach ($hostGraphs as $hostGraph) {
 			$graphsList[$hostGraph['graphid']] = $hostGraph['name'];
 		}
 		order_result($graphsList);
 
-		$listBox = new CListBox('graphs', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($graphsList);
+		$listBox = (new CListBox('graphs', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($graphsList);
 
 		$templateList->addRow(_('Graphs'), $listBox);
 	}
 
 	// discovery rules
-	$hostDiscoveryRules = API::DiscoveryRule()->get(array(
+	$hostDiscoveryRules = API::DiscoveryRule()->get([
 		'inherited' => false,
 		'hostids' => $data['templateId'],
 		'output' => API_OUTPUT_EXTEND,
-	));
+	]);
 
 	if ($hostDiscoveryRules) {
 		$hostDiscoveryRules = CMacrosResolverHelper::resolveItemNames($hostDiscoveryRules);
 
-		$discoveryRuleList = array();
+		$discoveryRuleList = [];
 		foreach ($hostDiscoveryRules as $discoveryRule) {
 			$discoveryRuleList[$discoveryRule['itemid']] = $discoveryRule['name_expanded'];
 		}
 		order_result($discoveryRuleList);
 		$hostDiscoveryRuleids = array_keys($discoveryRuleList);
 
-		$listBox = new CListBox('discoveryRules', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($discoveryRuleList);
+		$listBox = (new CListBox('discoveryRules', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($discoveryRuleList);
 
 		$templateList->addRow(_('Discovery rules'), $listBox);
 
 		// item prototypes
-		$hostItemPrototypes = API::ItemPrototype()->get(array(
+		$hostItemPrototypes = API::ItemPrototype()->get([
 			'hostids' => $data['templateId'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
-		));
+		]);
 
 		if ($hostItemPrototypes) {
 			$hostItemPrototypes = CMacrosResolverHelper::resolveItemNames($hostItemPrototypes);
 
-			$prototypeList = array();
+			$prototypeList = [];
 			foreach ($hostItemPrototypes as $itemPrototype) {
 				$prototypeList[$itemPrototype['itemid']] = $itemPrototype['name_expanded'];
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('itemsPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('itemsPrototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Item prototypes'), $listBox);
 		}
 
 // Trigger prototypes
-		$hostTriggerPrototypes = API::TriggerPrototype()->get(array(
+		$hostTriggerPrototypes = API::TriggerPrototype()->get([
 			'hostids' => $data['templateId'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND
-		));
+		]);
 		if (!empty($hostTriggerPrototypes)) {
-			$prototypeList = array();
+			$prototypeList = [];
 			foreach ($hostTriggerPrototypes as $triggerPrototype) {
 				$prototypeList[$triggerPrototype['triggerid']] = $triggerPrototype['description'];
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('triggerprototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('triggerprototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Trigger prototypes'), $listBox);
 		}
 
 // Graph prototypes
-		$hostGraphPrototypes = API::GraphPrototype()->get(array(
+		$hostGraphPrototypes = API::GraphPrototype()->get([
 			'hostids' => $data['templateId'],
 			'discoveryids' => $hostDiscoveryRuleids,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
-		));
+		]);
 		if (!empty($hostGraphPrototypes)) {
-			$prototypeList = array();
+			$prototypeList = [];
 			foreach ($hostGraphPrototypes as $graphPrototype) {
 				$prototypeList[$graphPrototype['graphid']] = $graphPrototype['name'];
 			}
 			order_result($prototypeList);
 
-			$listBox = new CListBox('graphPrototypes', null, 8);
-			$listBox->setAttribute('disabled', 'disabled');
-			$listBox->addItems($prototypeList);
+			$listBox = (new CListBox('graphPrototypes', null, 8))
+				->setAttribute('disabled', 'disabled')
+				->addItems($prototypeList);
 
 			$templateList->addRow(_('Graph prototypes'), $listBox);
 		}
 	}
 
 	// screens
-	$screens = API::TemplateScreen()->get(array(
+	$screens = API::TemplateScreen()->get([
 		'inherited' => false,
 		'templateids' => $data['templateId'],
-		'output' => array('screenid', 'name'),
-	));
+		'output' => ['screenid', 'name'],
+	]);
 	if (!empty($screens)) {
-		$screensList = array();
+		$screensList = [];
 		foreach ($screens as $screen) {
 			$screensList[$screen['screenid']] = $screen['name'];
 		}
 		order_result($screensList);
 
-		$listBox = new CListBox('screens', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($screensList);
+		$listBox = (new CListBox('screens', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($screensList);
 
 		$templateList->addRow(_('Screens'), $listBox);
 	}
 
 	// web scenarios
-	$httpTests = API::HttpTest()->get(array(
-		'output' => array('httptestid', 'name'),
+	$httpTests = API::HttpTest()->get([
+		'output' => ['httptestid', 'name'],
 		'hostids' => $data['templateId'],
 		'inherited' => false
-	));
+	]);
 
 	if ($httpTests) {
-		$httpTestList = array();
+		$httpTestList = [];
 
 		foreach ($httpTests as $httpTest) {
 			$httpTestList[$httpTest['httptestid']] = $httpTest['name'];
@@ -361,9 +369,9 @@ if ($data['form'] === 'full_clone') {
 
 		order_result($httpTestList);
 
-		$listBox = new CListBox('httpTests', null, 8);
-		$listBox->setAttribute('disabled', 'disabled');
-		$listBox->addItems($httpTestList);
+		$listBox = (new CListBox('httpTests', null, 8))
+			->setAttribute('disabled', 'disabled')
+			->addItems($httpTestList);
 		$templateList->addRow(_('Web scenarios'), $listBox);
 	}
 }
@@ -376,89 +384,90 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // } TEMPLATE WIDGET
 
 // TEMPLATES{
-$tmplList = new CFormList('tmpllist');
+$tmplList = new CFormList();
 
-// create linked template table
-$linkedTemplateTable = new CTable(_('No templates linked.'), 'formElementTable');
-$linkedTemplateTable->attr('id', 'linkedTemplateTable');
-$linkedTemplateTable->setHeader(array(_('Name'), _('Action')));
+$ignoredTemplates = [];
 
-$ignoredTemplates = array();
+$linkedTemplateTable = (new CTable())
+	->setNoDataMessage(_('No templates linked.'))
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
-	$templateLink = new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']);
-	$templateLink->setTarget('_blank');
+	$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+		->setTarget('_blank');
 
-	$unlinkButton = new CSubmit('unlink['.$template['templateid'].']', _('Unlink'), null, 'link_menu');
-	$unlinkAndClearButton = new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear'), null,
-		'link_menu'
-	);
-	$unlinkAndClearButton->addStyle('margin-left: 8px');
+	$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
+	if (isset($data['original_templates'][$template['templateid']]) && !$cloneOrFullClone) {
+		$unlinkAndClearButton =
+			(new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addStyle('margin-left: 8px');
+	}
+	else {
+		$unlinkAndClearButton = null;
+	}
 
-	$linkedTemplateTable->addRow(
-		array(
-			$templateLink,
-			array(
-				$unlinkButton,
-				(isset($data['original_templates'][$template['templateid']]) && !$cloneOrFullClone)
-					? $unlinkAndClearButton
-					: null
-			)
-		),
-		null,
+	$linkedTemplateTable->addRow([$templateLink, [$unlinkButton, $unlinkAndClearButton]], null,
 		'conditions_'.$template['templateid']
 	);
 
 	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
-$tmplList->addRow(_('Linked templates'), new CDiv($linkedTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
-
-// create new linked template table
-$newTemplateTable = new CTable(null, 'formElementTable');
-$newTemplateTable->attr('id', 'newTemplateTable');
-$newTemplateTable->attr('style', 'min-width: 400px;');
-
-$newTemplateTable->addRow(array(new CMultiSelect(array(
-	'name' => 'add_templates[]',
-	'objectName' => 'templates',
-	'ignored' => $ignoredTemplates,
-	'popup' => array(
-		'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-			'&dstfld1=add_templates_&templated_hosts=1&multiselect=1',
-		'width' => 450,
-		'height' => 450
-	)
-))));
-
-$newTemplateTable->addRow(
-	array(
-		new CSubmit('add_template', _('Add'), null, 'link_menu')
-	)
+$tmplList->addRow(_('Linked templates'),
+	(new CDiv($linkedTemplateTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
-$tmplList->addRow(_('Link new templates'), new CDiv($newTemplateTable, 'template-link-block objectgroup inlineblock border_dotted ui-corner-all'));
+// create new linked template table
+$newTemplateTable = (new CTable())
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'add_templates[]',
+			'objectName' => 'templates',
+			'ignored' => $ignoredTemplates,
+			'popup' => [
+				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	])
+	->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
+
+$tmplList->addRow(_('Link new templates'),
+	(new CDiv($newTemplateTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
 // } TEMPLATES
 
 // macros
-if (empty($macros)) {
-	$macros = array(array('macro' => '', 'value' => ''));
+if (!$macros) {
+	$macro = ['macro' => '', 'value' => ''];
+	if ($data['show_inherited_macros']) {
+		$macro['type'] = MACRO_TYPE_HOSTMACRO;
+	}
+	$macros[] = $macro;
 }
-$macrosView = new CView('common.macros', array(
-	'macros' => $macros
-));
+
+$macrosView = new CView('hostmacros', [
+	'macros' => $macros,
+	'show_inherited_macros' => $data['show_inherited_macros'],
+	'readonly' => false
+]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
-$frmHost->addItem($divTabs);
 
 // Footer
 if ($data['templateId'] != 0 && $data['form'] !== 'full_clone') {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array(
+		[
 			new CSubmit('clone', _('Clone')),
 			new CSubmit('full_clone', _('Full clone')),
 			new CButtonDelete(_('Delete template?'), url_param('form').url_param('templateid').url_param('groupid')),
@@ -469,14 +478,16 @@ if ($data['templateId'] != 0 && $data['form'] !== 'full_clone') {
 				url_param('form').url_param('templateid').url_param('groupid')
 			),
 			new CButtonCancel(url_param('groupid'))
-		)
+		]
 	));
 }
 else {
-	$frmHost->addItem(makeFormFooter(
+	$divTabs->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('groupid')))
+		[new CButtonCancel(url_param('groupid'))]
 	));
 }
+
+$frmHost->addItem($divTabs);
 
 return $frmHost;

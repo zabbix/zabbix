@@ -233,7 +233,7 @@ class testFormHost extends CWebTest {
 		$this->zbxTestTextPresent('Host deleted');
 
 		// check if all records have been deleted
-		$tables=array('hosts','items','applications','interface','hostmacro','hosts_groups','hosts_templates','maintenances_hosts','host_inventory');
+		$tables=['hosts','items','applications','interface','hostmacro','hosts_groups','hosts_templates','maintenances_hosts','host_inventory'];
 		foreach ($tables as $table) {
 			$count=DBcount("select * from $table where hostid=$hostid");
 			$this->assertEquals(0, $count, "Records from table '$table' have not been deleted.");

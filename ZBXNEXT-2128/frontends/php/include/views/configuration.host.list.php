@@ -19,103 +19,73 @@
 **/
 
 
-$hostWidget = new CWidget(null, 'host-list');
-
-$frmForm = new CForm();
-$frmForm->cleanItems();
-$frmForm->addItem(new CDiv(array(
-	new CSubmit('form', _('Create host')),
-	new CButton('form', _('Import'), 'redirect("conf.import.php?rules_preset=host")')
-)));
-$frmForm->addItem(new CVar('groupid', $data['groupId'], 'filter_groupid_id'));
-
-$hostWidget->addPageHeader(_('CONFIGURATION OF HOSTS'), $frmForm);
-
-$frmGroup = new CForm('get');
-$frmGroup->addItem(array(_('Group').' ', $data['pageFilter']->getGroupsCB()));
-
-$hostWidget->addHeader(_('Hosts'), $frmGroup);
-$hostWidget->addHeaderRowNumber();
+$widget = (new CWidget())
+	->setTitle(_('Hosts'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $data['pageFilter']->getGroupsCB()])
+			->addItem(new CSubmit('form', _('Create host')))
+			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=host")'))
+		)
+	);
 
 // filter
-$filterTable = new CTable('', 'filter filter-center');
-$filterTable->addRow(array(
-	array(array(bold(_('Name')),' '._('like').' '), new CTextBox('filter_host', $data['filter']['host'], 20)),
-	array(array(bold(_('DNS')),' '._('like').' '), new CTextBox('filter_dns', $data['filter']['dns'], 20)),
-	array(array(bold(_('IP')),' '._('like').' '), new CTextBox('filter_ip', $data['filter']['ip'], 20)),
-	array(bold(_('Port').' '), new CTextBox('filter_port', $data['filter']['port'], 20))
-));
+$filter = (new CFilter('web.hosts.filter.state'))
+	->addColumn((new CFormList())->addRow(_('Name like'),
+		(new CTextBox('filter_host', $data['filter']['host']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('DNS like'),
+		(new CTextBox('filter_dns', $data['filter']['dns']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('IP like'),
+		(new CTextBox('filter_ip', $data['filter']['ip']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	))
+	->addColumn((new CFormList())->addRow(_('Port like'),
+		(new CTextBox('filter_port', $data['filter']['port']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+	));
 
-$filterButton = new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();',
-	'jqueryinput shadow'
-);
-$filterButton->main();
-
-$resetButton = new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();',
-	'jqueryinput shadow'
-);
-
-$divButtons = new CDiv(array($filterButton, $resetButton));
-$divButtons->addStyle('padding: 4px 0;');
-
-$filterTable->addRow(new CCol($divButtons, 'controls', 4));
-
-$filterForm = new CForm('get');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addItem($filterTable);
-
-$hostWidget->addFlicker($filterForm, CProfile::get('web.hosts.filter.state', 0));
+$widget->addItem($filter);
 
 // table hosts
-$form = new CForm();
-$form->setName('hosts');
+$form = (new CForm())->setName('hosts');
 
-$table = new CTableInfo(_('No hosts found.'));
-$table->setHeader(array(
-	new CCheckBox('all_hosts', null, "checkAll('".$form->getName()."', 'all_hosts', 'hosts');"),
-	make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
-	_('Applications'),
-	_('Items'),
-	_('Triggers'),
-	_('Graphs'),
-	_('Discovery'),
-	_('Web'),
-	_('Interface'),
-	_('Templates'),
-	make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
-	_('Availability')
-));
+$table = (new CTableInfo())
+	->setHeader([
+		(new CColHeader(
+			(new CCheckBox('all_hosts'))->onClick("checkAll('".$form->getName()."', 'all_hosts', 'hosts');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		make_sorting_header(_('Name'), 'name', $data['sortField'], $data['sortOrder']),
+		_('Applications'),
+		_('Items'),
+		_('Triggers'),
+		_('Graphs'),
+		_('Discovery'),
+		_('Web'),
+		_('Interface'),
+		_('Templates'),
+		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
+		_('Availability'),
+		_('Info')
+	]);
 
-$currentTime = time();
+$current_time = time();
 
 foreach ($data['hosts'] as $host) {
 	$interface = reset($host['interfaces']);
 
-	$applications = array(new CLink(_('Applications'),
-		'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']), ' ('.$host['applications'].')'
-	);
-	$items = array(new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']), ' ('.$host['items'].')');
-	$triggers = array(new CLink(_('Triggers'),
-		'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']), ' ('.$host['triggers'].')'
-	);
-	$graphs = array(new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
-		' ('.$host['graphs'].')'
-	);
-	$discoveries = array(new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
-		' ('.$host['discoveries'].')'
-	);
-	$httpTests = array(new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']), ' ('.$host['httpTests'].')');
+	$description = [];
 
-	$description = array();
-
-	if (isset($data['proxies'][$host['proxy_hostid']])) {
-		$description[] = $data['proxies'][$host['proxy_hostid']]['host'].NAME_DELIMITER;
+	if ($host['proxy_hostid'] != 0) {
+		$description[] = $data['proxies'][$host['proxy_hostid']]['host'];
+		$description[] = NAME_DELIMITER;
 	}
 	if ($host['discoveryRule']) {
-		$description[] = new CLink($host['discoveryRule']['name'],
-			'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid'], 'parent-discovery'
-		);
+		$description[] = (new CLink(
+			$host['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$host['discoveryRule']['itemid']
+		))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_ORANGE);
 		$description[] = NAME_DELIMITER;
 	}
 
@@ -131,11 +101,11 @@ foreach ($data['hosts'] as $host) {
 	if ($host['status'] == HOST_STATUS_MONITORED) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			$statusCaption = _('In maintenance');
-			$statusClass = 'orange';
+			$statusClass = ZBX_STYLE_ORANGE;
 		}
 		else {
 			$statusCaption = _('Enabled');
-			$statusClass = 'enabled';
+			$statusClass = ZBX_STYLE_GREEN;
 		}
 
 		$statusScript = 'return Confirm('.CJs::encodeJson(_('Disable host?')).');';
@@ -145,85 +115,118 @@ foreach ($data['hosts'] as $host) {
 		$statusCaption = _('Disabled');
 		$statusUrl = 'hosts.php?hosts[]='.$host['hostid'].'&action=host.massenable'.url_param('groupid');
 		$statusScript = 'return Confirm('.CJs::encodeJson(_('Enable host?')).');';
-		$statusClass = 'disabled';
+		$statusClass = ZBX_STYLE_RED;
 	}
 
-	$status = new CLink($statusCaption, $statusUrl, $statusClass, $statusScript);
+	$status = (new CLink($statusCaption, $statusUrl))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass($statusClass)
+		->onClick($statusScript);
 
-	if (empty($host['parentTemplates'])) {
-		$hostTemplates = '-';
+	order_result($host['parentTemplates'], 'name');
+
+	$hostTemplates = [];
+	$i = 0;
+
+	foreach ($host['parentTemplates'] as $template) {
+		$i++;
+
+		if ($i > $data['config']['max_in_table']) {
+			$hostTemplates[] = ' &hellip;';
+
+			break;
+		}
+
+		$caption = [
+			(new CLink(
+				CHtml::encode($template['name']), 'templates.php?form=update&templateid='.$template['templateid']
+			))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREY)
+		];
+
+		$parentTemplates = $data['templates'][$template['templateid']]['parentTemplates'];
+		if ($parentTemplates) {
+			order_result($parentTemplates, 'name');
+
+			$caption[] = ' (';
+			foreach ($parentTemplates as $parentTemplate) {
+				$caption[] = (new CLink(
+					CHtml::encode($parentTemplate['name']),
+					'templates.php?form=update&templateid='.$parentTemplate['templateid']
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREY);
+				$caption[] = ', ';
+			}
+			array_pop($caption);
+
+			$caption[] = ')';
+		}
+
+		if ($hostTemplates) {
+			$hostTemplates[] = ', ';
+		}
+
+		$hostTemplates[] = $caption;
+	}
+
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
+		$lifetime_indicator = getHostLifetimeIndicator($current_time, $host['hostDiscovery']['ts_delete']);
 	}
 	else {
-		order_result($host['parentTemplates'], 'name');
-
-		$hostTemplates = array();
-		$i = 0;
-
-		foreach ($host['parentTemplates'] as $template) {
-			$i++;
-
-			if ($i > $data['config']['max_in_table']) {
-				$hostTemplates[] = ' &hellip;';
-
-				break;
-			}
-
-			$caption = array(new CLink(
-				CHtml::encode($template['name']),
-				'templates.php?form=update&templateid='.$template['templateid'],
-				'unknown'
-			));
-
-			$parentTemplates = $data['templates'][$template['templateid']]['parentTemplates'];
-			if ($parentTemplates) {
-				order_result($parentTemplates, 'name');
-
-				$caption[] = ' (';
-				foreach ($parentTemplates as $parentTemplate) {
-					$caption[] = new CLink(CHtml::encode($parentTemplate['name']),
-						'templates.php?form=update&templateid='.$parentTemplate['templateid'], 'unknown'
-					);
-					$caption[] = ', ';
-				}
-				array_pop($caption);
-
-				$caption[] = ')';
-			}
-
-			if ($hostTemplates) {
-				$hostTemplates[] = ', ';
-			}
-
-			$hostTemplates[] = $caption;
-		}
+		$lifetime_indicator = '';
 	}
 
-	$table->addRow(array(
-		new CCheckBox('hosts['.$host['hostid'].']', null, null, $host['hostid']),
-		$description,
-		$applications,
-		$items,
-		$triggers,
-		$graphs,
-		$discoveries,
-		$httpTests,
+	$table->addRow([
+		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
+		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
+		[
+			new CLink(_('Applications'), 'applications.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['applications'])
+		],
+		[
+			new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['items'])
+		],
+		[
+			new CLink(_('Triggers'), 'triggers.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['triggers'])
+		],
+		[
+			new CLink(_('Graphs'), 'graphs.php?groupid='.$data['groupId'].'&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['graphs'])
+		],
+		[
+			new CLink(_('Discovery'), 'host_discovery.php?&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['discoveries'])
+		],
+		[
+			new CLink(_('Web'), 'httpconf.php?&hostid='.$host['hostid']),
+			CViewHelper::showNum($host['httpTests'])
+		],
 		$hostInterface,
-		new CCol($hostTemplates, 'wraptext'),
+		$hostTemplates,
 		$status,
-		getAvailabilityTable($host, $currentTime)
-	));
+		getHostAvailabilityTable($host),
+		$lifetime_indicator
+	]);
 }
 
-$form->addItem(array($data['paging'], $table, $data['paging'], get_table_header(new CActionButtonList('action', 'hosts',
-	array(
-		'host.massenable' => array('name' => _('Enable'), 'confirm' => _('Enable selected hosts?')),
-		'host.massdisable' => array('name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')),
-		'host.export' => array('name' => _('Export')),
-		'host.massupdateform' => array('name' => _('Mass update')),
-		'host.massdelete' => array('name' => _('Delete'), 'confirm' => _('Delete selected hosts?'))
+$form->addItem([
+	$table,
+	$data['paging'],
+	new CActionButtonList('action', 'hosts',
+		[
+			'host.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
+			'host.massdisable' => ['name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')],
+			'host.export' => ['name' => _('Export')],
+			'host.massupdateform' => ['name' => _('Mass update')],
+			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
+		]
 	)
-))));
+]);
 
-$hostWidget->addItem($form);
+$widget->addItem($form);
 
-return $hostWidget;
+return $widget;

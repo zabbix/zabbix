@@ -36,7 +36,7 @@ class CHtml {
 	 */
 	public static function encode($data) {
 		if (is_array($data)) {
-			$rs = array();
+			$rs = [];
 			foreach ($data as $key => $value) {
 				$rs[$key] = self::encode($value);
 			}

@@ -100,7 +100,8 @@ var timeControl = {
 				);
 
 				// scrollbar
-				var width = get_bodywidth() - 30;
+				var width = get_bodywidth() - 100;
+
 				if (!is_number(width)) {
 					width = 900;
 				}
@@ -463,7 +464,7 @@ var CScrollBar = Class.create({
 
 	size: {
 		scrollline:		null,	// scroll line width
-		barminwidth:	21		// bar minimal width
+		barminwidth:	40		// bar minimal width
 	},
 
 	position: {
@@ -493,7 +494,7 @@ var CScrollBar = Class.create({
 
 			// variable initialization
 			this.ghostBox = new CGhostBox(this.dom.ghost);
-			this.size.scrollline = width - 36; // border (17 * 2) + 2 = 36
+			this.size.scrollline = jQuery(this.dom.overlevel).width();
 			this.px2sec = (timeControl.timeline.endtime() - timeControl.timeline.starttime()) / this.size.scrollline;
 
 			// additional dom objects
@@ -669,13 +670,13 @@ var CScrollBar = Class.create({
 		if (width < this.size.barminwidth) {
 			width = this.size.barminwidth;
 		}
+		else if (width + 2 > this.size.scrollline) {
+			width = this.size.scrollline - 2;
+		}
 
 		// left min
-		if ((right - width) < 0) {
-			if (width < this.size.barminwidth) {
-				width = this.size.barminwidth;
-			}
-			right = width;
+		if ((right - width - 2) < 0) {
+			right = width + 2;
 
 			// actual bar dimensions shouldn't be over side limits
 			rightSide = right;
@@ -683,9 +684,6 @@ var CScrollBar = Class.create({
 
 		// right max
 		if (right > this.size.scrollline) {
-			if (width < this.size.barminwidth) {
-				width = this.size.barminwidth;
-			}
 			right = this.size.scrollline;
 
 			// actual bar dimensions shouldn't be over side limits
@@ -699,7 +697,7 @@ var CScrollBar = Class.create({
 
 		// set actual bar position
 		this.dom.bar.style.width = width + 'px';
-		this.dom.bar.style.left = (right - width) + 'px';
+		this.dom.bar.style.left = (right - jQuery(this.dom.bar).outerWidth()) + 'px';
 
 		// set timeline to given dimensions
 		this.position.bar.left = rightSide - periodWidth;
@@ -725,8 +723,8 @@ var CScrollBar = Class.create({
 		this.dom.ghost.style.width = dims.width + 'px';
 
 		// arrows
-		this.dom.left_arr.style.left = (dims.left - 4) + 'px';
-		this.dom.right_arr.style.left = (dims.left + dims.width - 3) + 'px';
+		this.dom.left_arr.style.left = (dims.left + 1) + 'px';
+		this.dom.right_arr.style.left = (dims.left + 1 + dims.width - jQuery(this.dom.right_arr).outerWidth()) + 'px';
 
 		this.position.ghost = getDimensions(this.dom.ghost);
 	},
@@ -862,13 +860,8 @@ var CScrollBar = Class.create({
 
 	// <left arr>
 	make_left_arr_dragable: function(element) {
-		var pD = {
-			left: jQuery(this.dom.overlevel).offset().left,
-			width: jQuery(this.dom.overlevel).width()
-		};
-
 		jQuery(element).draggable({
-			containment: [pD.left - 4, 0, pD.width + pD.left - 4, 0],
+			containment: 'parent',
 			axis: 'x',
 			start: this.leftArrowDragStart.bind(this),
 			drag: this.leftArrowDragChange.bind(this),
@@ -912,13 +905,8 @@ var CScrollBar = Class.create({
 
 	// <right arr>
 	make_right_arr_dragable: function(element) {
-		var pD = {
-			left: jQuery(this.dom.overlevel).offset().left,
-			width: jQuery(this.dom.overlevel).width()
-		};
-
 		jQuery(element).draggable({
-			containment: [pD.left - 4, 0, pD.width + pD.left - 5, 0],
+			containment: 'parent',
 			axis: 'x',
 			start: this.rightArrowDragStart.bind(this),
 			drag: this.rightArrowDragChange.bind(this),
@@ -1019,11 +1007,8 @@ var CScrollBar = Class.create({
 			new_period = this.roundTime(new_period) - this.getTZOffset(new_period);
 		}
 
-		var right = (this.ghostBox.sideToMove == 1 && this.ghostBox.flip >= 0) || (this.ghostBox.sideToMove == 0 && this.ghostBox.flip < 0);
-		var left = (this.ghostBox.sideToMove == 0 && this.ghostBox.flip >= 0) || (this.ghostBox.sideToMove == 1 && this.ghostBox.flip < 0);
-
 		// hack for bars most right position
-		if (dim.right == this.size.scrollline) {
+		if (dim.right + 2 == this.size.scrollline) {
 			if (dim.width != this.position.bar.width) {
 				this.position.bar.width = dim.width;
 				timeControl.timeline.period(new_period);
@@ -1032,10 +1017,10 @@ var CScrollBar = Class.create({
 			timeControl.timeline.setNow();
 		}
 		else {
-			if (right) {
+			if (this.ghostBox.sideToMove == 1) {
 				new_usertime = this.ghostBox.userstartime + new_period;
 			}
-			else if (left) {
+			else if (this.ghostBox.sideToMove == 0) {
 				new_usertime = this.ghostBox.userstartime;
 			}
 
@@ -1138,8 +1123,8 @@ var CScrollBar = Class.create({
 			caption = formatTimestamp(zooms[key], false, true);
 			caption = caption.split(' ', 2)[0];
 
-			this.dom.linklist[links] = document.createElement('span');
-			this.dom.linklist[links].className = 'link';
+			this.dom.linklist[links] = document.createElement('a');
+			this.dom.linklist[links].className = 'link-action';
 			this.dom.linklist[links].setAttribute('zoom', zooms[key]);
 			this.dom.linklist[links].appendChild(document.createTextNode(caption));
 			this.dom.links.appendChild(this.dom.linklist[links]);
@@ -1148,8 +1133,8 @@ var CScrollBar = Class.create({
 			links++;
 		}
 
-		this.dom.linklist[links] = document.createElement('span');
-		this.dom.linklist[links].className = 'link';
+		this.dom.linklist[links] = document.createElement('a');
+		this.dom.linklist[links].className = 'link-action';
 		this.dom.linklist[links].setAttribute('zoom', this.maxperiod);
 		this.dom.linklist[links].appendChild(document.createTextNode(locale['S_ALL_S']));
 		this.dom.links.appendChild(this.dom.linklist[links]);
@@ -1186,8 +1171,8 @@ var CScrollBar = Class.create({
 			caption = formatTimestamp(moves[i], false, true);
 			caption = caption.split(' ', 2)[0];
 
-			this.dom.nav_linklist[links] = document.createElement('span');
-			this.dom.nav_linklist[links].className = 'link';
+			this.dom.nav_linklist[links] = document.createElement('a');
+			this.dom.nav_linklist[links].className = 'link-action';
 			this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 			this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
 			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
@@ -1209,8 +1194,8 @@ var CScrollBar = Class.create({
 			caption = formatTimestamp(moves[i], false, true);
 			caption = caption.split(' ', 2)[0];
 
-			this.dom.nav_linklist[links] = document.createElement('span');
-			this.dom.nav_linklist[links].className = 'link';
+			this.dom.nav_linklist[links] = document.createElement('a');
+			this.dom.nav_linklist[links].className = 'link-action';
 			this.dom.nav_linklist[links].setAttribute('nav', moves[i]);
 			this.dom.nav_linklist[links].appendChild(document.createTextNode(caption));
 			this.dom.nav_links.appendChild(this.dom.nav_linklist[links]);
@@ -1233,23 +1218,17 @@ var CScrollBar = Class.create({
 				var linkzoom = this.dom.linklist[i].getAttribute('zoom');
 
 				if (linkzoom == period) {
-					this.dom.linklist[i].style.textDecoration = 'none';
-					this.dom.linklist[i].style.fontWeight = 'bold';
-					this.dom.linklist[i].style.fontSize = '11px';
+					this.dom.linklist[i].className = 'link-action selected';
 				}
 				else {
-					this.dom.linklist[i].style.textDecoration = 'underline';
-					this.dom.linklist[i].style.fontWeight = 'normal';
-					this.dom.linklist[i].style.fontSize = '10px';
+					this.dom.linklist[i].className = 'link-action';
 				}
 			}
 		}
 
 		i = this.dom.linklist.length - 1;
 		if (period == (timeControl.timeline.endtime() - timeControl.timeline.starttime())) {
-			this.dom.linklist[i].style.textDecoration = 'none';
-			this.dom.linklist[i].style.fontWeight = 'bold';
-			this.dom.linklist[i].style.fontSize = '11px';
+			this.dom.linklist[i].className = 'link-action selected';
 		}
 	},
 
@@ -1261,10 +1240,6 @@ var CScrollBar = Class.create({
 
 		// remove existed scrollbars
 		jQuery('.scrollbar').remove();
-
-		scr_cntr.style.paddingRight = '2px';
-		scr_cntr.style.paddingLeft = '2px';
-		scr_cntr.style.margin = '5px 0 0 0';
 
 		this.dom.scrollbar = document.createElement('div');
 		this.dom.scrollbar.className = 'scrollbar';
@@ -1298,9 +1273,9 @@ var CScrollBar = Class.create({
 		this.dom.timeline.className = 'timeline';
 
 		// left
-		this.dom.info_left = document.createElement('span');
+		this.dom.info_left = document.createElement('a');
 		this.dom.timeline.appendChild(this.dom.info_left);
-		this.dom.info_left.className = 'info_left link';
+		this.dom.info_left.className = 'info_left link-action';
 		this.dom.info_left.appendChild(document.createTextNode('01.01.1970 00:00:00'));
 		this.dom.info_left.setAttribute('data-timestamp', 1);
 
@@ -1310,9 +1285,9 @@ var CScrollBar = Class.create({
 		this.dom.timeline.appendChild(sep);
 
 		// right
-		this.dom.info_right = document.createElement('span');
+		this.dom.info_right = document.createElement('a');
 		this.dom.timeline.appendChild(this.dom.info_right);
-		this.dom.info_right.className = 'info_right link';
+		this.dom.info_right.className = 'info_right link-action';
 		this.dom.info_right.appendChild(document.createTextNode('01.01.1970 00:00:00'));
 		this.dom.info_right.setAttribute('data-timestamp', 1);
 
@@ -1322,25 +1297,25 @@ var CScrollBar = Class.create({
 		this.dom.sublevel.className = 'sublevel';
 		$(this.dom.sublevel).setStyle({width: width + 'px'});
 
-		this.dom.left = document.createElement('div');
+		this.dom.left = document.createElement('button');
 		this.dom.sublevel.appendChild(this.dom.left);
-		this.dom.left.className = 'left';
+		this.dom.left.className = 'btn-grey';
+		this.dom.left.innerHTML = "<span class='arrow-left'></span>";
 		addListener(this.dom.left, 'click', this.navigateLeft.bindAsEventListener(this), true);
 
-		this.dom.right = document.createElement('div');
+		this.dom.right = document.createElement('button');
 		this.dom.sublevel.appendChild(this.dom.right);
-		this.dom.right.className = 'right';
+		this.dom.right.className = 'btn-grey';
+		this.dom.right.innerHTML = "<span class='arrow-right'></span>";
 		addListener(this.dom.right, 'click', this.navigateRight.bindAsEventListener(this), true);
 
-		this.dom.bg = document.createElement('div');
-		this.dom.sublevel.appendChild(this.dom.bg);
-		this.dom.bg.className = 'bg';
-
 		// <overlevel>
+		var overlevel_width = width - jQuery(this.dom.left).outerWidth() - jQuery(this.dom.right).outerWidth() + 2;
+
 		this.dom.overlevel = document.createElement('div');
 		this.dom.scrollbar.appendChild(this.dom.overlevel);
 		this.dom.overlevel.className = 'overlevel';
-		$(this.dom.overlevel).setStyle({width: (width - 34) + 'px'});
+		$(this.dom.overlevel).setStyle({width: overlevel_width + 'px'});
 
 		this.dom.bar = document.createElement('div');
 		this.dom.overlevel.appendChild(this.dom.bar);
@@ -1359,10 +1334,12 @@ var CScrollBar = Class.create({
 		this.dom.ghost.className = 'ghost';
 
 		this.dom.left_arr = document.createElement('div');
+		this.dom.left_arr.innerHTML = "<span class='arrow-left'></span>";
 		this.dom.overlevel.appendChild(this.dom.left_arr);
 		this.dom.left_arr.className = 'left_arr';
 
 		this.dom.right_arr = document.createElement('div');
+		this.dom.right_arr.innerHTML = "<span class='arrow-right'></span>";
 		this.dom.overlevel.appendChild(this.dom.right_arr);
 		this.dom.right_arr.className = 'right_arr';
 
@@ -1383,92 +1360,25 @@ var CScrollBar = Class.create({
 		this.dom.period.className = 'period';
 
 		// state
-		var tmp  = document.createElement('span');
-		tmp.className = 'period_state_begin';
-		tmp.appendChild(document.createTextNode('('));
-		this.dom.period.appendChild(tmp);
 
-		this.dom.period_state = document.createElement('span');
+		this.dom.period_state = document.createElement('a');
 		this.dom.period.appendChild(this.dom.period_state);
-		this.dom.period_state.className = 'period_state link';
+		this.dom.period_state.className = 'period_state link-action';
 		this.dom.period_state.appendChild(document.createTextNode(this.fixedperiod == 1 ? locale['S_FIXED_SMALL'] : locale['S_DYNAMIC_SMALL']));
 		addListener(this.dom.period_state, 'click', this.switchPeriodState.bindAsEventListener(this));
-
-		var tmp  = document.createElement('span');
-		tmp.className = 'period_state_end';
-		tmp.appendChild(document.createTextNode(')'));
-		this.dom.period.appendChild(tmp);
 
 		// period info
 		this.dom.info_period = document.createElement('div');
 		this.dom.subline.appendChild(this.dom.info_period);
 		this.dom.info_period.className = 'info_period';
 		this.dom.info_period.appendChild(document.createTextNode('0h 0m'));
-
-		/*
-		<div class="scrollbar">
-			<div class="info">
-				<div class="zoom">
-					<span class="text">Zoom:</span>
-					<span class="links">
-						<span class="link">1h</span>
-						<span class="link">2h</span>
-						<span class="link">3h</span>
-						<span class="link">6h</span>
-						<span class="link">12h</span>
-						<span class="link">1d</span>
-						<span class="link">5d</span>
-						<span class="link">1w</span>
-						<span class="link">1m</span>
-						<span class="link">3m</span>
-						<span class="link">6m</span>
-						<span class="link">YTD</span>
-						<span class="link">1y</span>
-					</span>
-				</div>
-				<div class="gmenu"></div>
-				<div class="timeline">
-					<span class="info_right">30.06.2009 16:35:08</span>
-					<span class="info_sep1"> - </span>
-					<span class="info_left">30.06.2009 16:35:00</span>
-				</div>
-			</div>
-			<div class="sublevel">
-				<div class="left"></div>
-				<div class="right"></div>
-				<div class="bg">
-				</div>
-			</div>
-			<div class="overlevel">
-				<div class="bar">
-					<div class="icon">
-						<div class="center"></div>
-					</div>
-				</div>
-				<div class="ghost">
-					<div class="left_arr"></div>
-					<div class="right_arr"></div>
-				</div>
-			</div>
-			<div class="subline">
-				<div class="nav_links"></div>
-				<div class="info_period">0h 0m</div>
-				<div class="period">
-					(
-					<span class="period_state">fixed</span>
-					)
-				</div>
-			</div>
-		</div>
-		*/
 	}
 });
 
 var CGhostBox = Class.create({
 
 	box:		null, // resized dom object
-	sideToMove:	null, // 0 - left side, 1 - right side
-	flip:		null, // if flip < 0, ghost is fliped
+	sideToMove:	-1, // 0 - left side, 1 - right side
 
 	// resize start position
 	start: {
@@ -1496,7 +1406,6 @@ var CGhostBox = Class.create({
 		var dimensions = getDimensions(this.box);
 
 		this.sideToMove = side;
-		this.flip = 0;
 		this.start.width = dimensions.width;
 		this.start.leftSide = dimensions.left;
 		this.start.rightSide = dimensions.right;
@@ -1505,37 +1414,35 @@ var CGhostBox = Class.create({
 
 	endResize: function() {
 		this.sideToMove = -1;
-		this.flip = 0;
 		this.box.style.zIndex = 0;
 	},
 
 	calcResizeByPX: function(px) {
 		px = parseInt(px, 10);
-		this.flip = 0;
 
 		// resize from the left
 		if (this.sideToMove == 0) {
-			this.flip =  this.start.rightSide - (this.start.leftSide + px);
-			if (this.flip < 0) {
+			var width = this.start.rightSide - this.start.leftSide - px;
+
+			if (width < 0) {
 				this.current.leftSide = this.start.rightSide;
-				this.current.rightSide = this.start.rightSide + Math.abs(this.flip);
 			}
 			else {
 				this.current.leftSide = this.start.leftSide + px;
-				this.current.rightSide = this.start.rightSide;
 			}
+			this.current.rightSide = this.start.rightSide;
 		}
 		// resize from the right
 		else if (this.sideToMove == 1) {
-			this.flip = (this.start.rightSide + px) - this.start.leftSide;
-			if (this.flip < 0) {
-				this.current.leftSide = this.start.leftSide - Math.abs(this.flip);
+			var width = this.start.rightSide - this.start.leftSide + px;
+
+			if (width < 0) {
 				this.current.rightSide = this.start.leftSide;
 			}
 			else {
-				this.current.leftSide = this.start.leftSide;
 				this.current.rightSide = this.start.rightSide + px;
 			}
+			this.current.leftSide = this.start.leftSide;
 		}
 
 		this.current.width = this.current.rightSide - this.current.leftSide;
@@ -1615,7 +1522,7 @@ var sbox = Class.create({
 		jQuery(this.grphobj).off();
 		jQuery(this.dom_obj).off();
 
-		if (IE8 || IE9 || IE10) {
+		if (IE9 || IE10) {
 			jQuery(this.grphobj).mousedown(jQuery.proxy(this.mouseDown, this));
 			jQuery(this.grphobj).mousemove(jQuery.proxy(this.mouseMove, this));
 			jQuery(this.grphobj).click(function() {
@@ -1789,11 +1696,11 @@ var sbox = Class.create({
 			this.box.height = this.areaHeight;
 
 			this.dom_box.setAttribute('id', 'selection_box');
+			this.dom_box.className = 'graph-selection';
 			this.dom_box.style.top = this.box.top + 'px';
 			this.dom_box.style.left = this.box.left + 'px';
 			this.dom_box.style.height = this.areaHeight + 'px';
 			this.dom_box.style.width = '1px';
-			this.dom_box.style.zIndex = 98;
 
 			this.start_event.top = this.mouse_event.top;
 			this.start_event.left = this.mouse_event.left;

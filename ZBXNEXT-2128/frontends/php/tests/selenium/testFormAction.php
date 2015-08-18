@@ -30,422 +30,422 @@ class testFormAction extends CWebTest {
 	}
 
 	public static function layout() {
-		return array(
-			array(
-				array('eventsource' => 'Triggers')
-			),
-			array(
-				array(
+		return [
+			[
+				['eventsource' => 'Triggers']
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Send message'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_default_msg' => 'unchecked'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Send message',
 					'add_opcondition' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'add_opcondition' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Current host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Host group'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Custom script'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'IPMI'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'SSH'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'SSH',
 					'new_operation_opcommand_authtype' => 'Public key'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Telnet'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Global script'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Triggers',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Custom script',
 					'add_opcondition' => true
-				)
-			),
-			array(
-				array('eventsource' => 'Triggers', 'recovery_msg' => true)
-			),
-			array(
-				array('eventsource' => 'Triggers', 'evaltype' => 'AND')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'evaltype' => 'OR')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Application')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Host group')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Template')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Host')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger name')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger severity')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger value')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Time period')
-			),
-			array(
-				array('eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Maintenance status')
-			),
-			array(
-				array('eventsource' => 'Discovery')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Host IP')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Service type')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Service port')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery rule')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery check')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery object')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery status')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Uptime/Downtime')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Received value')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Proxy')
-			),
-			array(
-				array(
+				]
+			],
+			[
+				['eventsource' => 'Triggers', 'recovery_msg' => true]
+			],
+			[
+				['eventsource' => 'Triggers', 'evaltype' => 'AND']
+			],
+			[
+				['eventsource' => 'Triggers', 'evaltype' => 'OR']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Application']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Host group']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Template']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Host']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger name']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger severity']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Trigger value']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Time period']
+			],
+			[
+				['eventsource' => 'Triggers', 'new_condition_conditiontype' => 'Maintenance status']
+			],
+			[
+				['eventsource' => 'Discovery']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Host IP']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Service type']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Service port']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery rule']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery check']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery object']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Discovery status']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Uptime/Downtime']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Received value']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_condition_conditiontype' => 'Proxy']
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Send message'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_default_msg' => 'unchecked'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Current host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Host group'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Custom script'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'IPMI'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'SSH'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'SSH',
 					'new_operation_opcommand_authtype' => 'Public key'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Telnet'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Global script'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Discovery',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Custom script'
-				)
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_operation_operationtype' => 'Add host')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_operation_operationtype' => 'Remove host')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_operation_operationtype' => 'Add to host group')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_operation_operationtype' => 'Remove from host group')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_operation_operationtype' => 'Link to template')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_operation_operationtype' => 'Unlink from template')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_operation_operationtype' => 'Enable host')
-			),
-			array(
-				array('eventsource' => 'Discovery', 'new_operation_operationtype' => 'Disable host')
-			),
-			array(
-				array('eventsource' => 'Auto registration')
-			),
-			array(
-				array('eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Host name')
-			),
-			array(
-				array('eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Proxy')
-			),
-			array(
-				array('eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Host metadata')
-			),
-			array(
-				array(
+				]
+			],
+			[
+				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Add host']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Remove host']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Add to host group']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Remove from host group']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Link to template']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Unlink from template']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Enable host']
+			],
+			[
+				['eventsource' => 'Discovery', 'new_operation_operationtype' => 'Disable host']
+			],
+			[
+				['eventsource' => 'Auto registration']
+			],
+			[
+				['eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Host name']
+			],
+			[
+				['eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Proxy']
+			],
+			[
+				['eventsource' => 'Auto registration', 'new_condition_conditiontype' => 'Host metadata']
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Send message'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_default_msg' => 'unchecked'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Current host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'opCmdTarget' => 'Host group'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Custom script'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'IPMI'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'SSH'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'SSH',
 					'new_operation_opcommand_authtype' => 'Public key'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Telnet'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'eventsource' => 'Auto registration',
 					'new_operation_operationtype' => 'Remote command',
 					'new_operation_opcommand_type' => 'Global script'
-				)
-			),
-			array(
-				array('eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Add host')
-			),
-			array(
-				array('eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Add to host group')
-			),
-			array(
-				array('eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Link to template')
-			),
-			array(
-				array('eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Disable host')
-			),
-			array(
-				array('eventsource' => 'Internal')
-			),
-			array(
-				array('eventsource' => 'Internal', 'recovery_msg' => true)
-			),
-			array(
-				array('eventsource' => 'Internal', 'new_condition_conditiontype' => 'Application')
-			),
-			array(
-				array('eventsource' => 'Internal', 'new_condition_conditiontype' => 'Event type')
-			),
-			array(
-				array('eventsource' => 'Internal', 'new_condition_conditiontype' => 'Host group')
-			),
-			array(
-				array('eventsource' => 'Internal', 'new_condition_conditiontype' => 'Template')
-			),
-			array(
-				array('eventsource' => 'Internal', 'new_condition_conditiontype' => 'Host')
-			),
-			array(
-				array('eventsource' => 'Internal', 'new_operation_operationtype' => 'Send message')
-			),
-			array(
-				array(
+				]
+			],
+			[
+				['eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Add host']
+			],
+			[
+				['eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Add to host group']
+			],
+			[
+				['eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Link to template']
+			],
+			[
+				['eventsource' => 'Auto registration', 'new_operation_operationtype' => 'Disable host']
+			],
+			[
+				['eventsource' => 'Internal']
+			],
+			[
+				['eventsource' => 'Internal', 'recovery_msg' => true]
+			],
+			[
+				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Application']
+			],
+			[
+				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Event type']
+			],
+			[
+				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Host group']
+			],
+			[
+				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Template']
+			],
+			[
+				['eventsource' => 'Internal', 'new_condition_conditiontype' => 'Host']
+			],
+			[
+				['eventsource' => 'Internal', 'new_operation_operationtype' => 'Send message']
+			],
+			[
+				[
 					'eventsource' => 'Internal',
 					'new_operation_operationtype' => 'Send message',
 					'new_operation_opmessage_default_msg' => 'unchecked'
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**
@@ -494,10 +494,10 @@ class testFormAction extends CWebTest {
 
 
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 				'CONFIGURATION OF ACTIONS',
 				'Action', 'Conditions', 'Operations'
-		));
+		]);
 
 		$this->zbxTestTextPresent('Name');
 		$this->assertVisible('name');
@@ -625,11 +625,11 @@ class testFormAction extends CWebTest {
 		if ($eventsource == 'Triggers') {
 			$this->zbxTestTextPresent('Type of calculation');
 			$this->assertElementPresent('evaltype');
-			$this->zbxTestDropdownHasOptions('evaltype', array(
+			$this->zbxTestDropdownHasOptions('evaltype', [
 					'AND / OR',
 					'AND',
 					'OR'
-			));
+			]);
 			$this->assertAttribute('//*[@id=\'evaltype\']/option[text()=\''.$evaltype.'\']/@selected', 'selected');
 			switch ($evaltype) {
 				case 'AND / OR':
@@ -646,24 +646,24 @@ class testFormAction extends CWebTest {
 			$this->assertNotVisible('evaltype');
 		}
 
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 				'Conditions',
 				'Label', 'Name', 'Action'
-		));
+		]);
 
 		if ($eventsource == 'Triggers') {
-			$this->zbxTestTextPresent(array(
+			$this->zbxTestTextPresent([
 					'(A)', 'Maintenance status not in maintenance','(B)', 'Trigger value = PROBLEM'
-			));
+			]);
 			$this->assertElementPresent('//input[@id="remove" and @value="Remove" and @onclick="javascript:'.
 				' removeCondition(0);"]');
 			$this->assertElementPresent('//input[@id="remove" and @value="Remove" and @onclick="javascript:'.
 				' removeCondition(1);"]');
 		}
 		else {
-			$this->zbxTestTextNotPresent(array(
+			$this->zbxTestTextNotPresent([
 					'(A)', 'Maintenance status not in maintenance','(B)', 'Trigger value = PROBLEM'
-			));
+			]);
 			$this->assertElementNotPresent('//input[@id="remove" and @value="Remove" and @onclick="javascript:'.
 				' removeCondition(0);"]');
 			$this->assertElementNotPresent('//input[@id="remove" and @value="Remove" and @onclick="javascript:'.
@@ -674,7 +674,7 @@ class testFormAction extends CWebTest {
 		$this->assertElementPresent('new_condition_conditiontype');
 		switch ($eventsource) {
 			case 'Triggers':
-				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', array(
+				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
 						'Application',
 						'Host group',
 						'Template',
@@ -685,10 +685,10 @@ class testFormAction extends CWebTest {
 						'Trigger value',
 						'Time period',
 						'Maintenance status'
-				));
+				]);
 				break;
 			case 'Discovery':
-				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', array(
+				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
 						'Host IP',
 						'Service type',
 						'Service port',
@@ -699,23 +699,23 @@ class testFormAction extends CWebTest {
 						'Uptime/Downtime',
 						'Received value',
 						'Proxy'
-				));
+				]);
 				break;
 			case 'Auto registration':
-				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', array(
+				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
 						'Host name',
 						'Proxy',
 						'Host metadata'
-				));
+				]);
 				break;
 			case 'Internal':
-				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', array(
+				$this->zbxTestDropdownHasOptions('new_condition_conditiontype', [
 						'Application',
 						'Event type',
 						'Host group',
 						'Template',
 						'Host'
-				));
+				]);
 				break;
 		}
 
@@ -744,11 +744,11 @@ class testFormAction extends CWebTest {
 
 		switch ($new_condition_conditiontype) {
 			case 'Application':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'=',
 						'like',
 						'not like'
-				));
+				]);
 				break;
 			case 'Host group':
 			case 'Template':
@@ -759,57 +759,57 @@ class testFormAction extends CWebTest {
 			case 'Discovery rule':
 			case 'Discovery check':
 			case 'Proxy':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'=',
 						'<>'
-				));
+				]);
 				break;
 			case 'Trigger name':
 			case 'Host name':
 			case 'Host metadata':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'like',
 						'not like'
-				));
+				]);
 				break;
 			case 'Trigger severity':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'=',
 						'<>',
 						'>=',
 						'<='
-				));
+				]);
 				break;
 			case 'Trigger value':
 			case 'Discovery object':
 			case 'Discovery status':
 			case 'Event type':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'='
-				));
+				]);
 				break;
 			case 'Time period':
 			case 'Maintenance status':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'in',
 						'not in'
-				));
+				]);
 				break;
 			case 'Uptime/Downtime':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'>=',
 						'<='
-				));
+				]);
 				break;
 			case 'Received value':
-				$this->zbxTestDropdownHasOptions('new_condition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_condition_operator', [
 						'=',
 						'<>',
 						'>=',
 						'<=',
 						'like',
 						'not like'
-				));
+				]);
 				break;
 		}
 
@@ -903,23 +903,23 @@ class testFormAction extends CWebTest {
 
 		switch ($new_condition_conditiontype) {
 			case 'Trigger severity':
-				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+				$this->zbxTestDropdownHasOptions('new_condition_value', [
 						'Not classified',
 						'Information',
 						'Warning',
 						'Average',
 						'High',
 						'Disaster'
-				));
+				]);
 				break;
 			case 'Trigger value':
-				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+				$this->zbxTestDropdownHasOptions('new_condition_value', [
 						'OK',
 						'PROBLEM'
-				));
+				]);
 				break;
 			case 'Service type':
-				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+				$this->zbxTestDropdownHasOptions('new_condition_value', [
 						'SSH',
 						'LDAP',
 						'SMTP',
@@ -936,31 +936,31 @@ class testFormAction extends CWebTest {
 						'SNMPv3 agent',
 						'ICMP ping',
 						'Telnet'
-				));
+				]);
 				break;
 			case 'Discovery object':
-				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+				$this->zbxTestDropdownHasOptions('new_condition_value', [
 						'Device',
 						'Service'
-				));
+				]);
 				break;
 			case 'Discovery status':
-				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+				$this->zbxTestDropdownHasOptions('new_condition_value', [
 						'Up',
 						'Down',
 						'Discovered',
 						'Lost'
-				));
+				]);
 				break;
 			case 'Event type':
-				$this->zbxTestDropdownHasOptions('new_condition_value', array(
+				$this->zbxTestDropdownHasOptions('new_condition_value', [
 						'Item in "not supported" state',
 						'Item in "normal" state',
 						'Low-level discovery rule in "not supported" state',
 						'Low-level discovery rule in "normal" state',
 						'Trigger in "unknown" state',
 						'Trigger in "normal" state'
-				));
+				]);
 				break;
 		}
 
@@ -1106,39 +1106,39 @@ class testFormAction extends CWebTest {
 		switch ($eventsource) {
 			case 'Triggers':
 			case 'Internal':
-				$this->zbxTestTextPresent(array(
+				$this->zbxTestTextPresent([
 						'Default operation step duration',	'(minimum 60 seconds)'
-				));
+				]);
 				$this->assertVisible('esc_period');
 				$this->assertAttribute('//input[@id=\'esc_period\']/@maxlength', 6);
 				$this->assertAttribute('//input[@id=\'esc_period\']/@size', 6);
 				$this->assertAttribute('//input[@id=\'esc_period\']/@value', 3600);
 				break;
 			default:
-				$this->zbxTestTextNotPresent(array(
+				$this->zbxTestTextNotPresent([
 						'Default operation step duration',	'(minimum 60 seconds)'
-				));
+				]);
 				$this->assertElementNotPresent('esc_period');
 				break;
 		}
 
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 				'Action operations',
 				'Details', 'Action',
 				'No operations defined.'
-		));
+		]);
 
 		switch ($eventsource) {
 			case 'Triggers':
 			case 'Internal':
-				$this->zbxTestTextPresent(array(
+				$this->zbxTestTextPresent([
 						'Steps', 'Start in', 'Duration (sec)'
-				));
+				]);
 				break;
 			default:
-				$this->zbxTestTextNotPresent(array(
+				$this->zbxTestTextNotPresent([
 						'Steps', 'Start in', 'Duration (sec)'
-				));
+				]);
 				break;
 		}
 
@@ -1162,13 +1162,13 @@ class testFormAction extends CWebTest {
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@size', 6);
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_from\']/@value', 1);
 
-					$this->zbxTestTextPresent (array('To', '(0 - infinitely)'));
+					$this->zbxTestTextPresent (['To', '(0 - infinitely)']);
 					$this->assertVisible('new_operation_esc_step_to');
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@maxlength', 5);
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@size', 6);
 					$this->assertAttribute('//input[@id=\'new_operation_esc_step_to\']/@value', 1);
 
-					$this->zbxTestTextPresent (array('Step duration', '(minimum 60 seconds, 0 - use action default)'));
+					$this->zbxTestTextPresent (['Step duration', '(minimum 60 seconds, 0 - use action default)']);
 					$this->assertVisible('new_operation_esc_period');
 					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@maxlength', 6);
 					$this->assertAttribute('//input[@id=\'new_operation_esc_period\']/@size', 6);
@@ -1193,13 +1193,13 @@ class testFormAction extends CWebTest {
 		if (isset($data['new_operation_operationtype'])) {
 			switch ($eventsource) {
 				case 'Triggers':
-				$this->zbxTestDropdownHasOptions('new_operation_operationtype', array(
+				$this->zbxTestDropdownHasOptions('new_operation_operationtype', [
 						'Send message',
 						'Remote command'
-				));
+				]);
 					break;
 				case 'Discovery':
-				$this->zbxTestDropdownHasOptions('new_operation_operationtype', array(
+				$this->zbxTestDropdownHasOptions('new_operation_operationtype', [
 						'Send message',
 						'Remote command',
 						'Add host',
@@ -1210,17 +1210,17 @@ class testFormAction extends CWebTest {
 						'Unlink from template',
 						'Enable host',
 						'Disable host'
-				));
+				]);
 					break;
 				case 'Auto registration':
-				$this->zbxTestDropdownHasOptions('new_operation_operationtype', array(
+				$this->zbxTestDropdownHasOptions('new_operation_operationtype', [
 						'Send message',
 						'Remote command',
 						'Add host',
 						'Add to host group',
 						'Link to template',
 						'Disable host'
-				));
+				]);
 					break;
 			}
 		}
@@ -1238,7 +1238,7 @@ class testFormAction extends CWebTest {
 		if ($opCmdTarget != null) {
 			$this->assertVisible('//*[@id=\'opcmdEditForm\']');
 			$this->assertVisible('//select[@name=\'opCmdTarget\']');
-			$this->zbxTestDropdownHasOptions('opCmdTarget', array('Current host', 'Host', 'Host group'));
+			$this->zbxTestDropdownHasOptions('opCmdTarget', ['Current host', 'Host', 'Host group']);
 
 			$this->assertVisible('//input[@value=\'Add\' and @name=\'save\']');
 			$this->assertVisible('//input[@value=\'Cancel\' and @name=\'cancel\']');
@@ -1248,10 +1248,10 @@ class testFormAction extends CWebTest {
 		}
 
 		if ($new_operation_operationtype == 'Send message') {
-			$this->zbxTestTextPresent (array(
+			$this->zbxTestTextPresent ([
 				'Send to User groups', 'User group', 'Action',
 				'Send to Users'
-			));
+			]);
 			$this->assertVisible('addusrgrpbtn');
 			$this->assertAttribute('//input[@id=\'addusrgrpbtn\']/@value', 'Add');
 			$this->assertVisible('adduserbtn');
@@ -1260,13 +1260,13 @@ class testFormAction extends CWebTest {
 			$this->zbxTestTextPresent ('Send only to');
 			$this->assertVisible('//select[@id=\'new_operation_opmessage_mediatypeid\']');
 			$this->assertAttribute('//*[@id=\'new_operation_opmessage_mediatypeid\']/option[text()=\'- All -\']/@selected', 'selected');
-			$this->zbxTestDropdownHasOptions('new_operation_opmessage_mediatypeid', array(
+			$this->zbxTestDropdownHasOptions('new_operation_opmessage_mediatypeid', [
 					'- All -',
 					'Email',
 					'Jabber',
 					'SMS',
 					'SMS via IP'
-			));
+			]);
 
 			$this->zbxTestTextPresent('Default message');
 			$this->assertVisible('new_operation_opmessage_default_msg');
@@ -1355,9 +1355,9 @@ class testFormAction extends CWebTest {
 		}
 
 		if ($eventsource == 'Triggers' && $new_operation_operationtype != null) {
-			$this->zbxTestTextPresent (array(
+			$this->zbxTestTextPresent ([
 				'Conditions', 'Label', 'Name', 'Action'
-			));
+			]);
 
 			if ($add_opcondition == null) {
 				$this->assertVisible('new_opcondition');
@@ -1370,21 +1370,21 @@ class testFormAction extends CWebTest {
 
 				$this->assertVisible('//select[@id=\'new_opcondition_conditiontype\']');
 				$this->assertAttribute('//*[@id=\'new_opcondition_conditiontype\']/option[text()=\'Event acknowledged\']/@selected', 'selected');
-				$this->zbxTestDropdownHasOptions('new_opcondition_conditiontype', array(
+				$this->zbxTestDropdownHasOptions('new_opcondition_conditiontype', [
 						'Event acknowledged'
-				));
+				]);
 
 				$this->assertVisible('//select[@id=\'new_opcondition_operator\']');
-				$this->zbxTestDropdownHasOptions('new_opcondition_operator', array(
+				$this->zbxTestDropdownHasOptions('new_opcondition_operator', [
 						'='
-				));
+				]);
 
 				$this->assertVisible('//select[@id=\'new_opcondition_value\']');
 				$this->assertAttribute('//*[@id=\'new_opcondition_value\']/option[text()=\'Not Ack\']/@selected', 'selected');
-				$this->zbxTestDropdownHasOptions('new_opcondition_value', array(
+				$this->zbxTestDropdownHasOptions('new_opcondition_value', [
 						'Not Ack',
 						'Ack'
-				));
+				]);
 			}
 		}
 		else {
@@ -1397,34 +1397,34 @@ class testFormAction extends CWebTest {
 		}
 
 		if ($new_operation_operationtype == 'Remote command') {
-			$this->zbxTestTextPresent (array(
+			$this->zbxTestTextPresent ([
 				'Target list', 'Target', 'Action'
-			));
+			]);
 			$this->assertVisible('//input[@value=\'New\' and @id=\'add\']');
 		}
 		else {
-			$this->zbxTestTextNotPresent (array('Target list', 'Target'));
+			$this->zbxTestTextNotPresent (['Target list', 'Target']);
 		}
 
 		if ($new_operation_opcommand_type != null) {
 			$this->zbxTestTextPresent ('Type');
 			$this->assertVisible('//select[@id=\'new_operation_opcommand_type\']');
 			$this->assertAttribute('//*[@id=\'new_operation_opcommand_type\']/option[text()=\'Custom script\']/@selected', 'selected');
-			$this->zbxTestDropdownHasOptions('new_operation_opcommand_type', array(
+			$this->zbxTestDropdownHasOptions('new_operation_opcommand_type', [
 					'IPMI',
 					'Custom script',
 					'SSH',
 					'Telnet',
 					'Global script'
-			));
+			]);
 		}
 		else {
 			$this->assertElementNotPresent('//select[@id=\'new_operation_opcommand_type\']');
 		}
 
 		if ($new_operation_opcommand_type == 'Custom script') {
-			$this->zbxTestTextPresent (array(
-				'Execute on', 'Zabbix agent', 'Zabbix server')
+			$this->zbxTestTextPresent ([
+				'Execute on', 'Zabbix agent', 'Zabbix server']
 			);
 			$this->assertVisible('//input[@id=\'new_operation_opcommand_execute_on_1\']');
 			$this->assertAttribute('//*[@id=\'new_operation_opcommand_execute_on_1\']/@checked', 'checked');
@@ -1475,10 +1475,10 @@ class testFormAction extends CWebTest {
 			case 'SSH':
 				$this->zbxTestTextPresent ('Authentication method');
 				$this->assertVisible('//select[@id=\'new_operation_opcommand_authtype\']');
-				$this->zbxTestDropdownHasOptions('new_operation_opcommand_authtype', array(
+				$this->zbxTestDropdownHasOptions('new_operation_opcommand_authtype', [
 						'Password',
 						'Public key'
-				));
+				]);
 				$this->assertAttribute('//*[@id=\'new_operation_opcommand_authtype\']/option[text()=\'Password\']/@selected', 'selected');
 				break;
 			case 'IPMI':
@@ -1668,172 +1668,172 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClickWait('link='.$name);
 		$this->zbxTestClickWait('update');
 		$this->zbxTestCheckTitle('Configuration of actions');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 				'Action updated',
 				'CONFIGURATION OF ACTIONS',
 				'Actions',
 				$name
-		));
+		]);
 
 		$this->assertEquals($oldHashActions, DBhash($sqlActions));
 	}
 
 
 	public static function create() {
-		return array(
-			array(array(
+		return [
+			[[
 				'expected' => ACTION_GOOD,
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'name' => 'TestFormAction Triggers 001',
 				'esc_period' => '123',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
-				'conditions' => array(
-					array(
+				'conditions' => [
+					[
 						'type' => 'Trigger name',
 						'value' => 'trigger',
-					),
-					array(
+					],
+					[
 						'type' => 'Trigger severity',
 						'value' => 'Warning',
-					),
-					array(
+					],
+					[
 						'type' => 'Application',
 						'value' => 'application',
-					),
-				),
-				'operations' => array(
-					array(
+					],
+				],
+				'operations' => [
+					[
 						'type' => 'Send message',
 						'media' => 'Email',
-					),
-					array(
+					],
+					[
 						'type' => 'Remote command',
 						'command' => 'command',
-					)
-				),
-			)),
-			array(array(
+					]
+				],
+			]],
+			[[
 				'expected' => ACTION_BAD,
 				'eventsource' => EVENT_SOURCE_TRIGGERS,
 				'name' => '',
 				'esc_period' => '123',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
-				'errors' => array(
+				'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "operations" is mandatory.'
-				)
-			)),
-			array(array(
+				]
+			]],
+			[[
 				'expected' => ACTION_GOOD,
 				'eventsource' => EVENT_SOURCE_DISCOVERY,
 				'name' => 'TestFormAction Discovery 001',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
-				'conditions' => array(
-					array(
+				'conditions' => [
+					[
 						'type' => 'Service type',
 						'value' => 'FTP',
-					)
-				),
-				'operations' => array(
-					array(
+					]
+				],
+				'operations' => [
+					[
 						'type' => 'Send message',
 						'media' => 'Email',
-					),
-					array(
+					],
+					[
 						'type' => 'Remote command',
 						'command' => 'command',
-					)
-				),
-			)),
-			array(array(
+					]
+				],
+			]],
+			[[
 				'expected' => ACTION_BAD,
 				'eventsource' => EVENT_SOURCE_DISCOVERY,
 				'name' => '',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
-				'errors' => array(
+				'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "operations" is mandatory.'
-				)
-			)),
-			array(array(
+				]
+			]],
+			[[
 				'expected' => ACTION_GOOD,
 				'eventsource' => EVENT_SOURCE_AUTO_REGISTRATION,
 				'name' => 'TestFormAction Auto registration 001',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
-				'conditions' => array(
-					array(
+				'conditions' => [
+					[
 						'type' => 'Host name',
 						'value' => 'Zabbix',
-					)
-				),
-				'operations' => array(
-					array(
+					]
+				],
+				'operations' => [
+					[
 						'type' => 'Send message',
 						'media' => 'Email',
-					),
-					array(
+					],
+					[
 						'type' => 'Remote command',
 						'command' => 'command',
-					)
-				),
-			)),
-			array(array(
+					]
+				],
+			]],
+			[[
 				'expected' => ACTION_BAD,
 				'eventsource' => EVENT_SOURCE_AUTO_REGISTRATION,
 				'name' => '',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
-				'errors' => array(
+				'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "operations" is mandatory.'
-				)
-			)),
-			array(array(
+				]
+			]],
+			[[
 				'expected' => ACTION_GOOD,
 				'eventsource' => EVENT_SOURCE_INTERNAL,
 				'name' => 'TestFormAction Internal 001',
 				'esc_period' => '123',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
-				'conditions' => array(
-					array(
+				'conditions' => [
+					[
 						'type' => 'Event type',
 						'value' => 'Trigger in "unknown" state',
-					),
-					array(
+					],
+					[
 						'type' => 'Application',
 						'value' => 'application',
-					),
-				),
-				'operations' => array(
-					array(
+					],
+				],
+				'operations' => [
+					[
 						'type' => 'Send message',
 						'media' => 'Email',
-					)
-				)
-			)),
-			array(array(
+					]
+				]
+			]],
+			[[
 				'expected' => ACTION_BAD,
 				'eventsource' => EVENT_SOURCE_INTERNAL,
 				'name' => '',
 				'esc_period' => '123',
 				'def_shortdata' => 'def_shortdata',
 				'def_longdata' => 'def_longdata',
-				'errors' => array(
+				'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "operations" is mandatory.'
-				)
-			))
-		);
+				]
+			]]
+		];
 	}
 
 	/**
@@ -2021,7 +2021,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClick('add');
 		sleep(1);
 		$this->select("opCmdTarget", "label=Host");
-		$this->zbxTestTextPresent(array('Target list', 'Target', 'Action'));
+		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		sleep(1);
 		$this->assertElementPresent("//div[@id='opCmdTargetObject']/input");
 		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Simple form test host');
@@ -2034,7 +2034,7 @@ class testFormAction extends CWebTest {
 		$this->zbxTestClick('add');
 		sleep(1);
 		$this->select("opCmdTarget", "label=Host group");
-		$this->zbxTestTextPresent(array('Target list', 'Target', 'Action'));
+		$this->zbxTestTextPresent(['Target list', 'Target', 'Action']);
 		sleep(1);
 		$this->assertElementPresent("//div[@id='opCmdTargetObject']/input");
 		$this->input_type("//div[@id='opCmdTargetObject']/input", 'Zabbix servers');

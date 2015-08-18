@@ -36,12 +36,12 @@ class testPageScreens extends CWebTest {
 		$this->zbxTestTextPresent('Screens');
 		$this->zbxTestTextPresent(sprintf('Displaying 1 to %1$s of %1$s found', count($screens)));
 		// header
-		$this->zbxTestTextPresent(array('Name', 'Dimension (cols x rows)', 'Screen'));
+		$this->zbxTestTextPresent(['Name', 'Dimension (cols x rows)', 'Screen']);
 		// data
 		foreach ($screens as $screen) {
 			$this->zbxTestTextPresent($screen['name']);
 		}
-		$this->zbxTestDropdownHasOptions('action', array('Export selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', ['Export selected', 'Delete selected']);
 	}
 
 	/**

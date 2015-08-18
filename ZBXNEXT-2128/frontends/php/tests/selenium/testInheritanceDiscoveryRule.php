@@ -62,25 +62,25 @@ class testInheritanceDiscoveryRule extends CWebTest {
 
 	// Returns create data
 	public static function create() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'testInheritanceDiscoveryRule6',
 					'key' => 'discovery-rule-inheritance6'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'testInheritanceDiscoveryRule5',
 					'key' => 'discovery-rule-inheritance5',
-					'errors' => array(
+					'errors' => [
 						'Discovery rule "discovery-rule-inheritance5" already exists on "Template inheritance test host", inherited from another template'
-					)
-				)
-			)
-		);
+					]
+				]
+			]
+		];
 	}
 
 	/**

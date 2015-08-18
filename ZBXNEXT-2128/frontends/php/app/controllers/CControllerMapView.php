@@ -28,12 +28,12 @@ class CControllerMapView extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'sysmapid' =>		'db sysmaps.sysmapid',
 			'mapname' =>		'not_empty',
 			'severity_min' =>	'in 0,1,2,3,4,5',
 			'fullscreen' =>		'in 0,1'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -49,10 +49,10 @@ class CControllerMapView extends CController {
 			return false;
 		}
 
-		$maps = API::Map()->get(array(
-			'output' => array('sysmapid', 'name'),
+		$maps = API::Map()->get([
+			'output' => ['sysmapid', 'name'],
 			'preservekeys' => true
-		));
+		]);
 		order_result($maps, 'name');
 
 		$sysmapid = null;
@@ -99,29 +99,29 @@ class CControllerMapView extends CController {
 	protected function doAction() {
 		CProfile::update('web.maps.sysmapid', $this->sysmapid, PROFILE_TYPE_ID);
 
-		$data = array(
+		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'sysmapid' => $this->sysmapid,
 			'maps' => $this->maps
-		);
+		];
 
 		if ($data['maps']) {
-			$maps = API::Map()->get(array(
+			$maps = API::Map()->get([
 				'output' => API_OUTPUT_EXTEND,
 				'selectSelements' => API_OUTPUT_EXTEND,
 				'selectLinks' => API_OUTPUT_EXTEND,
 				'sysmapids' => $this->sysmapid,
 				'expandUrls' => true
-			));
+			]);
 			$data['map'] = $maps[0];
 
-			$data['pageFilter'] = new CPageFilter(array(
-				'severitiesMin' => array(
+			$data['pageFilter'] = new CPageFilter([
+				'severitiesMin' => [
 					'default' => $data['map']['severity_min'],
 					'mapId' => $data['sysmapid']
-				),
+				],
 				'severityMin' => $this->hasInput('severity_min') ? $this->getInput('severity_min') : null
-			));
+			]);
 
 			$data['severity_min'] = $data['pageFilter']->severityMin;
 		}

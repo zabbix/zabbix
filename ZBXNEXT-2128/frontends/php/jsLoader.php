@@ -42,13 +42,13 @@ if (isset($_GET['lang'])) {
 		textdomain('frontend');
 	}
 	// numeric Locale to default
-	setlocale(LC_NUMERIC, array('C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'));
+	setlocale(LC_NUMERIC, ['C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8']);
 }
 
 require_once dirname(__FILE__).'/include/translateDefines.inc.php';
 
 // available scripts 'scriptFileName' => 'path relative to js/'
-$availableJScripts = array(
+$availableJScripts = [
 	'common.js' => '',
 	'menupopup.js' => '',
 	'gtlc.js' => '',
@@ -60,10 +60,9 @@ $availableJScripts = array(
 	'multiselect.js' => '',
 	'chkbxrange.js' => '',
 	// vendors
-	'prototype.js' => '',
-	'jquery.js' => 'jquery/',
-	'jquery-ui.js' => 'jquery/',
-	'activity-indicator.js' => 'vendors/',
+	'prototype.js' => 'vendors/',
+	'jquery.js' => 'vendors/',
+	'jquery-ui.js' => 'vendors/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -86,10 +85,10 @@ $availableJScripts = array(
 	// page-specific scripts
 	'items.js' => 'pages/',
 	'tr_logform.js' => 'pages/',
-);
+];
 
-$tranStrings = array(
-	'gtlc.js' => array(
+$tranStrings = [
+	'gtlc.js' => [
 		'S_ALL_S' => _('All'),
 		'S_ZOOM' => _('Zoom'),
 		'S_FIXED_SMALL' => _('fixed'),
@@ -100,16 +99,14 @@ $tranStrings = array(
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_DATE_FORMAT' => DATE_TIME_FORMAT
-	),
-	'functions.js' => array(
+	],
+	'functions.js' => [
 		'Cancel' => _('Cancel'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation'),
-		'S_DELETE' => _('Delete'),
-		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
-		'S_DELETE_EXPRESSION_Q' => _('Delete expression?')
-	),
-	'class.calendar.js' => array(
+		'S_DELETE' => _('Delete')
+	],
+	'class.calendar.js' => [
 		'S_JANUARY' => _('January'),
 		'S_FEBRUARY' => _('February'),
 		'S_MARCH' => _('March'),
@@ -132,8 +129,8 @@ $tranStrings = array(
 		'S_NOW' => _('Now'),
 		'S_DONE' => _('Done'),
 		'S_TIME' => _('Time')
-	),
-	'class.cmap.js' => array(
+	],
+	'class.cmap.js' => [
 		'S_ON' => _('On'),
 		'S_OFF' => _('Off'),
 		'S_HIDDEN' => _('Hidden'),
@@ -156,28 +153,28 @@ $tranStrings = array(
 		'S_NO_IMAGES' => 'You need to have at least one image uploaded to create map element. Images can be uploaded in Administration->General->Images section.',
 		'S_ICONMAP_IS_NOT_ENABLED' => _('Iconmap is not enabled'),
 		'Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).' => _('Colour "%1$s" is not correct: expecting hexadecimal colour code (6 symbols).')
-	),
-	'class.cmessages.js' => array(
+	],
+	'class.cmessages.js' => [
 		'S_MUTE' => _('Mute'),
 		'S_UNMUTE' => _('Unmute'),
 		'S_MESSAGES' => _('Messages'),
 		'S_CLEAR' => _('Clear'),
 		'S_SNOOZE' => _('Snooze')
-	),
-	'class.cookie.js' => array(
+	],
+	'class.cookie.js' => [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
-	),
-	'main.js' => array(
+	],
+	'main.js' => [
 		'S_CLOSE' => _('Close')
-	),
-	'multiselect.js' => array(
+	],
+	'multiselect.js' => [
 		'No matches found' => _('No matches found'),
 		'More matches found...' => _('More matches found...'),
 		'type here to search' => _('type here to search'),
 		'new' => _('new'),
 		'Select' => _('Select')
-	),
-	'menupopup.js' => array(
+	],
+	'menupopup.js' => [
 		'Acknowledge' => _('Acknowledge'),
 		'Add' => _('Add'),
 		'Add child' => _('Add child'),
@@ -225,19 +222,18 @@ $tranStrings = array(
 		'2 minutes' => _n('%1$s minute', '%1$s minutes', 2),
 		'10 minutes' => _n('%1$s minute', '%1$s minutes', 10),
 		'15 minutes' => _n('%1$s minute', '%1$s minutes', 15)
-	),
-	'items.js' => array(
+	],
+	'items.js' => [
 		'To set a host interface select a single item type for all items' => _('To set a host interface select a single item type for all items'),
 		'No interface found' => _('No interface found')
-	)
-);
+	]
+];
 
 if (empty($_GET['files'])) {
-	$files = array(
+	$files = [
 		'prototype.js',
 		'jquery.js',
 		'jquery-ui.js',
-		'activity-indicator.js',
 		'common.js',
 		'class.cdebug.js',
 		'class.cdate.js',
@@ -251,7 +247,7 @@ if (empty($_GET['files'])) {
 		'functions.js',
 		'menupopup.js',
 		'init.js'
-	);
+	];
 
 	// load frontend messaging only for some pages
 	if (isset($_GET['showGuiMessaging']) && $_GET['showGuiMessaging']) {

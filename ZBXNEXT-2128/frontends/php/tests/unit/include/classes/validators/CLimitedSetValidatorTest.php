@@ -22,105 +22,105 @@
 class CLimitedSetValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
-		return array(
-			array(array(
-				'values' => array(1, 2, 3),
+		return [
+			[[
+				'values' => [1, 2, 3],
 				'messageInvalid' => 'Incorrect value'
-			))
-		);
+			]]
+		];
 	}
 
 	public function validValuesProvider() {
-		return array(
-			array(array('values' => array(1, 2, 3)), 2),
-			array(array('values' => array(1, 2, 3)), '2'),
-			array(array('values' => array('1', '2', '3')), 2),
-			array(array('values' => array('1', '2', '3')), '2'),
-			array(array('values' => array('one', 'two', 'three')), 'one'),
-		);
+		return [
+			[['values' => [1, 2, 3]], 2],
+			[['values' => [1, 2, 3]], '2'],
+			[['values' => ['1', '2', '3']], 2],
+			[['values' => ['1', '2', '3']], '2'],
+			[['values' => ['one', 'two', 'three']], 'one'],
+		];
 	}
 
 	public function invalidValuesProvider() {
-		return array(
-			array(
-				array('messageInvalid' => 'Incorrect value type'),
+		return [
+			[
+				['messageInvalid' => 'Incorrect value type'],
 				null,
 				'Incorrect value type'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect value type'),
+			],
+			[
+				['messageInvalid' => 'Incorrect value type'],
 				true,
 				'Incorrect value type'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect value type'),
-				array(),
+			],
+			[
+				['messageInvalid' => 'Incorrect value type'],
+				[],
 				'Incorrect value type'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect value type'),
+			],
+			[
+				['messageInvalid' => 'Incorrect value type'],
 				1.1,
 				'Incorrect value type'
-			),
-			array(
-				array('values' => array(1, 2, 3), 'messageInvalid' => 'Incorrect value "%1$s"'),
+			],
+			[
+				['values' => [1, 2, 3], 'messageInvalid' => 'Incorrect value "%1$s"'],
 				4,
 				'Incorrect value "4"'
-			),
-			array(
-				array('values' => array('one', 'two', 'three'), 'messageInvalid' => 'Incorrect value "%1$s"'),
+			],
+			[
+				['values' => ['one', 'two', 'three'], 'messageInvalid' => 'Incorrect value "%1$s"'],
 				'four',
 				'Incorrect value "four"'
-			),
-			array(
-				array('values' => array('one', 'two', 'three'), 'messageInvalid' => 'Incorrect value "%1$s"'),
+			],
+			[
+				['values' => ['one', 'two', 'three'], 'messageInvalid' => 'Incorrect value "%1$s"'],
 				'FOUR',
 				'Incorrect value "FOUR"'
-			),
-		);
+			],
+		];
 	}
 
 	public function invalidValuesWithObjectsProvider() {
-		return array(
-			array(
-				array('messageInvalid' => 'Incorrect value type for "%1$s"'),
+		return [
+			[
+				['messageInvalid' => 'Incorrect value type for "%1$s"'],
 				null,
 				'Incorrect value type for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect value type for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect value type for "%1$s"'],
 				true,
 				'Incorrect value type for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect value type for "%1$s"'),
-				array(),
+			],
+			[
+				['messageInvalid' => 'Incorrect value type for "%1$s"'],
+				[],
 				'Incorrect value type for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect value type for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect value type for "%1$s"'],
 				1.1,
 				'Incorrect value type for "object"'
-			),
-			array(
-				array('values' => array(1, 2, 3), 'messageInvalid' => 'Incorrect value "%2$s" for "%1$s"'),
+			],
+			[
+				['values' => [1, 2, 3], 'messageInvalid' => 'Incorrect value "%2$s" for "%1$s"'],
 				4,
 				'Incorrect value "4" for "object"'
-			),
-			array(
-				array('values' => array('one', 'two', 'three'), 'messageInvalid' => 'Incorrect value "%2$s" for "%1$s"'),
+			],
+			[
+				['values' => ['one', 'two', 'three'], 'messageInvalid' => 'Incorrect value "%2$s" for "%1$s"'],
 				'four',
 				'Incorrect value "four" for "object"'
-			),
-			array(
-				array('values' => array('one', 'two', 'three'), 'messageInvalid' => 'Incorrect value "%2$s" for "%1$s"'),
+			],
+			[
+				['values' => ['one', 'two', 'three'], 'messageInvalid' => 'Incorrect value "%2$s" for "%1$s"'],
 				'FOUR',
 				'Incorrect value "FOUR" for "object"'
-			),
-		);
+			],
+		];
 	}
 
-	protected function createValidator(array $params = array()) {
+	protected function createValidator(array $params = []) {
 		return new CLimitedSetValidator($params);
 	}
 }

@@ -27,28 +27,28 @@ class testFormAdministrationMediaTypes extends CWebTest {
 	}
 
 	public static function newMediaTypes() {
-		$data=array(
-			array(
-				'Email', array('Description' => 'Email2', 'SMTP server' => 'mail.zabbix.com',
-						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com')
-			),
-			array(
-				'Email', array('Description' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
-					'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix2@zabbix.com')),
-			array('Script', array('Description' => 'Skype message', 'Script' => '/usr/local/bin/skype.sh')),
-			array(
-				'Script', array('Description' => 'Skype message2',
-						'Script' => '/usr/local/bin/skyp2.sh')),
-			array('SMS', array('Description' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3')),
-			array(
+		$data=[
+			[
+				'Email', ['Description' => 'Email2', 'SMTP server' => 'mail.zabbix.com',
+						'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix@zabbix.com']
+			],
+			[
+				'Email', ['Description' => 'Email3', 'SMTP server' => 'mail2.zabbix.com',
+					'SMTP helo' => 'zabbix.com', 'SMTP email' => 'zabbix2@zabbix.com']],
+			['Script', ['Description' => 'Skype message', 'Script' => '/usr/local/bin/skype.sh']],
+			[
+				'Script', ['Description' => 'Skype message2',
+						'Script' => '/usr/local/bin/skyp2.sh']],
+			['SMS', ['Description' => 'Direct SMS messaging', 'GSM modem' => '/dev/ttyS3']],
+			[
 				'Jabber',
-				array(
+				[
 					'Description' => 'Jabber messages',
 					'Jabber identifier' => 'zabbix@jabber.com',
 					'Password' => 'Secret password'
-				)
-			)
-		);
+				]
+			]
+		];
 		return $data;
 	}
 
@@ -65,7 +65,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
 		$this->zbxTestTextPresent('Media');
 		$this->zbxTestTextNotPresent('Displaying');
-		$this->zbxTestTextPresent(array('Name', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email'));
+		$this->zbxTestTextPresent(['Name', 'Type', 'SMTP server', 'SMTP helo', 'SMTP email']);
 
 		$this->assertElementPresent('description');
 		$this->assertAttribute("//input[@id='description']/@maxlength", '100');

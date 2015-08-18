@@ -31,268 +31,268 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetExpressionFromPartsValidProvider() {
-		return array(
-			array(
+		return [
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
+					]
+				],
 				'(({host:item.regexp(test)})<>0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
+					]
+				],
 				'(({host:item.regexp(test)})=0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a) and regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
+					]
+				],
 				'(({host:item.regexp(a)})<>0 and ({host:item.regexp(b)})<>0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a) or regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
+					]
+				],
 				'(({host:item.regexp(a)})<>0 or ({host:item.regexp(b)})<>0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-				),
+					],
+				],
 				'((({host:item.regexp(a)})<>0) or (({host:item.regexp(b)})<>0))'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				),
+					],
+				],
 				'(({host:item.regexp(a)})=0) and (({host:item.regexp(b)})=0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a) and regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(с) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-				),
+					],
+				],
 				'((({host:item.regexp(a)})<>0 and ({host:item.regexp(b)})<>0) or (({host:item.regexp(с)})<>0 or ({host:item.regexp(d)})<>0))'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a) and regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(c) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				),
+					],
+				],
 				'(({host:item.regexp(a)})=0 and ({host:item.regexp(b)})=0) and (({host:item.regexp(c)})=0 or ({host:item.regexp(d)})=0)'
-			),
+			],
 
-			array(
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'iregexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
+					]
+				],
 				'(({host:item.iregexp(test)})<>0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'iregexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
+					]
+				],
 				'(({host:item.iregexp(test)})=0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => '(regexp(a))>0',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
+					]
+				],
 				'(({host:item.regexp(a)})=0)'
-			),
+			],
 
 			// "not" cases
-			array(
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'not regexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
+					]
+				],
 				'((not {host:item.regexp(test)})=0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'not (regexp(test))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
+					]
+				],
 				'((not {host:item.regexp(test)})=0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'not regexp(a) and not regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
+					]
+				],
 				'((not {host:item.regexp(a)})<>0 and (not {host:item.regexp(b)})<>0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'not regexp(a) or not regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
+					]
+				],
 				'((not {host:item.regexp(a)})<>0 or (not {host:item.regexp(b)})<>0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => 'not regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'not regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-				),
+					],
+				],
 				'(((not {host:item.regexp(a)})<>0) or ((not {host:item.regexp(b)})<>0))'
-			),
+			],
 
 			// "-" cases
-			array(
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => '- regexp(test)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
+					]
+				],
 				'((-{host:item.regexp(test)})=0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => '- (regexp(test))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				),
+					]
+				],
 				'((-{host:item.regexp(test)})=0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => '- regexp(a) and - regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
+					]
+				],
 				'((-{host:item.regexp(a)})<>0 and (-{host:item.regexp(b)})<>0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => '- regexp(a) or - regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				),
+					]
+				],
 				'((-{host:item.regexp(a)})<>0 or (-{host:item.regexp(b)})<>0)'
-			),
-			array(
+			],
+			[
 				'host',
 				'item',
-				array(
-					array(
+				[
+					[
 						'value' => '- regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-					array(
+					],
+					[
 						'value' => '- regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					),
-				),
+					],
+				],
 				'(((-{host:item.regexp(a)})<>0) or ((-{host:item.regexp(b)})<>0))'
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -319,219 +319,219 @@ class CTextTriggerConstructorTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetPartsFromExpressionProvider() {
-		return array(
-			array(
+		return [
+			[
 				'({Zabbix server:system.hostname.regexp(a)})=0',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'({Zabbix server:system.hostname.regexp(a)})<>0',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'(({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'({Zabbix server:system.hostname.regexp(a)})=0 and ({Zabbix server:system.hostname.regexp(b)})=0',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				)
-			),
-			array(
+					],
+				]
+			],
+			[
 				'({Zabbix server:system.hostname.regexp(a)})=0 or ({Zabbix server:system.hostname.regexp(b)})=0',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				)
-			),
-			array(
+					],
+				]
+			],
+			[
 				'(({Zabbix server:system.hostname.regexp(a)})=0 or ({Zabbix server:system.hostname.regexp(b)})=0) and ({Zabbix server:system.hostname.regexp(c)})=0',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a) or regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				)
-			),
-			array(
+					],
+				]
+			],
+			[
 				'({Zabbix server:system.hostname.regexp(a)})=0 or (({Zabbix server:system.hostname.regexp(b)})=0 and ({Zabbix server:system.hostname.regexp(c)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(b) and regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				)
-			),
-			array(
+					],
+				]
+			],
+			[
 				'({Zabbix server:system.hostname.regexp(a)})=0 or ({Zabbix server:system.hostname.regexp(b)})=0 and ({Zabbix server:system.hostname.regexp(c)})=0',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				)
-			),
-			array(
+					],
+				]
+			],
+			[
 				'(({Zabbix server:system.hostname.regexp(a)})=0 and ({Zabbix server:system.hostname.regexp(b)})=0) or (({Zabbix server:system.hostname.regexp(c)})=0 or ({Zabbix server:system.hostname.regexp(d)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a) and regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(c) or regexp(d)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				)
-			),
-			array(
+					],
+				]
+			],
+			[
 				'((({Zabbix server:system.hostname.regexp(a)})=0) or (({Zabbix server:system.hostname.regexp(b)})=0)) and (({Zabbix server:system.hostname.regexp(c)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => 'regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(b)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-					array(
+					],
+					[
 						'value' => 'regexp(c)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					),
-				)
-			),
+					],
+				]
+			],
 
 			// "not" cases
-			array(
+			[
 				'(not {Zabbix server:system.hostname.regexp(a)})=0',
-				array(
-					array(
+				[
+					[
 						'value' => 'not regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'(not ({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => 'not regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'not (({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => 'not (regexp(a))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
+					]
+				]
+			],
 
 			// "-" cases
-			array(
+			[
 				'(-{Zabbix server:system.hostname.regexp(a)})=0',
-				array(
-					array(
+				[
+					[
 						'value' => '-regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'(-({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => '-regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'-(({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => '-(regexp(a))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'(- {Zabbix server:system.hostname.regexp(a)})=0',
-				array(
-					array(
+				[
+					[
 						'value' => '-regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'(- ({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => '-regexp(a)',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-			array(
+					]
+				]
+			],
+			[
 				'- (({Zabbix server:system.hostname.regexp(a)})=0)',
-				array(
-					array(
+				[
+					[
 						'value' => '-(regexp(a))',
 						'type' => CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH
-					)
-				)
-			),
-		);
+					]
+				]
+			],
+		];
 	}
 
 	/**

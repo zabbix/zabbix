@@ -25,8 +25,7 @@ require_once dirname(__FILE__).'/include/graphs.inc.php';
 
 $page['title'] = _('Custom graphs');
 $page['file'] = 'charts.php';
-$page['hist_arg'] = array('hostid', 'groupid', 'graphid');
-$page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
@@ -36,55 +35,50 @@ ob_start();
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
-	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
-	'graphid' =>	array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null),
-	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null),
-	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS, null,		null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null),
+$fields = [
+	'groupid' =>	[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
+	'hostid' =>		[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
+	'graphid' =>	[T_ZBX_INT, O_OPT, P_SYS, DB_ID,		null],
+	'period' =>		[T_ZBX_INT, O_OPT, P_SYS, null,		null],
+	'stime' =>		[T_ZBX_STR, O_OPT, P_SYS, null,		null],
+	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null],
 	// ajax
-	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT, null,		null),
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT, null,		null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT, null,		null)
-);
+	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT, null,		null],
+	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT, null,		null]
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable([$_REQUEST['hostid']])) {
 	access_deny();
 }
 if (getRequest('graphid')) {
-	$graphs = API::Graph()->get(array(
-		'graphids' => array($_REQUEST['graphid']),
-		'output' => array('graphid')
-	));
+	$graphs = API::Graph()->get([
+		'graphids' => [$_REQUEST['graphid']],
+		'output' => ['graphid']
+	]);
 	if (!$graphs) {
 		access_deny();
 	}
 }
 
-$pageFilter = new CPageFilter(array(
-	'groups' => array('real_hosts' => true, 'with_graphs' => true),
-	'hosts' => array('with_graphs' => true),
+$pageFilter = new CPageFilter([
+	'groups' => ['real_hosts' => true, 'with_graphs' => true],
+	'hosts' => ['with_graphs' => true],
 	'groupid' => getRequest('groupid'),
 	'hostid' => getRequest('hostid'),
-	'graphs' => array('templated' => 0),
+	'graphs' => ['templated' => 0],
 	'graphid' => getRequest('graphid')
-));
+]);
 
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.charts.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
 if (isset($_REQUEST['favobj'])) {
 	if (getRequest('favobj') === 'timelinefixedperiod' && hasRequest('favid')) {
 		CProfile::update('web.screens.timelinefixed', getRequest('favid'), PROFILE_TYPE_INT);
@@ -92,13 +86,13 @@ if (isset($_REQUEST['favobj'])) {
 }
 
 if (!empty($_REQUEST['period']) || !empty($_REQUEST['stime'])) {
-	CScreenBase::calculateTime(array(
+	CScreenBase::calculateTime([
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $pageFilter->graphid,
 		'updateProfile' => true,
 		'period' => getRequest('period'),
 		'stime' => getRequest('stime')
-	));
+	]);
 
 	$curl = new CUrl();
 	$curl->removeArgument('period');
@@ -123,11 +117,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Display
  */
-$data = array(
+$data = [
 	'pageFilter' => $pageFilter,
 	'graphid' => $pageFilter->graphid,
 	'fullscreen' => $_REQUEST['fullscreen']
-);
+];
 
 // render view
 $chartsView = new CView('monitoring.charts', $data);

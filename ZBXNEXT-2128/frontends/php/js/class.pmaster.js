@@ -134,7 +134,9 @@ var CPMaster = Class.create({
 
 var CDoll = Class.create({
 	_pmasterid:		0,		// PMasters id to which doll belongs
-	_domobj:		null,	// DOM obj for update
+	_domobj:		null,	// DOM obj body for update
+	_domobj_header:	null,	// DOM obj header for update
+	_domobj_footer:	null,	// DOM obj footer for update
 	_domid:			null,	// DOM obj id
 	_domdark:		null,	// DOM div for darken updated obj
 	_url:			'',
@@ -151,6 +153,8 @@ var CDoll = Class.create({
 	initialize: function(obj4update) {
 		this._domid = obj4update.domid;
 		this._domobj = jQuery('#'+this._domid);
+		this._domobj_header = jQuery('#'+this._domid+'_header');
+		this._domobj_footer = jQuery('#'+this._domid+'_footer');
 		this.url(obj4update.url);
 		this.frequency(obj4update.frequency);
 		this.lastupdate(obj4update.lastupdate);
@@ -322,7 +326,17 @@ var CDoll = Class.create({
 			return false;
 		}
 		else {
-			this._domobj.html(resp.responseText);
+			if (is_null(resp.responseJSON)) {
+				// If plaintext, slide show data
+				this._domobj.html(resp.responseText);
+			}
+			else
+			{
+				// Dashboard widget data comes in JSON
+				this._domobj.html(resp.responseJSON.body);
+				this._domobj_header.html(resp.responseJSON.header);
+				this._domobj_footer.html(resp.responseJSON.footer);
+			}
 		}
 
 		this._ready = true;
@@ -369,25 +383,25 @@ var CDoll = Class.create({
 	},
 
 	updateSortable: function() {
-		var columnObj = jQuery('.column');
+		var columnObj = jQuery('.cell');
 
 		if (columnObj.length > 0) {
 			columnObj
 				.sortable({
-					connectWith: '.column',
-					handle: 'div.header',
+					connectWith: '.cell',
+					handle: 'div.dashbrd-widget-head',
 					forcePlaceholderSize: true,
-					placeholder: 'widget ui-corner-all ui-sortable-placeholder',
+					placeholder: 'dashbrd-widget',
 					opacity: '0.8',
 					update: function(e, ui) {
 						// prevent duplicate save requests when moving a widget from one column to another
 						if (!ui.sender) {
 							var widgetPositions = {};
 
-							jQuery('.column').each(function(colNum, column) {
+							jQuery('.cell').each(function(colNum, column) {
 								widgetPositions[colNum] = {};
 
-								jQuery('.widget', column).each(function(rowNum, widget) {
+								jQuery('.dashbrd-widget', column).each(function(rowNum, widget) {
 									widgetPositions[colNum][rowNum] = widget.id;
 								});
 							});

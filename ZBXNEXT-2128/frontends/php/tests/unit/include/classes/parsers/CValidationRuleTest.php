@@ -21,118 +21,130 @@
 class CValidationRuleTest extends PHPUnit_Framework_TestCase {
 
 	public static function provider() {
-		return array(
-			array('', '',
-				array(
-				)
-			),
-			array('fatal', '',
-				array(
+		return [
+			['', '',
+				[
+				]
+			],
+			['fatal', '',
+				[
 					'fatal' => true
-				)
-			),
-			array('required', '',
-				array(
+				]
+			],
+			['required', '',
+				[
 					'required' => true
-				)
-			),
-			array('not_empty', '',
-				array(
+				]
+			],
+			['not_empty', '',
+				[
 					'not_empty' => true
-				)
-			),
-			array('in 1,2,3', '',
-				array(
-					'in' => array('1', '2', '3')
-				)
-			),
-			array('in 1,2,3 | fatal', '',
-				array(
-					'in' => array('1', '2', '3'),
+				]
+			],
+			['in 1,2,3', '',
+				[
+					'in' => ['1', '2', '3']
+				]
+			],
+			['in 1,2,3 | fatal', '',
+				[
+					'in' => ['1', '2', '3'],
 					'fatal' => true
-				)
-			),
-			array('in 1,2,3|fatal', '',
-				array(
-					'in' => array('1', '2', '3'),
+				]
+			],
+			['in 1,2,3|fatal', '',
+				[
+					'in' => ['1', '2', '3'],
 					'fatal' => true
-				)
-			),
-			array('db hosts.name', '',
-				array(
-					'db' => array(
+				]
+			],
+			['int32', '',
+				[
+					'int32' => true
+				]
+			],
+			['db hosts.name', '',
+				[
+					'db' => [
 						'table' => 'hosts',
 						'field' => 'name'
-					)
-				)
-			),
-			array('array_db hosts.name', '',
-				array(
-					'array_db' => array(
+					]
+				]
+			],
+			['array_db hosts.name', '',
+				[
+					'array_db' => [
 						'table' => 'hosts',
 						'field' => 'name'
-					)
-				)
-			),
-			array('in  ASC,DESC | fatal | db  interface.ip ', '',
-				array(
-					'in' => array('ASC', 'DESC'),
+					]
+				]
+			],
+			['in  ASC,DESC | fatal | db  interface.ip ', '',
+				[
+					'in' => ['ASC', 'DESC'],
 					'fatal' => true,
-					'db' => array(
+					'db' => [
 						'table' => 'interface',
 						'field' => 'ip'
-					)
-				)
-			),
-			array('fatal|required|json', '',
-				array(
+					]
+				]
+			],
+			['fatal|required|int32', '',
+				[
+					'fatal' => true,
+					'required' => true,
+					'int32' => true
+				]
+			],
+			['fatal|required|json', '',
+				[
 					'fatal' => true,
 					'required' => true,
 					'json' => true
-				)
-			),
-			array('  fatal |  required   | array_db host.name', '',
-				array(
+				]
+			],
+			['  fatal |  required   | array_db host.name', '',
+				[
 					'fatal' => true,
 					'required' => true,
-					'array_db' => array(
+					'array_db' => [
 						'table' => 'host',
 						'field' => 'name'
-					)
-				)
-			),
-			array('json', '',
-				array(
+					]
+				]
+			],
+			['json', '',
+				[
 					'json' => true
-				)
-			),
-			array('array_id', '',
-				array(
+				]
+			],
+			['array_id', '',
+				[
 					'array_id' => true
-				)
-			),
-			array('id', '',
-				array(
+				]
+			],
+			['id', '',
+				[
 					'id' => true
-				)
-			),
-			array('in graphid,itemid,screenid,slideshowid,sysmapid|fatal|required', '',
-				array(
-					'in' => array('graphid', 'itemid', 'screenid', 'slideshowid', 'sysmapid'),
+				]
+			],
+			['in graphid,itemid,screenid,slideshowid,sysmapid|fatal|required', '',
+				[
+					'in' => ['graphid', 'itemid', 'screenid', 'slideshowid', 'sysmapid'],
 					'fatal' => true,
 					'required' => true
-				)
-			),
-			array('in', 'Cannot parse validation rules "in" at position 0.', false),
-			array('in 1, 2', 'Cannot parse validation rules "in 1, 2" at position 0.', false),
-			array('in 1,|fatal', 'Cannot parse validation rules "in 1,|fatal" at position 0.', false),
-			array('fatal|required|fatal', 'Validation rule "fatal" already exists.', false),
-			array('fatal|required2', 'Cannot parse validation rules "fatal|required2" at position 14.', false),
-			array('fatal|require', 'Cannot parse validation rules "fatal|require" at position 6.', false),
-			array('fatala', 'Cannot parse validation rules "fatala" at position 5.', false),
-			array('fatal not_empty', 'Cannot parse validation rules "fatal not_empty" at position 6.', false),
-			array('FATAL', 'Cannot parse validation rules "FATAL" at position 0.', false)
-		);
+				]
+			],
+			['in', 'Cannot parse validation rules "in" at position 0.', false],
+			['in 1, 2', 'Cannot parse validation rules "in 1, 2" at position 0.', false],
+			['in 1,|fatal', 'Cannot parse validation rules "in 1,|fatal" at position 0.', false],
+			['fatal|required|fatal', 'Validation rule "fatal" already exists.', false],
+			['fatal|required2', 'Cannot parse validation rules "fatal|required2" at position 14.', false],
+			['fatal|require', 'Cannot parse validation rules "fatal|require" at position 6.', false],
+			['fatala', 'Cannot parse validation rules "fatala" at position 5.', false],
+			['fatal not_empty', 'Cannot parse validation rules "fatal not_empty" at position 6.', false],
+			['FATAL', 'Cannot parse validation rules "FATAL" at position 0.', false]
+		];
 	}
 
 	/**

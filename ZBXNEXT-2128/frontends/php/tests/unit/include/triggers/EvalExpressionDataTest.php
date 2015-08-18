@@ -22,94 +22,94 @@
 class EvalExpressionDataTest extends PHPUnit_Framework_TestCase {
 
 	public function testValidProvider() {
-		return array(
-			array(
+		return [
+			[
 				'{host:item.last()} = 0',
-				array(
+				[
 					'{host:item.last()}' => 0
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} <> 0',
-				array(
+				[
 					'{host:item.last()}' => 1
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} < 10',
-				array(
+				[
 					'{host:item.last()}' => 5
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} <= 10',
-				array(
+				[
 					'{host:item.last()}' => 10
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} > 10',
-				array(
+				[
 					'{host:item.last()}' => 15
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} >= 10',
-				array(
+				[
 					'{host:item.last()}' => 10
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 10.9',
-				array(
+				[
 					'{host:item.last()}' => 10.9
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 1 or {host:item2.last()} = 2',
-				array(
+				[
 					'{host:item.last()}' => 1,
 					'{host:item2.last()}' => 2,
-				)
-			),
-			array(
+				]
+			],
+			[
 				'not {host:item.last()} = 0',
-				array(
+				[
 					'{host:item.last()}' => 1
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = -1',
-				array(
+				[
 					'{host:item.last()}' => -1
-				)
-			),
+				]
+			],
 			// units
-			array(
+			[
 				'{host:item.last()} = 10s',
-				array(
+				[
 					'{host:item.last()}' => 10
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 10m',
-				array(
+				[
 					'{host:item.last()}' => 600
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 10m',
-				array(
+				[
 					'{host:item.last()}' => '600s'
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 600',
-				array(
+				[
 					'{host:item.last()}' => '10m'
-				)
-			),
-		);
+				]
+			],
+		];
 	}
 
 	/**
@@ -125,107 +125,107 @@ class EvalExpressionDataTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testInvalidProvider() {
-		return array(
-			array(
+		return [
+			[
 				'{host:item.last()} = 0',
-				array(
+				[
 					'{host:item.last()}' => 2
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} <> 0',
-				array(
+				[
 					'{host:item.last()}' => 0
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} < 10',
-				array(
+				[
 					'{host:item.last()}' => 15
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} <= 10',
-				array(
+				[
 					'{host:item.last()}' => 15
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} > 10',
-				array(
+				[
 					'{host:item.last()}' => 5
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} >= 10',
-				array(
+				[
 					'{host:item.last()}' => 5
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 10.9',
-				array(
+				[
 					'{host:item.last()}' => 10.99
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 1 and {host:item2.last()} = 2',
-				array(
+				[
 					'{host:item.last()}' => 2,
 					'{host:item2.last()}' => 2,
-				)
-			),
-			array(
+				]
+			],
+			[
 				'not {host:item.last()} = 0',
-				array(
+				[
 					'{host:item.last()}' => 0
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = -1',
-				array(
+				[
 					'{host:item.last()}' => -20
-				)
-			),
+				]
+			],
 			// units
-			array(
+			[
 				'{host:item.last()} = 10s',
-				array(
+				[
 					'{host:item.last()}' => 11
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 10m',
-				array(
+				[
 					'{host:item.last()}' => 601
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 10m',
-				array(
+				[
 					'{host:item.last()}' => '601s'
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 600',
-				array(
+				[
 					'{host:item.last()}' => '11m'
-				)
-			),
-			array(
+				]
+			],
+			[
 				'{host:item.last()} = 10s',
-				array(
+				[
 					'{host:item.last()}' => '10m'
-				)
-			),
+				]
+			],
 			// invalid expression
-			array(
+			[
 				'{host:item.last()} = value',
-				array(
+				[
 					'{host:item.last()}' => 2
-				)
-			),
-		);
+				]
+			],
+		];
 	}
 
 	/**

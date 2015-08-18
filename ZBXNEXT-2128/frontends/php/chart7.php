@@ -28,36 +28,35 @@ $page['type'] = PAGE_TYPE_IMAGE;
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'period' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
-	'from' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	null,				null),
-	'stime' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	null,				null),
-	'border' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null),
-	'name' =>		array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'width' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null),
-	'height' =>		array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null),
-	'graphtype' =>	array(T_ZBX_INT, O_OPT, null,		IN('2,3'),			null),
-	'graph3d' =>	array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null),
-	'legend' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null),
-	'items' =>		array(T_ZBX_STR, O_OPT, null,		null,				null)
-);
+$fields = [
+	'period' =>		[T_ZBX_INT, O_OPT, P_NZERO,	BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
+	'from' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
+	'stime' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
+	'name' =>		[T_ZBX_STR, O_OPT, null,		null,				null],
+	'width' =>		[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
+	'height' =>		[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
+	'graphtype' =>	[T_ZBX_INT, O_OPT, null,		IN('2,3'),			null],
+	'graph3d' =>	[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null],
+	'legend' =>		[T_ZBX_INT, O_OPT, P_NZERO,	IN('0,1'),			null],
+	'items' =>		[T_ZBX_STR, O_OPT, null,		null,				null]
+];
 $isDataValid = check_fields($fields);
 
-$items = getRequest('items', array());
+$items = getRequest('items', []);
 asort_by_key($items, 'sortorder');
 
 /*
  * Permissions
  */
-$dbItems = API::Item()->get(array(
+$dbItems = API::Item()->get([
 	'itemids' => zbx_objectValues($items, 'itemid'),
-	'filter' => array(
-		'flags' => array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED)
-	),
-	'output' => array('itemid'),
+	'filter' => [
+		'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
+	],
+	'output' => ['itemid'],
 	'webitems' => true,
 	'preservekeys' => true
-));
+]);
 
 foreach ($items as $item) {
 	if (!isset($dbItems[$item['itemid']])) {
@@ -68,7 +67,7 @@ foreach ($items as $item) {
 /*
  * Validation
  */
-$types = array();
+$types = [];
 foreach ($items as $item) {
 	if ($item['type'] == GRAPH_ITEM_SUM) {
 		if (!in_array($item['type'], $types)) {
@@ -103,9 +102,6 @@ if ($isDataValid) {
 	}
 	if (isset($_REQUEST['stime'])) {
 		$graph->setSTime($_REQUEST['stime']);
-	}
-	if (isset($_REQUEST['border'])) {
-		$graph->setBorder(0);
 	}
 	$graph->setWidth(getRequest('width', 400));
 	$graph->setHeight(getRequest('height', 300));

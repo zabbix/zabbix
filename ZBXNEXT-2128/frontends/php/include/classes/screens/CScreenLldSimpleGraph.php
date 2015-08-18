@@ -27,7 +27,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	/**
 	 * @var array
 	 */
-	protected $createdItemIds = array();
+	protected $createdItemIds = [];
 
 	/**
 	 * @var array
@@ -56,15 +56,15 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 
 			if ($itemPrototype) {
 				// get all created (discovered) items for current host
-				$allCreatedItems = API::Item()->get(array(
-					'output' => array('itemid', 'name', 'key_', 'hostid'),
-					'hostids' => array($itemPrototype['discoveryRule']['hostid']),
-					'selectItemDiscovery' => array('itemid', 'parent_itemid'),
-					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
-				));
+				$allCreatedItems = API::Item()->get([
+					'output' => ['itemid', 'name', 'key_', 'hostid'],
+					'hostids' => [$itemPrototype['discoveryRule']['hostid']],
+					'selectItemDiscovery' => ['itemid', 'parent_itemid'],
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				]);
 
 				// collect those items where parent item is item prototype selected for this screen item as resource
-				$createdItems = array();
+				$createdItems = [];
 				foreach ($allCreatedItems as $item) {
 					if ($item['itemDiscovery']['parent_itemid'] == $itemPrototype['itemid']) {
 						$createdItems[] = $item;
@@ -94,7 +94,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	protected function getSimpleGraphsForSurrogateScreen(array $itemIds) {
 		$screenItemTemplate = $this->getScreenItemTemplate(SCREEN_RESOURCE_SIMPLE_GRAPH);
 
-		$screenItems = array();
+		$screenItems = [];
 		foreach ($itemIds as $itemId) {
 			$screenItem = $screenItemTemplate;
 
@@ -115,21 +115,16 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	protected function getPreviewOutput() {
 		$itemPrototype = $this->getItemPrototype();
 
-		$queryParams = array(
-			'items' => array($itemPrototype),
+		$queryParams = [
+			'items' => [$itemPrototype],
 			'period' => 3600,
 			'legend' => 1,
 			'width' => $this->screenitem['width'],
 			'height' => $this->screenitem['height'],
 			'name' => $itemPrototype['hosts'][0]['name'].NAME_DELIMITER.$itemPrototype['name']
-		);
+		];
 
-		$src = 'chart3.php?'.http_build_query($queryParams);
-
-		$img = new CImg($src);
-		$img->preload();
-
-		return new CSpan($img);
+		return new CSpan(new CImg('chart3.php?'.http_build_query($queryParams)));
 	}
 
 	/**
@@ -139,31 +134,31 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 	 */
 	protected function getItemPrototype() {
 		if ($this->itemPrototype === null) {
-			$defaultOptions = array(
-				'output' => array('itemid', 'name'),
-				'selectHosts' => array('name'),
-				'selectDiscoveryRule' => array('hostid')
-			);
+			$defaultOptions = [
+				'output' => ['itemid', 'name'],
+				'selectHosts' => ['name'],
+				'selectDiscoveryRule' => ['hostid']
+			];
 
-			$options = array();
+			$options = [];
 
 			/*
 			 * If screen item is dynamic or is templated screen, real item prototype is looked up by "key"
 			 * used as resource ID for this screen item and by current host.
 			 */
 			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen) && $this->hostid) {
-				$currentItemPrototype = API::ItemPrototype()->get(array(
-					'output' => array('key_'),
-					'itemids' => array($this->screenitem['resourceid'])
-				));
+				$currentItemPrototype = API::ItemPrototype()->get([
+					'output' => ['key_'],
+					'itemids' => [$this->screenitem['resourceid']]
+				]);
 				$currentItemPrototype = reset($currentItemPrototype);
 
-				$options['hostids'] = array($this->hostid);
-				$options['filter'] = array('key_' => $currentItemPrototype['key_']);
+				$options['hostids'] = [$this->hostid];
+				$options['filter'] = ['key_' => $currentItemPrototype['key_']];
 			}
 			// otherwise just use resource ID given to to this screen item.
 			else {
-				$options['itemids'] = array($this->screenitem['resourceid']);
+				$options['itemids'] = [$this->screenitem['resourceid']];
 			}
 
 			$options = zbx_array_merge($defaultOptions, $options);

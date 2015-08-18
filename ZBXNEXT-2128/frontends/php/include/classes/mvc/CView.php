@@ -22,7 +22,7 @@
 class CView {
 
 	/**
-	 * @var string - name of the template file without extension, for example 'general.search'
+	 * @var string - name of the template file without extension, for example 'configuration.item.edit'
 	 */
 	private $filePath;
 
@@ -45,24 +45,24 @@ class CView {
 	/**
 	 * @var array - Java code for inclusions on page
 	 */
-	private $jsIncludePost = array();
+	private $jsIncludePost = [];
 
 	/**
 	 * @var array - Java Script files for inclusions on page, pre-processed by PHP
 	 */
-	private $jsIncludeFiles = array();
+	private $jsIncludeFiles = [];
 
 	/**
 	 * @var array - Java Script files for inclusions on page, included as <script src="..."></script>
 	 */
-	private $jsFiles = array();
+	private $jsFiles = [];
 
 	/**
 	 * @array - directories where views are stored, ordered by priority
 	 * include/views should be removed once we fully move to MVC
 	 */
 //	static $viewsDir = array('app/local/views', 'app/views', 'include/views');
-	static $viewsDir = array('local/app/views', 'app/views', 'include/views');
+	static $viewsDir = ['local/app/views', 'app/views', 'include/views'];
 
 	/**
 	 * Creates a new view based on provided template file.
@@ -70,7 +70,7 @@ class CView {
 	 * @param array $data deprecated parameter, use set() and get() methods for passing variables to views
 	 * @example $scriptForm = new CView('administration.script.edit');
 	 */
-	public function __construct($view, $data = array()) {
+	public function __construct($view, $data = []) {
 		$this->assign($view);
 		$this->data = $data;
 	}
@@ -123,7 +123,7 @@ class CView {
 	 * @deprecated use $data instead
 	 */
 	public function getArray($var) {
-		return isset($this->data[$var]) && is_array($this->data[$var]) ? $this->data[$var] : array();
+		return isset($this->data[$var]) && is_array($this->data[$var]) ? $this->data[$var] : [];
 	}
 
 	/**

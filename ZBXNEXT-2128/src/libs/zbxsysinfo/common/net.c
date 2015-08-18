@@ -34,7 +34,7 @@
 int	tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)
 {
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	const char	*buf;
 	int		net, val = ZBX_TCP_EXPECT_OK;
 
@@ -74,7 +74,7 @@ int	tcp_expect(const char *host, unsigned short port, int timeout, const char *r
 	zbx_tcp_close(&s);
 out:
 	if (SUCCEED != net)
-		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "TCP expect network error: %s", zbx_socket_strerror());
 
 	return SYSINFO_RET_OK;
 }
@@ -185,7 +185,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	char			*ip, zone[MAX_STRING_LEN], buffer[MAX_STRING_LEN], *zone_str, *param;
 	struct in_addr		inaddr;
 #ifndef _WINDOWS
-	int			saved_nscount, saved_retrans, saved_retry;
+	int			saved_nscount = 0, saved_retrans, saved_retry;
 	unsigned long		saved_options;
 	struct sockaddr_in	saved_ns;
 #endif

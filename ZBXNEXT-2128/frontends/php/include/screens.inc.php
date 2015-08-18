@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/actions.inc.php';
 require_once dirname(__FILE__).'/js.inc.php';
 
 function screen_resources($resource = null) {
-	$resources = array(
+	$resources = [
 		SCREEN_RESOURCE_CLOCK => _('Clock'),
 		SCREEN_RESOURCE_DATA_OVERVIEW => _('Data overview'),
 		SCREEN_RESOURCE_GRAPH => _('Graph'),
@@ -44,7 +44,7 @@ function screen_resources($resource = null) {
 		SCREEN_RESOURCE_URL => _('URL'),
 		SCREEN_RESOURCE_LLD_GRAPH => _('Graph prototype'),
 		SCREEN_RESOURCE_LLD_SIMPLE_GRAPH => _('Simple graph prototype')
-	);
+	];
 
 	if (is_null($resource)) {
 		natsort($resources);
@@ -119,7 +119,7 @@ function slideshow_accessible($slideshowid, $perm) {
 	if (DBselect($sql)) {
 		$result = true;
 
-		$screenids = array();
+		$screenids = [];
 		$db_screens = DBselect(
 			'SELECT DISTINCT s.screenid'.
 			' FROM slides s'.
@@ -129,10 +129,10 @@ function slideshow_accessible($slideshowid, $perm) {
 			$screenids[$slide_data['screenid']] = $slide_data['screenid'];
 		}
 
-		$options = array(
-			'output' => array('screenid'),
+		$options = [
+			'output' => ['screenid'],
 			'screenids' => $screenids
-		);
+		];
 		if ($perm == PERM_READ_WRITE) {
 			$options['editable'] = true;
 		}
@@ -162,10 +162,10 @@ function add_slideshow($name, $delay, $slides) {
 
 	// validate screens
 	$screenids = zbx_objectValues($slides, 'screenid');
-	$screens = API::Screen()->get(array(
+	$screens = API::Screen()->get([
 		'screenids' => $screenids,
-		'output' => array('screenid')
-	));
+		'output' => ['screenid']
+	]);
 	$screens = ZBX_toHash($screens, 'screenid');
 	foreach ($screenids as $screenid) {
 		if (!isset($screens[$screenid])) {
@@ -222,10 +222,10 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 
 	// validate screens
 	$screenids = zbx_objectValues($slides, 'screenid');
-	$screens = API::Screen()->get(array(
+	$screens = API::Screen()->get([
 		'screenids' => $screenids,
-		'output' => array('screenid')
-	));
+		'output' => ['screenid']
+	]);
 	$screens = ZBX_toHash($screens, 'screenid');
 	foreach ($screenids as $screenid) {
 		if (!isset($screens[$screenid])) {
@@ -249,7 +249,7 @@ function update_slideshow($slideshowid, $name, $delay, $slides) {
 	$dbSlideshow = DBfetchArray(DBselect('SELECT * FROM slideshows WHERE slideshowid='.zbx_dbstr($slideshowid)));
 	$dbSlideshow = $dbSlideshow[0];
 	$changed = false;
-	$slideshow = array('name' => $name, 'delay' => $delay);
+	$slideshow = ['name' => $name, 'delay' => $delay];
 
 	foreach ($slideshow as $key => $val) {
 		if ((string) $val !== (string) $dbSlideshow[$key]) {

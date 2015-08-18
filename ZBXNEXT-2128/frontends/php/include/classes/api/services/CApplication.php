@@ -28,7 +28,7 @@ class CApplication extends CApiService {
 
 	protected $tableName = 'applications';
 	protected $tableAlias = 'a';
-	protected $sortColumns = array('applicationid', 'name');
+	protected $sortColumns = ['applicationid', 'name'];
 
 	/**
 	 * Get applications data.
@@ -48,48 +48,50 @@ class CApplication extends CApiService {
 	 *
 	 * @return array	item data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('apps' => 'a.applicationid'),
-			'from'		=> array('applications' => 'applications a'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['apps' => 'a.applicationid'],
+			'from'		=> ['applications' => 'applications a'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
-			'groupids'					=> null,
-			'templateids'				=> null,
-			'hostids'					=> null,
-			'itemids'					=> null,
-			'applicationids'			=> null,
-			'templated'					=> null,
-			'editable'					=> null,
-			'inherited' 				=> null,
-			'nopermissions'				=> null,
+		$defOptions = [
+			'groupids'						=> null,
+			'templateids'					=> null,
+			'hostids'						=> null,
+			'itemids'						=> null,
+			'applicationids'				=> null,
+			'templated'						=> null,
+			'editable'						=> null,
+			'inherited'						=> null,
+			'nopermissions'					=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
-			'searchWildcardsEnabled'	=> null,
+			'filter'						=> null,
+			'search'						=> null,
+			'searchByAny'					=> null,
+			'startSearch'					=> null,
+			'excludeSearch'					=> null,
+			'searchWildcardsEnabled'		=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHost'				=> null,
-			'selectItems'				=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null
-		);
+			'output'						=> API_OUTPUT_EXTEND,
+			'selectHost'					=> null,
+			'selectItems'					=> null,
+			'selectDiscoveryRule'			=> null,
+			'selectApplicationDiscovery'	=> null,
+			'countOutput'					=> null,
+			'groupCount'					=> null,
+			'preservekeys'					=> null,
+			'sortfield'						=> '',
+			'sortorder'						=> '',
+			'limit'							=> null
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
@@ -225,7 +227,7 @@ class CApplication extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -247,27 +249,27 @@ class CApplication extends CApiService {
 
 		// permissions
 		if ($update || $delete) {
-			$itemDbFields = array('applicationid' => null);
-			$dbApplications = $this->get(array(
-				'output' => API_OUTPUT_EXTEND,
+			$itemDbFields = ['applicationid' => null];
+			$dbApplications = $this->get([
+				'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
 				'applicationids' => zbx_objectValues($applications, 'applicationid'),
-				'editable' => 1,
-				'preservekeys' => 1
-			));
+				'editable' => true,
+				'preservekeys' => true
+			]);
 		}
 		else {
-			$itemDbFields = array('name' => null, 'hostid' => null);
-			$dbHosts = API::Host()->get(array(
-				'output' => array('hostid', 'host', 'status'),
+			$itemDbFields = ['name' => null, 'hostid' => null];
+			$dbHosts = API::Host()->get([
+				'output' => ['hostid', 'host', 'status'],
 				'hostids' => zbx_objectValues($applications, 'hostid'),
-				'templated_hosts' => 1,
-				'editable' => 1,
-				'preservekeys' => 1
-			));
+				'templated_hosts' => true,
+				'editable' => true,
+				'preservekeys' => true
+			]);
 		}
 
 		if ($update){
-			$applications = $this->extendObjects($this->tableName(), $applications, array('name'));
+			$applications = $this->extendObjects($this->tableName(), $applications, ['name']);
 		}
 
 		foreach ($applications as &$application) {
@@ -289,21 +291,29 @@ class CApplication extends CApiService {
 				}
 			}
 
-			// check for "templateid", because it is not allowed
-			if (array_key_exists('templateid', $application)) {
-				if ($update) {
-					$error = _s('Cannot update "templateid" for application "%1$s".', $application['name']);
-				}
-				else {
-					$error = _s('Cannot set "templateid" for application "%1$s".', $application['name']);
-				}
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			if ($update) {
+				$this->checkNoParameters(
+					$application, ['templateid', 'flags'], _('Cannot update "%1$s" for application "%2$s".'),
+					$application['name']
+				);
+			}
+			elseif ($create) {
+				$this->checkNoParameters(
+					$application, ['templateid', 'flags'], _('Cannot set "%1$s" for application "%2$s".'),
+					$application['name']
+				);
 			}
 
-			// check on operating with templated applications
+			// Check on operating with templated and discovered applications.
 			if ($delete || $update) {
 				if ($dbApplications[$application['applicationid']]['templateids']) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot update templated applications.'));
+				}
+
+				if ($dbApplications[$application['applicationid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot update discovered application "%1$s".',
+						$dbApplications[$application['applicationid']]['name']
+					));
 				}
 			}
 
@@ -315,14 +325,14 @@ class CApplication extends CApiService {
 
 			// check existence
 			if ($update || $create) {
-				$applicationsExists = $this->get(array(
+				$applicationsExists = $this->get([
 					'output' => API_OUTPUT_EXTEND,
-					'filter' => array(
+					'filter' => [
 						'hostid' => $application['hostid'],
 						'name' => $application['name']
-					),
+					],
 					'nopermissions' => 1
-				));
+				]);
 				foreach ($applicationsExists as $applicationExists) {
 					if (!$update || (bccomp($applicationExists['applicationid'], $application['applicationid']) != 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Application "%1$s" already exists.', $application['name']));
@@ -344,11 +354,16 @@ class CApplication extends CApiService {
 		$applications = zbx_toArray($applications);
 		$this->checkInput($applications, __FUNCTION__);
 
+		foreach ($applications as &$application) {
+			$application['flags'] = ZBX_FLAG_DISCOVERY_NORMAL;
+		}
+		unset($application);
+
 		$appManager = new CApplicationManager();
 		$applications = $appManager->create($applications);
 		$appManager->inherit($applications);
 
-		return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
+		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
 
 	/**
@@ -366,7 +381,7 @@ class CApplication extends CApiService {
 		$appManager->update($applications);
 		$appManager->inherit($applications);
 
-		return array('applicationids' => zbx_objectValues($applications, 'applicationid'));
+		return ['applicationids' => zbx_objectValues($applications, 'applicationid')];
 	}
 
 	/**
@@ -379,14 +394,13 @@ class CApplication extends CApiService {
 	 */
 	public function delete(array $applicationids, $nopermissions = false) {
 		// TODO: remove $nopermissions hack
-		$options = array(
+		$delApplications = $this->get([
+			'output' => ['applicationid', 'hostid', 'name', 'flags', 'templateids'],
+			'selectHost' => ['name', 'hostid'],
 			'applicationids' => $applicationids,
 			'editable' => true,
-			'output' => API_OUTPUT_EXTEND,
-			'preservekeys' => true,
-			'selectHost' => array('name', 'hostid')
-		);
-		$delApplications = $this->get($options);
+			'preservekeys' => true
+		]);
 
 		if (!$nopermissions) {
 			foreach ($applicationids as $applicationid) {
@@ -396,13 +410,19 @@ class CApplication extends CApiService {
 				if ($delApplications[$applicationid]['templateids']) {
 					self::exception(ZBX_API_ERROR_PERMISSIONS, _('Cannot delete templated application.'));
 				}
+
+				if ($delApplications[$applicationid]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Cannot delete discovered application "%1$s".',
+						$delApplications[$applicationid]['name']
+					));
+				}
 			}
 		}
 
 		$appManager = new CApplicationManager();
 
 		// fetch application children
-		$childApplicationIds = array();
+		$childApplicationIds = [];
 		$parentApplicationIds = $applicationids;
 		while ($parentApplicationIds) {
 			$parentApplicationIds = $appManager->fetchExclusiveChildIds($parentApplicationIds);
@@ -416,13 +436,13 @@ class CApplication extends CApiService {
 			$childApplicationIds = $appManager->fetchEmptyIds($childApplicationIds);
 		}
 
-		$childApplications = $this->get(array(
+		$childApplications = $this->get([
 			'applicationids' => $childApplicationIds,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHost' => array('name', 'hostid')
-		));
+			'selectHost' => ['name', 'hostid']
+		]);
 
 		$appManager->delete(array_merge($applicationids, $childApplicationIds));
 
@@ -433,7 +453,7 @@ class CApplication extends CApiService {
 			));
 		}
 
-		return array('applicationids' => $applicationids);
+		return ['applicationids' => $applicationids];
 	}
 
 	/**
@@ -456,26 +476,26 @@ class CApplication extends CApiService {
 		$itemIds = zbx_objectValues($items, 'itemid');
 
 		// validate permissions
-		$allowedApplications = $this->get(array(
+		$allowedApplications = $this->get([
 			'applicationids' => $applicationIds,
-			'output' => array('applicationid', 'hostid', 'name'),
-			'selectHost' => array('hostid', 'name'),
+			'output' => ['applicationid', 'hostid', 'name'],
+			'selectHost' => ['hostid', 'name'],
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 		foreach ($applications as $application) {
 			if (!isset($allowedApplications[$application['applicationid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 			}
 		}
 
-		$allowedItems = API::Item()->get(array(
+		$allowedItems = API::Item()->get([
 			'itemids' => $itemIds,
-			'selectHosts' => array('name'),
-			'output' => array('itemid', 'hostid', 'name'),
+			'selectHosts' => ['name'],
+			'output' => ['itemid', 'hostid', 'name'],
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 		foreach ($items as $item) {
 			if (!isset($allowedItems[$item['itemid']])) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
@@ -514,7 +534,7 @@ class CApplication extends CApiService {
 			$linked[$pair['applicationid']][$pair['itemid']] = true;
 		}
 
-		$createApplications = array();
+		$createApplications = [];
 
 		foreach ($applicationIds as $applicationId) {
 			foreach ($itemIds as $itemId) {
@@ -522,10 +542,10 @@ class CApplication extends CApiService {
 					continue;
 				}
 
-				$createApplications[] = array(
+				$createApplications[] = [
 					'itemid' => $itemId,
 					'applicationid' => $applicationId
-				);
+				];
 			}
 		}
 
@@ -544,19 +564,19 @@ class CApplication extends CApiService {
 						' AND '.dbConditionInt('a2.applicationid', $applicationIds)
 				);
 
-				$childApplications = array();
+				$childApplications = [];
 
 				while ($dbApplication = DBfetch($dbApplications)) {
 					$childApplications[] = $dbApplication;
 				}
 
-				if (!$result = $this->massAdd(array('items' => $child, 'applications' => $childApplications))) {
+				if (!$result = $this->massAdd(['items' => $child, 'applications' => $childApplications])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot add items.'));
 				}
 			}
 		}
 
-		return array('applicationids' => $applicationIds);
+		return ['applicationids' => $applicationIds];
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {
@@ -570,7 +590,7 @@ class CApplication extends CApiService {
 					' WHERE '.dbConditionInt('at.applicationid', array_keys($result))
 			);
 			$relationMap = new CRelationMap();
-			$templateApplications = array();
+			$templateApplications = [];
 			while ($templateApplication = DBfetch($query)) {
 				$relationMap->addRelation($templateApplication['applicationid'], $templateApplication['application_templateid']);
 				$templateApplications[$templateApplication['application_templateid']] = $templateApplication['templateid'];
@@ -581,26 +601,74 @@ class CApplication extends CApiService {
 		// adding one host
 		if ($options['selectHost'] !== null) {
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'hostid');
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'output' => $options['selectHost'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'templated_hosts' => true,
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapOne($result, $hosts, 'host');
 		}
 
 		// adding items
 		if ($options['selectItems'] !== null && $options['selectItems'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'applicationid', 'itemid', 'items_applications');
-			$items = API::Item()->get(array(
+			$items = API::Item()->get([
 				'output' => $options['selectItems'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $items, 'items');
+		}
+
+		// adding discovery rule
+		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
+			$relationMap = new CRelationMap();
+
+			$dbRules = DBselect(
+				'SELECT ad.applicationid,ap.itemid'.
+				' FROM application_discovery ad,application_prototype ap,applications a'.
+				' WHERE '.dbConditionInt('ad.applicationid', array_keys($result)).
+					' AND ad.application_prototypeid=ap.application_prototypeid'.
+					' AND a.applicationid=ad.applicationid'.
+					' AND a.flags='.ZBX_FLAG_DISCOVERY_CREATED
+			);
+
+			while ($rule = DBfetch($dbRules)) {
+				$relationMap->addRelation($rule['applicationid'], $rule['itemid']);
+			}
+
+			$discoveryRules = API::DiscoveryRule()->get([
+				'output' => $options['selectDiscoveryRule'],
+				'itemids' => $relationMap->getRelatedIds(),
+				'nopermissions' => true,
+				'preservekeys' => true
+			]);
+
+			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
+		}
+
+		// adding application discovery
+		if ($options['selectApplicationDiscovery'] !== null) {
+			$applicationDiscoveries = API::getApiService()->select('application_discovery', [
+				'output' => $this->outputExtend($options['selectApplicationDiscovery'],
+					['application_discoveryid', 'applicationid']
+				),
+				'filter' => ['applicationid' => array_keys($result)],
+				'preservekeys' => true
+			]);
+
+			$relationMap = $this->createRelationMap($applicationDiscoveries, 'applicationid',
+				'application_discoveryid'
+			);
+
+			$applicationDiscoveries = $this->unsetExtraFields($applicationDiscoveries,
+				['applicationid', 'application_discoveryid'], $options['selectApplicationDiscovery']
+			);
+
+			$result = $relationMap->mapMany($result, $applicationDiscoveries, 'applicationDiscovery');
 		}
 
 		return $result;

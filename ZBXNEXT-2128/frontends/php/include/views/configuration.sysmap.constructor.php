@@ -21,86 +21,67 @@
 
 include('include/views/js/configuration.sysmaps.js.php');
 
-$sysmapWidget = new CWidget();
-$sysmapWidget->addPageHeader(_('CONFIGURATION OF NETWORK MAPS'));
+$sysmapWidget = (new CWidget())->setTitle(_('Network maps'));
 
 // create menu
-$addIcon = new CIcon(_('Add element'), 'iconplus');
-$addIcon->setAttribute('id', 'selementAdd');
-$removeIcon = new CIcon(_('Remove element'), 'iconminus');
-$removeIcon->setAttribute('id', 'selementRemove');
-
-$addLinkIcon = new CIcon(_('Add link'), 'iconplus');
-$addLinkIcon->setAttribute('id', 'linkAdd');
-$removeLinkIcon = new CIcon(_('Remove link'), 'iconminus');
-$removeLinkIcon->setAttribute('id', 'linkRemove');
-
-$expandMacros = new CSpan(($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off'), 'whitelink');
-$expandMacros->setAttribute('id', 'expand_macros');
-
-$gridShow = new CSpan(($this->data['sysmap']['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden'), 'whitelink');
-$gridShow->setAttribute('id', 'gridshow');
-
-$gridAutoAlign = new CSpan(($this->data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off'), 'whitelink');
-$gridAutoAlign->setAttribute('id', 'gridautoalign');
-
-$gridSize = new CComboBox('gridsize', $this->data['sysmap']['grid_size']);
-$gridSize->addItems(array(
-	20 => '20x20',
-	40 => '40x40',
-	50 => '50x50',
-	75 => '75x75',
-	100 => '100x100'
-));
-
-$gridAlignAll = new CSubmit('gridalignall', _('Align icons'));
-$gridAlignAll->setAttribute('id', 'gridalignall');
-
-$gridForm = new CDiv(array($gridSize, $gridAlignAll));
-$gridForm->setAttribute('id', 'gridalignblock');
-
-$saveButton = new CSubmit('update', _('Update'));
-$saveButton->setAttribute('id', 'sysmap_update');
-
-$menuTable = new CTable(null, 'textwhite');
-$menuTable->addRow(array(
-	_s('Map "%s"', $this->data['sysmap']['name']),
-	SPACE.SPACE,
-	_('Icon'), SPACE, $addIcon, SPACE, $removeIcon,
-	SPACE.SPACE,
-	_('Link'), SPACE, $addLinkIcon, SPACE, $removeLinkIcon,
-	SPACE.SPACE,
-	_('Expand macros').' [ ', $expandMacros, ' ]',
-	SPACE.SPACE,
-	_('Grid').SPACE.'[', $gridShow, '|', $gridAutoAlign, ']',
-	SPACE,
-	$gridForm,
-	SPACE.'|'.SPACE,
-	$saveButton
-));
-
-$sysmapWidget->addPageHeader($menuTable);
+$menu = (new CList())
+	->addClass('object-group')
+	->addItem([
+		_('Icon').':'.SPACE,
+		(new CButton('selementAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
+		SPACE.'/'.SPACE,
+		(new CButton('selementRemove', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
+	])
+	->addItem([
+		_('Link').':'.SPACE,
+		(new CButton('linkAdd', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
+		SPACE.'/'.SPACE,
+		(new CButton('linkRemove', _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
+	])
+	->addItem([
+		_('Expand macros').':'.SPACE,
+		(new CButton('expand_macros', ($this->data['sysmap']['expand_macros'] == SYSMAP_EXPAND_MACROS_ON) ? _('On') : _('Off')))->addClass(ZBX_STYLE_BTN_LINK)
+	])
+	->addItem([
+		_('Grid').':'.SPACE,
+		(new CButton('gridshow', ($this->data['sysmap']['grid_show'] == SYSMAP_GRID_SHOW_ON) ? _('Shown') : _('Hidden')))->addClass(ZBX_STYLE_BTN_LINK),
+		SPACE.'/'.SPACE,
+		(new CButton('gridautoalign', ($this->data['sysmap']['grid_align'] == SYSMAP_GRID_ALIGN_ON) ? _('On') : _('Off')))->addClass(ZBX_STYLE_BTN_LINK)
+	])
+	->addItem(new CComboBox('gridsize', $this->data['sysmap']['grid_size'], null, [
+		20 => '20x20',
+		40 => '40x40',
+		50 => '50x50',
+		75 => '75x75',
+		100 => '100x100'
+	]))
+	->addItem((new CButton('gridalignall', _('Align icons')))->addClass(ZBX_STYLE_BTN_LINK))
+	->addItem((new CSubmit('update', _('Update')))->setAttribute('id', 'sysmap_update'));
 
 // create map
-$backgroundImage = new CImg('images/general/tree/zero.gif', 'Sysmap');
-$backgroundImage->setAttribute('id', 'sysmap_img', $this->data['sysmap']['width'], $this->data['sysmap']['height']);
+$backgroundImage = (new CImg('images/general/tree/zero.gif', 'Sysmap'))
+	->setId('sysmap_img', $this->data['sysmap']['width'], $this->data['sysmap']['height']);
 
 $backgroundImageTable = new CTable();
 $backgroundImageTable->addRow($backgroundImage);
-$sysmapWidget->addItem($backgroundImageTable);
 
-$container = new CDiv();
-$container->setAttribute('id', 'sysmap_cnt');
-$sysmapWidget->addItem($container);
+$container = (new CDiv())->setId('sysmap_cnt');
+
+$sysmapWidget->addItem($menu)->addItem(
+	(new CDiv())
+		->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER)
+		->addItem($backgroundImageTable)
+		->addItem($container)
+);
 
 // create elements
-zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson(array(
+zbx_add_post_js('ZABBIX.apps.map.run("sysmap_cnt", '.CJs::encodeJson([
 	'sysmap' => $this->data['sysmap'],
 	'iconList' => $this->data['iconList'],
 	'defaultAutoIconId' => $this->data['defaultAutoIconId'],
 	'defaultIconId' => $this->data['defaultIconId'],
 	'defaultIconName' => $this->data['defaultIconName']
-), true).');');
+], true).');');
 
 insert_show_color_picker_javascript();
 

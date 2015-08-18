@@ -23,23 +23,6 @@ function unset_request($key) {
 	unset($_GET[$key], $_POST[$key], $_REQUEST[$key]);
 }
 
-function is_int_range($value) {
-	if (!empty($value)) {
-		foreach (explode(',', $value) as $int_range) {
-			$int_range = explode('-', $int_range);
-			if (count($int_range) > 2) {
-				return false;
-			}
-			foreach ($int_range as $int_val) {
-				if (!is_numeric($int_val)) {
-					return false;
-				}
-			}
-		}
-	}
-	return true;
-}
-
 function BETWEEN($min, $max, $var = null) {
 	return '({'.$var.'}>='.$min.'&&{'.$var.'}<='.$max.')&&';
 }
@@ -164,7 +147,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_DBL) {
-		$decimalValidator = new CDecimalValidator(array(
+		$decimalValidator = new CDecimalValidator([
 			'maxPrecision' => 16,
 			'maxScale' => 4,
 			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
@@ -180,7 +163,7 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 				'Value "%2$s" of "%1$s" has too many digits after the decimal point: '.
 				'it cannot have more than %3$s digits.'
 			)
-		));
+		]);
 		$decimalValidator->setObjectName($caption);
 
 		if (!$decimalValidator->validate($var)) {
@@ -189,14 +172,14 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_DBL_BIG) {
-		$decimalValidator = new CDecimalValidator(array(
+		$decimalValidator = new CDecimalValidator([
 			'maxScale' => 4,
 			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.'),
 			'messageScale' => _(
 				'Value "%2$s" of "%1$s" has too many digits after the decimal point: '.
 				'it cannot have more than %3$s digits.'
 			)
-		));
+		]);
 		$decimalValidator->setObjectName($caption);
 
 		if (!$decimalValidator->validate($var)) {
@@ -205,9 +188,9 @@ function check_type(&$field, $flags, &$var, $type, $caption = null) {
 		}
 	}
 	elseif ($type == T_ZBX_DBL_STR) {
-		$decimalStringValidator = new CDecimalStringValidator(array(
+		$decimalStringValidator = new CDecimalStringValidator([
 			'messageInvalid' => _('Value "%2$s" of "%1$s" has incorrect decimal format.')
-		));
+		]);
 		$decimalStringValidator->setObjectName($caption);
 
 		if (!$decimalStringValidator->validate($var)) {
@@ -361,7 +344,7 @@ function invalid_url($msg = null) {
 
 	// backup messages before including page_header.php
 	$temp = $ZBX_MESSAGES;
-	$ZBX_MESSAGES = null;
+	$ZBX_MESSAGES = [];
 
 	require_once dirname(__FILE__).'/page_header.php';
 
@@ -375,13 +358,13 @@ function invalid_url($msg = null) {
 
 function check_fields(&$fields, $show_messages = true) {
 	// VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-	$system_fields = array(
-		'sid' =>			array(T_ZBX_STR, O_OPT, P_SYS, HEX(),		null),
-		'triggers_hash' =>	array(T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null),
-		'print' =>			array(T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null),
-		'page' =>			array(T_ZBX_INT, O_OPT, P_SYS, null,		null), // paging
-		'ddreset' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,		null)
-	);
+	$system_fields = [
+		'sid' =>			[T_ZBX_STR, O_OPT, P_SYS, HEX(),		null],
+		'triggers_hash' =>	[T_ZBX_STR, O_OPT, P_SYS, NOT_EMPTY,	null],
+		'print' =>			[T_ZBX_INT, O_OPT, P_SYS, IN('1'),		null],
+		'page' =>			[T_ZBX_INT, O_OPT, P_SYS, null,		null], // paging
+		'ddreset' =>		[T_ZBX_INT, O_OPT, P_SYS, null,		null]
+	];
 	$fields = zbx_array_merge($system_fields, $fields);
 
 	$err = ZBX_VALID_OK;

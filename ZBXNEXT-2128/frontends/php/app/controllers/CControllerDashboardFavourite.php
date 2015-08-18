@@ -28,16 +28,16 @@ class CControllerDashboardFavourite extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'object' =>		'fatal|required|in graphid,itemid,screenid,slideshowid,sysmapid',
 			'objectids' =>	'fatal|required|array_id',
 			'operation' =>	'fatal|required|in create,delete'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseData(array('main_block' => '')));
+			$this->setResponse(new CControllerResponseData(['main_block' => '']));
 		}
 
 		return $ret;
@@ -52,7 +52,7 @@ class CControllerDashboardFavourite extends CController {
 		$operation = $this->getInput('operation');
 		$objectids = $this->getInput('objectids');
 
-		$data = array();
+		$data = [];
 		$result = true;
 
 		DBstart();
@@ -76,7 +76,7 @@ class CControllerDashboardFavourite extends CController {
 
 				$data['main_block'] =
 					'jQuery("#'.WIDGET_FAVOURITE_GRAPHS.'").html('.CJs::encodeJson($graphs).');'.
-					'jQuery(".menuPopup").remove();'.
+					'jQuery(".action-menu").remove();'.
 					'jQuery("#favouriteGraphs").data('.
 						'"menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteGraphs()).
 					');';
@@ -99,7 +99,7 @@ class CControllerDashboardFavourite extends CController {
 
 				$data['main_block'] =
 					'jQuery("#'.WIDGET_FAVOURITE_MAPS.'").html('.CJs::encodeJson($maps).');'.
-					'jQuery(".menuPopup").remove();'.
+					'jQuery(".action-menu").remove();'.
 					'jQuery("#favouriteMaps").data('.
 						'"menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteMaps()).
 					');';
@@ -123,7 +123,7 @@ class CControllerDashboardFavourite extends CController {
 
 				$data['main_block'] =
 					'jQuery("#'.WIDGET_FAVOURITE_SCREENS.'").html('.CJs::encodeJson($screens).');'.
-					'jQuery(".menuPopup").remove();'.
+					'jQuery(".action-menu").remove();'.
 					'jQuery("#favouriteScreens").data('.
 						'"menu-popup", '.CJs::encodeJson(CMenuPopupHelper::getFavouriteScreens()).
 					');';

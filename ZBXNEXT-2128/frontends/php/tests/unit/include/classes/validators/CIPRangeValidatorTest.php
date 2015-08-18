@@ -30,7 +30,7 @@ class CIPRangeValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function validParamProvider() {
-		return array(array(array('ipRangeLimit' => 65536)));
+		return [[['ipRangeLimit' => 65536]]];
 	}
 
 	/**
@@ -39,45 +39,46 @@ class CIPRangeValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function validValuesProvider() {
-		return array(
-			array(array(), '0.0.0.0'),
-			array(array(), '255.255.255.255'),
-			array(array(), '192.168.1.0'),
-			array(array(), '2002:0:0:0:0:0:0:0'),
-			array(array(), '2002:0:0:0:0:0:ffff:ffff'),
-			array(array(), 'fe80:0:0:0:0:0:c0a8:100'),
-			array(array(), 'fe80::c0a8:100'),
-			array(array(), '0.0.0.0/0'),
-			array(array(), '0.0.0.0/30'),
-			array(array(), '192.168.255.0/30'),
-			array(array(), '192.168.0-255.0-255'),
-			array(array(), '0-255.0-255.0-255.0-255'),
-			array(array(), '192.168.0.0/16,192.168.0.1'),
-			array(array(), '192.168.0.1-127,192.168.2.1'),
-			array(array(), ' 192.168.0.2 , 192.168.1-127.0  ,  192.168.255.0/16  '),
-			array(array(), 'fe80:0:0:0:0:0:c0a8:0/128'),
-			array(array(), 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0'),
-			array(array(), 'fe80::c0a8:0/112'),
-			array(array(), 'fe80::c0a8:0/128'),
-			array(array(), 'fe80:0:0:0:0:0:c0a8:0-ff'),
-			array(array(), 'fe80::c0a8:0-ff'),
-			array(array(), '0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff'),
-			array(array(), ' fe80::c0a8:100 , fe80::c0a8:0-ff:1  ,  fe80::c0a8:0:1/112  '),
-			array(array('ipRangeLimit' => 4), '255.255.255.254/30'),
-			array(array('ipRangeLimit' => 65536), '255.255.0.0/16'),
-			array(array('ipRangeLimit' => 65536), 'fe80:0:0:0:0:0:c0a8:0/112'),
-			array(array('ipRangeLimit' => 131072), '255.254.0.0/15'),
-			array(array('ipRangeLimit' => 262144), '255.252.0.0/14'),
-			array(array('ipRangeLimit' => 524288), '255.248.0.0/13'),
-			array(array('ipRangeLimit' => 1048576), '255.240.0.0/12'),
-			array(array('ipRangeLimit' => 2097152), '255.224.0.0/11'),
-			array(array('ipRangeLimit' => 4194304), '255.192.0.0/10'),
-			array(array('ipRangeLimit' => 8388608), '255.128.0.0/9'),
-			array(array('ipRangeLimit' => 16777216), '255.0.0.0/8'),
-			array(array('ipRangeLimit' => 268435456), '64.0.0.0/4'),
-			array(array('ipRangeLimit' => 2147483648), '0.0.0.0/1'),
-			array(array('ipRangeLimit' => 4294967296), '0.0.0.0/0')
-		);
+		return [
+			[[], '0.0.0.0'],
+			[[], '255.255.255.255'],
+			[[], '192.168.1.0'],
+			[[], '2002:0:0:0:0:0:0:0'],
+			[[], '2002:0:0:0:0:0:ffff:ffff'],
+			[[], 'fe80:0:0:0:0:0:c0a8:100'],
+			[[], 'fe80::c0a8:100'],
+			[[], '0.0.0.0/0'],
+			[[], '0.0.0.0/30'],
+			[[], '192.168.255.0/30'],
+			[[], '192.168.0-255.0-255'],
+			[[], '0-255.0-255.0-255.0-255'],
+			[[], '192.168.0.0/16,192.168.0.1'],
+			[[], '192.168.0.1-127,192.168.2.1'],
+			[[], ' 192.168.0.2 , 192.168.1-127.0  ,  192.168.255.0/16  '],
+			[[], 'fe80:0:0:0:0:0:c0a8:0/128'],
+			[[], 'ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff/0'],
+			[[], 'fe80::c0a8:0/112'],
+			[[], 'fe80::c0a8:0/128'],
+			[[], 'fe80:0:0:0:0:0:c0a8:0-ff'],
+			[[], 'fe80::c0a8:0-ff'],
+			[[], '0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff'],
+			[[], ' fe80::c0a8:100 , fe80::c0a8:0-ff:1  ,  fe80::c0a8:0:1/112  '],
+			[['ipRangeLimit' => 4], '255.255.255.254/30'],
+			[['ipRangeLimit' => 65536], '255.255.0.0/16'],
+			[['ipRangeLimit' => 65536], 'fe80:0:0:0:0:0:c0a8:0/112'],
+			[['ipRangeLimit' => 131072], '255.254.0.0/15'],
+			[['ipRangeLimit' => 262144], '255.252.0.0/14'],
+			[['ipRangeLimit' => 524288], '255.248.0.0/13'],
+			[['ipRangeLimit' => 1048576], '255.240.0.0/12'],
+			[['ipRangeLimit' => 2097152], '255.224.0.0/11'],
+			[['ipRangeLimit' => 4194304], '255.192.0.0/10'],
+			[['ipRangeLimit' => 8388608], '255.128.0.0/9'],
+			[['ipRangeLimit' => 16777216], '255.0.0.0/8'],
+			[['ipRangeLimit' => 268435456], '64.0.0.0/4'],
+			[['ipRangeLimit' => 2147483648], '0.0.0.0/1'],
+			[['ipRangeLimit' => 4294967296], '0.0.0.0/0'],
+			[[], "192.168.1.1-2\t\n\r,\t\n\r192.168.1.2-3"],
+		];
 	}
 
 	/**
@@ -86,73 +87,77 @@ class CIPRangeValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function invalidValuesProvider() {
-		return array(
-			array(array(),
+		return [
+			[[],
 				null,
 				'Invalid IP address range "null": must be a string.'
-			),
-			array(array(),
-				array(),
+			],
+			[[],
+				[],
 				'Invalid IP address range "array": must be a string.'
-			),
-			array(array(),
+			],
+			[[],
 				'',
 				'IP address range cannot be empty.'
-			),
-			array(array(),
+			],
+			[[],
 				'192.168.0-255.0/30',
 				'Invalid IP address range "192.168.0-255.0/30".'
-			),
-			array(array(),
+			],
+			[[],
 				'192.168.0-255.0-255/16-30',
 				'Invalid IP address range "192.168.0-255.0-255/16-30".'
-			),
-			array(array('ipRangeLimit' => 65536),
+			],
+			[['ipRangeLimit' => 65536],
 				'0-255.0-255.0-255.0-255',
 				'IP range "0-255.0-255.0-255.0-255" exceeds "65536" address limit.'
-			),
-			array(array('ipRangeLimit' => 65536),
+			],
+			[['ipRangeLimit' => 65536],
 				'0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff',
 				'IP range "0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff:0000-ffff"'.
 				' exceeds "65536" address limit.'
-			),
-			array(array(),
+			],
+			[[],
 				'{$A}',
 				'Invalid IP address range "{$A}".'
-			),
-			array(array(),
+			],
+			[[],
 				'321.654.987.456',
 				'Invalid IP address range "321.654.987.456".'
-			),
-			array(array(),
+			],
+			[[],
 				'321.654.987.456-456',
 				'Invalid IP address range "321.654.987.456-456".'
-			),
-			array(array(),
+			],
+			[[],
 				'192.168.443.0/432',
 				'Invalid IP address range "192.168.443.0/432".'
-			),
-			array(array('ipRangeLimit' => 65536),
+			],
+			[['ipRangeLimit' => 65536],
 				'192.168.0.0/15',
 				'IP range "192.168.0.0/15" exceeds "65536" address limit.'
-			),
-			array(array(),
+			],
+			[[],
 				'192.168.0.0/16-30',
 				'Invalid IP address range "192.168.0.0/16-30".'
-			),
-			array(array('ipRangeLimit' => 65536),
+			],
+			[['ipRangeLimit' => 65536],
 				'fe80:0:0:0:0:0:c0a8:0/111',
 				'IP range "fe80:0:0:0:0:0:c0a8:0/111" exceeds "65536" address limit.'
-			),
-			array(array(),
+			],
+			[[],
 				'fe80:0:0:0:0:0:c0a8:0/129',
 				'Invalid IP address range "fe80:0:0:0:0:0:c0a8:0/129".'
-			),
-			array(array(),
+			],
+			[[],
 				'fe80::c0a8:0/129',
 				'Invalid IP address range "fe80::c0a8:0/129".'
-			)
-		);
+			],
+			[[], // contains vertical tab character \0x0B
+				"192.168.1.1-2\t\n\r,192.168.1.2-3",
+				'Invalid IP address range "192.168.1.2-3".'
+			]
+		];
 	}
 
 	/**
@@ -161,11 +166,11 @@ class CIPRangeValidatorTest extends CValidatorTest {
 	 * @return array
 	 */
 	public function invalidValuesWithObjectsProvider() {
-		return array(array(
-			array(),
+		return [[
+			[],
 			null,
 			'Invalid IP address range "null": must be a string.'
-		));
+		]];
 	}
 
 	/**
@@ -175,7 +180,7 @@ class CIPRangeValidatorTest extends CValidatorTest {
 	 *
 	 * @return CValidator
 	 */
-	protected function createValidator(array $params = array()) {
+	protected function createValidator(array $params = []) {
 		return new CIPRangeValidator($params);
 	}
 }

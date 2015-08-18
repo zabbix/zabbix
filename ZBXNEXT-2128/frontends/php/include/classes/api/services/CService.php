@@ -28,12 +28,12 @@ class CService extends CApiService {
 
 	protected $tableName = 'services';
 	protected $tableAlias = 's';
-	protected $sortColumns = array('sortorder', 'name');
+	protected $sortColumns = ['sortorder', 'name'];
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->getOptions = array_merge($this->getOptions, array(
+		$this->getOptions = array_merge($this->getOptions, [
 			'parentids' => null,
 			'childids' => null,
 			'countOutput' => null,
@@ -45,7 +45,7 @@ class CService extends CApiService {
 			'selectTrigger' => null,
 			'sortfield' => '',
 			'sortorder' => ''
-		));
+		]);
 	}
 
 	/**
@@ -76,7 +76,7 @@ class CService extends CApiService {
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
-		$result = array();
+		$result = [];
 		while ($row = DBfetch($res)) {
 			// a count query, return a single result
 			if ($options['countOutput'] !== null) {
@@ -94,7 +94,7 @@ class CService extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('triggerid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['triggerid'], $options['output']);
 		}
 
 		if ($options['preservekeys'] === null) {
@@ -125,9 +125,9 @@ class CService extends CApiService {
 			$this->checkParentId($service);
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
-			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
+			$this->checkUnsupportedFields($this->tableName(), $service, $error, [
 				'parentid', 'dependencies', 'times'
-			));
+			]);
 		}
 
 		$this->checkTriggerPermissions($services);
@@ -147,8 +147,8 @@ class CService extends CApiService {
 		// save the services
 		$serviceIds = DB::insert($this->tableName(), $services);
 
-		$dependencies = array();
-		$serviceTimes = array();
+		$dependencies = [];
+		$serviceTimes = [];
 		foreach ($services as $key => $service) {
 			$serviceId = $serviceIds[$key];
 
@@ -162,11 +162,11 @@ class CService extends CApiService {
 
 			// save parent service
 			if (!empty($service['parentid'])) {
-				$dependencies[] = array(
+				$dependencies[] = [
 					'serviceid' => $service['parentid'],
 					'dependsOnServiceid' => $serviceId,
 					'soft' => 0
-				);
+				];
 			}
 
 			// save service times
@@ -188,7 +188,7 @@ class CService extends CApiService {
 
 		updateItServices();
 
-		return array('serviceids' => $serviceIds);
+		return ['serviceids' => $serviceIds];
 	}
 
 	/**
@@ -209,7 +209,7 @@ class CService extends CApiService {
 
 		$this->checkServicePermissions(zbx_objectValues($services, 'serviceid'));
 
-		$services = $this->extendObjects($this->tableName(), $services, array('name'));
+		$services = $this->extendObjects($this->tableName(), $services, ['name']);
 		foreach ($services as $service) {
 			$this->checkName($service);
 
@@ -236,9 +236,9 @@ class CService extends CApiService {
 			}
 
 			$error = _s('Wrong fields for service "%1$s".', $service['name']);
-			$this->checkUnsupportedFields($this->tableName(), $service, $error, array(
+			$this->checkUnsupportedFields($this->tableName(), $service, $error, [
 				'parentid', 'dependencies', 'times'
-			));
+			]);
 		}
 
 		$this->checkTriggerPermissions($services);
@@ -261,12 +261,12 @@ class CService extends CApiService {
 		}
 
 		// update dependencies
-		$dependencies = array();
-		$parentDependencies = array();
-		$serviceTimes = array();
-		$deleteParentsForServiceIds = array();
-		$deleteDependenciesForServiceIds = array();
-		$deleteTimesForServiceIds = array();
+		$dependencies = [];
+		$parentDependencies = [];
+		$serviceTimes = [];
+		$deleteParentsForServiceIds = [];
+		$deleteDependenciesForServiceIds = [];
+		$deleteTimesForServiceIds = [];
 		foreach ($services as $service) {
 			if (isset($service['dependencies'])) {
 				$deleteDependenciesForServiceIds[] = $service['serviceid'];
@@ -284,11 +284,11 @@ class CService extends CApiService {
 				$deleteParentsForServiceIds[] = $service['serviceid'];
 
 				if ($service['parentid']) {
-					$parentDependencies[] = array(
+					$parentDependencies[] = [
 						'serviceid' => $service['parentid'],
 						'dependsOnServiceid' => $service['serviceid'],
 						'soft' => 0
-					);
+					];
 				}
 			}
 
@@ -324,7 +324,7 @@ class CService extends CApiService {
 
 		updateItServices();
 
-		return array('serviceids' => zbx_objectValues($services, 'serviceid'));
+		return ['serviceids' => zbx_objectValues($services, 'serviceid')];
 	}
 
 	/**
@@ -355,11 +355,11 @@ class CService extends CApiService {
 	public function delete(array $serviceIds) {
 		$this->validateDelete($serviceIds);
 
-		DB::delete($this->tableName(), array('serviceid' => $serviceIds));
+		DB::delete($this->tableName(), ['serviceid' => $serviceIds]);
 
 		updateItServices();
 
-		return array('serviceids' => $serviceIds);
+		return ['serviceids' => $serviceIds];
 	}
 
 	/**
@@ -394,7 +394,7 @@ class CService extends CApiService {
 
 			$this->checkUnsupportedFields('services_links', $dependency,
 				_s('Wrong fields for dependency for service "%1$s".', $dependency['serviceid']),
-				array('dependsOnServiceid', 'serviceid')
+				['dependsOnServiceid', 'serviceid']
 			);
 		}
 
@@ -415,17 +415,17 @@ class CService extends CApiService {
 		$dependencies = zbx_toArray($dependencies);
 		$this->validateAddDependencies($dependencies);
 
-		$data = array();
+		$data = [];
 		foreach ($dependencies as $dependency) {
-			$data[] = array(
+			$data[] = [
 				'serviceupid' => $dependency['serviceid'],
 				'servicedownid' => $dependency['dependsOnServiceid'],
 				'soft' => $dependency['soft']
-			);
+			];
 		}
 		DB::insert('services_links', $data);
 
-		return array('serviceids' => zbx_objectValues($dependencies, 'serviceid'));
+		return ['serviceids' => zbx_objectValues($dependencies, 'serviceid')];
 	}
 
 	/**
@@ -456,11 +456,11 @@ class CService extends CApiService {
 		$serviceIds = zbx_toArray($serviceIds);
 		$this->validateDeleteDependencies($serviceIds);
 
-		DB::delete('services_links', array(
+		DB::delete('services_links', [
 			'serviceupid' =>  $serviceIds
-		));
+		]);
 
-		return array('serviceids' => $serviceIds);
+		return ['serviceids' => $serviceIds];
 	}
 
 	/**
@@ -497,7 +497,7 @@ class CService extends CApiService {
 
 		DB::insert('services_times', $serviceTimes);
 
-		return array('serviceids' => zbx_objectValues($serviceTimes, 'serviceid'));
+		return ['serviceids' => zbx_objectValues($serviceTimes, 'serviceid')];
 	}
 
 	/**
@@ -546,24 +546,24 @@ class CService extends CApiService {
 	 */
 	public function getSla(array $options) {
 		$serviceIds = (isset($options['serviceids'])) ? zbx_toArray($options['serviceids']) : null;
-		$intervals = (isset($options['intervals'])) ? zbx_toArray($options['intervals']) : array();
+		$intervals = (isset($options['intervals'])) ? zbx_toArray($options['intervals']) : [];
 
 		// fetch services
-		$services = $this->get(array(
-			'output' => array('serviceid', 'name', 'status', 'algorithm'),
+		$services = $this->get([
+			'output' => ['serviceid', 'name', 'status', 'algorithm'],
 			'selectTimes' => API_OUTPUT_EXTEND,
-			'selectParentDependencies' => array('serviceupid'),
+			'selectParentDependencies' => ['serviceupid'],
 			'serviceids' => $serviceIds,
 			'preservekeys' => true
-		));
+		]);
 
-		$rs = array();
+		$rs = [];
 		if ($services) {
-			$usedSeviceIds = array();
+			$usedSeviceIds = [];
 
-			$problemServiceIds = array();
+			$problemServiceIds = [];
 			foreach ($services as &$service) {
-				$service['alarms'] = array();
+				$service['alarms'] = [];
 
 				// don't calculate SLA for services with disabled status calculation
 				if ($this->isStatusEnabled($service)) {
@@ -578,16 +578,16 @@ class CService extends CApiService {
 
 			// initial data
 			foreach ($services as $service) {
-				$rs[$service['serviceid']] = array(
+				$rs[$service['serviceid']] = [
 					'status' => ($this->isStatusEnabled($service)) ? $service['status'] : null,
-					'problems' => array(),
-					'sla' => array()
-				);
+					'problems' => [],
+					'sla' => []
+				];
 			}
 
 			if ($usedSeviceIds) {
 				// add service alarms
-				$intervalConditions = array();
+				$intervalConditions = [];
 				foreach ($intervals as $interval) {
 					$intervalConditions[] = 'sa.clock BETWEEN '.zbx_dbstr($interval['from']).' AND '.zbx_dbstr($interval['to']);
 				}
@@ -625,22 +625,22 @@ class CService extends CApiService {
 							);
 						}
 						else {
-							$intervalSla = array(
+							$intervalSla = [
 								'ok' => null,
 								'okTime' => null,
 								'problemTime' => null,
 								'downtimeTime' => null
-							);
+							];
 						}
 
-						$rs[$service['serviceid']]['sla'][] = array(
+						$rs[$service['serviceid']]['sla'][] = [
 							'from' => $interval['from'],
 							'to' => $interval['to'],
 							'sla' => $intervalSla['ok'],
 							'okTime' => $intervalSla['okTime'],
 							'problemTime' => $intervalSla['problemTime'],
 							'downtimeTime' => $intervalSla['downtimeTime']
-						);
+						];
 					}
 				}
 			}
@@ -660,11 +660,11 @@ class CService extends CApiService {
 		$serviceIds = zbx_toArray($serviceIds);
 		$this->validateDeleteTimes($serviceIds);
 
-		DB::delete('services_times', array(
+		DB::delete('services_times', [
 			'serviceid' =>  $serviceIds
-		));
+		]);
 
-		return array('serviceids' => $serviceIds);
+		return ['serviceids' => $serviceIds];
 	}
 
 	/**
@@ -680,10 +680,10 @@ class CService extends CApiService {
 		}
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'serviceids' => $ids,
 			'countOutput' => true
-		));
+		]);
 		return count($ids) == $count;
 	}
 
@@ -706,10 +706,10 @@ class CService extends CApiService {
 	 * @return void
 	 */
 	protected function deleteParentDependencies($serviceIds) {
-		DB::delete('services_links', array(
+		DB::delete('services_links', [
 			'servicedownid' => $serviceIds,
 			'soft' => 0
-		));
+		]);
 	}
 
 
@@ -731,12 +731,12 @@ class CService extends CApiService {
 		// get service reason
 		$triggers = DBfetchArray(DBSelect($sql));
 
-		$rs = array();
+		$rs = [];
 		foreach ($triggers as $trigger) {
 			$serviceId = $trigger['serviceid'];
 			unset($trigger['serviceid']);
 
-			$rs[$serviceId] = array($trigger['triggerid'] => $trigger);
+			$rs[$serviceId] = [$trigger['triggerid'] => $trigger];
 		}
 
 		return $rs;
@@ -754,7 +754,7 @@ class CService extends CApiService {
 	 * @return array
 	 */
 	protected function escalateProblems(array $services, array $serviceProblems, array $slaData) {
-		$parentProblems = array();
+		$parentProblems = [];
 		foreach ($serviceProblems as $serviceId => $problemTriggers) {
 			$service = $services[$serviceId];
 
@@ -771,7 +771,7 @@ class CService extends CApiService {
 					// escalate only if status calculation is enabled for the parent service and it's in problem state
 					if ($this->isStatusEnabled($parentService) && $parentService['status']) {
 						if (!isset($parentProblems[$parentServiceId])) {
-							$parentProblems[$parentServiceId] = array();
+							$parentProblems[$parentServiceId] = [];
 						}
 						$parentProblems[$parentServiceId] = zbx_array_merge($parentProblems[$parentServiceId], $problemTriggers);
 					}
@@ -810,7 +810,7 @@ class CService extends CApiService {
 					' GROUP BY sa3.serviceid) ss2'.
 			' JOIN service_alarms sa ON sa.servicealarmid = ss2.servicealarmid'
 		);
-		$rs = array();
+		$rs = [];
 		while ($alarm = DBfetch($query)) {
 			$rs[$alarm['serviceid']] = $alarm['value'];
 		}
@@ -827,10 +827,10 @@ class CService extends CApiService {
 	 * @return array    an array of service links sorted by "sortorder" in ascending order
 	 */
 	protected function fetchChildDependencies(array $parentServiceIds, $output) {
-		$sqlParts = API::getApiService()->createSelectQueryParts('services_links', 'sl', array(
+		$sqlParts = API::getApiService()->createSelectQueryParts('services_links', 'sl', [
 			'output' => $output,
-			'filter' => array('serviceupid' => $parentServiceIds)
-		));
+			'filter' => ['serviceupid' => $parentServiceIds]
+		]);
 
 		// sort by sortorder
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
@@ -859,10 +859,10 @@ class CService extends CApiService {
 	 * @return array    an array of service links sorted by "sortorder" in ascending order
 	 */
 	protected function fetchParentDependencies(array $childServiceIds, $output, $soft = null) {
-		$sqlParts = API::getApiService()->createSelectQueryParts('services_links', 'sl', array(
+		$sqlParts = API::getApiService()->createSelectQueryParts('services_links', 'sl', [
 			'output' => $output,
-			'filter' => array('servicedownid' => $childServiceIds)
-		));
+			'filter' => ['servicedownid' => $childServiceIds]
+		]);
 
 		$sqlParts['from'][] = $this->tableName().' '.$this->tableAlias();
 		$sqlParts['where'][] = 'sl.serviceupid='.$this->fieldId('serviceid');
@@ -933,10 +933,10 @@ class CService extends CApiService {
 	 * @return void
 	 */
 	protected function checkShowSla(array $service) {
-		$showSlaValues = array(
+		$showSlaValues = [
 			SERVICE_SHOW_SLA_OFF => true,
 			SERVICE_SHOW_SLA_ON => true
-		);
+		];
 		if (!isset($service['showsla']) || !isset($showSlaValues[$service['showsla']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect calculate SLA value for service "%1$s".', $service['name']));
 		}
@@ -1041,7 +1041,7 @@ class CService extends CApiService {
 	 * @return void
 	 */
 	protected function checkTriggerPermissions(array $services) {
-		$triggerIds = array();
+		$triggerIds = [];
 		foreach ($services as $service) {
 			if (!empty($service['triggerid'])) {
 				$triggerIds[] = $service['triggerid'];
@@ -1077,21 +1077,21 @@ class CService extends CApiService {
 	 * @return void
 	 */
 	protected function checkThatServicesDontHaveChildren(array $serviceIds) {
-		$child = API::getApiService()->select('services_links', array(
-			'output' => array('serviceupid'),
-			'filter' => array(
+		$child = API::getApiService()->select('services_links', [
+			'output' => ['serviceupid'],
+			'filter' => [
 				'serviceupid' => $serviceIds,
 				'soft' => 0
-			),
+			],
 			'limit' => 1
-		));
+		]);
 		$child = reset($child);
 		if ($child) {
-			$service = API::getApiService()->select($this->tableName(), array(
-				'output' => array('name'),
+			$service = API::getApiService()->select($this->tableName(), [
+				'output' => ['name'],
 				'serviceids' => $child['serviceupid'],
 				'limit' => 1
-			));
+			]);
 			$service = reset($service);
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('Service "%1$s" cannot be deleted, because it is dependent on another service.', $service['name'])
@@ -1110,20 +1110,20 @@ class CService extends CApiService {
 	 */
 	protected function checkDependency(array $dependency) {
 		if (idcmp($dependency['serviceid'], $dependency['dependsOnServiceid'])) {
-			$service = API::getApiService()->select($this->tableName(), array(
-				'output' => array('name'),
+			$service = API::getApiService()->select($this->tableName(), [
+				'output' => ['name'],
 				'serviceids' => $dependency['serviceid']
-			));
+			]);
 			$service = reset($service);
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Service "%1$s" cannot be dependent on itself.', $service['name']));
 		}
 
 		// check 'soft' field value
-		if (!isset($dependency['soft']) || !in_array((int) $dependency['soft'], array(0, 1), true)) {
-			$service = API::getApiService()->select($this->tableName(), array(
-				'output' => array('name'),
+		if (!isset($dependency['soft']) || !in_array((int) $dependency['soft'], [0, 1], true)) {
+			$service = API::getApiService()->select($this->tableName(), [
+				'output' => ['name'],
 				'serviceids' => $dependency['serviceid']
-			));
+			]);
 			$service = reset($service);
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect "soft" field value for dependency for service "%1$s".', $service['name'])
@@ -1143,7 +1143,7 @@ class CService extends CApiService {
 	 */
 	protected function checkForHardlinkedDependencies(array $dependencies) {
 		// only check hard dependencies
-		$hardDepServiceIds = array();
+		$hardDepServiceIds = [];
 		foreach ($dependencies as $dependency) {
 			if (!$dependency['soft']) {
 				$hardDepServiceIds[] = $dependency['dependsOnServiceid'];
@@ -1153,20 +1153,20 @@ class CService extends CApiService {
 		if ($hardDepServiceIds) {
 			// look for at least one hardlinked service among the given
 			$hardDepServiceIds = array_unique($hardDepServiceIds);
-			$dep = API::getApiService()->select('services_links', array(
-				'output' => array('servicedownid'),
-				'filter' => array(
+			$dep = API::getApiService()->select('services_links', [
+				'output' => ['servicedownid'],
+				'filter' => [
 					'soft' => 0,
 					'servicedownid' => $hardDepServiceIds
-				),
+				],
 				'limit' => 1
-			));
+			]);
 			if ($dep) {
 				$dep = reset($dep);
-				$service = API::getApiService()->select($this->tableName(), array(
-					'output' => array('name'),
+				$service = API::getApiService()->select($this->tableName(), [
+					'output' => ['name'],
 					'serviceids' => $dep['servicedownid']
-				));
+				]);
 				$service = reset($service);
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Service "%1$s" is already hardlinked to a different service.', $service['name'])
@@ -1209,15 +1209,15 @@ class CService extends CApiService {
 	 * @return void
 	 */
 	protected function checkForCircularityInDependencies($depsToValid) {
-		$dbDeps = API::getApiService()->select('services_links', array(
-			'output' => array('serviceupid', 'servicedownid')
-		));
+		$dbDeps = API::getApiService()->select('services_links', [
+			'output' => ['serviceupid', 'servicedownid']
+		]);
 
 		// create existing dependency acyclic graph
-		$arr = array();
+		$arr = [];
 		foreach ($dbDeps as $dbDep) {
 			if (!isset($arr[$dbDep['serviceupid']])) {
-				$arr[$dbDep['serviceupid']] = array();
+				$arr[$dbDep['serviceupid']] = [];
 			}
 			$arr[$dbDep['serviceupid']][$dbDep['servicedownid']] = $dbDep['servicedownid'];
 		}
@@ -1275,10 +1275,10 @@ class CService extends CApiService {
 		if (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 			// if services with specific trigger IDs were requested, return only the ones accessible to the current user.
 			if ($options['filter']['triggerid']) {
-				$accessibleTriggers = API::Trigger()->get(array(
-					'output' => array('triggerid'),
+				$accessibleTriggers = API::Trigger()->get([
+					'output' => ['triggerid'],
 					'triggerids' => $options['filter']['triggerid']
-				));
+				]);
 				$options['filter']['triggerid'] = zbx_objectValues($accessibleTriggers, 'triggerid');
 			}
 			// otherwise return services with either no triggers, or any trigger accessible to the current user
@@ -1313,24 +1313,24 @@ class CService extends CApiService {
 		// selectDependencies
 		if ($options['selectDependencies'] !== null && $options['selectDependencies'] != API_OUTPUT_COUNT) {
 			$dependencies = $this->fetchChildDependencies($serviceIds,
-				$this->outputExtend($options['selectDependencies'], array('serviceupid', 'linkid'))
+				$this->outputExtend($options['selectDependencies'], ['serviceupid', 'linkid'])
 			);
 			$dependencies = zbx_toHash($dependencies, 'linkid');
 			$relationMap = $this->createRelationMap($dependencies, 'serviceupid', 'linkid');
 
-			$dependencies = $this->unsetExtraFields($dependencies, array('serviceupid', 'linkid'), $options['selectDependencies']);
+			$dependencies = $this->unsetExtraFields($dependencies, ['serviceupid', 'linkid'], $options['selectDependencies']);
 			$result = $relationMap->mapMany($result, $dependencies, 'dependencies');
 		}
 
 		// selectParentDependencies
 		if ($options['selectParentDependencies'] !== null && $options['selectParentDependencies'] != API_OUTPUT_COUNT) {
 			$dependencies = $this->fetchParentDependencies($serviceIds,
-				$this->outputExtend($options['selectParentDependencies'], array('servicedownid', 'linkid'))
+				$this->outputExtend($options['selectParentDependencies'], ['servicedownid', 'linkid'])
 			);
 			$dependencies = zbx_toHash($dependencies, 'linkid');
 			$relationMap = $this->createRelationMap($dependencies, 'servicedownid', 'linkid');
 
-			$dependencies = $this->unsetExtraFields($dependencies, array('servicedownid', 'linkid'),
+			$dependencies = $this->unsetExtraFields($dependencies, ['servicedownid', 'linkid'],
 				$options['selectParentDependencies']
 			);
 			$result = $relationMap->mapMany($result, $dependencies, 'parentDependencies');
@@ -1338,39 +1338,39 @@ class CService extends CApiService {
 
 		// selectParent
 		if ($options['selectParent'] !== null && $options['selectParent'] != API_OUTPUT_COUNT) {
-			$dependencies = $this->fetchParentDependencies($serviceIds, array('servicedownid', 'serviceupid'), false);
+			$dependencies = $this->fetchParentDependencies($serviceIds, ['servicedownid', 'serviceupid'], false);
 			$relationMap = $this->createRelationMap($dependencies, 'servicedownid', 'serviceupid');
-			$parents = $this->get(array(
+			$parents = $this->get([
 				'output' => $options['selectParent'],
 				'serviceids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapOne($result, $parents, 'parent');
 		}
 
 		// selectTimes
 		if ($options['selectTimes'] !== null && $options['selectTimes'] != API_OUTPUT_COUNT) {
-			$serviceTimes = API::getApiService()->select('services_times', array(
-				'output' => $this->outputExtend($options['selectTimes'], array('serviceid', 'timeid')),
-				'filter' => array('serviceid' => $serviceIds),
+			$serviceTimes = API::getApiService()->select('services_times', [
+				'output' => $this->outputExtend($options['selectTimes'], ['serviceid', 'timeid']),
+				'filter' => ['serviceid' => $serviceIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($serviceTimes, 'serviceid', 'timeid');
 
-			$serviceTimes = $this->unsetExtraFields($serviceTimes, array('serviceid', 'timeid'), $options['selectTimes']);
+			$serviceTimes = $this->unsetExtraFields($serviceTimes, ['serviceid', 'timeid'], $options['selectTimes']);
 			$result = $relationMap->mapMany($result, $serviceTimes, 'times');
 		}
 
 		// selectAlarms
 		if ($options['selectAlarms'] !== null && $options['selectAlarms'] != API_OUTPUT_COUNT) {
-			$serviceAlarms = API::getApiService()->select('service_alarms', array(
-				'output' => $this->outputExtend($options['selectAlarms'], array('serviceid', 'servicealarmid')),
-				'filter' => array('serviceid' => $serviceIds),
+			$serviceAlarms = API::getApiService()->select('service_alarms', [
+				'output' => $this->outputExtend($options['selectAlarms'], ['serviceid', 'servicealarmid']),
+				'filter' => ['serviceid' => $serviceIds],
 				'preservekeys' => true
-			));
+			]);
 			$relationMap = $this->createRelationMap($serviceAlarms, 'serviceid', 'servicealarmid');
 
-			$serviceAlarms = $this->unsetExtraFields($serviceAlarms, array('serviceid', 'servicealarmid'),
+			$serviceAlarms = $this->unsetExtraFields($serviceAlarms, ['serviceid', 'servicealarmid'],
 				$options['selectAlarms']
 			);
 			$result = $relationMap->mapMany($result, $serviceAlarms, 'alarms');
@@ -1379,11 +1379,11 @@ class CService extends CApiService {
 		// selectTrigger
 		if ($options['selectTrigger'] !== null && $options['selectTrigger'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'serviceid', 'triggerid');
-			$triggers = API::getApiService()->select('triggers', array(
+			$triggers = API::getApiService()->select('triggers', [
 				'output' => $options['selectTrigger'],
 				'triggerids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapOne($result, $triggers, 'trigger');
 		}
 

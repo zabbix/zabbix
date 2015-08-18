@@ -209,7 +209,7 @@ function zbx_date2str($format, $value = null) {
 	}
 
 	if (!is_array($weekdaynames)) {
-		$weekdaynames = array(
+		$weekdaynames = [
 			0 => _('Sun'),
 			1 => _('Mon'),
 			2 => _('Tue'),
@@ -217,11 +217,11 @@ function zbx_date2str($format, $value = null) {
 			4 => _('Thu'),
 			5 => _('Fri'),
 			6 => _('Sat')
-		);
+		];
 	}
 
 	if (!is_array($weekdaynameslong)) {
-		$weekdaynameslong = array(
+		$weekdaynameslong = [
 			0 => _('Sunday'),
 			1 => _('Monday'),
 			2 => _('Tuesday'),
@@ -229,11 +229,11 @@ function zbx_date2str($format, $value = null) {
 			4 => _('Thursday'),
 			5 => _('Friday'),
 			6 => _('Saturday')
-		);
+		];
 	}
 
 	if (!is_array($months)) {
-		$months = array(
+		$months = [
 			1 => _('Jan'),
 			2 => _('Feb'),
 			3 => _('Mar'),
@@ -246,11 +246,11 @@ function zbx_date2str($format, $value = null) {
 			10 => _('Oct'),
 			11 => _('Nov'),
 			12 => _('Dec')
-		);
+		];
 	}
 
 	if (!is_array($monthslong)) {
-		$monthslong = array(
+		$monthslong = [
 			1 => _('January'),
 			2 => _('February'),
 			3 => _('March'),
@@ -263,15 +263,15 @@ function zbx_date2str($format, $value = null) {
 			10 => _('October'),
 			11 => _('November'),
 			12 => _('December')
-		);
+		];
 	}
 
-	$rplcs = array(
+	$rplcs = [
 		'l' => $weekdaynameslong[date('w', $value)],
 		'F' => $monthslong[date('n', $value)],
 		'D' => $weekdaynames[date('w', $value)],
 		'M' => $months[date('n', $value)]
-	);
+	];
 
 	$output = $part = '';
 	$length = strlen($format);
@@ -333,11 +333,11 @@ function zbxAddSecondsToUnixtime($sec, $unixtime) {
 
 /*************** CONVERTING ******************/
 function rgb2hex($color) {
-	$HEX = array(
+	$HEX = [
 		dechex($color[0]),
 		dechex($color[1]),
 		dechex($color[2])
-	);
+	];
 	foreach ($HEX as $id => $value) {
 		if (strlen($value) != 2) {
 			$HEX[$id] = '0'.$value;
@@ -353,16 +353,16 @@ function hex2rgb($color) {
 	}
 
 	if (strlen($color) == 6) {
-		list($r, $g, $b) = array($color[0].$color[1], $color[2].$color[3], $color[4].$color[5]);
+		list($r, $g, $b) = [$color[0].$color[1], $color[2].$color[3], $color[4].$color[5]];
 	}
 	elseif (strlen($color) == 3) {
-		list($r, $g, $b) = array($color[0].$color[0], $color[1].$color[1], $color[2].$color[2]);
+		list($r, $g, $b) = [$color[0].$color[0], $color[1].$color[1], $color[2].$color[2]];
 	}
 	else {
 		return false;
 	}
 
-	return array(hexdec($r), hexdec($g), hexdec($b));
+	return [hexdec($r), hexdec($g), hexdec($b)];
 }
 
 function zbx_num2bitstr($num, $rev = false) {
@@ -481,7 +481,7 @@ function convertUnitsS($value, $ignoreMillisec = false) {
 		$str = '';
 	}
 
-	$values = array('y' => null, 'm' => null, 'd' => null, 'h' => null, 'mm' => null, 's' => null, 'ms' => null);
+	$values = ['y' => null, 'm' => null, 'd' => null, 'h' => null, 'mm' => null, 's' => null, 'ms' => null];
 	$n_unit = 0;
 
 	if (($n = floor($secs / SEC_PER_YEAR)) != 0) {
@@ -574,8 +574,8 @@ function convertUnitsS($value, $ignoreMillisec = false) {
  *
  * @return string
  */
-function convert_units($options = array()) {
-	$defOptions = array(
+function convert_units($options = []) {
+	$defOptions = [
 		'value' => null,
 		'units' => null,
 		'convert' => ITEM_CONVERT_WITH_UNITS,
@@ -583,7 +583,7 @@ function convert_units($options = array()) {
 		'pow' => false,
 		'ignoreMillisec' => false,
 		'length' => false
-	);
+	];
 
 	$options = zbx_array_merge($defOptions, $options);
 
@@ -604,7 +604,7 @@ function convert_units($options = array()) {
 
 	// any other unit
 	// black list of units that should have no multiplier prefix (K, M, G etc) applied
-	$blackList = array('%', 'ms', 'rpm', 'RPM');
+	$blackList = ['%', 'ms', 'rpm', 'RPM'];
 
 	if (in_array($options['units'], $blackList) || (zbx_empty($options['units'])
 			&& ($options['convert'] == ITEM_CONVERT_WITH_UNITS))) {
@@ -655,21 +655,21 @@ function convert_units($options = array()) {
 	// init intervals
 	static $digitUnits;
 	if (is_null($digitUnits)) {
-		$digitUnits = array();
+		$digitUnits = [];
 	}
 
 	if (!isset($digitUnits[$step])) {
-		$digitUnits[$step] = array(
-			array('pow' => 0, 'short' => ''),
-			array('pow' => 1, 'short' => 'K'),
-			array('pow' => 2, 'short' => 'M'),
-			array('pow' => 3, 'short' => 'G'),
-			array('pow' => 4, 'short' => 'T'),
-			array('pow' => 5, 'short' => 'P'),
-			array('pow' => 6, 'short' => 'E'),
-			array('pow' => 7, 'short' => 'Z'),
-			array('pow' => 8, 'short' => 'Y')
-		);
+		$digitUnits[$step] = [
+			['pow' => 0, 'short' => ''],
+			['pow' => 1, 'short' => 'K'],
+			['pow' => 2, 'short' => 'M'],
+			['pow' => 3, 'short' => 'G'],
+			['pow' => 4, 'short' => 'T'],
+			['pow' => 5, 'short' => 'P'],
+			['pow' => 6, 'short' => 'E'],
+			['pow' => 7, 'short' => 'Z'],
+			['pow' => 8, 'short' => 'Y']
+		];
 
 		foreach ($digitUnits[$step] as $dunit => $data) {
 			// skip milli & micro for values without units
@@ -678,7 +678,7 @@ function convert_units($options = array()) {
 	}
 
 
-	$valUnit = array('pow' => 0, 'short' => '', 'value' => $options['value']);
+	$valUnit = ['pow' => 0, 'short' => '', 'value' => $options['value']];
 
 	if ($options['pow'] === false || $options['value'] == 0) {
 		foreach ($digitUnits[$step] as $dnum => $data) {
@@ -865,11 +865,11 @@ function zbx_array_diff(array $primary, array $secondary, $field) {
 	$second = array_diff($fields2, $fields1);
 	$second = zbx_toHash($second);
 
-	$result = array(
-		'first' => array(),
-		'second' => array(),
-		'both' => array()
-	);
+	$result = [
+		'first' => [],
+		'second' => [],
+		'both' => []
+	];
 
 	foreach ($primary as $array) {
 		if (!isset($array[$field])) {
@@ -933,17 +933,17 @@ function zbx_arrayFindDuplicates(array $array) {
 
 /************* STRING *************/
 function zbx_nl2br($str) {
-	$str_res = array();
-	$str_arr = explode("\n", $str);
-	foreach ($str_arr as $id => $str_line) {
+	$str_res = [];
+	foreach (explode("\n", $str) as $str_line) {
 		array_push($str_res, $str_line, BR());
 	}
+	array_pop($str_res);
 
 	return $str_res;
 }
 
 function zbx_formatDomId($value) {
-	return str_replace(array('[', ']'), array('_', ''), $value);
+	return str_replace(['[', ']'], ['_', ''], $value);
 }
 
 /**
@@ -960,10 +960,10 @@ function zbx_formatDomId($value) {
 function selectByPattern(array $table, $column, $pattern, $limit) {
 	$chunk_size = $limit;
 
-	$rsTable = array();
+	$rsTable = [];
 	foreach ($table as $num => $row) {
 		if (mb_strtolower($row[$column]) === mb_strtolower($pattern)) {
-			$rsTable = array($num => $row) + $rsTable;
+			$rsTable = [$num => $row] + $rsTable;
 		}
 		elseif ($limit > 0) {
 			$rsTable[$num] = $row;
@@ -987,7 +987,7 @@ function natksort(&$array) {
 	$keys = array_keys($array);
 	natcasesort($keys);
 
-	$new_array = array();
+	$new_array = [];
 
 	foreach ($keys as $k) {
 		$new_array[$k] = $array[$k];
@@ -1001,7 +1001,7 @@ function natksort(&$array) {
 function asort_by_key(&$array, $key) {
 	if (!is_array($array)) {
 		error(_('Incorrect type of asort_by_key.'));
-		return array();
+		return [];
 	}
 	$key = htmlspecialchars($key);
 	uasort($array, create_function('$a,$b', 'return $a[\''.$key.'\'] - $b[\''.$key.'\'];'));
@@ -1047,7 +1047,7 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 		return true;
 	}
 
-	$sort = array();
+	$sort = [];
 	foreach ($data as $key => $arr) {
 		if (!isset($arr[$sortfield])) {
 			return false;
@@ -1061,7 +1061,7 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
 	}
 
 	$tmp = $data;
-	$data = array();
+	$data = [];
 	foreach ($sort as $key => $val) {
 		$data[$key] = $tmp[$key];
 	}
@@ -1085,13 +1085,13 @@ function order_result(&$data, $sortfield = null, $sortorder = ZBX_SORT_UP) {
  * @return array
  */
 function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
-	$temp = array();
+	$temp = [];
 	foreach ($macros as $key => $macro) {
 		$temp[$key] = substr($macro[$sortfield], 2, strlen($macro[$sortfield]) - 3);
 	}
 	order_result($temp, null, $order);
 
-	$rs = array();
+	$rs = [];
 	foreach ($temp as $key => $macroLabel) {
 		$rs[$key] = $macros[$key];
 	}
@@ -1102,7 +1102,7 @@ function order_macros(array $macros, $sortfield, $order = ZBX_SORT_UP) {
 // preserve keys
 function zbx_array_merge() {
 	$args = func_get_args();
-	$result = array();
+	$result = [];
 	foreach ($args as &$array) {
 		if (!is_array($array)) {
 			return false;
@@ -1149,7 +1149,7 @@ function str_in_array($needle, $haystack, $strict = false) {
 
 function zbx_value2array(&$values) {
 	if (!is_array($values) && !is_null($values)) {
-		$tmp = array();
+		$tmp = [];
 		if (is_object($values)) {
 			$tmp[] = $values;
 		}
@@ -1160,10 +1160,10 @@ function zbx_value2array(&$values) {
 	}
 }
 
-// creates chain of relation parent -> childs, for all chain levels
+// creates chain of relation parent -> child, for all chain levels
 function createParentToChildRelation(&$chain, $link, $parentField, $childField) {
 	if (!isset($chain[$link[$parentField]])) {
-		$chain[$link[$parentField]] = array();
+		$chain[$link[$parentField]] = [];
 	}
 
 	$chain[$link[$parentField]][$link[$childField]] = $link[$childField];
@@ -1177,10 +1177,10 @@ function zbx_toHash($value, $field = null) {
 	if (is_null($value)) {
 		return $value;
 	}
-	$result = array();
+	$result = [];
 
 	if (!is_array($value)) {
-		$result = array($value => $value);
+		$result = [$value => $value];
 	}
 	elseif (isset($value[$field])) {
 		$result[$value[$field]] = $value;
@@ -1216,16 +1216,16 @@ function zbx_toObject($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}
-	$result = array();
+	$result = [];
 
 	// Value or Array to Object or Array of objects
 	if (!is_array($value)) {
-		$result = array(array($field => $value));
+		$result = [[$field => $value]];
 	}
 	elseif (!isset($value[$field])) {
 		foreach ($value as $val) {
 			if (!is_array($val)) {
-				$result[] = array($field => $val);
+				$result[] = [$field => $val];
 			}
 		}
 	}
@@ -1249,7 +1249,7 @@ function zbx_toArray($value) {
 		return $value;
 	}
 
-	$result = array();
+	$result = [];
 	if (is_array($value)) {
 		// reset() is needed to move internal array pointer to the beginning of the array
 		reset($value);
@@ -1258,11 +1258,11 @@ function zbx_toArray($value) {
 			$result = array_values($value);
 		}
 		elseif (!empty($value)) {
-			$result = array($value);
+			$result = [$value];
 		}
 	}
 	else {
-		$result = array($value);
+		$result = [$value];
 	}
 
 	return $result;
@@ -1273,13 +1273,13 @@ function zbx_objectValues($value, $field) {
 	if (is_null($value)) {
 		return $value;
 	}
-	$result = array();
+	$result = [];
 
 	if (!is_array($value)) {
-		$result = array($value);
+		$result = [$value];
 	}
 	elseif (isset($value[$field])) {
-		$result = array($value[$field]);
+		$result = [$value[$field]];
 	}
 	else {
 		foreach ($value as $val) {
@@ -1312,7 +1312,7 @@ function zbx_toCSV($values) {
 	$glue = '","';
 	foreach ($values as $row) {
 		if (!is_array($row)) {
-			$row = array($row);
+			$row = [$row];
 		}
 		foreach ($row as $num => $value) {
 			if (is_null($value)) {
@@ -1329,7 +1329,7 @@ function zbx_toCSV($values) {
 }
 
 function zbx_array_mintersect($keys, $array) {
-	$result = array();
+	$result = [];
 
 	foreach ($keys as $field) {
 		if (is_array($field)) {
@@ -1349,7 +1349,7 @@ function zbx_array_mintersect($keys, $array) {
 }
 
 function zbx_str2links($text) {
-	$result = array();
+	$result = [];
 	if (zbx_empty($text)) {
 		return $result;
 	}
@@ -1358,7 +1358,7 @@ function zbx_str2links($text) {
 	$start = 0;
 	foreach ($matches[0] as $match) {
 		$result[] = mb_substr($text, $start, $match[1] - $start);
-		$result[] = new CLink($match[0], $match[0], null, null, true);
+		$result[] = (new CLink($match[0], $match[0]))->removeSID();
 		$start = $match[1] + mb_strlen($match[0]);
 	}
 	$result[] = mb_substr($text, $start, mb_strlen($text));
@@ -1368,7 +1368,7 @@ function zbx_str2links($text) {
 
 function zbx_subarray_push(&$mainArray, $sIndex, $element = null, $key = null) {
 	if (!isset($mainArray[$sIndex])) {
-		$mainArray[$sIndex] = array();
+		$mainArray[$sIndex] = [];
 	}
 	if ($key) {
 		$mainArray[$sIndex][$key] = is_null($element) ? $sIndex : $element;
@@ -1390,29 +1390,18 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$link->setArgument('sortorder', $sortorder);
 
 	zbx_value2array($obj);
-	$cont = new CSpan();
 
-	foreach ($obj as $el) {
-		if (is_object($el) || $el === SPACE) {
-			$cont->addItem($el);
-		}
-		else {
-			$cont->addItem(new CSpan($el, 'underline'));
-		}
-	}
-	$cont->addItem(SPACE);
-
-	$img = null;
+	$arrow = null;
 	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$img = new CSpan(SPACE, 'icon_sortdown');
+			$arrow = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);
 		}
 		else {
-			$img = new CSpan(SPACE, 'icon_sortup');
+			$arrow = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
 		}
 	}
-	$col = new CCol(array($cont, $img), 'nowrap hover_grey');
-	$col->setAttribute('onclick', 'javascript: redirect("'.$link->getUrl().'");');
+
+	$col = new CColHeader([new CLink([$obj, $arrow], $link->getUrl())]);
 
 	return $col;
 }
@@ -1449,24 +1438,35 @@ function getPageNumber() {
 /**
  * Returns paging line.
  *
- * @param array $items				list of items
+ * @param array  $items				list of items
+ * @param string $sortorder			the order in which items are sorted ASC or DESC
  *
  * @return CTable
  */
-function getPagingLine(&$items) {
+function getPagingLine(&$items, $sortorder) {
 	global $page;
 
 	$config = select_config();
 
 	$searchLimit = '';
 	if ($config['search_limit'] < count($items)) {
-		array_pop($items);
+		if ($sortorder == ZBX_SORT_UP) {
+			array_pop($items);
+		}
+		else {
+			array_shift($items);
+		}
+
 		$searchLimit = '+';
 	}
 
 	$rowsPerPage = CWebUser::$data['rows_per_page'];
 	$itemsCount = count($items);
 	$pagesCount = ($itemsCount > 0) ? ceil($itemsCount / $rowsPerPage) : 1;
+
+	if ($pagesCount == 1) {
+		return null;
+	}
 
 	$currentPage = getPageNumber();
 	if ($currentPage < 1) {
@@ -1505,87 +1505,39 @@ function getPagingLine(&$items) {
 
 	$startPage = ($endPage > $pagingNavRange) ? $endPage - $pagingNavRange + 1 : 1;
 
-	$pageLine = array();
+	$tags = [];
 
-	$table = null;
-
-	if ($pagesCount > 1) {
-		$url = CUrlFactory::getContextUrl();
-
-		if ($startPage > 1) {
-			$url->setArgument('page', 1);
-			$pageLine[] = new CLink('<< '._x('First', 'page navigation'), $url->getUrl(), null, null, true);
-			$pageLine[] = '&nbsp;&nbsp;';
-		}
-
-		if ($currentPage > 1) {
-			$url->setArgument('page', $currentPage - 1);
-			$pageLine[] = new CLink('< '._x('Previous', 'page navigation'), $url->getUrl(), null, null, true);
-			$pageLine[] = ' | ';
-		}
-
-		for ($p = $startPage; $p <= $pagesCount; $p++) {
-			if ($p > $endPage) {
-				break;
-			}
-
-			if ($p == $currentPage) {
-				$pagespan = new CSpan($p, 'bold textcolorstyles');
-			}
-			else {
-				$url->setArgument('page', $p);
-				$pagespan = new CLink($p, $url->getUrl(), null, null, true);
-			}
-
-			$pageLine[] = $pagespan;
-			$pageLine[] = ' | ';
-		}
-
-		array_pop($pageLine);
-
-		if ($currentPage < $pagesCount) {
-			$pageLine[] = ' | ';
-
-			$url->setArgument('page', $currentPage + 1);
-			$pageLine[] = new CLink(_x('Next', 'page navigation').' >', $url->getUrl(), null, null, true);
-		}
-
-		if ($p < $pagesCount) {
-			$pageLine[] = '&nbsp;&nbsp;';
-
-			$url->setArgument('page', $pagesCount);
-			$pageLine[] = new CLink(_x('Last', 'page navigation').' >>', $url->getUrl(), null, null, true);
-		}
-
-		$table = new CTable(null, 'paging');
-		$table->addRow(new CCol($pageLine));
+	$url = CUrlFactory::getContextUrl();
+	if ($startPage > 1) {
+		$url->setArgument('page', 1);
+		$tags[] = (new CLink(_('First'), $url->getUrl()))->removeSID();
 	}
 
-	$viewFromPage = ($currentPage - 1) * $rowsPerPage + 1;
-
-	$viewTillPage = $currentPage * $rowsPerPage;
-	if ($viewTillPage > $itemsCount) {
-		$viewTillPage = $itemsCount;
+	if ($currentPage > 1) {
+		$url->setArgument('page', $currentPage - 1);
+		$tags[] = (new CLink(
+			(new CSpan())->addClass('arrow-left'), $url->getUrl()
+		))->removeSID();
 	}
 
-	$pageView = array();
-	$pageView[] = _('Displaying').SPACE;
-	if ($itemsCount > 0) {
-		$pageView[] = new CSpan($viewFromPage, 'info');
-		$pageView[] = SPACE._('to').SPACE;
+	for ($p = $startPage; $p <= $endPage; $p++) {
+		$url->setArgument('page', $p);
+		$tags[] = (new CLink($p, $url->getUrl()))
+			->addClass($p == $currentPage ? 'paging-selected' : null)
+			->removeSID();
 	}
 
-	$pageView[] = new CSpan($viewTillPage, 'info');
-	$pageView[] = SPACE._('of').SPACE;
-	$pageView[] = new CSpan($itemsCount, 'info');
-	$pageView[] = $searchLimit;
-	$pageView[] = SPACE._('found');
+	if ($currentPage < $pagesCount) {
+		$url->setArgument('page', $currentPage + 1);
+		$tags[] = (new CLink((new CSpan())->addClass('arrow-right'), $url->getUrl()))->removeSID();
+	}
 
-	$pageView = new CSpan($pageView);
+	if ($p < $pagesCount) {
+		$url->setArgument('page', $pagesCount);
+		$tags[] = (new CLink(_('Last'), $url->getUrl()))->removeSID();
+	}
 
-	zbx_add_post_js('insertInElement("numrows", '.zbx_jsvalue($pageView->toString()).', "div");');
-
-	return $table;
+	return (new CDiv($tags))->addClass('table-paging');
 }
 
 /************* MATH *************/
@@ -1675,48 +1627,40 @@ function access_deny($mode = ACCESS_DENY_OBJECT) {
 
 		// if the user is logged in - render the access denied message
 		if (CWebUser::isLoggedIn()) {
-			$header = _('Access denied.');
-			$message = array(
-				_('Your are logged in as'),
-				' ',
-				bold(CWebUser::$data['alias']),
-				'. ',
-				_('You have no permissions to access this page.'),
-				BR(),
-				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-			);
+			$data = [
+				'header' => _('Access denied'),
+				'messages' => [
+					_s('You are logged in as "%1$s".', CWebUser::$data['alias']).' '._('You have no permissions to access this page.'),
+					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+				],
+				'buttons' => []
+			];
 
-			$buttons = array();
 			// display the login button only for guest users
 			if (CWebUser::isGuest()) {
-				$buttons[] = new CButton('login', _('Login'),
-					'javascript: document.location = "index.php?request='.$url.'";', 'button'
-				);
+				$data['buttons'][] = (new CButton('login', _('Login')))
+					->onClick('javascript: document.location = "index.php?request='.$url.'";');
 			}
-			$buttons[] = new CButton('back', _('Go to dashboard'),
-				'javascript: document.location = "zabbix.php?action=dashboard.view"', 'button'
-			);
+			$data['buttons'][] = (new CButton('back', _('Go to dashboard')))
+				->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"');
 		}
 		// if the user is not logged in - offer to login
 		else {
-			$header = _('You are not logged in.');
-			$message = array(
-				_('You must login to view this page.'),
-				BR(),
-				_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
-			);
-			$buttons = array(
-				new CButton('login', _('Login'), 'javascript: document.location = "index.php?request='.$url.'";', 'button')
-			);
+			$data = [
+				'header' => _('You are not logged in'),
+				'messages' => [
+					_('You must login to view this page.'),
+					_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.')
+				],
+				'buttons' => [
+					(new CButton('login', _('Login')))->onClick('javascript: document.location = "index.php?request='.$url.'";')
+				]
+			];
 		}
 
-		$warning = new CWarning($header, $message);
-		$warning->setButtons($buttons);
+		$data['theme'] = getUserTheme(CWebUser::$data);
 
-		$warningView = new CView('general.warning', array(
-			'warning' => $warning
-		));
-		$warningView->render();
+		(new CView('general.warning', $data))->render();
 		exit;
 	}
 }
@@ -1744,7 +1688,56 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 	return $default;
 }
 
-function show_messages($bool = true, $okmsg = null, $errmsg = null) {
+function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
+{
+	$msg_box = (new CDiv($title))
+		->addClass($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD);
+
+	if ($show_close_box) {
+		$id = $good ? 'global-message-good' : 'global-message-bad';
+		$msg_box->setId($id);
+	}
+
+	if ($messages) {
+		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS);
+
+		if ($title !== null) {
+			$link = (new CLink(_('Details')))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->removeSID()
+				->onClick('javascript: showHide("msg-messages", IE ? "block" : "");');
+			$msg_details->addItem($link);
+		}
+
+		$list = new CList();
+		if ($title !== null) {
+			$list
+				->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
+				->setId('msg-messages');
+
+			if (!$show_details) {
+				$list->setAttribute('style', 'display: none;');
+			}
+		}
+		foreach ($messages as $message) {
+			$list->addItem(/*$msg['type'].'&nbsp;'.*/$message['message']);
+		}
+		$msg_details->addItem($list);
+
+		$msg_box->addItem($msg_details);
+	}
+
+	if ($show_close_box) {
+		$msg_box->addItem((new CSpan())
+			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
+			->onClick('javascript: showHide("'.$id.'", IE ? "block" : "");')
+			->setAttribute('title', _('Close')));
+	}
+
+	return $msg_box;
+}
+
+function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
 	if (!defined('PAGE_HEADER_LOADED')) {
@@ -1757,102 +1750,50 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 		$page['type'] = PAGE_TYPE_HTML;
 	}
 
-	$imageMessages = array();
+	$imageMessages = [];
 
-	if (!$bool && !is_null($errmsg)) {
-		$msg = _('ERROR').': '.$errmsg;
-	}
-	elseif ($bool && !is_null($okmsg)) {
-		$msg = $okmsg;
-	}
+	$title = $good ? $okmsg : $errmsg;
+	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 
-	if (isset($msg)) {
-		switch ($page['type']) {
-			case PAGE_TYPE_IMAGE:
-				// save all of the messages in an array to display them later in an image
-				$imageMessages[] = array(
-					'text' => $msg,
-					'color' => (!$bool) ? array('R' => 255, 'G' => 0, 'B' => 0) : array('R' => 34, 'G' => 51, 'B' => 68)
-				);
-				break;
-			case PAGE_TYPE_XML:
-				echo htmlspecialchars($msg)."\n";
-				break;
-			case PAGE_TYPE_HTML:
-			default:
-				$msg_tab = new CTable($msg, ($bool ? 'msgok' : 'msgerr'));
-				$msg_tab->setCellPadding(0);
-				$msg_tab->setCellSpacing(0);
+	$ZBX_MESSAGES = [];
 
-				$row = array();
-
-				$msg_col = new CCol(bold($msg), 'msg_main msg');
-				$msg_col->setAttribute('id', 'page_msg');
-				$row[] = $msg_col;
-
-				if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
-					$msg_details = new CDiv(_('Details'), 'blacklink');
-					$msg_details->setAttribute('onclick', 'javascript: showHide("msg_messages", IE ? "block" : "table");');
-					$msg_details->setAttribute('title', _('Maximize').'/'._('Minimize'));
-					array_unshift($row, new CCol($msg_details, 'clr'));
-				}
-				$msg_tab->addRow($row);
-				$msg_tab->show();
-				break;
-		}
-	}
-
-	if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
-		if ($page['type'] == PAGE_TYPE_IMAGE) {
-			foreach ($ZBX_MESSAGES as $msg) {
-				// save all of the messages in an array to display them later in an image
-				if ($msg['type'] == 'error') {
-					$imageMessages[] = array(
-						'text' => $msg['message'],
-						'color' => array('R' => 255, 'G' => 55, 'B' => 55)
-					);
-				}
-				else {
-					$imageMessages[] = array(
-						'text' => $msg['message'],
-						'color' => array('R' => 155, 'G' => 155, 'B' => 55)
-					);
-				}
+	switch ($page['type']) {
+		case PAGE_TYPE_IMAGE:
+			if ($title !== null) {
+				$imageMessages[] = [
+					'text' => $title,
+					'color' => (!$good) ? ['R' => 255, 'G' => 0, 'B' => 0] : ['R' => 34, 'G' => 51, 'B' => 68]
+				];
 			}
-		}
-		elseif ($page['type'] == PAGE_TYPE_XML) {
-			foreach ($ZBX_MESSAGES as $msg) {
-				echo '['.$msg['type'].'] '.$msg['message']."\n";
+
+			foreach ($messages as $message) {
+				$imageMessages[] = [
+					'text' => $message['message'],
+					'color' => $message['type'] == 'error'
+						? ['R' => 255, 'G' => 55, 'B' => 55]
+						: ['R' => 155, 'G' => 155, 'B' => 55]
+				];
 			}
-		}
-		else {
-			$lst_error = new CList(null,'messages');
-			foreach ($ZBX_MESSAGES as $msg) {
-				$lst_error->addItem($msg['message'], $msg['type']);
-				$bool = ($bool && 'error' !== strtolower($msg['type']));
+			break;
+		case PAGE_TYPE_XML:
+			if ($title !== null) {
+				echo htmlspecialchars($title)."\n";
 			}
-			$msg_show = 6;
-			$msg_count = count($ZBX_MESSAGES);
-			if ($msg_count > $msg_show) {
-				$msg_count = $msg_show * 16;
-				$lst_error->setAttribute('style', 'height: '.$msg_count.'px;');
+
+			foreach ($messages as $message) {
+				echo '['.$message['type'].'] '.$message['message']."\n";
 			}
-			$tab = new CTable(null, ($bool ? 'msgok' : 'msgerr'));
-			$tab->setCellPadding(0);
-			$tab->setCellSpacing(0);
-			$tab->setAttribute('id', 'msg_messages');
-			$tab->setAttribute('style', 'width: 100%;');
-			if (isset($msg_tab) && $bool) {
-				$tab->setAttribute('style', 'display: none;');
+			break;
+		case PAGE_TYPE_HTML:
+		default:
+			if ($title || $messages) {
+				makeMessageBox($good, $messages, $title, true, !$good)->show();
 			}
-			$tab->addRow(new CCol($lst_error, 'msg'));
-			$tab->show();
-		}
-		$ZBX_MESSAGES = null;
+			break;
 	}
 
 	// draw an image with the messages
-	if ($page['type'] == PAGE_TYPE_IMAGE && count($imageMessages) > 0) {
+	if ($imageMessages) {
 		$imageFontSize = 8;
 
 		// calculate the size of the text
@@ -1901,44 +1842,46 @@ function show_error_message($msg) {
 function info($msgs) {
 	global $ZBX_MESSAGES;
 
-	zbx_value2array($msgs);
-	if (is_null($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = array();
+	if (!isset($ZBX_MESSAGES)) {
+		$ZBX_MESSAGES = [];
 	}
+
+	zbx_value2array($msgs);
+
 	foreach ($msgs as $msg) {
-		array_push($ZBX_MESSAGES, array('type' => 'info', 'message' => $msg));
+		$ZBX_MESSAGES[] = ['type' => 'info', 'message' => $msg];
 	}
 }
 
 function error($msgs) {
 	global $ZBX_MESSAGES;
 
-	if (is_null($ZBX_MESSAGES)) {
-		$ZBX_MESSAGES = array();
+	if (!isset($ZBX_MESSAGES)) {
+		$ZBX_MESSAGES = [];
 	}
 
 	$msgs = zbx_toArray($msgs);
+
 	foreach ($msgs as $msg) {
-		if (isset(CWebUser::$data['debug_mode']) && !is_object($msg) && !CWebUser::$data['debug_mode']) {
-			$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
-		}
-		array_push($ZBX_MESSAGES, array('type' => 'error', 'message' => $msg));
+		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg];
 	}
 }
 
 function clear_messages($count = null) {
 	global $ZBX_MESSAGES;
 
-	$result = array();
-	if (!is_null($count)) {
+	if ($count != null) {
+		$result = [];
+
 		while ($count-- > 0) {
 			array_unshift($result, array_pop($ZBX_MESSAGES));
 		}
 	}
 	else {
 		$result = $ZBX_MESSAGES;
-		$ZBX_MESSAGES = null;
+		$ZBX_MESSAGES = [];
 	}
+
 	return $result;
 }
 
@@ -1959,14 +1902,14 @@ function parse_period($str) {
 
 		for ($i = $arr[1]; $i <= $arr[2]; $i++) {
 			if (!isset($out[$i])) {
-				$out[$i] = array();
+				$out[$i] = [];
 			}
-			array_push($out[$i], array(
+			array_push($out[$i], [
 				'start_h' => $arr[3],
 				'start_m' => $arr[4],
 				'end_h' => $arr[5],
 				'end_m' => $arr[6]
-			));
+			]);
 		}
 	}
 	return $out;
@@ -1975,7 +1918,7 @@ function parse_period($str) {
 function get_status() {
 	global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-	$status = array(
+	$status = [
 		'triggers_count' => 0,
 		'triggers_count_enabled' => 0,
 		'triggers_count_disabled' => 0,
@@ -1991,7 +1934,7 @@ function get_status() {
 		'hosts_count_template' => 0,
 		'users_online' => 0,
 		'qps_total' => 0
-	);
+	];
 
 	// server
 	$zabbixServer = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT, ZBX_SOCKET_TIMEOUT, 0);
@@ -2059,10 +2002,10 @@ function get_status() {
 	$dbHosts = DBselect(
 		'SELECT COUNT(*) AS cnt,h.status'.
 		' FROM hosts h'.
-		' WHERE '.dbConditionInt('h.status', array(
+		' WHERE '.dbConditionInt('h.status', [
 				HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, HOST_STATUS_TEMPLATE
-			)).
-			' AND '.dbConditionInt('h.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			]).
+			' AND '.dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
 		' GROUP BY h.status');
 	while ($dbHost = DBfetch($dbHosts)) {
 		switch ($dbHost['status']) {
@@ -2155,7 +2098,7 @@ function imageOut(&$image, $format = null) {
 	if ($page['type'] != PAGE_TYPE_IMAGE) {
 		session_start();
 		$imageId = md5(strlen($imageSource));
-		$_SESSION['image_id'] = array();
+		$_SESSION['image_id'] = [];
 		$_SESSION['image_id'][$imageId] = $imageSource;
 		session_write_close();
 	}
@@ -2166,7 +2109,7 @@ function imageOut(&$image, $format = null) {
 			break;
 		case PAGE_TYPE_JSON:
 			$json = new CJson();
-			echo $json->encode(array('result' => $imageId));
+			echo $json->encode(['result' => $imageId]);
 			break;
 		case PAGE_TYPE_TEXT:
 		default:
@@ -2184,7 +2127,7 @@ function imageOut(&$image, $format = null) {
 function hasErrorMesssages() {
 	global $ZBX_MESSAGES;
 
-	if ($ZBX_MESSAGES !== null) {
+	if (isset($ZBX_MESSAGES)) {
 		foreach ($ZBX_MESSAGES as $message) {
 			if ($message['type'] === 'error') {
 				return true;
@@ -2231,7 +2174,7 @@ function uncheckTableRows($cookieId = null) {
 function splitPath($path, $stripSlashes = true, $cleanupBackslashes = false) {
 	$position = 0;
 	$escapeCharacters = '';
-	$pathItemsArray = array();
+	$pathItemsArray = [];
 	$pathItemString = '';
 
 	for ($stringLength = strlen($path); $position < $stringLength; ++$position) {

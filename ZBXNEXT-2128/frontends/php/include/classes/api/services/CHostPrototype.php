@@ -26,12 +26,12 @@
  */
 class CHostPrototype extends CHostBase {
 
-	protected $sortColumns = array('hostid', 'host', 'name', 'status');
+	protected $sortColumns = ['hostid', 'host', 'name', 'status'];
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->getOptions = array_merge($this->getOptions, array(
+		$this->getOptions = array_merge($this->getOptions, [
 			'discoveryids'  		=> null,
 			'inherited'				=> null,
 			'selectDiscoveryRule' 	=> null,
@@ -44,7 +44,7 @@ class CHostPrototype extends CHostBase {
 			'nopermissions'			=> null,
 			'sortfield'    			=> '',
 			'sortorder'     		=> ''
-		));
+		]);
 	}
 
 	/**
@@ -63,7 +63,7 @@ class CHostPrototype extends CHostBase {
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
-		$result = array();
+		$result = [];
 		while ($row = DBfetch($res)) {
 			// a count query, return a single result
 			if ($options['countOutput'] !== null) {
@@ -86,7 +86,7 @@ class CHostPrototype extends CHostBase {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('triggerid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['triggerid'], $options['output']);
 		}
 
 		if ($options['preservekeys'] === null) {
@@ -108,16 +108,16 @@ class CHostPrototype extends CHostBase {
 	protected function validateCreate(array $hostPrototypes) {
 		// host prototype validator
 		$hostPrototypeValidator = new CSchemaValidator($this->getHostPrototypeSchema());
-		$hostPrototypeValidator->setValidator('ruleid', new CIdValidator(array(
+		$hostPrototypeValidator->setValidator('ruleid', new CIdValidator([
 			'messageEmpty' => _('No discovery rule ID given for host prototype "%1$s".'),
 			'messageInvalid' => _('Incorrect discovery rule ID for host prototype "%1$s".')
-		)));
+		]));
 
 		// group validators
 		$groupLinkValidator = new CSchemaValidator($this->getGroupLinkSchema());
 		$groupPrototypeValidator = new CSchemaValidator($this->getGroupPrototypeSchema());
 
-		$groupPrototypeGroupIds = array();
+		$groupPrototypeGroupIds = [];
 		foreach ($hostPrototypes as $hostPrototype) {
 			// host prototype
 			$hostPrototypeValidator->setObjectName(isset($hostPrototype['host']) ? $hostPrototype['host'] : '');
@@ -143,18 +143,18 @@ class CHostPrototype extends CHostBase {
 		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
 
 		// check if the host is discovered
-		$discoveryRules = API::getApiService()->select('items', array(
-			'output' => array('hostid'),
+		$discoveryRules = API::getApiService()->select('items', [
+			'output' => ['hostid'],
 			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid')
-		));
-		$this->checkValidator(zbx_objectValues($discoveryRules, 'hostid'), new CHostNormalValidator(array(
+		]);
+		$this->checkValidator(zbx_objectValues($discoveryRules, 'hostid'), new CHostNormalValidator([
 			'message' => _('Cannot create a host prototype on a discovered host "%1$s".')
-		)));
+		]));
 
 		// check if group prototypes use discovered host groups
-		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator(array(
+		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator([
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
-		)));
+		]));
 
 		$this->checkDuplicates($hostPrototypes);
 	}
@@ -165,49 +165,49 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	protected function getHostPrototypeSchema() {
-		return array(
-			'validators' => array(
-				'host' => new CLldMacroStringValidator(array(
+		return [
+			'validators' => [
+				'host' => new CLldMacroStringValidator([
 					'maxLength' => 64,
 					'regex' => '/^('.ZBX_PREG_INTERNAL_NAMES.'|\{#'.ZBX_PREG_MACRO_NAME_LLD.'\})+$/',
 					'messageEmpty' => _('Empty host.'),
 					'messageMaxLength' => _('Host name "%1$s" is too long, it must not be longer than %2$d characters.'),
 					'messageRegex' => _('Incorrect characters used for host "%1$s".'),
 					'messageMacro' => _('Host name for host prototype "%1$s" must contain macros.')
-				)),
-				'name' => new CStringValidator(array(
+				]),
+				'name' => new CStringValidator([
 					// if an empty name is given, it should be replaced with the host name, but we'll validate it
 					// just in case
 					'messageEmpty' => _('Empty name for host prototype "%1$s".')
-				)),
-				'status' => new CLimitedSetValidator(array(
-					'values' => array(HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED),
+				]),
+				'status' => new CLimitedSetValidator([
+					'values' => [HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED],
 					'messageInvalid' => _('Incorrect status for host prototype "%1$s".')
-				)),
-				'groupLinks' => new CCollectionValidator(array(
+				]),
+				'groupLinks' => new CCollectionValidator([
 					'uniqueField' => 'groupid',
 					'messageEmpty' => _('Host prototype "%1$s" must have at least one host group.'),
 					'messageInvalid' => _('Incorrect host groups for host prototype "%1$s".'),
 					'messageDuplicate' => _('Duplicate host group ID "%2$s" for host prototype "%1$s".')
-				)),
-				'groupPrototypes' => new CCollectionValidator(array(
+				]),
+				'groupPrototypes' => new CCollectionValidator([
 					'empty' => true,
 					'uniqueField' => 'name',
 					'messageInvalid' => _('Incorrect group prototypes for host prototype "%1$s".'),
 					'messageDuplicate' => _('Duplicate group prototype name "%2$s" for host prototype "%1$s".')
-				)),
-				'inventory' => new CSchemaValidator(array(
-					'validators' => array(
+				]),
+				'inventory' => new CSchemaValidator([
+					'validators' => [
 						'inventory_mode' => null,
-					),
+					],
 					'messageUnsupported' => _('Unsupported parameter "%2$s" for host prototype %1$s host inventory.'),
-				)),
+				]),
 				'templates' => null
-			),
-			'required' => array('host', 'ruleid', 'groupLinks'),
+			],
+			'required' => ['host', 'ruleid', 'groupLinks'],
 			'messageRequired' => _('No "%2$s" given for host prototype "%1$s".'),
 			'messageUnsupported' => _('Unsupported parameter "%2$s" for host prototype "%1$s".')
-		);
+		];
 	}
 
 	/**
@@ -216,16 +216,16 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	protected function getGroupPrototypeSchema() {
-		return array(
-			'validators' => array(
-				'name' => new CLldMacroStringValidator(array(
+		return [
+			'validators' => [
+				'name' => new CLldMacroStringValidator([
 					'messageEmpty' => _('Empty name for group prototype.'),
 					'messageMacro' => _('Name for group prototype "%1$s" must contain macros.')
-				))
-			),
-			'required' => array('name'),
+				])
+			],
+			'required' => ['name'],
 			'messageUnsupported' => _('Unsupported parameter "%1$s" for group prototype.')
-		);
+		];
 	}
 
 	/**
@@ -234,16 +234,16 @@ class CHostPrototype extends CHostBase {
 	 * @return array
 	 */
 	protected function getGroupLinkSchema() {
-		return array(
-			'validators' => array(
-				'groupid' => new CIdValidator(array(
+		return [
+			'validators' => [
+				'groupid' => new CIdValidator([
 					'messageEmpty' => _('No host group ID for group prototype.'),
 					'messageInvalid' => _('Incorrect host group ID for group prototype.')
-				))
-			),
-			'required' => array('groupid'),
+				])
+			],
+			'required' => ['groupid'],
 			'messageUnsupported' => _('Unsupported parameter "%1$s" for group prototype.')
-		);
+		];
 	}
 
 	/**
@@ -282,7 +282,7 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypes = $this->createReal($hostPrototypes);
 		$this->inherit($hostPrototypes);
 
-		return array('hostids' => zbx_objectValues($hostPrototypes, 'hostid'));
+		return ['hostids' => zbx_objectValues($hostPrototypes, 'hostid')];
 	}
 
 	/**
@@ -301,9 +301,9 @@ class CHostPrototype extends CHostBase {
 		// save the host prototypes
 		$hostPrototypeIds = DB::insert($this->tableName(), $hostPrototypes);
 
-		$groupPrototypes = array();
-		$hostPrototypeDiscoveryRules = array();
-		$hostPrototypeInventory = array();
+		$groupPrototypes = [];
+		$hostPrototypeDiscoveryRules = [];
+		$hostPrototypeInventory = [];
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$hostPrototypes[$key]['hostid'] = $hostPrototype['hostid'] = $hostPrototypeIds[$key];
 
@@ -314,17 +314,17 @@ class CHostPrototype extends CHostBase {
 			}
 
 			// discovery rules
-			$hostPrototypeDiscoveryRules[] = array(
+			$hostPrototypeDiscoveryRules[] = [
 				'hostid' => $hostPrototype['hostid'],
 				'parent_itemid' => $hostPrototype['ruleid']
-			);
+			];
 
 			// inventory
 			if (isset($hostPrototype['inventory']) && $hostPrototype['inventory']) {
-				$hostPrototypeInventory[] = array(
+				$hostPrototypeInventory[] = [
 					'hostid' => $hostPrototype['hostid'],
 					'inventory_mode' => $hostPrototype['inventory']['inventory_mode']
-				);
+				];
 			}
 		}
 
@@ -349,17 +349,17 @@ class CHostPrototype extends CHostBase {
 		// link templates
 		foreach ($hostPrototypes as $hostPrototype) {
 			if (isset($hostPrototype['templates']) && $hostPrototype['templates']) {
-				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), array($hostPrototype['hostid']));
+				$this->link(zbx_objectValues($hostPrototype['templates'], 'templateid'), [$hostPrototype['hostid']]);
 			}
 		}
 
 		// TODO: REMOVE info
-		$createdHostPrototypes = $this->get(array(
+		$createdHostPrototypes = $this->get([
 			'hostids' => $hostPrototypeIds,
-			'output' => array('host'),
-			'selectParentHost' => array('host'),
+			'output' => ['host'],
+			'selectParentHost' => ['host'],
 			'nopermissions' => true
-		));
+		]);
 		foreach ($createdHostPrototypes as $hostProtototype) {
 			info(_s('Created: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
 		}
@@ -381,9 +381,9 @@ class CHostPrototype extends CHostBase {
 		// TODO: permissions should be checked using the $dbHostPrototypes array
 		$this->checkHostPrototypePermissions(zbx_objectValues($hostPrototypes, 'hostid'));
 
-		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, array(
+		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, [
 			'host', 'name'
-		));
+		]);
 
 		// host prototype validator
 		$hostPrototypeValidator = new CPartialSchemaValidator($this->getHostPrototypeSchema());
@@ -391,19 +391,19 @@ class CHostPrototype extends CHostBase {
 
 		// group validator
 		$groupLinkValidator = new CPartialSchemaValidator($this->getGroupLinkSchema());
-		$groupLinkValidator->setValidator('group_prototypeid', new CIdValidator(array(
+		$groupLinkValidator->setValidator('group_prototypeid', new CIdValidator([
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
 			'messageInvalid' => _('Incorrect group prototype ID.')
-		)));
+		]));
 
 		// group prototype validator
 		$groupPrototypeValidator = new CPartialSchemaValidator($this->getGroupPrototypeSchema());
-		$groupPrototypeValidator->setValidator('group_prototypeid', new CIdValidator(array(
+		$groupPrototypeValidator->setValidator('group_prototypeid', new CIdValidator([
 			'messageEmpty' => _('Group prototype ID cannot be empty.'),
 			'messageInvalid' => _('Incorrect group prototype ID.')
-		)));
+		]));
 
-		$groupPrototypeGroupIds = array();
+		$groupPrototypeGroupIds = [];
 		foreach ($hostPrototypes as $hostPrototype) {
 			// host prototype
 			$hostPrototypeValidator->setObjectName($hostPrototype['host']);
@@ -430,9 +430,9 @@ class CHostPrototype extends CHostBase {
 		$this->checkHostGroupsPermissions($groupPrototypeGroupIds);
 
 		// check if group prototypes use discovered host groups
-		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator(array(
+		$this->checkValidator(array_unique($groupPrototypeGroupIds), new CHostGroupNormalValidator([
 			'message' => _('Group prototype cannot be based on a discovered host group "%1$s".')
-		)));
+		]));
 
 		// check for duplicates
 		foreach ($hostPrototypes as &$hostPrototype) {
@@ -460,15 +460,15 @@ class CHostPrototype extends CHostBase {
 		);
 
 		// fetch updated objects from the DB
-		$dbHostPrototypes = $this->get(array(
-			'output' => array('host', 'name'),
+		$dbHostPrototypes = $this->get([
+			'output' => ['host', 'name'],
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRule' => array('itemid'),
+			'selectDiscoveryRule' => ['itemid'],
 			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
 			if (isset($hostPrototype['templates'])) {
@@ -487,9 +487,9 @@ class CHostPrototype extends CHostBase {
 		$this->validateUpdate($hostPrototypes, $dbHostPrototypes);
 
 		// fetch missing data from the DB
-		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, array(
+		$hostPrototypes = $this->extendFromObjects(zbx_toHash($hostPrototypes, 'hostid'), $dbHostPrototypes, [
 			'host', 'groupLinks', 'groupPrototypes'
-		));
+		]);
 		foreach ($hostPrototypes as &$hostPrototype) {
 			$hostPrototype['ruleid'] = $dbHostPrototypes[$hostPrototype['hostid']]['discoveryRule']['itemid'];
 		}
@@ -509,7 +509,7 @@ class CHostPrototype extends CHostBase {
 		$hostPrototypes = $this->updateReal($hostPrototypes);
 		$this->inherit($hostPrototypes);
 
-		return array('hostids' => zbx_objectValues($hostPrototypes, 'hostid'));
+		return ['hostids' => zbx_objectValues($hostPrototypes, 'hostid')];
 	}
 
 	/**
@@ -525,19 +525,19 @@ class CHostPrototype extends CHostBase {
 			DB::updateByPk($this->tableName(), $hostPrototype['hostid'], $hostPrototype);
 		}
 
-		$exHostPrototypes = $this->get(array(
-			'output' => array('hostid'),
+		$exHostPrototypes = $this->get([
+			'output' => ['hostid'],
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
-			'selectTemplates' => array('templateid'),
+			'selectTemplates' => ['templateid'],
 			'selectInventory' => API_OUTPUT_EXTEND,
 			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
 			'preservekeys' => true
-		));
+		]);
 
 		// update related objects
-		$inventoryCreate = array();
-		$inventoryDeleteIds = array();
+		$inventoryCreate = [];
+		$inventoryDeleteIds = [];
 		foreach ($hostPrototypes as $key => $hostPrototype) {
 			$exHostPrototype = $exHostPrototypes[$hostPrototype['hostid']];
 
@@ -553,7 +553,7 @@ class CHostPrototype extends CHostBase {
 					array_merge($exHostPrototype['groupLinks'], $exHostPrototype['groupPrototypes']),
 					'group_prototypeid'
 				);
-				$modifiedGroupPrototypes = array();
+				$modifiedGroupPrototypes = [];
 				foreach ($hostPrototype['groupPrototypes'] as $groupPrototype) {
 					if (isset($groupPrototype['group_prototypeid'])) {
 						unset($exGroupPrototypes[$groupPrototype['group_prototypeid']]);
@@ -571,23 +571,23 @@ class CHostPrototype extends CHostBase {
 			if (isset($hostPrototype['templates'])) {
 				$existingTemplateIds = zbx_objectValues($exHostPrototype['templates'], 'templateid');
 				$newTemplateIds = zbx_objectValues($hostPrototype['templates'], 'templateid');
-				$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), array($hostPrototype['hostid']));
-				$this->link(array_diff($newTemplateIds, $existingTemplateIds), array($hostPrototype['hostid']));
+				$this->unlink(array_diff($existingTemplateIds, $newTemplateIds), [$hostPrototype['hostid']]);
+				$this->link(array_diff($newTemplateIds, $existingTemplateIds), [$hostPrototype['hostid']]);
 			}
 
 			// inventory
 			if (isset($hostPrototype['inventory']) ) {
-				$inventory = zbx_array_mintersect(array('inventory_mode'), $hostPrototype['inventory']);
+				$inventory = zbx_array_mintersect(['inventory_mode'], $hostPrototype['inventory']);
 				$inventory['hostid'] = $hostPrototype['hostid'];
 
 				if ($hostPrototype['inventory']
 					&& (!isset($hostPrototype['inventory']['inventory_mode']) || $hostPrototype['inventory']['inventory_mode'] != HOST_INVENTORY_DISABLED)) {
 
 					if ($exHostPrototype['inventory']) {
-						DB::update('host_inventory', array(
+						DB::update('host_inventory', [
 							'values' => $inventory,
-							'where' => array('hostid' => $inventory['hostid'])
-						));
+							'where' => ['hostid' => $inventory['hostid']]
+						]);
 					}
 					else {
 						$inventoryCreate[] = $inventory;
@@ -602,15 +602,15 @@ class CHostPrototype extends CHostBase {
 
 		// save inventory
 		DB::insert('host_inventory', $inventoryCreate, false);
-		DB::delete('host_inventory', array('hostid' => $inventoryDeleteIds));
+		DB::delete('host_inventory', ['hostid' => $inventoryDeleteIds]);
 
 		// TODO: REMOVE info
-		$updatedHostPrototypes = $this->get(array(
+		$updatedHostPrototypes = $this->get([
 			'hostids' => zbx_objectValues($hostPrototypes, 'hostid'),
-			'output' => array('host'),
-			'selectParentHost' => array('host'),
+			'output' => ['host'],
+			'selectParentHost' => ['host'],
 			'nopermissions' => true
-		));
+		]);
 		foreach ($updatedHostPrototypes as $hostProtototype) {
 			info(_s('Updated: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
 		}
@@ -638,8 +638,8 @@ class CHostPrototype extends CHostBase {
 			return true;
 		}
 
-		$insertHostPrototypes = array();
-		$updateHostPrototypes = array();
+		$insertHostPrototypes = [];
+		$updateHostPrototypes = [];
 		foreach ($newHostPrototypes as $newHostPrototype) {
 			if (isset($newHostPrototype['hostid'])) {
 				$updateHostPrototypes[] = $newHostPrototype;
@@ -676,49 +676,49 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function prepareInheritedObjects(array $hostPrototypes, array $hostIds = null) {
 		// fetch the related discovery rules with their hosts
-		$discoveryRules = API::DiscoveryRule()->get(array(
-			'output' => array('itemid', 'hostid'),
-			'selectHosts' => array('hostid'),
+		$discoveryRules = API::DiscoveryRule()->get([
+			'output' => ['itemid', 'hostid'],
+			'selectHosts' => ['hostid'],
 			'itemids' => zbx_objectValues($hostPrototypes, 'ruleid'),
 			'templated' => true,
 			'nopermissions' => true,
 			'preservekeys' => true
-		));
+		]);
 
 		// fetch all child hosts to inherit to
 		// do not inherit host prototypes on discovered hosts
-		$chdHosts = API::Host()->get(array(
-			'output' => array('hostid', 'host', 'status'),
-			'selectParentTemplates' => array('templateid'),
+		$chdHosts = API::Host()->get([
+			'output' => ['hostid', 'host', 'status'],
+			'selectParentTemplates' => ['templateid'],
 			'templateids' => zbx_objectValues($discoveryRules, 'hostid'),
 			'hostids' => $hostIds,
 			'nopermissions' => true,
 			'templated_hosts' => true,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL)
-		));
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+		]);
 		if (empty($chdHosts)) {
-			return array();
+			return [];
 		}
 
 		// fetch the child discovery rules
-		$childDiscoveryRules = API::DiscoveryRule()->get(array(
-			'output' => array('itemid', 'templateid', 'hostid'),
+		$childDiscoveryRules = API::DiscoveryRule()->get([
+			'output' => ['itemid', 'templateid', 'hostid'],
 			'preservekeys' => true,
-			'filter' => array(
+			'filter' => [
 				'templateid' => array_keys($discoveryRules)
-			)
-		));
+			]
+		]);
 
 		// fetch child host prototypes and group them by discovery rule
-		$childHostPrototypes = API::HostPrototype()->get(array(
-			'output' => array('hostid', 'host', 'templateid'),
+		$childHostPrototypes = API::HostPrototype()->get([
+			'output' => ['hostid', 'host', 'templateid'],
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
-			'selectDiscoveryRule' => array('itemid'),
+			'selectDiscoveryRule' => ['itemid'],
 			'discoveryids' => zbx_objectValues($childDiscoveryRules, 'itemid'),
-		));
+		]);
 		foreach ($childDiscoveryRules as &$childDiscoveryRule) {
-			$childDiscoveryRule['hostPrototypes'] = array();
+			$childDiscoveryRule['hostPrototypes'] = [];
 		}
 		unset($childDiscoveryRule);
 		foreach ($childHostPrototypes as $childHostPrototype) {
@@ -729,18 +729,18 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// match each discovery that the parent host prototypes belong to to the child discovery rule for each host
-		$discoveryRuleChildren = array();
+		$discoveryRuleChildren = [];
 		foreach ($childDiscoveryRules as $childRule) {
 			$discoveryRuleChildren[$childRule['templateid']][$childRule['hostid']] = $childRule['itemid'];
 		}
 
-		$newHostPrototypes = array();
+		$newHostPrototypes = [];
 		foreach ($chdHosts as $host) {
 			$hostId = $host['hostid'];
 
 			// skip items not from parent templates of current host
 			$templateIds = zbx_toHash($host['parentTemplates'], 'templateid');
-			$parentHostPrototypes = array();
+			$parentHostPrototypes = [];
 			foreach ($hostPrototypes as $inum => $parentHostPrototype) {
 				$parentTemplateId = $discoveryRules[$parentHostPrototype['ruleid']]['hostid'];
 
@@ -859,19 +859,19 @@ class CHostPrototype extends CHostBase {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$discoveryRules = API::DiscoveryRule()->get(array(
-			'output' => array('itemid'),
+		$discoveryRules = API::DiscoveryRule()->get([
+			'output' => ['itemid'],
 			'hostids' => $data['templateids']
-		));
-		$hostPrototypes = $this->get(array(
+		]);
+		$hostPrototypes = $this->get([
 			'discoveryids' => zbx_objectValues($discoveryRules, 'itemid'),
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => API_OUTPUT_EXTEND,
 			'selectGroupPrototypes' => API_OUTPUT_EXTEND,
-			'selectTemplates' => array('templateid'),
-			'selectDiscoveryRule' => array('itemid')
-		));
+			'selectTemplates' => ['templateid'],
+			'selectDiscoveryRule' => ['itemid']
+		]);
 
 		foreach ($hostPrototypes as &$hostPrototype) {
 			// merge group links into group prototypes
@@ -925,10 +925,10 @@ class CHostPrototype extends CHostBase {
 
 		// include child IDs
 		$parentHostPrototypeIds = $hostPrototypeIds;
-		$childHostPrototypeIds = array();
+		$childHostPrototypeIds = [];
 		do {
 			$query = DBselect('SELECT h.hostid FROM hosts h WHERE '.dbConditionInt('h.templateid', $parentHostPrototypeIds));
-			$parentHostPrototypeIds = array();
+			$parentHostPrototypeIds = [];
 			while ($hostPrototype = DBfetch($query)) {
 				$parentHostPrototypeIds[] = $hostPrototype['hostid'];
 				$childHostPrototypeIds[] = $hostPrototype['hostid'];
@@ -937,13 +937,13 @@ class CHostPrototype extends CHostBase {
 
 		$hostPrototypeIds = array_merge($hostPrototypeIds, $childHostPrototypeIds);
 
-		$deleteHostPrototypes = $this->get(array(
+		$deleteHostPrototypes = $this->get([
 			'hostids' => $hostPrototypeIds,
-			'output' => array('host'),
-			'selectGroupPrototypes' => array('group_prototypeid'),
-			'selectParentHost' => array('host'),
+			'output' => ['host'],
+			'selectGroupPrototypes' => ['group_prototypeid'],
+			'selectParentHost' => ['host'],
 			'nopermissions' => true
-		));
+		]);
 
 		// delete discovered hosts
 		$discoveredHosts = DBfetchArray(DBselect(
@@ -954,7 +954,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// delete group prototypes and discovered groups
-		$groupPrototypeIds = array();
+		$groupPrototypeIds = [];
 		foreach ($deleteHostPrototypes as $groupPrototype) {
 			foreach ($groupPrototype['groupPrototypes'] as $groupPrototype) {
 				$groupPrototypeIds[] = $groupPrototype['group_prototypeid'];
@@ -963,14 +963,14 @@ class CHostPrototype extends CHostBase {
 		$this->deleteGroupPrototypes($groupPrototypeIds);
 
 		// delete host prototypes
-		DB::delete($this->tableName(), array('hostid' => $hostPrototypeIds));
+		DB::delete($this->tableName(), ['hostid' => $hostPrototypeIds]);
 
 		// TODO: REMOVE info
 		foreach ($deleteHostPrototypes as $hostProtototype) {
 			info(_s('Deleted: Host prototype "%1$s" on "%2$s".', $hostProtototype['host'], $hostProtototype['parentHost']['host']));
 		}
 
-		return array('hostids' => $hostPrototypeIds);
+		return ['hostids' => $hostPrototypeIds];
 	}
 
 	/**
@@ -986,10 +986,10 @@ class CHostPrototype extends CHostBase {
 		}
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'hostids' => $ids,
 			'countOutput' => true
-		));
+		]);
 		return count($ids) == $count;
 	}
 
@@ -1006,11 +1006,11 @@ class CHostPrototype extends CHostBase {
 		}
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'hostids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 		return count($ids) == $count;
 	}
 
@@ -1088,12 +1088,12 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function checkDuplicates(array $hostPrototypes) {
 		// check host name duplicates
-		$collectionValidator = new CCollectionValidator(array(
+		$collectionValidator = new CCollectionValidator([
 			'empty' => true,
 			'uniqueField' => 'host',
 			'uniqueField2' => 'ruleid',
 			'messageDuplicate' => _('Host prototype with host name "%1$s" already exists.')
-		));
+		]);
 		$this->checkValidator($hostPrototypes, $collectionValidator);
 		$this->checkExistingHostPrototypes($hostPrototypes, 'host',
 			_('Host prototype with host name "%1$s" already exists in discovery rule "%2$s".')
@@ -1119,8 +1119,8 @@ class CHostPrototype extends CHostBase {
 	 * @param string $error				error message in case duplicates are found
 	 */
 	protected function checkExistingHostPrototypes(array $hostPrototypes, $field, $error) {
-		$valuesByDiscoveryRuleId = array();
-		$hostIds = array();
+		$valuesByDiscoveryRuleId = [];
+		$hostIds = [];
 		foreach ($hostPrototypes as $hostPrototype) {
 			$valuesByDiscoveryRuleId[$hostPrototype['ruleid']][] = $hostPrototype[$field];
 
@@ -1129,7 +1129,7 @@ class CHostPrototype extends CHostBase {
 			}
 		}
 
-		$sqlWhere = array();
+		$sqlWhere = [];
 		foreach ($valuesByDiscoveryRuleId as $discoveryRuleId => $values) {
 			$sqlWhere[] = '(hd.parent_itemid='.zbx_dbstr($discoveryRuleId).
 				' AND '.dbConditionString('h.'.$field, $values).')';
@@ -1207,12 +1207,12 @@ class CHostPrototype extends CHostBase {
 		// adding discovery rule
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'parent_itemid', 'host_discovery');
-			$discoveryRules = API::DiscoveryRule()->get(array(
+			$discoveryRules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'preservekeys' => true,
-			));
+			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 
@@ -1225,11 +1225,11 @@ class CHostPrototype extends CHostBase {
 					' AND hg.groupid IS NOT NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
-			$groupPrototypes = API::getApiService()->select('group_prototype', array(
+			$groupPrototypes = API::getApiService()->select('group_prototype', [
 				'output' => $options['selectGroupLinks'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			foreach ($groupPrototypes as &$groupPrototype) {
 				unset($groupPrototype['name']);
 			}
@@ -1246,11 +1246,11 @@ class CHostPrototype extends CHostBase {
 					' AND hg.groupid IS NULL'
 			));
 			$relationMap = $this->createRelationMap($groupPrototypes, 'hostid', 'group_prototypeid');
-			$groupPrototypes = API::getApiService()->select('group_prototype', array(
+			$groupPrototypes = API::getApiService()->select('group_prototype', [
 				'output' => $options['selectGroupPrototypes'],
 				'group_prototypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			foreach ($groupPrototypes as &$groupPrototype) {
 				unset($groupPrototype['groupid']);
 			}
@@ -1271,13 +1271,13 @@ class CHostPrototype extends CHostBase {
 				$relationMap->addRelation($relation['hostid'], $relation['parent_hostid']);
 			}
 
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'output' => $options['selectParentHost'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'templated_hosts' => true,
 				'nopermissions' => true,
 				'preservekeys' => true,
-			));
+			]);
 			$result = $relationMap->mapOne($result, $hosts, 'parentHost');
 		}
 
@@ -1285,19 +1285,19 @@ class CHostPrototype extends CHostBase {
 		if ($options['selectTemplates'] !== null) {
 			if ($options['selectTemplates'] != API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'hostid', 'templateid', 'hosts_templates');
-				$templates = API::Template()->get(array(
+				$templates = API::Template()->get([
 					'output' => $options['selectTemplates'],
 					'templateids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
-				));
+				]);
 				$result = $relationMap->mapMany($result, $templates, 'templates');
 			}
 			else {
-				$templates = API::Template()->get(array(
+				$templates = API::Template()->get([
 					'hostids' => $hostPrototypeIds,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$templates = zbx_toHash($templates, 'hostid');
 				foreach ($result as $hostid => $host) {
 					$result[$hostid]['templates'] = isset($templates[$hostid]) ? $templates[$hostid]['rowscount'] : 0;
@@ -1310,17 +1310,17 @@ class CHostPrototype extends CHostBase {
 			$relationMap = $this->createRelationMap($result, 'hostid', 'hostid');
 
 			// only allow to retrieve the hostid and inventory_mode fields
-			$output = array();
+			$output = [];
 			if ($this->outputIsRequested('hostid', $options['selectInventory'])) {
 				$output[] = 'hostid';
 			}
 			if ($this->outputIsRequested('inventory_mode', $options['selectInventory'])) {
 				$output[] = 'inventory_mode';
 			}
-			$inventory = API::getApiService()->select('host_inventory', array(
+			$inventory = API::getApiService()->select('host_inventory', [
 				'output' => $output,
-				'filter' => array('hostid' => $hostPrototypeIds)
-			));
+				'filter' => ['hostid' => $hostPrototypeIds]
+			]);
 			$result = $relationMap->mapOne($result, zbx_toHash($inventory, 'hostid'), 'inventory');
 		}
 
@@ -1351,6 +1351,6 @@ class CHostPrototype extends CHostBase {
 		}
 
 		// delete group prototypes
-		DB::delete('group_prototype', array('group_prototypeid' => $groupPrototypeIds));
+		DB::delete('group_prototype', ['group_prototypeid' => $groupPrototypeIds]);
 	}
 }

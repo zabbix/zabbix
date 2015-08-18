@@ -36,12 +36,12 @@ class CHostNormalValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($hostIds) {
-		$hosts = API::Host()->get(array(
-			'output' => array('host'),
+		$hosts = API::Host()->get([
+			'output' => ['host'],
 			'hostids' => $hostIds,
-			'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
 			'limit' => 1
-		));
+		]);
 
 		if ($hosts) {
 			$host = reset($hosts);

@@ -48,9 +48,9 @@ class testTriggerDependenciesFromHost extends CWebTest {
 	}
 
 	public function testTriggerDependenciesFromHost_SimpleTestProvider() {
-		return array (
-			array('10054', 'Cannot add dependency from template to host'),
-			array('10001', 'Trigger updated')
-		);
+		return [
+			['10054', 'Cannot add dependency from template to host'],
+			['10001', 'Trigger updated']
+		];
 	}
 }

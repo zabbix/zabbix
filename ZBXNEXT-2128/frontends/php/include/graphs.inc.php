@@ -20,12 +20,12 @@
 
 
 function graphType($type = null) {
-	$types = array(
+	$types = [
 		GRAPH_TYPE_NORMAL => _('Normal'),
 		GRAPH_TYPE_STACKED => _('Stacked'),
 		GRAPH_TYPE_PIE => _('Pie'),
 		GRAPH_TYPE_EXPLODED => _('Exploded')
-	);
+	];
 
 	if (is_null($type)) {
 		return $types;
@@ -39,14 +39,14 @@ function graphType($type = null) {
 }
 
 function graph_item_drawtypes() {
-	return array(
+	return [
 		GRAPH_ITEM_DRAWTYPE_LINE,
 		GRAPH_ITEM_DRAWTYPE_FILLED_REGION,
 		GRAPH_ITEM_DRAWTYPE_BOLD_LINE,
 		GRAPH_ITEM_DRAWTYPE_DOT,
 		GRAPH_ITEM_DRAWTYPE_DASHED_LINE,
 		GRAPH_ITEM_DRAWTYPE_GRADIENT_LINE
-	);
+	];
 }
 
 function graph_item_drawtype2str($drawtype) {
@@ -87,7 +87,7 @@ function graph_item_calc_fnc2str($calc_fnc) {
 }
 
 function getGraphDims($graphid = null) {
-	$graphDims = array();
+	$graphDims = [];
 
 	$graphDims['shiftYtop'] = 35;
 	if (is_null($graphid)) {
@@ -163,7 +163,7 @@ function get_hosts_by_graphid($graphid) {
  *	sql is split to many sql's to optimize search on history tables
  */
 function get_min_itemclock_by_graphid($graphid) {
-	$itemids = array();
+	$itemids = [];
 	$dbItems = DBselect(
 		'SELECT DISTINCT gi.itemid'.
 		' FROM graphs_items gi'.
@@ -189,13 +189,13 @@ function get_min_itemclock_by_itemid($itemIds) {
 	$min = null;
 	$result = time() - SEC_PER_YEAR;
 
-	$itemTypes = array(
-		ITEM_VALUE_TYPE_FLOAT => array(),
-		ITEM_VALUE_TYPE_STR => array(),
-		ITEM_VALUE_TYPE_LOG => array(),
-		ITEM_VALUE_TYPE_UINT64 => array(),
-		ITEM_VALUE_TYPE_TEXT => array()
-	);
+	$itemTypes = [
+		ITEM_VALUE_TYPE_FLOAT => [],
+		ITEM_VALUE_TYPE_STR => [],
+		ITEM_VALUE_TYPE_LOG => [],
+		ITEM_VALUE_TYPE_UINT64 => [],
+		ITEM_VALUE_TYPE_TEXT => []
+	];
 
 	$dbItems = DBselect(
 		'SELECT i.itemid,i.value_type'.
@@ -297,8 +297,8 @@ function getGraphByGraphId($graphId) {
  *
  * @return array|bool
  */
-function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, array $flags = array()) {
-	$result = array();
+function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, array $flags = []) {
+	$result = [];
 
 	$flagsSql = $flags ? ' AND '.dbConditionInt('dest.flags', $flags) : '';
 
@@ -343,12 +343,12 @@ function getSameGraphItemsForHost($gitems, $destinationHostId, $error = true, ar
  * @return array
  */
 function copyGraphToHost($graphId, $hostId) {
-	$graphs = API::Graph()->get(array(
+	$graphs = API::Graph()->get([
 		'graphids' => $graphId,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name'),
+		'selectHosts' => ['hostid', 'name'],
 		'selectGraphItems' => API_OUTPUT_EXTEND
-	));
+	]);
 	$graph = reset($graphs);
 	$graphHost = reset($graph['hosts']);
 
@@ -362,7 +362,7 @@ function copyGraphToHost($graphId, $hostId) {
 		$graph['gitems'],
 		$hostId,
 		true,
-		array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)
+		[ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]
 	);
 
 	if (!$graph['gitems']) {
@@ -433,18 +433,18 @@ function navigation_bar_calc($idx = null, $idx2 = 0, $update = false) {
 }
 
 function get_next_color($palettetype = 0) {
-	static $prev_color = array('dark' => true, 'color' => 0, 'grad' => 0);
+	static $prev_color = ['dark' => true, 'color' => 0, 'grad' => 0];
 
 	switch ($palettetype) {
 		case 1:
-			$grad = array(200, 150, 255, 100, 50, 0);
+			$grad = [200, 150, 255, 100, 50, 0];
 			break;
 		case 2:
-			$grad = array(100, 50, 200, 150, 250, 0);
+			$grad = [100, 50, 200, 150, 250, 0];
 			break;
 		case 0:
 		default:
-			$grad = array(255, 200, 150, 100, 50, 0);
+			$grad = [255, 200, 150, 100, 50, 0];
 			break;
 	}
 
@@ -482,30 +482,30 @@ function get_next_color($palettetype = 0) {
 	}
 	$prev_color['color'] = ($prev_color['color'] + 1) % 7;
 
-	return array($r, $g, $b);
+	return [$r, $g, $b];
 }
 
 function get_next_palette($palette = 0, $palettetype = 0) {
-	static $prev_color = array(0, 0, 0, 0);
+	static $prev_color = [0, 0, 0, 0];
 
 	switch ($palette) {
 		case 0:
-			$palettes = array(
-				array(150, 0, 0), array(0, 100, 150), array(170, 180, 180), array(152, 100, 0), array(130, 0, 150),
-				array(0, 0, 150), array(200, 100, 50), array(250, 40, 40), array(50, 150, 150), array(100, 150, 0)
-			);
+			$palettes = [
+				[150, 0, 0], [0, 100, 150], [170, 180, 180], [152, 100, 0], [130, 0, 150],
+				[0, 0, 150], [200, 100, 50], [250, 40, 40], [50, 150, 150], [100, 150, 0]
+			];
 			break;
 		case 1:
-			$palettes = array(
-				array(0, 100, 150), array(153, 0, 30), array(100, 150, 0), array(130, 0, 150), array(0, 0, 100),
-				array(200, 100, 50), array(152, 100, 0), array(0, 100, 0), array(170, 180, 180), array(50, 150, 150)
-			);
+			$palettes = [
+				[0, 100, 150], [153, 0, 30], [100, 150, 0], [130, 0, 150], [0, 0, 100],
+				[200, 100, 50], [152, 100, 0], [0, 100, 0], [170, 180, 180], [50, 150, 150]
+			];
 			break;
 		case 2:
-			$palettes = array(
-				array(170, 180, 180), array(152, 100, 0), array(50, 200, 200), array(153, 0, 30), array(0, 0, 100),
-				array(100, 150, 0), array(130, 0, 150), array(0, 100, 150), array(200, 100, 50), array(0, 100, 0)
-			);
+			$palettes = [
+				[170, 180, 180], [152, 100, 0], [50, 200, 200], [153, 0, 30], [0, 0, 100],
+				[100, 150, 0], [130, 0, 150], [0, 100, 150], [200, 100, 50], [0, 100, 0]
+			];
 			break;
 		case 3:
 		default:
@@ -561,12 +561,12 @@ function imageVerticalMarks($im, $x, $y, $offset, $color, $marks) {
 	global $colors;
 
 	$polygons = 5;
-	$gims = array(
-		't' => array(0, 0, -6, -6, -3, -9, 3, -9, 6, -6),
-		'r' => array(0, 0, 6, -6, 9, -3, 9, 3, 6, 6),
-		'b' => array(0, 0, 6, 6, 3, 9, -3, 9, -6, 6),
-		'l' => array(0, 0, -6, 6, -9, 3, -9, -3, -6, -6)
-	);
+	$gims = [
+		't' => [0, 0, -6, -6, -3, -9, 3, -9, 6, -6],
+		'r' => [0, 0, 6, -6, 9, -3, 9, 3, 6, 6],
+		'b' => [0, 0, 6, 6, 3, 9, -3, 9, -6, 6],
+		'l' => [0, 0, -6, 6, -9, 3, -9, -3, -6, -6]
+	];
 
 	foreach ($gims['t'] as $num => $px) {
 		if (($num % 2) == 0) {
@@ -683,17 +683,17 @@ function imageTextSize($fontsize, $angle, $string) {
 
 	$ar = imagettfbbox($fontsize, $angle, $ttf, $string);
 
-	return array(
+	return [
 		'height' => abs($ar[1] - $ar[5]),
 		'width' => abs($ar[0] - $ar[4]),
 		'baseline' => $ar[1]
-	);
+	];
 }
 
 function dashedLine($image, $x1, $y1, $x2, $y2, $color) {
 	// style for dashed lines
 	if (!is_array($color)) {
-		$style = array($color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT);
+		$style = [$color, $color, IMG_COLOR_TRANSPARENT, IMG_COLOR_TRANSPARENT];
 	}
 	else {
 		$style = $color;

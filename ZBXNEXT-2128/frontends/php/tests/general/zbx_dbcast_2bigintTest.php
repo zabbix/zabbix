@@ -32,10 +32,10 @@ class zbx_dbcast_2bigintTest extends PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public static function provider() {
-		return array(
-			array('field'),
-			array('field_1')
-		);
+		return [
+			['field'],
+			['field_1']
+		];
 	}
 
 	/**

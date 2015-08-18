@@ -22,9 +22,9 @@
 class CControllerProxyHostDisable extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'proxyids' =>	'required|array_db hosts.hostid'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -40,23 +40,23 @@ class CControllerProxyHostDisable extends CController {
 			return false;
 		}
 
-		$proxies = API::Proxy()->get(array(
+		$proxies = API::Proxy()->get([
 			'proxyids' => $this->getInput('proxyids'),
 			'countOutput' => true,
 			'editable' => true
-		));
+		]);
 
 		return ($proxies == count($this->getInput('proxyids')));
 	}
 
 	protected function doAction() {
-		$hosts = API::Host()->get(array(
-			'output' => array('hostid'),
-			'filter' => array(
+		$hosts = API::Host()->get([
+			'output' => ['hostid'],
+			'filter' => [
 				'proxy_hostid' => $this->getInput('proxyids'),
 				'status' => HOST_STATUS_MONITORED
-			)
-		));
+			]
+		]);
 
 		foreach ($hosts as &$host) {
 			$host['status'] = HOST_STATUS_NOT_MONITORED;

@@ -117,8 +117,8 @@ switch ($page['type']) {
 }
 
 // construct menu
-$main_menu = array();
-$sub_menus = array();
+$main_menu = [];
+$sub_menus = [];
 
 $denied_page_requested = zbx_construct_menu($main_menu, $sub_menus, $page);
 
@@ -129,13 +129,14 @@ if ($denied_page_requested) {
 
 if ($page['type'] == PAGE_TYPE_HTML) {
 	$pageHeader = new CPageHeader($pageTitle);
-	$pageHeader->addCssInit();
 
-	$css = ZBX_DEFAULT_THEME;
+	$theme = ZBX_DEFAULT_THEME;
 	if (!ZBX_PAGE_NO_THEME) {
+		global $DB;
+
 		if (!empty($DB['DB'])) {
 			$config = select_config();
-			$css = getUserTheme(CWebUser::$data);
+			$theme = getUserTheme(CWebUser::$data);
 
 			$severityCss = <<<CSS
 .disaster { background: #{$config['severity_color_5']} !important; }
@@ -154,8 +155,7 @@ CSS;
 			}
 		}
 	}
-	$css = CHtml::encode($css);
-	$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
+	$pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
 
 	if ($page['file'] == 'sysmap.php') {
 		$pageHeader->addCssFile('imgstore.php?css=1&output=css');
@@ -177,8 +177,8 @@ CSS;
 
 	$pageHeader->display();
 ?>
-<body class="<?php echo $css; ?>">
-<div id="message-global-wrap"><div id="message-global"></div></div>
+<body>
+<div class="<?= ZBX_STYLE_MSG_BAD_GLOBAL ?>" id="msg-bad-global"></div>
 <?php
 }
 
@@ -189,151 +189,24 @@ if (defined('ZBX_PAGE_NO_HEADER')) {
 }
 
 if (!defined('ZBX_PAGE_NO_MENU')) {
-	$help = new CLink(_('Help'), 'http://www.zabbix.com/documentation/', 'small_font', null, 'nosid');
-	$help->setTarget('_blank');
-	$support = new CLink(_('Get support'), 'http://www.zabbix.com/support.php', 'small_font', null, 'nosid');
-	$support->setTarget('_blank');
-
-	$printview = new CLink(_('Print'), '', 'small_font print-link', null, 'nosid');
-
-	$page_header_r_col = array($help, '|', $support, '|', $printview, '|');
-
-	if (!CWebUser::isGuest()) {
-		array_push($page_header_r_col, new CLink(_('Profile'), 'profile.php', 'small_font', null, 'nosid'), '|');
-	}
-
-	if (isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-		$debug = new CLink(_('Debug'), '#debug', 'small_font', null, 'nosid');
-		$d_script = " if (!isset('state', this)) { this.state = 'none'; }".
-			" if (this.state == 'none') { this.state = 'block'; }".
-			" else { this.state = 'none'; }".
-			" showHideByName('zbx_debug_info', this.state);";
-		$debug->setAttribute('onclick', 'javascript: '.$d_script);
-		array_push($page_header_r_col, $debug, '|');
-	}
-
-	if (CWebUser::isGuest()) {
-		$page_header_r_col[] = array(new CLink(_('Login'), 'index.php?reconnect=1', 'small_font', null, null));
-	}
-	else {
-		// it is not possible to logout from HTTP authentication
-		$chck = $page['file'] == 'authentication.php' && isset($_REQUEST['save'], $_REQUEST['config']);
-		if ($chck && $_REQUEST['config'] == ZBX_AUTH_HTTP || !$chck && isset($config) && $config['authentication_type'] == ZBX_AUTH_HTTP) {
-			$logout =  new CLink(_('Logout'), '', 'small_font', null, 'nosid');
-			$logout->setHint(_s('It is not possible to logout from HTTP authentication.'), null, false);
-		}
-		else {
-			$logout =  new CLink(_('Logout'), 'index.php?reconnect=1', 'small_font', null, null);
-		}
-		array_push($page_header_r_col, $logout);
-	}
-
-	$logo = new CLink(new CDiv(SPACE, 'zabbix_logo'), 'http://www.zabbix.com/', 'image', null, 'nosid');
-	$logo->setTarget('_blank');
-
-	$top_page_row = array(
-		new CCol($logo, 'page_header_l'),
-		new CCol($page_header_r_col, 'maxwidth page_header_r')
-	);
-
-	unset($logo, $page_header_r_col, $help, $support);
-
-	$table = new CTable(null, 'maxwidth page_header');
-	$table->setCellSpacing(0);
-	$table->setCellPadding(5);
-	$table->addRow($top_page_row);
-	$table->show();
-
-	$menu_table = new CTable(null, 'menu pointer');
-	$menu_table->setCellSpacing(0);
-	$menu_table->setCellPadding(5);
-	$menu_table->addRow($main_menu);
-
-	$serverName = (isset($ZBX_SERVER_NAME) && !zbx_empty($ZBX_SERVER_NAME))
-		? new CCol($ZBX_SERVER_NAME, 'right textcolorstyles server-name')
-		: null;
-
-	// 1st level menu
-	$table = new CTable(null, 'maxwidth');
-	$table->addRow(array($menu_table, $serverName));
-
-	$page_menu = new CDiv(null, 'textwhite');
-	$page_menu->setAttribute('id', 'mmenu');
-	$page_menu->addItem($table);
-
-	// 2nd level menu
-	$sub_menu_table = new CTable(null, 'sub_menu maxwidth ui-widget-header');
-	$menu_divs = array();
-	$menu_selected = false;
-	foreach ($sub_menus as $label => $sub_menu) {
-		$sub_menu_row = array();
-		foreach ($sub_menu as $id => $sub_page) {
-			if (empty($sub_page['menu_text'])) {
-				$sub_page['menu_text'] = SPACE;
-			}
-
-			$url = new CUrl($sub_page['menu_url']);
-			if ($sub_page['menu_action'] !== null) {
-				$url->setArgument('action', $sub_page['menu_action']);
-			}
-			else {
-				$url->setArgument('ddreset', 1);
-			}
-			$url->removeArgument('sid');
-
-			$sub_menu_item = new CLink($sub_page['menu_text'], $url->getUrl(), $sub_page['class'].' nowrap', null, false);
-			if ($sub_page['selected']) {
-				$sub_menu_item = new CSpan($sub_menu_item, 'active nowrap');
-			}
-			$sub_menu_row[] = $sub_menu_item;
-			$sub_menu_row[] = new CSpan(SPACE.' | '.SPACE, 'divider');
-		}
-		array_pop($sub_menu_row);
-
-		$sub_menu_div = new CDiv($sub_menu_row);
-		$sub_menu_div->setAttribute('id', 'sub_'.$label);
-		$sub_menu_div->addAction('onmouseover', 'javascript: MMenu.submenu_mouseOver();');
-		$sub_menu_div->addAction('onmouseout', 'javascript: MMenu.mouseOut();');
-
-		if (isset($page['menu']) && $page['menu'] == $label) {
-			$menu_selected = true;
-			$sub_menu_div->setAttribute('style', 'display: block;');
-			insert_js('MMenu.def_label = '.zbx_jsvalue($label));
-		}
-		else {
-			$sub_menu_div->setAttribute('style', 'display: none;');
-		}
-		$menu_divs[] = $sub_menu_div;
-	}
-
-	$sub_menu_div = new CDiv(SPACE);
-	$sub_menu_div->setAttribute('id', 'sub_empty');
-	$sub_menu_div->setAttribute('style', 'display: '.($menu_selected ? 'none;' : 'block;'));
-
-	$menu_divs[] = $sub_menu_div;
-	$search_div = null;
-
-	if ($page['file'] != 'index.php' && CWebUser::$data['userid'] > 0) {
-		$searchForm = new CView('general.search');
-		$search_div = $searchForm->render();
-	}
-
-	$sub_menu_table->addRow(array($menu_divs, $search_div));
-	$page_menu->addItem($sub_menu_table);
-	$page_menu->show();
+	$pageMenu = new CView('layout.htmlpage.menu', [
+		'menu' => [
+			'main_menu' => $main_menu,
+			'sub_menus' => $sub_menus,
+			'selected' => $page['menu']
+		],
+		'user' => [
+			'is_guest' => CWebUser::isGuest(),
+			'alias' => CWebUser::$data['alias'],
+			'name' => CWebUser::$data['name'],
+			'surname' => CWebUser::$data['surname']
+		]
+	]);
+	echo $pageMenu->getOutput();
 }
 
-// create history
-if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	$table = new CTable(null, 'history left');
-	$table->addRow(new CRow(array(
-		new CCol(_('History').':', 'caption'),
-		get_user_history()
-	)));
-	$table->show();
-}
-elseif ($page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	echo BR();
+if ($page['type'] == PAGE_TYPE_HTML) {
+	echo '<div class="'.ZBX_STYLE_ARTICLE.'">';
 }
 
 // unset multiple variables

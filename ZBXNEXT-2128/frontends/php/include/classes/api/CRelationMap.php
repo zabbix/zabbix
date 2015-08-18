@@ -29,14 +29,14 @@ class CRelationMap {
 	 *
 	 * @var array
 	 */
-	protected $map = array();
+	protected $map = [];
 
 	/**
 	 * A hash of related object IDs.
 	 *
 	 * @var array
 	 */
-	protected $relatedIds = array();
+	protected $relatedIds = [];
 
 	/**
 	 * Adds a new relation.
@@ -71,7 +71,7 @@ class CRelationMap {
 	 */
 	public function mapMany(array $baseObjects, array $relatedObjects, $name, $limit = null) {
 		foreach ($baseObjects as $baseObjectId => &$baseObject) {
-			$baseObject[$name] = array();
+			$baseObject[$name] = [];
 
 			if (isset($this->map[$baseObjectId]) && $this->map[$baseObjectId]) {
 				$matchingRelatedObjects = array_values(array_intersect_key($relatedObjects, $this->map[$baseObjectId]));
@@ -102,7 +102,7 @@ class CRelationMap {
 	 */
 	public function mapOne(array $baseObjects, array $relatedObjects, $name) {
 		foreach ($baseObjects as $baseObjectId => &$baseObject) {
-			$matchingRelatedObject = array();
+			$matchingRelatedObject = [];
 
 			if (isset($this->map[$baseObjectId])) {
 				$matchingRelatedId = reset($this->map[$baseObjectId]);

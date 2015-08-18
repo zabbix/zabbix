@@ -124,11 +124,11 @@ class CZabbixServer {
 	 * @return bool|array
 	 */
 	public function executeScript($scriptId, $hostId) {
-		return $this->request(array(
+		return $this->request([
 			'request' => 'command',
 			'scriptid' => $scriptId,
 			'hostid' => $hostId
-		));
+		]);
 	}
 
 	/**
@@ -145,11 +145,11 @@ class CZabbixServer {
 	 * @return bool|array
 	 */
 	public function getQueue($type, $sid) {
-		return $this->request(array(
+		return $this->request([
 			'request' => 'queue.get',
 			'sid' => $sid,
 			'type' => $type
-		));
+		]);
 	}
 
 	/**

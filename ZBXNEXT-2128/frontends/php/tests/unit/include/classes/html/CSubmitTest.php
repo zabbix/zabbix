@@ -22,51 +22,49 @@
 class CSubmitTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
-			array(
-				array(),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="submit" name="submit" value=""></button>'
-			),
-			array(
-				array('my-button'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="my-button" name="my-button" value=""></button>'
-			),
-			array(
-				array('button[value]'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button_value" name="button[value]" value=""></button>'
-			),
-			array(
-				array('button', 'caption'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="caption">caption</button>'
-			),
-			array(
-				array('button', 'caption', 'callback()'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button" onclick="callback()" value="caption">caption</button>'
-			),
-			array(
-				array('button', 'caption', null, 'my-class'),
-				'<button class="button my-class" type="submit" id="button" name="button" value="caption">caption</button>'
-			),
+		return [
+			[
+				[],
+				'<button type="submit" id="submit" name="submit" value=""></button>'
+			],
+			[
+				['my-button'],
+				'<button type="submit" id="my-button" name="my-button" value=""></button>'
+			],
+			[
+				['button[value]'],
+				'<button type="submit" id="button_value" name="button[value]" value=""></button>'
+			],
+			[
+				['button', 'caption'],
+				'<button type="submit" id="button" name="button" value="caption">caption</button>'
+			],
+			[
+				['button', 'caption', 'callback()'],
+				'<button type="submit" id="button" name="button" onclick="callback()" value="caption">caption</button>'
+			],
+			[
+				['button', 'caption', null, 'my-class'],
+				'<button class="my-class" type="submit" id="button" name="button" value="caption">caption</button>'
+			],
 			// value encoding
-			array(
-				array('button', '</button>'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button" name="button" value="&lt;/button&gt;">&lt;/button&gt;</button>'
-			),
+			[
+				['button', '</button>'],
+				'<button type="submit" id="button" name="button" value="&lt;/button&gt;">&lt;/button&gt;</button>'
+			],
 			// parameter encoding
-			array(
-				array('button"&"'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" id="button&quot;&amp;&quot;" name="button&quot;&amp;&quot;" value=""></button>'
-			),
-		);
+			[
+				['button"&"'],
+				'<button type="submit" id="button&quot;&amp;&quot;" name="button&quot;&amp;&quot;" value=""></button>'
+			],
+		];
 	}
 	/**
 	 * @param $name
 	 * @param $caption
-	 * @param $action
-	 * @param $class
 	 * @return CSubmit
 	 */
-	protected function createTag($name = 'submit', $caption = '', $action = null, $class = 'button-plain shadow ui-corner-all') {
-		return new CSubmit($name, $caption, $action, $class);
+	protected function createTag($name = 'submit', $caption = '') {
+		return new CSubmit($name, $caption);
 	}
 }

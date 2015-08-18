@@ -50,7 +50,7 @@ class ZBase {
 	/**
 	 * @var array of config data from zabbix config file
 	 */
-	protected $config = array();
+	protected $config = [];
 
 	/**
 	 * Returns the current instance of Z.
@@ -123,7 +123,7 @@ class ZBase {
 	/**
 	 * Initializes the application.
 	 */
-	public function run($mode = self::EXEC_MODE_DEFAULT) {
+	public function run($mode) {
 		$this->init();
 
 		$this->setMaintenanceMode();
@@ -150,7 +150,6 @@ class ZBase {
 					$this->initDB();
 					$this->authenticateUser();
 					$this->initLocales();
-					DBclose();
 				}
 				catch (ConfigFileException $e) {}
 				break;
@@ -199,7 +198,7 @@ class ZBase {
 	 * @return array
 	 */
 	private function getIncludePaths() {
-		return array(
+		return [
 			$this->rootDir.'/include/classes/core',
 			$this->rootDir.'/include/classes/mvc',
 			$this->rootDir.'/include/classes/api',
@@ -222,9 +221,11 @@ class ZBase {
 			$this->rootDir.'/include/classes/export/elements',
 			$this->rootDir.'/include/classes/graphdraw',
 			$this->rootDir.'/include/classes/import',
+			$this->rootDir.'/include/classes/import/converters',
 			$this->rootDir.'/include/classes/import/importers',
+			$this->rootDir.'/include/classes/import/preprocessors',
 			$this->rootDir.'/include/classes/import/readers',
-			$this->rootDir.'/include/classes/import/formatters',
+			$this->rootDir.'/include/classes/import/validators',
 			$this->rootDir.'/include/classes/items',
 			$this->rootDir.'/include/classes/triggers',
 			$this->rootDir.'/include/classes/server',
@@ -251,7 +252,7 @@ class ZBase {
 			$this->rootDir.'/include/classes/pagefilter',
 			$this->rootDir.'/local/app/controllers',
 			$this->rootDir.'/app/controllers'
-		);
+		];
 	}
 
 	/**
@@ -260,12 +261,10 @@ class ZBase {
 	 * @return array
 	 */
 	public static function getThemes() {
-		return array(
-			'classic' => _('Classic'),
-			'originalblue' => _('Original blue'),
-			'darkblue' => _('Black & Blue'),
-			'darkorange' => _('Dark orange')
-		);
+		return [
+			'blue-theme' => _('Blue'),
+			'dark-theme' => _('Dark'),
+		];
 	}
 
 	/**
@@ -342,9 +341,9 @@ class ZBase {
 	protected function initLocales() {
 		init_mbstrings();
 
-		$defaultLocales = array(
+		$defaultLocales = [
 			'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
-		);
+		];
 
 		if (function_exists('bindtextdomain')) {
 			// initializing gettext translations depending on language selected by user

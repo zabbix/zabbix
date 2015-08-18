@@ -29,41 +29,41 @@ $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION		EXCEPTION
-$fields = array(
-	'sysmapid' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,				null),
-	'selements' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'links' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,				null),
-	'noselements' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
-	'nolinks' =>		array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
-	'nocalculations' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
-	'expand_macros' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null),
-	'show_triggers' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2,3'),		null),
-	'severity_min' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'),	null),
-	'grid' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(0, 500),	null),
-	'base64image' =>	array(T_ZBX_INT, O_OPT, null,	IN('0,1'),			null)
-);
+$fields = [
+	'sysmapid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,				null],
+	'selements' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'links' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,				null],
+	'noselements' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null],
+	'nolinks' =>		[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null],
+	'nocalculations' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null],
+	'expand_macros' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null],
+	'show_triggers' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1,2,3'),		null],
+	'severity_min' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'),	null],
+	'grid' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 500),	null],
+	'base64image' =>	[T_ZBX_INT, O_OPT, null,	IN('0,1'),			null]
+];
 check_fields($fields);
 
-$maps = API::Map()->get(array(
+$maps = API::Map()->get([
 	'sysmapids' => $_REQUEST['sysmapid'],
 	'selectSelements' => API_OUTPUT_EXTEND,
 	'selectLinks' => API_OUTPUT_EXTEND,
 	'output' => API_OUTPUT_EXTEND,
 	'preservekeys' => true
-));
+]);
 $map = reset($maps);
 if (empty($map)) {
 	access_deny();
 }
 
-$mapPainter = new CMapPainter($map, array(
-	'map' => array(
+$mapPainter = new CMapPainter($map, [
+	'map' => [
 		'drawAreas' => (!isset($_REQUEST['selements']) && !isset($_REQUEST['noselements']))
-	),
-	'grid' => array(
+	],
+	'grid' => [
 		'size' => getRequest('grid', 0)
-	)
-));
+	]
+]);
 
 $im = $mapPainter->paint();
 
@@ -112,17 +112,17 @@ if (getRequest('nocalculations', false)) {
 
 	// get default iconmap id to use for elements that use icon map
 	if ($map['iconmapid']) {
-		$iconMaps = API::IconMap()->get(array(
+		$iconMaps = API::IconMap()->get([
 			'iconmapids' => $map['iconmapid'],
-			'output' => array('default_iconid'),
+			'output' => ['default_iconid'],
 			'preservekeys' => true
-		));
+		]);
 		$iconMap = reset($iconMaps);
 
 		$defaultAutoIconId = $iconMap['default_iconid'];
 	}
 
-	$mapInfo = array();
+	$mapInfo = [];
 	foreach ($map['selements'] as $selement) {
 		// if element use icon map and icon map is set for map, and is host like element, we use default icon map icon
 		if ($map['iconmapid'] && $selement['use_iconmap']
@@ -135,10 +135,10 @@ if (getRequest('nocalculations', false)) {
 			$iconid = $selement['iconid_off'];
 		}
 
-		$mapInfo[$selement['selementid']] = array(
+		$mapInfo[$selement['selementid']] = [
 			'iconid' => $iconid,
 			'icon_type' => SYSMAP_ELEMENT_ICON_OFF
-		);
+		];
 
 		$mapInfo[$selement['selementid']]['name'] = ($selement['elementtype'] == SYSMAP_ELEMENT_TYPE_IMAGE)
 			? _('Image')
@@ -154,7 +154,7 @@ else {
 	add_triggerExpressions($map['selements']);
 
 	$areas = populateFromMapAreas($map);
-	$mapInfo = getSelementsInfo($map, array('severity_min' => getRequest('severity_min')));
+	$mapInfo = getSelementsInfo($map, ['severity_min' => getRequest('severity_min')]);
 	processAreasCoordinates($map, $areas, $mapInfo);
 	$allLinks = false;
 }
@@ -185,7 +185,7 @@ if (getRequest('base64image')) {
 	$imageSource = ob_get_contents();
 	ob_end_clean();
 	$json = new CJson();
-	echo $json->encode(array('result' => base64_encode($imageSource)));
+	echo $json->encode(['result' => base64_encode($imageSource)]);
 	imagedestroy($im);
 }
 else {

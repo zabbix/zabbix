@@ -41,7 +41,7 @@ class CValidationRule {
 
 		$pos = 0;
 		$state = self::STATE_BEGIN;
-		$rules = array();
+		$rules = [];
 		$is_empty = true;
 
 		while (isset($buffer[$pos])) {
@@ -53,11 +53,12 @@ class CValidationRule {
 							break;
 						default:
 							$is_empty = false;
-							$rule = array();
+							$rule = [];
 
 							if (!$this->parseRequired($buffer, $pos, $rule)				// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseJson($buffer, $pos, $rule)			// json
+									&& !$this->parseInt32($buffer, $pos, $rule)			// int32
 									&& !$this->parseIn($buffer, $pos, $rule)			// in
 									&& !$this->parseId($buffer, $pos, $rule)			// id
 									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
@@ -180,6 +181,22 @@ class CValidationRule {
 	}
 
 	/**
+	 * int32
+	 *
+	 * 'int32' => true
+	 */
+	private function parseInt32($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'int32', 5)) {
+			return false;
+		}
+
+		$pos += 5;
+		$rules['int32'] = true;
+
+		return true;
+	}
+
+	/**
 	 * in <value1>[,...,<valueN>]
 	 *
 	 * 'in' => array('<value1>', ..., '<valueN>')
@@ -197,7 +214,7 @@ class CValidationRule {
 			$i++;
 		}
 
-		$values = array();
+		$values = [];
 
 		if (!$this->parseValues($buffer, $i, $values)) {
 			return false;
@@ -259,10 +276,10 @@ class CValidationRule {
 		}
 
 		$pos = $i;
-		$rules['db'] = array(
+		$rules['db'] = [
 			'table' => $table,
 			'field' => $field
-		);
+		];
 
 		return true;
 	}
@@ -317,10 +334,10 @@ class CValidationRule {
 		}
 
 		$pos = $i;
-		$rules['array_db'] = array(
+		$rules['array_db'] = [
 			'table' => $table,
 			'field' => $field
-		);
+		];
 
 		return true;
 	}
@@ -329,7 +346,7 @@ class CValidationRule {
 	 * <field>
 	 */
 	private function parseField($buffer, &$pos, &$field) {
-		$matches = array();
+		$matches = [];
 		if (1 != preg_match('/^[A-Za-z0-9_]+/', substr($buffer, $pos), $matches))
 			return false;
 

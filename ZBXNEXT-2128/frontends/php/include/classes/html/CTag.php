@@ -45,53 +45,43 @@ class CTag extends CObject {
 	 */
 	protected $attrEncStrategy = self::ENC_ALL;
 
-	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
+	public function __construct($tagname, $paired = false, $body = null) {
 		parent::__construct();
-		$this->attributes = array();
-		$this->dataAttributes = array();
 
-		if (!is_string($tagname)) {
-			return $this->error('Incorrect tagname for CTag "'.$tagname.'".');
-		}
-
+		$this->attributes = [];
 		$this->tagname = $tagname;
 		$this->paired = $paired;
-		$this->tag_start = $this->tag_end = $this->tag_body_start = $this->tag_body_end = '';
 
-		if (is_null($body)) {
-			$this->tag_end = $this->tag_body_start = '';
-		}
-		else {
+		if (!is_null($body)) {
 			$this->addItem($body);
 		}
-		$this->addClass($class);
 	}
 
 	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
 	public function startToString() {
-		$res = $this->tag_start.'<'.$this->tagname;
+		$res = '<'.$this->tagname;
 		foreach ($this->attributes as $key => $value) {
 			if ($value === null) {
 				continue;
 			}
 
 			// a special encoding strategy should be used for the "value", "name" and "id" attributes
-			$strategy = in_array($key, array('value', 'name', 'id'), true) ? $this->attrEncStrategy : $this->encStrategy;
+			$strategy = in_array($key, ['value', 'name', 'id'], true) ? $this->attrEncStrategy : $this->encStrategy;
 			$value = $this->encode($value, $strategy);
 			$res .= ' '.$key.'="'.$value.'"';
 		}
-		$res .= ($this->paired === 'yes') ? '>' : ' />';
+		$res .= '>';
+//		$res .= ($this->paired) ? '>' : ' />';
 
 		return $res;
 	}
 
 	public function bodyToString() {
-		return $this->tag_body_start.parent::toString(false);
+		return parent::toString(false);
 	}
 
 	public function endToString() {
-		$res = ($this->paired === 'yes') ? $this->tag_body_end.'</'.$this->tagname.'>' : '';
-		$res .= $this->tag_end;
+		$res = ($this->paired) ? '</'.$this->tagname.'>' : '';
 
 		return $res;
 	}
@@ -114,54 +104,26 @@ class CTag extends CObject {
 		}
 
 		parent::addItem($value);
+		return $this;
 	}
 
 	public function setName($value) {
-		if (is_null($value)) {
-			return $value;
-		}
-		if (!is_string($value)) {
-			return $this->error('Incorrect value for SetName "'.$value.'".');
-		}
-
-		return $this->setAttribute('name', $value);
+		$this->setAttribute('name', $value);
+		return $this;
 	}
 
 	public function getName() {
-		if (isset($this->attributes['name'])) {
-			return $this->attributes['name'];
-		}
-
-		return null;
+		return $this->getAttribute('name');
 	}
 
-	public function addClass($cssClass) {
+	public function addClass($class) {
 		if (!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) {
-			$this->attributes['class'] = $cssClass;
+			$this->attributes['class'] = $class;
 		}
 		else {
-			$this->attributes['class'] .= ' '.$cssClass;
+			$this->attributes['class'] .= ' '.$class;
 		}
-
-		return $this->attributes['class'];
-	}
-
-	/**
-	 * HTML class check for existing, return thue if exist
-	 *
-	 * @param string $cssClass
-	 *
-	 * @return bool
-	 */
-	public function hasClass($cssClass) {
-		$chkClass = explode(' ', $this->getAttribute('class'));
-		return in_array($cssClass, $chkClass);
-	}
-
-	public function attr($name, $value) {
-		if (!is_null($value)) {
-			$this->setAttribute($name, $value);
-		}
+		return $this;
 	}
 
 	public function getAttribute($name) {
@@ -169,63 +131,49 @@ class CTag extends CObject {
 	}
 
 	public function setAttribute($name, $value) {
-		if (!is_null($value)) {
-			if (is_object($value)) {
-				$value = unpack_object($value);
-			}
-			elseif (is_array($value)) {
-				$value = CHtml::serialize($value);
-			}
-			$this->attributes[$name] = $value;
+		if (is_object($value)) {
+			$value = unpack_object($value);
 		}
-		else {
-			$this->removeAttribute($name);
+		elseif (is_array($value)) {
+			$value = CHtml::serialize($value);
 		}
-	}
-
-	/**
-	 * Sets multiple HTML attributes.
-	 *
-	 * @param array $attributes		defined as array(attributeName1 => value1, attributeName2 => value2, ...)
-	 */
-	public function setAttributes(array $attributes) {
-		foreach ($attributes as $name => $value) {
-			$this->setAttribute($name, $value);
-		}
+		$this->attributes[$name] = $value;
+		return $this;
 	}
 
 	public function removeAttribute($name) {
 		unset($this->attributes[$name]);
+		return $this;
 	}
 
-	public function addAction($name, $value) {
+	private function addAction($name, $value) {
 		$this->attributes[$name] = $value;
+		return $this;
 	}
 
 	/**
 	 * Adds a hint box to the elemt.
 	 *
-	 * @param string|array|CTag     $text       hint content
-	 * @param string                $spanClass  wrap the content in a span element and assign a this class to the span
-	 * @param bool                  $byClick    if set to true, it will be possible to "freeze" the hint box via a mouse
+	 * @param string|array|CTag     $text          hint content
+	 * @param string                $spanClass     wrap the content in a span element and assign a this class to the span
+	 * @param bool                  $freezeOnCLick if set to true, it will be possible to "freeze" the hint box via a mouse
 	 *                                          click
 	 *
 	 * @return bool
 	 */
-	public function setHint($text, $spanClass = '', $byClick = true) {
+	public function setHint($text, $spanClass = '', $freezeOnClick = true) {
 		if (empty($text)) {
-			return false;
+			return $this;
 		}
 
 		encodeValues($text);
 		$text = unpack_object($text);
 
-		$this->addAction('onmouseover', 'hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
-		if ($byClick) {
-			$this->addAction('onclick', 'hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
+		$this->onMouseover('hintBox.HintWraper(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
+		if ($freezeOnClick) {
+			$this->onClick('hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
 		}
-
-		return true;
+		return $this;
 	}
 
 	/**
@@ -234,11 +182,28 @@ class CTag extends CObject {
 	 * @param array $data
 	 */
 	public function setMenuPopup(array $data) {
-		$this->attr('data-menu-popup', $data);
+		$this->setAttribute('data-menu-popup', $data);
+		return $this;
 	}
 
-	public function onClick($handleCode) {
-		$this->addAction('onclick', $handleCode);
+	public function onChange($script) {
+		$this->addAction('onchange', $script);
+		return $this;
+	}
+
+	public function onClick($script) {
+		$this->addAction('onclick', $script);
+		return $this;
+	}
+
+	public function onMouseover($script) {
+		$this->addAction('onmouseover', $script);
+		return $this;
+	}
+
+	public function onMouseout($script) {
+		$this->addAction('onmouseout', $script);
+		return $this;
 	}
 
 	public function addStyle($value) {
@@ -251,6 +216,7 @@ class CTag extends CObject {
 		else {
 			unset($this->attributes['style']);
 		}
+		return $this;
 	}
 
 	public function error($value) {
@@ -259,14 +225,23 @@ class CTag extends CObject {
 	}
 
 	public function getForm($method = 'post', $action = null, $enctype = null) {
-		$form = new CForm($method, $action, $enctype);
-		$form->addItem($this);
-
+		$form = (new CForm($method, $action, $enctype))
+			->addItem($this);
 		return $form;
 	}
 
-	public function setTitle($value = 'title') {
+	public function setTitle($value) {
 		$this->setAttribute('title', $value);
+		return $this;
+	}
+
+	public function setId($id) {
+		$this->setAttribute('id', $id);
+		return $this;
+	}
+
+	public function getId() {
+		return $this->getAttribute('id');
 	}
 
 	/**
@@ -279,7 +254,7 @@ class CTag extends CObject {
 	 */
 	protected function encode($value, $strategy = self::ENC_NOAMP) {
 		if ($strategy == self::ENC_NOAMP) {
-			$value = str_replace(array('<', '>', '"'), array('&lt;', '&gt;', '&quot;'), $value);
+			$value = str_replace(['<', '>', '"'], ['&lt;', '&gt;', '&quot;'], $value);
 		}
 		else {
 			$value = CHtml::encode($value);
@@ -293,6 +268,7 @@ class CTag extends CObject {
 	 */
 	public function setEncStrategy($encStrategy) {
 		$this->encStrategy = $encStrategy;
+		return $this;
 	}
 
 	/**

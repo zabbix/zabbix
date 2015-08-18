@@ -23,30 +23,29 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Status of Web monitoring');
 $page['file'] = 'httpmon.php';
-$page['hist_arg'] = array('groupid', 'hostid');
 
 define('ZBX_PAGE_DO_REFRESH', 1);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR				TYPE		OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'fullscreen' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	IN('0,1'),	null),
-	'groupid' =>		array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
-	'hostid' =>			array(T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null),
+$fields = [
+	'fullscreen' =>		[T_ZBX_INT,	O_OPT,		P_SYS,	IN('0,1'),	null],
+	'groupid' =>		[T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null],
+	'hostid' =>			[T_ZBX_INT,	O_OPT,		P_SYS,	DB_ID,		null],
 	// sort and sortorder
-	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name"'),						null),
-	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"hostname","name"'),						null],
+	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isReadable(array($_REQUEST['hostid']))) {
+if (getRequest('hostid') && !API::Host()->isReadable([$_REQUEST['hostid']])) {
 	access_deny();
 }
 
@@ -56,56 +55,57 @@ $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortor
 CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-$options = array(
-	'groups' => array(
+$options = [
+	'groups' => [
 		'real_hosts' => true,
 		'with_httptests' => true
-	),
-	'hosts' => array(
+	],
+	'hosts' => [
 		'with_monitored_items' => true,
 		'with_httptests' => true
-	),
+	],
 	'hostid' => getRequest('hostid'),
 	'groupid' => getRequest('groupid'),
-);
+];
 $pageFilter = new CPageFilter($options);
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = $pageFilter->hostid;
 
-$r_form = new CForm('get');
-$r_form->addVar('fullscreen', $_REQUEST['fullscreen']);
-$r_form->addItem(array(_('Group').SPACE,$pageFilter->getGroupsCB()));
-$r_form->addItem(array(SPACE._('Host').SPACE,$pageFilter->getHostsCB()));
-
-$httpmon_wdgt = new CWidget();
-$httpmon_wdgt->addPageHeader(
-	_('STATUS OF WEB MONITORING'),
-	get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
-);
-$httpmon_wdgt->addHeader(_('Web scenarios'), $r_form);
-$httpmon_wdgt->addHeaderRowNumber();
+$widget = (new CWidget())
+	->setTitle(_('Web monitoring'))
+	->setControls((new CForm('get'))
+		->addVar('fullscreen', $_REQUEST['fullscreen'])
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $pageFilter->getGroupsCB()])
+			->addItem([_('Host'), SPACE, $pageFilter->getHostsCB()])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $_REQUEST['fullscreen']]))
+		)
+	);
 
 // TABLE
-$table = new CTableInfo(_('No web scenarios found.'));
-$table->SetHeader(array(
-	$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
-	make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
-	_('Number of steps'),
-	_('Last check'),
-	_('Status')
-));
+$table = (new CTableInfo())
+	->setHeader([
+		$_REQUEST['hostid'] == 0 ? make_sorting_header(_('Host'), 'hostname', $sortField, $sortOrder) : null,
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		_('Number of steps'),
+		_('Last check'),
+		_('Status')
+	]);
 $paging = null;
 
 
 if ($pageFilter->hostsSelected) {
 	$config = select_config();
 
-	$options = array(
-		'output' => array('httptestid'),
+	$options = [
+		'output' => ['httptestid', 'name', 'hostid'],
+		'selectHosts' => ['name', 'status'],
+		'selectSteps' => API_OUTPUT_COUNT,
 		'templated' => false,
-		'filter' => array('status' => HTTPTEST_STATUS_ACTIVE),
+		'preservekeys' => true,
+		'filter' => ['status' => HTTPTEST_STATUS_ACTIVE],
 		'limit' => $config['search_limit'] + 1
-	);
+	];
 	if ($pageFilter->hostid > 0) {
 		$options['hostids'] = $pageFilter->hostid;
 	}
@@ -114,22 +114,16 @@ if ($pageFilter->hostsSelected) {
 	}
 	$httpTests = API::HttpTest()->get($options);
 
-	$paging = getPagingLine($httpTests);
-
-	$httpTests = API::HttpTest()->get(array(
-		'httptestids' => zbx_objectValues($httpTests, 'httptestid'),
-		'preservekeys' => true,
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('name', 'status'),
-		'selectSteps' => API_OUTPUT_COUNT,
-	));
-
 	foreach ($httpTests as &$httpTest) {
 		$httpTest['host'] = reset($httpTest['hosts']);
 		$httpTest['hostname'] = $httpTest['host']['name'];
 		unset($httpTest['hosts']);
 	}
 	unset($httpTest);
+
+	order_result($httpTests, $sortField, $sortOrder);
+
+	$paging = getPagingLine($httpTests, $sortOrder);
 
 	$httpTests = resolveHttpTestMacros($httpTests, true, false);
 
@@ -163,39 +157,39 @@ if ($pageFilter->hostsSelected) {
 					$status['msg'] = _s('Unknown step failed: %1$s', $error);
 				}
 
-				$status['style'] = 'disabled';
+				$status['style'] = ZBX_STYLE_RED;
 			}
 			else {
 				$status['msg'] = _('OK');
-				$status['style'] = 'enabled';
+				$status['style'] = ZBX_STYLE_GREEN;
 			}
 		}
 		// no history data exists
 		else {
-			$lastcheck = _('Never');
+			$lastcheck = (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED);
 			$status['msg'] = _('Unknown');
-			$status['style'] = 'unknown';
+			$status['style'] = ZBX_STYLE_GREY;
 		}
 
-		$cpsan = new CSpan($httpTest['hostname'],
-			($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : ''
-		);
-		$table->addRow(new CRow(array(
+		$cpsan = new CSpan($httpTest['hostname']);
+		if ($httpTest['host']['status'] == HOST_STATUS_NOT_MONITORED) {
+			$cpsan->addClass('not-monitored');
+		};
+		$table->addRow(new CRow([
 			($_REQUEST['hostid'] > 0) ? null : $cpsan,
 			new CLink($httpTest['name'], 'httpdetails.php?httptestid='.$httpTest['httptestid']),
 			$httpTest['steps'],
 			$lastcheck,
-			new CSpan($status['msg'], $status['style'])
-		)));
+			(new CSpan($status['msg']))->addClass($status['style'])
+		]));
 	}
 }
 else {
-	$tmp = array();
-	getPagingLine($tmp);
+	$tmp = [];
+	getPagingLine($tmp, $sortOrder);
 }
 
-$httpmon_wdgt->addItem(array($paging, $table, $paging));
-$httpmon_wdgt->show();
+$widget->addItem([$table, $paging])->show();
 
 
 require_once dirname(__FILE__).'/include/page_footer.php';

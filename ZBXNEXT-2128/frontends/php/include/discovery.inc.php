@@ -31,7 +31,7 @@ function check_right_on_discovery() {
 }
 
 function svc_default_port($type_int) {
-	$typePort = array(
+	$typePort = [
 		SVC_SSH =>		'22',
 		SVC_LDAP =>		'389',
 		SVC_SMTP =>		'25',
@@ -46,13 +46,13 @@ function svc_default_port($type_int) {
 		SVC_SNMPv3 =>	'161',
 		SVC_HTTPS =>	'443',
 		SVC_TELNET =>	'23'
-	);
+	];
 
 	return isset($typePort[$type_int]) ? $typePort[$type_int] : 0;
 }
 
 function discovery_check_type2str($type = null) {
-	$discoveryTypes = array(
+	$discoveryTypes = [
 		SVC_SSH => _('SSH'),
 		SVC_LDAP => _('LDAP'),
 		SVC_SMTP => _('SMTP'),
@@ -69,7 +69,7 @@ function discovery_check_type2str($type = null) {
 		SVC_ICMPPING => _('ICMP ping'),
 		SVC_TELNET => _('Telnet'),
 		SVC_HTTPS => _('HTTPS')
-	);
+	];
 
 	if ($type === null) {
 		return $discoveryTypes;
@@ -116,10 +116,10 @@ function discovery_port2str($type_int, $port) {
 }
 
 function discovery_status2str($status = null) {
-	$discoveryStatus = array(
+	$discoveryStatus = [
 		DRULE_STATUS_ACTIVE => _('Enabled'),
 		DRULE_STATUS_DISABLED => _('Disabled')
-	);
+	];
 
 	if (is_null($status)) {
 		return $discoveryStatus;
@@ -135,13 +135,13 @@ function discovery_status2str($status = null) {
 function discovery_status2style($status) {
 	switch ($status) {
 		case DRULE_STATUS_ACTIVE:
-			$status = 'off';
+			$status = ZBX_STYLE_GREEN;
 			break;
 		case DRULE_STATUS_DISABLED:
-			$status = 'on';
+			$status = ZBX_STYLE_RED;
 			break;
 		default:
-			$status = 'unknown';
+			$status = ZBX_STYLE_GREY;
 			break;
 	}
 
@@ -149,12 +149,12 @@ function discovery_status2style($status) {
 }
 
 function discovery_object_status2str($status = null) {
-	$discoveryStatus = array(
+	$discoveryStatus = [
 		DOBJECT_STATUS_UP => _x('Up', 'discovery status'),
 		DOBJECT_STATUS_DOWN => _x('Down', 'discovery status'),
 		DOBJECT_STATUS_DISCOVER => _('Discovered'),
 		DOBJECT_STATUS_LOST => _('Lost')
-	);
+	];
 
 	if (is_null($status)) {
 		order_result($discoveryStatus);

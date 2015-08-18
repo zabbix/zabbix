@@ -50,298 +50,298 @@ class testFormWeb extends CWebTest {
 
 	// Returns layout data
 	public static function layout() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'None',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'Basic authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'NTLM authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'None',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'Basic authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'NTLM authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Opera 12.00',
 					'authentication' => 'None',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Opera 12.00',
 					'authentication' => 'Basic authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Opera 12.00',
 					'authentication' => 'NTLM authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Safari 5.0',
 					'authentication' => 'None',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Safari 5.0',
 					'authentication' => 'Basic authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Safari 5.0',
 					'authentication' => 'NTLM authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'None',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'Basic authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'NTLM authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => '(other ...)',
 					'authentication' => 'None',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => '(other ...)',
 					'authentication' => 'Basic authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'agent' => '(other ...)',
 					'authentication' => 'NTLM authentication',
 					'host' => 'Simple form test host'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'None',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'Basic authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'NTLM authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'None',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'Basic authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'NTLM authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'None',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'Basic authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'NTLM authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'None',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'Basic authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'NTLM authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'None',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'Basic authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'NTLM authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => '(other ...)',
 					'authentication' => 'None',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => '(other ...)',
 					'authentication' => 'Basic authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'agent' => '(other ...)',
 					'authentication' => 'NTLM authentication',
 					'template' => 'Inheritance test template'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Simple form test host',
 					'form' => 'testFormWeb1'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'template' => 'Inheritance test template',
 					'form' => 'testInheritanceWeb1'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'host' => 'Template inheritance test host',
 					'form' => 'testInheritanceWeb1',
 					'templatedHost' => true,
 					'hostTemplate' => 'Inheritance test template'
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**
@@ -422,11 +422,11 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestTextPresent('Authentication');
 		$this->assertVisible('authentication');
-		$this->zbxTestDropdownHasOptions('authentication', array(
+		$this->zbxTestDropdownHasOptions('authentication', [
 			'None',
 			'Basic authentication',
 			'NTLM authentication'
-		));
+		]);
 
 		if ($authentication!='None') {
 		$this->zbxTestTextPresent('User');
@@ -440,7 +440,7 @@ class testFormWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='http_password']/@size", 50);
 		}
 		else {
-			$this->zbxTestTextNotPresent(array('User', 'Password'));
+			$this->zbxTestTextNotPresent(['User', 'Password']);
 			$this->assertElementNotPresent('http_user');
 			$this->assertElementNotPresent('http_password');
 		}
@@ -451,7 +451,7 @@ class testFormWeb extends CWebTest {
 		$this->assertAttribute("//input[@id='delay']/@size", 5);
 		$this->assertAttribute("//input[@id='delay']/@value", 60);
 
-		$this->zbxTestTextPresent('Retries');
+		$this->zbxTestTextPresent('Attempts');
 		$this->assertVisible('retries');
 		$this->assertAttribute("//input[@id='retries']/@maxlength", 2);
 		$this->assertAttribute("//input[@id='retries']/@size", 2);
@@ -554,7 +554,7 @@ class testFormWeb extends CWebTest {
 
 		$this->zbxTestClick('link=Steps');
 		$this->zbxTestTextPresent('Steps');
-		$this->zbxTestTextPresent(array('Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes'));
+		$this->zbxTestTextPresent(['Steps', 'Name', 'Timeout', 'URL', 'Required' ,'Status codes']);
 		$this->assertVisible('tab_stepTab');
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
@@ -609,121 +609,121 @@ class testFormWeb extends CWebTest {
 
 	// Returns create data
 	public static function create() {
-		return array(
+		return [
 			// Empty name/steps
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.',
 						'Field "Steps" is mandatory.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Empty steps
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Empty steps',
-					'errors' => array(
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Field "Steps" is mandatory.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Empty name/steps
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
-					'add_step' => array(
-						array('step' => 'Empty name')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Empty name']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Empty name/steps
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
-					'add_step' => array(
-						array('step' => 'Empty name')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Empty name']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Name": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 
 			// Name -numbers only
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => '1234567890',
-					'add_step' => array(
-						array('step' => '1234567890')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => '1234567890']
+					]
+				]
+			],
 			// Name -symbols only
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => array(
-						array('step' => '!@#$%^&*()_+{}:"|<>?,./')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => '!@#$%^&*()_+{}:"|<>?,./']
+					]
+				]
+			],
 			// Name-spaces
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => '   zabbix  123  ',
-					'add_step' => array(
-						array('step' => '   zabbix  123  ')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => '   zabbix  123  ']
+					]
+				]
+			],
 			// Max -64 symbols
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
-					'add_step' => array(
-						array('step' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'qwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop']
+					]
+				]
+			],
 			// Application -numbers
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Application numbers only',
 					'new_application' => '1234567890',
-					'add_step' => array(
-						array('step' => 'Application numbers only')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Application numbers only']
+					]
+				]
+			],
 			// Application -symbols
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Application symbols only',
 					'new_application' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => array(
-						array('step' => 'Application symbols only')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Application symbols only']
+					]
+				]
+			],
 			// Application -max length
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Application max length',
 					'new_application' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
@@ -731,282 +731,282 @@ class testFormWeb extends CWebTest {
 						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
 						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
 						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
-					'add_step' => array(
-						array('step' => 'Application max length')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Application max length']
+					]
+				]
+			],
 			// User/password empty
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'User/password empty',
 					'authentication' => 'Basic authentication',
-					'add_step' => array(
-						array('step' => 'User/password empty')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'User/password empty']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "User": cannot be empty.',
 						'Incorrect value for field "Password": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// User empty
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Password empty',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'zabbix',
-					'add_step' => array(
-						array('step' => 'Password empty')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Password empty']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "Password": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Password empty
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'User empty',
 					'authentication' => 'Basic authentication',
 					'http_password' => 'zabbix',
-					'add_step' => array(
-						array('step' => 'User empty')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'User empty']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value for field "User": cannot be empty.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Username/password numbers only
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Username/password numbers only',
 					'authentication' => 'Basic authentication',
 					'http_user' => '12345',
 					'http_password' => '67890',
-					'add_step' => array(
-						array('step' => 'Username/password numbers only')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Username/password numbers only']
+					]
+				]
+			],
 			// Username/password symbols only
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Username/password symbols only',
 					'authentication' => 'Basic authentication',
 					'http_user' => '!@#$%^&*()_+{}:"|<>?,./',
 					'http_password' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => array(
-						array('step' => 'Username/password symbols only')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Username/password symbols only']
+					]
+				]
+			],
 			// Username/password with spaces
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Username/password with spaces',
 					'authentication' => 'Basic authentication',
 					'http_user' => '   zabbix  123  ',
 					'http_password' => '   zabbix  123  ',
-					'add_step' => array(
-						array('step' => 'Username/password with spaces')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Username/password with spaces']
+					]
+				]
+			],
 			// Username/password -64 max allowed
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Username/password max allowed',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'wertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
 					'http_password' => 'wertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop1234',
-					'add_step' => array(
-						array('step' => 'Username/password max allowed')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Username/password max allowed']
+					]
+				]
+			],
 			// Retries-minus one
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Retries- minus one',
 					'retries' => '-1',
-					'add_step' => array(
-						array('step' => 'Retries- minus one')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Retries- minus one']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "-1" for "Retries" field: must be between 1 and 10.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Retries-zero
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Retries- zero',
 					'retries' => '0',
-					'add_step' => array(
-						array('step' => 'Retries- zero')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Retries- zero']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "0" for "Retries" field: must be between 1 and 10.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Retries-number
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Retries-one',
 					'retries' => '1',
-					'add_step' => array(
-						array('step' => 'Retries-one')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Retries-one']
+					]
+				]
+			],
 			// Retries-ten
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Retries- ten',
 					'retries' => '10',
-					'add_step' => array(
-						array('step' => 'Retries- ten')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Retries- ten']
+					]
+				]
+			],
 			// Retries-eleven
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Retries- eleven',
 					'retries' => '11',
-					'add_step' => array(
-						array('step' => 'Retries- eleven')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Retries- eleven']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "11" for "Retries" field: must be between 1 and 10.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Interval-minus one
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Interval- minus one',
 					'delay' => '-1',
-					'add_step' => array(
-						array('step' => 'Interval- minus one')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Interval- minus one']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "-1" for "Update interval (in sec)" field: must be between 1 and 86400.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Interval-zero
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Interval- zero',
 					'delay' => '0',
-					'add_step' => array(
-						array('step' => 'Interval- zero')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Interval- zero']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "0" for "Update interval (in sec)" field: must be between 1 and 86400.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// Interval-number
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Interval-one',
 					'delay' => '1',
-					'add_step' => array(
-						array('step' => 'Interval-one')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Interval-one']
+					]
+				]
+			],
 			// Interval-86400
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Interval- 86400',
 					'delay' => '86400',
-					'add_step' => array(
-						array('step' => 'Interval- 86400')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Interval- 86400']
+					]
+				]
+			],
 			// Interval-86401
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Interval- 86401',
 					'delay' => '86401',
-					'add_step' => array(
-						array('step' => 'Interval- 86401')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Interval- 86401']
+					],
+					'errors' => [
 						'ERROR: Page received incorrect data',
 						'Incorrect value "86401" for "Update interval (in sec)" field: must be between 1 and 86400.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// agent-remove from (other ...) then save (will be saved as internet explorer 10.0)
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => '(other ...) Remove agent',
 					'agent' => '(other ...)',
 					'removeAgent' => 'true',
-					'add_step' => array(
-						array('step' => '(other ...) Remove agent')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => '(other ...) Remove agent']
+					]
+				]
+			],
 			// Http proxy -just numbers
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Http proxy -just numbers',
 					'http_proxy' => '1234567890',
-					'add_step' => array(
-						array('step' => 'Http proxy -just numbers')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Http proxy -just numbers']
+					]
+				]
+			],
 			// Http proxy -symbols
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Http proxy -symbols',
 					'http_proxy' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => array(
-						array('step' => 'Http proxy -symbols')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Http proxy -symbols']
+					]
+				]
+			],
 			// Http proxy -max allowed length
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Http proxy -max allowed length',
 					'http_proxy' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
@@ -1014,36 +1014,36 @@ class testFormWeb extends CWebTest {
 						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
 						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
 						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
-					'add_step' => array(
-						array('step' => 'Http proxy -max allowed length')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Http proxy -max allowed length']
+					]
+				]
+			],
 			// Variables -just numbers
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Variables -just numbers',
 					'variables' => '1234567890',
-					'add_step' => array(
-						array('step' => 'Variables -just numbers')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Variables -just numbers']
+					]
+				]
+			],
 			// Variables -symbols
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Variables -symbols',
 					'variables' => '!@#$%^&*()_+{}:"|<>?,./',
-					'add_step' => array(
-						array('step' => 'Variables -symbols')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Variables -symbols']
+					]
+				]
+			],
 			// Variables -255 length-allowed more
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Variables -255 length',
 					'http_proxy' => 'qwertyuiopqwertyuiopqwertyuiopqwertyui'.
@@ -1051,64 +1051,64 @@ class testFormWeb extends CWebTest {
 						'rtyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqw'.
 						'ertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwer'.
 						'tyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiopqwertyuiop123456789012345',
-					'add_step' => array(
-						array('step' => 'Variables -255 length')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Variables -255 length']
+					]
+				]
+			],
 			// Duplicate web scenario
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Duplicate web test',
-					'add_step' => array(
-						array('step' => 'Duplicate web test')
-					)
-				)
-			),
-			array(
-				array(
+					'add_step' => [
+						['step' => 'Duplicate web test']
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_BAD,
 					'name' => 'Duplicate web test',
-					'add_step' => array(
-						array('step' => 'Duplicate web test')
-					),
-					'errors' => array(
+					'add_step' => [
+						['step' => 'Duplicate web test']
+					],
+					'errors' => [
 						'ERROR: Cannot add web scenario',
 						'Web scenario "Duplicate web test" already exists.'
-					)
-				)
-			),
+					]
+				]
+			],
 			// testing created items using triggers
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Trigger create web test',
-					'add_step' => array(
-						array('step' => 'Trigger create web test')
-					),
-					'createTriggers' => array(
+					'add_step' => [
+						['step' => 'Trigger create web test']
+					],
+					'createTriggers' => [
 						'web.test.in[Trigger create web test,,bps]',
 						'web.test.fail[Trigger create web test]',
 						'web.test.error[Trigger create web test]',
 						'web.test.in[Trigger create web test,Trigger create web test step,bps]',
 						'web.test.time[Trigger create web test,Trigger create web test step,resp]',
 						'web.test.rspcode[Trigger create web test,Trigger create web test step]'
-					)
-				)
-			),
+					]
+				]
+			],
 			// testing created items using triggers -multiple steps added
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Trigger create multiple steps web test',
-					'add_step' => array(
-						array('step' => 'Trigger create multiple steps web test1'),
-						array('step' => 'Trigger create multiple steps web test2'),
-						array('step' => 'Trigger create multiple steps web test3'),
-						array('step' => 'Trigger create multiple steps web test4'),
-					),
-					'createTriggers' => array(
+					'add_step' => [
+						['step' => 'Trigger create multiple steps web test1'],
+						['step' => 'Trigger create multiple steps web test2'],
+						['step' => 'Trigger create multiple steps web test3'],
+						['step' => 'Trigger create multiple steps web test4'],
+					],
+					'createTriggers' => [
 						'web.test.in[Trigger create multiple steps web test,,bps]',
 						'web.test.fail[Trigger create multiple steps web test]',
 						'web.test.error[Trigger create multiple steps web test]',
@@ -1124,325 +1124,325 @@ class testFormWeb extends CWebTest {
 						'web.test.in[Trigger create multiple steps web test,Trigger create multiple steps web test4 step,bps]',
 						'web.test.time[Trigger create multiple steps web test,Trigger create multiple steps web test4 step,resp]',
 						'web.test.rspcode[Trigger create multiple steps web test,Trigger create multiple steps web test4 step]'
-					)
-				)
-			),
+					]
+				]
+			],
 		// many steps added
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Many websteps added web test',
-					'add_step' => array(
-						array('step' => 'Many websteps added web test1'),
-						array('step' => 'Many websteps added web test2'),
-						array('step' => 'Many websteps added web test3'),
-						array('step' => 'Many websteps added web test4'),
-						array('step' => 'Many websteps added web test5'),
-						array('step' => 'Many websteps added web test6'),
-						array('step' => 'Many websteps added web test7'),
-						array('step' => 'Many websteps added web test8'),
-						array('step' => 'Many websteps added web test9'),
-						array('step' => 'Many websteps added web test10'),
-						array('step' => 'Many websteps added web test11'),
-						array('step' => 'Many websteps added web test12'),
-						array('step' => 'Many websteps added web test13'),
-						array('step' => 'Many websteps added web test14'),
-						array('step' => 'Many websteps added web test15'),
-						array('step' => 'Many websteps added web test16'),
-						array('step' => 'Many websteps added web test17'),
-						array('step' => 'Many websteps added web test18'),
-						array('step' => 'Many websteps added web test19'),
-						array('step' => 'Many websteps added web test20'),
-						array('step' => 'Many websteps added web test21'),
-						array('step' => 'Many websteps added web test22'),
-						array('step' => 'Many websteps added web test23'),
-						array('step' => 'Many websteps added web test24'),
-						array('step' => 'Many websteps added web test25'),
-						array('step' => 'Many websteps added web test26'),
-						array('step' => 'Many websteps added web test27'),
-						array('step' => 'Many websteps added web test28'),
-						array('step' => 'Many websteps added web test29'),
-						array('step' => 'Many websteps added web test30')
-					)
-				)
-			),
+					'add_step' => [
+						['step' => 'Many websteps added web test1'],
+						['step' => 'Many websteps added web test2'],
+						['step' => 'Many websteps added web test3'],
+						['step' => 'Many websteps added web test4'],
+						['step' => 'Many websteps added web test5'],
+						['step' => 'Many websteps added web test6'],
+						['step' => 'Many websteps added web test7'],
+						['step' => 'Many websteps added web test8'],
+						['step' => 'Many websteps added web test9'],
+						['step' => 'Many websteps added web test10'],
+						['step' => 'Many websteps added web test11'],
+						['step' => 'Many websteps added web test12'],
+						['step' => 'Many websteps added web test13'],
+						['step' => 'Many websteps added web test14'],
+						['step' => 'Many websteps added web test15'],
+						['step' => 'Many websteps added web test16'],
+						['step' => 'Many websteps added web test17'],
+						['step' => 'Many websteps added web test18'],
+						['step' => 'Many websteps added web test19'],
+						['step' => 'Many websteps added web test20'],
+						['step' => 'Many websteps added web test21'],
+						['step' => 'Many websteps added web test22'],
+						['step' => 'Many websteps added web test23'],
+						['step' => 'Many websteps added web test24'],
+						['step' => 'Many websteps added web test25'],
+						['step' => 'Many websteps added web test26'],
+						['step' => 'Many websteps added web test27'],
+						['step' => 'Many websteps added web test28'],
+						['step' => 'Many websteps added web test29'],
+						['step' => 'Many websteps added web test30']
+					]
+				]
+			],
 			// List of main agents
-			array(
-				array(
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Internet Explorer 10.0 None',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'None',
-					'add_step' => array(
-						array('step' => 'Internet Explorer 10.0 None')
-					),
+					'add_step' => [
+						['step' => 'Internet Explorer 10.0 None']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Internet Explorer 10.0 Basic',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Internet Explorer 10.0 Basic')
-					),
+					'add_step' => [
+						['step' => 'Internet Explorer 10.0 Basic']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Internet Explorer 10.0 NTLM',
 					'agent' => 'Internet Explorer 10.0',
 					'authentication' => 'NTLM authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Internet Explorer 10.0 NTLM')
-					),
+					'add_step' => [
+						['step' => 'Internet Explorer 10.0 NTLM']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Mozilla Firefox 8.0 None',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'None',
-					'add_step' => array(
-						array('step' => 'Mozilla Firefox 8.0 None')
-					),
+					'add_step' => [
+						['step' => 'Mozilla Firefox 8.0 None']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Mozilla Firefox 8.0 Basic',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Mozilla Firefox 8.0 Basic')
-					),
+					'add_step' => [
+						['step' => 'Mozilla Firefox 8.0 Basic']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Mozilla Firefox 8.0 NTLM',
 					'agent' => 'Mozilla Firefox 8.0',
 					'authentication' => 'NTLM authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Mozilla Firefox 8.0 NTLM')
-					),
+					'add_step' => [
+						['step' => 'Mozilla Firefox 8.0 NTLM']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Opera 12.00 None',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'None',
-					'add_step' => array(
-						array('step' => 'Opera 12.00 None')
-					),
+					'add_step' => [
+						['step' => 'Opera 12.00 None']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Opera 12.00 Basic',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Opera 12.00 Basic')
-					),
+					'add_step' => [
+						['step' => 'Opera 12.00 Basic']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Opera 12.00 NTLM',
 					'agent' => 'Opera 12.00',
 					'authentication' => 'NTLM authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Opera 12.00 NTLM')
-					),
+					'add_step' => [
+						['step' => 'Opera 12.00 NTLM']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Safari 5.0 None',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'None',
-					'add_step' => array(
-						array('step' => 'Safari 5.0 None')
-					)
-				)
-			),
-			array(
-				array(
+					'add_step' => [
+						['step' => 'Safari 5.0 None']
+					]
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Safari 5.0 Basic',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Safari 5.0 Basic')
-					),
+					'add_step' => [
+						['step' => 'Safari 5.0 Basic']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Safari 5.0 NTLM',
 					'agent' => 'Safari 5.0',
 					'authentication' => 'NTLM authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Safari 5.0 NTLM', 'remove' => true),
-						array('step' => 'Safari 5.0 NTLM')
-					),
+					'add_step' => [
+						['step' => 'Safari 5.0 NTLM', 'remove' => true],
+						['step' => 'Safari 5.0 NTLM']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Google Chrome 17 None',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'None',
-					'add_step' => array(
-						array('step' => 'Google Chrome 17 None')
-					),
+					'add_step' => [
+						['step' => 'Google Chrome 17 None']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Google Chrome 17 Basic',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Google Chrome 17 Basic')
-					),
+					'add_step' => [
+						['step' => 'Google Chrome 17 Basic']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'Google Chrome 17 NTLM',
 					'agent' => 'Google Chrome 17',
 					'authentication' => 'NTLM authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => 'Google Chrome 17 NTLM')
-					),
+					'add_step' => [
+						['step' => 'Google Chrome 17 NTLM']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => '(other ...) None',
 					'agent' => '(other ...)',
 					'authentication' => 'None',
-					'add_step' => array(
-						array('step' => '(other ...) None')
-					),
+					'add_step' => [
+						['step' => '(other ...) None']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => '(other ...) Basic',
 					'agent' => '(other ...)',
 					'authentication' => 'Basic authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => '(other ...) Basic')
-					),
+					'add_step' => [
+						['step' => '(other ...) Basic']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => '(other ...) NTLM',
 					'agent' => '(other ...)',
 					'authentication' => 'NTLM authentication',
 					'http_user' => 'zabbix',
 					'http_password' => 'zabbix123',
-					'add_step' => array(
-						array('step' => '(other ...) NTLM', 'remove' => true),
-						array('step' => '(other ...) NTLM')
-					),
+					'add_step' => [
+						['step' => '(other ...) NTLM', 'remove' => true],
+						['step' => '(other ...) NTLM']
+					],
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**
@@ -1554,7 +1554,7 @@ class testFormWeb extends CWebTest {
 				$this->zbxTestTextPresent('Web scenario added');
 				$this->zbxTestCheckTitle('Configuration of web monitoring');
 				$this->zbxTestTextPresent('CONFIGURATION OF WEB MONITORING');
-				$this->zbxTestTextPresent(array('Number of steps', 'Update interval', 'Status'));
+				$this->zbxTestTextPresent(['Number of steps', 'Update interval', 'Status']);
 				break;
 
 			case TEST_BAD:

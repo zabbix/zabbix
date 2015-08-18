@@ -22,18 +22,18 @@
 class CControllerDashboardSort extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'grid' =>	'fatal|required|json'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
 		if ($ret) {
-			$widgets = array(
+			$widgets = [
 				WIDGET_SYSTEM_STATUS, WIDGET_ZABBIX_STATUS, WIDGET_LAST_ISSUES, WIDGET_WEB_OVERVIEW,
 				WIDGET_DISCOVERY_STATUS, WIDGET_HOST_STATUS, WIDGET_FAVOURITE_GRAPHS, WIDGET_FAVOURITE_MAPS,
 				WIDGET_FAVOURITE_SCREENS
-			);
+			];
 
 			/*
 			 * {
@@ -55,13 +55,13 @@ class CControllerDashboardSort extends CController {
 			 * }
 			 */
 			foreach (CJs::decodeJson($this->getInput('grid')) as $col => $column) {
-				if (!CNewValidator::is_int($col) || $col < 0 || $col > 2 || !is_array($column)) {
+				if (!CNewValidator::is_int32($col) || $col < 0 || $col > 2 || !is_array($column)) {
 					$ret = false;
 					break;
 				}
 
 				foreach ($column as $row => $widgetName) {
-					if (!CNewValidator::is_int($row) || $row < 0 || !is_string($widgetName)) {
+					if (!CNewValidator::is_int32($row) || $row < 0 || !is_string($widgetName)) {
 						$ret = false;
 						break 2;
 					}
@@ -97,9 +97,9 @@ class CControllerDashboardSort extends CController {
 			}
 		}
 
-		$data = array(
+		$data = [
 			'main_block' => ''
-		);
+		];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

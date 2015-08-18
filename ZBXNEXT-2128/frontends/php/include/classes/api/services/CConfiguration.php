@@ -73,16 +73,27 @@ class CConfiguration extends CApiService {
 	 */
 	public function import($params) {
 		$importReader = CImportReaderFactory::getReader($params['format']);
+		$data = $importReader->read($params['source']);
+
+		// XML validation
+		$data = (new CXmlValidator())->validate($data);
+
+		$importConverterFactory = new CImportConverterFactory();
+
+		$converterChain = new CConverterChain();
+		$converterChain->addConverter('1.0', $importConverterFactory->getObject('1.0'));
+		$converterChain->addConverter('2.0', $importConverterFactory->getObject('2.0'));
+
+		$adapter = new CImportDataAdapter(ZABBIX_EXPORT_VERSION, $converterChain);
+		$adapter->load($data);
 
 		$configurationImport = new CConfigurationImport(
-			$params['source'],
 			$params['rules'],
 			new CImportReferencer(),
 			new CImportedObjectContainer(),
 			new CTriggerExpression()
 		);
-		$configurationImport->setReader($importReader);
 
-		return $configurationImport->import();
+		return $configurationImport->import($adapter);
 	}
 }

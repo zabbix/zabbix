@@ -26,34 +26,29 @@ require_once dirname(__FILE__).'/include/users.inc.php';
 
 $page['title'] = _('Audit log');
 $page['file'] = 'auditlogs.php';
-$page['hist_arg'] = array();
-$page['scripts'] = array('class.calendar.js', 'gtlc.js');
+$page['scripts'] = ['class.calendar.js', 'gtlc.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'action' =>			array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 6), null),
-	'resourcetype' =>	array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 31), null),
-	'filter_rst' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'filter_set' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'alias' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'period' =>			array(T_ZBX_INT, O_OPT, null,	null,	null),
-	'stime' =>			array(T_ZBX_STR, O_OPT, null,	null,	null),
+$fields = [
+	'action' =>			[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 6), null],
+	'resourcetype' =>	[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(-1, 31), null],
+	'filter_rst' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'filter_set' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'alias' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'period' =>			[T_ZBX_INT, O_OPT, null,	null,	null],
+	'stime' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
 	// ajax
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
-	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
-	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
-);
+	'favobj' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,	null],
+	'favid' =>			[T_ZBX_INT, O_OPT, P_ACT,	null,	null]
+];
 check_fields($fields);
 
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.auditlogs.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (isset($_REQUEST['favobj'])) {
 	// saving fixed/dynamic setting to profile
 	if ($_REQUEST['favobj'] == 'timelinefixedperiod') {
@@ -87,13 +82,13 @@ elseif (hasRequest('filter_rst')) {
  * Display
  */
 $effectivePeriod = navigation_bar_calc('web.auditlogs.timeline', 0, true);
-$data = array(
+$data = [
 	'stime' => getRequest('stime'),
-	'actions' => array(),
+	'actions' => [],
 	'action' => CProfile::get('web.auditlogs.filter.action', -1),
 	'resourcetype' => CProfile::get('web.auditlogs.filter.resourcetype', -1),
 	'alias' => CProfile::get('web.auditlogs.filter.alias', '')
-);
+];
 
 $from = zbxDateToTime($data['stime']);
 $till = $from + $effectivePeriod;
@@ -101,7 +96,7 @@ $till = $from + $effectivePeriod;
 // get audit
 $config = select_config();
 
-$sqlWhere = array();
+$sqlWhere = [];
 if (!empty($data['alias'])) {
 	$sqlWhere['alias'] = ' AND u.alias='.zbx_dbstr($data['alias']);
 }
@@ -163,7 +158,7 @@ if (!empty($data['actions'])) {
 }
 
 // get paging
-$data['paging'] = getPagingLine($data['actions']);
+$data['paging'] = getPagingLine($data['actions'], ZBX_SORT_DOWN);
 
 // get timeline
 unset($sqlWhere['from'], $sqlWhere['till']);
@@ -174,11 +169,11 @@ $sql = 'SELECT MIN(a.clock) AS clock'.
 			implode('', $sqlWhere);
 $firstAudit = DBfetch(DBselect($sql, $config['search_limit'] + 1));
 
-$data['timeline'] = array(
+$data['timeline'] = [
 	'period' => $effectivePeriod,
 	'starttime' => date(TIMESTAMP_FORMAT, $firstAudit ? $firstAudit['clock'] : null),
 	'usertime' => isset($_REQUEST['stime']) ? date(TIMESTAMP_FORMAT, zbxDateToTime($data['stime']) + $effectivePeriod) : null
-);
+];
 
 // render view
 $auditView = new CView('administration.auditlogs.list', $data);

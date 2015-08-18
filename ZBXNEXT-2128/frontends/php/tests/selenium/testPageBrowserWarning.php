@@ -27,12 +27,12 @@ class testPageBrowserWarning extends CWebTest {
 		$this->zbxTestOpen('browserwarning.php');
 		$this->assertTitle('WARNING! You are using an outdated browser.');
 		$this->zbxTestTextPresent('WARNING! You are using an outdated browser.');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			'Google Chrome',
 			'Mozilla Firefox',
 			'Internet Explorer',
 			'Opera browser',
 			'Apple Safari'
-		));
+		]);
 	}
 }

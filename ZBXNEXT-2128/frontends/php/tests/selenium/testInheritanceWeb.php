@@ -68,17 +68,17 @@ class testInheritanceWeb extends CWebTest {
 	}
 
 	public static function create() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'testInheritanceWeb5',
-					'addStep' => array(
-						array('name' => 'testInheritanceStep1', 'url' => 'http://testInheritanceStep1/')
-					)
-				)
-			)
-		);
+					'addStep' => [
+						['name' => 'testInheritanceStep1', 'url' => 'http://testInheritanceStep1/']
+					]
+				]
+			]
+		];
 	}
 
 	/**

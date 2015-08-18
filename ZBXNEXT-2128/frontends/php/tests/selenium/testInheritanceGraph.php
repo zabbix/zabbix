@@ -68,20 +68,20 @@ class testInheritanceGraph extends CWebTest {
 
 	// Returns create data
 	public static function create() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'testInheritanceGraph5',
-					'addItems' => array(
-						array('itemName' => 'testInheritanceItem1'),
-						array('itemName' => 'testInheritanceItem2'),
-						array('itemName' => 'testInheritanceItem3'),
-						array('itemName' => 'testInheritanceItem4')
-					)
-				)
-			)
-		);
+					'addItems' => [
+						['itemName' => 'testInheritanceItem1'],
+						['itemName' => 'testInheritanceItem2'],
+						['itemName' => 'testInheritanceItem3'],
+						['itemName' => 'testInheritanceItem4']
+					]
+				]
+			]
+		];
 	}
 
 	/**

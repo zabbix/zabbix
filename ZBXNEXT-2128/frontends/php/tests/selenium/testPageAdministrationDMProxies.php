@@ -64,11 +64,11 @@ class testPageAdministrationDMProxies extends CWebTest {
 		$this->zbxTestTextPresent('Proxies');
 		$this->zbxTestTextPresent('Displaying');
 
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			'Name', 'Mode', 'Last seen (age)', 'Host count', 'Item count', 'Required performance (vps)', 'Hosts'
-		));
+		]);
 
-		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
 		$this->assertElementValue('goButton', 'Go (0)');
 	}
 

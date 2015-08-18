@@ -27,14 +27,14 @@ class CScreenScreen extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$screen = API::Screen()->get(array(
+		$screen = API::Screen()->get([
 			'screenids' => $this->screenitem['resourceid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectScreenItems' => API_OUTPUT_EXTEND
-		));
+		]);
 		$screen = reset($screen);
 
-		$screenBuilder = new CScreenBuilder(array(
+		$screenBuilder = new CScreenBuilder([
 			'isFlickerfree' => $this->isFlickerfree,
 			'mode' => ($this->mode == SCREEN_MODE_EDIT || $this->mode == SCREEN_MODE_SLIDESHOW) ? SCREEN_MODE_SLIDESHOW : SCREEN_MODE_PREVIEW,
 			'timestamp' => $this->timestamp,
@@ -43,7 +43,7 @@ class CScreenScreen extends CScreenBase {
 			'stime' => $this->timeline['stimeNow'],
 			'profileIdx' => $this->profileIdx,
 			'updateProfile' => false
-		));
+		]);
 
 		return $this->getOutput($screenBuilder->show(), true);
 	}

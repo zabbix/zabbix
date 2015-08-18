@@ -84,7 +84,7 @@ class CXmlExportWriter extends CExportWriter {
 	 * @return bool
 	 */
 	private function mapName($name) {
-		$map = array(
+		$map = [
 			'groups' => 'group',
 			'templates' => 'template',
 			'hosts' => 'host',
@@ -94,6 +94,7 @@ class CXmlExportWriter extends CExportWriter {
 			'discovery_rules' => 'discovery_rule',
 			'conditions' => 'condition',
 			'item_prototypes' => 'item_prototype',
+			'application_prototypes' => 'application_prototype',
 			'trigger_prototypes' => 'trigger_prototype',
 			'graph_prototypes' => 'graph_prototype',
 			'host_prototypes' => 'host_prototype',
@@ -111,8 +112,8 @@ class CXmlExportWriter extends CExportWriter {
 			'urls' => 'url',
 			'selements' => 'selement',
 			'links' => 'link',
-			'linktriggers' => 'linktrigger',
-		);
+			'linktriggers' => 'linktrigger'
+		];
 
 		return isset($map[$name]) ? $map[$name] : false;
 	}

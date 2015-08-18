@@ -19,86 +19,38 @@
 **/
 
 
-class CSeverity extends CTag {
+class CSeverity extends CList {
 
 	/**
-	 * @param string $options['id']
 	 * @param string $options['name']
 	 * @param int    $options['value']
 	 */
-	public function __construct(array $options = array()) {
-		parent::__construct('div', 'yes');
-		$this->attr('id', isset($options['id']) ? $options['id'] : zbx_formatDomId($options['name']));
-		$this->addClass('jqueryinputset radioset control-severity');
+	public function __construct(array $options = []) {
+		parent::__construct();
 
-		if (!isset($options['value'])) {
+		$id = zbx_formatDomId($options['name']);
+
+		$this->addClass(ZBX_STYLE_RADIO_SEGMENTED);
+		$this->setId($id);
+
+		if (!array_key_exists('value', $options)) {
 			$options['value'] = TRIGGER_SEVERITY_NOT_CLASSIFIED;
 		}
 
-		$items = array();
-		$jsIds = '';
-		$jsLabels = '';
 		$config = select_config();
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-			$items[] = new CRadioButton(
-				$options['name'],
-				$severity,
-				null,
-				$options['name'].'_'.$severity,
-				($options['value'] == $severity)
-			);
-
-			$css = getSeverityStyle($severity);
-
-			$label = new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity,
-				$options['name'].'_label_'.$severity
-			);
-			$label->attr('data-severity', $severity);
-			$label->attr('data-severity-style', $css);
-
-			if ($options['value'] == $severity) {
-				$label->attr('aria-pressed', 'true');
-				$label->addClass($css);
-			}
-			else {
-				$label->attr('aria-pressed', 'false');
+			$radio = (new CInput('radio', $options['name'], $severity))
+				->setId(zbx_formatDomId($options['name'].'_'.$severity));
+			if ($severity === $options['value']) {
+				$radio->setAttribute('checked', 'checked');
 			}
 
-			$items[] = $label;
-
-			$jsIds .= ', #'.$options['name'].'_'.$severity;
-			$jsLabels .= ', #'.$options['name'].'_label_'.$severity;
+			parent::addItem(
+				(new CListItem([
+					$radio, new CLabel(getSeverityName($severity, $config), $options['name'].'_'.$severity)
+				]))->addClass(getSeverityStyle($severity))
+			);
 		}
-
-		if ($jsIds) {
-			$jsIds = substr($jsIds, 2);
-			$jsLabels = substr($jsLabels, 2);
-		}
-
-		$this->addItem($items);
-
-		insert_js('
-			jQuery("'.$jsLabels.'").mouseenter(function() {
-				jQuery("'.$jsLabels.'").each(function() {
-					var obj = jQuery(this);
-
-					if (obj.attr("aria-pressed") == "false") {
-						obj.removeClass("ui-state-hover " + obj.data("severityStyle"));
-					}
-				});
-
-				var obj = jQuery(this);
-
-				obj.addClass(obj.data("severityStyle"));
-			})
-			.mouseleave(function() {
-				jQuery("#'.$this->getAttribute('id').' [aria-pressed=\"true\"]").trigger("mouseenter");
-			});
-
-			jQuery("'.$jsIds.'").change(function() {
-				jQuery("#'.$this->getAttribute('id').' [aria-pressed=\"true\"]").trigger("mouseenter");
-			});'
-		, true);
 	}
 }

@@ -22,161 +22,161 @@
 class CIdValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
-		return array(
-			array(array(
+		return [
+			[[
 				'empty' => true,
 				'messageEmpty' => 'Empty ID',
 				'messageInvalid' => 'Incorrect ID specified'
-			))
-		);
+			]]
+		];
 	}
 
 	public function validValuesProvider() {
-		return array(
-			array(array(), 1),
-			array(array(), '1'),
-			array(array(), '9223372036854775807'),
-			array(array('empty' => true), 0),
-			array(array('empty' => true), '0'),
-		);
+		return [
+			[[], 1],
+			[[], '1'],
+			[[], '9223372036854775807'],
+			[['empty' => true], 0],
+			[['empty' => true], '0'],
+		];
 	}
 
 	public function invalidValuesProvider() {
-		return array(
-			array(
-				array('messageInvalid' => 'Invalid ID type'),
+		return [
+			[
+				['messageInvalid' => 'Invalid ID type'],
 				true,
 				'Invalid ID type'
-			),
-			array(
-				array('messageInvalid' => 'Invalid ID type'),
+			],
+			[
+				['messageInvalid' => 'Invalid ID type'],
 				null,
 				'Invalid ID type'
-			),
-			array(
-				array('messageInvalid' => 'Invalid ID type'),
-				array(),
+			],
+			[
+				['messageInvalid' => 'Invalid ID type'],
+				[],
 				'Invalid ID type'
-			),
-			array(
-				array('messageInvalid' => 'Invalid ID type'),
+			],
+			[
+				['messageInvalid' => 'Invalid ID type'],
 				new stdClass(),
 				'Invalid ID type'
-			),
-			array(
-				array('messageEmpty' => 'Empty ID'),
+			],
+			[
+				['messageEmpty' => 'Empty ID'],
 				0,
 				'Empty ID'
-			),
-			array(
-				array('messageEmpty' => 'Empty ID'),
+			],
+			[
+				['messageEmpty' => 'Empty ID'],
 				'0',
 				'Empty ID'
-			),
-			array(
-				array('messageInvalid' => 'Invalid ID'),
+			],
+			[
+				['messageInvalid' => 'Invalid ID'],
 				'',
 				'Invalid ID'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%1$s"'],
 				'01',
 				'Incorrect ID "01"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%1$s"'],
 				'1.1',
 				'Incorrect ID "1.1"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%1$s"'],
 				'-1',
 				'Incorrect ID "-1"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%1$s"'],
 				'9223372036854775808',
 				'Incorrect ID "9223372036854775808"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%1$s"'],
 				'A',
 				'Incorrect ID "A"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%1$s"'],
 				'1A',
 				'Incorrect ID "1A"'
-			)
-		);
+			]
+		];
 	}
 
 	public function invalidValuesWithObjectsProvider() {
-		return array(
-			array(
-				array('messageInvalid' => 'Invalid ID for "%1$s"'),
+		return [
+			[
+				['messageInvalid' => 'Invalid ID for "%1$s"'],
 				true,
 				'Invalid ID for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Invalid ID for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Invalid ID for "%1$s"'],
 				null,
 				'Invalid ID for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Invalid ID for "%1$s"'),
-				array(),
+			],
+			[
+				['messageInvalid' => 'Invalid ID for "%1$s"'],
+				[],
 				'Invalid ID for "object"'
-			),
-			array(
-				array('messageEmpty' => 'Empty ID for "%1$s"'),
+			],
+			[
+				['messageEmpty' => 'Empty ID for "%1$s"'],
 				0,
 				'Empty ID for "object"'
-			),
-			array(
-				array('messageEmpty' => 'Empty ID for "%1$s"'),
+			],
+			[
+				['messageEmpty' => 'Empty ID for "%1$s"'],
 				'0',
 				'Empty ID for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Invalid ID for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Invalid ID for "%1$s"'],
 				'',
 				'Invalid ID for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'],
 				'01',
 				'Incorrect ID "01" for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'],
 				'-1',
 				'Incorrect ID "-1" for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'],
 				'1.1',
 				'Incorrect ID "1.1" for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'],
 				'9223372036854775808',
 				'Incorrect ID "9223372036854775808" for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'],
 				'A',
 				'Incorrect ID "A" for "object"'
-			),
-			array(
-				array('messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'),
+			],
+			[
+				['messageInvalid' => 'Incorrect ID "%2$s" for "%1$s"'],
 				'1A',
 				'Incorrect ID "1A" for "object"'
-			)
-		);
+			]
+		];
 	}
 
-	protected function createValidator(array $params = array()) {
+	protected function createValidator(array $params = []) {
 		return new CIdValidator($params);
 	}
 }

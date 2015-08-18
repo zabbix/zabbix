@@ -49,7 +49,7 @@ class CImageTextTable {
 		$this->align = 0;
 		$this->x = $x;
 		$this->y = $y;
-		$this->table = array();
+		$this->table = [];
 		$this->numrows = 0;
 	}
 
@@ -77,14 +77,16 @@ class CImageTextTable {
 		if ($numrow >= $this->numrows) {
 			$numrow = $this->numrows;
 			$this->numrows++;
-			$this->table[$numrow] = array();
+			$this->table[$numrow] = [];
 		}
 		$this->table[$numrow][] = $cell;
+		return $this;
 	}
 
 	public function addRow($row) {
 		$this->table[$this->numrows] = $row;
 		$this->numrows++;
+		return $this;
 	}
 
 	public function draw() {
@@ -133,6 +135,7 @@ class CImageTextTable {
 			}
 			$coly += $height;
 		}
+		return $this;
 	}
 
 	/**
@@ -142,16 +145,16 @@ class CImageTextTable {
 	 */
 	private function calcRows() {
 		$rowHeight = 0;
-		$colWidth = array();
+		$colWidth = [];
 
 		foreach ($this->table as $y => $row) {
 			foreach ($row as $x => $col) {
 				// calculate size from image
 				if (isset($col['image'])) {
-					$dims = array(
+					$dims = [
 						'width' => imagesx($col['image']),
 						'height' => imagesy($col['image'])
-					);
+					];
 				}
 				// calculate size from text
 				else {

@@ -26,103 +26,102 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'host_discovery.php';
-$page['scripts'] = array('class.cviewswitcher.js', 'items.js');
-$page['hist_arg'] = array('hostid');
+$page['scripts'] = ['class.cviewswitcher.js', 'items.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 $paramsFieldName = getParamFieldNameByType(getRequest('type', 0));
 
 // supported eval types
-$evalTypes = array(
+$evalTypes = [
 	CONDITION_EVAL_TYPE_AND_OR,
 	CONDITION_EVAL_TYPE_AND,
 	CONDITION_EVAL_TYPE_OR,
 	CONDITION_EVAL_TYPE_EXPRESSION
-);
+];
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({form})'),
-	'itemid' =>				array(T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'),
-	'interfaceid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')),
-	'name' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')),
-	'description' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'key' =>				array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Key')),
-	'delay' =>				array(T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY),
+$fields = [
+	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'!isset({form})'],
+	'itemid' =>				[T_ZBX_INT, O_NO,	P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
+	'interfaceid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID, null, _('Interface')],
+	'name' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
+	'description' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'key' =>				[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Key')],
+	'delay' =>				[T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY),
 		'(isset({add}) || isset({update})) && isset({type}) && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP,
-		_('Update interval (in sec)')),
-	'delay_flex' =>			array(T_ZBX_STR, O_OPT, null,	'',			null),
-	'add_delay_flex' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'new_delay_flex' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add_delay_flex}) && isset({type}) && {type} != 2',
-		_('New flexible interval')),
-	'status' =>					array(T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null),
-	'type' =>				array(T_ZBX_INT, O_OPT, null,
-		IN(array(-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
+		_('Update interval (in sec)')],
+	'delay_flex' =>			[T_ZBX_STR, O_OPT, null,	'',			null],
+	'add_delay_flex' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'new_delay_flex' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add_delay_flex}) && isset({type}) && {type} != 2',
+		_('New flexible interval')],
+	'status' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
+	'type' =>				[T_ZBX_INT, O_OPT, null,
+		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
 			ITEM_TYPE_INTERNAL, ITEM_TYPE_SNMPV3, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-			ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX)), 'isset({add}) || isset({update})'),
-	'authtype' =>			array(T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH),
-	'username' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type'), _('User name')),
-	'password' =>			array(T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type')),
-	'publickey' =>			array(T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY),
-	'privatekey' =>			array(T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY),
-	$paramsFieldName =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update})) && isset({type}) && '.
+			ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX]), 'isset({add}) || isset({update})'],
+	'authtype' =>			[T_ZBX_INT, O_OPT, null,	IN(ITEM_AUTHTYPE_PASSWORD.','.ITEM_AUTHTYPE_PUBLICKEY),
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH],
+	'username' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type'), _('User name')],
+	'password' =>			[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SSH.','.ITEM_TYPE_TELNET, 'type')],
+	'publickey' =>			[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY],
+	'privatekey' =>			[T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SSH.' && {authtype} == '.ITEM_AUTHTYPE_PUBLICKEY],
+	$paramsFieldName =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add}) || isset({update})) && isset({type}) && '.
 		IN(ITEM_TYPE_SSH.','.ITEM_TYPE_DB_MONITOR.','.ITEM_TYPE_TELNET.','.ITEM_TYPE_CALCULATED, 'type'),
-		getParamFieldLabelByType(getRequest('type', 0))),
-	'snmp_community' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		getParamFieldLabelByType(getRequest('type', 0))],
+	'snmp_community' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C, 'type'),
-		_('SNMP community')),
-	'snmp_oid' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		_('SNMP community')],
+	'snmp_oid' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
 		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3, 'type'),
-		_('SNMP OID')),
-	'port' =>				array(T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535),
+		_('SNMP OID')],
+	'port' =>				[T_ZBX_STR, O_OPT, null,	BETWEEN(0, 65535),
 		'(isset({add}) || isset({update})) && isset({type}) && '.IN(ITEM_TYPE_SNMPV1.','.ITEM_TYPE_SNMPV2C.','.ITEM_TYPE_SNMPV3, 'type'),
-		_('Port')),
-	'snmpv3_contextname' => array(T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3),
-	'snmpv3_securitylevel' => array(T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3),
-	'snmpv3_securityname' => array(T_ZBX_STR, O_OPT, null,	null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3),
-	'snmpv3_authprotocol' => array(T_ZBX_INT, O_OPT, null, IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
+		_('Port')],
+	'snmpv3_contextname' => [T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3],
+	'snmpv3_securitylevel' => [T_ZBX_INT, O_OPT, null,	IN('0,1,2'),
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3],
+	'snmpv3_securityname' => [T_ZBX_STR, O_OPT, null,	null,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3],
+	'snmpv3_authprotocol' => [T_ZBX_INT, O_OPT, null, IN(ITEM_AUTHPROTOCOL_MD5.','.ITEM_AUTHPROTOCOL_SHA),
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && ({snmpv3_securitylevel} == '.
-		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.' || {snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.')'),
-	'snmpv3_authpassphrase' => array(T_ZBX_STR, O_OPT, null, null,
+		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.' || {snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.')'],
+	'snmpv3_authpassphrase' => [T_ZBX_STR, O_OPT, null, null,
 		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && ({snmpv3_securitylevel} == '.
-		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.' || {snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.')'),
-	'snmpv3_privprotocol' => array(T_ZBX_INT, O_OPT, null, IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV),
-	'snmpv3_privpassphrase' => array(T_ZBX_STR, O_OPT, null, null,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV),
-	'ipmi_sensor' =>		array(T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,
-		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_IPMI, _('IPMI sensor')),
-	'trapper_hosts' =>		array(T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && isset({type}) && {type} == 2'),
-	'lifetime' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'evaltype' =>	 		array(T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'),
-	'formula' => 			array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'conditions' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
+		ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV.' || {snmpv3_securitylevel}=='.ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV.')'],
+	'snmpv3_privprotocol' => [T_ZBX_INT, O_OPT, null, IN(ITEM_PRIVPROTOCOL_DES.','.ITEM_PRIVPROTOCOL_AES),
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV],
+	'snmpv3_privpassphrase' => [T_ZBX_STR, O_OPT, null, null,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_SNMPV3.' && {snmpv3_securitylevel} == '.ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV],
+	'ipmi_sensor' =>		[T_ZBX_STR, O_OPT, P_NO_TRIM,	NOT_EMPTY,
+		'(isset({add}) || isset({update})) && isset({type}) && {type} == '.ITEM_TYPE_IPMI, _('IPMI sensor')],
+	'trapper_hosts' =>		[T_ZBX_STR, O_OPT, null,	null,		'(isset({add}) || isset({update})) && isset({type}) && {type} == 2'],
+	'lifetime' => 			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'evaltype' =>	 		[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
+	'formula' => 			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'conditions' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// actions
-	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"discoveryrule.massdelete","discoveryrule.massdisable","discoveryrule.massenable"'),
 								null
-							),
-	'g_hostdruleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+							],
+	'g_hostdruleid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -132,13 +131,13 @@ unset($_REQUEST[$paramsFieldName]);
  * Permissions
  */
 if (getRequest('itemid', false)) {
-	$item = API::DiscoveryRule()->get(array(
+	$item = API::DiscoveryRule()->get([
 		'itemids' => $_REQUEST['itemid'],
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('status', 'flags'),
-		'selectFilter' => array('formula', 'evaltype', 'conditions'),
+		'selectHosts' => ['status', 'flags'],
+		'selectFilter' => ['formula', 'evaltype', 'conditions'],
 		'editable' => true
-	));
+	]);
 	$item = reset($item);
 	if (!$item) {
 		access_deny();
@@ -147,12 +146,12 @@ if (getRequest('itemid', false)) {
 	$host = reset($item['hosts']);
 }
 else {
-	$hosts = API::Host()->get(array(
+	$hosts = API::Host()->get([
 		'hostids' => $_REQUEST['hostid'],
-		'output' => array('status', 'flags'),
+		'output' => ['status', 'flags'],
 		'templated_hosts' => true,
 		'editable' => true
-	));
+	]);
 	$host = reset($hosts);
 	if (!$host) {
 		access_deny();
@@ -163,8 +162,8 @@ else {
  * Actions
  */
 if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator(array('allowMultiple' => false));
-	$_REQUEST['delay_flex'] = getRequest('delay_flex', array());
+	$timePeriodValidator = new CTimePeriodValidator(['allowMultiple' => false]);
+	$_REQUEST['delay_flex'] = getRequest('delay_flex', []);
 
 	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
 		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
@@ -176,7 +175,7 @@ if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
 	}
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
-	$result = API::DiscoveryRule()->delete(array(getRequest('itemid')));
+	$result = API::DiscoveryRule()->delete([getRequest('itemid')]);
 
 	if ($result) {
 		uncheckTableRows(getRequest('hostid'));
@@ -186,7 +185,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$delay_flex = getRequest('delay_flex', array());
+	$delay_flex = getRequest('delay_flex', []);
 
 	$db_delay_flex = '';
 	foreach ($delay_flex as $val) {
@@ -194,7 +193,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 	$db_delay_flex = trim($db_delay_flex, ';');
 
-	$newItem = array(
+	$newItem = [
 		'itemid' => getRequest('itemid'),
 		'interfaceid' => getRequest('interfaceid'),
 		'name' => getRequest('name'),
@@ -224,14 +223,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'params' => getRequest('params'),
 		'ipmi_sensor' => getRequest('ipmi_sensor'),
 		'lifetime' => getRequest('lifetime')
-	);
+	];
 
 	// add macros; ignore empty new macros
-	$filter = array(
+	$filter = [
 		'evaltype' => getRequest('evaltype'),
-		'conditions' => array()
-	);
-	$conditions = getRequest('conditions', array());
+		'conditions' => []
+	];
+	$conditions = getRequest('conditions', []);
 	ksort($conditions);
 	$conditions = array_values($conditions);
 	foreach ($conditions as $condition) {
@@ -266,7 +265,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 
 		// unset unchanged values
-		$newItem = CArrayHelper::unsetEqualValues($newItem, $item, array('itemid'));
+		$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
 
 		// don't update the filter if it hasn't changed
 		$conditionsChanged = false;
@@ -292,7 +291,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
 	}
 	else {
-		$result = API::DiscoveryRule()->create(array($newItem));
+		$result = API::DiscoveryRule()->create([$newItem]);
 		show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
 	}
 
@@ -301,7 +300,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		uncheckTableRows(getRequest('hostid'));
 	}
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('discoveryrule.massenable', 'discoveryrule.massdisable')) && hasRequest('g_hostdruleid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryrule.massenable', 'discoveryrule.massdisable']) && hasRequest('g_hostdruleid')) {
 	$groupHostDiscoveryRuleId = getRequest('g_hostdruleid');
 	$enable = (getRequest('action') == 'discoveryrule.massenable');
 
@@ -337,15 +336,14 @@ elseif (hasRequest('action') && getRequest('action') == 'discoveryrule.massdelet
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$formItem = (hasRequest('itemid') && !hasRequest('clone')) ? $item : array();
-	$data = getItemFormData($formItem, array(
+	$formItem = (hasRequest('itemid') && !hasRequest('clone')) ? $item : [];
+	$data = getItemFormData($formItem, [
 		'is_discovery_rule' => true
-	));
-	$data['page_header'] = _('CONFIGURATION OF DISCOVERY RULES');
+	]);
 	$data['lifetime'] = getRequest('lifetime', 30);
 	$data['evaltype'] = getRequest('evaltype');
 	$data['formula'] = getRequest('formula');
-	$data['conditions'] = getRequest('conditions', array());
+	$data['conditions'] = getRequest('conditions', []);
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
@@ -374,16 +372,16 @@ else {
 
 	$config = select_config();
 
-	$data = array(
+	$data = [
 		'hostid' => getRequest('hostid', 0),
 		'host' => $host,
 		'showInfoColumn' => ($host['status'] != HOST_STATUS_TEMPLATE),
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
-	);
+	];
 
 	// discoveries
-	$data['discoveries'] = API::DiscoveryRule()->get(array(
+	$data['discoveries'] = API::DiscoveryRule()->get([
 		'hostids' => $data['hostid'],
 		'output' => API_OUTPUT_EXTEND,
 		'editable' => true,
@@ -393,7 +391,15 @@ else {
 		'selectHostPrototypes' => API_OUTPUT_COUNT,
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
-	));
+	]);
+
+	// hide zeroes for trapper and SNMP trap items
+	foreach ($data['discoveries'] as &$discovery) {
+		if ($discovery['type'] == ITEM_TYPE_TRAPPER || $discovery['type'] == ITEM_TYPE_SNMPTRAP) {
+			$discovery['delay'] = '';
+		}
+	}
+	unset($discovery);
 
 	$data['discoveries'] = CMacrosResolverHelper::resolveItemNames($data['discoveries']);
 
@@ -405,7 +411,7 @@ else {
 	}
 
 	// paging
-	$data['paging'] = getPagingLine($data['discoveries']);
+	$data['paging'] = getPagingLine($data['discoveries'], $sortOrder);
 
 	// render view
 	$discoveryView = new CView('configuration.host.discovery.list', $data);

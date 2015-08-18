@@ -35,31 +35,18 @@ class CTextArea extends CTag {
 	 * @param string	$value
 	 * @param array		$options
 	 * @param int		$options['rows']
-	 * @param int		$options['width']
 	 * @param int		$options['maxlength']
 	 * @param boolean	$options['readonly']
 	 */
-	public function __construct($name = 'textarea', $value = '', $options = array()) {
-		parent::__construct('textarea', 'yes');
-		$this->attr('class', 'input');
-		$this->attr('id', zbx_formatDomId($name));
-		$this->attr('name', $name);
-		$this->attr('rows', !empty($options['rows']) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
+	public function __construct($name = 'textarea', $value = '', $options = []) {
+		parent::__construct('textarea', true);
+		$this->setId(zbx_formatDomId($name));
+		$this->setAttribute('name', $name);
+		$this->setAttribute('rows', !empty($options['rows']) ? $options['rows'] : ZBX_TEXTAREA_STANDARD_ROWS);
 		if (isset($options['readonly'])) {
 			$this->setReadonly($options['readonly']);
 		}
 		$this->addItem($value);
-
-		// set width
-		if (empty($options['width']) || $options['width'] == ZBX_TEXTAREA_STANDARD_WIDTH) {
-			$this->addClass('textarea_standard');
-		}
-		elseif ($options['width'] == ZBX_TEXTAREA_BIG_WIDTH) {
-			$this->addClass('textarea_big');
-		}
-		else {
-			$this->attr('style', 'width: '.$options['width'].'px;');
-		}
 
 		// set maxlength
 		if (!empty($options['maxlength'])) {
@@ -69,27 +56,31 @@ class CTextArea extends CTag {
 
 	public function setReadonly($value) {
 		if ($value) {
-			$this->attr('readonly', 'readonly');
+			$this->setAttribute('readonly', 'readonly');
 		}
 		else {
 			$this->removeAttribute('readonly');
 		}
+		return $this;
 	}
 
 	public function setValue($value = '') {
-		return $this->addItem($value);
+		$this->addItem($value);
+		return $this;
 	}
 
 	public function setRows($value) {
-		$this->attr('rows', $value);
+		$this->setAttribute('rows', $value);
+		return $this;
 	}
 
 	public function setCols($value) {
-		$this->attr('cols', $value);
+		$this->setAttribute('cols', $value);
+		return $this;
 	}
 
 	public function setMaxlength($maxlength) {
-		$this->attr('maxlength', $maxlength);
+		$this->setAttribute('maxlength', $maxlength);
 
 		if (!defined('IS_TEXTAREA_MAXLENGTH_JS_INSERTED')) {
 			define('IS_TEXTAREA_MAXLENGTH_JS_INSERTED', true);
@@ -106,5 +97,11 @@ class CTextArea extends CTag {
 				}',
 			true);
 		}
+		return $this;
+	}
+
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+		return $this;
 	}
 }

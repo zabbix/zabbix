@@ -23,35 +23,34 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of authentication');
 $page['file'] = 'authentication.php';
-$page['hist_arg'] = array('config');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR						TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'config' =>			array(T_ZBX_INT, O_OPT, null, IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP), null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,			null, null),
+$fields = [
+	'config' =>			[T_ZBX_INT, O_OPT, null, IN(ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP.','.ZBX_AUTH_HTTP), null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,			null, null],
 	// actions
-	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null),
-	'test' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null),
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null],
+	'test' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null, null],
 	// LDAP
-	'ldap_host' =>		array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('LDAP host')),
-	'ldap_port' =>		array(T_ZBX_INT, O_OPT, null,			BETWEEN(0, 65535),
-		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('Port')),
-	'ldap_base_dn' =>	array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('Base DN')),
-	'ldap_bind_dn' =>	array(T_ZBX_STR, O_OPT, null,			null,
-		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))'),
-	'ldap_bind_password' => array(T_ZBX_STR, O_OPT, null,		null, null,				_('Bind password')),
-	'ldap_search_attribute' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
-		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('Search attribute')),
-	'user' =>			array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))'),
-	'user_password' =>	array(T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
-		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('User password')),
-	'change_bind_password' => array(T_ZBX_STR, O_OPT, null, null,	null)
-);
+	'ldap_host' =>		[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
+		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('LDAP host')],
+	'ldap_port' =>		[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 65535),
+		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('Port')],
+	'ldap_base_dn' =>	[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
+		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('Base DN')],
+	'ldap_bind_dn' =>	[T_ZBX_STR, O_OPT, null,			null,
+		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))'],
+	'ldap_bind_password' => [T_ZBX_STR, O_OPT, null,		null, null,				_('Bind password')],
+	'ldap_search_attribute' => [T_ZBX_STR, O_OPT, null,	NOT_EMPTY,
+		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('Search attribute')],
+	'user' =>			[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
+		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))'],
+	'user_password' =>	[T_ZBX_STR, O_OPT, null,			NOT_EMPTY,
+		'isset({config}) && {config} == '.ZBX_AUTH_LDAP.' && (isset({update}) || isset({test}))',	_('User password')],
+	'change_bind_password' => [T_ZBX_STR, O_OPT, null, null,	null]
+];
 check_fields($fields);
 
 $config = select_config();
@@ -64,7 +63,7 @@ else {
 	$isAuthenticationTypeChanged = false;
 }
 
-$fields = array(
+$fields = [
 	'authentication_type' => true,
 	'ldap_host' => true,
 	'ldap_port' => true,
@@ -72,7 +71,7 @@ $fields = array(
 	'ldap_search_attribute' => true,
 	'ldap_bind_dn' => true,
 	'ldap_bind_password' => true
-);
+];
 
 foreach ($config as $field => $value) {
 	if (array_key_exists($field, $fields)) {
@@ -116,21 +115,21 @@ if ($config['authentication_type'] == ZBX_AUTH_INTERNAL) {
 elseif ($config['authentication_type'] == ZBX_AUTH_LDAP) {
 	if (hasRequest('update') || hasRequest('test')) {
 		// check LDAP login/password
-		$ldapValidator = new CLdapAuthValidator(array(
-			'conf' => array(
+		$ldapValidator = new CLdapAuthValidator([
+			'conf' => [
 				'host' => $config['ldap_host'],
 				'port' => $config['ldap_port'],
 				'base_dn' => $config['ldap_base_dn'],
 				'bind_dn' => $config['ldap_bind_dn'],
 				'bind_password' => $config['ldap_bind_password'],
 				'search_attribute' => $config['ldap_search_attribute']
-			)
-		));
+			]
+		]);
 
-		$login = $ldapValidator->validate(array(
+		$login = $ldapValidator->validate([
 			'user' => getRequest('user', CWebUser::$data['alias']),
 			'password' => getRequest('user_password', '')
-		));
+		]);
 
 		if (!$login) {
 			error(_('Login name or password is incorrect!'));
@@ -223,7 +222,7 @@ show_messages();
 /*
  * Display
  */
-$data = array(
+$data = [
 	'form_refresh' => getRequest('form_refresh'),
 	'config' => $config,
 	'is_authentication_type_changed' => $isAuthenticationTypeChanged,
@@ -231,7 +230,7 @@ $data = array(
 	'user_password' => getRequest('user_password', ''),
 	'user_list' => null,
 	'change_bind_password' => getRequest('change_bind_password')
-);
+];
 
 // get tab title
 $data['title'] = authentication2str($config['authentication_type']);
@@ -244,8 +243,8 @@ if (getUserGuiAccess(CWebUser::$data['userid']) == GROUP_GUI_ACCESS_INTERNAL) {
 }
 
 // render view
-$authenticationView = new CView('administration.authentication.edit', $data);
-$authenticationView->render();
-$authenticationView->show();
+$view = new CView('administration.authentication.edit', $data);
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

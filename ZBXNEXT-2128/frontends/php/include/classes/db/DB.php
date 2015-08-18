@@ -270,7 +270,7 @@ class DB {
 	public static function getDefaults($table) {
 		$table = self::getSchema($table);
 
-		$defaults = array();
+		$defaults = [];
 		foreach ($table['fields'] as $name => $field) {
 			if (isset($field['default'])) {
 				$defaults[$name] = $field['default'];
@@ -380,9 +380,9 @@ class DB {
 	 *
 	 * @return array
 	 */
-	public static function find($tableName, array $criteria = array()) {
+	public static function find($tableName, array $criteria = []) {
 		// build the WHERE part
-		$sqlWhere = array();
+		$sqlWhere = [];
 		foreach ($criteria as $field => $value) {
 			// check if the table has this field
 			if (!self::hasField($tableName, $field)) {
@@ -415,7 +415,7 @@ class DB {
 			return true;
 		}
 
-		$resultIds = array();
+		$resultIds = [];
 
 		if ($getids) {
 			$id = self::reserveIds($table, count($values));
@@ -459,7 +459,7 @@ class DB {
 			return true;
 		}
 
-		$resultIds = array();
+		$resultIds = [];
 
 		$tableSchema = self::getSchema($table);
 		$values = self::addMissingFields($tableSchema, $values);
@@ -468,7 +468,7 @@ class DB {
 			$id = self::reserveIds($table, count($values));
 		}
 
-		$newValues = array();
+		$newValues = [];
 		foreach ($values as $key => $row) {
 			if ($getids) {
 				$resultIds[$key] = $id;
@@ -528,7 +528,7 @@ class DB {
 			}
 
 			// where condition processing
-			$sqlWhere = array();
+			$sqlWhere = [];
 			foreach ($row['where'] as $field => $values) {
 				if (!isset($tableSchema['fields'][$field]) || is_null($values)) {
 					self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));
@@ -561,10 +561,10 @@ class DB {
 	 * @return bool
 	 */
 	public static function updateByPk($tableName, $pk, array $values) {
-		return self::update($tableName, array(
-			'where' => array(self::getPk($tableName) => $pk),
+		return self::update($tableName, [
+			'where' => [self::getPk($tableName) => $pk],
 			'values' => $values
-		));
+		]);
 	}
 
 	/**
@@ -581,7 +581,7 @@ class DB {
 	public static function save($tableName, array $data) {
 		$pk = self::getPk($tableName);
 
-		$newRecords = array();
+		$newRecords = [];
 		foreach ($data as $key => $record) {
 			// if the pk is set - update the record
 			if (isset($record[$pk])) {
@@ -625,7 +625,7 @@ class DB {
 		$pk = self::getPk($tableName);
 		$oldRecords = zbx_toHash($oldRecords, $pk);
 
-		$modifiedRecords = array();
+		$modifiedRecords = [];
 		foreach ($newRecords as $key => $record) {
 			// if it's a new or modified record - save it later
 			if (!isset($record[$pk]) || self::recordModified($tableName, $oldRecords[$record[$pk]], $record)) {
@@ -650,9 +650,9 @@ class DB {
 
 		// delete remaining records
 		if ($oldRecords) {
-			DB::delete($tableName, array(
+			DB::delete($tableName, [
 				$pk => array_keys($oldRecords)
-			));
+			]);
 		}
 
 		return $newRecords;
@@ -710,8 +710,8 @@ class DB {
 	public static function replaceByPosition($tableName, array $groupedOldRecords, array $groupedNewRecords) {
 		$pk = self::getPk($tableName);
 
-		$allOldRecords = array();
-		$allNewRecords = array();
+		$allOldRecords = [];
+		$allNewRecords = [];
 		foreach ($groupedNewRecords as $key => $newRecords) {
 			// if records exist for the parent object - replace them, otherwise create new records
 			if (isset($groupedOldRecords[$key])) {
@@ -768,7 +768,7 @@ class DB {
 	 * @return array	array of new records with the primary keys from the old ones
 	 */
 	protected static function mergeRecords(array $oldRecords, array $newRecords, $pk) {
-		$result = array();
+		$result = [];
 		foreach ($newRecords as $i => $record) {
 			if (isset($oldRecords[$i])) {
 				$record[$pk] = $oldRecords[$i][$pk];
@@ -802,7 +802,7 @@ class DB {
 		}
 		$table_schema = self::getSchema($table);
 
-		$sqlWhere = array();
+		$sqlWhere = [];
 		foreach ($wheres as $field => $values) {
 			if (!isset($table_schema['fields'][$field]) || is_null($values)) {
 				self::exception(self::DBEXECUTE_ERROR, _s('Incorrect field "%1$s" name or value in where statement for table "%2$s".', $field, $table));

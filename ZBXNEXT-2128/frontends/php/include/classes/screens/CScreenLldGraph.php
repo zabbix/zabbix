@@ -27,7 +27,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	/**
 	 * @var array
 	 */
-	protected $createdGraphIds = array();
+	protected $createdGraphIds = [];
 
 	/**
 	 * @var array
@@ -56,13 +56,13 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 
 			if ($graphPrototype) {
 				// Get all created (discovered) graphs for host of graph prototype.
-				$allCreatedGraphs = API::Graph()->get(array(
-					'output' => array('graphid', 'name'),
-					'hostids' => array($graphPrototype['discoveryRule']['hostid']),
-					'selectGraphDiscovery' => array('graphid', 'parent_graphid'),
+				$allCreatedGraphs = API::Graph()->get([
+					'output' => ['graphid', 'name'],
+					'hostids' => [$graphPrototype['discoveryRule']['hostid']],
+					'selectGraphDiscovery' => ['graphid', 'parent_graphid'],
 					'expandName' => true,
-					'filter' => array('flags' => ZBX_FLAG_DISCOVERY_CREATED),
-				));
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				]);
 
 				// Collect those graph IDs where parent graph is graph prototype selected for
 				// this screen item as resource.
@@ -89,7 +89,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	protected function getGraphsForSurrogateScreen(array $graphIds) {
 		$screenItemTemplate = $this->getScreenItemTemplate(SCREEN_RESOURCE_GRAPH);
 
-		$screenItems = array();
+		$screenItems = [];
 		foreach ($graphIds as $graphId) {
 			$screenItem = $screenItemTemplate;
 
@@ -109,30 +109,30 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 	 */
 	protected function getGraphPrototype() {
 		if ($this->graphPrototype === null) {
-			$defaultOptions = array(
-				'output' => array('graphid', 'name', 'graphtype', 'show_legend', 'show_3d', 'templated'),
-				'selectDiscoveryRule' => array('hostid')
-			);
+			$defaultOptions = [
+				'output' => ['graphid', 'name', 'graphtype', 'show_legend', 'show_3d', 'templated'],
+				'selectDiscoveryRule' => ['hostid']
+			];
 
-			$options = array();
+			$options = [];
 
 			/*
 			 * If screen item is dynamic or is templated screen, real graph prototype is looked up by "name"
 			 * used as resource ID for this screen item and by current host.
 			 */
 			if (($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM || $this->isTemplatedScreen) && $this->hostid) {
-				$currentGraphPrototype = API::GraphPrototype()->get(array(
-					'output' => array('name'),
-					'graphids' => array($this->screenitem['resourceid'])
-				));
+				$currentGraphPrototype = API::GraphPrototype()->get([
+					'output' => ['name'],
+					'graphids' => [$this->screenitem['resourceid']]
+				]);
 				$currentGraphPrototype = reset($currentGraphPrototype);
 
-				$options['hostids'] = array($this->hostid);
-				$options['filter'] = array('name' => $currentGraphPrototype['name']);
+				$options['hostids'] = [$this->hostid];
+				$options['filter'] = ['name' => $currentGraphPrototype['name']];
 			}
 			// otherwise just use resource ID given to this screen item.
 			else {
-				$options['graphids'] = array($this->screenitem['resourceid']);
+				$options['graphids'] = [$this->screenitem['resourceid']];
 			}
 
 			$options = zbx_array_merge($defaultOptions, $options);
@@ -165,26 +165,19 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 				$url = 'chart7.php';
 				break;
 
-			case GRAPH_TYPE_BAR:
-			case GRAPH_TYPE_COLUMN:
-			case GRAPH_TYPE_BAR_STACKED:
-			case GRAPH_TYPE_COLUMN_STACKED:
-				$url = 'chart_bar.php';
-				break;
-
 			default:
 				show_error_message(_('Graph prototype not found.'));
 				exit;
 		}
 
-		$graphPrototypeItems = API::GraphItem()->get(array(
-			'output' => array(
+		$graphPrototypeItems = API::GraphItem()->get([
+			'output' => [
 				'gitemid', 'itemid', 'sortorder', 'flags', 'type', 'calc_fnc',  'drawtype', 'yaxisside', 'color'
-			),
-			'graphids' => array($graphPrototype['graphid'])
-		));
+			],
+			'graphids' => [$graphPrototype['graphid']]
+		]);
 
-		$queryParams = array(
+		$queryParams = [
 			'items' => $graphPrototypeItems,
 			'graphtype' => $graphPrototype['graphtype'],
 			'period' => 3600,
@@ -193,13 +186,10 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 			'width' => $this->screenitem['width'],
 			'height' => $this->screenitem['height'],
 			'name' => $graphPrototype['name']
-		);
+		];
 
 		$url .= '?'.http_build_query($queryParams);
 
-		$img = new CImg($url);
-		$img->preload();
-
-		return new CSpan($img);
+		return new CSpan(new CImg($url));
 	}
 }

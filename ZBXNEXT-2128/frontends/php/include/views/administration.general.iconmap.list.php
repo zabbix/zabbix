@@ -18,26 +18,37 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$widget = (new CWidget())
+	->setTitle(_('Icon mapping'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.iconmapping.php'))
+			->addItem(new CSubmit('form', _('Create icon map')))
+		)
+	);
 
-$iconMapTable = new CTableInfo(_('No icon maps found.'));
-$iconMapTable->setHeader(array(
-	_('Name'),
-	_('Icon map')
-));
-$iconMapTable->addItem(BR());
+$iconMapTable = (new CTableInfo())
+	->setHeader([
+		_('Name'),
+		_('Icon map')
+	])
+	->addItem(BR());
 
 foreach ($this->data['iconmaps'] as $iconMap) {
-	$row = array();
+	$row = [];
 	foreach ($iconMap['mappings'] as $mapping) {
 		$row[] = $this->data['inventoryList'][$mapping['inventory_link']].NAME_DELIMITER.
 				$mapping['expression'].SPACE.'&rArr;'.SPACE.$this->data['iconList'][$mapping['iconid']];
 		$row[] = BR();
 	}
 
-	$iconMapTable->addRow(array(
+	$iconMapTable->addRow([
 		new CLink($iconMap['name'], 'adm.iconmapping.php?form=update&iconmapid='.$iconMap['iconmapid']),
 		$row
-	));
+	]);
 }
 
-return $iconMapTable;
+$widget->addItem($iconMapTable);
+
+return $widget;

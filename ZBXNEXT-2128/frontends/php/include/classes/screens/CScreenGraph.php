@@ -42,26 +42,26 @@ class CScreenGraph extends CScreenBase {
 
 		if ($this->screenitem['dynamic'] == SCREEN_DYNAMIC_ITEM && $this->hostid) {
 			// get host
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'hostids' => $this->hostid,
-				'output' => array('hostid', 'name')
-			));
+				'output' => ['hostid', 'name']
+			]);
 			$host = reset($hosts);
 
 			// get graph
-			$graph = API::Graph()->get(array(
+			$graph = API::Graph()->get([
 				'graphids' => $resourceId,
 				'output' => API_OUTPUT_EXTEND,
-				'selectHosts' => array('hostid'),
+				'selectHosts' => ['hostid'],
 				'selectGraphItems' => API_OUTPUT_EXTEND
-			));
+			]);
 			$graph = reset($graph);
 
 			// if items from one host we change them, or set calculated if not exist on that host
 			if (count($graph['hosts']) == 1) {
 				if ($graph['ymax_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymax_itemid']) {
 					$newDynamic = getSameGraphItemsForHost(
-						array(array('itemid' => $graph['ymax_itemid'])),
+						[['itemid' => $graph['ymax_itemid']]],
 						$this->hostid,
 						false
 					);
@@ -77,7 +77,7 @@ class CScreenGraph extends CScreenBase {
 
 				if ($graph['ymin_type'] == GRAPH_YAXIS_TYPE_ITEM_VALUE && $graph['ymin_itemid']) {
 					$newDynamic = getSameGraphItemsForHost(
-						array(array('itemid' => $graph['ymin_itemid'])),
+						[['itemid' => $graph['ymin_itemid']]],
 						$this->hostid,
 						false
 					);
@@ -119,7 +119,7 @@ class CScreenGraph extends CScreenBase {
 		}
 
 		// get time control
-		$timeControlData = array(
+		$timeControlData = [
 			'id' => $this->getDataId(),
 			'containerid' => $containerId,
 			'objDims' => $graphDims,
@@ -127,7 +127,7 @@ class CScreenGraph extends CScreenBase {
 			'loadImage' => 1,
 			'periodFixed' => CProfile::get('web.screens.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-		);
+		];
 
 		$isDefault = false;
 		if ($graphDims['graphtype'] == GRAPH_TYPE_PIE || $graphDims['graphtype'] == GRAPH_TYPE_EXPLODED) {
@@ -188,7 +188,7 @@ class CScreenGraph extends CScreenBase {
 				$item = new CLink(null, 'charts.php?graphid='.$resourceId.'&period='.$this->timeline['period'].
 						'&stime='.$this->timeline['stimeNow']);
 			}
-			$item->setAttribute('id', $containerId);
+			$item->setId($containerId);
 
 			return $this->getOutput($item);
 		}

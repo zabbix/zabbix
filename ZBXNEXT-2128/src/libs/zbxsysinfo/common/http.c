@@ -33,7 +33,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 {
 	int		ret;
 	char		request[MAX_STRING_LEN];
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT)))
 	{
@@ -58,7 +58,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 	if (FAIL == ret)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "HTTP get error: %s", zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "HTTP get error: %s", zbx_socket_strerror());
 		return SYSINFO_RET_FAIL;
 	}
 

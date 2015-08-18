@@ -24,7 +24,7 @@ class CCanvas {
 	protected $canvas;
 	protected $width;
 	protected $height;
-	protected $colors = array();
+	protected $colors = [];
 
 	public function __construct($w, $h) {
 		$this->width = $w;

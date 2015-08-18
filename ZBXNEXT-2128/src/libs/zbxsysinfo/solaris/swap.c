@@ -311,7 +311,7 @@ int	SYSTEM_SWAP_IN(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret;
 	char		*tmp, *error;
-	zbx_uint64_t	value;
+	zbx_uint64_t	value = 0;
 
 	if (2 < request->nparam)
 	{
@@ -351,7 +351,7 @@ int	SYSTEM_SWAP_OUT(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	int		ret;
 	char		*tmp, *error;
-	zbx_uint64_t	value;
+	zbx_uint64_t	value = 0;
 
 	if (2 < request->nparam)
 	{

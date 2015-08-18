@@ -18,63 +18,57 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$chartsWidget = (new CWidget())->setTitle(_('Graphs'));
 
-$chartsWidget = new CWidget('hat_charts');
-$chartForm = new CForm('get');
-$chartForm->addVar('fullscreen', $this->data['fullscreen']);
-$chartForm->addItem(array(_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()));
-$chartForm->addItem(array(SPACE._('Host').SPACE, $this->data['pageFilter']->getHostsCB()));
-$chartForm->addItem(array(SPACE._('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()));
-
-$chartsWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.charts.filter.state', 1));
+$controls = (new CList())
+	->addItem([_('Group').SPACE, $this->data['pageFilter']->getGroupsCB()])
+	->addItem([_('Host').SPACE, $this->data['pageFilter']->getHostsCB()])
+	->addItem([_('Graph').SPACE, $this->data['pageFilter']->getGraphsCB()]);
 
 if ($this->data['graphid']) {
-	$chartsWidget->addPageHeader(_('GRAPHS'), array(
-		get_icon('favourite', array('fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid'])),
-		SPACE,
-		get_icon('reset', array('id' => $this->data['graphid'])),
-		SPACE,
-		get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))
-	));
+	$controls->addItem(get_icon('favourite', ['fav' => 'web.favorite.graphids', 'elname' => 'graphid', 'elid' => $this->data['graphid']]));
+	$controls->addItem(get_icon('reset', ['id' => $this->data['graphid']]));
+	$controls->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
 }
 else {
-	$chartsWidget->addPageHeader(_('GRAPHS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
+	$controls->addItem([get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']])]);
 }
 
-$chartsWidget->addHeader(
-	isset($this->data['pageFilter']->graphs[$this->data['graphid']]['name'])
-		? $this->data['pageFilter']->graphs[$this->data['graphid']]['name']
-		: null,
-	$chartForm
-);
-$chartsWidget->addItem(BR());
+$chartForm = (new CForm('get'))
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addItem($controls);
+$chartsWidget->setControls($chartForm);
+
+$filterForm = (new CFilter('web.charts.filter.state'))
+	->addNavigator();
+$chartsWidget->addItem($filterForm);
 
 if (!empty($this->data['graphid'])) {
 	// append chart to widget
-	$screen = CScreenBuilder::getScreen(array(
+	$screen = CScreenBuilder::getScreen([
 		'resourcetype' => SCREEN_RESOURCE_CHART,
 		'graphid' => $this->data['graphid'],
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['graphid']
-	));
+	]);
 
-	$chartTable = new CTable(null, 'maxwidth');
-	$chartTable->addRow($screen->get());
+	$chartTable = (new CTable())
+		->addRow($screen->get());
 
 	$chartsWidget->addItem($chartTable);
 
-	CScreenBuilder::insertScreenStandardJs(array(
+	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screen->timeline,
 		'profileIdx' => $screen->profileIdx
-	));
+	]);
 }
 else {
 	$screen = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs(array(
+	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screen->timeline
-	));
+	]);
 
-	$chartsWidget->addItem(new CTableInfo(_('No graphs found.')));
+	$chartsWidget->addItem(new CTableInfo());
 }
 
 return $chartsWidget;

@@ -78,7 +78,7 @@ static int	waitsocket(int socket_fd, LIBSSH2_SESSION *session)
 static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 {
 	const char	*__function_name = "ssh_run";
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	LIBSSH2_SESSION	*session;
 	LIBSSH2_CHANNEL	*channel;
 	int		auth_pw = 0, rc, ret = NOTSUPPORTED,
@@ -91,7 +91,7 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_tcp_strerror()));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));
 		goto close;
 	}
 
@@ -203,8 +203,6 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 				rc = libssh2_userauth_publickey_fromfile(session, item->username, publickey,
 						privatekey, item->password);
-				zbx_free(publickey);
-				zbx_free(privatekey);
 
 				if (0 != rc)
 				{
@@ -323,6 +321,8 @@ tcp_close:
 	zbx_tcp_close(&s);
 
 close:
+	zbx_free(publickey);
+	zbx_free(privatekey);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;

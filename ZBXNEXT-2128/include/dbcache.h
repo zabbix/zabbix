@@ -42,6 +42,8 @@
 #define MAX_POLLER_ITEMS	128	/* MAX(MAX_JAVA_ITEMS, MAX_SNMP_ITEMS) */
 #define MAX_PINGER_ITEMS	128
 
+#define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
+
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 
@@ -127,6 +129,7 @@ typedef struct
 	unsigned char	snmpv3_privprotocol;
 	unsigned char	inventory_link;
 	unsigned char	status;
+	unsigned char	unreachable;
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char		*formula;
 	char		*units;

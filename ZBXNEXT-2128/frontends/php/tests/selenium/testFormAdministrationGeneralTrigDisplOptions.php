@@ -33,7 +33,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 	public function testFormAdministrationGeneralTrigDisplOptions_Layout($allValues) {
 
 		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF ZABBIX', 'Trigger displaying options', 'Colour', 'Blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged OK events', 'Acknowledged OK events', 'Display OK triggers for', 'On status change triggers blink for'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF ZABBIX', 'Trigger displaying options', 'Colour', 'Blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged OK events', 'Acknowledged OK events', 'Display OK triggers for', 'On status change triggers blink for']);
 
 		$sql = 'SELECT problem_unack_color, problem_unack_style, problem_ack_color, problem_ack_style, ok_unack_color, ok_unack_style,'.
 		'ok_ack_color, ok_ack_style, ok_period, blink_period FROM config ORDER BY configid';
@@ -81,7 +81,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF ZABBIX', 'Trigger displaying options', 'Colour', 'Blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged OK events', 'Acknowledged OK events', 'Display OK triggers for', 'On status change triggers blink for'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF ZABBIX', 'Trigger displaying options', 'Colour', 'Blinking', 'Unacknowledged PROBLEM events', 'Acknowledged PROBLEM events', 'Unacknowledged OK events', 'Acknowledged OK events', 'Display OK triggers for', 'On status change triggers blink for']);
 
 		// hash calculation for not-changed DB fields
 		$sqlHash = 'SELECT configid, refresh_unsupported, work_period, alert_usrgrpid, event_ack_enable, event_expire,'.
@@ -106,7 +106,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->input_type('blink_period', '120');
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Trigger displaying options'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF ZABBIX', 'Trigger displaying options']);
 
 		// checking values in the DB
 		$sql = 'SELECT problem_unack_color FROM config WHERE problem_unack_color='.zbx_dbstr('BB0000');
@@ -145,7 +145,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestLogin('adm.triggerdisplayoptions.php');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'Trigger displaying options');
 		$this->zbxTestCheckTitle('Configuration of trigger displaying options');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF ZABBIX', 'Trigger displaying options'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF ZABBIX', 'Trigger displaying options']);
 
 		// hash calculation for the DB fields that should be changed in this report
 		$sqlHash = 'SELECT configid, refresh_unsupported, work_period, alert_usrgrpid, event_ack_enable,'.
@@ -158,7 +158,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends CWebTest {
 		$this->zbxTestClick('resetDefaults');
 		$this->zbxTestClick("//button[@type='button']");
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF ZABBIX', 'Trigger displaying options'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF ZABBIX', 'Trigger displaying options']);
 
 		$sql = 'SELECT problem_unack_color FROM config WHERE problem_unack_color='.zbx_dbstr('DC0000').'';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect color in the DB field "problem_unack_color"');

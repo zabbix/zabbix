@@ -27,7 +27,7 @@ class CScreenDataOverview extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$hostids = array();
+		$hostids = [];
 		$dbHostGroups = DBselect('SELECT DISTINCT hg.hostid FROM hosts_groups hg WHERE hg.groupid='.zbx_dbstr($this->screenitem['resourceid']));
 		while ($dbHostGroup = DBfetch($dbHostGroups)) {
 			$hostids[$dbHostGroup['hostid']] = $dbHostGroup['hostid'];
@@ -36,11 +36,11 @@ class CScreenDataOverview extends CScreenBase {
 		// application filter
 		$applicationIds = null;
 		if ($this->screenitem['application'] !== '') {
-			$applications = API::Application()->get(array(
-				'output' => array('applicationid'),
+			$applications = API::Application()->get([
+				'output' => ['applicationid'],
 				'hostids' => $hostids,
-				'search' => array('name' => $this->screenitem['application'])
-			));
+				'search' => ['name' => $this->screenitem['application']]
+			]);
 			$applicationIds = zbx_objectValues($applications, 'applicationid');
 		}
 

@@ -27,20 +27,19 @@ $page['type'] = PAGE_TYPE_IMAGE;
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'type' =>           array(T_ZBX_INT, O_OPT, null,   IN(array(GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED)), null),
-	'itemids' =>		array(T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null),
-	'period' =>			array(T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null),
-	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'profileIdx' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'profileIdx2' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'updateProfile' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'from' =>			array(T_ZBX_INT, O_OPT, null,	'{} >= 0',	null),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,	'{} > 0',	null),
-	'height' =>			array(T_ZBX_INT, O_OPT, null,	'{} > 0',	null),
-	'border' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'batch' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-);
+$fields = [
+	'type' =>           [T_ZBX_INT, O_OPT, null,   IN([GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED]), null],
+	'itemids' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID,		null],
+	'period' =>			[T_ZBX_INT, O_OPT, P_NZERO, BETWEEN(ZBX_MIN_PERIOD, ZBX_MAX_PERIOD), null],
+	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'profileIdx' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
+	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
+	'from' =>			[T_ZBX_INT, O_OPT, null,	'{} >= 0',	null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	'{} > 0',	null],
+	'height' =>			[T_ZBX_INT, O_OPT, null,	'{} > 0',	null],
+	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+];
 check_fields($fields);
 
 $itemIds = getRequest('itemids');
@@ -48,20 +47,20 @@ $itemIds = getRequest('itemids');
 /*
  * Permissions
  */
-$items = API::Item()->get(array(
-	'output' => array('itemid', 'name'),
-	'selectHosts' => array('name'),
+$items = API::Item()->get([
+	'output' => ['itemid', 'name'],
+	'selectHosts' => ['name'],
 	'itemids' => $itemIds,
 	'webitems' => true,
 	'preservekeys' => true
-));
+]);
 foreach ($itemIds as $itemId) {
 	if (!isset($items[$itemId])) {
 		access_deny();
 	}
 }
 
-$hostNames = array();
+$hostNames = [];
 foreach ($items as &$item) {
 	$item['hostname'] = $item['hosts'][0]['name'];
 	if (!in_array($item['hostname'], $hostNames)) {
@@ -70,18 +69,18 @@ foreach ($items as &$item) {
 }
 unset($item);
 // sort items
-CArrayHelper::sort($items, array('name', 'hostname', 'itemid'));
+CArrayHelper::sort($items, ['name', 'hostname', 'itemid']);
 
 /*
  * Display
  */
-$timeline = CScreenBase::calculateTime(array(
+$timeline = CScreenBase::calculateTime([
 	'profileIdx' => getRequest('profileIdx', 'web.screens'),
 	'profileIdx2' => getRequest('profileIdx2'),
 	'updateProfile' => getRequest('updateProfile', true),
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime')
-));
+]);
 
 $graph = new CLineGraphDraw(getRequest('type'));
 $graph->setPeriod($timeline['period']);
@@ -109,9 +108,6 @@ if (isset($_REQUEST['width'])) {
 }
 if (isset($_REQUEST['height'])) {
 	$graph->setHeight($_REQUEST['height']);
-}
-if (isset($_REQUEST['border'])) {
-	$graph->setBorder(0);
 }
 
 foreach ($items as $item) {

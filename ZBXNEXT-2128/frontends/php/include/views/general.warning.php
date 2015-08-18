@@ -18,34 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+$pageHeader = (new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']'))
+	->addCssFile('styles/'.CHtml::encode($data['theme']).'.css')
+	->display();
 
-$pageHeader = new CPageHeader(_('Warning').' ['._s('refreshed every %1$s sec.', 30).']');
-$pageHeader->addCssInit();
-$pageHeader->display();
+$buttons = array_key_exists('buttons', $data)
+	? $data['buttons']
+	: [(new CButton(null, _('Retry')))->onClick('document.location.reload();')];
 
-?>
-<body>
-<?php
+echo '<body>';
 
-// check if a CWarning object is passed
-if (!$warning = $this->get('warning')) {
-	$message = $this->get('message');
+(new CDiv(new CWarning($data['header'], $data['messages'], $buttons)))
+	->addClass(ZBX_STYLE_ARTICLE)
+	->show();
 
-	if (is_array($message) && isset($message['header'])) {
-		$message = array(bold($message['header']), BR(), $message['text']);
-	}
-
-	// if not - render a standard warning with a message
-	$warning = new CWarning('Zabbix '.ZABBIX_VERSION, $message);
-	$warning->setButtons(array(new CButton('login', _('Retry'), 'document.location.reload();')));
-}
-
-$warning->show();
-
-?>
-<script type="text/javascript">
-	setTimeout('document.location.reload();', 30000);
-</script>
-
-</body>
-</html>
+echo get_js("setTimeout('document.location.reload();', 30000);");
+echo '</body>';
+echo '</html>';

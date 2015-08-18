@@ -32,7 +32,7 @@ const char	*help_message[] = {NULL};
 int	zabbix_sender_send_values(const char *address, unsigned short port, const char *source,
 		const zabbix_sender_value_t *values, int count, char **result)
 {
-	zbx_sock_t	sock;
+	zbx_socket_t	sock;
 	int		ret, i;
 	struct zbx_json	json;
 
@@ -73,7 +73,7 @@ int	zabbix_sender_send_values(const char *address, unsigned short port, const ch
 	}
 
 	if (FAIL == ret && NULL != result)
-		*result = zbx_strdup(NULL, zbx_tcp_strerror());
+		*result = zbx_strdup(NULL, zbx_socket_strerror());
 
 	zbx_json_free(&json);
 

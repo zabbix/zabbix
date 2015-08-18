@@ -22,58 +22,32 @@
 class CSimpleButtonTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
-			array(
-				array(),
-				'<button class="button button-plain shadow ui-corner-all" type="button"></button>'
-			),
-			array(
-				array('caption'),
-				'<button class="button button-plain shadow ui-corner-all" type="button">caption</button>'
-			),
-			array(
-				array('caption', 'my-class'),
-				'<button class="button my-class" type="button">caption</button>'
-			),
+		return [
+			[
+				[],
+				'<button type="button"></button>'
+			],
+			[
+				['caption'],
+				'<button type="button">caption</button>'
+			],
+			[
+				['caption', 'my-class'],
+				'<button class="my-class" type="button">caption</button>'
+			],
 			// value encoding
-			array(
-				array('</button>'),
-				'<button class="button button-plain shadow ui-corner-all" type="button">&lt;/button&gt;</button>'
-			),
-		);
+			[
+				['</button>'],
+				'<button type="button">&lt;/button&gt;</button>'
+			],
+		];
 	}
 
 	public function testSetEnabled() {
 		$button = $this->createTag();
 		$button->setEnabled(false);
 		$this->assertEquals(
-			'<button class="button button-plain shadow ui-corner-all" type="button" disabled="disabled"></button>',
-			(string) $button
-		);
-	}
-
-	public function testMain() {
-		$button = $this->createTag();
-		$button->main();
-		$this->assertEquals(
-			'<button class="button main button-plain shadow ui-corner-all" type="button"></button>',
-			(string) $button
-		);
-	}
-
-	public function testSetButtonStyle() {
-		$button = $this->createTag();
-		$button->setButtonClass('my-button');
-		$this->assertEquals(
-			'<button class="button my-button" type="button"></button>',
-			(string) $button
-		);
-
-		// test class reset
-		$button = $this->createTag('', 'my-button');
-		$button->setButtonClass(null);
-		$this->assertEquals(
-			'<button class="button" type="button"></button>',
+			'<button type="button" disabled="disabled"></button>',
 			(string) $button
 		);
 	}
@@ -84,7 +58,7 @@ class CSimpleButtonTest extends CTagTest {
 	 *
 	 * @return CSimpleButton
 	 */
-	protected function createTag($caption = '', $class = 'button-plain shadow ui-corner-all') {
-		return new CSimpleButton($caption, $class);
+	protected function createTag($caption = '') {
+		return new CSimpleButton($caption);
 	}
 }

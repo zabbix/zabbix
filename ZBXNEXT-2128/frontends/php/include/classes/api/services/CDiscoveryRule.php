@@ -31,36 +31,36 @@ class CDiscoveryRule extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
-	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'type', 'status');
+	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'type', 'status'];
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->errorMessages = array_merge($this->errorMessages, array(
+		$this->errorMessages = array_merge($this->errorMessages, [
 			self::ERROR_EXISTS_TEMPLATE => _('Discovery rule "%1$s" already exists on "%2$s", inherited from another template.'),
 			self::ERROR_EXISTS => _('Discovery rule "%1$s" already exists on "%2$s".'),
 			self::ERROR_INVALID_KEY => _('Invalid key "%1$s" for discovery rule "%2$s" on "%3$s": %4$s.')
-		));
+		]);
 	}
 
 	/**
 	 * Get DiscoveryRule data
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('items' => 'i.itemid'),
-			'from'		=> array('items' => 'items i'),
-			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY_RULE),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['items' => 'i.itemid'],
+			'from'		=> ['items' => 'items i'],
+			'where'		=> ['i.flags='.ZBX_FLAG_DISCOVERY_RULE],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'groupids'					=> null,
 			'templateids'				=> null,
 			'hostids'					=> null,
@@ -93,7 +93,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
@@ -240,15 +240,15 @@ class CDiscoveryRule extends CItemGeneral {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter
 				unset($rule['formula'], $rule['evaltype']);
 
 				if ($options['selectFilter'] !== null) {
-					$filter = $this->unsetExtraFields(array($rule['filter']),
-						array('conditions', 'formula', 'evaltype'),
+					$filter = $this->unsetExtraFields([$rule['filter']],
+						['conditions', 'formula', 'evaltype'],
 						$options['selectFilter']
 					);
 					$filter = reset($filter);
@@ -285,7 +285,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->createReal($items);
 		$this->inherit($items);
 
-		return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return ['itemids' => zbx_objectValues($items, 'itemid')];
 	}
 
 	/**
@@ -298,12 +298,12 @@ class CDiscoveryRule extends CItemGeneral {
 	public function update($items) {
 		$items = zbx_toArray($items);
 
-		$dbItems = $this->get(array(
-			'output' => array('itemid', 'name'),
-			'selectFilter' => array('evaltype', 'formula', 'conditions'),
+		$dbItems = $this->get([
+			'output' => ['itemid', 'name'],
+			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'itemids' => zbx_objectValues($items, 'itemid'),
 			'preservekeys' => true
-		));
+		]);
 
 		$this->checkInput($items, true, $dbItems);
 
@@ -311,9 +311,9 @@ class CDiscoveryRule extends CItemGeneral {
 		foreach ($items as &$item) {
 			if (isset($item['filter'])) {
 				foreach ($item['filter']['conditions'] as &$condition) {
-					$condition += array(
+					$condition += [
 						'operator' => DB::getDefault('item_condition', 'operator')
-					);
+					];
 				}
 				unset($condition);
 			}
@@ -324,7 +324,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$this->updateReal($items);
 		$this->inherit($items);
 
-		return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return ['itemids' => zbx_objectValues($items, 'itemid')];
 	}
 
 	/**
@@ -342,13 +342,13 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$ruleids = array_keys(array_flip($ruleids));
 
-		$delRules = $this->get(array(
+		$delRules = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $ruleids,
 			'editable' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('name')
-		));
+			'selectHosts' => ['name']
+		]);
 
 		// TODO: remove $nopermissions hack
 		if (!$nopermissions) {
@@ -364,28 +364,28 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// get child discovery rules
 		$parentItemids = $ruleids;
-		$childTuleids = array();
+		$childTuleids = [];
 		do {
 			$dbItems = DBselect('SELECT i.itemid FROM items i WHERE '.dbConditionInt('i.templateid', $parentItemids));
-			$parentItemids = array();
+			$parentItemids = [];
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
 				$childTuleids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
 		} while (!empty($parentItemids));
 
-		$delRulesChilds = $this->get(array(
+		$delRulesChilds = $this->get([
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $childTuleids,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('name')
-		));
+			'selectHosts' => ['name']
+		]);
 
 		$delRules = array_merge($delRules, $delRulesChilds);
 		$ruleids = array_merge($ruleids, $childTuleids);
 
-		$iprototypeids = array();
+		$iprototypeids = [];
 		$dbItems = DBselect(
 			'SELECT i.itemid'.
 			' FROM item_discovery id,items i'.
@@ -414,7 +414,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// delete LLD rules
-		DB::delete('items', array('itemid' => $ruleids));
+		DB::delete('items', ['itemid' => $ruleids]);
 
 		// TODO: remove info from API
 		foreach ($delRules as $item) {
@@ -422,7 +422,7 @@ class CDiscoveryRule extends CItemGeneral {
 			info(_s('Deleted: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('ruleids' => $ruleids);
+		return ['ruleids' => $ruleids];
 	}
 
 	/**
@@ -470,19 +470,19 @@ class CDiscoveryRule extends CItemGeneral {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$selectFields = array();
+		$selectFields = [];
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
 			}
 		}
 
-		$items = $this->get(array(
+		$items = $this->get([
 			'hostids' => $data['templateids'],
 			'preservekeys' => true,
 			'output' => $selectFields,
-			'selectFilter' => array('formula', 'evaltype', 'conditions')
-		));
+			'selectFilter' => ['formula', 'evaltype', 'conditions']
+		]);
 
 		$this->inherit($items, $data['hostids']);
 
@@ -507,10 +507,10 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'itemids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -533,11 +533,11 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'itemids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -555,18 +555,18 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return array
 	 */
 	protected function copyTriggerPrototypes(array $srcDiscovery, array $dstDiscovery, array $srcHost, array $dstHost) {
-		$srcTriggers = API::TriggerPrototype()->get(array(
+		$srcTriggers = API::TriggerPrototype()->get([
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectHosts' => API_OUTPUT_EXTEND,
-			'selectItems' => array('itemid', 'type'),
+			'selectItems' => ['itemid', 'type'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectFunctions' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		));
+		]);
 
 		if (!$srcTriggers) {
-			return array();
+			return [];
 		}
 
 		foreach ($srcTriggers as $id => $trigger) {
@@ -597,7 +597,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 	protected function createReal(&$items) {
 		// create items without formulas, they will be updated when items and conditions are saved
-		$createItems = array();
+		$createItems = [];
 		foreach ($items as $item) {
 			if (isset($item['filter'])) {
 				$item['evaltype'] = $item['filter']['evaltype'];
@@ -608,7 +608,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 		$createItems = DB::save('items', $createItems);
 
-		$conditions = array();
+		$conditions = [];
 		foreach ($items as $key => &$item) {
 			$item['itemid'] = $createItems[$key]['itemid'];
 
@@ -626,7 +626,7 @@ class CDiscoveryRule extends CItemGeneral {
 		$conditions = DB::save('item_condition', $conditions);
 
 		// update formulas
-		$itemConditions = array();
+		$itemConditions = [];
 		foreach ($conditions as $condition) {
 			$itemConditions[$condition['itemid']][] = $condition;
 		}
@@ -637,12 +637,12 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// TODO: REMOVE info
-		$itemHosts = $this->get(array(
+		$itemHosts = $this->get([
 			'itemids' => zbx_objectValues($items, 'itemid'),
-			'output' => array('key_', 'name'),
-			'selectHosts' => array('name'),
+			'output' => ['key_', 'name'],
+			'selectHosts' => ['name'],
 			'nopermissions' => true
-		));
+		]);
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
 			info(_s('Created: Discovery rule "%1$s" on "%2$s".', $item['name'], $host['name']));
@@ -653,16 +653,16 @@ class CDiscoveryRule extends CItemGeneral {
 		$items = zbx_toArray($items);
 
 		$ruleIds = zbx_objectValues($items, 'itemid');
-		$exRules = $this->get(array(
+		$exRules = $this->get([
 			'itemids' => $ruleIds,
-			'output' => array('key_', 'name'),
-			'selectHosts' => array('name'),
-			'selectFilter' => array('evaltype'),
+			'output' => ['key_', 'name'],
+			'selectHosts' => ['name'],
+			'selectFilter' => ['evaltype'],
 			'nopermissions' => true,
-			'preservekeys' => true,
-		));
+			'preservekeys' => true
+		]);
 
-		$data = array();
+		$data = [];
 		foreach ($items as $item) {
 			$values = $item;
 
@@ -676,7 +676,7 @@ class CDiscoveryRule extends CItemGeneral {
 				unset($values['filter']);
 			}
 
-			$data[] = array('values' => $values, 'where' => array('itemid' => $item['itemid']));
+			$data[] = ['values' => $values, 'where' => ['itemid' => $item['itemid']]];
 		}
 		DB::update('items', $data);
 
@@ -685,10 +685,10 @@ class CDiscoveryRule extends CItemGeneral {
 			// conditions
 			if (isset($item['filter'])) {
 				if ($newRuleConditions === null) {
-					$newRuleConditions = array();
+					$newRuleConditions = [];
 				}
 
-				$newRuleConditions[$item['itemid']] = array();
+				$newRuleConditions[$item['itemid']] = [];
 				foreach ($item['filter']['conditions'] as $condition) {
 					$condition['itemid'] = $item['itemid'];
 
@@ -698,7 +698,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// replace conditions
-		$ruleConditions = array();
+		$ruleConditions = [];
 		if ($newRuleConditions !== null) {
 			// fetch existing conditions
 			$exConditions = DBfetchArray(DBselect(
@@ -707,7 +707,7 @@ class CDiscoveryRule extends CItemGeneral {
 				' WHERE '.dbConditionInt('itemid', $ruleIds).
 				' ORDER BY item_conditionid'
 			));
-			$exRuleConditions = array();
+			$exRuleConditions = [];
 			foreach ($exConditions as $condition) {
 				$exRuleConditions[$condition['itemid']][] = $condition;
 			}
@@ -741,15 +741,15 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param array 	$conditions
 	 */
 	protected function updateFormula($itemId, $evalFormula, array $conditions) {
-		$ids = array();
+		$ids = [];
 		foreach ($conditions as $condition) {
 			$ids[$condition['formulaid']] = $condition['item_conditionid'];
 		}
 		$formula = CConditionHelper::replaceLetterIds($evalFormula, $ids);
 
-		DB::updateByPk('items', $itemId, array(
+		DB::updateByPk('items', $itemId, [
 			'formula' => $formula
-		));
+		]);
 	}
 
 	/**
@@ -759,7 +759,7 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @param bool  $update
 	 * @param array $dbItems
 	 */
-	protected function checkInput(array &$items, $update = false, array $dbItems = array()) {
+	protected function checkInput(array &$items, $update = false, array $dbItems = []) {
 		// add the values that cannot be changed, but are required for further processing
 		foreach ($items as &$item) {
 			$item['flags'] = ZBX_FLAG_DISCOVERY_RULE;
@@ -775,7 +775,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$validateItems = $items;
 		if ($update) {
-			$validateItems = $this->extendFromObjects(zbx_toHash($validateItems, 'itemid'), $dbItems, array('name'));
+			$validateItems = $this->extendFromObjects(zbx_toHash($validateItems, 'itemid'), $dbItems, ['name']);
 		}
 
 		// filter validator
@@ -803,36 +803,36 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return array
 	 */
 	protected function getFilterSchema() {
-		return array(
-			'validators' => array(
-				'evaltype' => new CLimitedSetValidator(array(
-					'values' => array(
+		return [
+			'validators' => [
+				'evaltype' => new CLimitedSetValidator([
+					'values' => [
 						CONDITION_EVAL_TYPE_OR,
 						CONDITION_EVAL_TYPE_AND,
 						CONDITION_EVAL_TYPE_AND_OR,
 						CONDITION_EVAL_TYPE_EXPRESSION
-					),
+					],
 					'messageInvalid' => _('Incorrect type of calculation for discovery rule "%1$s".')
-				)),
-				'formula' => new CStringValidator(array(
+				]),
+				'formula' => new CStringValidator([
 					'empty' => true
-				)),
-				'conditions' => new CCollectionValidator(array(
+				]),
+				'conditions' => new CCollectionValidator([
 					'empty' => true,
 					'messageInvalid' => _('Incorrect conditions for discovery rule "%1$s".')
-				))
-			),
-			'postValidators' => array(
-				new CConditionValidator(array(
+				])
+			],
+			'postValidators' => [
+				new CConditionValidator([
 					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for discovery rule "%1$s": %3$s.'),
 					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for discovery rule "%1$s" is not defined.'),
 					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for discovery rule "%1$s".')
-				))
-			),
-			'required' => array('evaltype', 'conditions'),
+				])
+			],
+			'required' => ['evaltype', 'conditions'],
 			'messageRequired' => _('No "%2$s" given for the filter of discovery rule "%1$s".'),
 			'messageUnsupported' => _('Unsupported parameter "%2$s" for the filter of discovery rule "%1$s".')
-		);
+		];
 	}
 
 	/**
@@ -841,30 +841,30 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return array
 	 */
 	protected function getFilterConditionSchema() {
-		return array(
-			'validators' => array(
-				'macro' => new CStringValidator(array(
+		return [
+			'validators' => [
+				'macro' => new CStringValidator([
 					'regex' => '/^'.ZBX_PREG_EXPRESSION_LLD_MACROS.'$/',
 					'messageEmpty' => _('Empty filter condition macro for discovery rule "%1$s".'),
 					'messageRegex' => _('Incorrect filter condition macro for discovery rule "%1$s".')
-				)),
-				'value' => new CStringValidator(array(
+				]),
+				'value' => new CStringValidator([
 					'empty' => true
-				)),
-				'formulaid' => new CStringValidator(array(
+				]),
+				'formulaid' => new CStringValidator([
 					'regex' => '/[A-Z]+/',
 					'messageEmpty' => _('Empty filter condition formula ID for discovery rule "%1$s".'),
 					'messageRegex' => _('Incorrect filter condition formula ID for discovery rule "%1$s".')
-				)),
-				'operator' => new CLimitedSetValidator(array(
-					'values' => array(CONDITION_OPERATOR_REGEXP),
+				]),
+				'operator' => new CLimitedSetValidator([
+					'values' => [CONDITION_OPERATOR_REGEXP],
 					'messageInvalid' => _('Incorrect filter condition operator for discovery rule "%1$s".')
-				))
-			),
-			'required' => array('macro', 'value'),
+				])
+			],
+			'required' => ['macro', 'value'],
 			'messageRequired' => _('No "%2$s" given for a filter condition of discovery rule "%1$s".'),
 			'messageUnsupported' => _('Unsupported parameter "%2$s" for a filter condition of discovery rule "%1$s".')
-		);
+		];
 	}
 
 	protected function checkSpecificFields(array $item) {
@@ -887,8 +887,8 @@ class CDiscoveryRule extends CItemGeneral {
 			return true;
 		}
 
-		$insertItems = array();
-		$updateItems = array();
+		$insertItems = [];
+		$updateItems = [];
 		foreach ($newItems as $newItem) {
 			if (isset($newItem['itemid'])) {
 				$updateItems[] = $newItem;
@@ -920,22 +920,22 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	protected function copyDiscoveryRule($discoveryid, $hostid) {
 		// fetch discovery to clone
-		$srcDiscovery = $this->get(array(
+		$srcDiscovery = $this->get([
 			'itemids' => $discoveryid,
 			'output' => API_OUTPUT_EXTEND,
-			'selectFilter' => array('evaltype', 'formula', 'conditions'),
+			'selectFilter' => ['evaltype', 'formula', 'conditions'],
 			'preservekeys' => true
-		));
+		]);
 		$srcDiscovery = reset($srcDiscovery);
 
 		// fetch source and destination hosts
-		$hosts = API::Host()->get(array(
-			'hostids' => array($srcDiscovery['hostid'], $hostid),
+		$hosts = API::Host()->get([
+			'hostids' => [$srcDiscovery['hostid'], $hostid],
 			'output' => API_OUTPUT_EXTEND,
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'templated_hosts' => true,
 			'preservekeys' => true
-		));
+		]);
 		$srcHost = $hosts[$srcDiscovery['hostid']];
 		$dstHost = $hosts[$hostid];
 
@@ -963,7 +963,7 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// save new discovery
-		$newDiscovery = $this->create(array($dstDiscovery));
+		$newDiscovery = $this->create([$dstDiscovery]);
 		$dstDiscovery['itemid'] = $newDiscovery['itemids'][0];
 
 		// copy prototypes
@@ -972,11 +972,11 @@ class CDiscoveryRule extends CItemGeneral {
 		// if there were prototypes defined, clone everything else
 		if ($newPrototypes) {
 			// fetch new prototypes
-			$newPrototypes = API::ItemPrototype()->get(array(
+			$newPrototypes = API::ItemPrototype()->get([
 				'itemids' => $newPrototypes['itemids'],
 				'output' => API_OUTPUT_EXTEND,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($newPrototypes as $i => $newPrototype) {
 				unset($newPrototypes[$i]['templateid']);
@@ -1010,20 +1010,26 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return array
 	 */
 	protected function copyItemPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
-		$prototypes = API::ItemPrototype()->get(array(
+		$prototypes = API::ItemPrototype()->get([
+			'output' => [
+				'itemid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+				'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+			],
+			'selectApplications' => ['applicationid'],
+			'selectApplicationPrototypes' => ['name'],
 			'discoveryids' => $srcDiscovery['itemid'],
-			'selectApplications' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		));
+		]);
 
-		$rs = array();
+		$rs = [];
 		if ($prototypes) {
 			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
-
-				unset($prototype['templateid'], $prototype['state']);
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {
@@ -1065,19 +1071,19 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	protected function copyGraphPrototypes(array $srcDiscovery, array $dstDiscovery) {
 		// fetch source graphs
-		$srcGraphs = API::GraphPrototype()->get(array(
+		$srcGraphs = API::GraphPrototype()->get([
 			'discoveryids' => $srcDiscovery['itemid'],
 			'output' => API_OUTPUT_EXTEND,
 			'selectGraphItems' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('hostid'),
+			'selectHosts' => ['hostid'],
 			'preservekeys' => true
-		));
+		]);
 
 		if (!$srcGraphs) {
-			return array();
+			return [];
 		}
 
-		$srcItemIds = array();
+		$srcItemIds = [];
 		foreach ($srcGraphs as $key => $graph) {
 			// skip graphs with items from multiple hosts
 			if (count($graph['hosts']) > 1) {
@@ -1104,33 +1110,33 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		// fetch source items
-		$items = API::Item()->get(array(
+		$items = API::Item()->get([
 			'itemids' => $srcItemIds,
-			'output' => array('itemid', 'key_'),
+			'output' => ['itemid', 'key_'],
 			'preservekeys' => true,
-			'filter' => array('flags' => null)
-		));
+			'filter' => ['flags' => null]
+		]);
 
-		$srcItems = array();
-		$itemKeys = array();
+		$srcItems = [];
+		$itemKeys = [];
 		foreach ($items as $item) {
 			$srcItems[$item['itemid']] = $item;
 			$itemKeys[$item['key_']] = $item['key_'];
 		}
 
 		// fetch newly cloned items
-		$newItems = API::Item()->get(array(
+		$newItems = API::Item()->get([
 			'hostids' => $dstDiscovery['hostid'],
-			'filter' => array(
+			'filter' => [
 				'key_' => $itemKeys,
 				'flags' => null
-			),
-			'output' => array('itemid', 'key_'),
+			],
+			'output' => ['itemid', 'key_'],
 			'preservekeys' => true
-		));
+		]);
 
 		$items = array_merge($dstDiscovery['items'], $newItems);
-		$dstItems = array();
+		$dstItems = [];
 		foreach ($items as $item) {
 			$dstItems[$item['key_']] = $item;
 		}
@@ -1180,17 +1186,17 @@ class CDiscoveryRule extends CItemGeneral {
 	 * @return array
 	 */
 	protected function copyHostPrototypes(array $srcDiscovery, array $dstDiscovery) {
-		$prototypes = API::HostPrototype()->get(array(
+		$prototypes = API::HostPrototype()->get([
 			'discoveryids' => $srcDiscovery['itemid'],
-			'output' => array('host', 'name', 'status'),
-			'selectGroupLinks' => array('groupid'),
-			'selectGroupPrototypes' => array('name'),
-			'selectInventory' => array('inventory_mode'),
-			'selectTemplates' => array('templateid'),
+			'output' => ['host', 'name', 'status'],
+			'selectGroupLinks' => ['groupid'],
+			'selectGroupPrototypes' => ['name'],
+			'selectInventory' => ['inventory_mode'],
+			'selectTemplates' => ['templateid'],
 			'preservekeys' => true
-		));
+		]);
 
-		$rs = array();
+		$rs = [];
 		if ($prototypes) {
 			foreach ($prototypes as &$prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
@@ -1253,21 +1259,21 @@ class CDiscoveryRule extends CItemGeneral {
 		if (!is_null($options['selectItems'])) {
 			if ($options['selectItems'] != API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'itemid', 'item_discovery');
-				$items = API::ItemPrototype()->get(array(
+				$items = API::ItemPrototype()->get([
 					'output' => $options['selectItems'],
 					'itemids' => $relationMap->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 				$result = $relationMap->mapMany($result, $items, 'items', $options['limitSelects']);
 			}
 			else {
-				$items = API::ItemPrototype()->get(array(
+				$items = API::ItemPrototype()->get([
 					'discoveryids' => $itemIds,
 					'nopermissions' => true,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 
 				$items = zbx_toHash($items, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -1291,19 +1297,19 @@ class CDiscoveryRule extends CItemGeneral {
 					$relationMap->addRelation($relation['parent_itemid'], $relation['triggerid']);
 				}
 
-				$triggers = API::TriggerPrototype()->get(array(
+				$triggers = API::TriggerPrototype()->get([
 					'output' => $options['selectTriggers'],
 					'triggerids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
-				));
+				]);
 				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
-				$triggers = API::TriggerPrototype()->get(array(
+				$triggers = API::TriggerPrototype()->get([
 					'discoveryids' => $itemIds,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 
 				$triggers = zbx_toHash($triggers, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -1327,19 +1333,19 @@ class CDiscoveryRule extends CItemGeneral {
 					$relationMap->addRelation($relation['parent_itemid'], $relation['graphid']);
 				}
 
-				$graphs = API::GraphPrototype()->get(array(
+				$graphs = API::GraphPrototype()->get([
 					'output' => $options['selectGraphs'],
 					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
-				));
+				]);
 				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
-				$graphs = API::GraphPrototype()->get(array(
+				$graphs = API::GraphPrototype()->get([
 					'discoveryids' => $itemIds,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 
 				$graphs = zbx_toHash($graphs, 'parent_itemid');
 				foreach ($result as $itemid => $item) {
@@ -1352,21 +1358,21 @@ class CDiscoveryRule extends CItemGeneral {
 		if ($options['selectHostPrototypes'] !== null) {
 			if ($options['selectHostPrototypes'] != API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'parent_itemid', 'hostid', 'host_discovery');
-				$hostPrototypes = API::HostPrototype()->get(array(
+				$hostPrototypes = API::HostPrototype()->get([
 					'output' => $options['selectHostPrototypes'],
 					'hostids' => $relationMap->getRelatedIds(),
 					'nopermissions' => true,
 					'preservekeys' => true
-				));
+				]);
 				$result = $relationMap->mapMany($result, $hostPrototypes, 'hostPrototypes', $options['limitSelects']);
 			}
 			else {
-				$hostPrototypes = API::HostPrototype()->get(array(
+				$hostPrototypes = API::HostPrototype()->get([
 					'discoveryids' => $itemIds,
 					'nopermissions' => true,
 					'countOutput' => true,
 					'groupCount' => true
-				));
+				]);
 				$hostPrototypes = zbx_toHash($hostPrototypes, 'parent_itemid');
 
 				foreach ($result as $itemid => $item) {
@@ -1380,22 +1386,22 @@ class CDiscoveryRule extends CItemGeneral {
 			$evalFormulaRequested = $this->outputIsRequested('eval_formula', $options['selectFilter']);
 			$conditionsRequested = $this->outputIsRequested('conditions', $options['selectFilter']);
 
-			$filters = array();
+			$filters = [];
 			foreach ($result as $rule) {
-				$filters[$rule['itemid']] = array(
+				$filters[$rule['itemid']] = [
 					'evaltype' => $rule['evaltype'],
 					'formula' => isset($rule['formula']) ? $rule['formula'] : ''
-				);
+				];
 			}
 
 			// adding conditions
 			if ($formulaRequested || $evalFormulaRequested || $conditionsRequested) {
-				$conditions = API::getApiService()->select('item_condition', array(
-					'output' => array('item_conditionid', 'macro', 'value', 'itemid', 'operator'),
-					'filter' => array('itemid' => $itemIds),
+				$conditions = API::getApiService()->select('item_condition', [
+					'output' => ['item_conditionid', 'macro', 'value', 'itemid', 'operator'],
+					'filter' => ['itemid' => $itemIds],
 					'preservekeys' => true,
 					'sortfield' => 'item_conditionid'
-				));
+				]);
 				$relationMap = $this->createRelationMap($conditions, 'itemid', 'item_conditionid');
 
 				$filters = $relationMap->mapMany($filters, $conditions, 'conditions');
@@ -1411,7 +1417,7 @@ class CDiscoveryRule extends CItemGeneral {
 						$conditions = zbx_toHash($filter['conditions'], 'item_conditionid');
 						$conditions = order_macros($conditions, 'macro');
 
-						$formulaConditions = array();
+						$formulaConditions = [];
 						foreach ($conditions as $condition) {
 							$formulaConditions[$condition['item_conditionid']] = $condition['macro'];
 						}

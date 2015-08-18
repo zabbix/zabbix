@@ -38,11 +38,11 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->assertElementPresent('configDropDown');
 		$this->assertElementPresent('form');
 		$this->zbxTestCheckTitle('Configuration of images');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF IMAGES', 'Images', 'Type']);
 		$this->assertElementPresent('imagetype');
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 		$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
-		$this->zbxTestTextPresent(array($icon_name['name']));
+		$this->zbxTestTextPresent([$icon_name['name']]);
 	}
 
 	/**
@@ -53,7 +53,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$BgImagesCount = DBdata('SELECT count(name) FROM images WHERE imagetype=2 ORDER BY imageid');
 
 		if ($BgImagesCount==0) {
-				$this->zbxTestTextPresent(array('No images defined.'));
+				$this->zbxTestTextPresent(['No images defined.']);
 		}
 		else {
 				$this->zbxTestLogin('adm.images.php');
@@ -61,7 +61,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 				$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 				$this->assertElementPresent('form');
 				$this->zbxTestCheckTitle('Configuration of Zabbix');
-				$this->zbxTestTextPresent(array('CONFIGURATION OF IMAGES', 'Images', 'Type'));
+				$this->zbxTestTextPresent(['CONFIGURATION OF IMAGES', 'Images', 'Type']);
 				$this->assertElementPresent('imagetype');
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Icon']");
 				$this->assertElementPresent("//select[@id='imagetype']/option[text()='Background']");
@@ -81,7 +81,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->assertElementPresent('form');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Icon');
 		$this->zbxTestClickWait('link='.$icon_name['name']);
-		$this->zbxTestTextPresent(array('Name', 'Type', 'Upload', 'Image'));
+		$this->zbxTestTextPresent(['Name', 'Type', 'Upload', 'Image']);
 		$this->assertElementPresent('update');
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');
@@ -104,7 +104,7 @@ class testPageAdministrationGeneralImages extends CWebTest {
 		$this->assertElementPresent('form');
 		$this->zbxTestDropdownSelectWait('imagetype', 'Background');
 		$this->zbxTestClickWait('link='.$bgimage_name['name']);
-		$this->zbxTestTextPresent(array('Name', 'Type', 'Upload', 'Image'));
+		$this->zbxTestTextPresent(['Name', 'Type', 'Upload', 'Image']);
 		$this->assertElementPresent('update');
 		$this->assertElementPresent('delete');
 		$this->assertElementPresent('cancel');

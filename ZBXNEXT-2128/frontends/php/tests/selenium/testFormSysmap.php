@@ -31,18 +31,18 @@ class testFormSysmap extends CWebTest {
 	 * @return array
 	 */
 	public static function possibleMapNames() {
-		return array(
+		return [
 			//string map name
 			//bool   operation with this name should be successful
-			array('My map name', true),
-			array('Another_map_name', true),
-			array('1 starts with a number', true),
-			array('!@#$%^&*()', true),
-			array('0', true),
+			['My map name', true],
+			['Another_map_name', true],
+			['1 starts with a number', true],
+			['!@#$%^&*()', true],
+			['0', true],
 
-			array('', false), // map with empty name
-			array('0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789', false),
-		);
+			['', false], // map with empty name
+			['0123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890123456789', false],
+		];
 	}
 
 

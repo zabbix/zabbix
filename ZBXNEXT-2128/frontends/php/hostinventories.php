@@ -25,38 +25,35 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Host inventory');
 $page['file'] = 'hostinventories.php';
-$page['hist_arg'] = array('groupid', 'hostid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
+$fields = [
+	'groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
 	// filter
-	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'filter_field' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'filter_field_value' =>	array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'filter_exact' =>		array(T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null),
-	//ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_field' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_field_value' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_exact' =>		[T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null],
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS,
+	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS,
 								IN('"name","pr_macaddress_a","pr_name","pr_os","pr_serialno_a","pr_tag","pr_type"'),
 								null
-							),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+							],
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable(array(getRequest('groupid')))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid')])) {
 	access_deny();
 }
-if (getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
+if (getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
 	access_deny();
 }
 
@@ -66,25 +63,16 @@ $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortor
 CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-if (hasRequest('filterState')) {
-	CProfile::update('web.hostinventories.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
-if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
-}
-
 $hostId = getRequest('hostid', 0);
 
 /*
  * Display
  */
 if ($hostId > 0) {
-	$data = array();
+	$data = [];
 
 	// host scripts
-	$data['hostScripts'] = API::Script()->getScriptsByHosts(array($hostId));
+	$data['hostScripts'] = API::Script()->getScriptsByHosts([$hostId]);
 
 	// inventory info
 	$data['tableTitles'] = getHostInventories();
@@ -92,8 +80,8 @@ if ($hostId > 0) {
 	$inventoryFields = array_keys($data['tableTitles']);
 
 	// overview tab
-	$data['host'] = API::Host()->get(array(
-		'output' => array('hostid', 'host', 'name', 'status', 'maintenance_status', 'description'),
+	$data['host'] = API::Host()->get([
+		'output' => ['hostid', 'host', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type', 'description'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
@@ -105,12 +93,20 @@ if ($hostId > 0) {
 		'selectHttpTests' => API_OUTPUT_COUNT,
 		'hostids' => $hostId,
 		'preservekeys' => true
-	));
+	]);
 	$data['host'] = reset($data['host']);
 	unset($data['host']['inventory']['hostid']);
 
 	// resolve macros
 	$data['host']['interfaces'] = CMacrosResolverHelper::resolveHostInterfaces($data['host']['interfaces']);
+
+	if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+		$data['maintenances'] = API::Maintenance()->get([
+			'maintenanceids' => [$data['host']['maintenanceid']],
+			'output' => ['name', 'description'],
+			'preservekeys' => true
+		]);
+	}
 
 	// get permissions
 	$userType = CWebUser::getType();
@@ -118,11 +114,11 @@ if ($hostId > 0) {
 		$data['rwHost'] = true;
 	}
 	elseif ($userType == USER_TYPE_ZABBIX_ADMIN) {
-		$rwHost = API::Host()->get(array(
-			'output' => array('hostid'),
+		$rwHost = API::Host()->get([
+			'output' => ['hostid'],
 			'hostids' => $hostId,
 			'editable' => true
-		));
+		]);
 
 		$data['rwHost'] = (bool) $rwHost;
 	}
@@ -136,20 +132,20 @@ if ($hostId > 0) {
 	$hostinventoriesView->show();
 }
 else {
-	$data = array(
+	$data = [
 		'config' => select_config(),
-		'hosts' => array(),
+		'hosts' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
-	);
+	];
 
 	// filter
-	$data['pageFilter'] = new CPageFilter(array(
-		'groups' => array(
+	$data['pageFilter'] = new CPageFilter([
+		'groups' => [
 			'real_hosts' => true
-		),
+		],
 		'groupid' => getRequest('groupid')
-	));
+	]);
 
 	/*
 	 * Filter
@@ -174,14 +170,14 @@ else {
 
 	if ($data['pageFilter']->groupsSelected) {
 		// which inventory fields we will need for displaying
-		$requiredInventoryFields = array(
+		$requiredInventoryFields = [
 			'name',
 			'type',
 			'os',
 			'serialno_a',
 			'tag',
 			'macaddress_a'
-		);
+		];
 
 		// checking if correct inventory field is specified for filter
 		$possibleInventoryFields = getHostInventories();
@@ -196,20 +192,20 @@ else {
 				$requiredInventoryFields[] = $data['filterField'];
 			}
 
-			$options = array(
-				'output' => array('hostid', 'name', 'status'),
+			$options = [
+				'output' => ['hostid', 'name', 'status'],
 				'selectInventory' => $requiredInventoryFields,
 				'withInventory' => true,
 				'selectGroups' => API_OUTPUT_EXTEND
-			);
+			];
 			if ($data['pageFilter']->groupid > 0) {
 				$options['groupids'] = $data['pageFilter']->groupid;
 			}
 
 			if ($data['filterField'] !== '' && $data['filterFieldValue'] !== '') {
-				$options['searchInventory'] = array(
-					$data['filterField'] => array($data['filterFieldValue'])
-				);
+				$options['searchInventory'] = [
+					$data['filterField'] => [$data['filterFieldValue']]
+				];
 			}
 
 			$data['hosts'] = API::Host()->get($options);
@@ -227,14 +223,14 @@ else {
 				}
 			}
 
-			$sort_fields = array(
+			$sort_fields = [
 				'pr_name' => 'name',
 				'pr_type' => 'type',
 				'pr_os' => 'os',
 				'pr_serialno_a' => 'serialno_a',
 				'pr_tag' => 'tag',
 				'pr_macaddress_a' => 'macaddress_a'
-			);
+			];
 
 			if (array_key_exists($sortField, $sort_fields)) {
 				// copying an inventory field into the upper array level for sorting
@@ -244,13 +240,22 @@ else {
 				unset($host);
 			}
 
+			$limit = $data['config']['search_limit'] + 1;
+
 			order_result($data['hosts'], $sortField, $sortOrder);
 
-			$data['hosts'] = array_slice($data['hosts'], 0, $data['config']['search_limit'] + 1);
+			if ($sortOrder == ZBX_SORT_UP) {
+				$data['hosts'] = array_slice($data['hosts'], 0, $limit);
+			}
+			else {
+				$data['hosts'] = array_slice($data['hosts'], -$limit, $limit);
+			}
+
+			order_result($data['hosts'], $sortField, $sortOrder);
 		}
 	}
 
-	$data['paging'] = getPagingLine($data['hosts']);
+	$data['paging'] = getPagingLine($data['hosts'], $sortOrder);
 
 	$hostinventoriesView = new CView('inventory.host.list', $data);
 	$hostinventoriesView->render();

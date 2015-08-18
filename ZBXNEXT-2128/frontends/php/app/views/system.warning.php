@@ -18,21 +18,20 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 **/
 
+$pageHeader = (new CPageHeader(_('Fatal error, please report to the Zabbix team')))
+	->addCssFile('styles/'.CHtml::encode($data['theme']).'.css')
+	->display();
 
-$pageHeader = new CPageHeader(_('Something wrong hapenned'));
-$pageHeader->addCssInit();
-$pageHeader->display();
+$buttons = [
+	(new CButton('back', _('Go to dashboard')))
+		->onClick('javascript: document.location = "zabbix.php?action=dashboard.view"'
+)];
 
-$messages = array();
-foreach ($data['messages'] as $message) {
-	$messages[] = $message;
-	$messages[] = BR();
-}
+echo '<body>';
 
-$warning = new CWarning(_('Fatal error, please report to Zabbix Team'), $messages);
-$warning->setButtons(new CButton('back', _('Go to dashboard'),
-	'javascript: document.location = "zabbix.php?action=dashboard.view"',
-	'button'
-));
+(new CDiv(
+	new CWarning(_('Fatal error, please report to the Zabbix team'), $data['messages'], $buttons), ZBX_STYLE_ARTICLE
+))->show();
 
-$warning->show();
+echo '</body>';
+echo '</html>';

@@ -22,8 +22,6 @@
 class CTweenBox {
 
 	public function __construct(&$form, $name, $value = null, $size = 10) {
-		zbx_add_post_js('if (IE7) $$("select option[disabled]").each(function(e) { e.setStyle({color: "gray"}); });');
-
 		$this->form = &$form;
 		$this->name = $name.'_tweenbox';
 		$this->varname = $name;
@@ -46,7 +44,7 @@ class CTweenBox {
 		return $this->name;
 	}
 
-	public function addItem($value, $caption, $selected = null, $enabled = 'yes') {
+	public function addItem($value, $caption, $selected = null, $enabled = true) {
 		if (is_null($selected)) {
 			if (is_array($this->value)) {
 				if (isset($this->value[$value])) {
@@ -66,6 +64,7 @@ class CTweenBox {
 		else {
 			$this->rbox->addItem($value, $caption, null, $enabled);
 		}
+		return $this;
 	}
 
 	public function get($caption_l = null, $caption_r = null) {
@@ -76,22 +75,25 @@ class CTweenBox {
 			$caption_r = _('Other');
 		}
 
-		$grp_tab = new CTable(null, 'tweenBoxTable');
-		$grp_tab->attr('name', $this->name);
-		$grp_tab->attr('id', zbx_formatDomId($this->name));
-		$grp_tab->setCellSpacing(0);
-		$grp_tab->setCellPadding(0);
+		$grp_tab = (new CTable())
+			->addClass('tweenBoxTable')
+			->setAttribute('name', $this->name)
+			->setId('id', zbx_formatDomId($this->name))
+			->setCellSpacing(0)
+			->setCellPadding(0);
 
 		if (!is_null($caption_l) || !is_null($caption_r)) {
-			$grp_tab->addRow(array($caption_l, SPACE, $caption_r));
+			$grp_tab->addRow([$caption_l, '', $caption_r]);
 		}
 
-		$add_btn = new CButton('add', '  &laquo;  ', null, 'button-form');
-		$add_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
-		$rmv_btn = new CButton('remove', '  &raquo;  ', null, 'button-form');
-		$rmv_btn->setAttribute('onclick', 'moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
+		$add_btn = (new CButton('add', (new CSpan())->addClass('arrow-left')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_r.'", "'.$this->id_l.'", "add");');
+		$rmv_btn = (new CButton('remove', (new CSpan())->addClass('arrow-right')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('moveListBoxSelectedItem("'.$this->form->getName().'", "'.$this->varname.'", "'.$this->id_l.'", "'.$this->id_r.'", "rmv");');
 
-		$grp_tab->addRow(array($this->lbox, new CCol(array($add_btn, BR(), $rmv_btn)), $this->rbox));
+		$grp_tab->addRow([$this->lbox, (new CCol([$add_btn, BR(), $rmv_btn]))->addClass(ZBX_STYLE_CENTER), $this->rbox]);
 		return $grp_tab;
 	}
 
@@ -104,6 +106,7 @@ class CTweenBox {
 		}
 		$tab = $this->get($caption_l, $caption_r);
 		$tab->show();
+		return $this;
 	}
 
 	public function toString() {

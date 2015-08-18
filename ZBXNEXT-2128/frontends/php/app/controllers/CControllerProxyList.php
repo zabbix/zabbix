@@ -26,11 +26,11 @@ class CControllerProxyList extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'sort' =>		'in host',
 			'sortorder' =>	'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'uncheck' =>	'in 1'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -54,26 +54,26 @@ class CControllerProxyList extends CController {
 
 		$config = select_config();
 
-		$data = array(
+		$data = [
 			'uncheck' => $this->hasInput('uncheck'),
 			'sort' => $sortField,
 			'sortorder' => $sortOrder,
-			'config' => array(
+			'config' => [
 				'max_in_table' => $config['max_in_table']
-			)
-		);
+			]
+		];
 
-		$data['proxies'] = API::Proxy()->get(array(
-			'output' => array('proxyid', 'host', 'status', 'lastaccess'),
-			'selectHosts' => array('hostid', 'name', 'status'),
+		$data['proxies'] = API::Proxy()->get([
+			'output' => ['proxyid', 'host', 'status', 'lastaccess'],
+			'selectHosts' => ['hostid', 'name', 'status'],
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 		// sorting & paging
 		order_result($data['proxies'], $sortField, $sortOrder);
-		$data['paging'] = getPagingLine($data['proxies']);
+		$data['paging'] = getPagingLine($data['proxies'], $sortOrder);
 
 		foreach ($data['proxies'] as &$proxy) {
 			order_result($proxy['hosts'], 'name');
@@ -101,13 +101,13 @@ class CControllerProxyList extends CController {
 			}
 
 			// get items
-			$items = API::Item()->get(array(
+			$items = API::Item()->get([
 				'proxyids' => $proxyIds,
 				'groupCount' => true,
 				'countOutput' => true,
 				'webitems' => true,
 				'monitored' => true
-			));
+			]);
 			foreach ($items as $item) {
 				$data['proxies'][$item['proxy_hostid']]['item_count'] = $item['rowscount'];
 			}

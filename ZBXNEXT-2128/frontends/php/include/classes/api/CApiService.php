@@ -49,34 +49,34 @@ class CApiService {
 	 *
 	 * @var array
 	 */
-	protected $sortColumns = array();
+	protected $sortColumns = [];
 
 	/**
 	 * An array of allowed get() options that are supported by all APIs.
 	 *
 	 * @var array
 	 */
-	protected $globalGetOptions = array();
+	protected $globalGetOptions = [];
 
 	/**
 	 * An array containing all of the allowed get() options for the current API.
 	 *
 	 * @var array
 	 */
-	protected $getOptions = array();
+	protected $getOptions = [];
 
 	/**
 	 * An array containing all of the error strings.
 	 *
 	 * @var array
 	 */
-	protected $errorMessages = array();
+	protected $errorMessages = [];
 
 	public function __construct() {
 		// set the PK of the table
 		$this->pk = $this->pk($this->tableName());
 
-		$this->globalGetOptions = array(
+		$this->globalGetOptions = [
 			// filter
 			'filter'				=> null,
 			'search'				=> null,
@@ -90,7 +90,7 @@ class CApiService {
 			'groupCount'			=> null,
 			'preservekeys'			=> null,
 			'limit'					=> null
-		);
+		];
 		$this->getOptions = $this->globalGetOptions;
 	}
 
@@ -274,7 +274,7 @@ class CApiService {
 	 */
 	protected function unsetExtraFields(array $objects, array $fields, $output) {
 		// find the fields that have not been requested
-		$extraFields = array();
+		$extraFields = [];
 		foreach ($fields as $field) {
 			if (!$this->outputIsRequested($field, $output)) {
 				$extraFields[] = $field;
@@ -312,10 +312,10 @@ class CApiService {
 
 		// create the map from a database table
 		if ($table) {
-			$res = DBselect(API::getApiService()->createSelectQuery($table, array(
-				'output' => array($baseField, $foreignField),
-				'filter' => array($baseField => array_keys($objects))
-			)));
+			$res = DBselect(API::getApiService()->createSelectQuery($table, [
+				'output' => [$baseField, $foreignField],
+				'filter' => [$baseField => array_keys($objects)]
+			]));
 			while ($relation = DBfetch($res)) {
 				$relationMap->addRelation($relation[$baseField], $relation[$foreignField]);
 			}
@@ -350,7 +350,7 @@ class CApiService {
 		$objects = DBfetchArray(DBSelect($sql, $limit));
 
 		if (isset($options['preservekeys'])) {
-			$rs = array();
+			$rs = [];
 			foreach ($objects as $object) {
 				$rs[$object[$this->pk($tableName)]] = $object;
 			}
@@ -389,14 +389,14 @@ class CApiService {
 		// extend default options
 		$options = zbx_array_merge($this->globalGetOptions, $options);
 
-		$sqlParts = array(
-			'select' => array($this->fieldId($this->pk($tableName), $tableAlias)),
-			'from' => array($this->tableId($tableName, $tableAlias)),
-			'where' => array(),
-			'group' => array(),
-			'order' => array(),
+		$sqlParts = [
+			'select' => [$this->fieldId($this->pk($tableName), $tableAlias)],
+			'from' => [$this->tableId($tableName, $tableAlias)],
+			'where' => [],
+			'group' => [],
+			'order' => [],
 			'limit' => null
-		);
+		];
 
 		// add filter options
 		$sqlParts = $this->applyQueryFilterOptions($tableName, $tableAlias, $options, $sqlParts);
@@ -447,7 +447,7 @@ class CApiService {
 
 		// count
 		if (isset($options['countOutput']) && !$this->requiresPostSqlFiltering($options)) {
-			$sqlParts['select'] = array('COUNT(DISTINCT '.$pkFieldId.') AS rowscount');
+			$sqlParts['select'] = ['COUNT(DISTINCT '.$pkFieldId.') AS rowscount'];
 
 			// select columns used by group count
 			if (isset($options['groupCount'])) {
@@ -459,7 +459,7 @@ class CApiService {
 		// custom output
 		elseif (is_array($options['output'])) {
 			// the pk field must always be included for the API to work properly
-			$sqlParts['select'] = array($pkFieldId);
+			$sqlParts['select'] = [$pkFieldId];
 			foreach ($options['output'] as $field) {
 				if ($this->hasField($field, $tableName)) {
 					$sqlParts['select'][] = $this->fieldId($field, $tableAlias);
@@ -525,7 +525,7 @@ class CApiService {
 		if ($this->sortColumns && !zbx_empty($options['sortfield'])) {
 			$options['sortfield'] = is_array($options['sortfield'])
 				? array_unique($options['sortfield'])
-				: array($options['sortfield']);
+				: [$options['sortfield']];
 
 			foreach ($options['sortfield'] as $i => $sortfield) {
 				// validate sortfield
@@ -586,7 +586,7 @@ class CApiService {
 	 */
 	protected function addQuerySelect($fieldId, array $sqlParts) {
 		if (!isset($sqlParts['select'])) {
-			return array('select' => array($fieldId));
+			return ['select' => [$fieldId]];
 		}
 
 		list($tableAlias, $field) = explode('.', $fieldId);
@@ -649,9 +649,9 @@ class CApiService {
 	 * @param array $ids
 	 */
 	protected function deleteByIds(array $ids) {
-		DB::delete($this->tableName(), array(
+		DB::delete($this->tableName(), [
 			$this->pk() => $ids
-		));
+		]);
 	}
 
 	/**
@@ -664,16 +664,18 @@ class CApiService {
 	 * @return array
 	 */
 	protected function extendObjects($tableName, array $objects, array $fields) {
-		$dbObjects = API::getApiService()->select($tableName, array(
-			'output' => $fields,
-			$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
-			'preservekeys' => true
-		));
+		if ($objects) {
+			$dbObjects = API::getApiService()->select($tableName, [
+				'output' => $fields,
+				$this->pkOption($tableName) => zbx_objectValues($objects, $this->pk($tableName)),
+				'preservekeys' => true
+			]);
 
-		foreach ($objects as &$object) {
-			$pk = $object[$this->pk($tableName)];
-			if (isset($dbObjects[$pk])) {
-				check_db_fields($dbObjects[$pk], $object);
+			foreach ($objects as &$object) {
+				$pk = $object[$this->pk($tableName)];
+				if (isset($dbObjects[$pk])) {
+					check_db_fields($dbObjects[$pk], $object);
+				}
 			}
 		}
 
@@ -692,7 +694,7 @@ class CApiService {
 	 * @return mixed
 	 */
 	protected function extendObject($tableName, array $object, array $fields) {
-		$objects = $this->extendObjects($tableName, array($object), $fields);
+		$objects = $this->extendObjects($tableName, [$object], $fields);
 
 		return reset($objects);
 	}
@@ -731,13 +733,13 @@ class CApiService {
 	 * @param $messageInvalid	error message if the ID is invalid
 	 */
 	protected function checkObjectIds(array $objects, $idField, $messageRequired, $messageEmpty, $messageInvalid) {
-		$idValidator = new CIdValidator(array(
+		$idValidator = new CIdValidator([
 			'messageEmpty' => $messageEmpty,
 			'messageInvalid' => $messageInvalid
-		));
+		]);
 		foreach ($objects as $object) {
 			if (!isset($object[$idField])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _params($messageRequired, array($idField)));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _params($messageRequired, [$idField]));
 			}
 
 			$this->checkValidator($object[$idField], $idValidator);
@@ -755,7 +757,7 @@ class CApiService {
 	 *
 	 * @throws APIException
 	 */
-	protected function checkUnsupportedFields($tableName, array $object, $error, array $extraFields = array()) {
+	protected function checkUnsupportedFields($tableName, array $object, $error, array $extraFields = []) {
 		$extraFields = array_flip($extraFields);
 
 		foreach ($object as $field => $value) {
@@ -783,7 +785,7 @@ class CApiService {
 	protected function checkNoParameters(array $object, array $params, $error, $objectName) {
 		foreach ($params as $param) {
 			if (array_key_exists($param, $object)) {
-				$error = _params($error, array($param, $objectName));
+				$error = _params($error, [$param, $objectName]);
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
 		}
@@ -825,7 +827,7 @@ class CApiService {
 
 		$tableSchema = DB::getSchema($table);
 
-		$filter = array();
+		$filter = [];
 		foreach ($options['filter'] as $field => $value) {
 			// skip missing fields and text fields (not supported by Oracle)
 			// skip empty values
@@ -929,7 +931,7 @@ class CApiService {
 	 * @param CPartialValidatorInterface $validator
 	 * @param array $fullArray
 	 */
-	protected function checkPartialValidator(array $array, CPartialValidatorInterface $validator, $fullArray = array()) {
+	protected function checkPartialValidator(array $array, CPartialValidatorInterface $validator, $fullArray = []) {
 		if (!$validator->validatePartial($array, $fullArray)) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $validator->getError());
 		}
@@ -977,7 +979,7 @@ class CApiService {
 			// we use $minLimit for setting minimum limit twice as big for each consecutive query to not run in lots
 			// of queries for some cases
 			$minLimit = $limit;
-			$allElements = array();
+			$allElements = [];
 
 			do {
 				// fetch group of elements

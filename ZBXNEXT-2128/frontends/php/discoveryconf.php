@@ -25,59 +25,58 @@ require_once dirname(__FILE__).'/include/discovery.inc.php';
 
 $page['title'] = _('Configuration of discovery rules');
 $page['file'] = 'discoveryconf.php';
-$page['hist_arg'] = array();
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'druleid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'),
-	'name' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})'),
-	'proxy_hostid' =>	array(T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({add}) || isset({update})'),
-	'iprange' =>		array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'delay' =>			array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, SEC_PER_WEEK), 'isset({add}) || isset({update})'),
-	'status' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'uniqueness_criteria' => array(T_ZBX_STR, O_OPT, null, null,	'isset({add}) || isset({update})', _('Device uniqueness criteria')),
-	'g_druleid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'dchecks' =>		array(null, O_OPT, null,		null,		null),
+$fields = [
+	'druleid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({form}) && {form} == "update"'],
+	'name' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})'],
+	'proxy_hostid' =>	[T_ZBX_INT, O_OPT, null,	DB_ID,		'isset({add}) || isset({update})'],
+	'iprange' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'delay' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(1, SEC_PER_WEEK), 'isset({add}) || isset({update})'],
+	'status' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'uniqueness_criteria' => [T_ZBX_STR, O_OPT, null, null,	'isset({add}) || isset({update})', _('Device uniqueness criteria')],
+	'g_druleid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'dchecks' =>		[null, O_OPT, null,		null,		null],
 	// actions
-	'action' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 							IN('"drule.massdelete","drule.massdisable","drule.massenable"'),
 							null
-						),
-	'add' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'update' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'output' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'ajaxaction' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'ajaxdata' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+						],
+	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'output' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'ajaxaction' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'ajaxdata' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	// sort and sortorder
-	'sort' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null),
-	'sortorder' =>		array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
+	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 check_fields($fields);
 
 $_REQUEST['status'] = isset($_REQUEST['status']) ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
-$_REQUEST['dchecks'] = getRequest('dchecks', array());
+$_REQUEST['dchecks'] = getRequest('dchecks', []);
 
 /*
  * Permissions
  */
 if (isset($_REQUEST['druleid'])) {
-	$dbDRule = API::DRule()->get(array(
+	$dbDRule = API::DRule()->get([
 		'druleids' => getRequest('druleid'),
-		'output' => array('name', 'proxy_hostid', 'iprange', 'delay', 'status'),
-		'selectDChecks' => array(
+		'output' => ['name', 'proxy_hostid', 'iprange', 'delay', 'status'],
+		'selectDChecks' => [
 			'type', 'key_', 'snmp_community', 'ports', 'snmpv3_securityname', 'snmpv3_securitylevel',
 			'snmpv3_authpassphrase', 'snmpv3_privpassphrase', 'uniq', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
 			'snmpv3_contextname'
-		),
+		],
 		'editable' => true
-	));
+	]);
 	if (empty($dbDRule)) {
 		access_deny();
 	}
@@ -88,7 +87,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse = new CAjaxResponse;
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'validate') {
-		$ajaxData = getRequest('ajaxdata', array());
+		$ajaxData = getRequest('ajaxdata', []);
 
 		foreach ($ajaxData as $check) {
 			switch ($check['field']) {
@@ -118,7 +117,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
  * Action
  */
 if (hasRequest('add') || hasRequest('update')) {
-	$dChecks = getRequest('dchecks', array());
+	$dChecks = getRequest('dchecks', []);
 	$uniq = getRequest('uniqueness_criteria', 0);
 
 	foreach ($dChecks as $dcnum => $check) {
@@ -129,14 +128,14 @@ if (hasRequest('add') || hasRequest('update')) {
 		$dChecks[$dcnum]['uniq'] = ($uniq == $dcnum) ? 1 : 0;
 	}
 
-	$discoveryRule = array(
+	$discoveryRule = [
 		'name' => getRequest('name'),
 		'proxy_hostid' => getRequest('proxy_hostid'),
 		'iprange' => getRequest('iprange'),
 		'delay' => getRequest('delay'),
 		'status' => getRequest('status'),
 		'dchecks' => $dChecks
-	);
+	];
 
 	DBStart();
 
@@ -170,7 +169,7 @@ if (hasRequest('add') || hasRequest('update')) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
-	$result = API::DRule()->delete(array($_REQUEST['druleid']));
+	$result = API::DRule()->delete([$_REQUEST['druleid']]);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['druleid']);
@@ -178,7 +177,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['druleid'])) {
 	}
 	show_messages($result, _('Discovery rule deleted'), _('Cannot delete discovery rule'));
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('drule.massenable', 'drule.massdisable')) && hasRequest('g_druleid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), ['drule.massenable', 'drule.massdisable']) && hasRequest('g_druleid')) {
 	$result = true;
 	$enable = (getRequest('action') == 'drule.massenable');
 	$status = $enable ? DRULE_STATUS_ACTIVE : DRULE_STATUS_DISABLED;
@@ -225,12 +224,12 @@ elseif (hasRequest('action') && getRequest('action') == 'drule.massdelete' && ha
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$data = array(
+	$data = [
 		'druleid' => getRequest('druleid'),
-		'drule' => array(),
+		'drule' => [],
 		'form' => getRequest('form'),
 		'form_refresh' => getRequest('form_refresh', 0)
-	);
+	];
 
 	// get drule
 	if (isset($data['druleid']) && !isset($_REQUEST['form_refresh'])) {
@@ -251,7 +250,7 @@ if (isset($_REQUEST['form'])) {
 		$data['drule']['iprange'] = getRequest('iprange', '192.168.0.1-254');
 		$data['drule']['delay'] = getRequest('delay', SEC_PER_HOUR);
 		$data['drule']['status'] = getRequest('status', DRULE_STATUS_ACTIVE);
-		$data['drule']['dchecks'] = getRequest('dchecks', array());
+		$data['drule']['dchecks'] = getRequest('dchecks', []);
 		$data['drule']['nextcheck'] = getRequest('nextcheck', 0);
 		$data['drule']['uniqueness_criteria'] = getRequest('uniqueness_criteria', -1);
 	}
@@ -269,9 +268,9 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	// get proxies
-	$data['proxies'] = API::Proxy()->get(array(
+	$data['proxies'] = API::Proxy()->get([
 		'output' => API_OUTPUT_EXTEND
-	));
+	]);
 	order_result($data['proxies'], 'host');
 
 	// render view
@@ -286,22 +285,26 @@ else {
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-	$data = array(
+	$config = select_config();
+
+	$data = [
 		'sort' => $sortField,
 		'sortorder' => $sortOrder
-	);
+	];
 
 	// get drules
-	$data['drules'] = API::DRule()->get(array(
-		'output' => array('proxy_hostid', 'name', 'status', 'iprange', 'delay'),
-		'selectDChecks' => array('type'),
-		'editable' => true
-	));
+	$data['drules'] = API::DRule()->get([
+		'output' => ['proxy_hostid', 'name', 'status', 'iprange', 'delay'],
+		'selectDChecks' => ['type'],
+		'editable' => true,
+		'sortfield' => $sortField,
+		'limit' => $config['search_limit'] + 1
+	]);
 
 	if ($data['drules']) {
 		foreach ($data['drules'] as $key => $drule) {
 			// checks
-			$checks = array();
+			$checks = [];
 
 			foreach ($drule['dchecks'] as $check) {
 				$checks[$check['type']] = discovery_check_type2str($check['type']);
@@ -312,7 +315,7 @@ else {
 			$data['drules'][$key]['checks'] = $checks;
 
 			// description
-			$data['drules'][$key]['description'] = array();
+			$data['drules'][$key]['description'] = [];
 
 			if ($drule['proxy_hostid']) {
 				$proxy = get_host_by_hostid($drule['proxy_hostid']);
@@ -325,7 +328,7 @@ else {
 	}
 
 	// get paging
-	$data['paging'] = getPagingLine($data['drules']);
+	$data['paging'] = getPagingLine($data['drules'], $sortOrder);
 
 	// render view
 	$discoveryView = new CView('configuration.discovery.list', $data);

@@ -28,7 +28,7 @@ class CHttpTest extends CApiService {
 
 	protected $tableName = 'httptest';
 	protected $tableAlias = 'ht';
-	protected $sortColumns = array('httptestid', 'name');
+	protected $sortColumns = ['httptestid', 'name'];
 
 	/**
 	 * Get data about web scenarios.
@@ -37,21 +37,21 @@ class CHttpTest extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('httptests' => 'ht.httptestid'),
-			'from'		=> array('httptest' => 'httptest ht'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['httptests' => 'ht.httptestid'],
+			'from'		=> ['httptest' => 'httptest ht'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'httptestids'    => null,
 			'applicationids' => null,
 			'hostids'        => null,
@@ -80,7 +80,7 @@ class CHttpTest extends CApiService {
 			'sortfield'      => '',
 			'sortorder'      => '',
 			'limit'          => null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
@@ -236,7 +236,7 @@ class CHttpTest extends CApiService {
 				$result = resolveHttpTestMacros($result, $expandName, $expandStepName);
 			}
 
-			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -263,10 +263,10 @@ class CHttpTest extends CApiService {
 
 		// Check and set default values, and find "hostid" by "applicationid".
 		foreach ($httpTests as &$httpTest) {
-			$defaultValues = array(
+			$defaultValues = [
 				'verify_peer' => HTTPTEST_VERIFY_PEER_OFF,
 				'verify_host' => HTTPTEST_VERIFY_HOST_OFF
-			);
+			];
 
 			check_db_fields($defaultValues, $httpTest);
 		}
@@ -276,7 +276,7 @@ class CHttpTest extends CApiService {
 
 		$httpTests = Manager::HttpTest()->persist($httpTests);
 
-		return array('httptestids' => zbx_objectValues($httpTests, 'httptestid'));
+		return ['httptestids' => zbx_objectValues($httpTests, 'httptestid')];
 	}
 
 	/**
@@ -301,7 +301,7 @@ class CHttpTest extends CApiService {
 
 		$httpTests = zbx_toHash($httpTests, 'httptestid');
 
-		$dbHttpTests = array();
+		$dbHttpTests = [];
 		$dbCursor = DBselect(
 			'SELECT ht.httptestid,ht.hostid,ht.templateid,ht.name,'.
 				'ht.ssl_cert_file,ht.ssl_key_file,ht.ssl_key_password,ht.verify_peer,ht.verify_host'.
@@ -325,7 +325,7 @@ class CHttpTest extends CApiService {
 
 		Manager::HttpTest()->persist($httpTests);
 
-		return array('httptestids' => array_keys($httpTests));
+		return ['httptestids' => array_keys($httpTests)];
 	}
 
 	/**
@@ -341,13 +341,13 @@ class CHttpTest extends CApiService {
 			return true;
 		}
 
-		$delHttpTests = $this->get(array(
+		$delHttpTests = $this->get([
 			'httptestids' => $httpTestIds,
 			'output' => API_OUTPUT_EXTEND,
 			'editable' => true,
 			'selectHosts' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
-		));
+		]);
 		if (!$nopermissions) {
 			foreach ($httpTestIds as $httpTestId) {
 				if (!empty($delHttpTests[$httpTestId]['templateid'])) {
@@ -360,28 +360,28 @@ class CHttpTest extends CApiService {
 		}
 
 		$parentHttpTestIds = $httpTestIds;
-		$childHttpTestIds = array();
+		$childHttpTestIds = [];
 		do {
 			$dbTests = DBselect('SELECT ht.httptestid FROM httptest ht WHERE '.dbConditionInt('ht.templateid', $parentHttpTestIds));
-			$parentHttpTestIds = array();
+			$parentHttpTestIds = [];
 			while ($dbTest = DBfetch($dbTests)) {
 				$parentHttpTestIds[] = $dbTest['httptestid'];
 				$childHttpTestIds[$dbTest['httptestid']] = $dbTest['httptestid'];
 			}
 		} while (!empty($parentHttpTestIds));
 
-		$options = array(
+		$options = [
 			'httptestids' => $childHttpTestIds,
 			'output' => API_OUTPUT_EXTEND,
 			'nopermissions' => true,
 			'preservekeys' => true,
 			'selectHosts' => API_OUTPUT_EXTEND
-		);
+		];
 		$delHttpTestChilds = $this->get($options);
 		$delHttpTests = zbx_array_merge($delHttpTests, $delHttpTestChilds);
 		$httpTestIds = array_merge($httpTestIds, $childHttpTestIds);
 
-		$itemidsDel = array();
+		$itemidsDel = [];
 		$dbTestItems = DBselect(
 			'SELECT hsi.itemid'.
 			' FROM httptestitem hsi'.
@@ -405,7 +405,7 @@ class CHttpTest extends CApiService {
 			API::Item()->delete($itemidsDel, true);
 		}
 
-		DB::delete('httptest', array('httptestid' => $httpTestIds));
+		DB::delete('httptest', ['httptestid' => $httpTestIds]);
 
 		// TODO: REMOVE
 		foreach ($delHttpTests as $httpTest) {
@@ -418,7 +418,7 @@ class CHttpTest extends CApiService {
 			);
 		}
 
-		return array('httptestids' => $httpTestIds);
+		return ['httptestids' => $httpTestIds];
 	}
 
 	/**
@@ -430,7 +430,7 @@ class CHttpTest extends CApiService {
 	 */
 	protected function validateCreate(array $httpTests) {
 		foreach ($httpTests as $httpTest) {
-			$missingKeys = checkRequiredKeys($httpTest, array('name', 'hostid', 'steps'));
+			$missingKeys = checkRequiredKeys($httpTest, ['name', 'hostid', 'steps']);
 			if (!empty($missingKeys)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario missing parameters: %1$s', implode(', ', $missingKeys)));
 			}
@@ -457,11 +457,11 @@ class CHttpTest extends CApiService {
 		}
 
 		// check input array for duplicate names
-		$collectionValidator = new CCollectionValidator(array(
+		$collectionValidator = new CCollectionValidator([
 			'uniqueField' => 'name',
 			'uniqueField2' => 'hostid',
 			'messageDuplicate' => _('Web scenario "%1$s" already exists.')
-		));
+		]);
 		$this->checkValidator($httpTests, $collectionValidator);
 
 		// check database for duplicate names
@@ -487,9 +487,9 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$httpTests = $this->extendFromObjects($httpTests, $dbHttpTests, array(
+		$httpTests = $this->extendFromObjects($httpTests, $dbHttpTests, [
 			'ssl_key_file', 'ssl_cert_file', 'ssl_key_password', 'verify_host', 'verify_peer'
-		));
+		]);
 
 		foreach ($httpTests as &$httpTest) {
 			$dbHttpTest = $dbHttpTests[$httpTest['httptestid']];
@@ -531,11 +531,11 @@ class CHttpTest extends CApiService {
 		unset($httpTest);
 
 		// check input array for duplicate names
-		$collectionValidator = new CCollectionValidator(array(
+		$collectionValidator = new CCollectionValidator([
 			'uniqueField' => 'name',
 			'uniqueField2' => 'hostid',
 			'messageDuplicate' => _('Web scenario "%1$s" already exists.')
-		));
+		]);
 		$this->checkValidator($httpTests, $collectionValidator);
 
 		// check database for duplicate names
@@ -554,8 +554,8 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTests		array of web screnarios
 	 * @param array $dbHttpTests	array of DB web screnarios
 	 */
-	protected function checkDuplicates(array $httpTests, array $dbHttpTests = array()) {
-		$httpTestNames = array();
+	protected function checkDuplicates(array $httpTests, array $dbHttpTests = []) {
+		$httpTestNames = [];
 
 		foreach ($httpTests as $httpTest) {
 			if (isset($httpTest['name'])) {
@@ -571,11 +571,11 @@ class CHttpTest extends CApiService {
 
 		if ($httpTestNames) {
 			foreach ($httpTestNames as $hostId => $httpTestName) {
-				$nameExists = API::getApiService()->select($this->tableName(), array(
-					'output' => array('name'),
-					'filter' => array('name' => $httpTestName, 'hostid' => $hostId),
+				$nameExists = API::getApiService()->select($this->tableName(), [
+					'output' => ['name'],
+					'filter' => ['name' => $httpTestName, 'hostid' => $hostId],
 					'limit' => 1
-				));
+				]);
 
 				if ($nameExists) {
 					$nameExists = reset($nameExists);
@@ -593,27 +593,42 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTests
 	 */
 	protected function checkApplicationHost(array $httpTests) {
-		$appIds = zbx_objectValues($httpTests, 'applicationid');
-		$appIds = zbx_toHash($appIds);
-		unset($appIds['0']);
+		// applications containing 0 in ID, will be removed from web scenario
+		foreach ($httpTests as $httpTestId => $httpTest) {
+			if (array_key_exists('applicationid', $httpTest) && $httpTest['applicationid'] == 0) {
+				unset($httpTests[$httpTestId]);
+			}
+		}
 
-		if (!empty($appIds)) {
-			$appHostIds = array();
+		$applicationids = zbx_objectValues($httpTests, 'applicationid');
 
-			$dbCursor = DBselect(
-				'SELECT a.hostid,a.applicationid'.
-				' FROM applications a'.
-				' WHERE '.dbConditionInt('a.applicationid', $appIds)
-			);
-			while ($dbApp = DBfetch($dbCursor)) {
-				$appHostIds[$dbApp['applicationid']] = $dbApp['hostid'];
+		if ($applicationids) {
+			$applications = API::getApiService()->select('applications', [
+				'output' => ['applicationid', 'hostid', 'name', 'flags'],
+				'applicationids' => $applicationids,
+				'preservekeys' => true
+			]);
+
+			// check if applications exist and are normal applications
+			foreach ($applicationids as $applicationid) {
+				if (!array_key_exists($applicationid, $applications)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+				elseif ($applications[$applicationid]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a discovered application "%1$s" to a web scenario.',
+						$applications[$applicationid]['name']
+					));
+				}
 			}
 
 			foreach ($httpTests as $httpTest) {
-				if (isset($httpTest['applicationid'])) {
-					if (!idcmp($appHostIds[$httpTest['applicationid']], $httpTest['hostid'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('The web scenario application belongs to a different host than the web scenario host.'));
-					}
+				if (!idcmp($applications[$httpTest['applicationid']]['hostid'], $httpTest['hostid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('The web scenario application belongs to a different host than the web scenario host.')
+					);
 				}
 			}
 		}
@@ -629,7 +644,7 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTest
 	 * @param array $dbHttpTest
 	 */
-	protected function checkSteps(array $httpTest, array $dbHttpTest = array()) {
+	protected function checkSteps(array $httpTest, array $dbHttpTest = []) {
 		if (array_key_exists('steps', $httpTest)
 				&& (!is_array($httpTest['steps']) || (count($httpTest['steps']) == 0))) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario must have at least one step.'));
@@ -640,14 +655,14 @@ class CHttpTest extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Web scenario step name should contain only printable characters.'));
 		}
 
-		$followRedirectsValidator = new CLimitedSetValidator(array(
-				'values' => array(HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON)
-			)
+		$followRedirectsValidator = new CLimitedSetValidator([
+				'values' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON]
+			]
 		);
 
-		$retrieveModeValidator = new CLimitedSetValidator(array(
-				'values' => array(HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS)
-			)
+		$retrieveModeValidator = new CLimitedSetValidator([
+				'values' => [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS]
+			]
 		);
 
 		foreach ($httpTest['steps'] as $step) {
@@ -709,7 +724,7 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTest
 	 * @param array $dbHttpTest
 	 */
-	protected function checkDuplicateSteps(array $httpTest, array $dbHttpTest = array()) {
+	protected function checkDuplicateSteps(array $httpTest, array $dbHttpTest = []) {
 		if ($duplicate = CArrayHelper::findDuplicate($httpTest['steps'], 'name')) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Web scenario step "%1$s" already exists.', $duplicate['name']));
 		}
@@ -766,10 +781,10 @@ class CHttpTest extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'httptestids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -788,11 +803,11 @@ class CHttpTest extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'httptestids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -818,27 +833,27 @@ class CHttpTest extends CApiService {
 		// adding hosts
 		if ($options['selectHosts'] !== null && $options['selectHosts'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'httptestid', 'hostid');
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'output' => $options['selectHosts'],
 				'hostid' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
 				'templated_hosts' => true,
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding steps
 		if ($options['selectSteps'] !== null) {
 			if ($options['selectSteps'] != API_OUTPUT_COUNT) {
-				$httpSteps = API::getApiService()->select('httpstep', array(
-					'output' => $this->outputExtend($options['selectSteps'], array('httptestid', 'httpstepid')),
-					'filters' => array('httptestid' => $httpTestIds),
+				$httpSteps = API::getApiService()->select('httpstep', [
+					'output' => $this->outputExtend($options['selectSteps'], ['httptestid', 'httpstepid']),
+					'filters' => ['httptestid' => $httpTestIds],
 					'preservekeys' => true
-				));
+				]);
 				$relationMap = $this->createRelationMap($httpSteps, 'httptestid', 'httpstepid');
 
-				$httpSteps = $this->unsetExtraFields($httpSteps, array('httptestid', 'httpstepid'), $options['selectSteps']);
+				$httpSteps = $this->unsetExtraFields($httpSteps, ['httptestid', 'httpstepid'], $options['selectSteps']);
 
 				$result = $relationMap->mapMany($result, $httpSteps, 'steps');
 			}
@@ -868,19 +883,19 @@ class CHttpTest extends CApiService {
 	protected function checkSslParameters($httpTest) {
 
 		$verifyPeerValidator = new CLimitedSetValidator(
-			array(
-				'values' => array(HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF),
+			[
+				'values' => [HTTPTEST_VERIFY_PEER_ON, HTTPTEST_VERIFY_PEER_OFF],
 				'messageInvalid' => _('Incorrect SSL verify peer value for web scenario "%1$s".')
-			)
+			]
 		);
 		$verifyPeerValidator->setObjectName($httpTest['name']);
 		$this->checkValidator($httpTest['verify_peer'], $verifyPeerValidator);
 
 		$verifyHostValidator = new CLimitedSetValidator(
-			array(
-				'values' => array(HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF),
+			[
+				'values' => [HTTPTEST_VERIFY_HOST_ON, HTTPTEST_VERIFY_HOST_OFF],
 				'messageInvalid' => _('Incorrect SSL verify host value for web scenario "%1$s".')
-			)
+			]
 		);
 
 		$verifyHostValidator->setObjectName($httpTest['name']);

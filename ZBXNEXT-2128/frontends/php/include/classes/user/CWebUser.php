@@ -37,11 +37,11 @@ class CWebUser {
 		try {
 			self::setDefault();
 
-			self::$data = API::User()->login(array(
+			self::$data = API::User()->login([
 				'user' => $login,
 				'password' => $password,
 				'userData' => true
-			));
+			]);
 
 			if (!self::$data) {
 				throw new Exception();
@@ -88,16 +88,16 @@ class CWebUser {
 	public static function checkAuthentication($sessionId) {
 		try {
 			if ($sessionId !== null) {
-				self::$data = API::User()->checkAuthentication(array($sessionId));
+				self::$data = API::User()->checkAuthentication([$sessionId]);
 			}
 
 			if ($sessionId === null || empty(self::$data)) {
 				self::setDefault();
-				self::$data = API::User()->login(array(
+				self::$data = API::User()->login([
 					'user' => ZBX_GUEST_USER,
 					'password' => '',
 					'userData' => true
-				));
+				]);
 
 				if (empty(self::$data)) {
 					clear_messages(1);
@@ -141,13 +141,13 @@ class CWebUser {
 	}
 
 	public static function setDefault() {
-		self::$data = array(
+		self::$data = [
 			'alias' => ZBX_GUEST_USER,
 			'userid' => 0,
 			'lang' => 'en_gb',
 			'type' => '0',
 			'debug_mode' => false
-		);
+		];
 	}
 
 	/**

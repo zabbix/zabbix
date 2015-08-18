@@ -35,11 +35,11 @@ class testPageUserGroups extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF USER GROUPS');
 		$this->zbxTestTextPresent('Displaying');
 		// Header
-		$this->zbxTestTextPresent(array('Name', '#', 'Members', 'Status', 'Frontend access', 'Debug mode'));
+		$this->zbxTestTextPresent(['Name', '#', 'Members', 'Status', 'Frontend access', 'Debug mode']);
 		// Data
-		$this->zbxTestTextPresent(array($group['name']));
+		$this->zbxTestTextPresent([$group['name']]);
 		$this->zbxTestDropdownHasOptions('action',
-				array('Enable selected', 'Disable selected', 'Enable DEBUG', 'Disable DEBUG', 'Delete selected'));
+				['Enable selected', 'Disable selected', 'Enable DEBUG', 'Disable DEBUG', 'Delete selected']);
 	}
 
 	/**

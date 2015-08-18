@@ -73,7 +73,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 *
 	 * @param array $screenItems
 	 */
-	protected function createSurrogateScreen(array $screenItems = array()) {
+	protected function createSurrogateScreen(array $screenItems = []) {
 		$screenId = $this->screenitem['screenitemid'].'_'.$this->screenitem['resourceid'];
 
 		foreach ($screenItems as &$screenItem) {
@@ -81,14 +81,14 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 		}
 		unset($screenItem);
 
-		$this->surrogateScreen = array(
+		$this->surrogateScreen = [
 			'screenid' => $screenId,
 			'dynamic' => $this->screenitem['dynamic'],
 			'hsize' => 0,
 			'vsize' => 0,
 			'templateid' => 0,
 			'screenitems' => $screenItems
-		);
+		];
 	}
 
 	/**
@@ -114,7 +114,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * @return CScreenBuilder
 	 */
 	protected function makeSurrogateScreenBuilder() {
-		return new CScreenBuilder(array(
+		return new CScreenBuilder([
 			'isFlickerfree' => $this->isFlickerfree,
 			'mode' => $this->mode,
 			'timestamp' => $this->timestamp,
@@ -124,7 +124,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 			'profileIdx' => $this->profileIdx,
 			'hostid' => $this->hostid,
 			'updateProfile' => false
-		));
+		]);
 	}
 
 	/**
@@ -135,7 +135,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 	 * @return array
 	 */
 	protected function getScreenItemTemplate($resourceType) {
-		return array(
+		return [
 			'resourcetype' => $resourceType,
 			'rowspan' => 1,
 			'colspan' => 1,
@@ -145,7 +145,7 @@ abstract class CScreenLldGraphBase extends CScreenBase {
 			'halign' => $this->screenitem['halign'],
 			'valign' => $this->screenitem['valign'],
 			'url' => ''
-		);
+		];
 	}
 
 	/**

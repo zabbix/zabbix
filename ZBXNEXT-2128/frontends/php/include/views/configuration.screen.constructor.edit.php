@@ -25,12 +25,10 @@ if (isset($_REQUEST['screenitemid'])) {
 }
 
 // create screen form
-$screenForm = new CForm('post', $action);
-$screenForm->setName('screen_item_form');
+$screenForm = (new CForm('post', $action))->setName('screen_item_form');
 
 // create screen form list
-$screenFormList = new CFormList('screenFormList');
-$screenFormList->addVar('screenid', $_REQUEST['screenid']);
+$screenFormList = (new CFormList())->addVar('screenid', $_REQUEST['screenid']);
 
 if (isset($_REQUEST['screenitemid'])) {
 	$screenFormList->addVar('screenitemid', $_REQUEST['screenitemid']);
@@ -78,7 +76,6 @@ else {
 }
 
 // append resource types to form list
-$resourceTypeComboBox = new CComboBox('resourcetype', $resourceType, 'submit()');
 $screenResources = screen_resources();
 if ($this->data['screen']['templateid']) {
 	unset(
@@ -90,8 +87,7 @@ if ($this->data['screen']['templateid']) {
 		$screenResources[SCREEN_RESOURCE_TRIGGERS_INFO], $screenResources[SCREEN_RESOURCE_TRIGGERS_OVERVIEW]
 	);
 }
-$resourceTypeComboBox->addItems($screenResources);
-$screenFormList->addRow(_('Resource'), $resourceTypeComboBox);
+$screenFormList->addRow(_('Resource'), new CComboBox('resourcetype', $resourceType, 'submit()', $screenResources));
 
 /*
  * Screen item: Graph
@@ -100,11 +96,11 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 	$caption = '';
 	$id = 0;
 
-	$graphs = API::Graph()->get(array(
+	$graphs = API::Graph()->get([
 		'graphids' => $resourceId,
-		'selectHosts' => array('hostid', 'name', 'status'),
+		'selectHosts' => ['hostid', 'name', 'status'],
 		'output' => API_OUTPUT_EXTEND
-	));
+	]);
 	if (!empty($graphs)) {
 		$id = $resourceId;
 		$graph = reset($graphs);
@@ -116,28 +112,27 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 	}
 
 	if ($this->data['screen']['templateid']) {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=graphs&srcfld1=graphid&srcfld2=name'.
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=graphs&srcfld1=graphid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&writeonly=1", 800, 450);',
-			'button-form'
-		);
+				'&writeonly=1");');
 	}
 	else {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=graphs&srcfld1=graphid&srcfld2=name'.
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=graphs&srcfld1=graphid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&with_graphs=1&writeonly=1", 800, 450);',
-			'button-form'
-		);
+				'&real_hosts=1&with_graphs=1&writeonly=1");');
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Graph'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+	$screenFormList->addRow(_('Graph'), [
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	), false, null, 'nowrap');
+	]);
 }
 
 /*
@@ -147,11 +142,11 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 	$caption = '';
 	$id = 0;
 
-	$graphPrototypes = API::GraphPrototype()->get(array(
-		'output' => array('name'),
+	$graphPrototypes = API::GraphPrototype()->get([
+		'output' => ['name'],
 		'graphids' => $resourceId,
-		'selectHosts' => array('name')
-	));
+		'selectHosts' => ['name']
+	]);
 
 	if ($graphPrototypes) {
 		$id = $resourceId;
@@ -164,30 +159,32 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 	}
 
 	if ($this->data['screen']['templateid']) {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=graph_prototypes&srcfld1=graphid&srcfld2=name'.
-			'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-			'&only_hostid='.$this->data['screen']['templateid'].
-			'&templated_hosts=1&writeonly=1", 800, 450);',
-			'button-form'
-		);
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=graph_prototypes&srcfld1=graphid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&only_hostid='.$this->data['screen']['templateid'].
+				'&templated_hosts=1&writeonly=1");');
 	}
 	else {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=graph_prototypes&srcfld1=graphid&srcfld2=name'.
-			'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-			'&real_hosts=1&writeonly=1", 800, 450);',
-			'button-form'
-		);
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=graph_prototypes&srcfld1=graphid&srcfld2=name'.
+				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
+				'&real_hosts=1&writeonly=1");');
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Graph prototype'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+	$screenFormList->addRow(_('Graph prototype'), [
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	), false, null, 'nowrap');
+	]);
 
-	$screenFormList->addRow(_('Max columns'), new CNumericBox('max_columns', $maxColumns, 3, false, false, false));
+	$screenFormList->addRow(_('Max columns'),
+		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 }
 
 /*
@@ -197,11 +194,11 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	$caption = '';
 	$id = 0;
 
-	$items = API::Item()->get(array(
+	$items = API::Item()->get([
 		'itemids' => $resourceId,
-		'selectHosts' => array('name'),
-		'output' => array('itemid', 'hostid', 'key_', 'name')
-	));
+		'selectHosts' => ['name'],
+		'output' => ['itemid', 'hostid', 'key_', 'name']
+	]);
 
 	if ($items) {
 		$items = CMacrosResolverHelper::resolveItemNames($items);
@@ -214,28 +211,27 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 	}
 
 	if ($this->data['screen']['templateid']) {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&writeonly=1&numeric=1", 800, 450);',
-			'button-form'
-		);
+				'&writeonly=1&numeric=1");');
 	}
 	else {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&with_simple_graph_items=1&writeonly=1&numeric=1", 800, 450);',
-			'button-form'
-		);
+				'&real_hosts=1&with_simple_graph_items=1&writeonly=1&numeric=1");');
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Item'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+	$screenFormList->addRow(_('Item'), [
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	), false, null, 'nowrap');
+	]);
 }
 
 /*
@@ -245,11 +241,11 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 	$caption = '';
 	$id = 0;
 
-	$items = API::ItemPrototype()->get(array(
-		'output' => array('hostid', 'key_', 'name'),
+	$items = API::ItemPrototype()->get([
+		'output' => ['hostid', 'key_', 'name'],
 		'itemids' => $resourceId,
-		'selectHosts' => array('name')
-	));
+		'selectHosts' => ['name']
+	]);
 
 	if ($items) {
 		$items = CMacrosResolverHelper::resolveItemNames($items);
@@ -262,30 +258,32 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 	}
 
 	if ($this->data['screen']['templateid']) {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&writeonly=1&numeric=1", 800, 450);',
-			'button-form'
-		);
+				'&writeonly=1&numeric=1");');
 	}
 	else {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=item_prototypes&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&real_hosts=1&with_discovery_rule=1&items=1&writeonly=1&numeric=1", 800, 450);',
-			'button-form'
-		);
+				'&real_hosts=1&with_discovery_rule=1&items=1&writeonly=1&numeric=1");');
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Item prototype'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+	$screenFormList->addRow(_('Item prototype'), [
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	), false, null, 'nowrap');
+	]);
 
-	$screenFormList->addRow(_('Max columns'), new CNumericBox('max_columns', $maxColumns, 3, false, false, false));
+	$screenFormList->addRow(_('Max columns'),
+		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 }
 
 /*
@@ -295,10 +293,10 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 	$caption = '';
 	$id = 0;
 
-	$maps = API::Map()->get(array(
+	$maps = API::Map()->get([
 		'sysmapids' => $resourceId,
 		'output' => API_OUTPUT_EXTEND
-	));
+	]);
 	if (!empty($maps)) {
 		$id = $resourceId;
 		$map = reset($maps);
@@ -306,15 +304,15 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Map'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
-		new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
+	$screenFormList->addRow(_('Map'), [
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&writeonly=1", 400, 450);',
-			'button-form'
-		)
-	), false, null, 'nowrap');
+				'&writeonly=1");')
+	]);
 }
 
 /*
@@ -324,11 +322,11 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	$caption = '';
 	$id = 0;
 
-	$items = API::Item()->get(array(
+	$items = API::Item()->get([
 		'itemids' => $resourceId,
-		'selectHosts' => array('name'),
-		'output' => array('itemid', 'hostid', 'key_', 'name')
-	));
+		'selectHosts' => ['name'],
+		'output' => ['itemid', 'hostid', 'key_', 'name']
+	]);
 
 	if ($items) {
 		$items = CMacrosResolverHelper::resolveItemNames($items);
@@ -340,103 +338,107 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 	}
 
 	if ($this->data['screen']['templateid']) {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&templated_hosts=1&only_hostid='.$this->data['screen']['templateid'].
-				'&writeonly=1", 800, 450);',
-			'button-form'
-		);
+				'&writeonly=1");');
 	}
 	else {
-		$selectButton = new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
+		$selectButton = (new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=items&srcfld1=itemid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption&real_hosts=1'.
-				'&writeonly=1", 800, 450);',
-			'button-form'
-		);
+				'&writeonly=1");');
 	}
 
-	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Item'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
-		$selectButton
-	), false, null, 'nowrap');
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
-	$screenFormList->addRow(_('Show text as HTML'), new CCheckBox('style', $style, null, 1));
+	$screenFormList
+		->addVar('resourceid', $id)
+		->addRow(_('Item'), [
+			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$selectButton
+		])
+		->addRow(_('Show lines'),
+			(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		)
+		->addRow(_('Show text as HTML'), (new CCheckBox('style'))->setChecked($style == 1));
 }
 
 /*
  * Screen item: Status of triggers
  */
-elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS))) {
-	$data = array();
+elseif (in_array($resourceType, [SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN_RESOURCE_HOST_TRIGGERS])) {
+	$data = [];
 
 	if ($resourceType == SCREEN_RESOURCE_HOSTGROUP_TRIGGERS) {
 		if ($resourceId > 0) {
-			$data = API::HostGroup()->get(array(
+			$data = API::HostGroup()->get([
 				'groupids' => $resourceId,
-				'output' => array('groupid', 'name'),
+				'output' => ['groupid', 'name'],
 				'editable' => true
-			));
+			]);
 
 			if ($data) {
 				$data = reset($data);
 			}
 		}
 
-		$screenFormList->addRow(_('Group'), new CMultiSelect(array(
-			'name' => 'resourceid',
-			'objectName' => 'hostGroup',
-			'objectOptions' => array('editable' => true),
-			'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
-			'defaultValue' => 0,
-			'selectedLimit' => 1,
-			'popup' => array(
-				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-					'&srcfld1=groupid&writeonly=1',
-				'width' => 450,
-				'height' => 450
-			)
-		)));
+		$screenFormList->addRow(_('Group'),
+			(new CMultiSelect([
+				'name' => 'resourceid',
+				'objectName' => 'hostGroup',
+				'objectOptions' => ['editable' => true],
+				'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
+				'defaultValue' => 0,
+				'selectedLimit' => 1,
+				'popup' => [
+					'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+						'&srcfld1=groupid&writeonly=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
 	}
 	else {
 		if ($resourceId > 0) {
-			$data = API::Host()->get(array(
+			$data = API::Host()->get([
 				'hostids' => $resourceId,
-				'output' => array('hostid', 'name'),
+				'output' => ['hostid', 'name'],
 				'editable' => true
-			));
+			]);
 
 			if ($data) {
 				$data = reset($data);
 			}
 		}
 
-		$screenFormList->addRow(_('Host'), new CMultiSelect(array(
-			'name' => 'resourceid',
-			'objectName' => 'hosts',
-			'objectOptions' => array('editable' => true),
-			'data' => $data ? array(array('id' => $data['hostid'], 'name' => $data['name'])) : null,
-			'defaultValue' => 0,
-			'selectedLimit' => 1,
-			'popup' => array(
-				'parameters' => 'srctbl=hosts&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-					'&srcfld1=hostid&writeonly=1',
-				'width' => 450,
-				'height' => 450
-			)
-		)));
+		$screenFormList->addRow(_('Host'),
+			(new CMultiSelect([
+				'name' => 'resourceid',
+				'objectName' => 'hosts',
+				'objectOptions' => ['editable' => true],
+				'data' => $data ? [['id' => $data['hostid'], 'name' => $data['name']]] : null,
+				'defaultValue' => 0,
+				'selectedLimit' => 1,
+				'popup' => [
+					'parameters' => 'srctbl=hosts&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+						'&srcfld1=hostid&writeonly=1'
+				]
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		);
 	}
 
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
+	$screenFormList->addRow(_('Show lines'),
+		(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 	$screenFormList->addRow(
 		_('Sort triggers by'),
-		new CComboBox('sort_triggers', $sortTriggers, null, array(
+		new CComboBox('sort_triggers', $sortTriggers, null, [
 			SCREEN_SORT_TRIGGERS_DATE_DESC => _('Last change (descending)'),
 			SCREEN_SORT_TRIGGERS_SEVERITY_DESC => _('Severity (descending)'),
 			SCREEN_SORT_TRIGGERS_HOST_NAME_ASC => _('Host (ascending)')
-		))
+		])
 	);
 }
 
@@ -444,10 +446,12 @@ elseif (in_array($resourceType, array(SCREEN_RESOURCE_HOSTGROUP_TRIGGERS, SCREEN
  * Screen item: Action log
  */
 elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
+	$screenFormList->addRow(_('Show lines'),
+		(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 	$screenFormList->addRow(
 		_('Sort entries by'),
-		new CComboBox('sort_triggers', $sortTriggers, null, array(
+		new CComboBox('sort_triggers', $sortTriggers, null, [
 			SCREEN_SORT_TRIGGERS_TIME_DESC => _('Time (descending)'),
 			SCREEN_SORT_TRIGGERS_TIME_ASC => _('Time (ascending)'),
 			SCREEN_SORT_TRIGGERS_TYPE_DESC => _('Type (descending)'),
@@ -456,7 +460,7 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
 			SCREEN_SORT_TRIGGERS_STATUS_ASC => _('Status (ascending)'),
 			SCREEN_SORT_TRIGGERS_RECIPIENT_DESC => _('Recipient (descending)'),
 			SCREEN_SORT_TRIGGERS_RECIPIENT_ASC => _('Recipient (ascending)')
-		))
+		])
 	);
 }
 
@@ -464,42 +468,46 @@ elseif ($resourceType == SCREEN_RESOURCE_ACTIONS) {
  * Screen item: History of events
  */
 elseif ($resourceType == SCREEN_RESOURCE_EVENTS) {
-	$screenFormList->addRow(_('Show lines'), new CNumericBox('elements', $elements, 3));
+	$screenFormList->addRow(_('Show lines'),
+		(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 	$screenFormList->addVar('resourceid', 0);
 }
 
 /*
  * Screen item: Overviews
  */
-elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW))) {
-	$data = array();
+elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
+	$data = [];
 
 	if ($resourceId > 0) {
-		$data = API::HostGroup()->get(array(
+		$data = API::HostGroup()->get([
 			'groupids' => $resourceId,
-			'output' => array('groupid', 'name'),
+			'output' => ['groupid', 'name'],
 			'editable' => true
-		));
+		]);
 
 		if ($data) {
 			$data = reset($data);
 		}
 	}
 
-	$screenFormList->addRow(_('Group'), new CMultiSelect(array(
-		'name' => 'resourceid',
-		'objectName' => 'hostGroup',
-		'objectOptions' => array('editable' => true),
-		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
-		'selectedLimit' => 1,
-		'popup' => array(
-			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-				'&srcfld1=groupid&writeonly=1',
-			'width' => 450,
-			'height' => 450
-		)
-	)));
-	$screenFormList->addRow(_('Application'), new CTextBox('application', $application, ZBX_TEXTBOX_STANDARD_SIZE, false, 255));
+	$screenFormList->addRow(_('Group'),
+		(new CMultiSelect([
+			'name' => 'resourceid',
+			'objectName' => 'hostGroup',
+			'objectOptions' => ['editable' => true],
+			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
+			'selectedLimit' => 1,
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+					'&srcfld1=groupid&writeonly=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
+	$screenFormList->addRow(_('Application'),
+		(new CTextBox('application', $application, false, 255))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 }
 
 /*
@@ -513,10 +521,10 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 		$db_screens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE s.screenid='.zbx_dbstr($resourceId));
 
 		while ($row = DBfetch($db_screens)) {
-			$screen = API::Screen()->get(array(
+			$screen = API::Screen()->get([
 				'screenids' => $row['screenid'],
-				'output' => array('screenid')
-			));
+				'output' => ['screenid']
+			]);
 			if (empty($screen)) {
 				continue;
 			}
@@ -530,49 +538,49 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 	}
 
 	$screenFormList->addVar('resourceid', $id);
-	$screenFormList->addRow(_('Screen'), array(
-		new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
-		new CButton('select', _('Select'),
-			'javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
+	$screenFormList->addRow(_('Screen'), [
+		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('select', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
-				'&writeonly=1&screenid='.$_REQUEST['screenid'].'", 800, 450);',
-			'button-form'
-		)
-	), false, null, 'nowrap');
+				'&writeonly=1&screenid='.$_REQUEST['screenid'].'");')
+	]);
 }
 
 /*
  * Screen item: Hosts info
  */
 elseif ($resourceType == SCREEN_RESOURCE_HOSTS_INFO || $resourceType == SCREEN_RESOURCE_TRIGGERS_INFO) {
-	$data = array();
+	$data = [];
 
 	if ($resourceId > 0) {
-		$data = API::HostGroup()->get(array(
+		$data = API::HostGroup()->get([
 			'groupids' => $resourceId,
-			'output' => array('groupid', 'name'),
+			'output' => ['groupid', 'name'],
 			'editable' => true
-		));
+		]);
 
 		if ($data) {
 			$data = reset($data);
 		}
 	}
 
-	$screenFormList->addRow(_('Group'), new CMultiSelect(array(
-		'name' => 'resourceid',
-		'objectName' => 'hostGroup',
-		'objectOptions' => array('editable' => true),
-		'data' => $data ? array(array('id' => $data['groupid'], 'name' => $data['name'])) : null,
-		'defaultValue' => 0,
-		'selectedLimit' => 1,
-		'popup' => array(
-			'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
-				'&srcfld1=groupid&writeonly=1',
-			'width' => 450,
-			'height' => 450
-		)
-	)));
+	$screenFormList->addRow(_('Group'),
+		(new CMultiSelect([
+			'name' => 'resourceid',
+			'objectName' => 'hostGroup',
+			'objectOptions' => ['editable' => true],
+			'data' => $data ? [['id' => $data['groupid'], 'name' => $data['name']]] : null,
+			'defaultValue' => 0,
+			'selectedLimit' => 1,
+			'popup' => [
+				'parameters' => 'srctbl=host_groups&dstfrm='.$screenForm->getName().'&dstfld1=resourceid'.
+					'&srcfld1=groupid&writeonly=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	);
 }
 
 /*
@@ -582,11 +590,12 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 	$caption = getRequest('caption', '');
 
 	if (zbx_empty($caption) && TIME_TYPE_HOST == $style && $resourceId > 0) {
-		$items = API::Item()->get(array(
+		$items = API::Item()->get([
+			'output' => ['itemid', 'hostid', 'key_', 'name'],
+			'selectHosts' => ['name'],
 			'itemids' => $resourceId,
-			'selectHosts' => array('name'),
-			'output' => array('itemid', 'hostid', 'key_', 'name')
-		));
+			'webitems' => true
+		]);
 
 		if ($items) {
 			$items = CMacrosResolverHelper::resolveItemNames($items);
@@ -597,34 +606,33 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 		}
 	}
 
-	$styleComboBox = new CComboBox('style', $style, 'javascript: submit();');
-	$styleComboBox->addItem(TIME_TYPE_LOCAL, _('Local time'));
-	$styleComboBox->addItem(TIME_TYPE_SERVER, _('Server time'));
-	$styleComboBox->addItem(TIME_TYPE_HOST, _('Host time'));
-	$screenFormList->addRow(_('Time type'), $styleComboBox);
+	$screenFormList->addRow(_('Time type'), new CComboBox('style', $style, 'submit()', [
+		TIME_TYPE_LOCAL => _('Local time'),
+		TIME_TYPE_SERVER => _('Server time'),
+		TIME_TYPE_HOST => _('Host time')
+	]));
 
 	if (TIME_TYPE_HOST == $style) {
 		$screenFormList->addVar('resourceid', $resourceId);
 
 		if ($this->data['screen']['templateid']) {
-			$selectButton = new CButton('select', _('Select'),
-				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
+			$selectButton = (new CButton('select', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick("javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().
 					'&dstfld1=resourceid&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&templated_hosts=1'.
-					'&only_hostid='.$this->data['screen']['templateid']."', 800, 450);",
-				'button-form'
-			);
+					'&only_hostid='.$this->data['screen']['templateid']."');");
 		}
 		else {
-			$selectButton = new CButton('select', _('Select'),
-				"javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&dstfld1=resourceid'.
-					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1', 800, 450);",
-				'button-form'
-			);
+			$selectButton = (new CButton('select', _('Select')))
+				->addClass(ZBX_STYLE_BTN_GREY)
+				->onClick("javascript: return PopUp('popup.php?writeonly=1&dstfrm=".$screenForm->getName().'&dstfld1=resourceid'.
+					"&dstfld2=caption&srctbl=items&srcfld1=itemid&srcfld2=name&real_hosts=1');");
 		}
-		$screenFormList->addRow(_('Item'), array(
-			new CTextBox('caption', $caption, ZBX_TEXTBOX_STANDARD_SIZE, true),
+		$screenFormList->addRow(_('Item'), [
+			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
-		));
+		]);
 	}
 	else {
 		$screenFormList->addVar('caption', $caption);
@@ -634,53 +642,55 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
 /*
  * Append common fields
  */
-if (in_array($resourceType, array(SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO))) {
-	$styleRadioButton = array(
-		new CRadioButton('style', STYLE_HORIZONTAL, null, 'style_'.STYLE_HORIZONTAL, $style != STYLE_VERTICAL),
-		new CLabel(_('Horizontal'), 'style_'.STYLE_HORIZONTAL),
-		new CRadioButton('style', STYLE_VERTICAL, null, 'style_'.STYLE_VERTICAL, $style == STYLE_VERTICAL),
-		new CLabel(_('Vertical'), 'style_'.STYLE_VERTICAL)
+if (in_array($resourceType, [SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO])) {
+	$screenFormList->addRow(_('Style'),
+		(new CRadioButtonList('style', (int) $style))
+			->addValue(_('Horizontal'), STYLE_HORIZONTAL)
+			->addValue(_('Vertical'), STYLE_VERTICAL)
+			->setModern(true)
 	);
-	$screenFormList->addRow(_('Style'), new CDiv($styleRadioButton, 'jqueryinputset radioset'));
 }
-elseif (in_array($resourceType, array(SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW))) {
-	$styleRadioButton = array(
-		new CRadioButton('style', STYLE_LEFT, null, 'style_'.STYLE_LEFT, $style != STYLE_TOP),
-		new CLabel(_('Left'), 'style_'.STYLE_LEFT),
-		new CRadioButton('style', STYLE_TOP, null, 'style_'.STYLE_TOP, $style == STYLE_TOP),
-		new CLabel(_('Top'), 'style_'.STYLE_TOP)
+elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
+	$screenFormList->addRow(_('Hosts location'),
+		(new CRadioButtonList('style', (int) $style))
+			->addValue(_('Left'), STYLE_LEFT)
+			->addValue(_('Top'), STYLE_TOP)
+			->setModern(true)
 	);
-	$screenFormList->addRow(_('Hosts location'), new CDiv($styleRadioButton, 'jqueryinputset radioset'));
 }
-else {
+elseif ($resourceType != SCREEN_RESOURCE_CLOCK) {
 	$screenFormList->addVar('style', 0);
 }
 
-if (in_array($resourceType, array(SCREEN_RESOURCE_URL))) {
-	$screenFormList->addRow(_('URL'), new CTextBox('url', $url, ZBX_TEXTBOX_STANDARD_SIZE));
+if (in_array($resourceType, [SCREEN_RESOURCE_URL])) {
+	$screenFormList->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 }
 else {
 	$screenFormList->addVar('url', '');
 }
 
-$resourcesWithWidthAndHeight = array(
+$resourcesWithWidthAndHeight = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_CLOCK,
 	SCREEN_RESOURCE_URL,
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-);
+];
 if (in_array($resourceType, $resourcesWithWidthAndHeight)) {
-	$screenFormList->addRow(_('Width'), new CNumericBox('width', $width, 5));
-	$screenFormList->addRow(_('Height'), new CNumericBox('height', $height, 5));
+	$screenFormList->addRow(_('Width'),
+		(new CNumericBox('width', $width, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
+	$screenFormList->addRow(_('Height'),
+		(new CNumericBox('height', $height, 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+	);
 }
 else {
 	$screenFormList->addVar('width', 500);
 	$screenFormList->addVar('height', 100);
 }
 
-$resourcesWithHAlign = array(
+$resourcesWithHAlign = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_MAP,
@@ -688,70 +698,69 @@ $resourcesWithHAlign = array(
 	SCREEN_RESOURCE_URL,
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-);
+];
 if (in_array($resourceType, $resourcesWithHAlign)) {
-	$hAlignRadioButton = array(
-		new CRadioButton('halign', HALIGN_LEFT, null, 'halign_'.HALIGN_LEFT, $halign == HALIGN_LEFT),
-		new CLabel(_('Left'), 'halign_'.HALIGN_LEFT),
-		new CRadioButton('halign', HALIGN_CENTER, null, 'halign_'.HALIGN_CENTER, $halign == HALIGN_CENTER),
-		new CLabel(_('Center'), 'halign_'.HALIGN_CENTER),
-		new CRadioButton('halign', HALIGN_RIGHT, null, 'halign_'.HALIGN_RIGHT, $halign == HALIGN_RIGHT),
-		new CLabel(_('Right'), 'halign_'.HALIGN_RIGHT)
+	$screenFormList->addRow(_('Horizontal align'),
+		(new CRadioButtonList('halign', (int) $halign))
+			->addValue(_('Left'), HALIGN_LEFT)
+			->addValue(_('Center'), HALIGN_CENTER)
+			->addValue(_('Right'), HALIGN_RIGHT)
+			->setModern(true)
 	);
-	$screenFormList->addRow(_('Horizontal align'), new CDiv($hAlignRadioButton, 'jqueryinputset radioset'));
 }
 else {
 	$screenFormList->addVar('halign', 0);
 }
 
-$vAlignRadioButton = array(
-	new CRadioButton('valign', VALIGN_TOP, null, 'valign_'.VALIGN_TOP, $valign == VALIGN_TOP),
-	new CLabel(_('Top'), 'valign_'.VALIGN_TOP),
-	new CRadioButton('valign', VALIGN_MIDDLE, null, 'valign_'.VALIGN_MIDDLE, $valign == VALIGN_MIDDLE),
-	new CLabel(_('Middle'), 'valign_'.VALIGN_MIDDLE),
-	new CRadioButton('valign', VALIGN_BOTTOM, null, 'valign_'.VALIGN_BOTTOM, $valign == VALIGN_BOTTOM),
-	new CLabel(_('Bottom'), 'valign_'.VALIGN_BOTTOM)
+$screenFormList->addRow(_('Vertical align'),
+	(new CRadioButtonList('valign', (int) $valign))
+		->addValue(_('Top'), VALIGN_TOP)
+		->addValue(_('Middle'), VALIGN_MIDDLE)
+		->addValue(_('Bottom'), VALIGN_BOTTOM)
+		->setModern(true)
 );
-$screenFormList->addRow(
-	_('Vertical align'), new CDiv($vAlignRadioButton, 'jqueryinputset radioset'), false, null, 'nowrap'
+$screenFormList->addRow(_('Column span'),
+	(new CNumericBox('colspan', $colspan, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 );
-$screenFormList->addRow(_('Column span'), new CNumericBox('colspan', $colspan, 3));
-$screenFormList->addRow(_('Row span'), new CNumericBox('rowspan', $rowspan, 3));
+$screenFormList->addRow(_('Row span'),
+	(new CNumericBox('rowspan', $rowspan, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+);
 
 // dynamic addon
-$resourcesWithDynamic = array(
+$resourcesWithDynamic = [
 	SCREEN_RESOURCE_GRAPH,
 	SCREEN_RESOURCE_SIMPLE_GRAPH,
 	SCREEN_RESOURCE_PLAIN_TEXT,
 	SCREEN_RESOURCE_URL,
 	SCREEN_RESOURCE_LLD_GRAPH,
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
-);
+];
 if ($this->data['screen']['templateid'] == 0 && in_array($resourceType, $resourcesWithDynamic)) {
-	$screenFormList->addRow(_('Dynamic item'), new CCheckBox('dynamic', $dynamic, null, 1));
+	$screenFormList->addRow(_('Dynamic item'), (new CCheckBox('dynamic'))->setChecked($dynamic == 1));
 }
 
 // append tabs to form
 $screenTab = new CTabView();
 $screenTab->setAttribute('style', 'text-align: left;');
 $screenTab->addTab('screenTab', _('Screen cell configuration'), $screenFormList);
-$screenForm->addItem($screenTab);
 
 // append buttons to form
 if (isset($_REQUEST['screenitemid'])) {
-	$screenForm->addItem(makeFormFooter(
+	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
-		array (
+		[
 			new CButtonDelete(null, url_param('form').url_param('screenid').url_param('screenitemid')),
 			new CButtonCancel(url_param('screenid'))
-		)
+		]
 	));
 }
 else {
-	$screenForm->addItem(makeFormFooter(
+	$screenTab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
-		array(new CButtonCancel(url_param('screenid')))
+		[new CButtonCancel(url_param('screenid'))]
 	));
 }
+
+$screenForm->addItem($screenTab);
 
 return $screenForm;

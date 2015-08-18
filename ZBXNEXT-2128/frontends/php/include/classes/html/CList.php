@@ -21,31 +21,35 @@
 
 class CList extends CTag {
 
-	public $emptyList;
+	private $emptyList;
 
 	/**
 	 * Creates a UL list.
 	 *
-	 * @param mixed $value			a single or an array of values to add to the list
-	 * @param string $class			HTML class
-	 * @param string $emptyString	text to display if the list is empty
+	 * @param array $values			an array of items to add to the list
 	 */
-	public function __construct($value = null, $class = null, $emptyString = null) {
-		parent::__construct('ul', 'yes');
-		$this->tag_end = '';
-		$this->addItem($value);
-		$this->addClass($class);
+	public function __construct(array $values = []) {
+		parent::__construct('ul', true);
 
-		if (is_null($value)) {
-			$emptyString = (!zbx_empty($emptyString)) ? $emptyString : _('List is empty');
-			$this->addItem($emptyString, 'empty');
+		foreach ($values as $value) {
+			$this->addItem($value);
+		}
+
+		if (!$values) {
+			$this->addItem(_('List is empty'), 'empty');
 			$this->emptyList = true;
 		}
 	}
 
 	public function prepareItem($value = null, $class = null, $id = null) {
-		if (!is_null($value)) {
-			$value = new CListItem($value, $class, $id);
+		if ($value !== null) {
+			$value = new CListItem($value);
+			if ($class !== null) {
+				$value->addClass($class);
+			}
+			if ($id !== null) {
+				$value->setId($id);
+			}
 		}
 
 		return $value;
@@ -54,7 +58,7 @@ class CList extends CTag {
 	public function addItem($value, $class = null, $id = null) {
 		if (!is_null($value) && $this->emptyList) {
 			$this->emptyList = false;
-			$this->items = array();
+			$this->items = [];
 		}
 
 		if ($value instanceof CListItem) {
@@ -63,5 +67,8 @@ class CList extends CTag {
 		else {
 			parent::addItem($this->prepareItem($value, $class, $id));
 		}
+
+		return $this;
 	}
+
 }

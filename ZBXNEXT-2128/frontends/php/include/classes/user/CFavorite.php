@@ -46,7 +46,7 @@ class CFavorite {
 			return self::$cache[$idx];
 		}
 
-		$result = array();
+		$result = [];
 		$db_profiles = DBselect(
 			'SELECT p.value_id,p.source'.
 			' FROM profiles p'.
@@ -55,7 +55,7 @@ class CFavorite {
 			' ORDER BY p.profileid'
 		);
 		while ($profile = DBfetch($db_profiles)) {
-			$result[] = array('value' => $profile['value_id'], 'source' => $profile['source']);
+			$result[] = ['value' => $profile['value_id'], 'source' => $profile['source']];
 		}
 
 		// store db values in cache
@@ -80,19 +80,19 @@ class CFavorite {
 
 		// add to cache only if cache is created
 		if (isset(self::$cache[$idx])) {
-			self::$cache[$idx][] = array(
+			self::$cache[$idx][] = [
 				'value' => $favid,
 				'source' => $favobj
-			);
+			];
 		}
 
-		$values = array(
+		$values = [
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => CWebUser::$data['userid'],
 			'idx' => zbx_dbstr($idx),
 			'value_id' => zbx_dbstr($favid),
 			'type' => PROFILE_TYPE_ID
-		);
+		];
 		if (!is_null($favobj)) {
 			$values['source'] = zbx_dbstr($favobj);
 		}
@@ -115,7 +115,7 @@ class CFavorite {
 	public static function remove($idx, $favid = 0, $favobj = null) {
 		// empty cache, we know that all $idx values will be removed in DELETE
 		if ($favid == 0 && $favobj === null) {
-			self::$cache[$idx] = array();
+			self::$cache[$idx] = [];
 		}
 		// remove from cache, cache will be rebuilt upon get()
 		else {

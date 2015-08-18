@@ -23,22 +23,22 @@
 // it is also required for PHP to work with the Turkish locale (https://bugs.php.net/bug.php?id=18556)
 // WARNING: this must be done before executing any other code, otherwise code execution could fail!
 // this will be unnecessary in PHP 5.5
-setlocale(LC_CTYPE, array(
+setlocale(LC_CTYPE, [
 	'C', 'POSIX', 'en', 'en_US', 'en_US.UTF-8', 'English_United States.1252', 'en_GB', 'en_GB.UTF-8'
-));
+]);
 
 require_once dirname(__FILE__).'/classes/core/Z.php';
 
 try {
-	Z::getInstance()->run();
+	Z::getInstance()->run(ZBase::EXEC_MODE_DEFAULT);
 }
 catch (DBException $e) {
-	$warningView = new CView('general.warning', array(
-		'message' => array(
-			'header' => 'Database error', 'text' => $e->getMessage()
-		)
-	));
-	$warningView->render();
+	(new CView('general.warning', [
+		'header' => 'Database error',
+		'messages' => [$e->getMessage()],
+		'theme' => ZBX_DEFAULT_THEME
+	]))->render();
+
 	exit;
 }
 catch (ConfigFileException $e) {
@@ -48,18 +48,22 @@ catch (ConfigFileException $e) {
 			exit;
 
 		case CConfigFile::CONFIG_ERROR:
-			$warningView = new CView('general.warning', array(
-				'message' => array(
-					'header' => 'Configuration file error', 'text' => $e->getMessage()
-				)
-			));
-			$warningView->render();
+			(new CView('general.warning', [
+				'header' => 'Configuration file error',
+				'messages' => [$e->getMessage()],
+				'theme' => ZBX_DEFAULT_THEME
+			]))->render();
+
 			exit;
 	}
 }
 catch (Exception $e) {
-	$warningView = new CView('general.warning', array('message' => $e->getMessage()));
-	$warningView->render();
+	(new CView('general.warning', [
+		'header' => $e->getMessage(),
+		'messages' => [],
+		'theme' => ZBX_DEFAULT_THEME
+	]))->render();
+
 	exit;
 }
 
@@ -67,11 +71,10 @@ CProfiler::getInstance()->start();
 
 global $ZBX_SERVER, $ZBX_SERVER_PORT, $page;
 
-$page = array(
+$page = [
 	'title' => null,
 	'file' => null,
-	'hist_arg' => null,
 	'scripts' => null,
 	'type' => null,
 	'menu' => null
-);
+];

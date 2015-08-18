@@ -26,10 +26,10 @@ class CMultiSelect extends CTag {
 	 *
 	 * @see jQuery.multiSelect()
 	 */
-	public function __construct(array $options = array()) {
-		parent::__construct('div', 'yes');
+	public function __construct(array $options = []) {
+		parent::__construct('div', true);
 		$this->addClass('multiselect');
-		$this->attr('id', zbx_formatDomId($options['name']));
+		$this->setId(zbx_formatDomId($options['name']));
 
 		// url
 		$url = new CUrl('jsrpc.php');
@@ -43,29 +43,41 @@ class CMultiSelect extends CTag {
 			}
 		}
 
-		$params = array(
+		$params = [
 			'url' => $url->getUrl(),
 			'name' => $options['name'],
-			'labels' => array(
+			'labels' => [
 				'No matches found' => _('No matches found'),
 				'More matches found...' => _('More matches found...'),
 				'type here to search' => _('type here to search'),
 				'new' => _('new'),
 				'Select' => _('Select')
-			),
-			'data' => empty($options['data']) ? array() : zbx_cleanHashes($options['data']),
-			'ignored' => isset($options['ignored']) ? $options['ignored'] : null,
-			'defaultValue' => isset($options['defaultValue']) ? $options['defaultValue'] : null,
-			'disabled' => isset($options['disabled']) ? $options['disabled'] : false,
-			'selectedLimit' => isset($options['selectedLimit']) ? $options['selectedLimit'] : null,
-			'addNew' => isset($options['addNew']) ? $options['addNew'] : false,
-			'popup' => array(
-				'parameters' => isset($options['popup']['parameters']) ? $options['popup']['parameters'] : null,
-				'width' => isset($options['popup']['width']) ? $options['popup']['width'] : null,
-				'height' => isset($options['popup']['height']) ? $options['popup']['height'] : null
-			)
-		);
+			]
+		];
+
+		if (array_key_exists('data', $options)) {
+			$params['data'] = zbx_cleanHashes($options['data']);
+		}
+
+		foreach (['ignored', 'defaultValue', 'disabled', 'selectedLimit', 'addNew'] as $option) {
+			if (array_key_exists($option, $options)) {
+				$params[$option] = $options[$option];
+			}
+		}
+
+		if (array_key_exists('popup', $options)) {
+			foreach (['parameters', 'width', 'height'] as $option) {
+				if (array_key_exists($option, $options['popup'])) {
+					$params['popup'][$option] = $options['popup'][$option];
+				}
+			}
+		}
 
 		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).');');
+	}
+
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+		return $this;
 	}
 }

@@ -37,9 +37,9 @@ class testPageUsers extends CWebTest {
 
 		$this->zbxTestTextPresent('CONFIGURATION OF USERS');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(array('Alias', 'Name', 'Surname', 'User type', 'Groups', 'Is online?', 'Login', 'Frontend access', 'Debug mode', 'Status'));
-		$this->zbxTestTextPresent(array($user['alias'], $user['name'], $user['surname']));
-		$this->zbxTestDropdownHasOptions('action', array('Unblock selected', 'Delete selected'));
+		$this->zbxTestTextPresent(['Alias', 'Name', 'Surname', 'User type', 'Groups', 'Is online?', 'Login', 'Frontend access', 'Debug mode', 'Status']);
+		$this->zbxTestTextPresent([$user['alias'], $user['name'], $user['surname']]);
+		$this->zbxTestDropdownHasOptions('action', ['Unblock selected', 'Delete selected']);
 	}
 
 	/**

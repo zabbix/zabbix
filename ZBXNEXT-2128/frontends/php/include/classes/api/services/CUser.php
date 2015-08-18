@@ -28,7 +28,7 @@ class CUser extends CApiService {
 
 	protected $tableName = 'users';
 	protected $tableAlias = 'u';
-	protected $sortColumns = array('userid', 'alias');
+	protected $sortColumns = ['userid', 'alias'];
 
 	/**
 	 * Get users data.
@@ -47,18 +47,18 @@ class CUser extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 
-		$sqlParts = array(
-			'select'	=> array('users' => 'u.userid'),
-			'from'		=> array('users' => 'users u'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['users' => 'u.userid'],
+			'from'		=> ['users' => 'users u'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'usrgrpids'					=> null,
 			'userids'					=> null,
 			'mediaids'					=> null,
@@ -82,7 +82,7 @@ class CUser extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// permission check
@@ -158,7 +158,7 @@ class CUser extends CApiService {
 			$sqlParts['limit'] = $options['limit'];
 		}
 
-		$userIds = array();
+		$userIds = [];
 
 		$sqlParts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
 		$sqlParts = $this->applyQuerySortOptions($this->tableName(), $this->tableAlias(), $options, $sqlParts);
@@ -186,7 +186,7 @@ class CUser extends CApiService {
 		 */
 		if ($options['getAccess'] !== null) {
 			foreach ($result as $userid => $user) {
-				$result[$userid] += array('gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0);
+				$result[$userid] += ['gui_access' => 0, 'debug_mode' => 0, 'users_status' => 0];
 			}
 
 			$access = DBselect(
@@ -220,26 +220,26 @@ class CUser extends CApiService {
 		$update = ($method === 'update');
 
 		if ($update) {
-			$userDBfields = array('userid' => null);
+			$userDBfields = ['userid' => null];
 
-			$dbUsers = $this->get(array(
-				'output' => array('userid', 'alias', 'autologin', 'autologout'),
+			$dbUsers = $this->get([
+				'output' => ['userid', 'alias', 'autologin', 'autologout'],
 				'userids' => zbx_objectValues($users, 'userid'),
 				'editable' => true,
 				'preservekeys' => true
-			));
+			]);
 		}
 		else {
-			$userDBfields = array('alias' => null, 'passwd' => null, 'usrgrps' => null, 'user_medias' => array());
+			$userDBfields = ['alias' => null, 'passwd' => null, 'usrgrps' => null, 'user_medias' => []];
 		}
 
 		$themes = array_keys(Z::getThemes());
 		$themes[] = THEME_DEFAULT;
-		$themeValidator = new CLimitedSetValidator(array(
+		$themeValidator = new CLimitedSetValidator([
 				'values' => $themes
-			)
+			]
 		);
-		$alias = array();
+		$alias = [];
 
 		foreach ($users as &$user) {
 			if (!check_db_fields($userDBfields, $user)) {
@@ -290,12 +290,12 @@ class CUser extends CApiService {
 
 				// checking if user tries to disable himself (not allowed). No need to check this on creating a user.
 				if (!$create && bccomp(self::$userData['userid'], $user['userid']) == 0) {
-					$usrgrps = API::UserGroup()->get(array(
+					$usrgrps = API::UserGroup()->get([
 						'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
 						'output' => API_OUTPUT_EXTEND,
 						'preservekeys' => true,
 						'nopermissions' => true
-					));
+					]);
 					foreach ($usrgrps as $groupid => $group) {
 						if ($group['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('User may not modify GUI access for himself by becoming a member of user group "%s".', $group['name']));
@@ -339,11 +339,11 @@ class CUser extends CApiService {
 			}
 
 			if (isset($user['alias'])) {
-				$userExist = $this->get(array(
-					'output' => array('userid'),
-					'filter' => array('alias' => $user['alias']),
+				$userExist = $this->get([
+					'output' => ['userid'],
+					'filter' => ['alias' => $user['alias']],
 					'nopermissions' => true
-				));
+				]);
 				if ($exUser = reset($userExist)) {
 					if ($create || (bccomp($exUser['userid'], $user['userid']) != 0)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _s('User with alias "%s" already exists.', $user['alias']));
@@ -411,7 +411,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		return array('userids' => $userids);
+		return ['userids' => $userids];
 	}
 
 	/**
@@ -449,12 +449,12 @@ class CUser extends CApiService {
 		foreach ($users as $user) {
 			$self = (bccomp(self::$userData['userid'], $user['userid']) == 0);
 
-			$result = DB::update('users', array(
-				array(
+			$result = DB::update('users', [
+				[
 					'values' => $user,
-					'where' => array('userid' => $user['userid'])
-				)
-			));
+					'where' => ['userid' => $user['userid']]
+				]
+			]);
 
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -472,16 +472,16 @@ class CUser extends CApiService {
 
 				// getting the list of groups user is currently in
 				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($user['userid']));
-				$groupsUserIn = array();
+				$groupsUserIn = [];
 				while ($grp = DBfetch($dbGroupsUserIn)) {
 					$groupsUserIn[$grp['usrgrpid']] = $grp['usrgrpid'];
 				}
 
-				$usrgrps = API::UserGroup()->get(array(
+				$usrgrps = API::UserGroup()->get([
 					'usrgrpids' => zbx_objectValues($user['usrgrps'], 'usrgrpid'),
 					'output' => API_OUTPUT_EXTEND,
 					'preservekeys' => true
-				));
+				]);
 				foreach ($usrgrps as $groupid => $group) {
 					// if user is not already in a given group
 					if (isset($groupsUserIn[$groupid])) {
@@ -498,13 +498,13 @@ class CUser extends CApiService {
 			}
 		}
 
-		return array('userids' => $userids);
+		return ['userids' => $userids];
 	}
 
 	public function updateProfile($user) {
 		$user['userid'] = self::$userData['userid'];
 
-		return $this->update(array($user));
+		return $this->update([$user]);
 	}
 
 	/**
@@ -535,7 +535,7 @@ class CUser extends CApiService {
 		$this->validateDelete($userIds);
 
 		// delete action operation msg
-		$operationids = array();
+		$operationids = [];
 		$dbOperations = DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
@@ -545,10 +545,10 @@ class CUser extends CApiService {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('opmessage_usr', array('userid' => $userIds));
+		DB::delete('opmessage_usr', ['userid' => $userIds]);
 
 		// delete empty operations
-		$delOperationids = array();
+		$delOperationids = [];
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
@@ -559,13 +559,13 @@ class CUser extends CApiService {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('operations', array('operationid' => $delOperationids));
-		DB::delete('media', array('userid' => $userIds));
-		DB::delete('profiles', array('userid' => $userIds));
-		DB::delete('users_groups', array('userid' => $userIds));
-		DB::delete('users', array('userid' => $userIds));
+		DB::delete('operations', ['operationid' => $delOperationids]);
+		DB::delete('media', ['userid' => $userIds]);
+		DB::delete('profiles', ['userid' => $userIds]);
+		DB::delete('users_groups', ['userid' => $userIds]);
+		DB::delete('users', ['userid' => $userIds]);
 
-		return array('userids' => $userIds);
+		return ['userids' => $userIds];
 	}
 
 	/**
@@ -586,7 +586,7 @@ class CUser extends CApiService {
 		$this->validateAddMedia($data);
 		$mediaIds = $this->addMediaReal($data);
 
-		return array('mediaids' => $mediaIds);
+		return ['mediaids' => $mediaIds];
 	}
 
 	/**
@@ -619,13 +619,13 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$mediaDBfields = array(
+		$mediaDBfields = [
 			'period' => null,
 			'mediatypeid' => null,
 			'sendto' => null,
 			'active' => null,
 			'severity' => null
-		);
+		];
 
 		foreach ($media as $mediaItem) {
 			if (!check_db_fields($mediaDBfields, $mediaItem)) {
@@ -662,7 +662,7 @@ class CUser extends CApiService {
 		$users = zbx_toArray($data['users']);
 		$media = zbx_toArray($data['medias']);
 
-		$mediaIds = array();
+		$mediaIds = [];
 
 		foreach ($users as $user) {
 			foreach ($media as $mediaItem) {
@@ -708,14 +708,14 @@ class CUser extends CApiService {
 
 		$userIds = array_keys(array_flip((zbx_objectValues($users, 'userid'))));
 
-		$dbMedia = API::UserMedia()->get(array(
-			'output' => array('mediaid'),
+		$dbMedia = API::UserMedia()->get([
+			'output' => ['mediaid'],
 			'userids' => $userIds,
 			'editable' => true,
 			'preservekeys' => true
-		));
+		]);
 
-		$mediaToCreate = $mediaToUpdate = $mediaToDelete = array();
+		$mediaToCreate = $mediaToUpdate = $mediaToDelete = [];
 
 		foreach ($media as $mediaItem) {
 			if (isset($mediaItem['mediaid'])) {
@@ -734,10 +734,10 @@ class CUser extends CApiService {
 
 		// create
 		if ($mediaToCreate) {
-			$this->addMediaReal(array(
+			$this->addMediaReal([
 				'users' => $users,
 				'medias' => $mediaToCreate
-			));
+			]);
 		}
 
 		// update
@@ -764,7 +764,7 @@ class CUser extends CApiService {
 			$this->deleteMediaReal($mediaToDelete);
 		}
 
-		return array('userids' => $userIds);
+		return ['userids' => $userIds];
 	}
 
 	/**
@@ -799,7 +799,7 @@ class CUser extends CApiService {
 		}
 
 		// validate media permissions
-		$mediaIds = array();
+		$mediaIds = [];
 
 		foreach ($media as $mediaItem) {
 			if (isset($mediaItem['mediaid'])) {
@@ -808,11 +808,11 @@ class CUser extends CApiService {
 		}
 
 		if ($mediaIds) {
-			$dbUserMediaCount = API::UserMedia()->get(array(
+			$dbUserMediaCount = API::UserMedia()->get([
 				'countOutput' => true,
 				'mediaids' => $mediaIds,
 				'editable' => true
-			));
+			]);
 
 			if ($dbUserMediaCount != count($mediaIds)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -820,13 +820,13 @@ class CUser extends CApiService {
 		}
 
 		// validate media parameters
-		$mediaDBfields = array(
+		$mediaDBfields = [
 			'period' => null,
 			'mediatypeid' => null,
 			'sendto' => null,
 			'active' => null,
 			'severity' => null
-		);
+		];
 
 		$timePeriodValidator = new CTimePeriodValidator();
 
@@ -854,7 +854,7 @@ class CUser extends CApiService {
 		$this->validateDeleteMedia($mediaIds);
 		$this->deleteMediaReal($mediaIds);
 
-		return array('mediaids' => $mediaIds);
+		return ['mediaids' => $mediaIds];
 	}
 
 	/**
@@ -867,11 +867,11 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Only Zabbix Admins can remove user media.'));
 		}
 
-		$dbUserMediaCount = API::UserMedia()->get(array(
+		$dbUserMediaCount = API::UserMedia()->get([
 			'countOutput' => true,
 			'mediaids' => $mediaIds,
 			'editable' => true
-		));
+		]);
 
 		if (count($mediaIds) != $dbUserMediaCount) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
@@ -902,7 +902,7 @@ class CUser extends CApiService {
 	 */
 	protected function ldapLogin(array $user) {
 		$config = select_config();
-		$cnf = array();
+		$cnf = [];
 
 		foreach ($config as $id => $value) {
 			if (strpos($id, 'ldap_') !== false) {
@@ -914,7 +914,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Probably php-ldap module is missing.'));
 		}
 
-		$ldapValidator = new CLdapAuthValidator(array('conf' => $cnf));
+		$ldapValidator = new CLdapAuthValidator(['conf' => $cnf]);
 
 		if ($ldapValidator->validate($user)) {
 			return true;
@@ -1197,10 +1197,10 @@ class CUser extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'userids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -1215,11 +1215,11 @@ class CUser extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'userids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -1233,37 +1233,37 @@ class CUser extends CApiService {
 		if ($options['selectUsrgrps'] !== null && $options['selectUsrgrps'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'userid', 'usrgrpid', 'users_groups');
 
-			$dbUserGroups = API::UserGroup()->get(array(
+			$dbUserGroups = API::UserGroup()->get([
 				'output' => $options['selectUsrgrps'],
 				'usrgrpids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 
 			$result = $relationMap->mapMany($result, $dbUserGroups, 'usrgrps');
 		}
 
 		// adding medias
 		if ($options['selectMedias'] !== null && $options['selectMedias'] != API_OUTPUT_COUNT) {
-			$userMedias = API::UserMedia()->get(array(
-				'output' => $this->outputExtend($options['selectMedias'], array('userid', 'mediaid')),
+			$userMedias = API::UserMedia()->get([
+				'output' => $this->outputExtend($options['selectMedias'], ['userid', 'mediaid']),
 				'userids' => $userIds,
 				'preservekeys' => true
-			));
+			]);
 
 			$relationMap = $this->createRelationMap($userMedias, 'userid', 'mediaid');
 
-			$userMedias = $this->unsetExtraFields($userMedias, array('userid', 'mediaid'), $options['selectMedias']);
+			$userMedias = $this->unsetExtraFields($userMedias, ['userid', 'mediaid'], $options['selectMedias']);
 			$result = $relationMap->mapMany($result, $userMedias, 'medias');
 		}
 
 		// adding media types
 		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'userid', 'mediatypeid', 'media');
-			$mediaTypes = API::Mediatype()->get(array(
+			$mediaTypes = API::Mediatype()->get([
 				'output' => $options['selectMediatypes'],
 				'mediatypeids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $mediaTypes, 'mediatypes');
 		}
 
@@ -1304,12 +1304,12 @@ class CUser extends CApiService {
 	 * @throws APIException		if we're deleting the guest user
 	 */
 	protected function checkDeleteInternal(array $userIds) {
-		$guest = $this->get(array(
-			'output' => array('userid'),
-			'filter' => array(
+		$guest = $this->get([
+			'output' => ['userid'],
+			'filter' => [
 				'alias' => ZBX_GUEST_USER
-			)
-		));
+			]
+		]);
 		$guest = reset($guest);
 
 		if (in_array($guest['userid'], $userIds)) {

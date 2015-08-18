@@ -64,9 +64,9 @@ void	proxy_set_areg_lastid(const zbx_uint64_t lastid);
 
 void	calc_timestamp(const char *line, int *timestamp, const char *format);
 
-void	process_mass_data(zbx_sock_t *sock, zbx_uint64_t proxy_hostid,
+void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 		AGENT_VALUE *values, size_t value_num, int *processed);
-int	process_hist_data(zbx_sock_t *sock, struct zbx_json_parse *jp,
+int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 		const zbx_uint64_t proxy_hostid, char *info, int max_info_size);
 void	process_dhis_data(struct zbx_json_parse *jp);
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid);

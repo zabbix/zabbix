@@ -47,16 +47,16 @@ class CApplicationManager {
 			$applicationids = DB::insert('applications', $insertApplications);
 		}
 
-		$applicationTemplates = array();
+		$applicationTemplates = [];
 		foreach ($applications as $anum => &$application) {
 			$application['applicationid'] = $applicationids[$anum];
 
 			if (isset($application['applicationTemplates'])) {
 				foreach ($application['applicationTemplates'] as $applicationTemplate) {
-					$applicationTemplates[] = array(
+					$applicationTemplates[] = [
 						'applicationid' => $application['applicationid'],
 						'templateid' => $applicationTemplate['templateid']
-					);
+					];
 				}
 			}
 		}
@@ -84,8 +84,8 @@ class CApplicationManager {
 	 * @return array
 	 */
 	public function update(array $applications) {
-		$update = array();
-		$applicationTemplates = array();
+		$update = [];
+		$applicationTemplates = [];
 		foreach ($applications as $application) {
 			if (isset($application['applicationTemplates'])) {
 				foreach ($application['applicationTemplates'] as $applicationTemplate) {
@@ -94,10 +94,10 @@ class CApplicationManager {
 				unset($application['applicationTemplates']);
 			}
 
-			$update[] = array(
+			$update[] = [
 				'values' => $application,
-				'where' => array('applicationid' => $application['applicationid'])
-			);
+				'where' => ['applicationid' => $application['applicationid']]
+			];
 		}
 		DB::update('applications', $update);
 
@@ -164,7 +164,7 @@ class CApplicationManager {
 	 *
 	 * @return bool
 	 */
-	public function inherit(array $applications, array $hostIds = array()) {
+	public function inherit(array $applications, array $hostIds = []) {
 		$hostTemplateMap = $this->getChildHostsFromApplications($applications, $hostIds);
 		if (empty($hostTemplateMap)) {
 			return true;
@@ -177,10 +177,10 @@ class CApplicationManager {
 		$applications = zbx_toHash($applications, 'applicationid');
 
 		// update application linkage
-		$oldApplicationTemplateIds = array();
-		$movedAppTemplateIds = array();
-		$childAppIdsPairs = array();
-		$oldChildApps = array();
+		$oldApplicationTemplateIds = [];
+		$movedAppTemplateIds = [];
+		$childAppIdsPairs = [];
+		$oldChildApps = [];
 		foreach ($inheritedApps as $newChildApp) {
 			$oldChildAppsByTemplateId = $hostApps[$newChildApp['hostid']]['byTemplateId'];
 
@@ -213,13 +213,13 @@ class CApplicationManager {
 
 		// delete old application links
 		if ($oldApplicationTemplateIds) {
-			DB::delete('application_template', array(
+			DB::delete('application_template', [
 				'application_templateid' => $oldApplicationTemplateIds
-			));
+			]);
 		}
 
 		// delete old children that have only one parent
-		$delAppIds = array();
+		$delAppIds = [];
 		foreach ($oldChildApps as $app) {
 			if (count($app['applicationTemplates']) == 1) {
 				$delAppIds[] = $app['applicationid'];
@@ -261,13 +261,13 @@ class CApplicationManager {
 			' WHERE '.dbConditionInt('ia.applicationid', $appIdPairs).
 				' AND '.dbConditionInt('ia.itemid', zbx_objectValues($itemApps, 'itemid'))
 		);
-		$exItemAppIds = array();
+		$exItemAppIds = [];
 		while ($row = DBfetch($query)) {
 			$exItemAppIds[$row['itemid']][$row['applicationid']] = $row['applicationid'];
 		}
 
-		$newAppItems = array();
-		$delAppItemIds = array();
+		$newAppItems = [];
+		$delAppItemIds = [];
 		foreach ($itemApps as $itemApp) {
 			// if no link to the target app exists, add a new one
 			if (!isset($exItemAppIds[$itemApp['itemid']][$appIdPairs[$itemApp['applicationid']]])) {
@@ -281,14 +281,14 @@ class CApplicationManager {
 
 		// link the items to the new apps
 		foreach ($newAppItems as $targetAppId => $itemAppIds) {
-			DB::updateByPk('items_applications', $itemAppIds, array(
+			DB::updateByPk('items_applications', $itemAppIds, [
 				'applicationid' => $targetAppId
-			));
+			]);
 		}
 
 		// delete old item application links
 		if ($delAppItemIds) {
-			DB::delete('items_applications', array('itemappid' => $delAppItemIds));
+			DB::delete('items_applications', ['itemappid' => $delAppItemIds]);
 		}
 	}
 
@@ -335,15 +335,15 @@ class CApplicationManager {
 	 */
 	public function delete(array $applicationIds) {
 		// unset applications from http tests
-		DB::update('httptest', array(
-			'values' => array('applicationid' => null),
-			'where' => array('applicationid' => $applicationIds)
-		));
+		DB::update('httptest', [
+			'values' => ['applicationid' => null],
+			'where' => ['applicationid' => $applicationIds]
+		]);
 
 		// remove Monitoring > Latest data toggle profile values related to given applications
 		CProfile::delete('web.latest.toggle', $applicationIds);
 
-		DB::delete('applications', array('applicationid' => $applicationIds));
+		DB::delete('applications', ['applicationid' => $applicationIds]);
 	}
 
 	/**
@@ -364,16 +364,16 @@ class CApplicationManager {
 				' AND '.dbConditionInt('ht.hostid', $templateIds).
 				' AND '.dbConditionInt('ht2.applicationid', array_keys($appIdPairs))
 		);
-		$targetAppHttpTestIds = array();
+		$targetAppHttpTestIds = [];
 		while ($row = DBfetch($query)) {
 			$targetAppHttpTestIds[$appIdPairs[$row['applicationid']]][] = $row['httptestid'];
 		}
 
 		// link the http test to the new apps
 		foreach ($targetAppHttpTestIds as $targetAppId => $httpTestIds) {
-			DB::updateByPk('httptest', $httpTestIds, array(
+			DB::updateByPk('httptest', $httpTestIds, [
 				'applicationid' => $targetAppId
-			));
+			]);
 		}
 	}
 
@@ -392,8 +392,8 @@ class CApplicationManager {
 	 *
 	 * @return array
 	 */
-	protected function getChildHostsFromApplications(array $applications, array $hostIds = array()) {
-		$hostsTemplatesMap = array();
+	protected function getChildHostsFromApplications(array $applications, array $hostIds = []) {
+		$hostsTemplatesMap = [];
 
 		$dbCursor = DBselect(
 			'SELECT ht.templateid,ht.hostid'.
@@ -406,7 +406,7 @@ class CApplicationManager {
 			$templateId = $dbHost['templateid'];
 
 			if (!isset($hostsTemplatesMap[$hostId])) {
-				$hostsTemplatesMap[$hostId] = array();
+				$hostsTemplatesMap[$hostId] = [];
 			}
 			$hostsTemplatesMap[$hostId][$templateId] = $templateId;
 		}
@@ -433,7 +433,7 @@ class CApplicationManager {
 		 * with key "applicationTemplates" which is updated, if application with same name is inherited from
 		 * more than one template. In the end this variable gets looped through and plain result array is constructed.
 		 */
-		$newApplications = array_fill_keys(array_keys($hostApplications), array());
+		$newApplications = array_fill_keys(array_keys($hostApplications), []);
 
 		foreach ($applications as $application) {
 			$applicationId = $application['applicationid'];
@@ -445,11 +445,11 @@ class CApplicationManager {
 				}
 
 				if (!isset($newApplications[$hostId][$application['name']])) {
-					$newApplication = array(
+					$newApplication = [
 						'name' => $application['name'],
 						'hostid' => $hostId,
-						'applicationTemplates' => array()
-					);
+						'applicationTemplates' => []
+					];
 				}
 				else {
 					$newApplication = $newApplications[$hostId][$application['name']];
@@ -476,20 +476,20 @@ class CApplicationManager {
 					// Add the new template link to an existing child application if it's not present yet.
 					$newApplication['applicationTemplates'] = isset($existingApplication['applicationTemplates'])
 						? $existingApplication['applicationTemplates']
-						: array();
+						: [];
 
 					$applicationTemplateIds = zbx_objectValues($newApplication['applicationTemplates'], 'templateid');
 
 					if (!in_array($applicationId, $applicationTemplateIds)) {
-						$newApplication['applicationTemplates'][] = array(
+						$newApplication['applicationTemplates'][] = [
 							'applicationid' => $newApplication['applicationid'],
 							'templateid' => $applicationId
-						);
+						];
 					}
 				}
 				else {
 					// If no matching child application exists, add a new one.
-					$newApplication['applicationTemplates'][] = array('templateid' => $applicationId);
+					$newApplication['applicationTemplates'][] = ['templateid' => $applicationId];
 				}
 
 				// Store new or updated application data so it can be reused.
@@ -497,7 +497,7 @@ class CApplicationManager {
 			}
 		}
 
-		$result = array();
+		$result = [];
 		foreach ($newApplications as $hostId => $newApplicationsPerHost) {
 			foreach ($newApplicationsPerHost as $newApplication) {
 				$result[] = $newApplication;
@@ -524,9 +524,9 @@ class CApplicationManager {
 	 * @return array
 	 */
 	protected function getApplicationMapsByHostIds(array $hostIds) {
-		$hostApps = array();
+		$hostApps = [];
 		foreach ($hostIds as $hostid) {
-			$hostApps[$hostid] = array('byName' => array(), 'byTemplateId' => array());
+			$hostApps[$hostid] = ['byName' => [], 'byTemplateId' => []];
 		}
 
 		// fetch applications
@@ -565,8 +565,8 @@ class CApplicationManager {
 	 * @return array
 	 */
 	protected function save(array $applications) {
-		$appsCreate = array();
-		$appsUpdate = array();
+		$appsCreate = [];
+		$appsUpdate = [];
 
 		foreach ($applications as $key => $app) {
 			if (isset($app['applicationid'])) {

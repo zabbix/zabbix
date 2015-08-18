@@ -46,7 +46,7 @@ class CSession implements ArrayAccess {
 	 * Clears and implicitly flushes session.
 	 */
 	public function clear() {
-		$_SESSION = array();
+		$_SESSION = [];
 		session_write_close();
 	}
 

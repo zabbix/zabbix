@@ -22,35 +22,40 @@
 class CSetupWizard extends CForm {
 
 	function __construct($ZBX_CONFIG) {
-		$this->DISABLE_NEXT_BUTTON = false;
+		$this->DISABLE_CANCEL_BUTTON = false;
+		$this->DISABLE_BACK_BUTTON = false;
+		$this->SHOW_RETRY_BUTTON = false;
+		$this->STEP_FAILED = false;
 		$this->ZBX_CONFIG = $ZBX_CONFIG;
 
-		$this->stage = array(
-			0 => array(
-				'title' => '1. Welcome',
+		$this->frontendSetup = new CFrontendSetup();
+
+		$this->stage = [
+			0 => [
+				'title' => _('Welcome'),
+				'fnc' => 'stage0'
+			],
+			1 => [
+				'title' => _('Check of pre-requisites'),
 				'fnc' => 'stage1'
-			),
-			1 => array(
-				'title' => '2. Check of pre-requisites',
+			],
+			2 => [
+				'title' => _('Configure DB connection'),
 				'fnc' => 'stage2'
-			),
-			2 => array(
-				'title' => '3. Configure DB connection',
+			],
+			3 => [
+				'title' => _('Zabbix server details'),
 				'fnc' => 'stage3'
-			),
-			3 => array(
-				'title' => '4. Zabbix server details',
+			],
+			4 => [
+				'title' => _('Pre-installation summary'),
 				'fnc' => 'stage4'
-			),
-			4 => array(
-				'title' => '5. Pre-Installation summary',
+			],
+			5 => [
+				'title' => _('Install'),
 				'fnc' => 'stage5'
-			),
-			5 => array(
-				'title' => '6. Install',
-				'fnc' => 'stage6'
-			)
-		);
+			]
+		];
 
 		$this->eventHandler();
 
@@ -62,7 +67,7 @@ class CSetupWizard extends CForm {
 	}
 
 	function setConfig($name, $value) {
-		return ($this->ZBX_CONFIG[$name] = $value);
+		$this->ZBX_CONFIG[$name] = $value;
 	}
 
 	function getStep() {
@@ -90,362 +95,262 @@ class CSetupWizard extends CForm {
 	}
 
 	function bodyToString($destroy = true) {
-		$left = new CDiv(null, 'left');
-		$left->addItem(new CDiv($this->getList(), 'left_menu'));
+		$setup_left = (new CDiv($this->getList()))->addClass('setup-left');
 
-		$link1 = new CLink('www.zabbix.com', 'http://www.zabbix.com/', null, null, true);
-		$link1->setAttribute('target', '_blank');
+		$setup_right = (new CDiv($this->getStage()))->addClass('setup-right');
 
-		$link2 = new CLink('GPL v2', 'http://www.zabbix.com/license.php', null, null, true);
-		$link2->setAttribute('target', '_blank');
-
-		$licence = new CDiv(array($link1, BR(), ' Licensed under ', $link2), 'setup_wizard_licence');
-		$left->addItem($licence);
-
-		$right = new CDiv(null, 'right');
-		if ($this->getStep() == 0) {
-			$right->addItem(new CDiv(null, 'blank_title'));
-			$right->addItem(new CDiv($this->getState(), 'blank_under_title'));
-			$container = new CDiv(array($left, $right), 'setup_wizard setup_wizard_welcome');
+		if (CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$cancel_button = (new CSubmit('cancel', _('Cancel')))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->addClass(ZBX_STYLE_FLOAT_LEFT);
+			if ($this->DISABLE_CANCEL_BUTTON) {
+				$cancel_button->setEnabled(false);
+			}
 		}
 		else {
-			$right->addItem(new CDiv($this->stage[$this->getStep()]['title'], 'setup_title'));
-			$right->addItem(new CDiv($this->getState(), 'under_title'));
-			$container = new CDiv(array($left, $right), 'setup_wizard');
+			$cancel_button = null;
 		}
 
-		if (isset($this->stage[$this->getStep() + 1])) {
-			$next = new CSubmit('next['.$this->getStep().']', _('Next').SPACE.'&raquo;', null, 'jqueryinput');
+		if (array_key_exists($this->getStep() + 1, $this->stage)) {
+			$next_button = new CSubmit('next['.$this->getStep().']', _('Next step'));
 		}
 		else {
-			$next = new CSubmit('finish', _('Finish'), null, 'jqueryinput');
+			$next_button = new CSubmit($this->SHOW_RETRY_BUTTON ? 'retry' : 'finish', _('Finish'));
 		}
 
-		if (isset($this->HIDE_CANCEL_BUTTON) && $this->HIDE_CANCEL_BUTTON) {
-			$cancel = null;
-		}
-		else {
-			$cancel = new CDiv(new CSubmit('cancel', _('Cancel'), null, 'jqueryinput'), 'footer_left');
-		}
+		$back_button = (new CSubmit('back['.$this->getStep().']', _('Back')))
+			->addClass(ZBX_STYLE_BTN_ALT)
+			->addClass(ZBX_STYLE_FLOAT_LEFT);
 
-		if ($this->DISABLE_NEXT_BUTTON) {
-			$next->setEnabled(false);
+		if ($this->getStep() == 0 || $this->DISABLE_BACK_BUTTON) {
+			$back_button->setEnabled(false);
 		}
 
-		// if the user is not logged in (first setup run) hide the "previous" button on the final step
-		if ($this->getStep()
-				&& ((CWebUser::$data && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) || $this->getStep() < 5)) {
-			$back = new CSubmit('back['.$this->getStep().']', '&laquo;'.SPACE._('Previous'), null, 'jqueryinput');
-		}
-		else {
-			$back = null;
-		}
+		$setup_footer = (new CDiv([new CDiv([$next_button, $back_button]), $cancel_button]))->addClass('setup-footer');
 
-		$footer = new CDiv(array($cancel, new CDiv(array($back, $next), 'footer_right')), 'footer');
+		$setup_container = (new CDiv([$setup_left, $setup_right, $setup_footer]))->addClass('setup-container');
 
-		$container->addItem($footer);
-
-		return parent::bodyToString($destroy).$container->ToString();
+		return parent::bodyToString($destroy).$setup_container->ToString();
 	}
 
 	function getList() {
 		$list = new CList();
-		foreach ($this->stage as $id => $data) {
-			if ($id < $this->getStep()) {
-				$style = 'completed';
-			}
-			elseif ($id == $this->getStep() && $this->getStep() != 0) {
-				$style = 'current';
-			}
-			else {
-				$style = null;
-			}
 
-			$list->addItem($data['title'], $style);
+		foreach ($this->stage as $id => $data) {
+			$list->addItem($data['title'], ($id <= $this->getStep()) ? 'setup-left-current' : null);
 		}
+
 		return $list;
 	}
 
-	function getState() {
-		$fnc = $this->stage[$this->getStep()]['fnc'];
-		return $this->$fnc();
+	function getStage() {
+		$function = $this->stage[$this->getStep()]['fnc'];
+		return $this->$function();
+	}
+
+	function stage0() {
+		$setup_title = (new CDiv([new CSpan(_('Welcome to')), 'Zabbix 3.0']))->addClass('setup-title');
+
+		return (new CDiv($setup_title))->addClass('setup-right-body');
 	}
 
 	function stage1() {
-		return null;
+		$table = (new CTable())
+			->addClass(ZBX_STYLE_LIST_TABLE)
+			->setHeader(['', _('Current value'), _('Required'), '']);
+
+		$messages = [];
+		$finalResult = CFrontendSetup::CHECK_OK;
+
+		foreach ($this->frontendSetup->checkRequirements() as $req) {
+			if ($req['result'] == CFrontendSetup::CHECK_OK) {
+				$class = ZBX_STYLE_GREEN;
+				$result = 'OK';
+			}
+			elseif ($req['result'] == CFrontendSetup::CHECK_WARNING) {
+				$class = ZBX_STYLE_ORANGE;
+				$result = new CSpan(_x('Warning', 'setup'));
+			}
+			else {
+				$class = ZBX_STYLE_RED;
+				$result = new CSpan(_('Fail'));
+				$messages[] = ['type' => 'error', 'message' => $req['error']];
+			}
+
+			$table->addRow(
+				[
+					$req['name'],
+					$req['current'],
+					($req['required'] !== null) ? $req['required'] : '',
+					(new CCol($result))->addClass($class)
+				]
+			);
+
+			if ($req['result'] > $finalResult) {
+				$finalResult = $req['result'];
+			}
+		}
+
+		if ($finalResult == CFrontendSetup::CHECK_FATAL) {
+			$message_box = makeMessageBox(false, $messages, null, false, true);
+		}
+		else {
+			$message_box = null;
+		}
+
+		return [
+			new CTag('h1', true, _('Check of pre-requisites')),
+			(new CDiv([$message_box, $table]))->addClass('setup-right-body')
+		];
 	}
 
 	function stage2() {
-		$table = new CTable(null, 'requirements');
-		$table->setAlign('center');
-
-		$finalResult = CFrontendSetup::CHECK_OK;
-
-		$table->addRow(array(
-			SPACE,
-			new CCol(_('Current value'), 'header'),
-			new CCol(_('Required'), 'header')
-		));
-
-		$frontendSetup = new CFrontendSetup();
-		$reqs = $frontendSetup->checkRequirements();
-		foreach ($reqs as $req) {
-			$result = null;
-
-			// OK
-			if ($req['result'] == CFrontendSetup::CHECK_OK) {
-				$rowClass = '';
-				$result = new CSpan(_('OK'), 'ok');
-			}
-			// warning
-			elseif ($req['result'] == CFrontendSetup::CHECK_WARNING) {
-				$rowClass = 'notice';
-				$result = new CSpan(_x('Warning', 'setup'), 'link_menu notice');
-				$result->setHint($req['error']);
-			}
-			// fatal error
-			else {
-				$rowClass = 'fail';
-				$result = new CSpan(_('Fail'), 'link_menu fail');
-				$result->setHint($req['error']);
-			}
-
-			$table->addRow(array(
-				new CCol(
-					$req['name'], 'header'),
-					$req['current'],
-					$req['required'] ? $req['required'] : SPACE,
-					$result
-				),
-				$rowClass
-			);
-
-			$finalResult = max($finalResult, $req['result']);
-		}
-
-		// fatal error
-		if ($finalResult == CFrontendSetup::CHECK_FATAL) {
-			$this->DISABLE_NEXT_BUTTON = true;
-
-			$message = array(
-				_('Please correct all issues and press "Retry" button'),
-				BR(),
-				new CSubmit('retry', _('Retry'), null, 'jqueryinput')
-			);
-		}
-		// OK or warning
-		else {
-			$this->DISABLE_NEXT_BUTTON = false;
-			$message = array(new CSpan(_('OK'), 'ok'));
-
-			// add a warning message
-			if ($finalResult == CFrontendSetup::CHECK_WARNING) {
-				$message[] = BR();
-				$message[] = _('(with warnings)');
-			}
-		}
-
-		return array(
-			new CDiv(array(BR(), $table, BR()), 'table_wraper'),
-			new CDiv($message, 'info_bar')
-		);
-	}
-
-	function stage3() {
-		$table = new CTable(null, 'requirements');
-		$table->setAlign('center');
-
 		$DB['TYPE'] = $this->getConfig('DB_TYPE');
 
-		$cmbType = new CComboBox('type', $DB['TYPE'], 'this.form.submit();');
+		$table = new CFormList();
 
-		$frontendSetup = new CFrontendSetup();
-		$databases = $frontendSetup->getSupportedDatabases();
-
-		foreach ($databases as $id => $name) {
-			$cmbType->addItem($id, $name);
-		}
-		$table->addRow(array(new CCol(_('Database type'), 'header'), $cmbType));
+		$table->addRow(_('Database type'),
+			new CComboBox('type', $DB['TYPE'], 'submit()', $this->frontendSetup->getSupportedDatabases())
+		);
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_SQLITE3:
-				$database = new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'));
-				$database->attr('onchange', "disableSetupStepButton('#next_2')");
-				$table->addRow(array(
-					new CCol(_('Database file'), 'header'),
-					$database
-				));
-			break;
-			default:
-				$server = new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost'));
-				$server->attr('onchange', "disableSetupStepButton('#next_2')");
-				$table->addRow(array(
-					new CCol(_('Database host'), 'header'),
-					$server
-				));
+				$table->addRow(
+					_('Database file'),
+					(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				);
+				break;
 
-				$port = new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, false, false, false);
-				$port->attr('style', '');
-				$port->attr(
-					'onchange',
-					"disableSetupStepButton('#next_2'); validateNumericBox(this, 'false', 'false');"
+			default:
+				$table->addRow(_('Database host'),
+					(new CTextBox('server', $this->getConfig('DB_SERVER', 'localhost')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				);
 
-				$table->addRow(array(
-					new CCol(_('Database port'), 'header'),
-					array($port, ' 0 - use default port')
-				));
+				$table->addRow(_('Database port'), [
+					(new CNumericBox('port', $this->getConfig('DB_PORT', '0'), 5, false, false, false))
+						->removeAttribute('style')
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CSpan(_('0 - use default port')))->addClass(ZBX_STYLE_GREY)
+				]);
 
-				$database = new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix'));
-				$database->attr('onchange', "disableSetupStepButton('#next_2')");
-
-				$table->addRow(array(
-					new CCol(_('Database name'), 'header'),
-					$database
-				));
+				$table->addRow(_('Database name'),
+					(new CTextBox('database', $this->getConfig('DB_DATABASE', 'zabbix')))
+						->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				);
 
 				if ($DB['TYPE'] == ZBX_DB_DB2 || $DB['TYPE'] == ZBX_DB_POSTGRESQL) {
-					$schema = new CTextBox('schema', $this->getConfig('DB_SCHEMA', ''));
-					$schema->attr('onchange', "disableSetupStepButton('#next_2')");
-					$table->addRow(array(
-						new CCol(_('Database schema'), 'header'),
-						$schema
-					));
+					$table->addRow(_('Database schema'),
+						(new CTextBox('schema', $this->getConfig('DB_SCHEMA', '')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					);
 				}
 
-				$user = new CTextBox('user', $this->getConfig('DB_USER', 'root'));
-				$user->attr('onchange', "disableSetupStepButton('#next_2')");
-				$table->addRow(array(
-					new CCol(_('User'), 'header'),
-					$user
-				));
-
-				$password = new CPassBox('password', $this->getConfig('DB_PASSWORD', ''));
-				$password->attr('onchange', "disableSetupStepButton('#next_2')");
-				$table->addRow(array(
-					new CCol(_('Password'), 'header'),
-					$password
-				));
-			break;
+				$table->addRow(_('User'),
+					(new CTextBox('user', $this->getConfig('DB_USER', 'zabbix')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				);
+				$table->addRow(_('Password'),
+					(new CPassBox('password', $this->getConfig('DB_PASSWORD')))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				);
+				break;
 		}
 
-		global $ZBX_MESSAGES;
-		if (!empty($ZBX_MESSAGES)) {
-			$lst_error = new CList(null, 'messages');
-			foreach ($ZBX_MESSAGES as $msg) {
-				$lst_error->addItem($msg['message'], $msg['type']);
-			}
+		if ($this->STEP_FAILED) {
+			global $ZBX_MESSAGES;
 
-			$table = array($table, $lst_error);
+			$message_box = makeMessageBox(false, $ZBX_MESSAGES, _('Cannot connect to the database.'), false, true);
+		}
+		else {
+			$message_box = null;
 		}
 
-		return array(
-			new CDiv(new CDiv(array(
-				'Please create database manually, and set the configuration parameters for connection to this database.', BR(), BR(),
-				'Press "Test connection" button when done.', BR(),
-				$table
-			), 'vertical_center'), 'table_wraper'),
+		return [
+			new CTag('h1', true, _('Configure DB connection')),
+			(new CDiv([
+				new CTag('p', true, _s('Please create database manually, and set the configuration parameters for connection to this database. Press "%1$s" button when done.', _('Next step'))),
+				$message_box,
+				$table]))
+				->addClass('setup-right-body')
+		];
+	}
 
-			new CDiv(array(
-				isset($_REQUEST['retry']) ? !$this->DISABLE_NEXT_BUTTON ?
-					new CSpan(array(_('OK'), BR()), 'ok')
-					: new CSpan(array(_('Fail'), BR()), 'fail')
-					: null,
-				new  CSubmit('retry', 'Test connection', null, 'jqueryinput')
-			), 'info_bar')
+	function stage3() {
+		$table = new CFormList();
 
+		$table->addRow(_('Host'),
+			(new CTextBox('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
+
+		$table->addRow(_('Port'),
+			(new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 5, false, false, false))
+				->removeAttribute('style')
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		);
+
+		$table->addRow('Name',
+			(new CTextBox('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')))
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+		);
+
+		return [
+			new CTag('h1', true, _('Zabbix server details')),
+			(new CDiv([
+				new CTag('p', true, _('Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional).')),
+				$table]))
+				->addClass('setup-right-body')
+		];
 	}
 
 	function stage4() {
-		$table = new CTable(null, 'requirements');
-		$table->setAlign('center');
+		$db_type = $this->getConfig('DB_TYPE');
+		$databases = $this->frontendSetup->getSupportedDatabases();
 
-		$table->addRow(array(
-			new CCol(_('Host'), 'header'),
-			new CTextBox('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost'))
-		));
+		$table = new CFormList();
+		$table->addRow((new CSpan(_('Database type')))->addClass(ZBX_STYLE_GREY), $databases[$db_type]);
 
-		$port = new CNumericBox(
-			'zbx_server_port',
-			$this->getConfig('ZBX_SERVER_PORT', '10051'),
-			20,
-			false,
-			false,
-			false
-		);
-		$port->attr('style', '');
-		$table->addRow(array(
-			new CCol(_('Port'), 'header'),
-			$port
-		));
-
-		$table->addRow(array(
-			new CCol(_('Name'), 'header'),
-			new CTextBox('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', ''))
-		));
-
-		return array(
-			'Please enter host name or host IP address', BR(),
-			'and port number of Zabbix server,', BR(),
-			'as well as the name of the installation (optional).', BR(), BR(),
-			$table,
-		);
-	}
-
-	function stage5() {
-		$dbType = $this->getConfig('DB_TYPE');
-		$frontendSetup = new CFrontendSetup();
-		$databases = $frontendSetup->getSupportedDatabases();
-
-		$table = new CTable(null, 'requirements');
-		$table->setAlign('center');
-		$table->addRow(array(
-			new CCol(_('Database type'), 'header'),
-			$databases[$dbType]
-		));
-
-		switch ($dbType) {
+		switch ($db_type) {
 			case ZBX_DB_SQLITE3:
-				$table->addRow(array(
-					new CCol(_('Database file'), 'header'),
-					$this->getConfig('DB_DATABASE')
-				));
+				$table->addRow((new CSpan(_('Database file')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
 				break;
 			default:
-				$table->addRow(array(new CCol(_('Database server'), 'header'), $this->getConfig('DB_SERVER')));
-				$dbPort = $this->getConfig('DB_PORT');
-				$table->addRow(array(
-					new CCol(_('Database port'), 'header'),
-					($dbPort == 0) ? _('default') : $dbPort
-				));
-				$table->addRow(array(new CCol(_('Database name'), 'header'), $this->getConfig('DB_DATABASE')));
-				$table->addRow(array(new CCol(_('Database user'), 'header'), $this->getConfig('DB_USER')));
-				$table->addRow(array(new CCol(_('Database password'), 'header'), preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'))));
-				if ($dbType == ZBX_DB_DB2 || $dbType == ZBX_DB_POSTGRESQL) {
-					$table->addRow(array(new CCol(_('Database schema'), 'header'), $this->getConfig('DB_SCHEMA')));
+				$db_port = ($this->getConfig('DB_PORT') == 0) ? _('default') : $this->getConfig('DB_PORT');
+				$db_password = preg_replace('/./', '*', $this->getConfig('DB_PASSWORD'));
+
+				$table->addRow((new CSpan(_('Database server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SERVER'));
+				$table->addRow((new CSpan(_('Database port')))->addClass(ZBX_STYLE_GREY), $db_port);
+				$table->addRow((new CSpan(_('Database name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_DATABASE'));
+				$table->addRow((new CSpan(_('Database user')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_USER'));
+				$table->addRow((new CSpan(_('Database password')))->addClass(ZBX_STYLE_GREY), $db_password);
+				if ($db_type == ZBX_DB_DB2 || $db_type == ZBX_DB_POSTGRESQL) {
+					$table->addRow((new CSpan(_('Database schema')))->addClass(ZBX_STYLE_GREY), $this->getConfig('DB_SCHEMA'));
 				}
 				break;
 		}
 
-		$table->addRow(BR());
-		$table->addRow(array(new CCol(_('Zabbix server'), 'header'), $this->getConfig('ZBX_SERVER')));
-		$table->addRow(array(new CCol(_('Zabbix server port'), 'header'), $this->getConfig('ZBX_SERVER_PORT')));
-		$table->addRow(array(new CCol(_('Zabbix server name'), 'header'), $this->getConfig('ZBX_SERVER_NAME')));
+		$table->addRow(null, null);
 
-		return array(
-			'Please check configuration parameters.', BR(),
-			'If all is correct, press "Next" button, or "Previous" button to change configuration parameters.', BR(), BR(),
-			$table
-		);
+		$table->addRow((new CSpan(_('Zabbix server')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER'));
+		$table->addRow((new CSpan(_('Zabbix server port')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_PORT'));
+		$table->addRow((new CSpan(_('Zabbix server name')))->addClass(ZBX_STYLE_GREY), $this->getConfig('ZBX_SERVER_NAME'));
+
+		return [
+			new CTag('h1', true, _('Pre-installation summary')),
+			(new CDiv([
+				new CTag('p', true, _s('Please check configuration parameters. If all is correct, press "%1$s" button, or "%2$s" button to change configuration parameters.', _('Next step'), _('Back'))),
+				$table]))
+				->addClass('setup-right-body')
+		];
 	}
 
-	function stage6() {
+	function stage5() {
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
-		$config = new CConfigFile(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
-		$config->config = array(
-			'DB' => array(
+		$config_file_name = Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH;
+		$config = new CConfigFile($config_file_name);
+		$config->config = [
+			'DB' => [
 				'TYPE' => $this->getConfig('DB_TYPE'),
 				'SERVER' => $this->getConfig('DB_SERVER'),
 				'PORT' => $this->getConfig('DB_PORT'),
@@ -453,86 +358,53 @@ class CSetupWizard extends CForm {
 				'USER' => $this->getConfig('DB_USER'),
 				'PASSWORD' => $this->getConfig('DB_PASSWORD'),
 				'SCHEMA' => $this->getConfig('DB_SCHEMA')
-			),
+			],
 			'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 			'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
 			'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
-		);
-		$config->save();
+		];
 
-		try {
-			$error = false;
-			$config->load();
+		$error = false;
 
-			if ($config->config['DB']['TYPE'] != $this->getConfig('DB_TYPE')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['SERVER'] != $this->getConfig('DB_SERVER')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['PORT'] != $this->getConfig('DB_PORT')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['DATABASE'] != $this->getConfig('DB_DATABASE')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['USER'] != $this->getConfig('DB_USER')) {
-				$error = true;
-			}
-			elseif ($config->config['DB']['PASSWORD'] != $this->getConfig('DB_PASSWORD')) {
-				$error = true;
-			}
-			elseif (($this->getConfig('DB_TYPE') == ZBX_DB_DB2 || $this->getConfig('DB_TYPE') == ZBX_DB_POSTGRESQL)
-					&& $config->config['DB']['SCHEMA'] != $this->getConfig('DB_SCHEMA')) {
-				$error = true;
-			}
-			elseif ($config->config['ZBX_SERVER'] != $this->getConfig('ZBX_SERVER')) {
-				$error = true;
-			}
-			elseif ($config->config['ZBX_SERVER_PORT'] != $this->getConfig('ZBX_SERVER_PORT')) {
-				$error = true;
-			}
-			elseif ($config->config['ZBX_SERVER_NAME'] != $this->getConfig('ZBX_SERVER_NAME')) {
-				$error = true;
-			}
-			$error_text = 'Unable to overwrite the existing configuration file. ';
-		}
-		catch (ConfigFileException $e) {
+		if (!$config->save()) {
 			$error = true;
-			$error_text = 'Unable to create the configuration file. ';
+			$messages[] = [
+				'type' => 'error',
+				'message' => $config->error
+			];
 		}
 
-		clear_messages();
 		if ($error) {
+			$this->SHOW_RETRY_BUTTON = true;
+
 			$this->setConfig('ZBX_CONFIG_FILE_CORRECT', false);
+
+			$message_box = makeMessageBox(false, $messages, _('Cannot create the configuration file.'), false, true);
+			$message = [
+				new CTag('p', true, _('Alternatively, you can install it manually:')),
+				new CTag('ol', true, [
+					new CTag('li', true, new CLink(_('Download the configuration file'), 'setup.php?save_config=1')),
+					new CTag('li', true, _s('Save it as "%1$s"', $config_file_name))
+				]),
+			];
+		}
+		else {
+			$this->DISABLE_CANCEL_BUTTON = true;
+			$this->DISABLE_BACK_BUTTON = true;
+
+			$message_box = null;
+			$message = [
+				new CTag('h4', true, _('Congratulations! You have successfully installed Zabbix frontend.'),
+					ZBX_STYLE_GREEN
+				),
+				new CTag('p', true, _s('Configuration file "%1$s" created.', $config_file_name))
+			];
 		}
 
-		$this->DISABLE_NEXT_BUTTON = !$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false);
-		$this->HIDE_CANCEL_BUTTON = !$this->DISABLE_NEXT_BUTTON;
-
-
-		$table = array('Configuration file', BR(), '"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"',
-			BR(), 'created: ', $this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
-			? new CSpan(_('OK'), 'ok')
-			: new CSpan(_('Fail'), 'fail')
-		);
-
-		return array(
-			$table, BR(), BR(),
-			$this->DISABLE_NEXT_BUTTON ? array(new CSubmit('retry', _('Retry'), null, 'jqueryinput'), BR(), BR()) : null,
-			!$this->getConfig('ZBX_CONFIG_FILE_CORRECT', false)
-				? array($error_text, BR(), 'Please install it manually, or fix permissions on the conf directory.', BR(), BR(),
-					'Press the "Download configuration file" button, download the configuration file ',
-					'and save it as ', BR(),
-					'"'.Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH.'"', BR(), BR(),
-					new CSubmit('save_config', 'Download configuration file', null, 'jqueryinput'),
-					BR(), BR()
-				)
-				: array(
-					'Congratulations on successful installation of Zabbix frontend.', BR(), BR()
-				),
-			'When done, press the '.($this->DISABLE_NEXT_BUTTON ? '"Retry"' : '"Finish"').' button'
-		);
+		return [
+			new CTag('h1', true, _('Install')),
+			(new CDiv([$message_box, $message]))->addClass('setup-right-body')
+		];
 	}
 
 	function checkConnection() {
@@ -585,15 +457,27 @@ class CSetupWizard extends CForm {
 	}
 
 	function eventHandler() {
-		if (isset($_REQUEST['back'][$this->getStep()])) {
+		if (hasRequest('back') && array_key_exists($this->getStep(), getRequest('back'))) {
 			$this->doBack();
 		}
 
 		if ($this->getStep() == 1) {
-			if (isset($_REQUEST['next'][$this->getStep()])) {
-				$this->doNext();
+			if (hasRequest('next') && array_key_exists(1, getRequest('next'))) {
+				$finalResult = CFrontendSetup::CHECK_OK;
+				foreach ($this->frontendSetup->checkRequirements() as $req) {
+					if ($req['result'] > $finalResult) {
+						$finalResult = $req['result'];
+					}
+				}
+
+				if ($finalResult == CFrontendSetup::CHECK_FATAL) {
+					$this->STEP_FAILED = true;
+					unset($_REQUEST['next']);
+				}
+				else {
+					$this->doNext();
+				}
 			}
-			$this->DISABLE_NEXT_BUTTON = true;
 		}
 		elseif ($this->getStep() == 2) {
 			$this->setConfig('DB_TYPE', getRequest('type', $this->getConfig('DB_TYPE')));
@@ -604,40 +488,38 @@ class CSetupWizard extends CForm {
 			$this->setConfig('DB_PASSWORD', getRequest('password', $this->getConfig('DB_PASSWORD', '')));
 			$this->setConfig('DB_SCHEMA', getRequest('schema', $this->getConfig('DB_SCHEMA', '')));
 
-			if (isset($_REQUEST['retry'])) {
-				if (!$this->checkConnection()) {
-					$this->DISABLE_NEXT_BUTTON = true;
+			if (hasRequest('next') && array_key_exists(2, getRequest('next'))) {
+				if ($this->checkConnection()) {
+					$this->doNext();
+				}
+				else {
+					$this->STEP_FAILED = true;
 					unset($_REQUEST['next']);
 				}
-			}
-			elseif (!isset($_REQUEST['next'][$this->getStep()])) {
-				$this->DISABLE_NEXT_BUTTON = true;
-				unset($_REQUEST['next']);
-			}
-
-			if (isset($_REQUEST['next'][$this->getStep()])) {
-				$this->doNext();
 			}
 		}
 		elseif ($this->getStep() == 3) {
 			$this->setConfig('ZBX_SERVER', getRequest('zbx_server', $this->getConfig('ZBX_SERVER', 'localhost')));
 			$this->setConfig('ZBX_SERVER_PORT', getRequest('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051')));
 			$this->setConfig('ZBX_SERVER_NAME', getRequest('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
-			if (isset($_REQUEST['next'][$this->getStep()])) {
+
+			if (hasRequest('next') && array_key_exists(3, getRequest('next'))) {
 				$this->doNext();
 			}
 		}
-		elseif ($this->getStep() == 4 && isset($_REQUEST['next'][$this->getStep()])) {
-			$this->doNext();
+		elseif ($this->getStep() == 4) {
+			if (hasRequest('next') && array_key_exists(4, getRequest('next'))) {
+				$this->doNext();
+			}
 		}
 		elseif ($this->getStep() == 5) {
-			if (isset($_REQUEST['save_config'])) {
+			if (hasRequest('save_config')) {
 				// make zabbix.conf.php downloadable
 				header('Content-Type: application/x-httpd-php');
 				header('Content-Disposition: attachment; filename="'.basename(CConfigFile::CONFIG_FILE_PATH).'"');
 				$config = new CConfigFile(Z::getInstance()->getRootDir().CConfigFile::CONFIG_FILE_PATH);
-				$config->config = array(
-					'DB' => array(
+				$config->config = [
+					'DB' => [
 						'TYPE' => $this->getConfig('DB_TYPE'),
 						'SERVER' => $this->getConfig('DB_SERVER'),
 						'PORT' => $this->getConfig('DB_PORT'),
@@ -645,16 +527,16 @@ class CSetupWizard extends CForm {
 						'USER' => $this->getConfig('DB_USER'),
 						'PASSWORD' => $this->getConfig('DB_PASSWORD'),
 						'SCHEMA' => $this->getConfig('DB_SCHEMA')
-					),
+					],
 					'ZBX_SERVER' => $this->getConfig('ZBX_SERVER'),
 					'ZBX_SERVER_PORT' => $this->getConfig('ZBX_SERVER_PORT'),
 					'ZBX_SERVER_NAME' => $this->getConfig('ZBX_SERVER_NAME')
-				);
+				];
 				die($config->getString());
 			}
 		}
 
-		if (isset($_REQUEST['next'][$this->getStep()])) {
+		if (hasRequest('next') && array_key_exists($this->getStep(), getRequest('next'))) {
 			$this->doNext();
 		}
 	}

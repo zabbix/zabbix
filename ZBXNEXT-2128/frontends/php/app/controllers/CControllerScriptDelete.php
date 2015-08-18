@@ -22,9 +22,9 @@
 class CControllerScriptDelete extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'scriptids' =>	'required|array_db scripts.scriptid'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -40,11 +40,11 @@ class CControllerScriptDelete extends CController {
 			return false;
 		}
 
-		$scripts = API::Script()->get(array(
+		$scripts = API::Script()->get([
 			'countOutput' => true,
 			'scriptids' => $this->getInput('scriptids'),
 			'editable' => true
-		));
+		]);
 
 		return ($scripts == count($this->getInput('scriptids')));
 	}

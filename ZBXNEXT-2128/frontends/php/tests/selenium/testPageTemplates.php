@@ -37,12 +37,12 @@ class testPageTemplates extends CWebTest {
 		$this->zbxTestTextPresent('Displaying');
 
 		// header
-		$this->zbxTestTextPresent(array('Templates', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Linked templates', 'Linked to'));
+		$this->zbxTestTextPresent(['Templates', 'Applications', 'Items', 'Triggers', 'Graphs', 'Screens', 'Discovery', 'Linked templates', 'Linked to']);
 
 		// data
-		$this->zbxTestTextPresent(array($template['name']));
+		$this->zbxTestTextPresent([$template['name']]);
 		$this->zbxTestDropdownHasOptions('action',
-				array('Export selected', 'Delete selected', 'Delete selected with linked elements'));
+				['Export selected', 'Delete selected', 'Delete selected with linked elements']);
 	}
 
 	/**

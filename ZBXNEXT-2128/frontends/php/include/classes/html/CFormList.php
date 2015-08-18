@@ -19,72 +19,75 @@
 **/
 
 
-class CFormList extends CDiv {
+class CFormList extends CList {
 
-	protected $formList = null;
 	protected $editable = true;
-	protected $formInputs = array('ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox');
+	protected $formInputs = ['ctextbox', 'cnumericbox', 'ctextarea', 'ccombobox', 'ccheckbox', 'cpassbox', 'cipbox'];
 
-	public function __construct($id = null, $class = null, $editable = true) {
-		$this->editable = $editable;
-		$this->formList = new CList(null, 'formlist');
-
+	public function __construct($id = null) {
 		parent::__construct();
 
-		if ($id) {
-			$this->attr('id', zbx_formatDomId($id));
-		}
+		$this->addClass('table-forms');
 
-		$this->attr('class', $class);
+		if ($id) {
+			$this->setId(zbx_formatDomId($id));
+		}
 	}
 
-	public function addRow($term, $description = null, $hidden = false, $id = null, $class = null) {
-		$label = $term;
+	public function addRow($term, $description = null, $id = null, $class = null) {
+		$input_id = null;
 
-		if (is_object($description)) {
-			$inputClass = strtolower(get_class($description));
+		$input = $description;
+		if (is_array($input)) {
+			$input = reset($input);
+		}
 
-			if (in_array($inputClass, $this->formInputs)) {
-				$label = new CLabel($term, $description->getAttribute('id'));
+		if (is_object($input)) {
+			$input_class = strtolower(get_class($input));
+
+			if (in_array($input_class, $this->formInputs)) {
+				$input_id = $input->getAttribute('id');
 			}
 		}
 
-		$defaultClass = $hidden ? 'formrow hidden' : 'formrow';
-
-		if ($class === null) {
-			$class = $defaultClass;
-		}
-		else {
-			$class .= ' '.$defaultClass;
-		}
+		$label = is_object($term) ? $term : new CLabel($term, $input_id);
 
 		if ($description === null) {
-			$this->formList->addItem(array(new CDiv(SPACE, 'dt right'), new CDiv($label, 'dd')), $class, $id);
+			$this->addItem([
+				(new CDiv(SPACE))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv($label))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
+				$class, $id);
 		}
 		else {
-			$this->formList->addItem(array(new CDiv($label, 'dt right'), new CDiv($description, 'dd')), $class, $id);
+			$this->addItem([
+				(new CDiv($label))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv($description))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)],
+				$class, $id);
 		}
+
+		return $this;
 	}
 
-	public function addInfo($text, $label = null) {
-		$this->formList->addItem(
-			array(
-				new CDiv($label ? $label : _('Info'), 'dt right listInfoLabel'),
-				new CDiv($text, 'objectgroup inlineblock border_dotted ui-corner-all listInfoText')
-			),
-			'formrow listInfo'
+	public function addInfo($text) {
+		$this->addItem(
+			[
+				(new CDiv(_('Info')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv(
+					(new CDiv($text))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+			]
 		);
+		return $this;
 	}
 
 	public function toString($destroy = true) {
-		$this->addItem($this->formList);
-
 		return parent::toString($destroy);
 	}
 
 	public function addVar($name, $value, $id = null) {
 		if ($value !== null) {
-			return $this->addItem(new CVar($name, $value, $id));
+			$this->addItem(new CVar($name, $value, $id));
 		}
+		return $this;
 	}
 }

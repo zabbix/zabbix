@@ -27,7 +27,7 @@ class CUpdateDiscoveredValidator extends CValidator implements CPartialValidator
 	 *
 	 * @var array
 	 */
-	public $allowed = array();
+	public $allowed = [];
 
 	/**
 	 * Error message in case updating discovered objects is totally forbidden.

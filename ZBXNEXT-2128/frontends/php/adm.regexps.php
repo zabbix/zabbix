@@ -25,29 +25,28 @@ require_once dirname(__FILE__).'/include/regexp.inc.php';
 
 $page['title'] = _('Configuration of regular expressions');
 $page['file'] = 'adm.regexps.php';
-$page['hist_arg'] = array();
 $page['type'] = detect_page_type();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'regexpids' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null),
-	'regexpid' =>				array(T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'),
-	'name' =>					array(T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')),
-	'test_string' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({add}) || isset({update})', _('Test string')),
-	'expressions' =>			array(T_ZBX_STR, O_OPT, P_NO_TRIM,		null,	'isset({add}) || isset({update})'),
+$fields = [
+	'regexpids' =>		[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	null],
+	'regexpid' =>		[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,	'isset({form}) && {form} == "update"'],
+	'name' =>			[T_ZBX_STR, O_OPT, null,		NOT_EMPTY, 'isset({add}) || isset({update})', _('Name')],
+	'test_string' =>	[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	'isset({add}) || isset({update})', _('Test string')],
+	'expressions' =>	[T_ZBX_STR, O_OPT, P_NO_TRIM,	null,	'isset({add}) || isset({update})'],
 	// actions
-	'action' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"regexp.massdelete"'),	null),
-	'add' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'update' =>					array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'form' =>					array(T_ZBX_STR, O_OPT, P_SYS,		null,	null),
-	'form_refresh' =>			array(T_ZBX_INT, O_OPT, null,		null,	null),
+	'action' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"regexp.massdelete"'),	null],
+	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'form' =>			[T_ZBX_STR, O_OPT, P_SYS,		null,	null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,		null,	null],
 	// ajax
-	'output' =>					array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
-	'ajaxaction' =>				array(T_ZBX_STR, O_OPT, P_ACT,		null,	null),
-	'ajaxdata' =>				array(T_ZBX_STR, O_OPT, P_ACT|P_NO_TRIM,		null,	null)
-);
+	'output' =>			[T_ZBX_STR, O_OPT, P_ACT,		null,	null],
+	'ajaxaction' =>		[T_ZBX_STR, O_OPT, P_ACT,		null,	null],
+	'ajaxdata' =>		[T_ZBX_STR, O_OPT, P_ACT|P_NO_TRIM,		null,	null]
+];
 check_fields($fields);
 
 /*
@@ -55,22 +54,22 @@ check_fields($fields);
  */
 if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 	$ajaxResponse = new CAjaxResponse;
-	$ajaxData = getRequest('ajaxdata', array());
+	$ajaxData = getRequest('ajaxdata', []);
 
 	if (isset($_REQUEST['ajaxaction']) && $_REQUEST['ajaxaction'] == 'test') {
-		$result = array(
-			'expressions' => array(),
-			'errors' => array(),
+		$result = [
+			'expressions' => [],
+			'errors' => [],
 			'final' => true
-		);
+		];
 
-		$validator = new CRegexValidator(array(
+		$validator = new CRegexValidator([
 			'messageInvalid' => _('Regular expression must be a string'),
 			'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
-		));
+		]);
 
 		foreach ($ajaxData['expressions'] as $id => $expression) {
-			if (!in_array($expression['expression_type'], array(EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE)) ||
+			if (!in_array($expression['expression_type'], [EXPRESSION_TYPE_FALSE, EXPRESSION_TYPE_TRUE]) ||
 				$validator->validate($expression['expression'])
 			) {
 				$match = CGlobalRegexp::matchExpression($expression, $ajaxData['testString']);
@@ -120,11 +119,18 @@ if (hasRequest('action') && !hasRequest('regexpid')) {
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
-	$regExp = array(
+	$regExp = [
 		'name' => getRequest('name'),
 		'test_string' => getRequest('test_string')
-	);
-	$expressions = getRequest('expressions', array());
+	];
+	$expressions = getRequest('expressions', []);
+
+	foreach ($expressions as $i => &$expression) {
+		if (!array_key_exists('case_sensitive', $expression)) {
+			$expression['case_sensitive'] = 0;
+		}
+	}
+	unset($expression);
 
 	DBstart();
 
@@ -157,11 +163,11 @@ if (hasRequest('add') || hasRequest('update')) {
 	show_messages($result, $messageSuccess, $messageFailed);
 }
 elseif (hasRequest('action') && getRequest('action') == 'regexp.massdelete') {
-	$regExpIds = getRequest('regexpids', getRequest('regexpid', array()));
+	$regExpIds = getRequest('regexpids', getRequest('regexpid', []));
 
 	zbx_value2array($regExpIds);
 
-	$regExps = array();
+	$regExps = [];
 	foreach ($regExpIds as $regExpId) {
 		$regExps[$regExpId] = getRegexp($regExpId);
 	}
@@ -197,10 +203,10 @@ elseif (hasRequest('action') && getRequest('action') == 'regexp.massdelete') {
  * Display
  */
 if (isset($_REQUEST['form'])) {
-	$data = array(
+	$data = [
 		'form_refresh' => getRequest('form_refresh'),
 		'regexpid' => getRequest('regexpid')
-	);
+	];
 
 	if (isset($_REQUEST['regexpid']) && !isset($_REQUEST['form_refresh'])) {
 		$regExp = DBfetch(DBSelect(
@@ -211,35 +217,38 @@ if (isset($_REQUEST['form'])) {
 
 		$data['name'] = $regExp['name'];
 		$data['test_string'] = $regExp['test_string'];
-
-		$dbExpressions = DBselect(
+		$data['expressions'] = DBfetchArray(DBselect(
 			'SELECT e.expressionid,e.expression,e.expression_type,e.exp_delimiter,e.case_sensitive'.
 			' FROM expressions e'.
 			' WHERE e.regexpid='.zbx_dbstr($_REQUEST['regexpid']).
 			' ORDER BY e.expression_type'
-		);
-		$data['expressions'] = DBfetchArray($dbExpressions);
+		));
 	}
 	else {
 		$data['name'] = getRequest('name', '');
 		$data['test_string'] = getRequest('test_string', '');
-		$data['expressions'] = getRequest('expressions', array());
+		$data['expressions'] = getRequest('expressions', [
+			[
+				'expression' => '',
+				'expression_type' => EXPRESSION_TYPE_INCLUDED,
+				'exp_delimiter' => ',',
+				'case_sensitive' => 0
+			]
+		]);
 	}
 
-	$regExpView = new CView('administration.general.regularexpressions.edit', $data);
-	$regExpView->render();
-	$regExpView->show();
+	$view = new CView('administration.general.regularexpressions.edit', $data);
 }
 else {
-	$data = array(
-		'regexps' => array(),
-		'regexpids' => array()
-	);
+	$data = [
+		'regexps' => [],
+		'regexpids' => []
+	];
 
 	$dbRegExp = DBselect('SELECT re.* FROM regexps re');
 
 	while ($regExp = DBfetch($dbRegExp)) {
-		$regExp['expressions'] = array();
+		$regExp['expressions'] = [];
 
 		$data['regexps'][$regExp['regexpid']] = $regExp;
 		$data['regexpids'][$regExp['regexpid']] = $regExp['regexpid'];
@@ -254,9 +263,10 @@ else {
 		' ORDER BY e.expression_type'
 	));
 
-	$regExpView = new CView('administration.general.regularexpressions.list', $data);
-	$regExpView->render();
-	$regExpView->show();
+	$view = new CView('administration.general.regularexpressions.list', $data);
 }
+
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

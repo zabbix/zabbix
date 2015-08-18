@@ -22,52 +22,54 @@
 class CRowTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
+		return [
 			// the row should render an empty <td> tag instead
-			array(
-				array(null),
+			[
+				[null],
 				'<tr></tr>'
-			),
-			array(
-				array(''),
+			],
+			[
+				[''],
 				'<tr><td></td></tr>'
-			),
-			array(
-				array('test'),
+			],
+			[
+				['test'],
 				'<tr><td>test</td></tr>'
-			),
-			array(
-				array(array('one', 'two')),
+			],
+			[
+				[['one', 'two']],
 				'<tr><td>one</td><td>two</td></tr>'
-			),
+			],
 
 			// null columns are not rendered
-			array(
-				array(array('one', null)),
+			[
+				[['one', null]],
 				'<tr><td>one</td></tr>'
-			),
+			],
 
-			array(
-				array(new CCol('test')),
+			[
+				[new CCol('test')],
 				'<tr><td>test</td></tr>'
-			),
-			array(
-				array(array(new CCol('one'), new CCol('two'))),
+			],
+			[
+				[[new CCol('one'), new CCol('two')]],
 				'<tr><td>one</td><td>two</td></tr>'
-			),
+			],
 
-			array(
-				array('', 'myclass'),
+			[
+				['', 'myclass'],
 				'<tr class="myclass"><td></td></tr>'
-			),
-			array(
-				array('', null, 'myid'),
+			],
+			[
+				['', null, 'myid'],
 				'<tr id="myid"><td></td></tr>'
-			),
-		);
+			],
+		];
 	}
 
 	public function createTag($items = null, $class = null, $id = null) {
-		return new CRow($items, $class, $id);
+		return (new CRow($items))
+			->addClass($class)
+			->setId($id);
 	}
 }

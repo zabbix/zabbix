@@ -36,7 +36,7 @@ abstract class CValidator {
 	 */
 	private $error;
 
-	public function __construct(array $options = array()) {
+	public function __construct(array $options = []) {
 		// set options
 		foreach ($options as $key => $value) {
 			$this->$key = $value;

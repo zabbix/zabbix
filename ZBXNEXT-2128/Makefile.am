@@ -59,3 +59,18 @@ dbschema: dbschema_ibm_db2 dbschema_mysql dbschema_oracle dbschema_postgresql db
 
 gettext:
 	frontends/php/locale/make_mo.sh
+
+css:
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/screen.scss frontends/php/styles/blue-theme.css
+	sass --no-cache --sourcemap=none sass/stylesheets/sass/dark-theme.scss frontends/php/styles/dark-theme.css
+	cp frontends/php/styles/blue-theme.css sass/stylesheets/screen.css
+	cp frontends/php/styles/dark-theme.css sass/stylesheets/dark-theme.css
+	cp sass/img/icon-sprite.svg frontends/php/img/
+	cp sass/img/browser-sprite.png frontends/php/img/
+	cp sass/apple-touch-icon-120x120-precomposed.png frontends/php/img/
+	cp sass/apple-touch-icon-152x152-precomposed.png frontends/php/img/
+	cp sass/apple-touch-icon-180x180-precomposed.png frontends/php/img/
+	cp sass/apple-touch-icon-76x76-precomposed.png frontends/php/img/
+	cp sass/ms-tile-144x144.png frontends/php/img/
+	cp sass/touch-icon-192x192.png frontends/php/img/
+	cp sass/favicon.ico frontends/php/

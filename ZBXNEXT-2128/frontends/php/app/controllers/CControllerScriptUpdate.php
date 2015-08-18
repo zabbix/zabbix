@@ -22,7 +22,7 @@
 class CControllerScriptUpdate extends CController {
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'scriptid' =>				'fatal|required|db scripts.scriptid',
 			'name' =>					'               db scripts.name',
 			'type' =>					'               db scripts.type        |in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI,
@@ -36,7 +36,7 @@ class CControllerScriptUpdate extends CController {
 			'hgstype' =>				'                                       in 0,1',
 			'confirmation' =>			'               db scripts.confirmation|not_empty',
 			'enable_confirmation' =>	'                                       in 1'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -62,19 +62,19 @@ class CControllerScriptUpdate extends CController {
 			return false;
 		}
 
-		return (bool) API::Script()->get(array(
-			'output' => array(),
+		return (bool) API::Script()->get([
+			'output' => [],
 			'scriptids' => $this->getInput('scriptid'),
 			'editable' => true
-		));
+		]);
 	}
 
 	protected function doAction() {
-		$script = array();
+		$script = [];
 
-		$this->getInputs($script, array('scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
+		$this->getInputs($script, ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
 			'groupid', 'host_access', 'confirmation'
-		));
+		]);
 
 		if ($this->getInput('type', ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT) == ZBX_SCRIPT_TYPE_IPMI
 				&& $this->hasInput('commandipmi')) {

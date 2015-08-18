@@ -35,7 +35,7 @@ class CPieGraphDraw extends CGraphDraw {
 	/* PRE CONFIG: ADD / SET / APPLY
 	/********************************************************************************************************/
 	public function addItem($itemid, $calc_fnc = CALC_FNC_AVG, $color = null, $type = null) {
-		$items = CMacrosResolverHelper::resolveItemNames(array(get_item_by_itemid($itemid)));
+		$items = CMacrosResolverHelper::resolveItemNames([get_item_by_itemid($itemid)]);
 
 		$this->items[$this->num] = reset($items);
 
@@ -120,23 +120,23 @@ class CPieGraphDraw extends CGraphDraw {
 		$y+= round($count * sin(deg2rad($anglemid)));
 		$x+= round($count * cos(deg2rad($anglemid)));
 
-		return array($x, $y);
+		return [$x, $y];
 	}
 
 	protected function calcExplodedRadius($sizeX, $sizeY, $count) {
 		$count *= $this->exploderad * 2;
 		$sizeX -= $count;
 		$sizeY -= $count;
-		return array($sizeX, $sizeY);
+		return [$sizeX, $sizeY];
 	}
 
 	protected function calc3DAngle($sizeX, $sizeY) {
 		$sizeY *= GRAPH_3D_ANGLE / 90;
-		return array($sizeX, round($sizeY));
+		return [$sizeX, round($sizeY)];
 	}
 
 	protected function selectData() {
-		$this->data = array();
+		$this->data = [];
 		$now = time(null);
 
 		if (isset($this->stime)) {
@@ -151,7 +151,7 @@ class CPieGraphDraw extends CGraphDraw {
 		$strvaluelength = 0; // we need to know how long in px will be our legend
 
 		// fetch values for items with the "last" function
-		$lastValueItems = array();
+		$lastValueItems = [];
 		foreach ($this->items as $item) {
 			if ($item['calc_fnc'] == CALC_FNC_LST) {
 				$lastValueItems[] = $item;
@@ -169,7 +169,7 @@ class CPieGraphDraw extends CGraphDraw {
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
-			$sql_arr = array();
+			$sql_arr = [];
 
 			// override item history setting with housekeeping settings
 			if ($config['hk_history_global']) {
@@ -268,10 +268,10 @@ class CPieGraphDraw extends CGraphDraw {
 
 			$this->sum += $item_value;
 
-			$convertedUnit = strlen(convert_units(array(
+			$convertedUnit = strlen(convert_units([
 				'value' => $item_value,
 				'units' => $this->items[$i]['units']
-			)));
+			]));
 			$strvaluelength = max($strvaluelength, $convertedUnit);
 		}
 
@@ -332,10 +332,10 @@ class CPieGraphDraw extends CGraphDraw {
 				$proc = ($this->sum == 0) ? 0 : ($dataValue * 100) / $this->sum;
 
 				$strValue = sprintf(_('Value').': %s ('.(round($proc) != round($proc, 2) ? '%0.2f' : '%0.0f').'%%)',
-					convert_units(array(
+					convert_units([
 						'value' => $dataValue,
 						'units' => $this->items[$i]['units']
-					)),
+					]),
 					$proc
 				);
 
@@ -444,7 +444,7 @@ class CPieGraphDraw extends CGraphDraw {
 		}
 
 		if ($sum <= 0) {
-			$values = array(0 => 1);
+			$values = [0 => 1];
 			$sum = 1;
 			$isEmptyData = true;
 		}
@@ -519,7 +519,7 @@ class CPieGraphDraw extends CGraphDraw {
 		}
 
 		if ($sum <= 0) {
-			$values = array(0 => 1);
+			$values = [0 => 1];
 			$sum = 1;
 			$isEmptyData = true;
 		}
@@ -697,7 +697,7 @@ class CPieGraphDraw extends CGraphDraw {
 		$this->drawHeader();
 
 		// for each metric
-		$values = array();
+		$values = [];
 		for ($i = 0; $i < $this->num; $i++) {
 			$type = $this->items[$i]['calc_type'];
 

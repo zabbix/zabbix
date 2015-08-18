@@ -24,123 +24,137 @@ $overview = $this->data['overview'];
 $filter = $this->data['filter'];
 $config = $this->data['config'];
 
-$filterForm = new CFormTable(null, null, 'get');
-$filterForm->setTableClass('formtable old-filter');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addVar('fullscreen', $filter['fullScreen']);
-$filterForm->addVar('groupid', $filter['groupId']);
-$filterForm->addVar('hostid', $filter['hostId']);
+$filterForm = (new CFilter($filter['filterid']))
+	->addVar('fullscreen', $filter['fullScreen'])
+	->addVar('groupid', $filter['groupId'])
+	->addVar('hostid', $filter['hostId']);
 
-// trigger status
-$filterForm->addRow(_('Triggers status'), new CComboBox('show_triggers', $filter['showTriggers'], null, array(
-	TRIGGERS_OPTION_ALL => _('Any'),
-	TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problem'),
-	TRIGGERS_OPTION_IN_PROBLEM => _('Problem')
-)));
+$column1 = (new CFormList())
+	->addRow(_('Triggers status'),
+		new CComboBox('show_triggers', $filter['showTriggers'], null, [
+			TRIGGERS_OPTION_ALL => _('Any'),
+			TRIGGERS_OPTION_RECENT_PROBLEM => _('Recent problem'),
+			TRIGGERS_OPTION_IN_PROBLEM => _('Problem')
+		])
+	);
 
 // ack status
 if ($config['event_ack_enable']) {
-	$filterForm->addRow(_('Acknowledge status'), new CComboBox('ack_status', $filter['ackStatus'], null, array(
-		ZBX_ACK_STS_ANY => _('Any'),
-		ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
-		ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
-	)));
+	$column1->addRow(_('Acknowledge status'),
+		new CComboBox('ack_status', $filter['ackStatus'], null, [
+			ZBX_ACK_STS_ANY => _('Any'),
+			ZBX_ACK_STS_WITH_UNACK => _('With unacknowledged events'),
+			ZBX_ACK_STS_WITH_LAST_UNACK => _('With last event unacknowledged')
+		])
+	);
 }
 
 // events
 if (!$overview) {
-	$eventsComboBox = new CComboBox('show_events', $filter['showEvents'], null, array(
+	$eventsComboBox = new CComboBox('show_events', $filter['showEvents'], null, [
 		EVENTS_OPTION_NOEVENT => _('Hide all'),
 		EVENTS_OPTION_ALL => _n('Show all (%1$s day)', 'Show all (%1$s days)', $config['event_expire'])
-	));
+	]);
 	if ($config['event_ack_enable']) {
 		$eventsComboBox->addItem(EVENTS_OPTION_NOT_ACK,
 			_n('Show unacknowledged (%1$s day)', 'Show unacknowledged (%1$s days)', $config['event_expire'])
 		);
 	}
-	$filterForm->addRow(_('Events'), $eventsComboBox);
+	$column1->addRow(_('Events'), $eventsComboBox);
 }
 
 // min severity
-$severityNames = array();
+$severityNames = [];
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 	$severityNames[] = getSeverityName($severity, $config);
 }
-$filterForm->addRow(_('Minimum trigger severity'),
+$column1->addRow(_('Minimum trigger severity'),
 	new CComboBox('show_severity', $filter['showSeverity'], null, $severityNames)
 );
 
 // age less than
-$statusChangeDays = new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false);
+$statusChangeDays = (new CNumericBox('status_change_days', $filter['statusChangeDays'], 3, false, false, false))
+	->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH);
 if (!$filter['statusChange']) {
 	$statusChangeDays->setAttribute('disabled', 'disabled');
 }
 $statusChangeDays->addStyle('vertical-align: middle;');
 
-$statusChangeCheckBox = new CCheckBox('status_change', $filter['statusChange'],
-	'javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()', 1
-);
-$statusChangeCheckBox->addStyle('vertical-align: middle;');
-
-$daysSpan = new CSpan(_('days'));
-$daysSpan->addStyle('vertical-align: middle;');
-$filterForm->addRow(_('Age less than'), array($statusChangeCheckBox, $statusChangeDays, SPACE, $daysSpan));
+$column1->addRow(_('Age less than'), [
+	(new CCheckBox('status_change'))
+		->setChecked($filter['statusChange'] == 1)
+		->onClick('javascript: this.checked ? $("status_change_days").enable() : $("status_change_days").disable()')
+		->addStyle('vertical-align: middle;'),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	$statusChangeDays,
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CSpan(_('days')))->addStyle('vertical-align: middle;')
+]);
 
 // name
-$filterForm->addRow(_('Filter by name'), new CTextBox('txt_select', $filter['txtSelect'], 40));
+$column1->addRow(_('Filter by name'),
+	(new CTextBox('txt_select', $filter['txtSelect']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
+);
+
+$application_name_url =
+	'popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1&dstfrm=zbx_filter';
 
 // application
-$filterForm->addRow(_('Filter by application'), array(
-	new CTextBox('application', $filter['application'], 40),
-	new CButton('application_name', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
-		'&dstfrm='.$filterForm->getName().'");',
-		'button-form'
-	)
-));
+$column2 = (new CFormList())
+	->addRow(_('Filter by application'), [
+		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('application_name', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("'.$application_name_url.'");')
+	]);
 
 // inventory filter
 $inventoryFilters = $filter['inventory'];
 if (!$inventoryFilters) {
-	$inventoryFilters = array(
-		array('field' => '', 'value' => '')
-	);
+	$inventoryFilters = [
+		['field' => '', 'value' => '']
+	];
 }
-$inventoryFields = array();
+$inventoryFields = [];
 foreach (getHostInventories() as $inventory) {
 	$inventoryFields[$inventory['db_field']] = $inventory['title'];
 }
 
 $inventoryFilterTable = new CTable();
-$inventoryFilterTable->setAttribute('id', 'inventory-filter');
+$inventoryFilterTable->setId('inventory-filter');
 $i = 0;
 foreach ($inventoryFilters as $field) {
-	$inventoryFilterTable->addRow(array(
+	$inventoryFilterTable->addRow([
 		new CComboBox('inventory['.$i.'][field]', $field['field'], null, $inventoryFields),
-		new CTextBox('inventory['.$i.'][value]', $field['value'], 20),
-		new CButton('inventory['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')
-	), 'form_row');
+		(new CTextBox('inventory['.$i.'][value]', $field['value']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+		(new CButton('inventory['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	], 'form_row');
 
 	$i++;
 }
 $inventoryFilterTable->addRow(
-	new CCol(new CButton('inventory_add', _('Add'), null, 'link_menu element-table-add'), null, 3)
+	(new CCol(
+		(new CButton('inventory_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	))->setColSpan(2)
 );
-$filterForm->addRow(_('Filter by host inventory'), $inventoryFilterTable);
+$column2->addRow(_('Filter by host inventory'), $inventoryFilterTable);
 
 // maintenance filter
-$filterForm->addRow(_('Show hosts in maintenance'),
-	new CCheckBox('show_maintenance', $filter['showMaintenance'], null, 1)
+$column2->addRow(_('Show hosts in maintenance'),
+	(new CCheckBox('show_maintenance'))->setChecked($filter['showMaintenance'] == 1)
 );
 
 // show details
 if (!$overview) {
-	$filterForm->addRow(_('Show details'), new CCheckBox('show_details', $filter['showDetails'], null, 1));
+	$column2->addRow(_('Show details'), (new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1));
 }
 
-// buttons
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
+$filterForm->addColumn($column1);
+$filterForm->addColumn($column2);
 
 return $filterForm;

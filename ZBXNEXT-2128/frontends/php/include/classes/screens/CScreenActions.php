@@ -111,82 +111,65 @@ class CScreenActions extends CScreenBase {
 		order_result($alerts, $sortfield, $sortorder);
 
 		if ($alerts) {
-			$dbUsers = API::User()->get(array(
-				'output' => array('userid', 'alias', 'name', 'surname'),
+			$dbUsers = API::User()->get([
+				'output' => ['userid', 'alias', 'name', 'surname'],
 				'userids' => zbx_objectValues($alerts, 'userid'),
 				'preservekeys' => true
-			));
+			]);
 		}
 
 		// indicator of sort field
-		$sortfieldSpan = new CSpan(array($sorttitle, SPACE));
-		$sortorderSpan = new CSpan(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
+		$sortfieldSpan = new CSpan([$sorttitle, SPACE]);
+		$sortorderSpan = (new CSpan(SPACE))
+			->addClass(($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
-		$actionTable = new CTableInfo(_('No action log entries found.'));
-		$actionTable->setHeader(array(
-			($sortfield === 'clock') ? array($sortfieldSpan, $sortorderSpan) : _('Time'),
-			_('Action'),
-			($sortfield === 'description') ? array($sortfieldSpan, $sortorderSpan) : _('Type'),
-			($sortfield === 'sendto') ? array($sortfieldSpan, $sortorderSpan) : _('Recipient(s)'),
-			_('Message'),
-			($sortfield === 'status') ? array($sortfieldSpan, $sortorderSpan) : _('Status'),
-			_('Info')
-		));
+		$actionTable = (new CTableInfo())
+			->setHeader([
+				($sortfield === 'clock') ? [$sortfieldSpan, $sortorderSpan] : _('Time'),
+				_('Action'),
+				($sortfield === 'description') ? [$sortfieldSpan, $sortorderSpan] : _('Type'),
+				($sortfield === 'sendto') ? [$sortfieldSpan, $sortorderSpan] : _('Recipient(s)'),
+				_('Message'),
+				($sortfield === 'status') ? [$sortfieldSpan, $sortorderSpan] : _('Status'),
+				_('Info')
+			]);
 
-		$actions = API::Action()->get(array(
-			'output' => array('actionid', 'name'),
+		$actions = API::Action()->get([
+			'output' => ['actionid', 'name'],
 			'actionids' => array_unique(zbx_objectValues($alerts, 'actionid')),
 			'preservekeys' => true
-		));
+		]);
 
 		foreach ($alerts as $alert) {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$status = new CSpan(_('Sent'), 'green');
+				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
 			}
 			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-				$status = new CSpan(array(
+				$status = (new CSpan([
 					_('In progress').':',
 					BR(),
-					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-				), 'orange');
+					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries'])])
+				)
+					->addClass(ZBX_STYLE_ORANGE);
 			}
 			else {
-				$status = new CSpan(_('Not sent'), 'red');
+				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 			}
 
 			$recipient = $alert['userid']
-				? array(bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto'])
+				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
-			$message = array(
-				bold(_('Subject').':'),
-				br(),
-				$alert['subject'],
-				br(),
-				br(),
-				bold(_('Message').':'),
-				br(),
-				$alert['message']
-			);
-
-			if (zbx_empty($alert['error'])) {
-				$info = '';
-			}
-			else {
-				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($alert['error'], 'on');
-			}
-
-			$actionTable->addRow(array(
-				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']), 'top'),
-				new CCol($actions[$alert['actionid']]['name'], 'top'),
-				new CCol(($alert['mediatypeid'] == 0) ? '-' : $alert['description'], 'top'),
-				new CCol($recipient, 'top'),
-				new CCol($message, 'top pre'),
-				new CCol($status, 'top'),
-				new CCol($info, 'wraptext top')
-			));
+			$actionTable->addRow([
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+				$actions[$alert['actionid']]['name'],
+				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
+				$recipient,
+				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
+				$status,
+				$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
+			]);
 		}
 
 		return $this->getOutput($actionTable);

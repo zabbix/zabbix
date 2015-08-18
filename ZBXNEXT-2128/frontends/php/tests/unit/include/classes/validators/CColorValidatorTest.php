@@ -22,88 +22,88 @@
 class CColorValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
-		return array(
-			array(array(
+		return [
+			[[
 				'empty' => true,
 				'messageInvalid' => 'Not a string',
 				'messageEmpty' => 'Empty color',
 				'messageRegex' => 'Incorrect color'
-			))
-		);
+			]]
+		];
 	}
 
 	public function validValuesProvider() {
-		return array(
-			array(array(), '000000'),
-			array(array(), 'AAAAAA'),
-			array(array(), 'F3F3F3'),
-			array(array(), 'FFFFFF'),
-			array(array(), 'ffffff'),
-			array(array('empty' => true), ''),
-		);
+		return [
+			[[], '000000'],
+			[[], 'AAAAAA'],
+			[[], 'F3F3F3'],
+			[[], 'FFFFFF'],
+			[[], 'ffffff'],
+			[['empty' => true], ''],
+		];
 	}
 
 	public function invalidValuesProvider() {
-		return array(
-			array(
-				array('messageEmpty' => 'Empty color'),
+		return [
+			[
+				['messageEmpty' => 'Empty color'],
 				'',
 				'Empty color'
-			),
-			array(
-				array('messageRegex' => 'Incorrect color "%1$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect color "%1$s"'],
 				'GGGGGG',
 				'Incorrect color "GGGGGG"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect color "%1$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect color "%1$s"'],
 				'0000000',
 				'Incorrect color "0000000"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect color "%1$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect color "%1$s"'],
 				'FFF',
 				'Incorrect color "FFF"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect color "%1$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect color "%1$s"'],
 				'fff',
 				'Incorrect color "fff"'
-			),
-		);
+			],
+		];
 	}
 
 	public function invalidValuesWithObjectsProvider() {
-		return array(
-			array(
-				array('messageEmpty' => 'Empty color for "%1$s"'),
+		return [
+			[
+				['messageEmpty' => 'Empty color for "%1$s"'],
 				'',
 				'Empty color for "object"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect color "%2$s" for "%1$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect color "%2$s" for "%1$s"'],
 				'@#$$%^',
 				'Incorrect color "@#$$%^" for "object"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect color "%2$s" for "%1$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect color "%2$s" for "%1$s"'],
 				'0000000',
 				'Incorrect color "0000000" for "object"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect color "%2$s" for "%1$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect color "%2$s" for "%1$s"'],
 				'FFF',
 				'Incorrect color "FFF" for "object"'
-			),
-			array(
-				array('messageRegex' => 'Incorrect color "%2$s" for "%1$s"'),
+			],
+			[
+				['messageRegex' => 'Incorrect color "%2$s" for "%1$s"'],
 				'fff',
 				'Incorrect color "fff" for "object"'
-			),
-		);
+			],
+		];
 	}
 
-	protected function createValidator(array $params = array()) {
+	protected function createValidator(array $params = []) {
 		return new CColorValidator($params);
 	}
 }

@@ -38,12 +38,12 @@ class CControllerWidgetHostsView extends CController {
 	protected function doAction() {
 		$config = select_config();
 
-		$filter = array(
+		$filter = [
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
 			'extAck' => 0
-		);
+		];
 
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
 			// groups
@@ -58,25 +58,25 @@ class CControllerWidgetHostsView extends CController {
 				if ($hideHostGroupIds) {
 					// get all groups if no selected groups defined
 					if (!$filter['groupids']) {
-						$dbHostGroups = API::HostGroup()->get(array(
-							'output' => array('groupid')
-						));
+						$dbHostGroups = API::HostGroup()->get([
+							'output' => ['groupid']
+						]);
 						$filter['groupids'] = zbx_objectValues($dbHostGroups, 'groupid');
 					}
 
 					$filter['groupids'] = array_diff($filter['groupids'], $hideHostGroupIds);
 
 					// get available hosts
-					$dbAvailableHosts = API::Host()->get(array(
-						'output' => array('hostid'),
+					$dbAvailableHosts = API::Host()->get([
+						'output' => ['hostid'],
 						'groupids' => $filter['groupids']
-					));
+					]);
 					$availableHostIds = zbx_objectValues($dbAvailableHosts, 'hostid');
 
-					$dbDisabledHosts = API::Host()->get(array(
-						'output' => array('hostid'),
+					$dbDisabledHosts = API::Host()->get([
+						'output' => ['hostid'],
 						'groupids' => $hideHostGroupIds
-					));
+					]);
 					$disabledHostIds = zbx_objectValues($dbDisabledHosts, 'hostid');
 
 					$filter['hostids'] = array_diff($availableHostIds, $disabledHostIds);
@@ -101,17 +101,17 @@ class CControllerWidgetHostsView extends CController {
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
 
-		$data = array(
+		$data = [
 			'filter' => $filter,
-			'config' => array(
+			'config' => [
 				'severity_name_0' => $config['severity_name_0'],
 				'severity_name_1' => $config['severity_name_1'],
 				'severity_name_2' => $config['severity_name_2'],
 				'severity_name_3' => $config['severity_name_3'],
 				'severity_name_4' => $config['severity_name_4'],
 				'severity_name_5' => $config['severity_name_5']
-			)
-		);
+			]
+		];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

@@ -19,36 +19,21 @@
 **/
 
 
-$authenticationWidget = new CWidget();
-$authenticationWidget->addPageHeader(_('CONFIGURATION OF AUTHENTICATION'));
+$widget = (new CWidget())->setTitle(_('Authentication'));
 
 // create form
-$authenticationForm = new CForm();
-$authenticationForm->setName('authenticationForm');
+$authenticationForm = (new CForm())->setName('authenticationForm');
 
 // create form list
 $authenticationFormList = new CFormList('authenticationList');
 
 // append config radio buttons to form list
-$configTypeRadioButton = array(
-	new CRadioButton('config', ZBX_AUTH_INTERNAL, null, 'config_'.ZBX_AUTH_INTERNAL,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_INTERNAL),
-		'submit()'
-	),
-	new CLabel(_x('Internal', 'authentication'), 'config_'.ZBX_AUTH_INTERNAL),
-	new CRadioButton('config', ZBX_AUTH_LDAP, null, 'config_'.ZBX_AUTH_LDAP,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP),
-		'submit()'
-	),
-	new CLabel(_('LDAP'), 'config_'.ZBX_AUTH_LDAP),
-	new CRadioButton('config', ZBX_AUTH_HTTP, null, 'config_'.ZBX_AUTH_HTTP,
-		($this->data['config']['authentication_type'] == ZBX_AUTH_HTTP),
-		'submit()'
-	),
-	new CLabel(_('HTTP'), 'config_'.ZBX_AUTH_HTTP)
-);
 $authenticationFormList->addRow(_('Default authentication'),
-	new CDiv($configTypeRadioButton, 'jqueryinputset radioset')
+	(new CRadioButtonList('config', (int) $this->data['config']['authentication_type']))
+		->addValue(_x('Internal', 'authentication'), ZBX_AUTH_INTERNAL, null, 'submit()')
+		->addValue(_('LDAP'), ZBX_AUTH_LDAP, null, 'submit()')
+		->addValue(_('HTTP'), ZBX_AUTH_HTTP, null, 'submit()')
+		->setModern(true)
 );
 
 // append LDAP fields to form list
@@ -62,36 +47,36 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 		}
 	}
 	else {
-		$userComboBox = new CTextBox('user', $this->data['user'], ZBX_TEXTBOX_STANDARD_SIZE, true);
+		$userComboBox = (new CTextBox('user', $this->data['user'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 	}
 
 	$authenticationFormList->addRow(
 		_('LDAP host'),
-		new CTextBox('ldap_host', $this->data['config']['ldap_host'], ZBX_TEXTBOX_STANDARD_SIZE)
+		(new CTextBox('ldap_host', $this->data['config']['ldap_host']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Port'),
-		new CNumericBox('ldap_port', $this->data['config']['ldap_port'], 5)
+		(new CNumericBox('ldap_port', $this->data['config']['ldap_port'], 5))
+			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Base DN'),
-		new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn'], ZBX_TEXTBOX_STANDARD_SIZE)
+		(new CTextBox('ldap_base_dn', $this->data['config']['ldap_base_dn']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Search attribute'),
-		new CTextBox(
+		(new CTextBox(
 			'ldap_search_attribute',
 			(zbx_empty($this->data['config']['ldap_search_attribute']) && $this->data['form_refresh'] == 0)
 				? 'uid'
 				: $this->data['config']['ldap_search_attribute'],
-			ZBX_TEXTBOX_STANDARD_SIZE,
 			false,
 			128
-		)
+		))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 	$authenticationFormList->addRow(
 		_('Bind DN'),
-		new CTextBox('ldap_bind_dn', $this->data['config']['ldap_bind_dn'], ZBX_TEXTBOX_STANDARD_SIZE)
+		(new CTextBox('ldap_bind_dn', $this->data['config']['ldap_bind_dn']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 	// bind password
@@ -99,32 +84,29 @@ if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
 		$authenticationForm->addVar('change_bind_password', 1);
 		$authenticationFormList->addRow(
 			_('Bind password'),
-			new CPassBox('ldap_bind_password', null, ZBX_TEXTBOX_SMALL_SIZE)
+			(new CPassBox('ldap_bind_password'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 	}
 	else {
 		$authenticationFormList->addRow(
 			_('Bind password'),
-			new CSubmit('change_bind_password', _('Change password'), null, 'button-form')
+			(new CSubmit('change_bind_password', _('Change password')))->addClass(ZBX_STYLE_BTN_GREY)
 		);
 	}
 
 	$authenticationFormList->addRow(_('Test authentication'), ' ['._('must be a valid LDAP user').']');
 	$authenticationFormList->addRow(_('Login'), $userComboBox);
-	$authenticationFormList->addRow(_('User password'), new CPassBox('user_password', null, ZBX_TEXTBOX_SMALL_SIZE));
+	$authenticationFormList->addRow(_('User password'), (new CPassBox('user_password'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH));
 }
 
 // append form list to tab
 $authenticationTab = new CTabView();
 $authenticationTab->addTab('authenticationTab', $this->data['title'], $authenticationFormList);
 
-// append tab to form
-$authenticationForm->addItem($authenticationTab);
-
 // create save button
 $saveButton = new CSubmit('update', _('Update'));
 if ($this->data['is_authentication_type_changed']) {
-	$saveButton->addAction('onclick', 'javascript: if (confirm('.
+	$saveButton->onClick('javascript: if (confirm('.
 		CJs::encodeJson(_('Switching authentication method will reset all except this session! Continue?')).')) {'.
 		'jQuery("#authenticationForm").submit(); return true; } else { return false; }'
 	);
@@ -135,13 +117,16 @@ elseif ($this->data['config']['authentication_type'] != ZBX_AUTH_LDAP) {
 
 // append buttons to form
 if ($this->data['config']['authentication_type'] == ZBX_AUTH_LDAP) {
-	$authenticationForm->addItem(makeFormFooter($saveButton, array(new CSubmit('test', _('Test')))));
+	$authenticationTab->setFooter(makeFormFooter($saveButton, [new CSubmit('test', _('Test'))]));
 }
 else {
-	$authenticationForm->addItem(makeFormFooter($saveButton));
+	$authenticationTab->setFooter(makeFormFooter($saveButton));
 }
 
-// append form to widget
-$authenticationWidget->addItem($authenticationForm);
+// append tab to form
+$authenticationForm->addItem($authenticationTab);
 
-return $authenticationWidget;
+// append form to widget
+$widget->addItem($authenticationForm);
+
+return $widget;

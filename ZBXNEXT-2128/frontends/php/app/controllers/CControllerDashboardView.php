@@ -28,9 +28,9 @@ class CControllerDashboardView extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'fullscreen' =>	'in 0,1'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -46,13 +46,13 @@ class CControllerDashboardView extends CController {
 	}
 
 	protected function doAction() {
-		$show_discovery_widget = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get(array(
-			'output' => array(),
-			'filter' => array('status' => DRULE_STATUS_ACTIVE),
+		$show_discovery_widget = ($this->getUserType() >= USER_TYPE_ZABBIX_ADMIN && (bool) API::DRule()->get([
+			'output' => [],
+			'filter' => ['status' => DRULE_STATUS_ACTIVE],
 			'limit' => 1
-		)));
+		]));
 
-		$data = array(
+		$data = [
 			'fullscreen' => $this->getInput('fullscreen', 0),
 			'filter_enabled' => CProfile::get('web.dashconf.filter.enable', 0),
 			'favourite_graphs' => getFavouriteGraphs(),
@@ -60,7 +60,7 @@ class CControllerDashboardView extends CController {
 			'favourite_screens' => getFavouriteScreens(),
 			'show_status_widget' => ($this->getUserType() == USER_TYPE_SUPER_ADMIN),
 			'show_discovery_widget' => $show_discovery_widget
-		);
+		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboard'));

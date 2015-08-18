@@ -21,10 +21,13 @@
 
 class CButtonCancel extends CButton {
 
-	public function __construct($vars = null, $action = null, $class = 'button-plain shadow ui-corner-all') {
-		parent::__construct('cancel', _('Cancel'), $action, $class);
+	public function __construct($vars = null, $action = null) {
+		parent::__construct('cancel', _('Cancel'));
 		if (is_null($action)) {
 			$this->setVars($vars);
+		}
+		if ($action !== null) {
+			$this->onClick($action);
 		}
 	}
 
@@ -35,6 +38,7 @@ class CButtonCancel extends CButton {
 		}
 		$uri = new CUrl($url);
 		$url = $uri->getUrl();
-		return $this->setAttribute('onclick', "javascript: return redirect('".$url."');");
+		$this->onClick("javascript: return redirect('".$url."');");
+		return $this;
 	}
 }

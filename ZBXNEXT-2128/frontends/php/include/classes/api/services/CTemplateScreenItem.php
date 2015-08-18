@@ -29,15 +29,15 @@ class CTemplateScreenItem extends CApiService {
 	protected $tableName = 'screens_items';
 	protected $tableAlias = 'si';
 
-	protected $sortColumns = array(
+	protected $sortColumns = [
 		'screenitemid',
 		'screenid'
-	);
+	];
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->getOptions = zbx_array_merge($this->getOptions, array(
+		$this->getOptions = zbx_array_merge($this->getOptions, [
 			'screenitemids'	=> null,
 			'screenids'		=> null,
 			'hostids'		=> null,
@@ -46,7 +46,7 @@ class CTemplateScreenItem extends CApiService {
 			'sortorder'		=> '',
 			'preservekeys'	=> null,
 			'countOutput'	=> null
-		));
+		]);
 	}
 
 	/**
@@ -61,7 +61,7 @@ class CTemplateScreenItem extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function get(array $options = array()) {
+	public function get(array $options = []) {
 		$options = zbx_array_merge($this->getOptions, $options);
 
 		// build and execute query
@@ -69,7 +69,7 @@ class CTemplateScreenItem extends CApiService {
 		$res = DBselect($sql, $options['limit']);
 
 		// fetch results
-		$result = array();
+		$result = [];
 		while ($row = DBfetch($res)) {
 			// count query, return a single result
 			if ($options['countOutput'] !== null) {
@@ -92,12 +92,12 @@ class CTemplateScreenItem extends CApiService {
 				$options['screenitemid'] = zbx_objectValues($result, 'screenitemid');
 			}
 
-			$dbTemplateScreens = API::TemplateScreen()->get(array(
-				'output' => array('screenitemid'),
+			$dbTemplateScreens = API::TemplateScreen()->get([
+				'output' => ['screenitemid'],
 				'screenitemids' => $options['screenitemid'],
 				'hostids' => $options['hostids'],
 				'selectScreenItems' => API_OUTPUT_EXTEND
-			));
+			]);
 
 			if ($dbTemplateScreens) {
 				foreach ($result as &$screenItem) {

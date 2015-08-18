@@ -487,7 +487,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	const char	*__function_name = "refresh_active_checks";
 
 	ZBX_THREAD_LOCAL static int	last_ret = SUCCEED;
-	zbx_sock_t			s;
+	zbx_socket_t			s;
 	int				ret;
 	struct zbx_json			json;
 
@@ -586,7 +586,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	{
 		zabbix_log(LOG_LEVEL_WARNING,
 				"active check configuration update from [%s:%hu] started to fail (%s)",
-				host, port, zbx_tcp_strerror());
+				host, port, zbx_socket_strerror());
 	}
 
 	last_ret = ret;
@@ -661,7 +661,7 @@ static int	send_buffer(const char *host, unsigned short port)
 	const char			*__function_name = "send_buffer";
 	struct zbx_json 		json;
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
-	zbx_sock_t			s;
+	zbx_socket_t			s;
 	int				ret = SUCCEED, i, now;
 	zbx_timespec_t			ts;
 	const char			*err_send_step = "";
@@ -776,10 +776,10 @@ static int	send_buffer(const char *host, unsigned short port)
 		if (0 == buffer.first_error)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "active check data upload to [%s:%hu] started to fail (%s%s)",
-					host, port, err_send_step, zbx_tcp_strerror());
+					host, port, err_send_step, zbx_socket_strerror());
 			buffer.first_error = now;
 		}
-		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s %s", err_send_step, zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_DEBUG, "send value error: %s %s", err_send_step, zbx_socket_strerror());
 	}
 ret:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -1478,7 +1478,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		{
 			const char	*perror;
 
-			perror = (NULL != error ? error : ZBX_NOTSUPPORTED);
+			perror = (NULL != error ? error : ZBX_NOTSUPPORTED_MSG);
 
 			metric->state = ITEM_STATE_NOTSUPPORTED;
 			metric->refresh_unsupported = 0;

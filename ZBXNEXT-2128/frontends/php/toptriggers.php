@@ -22,32 +22,23 @@
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 
-$page['title'] = _('Most busy triggers top 100');
+$page['title'] = _('100 busiest triggers');
 $page['file'] = 'toptriggers.php';
-$page['hist_arg'] = array('period');
-$page['scripts'] = array('multiselect.js', 'class.calendar.js');
+$page['scripts'] = ['multiselect.js', 'class.calendar.js'];
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR					TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupids' =>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null),
-	'hostids' =>		array(T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null),
-	'severities'=>		array(T_ZBX_INT,	O_OPT,	P_SYS,			null,	null),
-	'filter_from' =>	array(T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null),
-	'filter_till' =>	array(T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null),
-	'filter_rst' =>		array(T_ZBX_STR,	O_OPT,	P_SYS,			null,	null),
-	'filter_set' =>		array(T_ZBX_STR,	O_OPT,	P_SYS,			null,	null),
-	'filterState' =>	array(T_ZBX_INT,	O_OPT,	P_ACT,			null,	null)
-);
+$fields = [
+	'groupids' =>		[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null],
+	'hostids' =>		[T_ZBX_INT,	O_OPT,	P_SYS,			DB_ID,	null],
+	'severities'=>		[T_ZBX_INT,	O_OPT,	P_SYS,			null,	null],
+	'filter_from' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null],
+	'filter_till' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,	null],
+	'filter_rst' =>		[T_ZBX_STR,	O_OPT,	P_SYS,			null,	null],
+	'filter_set' =>		[T_ZBX_STR,	O_OPT,	P_SYS,			null,	null]
+];
 check_fields($fields);
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.toptriggers.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 
 $data['config'] = select_config();
 
@@ -62,11 +53,11 @@ $timeTill = hasRequest('filter_till') ? zbxDateToTime(getRequest('filter_till'))
 
 if (hasRequest('filter_set')) {
 	// prepare severity array
-	$severities = hasRequest('severities') ? array_keys(getRequest('severities')) : array();
+	$severities = hasRequest('severities') ? array_keys(getRequest('severities')) : [];
 
 	CProfile::updateArray('web.toptriggers.filter.severities', $severities, PROFILE_TYPE_STR);
-	CProfile::updateArray('web.toptriggers.filter.groupids', getRequest('groupids', array()), PROFILE_TYPE_STR);
-	CProfile::updateArray('web.toptriggers.filter.hostids', getRequest('hostids', array()), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.toptriggers.filter.groupids', getRequest('groupids', []), PROFILE_TYPE_STR);
+	CProfile::updateArray('web.toptriggers.filter.hostids', getRequest('hostids', []), PROFILE_TYPE_STR);
 	CProfile::update('web.toptriggers.filter.from', $timeFrom, PROFILE_TYPE_STR);
 	CProfile::update('web.toptriggers.filter.till', $timeTill, PROFILE_TYPE_STR);
 }
@@ -86,52 +77,52 @@ if (!hasRequest('filter_set')) {
 	}
 }
 else {
-	$defaultSeverities = array();
+	$defaultSeverities = [];
 }
 
-$data['filter'] = array(
+$data['filter'] = [
 	'severities' => CProfile::getArray('web.toptriggers.filter.severities', $defaultSeverities),
 	'groupids' => CProfile::getArray('web.toptriggers.filter.groupids'),
 	'hostids' => CProfile::getArray('web.toptriggers.filter.hostids'),
 	'filter_from' => CProfile::get('web.toptriggers.filter.from', $today),
 	'filter_till' => CProfile::get('web.toptriggers.filter.till', $tomorrow)
-);
+];
 
 
 // multiselect host groups
-$data['multiSelectHostGroupData'] = array();
+$data['multiSelectHostGroupData'] = [];
 if ($data['filter']['groupids'] !== null) {
-	$filterGroups = API::HostGroup()->get(array(
-		'output' => array('groupid', 'name'),
+	$filterGroups = API::HostGroup()->get([
+		'output' => ['groupid', 'name'],
 		'groupids' => $data['filter']['groupids']
-	));
+	]);
 
 	foreach ($filterGroups as $filterGroup) {
-		$data['multiSelectHostGroupData'][] = array(
+		$data['multiSelectHostGroupData'][] = [
 			'id' => $filterGroup['groupid'],
 			'name' => $filterGroup['name']
-		);
+		];
 	}
 }
 
 // multiselect hosts
-$data['multiSelectHostData'] = array();
+$data['multiSelectHostData'] = [];
 if ($data['filter']['hostids']) {
-	$filterHosts = API::Host()->get(array(
-		'output' => array('hostid', 'name'),
+	$filterHosts = API::Host()->get([
+		'output' => ['hostid', 'name'],
 		'hostids' => $data['filter']['hostids']
-	));
+	]);
 
 	foreach ($filterHosts as $filterHost) {
-		$data['multiSelectHostData'][] = array(
+		$data['multiSelectHostData'][] = [
 			'id' => $filterHost['hostid'],
 			'name' => $filterHost['name']
-		);
+		];
 	}
 }
 
 // data generation
-$triggersEventCount = array();
+$triggersEventCount = [];
 
 // get 100 triggerids with max event count
 $sql = 'SELECT e.objectid,count(distinct e.eventid) AS cnt_event'.
@@ -180,7 +171,7 @@ elseif (CWebUser::getType() != USER_TYPE_SUPER_ADMIN) {
 				' HAVING MIN(r.permission)>'.PERM_DENY.
 			')';
 }
-$sql .= ' AND '.dbConditionInt('t.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+$sql .= ' AND '.dbConditionInt('t.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
 		' GROUP BY e.objectid'.
 		' ORDER BY cnt_event DESC';
 $result = DBselect($sql, 100);
@@ -188,18 +179,18 @@ while ($row = DBfetch($result)) {
 	$triggersEventCount[$row['objectid']] = $row['cnt_event'];
 }
 
-$data['triggers'] = API::Trigger()->get(array(
-	'output' => array('triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'),
-	'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
-	'selectHosts' => array('hostid', 'status', 'name'),
+$data['triggers'] = API::Trigger()->get([
+	'output' => ['triggerid', 'description', 'expression', 'priority', 'flags', 'url', 'lastchange'],
+	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
+	'selectHosts' => ['hostid', 'status', 'name'],
 	'triggerids' => array_keys($triggersEventCount),
 	'expandDescription' => true,
 	'preservekeys' => true
-));
+]);
 
 $data['triggers'] = CMacrosResolverHelper::resolveTriggerUrl($data['triggers']);
 
-$hostIds = array();
+$hostIds = [];
 
 foreach ($data['triggers'] as $triggerId => $trigger) {
 	$hostId = $trigger['hosts'][0]['hostid'];
@@ -208,20 +199,39 @@ foreach ($data['triggers'] as $triggerId => $trigger) {
 	$data['triggers'][$triggerId]['cnt_event'] = $triggersEventCount[$triggerId];
 }
 
-CArrayHelper::sort($data['triggers'], array(
-	array('field' => 'cnt_event', 'order' => ZBX_SORT_DOWN),
+CArrayHelper::sort($data['triggers'], [
+	['field' => 'cnt_event', 'order' => ZBX_SORT_DOWN],
 	'host', 'description', 'priority'
-));
+]);
 
-$data['hosts'] = API::Host()->get(array(
-	'output' => array('hostid', 'status'),
+$data['hosts'] = API::Host()->get([
+	'output' => ['hostid', 'status'],
 	'selectGraphs' => API_OUTPUT_COUNT,
 	'selectScreens' => API_OUTPUT_COUNT,
 	'hostids' => $hostIds,
 	'preservekeys' => true
-));
+]);
 
 $data['scripts'] = API::Script()->getScriptsByHosts($hostIds);
+
+$monitored_hostids = [];
+
+foreach ($data['triggers'] as $trigger) {
+	foreach ($trigger['hosts'] as $host) {
+		if ($host['status'] == HOST_STATUS_MONITORED) {
+			$monitored_hostids[$host['hostid']] = true;
+		}
+	}
+}
+
+if ($monitored_hostids) {
+	$data['monitored_hosts'] = API::Host()->get([
+		'output' => ['hostid'],
+		'selectGroups' => ['groupid'],
+		'hostids' => array_keys($monitored_hostids),
+		'preservekeys' => true
+	]);
+}
 
 // render view
 $historyView = new CView('reports.toptriggers', $data);

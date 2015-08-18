@@ -54,7 +54,7 @@ class CTriggerExpressionParserResult extends CParserResult {
 	 *
 	 * @var array
 	 */
-	protected $tokens = array();
+	protected $tokens = [];
 
 	/**
 	 * Return the expression tokens.
@@ -77,13 +77,13 @@ class CTriggerExpressionParserResult extends CParserResult {
 	 * @param array|null    $data       additional token information
 	 */
 	public function addToken($type, $value, $pos, $length, array $data = null) {
-		$this->tokens[] = array(
+		$this->tokens[] = [
 			'type' => $type,
 			'value' => $value,
 			'pos' => $pos,
 			'length' => $length,
 			'data' => $data
-		);
+		];
 	}
 
 	/**
@@ -94,7 +94,7 @@ class CTriggerExpressionParserResult extends CParserResult {
 	 * @return array
 	 */
 	public function getTokensByType($type) {
-		$result = array();
+		$result = [];
 
 		foreach ($this->tokens as $token) {
 			if ($token['type'] == $type) {

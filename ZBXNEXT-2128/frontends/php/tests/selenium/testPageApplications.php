@@ -23,22 +23,22 @@ require_once dirname(__FILE__) . '/../include/class.cwebtest.php';
 class testPageApplications extends CWebTest {
 
 	public static function allHosts() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					// "Template OS Linux"
 					'hostid' => 10001,
 					'status' => HOST_STATUS_TEMPLATE
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					// "Test host" ("ЗАББИКС Сервер")
 					'hostid' => 10084,
 					'status' => HOST_STATUS_MONITORED
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**
@@ -53,8 +53,8 @@ class testPageApplications extends CWebTest {
 		$this->zbxTestTextPresent($data['status'] == HOST_STATUS_TEMPLATE ? 'Template list' : 'Host list');
 
 		// table
-		$this->zbxTestTextPresent(array('Applications', 'Show'));
+		$this->zbxTestTextPresent(['Applications', 'Show']);
 
-		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
 	}
 }

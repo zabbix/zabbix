@@ -24,7 +24,7 @@ class CTemplateImporter extends CImporter {
 	/**
 	 * @var array		a list of template IDs which were created or updated
 	 */
-	protected $processedTemplateIds = array();
+	protected $processedTemplateIds = [];
 
 	/**
 	 * Import templates.
@@ -41,9 +41,6 @@ class CTemplateImporter extends CImporter {
 		$this->checkCircularTemplateReferences($templates);
 
 		foreach ($templates as &$template) {
-			// screens are imported separately
-			unset($template['screens']);
-
 			if (!$this->options['templateLinkage']['createMissing']) {
 				unset($template['templates']);
 			}
@@ -53,9 +50,9 @@ class CTemplateImporter extends CImporter {
 		do {
 			$independentTemplates = $this->getIndependentTemplates($templates);
 
-			$templatesToCreate = array();
-			$templatesToUpdate = array();
-			$templateLinkage = array();
+			$templatesToCreate = [];
+			$templatesToUpdate = [];
+			$templateLinkage = [];
 
 			foreach ($independentTemplates as $name) {
 				$template = $templates[$name];
@@ -87,10 +84,10 @@ class CTemplateImporter extends CImporter {
 					$this->processedTemplateIds[$templateId] = $templateId;
 
 					if (!empty($templateLinkage[$createdTemplate['host']])) {
-						API::Template()->massAdd(array(
-							'templates' => array('templateid' => $templateId),
+						API::Template()->massAdd([
+							'templates' => ['templateid' => $templateId],
 							'templates_link' => $templateLinkage[$createdTemplate['host']]
-						));
+						]);
 					}
 				}
 			}
@@ -102,10 +99,10 @@ class CTemplateImporter extends CImporter {
 					$this->processedTemplateIds[$updatedTemplate['templateid']] = $updatedTemplate['templateid'];
 
 					if (!empty($templateLinkage[$updatedTemplate['host']])) {
-						API::Template()->massAdd(array(
+						API::Template()->massAdd([
 							'templates' => $updatedTemplate,
 							'templates_link' => $templateLinkage[$updatedTemplate['host']]
-						));
+						]);
 					}
 				}
 			}
@@ -113,7 +110,7 @@ class CTemplateImporter extends CImporter {
 
 		// if there are templates left in $templates, then they have unresolved references
 		foreach ($templates as $template) {
-			$unresolvedReferences = array();
+			$unresolvedReferences = [];
 			foreach ($template['templates'] as $linkedTemplate) {
 				if (!$this->referencer->resolveTemplate($linkedTemplate['name'])) {
 					$unresolvedReferences[] = $linkedTemplate['name'];
@@ -151,7 +148,7 @@ class CTemplateImporter extends CImporter {
 			}
 
 			foreach ($template['templates'] as $linkedTemplate) {
-				$checked = array($name);
+				$checked = [$name];
 				if ($circTemplates = $this->checkCircularRecursive($linkedTemplate, $templates, $checked)) {
 					throw new Exception(_s('Circular reference in templates: %1$s.', implode(' - ', $circTemplates)));
 				}
@@ -237,26 +234,28 @@ class CTemplateImporter extends CImporter {
 			$template['templateid'] = $templateId;
 
 			// if we update template, existing macros should have hostmacroid
-			foreach ($template['macros'] as &$macro) {
-				if ($hostMacroId = $this->referencer->resolveMacro($templateId, $macro['macro'])) {
-					$macro['hostmacroid'] = $hostMacroId;
+			if (array_key_exists('macros', $template)) {
+				foreach ($template['macros'] as &$macro) {
+					if ($hostMacroId = $this->referencer->resolveMacro($templateId, $macro['macro'])) {
+						$macro['hostmacroid'] = $hostMacroId;
+					}
 				}
+				unset($macro);
 			}
-			unset($macro);
 		}
 
 		foreach ($template['groups'] as $gnum => $group) {
 			if (!$this->referencer->resolveGroup($group['name'])) {
 				throw new Exception(_s('Group "%1$s" does not exist.', $group['name']));
 			}
-			$template['groups'][$gnum] = array('groupid' => $this->referencer->resolveGroup($group['name']));
+			$template['groups'][$gnum] = ['groupid' => $this->referencer->resolveGroup($group['name'])];
 		}
 
 		if (isset($template['templates'])) {
 			foreach ($template['templates'] as $tnum => $parentTemplate) {
-				$template['templates'][$tnum] = array(
+				$template['templates'][$tnum] = [
 					'templateid' => $this->referencer->resolveTemplate($parentTemplate['name'])
-				);
+				];
 			}
 		}
 

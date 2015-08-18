@@ -67,35 +67,35 @@ class testTemplateInheritance extends CWebTest {
 	// Returns all possible item data
 	public static function dataCreate() {
 	// result, template, itemName, keyName, errorMsg
-		return array(
-			array(
+		return [
+			[
 				TEST_GOOD,
 				'Inheritance test template',
 				'Test LLD item1',
 				'test-general-item',
-				array()
-					),
+				[]
+					],
 			// Duplicated item on Template inheritance test host
-			array(
+			[
 				TEST_BAD,
 				'Template App Zabbix Agent',
 				'Test LLD item1',
 				'test-general-item',
-				array(
+				[
 						'ERROR: Cannot add item',
 						'Item "test-general-item" already exists on "Template inheritance test host", inherited from '.
 							'another template.'
-						)
-				),
+						]
+				],
 			// Item added to Template inheritance test host
-			array(
+			[
 				TEST_GOOD,
 				'Template App Zabbix Agent',
 				'Test LLD item2',
 				'test-additional-item',
-				array()
-				)
-			);
+				[]
+				]
+			];
 	}
 
 	/**

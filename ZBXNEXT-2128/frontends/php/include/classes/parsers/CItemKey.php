@@ -36,7 +36,7 @@ class CItemKey {
 	const STATE_QUOTED = 3;
 
 	private $keyId = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
-	private $parameters = array();
+	private $parameters = [];
 	private $isValid = true;
 	private $error = '';
 

@@ -26,24 +26,24 @@ class CMacroParserTest extends CParserTest {
 	}
 
 	public function validProvider() {
-		return array(
-			array('{#M}', 0, '{#M}', 4),
-			array('{#MACRO12.A_Z}', 0, '{#MACRO12.A_Z}', 14),
-			array('{#MACRO} = 0', 0, '{#MACRO}', 8),
-			array('not {#MACRO} = 0', 4, '{#MACRO}', 8),
-		);
+		return [
+			['{#M}', 0, '{#M}', 4],
+			['{#MACRO12.A_Z}', 0, '{#MACRO12.A_Z}', 14],
+			['{#MACRO} = 0', 0, '{#MACRO}', 8],
+			['not {#MACRO} = 0', 4, '{#MACRO}', 8],
+		];
 	}
 
 	public function invalidProvider() {
-		return array(
-			array('', 0, 0),
-			array('A', 0, 0),
-			array('{A', 0, 1),
-			array('{#', 0, 2),
-			array('{#}', 0, 2),
-			array('{#A', 0, 3),
-			array('{#a}', 0, 2),
-			array('{#+}', 0, 2),
-		);
+		return [
+			['', 0, 0],
+			['A', 0, 0],
+			['{A', 0, 1],
+			['{#', 0, 2],
+			['{#}', 0, 2],
+			['{#A', 0, 3],
+			['{#a}', 0, 2],
+			['{#+}', 0, 2],
+		];
 	}
 }

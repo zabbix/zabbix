@@ -51,7 +51,7 @@ class CController {
 	 *
 	 * @var string
 	 */
-	public $input = array();
+	public $input = [];
 
 	/**
 	 * SID validation flag, if true SID must be validated.

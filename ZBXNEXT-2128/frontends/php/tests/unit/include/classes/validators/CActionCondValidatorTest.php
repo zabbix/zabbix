@@ -22,424 +22,424 @@
 class CActionCondValidatorTest extends CValidatorTest {
 
 	public function validParamProvider() {
-		return array(
-			array(array())
-		);
+		return [
+			[[]]
+		];
 	}
 
 	public function validValuesProvider()
 	{
-		return array(
-			array(array(), array(
+		return [
+			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_GROUP,
 				'value' => 1,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_TEMPLATE,
 				'value' => 1,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER,
 				'value' => 1,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST,
 				'value' => 1,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DRULE,
 				'value' => 1,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DCHECK,
 				'value' => 1,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_PROXY,
 				'value' => 1,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DOBJECT,
 				'value' => EVENT_OBJECT_DHOST,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DOBJECT,
 				'value' => EVENT_OBJECT_DSERVICE,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 				'value' => '5-7,00:00-09:00;1,10:00-20:00;',
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => '192.168.0.0/16'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => '192.168.0.0/30'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => '192.168.0-255.0-255'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => 'fe80:0:0:0:0:0:c0a8:0/0'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => 'fe80:0:0:0:0:0:c0a8:0/111'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => 'fe80:0:0:0:0:0:c0a8:0/112'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => 'fe80:0:0:0:0:0:c0a8:0/128'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => 'fe80::c0a8:0/112'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => 'fe80::c0a8:0/128'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => '192.168.0.1-127,192.168.2.1'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DHOST_IP,
 				'value' => '0-255.0-255.0-255.0-255'
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
 				'value' => SVC_SSH,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
 				'value' => '100-200',
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DSTATUS,
 				'value' => DOBJECT_STATUS_UP,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 				'value' => null,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
 				'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 				'value' => TRIGGER_VALUE_TRUE,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
 				'value' => EVENT_TYPE_ITEM_NORMAL,
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
 				'value' => 'abc',
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DUPTIME,
 				'value' => 'abc',
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_DVALUE,
 				'value' => 'abc',
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_APPLICATION,
 				'value' => 'abc',
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_NAME,
 				'value' => 'abc',
-			)),
-			array(array(), array(
+			]],
+			[[], [
 				'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 				'value' => 'abc',
-			))
-		);
+			]]
+		];
 	}
 
 	public function invalidValuesProvider()
 	{
-		return array(
-			array(array(),
-				array(
+		return [
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_HOST_GROUP,
 					'value' => ''
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TEMPLATE,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_HOST,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DRULE,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DCHECK,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_PROXY,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DOBJECT,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DOBJECT,
 					'value' => 100,
-				),
+				],
 				'Incorrect action condition discovery object.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 					'value' => '',
-				),
+				],
 				'Empty time period.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TIME_PERIOD,
 					'value' => 'QQQQQQ',
-				),
+				],
 				'Incorrect time period "QQQQQQ".'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => ''
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.0.0/31'
-				),
+				],
 				'Invalid IP address range "192.168.0.0/31".'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.0.0/16-30'
-				),
+				],
 				'Invalid IP address range "192.168.0.0/16-30".'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => 'fe80:0:0:0:0:0:c0a8:0/129'
-				),
+				],
 				'Invalid IP address range "fe80:0:0:0:0:0:c0a8:0/129".'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => 'fe80::c0a8:0/129'
-				),
+				],
 				'Invalid IP address range "fe80::c0a8:0/129".'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '192.168.443.0/432'
-				),
+				],
 				'Invalid IP address range "192.168.443.0/432".'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DHOST_IP,
 					'value' => '{$A}'
-				),
+				],
 				'Invalid IP address range "{$A}".'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_TYPE,
 					'value' => 100,
-				),
+				],
 				'Incorrect action condition discovery check.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DSERVICE_PORT,
 					'value' => '3mdn-jiwiw',
-				),
+				],
 				'Incorrect action condition port "3mdn-jiwiw".'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DSTATUS,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DSTATUS,
 					'value' => 100,
-				),
+				],
 				'Incorrect action condition discovery status.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_MAINTENANCE,
 					'value' => 123,
-				),
+				],
 				'Maintenance action condition value must be empty.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_SEVERITY,
 					'value' => 100,
-				),
+				],
 				'Incorrect action condition trigger severity.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_VALUE,
 					'value' => 100,
-				),
+				],
 				'Incorrect action condition trigger value.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
 					'value' => 100,
-				),
+				],
 				'Incorrect action condition event type.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DUPTIME,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_DVALUE,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_APPLICATION,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_HOST_NAME,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
-			array(array(),
-				array(
+			],
+			[[],
+				[
 					'conditiontype' => CONDITION_TYPE_HOST_METADATA,
 					'value' => '',
-				),
+				],
 				'Empty action condition.'
-			),
+			],
 			// invalid condition type
-			array(array(),
-				array(
+			[[],
+				[
 					'conditiontype' => 9999,
 					'value' => '',
-				),
+				],
 				'Incorrect action condition type.'
-			)
-		);
+			]
+		];
 
 	}
 
@@ -458,16 +458,16 @@ class CActionCondValidatorTest extends CValidatorTest {
 	}
 
 	public function invalidValuesWithObjectsProvider() {
-		return array(
-			array(
-				array(),
-				array(
+		return [
+			[
+				[],
+				[
 					'conditiontype' => CONDITION_TYPE_HOST_GROUP,
 					'value' => ''
-				),
+				],
 				'Empty action condition.'
-			)
-		);
+			]
+		];
 	}
 
 	/**
@@ -477,7 +477,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 	 *
 	 * @return CValidator
 	 */
-	protected function createValidator(array $params = array()) {
+	protected function createValidator(array $params = []) {
 		return new CActionCondValidator($params);
 	}
 }
