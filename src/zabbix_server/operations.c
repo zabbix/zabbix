@@ -197,21 +197,23 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid;
 	char			*host = NULL, *host_esc, *host_unique;
 	unsigned short		port;
-	zbx_uint64_t		groupid;
 	zbx_vector_uint64_t	groupids;
 	unsigned char		svc_type, interface_type;
+	zbx_config_t		cfg;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
 
 	zbx_vector_uint64_create(&groupids);
 
-	if (0 == *(zbx_uint64_t *)DCconfig_get_config_data(&groupid, CONFIG_DISCOVERY_GROUPID))
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID);
+
+	if (0 == cfg.discovery_groupid)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host: group for discovered hosts is not defined");
 		goto clean;
 	}
 
-	zbx_vector_uint64_append(&groupids, groupid);
+	zbx_vector_uint64_append(&groupids, cfg.discovery_groupid);
 
 	if (EVENT_OBJECT_DHOST == event->object || EVENT_OBJECT_DSERVICE == event->object)
 	{
@@ -410,6 +412,8 @@ out:
 		DBfree_result(result);
 	}
 clean:
+	zbx_config_clean(&cfg);
+
 	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
