@@ -76,7 +76,8 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			[['ipRangeLimit' => 16777216], '255.0.0.0/8'],
 			[['ipRangeLimit' => 268435456], '64.0.0.0/4'],
 			[['ipRangeLimit' => 2147483648], '0.0.0.0/1'],
-			[['ipRangeLimit' => 4294967296], '0.0.0.0/0']
+			[['ipRangeLimit' => 4294967296], '0.0.0.0/0'],
+			[[], "192.168.1.1-2\t\n\r,\t\n\r192.168.1.2-3"],
 		];
 	}
 
@@ -151,6 +152,10 @@ class CIPRangeValidatorTest extends CValidatorTest {
 			[[],
 				'fe80::c0a8:0/129',
 				'Invalid IP address range "fe80::c0a8:0/129".'
+			],
+			[[], // contains vertical tab character \0x0B
+				"192.168.1.1-2\t\n\r,192.168.1.2-3",
+				'Invalid IP address range "192.168.1.2-3".'
 			]
 		];
 	}
