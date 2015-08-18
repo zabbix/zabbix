@@ -520,12 +520,19 @@ static int	DBpatch_2050050(void)
 
 static int	DBpatch_2050051(void)
 {
+	const ZBX_FIELD	field = {"iprange", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("drules", &field);
+}
+
+static int	DBpatch_2050052(void)
+{
 	const ZBX_FIELD	field = {"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBmodify_field_type("globalmacro", &field);
 }
 
-static int	DBpatch_2050052(void)
+static int	DBpatch_2050053(void)
 {
 	const ZBX_FIELD	field = {"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -583,5 +590,6 @@ DBPATCH_ADD(2050049, 0, 1)
 DBPATCH_ADD(2050050, 0, 1)
 DBPATCH_ADD(2050051, 0, 1)
 DBPATCH_ADD(2050052, 0, 1)
+DBPATCH_ADD(2050053, 0, 1)
 
 DBPATCH_END()
