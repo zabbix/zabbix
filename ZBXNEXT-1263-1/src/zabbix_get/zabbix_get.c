@@ -286,7 +286,7 @@ int	main(int argc, char **argv)
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_coredump_disable())
 	{
-		zbx_error("cannot set resource limits, exiting...");
+		zbx_error("cannot disable core dump, exiting...");
 		exit(EXIT_FAILURE);
 	}
 #endif

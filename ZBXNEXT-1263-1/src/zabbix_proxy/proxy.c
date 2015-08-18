@@ -844,7 +844,7 @@ int	MAIN_ZABBIX_ENTRY()
 
 	if (SUCCEED != zbx_coredump_disable())
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot set resource limits, exiting...");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
 		exit(EXIT_FAILURE);
 	}
 
