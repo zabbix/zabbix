@@ -116,7 +116,7 @@ $actionCommandWidget = (new CCollapsibleUiWidget('hat_eventactionmcmds', getActi
 	->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventactioncmds.state', true));
 
 // event history
-$eventHistoryWidget = (new CCollapsibleUiWidget('hat_eventlist', make_small_eventlist($event)))
+$eventHistoryWidget = (new CCollapsibleUiWidget('hat_eventlist', make_small_eventlist($event, $page['file'])))
 	->setHeader(_('Event list [previous 20]'))
 	->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventlist.state', true));
 
@@ -125,7 +125,7 @@ $eventTab->addRow([
 	new CDiv([
 		(new CUiWidget('hat_triggerdetails', make_trigger_details($trigger)))
 			->setHeader(_('Event source details')),
-		(new CUiWidget('hat_eventdetails', make_event_details($event, $trigger)))
+		(new CUiWidget('hat_eventdetails', make_event_details($event, $trigger, $page['file'])))
 			->setHeader(_('Event details'))
 	]),
 	new CDiv([$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget])
