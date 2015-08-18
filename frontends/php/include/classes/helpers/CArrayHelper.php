@@ -125,17 +125,21 @@ class CArrayHelper {
 		foreach (self::$fields as $field) {
 			// if field is not set or is null, treat it as smallest string
 			// strnatcasecmp() has unexpected behaviour with null values
-			if (!isset($a[$field['field']]) && !isset($b[$field['field']])) {
+
+			$valueA = self::getValueByPath($a, $field['field']);
+			$valueB = self::getValueByPath($b, $field['field']);
+
+			if ((false === $valueA) && (false === $valueB)) {
 				$cmp = 0;
 			}
-			elseif (!isset($a[$field['field']])) {
+			elseif ((false === $valueA)) {
 				$cmp = -1;
 			}
-			elseif (!isset($b[$field['field']])) {
+			elseif ((false === $valueB)) {
 				$cmp = 1;
 			}
 			else {
-				$cmp = strnatcasecmp($a[$field['field']], $b[$field['field']]);
+				$cmp = strnatcasecmp($valueA, $valueB);
 			}
 
 			if ($cmp != 0) {
@@ -222,5 +226,51 @@ class CArrayHelper {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get value of multidimensional array field by provided path
+	 *
+	 * Example 1
+	 * CArrayHelper::getValueByPath($myArray, 'item/key');
+	 *
+	 * @param array $array		array
+	 * @param string $path		path to field
+	 * @param string $delimiter	path delimeter
+	 *
+	 * @return boolean|string|array		nested array field value
+	 */
+	public static function getValueByPath(array $array, $path, $delimiter = '/') {
+		if (strpos($path, $delimiter) === 0) {
+			$path = substr($path, 1);
+		}
+		$pathArray = explode($delimiter, $path);
+		$value = $array;
+
+		foreach ($pathArray as $key) {
+			if (!is_array($value) || !array_key_exists($key, $value)) {
+				return false;
+			}
+			$value = $value[$key];
+		}
+		return $value;
+	}
+
+	/**
+	 * Flip multidimensional array by specified field
+	 *
+	 * @param array $array
+	 * @param string $field
+	 * @return array
+	 */
+	public static function flipByField(array $array, $field) {
+		$result = [];
+
+		foreach ($array as $key => $item) {
+			if(array_key_exists($field, $item)) {
+				$result[$item[$field]] = $key;
+			}
+		}
+		return $result;
 	}
 }
