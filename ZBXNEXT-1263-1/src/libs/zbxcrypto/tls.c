@@ -1316,6 +1316,26 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_check_psk_identity_len                                       *
+ *                                                                            *
+ * Purpose: check PSK identity size. Exit if the size exceeds maximum size.   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_check_psk_identity_len(size_t psk_identity_len)
+{
+	if (HOST_TLS_PSK_IDENTITY_LEN < psk_identity_len)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "PSK identity size " ZBX_FS_UI64 " exceeds the maximum size " ZBX_FS_UI64
+				" bytes.", (zbx_uint64_t)psk_identity_len, (zbx_uint64_t)HOST_TLS_PSK_IDENTITY_LEN);
+		zbx_tls_free();
+		exit(EXIT_FAILURE);
+	}
+}
+#endif
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_read_psk_file                                                *
  *                                                                            *
  * Purpose:                                                                   *
@@ -2291,26 +2311,6 @@ static void	zbx_tls_library_init(void)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
- * Function: zbx_check_psk_identity_size                                      *
- *                                                                            *
- * Purpose: check PSK identity size. Exit if the size exceeds maximum size.   *
- *                                                                            *
- ******************************************************************************/
-static void	zbx_check_psk_identity_size(size_t psk_identity_len)
-{
-	if (HOST_TLS_PSK_IDENTITY_LEN < psk_identity_len)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "PSK identity size " ZBX_FS_UI64 " exceeds the maximum size " ZBX_FS_UI64
-				" bytes.", (zbx_uint64_t)psk_identity_len, (zbx_uint64_t)HOST_TLS_PSK_IDENTITY_LEN);
-		zbx_tls_free();
-		exit(EXIT_FAILURE);
-	}
-}
-#endif
-
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-/******************************************************************************
- *                                                                            *
  * Function: zbx_tls_library_deinit                                           *
  *                                                                            *
  * Purpose: deinitialize TLS library                                          *
@@ -2501,7 +2501,7 @@ void	zbx_tls_init_child(void)
 		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
 		my_psk_identity_len = strlen(my_psk_identity);
 
-		zbx_check_psk_identity_size(my_psk_identity_len);
+		zbx_check_psk_identity_len(my_psk_identity_len);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK identity \"%s\"", __function_name,
 				CONFIG_TLS_PSK_IDENTITY);
@@ -2670,7 +2670,7 @@ void	zbx_tls_init_child(void)
 		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
 		my_psk_identity_len = strlen(my_psk_identity);
 
-		zbx_check_psk_identity_size(my_psk_identity_len);
+		zbx_check_psk_identity_len(my_psk_identity_len);
 
 		zbx_read_psk_file();
 
@@ -2970,7 +2970,7 @@ void	zbx_tls_init_child(void)
 		my_psk_identity = CONFIG_TLS_PSK_IDENTITY;
 		my_psk_identity_len = strlen(my_psk_identity);
 
-		zbx_check_psk_identity_size(my_psk_identity_len);
+		zbx_check_psk_identity_len(my_psk_identity_len);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded PSK identity \"%s\"", __function_name,
 				CONFIG_TLS_PSK_IDENTITY);
