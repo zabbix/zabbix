@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-15 10:02+0300\n"
+"POT-Creation-Date: 2015-08-18 10:23+0300\n"
 "PO-Revision-Date: 2015-07-30 20:39+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -439,9 +439,9 @@ msgstr "Ativo até"
 #: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.edit.php:1108
 #: include/views/configuration.application.edit.php:58
-#: include/views/configuration.discovery.edit.php:110
+#: include/views/configuration.discovery.edit.php:111
 #: include/views/configuration.graph.edit.php:267
-#: include/views/configuration.graph.edit.php:354
+#: include/views/configuration.graph.edit.php:356
 #: include/views/configuration.host.discovery.edit.php:245
 #: include/views/configuration.host.discovery.edit.php:344
 #: include/views/configuration.host.discovery.edit.php:380
@@ -488,7 +488,7 @@ msgstr "Ativo até"
 #: include/views/configuration.triggers.edit.php:307
 #: include/views/configuration.triggers.edit.php:334
 #: include/views/configuration.triggers.massupdate.php:91
-#: include/views/hostmacros.php:144
+#: include/views/hostmacros.php:155
 #: include/views/js/adm.regexprs.edit.js.php:188
 #: include/views/js/configuration.action.edit.js.php:225
 #: include/views/js/configuration.action.edit.js.php:511
@@ -736,7 +736,7 @@ msgstr "Aplicação com ID \"%1$s\" não está disponível no \"%2$s\"."
 #: include/views/configuration.host.list.php:59
 #: include/views/configuration.host.list.php:185
 #: include/views/configuration.item.edit.php:428
-#: include/views/configuration.item.list.php:65
+#: include/views/configuration.item.list.php:64
 #: include/views/configuration.item.prototype.edit.php:394
 #: include/views/configuration.item.prototype.list.php:49
 #: include/views/configuration.template.edit.php:177
@@ -1013,7 +1013,7 @@ msgid "Background image"
 msgstr "Imagem de fundo"
 
 #: authentication.php:42
-#: include/views/administration.authentication.edit.php:77
+#: include/views/administration.authentication.edit.php:63
 msgid "Base DN"
 msgstr "Base DN"
 
@@ -1021,13 +1021,13 @@ msgstr "Base DN"
 msgid "Basic"
 msgstr "Basico"
 
-#: include/views/administration.authentication.edit.php:92
+#: include/views/administration.authentication.edit.php:78
 msgid "Bind DN"
 msgstr "Bind DN"
 
 #: authentication.php:45
-#: include/views/administration.authentication.edit.php:100
-#: include/views/administration.authentication.edit.php:106
+#: include/views/administration.authentication.edit.php:86
+#: include/views/administration.authentication.edit.php:92
 msgid "Bind password"
 msgstr "Senha para o Bind"
 
@@ -2501,7 +2501,7 @@ msgid "Change"
 msgstr "Alterar"
 
 #: app/views/administration.mediatype.edit.php:86
-#: include/views/administration.authentication.edit.php:107
+#: include/views/administration.authentication.edit.php:93
 #: include/views/administration.users.edit.php:100
 msgid "Change password"
 msgstr "Alterar senha"
@@ -2554,7 +2554,7 @@ msgstr "Verificar a chave, por favor. Exemplo padão foi aprovado."
 msgid "Check type"
 msgstr "Verificar tipo"
 
-#: include/views/configuration.discovery.edit.php:58
+#: include/views/configuration.discovery.edit.php:59
 #: include/views/configuration.discovery.list.php:40
 msgid "Checks"
 msgstr "Checagens"
@@ -2654,7 +2654,7 @@ msgid "Clear"
 msgstr "Limpar"
 
 #: include/views/configuration.httpconf.list.php:142
-#: include/views/configuration.item.list.php:255
+#: include/views/configuration.item.list.php:258
 msgid "Clear history"
 msgstr "Limpar histórico"
 
@@ -2678,8 +2678,8 @@ msgstr "Relógio"
 #: include/views/administration.general.regularexpressions.edit.php:135
 #: include/views/configuration.action.edit.php:1097
 #: include/views/configuration.application.edit.php:50
-#: include/views/configuration.discovery.edit.php:102
-#: include/views/configuration.graph.edit.php:346
+#: include/views/configuration.discovery.edit.php:103
+#: include/views/configuration.graph.edit.php:348
 #: include/views/configuration.host.discovery.edit.php:365
 #: include/views/configuration.host.edit.php:776
 #: include/views/configuration.hostgroups.edit.php:77
@@ -3077,7 +3077,7 @@ msgstr "Coordenadas"
 
 #: include/views/configuration.copy.elements.php:120
 #: include/views/configuration.graph.list.php:160
-#: include/views/configuration.item.list.php:258
+#: include/views/configuration.item.list.php:261
 #: include/views/configuration.triggers.list.php:199
 msgid "Copy"
 msgstr "Copiar"
@@ -3648,7 +3648,7 @@ msgstr "Decimal"
 msgid "Default"
 msgstr "Padrão"
 
-#: include/views/administration.authentication.edit.php:45
+#: include/views/administration.authentication.edit.php:31
 msgid "Default authentication"
 msgstr "Autenticação padrão"
 
@@ -3684,7 +3684,7 @@ msgstr "Tema padrão \"%1$s\"."
 msgid "Delay"
 msgstr "Espera"
 
-#: include/views/configuration.discovery.edit.php:54
+#: include/views/configuration.discovery.edit.php:55
 msgid "Delay (in sec)"
 msgstr "Atraso (em segundos)"
 
@@ -3712,7 +3712,7 @@ msgstr "Atrasado por"
 #: include/views/configuration.host.list.php:225
 #: include/views/configuration.host.prototype.list.php:134
 #: include/views/configuration.httpconf.list.php:145
-#: include/views/configuration.item.list.php:260
+#: include/views/configuration.item.list.php:263
 #: include/views/configuration.item.prototype.list.php:120
 #: include/views/configuration.maintenance.list.php:78
 #: include/views/configuration.screen.list.php:68
@@ -3748,7 +3748,7 @@ msgstr "Excluir aplicação?"
 msgid "Delete current action?"
 msgstr "Excluir a ação atual?"
 
-#: include/views/configuration.discovery.edit.php:103
+#: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:369
 msgid "Delete discovery rule?"
 msgstr "Excluir a regra de descoberta?"
@@ -3758,15 +3758,15 @@ msgstr "Excluir a regra de descoberta?"
 msgid "Delete expression?"
 msgstr "Remover expressão?"
 
-#: include/views/configuration.graph.edit.php:334
+#: include/views/configuration.graph.edit.php:336
 msgid "Delete graph prototype?"
 msgstr "Excluir o protótipo de gráfico?"
 
-#: include/views/configuration.graph.edit.php:334
+#: include/views/configuration.graph.edit.php:336
 msgid "Delete graph?"
 msgstr "Remover gráfico?"
 
-#: include/views/configuration.item.list.php:256
+#: include/views/configuration.item.list.php:259
 msgid "Delete history of selected items?"
 msgstr "Remover o histórico dos itens selecionados?"
 
@@ -3893,7 +3893,7 @@ msgstr "Remover imagem selecionada?"
 msgid "Delete selected item prototypes?"
 msgstr "Excluir o protótipos de item selecionados?"
 
-#: include/views/configuration.item.list.php:260
+#: include/views/configuration.item.list.php:263
 msgid "Delete selected items?"
 msgstr "Remover itens selecionados?"
 
@@ -4154,7 +4154,7 @@ msgstr "Dispositivo"
 msgid "Device interrupts. Returns integer"
 msgstr "Interrupções do dispositivo. Retorna: número inteiro"
 
-#: discoveryconf.php:40 include/views/configuration.discovery.edit.php:76
+#: discoveryconf.php:40 include/views/configuration.discovery.edit.php:77
 msgid "Device uniqueness criteria"
 msgstr "Critério único do dispositivo"
 
@@ -4217,7 +4217,7 @@ msgstr "Dimensão (cols x linhas)"
 #: include/views/configuration.host.list.php:222
 #: include/views/configuration.host.prototype.list.php:131
 #: include/views/configuration.httpconf.list.php:141
-#: include/views/configuration.item.list.php:254
+#: include/views/configuration.item.list.php:257
 #: include/views/configuration.item.prototype.list.php:117
 #: include/views/configuration.trigger.prototype.list.php:170
 #: include/views/configuration.triggers.list.php:198
@@ -4282,7 +4282,7 @@ msgstr "Desativar hosts selecionados?"
 msgid "Disable selected item prototypes?"
 msgstr "Desabilitar o protótipo de item selecionado?"
 
-#: include/views/configuration.item.list.php:254
+#: include/views/configuration.item.list.php:257
 msgid "Disable selected items?"
 msgstr "Desativar itens selecionados?"
 
@@ -4384,7 +4384,7 @@ msgstr "Objeto de descoberta"
 #: app/views/monitoring.widget.discovery.view.php:46
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/forms.inc.php:1099
-#: include/views/configuration.discovery.edit.php:94
+#: include/views/configuration.discovery.edit.php:95
 msgid "Discovery rule"
 msgstr "Regra de autobusca"
 
@@ -4813,7 +4813,7 @@ msgstr "Não foi informado o ID do cenário."
 #: include/views/configuration.host.list.php:221
 #: include/views/configuration.host.prototype.list.php:128
 #: include/views/configuration.httpconf.list.php:140
-#: include/views/configuration.item.list.php:253
+#: include/views/configuration.item.list.php:256
 #: include/views/configuration.item.prototype.list.php:114
 #: include/views/configuration.trigger.prototype.list.php:167
 #: include/views/configuration.triggers.list.php:197
@@ -4894,7 +4894,7 @@ msgstr "Ativar os hosts selecionados?"
 msgid "Enable selected item prototypes?"
 msgstr "Ativar os protótipos de item selecionados?"
 
-#: include/views/configuration.item.list.php:253
+#: include/views/configuration.item.list.php:256
 msgid "Enable selected items?"
 msgstr "Ativar itens selecionados?"
 
@@ -4930,7 +4930,7 @@ msgstr "Ativar os cenários web selecionados?"
 #: include/views/administration.users.list.php:145
 #: include/views/configuration.action.edit.php:65
 #: include/views/configuration.action.list.php:86
-#: include/views/configuration.discovery.edit.php:91
+#: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.host.discovery.edit.php:270
 #: include/views/configuration.host.edit.php:300
 #: include/views/configuration.host.list.php:107
@@ -5119,7 +5119,7 @@ msgstr "Exportar para CSV"
 #: include/views/administration.general.iconmap.edit.php:48
 #: include/views/administration.general.regularexpressions.edit.php:44
 #: include/views/administration.general.regularexpressions.edit.php:117
-#: include/views/configuration.item.list.php:134
+#: include/views/configuration.item.list.php:137
 #: include/views/configuration.trigger.prototype.edit.php:131
 #: include/views/configuration.trigger.prototype.edit.php:140
 #: include/views/configuration.trigger.prototype.list.php:57
@@ -5846,8 +5846,7 @@ msgid "HOST ISSUES"
 msgstr "INCIDENTES DO HOST"
 
 #: include/discovery.inc.php:60
-#: include/views/administration.authentication.edit.php:43
-#: include/views/administration.authentication.edit.php:49
+#: include/views/administration.authentication.edit.php:35
 #: include/views/js/configuration.discovery.edit.js.php:167
 msgid "HTTP"
 msgstr "HTTP"
@@ -5937,7 +5936,7 @@ msgstr "Alta"
 
 #: history.php:27 include/forms.inc.php:921
 #: include/views/administration.general.housekeeper.edit.php:98
-#: include/views/configuration.item.list.php:62
+#: include/views/configuration.item.list.php:61
 #: include/views/configuration.item.prototype.list.php:46 items.php:162
 #: jsLoader.php:200 latest.php:434 latest.php:526 latest.php:706
 msgid "History"
@@ -6010,7 +6009,7 @@ msgstr "Alinhamento horizontal"
 #: include/views/configuration.host.prototype.edit.php:178
 #: include/views/configuration.httpconf.list.php:35
 #: include/views/configuration.httpconf.list.php:55
-#: include/views/configuration.item.list.php:57
+#: include/views/configuration.item.list.php:56
 #: include/views/configuration.screen.constructor.edit.php:416
 #: include/views/configuration.triggers.list.php:35
 #: include/views/configuration.triggers.list.php:56
@@ -6178,7 +6177,7 @@ msgstr "Incidentes dos hosts"
 msgid "Host label type"
 msgstr "Tipo do rótulo do host"
 
-#: include/views/hostmacros.php:154
+#: include/views/hostmacros.php:165
 msgid "Host macros"
 msgstr "Macros de host"
 
@@ -6419,7 +6418,7 @@ msgid "IP"
 msgstr "IP"
 
 #: app/views/administration.proxy.edit.php:35 include/maps.inc.php:46
-#: include/views/configuration.discovery.edit.php:80
+#: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.host.edit.php:128
 #: include/views/configuration.host.edit.php:211
 #: include/views/configuration.host.prototype.edit.php:92
@@ -7580,7 +7579,7 @@ msgstr "Indonésio (id_ID)"
 #: include/views/configuration.hostgroups.list.php:51
 #: include/views/configuration.host.list.php:69
 #: include/views/configuration.httpconf.list.php:65
-#: include/views/configuration.item.list.php:67
+#: include/views/configuration.item.list.php:66
 #: include/views/configuration.trigger.prototype.edit.php:142
 #: include/views/configuration.triggers.edit.php:147
 #: include/views/configuration.triggers.list.php:60 latest.php:441
@@ -7600,7 +7599,7 @@ msgstr "Informação"
 msgid "Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description"
 msgstr "Informacoes sobre o servico. Retorna um inteiro com parametro <state> ou <startup>; uma string com o parametro <displayname>, <path> ou <user>; texto com parametro <description>"
 
-#: include/views/hostmacros.php:155
+#: include/views/hostmacros.php:166
 msgid "Inherited and host macros"
 msgstr "Herdado e macros de host"
 
@@ -7657,8 +7656,7 @@ msgstr "A interface com o IP \"%1$s\" não pode possuir nome de DNS nulo enquant
 msgid "Interface with IP \"%1$s\" cannot have empty DNS name."
 msgstr "A interface com IP \"%s$s\" não pode possuir nome de DNS nulo."
 
-#: include/views/administration.authentication.edit.php:35
-#: include/views/administration.authentication.edit.php:47
+#: include/views/administration.authentication.edit.php:33
 msgctxt "authentication"
 msgid "Internal"
 msgstr "Interno"
@@ -7704,7 +7702,7 @@ msgstr "Internet Explorer"
 #: include/views/configuration.host.discovery.edit.php:200
 #: include/views/configuration.host.discovery.list.php:47
 #: include/views/configuration.item.edit.php:275
-#: include/views/configuration.item.list.php:61
+#: include/views/configuration.item.list.php:60
 #: include/views/configuration.item.massupdate.php:332
 #: include/views/configuration.item.prototype.edit.php:273
 #: include/views/configuration.item.prototype.list.php:45
@@ -8206,7 +8204,7 @@ msgstr "Manter dados de recursos perdidos por (em dias)"
 #: include/views/configuration.host.discovery.edit.php:65
 #: include/views/configuration.host.discovery.list.php:46
 #: include/views/configuration.item.edit.php:76
-#: include/views/configuration.item.list.php:60
+#: include/views/configuration.item.list.php:59
 #: include/views/configuration.item.prototype.edit.php:75
 #: include/views/configuration.item.prototype.list.php:44
 #: include/views/js/configuration.discovery.edit.js.php:426 items.php:44
@@ -8237,8 +8235,7 @@ msgid "Korean (ko_KR)"
 msgstr "Coreano (ko_KR)"
 
 #: include/discovery.inc.php:57
-#: include/views/administration.authentication.edit.php:39
-#: include/views/administration.authentication.edit.php:48
+#: include/views/administration.authentication.edit.php:34
 #: include/views/js/configuration.discovery.edit.js.php:172
 msgid "LDAP"
 msgstr "LDAP"
@@ -8252,7 +8249,7 @@ msgid "LDAP authentication changed"
 msgstr "Autenticação LDAP modificada"
 
 #: authentication.php:38
-#: include/views/administration.authentication.edit.php:68
+#: include/views/administration.authentication.edit.php:54
 msgid "LDAP host"
 msgstr "Servidor LDAP"
 
@@ -8601,7 +8598,7 @@ msgstr "Conectado como"
 
 #: auditlogs.php:130 include/func.inc.php:1641 include/func.inc.php:1656
 #: include/menu.inc.php:288 include/views/administration.auditlogs.list.php:37
-#: include/views/administration.authentication.edit.php:112
+#: include/views/administration.authentication.edit.php:98
 #: include/views/administration.users.list.php:53
 msgid "Login"
 msgstr "Login"
@@ -8889,7 +8886,7 @@ msgid "Mask"
 msgstr "Máscara"
 
 #: include/views/configuration.host.list.php:224
-#: include/views/configuration.item.list.php:259
+#: include/views/configuration.item.list.php:262
 #: include/views/configuration.item.massupdate.php:590
 #: include/views/configuration.trigger.prototype.list.php:173
 #: include/views/configuration.trigger.prototype.massupdate.php:112
@@ -9315,8 +9312,8 @@ msgstr "NTLM"
 #: include/views/configuration.httpconf.list.php:57
 #: include/views/configuration.httpconf.popup.php:86
 #: include/views/configuration.item.edit.php:46
-#: include/views/configuration.item.list.php:58
-#: include/views/configuration.item.list.php:133
+#: include/views/configuration.item.list.php:57
+#: include/views/configuration.item.list.php:136
 #: include/views/configuration.item.prototype.edit.php:45
 #: include/views/configuration.item.prototype.list.php:43
 #: include/views/configuration.maintenance.edit.php:36
@@ -9415,7 +9412,7 @@ msgstr "Nunca executado"
 #: include/views/configuration.action.edit.php:499
 #: include/views/configuration.action.edit.php:770
 #: include/views/configuration.action.edit.php:998
-#: include/views/configuration.discovery.edit.php:65
+#: include/views/configuration.discovery.edit.php:66
 #: include/views/configuration.maintenance.edit.php:138
 msgid "New"
 msgstr "Nova"
@@ -9619,8 +9616,8 @@ msgid "No data collection"
 msgstr "Sem coleta de dados"
 
 #: include/classes/html/CTableInfo.php:27
-msgid "No data found"
-msgstr "Dado não encontrado"
+msgid "No data found."
+msgstr ""
 
 #: popup_trexpr.php:536
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
@@ -11050,7 +11047,7 @@ msgstr "Preencha o campo do inventário do host"
 #: app/views/administration.proxy.edit.php:38 authentication.php:40
 #: disc_prototypes.php:110 host_discovery.php:84
 #: include/classes/setup/CSetupWizard.php:286
-#: include/views/administration.authentication.edit.php:72
+#: include/views/administration.authentication.edit.php:58
 #: include/views/configuration.action.edit.php:854
 #: include/views/configuration.host.discovery.edit.php:150
 #: include/views/configuration.host.edit.php:131
@@ -11102,7 +11099,7 @@ msgstr "Sumário da pré-instalação"
 
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:116
-#: include/views/configuration.graph.edit.php:328
+#: include/views/configuration.graph.edit.php:330
 msgid "Preview"
 msgstr "Visualizar"
 
@@ -12153,7 +12150,7 @@ msgid "Search"
 msgstr "Pesquisar"
 
 #: authentication.php:47
-#: include/views/administration.authentication.edit.php:81
+#: include/views/administration.authentication.edit.php:67
 msgid "Search attribute"
 msgstr "Atributo de pesquisa"
 
@@ -12433,7 +12430,7 @@ msgstr "Sessão terminada, conecte-se novamente por favor."
 
 #: events.php:453 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
-#: include/triggers.inc.php:1465 include/views/configuration.item.list.php:132
+#: include/triggers.inc.php:1465 include/views/configuration.item.list.php:135
 #: include/views/configuration.trigger.prototype.edit.php:245
 #: include/views/configuration.trigger.prototype.list.php:55
 #: include/views/configuration.trigger.prototype.massupdate.php:40
@@ -12735,7 +12732,7 @@ msgstr "Espanhol (es_ES)"
 msgid "Specified script does not exist or you do not have rights on it for action operation command."
 msgstr "O script informado não existe ou você não possui privilégios para executa-lo."
 
-#: include/views/configuration.item.list.php:51
+#: include/views/configuration.item.list.php:70
 msgid "Specify some filter condition to see the items."
 msgstr "Especifique alguma condição de filtro para visualizar os itens."
 
@@ -12787,8 +12784,8 @@ msgstr "Status"
 #: include/views/configuration.host.massupdate.php:181
 #: include/views/configuration.host.prototype.list.php:46
 #: include/views/configuration.httpconf.list.php:64
-#: include/views/configuration.item.list.php:66
-#: include/views/configuration.item.list.php:135
+#: include/views/configuration.item.list.php:65
+#: include/views/configuration.item.list.php:138
 #: include/views/configuration.item.massupdate.php:422
 #: include/views/configuration.item.prototype.list.php:50
 #: include/views/configuration.trigger.prototype.list.php:58
@@ -12966,7 +12963,7 @@ msgstr "Tamanho do espaço do swap em bytes ou percentual relativo ao total. Ret
 msgid "Swedish (sv_SE)"
 msgstr "Sueco (sv_SE)"
 
-#: include/views/administration.authentication.edit.php:124
+#: include/views/administration.authentication.edit.php:110
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "A mudança do método de autenticação irá invalidar todas as sessões, exceto esta! Continuar?"
 
@@ -13187,7 +13184,7 @@ msgstr "Templates"
 msgid "Templates \"%1$s\" unlinked from hosts \"%2$s\"."
 msgstr "Os templates \"%1$s\" foram desvinculados dos hosts \"%2$s\"."
 
-#: include/views/administration.authentication.edit.php:134
+#: include/views/administration.authentication.edit.php:120
 #: include/views/administration.general.regularexpressions.edit.php:128
 #: include/views/configuration.trigger.prototype.edit.php:207
 #: include/views/configuration.triggers.edit.php:212 tr_testexpr.php:25
@@ -13195,7 +13192,7 @@ msgstr "Os templates \"%1$s\" foram desvinculados dos hosts \"%2$s\"."
 msgid "Test"
 msgstr "Testar"
 
-#: include/views/administration.authentication.edit.php:111
+#: include/views/administration.authentication.edit.php:97
 msgid "Test authentication"
 msgstr "Teste de autenticação"
 
@@ -13518,7 +13515,7 @@ msgstr "Período de retenção das estatísticas (em dias)"
 
 #: include/forms.inc.php:926
 #: include/views/administration.general.housekeeper.edit.php:114
-#: include/views/configuration.item.list.php:63
+#: include/views/configuration.item.list.php:62
 #: include/views/configuration.item.prototype.list.php:47 items.php:163
 #: latest.php:435
 msgid "Trends"
@@ -13745,8 +13742,8 @@ msgstr "Valor da trigger"
 #: include/views/configuration.host.edit.php:375
 #: include/views/configuration.host.list.php:61
 #: include/views/configuration.host.list.php:193
-#: include/views/configuration.item.list.php:59
-#: include/views/configuration.item.list.php:188
+#: include/views/configuration.item.list.php:58
+#: include/views/configuration.item.list.php:191
 #: include/views/configuration.template.edit.php:222
 #: include/views/configuration.triggers.edit.php:24
 #: include/views/configuration.triggers.list.php:29
@@ -13838,7 +13835,7 @@ msgstr "Dois itens (\"%1$s\" e \"%2$s\") não podem popular um mesmo campo \"%3$
 #: include/views/configuration.host.discovery.list.php:48
 #: include/views/configuration.item.edit.php:55
 #: include/views/configuration.item.edit.php:60
-#: include/views/configuration.item.list.php:64
+#: include/views/configuration.item.list.php:63
 #: include/views/configuration.item.massupdate.php:41
 #: include/views/configuration.item.prototype.edit.php:54
 #: include/views/configuration.item.prototype.edit.php:59
@@ -14213,7 +14210,7 @@ msgstr "Ligado"
 #: app/views/administration.proxy.edit.php:98
 #: app/views/administration.script.edit.php:118
 #: include/views/administration.auditlogs.list.php:40
-#: include/views/administration.authentication.edit.php:121
+#: include/views/administration.authentication.edit.php:107
 #: include/views/administration.general.gui.edit.php:66
 #: include/views/administration.general.housekeeper.edit.php:133
 #: include/views/administration.general.iconmap.edit.php:135
@@ -14230,8 +14227,8 @@ msgstr "Ligado"
 #: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.edit.php:1095
 #: include/views/configuration.application.edit.php:48
-#: include/views/configuration.discovery.edit.php:100
-#: include/views/configuration.graph.edit.php:332
+#: include/views/configuration.discovery.edit.php:101
+#: include/views/configuration.graph.edit.php:334
 #: include/views/configuration.host.discovery.edit.php:376
 #: include/views/configuration.host.edit.php:774
 #: include/views/configuration.hostgroups.edit.php:88
@@ -14520,7 +14517,7 @@ msgid "User name does not match with DB"
 msgstr "O nome de usuário não foi encontrado no BD"
 
 #: authentication.php:51
-#: include/views/administration.authentication.edit.php:113
+#: include/views/administration.authentication.edit.php:99
 msgid "User password"
 msgstr "Senha do usuário"
 
@@ -15131,7 +15128,7 @@ msgstr "Sem incidentes"
 msgid "Without triggers"
 msgstr "Sem triggers"
 
-#: include/views/configuration.item.list.php:56
+#: include/views/configuration.item.list.php:55
 msgid "Wizard"
 msgstr "Assistente"
 
@@ -15805,7 +15802,7 @@ msgctxt "millisecond short"
 msgid "ms"
 msgstr "ms"
 
-#: include/views/administration.authentication.edit.php:111
+#: include/views/administration.authentication.edit.php:97
 msgid "must be a valid LDAP user"
 msgstr "necessário um usuário LDAP válido"
 
