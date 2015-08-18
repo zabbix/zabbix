@@ -2212,9 +2212,16 @@ fail:
 int	zbx_coredump_disable(void)
 {
 	struct rlimit	limit;
+	int		res;
 
 	limit.rlim_cur = 0;
 	limit.rlim_max = 0;
 
-	return 0 == setrlimit(RLIMIT_CORE, &limit) ? SUCCEED : FAIL;
+	if (0 != (res = setrlimit(RLIMIT_CORE, &limit)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set resource limit: %s", zbx_strerror(errno));
+		return FAIL;
+	}
+
+	return SUCCEED;
 }

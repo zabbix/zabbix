@@ -965,7 +965,7 @@ int	main(int argc, char **argv)
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_coredump_disable())
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot set resource limits, exiting...");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
 		goto exit;
 	}
 #endif
