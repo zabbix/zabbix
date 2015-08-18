@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-18 10:18+0300\n"
+"POT-Creation-Date: 2015-08-18 10:23+0300\n"
 "PO-Revision-Date: 2015-03-25 14:24+0300\n"
 "Last-Translator: filipp.sudanov <filipp.sudanov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -451,7 +451,7 @@ msgstr "Активно до"
 #: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.edit.php:1108
 #: include/views/configuration.application.edit.php:58
-#: include/views/configuration.discovery.edit.php:110
+#: include/views/configuration.discovery.edit.php:111
 #: include/views/configuration.graph.edit.php:267
 #: include/views/configuration.graph.edit.php:356
 #: include/views/configuration.host.discovery.edit.php:245
@@ -2599,7 +2599,7 @@ msgstr "Пожалуйста, проверьте ключ. Пример по у�
 msgid "Check type"
 msgstr "Тип проверки"
 
-#: include/views/configuration.discovery.edit.php:58
+#: include/views/configuration.discovery.edit.php:59
 #: include/views/configuration.discovery.list.php:40
 msgid "Checks"
 msgstr "Проверки"
@@ -2723,7 +2723,7 @@ msgstr "Часы"
 #: include/views/administration.general.regularexpressions.edit.php:135
 #: include/views/configuration.action.edit.php:1097
 #: include/views/configuration.application.edit.php:50
-#: include/views/configuration.discovery.edit.php:102
+#: include/views/configuration.discovery.edit.php:103
 #: include/views/configuration.graph.edit.php:348
 #: include/views/configuration.host.discovery.edit.php:365
 #: include/views/configuration.host.edit.php:776
@@ -3731,7 +3731,7 @@ msgstr "Тема по умолчанию \"%1$s\"."
 msgid "Delay"
 msgstr "Задержка"
 
-#: include/views/configuration.discovery.edit.php:54
+#: include/views/configuration.discovery.edit.php:55
 msgid "Delay (in sec)"
 msgstr "Задержка (в сек)"
 
@@ -3795,7 +3795,7 @@ msgstr "Удалить группу элементов данных?"
 msgid "Delete current action?"
 msgstr "Удалить текущее действие?"
 
-#: include/views/configuration.discovery.edit.php:103
+#: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:369
 msgid "Delete discovery rule?"
 msgstr "Удалить правило обнаружения?"
@@ -4201,7 +4201,7 @@ msgstr "Устройство"
 msgid "Device interrupts. Returns integer"
 msgstr ""
 
-#: discoveryconf.php:40 include/views/configuration.discovery.edit.php:76
+#: discoveryconf.php:40 include/views/configuration.discovery.edit.php:77
 msgid "Device uniqueness criteria"
 msgstr "Критерий уникальности устройства"
 
@@ -4431,7 +4431,7 @@ msgstr "Объект обнаружения"
 #: app/views/monitoring.widget.discovery.view.php:46
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/forms.inc.php:1099
-#: include/views/configuration.discovery.edit.php:94
+#: include/views/configuration.discovery.edit.php:95
 msgid "Discovery rule"
 msgstr "Правило обнаружения"
 
@@ -4978,7 +4978,7 @@ msgstr "Активировать выбранные веб-сценарии?"
 #: include/views/administration.users.list.php:145
 #: include/views/configuration.action.edit.php:65
 #: include/views/configuration.action.list.php:86
-#: include/views/configuration.discovery.edit.php:91
+#: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.host.discovery.edit.php:270
 #: include/views/configuration.host.edit.php:300
 #: include/views/configuration.host.list.php:107
@@ -6472,7 +6472,7 @@ msgid "IP"
 msgstr "IP"
 
 #: app/views/administration.proxy.edit.php:35 include/maps.inc.php:46
-#: include/views/configuration.discovery.edit.php:80
+#: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.host.edit.php:128
 #: include/views/configuration.host.edit.php:211
 #: include/views/configuration.host.prototype.edit.php:92
@@ -9467,7 +9467,7 @@ msgstr "Никогда не выполнялось"
 #: include/views/configuration.action.edit.php:499
 #: include/views/configuration.action.edit.php:770
 #: include/views/configuration.action.edit.php:998
-#: include/views/configuration.discovery.edit.php:65
+#: include/views/configuration.discovery.edit.php:66
 #: include/views/configuration.maintenance.edit.php:138
 msgid "New"
 msgstr "Новый"
@@ -14285,7 +14285,7 @@ msgstr "Доступен"
 #: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.edit.php:1095
 #: include/views/configuration.application.edit.php:48
-#: include/views/configuration.discovery.edit.php:100
+#: include/views/configuration.discovery.edit.php:101
 #: include/views/configuration.graph.edit.php:334
 #: include/views/configuration.host.discovery.edit.php:376
 #: include/views/configuration.host.edit.php:774

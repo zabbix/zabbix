@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-18 10:18+0300\n"
+"POT-Creation-Date: 2015-08-18 10:23+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0300\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -430,7 +430,7 @@ msgstr "作用中直到"
 #: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.edit.php:1108
 #: include/views/configuration.application.edit.php:58
-#: include/views/configuration.discovery.edit.php:110
+#: include/views/configuration.discovery.edit.php:111
 #: include/views/configuration.graph.edit.php:267
 #: include/views/configuration.graph.edit.php:356
 #: include/views/configuration.host.discovery.edit.php:245
@@ -2517,7 +2517,7 @@ msgstr "检查键值, 请. 用的是预设的例子."
 msgid "Check type"
 msgstr "检查类型"
 
-#: include/views/configuration.discovery.edit.php:58
+#: include/views/configuration.discovery.edit.php:59
 #: include/views/configuration.discovery.list.php:40
 msgid "Checks"
 msgstr "检查 "
@@ -2641,7 +2641,7 @@ msgstr "时钟"
 #: include/views/administration.general.regularexpressions.edit.php:135
 #: include/views/configuration.action.edit.php:1097
 #: include/views/configuration.application.edit.php:50
-#: include/views/configuration.discovery.edit.php:102
+#: include/views/configuration.discovery.edit.php:103
 #: include/views/configuration.graph.edit.php:348
 #: include/views/configuration.host.discovery.edit.php:365
 #: include/views/configuration.host.edit.php:776
@@ -3647,7 +3647,7 @@ msgstr "默认主题 \"%1$s\"."
 msgid "Delay"
 msgstr "延迟"
 
-#: include/views/configuration.discovery.edit.php:54
+#: include/views/configuration.discovery.edit.php:55
 msgid "Delay (in sec)"
 msgstr "延迟(秒计)"
 
@@ -3711,7 +3711,7 @@ msgstr "删除应用集?"
 msgid "Delete current action?"
 msgstr "删除目前的动作?"
 
-#: include/views/configuration.discovery.edit.php:103
+#: include/views/configuration.discovery.edit.php:104
 #: include/views/configuration.host.discovery.edit.php:369
 msgid "Delete discovery rule?"
 msgstr "删除发现规则?"
@@ -4115,7 +4115,7 @@ msgstr "设备"
 msgid "Device interrupts. Returns integer"
 msgstr ""
 
-#: discoveryconf.php:40 include/views/configuration.discovery.edit.php:76
+#: discoveryconf.php:40 include/views/configuration.discovery.edit.php:77
 msgid "Device uniqueness criteria"
 msgstr "设备唯一性准则"
 
@@ -4345,7 +4345,7 @@ msgstr "探索物件"
 #: app/views/monitoring.widget.discovery.view.php:46
 #: include/actions.inc.php:68 include/audit.inc.php:43
 #: include/forms.inc.php:1099
-#: include/views/configuration.discovery.edit.php:94
+#: include/views/configuration.discovery.edit.php:95
 msgid "Discovery rule"
 msgstr "探索规则"
 
@@ -4888,7 +4888,7 @@ msgstr ""
 #: include/views/administration.users.list.php:145
 #: include/views/configuration.action.edit.php:65
 #: include/views/configuration.action.list.php:86
-#: include/views/configuration.discovery.edit.php:91
+#: include/views/configuration.discovery.edit.php:92
 #: include/views/configuration.host.discovery.edit.php:270
 #: include/views/configuration.host.edit.php:300
 #: include/views/configuration.host.list.php:107
@@ -6372,7 +6372,7 @@ msgid "IP"
 msgstr "IP地址"
 
 #: app/views/administration.proxy.edit.php:35 include/maps.inc.php:46
-#: include/views/configuration.discovery.edit.php:80
+#: include/views/configuration.discovery.edit.php:81
 #: include/views/configuration.host.edit.php:128
 #: include/views/configuration.host.edit.php:211
 #: include/views/configuration.host.prototype.edit.php:92
@@ -9349,7 +9349,7 @@ msgstr "从未执行过"
 #: include/views/configuration.action.edit.php:499
 #: include/views/configuration.action.edit.php:770
 #: include/views/configuration.action.edit.php:998
-#: include/views/configuration.discovery.edit.php:65
+#: include/views/configuration.discovery.edit.php:66
 #: include/views/configuration.maintenance.edit.php:138
 msgid "New"
 msgstr "新的"
@@ -14144,7 +14144,7 @@ msgstr "上"
 #: include/views/configuration.action.edit.php:1070
 #: include/views/configuration.action.edit.php:1095
 #: include/views/configuration.application.edit.php:48
-#: include/views/configuration.discovery.edit.php:100
+#: include/views/configuration.discovery.edit.php:101
 #: include/views/configuration.graph.edit.php:334
 #: include/views/configuration.host.discovery.edit.php:376
 #: include/views/configuration.host.edit.php:774
