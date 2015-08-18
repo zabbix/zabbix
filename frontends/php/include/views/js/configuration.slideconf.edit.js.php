@@ -10,7 +10,7 @@
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?= CHtml::encode(_('default')); ?>" value="" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right; width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px">
+		<input type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?= CHtml::encode(_('default')); ?>" value="" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right; width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px">
 	</td>
 	<td>
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="remove_#{rowId}" remove_slide="#{rowId}" onclick="removeSlide(this);"><?= _('Remove') ?></button>

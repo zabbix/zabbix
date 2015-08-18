@@ -32,14 +32,6 @@ class CSimpleButton extends CTag implements CButtonInterface {
 	}
 
 	/**
-	 * Mark the button as main.
-	 */
-	public function main() {
-		$this->addClass('main');
-		return $this;
-	}
-
-	/**
 	 * Enable or disable the element.
 	 *
 	 * @param bool $value

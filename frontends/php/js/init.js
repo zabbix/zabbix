@@ -131,9 +131,13 @@ jQuery(function($) {
 				if (typeof data.values[i].id !== 'undefined') {
 					var item = {
 						'id': data.values[i].id,
-						'name': data.values[i].name,
-						'prefix': data.values[i].prefix
+						'name': data.values[i].name
 					};
+
+					if (typeof(data.values[i].prefix) !== 'undefined') {
+						item.prefix = data.values[i].prefix;
+					}
+
 					jQuery('#' + data.parentId).multiSelect('addData', item);
 				}
 			}
@@ -146,9 +150,6 @@ jQuery(function($) {
 			jQuery('#' + data.parentId).val(data.values[0].name);
 		}
 	});
-
-	// create jquery buttons
-	$('.jqueryinput').button();
 
 	// redirect buttons
 	$('button[data-url]').click(function() {
