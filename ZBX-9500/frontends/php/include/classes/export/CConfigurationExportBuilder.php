@@ -168,6 +168,7 @@ class CConfigurationExportBuilder {
 		$this->data['maps'] = [];
 
 		foreach ($maps as $map) {
+			$tmpSelements = $this->formatMapElements($map['selements']);
 			$this->data['maps'][] = [
 				'name' => $map['name'],
 				'width' => $map['width'],
@@ -197,8 +198,8 @@ class CConfigurationExportBuilder {
 				'background' => $map['backgroundid'],
 				'iconmap' => $map['iconmap'],
 				'urls' => $this->formatMapUrls($map['urls']),
-				'selements' => $this->formatMapElements($map['selements']),
-				'links' => $this->formatMapLinks($map['links'])
+				'selements' => $tmpSelements,
+				'links' => $this->formatMapLinks($map['links'],$tmpSelements)
 			];
 		}
 	}
@@ -393,6 +394,8 @@ class CConfigurationExportBuilder {
 	protected function formatGroupLinks(array $groupLinks) {
 		$result = [];
 
+		order_result($groupLinks, 'name');
+
 		foreach ($groupLinks as $groupLink) {
 			$result[] = [
 				'group' => $groupLink['groupid'],
@@ -411,6 +414,8 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatGroupPrototypes(array $groupPrototypes) {
 		$result = [];
+
+		order_result($groupPrototypes, 'name');
 
 		foreach ($groupPrototypes as $groupPrototype) {
 			$result[] = [
@@ -685,6 +690,11 @@ class CConfigurationExportBuilder {
 	protected function formatScreenItems(array $screenItems) {
 		$result = [];
 
+		CArrayHelper::sort($screenItems, [
+			['field' => 'y', 'order' => ZBX_SORT_UP],
+			['field' => 'x', 'order' => ZBX_SORT_UP]
+		]);
+
 		foreach ($screenItems as $screenItem) {
 			$result[] = [
 				'resourcetype' => $screenItem['resourcetype'],
@@ -720,6 +730,8 @@ class CConfigurationExportBuilder {
 	protected function formatGraphItems(array $graphItems) {
 		$result = [];
 
+		CArrayHelper::sort($graphItems, ['itemid/key', 'order' => ZBX_SORT_UP]);
+
 		foreach ($graphItems as $graphItem) {
 			$result[] = [
 				'sortorder'=> $graphItem['sortorder'],
@@ -745,6 +757,8 @@ class CConfigurationExportBuilder {
 	protected function formatMapUrls(array $urls) {
 		$result = [];
 
+		CArrayHelper::sort($urls, ['url']);
+
 		foreach ($urls as $url) {
 			$result[] = [
 				'name' => $url['name'],
@@ -766,6 +780,8 @@ class CConfigurationExportBuilder {
 	protected function formatMapElementUrls(array $urls) {
 		$result = [];
 
+		order_result($urls, 'url');
+
 		foreach ($urls as $url) {
 			$result[] = [
 				'name' => $url['name'],
@@ -783,8 +799,27 @@ class CConfigurationExportBuilder {
 	 *
 	 * @return array
 	 */
-	protected function formatMapLinks(array $links) {
+	protected function formatMapLinks(array $links, array $selements) {
 		$result = [];
+
+		// Get array where key is selementid and value is sort position.
+		$flippedSelements = CArrayHelper::flipByField($selements, 'selementid');
+		foreach ($links as &$link) {
+			$link['selementpos1'] = $flippedSelements[$link['selementid1']];
+			$link['selementpos2'] = $flippedSelements[$link['selementid2']];
+
+			// Sort selements positons asc.
+			if ($link['selementpos2'] < $link['selementpos1']) {
+				zbx_swap($link['selementpos1'], $link['selementpos2']);
+			}
+		}
+		unset($link);
+
+		// Sort links by selements positions
+		CArrayHelper::sort($links, [
+			['field' => 'selementpos1', 'order' => ZBX_SORT_UP],
+			['field' => 'selementpos2', 'order' => ZBX_SORT_UP]
+		]);
 
 		foreach ($links as $link) {
 			$result[] = [
@@ -810,6 +845,11 @@ class CConfigurationExportBuilder {
 	protected function formatMapLinkTriggers(array $linktriggers) {
 		$result = [];
 
+		CArrayHelper::sort($linktriggers, [
+			['field' => 'triggerid/description', 'order' => ZBX_SORT_UP],
+			['field' => 'triggerid/expression', 'order' => ZBX_SORT_UP]
+		]);
+
 		foreach ($linktriggers as $linktrigger) {
 			$result[] = [
 				'drawtype' => $linktrigger['drawtype'],
@@ -830,6 +870,11 @@ class CConfigurationExportBuilder {
 	 */
 	protected function formatMapElements(array $elements) {
 		$result = [];
+
+		CArrayHelper::sort($elements, [
+			['field' => 'y', 'order' => ZBX_SORT_UP],
+			['field' => 'x', 'order' => ZBX_SORT_UP]
+		]);
 
 		foreach ($elements as $element) {
 			$result[] = [
