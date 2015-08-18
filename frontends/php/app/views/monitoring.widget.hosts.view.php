@@ -53,6 +53,7 @@ CArrayHelper::sort($hosts, ['name']);
 $triggers = API::Trigger()->get([
 	'output' => ['triggerid', 'priority'],
 	'selectHosts' => ['hostid'],
+	'search' => ($data['filter']['trigger_name'] !== '') ? ['description' => $data['filter']['trigger_name']] : null,
 	'filter' => [
 		'priority' => $data['filter']['severity'],
 		'value' => TRIGGER_VALUE_TRUE
@@ -65,6 +66,9 @@ if ($data['filter']['extAck']) {
 	$triggers_unack = API::Trigger()->get([
 		'output' => ['triggerid'],
 		'selectHosts' => ['hostid'],
+		'search' => ($data['filter']['trigger_name'] !== '')
+			? ['description' => $data['filter']['trigger_name']]
+			: null,
 		'filter' => [
 			'priority' => $data['filter']['severity'],
 			'value' => TRIGGER_VALUE_TRUE
