@@ -222,7 +222,7 @@ foreach ($groups as $group) {
 
 	if ($data['filter']['extAck']) {
 		if ($hosts_data[$group['groupid']]['lastUnack']) {
-			$table_inf = (new CTableInfo())->setAttribute('style', 'width: 400px;');
+			$table_inf = new CTableInfo();
 
 			// set trigger severities as table header starting from highest severity
 			$header = [];
