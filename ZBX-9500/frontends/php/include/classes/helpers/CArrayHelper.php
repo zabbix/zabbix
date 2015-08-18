@@ -24,7 +24,6 @@ class CArrayHelper {
 	/**
 	 * @var array
 	 */
-	protected static $fields;
 
 	private function __construct() {}
 
@@ -106,47 +105,34 @@ class CArrayHelper {
 				$fields[$fid] = ['field' => $field, 'order' => ZBX_SORT_UP];
 			}
 		}
-		self::$fields = $fields;
-		uasort($array, ['self', 'compare']);
-	}
 
-	/**
-	 * Method to be used as callback for uasort function in sort method.
-	 *
-	 * @TODO: with PHP 5.3+ this should be changed to closure
-	 * @static
-	 *
-	 * @param $a
-	 * @param $b
-	 *
-	 * @return int
-	 */
-	protected static function compare($a, $b) {
-		foreach (self::$fields as $field) {
-			// if field is not set or is null, treat it as smallest string
-			// strnatcasecmp() has unexpected behaviour with null values
+		uasort($array, function($a, $b) use ($fields) {
+			foreach ($fields as $field) {
+				// if field is not set or is null, treat it as smallest string
+				// strnatcasecmp() has unexpected behaviour with null values
 
-			$valueA = self::getValueByPath($a, $field['field']);
-			$valueB = self::getValueByPath($b, $field['field']);
+				$valueA = self::getValueByPath($a, $field['field']);
+				$valueB = self::getValueByPath($b, $field['field']);
 
-			if ((false === $valueA) && (false === $valueB)) {
-				$cmp = 0;
-			}
-			elseif ((false === $valueA)) {
-				$cmp = -1;
-			}
-			elseif ((false === $valueB)) {
-				$cmp = 1;
-			}
-			else {
-				$cmp = strnatcasecmp($valueA, $valueB);
-			}
+				if ((false === $valueA) && (false === $valueB)) {
+					$cmp = 0;
+				}
+				elseif ((false === $valueA)) {
+					$cmp = -1;
+				}
+				elseif ((false === $valueB)) {
+					$cmp = 1;
+				}
+				else {
+					$cmp = strnatcasecmp($valueA, $valueB);
+				}
 
-			if ($cmp != 0) {
-				return $cmp * ($field['order'] == ZBX_SORT_UP?1:-1);
+				if ($cmp != 0) {
+					return $cmp * ($field['order'] == ZBX_SORT_UP?1:-1);
+				}
 			}
-		}
-		return 0;
+			return 0;
+		});
 	}
 
 	/**
