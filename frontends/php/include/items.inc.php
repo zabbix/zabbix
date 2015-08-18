@@ -702,7 +702,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		foreach ($hostNames as $hostName) {
 			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
 		}
-		$table->setHeader($header, 'vertical_header');
+		$table->setHeader($header);
 
 		foreach ($items as $descr => $ithosts) {
 			$tableRow = [nbsp($descr)];
@@ -719,7 +719,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 		foreach ($items as $descr => $ithosts) {
 			$header[] = (new CColHeader($descr))->addClass('vertical_rotation');
 		}
-		$table->setHeader($header, 'vertical_header');
+		$table->setHeader($header);
 
 		foreach ($hostNames as $hostId => $hostName) {
 			$host = $hosts[$hostId];
@@ -751,7 +751,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 			$css = getSeverityStyle($item['severity']);
 			$ack = get_last_event_by_triggerid($item['triggerid']);
 			$ack = ($ack['acknowledged'] == 1)
-				? [SPACE, new CImg('images/general/tick.png', 'ack')]
+				? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
 				: null;
 		}
 
@@ -761,13 +761,16 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	}
 
 	if ($value != UNKNOWN_VALUE) {
-		$value = (new CSpan($value))->addClass('link');
+		$value = $value;
 	}
 
 	$column = (new CCol([$value, $ack]))->addClass($css);
 
 	if (isset($ithosts[$hostName])) {
-		$column->setMenuPopup(CMenuPopupHelper::getHistory($item));
+		$column
+			->setMenuPopup(CMenuPopupHelper::getHistory($item))
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->addClass(ZBX_STYLE_NOWRAP);
 	}
 
 	$tableRow[] = $column;

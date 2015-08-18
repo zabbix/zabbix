@@ -605,7 +605,7 @@ class CHelpItems {
 			],
 			ITEM_TYPE_AGGREGATE => [
 				[
-					'key' => 'grpfunc[<group>,<key>,<func>,<param>]',
+					'key' => 'grpfunc[group,key,func,<param>]',
 					'description' => _('Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.')
 				]
 			],
@@ -873,6 +873,14 @@ class CHelpItems {
 				[
 					'key' => 'zabbix[history_uint]',
 					'description' => _('Number of values stored in table HISTORY_UINT.')
+				],
+				[
+					'key' => 'zabbix[host,,items]',
+					'description' => _('Number of enabled items on the host.')
+				],
+				[
+					'key' => 'zabbix[host,,items_unsupported]',
+					'description' => _('Number of unsupported items on the host.')
 				],
 				[
 					'key' => 'zabbix[host,,maintenance]',
