@@ -28,22 +28,22 @@ class CImportReferencer {
 	/**
 	 * @var array with references to interfaceid (hostid -> reference_name -> interfaceid)
 	 */
-	public $interfacesCache = array();
-	protected $groups = array();
-	protected $templates = array();
-	protected $hosts = array();
-	protected $applications = array();
-	protected $items = array();
-	protected $valueMaps = array();
-	protected $triggers = array();
-	protected $graphs = array();
-	protected $iconMaps = array();
-	protected $maps = array();
-	protected $screens = array();
-	protected $templateScreens = array();
-	protected $macros = array();
-	protected $proxies = array();
-	protected $hostPrototypes = array();
+	public $interfacesCache = [];
+	protected $groups = [];
+	protected $templates = [];
+	protected $hosts = [];
+	protected $applications = [];
+	protected $items = [];
+	protected $valueMaps = [];
+	protected $triggers = [];
+	protected $graphs = [];
+	protected $iconMaps = [];
+	protected $maps = [];
+	protected $screens = [];
+	protected $templateScreens = [];
+	protected $macros = [];
+	protected $proxies = [];
+	protected $hostPrototypes = [];
 	protected $groupsRefs;
 	protected $templatesRefs;
 	protected $hostsRefs;
@@ -394,7 +394,7 @@ class CImportReferencer {
 	public function addApplications(array $applications) {
 		foreach ($applications as $host => $apps) {
 			if (!isset($this->applications[$host])) {
-				$this->applications[$host] = array();
+				$this->applications[$host] = [];
 			}
 			$this->applications[$host] = array_unique(array_merge($this->applications[$host], $apps));
 		}
@@ -410,7 +410,7 @@ class CImportReferencer {
 	public function addItems(array $items) {
 		foreach ($items as $host => $keys) {
 			if (!isset($this->items[$host])) {
-				$this->items[$host] = array();
+				$this->items[$host] = [];
 			}
 			$this->items[$host] = array_unique(array_merge($this->items[$host], $keys));
 		}
@@ -446,7 +446,7 @@ class CImportReferencer {
 	public function addTriggers(array $triggers) {
 		foreach ($triggers as $name => $expressions) {
 			if (!isset($this->triggers[$name])) {
-				$this->triggers[$name] = array();
+				$this->triggers[$name] = [];
 			}
 			$this->triggers[$name] = array_unique(array_merge($this->triggers[$name], $expressions));
 		}
@@ -462,7 +462,7 @@ class CImportReferencer {
 	public function addGraphs(array $graphs) {
 		foreach ($graphs as $host => $hostGraphs) {
 			if (!isset($this->graphs[$host])) {
-				$this->graphs[$host] = array();
+				$this->graphs[$host] = [];
 			}
 			$this->graphs[$host] = array_unique(array_merge($this->graphs[$host], $hostGraphs));
 		}
@@ -553,7 +553,7 @@ class CImportReferencer {
 	public function addMacros(array $macros) {
 		foreach ($macros as $host => $ms) {
 			if (!isset($this->macros[$host])) {
-				$this->macros[$host] = array();
+				$this->macros[$host] = [];
 			}
 			$this->macros[$host] = array_unique(array_merge($this->macros[$host], $ms));
 		}
@@ -597,11 +597,11 @@ class CImportReferencer {
 	public function addHostPrototypes(array $hostPrototypes) {
 		foreach ($hostPrototypes as $host => $discoveryRule) {
 			if (!isset($this->hostPrototypes[$host])) {
-				$this->hostPrototypes[$host] = array();
+				$this->hostPrototypes[$host] = [];
 			}
 			foreach ($discoveryRule as $discoveryRuleKey => $hostPrototypes) {
 				if (!isset($this->hostPrototypes[$host][$discoveryRuleKey])) {
-					$this->hostPrototypes[$host][$discoveryRuleKey] = array();
+					$this->hostPrototypes[$host][$discoveryRuleKey] = [];
 				}
 				$this->hostPrototypes[$host][$discoveryRuleKey] = array_unique(
 					array_merge($this->hostPrototypes[$host][$discoveryRuleKey], $hostPrototypes)
@@ -615,18 +615,18 @@ class CImportReferencer {
 	 */
 	protected function selectGroups() {
 		if (!empty($this->groups)) {
-			$this->groupsRefs = array();
-			$dbGroups = API::HostGroup()->get(array(
-				'filter' => array('name' => $this->groups),
-				'output' => array('groupid', 'name'),
+			$this->groupsRefs = [];
+			$dbGroups = API::HostGroup()->get([
+				'filter' => ['name' => $this->groups],
+				'output' => ['groupid', 'name'],
 				'preservekeys' => true,
 				'editable' => true
-			));
+			]);
 			foreach ($dbGroups as $group) {
 				$this->groupsRefs[$group['name']] = $group['groupid'];
 			}
 
-			$this->groups = array();
+			$this->groups = [];
 		}
 	}
 
@@ -635,18 +635,18 @@ class CImportReferencer {
 	 */
 	protected function selectTemplates() {
 		if (!empty($this->templates)) {
-			$this->templatesRefs = array();
-			$dbTemplates = API::Template()->get(array(
-				'output' => array('host', 'templateid'),
+			$this->templatesRefs = [];
+			$dbTemplates = API::Template()->get([
+				'output' => ['host', 'templateid'],
 				'preservekeys' => true,
 				'editable' => true,
-				'filter' => array('host' => $this->templates)
-			));
+				'filter' => ['host' => $this->templates]
+			]);
 			foreach ($dbTemplates as $template) {
 				$this->templatesRefs[$template['host']] = $template['templateid'];
 			}
 
-			$this->templates = array();
+			$this->templates = [];
 		}
 	}
 
@@ -655,20 +655,20 @@ class CImportReferencer {
 	 */
 	protected function selectHosts() {
 		if (!empty($this->hosts)) {
-			$this->hostsRefs = array();
+			$this->hostsRefs = [];
 			// fetch only normal hosts, discovered hosts must not be imported
-			$dbHosts = API::Host()->get(array(
-				'filter' => array('host' => $this->hosts),
-				'output' => array('hostid', 'host'),
+			$dbHosts = API::Host()->get([
+				'filter' => ['host' => $this->hosts],
+				'output' => ['hostid', 'host'],
 				'preservekeys' => true,
 				'templated_hosts' => true,
 				'editable' => true
-			));
+			]);
 			foreach ($dbHosts as $host) {
 				$this->hostsRefs[$host['host']] = $host['hostid'];
 			}
 
-			$this->hosts = array();
+			$this->hosts = [];
 		}
 	}
 
@@ -677,17 +677,24 @@ class CImportReferencer {
 	 */
 	protected function selectApplications() {
 		if (!empty($this->applications)) {
-			$this->applicationsRefs = array();
-			$sqlWhere = array();
+			$this->applicationsRefs = [];
+			$sqlWhere = [];
+
 			foreach ($this->applications as $host => $applications) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
-					$sqlWhere[] = '(hostid='.zbx_dbstr($hostId).' AND '.dbConditionString('name', $applications).')';
+					$sqlWhere[] = '(a.hostid='.zbx_dbstr($hostId).' AND '.
+						dbConditionString('a.name', $applications).')';
 				}
 			}
 
 			if ($sqlWhere) {
-				$dbApplications = DBselect('SELECT applicationid,hostid,name FROM applications WHERE '.implode(' OR ', $sqlWhere));
+				$dbApplications = DBselect(
+					'SELECT a.applicationid,a.hostid,a.name'.
+					' FROM applications a'.
+					' WHERE '.implode(' OR ', $sqlWhere).
+						' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL
+				);
 				while ($dbApplication = DBfetch($dbApplications)) {
 					$this->applicationsRefs[$dbApplication['hostid']][$dbApplication['name']] = $dbApplication['applicationid'];
 				}
@@ -707,9 +714,9 @@ class CImportReferencer {
 	 */
 	protected function selectItems() {
 		if (!empty($this->items)) {
-			$this->itemsRefs = array();
+			$this->itemsRefs = [];
 
-			$sqlWhere = array();
+			$sqlWhere = [];
 			foreach ($this->items as $host => $keys) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
@@ -738,14 +745,14 @@ class CImportReferencer {
 	 */
 	protected function selectValueMaps() {
 		if (!empty($this->valueMaps)) {
-			$this->valueMapsRefs = array();
+			$this->valueMapsRefs = [];
 
 			$dbitems = DBselect('SELECT v.name,v.valuemapid FROM valuemaps v WHERE '.dbConditionString('v.name', $this->valueMaps));
 			while ($dbItem = DBfetch($dbitems)) {
 				$this->valueMapsRefs[$dbItem['name']] = $dbItem['valuemapid'];
 			}
 
-			$this->valueMaps = array();
+			$this->valueMaps = [];
 		}
 	}
 
@@ -754,20 +761,20 @@ class CImportReferencer {
 	 */
 	protected function selectTriggers() {
 		if (!empty($this->triggers)) {
-			$this->triggersRefs = array();
+			$this->triggersRefs = [];
 
-			$dbTriggers = API::Trigger()->get(array(
-				'output' => array('triggerid', 'expression', 'description'),
-				'filter' => array(
+			$dbTriggers = API::Trigger()->get([
+				'output' => ['triggerid', 'expression', 'description'],
+				'filter' => [
 					'description' => array_keys($this->triggers),
-					'flags' => array(
+					'flags' => [
 						ZBX_FLAG_DISCOVERY_NORMAL,
 						ZBX_FLAG_DISCOVERY_PROTOTYPE,
 						ZBX_FLAG_DISCOVERY_CREATED
-					)
-				),
+					]
+				],
 				'editable' => true
-			));
+			]);
 
 			foreach ($dbTriggers as $dbTrigger) {
 				$dbTriggerExpression = explode_exp($dbTrigger['expression']);
@@ -783,9 +790,9 @@ class CImportReferencer {
 	 */
 	protected function selectGraphs() {
 		if ($this->graphs) {
-			$this->graphsRefs = array();
+			$this->graphsRefs = [];
 
-			$graphNames = array();
+			$graphNames = [];
 
 			foreach ($this->graphs as $graphs) {
 				foreach ($graphs as $graph) {
@@ -793,15 +800,15 @@ class CImportReferencer {
 				}
 			}
 
-			$dbGraphs = API::Graph()->get(array(
-				'output' => array('graphid', 'name'),
-				'selectHosts' => array('hostid'),
-				'filter' => array(
+			$dbGraphs = API::Graph()->get([
+				'output' => ['graphid', 'name'],
+				'selectHosts' => ['hostid'],
+				'filter' => [
 					'name' => $graphNames,
 					'flags' => null
-				),
+				],
 				'editable' => true
-			));
+			]);
 
 			foreach ($dbGraphs as $dbGraph) {
 				foreach ($dbGraph['hosts'] as $host) {
@@ -830,17 +837,17 @@ class CImportReferencer {
 	 */
 	protected function selectIconMaps() {
 		if (!empty($this->iconMaps)) {
-			$this->iconMapsRefs = array();
-			$dbIconMaps = API::IconMap()->get(array(
-				'filter' => array('name' => $this->iconMaps),
-				'output' => array('iconmapid', 'name'),
-				'preservekeys' => true,
-			));
+			$this->iconMapsRefs = [];
+			$dbIconMaps = API::IconMap()->get([
+				'filter' => ['name' => $this->iconMaps],
+				'output' => ['iconmapid', 'name'],
+				'preservekeys' => true
+			]);
 			foreach ($dbIconMaps as $iconMap) {
 				$this->iconMapsRefs[$iconMap['name']] = $iconMap['iconmapid'];
 			}
 
-			$this->iconMaps = array();
+			$this->iconMaps = [];
 		}
 	}
 
@@ -849,17 +856,17 @@ class CImportReferencer {
 	 */
 	protected function selectMaps() {
 		if (!empty($this->maps)) {
-			$this->mapsRefs = array();
-			$dbMaps = API::Map()->get(array(
-				'filter' => array('name' => $this->maps),
-				'output' => array('sysmapid', 'name'),
-				'preservekeys' => true,
-			));
+			$this->mapsRefs = [];
+			$dbMaps = API::Map()->get([
+				'filter' => ['name' => $this->maps],
+				'output' => ['sysmapid', 'name'],
+				'preservekeys' => true
+			]);
 			foreach ($dbMaps as $dbMap) {
 				$this->mapsRefs[$dbMap['name']] = $dbMap['sysmapid'];
 			}
 
-			$this->maps = array();
+			$this->maps = [];
 		}
 	}
 
@@ -868,7 +875,7 @@ class CImportReferencer {
 	 */
 	protected function selectScreens() {
 		if (!empty($this->screens)) {
-			$this->screensRefs = array();
+			$this->screensRefs = [];
 
 			$dbScreens = DBselect('SELECT s.screenid,s.name FROM screens s WHERE'.
 					' s.templateid IS NULL '.
@@ -877,7 +884,7 @@ class CImportReferencer {
 				$this->screensRefs[$dbScreen['name']] = $dbScreen['screenid'];
 			}
 
-			$this->screens = array();
+			$this->screens = [];
 		}
 	}
 
@@ -886,7 +893,7 @@ class CImportReferencer {
 	 */
 	protected function selectTemplateScreens() {
 		if ($this->templateScreens) {
-			$this->templateScreensRefs = array();
+			$this->templateScreensRefs = [];
 
 			$dbScreens = DBselect(
 				'SELECT s.screenid, s.name, s.templateid'.
@@ -899,7 +906,7 @@ class CImportReferencer {
 				$this->templateScreensRefs[$dbScreen['templateid']][$dbScreen['name']] = $dbScreen['screenid'];
 			}
 
-			$this->templateScreens = array();
+			$this->templateScreens = [];
 		}
 	}
 
@@ -908,8 +915,8 @@ class CImportReferencer {
 	 */
 	protected function selectMacros() {
 		if (!empty($this->macros)) {
-			$this->macrosRefs = array();
-			$sqlWhere = array();
+			$this->macrosRefs = [];
+			$sqlWhere = [];
 			foreach ($this->macros as $host => $macros) {
 				$hostId = $this->resolveHostOrTemplate($host);
 				if ($hostId) {
@@ -924,7 +931,7 @@ class CImportReferencer {
 				}
 			}
 
-			$this->macros = array();
+			$this->macros = [];
 		}
 	}
 
@@ -933,18 +940,18 @@ class CImportReferencer {
 	 */
 	protected function selectProxyes() {
 		if (!empty($this->proxies)) {
-			$this->proxiesRefs = array();
-			$dbProxy = API::Proxy()->get(array(
-				'filter' => array('host' => $this->proxies),
-				'output' => array('hostid', 'host'),
+			$this->proxiesRefs = [];
+			$dbProxy = API::Proxy()->get([
+				'filter' => ['host' => $this->proxies],
+				'output' => ['hostid', 'host'],
 				'preservekeys' => true,
 				'editable' => true
-			));
+			]);
 			foreach ($dbProxy as $proxy) {
 				$this->proxiesRefs[$proxy['host']] = $proxy['proxyid'];
 			}
 
-			$this->proxies = array();
+			$this->proxies = [];
 		}
 	}
 
@@ -953,8 +960,8 @@ class CImportReferencer {
 	 */
 	protected function selectHostPrototypes() {
 		if (!empty($this->hostPrototypes)) {
-			$this->hostPrototypesRefs = array();
-			$sqlWhere = array();
+			$this->hostPrototypesRefs = [];
+			$sqlWhere = [];
 			foreach ($this->hostPrototypes as $host => $discoveryRule) {
 				$hostId = $this->resolveHostOrTemplate($host);
 

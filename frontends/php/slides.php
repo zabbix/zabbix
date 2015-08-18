@@ -26,8 +26,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Custom slides');
 $page['file'] = 'slides.php';
-$page['hist_arg'] = array('elementid');
-$page['scripts'] = array('class.pmaster.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
+$page['scripts'] = ['class.pmaster.js', 'class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
@@ -35,23 +34,22 @@ define('ZBX_PAGE_DO_JS_REFRESH', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'hostid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null),
-	'elementid' =>		array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null),
-	'step' =>			array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
-	'period' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,	null),
-	'stime' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,	null),
-	'reset' =>			array(T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null),
-	'fullscreen' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
+$fields = [
+	'groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null],
+	'hostid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,	null],
+	'elementid' =>		[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null],
+	'step' =>			[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null],
+	'period' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,	null],
+	'stime' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
+	'reset' =>			[T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null],
+	'fullscreen' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null],
 	// ajax
-	'widgetRefresh' =>	array(T_ZBX_STR, O_OPT, null,	null,	null),
-	'widgetRefreshRate' => array(T_ZBX_STR, O_OPT, P_ACT, null,	null),
-	'filterState' =>	array(T_ZBX_INT, O_OPT, P_ACT, null,	null),
-	'favobj' =>			array(T_ZBX_STR, O_OPT, P_ACT,	null,	null),
-	'favid' =>			array(T_ZBX_INT, O_OPT, P_ACT,	null,	null),
-	'upd_counter' =>	array(T_ZBX_INT, O_OPT, P_ACT,	null,	null)
-);
+	'widgetRefresh' =>	[T_ZBX_STR, O_OPT, null,	null,	null],
+	'widgetRefreshRate' => [T_ZBX_STR, O_OPT, P_ACT, null,	null],
+	'favobj' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,	null],
+	'favid' =>			[T_ZBX_INT, O_OPT, P_ACT,	null,	null],
+	'upd_counter' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,	null]
+];
 check_fields($fields);
 
 /*
@@ -59,8 +57,8 @@ check_fields($fields);
  */
 $dbSlideshow = null;
 
-if (getRequest('groupid') && !API::HostGroup()->isReadable(array(getRequest('groupid')))
-		|| getRequest('hostid') && !API::Host()->isReadable(array(getRequest('hostid')))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable([getRequest('groupid')])
+		|| getRequest('hostid') && !API::Host()->isReadable([getRequest('hostid')])) {
 	access_deny();
 }
 if (hasRequest('elementid')) {
@@ -80,11 +78,11 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 	$screen = getSlideshowScreens($elementId, getRequest('upd_counter'));
 
 	// display screens
-	$dbScreens = API::Screen()->get(array(
+	$dbScreens = API::Screen()->get([
 		'screenids' => $screen['screenid'],
 		'output' => API_OUTPUT_EXTEND,
 		'selectScreenItems' => API_OUTPUT_EXTEND
-	));
+	]);
 
 	if (!$dbScreens) {
 		insert_js('alert("'._('No permissions').'");');
@@ -94,7 +92,7 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 
 		// get fresh widget data
 		if (hasRequest('widgetRefresh')) {
-			$screenBuilder = new CScreenBuilder(array(
+			$screenBuilder = new CScreenBuilder([
 				'screen' => $dbScreen,
 				'mode' => SCREEN_MODE_PREVIEW,
 				'profileIdx' => 'web.slides',
@@ -102,16 +100,16 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 				'hostid' => getRequest('hostid'),
 				'period' => getRequest('period'),
 				'stime' => getRequest('stime')
-			));
+			]);
 
 			CScreenBuilder::insertScreenCleanJs();
 
 			echo $screenBuilder->show()->toString();
 
-			CScreenBuilder::insertScreenStandardJs(array(
+			CScreenBuilder::insertScreenStandardJs([
 				'timeline' => $screenBuilder->timeline,
 				'profileIdx' => $screenBuilder->profileIdx
-			));
+			]);
 
 			insertPagePostJs();
 		}
@@ -131,10 +129,6 @@ if ((hasRequest('widgetRefresh') || hasRequest('widgetRefreshRate')) && $dbSlide
 }
 
 // filter state
-if (hasRequest('filterState')) {
-	CProfile::update('web.slides.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
 if (hasRequest('favobj') && hasRequest('favid')) {
 	$favouriteObject = getRequest('favobj');
 	$favouriteId = getRequest('favid');
@@ -153,11 +147,11 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Display
  */
-$data = array(
+$data = [
 	'fullscreen' => getRequest('fullscreen'),
 	'elementId' => getRequest('elementid', CProfile::get('web.slides.elementid')),
-	'slideshows' => array()
-);
+	'slideshows' => []
+];
 
 // get slideshows
 $dbSlideshows = DBselect('SELECT s.slideshowid,s.name FROM slideshows s');
@@ -178,26 +172,26 @@ if (!isset($data['slideshows'][$data['elementId']])) {
 CProfile::update('web.slides.elementid', $data['elementId'], PROFILE_TYPE_ID);
 
 // get screen
-$data['screen'] = $data['elementId'] ? getSlideshowScreens($data['elementId'], 0) : array();
+$data['screen'] = $data['elementId'] ? getSlideshowScreens($data['elementId'], 0) : [];
 
 if ($data['screen']) {
 	// get groups and hosts
 	if (check_dynamic_items($data['elementId'], 1)) {
 		$data['isDynamicItems'] = true;
 
-		$data['pageFilter'] = new CPageFilter(array(
-			'groups' => array(
+		$data['pageFilter'] = new CPageFilter([
+			'groups' => [
 				'monitored_hosts' => true,
 				'with_items' => true
-			),
-			'hosts' => array(
+			],
+			'hosts' => [
 				'monitored_hosts' => true,
 				'with_items' => true,
 				'DDFirstLabel' => _('not selected')
-			),
+			],
 			'hostid' => getRequest('hostid'),
 			'groupid' => getRequest('groupid')
-		));
+		]);
 
 		$data['groupid'] = $data['pageFilter']->groupid;
 		$data['hostid'] = $data['pageFilter']->hostid;

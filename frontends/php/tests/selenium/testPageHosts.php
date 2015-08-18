@@ -46,7 +46,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextPresent('Displaying');
 		// Header
 		$this->zbxTestTextPresent(
-			array(
+			[
 				'Name',
 				'Applications',
 				'Items',
@@ -57,12 +57,12 @@ class testPageHosts extends CWebTest {
 				'Templates',
 				'Status',
 				'Availability'
-			)
+			]
 		);
 		// Data
-		$this->zbxTestTextPresent(array($host['name']));
+		$this->zbxTestTextPresent([$host['name']]);
 		$this->zbxTestDropdownHasOptions('action',
-				array('Export selected', 'Mass update', 'Enable selected', 'Disable selected', 'Delete selected'));
+				['Export selected', 'Mass update', 'Enable selected', 'Disable selected', 'Delete selected']);
 	}
 
 	/**
@@ -99,7 +99,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0');
 		// Header
 		$this->zbxTestTextPresent(
-			array(
+			[
 				'Name',
 				'Applications',
 				'Items',
@@ -110,7 +110,7 @@ class testPageHosts extends CWebTest {
 				'Templates',
 				'Status',
 				'Availability'
-			)
+			]
 		);
 
 		$this->zbxTestClickWait('link='.$name);
@@ -188,7 +188,7 @@ class testPageHosts extends CWebTest {
 		$this->zbxTestTextPresent('Displaying');
 		// Header
 		$this->zbxTestTextPresent(
-			array(
+			[
 				'Wizard',
 				'Name',
 				'Triggers',
@@ -200,7 +200,7 @@ class testPageHosts extends CWebTest {
 				'Status',
 				'Applications',
 				'Error'
-			)
+			]
 		);
 	}
 

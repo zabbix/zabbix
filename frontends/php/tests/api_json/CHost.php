@@ -23,110 +23,110 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
 class API_JSON_Host extends CZabbixTest {
 	public static function host_names() {
-		return array(
-			array('Test host', true),
-			array('Fake host', false),
-		);
+		return [
+			['Test host', true],
+			['Fake host', false],
+		];
 	}
 
 	public static function dup_template_ids() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'host' => 'Host to test dup ids 1',
 					'name' => 'Host visible to test dup ids 1',
-					'interfaces' => array(
-						array(
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_AGENT,
 							'useip' => INTERFACE_USE_IP,
 							'ip' => '192.168.3.1',
 							'dns' => '',
 							'port' => 567,
 							'main' => 1
-						)
-					),
-					'groups' => array(
-						array('groupid' => 5)		/* Discovered hosts */
-					),
-					'templates' => array(
-						array('templateid' => 10047),	/* Template App Zabbix Server */
-						array('templateid' => 10050),	/* Template App Zabbix Agent */
-						array('templateid' => 10093),	/* Template App FTP Service */
-						array('templateid' => 10094),	/* Template App HTTP Service */
-						array('templateid' => 10095),	/* Template App HTTPS Service */
-						array('templateid' => 10096),	/* Template App IMAP Service */
-						array('templateid' => 10097),	/* Template App LDAP Service */
-						array('templateid' => 10098),	/* Template App NNTP Service */
-						array('templateid' => 10099),	/* Template App NTP Service */
-						array('templateid' => 10100),	/* Template App POP Service */
-						array('templateid' => 10101),	/* Template App SMTP Service */
-						array('templateid' => 10102),	/* Template App SSH Service */
-						array('templateid' => 10103)	/* Template App Telnet Service */
-					)
-				),
+						]
+					],
+					'groups' => [
+						['groupid' => 5]		/* Discovered hosts */
+					],
+					'templates' => [
+						['templateid' => 10047],	/* Template App Zabbix Server */
+						['templateid' => 10050],	/* Template App Zabbix Agent */
+						['templateid' => 10093],	/* Template App FTP Service */
+						['templateid' => 10094],	/* Template App HTTP Service */
+						['templateid' => 10095],	/* Template App HTTPS Service */
+						['templateid' => 10096],	/* Template App IMAP Service */
+						['templateid' => 10097],	/* Template App LDAP Service */
+						['templateid' => 10098],	/* Template App NNTP Service */
+						['templateid' => 10099],	/* Template App NTP Service */
+						['templateid' => 10100],	/* Template App POP Service */
+						['templateid' => 10101],	/* Template App SMTP Service */
+						['templateid' => 10102],	/* Template App SSH Service */
+						['templateid' => 10103]	/* Template App Telnet Service */
+					]
+				],
 				true
-			),
-			array(
-				array(
+			],
+			[
+				[
 					'host' => 'Host to test dup ids 2',
 					'name' => 'Host visible to test dup ids 2',
-					'interfaces' => array(
-						array(
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_AGENT,
 							'useip' => INTERFACE_USE_IP,
 							'ip' => '192.168.3.1',
 							'dns' => '',
 							'port' => 567,
 							'main' => 1
-						)
-					),
-					'groups' => array(
-						array('groupid' => 5)		/* Discovered hosts */
-					),
-					'templates' => array(
-						array('templateid' => 10050),	/* Template App Zabbix Agent */
-						array('templateid' => 10050)	/* Template App Zabbix Agent */
-					)
-				),
+						]
+					],
+					'groups' => [
+						['groupid' => 5]		/* Discovered hosts */
+					],
+					'templates' => [
+						['templateid' => 10050],	/* Template App Zabbix Agent */
+						['templateid' => 10050]	/* Template App Zabbix Agent */
+					]
+				],
 				false
-			),
-			array(
-				array(
+			],
+			[
+				[
 					'host' => 'Host to test dup ids 3',
 					'name' => 'Host visible to test dup ids 3',
-					'interfaces' => array(
-						array(
+					'interfaces' => [
+						[
 							'type' => INTERFACE_TYPE_AGENT,
 							'useip' => INTERFACE_USE_IP,
 							'ip' => '192.168.3.1',
 							'dns' => '',
 							'port' => 567,
 							'main' => 1
-						)
-					),
-					'groups' => array(
-						array('groupid' => 5)		/* Discovered hosts */
-					),
-					'templates' => array(
-						array('templateid' => 10047),	/* Template App Zabbix Server */
-						array('templateid' => 10050),	/* Template App Zabbix Agent */
-						array('templateid' => 10050),	/* Template App Zabbix Agent */
-						array('templateid' => 10093),	/* Template App FTP Service */
-						array('templateid' => 10094),	/* Template App HTTP Service */
-						array('templateid' => 10095),	/* Template App HTTPS Service */
-						array('templateid' => 10096),	/* Template App IMAP Service */
-						array('templateid' => 10097),	/* Template App LDAP Service */
-						array('templateid' => 10098),	/* Template App NNTP Service */
-						array('templateid' => 10099),	/* Template App NTP Service */
-						array('templateid' => 10100),	/* Template App POP Service */
-						array('templateid' => 10101),	/* Template App SMTP Service */
-						array('templateid' => 10102),	/* Template App SSH Service */
-						array('templateid' => 10103)	/* Template App Telnet Service */
-					)
-				),
+						]
+					],
+					'groups' => [
+						['groupid' => 5]		/* Discovered hosts */
+					],
+					'templates' => [
+						['templateid' => 10047],	/* Template App Zabbix Server */
+						['templateid' => 10050],	/* Template App Zabbix Agent */
+						['templateid' => 10050],	/* Template App Zabbix Agent */
+						['templateid' => 10093],	/* Template App FTP Service */
+						['templateid' => 10094],	/* Template App HTTP Service */
+						['templateid' => 10095],	/* Template App HTTPS Service */
+						['templateid' => 10096],	/* Template App IMAP Service */
+						['templateid' => 10097],	/* Template App LDAP Service */
+						['templateid' => 10098],	/* Template App NNTP Service */
+						['templateid' => 10099],	/* Template App NTP Service */
+						['templateid' => 10100],	/* Template App POP Service */
+						['templateid' => 10101],	/* Template App SMTP Service */
+						['templateid' => 10102],	/* Template App SSH Service */
+						['templateid' => 10103]	/* Template App Telnet Service */
+					]
+				],
 				false
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -137,7 +137,7 @@ class API_JSON_Host extends CZabbixTest {
 
 		$result = $this->api_acall(
 			'host.exists',
-			array('host' => $name),
+			['host' => $name],
 			$debug
 		);
 
@@ -177,47 +177,47 @@ class API_JSON_Host extends CZabbixTest {
 	}
 
 	public static function inventoryGetRequests() {
-		return array(
-			array(
+		return [
+			[
 				// request
-				array(
+				[
 					'withInventory' => true,
-					'selectInventory' => array('type'),
+					'selectInventory' => ['type'],
 					'hostids' => 10053
-				),
+				],
 				// expected result
-				array(
+				[
 					'hostid' => 10053,
 					'type' => 'Type'
-				)
-			),
-			array(
+				]
+			],
+			[
 				// request
-				array(
+				[
 					'withInventory' => true,
-					'selectInventory' => array('os', 'tag'),
+					'selectInventory' => ['os', 'tag'],
 					'hostids' => 10053
-				),
+				],
 				// expected result
-				array(
+				[
 					'hostid' => 10053,
 					'os' => 'OS',
 					'tag' => 'Tag'
-				)
-			),
-			array(
+				]
+			],
+			[
 				// request
-				array(
+				[
 					'withInventory' => true,
-					'selectInventory' => array('blabla'), // non existent field
+					'selectInventory' => ['blabla'], // non existent field
 					'hostids' => 10053
-				),
+				],
 				// expected result
-				array(
+				[
 					'hostid' => 10053
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**

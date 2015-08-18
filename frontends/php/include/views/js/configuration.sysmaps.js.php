@@ -1,160 +1,157 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
+	<div class="dashbrd-widget-head <?= ZBX_STYLE_CURSOR_MOVE ?>">
+		<h4 id="formDragHandler">Map element</h4>
+	</div>
 	<form id="selementForm" name="selementForm">
 		<input type="hidden" id="elementid" name="elementid">
-		<table id="elementFormTable" class="formtable">
-			<thead>
-			<tr class="header">
-				<td id="formDragHandler" colspan="2" class="form_row_first move"><?php echo _('Edit map element'); ?></td>
-			</tr>
-			</thead>
+		<table id="elementFormTable" class="table-forms">
 			<tbody>
 			<tr>
-				<td>
-					<label for="elementType"><?php echo _('Type'); ?></label>
+				<td class="table-forms-td-left">
+					<label for="elementType"><?= _('Type') ?></label>
 				</td>
-				<td>
-					<select size="1" class="input select" name="elementtype" id="elementType">
-						<option value="<?php echo SYSMAP_ELEMENT_TYPE_HOST; ?>"><?php echo _('Host'); ?></option>
-						<option value="<?php echo SYSMAP_ELEMENT_TYPE_MAP; ?>"><?php echo _('Map'); ?></option>
-						<option value="<?php echo SYSMAP_ELEMENT_TYPE_TRIGGER; ?>"><?php echo _('Trigger'); ?></option>
-						<option value="<?php echo SYSMAP_ELEMENT_TYPE_HOST_GROUP; ?>"><?php echo _('Host group'); ?></option>
-						<option value="<?php echo SYSMAP_ELEMENT_TYPE_IMAGE; ?>"><?php echo _('Image'); ?></option>
+				<td class="table-forms-td-right">
+					<select name="elementtype" id="elementType">
+						<option value="<?= SYSMAP_ELEMENT_TYPE_HOST ?>"><?= _('Host') ?></option>
+						<option value="<?= SYSMAP_ELEMENT_TYPE_MAP ?>"><?= _('Map') ?></option>
+						<option value="<?= SYSMAP_ELEMENT_TYPE_TRIGGER ?>"><?= _('Trigger') ?></option>
+						<option value="<?= SYSMAP_ELEMENT_TYPE_HOST_GROUP ?>"><?= _('Host group') ?></option>
+						<option value="<?= SYSMAP_ELEMENT_TYPE_IMAGE ?>"><?= _('Image') ?></option>
 					</select>
 				</td>
 			</tr>
 			<tr id="subtypeRow">
-				<td><?php echo _('Show'); ?></td>
-				<td>
+				<td class="table-forms-td-left"><?= _('Show') ?></td>
+				<td class="table-forms-td-right">
 					<div class="groupingContent">
-						<input id="subtypeHostGroup" type="radio" class="input radio" name="elementsubtype" value="0" checked="checked">
-						<label for="subtypeHostGroup"><?php echo _('Host group'); ?></label>
+						<input id="subtypeHostGroup" type="radio" name="elementsubtype" value="0" checked="checked">
+						<label for="subtypeHostGroup"><?= _('Host group') ?></label>
 						<br />
-						<input id="subtypeHostGroupElements" type="radio" class="input radio" name="elementsubtype" value="1">
-						<label for="subtypeHostGroupElements"><?php echo _('Host group elements'); ?></label>
+						<input id="subtypeHostGroupElements" type="radio" name="elementsubtype" value="1">
+						<label for="subtypeHostGroupElements"><?= _('Host group elements') ?></label>
 					</div>
 				</td>
 			</tr>
 			<tr id="areaTypeRow">
-				<td><?php echo _('Area type'); ?></td>
-				<td>
+				<td class="table-forms-td-left"><?= _('Area type') ?></td>
+				<td class="table-forms-td-right">
 					<div class="groupingContent">
-						<input id="areaTypeAuto" type="radio" class="input radio" name="areatype" value="0" checked="checked">
-						<label for="areaTypeAuto"><?php echo _('Fit to map'); ?></label>
+						<input id="areaTypeAuto" type="radio" name="areatype" value="0" checked="checked">
+						<label for="areaTypeAuto"><?= _('Fit to map') ?></label>
 						<br />
-						<input id="areaTypeCustom" type="radio" class="input radio" name="areatype" value="1">
-						<label for="areaTypeCustom"><?php echo _('Custom size'); ?></label>
+						<input id="areaTypeCustom" type="radio" name="areatype" value="1">
+						<label for="areaTypeCustom"><?= _('Custom size') ?></label>
 					</div>
 				</td>
 			</tr>
 			<tr id="areaSizeRow">
-				<td><?php echo _('Area size'); ?></td>
-				<td>
-					<label for="areaSizeWidth"><?php echo _('Width'); ?></label>
-					<input id="areaSizeWidth" type="text" class="input text" name="width" value="200" size="5">
-					<label for="areaSizeHeight"><?php echo _('Height'); ?></label>
-					<input id="areaSizeHeight" type="text" class="input text" name="height" value="200" size="5">
+				<td class="table-forms-td-left"><?= _('Area size') ?></td>
+				<td class="table-forms-td-right">
+					<label for="areaSizeWidth"><?= _('Width') ?></label>
+					<input id="areaSizeWidth" type="text" name="width" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
+					<label for="areaSizeHeight"><?= _('Height') ?></label>
+					<input id="areaSizeHeight" type="text" name="height" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
 				</td>
 			</tr>
 			<tr id="areaPlacingRow">
-				<td>
-					<label for="areaPlacing"><?php echo _('Placing algorithm'); ?></label>
+				<td class="table-forms-td-left">
+					<label for="areaPlacing"><?= _('Placing algorithm') ?></label>
 				</td>
-				<td>
-					<select id="areaPlacing" class="input select">
-						<option value="<?php echo SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID; ?>"><?php echo _('Grid'); ?></option>
+				<td class="table-forms-td-right">
+					<select id="areaPlacing">
+						<option value="<?= SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID ?>"><?= _('Grid') ?></option>
 					</select>
 				</td>
 			</tr>
 			<tr>
-				<td>
-					<label for="elementLabel"><?php echo _('Label'); ?></label>
+				<td class="table-forms-td-left">
+					<label for="elementLabel"><?= _('Label') ?></label>
 				</td>
-				<td>
-					<textarea id="elementLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+				<td class="table-forms-td-right">
+					<textarea id="elementLabel" cols="56" rows="4" name="label" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr>
-				<td>
-					<label for="label_location"><?php echo _('Label location'); ?></label>
+				<td class="table-forms-td-left">
+					<label for="label_location"><?= _('Label location') ?></label>
 				</td>
-				<td>
-					<select id="label_location" class="input select" name="label_location">
-						<option value="<?php echo MAP_LABEL_LOC_DEFAULT; ?>"><?php echo _('Default'); ?></option>
-						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
-						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
-						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
-						<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
+				<td class="table-forms-td-right">
+					<select id="label_location" name="label_location">
+						<option value="<?= MAP_LABEL_LOC_DEFAULT ?>"><?= _('Default') ?></option>
+						<option value="<?= MAP_LABEL_LOC_BOTTOM ?>"><?= _('Bottom') ?></option>
+						<option value="<?= MAP_LABEL_LOC_LEFT ?>"><?= _('Left') ?></option>
+						<option value="<?= MAP_LABEL_LOC_RIGHT ?>"><?= _('Right') ?></option>
+						<option value="<?= MAP_LABEL_LOC_TOP ?>"><?= _('Top') ?></option>
 					</select>
 				</td>
 			</tr>
 			<tr id="hostGroupSelectRow">
-				<td><?php echo _('Host group'); ?></td>
-				<td>
-					<div id="elementNameHostGroup" class="multiselect" style="width: 312px;"></div>
+				<td class="table-forms-td-left"><?= _('Host group') ?></td>
+				<td class="table-forms-td-right">
+					<div id="elementNameHostGroup" class="multiselect" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></div>
 				</td>
 			</tr>
 			<tr id="hostSelectRow">
-				<td><?php echo _('Host'); ?></td>
-				<td>
-					<div id="elementNameHost" class="multiselect" style="width: 312px;"></div>
+				<td class="table-forms-td-left"><?= _('Host') ?></td>
+				<td class="table-forms-td-right">
+					<div id="elementNameHost" class="multiselect" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></div>
 				</td>
 			</tr>
 			<tr id="triggerSelectRow">
-				<td><?php echo _('Trigger'); ?></td>
-				<td>
-					<input readonly="readonly" size="50" id="elementNameTrigger" name="elementName" class="input">
+				<td class="table-forms-td-left"><?= _('Trigger') ?></td>
+				<td class="table-forms-td-right">
 					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
-					<span class="link" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1',450,450)"><?php echo _('Select'); ?></span>
+					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameTrigger" name="elementName" type="text">
+					<button type="button" class="<?= ZBX_STYLE_BTN_GREY ?>" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?= _('Select') ?></button>
 				</td>
 			</tr>
 			<tr id="mapSelectRow">
-				<td><?php echo _('Map'); ?></td>
-				<td>
-					<input readonly="readonly" size="50" id="elementNameMap" name="elementName" class="input">
-					<span class="link" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}", 450, 450)'><?php echo _('Select'); ?></span>
+				<td class="table-forms-td-left"><?= _('Map') ?></td>
+				<td class="table-forms-td-right">
+					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameMap" name="elementName" type="text">
+					<button type="button" class="btn-grey" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}")'><?= _('Select') ?></button>
 				</td>
 			</tr>
 			<tr id="application-select-row">
-				<td><?php echo _('Application'); ?></td>
-				<td>
-					<input size="50" id="application" name="application" class="input text"><button id="application-select" type="button" class="button link_menu"><?php echo _('Select'); ?></button>
+				<td class="table-forms-td-left"><?= _('Application') ?></td>
+				<td class="table-forms-td-right">
+					<input id="application" name="application" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" type="text">
+					<button class="<?= ZBX_STYLE_BTN_GREY ?>" id="application-select" type="button"><?= _('Select') ?></button>
 				</td>
 			</tr>
 
 			<tr>
-				<td colspan="2">
+				<td class="table-forms-td-right" colspan="2">
 					<fieldset>
-						<legend><?php echo _('Icons'); ?></legend>
+						<legend><?= _('Icons') ?></legend>
 						<table>
 							<tbody>
 							<tr id="useIconMapRow">
 								<td colspan="2">
-									<label for="use_iconmap" id=use_iconmapLabel><?php echo _('Automatic icon selection'); ?></label>
-									<input type="checkbox" name="use_iconmap" id="use_iconmap" class="checkbox" value="1">
+									<label for="use_iconmap" id=use_iconmapLabel>
+										<input type="checkbox" name="use_iconmap" id="use_iconmap" value="1">
+										<?= _('Automatic icon selection') ?>
+									</label>
 								</td>
 							</tr>
 							<tr>
 								<td>
-									<label for="iconid_off"><?php echo _('Default'); ?></label>
-									<br />
-									<select class="input select" name="iconid_off" id="iconid_off"></select>
+									<label for="iconid_off"><?= _('Default') ?></label>
+									<select name="iconid_off" id="iconid_off"></select>
 								</td>
 								<td id="iconProblemRow">
-									<label for="iconid_on"><?php echo _('Problem'); ?></label>
-									<br />
-									<select class="input select" name="iconid_on" id="iconid_on"></select>
+									<label for="iconid_on"><?= _('Problem') ?></label>
+									<select name="iconid_on" id="iconid_on"></select>
 								</td>
 							</tr>
 							<tr>
 								<td id="iconMainetnanceRow">
-									<label for="iconid_maintenance"><?php echo _('Maintenance'); ?></label>
-									<br />
-									<select class="input select" name="iconid_maintenance" id="iconid_maintenance"></select>
+									<label for="iconid_maintenance"><?= _('Maintenance') ?></label>
+									<select name="iconid_maintenance" id="iconid_maintenance"></select>
 								</td>
 								<td id="iconDisabledRow">
-									<label for="iconid_disabled"><?php echo _('Disabled'); ?></label>
-									<br />
-									<select class="input select" name="iconid_disabled" id="iconid_disabled"></select>
+									<label for="iconid_disabled"><?= _('Disabled') ?></label>
+									<select name="iconid_disabled" id="iconid_disabled"></select>
 								</td>
 							</tr>
 							</tbody>
@@ -164,32 +161,32 @@
 			</tr>
 
 			<tr>
-				<td><?php echo _('Coordinates'); ?></td>
-				<td>
-					<label for="x"><?php echo _('X'); ?></label>:
-					<input id="x" maxlength="5" value="0" size="5" name="x" class="input">
-					<label for="y"><?php echo _('Y'); ?></label>:
-					<input maxlength="5" value="0" size="5" id="y" name="y" class="input">
+				<td class="table-forms-td-left"><?= _('Coordinates') ?></td>
+				<td class="table-forms-td-right">
+					<input id="x" type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" name="x">
+					<label for="x"><?= _('X') ?></label>
+					<input type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" id="y" name="y">
+					<label for="y"><?= _('Y') ?></label>
 				</td>
 			</tr>
 
 			<tr>
-				<td colspan="2">
+				<td class="table-forms-td-right" colspan="2">
 					<fieldset>
-						<legend><?php echo _('URLs'); ?></legend>
+						<legend><?= _('URLs') ?></legend>
 						<table>
 							<thead>
 							<tr>
-								<td><?php echo _('Name'); ?></td>
-								<td><?php echo _('URL'); ?></td>
+								<td><label><?= _('Name') ?></label></td>
+								<td><label><?= _('URL') ?></label></td>
 								<td></td>
 							</tr>
 							</thead>
 							<tbody id="urlContainer"></tbody>
 							<tfoot>
 							<tr>
-								<td colspan="3">
-									<button type="button" id="newSelementUrl" class="button link_menu"><?php echo _('Add'); ?></button>
+								<td colspan=3>
+									<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" id="newSelementUrl"><?= _('Add') ?></button>
 								</td>
 							</tr>
 							</tfoot>
@@ -197,33 +194,35 @@
 					</fieldset>
 				</td>
 			</tr>
+			</tbody>
+			<tfoot>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
-					<button id="elementApply" class="button element-edit-control jqueryinput" type="button"><?php echo _('Apply') ?></button>
-					<button id="elementRemove" class="button element-edit-control jqueryinput" type="button"><?php echo _('Remove') ?></button>
-					<button id="elementClose" class="button jqueryinput" type="button"><?php echo _('Close') ?></button>
+				<td colspan="2">
+					<button class="element-edit-control" id="elementApply" type="button"><?= _('Apply') ?></button>
+					<button class="element-edit-control" id="elementRemove" type="button"><?= _('Remove') ?></button>
+					<button id="elementClose" type="button"><?= _('Close') ?></button>
 				</td>
 			</tr>
-			</tbody>
+			</tfoot>
 		</table>
 	</form>
 </script>
 
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
 	<form id="massForm">
-		<table class="formtable">
+		<table>
 			<tbody>
 			<tr class="header">
 				<td id="massDragHandler" colspan="2" class="form_row_first move">
-					<?php echo _('Mass update elements'); ?>&nbsp;
-					(<span id="massElementCount"></span>&nbsp;<?php echo _('elements'); ?>)
+					<?= _('Mass update elements') ?>&nbsp;
+					(<span id="massElementCount"></span>&nbsp;<?= _('elements') ?>)
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
-					<?php echo _('Selected elements'); ?>:
+					<?= _('Selected elements') ?>:
 					<div id="elements-selected">
-						<table class="tableinfo">
+						<table>
 							<tbody id="massList"></tbody>
 						</table>
 					</div>
@@ -231,78 +230,78 @@
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_label" id="chkboxLabel" class="checkbox">
-					<label for="chkboxLabel"><?php echo _('Label'); ?></label>
+					<input type="checkbox" name="chkbox_label" id="chkboxLabel">
+					<label for="chkboxLabel"><?= _('Label') ?></label>
 				</td>
 				<td>
-					<textarea id="massLabel" cols="56" rows="4" name="label" class="input textarea_standard"></textarea>
+					<textarea id="massLabel" rows="4" name="label" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation" class="checkbox">
-					<label for="chkboxLabelLocation"><?php echo _('Label location'); ?></label>
+					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation">
+					<label for="chkboxLabelLocation"><?= _('Label location') ?></label>
 				</td>
 				<td>
-					<select id="massLabelLocation" class="input select" name="label_location">
-						<option value="<?php echo MAP_LABEL_LOC_DEFAULT; ?>"><?php echo _('Default'); ?></option>
-						<option value="<?php echo MAP_LABEL_LOC_BOTTOM; ?>"><?php echo _('Bottom'); ?></option>
-						<option value="<?php echo MAP_LABEL_LOC_LEFT; ?>"><?php echo _('Left'); ?></option>
-						<option value="<?php echo MAP_LABEL_LOC_RIGHT; ?>"><?php echo _('Right'); ?></option>
-						<option value="<?php echo MAP_LABEL_LOC_TOP; ?>"><?php echo _('Top'); ?></option>
+					<select id="massLabelLocation" name="label_location">
+						<option value="<?= MAP_LABEL_LOC_DEFAULT ?>"><?= _('Default') ?></option>
+						<option value="<?= MAP_LABEL_LOC_BOTTOM ?>"><?= _('Bottom') ?></option>
+						<option value="<?= MAP_LABEL_LOC_LEFT ?>"><?= _('Left') ?></option>
+						<option value="<?= MAP_LABEL_LOC_RIGHT ?>"><?= _('Right') ?></option>
+						<option value="<?= MAP_LABEL_LOC_TOP ?>"><?= _('Top') ?></option>
 					</select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap" class="checkbox">
-					<label for="chkboxMassUseIconmap"><?php echo _('Automatic icon selection'); ?></label>
+					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap">
+					<label for="chkboxMassUseIconmap"><?= _('Automatic icon selection') ?></label>
 				</td>
 				<td>
-					<input type="checkbox" name="use_iconmap" id="massUseIconmap" class="checkbox" value="1">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff" class="checkbox">
-					<label for="chkboxMassIconidOff"><?php echo _('Icon (default)'); ?></label>
-				</td>
-				<td>
-					<select class="input select" name="iconid_off" id="massIconidOff"></select>
+					<input type="checkbox" name="use_iconmap" id="massUseIconmap" value="1">
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn" class="checkbox">
-					<label for="chkboxMassIconidOn"><?php echo _('Icon (problem)'); ?></label>
+					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff">
+					<label for="chkboxMassIconidOff"><?= _('Icon (default)') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="iconid_on" id="massIconidOn"></select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance" class="checkbox">
-					<label for="chkboxMassIconidMaintenance"><?php echo _('Icon (maintenance)'); ?></label>
-				</td>
-				<td>
-					<select class="input select" name="iconid_maintenance" id="massIconidMaintenance"></select>
+					<select name="iconid_off" id="massIconidOff"></select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled" class="checkbox">
-					<label for="chkboxMassIconidDisabled"><?php echo _('Icon (disabled)'); ?></label>
+					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn">
+					<label for="chkboxMassIconidOn"><?= _('Icon (problem)') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="iconid_disabled" id="massIconidDisabled"></select>
+					<select name="iconid_on" id="massIconidOn"></select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance">
+					<label for="chkboxMassIconidMaintenance"><?= _('Icon (maintenance)') ?></label>
+				</td>
+				<td>
+					<select name="iconid_maintenance" id="massIconidMaintenance"></select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled">
+					<label for="chkboxMassIconidDisabled"><?= _('Icon (disabled)') ?></label>
+				</td>
+				<td>
+					<select name="iconid_disabled" id="massIconidDisabled"></select>
 				</td>
 			</tr>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
-					<button id="massApply" class="element-edit-control jqueryinput" type="button"><?php echo _('Apply') ?></button>
-					<button id="massRemove" class="element-edit-control jqueryinput" type="button"><?php echo _('Remove') ?></button>
-					<button id="massClose" class="jqueryinput" type="button"><?php echo _('Close') ?></button>
+				<td colspan="2">
+					<button class="element-edit-control" id="massApply" type="button"><?= _('Apply') ?></button>
+					<button class="element-edit-control" id="massRemove" type="button"><?= _('Remove') ?></button>
+					<button id="massClose" type="button"><?= _('Close') ?></button>
 				</td>
 			</tr>
 			</tbody>
@@ -319,25 +318,25 @@
 
 <script type="text/x-jquery-tmpl" id="linkFormTpl">
 	<div id="mapLinksContainer">
-		<table id="element-links" class="tableinfo element-links">
-			<caption><?php echo _('Links for the selected element'); ?></caption>
+		<table id="element-links" class="element-links">
+			<caption><?= _('Links for the selected element') ?></caption>
 			<thead>
 			<tr class="header">
 				<td></td>
-				<td><?php echo _('Element name'); ?></td>
-				<td><?php echo _('Link indicators'); ?></td>
+				<td><?= _('Element name') ?></td>
+				<td><?= _('Link indicators') ?></td>
 			</tr>
 			</thead>
 			<tbody></tbody>
 		</table>
-		<table id="mass-element-links" class="tableinfo element-links">
-			<caption><?php echo _('Links between the selected elements'); ?></caption>
+		<table id="mass-element-links" class="element-links">
+			<caption><?= _('Links between the selected elements') ?></caption>
 			<thead>
 			<tr class="header">
 				<td></td>
-				<td><?php echo _('From'); ?></td>
-				<td><?php echo _('To'); ?></td>
-				<td><?php echo _('Link indicators'); ?></td>
+				<td><?= _('From') ?></td>
+				<td><?= _('To') ?></td>
+				<td><?= _('Link indicators') ?></td>
 			</tr>
 			</thead>
 			<tbody></tbody>
@@ -346,56 +345,58 @@
 	<form id="linkForm" name="linkForm">
 		<input type="hidden" name="selementid1">
 
-		<table class="formtable">
+		<table>
 			<tbody>
 			<tr>
 				<td>
-					<label for="linklabel"><?php echo _('Label'); ?></label>
+					<label for="linklabel"><?= _('Label') ?></label>
 				</td>
 				<td>
-					<textarea cols="48" rows="4" name="label" id="linklabel" class="input textarea_standard"></textarea>
+					<textarea cols="48" rows="4" name="label" id="linklabel" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
 				</td>
 			</tr>
 			<tr id="link-connect-to">
 				<td>
-					<label for="selementid2"><?php echo _('Connect to'); ?></label>
+					<label for="selementid2"><?= _('Connect to') ?></label>
 				</td>
 				<td>
-					<select class="input select" name="selementid2" id="selementid2"></select>
+					<select name="selementid2" id="selementid2"></select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<label for="drawtype"><?php echo _('Type (OK)'); ?></label>
+					<label for="drawtype"><?= _('Type (OK)') ?></label>
 				</td>
 				<td>
-					<select size="1" class="input select" name="drawtype" id="drawtype">
-						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_LINE; ?>"><?php echo _('Line'); ?></option>
-						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_BOLD_LINE; ?>"><?php echo _('Bold line'); ?></option>
-						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DOT; ?>"><?php echo _('Dot'); ?></option>
-						<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DASHED_LINE; ?>"><?php echo _('Dashed line'); ?></option>
+					<select name="drawtype" id="drawtype">
+						<option value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>"><?= _('Line') ?></option>
+						<option value="<?= GRAPH_ITEM_DRAWTYPE_BOLD_LINE ?>"><?= _('Bold line') ?></option>
+						<option value="<?= GRAPH_ITEM_DRAWTYPE_DOT ?>"><?= _('Dot') ?></option>
+						<option value="<?= GRAPH_ITEM_DRAWTYPE_DASHED_LINE ?>"><?= _('Dashed line') ?></option>
 					</select>
 				</td>
 			</tr>
 			<tr>
 				<td>
-					<label for="color"><?php echo _('Colour (OK)'); ?></label>
+					<label for="color"><?= _('Colour (OK)') ?></label>
 				</td>
 				<td>
-					<input maxlength="6" size="7" id="color" name="color" class="input colorpicker">
-					<div id="lbl_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
+					<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
+						<div name="lbl_color" id="lbl_color" style="background: #{color}" title="#{color}" onclick="javascript: show_color_picker('color')"></div>
+						<input id="color" name="color" value="#{color}" class="colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('color', this.value)" type="text">
+					</div>
 				</td>
 			</tr>
 			<tr>
 				<td colspan="2">
 					<fieldset>
-						<legend><?php echo _('Link indicators'); ?></legend>
+						<legend><?= _('Link indicators') ?></legend>
 						<table>
 							<thead>
 							<tr>
-								<td><?php echo _('Triggers'); ?></td>
-								<td><?php echo _('Type'); ?></td>
-								<td><?php echo _('Colour'); ?></td>
+								<td><?= _('Triggers') ?></td>
+								<td><?= _('Type') ?></td>
+								<td><?= _('Colour') ?></td>
 								<td></td>
 							</tr>
 							</thead>
@@ -403,7 +404,7 @@
 							<tfoot>
 							<tr>
 								<td colspan="4">
-									<button type="button" class="button link_menu" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1');"><?php echo _('Add'); ?></button>
+									<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1');"><?= _('Add') ?></button>
 								</td>
 							</tr>
 							</tfoot>
@@ -412,10 +413,10 @@
 				</td>
 			</tr>
 			<tr class="footer">
-				<td colspan="2" class="form_row_last">
-					<button id="formLinkApply" type="button"><?php echo _('Apply') ?></button>
-					<button id="formLinkRemove" type="button"><?php echo _('Remove') ?></button>
-					<button id="formLinkClose" type="button"><?php echo _('Close') ?></button>
+				<td colspan="2">
+					<button id="formLinkApply" type="button"><?= _('Apply') ?></button>
+					<button id="formLinkRemove" type="button"><?= _('Remove') ?></button>
+					<button id="formLinkClose" type="button"><?= _('Close') ?></button>
 				</td>
 			</tr>
 			</tbody>
@@ -426,7 +427,7 @@
 <script type="text/x-jquery-tmpl" id="elementLinkTableRowTpl">
 	<tr>
 		<td>
-			<button type="button" class="button link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> openlink" type="button" data-linkid="#{linkid}"><?= _('Edit') ?></button>
 		</td>
 		<td>#{toElementName}</td>
 		<td class="pre">#{linktriggers}</td>
@@ -436,7 +437,7 @@
 <script type="text/x-jquery-tmpl" id="massElementLinkTableRowTpl">
 	<tr>
 		<td>
-			<button type="button" class="button link_menu openlink" data-linkid="#{linkid}"><?php echo _('Edit'); ?></button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> openlink" type="button" data-linkid="#{linkid}"><?= _('Edit') ?></button>
 		</td>
 		<td>#{fromElementName}</td>
 		<td>#{toElementName}</td>
@@ -451,29 +452,31 @@
 			<input type="hidden" name="linktrigger_#{linktriggerid}_desc_exp" value="#{desc_exp}" />
 			<input type="hidden" name="linktrigger_#{linktriggerid}_triggerid" value="#{triggerid}" />
 			<input type="hidden" name="linktrigger_#{linktriggerid}_linktriggerid" value="#{linktriggerid}" />
-			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype" class="input select">
-				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_LINE; ?>"><?php echo _('Line'); ?></option>
-				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_BOLD_LINE; ?>"><?php echo _('Bold line'); ?></option>
-				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DOT; ?>"><?php echo _('Dot'); ?></option>
-				<option value="<?php echo GRAPH_ITEM_DRAWTYPE_DASHED_LINE; ?>"><?php echo _('Dashed line'); ?></option>
+			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype">
+				<option value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>"><?= _('Line') ?></option>
+				<option value="<?= GRAPH_ITEM_DRAWTYPE_BOLD_LINE ?>"><?= _('Bold line') ?></option>
+				<option value="<?= GRAPH_ITEM_DRAWTYPE_DOT ?>"><?= _('Dot') ?></option>
+				<option value="<?= GRAPH_ITEM_DRAWTYPE_DASHED_LINE ?>"><?= _('Dashed line') ?></option>
 			</select>
 		</td>
 		<td>
-			<input maxlength="6" value="#{color}" size="7" id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" class="input colorpicker">
-			<div id="lbl_linktrigger_#{linktriggerid}_color" class="pointer colorpickerLabel">&nbsp;&nbsp;&nbsp;</div>
+			<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
+				<div name="lbl_linktrigger_#{linktriggerid}_color" id="lbl_linktrigger_#{linktriggerid}_color" style="background: #{color}" title="#{color}" onclick="javascript: show_color_picker('linktrigger_#{linktriggerid}_color')"></div>
+				<input id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" value="#{color}" class="colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('linktrigger_#{linktriggerid}_color', this.value)" type="text">
+			</div>
 		</td>
 		<td>
-			<button type="button" class="button link_menu triggerRemove" data-linktriggerid="#{linktriggerid}"><?php echo _('Remove'); ?></button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> triggerRemove" type="button" data-linktriggerid="#{linktriggerid}"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
-	<tr id="urlrow_#{selementurlid}" class="even_row">
-		<td><input class="input" name="url_#{selementurlid}_name" type="text" size="16" value="#{name}"></td>
-		<td><input class="input" name="url_#{selementurlid}_url" type="text" size="32" value="#{url}"></td>
+	<tr id="urlrow_#{selementurlid}">
+		<td><input name="url_#{selementurlid}_name" type="text" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" value="#{name}"></td>
 		<td>
-			<button type="button" class="button link_menu" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?php echo _('Remove'); ?></button>
+			<input name="url_#{selementurlid}_url" type="text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" value="#{url}">
+			<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?= _('Remove') ?></button>
 		</td>
 	</tr>
 </script>

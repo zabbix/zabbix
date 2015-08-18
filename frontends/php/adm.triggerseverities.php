@@ -23,27 +23,26 @@ require_once dirname(__FILE__).'/include/config.inc.php';
 
 $page['title'] = _('Configuration of trigger severities');
 $page['file'] = 'adm.triggerseverities.php';
-$page['hist_arg'] = array();
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-$fields = array(
-	'severity_name_0' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Not classified')),
-	'severity_color_0' =>	array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Not classified')),
-	'severity_name_1' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Information')),
-	'severity_color_1' =>	array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Information')),
-	'severity_name_2' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Warning')),
-	'severity_color_2' =>	array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Warning')),
-	'severity_name_3' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Average')),
-	'severity_color_3' =>	array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Average')),
-	'severity_name_4' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('High')),
-	'severity_color_4' =>	array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('High')),
-	'severity_name_5' =>	array(T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Disaster')),
-	'severity_color_5' =>	array(T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Disaster')),
+$fields = [
+	'severity_name_0' =>	[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Not classified')],
+	'severity_color_0' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Not classified')],
+	'severity_name_1' =>	[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Information')],
+	'severity_color_1' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Information')],
+	'severity_name_2' =>	[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Warning')],
+	'severity_color_2' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Warning')],
+	'severity_name_3' =>	[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Average')],
+	'severity_color_3' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Average')],
+	'severity_name_4' =>	[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('High')],
+	'severity_color_4' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('High')],
+	'severity_name_5' =>	[T_ZBX_STR, O_OPT, null, NOT_EMPTY, 'isset({update})', _('Disaster')],
+	'severity_color_5' =>	[T_ZBX_CLR, O_OPT, null, null, 'isset({update})', _('Disaster')],
 	// actions
-	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null, null, null)
-);
+	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT, null, null, null]
+];
 check_fields($fields);
 
 /*
@@ -51,7 +50,7 @@ check_fields($fields);
  */
 if (hasRequest('update')) {
 	DBstart();
-	$result = update_config(array(
+	$result = update_config([
 		'severity_name_0' => getRequest('severity_name_0'),
 		'severity_color_0' => getRequest('severity_color_0'),
 		'severity_name_1' => getRequest('severity_name_1'),
@@ -64,7 +63,7 @@ if (hasRequest('update')) {
 		'severity_color_4' => getRequest('severity_color_4'),
 		'severity_name_5' => getRequest('severity_name_5'),
 		'severity_color_5' => getRequest('severity_color_5')
-	));
+	]);
 	$result = DBend($result);
 
 	show_messages($result, _('Configuration updated'), _('Cannot update configuration'));
@@ -73,33 +72,10 @@ if (hasRequest('update')) {
 /*
  * Display
  */
-$form = new CForm();
-$form->cleanItems();
-$cmbConf = new CComboBox('configDropDown', 'adm.triggerseverities.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	array(
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	)
-);
-$form->addItem($cmbConf);
-
-$cnf_wdgt = new CWidget();
-$cnf_wdgt->addPageHeader(_('CONFIGURATION OF TRIGGER SEVERITIES'), $form);
-
 $config = select_config();
 
 if (hasRequest('form_refresh')) {
-	$data = array(
+	$data = [
 		'severity_name_0' => getRequest('severity_name_0', $config['severity_name_0']),
 		'severity_color_0' => getRequest('severity_color_0', $config['severity_color_0']),
 		'severity_name_1' => getRequest('severity_name_1', $config['severity_name_1']),
@@ -112,10 +88,10 @@ if (hasRequest('form_refresh')) {
 		'severity_color_4' => getRequest('severity_color_4', $config['severity_color_4']),
 		'severity_name_5' => getRequest('severity_name_5', $config['severity_name_5']),
 		'severity_color_5' => getRequest('severity_color_5', $config['severity_color_5'])
-	);
+	];
 }
 else {
-	$data = array(
+	$data = [
 		'severity_name_0' => $config['severity_name_0'],
 		'severity_color_0' => $config['severity_color_0'],
 		'severity_name_1' => $config['severity_name_1'],
@@ -128,11 +104,11 @@ else {
 		'severity_color_4' => $config['severity_color_4'],
 		'severity_name_5' => $config['severity_name_5'],
 		'severity_color_5' => $config['severity_color_5']
-	);
+	];
 }
 
-$triggerSeverityForm = new CView('administration.general.triggerSeverity.edit', $data);
-$cnf_wdgt->addItem($triggerSeverityForm->render());
-$cnf_wdgt->show();
+$view = new CView('administration.general.triggerSeverity.edit', $data);
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

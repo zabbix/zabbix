@@ -72,14 +72,14 @@ int	DBconnect(int flag)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
 		connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
 
 	if (0 != connection_failure)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "database connection re-established");
+		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		connection_failure = 0;
 	}
 
@@ -122,7 +122,7 @@ static void	DBtxn_operation(int (*txn_operation)())
 
 		if (ZBX_DB_DOWN == (rc = txn_operation()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -217,7 +217,7 @@ void	DBstatement_prepare(const char *sql)
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_statement_prepare(sql)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -247,7 +247,7 @@ void	DBbind_parameter(int position, void *buffer, unsigned char type)
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_bind_parameter(position, buffer, type)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -276,7 +276,7 @@ int	DBstatement_execute()
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_statement_execute()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -311,7 +311,7 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_vexecute(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -378,7 +378,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_vselect(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -411,7 +411,7 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(query, n)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -2607,6 +2607,108 @@ out:
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, result_string);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_record                                                    *
+ *                                                                            *
+ * Purpose: locks a record in a table by its primary key and an optional      *
+ *          constraint field                                                  *
+ *                                                                            *
+ * Parameters: table     - [IN] the target table                              *
+ *             id        - [IN] primary key value                             *
+ *             add_field - [IN] additional constraint field name (optional)   *
+ *             add_id    - [IN] constraint field value                        *
+ *                                                                            *
+ * Return value: SUCCEED - the record was successfully locked                 *
+ *               FAIL    - the table does not contain the specified record    *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id)
+{
+	const char	*__function_name = "DBlock_record";
+
+	DB_RESULT	result;
+	const ZBX_TABLE	*t;
+	int		ret;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == zbx_db_txn_level())
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
+
+	t = DBget_table(table);
+
+	if (NULL == add_field)
+	{
+		result = DBselect("select null from %s where %s=" ZBX_FS_UI64 ZBX_FOR_UPDATE, table, t->recid, id);
+	}
+	else
+	{
+		result = DBselect("select null from %s where %s=" ZBX_FS_UI64 " and %s=" ZBX_FS_UI64 ZBX_FOR_UPDATE,
+				table, t->recid, id, add_field, add_id);
+	}
+
+	if (NULL == DBfetch(result))
+		ret = FAIL;
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBlock_records                                                   *
+ *                                                                            *
+ * Purpose: locks a records in a table by its primary key                     *
+ *                                                                            *
+ * Parameters: table     - [IN] the target table                              *
+ *             ids       - [IN] primary key values                            *
+ *                                                                            *
+ * Return value: SUCCEED - one or more of the specified records were          *
+ *                         successfully locked                                *
+ *               FAIL    - the table does not contain any of the specified    *
+ *                         records                                            *
+ *                                                                            *
+ ******************************************************************************/
+int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids)
+{
+	const char	*__function_name = "DBlock_records";
+
+	DB_RESULT	result;
+	const ZBX_TABLE	*t;
+	int		ret;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (0 == zbx_db_txn_level())
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() called outside of transaction", __function_name);
+
+	t = DBget_table(table);
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select null from %s where", table);
+	DBadd_condition_alloc(&sql, &sql_alloc, &sql_offset, t->recid, ids->values, ids->values_num);
+
+	result = DBselect("%s" ZBX_FOR_UPDATE, sql);
+
+	if (NULL == DBfetch(result))
+		ret = FAIL;
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

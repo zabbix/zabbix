@@ -26,7 +26,6 @@ require_once dirname(__FILE__).'/include/items.inc.php';
 
 $page['title'] = _('Overview');
 $page['file'] = 'overview.php';
-$page['hist_arg'] = array('groupid', 'type');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_REFRESH', 1);
@@ -36,45 +35,31 @@ define('SHOW_DATA', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupid'     => array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null),
-	'view_style'  => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null),
-	'type'        => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null),
-	'fullscreen'  => array(T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null),
+$fields = [
+	'groupid'     => [T_ZBX_INT, O_OPT, P_SYS, DB_ID,     null],
+	'view_style'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
+	'type'        => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
+	'fullscreen'  => [T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
 	// filter
-	'filter_rst' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'filter_set' =>			array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'show_triggers' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'ack_status' =>			array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
-	'show_severity' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
-	'show_maintenance' =>	array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'status_change_days' =>	array(T_ZBX_INT, O_OPT, null,	BETWEEN(1, DAY_IN_YEAR * 2), null),
-	'status_change' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
-	'txt_select' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'application' =>		array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'inventory' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
-	// ajax
-	'filterState' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
-);
+	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'show_triggers' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'ack_status' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'show_severity' =>		[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'show_maintenance' =>	[T_ZBX_INT, O_OPT, null,	null,		null],
+	'status_change_days' =>	[T_ZBX_INT, O_OPT, null,	BETWEEN(1, DAY_IN_YEAR * 2), null],
+	'status_change' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
+	'txt_select' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
+	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'inventory' =>			[T_ZBX_STR, O_OPT, null,	null,		null]
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
-if (getRequest('groupid') && !API::HostGroup()->isReadable(array($_REQUEST['groupid']))) {
+if (getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.overview.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
 }
 
 $config = select_config();
@@ -103,9 +88,9 @@ if (hasRequest('filter_set')) {
 	}
 
 	// update host inventory filter
-	$inventoryFields = array();
-	$inventoryValues = array();
-	foreach (getRequest('inventory', array()) as $field) {
+	$inventoryFields = [];
+	$inventoryValues = [];
+	foreach (getRequest('inventory', []) as $field) {
 		if ($field['value'] === '') {
 			continue;
 		}
@@ -153,24 +138,24 @@ else {
 /*
  * Display
  */
-$data = array(
+$data = [
 	'fullscreen' => $_REQUEST['fullscreen'],
 	'type' => $type,
 	'view_style' => $viewStyle,
 	'config' => $config
-);
+];
 
-$data['pageFilter'] = new CPageFilter(array(
-	'groups' => array(
+$data['pageFilter'] = new CPageFilter([
+	'groups' => [
 		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
-	),
-	'hosts' => array(
+	],
+	'hosts' => [
 		'monitored_hosts' => true,
 		($data['type'] == SHOW_TRIGGERS ? 'with_monitored_triggers' : 'with_monitored_items') => true
-	),
+	],
 	'hostid' => getRequest('hostid'),
 	'groupid' => getRequest('groupid')
-));
+]);
 
 $data['groupid'] = $data['pageFilter']->groupid;
 $data['hostid'] = $data['pageFilter']->hostid;
@@ -178,7 +163,7 @@ $data['hostid'] = $data['pageFilter']->hostid;
 // fetch trigger data
 if ($type == SHOW_TRIGGERS) {
 	// filter data
-	$filter = array(
+	$filter = [
 		'showTriggers' => $showTriggers,
 		'ackStatus' => CProfile::get('web.overview.filter.ack_status', 0),
 		'showSeverity' => CProfile::get('web.overview.filter.show_severity', TRIGGER_SEVERITY_NOT_CLASSIFIED),
@@ -187,38 +172,38 @@ if ($type == SHOW_TRIGGERS) {
 		'txtSelect' => CProfile::get('web.overview.filter.txt_select', ''),
 		'application' => CProfile::get('web.overview.filter.application', ''),
 		'showMaintenance' => CProfile::get('web.overview.filter.show_maintenance', 1),
-		'inventory' => array()
-	);
-	foreach (CProfile::getArray('web.overview.filter.inventory.field', array()) as $i => $field) {
-		$filter['inventory'][] = array(
+		'inventory' => []
+	];
+	foreach (CProfile::getArray('web.overview.filter.inventory.field', []) as $i => $field) {
+		$filter['inventory'][] = [
 			'field' => $field,
 			'value' => CProfile::get('web.overview.filter.inventory.value', null, $i)
-		);
+		];
 	}
 
 	// fetch hosts
-	$inventoryFilter = array();
+	$inventoryFilter = [];
 	foreach ($filter['inventory'] as $field) {
 		$inventoryFilter[$field['field']][] = $field['value'];
 	}
-	$hosts = API::Host()->get(array(
-		'output' => array('hostid', 'status'),
+	$hosts = API::Host()->get([
+		'output' => ['hostid', 'status'],
 		'selectGraphs' => ($viewStyle == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
 		'selectScreens' => ($viewStyle == STYLE_LEFT) ? API_OUTPUT_COUNT : null,
 		'groupids' => ($data['pageFilter']->groupid != 0) ? $data['pageFilter']->groupid : null,
 		'searchInventory' => ($inventoryFilter) ? $inventoryFilter : null,
 		'preservekeys' => true
-	));
+	]);
 	$hostIds = array_keys($hosts);
 
-	$options = array(
-		'output' => array(
+	$options = [
+		'output' => [
 			'description', 'expression', 'priority', 'url', 'value', 'triggerid', 'lastchange', 'flags'
-		),
-		'selectHosts' => array('hostid', 'name', 'status'),
-		'selectItems' => array('itemid', 'hostid', 'name', 'key_', 'value_type'),
+		],
+		'selectHosts' => ['hostid', 'name', 'status'],
+		'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 		'hostids' => $hostIds,
-		'search' => ($filter['txtSelect'] !== '') ? array('description' => $filter['txtSelect']) : null,
+		'search' => ($filter['txtSelect'] !== '') ? ['description' => $filter['txtSelect']] : null,
 		'only_true' => ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) ? true : null,
 		'withUnacknowledgedEvents' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_UNACK) ? true : null,
 		'withLastEventUnacknowledged' => ($filter['ackStatus'] == ZBX_ACK_STS_WITH_LAST_UNACK) ? true : null,
@@ -229,7 +214,7 @@ if ($type == SHOW_TRIGGERS) {
 		'skipDependent' => true,
 		'sortfield' => 'description',
 		'preservekeys' => true
-	);
+	];
 
 	// trigger status filter
 	if ($filter['showTriggers'] == TRIGGERS_OPTION_RECENT_PROBLEM) {
@@ -241,17 +226,23 @@ if ($type == SHOW_TRIGGERS) {
 
 	// application filter
 	if ($filter['application'] !== '') {
-		$applications = API::Application()->get(array(
-			'output' => array('applicationid'),
+		$applications = API::Application()->get([
+			'output' => ['applicationid'],
 			'hostids' => $hostIds,
-			'search' => array('name' => $filter['application'])
-		));
+			'search' => ['name' => $filter['application']]
+		]);
 		$options['applicationids'] = zbx_objectValues($applications, 'applicationid');
 	}
 
 	$triggers = API::Trigger()->get($options);
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+
+	// Pass already filtered 'groupid' to menu pop-up "Events" link.
+	foreach ($triggers as &$trigger) {
+		$trigger['groupid'] = $data['pageFilter']->groupid;
+	}
+	unset($trigger);
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;
@@ -262,18 +253,18 @@ if ($type == SHOW_TRIGGERS) {
 // fetch item data
 else {
 	// filter data
-	$filter = array(
+	$filter = [
 		'application' => CProfile::get('web.overview.filter.application', '')
-	);
+	];
 
 	// application filter
 	$applicationIds = null;
 	if ($filter['application'] !== '') {
-		$applications = API::Application()->get(array(
-			'output' => array('applicationid'),
+		$applications = API::Application()->get([
+			'output' => ['applicationid'],
 			'groupids' => ($data['pageFilter']->groupid != 0) ? $data['pageFilter']->groupid : null,
-			'search' => array('name' => $filter['application'])
-		));
+			'search' => ['name' => $filter['application']]
+		]);
 		$applicationIds = zbx_objectValues($applications, 'applicationid');
 	}
 

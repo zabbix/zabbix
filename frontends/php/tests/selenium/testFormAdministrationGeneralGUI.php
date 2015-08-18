@@ -34,8 +34,8 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->assertElementPresent('configDropDown');
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
-		$this->zbxTestTextPresent(array('Default theme', 'Dropdown first entry', 'remember selected', 'Search/Filter elements limit', 'Max count of elements to show inside table cell', 'Enable event acknowledges', 'Show events not older than (in days)', 'Max count of events per trigger to show'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
+		$this->zbxTestTextPresent(['Default theme', 'Dropdown first entry', 'remember selected', 'Search/Filter elements limit', 'Max count of elements to show inside table cell', 'Enable event acknowledges', 'Show events not older than (in days)', 'Max count of events per trigger to show']);
 
 		$this->assertElementPresent('default_theme');
 		$this->assertElementPresent("//select[@id='default_theme']/option[text()='Original blue']");
@@ -96,14 +96,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestDropdownSelect('default_theme', 'Black & Blue');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Default theme'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('darkblue');
 
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Black and Blue" theme can not be selected as default theme: it does not exist in the DB');
 
 		$this->zbxTestDropdownSelect('default_theme', 'Dark orange');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Default theme'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Default theme']);
 		$sql = 'SELECT default_theme FROM config WHERE default_theme='.zbx_dbstr('darkorange');
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: "Dark orange" theme can not be selected as default theme: it does not exist in the DB');
 
@@ -124,13 +124,13 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestDropdownSelect('dropdown_first_entry', 'None');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Dropdown first entry'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Dropdown first entry']);
 		$sql = 'SELECT dropdown_first_entry FROM config WHERE dropdown_first_entry=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value "None" can not be selected as "dropdown first entry" value');
 
 		$this->zbxTestDropdownSelect('dropdown_first_entry', 'All');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Dropdown first entry'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Dropdown first entry']);
 
 		$sql = 'SELECT dropdown_first_entry FROM config WHERE dropdown_first_entry=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Value "All" can not be selected as "dropdown first entry" value');
@@ -146,14 +146,14 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestCheckboxSelect('dropdown_first_remember');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'remember selected'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'remember selected']);
 
 		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=0';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
 
 		$this->zbxTestCheckboxSelect('dropdown_first_remember', false);
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'remember selected'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'remember selected']);
 
 		$sql = 'SELECT dropdown_first_remember FROM config WHERE dropdown_first_remember=1';
 		$this->assertEquals(0, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "dropdown_first_remember"');
@@ -168,27 +168,27 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->input_type('search_limit', '1000');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=1000';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('search_limit', '1');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('search_limit', '999999');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit']);
 
 		$sql = 'SELECT search_limit FROM config WHERE search_limit=999999';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "search_limit"');
@@ -201,18 +201,18 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('search_limit', '0');
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit']);
+		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Incorrect value "0" for "Search/Filter elements limit" field: must be between 1 and 999999.']);
 
 		// Check to enter -1 value
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('search_limit', '-1');
 		$this->zbxTestClickWait('update');
 
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit'));
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "-1" for "Search/Filter elements limit" field: must be between 1 and 999999.'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI', 'Search/Filter elements limit']);
+		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Incorrect value "-1" for "Search/Filter elements limit" field: must be between 1 and 999999.']);
 
 		$this->assertEquals($oldHash, DBhash($sqlHash));
 	}
@@ -224,55 +224,55 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->input_type('max_in_table', '1000');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			'Configuration updated',
 			'CONFIGURATION OF GUI',
 			'GUI',
 			'Max count of elements to show inside table cell'
-		));
+		]);
 
 		$this->assertEquals(1, DBcount('SELECT NULL FROM config WHERE max_in_table=1000'));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('max_in_table', '1');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			'Configuration updated',
 			'CONFIGURATION OF GUI',
 			'GUI',
 			'Max count of elements to show inside table cell'
-		));
+		]);
 
 		$this->assertEquals(1, DBcount('SELECT NULL FROM config WHERE max_in_table=1'));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('max_in_table', '99999');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			'Configuration updated',
 			'CONFIGURATION OF GUI',
 			'GUI',
 			'Max count of elements to show inside table cell'
-		));
+		]);
 
 		$this->assertEquals(1, DBcount('SELECT NULL FROM config WHERE max_in_table=99999'));
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('max_in_table', '-1');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array(
+		$this->zbxTestTextPresent([
 			'ERROR: Page received incorrect data',
 			'Incorrect value "-1" for "Max count of elements to show inside table cell" field: must be between 1 and 99999.',
 			'CONFIGURATION OF GUI',
 			'GUI',
 			'Max count of elements to show inside table cell'
-		));
+		]);
 
 		$this->assertEquals($oldHash, DBhash($sqlHash));
 	}
@@ -294,11 +294,11 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->zbxTestCheckboxSelect('event_ack_enable', false);
 
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Enable event acknowledges'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Enable event acknowledges']);
 
 		$sql = 'SELECT event_ack_enable FROM config WHERE event_ack_enable=0';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_ack_enable"');
@@ -317,7 +317,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->input_type('event_expire', '99999');
 		$this->zbxTestClickWait('update');
 		$this->zbxTestTextPresent('Configuration updated');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)']);
 
 		$sql = 'SELECT event_expire FROM config WHERE event_expire=99999';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_expire"');
@@ -338,21 +338,21 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('event_expire', '100000');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "100000" for "Show events not older than (in days)" field: must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Incorrect value "100000" for "Show events not older than (in days)" field: must be between 1 and 99999.']);
 
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)']);
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('event_expire', '0');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "0" for "Show events not older than (in days)" field: must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Incorrect value "0" for "Show events not older than (in days)" field: must be between 1 and 99999.']);
 
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI', 'Show events not older than (in days)']);
 
 		$this->assertEquals($oldHash, DBhash($sqlHash));
 	}
@@ -361,7 +361,7 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 		$this->zbxTestLogin('adm.gui.php');
 		$this->input_type('event_show_max', '99999');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show']);
 
 		$sqlHash = 'SELECT configid,refresh_unsupported,work_period,alert_usrgrpid,event_ack_enable,default_theme,authentication_type,ldap_host,ldap_port,ldap_base_dn,ldap_bind_dn,ldap_bind_password,ldap_search_attribute,dropdown_first_entry,dropdown_first_remember,discovery_groupid,max_in_table,search_limit,severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,severity_color_5,severity_name_0,severity_name_1,severity_name_2,severity_name_3,severity_name_4,severity_name_5,ok_period,blink_period,problem_unack_color,problem_ack_color,ok_unack_color,ok_ack_color,problem_unack_style,problem_ack_style,ok_unack_style,ok_ack_style,snmptrap_logging FROM config ORDER BY configid';
 		$oldHash = DBhash($sqlHash);
@@ -371,31 +371,31 @@ class testFormAdministrationGeneralGUI extends CWebTest {
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', ));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI', ]);
 		$this->input_type('event_show_max', '1');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
+		$this->zbxTestTextPresent(['Configuration updated', 'CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show']);
 
 		$sql = 'SELECT event_show_max FROM config WHERE event_show_max=1';
 		$this->assertEquals(1, DBcount($sql), 'Chuck Norris: Incorrect value in the DB field "event_show_max"');
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('event_show_max', '100000');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "100000" for "Max count of events per trigger to show" field: must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Incorrect value "100000" for "Max count of events per trigger to show" field: must be between 1 and 99999.']);
 
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show']);
 
 		$this->zbxTestDropdownSelectWait('configDropDown', 'GUI');
 		$this->zbxTestCheckTitle('Configuration of GUI');
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI']);
 		$this->input_type('event_show_max', '0');
 		$this->zbxTestClickWait('update');
-		$this->zbxTestTextPresent(array('ERROR: Page received incorrect data', 'Incorrect value "0" for "Max count of events per trigger to show" field: must be between 1 and 99999.'));
+		$this->zbxTestTextPresent(['ERROR: Page received incorrect data', 'Incorrect value "0" for "Max count of events per trigger to show" field: must be between 1 and 99999.']);
 
-		$this->zbxTestTextPresent(array('CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show'));
+		$this->zbxTestTextPresent(['CONFIGURATION OF GUI', 'GUI', 'Max count of events per trigger to show']);
 
 		$this->assertEquals($oldHash, DBhash($sqlHash));
 	}

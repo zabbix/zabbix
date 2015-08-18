@@ -22,38 +22,38 @@
 class CSubmitButtonTest extends CTagTest {
 
 	public function constructProvider() {
-		return array(
-			array(
-				array('caption'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit">caption</button>'
-			),
-			array(
-				array('caption', 'button'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button">caption</button>'
-			),
-			array(
-				array('caption', 'button[value]'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button[value]">caption</button>'
-			),
-			array(
-				array('caption', 'button', 'value'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button" value="value">caption</button>'
-			),
-			array(
-				array('caption', 'button', 'value', 'my-class'),
-				'<button class="button my-class" type="submit" name="button" value="value">caption</button>'
-			),
+		return [
+			[
+				['caption'],
+				'<button type="submit">caption</button>'
+			],
+			[
+				['caption', 'button'],
+				'<button type="submit" name="button">caption</button>'
+			],
+			[
+				['caption', 'button[value]'],
+				'<button type="submit" name="button[value]">caption</button>'
+			],
+			[
+				['caption', 'button', 'value'],
+				'<button type="submit" name="button" value="value">caption</button>'
+			],
+			[
+				['caption', 'button', 'value', 'my-class'],
+				'<button class="my-class" type="submit" name="button" value="value">caption</button>'
+			],
 			// caption encoding
-			array(
-				array('</button>'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit">&lt;/button&gt;</button>'
-			),
+			[
+				['</button>'],
+				'<button type="submit">&lt;/button&gt;</button>'
+			],
 			// parameter encoding
-			array(
-				array('caption', 'button', 'button"&"'),
-				'<button class="button button-plain shadow ui-corner-all" type="submit" name="button" value="button&quot;&amp;&quot;">caption</button>'
-			),
-		);
+			[
+				['caption', 'button', 'button"&"'],
+				'<button type="submit" name="button" value="button&quot;&amp;&quot;">caption</button>'
+			],
+		];
 	}
 	/**
 	 * @param $name
@@ -63,7 +63,7 @@ class CSubmitButtonTest extends CTagTest {
 	 *
 	 * @return CSubmitButton
 	 */
-	protected function createTag($name = null, $value = null, $caption = null, $class = 'button-plain shadow ui-corner-all') {
-		return new CSubmitButton($name, $value, $caption, $class);
+	protected function createTag($name = null, $value = null, $caption = null) {
+		return new CSubmitButton($name, $value, $caption);
 	}
 }

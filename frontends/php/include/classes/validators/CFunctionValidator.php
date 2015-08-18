@@ -41,195 +41,195 @@ class CFunctionValidator extends CValidator {
 	 */
 	private $allowed;
 
-	public function __construct(array $options = array()) {
+	public function __construct(array $options = []) {
 		parent::__construct($options);
 
-		$valueTypesAll = array(
+		$valueTypesAll = [
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_UINT64 => true,
 			ITEM_VALUE_TYPE_STR => true,
 			ITEM_VALUE_TYPE_TEXT => true,
 			ITEM_VALUE_TYPE_LOG => true
-		);
-		$valueTypesNum = array(
+		];
+		$valueTypesNum = [
 			ITEM_VALUE_TYPE_FLOAT => true,
 			ITEM_VALUE_TYPE_UINT64 => true
-		);
-		$valueTypesChar = array(
+		];
+		$valueTypesChar = [
 			ITEM_VALUE_TYPE_STR => true,
 			ITEM_VALUE_TYPE_TEXT => true,
 			ITEM_VALUE_TYPE_LOG => true
-		);
-		$valueTypesLog = array(
+		];
+		$valueTypesLog = [
 			ITEM_VALUE_TYPE_LOG => true
-		);
-		$valueTypesInt = array(
+		];
+		$valueTypesInt = [
 			ITEM_VALUE_TYPE_UINT64 => true
-		);
+		];
 
-		$argsIgnored = array(array('type' => 'str'));
+		$argsIgnored = [['type' => 'str']];
 
-		$this->allowed = array(
-			'abschange' => array(
+		$this->allowed = [
+			'abschange' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			),
-			'avg' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'avg' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesNum
-			),
-			'band' => array(
-				'args' => array(
-					array('type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true),
-					array('type' => 'num', 'mandat' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'band' => [
+				'args' => [
+					['type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true],
+					['type' => 'num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesInt
-			),
-			'change' => array(
+			],
+			'change' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			),
-			'count' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'str'),
-					array('type' => 'operation'),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'count' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'str'],
+					['type' => 'operation'],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesAll
-			),
-			'date' => array(
+			],
+			'date' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			),
-			'dayofmonth' => array(
+			],
+			'dayofmonth' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			),
-			'dayofweek' => array(
+			],
+			'dayofweek' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			),
-			'delta' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'delta' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesNum
-			),
-			'diff' => array(
+			],
+			'diff' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			),
-			'fuzzytime' => array(
-				'args' => array(
-					array('type' => 'sec_zero', 'mandat' => true)
-				),
+			],
+			'fuzzytime' => [
+				'args' => [
+					['type' => 'sec_zero', 'mandat' => true]
+				],
 				'value_types' => $valueTypesNum
-			),
-			'iregexp' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true),
-					array('type' => 'sec_num', 'can_be_empty' => true)
-				),
+			],
+			'iregexp' => [
+				'args' => [
+					['type' => 'str', 'mandat' => true],
+					['type' => 'sec_num', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesChar
-			),
-			'last' => array(
-				'args' => array(
-					array('type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'last' => [
+				'args' => [
+					['type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesAll
-			),
-			'logeventid' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true)
-				),
+			],
+			'logeventid' => [
+				'args' => [
+					['type' => 'str', 'mandat' => true]
+				],
 				'value_types' => $valueTypesLog
-			),
-			'logseverity' => array(
+			],
+			'logseverity' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesLog
-			),
-			'logsource' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true)
-				),
+			],
+			'logsource' => [
+				'args' => [
+					['type' => 'str', 'mandat' => true]
+				],
 				'value_types' => $valueTypesLog
-			),
-			'max' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'max' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesNum
-			),
-			'min' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'min' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesNum
-			),
-			'nodata'=> array(
-				'args' => array(
-					array('type' => 'sec_zero', 'mandat' => true)
-				),
+			],
+			'nodata'=> [
+				'args' => [
+					['type' => 'sec_zero', 'mandat' => true]
+				],
 				'value_types' => $valueTypesAll
-			),
-			'now' => array(
+			],
+			'now' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			),
-			'percentile' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true),
-					array('type' => 'percent', 'mandat' => true)
-				),
+			],
+			'percentile' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true],
+					['type' => 'percent', 'mandat' => true]
+				],
 				'value_types' => $valueTypesNum
-			),
-			'prev' => array(
+			],
+			'prev' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			),
-			'regexp' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true),
-					array('type' => 'sec_num', 'can_be_empty' => true)
-				),
+			],
+			'regexp' => [
+				'args' => [
+					['type' => 'str', 'mandat' => true],
+					['type' => 'sec_num', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesChar
-			),
-			'str' => array(
-				'args' => array(
-					array('type' => 'str', 'mandat' => true),
-					array('type' => 'sec_num', 'can_be_empty' => true)
-				),
+			],
+			'str' => [
+				'args' => [
+					['type' => 'str', 'mandat' => true],
+					['type' => 'sec_num', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesChar
-			),
-			'strlen' => array(
-				'args' => array(
-					array('type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'strlen' => [
+				'args' => [
+					['type' => 'sec_num_zero', 'mandat' => true, 'can_be_empty' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesChar
-			),
-			'sum' => array(
-				'args' => array(
-					array('type' => 'sec_num', 'mandat' => true),
-					array('type' => 'sec_zero', 'can_be_empty' => true)
-				),
+			],
+			'sum' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true]
+				],
 				'value_types' => $valueTypesNum
-			),
-			'time' => array(
+			],
+			'time' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
-			)
-		);
+			]
+		];
 	}
 
 	/**
@@ -270,12 +270,12 @@ class CFunctionValidator extends CValidator {
 			return false;
 		}
 
-		$paramLabels = array(
+		$paramLabels = [
 			_('Invalid first parameter.'),
 			_('Invalid second parameter.'),
 			_('Invalid third parameter.'),
 			_('Invalid fourth parameter.')
-		);
+		];
 
 		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
 			// mandatory check

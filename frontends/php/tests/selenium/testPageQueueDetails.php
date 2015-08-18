@@ -27,7 +27,7 @@ class testPageQueueDetails extends CWebTest {
 		$this->zbxTestTextPresent('Queue');
 		$this->zbxTestTextPresent('QUEUE OF ITEMS TO BE UPDATED');
 		// Header
-		$this->zbxTestTextPresent(array('Next check', 'Delayed by', 'Host', 'Name'));
+		$this->zbxTestTextPresent(['Next check', 'Delayed by', 'Host', 'Name']);
 		$this->zbxTestTextPresent('Total:');
 	}
 

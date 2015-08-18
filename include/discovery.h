@@ -27,5 +27,4 @@
 void	discovery_update_host(DB_DHOST *dhost, const char *ip, int status, int now);
 void	discovery_update_service(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost,
 		const char *ip, const char *dns, int port, int status, const char *value, int now);
-
 #endif

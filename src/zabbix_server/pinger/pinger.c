@@ -476,9 +476,11 @@ static void	add_pinger_host(ZBX_FPING_HOST **hosts, int *hosts_alloc, int *hosts
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() addr:'%s'", __function_name, addr);
 
-	for (i = 0; i < *hosts_count; i ++)
+	for (i = 0; i < *hosts_count; i++)
+	{
 		if (0 == strcmp(addr, (*hosts)[i].addr))
 			return;
+	}
 
 	(*hosts_count)++;
 

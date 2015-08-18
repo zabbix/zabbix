@@ -55,13 +55,13 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
 		$this->zbxTestTextPresent('CONFIGURATION OF REGULAR EXPRESSIONS');
 		$this->zbxTestTextPresent('Regular expressions');
-		$this->zbxTestDropdownHasOptions('configDropDown', array(
+		$this->zbxTestDropdownHasOptions('configDropDown', [
 			'GUI', 'Housekeeping', 'Images', 'Icon mapping', 'Regular expressions', 'Macros', 'Value mapping',
 			'Working time', 'Trigger severities', 'Trigger displaying options', 'Other'
-		));
+		]);
 		$this->assertElementPresent('form');
 
-		$this->zbxTestTextPresent(array('Name', 'Expressions'));
+		$this->zbxTestTextPresent(['Name', 'Expressions']);
 
 		$dbResult = DBselect('select name from regexps');
 
@@ -69,7 +69,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 			$this->zbxTestTextPresent($dbRow['name']);
 		}
 
-		$this->zbxTestDropdownHasOptions('action', array('Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', ['Delete selected']);
 		$this->assertElementValue('goButton', 'Go (0)');
 
 		$this->assertElementPresent("//select[@id='action' and @disabled]");
@@ -87,7 +87,7 @@ class testPageAdministrationGeneralRegexp extends CWebTest {
 		$this->zbxTestClick('goButton');
 		$this->getConfirmation();
 		$this->zbxTestCheckTitle('Configuration of regular expressions');
-		$this->zbxTestTextNotPresent(array('Regular expression deleted', 'Regular expressions deleted'));
+		$this->zbxTestTextNotPresent(['Regular expression deleted', 'Regular expressions deleted']);
 
 		$this->verifyHash();
 	}

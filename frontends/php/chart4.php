@@ -28,9 +28,9 @@ $page['type'] = PAGE_TYPE_IMAGE;
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'triggerid' => array(T_ZBX_INT, O_MAND, P_SYS, DB_ID, null)
-);
+$fields = [
+	'triggerid' => [T_ZBX_INT, O_MAND, P_SYS, DB_ID, null]
+];
 check_fields($fields);
 
 /*
@@ -40,11 +40,11 @@ if (!hasRequest('triggerid')) {
 	fatal_error(_('No triggers defined.'));
 }
 
-$dbTriggers = API::Trigger()->get(array(
-	'output' => array('description'),
+$dbTriggers = API::Trigger()->get([
+	'output' => ['description'],
 	'triggerids' => getRequest('triggerid'),
 	'expandDescription' => true
-));
+]);
 
 if (!$dbTriggers) {
 	access_deny();
@@ -91,9 +91,9 @@ $x = imagesx($im) / 2 - imagefontwidth(4) * mb_strlen($str) / 2;
 imageText($im, 10, 0, $x, 14, $darkred, $str);
 
 $now = time(null);
-$count_now = array();
-$true = array();
-$false = array();
+$count_now = [];
+$true = [];
+$false = [];
 
 $start = mktime(0, 0, 0, 1, 1, date('Y'));
 

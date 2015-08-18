@@ -46,7 +46,7 @@ class CJs {
 			self::$json = new CJson();
 		}
 
-		return self::$json->encode($data, array(), $forceObject);
+		return self::$json->encode($data, [], $forceObject);
 	}
 
 	/**

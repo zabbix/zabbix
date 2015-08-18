@@ -19,51 +19,66 @@
 **/
 
 
+$widget = (new CWidget())
+	->setTitle(_('Images'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addVar('imagetype', $data['imagetype'])
+		->addItem((new CList())
+			->addItem(makeAdministrationGeneralMenu('adm.images.php'))
+			->addItem(
+				new CSubmit('form', ($data['imagetype'] == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background'))
+			)
+		)
+	);
+
 // header
-$imageComboBox = new CComboBox('imagetype', $this->data['imagetype'], 'submit();');
-$imageComboBox->addItem(IMAGE_TYPE_ICON, _('Icon'));
-$imageComboBox->addItem(IMAGE_TYPE_BACKGROUND, _('Background'));
-$imageComboBoxForm = new CForm();
-$imageComboBoxForm->addItem(_('Type').SPACE);
-$imageComboBoxForm->addItem($imageComboBox);
-$this->data['widget']->addHeader(_('Images'), $imageComboBoxForm);
+$imageComboBoxForm = (new CForm())
+	->addItem([_('Type'), SPACE, new CComboBox('imagetype', $this->data['imagetype'], 'submit();', [
+		IMAGE_TYPE_ICON => _('Icon'),
+		IMAGE_TYPE_BACKGROUND => _('Background')])
+	]);
 
-// form
-$imageForm = new CForm();
-$imageForm->setName('imageForm');
-$imageForm->addItem(BR());
-
-$imageTable = new CTable(_('No images found.'), 'header_wide padding_standard');
+$imageTable = (new CDiv())
+	->addClass(ZBX_STYLE_TABLE)
+	->addClass(ZBX_STYLE_ADM_IMG);
 
 $count = 0;
-$imageRow = new CRow();
+$imageRow = (new CDiv())->addClass(ZBX_STYLE_ROW);
 foreach ($this->data['images'] as $image) {
 	$img = ($image['imagetype'] == IMAGE_TYPE_BACKGROUND)
-		? new CLink(new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'), 'image.php?imageid='.$image['imageid'])
+		? new CLink(
+			new CImg('imgstore.php?width=200&height=200&iconid='.$image['imageid'], 'no image'),
+			'image.php?imageid='.$image['imageid']
+		)
 		: new CImg('imgstore.php?iconid='.$image['imageid'], 'no image');
 
-	$name = new CLink($image['name'], 'adm.images.php?form=update&imageid='.$image['imageid']);
+	$imageRow->addItem(
+		(new CDiv())
+			->addClass(ZBX_STYLE_CELL)
+			->addItem([
+				$img,
+				BR(),
+				new CLink($image['name'], 'adm.images.php?form=update&imageid='.$image['imageid'])
+			])
+	);
 
-	$imgColumn = new CCol();
-	$imgColumn->setAttribute('align', 'center');
-	$imgColumn->addItem(array($img, BR(), $name), 'center');
-	$imageRow->addItem($imgColumn);
-
-	$count++;
-	if (($count % 4) == 0) {
-		$imageTable->addRow($imageRow);
-		$imageRow = new CRow();
+	if ((++$count % 5) == 0) {
+		$imageTable->addItem($imageRow);
+		$imageRow = (new CDiv())->addClass(ZBX_STYLE_ROW);
 	}
 }
 
-if ($count > 0) {
-	while (($count % 4) != 0) {
-		$imageRow->addItem(SPACE);
-		$count++;
-	}
-	$imageTable->addRow($imageRow);
+if (($count % 5) != 0) {
+	$imageTable->addItem($imageRow);
 }
 
-$imageForm->addItem($imageTable);
+// form
+$imageForm = (new CForm())
+	->addItem($imageTable);
 
-return $imageForm;
+$widget
+	->addItem($imageComboBoxForm)
+	->addItem($imageForm);
+
+return $widget;

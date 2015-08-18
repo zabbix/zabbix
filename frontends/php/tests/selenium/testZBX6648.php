@@ -25,35 +25,35 @@ class testZBX6648 extends CWebTest {
 
 	// Returns test data
 	public static function zbx_data() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'hostgroup' => 'ZBX6648 All Triggers',
 					'host' => 'ZBX6648 All Triggers Host',
 					'triggers' => 'both'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'hostgroup' => 'ZBX6648 Enabled Triggers',
 					'host' => 'ZBX6648 Enabled Triggers Host',
 					'triggers' => 'enabled'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'hostgroup' => 'ZBX6648 Disabled Triggers',
 					'host' => 'ZBX6648 Disabled Triggers Host',
 					'triggers' => 'disabled'
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'hostgroup' => 'ZBX6648 Group No Hosts',
 					'triggers' => 'no triggers'
-				)
-			)
-		);
+				]
+			]
+		];
 	}
 
 	/**

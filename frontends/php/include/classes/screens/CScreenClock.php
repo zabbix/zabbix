@@ -33,15 +33,15 @@ class CScreenClock extends CScreenBase {
 
 		switch ($this->screenitem['style']) {
 			case TIME_TYPE_HOST:
-				$items = API::Item()->get(array(
+				$items = API::Item()->get([
 					'itemids' => $this->screenitem['resourceid'],
-					'selectHosts' => array('host'),
-					'output' => array('itemid', 'value_type')
-				));
+					'selectHosts' => ['host'],
+					'output' => ['itemid', 'value_type']
+				]);
 				$item = reset($items);
 				$host = reset($item['hosts']);
 
-				$lastValue = Manager::History()->getLast(array($item));
+				$lastValue = Manager::History()->getLast([$item]);
 				if ($lastValue) {
 					$lastValue = reset($lastValue[$item['itemid']]);
 					$item['lastvalue'] = $lastValue['value'];
@@ -94,9 +94,10 @@ class CScreenClock extends CScreenBase {
 		$item->setTimeZone($timeZone);
 		$item->setTimeOffset($timeOffset);
 
-		$flashclockOverDiv = new CDiv(null, 'flashclock');
-		$flashclockOverDiv->setAttribute('style', 'width: '.$this->screenitem['width'].'px; height: '.$this->screenitem['height'].'px;');
+		$flashclockOverDiv = (new CDiv())
+			->addClass('flashclock')
+			->setAttribute('style', 'width: '.$this->screenitem['width'].'px; height: '.$this->screenitem['height'].'px;');
 
-		return $this->getOutput(array($item, $flashclockOverDiv));
+		return $this->getOutput([$item, $flashclockOverDiv]);
 	}
 }

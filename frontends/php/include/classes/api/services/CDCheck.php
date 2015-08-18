@@ -28,22 +28,22 @@ class CDCheck extends CApiService {
 
 	protected $tableName = 'dchecks';
 	protected $tableAlias = 'dc';
-	protected $sortColumns = array('dcheckid', 'druleid');
+	protected $sortColumns = ['dcheckid', 'druleid'];
 
 	public function get($options) {
-		$result = array();
+		$result = [];
 		$userType = self::$userData['type'];
 
-		$sqlParts = array(
-			'select'	=> array('dchecks' => 'dc.dcheckid'),
-			'from'		=> array('dchecks' => 'dchecks dc'),
-			'where'		=> array(),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['dchecks' => 'dc.dcheckid'],
+			'from'		=> ['dchecks' => 'dchecks dc'],
+			'where'		=> [],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'dcheckids'					=> null,
 			'druleids'					=> null,
 			'dserviceids'				=> null,
@@ -66,7 +66,7 @@ class CDCheck extends CApiService {
 			'sortorder'					=> '',
 			'limit'						=> null,
 			'limitSelects'				=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 // editable + PERMISSION CHECK
@@ -75,7 +75,7 @@ class CDCheck extends CApiService {
 		elseif (is_null($options['editable']) && (self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN)) {
 		}
 		elseif (!is_null($options['editable']) && (self::$userData['type']!=USER_TYPE_SUPER_ADMIN)) {
-			return array();
+			return [];
 		}
 
 // dcheckids
@@ -148,7 +148,7 @@ class CDCheck extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('druleid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['druleid'], $options['output']);
 		}
 
 // removing keys (hash -> array)
@@ -172,10 +172,10 @@ class CDCheck extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'dcheckids' => $ids,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -193,11 +193,11 @@ class CDCheck extends CApiService {
 
 		$ids = array_unique($ids);
 
-		$count = $this->get(array(
+		$count = $this->get([
 			'dcheckids' => $ids,
 			'editable' => true,
 			'countOutput' => true
-		));
+		]);
 
 		return (count($ids) == $count);
 	}
@@ -220,11 +220,11 @@ class CDCheck extends CApiService {
 		// select_drules
 		if ($options['selectDRules'] !== null && $options['selectDRules'] !== API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'dcheckid', 'druleid');
-			$drules = API::DRule()->get(array(
+			$drules = API::DRule()->get([
 				'output' => $options['selectDRules'],
 				'druleids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			if (!is_null($options['limitSelects'])) {
 				order_result($drules, 'name');
 			}

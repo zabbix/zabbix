@@ -27,12 +27,12 @@ class CRegistryFactoryTest extends PHPUnit_Framework_TestCase {
 	protected $factory;
 
 	public function setUp() {
-		$this->factory = new CRegistryFactory(array(
+		$this->factory = new CRegistryFactory([
 			'string' => 'DateTime',
 			'closure' => function() {
 				return new DateTime();
 			}
-		));
+		]);
 	}
 
 	/**

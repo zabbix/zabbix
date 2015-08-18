@@ -67,7 +67,7 @@ class testZBX6339 extends CWebTest {
 		$this->getConfirmation();
 
 		$this->zbxTestCheckTitle('Configuration of screens');
-		$this->zbxTestTextPresent(array('Screen deleted', 'CONFIGURATION OF SCREENS', $host));
+		$this->zbxTestTextPresent(['Screen deleted', 'CONFIGURATION OF SCREENS', $host]);
 	}
 
 	/**

@@ -123,10 +123,9 @@ function cancelEvent(e) {
 		e = window.event;
 	}
 
-	if (!IE8) {
-		e.stopPropagation();
-		e.preventDefault();
-	}
+	e.stopPropagation();
+	e.preventDefault();
+
 	if (IE) {
 		e.cancelBubble = true;
 		e.returnValue = false;
@@ -384,10 +383,10 @@ function openWinCentered(url, name, width, height, params) {
 
 function PopUp(url, width, height, form_name) {
 	if (!width) {
-		width = 720;
+		width = 1024;
 	}
 	if (!height) {
-		height = 480;
+		height = 768;
 	}
 	if (!form_name) {
 		form_name = 'zbx_popup';

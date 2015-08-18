@@ -95,7 +95,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_item_count());
+		SET_UI64_RESULT(result, DCget_item_count(0));
 	}
 	else if (0 == strcmp(tmp, "items_unsupported"))		/* zabbix["items_unsupported"] */
 	{
@@ -105,7 +105,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 			goto out;
 		}
 
-		SET_UI64_RESULT(result, DCget_item_unsupported_count());
+		SET_UI64_RESULT(result, DCget_item_unsupported_count(0));
 	}
 	else if (0 == strcmp(tmp, "hosts"))			/* zabbix["hosts"] */
 	{
@@ -218,7 +218,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 
 		tmp = get_rparam(&request, 2);
 
-		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<host>,"available"] */
+		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<type>,"available"] */
 		{
 			tmp = get_rparam(&request, 1);
 
@@ -240,7 +240,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 		}
 		else if (0 == strcmp(tmp, "maintenance"))	/* zabbix["host",,"maintenance"] */
 		{
-			/* this item always processed by server */
+			/* this item is always processed by server */
 			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
 			{
 				error = zbx_strdup(error, "Invalid second parameter.");
@@ -251,6 +251,28 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, item->host.maintenance_type + 1);
 			else
 				SET_UI64_RESULT(result, 0);
+		}
+		else if (0 == strcmp(tmp, "items"))	/* zabbix["host",,"items"] */
+		{
+			/* this item is always processed by server */
+			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
+			{
+				error = zbx_strdup(error, "Invalid second parameter.");
+				goto out;
+			}
+
+			SET_UI64_RESULT(result, DCget_item_count(item->host.hostid));
+		}
+		else if (0 == strcmp(tmp, "items_unsupported"))	/* zabbix["host",,"items_unsupported"] */
+		{
+			/* this item is always processed by server */
+			if (NULL != (tmp = get_rparam(&request, 1)) && '\0' != *tmp)
+			{
+				error = zbx_strdup(error, "Invalid second parameter.");
+				goto out;
+			}
+
+			SET_UI64_RESULT(result, DCget_item_unsupported_count(item->host.hostid));
 		}
 		else
 		{
@@ -263,7 +285,7 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 	{
 		int	lastaccess;
 
-		/* this item always processed by server */
+		/* this item is always processed by server */
 
 		if (3 != nparams)
 		{
@@ -569,6 +591,8 @@ int	get_value_internal(DC_ITEM *item, AGENT_RESULT *result)
 				SET_UI64_RESULT(result, stats.hits + stats.misses);
 			else if (0 == strcmp(tmp1, "misses"))
 				SET_UI64_RESULT(result, stats.misses);
+			else if (0 == strcmp(tmp1, "mode"))
+				SET_UI64_RESULT(result, stats.mode);
 			else
 			{
 				error = zbx_strdup(error, "Invalid third parameter.");

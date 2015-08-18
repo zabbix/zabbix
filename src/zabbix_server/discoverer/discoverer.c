@@ -362,6 +362,15 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 
 			DBbegin();
 
+			if (SUCCEED != DBlock_dcheckid(dcheck->dcheckid, drule->druleid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery check was deleted during processing, stopping");
+
+				goto out;
+			}
+
 			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 				discovery_update_service(drule, dcheck, dhost, ip, dns, port, status, value, now);
 			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
@@ -378,7 +387,7 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 		else
 			break;
 	}
-
+out:
 	zbx_free(value);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -494,7 +503,7 @@ static void	process_rule(DB_DRULE *drule)
 			{
 				zbx_snprintf(ip, sizeof(ip), "%x:%x:%x:%x:%x:%x:%x:%x", ipaddress[0], ipaddress[1],
 						ipaddress[2], ipaddress[3], ipaddress[4], ipaddress[5], ipaddress[6],
-						ipaddress[7], ipaddress[8]);
+						ipaddress[7]);
 			}
 			else
 			{
@@ -521,6 +530,16 @@ static void	process_rule(DB_DRULE *drule)
 
 			DBbegin();
 
+			if (SUCCEED != DBlock_druleid(drule->druleid))
+			{
+				DBrollback();
+
+				zabbix_log(LOG_LEVEL_DEBUG, "discovery rule '%s' was deleted during processing,"
+						" stopping", drule->name);
+
+				goto out;
+			}
+
 			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
 				discovery_update_host(&dhost, ip, host_status, now);
 			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
@@ -538,7 +557,7 @@ next:
 		else
 			break;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
@@ -564,10 +583,8 @@ static void	discovery_clean_services(zbx_uint64_t druleid)
 	result = DBselect("select iprange from drules where druleid=" ZBX_FS_UI64, druleid);
 
 	if (NULL != (row = DBfetch(result)))
-	{
 		iprange = zbx_strdup(iprange, row[0]);
-		zbx_trim_str_list(iprange, ',');
-	}
+
 	DBfree_result(result);
 
 	if (NULL == iprange)
@@ -691,8 +708,6 @@ static int	process_discovery(int now)
 			drule.iprange = row[1];
 			drule.name = row[2];
 			ZBX_DBROW2UINT64(drule.unique_dcheckid, row[3]);
-
-			zbx_trim_str_list(drule.iprange, ',');
 
 			process_rule(&drule);
 		}

@@ -41,7 +41,7 @@ class CArrayHelper {
 	 * @return array
 	 */
 	public static function getByKeysStrict(array $array, array $keys) {
-		$result = array();
+		$result = [];
 		foreach ($keys as $key) {
 			if (!isset($array[$key])) {
 				throw new InvalidArgumentException(sprintf('Array does not have element with key "%1$s".', $key));
@@ -64,9 +64,9 @@ class CArrayHelper {
 	 * @return array
 	 */
 	public static function getByKeys(array $array, array $keys) {
-		$result = array();
+		$result = [];
 		foreach ($keys as $key) {
-			if (isset($array[$key])) {
+			if (array_key_exists($key, $array)) {
 				$result[$key] = $array[$key];
 			}
 		}
@@ -75,23 +75,23 @@ class CArrayHelper {
 	}
 
 	/**
-	 * Converts the field with the given key to either an empty array, if the field is empty, or to an array with numeric keys.
-	 * If the field with the given key does not exist, does nothing.
+	 * Renames array elements keys according to given map.
 	 *
-	 * @param array  $array
-	 * @param string $fieldKey
+	 * @param array $array
+	 * @param array $fieldMap
+	 *
+	 * @return array
 	 */
-	public static function convertFieldToArray(array &$array, $fieldKey) {
-		if (array_key_exists($fieldKey, $array)) {
-			if (is_array($array[$fieldKey])) {
-				$array[$fieldKey] = array_values($array[$fieldKey]);
-			}
-			else {
-				$array[$fieldKey] = array();
+	public static function renameKeys(array $array, array $fieldMap) {
+		foreach ($fieldMap as $old_key => $new_key) {
+			if (array_key_exists($old_key, $array)) {
+				$array[$new_key] = $array[$old_key];
+				unset($array[$old_key]);
 			}
 		}
-	}
 
+		return $array;
+	}
 	/**
 	 * Sort array by multiple fields.
 	 *
@@ -103,11 +103,11 @@ class CArrayHelper {
 	public static function sort(array &$array, array $fields) {
 		foreach ($fields as $fid => $field) {
 			if (!is_array($field)) {
-				$fields[$fid] = array('field' => $field, 'order' => ZBX_SORT_UP);
+				$fields[$fid] = ['field' => $field, 'order' => ZBX_SORT_UP];
 			}
 		}
 		self::$fields = $fields;
-		uasort($array, array('self', 'compare'));
+		uasort($array, ['self', 'compare']);
 	}
 
 	/**
@@ -154,7 +154,7 @@ class CArrayHelper {
 	 *
 	 * @return array
 	 */
-	public static function unsetEqualValues(array $a1, array $a2, array $skipKeys = array()) {
+	public static function unsetEqualValues(array $a1, array $a2, array $skipKeys = []) {
 		// ignore given fields
 		foreach ($skipKeys as $key) {
 			unset($a2[$key]);
@@ -198,7 +198,7 @@ class CArrayHelper {
 	 * @return null|array           the first duplicate found or null if there are no duplicates
 	 */
 	public static function findDuplicate(array $arrays, $uniqueField, $uniqueField2 = null) {
-		$uniqueValues = array();
+		$uniqueValues = [];
 
 		foreach ($arrays as $array) {
 			$value = $array[$uniqueField];

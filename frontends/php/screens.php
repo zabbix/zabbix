@@ -26,8 +26,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 
 $page['title'] = _('Custom screens');
 $page['file'] = 'screens.php';
-$page['hist_arg'] = array('elementid', 'screenname');
-$page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
+$page['scripts'] = ['class.calendar.js', 'gtlc.js', 'flickerfreescreen.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 define('ZBX_PAGE_DO_JS_REFRESH', 1);
@@ -35,51 +34,50 @@ define('ZBX_PAGE_DO_JS_REFRESH', 1);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'tr_groupid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'tr_hostid' =>	array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'elementid' =>	array(T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null),
-	'screenname' =>	array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'step' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null),
-	'period' =>		array(T_ZBX_INT, O_OPT, P_SYS,	null,		null),
-	'stime' =>		array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'reset' =>		array(T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null),
-	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null),
+$fields = [
+	'groupid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'hostid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'tr_groupid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'tr_hostid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'elementid' =>	[T_ZBX_INT, O_OPT, P_SYS|P_NZERO, DB_ID, null],
+	'screenname' =>	[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'step' =>		[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(0, 65535), null],
+	'period' =>		[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'stime' =>		[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'reset' =>		[T_ZBX_STR, O_OPT, P_SYS,	IN('"reset"'), null],
+	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'), null],
 	// ajax
-	'filterState' => array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
-);
+	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
+	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null]
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
 // validate group IDs
-$validateGroupIds = array_filter(array(
+$validateGroupIds = array_filter([
 	getRequest('groupid'),
 	getRequest('tr_groupid')
-));
+]);
 if ($validateGroupIds && !API::HostGroup()->isReadable($validateGroupIds)) {
 	access_deny();
 }
 
 // validate host IDs
-$validateHostIds = array_filter(array(
+$validateHostIds = array_filter([
 	getRequest('hostid'),
 	getRequest('tr_hostid')
-));
+]);
 if ($validateHostIds && !API::Host()->isReadable($validateHostIds)) {
 	access_deny();
 }
 
 if (getRequest('elementid')) {
-	$screens = API::Screen()->get(array(
-		'screenids' => array($_REQUEST['elementid']),
-		'output' => array('screenid')
-	));
+	$screens = API::Screen()->get([
+		'screenids' => [$_REQUEST['elementid']],
+		'output' => ['screenid']
+	]);
 	if (!$screens) {
 		access_deny();
 	}
@@ -89,10 +87,6 @@ if (getRequest('elementid')) {
 /*
  * Filter
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.screens.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
 if (isset($_REQUEST['favobj'])) {
 	if (getRequest('favobj') === 'timeline' && hasRequest('elementid') && hasRequest('period')) {
 		navigation_bar_calc('web.screens', $_REQUEST['elementid'], true);
@@ -112,7 +106,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
 /*
  * Display
  */
-$data = array(
+$data = [
 	'fullscreen' => $_REQUEST['fullscreen'],
 	'period' => getRequest('period'),
 	'stime' => getRequest('stime'),
@@ -120,7 +114,7 @@ $data = array(
 
 	// whether we should use screen name to fetch a screen (if this is false, elementid is used)
 	'use_screen_name' => isset($_REQUEST['screenname'])
-);
+];
 
 // if none is provided
 if (empty($data['elementid']) && !$data['use_screen_name']) {
@@ -128,9 +122,9 @@ if (empty($data['elementid']) && !$data['use_screen_name']) {
 	$data['elementid'] = CProfile::get('web.screens.elementid', null);
 }
 
-$data['screens'] = API::Screen()->get(array(
-	'output' => array('screenid', 'name')
-));
+$data['screens'] = API::Screen()->get([
+	'output' => ['screenid', 'name']
+]);
 
 // if screen name is provided it takes priority over elementid
 if ($data['use_screen_name']) {

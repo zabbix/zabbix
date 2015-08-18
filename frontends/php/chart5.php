@@ -28,18 +28,18 @@ $page['type'] = PAGE_TYPE_IMAGE;
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'serviceid' => array(T_ZBX_INT, O_MAND, P_SYS, DB_ID, null)
-);
+$fields = [
+	'serviceid' => [T_ZBX_INT, O_MAND, P_SYS, DB_ID, null]
+];
 check_fields($fields);
 
 /*
  * Permissions
  */
-$service = API::Service()->get(array(
-	'output' => array('serviceid', 'name'),
+$service = API::Service()->get([
+	'output' => ['serviceid', 'name'],
 	'serviceids' => $_REQUEST['serviceid']
-));
+]);
 $service = reset($service);
 if (!$service) {
 	access_deny();
@@ -87,8 +87,8 @@ imageText($im, 10, 0, $x, 14, $darkred, $str);
 $now = time(null);
 $to_time = $now;
 
-$count_now = array();
-$problem = array();
+$count_now = [];
+$problem = [];
 
 $start = mktime(0, 0, 0, 1, 1, date('Y'));
 
@@ -100,7 +100,7 @@ $start = $start - ($wday - 1) * 24 * 3600;
 
 $weeks = (int) date('W') + ($wday ? 1 : 0);
 
-$intervals = array();
+$intervals = [];
 for ($i = 0; $i < 52; $i++) {
 	if (($period_start = $start + 7 * 24 * 3600 * $i) > time()) {
 		break;
@@ -110,16 +110,16 @@ for ($i = 0; $i < 52; $i++) {
 		$period_end = time();
 	}
 
-	$intervals[] = array(
+	$intervals[] = [
 		'from' => $period_start,
 		'to' => $period_end
-	);
+	];
 }
 
-$sla = API::Service()->getSla(array(
+$sla = API::Service()->getSla([
 	'serviceids' => $service['serviceid'],
 	'intervals' => $intervals
-));
+]);
 $sla = reset($sla);
 
 foreach ($sla['sla'] as $i => $intervalSla) {

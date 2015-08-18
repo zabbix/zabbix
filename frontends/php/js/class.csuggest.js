@@ -319,8 +319,8 @@ keyDown: function(e){
 mouseOver: function(e){
 	this.mouseOverSuggest = true;
 
-	var row = Event.element(e).parentNode;
-	if(is_null(row) || (row.tagName.toLowerCase() != 'tr') || !isset('id',row)) return true;
+	var row = Event.element(e);
+	if(is_null(row) || (row.tagName.toLowerCase() != 'li') || !isset('id',row)) return true;
 
 	var tmp = row.id.split('_');
 	if(tmp.length != 2) return true;
@@ -345,13 +345,13 @@ suggestBlur: function(e){
 // -----------------------------------------------------------------------
 
 removeHighLight: function(){
-	$$('tr.highlight').each( function(hlRow){hlRow.className = '';});
+	$$('li.suggest-hover').each( function(hlRow){hlRow.className = '';});
 },
 
 
 highLightSuggest: function(){
 	var row = $('line_'+this.hlIndex);
-	if(!is_null(row)) row.className = 'highlight';
+	if(!is_null(row)) row.className = 'suggest-hover';
 },
 
 setNeedleByHighLight: function(){
@@ -365,7 +365,7 @@ selectSuggest: function(e){
 	this.setNeedleByHighLight(e);
 	this.hideSuggests();
 
-	if(this.onSelect(this.dom.input.value) && !GK) this.dom.input.form.submit();
+	if(this.onSelect(this.dom.input.value)) this.dom.input.form.submit();
 },
 
 
@@ -375,16 +375,19 @@ selectSuggest: function(e){
 
 showSuggests: function(){
 	if(is_null(this.dom.suggest)){
-		this.dom.suggest = document.createElement('div');
+		this.dom.suggest = document.createElement('ul');
 		this.dom.suggest = $(this.dom.suggest);
 
 		var doc_body = document.getElementsByTagName('body')[0];
 		if(empty(doc_body)) return false;
 
 		doc_body.appendChild(this.dom.suggest);
-		this.dom.suggest.className = 'suggest';
+		this.dom.suggest.className = 'search-suggest';
 
 		this.positionSuggests();
+
+		// insert just after input
+		this.dom.input.parentNode.insertBefore(this.dom.suggest, this.dom.input.nextSibling);
 	}
 
 	this.dom.suggest.style.display = 'block';
@@ -403,43 +406,38 @@ positionSuggests: function(){
 	var dims = getDimensions(this.dom.input);
 
 	this.dom.suggest.style.top = (pos.top+dims.height)+'px';
-	this.dom.suggest.style.left = pos.left+'px';
+	this.dom.suggest.style.left = '0px';
 },
 
 newSugTab: function(needle){
 	var list = this.needles[needle].list;
 
-	var sugTab = document.createElement('table');
-	sugTab.className = 'suggest';
-
-	var sugBody = document.createElement('tbody');
-	sugTab.appendChild(sugBody);
+	var sugTab = document.createElement('div');
 
 	var count = 0;
 	for(var key in list){
 		if(empty(list[key])) continue;
 		count++;
 
-		var tr = document.createElement('tr');
-		sugBody.appendChild(tr);
+		var li = document.createElement('li');
+		li.setAttribute('id', 'line_'+count);
+		li.setAttribute('needle', list[key]);
 
-		tr.setAttribute('id', 'line_'+count);
-		tr.setAttribute('needle', list[key]);
-
-		var td = document.createElement('td');
-		tr.appendChild(td);
-
-		var bold = document.createElement('b');
+		var bold = document.createElement('span');
 		bold.appendChild(document.createTextNode(list[key].substr(0, needle.length)));
-		td.appendChild(bold);
-		td.appendChild(document.createTextNode(list[key].substr(needle.length)));
+		bold.setAttribute('class', 'suggest-found');
+		li.appendChild(bold);
+		li.appendChild(document.createTextNode(list[key].substr(needle.length)));
 
-		addListener(td, 'mouseover', this.mouseOver.bindAsEventListener(this), true);
-		addListener(td, 'mouseup', this.selectSuggest.bindAsEventListener(this), true);
-		addListener(td, 'mouseout', this.mouseOut.bindAsEventListener(this), true);
+		addListener(li, 'mouseover', this.mouseOver.bindAsEventListener(this), true);
+		addListener(li, 'mouseup', this.selectSuggest.bindAsEventListener(this), true);
+		addListener(li, 'mouseout', this.mouseOut.bindAsEventListener(this), true);
+		sugTab.appendChild(li);
 
 		if(count >= this.suggestLimit) break;
 	}
+
+	this.dom.suggest.appendChild(sugTab);
 
 	if(!is_null(this.dom.sugtab)) this.dom.sugtab.remove();
 

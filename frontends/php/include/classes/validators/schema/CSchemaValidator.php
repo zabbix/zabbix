@@ -26,7 +26,7 @@ class CSchemaValidator extends CValidator {
 	 *
 	 * @var array
 	 */
-	public $required = array();
+	public $required = [];
 
 	/**
 	 * Error message if a required field is missing.
@@ -49,16 +49,16 @@ class CSchemaValidator extends CValidator {
 	 *
 	 * @var array
 	 */
-	protected $validators = array();
+	protected $validators = [];
 
 	/**
 	 * Array of validators to validate the whole object.
 	 *
 	 * @var array
 	 */
-	protected $postValidators = array();
+	protected $postValidators = [];
 
-	public function __construct(array $options = array()) {
+	public function __construct(array $options = []) {
 		// set validators via the public setter method
 		if (isset($options['validators'])) {
 			foreach ($options['validators'] as $field => $validator) {

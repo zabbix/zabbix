@@ -19,6 +19,7 @@
 
 #include "common.h"
 #include "sysinfo.h"
+#include "proc.h"
 #include "log.h"
 
 static int	VM_MEMORY_TOTAL(AGENT_RESULT *result)
@@ -69,8 +70,8 @@ static int	VM_MEMORY_BUFFERS(AGENT_RESULT *result)
 static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 {
 	FILE		*f;
-	char		*t, c[MAX_STRING_LEN];
-	zbx_uint64_t	res = 0;
+	zbx_uint64_t	value;
+	int		res;
 
 	if (NULL == (f = fopen("/proc/meminfo", "r")))
 	{
@@ -78,30 +79,18 @@ static int	VM_MEMORY_CACHED(AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	while (NULL != fgets(c, sizeof(c), f))
+	if (FAIL == (res = byte_value_from_proc_file(f, "Cached:", NULL, &value)))
 	{
-		if (0 == strncmp(c, "Cached:", 7))
-		{
-			t = strtok(c, " ");
-			t = strtok(NULL, " ");
-			sscanf(t, ZBX_FS_UI64, &res);
-			t = strtok(NULL, " ");
-
-			if (0 != strcasecmp(t, "kb"))
-				res <<= 10;
-			else if (0 != strcasecmp(t, "mb"))
-				res <<= 20;
-			else if (0 != strcasecmp(t, "gb"))
-				res <<= 30;
-			else if (0 != strcasecmp(t, "tb"))
-				res <<= 40;
-
-			break;
-		}
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of Cached from /proc/meminfo."));
+		goto close;
 	}
+
+	if (NOTSUPPORTED == res)
+		value = 0;
+close:
 	zbx_fclose(f);
 
-	SET_UI64_RESULT(result, res);
+	SET_UI64_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }
@@ -144,26 +133,51 @@ static int	VM_MEMORY_PUSED(AGENT_RESULT *result)
 
 static int	VM_MEMORY_AVAILABLE(AGENT_RESULT *result)
 {
+	FILE		*f;
+	zbx_uint64_t	value;
 	struct sysinfo	info;
-	AGENT_RESULT	result_tmp;
-	int		ret = SYSINFO_RET_FAIL;
+	int		res, ret = SYSINFO_RET_FAIL;
+
+	/* try MemAvailable (present since Linux 3.14), falling back to a calculation based on sysinfo() and Cached */
+
+	if (NULL == (f = fopen("/proc/meminfo", "r")))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc/meminfo: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (FAIL == (res = byte_value_from_proc_file(f, "MemAvailable:", "Cached:", &value)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of MemAvailable from /proc/meminfo."));
+		goto close;
+	}
+
+	if (SUCCEED == res)
+	{
+		SET_UI64_RESULT(result, value);
+		ret = SYSINFO_RET_OK;
+		goto close;
+	}
+
+	if (FAIL == (res = byte_value_from_proc_file(f, "Cached:", NULL, &value)))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain the value of Cached from /proc/meminfo."));
+		goto close;
+	}
+
+	if (NOTSUPPORTED == res)
+		value = 0;
 
 	if (0 != sysinfo(&info))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain system information: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		goto close;
 	}
 
-	init_result(&result_tmp);
-
-	ret = VM_MEMORY_CACHED(&result_tmp);
-
-	if (SYSINFO_RET_OK == ret)
-		SET_UI64_RESULT(result, (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64);
-	else
-		SET_MSG_RESULT(result, zbx_strdup(NULL, result_tmp.msg));
-
-	free_result(&result_tmp);
+	SET_UI64_RESULT(result, (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + value);
+	ret = SYSINFO_RET_OK;
+close:
+	zbx_fclose(f);
 
 	return ret;
 }
@@ -183,7 +197,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 
 	init_result(&result_tmp);
 
-	ret = VM_MEMORY_CACHED(&result_tmp);
+	ret = VM_MEMORY_AVAILABLE(&result_tmp);
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
@@ -191,7 +205,7 @@ static int	VM_MEMORY_PAVAILABLE(AGENT_RESULT *result)
 		goto clean;
 	}
 
-	available = (zbx_uint64_t)(info.freeram + info.bufferram) * info.mem_unit + result_tmp.ui64;
+	available = result_tmp.ui64;
 	total = (zbx_uint64_t)info.totalram * info.mem_unit;
 
 	if (0 == total)

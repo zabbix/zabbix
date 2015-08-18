@@ -72,20 +72,20 @@ class testInheritanceGraphPrototype extends CWebTest {
 
 	// Returns create data
 	public static function create() {
-		return array(
-			array(
-				array(
+		return [
+			[
+				[
 					'expected' => TEST_GOOD,
 					'name' => 'testInheritanceGraphPrototype5',
-					'addItemPrototypes' => array(
-						array('itemName' => 'testInheritanceItemPrototype1'),
-						array('itemName' => 'testInheritanceItemPrototype2'),
-						array('itemName' => 'testInheritanceItemPrototype3'),
-						array('itemName' => 'testInheritanceItemPrototype4')
-					)
-				)
-			)
-		);
+					'addItemPrototypes' => [
+						['itemName' => 'testInheritanceItemPrototype1'],
+						['itemName' => 'testInheritanceItemPrototype2'],
+						['itemName' => 'testInheritanceItemPrototype3'],
+						['itemName' => 'testInheritanceItemPrototype4']
+					]
+				]
+			]
+		];
 	}
 
 	/**

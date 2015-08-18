@@ -34,7 +34,7 @@ class CScreenChart extends CScreenBase {
 	 * @param array		$options
 	 * @param int		$options['graphid']
 	 */
-	public function __construct(array $options = array()) {
+	public function __construct(array $options = []) {
 		parent::__construct($options);
 
 		$this->graphid = isset($options['graphid']) ? $options['graphid'] : null;
@@ -63,7 +63,7 @@ class CScreenChart extends CScreenBase {
 
 		$this->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_graphid($this->graphid));
 
-		$timeControlData = array(
+		$timeControlData = [
 			'id' => $this->getDataId(),
 			'containerid' => $containerId,
 			'src' => $src,
@@ -73,7 +73,7 @@ class CScreenChart extends CScreenBase {
 			'dynamic' => 1,
 			'periodFixed' => CProfile::get($this->profileIdx.'.timelinefixed', 1),
 			'sliderMaximumTimePeriod' => ZBX_MAX_PERIOD
-		);
+		];
 
 		// output
 		if ($this->mode == SCREEN_MODE_JS) {
@@ -90,7 +90,13 @@ class CScreenChart extends CScreenBase {
 				zbx_add_post_js('timeControl.addObject("'.$this->getDataId().'", '.zbx_jsvalue($this->timeline).', '.zbx_jsvalue($timeControlData).');');
 			}
 
-			return $this->getOutput(new CDiv(null, 'center', $containerId), true, array('graphid' => $this->graphid));
+			return $this->getOutput(
+				(new CDiv())
+					->addClass('center')
+					->setId($containerId),
+				true,
+				['graphid' => $this->graphid]
+			);
 		}
 	}
 }

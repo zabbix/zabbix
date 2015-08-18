@@ -27,77 +27,79 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getFavouriteGraphs() {
-		$graphs = $simpeGraphs = array();
+		$graphs = [];
+		$simple_graphs = [];
 
 		$favourites = CFavorite::get('web.favorite.graphids');
 
 		if ($favourites) {
-			$graphIds = $itemIds = $dbGraphs = $dbItems = array();
+			$graphids = [];
+			$itemids = [];
+			$db_graphs = [];
+			$db_items = [];
 
 			foreach ($favourites as $favourite) {
 				if ($favourite['source'] === 'itemid') {
-					$itemIds[$favourite['value']] = $favourite['value'];
+					$itemids[$favourite['value']] = true;
 				}
 				else {
-					$graphIds[$favourite['value']] = $favourite['value'];
+					$graphids[$favourite['value']] = true;
 				}
 			}
 
-			if ($graphIds) {
-				$dbGraphs = API::Graph()->get(array(
-					'output' => array('graphid', 'name'),
-					'selectHosts' => array('hostid', 'host'),
+			if ($graphids) {
+				$db_graphs = API::Graph()->get([
+					'output' => ['graphid', 'name'],
+					'selectHosts' => ['hostid', 'name'],
 					'expandName' => true,
-					'graphids' => $graphIds,
+					'graphids' => array_keys($graphids),
 					'preservekeys' => true
-				));
+				]);
 			}
 
-			if ($itemIds) {
-				$dbItems = API::Item()->get(array(
-					'output' => array('itemid', 'hostid', 'name', 'key_'),
-					'selectHosts' => array('hostid', 'host'),
-					'itemids' => $itemIds,
+			if ($itemids) {
+				$db_items = API::Item()->get([
+					'output' => ['itemid', 'hostid', 'name', 'key_'],
+					'selectHosts' => ['hostid', 'name'],
+					'itemids' => array_keys($itemids),
 					'webitems' => true,
 					'preservekeys' => true
-				));
+				]);
 
-				$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
+				$db_items = CMacrosResolverHelper::resolveItemNames($db_items);
 			}
 
 			foreach ($favourites as $favourite) {
-				$sourceId = $favourite['value'];
+				$sourceid = $favourite['value'];
 
 				if ($favourite['source'] === 'itemid') {
-					if (isset($dbItems[$sourceId])) {
-						$dbItem = $dbItems[$sourceId];
-						$dbHost = reset($dbItem['hosts']);
+					if (array_key_exists($sourceid, $db_items)) {
+						$db_item = $db_items[$sourceid];
 
-						$simpeGraphs[] = array(
-							'id' => $sourceId,
-							'label' => $dbHost['host'].NAME_DELIMITER.$dbItem['name_expanded']
-						);
+						$simple_graphs[] = [
+							'id' => $sourceid,
+							'label' => $db_item['hosts'][0]['name'].NAME_DELIMITER.$db_item['name_expanded']
+						];
 					}
 				}
 				else {
-					if (isset($dbGraphs[$sourceId])) {
-						$dbGraph = $dbGraphs[$sourceId];
-						$dbHost = reset($dbGraph['hosts']);
+					if (array_key_exists($sourceid, $db_graphs)) {
+						$db_graph = $db_graphs[$sourceid];
 
-						$graphs[] = array(
-							'id' => $sourceId,
-							'label' => $dbHost['host'].NAME_DELIMITER.$dbGraph['name']
-						);
+						$graphs[] = [
+							'id' => $sourceid,
+							'label' => $db_graph['hosts'][0]['name'].NAME_DELIMITER.$db_graph['name']
+						];
 					}
 				}
 			}
 		}
 
-		return array(
+		return [
 			'type' => 'favouriteGraphs',
 			'graphs' => $graphs,
-			'simpleGraphs' => $simpeGraphs
-		);
+			'simpleGraphs' => $simple_graphs
+		];
 	}
 
 	/**
@@ -106,34 +108,34 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getFavouriteMaps() {
-		$maps = array();
+		$maps = [];
 
 		$favourites = CFavorite::get('web.favorite.sysmapids');
 
 		if ($favourites) {
-			$mapIds = array();
+			$mapids = [];
 
 			foreach ($favourites as $favourite) {
-				$mapIds[$favourite['value']] = $favourite['value'];
+				$mapids[$favourite['value']] = true;
 			}
 
-			$dbMaps = API::Map()->get(array(
-				'output' => array('sysmapid', 'name'),
-				'sysmapids' => $mapIds
-			));
+			$db_maps = API::Map()->get([
+				'output' => ['sysmapid', 'name'],
+				'sysmapids' => array_keys($mapids)
+			]);
 
-			foreach ($dbMaps as $dbMap) {
-				$maps[] = array(
-					'id' => $dbMap['sysmapid'],
-					'label' => $dbMap['name']
-				);
+			foreach ($db_maps as $db_map) {
+				$maps[] = [
+					'id' => $db_map['sysmapid'],
+					'label' => $db_map['name']
+				];
 			}
 		}
 
-		return array(
+		return [
 			'type' => 'favouriteMaps',
 			'maps' => $maps
-		);
+		];
 	}
 
 	/**
@@ -142,12 +144,12 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getFavouriteScreens() {
-		$screens = $slideshows = array();
+		$screens = $slideshows = [];
 
 		$favourites = CFavorite::get('web.favorite.screenids');
 
 		if ($favourites) {
-			$screenIds = $slideshowIds = array();
+			$screenIds = $slideshowIds = [];
 
 			foreach ($favourites as $favourite) {
 				if ($favourite['source'] === 'screenid') {
@@ -155,11 +157,11 @@ class CMenuPopupHelper {
 				}
 			}
 
-			$dbScreens = API::Screen()->get(array(
-				'output' => array('screenid', 'name'),
+			$dbScreens = API::Screen()->get([
+				'output' => ['screenid', 'name'],
 				'screenids' => $screenIds,
 				'preservekeys' => true
-			));
+			]);
 
 			foreach ($favourites as $favourite) {
 				$sourceId = $favourite['value'];
@@ -169,10 +171,10 @@ class CMenuPopupHelper {
 						$dbSlideshow = get_slideshow_by_slideshowid($sourceId);
 
 						if ($dbSlideshow) {
-							$slideshows[] = array(
+							$slideshows[] = [
 								'id' => $dbSlideshow['slideshowid'],
 								'label' => $dbSlideshow['name']
-							);
+							];
 						}
 					}
 				}
@@ -180,20 +182,20 @@ class CMenuPopupHelper {
 					if (isset($dbScreens[$sourceId])) {
 						$dbScreen = $dbScreens[$sourceId];
 
-						$screens[] = array(
+						$screens[] = [
 							'id' => $dbScreen['screenid'],
 							'label' => $dbScreen['name']
-						);
+						];
 					}
 				}
 			}
 		}
 
-		return array(
+		return [
 			'type' => 'favouriteScreens',
 			'screens' => $screens,
 			'slideshows' => $slideshows
-		);
+		];
 	}
 
 	/**
@@ -206,11 +208,11 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getHistory(array $item) {
-		return array(
+		return [
 			'type' => 'history',
 			'itemid' => $item['itemid'],
-			'hasLatestGraphs' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT))
-		);
+			'hasLatestGraphs' => in_array($item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT])
+		];
 	}
 
 	/**
@@ -230,14 +232,14 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getHost(array $host, array $scripts = null, $hasGoTo = true) {
-		$data = array(
+		$data = [
 			'type' => 'host',
 			'hostid' => $host['hostid'],
 			'showGraphs' => (bool) $host['graphs'],
 			'showScreens' => (bool) $host['screens'],
 			'showTriggers' => ($host['status'] == HOST_STATUS_MONITORED),
 			'hasGoTo' => $hasGoTo
-		);
+		];
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
@@ -245,14 +247,14 @@ class CMenuPopupHelper {
 			}
 			unset($script);
 
-			CArrayHelper::sort($scripts, array('name'));
+			CArrayHelper::sort($scripts, ['name']);
 
 			foreach (array_values($scripts) as $script) {
-				$data['scripts'][] = array(
-					'name' => CHtml::encode($script['name']),
+				$data['scripts'][] = [
+					'name' => $script['name'],
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
-				);
+				];
 			}
 		}
 
@@ -280,25 +282,25 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getMap($hostId, array $scripts = null, array $gotos = null, array $urls = null) {
-		$data = array(
+		$data = [
 			'type' => 'map'
-		);
+		];
 
 		if ($scripts) {
 			foreach ($scripts as &$script) {
 				$script['name'] = implode('/', splitPath($script['name'], false, true));
 			}
 			unset($script);
-			CArrayHelper::sort($scripts, array('name'));
+			CArrayHelper::sort($scripts, ['name']);
 
 			$data['hostid'] = $hostId;
 
 			foreach (array_values($scripts) as $script) {
-				$data['scripts'][] = array(
-					'name' => CHtml::encode($script['name']),
+				$data['scripts'][] = [
+					'name' => $script['name'],
 					'scriptid' => $script['scriptid'],
 					'confirmation' => $script['confirmation']
-				);
+				];
 			}
 		}
 
@@ -308,10 +310,10 @@ class CMenuPopupHelper {
 
 		if ($urls) {
 			foreach ($urls as $url) {
-				$data['urls'][] = array(
+				$data['urls'][] = [
 					'label' => $url['name'],
 					'url' => $url['url']
-				);
+				];
 			}
 		}
 
@@ -328,14 +330,14 @@ class CMenuPopupHelper {
 	 *
 	 * @return array
 	 */
-	public static function getRefresh($widgetName, $currentRate, $multiplier = false, array $params = array()) {
-		return array(
+	public static function getRefresh($widgetName, $currentRate, $multiplier = false, array $params = []) {
+		return [
 			'type' => 'refresh',
 			'widgetName' => $widgetName,
 			'currentRate' => $currentRate,
 			'multiplier' => $multiplier,
 			'params' => $params
-		);
+		];
 	}
 
 	/**
@@ -348,12 +350,12 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getServiceConfiguration($serviceId, $name, $deletable) {
-		return array(
+		return [
 			'type' => 'serviceConfiguration',
 			'serviceid' => $serviceId,
 			'name' => $name,
 			'deletable' => $deletable
-		);
+		];
 	}
 
 	/**
@@ -382,7 +384,7 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getTrigger(array $trigger, array $acknowledge = null, $eventTime = null) {
-		$hosts = array();
+		$hosts = [];
 		$showEvents = true;
 
 		foreach ($trigger['hosts'] as $host) {
@@ -400,30 +402,32 @@ class CMenuPopupHelper {
 		}
 		unset($item);
 
-		CArrayHelper::sort($trigger['items'], array('name', 'hostname', 'itemid'));
+		CArrayHelper::sort($trigger['items'], ['name', 'hostname', 'itemid']);
 
 		$hostCount = count($hosts);
-		$items = array();
+		$items = [];
 
 		foreach ($trigger['items'] as $item) {
-			$items[] = array(
+			$items[] = [
 				'name' => ($hostCount > 1)
 					? $hosts[$item['hostid']].NAME_DELIMITER.$item['name_expanded']
 					: $item['name_expanded'],
-				'params' => array(
+				'params' => [
 					'itemid' => $item['itemid'],
-					'action' => in_array($item['value_type'], array(ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64))
+					'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
 						? HISTORY_GRAPH
 						: HISTORY_VALUES
-				)
-			);
+				]
+			];
 		}
 
-		$data = array(
+		$data = [
 			'type' => 'trigger',
+			'groupid' => $trigger['groupid'],
+			'hostid' => $trigger['hostid'],
 			'triggerid' => $trigger['triggerid'],
 			'items' => $items
-		);
+		];
 
 		if ($acknowledge !== null) {
 			$data['acknowledge'] = $acknowledge;
@@ -440,7 +444,7 @@ class CMenuPopupHelper {
 		if ($showEvents) {
 			$data['showEvents'] = true;
 		}
-		if (in_array(CWebUser::$data['type'], array(USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN))
+		if (in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 				&& $trigger['flags'] == ZBX_FLAG_DISCOVERY_NORMAL) {
 			$data['configuration'] = true;
 		}
@@ -460,12 +464,12 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getTriggerLog($itemId, $itemName, $triggers) {
-		return array(
+		return [
 			'type' => 'triggerLog',
 			'itemid' => $itemId,
 			'itemName' => $itemName,
 			'triggers' => $triggers
-		);
+		];
 	}
 
 	/**
@@ -474,8 +478,8 @@ class CMenuPopupHelper {
 	 * @return array
 	 */
 	public static function getTriggerMacro() {
-		return array(
+		return [
 			'type' => 'triggerMacro'
-		);
+		];
 	}
 }

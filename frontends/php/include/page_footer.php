@@ -30,18 +30,6 @@ if (!defined('PAGE_HEADER_LOADED')) {
 	define('PAGE_HEADER_LOADED', 1);
 }
 
-// history
-if (isset($page['hist_arg']) && CWebUser::$data['alias'] != ZBX_GUEST_USER && $page['type'] == PAGE_TYPE_HTML && !defined('ZBX_PAGE_NO_MENU')) {
-	// if URL length is greater than DB field size, skip history update
-	$url = getHistoryUrl($page);
-
-	if ($url) {
-		DBstart();
-		$result = addUserHistory($page['title'], $url);
-		DBend($result);
-	}
-}
-
 // last page
 if (!defined('ZBX_PAGE_NO_MENU') && $page['file'] != 'profile.php') {
 	CProfile::update('web.paging.lastpage', $page['file'], PROFILE_TYPE_STR);
@@ -61,38 +49,25 @@ if (isset($DB) && isset($DB['TRANSACTIONS']) && $DB['TRANSACTIONS'] != 0) {
 
 show_messages();
 
-if (in_array($page['type'], array(PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML))) {
-	if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode']) && CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-		CProfiler::getInstance()->stop();
-		CProfiler::getInstance()->show();
-	}
-}
-
 if ($page['type'] == PAGE_TYPE_HTML) {
-	if (!defined('ZBX_PAGE_NO_MENU') && !defined('ZBX_PAGE_NO_FOOTER')) {
-		$table = new CTable(null, 'textwhite bold maxwidth ui-widget-header ui-corner-all page_footer');
-
-		$conString = (CWebUser::$data['userid'] == 0)
-			? _('Not connected')
-			: _s('Connected as \'%1$s\'', CWebUser::$data['alias']);
-
-		$table->addRow(array(
-			new CCol(new CLink(
-				_s('Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA',
-					ZABBIX_VERSION, ZABBIX_COPYRIGHT_FROM, ZABBIX_COPYRIGHT_TO),
-				ZABBIX_HOMEPAGE, 'highlight', null, true), 'center'),
-			new CCol(array(
-				new CSpan(SPACE.SPACE.'|'.SPACE.SPACE, 'divider'),
-				new CSpan($conString, 'footer_sign')
-			), 'right')
-		));
-		$table->show();
+	// end of article div
+	echo '</div>'."\n";
+	if (!defined('ZBX_PAGE_NO_MENU')) {
+		makePageFooter()->show();
 	}
-
 	insertPagePostJs();
 	require_once 'include/views/js/common.init.js.php';
 
-	echo '</body>'."\n".
-		'</html>'."\n";
+	if (in_array($page['type'], [PAGE_TYPE_HTML_BLOCK, PAGE_TYPE_HTML])) {
+		if (!is_null(CWebUser::$data) && isset(CWebUser::$data['debug_mode'])
+				&& CWebUser::$data['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+			CProfiler::getInstance()->stop();
+			CProfiler::getInstance()->show();
+			makeDebugButton()->show();
+		}
+	}
+
+	echo '</body></html>';
 }
+
 exit;

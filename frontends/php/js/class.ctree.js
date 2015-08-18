@@ -62,17 +62,17 @@ CTree.prototype = {
 		}
 	},
 
-	closeSNodeX: function(id, img) {
-		if (!empty(this.nodes[id]) && !empty(img)) {
+	closeSNodeX: function(id, arrow) {
+		if (!empty(this.nodes[id]) && !empty(arrow)) {
 			var nodelist = this.nodes[id].nodelist.split(',');
 
 			if (this.getNodeStatus(id) == 'close') {
 				this.openNode(nodelist);
-				img.src = 'images/general/tree/minus.gif';
+				arrow.className = 'arrow-down';
 			}
 			else {
 				this.closeNode(nodelist);
-				img.src = 'images/general/tree/plus.gif';
+				arrow.className = 'arrow-right';
 			}
 
 			this.changeNodeStatus(id);
@@ -117,10 +117,10 @@ CTree.prototype = {
 
 	onStartSetStatus: function(id) {
 		if (!empty(this.nodes[id])) {
-			var img = document.getElementById('idi_' + id);
+			var arrow = document.getElementById('idi_' + id).getElementsByTagName('span')[0];
 
-			if (!empty(img)) {
-				img.src = 'images/general/tree/minus.gif';
+			if (!empty(arrow)) {
+				arrow.className = 'arrow-down';
 			}
 
 			this.nodes[id].status = 'open';

@@ -127,7 +127,7 @@ var MMenu = {
 	showSubMenu: function(show_label) {
 		var menu_div = $('sub_' + show_label);
 		if (!is_null(menu_div)) {
-			$(show_label).className = 'active';
+			$(show_label).className = 'selected';
 			menu_div.show();
 			for (var key in this.menus) {
 				if (key == show_label) {
@@ -365,7 +365,7 @@ var jqBlink = {
 var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic) {
-		var box = jQuery('<div></div>').addClass('hintbox');
+		var box = jQuery('<div></div>').addClass('overlay-dialogue');
 
 		if (typeof hintText === 'string') {
 			hintText = hintText.replace(/\n/g, '<br />');
@@ -379,12 +379,10 @@ var hintBox = {
 		}
 
 		if (isStatic) {
-			var close_link = jQuery('<div>' + locale['S_CLOSE'] + '</div>')
-				.addClass('link')
-				.css({
-					'text-align': 'right',
-					'border-bottom': '1px #333 solid'
-				}).click(function() {
+			var close_link = jQuery('<span>', {
+					'class': 'overlay-close-btn'}
+				)
+				.click(function() {
 					hintBox.hideHint(e, target, true);
 				});
 			box.prepend(close_link);
@@ -446,6 +444,8 @@ var hintBox = {
 			wHeight = jQuery(window).height(),
 			scrollTop = jQuery(window).scrollTop(),
 			scrollLeft = jQuery(window).scrollLeft(),
+			hint_width = jQuery(target.hintBoxItem).outerWidth(),
+			hint_height = jQuery(target.hintBoxItem).outerHeight(),
 			top, left;
 
 		// uses stored clientX on afterload positioning when there is no event
@@ -455,25 +455,25 @@ var hintBox = {
 		}
 
 		// doesn't fit in the screen horizontally
-		if (target.hintBoxItem.width() + 10 > wWidth) {
+		if (hint_width + 10 > wWidth) {
 			left = scrollLeft + 2;
 		}
 		// 10px to right if fit
-		else if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+		else if (wWidth - target.clientX - 10 > hint_width) {
 			left = scrollLeft + target.clientX + 10;
 		}
 		// 10px from screen right side
 		else {
-			left = scrollLeft + wWidth - 10 - target.hintBoxItem.width();
+			left = scrollLeft + wWidth - 10 - hint_width;
 		}
 
 		// 10px below if fit
-		if (wHeight - target.clientY - target.hintBoxItem.height() - 10 > 0) {
+		if (wHeight - target.clientY - hint_height - 10 > 0) {
 			top = scrollTop + target.clientY + 10;
 		}
 		// 10px above if fit
-		else if (target.clientY - target.hintBoxItem.height() - 10 > 0) {
-			top = scrollTop + target.clientY - target.hintBoxItem.height() - 10;
+		else if (target.clientY - hint_height - 10 > 0) {
+			top = scrollTop + target.clientY - hint_height - 10;
 		}
 		// 10px below as fallback
 		else {
@@ -481,21 +481,21 @@ var hintBox = {
 		}
 
 		// fallback if doesn't fit verticaly but could fit if aligned to right or left
-		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
-				&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
+		if ((top - scrollTop + hint_height > wHeight)
+				&& (target.clientX - 10 > hint_width || wWidth - target.clientX - 10 > hint_width)) {
 
 			// align to left if fit
-			if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+			if (wWidth - target.clientX - 10 > hint_width) {
 				left = scrollLeft + target.clientX + 10;
 			}
 			// align to right
 			else {
-				left = scrollLeft + target.clientX - target.hintBoxItem.width() - 10;
+				left = scrollLeft + target.clientX - hint_width - 10;
 			}
 
 			// 10px from bottom if fit
-			if (wHeight - 10 > target.hintBoxItem.height()) {
-				top = scrollTop + wHeight - target.hintBoxItem.height() - 10;
+			if (wHeight - 10 > hint_height) {
+				top = scrollTop + wHeight - hint_height - 10;
 			}
 			// 10px from top
 			else {
@@ -566,7 +566,7 @@ function create_color_picker() {
 	}
 
 	color_picker = document.createElement('div');
-	color_picker.setAttribute('id', 'color_picker');
+	color_picker.setAttribute('class', 'overlay-dialogue');
 	color_picker.innerHTML = color_table;
 	document.body.appendChild(color_picker);
 	hide_color_picker();
@@ -617,44 +617,30 @@ function rm4favorites(object, objectid) {
 /**
  * Toggles filter state and updates title and icons accordingly.
  *
- * @param {int} 	id					Id of filter in DOM
- * @param {string} 	titleWhenVisible	Title to set when filter is visible
- * @param {string} 	titleWhenHidden		Title to set when filter is collapsed
+ * @param {idx} 	idx					User profile index
+ * @param {int} 	value_int			Integer value
  */
-function changeFlickerState(id, titleWhenVisible, titleWhenHidden) {
-	var state = showHide(id);
-
-	switchElementClass('flicker_icon_l', 'dbl_arrow_up', 'dbl_arrow_down');
-	switchElementClass('flicker_icon_r', 'dbl_arrow_up', 'dbl_arrow_down');
-
-	var title = state ? titleWhenVisible : titleWhenHidden;
-
-	jQuery('#flicker_title').html(title);
-
-	sendAjaxData(location.href, {
+function updateUserProfile(idx, value_int) {
+	sendAjaxData('zabbix.php?action=profile.update', {
 		data: {
-			filterState: state
+			idx: idx,
+			value_int: value_int
 		}
 	});
-
-	// resize multiselects in the flicker
-	if (jQuery('.multiselect').length > 0 && state == 1) {
-		jQuery('.multiselect', jQuery('#' + id)).multiSelect('resize');
-	}
 }
 
 function changeWidgetState(obj, widgetId) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
-		css = switchElementClass(obj, 'arrowup', 'arrowdown'),
+		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
 
-	if (css === 'arrowdown') {
+	if (css === 'btn-widget-expand') {
 		jQuery('.body', widgetObj).slideUp(50);
-		jQuery('.footer', widgetObj).slideUp(50);
+		jQuery('.dashbrd-widget-foot', widgetObj).slideUp(50);
 	}
 	else {
 		jQuery('.body', widgetObj).slideDown(50);
-		jQuery('.footer', widgetObj).slideDown(50);
+		jQuery('.dashbrd-widget-foot', widgetObj).slideDown(50);
 
 		state = 1;
 	}
@@ -682,57 +668,6 @@ function sendAjaxData(url, options) {
 	options.url = url.getUrl();
 
 	jQuery.ajax(options);
-}
-
-/**
- * Finds all elements with a 'placeholder' attribute and emulates the placeholder in IE.
- */
-function createPlaceholders() {
-	if (IE) {
-		jQuery('[placeholder]').each(function() {
-			var placeholder = jQuery(this);
-
-			if (!placeholder.data('has-placeholder-handlers')) {
-				placeholder
-					.data('has-placeholder-handlers', true)
-					.focus(function() {
-						var obj = jQuery(this);
-
-						if (!obj.attr('placeholder')) {
-							return;
-						}
-
-						if (obj.val() == obj.attr('placeholder')) {
-							obj.val('');
-							obj.removeClass('placeholder');
-						}
-					})
-					.blur(function() {
-						var obj = jQuery(this);
-
-						if (!obj.attr('placeholder')) {
-							return;
-						}
-
-						if (obj.val() == '' ||  obj.val() == obj.attr('placeholder')) {
-							obj.val(obj.attr('placeholder'));
-							obj.addClass('placeholder');
-						}
-					})
-					.blur();
-			}
-
-			jQuery('form').submit(function() {
-				jQuery('.placeholder').each(function() {
-					var obj = jQuery(this);
-
-					if (obj.val() == obj.attr('placeholder')) {
-						obj.val('');
-					}
-				});
-			});
-		});
-	}
 }
 
 /**
@@ -915,8 +850,6 @@ function getConditionFormula(conditions, evalType) {
 		beforeRow.before(template.evaluate(data));
 		table.data('dynamicRows').counter++;
 
-		createPlaceholders();
-
 		table.trigger('tableupdate.dynamicRows', options);
 	}
 
@@ -985,11 +918,10 @@ jQuery(function ($) {
 
 			// insert spans
 			cellsToRotate.each(function() {
-				var cell = $(this);
-
-				var text = $('<span>', {
-					text: cell.html()
-				});
+				var cell = $(this),
+					text = $('<span>', {
+						text: cell.html()
+					}).css({'white-space': 'nowrap'});
 
 				if (IE) {
 					text.css({'font-family': 'monospace'});

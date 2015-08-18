@@ -22,10 +22,10 @@
 class CNewValidator {
 
 	private $rules;
-	private $input = array();
-	private $output = array();
-	private $errors = array();
-	private $errorsFatal = array();
+	private $input = [];
+	private $output = [];
+	private $errors = [];
+	private $errorsFatal = [];
 
 	/**
 	 * Parser for validation rules.
@@ -107,6 +107,18 @@ class CNewValidator {
 				case 'in':
 					if (array_key_exists($field, $this->input)) {
 						if (!is_string($this->input[$field]) || !in_array($this->input[$field], $params)) {
+							$this->addError($fatal,
+								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
+								// TODO: stringify($this->input[$field]) ???
+							);
+							return false;
+						}
+					}
+					break;
+
+				case 'int32':
+					if (array_key_exists($field, $this->input)) {
+						if (!is_string($this->input[$field]) || !$this->is_int32($this->input[$field])) {
 							$this->addError($fatal,
 								_s('Incorrect value "%1$s" for "%2$s" field.', $this->input[$field], $field)
 								// TODO: stringify($this->input[$field]) ???
@@ -211,7 +223,7 @@ class CNewValidator {
 		return (bccomp($value, '0') >= 0 && bccomp($value, '9223372036854775807') <= 0);
 	}
 
-	public static function is_int($value) {
+	public static function is_int32($value) {
 		if (1 != preg_match('/^\-?[0-9]+$/', $value)) {
 			return false;
 		}
@@ -226,7 +238,7 @@ class CNewValidator {
 				return $this->is_id($value);
 
 			case DB::FIELD_TYPE_INT:
-				return $this->is_int($value);
+				return $this->is_int32($value);
 
 			case DB::FIELD_TYPE_CHAR:
 				return (mb_strlen($value) <= $field_schema['length']);

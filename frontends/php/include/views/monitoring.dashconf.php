@@ -19,81 +19,81 @@
 **/
 
 
-$dashconfWidget = new CWidget();
-$dashconfWidget->setClass('header');
-$dashconfWidget->addPageHeader(_('DASHBOARD CONFIGURATION'));
+$dashconfWidget = (new CWidget())->setTitle(_('Dashboard'));
 
 // create form
-$dashconfForm = new CForm();
-$dashconfForm->setName('dashconf');
-$dashconfForm->setAttribute('id', 'dashform');
-$dashconfForm->addVar('filterEnable', $this->data['isFilterEnable']);
+$dashconfForm = (new CForm())
+	->setName('dashconf')
+	->setId('dashform')
+	->addVar('filterEnable', $this->data['isFilterEnable']);
 
 // create form list
 $dashconfFormList = new CFormList('dashconfFormList');
 
 // append filter status to form list
 if ($this->data['isFilterEnable']) {
-	$filterStatusSpan = new CSpan(_('Enabled'), 'green underline pointer');
-	$filterStatusSpan->setAttribute('onclick', "create_var('".$dashconfForm->getName()."', 'filterEnable', 0, true);");
+	$filterStatusSpan = (new CSpan(_('Enabled')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(ZBX_STYLE_GREEN)
+		->onClick("create_var('".$dashconfForm->getName()."', 'filterEnable', 0, true);")
+		->setAttribute('tabindex', 0);
 }
 else {
-	$filterStatusSpan = new CSpan(_('Disabled'), 'red underline pointer');
-	$filterStatusSpan->setAttribute('onclick', "$('dashform').enable(); create_var('".$dashconfForm->getName()."', 'filterEnable', 1, true);");
+	$filterStatusSpan = (new CSpan(_('Disabled')))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(ZBX_STYLE_RED)
+		->onClick("$('dashform').enable(); create_var('".$dashconfForm->getName()."', 'filterEnable', 1, true);")
+		->setAttribute('tabindex', 0);
 }
 $dashconfFormList->addRow(_('Dashboard filter'), $filterStatusSpan);
 
 // append host groups to form list
-$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit();');
-$hostGroupsComboBox->addItem(0, _('All'));
-$hostGroupsComboBox->addItem(1, _('Selected'));
+$hostGroupsComboBox = new CComboBox('grpswitch', $this->data['grpswitch'], 'submit()', [
+	0 => _('All'),
+	1 => _('Selected')
+]);
 if (!$this->data['isFilterEnable']) {
 	$hostGroupsComboBox->setAttribute('disabled', 'disabled');
 }
 $dashconfFormList->addRow(_('Host groups'), $hostGroupsComboBox);
 
 if ($this->data['grpswitch']) {
-	$dashconfFormList->addRow(_('Show selected groups'), new CMultiSelect(array(
+	$dashconfFormList->addRow(_('Show selected groups'), (new CMultiSelect([
 		'name' => 'groupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['groups'],
 		'disabled' => !$this->data['isFilterEnable'],
-		'popup' => array(
+		'popup' => [
 			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=groupids_'.
-				'&srcfld1=groupid&multiselect=1',
-			'width' => 450,
-			'height' => 450
-		)
-	)));
-	$dashconfFormList->addRow(_('Hide selected groups'), new CMultiSelect(array(
+				'&srcfld1=groupid&multiselect=1'
+		]
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH));
+	$dashconfFormList->addRow(_('Hide selected groups'), (new CMultiSelect([
 		'name' => 'hidegroupids[]',
 		'objectName' => 'hostGroup',
 		'data' => $this->data['hideGroups'],
 		'disabled' => !$this->data['isFilterEnable'],
-		'popup' => array(
+		'popup' => [
 			'parameters' => 'srctbl=host_groups&dstfrm='.$dashconfForm->getName().'&dstfld1=hidegroupids_'.
-				'&srcfld1=groupid&multiselect=1',
-			'width' => 450,
-			'height' => 450
-		)
-	)));
+				'&srcfld1=groupid&multiselect=1'
+		]
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH));
 }
 
 // append host in maintenance checkbox to form list
-$maintenanceCheckBox = new CCheckBox('maintenance', $this->data['maintenance'], null, '1');
+$maintenanceCheckBox = (new CCheckBox('maintenance'))->setChecked($this->data['maintenance'] == 1);
 if (!$this->data['isFilterEnable']) {
 	$maintenanceCheckBox->setAttribute('disabled', 'disabled');
 }
-$dashconfFormList->addRow(_('Hosts'), array($maintenanceCheckBox, _('Show hosts in maintenance')));
+$dashconfFormList->addRow(_('Hosts'), [$maintenanceCheckBox, _('Show hosts in maintenance')]);
 
 // append trigger severities to form list
-$severities = array();
+$severities = [];
 foreach ($this->data['severities'] as $severity) {
-	$serverityCheckBox = new CCheckBox('trgSeverity['.$severity.']',
-		isset($this->data['severity'][$severity]), null, 1
-	);
-	$serverityCheckBox->setEnabled($this->data['isFilterEnable']);
-	$severities[] = array($serverityCheckBox, getSeverityName($severity, $this->data['config']));
+	$serverityCheckBox = (new CCheckBox('trgSeverity['.$severity.']'))
+		->setChecked(isset($this->data['severity'][$severity]))
+		->setEnabled($this->data['isFilterEnable']);
+	$severities[] = [$serverityCheckBox, getSeverityName($severity, $this->data['config'])];
 	$severities[] = BR();
 }
 array_pop($severities);
@@ -101,12 +101,11 @@ array_pop($severities);
 $dashconfFormList->addRow(_('Triggers with severity'), $severities);
 
 // append problem display to form list
-$extAckComboBox = new CComboBox('extAck', $this->data['extAck']);
-$extAckComboBox->addItems(array(
+$extAckComboBox = new CComboBox('extAck', $this->data['extAck'], null, [
 	EXTACK_OPTION_ALL => _('All'),
 	EXTACK_OPTION_BOTH => _('Separated'),
 	EXTACK_OPTION_UNACK => _('Unacknowledged only')
-));
+]);
 $extAckComboBox->setEnabled($this->data['isFilterEnable'] && $this->data['config']['event_ack_enable']);
 if (!$this->data['config']['event_ack_enable']) {
 	$extAckComboBox->setAttribute('title', _('Event acknowledging disabled'));
@@ -117,12 +116,12 @@ $dashconfFormList->addRow(_('Problem display'), $extAckComboBox);
 $dashconfTab = new CTabView();
 $dashconfTab->addTab('dashconfTab', _('Filter'), $dashconfFormList);
 
-$dashconfForm->addItem($dashconfTab);
-$dashconfForm->addItem(makeFormFooter(
+$dashconfTab->setFooter(makeFormFooter(
 	new CSubmit('update', _('Update')),
-	array(new CButtonCancel())
+	[new CButtonCancel()]
 ));
 
+$dashconfForm->addItem($dashconfTab);
 $dashconfWidget->addItem($dashconfForm);
 
 return $dashconfWidget;

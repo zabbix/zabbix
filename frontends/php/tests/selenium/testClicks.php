@@ -26,110 +26,110 @@ class testClicks extends CWebTest {
 	public static function provider() {
 		// List of URLs to test
 		// URL, navigation, expected page Title, expected String
-		return array(
+		return [
 			// Configuration
-			array('hostgroups.php',
-				array('link=Discovered hosts','update'),
+			['hostgroups.php',
+				['link=Discovered hosts','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('hostgroups.php',
-				array('link=Zabbix servers','update'),
+			],
+			['hostgroups.php',
+				['link=Zabbix servers','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('hostgroups.php',
-				array('link=Hypervisors','update'),
+			],
+			['hostgroups.php',
+				['link=Hypervisors','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('hostgroups.php',
-				array('link=Linux servers','update'),
+			],
+			['hostgroups.php',
+				['link=Linux servers','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('hostgroups.php',
-				array('link=Virtual machines','update'),
+			],
+			['hostgroups.php',
+				['link=Virtual machines','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('hostgroups.php',
-				array('link=ZBX6648 All Triggers','update'),
+			],
+			['hostgroups.php',
+				['link=ZBX6648 All Triggers','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('hostgroups.php',
-				array('link=ZBX6648 Disabled Triggers','update'),
+			],
+			['hostgroups.php',
+				['link=ZBX6648 Disabled Triggers','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('hostgroups.php',
-				array('link=ZBX6648 Enabled Triggers','update'),
+			],
+			['hostgroups.php',
+				['link=ZBX6648 Enabled Triggers','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('hostgroups.php',
-				array('link=ZBX6648 Group No Hosts','update'),
+			],
+			['hostgroups.php',
+				['link=ZBX6648 Group No Hosts','update'],
 				'Configuration of host groups',
 				'Group updated'
-			),
-			array('templates.php',
-				array('link=Template OS Linux','update'),
+			],
+			['templates.php',
+				['link=Template OS Linux','update'],
 				'Configuration of templates',
 				'Template updated'
-			),
-			array('templates.php',
-				array('link=ЗАББИКС Сервер','update'),
+			],
+			['templates.php',
+				['link=ЗАББИКС Сервер','update'],
 				'Configuration of hosts',
 				'Host updated'
-			),
-			array('sysmaps.php',
-				array('link=Local network'),
+			],
+			['sysmaps.php',
+				['link=Local network'],
 				'Configuration of network maps',
 				'Grid'
-			),
-			array('discoveryconf.php',
-				array('link=Local network','update'),
+			],
+			['discoveryconf.php',
+				['link=Local network','update'],
 				'Configuration of discovery rules',
 				'Discovery rule updated'
-			),
+			],
 			// Administration
-			array('usergrps.php',
-				array('link=Guests', 'update'),
+			['usergrps.php',
+				['link=Guests', 'update'],
 				'Configuration of user groups',
 				'Group updated'
-			),
-			array('usergrps.php',
-				array('link=Zabbix administrators', 'update'),
+			],
+			['usergrps.php',
+				['link=Zabbix administrators', 'update'],
 				'Configuration of user groups',
 				'Group updated'
-			),
-			array('users.php',
-				array('link=Admin', 'update'),
+			],
+			['users.php',
+				['link=Admin', 'update'],
 				'Configuration of users',
 				'User updated'
-			),
-			array('media_types.php',
-				array('link=Email', 'update'),
+			],
+			['media_types.php',
+				['link=Email', 'update'],
 				'Configuration of media types',
 				'Media type updated'
-			),
-			array('media_types.php',
-				array('link=Jabber', 'update'),
+			],
+			['media_types.php',
+				['link=Jabber', 'update'],
 				'Configuration of media types',
 				'Media type updated'
-			),
-			array('media_types.php',
-				array('link=SMS', 'update'),
+			],
+			['media_types.php',
+				['link=SMS', 'update'],
 				'Configuration of media types',
 				'Media type updated'
-			),
-			array('scripts.php',
-				array('link=Ping', 'update'),
+			],
+			['scripts.php',
+				['link=Ping', 'update'],
 				'Configuration of scripts',
 				'Script updated'
-			)
-		);
+			]
+		];
 	}
 
 	/**

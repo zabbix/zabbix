@@ -25,13 +25,13 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	private $sqlHashMediaType = '';
 	private $oldHashMediaType = '';
 
-	private $mediatypes = array(
+	private $mediatypes = [
 		MEDIA_TYPE_EMAIL => 'Email',
 		MEDIA_TYPE_EXEC => 'Script',
 		MEDIA_TYPE_SMS => 'SMS',
 		MEDIA_TYPE_JABBER => 'Jabber',
 		MEDIA_TYPE_EZ_TEXTING => 'Ez Texting'
-	);
+	];
 
 	private function calculateHash($mediatypeid) {
 		$this->sqlHashMediaType = 'SELECT * FROM media_type WHERE mediatypeid='.$mediatypeid;
@@ -53,15 +53,15 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		$this->zbxTestTextPresent('CONFIGURATION OF MEDIA TYPES');
 		$this->zbxTestTextPresent('Media types');
 		$this->zbxTestTextPresent('Displaying');
-		$this->zbxTestTextPresent(array('Name', 'Type', 'Status', 'Used in actions', 'Details'));
+		$this->zbxTestTextPresent(['Name', 'Type', 'Status', 'Used in actions', 'Details']);
 
 		$dbResult = DBselect('SELECT description,type FROM media_type');
 
 		while ($dbRow = DBfetch($dbResult)) {
-			$this->zbxTestTextPresent(array($dbRow['description'], $this->mediatypes[$dbRow['type']]));
+			$this->zbxTestTextPresent([$dbRow['description'], $this->mediatypes[$dbRow['type']]]);
 		}
 
-		$this->zbxTestDropdownHasOptions('action', array('Enable selected', 'Disable selected', 'Delete selected'));
+		$this->zbxTestDropdownHasOptions('action', ['Enable selected', 'Disable selected', 'Delete selected']);
 		$this->assertElementValue('goButton', 'Go (0)');
 	}
 
@@ -165,7 +165,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 
 		if ($usedInOperations) {
 				$this->zbxTestTextNotPresent('Media type deleted');
-				$this->zbxTestTextPresent(array('ERROR: Cannot delete media type', 'Media types used by action'));
+				$this->zbxTestTextPresent(['ERROR: Cannot delete media type', 'Media types used by action']);
 				$this->assertEquals(1, DBcount($sql));
 		}
 		else {

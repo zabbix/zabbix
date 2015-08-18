@@ -25,20 +25,20 @@ class CMapPainter {
 	protected $mapData;
 	protected $options;
 
-	public function __construct(array $mapData, array $options = array()) {
-		$this->options = array(
-			'map' => array(
+	public function __construct(array $mapData, array $options = []) {
+		$this->options = [
+			'map' => [
 				'bgColor' => 'white',
 				'borderColor' => 'black',
 				'titleColor' => 'darkred',
 				'border' => true,
 				'drawAreas' => true
-			),
-			'grid' => array(
+			],
+			'grid' => [
 				'size' => 50,
 				'color' => 'black'
-			)
-		);
+			]
+		];
 		foreach ($options as $key => $option) {
 			$this->options[$key] = array_merge($this->options[$key], $option);
 		}

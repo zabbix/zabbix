@@ -126,44 +126,49 @@ function getMenuPopupFavouriteData(label, data, favouriteObj, addParams) {
 						}
 					});
 
-					obj.closest('.menuPopup').fadeOut(100);
+					obj.closest('.action-menu').fadeOut(100);
 					obj.remove();
 				}
 			};
 		});
 	}
 
+	var add = {
+			label: t('Add'),
+			clickCallback: function() {
+				PopUp(addParams);
+
+				jQuery(this).closest('.action-menu').fadeOut(100);
+			}
+		},
+		remove = {
+			label: t('Remove')
+		},
+		remove_all = {
+			label: t('Remove all')
+		};
+
+	if (removeItems.length != 0) {
+		remove.items = removeItems;
+		remove_all.clickCallback = function() {
+			sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
+				data: {
+					object: favouriteObj,
+					'objectids[]': [0]
+				}
+			});
+
+			jQuery(this).closest('.action-menu').fadeOut(100);
+		};
+	}
+	else {
+		remove.disabled = true;
+		remove_all.disabled = true;
+	}
+
 	return {
 		label: label,
-		items: [
-			{
-				label: t('Add'),
-				clickCallback: function() {
-					PopUp(addParams, 800, 450);
-
-					jQuery(this).closest('.menuPopup').fadeOut(100);
-				}
-			},
-			{
-				label: t('Remove'),
-				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
-				items: removeItems
-			},
-			{
-				label: t('Remove all'),
-				css: (removeItems.length == 0) ? 'ui-state-disabled' : '',
-				clickCallback: function() {
-					sendAjaxData('zabbix.php?action=dashboard.favourite&operation=delete', {
-						data: {
-							object: favouriteObj,
-							'objectids[]': [0]
-						}
-					});
-
-					jQuery(this).closest('.menuPopup').fadeOut(100);
-				}
-			}
-		]
+		items: [add, remove, remove_all]
 	};
 }
 
@@ -236,40 +241,56 @@ function getMenuPopupHost(options) {
 
 	// go to section
 	if (options.hasGoTo) {
-		var gotos = [];
+		var gotos = [],
+			// inventory
+			host_inventory = {
+				label: t('Host inventory'),
+				url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
+			},
+			// latest
+			latest_data = {
+				label: t('Latest data'),
+				url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid).getUrl()
+			},
+			// triggers
+			triggers = {
+				label: t('Triggers')
+			},
+			// graphs
+			graphs = {
+				label: t('Graphs')
+			},
+			// screens
+			screens = {
+				label: t('Host screens')
+			};
 
-		// inventory
-		gotos[gotos.length] = {
-			label: t('Host inventory'),
-			url: new Curl('hostinventories.php?hostid=' + options.hostid).getUrl()
-		};
+		if (!options.showTriggers) {
+			triggers.disabled = true;
+		}
+		else {
+			triggers.url = new Curl('tr_status.php?hostid=' + options.hostid).getUrl();
+		}
 
-		// latest
-		gotos[gotos.length] = {
-			label: t('Latest data'),
-			url: new Curl('latest.php?filter_set=1&hostids[]=' + options.hostid).getUrl()
-		};
+		if (!options.showGraphs) {
+			graphs.disabled = true;
+		}
+		else {
+			graphs.url = new Curl('charts.php?hostid=' + options.hostid).getUrl();
+		}
 
-		// triggers
-		gotos[gotos.length] = {
-			label: t('Triggers'),
-			css: options.showTriggers ? '' : 'ui-state-disabled',
-			url: new Curl('tr_status.php?hostid=' + options.hostid).getUrl()
-		};
+		if (!options.showScreens) {
+			screens.disabled = true;
+		}
+		else {
+			screens.url = new Curl('host_screen.php?hostid=' + options.hostid).getUrl();
+		}
 
-		// graphs
-		gotos[gotos.length] = {
-			label: t('Graphs'),
-			css: options.showGraphs ? '' : 'ui-state-disabled',
-			url: new Curl('charts.php?hostid=' + options.hostid).getUrl()
-		};
-
-		// screens
-		gotos[gotos.length] = {
-			label: t('Host screens'),
-			css: options.showScreens ?  '' : 'ui-state-disabled',
-			url: new Curl('host_screen.php?hostid=' + options.hostid).getUrl()
-		};
+		gotos[gotos.length] = host_inventory;
+		gotos[gotos.length] = latest_data;
+		gotos[gotos.length] = triggers;
+		gotos[gotos.length] = graphs;
+		gotos[gotos.length] = screens;
 
 		sections[sections.length] = {
 			label: t('Go to'),
@@ -353,47 +374,68 @@ function getMenuPopupMap(options) {
 
 		// trigger status
 		if (typeof options.gotos.triggerStatus !== 'undefined') {
-			var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
-
-			jQuery.each(options.gotos.triggerStatus, function(name, value) {
-				url.setArgument(name, value);
-			});
-
-			gotos[gotos.length] = {
-				label: t('Triggers'),
-				css: options.gotos.showTriggers ? '' : 'ui-state-disabled',
-				url: url.getUrl()
+			var triggers = {
+				label: t('Triggers')
 			};
+
+			if (options.gotos.showTriggers) {
+				triggers.disabled = true;
+			}
+			else {
+				var url = new Curl('tr_status.php?filter_set=1&show_maintenance=1');
+
+				jQuery.each(options.gotos.triggerStatus, function(name, value) {
+					url.setArgument(name, value);
+				});
+
+				triggers.url = url.getUrl();
+			}
+
+			gotos[gotos.length] = triggers;
 		}
 
 		// graphs
 		if (typeof options.gotos.graphs !== 'undefined') {
-			var url = new Curl('charts.php');
-
-			jQuery.each(options.gotos.graphs, function(name, value) {
-				url.setArgument(name, value);
-			});
-
-			gotos[gotos.length] = {
-				label: t('Graphs'),
-				css: options.gotos.showGraphs ? '' : 'ui-state-disabled',
-				url: url.getUrl()
+			var graphs = {
+				label: t('Graphs')
 			};
+
+			if (options.gotos.showGraphs) {
+				graphs.disabled = true;
+			}
+			else {
+				var url = new Curl('charts.php');
+
+				jQuery.each(options.gotos.graphs, function(name, value) {
+					url.setArgument(name, value);
+				});
+
+				graphs.url = url.getUrl();
+			}
+
+			gotos[gotos.length] = graphs;
 		}
 
 		// screens
 		if (typeof options.gotos.screens !== 'undefined') {
-			var url = new Curl('host_screen.php');
-
-			jQuery.each(options.gotos.screens, function(name, value) {
-				url.setArgument(name, value);
-			});
-
-			gotos[gotos.length] = {
-				label: t('Host screens'),
-				css: options.gotos.showScreens ? '' : 'ui-state-disabled',
-				url: url.getUrl()
+			var screens = {
+				label: t('Host screens')
 			};
+
+			if (options.gotos.showScreens) {
+				screens.disabled = true;
+			}
+			else {
+				var url = new Curl('host_screen.php');
+
+				jQuery.each(options.gotos.screens, function(name, value) {
+					url.setArgument(name, value);
+				});
+
+				screens.url = url.getUrl();
+			}
+
+			gotos[gotos.length] = screens;
 		}
 
 		// submap
@@ -412,17 +454,24 @@ function getMenuPopupMap(options) {
 
 		// events
 		if (typeof options.gotos.events !== 'undefined') {
-			var url = new Curl('events.php?filter_set=1&source=0');
-
-			jQuery.each(options.gotos.events, function(name, value) {
-				url.setArgument(name, value);
-			});
-
-			gotos[gotos.length] = {
+			var events = {
 				label: t('Events'),
-				css: options.gotos.showEvents ? '' : 'ui-state-disabled',
 				url: url.getUrl()
 			};
+
+			if (options.gotos.showEvents) {
+				events.disabled = true;
+			}
+			else {
+				var url = new Curl('events.php?filter_set=1&source=0');
+
+				jQuery.each(options.gotos.events, function(name, value) {
+					url.setArgument(name, value);
+				});
+
+			}
+
+			gotos[gotos.length] = events;
 		}
 
 		sections[sections.length] = {
@@ -476,16 +525,14 @@ function getMenuPopupRefresh(options) {
 			};
 
 	jQuery.each(intervals, function(value, label) {
-		items[items.length] = {
+		var item = {
 			label: label,
-			css: (value == options.currentRate) ? 'selected' : '',
 			data: {
 				value: value
 			},
 			clickCallback: function() {
 				var obj = jQuery(this),
 					currentRate = obj.data('value');
-
 
 				// it is a quick solution for slide refresh multiplier, should be replaced with slide.refresh or similar
 				if (options.multiplier) {
@@ -509,21 +556,26 @@ function getMenuPopupRefresh(options) {
 					});
 				}
 
-				jQuery('a', obj.closest('ul')).each(function() {
-					var a = jQuery(this),
-						li = a.parent();
+				jQuery('span').each(function() {
+					var span = jQuery(this);
 
-					if (a.data('value') == currentRate) {
-						li.addClass('selected');
+					if (span.data('value') == currentRate) {
+						span.addClass('selected');
 					}
 					else {
-						li.removeClass('selected');
+						span.removeClass('selected');
 					}
 				});
 
-				obj.closest('.menuPopup').fadeOut(100);
+				obj.closest('.action-menu').fadeOut(100);
 			}
 		};
+
+		if (value == options.currentRate) {
+			item.selected = true;
+		}
+
+		items[items.length] = item;
 	});
 
 	return [{
@@ -564,24 +616,24 @@ function getMenuPopupServiceConfiguration(options) {
 			url: new Curl('services.php?form=1&serviceid=' + options.serviceid).getUrl()
 		};
 
+		var del = {
+				label: t('Delete')
+			};
+
 		// delete
 		if (options.deletable) {
-			items[items.length] = {
-				label: t('Delete'),
-				url: new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl(),
-				clickCallback: function() {
-					jQuery(this).closest('.menuPopup').fadeOut(100);
+			del.clickCallback = function() {
+				jQuery(this).closest('.action-menu').fadeOut(100);
 
-					return confirm(sprintf(t('Delete service "%1$s"?'), options.name));
+				if (confirm(sprintf(t('Delete service "%1$s"?'), options.name))) {
+					window.location = new Curl('services.php?delete=1&serviceid=' + options.serviceid).getUrl();
 				}
 			};
 		}
 		else {
-			items[items.length] = {
-				label: t('Delete'),
-				css: 'ui-state-disabled'
-			};
+			del.disabled = true;
 		}
+		items[items.length] = del;
 	}
 
 	return [{
@@ -594,6 +646,8 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
+ * @param string options['groupid']					group id
+ * @param string options['hostid']					host id
  * @param object options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
@@ -611,16 +665,25 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&source=0&triggerid=' + options.triggerid);
+	var url = new Curl('events.php?filter_set=1&source=0&groupid=' + options.groupid + '&hostid=' + options.hostid +
+		'&triggerid=' + options.triggerid
+	);
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
 
-	items[items.length] = {
-		label: t('Events'),
-		css: (typeof options.showEvents !== 'undefined' && options.showEvents) ? '' : 'ui-state-disabled',
-		url: url.getUrl()
+	var events = {
+		label: t('Events')
 	};
+
+	if (typeof options.showEvents !== 'undefined' && options.showEvents) {
+		events.url = url.getUrl();
+	}
+	else {
+		events.disabled = true;
+	}
+
+	items[items.length] = events;
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
@@ -704,13 +767,17 @@ function getMenuPopupTriggerLog(options) {
 			openWinCentered(
 				'tr_logform.php?sform=1&itemid=' + options.itemid,
 				'TriggerLog',
-				760,
-				540,
+				950,
+				650,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 
-			jQuery(this).closest('.menuPopup').fadeOut(100);
+			jQuery(this).closest('.action-menu').fadeOut(100);
 		}
+	};
+
+	var edit_trigger = {
+		label: t('Edit trigger')
 	};
 
 	// edit
@@ -724,27 +791,23 @@ function getMenuPopupTriggerLog(options) {
 					openWinCentered(
 						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
 						'TriggerLog',
-						760,
-						540,
+						950,
+						650,
 						'titlebar=no, resizable=yes, scrollbars=yes'
 					);
 
-					jQuery(this).closest('.menuPopup').fadeOut(100);
+					jQuery(this).closest('.action-menu').fadeOut(100);
 				}
 			};
 		});
 
-		items[items.length] = {
-			label: t('Edit trigger'),
-			items: triggers
-		};
+		edit_trigger.items = triggers;
 	}
 	else {
-		items[items.length] = {
-			label: t('Edit trigger'),
-			css: 'ui-state-disabled'
-		};
+		edit_trigger.disabled = true;
 	}
+
+	items[items.length] = edit_trigger;
 
 	return [{
 		label: sprintf(t('Item "%1$s"'), options.itemName),
@@ -782,7 +845,7 @@ function getMenuPopupTriggerMacro(options) {
 
 				expressionInput.val(expression.string);
 
-				jQuery(this).closest('.menuPopup').fadeOut(100);
+				jQuery(this).closest('.action-menu').fadeOut(100);
 			}
 		};
 	});
@@ -844,21 +907,21 @@ function getMenuPopupScriptData(scripts, hostId) {
 
 		if (objectSize(tree) > 0) {
 			jQuery.each(tree, function(name, data) {
-				items[items.length] = {
-					label: name,
-					items: (typeof data.items !== 'undefined' && objectSize(data.items) > 0)
-						? getMenuPopupScriptItems(data.items)
-						: [],
-					clickCallback: function(e) {
-						if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
-							executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation);
-						}
+				var item = {label: name};
 
+				if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
+					item.items = getMenuPopupScriptItems(data.items);
+				}
+
+				if (typeof data.params !== 'undefined' && typeof data.params.scriptId !== 'undefined') {
+					item.clickCallback = function(e) {
+						executeScript(data.params.hostId, data.params.scriptId, data.params.confirmation);
 						cancelEvent(e);
+						jQuery(this).closest('.action-menu').fadeOut(100);
+					};
+				}
 
-						jQuery(this).closest('.menuPopup').fadeOut(100);
-					}
-				};
+				items[items.length] = item;
 			});
 		}
 
@@ -894,7 +957,7 @@ jQuery(function($) {
 			var display = menuPopup.css('display');
 
 			// hide all menu popups
-			jQuery('.menuPopup').css('display', 'none');
+			jQuery('.action-menu').css('display', 'none');
 
 			if (display === 'block') {
 				menuPopup.fadeOut(0);
@@ -912,32 +975,26 @@ jQuery(function($) {
 		else {
 			id = new Date().getTime();
 
-			menuPopup = $('<div>', {
+			menuPopup = $('<ul>', {
 				id: id,
-				'class': 'menuPopup'
+				'class': 'action-menu action-menu-top'
 			});
 
 			// create sections
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
-					var sectionTitleBox = $('<div>', {
-							'class': 'title'
-						}),
-						sectionTitleText = $('<div>', {
-							'class': 'text',
-							text: section.label
-						}),
-						sectionMenu = $('<ul>', {
-							'class': 'menu'
-						});
+					var h3 = $('<h3>').text(section.label);
+					var sectionItem = $('<li>').append(h3);
 
-					if (section.items.length > 0) {
-						$.each(section.items, function(i, item) {
-							sectionMenu.append(createMenuItem(item));
-						});
+					// add section delimited for all sections except first one
+					if (i > 0) {
+						menuPopup.append($('<li>').append($('<div>')));
 					}
+					menuPopup.append(sectionItem);
 
-					menuPopup.append(sectionTitleBox.append(sectionTitleText), sectionMenu);
+					$.each(section.items, function(i, item) {
+						menuPopup.append(createMenuItem(item));
+					});
 				});
 			}
 
@@ -945,9 +1002,6 @@ jQuery(function($) {
 			if (menuPopup.children().length == 0) {
 				return;
 			}
-
-			// build jQuery Menu
-			$('.menu', menuPopup).menu();
 
 			// set menu popup for map area
 			if (opener.prop('tagName') === 'AREA') {
@@ -973,7 +1027,7 @@ jQuery(function($) {
 			}
 
 			// hide all menu popups
-			jQuery('.menuPopup').css('display', 'none');
+			jQuery('.action-menu').css('display', 'none');
 
 			// display
 			menuPopup
@@ -987,7 +1041,7 @@ jQuery(function($) {
 				.mouseleave(function() {
 					menuPopup.data('is-active', false);
 
-					closeInactiveMenuPopup(menuPopup, 1000);
+					closeInactiveMenuPopup(menuPopup, 500);
 				})
 				.position({
 					of: (opener.prop('tagName') === 'AREA') ? mapContainer : event,
@@ -1013,40 +1067,86 @@ jQuery(function($) {
 	 */
 	function createMenuItem(options) {
 		var item = $('<li>'),
-			link = $('<a>');
+			span = $('<span>');
 
 		if (typeof options.label !== 'undefined') {
-			link.html(options.label);
-		}
-
-		if (typeof options.url !== 'undefined') {
-			link.attr('href', options.url);
+			if (typeof options.items !== 'undefined' && options.items.length > 0) {
+				// if submenu exists
+				span.html(jQuery.escapeHtml(options.label) + '<span class="arrow-right"></span>');
+			}
+			else {
+				span.html(jQuery.escapeHtml(options.label));
+			}
 		}
 
 		if (typeof options.data !== 'undefined' && objectSize(options.data) > 0) {
 			$.each(options.data, function(key, value) {
-				link.data(key, value);
+				span.data(key, value);
 			});
 		}
 
-		if (typeof options.clickCallback !== 'undefined') {
-			link.click(options.clickCallback);
+		if (typeof options.disabled !== 'undefined' && options.disabled) {
+			span.addClass('action-menu-item-disabled');
+		}
+		else {
+			span.addClass('action-menu-item');
+
+			if (typeof options.url !== 'undefined') {
+				span.attr('onclick', 'location.href=\'' + options.url + '\'');
+			}
+
+			if (typeof options.clickCallback !== 'undefined') {
+				span.click(options.clickCallback);
+			}
 		}
 
-		if (typeof options.css !== 'undefined') {
-			item.addClass(options.css);
+		if (typeof options.selected !== 'undefined' && options.selected) {
+			span.addClass('selected');
 		}
 
-		item.append(link);
+		item.append(span);
 
 		if (typeof options.items !== 'undefined' && options.items.length > 0) {
-			var menu = $('<ul>');
+			var menu = $('<ul>', {'class' : 'action-menu'} );
 
 			$.each(options.items, function(i, item) {
 				menu.append(createMenuItem(item));
 			});
 
 			item.append(menu);
+
+			item.hover(function() {
+				var li = $(this),
+					pos = li.position(),
+					menu = li.closest('.action-menu');
+
+				for (var item = $('li:first-child', menu); item.length > 0; item = item.next()) {
+					if (item[0] == li[0]) {
+						var display = $('ul', item[0]).css('display');
+
+						if (display !== 'block') {
+							$('ul:first', item[0])
+								.css({
+									'top': pos.top - 6,
+									'left': pos.left + li.outerWidth() + 14,
+									'display': 'block'
+								});
+						}
+					}
+					else {
+						var display = $('ul', item[0]).css('display');
+
+						if (display === 'block') {
+							$('ul', item[0]).css({'display': 'none'});
+						}
+					}
+				}
+			});
+		}
+		else {
+			item.hover(function() {
+				$('li ul', $(this).closest('.action-menu')).css({'display': 'none'});
+			});
 		}
 
 		return item;
@@ -1065,7 +1165,7 @@ jQuery(function($) {
 			if (!menuPopup.data('is-active')) {
 				menuPopup.data('is-active', false);
 
-				$('.menu', menuPopup).each(function() {
+				$('.action-menu-top', menuPopup).each(function() {
 					$(this).menu('collapseAll', null, true);
 				});
 

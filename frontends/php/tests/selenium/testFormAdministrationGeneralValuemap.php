@@ -40,7 +40,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->assertAttribute("//input[@id='mapname']/@maxlength", '64');
 		$this->assertAttribute("//input[@id='mapname']/@size", '40');
 
-		$this->zbxTestTextPresent(array('Mappings', 'Value', 'Mapped to'));
+		$this->zbxTestTextPresent(['Mappings', 'Value', 'Mapped to']);
 		$this->assertElementPresent('mappings[0][value]');
 		$this->assertAttribute("//table[@id='mappingsTable']//input[@name='mappings[0][value]']/@maxlength", 64);
 		$this->assertAttribute("//table[@id='mappingsTable']//input[@name='mappings[0][value]']/@size", 20);
@@ -55,18 +55,18 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 	public static function dataCreate() {
 
-		return array(
-			array('1valuemap1', '1', 'one'),
-			array('2valuemap2', '2', 'two')
-		);
+		return [
+			['1valuemap1', '1', 'one'],
+			['2valuemap2', '2', 'two']
+		];
 	}
 
 	public static function dataUpdate() {
 
-		return array(
-			array('1valuemap1', '1valuemap_updated'),
-			array('2valuemap2', '2valuemap_updated')
-		);
+		return [
+			['1valuemap1', '1valuemap_updated'],
+			['2valuemap2', '2valuemap_updated']
+		];
 	}
 
 	/**
@@ -76,7 +76,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestClickWait('form');
-		$this->zbxTestTextPresent(array('Name', 'Mappings', 'Value', 'Mapped to'));
+		$this->zbxTestTextPresent(['Name', 'Mappings', 'Value', 'Mapped to']);
 
 		$this->assertElementPresent('addMapping');
 		$this->assertElementPresent('add');
@@ -120,7 +120,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestClickWait('form');
-		$this->zbxTestTextPresent(array('Name', 'Mappings', 'Value', 'Mapped to'));
+		$this->zbxTestTextPresent(['Name', 'Mappings', 'Value', 'Mapped to']);
 
 		$this->input_type('mapname', $this->valuemapWithMultipleMappings);
 		$this->input_type('mappings[0][value]', $value1);
@@ -159,7 +159,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 
 		$this->zbxTestLogin('adm.valuemapping.php');
 		$this->zbxTestClickWait('form');
-		$this->zbxTestTextPresent(array('Name', 'Mappings', 'Value', 'Mapped to'));
+		$this->zbxTestTextPresent(['Name', 'Mappings', 'Value', 'Mapped to']);
 
 		$this->input_type('mapname', 'incorrect_valuemap');
 		// trying to create already existing valuemap
@@ -169,7 +169,7 @@ class testFormAdministrationGeneralValuemap extends CWebTest {
 		$this->input_type('mappings[0][newvalue]', 'six');
 		$this->zbxTestClick('addMapping');
 		$this->zbxTestClickWait('add');
-		$this->zbxTestTextPresent(array('ERROR: Cannot add value map', 'Value map', 'already exists.'));
+		$this->zbxTestTextPresent(['ERROR: Cannot add value map', 'Value map', 'already exists.']);
 	}
 
 	/**

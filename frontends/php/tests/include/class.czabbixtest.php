@@ -35,11 +35,11 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 
 		$debug="\n----DATA FLOW-------\nRequest:\n$data\n\n";
 
-		$params = array(
-				'http' => array(
+		$params = [
+				'http' => [
 					'method' => 'post',
 					'content' => $data
-				));
+				]];
 
 
 		$params['http']['header'] = "Content-type: application/json-rpc\r\n".
@@ -78,12 +78,12 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 	function api_call($method, $params, &$debug) {
 		global $ID;
 
-		$data = array(
+		$data = [
 			'jsonrpc' => '2.0',
 			'method' => $method,
 			'params' => $params,
 			'id' => $this->ID
-		);
+		];
 
 		$response = $this->do_post_request($data, $debug);
 		$decoded = json_decode($response, true);
@@ -94,24 +94,24 @@ class CZabbixTest extends PHPUnit_Framework_TestCase {
 	function api_acall($method, $params, &$debug) {
 		global $ID;
 
-		$data = array(
+		$data = [
 			'jsonrpc' => '2.0',
 			'method' => 'user.login',
-			'params' => array('user' => 'Admin', 'password' => 'zabbix'),
+			'params' => ['user' => 'Admin', 'password' => 'zabbix'],
 			'id' => $this->ID
-		);
+		];
 
 		$response = $this->do_post_request($data, $debug);
 		$decoded = json_decode($response, true);
 		$auth=$decoded["result"];
 
-		$data = array(
+		$data = [
 			'jsonrpc' => '2.0',
 			'method' => $method,
 			'params' => $params,
 			'auth' => $auth,
 			'id' => $this->ID
-		);
+		];
 
 		$response = $this->do_post_request($data, $debug);
 		$decoded = json_decode($response, true);

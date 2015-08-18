@@ -22,7 +22,7 @@
 class CJsScript extends CObject {
 
 	public function __construct($item = null) {
-		$this->items = array();
+		$this->items = [];
 		$this->addItem($item);
 	}
 
@@ -35,5 +35,6 @@ class CJsScript extends CObject {
 		elseif (!is_null($value)) {
 			array_push($this->items, unpack_object($value));
 		}
+		return $this;
 	}
 }

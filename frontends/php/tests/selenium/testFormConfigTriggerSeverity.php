@@ -25,9 +25,9 @@ class testFormConfigTriggerSeverity extends CWebTest {
 	public static function providerTriggerSeverity() {
 		// array of data, saveResult, db fields value
 		// if saveResult is false. values should not change
-		$data = array(
-			array(
-				array(
+		$data = [
+			[
+				[
 					'severity_name_0' => 'sev 0',
 					'severity_color_0' => '000000',
 					'severity_name_1' => 'sev 1',
@@ -40,9 +40,9 @@ class testFormConfigTriggerSeverity extends CWebTest {
 					'severity_color_4' => '444444',
 					'severity_name_5' => 'sev 5',
 					'severity_color_5' => '555555',
-				),
+				],
 				true,
-				array(
+				[
 					'severity_name_0' => 'sev 0',
 					'severity_color_0' => '000000',
 					'severity_name_1' => 'sev 1',
@@ -55,55 +55,55 @@ class testFormConfigTriggerSeverity extends CWebTest {
 					'severity_color_4' => '444444',
 					'severity_name_5' => 'sev 5',
 					'severity_color_5' => '555555',
-				)
-			),
-			array(
-				array(
+				]
+			],
+			[
+				[
 					'severity_name_0' => '',
-				),
+				],
 				false,
 				null
-			),
-			array(
-				array(
+			],
+			[
+				[
 					'severity_color_0' => '',
-				),
+				],
 				false,
 				null
-			),
-			array(
-				array(
+			],
+			[
+				[
 					'severity_color_0' => 'ccc',
-				),
+				],
 				false,
 				null
-			),
-			array(
-				array(
+			],
+			[
+				[
 					'severity_color_0' => 'yuttrt',
-				),
+				],
 				false,
 				null
-			),
-			array(
-				array(
+			],
+			[
+				[
 					'severity_color_0' => '1234567',
-				),
+				],
 				true,
-				array(
+				[
 					'severity_color_0' => '123456',
-				),
-			),
-			array(
-				array(
+				],
+			],
+			[
+				[
 					'severity_name_0' => 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii more than 32 chars',
-				),
+				],
 				true,
-				array(
+				[
 					'severity_name_0' => 'iiiiiiiiiiiiiiiiiiiiiiiiiiiiiiii',
-				),
-			),
-		);
+				],
+			],
+		];
 		return $data;
 	}
 
@@ -117,7 +117,7 @@ class testFormConfigTriggerSeverity extends CWebTest {
 		$this->zbxTestTextPresent('Trigger severities');
 		$this->zbxTestTextPresent('CONFIGURATION OF TRIGGER SEVERITIES');
 
-		$this->zbxTestTextPresent(array('Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'));
+		$this->zbxTestTextPresent(['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']);
 		$this->assertElementPresent('severity_name_0');
 		$this->assertElementPresent('severity_color_0');
 		$this->assertElementPresent('lbl_severity_color_0');

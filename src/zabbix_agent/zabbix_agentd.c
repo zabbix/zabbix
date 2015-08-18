@@ -671,7 +671,7 @@ static void	zbx_load_config(int requirement)
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
-			PARM_OPT,	0,			4},
+			PARM_OPT,	0,			5},
 		{"StartAgents",			&CONFIG_PASSIVE_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
@@ -785,7 +785,7 @@ static int	zbx_exec_service_task(const char *name, const ZBX_TASK_EX *t)
 
 int	MAIN_ZABBIX_ENTRY()
 {
-	zbx_sock_t	listen_sock;
+	zbx_socket_t	listen_sock;
 	int		i, j = 0;
 #ifdef _WINDOWS
 	DWORD		res;
@@ -811,7 +811,7 @@ int	MAIN_ZABBIX_ENTRY()
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, CONFIG_LISTEN_IP, (unsigned short)CONFIG_LISTEN_PORT))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_tcp_strerror());
+			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			exit(EXIT_FAILURE);
 		}
 	}

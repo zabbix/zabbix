@@ -36,7 +36,7 @@ class CControllerWidgetDiscoveryView extends CController {
 	}
 
 	protected function doAction() {
-		$data = array();
+		$data = [];
 
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);

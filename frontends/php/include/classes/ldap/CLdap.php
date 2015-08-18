@@ -21,10 +21,10 @@
 
 class CLdap {
 
-	public function __construct($arg = array()) {
+	public function __construct($arg = []) {
 		$this->ds = false;
-		$this->info = array();
-		$this->cnf = array(
+		$this->info = [];
+		$this->cnf = [
 			'host' => 'ldap://localhost',
 			'port' => '389',
 			'bind_dn' => 'uid=admin,ou=system',
@@ -33,16 +33,16 @@ class CLdap {
 			'search_attribute' => 'uid',
 			'userfilter' => '(%{attr}=%{user})',
 			'groupkey' => 'cn',
-			'mapping' => array(
+			'mapping' => [
 				'alias' => 'uid',
 				'userid' => 'uidnumbera',
 				'passwd' => 'userpassword'
-			),
+			],
 			'referrals' => 0,
 			'version' => 3,
 			'starttls' => null,
 			'deref' => null
-		);
+		];
 
 		if (is_array($arg)) {
 			$this->cnf = zbx_array_merge($this->cnf, $arg);
@@ -119,11 +119,11 @@ class CLdap {
 		}
 		elseif (!empty($this->cnf['bind_dn']) && !empty($this->cnf['base_dn']) && !empty($this->cnf['userfilter'])) {
 			// special bind string
-			$dn = $this->makeFilter($this->cnf['bind_dn'], array('user' => $user, 'host' => $this->cnf['host']));
+			$dn = $this->makeFilter($this->cnf['bind_dn'], ['user' => $user, 'host' => $this->cnf['host']]);
 		}
 		elseif (strpos($this->cnf['base_dn'], '%{user}')) {
 			// direct user bind
-			$dn = $this->makeFilter($this->cnf['base_dn'], array('user' => $user, 'host' => $this->cnf['host']));
+			$dn = $this->makeFilter($this->cnf['base_dn'], ['user' => $user, 'host' => $this->cnf['host']]);
 		}
 		else {
 			// anonymous bind
@@ -210,7 +210,7 @@ class CLdap {
 		// general user info
 		$info['dn'] = $user_result['dn'];
 		$info['name'] = $user_result['cn'][0];
-		$info['grps'] = array();
+		$info['grps'] = [];
 
 		// overwrite if other attribs are specified.
 		if (is_array($this->cnf['mapping'])) {
@@ -224,7 +224,7 @@ class CLdap {
 		if (isset($this->cnf['grouptree']) && isset($this->cnf['groupfilter'])) {
 			$base = $this->makeFilter($this->cnf['grouptree'], $user_result);
 			$filter = $this->makeFilter($this->cnf['groupfilter'], $user_result);
-			$sr = ldap_search($this->ds, $base, $filter, array($this->cnf['groupkey']));
+			$sr = ldap_search($this->ds, $base, $filter, [$this->cnf['groupkey']]);
 
 			if (!$sr) {
 				error('LDAP: Reading group memberships failed.');

@@ -50,7 +50,7 @@ class CConditionHelper {
 	 * @return string
 	 */
 	public static function getFormula(array $conditions, $evalType) {
-		$groupedConditions = array();
+		$groupedConditions = [];
 		foreach ($conditions as $id => $condition) {
 			$groupedConditions[$condition][] = '{'.$id.'}';
 		}
@@ -71,7 +71,7 @@ class CConditionHelper {
 				break;
 		}
 
-		$groupFormulas = array();
+		$groupFormulas = [];
 		foreach ($groupedConditions as $conditionIds) {
 			if (count($conditionIds) > 1) {
 				$groupFormulas[] = '('.implode(' '.$conditionOperator.' ', $conditionIds).')';
@@ -105,13 +105,13 @@ class CConditionHelper {
 	 * @return array
 	 */
 	public static function getFormulaIds($formula) {
-		$matches = array();
+		$matches = [];
 		preg_match_all('/\d+/', $formula, $matches);
 
 		$ids = array_keys(array_flip($matches[0]));
 
 		$i = 0;
-		$formulaIds = array();
+		$formulaIds = [];
 		foreach ($ids as $id) {
 			$formulaIds[$id] = num2letter($i);
 
@@ -140,14 +140,23 @@ class CConditionHelper {
 	/**
 	 * Replace formula IDs with numeric IDs using the pairs given in $ids.
 	 *
+	 * Notes:
+	 *     - $formula must be valid before the function call
+	 *     - $ids must contain all constants used in the $formula
+	 *
 	 * @param string 	$formula
 	 * @param array 	$ids		array of formula ID - numeric ID pairs
 	 *
 	 * @return string
 	 */
 	public static function replaceLetterIds($formula, array $ids) {
-		foreach ($ids as $formulaId => $id) {
-			$formula = str_replace($formulaId, '{'.$id.'}', $formula);
+		$parser = new CConditionFormula();
+		$parser->parse($formula);
+
+		foreach (array_reverse($parser->constants) as $constant) {
+			$formula = substr_replace($formula, '{'.$ids[$constant['value']].'}', $constant['pos'],
+				strlen($constant['value'])
+			);
 		}
 
 		return $formula;
@@ -199,7 +208,7 @@ class CConditionHelper {
 			$nextFormulaId = 'A';
 		}
 		else {
-			usort($formulaIds, array('CConditionHelper', 'compareFormulaIds'));
+			usort($formulaIds, ['CConditionHelper', 'compareFormulaIds']);
 
 			$lastFormulaId = array_pop($formulaIds);
 

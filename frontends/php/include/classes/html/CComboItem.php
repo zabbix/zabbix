@@ -22,8 +22,7 @@
 class CComboItem extends CTag {
 
 	public function __construct($value, $caption = null, $selected = null, $enabled = null) {
-		parent::__construct('option', 'yes');
-		$this->tag_body_start = '';
+		parent::__construct('option', true);
 		$this->setAttribute('value', $value);
 		$this->addItem($caption);
 		$this->setSelected($selected);
@@ -34,7 +33,8 @@ class CComboItem extends CTag {
 	}
 
 	public function setValue($value) {
-		return $this->attributes['value'] = $value;
+		$this->attributes['value'] = $value;
+		return $this;
 	}
 
 	public function getValue() {
@@ -43,13 +43,17 @@ class CComboItem extends CTag {
 
 	public function setCaption($value = null) {
 		$this->addItem(nbsp($value));
+		return $this;
 	}
 
 	public function setSelected($value = 'yes') {
 		if ((is_string($value) && ($value == 'yes' || $value == 'selected' || $value == 'on')) || (is_int($value) && $value <> 0)) {
-			return $this->attributes['selected'] = 'selected';
+			$this->attributes['selected'] = 'selected';
 		}
-		$this->removeAttribute('selected');
+		else {
+			$this->removeAttribute('selected');
+		}
+		return $this;
 	}
 
 	/**
@@ -62,7 +66,8 @@ class CComboItem extends CTag {
 			$this->removeAttribute('disabled');
 		}
 		else {
-			$this->attr('disabled', 'disabled');
+			$this->setAttribute('disabled', 'disabled');
 		}
+		return $this;
 	}
 }

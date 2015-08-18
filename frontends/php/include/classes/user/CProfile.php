@@ -21,15 +21,15 @@
 
 class CProfile {
 
-	private static $userDetails = array();
+	private static $userDetails = [];
 	private static $profiles = null;
-	private static $update = array();
-	private static $insert = array();
+	private static $update = [];
+	private static $insert = [];
 	private static $stringProfileMaxLength;
 
 	public static function init() {
 		self::$userDetails = CWebUser::$data;
-		self::$profiles = array();
+		self::$profiles = [];
 
 		$profilesTableSchema = DB::getSchema('profiles');
 		self::$stringProfileMaxLength = $profilesTableSchema['fields']['value_str']['length'];
@@ -44,7 +44,7 @@ class CProfile {
 			$value_type = self::getFieldByType($profile['type']);
 
 			if (!isset(self::$profiles[$profile['idx']])) {
-				self::$profiles[$profile['idx']] = array();
+				self::$profiles[$profile['idx']] = [];
 			}
 			self::$profiles[$profile['idx']][$profile['idx2']] = $profile[$value_type];
 		}
@@ -84,8 +84,8 @@ class CProfile {
 	}
 
 	public static function clear() {
-		self::$insert = array();
-		self::$update = array();
+		self::$insert = [];
+		self::$update = [];
 	}
 
 	public static function get($idx, $default_value = null, $idx2 = 0) {
@@ -120,7 +120,7 @@ class CProfile {
 		}
 
 		$i = 0;
-		$values = array();
+		$values = [];
 		while (self::get($idx, null, $i) !== null) {
 			$values[] = self::get($idx, null, $i);
 
@@ -146,7 +146,7 @@ class CProfile {
 		}
 
 		// pick existing Idx2
-		$deleteIdx2 = array();
+		$deleteIdx2 = [];
 		foreach ((array) $idx2 as $checkIdx2) {
 			if (isset(self::$profiles[$idx][$checkIdx2])) {
 				$deleteIdx2[] = $checkIdx2;
@@ -195,7 +195,7 @@ class CProfile {
 	 */
 	protected static function deleteValues($idx, array $idx2) {
 		// remove from DB
-		DB::delete('profiles', array('idx' => $idx, 'idx2' => $idx2));
+		DB::delete('profiles', ['idx' => $idx, 'idx2' => $idx2]);
 	}
 
 	/**
@@ -215,31 +215,31 @@ class CProfile {
 			return;
 		}
 
-		$profile = array(
+		$profile = [
 			'idx' => $idx,
 			'value' => $value,
 			'type' => $type,
 			'idx2' => $idx2
-		);
+		];
 
 		$current = self::get($idx, null, $idx2);
 		if (is_null($current)) {
 			if (!isset(self::$insert[$idx])) {
-				self::$insert[$idx] = array();
+				self::$insert[$idx] = [];
 			}
 			self::$insert[$idx][$idx2] = $profile;
 		}
 		else {
 			if ($current != $value) {
 				if (!isset(self::$update[$idx])) {
-					self::$update[$idx] = array();
+					self::$update[$idx] = [];
 				}
 				self::$update[$idx][$idx2] = $profile;
 			}
 		}
 
 		if (!isset(self::$profiles[$idx])) {
-			self::$profiles[$idx] = array();
+			self::$profiles[$idx] = [];
 		}
 
 		self::$profiles[$idx][$idx2] = $value;
@@ -264,7 +264,7 @@ class CProfile {
 		}
 
 		// delete remaining old values
-		$idx2 = array();
+		$idx2 = [];
 		while (self::get($idx, null, $i) !== null) {
 			$idx2[] = $i;
 
@@ -277,14 +277,14 @@ class CProfile {
 	private static function insertDB($idx, $value, $type, $idx2) {
 		$value_type = self::getFieldByType($type);
 
-		$values = array(
+		$values = [
 			'profileid' => get_dbid('profiles', 'profileid'),
 			'userid' => self::$userDetails['userid'],
 			'idx' => zbx_dbstr($idx),
 			$value_type => zbx_dbstr($value),
 			'type' => $type,
 			'idx2' => $idx2
-		);
+		];
 
 		return DBexecute('INSERT INTO profiles ('.implode(', ', array_keys($values)).') VALUES ('.implode(', ', $values).')');
 	}

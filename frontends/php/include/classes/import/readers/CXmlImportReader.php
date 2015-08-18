@@ -77,15 +77,31 @@ class CXmlImportReader extends CImportReader {
 		while ($xml->read()) {
 			switch ($xml->nodeType) {
 				case XMLReader::ELEMENT:
-					if (!is_array($array)) {
-						$array = array();
-					}
-
 					$nodeName = $xml->name;
 					if (isset($array[$nodeName])) {
 						$nodeName .= count($array);
 					}
-					$array[$nodeName] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml);
+
+					// a special case for 1.8 import where attributes are still used
+					// attributes must be added to the array as if they where child elements
+					if ($xml->hasAttributes) {
+						while ($xml->moveToNextAttribute()) {
+							$array[$nodeName][$xml->name] = $xml->value;
+						}
+
+						// we assume that an element with attributes always contains child elements, not a text node
+						// works for 1.8 XML
+						$xmlToArray = $this->xmlToArray($xml);
+						if (is_array($xmlToArray)) {
+							foreach ($xmlToArray as $name => $value) {
+								$array[$nodeName][$name] = $value;
+							}
+						}
+					}
+					else {
+						$array[$nodeName] = $xml->isEmptyElement ? '' : $this->xmlToArray($xml);
+					}
+
 					break;
 
 				case XMLReader::TEXT:

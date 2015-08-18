@@ -28,70 +28,71 @@ class CItemPrototype extends CItemGeneral {
 
 	protected $tableName = 'items';
 	protected $tableAlias = 'i';
-	protected $sortColumns = array('itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status');
+	protected $sortColumns = ['itemid', 'name', 'key_', 'delay', 'history', 'trends', 'type', 'status'];
 
 	public function __construct() {
 		parent::__construct();
 
-		$this->errorMessages = array_merge($this->errorMessages, array(
+		$this->errorMessages = array_merge($this->errorMessages, [
 			self::ERROR_EXISTS_TEMPLATE => _('Item prototype "%1$s" already exists on "%2$s", inherited from another template.'),
 			self::ERROR_EXISTS => _('Item prototype "%1$s" already exists on "%2$s".'),
 			self::ERROR_INVALID_KEY => _('Invalid key "%1$s" for item prototype "%2$s" on "%3$s": %4$s.')
-		));
+		]);
 	}
 
 	/**
 	 * Get Itemprototype data.
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('items' => 'i.itemid'),
-			'from'		=> array('items' => 'items i'),
-			'where'		=> array('i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE),
-			'group'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['items' => 'i.itemid'],
+			'from'		=> ['items' => 'items i'],
+			'where'		=> ['i.flags='.ZBX_FLAG_DISCOVERY_PROTOTYPE],
+			'group'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
-			'groupids'					=> null,
-			'templateids'				=> null,
-			'hostids'					=> null,
-			'itemids'					=> null,
-			'discoveryids'				=> null,
-			'graphids'					=> null,
-			'triggerids'				=> null,
-			'inherited'					=> null,
-			'templated'					=> null,
-			'monitored'					=> null,
-			'editable'					=> null,
-			'nopermissions'				=> null,
+		$defOptions = [
+			'groupids'						=> null,
+			'templateids'					=> null,
+			'hostids'						=> null,
+			'itemids'						=> null,
+			'discoveryids'					=> null,
+			'graphids'						=> null,
+			'triggerids'					=> null,
+			'inherited'						=> null,
+			'templated'						=> null,
+			'monitored'						=> null,
+			'editable'						=> null,
+			'nopermissions'					=> null,
 			// filter
-			'filter'					=> null,
-			'search'					=> null,
-			'searchByAny'				=> null,
-			'startSearch'				=> null,
-			'excludeSearch'				=> null,
-			'searchWildcardsEnabled'	=> null,
+			'filter'						=> null,
+			'search'						=> null,
+			'searchByAny'					=> null,
+			'startSearch'					=> null,
+			'excludeSearch'					=> null,
+			'searchWildcardsEnabled'		=> null,
 			// output
-			'output'					=> API_OUTPUT_EXTEND,
-			'selectHosts'				=> null,
-			'selectApplications'		=> null,
-			'selectTriggers'			=> null,
-			'selectGraphs'				=> null,
-			'selectDiscoveryRule'		=> null,
-			'countOutput'				=> null,
-			'groupCount'				=> null,
-			'preservekeys'				=> null,
-			'sortfield'					=> '',
-			'sortorder'					=> '',
-			'limit'						=> null,
-			'limitSelects'				=> null
-		);
+			'output'						=> API_OUTPUT_EXTEND,
+			'selectHosts'					=> null,
+			'selectApplications'			=> null,
+			'selectApplicationPrototypes'	=> null,
+			'selectTriggers'				=> null,
+			'selectGraphs'					=> null,
+			'selectDiscoveryRule'			=> null,
+			'countOutput'					=> null,
+			'groupCount'					=> null,
+			'preservekeys'					=> null,
+			'sortfield'						=> '',
+			'sortorder'						=> '',
+			'limit'							=> null,
+			'limitSelects'					=> null
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		// editable + PERMISSION CHECK
@@ -254,7 +255,7 @@ class CItemPrototype extends CItemGeneral {
 		// add other related objects
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('hostid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
 		}
 
 		if (is_null($options['preservekeys'])) {
@@ -267,10 +268,10 @@ class CItemPrototype extends CItemGeneral {
 	/**
 	 * Check item prototype data and set flags field.
 	 *
-	 * @param array $items passed by reference
-	 * @param bool  $update
-	 *
-	 * @return void
+	 * @param array  $items										an array of items passed by reference
+	 * @param array  $item['applicationPrototypes']				an array of application prototypes
+	 * @param string $item['applicationPrototypes'][]['name']	application prototype name
+	 * @param bool	 $update
 	 */
 	protected function checkInput(array &$items, $update = false) {
 		parent::checkInput($items, $update);
@@ -282,6 +283,41 @@ class CItemPrototype extends CItemGeneral {
 			// set default formula value
 			if (!$update && !isset($item['formula'])) {
 				$item['formula'] = '1';
+			}
+
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
+					&& $item['applicationPrototypes']) {
+				// Check that "name" field exists for application prototypes.
+				foreach ($item['applicationPrototypes'] as $application_prototype) {
+					if (!array_key_exists('name', $application_prototype)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Missing "name" field for application prototype in item prototype "%1$s".', $item['name']
+						));
+					}
+
+					if ($application_prototype['name'] === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Empty application prototype name in item prototype "%1$s".', $item['name']
+						));
+					}
+
+					if (array_key_exists('templateid', $application_prototype)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot set "templateid" field for application prototype in item prototype "%1$s".',
+							$item['name']
+						));
+					}
+				}
+
+				// Check that "name" field has no duplicate values for application prototypes.
+				$duplicate_name = CArrayHelper::findDuplicate($item['applicationPrototypes'], 'name');
+				if ($duplicate_name) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Duplicate "name" value "%1$s" for application prototype in item prototype "%2$s".',
+						$duplicate_name['name'],
+						$item['name']
+					));
+				}
 			}
 		}
 		unset($item);
@@ -300,29 +336,29 @@ class CItemPrototype extends CItemGeneral {
 		$this->createReal($items);
 		$this->inherit($items);
 
-		return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return ['itemids' => zbx_objectValues($items, 'itemid')];
 	}
 
 	protected function createReal(&$items) {
 		$itemids = DB::insert('items', $items);
 
-		$itemApplications = $insertItemDiscovery = array();
+		$itemApplications = $insertItemDiscovery = [];
 		foreach ($items as $key => $item) {
 			$items[$key]['itemid'] = $itemids[$key];
 
-			$insertItemDiscovery[] = array(
+			$insertItemDiscovery[] = [
 				'itemid' => $items[$key]['itemid'],
 				'parent_itemid' => $item['ruleid']
-			);
+			];
 
 			if (isset($item['applications'])) {
 				foreach ($item['applications'] as $anum => $appid) {
 					if ($appid == 0) continue;
 
-					$itemApplications[] = array(
+					$itemApplications[] = [
 						'applicationid' => $appid,
 						'itemid' => $items[$key]['itemid']
-					);
+					];
 				}
 			}
 		}
@@ -333,13 +369,66 @@ class CItemPrototype extends CItemGeneral {
 			DB::insert('items_applications', $itemApplications);
 		}
 
+		$item_application_prototypes = [];
+
+		foreach ($items as $item) {
+			// 'applicationPrototypes' is an array of 'name' properties and it should not be empty.
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
+					&& $item['applicationPrototypes']) {
+				// Get only application prototypes that already exist with this name in this discovery rule.
+				$db_application_prototypes = DBfetchArray(DBselect(
+					'SELECT ap.application_prototypeid,ap.name'.
+					' FROM application_prototype ap'.
+					' WHERE ap.itemid='.zbx_dbstr($item['ruleid']).
+						' AND '.dbConditionString('ap.name', zbx_objectValues($item['applicationPrototypes'], 'name'))
+				));
+
+				$names = zbx_objectValues($db_application_prototypes, 'name');
+
+				$application_prototypes_to_create = [];
+
+				foreach ($item['applicationPrototypes'] as $application_prototype) {
+					if (!in_array($application_prototype['name'], $names)) {
+						$application_prototypes_to_create[] = [
+							'itemid' => $item['ruleid'],
+							'name' => $application_prototype['name'],
+							'templateid' => array_key_exists('templateid', $application_prototype)
+								? $application_prototype['templateid']
+								: null
+						];
+					}
+				}
+
+				// Get newly created application prototype IDs and old existing IDs for linkage.
+				$new_ids = [];
+
+				if ($application_prototypes_to_create) {
+					$new_ids = DB::insert('application_prototype', $application_prototypes_to_create);
+				}
+
+				$ids = array_merge($new_ids, zbx_objectValues($db_application_prototypes, 'application_prototypeid'));
+
+				foreach ($ids as $id) {
+					$item_application_prototypes[] = [
+						'application_prototypeid' => $id,
+						'itemid' => $item['itemid']
+					];
+				}
+			}
+		}
+
+		// Link item prototypes to application prototypes.
+		if ($item_application_prototypes) {
+			DB::insert('item_application_prototype', $item_application_prototypes);
+		}
+
 // TODO: REMOVE info
-		$itemHosts = $this->get(array(
+		$itemHosts = $this->get([
 			'itemids' => $itemids,
-			'output' => array('name'),
-			'selectHosts' => array('name'),
+			'output' => ['name'],
+			'selectHosts' => ['name'],
 			'nopermissions' => true
-		));
+		]);
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
 			info(_s('Created: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
@@ -349,9 +438,9 @@ class CItemPrototype extends CItemGeneral {
 	protected function updateReal($items) {
 		$items = zbx_toArray($items);
 
-		$data = array();
+		$data = [];
 		foreach ($items as $inum => $item) {
-			$data[] = array('values' => $item, 'where'=> array('itemid' => $item['itemid']));
+			$data[] = ['values' => $item, 'where'=> ['itemid' => $item['itemid']]];
 		}
 
 		$result = DB::update('items', $data);
@@ -359,9 +448,9 @@ class CItemPrototype extends CItemGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 		}
 
-		$itemids = array();
-		$itemidsWithApplications = array();
-		$itemApplications = array();
+		$itemids = [];
+		$itemidsWithApplications = [];
+		$itemApplications = [];
 		foreach ($items as $item) {
 			if (!isset($item['applications'])) {
 				array_push($itemids, $item['itemid']);
@@ -370,25 +459,216 @@ class CItemPrototype extends CItemGeneral {
 
 			$itemidsWithApplications[] = $item['itemid'];
 			foreach ($item['applications'] as $anum => $appid) {
-				$itemApplications[] = array(
+				$itemApplications[] = [
 					'applicationid' => $appid,
 					'itemid' => $item['itemid']
-				);
+				];
 			}
 		}
 
 		if (!empty($itemidsWithApplications)) {
-			DB::delete('items_applications', array('itemid' => $itemidsWithApplications));
+			DB::delete('items_applications', ['itemid' => $itemidsWithApplications]);
 			DB::insert('items_applications', $itemApplications);
 		}
 
+		// application prototypes that are no longer linked to items will be deleted from database
+		$application_prototypes_to_remove = [];
+
+		// currently linked item prototypes and application prototypes
+		$old_records = [];
+
+		// records that will be added or replaced with in item_application_prototype table
+		$new_records = [];
+
+		// Get discovery rule IDs for all items.
+		$itemids_with_application_prototypes = [];
+
+		foreach ($items as $item) {
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])
+					&& !array_key_exists('ruleid', $item)) {
+				$itemids_with_application_prototypes[$item['itemid']] = true;
+			}
+		}
+
+		if ($itemids_with_application_prototypes) {
+			$discovery_rules = DBfetchArray(DBselect(
+				'SELECT id.itemid,id.parent_itemid'.
+				' FROM item_discovery id'.
+				' WHERE '.dbConditionInt('id.itemid', array_keys($itemids_with_application_prototypes))
+			));
+			$discovery_rules = zbx_toHash($discovery_rules, 'itemid');
+		}
+
+		// Process application prototypes.
+		foreach ($items as $item) {
+			/*
+			 * "applicationPrototypes" is an array of "name" properties. It can also be an empty array in case
+			 * application prototypes should be unlinked from item prototypes.
+			 */
+			if (array_key_exists('applicationPrototypes', $item) && is_array($item['applicationPrototypes'])) {
+				// Get discovery rule ID for current item prototype, if it is not yet set.
+				if (array_key_exists('ruleid', $item)) {
+					$discovery_ruleid = $item['ruleid'];
+				}
+				else {
+					$discovery_ruleid = $discovery_rules[$item['itemid']]['parent_itemid'];
+				}
+
+				/*
+				 * Get currently linked application prototypes to current item prototype together
+				 * existing application prototypes in this discovery rule. There cannot be unlinked
+				 * application prototypes.
+				 */
+				$db_item_application_prototypes = DBfetchArray(DBselect(
+					'SELECT DISTINCT ap.application_prototypeid,ap.name,ap.templateid,iap.item_application_prototypeid'.
+					' FROM application_prototype ap,item_application_prototype iap'.
+					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
+						' AND ap.itemid='.zbx_dbstr($discovery_ruleid).
+						' AND iap.itemid='.zbx_dbstr($item['itemid'])
+				));
+
+				// Gather all item application prototype records in $old_records for each item.
+				foreach ($db_item_application_prototypes as $db_item_application_prototype) {
+					$id = $db_item_application_prototype['item_application_prototypeid'];
+					$application_prototypeid = $db_item_application_prototype['application_prototypeid'];
+
+					$old_records[$id] = [
+						'item_application_prototypeid' => $id,
+						'application_prototypeid' => $application_prototypeid,
+						'itemid' => $item['itemid']
+					];
+				}
+
+				$application_prototypes = zbx_toHash($item['applicationPrototypes'], 'name');
+
+				/*
+				 * Check given application prototype names if they exist in database. If they exist, return IDs.
+				 * Other application prototypes will be created later.
+				 */
+				$db_application_prototypes = DBfetchArray(DBselect(
+					'SELECT ap.application_prototypeid,ap.name,ap.templateid'.
+					' FROM application_prototype ap'.
+					' WHERE ap.itemid='.zbx_dbstr($discovery_ruleid).
+						' AND '.dbConditionString('ap.name', array_keys($application_prototypes))
+				));
+
+				$names = [];
+				foreach ($db_application_prototypes as $db_application_prototype) {
+					$names[] = (string) $db_application_prototype['name'];
+				}
+
+				$db_application_prototypes = zbx_toHash($db_application_prototypes, 'name');
+
+				// New application prototype names that need to be created in database.
+				$application_prototypes_to_create = [];
+
+				// An array that contains "application_prototypeid" as key and "templateid" as value.
+				$application_prototypes_to_update = [];
+
+				/*
+				 * Cycle each application prototype and check if it exists. If not, we will create it. Else for existing
+				 * application prototypes check only if template ID has changed. No other parameters can change.
+				 * Otherwise application prototypes are deleted or stay unchanged.
+				 */
+				foreach ($application_prototypes as $application_prototype) {
+					if (!in_array((string) $application_prototype['name'], $names, true)) {
+						$application_prototypes_to_create[] = [
+							'itemid' => $discovery_ruleid,
+							'name' => $application_prototype['name'],
+							'templateid' => array_key_exists('templateid', $application_prototype)
+								? $application_prototype['templateid']
+								: null
+						];
+					}
+					elseif (array_key_exists('templateid', $application_prototype)) {
+						$db_application_prototype = $db_application_prototypes[$application_prototype['name']];
+
+						if ($db_application_prototype['templateid'] != $application_prototype['templateid']) {
+							$id = $db_application_prototype['application_prototypeid'];
+
+							$application_prototypes_to_update[$id] = $application_prototype['templateid'];
+						}
+					}
+				}
+
+				// Collect already existing application prototype IDs.
+				foreach ($db_application_prototypes as $db_application_prototype) {
+					$application_prototypeid = $db_application_prototype['application_prototypeid'];
+					$new_application_prototype = $application_prototypes[$db_application_prototype['name']];
+
+					$templateid = array_key_exists('templateid', $new_application_prototype)
+						? $new_application_prototype['templateid']
+						: 0;
+
+					$new_records[] = [
+						'application_prototypeid' => $application_prototypeid,
+						'itemid' => $item['itemid']
+					];
+				}
+
+				// Create new application prototypes, get new IDs.
+				if ($application_prototypes_to_create) {
+					$ids = DB::insert('application_prototype', $application_prototypes_to_create);
+
+					foreach ($ids as $id) {
+						$new_records[] = [
+							'application_prototypeid' => $id,
+							'itemid' => $item['itemid']
+						];
+					}
+				}
+
+				// Update application prototype template IDs.
+				if ($application_prototypes_to_update) {
+					foreach ($application_prototypes_to_update as $application_prototypeid => $templateid) {
+						DB::update('application_prototype', [
+							'values' => ['templateid' => $templateid],
+							'where' => ['application_prototypeid' => $application_prototypeid]
+						]);
+					}
+				}
+
+				/*
+				 * Collect application prototype IDs that will be unlinked from item prototypes, in case those
+				 * application prototypes should be permanently deleted when no longer linked to any item prototypes.
+				 */
+				$db_item_application_prototypes = zbx_toHash($db_item_application_prototypes, 'name');
+
+				$application_prototypes_to_unlink = array_diff_key($db_item_application_prototypes,
+					$application_prototypes
+				);
+				foreach ($application_prototypes_to_unlink as $application_prototype) {
+					$application_prototypes_to_remove[$application_prototype['application_prototypeid']] = true;
+				}
+			}
+		}
+
+		// Remove unchanged records.
+		foreach ($old_records as $i => $old_record) {
+			foreach ($new_records as $j => $new_record) {
+				if ($old_record['application_prototypeid'] == $new_record['application_prototypeid']
+						&& $old_record['itemid'] == $new_record['itemid']) {
+					unset($old_records[$i]);
+					unset($new_records[$j]);
+				}
+			}
+		}
+
+		// Find discovered applications that have been discovered from only one rule and delete them.
+		DB::replace('item_application_prototype', $old_records, $new_records);
+
+		// Find and delete application prototypes from database that are no longer linked to any item prototypes.
+		if ($application_prototypes_to_remove) {
+			$this->deleteApplicationPrototypes(array_keys($application_prototypes_to_remove));
+		}
+
 // TODO: REMOVE info
-		$itemHosts = $this->get(array(
+		$itemHosts = $this->get([
 			'itemids' => $itemids,
-			'output' => array('name'),
-			'selectHosts' => array('name'),
-			'nopermissions' => true,
-		));
+			'output' => ['name'],
+			'selectHosts' => ['name'],
+			'nopermissions' => true
+		]);
 
 		foreach ($itemHosts as $item) {
 			$host = reset($item['hosts']);
@@ -409,7 +689,7 @@ class CItemPrototype extends CItemGeneral {
 		$this->updateReal($items);
 		$this->inherit($items);
 
-		return array('itemids' => zbx_objectValues($items, 'itemid'));
+		return ['itemids' => zbx_objectValues($items, 'itemid')];
 	}
 
 	/**
@@ -427,13 +707,13 @@ class CItemPrototype extends CItemGeneral {
 
 		$prototypeids = array_keys(array_flip($prototypeids));
 
-		$options = array(
+		$options = [
 			'itemids' => $prototypeids,
 			'editable' => true,
 			'preservekeys' => true,
 			'output' => API_OUTPUT_EXTEND,
-			'selectHosts' => array('name')
-		);
+			'selectHosts' => ['name']
+		];
 		$delItemPrototypes = $this->get($options);
 
 		// TODO: remove $nopermissions hack
@@ -450,35 +730,35 @@ class CItemPrototype extends CItemGeneral {
 
 		// first delete child items
 		$parentItemids = $prototypeids;
-		$childPrototypeids = array();
+		$childPrototypeids = [];
 		do {
 			$dbItems = DBselect('SELECT itemid FROM items WHERE '.dbConditionInt('templateid', $parentItemids));
-			$parentItemids = array();
+			$parentItemids = [];
 			while ($dbItem = DBfetch($dbItems)) {
 				$parentItemids[$dbItem['itemid']] = $dbItem['itemid'];
 				$childPrototypeids[$dbItem['itemid']] = $dbItem['itemid'];
 			}
 		} while ($parentItemids);
 
-		$options = array(
+		$options = [
 			'output' => API_OUTPUT_EXTEND,
 			'itemids' => $childPrototypeids,
 			'nopermissions' => true,
 			'preservekeys' => true,
-			'selectHosts' => array('name')
-		);
+			'selectHosts' => ['name']
+		];
 		$delItemPrototypesChilds = $this->get($options);
 
 		$delItemPrototypes = array_merge($delItemPrototypes, $delItemPrototypesChilds);
 		$prototypeids = array_merge($prototypeids, $childPrototypeids);
 
 		// delete graphs with this item prototype
-		$delGraphPrototypes = API::GraphPrototype()->get(array(
-			'output' => array(),
+		$delGraphPrototypes = API::GraphPrototype()->get([
+			'output' => [],
 			'itemids' => $prototypeids,
 			'nopermissions' => true,
 			'preservekeys' => true
-		));
+		]);
 		if ($delGraphPrototypes) {
 			API::GraphPrototype()->delete(array_keys($delGraphPrototypes), true);
 		}
@@ -487,36 +767,56 @@ class CItemPrototype extends CItemGeneral {
 		$this->checkGraphReference($prototypeids);
 
 // CREATED ITEMS
-		$createdItems = array();
+		$createdItems = [];
 		$sql = 'SELECT itemid FROM item_discovery WHERE '.dbConditionInt('parent_itemid', $prototypeids);
 		$dbItems = DBselect($sql);
 		while ($item = DBfetch($dbItems)) {
 			$createdItems[$item['itemid']] = $item['itemid'];
 		}
 		if ($createdItems) {
+			// This API call will also make sure that discovered applications are no longer linked to other items.
 			API::Item()->delete($createdItems, true);
 		}
 
 
 // TRIGGER PROTOTYPES
-		$delTriggerPrototypes = API::TriggerPrototype()->get(array(
-			'output' => array(),
+		$delTriggerPrototypes = API::TriggerPrototype()->get([
+			'output' => [],
 			'itemids' => $prototypeids,
 			'nopermissions' => true,
 			'preservekeys' => true,
-		));
+		]);
 		if ($delTriggerPrototypes) {
 			API::TriggerPrototype()->delete(array_keys($delTriggerPrototypes), true);
 		}
 
 		// screen items
-		DB::delete('screens_items', array(
+		DB::delete('screens_items', [
 			'resourceid' => $prototypeids,
-			'resourcetype' => array(SCREEN_RESOURCE_LLD_SIMPLE_GRAPH)
+			'resourcetype' => [SCREEN_RESOURCE_LLD_SIMPLE_GRAPH]
+		]);
+
+		// Unlink application prototypes and delete those who are no longer linked to any other item prototypes.
+		$db_item_application_prototypes = DBfetchArray(DBselect(
+			'SELECT iap.item_application_prototypeid,iap.application_prototypeid'.
+			' FROM item_application_prototype iap'.
+			' WHERE '.dbConditionInt('iap.itemid', $prototypeids)
 		));
 
+		if ($db_item_application_prototypes) {
+			DB::delete('item_application_prototype', [
+				'item_application_prototypeid' => zbx_objectValues($db_item_application_prototypes,
+					'item_application_prototypeid'
+				)
+			]);
+
+			$this->deleteApplicationPrototypes(zbx_objectValues($db_item_application_prototypes,
+				'application_prototypeid'
+			));
+		}
+
 // ITEM PROTOTYPES
-		DB::delete('items', array('itemid' => $prototypeids));
+		DB::delete('items', ['itemid' => $prototypeids]);
 
 
 // TODO: remove info from API
@@ -525,26 +825,82 @@ class CItemPrototype extends CItemGeneral {
 			info(_s('Deleted: Item prototype "%1$s" on "%2$s".', $item['name'], $host['name']));
 		}
 
-		return array('prototypeids' => $prototypeids);
+		return ['prototypeids' => $prototypeids];
+	}
+
+	/*
+	 * Finds and deletes application prototypes by given IDs. Looks for discovered applications that were created from
+	 * prototypes and deletes them if they are not discovered by other rules.
+	 *
+	 * @param array $application_prototypeids
+	 */
+	protected function deleteApplicationPrototypes(array $application_prototypeids) {
+		$db_application_prototypes = DBfetchArray(DBselect(
+			'SELECT ap.application_prototypeid'.
+			' FROM application_prototype ap'.
+			' WHERE NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM item_application_prototype iap'.
+				' WHERE ap.application_prototypeid=iap.application_prototypeid'.
+			')'.
+			' AND '.dbConditionInt('ap.application_prototypeid', $application_prototypeids)
+		));
+
+		if ($db_application_prototypes) {
+			// Find discovered applications for deletable application prototypes.
+			$discovered_applications = DBfetchArray(DBselect(
+				'SELECT DISTINCT ad.applicationid'.
+				' FROM application_discovery ad'.
+				' WHERE '.dbConditionInt('ad.application_prototypeid', $application_prototypeids)
+			));
+
+			DB::delete('application_prototype', [
+				'application_prototypeid' => zbx_objectValues($db_application_prototypes, 'application_prototypeid')
+			]);
+
+			/*
+			 * Deleting an application prototype will automatically delete the link in 'item_application_prototype',
+			 * but it will not delete the actual discovered application. When the link is gone,
+			 * delete the discoveted application. Link between a regular item does not matter any more.
+			 */
+			if ($discovered_applications) {
+				$discovered_applicationids = zbx_objectValues($discovered_applications, 'applicationid');
+
+				$discovered_applications_to_delete = DBfetchArray(DBselect(
+					'SELECT DISTINCT ad.applicationid'.
+					' FROM application_discovery ad'.
+					' WHERE '.dbConditionInt('ad.applicationid', $discovered_applicationids)
+				));
+
+				$applications_to_delete = array_diff($discovered_applicationids,
+					zbx_objectValues($discovered_applications_to_delete, 'applicationid')
+				);
+
+				if ($applications_to_delete) {
+					API::Application()->delete($applications_to_delete, true);
+				}
+			}
+		}
 	}
 
 	public function syncTemplates($data) {
 		$data['templateids'] = zbx_toArray($data['templateids']);
 		$data['hostids'] = zbx_toArray($data['hostids']);
 
-		$selectFields = array();
+		$selectFields = [];
 		foreach ($this->fieldRules as $key => $rules) {
 			if (!isset($rules['system']) && !isset($rules['host'])) {
 				$selectFields[] = $key;
 			}
 		}
 
-		$items = $this->get(array(
+		$items = $this->get([
+			'output' => $selectFields,
+			'selectApplications' => ['applicationid'],
+			'selectApplicationPrototypes' => ['name'],
 			'hostids' => $data['templateids'],
-			'preservekeys' => true,
-			'selectApplications' => array('applicationid'),
-			'output' => $selectFields
-		));
+			'preservekeys' => true
+		]);
 
 		foreach ($items as $inum => $item) {
 			$items[$inum]['applications'] = zbx_objectValues($item['applications'], 'applicationid');
@@ -561,7 +917,7 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		// fetch the corresponding discovery rules for the child items
-		$ruleids = array();
+		$ruleids = [];
 		$dbResult = DBselect(
 			'SELECT i.itemid AS ruleid,id.itemid,i.hostid'.
 			' FROM items i,item_discovery id'.
@@ -570,7 +926,7 @@ class CItemPrototype extends CItemGeneral {
 		);
 		while ($rule = DBfetch($dbResult)) {
 			if (!isset($ruleids[$rule['itemid']])) {
-				$ruleids[$rule['itemid']] = array();
+				$ruleids[$rule['itemid']] = [];
 			}
 			$ruleids[$rule['itemid']][$rule['hostid']] = $rule['ruleid'];
 		}
@@ -581,8 +937,8 @@ class CItemPrototype extends CItemGeneral {
 			return true;
 		}
 
-		$insertItems = array();
-		$updateItems = array();
+		$insertItems = [];
+		$updateItems = [];
 		foreach ($newItems as $newItem) {
 			if (isset($newItem['itemid'])) {
 				unset($newItem['ruleid']);
@@ -597,8 +953,13 @@ class CItemPrototype extends CItemGeneral {
 		}
 
 		// save the new items
-		$this->createReal($insertItems);
-		$this->updateReal($updateItems);
+		if ($insertItems) {
+			$this->createReal($insertItems);
+		}
+
+		if ($updateItems) {
+			$this->updateReal($updateItems);
+		}
 
 		// propagate the inheritance to the children
 		$this->inherit(array_merge($insertItems, $updateItems));
@@ -624,23 +985,59 @@ class CItemPrototype extends CItemGeneral {
 		// adding applications
 		if ($options['selectApplications'] !== null && $options['selectApplications'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'applicationid', 'items_applications');
-			$applications = API::Application()->get(array(
+			$applications = API::Application()->get([
 				'output' => $options['selectApplications'],
 				'applicationids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $applications, 'applications');
+		}
+
+		// adding application prototypes
+		if ($options['selectApplicationPrototypes'] !== null
+				&& $options['selectApplicationPrototypes'] != API_OUTPUT_COUNT) {
+			$pkFieldId = $this->pk('application_prototype');
+			$outputFields = [
+				$pkFieldId => $this->fieldId($pkFieldId, 'ap')
+			];
+
+			if (is_array($options['selectApplicationPrototypes'])) {
+				foreach ($options['selectApplicationPrototypes'] as $field) {
+					if ($this->hasField($field, 'application_prototype')) {
+						$outputFields[$field] = $this->fieldId($field, 'ap');
+					}
+				}
+
+				$outputFields = implode(',', $outputFields);
+			}
+			else {
+				$outputFields = 'ap.*';
+			}
+
+			$relationMap = $this->createRelationMap($result, 'itemid', 'application_prototypeid',
+				'item_application_prototype'
+			);
+
+			$application_prototypes = DBfetchArray(DBselect(
+				'SELECT '.$outputFields.
+				' FROM application_prototype ap'.
+				' WHERE '.dbConditionInt('ap.application_prototypeid', $relationMap->getRelatedIds())
+			));
+
+			$application_prototypes = zbx_toHash($application_prototypes, 'application_prototypeid');
+
+			$result = $relationMap->mapMany($result, $application_prototypes, 'applicationPrototypes');
 		}
 
 		// adding triggers
 		if (!is_null($options['selectTriggers'])) {
 			if ($options['selectTriggers'] != API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'itemid', 'triggerid', 'functions');
-				$triggers = API::TriggerPrototype()->get(array(
+				$triggers = API::TriggerPrototype()->get([
 					'output' => $options['selectTriggers'],
 					'triggerids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
-				));
+				]);
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($triggers, 'description');
@@ -648,11 +1045,11 @@ class CItemPrototype extends CItemGeneral {
 				$result = $relationMap->mapMany($result, $triggers, 'triggers', $options['limitSelects']);
 			}
 			else {
-				$triggers = API::TriggerPrototype()->get(array(
+				$triggers = API::TriggerPrototype()->get([
 					'countOutput' => true,
 					'groupCount' => true,
 					'itemids' => $itemids
-				));
+				]);
 				$triggers = zbx_toHash($triggers, 'itemid');
 
 				foreach ($result as $itemid => $item) {
@@ -670,11 +1067,11 @@ class CItemPrototype extends CItemGeneral {
 		if (!is_null($options['selectGraphs'])) {
 			if ($options['selectGraphs'] != API_OUTPUT_COUNT) {
 				$relationMap = $this->createRelationMap($result, 'itemid', 'graphid', 'graphs_items');
-				$graphs = API::GraphPrototype()->get(array(
+				$graphs = API::GraphPrototype()->get([
 					'output' => $options['selectGraphs'],
 					'graphids' => $relationMap->getRelatedIds(),
 					'preservekeys' => true
-				));
+				]);
 
 				if (!is_null($options['limitSelects'])) {
 					order_result($graphs, 'name');
@@ -682,11 +1079,11 @@ class CItemPrototype extends CItemGeneral {
 				$result = $relationMap->mapMany($result, $graphs, 'graphs', $options['limitSelects']);
 			}
 			else {
-				$graphs = API::GraphPrototype()->get(array(
+				$graphs = API::GraphPrototype()->get([
 					'countOutput' => true,
 					'groupCount' => true,
 					'itemids' => $itemids
-				));
+				]);
 				$graphs = zbx_toHash($graphs, 'itemid');
 
 				foreach ($result as $itemid => $item) {
@@ -703,12 +1100,12 @@ class CItemPrototype extends CItemGeneral {
 		// adding discoveryrule
 		if ($options['selectDiscoveryRule'] !== null && $options['selectDiscoveryRule'] != API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'itemid', 'parent_itemid', 'item_discovery');
-			$discoveryRules = API::DiscoveryRule()->get(array(
+			$discoveryRules = API::DiscoveryRule()->get([
 				'output' => $options['selectDiscoveryRule'],
 				'itemids' => $relationMap->getRelatedIds(),
 				'nopermissions' => true,
-				'preservekeys' => true,
-			));
+				'preservekeys' => true
+			]);
 			$result = $relationMap->mapOne($result, $discoveryRules, 'discoveryRule');
 		}
 

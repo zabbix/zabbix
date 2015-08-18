@@ -21,59 +21,43 @@
 
 class CLink extends CTag {
 
-	protected $sid = null;
+	private	$use_sid = true;
+	private $url = null;
 
-	public function __construct($item = null, $url = null, $class = null, $action = null, $nosid = null) {
-		parent::__construct('a', 'yes');
+	public function __construct($item = null, $url = null) {
+		parent::__construct('a', true);
 
-		$this->tag_start = '';
-		$this->tag_end = '';
-		$this->tag_body_start = '';
-		$this->tag_body_end = '';
-		$this->nosid = $nosid;
-
-		if (!is_null($class)) {
-			$this->setAttribute('class', $class);
-		}
-		if (!is_null($item)) {
+		if ($item !== null) {
 			$this->addItem($item);
 		}
-		if (!is_null($url)) {
-			$this->setUrl($url);
-		}
-		if (!is_null($action)) {
-			$this->setAttribute('onclick', $action);
-		}
+		$this->url = $url;
 	}
 
-	public function setUrl($value) {
-		if (is_null($this->nosid)) {
-			if (is_null($this->sid)) {
-				$this->sid = isset($_COOKIE['zbx_sessionid']) ? substr($_COOKIE['zbx_sessionid'], 16, 16) : null;
-			}
-			if (!is_null($this->sid)) {
-				$value .= (strpos($value, '&') !== false || strpos($value, '?') !== false)
-					? '&sid='.$this->sid
-					: '?sid='.$this->sid;
-			}
-			$url = $value;
-		}
-		else {
-			$url = $value;
-		}
-		$this->setAttribute('href', $url);
+	public function removeSID() {
+		$this->use_sid = false;
+		return $this;
 	}
 
-	public function getUrl() {
-		return isset($this->attributes['href']) ? $this->attributes['href'] : null;
+	private function getUrl() {
+		$url = $this->url;
+
+		if ($this->use_sid) {
+			if (array_key_exists('zbx_sessionid', $_COOKIE)) {
+				$url .= (strpos($url, '&') !== false || strpos($url, '?') !== false) ? '&' : '?';
+				$url .= 'sid='.substr($_COOKIE['zbx_sessionid'], 16, 16);
+			}
+		}
+		return $url;
 	}
 
 	public function setTarget($value = null) {
-		if (is_null($value)) {
-			unset($this->attributes['target']);
-		}
-		else {
-			$this->attributes['target'] = $value;
-		}
+		$this->attributes['target'] = $value;
+		return $this;
+	}
+
+	public function toString($destroy = true) {
+		$this->setAttribute('href', $this->getUrl());
+
+		return parent::toString($destroy);
 	}
 }

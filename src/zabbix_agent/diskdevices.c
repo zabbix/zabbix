@@ -137,7 +137,7 @@ ZBX_SINGLE_DISKDEVICE_DATA	*collector_diskdevice_get(const char *devname)
 	else
 		diskstat_shm_reattach();
 
-	for (i = 0; i < diskdevices->count; i ++)
+	for (i = 0; i < diskdevices->count; i++)
 	{
 		if (0 == strcmp(devname, diskdevices->device[i].name))
 		{

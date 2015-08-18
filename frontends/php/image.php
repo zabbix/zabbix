@@ -29,11 +29,11 @@ $page['type'] = PAGE_TYPE_IMAGE;
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'imageid' =>	array(T_ZBX_INT, O_MAND, P_SYS, DB_ID,				null),
-	'width' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null),
-	'height' =>		array(T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null),
-);
+$fields = [
+	'imageid' =>	[T_ZBX_INT, O_MAND, P_SYS, DB_ID,				null],
+	'width' =>		[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null],
+	'height' =>		[T_ZBX_INT, O_OPT, P_SYS,	BETWEEN(1, 2000),	null],
+];
 check_fields($fields);
 
 $resize = false;

@@ -20,25 +20,34 @@
 
 
 $screenWidget = new CWidget();
-$screenWidget->addFlicker(new CDiv(null, null, 'scrollbar_cntr'), CProfile::get('web.hostscreen.filter.state', 1));
 
-$form = new CForm('get');
-$form->addVar('fullscreen', $this->data['fullscreen']);
+$form = (new CFilter('web.hostscreen.filter.state'))
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addNavigator();
+
 $screenWidget->addItem($form);
 
 if (empty($this->data['screen']) || empty($this->data['host'])) {
-	$screenWidget->addPageHeader(_('SCREENS'));
-	$screenWidget->addItem(BR());
-	$screenWidget->addItem(new CTableInfo(_('No screens found.')));
+	$screenWidget
+		->setTitle(_('Screens'))
+		->addItem(BR())
+		->addItem(new CTableInfo());
 
 	$screenBuilder = new CScreenBuilder();
-	CScreenBuilder::insertScreenStandardJs(array(
+	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screenBuilder->timeline
-	));
+	]);
 }
 else {
-	$screenWidget->addPageHeader(_('SCREENS'), array(get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen']))));
-	$screenWidget->addItem(BR());
+	$screenWidget->setTitle([
+		$this->data['screen']['name'],
+		SPACE,
+		_('on'),
+		SPACE,
+		(new CSpan($this->data['host']['name']))->addClass(ZBX_STYLE_ORANGE)
+	]);
+
+	$controls = new CList();
 
 	// host screen list
 	if (!empty($this->data['screens'])) {
@@ -51,11 +60,14 @@ else {
 			$screenComboBox->addItem('host_screen.php?hostid='.$this->data['hostid'].'&screenid='.$screen['screenid'], $screen['name']);
 		}
 
-		$screenWidget->addHeader(array($this->data['screen']['name'], SPACE, _('on'), SPACE, new CSpan($this->data['host']['name'], 'parent-discovery')), $screenComboBox);
+		$controls
+			->addItem($screenComboBox)
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]));
+		$screenWidget->setControls($controls);
 	}
 
 	// append screens to widget
-	$screenBuilder = new CScreenBuilder(array(
+	$screenBuilder = new CScreenBuilder([
 		'screen' => $this->data['screen'],
 		'mode' => SCREEN_MODE_PREVIEW,
 		'hostid' => $this->data['hostid'],
@@ -63,13 +75,13 @@ else {
 		'stime' => $this->data['stime'],
 		'profileIdx' => 'web.screens',
 		'profileIdx2' => $this->data['screen']['screenid']
-	));
+	]);
 	$screenWidget->addItem($screenBuilder->show());
 
-	CScreenBuilder::insertScreenStandardJs(array(
+	CScreenBuilder::insertScreenStandardJs([
 		'timeline' => $screenBuilder->timeline,
 		'profileIdx' => $screenBuilder->profileIdx
-	));
+	]);
 }
 
 return $screenWidget;

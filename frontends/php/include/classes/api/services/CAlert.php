@@ -28,7 +28,7 @@ class CAlert extends CApiService {
 
 	protected $tableName = 'alerts';
 	protected $tableAlias = 'a';
-	protected $sortColumns = array('alertid', 'clock', 'eventid', 'status');
+	protected $sortColumns = ['alertid', 'clock', 'eventid', 'status'];
 
 	/**
 	 * Get alerts data.
@@ -49,20 +49,20 @@ class CAlert extends CApiService {
 	 *
 	 * @return array|int item data as array or false if error
 	 */
-	public function get($options = array()) {
-		$result = array();
+	public function get($options = []) {
+		$result = [];
 		$userType = self::$userData['type'];
 		$userid = self::$userData['userid'];
 
-		$sqlParts = array(
-			'select'	=> array('alerts' => 'a.alertid'),
-			'from'		=> array('alerts' => 'alerts a'),
-			'where'		=> array(),
-			'order'		=> array(),
+		$sqlParts = [
+			'select'	=> ['alerts' => 'a.alertid'],
+			'from'		=> ['alerts' => 'alerts a'],
+			'where'		=> [],
+			'order'		=> [],
 			'limit'		=> null
-		);
+		];
 
-		$defOptions = array(
+		$defOptions = [
 			'eventsource'				=> EVENT_SOURCE_TRIGGERS,
 			'eventobject'				=> EVENT_OBJECT_TRIGGER,
 			'groupids'					=> null,
@@ -94,7 +94,7 @@ class CAlert extends CApiService {
 			'sortfield'					=> '',
 			'sortorder'					=> '',
 			'limit'						=> null
-		);
+		];
 		$options = zbx_array_merge($defOptions, $options);
 
 		$this->validateGet($options);
@@ -220,7 +220,7 @@ class CAlert extends CApiService {
 
 		// objectids
 		if ($options['objectids'] !== null
-				&& in_array($options['eventobject'], array(EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE))) {
+				&& in_array($options['eventobject'], [EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
 			zbx_value2array($options['objectids']);
 
 			// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
@@ -307,7 +307,7 @@ class CAlert extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, array('userid', 'mediatypeid'), $options['output']);
+			$result = $this->unsetExtraFields($result, ['userid', 'mediatypeid'], $options['output']);
 		}
 
 		// removing keys (hash -> array)
@@ -328,22 +328,22 @@ class CAlert extends CApiService {
 	 * @return void
 	 */
 	protected function validateGet(array $options) {
-		$sourceValidator = new CLimitedSetValidator(array(
+		$sourceValidator = new CLimitedSetValidator([
 			'values' => array_keys(eventSource())
-		));
+		]);
 		if (!$sourceValidator->validate($options['eventsource'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect eventsource value.'));
 		}
 
-		$objectValidator = new CLimitedSetValidator(array(
+		$objectValidator = new CLimitedSetValidator([
 			'values' => array_keys(eventObject())
-		));
+		]);
 		if (!$objectValidator->validate($options['eventobject'])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect eventobject value.'));
 		}
 
 		$sourceObjectValidator = new CEventSourceObjectValidator();
-		if (!$sourceObjectValidator->validate(array('source' => $options['eventsource'], 'object' => $options['eventobject']))) {
+		if (!$sourceObjectValidator->validate(['source' => $options['eventsource'], 'object' => $options['eventobject']])) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $sourceObjectValidator->getError());
 		}
 	}
@@ -401,33 +401,33 @@ class CAlert extends CApiService {
 			while ($relation = DBfetch($query)) {
 				$relationMap->addRelation($relation['alertid'], $relation['hostid']);
 			}
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'output' => $options['selectHosts'],
 				'hostids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $hosts, 'hosts');
 		}
 
 		// adding users
 		if ($options['selectUsers'] !== null && $options['selectUsers'] !== API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'alertid', 'userid');
-			$users = API::User()->get(array(
+			$users = API::User()->get([
 				'output' => $options['selectUsers'],
 				'userids' => $relationMap->getRelatedIds(),
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $users, 'users');
 		}
 
 		// adding media types
 		if ($options['selectMediatypes'] !== null && $options['selectMediatypes'] !== API_OUTPUT_COUNT) {
 			$relationMap = $this->createRelationMap($result, 'alertid', 'mediatypeid');
-			$mediatypes = API::getApiService()->select('media_type', array(
+			$mediatypes = API::getApiService()->select('media_type', [
 				'output' => $options['selectMediatypes'],
-				'filter' => array('mediatypeid' => $relationMap->getRelatedIds()),
+				'filter' => ['mediatypeid' => $relationMap->getRelatedIds()],
 				'preservekeys' => true
-			));
+			]);
 			$result = $relationMap->mapMany($result, $mediatypes, 'mediatypes');
 		}
 

@@ -29,7 +29,7 @@ class CScreenHostTriggers extends CScreenBase {
 	 * @return CDiv (screen inside container)
 	 */
 	public function get() {
-		$params = array(
+		$params = [
 			'groupids' => null,
 			'hostids' => null,
 			'screenid' => $this->screenid,
@@ -37,7 +37,7 @@ class CScreenHostTriggers extends CScreenBase {
 			'severity' => null,
 			'limit' => $this->screenitem['elements'],
 			'backUrl' => $this->pageFile
-		);
+		];
 
 		// by default triggers are sorted by date desc, do we need to override this?
 		switch ($this->screenitem['sort_triggers']) {
@@ -58,13 +58,13 @@ class CScreenHostTriggers extends CScreenBase {
 		}
 
 		if ($this->screenitem['resourceid'] > 0) {
-			$hosts = API::Host()->get(array(
+			$hosts = API::Host()->get([
 				'hostids' => $this->screenitem['resourceid'],
 				'output' => API_OUTPUT_EXTEND
-			));
+			]);
 			$host = reset($hosts);
 
-			$item = new CSpan(_('Host').NAME_DELIMITER.$host['host'], 'white');
+			$item = (new CSpan(_('Host').NAME_DELIMITER.$host['host']))->addClass('white');
 			$params['hostids'] = $host['hostid'];
 		}
 		else {
@@ -75,17 +75,17 @@ class CScreenHostTriggers extends CScreenBase {
 			CProfile::update('web.screens.tr_hostid', $hostid, PROFILE_TYPE_ID);
 
 			// get groups
-			$groups = API::HostGroup()->get(array(
+			$groups = API::HostGroup()->get([
 				'monitored_hosts' => true,
 				'output' => API_OUTPUT_EXTEND
-			));
+			]);
 			order_result($groups, 'name');
 
 			// get hsots
-			$options = array(
+			$options = [
 				'monitored_hosts' => true,
 				'output' => API_OUTPUT_EXTEND
-			);
+			];
 			if ($groupid > 0) {
 				$options['groupids'] = $groupid;
 			}
@@ -119,16 +119,16 @@ class CScreenHostTriggers extends CScreenBase {
 			}
 
 			if ($this->mode == SCREEN_MODE_EDIT) {
-				$groupComboBox->attr('disabled', 'disabled');
-				$hostsComboBox->attr('disabled', 'disabled');
+				$groupComboBox->setAttribute('disabled', 'disabled');
+				$hostsComboBox->setAttribute('disabled', 'disabled');
 			}
 
-			$item->addItem(array(_('Group').SPACE, $groupComboBox));
-			$item->addItem(array(SPACE._('Host').SPACE, $hostsComboBox));
+			$item->addItem([_('Group').SPACE, $groupComboBox]);
+			$item->addItem([SPACE._('Host').SPACE, $hostsComboBox]);
 		}
 
 		$output = new CUiWidget('hat_trstatus', make_latest_issues($params));
-		$output->setDoubleHeader(array(_('HOST ISSUES'), SPACE, '['.zbx_date2str(TIME_FORMAT_SECONDS).']', SPACE),
+		$output->setDoubleHeader([_('HOST ISSUES'), SPACE, '['.zbx_date2str(TIME_FORMAT_SECONDS).']', SPACE],
 			$item
 		);
 

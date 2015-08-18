@@ -32,22 +32,22 @@ abstract class CMapElement extends CApiService {
 
 		// permissions
 		if ($update || $delete) {
-			$selementDbFields = array('selementid' => null);
+			$selementDbFields = ['selementid' => null];
 
 			$dbSelements = $this->fetchSelementsByIds(zbx_objectValues($selements, 'selementid'));
 
 			if ($update) {
-				$selements = $this->extendFromObjects($selements, $dbSelements, array('elementtype', 'elementid'));
+				$selements = $this->extendFromObjects($selements, $dbSelements, ['elementtype', 'elementid']);
 			}
 		}
 		else {
-			$selementDbFields = array(
+			$selementDbFields = [
 				'sysmapid' => null,
 				'elementid' => null,
 				'elementtype' => null,
 				'iconid_off' => null,
-				'urls' => array()
-			);
+				'urls' => []
+			];
 		}
 
 		foreach ($selements as &$selement) {
@@ -94,7 +94,7 @@ abstract class CMapElement extends CApiService {
 			return;
 		}
 
-		$hostIds = $groupIds = $triggerIds = $mapIds = array();
+		$hostIds = $groupIds = $triggerIds = $mapIds = [];
 		foreach ($selements as $selement) {
 			switch ($selement['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
@@ -128,22 +128,22 @@ abstract class CMapElement extends CApiService {
 	 * @return array
 	 */
 	protected function fetchSelementsByIds(array $selementIds) {
-		$selements = API::getApiService()->select('sysmaps_elements', array(
+		$selements = API::getApiService()->select('sysmaps_elements', [
 			'output' => API_OUTPUT_EXTEND,
-			'filter' => array('selementid' => $selementIds),
+			'filter' => ['selementid' => $selementIds],
 			'preservekeys' => true
-		));
+		]);
 
 		if ($selements) {
 			foreach ($selements as &$selement) {
-				$selement['urls'] = array();
+				$selement['urls'] = [];
 			}
 			unset($selement);
 
-			$selementUrls = API::getApiService()->select('sysmap_element_url', array(
+			$selementUrls = API::getApiService()->select('sysmap_element_url', [
 				'output' => API_OUTPUT_EXTEND,
-				'filter' => array('selementid' => $selementIds)
-			));
+				'filter' => ['selementid' => $selementIds]
+			]);
 			foreach ($selementUrls as $selementUrl) {
 				$selements[$selementUrl['selementid']]['urls'][] = $selementUrl;
 			}
@@ -158,20 +158,20 @@ abstract class CMapElement extends CApiService {
 
 		// permissions
 		if ($update || $delete) {
-			$linkDbFields = array('linkid' => null);
+			$linkDbFields = ['linkid' => null];
 
-			$dbLinks = API::getApiService()->select('sysmap_element_url', array(
-				'filter' => array('selementid' => zbx_objectValues($links, 'linkid')),
-				'output' => array('linkid'),
+			$dbLinks = API::getApiService()->select('sysmap_element_url', [
+				'filter' => ['selementid' => zbx_objectValues($links, 'linkid')],
+				'output' => ['linkid'],
 				'preservekeys' => true
-			));
+			]);
 		}
 		else {
-			$linkDbFields = array(
+			$linkDbFields = [
 				'sysmapid' => null,
 				'selementid1' => null,
 				'selementid2' => null
-			);
+			];
 		}
 
 		$colorValidator = new CColorValidator();
@@ -243,7 +243,7 @@ abstract class CMapElement extends CApiService {
 
 		$selementIds = DB::insert('sysmaps_elements', $selements);
 
-		$insertUrls = array();
+		$insertUrls = [];
 
 		foreach ($selementIds as $key => $selementId) {
 			foreach ($selements[$key]['urls'] as $url) {
@@ -255,7 +255,7 @@ abstract class CMapElement extends CApiService {
 
 		DB::insert('sysmap_element_url', $insertUrls);
 
-		return array('selementids' => $selementIds);
+		return ['selementids' => $selementIds];
 	}
 
 	/**
@@ -276,17 +276,17 @@ abstract class CMapElement extends CApiService {
 	 */
 	protected function updateSelements(array $selements) {
 		$selements = zbx_toArray($selements);
-		$selementIds = array();
+		$selementIds = [];
 
 		$dbSelements = $this->checkSelementInput($selements, __FUNCTION__);
 
-		$update = array();
-		$urlsToDelete = $urlsToUpdate = $urlsToAdd = array();
+		$update = [];
+		$urlsToDelete = $urlsToUpdate = $urlsToAdd = [];
 		foreach ($selements as $selement) {
-			$update[] = array(
+			$update[] = [
 				'values' => $selement,
-				'where' => array('selementid' => $selement['selementid']),
-			);
+				'where' => ['selementid' => $selement['selementid']],
+			];
 			$selementIds[] = $selement['selementid'];
 
 			if (!isset($selement['urls'])) {
@@ -303,13 +303,13 @@ abstract class CMapElement extends CApiService {
 
 			// update url
 			foreach ($diffUrls['both'] as $updUrl) {
-				$urlsToUpdate[] = array(
+				$urlsToUpdate[] = [
 					'values' => $updUrl,
-					'where' => array(
+					'where' => [
 						'selementid' => $selement['selementid'],
 						'name' => $updUrl['name']
-					)
-				);
+					]
+				];
 			}
 
 			// delete url
@@ -319,7 +319,7 @@ abstract class CMapElement extends CApiService {
 		DB::update('sysmaps_elements', $update);
 
 		if (!empty($urlsToDelete)) {
-			DB::delete('sysmap_element_url', array('sysmapelementurlid' => $urlsToDelete));
+			DB::delete('sysmap_element_url', ['sysmapelementurlid' => $urlsToDelete]);
 		}
 
 		if (!empty($urlsToUpdate)) {
@@ -330,7 +330,7 @@ abstract class CMapElement extends CApiService {
 			DB::insert('sysmap_element_url', $urlsToAdd);
 		}
 
-		return array('selementids' => $selementIds);
+		return ['selementids' => $selementIds];
 	}
 
 	/**
@@ -345,7 +345,7 @@ abstract class CMapElement extends CApiService {
 
 		$this->checkSelementInput($selements, __FUNCTION__);
 
-		DB::delete('sysmaps_elements', array('selementid' => $selementIds));
+		DB::delete('sysmaps_elements', ['selementid' => $selementIds]);
 
 		return $selementIds;
 	}
@@ -369,7 +369,7 @@ abstract class CMapElement extends CApiService {
 
 		$linkIds = DB::insert('sysmaps_links', $links);
 
-		return array('linkids' => $linkIds);
+		return ['linkids' => $linkIds];
 	}
 
 	protected function updateLinks($links) {
@@ -377,14 +377,14 @@ abstract class CMapElement extends CApiService {
 
 		$this->checkLinkInput($links, __FUNCTION__);
 
-		$udpateLinks = array();
+		$udpateLinks = [];
 		foreach ($links as $link) {
-			$udpateLinks[] = array('values' => $link, 'where' => array('linkid' => $link['linkid']));
+			$udpateLinks[] = ['values' => $link, 'where' => ['linkid' => $link['linkid']]];
 		}
 
 		DB::update('sysmaps_links', $udpateLinks);
 
-		return array('linkids' => zbx_objectValues($links, 'linkid'));
+		return ['linkids' => zbx_objectValues($links, 'linkid')];
 	}
 
 	/**
@@ -401,9 +401,9 @@ abstract class CMapElement extends CApiService {
 
 		$this->checkLinkInput($links, __FUNCTION__);
 
-		DB::delete('sysmaps_links', array('linkid' => $linkIds));
+		DB::delete('sysmaps_links', ['linkid' => $linkIds]);
 
-		return array('linkids' => $linkIds);
+		return ['linkids' => $linkIds];
 	}
 
 	/**
@@ -421,14 +421,14 @@ abstract class CMapElement extends CApiService {
 
 		$linkTriggerIds = DB::insert('sysmaps_link_triggers', $linkTriggers);
 
-		return array('linktriggerids' => $linkTriggerIds);
+		return ['linktriggerids' => $linkTriggerIds];
 	}
 
 	protected function validateCreateLinkTriggers(array $linkTriggers) {
-		$linkTriggerDbFields = array(
+		$linkTriggerDbFields = [
 			'linkid' => null,
 			'triggerid' => null
-		);
+		];
 
 		$colorValidator = new CColorValidator();
 
@@ -449,21 +449,21 @@ abstract class CMapElement extends CApiService {
 
 		$linkTriggerIds = zbx_objectValues($linkTriggers, 'linktriggerid');
 
-		$updateLinkTriggers = array();
+		$updateLinkTriggers = [];
 		foreach ($linkTriggers as $linkTrigger) {
-			$updateLinkTriggers[] = array(
+			$updateLinkTriggers[] = [
 				'values' => $linkTrigger,
-				'where' => array('linktriggerid' => $linkTrigger['linktriggerid'])
-			);
+				'where' => ['linktriggerid' => $linkTrigger['linktriggerid']]
+			];
 		}
 
 		DB::update('sysmaps_link_triggers', $updateLinkTriggers);
 
-		return array('linktriggerids' => $linkTriggerIds);
+		return ['linktriggerids' => $linkTriggerIds];
 	}
 
 	protected function validateUpdateLinkTriggers(array $linkTriggers) {
-		$linkTriggerDbFields = array('linktriggerid' => null);
+		$linkTriggerDbFields = ['linktriggerid' => null];
 
 		$colorValidator = new CColorValidator();
 
@@ -484,13 +484,13 @@ abstract class CMapElement extends CApiService {
 
 		$linkTriggerIds = zbx_objectValues($linkTriggers, 'linktriggerid');
 
-		DB::delete('sysmaps_link_triggers', array('linktriggerid' => $linkTriggerIds));
+		DB::delete('sysmaps_link_triggers', ['linktriggerid' => $linkTriggerIds]);
 
-		return array('linktriggerids' => $linkTriggerIds);
+		return ['linktriggerids' => $linkTriggerIds];
 	}
 
 	protected function validateDeleteLinkTriggers(array $linkTriggers) {
-		$linktriggerDbFields = array('linktriggerid' => null);
+		$linktriggerDbFields = ['linktriggerid' => null];
 
 		foreach ($linkTriggers as $linkTrigger) {
 			if (!check_db_fields($linktriggerDbFields, $linkTrigger)) {

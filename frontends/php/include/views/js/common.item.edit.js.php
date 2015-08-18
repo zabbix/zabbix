@@ -3,7 +3,7 @@
 /*
  * Visibility
  */
-$this->data['typeVisibility'] = array();
+$this->data['typeVisibility'] = [];
 $i = 0;
 foreach ($this->data['delay_flex'] as $delayFlex) {
 	if (!isset($delayFlex['delay']) && !isset($delayFlex['period'])) {
@@ -112,26 +112,26 @@ foreach ($this->data['types'] as $type => $label) {
 				? ZBX_DEFAULT_KEY_DB_MONITOR_DISCOVERY
 				: ZBX_DEFAULT_KEY_DB_MONITOR;
 			zbx_subarray_push($this->data['typeVisibility'], $type,
-				array('id' => 'key', 'defaultValue' => $defaultKey)
+				['id' => 'key', 'defaultValue' => $defaultKey]
 			);
 			break;
 		case ITEM_TYPE_SSH:
 			zbx_subarray_push($this->data['typeVisibility'], $type,
-				array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH)
+				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_SSH]
 			);
 			break;
 		case ITEM_TYPE_TELNET:
 			zbx_subarray_push($this->data['typeVisibility'], $type,
-				array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET)
+				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_TELNET]
 			);
 			break;
 		case ITEM_TYPE_JMX:
 			zbx_subarray_push($this->data['typeVisibility'], $type,
-				array('id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX)
+				['id' => 'key', 'defaultValue' => ZBX_DEFAULT_KEY_JMX]
 			);
 			break;
 		default:
-			zbx_subarray_push($this->data['typeVisibility'], $type, array('id' => 'key', 'defaultValue' => ''));
+			zbx_subarray_push($this->data['typeVisibility'], $type, ['id' => 'key', 'defaultValue' => '']);
 	}
 }
 foreach ($this->data['types'] as $type => $label) {
@@ -153,15 +153,15 @@ foreach ($this->data['types'] as $type => $label) {
 }
 
 // disable dropdown items for calculated and aggregate items
-foreach (array(ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE) as $type) {
+foreach ([ITEM_TYPE_CALCULATED, ITEM_TYPE_AGGREGATE] as $type) {
 	// set to disable character, log and text items in value type
-	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT), 'value_type');
+	zbx_subarray_push($this->data['typeDisable'], $type, [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT], 'value_type');
 
 	// disable octal, hexadecimal and boolean items in data_type; Necessary for Numeric (unsigned) value type only
-	zbx_subarray_push($this->data['typeDisable'], $type, array(ITEM_DATA_TYPE_OCTAL, ITEM_DATA_TYPE_HEXADECIMAL, ITEM_DATA_TYPE_BOOLEAN), 'data_type');
+	zbx_subarray_push($this->data['typeDisable'], $type, [ITEM_DATA_TYPE_OCTAL, ITEM_DATA_TYPE_HEXADECIMAL, ITEM_DATA_TYPE_BOOLEAN], 'data_type');
 }
 
-$this->data['securityLevelVisibility'] = array();
+$this->data['securityLevelVisibility'] = [];
 zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'snmpv3_authprotocol');
 zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'row_snmpv3_authprotocol');
 zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, 'snmpv3_authpassphrase');
@@ -175,7 +175,7 @@ zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLE
 zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'snmpv3_privpassphrase');
 zbx_subarray_push($this->data['securityLevelVisibility'], ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV, 'row_snmpv3_privpassphrase');
 
-$this->data['authTypeVisibility'] = array();
+$this->data['authTypeVisibility'] = [];
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'row_publickey');
 zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'privatekey');
@@ -213,8 +213,8 @@ zbx_subarray_push($this->data['authTypeVisibility'], ITEM_AUTHTYPE_PUBLICKEY, 'r
 		jQuery('#type')
 			.change(function() {
 				// update the interface select with each item type change
-				var itemIntefaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
-				organizeInterfaces(itemIntefaceTypes[parseInt(jQuery(this).val())]);
+				var itemInterfaceTypes = <?php echo CJs::encodeJson(itemTypeInterface()); ?>;
+				organizeInterfaces(itemInterfaceTypes[parseInt(jQuery(this).val())]);
 
 				setAuthTypeLabel();
 			})

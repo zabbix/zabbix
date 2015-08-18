@@ -30,13 +30,13 @@ $page['type'] = detect_page_type(PAGE_TYPE_IMAGE);
 require_once dirname(__FILE__).'/include/page_header.php';
 
 //	VAR		TYPE	OPTIONAL 	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'css' =>		array(T_ZBX_INT, O_OPT, P_SYS, null,				null),
-	'imageid' =>	array(T_ZBX_STR, O_OPT, P_SYS, null,				null),
-	'iconid' =>		array(T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null),
-	'width' =>		array(T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null),
-	'height' =>		array(T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null),
-);
+$fields = [
+	'css' =>		[T_ZBX_INT, O_OPT, P_SYS, null,				null],
+	'imageid' =>	[T_ZBX_STR, O_OPT, P_SYS, null,				null],
+	'iconid' =>		[T_ZBX_INT, O_OPT, P_SYS, DB_ID,				null],
+	'width' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
+	'height' =>		[T_ZBX_INT, O_OPT, P_SYS, BETWEEN(1, 2000),	null],
+];
 check_fields($fields);
 
 $resize = false;
@@ -52,11 +52,11 @@ if (isset($_REQUEST['css'])) {
 			' width: 50px;'.
 			' background-image: url("images/general/no_icon.png"); }'."\n";
 
-	$images = API::Image()->get(array(
-		'output' => array('imageid'),
-		'filter' => array('imagetype' => IMAGE_TYPE_ICON),
+	$images = API::Image()->get([
+		'output' => ['imageid'],
+		'filter' => ['imagetype' => IMAGE_TYPE_ICON],
 		'select_image' => true
-	));
+	]);
 	foreach ($images as $image) {
 		$image['image'] = base64_decode($image['image']);
 		$ico = imagecreatefromstring($image['image']);

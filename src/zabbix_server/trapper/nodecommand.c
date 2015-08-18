@@ -81,7 +81,7 @@ fail:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_parse *jp)
+int	node_process_command(zbx_socket_t *sock, const char *data, struct zbx_json_parse *jp)
 {
 	char		*result = NULL, *send = NULL, tmp[64];
 	int		ret = FAIL;

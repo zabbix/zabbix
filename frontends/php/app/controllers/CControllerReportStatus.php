@@ -35,7 +35,7 @@ class CControllerReportStatus extends CController {
 
 	protected function doAction() {
 		// no data is passed to the view
-		$response = new CControllerResponseData(array());
+		$response = new CControllerResponseData([]);
 		$response->setTitle(_('Status of Zabbix'));
 		$this->setResponse($response);
 	}

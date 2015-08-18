@@ -33,7 +33,7 @@
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
 
-static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
+static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
 	const char	*__function_name = "connect_to_proxy";
 	int		ret;
@@ -43,7 +43,7 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
 
 	if (FAIL == (ret = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, proxy->addr, proxy->port, timeout)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_ERR, "cannot connect to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
 		ret = NETWORK_ERROR;
 	}
 
@@ -52,7 +52,7 @@ static int	connect_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, int timeout)
 	return ret;
 }
 
-static int	send_data_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, const char *data)
+static int	send_data_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, const char *data)
 {
 	const char	*__function_name = "send_data_to_proxy";
 	int		ret;
@@ -61,7 +61,7 @@ static int	send_data_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, const char *dat
 
 	if (FAIL == (ret = zbx_tcp_send(sock, data)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy \"%s\": %s", proxy->host, zbx_tcp_strerror());
+		zabbix_log(LOG_LEVEL_ERR, "cannot send data to proxy \"%s\": %s", proxy->host, zbx_socket_strerror());
 
 		ret = NETWORK_ERROR;
 	}
@@ -71,7 +71,7 @@ static int	send_data_to_proxy(DC_PROXY *proxy, zbx_sock_t *sock, const char *dat
 	return ret;
 }
 
-static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_sock_t *sock)
+static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_socket_t *sock)
 {
 	const char	*__function_name = "recv_data_from_proxy";
 	int		ret;
@@ -79,7 +79,10 @@ static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_sock_t *sock)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	if (FAIL == (ret = zbx_tcp_recv(sock)))
-		zabbix_log(LOG_LEVEL_ERR, "cannot obtain data from proxy \"%s\": %s", proxy->host, zbx_tcp_strerror());
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot obtain data from proxy \"%s\": %s", proxy->host,
+				zbx_socket_strerror());
+	}
 	else
 		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": %s", proxy->host, sock->buffer);
 
@@ -88,7 +91,7 @@ static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_sock_t *sock)
 	return ret;
 }
 
-static void	disconnect_proxy(zbx_sock_t *sock)
+static void	disconnect_proxy(zbx_socket_t *sock)
 {
 	const char	*__function_name = "disconnect_proxy";
 
@@ -118,7 +121,7 @@ static void	disconnect_proxy(zbx_sock_t *sock)
 static int	get_data_from_proxy(DC_PROXY *proxy, const char *request, char **data)
 {
 	const char	*__function_name = "get_data_from_proxy";
-	zbx_sock_t	s;
+	zbx_socket_t	s;
 	struct zbx_json	j;
 	int		ret = FAIL;
 
@@ -167,7 +170,7 @@ static int	process_proxy(void)
 	int			num, i, ret;
 	struct zbx_json		j;
 	struct zbx_json_parse	jp, jp_data;
-	zbx_sock_t		s;
+	zbx_socket_t		s;
 	char			*answer = NULL, *port = NULL;
 	time_t			now;
 	unsigned char		update_nextcheck;

@@ -77,7 +77,7 @@ function get_item_logtype_style($logtype) {
  * @return array|string
  */
 function item_type2str($type = null) {
-	$types = array(
+	$types = [
 		ITEM_TYPE_ZABBIX => _('Zabbix agent'),
 		ITEM_TYPE_ZABBIX_ACTIVE => _('Zabbix agent (active)'),
 		ITEM_TYPE_SIMPLE => _('Simple check'),
@@ -96,7 +96,7 @@ function item_type2str($type = null) {
 		ITEM_TYPE_JMX => _('JMX agent'),
 		ITEM_TYPE_CALCULATED => _('Calculated'),
 		ITEM_TYPE_HTTPTEST => _('Web monitoring')
-	);
+	];
 	if (is_null($type)) {
 		return $types;
 	}
@@ -132,12 +132,12 @@ function itemValueTypeString($valueType) {
 }
 
 function item_data_type2str($type = null) {
-	$types = array(
+	$types = [
 		ITEM_DATA_TYPE_BOOLEAN => _('Boolean'),
 		ITEM_DATA_TYPE_OCTAL => _('Octal'),
 		ITEM_DATA_TYPE_DECIMAL => _('Decimal'),
 		ITEM_DATA_TYPE_HEXADECIMAL => _('Hexadecimal')
-	);
+	];
 	if (is_null($type)) {
 		return $types;
 	}
@@ -150,10 +150,10 @@ function item_data_type2str($type = null) {
 }
 
 function item_status2str($type = null) {
-	$types = array(
+	$types = [
 		ITEM_STATUS_ACTIVE => _('Enabled'),
 		ITEM_STATUS_DISABLED => _('Disabled')
-	);
+	];
 	if (is_null($type)) {
 		return $types;
 	}
@@ -176,10 +176,10 @@ function item_status2str($type = null) {
  * @return array|string
  */
 function itemState($state = null) {
-	$states = array(
+	$states = [
 		ITEM_STATE_NORMAL => _('Normal'),
 		ITEM_STATE_NOTSUPPORTED => _('Not supported')
-	);
+	];
 
 	if ($state === null) {
 		return $states;
@@ -223,13 +223,15 @@ function itemIndicator($status, $state = null) {
  */
 function itemIndicatorStyle($status, $state = null) {
 	if ($status == ITEM_STATUS_ACTIVE) {
-		return ($state == ITEM_STATE_NOTSUPPORTED) ? 'unknown' : 'enabled';
+		return ($state == ITEM_STATE_NOTSUPPORTED) ?
+			ZBX_STYLE_GREY :
+			ZBX_STYLE_GREEN;
 	}
 	elseif ($status == ITEM_STATUS_DISABLED) {
-		return 'disabled';
+		return ZBX_STYLE_RED;
 	}
 
-	return 'unknown';
+	return ZBX_STYLE_GREY;
 }
 
 /**
@@ -241,7 +243,7 @@ function itemIndicatorStyle($status, $state = null) {
  * @param string $sortorder
  */
 function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
-	$sort = array();
+	$sort = [];
 
 	foreach ($items as $key => $item) {
 		if ($item['status'] == ITEM_STATUS_ACTIVE) {
@@ -261,7 +263,7 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
 		arsort($sort);
 	}
 
-	$sortedItems = array();
+	$sortedItems = [];
 	foreach ($sort as $key => $val) {
 		$sortedItems[$key] = $items[$key];
 	}
@@ -276,18 +278,18 @@ function orderItemsByStatus(array &$items, $sortorder = ZBX_SORT_UP) {
  * @return null
  */
 function interfaceType2str($type) {
-	$interfaceGroupLabels = array(
+	$interfaceGroupLabels = [
 		INTERFACE_TYPE_AGENT => _('Agent'),
 		INTERFACE_TYPE_SNMP => _('SNMP'),
 		INTERFACE_TYPE_JMX => _('JMX'),
 		INTERFACE_TYPE_IPMI => _('IPMI'),
-	);
+	];
 
 	return isset($interfaceGroupLabels[$type]) ? $interfaceGroupLabels[$type] : null;
 }
 
 function itemTypeInterface($type = null) {
-	$types = array(
+	$types = [
 		ITEM_TYPE_SNMPV1 => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_SNMPV2C => INTERFACE_TYPE_SNMP,
 		ITEM_TYPE_SNMPV3 => INTERFACE_TYPE_SNMP,
@@ -299,7 +301,7 @@ function itemTypeInterface($type = null) {
 		ITEM_TYPE_SSH => INTERFACE_TYPE_ANY,
 		ITEM_TYPE_TELNET => INTERFACE_TYPE_ANY,
 		ITEM_TYPE_JMX => INTERFACE_TYPE_JMX
-	);
+	];
 	if (is_null($type)) {
 		return $types;
 	}
@@ -333,31 +335,31 @@ function update_item_status($itemids, $status) {
 }
 
 function copyItemsToHosts($srcItemIds, $dstHostIds) {
-	$srcItems = API::Item()->get(array(
+	$srcItems = API::Item()->get([
 		'itemids' => $srcItemIds,
-		'output' => array(
+		'output' => [
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
 			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
 			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
 			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'port',
 			'description', 'inventory_link'
-		),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectApplications' => array('applicationid')
-	));
+		],
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+		'selectApplications' => ['applicationid']
+	]);
 
-	$dstHosts = API::Host()->get(array(
-		'output' => array('hostid', 'host', 'status'),
-		'selectInterfaces' => array('interfaceid', 'type', 'main'),
+	$dstHosts = API::Host()->get([
+		'output' => ['hostid', 'host', 'status'],
+		'selectInterfaces' => ['interfaceid', 'type', 'main'],
 		'hostids' => $dstHostIds,
 		'preservekeys' => true,
 		'nopermissions' => true,
 		'templated_hosts' => true
-	));
+	]);
 
 	foreach ($dstHosts as $dstHost) {
-		$interfaceids = array();
+		$interfaceids = [];
 		foreach ($dstHost['interfaces'] as $interface) {
 			if ($interface['main'] == 1) {
 				$interfaceids[$interface['type']] = $interface['interfaceid'];
@@ -368,7 +370,7 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 				$type = itemTypeInterface($srcItem['type']);
 
 				if ($type == INTERFACE_TYPE_ANY) {
-					foreach (array(INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI) as $itype) {
+					foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $itype) {
 						if (isset($interfaceids[$itype])) {
 							$srcItem['interfaceid'] = $interfaceids[$itype];
 							break;
@@ -395,28 +397,28 @@ function copyItemsToHosts($srcItemIds, $dstHostIds) {
 }
 
 function copyItems($srcHostId, $dstHostId) {
-	$srcItems = API::Item()->get(array(
+	$srcItems = API::Item()->get([
 		'hostids' => $srcHostId,
-		'output' => array(
+		'output' => [
 			'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history', 'trends', 'status', 'value_type',
 			'trapper_hosts', 'units', 'multiplier', 'delta', 'snmpv3_contextname', 'snmpv3_securityname',
 			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
 			'snmpv3_privpassphrase', 'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
 			'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey', 'flags', 'port',
 			'description', 'inventory_link'
-		),
+		],
 		'inherited' => false,
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
-		'selectApplications' => array('applicationid')
-	));
-	$dstHosts = API::Host()->get(array(
-		'output' => array('hostid', 'host', 'status'),
-		'selectInterfaces' => array('interfaceid', 'type', 'main'),
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
+		'selectApplications' => ['applicationid']
+	]);
+	$dstHosts = API::Host()->get([
+		'output' => ['hostid', 'host', 'status'],
+		'selectInterfaces' => ['interfaceid', 'type', 'main'],
 		'hostids' => $dstHostId,
 		'preservekeys' => true,
 		'nopermissions' => true,
 		'templated_hosts' => true
-	));
+	]);
 	$dstHost = reset($dstHosts);
 
 	foreach ($srcItems as &$srcItem) {
@@ -440,28 +442,39 @@ function copyItems($srcHostId, $dstHostId) {
 	return API::Item()->create($srcItems);
 }
 
-function copyApplications($srcHostId, $dstHostId) {
-	$apps_to_clone = API::Application()->get(array(
-		'hostids' => $srcHostId,
-		'output' => API_OUTPUT_EXTEND,
-		'inherited' => false
-	));
-	if (empty($apps_to_clone)) {
+/**
+ * Copy applications to a different host.
+ *
+ * @param string $source_hostid
+ * @param string $destination_hostid
+ *
+ * @return bool
+ */
+function copyApplications($source_hostid, $destination_hostid) {
+	$applications_to_create = API::Application()->get([
+		'output' => ['name'],
+		'hostids' => [$source_hostid],
+		'inherited' => false,
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+	]);
+
+	if (!$applications_to_create) {
 		return true;
 	}
 
-	foreach ($apps_to_clone as &$app) {
-		$app['hostid'] = $dstHostId;
-		unset($app['applicationid'], $app['templateid']);
+	foreach ($applications_to_create as &$application) {
+		$application['hostid'] = $destination_hostid;
+		unset($application['applicationid'], $application['templateid']);
 	}
-	return API::Application()->create($apps_to_clone);
+
+	return (bool) API::Application()->create($applications_to_create);
 }
 
 function activate_item($itemids) {
 	zbx_value2array($itemids);
 
 	// first update status for child items
-	$child_items = array();
+	$child_items = [];
 	$db_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionInt('i.templateid', $itemids));
 	while ($item = DBfetch($db_items)) {
 		$child_items[$item['itemid']] = $item['itemid'];
@@ -476,7 +489,7 @@ function disable_item($itemids) {
 	zbx_value2array($itemids);
 
 	// first update status for child items
-	$chd_items = array();
+	$chd_items = [];
 	$db_tmp_items = DBselect('SELECT i.itemid,i.hostid FROM items i WHERE '.dbConditionInt('i.templateid', $itemids));
 	while ($db_tmp_item = DBfetch($db_tmp_items)) {
 		$chd_items[$db_tmp_item['itemid']] = $db_tmp_item['itemid'];
@@ -485,24 +498,6 @@ function disable_item($itemids) {
 		disable_item($chd_items); // Recursion !!!
 	}
 	return update_item_status($itemids, ITEM_STATUS_DISABLED);
-}
-
-function get_item_by_key($key, $host = '') {
-	$item = false;
-	$sql_from = '';
-	$sql_where = '';
-	if (!empty($host)) {
-		$sql_from = ',hosts h ';
-		$sql_where = ' AND h.host='.zbx_dbstr($host).' AND i.hostid=h.hostid ';
-	}
-	$sql = 'SELECT DISTINCT i.*'.
-			' FROM items i '.$sql_from.
-			' WHERE i.key_='.zbx_dbstr($key).
-				$sql_where;
-	if ($item = DBfetch(DBselect($sql))) {
-		$item = $item;
-	}
-	return $item;
 }
 
 function get_item_by_itemid($itemid) {
@@ -550,7 +545,7 @@ function get_same_item_for_host($item, $dest_hostids) {
 	}
 
 	$same_item = null;
-	$same_items = array();
+	$same_items = [];
 
 	if (isset($itemid)) {
 		$db_items = DBselect(
@@ -643,32 +638,32 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 			' AND h.status='.HOST_STATUS_MONITORED.
 			' AND h.hostid=i.hostid'.
 			' AND i.status='.ITEM_STATUS_ACTIVE.
-			' AND '.dbConditionInt('i.flags', array(ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED)).
+			' AND '.dbConditionInt('i.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]).
 				$sqlWhere
 	));
 
 	$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
 
-	CArrayHelper::sort($dbItems, array(
-		array('field' => 'name_expanded', 'order' => ZBX_SORT_UP),
-		array('field' => 'itemid', 'order' => ZBX_SORT_UP)
-	));
+	CArrayHelper::sort($dbItems, [
+		['field' => 'name_expanded', 'order' => ZBX_SORT_UP],
+		['field' => 'itemid', 'order' => ZBX_SORT_UP]
+	]);
 
 	// fetch latest values
 	$history = Manager::History()->getLast(zbx_toHash($dbItems, 'itemid'), 1, ZBX_HISTORY_PERIOD);
 
 	// fetch data for the host JS menu
-	$hosts = API::Host()->get(array(
-		'output' => array('name', 'hostid', 'status'),
+	$hosts = API::Host()->get([
+		'output' => ['name', 'hostid', 'status'],
 		'monitored_hosts' => true,
 		'hostids' => $hostIds,
 		'with_monitored_items' => true,
 		'preservekeys' => true,
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
-	));
+	]);
 
-	$items = array();
+	$items = [];
 	foreach ($dbItems as $dbItem) {
 		$name = $dbItem['name_expanded'];
 
@@ -680,7 +675,7 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 				|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
 					|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
 						&& $dbItem['priority'] > $items[$name][$dbItem['hostname']]['severity']))) {
-			$items[$name][$dbItem['hostname']] = array(
+			$items[$name][$dbItem['hostname']] = [
 				'itemid' => $dbItem['itemid'],
 				'value_type' => $dbItem['value_type'],
 				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
@@ -690,11 +685,11 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 				'severity' => $dbItem['priority'],
 				'tr_value' => $dbItem['tr_value'],
 				'triggerid' => $dbItem['triggerid']
-			);
+			];
 		}
 	}
 
-	$table = new CTableInfo(_('No items found.'));
+	$table = new CTableInfo();
 	if (empty($hostNames)) {
 		return $table;
 	}
@@ -703,14 +698,14 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	order_result($hostNames);
 
 	if ($viewMode == STYLE_TOP) {
-		$header = array(new CCol(_('Items'), 'center'));
+		$header = [_('Items')];
 		foreach ($hostNames as $hostName) {
-			$header[] = new CCol($hostName, 'vertical_rotation');
+			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
 		}
-		$table->setHeader($header, 'vertical_header');
+		$table->setHeader($header);
 
 		foreach ($items as $descr => $ithosts) {
-			$tableRow = array(nbsp($descr));
+			$tableRow = [nbsp($descr)];
 			foreach ($hostNames as $hostName) {
 				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
@@ -720,19 +715,20 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 	else {
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
-		$header = array(new CCol(_('Hosts'), 'center'));
+		$header = [_('Hosts')];
 		foreach ($items as $descr => $ithosts) {
-			$header[] = new CCol($descr, 'vertical_rotation');
+			$header[] = (new CColHeader($descr))->addClass('vertical_rotation');
 		}
-		$table->setHeader($header, 'vertical_header');
+		$table->setHeader($header);
 
 		foreach ($hostNames as $hostId => $hostName) {
 			$host = $hosts[$hostId];
 
-			$name = new CSpan($host['name'], 'link_menu');
-			$name->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
+			$name = (new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$hostId]));
 
-			$tableRow = array(new CCol($name));
+			$tableRow = [(new CCol($name))->addClass(ZBX_STYLE_NOWRAP)];
 			foreach ($items as $ithosts) {
 				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
@@ -744,9 +740,9 @@ function getItemsDataOverview($hostIds, array $applicationIds = null, $viewMode)
 }
 
 function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
-	$css = '';
-	$value = '-';
 	$ack = null;
+	$css = '';
+	$value = UNKNOWN_VALUE;
 
 	if (isset($ithosts[$hostName])) {
 		$item = $ithosts[$hostName];
@@ -755,21 +751,26 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 			$css = getSeverityStyle($item['severity']);
 			$ack = get_last_event_by_triggerid($item['triggerid']);
 			$ack = ($ack['acknowledged'] == 1)
-				? array(SPACE, new CImg('images/general/tick.png', 'ack'))
+				? [SPACE, (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN)]
 				: null;
 		}
 
-		$value = ($item['value'] !== null) ? formatHistoryValue($item['value'], $item) : UNKNOWN_VALUE;
+		if ($item['value'] !== null) {
+			$value = formatHistoryValue($item['value'], $item);
+		}
 	}
 
-	if ($value != '-') {
-		$value = new CSpan($value, 'link');
+	if ($value != UNKNOWN_VALUE) {
+		$value = $value;
 	}
 
-	$column = new CCol(array($value, $ack), $css);
+	$column = (new CCol([$value, $ack]))->addClass($css);
 
 	if (isset($ithosts[$hostName])) {
-		$column->setMenuPopup(CMenuPopupHelper::getHistory($item));
+		$column
+			->setMenuPopup(CMenuPopupHelper::getHistory($item))
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
+			->addClass(ZBX_STYLE_NOWRAP);
 	}
 
 	$tableRow[] = $column;
@@ -789,7 +790,7 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
  * @return array
  */
 function get_same_applications_for_host(array $applicationIds, $hostId) {
-	$applications = array();
+	$applications = [];
 
 	$dbApplications = DBselect(
 		'SELECT a1.applicationid AS dstappid,a2.applicationid AS srcappid'.
@@ -813,7 +814,7 @@ function get_same_applications_for_host(array $applicationIds, $hostId) {
  ******************************************************************************/
 function get_applications_by_itemid($itemids, $field = 'applicationid') {
 	zbx_value2array($itemids);
-	$result = array();
+	$result = [];
 	$db_applications = DBselect(
 		'SELECT DISTINCT app.'.$field.' AS result'.
 		' FROM applications app,items_applications ia'.
@@ -865,10 +866,10 @@ function formatHistoryValue($value, array $item, $trim = true) {
 
 	// format value
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
-		$value = convert_units(array(
+		$value = convert_units([
 				'value' => $value,
 				'units' => $item['units']
-		));
+		]);
 	}
 	elseif ($item['value_type'] != ITEM_VALUE_TYPE_STR
 		&& $item['value_type'] != ITEM_VALUE_TYPE_TEXT
@@ -914,7 +915,7 @@ function formatHistoryValue($value, array $item, $trim = true) {
  */
 function getItemFunctionalValue($item, $function, $parameter) {
 	// check whether function is allowed
-	if (!in_array($function, array('min', 'max', 'avg')) || $parameter === '') {
+	if (!in_array($function, ['min', 'max', 'avg']) || $parameter === '') {
 		return UNRESOLVED_MACRO_STRING;
 	}
 
@@ -925,7 +926,7 @@ function getItemFunctionalValue($item, $function, $parameter) {
 	}
 
 	// allowed item types for min, max and avg function
-	$historyTables = array(ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint');
+	$historyTables = [ITEM_VALUE_TYPE_FLOAT => 'history', ITEM_VALUE_TYPE_UINT64 => 'history_uint'];
 
 	if (!isset($historyTables[$item['value_type']])) {
 		return UNRESOLVED_MACRO_STRING;
@@ -940,7 +941,7 @@ function getItemFunctionalValue($item, $function, $parameter) {
 			' HAVING COUNT(*)>0' // necessary because DBselect() return 0 if empty data set, for graph templates
 		);
 		if ($row = DBfetch($result)) {
-			return convert_units(array('value' => $row['value'], 'units' => $item['units']));
+			return convert_units(['value' => $row['value'], 'units' => $item['units']]);
 		}
 		// no data in history
 		else {

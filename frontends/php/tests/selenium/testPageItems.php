@@ -46,7 +46,7 @@ class testPageItems extends CWebTest {
 			$this->zbxTestTextPresent('Host list');
 			// Header
 			$this->zbxTestTextPresent(
-				array(
+				[
 					'Wizard',
 					'Name',
 					'Triggers',
@@ -58,14 +58,14 @@ class testPageItems extends CWebTest {
 					'Applications',
 					'Status',
 					'Error'
-				)
+				]
 			);
 		}
 		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
 			$this->zbxTestTextPresent('Template list');
 			// Header
 			$this->zbxTestTextPresent(
-				array(
+				[
 					'Wizard',
 					'Name',
 					'Triggers',
@@ -76,18 +76,18 @@ class testPageItems extends CWebTest {
 					'Type',
 					'Applications',
 					'Status'
-				)
+				]
 			);
 			$this->zbxTestTextNotPresent('Error');
 		}
 		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestDropdownHasOptions('action', array(
+		$this->zbxTestDropdownHasOptions('action', [
 				'Enable selected',
 				'Disable selected',
 				'Mass update',
 				'Copy selected to ...',
 				'Clear history for selected',
 				'Delete selected'
-			));
+			]);
 	}
 }

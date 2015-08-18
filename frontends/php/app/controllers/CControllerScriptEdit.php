@@ -26,7 +26,7 @@ class CControllerScriptEdit extends CController {
 	}
 
 	protected function checkInput() {
-		$fields = array(
+		$fields = [
 			'scriptid' =>				'db scripts.scriptid',
 			'name' =>					'db scripts.name',
 			'type' =>					'db scripts.type        |in '.ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT.','.ZBX_SCRIPT_TYPE_IPMI,
@@ -40,7 +40,7 @@ class CControllerScriptEdit extends CController {
 			'hgstype' =>				'                        in 0,1',
 			'confirmation' =>			'db scripts.confirmation',
 			'enable_confirmation' =>	'                        in 1'
-		);
+		];
 
 		$ret = $this->validateInput($fields);
 
@@ -57,11 +57,11 @@ class CControllerScriptEdit extends CController {
 		}
 
 		if ($this->hasInput('scriptid')) {
-			return (bool) API::Script()->get(array(
-				'output' => array(),
+			return (bool) API::Script()->get([
+				'output' => [],
 				'scriptids' => $this->getInput('scriptid'),
 				'editable' => true
-			));
+			]);
 		}
 
 		return true;
@@ -69,7 +69,7 @@ class CControllerScriptEdit extends CController {
 
 	protected function doAction() {
 		// default values
-		$data = array(
+		$data = [
 			'sid' => $this->getUserSID(),
 			'scriptid' => 0,
 			'name' => '',
@@ -84,16 +84,16 @@ class CControllerScriptEdit extends CController {
 			'confirmation' => '',
 			'enable_confirmation' => 0,
 			'hgstype' => 0
-		);
+		];
 
 		// get values from the dabatase
 		if ($this->hasInput('scriptid')) {
-			$scripts = API::Script()->get(array(
-				'output' => array('scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
+			$scripts = API::Script()->get([
+				'output' => ['scriptid', 'name', 'type', 'execute_on', 'command', 'description', 'usrgrpid',
 					'groupid', 'host_access', 'confirmation'
-				),
+				],
 				'scriptids' => $this->getInput('scriptid')
-			));
+			]);
 			$script = $scripts[0];
 
 			$data['scriptid'] = $script['scriptid'];
@@ -112,7 +112,7 @@ class CControllerScriptEdit extends CController {
 		}
 
 		// overwrite with input variables
-		$this->getInputs($data, array(
+		$this->getInputs($data, [
 			'name',
 			'type',
 			'execute_on',
@@ -125,29 +125,29 @@ class CControllerScriptEdit extends CController {
 			'confirmation',
 			'enable_confirmation',
 			'hgstype'
-		));
+		]);
 
 		// get host group
 		if ($data['groupid'] == 0) {
 			$data['hostgroup'] = null;
 		}
 		else {
-			$hostgroups = API::HostGroup()->get(array(
-				'groupids' => array($data['groupid']),
-				'output' => array('groupid', 'name')
-			));
+			$hostgroups = API::HostGroup()->get([
+				'groupids' => [$data['groupid']],
+				'output' => ['groupid', 'name']
+			]);
 			$hostgroup = $hostgroups[0];
 
-			$data['hostgroup'][] = array(
+			$data['hostgroup'][] = [
 				'id' => $hostgroup['groupid'],
 				'name' => $hostgroup['name']
-			);
+			];
 		}
 
 		// get list of user groups
-		$usergroups = API::UserGroup()->get(array(
-			'output' => array('usrgrpid', 'name')
-		));
+		$usergroups = API::UserGroup()->get([
+			'output' => ['usrgrpid', 'name']
+		]);
 		order_result($usergroups, 'name');
 		$data['usergroups'] = $usergroups;
 

@@ -19,70 +19,64 @@
 **/
 
 
-$overviewWidget = new CWidget();
-
-$typeComboBox = new CComboBox('type', $this->data['type'], 'submit()');
-$typeComboBox->addItem(SHOW_TRIGGERS, _('Triggers'));
-$typeComboBox->addItem(SHOW_DATA, _('Data'));
-
-$headerForm = new CForm('get');
-$headerForm->addItem(array(_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()));
-$headerForm->addItem(array(SPACE, _('Type'), SPACE, $typeComboBox));
-
-$overviewWidget->addHeader(_('Overview'), $headerForm);
-
 // hint table
-$hintTable = new CTableInfo(null, 'tableinfo tableinfo-overview-hint');
+$help_hint = (new CList())
+	->addClass(ZBX_STYLE_NOTIF_BODY)
+	->addStyle('min-width: '.ZBX_OVERVIEW_HELP_MIN_WIDTH.'px');
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$hintTable->addRow(array(getSeverityCell($severity, $this->data['config']), _('PROBLEM')));
+	$help_hint->addItem([
+		(new CDiv())
+			->addClass(ZBX_STYLE_NOTIF_INDIC)
+			->addClass(getSeverityStyle($severity)),
+		new CTag('h4', true, getSeverityName($severity, $data['config'])),
+		(new CTag('p', true, _('PROBLEM')))->addClass(ZBX_STYLE_GREY)
+	]);
 }
-$hintTable->addRow(array(new CCol(SPACE), _('OK or no trigger')));
-
-$help = new CIcon(null, 'iconhelp');
-$help->setHint($hintTable);
 
 // header right
-$overviewWidget->addPageHeader(_('OVERVIEW'), array(
-	get_icon('fullscreen', array('fullscreen' => $this->data['fullscreen'])),
-	SPACE,
-	$help
-));
+$help = get_icon('overviewhelp');
+$help->setHint($help_hint);
 
-// header left
-$styleComboBox = new CComboBox('view_style', $this->data['view_style'], 'submit()');
-$styleComboBox->addItem(STYLE_TOP, _('Top'));
-$styleComboBox->addItem(STYLE_LEFT, _('Left'));
-
-$hostLocationForm = new CForm('get');
-$hostLocationForm->addVar('groupid', $this->data['groupid']);
-$hostLocationForm->additem(array(_('Hosts location'), SPACE, $styleComboBox));
-
-$overviewWidget->addHeader($hostLocationForm);
+$widget = (new CWidget())
+	->setTitle(_('Overview'))
+	->setControls((new CForm('get'))
+		->cleanItems()
+		->addItem((new CList())
+			->addItem([_('Group'), SPACE, $this->data['pageFilter']->getGroupsCB()])
+			->addItem([_('Type'), SPACE, new CComboBox('type', $this->data['type'], 'submit()', [
+				SHOW_TRIGGERS => _('Triggers'),
+				SHOW_DATA => _('Data')
+			])])
+			->addItem([_('Hosts location'), SPACE, new CComboBox('view_style', $this->data['view_style'], 'submit()', [
+				STYLE_TOP => _('Top'),
+				STYLE_LEFT => _('Left')
+			])])
+			->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['fullscreen']]))
+			->addItem($help)
+		)
+	);
 
 // filter
-$filterForm = new CFormTable(null, null, 'get');
-$filterForm->setTableClass('formtable old-filter');
-$filterForm->setAttribute('name', 'zbx_filter');
-$filterForm->setAttribute('id', 'zbx_filter');
-$filterForm->addVar('fullscreen', $this->data['fullscreen']);
-$filterForm->addVar('groupid', $this->data['groupid']);
-$filterForm->addVar('hostid', $this->data['hostid']);
+$filter = (new CFilter('web.overview.filter.state'))
+	->addVar('fullscreen', $this->data['fullscreen'])
+	->addVar('groupid', $this->data['groupid'])
+	->addVar('hostid', $this->data['hostid']);
+
+$column = new CFormList();
 
 // application
-$filterForm->addRow(_('Filter by application'), array(
-	new CTextBox('application', $this->data['filter']['application'], 40),
-	new CButton('application_name', _('Select'),
-		'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application&with_applications=1'.
-		'&dstfrm='.$filterForm->getName().'");',
-		'button-form'
-	)
-));
+$column->addRow(_('Filter by application'), [
+	(new CTextBox('application', $this->data['filter']['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CButton('application_name', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
+			'&with_applications=1&dstfrm=zbx_filter");')
+]);
 
-// filter buttons
-$filterForm->addItemToBottomRow(new CSubmit('filter_set', _('Filter'), 'chkbxRange.clearSelectedOnFilterChange();'));
-$filterForm->addItemToBottomRow(new CSubmit('filter_rst', _('Reset'), 'chkbxRange.clearSelectedOnFilterChange();'));
+$filter->addColumn($column);
 
-$overviewWidget->addFlicker($filterForm, CProfile::get('web.overview.filter.state', 0));
+$widget->addItem($filter);
 
 // data table
 if ($data['pageFilter']->groupsSelected) {
@@ -91,9 +85,9 @@ if ($data['pageFilter']->groupsSelected) {
 	);
 }
 else {
-	$dataTable = new CTableInfo(_('No items found.'));
+	$dataTable = new CTableInfo();
 }
 
-$overviewWidget->addItem($dataTable);
+$widget->addItem($dataTable);
 
-return $overviewWidget;
+return $widget;

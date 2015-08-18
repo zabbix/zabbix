@@ -26,65 +26,64 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 
 $page['title'] = _('Configuration of triggers');
 $page['file'] = 'triggers.php';
-$page['hist_arg'] = array('hostid', 'groupid');
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
-$fields = array(
-	'groupid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'hostid' =>				array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null),
-	'triggerid' =>			array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'),
-	'copy_type' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN(array(COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_HOST_GROUP)), 'isset({copy})'),
-	'copy_mode' =>			array(T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null),
-	'type' =>				array(T_ZBX_INT, O_OPT, null,	IN('0,1'),	null),
-	'description' =>		array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')),
-	'expression' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')),
-	'priority' =>			array(T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'),
-	'comments' =>			array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'url' =>				array(T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'),
-	'status' =>				array(T_ZBX_STR, O_OPT, null,	null,		null),
-	'input_method' =>		array(T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'),
-	'expr_temp' =>			array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Expression')),
-	'expr_target_single' => array(T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'),
-	'dependencies' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'new_dependency' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependency})'),
-	'g_triggerid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_targetid' =>		array(T_ZBX_INT, O_OPT, null,	DB_ID,		null),
-	'copy_groupid' =>		array(T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'),
-	'showdisabled' =>		array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
-	'visible' =>			array(T_ZBX_STR, O_OPT, null,	null,		null),
+$fields = [
+	'groupid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'hostid' =>				[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		null],
+	'triggerid' =>			[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'(isset({form}) && ({form} == "update"))'],
+	'copy_type' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN([COPY_TYPE_TO_HOST, COPY_TYPE_TO_TEMPLATE, COPY_TYPE_TO_HOST_GROUP]), 'isset({copy})'],
+	'copy_mode' =>			[T_ZBX_INT, O_OPT, P_SYS,	IN('0'),	null],
+	'type' =>				[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
+	'description' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Name')],
+	'expression' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Expression')],
+	'priority' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1,2,3,4,5'), 'isset({add}) || isset({update})'],
+	'comments' =>			[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'url' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'status' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'input_method' =>		[T_ZBX_INT, O_OPT, null,	NOT_EMPTY,	'isset({toggle_input_method})'],
+	'expr_temp' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({add_expression}) || isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))', _('Expression')],
+	'expr_target_single' => [T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'(isset({and_expression}) || isset({or_expression}) || isset({replace_expression}))'],
+	'dependencies' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'new_dependency' =>		[T_ZBX_INT, O_OPT, null,	DB_ID.'{}>0', 'isset({add_dependency})'],
+	'g_triggerid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'copy_targetid' =>		[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
+	'copy_groupid' =>		[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		'isset({copy}) && (isset({copy_type}) && {copy_type} == 0)'],
+	'showdisabled' =>		[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
+	'visible' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	// actions
-	'action' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT,
+	'action' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 								IN('"trigger.masscopyto","trigger.massdelete","trigger.massdisable",'.
 									'"trigger.massenable","trigger.massupdate","trigger.massupdateform"'
 								),
 								null
-							),
-	'toggle_input_method' =>array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'and_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'or_expression' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'replace_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'remove_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'test_expression' =>	array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add_dependency' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'group_enable' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'group_disable' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'group_delete' =>		array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'copy' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'clone' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'add' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'update' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'massupdate' =>			array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'delete' =>				array(T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null),
-	'cancel' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form' =>				array(T_ZBX_STR, O_OPT, P_SYS,	null,		null),
-	'form_refresh' =>		array(T_ZBX_INT, O_OPT, null,	null,		null),
+							],
+	'toggle_input_method' =>[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_expression' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'and_expression' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'or_expression' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'replace_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'remove_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'test_expression' =>	[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add_dependency' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_enable' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_disable' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'group_delete' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'copy' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'clone' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'add' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'update' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'massupdate' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'delete' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
+	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
+	'form_refresh' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>				array(T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null),
-	'sortorder' =>			array(T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null)
-);
+	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"description","priority","status"'),		null],
+	'sortorder' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+];
 $_REQUEST['showdisabled'] = getRequest('showdisabled', CProfile::get('web.triggers.showdisabled', 1));
 
 check_fields($fields);
@@ -96,12 +95,12 @@ $_REQUEST['type'] = isset($_REQUEST['type']) ? TRIGGER_MULT_EVENT_ENABLED : TRIG
 $triggerId = getRequest('triggerid');
 
 if ($triggerId !== null) {
-	$trigger = API::Trigger()->get(array(
-		'output' => array('triggerid'),
-		'triggerids' => array($triggerId),
-		'filter' => array('flags' => ZBX_FLAG_DISCOVERY_NORMAL),
+	$trigger = API::Trigger()->get([
+		'output' => ['triggerid'],
+		'triggerids' => [$triggerId],
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 		'editable' => true
-	));
+	]);
 
 	if (!$trigger) {
 		access_deny();
@@ -109,7 +108,7 @@ if ($triggerId !== null) {
 }
 
 // Validate permissions to a group of triggers for mass enable/disable actions.
-$triggerIds = getRequest('g_triggerid', array());
+$triggerIds = getRequest('g_triggerid', []);
 $triggerIds = zbx_toArray($triggerIds);
 
 if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
@@ -118,13 +117,13 @@ if ($triggerIds && !API::Trigger()->isWritable($triggerIds)) {
 
 // Validate permissions to group.
 $groupId = getRequest('groupid');
-if ($groupId && !API::HostGroup()->isWritable(array($groupId))) {
+if ($groupId && !API::HostGroup()->isWritable([$groupId])) {
 	access_deny();
 }
 
 // Validate permissions to host.
 $hostId = getRequest('hostid');
-if ($hostId && !API::Host()->isWritable(array($hostId))) {
+if ($hostId && !API::Host()->isWritable([$hostId])) {
 	access_deny();
 }
 
@@ -154,35 +153,37 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['triggerid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$trigger = array(
+	$trigger = [
 		'expression' => getRequest('expression'),
 		'description' => getRequest('description'),
-		'priority' => getRequest('priority'),
-		'status' => getRequest('status'),
-		'type' => getRequest('type'),
-		'comments' => getRequest('comments'),
 		'url' => getRequest('url'),
-		'dependencies' => zbx_toObject(getRequest('dependencies', array()), 'triggerid')
-	);
+		'status' => getRequest('status'),
+		'priority' => getRequest('priority'),
+		'comments' => getRequest('comments'),
+		'type' => getRequest('type'),
+		'dependencies' => zbx_toObject(getRequest('dependencies', []), 'triggerid')
+	];
 
 	if (hasRequest('update')) {
 		// update only changed fields
-		$oldTrigger = API::Trigger()->get(array(
-			'triggerids' => getRequest('triggerid'),
-			'output' => API_OUTPUT_EXTEND,
-			'selectDependencies' => array('triggerid')
-		));
+
+		$oldTrigger = API::Trigger()->get([
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+			'selectDependencies' => ['triggerid'],
+			'triggerids' => getRequest('triggerid')
+		]);
 		if (!$oldTrigger) {
 			access_deny();
 		}
 
 		$oldTrigger = reset($oldTrigger);
 		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
+		$oldTrigger['expression'] = explode_exp($oldTrigger['expression']);
 
 		$newDependencies = $trigger['dependencies'];
 		$oldDependencies = $oldTrigger['dependencies'];
-		unset($trigger['dependencies']);
-		unset($oldTrigger['dependencies']);
+
+		unset($trigger['dependencies'], $oldTrigger['dependencies']);
 
 		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
 		$triggerToUpdate['triggerid'] = getRequest('triggerid');
@@ -202,11 +203,14 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		if ($updateDepencencies) {
 			$triggerToUpdate['dependencies'] = $newDependencies;
 		}
+
 		$result = API::Trigger()->update($triggerToUpdate);
+
 		show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 	}
 	else {
 		$result = API::Trigger()->create($trigger);
+
 		show_messages($result, _('Trigger added'), _('Cannot add trigger'));
 	}
 
@@ -218,7 +222,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 	DBstart();
 
-	$result = API::Trigger()->delete(array(getRequest('triggerid')));
+	$result = API::Trigger()->delete([getRequest('triggerid')]);
 	$result = DBend($result);
 
 	if ($result) {
@@ -229,7 +233,7 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['triggerid'])) {
 }
 elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])) {
 	if (!isset($_REQUEST['dependencies'])) {
-		$_REQUEST['dependencies'] = array();
+		$_REQUEST['dependencies'] = [];
 	}
 	foreach ($_REQUEST['new_dependency'] as $triggerid) {
 		if (!uint_in_array($triggerid, $_REQUEST['dependencies'])) {
@@ -237,28 +241,29 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 		}
 	}
 }
-elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && hasRequest('massupdate') && hasRequest('g_triggerid')) {
-	$visible = getRequest('visible', array());
+elseif (hasRequest('action') && getRequest('action') === 'trigger.massupdate'
+		&& hasRequest('massupdate') && hasRequest('g_triggerid')) {
+	$result = true;
+	$visible = getRequest('visible', []);
 
-	// update triggers
-	$triggersToUpdate = array();
-	foreach (getRequest('g_triggerid') as $triggerid) {
-		$trigger = array('triggerid' => $triggerid);
+	if ($visible) {
+		$triggersToUpdate = [];
 
-		if (isset($visible['priority'])) {
-			$trigger['priority'] = getRequest('priority');
+		foreach (getRequest('g_triggerid') as $triggerid) {
+			$trigger = ['triggerid' => $triggerid];
+
+			if (isset($visible['priority'])) {
+				$trigger['priority'] = getRequest('priority');
+			}
+			if (isset($visible['dependencies'])) {
+				$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', []), 'triggerid');
+			}
+
+			$triggersToUpdate[] = $trigger;
 		}
-		if (isset($visible['dependencies'])) {
-			$trigger['dependencies'] = zbx_toObject(getRequest('dependencies', array()), 'triggerid');
-		}
 
-		$triggersToUpdate[] = $trigger;
+		$result = (bool) API::Trigger()->update($triggersToUpdate);
 	}
-
-	DBstart();
-
-	$result = API::Trigger()->update($triggersToUpdate);
-	$result = DBend($result);
 
 	if ($result) {
 		unset($_REQUEST['form'], $_REQUEST['g_triggerid']);
@@ -266,24 +271,24 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.massupdate' && 
 	}
 	show_messages($result, _('Trigger updated'), _('Cannot update trigger'));
 }
-elseif (hasRequest('action') && str_in_array(getRequest('action'), array('trigger.massenable', 'trigger.massdisable')) && hasRequest('g_triggerid')) {
+elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.massenable', 'trigger.massdisable']) && hasRequest('g_triggerid')) {
 	$enable = (getRequest('action') == 'trigger.massenable');
 	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
-	$update = array();
+	$update = [];
 
 	// get requested triggers with permission check
-	$dbTriggers = API::Trigger()->get(array(
-		'output' => array('triggerid', 'status'),
+	$dbTriggers = API::Trigger()->get([
+		'output' => ['triggerid', 'status'],
 		'triggerids' => getRequest('g_triggerid'),
 		'editable' => true
-	));
+	]);
 
 	if ($dbTriggers) {
 		foreach ($dbTriggers as $dbTrigger) {
-			$update[] = array(
+			$update[] = [
 				'triggerid' => $dbTrigger['triggerid'],
 				'status' => $status
-			);
+			];
 		}
 
 		$result = API::Trigger()->update($update);
@@ -314,7 +319,7 @@ elseif (hasRequest('action') && getRequest('action') == 'trigger.masscopyto' && 
 		}
 		// host groups
 		else {
-			$hosts_ids = array();
+			$hosts_ids = [];
 			$group_ids = getRequest('copy_targetid');
 
 			$db_hosts = DBselect(
@@ -383,36 +388,41 @@ else {
 
 	$config = select_config();
 
-	$data = array(
+	$data = [
 		'showdisabled' => getRequest('showdisabled', 1),
-		'parent_discoveryid' => null,
-		'triggers' => array(),
+		'triggers' => [],
 		'sort' => $sortField,
 		'sortorder' => $sortOrder,
 		'config' => $config
-	);
+	];
 
 	CProfile::update('web.triggers.showdisabled', $data['showdisabled'], PROFILE_TYPE_INT);
 
-	$data['pageFilter'] = new CPageFilter(array(
-		'groups' => array('with_hosts_and_templates' => true, 'editable' => true),
-		'hosts' => array('templated_hosts' => true, 'editable' => true),
-		'triggers' => array('editable' => true),
+	$data['pageFilter'] = new CPageFilter([
+		'groups' => ['with_hosts_and_templates' => true, 'editable' => true],
+		'hosts' => ['templated_hosts' => true, 'editable' => true],
+		'triggers' => ['editable' => true],
 		'groupid' => getRequest('groupid'),
 		'hostid' => getRequest('hostid')
-	));
+	]);
 	$data['groupid'] = $data['pageFilter']->groupid;
 	$data['hostid'] = $data['pageFilter']->hostid;
 
 	// get triggers
 	if ($data['pageFilter']->hostsSelected) {
-		$options = array(
+		$options = [
 			'editable' => true,
-			'output' => array('triggerid'),
 			'sortfield' => $sortField,
-			'sortorder' => $sortOrder,
 			'limit' => $config['search_limit'] + 1
-		);
+		];
+
+		if ($sortField === 'status') {
+			$options['output'] = ['triggerid', 'status', 'state'];
+		}
+		else {
+			$options['output'] = ['triggerid', $sortField];
+		}
+
 		if (empty($data['showdisabled'])) {
 			$options['filter']['status'] = TRIGGER_STATUS_ENABLED;
 		}
@@ -427,19 +437,7 @@ else {
 
 	$_REQUEST['hostid'] = getRequest('hostid', $data['pageFilter']->hostid);
 
-	// paging
-	$data['paging'] = getPagingLine($data['triggers']);
-
-	$data['triggers'] = API::Trigger()->get(array(
-		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid'),
-		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => API_OUTPUT_EXTEND,
-		'selectItems' => array('itemid', 'hostid', 'key_', 'type', 'flags', 'status'),
-		'selectFunctions' => API_OUTPUT_EXTEND,
-		'selectDependencies' => array('triggerid', 'description'),
-		'selectDiscoveryRule' => API_OUTPUT_EXTEND
-	));
-
+	// sort for paging
 	if ($sortField === 'status') {
 		orderTriggersByStatus($data['triggers'], $sortOrder);
 	}
@@ -447,37 +445,52 @@ else {
 		order_result($data['triggers'], $sortField, $sortOrder);
 	}
 
-	$dependencyIds = array();
+	// paging
+	$data['paging'] = getPagingLine($data['triggers'], $sortOrder);
+
+	$data['triggers'] = API::Trigger()->get([
+		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state'],
+		'selectHosts' => ['hostid', 'host', 'name'],
+		'selectItems' => ['itemid', 'hostid', 'key_', 'type', 'flags', 'status'],
+		'selectFunctions' => ['functionid', 'itemid', 'function', 'parameter'],
+		'selectDependencies' => ['triggerid', 'description'],
+		'selectDiscoveryRule' => ['itemid', 'name'],
+		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
+	]);
+
+	// sort for displaying full results
+	if ($sortField === 'status') {
+		orderTriggersByStatus($data['triggers'], $sortOrder);
+	}
+	else {
+		order_result($data['triggers'], $sortField, $sortOrder);
+	}
+
+	$depTriggerIds = [];
 	foreach ($data['triggers'] as $trigger) {
 		foreach ($trigger['dependencies'] as $depTrigger) {
-			$dependencyIds[$depTrigger['triggerid']] = $depTrigger['triggerid'];
+			$depTriggerIds[$depTrigger['triggerid']] = true;
 		}
 	}
 
-	$dependencyTriggers = array();
-	if ($dependencyIds) {
-		$dependencyTriggers = API::Trigger()->get(array(
-			'triggerids' => $dependencyIds,
-			'output' => array('triggerid', 'flags', 'description', 'status'),
-			'selectHosts' => array('hostid', 'name'),
+	$dependencyTriggers = [];
+	if ($depTriggerIds) {
+		$dependencyTriggers = API::Trigger()->get([
+			'output' => ['triggerid', 'description', 'status', 'flags'],
+			'selectHosts' => ['hostid', 'name'],
+			'triggerids' => array_keys($depTriggerIds),
 			'preservekeys' => true
-		));
+		]);
 
-		// sort dependencies
 		foreach ($data['triggers'] as &$trigger) {
-			if (count($trigger['dependencies']) > 1) {
-				order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
-			}
+			order_result($trigger['dependencies'], 'description', ZBX_SORT_UP);
 		}
 		unset($trigger);
 
-		// sort dependency trigger hosts
-		foreach ($dependencyTriggers as &$trigger) {
-			if (count($dependencyTriggers[$trigger['triggerid']]['hosts']) > 1) {
-				order_result($dependencyTriggers[$trigger['triggerid']]['hosts'], 'name', ZBX_SORT_UP);
-			}
+		foreach ($dependencyTriggers as &$dependencyTrigger) {
+			order_result($dependencyTrigger['hosts'], 'name', ZBX_SORT_UP);
 		}
-		unset($trigger);
+		unset($dependencyTrigger);
 	}
 
 	$data['dependencyTriggers'] = $dependencyTriggers;
@@ -487,10 +500,10 @@ else {
 
 	// do not show 'Info' column, if it is a template
 	if ($data['hostid']) {
-		$data['showInfoColumn'] = (bool) API::Host()->get(array(
-			'output' => array(),
+		$data['showInfoColumn'] = (bool) API::Host()->get([
+			'output' => [],
 			'hostids' => $data['hostid']
-		));
+		]);
 	}
 	else {
 		$data['showInfoColumn'] = true;

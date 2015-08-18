@@ -85,7 +85,7 @@ struct	_DC_TRIGGER;
 #define HOST_HOST_LEN			MAX_ZBX_HOSTNAME_LEN
 #define HOST_HOST_LEN_MAX		(HOST_HOST_LEN + 1)
 #define HOST_NAME_LEN			128
-#define HOST_ERROR_LEN			128
+#define HOST_ERROR_LEN			2048
 #define HOST_IPMI_USERNAME_LEN		16
 #define HOST_IPMI_USERNAME_LEN_MAX	(HOST_IPMI_USERNAME_LEN + 1)
 #define HOST_IPMI_PASSWORD_LEN		20
@@ -306,27 +306,21 @@ typedef struct
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
-	char	*description;
-	char	*smtp_server;
-	char	*smtp_helo;
-	char	*smtp_email;
-	char	*exec_path;
-	char	*gsm_modem;
-	char	*username;
-	char	*passwd;
+	char			*description;
+	char			*smtp_server;
+	char			*smtp_helo;
+	char			*smtp_email;
+	char			*exec_path;
+	char			*gsm_modem;
+	char			*username;
+	char			*passwd;
+	unsigned short		smtp_port;
+	unsigned char		smtp_security;
+	unsigned char		smtp_verify_peer;
+	unsigned char		smtp_verify_host;
+	unsigned char		smtp_authentication;
 }
 DB_MEDIATYPE;
-
-typedef struct
-{
-	zbx_uint64_t	actionid;
-	char		*shortdata;
-	char		*longdata;
-	int		esc_period;
-	unsigned char	eventsource;
-	unsigned char	recovery_msg;
-}
-DB_ACTION;
 
 typedef struct
 {
@@ -550,6 +544,13 @@ int	DBtable_exists(const char *table_name);
 int	DBfield_exists(const char *table_name, const char *field_name);
 
 void	DBexecute_multiple_query(const char *query, const char *field_name, zbx_vector_uint64_t *ids);
+int	DBlock_record(const char *table, zbx_uint64_t id, const char *add_field, zbx_uint64_t add_id);
+int	DBlock_records(const char *table, const zbx_vector_uint64_t *ids);
+
+#define DBlock_hostid(id)			DBlock_record("hosts", id, NULL, 0)
+#define DBlock_druleid(id)			DBlock_record("drules", id, NULL, 0)
+#define DBlock_dcheckid(dcheckid, druleid)	DBlock_record("dchecks", dcheckid, "druleid", druleid)
+#define DBlock_hostids(ids)			DBlock_records("hosts", ids)
 
 void	DBdelete_groups(zbx_vector_uint64_t *groupids);
 

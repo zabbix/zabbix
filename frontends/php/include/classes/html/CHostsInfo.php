@@ -27,15 +27,14 @@ class CHostsInfo extends CTable {
 		$this->groupid = $groupid;
 		$this->style = null;
 
-		parent::__construct(null, 'hosts_info');
+		parent::__construct();
+		$this->addClass('hosts_info');
 		$this->setOrientation($style);
 	}
 
 	public function setOrientation($value) {
-		if ($value != STYLE_HORIZONTAL && $value != STYLE_VERTICAL) {
-			return $this->error('Incorrect value for SetOrientation "'.$value.'".');
-		}
 		$this->style = $value;
+		return $this;
 	}
 
 	public function bodyToString() {
@@ -44,10 +43,10 @@ class CHostsInfo extends CTable {
 		$total = 0;
 
 		// fetch accessible host ids
-		$hosts = API::Host()->get(array(
-			'output' => array('hostid'),
+		$hosts = API::Host()->get([
+			'output' => ['hostid'],
 			'preservekeys' => true
-		));
+		]);
 		$hostIds = array_keys($hosts);
 
 		if ($this->groupid != 0) {
@@ -108,20 +107,20 @@ class CHostsInfo extends CTable {
 			$header_str .= _('All groups');
 		}
 
-		$header = new CCol($header_str, 'header');
+		$header = new CCol($header_str);
 		if ($this->style == STYLE_HORIZONTAL) {
 			$header->setColspan(4);
 		}
 
 		$this->addRow($header);
 
-		$avail = new CCol($avail.'  '._('Available'), 'avail');
-		$notav = new CCol($notav.'  '._('Not available'), 'notav');
-		$uncn = new CCol($uncn.'  '._('Unknown'), 'uncn');
-		$total = new CCol($total.'  '._('Total'), 'total');
+		$avail = (new CCol($avail.'  '._('Available')))->addClass('avail');
+		$notav = (new CCol($notav.'  '._('Not available')))->addClass('notav');
+		$uncn = (new CCol($uncn.'  '._('Unknown')))->addClass('uncn');
+		$total = (new CCol($total.'  '._('Total')))->addClass('total');
 
 		if ($this->style == STYLE_HORIZONTAL) {
-			$this->addRow(array($avail, $notav, $uncn, $total));
+			$this->addRow([$avail, $notav, $uncn, $total]);
 		}
 		else {
 			$this->addRow($avail);

@@ -24,9 +24,9 @@ require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 class API_JSON_Map extends CZabbixTest {
 
 	public static function map_data() {
-		return array(
-			array(
-				array(array(
+		return [
+			[
+				[[
 					'name' => 'test_map_added_through_api_1',
 					'width' => 600,
 					'height' => 800,
@@ -42,10 +42,10 @@ class API_JSON_Map extends CZabbixTest {
 					'markelements' => 0,
 					'show_unack' => 0,
 					'severity_min' => 0,
-					'selements' => array()
-				)),
-			),
-		);
+					'selements' => []
+				]],
+			],
+		];
 	}
 
 	/**
@@ -76,9 +76,9 @@ class API_JSON_Map extends CZabbixTest {
 			// api call
 			$result = $this->api_acall(
 				'map.get',
-				array(
-					'filter' => array('name' => $map['name'])
-				),
+				[
+					'filter' => ['name' => $map['name']]
+				],
 				$debug
 			);
 			$map_api = reset($result['result']);

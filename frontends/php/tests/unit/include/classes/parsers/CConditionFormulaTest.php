@@ -31,16 +31,16 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testParseValidProvider() {
-		return array(
-			array('A'),
-			array('A and B'),
-			array('A or B'),
-			array('(A)'),
-			array('((A))'),
-			array('A and (B and C)'),
-			array('A and(B and C)'),
-			array('(A and B)and C'),
-		);
+		return [
+			['A'],
+			['A and B'],
+			['A or B'],
+			['(A)'],
+			['((A))'],
+			['A and (B and C)'],
+			['A and(B and C)'],
+			['(A and B)and C'],
+		];
 	}
 
 	/**
@@ -55,22 +55,22 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testParseInvalidProvider() {
-		return array(
-			array('a'),
-			array('A B'),
-			array('A and'),
-			array('A and or'),
-			array('A an'),
-			array('(A'),
-			array('A)'),
-			array('((A)'),
-			array('(A))'),
-			array('(A)B'),
-			array('A and (B and C'),
-			array('A andB'),
-			array('AandB'),
-			array('A and BandC'),
-		);
+		return [
+			['a'],
+			['A B'],
+			['A and'],
+			['A and or'],
+			['A an'],
+			['(A'],
+			['A)'],
+			['((A)'],
+			['(A))'],
+			['(A)B'],
+			['A and (B and C'],
+			['A andB'],
+			['AandB'],
+			['A and BandC'],
+		];
 	}
 
 	/**
@@ -85,12 +85,25 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function parseConstantsProvider() {
-		return array(
-			array('A', array('A')),
-			array('A and B', array('A', 'B')),
-			array('A and B or C', array('A', 'B', 'C')),
-			array('A and B or A', array('A', 'B')),
-		);
+		return [
+			['A', [
+				['value' => 'A', 'pos' => 0]
+			]],
+			['A and B', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'B', 'pos' => 6]
+			]],
+			['A and B or C', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'B', 'pos' => 6],
+				['value' => 'C', 'pos' => 11]
+			]],
+			['A and B or A', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'B', 'pos' => 6],
+				['value' => 'A', 'pos' => 11]
+			]]
+		];
 	}
 
 	/**

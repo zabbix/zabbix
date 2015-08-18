@@ -56,6 +56,9 @@
 /* the period of low memory warning messages */
 #define ZBX_VC_LOW_MEMORY_WARNING_PERIOD	(5 * SEC_PER_MIN)
 
+/* time period after which value cache will switch back to normal mode */
+#define ZBX_VC_LOW_MEMORY_RESET_PERIOD		SEC_PER_DAY
+
 /* Redefine the time function so unit tests can simulate time changes. */
 /* It should not be changed during normal processing.                  */
 static time_t (*vc_time)(time_t *) = time;
@@ -162,6 +165,13 @@ typedef struct
 	/* with daily_range and the daily range is reset.             */
 	int		daily_range;
 
+	/* The timestamp marking the oldest value that is guaranteed  */
+	/* to be cached.                                              */
+	/* The db_cached_from value is based on actual requests made  */
+	/* to database and is used to check if the requested time     */
+	/* interval should be cached.                                 */
+	int		db_cached_from;
+
 	/* The number of cache hits for this item.                    */
 	/* Used to evaluate if the item must be dropped from cache    */
 	/* in low memory situation.                                   */
@@ -187,8 +197,11 @@ typedef struct
 	/* the number of database queries performed, used only for unit tests */
 	zbx_uint64_t	db_queries;
 
-	/* the low memory mode flag */
-	int		low_memory;
+	/* value cache operating mode - see ZBX_VC_MODE_* defines */
+	int		mode;
+
+	/* time when cache operating mode was changed */
+	int		mode_time;
 
 	/* timestamp of the last low memory warning message */
 	int		last_warning_time;
@@ -860,7 +873,14 @@ static void	vc_warn_low_memory()
 
 	now = ZBX_VC_TIME();
 
-	if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
+	if (now - vc_cache->mode_time > ZBX_VC_LOW_MEMORY_RESET_PERIOD)
+	{
+		vc_cache->mode = ZBX_VC_MODE_NORMAL;
+		vc_cache->mode_time = now;
+
+		zabbix_log(LOG_LEVEL_WARNING, "value cache has been switched from low memory to normal operation mode");
+	}
+	else if (now - vc_cache->last_warning_time > ZBX_VC_LOW_MEMORY_WARNING_PERIOD)
 	{
 		vc_cache->last_warning_time = now;
 
@@ -916,7 +936,8 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 		return;
 
 	/* failed to free enough space by removing old items, entering low memory mode */
-	vc_cache->low_memory = 1;
+	vc_cache->mode = ZBX_VC_MODE_LOWMEM;
+	vc_cache->mode_time = ZBX_VC_TIME();
 
 	vc_warn_low_memory();
 
@@ -1300,6 +1321,23 @@ static void	vc_item_release(zbx_vc_item_t *item)
 
 		item->state = 0;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: vc_item_update_db_cached_from                                    *
+ *                                                                            *
+ * Purpose: updates the timestamp from which the item is being cached         *
+ *                                                                            *
+ * Parameters: item      - [IN] the item                                      *
+ *             timestamp - [IN] the timestamp from which all item values are  *
+ *                              guaranteed to be cached                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	vc_item_update_db_cached_from(zbx_vc_item_t *item, int timestamp)
+{
+	if (0 == item->db_cached_from || timestamp < item->db_cached_from)
+		item->db_cached_from = timestamp;
 }
 
 /******************************************************************************************************************
@@ -1785,6 +1823,9 @@ static void	vch_item_clean_cache(zbx_vc_item_t *item)
 				}
 			}
 
+			/* set the database cached from timestamp to the last (oldest) removed value timestamp + 1 */
+			item->db_cached_from = chunk->slots[chunk->last_value].timestamp.sec + 1;
+
 			vch_item_remove_chunk(item, chunk);
 
 			chunk = next;
@@ -1828,6 +1869,11 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 			/* flag and return success.                                                       */
 			if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
 				item->status = 0;
+
+			/* if the value is newer than the database cached from timestamp we must */
+			/* adjust the cached from timestamp to exclude this value                */
+			if (item->db_cached_from < value->timestamp.sec)
+				item->db_cached_from = value->timestamp.sec + 1;
 
 			ret = SUCCEED;
 			goto out;
@@ -1992,10 +2038,10 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		return SUCCEED;
 
 	start = timestamp - seconds;
-	update_end = ZBX_VC_TIME();
 
-	/* check if the requested period is in the cached range */
-	if (0 != item->active_range && update_end - start <= item->active_range)
+	/* check if the requested period is in the cached range                            */
+	/* (the first interval endpoint is excluded, thats why we have to check start + 1) */
+	if (0 != item->db_cached_from && start + 1 >= item->db_cached_from)
 		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required range */
@@ -2004,6 +2050,8 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		/* we need to get item values before the first cached value, but not including it */
 		update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
 	}
+	else
+		update_end = ZBX_VC_TIME();
 
 	update_seconds = update_end - start;
 
@@ -2031,15 +2079,18 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t *item, int seconds, int t
 		if (SUCCEED == ret)
 		{
 			if (0 < records.values_num)
-			{
 				ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
 
-				if (SUCCEED == ret)
-					ret = records.values_num;
-			}
 			/* when updating cache with time based request we can always reset status flags */
 			/* flag even if the requested period contains no data                           */
 			item->status = 0;
+
+			if (SUCCEED == ret)
+			{
+				ret = records.values_num;
+				vc_item_update_db_cached_from(item, start + 1);
+			}
+
 		}
 		zbx_history_record_vector_destroy(&records, item->value_type);
 	}
@@ -2124,7 +2175,11 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
 		if (SUCCEED == ret && 0 < records.values_num)
 		{
 			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
+			{
 				ret = records.values_num;
+				vc_item_update_db_cached_from(item,
+						item->tail->slots[item->tail->first_value].timestamp.sec);
+			}
 		}
 
 		zbx_history_record_vector_destroy(&records, item->value_type);
@@ -2154,16 +2209,16 @@ static int	vch_item_cache_values_by_count(zbx_vc_item_t *item, int count, int ti
  ******************************************************************************/
 static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seconds, int count, int timestamp)
 {
-	int	ret = SUCCEED, cached_records = 0, update_end, start;
+	int	ret = SUCCEED, cached_records = 0, start;
 
 	if (ZBX_ITEM_STATUS_CACHED_ALL == item->status)
 		return SUCCEED;
 
 	start = timestamp - seconds;
-	update_end = ZBX_VC_TIME();
 
-	/* check if the requested period is in the cached range */
-	if (0 != item->active_range && update_end - start <= item->active_range)
+	/* check if the requested period is in the cached range                            */
+	/* (the first interval endpoint is excluded, thats why we have to check start + 1) */
+	if (0 != item->db_cached_from && start + 1 >= item->db_cached_from)
 		return SUCCEED;
 
 	/* find if the cache should be updated to cover the required count */
@@ -2186,10 +2241,13 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 	{
 		zbx_vector_history_record_t	records;
 		zbx_uint64_t			queries = 0;
+		int				update_end;
 
 		/* get the end timestamp to which (including) the values should be cached */
 		if (NULL != item->head)
 			update_end = item->tail->slots[item->tail->first_value].timestamp.sec - 1;
+		else
+			update_end = ZBX_VC_TIME();
 
 		zbx_vector_history_record_create(&records);
 
@@ -2218,10 +2276,23 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t *item, int seco
 
 		vc_cache->db_queries += queries;
 
-		if (SUCCEED == ret && 0 < records.values_num)
+		if (SUCCEED == ret)
 		{
-			if (SUCCEED == (ret = vch_item_add_values_at_tail(item, records.values, records.values_num)))
+			if (0 < records.values_num)
+				ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
+
+			if (SUCCEED == ret)
+			{
 				ret = records.values_num;
+
+				if (count <= records.values_num)
+				{
+					vc_item_update_db_cached_from(item,
+							item->tail->slots[item->tail->first_value].timestamp.sec);
+				}
+				else
+					vc_item_update_db_cached_from(item, start + 1);
+			}
 		}
 
 		zbx_history_record_vector_destroy(&records, item->value_type);
@@ -2299,7 +2370,10 @@ static int	vch_item_cache_value(zbx_vc_item_t *item, const zbx_timespec_t *ts)
 		ret = vch_item_add_values_at_tail(item, records.values, records.values_num);
 
 		if (SUCCEED == ret)
+		{
 			ret = records.values_num;
+			vc_item_update_db_cached_from(item, item->tail->slots[item->tail->first_value].timestamp.sec);
+		}
 	}
 	zbx_history_record_vector_destroy(&records, item->value_type);
 
@@ -2821,12 +2895,12 @@ int	zbx_vc_get_value_range(zbx_uint64_t itemid, int value_type, zbx_vector_histo
 	if (NULL == vc_cache)
 		goto out;
 
-	if (1 == vc_cache->low_memory)
+	if (ZBX_VC_MODE_LOWMEM == vc_cache->mode)
 		vc_warn_low_memory();
 
 	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
-		if (0 == vc_cache->low_memory)
+		if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t   new_item = {itemid, value_type};
 
@@ -2944,12 +3018,12 @@ int	zbx_vc_get_value(zbx_uint64_t itemid, int value_type, const zbx_timespec_t *
 	if (NULL == vc_cache)
 		goto out;
 
-	if (1 == vc_cache->low_memory)
+	if (ZBX_VC_MODE_LOWMEM == vc_cache->mode)
 		vc_warn_low_memory();
 
 	if (NULL == (item = zbx_hashset_search(&vc_cache->items, &itemid)))
 	{
-		if (0 == vc_cache->low_memory)
+		if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
 			zbx_vc_item_t   new_item = {itemid, value_type};
 
@@ -3027,7 +3101,7 @@ int	zbx_vc_get_statistics(zbx_vc_stats_t *stats)
 
 	stats->hits = vc_cache->hits;
 	stats->misses = vc_cache->misses;
-	stats->low_memory = vc_cache->low_memory;
+	stats->mode = vc_cache->mode;
 
 	stats->total_size = vc_mem->total_size;
 	stats->free_size = vc_mem->free_size;

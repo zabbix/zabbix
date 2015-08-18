@@ -22,155 +22,155 @@
 class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 
 	public function testGetFormulaProvider() {
-		return array(
-			array(
-				array(), CONDITION_EVAL_TYPE_AND, ''
-			),
+		return [
+			[
+				[], CONDITION_EVAL_TYPE_AND, ''
+			],
 
 			// and
-			array(
-				array(
+			[
+				[
 					1 => 'condition1'
-				),
+				],
 				CONDITION_EVAL_TYPE_AND, '{1}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition2',
 					3 => 'condition3',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2} and {3}'
-			),
+			],
 			// same conditions shouldn't have parentheses
-			array(
-				array(
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND, '{1} and {2}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND, '({1} and {2}) and {3}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
 					4 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND, '({1} and {2}) and ({3} and {4})'
-			),
+			],
 
 			// or
-			array(
-				array(
+			[
+				[
 					1 => 'condition1'
-				),
+				],
 				CONDITION_EVAL_TYPE_OR, '{1}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition2',
 					3 => 'condition3',
-				),
+				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2} or {3}'
-			),
+			],
 			// same conditions shouldn't have parentheses
-			array(
-				array(
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
-				),
+				],
 				CONDITION_EVAL_TYPE_OR, '{1} or {2}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_OR, '({1} or {2}) or {3}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
 					4 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_OR, '({1} or {2}) or ({3} or {4})'
-			),
+			],
 
 			// and/or
-			array(
-				array(
+			[
+				[
 					1 => 'condition1'
-				),
+				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} and {2}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition2',
 					3 => 'condition3',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} and {2} and {3}'
-			),
+			],
 			// same conditions shouldn't have parentheses
-			array(
-				array(
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND_OR, '{1} or {2}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND_OR, '({1} or {2}) and {3}'
-			),
-			array(
-				array(
+			],
+			[
+				[
 					1 => 'condition1',
 					2 => 'condition1',
 					3 => 'condition2',
 					4 => 'condition2',
-				),
+				],
 				CONDITION_EVAL_TYPE_AND_OR, '({1} or {2}) and ({3} or {4})'
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -187,13 +187,13 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testGetFormulaIdsProvider() {
-		return array(
-			array('', array()),
-			array('1', array(1 => 'A')),
-			array('1 and 2', array(1 => 'A', 2 => 'B')),
-			array('1 and 2 and 1', array(1 => 'A', 2 => 'B')),
-			array('(1 and 2) and 3', array(1 => 'A', 2 => 'B', 3 => 'C')),
-		);
+		return [
+			['', []],
+			['1', [1 => 'A']],
+			['1 and 2', [1 => 'A', 2 => 'B']],
+			['1 and 2 and 1', [1 => 'A', 2 => 'B']],
+			['(1 and 2) and 3', [1 => 'A', 2 => 'B', 3 => 'C']],
+		];
 	}
 
 	/**
@@ -209,23 +209,23 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testReplaceNumericIdsProvider() {
-		return array(
-			array(
-				'', array(), ''
-			),
-			array(
-				'{1}', array(1 => 'A'), 'A'
-			),
-			array(
-				'{1} and {2}', array(1 => 'A', 2 => 'B'), 'A and B'
-			),
-			array(
-				'{1} and {2} or {3}', array(1 => 'A', 2 => 'B', '3' => 'C'), 'A and B or C'
-			),
-			array(
-				'{1} and {2} or {1}', array(1 => 'A', 2 => 'B'), 'A and B or A'
-			),
-		);
+		return [
+			[
+				'', [], ''
+			],
+			[
+				'{1}', [1 => 'A'], 'A'
+			],
+			[
+				'{1} and {2}', [1 => 'A', 2 => 'B'], 'A and B'
+			],
+			[
+				'{1} and {2} or {3}', [1 => 'A', 2 => 'B', '3' => 'C'], 'A and B or C'
+			],
+			[
+				'{1} and {2} or {1}', [1 => 'A', 2 => 'B'], 'A and B or A'
+			],
+		];
 	}
 
 	/**
@@ -242,23 +242,26 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	}
 
 	public function testReplaceLetterIdsProvider() {
-		return array(
-			array(
-				'', array(), ''
-			),
-			array(
-				'A', array('A' => 1), '{1}'
-			),
-			array(
-				'A and B', array('A' => 1, 'B' => 2), '{1} and {2}'
-			),
-			array(
-				'A and B or C', array('A' => 1, 'B' => 2, 'C' => 3), '{1} and {2} or {3}'
-			),
-			array(
-				'A and B or A', array('A' => 1, 'B' => 2), '{1} and {2} or {1}'
-			),
-		);
+		return [
+			[
+				'', [], ''
+			],
+			[
+				'A', ['A' => 1], '{1}'
+			],
+			[
+				'A and B', ['A' => 1, 'B' => 2], '{1} and {2}'
+			],
+			[
+				'A and B or C', ['A' => 1, 'B' => 2, 'C' => 3], '{1} and {2} or {3}'
+			],
+			[
+				'A and B or A', ['A' => 1, 'B' => 2], '{1} and {2} or {1}'
+			],
+			[
+				'A and (B or AA)', ['A' => 1, 'B' => 2, 'AA' => 3], '{1} and ({2} or {3})'
+			]
+		];
 	}
 
 	/**
@@ -290,24 +293,24 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function testSortConditionsByFormulaIdProvider() {
-		return array(
-			array(
-				array(0 => array('formulaid' => 'A'), 1 => array('formulaid' => 'B'), 2 => array('formulaid' => 'C')),
-				array(0 => array('formulaid' => 'A'), 1 => array('formulaid' => 'B'), 2 => array('formulaid' => 'C'))
-			),
-			array(
-				array(2 => array('formulaid' => 'C'), 0 => array('formulaid' => 'A'), 1 => array('formulaid' => 'B')),
-				array(0 => array('formulaid' => 'A'), 1 => array('formulaid' => 'B'), 2 => array('formulaid' => 'C'))
-			),
-			array(
-				array(2 => array('formulaid' => 'C'), 3 => array('formulaid' => 'D'), 0 => array('formulaid' => 'A')),
-				array(0 => array('formulaid' => 'A'), 2 => array('formulaid' => 'C'), 3 => array('formulaid' => 'D'))
-			),
-			array(
-				array(2 => array('formulaid' => 'CC'), 3 => array('formulaid' => 'D'), 0 => array('formulaid' => 'AA')),
-				array(3 => array('formulaid' => 'D'), 0 => array('formulaid' => 'AA'), 2 => array('formulaid' => 'CC'))
-			)
-		);
+		return [
+			[
+				[0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B'], 2 => ['formulaid' => 'C']],
+				[0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B'], 2 => ['formulaid' => 'C']]
+			],
+			[
+				[2 => ['formulaid' => 'C'], 0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B']],
+				[0 => ['formulaid' => 'A'], 1 => ['formulaid' => 'B'], 2 => ['formulaid' => 'C']]
+			],
+			[
+				[2 => ['formulaid' => 'C'], 3 => ['formulaid' => 'D'], 0 => ['formulaid' => 'A']],
+				[0 => ['formulaid' => 'A'], 2 => ['formulaid' => 'C'], 3 => ['formulaid' => 'D']]
+			],
+			[
+				[2 => ['formulaid' => 'CC'], 3 => ['formulaid' => 'D'], 0 => ['formulaid' => 'AA']],
+				[3 => ['formulaid' => 'D'], 0 => ['formulaid' => 'AA'], 2 => ['formulaid' => 'CC']]
+			]
+		];
 	}
 
 	/**
@@ -326,31 +329,31 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 	 * @return array
 	 */
 	public function testGetNextFormulaIdProvider() {
-		return array(
-			array(
-				array(), 'A'
-			),
-			array(
-				array('A', 'B', 'C'), 'D'
-			),
-			array(
-				array('C', 'A', 'B'), 'D'
-			),
-			array(
-				array('X', 'Y', 'Z'), 'AA'
-			),
-			array(
-				array('AX', 'AY', 'AZ'), 'BA'
-			),
-			array(
-				array('ZX', 'ZY', 'ZZ'), 'AAA'
-			),
-			array(
-				array('AAX', 'AAY', 'AAZ'), 'ABA'
-			),
-			array(
-				array('ZZZX', 'ZZZY', 'ZZZZ'), 'AAAAA'
-			)
-		);
+		return [
+			[
+				[], 'A'
+			],
+			[
+				['A', 'B', 'C'], 'D'
+			],
+			[
+				['C', 'A', 'B'], 'D'
+			],
+			[
+				['X', 'Y', 'Z'], 'AA'
+			],
+			[
+				['AX', 'AY', 'AZ'], 'BA'
+			],
+			[
+				['ZX', 'ZY', 'ZZ'], 'AAA'
+			],
+			[
+				['AAX', 'AAY', 'AAZ'], 'ABA'
+			],
+			[
+				['ZZZX', 'ZZZY', 'ZZZZ'], 'AAAAA'
+			]
+		];
 	}
 }
