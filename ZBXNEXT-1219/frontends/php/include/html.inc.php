@@ -158,18 +158,14 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 	}
 
 	$table = (new CTable())
-		->addClass('ui-widget-header')
-		->addClass('header');
-	$table->setCellSpacing(0);
-	$table->setCellPadding(1);
-	$table->addRow([
-		(new CCol($columnLeft))
-			->addClass('header_l')
-			->addClass('left'),
-		(new CCol($rights))
-			->addClass('header_r')
-			->addClass('right')
-	]);
+		->addRow([
+			(new CCol($columnLeft))
+				->addClass('header_l')
+				->addClass('left'),
+			(new CCol($rights))
+				->addClass('header_r')
+				->addClass('right')
+		]);
 
 	return $table;
 }
@@ -281,7 +277,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 	if (!$db_host) {
 		$options = [
-			'output' => ['templateid', 'name'],
+			'output' => ['templateid', 'name', 'flags'],
 			'templateids' => [$hostid],
 			'editable' => true
 		];
@@ -563,6 +559,7 @@ function getHostAvailabilityTable($host) {
 			case HOST_AVAILABLE_FALSE:
 				$ai = (new CSpan($type))
 					->addClass(ZBX_STYLE_STATUS_RED)
+					->addClass(ZBX_STYLE_CURSOR_POINTER)
 					->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
 				break;
 			case HOST_AVAILABLE_UNKNOWN:

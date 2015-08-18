@@ -66,15 +66,15 @@ class CConditionValidator extends CValidator {
 
 		// check that all conditions used in the formula are defined in the "conditions" array
 		$conditions = zbx_toHash($object['conditions'], 'formulaid');
-		foreach ($parser->constants as $formulaId) {
-			if (!isset($conditions[$formulaId])) {
-				$this->error($this->messageMissingCondition, $formulaId, $object['formula']);
+		$constants = array_unique(zbx_objectValues($parser->constants, 'value'));
+		foreach ($constants as $constant) {
+			if (!array_key_exists($constant, $conditions)) {
+				$this->error($this->messageMissingCondition, $constant, $object['formula']);
 
 				return false;
 			}
-			else {
-				unset($conditions[$formulaId]);
-			}
+
+			unset($conditions[$constant]);
 		}
 
 		// check that the "conditions" array has no unused conditions

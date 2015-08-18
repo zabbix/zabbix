@@ -100,6 +100,12 @@ array_pop($severities);
 
 $dashconfFormList->addRow(_('Triggers with severity'), $severities);
 
+$dashconfFormList->addRow(_('Trigger name like'),
+	(new CTextBox('trigger_name', $data['trigger_name']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setEnabled($data['isFilterEnable'])
+);
+
 // append problem display to form list
 $extAckComboBox = new CComboBox('extAck', $this->data['extAck'], null, [
 	EXTACK_OPTION_ALL => _('All'),

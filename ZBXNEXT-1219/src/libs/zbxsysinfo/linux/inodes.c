@@ -21,6 +21,21 @@
 #include "sysinfo.h"
 #include "log.h"
 
+#define get_string(field)	#field
+
+#define validate(result, structure, field)								\
+													\
+do													\
+{													\
+	if (__UINT64_C(0xffffffffffffffff) == structure.field)						\
+	{												\
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain filesystem information:"		\
+				" value of " get_string(field) " is unknown."));			\
+		return SYSINFO_RET_FAIL;								\
+	}												\
+}													\
+while(0)
+
 int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #ifdef HAVE_SYS_STATVFS_H
@@ -52,30 +67,41 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (0 != ZBX_STATFS(fsname, &s))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain filesystem information: %s",
-			zbx_strerror(errno)));
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "total"))	/* default parameter */
 	{
+		validate(result, s, f_files);
 		SET_UI64_RESULT(result, s.f_files);
 	}
 	else if (0 == strcmp(mode, "free"))
 	{
+		validate(result, s, ZBX_FFREE);
 		SET_UI64_RESULT(result, s.ZBX_FFREE);
 	}
 	else if (0 == strcmp(mode, "used"))
 	{
+		validate(result, s, f_files);
+		validate(result, s, f_ffree);
 		SET_UI64_RESULT(result, s.f_files - s.f_ffree);
 	}
 	else if (0 == strcmp(mode, "pfree"))
 	{
+		validate(result, s, f_files);
 		total = s.f_files;
 #ifdef HAVE_SYS_STATVFS_H
+		validate(result, s, f_ffree);
+		validate(result, s, f_favail);
 		total -= s.f_ffree - s.f_favail;
 #endif
+		validate(result, s, ZBX_FFREE);
+
 		if (0 != total)
-			SET_DBL_RESULT(result, (double)(100.0 * s.ZBX_FFREE) / total);
+		{
+			SET_DBL_RESULT(result, (100.0 * s.ZBX_FFREE) / total);
+		}
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
@@ -84,12 +110,19 @@ int	VFS_FS_INODE(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else if (0 == strcmp(mode, "pused"))
 	{
+		validate(result, s, f_files);
 		total = s.f_files;
 #ifdef HAVE_SYS_STATVFS_H
+		validate(result, s, f_ffree);
+		validate(result, s, f_favail);
 		total -= s.f_ffree - s.f_favail;
 #endif
+		validate(result, s, ZBX_FFREE);
+
 		if (0 != total)
-			SET_DBL_RESULT(result, 100.0 - (double)(100.0 * s.ZBX_FFREE) / total);
+		{
+			SET_DBL_RESULT(result, (100.0 * (total - s.ZBX_FFREE)) / total);
+		}
 		else
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot calculate percentage because total is zero."));
