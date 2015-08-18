@@ -441,7 +441,8 @@ footer, .footer {
   background-color: #fff;
   margin-top: -1px;
   padding: 7px 5px;
-  border: 1px solid #dfe4e7; }
+  border: 1px solid #dfe4e7;
+  border-top-color: #ebeef0; }
 
 .radio-switch {
   cursor: pointer;
@@ -451,6 +452,7 @@ footer, .footer {
   display: inline-block;
   margin-left: -1px;
   padding: 3px 11px;
+  background-color: #fff;
   border: 1px solid #acbbc2;
   text-decoration: none;
   color: #1f2c33;
@@ -482,13 +484,13 @@ footer, .footer {
     border-color: #acbbc2;
     background-color: #acbbc2; }
     .table-paging a.paging-selected:hover, .paging-selected.radio-switch:hover {
-      background-color: #9dafb7; }
+      background-color: #a0b1b9; }
     .table-paging a.paging-selected:focus, .paging-selected.radio-switch:focus {
-      background-color: #9dafb7;
+      background-color: #a0b1b9;
       border-color: #0275b8;
       position: relative; }
     .table-paging a.paging-selected:active, .paging-selected.radio-switch:active {
-      background-color: #9dafb7;
+      background-color: #a0b1b9;
       border-color: #0275b8;
       position: relative; }
 
