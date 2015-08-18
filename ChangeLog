@@ -1,6 +1,7 @@
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-2703] implemented feature to filter dashboard by trigger name (Ivo)
 A.F.I...S. [ZBXNEXT-2892] increased IP range length and added support for tabulation, carriage return and newline characters (wiper, Ivo)
 ........S. [ZBXNEXT-2760] added zabbix[host,,items] and zabbix[host,,items_unsupported] keys to monitor the number of (unsupported) items per host (wiper)
 A.F.I..PS. [ZBXNEXT-1219] added application prototype support to low level discovery rules (wiper, Ivo)
