@@ -206,7 +206,12 @@ static void	zbx_gnutls_debug_cb(int level, const char *str)
  ******************************************************************************/
 static void	zbx_gnutls_audit_cb(gnutls_session_t session, const char *str)
 {
-	zabbix_log(LOG_LEVEL_WARNING, "GnuTLS audit: \"%s\"", str);
+	char	msg[1024];
+
+	/* remove '\n' from the end of debug message */
+	zbx_strlcpy(msg, str, sizeof(msg));
+	zbx_rtrim(msg, "\n");
+	zabbix_log(LOG_LEVEL_WARNING, "GnuTLS audit: \"%s\"", msg);
 }
 #endif	/* defined(HAVE_GNUTLS) */
 
