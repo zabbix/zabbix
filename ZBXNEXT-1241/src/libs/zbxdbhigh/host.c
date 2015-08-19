@@ -4995,3 +4995,80 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_host_inventory                                             *
+ *                                                                            *
+ * Purpose: adds host inventory to the host                                   *
+ *                                                                            *
+ * Parameters: hostid         - [IN] host identifier                          *
+ *             inventory_mode - [IN] the host inventory mode                  *
+ *                                                                            *
+ * Return value: SUCCEED - the host inventory record was created successfully *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode)
+{
+	zbx_db_insert_t	db_insert;
+	int		ret = FAIL;
+
+	if (HOST_INVENTORY_MANUAL != inventory_mode && HOST_INVENTORY_AUTOMATIC != inventory_mode)
+		goto out;
+
+	zbx_db_insert_prepare(&db_insert, "host_inventory", "hostid", "inventory_mode", NULL);
+	zbx_db_insert_add_values(&db_insert, hostid, inventory_mode);
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+out:
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBset_host_inventory                                             *
+ *                                                                            *
+ * Purpose: sets host inventory mode for the specified host                   *
+ *                                                                            *
+ * Parameters: hostid         - [IN] host identifier                          *
+ *             inventory_mode - [IN] the host inventory mode                  *
+ *                                                                            *
+ * Return value: SUCCEED - the host inventory mode was set successfully       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: The host_inventory table record is created if absent.            *
+ *                                                                            *
+ ******************************************************************************/
+int	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	if (HOST_INVENTORY_MANUAL != inventory_mode && HOST_INVENTORY_AUTOMATIC != inventory_mode)
+		goto out;
+
+	result = DBselect("select hostid,inventory_mode from host_inventory where hostid=" ZBX_FS_UI64, hostid);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		ret = DBadd_host_inventory(hostid, inventory_mode);
+	}
+	else if (inventory_mode != atoi(row[1]))
+	{
+		ret = DBexecute("update host_inventory set inventory_mode=%d where hostid=" ZBX_FS_UI64, inventory_mode,
+				hostid);
+
+		if (ZBX_DB_OK > ret)
+			ret = FAIL;
+	}
+	else
+		ret = SUCCEED;
+
+	DBfree_result(result);
+
+out:
+	return ret;
+}
