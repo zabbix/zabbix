@@ -797,6 +797,7 @@ function makeErrorIcon($error)
 {
 	return (new CSpan(bold('&times;')))
 		->addClass(ZBX_STYLE_STATUS_RED)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($error, ZBX_STYLE_RED);
 }
 
@@ -811,6 +812,7 @@ function makeUnknownIcon($error)
 {
 	return (new CSpan(bold('?')))
 		->addClass(ZBX_STYLE_STATUS_GREY)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($error, ZBX_STYLE_RED);
 }
 
@@ -825,6 +827,7 @@ function makeWarningIcon($error)
 {
 	return (new CSpan(bold('!')))
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($error);
 }
 
