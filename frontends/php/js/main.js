@@ -871,39 +871,6 @@ function getConditionFormula(conditions, evalType) {
 jQuery(function ($) {
 	var verticalHeaderTables = {};
 
-	var tablesWidthChangeChecker = function() {
-		for (var tableId in verticalHeaderTables) {
-			if (verticalHeaderTables.hasOwnProperty(tableId)) {
-				var table = verticalHeaderTables[tableId];
-
-				if (table && table.width() != table.data('last-width')) {
-					centerVerticalCellContents(table);
-				}
-			}
-		}
-		setTimeout(tablesWidthChangeChecker, 100);
-	};
-
-	var centerVerticalCellContents = function(table) {
-		var verticalCells = $('.vertical_rotation', table);
-
-		verticalCells.each(function() {
-			var cell = $(this),
-				cellWidth = cell.width();
-
-			if (cellWidth > 30) {
-				cell.children().css({
-					position: 'relative',
-					left: (cellWidth / 2 - 12) + 'px'
-				});
-			}
-		});
-
-		table.data('last-width', table.width());
-	};
-
-	tablesWidthChangeChecker();
-
 	$.fn.makeVerticalRotation = function() {
 		this.each(function(i) {
 			var table = $(this);
@@ -923,10 +890,6 @@ jQuery(function ($) {
 						text: cell.html()
 					}).css({'white-space': 'nowrap'});
 
-				if (IE) {
-					text.css({'font-family': 'monospace'});
-				}
-
 				cell.text('').append(text);
 			});
 
@@ -938,20 +901,16 @@ jQuery(function ($) {
 					width = span.width(),
 					transform = (width / 2) + 'px ' + (width / 2) + 'px';
 
-				var css = {
-					"transform-origin": transform,
-					"-webkit-transform-origin": transform,
-					"-moz-transform-origin": transform,
-					"-o-transform-origin": transform
-				};
-
-				if (IE) {
-					css['font-family'] = 'monospace';
-					css['-ms-transform-origin'] = '50% 50%';
-				}
+				var css = {};
 
 				if (IE9) {
 					css['-ms-transform-origin'] = transform;
+				}
+				else {
+					css['transform-origin'] = transform;
+					css['-webkit-transform-origin'] = transform;
+					css['-moz-transform-origin'] = transform;
+					css['-o-transform-origin'] = transform;
 				}
 
 				var divInner = $('<div>', {
@@ -972,8 +931,6 @@ jQuery(function ($) {
 			cellsToRotate.each(function(i) {
 				$(this).html(betterCells[i]);
 			});
-
-			centerVerticalCellContents(table);
 
 			table.on('remove', function() {
 				delete verticalHeaderTables[table.attr('id')];
