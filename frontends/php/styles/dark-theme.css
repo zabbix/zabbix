@@ -975,15 +975,13 @@ label input[type="radio"] {
 input[type="file"] {
   padding: 1px; }
 input[readonly] {
-  color: #f2f2f2 !important;
-  cursor: text !important; }
+  color: #f2f2f2 !important; }
 
 textarea {
   padding: 4px 5px;
   overflow: auto; }
   textarea[readonly] {
-    color: #f2f2f2 !important;
-    cursor: text !important; }
+    color: #f2f2f2 !important; }
 
 select {
   padding: 3px 3px 3px 0;
@@ -993,8 +991,7 @@ select {
     width: 300px;
     height: auto; }
   select[readonly] {
-    color: #f2f2f2 !important;
-    cursor: text !important; }
+    color: #f2f2f2 !important; }
 
 fieldset {
   border: 1px solid #383838;
@@ -2247,3 +2244,8 @@ td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td
   min-width: 2em; }
   .list-hor-min-width li:last-child {
     min-width: auto; }
+
+.uppercase {
+  text-transform: uppercase;
+  letter-spacing: 0.0688em;
+  text-rendering: optimizeLegibility; }
