@@ -112,7 +112,7 @@ class CActionButtonList extends CObject {
 		}
 
 		$this->items[] = (new CDiv([$this->getSelectedCountElement(), $items]))
-			->setId('#action_buttons')
+			->setId('action_buttons')
 			->addClass(ZBX_STYLE_ACTION_BUTTONS);
 
 		return parent::toString($destroy);
