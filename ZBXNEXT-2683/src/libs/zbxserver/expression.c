@@ -379,6 +379,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 	AGENT_REQUEST	request;
 	const char	*param;
 	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
+	int		macro_r, context_l, context_r;
 
 	init_request(&request);
 
@@ -389,8 +390,11 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 	while (NULL != (m = strchr(p, '$')))
 	{
-		if (m > p && '{' == *(m - 1) && NULL != (n = strchr(m + 1, '}')))	/* user defined macros */
+		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r))
 		{
+			/* user macros  */
+
+			n = m + context_r;
 			c = *++n;
 			*n = '\0';
 			DCget_user_macro(&hostid, 1, m - 1, &replace_to);
@@ -410,8 +414,10 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9')				/* macros $1, $2, ... */
+		else if ('1' <= *(m + 1) && *(m + 1) <= '9')
 		{
+			/* macros $1, $2, ... */
+
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
 			*m++ = '$';
@@ -421,8 +427,10 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 			p = m + 1;
 		}
-		else									/* just a dollar sign */
+		else
 		{
+			/* just a dollar sign */
+
 			c = *++m;
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
@@ -2297,31 +2305,46 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	for (; NULL != bl && SUCCEED == res; m = bl = strchr(p, '{'))
 	{
-		if (NULL == (br = strchr(bl, '}')))
-			break;
+		/* User macros can have macro closing symbol } in quoted context. */
+		/* We must use user macro parsing function to find macro end.     */
+		if ('$' == m[1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (FAIL == zbx_user_macro_parse(m, &macro_r, &context_l, &context_r))
+				break;
+
+			br = bl + context_r + 1;
+		}
+		else
+		{
+			if (NULL == (br = strchr(bl, '}')))
+				break;
+
+			N_functionid = 1;
+
+			if ('1' <= *(br - 1) && *(br - 1) <= '9')
+			{
+				int	i, diff;
+
+				for (i = 0; NULL != ex_macros[i]; i++)
+				{
+					diff = zbx_mismatch(ex_macros[i], bl);
+
+					if ('}' == ex_macros[i][diff] && bl + diff == br - 1)
+					{
+						N_functionid = *(br - 1) - '0';
+						m = ex_macros[i];
+						break;
+					}
+				}
+			}
+		}
 
 		c = *++br;
 		*br = '\0';
 
 		ret = SUCCEED;
-		N_functionid = 1;
-
-		if ('1' <= *(br - 2) && *(br - 2) <= '9')
-		{
-			int	i, diff;
-
-			for (i = 0; NULL != ex_macros[i]; i++)
-			{
-				diff = zbx_mismatch(ex_macros[i], bl);
-
-				if ('}' == ex_macros[i][diff] && bl + diff == br - 2)
-				{
-					N_functionid = *(br - 2) - '0';
-					m = ex_macros[i];
-					break;
-				}
-			}
-		}
 
 		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY)))
 		{
