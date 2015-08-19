@@ -1463,7 +1463,7 @@ input {
 
 	&[readonly] {
 		color: $font-color!important;
-		cursor: text!important;
+		//cursor: text!important;
 		@extend %form-disabled;
 	}  
 }
@@ -1480,7 +1480,7 @@ textarea {
 
 	&[readonly] {
 		color: $font-color!important;
-		cursor: text!important;
+		//cursor: text!important;
 		@extend %form-disabled;
 	}   
 }
@@ -1503,7 +1503,7 @@ select {
 
 	&[readonly] {
 		color: $font-color!important;
-		cursor: text!important;
+		//cursor: text!important;
 		@extend %form-disabled;
 	}   
 }
