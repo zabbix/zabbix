@@ -660,13 +660,11 @@ footer {
 
 	&:hover {
 		color: $font-color;
-		//background-color: $ui-hover-color;
 		background-color: $btn-form-hover-color;
 	}
 
 	&:focus {
 		color: $font-color;
-		//background-color: $ui-hover-color;
 		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
 		position: relative;
@@ -674,7 +672,6 @@ footer {
 
 	&:active {
 		color: $font-color;
-		//background-color: $ui-hover-color;
 		background-color: $btn-form-hover-color;
 		position: relative;
 	}
@@ -1147,13 +1144,11 @@ footer {
 
 /* Forms */
 .table-forms-container {
-	//padding: 15px 0 10px 0;
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 	padding: 10px;
 	text-align: left;
-	//@extend .filter-container;
 }
 
 .form-btns {
@@ -1368,7 +1363,6 @@ footer {
 			background-color: $form-bg-color;
 
 			&:hover {
-				//background-color: $ui-hover-color;
 				background-color: $btn-form-hover-color;
 			}
 
@@ -1381,7 +1375,6 @@ footer {
 
 		&:focus + label {
 			border-color: $form-border-focus-color;
-			//background-color: $ui-hover-color;
 			background-color: $btn-form-hover-color;
 			position: relative;
 			z-index: 1;
@@ -1623,21 +1616,18 @@ button {
 
 	&:hover {
 		color: $btn-form-font-color;
-		//background-color: $ui-hover-color;
 		background-color: $btn-form-hover-color;
 		border-color: $btn-form-border-color;
 	}
 
 	&:focus {
 		color: $btn-form-font-color;
-		//background-color: $ui-hover-color;
 		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
 	}
 
 	&:active {
 		color: $btn-form-font-color;
-		//background-color: $ui-hover-color;
 		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
 	}
@@ -2625,19 +2615,6 @@ $form-icon-btn: (
 		text-align: center;
 		vertical-align: middle;
 		padding: 8px 5px;
-
-		//td {
-		//	text-align: left;
-		//	padding: initial;
-		//}
-
-		//.list-table {
-
-		//	td {
-		//		padding: 8px 5px;
-		//		border: initial;
-		//	}
-		//}
 	}
 
 	.table-forms {
@@ -2649,7 +2626,6 @@ $form-icon-btn: (
 
 		td {
 			text-align: left;
-			//padding: 8px 5px;
 			border: none;
 			border-bottom: 1px solid $table-border-color;
 		}
@@ -2660,10 +2636,6 @@ $form-icon-btn: (
 
 	td {
 		border: 1px dashed $table-border-color;
-
-		//td {
-		//	border: none;
-		//}
 	}
 }
 
