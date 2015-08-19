@@ -719,9 +719,9 @@ footer {
 	background-color: $ui-bg-color;
 	border: 1px solid $form-border-color;
 	cursor: pointer;
-	width: 10px;
-	height: 10px;
-	line-height: 10px;
+	width: 12px;
+	height: 12px;
+	line-height: 12px;
 	text-align: center;
 	@include border-radius(2px);
 
@@ -1147,9 +1147,13 @@ footer {
 
 /* Forms */
 .table-forms-container {
+	//padding: 15px 0 10px 0;
+	margin: 0 0 10px 0;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
 	padding: 10px;
 	text-align: left;
-	@extend .filter-container;
+	//@extend .filter-container;
 }
 
 .form-btns {
@@ -2620,11 +2624,34 @@ $form-icon-btn: (
 	td {
 		text-align: center;
 		vertical-align: middle;
-		padding: 3px;
+		padding: 8px 5px;
+
+		//td {
+		//	text-align: left;
+		//	padding: initial;
+		//}
+
+		//.list-table {
+
+		//	td {
+		//		padding: 8px 5px;
+		//		border: initial;
+		//	}
+		//}
+	}
+
+	.table-forms {
+		text-align: left;
+	}
+
+	.list-table {
+		border: none;
 
 		td {
 			text-align: left;
-			padding: initial;
+			//padding: 8px 5px;
+			border: none;
+			border-bottom: 1px solid $table-border-color;
 		}
 	}
 }
@@ -2634,9 +2661,9 @@ $form-icon-btn: (
 	td {
 		border: 1px dashed $table-border-color;
 
-		td {
-			border: none;
-		}
+		//td {
+		//	border: none;
+		//}
 	}
 }
 
