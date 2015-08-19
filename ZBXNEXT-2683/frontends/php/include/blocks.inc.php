@@ -318,24 +318,23 @@ function make_system_status($filter) {
 
 	// get triggers
 	$triggers = API::Trigger()->get([
+		'output' => ['triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange', 'expression'],
+		'selectGroups' => ['groupid'],
+		'selectHosts' => ['name'],
+		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid'],
+		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
+		'skipDependent' => true,
 		'groupids' => $groupIds,
 		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
-		'skipDependent' => true,
-		'withLastEventUnacknowledged' => ($filter['extAck'] == EXTACK_OPTION_UNACK) ? true : null,
-		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid'],
+		'search' => ($filter['trigger_name'] !== '') ? ['description' => $filter['trigger_name']] : null,
 		'filter' => [
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
 		],
 		'sortfield' => 'lastchange',
 		'sortorder' => ZBX_SORT_DOWN,
-		'output' => ['triggerid', 'priority', 'state', 'description', 'error', 'value', 'lastchange',
-			'expression'
-		],
-		'selectHosts' => ['name'],
-		'selectGroups' => ['groupid'],
 		'preservekeys' => true
 	]);
 
@@ -566,6 +565,7 @@ function make_latest_issues(array $filter = []) {
 		'hostids' => isset($filter['hostids']) ? $filter['hostids'] : null,
 		'monitored' => true,
 		'maintenance' => $filter['maintenance'],
+		'search' => ($filter['trigger_name'] !== '') ? ['description' => $filter['trigger_name']] : null,
 		'filter' => [
 			'priority' => $filter['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -573,13 +573,13 @@ function make_latest_issues(array $filter = []) {
 	];
 
 	$triggers = API::Trigger()->get(array_merge($options, [
+		'output' => ['triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'lastchange'],
+		'selectHosts' => ['hostid', 'name'],
+		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
 			? true
 			: null,
 		'skipDependent' => true,
-		'output' => ['triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'lastchange'],
-		'selectHosts' => ['hostid', 'name'],
-		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'sortfield' => $sortField,
 		'sortorder' => $sortOrder,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT,

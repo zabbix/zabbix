@@ -635,6 +635,7 @@ footer {
 	margin-top: -1px;
 	padding: 7px 5px;
 	border: 1px solid $ui-border-color;
+	border-top-color: $table-border-color;
 
 	a {
 		@extend %paging-btn;
@@ -651,6 +652,7 @@ footer {
 	display: inline-block;
 	margin-left: -1px;
 	padding: 3px 11px;
+	background-color: $btn-form-bg-color;
 	border: 1px solid $form-border-color;
 	text-decoration: none;
 	color: $font-color;
@@ -658,19 +660,19 @@ footer {
 
 	&:hover {
 		color: $font-color;
-		background-color: $ui-hover-color;
+		background-color: $btn-form-hover-color;
 	}
 
 	&:focus {
 		color: $font-color;
-		background-color: $ui-hover-color;
+		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
 		position: relative;
 	}
 
 	&:active {
 		color: $font-color;
-		background-color: $ui-hover-color;
+		background-color: $btn-form-hover-color;
 		position: relative;
 	}
 
@@ -688,17 +690,17 @@ footer {
 		background-color: $ui-bg-selected-color;
 
 		&:hover {
-			background-color: darken($ui-bg-selected-color, 5%);
+			background-color: darken($ui-bg-selected-color, 4%);
 		}
 
 		&:focus {
-			background-color: darken($ui-bg-selected-color, 5%);
+			background-color: darken($ui-bg-selected-color, 4%);
 			border-color: $form-border-focus-color;
 			position: relative;
 		}
 
 		&:active {
-			background-color: darken($ui-bg-selected-color, 5%);
+			background-color: darken($ui-bg-selected-color, 4%);
 			border-color: $form-border-focus-color;
 			position: relative;
 		}
@@ -714,9 +716,9 @@ footer {
 	background-color: $ui-bg-color;
 	border: 1px solid $form-border-color;
 	cursor: pointer;
-	width: 10px;
-	height: 10px;
-	line-height: 10px;
+	width: 12px;
+	height: 12px;
+	line-height: 12px;
 	text-align: center;
 	@include border-radius(2px);
 
@@ -1142,9 +1144,11 @@ footer {
 
 /* Forms */
 .table-forms-container {
+	margin: 0 0 10px 0;
+	background-color: $ui-bg-color;
+	border: 1px solid $ui-border-color;
 	padding: 10px;
 	text-align: left;
-	@extend .filter-container;
 }
 
 .form-btns {
@@ -1359,7 +1363,7 @@ footer {
 			background-color: $form-bg-color;
 
 			&:hover {
-				background-color: $ui-hover-color;
+				background-color: $btn-form-hover-color;
 			}
 
 			&:active {
@@ -1371,7 +1375,7 @@ footer {
 
 		&:focus + label {
 			border-color: $form-border-focus-color;
-			background-color: $ui-hover-color;
+			background-color: $btn-form-hover-color;
 			position: relative;
 			z-index: 1;
 		}
@@ -1612,19 +1616,19 @@ button {
 
 	&:hover {
 		color: $btn-form-font-color;
-		background-color: $ui-hover-color;
+		background-color: $btn-form-hover-color;
 		border-color: $btn-form-border-color;
 	}
 
 	&:focus {
 		color: $btn-form-font-color;
-		background-color: $ui-hover-color;
+		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
 	}
 
 	&:active {
 		color: $btn-form-font-color;
-		background-color: $ui-hover-color;
+		background-color: $btn-form-hover-color;
 		border-color: $form-border-focus-color;
 	}
 }
@@ -2610,11 +2614,20 @@ $form-icon-btn: (
 	td {
 		text-align: center;
 		vertical-align: middle;
-		padding: 3px;
+		padding: 8px 5px;
+	}
+
+	.table-forms {
+		text-align: left;
+	}
+
+	.list-table {
+		border: none;
 
 		td {
 			text-align: left;
-			padding: initial;
+			border: none;
+			border-bottom: 1px solid $table-border-color;
 		}
 	}
 }
@@ -2623,10 +2636,6 @@ $form-icon-btn: (
 
 	td {
 		border: 1px dashed $table-border-color;
-
-		td {
-			border: none;
-		}
 	}
 }
 
