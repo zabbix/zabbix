@@ -3288,3 +3288,9 @@ $browser-logos: (
 		}
 	}
 }
+
+.uppercase {
+	text-transform: $font-transform;
+	letter-spacing: 0.0688em;
+	text-rendering: optimizeLegibility;
+}
