@@ -990,6 +990,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to values one by one.
 		if ($macros) {
 			foreach ($macros as $key => $macro_data) {
+				// Replace user macros.
 				while ($exact_macros = (new CUserMacroParser($items[$key]['name_expanded'], false))->getMacros()) {
 					// Unresolved values stay as macros. Break the loop if cannot be resolved.
 					if (array_key_exists($exact_macros[0]['macro'], $macro_data['macros'])
@@ -1002,6 +1003,15 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					else {
 						break;
 					}
+				}
+
+				// Replace reference macros.
+				if (array_key_exists($key, $itemsWithReferenceMacros)) {
+					$items[$key]['name_expanded'] = str_replace(
+						array_keys($macro_data['macros']),
+						array_values($macro_data['macros']),
+						$items[$key]['name_expanded']
+					);
 				}
 			}
 		}
