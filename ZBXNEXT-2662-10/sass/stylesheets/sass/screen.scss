@@ -2706,6 +2706,14 @@ a.orange {
 	@extend .orange;
 }
 
+.yellow {
+	color: $dark-yellow;
+}
+
+a.yellow {
+	@extend .yellow;
+}
+
 .grey {
 	color: $font-alt-color;
 }
@@ -2818,6 +2826,16 @@ td.normal-bg {
 	@extend td.na-bg;
 }
 
+.active-bg {
+	color: darken($alt-green,45%);
+	@extend .green-bg;
+}
+
+td.active-bg {
+	color: darken($alt-green,45%);
+	@extend .active-bg;
+}
+
 .info-bg {
 	color: darken($alt-dark-blue,45%);
 	background-color: $alt-dark-blue;
@@ -2886,6 +2904,15 @@ td.high-bg {
 }
 td.disaster-bg {
 	@extend td.na-bg;
+}
+
+.inactive-bg {
+	color: darken($alt-red,45%);
+	background-color: $alt-red;
+}
+
+td.inactive-bg {
+	@extend .inactive-bg;
 }
 
 %found-bg {
@@ -3282,9 +3309,11 @@ $browser-logos: (
 	li {
 		display: inline-block;
 		min-width: 2em;
+		margin-right: .4em;
 
 		&:last-child {
 			min-width: auto;
+			margin-right: 0;
 		}
 	}
 }
