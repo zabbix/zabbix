@@ -34,6 +34,7 @@
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
+#include "alias.h"
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
