@@ -550,6 +550,46 @@ void	op_host_disable(const DB_EVENT *event)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_host_inventory_mode                                           *
+ *                                                                            *
+ * Purpose: sets host inventory mode                                          *
+ *                                                                            *
+ * Parameters: event          - [IN] the source event                         *
+ *             inventory_mode - [IN] the new inventory mode, see              *
+ *                              HOST_INVENTORY_ defines                       *
+ *                                                                            *
+ * Comments: This function does not allow disabling host inventory - only     *
+ *           setting manual or automatic host inventory mode is supported.    *
+ *                                                                            *
+ ******************************************************************************/
+void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
+{
+	const char	*__function_name = "op_host_inventory_mode";
+	zbx_uint64_t	hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE &&
+			event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	{
+		return;
+	}
+
+	if (0 == (hostid = add_discovered_host(event)))
+		return;
+
+	DBset_host_inventory(hostid, inventory_mode);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+
 /******************************************************************************
  *                                                                            *
  * Function: op_groups_add                                                    *
