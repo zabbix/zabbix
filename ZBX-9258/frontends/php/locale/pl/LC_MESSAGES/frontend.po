@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:15+0300\n"
+"POT-Creation-Date: 2015-08-14 21:04+0300\n"
 "PO-Revision-Date: 2015-03-26 11:41+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2051,7 +2051,7 @@ msgstr "Nie można znaleźć hosta \"%1$s\" użytego na mapie \"%2$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nie można znaleźć hosta \"%1$s\" użytego na ekranie \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:877
+#: include/classes/import/CConfigurationImport.php:879
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nie można znaleźć grupy hostów \"%1$s\" dla prototypu hosta \"%2$s\" dla reguły wykrywania \"%3$s\" w \"%4$s\"."
@@ -2075,42 +2075,42 @@ msgstr "Nie można znaleźć ikony \"%1$s\" użytej na mapie \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Nie można znaleźć mapy ikon \"%1$s\" użytej na mapie \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1153
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej jako wartość MAX osi Y dla wykresu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1053
+#: include/classes/import/CConfigurationImport.php:1055
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej jako wartość MAX osi Y dla prototypu wykresu \"%3$s\" dla reguły wykrywania \"%4$s\" w \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej jako wartość MIN osi Y dla wykresu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1033
+#: include/classes/import/CConfigurationImport.php:1035
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej jako wartość MIN osi Y dla prototypu wykresu \"%3$s\" dla reguły wykrywania \"%4$s\" w \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1172
+#: include/classes/import/CConfigurationImport.php:1174
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej w wykresie \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1073
+#: include/classes/import/CConfigurationImport.php:1075
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej w prototypie wykresu \"%3$s\" dla reguły wykrywania \"%4$s\" w \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1228
+#: include/classes/import/CConfigurationImport.php:1230
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej w wyzwalaczu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1002
+#: include/classes/import/CConfigurationImport.php:1004
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nie można znaleźć pozycji \"%1$s\" na \"%2$s\" użytej w prototypie wyzwalacza \"%3$s\" dla reguły wykrywania \"%4$s\" w \"%5$s\"."
@@ -2147,7 +2147,7 @@ msgstr "Nie można znaleźć obiektów o nazwie"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nie można znaleźć ekranu \"%1$s\" użytego na ekranie \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:900
+#: include/classes/import/CConfigurationImport.php:902
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nie można znaleźć szablonu \"%1$s\" dla prototypu hosta \"%2$s\" dla reguły wykrywania \"%3$s\" w \"%4$s\"."
@@ -2160,12 +2160,12 @@ msgstr "Nie można znaleźć szablonu \"%1$s\" dla prototypu hosta \"%2$s\" dla 
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Nie można znaleźć wyzwalacza \"%1$s\" użytego na mapie \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:686
+#: include/classes/import/CConfigurationImport.php:688
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Nie można znaleźć mapy wartości \"%1$s\" użytej dla pozycji \"%2$s\" w \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:844
+#: include/classes/import/CConfigurationImport.php:846
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nie można znaleźć mapy wartości \"%1$s\" użytej dla prototypu pozycji \"%2$s\" dla reguły wykrywania \"%3$s\" w \"%4$s\"."
@@ -8198,7 +8198,7 @@ msgstr "W szablonie \"%2$s\" nie ma pozycji \"%1$s\"."
 msgid "Item \"%1$s\" does not exist."
 msgstr "Pozycja \"%1$s\" nie istnieje."
 
-#: include/classes/import/CConfigurationImport.php:669
+#: include/classes/import/CConfigurationImport.php:671
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Pozycja \"%1$s\" w \"%2$s\": aplikacja \"%3$s\" nie istnieje."
@@ -14141,8 +14141,8 @@ msgstr "Wyzwalacz"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Wyzwalacz \"%1$s\" już istnieje w \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1244
-#: include/classes/import/CConfigurationImport.php:1288
+#: include/classes/import/CConfigurationImport.php:1246
+#: include/classes/import/CConfigurationImport.php:1290
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Wyzwalacz \"%1$s\" zależy od wyzwalacza \"%2$s\", którego nie ma."

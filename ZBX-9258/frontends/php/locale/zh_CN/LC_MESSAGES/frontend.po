@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:15+0300\n"
+"POT-Creation-Date: 2015-08-14 21:04+0300\n"
 "PO-Revision-Date: 2015-03-18 03:19+0300\n"
 "Last-Translator: Wayne Wang <net_use@bzhy.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1970,7 +1970,7 @@ msgstr "无法找到主机 \"%1$s\" 用于地图 \"%2$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "无法找到主机 \"%1$s\" 用于屏幕 \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:877
+#: include/classes/import/CConfigurationImport.php:879
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "在 \"%4$s\"上无法针对自动发现规则 \"%3$s\"上的\"%2$s\"主机样板找到主机组 \"%1$s\""
@@ -1994,42 +1994,42 @@ msgstr "无法找到图标 \"%1$s\" 用于地图 \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到地图图标 \"%1$s\" 用于地图 \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1153
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "无法为数据图\"%3$s\"在\"%2$s\"上找到可以作为最大Y值的监控项目 \"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1053
+#: include/classes/import/CConfigurationImport.php:1055
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "无法在\"%2$s\"上为\"%5$s\"上的自动发现规则\"%4$s\"上的数据图样板\"%3$s\"找到可以作为最大Y值的监控项目\"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "无法为数据图 \"%3$s\"在\"%2$s\"上可以作为最小值的监控项目\"%1$s\""
 
-#: include/classes/import/CConfigurationImport.php:1033
+#: include/classes/import/CConfigurationImport.php:1035
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "无法在\"%2$s\"上为\"%5$s\"上的自动发现规则\"%4$s\"上的数据图样板\"%3$s\"找到可以作为最小Y值的监控项目\"%1$s\""
 
-#: include/classes/import/CConfigurationImport.php:1172
+#: include/classes/import/CConfigurationImport.php:1174
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "无法在\"%2$s\"上找到被数据图\"%3$s\"引用的监控项目\"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1073
+#: include/classes/import/CConfigurationImport.php:1075
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "在 \"%5$s\"中无法找到被自动发现规则\"%4$s\"上的数据图样板 \"%3$s\"在\"%2$s\"上所引用的监控项目\"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1228
+#: include/classes/import/CConfigurationImport.php:1230
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
 msgstr "无法在 \"%2$s\"上找到被触发器 \"%3$s\"所引用的监控项目\"%1$s\" "
 
-#: include/classes/import/CConfigurationImport.php:1002
+#: include/classes/import/CConfigurationImport.php:1004
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "在 \"%5$s\"中无法找到被自动发现规则\"%4$s\"上的触发器样板 \"%3$s\"在\"%2$s\"上所引用的监控项目\"%1$s\"."
@@ -2066,7 +2066,7 @@ msgstr "无法找到有名称的物件"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "无法找到屏幕 \"%1$s\" 用于屏幕 \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:900
+#: include/classes/import/CConfigurationImport.php:902
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "无法在\"%4$s\"上为自动发现规则 \"%3$s\"上的主机样板\"%2$s\"找模板\"%1$s\""
@@ -2079,12 +2079,12 @@ msgstr "无法在\"%4$s\"上为自动发现规则 \"%3$s\"上的主机样板\"%2
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "无法找到触发器 \"%1$s\" 用于地图 \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:686
+#: include/classes/import/CConfigurationImport.php:688
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "无法在 \"%3$s\"上找到由监控项目\"%2$s\" 所引用的数据映射\"%1$s\"."
 
-#: include/classes/import/CConfigurationImport.php:844
+#: include/classes/import/CConfigurationImport.php:846
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "无法在\"%4$s\"上找到由自动发现规则 \"%3$s\"上的 \"%2$s\"监控项目样板所引用的数据映射 \"%1$s\"."
@@ -8093,7 +8093,7 @@ msgstr "项目\"%1$s\"不存在于模板\"%2$s\"中."
 msgid "Item \"%1$s\" does not exist."
 msgstr "项目 \"%1$s\"不存在."
 
-#: include/classes/import/CConfigurationImport.php:669
+#: include/classes/import/CConfigurationImport.php:671
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的项目\"%1$s\" : 应用集\"%3$s\"不存在."
@@ -14006,8 +14006,8 @@ msgstr "触发器"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "触发器\"%1$s\"已存在于\"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1244
-#: include/classes/import/CConfigurationImport.php:1288
+#: include/classes/import/CConfigurationImport.php:1246
+#: include/classes/import/CConfigurationImport.php:1290
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "触发器\"%1$s\"相依于一个不存在的触发器\"%2$s\"."
