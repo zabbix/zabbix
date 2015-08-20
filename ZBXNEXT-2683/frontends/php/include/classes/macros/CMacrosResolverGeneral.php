@@ -504,13 +504,7 @@ class CMacrosResolverGeneral {
 				$macro_name = $parsed_macro['macro_name'];
 				$context = $parsed_macro['context'];
 
-				if ($context === null) {
-					$macro_names['{$'.$macro_name] = true;
-				}
-				else {
-					// Narrow down the search for macros with contexts.
-					$macro_names['{$'.$macro_name.':'] = true;
-				}
+				$macro_names['{$'.$macro_name] = true;
 			}
 		}
 
