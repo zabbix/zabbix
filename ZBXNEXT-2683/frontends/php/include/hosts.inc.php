@@ -810,9 +810,54 @@ function getInheritedMacros(array $hostids) {
 				'macros' => []
 			];
 
+			/*
+			 * Global macros are overwritten by template macros and template macros are overwritten by host macros.
+			 * Macros with contexts require additional checking for contexts, since {$MACRO:} is the same as
+			 * {$MACRO:""}.
+			 */
 			foreach ($db_template['macros'] as $dbMacro) {
-				$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
-				$all_macros[$dbMacro['macro']] = true;
+				if (array_key_exists($dbMacro['macro'], $all_macros)) {
+					$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+					$all_macros[$dbMacro['macro']] = true;
+				}
+				else {
+					$parsed_macro = (new CUserMacroParser($dbMacro['macro']))->getMacros()[0];
+					$tpl_macro_name = $parsed_macro['macro_name'];
+					$tpl_context = $parsed_macro['context'];
+
+					if ($tpl_context === null) {
+						$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+						$all_macros[$dbMacro['macro']] = true;
+					}
+					else {
+						$match_found = false;
+
+						foreach ($global_macros as $global_macro => $global_value) {
+							$parsed_macro = (new CUserMacroParser($global_macro))->getMacros()[0];
+							$gbl_macro_name = $parsed_macro['macro_name'];
+							$gbl_context = $parsed_macro['context'];
+
+							if ($tpl_macro_name === $gbl_macro_name && $tpl_context === $gbl_context) {
+								$match_found = true;
+
+								unset($global_macros[$global_macro], $hosts[$hostid][$global_macro],
+									$all_macros[$global_macro]
+								);
+
+								$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+								$all_macros[$dbMacro['macro']] = true;
+								$global_macros[$dbMacro['macro']] = $global_value;
+
+								break;
+							}
+						}
+
+						if (!$match_found) {
+							$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
+							$all_macros[$dbMacro['macro']] = true;
+						}
+					}
+				}
 			}
 		}
 
@@ -933,14 +978,47 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 	}
 	unset($inherited_macro);
 
+	/*
+	 * Global macros and template macros are overwritten by host macros. Macros with contexts require additional
+	 * checking for contexts, since {$MACRO:} is the same as {$MACRO:""}.
+	 */
 	foreach ($host_macros as &$host_macro) {
 		if (array_key_exists($host_macro['macro'], $inherited_macros)) {
 			$host_macro = array_merge($inherited_macros[$host_macro['macro']], $host_macro);
 			unset($inherited_macros[$host_macro['macro']]);
 		}
 		else {
-			$host_macro['type'] = 0x00;
+			$parsed_macro = (new CUserMacroParser($host_macro['macro']))->getMacros()[0];
+			$host_macro_name = $parsed_macro['macro_name'];
+			$host_context = $parsed_macro['context'];
+
+			if ($host_context === null) {
+				$host_macro['type'] = 0x00;
+			}
+			else {
+				$match_found = false;
+
+				foreach ($inherited_macros as $inherited_macro => $inherited_values) {
+					$parsed_macro = (new CUserMacroParser($inherited_macro))->getMacros()[0];
+					$inherited_macro_name = $parsed_macro['macro_name'];
+					$inherited_context = $parsed_macro['context'];
+
+					if ($host_macro_name === $inherited_macro_name && $host_context === $inherited_context) {
+						$match_found = true;
+
+						$host_macro = array_merge($inherited_macros[$inherited_macro], $host_macro);
+						unset($inherited_macros[$inherited_macro]);
+
+						break;
+					}
+				}
+
+				if (!$match_found) {
+					$host_macro['type'] = 0x00;
+				}
+			}
 		}
+
 		$host_macro['type'] |= MACRO_TYPE_HOSTMACRO;
 	}
 	unset($host_macro);
