@@ -290,6 +290,8 @@ foreach (@$tlds_ref)
 fail("cannot calculate beginning of the period") unless(defined($probes_from));
 fail("cannot calculate end of the period") unless(defined($probes_till));
 
+info(sprintf("getting probe states from %s till %s", ts_str($probes_from), ts_str($probes_till)));
+
 my $all_probes_ref = get_probes();
 
 if (opt('probe'))
@@ -893,7 +895,7 @@ foreach (keys(%$servicedata))
 # unset TLD (for the logs)
 $tld = undef;
 
-unless (opt('dry-run'))
+unless (opt('dry-run') or opt('tld'))
 {
 	__update_false_positives();
 }
@@ -1773,19 +1775,9 @@ sub __get_min_clock
 
 	my $itemids_str = __sql_arr_to_str($rows_ref);
 
-	my $ret = 0;
+	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$config_minclock");
 
-	while ($ret == 0 && $config_minclock <= $now)
-	{
-		$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$config_minclock");
-
-		$ret = $rows_ref->[0]->[0] if ($rows_ref->[0]->[0]);
-
-		# move half of a day forward
-		$config_minclock += 43200;
-	}
-
-	return $ret;
+	return $rows_ref->[0]->[0] ? $rows_ref->[0]->[0] : $config_minclock;
 }
 
 sub __probe_offline_at
