@@ -181,7 +181,7 @@ static int			procstat_snapshot_num;
 /* external functions used by procstat collector */
 int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags);
 
-int	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
+void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
 		const char *cmdline, zbx_uint64_t flags, zbx_vector_uint64_t *pids);
 
 void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num);
