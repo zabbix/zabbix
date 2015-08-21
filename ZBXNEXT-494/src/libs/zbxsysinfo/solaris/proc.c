@@ -18,6 +18,11 @@
 **/
 
 #include <procfs.h>
+
+#ifdef HAVE_ZONE_H
+#	include "<zone.h>
+#endif
+
 #include "common.h"
 #include "sysinfo.h"
 #include "zbxregexp.h"
@@ -40,7 +45,6 @@ typedef struct
 }
 zbx_sysinfo_proc_t;
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sysinfo_proc_free                                            *
@@ -55,7 +59,6 @@ void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 
 	zbx_free(proc);
 }
-
 
 static int	check_procstate(psinfo_t *psinfo, int zbx_proc_stat)
 {
@@ -525,7 +528,6 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 
 	DIR			*dir;
 	struct dirent		*entries;
-	struct passwd		*usrinfo;
 	char			tmp[MAX_STRING_LEN];
 	int			pid, ret = FAIL, fd = -1, n;
 	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
@@ -613,16 +615,12 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes)
  *               -errno    - failed to read pids                              *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
+void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *procname, const char *username,
 		const char *cmdline, zbx_uint64_t flags, zbx_vector_uint64_t *pids)
 {
 	const char		*__function_name = "zbx_proc_get_matching_pids";
-	DIR			*dir;
-	struct dirent		*entries;
 	struct passwd		*usrinfo;
-	char			tmp[MAX_STRING_LEN];
-	int			pid, ret = FAIL, fd = -1, i;
-	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
+	int			ret = FAIL, i;
 	zbx_sysinfo_proc_t	*proc;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
@@ -635,10 +633,7 @@ int	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *pr
 	{
 		/* in the case of invalid user there are no matching processes, return empty vector */
 		if (NULL == (usrinfo = getpwnam(username)))
-		{
-			ret = SUCCEED;
 			goto out;
-		}
 	}
 	else
 		usrinfo = NULL;
