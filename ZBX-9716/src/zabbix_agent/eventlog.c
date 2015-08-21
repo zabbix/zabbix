@@ -86,7 +86,7 @@ static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint6
 	*FirstID = dwOldestRecord;
 	*LastID = dwOldestRecord + dwNumRecords - 1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64 " numIDs:%d",
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64 " numIDs:%lu",
 			__function_name, zbx_result_string(ret), *FirstID, *LastID, dwNumRecords);
 
 	ret = SUCCEED;
@@ -97,12 +97,10 @@ out:
 }
 
 /* close event logger */
-static int	zbx_close_eventlog(HANDLE eventlog_handle)
+static void	zbx_close_eventlog(HANDLE eventlog_handle)
 {
 	if (NULL != eventlog_handle)
 		CloseEventLog(eventlog_handle);
-
-	return SUCCEED;
 }
 
 /******************************************************************************
@@ -591,8 +589,8 @@ static int	zbx_open_eventlog6(LPCWSTR wsource, zbx_uint64_t *lastlogsize, EVT_HA
 		*lastlogsize = *FirstID - 1;
 		zabbix_log(LOG_LEVEL_DEBUG, "lastlogsize is too big. It is set to:" ZBX_FS_UI64, *lastlogsize);
 	}
-	ret = SUCCEED;
 
+	ret = SUCCEED;
 out:
 	if (NULL != log)
 		EvtClose(log);
@@ -633,8 +631,8 @@ static int	zbx_get_handle_eventlog6(LPCWSTR wsource, zbx_uint64_t *lastlogsize, 
 			zabbix_log(LOG_LEVEL_WARNING, "EvtQuery failed:%s", strerror_from_system(status));
 		goto out;
 	}
-	ret = SUCCEED;
 
+	ret = SUCCEED;
 out:
 	zbx_free(tmp_str);
 	zbx_free(event_query);
@@ -675,7 +673,6 @@ int	initialize_eventlog6(const char *source, zbx_uint64_t *lastlogsize, zbx_uint
 	}
 
 	ret = SUCCEED;
-
 out:
 	zbx_free(wsource);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
@@ -869,7 +866,6 @@ static int	zbx_get_eventlog_message6(LPCWSTR wsource, zbx_uint64_t *which, unsig
 	}
 
 	ret = SUCCEED;
-
 out:
 	if (NULL != event_bookmark)
 		EvtClose(event_bookmark);
@@ -936,7 +932,6 @@ int	process_eventlog6(const char *source, zbx_uint64_t *lastlogsize, unsigned lo
 			goto out;
 		}
 	}
-
 out:
 	zbx_free(wsource);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
