@@ -36,8 +36,6 @@
  *  | and historical data                  |
  *  | ------------------------------------ |
  *  | free space                           |
- *  | ------------------------------------ |
- *  | per process cpu utilization snapshot |
  *  '--------------------------------------'
  *
  * Because the shared memory can be resized by other processes instead of
@@ -49,17 +47,18 @@
  * memory which leads to 2GB total size limit.
  *
  * During every data collection cycle collector does the following:
- * 1) acquires list of pids for cpu utilization queries
- * 2) reads total cpu utilization snapshot for the processes
- * 3) calculates cpu utilization difference by comparing with previous snapshot
- * 4) updates cpu utilization values for queries.
- * 5) saves the last cpu utilization snapshot
+ * 1) acquires list of all processes running on system
+ * 2) builds a list of processes monitored by queries
+ * 3) reads total cpu utilization snapshot for the monitored processes
+ * 4) calculates cpu utilization difference by comparing with previous snapshot
+ * 5) updates cpu utilization values for queries.
+ * 6) saves the last cpu utilization snapshot
  *
  * Initialisation.
  * * procstat_init() initialises procstat dshm structure but doesn't allocate memory from the system
  *   (zbx_dshm_create() called with size 0).
- * * the first call of procstat_add() allocates the shared memory for the header, the first query and
- *   cpu utilization snapshots via call to zbx_dshm_reserve().
+ * * the first call of procstat_add() allocates the shared memory for the header and the first query
+ *   via call to zbx_dshm_reserve().
  * * The header is initialised in procstat_copy_data() which is called back from zbx_dshm_reserve().
  *
  * Memory allocation within dshm.
@@ -71,7 +70,7 @@
  * * agentd processes share a single instance of ZBX_COLLECTOR_DATA (*collector) containing reference
  *   to shared procstat memory segment.
  * * Each agentd process also holds local reference to procstat shared memory segment.
- * * The system keeps the shared memory segment untill the last process detaches from it.
+ * * The system keeps the shared memory segment until the last process detaches from it.
  * * Synchronise both references with procstat_reattach() before using procstat shared memory segment.
  */
 
