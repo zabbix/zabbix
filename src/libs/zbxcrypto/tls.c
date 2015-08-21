@@ -3843,19 +3843,43 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 				*error = zbx_strdup(*error, "TLS connection has been closed during handshake");
 				goto out;
 			case SSL_ERROR_SYSCALL:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake returned"
-						" SSL_ERROR_SYSCALL:");
-				zbx_tls_error_msg(error, &error_alloc, &error_offset);
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, ": %s", info_buf);
+				if (0 == ERR_peek_error())
+				{
+					if (0 == res)
+					{
+						*error = zbx_strdup(*error, "Connection closed by peer. Check"
+								" allowed connection types and access rights");
+					}
+					else if (-1 == res)
+					{
+						zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect()"
+								" I/O error: %s",
+								strerror_from_system(zbx_socket_last_error()));
+					}
+					else
+					{
+						/* "man SSL_get_error" describes only res == 0 and res == -1 for */
+						/* SSL_ERROR_SYSCALL case */
+						zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect()"
+								" returned undocumented code %d", res);
+					}
+				}
+				else
+				{
+					zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() returned"
+							" SSL_ERROR_SYSCALL:");
+					zbx_tls_error_msg(error, &error_alloc, &error_offset);
+					zbx_snprintf_alloc(error, &error_alloc, &error_offset, ": %s", info_buf);
+				}
 				goto out;
 			case SSL_ERROR_SSL:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake returned"
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() returned"
 						" SSL_ERROR_SSL:");
 				zbx_tls_error_msg(error, &error_alloc, &error_offset);
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, ": %s", info_buf);
 				goto out;
 			default:
-				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake returned error"
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "SSL_connect() returned error"
 						" code %d", error_code);
 				zbx_tls_error_msg(error, &error_alloc, &error_offset);
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, ": %s", info_buf);
