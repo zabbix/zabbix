@@ -370,10 +370,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 #define ZBX_CFG_LTRIM_CHARS	"\t "
 #define ZBX_CFG_RTRIM_CHARS	ZBX_CFG_LTRIM_CHARS "\r\n"
-#define ZBX_CFG_EOL_CHAR	'\n'
 
 	FILE		*file;
-	int		i, lineno, param_valid, line_length;
+	int		i, lineno, param_valid;
 	char		line[MAX_STRING_LEN], *parameter, *value;
 	zbx_uint64_t	var;
 #ifdef _WINDOWS
@@ -400,11 +399,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
-			/* only 2048 character (inc. '\n\0')single lines supported in the config file */
-			line_length = strlen(line);
-			if(ZBX_CFG_EOL_CHAR != line[line_length - 1])
-				goto line_too_long;
-
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
 			zbx_rtrim(line, ZBX_CFG_RTRIM_CHARS);
 
@@ -519,10 +513,6 @@ cannot_open:
 	if (0 != optional)
 		return SUCCEED;
 	zbx_error("cannot open config file [%s]: %s", cfg_file, zbx_strerror(errno));
-	goto error;
-line_too_long:
-	fclose(file);
-	zbx_error("line %d (%s) in config file [%s] is too long (max 2046 bytes)", lineno, line, cfg_file);
 	goto error;
 non_utf8:
 	fclose(file);
