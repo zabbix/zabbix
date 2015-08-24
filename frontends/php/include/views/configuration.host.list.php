@@ -179,6 +179,7 @@ foreach ($data['hosts'] as $host) {
 		$lifetime_indicator = '';
 	}
 
+	// encryption
 	if ($host['tls_connect'] != HOST_ENCRYPTION_NONE || $host['tls_accept']) {
 		// input
 		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
