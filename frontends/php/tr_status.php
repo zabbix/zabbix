@@ -240,7 +240,7 @@ $triggerWidget->addItem($filterForm);
 /*
  * Form
  */
-$triggerForm = (new CForm('get', 'acknow.php'))
+$triggerForm = (new CForm('get'))
 	->setName('tr_status')
 	->addVar('backurl', $page['file']);
 
@@ -643,8 +643,8 @@ foreach ($triggers as $trigger) {
 			if ($trigger['event_count']) {
 				$ackColumn = [
 					(new CLink(_('No'),
-						'acknow.php?'.
-							'triggers[]='.$trigger['triggerid'].
+						'zabbix.php?action=acknowledge.edit'.
+							'&eventids[]='.$trigger['lastEvent']['eventid'].
 							'&backurl='.$page['file']
 					))
 						->addClass(ZBX_STYLE_LINK_ALT)
@@ -654,9 +654,8 @@ foreach ($triggers as $trigger) {
 			}
 			else {
 				$ackColumn = (new CLink(_('Yes'),
-					'acknow.php?'.
-						'eventid='.$trigger['lastEvent']['eventid'].
-						'&triggerid='.$trigger['lastEvent']['objectid'].
+					'zabbix.php?action=acknowledge.edit'.
+						'&eventids[]='.$trigger['lastEvent']['eventid'].
 						'&backurl='.$page['file']
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
