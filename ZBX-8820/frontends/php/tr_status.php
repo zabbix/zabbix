@@ -240,7 +240,7 @@ $triggerWidget->addItem($filterForm);
 /*
  * Form
  */
-$triggerForm = (new CForm('get'))
+$triggerForm = (new CForm('get', 'zabbix.php'))
 	->setName('tr_status')
 	->addVar('backurl', $page['file']);
 
@@ -263,8 +263,8 @@ else {
 
 if ($config['event_ack_enable']) {
 	$headerCheckBox = (new CColHeader(
-		(new CCheckBox('all_triggers'))
-			->onClick("checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');")
+		(new CCheckBox('all_eventids'))
+			->onClick("checkAll('".$triggerForm->GetName()."', 'all_eventids', 'eventids');")
 	))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 else {
@@ -637,9 +637,13 @@ foreach ($triggers as $trigger) {
 		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
 	);
 
+	// open or close
 	// acknowledge
 	if ($config['event_ack_enable']) {
 		if ($trigger['hasEvents']) {
+			$ack_checkbox = new CCheckBox('eventids['.$trigger['lastEvent']['eventid'].']',
+				$trigger['lastEvent']['eventid']
+			);
 			if ($trigger['event_count']) {
 				$ackColumn = [
 					(new CLink(_('No'),
@@ -663,14 +667,15 @@ foreach ($triggers as $trigger) {
 			}
 		}
 		else {
+			$ack_checkbox = '';
 			$ackColumn = (new CCol(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 	}
 	else {
+		$ack_checkbox = null;
 		$ackColumn = null;
 	}
 
-	// open or close
 	if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
 		$openOrCloseDiv = $trigger['events']
 			? (new CDiv())
@@ -695,9 +700,7 @@ foreach ($triggers as $trigger) {
 
 	$triggerTable->addRow([
 		$openOrCloseDiv,
-		$config['event_ack_enable']
-			? new CCheckBox('triggers['.$trigger['triggerid'].']', $trigger['triggerid'])
-			: null,
+		$ack_checkbox,
 		getSeverityCell($trigger['priority'], $config, null, !$trigger['value']),
 		$statusSpan,
 		($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? makeUnknownIcon($trigger['error']) : '',
@@ -760,8 +763,8 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$footer = new CActionButtonList('action', 'triggers', [
-		'trigger.bulkacknowledge' => ['name' => _('Bulk acknowledge')]
+	$footer = new CActionButtonList('action', 'eventids', [
+		'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
 	]);
 }
 
