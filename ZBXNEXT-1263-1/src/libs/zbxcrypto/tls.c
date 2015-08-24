@@ -3640,8 +3640,16 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s(): gnutls_handshake() returned: %d %s",
-					__function_name, res, gnutls_strerror(res));
+			int level;
+
+			/* log "peer has closed connection" case with debug level */
+			level = GNUTLS_E_PREMATURE_TERMINATION == res ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+
+			if (SUCCEED == zabbix_check_log_level(level))
+			{
+				zabbix_log(level, "%s(): gnutls_handshake() returned: %d %s",
+						__function_name, res, gnutls_strerror(res));
+			}
 
 			if (0 != gnutls_error_is_fatal(res))
 			{

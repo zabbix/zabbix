@@ -469,7 +469,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 			SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
 	{
 		zbx_tcp_close(s);
-		zbx_set_socket_strerror("%s", error);
+		zbx_set_socket_strerror("TCP connection successful, cannot establish TLS to [[%s]:%d]: %s",
+				ip, port, error);
 		zbx_free(error);
 		goto out;
 	}
@@ -566,7 +567,8 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 			SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
 	{
 		zbx_tcp_close(s);
-		zbx_set_socket_strerror("%s", error);
+		zbx_set_socket_strerror("TCP connection successful, cannot establish TLS to [[%s]:%d]: %s",
+				ip, port, error);
 		zbx_free(error);
 		return FAIL;
 	}
