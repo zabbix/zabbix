@@ -105,11 +105,11 @@ $header['right']->addItem(get_icon('fullscreen', ['fullscreen' => $this->data['f
 // create filter
 if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_LATEST) {
 	if (isset($this->data['iv_string'][$this->data['value_type']])) {
-		$filterForm = new CFilter();
+		$filterForm = new CFilter('web.history.filter.state');
 		$filterColumn1 = new CFormList();
 		$filterForm->addVar('action', $this->data['action']);
 		foreach (getRequest('itemids') as $itemId) {
-			$filterForm->addVar('itemids[]', $itemId, 'filter_itemids_'.$itemId);
+			$filterForm->addVar('itemids['.$itemId.']', $itemId);
 		}
 
 		$itemListbox = new CListBox('cmbitemlist[]');
@@ -136,7 +136,10 @@ if ($this->data['action'] == HISTORY_VALUES || $this->data['action'] == HISTORY_
 		$deleteItemButton = null;
 
 		if (count($this->data['items']) > 1) {
-			$deleteItemButton = new CSubmit('remove_log', _('Remove selected'));
+			$deleteItemButton = [
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				new CButton('remove_log', _('Remove selected'))
+			];
 		}
 
 		$filterColumn1->addRow(_('Items list'), [$itemListbox, BR(), $addItemButton, $deleteItemButton]);
@@ -222,21 +225,18 @@ else {
 		if(!isset($filterForm)) {
 			$filterForm = new CFilter('web.history.filter.state');
 		}
-		$filterColumn1 = new CFormList();
 
 		// display the graph type filter for graphs with multiple items
 		if ($this->data['action'] == HISTORY_BATCH_GRAPH) {
-
-			$graphType = [
-				(new CRadioButton('graphtype', GRAPH_TYPE_NORMAL, ($this->data['graphtype'] == GRAPH_TYPE_NORMAL)))
-					->setId('graphtype_'.GRAPH_TYPE_NORMAL),
-				new CLabel(_('Normal'), 'graphtype_'.GRAPH_TYPE_NORMAL),
-				(new CRadioButton('graphtype', GRAPH_TYPE_STACKED, ($this->data['graphtype'] == GRAPH_TYPE_STACKED)))
-					->setId('graphtype_'.GRAPH_TYPE_STACKED),
-				new CLabel(_('Stacked'), 'graphtype_'.GRAPH_TYPE_STACKED)
-			];
-			$filterColumn1->addRow(_('Graph type'), $graphType);
-			$filterForm->addColumn($filterColumn1);
+			$filterForm->addColumn(
+				(new CFormList())->addRow(_('Graph type'),
+					(new CRadioButtonList('graphtype', (int) $this->data['graphtype']))
+						->addValue(_('Normal'), GRAPH_TYPE_NORMAL)
+						->addValue(_('Stacked'), GRAPH_TYPE_STACKED)
+						->setModern(true)
+				)
+			);
+			$filterForm->removeButtons();
 
 			$filterForm->addVar('action', $this->data['action']);
 			$filterForm->addVar('itemids', $this->data['itemids']);

@@ -26,7 +26,7 @@ $hostInventoryWidget = (new CWidget())->setTitle(_('Host inventory'));
  */
 $overviewFormList = new CFormList();
 
-$hostSpan = (new CSpan($this->data['host']['host']))
+$host_name = (new CSpan($this->data['host']['host']))
 	->addClass(ZBX_STYLE_LINK_ACTION)
 	->setMenuPopup(CMenuPopupHelper::getHost(
 		$this->data['host'],
@@ -34,11 +34,29 @@ $hostSpan = (new CSpan($this->data['host']['host']))
 		false
 	));
 
-$hostName = ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
-	? [$hostSpan, SPACE, (new CDiv())->addClass('icon-maintenance-inline')]
-	: $hostSpan;
+if ($this->data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+	$maintenance_icon = (new CSpan())
+		->addClass(ZBX_STYLE_ICON_MAINT)
+		->addClass(ZBX_STYLE_CURSOR_POINTER);
 
-$overviewFormList->addRow(_('Host name'), $hostName);
+	if (array_key_exists($data['host']['maintenanceid'], $data['maintenances'])) {
+		$maintenance = $data['maintenances'][$data['host']['maintenanceid']];
+
+		$hint = $maintenance['name'].' ['.($data['host']['maintenance_type']
+			? _('Maintenance without data collection')
+			: _('Maintenance with data collection')).']';
+
+		if ($maintenance['description']) {
+			$hint .= "\n".$maintenance['description'];
+		}
+
+		$maintenance_icon->setHint($hint);
+	}
+
+	$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
+}
+
+$overviewFormList->addRow(_('Host name'), $host_name);
 
 if ($this->data['host']['host'] !== $this->data['host']['name']) {
 	$overviewFormList->addRow(_('Visible name'), (new CSpan($this->data['host']['name']))->addClass('text-field'));

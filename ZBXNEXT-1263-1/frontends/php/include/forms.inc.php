@@ -253,10 +253,9 @@ function getPermissionsFormList($rights = [], $user_type = USER_TYPE_ZABBIX_USER
 
 		$table = (new CTable())
 			->setNoDataMessage(_('No accessible resources'))
-			->addClass('right_table')
 			->addClass('calculated');
 		if (!$isHeaderDisplayed) {
-			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')], 'header');
+			$table->setHeader([_('Read-write'), _('Read only'), _('Deny')]);
 			$isHeaderDisplayed = true;
 		}
 		$table->addRow($row);
@@ -275,7 +274,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
-			$link = (new CLink($element['name']))
+			$link = (new CSpan($element['name']))
 				->addClass(ZBX_STYLE_LINK_ACTION)
 				->addClass(ZBX_STYLE_GREEN)
 				->onClick(CHtml::encode(
@@ -283,25 +282,25 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
 				));
 			$output[] = $link;
-			$output[] = new CSup(SPACE.$element['count']);
+			$output[] = SPACE;
+			$output[] = new CSup($element['count']);
 		}
 
 		// isn't activated
 		else {
 			// subfilter has 0 items
 			if ($element['count'] == 0) {
-				$output[] = (new CLink($element['name']))
-					->addClass( ZBX_STYLE_LINK_ACTION)
-					->addClass(ZBX_STYLE_GREY);
-				$output[] = new CSup(SPACE.$element['count']);
+				$output[] = (new CSpan($element['name']))->addClass(ZBX_STYLE_GREY);
+				$output[] = SPACE;
+				$output[] = new CSup($element['count']);
 			}
 			else {
 				// this level has no active subfilters
 				$nspan = $subfilter
-					? new CSup(SPACE.'+'.$element['count'])
-					: new CSup(SPACE.$element['count']);
+					? new CSup('+'.$element['count'])
+					: new CSup($element['count']);
 
-				$link = (new CLink($element['name']))
+				$link = (new CSpan($element['name']))
 					->addClass(ZBX_STYLE_LINK_ACTION)
 					->onClick(CHtml::encode(
 						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
@@ -313,6 +312,7 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 					));
 
 				$output[] = $link;
+				$output[] = SPACE;
 				$output[] = $nspan;
 			}
 		}
@@ -1011,6 +1011,9 @@ function getItemFormData(array $item = [], array $options = []) {
 		]);
 		$discoveryRule = reset($discoveryRule);
 		$data['hostid'] = $discoveryRule['hostid'];
+
+		$data['new_application_prototype'] = getRequest('new_application_prototype', '');
+		$data['application_prototypes'] = getRequest('application_prototypes', array());
 	}
 	else {
 		$data['hostid'] = getRequest('hostid', 0);
@@ -1150,6 +1153,10 @@ function getItemFormData(array $item = [], array $options = []) {
 		$data['logtimefmt'] = $data['item']['logtimefmt'];
 		$data['new_application'] = getRequest('new_application', '');
 
+		if ($data['parent_discoveryid'] != 0) {
+			$data['new_application_prototype'] = getRequest('new_application_prototype', '');
+		}
+
 		if (!$data['is_discovery_rule']) {
 			$data['formula'] = $data['item']['formula'];
 		}
@@ -1175,7 +1182,27 @@ function getItemFormData(array $item = [], array $options = []) {
 					array_push($data['delay_flex'], ['delay' => $arr_of_delay[0], 'period' => $arr_of_delay[1]]);
 				}
 			}
+
 			$data['applications'] = array_unique(zbx_array_merge($data['applications'], get_applications_by_itemid($data['itemid'])));
+
+			if ($data['parent_discoveryid'] != 0) {
+				/*
+				 * Get a list of application prototypes assigned to item prototype. Don't select distinct names,
+				 * since database can be accidentally created case insensitive.
+				 */
+				$application_prototypes = DBfetchArray(DBselect(
+					'SELECT ap.name'.
+					' FROM application_prototype ap,item_application_prototype iap'.
+					' WHERE ap.application_prototypeid=iap.application_prototypeid'.
+						' AND ap.itemid='.zbx_dbstr($data['parent_discoveryid']).
+						' AND iap.itemid='.zbx_dbstr($data['itemid'])
+				));
+
+				// Merge form submitted data with data existing in DB to find diff and correctly display ListBox.
+				$data['application_prototypes'] = array_unique(
+					zbx_array_merge($data['application_prototypes'], zbx_objectValues($application_prototypes, 'name'))
+				);
+			}
 		}
 	}
 
@@ -1186,9 +1213,25 @@ function getItemFormData(array $item = [], array $options = []) {
 	$data['db_applications'] = DBfetchArray(DBselect(
 		'SELECT DISTINCT a.applicationid,a.name'.
 		' FROM applications a'.
-		' WHERE a.hostid='.zbx_dbstr($data['hostid'])
+		' WHERE a.hostid='.zbx_dbstr($data['hostid']).
+			($data['parent_discoveryid'] ? ' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL : '')
 	));
 	order_result($data['db_applications'], 'name');
+
+	if ($data['parent_discoveryid'] != 0) {
+		// Make the application prototype list no appearing empty, but filling it with "-None-" as first element.
+		if (count($data['application_prototypes']) == 0) {
+			$data['application_prototypes'][] = 0;
+		}
+
+		// Get a list of application prototypes by discovery rule.
+		$data['db_application_prototypes'] = DBfetchArray(DBselect(
+			'SELECT ap.application_prototypeid,ap.name'.
+			' FROM application_prototype ap'.
+			' WHERE ap.itemid='.zbx_dbstr($data['parent_discoveryid'])
+		));
+		order_result($data['db_application_prototypes'], 'name');
+	}
 
 	// interfaces
 	$data['interfaces'] = API::HostInterface()->get([
@@ -1536,7 +1579,7 @@ function getTriggerFormData($exprAction) {
 }
 
 function get_timeperiod_form() {
-	$tblPeriod = (new CTable())->addClass('formElementTable');
+	$tblPeriod = new CTable();
 
 	// init new_timeperiod variable
 	$new_timeperiod = getRequest('new_timeperiod', []);
@@ -1725,15 +1768,12 @@ function get_timeperiod_form() {
 		]);
 		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
-		$tblPeriod->addRow([_('Date'), [
-			(new CRadioButton('new_timeperiod[month_date_type]', '0', !$new_timeperiod['month_date_type']))
-				->onChange('submit()'),
-			_('Day'),
-			SPACE,
-			(new CRadioButton('new_timeperiod[month_date_type]', '1', $new_timeperiod['month_date_type']))
-				->onChange('submit()'),
-			_('Day of week')]]
-		);
+		$tblPeriod->addRow([_('Date'),
+			(new CRadioButtonList('new_timeperiod[month_date_type]', (int) $new_timeperiod['month_date_type']))
+				->addValue(_('Day'), 0, null, 'submit()')
+				->addValue(_('Day of week'), 1, null, 'submit()')
+				->setModern(true)
+		]);
 
 		if ($new_timeperiod['month_date_type'] > 0) {
 			$tblPeriod->addItem(new CVar('new_timeperiod[day]', $new_timeperiod['day']));
@@ -1797,7 +1837,9 @@ function get_timeperiod_form() {
 		$tblPeriod->addRow([_('At (hour:minute)'), [
 			(new CNumericBox('new_timeperiod[hour]', $new_timeperiod['hour'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			':',
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CNumericBox('new_timeperiod[minute]', $new_timeperiod['minute'], 2))
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		]]);

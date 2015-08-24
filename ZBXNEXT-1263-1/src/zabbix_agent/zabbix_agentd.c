@@ -676,7 +676,7 @@ static void	zbx_load_config(int requirement)
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
-			PARM_OPT,	0,			4},
+			PARM_OPT,	0,			5},
 		{"StartAgents",			&CONFIG_PASSIVE_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,
