@@ -175,7 +175,7 @@ class CConfigurationExport {
 
 		if ($options['templates'] || $options['hosts']) {
 			$this->gatherGraphs($options['hosts'], $options['templates']);
-			$this->gathertriggers($options['hosts'], $options['templates']);
+			$this->gatherTriggers($options['hosts'], $options['templates']);
 		}
 
 		if ($options['screens']) {
@@ -330,9 +330,10 @@ class CConfigurationExport {
 		// applications
 		$applications = API::Application()->get([
 			'hostids' => $hostIds,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => ['hostid', 'name'],
 			'inherited' => false,
-			'preservekeys' => true
+			'preservekeys' => true,
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 		]);
 
 		foreach ($applications as $application) {
@@ -378,7 +379,7 @@ class CConfigurationExport {
 			'output' => $this->dataFields['item'],
 			'selectApplications' => API_OUTPUT_EXTEND,
 			'inherited' => false,
-			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
 		]);
 
@@ -404,7 +405,7 @@ class CConfigurationExport {
 			'output' => $this->dataFields['item'],
 			'selectApplications' => API_OUTPUT_EXTEND,
 			'inherited' => false,
-			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'preservekeys' => true
 		]);
 
@@ -439,11 +440,19 @@ class CConfigurationExport {
 			$valueMapNames[$valueMap['valuemapid']] = $valueMap['name'];
 		}
 
-		foreach ($items as &$item) {
+		foreach ($items as $idx => &$item) {
 			$item['valuemap'] = [];
 
 			if ($item['valuemapid']) {
 				$item['valuemap'] = ['name' => $valueMapNames[$item['valuemapid']]];
+			}
+
+			// Remove items linked to discovered applications.
+			foreach ($item['applications'] as $application) {
+				if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					unset($items[$idx]);
+					continue 2;
+				}
 			}
 		}
 		unset($item);
@@ -527,6 +536,7 @@ class CConfigurationExport {
 			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => $this->dataFields['discoveryrule'],
 			'selectApplications' => API_OUTPUT_EXTEND,
+			'selectApplicationPrototypes' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
 			'inherited' => false,
 			'preservekeys' => true
@@ -576,20 +586,14 @@ class CConfigurationExport {
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'selectDiscoveryRule' => API_OUTPUT_EXTEND,
 			'selectDependencies' => ['description', 'expression'],
-			'selectItems' => ['flags', 'type'],
+			'selectItems' => ['itemid', 'flags', 'type'],
 			'inherited' => false,
 			'preservekeys' => true
 		]);
 
-		foreach($triggers as $trigger){
-			foreach ($trigger['items'] as $item) {
-				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
-					continue 2;
-				}
-			}
+		$triggers = $this->prepareTriggers($triggers);
 
-			$trigger['expression'] = explode_exp($trigger['expression']);
-
+		foreach ($triggers as $trigger) {
 			foreach ($trigger['dependencies'] as &$dependency) {
 				$dependency['expression'] = explode_exp($dependency['expression']);
 			}
@@ -648,7 +652,7 @@ class CConfigurationExport {
 
 		$graphs = API::Graph()->get([
 			'hostids' => $hostIds,
-			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'selectGraphItems' => API_OUTPUT_EXTEND,
 			'inherited' => false,
 			'output' => API_OUTPUT_EXTEND,
@@ -659,7 +663,7 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Unset graphs that have lld created items or web items.
+	 * Unset graphs that have LLD created items or web items, or items containing LLD applications.
 	 *
 	 * @param array $graphs
 	 *
@@ -683,10 +687,11 @@ class CConfigurationExport {
 		}
 
 		$graphItems = API::Item()->get([
-			'itemids' => $graphItemIds,
-			'output' => ['key_', 'flags', 'type'],
-			'webitems' => true,
+			'output' => ['itemid', 'key_', 'flags', 'type'],
 			'selectHosts' => ['host'],
+			'selectApplications' => ['flags'],
+			'itemids' => $graphItemIds,
+			'webitems' => true,
 			'preservekeys' => true,
 			'filter' => ['flags' => null]
 		]);
@@ -699,6 +704,14 @@ class CConfigurationExport {
 				if ($axisItem['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $axisItem['type'] == ITEM_TYPE_HTTPTEST) {
 					unset($graphs[$gnum]);
 					continue;
+				}
+
+				// Remove graphs with items that are linked to discovered applications.
+				foreach ($axisItem['applications'] as $application) {
+					if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+						unset($graphs[$gnum]);
+						continue 2;
+					}
 				}
 
 				$axisItemHost = reset($axisItem['hosts']);
@@ -718,6 +731,14 @@ class CConfigurationExport {
 					continue;
 				}
 
+				// Remove graphs with items that are linked to discovered applications.
+				foreach ($axisItem['applications'] as $application) {
+					if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+						unset($graphs[$gnum]);
+						continue 2;
+					}
+				}
+
 				$axisItemHost = reset($axisItem['hosts']);
 
 				$graphs[$gnum]['ymax_itemid'] = [
@@ -733,6 +754,14 @@ class CConfigurationExport {
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
 					unset($graphs[$gnum]);
 					continue 2;
+				}
+
+				// Remove graphs with items that are linked to discovered applications.
+				foreach ($item['applications'] as $application) {
+					if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+						unset($graphs[$gnum]);
+						continue 3;
+					}
 				}
 
 				$itemHost = reset($item['hosts']);
@@ -759,17 +788,49 @@ class CConfigurationExport {
 		$triggers = API::Trigger()->get([
 			'hostids' => $hostIds,
 			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
-			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL]],
+			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL],
 			'selectDependencies' => ['description', 'expression'],
-			'selectItems' => ['flags', 'type'],
+			'selectItems' => ['itemid', 'flags', 'type'],
 			'inherited' => false,
 			'preservekeys' => true
 		]);
 
-		foreach($triggers as $trigger){
+		$this->data['triggers'] = $this->prepareTriggers($triggers);
+	}
+
+	/**
+	 * Prepare trigger expressions and unset triggers containing items with LLD applications.
+	 *
+	 * @param array $triggers
+	 *
+	 * @return array
+	 */
+	protected function prepareTriggers(array $triggers) {
+		$itemids = [];
+
+		foreach ($triggers as $trigger) {
+			$itemids = array_merge($itemids, zbx_objectValues($trigger['items'], 'itemid'));
+		}
+
+		$items = API::Item()->get([
+			'output' => ['itemid'],
+			'selectApplications' => ['flags'],
+			'itemids' => $itemids,
+			'preservekeys' => true
+		]);
+
+		foreach ($triggers as $idx => &$trigger) {
 			foreach ($trigger['items'] as $item) {
 				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $item['type'] == ITEM_TYPE_HTTPTEST) {
+					unset($triggers[$idx]);
 					continue 2;
+				}
+
+				foreach ($items[$item['itemid']]['applications'] as $application) {
+					if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+						unset($triggers[$idx]);
+						continue 3;
+					}
 				}
 			}
 
@@ -779,11 +840,11 @@ class CConfigurationExport {
 				$dependency['expression'] = explode_exp($dependency['expression']);
 			}
 			unset($dependency);
-
-			$this->data['triggers'][] = $trigger;
 		}
-	}
+		unset($trigger);
 
+		return $triggers;
+	}
 	/**
 	 * Get maps for export from database.
 	 *

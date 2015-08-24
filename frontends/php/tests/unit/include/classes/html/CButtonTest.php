@@ -69,15 +69,6 @@ class CButtonTest extends CTagTest {
 		);
 	}
 
-	public function testMain() {
-		$button = $this->createTag();
-		$button->main();
-		$this->assertEquals(
-			'<button class="main" type="button" id="button" name="button"></button>',
-			(string) $button
-		);
-	}
-
 	/**
 	 * @param $name
 	 * @param $caption

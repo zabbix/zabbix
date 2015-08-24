@@ -36,7 +36,6 @@ if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 }
 
 $interfaceTable = (new CTable())
-	->addClass('formElementTable')
 	->setHeader([
 		_('IP address'),
 		_('DNS name'),
@@ -46,9 +45,10 @@ $interfaceTable = (new CTable())
 	->addRow([
 		(new CTextBox('ip', $data['ip'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
 		(new CTextBox('dns', $data['dns'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
-		(new CRadioButtonList('useip', $data['useip']))
-			->addValue(_('IP'), 1)
-			->addValue(_('DNS'), 0),
+		(new CRadioButtonList('useip', (int) $data['useip']))
+			->addValue(_('IP'), INTERFACE_USE_IP)
+			->addValue(_('DNS'), INTERFACE_USE_DNS)
+			->setModern(true),
 		(new CTextBox('port', $data['port'], false, 64))->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 	]);
 

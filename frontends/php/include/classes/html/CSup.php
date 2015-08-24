@@ -27,9 +27,4 @@ class CSup extends CTag {
 
 		return $this;
 	}
-
-	public function useJQueryStyle() {
-		$this->addClass('jqueryinputset');
-		return $this;
-	}
 }

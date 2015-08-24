@@ -276,38 +276,6 @@ static int      DBpatch_2050015(void)
 	return FAIL;
 }
 
-static int      DBpatch_2050016(void)
-{
-	if (ZBX_DB_OK <= DBexecute(
-		"update graph_theme set description='blue-theme',theme='blue-theme' where graphthemeid=1"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int      DBpatch_2050017(void)
-{
-	if (ZBX_DB_OK <= DBexecute(
-		"update graph_theme set description='dark-theme',theme='dark-theme' where graphthemeid=2"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int      DBpatch_2050018(void)
-{
-	if (ZBX_DB_OK <= DBexecute("delete from graph_theme where graphthemeid in (3,4)"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
 static int	DBpatch_2050019(void)
 {
 	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -343,49 +311,261 @@ static int	DBpatch_2050023(void)
 	return DBadd_field("media_type", &field);
 }
 
+static int	DBpatch_2050029(void)
+{
+	const ZBX_FIELD	field = {"default_theme", "blue-theme", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
-static int	DBpatch_2050024(void)
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050030(void)
+{
+	const ZBX_TABLE table =
+			{"application_prototype", "application_prototypeid", 0,
+				{
+					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"templateid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050031(void)
+{
+	return DBcreate_index("application_prototype", "application_prototype_1", "itemid", 0);
+}
+
+static int	DBpatch_2050032(void)
+{
+	return DBcreate_index("application_prototype", "application_prototype_2", "templateid", 0);
+}
+
+static int	DBpatch_2050033(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_prototype", 1, &field);
+}
+
+static int	DBpatch_2050034(void)
+{
+	const ZBX_FIELD	field = {"templateid", NULL, "application_prototype", "application_prototypeid",
+			0, ZBX_TYPE_ID, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_prototype", 2, &field);
+}
+
+static int	DBpatch_2050035(void)
+{
+	const ZBX_TABLE table =
+			{"item_application_prototype", "item_application_prototypeid", 0,
+				{
+					{"item_application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+							0},
+					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050036(void)
+{
+	return DBcreate_index("item_application_prototype", "item_application_prototype_1",
+			"application_prototypeid,itemid", 1);
+}
+
+static int	DBpatch_2050037(void)
+{
+	return DBcreate_index("item_application_prototype", "item_application_prototype_2", "itemid", 0);
+}
+
+static int	DBpatch_2050038(void)
+{
+	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
+			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_application_prototype", 1, &field);
+}
+
+static int	DBpatch_2050039(void)
+{
+	const ZBX_FIELD	field = {"itemid", NULL, "items", "itemid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("item_application_prototype", 2, &field);
+}
+
+static int	DBpatch_2050040(void)
+{
+	const ZBX_TABLE table =
+			{"application_discovery", "application_discoveryid", 0,
+				{
+					{"application_discoveryid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"applicationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"application_prototypeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"lastcheck", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ts_delete", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050041(void)
+{
+	return DBcreate_index("application_discovery", "application_discovery_1", "applicationid", 0);
+}
+
+static int	DBpatch_2050042(void)
+{
+	return DBcreate_index("application_discovery", "application_discovery_2", "application_prototypeid", 0);
+}
+
+static int	DBpatch_2050043(void)
+{
+	const ZBX_FIELD	field = {"applicationid", NULL, "applications", "applicationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_discovery", 1, &field);
+}
+
+static int	DBpatch_2050044(void)
+{
+	const ZBX_FIELD	field = {"application_prototypeid", NULL, "application_prototype", "application_prototypeid",
+			0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("application_discovery", 2, &field);
+}
+
+static int	DBpatch_2050045(void)
+{
+	const ZBX_FIELD field = {"flags", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("applications", &field);
+}
+
+static int	DBpatch_2050046(void)
+{
+	return DBdrop_table("graph_theme");
+}
+
+static int	DBpatch_2050047(void)
+{
+	const ZBX_TABLE table =
+		{"graph_theme",	"graphthemeid",	0,
+			{
+				{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"backgroundcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"graphcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"maingridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridbordercolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"textcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"highlightcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"leftpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"rightpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"nonworktimecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"legendview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050048(void)
+{
+	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
+}
+
+static int	DBpatch_2050049(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (1,'blue-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33','E33734',"
+				"'429E47','E33734','EBEBEB',1,1)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2050050(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (2,'dark-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2','E45959',"
+				"'59DB8F','E45959','333333',1,1)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2050051(void)
+{
+	const ZBX_FIELD	field = {"iprange", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("drules", &field);
+}
+
+static int	DBpatch_2050052(void)
 {
 	const ZBX_FIELD field = {"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050025(void)
+static int	DBpatch_2050053(void)
 {
 	const ZBX_FIELD field = {"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050026(void)
+static int	DBpatch_2050054(void)
 {
 	const ZBX_FIELD field = {"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050027(void)
+static int	DBpatch_2050055(void)
 {
 	const ZBX_FIELD field = {"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050028(void)
+static int	DBpatch_2050056(void)
 {
 	const ZBX_FIELD field = {"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
 
-static int	DBpatch_2050029(void)
+static int	DBpatch_2050057(void)
 {
 	const ZBX_FIELD field = {"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("hosts", &field);
 }
-
 #endif
 
 DBPATCH_START(2050)
@@ -408,19 +588,39 @@ DBPATCH_ADD(2050012, 0, 1)
 DBPATCH_ADD(2050013, 0, 0)
 DBPATCH_ADD(2050014, 0, 1)
 DBPATCH_ADD(2050015, 0, 1)
-DBPATCH_ADD(2050016, 0, 1)
-DBPATCH_ADD(2050017, 0, 1)
-DBPATCH_ADD(2050018, 0, 1)
 DBPATCH_ADD(2050019, 0, 1)
 DBPATCH_ADD(2050020, 0, 1)
 DBPATCH_ADD(2050021, 0, 1)
 DBPATCH_ADD(2050022, 0, 1)
 DBPATCH_ADD(2050023, 0, 1)
-DBPATCH_ADD(2050024, 0, 1)
-DBPATCH_ADD(2050025, 0, 1)
-DBPATCH_ADD(2050026, 0, 1)
-DBPATCH_ADD(2050027, 0, 1)
-DBPATCH_ADD(2050028, 0, 1)
 DBPATCH_ADD(2050029, 0, 1)
+DBPATCH_ADD(2050030, 0, 1)
+DBPATCH_ADD(2050031, 0, 1)
+DBPATCH_ADD(2050032, 0, 1)
+DBPATCH_ADD(2050033, 0, 1)
+DBPATCH_ADD(2050034, 0, 1)
+DBPATCH_ADD(2050035, 0, 1)
+DBPATCH_ADD(2050036, 0, 1)
+DBPATCH_ADD(2050037, 0, 1)
+DBPATCH_ADD(2050038, 0, 1)
+DBPATCH_ADD(2050039, 0, 1)
+DBPATCH_ADD(2050040, 0, 1)
+DBPATCH_ADD(2050041, 0, 1)
+DBPATCH_ADD(2050042, 0, 1)
+DBPATCH_ADD(2050043, 0, 1)
+DBPATCH_ADD(2050044, 0, 1)
+DBPATCH_ADD(2050045, 0, 1)
+DBPATCH_ADD(2050046, 0, 1)
+DBPATCH_ADD(2050047, 0, 1)
+DBPATCH_ADD(2050048, 0, 1)
+DBPATCH_ADD(2050049, 0, 1)
+DBPATCH_ADD(2050050, 0, 1)
+DBPATCH_ADD(2050051, 0, 1)
+DBPATCH_ADD(2050052, 0, 1)
+DBPATCH_ADD(2050053, 0, 1)
+DBPATCH_ADD(2050054, 0, 1)
+DBPATCH_ADD(2050055, 0, 1)
+DBPATCH_ADD(2050056, 0, 1)
+DBPATCH_ADD(2050057, 0, 1)
 
 DBPATCH_END()

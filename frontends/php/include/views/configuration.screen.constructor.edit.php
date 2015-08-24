@@ -132,7 +132,7 @@ if ($resourceType == SCREEN_RESOURCE_GRAPH) {
 		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 }
 
 /*
@@ -179,7 +179,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_GRAPH) {
 		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 
 	$screenFormList->addRow(_('Max columns'),
 		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
@@ -231,7 +231,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SIMPLE_GRAPH) {
 		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 }
 
 /*
@@ -278,7 +278,7 @@ elseif ($resourceType == SCREEN_RESOURCE_LLD_SIMPLE_GRAPH) {
 		(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		$selectButton
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 
 	$screenFormList->addRow(_('Max columns'),
 		(new CNumericBox('max_columns', $maxColumns, 3, false, false, false))
@@ -312,7 +312,7 @@ elseif ($resourceType == SCREEN_RESOURCE_MAP) {
 			->onClick('javascript: return PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&writeonly=1");')
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 }
 
 /*
@@ -359,7 +359,7 @@ elseif ($resourceType == SCREEN_RESOURCE_PLAIN_TEXT) {
 			(new CTextBox('caption', $caption, true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			$selectButton
-		], false, null, ZBX_STYLE_NOWRAP)
+		])
 		->addRow(_('Show lines'),
 			(new CNumericBox('elements', $elements, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		)
@@ -546,7 +546,7 @@ elseif ($resourceType == SCREEN_RESOURCE_SCREEN) {
 			->onClick('javascript: return PopUp("popup.php?srctbl=screens2&srcfld1=screenid&srcfld2=name'.
 				'&dstfrm='.$screenForm->getName().'&dstfld1=resourceid&dstfld2=caption'.
 				'&writeonly=1&screenid='.$_REQUEST['screenid'].'");')
-	], false, null, ZBX_STYLE_NOWRAP);
+	]);
 }
 
 /*
@@ -643,33 +643,19 @@ elseif ($resourceType == SCREEN_RESOURCE_CLOCK) {
  * Append common fields
  */
 if (in_array($resourceType, [SCREEN_RESOURCE_HOSTS_INFO, SCREEN_RESOURCE_TRIGGERS_INFO])) {
-	$styleRadioButton = [
-		(new CRadioButton('style', STYLE_HORIZONTAL, $style == STYLE_HORIZONTAL))
-			->setId('style_'.STYLE_HORIZONTAL),
-		new CLabel(_('Horizontal'), 'style_'.STYLE_HORIZONTAL),
-		(new CRadioButton('style', STYLE_VERTICAL, $style == STYLE_VERTICAL))
-			->setId('style_'.STYLE_VERTICAL),
-		new CLabel(_('Vertical'), 'style_'.STYLE_VERTICAL)
-	];
 	$screenFormList->addRow(_('Style'),
-		(new CDiv($styleRadioButton))
-			->addClass('jqueryinputset')
-			->addClass('radioset')
+		(new CRadioButtonList('style', (int) $style))
+			->addValue(_('Horizontal'), STYLE_HORIZONTAL)
+			->addValue(_('Vertical'), STYLE_VERTICAL)
+			->setModern(true)
 	);
 }
 elseif (in_array($resourceType, [SCREEN_RESOURCE_TRIGGERS_OVERVIEW, SCREEN_RESOURCE_DATA_OVERVIEW])) {
-	$styleRadioButton = [
-		(new CRadioButton('style', STYLE_LEFT, $style == STYLE_LEFT))
-			->setId('style_'.STYLE_LEFT),
-		new CLabel(_('Left'), 'style_'.STYLE_LEFT),
-		(new CRadioButton('style', STYLE_TOP, $style == STYLE_TOP))
-			->setId('style_'.STYLE_TOP),
-		new CLabel(_('Top'), 'style_'.STYLE_TOP)
-	];
 	$screenFormList->addRow(_('Hosts location'),
-		(new CDiv($styleRadioButton))
-			->addClass('jqueryinputset')
-			->addClass('radioset')
+		(new CRadioButtonList('style', (int) $style))
+			->addValue(_('Left'), STYLE_LEFT)
+			->addValue(_('Top'), STYLE_TOP)
+			->setModern(true)
 	);
 }
 elseif ($resourceType != SCREEN_RESOURCE_CLOCK) {
@@ -714,44 +700,24 @@ $resourcesWithHAlign = [
 	SCREEN_RESOURCE_LLD_SIMPLE_GRAPH
 ];
 if (in_array($resourceType, $resourcesWithHAlign)) {
-	$hAlignRadioButton = [
-		(new CRadioButton('halign', HALIGN_LEFT, $halign == HALIGN_LEFT))
-			->setId('halign_'.HALIGN_LEFT),
-		new CLabel(_('Left'), 'halign_'.HALIGN_LEFT),
-		(new CRadioButton('halign', HALIGN_CENTER, $halign == HALIGN_CENTER))
-			->setId('halign_'.HALIGN_CENTER),
-		new CLabel(_('Center'), 'halign_'.HALIGN_CENTER),
-		(new CRadioButton('halign', HALIGN_RIGHT, $halign == HALIGN_RIGHT))
-			->setId('halign_'.HALIGN_RIGHT),
-		new CLabel(_('Right'), 'halign_'.HALIGN_RIGHT)
-	];
 	$screenFormList->addRow(_('Horizontal align'),
-		(new CDiv($hAlignRadioButton))
-			->addClass('jqueryinputset')
-			->addClass('radioset')
+		(new CRadioButtonList('halign', (int) $halign))
+			->addValue(_('Left'), HALIGN_LEFT)
+			->addValue(_('Center'), HALIGN_CENTER)
+			->addValue(_('Right'), HALIGN_RIGHT)
+			->setModern(true)
 	);
 }
 else {
 	$screenFormList->addVar('halign', 0);
 }
 
-$vAlignRadioButton = [
-	(new CRadioButton('valign', VALIGN_TOP, $valign == VALIGN_TOP))
-		->setId('valign_'.VALIGN_TOP),
-	new CLabel(_('Top'), 'valign_'.VALIGN_TOP),
-	(new CRadioButton('valign', VALIGN_MIDDLE, $valign == VALIGN_MIDDLE))
-		->setId('valign_'.VALIGN_MIDDLE),
-	new CLabel(_('Middle'), 'valign_'.VALIGN_MIDDLE),
-	(new CRadioButton('valign', VALIGN_BOTTOM, $valign == VALIGN_BOTTOM))
-		->setId('valign_'.VALIGN_BOTTOM),
-	new CLabel(_('Bottom'), 'valign_'.VALIGN_BOTTOM)
-];
-$screenFormList->addRow(
-	_('Vertical align'),
-	(new CDiv($vAlignRadioButton))
-		->addClass('jqueryinputset')
-		->addClass('radioset'),
-	false, null, ZBX_STYLE_NOWRAP
+$screenFormList->addRow(_('Vertical align'),
+	(new CRadioButtonList('valign', (int) $valign))
+		->addValue(_('Top'), VALIGN_TOP)
+		->addValue(_('Middle'), VALIGN_MIDDLE)
+		->addValue(_('Bottom'), VALIGN_BOTTOM)
+		->setModern(true)
 );
 $screenFormList->addRow(_('Column span'),
 	(new CNumericBox('colspan', $colspan, 3))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)

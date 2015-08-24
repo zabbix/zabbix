@@ -581,7 +581,7 @@ static void	zbx_load_config(void)
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
-			PARM_OPT,	0,			4},
+			PARM_OPT,	0,			5},
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,

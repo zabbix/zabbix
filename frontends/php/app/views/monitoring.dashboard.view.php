@@ -26,8 +26,8 @@ $dashboard = (new CWidget())
 	->setControls((new CForm())
 		->cleanItems()
 		->addItem((new CList())
-			->addItem(get_icon('dashconf'))
-			->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+			->addItem(get_icon('dashconf', ['enabled' => $data['filter_enabled']]))
+			->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]))
 		)
 	);
 
@@ -37,7 +37,7 @@ $dashboard = (new CWidget())
 $dashboardGrid = [[], [], []];
 $widgetRefreshParams = [];
 
-$icon = (new CRedirectButton(SPACE, null))
+$icon = (new CButton(null))
 	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
 	->setTitle(_('Action'))
 	->setId('favouriteGraphs')
@@ -45,7 +45,7 @@ $icon = (new CRedirectButton(SPACE, null))
 
 $favouriteGraphs = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['favourite_graphs']))
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', true))
-	->setHeader(_('Favourite graphs'), [$icon])
+	->setHeader(_('Favourite graphs'), [$icon], true)
 	->setFooter(new CList([
 		(new CLink(_('Graphs'), 'charts.php'))->addClass('highlight')
 	]));
@@ -55,7 +55,7 @@ $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
 $dashboardGrid[$col][$row] = $favouriteGraphs;
 
 // favourite maps
-$icon = (new CRedirectButton(SPACE, null))
+$icon = (new CButton(null))
 	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
 	->setTitle(_('Action'))
 	->setId('favouriteMaps')
@@ -63,7 +63,7 @@ $icon = (new CRedirectButton(SPACE, null))
 
 $favouriteMaps = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favourite_maps']))
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true))
-	->setHeader(_('Favourite maps'), [$icon])
+	->setHeader(_('Favourite maps'), [$icon], true)
 	->setFooter(new CList([
 		(new CLink(_('Maps'), 'zabbix.php?action=map.view'))->addClass('highlight')
 	]));
@@ -73,12 +73,7 @@ $row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
 $dashboardGrid[$col][$row] = $favouriteMaps;
 
 // favourite screens
-$icon = (new CIcon(_('Menu')))
-	->addClass('iconmenu')
-	->setId('favouriteScreens')
-	->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
-
-$icon = (new CRedirectButton(SPACE, null))
+$icon = (new CButton(null))
 	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
 	->setTitle(_('Action'))
 	->setId('favouriteScreens')
@@ -86,7 +81,7 @@ $icon = (new CRedirectButton(SPACE, null))
 
 $favouriteScreens = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']))
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true))
-	->setHeader(_('Favourite screens'), [$icon])
+	->setHeader(_('Favourite screens'), [$icon], true)
 	->setFooter(new CList([
 		(new CLink(_('Screens'), 'screens.php'))->addClass('highlight'),
 		(new CLink(_('Slide shows'), 'slides.php'))->addClass('highlight')
@@ -142,16 +137,16 @@ foreach ($widgets as $widgetid => $widget) {
 	$col = CProfile::get($profile.'.col', $widget['col']);
 	$row = CProfile::get($profile.'.row', $widget['row']);
 
-	$icon = (new CRedirectButton(SPACE, null))
+	$icon = (new CButton(null))
 		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
 		->setTitle(_('Action'))
 		->setMenuPopup(CMenuPopupHelper::getRefresh($widgetid, $rate));
 
 	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass('preloader')))
 		->setExpanded($expanded)
-		->setHeader(null, [$icon])
+		->setHeader(null, [$icon], true)
 		->setFooter(new CList([
-			(new CDiv())->addClass('textwhite')->setId($widgetid.'_footer')
+			(new CListItem(''))->setId($widgetid.'_footer')
 		]));
 
 	$widgetRefreshParams[$widgetid] = [

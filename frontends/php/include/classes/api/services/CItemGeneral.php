@@ -136,7 +136,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => ['applicationid'],
+				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
 		}
@@ -156,7 +156,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => ['applicationid'],
+				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
 		}
@@ -190,7 +190,7 @@ abstract class CItemGeneral extends CApiService {
 				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItem);
 			}
 
-			$items = $this->extendObjects($this->tableName(), $items, ['name']);
+			$items = $this->extendObjects($this->tableName(), $items, ['name', 'flags']);
 		}
 
 		foreach ($items as $inum => &$item) {
@@ -412,10 +412,22 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			// check that the given applications belong to the item's host
 			if (isset($item['applications']) && $item['applications']) {
+				/*
+				 * 'flags' is available for update and item prototypes.
+				 * Don't allow discovered or any other application types for item prototypes in 'applications' option.
+				 */
+				if (array_key_exists('flags', $fullItem) && $fullItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					foreach ($host['applications'] as $num => $application) {
+						if ($application['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
+							unset($host['applications'][$num]);
+						}
+					}
+				}
+
+				// check that the given applications belong to the item's host
 				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
-				foreach($item['applications'] as $appId) {
+				foreach ($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
 						$error = _s('Application with ID "%1$s" is not available on "%2$s".', $appId, $host['name']);
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -699,6 +711,24 @@ abstract class CItemGeneral extends CApiService {
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
+			$itemids_with_application_prototypes = [];
+
+			foreach ($parentItems as $parentItem) {
+				if (isset($parentItem['applicationPrototypes']) && is_array($parentItem['applicationPrototypes'])
+						&& !array_key_exists('ruleid', $parentItem)) {
+					$itemids_with_application_prototypes[$parentItem['itemid']] = true;
+				}
+			}
+
+			if ($itemids_with_application_prototypes) {
+				$discovery_rules = DBfetchArray(DBselect(
+					'SELECT id.itemid,id.parent_itemid'.
+					' FROM item_discovery id'.
+					' WHERE '.dbConditionInt('id.itemid', array_keys($itemids_with_application_prototypes))
+				));
+				$discovery_rules = zbx_toHash($discovery_rules, 'itemid');
+			}
+
 			foreach ($parentItems as $parentItem) {
 				$exItem = null;
 
@@ -770,6 +800,40 @@ abstract class CItemGeneral extends CApiService {
 				// setting item application
 				if (isset($parentItem['applications'])) {
 					$newItem['applications'] = get_same_applications_for_host($parentItem['applications'], $host['hostid']);
+				}
+
+				if ($parentItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+						&& array_key_exists('applicationPrototypes', $parentItem)) {
+
+					// Get discovery rule ID for current item prototype, if it is not yet set.
+					if (array_key_exists('ruleid', $parentItem)) {
+						$discovery_ruleid = $parentItem['ruleid'];
+					}
+					else {
+						$discovery_ruleid = $discovery_rules[$parentItem['itemid']]['parent_itemid'];
+					}
+
+					$newItem['applicationPrototypes'] = [];
+
+					$db_application_prototypes = DBfetchArray(DBselect(
+						'SELECT ap.application_prototypeid,ap.name'.
+						' FROM application_prototype ap'.
+						' WHERE ap.itemid='.zbx_dbstr($discovery_ruleid).
+							' AND '.dbConditionString('ap.name',
+								zbx_objectValues($parentItem['applicationPrototypes'], 'name')
+							)
+					));
+
+					$db_application_prototypes = zbx_toHash($db_application_prototypes, 'name');
+
+					foreach ($parentItem['applicationPrototypes'] as $application_prototype) {
+						$db_application_prototype = $db_application_prototypes[$application_prototype['name']];
+
+						$newItem['applicationPrototypes'][] = [
+							'name' => $application_prototype['name'],
+							'templateid' => $db_application_prototype['application_prototypeid']
+						];
+					}
 				}
 
 				if ($exItem) {

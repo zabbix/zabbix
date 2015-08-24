@@ -32,16 +32,6 @@
 			});
 		}
 
-		// create jquery buttonset object when authprotocol visible box is switched on
-		jQuery('#visible_authprotocol').one('click', function() {
-			jQuery('#authprotocol_div').buttonset();
-		});
-
-		// create jquery buttonset object when privprotocol visible box is switched on
-		jQuery('#visible_privprotocol').one('click', function() {
-			jQuery('#privprotocol_div').buttonset();
-		});
-
 		var maxReached = <?php echo $this->data['maxReached'] ? 'true' : 'false'; ?>;
 		if (maxReached) {
 			jQuery('#row-new-delay-flex-fields').hide();

@@ -90,9 +90,7 @@ $userGroupFormList->addRow(_('Debug mode'), (new CCheckBox('debug_mode'))->setCh
 $permissionsFormList = new CFormList('permissionsFormList');
 
 // append permissions table to form list
-$permissionsTable = (new CTable())
-	->addClass('right_table')
-	->setHeader([_('Read-write'), _('Read only'), _('Deny')], 'header');
+$permissionsTable = (new CTable())->setHeader([_('Read-write'), _('Read only'), _('Deny')]);
 
 $lstWrite = new CListBox('right_to_del[read_write][]', null, 20);
 $lstRead = new CListBox('right_to_del[read_only][]', null, 20);
