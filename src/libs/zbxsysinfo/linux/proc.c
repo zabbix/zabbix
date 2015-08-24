@@ -824,48 +824,43 @@ out:
  *                                                                            *
  * Purpose: returns process name                                              *
  *                                                                            *
- * Parameters: pid - [IN] the process identifier                              *
+ * Parameters: pid -      [IN] the process identifier                         *
+ *             procname - [OUT] the process name                              *
  *                                                                            *
- * Return value: The process name.                                            *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
  *                                                                            *
- * Comments: The returned name must be freed by the caller.                   *
+ * Comments: The process name is allocated by this function and must be freed *
+ *           by the caller.                                                   *
  *                                                                            *
  ******************************************************************************/
-static char	*proc_get_process_name(pid_t pid)
+static int	proc_get_process_name(pid_t pid, char **procname)
 {
-	char	tmp[MAX_STRING_LEN], *ptr, *name = NULL, *pend;
-	int	fd, offset = 0, n;
+	int	n, fd;
+	char	tmp[MAX_STRING_LEN], *pend, *pstart;
 
-	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/status", (int)pid);
+	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/stat", (int)pid);
 
 	if (-1 == (fd = open(tmp, O_RDONLY)))
-		return NULL;
+		return FAIL;
 
-	while (0 < (n = read(fd, tmp + offset, sizeof(tmp) - offset - 1)))
-	{
-		n += offset;
-		tmp[n] = '\0';
-
-		for (ptr = tmp; NULL != ptr; ptr = pend + 1)
-		{
-			if (NULL == (pend = strchr(ptr, '\n')))
-				break;
-
-			if (0 == strncmp(ptr, "Name:\t", 6))
-			{
-				*pend = '\0';
-				name = zbx_strdup(NULL, ptr + 6);
-				goto out;
-			}
-		}
-
-		offset = n - (ptr - tmp);
-		memmove(tmp, ptr, offset);
-	}
-out:
+	n = read(fd, tmp, sizeof(tmp));
 	close(fd);
 
-	return name;
+	if (-1 == n)
+		return FAIL;
+
+	for (pend = tmp + n - 1; ')' != *pend && pend > tmp; pend--)
+		;
+
+	*pend = '\0';
+
+	if (NULL == (pstart = strchr(tmp, '(')))
+		return FAIL;
+
+	*procname = zbx_strdup(NULL, pstart + 1);
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -874,69 +869,62 @@ out:
  *                                                                            *
  * Purpose: returns process command line                                      *
  *                                                                            *
- * Parameters: pid - [IN] the process identifier                              *
+ * Parameters: pid     - [IN] the process identifier                          *
+ *             cmdline - [OUT] the process command line                       *
  *                                                                            *
- * Return value: The process command line                                     *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
  *                                                                            *
- * Comments: The returned command line must be freed by the caller.           *
+ * Comments: The command line is allocated by this function and must be freed *
+ *           by the caller.                                                   *
  *                                                                            *
  ******************************************************************************/
-static char	*proc_get_process_cmdline(pid_t pid)
+static int	proc_get_process_cmdline(pid_t pid, char **cmdline)
 {
-	char	tmp[MAX_STRING_LEN], *cmdline, *ptr;
+	char	tmp[MAX_STRING_LEN];
 	int	fd, n;
 	size_t	cmdline_alloc = ZBX_KIBIBYTE, cmdline_offset = 0;
 
 	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d/cmdline", (int)pid);
 
 	if (-1 == (fd = open(tmp, O_RDONLY)))
-		return NULL;
+		return FAIL;
 
-	cmdline = zbx_malloc(NULL, cmdline_alloc);
+	*cmdline = zbx_malloc(NULL, cmdline_alloc);
 
-	while (0 < (n = read(fd, cmdline + cmdline_offset, cmdline_alloc - cmdline_offset)))
+	while (0 < (n = read(fd, *cmdline + cmdline_offset, cmdline_alloc - cmdline_offset)))
 	{
 		cmdline_offset += n;
 
 		if (cmdline_offset == cmdline_alloc)
 		{
 			cmdline_alloc *= 2;
-			cmdline = zbx_realloc(cmdline, cmdline_alloc);
+			*cmdline = zbx_realloc(*cmdline, cmdline_alloc);
 		}
 	}
 
 	close(fd);
 
-	if (0 != cmdline_offset)
-	{
-		for (ptr = cmdline;; ptr++)
-		{
-			if ('\0' == *ptr)
-			{
-				if ('\0' == ptr[1])
-					break;
-				*ptr = ' ';
-			}
-		}
-	}
-	else
-		zbx_free(cmdline);
+	if (0 == cmdline_offset)
+		zbx_free(*cmdline);
 
-	return cmdline;
+	return SUCCEED;
 }
 
 /******************************************************************************
  *                                                                            *
  * Function: proc_get_process_uid                                             *
  *                                                                            *
- * Purpose: returns process user identifer                                    *
+ * Purpose: returns process user identifier                                   *
  *                                                                            *
  * Parameters: pid - [IN] the process identifier                              *
+ *             uid - [OUT] the user identifier                                *
  *                                                                            *
- * Return value: The process user identifier                                  *
+ * Return value: SUCCEED                                                      *
+ *               FAIL                                                         *
  *                                                                            *
  ******************************************************************************/
-static uid_t	proc_get_process_uid(pid_t pid)
+static int	proc_get_process_uid(pid_t pid, uid_t *uid)
 {
 	char		tmp[MAX_STRING_LEN];
 	zbx_stat_t	st;
@@ -944,9 +932,11 @@ static uid_t	proc_get_process_uid(pid_t pid)
 	zbx_snprintf(tmp, sizeof(tmp), "/proc/%d", (int)pid);
 
 	if (0 != zbx_stat(tmp, &st))
-		return 0;
+		return FAIL;
 
-	return st.st_uid;
+	*uid = st.st_uid;
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -1144,6 +1134,83 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 
 /******************************************************************************
  *                                                                            *
+ * Function: proc_create                                                      *
+ *                                                                            *
+ * Purpose: create process object with the specified properties               *
+ *                                                                            *
+ * Parameters: pid   - [IN] the process identifier                            *
+ *             flags - [IN] the flags specifying properties to set            *
+ *                                                                            *
+ * Return value: The created process object or NULL if property reading       *
+ *               failed.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
+{
+	char			*procname = NULL, *cmdline = NULL, *name_arg0 = NULL;
+	uid_t			uid;
+	zbx_sysinfo_proc_t	*proc = NULL;
+	int			ret = FAIL;
+
+	if (0 != (flags & ZBX_SYSINFO_PROC_USER) && SUCCEED != proc_get_process_uid(pid, &uid))
+		goto out;
+
+	if (0 != (flags & (ZBX_SYSINFO_PROC_CMDLINE | ZBX_SYSINFO_PROC_NAME)) &&
+			SUCCEED != proc_get_process_cmdline(pid, &cmdline))
+	{
+		goto out;
+	}
+
+	if (0 != (flags & ZBX_SYSINFO_PROC_NAME) && SUCCEED != proc_get_process_name(pid, &procname))
+		goto out;
+
+	if (NULL != cmdline)
+	{
+		char	*ptr;
+
+		if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
+		{
+			if (NULL == (ptr = strrchr(cmdline, '/')))
+				name_arg0 = zbx_strdup(NULL, cmdline);
+			else
+				name_arg0 = zbx_strdup(NULL, ptr + 1);
+		}
+
+		for (ptr = cmdline;; ptr++)
+		{
+			if ('\0' == *ptr)
+			{
+				if ('\0' == ptr[1])
+					break;
+				*ptr = ' ';
+			}
+		}
+	}
+
+	ret = SUCCEED;
+out:
+	if (SUCCEED == ret)
+	{
+		proc = (zbx_sysinfo_proc_t *)zbx_malloc(NULL, sizeof(zbx_sysinfo_proc_t));
+
+		proc->pid = pid;
+		proc->uid = uid;
+		proc->name = procname;
+		proc->cmdline = cmdline;
+		proc->name_arg0 = name_arg0;
+	}
+	else
+	{
+		zbx_free(procname);
+		zbx_free(cmdline);
+		zbx_free(name_arg0);
+	}
+
+	return proc;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_proc_get_processes                                           *
  *                                                                            *
  * Purpose: get system processes                                              *
@@ -1163,9 +1230,7 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 	DIR			*dir;
 	struct dirent		*entries;
 	int			ret = FAIL, pid;
-	char			*arg0;
 	zbx_sysinfo_proc_t	*proc;
-
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __function_name);
 
@@ -1178,29 +1243,8 @@ int	zbx_proc_get_processes(zbx_vector_ptr_t *processes, unsigned int flags)
 		if (FAIL == is_uint32(entries->d_name, &pid))
 			continue;
 
-		proc = (zbx_sysinfo_proc_t *)zbx_malloc(NULL, sizeof(zbx_sysinfo_proc_t));
-		memset(proc, 0, sizeof(zbx_sysinfo_proc_t));
-
-		proc->pid = pid;
-
-		if (0 != (flags & ZBX_SYSINFO_PROC_USER))
-			proc->uid = proc_get_process_uid(pid);
-
-		if (0 != (flags & (ZBX_SYSINFO_PROC_CMDLINE | ZBX_SYSINFO_PROC_NAME)))
-			proc->cmdline = proc_get_process_cmdline(pid);
-
-		if (0 != (flags & ZBX_SYSINFO_PROC_NAME))
-		{
-			proc->name = proc_get_process_name(pid);
-
-			if (NULL != proc->cmdline)
-			{
-				if (NULL == (arg0 = strrchr(proc->cmdline, '/')))
-					proc->name_arg0 = zbx_strdup(NULL, proc->cmdline);
-				else
-					proc->name_arg0 = zbx_strdup(NULL, arg0 + 1);
-			}
-		}
+		if (NULL == (proc = proc_create(pid, flags)))
+			continue;
 
 		zbx_vector_ptr_append(processes, proc);
 	}
