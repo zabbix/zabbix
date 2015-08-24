@@ -46,7 +46,8 @@ $proxyTable = (new CTableInfo())
 		_('Host count'),
 		_('Item count'),
 		_('Required performance (vps)'),
-		_('Hosts')
+		_('Hosts'),
+		(new CColHeader('Encryption'))->setColSpan(2)
 	]);
 
 foreach ($data['proxies'] as $proxy) {
@@ -80,6 +81,39 @@ foreach ($data['proxies'] as $proxy) {
 
 	$name = new CLink($proxy['host'], 'zabbix.php?action=proxy.edit&proxyid='.$proxy['proxyid']);
 
+
+	// encryption
+	if ($proxy['tls_connect'] != HOST_ENCRYPTION_NONE || $proxy['tls_accept']) {
+		// input
+		if ($proxy['tls_connect'] == HOST_ENCRYPTION_NONE) {
+			$in_encryption = (new CSpan(_('None')))->addClass('status-grey');
+		}
+		elseif ($proxy['tls_connect'] == HOST_ENCRYPTION_PSK) {
+			$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
+		}
+		else {
+			$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
+		}
+
+		// output
+		$out_encryption_array = [];
+		if (($proxy['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+			$out_encryption_array[] = (new CSpan(_('None')))->addClass('status-grey');
+		}
+		if (($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
+			$out_encryption_array[] = (new CSpan(_('PSK')))->addClass('status-green');
+		}
+		if (($proxy['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
+			$out_encryption_array[] = (new CSpan(_('CERT')))->addClass('status-green');
+		}
+
+		if (!$out_encryption_array) {
+			$out_encryption_array[] = (new CSpan(_('None')))->addClass('status-grey');
+		}
+
+		$out_encryption = (new CDiv($out_encryption_array))->addClass('status-container');
+	}
+
 	$proxyTable->addRow([
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', $proxy['proxyid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
@@ -90,7 +124,9 @@ foreach ($data['proxies'] as $proxy) {
 		count($proxy['hosts']),
 		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : 0,
 		array_key_exists('perf', $proxy) ? $proxy['perf'] : '',
-		$hosts ? $hosts : ''
+		$hosts ? $hosts : '',
+		$in_encryption,
+		$out_encryption
 	]);
 }
 
