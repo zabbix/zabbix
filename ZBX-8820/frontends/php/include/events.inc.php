@@ -330,7 +330,8 @@ function getEventAckState($event, $backurl) {
 	if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
 		$ack = (new CLink(_('Yes'), $link))
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_GREEN);
+			->addClass(ZBX_STYLE_GREEN)
+			->removeSID();
 		if (is_array($event['acknowledges'])) {
 			$ack->setHint(makeAckTab($event), '', false);
 		}
@@ -339,7 +340,8 @@ function getEventAckState($event, $backurl) {
 	else {
 		$ack = (new CLink(_('No'), $link))
 			->addClass(ZBX_STYLE_LINK_ALT)
-			->addClass(ZBX_STYLE_RED);
+			->addClass(ZBX_STYLE_RED)
+			->removeSID();
 	}
 
 	return $ack;

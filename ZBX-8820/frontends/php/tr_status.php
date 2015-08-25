@@ -654,7 +654,8 @@ foreach ($triggers as $trigger) {
 							'&backurl='.$page['file']
 					))
 						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_RED),
+						->addClass(ZBX_STYLE_RED)
+						->removeSID(),
 					CViewHelper::showNum($trigger['event_count'])
 				];
 			}
@@ -666,7 +667,8 @@ foreach ($triggers as $trigger) {
 						'&backurl='.$page['file']
 				))
 					->addClass(ZBX_STYLE_LINK_ALT)
-					->addClass(ZBX_STYLE_GREEN);
+					->addClass(ZBX_STYLE_GREEN)
+					->removeSID();
 			}
 		}
 		else {
