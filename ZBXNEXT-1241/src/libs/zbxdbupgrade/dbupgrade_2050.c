@@ -520,12 +520,19 @@ static int	DBpatch_2050050(void)
 
 static int	DBpatch_2050051(void)
 {
+	const ZBX_FIELD	field = {"iprange", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("drules", &field);
+}
+
+static int	DBpatch_2050052(void)
+{
 	const ZBX_FIELD field = {"default_inventory_mode", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_2050052(void)
+static int	DBpatch_2050053(void)
 {
 	const ZBX_TABLE table =
 			{"opinventory", "operationid", 0,
@@ -540,7 +547,7 @@ static int	DBpatch_2050052(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_2050053(void)
+static int	DBpatch_2050054(void)
 {
 	const ZBX_FIELD	field = {"operationid", NULL, "operations", "operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
@@ -599,5 +606,6 @@ DBPATCH_ADD(2050050, 0, 1)
 DBPATCH_ADD(2050051, 0, 1)
 DBPATCH_ADD(2050052, 0, 1)
 DBPATCH_ADD(2050053, 0, 1)
+DBPATCH_ADD(2050054, 0, 1)
 
 DBPATCH_END()

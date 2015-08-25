@@ -395,8 +395,8 @@ void	DCset_delta_items(zbx_hashset_t *items);
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
-int	DCget_item_count();
-int	DCget_item_unsupported_count();
+int	DCget_item_count(zbx_uint64_t hostid);
+int	DCget_item_unsupported_count(zbx_uint64_t hostid);
 int	DCget_trigger_count();
 double	DCget_required_performance();
 int	DCget_host_count();

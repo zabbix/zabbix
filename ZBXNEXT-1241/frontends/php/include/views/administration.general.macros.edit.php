@@ -68,9 +68,7 @@ $macros_form_list = (new CFormList('macrosFormList'))
 
 $tab_view = (new CTabView())->addTab('macros', _('Macros'), $macros_form_list);
 
-$saveButton = (new CSubmit('update', _('Update')))
-	->setAttribute('data-removed-count', 0)
-	->main();
+$saveButton = (new CSubmit('update', _('Update')))->setAttribute('data-removed-count', 0);
 
 $tab_view->setFooter(makeFormFooter($saveButton));
 

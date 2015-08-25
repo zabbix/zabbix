@@ -643,8 +643,6 @@ static int	check_discovery_condition(const DB_EVENT *event, DB_CONDITION *condit
 					event->objectid);
 		}
 
-		zbx_trim_str_list(condition->value, ',');
-
 		while (NULL != (row = DBfetch(result)) && FAIL == ret)
 		{
 			switch (condition->operator)

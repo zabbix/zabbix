@@ -450,7 +450,7 @@ else {
 
 	$data['triggers'] = API::Trigger()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'error', 'templateid', 'state'],
-		'selectHosts' => ['hostid', 'host'],
+		'selectHosts' => ['hostid', 'host', 'name'],
 		'selectItems' => ['itemid', 'hostid', 'key_', 'type', 'flags', 'status'],
 		'selectFunctions' => ['functionid', 'itemid', 'function', 'parameter'],
 		'selectDependencies' => ['triggerid', 'description'],

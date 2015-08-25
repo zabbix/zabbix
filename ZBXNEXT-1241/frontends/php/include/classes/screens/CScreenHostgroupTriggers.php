@@ -33,6 +33,7 @@ class CScreenHostgroupTriggers extends CScreenBase {
 			'groupids' => null,
 			'hostids' => null,
 			'maintenance' => null,
+			'trigger_name' => '',
 			'severity' => null,
 			'limit' => $this->screenitem['elements'],
 			'backUrl' => $this->pageFile
