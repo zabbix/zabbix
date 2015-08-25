@@ -67,6 +67,8 @@ $fields = [
 ];
 check_fields($fields);
 
+$config = select_config();
+
 // permissions
 if (getRequest('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get([
@@ -270,13 +272,14 @@ if (isset($_REQUEST['form'])) {
 			'status' => getRequest('status', HOST_STATUS_MONITORED),
 			'templates' => [],
 			'inventory' => [
-				'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED)
+				'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode'])
 			],
 			'groupPrototypes' => getRequest('group_prototypes', [])
 		],
 		'groups' => [],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
 	];
+	$data['config'] = $config;
 
 	// add already linked and new templates
 	$data['host_prototype']['templates'] = API::Template()->get([
@@ -361,8 +364,6 @@ else {
 
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
-	$config = select_config();
 
 	$data = [
 		'form' => getRequest('form'),

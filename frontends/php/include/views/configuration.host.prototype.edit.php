@@ -336,7 +336,9 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 }
 
-$inventoryMode = (isset($hostPrototype['inventory']['inventory_mode'])) ? $hostPrototype['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
+$inventoryMode = (isset($hostPrototype['inventory']['inventory_mode']))
+	? $hostPrototype['inventory']['inventory_mode']
+	: $data['config']['default_inventory_mode'];
 $inventoryFormList = (new CFormList('inventorylist'))
 	->addRow(null,
 		(new CRadioButtonList('inventory_mode', (int) $inventoryMode))

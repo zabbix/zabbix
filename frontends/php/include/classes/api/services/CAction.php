@@ -780,6 +780,7 @@ class CAction extends CApiService {
 		$opGroupsToInsert = [];
 		$opTemplatesToInsert = [];
 		$opConditionsToInsert = [];
+		$opInventoryToInsert = [];
 
 		foreach ($operations as $operationId => $operation) {
 			switch ($operation['operationtype']) {
@@ -849,6 +850,15 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_HOST_REMOVE:
 				case OPERATION_TYPE_HOST_ENABLE:
 				case OPERATION_TYPE_HOST_DISABLE:
+					break;
+				case OPERATION_TYPE_HOST_INVENTORY:
+					if (array_key_exists('opinventory', $operation)) {
+						$opInventoryToInsert[] = [
+							'operationid' => $operationId,
+							'inventory_mode' => $operation['opinventory']['inventory_mode']
+						];
+					}
+					break;
 			}
 			if (isset($operation['opconditions'])) {
 				foreach ($operation['opconditions'] as $opCondition) {
@@ -856,7 +866,7 @@ class CAction extends CApiService {
 					$opConditionsToInsert[] = $opCondition;
 				}
 			}
-		}
+		}//error_log('$opInventoryToInsert');error_log(json_encode($opInventoryToInsert));
 		DB::insert('opconditions', $opConditionsToInsert);
 		DB::insert('opmessage', $opMessagesToInsert, false);
 		DB::insert('opcommand', $opCommandsToInsert, false);
@@ -866,6 +876,7 @@ class CAction extends CApiService {
 		DB::insert('opcommand_grp', $opCommandGroupInserts);
 		DB::insert('opgroup', $opGroupsToInsert);
 		DB::insert('optemplate', $opTemplatesToInsert);
+		DB::insert('opinventory', $opInventoryToInsert, false);
 
 		return true;
 	}
@@ -908,6 +919,11 @@ class CAction extends CApiService {
 		// operation conditions
 		$opConditionsToInsert = [];
 
+		// inventory
+		$opInventoryToInsert = [];
+		$opInventoryToUpdate = [];
+		$opInventoryToDeleteByOpId = [];
+
 		foreach ($operations as $operation) {
 			$operationsDb = zbx_toHash($actionsDb[$operation['actionid']]['operations'], 'operationid');
 			$operationDb = $operationsDb[$operation['operationid']];
@@ -946,6 +962,9 @@ class CAction extends CApiService {
 							break;
 						}
 						$opTemplatesToDeleteByOpId[] = $operationDb['operationid'];
+						break;
+					case OPERATION_TYPE_HOST_INVENTORY:
+						$opInventoryToDeleteByOpId[] = $operationDb['operationid'];
 						break;
 				}
 			}
@@ -1134,6 +1153,18 @@ class CAction extends CApiService {
 						]);
 					}
 					break;
+				case OPERATION_TYPE_HOST_INVENTORY:
+					if ($typeChanged) {
+						$operation['opinventory']['operationid'] = $operation['operationid'];
+						$opInventoryToInsert[] = $operation['opinventory'];
+					}
+					else {
+						$opInventoryToUpdate[] = [
+							'values' => $operation['opinventory'],
+							'where' => ['operationid' => $operation['operationid']]
+						];
+					}
+					break;
 			}
 
 			if (!isset($operation['opconditions'])) {
@@ -1195,6 +1226,9 @@ class CAction extends CApiService {
 		if (!empty($opTemplatesToDeleteByOpId)) {
 			DB::delete('optemplate', ['operationid' => $opTemplatesToDeleteByOpId]);
 		}
+		if (!empty($opInventoryToDeleteByOpId)) {
+			DB::delete('opinventory', ['operationid' => $opInventoryToDeleteByOpId]);
+		}
 
 		DB::insert('opmessage', $opMessagesToInsert, false);
 		DB::insert('opcommand', $opCommandsToInsert, false);
@@ -1207,6 +1241,8 @@ class CAction extends CApiService {
 		DB::update('opmessage', $opMessagesToUpdate);
 		DB::update('opcommand', $opCommandsToUpdate);
 		DB::insert('opconditions', $opConditionsToInsert);
+		DB::insert('opinventory', $opInventoryToInsert, false);
+		DB::update('opinventory', $opInventoryToUpdate);
 	}
 
 	protected function deleteOperations($operationIds) {
@@ -1408,6 +1444,7 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_HOST_REMOVE:
 				case OPERATION_TYPE_HOST_ENABLE:
 				case OPERATION_TYPE_HOST_DISABLE:
+				case OPERATION_TYPE_HOST_INVENTORY:
 					break;
 				default:
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect action operation type.'));
@@ -1564,7 +1601,7 @@ class CAction extends CApiService {
 				}
 			}
 
-			$opmessage = $opcommand = $opgroup = $optemplate = [];
+			$opmessage = $opcommand = $opgroup = $optemplate = $opinventory = [];
 			foreach ($operations as $operationid => $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
@@ -1585,6 +1622,10 @@ class CAction extends CApiService {
 					case OPERATION_TYPE_HOST_REMOVE:
 					case OPERATION_TYPE_HOST_ENABLE:
 					case OPERATION_TYPE_HOST_DISABLE:
+						break;
+					case OPERATION_TYPE_HOST_INVENTORY:
+						$opinventory[] = $operationid;
+						break;
 				}
 			}
 
@@ -1716,6 +1757,24 @@ class CAction extends CApiService {
 					);
 					while ($optemplate = DBfetch($dbOptemplate)) {
 						$operations[$optemplate['operationid']]['optemplate'][] = $optemplate;
+					}
+				}
+			}
+
+			// get OPERATION_TYPE_HOST_INVENTORY data
+			if (!empty($opinventory)) {
+				if ($this->outputIsRequested('opinventory', $options['selectOperations'])) {
+					foreach ($opinventory as $operationId) {
+						$operations[$operationId]['opinventory'] = [];
+					}
+
+					$dbOpinventory = DBselect(
+						'SELECT o.operationid,o.inventory_mode'.
+							' FROM opinventory o'.
+							' WHERE '.dbConditionInt('operationid', $opinventory)
+					);
+					while ($opinventory = DBfetch($dbOpinventory)) {
+						$operations[$opinventory['operationid']]['opinventory'] = $opinventory;
 					}
 				}
 			}
