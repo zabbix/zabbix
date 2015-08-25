@@ -4324,7 +4324,8 @@ int	substitute_key_macros(char **data, zbx_uint64_t *hostid, DC_ITEM *dc_item, s
 			key_type = ZBX_KEY_TYPE_OID;
 			break;
 		default:
-			assert(0);
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	ret = replace_key_params_dyn(data, key_type, replace_key_param, &replace_key_param_data, error, maxerrlen);
