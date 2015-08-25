@@ -394,8 +394,8 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 		{
 			/* user macros  */
 
-			n = m + context_r;
-			c = *++n;
+			n = m + macro_r;
+			c = *n;
 			*n = '\0';
 			DCget_user_macro(&hostid, 1, m - 1, &replace_to);
 
@@ -2314,7 +2314,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			if (FAIL == zbx_user_macro_parse(m, &macro_r, &context_l, &context_r))
 				break;
 
-			br = bl + context_r + 1;
+			br = bl + macro_r;
 		}
 		else
 		{
