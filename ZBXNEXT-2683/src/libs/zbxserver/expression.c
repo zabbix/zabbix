@@ -392,7 +392,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 	{
 		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r))
 		{
-			/* user macros  */
+			/* user macros */
 
 			n = m + macro_r;
 			c = *n;
