@@ -557,7 +557,7 @@ class CScreenBuilder {
 			$screenTable->addRow($newColumns);
 		}
 
-		return (new CDiv($screenTable))->addClass('table-forms-container');
+		return (new CDiv($screenTable))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER);
 	}
 
 	/**

@@ -165,7 +165,7 @@ function get_next_event($currentEvent, array $eventList = []) {
 	return DBfetch(DBselect($sql, 1));
 }
 
-function make_event_details($event, $trigger) {
+function make_event_details($event, $trigger, $backurl) {
 	$config = select_config();
 	$table = (new CTableInfo())
 		->addRow([
@@ -180,16 +180,13 @@ function make_event_details($event, $trigger) {
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
 		$event['acknowledges'] = count($event['acknowledges']);
-		$table->addRow([
-			_('Acknowledged'),
-			getEventAckState($event, $page['file'])
-		]);
+		$table->addRow([_('Acknowledged'), getEventAckState($event, $backurl)]);
 	}
 
 	return $table;
 }
 
-function make_small_eventlist($startEvent) {
+function make_small_eventlist($startEvent, $backurl) {
 	$config = select_config();
 
 	$table = (new CTableInfo())
@@ -246,7 +243,7 @@ function make_small_eventlist($startEvent) {
 			$event['acknowledged']
 		);
 
-		$ack = getEventAckState($event, $page['file']);
+		$ack = getEventAckState($event, $backurl);
 
 		$table->addRow([
 			(new CLink(

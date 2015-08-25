@@ -2531,8 +2531,8 @@ static void	DBcopy_template_application_prototypes(zbx_uint64_t hostid, const zb
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select ap.application_prototypeid,ap.name,i_t.itemid"
-			" from items i"
-			" left join application_prototype ap"
+			" from application_prototype ap"
+			" left join items i"
 				" on ap.itemid=i.itemid"
 			" left join items i_t"
 				" on i_t.templateid=i.itemid"

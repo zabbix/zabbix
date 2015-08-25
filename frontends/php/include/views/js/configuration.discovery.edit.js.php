@@ -35,17 +35,17 @@
 				<tbody>
 				<tr>
 					<td><label for="type"><?= _('Check type') ?></label></td>
-					<td><select id="type" name="type" class="input select"></select></td>
+					<td><select id="type" name="type"></select></td>
 				</tr>
 				<tr id="newCheckPortsRow">
 					<td><label for="ports"><?= _('Port range') ?></label></td>
 					<td>
-						<input type="text" id="ports" name="ports" value="" class="input text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
+						<input type="text" id="ports" name="ports" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255">
 					</td>
 				</tr>
 				<tr id="newCheckCommunityRow">
 					<td><label for="snmp_community"><?= _('SNMP community') ?></label></td>
-					<td><input type="text" id="snmp_community" name="snmp_community" value="" class="input text"
+					<td><input type="text" id="snmp_community" name="snmp_community" value=""
 							style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="255"></td>
 				</tr>
 				<tr id="newCheckKeyRow">
