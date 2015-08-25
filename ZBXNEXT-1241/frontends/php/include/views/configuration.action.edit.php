@@ -911,6 +911,23 @@ if (!empty($this->data['new_operation'])) {
 				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			]);
 			break;
+		case OPERATION_TYPE_HOST_INVENTORY:
+			// inventory mode
+			$this->data['new_operation']['opinventory']['inventory_mode'] =
+				isset($this->data['new_operation']['opinventory']['inventory_mode'])
+				? $this->data['new_operation']['opinventory']['inventory_mode']
+				: HOST_INVENTORY_MANUAL;
+
+			$inventoryModeComboBox = new CComboBox('new_operation[opinventory][inventory_mode]',
+				$this->data['new_operation']['opinventory']['inventory_mode'],
+				null,
+				[
+					HOST_INVENTORY_MANUAL		=> _('Manual'),
+					HOST_INVENTORY_AUTOMATIC	=> _('Automatic')
+				]
+			);
+			$newOperationsTable->addRow([_('Type'), $inventoryModeComboBox]);
+			break;
 	}
 
 	// append operation conditions to form list

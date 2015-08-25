@@ -45,6 +45,9 @@ $otherTab
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(_('Group for discovered hosts'), $discoveryGroup)
+	->addRow(_('Default host inventory mode'),
+		new CComboBox('default_inventory_mode', $data['default_inventory_mode'], null, Z::getHostInventoryModes())
+	)
 	->addRow(_('User group for database down message'), $alertUserGroup)
 	->addRow(_('Log unmatched SNMP traps'),
 		(new CCheckBox('snmptrap_logging'))->setChecked($data['snmptrap_logging'] == 1)

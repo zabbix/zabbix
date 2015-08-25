@@ -110,6 +110,8 @@ $fields = [
 ];
 check_fields($fields);
 
+$config = select_config();
+
 /*
  * Permissions
  */
@@ -267,8 +269,8 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		}
 
 		if (isset($visible['inventory_mode'])) {
-			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
-			$newValues['inventory'] = ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED)
+			$newValues['inventory_mode'] = getRequest('inventory_mode', $config['default_inventory_mode']);
+			$newValues['inventory'] = ($newValues['inventory_mode'] == $config['default_inventory_mode'])
 				? [] : getRequest('host_inventory', []);
 		}
 
@@ -719,7 +721,7 @@ if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && ha
 		'ipmi_privilege' => getRequest('ipmi_privilege', IPMI_PRIVILEGE_USER),
 		'ipmi_username' => getRequest('ipmi_username', ''),
 		'ipmi_password' => getRequest('ipmi_password', ''),
-		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
+		'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
 		'host_inventory' => getRequest('host_inventory', []),
 		'templates' => getRequest('templates', []),
 		'inventories' => zbx_toHash(getHostInventories(), 'db_field')
@@ -798,7 +800,7 @@ elseif (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 
 		// Host inventory
-		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
+		'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
 		'host_inventory' => getRequest('host_inventory', []),
 		'inventory_items' => []
 	];
@@ -874,7 +876,7 @@ elseif (hasRequest('form')) {
 			// Host inventory
 			$data['inventory_mode'] = array_key_exists('inventory_mode', $dbHost['inventory'])
 				? $dbHost['inventory']['inventory_mode']
-				: HOST_INVENTORY_DISABLED;
+				: $config['default_inventory_mode'];
 			$data['host_inventory'] = $dbHost['inventory'];
 			unset($data['host_inventory']['inventory_mode']);
 
