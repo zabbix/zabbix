@@ -9,7 +9,7 @@
 				jQuery('#ip').closest('li').show();
 			}
 
-			toggleEncryptionFieldsByStatus();
+			toggleEncryptionFields();
 		});
 
 		// clone button, special processing because of list of hosts
@@ -23,10 +23,6 @@
 			url.setArgument('useip', jQuery('input[name=useip]:checked').val());
 			url.setArgument('port', jQuery('#port').val());
 			redirect(url.getUrl(), 'post', 'action');
-		});
-
-		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
-			toggleEncryptionAdditionalFields();
 		});
 
 		// Refresh field visibility on document load.
@@ -67,9 +63,17 @@
 
 		// Refresh field visibility on document load.
 		jQuery('#status').trigger('change');
-		toggleEncryptionFieldsByStatus();
 
-		function toggleEncryptionFieldsByStatus() {
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+			displayAdditionalEncryptionFields();
+		});
+
+		/**
+		 * Enabling or disabling connections to/from proxy based on proxy mode:
+		 *  if proxy is active, then disabled "Connections to proxy" field and enabled "Connections from proxy";
+		 *  if proxy is passive, then enabled "Connections to proxy" field and disabled "Connections from proxy".
+		 */
+		function toggleEncryptionFields() {
 			if (jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
 				jQuery('#tls_connect').prop('disabled', true);
 				jQuery('#tls_in_none, #tls_in_psk, #tls_in_cert').prop('disabled', false);
@@ -79,30 +83,55 @@
 				jQuery('#tls_in_none, #tls_in_psk, #tls_in_cert').prop('disabled', true);
 			}
 
-			toggleEncryptionAdditionalFields();
+			displayAdditionalEncryptionFields();
 		}
 
-		function toggleEncryptionAdditionalFields() {
+		/**
+		 * Show/hide they based on connections to/from proxy fields and enabling or disabling additional encryption
+		 * fields based on proxy mode:
+		 *  if selected or checked certificate then show "Issuer" and "Subject" fields;
+		 *  if selected or checked PSK then show "PSK identity" and "PSK" fields;
+		 *  if selected or checked certificate, but it disabled based on proxy status, then "Issuer" and "Subject"
+		 *   fields will be disabled;
+		 *  if selected or checked PSK, but it disabled based on proxy status, then "PSK identity" and "PSK"
+		 *   fields will be disabled;
+		 */
+		function displayAdditionalEncryptionFields() {
 			// If certificate is selected or checked.
-			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
-					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
-					|| (jQuery('#tls_in_cert').is(':checked'))
-					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
+			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
+					|| jQuery('#tls_in_cert').is(':checked')) {
 				jQuery('#tls_issuer, #tls_subject').closest('li').show();
 			}
 			else {
 				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
 			}
 
-			// If PSK is selected or checked.
-			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?>
+			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
 					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
-					|| (jQuery('#tls_in_psk').is(':checked'))
+					|| (jQuery('#tls_in_cert').is(':checked'))
 					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
+				jQuery('#tls_issuer, #tls_subject').prop('disabled', false);
+			}
+			else {
+				jQuery('#tls_issuer, #tls_subject').prop('disabled', true);
+			}
+
+			// If PSK is selected or checked.
+			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?> || jQuery('#tls_in_psk').is(':checked')) {
 				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
 			}
 			else {
 				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
+			}
+
+			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?>
+					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
+					|| (jQuery('#tls_in_psk').is(':checked'))
+					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
+				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
+			}
+			else {
+				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', true);
 			}
 		}
 	});
