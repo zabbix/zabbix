@@ -371,7 +371,6 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #define ZBX_CFG_LTRIM_CHARS	"\t "
 #define ZBX_CFG_RTRIM_CHARS	ZBX_CFG_LTRIM_CHARS "\r\n"
 #define ZBX_CFG_EOL_CHAR	'\n'
-#define ZBX_CFG_EOF_CHAR	'\0'
 
 	FILE		*file;
 	int		i, lineno, param_valid, line_length;
