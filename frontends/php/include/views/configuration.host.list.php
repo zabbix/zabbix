@@ -179,37 +179,30 @@ foreach ($data['hosts'] as $host) {
 		$lifetime_indicator = '';
 	}
 
-	// encryption
-	if ($host['tls_connect'] != HOST_ENCRYPTION_NONE || $host['tls_accept']) {
-		// input
-		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
-			$in_encryption = (new CSpan(_('None')))->addClass('status-grey');
-		}
-		elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
-			$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
-		}
-		else {
-			$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
-		}
-
-		// output
-		$out_encryption_array = [];
-		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
-			$out_encryption_array[] = (new CSpan(_('None')))->addClass('status-grey');
-		}
-		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
-			$out_encryption_array[] = (new CSpan(_('PSK')))->addClass('status-green');
-		}
-		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
-			$out_encryption_array[] = (new CSpan(_('CERT')))->addClass('status-green');
-		}
-
-		if (!$out_encryption_array) {
-			$out_encryption_array[] = (new CSpan(_('None')))->addClass('status-grey');
-		}
-
-		$out_encryption = (new CDiv($out_encryption_array))->addClass('status-container');
+	// input encryption
+	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
+		$in_encryption = (new CSpan(_('None')))->addClass('status-grey');
 	}
+	elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
+		$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
+	}
+	else {
+		$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
+	}
+
+	// output encryption
+	$out_encryption_array = [];
+	if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+		$out_encryption_array[] = (new CSpan(_('None')))->addClass('status-grey');
+	}
+	if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
+		$out_encryption_array[] = (new CSpan(_('PSK')))->addClass('status-green');
+	}
+	if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
+		$out_encryption_array[] = (new CSpan(_('CERT')))->addClass('status-green');
+	}
+
+	$out_encryption = (new CDiv($out_encryption_array))->addClass('status-container');
 
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
