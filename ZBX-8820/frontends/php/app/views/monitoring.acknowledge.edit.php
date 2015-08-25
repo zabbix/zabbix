@@ -50,7 +50,7 @@ $selected_events = count($data['eventids']);
 
 $form_list->addRow(_('Acknowledge'),
 	(new CDiv(
-		(new CRadioButtonList('acknowledge_type', ZBX_ACKNOWLEDGE_SELECTED))
+		(new CRadioButtonList('acknowledge_type', (int) $data['acknowledge_type']))
 			->makeVertical()
 			->addValue([
 				_n('Only selected event', 'Only selected events', $selected_events),

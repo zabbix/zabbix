@@ -242,7 +242,8 @@ $triggerWidget->addItem($filterForm);
  */
 $triggerForm = (new CForm('get', 'zabbix.php'))
 	->setName('tr_status')
-	->addVar('backurl', $page['file']);
+	->addVar('backurl', $page['file'])
+	->addVar('acknowledge_type', ZBX_ACKNOWLEDGE_PROBLEM);
 
 /*
  * Table
@@ -648,6 +649,7 @@ foreach ($triggers as $trigger) {
 				$ackColumn = [
 					(new CLink(_('No'),
 						'zabbix.php?action=acknowledge.edit'.
+							'&acknowledge_type='.ZBX_ACKNOWLEDGE_PROBLEM.
 							'&eventids[]='.$trigger['lastEvent']['eventid'].
 							'&backurl='.$page['file']
 					))
@@ -659,6 +661,7 @@ foreach ($triggers as $trigger) {
 			else {
 				$ackColumn = (new CLink(_('Yes'),
 					'zabbix.php?action=acknowledge.edit'.
+						'&acknowledge_type='.ZBX_ACKNOWLEDGE_PROBLEM.
 						'&eventids[]='.$trigger['lastEvent']['eventid'].
 						'&backurl='.$page['file']
 				))

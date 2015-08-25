@@ -76,6 +76,7 @@ class CControllerAcknowledgeEdit extends CController {
 			'sid' => $this->getUserSID(),
 			'eventids' => $this->getInput('eventids'),
 			'message' => $this->getInput('message', ''),
+			'acknowledge_type' => $this->getInput('acknowledge_type', ZBX_ACKNOWLEDGE_SELECTED),
 			'backurl' => $this->getInput('backurl', 'tr_status.php'),
 			'unack_problem_events_count' => 0,
 			'unack_events_count' => 0
