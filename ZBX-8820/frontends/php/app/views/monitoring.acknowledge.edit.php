@@ -39,12 +39,38 @@ if (array_key_exists('event', $data)) {
 		]);
 	}
 
-	$form_list->addRow(null,
+	$form_list->addRow(_('History'),
 		(new CDiv($acknowledgesTable))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
+
+$selected_events = count($data['eventids']);
+
+$form_list->addRow(_('Acknowledge'),
+	(new CDiv(
+		(new CRadioButtonList('acknowledge_type', ZBX_ACKNOWLEDGE_SELECTED))
+			->makeVertical()
+			->addValue([
+				_n('Only selected event', 'Only selected events', $selected_events),
+				$selected_events > 1 ? (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN) : null,
+				$selected_events > 1 ? new CSup(_n('%1$s event', '%1$s events', $selected_events)) : null
+			], ZBX_ACKNOWLEDGE_SELECTED)
+			->addValue([
+				_('Selected and all unacknowledged PROBLEM events'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				new CSup(_n('%1$s event', '%1$s events', $data['unack_problem_events_count']))
+			], ZBX_ACKNOWLEDGE_PROBLEM)
+			->addValue([
+				_('Selected and all unacknowledged events'),
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				new CSup(_n('%1$s event', '%1$s events', $data['unack_events_count']))
+			], ZBX_ACKNOWLEDGE_ALL)
+	))
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+);
 
 $footer_buttons = makeFormFooter(
 	new CSubmitButton(_('Acknowledge'), 'action', 'acknowledge.create'),

@@ -23,9 +23,10 @@ class CControllerAcknowledgeCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'eventids' =>	'array_db acknowledges.eventid',
-			'message' =>	'db acknowledges.message',
-			'backurl' =>	'string'
+			'eventids' =>			'required|array_db acknowledges.eventid',
+			'message' =>			'db acknowledges.message',
+			'acknowledge_type' =>	'in '.ZBX_ACKNOWLEDGE_SELECTED.','.ZBX_ACKNOWLEDGE_PROBLEM.','.ZBX_ACKNOWLEDGE_ALL,
+			'backurl' =>			'string'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -50,6 +51,8 @@ class CControllerAcknowledgeCreate extends CController {
 	protected function checkPermissions() {
 		$events = API::Event()->get([
 			'eventids' => $this->getInput('eventids'),
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
 			'countOutput' => true
 		]);
 
@@ -57,19 +60,56 @@ class CControllerAcknowledgeCreate extends CController {
 	}
 
 	protected function doAction() {
+		$eventids = $this->getInput('eventids');
+		$acknowledge_type = $this->getInput('acknowledge_type');
+
+		if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $acknowledge_type == ZBX_ACKNOWLEDGE_ALL) {
+			$events = API::Event()->get([
+				'output' => ['objectid'],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'eventids' => $eventids
+			]);
+
+			$triggerids = zbx_objectValues($events, 'objectid');
+
+			$filter = [
+				'acknowledged' => EVENT_NOT_ACKNOWLEDGED
+			];
+
+			if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM) {
+				$filter['value'] = TRIGGER_VALUE_TRUE;
+			}
+
+			$events = API::Event()->get([
+				'output' => [],
+				'source' => EVENT_SOURCE_TRIGGERS,
+				'object' => EVENT_OBJECT_TRIGGER,
+				'objectids' => $triggerids,
+				'filter' => $filter,
+				'preservekeys' => true
+			]);
+
+			foreach ($eventids as $eventid) {
+				$events[$eventid] = true;
+			}
+
+			$eventids = array_keys($events);
+		}
+
 		$result = API::Event()->acknowledge([
-			'eventids' => $this->getInput('eventids'),
-			'message' => $this->getInput('message')
+			'eventids' => $eventids,
+			'message' => $this->getInput('message', '')
 		]);
 
 		if ($result) {
-			$response = new CControllerResponseRedirect($this->getInput('backurl'));
-			$response->setMessageOk(_('Event acknowledged'));
+			$response = new CControllerResponseRedirect($this->getInput('backurl', 'tr_status.php'));
+			$response->setMessageOk(_n('Event acknowledged', 'Events acknowledged', count($eventids)));
 		}
 		else {
 			$response = new CControllerResponseRedirect('zabbix.php?action=acknowledge.edit');
 			$response->setFormData($this->getInputAll());
-			$response->setMessageError(_('Cannot acknowledge event'));
+			$response->setMessageError(_n('Cannot acknowledge event', 'Cannot acknowledge events', count($eventids)));
 		}
 		$this->setResponse($response);
 	}
