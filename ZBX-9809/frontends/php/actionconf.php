@@ -241,7 +241,7 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 					$uniqOperations[$operation['operationtype']]++;
 				}
 			}
-			if ( 1 < $uniqOperations[$new_operation['operationtype']]) {
+			if (1 < $uniqOperations[$new_operation['operationtype']]) {
 				$result = false;
 				info(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
 				show_messages();
