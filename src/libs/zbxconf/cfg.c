@@ -400,7 +400,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
-			/* only 2048 character (inc. '\n' and '\0') single lines supported in the config file */
+			/* only 2048 character (inc. '\n' or '\0') single lines supported in the config file */
 			line_length = strlen(line);
 			if (ZBX_CFG_EOL_CHAR != line[line_length - 1] && !feof(file))
 				goto line_too_long;
