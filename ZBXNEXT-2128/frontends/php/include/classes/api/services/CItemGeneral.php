@@ -899,7 +899,7 @@ abstract class CItemGeneral extends CApiService {
 	 *   'delay/day1-day2,time1-time2;interval2;interval3;...' (day2 is optional)
 	 * Examples:
 	 *   600/5-7,00:00-09:00;600/1-2,00:00-09:00
-	 *   600/5,0:0-9:0;600/1-2,0:0-9:0
+	 *   600/5,0:00-9:00;600/1-2,0:00-9:00
 	 *
 	 * @param array $item
 	 *
