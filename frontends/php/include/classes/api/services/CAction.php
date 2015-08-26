@@ -866,7 +866,7 @@ class CAction extends CApiService {
 					$opConditionsToInsert[] = $opCondition;
 				}
 			}
-		}//error_log('$opInventoryToInsert');error_log(json_encode($opInventoryToInsert));
+		}
 		DB::insert('opconditions', $opConditionsToInsert);
 		DB::insert('opmessage', $opMessagesToInsert, false);
 		DB::insert('opcommand', $opCommandsToInsert, false);
