@@ -165,43 +165,39 @@ function get_next_event($currentEvent, array $eventList = []) {
 	return DBfetch(DBselect($sql, 1));
 }
 
-function make_event_details($event, $trigger) {
+function make_event_details($event, $trigger, $backurl) {
 	$config = select_config();
-	$table = new CTableInfo();
-
-	$table->addRow([
-		_('Event'),
-		CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))
-	]);
-	$table->addRow([
-		_('Time'),
-		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])
-	]);
+	$table = (new CTableInfo())
+		->addRow([
+			_('Event'),
+			CMacrosResolverHelper::resolveEventDescription(array_merge($trigger, $event))
+		])
+		->addRow([
+			_('Time'),
+			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock'])
+		]);
 
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
 		$event['acknowledges'] = count($event['acknowledges']);
-		$table->addRow([
-			_('Acknowledged'),
-			getEventAckState($event, $page['file'])
-		]);
+		$table->addRow([_('Acknowledged'), getEventAckState($event, $backurl)]);
 	}
 
 	return $table;
 }
 
-function make_small_eventlist($startEvent) {
+function make_small_eventlist($startEvent, $backurl) {
 	$config = select_config();
 
-	$table = new CTableInfo();
-	$table->setHeader([
-		_('Time'),
-		_('Status'),
-		_('Duration'),
-		_('Age'),
-		$config['event_ack_enable'] ? _('Ack') : null, // if we need to chow acks
-		_('Actions')
-	]);
+	$table = (new CTableInfo())
+		->setHeader([
+			_('Time'),
+			_('Status'),
+			_('Duration'),
+			_('Age'),
+			$config['event_ack_enable'] ? _('Ack') : null, // if we need to chow acks
+			_('Actions')
+		]);
 
 	$clock = $startEvent['clock'];
 
@@ -223,7 +219,7 @@ function make_small_eventlist($startEvent) {
 	];
 	CArrayHelper::sort($events, $sortFields);
 
-	$actions = getEventActionsStatHints(zbx_objectValues($events, 'eventid'));
+	$actions = makeEventsActions(zbx_objectValues($events, 'eventid'));
 
 	foreach ($events as $event) {
 		$lclock = $clock;
@@ -247,14 +243,13 @@ function make_small_eventlist($startEvent) {
 			$event['acknowledged']
 		);
 
-		$ack = getEventAckState($event, $page['file']);
+		$ack = getEventAckState($event, $backurl);
 
 		$table->addRow([
-			new CLink(
+			(new CLink(
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-				'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid'],
-				'action'
-			),
+				'tr_events.php?triggerid='.$event['objectid'].'&eventid='.$event['eventid']))
+				->addClass('action'),
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
@@ -354,10 +349,14 @@ function getEventAckState($event, $url = null, $isLink = true, $params = []) {
 		}
 
 		if ($event['acknowledged'] == 0) {
-			$ack = new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_RED);
+			$ack = (new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_RED);
 		}
 		else {
-			$ackLink = new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams, ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
+			$ackLink = (new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREEN);
 			if (is_array($event['acknowledges'])) {
 				$ackLinkHints = makeAckTab($event);
 				if (!empty($ackLinkHints)) {
@@ -369,10 +368,10 @@ function getEventAckState($event, $url = null, $isLink = true, $params = []) {
 	}
 	else {
 		if ($event['acknowledged'] == 0) {
-			$ack = new CSpan(_('No'), ZBX_STYLE_RED);
+			$ack = (new CSpan(_('No')))->addClass(ZBX_STYLE_RED);
 		}
 		else {
-			$ack = [new CSpan(_('Yes'), ZBX_STYLE_GREEN), CViewHelper::showNum($acknowledges_num)];
+			$ack = [(new CSpan(_('Yes')))->addClass(ZBX_STYLE_GREEN), CViewHelper::showNum($acknowledges_num)];
 		}
 	}
 

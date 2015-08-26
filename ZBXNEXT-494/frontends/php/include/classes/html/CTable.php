@@ -21,50 +21,33 @@
 
 class CTable extends CTag {
 
-	public $headerClass;
-	public $footerClass;
-	protected $oddRowClass;
-	protected $evenRowClass;
 	protected $header;
 	protected $footer;
 	protected $colnum;
 	protected $rownum;
 	protected $message;
 
-	public function __construct($message = null, $class = null) {
-		parent::__construct('table', 'yes');
-		if ($class !== null) {
-			$this->addClass($class);
-		}
+	public function __construct() {
+		parent::__construct('table', true);
 		$this->rownum = 0;
-		$this->oddRowClass = null;
-		$this->evenRowClass = null;
 		$this->header = '';
-		$this->headerClass = null;
 		$this->footer = '';
-		$this->footerClass = null;
 		$this->colnum = 1;
-		$this->message = $message;
-	}
-
-	public function setOddRowClass($value = null) {
-		$this->oddRowClass = $value;
-	}
-
-	public function setEvenRowClass($value = null) {
-		$this->evenRowClass = $value;
-	}
-
-	public function setAlign($value) {
-		return $this->attributes['align'] = $value;
 	}
 
 	public function setCellPadding($value) {
-		return $this->attributes['cellpadding'] = strval($value);
+		$this->attributes['cellpadding'] = strval($value);
+		return $this;
 	}
 
 	public function setCellSpacing($value) {
-		return $this->attributes['cellspacing'] = strval($value);
+		$this->attributes['cellspacing'] = strval($value);
+		return $this;
+	}
+
+	public function setNoDataMessage($message) {
+		$this->message = $message;
+		return $this;
 	}
 
 	public function prepareRow($item, $class = null, $id = null) {
@@ -99,47 +82,29 @@ class CTable extends CTag {
 			}
 		}
 
-		if (!isset($item->attributes['class']) || is_array($item->attributes['class'])) {
-			$class = ($this->rownum % 2) ? $this->oddRowClass : $this->evenRowClass;
-			if ($class !== null) {
-				$item->addClass($class);
-			}
-		}
 		return $item;
 	}
 
-	public function setHeader($value = null, $class = null) {
-		if (is_null($class)) {
-			$class = $this->headerClass;
-		}
-		if (is_object($value) && strtolower(get_class($value)) === 'crow') {
-			if (!is_null($class)) {
-				$value->setAttribute('class', $class);
-			}
-		}
-		else {
-			$value = new CRowHeader($value, $class);
+	public function setHeader($value = null) {
+		if (!is_object($value) || strtolower(get_class($value)) !== 'crow') {
+			$value = new CRowHeader($value);
 		}
 		$this->colnum = $value->itemsCount();
 
-		$value = new CTag('thead', 'yes', $value);
+		$value = new CTag('thead', true, $value);
 		$this->header = $value->toString();
-
 		return $this;
 	}
 
-	public function setFooter($value = null, $class = 'footer') {
-		if (is_null($class)) {
-			$class = $this->footerClass;
-		}
+	public function setFooter($value = null, $class = null) {
 		$this->footer = $this->prepareRow($value, $class);
 		$this->footer = $this->footer->toString();
+		return $this;
 	}
 
 	public function addRow($item, $class = null, $id = null) {
 		$item = $this->addItem($this->prepareRow($item, $class, $id));
 		++$this->rownum;
-
 		return $this;
 	}
 

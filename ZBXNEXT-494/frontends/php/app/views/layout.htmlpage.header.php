@@ -19,17 +19,21 @@
 **/
 
 
-global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT;
+global $DB, $ZBX_SERVER, $ZBX_SERVER_NAME, $ZBX_SERVER_PORT;
 
-$pageHeader = new CPageHeader($data['page']['title']);
-$pageHeader->addCssInit();
+$page_title = $data['page']['title'];
+if (isset($ZBX_SERVER_NAME) && $ZBX_SERVER_NAME !== '') {
+	$page_title = $ZBX_SERVER_NAME.NAME_DELIMITER.$page_title;
+}
+
+$pageHeader = new CPageHeader($page_title);
 
 $scripts = [];
 
-$css = ZBX_DEFAULT_THEME;
+$theme = ZBX_DEFAULT_THEME;
 if (!empty($DB['DB'])) {
 	$config = select_config();
-	$css = getUserTheme($data['user']);
+	$theme = getUserTheme($data['user']);
 
 	$severityCss = <<<CSS
 .disaster { background: #{$config['severity_color_5']} !important; }
@@ -46,8 +50,7 @@ CSS;
 		$scripts[] = 'servercheck.js';
 	}
 }
-$css = CHtml::encode($css);
-//$pageHeader->addCssFile('styles/themes/'.$css.'/main.css');
+$pageHeader->addCssFile('styles/'.CHtml::encode($theme).'.css');
 
 $pageHeader->addJsFile('js/browsers.js');
 $pageHeader->addJsBeforeScripts('var PHP_TZ_OFFSET = '.date('Z').';');
@@ -67,5 +70,5 @@ foreach ($data['javascript']['files'] as $path) {
 
 $pageHeader->display();
 
-echo "<body class=\"$css\">";
-echo "<div class=\"msg-bad-global\" id=\"msg-bad-global\"></div>";
+echo '<body>';
+echo '<div class="'.ZBX_STYLE_MSG_BAD_GLOBAL.'" id="msg-bad-global"></div>';

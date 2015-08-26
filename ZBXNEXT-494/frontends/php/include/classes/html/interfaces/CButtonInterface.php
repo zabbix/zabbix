@@ -23,19 +23,4 @@
  * Interface that must be implemented by elements acting as buttons.
  */
 interface CButtonInterface {
-
-	/**
-	 * Mark the button as main.
-	 */
-	public function main();
-
-	/**
-	 * Set button-specific class.
-	 *
-	 * This method will not affect other classes of the element.
-	 *
-	 * @param string $class
-	 */
-	public function setButtonClass($class);
-
 }

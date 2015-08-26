@@ -66,15 +66,14 @@ class CActionButtonList extends CObject {
 		$this->checkboxesName = $checkboxesName;
 		$this->cookieNamePrefix = $cookieNamePrefix;
 
-		foreach ($buttonsData as $actionValue => $buttonData) {
-			$this->buttons[$actionValue] = new CSubmit($actionName, $buttonData['name']);
-
-			$this->buttons[$actionValue]->removeAttribute('id');
-			$this->buttons[$actionValue]->setAttribute('value', $actionValue);
-			$this->buttons[$actionValue]->addClass('btn-alt footerButton');
+		foreach ($buttonsData as $action=> $buttonData) {
+			$this->buttons[$action] = (new CSubmit($actionName, $buttonData['name']))
+				->addClass(ZBX_STYLE_BTN_ALT)
+				->removeAttribute('id')
+				->setAttribute('value', $action);
 
 			if (array_key_exists('confirm', $buttonData)) {
-				$this->buttons[$actionValue]->setAttribute('confirm', $buttonData['confirm']);
+				$this->buttons[$action]->setAttribute('confirm', $buttonData['confirm']);
 			}
 		}
 	}
@@ -87,7 +86,9 @@ class CActionButtonList extends CObject {
 	 */
 	public function getSelectedCountElement() {
 		if (!$this->selectedCountElement) {
-			$this->selectedCountElement = new CSpan(SPACE.'0 '._('selected').SPACE, null, 'selectedCount');
+			$this->selectedCountElement = (new CSpan('0 '._('selected')))
+				->setId('selected_count')
+				->addClass(ZBX_STYLE_SELECTED_ITEM_COUNT);
 		}
 
 		return $this->selectedCountElement;
@@ -110,11 +111,9 @@ class CActionButtonList extends CObject {
 			$items[] = $button;
 		}
 
-		$this->items[] = new CDiv([
-			$this->getSelectedCountElement(),
-			$items],
-			'action-buttons'
-		);
+		$this->items[] = (new CDiv([$this->getSelectedCountElement(), $items]))
+			->setId('action_buttons')
+			->addClass(ZBX_STYLE_ACTION_BUTTONS);
 
 		return parent::toString($destroy);
 	}

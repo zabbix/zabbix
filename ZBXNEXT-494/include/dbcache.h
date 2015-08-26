@@ -129,6 +129,7 @@ typedef struct
 	unsigned char	snmpv3_privprotocol;
 	unsigned char	inventory_link;
 	unsigned char	status;
+	unsigned char	unreachable;
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char		*formula;
 	char		*units;
@@ -376,8 +377,8 @@ void	DCset_delta_items(zbx_hashset_t *items);
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
-int	DCget_item_count();
-int	DCget_item_unsupported_count();
+int	DCget_item_count(zbx_uint64_t hostid);
+int	DCget_item_unsupported_count(zbx_uint64_t hostid);
 int	DCget_trigger_count();
 double	DCget_required_performance();
 int	DCget_host_count();

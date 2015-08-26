@@ -127,40 +127,8 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['imageid'])) {
 /*
  * Display
  */
-$form = new CForm();
-$form->cleanItems();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.images.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-
-if (!isset($_REQUEST['form'])) {
-	$imageType = getRequest('imagetype', IMAGE_TYPE_ICON);
-
-	$form->addVar('imagetype', $imageType);
-	$controls->addItem(new CSubmit('form',  ($imageType == IMAGE_TYPE_ICON) ? _('Create icon') : _('Create background')));
-}
-$form->addItem($controls);
-
-$imageWidget = (new CWidget())->setTitle(_('Images'))->setControls($form);
-
 $data = [
-	'form' => getRequest('form'),
-	'widget' => &$imageWidget
+	'form' => getRequest('form')
 ];
 
 if (!empty($data['form'])) {
@@ -175,7 +143,7 @@ if (!empty($data['form'])) {
 		$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
 	}
 
-	$imageForm = new CView('administration.general.image.edit', $data);
+	$view = new CView('administration.general.image.edit', $data);
 }
 else {
 	$data['imagetype'] = getRequest('imagetype', IMAGE_TYPE_ICON);
@@ -186,9 +154,10 @@ else {
 	]);
 	order_result($data['images'], 'name');
 
-	$imageForm = new CView('administration.general.image.list', $data);
+	$view = new CView('administration.general.image.list', $data);
 }
 
-$imageWidget->addItem($imageForm->render())->show();
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -140,9 +140,8 @@ class CScreenHistory extends CScreenBase {
 				$useEventLogItem = (strpos($firstItem['key_'], 'eventlog[') === 0);
 
 				if (empty($this->plaintext)) {
-					$historyTable = new CTableInfo();
-					$historyTable->setHeader(
-						[
+					$historyTable = (new CTableInfo())
+						->setHeader([
 							_('Timestamp'),
 							$isManyItems ? _('Item') : null,
 							$useLogItem ? _('Local time') : null,
@@ -150,9 +149,7 @@ class CScreenHistory extends CScreenBase {
 							($useEventLogItem && $useLogItem) ? _('Severity') : null,
 							($useEventLogItem && $useLogItem) ? _('Event ID') : null,
 							_('Value')
-						],
-						'header'
-					);
+						]);
 				}
 
 				if ($this->filter !== '' && in_array($this->filterTask, [FILTER_TASK_SHOW, FILTER_TASK_HIDE])) {
@@ -166,7 +163,7 @@ class CScreenHistory extends CScreenBase {
 				$historyData = API::History()->get($options);
 
 				foreach ($historyData as $data) {
-					$data['value'] = trim($data['value'], "\r\n");
+					$data['value'] = rtrim($data['value'], " \t\r\n");
 
 					if (empty($this->plaintext)) {
 						$item = $this->items[$data['itemid']];
@@ -187,13 +184,13 @@ class CScreenHistory extends CScreenBase {
 
 							switch ($color) {
 								case MARK_COLOR_RED:
-									$color = 'red';
+									$color = ZBX_STYLE_RED;
 									break;
 								case MARK_COLOR_GREEN:
-									$color = 'green';
+									$color = ZBX_STYLE_GREEN;
 									break;
 								case MARK_COLOR_BLUE:
-									$color = 'blue';
+									$color = ZBX_STYLE_BLUE;
 									break;
 							}
 						}
@@ -206,31 +203,32 @@ class CScreenHistory extends CScreenBase {
 
 						if ($useLogItem) {
 							$row[] = ($data['timestamp'] == 0)
-								? '-'
+								? ''
 								: zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['timestamp']);
 
 							// if this is a eventLog item, showing additional info
 							if ($useEventLogItem) {
-								$row[] = ($data['source'] === '') ? '-' : $data['source'];
+								$row[] = ($data['source'] === '') ? '' : $data['source'];
 								$row[] = ($data['severity'] == 0)
-								? '-'
-								: (new CCol(get_item_logtype_description($data['severity'])))->addClass(get_item_logtype_style($data['severity']));
-								$row[] = ($data['logeventid'] == 0) ? '-' : $data['logeventid'];
+									? ''
+									: (new CCol(get_item_logtype_description($data['severity'])))
+										->addClass(get_item_logtype_style($data['severity']));
+								$row[] = ($data['logeventid'] == 0) ? '' : $data['logeventid'];
 							}
 						}
 
-						$row[] = (new CCol($data['value']))->addClass('pre');
+						$row[] = new CPre(zbx_nl2br($data['value']));
 
 						$newRow = new CRow($row);
 						if (!is_null($color)) {
-							$newRow->setAttribute('class', $color);
+							$newRow->addClass($color);
 						}
 
 						$historyTable->addRow($newRow);
 					}
 					else {
-						$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']);
-						$output[] = "\t".$data['clock']."\t".htmlspecialchars($data['value'])."\n";
+						$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']).' '. $data['clock'].' '.
+							htmlspecialchars($data['value']);
 					}
 				}
 
@@ -242,8 +240,7 @@ class CScreenHistory extends CScreenBase {
 			// numeric, float
 			else {
 				if (empty($this->plaintext)) {
-					$historyTable = new CTableInfo();
-					$historyTable->setHeader([_('Timestamp'), _('Value')]);
+					$historyTable = (new CTableInfo())->setHeader([_('Timestamp'), _('Value')]);
 				}
 
 				$options['sortfield'] = ['itemid', 'clock'];
@@ -251,7 +248,7 @@ class CScreenHistory extends CScreenBase {
 
 				foreach ($historyData as $data) {
 					$item = $this->items[$data['itemid']];
-					$value = $data['value'];
+					$value = rtrim($data['value'], " \t\r\n");
 
 					// format the value as float
 					if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT) {
@@ -266,13 +263,13 @@ class CScreenHistory extends CScreenBase {
 
 						$historyTable->addRow([
 							zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']),
-							zbx_nl2br($value)
+							new CPre(zbx_nl2br($value))
 						]);
 					}
 					// plain text
 					else {
-						$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']);
-						$output[] = "\t".$data['clock']."\t".htmlspecialchars($value)."\n";
+						$output[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $data['clock']).' '.$data['clock'].' '.
+							htmlspecialchars($value);
 					}
 				}
 
@@ -297,7 +294,9 @@ class CScreenHistory extends CScreenBase {
 
 			if (($this->action == HISTORY_GRAPH || $this->action == HISTORY_BATCH_GRAPH) && !isset($iv_string[$firstItem['value_type']])) {
 				$containerId = 'graph_cont1';
-				$output[] = new CDiv(null, 'center', $containerId);
+				$output[] = (new CDiv())
+					->addClass('center')
+					->setId($containerId);
 
 				$timeControlData['id'] = $this->getDataId();
 				$timeControlData['containerid'] = $containerId;

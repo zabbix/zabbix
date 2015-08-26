@@ -17,21 +17,12 @@
 		});
 
 		<?php if ($this->data['is_profile']): ?>
-			jQuery('#messages_enabled').bind('click', function() {
-				if (this.checked && !jQuery('#triggers_row input[type=checkbox]').is(':checked')) {
-					jQuery('#triggers_row input[type=checkbox]').prop('checked', true);
-				}
-
-				// enable/disable childs fields
-				jQuery('#messagingTab .input, #messagingTab .button').prop('disabled', !this.checked);
+			jQuery('#messages_enabled').on('change', function() {
+				jQuery('#messagingTab input, #messagingTab button, #messagingTab select').prop('disabled', !this.checked);
 				jQuery('#messages_enabled').prop('disabled', false);
 			});
 
-			// initial state: enable/disable childs fields
-			jQuery('#messagingTab .input, #messagingTab .button').prop('disabled',
-				!jQuery('#messages_enabled').is(':checked')
-			);
-			jQuery('#messages_enabled').prop('disabled', false);
+			jQuery('#messages_enabled').trigger('change');
 		<?php endif ?>
 	});
 </script>

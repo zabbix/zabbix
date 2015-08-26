@@ -22,21 +22,20 @@
 $discoveryWidget = (new CWidget())->setTitle(_('Status of discovery'));
 
 // create header form
-$controls = new CList();
-$controls->addItem([_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()]);
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
+$controls = (new CList())
+	->addItem([_('Discovery rule'), SPACE, $data['pageFilter']->getDiscoveryCB()])
+	->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
-$discoveryHeaderForm = new CForm('get');
-$discoveryHeaderForm->setName('slideHeaderForm');
-$discoveryHeaderForm->addVar('action', 'discovery.view');
-$discoveryHeaderForm->addVar('fullscreen', $data['fullscreen']);
-$discoveryHeaderForm->addItem($controls);
-
-$discoveryWidget->setControls($discoveryHeaderForm);
+$discoveryWidget->setControls(
+	(new CForm('get'))
+		->setName('slideHeaderForm')
+		->addVar('action', 'discovery.view')
+		->addVar('fullscreen', $data['fullscreen'])
+		->addItem($controls)
+);
 
 // create table
-$discoveryTable = new CTableInfo();
-$discoveryTable->makeVerticalRotation();
+$discoveryTable = (new CTableInfo())->makeVerticalRotation();
 
 $discoveredDeviceCol = make_sorting_header(_('Discovered device'), 'ip', $data['sort'], $data['sortorder']);
 $discoveredDeviceCol->addClass('left');
@@ -50,7 +49,7 @@ $header = [
 foreach ($data['services'] as $name => $foo) {
 	$header[] = (new CColHeader($name))->addClass('vertical_rotation');
 }
-$discoveryTable->setHeader($header, 'vertical_header');
+$discoveryTable->setHeader($header);
 
 foreach ($data['drules'] as $drule) {
 	$discovery_info = [];
@@ -142,25 +141,28 @@ foreach ($data['drules'] as $drule) {
 	foreach ($discovery_info as $ip => $h_data) {
 		$dns = $h_data['dns'] == '' ? '' : ' ('.$h_data['dns'].')';
 		$row = [
-			$h_data['type'] == 'primary' ? new CSpan($ip.$dns, $h_data['class']) : new CSpan(SPACE.SPACE.$ip.$dns),
+			$h_data['type'] == 'primary'
+				? (new CSpan($ip.$dns))->addClass($h_data['class'])
+				: new CSpan(SPACE.SPACE.$ip.$dns),
 			new CSpan(empty($h_data['host']) ? '' : $h_data['host']),
-			new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
+			(new CSpan((($h_data['time'] == 0 || $h_data['type'] === 'slave')
 				? ''
-				: convert_units(['value' => time() - $h_data['time'], 'units' => 'uptime'])), $h_data['class'])
+				: convert_units(['value' => time() - $h_data['time'], 'units' => 'uptime'])))
+			)
+				->addClass($h_data['class'])
 		];
 
 		foreach ($data['services'] as $name => $foo) {
 			$class = null;
 			$time = SPACE;
-			$hint = new CDiv(SPACE, $class);
+			$hint = (new CDiv(SPACE))->addClass($class);
 
 			$hintTable = null;
 			if (isset($h_data['services'][$name])) {
 				$class = $h_data['services'][$name]['class'];
 				$time = $h_data['services'][$name]['time'];
 
-				$hintTable = new CTableInfo();
-				$hintTable->setAttribute('style', 'width: auto;');
+				$hintTable = (new CTableInfo())->setAttribute('style', 'width: auto;');
 
 				if ($class == 'active') {
 					$hintTable->setHeader(_('Uptime'));

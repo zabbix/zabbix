@@ -120,19 +120,20 @@ class CScreenActions extends CScreenBase {
 
 		// indicator of sort field
 		$sortfieldSpan = new CSpan([$sorttitle, SPACE]);
-		$sortorderSpan = new CSpan(SPACE, ($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
+		$sortorderSpan = (new CSpan(SPACE))
+			->addClass(($sortorder === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor');
 
 		// create alert table
-		$actionTable = new CTableInfo();
-		$actionTable->setHeader([
-			($sortfield === 'clock') ? [$sortfieldSpan, $sortorderSpan] : _('Time'),
-			_('Action'),
-			($sortfield === 'description') ? [$sortfieldSpan, $sortorderSpan] : _('Type'),
-			($sortfield === 'sendto') ? [$sortfieldSpan, $sortorderSpan] : _('Recipient(s)'),
-			_('Message'),
-			($sortfield === 'status') ? [$sortfieldSpan, $sortorderSpan] : _('Status'),
-			_('Info')
-		]);
+		$actionTable = (new CTableInfo())
+			->setHeader([
+				($sortfield === 'clock') ? [$sortfieldSpan, $sortorderSpan] : _('Time'),
+				_('Action'),
+				($sortfield === 'description') ? [$sortfieldSpan, $sortorderSpan] : _('Type'),
+				($sortfield === 'sendto') ? [$sortfieldSpan, $sortorderSpan] : _('Recipient(s)'),
+				_('Message'),
+				($sortfield === 'status') ? [$sortfieldSpan, $sortorderSpan] : _('Status'),
+				_('Info')
+			]);
 
 		$actions = API::Action()->get([
 			'output' => ['actionid', 'name'],
@@ -142,50 +143,32 @@ class CScreenActions extends CScreenBase {
 
 		foreach ($alerts as $alert) {
 			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$status = new CSpan(_('Sent'), ZBX_STYLE_GREEN);
+				$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
 			}
 			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-				$status = new CSpan([
+				$status = (new CSpan([
 					_('In progress').':',
 					BR(),
-					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries']),
-				], ZBX_STYLE_ORANGE);
+					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries'])])
+				)
+					->addClass(ZBX_STYLE_ORANGE);
 			}
 			else {
-				$status = new CSpan(_('Not sent'), ZBX_STYLE_RED);
+				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 			}
 
 			$recipient = $alert['userid']
 				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
-			$message = [
-				bold(_('Subject').':'),
-				br(),
-				$alert['subject'],
-				br(),
-				br(),
-				bold(_('Message').':'),
-				br(),
-				$alert['message']
-			];
-
-			if (zbx_empty($alert['error'])) {
-				$info = '';
-			}
-			else {
-				$info = new CDiv(SPACE, 'status_icon iconerror');
-				$info->setHint($alert['error'], ZBX_STYLE_RED);
-			}
-
 			$actionTable->addRow([
-				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
-				new CCol($actions[$alert['actionid']]['name']),
-				new CCol(($alert['mediatypeid'] == 0) ? '' : $alert['description']),
-				new CCol($recipient),
-				new CCol($message),
-				new CCol($status),
-				new CCol($info)
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+				$actions[$alert['actionid']]['name'],
+				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
+				$recipient,
+				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
+				$status,
+				$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
 			]);
 		}
 

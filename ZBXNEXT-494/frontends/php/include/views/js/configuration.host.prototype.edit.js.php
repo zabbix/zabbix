@@ -1,11 +1,10 @@
 <script type="text/x-jquery-tmpl" id="groupPrototypeRow">
 	<tr class="form_row">
 		<td>
-			<input class="input text" name="group_prototypes[#{i}][name]" type="text" size="30" value="#{name}"
-				placeholder="{#MACRO}">
+			<input name="group_prototypes[#{i}][name]" type="text" value="#{name}" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" placeholder="{#MACRO}">
 		</td>
 		<td>
-			<button type="button" class="button link_menu group-prototype-remove" name="remove"><?php echo _('Remove') ?></button>
+			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove"><?= _('Remove') ?></button>
 			<input type="hidden" name="group_prototypes[#{i}][group_prototypeid]" value="#{group_prototypeid}" />
 		</td>
 	</tr>
@@ -38,7 +37,7 @@
 			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
 		<?php endif ?>
 		<?php foreach ($hostPrototype['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?php echo CJs::encodeJson([
+			addGroupPrototypeRow(<?= CJs::encodeJson([
 				'name' => $groupPrototype['name'],
 				'group_prototypeid' => isset($groupPrototype['group_prototypeid']) ? $groupPrototype['group_prototypeid'] : null
 			]) ?>);

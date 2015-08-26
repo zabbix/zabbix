@@ -388,7 +388,10 @@ zbx_graph_yaxis_types_t;
 
 /* value for not supported items */
 #define ZBX_NOTSUPPORTED	"ZBX_NOTSUPPORTED"
-/* Zabbix Agent non-critical error */
+/* the error message for not supported items when reason is unknown */
+#define ZBX_NOTSUPPORTED_MSG	"Unknown error."
+
+/* Zabbix Agent non-critical error (agents older than 2.0) */
 #define ZBX_ERROR		"ZBX_ERROR"
 
 /* media types */
@@ -570,6 +573,15 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 /* media type statuses */
 #define MEDIA_TYPE_STATUS_ACTIVE	0
 #define MEDIA_TYPE_STATUS_DISABLED	1
+
+/* SMTP security options */
+#define SMTP_SECURITY_NONE	0
+#define SMTP_SECURITY_STARTTLS	1
+#define SMTP_SECURITY_SSL	2
+
+/* SMTP authentication options */
+#define SMTP_AUTHENTICATION_NONE		0
+#define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
 
 /* operation types */
 #define OPERATION_TYPE_MESSAGE		0

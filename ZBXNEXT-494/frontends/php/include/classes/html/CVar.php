@@ -34,13 +34,13 @@ class CVar {
 
 	public function setValue($value) {
 		$this->var_container = [];
-		if (is_null($value)) {
-			return;
+		if ($value !== null) {
+			$this->parseValue($this->var_name, $value);
 		}
-		$this->parseValue($this->var_name, $value);
+		return $this;
 	}
 
-	public function parseValue($name, $value) {
+	private function parseValue($name, $value) {
 		if (is_array($value)) {
 			foreach ($value as $key => $item) {
 				if (is_null($item)) {
@@ -51,12 +51,14 @@ class CVar {
 			return null;
 		}
 		if (strpos($value, "\n") === false) {
-			$hiddenVar = new CInput('hidden', $name, $value, null, $this->element_id);
-			$hiddenVar->removeAttribute('class');
+			$hiddenVar = new CInput('hidden', $name, $value);
+
+			if ($this->element_id !== null) {
+				$hiddenVar->setId($this->element_id);
+			}
 		}
 		else {
-			$hiddenVar = new CTextArea($name, $value);
-			$hiddenVar->setAttribute('class', 'hidden');
+			$hiddenVar = (new CTextArea($name, $value))->addStyle('display: none;');
 		}
 		$this->var_container[] = $hiddenVar;
 	}

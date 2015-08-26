@@ -19,13 +19,13 @@
 **/
 
 
-$table = new CTableInfo();
-$table->setHeader([
-	_('Host group'),
-	_('Without problems'),
-	_('With problems'),
-	_('Total')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		_('Host group'),
+		_('Without problems'),
+		_('With problems'),
+		_('Total')
+	]);
 
 // get host groups
 $groups = API::HostGroup()->get([
@@ -53,6 +53,7 @@ CArrayHelper::sort($hosts, ['name']);
 $triggers = API::Trigger()->get([
 	'output' => ['triggerid', 'priority'],
 	'selectHosts' => ['hostid'],
+	'search' => ($data['filter']['trigger_name'] !== '') ? ['description' => $data['filter']['trigger_name']] : null,
 	'filter' => [
 		'priority' => $data['filter']['severity'],
 		'value' => TRIGGER_VALUE_TRUE
@@ -65,6 +66,9 @@ if ($data['filter']['extAck']) {
 	$triggers_unack = API::Trigger()->get([
 		'output' => ['triggerid'],
 		'selectHosts' => ['hostid'],
+		'search' => ($data['filter']['trigger_name'] !== '')
+			? ['description' => $data['filter']['trigger_name']]
+			: null,
 		'filter' => [
 			'priority' => $data['filter']['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -218,19 +222,18 @@ foreach ($groups as $group) {
 		'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 	);
 	$group_row->addItem($name);
-	$group_row->addItem((new CCol($hosts_data[$group['groupid']]['ok']))->addClass('normal'));
+	$group_row->addItem((new CCol($hosts_data[$group['groupid']]['ok']))->addClass(ZBX_STYLE_NORMAL_BG));
 
 	if ($data['filter']['extAck']) {
 		if ($hosts_data[$group['groupid']]['lastUnack']) {
 			$table_inf = new CTableInfo();
-			$table_inf->setAttribute('style', 'width: 400px;');
 
 			// set trigger severities as table header starting from highest severity
 			$header = [];
 
 			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 				$header[] = ($data['filter']['severity'] === null || isset($data['filter']['severity'][$severity]))
-					? (new CColHeader(getSeverityName($severity, $data['config'])))->addClass(ZBX_STYLE_NOWAP)
+					? getSeverityName($severity, $data['config'])
 					: null;
 			}
 
@@ -256,9 +259,10 @@ foreach ($groups as $group) {
 
 				$r = new CRow();
 				$r->addItem(
-					(new CCol(new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
-					'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM)))->
-						addClass(ZBX_STYLE_NOWRAP)
+					(new CCol(
+						new CLink($host_data['host'], 'tr_status.php?filter_set=1&groupid='.$group['groupid'].
+							'&hostid='.$hostid.'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM)
+					))->addClass(ZBX_STYLE_NOWRAP)
 				);
 
 				foreach ($lastUnack_host_list[$host['hostid']]['severities'] as $severity => $trigger_count) {
@@ -269,8 +273,9 @@ foreach ($groups as $group) {
 				}
 				$table_inf->addRow($r);
 			}
-			$lastUnack_count = new CSpan($hosts_data[$group['groupid']]['lastUnack'], ZBX_STYLE_LINK_ACTION.' '.ZBX_STYLE_RED);
-			$lastUnack_count->setHint($table_inf);
+			$lastUnack_count = (new CSpan($hosts_data[$group['groupid']]['lastUnack']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setHint($table_inf);
 		}
 		else {
 			$lastUnack_count = 0;
@@ -322,8 +327,9 @@ foreach ($groups as $group) {
 			}
 			$table_inf->addRow($r);
 		}
-		$problematic_count = new CSpan($hosts_data[$group['groupid']]['problematic'], ZBX_STYLE_LINK_ACTION);
-		$problematic_count->setHint($table_inf);
+		$problematic_count = (new CSpan($hosts_data[$group['groupid']]['problematic']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setHint($table_inf);
 	}
 	else {
 		$problematic_count = 0;
@@ -331,25 +337,26 @@ foreach ($groups as $group) {
 
 	switch ($data['filter']['extAck']) {
 		case EXTACK_OPTION_ALL:
-			$group_row->addItem((new CCol(
-				$problematic_count))->
-				addClass(getSeverityStyle($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
+			$group_row->addItem((new CCol($problematic_count))
+				->addClass(getSeverityStyle($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
 			);
 			$group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
 			break;
 		case EXTACK_OPTION_UNACK:
-			$group_row->addItem((new CCol(
-				$lastUnack_count))->
-				addClass(getSeverityStyle((isset($highest_severity2[$group['groupid']]) ? $highest_severity2[$group['groupid']] : 0),
-					$hosts_data[$group['groupid']]['lastUnack']))
+			$group_row->addItem((new CCol($lastUnack_count))
+				->addClass(getSeverityStyle(
+					isset($highest_severity2[$group['groupid']]) ? $highest_severity2[$group['groupid']] : 0,
+					$hosts_data[$group['groupid']]['lastUnack']
+				))
 			);
 			$group_row->addItem($hosts_data[$group['groupid']]['lastUnack'] + $hosts_data[$group['groupid']]['ok']);
 			break;
 		case EXTACK_OPTION_BOTH:
-			$unackspan = $lastUnack_count ? new CSpan([$lastUnack_count, SPACE._('of').SPACE]) : null;
-			$group_row->addItem((new CCol([
-				$unackspan, $problematic_count]))->
-				addClass(getSeverityStyle($highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']))
+			$unackspan = $lastUnack_count ? [$lastUnack_count, ' '._('of').' '] : null;
+			$group_row->addItem((new CCol([$unackspan, $problematic_count]))
+				->addClass(getSeverityStyle(
+					$highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']
+				))
 			);
 			$group_row->addItem($hosts_data[$group['groupid']]['problematic'] + $hosts_data[$group['groupid']]['ok']);
 			break;
@@ -358,9 +365,8 @@ foreach ($groups as $group) {
 	$table->addRow($group_row);
 }
 
-$script = new CJsScript(get_js(
-	'jQuery("#'.WIDGET_HOST_STATUS.'_footer").html("'._s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-));
-
-$widget = new CDiv([$table, $script]);
-$widget->show();
+echo (new CJson())->encode([
+	'header' =>  _('Host status'),
+	'body' =>  (new CDiv($table))->toString(),
+	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+]);

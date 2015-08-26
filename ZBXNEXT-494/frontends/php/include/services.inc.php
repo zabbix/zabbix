@@ -37,8 +37,8 @@ function serviceAlgorythm($algorythm = null) {
 	}
 }
 
-function get_service_childs($serviceid, $soft = 0) {
-	$childs = [];
+function get_service_children($serviceid, $soft = 0) {
+	$children = [];
 
 	$result = DBselect(
 		'SELECT sl.servicedownid'.
@@ -47,10 +47,10 @@ function get_service_childs($serviceid, $soft = 0) {
 			($soft ? '' : ' AND sl.soft=0')
 	);
 	while ($row = DBfetch($result)) {
-		$childs[] = $row['servicedownid'];
-		$childs = array_merge($childs, get_service_childs($row['servicedownid']));
+		$children[] = $row['servicedownid'];
+		$children = array_merge($children, get_service_children($row['servicedownid']));
 	}
-	return $childs;
+	return $children;
 }
 
 /**
@@ -66,8 +66,8 @@ function get_service_childs($serviceid, $soft = 0) {
  */
 function createServiceConfigurationTree(array $services, &$tree, array $parentService = [], array $service = [], array $dependency = []) {
 	if (!$service) {
-		$caption = new CLink(_('root'), '#');
-		$caption->setMenuPopup(CMenuPopupHelper::getServiceConfiguration(null, _('root'), false));
+		$caption = (new CLink(_('root'), '#'))
+			->setMenuPopup(CMenuPopupHelper::getServiceConfiguration(null, _('root'), false));
 
 		$serviceNode = [
 			'id' => 0,
@@ -129,7 +129,7 @@ function createServiceConfigurationTree(array $services, &$tree, array $parentSe
 		}
 	}
 	else {
-		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
+		$serviceNode['caption'] = (new CSpan($serviceNode['caption']))->addClass('service-caption-soft');
 
 		$tree[$serviceNode['id'].'.'.$dependency['linkid']] = $serviceNode;
 	}
@@ -215,7 +215,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 		// reason
 		$problemList = '';
 		if ($serviceSla['problems']) {
-			$problemList = new CList([], 'service-problems');
+			$problemList = (new CList())->addClass('service-problems');
 			foreach ($serviceSla['problems'] as $problemTrigger) {
 				$problemList->addItem(new CLink($problemTrigger['description'],
 					'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.'&triggerid='.$problemTrigger['triggerid']
@@ -238,33 +238,46 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 
 			$chart1 = null;
 			if ($widthGreen > 0) {
-				$chart1 = new CDiv(null, 'sla-bar-part sla-green');
-				$chart1->setAttribute('style', 'width: '.$widthGreen.'px;');
+				$chart1 = (new CDiv())
+					->addClass('sla-bar-part')
+					->addClass('sla-green')
+					->setAttribute('style', 'width: '.$widthGreen.'px;');
 			}
 			$chart2 = null;
 			if ($widthRed > 0) {
-				$chart2 = new CDiv(null, 'sla-bar-part sla-red');
-				$chart2->setAttribute('style', 'width: '.$widthRed.'px;');
+				$chart2 = (new CDiv())
+					->addClass('sla-bar-part')
+					->addClass('sla-red')
+					->setAttribute('style', 'width: '.$widthRed.'px;');
 			}
 			$bar = new CLink([
 				$chart1,
 				$chart2,
-				new CDiv('80%', 'sla-bar-legend sla-bar-legend-start'),
-				new CDiv('100%', 'sla-bar-legend sla-bar-legend-end')
+				(new CDiv('80%'))
+					->addClass('sla-bar-legend')
+					->addClass('sla-bar-legend-start'),
+				(new CDiv('100%'))
+					->addClass('sla-bar-legend')
+					->addClass('sla-bar-legend-end')
 			], 'srv_status.php?serviceid='.$service['serviceid'].'&showgraph=1'.url_param('path'));
-			$bar = new CDiv($bar, 'sla-bar');
-			$bar->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
+			$bar = (new CDiv($bar))
+				->addClass('sla-bar')
+				->setAttribute('title', _s('Only the last 20%% of the indicator is displayed.'));
 
 			$slaBar = [
 				$bar,
-				new CSpan(sprintf('%.4f', $slaBad), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN))
+				(new CSpan(sprintf('%.4f', $slaBad)))
+					->addClass('sla-value')
+					->addClass($service['goodsla'] > $slaGood ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 			];
 
-			$sla = new CDiv($slaBar, 'invisible');
+			$sla = (new CDiv($slaBar))->addClass('invisible');
 			$sla2 = [
-				new CSpan(sprintf('%.4f', $slaGood), 'sla-value '.(($service['goodsla'] > $slaGood) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)),
+				(new CSpan(sprintf('%.4f', $slaGood)))
+					->addClass('sla-value')
+					->addClass($service['goodsla'] > $slaGood ? ZBX_STYLE_RED : ZBX_STYLE_GREEN),
 				'/',
-				new CSpan(sprintf('%.4f', $service['goodsla']), 'sla-value')
+				(new CSpan(sprintf('%.4f', $service['goodsla'])))->addClass('sla-value')
 			];
 		}
 
@@ -291,7 +304,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 	}
 	// soft dependencies
 	else {
-		$serviceNode['caption'] = new CSpan($serviceNode['caption'], 'service-caption-soft');
+		$serviceNode['caption'] = (new CSpan($serviceNode['caption']))->addClass('service-caption-soft');
 
 		$tree[$serviceNode['id'].'.'.$dependency['linkid']] = $serviceNode;
 	}

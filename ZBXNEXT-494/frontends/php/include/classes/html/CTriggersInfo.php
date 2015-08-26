@@ -21,22 +21,19 @@
 
 class CTriggersInfo extends CTable {
 
-	public $style;
+	private $style = STYLE_HORIZONTAL;
 	private $groupid;
-	private $hostid;
 
-	public function __construct($groupid = null, $hostid = null, $style = STYLE_HORIZONTAL) {
-		$this->style = null;
-
+	public function __construct($groupid) {
 		parent::__construct();
+
 		$this->addClass(ZBX_STYLE_LIST_TABLE);
-		$this->setOrientation($style);
-		$this->groupid = is_null($groupid) ? 0 : $groupid;
-		$this->hostid = is_null($hostid) ? 0 : $hostid;
+		$this->groupid = $groupid;
 	}
 
 	public function setOrientation($value) {
 		$this->style = $value;
+		return $this;
 	}
 
 	public function bodyToString() {
@@ -51,38 +48,28 @@ class CTriggersInfo extends CTable {
 		$triggersOkState = 0;
 
 		$options = [
+			'output' => ['triggerid', 'priority', 'value'],
 			'monitored' => true,
-			'skipDependent' => true,
-			'output' => ['triggerid']
+			'skipDependent' => true
 		];
 
-		if ($this->hostid > 0) {
-			$options['hostids'] = $this->hostid;
-		}
-		elseif ($this->groupid > 0) {
+		if ($this->groupid != 0) {
 			$options['groupids'] = $this->groupid;
 		}
 		$triggers = API::Trigger()->get($options);
-		$triggers = zbx_objectValues($triggers, 'triggerid');
 
-		$db_priority = DBselect(
-			'SELECT t.priority,t.value,count(DISTINCT t.triggerid) AS cnt'.
-			' FROM triggers t'.
-			' WHERE '.dbConditionInt('t.triggerid', $triggers).
-			' GROUP BY t.priority,t.value'
-		);
-		while ($row = DBfetch($db_priority)) {
-			switch ($row['value']) {
+		foreach ($triggers as $trigger) {
+			switch ($trigger['value']) {
 				case TRIGGER_VALUE_TRUE:
-					if (!isset($triggersProblemState[$row['priority']])) {
-						$triggersProblemState[$row['priority']] = 0;
+					if (!array_key_exists($trigger['priority'], $triggersProblemState)) {
+						$triggersProblemState[$trigger['priority']] = 0;
 					}
 
-					$triggersProblemState[$row['priority']] += $row['cnt'];
+					$triggersProblemState[$trigger['priority']]++;
 					break;
 
 				case TRIGGER_VALUE_FALSE:
-					$triggersOkState += $row['cnt'];
+					$triggersOkState++;
 			}
 		}
 
@@ -98,7 +85,7 @@ class CTriggersInfo extends CTable {
 			);
 		}
 
-		if (STYLE_HORIZONTAL == $this->style) {
+		if ($this->style == STYLE_HORIZONTAL) {
 			$this->addRow($severityCells);
 		}
 		else {

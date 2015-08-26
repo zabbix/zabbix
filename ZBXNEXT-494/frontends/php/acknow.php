@@ -191,9 +191,7 @@ ob_end_flush();
  * Display
  */
 
-$widget = (new CWidget())->setTitle(_('Alarm acknowledgements').SPACE.($bulk ? 'Bulk acknowledge ' : $eventTriggerName));
-
-echo BR();
+$widget = (new CWidget())->setTitle(_('Alarm acknowledgements').': '.($bulk ? 'Bulk acknowledge ' : $eventTriggerName));
 
 $acknowledgesTable = null;
 if ($bulk) {
@@ -209,13 +207,14 @@ else {
 	);
 
 	if ($acknowledges) {
-		$acknowledgesTable = new CTableInfo();
-		$acknowledgesTable->setHeader([_('Time'), _('User'), _('Message')]);
+		$acknowledgesTable = (new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setHeader([_('Time'), _('User'), _('Message')]);
 
 		while ($acknowledge = DBfetch($acknowledges)) {
 			$acknowledgesTable->addRow([
-				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock']),
-				getUserFullname($acknowledge),
+				(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $acknowledge['clock'])))->addClass(ZBX_STYLE_NOWRAP),
+				(new CCol(getUserFullname($acknowledge)))->addClass(ZBX_STYLE_NOWRAP),
 				zbx_nl2br($acknowledge['message'])
 			]);
 		}
@@ -233,10 +232,9 @@ else {
 	}
 }
 
-$form = new CForm();
-
 $backURL = getRequest('backurl');
-$form->addVar('backurl', $backURL);
+
+$form = (new CForm())->addVar('backurl', $backURL);
 
 if ($backURL === 'tr_events.php' || $backURL === 'events.php') {
 	$form->addVar('triggerid', getRequest('triggerid'));
@@ -260,22 +258,25 @@ elseif (hasRequest('events')) {
 	}
 }
 
-$formList = new CFormList();
-
-$message = new CTextArea('message', '', [
-	'rows' => ZBX_TEXTAREA_STANDARD_ROWS,
-	'width' => ZBX_TEXTAREA_BIG_WIDTH,
-	'maxlength' => 255
-]);
-$message->setAttribute('autofocus', 'autofocus');
-
-$formList->addRow(_('Message'), $message);
-
 // append tabs to form
 $ackTab = new CTabView();
-$ackTab->addTab('ackTab', _('Acknowledge'), $formList);
+$ackTab->addTab('ackTab', _('Acknowledge'),
+	(new CFormList())
+		->addRow(_('Message'),
+			(new CTextArea('message', '', ['maxlength' => 255]))
+				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setAttribute('autofocus', 'autofocus')
+		)
+);
 if ($acknowledgesTable !== null) {
-	$ackTab->addTab('ackListTab', _('List'), $acknowledgesTable);
+	$ackTab->addTab('ackListTab', _('List'),
+		(new CFormList())
+			->addRow(null,
+				(new CDiv($acknowledgesTable))
+					->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+					->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+			)
+	);
 }
 
 if (!$bulk) {

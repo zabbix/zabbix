@@ -212,6 +212,11 @@ class C30XmlValidator {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
+									'application_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'name' =>						['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 										'name' =>					['type' => XML_STRING]
 									]],
@@ -527,6 +532,11 @@ class C30XmlValidator {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
+									'application_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'name' =>						['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 										'name' =>					['type' => XML_STRING]
 									]],
@@ -627,6 +637,8 @@ class C30XmlValidator {
 								'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
 									// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
 									'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
+									// The tag 'style' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
+									'style' =>					['type' => XML_STRING | XML_REQUIRED],
 									'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
 									'width' =>					['type' => XML_STRING | XML_REQUIRED],
 									'height' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -637,7 +649,6 @@ class C30XmlValidator {
 									'elements' =>				['type' => XML_STRING | XML_REQUIRED],
 									'valign' =>					['type' => XML_STRING | XML_REQUIRED],
 									'halign' =>					['type' => XML_STRING | XML_REQUIRED],
-									'style' =>					['type' => XML_STRING | XML_REQUIRED],
 									'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
 									'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -711,6 +722,8 @@ class C30XmlValidator {
 						'screen_item' =>			['type' => XML_ARRAY, 'rules' => [
 							// The tag 'resourcetype' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
 							'resourcetype' =>			['type' => XML_STRING | XML_REQUIRED],
+							// The tag 'style' should be validated before the 'resource' because it is used in 'ex_required' and 'ex_validate' methods.
+							'style' =>					['type' => XML_STRING | XML_REQUIRED],
 							'resource' =>				['type' => XML_REQUIRED, 'preprocessor' => [$this, 'transformZero2Array'], 'ex_validate' => [$this, 'validateScreenItemResource']],
 							'width' =>					['type' => XML_STRING | XML_REQUIRED],
 							'height' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -721,7 +734,6 @@ class C30XmlValidator {
 							'elements' =>				['type' => XML_STRING | XML_REQUIRED],
 							'valign' =>					['type' => XML_STRING | XML_REQUIRED],
 							'halign' =>					['type' => XML_STRING | XML_REQUIRED],
-							'style' =>					['type' => XML_STRING | XML_REQUIRED],
 							'dynamic' =>				['type' => XML_STRING | XML_REQUIRED],
 							'sort_triggers' =>			['type' => XML_STRING | XML_REQUIRED],
 							'url' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -939,13 +951,21 @@ class C30XmlValidator {
 		if (zbx_is_int($parent_data['resourcetype'])) {
 			switch ($parent_data['resourcetype']) {
 				case SCREEN_RESOURCE_GRAPH:
+				case SCREEN_RESOURCE_LLD_GRAPH:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
 						'name' =>			['type' => XML_STRING | XML_REQUIRED],
 						'host' =>			['type' => XML_STRING | XML_REQUIRED]
 					]];
 					break;
 
+				case SCREEN_RESOURCE_CLOCK:
+					if ($parent_data['style'] != TIME_TYPE_HOST) {
+						return $data;
+					}
+					// break; is not missing here
+
 				case SCREEN_RESOURCE_SIMPLE_GRAPH:
+				case SCREEN_RESOURCE_LLD_SIMPLE_GRAPH:
 				case SCREEN_RESOURCE_PLAIN_TEXT:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
 						'key' =>			['type' => XML_STRING | XML_REQUIRED],

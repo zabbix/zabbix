@@ -1682,7 +1682,7 @@ static void	lld_expression_create(char **expression, zbx_vector_ptr_t *functions
  * Purpose: add or update triggers in database based on discovery rule        *
  *                                                                            *
  ******************************************************************************/
-static void	lld_triggers_save(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
+static void	lld_triggers_save(zbx_uint64_t hostid, zbx_vector_ptr_t *trigger_prototypes, zbx_vector_ptr_t *triggers)
 {
 	const char			*__function_name = "lld_triggers_save";
 
@@ -1762,6 +1762,13 @@ static void	lld_triggers_save(zbx_vector_ptr_t *trigger_prototypes, zbx_vector_p
 	}
 
 	DBbegin();
+
+	if (SUCCEED != DBlock_hostid(hostid))
+	{
+		/* the host was removed while processing lld rule */
+		DBrollback();
+		goto out;
+	}
 
 	if (0 != new_triggers)
 	{
@@ -2044,7 +2051,7 @@ zbx_hash_t	zbx_lld_trigger_ref_hash_func(const void *data)
 	if (0 == trigger_node->trigger_ref.triggerid)
 		ptr = trigger_node->trigger_ref.trigger;
 
-	return zbx_hash_modfnv(&ptr, sizeof(trigger_node->trigger_ref.trigger), hash);
+	return ZBX_DEFAULT_PTR_HASH_ALGO(&ptr, sizeof(trigger_node->trigger_ref.trigger), hash);
 }
 
 int	zbx_lld_trigger_ref_compare_func(const void *d1, const void *d2)
@@ -2692,7 +2699,7 @@ void	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vecto
 	lld_triggers_validate(hostid, &triggers, error);
 	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, &items, lld_rows, error);
 	lld_trigger_dependencies_validate(&triggers, error);
-	lld_triggers_save(&trigger_prototypes, &triggers);
+	lld_triggers_save(hostid, &trigger_prototypes, &triggers);
 
 	/* cleaning */
 

@@ -27,9 +27,9 @@ class CMultiSelect extends CTag {
 	 * @see jQuery.multiSelect()
 	 */
 	public function __construct(array $options = []) {
-		parent::__construct('div', 'yes');
+		parent::__construct('div', true);
 		$this->addClass('multiselect');
-		$this->setAttribute('id', zbx_formatDomId($options['name']));
+		$this->setId(zbx_formatDomId($options['name']));
 
 		// url
 		$url = new CUrl('jsrpc.php');
@@ -74,5 +74,10 @@ class CMultiSelect extends CTag {
 		}
 
 		zbx_add_post_js('jQuery("#'.$this->getAttribute('id').'").multiSelect('.CJs::encodeJson($params).');');
+	}
+
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+		return $this;
 	}
 }

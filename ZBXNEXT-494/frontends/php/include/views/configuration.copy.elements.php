@@ -32,11 +32,11 @@ if (!empty($this->data['title'])) {
 }
 
 // create form
-$triggersForm = new CForm();
-$triggersForm->setName('triggersForm');
-$triggersForm->addVar($this->data['elements_field'], $this->data['elements']);
-$triggersForm->addVar('hostid', $this->data['hostid']);
-$triggersForm->addVar('action', $this->data['action']);
+$triggersForm = (new CForm())
+	->setName('triggersForm')
+	->addVar($this->data['elements_field'], $this->data['elements'])
+	->addVar('hostid', $this->data['hostid'])
+	->addVar('action', $this->data['action']);
 
 // create form list
 $triggersFormList = new CFormList('triggersFormList');
@@ -68,7 +68,8 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 		array_push(
 			$targets,
 			[
-				new CCheckBox('copy_targetid['.$host['hostid'].']', uint_in_array($host['hostid'], $this->data['copy_targetid']), null, $host['hostid']),
+				(new CCheckBox('copy_targetid['.$host['hostid'].']', $host['hostid']))
+					->setChecked(uint_in_array($host['hostid'], $this->data['copy_targetid'])),
 				SPACE,
 				$host['name'],
 				BR()
@@ -80,7 +81,8 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 		array_push(
 			$targets,
 			[
-				new CCheckBox('copy_targetid['.$template['templateid'].']', uint_in_array($template['templateid'], $this->data['copy_targetid']), null, $template['templateid']),
+				(new CCheckBox('copy_targetid['.$template['templateid'].']', $template['templateid']))
+					->setChecked(uint_in_array($template['templateid'], $this->data['copy_targetid'])),
 				SPACE,
 				$template['name'],
 				BR()
@@ -92,7 +94,8 @@ if ($this->data['copy_type'] == COPY_TYPE_TO_HOST) {
 		array_push(
 			$targets,
 			[
-				new CCheckBox('copy_targetid['.$group['groupid'].']', uint_in_array($group['groupid'], $this->data['copy_targetid']), null, $group['groupid']),
+				(new CCheckBox('copy_targetid['.$group['groupid'].']', $group['groupid']))
+					->setChecked(uint_in_array($group['groupid'], $this->data['copy_targetid'])),
 				SPACE,
 				$group['name'],
 				BR()
@@ -106,12 +109,11 @@ if (empty($targets)) {
 $triggersFormList->addRow(_('Target'), $targets);
 
 // append tabs to form
-$triggersTab = new CTabView();
-
-$triggersTab->addTab('triggersTab',
-	_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
-	$triggersFormList
-);
+$triggersTab = (new CTabView())
+	->addTab('triggersTab',
+		_n('Copy %1$s element to...', 'Copy %1$s elements to...', count($this->data['elements'])),
+		$triggersFormList
+	);
 
 // append buttons to form
 $triggersTab->setFooter(makeFormFooter(

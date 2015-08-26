@@ -51,9 +51,7 @@ $fields = [
 	'status_change' =>		[T_ZBX_INT, O_OPT, null,	null,		null],
 	'txt_select' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'inventory' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	// ajax
-	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null]
+	'inventory' =>			[T_ZBX_STR, O_OPT, null,	null,		null]
 ];
 check_fields($fields);
 
@@ -62,18 +60,6 @@ check_fields($fields);
  */
 if (getRequest('groupid') && !API::HostGroup()->isReadable([$_REQUEST['groupid']])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.overview.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit();
 }
 
 $config = select_config();
@@ -251,6 +237,12 @@ if ($type == SHOW_TRIGGERS) {
 	$triggers = API::Trigger()->get($options);
 
 	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+
+	// Pass already filtered 'groupid' to menu pop-up "Events" link.
+	foreach ($triggers as &$trigger) {
+		$trigger['groupid'] = $data['pageFilter']->groupid;
+	}
+	unset($trigger);
 
 	$data['filter'] = $filter;
 	$data['hosts'] = $hosts;

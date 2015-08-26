@@ -103,38 +103,7 @@ elseif (isset($_REQUEST['clone'])) {
 /*
  * Display
  */
-$iconMapWidget = (new CWidget())->setTitle(_('Icon mapping'));
-
-$iconMapForm = new CForm();
-$iconMapForm->cleanItems();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.iconmapping.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-
-if (!isset($_REQUEST['form'])) {
-	$controls->addItem(new CSubmit('form', _('Create icon map')));
-}
-
-$iconMapForm->addItem($controls);
-$iconMapWidget->setControls($iconMapForm);
-
 $data = [
-	'form_refresh' => getRequest('form_refresh', 0),
 	'iconmapid' => getRequest('iconmapid'),
 	'iconList' => [],
 	'inventoryList' => []
@@ -157,7 +126,7 @@ foreach ($inventoryFields as $field) {
 }
 
 if (isset($_REQUEST['form'])) {
-	if ($data['form_refresh'] || ($_REQUEST['form'] === 'clone')) {
+	if (hasRequest('form_refresh') || ($_REQUEST['form'] === 'clone')) {
 		$data['iconmap'] = getRequest('iconmap');
 	}
 	elseif (isset($_REQUEST['iconmapid'])) {
@@ -173,7 +142,7 @@ if (isset($_REQUEST['form'])) {
 		];
 	}
 
-	$iconMapView = new CView('administration.general.iconmap.edit', $data);
+	$view = new CView('administration.general.iconmap.edit', $data);
 }
 else {
 	$data['iconmaps'] = API::IconMap()->get([
@@ -184,9 +153,10 @@ else {
 	]);
 	order_result($data['iconmaps'], 'name');
 
-	$iconMapView = new CView('administration.general.iconmap.list', $data);
+	$view = new CView('administration.general.iconmap.list', $data);
 }
 
-$iconMapWidget->addItem($iconMapView->render())->show();
+$view->render();
+$view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

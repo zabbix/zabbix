@@ -43,7 +43,6 @@ $fields = [
 	'stime' =>		[T_ZBX_STR, O_OPT, P_SYS, null,		null],
 	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'),	null],
 	// ajax
-	'filterState' => [T_ZBX_INT, O_OPT, P_ACT, null,		null],
 	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT, null,		null],
 	'favid' =>		[T_ZBX_INT, O_OPT, P_ACT, null,		null]
 ];
@@ -80,10 +79,6 @@ $pageFilter = new CPageFilter([
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.charts.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
 if (isset($_REQUEST['favobj'])) {
 	if (getRequest('favobj') === 'timelinefixedperiod' && hasRequest('favid')) {
 		CProfile::update('web.screens.timelinefixed', getRequest('favid'), PROFILE_TYPE_INT);
