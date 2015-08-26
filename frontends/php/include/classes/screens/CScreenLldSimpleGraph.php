@@ -124,12 +124,7 @@ class CScreenLldSimpleGraph extends CScreenLldGraphBase {
 			'name' => $itemPrototype['hosts'][0]['name'].NAME_DELIMITER.$itemPrototype['name']
 		];
 
-		$src = 'chart3.php?'.http_build_query($queryParams);
-
-		$img = new CImg($src);
-		$img->preload();
-
-		return new CSpan($img);
+		return new CSpan(new CImg('chart3.php?'.http_build_query($queryParams)));
 	}
 
 	/**

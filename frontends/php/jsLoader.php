@@ -63,7 +63,6 @@ $availableJScripts = [
 	'prototype.js' => 'vendors/',
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
-	'activity-indicator.js' => 'vendors/',
 	// classes
 	'class.bbcode.js' => '',
 	'class.calendar.js' => '',
@@ -105,9 +104,7 @@ $tranStrings = [
 		'Cancel' => _('Cancel'),
 		'Execute' => _('Execute'),
 		'Execution confirmation' => _('Execution confirmation'),
-		'S_DELETE' => _('Delete'),
-		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
-		'S_DELETE_EXPRESSION_Q' => _('Delete expression?')
+		'S_DELETE' => _('Delete')
 	],
 	'class.calendar.js' => [
 		'S_JANUARY' => _('January'),
@@ -237,7 +234,6 @@ if (empty($_GET['files'])) {
 		'prototype.js',
 		'jquery.js',
 		'jquery-ui.js',
-		'activity-indicator.js',
 		'common.js',
 		'class.cdebug.js',
 		'class.cdate.js',

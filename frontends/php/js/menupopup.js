@@ -646,6 +646,8 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
+ * @param string options['groupid']					group id
+ * @param string options['hostid']					host id
  * @param object options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
@@ -663,7 +665,9 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&source=0&triggerid=' + options.triggerid);
+	var url = new Curl('events.php?filter_set=1&source=0&groupid=' + options.groupid + '&hostid=' + options.hostid +
+		'&triggerid=' + options.triggerid
+	);
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
@@ -763,8 +767,8 @@ function getMenuPopupTriggerLog(options) {
 			openWinCentered(
 				'tr_logform.php?sform=1&itemid=' + options.itemid,
 				'TriggerLog',
-				760,
-				540,
+				950,
+				650,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 
@@ -787,8 +791,8 @@ function getMenuPopupTriggerLog(options) {
 					openWinCentered(
 						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
 						'TriggerLog',
-						760,
-						540,
+						950,
+						650,
 						'titlebar=no, resizable=yes, scrollbars=yes'
 					);
 
@@ -1123,8 +1127,8 @@ jQuery(function($) {
 						if (display !== 'block') {
 							$('ul:first', item[0])
 								.css({
-									'left': pos.left + li.outerWidth(),
-									'top': pos.top,
+									'top': pos.top - 6,
+									'left': pos.left + li.outerWidth() + 14,
 									'display': 'block'
 								});
 						}

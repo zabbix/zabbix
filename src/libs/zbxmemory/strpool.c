@@ -35,7 +35,7 @@ static int		__strpool_compare_func(const void *d1, const void *d2);
 
 ZBX_MEM_FUNC_DECL(__strpool);
 
-#define INIT_HASHSET_SIZE	1000
+#define INIT_HASHSET_SIZE	100
 #define	REFCOUNT_FIELD_SIZE	sizeof(uint32_t)
 
 /* private strpool functions */

@@ -41,24 +41,23 @@ foreach ($drules as &$drule) {
 }
 unset($drule);
 
-$table = new CTableInfo();
-$table->setHeader([
-	_('Discovery rule'),
-	_x('Up', 'discovery results in dashboard'),
-	_x('Down', 'discovery results in dashboard')
-]);
+$table = (new CTableInfo())
+	->setHeader([
+		_('Discovery rule'),
+		_x('Up', 'discovery results in dashboard'),
+		_x('Down', 'discovery results in dashboard')
+	]);
 
 foreach ($drules as $drule) {
 	$table->addRow([
 		new CLink($drule['name'], 'zabbix.php?action=discovery.view&druleid='.$drule['druleid']),
-		new CSpan($drule['up'], ZBX_STYLE_GREEN),
-		new CSpan($drule['down'], ($drule['down'] != 0) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
+		(new CSpan($drule['up']))->addClass(ZBX_STYLE_GREEN),
+		(new CSpan($drule['down']))->addClass(($drule['down'] != 0) ? ZBX_STYLE_RED : ZBX_STYLE_GREEN)
 	]);
 }
 
-$script = new CJsScript(get_js('jQuery("#'.WIDGET_DISCOVERY_STATUS.'_footer").html("'.
-	_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)).'");'
-));
-
-$widget = new CDiv([$table, $script]);
-$widget->show();
+echo (new CJson())->encode([
+	'header' =>  _('Discovery status'),
+	'body' =>  (new CDiv($table))->toString(),
+	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+]);

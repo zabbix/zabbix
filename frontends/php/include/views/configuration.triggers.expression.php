@@ -21,14 +21,14 @@
 
 require_once dirname(__FILE__).'/js/configuration.triggers.expression.js.php';
 
-$expressionWidget = new CWidget('trigger-popup');
+$expressionWidget = new CWidget();
 
 // create form
-$expressionForm = new CForm();
-$expressionForm->setName('expression');
-$expressionForm->addVar('dstfrm', $this->data['dstfrm']);
-$expressionForm->addVar('dstfld1', $this->data['dstfld1']);
-$expressionForm->addVar('itemid', $this->data['itemid']);
+$expressionForm = (new CForm())
+	->setName('expression')
+	->addVar('dstfrm', $this->data['dstfrm'])
+	->addVar('dstfld1', $this->data['dstfld1'])
+	->addVar('itemid', $this->data['itemid']);
 
 if (!empty($this->data['parent_discoveryid'])) {
 	$expressionForm->addVar('parent_discoveryid', $this->data['parent_discoveryid']);
@@ -39,19 +39,22 @@ $expressionFormList = new CFormList();
 
 // append item to form list
 $item = [
-	new CTextBox('description', $this->data['description'], ZBX_TEXTBOX_STANDARD_SIZE, true),
-	new CButton('select', _('Select'), 'return PopUp(\'popup.php?writeonly=1&dstfrm='.$expressionForm->getName().
-		'&dstfld1=itemid&dstfld2=description&submitParent=1'.(!empty($this->data['parent_discoveryid']) ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
-		'button-form'
-	)
+	(new CTextBox('description', $this->data['description'], true))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CButton('select', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp(\'popup.php?writeonly=1&dstfrm='.$expressionForm->getName().
+			'&dstfld1=itemid&dstfld2=description&submitParent=1'.(!empty($this->data['parent_discoveryid']) ? '&normal_only=1' : '').
+			'&srctbl=items&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');')
 ];
+
 if (!empty($this->data['parent_discoveryid'])) {
-	$item[] = new CButton('select', _('Select prototype'), 'return PopUp(\'popup.php?dstfrm='.$expressionForm->getName().
-		'&dstfld1=itemid&dstfld2=description&submitParent=1'.url_param('parent_discoveryid', true).
-		'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');',
-		'button-form'
-	);
+	$item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
+	$item[] = (new CButton('select', _('Select prototype')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp(\'popup.php?dstfrm='.$expressionForm->getName().
+			'&dstfld1=itemid&dstfld2=description&submitParent=1'.url_param('parent_discoveryid', true).
+			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name\', 0, 0, \'zbx_popup_item\');');
 }
 
 $expressionFormList->addRow(_('Item'), $item);
@@ -75,15 +78,11 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 						|| substr($this->data['expr_type'], 0, 7) == 'iregexp'
 						|| (substr($this->data['expr_type'], 0, 3) == 'str' && substr($this->data['expr_type'], 0, 6) != 'strlen')))) {
 				if (isset($paramFunction['M'])) {
-					$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype']);
-
-					foreach ($paramFunction['M'] as $mid => $caption) {
-						$paramTypeElement->addItem($mid, $caption);
-					}
+					$paramTypeElement = new CComboBox('paramtype', $this->data['paramtype'], null, $paramFunction['M']);
 				}
 				else {
 					$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
-					$paramTypeElement = SPACE._('Time');
+					$paramTypeElement = _('Time');
 				}
 			}
 
@@ -91,21 +90,26 @@ if (isset($this->data['functions'][$this->data['selectedFunction']]['params'])) 
 					&& (substr($this->data['expr_type'], 0, 3) != 'str' || substr($this->data['expr_type'], 0, 6) == 'strlen')
 					&& substr($this->data['expr_type'], 0, 6) != 'regexp'
 					&& substr($this->data['expr_type'], 0, 7) != 'iregexp') {
-				$paramTypeElement = SPACE._('Time');
-				$paramField = new CTextBox('params['.$paramId.']', $paramValue, 10);
+				$paramTypeElement = _('Time');
+				$paramField = (new CTextBox('params['.$paramId.']', $paramValue))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
 			else {
 				$paramField = ($this->data['paramtype'] == PARAM_TYPE_COUNTS)
-					? new CNumericBox('params['.$paramId.']', (int) $paramValue, 10)
-					: new CTextBox('params['.$paramId.']', $paramValue, 10);
+					? (new CNumericBox('params['.$paramId.']', (int) $paramValue, 10))
+						->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+					: (new CTextBox('params['.$paramId.']', $paramValue))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 			}
 
-			$expressionFormList->addRow($paramFunction['C'], [$paramField, $paramTypeElement]);
+			$expressionFormList->addRow($paramFunction['C'], [
+				$paramField,
+				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+				$paramTypeElement
+			]);
 		}
 		else {
 			$expressionFormList->addRow($paramFunction['C'],
-				new CTextBox('params['.$paramId.']', $paramValue, $paramFunction['T'] == T_ZBX_DBL ? 10 : 30
-			));
+				(new CTextBox('params['.$paramId.']', $paramValue))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			);
 			$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 		}
 	}
@@ -114,11 +118,10 @@ else {
 	$expressionForm->addVar('paramtype', PARAM_TYPE_TIME);
 }
 
-$expressionFormList->addRow('N', new CTextBox('value', $this->data['value'], 10));
+$expressionFormList->addRow('N', (new CTextBox('value', $this->data['value']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH));
 
 // append tabs to form
-$expressionTab = new CTabView();
-$expressionTab->addTab('expressionTab', _('Trigger expression condition'), $expressionFormList);
+$expressionTab = (new CTabView())->addTab('expressionTab', _('Trigger expression condition'), $expressionFormList);
 
 // append buttons to form
 $expressionTab->setFooter(makeFormFooter(

@@ -41,9 +41,7 @@ $fields = [
 	'filter_rst'=>			[T_ZBX_STR,	O_OPT,	P_SYS,			null,		null],
 	'filter_set' =>			[T_ZBX_STR,	O_OPT,	P_SYS,			null,		null],
 	'filter_timesince' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null],
-	'filter_timetill' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null],
-	// ajax
-	'filterState' =>		[T_ZBX_INT,	O_OPT,	P_ACT,			null,		null]
+	'filter_timetill' =>	[T_ZBX_STR,	O_OPT,	P_UNSET_EMPTY,	null,		null]
 ];
 check_fields($fields);
 
@@ -78,17 +76,6 @@ else {
 }
 if (getRequest('triggerid') && !API::Trigger()->isReadable([$_REQUEST['triggerid']])) {
 	access_deny();
-}
-
-/*
- * Ajax
- */
-if (hasRequest('filterState')) {
-	CProfile::update('web.avail_report.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
 }
 
 /*
@@ -167,26 +154,25 @@ if ($triggerData) {
 	$triggerData['hostname'] = $host['name'];
 
 	$reportWidget->setControls(
-		(new CList())->
-			addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))->
-			addItem($triggerData['description'])
+		(new CList())
+			->addItem(new CLink($triggerData['hostname'], '?filter_groupid='.$_REQUEST['filter_groupid']))
+			->addItem($triggerData['description'])
 	);
 
-	$table = new CTableInfo();
-	$table->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
+	$table = (new CTableInfo())
+		->addRow(new CImg('chart4.php?triggerid='.$_REQUEST['triggerid']));
 
-	$reportWidget->addItem(BR());
-	$reportWidget->addItem($table);
-	$reportWidget->show();
+	$reportWidget->addItem(BR())
+		->addItem($table)
+		->show();
 }
 elseif (isset($_REQUEST['filter_hostid'])) {
-	$headerForm = new CForm('get');
 	$controls = new CList();
 	$controls->addItem([_('Mode').SPACE, new CComboBox('mode', $availabilityReportMode, 'submit()', [
 		AVAILABILITY_REPORT_BY_HOST => _('By host'),
 		AVAILABILITY_REPORT_BY_TEMPLATE => _('By trigger template')
 	])]);
-	$headerForm->addItem($controls);
+	$headerForm = (new CForm('get'))->addItem($controls);
 	$reportWidget->setControls($headerForm);
 
 	$triggerOptions = [
@@ -202,10 +188,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Filter
 	 */
-	$filterForm = new CFilter('web.avail_report.filter.state');
-	$filterForm->addVar('config', $availabilityReportMode);
-	$filterForm->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']));
-	$filterForm->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
+	$filterForm = (new CFilter('web.avail_report.filter.state'))
+		->addVar('config', $availabilityReportMode)
+		->addVar('filter_timesince', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timesince']))
+		->addVar('filter_timetill', date(TIMESTAMP_FORMAT, $_REQUEST['filter_timetill']));
 
 	$filterColumn1 = new CFormList();
 	$filterColumn2 = new CFormList();
@@ -213,7 +199,7 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	// report by template
 	if ($availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) {
 		// trigger options
-		if (!empty($_REQUEST['filter_hostid']) || !$config['dropdown_first_entry']) {
+		if (!empty($_REQUEST['filter_hostid'])) {
 			$hosts = API::Host()->get([
 				'output' => ['hostid'],
 				'templateids' => $_REQUEST['filter_hostid']
@@ -356,10 +342,10 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$filterColumn1->addRow(_('Host'), $hostsComboBox);
 
 		// trigger options
-		if (!empty($_REQUEST['filter_groupid']) || !$config['dropdown_first_entry']) {
+		if (!empty($_REQUEST['filter_groupid'])) {
 			$triggerOptions['groupids'] = $_REQUEST['filter_groupid'];
 		}
-		if (!empty($_REQUEST['filter_hostid']) && isset($hosts[$_REQUEST['filter_hostid']]) || !$config['dropdown_first_entry']) {
+		if (!empty($_REQUEST['filter_hostid']) && isset($hosts[$_REQUEST['filter_hostid']])) {
 			$triggerOptions['hostids'] = $_REQUEST['filter_hostid'];
 		}
 	}
@@ -376,14 +362,14 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 	/*
 	 * Triggers
 	 */
-	$triggerTable = new CTableInfo();
-	$triggerTable->setHeader([
-		($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
-		_('Name'),
-		_('Problems'),
-		_('Ok'),
-		_('Graph')
-	]);
+	$triggerTable = (new CTableInfo())
+		->setHeader([
+			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE) ? _('Host') : null,
+			_('Name'),
+			_('Problems'),
+			_('Ok'),
+			_('Graph')
+		]);
 
 	$triggers = API::Trigger()->get($triggerOptions);
 
@@ -399,18 +385,19 @@ elseif (isset($_REQUEST['filter_hostid'])) {
 		$triggerTable->addRow([
 			($_REQUEST['filter_hostid'] == 0 || $availabilityReportMode == AVAILABILITY_REPORT_BY_TEMPLATE)
 				? $trigger['hosts'][0]['name'] : null,
-			new CLink($trigger['description'], 'events.php?filter_set=1&triggerid='.$trigger['triggerid'].
-				'&source='.EVENT_SOURCE_TRIGGERS
+			new CLink($trigger['description'], 'events.php?filter_set=1&source='.EVENT_SOURCE_TRIGGERS.
+				'&hostid='.$trigger['hosts'][0]['hostid'].
+				'&triggerid='.$trigger['triggerid']
 			),
-			$availability['true'] == 0 ? '' : new CSpan(sprintf('%.4f%%', $availability['true']), ZBX_STYLE_RED),
-			$availability['false'] == 0 ? '' : new CSpan(sprintf('%.4f%%', $availability['false']), ZBX_STYLE_GREEN),
+			$availability['true'] == 0 ? '' : (new CSpan(sprintf('%.4f%%', $availability['true'])))->addClass(ZBX_STYLE_RED),
+			$availability['false'] == 0 ? '' : (new CSpan(sprintf('%.4f%%', $availability['false'])))->addClass(ZBX_STYLE_GREEN),
 			new CLink(_('Show'), 'report2.php?filter_groupid='.$_REQUEST['filter_groupid'].
 				'&filter_hostid='.$_REQUEST['filter_hostid'].'&triggerid='.$trigger['triggerid'])
 		]);
 	}
 
-	$reportWidget->addItem([$triggerTable, $paging]);
-	$reportWidget->show();
+	$reportWidget->addItem([$triggerTable, $paging])
+		->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

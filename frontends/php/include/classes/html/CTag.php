@@ -45,22 +45,16 @@ class CTag extends CObject {
 	 */
 	protected $attrEncStrategy = self::ENC_ALL;
 
-	public function __construct($tagname = null, $paired = 'no', $body = null, $class = null) {
+	public function __construct($tagname, $paired = false, $body = null) {
 		parent::__construct();
+
 		$this->attributes = [];
-		$this->dataAttributes = [];
-
-		if (!is_string($tagname)) {
-			return $this->error('Incorrect tagname for CTag "'.$tagname.'".');
-		}
-
 		$this->tagname = $tagname;
 		$this->paired = $paired;
 
 		if (!is_null($body)) {
 			$this->addItem($body);
 		}
-		$this->addClass($class);
 	}
 
 	// do not put new line symbol (\n) before or after html tags, it adds spaces in unwanted places
@@ -76,7 +70,8 @@ class CTag extends CObject {
 			$value = $this->encode($value, $strategy);
 			$res .= ' '.$key.'="'.$value.'"';
 		}
-		$res .= ($this->paired === 'yes') ? '>' : ' />';
+		$res .= '>';
+//		$res .= ($this->paired) ? '>' : ' />';
 
 		return $res;
 	}
@@ -86,7 +81,7 @@ class CTag extends CObject {
 	}
 
 	public function endToString() {
-		$res = ($this->paired === 'yes') ? '</'.$this->tagname.'>' : '';
+		$res = ($this->paired) ? '</'.$this->tagname.'>' : '';
 
 		return $res;
 	}
@@ -109,13 +104,11 @@ class CTag extends CObject {
 		}
 
 		parent::addItem($value);
-
 		return $this;
 	}
 
 	public function setName($value) {
 		$this->setAttribute('name', $value);
-
 		return $this;
 	}
 
@@ -130,7 +123,6 @@ class CTag extends CObject {
 		else {
 			$this->attributes['class'] .= ' '.$class;
 		}
-
 		return $this;
 	}
 
@@ -146,18 +138,17 @@ class CTag extends CObject {
 			$value = CHtml::serialize($value);
 		}
 		$this->attributes[$name] = $value;
-
 		return $this;
 	}
 
 	public function removeAttribute($name) {
 		unset($this->attributes[$name]);
-
 		return $this;
 	}
 
 	private function addAction($name, $value) {
 		$this->attributes[$name] = $value;
+		return $this;
 	}
 
 	/**
@@ -172,7 +163,7 @@ class CTag extends CObject {
 	 */
 	public function setHint($text, $spanClass = '', $freezeOnClick = true) {
 		if (empty($text)) {
-			return;
+			return $this;
 		}
 
 		encodeValues($text);
@@ -182,7 +173,6 @@ class CTag extends CObject {
 		if ($freezeOnClick) {
 			$this->onClick('hintBox.showStaticHint(event, this, '.zbx_jsvalue($text).', "'.$spanClass.'");');
 		}
-
 		return $this;
 	}
 
@@ -193,31 +183,26 @@ class CTag extends CObject {
 	 */
 	public function setMenuPopup(array $data) {
 		$this->setAttribute('data-menu-popup', $data);
-
 		return $this;
 	}
 
 	public function onChange($script) {
 		$this->addAction('onchange', $script);
-
 		return $this;
 	}
 
 	public function onClick($script) {
 		$this->addAction('onclick', $script);
-
 		return $this;
 	}
 
 	public function onMouseover($script) {
 		$this->addAction('onmouseover', $script);
-
 		return $this;
 	}
 
 	public function onMouseout($script) {
 		$this->addAction('onmouseout', $script);
-
 		return $this;
 	}
 
@@ -231,7 +216,6 @@ class CTag extends CObject {
 		else {
 			unset($this->attributes['style']);
 		}
-
 		return $this;
 	}
 
@@ -241,20 +225,23 @@ class CTag extends CObject {
 	}
 
 	public function getForm($method = 'post', $action = null, $enctype = null) {
-		$form = new CForm($method, $action, $enctype);
-		$form->addItem($this);
-
+		$form = (new CForm($method, $action, $enctype))
+			->addItem($this);
 		return $form;
 	}
 
 	public function setTitle($value) {
 		$this->setAttribute('title', $value);
+		return $this;
 	}
 
 	public function setId($id) {
 		$this->setAttribute('id', $id);
-
 		return $this;
+	}
+
+	public function getId() {
+		return $this->getAttribute('id');
 	}
 
 	/**
@@ -281,6 +268,7 @@ class CTag extends CObject {
 	 */
 	public function setEncStrategy($encStrategy) {
 		$this->encStrategy = $encStrategy;
+		return $this;
 	}
 
 	/**

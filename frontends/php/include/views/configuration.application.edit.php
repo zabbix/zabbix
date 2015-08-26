@@ -19,27 +19,28 @@
 **/
 
 
-$applicationWidget = (new CWidget())->setTitle(_('Applications'))->
-	addItem(get_header_host_table('applications', $this->data['hostid']));
+$widget = (new CWidget())
+	->setTitle(_('Applications'))
+	->addItem(get_header_host_table('applications', $this->data['hostid']));
 
 // create form
-$applicationForm = new CForm();
-$applicationForm->setName('applicationForm');
-$applicationForm->addVar('form', $this->data['form']);
-$applicationForm->addVar('hostid', $this->data['hostid']);
+$applicationForm = (new CForm())
+	->addVar('form', $this->data['form'])
+	->addVar('hostid', $this->data['hostid']);
 if (!empty($this->data['applicationid'])) {
 	$applicationForm->addVar('applicationid', $this->data['applicationid']);
 }
 
-// create form list
-$applicationFormList = new CFormList('applicationFormList');
-$nameTextBox = new CTextBox('appname', $this->data['appname'], ZBX_TEXTBOX_STANDARD_SIZE);
-$nameTextBox->setAttribute('autofocus', 'autofocus');
-$applicationFormList->addRow(_('Name'), $nameTextBox);
-
 // append tabs to form
-$applicationTab = new CTabView();
-$applicationTab->addTab('applicationTab', _('Application'), $applicationFormList);
+$applicationTab = (new CTabView())
+	->addTab('applicationTab', _('Application'),
+		(new CFormList())
+			->addRow(_('Name'),
+				(new CTextBox('appname', $this->data['appname']))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setAttribute('autofocus', 'autofocus')
+			)
+	);
 
 // append buttons to form
 if (!empty($this->data['applicationid'])) {
@@ -62,6 +63,6 @@ else {
 $applicationForm->addItem($applicationTab);
 
 // append form to widget
-$applicationWidget->addItem($applicationForm);
+$widget->addItem($applicationForm);
 
-return $applicationWidget;
+return $widget;

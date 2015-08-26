@@ -20,9 +20,8 @@
 
 include dirname(__FILE__).'/js/conf.import.js.php';
 
-$rulesTable = (new CTable())->
-	addClass('formElementTable')->
-	setHeader([SPACE, _('Update existing'), _('Create new'), _('Delete missing')], 'bold');
+$rulesTable = (new CTable())
+	->setHeader(['', _('Update existing'), _('Create new'), _('Delete missing')]);
 
 $titles = [
 	'groups' => _('Groups'),
@@ -39,60 +38,63 @@ $titles = [
 	'maps' => _('Maps'),
 	'images' => _('Images')
 ];
-$rules = $this->get('rules');
+
 foreach ($titles as $key => $title) {
 	$cbExist = null;
 	$cbMissed = null;
 	$cbDeleted = null;
 
-	if (isset($rules[$key]['updateExisting'])) {
-		$cbExist = new CCheckBox('rules['.$key.'][updateExisting]', $rules[$key]['updateExisting'], null, 1);
+	if (array_key_exists('updateExisting', $data['rules'][$key])) {
+		$cbExist = (new CCheckBox('rules['.$key.'][updateExisting]'))
+			->setChecked($data['rules'][$key]['updateExisting']);
 
 		if ($key == 'images') {
 			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
 				continue;
 			}
 
-			$cbExist->setAttribute('onclick', 'if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
+			$cbExist->onClick('if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
 		}
 	}
 
-	if (isset($rules[$key]['createMissing'])) {
-		$cbMissed = new CCheckBox('rules['.$key.'][createMissing]', $rules[$key]['createMissing'], null, 1);
+	if (array_key_exists('createMissing', $data['rules'][$key])) {
+		$cbMissed = (new CCheckBox('rules['.$key.'][createMissing]'))
+			->setChecked($data['rules'][$key]['createMissing']);
 	}
 
-	if (isset($rules[$key]['deleteMissing'])) {
-		$cbDeleted = new CCheckBox('rules['.$key.'][deleteMissing]', $rules[$key]['deleteMissing'], null, 1);
-		$cbDeleted->setAttribute('class', 'input checkbox pointer deleteMissing');
+	if (array_key_exists('deleteMissing', $data['rules'][$key])) {
+		$cbDeleted = (new CCheckBox('rules['.$key.'][deleteMissing]'))
+			->setChecked($data['rules'][$key]['deleteMissing'])
+			->addClass('deleteMissing');
 	}
 
 	$rulesTable->addRow([
 		$title,
-		(new CCol($cbExist))->addClass('center'),
-		(new CCol($cbMissed))->addClass('center'),
-		(new CCol($cbDeleted))->addClass('center')
+		(new CCol($cbExist))->addClass(ZBX_STYLE_CENTER),
+		(new CCol($cbMissed))->addClass(ZBX_STYLE_CENTER),
+		(new CCol($cbDeleted))->addClass(ZBX_STYLE_CENTER)
 	]);
 }
 
 // form list
-$importFormList = new CFormList('proxyFormList');
-$importFormList->addRow(_('Import file'), new CFile('import_file'));
-$importFormList->addRow(_('Rules'), new CDiv($rulesTable, 'border_dotted objectgroup inlineblock'));
+$importFormList = (new CFormList())
+	->addRow(_('Import file'), (new CFile('import_file'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('Rules'), new CDiv($rulesTable));
 
 // tab
-$importTab = new CTabView();
-$importTab->addTab('importTab', _('Import'), $importFormList);
+$importTab = (new CTabView())->addTab('importTab', _('Import'), $importFormList);
 
 // form
-$importForm = new CForm('post', null, 'multipart/form-data');
 $importTab->setFooter(makeFormFooter(
 	new CSubmit('import', _('Import')),
-	[new CButtonCancel()]
+	[new CRedirectButton(_('Cancel'), $data['backurl'])]
 ));
 
-$importForm->addItem($importTab);
+$form = (new CForm('post', null, 'multipart/form-data'))
+	->addVar('backurl', $data['backurl'])
+	->addItem($importTab);
 
 // widget
-$importWidget = (new CWidget())->addItem($importForm);
+$importWidget = (new CWidget())->addItem($form);
 
 return $importWidget;

@@ -41,12 +41,8 @@ frontends/php/.htpasswd
 frontends/php/.idea
 frontends/php/.project
 frontends/php/conf/zabbix.conf.php
-frontends/php/conf/zabbix.conf.php.bckp
 frontends/php/images/general/*.db
-frontends/php/images/general/bar/*.db
-frontends/php/images/general/bttn/*.db
 frontends/php/images/general/tree/*.db
-frontends/php/images/gradients/*.db
 frontends/php/include/views/.administration.script.edit.php.swp
 frontends/php/include/views/.configuration.host.edit.php.swp
 frontends/php/js/jsDump.js
@@ -97,6 +93,11 @@ misc/images/pngcrushoutput.txt
 /nbproject
 sass/.sass-cache
 sass/forms_with_tables.html
+sass/img/man.svg
+sass/img/reload.svg
+sass/img/tomato.png
+sass/img/tomato.svg
+sass/overlay-dialog.html
 sass/stylesheets/*.css
 sass/stylesheets/*.map
 sass/stylesheets/sass/screen2.scss

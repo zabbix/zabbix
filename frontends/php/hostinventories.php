@@ -38,8 +38,6 @@ $fields = [
 	'filter_field' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_field_value' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_exact' =>		[T_ZBX_INT, O_OPT, null,	'IN(0,1)',	null],
-	//ajax
-	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	// sort and sortorder
 	'sort' =>				[T_ZBX_STR, O_OPT, P_SYS,
 								IN('"name","pr_macaddress_a","pr_name","pr_os","pr_serialno_a","pr_tag","pr_type"'),
@@ -65,15 +63,6 @@ $sortOrder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortor
 CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
 
-if (hasRequest('filterState')) {
-	CProfile::update('web.hostinventories.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
-
-if ((PAGE_TYPE_JS == $page['type']) || (PAGE_TYPE_HTML_BLOCK == $page['type'])) {
-	require_once dirname(__FILE__).'/include/page_footer.php';
-	exit;
-}
-
 $hostId = getRequest('hostid', 0);
 
 /*
@@ -92,7 +81,7 @@ if ($hostId > 0) {
 
 	// overview tab
 	$data['host'] = API::Host()->get([
-		'output' => ['hostid', 'host', 'name', 'status', 'maintenance_status', 'description'],
+		'output' => ['hostid', 'host', 'name', 'status', 'maintenance_status', 'maintenanceid', 'maintenance_type', 'description'],
 		'selectInterfaces' => API_OUTPUT_EXTEND,
 		'selectItems' => API_OUTPUT_COUNT,
 		'selectTriggers' => API_OUTPUT_COUNT,
@@ -110,6 +99,14 @@ if ($hostId > 0) {
 
 	// resolve macros
 	$data['host']['interfaces'] = CMacrosResolverHelper::resolveHostInterfaces($data['host']['interfaces']);
+
+	if ($data['host']['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+		$data['maintenances'] = API::Maintenance()->get([
+			'maintenanceids' => [$data['host']['maintenanceid']],
+			'output' => ['name', 'description'],
+			'preservekeys' => true
+		]);
+	}
 
 	// get permissions
 	$userType = CWebUser::getType();

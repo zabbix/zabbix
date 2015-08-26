@@ -45,7 +45,6 @@ $fields = [
 	'application' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
-	'filterState' =>		[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
 	'favobj' =>				[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'toggle_ids' =>			[T_ZBX_STR, O_OPT, P_ACT,	null,		null],
 	'toggle_open_state' =>	[T_ZBX_INT, O_OPT, P_ACT,	null,		null],
@@ -68,9 +67,6 @@ if (getRequest('hostids') && !API::Host()->isReadable(getRequest('hostids'))) {
 /*
  * Ajax
  */
-if (hasRequest('filterState')) {
-	CProfile::update('web.latest.filter.state', getRequest('filterState'), PROFILE_TYPE_INT);
-}
 if (hasRequest('favobj')) {
 	if ($_REQUEST['favobj'] == 'toggle') {
 		// $_REQUEST['toggle_ids'] can be single id or list of ids,
@@ -336,7 +332,11 @@ if ($filter['groupids'] !== null) {
 /*
  * Display
  */
-$latestWidget = (new CWidget())->setTitle(_('Latest data'));
+$widget = (new CWidget())
+	->setTitle(_('Latest data'))
+	->setControls((new CList())
+		->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]))
+	);
 
 // Filter
 $filterForm = new CFilter('web.latest.filter.state');
@@ -344,7 +344,7 @@ $filterForm = new CFilter('web.latest.filter.state');
 $filterColumn1 = new CFormList();
 $filterColumn1->addRow(
 	_('Host groups'),
-	new CMultiSelect(
+	(new CMultiSelect(
 		[
 			'name' => 'groupids[]',
 			'objectName' => 'hostGroup',
@@ -353,11 +353,11 @@ $filterColumn1->addRow(
 				'parameters' => 'srctbl=host_groups&dstfrm=zbx_filter&dstfld1=groupids_'.
 					'&srcfld1=groupid&multiselect=1'
 			]
-	])
+	]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn1->addRow(
 		_('Hosts'),
-		new CMultiSelect(
+		(new CMultiSelect(
 			[
 				'name' => 'hostids[]',
 				'objectName' => 'hosts',
@@ -367,138 +367,96 @@ $filterColumn1->addRow(
 						'&real_hosts=1&multiselect=1'
 				]
 			]
-		)
+		))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn1->addRow(
 	_('Application'),
 	[
-		new CTextBox('application', $filter['application']),
-		new CButton('application_name', _('Select'),
-			'return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
-				'&with_applications=1&dstfrm=zbx_filter");',
-			'button-form'
-		)
+		(new CTextBox('application', $filter['application']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('application_name', _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('return PopUp("popup.php?srctbl=applications&srcfld1=name&real_hosts=1&dstfld1=application'.
+				'&with_applications=1&dstfrm=zbx_filter");'
+			)
 	]
 );
 
 $filterColumn2 = new CFormList();
 $filterColumn2->addRow(
 	_('Name'),
-	new CTextBox('select', $filter['select'], 40)
+	(new CTextBox('select', $filter['select']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 );
 $filterColumn2->addRow(
 	_('Show items without data'),
-	new CCheckBox('show_without_data', $filter['showWithoutData'], null, 1)
+	(new CCheckBox('show_without_data'))->setChecked($filter['showWithoutData'] == 1)
 );
 $filterColumn2->addRow(
 	_('Show details'),
-	new CCheckBox('show_details', $filter['showDetails'], null, 1)
+	(new CCheckBox('show_details'))->setChecked($filter['showDetails'] == 1)
 );
 
 $filterForm->addColumn($filterColumn1);
 $filterForm->addColumn($filterColumn2);
 
-$latestWidget->addItem($filterForm);
+$widget->addItem($filterForm);
 // End of Filter
 
-$controls = new CList();
-$controls->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')]));
-$latestWidget->setControls($controls);
-
-$form = new CForm('GET', 'history.php');
-$form->setName('items');
-// set an ID for the hidden input so that it wouldn't conflict with the ID of the "Go" button list
-$form->addItem(new CVar('action', HISTORY_BATCH_GRAPH, 'action-hidden'));
-
+$form = (new CForm('GET', 'history.php'))
+	->setName('items')
+	->addItem(new CVar('action', HISTORY_BATCH_GRAPH));
 // table
-$table = new CTableInfo(($filterSet) ? null : _('Specify some filter condition to see the values.'));
-
-if ($singleHostSelected) {
-	$hostHeader = null;
-	$hostColumn = null;
-}
-else {
-	$hostHeader = make_sorting_header(_('Host'), 'host', $sortField, $sortOrder);
-	$hostHeader->addClass('latest-host '.($filter['showDetails'] ? 'with-details' : 'no-details'));
-	$hostHeader->setAttribute('title', _('Host'));
-
-	$hostColumn = '';
+$table = (new CTableInfo())->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS);
+if (!$filterSet) {
+	$table->setNoDataMessage(_('Specify some filter condition to see the values.'));
 }
 
-$nameHeader = make_sorting_header(_('Name'), 'name', $sortField, $sortOrder);
-$nameHeader->setAttribute('title', _('Name'));
+$toggle_all = (new CColHeader(
+	(new CDiv())
+		->addClass(ZBX_STYLE_TREEVIEW)
+		->addClass('app-list-toggle-all')
+		->addItem(new CSpan())
+))->addStyle('width: 18px');
 
-$lastCheckHeader = make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder);
-$lastCheckHeader->addClass('latest-lastcheck');
-$lastCheckHeader->setAttribute('title', _('Last check'));
-
-$lastValueHeader = (new CColHeader(new CSpan(_('Last value'))))->
-	addClass('latest-lastvalue')->
-	setAttribute('title', _('Last value'));
-
-$lastDataHeader = (new CColHeader(new CSpan(_x('Change', 'noun in latest data'))))->
-	addClass('latest-data')->
-	setAttribute('title', _x('Change', 'noun in latest data'));
-
-$checkAllCheckbox = new CCheckBox('all_items', null, "checkAll('".$form->getName()."', 'all_items', 'itemids');");
-
-$checkAllCheckboxCol = (new CColHeader($checkAllCheckbox))->addClass('cell-width');
+$check_all = (new CColHeader(
+	(new CCheckBox('all_items'))->onClick("checkAll('".$form->getName()."', 'all_items', 'itemids');")
+))->addStyle('width: 15px');
 
 if ($filter['showDetails']) {
-	$intervalHeader = (new CColHeader(_('Interval')))->
-		addClass('latest-interval')->
-		setAttribute('title', _('Interval'));
-
-	$historyHeader = (new CColHeader(_('History')))->
-		addClass('latest-history')->
-		setAttribute('title', _('History'));
-
-	$trendsHeader = (new CColHeader(_('Trends')))->
-		addClass('latest-trends')->
-		setAttribute('title', _('Trends'));
-
-	$typeHeader = (new CColHeader(_('Type')))->
-		addClass('latest-type')->
-		setAttribute('title', _('Type'));
-
-	$infoHeader = (new CColHeader(_('Info')))->
-		addClass('latest-info')->
-		setAttribute('title', _('Info'));
-
-	$table->addClass('latest-details');
 	$table->setHeader([
-		(new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')))->
-			addClass('cell-width'),
-		$checkAllCheckboxCol,
-		$hostHeader,
-		$nameHeader,
-		$intervalHeader,
-		$historyHeader,
-		$trendsHeader,
-		$typeHeader,
-		$lastCheckHeader,
-		$lastValueHeader,
-		$lastDataHeader,
-		(new CColHeader())->
-			addClass('latest-actions'),
-		$infoHeader
+		$toggle_all,
+		$check_all,
+		$singleHostSelected
+			? null
+			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 13%'),
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		(new CColHeader(_('Interval')))->addStyle('width: 5%'),
+		(new CColHeader(_('History')))->addStyle('width: 5%'),
+		(new CColHeader(_('Trends')))->addStyle('width: 5%'),
+		(new CColHeader(_('Type')))->addStyle('width: 8%'),
+		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
+		(new CColHeader(_x('Change', 'noun in latest data')))->addStyle('width: 10%'),
+		(new CColHeader())->addStyle('width: 5%'),
+		(new CColHeader(_('Info')))->addStyle('width: 35px')
 	]);
 }
 else {
 	$table->setHeader([
-		(new CColHeader(new CDiv(null, 'app-list-toggle-all icon-plus-9x9')))
-			->addClass('cell-width'),
-		$checkAllCheckboxCol,
-		$hostHeader,
-		$nameHeader,
-		$lastCheckHeader,
-		$lastValueHeader,
-		$lastDataHeader,
-		(new CColHeader())->
-			addClass('latest-actions')
+		$toggle_all,
+		$check_all,
+		$singleHostSelected
+			? null
+			: make_sorting_header(_('Host'), 'host', $sortField, $sortOrder)->addStyle('width: 17%'),
+		make_sorting_header(_('Name'), 'name', $sortField, $sortOrder),
+		make_sorting_header(_('Last check'), 'lastclock', $sortField, $sortOrder)->addStyle('width: 14%'),
+		(new CColHeader(_('Last value')))->addStyle('width: 14%'),
+		(new CColHeader(_x('Change', 'noun in latest data')))->addStyle('width: 10%'),
+		(new CColHeader())->addStyle('width: 5%')
 	]);
 }
 
+$hostColumn = $singleHostSelected ? null : '';
 $tab_rows = [];
 
 $config = select_config();
@@ -554,8 +512,8 @@ foreach ($items as $key => $item){
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
-	$checkbox->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
+		->removeAttribute('id');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -569,18 +527,19 @@ foreach ($items as $key => $item){
 		$checkbox->setEnabled(false);
 	}
 
-	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : '';
+	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan($item['key_expanded'], ZBX_STYLE_GREEN)
-			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
+			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
+			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREEN);
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = new CDiv(null, 'status_icon iconerror');
-			$info->setHint($item['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($item['error']);
 		}
 		else {
 			$info = '';
@@ -598,19 +557,18 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CDiv([$item['name_expanded'], BR(), $itemKey], $stateCss.' item')),
-			new CCol(new CSpan(
+			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
+			(new CCol(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $item['delay'],
-				$stateCss
-			)),
-			new CCol(new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history'], $stateCss)),
-			new CCol(new CSpan($trendValue, $stateCss)),
-			new CCol(new CSpan(item_type2str($item['type']), $stateCss)),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
+					: $item['delay']
+			))->addClass($state_css),
+			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
+			(new CCol($trendValue))->addClass($state_css),
+			(new CCol(item_type2str($item['type'])))->addClass($state_css),
+			(new CCol($lastClock))->addClass($state_css),
+			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($change))->addClass($state_css),
 			$actions,
 			$info
 		]);
@@ -620,10 +578,10 @@ foreach ($items as $key => $item){
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
+			(new CCol($item['name_expanded']))->addClass($state_css),
+			(new CCol($lastClock))->addClass($state_css),
+			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($change))->addClass($state_css),
 			$actions
 		]);
 	}
@@ -650,43 +608,36 @@ foreach ($applications as $appid => $dbApp) {
 
 	$appRows = $tab_rows[$appid];
 
-	$openState = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
-
-	$toggle = new CDiv(null, 'app-list-toggle icon-plus-9x9');
-	if ($openState) {
-		$toggle->addClass('icon-minus-9x9');
-	}
-	$toggle->setAttribute('data-app-id', $dbApp['applicationid']);
-	$toggle->setAttribute('data-open-state', $openState);
+	$open_state = CProfile::get('web.latest.toggle', null, $dbApp['applicationid']);
 
 	$hostName = null;
 
 	if (!$singleHostSelected) {
-		$hostName = new CSpan($host['name'],
-			ZBX_STYLE_LINK_ACTION.' link_menu'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
-		);
-
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+		$hostName = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$hostName->addClass(ZBX_STYLE_RED);
+		}
 	}
 
 	// add toggle row
 	$table->addRow([
-		$toggle,
+		(new CDiv())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->addClass('app-list-toggle')
+			->setAttribute('data-app-id', $dbApp['applicationid'])
+			->setAttribute('data-open-state', $open_state)
+			->addItem(new CSpan()),
 		'',
 		$hostName,
-		new CCol([
-				bold($dbApp['name']),
-				' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')'
-			], null, $filter['showDetails'] ? 10 : 5)
-	], 'odd_row');
+		(new CCol([bold($dbApp['name']), ' ('._n('%1$s Item', '%1$s Items', $dbApp['item_cnt']).')']))
+			->setColSpan($filter['showDetails'] ? 10 : 5)
+	]);
 
 	// add toggle sub rows
 	foreach ($appRows as $row) {
 		$row->setAttribute('parent_app_id', $dbApp['applicationid']);
-		$row->addClass('odd_row');
-		if (!$openState) {
-			$row->addClass('hidden');
-		}
 		$table->addRow($row);
 	}
 }
@@ -741,8 +692,8 @@ foreach ($items as $item) {
 			&& (($config['hk_trends_global'] && $config['hk_trends'] == 0) || $item['trends'] == 0)
 	);
 
-	$checkbox = new CCheckBox('itemids['.$item['itemid'].']', null, null, $item['itemid']);
-	$checkbox->removeAttribute('id');
+	$checkbox = (new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
+		->removeAttribute('id');
 
 	if ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
 		$actions = $showLink
@@ -756,19 +707,20 @@ foreach ($items as $item) {
 		$checkbox->setEnabled(false);
 	}
 
-	$stateCss = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : '';
+	$state_css = ($item['state'] == ITEM_STATE_NOTSUPPORTED) ? ZBX_STYLE_GREY : null;
 
 	$host = $hosts[$item['hostid']];
 	if ($filter['showDetails']) {
 		// item key
 		$itemKey = ($item['type'] == ITEM_TYPE_HTTPTEST || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
-			? new CSpan($item['key_expanded'], 'enabled')
-			: new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid'], ZBX_STYLE_LINK_ALT.' '.ZBX_STYLE_GREEN);
+			? (new CSpan($item['key_expanded']))->addClass(ZBX_STYLE_GREEN)
+			: (new CLink($item['key_expanded'], 'items.php?form=update&itemid='.$item['itemid']))
+				->addClass(ZBX_STYLE_LINK_ALT)
+				->addClass(ZBX_STYLE_GREEN);
 
 		// info
 		if ($item['status'] == ITEM_STATUS_ACTIVE && $item['error'] !== '') {
-			$info = new CDiv(null, 'status_icon iconerror');
-			$info->setHint($item['error'], ZBX_STYLE_RED);
+			$info = makeErrorIcon($item['error']);
 		}
 		else {
 			$info = '';
@@ -786,21 +738,19 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CDiv([$item['name_expanded'], BR(), $itemKey], $stateCss.' item')),
-			new CCol(new CSpan(
+			(new CCol([$item['name_expanded'], BR(), $itemKey]))->addClass($state_css),
+			(new CCol(
 				($item['type'] == ITEM_TYPE_SNMPTRAP || $item['type'] == ITEM_TYPE_TRAPPER)
 					? UNKNOWN_VALUE
-					: $item['delay'],
-				$stateCss
-			)),
-			new CCol(new CSpan($config['hk_history_global'] ? $config['hk_history'] : $item['history'], $stateCss)),
-			new CCol(new CSpan($trendValue, $stateCss)),
-			new CCol(new CSpan(item_type2str($item['type']), $stateCss)),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
-			(new CCol($actions))->
-				addClass($stateCss),
+					: $item['delay']
+			))->addClass($state_css),
+			(new CCol($config['hk_history_global'] ? $config['hk_history'] : $item['history']))->addClass($state_css),
+			(new CCol($trendValue))->addClass($state_css),
+			(new CCol(item_type2str($item['type'])))->addClass($state_css),
+			(new CCol($lastClock))->addClass($state_css),
+			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($change))->addClass($state_css),
+			$actions,
 			$info
 		]);
 	}
@@ -809,12 +759,11 @@ foreach ($items as $item) {
 			'',
 			$checkbox,
 			$hostColumn,
-			new CCol(new CSpan($item['name_expanded'], $stateCss.' item')),
-			new CCol(new CSpan($lastClock, $stateCss)),
-			new CCol(new CSpan($lastValue, $stateCss)),
-			new CCol(new CSpan($change, $stateCss)),
-			(new CCol($actions))->
-				addClass($stateCss)
+			(new CCol($item['name_expanded']))->addClass($state_css),
+			(new CCol($lastClock))->addClass($state_css),
+			(new CCol($lastValue))->addClass($state_css),
+			(new CCol($change))->addClass($state_css),
+			$actions
 		]);
 	}
 
@@ -830,46 +779,36 @@ foreach ($hosts as $hostId => $dbHost) {
 	}
 	$appRows = $tab_rows[$hostId];
 
-	$openState = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
-
-	$toggle = new CDiv(null, 'app-list-toggle icon-plus-9x9');
-	if ($openState) {
-		$toggle->addClass('icon-minus-9x9');
-	}
-	$toggle->setAttribute('data-app-id', '0_'.$host['hostid']);
-	$toggle->setAttribute('data-open-state', $openState);
+	$open_state = CProfile::get('web.latest.toggle_other', null, $host['hostid']);
 
 	$hostName = null;
 
 	if (!$singleHostSelected) {
-		$hostName = new CSpan($host['name'],
-			ZBX_STYLE_LINK_ACTION.' link_menu'.(($host['status'] == HOST_STATUS_NOT_MONITORED) ? ' '.ZBX_STYLE_RED : '')
-		);
-
-		$hostName->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+		$hostName = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($host, $hostScripts[$host['hostid']]));
+		if ($host['status'] == HOST_STATUS_NOT_MONITORED) {
+			$hostName->addClass(ZBX_STYLE_RED);
+		}
 	}
 
 	// add toggle row
 	$table->addRow([
-		$toggle,
+		(new CDiv())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->addClass('app-list-toggle')
+			->setAttribute('data-app-id', '0_'.$host['hostid'])
+			->setAttribute('data-open-state', $open_state)
+			->addItem(new CSpan()),
 		'',
 		$hostName,
-		new CCol(
-			[
-				bold('- '.('other').' -'),
-				' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')'
-			],
-			null, $filter['showDetails'] ? 10 : 5
-		)
-	], 'odd_row');
+		(new CCol([bold('- '.('other').' -'), ' ('._n('%1$s Item', '%1$s Items', $dbHost['item_cnt']).')']))
+			->setColSpan($filter['showDetails'] ? 10 : 5)
+	]);
 
 	// add toggle sub rows
 	foreach($appRows as $row) {
 		$row->setAttribute('parent_app_id', '0_'.$host['hostid']);
-		$row->addClass('odd_row');
-		if (!$openState) {
-			$row->addClass('hidden');
-		}
 		$table->addRow($row);
 	}
 }
@@ -882,6 +821,6 @@ $form->addItem([
 	])
 ]);
 
-$latestWidget->addItem($form)->show();
+$widget->addItem($form)->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

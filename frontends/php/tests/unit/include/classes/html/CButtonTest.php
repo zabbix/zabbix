@@ -25,37 +25,37 @@ class CButtonTest extends CTagTest {
 		return [
 			[
 				[],
-				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button"></button>'
+				'<button type="button" id="button" name="button"></button>'
 			],
 			[
 				['my-button'],
-				'<button class="button button-plain shadow ui-corner-all" type="button" id="my-button" name="my-button"></button>'
+				'<button type="button" id="my-button" name="my-button"></button>'
 			],
 			[
 				['button[value]'],
-				'<button class="button button-plain shadow ui-corner-all" type="button" id="button_value" name="button[value]"></button>'
+				'<button type="button" id="button_value" name="button[value]"></button>'
 			],
 			[
 				['button', 'caption'],
-				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button">caption</button>'
+				'<button type="button" id="button" name="button">caption</button>'
 			],
 			[
 				['button', 'caption', 'callback()'],
-				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button" onclick="callback()">caption</button>'
+				'<button type="button" id="button" name="button" onclick="callback()">caption</button>'
 			],
 			[
 				['button', 'caption', null, 'my-class'],
-				'<button class="button my-class" type="button" id="button" name="button">caption</button>'
+				'<button class="my-class" type="button" id="button" name="button">caption</button>'
 			],
 			// value encoding
 			[
 				['button', '</button>'],
-				'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button">&lt;/button&gt;</button>'
+				'<button type="button" id="button" name="button">&lt;/button&gt;</button>'
 			],
 			// parameter encoding
 			[
 				['button"&"'],
-				'<button class="button button-plain shadow ui-corner-all" type="button" id="button&quot;&amp;&quot;" name="button&quot;&amp;&quot;"></button>'
+				'<button type="button" id="button&quot;&amp;&quot;" name="button&quot;&amp;&quot;"></button>'
 			],
 		];
 	}
@@ -64,33 +64,7 @@ class CButtonTest extends CTagTest {
 		$button = $this->createTag();
 		$button->setEnabled(false);
 		$this->assertEquals(
-			'<button class="button button-plain shadow ui-corner-all" type="button" id="button" name="button" disabled="disabled"></button>',
-			(string) $button
-		);
-	}
-
-	public function testMain() {
-		$button = $this->createTag();
-		$button->main();
-		$this->assertEquals(
-			'<button class="button main button-plain shadow ui-corner-all" type="button" id="button" name="button"></button>',
-			(string) $button
-		);
-	}
-
-	public function testSetButtonStyle() {
-		$button = $this->createTag();
-		$button->setButtonClass('my-button');
-		$this->assertEquals(
-			'<button class="button my-button" type="button" id="button" name="button"></button>',
-			(string) $button
-		);
-
-		// test class reset
-		$button = $this->createTag('button', '', null, 'my-button');
-		$button->setButtonClass(null);
-		$this->assertEquals(
-			'<button class="button" type="button" id="button" name="button"></button>',
+			'<button type="button" id="button" name="button" disabled="disabled"></button>',
 			(string) $button
 		);
 	}
@@ -102,7 +76,7 @@ class CButtonTest extends CTagTest {
 	 * @param $class
 	 * @return CButton
 	 */
-	protected function createTag($name = 'button', $caption = '', $action = null, $class = 'button-plain shadow ui-corner-all') {
-		return new CButton($name, $caption, $action, $class);
+	protected function createTag($name = 'button', $caption = '') {
+		return new CButton($name, $caption);
 	}
 }

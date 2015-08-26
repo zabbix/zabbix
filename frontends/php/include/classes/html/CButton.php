@@ -21,33 +21,14 @@
 
 class CButton extends CTag implements CButtonInterface {
 
-	/**
-	 * Button class that will be added to the other classes of the element.
-	 *
-	 * @var string
-	 */
-	protected $buttonClass;
-
-	public function __construct($name = 'button', $caption = '', $action = null,
-			$buttonClass = 'button-plain shadow ui-corner-all') {
-		parent::__construct('button', 'yes', $caption, 'button');
+	public function __construct($name = 'button', $caption = '') {
+		parent::__construct('button', true, $caption);
 		$this->setAttribute('type', 'button');
 
 		if ($name !== null) {
-			$this->setAttribute('id', zbx_formatDomId($name));
+			$this->setId(zbx_formatDomId($name));
 			$this->setAttribute('name', $name);
 		}
-
-		$this->onClick($action);
-
-		$this->buttonClass = $buttonClass;
-	}
-
-	/**
-	 * @see CButtonInterface::main()
-	 */
-	public function main() {
-		$this->addClass('main');
 	}
 
 	/**
@@ -62,21 +43,6 @@ class CButton extends CTag implements CButtonInterface {
 		else {
 			$this->setAttribute('disabled', 'disabled');
 		}
-	}
-
-	/**
-	 * @see CButtonInterface::setButtonClass()
-	 */
-	public function setButtonClass($class) {
-		$this->buttonClass = $class;
-	}
-
-	public function toString($destroy = true) {
-		// append the button class
-		if ($this->buttonClass !== null) {
-			$this->addClass($this->buttonClass);
-		}
-
-		return parent::toString($destroy);
+		return $this;
 	}
 }

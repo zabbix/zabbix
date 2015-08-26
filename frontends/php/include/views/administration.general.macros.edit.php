@@ -21,51 +21,33 @@
 
 require_once dirname(__FILE__).'/js/administration.general.macros.edit.js.php';
 
-$widget = (new CWidget())->setTitle(_('Macros'));
+$widget = (new CWidget())
+	->setTitle(_('Macros'))
+	->setControls((new CForm())
+		->cleanItems()
+		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.macros.php')))
+	);
 
-$header_form = (new CForm())->cleanItems();
-
-$controls = new CList();
-$controls->addItem(new CComboBox('configDropDown', 'adm.macros.php',
-	'redirect(this.options[this.selectedIndex].value);',
-	[
-		'adm.gui.php' => _('GUI'),
-		'adm.housekeeper.php' => _('Housekeeping'),
-		'adm.images.php' => _('Images'),
-		'adm.iconmapping.php' => _('Icon mapping'),
-		'adm.regexps.php' => _('Regular expressions'),
-		'adm.macros.php' => _('Macros'),
-		'adm.valuemapping.php' => _('Value mapping'),
-		'adm.workingtime.php' => _('Working time'),
-		'adm.triggerseverities.php' => _('Trigger severities'),
-		'adm.triggerdisplayoptions.php' => _('Trigger displaying options'),
-		'adm.other.php' => _('Other')
-	]
-));
-
-$header_form->addItem($controls);
-
-$widget->setControls($header_form);
-
-$table = (new CTable())->
-	addClass('formElementTable')->
-	setAttribute('id', 'tbl_macros')->
-	addRow([
-		_('Macro'), '',
-		_('Value'),
-		''
-	]);
+$table = (new CTable())
+	->setId('tbl_macros')
+	->setHeader([_('Macro'), '', _('Value'), '']);
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
-	$macro_input = new CTextBox('macros['.$i.'][macro]', $macro['macro'], 30, false, 64);
-	$macro_input->addClass('macro');
-	$macro_input->setAttribute('placeholder', '{$MACRO}');
+	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 64))
+		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+		->addClass('macro')
+		->setAttribute('placeholder', '{$MACRO}');
 
-	$value_input = new CTextBox('macros['.$i.'][value]', $macro['value'], 40, false, 255);
-	$value_input->setAttribute('placeholder', _('value'));
+	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))
+		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setAttribute('placeholder', _('value'));
 
-	$button_cell = [new CButton('macros['.$i.'][remove]', _('Remove'), null, 'link_menu element-table-remove')];
+	$button_cell = [
+		(new CButton('macros['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	];
 	if (array_key_exists('globalmacroid', $macro)) {
 		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
 	}
@@ -74,27 +56,25 @@ foreach ($data['macros'] as $i => $macro) {
 }
 
 // buttons
-$buttons_column = new CCol(new CButton('macro_add', _('Add'), null, 'link_menu element-table-add'));
-$buttons_column->setAttribute('colspan', 5);
-
-$table->addRow(new CRow($buttons_column, null, 'row_new_macro'));
+$table->setFooter(new CCol(
+	(new CButton('macro_add', _('Add')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-add')
+));
 
 // form list
-$macros_form_list = new CFormList('macrosFormList');
-$macros_form_list->addRow($table);
+$macros_form_list = (new CFormList('macrosFormList'))
+	->addRow($table);
 
-$tab_view = new CTabView();
-$tab_view->addTab('macros', _('Macros'), $macros_form_list);
+$tab_view = (new CTabView())->addTab('macros', _('Macros'), $macros_form_list);
 
-$saveButton = new CSubmit('update', _('Update'));
-$saveButton->setAttribute('data-removed-count', 0);
-$saveButton->main();
+$saveButton = (new CSubmit('update', _('Update')))->setAttribute('data-removed-count', 0);
 
-$tab_view->setFooter(makeFormFooter(null, [$saveButton]));
+$tab_view->setFooter(makeFormFooter($saveButton));
 
-$form = new CForm();
-$form->setName('macrosForm');
-$form->addItem($tab_view);
+$form = (new CForm())
+	->setName('macrosForm')
+	->addItem($tab_view);
 
 $widget->addItem($form);
 

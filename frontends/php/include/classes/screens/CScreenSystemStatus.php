@@ -38,13 +38,13 @@ class CScreenSystemStatus extends CScreenBase {
 			'groupids' => null,
 			'hostids' => null,
 			'maintenance' => null,
+			'trigger_name' => '',
 			'severity' => null,
 			'limit' => null,
 			'extAck' => 0,
 			'screenid' => $this->screenid
 		]));
 		$item->setHeader(_('Status of Zabbix'));
-		$item->setFooter(_s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS)));
 
 		return $this->getOutput($item);
 	}
