@@ -842,9 +842,10 @@ footer {
 .subfilter-enabled {
 	display: inline-block;
 	position: relative;
-	padding: 0 9px 0 4px;
+	//padding: 0 9px 0 4px;
 	height: 18px;
-	line-height: 18px;
+	//line-height: 18px;
+	padding: 0 4px;
 	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
 
@@ -919,6 +920,11 @@ footer {
 			display: inline-block;
 			margin: 2px 14px 0 0;
 			white-space: nowrap;
+
+			.subfilter-enabled {
+				padding: 0 9px 0 4px;
+				line-height: 18px;
+			}
 
 			&.selected {
 
@@ -1026,6 +1032,8 @@ footer {
 	}
 
 	.btn-grey {
+		height: 22px;
+		line-height: 22px;
 		background-color: $btn-form-bg-color;
 		margin-top: -1px;
 	}
