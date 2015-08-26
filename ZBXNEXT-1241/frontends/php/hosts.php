@@ -174,8 +174,6 @@ foreach ($macros as $idx => $macro) {
 	}
 }
 
-$config = select_config();
-
 /*
  * Actions
  */
@@ -705,6 +703,8 @@ $pageFilter = new CPageFilter([
 
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = getRequest('hostid', 0);
+
+$config = select_config();
 
 if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && hasRequest('hosts')) {
 	$data = [
