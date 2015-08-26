@@ -686,9 +686,10 @@ function getActionOperationDescriptions(array $actions) {
 					$result[$i][$j][] = [implode(', ', $templateList), BR()];
 					break;
 				case OPERATION_TYPE_HOST_INVENTORY:
+					$host_inventory_modes = getHostInventoryModes();
 					$result[$i][$j][] = bold(_(operation_type2str(OPERATION_TYPE_HOST_INVENTORY)).': ');
 					$result[$i][$j][] = [
-						ZBase::getHostInventoryModes()[$operation['opinventory']['inventory_mode']],
+						$host_inventory_modes[$operation['opinventory']['inventory_mode']],
 						BR()
 					];
 					break;
