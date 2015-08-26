@@ -341,7 +341,7 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			foreach ($_REQUEST['operations'] as $operationId => $operation) {
 				if (array_key_exists($operation['operationtype'], $uniqOperations)
 					&& (!array_key_exists('id', $new_operation)
-						|| $new_operation['id'] <> $operationId)) {
+						|| bccomp($new_operation['id'], $operationId) != 0)) {
 					$uniqOperations[$operation['operationtype']]++;
 				}
 			}
