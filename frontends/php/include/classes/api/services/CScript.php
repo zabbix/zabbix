@@ -384,18 +384,18 @@ class CScript extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
-		$dbfields = ['command' => null, 'name' => null];
+		$dbFields = ['command' => null, 'name' => null];
 
 		foreach ($scripts as $script) {
-			if (!check_db_fields($dbfields, $script)) {
-				self::exception(zbx_api_error_parameters, _('wrong fields for script.'));
+			if (!check_db_fields($dbFields, $script)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for script.'));
 			}
 
 			if ($script['name'] === '') {
-				self::exception(zbx_api_error_parameters, _('script name cannot be empty.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Script name cannot be empty.'));
 			}
 			if ($script['command'] === '') {
-				self::exception(zbx_api_error_parameters, _('script command cannot be empty.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Script command cannot be empty.'));
 			}
 		}
 	}
