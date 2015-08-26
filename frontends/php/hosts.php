@@ -110,8 +110,6 @@ $fields = [
 ];
 check_fields($fields);
 
-$config = select_config();
-
 /*
  * Permissions
  */
@@ -175,6 +173,8 @@ foreach ($macros as $idx => $macro) {
 		unset($macros[$idx]);
 	}
 }
+
+$config = select_config();
 
 /*
  * Actions

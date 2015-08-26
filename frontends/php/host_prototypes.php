@@ -67,8 +67,6 @@ $fields = [
 ];
 check_fields($fields);
 
-$config = select_config();
-
 // permissions
 if (getRequest('parent_discoveryid')) {
 	$discoveryRule = API::DiscoveryRule()->get([
@@ -258,6 +256,8 @@ elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelet
 	show_messages($result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
 }
 
+$config = select_config();
+
 /*
  * Display
  */
@@ -279,7 +279,6 @@ if (isset($_REQUEST['form'])) {
 		'groups' => [],
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0)
 	];
-	$data['config'] = $config;
 
 	// add already linked and new templates
 	$data['host_prototype']['templates'] = API::Template()->get([
