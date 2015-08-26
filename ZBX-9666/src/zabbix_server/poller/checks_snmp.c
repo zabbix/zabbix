@@ -120,8 +120,6 @@ static char	*get_item_community_context(const DC_ITEM *item)
 
 	THIS_SHOULD_NEVER_HAPPEN;
 	exit(EXIT_FAILURE);
-
-	return NULL;
 }
 
 static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, char **idx, size_t *idx_alloc)
