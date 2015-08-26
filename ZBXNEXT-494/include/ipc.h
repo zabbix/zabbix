@@ -81,7 +81,7 @@ int	zbx_dshm_create(zbx_dshm_t *shm, int proj_id, size_t shm_size, ZBX_MUTEX_NAM
 
 int	zbx_dshm_destroy(zbx_dshm_t *shm, char **errmsg);
 
-int	zbx_dshm_reserve(zbx_dshm_t *shm, size_t size, char **errmsg);
+int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg);
 
 int	zbx_dshm_validate_ref(const zbx_dshm_t *shm, zbx_dshm_ref_t *shm_ref, char **errmsg);
 

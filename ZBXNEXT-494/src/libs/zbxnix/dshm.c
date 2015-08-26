@@ -210,10 +210,9 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Function: zbx_dshm_reserve                                                 *
+ * Function: zbx_dshm_realloc                                                 *
  *                                                                            *
- * Purpose: ensures that dynamic shared memory segment has enough free space  *
- *          to store the requested size of data                               *
+ * Purpose: reallocates dynamic shared memory segment                         *
  *                                                                            *
  * Parameters: shm      - [IN/OUT] the dynamic shared memory data             *
  *             size     - [IN] the number of bytes to reserve                 *
@@ -231,7 +230,7 @@ out:
  *           the copy_data callback function.                                 *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dshm_reserve(zbx_dshm_t *shm, size_t size, char **errmsg)
+int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 {
 	const char	*__function_name = "zbx_dshm_reserve";
 	key_t		shm_key;
@@ -248,7 +247,7 @@ int	zbx_dshm_reserve(zbx_dshm_t *shm, size_t size, char **errmsg)
 		goto out;
 	}
 
-	shm_size = shm->size + ZBX_SIZE_T_ALIGN8(size);
+	shm_size = ZBX_SIZE_T_ALIGN8(size);
 
 	/* attach to the old segment if possible */
 	if (ZBX_NONEXISTENT_SHMID != shm->shmid && (void *)(-1) == (addr_old = shmat(shm->shmid, NULL, 0)))

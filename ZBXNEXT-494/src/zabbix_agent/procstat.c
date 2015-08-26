@@ -204,12 +204,50 @@ void	zbx_proc_free_processes(zbx_vector_ptr_t *processes);
  ******************************************************************************/
 static int	procstat_dshm_has_enough_space(void *base, size_t size)
 {
-	zbx_procstat_header_t   *header = (zbx_procstat_header_t *)base;
+	zbx_procstat_header_t	*header = (zbx_procstat_header_t *)base;
 
 	if (header->size >= size + header->size_allocated)
 		return SUCCEED;
 
 	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: procstat_dshm_used_size                                          *
+ *                                                                            *
+ * Purpose: calculate the actual shared memory size used by procstat          *
+ *                                                                            *
+ * Parameters: base - [IN] the procstat shared memory segment                 *
+ *                                                                            *
+ * Return value: The number of bytes required to store current procstat data. *
+ *                                                                            *
+ ******************************************************************************/
+static size_t	procstat_dshm_used_size(void *base)
+{
+	const zbx_procstat_query_t	*query;
+	size_t				size;
+
+	if (NULL == base)
+		return 0;
+
+	size = PROCSTAT_ALIGNED_HEADER_SIZE;
+
+	for (query = PROCSTAT_QUERY_FIRST(base); NULL != query; query = PROCSTAT_QUERY_NEXT(base, query))
+	{
+		if (PROCSTAT_NULL_OFFSET != query->procname)
+			size += ZBX_SIZE_T_ALIGN8(strlen(PROCSTAT_PTR(base, query->procname)) + 1);
+
+		if (PROCSTAT_NULL_OFFSET != query->username)
+			size += ZBX_SIZE_T_ALIGN8(strlen(PROCSTAT_PTR(base, query->username)) + 1);
+
+		if (PROCSTAT_NULL_OFFSET != query->cmdline)
+			size += ZBX_SIZE_T_ALIGN8(strlen(PROCSTAT_PTR(base, query->cmdline)) + 1);
+
+		size += ZBX_SIZE_T_ALIGN8(sizeof(zbx_procstat_query_t));
+	}
+
+	return size;
 }
 
 /******************************************************************************
@@ -451,12 +489,15 @@ static void	procstat_add(const char *procname, const char *username, const char 
 	/* procstat_add() is called when the shared memory reference has already been validated - */
 	/* no need to call procstat_reattach()                                                    */
 
-	/* reserve space for a new query only if there are no freed queries */
+	/* reserve space for query container */
 	size += ZBX_SIZE_T_ALIGN8(sizeof(zbx_procstat_query_t));
 
 	if (NULL == procstat_ref.addr || FAIL == procstat_dshm_has_enough_space(procstat_ref.addr, size))
 	{
-		if (FAIL == zbx_dshm_reserve(&collector->procstat, size, &errmsg))
+		/* recalculate the space required to store existing data + new query */
+		size += procstat_dshm_used_size(procstat_ref.addr);
+
+		if (FAIL == zbx_dshm_realloc(&collector->procstat, size, &errmsg))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot reserve memory in process data collector: %s", errmsg);
 			zbx_free(errmsg);
