@@ -616,6 +616,7 @@ static int	replace_param(const char *cmd, AGENT_REQUEST *request, char **out, ch
  * Parameters: in_command - item key                                          *
  *             flags - PROCESS_LOCAL_COMMAND, allow execution of system.run   *
  *                     PROCESS_MODULE_COMMAND, execute item from a module     *
+ *                     PROCESS_WITHOUT_ALIAS, do not substitute agent Alias   *
  *                                                                            *
  * Return value: SUCCEED - successful execution                               *
  *               NOTSUPPORTED - item key is not supported or other error      *
@@ -631,7 +632,8 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	init_result(result);
 	init_request(&request);
 
-	if (SUCCEED != parse_item_key(zbx_alias_get(in_command), &request))
+	if (SUCCEED != parse_item_key((0 == (flags & PROCESS_WITHOUT_ALIAS) ? zbx_alias_get(in_command) : in_command),
+			&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto notsupported;

@@ -1311,7 +1311,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		/* other (not log, logrt or eventlog) */
 		else
 		{
-			if (SUCCEED == process(active_metrics[i].key, 0, &result))
+			if (SUCCEED == process(active_metrics[i].key, PROCESS_WITHOUT_ALIAS, &result))
 			{
 				if (NULL != (pvalue = GET_TEXT_RESULT(&result)))
 				{
