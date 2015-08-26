@@ -18,7 +18,6 @@
 **/
 
 #include "common.h"
-#include "ipc.h"
 #include "log.h"
 #include "mutexs.h"
 
