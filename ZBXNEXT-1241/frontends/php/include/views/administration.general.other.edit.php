@@ -46,7 +46,11 @@ $otherTab
 	)
 	->addRow(_('Group for discovered hosts'), $discoveryGroup)
 	->addRow(_('Default host inventory mode'),
-		new CComboBox('default_inventory_mode', $data['default_inventory_mode'], null, Z::getHostInventoryModes())
+		(new CRadioButtonList('default_inventory_mode', (int) $data['default_inventory_mode']))
+			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+			->setModern(true)
 	)
 	->addRow(_('User group for database down message'), $alertUserGroup)
 	->addRow(_('Log unmatched SNMP traps'),
