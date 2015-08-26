@@ -338,14 +338,14 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 		];
 		if (array_key_exists($new_operation['operationtype'], $uniqOperations)) {
 			$uniqOperations[$new_operation['operationtype']]++;
-			foreach ($_REQUEST['operations'] as $operation) {
+			foreach ($_REQUEST['operations'] as $operationId => $operation) {
 				if (array_key_exists($operation['operationtype'], $uniqOperations)
-					&& (!array_key_exists('operationid', $new_operation)
-						|| $new_operation['operationid'] <> $operation['operationid'])) {
+					&& (!array_key_exists('id', $new_operation)
+						|| $new_operation['id'] <> $operationId)) {
 					$uniqOperations[$operation['operationtype']]++;
 				}
 			}
-			if (1 < $uniqOperations[$new_operation['operationtype']]) {
+			if ($uniqOperations[$new_operation['operationtype']] > 1) {
 				$result = false;
 				error(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
 				show_messages();
