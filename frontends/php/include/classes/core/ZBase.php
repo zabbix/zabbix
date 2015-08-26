@@ -468,17 +468,4 @@ class ZBase {
 			redirect('zabbix.php?action=system.warning');
 		}
 	}
-
-	/**
-	 * An array of available host inventory modes.
-	 *
-	 * @return array
-	 */
-	public static function getHostInventoryModes() {
-		return [
-			HOST_INVENTORY_DISABLED		=> _('Disabled'),
-			HOST_INVENTORY_MANUAL		=> _('Manual'),
-			HOST_INVENTORY_AUTOMATIC	=> _('Automatic'),
-		];
-	}
 }
