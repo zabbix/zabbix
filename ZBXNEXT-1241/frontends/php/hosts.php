@@ -269,8 +269,8 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		}
 
 		if (isset($visible['inventory_mode'])) {
-			$newValues['inventory_mode'] = getRequest('inventory_mode', $config['default_inventory_mode']);
-			$newValues['inventory'] = ($newValues['inventory_mode'] == $config['default_inventory_mode'])
+			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
+			$newValues['inventory'] = ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED)
 				? [] : getRequest('host_inventory', []);
 		}
 
@@ -721,7 +721,7 @@ if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && ha
 		'ipmi_privilege' => getRequest('ipmi_privilege', IPMI_PRIVILEGE_USER),
 		'ipmi_username' => getRequest('ipmi_username', ''),
 		'ipmi_password' => getRequest('ipmi_password', ''),
-		'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
+		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
 		'host_inventory' => getRequest('host_inventory', []),
 		'templates' => getRequest('templates', []),
 		'inventories' => zbx_toHash(getHostInventories(), 'db_field')
