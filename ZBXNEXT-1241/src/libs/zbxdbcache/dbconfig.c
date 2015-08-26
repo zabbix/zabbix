@@ -946,7 +946,6 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 		config->config->refresh_unsupported = refresh_unsupported;
 		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
 		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
-
 		config->config->default_inventory_mode = atoi(row[26]);
 
 		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)

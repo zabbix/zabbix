@@ -5037,13 +5037,13 @@ void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 	DB_RESULT	result;
 	DB_ROW		row;
 
-	result = DBselect("select hostid,inventory_mode from host_inventory where hostid=" ZBX_FS_UI64, hostid);
+	result = DBselect("select inventory_mode from host_inventory where hostid=" ZBX_FS_UI64, hostid);
 
 	if (NULL == (row = DBfetch(result)))
 	{
 		DBadd_host_inventory(hostid, inventory_mode);
 	}
-	else if (inventory_mode != atoi(row[1]))
+	else if (inventory_mode != atoi(row[0]))
 	{
 		DBexecute("update host_inventory set inventory_mode=%d where hostid=" ZBX_FS_UI64, inventory_mode,
 				hostid);
