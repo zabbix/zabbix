@@ -2312,7 +2312,10 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			int	macro_r, context_l, context_r;
 
 			if (FAIL == zbx_user_macro_parse(m, &macro_r, &context_l, &context_r))
-				break;
+			{
+				p = bl + 1;
+				continue;
+			}
 
 			br = bl + macro_r;
 		}
