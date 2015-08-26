@@ -110,6 +110,9 @@ zbx_procstat_header_t;
 
 #define PROCSTAT_OFFSET(base, ptr) ((char *)ptr - (char *)base)
 
+/* maximum number of active procstat queries */
+#define PROCSTAT_MAX_QUERIES	1024
+
 /* data sample collected every second for the process cpu utilization queries */
 typedef struct
 {
@@ -248,6 +251,33 @@ static size_t	procstat_dshm_used_size(void *base)
 	}
 
 	return size;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: procstat_queries_num                                             *
+ *                                                                            *
+ * Purpose: calculate the number of active queries                            *
+ *                                                                            *
+ * Parameters: base - [IN] the procstat shared memory segment                 *
+ *                                                                            *
+ * Return value: The number of active queries.                                *
+ *                                                                            *
+ ******************************************************************************/
+static int	procstat_queries_num(void *base)
+{
+	const zbx_procstat_query_t	*query;
+	int				queries_num;
+
+	if (NULL == base)
+		return 0;
+
+	queries_num = 0;
+
+	for (query = PROCSTAT_QUERY_FIRST(base); NULL != query; query = PROCSTAT_QUERY_NEXT(base, query))
+		queries_num++;
+
+	return queries_num;
 }
 
 /******************************************************************************
@@ -992,7 +1022,11 @@ int	zbx_procstat_get_util(const char *procname, const char *username, const char
 
 	if (NULL == (query = procstat_get_query(procstat_ref.addr, procname, username, cmdline, flags)))
 	{
-		procstat_add(procname, username, cmdline, flags);
+		if (procstat_queries_num(procstat_ref.addr) == PROCSTAT_MAX_QUERIES)
+			*errmsg = zbx_strdup(*errmsg, "Maximum number of queries reached.");
+		else
+			procstat_add(procname, username, cmdline, flags);
+
 		goto out;
 	}
 
