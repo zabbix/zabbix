@@ -1435,7 +1435,6 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 		operationtype = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(groupid, row[1]);
 		ZBX_DBROW2UINT64(templateid, row[2]);
-
 		inventory_mode = (SUCCEED == DBis_null(row[3]) ? 0 : atoi(row[3]));
 
 		switch (operationtype)

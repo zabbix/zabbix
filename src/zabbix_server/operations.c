@@ -550,7 +550,6 @@ void	op_host_disable(const DB_EVENT *event)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: op_host_inventory_mode                                           *
