@@ -2382,6 +2382,5 @@ class CChart extends CGraphDraw {
 		unset($this->items, $this->data);
 
 		imageOut($this->im);
-
 	}
 }

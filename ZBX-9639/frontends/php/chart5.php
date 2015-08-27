@@ -79,7 +79,7 @@ $x = imagesx($im);
 $y = imagesy($im);
 
 imagefilledrectangle($im, 0, 0, $x, $y, $white);
-imagerectangle($im, 0, 0, $x - 1, $y - 1, $black);
+imagerectangle($im, 0, 0, $x-1, $y-1, $black);
 
 $d = zbx_date2str('Y');
 $str = _s('%1$s (year %2$s)', $service['name'], $d);
@@ -147,7 +147,7 @@ $maxX = $sizeX;
 $minX = 0;
 
 for ($i = 1; $i <= $weeks; $i++) {
-	if (!isset($ok[$i - 1])) {
+	if (!isset($ok[$i-1])) {
 		continue;
 	}
 	$x2 = ($sizeX / 52) * ($i - 1 - $minX) * $sizeX / ($maxX - $minX);
@@ -160,16 +160,28 @@ for ($i = 1; $i <= $weeks; $i++) {
 	}
 
 	imagefilledrectangle(
-		$im, $x2 + $shiftX, $shiftYup + $sizeY - $y2, $x2 + $shiftX + 8, $shiftYup + $sizeY, imagecolorallocate($im, 120, 235, 120)
+		$im,
+		$x2 + $shiftX, $shiftYup + $sizeY - $y2,
+		$x2 + $shiftX + 8, $shiftYup + $sizeY,
+		imagecolorallocate($im, 120, 235, 120)
 	);
 	imagerectangle(
-		$im, $x2 + $shiftX, $shiftYup + $sizeY - $y2, $x2 + $shiftX + 8, $shiftYup + $sizeY, $black
+		$im,
+		$x2 + $shiftX, $shiftYup + $sizeY - $y2,
+		$x2 + $shiftX + 8, $shiftYup + $sizeY,
+		$black
 	);
 	imagefilledrectangle(
-		$im, $x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY, $x2 + $shiftX + 8, $shiftYup + $sizeY - $y2, imagecolorallocate($im, 235, 120, 120)
+		$im,
+		$x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY,
+		$x2 + $shiftX + 8, $shiftYup + $sizeY - $y2,
+		imagecolorallocate($im, 235, 120, 120)
 	);
 	imagerectangle(
-		$im, $x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY, $x2 + $shiftX + 8, $shiftYup + $sizeY - $y2, $black
+		$im,
+		$x2 + $shiftX, $shiftYup + $sizeY - $maxSizeY,
+		$x2 + $shiftX + 8, $shiftYup + $sizeY - $y2,
+		$black
 	);
 }
 

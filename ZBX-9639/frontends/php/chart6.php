@@ -71,11 +71,11 @@ $host = reset($db_data['hosts']);
  * Display
  */
 $timeline = CScreenBase::calculateTime(array(
-		'profileIdx' => get_request('profileIdx', 'web.screens'),
-		'profileIdx2' => get_request('profileIdx2'),
-		'updateProfile' => get_request('updateProfile', true),
-		'period' => get_request('period'),
-		'stime' => get_request('stime')
+	'profileIdx' => get_request('profileIdx', 'web.screens'),
+	'profileIdx2' => get_request('profileIdx2'),
+	'updateProfile' => get_request('updateProfile', true),
+	'period' => get_request('period'),
+	'stime' => get_request('stime')
 ));
 
 $graph = new CPie($db_data['graphtype']);
@@ -98,7 +98,7 @@ if ($height <= 0) {
 
 $graph->setWidth($width);
 $graph->setHeight($height);
-$graph->setHeader($host['host'] . ': ' . $db_data['name']);
+$graph->setHeader($host['host'].': '.$db_data['name']);
 
 if ($db_data['show_3d']) {
 	$graph->switchPie3D();
@@ -106,14 +106,17 @@ if ($db_data['show_3d']) {
 $graph->showLegend($db_data['show_legend']);
 
 $result = DBselect(
-	'SELECT gi.*' .
-	' FROM graphs_items gi' .
-	' WHERE gi.graphid=' . $db_data['graphid'] .
+	'SELECT gi.*'.
+	' FROM graphs_items gi'.
+	' WHERE gi.graphid='.$db_data['graphid'].
 	' ORDER BY gi.sortorder,gi.itemid DESC'
 );
 while ($db_data = DBfetch($result)) {
 	$graph->addItem(
-		$db_data['itemid'], $db_data['calc_fnc'], $db_data['color'], $db_data['type']
+		$db_data['itemid'],
+		$db_data['calc_fnc'],
+		$db_data['color'],
+		$db_data['type']
 	);
 }
 $graph->draw();
