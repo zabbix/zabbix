@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 12:13+0300\n"
-"PO-Revision-Date: 2015-08-17 14:21+0300\n"
+"POT-Creation-Date: 2015-08-27 12:50+0300\n"
+"PO-Revision-Date: 2015-08-26 09:02+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1439814077.0\n"
+"X-POOTLE-MTIME: 1440572567.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -591,12 +591,12 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:335
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Kontrola dostupnosti agenta. Vrátí nic - nedostupný, 1 - dostupný"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:331
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Jméno hosta. Vrátí řetězec"
 
 #: include/views/configuration.host.edit.php:140
 #: include/views/configuration.host.edit.php:225
@@ -615,7 +615,7 @@ msgstr "Agregované kontroly nevyžadují spuštění agenta na monitorovaném h
 
 #: acknow.php:194
 msgid "Alarm acknowledgements"
-msgstr ""
+msgstr "Potvrzení alarmů"
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:46
 #: include/views/administration.users.list.php:47 popup.php:625 users.php:43
@@ -650,7 +650,7 @@ msgstr "Všechny skupiny"
 
 #: include/html.inc.php:369
 msgid "All hosts"
-msgstr ""
+msgstr "Všichni hosty"
 
 #: jsLoader.php:150
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -658,7 +658,7 @@ msgstr "Veškeré odkazy by měly mít zadáno \"Jméno\" a \"URL\""
 
 #: include/html.inc.php:330
 msgid "All templates"
-msgstr ""
+msgstr "Všechny šablony"
 
 #: include/views/configuration.host.discovery.edit.php:259
 #: include/views/configuration.item.edit.php:413
@@ -669,7 +669,7 @@ msgstr "Povolení hostitelé"
 
 #: include/classes/setup/CSetupWizard.php:384
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Eventuálně to můžete nainstalovat manuálně:"
 
 #: include/triggers.inc.php:1531
 #: include/views/configuration.action.edit.php:135
@@ -730,7 +730,7 @@ msgstr "Chyba aplikace."
 
 #: include/views/configuration.item.prototype.edit.php:409
 msgid "Application prototypes"
-msgstr ""
+msgstr "Prototypy aplikací"
 
 #: applications.php:110
 msgid "Application updated"
@@ -862,7 +862,7 @@ msgstr "Nejméně jedna databáze z MySQL, PostgreSQL, Oracle, SQLite3 nebo IBM 
 #: httpconf.php:47 include/views/configuration.httpconf.edit.php:80
 #: include/views/configuration.httpconf.list.php:60
 msgid "Attempts"
-msgstr ""
+msgstr "Pokusy"
 
 #: include/menu.inc.php:141
 #: include/views/administration.general.housekeeper.edit.php:74
@@ -1015,7 +1015,7 @@ msgstr "Průměrná hodnota za čas T je NOT N"
 #: include/classes/setup/CSetupWizard.php:121
 #: include/classes/setup/CSetupWizard.php:341
 msgid "Back"
-msgstr ""
+msgstr "Zpět"
 
 #: include/views/administration.general.image.edit.php:55
 #: include/views/administration.general.image.list.php:39
@@ -1064,7 +1064,7 @@ msgstr "Blokovaný"
 
 #: include/classes/core/ZBase.php:265
 msgid "Blue"
-msgstr ""
+msgstr "Modrá"
 
 #: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:373
 #: include/views/js/configuration.sysmaps.js.php:457
@@ -1105,17 +1105,17 @@ msgstr "NASTAVENÍ SPOUŠTĚČŮ"
 #: include/classes/items/CHelpItems.php:201
 #: include/classes/items/CHelpItems.php:479
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "CPU informace. Vráti řetězec nebo celé číslo"
 
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:455
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "CPU load. Vrátí desetinné číslo"
 
 #: include/classes/items/CHelpItems.php:189
 #: include/classes/items/CHelpItems.php:467
 msgid "CPU utilisation in percent. Returns float"
-msgstr ""
+msgstr "CPU utilizace v procentech. Vrátí desetinné číslo"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1164,7 +1164,7 @@ msgstr "Nelze potvrdit událost"
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
-msgstr ""
+msgstr "Není možné přidat objevenou aplikaci \"%1$s\" k web scénáři."
 
 #: include/classes/api/services/CGraph.php:725
 #: include/classes/api/services/CGraph.php:739
@@ -1374,7 +1374,7 @@ msgstr "Nelze klonovat předlohy spouštěčů."
 
 #: include/classes/setup/CSetupWizard.php:262
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Není možné se připojit k databázi."
 
 #: scripts_exec.php:70
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
@@ -1413,7 +1413,7 @@ msgstr "Není možné vytvořit závislost spouštěče na sebe sama."
 
 #: include/classes/api/services/CTriggerPrototype.php:1018
 msgid "Cannot create dependency on trigger prototype itself."
-msgstr ""
+msgstr "Není možné vytvořit závislost prototypu spouštěče na sobě samém."
 
 #: discoveryconf.php:154
 msgid "Cannot create discovery rule"
@@ -1443,7 +1443,7 @@ msgstr "Není možné vytvořit šablonu."
 
 #: include/classes/setup/CSetupWizard.php:382
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Není možné vytvořit konfigurační soubor."
 
 #: include/classes/api/services/CUser.php:1317
 #, c-format
@@ -1469,22 +1469,22 @@ msgstr "Není možné smazat závislost"
 #: include/classes/api/services/CApplication.php:415
 #, c-format
 msgid "Cannot delete discovered application \"%1$s\"."
-msgstr ""
+msgstr "Není možné smazat objevenou aplikaci \"%1$s\"."
 
 #: include/classes/api/services/CGraph.php:554
 #, c-format
 msgid "Cannot delete discovered graph \"%1$s\"."
-msgstr ""
+msgstr "Není možné smazat objevený graf \"%1$s\"."
 
 #: include/classes/api/services/CItem.php:581
 #, c-format
 msgid "Cannot delete discovered item \"%1$s\"."
-msgstr ""
+msgstr "Není možné smazat objevenou položku \"%1$s\"."
 
 #: include/classes/api/services/CTrigger.php:764
 #, c-format
 msgid "Cannot delete discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "Není možné smazat objevený spouštěč \"%1$s\"."
 
 #: discoveryconf.php:178 host_discovery.php:183
 #: include/classes/api/services/CDiscoveryRule.php:400
@@ -2055,7 +2055,7 @@ msgstr[2] "Není možné importovat šablonu \"%1$s\", připojené šablony \"%2
 #: include/classes/mvc/CView.php:219
 #, c-format
 msgid "Cannot include JS file \"%s\"."
-msgstr ""
+msgstr "Není možné vložit JS soubor \"%s\"."
 
 #: include/classes/mvc/CView.php:141
 #, c-format
@@ -2152,7 +2152,7 @@ msgstr "Není možné poslat příkaz, zkontrolujte spojení se Zabbix serverem 
 #: include/classes/api/services/CApplication.php:302
 #, c-format
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "Není možné nastavit \"%1$s\" pro aplikaci \"%2$s\"."
 
 #: include/classes/api/services/CHostGroup.php:389
 #, c-format
@@ -2172,7 +2172,7 @@ msgstr "Nelze nastavit \"%1$s\" pro spouštěč \"%2$s\"."
 #: include/classes/api/services/CItemPrototype.php:306
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "Není možné nastavit \"templateid\" pro prototyp aplikace v prototypu položky \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:350
 #, c-format
@@ -2258,7 +2258,7 @@ msgstr "Nelze aktualizovat \"%1$s\" pro akci \"%2$s\"."
 #: include/classes/api/services/CApplication.php:296
 #, c-format
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "Není možné aktualizovat \"%1$s\" pro aplikaci \"%2$s\"."
 
 #: include/classes/api/services/CHostGroup.php:451
 #, c-format
@@ -2278,17 +2278,17 @@ msgstr "Nelze aktualizovat \"%1$s\" pro spouštěč \"%2$s\"."
 #: include/classes/api/services/CHost.php:556
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered host \"%1$s\"."
-msgstr ""
+msgstr "Není možné aktualizovat \"%2$s\" pro objeveného hosta \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:175
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered item \"%1$s\"."
-msgstr ""
+msgstr "Není možné aktualizovat \"%2$s\" pro objevenou položku \"%1$s\"."
 
 #: include/classes/api/services/CTrigger.php:500
 #, c-format
 msgid "Cannot update \"%2$s\" for a discovered trigger \"%1$s\"."
-msgstr ""
+msgstr "Není možné aktualizovat \"%2$s\" pro objevený spouštěč \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:516
 #, c-format
@@ -2348,7 +2348,7 @@ msgstr "Není možné aktualizovat poznámku"
 #: include/classes/api/services/CApplication.php:314
 #, c-format
 msgid "Cannot update discovered application \"%1$s\"."
-msgstr ""
+msgstr "Není možné aktualizovat objevenou aplikaci \"%1$s\"."
 
 #: discoveryconf.php:147 host_discovery.php:291
 msgid "Cannot update discovery rule"
@@ -2573,7 +2573,7 @@ msgstr "Šasí"
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:475
 msgid "Chassis information. Returns string"
-msgstr ""
+msgstr "Informace o šasi. Vráti řetězec"
 
 #: include/views/js/configuration.discovery.edit.js.php:529
 msgid "Check already exists."
@@ -2587,7 +2587,7 @@ msgstr "Zkontrolujte část výrazu začínajícího od \"%1$s\"."
 #: include/classes/setup/CSetupWizard.php:39
 #: include/classes/setup/CSetupWizard.php:202
 msgid "Check of pre-requisites"
-msgstr ""
+msgstr "Kontrola předpokladů"
 
 #: include/classes/api/services/CItemGeneral.php:293
 #: include/classes/api/services/CItemGeneral.php:300
@@ -2607,17 +2607,17 @@ msgstr "Kontroly"
 #: include/classes/items/CHelpItems.php:85
 #: include/classes/items/CHelpItems.php:363
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
-msgstr ""
+msgstr "Kontrola DNS. Vráti 0 - DNS je nedostupné (server neodpovídá nebo DNS překlad selhal), 1 - DNS je dostupné"
 
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:555
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
-msgstr ""
+msgstr "Kontrola existence souboru. Vráti 0 - nenalezený, 1 - soubor nebo link (symbolický nebo hard) k souboru existuje"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:395
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
-msgstr ""
+msgstr "Kontrola úspěšného TCP spojení na zadaný port. Vráti 0 - neúspěšné, 1 - úspěšné"
 
 #: include/classes/items/CHelpItems.php:615
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
@@ -2627,35 +2627,35 @@ msgstr "Kontrola, zda je server dostupný přes ICMP ping. 0 - ICMP ping selhal.
 #: include/classes/items/CHelpItems.php:399
 #: include/classes/items/CHelpItems.php:627
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "Kontrola, nebo služba akceptuje TCP spojení. 0 - služba je nedostupná, 1 - služba je dostupná"
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:411
 #: include/classes/items/CHelpItems.php:635
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "Kontrola, zda služba akceptuje UDP žádosti. 0 - služba je nedostupná, 1 - služba je dostupná"
 
 #: include/classes/items/CHelpItems.php:113
 #: include/classes/items/CHelpItems.php:391
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "Kontrola, zda TCP port je v LISTEN stavu. 0 - Není v LISTEN stavu; 1 - je v LISTEN stavu"
 
 #: include/classes/items/CHelpItems.php:129
 #: include/classes/items/CHelpItems.php:407
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "Kontrola, zda UDP port je v LISTEN stavu. 0 - Není v LISTEN stavu; 1 - je v LISTEN stavu"
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:403
 #: include/classes/items/CHelpItems.php:631
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
-msgstr ""
+msgstr "Kontroly výkonnosti služby TCP. 0 - služba je nedostupná; sekund - počet sekund strávených při připojování se ke službě"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:415
 #: include/classes/items/CHelpItems.php:639
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
-msgstr ""
+msgstr "Kontroly výkonnosti služby UDP. 0 - služba je nedostupná; sekund - počet sekund strávených při připojování se ke službě"
 
 #: include/classes/api/services/CDRule.php:349
 msgid "Checks should be unique."
@@ -2701,7 +2701,7 @@ msgstr "Vyčistit"
 #: include/views/configuration.httpconf.list.php:142
 #: include/views/configuration.item.list.php:258
 msgid "Clear history"
-msgstr ""
+msgstr "Vyčistit historii"
 
 #: include/views/configuration.httpconf.edit.php:274
 #: include/views/configuration.item.edit.php:473
@@ -2867,7 +2867,7 @@ msgstr "Nastavení cache statistik. Cache - buffer (mod: pfree, total, used, fre
 #: include/classes/setup/CSetupWizard.php:400
 #, c-format
 msgid "Configuration file \"%1$s\" created."
-msgstr ""
+msgstr "Konfigurační soubor \"%1$s\" vytvořený."
 
 #: conf.import.php:25
 msgid "Configuration import"
@@ -3028,12 +3028,12 @@ msgstr "Nastavení bylo aktualizováno"
 
 #: include/html.inc.php:220
 msgid "Configure"
-msgstr ""
+msgstr "Nastavit"
 
 #: include/classes/setup/CSetupWizard.php:43
 #: include/classes/setup/CSetupWizard.php:269
 msgid "Configure DB connection"
-msgstr ""
+msgstr "Nastavení DB připojení"
 
 #: app/views/administration.script.edit.php:97
 msgid "Confirmation text"
@@ -3041,7 +3041,7 @@ msgstr "Potvrzující text"
 
 #: include/classes/setup/CSetupWizard.php:397
 msgid "Congratulations! You have successfully installed Zabbix frontend."
-msgstr ""
+msgstr "Gratulace! Právě jste úspěšně nainstalovali Zabbix frontend."
 
 #: app/views/administration.proxy.edit.php:37
 #: include/views/configuration.host.edit.php:130
@@ -3057,7 +3057,7 @@ msgstr "Připojit k"
 
 #: app/views/administration.mediatype.edit.php:64
 msgid "Connection security"
-msgstr ""
+msgstr "Bezpečnost připojení"
 
 #: include/classes/server/CZabbixServer.php:207
 #, c-format
@@ -3147,7 +3147,7 @@ msgstr "Počet"
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:463
 msgid "Count of context switches. Returns integer"
-msgstr ""
+msgstr "Počet kontextových přepnutí. Vráti celé číslo"
 
 #: include/views/configuration.action.list.php:35
 msgid "Create action"
@@ -3277,11 +3277,11 @@ msgstr "Vytvořit mapu hodnot"
 
 #: include/views/configuration.httpconf.list.php:25
 msgid "Create web scenario"
-msgstr ""
+msgstr "Vytvořit web scénár"
 
 #: include/views/configuration.httpconf.list.php:22
 msgid "Create web scenario (select host first)"
-msgstr ""
+msgstr "Vytvořit web scénář (vyber nejprve hosta)"
 
 #: include/classes/api/managers/CApplicationManager.php:73
 #, c-format
@@ -3350,7 +3350,7 @@ msgstr "Aktuální host"
 
 #: include/views/reports.toptriggers.php:46
 msgid "Current month"
-msgstr ""
+msgstr "Aktuální měsíc"
 
 #: popup_trexpr.php:520
 msgid "Current time is < N"
@@ -3374,11 +3374,11 @@ msgstr "Aktuální hodnota"
 
 #: include/views/reports.toptriggers.php:43
 msgid "Current week"
-msgstr ""
+msgstr "Aktuální týden"
 
 #: include/views/reports.toptriggers.php:49
 msgid "Current year"
-msgstr ""
+msgstr "Aktuální rok"
 
 #: include/views/configuration.action.edit.php:137
 #: include/views/configuration.host.discovery.edit.php:284
@@ -3434,7 +3434,7 @@ msgstr "D"
 #: include/classes/import/validators/C10XmlValidator.php:344
 msgctxt "XML date format"
 msgid "DD.MM.YY"
-msgstr ""
+msgstr "DD.MM.YY"
 
 #: include/views/configuration.host.discovery.edit.php:140
 #: include/views/configuration.item.edit.php:149
@@ -3464,7 +3464,7 @@ msgstr "DNS"
 
 #: include/views/configuration.host.list.php:38
 msgid "DNS like"
-msgstr ""
+msgstr "DNS jako"
 
 #: app/views/administration.proxy.edit.php:36
 #: include/views/configuration.host.edit.php:129
@@ -3488,7 +3488,7 @@ msgstr "Denně"
 
 #: include/classes/core/ZBase.php:266
 msgid "Dark"
-msgstr ""
+msgstr "Tmavý"
 
 #: app/controllers/CControllerDashboardView.php:66
 #: app/views/monitoring.dashboard.view.php:25 include/menu.inc.php:34
@@ -3843,7 +3843,7 @@ msgstr "Smazat servisní okno?"
 
 #: app/views/administration.mediatype.edit.php:133
 msgid "Delete media type?"
-msgstr ""
+msgstr "Zmazat typ média?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
@@ -4034,7 +4034,7 @@ msgstr "Smazat spouštěč?"
 
 #: include/views/configuration.httpconf.edit.php:264
 msgid "Delete web scenario?"
-msgstr ""
+msgstr "Smazat web scénář?"
 
 #: auditlogs.php:127
 msgid "Deleted"
@@ -4177,7 +4177,7 @@ msgstr "Poznámka aktualizována"
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:527
 msgid "Detailed host information. Returns string"
-msgstr ""
+msgstr "Detailní informace o hostovi. Vrátí řetězec"
 
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1208
 #: include/blocks.inc.php:472 include/func.inc.php:1705
@@ -4190,7 +4190,7 @@ msgstr "Detaily"
 
 #: httpdetails.php:27 httpdetails.php:110
 msgid "Details of web scenario"
-msgstr ""
+msgstr "Detaily web scénáře"
 
 #: include/actions.inc.php:102
 msgid "Device"
@@ -4199,7 +4199,7 @@ msgstr "Zařízení"
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:451
 msgid "Device interrupts. Returns integer"
-msgstr ""
+msgstr "Přerušení zařízení. Vráti celé číslo"
 
 #: discoveryconf.php:40 include/views/configuration.discovery.edit.php:77
 msgid "Device uniqueness criteria"
@@ -4516,7 +4516,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:543
 msgid "Disk write statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr ""
+msgstr "Zapisovaní statistiky disku. Vráti celé číslo pro položky v sektorech, operacích, bytech nebo desetinné číslo pro položky v sps, ops, bsp"
 
 #: adm.triggerdisplayoptions.php:43
 #: include/views/administration.general.triggerDisplayOptions.edit.php:65
@@ -4565,7 +4565,7 @@ msgstr "Nedostupné"
 
 #: include/classes/setup/CSetupWizard.php:386
 msgid "Download the configuration file"
-msgstr ""
+msgstr "Stáhnout konfigurační soubor"
 
 #: app/views/monitoring.discovery.view.php:46
 #: app/views/monitoring.discovery.view.php:171
@@ -4595,7 +4595,7 @@ msgstr "Zapamatovat označený výběr \"%1$s\"."
 #: include/classes/api/services/CItemPrototype.php:316
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
-msgstr ""
+msgstr "Duplicita \"name\" hodnoty \"%1$s\" pro prototyp aplikace v prototypu položky \"%2$s\"."
 
 #: include/classes/api/services/CTrigger.php:1479
 #, c-format
@@ -4605,7 +4605,7 @@ msgstr "Kopírovat závislosti ve spouštěči \"%1$s\"."
 #: include/classes/api/services/CTriggerPrototype.php:1249
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Duplicita závislosti v prototypu spouštěče \"%1$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:197
 #, c-format
@@ -4684,7 +4684,7 @@ msgstr "Editovat spouštěč"
 
 #: include/views/hostmacros.php:46
 msgid "Effective value"
-msgstr ""
+msgstr "Efektivní hodnota"
 
 #: include/views/configuration.sysmap.edit.php:155
 msgid "Element"
