@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-08-27 11:29+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -338,13 +338,13 @@ msgstr "Actie toegevoegd"
 msgid "Action deleted"
 msgstr "Actie verwijderd"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1687,7 +1687,7 @@ msgstr "Kan de scripts niet verwijderen. Het script \"%1$s\" wordt gebruikt in e
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Kan scripts niet verwijderen. Scripts met scriptid \"%1$s\" bestaat niet."
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "Kan de geslecteerde acties niet verwijderen"
 
@@ -1777,7 +1777,7 @@ msgstr "Kan waarde relaties niet verwijderen"
 msgid "Cannot delete web scenario"
 msgstr "Kan web scenario niet verwijderen"
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1859,7 +1859,7 @@ msgstr "Kan artikel wachtrij niet weergeven."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Kan niet meer dan één item weergeven met type \"Graph sum\"."
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -10645,7 +10645,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -12465,7 +12465,7 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr ""
 

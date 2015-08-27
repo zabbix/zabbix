@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-08-27 11:29+0300\n"
 "PO-Revision-Date: 2015-02-13 00:45+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -342,14 +342,14 @@ msgstr "Akcia bola pridaná"
 msgid "Action deleted"
 msgstr "Akcia bola zmazaná"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Akcia vypnutá"
 msgstr[1] "Akcie vypnuté"
 msgstr[2] "Akcie vypnuté"
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Akcia povolená"
@@ -1696,7 +1696,7 @@ msgstr "Nie je možné zmazať skripty. Skript \"%1$s\" sa používa v operácii
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Nie je možné zmazať skripty. Skript so scriptid \"%1$s\" neexistuje."
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "Nie je možné zmazať označené akcie"
 
@@ -1787,7 +1787,7 @@ msgstr "Nie je možné zmazať mapu hodnôt"
 msgid "Cannot delete web scenario"
 msgstr "Nie je možné zmazať web scenár"
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Nie je možné vypnúť akciu"
@@ -1879,7 +1879,7 @@ msgstr "Nie je možné zobraziť frontu položiek."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Nie je možné zobraziť viac ako jednu položku s typom \"Súhrn grafu\"."
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Nie je možné vypnúť akciu"
@@ -10694,7 +10694,7 @@ msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na m
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operácia \"%s\" už existuje."
@@ -12515,7 +12515,7 @@ msgstr "Označ riadky s hodnotou obsahujúcou"
 msgid "Selected"
 msgstr "Označené"
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr "Označené akcie zmazané"
 

@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-08-27 11:29+0300\n"
 "PO-Revision-Date: 2014-03-24 15:26+0300\n"
 "Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: American English <>\n"
@@ -337,13 +337,13 @@ msgstr "Eylem eklendi"
 msgid "Action deleted"
 msgstr "Eylem silindi"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Eylem devre dışı"
 msgstr[1] "Eylemler devre dışı"
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Eylem etkin"
@@ -1686,7 +1686,7 @@ msgstr "Betikler silinemiyor. \"%1$s\" betiği \"%2$s\" eylem işleminde kullan�
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Betikler silinemiyor. \"%1$s\" scriptid'li betik mevcut değil."
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "Seçilen eylemler silinemiyor"
 
@@ -1776,7 +1776,7 @@ msgstr "Değer haritası silinemiyor"
 msgid "Cannot delete web scenario"
 msgstr "Web senaryosu silinemiyor"
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Eylem devre dışı bırakılamıyor"
@@ -1856,7 +1856,7 @@ msgstr "Öğe kuyruğu görüntülenemez."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "\"Graph sum\" tipinde birden fazla öğe görüntülenemez"
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Eylem etkinleştirilemiyor"
@@ -10636,7 +10636,7 @@ msgstr "Yalnızca etkin konaklara atanmış ve etkin öğelere bağımlılığı
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "\"%s\" işlemi zaten var."
@@ -12456,7 +12456,7 @@ msgstr ""
 msgid "Selected"
 msgstr "Seçilen"
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr "Seçilen eylemler silindi"
 
