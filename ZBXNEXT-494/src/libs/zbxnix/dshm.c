@@ -215,13 +215,11 @@ out:
  * Purpose: reallocates dynamic shared memory segment                         *
  *                                                                            *
  * Parameters: shm      - [IN/OUT] the dynamic shared memory data             *
- *             size     - [IN] the number of bytes to reserve                 *
+ *             size     - [IN] the new segment size                           *
  *             errmsg   - [OUT] the error message                             *
  *                                                                            *
  * Return value:                                                              *
- *    SUCCEED - either the dynamic shared memory segment has enough free      *
- *              space to store requested data, or the segment was             *
- *              successfully reallocated.                                     *
+ *    SUCCEED - the shared memory segment was successfully reallocated.       *
  *    FAIL    - otherwise. The errmsg contains error message and must be      *
  *              freed by the caller.                                          *
  *                                                                            *
@@ -232,7 +230,7 @@ out:
  ******************************************************************************/
 int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 {
-	const char	*__function_name = "zbx_dshm_reserve";
+	const char	*__function_name = "zbx_dshm_realloc";
 	key_t		shm_key;
 	int		shmid, ret = FAIL;
 	void		*addr, *addr_old = NULL;
