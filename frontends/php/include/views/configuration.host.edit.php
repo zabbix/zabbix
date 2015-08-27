@@ -683,9 +683,8 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 $macrosView = new CView('hostmacros', [
 	'macros' => $data['macros'],
 	'show_inherited_macros' => $data['show_inherited_macros'],
-	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED),
-	'title_host_macros' => 'Host macros',
-	'title_inherited_macros' => 'Inherited and host macros'
+	'is_template' => false,
+	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
