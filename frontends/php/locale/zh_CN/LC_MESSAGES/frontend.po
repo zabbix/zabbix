@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
 "PO-Revision-Date: 2013-08-16 03:47+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1475,7 +1475,7 @@ msgstr "无法删除脚本. 脚本 \"%1$s\" 用于动作操作\"%2$s\"."
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "无法删除脚本. 脚本ID为 \"%s\"的脚本不存在."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "无法删除所选的动作"
 
@@ -1994,7 +1994,7 @@ msgstr "无法更新服务"
 msgid "Cannot update slide show"
 msgstr "无法更新简报片显示"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "无法更新状态"
 
@@ -9003,7 +9003,7 @@ msgstr "仅所有数字"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "操作\"%s\"已存在."
@@ -10763,7 +10763,7 @@ msgstr "选择行含有值类似于"
 msgid "Selected"
 msgstr "选择的"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "所选的动作已删除"
 
@@ -11323,7 +11323,7 @@ msgstr "触发器状态"
 msgid "Status only"
 msgstr "只有状态"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "状态已更新"
 
