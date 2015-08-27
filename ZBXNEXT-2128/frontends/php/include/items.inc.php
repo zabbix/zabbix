@@ -1051,14 +1051,22 @@ function checkTimePeriod($period, $now) {
 	return $d1 <= $day && $day <= $d2 && $sec1 <= $sec && $sec < $sec2;
 }
 
-function getItemDelay($delay, $flexIntervals) {
-	if (!empty($delay) || zbx_empty($flexIntervals)) {
+/**
+ * Get item minimum delay.
+ *
+ * @param string $delay
+ * @param array $flexibe_intervals
+ *
+ * @return string
+ */
+function getItemDelay($delay, $flexibe_intervals) {
+	if (!empty($delay) || !$flexibe_intervals) {
 		return $delay;
 	}
 	$minDelay = SEC_PER_YEAR;
-	$flexIntervals = explode(';', $flexIntervals);
-	foreach ($flexIntervals as $flexInterval) {
-		if (sscanf($flexInterval, "%d/%29s", $flexDelay, $flexPeriod) != 2) {
+
+	foreach ($flexibe_intervals as $flexibe_interval) {
+		if (sscanf($flexibe_interval, "%d/%29s", $flexDelay, $flexPeriod) != 2) {
 			continue;
 		}
 		$minDelay = min($minDelay, $flexDelay);
@@ -1177,9 +1185,9 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
 }
 
 /**
- * Calculate nextcheck timestamp for an item
+ * Calculate nextcheck timestamp for an item using flexible intervals.
  *
- * the parameter $flexIntervals accepts data in a format:
+ * the parameter $flexible_intervals is an array if strings that are in the following format:
  *
  *           +------------[;]<----------+
  *           |                          |
@@ -1190,24 +1198,26 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  *         hh      - hours (0-24)
  *         mm      - minutes (0-59)
  *
- * @param string $seed               seed value applied to delay to spread item checks over the delay period
- * @param int $delay                 default delay, can be overridden
- * @param string $flexIntervals      flexible intervals
- * @param int $now                   current timestamp
+ * @param int $seed						seed value applied to delay to spread item checks over the delay period
+ * @param string $delay					default delay, can be overridden
+ * @param array $flexible_intervals		array of flexible intervals
+ * @param int $now						current timestamp
  *
  * @return array
  */
-function calculateItemNextCheck($seed, $delay, $flexIntervals, $now) {
-	// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
-	// if it is not possible to check the item within a year, fail
-	$arrOfFlexIntervals = explode(';', $flexIntervals);
+function calculateItemNextCheck($seed, $delay, $flexible_intervals, $now) {
+	/*
+	 * Try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
+	 * If it is not possible to check the item within a year, fail.
+	 */
+
 	$t = $now;
 	$tMax = $now + SEC_PER_YEAR;
 	$try = 0;
 
 	while ($t < $tMax) {
-		// calculate 'nextcheck' value for the current interval
-		$currentDelay = getCurrentDelay($delay, $arrOfFlexIntervals, $t);
+		// Calculate 'nextcheck' value for the current interval.
+		$currentDelay = getCurrentDelay($delay, $flexible_intervals, $t);
 
 		if ($currentDelay != 0) {
 			$nextCheck = $currentDelay * floor($t / $currentDelay) + ($seed % $currentDelay);
@@ -1227,10 +1237,12 @@ function calculateItemNextCheck($seed, $delay, $flexIntervals, $now) {
 			$nextCheck = ZBX_JAN_2038;
 		}
 
-		// 'nextcheck' < end of the current interval ?
-		// the end of the current interval is the beginning of the next interval - 1
-		if (getNextDelayInterval($arrOfFlexIntervals, $t, $nextInterval) && $nextCheck >= $nextInterval) {
-			// 'nextcheck' is beyond the current interval
+		/*
+		 * Is 'nextcheck' < end of the current interval and the end of the current interval
+		 * is the beginning of the next interval - 1.
+		 */
+		if (getNextDelayInterval($flexible_intervals, $t, $nextInterval) && $nextCheck >= $nextInterval) {
+			// 'nextcheck' is beyond the current interval.
 			$t = $nextInterval;
 			$try++;
 		}

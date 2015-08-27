@@ -2086,8 +2086,7 @@ class CItemDelayFlexParser {
 		array_pop($this->intervals);
 
 		if (!isset($this->source[$this->pos])) {
-			//$this->error = ($this->pos == 0) ? _('interval is empty') : _('unexpected end of interval');
-			$this->error = ($this->pos == 0) ? 'interval is empty' : 'unexpected end of interval';
+			$this->error = _('unexpected end of interval');
 
 			return;
 		}
@@ -2103,8 +2102,7 @@ class CItemDelayFlexParser {
 			$chunk .= ' ...';
 		}
 
-		//$this->error = _s('incorrect syntax near "%1$s"', $chunk);
-		$this->error = 'incorrect syntax near "'.$chunk.'"';
+		$this->error = _s('incorrect syntax near "%1$s"', $chunk);
 	}
 
 	/**
