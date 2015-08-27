@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 12:50+0300\n"
+"POT-Creation-Date: 2015-08-27 14:24+0300\n"
 "PO-Revision-Date: 2015-08-18 10:36+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -7534,8 +7534,8 @@ msgstr "情報"
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:439
-msgid "Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description"
-msgstr "サービスの情報。パラメータでstate、startupを指定したら整数値を返す。パラメータでdisplayname、path、userを指定したら文字列値を返す。パラメータでdescriptionを指定したらテキスト値を返す。"
+msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
+msgstr ""
 
 #: include/views/hostmacros.php:166
 msgid "Inherited and host macros"
