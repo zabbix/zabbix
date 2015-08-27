@@ -569,7 +569,9 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	{
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
+	}
 
 	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif
@@ -744,7 +746,9 @@ static int	send_buffer(const char *host, unsigned short port)
 		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	{
 		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
+	}
 
 	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
 #endif

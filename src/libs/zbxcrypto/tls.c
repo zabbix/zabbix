@@ -211,6 +211,7 @@ static void	zbx_gnutls_audit_cb(gnutls_session_t session, const char *str)
 	/* remove '\n' from the end of debug message */
 	zbx_strlcpy(msg, str, sizeof(msg));
 	zbx_rtrim(msg, "\n");
+
 	zabbix_log(LOG_LEVEL_WARNING, "GnuTLS audit: \"%s\"", msg);
 }
 #endif	/* defined(HAVE_GNUTLS) */
@@ -325,7 +326,7 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
 				BADCERT_NOT_TRUSTED, BADCRL_NOT_TRUSTED,
 				BADCRL_EXPIRED, BADCERT_MISSING, BADCERT_SKIP_VERIFY, BADCERT_OTHER,
 				BADCERT_FUTURE, BADCRL_FUTURE,
-#if POLARSSL_VERSION_NUMBER >= 0x01030B00	/* 1.3.11 */
+#if 0x01030B00 <= POLARSSL_VERSION_NUMBER	/* 1.3.11 */
 				BADCERT_KEY_USAGE, BADCERT_EXT_KEY_USAGE, BADCERT_NS_CERT_TYPE,
 #endif
 				0 };
@@ -333,7 +334,7 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
 				"self-signed or not signed by trusted CA", "CRL not signed by trusted CA",
 				"CRL expired", "certificate missing", "verification skipped", "other reason",
 				"validity starts in future", "CRL validity starts in future"
-#if POLARSSL_VERSION_NUMBER >= 0x01030B00	/* 1.3.11 */
+#if 0x01030B00 <= POLARSSL_VERSION_NUMBER	/* 1.3.11 */
 				, "actual use does not match keyUsage extension",
 				"actual use does not match extendedKeyUsage extension",
 				"actual use does not match nsCertType extension"
@@ -1323,15 +1324,15 @@ static unsigned int	zbx_psk_server_cb(SSL *ssl, const char *identity, unsigned c
  *                                                                            *
  * Function: zbx_check_psk_identity_len                                       *
  *                                                                            *
- * Purpose: check PSK identity size. Exit if the size exceeds maximum size.   *
+ * Purpose: Check PSK identity length. Exit if length exceeds the maximum.    *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_check_psk_identity_len(size_t psk_identity_len)
 {
 	if (HOST_TLS_PSK_IDENTITY_LEN < psk_identity_len)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "PSK identity size " ZBX_FS_UI64 " exceeds the maximum size " ZBX_FS_UI64
-				" bytes.", (zbx_uint64_t)psk_identity_len, (zbx_uint64_t)HOST_TLS_PSK_IDENTITY_LEN);
+		zabbix_log(LOG_LEVEL_CRIT, "PSK identity length " ZBX_FS_SIZE_T " exceeds the maximum length of %d"
+				" bytes.", (zbx_fs_size_t)psk_identity_len, HOST_TLS_PSK_IDENTITY_LEN);
 		zbx_tls_free();
 		exit(EXIT_FAILURE);
 	}
@@ -3640,10 +3641,10 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		}
 		else
 		{
-			int level;
+			int	level;
 
 			/* log "peer has closed connection" case with debug level */
-			level = GNUTLS_E_PREMATURE_TERMINATION == res ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING;
+			level = (GNUTLS_E_PREMATURE_TERMINATION == res ? LOG_LEVEL_DEBUG : LOG_LEVEL_WARNING);
 
 			if (SUCCEED == zabbix_check_log_level(level))
 			{
@@ -4044,7 +4045,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		}
 	}
 
-	/* prepare te accept with pre-shared key */
+	/* prepare to accept with pre-shared key */
 
 	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
 	{
@@ -4207,7 +4208,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		gnutls_certificate_server_set_request(s->tls_ctx, GNUTLS_CERT_REQUIRE);
 	}
 
-	/* prepare te accept with pre-shared key */
+	/* prepare to accept with pre-shared key */
 
 	if (0 != (tls_accept & ZBX_TCP_SEC_TLS_PSK))
 	{
