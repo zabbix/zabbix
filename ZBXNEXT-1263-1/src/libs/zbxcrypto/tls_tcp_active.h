@@ -42,4 +42,5 @@ size_t		DCget_psk_by_identity(const unsigned char *psk_identity, unsigned char *
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 int		zbx_check_server_issuer_subject(zbx_socket_t *sock, char **error);
 #endif
+
 #endif	/* ZABBIX_TLS_TCP_ACTIVE_H */
