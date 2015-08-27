@@ -113,6 +113,12 @@ zbx_procstat_header_t;
 /* maximum number of active procstat queries */
 #define PROCSTAT_MAX_QUERIES	1024
 
+/* the time period after which inactive queries (not accessed during this period) can be removed */
+#define PROCSTAT_MAX_INACTIVITY_PERIOD	SEC_PER_DAY
+
+/* the time interval between compressing (inactive query removal) attempts */
+#define PROCSTAT_COMPRESS_PERIOD	SEC_PER_DAY
+
 /* data sample collected every second for the process cpu utilization queries */
 typedef struct
 {
@@ -529,7 +535,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 
 		if (FAIL == zbx_dshm_realloc(&collector->procstat, size, &errmsg))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot reserve memory in process data collector: %s", errmsg);
+			zabbix_log(LOG_LEVEL_CRIT, "cannot reallocate memory in process data collector: %s", errmsg);
 			zbx_free(errmsg);
 			zbx_dshm_unlock(&collector->procstat);
 
@@ -571,6 +577,43 @@ static void	procstat_free_query_data(zbx_procstat_query_data_t *data)
 {
 	zbx_vector_uint64_destroy(&data->pids);
 	zbx_free(data);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: procstat_try_compress                                            *
+ *                                                                            *
+ * Purpose: try to compress (remove inactive queries) the procstat shared     *
+ *          memory segment once per day                                       *
+ *                                                                            *
+ * Parameters: base - [IN] the procstat shared memory segment                 *
+ *                                                                            *
+ ******************************************************************************/
+static void	procstat_try_compress(void *base)
+{
+	static int	collector_iteration = 0;
+
+	/* The iteration counter ~ the number seconds collector has been running */
+	/* because collector data gathering is done once per second.             */
+	/* This approximation is done to avoid calling time() function if there  */
+	/* are no defined queries.                                               */
+	if (0 == (++collector_iteration % PROCSTAT_COMPRESS_PERIOD))
+	{
+		zbx_procstat_header_t	*header = (zbx_procstat_header_t *)procstat_ref.addr;
+		size_t			size;
+		char			*errmsg = NULL;
+
+		size = procstat_dshm_used_size(base);
+
+		if (size < header->size && FAIL == zbx_dshm_realloc(&collector->procstat, size, &errmsg))
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot reallocate memory in process data collector: %s", errmsg);
+			zbx_free(errmsg);
+			zbx_dshm_unlock(&collector->procstat);
+
+			exit(EXIT_FAILURE);
+		}
+	}
 }
 
 /******************************************************************************
@@ -617,7 +660,7 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 			query = PROCSTAT_QUERY_NEXT(procstat_ref.addr, query))
 	{
 		/* remove unused queries, the data is still allocated until the next resize */
-		if (SEC_PER_DAY < now - query->last_accessed)
+		if (PROCSTAT_MAX_INACTIVITY_PERIOD < now - query->last_accessed)
 		{
 			*pnext_query = query->next;
 			continue;
@@ -656,6 +699,8 @@ static int	procstat_build_local_query_vector(zbx_vector_ptr_t *queries_ptr, int 
 	}
 
 out:
+	procstat_try_compress(procstat_ref.addr);
+
 	zbx_dshm_unlock(&collector->procstat);
 
 	return flags;
@@ -854,7 +899,7 @@ static void	procstat_calculate_cpu_util_for_queries(zbx_vector_ptr_t *queries,
  *                                                                            *
  ******************************************************************************/
 static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runid,
-		zbx_timespec_t snapshot_timestamp)
+		const zbx_timespec_t *snapshot_timestamp)
 {
 	zbx_procstat_query_t		*query;
 	zbx_procstat_query_data_t	*qdata;
@@ -907,7 +952,7 @@ static void	procstat_update_query_statistics(zbx_vector_ptr_t *queries, int runi
 
 		query->h_data[index].utime = qdata->utime;
 		query->h_data[index].stime = qdata->stime;
-		query->h_data[index].timestamp = snapshot_timestamp;
+		query->h_data[index].timestamp = *snapshot_timestamp;
 	}
 
 	zbx_dshm_unlock(&collector->procstat);
@@ -1126,7 +1171,7 @@ void	zbx_procstat_collect()
 
 	procstat_calculate_cpu_util_for_queries(&queries, &pids, stats);
 
-	procstat_update_query_statistics(&queries, runid, snapshot_timestamp);
+	procstat_update_query_statistics(&queries, runid, &snapshot_timestamp);
 
 	/* replace the current snapshot with the new stats */
 	zbx_free(procstat_snapshot);
