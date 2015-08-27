@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-08-27 11:29+0300\n"
 "PO-Revision-Date: 2013-12-17 21:07+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -335,13 +335,13 @@ msgstr "Action added"
 msgid "Action deleted"
 msgstr "Action deleted"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Action disabled"
 msgstr[1] "Actions disabled"
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Action enabled"
@@ -1684,7 +1684,7 @@ msgstr "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "Cannot delete selected actions"
 
@@ -1774,7 +1774,7 @@ msgstr "Cannot delete value map"
 msgid "Cannot delete web scenario"
 msgstr "Cannot delete web scenario"
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Cannot disable action"
@@ -1854,7 +1854,7 @@ msgstr "Cannot display item queue."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Cannot display more than one item with type \"Graph sum\"."
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Cannot enable action"
@@ -10634,7 +10634,7 @@ msgstr "Only triggers assigned to enabled hosts and depending on enabled items a
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operation \"%s\" already exists."
@@ -12454,7 +12454,7 @@ msgstr "Select rows with value like"
 msgid "Selected"
 msgstr "Selected"
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr "Selected actions deleted"
 
