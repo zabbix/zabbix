@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 12:13+0300\n"
-"PO-Revision-Date: 2015-08-06 03:10+0300\n"
+"POT-Creation-Date: 2015-08-27 12:50+0300\n"
+"PO-Revision-Date: 2015-08-18 10:36+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1438823401.0\n"
+"X-POOTLE-MTIME: 1439886984.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -704,7 +704,7 @@ msgstr "アプリケーションエラー。"
 
 #: include/views/configuration.item.prototype.edit.php:409
 msgid "Application prototypes"
-msgstr ""
+msgstr "アプリケーションプロトタイプ"
 
 #: applications.php:110
 msgid "Application updated"
@@ -1134,7 +1134,7 @@ msgstr "イベントの障害対応コメントを入力できません"
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
-msgstr ""
+msgstr "ディスカバリされたアプリケーション\"%1$s\"をWebシナリオに追加できません。"
 
 #: include/classes/api/services/CGraph.php:725
 #: include/classes/api/services/CGraph.php:739
@@ -1437,7 +1437,7 @@ msgstr "依存関係を削除できません"
 #: include/classes/api/services/CApplication.php:415
 #, c-format
 msgid "Cannot delete discovered application \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたアプリケーション\"%1$s\"は削除できません。"
 
 #: include/classes/api/services/CGraph.php:554
 #, c-format
@@ -2058,7 +2058,7 @@ msgstr "コマンドを送信できません。Zabbixサーバー\"%1$s\"との�
 #: include/classes/api/services/CApplication.php:302
 #, c-format
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "アプリケーション\"%2$s\"に\"%1$s\"を設定できません。"
 
 #: include/classes/api/services/CHostGroup.php:389
 #, c-format
@@ -2078,7 +2078,7 @@ msgstr "トリガー\"%2$s\"に\"%1$s\"を設定できません。"
 #: include/classes/api/services/CItemPrototype.php:306
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "アイテムプロトタイプ\"%1$s\"内のアプリケーションプロトタイプのための\"templateid\"フィールドを設定できません。"
 
 #: include/classes/api/services/CScreen.php:350
 #, c-format
@@ -2164,7 +2164,7 @@ msgstr "アクション\"%2$s\"の\"%1$s\"を更新できません。"
 #: include/classes/api/services/CApplication.php:296
 #, c-format
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "アプリケーション\"%2$s\"の\"%1$s\"を更新できません。"
 
 #: include/classes/api/services/CHostGroup.php:451
 #, c-format
@@ -2254,7 +2254,7 @@ msgstr "説明を更新できません"
 #: include/classes/api/services/CApplication.php:314
 #, c-format
 msgid "Cannot update discovered application \"%1$s\"."
-msgstr ""
+msgstr "ディスカバリされたアプリケーション\"%1$s\"を更新できません。"
 
 #: discoveryconf.php:147 host_discovery.php:291
 msgid "Cannot update discovery rule"
@@ -4493,7 +4493,7 @@ msgstr "ドロップダウンの選択を記憶する \"%1$s\""
 #: include/classes/api/services/CItemPrototype.php:316
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for application prototype in item prototype \"%2$s\"."
-msgstr ""
+msgstr "アイテムプロトタイプ\"%2$s\"内のアプリケーションプロトタイプのための\"name\"の値\"%1$s\"が重複しています。"
 
 #: include/classes/api/services/CTrigger.php:1479
 #, c-format
@@ -4632,7 +4632,7 @@ msgstr "アクションの実行条件が空白です。"
 #: include/classes/api/services/CItemPrototype.php:300
 #, c-format
 msgid "Empty application prototype name in item prototype \"%1$s\"."
-msgstr ""
+msgstr "アイテムプロトタイプ\"%1$s\"内のアプリケーションプロトタイプの名前が空白です。"
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
@@ -9079,7 +9079,7 @@ msgstr "アイテムの\"itemid\"フィールドが存在しません。"
 #: include/classes/api/services/CItemPrototype.php:294
 #, c-format
 msgid "Missing \"name\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "アイテムプロトタイプ\"%1$s\"内のアプリケーションプロトタイプのための\"name\"フィールドが存在しません。"
 
 #: include/classes/api/services/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
@@ -9345,7 +9345,7 @@ msgstr "アプリケーションの作成"
 
 #: include/views/configuration.item.prototype.edit.php:397
 msgid "New application prototype"
-msgstr ""
+msgstr "アプリケーションプロトタイプの作成"
 
 #: include/views/configuration.action.edit.php:356
 msgid "New condition"
@@ -9537,7 +9537,7 @@ msgstr "データ収集なし"
 
 #: include/classes/html/CTableInfo.php:27
 msgid "No data found."
-msgstr ""
+msgstr "データがありません。"
 
 #: popup_trexpr.php:536
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
@@ -10042,7 +10042,7 @@ msgstr "CPU数。整数値を返す。"
 
 #: include/classes/items/CHelpItems.php:879
 msgid "Number of enabled items on the host."
-msgstr ""
+msgstr "ホスト上の有効アイテム数。"
 
 #: include/blocks.inc.php:483 include/blocks.inc.php:484
 msgid "Number of hosts (enabled/disabled/templates)"
@@ -10143,7 +10143,7 @@ msgstr "Zabbixデータベース内の取得不可アイテム数。"
 
 #: include/classes/items/CHelpItems.php:883
 msgid "Number of unsupported items on the host."
-msgstr ""
+msgstr "ホスト上の取得不可アイテム数。"
 
 #: include/blocks.inc.php:510
 msgid "Number of users (online)"
@@ -11749,7 +11749,7 @@ msgstr "SMTPサーバー"
 
 #: app/views/administration.mediatype.edit.php:59
 msgid "SMTP server port"
-msgstr ""
+msgstr "SMTPサーバーポート番号"
 
 #: include/hosts.inc.php:465 include/items.inc.php:283
 msgid "SNMP"
@@ -13145,11 +13145,11 @@ msgstr "スクリーン\"%3$s\"のX - %1$s Y - %2$sにあるスクリーンの�
 #: include/views/configuration.application.list.php:97
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "アプリケーションがディスカバリされなくなったため%1$sに削除されます。(日時 %2$s at %3$s)"
 
 #: include/views/configuration.application.list.php:92
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "ディスカバリされたアプリケーションが見つかりませんでした。次のディスカバリルールの処理時に削除されます。"
 
 #: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
