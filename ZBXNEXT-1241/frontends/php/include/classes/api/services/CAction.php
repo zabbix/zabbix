@@ -1601,7 +1601,12 @@ class CAction extends CApiService {
 				}
 			}
 
-			$opmessage = $opcommand = $opgroup = $optemplate = $opinventory = [];
+			$opmessage = [];
+			$opcommand = [];
+			$opgroup = [];
+			$optemplate = [];
+			$opinventory = [];
+
 			foreach ($operations as $operationid => $operation) {
 				switch ($operation['operationtype']) {
 					case OPERATION_TYPE_MESSAGE:
@@ -1762,7 +1767,7 @@ class CAction extends CApiService {
 			}
 
 			// get OPERATION_TYPE_HOST_INVENTORY data
-			if (!empty($opinventory)) {
+			if (($opinventory) != []) {
 				if ($this->outputIsRequested('opinventory', $options['selectOperations'])) {
 					foreach ($opinventory as $operationId) {
 						$operations[$operationId]['opinventory'] = [];
