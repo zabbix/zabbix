@@ -110,11 +110,11 @@ class CControllerAcknowledgeEdit extends CController {
 
 		foreach ($events as $event) {
 			if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
-				$data['unack_problem_events_count'] ++;
-				$data['unack_events_count'] ++;
+				$data['unack_problem_events_count']++;
+				$data['unack_events_count']++;
 			}
 			elseif ($event['value'] == TRIGGER_VALUE_FALSE) {
-				$data['unack_problem_events_count'] ++;
+				$data['unack_problem_events_count']++;
 			}
 			$triggerids[$event['objectid']] = true;
 		}
