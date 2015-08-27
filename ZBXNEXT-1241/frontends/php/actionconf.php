@@ -635,6 +635,12 @@ if (hasRequest('form')) {
 					$data['new_operation']['templates'] = [];
 				}
 				break;
+
+			case OPERATION_TYPE_HOST_INVENTORY:
+				if (!array_key_exists('opinventory', $data['new_operation'])) {
+					$data['new_operation']['opinventory'] = ['inventory_mode' => HOST_INVENTORY_MANUAL];
+				}
+				break;
 		}
 	}
 
