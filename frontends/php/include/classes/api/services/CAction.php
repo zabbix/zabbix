@@ -852,12 +852,10 @@ class CAction extends CApiService {
 				case OPERATION_TYPE_HOST_DISABLE:
 					break;
 				case OPERATION_TYPE_HOST_INVENTORY:
-					if (array_key_exists('opinventory', $operation)) {
-						$opInventoryToInsert[] = [
-							'operationid' => $operationId,
-							'inventory_mode' => $operation['opinventory']['inventory_mode']
-						];
-					}
+					$opInventoryToInsert[] = [
+						'operationid' => $operationId,
+						'inventory_mode' => $operation['opinventory']['inventory_mode']
+					];
 					break;
 			}
 			if (isset($operation['opconditions'])) {
@@ -1450,6 +1448,10 @@ class CAction extends CApiService {
 					if (!array_key_exists('opinventory', $operation)
 						|| !array_key_exists('inventory_mode', $operation['opinventory'])) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('No inventory mode specified for action operation.'));
+					}
+					elseif ($operation['opinventory']['inventory_mode'] != HOST_INVENTORY_MANUAL
+						&& $operation['opinventory']['inventory_mode'] != HOST_INVENTORY_AUTOMATIC) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect inventory mode in action operation.'));
 					}
 					break;
 				default:
