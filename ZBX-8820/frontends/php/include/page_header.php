@@ -214,7 +214,6 @@ if (array_key_exists('messageOk', $_SESSION) || array_key_exists('messageError',
 }
 session_write_close();
 
-
 if (!defined('ZBX_PAGE_NO_MENU')) {
 	$pageMenu = new CView('layout.htmlpage.menu', [
 		'menu' => [
