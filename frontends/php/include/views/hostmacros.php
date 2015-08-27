@@ -163,7 +163,9 @@ $macros_form_list
 	->addRow(null,
 		(new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
 			->addValue($data['is_template'] ? _('Template macros') : _('Host macros'), 0, null, 'this.form.submit()')
-			->addValue($data['is_template'] ? _('Inherited and template macros') : _('Inherited and host macros'), 1, null, 'this.form.submit()')
+			->addValue($data['is_template'] ? _('Inherited and template macros') : _('Inherited and host macros'), 1,
+				null, 'this.form.submit()'
+			)
 			->setModern(true)
 	)
 	->addRow(null, $table);
