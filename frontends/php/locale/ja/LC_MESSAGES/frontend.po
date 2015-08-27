@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2015-08-06 03:08+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -353,12 +353,12 @@ msgstr "アクションを追加しました"
 msgid "Action deleted"
 msgstr "アクションを削除しました"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "アクションを無効にしました"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "アクションを有効にしました"
@@ -1719,7 +1719,7 @@ msgstr "スクリプトを削除できません。スクリプト\"%1$s\"は実�
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "スクリプトを削除できません。スクリプトID\"%1$s\"は存在しません。"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "選択したアクションを削除できません。"
 
@@ -1803,7 +1803,7 @@ msgstr "値のマッピングを削除できません"
 msgid "Cannot delete web scenario"
 msgstr "Webシナリオを削除できません"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "アクションを無効にできません"
@@ -1871,7 +1871,7 @@ msgstr "アイテムのキューを表示できません。"
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "グラフの合計値は2つ以上表示できません。"
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "アクションを有効にできません"
@@ -10883,7 +10883,7 @@ msgstr "有効なホストとアイテムのトリガーのみカウント"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
@@ -12719,7 +12719,7 @@ msgstr "次の値が含まれる行を表示"
 msgid "Selected"
 msgstr "選択"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "選択したアクションを削除しました"
 

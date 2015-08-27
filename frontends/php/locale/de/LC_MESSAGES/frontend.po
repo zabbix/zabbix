@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2014-09-25 15:16+0300\n"
 "Last-Translator: maxhq <jens@jebecs.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -365,13 +365,13 @@ msgstr "Aktion hinzugefügt"
 msgid "Action deleted"
 msgstr "Aktion gelöscht"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Aktion deaktiviert"
 msgstr[1] "Aktionen deaktiviert"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Aktion aktiviert"
@@ -1751,7 +1751,7 @@ msgstr "Kann Skript nicht löschen. Aktionsoperation \"%2$s\" verwendet Skript \
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Kann Skripte nicht löschen. Skript mit scriptid = \"%1$s\" existiert nicht."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Kann ausgewählte Aktionen nicht löschen"
 
@@ -1835,7 +1835,7 @@ msgstr "Kann Wertezuordnung nicht löschen"
 msgid "Cannot delete web scenario"
 msgstr "Kann Web-Szenario nicht löschen"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Kann Aktion nicht deaktivieren"
@@ -1917,7 +1917,7 @@ msgstr "Kann Datenpunktwarteschlange nicht anzeigen."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Kann nicht mehr als ein Element des Typs \"Diagrammsumme\" anzeigen."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Kann Aktion nicht aktivieren"
@@ -10999,7 +10999,7 @@ msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Datenpunkten verbunden 
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operation \"%s\" existiert bereits."
@@ -12847,7 +12847,7 @@ msgstr "Zeilen auswählen mit Wert wie"
 msgid "Selected"
 msgstr "Ausgewählte"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Ausgewählte Aktionen gelöscht"
 

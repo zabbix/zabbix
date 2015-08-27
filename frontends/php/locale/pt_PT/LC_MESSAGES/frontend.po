@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -362,13 +362,13 @@ msgstr "Acção adicionada"
 msgid "Action deleted"
 msgstr "Acção eliminada"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1739,7 +1739,7 @@ msgstr "Não foi possível eliminar scripts. Script \"%1$s\" está a ser utiliza
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Não foi possível eliminar as acções seleccionadas"
 
@@ -1823,7 +1823,7 @@ msgstr "Não foi possível eliminar mapeamento de valores"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1904,7 +1904,7 @@ msgstr ""
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -10953,7 +10953,7 @@ msgstr "Apenas são contabilizados triggers associados a hosts activos e que dep
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "A operação \"%s\" já existe."
@@ -12790,7 +12790,7 @@ msgstr "Seleccionar linhas com valor"
 msgid "Selected"
 msgstr "Seleccionado"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Acções seleccionadas eliminadas"
 

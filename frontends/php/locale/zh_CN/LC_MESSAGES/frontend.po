@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2015-03-18 03:19+0300\n"
 "Last-Translator: Wayne Wang <net_use@bzhy.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -356,12 +356,12 @@ msgstr "动作已添加"
 msgid "Action deleted"
 msgstr "动作已删除"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "动作已禁用"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "动作已启用"
@@ -1722,7 +1722,7 @@ msgstr "无法删除脚本. 脚本 \"%1$s\" 用于动作操作 \"%2$s\"."
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "无法删除脚本。由 \"%1$s\"scriptid所指定的脚本不存在"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "无法删除所选的动作"
 
@@ -1806,7 +1806,7 @@ msgstr "无法删除值对应"
 msgid "Cannot delete web scenario"
 msgstr "无法删除 web 场景"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "无法禁用动作"
@@ -1874,7 +1874,7 @@ msgstr "无法显示监控项队列."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "不可以显示超过一个 \"Graph sum\"类型的监控项目"
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "无法启用动作"
@@ -10887,7 +10887,7 @@ msgstr "只计算指派给启用的主机的和相依于启用的项目的触发
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "操作\"%s\"已存在."
@@ -12723,7 +12723,7 @@ msgstr "选择行含有值类似于"
 msgid "Selected"
 msgstr "选择的"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "所选的动作已删除"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2015-02-16 09:19+0300\n"
 "Last-Translator: dotneft <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -373,14 +373,14 @@ msgstr "Действие добавлено"
 msgid "Action deleted"
 msgstr "Действие удалено"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Действие деактивировано"
 msgstr[1] "Действий деактивировано"
 msgstr[2] "Действия деактивированы"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Действие активировано"
@@ -1755,7 +1755,7 @@ msgstr "Не удалось удалить скрипты. Скрипт \"%1$s\"
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Не удалось удалить скрипты. Скрипт с scriptid \"%1$s\" не существует."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Не удалось удалить выбранные действия"
 
@@ -1839,7 +1839,7 @@ msgstr "Не удалось удалить преобразование знач
 msgid "Cannot delete web scenario"
 msgstr "Не удалось удалить веб-сценарий"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Не удалось деактивировать действие"
@@ -1931,7 +1931,7 @@ msgstr "Не удалось отобразить очередь элементо
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Не удалось отобразить более одного элемента данных с типом \"Суммарный график\""
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Не удалось активировать действие"
@@ -11010,7 +11010,7 @@ msgstr "Подсчитываются только триггеры у узлов
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Операция \"%s\" уже существует."
@@ -12849,7 +12849,7 @@ msgstr "Выбрать строки, содержащие в описании"
 msgid "Selected"
 msgstr "Выбранные"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Выбранные действия удалены"
 

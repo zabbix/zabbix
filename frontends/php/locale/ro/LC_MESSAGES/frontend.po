@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2013-09-11 18:19+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -373,14 +373,14 @@ msgstr "Acțiune adăugată"
 msgid "Action deleted"
 msgstr "Acțiune ștearsă"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 msgstr[2] ""
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1758,7 +1758,7 @@ msgstr "Nu se pot șterge scripturile. Scriptul \"%1$s\" este folosit in acțiun
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Nu se pot șterge acțiunile selectate"
 
@@ -1842,7 +1842,7 @@ msgstr "Nu se poate șterge maparea valorii"
 msgid "Cannot delete web scenario"
 msgstr "Nu se poate șterge scenariul web"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1936,7 +1936,7 @@ msgstr ""
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Nu se poate afișa mai mult de un element de tipul \"Sum grafic\"."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -11015,7 +11015,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -12853,7 +12853,7 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr ""
 

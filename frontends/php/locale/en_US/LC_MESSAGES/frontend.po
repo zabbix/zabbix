@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2014-02-04 10:36+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -362,13 +362,13 @@ msgstr "Action added"
 msgid "Action deleted"
 msgstr "Action deleted"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1739,7 +1739,7 @@ msgstr "Cannot delete scripts. Script \"%1$s\" is used in action operation \"%2$
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Cannot delete selected actions"
 
@@ -1823,7 +1823,7 @@ msgstr "Cannot delete value map"
 msgid "Cannot delete web scenario"
 msgstr "Cannot delete web scenario"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1905,7 +1905,7 @@ msgstr "Cannot display item queue."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Cannot display more than one item with type \"Graph sum\"."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -10955,7 +10955,7 @@ msgstr "Only triggers assigned to enabled hosts and depending on enabled items a
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operation \"%s\" already exists."
@@ -12792,7 +12792,7 @@ msgstr "Select rows with value like"
 msgid "Selected"
 msgstr "Selected"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Selected actions deleted"
 

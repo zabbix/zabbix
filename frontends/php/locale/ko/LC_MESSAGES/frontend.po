@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2014-12-31 05:06+0300\n"
 "Last-Translator: Harper <er2357@naver.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -353,12 +353,12 @@ msgstr "액션을 추가하였습니다"
 msgid "Action deleted"
 msgstr "액션을 삭제하였습니다"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1722,7 +1722,7 @@ msgstr ""
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr ""
 
@@ -1806,7 +1806,7 @@ msgstr "값 매핑을 삭제할 수 없습니다"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1874,7 +1874,7 @@ msgstr ""
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -10877,7 +10877,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -12713,7 +12713,7 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr ""
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2014-02-02 00:22+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -363,13 +363,13 @@ msgstr "Eylem eklendi"
 msgid "Action deleted"
 msgstr "Eylem silindi"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1741,7 +1741,7 @@ msgstr "Betikler silinemedi. \"%1$s\"  betiği \"%2$s\" eylem işleminde kullan�
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Seçilen eylemler silinemedi."
 
@@ -1825,7 +1825,7 @@ msgstr "Değer haritası silinemedi"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1905,7 +1905,7 @@ msgstr ""
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -10940,7 +10940,7 @@ msgstr "Yalnızca etkinleştirilmiş konaklara atanmış ve etkinleştirilmiş �
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "\"%s\" işlemi zaten var."
@@ -12778,7 +12778,7 @@ msgstr ""
 msgid "Selected"
 msgstr "Seçilen"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Seçilen eylemler silindi"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2015-05-29 17:37+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -363,13 +363,13 @@ msgstr "Ação incluída"
 msgid "Action deleted"
 msgstr "Ação excluída"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Ação desativada"
 msgstr[1] "Ações desativadas"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Ação ativada"
@@ -1738,7 +1738,7 @@ msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na opera
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Falha ao excluir scripts. Não existe script com o scriptid \"%1$s\"."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Ações selecionadas não foram excluídas"
 
@@ -1822,7 +1822,7 @@ msgstr "Mapeamento não foi removido"
 msgid "Cannot delete web scenario"
 msgstr "Não foi possível excluir o cenário web"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Não foi possível desativar a ação"
@@ -1903,7 +1903,7 @@ msgstr "Não foi possível exibir a fila de item."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Não é possível exibir mais de um item com o tipo \"Soma do gráfico\"."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Não foi possível ativar a ação"
@@ -10963,7 +10963,7 @@ msgstr "Somente triggers de hosts ativados e dependentes de itens ativados são 
 msgid "Opera"
 msgstr "Ópera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "A operação \"%s\" já existe."
@@ -12802,7 +12802,7 @@ msgstr "Selecionar registros com valores como"
 msgid "Selected"
 msgstr "Selecionado"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "A ação selecionada foi excluída"
 

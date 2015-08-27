@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:05+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2015-08-11 08:36+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -373,14 +373,14 @@ msgstr "Akce byla přidána"
 msgid "Action deleted"
 msgstr "Akce byla smazána"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Akce vypnutá"
 msgstr[1] "Akce vypnuty"
 msgstr[2] "Akce vypnuty"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Akce zapnuta"
@@ -1755,7 +1755,7 @@ msgstr "Není možné smazat skripty. Skript \"%1$s\" se používá v operaci ak
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Není možné smazat skripty. Skript se scriptid \"%1$s\" neexistuje."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Není možné smazat označené akce"
 
@@ -1839,7 +1839,7 @@ msgstr "Nelze smazat mapu hodnot"
 msgid "Cannot delete web scenario"
 msgstr "Není možné smazat web scénář"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Není možné vypnout akci"
@@ -1931,7 +1931,7 @@ msgstr "Není možné zobrazit frontu položek."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Není možné zobrazit víc jak jednu položku s typem \"Souhrn grafu\"."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Není možné vypnout akci"
@@ -11009,7 +11009,7 @@ msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelů
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operace \"%s\" již existuje."
@@ -12847,7 +12847,7 @@ msgstr "Vybrat řádky s hodnotou jako"
 msgid "Selected"
 msgstr "Vybrané"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Označené akce smazané"
 
