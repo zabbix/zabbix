@@ -331,6 +331,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$macrosView = new CView('hostmacros', [
 		'macros' => $macros,
 		'show_inherited_macros' => $data['show_inherited_macros'],
+		'is_template' => false,
 		'readonly' => true
 	]);
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
