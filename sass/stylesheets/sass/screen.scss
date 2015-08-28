@@ -908,8 +908,9 @@ footer {
 		background: none;
 		box-sizing: border-box;
 		width: 100%;
-		padding-top: 2px;
-
+		padding-top: 1px;
+		//padding-top: 2px;
+		min-height: 1.8em;
 	}
 
 	.multiselect-list {
