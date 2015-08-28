@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ........S. [ZBX-9729] fixed replacement of {MACRO<1-9>} with {MACRO} where only {MACRO} is acceptable (gleb, wiper)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ........S. [ZBX-9814] fixed function prototype declaration created in ZBXNEXT-2760 (wiper)
@@ -115,6 +116,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China) and Czech translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
 ...G...... [ZBX-9258] fixed Alias for log[], logrt[] and eventlog[] (gleb)
@@ -775,6 +777,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
 .......PS. [ZBX-4284] improved handling of timeouting items on reachable hosts (wiper)
@@ -2063,6 +2066,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)

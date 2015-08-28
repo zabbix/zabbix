@@ -35,7 +35,7 @@ $fields = [
 	'httptestid' =>		[T_ZBX_INT, O_OPT, P_NZERO,	null,				null],
 	'http_item_type' =>	[T_ZBX_INT, O_OPT, null,		null,				null],
 	'name' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
-	'width' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null],
 	'ymin_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
 	'ymax_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null],
@@ -51,7 +51,9 @@ $fields = [
 	'percent_right' =>	[T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null],
 	'items' =>			[T_ZBX_STR, O_OPT, null,		null,				null]
 ];
-$isDataValid = check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 if ($httptestid = getRequest('httptestid', false)) {
 	if (!API::HttpTest()->isReadable([$_REQUEST['httptestid']])) {
@@ -121,49 +123,47 @@ else {
 /*
  * Display
  */
-if ($isDataValid) {
-	$profileIdx = getRequest('profileIdx', 'web.httptest');
-	$profileIdx2 = getRequest('httptestid', getRequest('profileIdx2'));
+$profileIdx = getRequest('profileIdx', 'web.httptest');
+$profileIdx2 = getRequest('httptestid', getRequest('profileIdx2'));
 
-	$timeline = CScreenBase::calculateTime([
-		'profileIdx' => $profileIdx,
-		'profileIdx2' => $profileIdx2,
-		'period' => getRequest('period'),
-		'stime' => getRequest('stime')
-	]);
+$timeline = CScreenBase::calculateTime([
+	'profileIdx' => $profileIdx,
+	'profileIdx2' => $profileIdx2,
+	'period' => getRequest('period'),
+	'stime' => getRequest('stime')
+]);
 
-	CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
+CProfile::update($profileIdx.'.httptestid', $profileIdx2, PROFILE_TYPE_ID);
 
-	$graph = new CLineGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
-	$graph->setHeader($name);
-	$graph->setPeriod($timeline['period']);
-	$graph->setSTime($timeline['stime']);
-	$graph->setWidth(getRequest('width', 900));
-	$graph->setHeight(getRequest('height', 200));
-	$graph->showLegend(getRequest('legend', 1));
-	$graph->showWorkPeriod(getRequest('showworkperiod', 1));
-	$graph->showTriggers(getRequest('showtriggers', 1));
-	$graph->setYMinAxisType(getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->setYMaxAxisType(getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->setYAxisMin(getRequest('yaxismin', 0.00));
-	$graph->setYAxisMax(getRequest('yaxismax', 100.00));
-	$graph->setYMinItemId(getRequest('ymin_itemid', 0));
-	$graph->setYMaxItemId(getRequest('ymax_itemid', 0));
-	$graph->setLeftPercentage(getRequest('percent_left', 0));
-	$graph->setRightPercentage(getRequest('percent_right', 0));
+$graph = new CLineGraphDraw(getRequest('graphtype', GRAPH_TYPE_NORMAL));
+$graph->setHeader($name);
+$graph->setPeriod($timeline['period']);
+$graph->setSTime($timeline['stime']);
+$graph->setWidth(getRequest('width', 900));
+$graph->setHeight(getRequest('height', 200));
+$graph->showLegend(getRequest('legend', 1));
+$graph->showWorkPeriod(getRequest('showworkperiod', 1));
+$graph->showTriggers(getRequest('showtriggers', 1));
+$graph->setYMinAxisType(getRequest('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
+$graph->setYMaxAxisType(getRequest('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
+$graph->setYAxisMin(getRequest('yaxismin', 0.00));
+$graph->setYAxisMax(getRequest('yaxismax', 100.00));
+$graph->setYMinItemId(getRequest('ymin_itemid', 0));
+$graph->setYMaxItemId(getRequest('ymax_itemid', 0));
+$graph->setLeftPercentage(getRequest('percent_left', 0));
+$graph->setRightPercentage(getRequest('percent_right', 0));
 
-	foreach ($items as $item) {
-		$graph->addItem(
-			$item['itemid'],
-			isset($item['yaxisside']) ? $item['yaxisside'] : null,
-			isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
-			isset($item['color']) ? $item['color'] : null,
-			isset($item['drawtype']) ? $item['drawtype'] : null,
-			isset($item['type']) ? $item['type'] : null
-		);
-	}
-
-	$graph->draw();
+foreach ($items as $item) {
+	$graph->addItem(
+		$item['itemid'],
+		isset($item['yaxisside']) ? $item['yaxisside'] : null,
+		isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
+		isset($item['color']) ? $item['color'] : null,
+		isset($item['drawtype']) ? $item['drawtype'] : null,
+		isset($item['type']) ? $item['type'] : null
+	);
 }
+
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
