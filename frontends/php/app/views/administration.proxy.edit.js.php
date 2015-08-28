@@ -22,6 +22,12 @@
 			url.setArgument('dns', jQuery('#dns').val());
 			url.setArgument('useip', jQuery('input[name=useip]:checked').val());
 			url.setArgument('port', jQuery('#port').val());
+			url.setArgument('tls_connect', jQuery('#tls_connect').val());
+			url.setArgument('tls_psk_identity', jQuery('#tls_psk_identity').val());
+			url.setArgument('tls_psk', jQuery('#tls_psk').val());
+			url.setArgument('tls_issuer', jQuery('#tls_issuer').val());
+			url.setArgument('tls_subject', jQuery('#tls_subject').val());
+			url.setArgument('tls_accept', getTlsAccept());
 			redirect(url.getUrl(), 'post', 'action');
 		});
 
@@ -45,20 +51,7 @@
 			jQuery('#dns').val(jQuery.trim(jQuery('#dns').val()));
 			jQuery('#port').val(jQuery.trim(jQuery('#port').val()));
 			jQuery('#description').val(jQuery.trim(jQuery('#description').val()));
-
-			var tls_accept = 0x00;
-
-			if (jQuery('#tls_in_none').is(':checked')) {
-				tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
-			}
-			if (jQuery('#tls_in_psk').is(':checked')) {
-				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
-			}
-			if (jQuery('#tls_in_cert').is(':checked')) {
-				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
-			}
-
-			jQuery('#tls_accept').val(tls_accept);
+			jQuery('#tls_accept').val(getTlsAccept());
 		});
 
 		// Refresh field visibility on document load.
@@ -133,6 +126,27 @@
 			else {
 				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', true);
 			}
+		}
+
+		/**
+		 * Get tls_accept value.
+		 *
+		 * @return int
+		 */
+		function getTlsAccept() {
+			var tls_accept = 0x00;
+
+			if (jQuery('#tls_in_none').is(':checked')) {
+				tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
+			}
+			if (jQuery('#tls_in_psk').is(':checked')) {
+				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
+			}
+			if (jQuery('#tls_in_cert').is(':checked')) {
+				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
+			}
+
+			return tls_accept;
 		}
 	});
 </script>
