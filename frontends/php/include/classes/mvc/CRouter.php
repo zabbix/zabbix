@@ -54,7 +54,9 @@ class CRouter {
 	 * @var array
 	 */
 	private $routes = [
-		// action					controller								layout					view
+		// action					controller							layout					view
+		'acknowledge.create'	=> ['CControllerAcknowledgeCreate',		null,					null],
+		'acknowledge.edit'		=> ['CControllerAcknowledgeEdit',		'layout.htmlpage',		'monitoring.acknowledge.edit'],
 		'dashboard.favourite'	=> ['CControllerDashboardFavourite',	'layout.javascript',	null],
 		'dashboard.sort'		=> ['CControllerDashboardSort',			'layout.javascript',	null],
 		'dashboard.view'		=> ['CControllerDashboardView',			'layout.htmlpage',		'monitoring.dashboard.view'],

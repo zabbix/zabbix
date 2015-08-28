@@ -104,6 +104,9 @@ define('ZBX_DB_SQLITE3',	'SQLITE3');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
 
+// maximum number of records for create() or update() API calls
+define('ZBX_DB_MAX_INSERTS', 10000);
+
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
 define('PAGE_TYPE_XML',					2);
@@ -684,6 +687,10 @@ define('EVENT_ACK_ENABLED',		'1');
 
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
+
+define('ZBX_ACKNOWLEDGE_SELECTED',	0);
+define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
+define('ZBX_ACKNOWLEDGE_ALL',		2);
 
 define('EVENT_SOURCE_TRIGGERS',				0);
 define('EVENT_SOURCE_DISCOVERY',			1);
