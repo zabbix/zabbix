@@ -2589,6 +2589,32 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Function: vmware_counters_add_new                                          *
+ *                                                                            *
+ * Purpose: creates a new performance counter object in shared memory and     *
+ *          adds to the specified vector                                      *
+ *                                                                            *
+ * Parameters: counters  - [IN/OUT] the vector the created performance        *
+ *                                  counter object should be added to         *
+ *             counterid - [IN] the performance counter id                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	vmware_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t counterid)
+{
+	zbx_vmware_perf_counter_t	*counter;
+
+	counter = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
+	counter->counterid = counterid;
+	counter->state = ZBX_VMWARE_COUNTER_NEW;
+
+	zbx_vector_ptr_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
+			__vm_mem_free_func);
+
+	zbx_vector_ptr_append(counters, counter);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: vmware_service_initialize                                        *
  *                                                                            *
  * Purpose: initializes vmware service object                                 *
@@ -2678,16 +2704,7 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 		for (i = 0; NULL != counters[i]; i++)
 		{
 			if (SUCCEED == zbx_vmware_service_get_counterid(service, counters[i], &counterid))
-			{
-				zbx_vmware_perf_counter_t	*counter;
-
-				counter = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
-				counter->counterid = counterid;
-				zbx_vector_ptr_pair_create_ext(&counter->values, __vm_mem_malloc_func,
-						__vm_mem_realloc_func, __vm_mem_free_func);
-
-				zbx_vector_ptr_append(&pentity->counters, counter);
-			}
+				vmware_counters_add_new(&pentity->counters, counterid);
 			else
 				zabbix_log(LOG_LEVEL_DEBUG, "cannot find performance counter %s", counters[i]);
 		}
@@ -3357,14 +3374,7 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 
 	if (FAIL == zbx_vector_ptr_search(&pentity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 	{
-		zbx_vmware_perf_counter_t	*counter;
-
-		counter = __vm_mem_malloc_func(NULL, sizeof(zbx_vmware_perf_counter_t));
-		counter->counterid = counterid;
-		zbx_vector_ptr_pair_create_ext(&counter->values, __vm_mem_malloc_func, __vm_mem_realloc_func,
-				__vm_mem_free_func);
-		zbx_vector_ptr_append(&pentity->counters, counter);
-
+		vmware_counters_add_new(&pentity->counters, counterid);
 		zbx_vector_ptr_sort(&pentity->counters, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		ret = SUCCEED;

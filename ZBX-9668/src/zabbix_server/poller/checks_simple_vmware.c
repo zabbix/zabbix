@@ -216,6 +216,12 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
+	if (0 == perfcounter->values.values_num)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data is not available."));
+		goto out;
+	}
+
 	for (i = 0; i < perfcounter->values.values_num; i++)
 	{
 		perfvalue = (zbx_ptr_pair_t *)&perfcounter->values.values[i];
