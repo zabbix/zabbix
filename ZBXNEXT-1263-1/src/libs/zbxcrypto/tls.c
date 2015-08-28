@@ -1019,8 +1019,8 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
 		/* special print: psk_identity is not '\0'-terminated */
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK identity: \"%.*s\"", __function_name, psk_identity_len,
-				psk_identity);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): requested PSK identity: \"%.*s\"", __function_name,
+				(int)psk_identity_len, psk_identity);
 	}
 
 	/* try PSK from configuration file first (it is already in binary form) */
@@ -1050,7 +1050,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 			{
 				/* this should have been prevented by validation in frontend or API */
 				zabbix_log(LOG_LEVEL_WARNING, "cannot convert PSK to binary form for PSK identity"
-						" \"%.*s\"", psk_identity_len, psk_identity);
+						" \"%.*s\"", (int)psk_identity_len, psk_identity);
 				return -1;
 			}
 
@@ -1062,7 +1062,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 			if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): cannot find requested PSK identity: \"%.*s\"",
-						__function_name, psk_identity_len, psk_identity);
+						__function_name, (int)psk_identity_len, psk_identity);
 			}
 		}
 	}
@@ -1075,7 +1075,7 @@ static int	zbx_psk_cb(void *par, ssl_context *tls_ctx, const unsigned char *psk_
 			return 0;
 
 		zbx_tls_error_msg(res, "", &err_msg);
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set PSK for PSK identity \"%.*s\": %s", psk_identity_len,
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set PSK for PSK identity \"%.*s\": %s", (int)psk_identity_len,
 				psk_identity, err_msg);
 		zbx_free(err_msg);
 	}
@@ -3448,7 +3448,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		{
 			/* special print: s->tls_ctx->psk_identity is not '\0'-terminated */
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK identity: \"%.*s\"", __function_name,
-					s->tls_ctx->psk_identity_len, s->tls_ctx->psk_identity);
+					(int)s->tls_ctx->psk_identity_len, s->tls_ctx->psk_identity);
 		}
 	}
 
@@ -4131,7 +4131,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		{
 			/* special print: s->tls_ctx->psk_identity is not '\0'-terminated */
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): PSK identity: \"%.*s\"", __function_name,
-					s->tls_ctx->psk_identity_len, s->tls_ctx->psk_identity);
+					(int)s->tls_ctx->psk_identity_len, s->tls_ctx->psk_identity);
 		}
 	}
 	else
