@@ -945,7 +945,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					if (fields_count == f)
 					{
 						*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-								jp_row.end - jp_row.start + 1, jp_row.start);
+								(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 						goto clean2;
 					}
 
@@ -1074,7 +1074,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				if (f == fields_count)
 				{
 					*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-							jp_row.end - jp_row.start + 1, jp_row.start);
+							(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 					goto clean;
 				}
 
@@ -1140,7 +1140,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			if (f != fields_count)
 			{
 				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-						jp_row.end - jp_row.start + 1, jp_row.start);
+						(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 				goto clean;
 			}
 		}
@@ -1171,7 +1171,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				if (f == fields_count)
 				{
 					*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-							jp_row.end - jp_row.start + 1, jp_row.start);
+							(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 					goto clean;
 				}
 
@@ -1222,7 +1222,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			if (f != fields_count)
 			{
 				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-						jp_row.end - jp_row.start + 1, jp_row.start);
+						(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 				goto clean;
 			}
 
