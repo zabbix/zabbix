@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
-"PO-Revision-Date: 2014-03-25 02:18+0300\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
+"PO-Revision-Date: 2015-08-06 03:13+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1395706736.0\n"
+"X-POOTLE-MTIME: 1438823624.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:575 api/classes/CMaintenance.php:580
@@ -1473,7 +1473,7 @@ msgstr "スクリプトを削除できません。スクリプト\"%1$s\"は実�
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "スクリプトを削除できません。スクリプトID\"%s\"は存在しません。"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "選択したアクションを削除できません。"
 
@@ -1992,7 +1992,7 @@ msgstr "サービスを更新できません"
 msgid "Cannot update slide show"
 msgstr "スライドショーを更新できません"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "ステータスを更新できません"
 
@@ -9001,7 +9001,7 @@ msgstr "整数のみ"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
@@ -10761,7 +10761,7 @@ msgstr "次の値が含まれる行を表示"
 msgid "Selected"
 msgstr "選択"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "選択したアクションを削除しました"
 
@@ -11321,7 +11321,7 @@ msgstr "トリガーのステータス"
 msgid "Status only"
 msgstr "ステータスのみ"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "ステータスを更新しました"
 
@@ -11553,7 +11553,7 @@ msgstr "テンプレートを追加しました"
 
 #: api/classes/CHostGeneral.php:770
 msgid "Template cannot be linked to another template more than once even through other templates."
-msgstr "テンプレートは複数のテンプレートとリンクすることはできません(他のテンプレート経由でも不可)。"
+msgstr "他のテンプレートを介しても同じテンプレートを複数回リンクすることはできません。"
 
 #: templates.php:353 templates.php:371 templates.php:396
 msgid "Template deleted"

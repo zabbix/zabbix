@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
 "PO-Revision-Date: 2014-06-08 10:44+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1494,7 +1494,7 @@ msgstr "Не вдалося видалити скрипт. Скрипт \"%1$s\"
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Не вдалося видалити скрипт. Скрипт з scriptid \"%s\" не існує."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "Не вдалося видалити вибрані дії"
 
@@ -2019,7 +2019,7 @@ msgstr "Не вдалося оновити послугу"
 msgid "Cannot update slide show"
 msgstr "Не вдалося оновити слайд-шоу"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Не вдалося оновити статус"
 
@@ -9043,7 +9043,7 @@ msgstr "Тільки цілі числа"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "Операція \"%s\" вже існує."
@@ -10806,7 +10806,7 @@ msgstr "Відібрати рядки, які В ЗНАЧЕННІ містять
 msgid "Selected"
 msgstr "Відібрані"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "Вибрані дії видалено"
 
@@ -11366,7 +11366,7 @@ msgstr "Стан тригерів"
 msgid "Status only"
 msgstr "Тільки статус"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Статус оновлено"
 

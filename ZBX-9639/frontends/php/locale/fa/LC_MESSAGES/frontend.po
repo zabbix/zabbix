@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
 "PO-Revision-Date: 2014-04-07 06:17+0300\n"
 "Last-Translator: Starless boi <mohammadsharifi666@gmail.com>\n"
 "Language-Team: none\n"
@@ -1472,7 +1472,7 @@ msgstr "اسکریپت ها نمی توانند حذف شوند.اسکریپت \
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "اسکریپت ها نمی توانند حذف شوند.اسکریپت با شناسه اسکریپت  \"%s\" وجود ندارد."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "فعالیت های انتخاب شده نمی‌توانند حذف شوند"
 
@@ -1991,7 +1991,7 @@ msgstr "سرویس نمی‌تواند بروز شود"
 msgid "Cannot update slide show"
 msgstr "نمایش اسلاید نمی‌تواند بروز شود"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "وضعیت نمیتواند بروز شود"
 
@@ -8990,7 +8990,7 @@ msgstr "فقط کل عددها"
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -10750,7 +10750,7 @@ msgstr "انتخاب سطرها با مقادیر مانند"
 msgid "Selected"
 msgstr "انتخاب شده"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr ""
 
@@ -11310,7 +11310,7 @@ msgstr "وضعیت هشدار ها"
 msgid "Status only"
 msgstr "فقط وضعیت"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr ""
 
