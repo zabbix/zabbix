@@ -252,7 +252,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 	}
 
-	// Convert array "delay_flex" to string glued with ";" which is later validated through API.
+	/*
+	 * Intially validate "delay_flex" field one by one to make sure it does not have interval separator ";".
+	 * Skip empty fields and convert "delay_flex" array to string glued with ";" which is later validated through API.
+	 */
 	$delay_flex = '';
 	$intervals = [];
 
