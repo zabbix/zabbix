@@ -34,6 +34,7 @@
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
+#include "alias.h"
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
@@ -329,7 +330,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		else
 			mtime = atoi(tmp);
 
-		add_check(name, key_orig, delay, lastlogsize, mtime);
+		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime);
 	}
 
 	zbx_regexp_clean_expressions(&regexps);

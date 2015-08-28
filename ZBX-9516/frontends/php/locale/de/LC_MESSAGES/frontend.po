@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:15+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2014-09-25 15:16+0300\n"
 "Last-Translator: maxhq <jens@jebecs.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -365,13 +365,13 @@ msgstr "Aktion hinzugefügt"
 msgid "Action deleted"
 msgstr "Aktion gelöscht"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Aktion deaktiviert"
 msgstr[1] "Aktionen deaktiviert"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Aktion aktiviert"
@@ -1751,7 +1751,7 @@ msgstr "Kann Skript nicht löschen. Aktionsoperation \"%2$s\" verwendet Skript \
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Kann Skripte nicht löschen. Skript mit scriptid = \"%1$s\" existiert nicht."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Kann ausgewählte Aktionen nicht löschen"
 
@@ -1835,7 +1835,7 @@ msgstr "Kann Wertezuordnung nicht löschen"
 msgid "Cannot delete web scenario"
 msgstr "Kann Web-Szenario nicht löschen"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Kann Aktion nicht deaktivieren"
@@ -1917,7 +1917,7 @@ msgstr "Kann Datenpunktwarteschlange nicht anzeigen."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Kann nicht mehr als ein Element des Typs \"Diagrammsumme\" anzeigen."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Kann Aktion nicht aktivieren"
@@ -2026,7 +2026,7 @@ msgstr "Kann Host \"%1$s\" nicht finden, der in Karte \"%2$s\" verwendet wird."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Kann Host \"%1$s\" nicht finden, der in Tafel \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:877
+#: include/classes/import/CConfigurationImport.php:879
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2050,42 +2050,42 @@ msgstr "Kann Symbol \"%1$s\" nicht finden, das in Karte \"%2$s\" verwendet wird.
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Symbolzuordnung \"%1$s\" nicht finden, die in Karte \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:1153
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1053
+#: include/classes/import/CConfigurationImport.php:1055
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1033
+#: include/classes/import/CConfigurationImport.php:1035
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1172
+#: include/classes/import/CConfigurationImport.php:1174
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1073
+#: include/classes/import/CConfigurationImport.php:1075
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1228
+#: include/classes/import/CConfigurationImport.php:1230
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1002
+#: include/classes/import/CConfigurationImport.php:1004
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
@@ -2122,7 +2122,7 @@ msgstr "Kann keine Objekte finden namens"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Kann Tafel \"%1$s\" nicht finden, die in Tafel \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:900
+#: include/classes/import/CConfigurationImport.php:902
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2135,12 +2135,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Kann Auslöser \"%1$s\" nicht finden, der in Karte \"%2$s\" verwendet wird."
 
-#: include/classes/import/CConfigurationImport.php:686
+#: include/classes/import/CConfigurationImport.php:688
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:844
+#: include/classes/import/CConfigurationImport.php:846
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -8188,7 +8188,7 @@ msgstr "Datenpunkt \"%1$s\" existiert nicht in Vorlage \"%2$s\"."
 msgid "Item \"%1$s\" does not exist."
 msgstr "Datenpunkt \"%1$s\" existiert nicht."
 
-#: include/classes/import/CConfigurationImport.php:669
+#: include/classes/import/CConfigurationImport.php:671
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Datenpunkt \"%1$s\" auf \"%2$s\": Kategorie \"%3$s\" existiert nicht."
@@ -10999,7 +10999,7 @@ msgstr "Nur Auslöser, die mit aktiven Hosts und aktiven Datenpunkten verbunden 
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operation \"%s\" existiert bereits."
@@ -12847,7 +12847,7 @@ msgstr "Zeilen auswählen mit Wert wie"
 msgid "Selected"
 msgstr "Ausgewählte"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Ausgewählte Aktionen gelöscht"
 
@@ -14147,8 +14147,8 @@ msgstr "Auslöser"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Auslöser \"%1$s\" existiert bereits für \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1244
-#: include/classes/import/CConfigurationImport.php:1288
+#: include/classes/import/CConfigurationImport.php:1246
+#: include/classes/import/CConfigurationImport.php:1290
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Auslöser \"%1$s\" hängt ab von Auslöser \"%2$s\", welcher nicht existiert."

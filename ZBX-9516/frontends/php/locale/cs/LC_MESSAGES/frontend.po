@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:15+0300\n"
-"PO-Revision-Date: 2015-07-22 11:20+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
+"PO-Revision-Date: 2015-08-11 08:36+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1437556822.0\n"
+"X-POOTLE-MTIME: 1439275003.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -373,14 +373,14 @@ msgstr "Akce byla přidána"
 msgid "Action deleted"
 msgstr "Akce byla smazána"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Akce vypnutá"
 msgstr[1] "Akce vypnuty"
 msgstr[2] "Akce vypnuty"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Akce zapnuta"
@@ -617,7 +617,7 @@ msgstr "Jméno Agent host je definované v konfiguračím souboru. Hodnota retě
 #: include/views/configuration.host.prototype.edit.php:107
 #: include/views/inventory.host.view.php:103
 msgid "Agent interfaces"
-msgstr "Agentova rozhraní"
+msgstr "Agent rozhraní"
 
 #: hosts.php:59
 msgid "Agent or SNMP or JMX or IPMI interface"
@@ -1755,7 +1755,7 @@ msgstr "Není možné smazat skripty. Skript \"%1$s\" se používá v operaci ak
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Není možné smazat skripty. Skript se scriptid \"%1$s\" neexistuje."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Není možné smazat označené akce"
 
@@ -1839,7 +1839,7 @@ msgstr "Nelze smazat mapu hodnot"
 msgid "Cannot delete web scenario"
 msgstr "Není možné smazat web scénář"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Není možné vypnout akci"
@@ -1931,7 +1931,7 @@ msgstr "Není možné zobrazit frontu položek."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Není možné zobrazit víc jak jednu položku s typem \"Souhrn grafu\"."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Není možné vypnout akci"
@@ -2051,7 +2051,7 @@ msgstr "Host \"%1$s\" použitý v mapě \"%2$s\" nebyl nalezený."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Host \"%1$s\" použitý v obrazovce \"%2$s\" nebyl nalezený."
 
-#: include/classes/import/CConfigurationImport.php:877
+#: include/classes/import/CConfigurationImport.php:879
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nelze najít skupinu \"%1$s\" pro prototyp hosta \"%2$s\" zjišťovacího pravidla \"%3$s\" na\"%4$s\"."
@@ -2075,42 +2075,42 @@ msgstr "Nelze najít ikonu \"%1$s\" použitou v mapě \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Mapa ikon \"%1$s\" použitá v mapě \"%2$s\" nebyla nalezena."
 
-#: include/classes/import/CConfigurationImport.php:1153
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako maximální hodnota Y ose grafu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1053
+#: include/classes/import/CConfigurationImport.php:1055
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako maximální hodnota Y ose prototypu grafu \"%3$s\" objevovacího pravidla \"%4$s\" na \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako minimální hodnota Y ose grafu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1033
+#: include/classes/import/CConfigurationImport.php:1035
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nejde nalézt položku \"%1$s\" na \"%2$s\" použitou jako minimální hodnota Y ose prototypu grafu \"%3$s\" objevovacího pravidla \"%4$s\" na \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1172
+#: include/classes/import/CConfigurationImport.php:1174
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Nemůžu najít položku \"%1$s\" na \"%2$s\" použitou v grafu \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1073
+#: include/classes/import/CConfigurationImport.php:1075
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nemohu nalézt položku \"%1$s\" na \"%2$s\" použitou v prototypu grafu \"%3$s\" objevovacího pravidla \"%4$s\" na \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1228
+#: include/classes/import/CConfigurationImport.php:1230
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
 msgstr "Nemohu nalézt položku \"%1$s\" na \"%2$s\" použitou ve spouštěči \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1002
+#: include/classes/import/CConfigurationImport.php:1004
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Nemohu nalézt položku \"%1$s\" na \"%2$s\" použitou v prototypu spouštěče \"%3$s\" objevovacího pravidla \"%4$s\" na \"%5$s\"."
@@ -2147,7 +2147,7 @@ msgstr "Nelze nalézt objekt s jménem"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Obrazovka \"%1$s\" použitá v obrazovce \"%2$s\" nebyla nalezena."
 
-#: include/classes/import/CConfigurationImport.php:900
+#: include/classes/import/CConfigurationImport.php:902
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nelze nalézt šablonu \"%1$s\" pro prototyp hosta \"%2$s\" objevovacího pravidla \"%3$s\" na \"%4$s\"."
@@ -2160,12 +2160,12 @@ msgstr "Nelze nalézt šablonu \"%1$s\" pro prototyp hosta \"%2$s\" objevovacíh
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Spouštěč \"%1$s\" použitý v mapě \"%2$s\" nebyl nalezený."
 
-#: include/classes/import/CConfigurationImport.php:686
+#: include/classes/import/CConfigurationImport.php:688
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Nelze nalézt mapu hodnot \"%1$s\" použitou pro položku \"%2$s\" na \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:844
+#: include/classes/import/CConfigurationImport.php:846
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nelze nalézt mapu hodnot \"%1$s\" použitou pro prototyp položky \"%2$s\" objevovacího pravidla \"%3$s\" na \"%4$s\"."
@@ -7459,7 +7459,7 @@ msgstr "Neplatný obrázkový index."
 #: include/classes/api/services/CScreen.php:365
 #: include/classes/api/services/CTemplateScreen.php:544
 msgid "Incorrect input parameters."
-msgstr "Neplatný parametr DNS pro rozhraní \"%s\"."
+msgstr "Neplatné vstupní parametry."
 
 #: include/classes/api/services/CHostInterface.php:595
 #, c-format
@@ -8197,7 +8197,7 @@ msgstr "Položka \"%1$s\" neexistuje v šabloně \"%2$s\"."
 msgid "Item \"%1$s\" does not exist."
 msgstr "Položka \"%1$s\" neexistuje."
 
-#: include/classes/import/CConfigurationImport.php:669
+#: include/classes/import/CConfigurationImport.php:671
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Položka \"%1$s\" na \"%2$s\": aplikaci \"%3$s\" neexistuje."
@@ -11009,7 +11009,7 @@ msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelů
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operace \"%s\" již existuje."
@@ -12847,7 +12847,7 @@ msgstr "Vybrat řádky s hodnotou jako"
 msgid "Selected"
 msgstr "Vybrané"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Označené akce smazané"
 
@@ -13609,7 +13609,7 @@ msgstr "Čt"
 #: jsLoader.php:126
 msgctxt "Tuesday short"
 msgid "T"
-msgstr "\"%1$s.%2$s\" metoda musí být volaná bez \"auth\" parametru."
+msgstr "Út"
 
 #: include/discovery.inc.php:64
 #: include/views/js/configuration.discovery.edit.js.php:174
@@ -14140,8 +14140,8 @@ msgstr "Spouštěč"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "Spouštěč \"%1$s\" již existuje na \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1244
-#: include/classes/import/CConfigurationImport.php:1288
+#: include/classes/import/CConfigurationImport.php:1246
+#: include/classes/import/CConfigurationImport.php:1290
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "Spouštěč \"%1$s\" závisí na jiném spouštěči \"%2$s\", který neexistuje."

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:15+0300\n"
+"POT-Creation-Date: 2015-08-27 11:56+0300\n"
 "PO-Revision-Date: 2015-05-29 17:37+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -363,13 +363,13 @@ msgstr "Ação incluída"
 msgid "Action deleted"
 msgstr "Ação excluída"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Ação desativada"
 msgstr[1] "Ações desativadas"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Ação ativada"
@@ -1738,7 +1738,7 @@ msgstr "Não foi possível excluir os scripts. Script \"%1$s\" é usado na opera
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Falha ao excluir scripts. Não existe script com o scriptid \"%1$s\"."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Ações selecionadas não foram excluídas"
 
@@ -1822,7 +1822,7 @@ msgstr "Mapeamento não foi removido"
 msgid "Cannot delete web scenario"
 msgstr "Não foi possível excluir o cenário web"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Não foi possível desativar a ação"
@@ -1903,7 +1903,7 @@ msgstr "Não foi possível exibir a fila de item."
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Não é possível exibir mais de um item com o tipo \"Soma do gráfico\"."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Não foi possível ativar a ação"
@@ -2011,7 +2011,7 @@ msgstr "Não foi encontrado o host \"%1$s\" usado no mapa \"%2$s\"."
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Não foi encontrado o host \"%1$s\" usado na tela \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:877
+#: include/classes/import/CConfigurationImport.php:879
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o grupo de host \"%1$s\" para o protótipo de host \"%2$s\" da autobusca \"%3$s\" em \"%4$s\"."
@@ -2035,42 +2035,42 @@ msgstr "Não foi possível encontrar o ícone \"%1$s\" usado no mapa \"%2$s\"."
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr "Não foi possível encontrar o mapeamento de ícones \"%1$s\" usado no mapa \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1153
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr "Não foi possível localizar o item \"%1$s\" em \"%2$s\" utilizado como limite MÁXIMO para o eixo Y no gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1053
+#: include/classes/import/CConfigurationImport.php:1055
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÁXIMO para o eixo Y no protótipo de gráfico \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÁXIMO para o eixo Y do gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1033
+#: include/classes/import/CConfigurationImport.php:1035
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\" utilizado como MÍNIMO para o eixo Y no protótipo de gráfico \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1172
+#: include/classes/import/CConfigurationImport.php:1174
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo gráfico \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1073
+#: include/classes/import/CConfigurationImport.php:1075
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo protótipo de gráfico \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1228
+#: include/classes/import/CConfigurationImport.php:1230
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pela trigger \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1002
+#: include/classes/import/CConfigurationImport.php:1004
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr "Não foi possível encontrar o item \"%1$s\" em \"%2$s\". Ele é utilizado pelo protótipo de trigger \"%3$s\" da autobusca \"%4$s\" em \"%5$s\"."
@@ -2107,7 +2107,7 @@ msgstr "Não foi possível localizar objetos com nome"
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr "Não foi encontrada a tela \"%1$s\" usada na tela \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:900
+#: include/classes/import/CConfigurationImport.php:902
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o template \"%1$s\" para o protótipo de host \"%2$s\" da autobusca \"%3$s\" em \"%4$s\"."
@@ -2120,12 +2120,12 @@ msgstr "Não foi possível localizar o template \"%1$s\" para o protótipo de ho
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr "Não foi possível localizar a trigger \"%1$s\" que é utilizada no mapa \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:686
+#: include/classes/import/CConfigurationImport.php:688
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr "Não foi possível localizar o mapeamento de valores \"%1$s\" utilizado para o item \"%2$s\" em \"%3$s\"."
 
-#: include/classes/import/CConfigurationImport.php:844
+#: include/classes/import/CConfigurationImport.php:846
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Não foi possível localizar o mapeamento de valores \"%1$s\" utilizado para o protótipo de item \"%2$s\" da autobusca \"%3$s\" em \"%4$s\"."
@@ -8151,7 +8151,7 @@ msgstr "O item \"%1$s\" não existe no template \"%2$s\"."
 msgid "Item \"%1$s\" does not exist."
 msgstr "O item \"%1$s\" não existe."
 
-#: include/classes/import/CConfigurationImport.php:669
+#: include/classes/import/CConfigurationImport.php:671
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Item \"%1$s\" em \"%2$s\": a aplicação \"%3$s\" não existe."
@@ -10963,7 +10963,7 @@ msgstr "Somente triggers de hosts ativados e dependentes de itens ativados são 
 msgid "Opera"
 msgstr "Ópera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "A operação \"%s\" já existe."
@@ -12802,7 +12802,7 @@ msgstr "Selecionar registros com valores como"
 msgid "Selected"
 msgstr "Selecionado"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "A ação selecionada foi excluída"
 
@@ -14093,8 +14093,8 @@ msgstr "Trigger"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr "A trigger \"%1$s\" já existe em \"%2$s\"."
 
-#: include/classes/import/CConfigurationImport.php:1244
-#: include/classes/import/CConfigurationImport.php:1288
+#: include/classes/import/CConfigurationImport.php:1246
+#: include/classes/import/CConfigurationImport.php:1290
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr "A trigger \"%1$s\" depende da trigger \"%2$s\", que não existe."
