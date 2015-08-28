@@ -73,47 +73,20 @@ lbl_err:
 	return res;
 }
 
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+int	old_proc_num_walk(char *procName, char *userName, DWORD access, AGENT_RESULT *result)
 {
 	HANDLE	hProcessSnap, hProcess;
 	PROCESSENTRY32	pe32;
-	DWORD		access;
-	const OSVERSIONINFOEX	*vi;
 	int	proccount,
 		proc_ok;
-	char	*procName,
-		*userName,
-		baseName[MAX_PATH],
+	char	baseName[MAX_PATH],
 		uname[MAX_NAME];
-
-	if (2 < request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	procName = get_rparam(request, 0);
-	userName = get_rparam(request, 1);
 
 	if (INVALID_HANDLE_VALUE == (hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}
-
-	if (NULL == (vi = zbx_win_getversion()))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (6 > vi->dwMajorVersion)
-	{
-		/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
-		access = PROCESS_QUERY_INFORMATION;
-	}
-	else
-		access = PROCESS_QUERY_LIMITED_INFORMATION;
 
 	pe32.dwSize = sizeof(PROCESSENTRY32);
 
@@ -162,6 +135,46 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
+}
+
+int	new_proc_num_walk(char *procName, char *userName, AGENT_RESULT *result)
+{
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "Congratulations, you are the lucky Windows Server 2012 user! That's all I can tell now."));
+
+	return SYSINFO_RET_FAIL;
+}
+
+int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
+{
+	const OSVERSIONINFOEX	*vi;
+	char	*procName,
+		*userName;
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	procName = get_rparam(request, 0);
+	userName = get_rparam(request, 1);
+
+	if (NULL == (vi = zbx_win_getversion()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (6 > vi->dwMajorVersion)
+	{
+		/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
+		return old_proc_num_walk(procName, userName, PROCESS_QUERY_INFORMATION, result));
+	}
+
+	if (2 > vi->dwMinorVersion)
+		return old_proc_num_walk(procName, userName, PROCESS_QUERY_LIMITED_INFORMATION, result);
+
+	return new_proc_num_walk(procName, userName, result);
 }
 
 /************ PROC INFO ****************/
