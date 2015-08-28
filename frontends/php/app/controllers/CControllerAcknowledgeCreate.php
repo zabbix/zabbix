@@ -81,26 +81,41 @@ class CControllerAcknowledgeCreate extends CController {
 				$filter['value'] = TRIGGER_VALUE_TRUE;
 			}
 
-			$events = API::Event()->get([
-				'output' => [],
-				'source' => EVENT_SOURCE_TRIGGERS,
-				'object' => EVENT_OBJECT_TRIGGER,
-				'objectids' => $triggerids,
-				'filter' => $filter,
-				'preservekeys' => true
-			]);
+			while (true) {
+				$events = API::Event()->get([
+					'output' => [],
+					'source' => EVENT_SOURCE_TRIGGERS,
+					'object' => EVENT_OBJECT_TRIGGER,
+					'objectids' => $triggerids,
+					'filter' => $filter,
+					'preservekeys' => true,
+					'limit' => ZBX_DB_MAX_INSERTS
+				]);
 
-			foreach ($eventids as $eventid) {
-				$events[$eventid] = true;
+				if ($events) {
+					foreach ($eventids as $i => $eventid) {
+						if (array_key_exists($eventid, $events)) {
+							unset($eventids[$i]);
+						}
+					}
+
+					$result = API::Event()->acknowledge([
+						'eventids' => array_keys($events),
+						'message' => $this->getInput('message', '')
+					]);
+				}
+				else {
+					break;
+				}
 			}
-
-			$eventids = array_keys($events);
 		}
 
-		$result = API::Event()->acknowledge([
-			'eventids' => $eventids,
-			'message' => $this->getInput('message', '')
-		]);
+		if ($eventids) {
+			$result = API::Event()->acknowledge([
+				'eventids' => $eventids,
+				'message' => $this->getInput('message', '')
+			]);
+		}
 
 		if ($result) {
 			$response = new CControllerResponseRedirect($this->getInput('backurl', 'tr_status.php'));
