@@ -2271,7 +2271,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
-	int			N_functionid, indexed_macro = 0, ret, res = SUCCEED;
+	int			N_functionid, indexed_macro, ret, res = SUCCEED;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
@@ -2305,6 +2305,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 		ret = SUCCEED;
 		N_functionid = 1;
+		indexed_macro = 0;
 
 		if ('1' <= *(br - 2) && *(br - 2) <= '9')
 		{
