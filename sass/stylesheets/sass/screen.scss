@@ -132,7 +132,7 @@ h4 {
 	line-height: $h4-line-height;
 
 	span {
-		font-size: $font-body-size;
+		//font-size: $font-body-size;
 		color: $font-alt-color;
 	}
 }
@@ -2640,6 +2640,25 @@ $form-icon-btn: (
 			border: none;
 			border-bottom: 1px solid $table-border-color;
 		}
+	}
+
+	.dashbrd-widget {
+		margin: 0;
+		border: none;
+	}
+
+	.dashbrd-widget-head {
+		font-weight: normal;
+		text-align: left;
+		padding: 8px;
+	}
+
+	.dashbrd-widget-foot {
+		margin: 0;
+	}
+
+	.nothing-to-show {
+		text-align: center !important;
 	}
 }
 
