@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9729] fixed replacement of {MACRO<1-9>} with {MACRO} where only {MACRO} is acceptable (gleb, wiper)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ........S. [ZBX-9814] fixed function prototype declaration created in ZBXNEXT-2760 (wiper)
 ...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
