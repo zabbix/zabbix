@@ -410,7 +410,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 	zbx_socket_clean(s);
 
-	zbx_snprintf(service, sizeof(service), "%d", port);
+	zbx_snprintf(service, sizeof(service), "%hu", port);
 	memset(&hints, 0x00, sizeof(struct addrinfo));
 	hints.ai_family = PF_UNSPEC;
 	hints.ai_socktype = type;
@@ -423,7 +423,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 	if (ZBX_SOCKET_ERROR == (s->socket = socket(ai->ai_family, ai->ai_socktype | SOCK_CLOEXEC, ai->ai_protocol)))
 	{
-		zbx_set_socket_strerror("cannot create socket [[%s]:%d]: %s",
+		zbx_set_socket_strerror("cannot create socket [[%s]:%hu]: %s",
 				ip, port, strerror_from_system(zbx_socket_last_error()));
 		goto out;
 	}
@@ -459,7 +459,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	if (SUCCEED != zbx_socket_connect(s, ai->ai_addr, ai->ai_addrlen, timeout, &error))
 	{
 		func_socket_close(s);
-		zbx_set_socket_strerror("cannot connect to [[%s]:%d]: %s", ip, port, error);
+		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
 		zbx_free(error);
 		goto out;
 	}
@@ -469,7 +469,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 			SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
 	{
 		zbx_tcp_close(s);
-		zbx_set_socket_strerror("TCP connection successful, cannot establish TLS to [[%s]:%d]: %s",
+		zbx_set_socket_strerror("TCP connection successful, cannot establish TLS to [[%s]:%hu]: %s",
 				ip, port, error);
 		zbx_free(error);
 		goto out;
@@ -526,7 +526,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 
 	if (ZBX_SOCKET_ERROR == (s->socket = socket(AF_INET, type | SOCK_CLOEXEC, 0)))
 	{
-		zbx_set_socket_strerror("cannot create socket [[%s]:%d]: %s",
+		zbx_set_socket_strerror("cannot create socket [[%s]:%hu]: %s",
 				ip, port, strerror_from_system(zbx_socket_last_error()));
 		return FAIL;
 	}
@@ -557,7 +557,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	if (SUCCEED != zbx_socket_connect(s, (struct sockaddr *)&servaddr_in, sizeof(servaddr_in), timeout, &error))
 	{
 		func_socket_close(s);
-		zbx_set_socket_strerror("cannot connect to [[%s]:%d]: %s", ip, port, error);
+		zbx_set_socket_strerror("cannot connect to [[%s]:%hu]: %s", ip, port, error);
 		zbx_free(error);
 		return FAIL;
 	}
@@ -567,7 +567,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 			SUCCEED != zbx_tls_connect(s, &error, tls_connect, tls_arg1, tls_arg2))
 	{
 		zbx_tcp_close(s);
-		zbx_set_socket_strerror("TCP connection successful, cannot establish TLS to [[%s]:%d]: %s",
+		zbx_set_socket_strerror("TCP connection successful, cannot establish TLS to [[%s]:%hu]: %s",
 				ip, port, error);
 		zbx_free(error);
 		return FAIL;
