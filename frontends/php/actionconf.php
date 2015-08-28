@@ -333,9 +333,10 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			OPERATION_TYPE_HOST_ADD => 0,
 			OPERATION_TYPE_HOST_REMOVE => 0,
 			OPERATION_TYPE_HOST_ENABLE => 0,
-			OPERATION_TYPE_HOST_DISABLE => 0
+			OPERATION_TYPE_HOST_DISABLE => 0,
+			OPERATION_TYPE_HOST_INVENTORY => 0
 		];
-		if (isset($uniqOperations[$new_operation['operationtype']])) {
+		if (array_key_exists($new_operation['operationtype'], $uniqOperations)) {
 			$uniqOperations[$new_operation['operationtype']]++;
 			foreach ($_REQUEST['operations'] as $operationId => $operation) {
 				if (array_key_exists($operation['operationtype'], $uniqOperations)
@@ -632,6 +633,12 @@ if (hasRequest('form')) {
 				}
 				else {
 					$data['new_operation']['templates'] = [];
+				}
+				break;
+
+			case OPERATION_TYPE_HOST_INVENTORY:
+				if (!array_key_exists('opinventory', $data['new_operation'])) {
+					$data['new_operation']['opinventory'] = ['inventory_mode' => HOST_INVENTORY_MANUAL];
 				}
 				break;
 		}
