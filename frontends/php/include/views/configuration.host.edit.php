@@ -683,6 +683,7 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 $macrosView = new CView('hostmacros', [
 	'macros' => $data['macros'],
 	'show_inherited_macros' => $data['show_inherited_macros'],
+	'is_template' => false,
 	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
