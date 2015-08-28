@@ -34,7 +34,7 @@ $fields = array(
 	'httptestid' =>		array(T_ZBX_INT, O_OPT, P_NZERO,	null,				null),
 	'http_item_type' =>	array(T_ZBX_INT, O_OPT, null,		null,				null),
 	'name' =>			array(T_ZBX_STR, O_OPT, null,		null,				null),
-	'width' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null),
+	'width' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(20, 65535),	null),
 	'height' =>			array(T_ZBX_INT, O_OPT, null,		BETWEEN(0, 65535),	null),
 	'ymin_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
 	'ymax_type' =>		array(T_ZBX_INT, O_OPT, null,		IN('0,1,2'),		null),
@@ -50,7 +50,9 @@ $fields = array(
 	'percent_right' =>	array(T_ZBX_DBL, O_OPT, null,		BETWEEN(0, 100),	null),
 	'items' =>			array(T_ZBX_STR, O_OPT, null,		null,				null)
 );
-$isDataValid = check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 if ($httptestid = get_request('httptestid', false)) {
 	$color = array(
@@ -114,40 +116,38 @@ else {
 /*
  * Display
  */
-if ($isDataValid) {
-	$graph = new CChart(get_request('graphtype', GRAPH_TYPE_NORMAL));
-	$graph->setHeader($name);
+$graph = new CChart(get_request('graphtype', GRAPH_TYPE_NORMAL));
+$graph->setHeader($name);
 
-	navigation_bar_calc();
+navigation_bar_calc();
 
-	$graph->setPeriod($_REQUEST['period']);
-	$graph->setSTime($_REQUEST['stime']);
-	$graph->setWidth(get_request('width', 900));
-	$graph->setHeight(get_request('height', 200));
-	$graph->showLegend(get_request('legend', 1));
-	$graph->showWorkPeriod(get_request('showworkperiod', 1));
-	$graph->showTriggers(get_request('showtriggers', 1));
-	$graph->setYMinAxisType(get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->setYMaxAxisType(get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
-	$graph->setYAxisMin(get_request('yaxismin', 0.00));
-	$graph->setYAxisMax(get_request('yaxismax', 100.00));
-	$graph->setYMinItemId(get_request('ymin_itemid', 0));
-	$graph->setYMaxItemId(get_request('ymax_itemid', 0));
-	$graph->setLeftPercentage(get_request('percent_left', 0));
-	$graph->setRightPercentage(get_request('percent_right', 0));
+$graph->setPeriod($_REQUEST['period']);
+$graph->setSTime($_REQUEST['stime']);
+$graph->setWidth(get_request('width', 900));
+$graph->setHeight(get_request('height', 200));
+$graph->showLegend(get_request('legend', 1));
+$graph->showWorkPeriod(get_request('showworkperiod', 1));
+$graph->showTriggers(get_request('showtriggers', 1));
+$graph->setYMinAxisType(get_request('ymin_type', GRAPH_YAXIS_TYPE_CALCULATED));
+$graph->setYMaxAxisType(get_request('ymax_type', GRAPH_YAXIS_TYPE_CALCULATED));
+$graph->setYAxisMin(get_request('yaxismin', 0.00));
+$graph->setYAxisMax(get_request('yaxismax', 100.00));
+$graph->setYMinItemId(get_request('ymin_itemid', 0));
+$graph->setYMaxItemId(get_request('ymax_itemid', 0));
+$graph->setLeftPercentage(get_request('percent_left', 0));
+$graph->setRightPercentage(get_request('percent_right', 0));
 
-	foreach ($items as $inum => $item) {
-		$graph->addItem(
-			$item['itemid'],
-			isset($item['yaxisside']) ? $item['yaxisside'] : null,
-			isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
-			isset($item['color']) ? $item['color'] : null,
-			isset($item['drawtype']) ? $item['drawtype'] : null,
-			isset($item['type']) ? $item['type'] : null
-		);
-		unset($items[$inum]);
-	}
-	$graph->draw();
+foreach ($items as $inum => $item) {
+	$graph->addItem(
+		$item['itemid'],
+		isset($item['yaxisside']) ? $item['yaxisside'] : null,
+		isset($item['calc_fnc']) ? $item['calc_fnc'] : null,
+		isset($item['color']) ? $item['color'] : null,
+		isset($item['drawtype']) ? $item['drawtype'] : null,
+		isset($item['type']) ? $item['type'] : null
+	);
+	unset($items[$inum]);
 }
+$graph->draw();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
