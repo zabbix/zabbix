@@ -256,6 +256,8 @@ elseif (hasRequest('action') && getRequest('action') == 'hostprototype.massdelet
 	show_messages($result, _('Host prototypes deleted'), _('Cannot delete host prototypes'));
 }
 
+$config = select_config();
+
 /*
  * Display
  */
@@ -270,7 +272,7 @@ if (isset($_REQUEST['form'])) {
 			'status' => getRequest('status', HOST_STATUS_MONITORED),
 			'templates' => [],
 			'inventory' => [
-				'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED)
+				'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode'])
 			],
 			'groupPrototypes' => getRequest('group_prototypes', [])
 		],
@@ -361,8 +363,6 @@ else {
 
 	CProfile::update('web.'.$page['file'].'.sort', $sortField, PROFILE_TYPE_STR);
 	CProfile::update('web.'.$page['file'].'.sortorder', $sortOrder, PROFILE_TYPE_STR);
-
-	$config = select_config();
 
 	$data = [
 		'form' => getRequest('form'),
