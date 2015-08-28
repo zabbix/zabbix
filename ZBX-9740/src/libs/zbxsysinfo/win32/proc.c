@@ -168,7 +168,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (6 > vi->dwMajorVersion)
 	{
 		/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
-		return old_proc_num_walk(procName, userName, PROCESS_QUERY_INFORMATION, result));
+		return old_proc_num_walk(procName, userName, PROCESS_QUERY_INFORMATION, result);
 	}
 
 	if (2 > vi->dwMinorVersion)
