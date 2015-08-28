@@ -913,7 +913,7 @@ if (!empty($this->data['new_operation'])) {
 			break;
 
 		case OPERATION_TYPE_HOST_INVENTORY:
-			$newOperationsTable->addRow([_('Type'),
+			$newOperationsTable->addRow([_('Inventory mode'),
 				(new CRadioButtonList('new_operation[opinventory][inventory_mode]',
 					(int) $data['new_operation']['opinventory']['inventory_mode']
 				))
