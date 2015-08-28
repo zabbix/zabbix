@@ -791,9 +791,6 @@ else {
 							CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
 						);
 
-					// acknowledge
-					$ack = getEventAckState($event, $page['file']);
-
 					// add colors and blinking to span depending on configuration and trigger parameters
 					$statusSpan = new CSpan(trigger_value2str($event['value']));
 
@@ -822,7 +819,7 @@ else {
 						$statusSpan,
 						getSeverityCell($trigger['priority'], $config, null, !$event['value']),
 						$event['duration'],
-						$config['event_ack_enable'] ? $ack : null,
+						$config['event_ack_enable'] ? getEventAckState($event, $page['file']) : null,
 						$action
 					]);
 				}
