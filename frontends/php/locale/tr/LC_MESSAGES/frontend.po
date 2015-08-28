@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-18 10:23+0300\n"
+"POT-Creation-Date: 2015-08-27 14:24+0300\n"
 "PO-Revision-Date: 2015-05-08 10:29+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix translation team\n"
@@ -235,7 +235,7 @@ msgstr "Hesap %s saniye için bloklandı"
 
 #: events.php:455 include/actions.inc.php:186 include/actions.inc.php:374
 #: include/blocks.inc.php:671 include/blocks.inc.php:821
-#: include/events.inc.php:201 include/events.inc.php:274
+#: include/events.inc.php:198 include/events.inc.php:271
 #: include/views/configuration.action.edit.php:1051 tr_status.php:278
 msgid "Ack"
 msgstr "Onay"
@@ -260,7 +260,7 @@ msgstr "Onayla ve dön"
 msgid "Acknowledge status"
 msgstr "Onay durumu"
 
-#: include/events.inc.php:184
+#: include/events.inc.php:183
 msgid "Acknowledged"
 msgstr "Onaylandı"
 
@@ -352,13 +352,13 @@ msgstr "Eylem eklendi"
 msgid "Action deleted"
 msgstr "Eylem silindi"
 
-#: actionconf.php:412
+#: actionconf.php:415
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:411
+#: actionconf.php:414
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -378,7 +378,7 @@ msgid "Action updated"
 msgstr "Eylem güncellendi"
 
 #: events.php:456 include/blocks.inc.php:672 include/blocks.inc.php:822
-#: include/events.inc.php:202 include/menu.inc.php:203
+#: include/events.inc.php:199 include/menu.inc.php:203
 #: include/views/configuration.action.edit.php:24
 #: include/views/configuration.action.list.php:22
 msgid "Actions"
@@ -557,8 +557,8 @@ msgid "Advanced labels"
 msgstr "Gelişmiş etiket"
 
 #: include/blocks.inc.php:669 include/blocks.inc.php:819
-#: include/events.inc.php:200 include/events.inc.php:274
-#: include/events.inc.php:277 tr_status.php:276
+#: include/events.inc.php:197 include/events.inc.php:271
+#: include/events.inc.php:274 tr_status.php:276
 msgid "Age"
 msgstr "Süre"
 
@@ -627,7 +627,7 @@ msgstr "Simgeleri hizala"
 #: include/views/configuration.hostgroups.edit.php:44
 #: include/views/configuration.sysmap.edit.php:139
 #: include/views/monitoring.dashconf.php:52
-#: include/views/monitoring.dashconf.php:105 jsLoader.php:92
+#: include/views/monitoring.dashconf.php:111 jsLoader.php:92
 msgid "All"
 msgstr "Bütün"
 
@@ -684,7 +684,7 @@ msgid "Any character string included"
 msgstr "Herhangi karakter dizgisini içeren"
 
 #: applications.php:126 httpconf.php:42 include/actions.inc.php:88
-#: include/audit.inc.php:32 include/forms.inc.php:558
+#: include/audit.inc.php:32 include/forms.inc.php:559
 #: include/views/configuration.application.edit.php:36
 #: include/views/configuration.application.list.php:50
 #: include/views/configuration.httpconf.edit.php:62
@@ -729,7 +729,7 @@ msgstr "Uygulama güncellendi"
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr ""
 
-#: include/forms.inc.php:886 include/html.inc.php:387
+#: include/forms.inc.php:887 include/html.inc.php:387
 #: include/views/configuration.application.edit.php:23
 #: include/views/configuration.application.list.php:29
 #: include/views/configuration.host.edit.php:324
@@ -761,7 +761,7 @@ msgstr ""
 msgid "Apr"
 msgstr "Nis"
 
-#: include/forms.inc.php:1754 include/func.inc.php:120
+#: include/forms.inc.php:1755 include/func.inc.php:120
 #: include/func.inc.php:257 jsLoader.php:113
 msgid "April"
 msgstr "Nisan"
@@ -825,7 +825,7 @@ msgid_plural "At %1$s:%2$s on every %3$s days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/forms.inc.php:1836
+#: include/forms.inc.php:1837
 msgid "At (hour:minute)"
 msgstr ""
 
@@ -872,7 +872,7 @@ msgstr ""
 msgid "Aug"
 msgstr "Ağu"
 
-#: include/forms.inc.php:1746 include/func.inc.php:124
+#: include/forms.inc.php:1747 include/func.inc.php:124
 #: include/func.inc.php:261 jsLoader.php:117
 msgid "August"
 msgstr "Ağustos"
@@ -1599,7 +1599,7 @@ msgstr "Betikler silinemedi. \"%1$s\"  betiği \"%2$s\" eylem işleminde kullan�
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:430
+#: actionconf.php:433
 msgid "Cannot delete selected actions"
 msgstr "Seçilen eylemler silinemedi."
 
@@ -1683,7 +1683,7 @@ msgstr "Değer haritası silinemedi"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:415
+#: actionconf.php:418
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1764,7 +1764,7 @@ msgstr ""
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:414
+#: actionconf.php:417
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2508,7 +2508,7 @@ msgstr ""
 msgid "Change password"
 msgstr "Parolayı değiştir"
 
-#: include/forms.inc.php:427 include/items.inc.php:125
+#: include/forms.inc.php:428 include/items.inc.php:125
 #: include/triggers.inc.php:2056 include/views/configuration.item.edit.php:217
 #: include/views/configuration.item.massupdate.php:217
 #: include/views/configuration.item.prototype.edit.php:215
@@ -3426,7 +3426,7 @@ msgstr "DNS ismi"
 msgid "DOWN"
 msgstr "AŞAĞI"
 
-#: include/forms.inc.php:1697 include/maintenances.inc.php:33 report3.php:63
+#: include/forms.inc.php:1698 include/maintenances.inc.php:33 report3.php:63
 #: report4.php:102
 msgid "Daily"
 msgstr "Günlük"
@@ -3481,7 +3481,7 @@ msgstr "Verilere genel bakış"
 msgid "Data storage period (in days)"
 msgstr ""
 
-#: include/forms.inc.php:458 include/views/configuration.item.edit.php:232
+#: include/forms.inc.php:459 include/views/configuration.item.edit.php:232
 #: include/views/configuration.item.massupdate.php:226
 #: include/views/configuration.item.prototype.edit.php:230
 msgid "Data type"
@@ -3532,7 +3532,7 @@ msgstr "Veritabanı tipi"
 msgid "Database user"
 msgstr "Veritabanı kullanıcısı"
 
-#: include/forms.inc.php:1770 include/forms.inc.php:1832
+#: include/forms.inc.php:1771 include/forms.inc.php:1833
 msgid "Date"
 msgstr "Tarih"
 
@@ -3552,11 +3552,11 @@ msgstr "HW'nin bakım zamanının bittiği tarih"
 msgid "Date HW purchased"
 msgstr "HW'nin alındığı tarih"
 
-#: include/forms.inc.php:1772 report3.php:125 report4.php:158
+#: include/forms.inc.php:1773 report3.php:125 report4.php:158
 msgid "Day"
 msgstr "Gün"
 
-#: include/forms.inc.php:1802
+#: include/forms.inc.php:1803
 msgid "Day of month"
 msgstr "Ayın günü"
 
@@ -3576,8 +3576,8 @@ msgstr ""
 msgid "Day of month is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1732 include/forms.inc.php:1773
-#: include/forms.inc.php:1798
+#: include/forms.inc.php:1733 include/forms.inc.php:1774
+#: include/forms.inc.php:1799
 msgid "Day of week"
 msgstr "Haftanın günü"
 
@@ -3597,7 +3597,7 @@ msgstr ""
 msgid "Day of week is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1854
+#: include/forms.inc.php:1855
 msgid "Days"
 msgstr "Günler"
 
@@ -3619,7 +3619,7 @@ msgstr "Hata ayıklama modu güncellendi"
 msgid "Dec"
 msgstr "Ara"
 
-#: include/forms.inc.php:1766 include/func.inc.php:128
+#: include/forms.inc.php:1767 include/func.inc.php:128
 #: include/func.inc.php:265 jsLoader.php:121
 msgid "December"
 msgstr "Aralık"
@@ -4105,11 +4105,11 @@ msgstr "Dağıtım durumu"
 #: include/views/configuration.trigger.prototype.edit.php:241
 #: include/views/configuration.triggers.edit.php:246
 #: include/views/inventory.host.view.php:241
-#: include/views/monitoring.triggerComment.php:39 tr_status.php:281
+#: include/views/monitoring.triggerComment.php:38 tr_status.php:281
 msgid "Description"
 msgstr "Açıklama"
 
-#: include/views/monitoring.triggerComment.php:43
+#: include/views/monitoring.triggerComment.php:42
 #, c-format
 msgid "Description for \"%s\"."
 msgstr ""
@@ -4124,7 +4124,7 @@ msgid "Detailed host information. Returns string"
 msgstr ""
 
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1208
-#: include/blocks.inc.php:473 include/func.inc.php:1705
+#: include/blocks.inc.php:472 include/func.inc.php:1705
 #: include/views/administration.auditlogs.list.php:66
 #: include/views/configuration.action.edit.php:395
 #: include/views/configuration.action.edit.php:399
@@ -4374,7 +4374,7 @@ msgstr "Keşif objesi"
 #: app/views/monitoring.discovery.view.php:26
 #: app/views/monitoring.widget.discovery.view.php:46
 #: include/actions.inc.php:68 include/audit.inc.php:43
-#: include/forms.inc.php:1099
+#: include/forms.inc.php:1100
 #: include/views/configuration.discovery.edit.php:95
 msgid "Discovery rule"
 msgstr "Keşif kuralı"
@@ -4584,8 +4584,8 @@ msgstr "Çift kopya \"%s\" önem derecesi ismi"
 msgid "Duplicate user alias \"%s\"."
 msgstr "Çift kopya \"%s\"  kullanıcı rumuzu"
 
-#: events.php:454 include/events.inc.php:199 include/events.inc.php:274
-#: include/events.inc.php:277 tr_status.php:277
+#: events.php:454 include/events.inc.php:196 include/events.inc.php:271
+#: include/events.inc.php:274 tr_status.php:277
 msgid "Duration"
 msgstr "Süre"
 
@@ -4616,7 +4616,7 @@ msgstr "Her URL tekil bir isme sahip olmalıdır. Lütfen URL'in yalnızca bir i
 #: include/views/js/configuration.discovery.edit.js.php:7
 #: include/views/js/configuration.sysmaps.js.php:430
 #: include/views/js/configuration.sysmaps.js.php:440
-#: include/views/monitoring.triggerComment.php:54 jsLoader.php:186
+#: include/views/monitoring.triggerComment.php:53 jsLoader.php:186
 msgid "Edit"
 msgstr "Düzenle"
 
@@ -4982,7 +4982,7 @@ msgstr "Olay onaylandı"
 msgid "Event acknowledges \"%1$s\"."
 msgstr ""
 
-#: include/views/monitoring.dashconf.php:111
+#: include/views/monitoring.dashconf.php:117
 msgid "Event acknowledging disabled"
 msgstr "Olay onaylaması etkisizleştirilmiş"
 
@@ -5025,11 +5025,11 @@ msgstr "Olaylar"
 msgid "Events and alerts"
 msgstr ""
 
-#: include/forms.inc.php:1709
+#: include/forms.inc.php:1710
 msgid "Every day(s)"
 msgstr "Her gün"
 
-#: include/forms.inc.php:1719
+#: include/forms.inc.php:1720
 msgid "Every week(s)"
 msgstr "Her hafta"
 
@@ -5121,8 +5121,8 @@ msgstr "CSV'e aktar"
 msgid "Expression"
 msgstr "İfade"
 
-#: include/forms.inc.php:1524 include/forms.inc.php:1529
-#: include/forms.inc.php:1537
+#: include/forms.inc.php:1525 include/forms.inc.php:1530
+#: include/forms.inc.php:1538
 msgid "Expression Syntax Error."
 msgstr ""
 
@@ -5222,7 +5222,7 @@ msgstr "favoriler"
 msgid "Feb"
 msgstr "Şub"
 
-#: include/forms.inc.php:1744 include/func.inc.php:118
+#: include/forms.inc.php:1745 include/func.inc.php:118
 #: include/func.inc.php:255 jsLoader.php:111
 msgid "February"
 msgstr "Şubat"
@@ -5309,7 +5309,7 @@ msgstr "Dolu bölge"
 
 #: include/classes/html/CFilter.php:85 include/classes/html/CFilter.php:94
 #: include/classes/html/CFilter.php:144
-#: include/views/monitoring.dashconf.php:117
+#: include/views/monitoring.dashconf.php:123
 msgid "Filter"
 msgstr "Filtre"
 
@@ -5366,7 +5366,7 @@ msgstr "Bitir"
 msgid "Finnish (fi_FI)"
 msgstr ""
 
-#: include/forms.inc.php:1781 include/func.inc.php:1513
+#: include/forms.inc.php:1782 include/func.inc.php:1513
 #: include/maintenances.inc.php:111
 msgid "First"
 msgstr "İlk"
@@ -5400,7 +5400,7 @@ msgstr "Misafir için parola boş olmak zorunda"
 msgid "Formula"
 msgstr "Formül"
 
-#: include/forms.inc.php:1784 include/maintenances.inc.php:114
+#: include/forms.inc.php:1785 include/maintenances.inc.php:114
 msgid "Fourth"
 msgstr "Dördüncü"
 
@@ -5412,7 +5412,7 @@ msgstr ""
 msgid "Fri"
 msgstr "Cum"
 
-#: include/forms.inc.php:1729 include/forms.inc.php:1795
+#: include/forms.inc.php:1730 include/forms.inc.php:1796
 #: include/func.inc.php:140 include/func.inc.php:230
 msgid "Friday"
 msgstr "Cuma"
@@ -5714,9 +5714,9 @@ msgstr "Izgara"
 
 #: events.php:306 hostinventoriesoverview.php:88 httpmon.php:79
 #: include/classes/html/CHostsInfo.php:104
-#: include/classes/screens/CScreenHostgroupTriggers.php:66
-#: include/classes/screens/CScreenHostgroupTriggers.php:125
-#: include/classes/screens/CScreenHostTriggers.php:126
+#: include/classes/screens/CScreenHostgroupTriggers.php:67
+#: include/classes/screens/CScreenHostgroupTriggers.php:126
+#: include/classes/screens/CScreenHostTriggers.php:127
 #: include/classes/screens/CScreenTriggersInfo.php:34
 #: include/screens.inc.php:348
 #: include/views/configuration.application.list.php:33
@@ -5828,11 +5828,11 @@ msgstr "H.i"
 msgid "H:i:s"
 msgstr "H:i:s"
 
-#: include/classes/screens/CScreenHostgroupTriggers.php:132
+#: include/classes/screens/CScreenHostgroupTriggers.php:133
 msgid "HOST GROUP ISSUES"
 msgstr ""
 
-#: include/classes/screens/CScreenHostTriggers.php:131
+#: include/classes/screens/CScreenHostTriggers.php:132
 msgid "HOST ISSUES"
 msgstr ""
 
@@ -5925,7 +5925,7 @@ msgstr ""
 msgid "High"
 msgstr "Yüksek"
 
-#: history.php:27 include/forms.inc.php:921
+#: history.php:27 include/forms.inc.php:922
 #: include/views/administration.general.housekeeper.edit.php:98
 #: include/views/configuration.item.list.php:61
 #: include/views/configuration.item.prototype.list.php:46 items.php:162
@@ -5933,7 +5933,7 @@ msgstr "Yüksek"
 msgid "History"
 msgstr "Geçmiş"
 
-#: include/forms.inc.php:573
+#: include/forms.inc.php:574
 msgid "History (in days)"
 msgstr ""
 
@@ -5978,18 +5978,18 @@ msgstr "Yatay"
 msgid "Horizontal align"
 msgstr "Yatay hizalama"
 
-#: app/views/monitoring.widget.hosts.view.php:237
-#: app/views/monitoring.widget.hosts.view.php:295 events.php:307
+#: app/views/monitoring.widget.hosts.view.php:241
+#: app/views/monitoring.widget.hosts.view.php:299 events.php:307
 #: events.php:450 events.php:550 httpconf.php:183 httpconf.php:330
 #: httpconf.php:388 httpconf.php:439 httpmon.php:80 httpmon.php:88
 #: include/actions.inc.php:64 include/audit.inc.php:27
 #: include/blocks.inc.php:656 include/blocks.inc.php:666
 #: include/blocks.inc.php:817 include/classes/api/services/CHttpTest.php:417
 #: include/classes/screens/CScreenEvents.php:40
-#: include/classes/screens/CScreenHostgroupTriggers.php:126
-#: include/classes/screens/CScreenHostTriggers.php:67
-#: include/classes/screens/CScreenHostTriggers.php:127
-#: include/classes/setup/CSetupWizard.php:281 include/forms.inc.php:536
+#: include/classes/screens/CScreenHostgroupTriggers.php:127
+#: include/classes/screens/CScreenHostTriggers.php:68
+#: include/classes/screens/CScreenHostTriggers.php:128
+#: include/classes/setup/CSetupWizard.php:281 include/forms.inc.php:537
 #: include/maps.inc.php:24 include/triggers.inc.php:1115
 #: include/triggers.inc.php:1457
 #: include/views/configuration.application.list.php:34
@@ -6082,7 +6082,7 @@ msgstr[1] ""
 #: app/views/monitoring.widget.hosts.view.php:24
 #: app/views/monitoring.widget.web.view.php:46 include/actions.inc.php:60
 #: include/audit.inc.php:35 include/blocks.inc.php:287
-#: include/forms.inc.php:499 include/maps.inc.php:25
+#: include/forms.inc.php:500 include/maps.inc.php:25
 #: include/views/configuration.hostgroups.edit.php:67
 #: include/views/js/configuration.action.edit.js.php:68
 #: include/views/js/configuration.action.edit.js.php:139
@@ -6276,7 +6276,7 @@ msgstr "Konak yöndendiricisi"
 msgid "Host screens"
 msgstr "Konak ekranları"
 
-#: app/views/monitoring.widget.hosts.view.php:365
+#: app/views/monitoring.widget.hosts.view.php:369
 msgid "Host status"
 msgstr "Konak Durumu"
 
@@ -6319,7 +6319,7 @@ msgstr "\"%s\" görünen ismi ile konak zaten var."
 
 #: app/views/administration.proxy.edit.php:79
 #: app/views/administration.proxy.list.php:49 include/forms.inc.php:212
-#: include/forms.inc.php:881 include/items.inc.php:718
+#: include/forms.inc.php:882 include/items.inc.php:718
 #: include/menu.inc.php:115 include/menu.inc.php:180
 #: include/views/configuration.copy.elements.php:47
 #: include/views/configuration.graph.list.php:71
@@ -6370,7 +6370,7 @@ msgstr "Konakların konumu"
 msgid "Hosts updated"
 msgstr "Konaklar güncellendi"
 
-#: include/forms.inc.php:1856
+#: include/forms.inc.php:1857
 msgid "Hours"
 msgstr "Saat"
 
@@ -7202,7 +7202,7 @@ msgstr ""
 msgid "Incorrect key."
 msgstr "Geçersiz anahtar."
 
-#: include/forms.inc.php:1305
+#: include/forms.inc.php:1306
 msgid "Incorrect list of items."
 msgstr "Geçersiz öğelerin listesi."
 
@@ -7585,7 +7585,7 @@ msgstr "Bilgi"
 
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:439
-msgid "Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description"
+msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
 msgstr ""
 
 #: include/views/hostmacros.php:166
@@ -7685,7 +7685,7 @@ msgstr ""
 msgid "Internet Explorer"
 msgstr ""
 
-#: include/forms.inc.php:931
+#: include/forms.inc.php:932
 #: include/views/configuration.host.discovery.edit.php:200
 #: include/views/configuration.host.discovery.list.php:47
 #: include/views/configuration.item.edit.php:275
@@ -7877,7 +7877,7 @@ msgid "Italian (it_IT)"
 msgstr ""
 
 #: include/audit.inc.php:36 include/classes/screens/CScreenHistory.php:146
-#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1102
+#: include/classes/screens/CScreenPlainText.php:42 include/forms.inc.php:1103
 #: include/views/configuration.graph.edit.php:118
 #: include/views/configuration.graph.edit.php:179
 #: include/views/configuration.screen.constructor.edit.php:230
@@ -7959,7 +7959,7 @@ msgstr ""
 msgid "Item not selected"
 msgstr ""
 
-#: include/forms.inc.php:1102
+#: include/forms.inc.php:1103
 #: include/views/configuration.screen.constructor.edit.php:277
 msgid "Item prototype"
 msgstr "Öğe ptototipi"
@@ -8151,7 +8151,7 @@ msgstr "Jabber tanımlayıcısı"
 msgid "Jan"
 msgstr "Oca"
 
-#: include/forms.inc.php:1739 include/func.inc.php:117
+#: include/forms.inc.php:1740 include/func.inc.php:117
 #: include/func.inc.php:254 jsLoader.php:110
 msgid "January"
 msgstr "Ocak"
@@ -8164,7 +8164,7 @@ msgstr ""
 msgid "Jul"
 msgstr "Tem"
 
-#: include/forms.inc.php:1741 include/func.inc.php:123
+#: include/forms.inc.php:1742 include/func.inc.php:123
 #: include/func.inc.php:260 jsLoader.php:116
 msgid "July"
 msgstr "Temmuz"
@@ -8173,7 +8173,7 @@ msgstr "Temmuz"
 msgid "Jun"
 msgstr "Haz"
 
-#: include/forms.inc.php:1764 include/func.inc.php:122
+#: include/forms.inc.php:1765 include/func.inc.php:122
 #: include/func.inc.php:259 jsLoader.php:115
 msgid "June"
 msgstr "Haziran"
@@ -8199,7 +8199,7 @@ msgstr "Anahtar"
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr ""
 
-#: include/forms.inc.php:603
+#: include/forms.inc.php:604
 msgid "Key like"
 msgstr ""
 
@@ -8269,7 +8269,7 @@ msgstr "Etiket konumu"
 msgid "Language"
 msgstr "Dil"
 
-#: include/forms.inc.php:1785 include/func.inc.php:1537
+#: include/forms.inc.php:1786 include/func.inc.php:1537
 #: include/maintenances.inc.php:115
 msgid "Last"
 msgstr "Son"
@@ -8525,7 +8525,7 @@ msgstr "Konum enlemi"
 msgid "Location longitude"
 msgstr "Konum boylamı"
 
-#: include/forms.inc.php:428 include/items.inc.php:127
+#: include/forms.inc.php:429 include/items.inc.php:127
 #: include/triggers.inc.php:2057 include/views/configuration.item.edit.php:218
 #: include/views/configuration.item.massupdate.php:218
 #: include/views/configuration.item.prototype.edit.php:216
@@ -8747,7 +8747,7 @@ msgstr "Bakım silindi"
 msgid "Maintenance period"
 msgstr ""
 
-#: include/forms.inc.php:1850
+#: include/forms.inc.php:1851
 msgid "Maintenance period length"
 msgstr "Bakım dönemi uzunluğu"
 
@@ -8845,7 +8845,7 @@ msgstr "Haritalar"
 msgid "Mar"
 msgstr "Mar"
 
-#: include/forms.inc.php:1749 include/func.inc.php:119
+#: include/forms.inc.php:1750 include/func.inc.php:119
 #: include/func.inc.php:256 jsLoader.php:112
 msgid "March"
 msgstr "Mart"
@@ -8939,7 +8939,7 @@ msgstr ""
 msgid "Maximum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1759 include/func.inc.php:121
+#: include/forms.inc.php:1760 include/func.inc.php:121
 #: include/func.inc.php:258 jsLoader.php:114
 msgid "May"
 msgstr "Mayıs"
@@ -9124,7 +9124,7 @@ msgstr ""
 msgid "Minimum value for period T is NOT N"
 msgstr ""
 
-#: include/forms.inc.php:1858
+#: include/forms.inc.php:1859
 msgid "Minutes"
 msgstr "Dakika"
 
@@ -9181,7 +9181,7 @@ msgstr "Model"
 msgid "Mon"
 msgstr "Pzt"
 
-#: include/forms.inc.php:1725 include/forms.inc.php:1791
+#: include/forms.inc.php:1726 include/forms.inc.php:1792
 #: include/func.inc.php:136 include/func.inc.php:226
 msgid "Monday"
 msgstr "Pazartesi"
@@ -9200,11 +9200,11 @@ msgstr "Gözetlenen konak"
 msgid "Monitoring"
 msgstr "Gözetleme"
 
-#: include/forms.inc.php:1768 report3.php:107 report4.php:145
+#: include/forms.inc.php:1769 report3.php:107 report4.php:145
 msgid "Month"
 msgstr "Ay"
 
-#: include/forms.inc.php:1699 include/maintenances.inc.php:37 report3.php:65
+#: include/forms.inc.php:1700 include/maintenances.inc.php:37 report3.php:65
 #: report4.php:104
 msgid "Monthly"
 msgstr "Aylık"
@@ -9341,7 +9341,7 @@ msgstr ""
 msgid "Name for group prototype \"%1$s\" must contain macros."
 msgstr ""
 
-#: include/forms.inc.php:586 include/views/configuration.host.list.php:35
+#: include/forms.inc.php:587 include/views/configuration.host.list.php:35
 msgid "Name like"
 msgstr ""
 
@@ -9451,7 +9451,7 @@ msgstr "Yeni servis zamanı"
 msgid "Next step"
 msgstr ""
 
-#: events.php:783 include/events.inc.php:355 include/events.inc.php:374
+#: events.php:783 include/events.inc.php:352 include/events.inc.php:371
 #: include/func.inc.php:1941 include/triggers.inc.php:1475
 #: include/views/administration.users.list.php:69
 #: include/views/administration.users.list.php:72
@@ -10020,7 +10020,7 @@ msgstr ""
 msgid "Not Ack"
 msgstr "Onaysız"
 
-#: include/forms.inc.php:598 include/forms.inc.php:774
+#: include/forms.inc.php:599 include/forms.inc.php:775
 msgid "Not Templated items"
 msgstr "Şablonlanmamış öğeler"
 
@@ -10087,7 +10087,7 @@ msgstr "Bildirimler"
 msgid "Nov"
 msgstr "Kas"
 
-#: include/forms.inc.php:1761 include/func.inc.php:127
+#: include/forms.inc.php:1762 include/func.inc.php:127
 #: include/func.inc.php:264 jsLoader.php:120
 msgid "November"
 msgstr "Kasım"
@@ -10105,11 +10105,11 @@ msgstr ""
 msgid "Number of enabled items on the host."
 msgstr ""
 
-#: include/blocks.inc.php:484 include/blocks.inc.php:485
+#: include/blocks.inc.php:483 include/blocks.inc.php:484
 msgid "Number of hosts (enabled/disabled/templates)"
 msgstr ""
 
-#: include/blocks.inc.php:492
+#: include/blocks.inc.php:491
 msgid "Number of items (enabled/disabled/not supported)"
 msgstr ""
 
@@ -10190,7 +10190,7 @@ msgstr ""
 msgid "Number of successfully retrieved values V (which fulfill operator O) for period T is NOT N"
 msgstr ""
 
-#: include/blocks.inc.php:501
+#: include/blocks.inc.php:500
 msgid "Number of triggers (enabled/disabled [problem/ok])"
 msgstr ""
 
@@ -10206,7 +10206,7 @@ msgstr ""
 msgid "Number of unsupported items on the host."
 msgstr ""
 
-#: include/blocks.inc.php:511
+#: include/blocks.inc.php:510
 msgid "Number of users (online)"
 msgstr "Kullanıcıların sayısı(çevrimiçi)"
 
@@ -10252,7 +10252,7 @@ msgstr ""
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
 msgstr ""
 
-#: include/forms.inc.php:426 include/items.inc.php:123
+#: include/forms.inc.php:427 include/items.inc.php:123
 #: include/triggers.inc.php:2055 include/views/configuration.item.edit.php:216
 #: include/views/configuration.item.massupdate.php:216
 #: include/views/configuration.item.prototype.edit.php:214
@@ -10265,7 +10265,7 @@ msgstr "Sayısal(kayan noktalı)"
 msgid "Numeric (integer 64bit)"
 msgstr "Sayısal(tamsayı 64bit)"
 
-#: include/forms.inc.php:425 include/items.inc.php:121
+#: include/forms.inc.php:426 include/items.inc.php:121
 #: include/views/configuration.item.edit.php:215
 #: include/views/configuration.item.massupdate.php:215
 #: include/views/configuration.item.prototype.edit.php:213
@@ -10320,7 +10320,7 @@ msgstr "Eki"
 msgid "Octal"
 msgstr "Sekizlik"
 
-#: include/forms.inc.php:1756 include/func.inc.php:126
+#: include/forms.inc.php:1757 include/func.inc.php:126
 #: include/func.inc.php:263 jsLoader.php:119
 msgid "October"
 msgstr "Ekim"
@@ -10357,7 +10357,7 @@ msgstr "Birkere"
 msgid "One of the objects is left without a host group."
 msgstr ""
 
-#: include/forms.inc.php:1696 include/maintenances.inc.php:31
+#: include/forms.inc.php:1697 include/maintenances.inc.php:31
 msgid "One time only"
 msgstr "Yalnızca bir kere"
 
@@ -10426,7 +10426,7 @@ msgstr ""
 msgid "Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique."
 msgstr ""
 
-#: include/blocks.inc.php:493
+#: include/blocks.inc.php:492
 msgid "Only items assigned to enabled hosts are counted"
 msgstr "Yalnızca etkinleştirilmiş konaklara atanmış olan öğeler sayıldı"
 
@@ -10447,7 +10447,7 @@ msgstr ""
 msgid "Only trigger events can be acknowledged."
 msgstr ""
 
-#: include/blocks.inc.php:502
+#: include/blocks.inc.php:501
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Yalnızca etkinleştirilmiş konaklara atanmış ve etkinleştirilmiş öğeler bağımlılığı olan tetikler sayıldı"
 
@@ -10464,7 +10464,7 @@ msgstr ""
 msgid "Operating system information. Returns string"
 msgstr ""
 
-#: actionconf.php:346
+#: actionconf.php:349
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "\"%s\" işlemi zaten var."
@@ -10809,7 +10809,7 @@ msgstr "SORUN"
 msgid "Page received incorrect data"
 msgstr ""
 
-#: include/blocks.inc.php:471
+#: include/blocks.inc.php:470
 msgid "Parameter"
 msgstr "Parametre"
 
@@ -10950,7 +10950,7 @@ msgstr ""
 msgid "Period"
 msgstr "Dönem"
 
-#: include/forms.inc.php:1701
+#: include/forms.inc.php:1702
 #: include/views/configuration.maintenance.edit.php:106
 #: include/views/configuration.services.edit.php:187
 msgid "Period type"
@@ -11045,7 +11045,7 @@ msgstr "Port"
 msgid "Port cannot be empty for host interface."
 msgstr ""
 
-#: include/forms.inc.php:479 include/views/configuration.host.list.php:44
+#: include/forms.inc.php:480 include/views/configuration.host.list.php:44
 msgid "Port like"
 msgstr ""
 
@@ -11164,7 +11164,7 @@ msgid "Problem"
 msgstr "Sorun"
 
 #: include/views/configuration.sysmap.edit.php:148
-#: include/views/monitoring.dashconf.php:113
+#: include/views/monitoring.dashconf.php:119
 msgid "Problem display"
 msgstr "Sorun gösterimi"
 
@@ -11551,7 +11551,7 @@ msgstr "Gerekli performans(vps) "
 msgid "Required performance of the Zabbix server, in new values per second expected."
 msgstr ""
 
-#: include/blocks.inc.php:512
+#: include/blocks.inc.php:511
 msgid "Required server performance, new values per second"
 msgstr "Gereki sunucu performansı, saniye başına yeni değerler"
 
@@ -11831,7 +11831,7 @@ msgstr "SNMP Anahtarı"
 msgid "SNMP OID"
 msgstr "SNMP OID"
 
-#: include/forms.inc.php:475
+#: include/forms.inc.php:476
 msgid "SNMP OID like"
 msgstr ""
 
@@ -11844,7 +11844,7 @@ msgstr ""
 msgid "SNMP community"
 msgstr "SNMP topluluğu"
 
-#: include/forms.inc.php:465
+#: include/forms.inc.php:466
 msgid "SNMP community like"
 msgstr ""
 
@@ -11949,7 +11949,7 @@ msgstr ""
 msgid "Sat"
 msgstr "Cts"
 
-#: include/forms.inc.php:1730 include/forms.inc.php:1796
+#: include/forms.inc.php:1731 include/forms.inc.php:1797
 #: include/func.inc.php:141 include/func.inc.php:231
 msgid "Saturday"
 msgstr "Cumartesi"
@@ -12138,7 +12138,7 @@ msgstr "Arama şekil düzeni boş"
 msgid "Search/Filter elements limit"
 msgstr "Ara/Filtrele elemanları limiti"
 
-#: include/forms.inc.php:1782 include/maintenances.inc.php:112
+#: include/forms.inc.php:1783 include/maintenances.inc.php:112
 msgid "Second"
 msgstr "İkinci"
 
@@ -12190,12 +12190,12 @@ msgstr ""
 msgid "Security name"
 msgstr ""
 
-#: include/forms.inc.php:470
+#: include/forms.inc.php:471
 msgid "Security name like"
 msgstr ""
 
 #: events.php:359 include/classes/html/CMultiSelect.php:54
-#: include/forms.inc.php:562
+#: include/forms.inc.php:563
 #: include/views/administration.auditacts.list.php:32
 #: include/views/administration.auditlogs.list.php:31
 #: include/views/common.filter.trigger.php:107
@@ -12251,7 +12251,7 @@ msgstr ""
 msgid "Selected"
 msgstr "Seçilen"
 
-#: actionconf.php:430
+#: actionconf.php:433
 msgid "Selected actions deleted"
 msgstr "Seçilen eylemler silindi"
 
@@ -12298,11 +12298,11 @@ msgid "Sep"
 msgstr "Eyl"
 
 #: include/views/configuration.sysmap.edit.php:140
-#: include/views/monitoring.dashconf.php:106
+#: include/views/monitoring.dashconf.php:112
 msgid "Separated"
 msgstr "Ayrılmış"
 
-#: include/forms.inc.php:1751 include/func.inc.php:125
+#: include/forms.inc.php:1752 include/func.inc.php:125
 #: include/func.inc.php:262 jsLoader.php:118
 msgid "September"
 msgstr "Eylül"
@@ -12735,7 +12735,7 @@ msgstr ""
 msgid "Startup time of Zabbix server, Unix timestamp."
 msgstr ""
 
-#: include/forms.inc.php:517 include/forms.inc.php:906
+#: include/forms.inc.php:518 include/forms.inc.php:907
 #: include/views/configuration.maintenance.list.php:43
 msgid "State"
 msgstr "Aşama"
@@ -12745,9 +12745,9 @@ msgstr "Aşama"
 #: include/actions.inc.php:1117 include/actions.inc.php:1174
 #: include/actions.inc.php:1208 include/classes/screens/CScreenActions.php:62
 #: include/classes/screens/CScreenActions.php:68
-#: include/classes/screens/CScreenActions.php:134 include/events.inc.php:198
-#: include/events.inc.php:274 include/events.inc.php:277
-#: include/forms.inc.php:555 include/forms.inc.php:901
+#: include/classes/screens/CScreenActions.php:134 include/events.inc.php:195
+#: include/events.inc.php:271 include/events.inc.php:274
+#: include/forms.inc.php:556 include/forms.inc.php:902
 #: include/views/administration.auditacts.list.php:55
 #: include/views/administration.usergroups.list.php:42
 #: include/views/administration.users.list.php:56
@@ -12796,7 +12796,7 @@ msgstr "Web gözetleme durumu"
 #: app/controllers/CControllerReportStatus.php:39
 #: app/views/monitoring.widget.status.view.php:25
 #: app/views/report.status.php:24
-#: include/classes/screens/CScreenSystemStatus.php:46 include/menu.inc.php:128
+#: include/classes/screens/CScreenSystemStatus.php:47 include/menu.inc.php:128
 msgid "Status of Zabbix"
 msgstr "Zabbix'in durumu"
 
@@ -12862,7 +12862,7 @@ msgstr "Düz"
 msgid "Style"
 msgstr "Stil"
 
-#: include/forms.inc.php:619
+#: include/forms.inc.php:620
 msgid "Subfilter"
 msgstr ""
 
@@ -12904,7 +12904,7 @@ msgstr ""
 msgid "Sun"
 msgstr "Paz"
 
-#: include/forms.inc.php:1731 include/forms.inc.php:1797
+#: include/forms.inc.php:1732 include/forms.inc.php:1798
 #: include/func.inc.php:143 include/func.inc.php:225
 msgid "Sunday"
 msgstr "Pazar"
@@ -13043,7 +13043,7 @@ msgid "Telnet"
 msgstr "Telnet"
 
 #: include/actions.inc.php:62 include/audit.inc.php:50
-#: include/forms.inc.php:594 include/forms.inc.php:911
+#: include/forms.inc.php:595 include/forms.inc.php:912
 #: include/views/configuration.template.edit.php:34
 #: include/views/configuration.template.edit.php:381
 #: include/views/configuration.trigger.prototype.list.php:74 report2.php:250
@@ -13134,7 +13134,7 @@ msgstr ""
 msgid "Template with the same visible name \"%s\" already exists."
 msgstr "\"%s\" ile aynı görünen isimli şablon zaten var"
 
-#: include/forms.inc.php:597 include/forms.inc.php:777
+#: include/forms.inc.php:598 include/forms.inc.php:778
 msgid "Templated items"
 msgstr "Şablonlanmış öğeler"
 
@@ -13187,7 +13187,7 @@ msgstr ""
 msgid "Test string"
 msgstr "Test dizgisi"
 
-#: include/forms.inc.php:429 include/items.inc.php:129
+#: include/forms.inc.php:430 include/items.inc.php:129
 #: include/triggers.inc.php:2058 include/views/configuration.item.edit.php:219
 #: include/views/configuration.item.massupdate.php:219
 #: include/views/configuration.item.prototype.edit.php:217
@@ -13300,7 +13300,7 @@ msgid_plural "There are \"%1$d\" groups with Internal GUI access."
 msgstr[0] ""
 msgstr[1] ""
 
-#: include/forms.inc.php:1783 include/maintenances.inc.php:113
+#: include/forms.inc.php:1784 include/maintenances.inc.php:113
 msgid "Third"
 msgstr "Üçüncü"
 
@@ -13333,7 +13333,7 @@ msgstr "Bu sene"
 msgid "Thu"
 msgstr "Per"
 
-#: include/forms.inc.php:1728 include/forms.inc.php:1794
+#: include/forms.inc.php:1729 include/forms.inc.php:1795
 #: include/func.inc.php:139 include/func.inc.php:229
 msgid "Thursday"
 msgstr "Perşembe"
@@ -13352,8 +13352,8 @@ msgstr "Kadar"
 #: include/classes/screens/CScreenActions.php:44
 #: include/classes/screens/CScreenActions.php:129
 #: include/classes/screens/CScreenEvents.php:39 include/events.inc.php:176
-#: include/events.inc.php:197 include/events.inc.php:274
-#: include/events.inc.php:277
+#: include/events.inc.php:194 include/events.inc.php:271
+#: include/events.inc.php:274
 #: include/views/administration.auditacts.list.php:50
 #: include/views/administration.auditlogs.list.php:59
 #: include/views/configuration.services.edit.php:283
@@ -13486,7 +13486,7 @@ msgstr ""
 msgid "Trend storage period (in days)"
 msgstr ""
 
-#: include/forms.inc.php:926
+#: include/forms.inc.php:927
 #: include/views/administration.general.housekeeper.edit.php:114
 #: include/views/configuration.item.list.php:62
 #: include/views/configuration.item.prototype.list.php:47 items.php:163
@@ -13494,7 +13494,7 @@ msgstr ""
 msgid "Trends"
 msgstr "Yönelimler"
 
-#: include/forms.inc.php:590
+#: include/forms.inc.php:591
 msgid "Trends (in days)"
 msgstr ""
 
@@ -13615,6 +13615,10 @@ msgstr "Tetik etiket tipi"
 msgid "Trigger name"
 msgstr "Tetik ismi"
 
+#: include/views/monitoring.dashconf.php:103
+msgid "Trigger name like"
+msgstr ""
+
 #: include/audit.inc.php:34
 #: include/views/configuration.trigger.prototype.edit.php:263
 msgid "Trigger prototype"
@@ -13708,7 +13712,7 @@ msgstr "Tetik güncellendi"
 msgid "Trigger value"
 msgstr "Tetik değeri"
 
-#: include/forms.inc.php:577 include/html.inc.php:407 include/menu.inc.php:53
+#: include/forms.inc.php:578 include/html.inc.php:407 include/menu.inc.php:53
 #: include/triggers.inc.php:1091
 #: include/views/configuration.action.list.php:29
 #: include/views/configuration.host.discovery.list.php:43
@@ -13774,7 +13778,7 @@ msgstr ""
 msgid "Tue"
 msgstr "Sal"
 
-#: include/forms.inc.php:1726 include/forms.inc.php:1792
+#: include/forms.inc.php:1727 include/forms.inc.php:1793
 #: include/func.inc.php:137 include/func.inc.php:227
 msgid "Tuesday"
 msgstr "Salı"
@@ -13798,7 +13802,7 @@ msgstr ""
 #: app/views/administration.script.list.php:43 include/actions.inc.php:1117
 #: include/classes/screens/CScreenActions.php:50
 #: include/classes/screens/CScreenActions.php:56
-#: include/classes/screens/CScreenActions.php:131 include/forms.inc.php:515
+#: include/classes/screens/CScreenActions.php:131 include/forms.inc.php:516
 #: include/hosts.inc.php:99 include/views/administration.auditacts.list.php:52
 #: include/views/administration.general.image.list.php:37
 #: include/views/configuration.action.edit.php:804
@@ -13847,7 +13851,7 @@ msgstr ""
 msgid "Type of calculation"
 msgstr "Hesaplamanın tipi"
 
-#: include/forms.inc.php:516 include/forms.inc.php:896
+#: include/forms.inc.php:517 include/forms.inc.php:897
 #: include/views/configuration.item.edit.php:208
 #: include/views/configuration.item.edit.php:214
 #: include/views/configuration.item.massupdate.php:209
@@ -13860,7 +13864,7 @@ msgstr "Bilginin tipi"
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr ""
 
-#: include/forms.inc.php:891
+#: include/forms.inc.php:892
 msgid "Types"
 msgstr "Tipler"
 
@@ -13963,7 +13967,7 @@ msgid "Unacknowledged PROBLEM events"
 msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:141
-#: include/views/monitoring.dashconf.php:107
+#: include/views/monitoring.dashconf.php:113
 msgid "Unacknowledged only"
 msgstr "Sadece onaylanmamışlar"
 
@@ -14225,8 +14229,8 @@ msgstr ""
 #: include/views/configuration.triggers.edit.php:325
 #: include/views/configuration.triggers.massupdate.php:114
 #: include/views/js/configuration.discovery.edit.js.php:348
-#: include/views/monitoring.dashconf.php:120
-#: include/views/monitoring.triggerComment.php:46 popup_media.php:152
+#: include/views/monitoring.dashconf.php:126
+#: include/views/monitoring.triggerComment.php:45 popup_media.php:152
 #: tr_logform.php:378
 msgid "Update"
 msgstr "Güncelle"
@@ -14244,7 +14248,7 @@ msgid "Update interval"
 msgstr "Güncelleme zaman aralığı"
 
 #: disc_prototypes.php:50 host_discovery.php:53 httpconf.php:45
-#: include/forms.inc.php:452
+#: include/forms.inc.php:453
 #: include/views/configuration.host.discovery.edit.php:190
 #: include/views/configuration.httpconf.edit.php:77
 #: include/views/configuration.item.edit.php:265
@@ -14262,7 +14266,7 @@ msgid "Updated status of host"
 msgstr "Konağın durumunu güncelle"
 
 #: app/views/monitoring.widget.discovery.view.php:62
-#: app/views/monitoring.widget.hosts.view.php:367
+#: app/views/monitoring.widget.hosts.view.php:371
 #: app/views/monitoring.widget.issues.view.php:27
 #: app/views/monitoring.widget.status.view.php:27
 #: app/views/monitoring.widget.system.view.php:27
@@ -14738,7 +14742,7 @@ msgstr ""
 msgid "VMware virtual machine uptime, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
 msgstr ""
 
-#: include/blocks.inc.php:472 include/classes/graphdraw/CPieGraphDraw.php:334
+#: include/blocks.inc.php:471 include/classes/graphdraw/CPieGraphDraw.php:334
 #: include/classes/screens/CScreenEvents.php:42
 #: include/classes/screens/CScreenHistory.php:151
 #: include/classes/screens/CScreenHistory.php:243
@@ -15038,12 +15042,12 @@ msgstr ""
 msgid "Wed"
 msgstr "Pts"
 
-#: include/forms.inc.php:1727 include/forms.inc.php:1793
+#: include/forms.inc.php:1728 include/forms.inc.php:1794
 #: include/func.inc.php:138 include/func.inc.php:228
 msgid "Wednesday"
 msgstr "Çarşamba"
 
-#: include/forms.inc.php:1698 include/maintenances.inc.php:35 report3.php:64
+#: include/forms.inc.php:1699 include/maintenances.inc.php:35 report3.php:64
 #: report4.php:103
 msgid "Weekly"
 msgstr "Haftalık"
@@ -15083,8 +15087,8 @@ msgstr "Son onaylanmamış olay ile"
 msgid "With problems"
 msgstr "Problemli"
 
-#: include/forms.inc.php:580 include/forms.inc.php:802
-#: include/forms.inc.php:916
+#: include/forms.inc.php:581 include/forms.inc.php:803
+#: include/forms.inc.php:917
 msgid "With triggers"
 msgstr "Tetikli"
 
@@ -15096,7 +15100,7 @@ msgstr "Onaylanmamış olaylar ile"
 msgid "Without problems"
 msgstr "Problemsiz"
 
-#: include/forms.inc.php:581 include/forms.inc.php:799
+#: include/forms.inc.php:582 include/forms.inc.php:800
 msgid "Without triggers"
 msgstr "Tetiksiz"
 
@@ -15270,9 +15274,9 @@ msgstr "Yıl"
 msgid "Yearly"
 msgstr "Yıllık"
 
-#: events.php:783 include/blocks.inc.php:481
-#: include/classes/html/CServerInfo.php:33 include/events.inc.php:360
-#: include/events.inc.php:377 include/func.inc.php:1941
+#: events.php:783 include/blocks.inc.php:480
+#: include/classes/html/CServerInfo.php:33 include/events.inc.php:357
+#: include/events.inc.php:374 include/func.inc.php:1941
 #: include/triggers.inc.php:1475
 #: include/views/administration.users.list.php:68
 #: include/views/configuration.httpconf.list.php:116 tr_status.php:661
@@ -15428,7 +15432,7 @@ msgid ""
 "2. Incorrect network configuration.\n"
 msgstr ""
 
-#: include/blocks.inc.php:482
+#: include/blocks.inc.php:481
 msgid "Zabbix server IP or port is not set!"
 msgstr ""
 
@@ -15445,7 +15449,7 @@ msgstr ""
 msgid "Zabbix server is not running: the information displayed may not be current."
 msgstr ""
 
-#: include/blocks.inc.php:480
+#: include/blocks.inc.php:479
 msgid "Zabbix server is running"
 msgstr "Zabbix sunucu çalışıyor"
 
@@ -15484,7 +15488,7 @@ msgstr ""
 msgid "a character string is expected"
 msgstr ""
 
-#: include/forms.inc.php:620
+#: include/forms.inc.php:621
 msgid "affects only filtered data"
 msgstr ""
 
@@ -15494,14 +15498,14 @@ msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:1869
 #: include/classes/pagefilter/CPageFilter.php:789
-#: include/classes/screens/CScreenHostgroupTriggers.php:109
-#: include/classes/screens/CScreenHostgroupTriggers.php:115
-#: include/classes/screens/CScreenHostTriggers.php:110
-#: include/classes/screens/CScreenHostTriggers.php:116
-#: include/forms.inc.php:381 include/forms.inc.php:424
-#: include/forms.inc.php:439 include/forms.inc.php:446
-#: include/forms.inc.php:461 include/forms.inc.php:579
-#: include/forms.inc.php:596 include/graphs.inc.php:76
+#: include/classes/screens/CScreenHostgroupTriggers.php:110
+#: include/classes/screens/CScreenHostgroupTriggers.php:116
+#: include/classes/screens/CScreenHostTriggers.php:111
+#: include/classes/screens/CScreenHostTriggers.php:117
+#: include/forms.inc.php:382 include/forms.inc.php:425
+#: include/forms.inc.php:440 include/forms.inc.php:447
+#: include/forms.inc.php:462 include/forms.inc.php:580
+#: include/forms.inc.php:597 include/graphs.inc.php:76
 #: include/views/js/configuration.graph.edit.js.php:47 report2.php:219
 #: report2.php:235 report2.php:254 report2.php:287 report2.php:312
 #: report2.php:328 report4.php:89 report4.php:266
@@ -15801,7 +15805,7 @@ msgstr "çalışmayan"
 
 #: hostinventoriesoverview.php:75
 #: include/classes/pagefilter/CPageFilter.php:727
-#: include/classes/pagefilter/CPageFilter.php:789 include/forms.inc.php:1117
+#: include/classes/pagefilter/CPageFilter.php:789 include/forms.inc.php:1118
 #: include/views/monitoring.screen.php:81 slides.php:190
 msgid "not selected"
 msgstr "Seçilmeyen"
@@ -15810,7 +15814,7 @@ msgstr "Seçilmeyen"
 msgid "now"
 msgstr "şimdi"
 
-#: app/views/monitoring.widget.hosts.view.php:351 include/blocks.inc.php:450
+#: app/views/monitoring.widget.hosts.view.php:355 include/blocks.inc.php:449
 msgid "of"
 msgstr "un"
 
