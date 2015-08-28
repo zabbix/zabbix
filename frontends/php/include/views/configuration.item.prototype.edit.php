@@ -265,7 +265,7 @@ $itemFormList->addRow(_('Update interval (in sec)'),
 	'row_delay'
 );
 
-// append delay flex to form list
+// Append delay_flex to form list.
 $delayFlexTable = (new CTable())
 	->setId('delayFlexTable')
 	->setHeader([_('Type'), _('Interval'), _('Period'), _('Action')])

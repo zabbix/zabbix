@@ -344,6 +344,7 @@ abstract class CItemGeneral extends CApiService {
 
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
+				// Don't parse empty strings, they will not be valid.
 				if ($fullItem['delay_flex'] === '') {
 					continue;
 				}
