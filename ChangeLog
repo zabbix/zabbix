@@ -1,17 +1,23 @@
 Changes for 2.5.1
 
 New features:
+A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9729] fixed replacement of {MACRO<1-9>} with {MACRO} where only {MACRO} is acceptable (gleb, wiper)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
+........S. [ZBX-9814] fixed function prototype declaration created in ZBXNEXT-2760 (wiper)
+...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
+...G...... [ZBX-9258] fixed Alias for log[], logrt[] and eventlog[] (gleb)
 
 --------------------------------------------------------------------------------
 Changes for 2.5.0
 
 New features:
 ..F....... [ZBXNEXT-2703] implemented feature to filter dashboard by trigger name (Ivo)
-A.F.I...S. [ZBXNEXT-2892] increased IP range length and added support for tabulation, carriage return and newline characters (wiper, Ivo)
+A.F.I...S. [ZBXNEXT-2892] increased IP range length and added support for tabulation, carriage return and newline characters (Ivo, wiper)
 ........S. [ZBXNEXT-2760] added zabbix[host,,items] and zabbix[host,,items_unsupported] keys to monitor the number of (unsupported) items per host (wiper)
-A.F.I..PS. [ZBXNEXT-1219] added application prototype support to low level discovery rules (wiper, Ivo)
+A.F.I..PS. [ZBXNEXT-1219] added application prototype support to low level discovery rules (Ivo, wiper)
 ........S. [ZBX-4344] added functionality to stop processing escalations if dependent trigger fires (dimir)
 ADF.I..PS. [ZBXNEXT-679] implemented SMTP authentication support (asaveljevs, Oleg)
 ..FGI..... [ZBXNEXT-1368] added Windows service discovery and service.info[] item; thanks to Ryan Armstrong for patch (asaveljevs, igors)
@@ -106,9 +112,12 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.7rc1
 
 New features:
-A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Chinese (China) and Czech translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
+...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
+...G...... [ZBX-9258] fixed Alias for log[], logrt[] and eventlog[] (gleb)
 .......PS. [ZBX-4284] improved handling of timeouting items on reachable hosts (wiper)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ..F....... [ZBX-9631] fixed "Undefined offset" in the actions conditions and lld rule filters when using a custom expression with more than 26 elements (Gunars, Sasha)
@@ -140,7 +149,7 @@ Bug fixes:
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9595] added variable initialization for correct operation of system.swap.*[,pages] items (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
-...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+...G...... [ZBX-9456] fixed system.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ..F....... [ZBX-9402] fixed sorting of elements in pages and fixed several requests returning more results than record count set in configuration (Ivo)
 ........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 ...G...... [ZBX-9385] fixed proc.num[,,run] and proc.num[,,sleep] always returning 0 on AIX hosts (asaveljevs)
@@ -766,6 +775,8 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
+...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
 .......PS. [ZBX-4284] improved handling of timeouting items on reachable hosts (wiper)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ..F....... [ZBX-7492] fixed "Undefined index" when importing host without macros (Gunars)
@@ -805,7 +816,7 @@ Bug fixes:
 ...G...... [ZBX-8969] fixed "system.uname" and "system.sw.arch" returning bad values on HP-UX (asaveljevs, wiper)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
-...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+...G...... [ZBX-9456] fixed system.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
@@ -2052,6 +2063,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 
@@ -2074,7 +2086,7 @@ Bug fixes:
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
-...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+...G...... [ZBX-9456] fixed system.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
