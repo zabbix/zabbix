@@ -594,6 +594,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define OPERATION_TYPE_TEMPLATE_REMOVE	7
 #define OPERATION_TYPE_HOST_ENABLE	8
 #define OPERATION_TYPE_HOST_DISABLE	9
+#define OPERATION_TYPE_HOST_INVENTORY	10
 
 /* algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0

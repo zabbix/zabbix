@@ -911,6 +911,17 @@ if (!empty($this->data['new_operation'])) {
 				]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			]);
 			break;
+
+		case OPERATION_TYPE_HOST_INVENTORY:
+			$newOperationsTable->addRow([_('Inventory mode'),
+				(new CRadioButtonList('new_operation[opinventory][inventory_mode]',
+					(int) $data['new_operation']['opinventory']['inventory_mode']
+				))
+					->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+					->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+					->setModern(true)
+			]);
+			break;
 	}
 
 	// append operation conditions to form list

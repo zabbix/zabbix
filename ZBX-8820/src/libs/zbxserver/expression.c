@@ -2256,6 +2256,37 @@ static void	cache_item_hostid(zbx_vector_uint64_t *hostids, zbx_uint64_t itemid)
 
 /******************************************************************************
  *                                                                            *
+ * Function: get_trigger_severity_name                                        *
+ *                                                                            *
+ * Purpose: get trigger severity name                                         *
+ *                                                                            *
+ * Parameters: trigger    - [IN] a trigger data with priority field;          *
+ *                               TRIGGER_SEVERITY_*                           *
+ *             replace_to - [OUT] pointer to a buffer that will receive       *
+ *                          a null-terminated trigger severity string         *
+ *                                                                            *
+ * Return value: upon successful completion return SUCCEED                    *
+ *               otherwise FAIL                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	get_trigger_severity_name(unsigned char priority, char **replace_to)
+{
+	zbx_config_t	cfg;
+
+	if (TRIGGER_SEVERITY_COUNT <= priority)
+		return FAIL;
+
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SEVERITY_NAME);
+
+	*replace_to = zbx_strdup(*replace_to, cfg.severity_name[priority]);
+
+	zbx_config_clean(&cfg);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: substitute_simple_macros                                         *
  *                                                                            *
  * Purpose: substitute simple macros in data string with real values          *
@@ -2551,7 +2582,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
 				{
-					ret = DCget_trigger_severity_name(c_event->trigger.priority, &replace_to);
+					ret = get_trigger_severity_name(c_event->trigger.priority, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_TEMPLATE_NAME))
 				{
@@ -2724,7 +2755,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_SEVERITY))
 				{
-					ret = DCget_trigger_severity_name(c_event->trigger.priority, &replace_to);
+					ret = get_trigger_severity_name(c_event->trigger.priority, &replace_to);
 				}
 				else if (0 == strcmp(m, MVAR_TRIGGER_STATE))
 				{

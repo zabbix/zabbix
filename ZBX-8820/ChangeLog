@@ -1,10 +1,13 @@
 Changes for 2.5.1
 
 New features:
+..F....... [ZBXNEXT-210] changed macros type labels in template configuration form (Gunars)
+A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discovered hosts (wiper, Gunars, Sasha)
 ...G...... [ZBXNEXT-494] added support for proc.cpu.util key on linux and solaris platforms (wiper)
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ........S. [ZBX-9729] fixed replacement of {MACRO<1-9>} with {MACRO} where only {MACRO} is acceptable (gleb, wiper)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
@@ -117,6 +120,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China) and Czech translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
