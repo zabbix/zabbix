@@ -988,34 +988,44 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 			unset($inherited_macros[$host_macro['macro']]);
 		}
 		else {
-			$parsed_macro = (new CUserMacroParser($host_macro['macro']))->getMacros()[0];
-			$host_macro_name = $parsed_macro['macro_name'];
-			$host_context = $parsed_macro['context'];
+			/*
+			 * Cannot use array dereferencing because "$host_macro['macro']" may contain invalid macros
+			 * which results in empty array.
+			 */
+			$parsed_macros = (new CUserMacroParser($host_macro['macro']))->getMacros();
+			if ($parsed_macros) {
+				$host_macro_name = $parsed_macros[0]['macro_name'];
+				$host_context = $parsed_macros[0]['context'];
 
-			if ($host_context === null) {
-				$host_macro['type'] = 0x00;
-			}
-			else {
-				$match_found = false;
-
-				foreach ($inherited_macros as $inherited_macro => $inherited_values) {
-					$parsed_macro = (new CUserMacroParser($inherited_macro))->getMacros()[0];
-					$inherited_macro_name = $parsed_macro['macro_name'];
-					$inherited_context = $parsed_macro['context'];
-
-					if ($host_macro_name === $inherited_macro_name && $host_context === $inherited_context) {
-						$match_found = true;
-
-						$host_macro = array_merge($inherited_macros[$inherited_macro], $host_macro);
-						unset($inherited_macros[$inherited_macro]);
-
-						break;
-					}
-				}
-
-				if (!$match_found) {
+				if ($host_context === null) {
 					$host_macro['type'] = 0x00;
 				}
+				else {
+					$match_found = false;
+
+					foreach ($inherited_macros as $inherited_macro => $inherited_values) {
+						// Safe to use array dereferencing since these values come from database.
+						$parsed_macro = (new CUserMacroParser($inherited_macro))->getMacros()[0];
+						$inherited_macro_name = $parsed_macro['macro_name'];
+						$inherited_context = $parsed_macro['context'];
+
+						if ($host_macro_name === $inherited_macro_name && $host_context === $inherited_context) {
+							$match_found = true;
+
+							$host_macro = array_merge($inherited_macros[$inherited_macro], $host_macro);
+							unset($inherited_macros[$inherited_macro]);
+
+							break;
+						}
+					}
+
+					if (!$match_found) {
+						$host_macro['type'] = 0x00;
+					}
+				}
+			}
+			else {
+				$host_macro['type'] = 0x00;
 			}
 		}
 
