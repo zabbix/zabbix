@@ -2302,7 +2302,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	char			*p, *bl, *br, c, *replace_to = NULL, sql[64];
 	const char		*m;
-	int			N_functionid, ret, res = SUCCEED;
+	int			N_functionid, indexed_macro, ret, res = SUCCEED;
 	size_t			data_alloc, data_len;
 	DC_INTERFACE		interface;
 	zbx_vector_uint64_t	hostids;
@@ -2336,6 +2336,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 		ret = SUCCEED;
 		N_functionid = 1;
+		indexed_macro = 0;
 
 		if ('1' <= *(br - 2) && *(br - 2) <= '9')
 		{
@@ -2348,6 +2349,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				if ('}' == ex_macros[i][diff] && bl + diff == br - 2)
 				{
 					N_functionid = *(br - 2) - '0';
+					indexed_macro = 1;
 					m = ex_macros[i];
 					break;
 				}
@@ -2770,7 +2772,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 							&replace_to, MACRO_TYPE_TRIGGER_URL, error, maxerrlen);
 				}
 			}
-			else if (EVENT_SOURCE_DISCOVERY == c_event->source)
+			else if (0 == indexed_macro && EVENT_SOURCE_DISCOVERY == c_event->source)
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
@@ -2893,7 +2895,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				}
 			}
-			else if (EVENT_SOURCE_AUTO_REGISTRATION == c_event->source)
+			else if (0 == indexed_macro && EVENT_SOURCE_AUTO_REGISTRATION == c_event->source)
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
@@ -2967,7 +2969,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				}
 			}
-			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_ITEM == c_event->object)
+			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
+					EVENT_OBJECT_ITEM == c_event->object)
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
@@ -3074,7 +3077,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_strdup(replace_to, zbx_time2str(time(NULL)));
 				}
 			}
-			else if (EVENT_SOURCE_INTERNAL == c_event->source && EVENT_OBJECT_LLDRULE == c_event->object)
+			else if (0 == indexed_macro && EVENT_SOURCE_INTERNAL == c_event->source &&
+					EVENT_OBJECT_LLDRULE == c_event->object)
 			{
 				if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
@@ -3305,7 +3309,8 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 			}
 		}
-		else if (0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD | MACRO_TYPE_LLD_FILTER)))
+		else if (0 == indexed_macro &&
+				0 != (macro_type & (MACRO_TYPE_ITEM_KEY | MACRO_TYPE_PARAMS_FIELD | MACRO_TYPE_LLD_FILTER)))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_item->host.hostid, 1, m, &replace_to);
@@ -3335,7 +3340,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					ret = FAIL;
 			}
 		}
-		else if (0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR))
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
@@ -3368,7 +3373,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 				}
 			}
 		}
-		else if (0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR_DB))
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_INTERFACE_ADDR_DB))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
@@ -3402,7 +3407,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					zbx_snprintf(error, maxerrlen, "Macro '%s' value is not numeric", m);
 			}
 		}
-		else if (0 != (macro_type & MACRO_TYPE_SCRIPT))
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_SCRIPT))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);
@@ -3417,7 +3422,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 			else if (0 == strcmp(m, MVAR_HOST_CONN))
 				ret = DBget_interface_value(dc_host->hostid, &replace_to, ZBX_REQUEST_HOST_CONN, 0);
 		}
-		else if (0 != (macro_type & MACRO_TYPE_HTTPTEST_FIELD))
+		else if (0 == indexed_macro && 0 != (macro_type & MACRO_TYPE_HTTPTEST_FIELD))
 		{
 			if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				DCget_user_macro(&dc_host->hostid, 1, m, &replace_to);

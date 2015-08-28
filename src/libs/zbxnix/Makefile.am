@@ -9,4 +9,5 @@ libzbxnix_a_SOURCES = \
 	fatal.c fatal.h \
 	sighandler.c \
 	sigcommon.h \
-	control.c control.h
+	control.c control.h \
+	dshm.c
