@@ -63,6 +63,8 @@ class CControllerAcknowledgeCreate extends CController {
 		$eventids = $this->getInput('eventids');
 		$acknowledge_type = $this->getInput('acknowledge_type');
 
+		$result = true;
+
 		if ($acknowledge_type == ZBX_ACKNOWLEDGE_PROBLEM || $acknowledge_type == ZBX_ACKNOWLEDGE_ALL) {
 			$events = API::Event()->get([
 				'output' => ['objectid'],
@@ -81,7 +83,7 @@ class CControllerAcknowledgeCreate extends CController {
 				$filter['value'] = TRIGGER_VALUE_TRUE;
 			}
 
-			while (true) {
+			while ($result) {
 				$events = API::Event()->get([
 					'output' => [],
 					'source' => EVENT_SOURCE_TRIGGERS,
@@ -110,7 +112,7 @@ class CControllerAcknowledgeCreate extends CController {
 			}
 		}
 
-		if ($eventids) {
+		if ($result && $eventids) {
 			$result = API::Event()->acknowledge([
 				'eventids' => $eventids,
 				'message' => $this->getInput('message', '')
