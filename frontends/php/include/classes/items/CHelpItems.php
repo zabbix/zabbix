@@ -141,6 +141,10 @@ class CHelpItems {
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
 				],
 				[
+					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+					'description' => _('Process CPU utilisation in percent. Returns float')
+				],
+				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 					'description' => _('Memory used by process in bytes. Returns integer')
 				],
@@ -417,6 +421,10 @@ class CHelpItems {
 				[
 					'key' => 'perf_counter[counter,<interval>]',
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
+				],
+				[
+					'key' => 'proc.cpu.util[<name>,<user>,<state>,<cmdline>,<mode>,<scope>]',
+					'description' => _('Process CPU utilisation in percent. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
