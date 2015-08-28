@@ -1547,8 +1547,11 @@ legend {
 }
 
 %form-input-height-padding {
-	padding: 4px 5px;
-	zoom: 1;
+	//padding: 4px 5px;
+	padding: 0 5px;
+	min-height: 2em;
+	//line-height: 22px;
+	//zoom: 1;
 }
 
 %form-input-style {
