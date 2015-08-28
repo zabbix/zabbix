@@ -409,8 +409,8 @@ static void	zbx_parameter_not_empty(const char *param, const char *param_name)
  *           string),                                                         *
  *         - in agentd and active proxy the certificate and PSK parameters    *
  *           must match the value of CONFIG_TLS_CONNECT parameter,            *
- *         - in agentd, agent and passive proxy the certificate and PSK       *
- *           parameters must match the value of CONFIG_TLS_ACCEPT parameter.  *
+ *         - in agentd and passive proxy the certificate and PSK parameters   *
+ *           must match the value of CONFIG_TLS_ACCEPT parameter.             *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_tls_validate_config(void)
@@ -460,7 +460,8 @@ static void	zbx_tls_validate_config(void)
 
 		while (1)
 		{
-			delim = (NULL == p ? NULL : strchr(p, ','));
+			delim = strchr(p, ',');
+
 			if (NULL != delim)
 				*delim = '\0';
 
@@ -477,7 +478,7 @@ static void	zbx_tls_validate_config(void)
 				goto out;
 			}
 
-			if (NULL == p || NULL == delim)
+			if (NULL == delim)
 				break;
 
 			*delim = ',';
