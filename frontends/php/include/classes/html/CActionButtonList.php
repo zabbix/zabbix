@@ -66,7 +66,7 @@ class CActionButtonList extends CObject {
 		$this->checkboxesName = $checkboxesName;
 		$this->cookieNamePrefix = $cookieNamePrefix;
 
-		foreach ($buttonsData as $action=> $buttonData) {
+		foreach ($buttonsData as $action => $buttonData) {
 			$this->buttons[$action] = (new CSubmit($actionName, $buttonData['name']))
 				->addClass(ZBX_STYLE_BTN_ALT)
 				->removeAttribute('id')
