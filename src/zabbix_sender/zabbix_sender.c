@@ -437,7 +437,7 @@ static int	check_response(char *response)
 
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
-	ZBX_THREAD_SENDVAL_ARGS	*sentdval_args;
+	ZBX_THREAD_SENDVAL_ARGS	*sendval_args;
 	int			tcp_ret, ret = FAIL;
 	char			*tls_arg1, *tls_arg2;
 	zbx_socket_t		sock;
@@ -445,11 +445,11 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	sentdval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
+	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	/* take TLS data passed from 'main' thread */
-	zbx_tls_take_vars(&sentdval_args->tls_vars);
+	zbx_tls_take_vars(&sendval_args->tls_vars);
 #endif
 
 #if !defined(_WINDOWS)
@@ -474,10 +474,10 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
 	}
 
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port,
+	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
 			GET_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
-		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
+		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sendval_args->json.buffer)))
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
 			{
@@ -952,7 +952,7 @@ int	main(int argc, char **argv)
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
-	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
+	ZBX_THREAD_SENDVAL_ARGS sendval_args;
 
 	progname = get_program_name(argv[0]);
 
@@ -986,10 +986,10 @@ int	main(int argc, char **argv)
 	}
 
 	thread_args.server_num = 0;
-	thread_args.args = &sentdval_args;
+	thread_args.args = &sendval_args;
 
-	sentdval_args.server = ZABBIX_SERVER;
-	sentdval_args.port = ZABBIX_SERVER_PORT;
+	sendval_args.server = ZABBIX_SERVER;
+	sendval_args.port = ZABBIX_SERVER_PORT;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #if defined(_WINDOWS)
@@ -1010,11 +1010,11 @@ int	main(int argc, char **argv)
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
-	zbx_tls_pass_vars(&sentdval_args.tls_vars);
+	zbx_tls_pass_vars(&sendval_args.tls_vars);
 #endif
-	zbx_json_init(&sentdval_args.json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
+	zbx_json_init(&sendval_args.json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(&sendval_args.json, ZBX_PROTO_TAG_DATA);
 
 	if (INPUT_FILE)
 	{
@@ -1107,13 +1107,13 @@ int	main(int argc, char **argv)
 				break;
 			}
 
-			zbx_json_addobject(&sentdval_args.json, NULL);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addobject(&sendval_args.json, NULL);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
 			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, timestamp);
-			zbx_json_close(&sentdval_args.json);
+				zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, timestamp);
+			zbx_json_close(&sendval_args.json);
 
 			succeed_count++;
 			buffer_count++;
@@ -1147,29 +1147,29 @@ int	main(int argc, char **argv)
 
 			if (VALUES_MAX == buffer_count || (stdin == in && 1 == REAL_TIME && 0 >= read_more))
 			{
-				zbx_json_close(&sentdval_args.json);
+				zbx_json_close(&sendval_args.json);
 
 				if (1 == WITH_TIMESTAMPS)
-					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+					zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 				last_send = zbx_time();
 
 				ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 
 				buffer_count = 0;
-				zbx_json_clean(&sentdval_args.json);
-				zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
+				zbx_json_clean(&sendval_args.json);
+				zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
 						ZBX_JSON_TYPE_STRING);
-				zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
+				zbx_json_addarray(&sendval_args.json, ZBX_PROTO_TAG_DATA);
 			}
 		}
 
 		if (FAIL != ret && 0 != buffer_count)
 		{
-			zbx_json_close(&sentdval_args.json);
+			zbx_json_close(&sendval_args.json);
 
 			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+				zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 		}
@@ -1201,11 +1201,11 @@ int	main(int argc, char **argv)
 
 			ret = SUCCEED;
 
-			zbx_json_addobject(&sentdval_args.json, NULL);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&sentdval_args.json);
+			zbx_json_addobject(&sendval_args.json, NULL);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&sendval_args.json);
 
 			succeed_count++;
 
@@ -1214,7 +1214,7 @@ int	main(int argc, char **argv)
 		while (0); /* try block simulation */
 	}
 free:
-	zbx_json_free(&sentdval_args.json);
+	zbx_json_free(&sendval_args.json);
 exit:
 	if (FAIL != ret)
 	{
