@@ -110,7 +110,6 @@ h4 {
   color: #1f2c33;
   line-height: 1.2em; }
   h4 span {
-    font-size: 75%;
     color: #768d99; }
 
 sup {
@@ -588,9 +587,8 @@ footer, .footer {
 .subfilter-enabled {
   display: inline-block;
   position: relative;
-  padding: 0 9px 0 4px;
   height: 18px;
-  line-height: 18px;
+  padding: 0 4px;
   background-color: #acbbc2;
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
@@ -635,7 +633,8 @@ footer, .footer {
     background: none;
     box-sizing: border-box;
     width: 100%;
-    padding-top: 2px; }
+    padding-top: 1px;
+    min-height: 1.8em; }
   .multiselect .multiselect-list {
     padding-left: 2px;
     padding-bottom: 2px; }
@@ -643,6 +642,9 @@ footer, .footer {
       display: inline-block;
       margin: 2px 14px 0 0;
       white-space: nowrap; }
+      .multiselect .multiselect-list li .subfilter-enabled {
+        padding: 0 9px 0 4px;
+        line-height: 18px; }
       .multiselect .multiselect-list li.selected .subfilter-enabled {
         background-color: #c9d3d8; }
       .multiselect .multiselect-list li.selected .subfilter-disable-btn {
@@ -720,6 +722,8 @@ footer, .footer {
     float: right;
     margin-right: -1px; }
   .sublevel .btn-grey {
+    height: 22px;
+    line-height: 22px;
     background-color: #fff;
     margin-top: -1px; }
 
@@ -1020,8 +1024,8 @@ input[type="checkbox"], input[type="radio"] {
   background: none; }
 
 input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"] {
-  padding: 4px 5px;
-  zoom: 1; }
+  padding: 0 5px;
+  min-height: 2em; }
 
 .multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
@@ -1801,6 +1805,17 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       text-align: left;
       border: none;
       border-bottom: 1px solid #ebeef0; }
+  .screen-table .dashbrd-widget {
+    margin: 0;
+    border: none; }
+  .screen-table .dashbrd-widget-head {
+    font-weight: normal;
+    text-align: left;
+    padding: 8px; }
+  .screen-table .dashbrd-widget-foot {
+    margin: 0; }
+  .screen-table .nothing-to-show {
+    text-align: center !important; }
 
 .dashed-border td {
   border: 1px dashed #ebeef0; }
