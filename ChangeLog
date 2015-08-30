@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
