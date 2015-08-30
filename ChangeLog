@@ -783,6 +783,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
