@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China) and Czech translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
