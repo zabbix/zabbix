@@ -274,18 +274,17 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
-			$link = (new CSpan($element['name']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN)
-				->onClick(CHtml::encode(
-					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
-					'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
-				));
-			$output[] = $link;
-			$output[] = SPACE;
-			$output[] = new CSup($element['count']);
+			$output[] = (new CSpan([
+				(new CSpan($element['name']))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->onClick(CHtml::encode(
+						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+						'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
+					)),
+				SPACE,
+				new CSup($element['count'])
+			]))->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
-
 		// isn't activated
 		else {
 			// subfilter has 0 items
@@ -612,16 +611,8 @@ function getItemFilterForm(&$items) {
 	$form->addColumn($filterColumn4);
 
 	// subfilters
-	$table_subfilter = new CTableInfo();
-	$table_subfilter->addRow(
-		[
-			new CTag('h4', true,
-				[
-					_('Subfilter').SPACE,
-					new CSpan(_('affects only filtered data'))
-				]
-			)]
-	);
+	$table_subfilter = (new CTableInfo())
+		->addRow([new CTag('h4', true, [_('Subfilter'), SPACE, new CSpan(_('affects only filtered data'))])]);
 
 	// array contains subfilters and number of items in each
 	$item_params = [
