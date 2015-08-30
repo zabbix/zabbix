@@ -575,7 +575,7 @@ foreach ($triggers as $trigger) {
 
 	if ($showDetails) {
 		$description[] = BR();
-		$description[] = (new CDiv(explode_exp($trigger['expression'], true, true)))->addClass('trigger-expression');
+		$description[] = explode_exp($trigger['expression'], true, true);
 	}
 
 	// host js menu
