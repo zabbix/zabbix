@@ -645,6 +645,8 @@ function changeWidgetState(obj, widgetId) {
 		state = 1;
 	}
 
+	obj.title = (state == 1) ? locale['S_COLLAPSE'] : locale['S_EXPAND'];
+
 	sendAjaxData('zabbix.php?action=dashboard.widget', {
 		data: {
 			widget: widgetId,
