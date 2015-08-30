@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
 "PO-Revision-Date: 2014-06-09 18:30+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1487,7 +1487,7 @@ msgstr "Nie je možné zmazať skripty. Skript \"%1$s\" sa používa v operácii
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Nie je možné zmazať skripty. Skript so scriptid \"%s\" neexistuje."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "Nie je možné zmazať označené akcie"
 
@@ -2011,7 +2011,7 @@ msgstr "Nie je možné aktualizovať službu"
 msgid "Cannot update slide show"
 msgstr "Nie je možné aktualizovať prezentáciu"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Nie je možné aktualizovať stav"
 
@@ -9031,7 +9031,7 @@ msgstr "Len celé čísla"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operácia \"%s\" už existuje."
@@ -10793,7 +10793,7 @@ msgstr "Označ riadky s hodnotou obsahujúcou"
 msgid "Selected"
 msgstr "Označené"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "Označené akcie zmazané"
 
@@ -11353,7 +11353,7 @@ msgstr "Stavy spúšťačov"
 msgid "Status only"
 msgstr "Len stav"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Stav aktualizovaný"
 

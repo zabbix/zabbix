@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
 "PO-Revision-Date: 2013-04-29 23:58+0200\n"
 "Last-Translator: Murat <murat@profelis.com.tr>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1481,7 +1481,7 @@ msgstr "Betikler silinemedi. \"%1$s\"  betiği \"%2$s\" eylem işleminde kullan�
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Betikler silinemedi. Betik numarası \"%s\" olan betik mevcut değil. "
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "Seçilen aksiyonlar silinemedi"
 
@@ -2002,7 +2002,7 @@ msgstr "Servis güncellenemedi"
 msgid "Cannot update slide show"
 msgstr "Slayt gösterisi güncellenemiyor"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Durum güncellenemedi"
 
@@ -9016,7 +9016,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "\"%s\" işlemi zaten var."
@@ -10778,7 +10778,7 @@ msgstr ""
 msgid "Selected"
 msgstr "Seçilen"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "Seçilen eylemler silindi"
 
@@ -11338,7 +11338,7 @@ msgstr "Tetiklerin Durumu"
 msgid "Status only"
 msgstr "Yalnızca durum"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Durum güncellendi"
 

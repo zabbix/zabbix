@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
 "PO-Revision-Date: 2014-11-10 16:48+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1480,7 +1480,7 @@ msgstr "Impossibile rimuovere gli script. Lo script \"%1$s\" e' utilizzato nell'
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "Impossibile rimuovere azioni selezionate."
 
@@ -2001,7 +2001,7 @@ msgstr "Impossibile aggiornare il servizio"
 msgid "Cannot update slide show"
 msgstr "Impossibile aggiornare la presentazione"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Impossibile aggiornare lo stato"
 
@@ -9015,7 +9015,7 @@ msgstr "Solo numeri interi"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "L'operazione \"%s\" esiste già."
@@ -10776,7 +10776,7 @@ msgstr "Seleziona righe con valori contenenti"
 msgid "Selected"
 msgstr "Selezionati"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "Azioni selezionate eliminate"
 
@@ -11336,7 +11336,7 @@ msgstr "Stato dei trigger"
 msgid "Status only"
 msgstr "Solo lo stato"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Stato aggiornato"
 

@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1475,7 +1475,7 @@ msgstr "無法刪除腳本. 腳本 \"%1$s\" 用於動作操作\"%2$s\"."
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "無法刪除腳本. 腳本ID為 \"%s\"的腳本不存在."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "無法刪除所選的動作"
 
@@ -1994,7 +1994,7 @@ msgstr "無法更新服務"
 msgid "Cannot update slide show"
 msgstr "無法更新簡報片展示"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "無法更新狀態"
 
@@ -9003,7 +9003,7 @@ msgstr "僅全數值"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "操作\"%s\"已存在."
@@ -10763,7 +10763,7 @@ msgstr "選擇行含有值類似於"
 msgid "Selected"
 msgstr "選擇的"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "所選的動作已刪除"
 
@@ -11323,7 +11323,7 @@ msgstr "觸發器狀態"
 msgid "Status only"
 msgstr "只有狀態"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "狀態已更新"
 

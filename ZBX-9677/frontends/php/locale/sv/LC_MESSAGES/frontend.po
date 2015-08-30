@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-27 11:28+0300\n"
 "PO-Revision-Date: 2013-01-27 08:54+0200\n"
 "Last-Translator: Niklas <niklas@gyori.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -1479,7 +1479,7 @@ msgstr ""
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr ""
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr ""
 
@@ -2000,7 +2000,7 @@ msgstr "Kan inte uppdatera tjänst"
 msgid "Cannot update slide show"
 msgstr ""
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Kan inte uppdatera status"
 
@@ -9003,7 +9003,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -10764,7 +10764,7 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr ""
 
@@ -11324,7 +11324,7 @@ msgstr "Status för utlösare"
 msgid "Status only"
 msgstr "Endast status"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Status uppdaterad"
 
