@@ -453,8 +453,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command",
 			operationid, HOST_STATUS_MONITORED);
 #ifdef HAVE_OPENIPMI
-	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-			",0,2,null,null");
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, ",0,2,null,null");
 #endif
 	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_hst oh"
