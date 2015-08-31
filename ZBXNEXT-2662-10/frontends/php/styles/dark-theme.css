@@ -1934,8 +1934,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   background-color: #e45959; }
 
 .na-bg, .na-bg input[type="radio"]:checked + label {
-  color: #2a353a;
-  background-color: #97aab3; }
+  color: #2a353a; }
 
 td.na-bg, td.normal-bg, td.info-bg, td.average-bg, td.warning-bg, td.high-bg, td.disaster-bg {
   border-left: none; }
@@ -1952,24 +1951,19 @@ td.active-bg {
   color: #0e4123; }
 
 .info-bg, .info-bg input[type="radio"]:checked + label {
-  color: #00268d;
-  background-color: #7499ff; }
+  color: #00268d; }
 
 .average-bg, .average-bg input[type="radio"]:checked + label {
-  color: #733100;
-  background-color: #ffa059; }
+  color: #733100; }
 
 .warning-bg, .warning-bg input[type="radio"]:checked + label {
-  color: #734d00;
-  background-color: #ffc859; }
+  color: #734d00; }
 
 .high-bg, .high-bg input[type="radio"]:checked + label {
-  color: #52190b;
-  background-color: #e97659; }
+  color: #52190b; }
 
 .disaster-bg, .disaster-bg input[type="radio"]:checked + label {
-  color: #4b0c0c;
-  background-color: #e45959; }
+  color: #4b0c0c; }
 
 .inactive-bg, td.inactive-bg {
   color: #4b0c0c;
