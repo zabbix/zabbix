@@ -1093,7 +1093,7 @@ static void	DCsync_hosts(DB_RESULT result)
 				if (NULL != host_h && host == host_h->host_ptr)	/* see ZBX-4045 for NULL check */
 				{
 					zbx_strpool_release(host_h->host);
-					zbx_hashset_remove(&config->hosts_h, &host_h_local);
+					zbx_hashset_remove_direct(&config->hosts_h, host_h);
 				}
 			}
 
@@ -1116,7 +1116,7 @@ static void	DCsync_hosts(DB_RESULT result)
 				if (NULL != host_p && host == host_p->host_ptr)
 				{
 					zbx_strpool_release(host_p->host);
-					zbx_hashset_remove(&config->hosts_p, &host_p_local);
+					zbx_hashset_remove_direct(&config->hosts_p, host_p);
 				}
 			}
 
@@ -1244,7 +1244,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			{
 				zbx_strpool_release(psk_i->tls_psk_identity);
 				zbx_strpool_release(psk_i->tls_psk);
-				zbx_hashset_remove(&config->psks, &psk_i_local);
+				zbx_hashset_remove_direct(&config->psks, psk_i);
 			}
 
 			host->tls_dc_psk = NULL;
@@ -1278,7 +1278,7 @@ static void	DCsync_hosts(DB_RESULT result)
 			{
 				zbx_strpool_release(psk_i->tls_psk_identity);
 				zbx_strpool_release(psk_i->tls_psk);
-				zbx_hashset_remove(&config->psks, &psk_i_local);
+				zbx_hashset_remove_direct(&config->psks, psk_i);
 			}
 
 			host->tls_dc_psk = NULL;
@@ -1377,7 +1377,7 @@ done:
 			zbx_strpool_release(ipmihost->ipmi_username);
 			zbx_strpool_release(ipmihost->ipmi_password);
 
-			zbx_hashset_remove(&config->ipmihosts, &hostid);
+			zbx_hashset_remove_direct(&config->ipmihosts, ipmihost);
 		}
 
 		/* proxies */
@@ -1415,7 +1415,7 @@ done:
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
 
-			zbx_hashset_remove(&config->proxies, &hostid);
+			zbx_hashset_remove_direct(&config->proxies, proxy);
 		}
 
 		host->status = status;
@@ -1441,7 +1441,7 @@ done:
 			zbx_strpool_release(ipmihost->ipmi_username);
 			zbx_strpool_release(ipmihost->ipmi_password);
 
-			zbx_hashset_remove(&config->ipmihosts, &hostid);
+			zbx_hashset_remove_direct(&config->ipmihosts, ipmihost);
 		}
 
 		/* proxies */
@@ -1454,7 +1454,7 @@ done:
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
 
-			zbx_hashset_remove(&config->proxies, &hostid);
+			zbx_hashset_remove_direct(&config->proxies, proxy);
 		}
 
 		/* hosts */
@@ -1467,7 +1467,7 @@ done:
 			if (NULL != host_h && host == host_h->host_ptr)	/* see ZBX-4045 for NULL check */
 			{
 				zbx_strpool_release(host_h->host);
-				zbx_hashset_remove(&config->hosts_h, &host_h_local);
+				zbx_hashset_remove_direct(&config->hosts_h, host_h);
 			}
 		}
 		else if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
@@ -1478,7 +1478,7 @@ done:
 			if (NULL != host_p && host == host_p->host_ptr)
 			{
 				zbx_strpool_release(host_p->host);
-				zbx_hashset_remove(&config->hosts_p, &host_p_local);
+				zbx_hashset_remove_direct(&config->hosts_p, host_p);
 			}
 		}
 
@@ -1498,7 +1498,7 @@ done:
 			{
 				zbx_strpool_release(psk_i->tls_psk_identity);
 				zbx_strpool_release(psk_i->tls_psk);
-				zbx_hashset_remove(&config->psks, &psk_i_local);
+				zbx_hashset_remove_direct(&config->psks, psk_i);
 			}
 		}
 #endif
@@ -1673,7 +1673,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 				if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
 				{
 					zbx_strpool_release(gmacro_m->macro);
-					zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
+					zbx_hashset_remove_direct(&config->gmacros_m, gmacro_m);
 				}
 			}
 
@@ -1718,7 +1718,7 @@ static void	DCsync_gmacros(DB_RESULT result)
 		if (NULL != gmacro_m && gmacro == gmacro_m->gmacro_ptr)	/* see ZBX-4045 for NULL check */
 		{
 			zbx_strpool_release(gmacro_m->macro);
-			zbx_hashset_remove(&config->gmacros_m, &gmacro_m_local);
+			zbx_hashset_remove_direct(&config->gmacros_m, gmacro_m);
 		}
 
 		zbx_strpool_release(gmacro->macro);
@@ -1776,7 +1776,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 				if (hmacro == hmacro_hm->hmacro_ptr)
 				{
 					zbx_strpool_release(hmacro_hm->macro);
-					zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
+					zbx_hashset_remove_direct(&config->hmacros_hm, hmacro_hm);
 				}
 			}
 
@@ -1825,7 +1825,7 @@ static void	DCsync_hmacros(DB_RESULT result)
 		if (hmacro == hmacro_hm->hmacro_ptr)
 		{
 			zbx_strpool_release(hmacro_hm->macro);
-			zbx_hashset_remove(&config->hmacros_hm, &hmacro_hm_local);
+			zbx_hashset_remove_direct(&config->hmacros_hm, hmacro_hm);
 		}
 
 		zbx_strpool_release(hmacro->macro);
@@ -1901,7 +1901,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
 				{
 					/* see ZBX-4045 for NULL check in the conditional */
-					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+					zbx_hashset_remove_direct(&config->interfaces_ht, interface_ht);
 				}
 			}
 
@@ -1995,7 +1995,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (NULL != interface_ht && interface == interface_ht->interface_ptr)
 				{
 					/* see ZBX-4045 for NULL check in the conditional */
-					zbx_hashset_remove(&config->interfaces_ht, &interface_ht_local);
+					zbx_hashset_remove_direct(&config->interfaces_ht, interface_ht);
 				}
 			}
 
@@ -2124,7 +2124,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				if (item == item_hk->item_ptr)
 				{
 					zbx_strpool_release(item_hk->key);
-					zbx_hashset_remove(&config->items_hk, &item_hk_local);
+					zbx_hashset_remove_direct(&config->items_hk, item_hk);
 				}
 			}
 
@@ -2227,7 +2227,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			/* remove delay_flex parameter for non-flexible item */
 
 			zbx_strpool_release(flexitem->delay_flex);
-			zbx_hashset_remove(&config->flexitems, &itemid);
+			zbx_hashset_remove_direct(&config->flexitems, flexitem);
 
 			delay_flex_changed = 1;
 		}
@@ -2307,7 +2307,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(numitem->formula);
 			zbx_strpool_release(numitem->units);
 
-			zbx_hashset_remove(&config->numitems, &itemid);
+			zbx_hashset_remove_direct(&config->numitems, numitem);
 		}
 
 		/* SNMP items */
@@ -2346,7 +2346,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
 			zbx_strpool_release(snmpitem->snmpv3_contextname);
 
-			zbx_hashset_remove(&config->snmpitems, &itemid);
+			zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
 		}
 
 		/* IPMI items */
@@ -2361,7 +2361,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			/* remove IPMI parameters for non-IPMI item */
 			zbx_strpool_release(ipmiitem->ipmi_sensor);
-			zbx_hashset_remove(&config->ipmiitems, &itemid);
+			zbx_hashset_remove_direct(&config->ipmiitems, ipmiitem);
 		}
 
 		/* trapper items */
@@ -2376,7 +2376,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			/* remove trapper_hosts parameter */
 			zbx_strpool_release(trapitem->trapper_hosts);
-			zbx_hashset_remove(&config->trapitems, &itemid);
+			zbx_hashset_remove_direct(&config->trapitems, trapitem);
 		}
 
 		/* log items */
@@ -2391,7 +2391,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			/* remove logtimefmt parameter */
 			zbx_strpool_release(logitem->logtimefmt);
-			zbx_hashset_remove(&config->logitems, &itemid);
+			zbx_hashset_remove_direct(&config->logitems, logitem);
 		}
 
 		/* db items */
@@ -2411,7 +2411,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(dbitem->username);
 			zbx_strpool_release(dbitem->password);
 
-			zbx_hashset_remove(&config->dbitems, &itemid);
+			zbx_hashset_remove_direct(&config->dbitems, dbitem);
 		}
 
 		/* SSH items */
@@ -2437,7 +2437,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(sshitem->privatekey);
 			zbx_strpool_release(sshitem->params);
 
-			zbx_hashset_remove(&config->sshitems, &itemid);
+			zbx_hashset_remove_direct(&config->sshitems, sshitem);
 		}
 
 		/* TELNET items */
@@ -2458,7 +2458,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(telnetitem->password);
 			zbx_strpool_release(telnetitem->params);
 
-			zbx_hashset_remove(&config->telnetitems, &itemid);
+			zbx_hashset_remove_direct(&config->telnetitems, telnetitem);
 		}
 
 		/* simple items */
@@ -2477,7 +2477,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(simpleitem->username);
 			zbx_strpool_release(simpleitem->password);
 
-			zbx_hashset_remove(&config->simpleitems, &itemid);
+			zbx_hashset_remove_direct(&config->simpleitems, simpleitem);
 		}
 
 		/* JMX items */
@@ -2496,7 +2496,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(jmxitem->username);
 			zbx_strpool_release(jmxitem->password);
 
-			zbx_hashset_remove(&config->jmxitems, &itemid);
+			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
 		}
 
 		/* SNMP trap items for current server/proxy */
@@ -2530,7 +2530,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			/* remove calculated item parameters */
 
 			zbx_strpool_release(calcitem->params);
-			zbx_hashset_remove(&config->calcitems, &itemid);
+			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
 		DCupdate_item_queue(item, old_poller_type, old_nextcheck);
@@ -2558,7 +2558,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(numitem->formula);
 			zbx_strpool_release(numitem->units);
 
-			zbx_hashset_remove(&config->numitems, &itemid);
+			zbx_hashset_remove_direct(&config->numitems, numitem);
 		}
 
 		/* SNMP items */
@@ -2574,7 +2574,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(snmpitem->snmpv3_privpassphrase);
 			zbx_strpool_release(snmpitem->snmpv3_contextname);
 
-			zbx_hashset_remove(&config->snmpitems, &itemid);
+			zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
 		}
 
 		/* IPMI items */
@@ -2583,7 +2583,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			ipmiitem = zbx_hashset_search(&config->ipmiitems, &itemid);
 			zbx_strpool_release(ipmiitem->ipmi_sensor);
-			zbx_hashset_remove(&config->ipmiitems, &itemid);
+			zbx_hashset_remove_direct(&config->ipmiitems, ipmiitem);
 		}
 
 		/* items with flexible intervals */
@@ -2591,7 +2591,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
 		{
 			zbx_strpool_release(flexitem->delay_flex);
-			zbx_hashset_remove(&config->flexitems, &itemid);
+			zbx_hashset_remove_direct(&config->flexitems, flexitem);
 		}
 
 		/* trapper items */
@@ -2600,7 +2600,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				NULL != (trapitem = zbx_hashset_search(&config->trapitems, &itemid)))
 		{
 			zbx_strpool_release(trapitem->trapper_hosts);
-			zbx_hashset_remove(&config->trapitems, &itemid);
+			zbx_hashset_remove_direct(&config->trapitems, trapitem);
 		}
 
 		/* log items */
@@ -2609,7 +2609,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				NULL != (logitem = zbx_hashset_search(&config->logitems, &itemid)))
 		{
 			zbx_strpool_release(logitem->logtimefmt);
-			zbx_hashset_remove(&config->logitems, &itemid);
+			zbx_hashset_remove_direct(&config->logitems, logitem);
 		}
 
 		/* db items */
@@ -2621,7 +2621,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(dbitem->username);
 			zbx_strpool_release(dbitem->password);
 
-			zbx_hashset_remove(&config->dbitems, &itemid);
+			zbx_hashset_remove_direct(&config->dbitems, dbitem);
 		}
 
 		/* SSH items */
@@ -2636,7 +2636,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(sshitem->privatekey);
 			zbx_strpool_release(sshitem->params);
 
-			zbx_hashset_remove(&config->sshitems, &itemid);
+			zbx_hashset_remove_direct(&config->sshitems, sshitem);
 		}
 
 		/* TELNET items */
@@ -2649,7 +2649,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(telnetitem->password);
 			zbx_strpool_release(telnetitem->params);
 
-			zbx_hashset_remove(&config->telnetitems, &itemid);
+			zbx_hashset_remove_direct(&config->telnetitems, telnetitem);
 		}
 
 		/* simple items */
@@ -2661,7 +2661,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(simpleitem->username);
 			zbx_strpool_release(simpleitem->password);
 
-			zbx_hashset_remove(&config->simpleitems, &itemid);
+			zbx_hashset_remove_direct(&config->simpleitems, simpleitem);
 		}
 
 		/* JMX items */
@@ -2673,7 +2673,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			zbx_strpool_release(jmxitem->username);
 			zbx_strpool_release(jmxitem->password);
 
-			zbx_hashset_remove(&config->jmxitems, &itemid);
+			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
 		}
 
 		/* calculated items */
@@ -2682,13 +2682,13 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		{
 			calcitem = zbx_hashset_search(&config->calcitems, &itemid);
 			zbx_strpool_release(calcitem->params);
-			zbx_hashset_remove(&config->calcitems, &itemid);
+			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
 		/* delta items */
 
 		if (NULL != (deltaitem = zbx_hashset_search(&config->deltaitems, &itemid)))
-			zbx_hashset_remove(&config->deltaitems, &itemid);
+			zbx_hashset_remove_direct(&config->deltaitems, deltaitem);
 
 		/* items */
 
@@ -2699,7 +2699,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 		if (item == item_hk->item_ptr)
 		{
 			zbx_strpool_release(item_hk->key);
-			zbx_hashset_remove(&config->items_hk, &item_hk_local);
+			zbx_hashset_remove_direct(&config->items_hk, item_hk);
 		}
 
 		if (ZBX_LOC_QUEUE == item->location)
@@ -6692,7 +6692,7 @@ void	DCset_delta_items(zbx_hashset_t *items)
 				}
 			}
 			else
-				zbx_hashset_remove(&config->deltaitems, &item->itemid);
+				zbx_hashset_remove_direct(&config->deltaitems, deltaitem);
 		}
 	}
 
