@@ -47,7 +47,7 @@ $favouriteGraphs = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['fav
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', true))
 	->setHeader(_('Favourite graphs'), [$icon], true)
 	->setFooter(new CList([
-		(new CLink(_('Graphs'), 'charts.php'))->addClass('highlight')
+		new CLink(_('Graphs'), 'charts.php')
 	]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.col', 0);
@@ -65,7 +65,7 @@ $favouriteMaps = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favouri
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true))
 	->setHeader(_('Favourite maps'), [$icon], true)
 	->setFooter(new CList([
-		(new CLink(_('Maps'), 'zabbix.php?action=map.view'))->addClass('highlight')
+		new CLink(_('Maps'), 'zabbix.php?action=map.view')
 	]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
@@ -83,8 +83,8 @@ $favouriteScreens = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['f
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true))
 	->setHeader(_('Favourite screens'), [$icon], true)
 	->setFooter(new CList([
-		(new CLink(_('Screens'), 'screens.php'))->addClass('highlight'),
-		(new CLink(_('Slide shows'), 'slides.php'))->addClass('highlight')
+		new CLink(_('Screens'), 'screens.php'),
+		new CLink(_('Slide shows'), 'slides.php')
 	]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);

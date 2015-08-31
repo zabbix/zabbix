@@ -1052,26 +1052,23 @@ function getItemFormData(array $item = [], array $options = []) {
 					}
 					// discovery rule
 					elseif ($data['is_discovery_rule']) {
-						$data['templates'][] = (new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid']))
-							->addClass('highlight')
-							->addClass('underline')
-							->addClass('weight_normal');
+						$data['templates'][] = new CLink($host['name'],
+							'host_discovery.php?form=update&itemid='.$item['itemid']
+						);
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// item prototype
 					elseif ($item['discoveryRule']) {
-						$data['templates'][] = (new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']))
-							->addClass('highlight')
-							->addClass('underline')
-							->addClass('weight_normal');
+						$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
+							'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
+						);
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
 					else {
-						$data['templates'][] = (new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid']))
-							->addClass('highlight')
-							->addClass('underline')
-							->addClass('weight_normal');
+						$data['templates'][] = new CLink($host['name'],
+							'items.php?form=update&itemid='.$item['itemid']
+						);
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 				}
@@ -1451,10 +1448,7 @@ function getTriggerFormData($exprAction) {
 					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 				}
 
-				$data['templates'][] = (new CLink(CHtml::encode($db_triggers['name']), $link))
-					->addClass('highlight')
-					->addClass('underline')
-					->addClass('weight_normal');
+				$data['templates'][] = new CLink(CHtml::encode($db_triggers['name']), $link);
 				$data['templates'][] = SPACE.'&rArr;'.SPACE;
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
