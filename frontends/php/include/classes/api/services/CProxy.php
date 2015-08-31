@@ -277,6 +277,7 @@ class CProxy extends CApiService {
 			}
 
 			$this->encryptionValidation($proxy);
+			$proxy = $this->cleanEncryptionFields($proxy);
 		}
 		unset($proxy);
 
@@ -676,10 +677,12 @@ class CProxy extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from proxy field.'));
 		}
 
-		// psk validation
-		if ((array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK)
-				|| (array_key_exists('tls_accept', $data)
-					&& ($data['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
+		// PSK validation
+		if ((array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK
+				&& $data['status'] == HOST_STATUS_PROXY_PASSIVE)
+					|| (array_key_exists('tls_accept', $data)
+						&& ($data['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK
+						&& $data['status'] == HOST_STATUS_PROXY_ACTIVE)) {
 			if (!array_key_exists('tls_psk_identity', $data) || zbx_empty($data['tls_psk_identity'])) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
 			}
@@ -692,5 +695,37 @@ class CProxy extends CApiService {
 				));
 			}
 		}
+	}
+
+
+	/**
+	 * Clean extra PSK and certificate fields.
+	 *
+	 * @param array $data		proxy data array
+	 *
+	 * @return array
+	 */
+	protected function cleanEncryptionFields(array $data) {
+		// PSK fields
+		if ((!array_key_exists('tls_connect', $data)
+				|| (array_key_exists('tls_connect', $data) && $data['tls_connect'] != HOST_ENCRYPTION_PSK))
+					&& (!array_key_exists('tls_accept', $data)
+						|| (array_key_exists('tls_accept', $data)
+							&& $data['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK)) {
+			$data['tls_psk_identity'] = '';
+			$data['tls_psk'] = '';
+		}
+
+		// certificate fields
+		if ((!array_key_exists('tls_connect', $data)
+				|| (array_key_exists('tls_connect', $data) && $data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE))
+					&& (!array_key_exists('tls_accept', $data)
+						|| (array_key_exists('tls_accept', $data)
+							&& $data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE)) {
+			$data['tls_issuer'] = '';
+			$data['tls_subject'] = '';
+		}
+
+		return $data;
 	}
 }

@@ -542,6 +542,7 @@ class CHost extends CHostGeneral {
 				}
 
 				$this->encryptionValidation($host);
+				$host = $this->cleanEncryptionFields($host);
 			}
 		}
 
@@ -946,6 +947,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$this->encryptionValidation($data);
+		$data = $this->cleanEncryptionFields($data);
 
 		if (isset($data['host'])) {
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])) {
@@ -1654,7 +1656,7 @@ class CHost extends CHostGeneral {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from host field.'));
 		}
 
-		// psk validation
+		// PSK validation
 		if ((array_key_exists('tls_connect', $data) && $data['tls_connect'] == HOST_ENCRYPTION_PSK)
 				|| (array_key_exists('tls_accept', $data)
 					&& ($data['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
@@ -1670,5 +1672,36 @@ class CHost extends CHostGeneral {
 				));
 			}
 		}
+	}
+
+	/**
+	 * Clean extra PSK and certificate fields.
+	 *
+	 * @param array $data		host data array
+	 *
+	 * @return array
+	 */
+	protected function cleanEncryptionFields(array $data) {
+		// PSK fields
+		if ((!array_key_exists('tls_connect', $data)
+				|| (array_key_exists('tls_connect', $data) && $data['tls_connect'] != HOST_ENCRYPTION_PSK))
+					&& (!array_key_exists('tls_accept', $data)
+						|| (array_key_exists('tls_accept', $data)
+							&& $data['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK)) {
+			$data['tls_psk_identity'] = '';
+			$data['tls_psk'] = '';
+		}
+
+		// certificate fields
+		if ((!array_key_exists('tls_connect', $data)
+				|| (array_key_exists('tls_connect', $data) && $data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE))
+					&& (!array_key_exists('tls_accept', $data)
+						|| (array_key_exists('tls_accept', $data)
+							&& $data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE)) {
+			$data['tls_issuer'] = '';
+			$data['tls_subject'] = '';
+		}
+
+		return $data;
 	}
 }
