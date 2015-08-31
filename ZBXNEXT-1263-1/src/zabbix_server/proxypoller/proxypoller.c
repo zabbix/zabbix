@@ -86,7 +86,7 @@ static int	recv_data_from_proxy(DC_PROXY *proxy, zbx_socket_t *sock)
 				zbx_socket_strerror());
 	}
 	else
-		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": %s", proxy->host, sock->buffer);
+		zabbix_log(LOG_LEVEL_DEBUG, "obtained data from proxy \"%s\": [%s]", proxy->host, sock->buffer);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -233,14 +233,13 @@ static int	process_proxy(void)
 
 				if (SUCCEED == (ret = send_data_to_proxy(&proxy, &s, j.buffer)))
 				{
-					char	*error = NULL;
-
 					if (SUCCEED != (ret = zbx_recv_response(&s, 0, &error)))
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "cannot send configuration data to proxy"
 								" \"%s\" at \"%s\": %s",
 								proxy.host, get_ip_by_socket(&s), error);
 					}
+
 					zbx_free(error);
 				}
 
@@ -256,6 +255,15 @@ static int	process_proxy(void)
 			if (SUCCEED == get_data_from_proxy(&proxy,
 					ZBX_PROTO_VALUE_HOST_AVAILABILITY, &answer))
 			{
+				if ('\0' == *answer)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no host"
+							" availability data. Check allowed connection types and access"
+							" rights.", proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
+
 				if (SUCCEED == zbx_json_open(answer, &jp))
 					process_host_availability(&jp);
 
@@ -267,6 +275,15 @@ retry_history:
 			if (SUCCEED == get_data_from_proxy(&proxy,
 					ZBX_PROTO_VALUE_HISTORY_DATA, &answer))
 			{
+				if ('\0' == *answer)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no history"
+							" data. Check allowed connection types and access rights.",
+							proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
+
 				if (SUCCEED == zbx_json_open(answer, &jp))
 				{
 					process_hist_data(NULL, &jp, proxy.hostid, NULL, 0);
@@ -280,6 +297,7 @@ retry_history:
 						}
 					}
 				}
+
 				zbx_free(answer);
 			}
 			else
@@ -288,6 +306,15 @@ retry_dhistory:
 			if (SUCCEED == get_data_from_proxy(&proxy,
 					ZBX_PROTO_VALUE_DISCOVERY_DATA, &answer))
 			{
+				if ('\0' == *answer)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no discovery"
+							" data. Check allowed connection types and access rights.",
+							proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
+
 				if (SUCCEED == zbx_json_open(answer, &jp))
 				{
 					process_dhis_data(&jp);
@@ -301,6 +328,7 @@ retry_dhistory:
 						}
 					}
 				}
+
 				zbx_free(answer);
 			}
 			else
@@ -309,6 +337,15 @@ retry_autoreg_host:
 			if (SUCCEED == get_data_from_proxy(&proxy,
 					ZBX_PROTO_VALUE_AUTO_REGISTRATION_DATA, &answer))
 			{
+				if ('\0' == *answer)
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no"
+							" autoregistration data. Check allowed connection types and"
+							" access rights.", proxy.host, proxy.addr);
+					zbx_free(answer);
+					goto network_error;
+				}
+
 				if (SUCCEED == zbx_json_open(answer, &jp))
 				{
 					process_areg_data(&jp, proxy.hostid);
@@ -322,6 +359,7 @@ retry_autoreg_host:
 						}
 					}
 				}
+
 				zbx_free(answer);
 			}
 			else
