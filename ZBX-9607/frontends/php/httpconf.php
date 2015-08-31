@@ -199,10 +199,10 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			$i = 1;
 			foreach ($steps as $stepNumber => &$step) {
 				$step['no'] = $i++;
-				$step['follow_redirects'] = (1 == $step['follow_redirects'])
+				$step['follow_redirects'] = ($step['follow_redirects'] == 1)
 					? HTTPTEST_STEP_FOLLOW_REDIRECTS_ON
 					: HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF;
-				$step['retrieve_mode'] = (1 == $step['retrieve_mode'])
+				$step['retrieve_mode'] = ($step['retrieve_mode'] == 1)
 					? HTTPTEST_STEP_RETRIEVE_MODE_HEADERS
 					: HTTPTEST_STEP_RETRIEVE_MODE_CONTENT;
 			}
