@@ -784,7 +784,7 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.11rc1
 
 New features:
-A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 ........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
