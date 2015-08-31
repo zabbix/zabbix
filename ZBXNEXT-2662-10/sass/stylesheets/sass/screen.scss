@@ -2845,6 +2845,14 @@ td.na-bg {
 	}
 }
 
+.log-na-bg {
+	color: darken($alt-blue-grey,45%);
+	background-color: $alt-blue-grey;
+}
+td.log-na-bg {
+	@extend td.na-bg;
+}
+
 .normal-bg {
 	color: darken($alt-green,45%);
 	@extend .green-bg;
@@ -2877,6 +2885,14 @@ td.info-bg {
 	@extend td.na-bg;
 }
 
+.log-info-bg {
+	color: darken($alt-dark-blue,45%);
+	background-color: $alt-dark-blue;
+}
+td.log-info-bg {
+	@extend td.na-bg;
+}
+
 .average-bg {
 	color: darken($alt-orange,45%);
 	//background-color: $alt-orange;
@@ -2905,6 +2921,15 @@ td.warning-bg {
 	@extend td.na-bg;
 }
 
+.log-warning-bg {
+	color: darken($alt-yellow,45%);
+	background-color: $alt-yellow;
+}
+td.log-warning-bg {
+	@extend td.na-bg;
+}
+
+
 .high-bg {
 	color: darken($alt-dark-orange,45%);
 	//background-color: $alt-dark-orange;
@@ -2919,6 +2944,14 @@ td.high-bg {
 	@extend td.na-bg;
 }
 
+.log-high-bg {
+	color: darken($alt-dark-orange,45%);
+	background-color: $alt-dark-orange;
+}
+td.log-high-bg {
+	@extend td.na-bg;
+}
+
 .disaster-bg {
 	color: darken($alt-red,45%);
 	//background-color: $alt-red;
@@ -2930,6 +2963,14 @@ td.high-bg {
 	}
 }
 td.disaster-bg {
+	@extend td.na-bg;
+}
+
+.log-disaster-bg {
+	color: darken($alt-red,45%);
+	background-color: $alt-red;
+}
+td.log-disaster-bg {
 	@extend td.na-bg;
 }
 
