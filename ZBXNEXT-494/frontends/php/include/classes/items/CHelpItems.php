@@ -423,7 +423,7 @@ class CHelpItems {
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
 				],
 				[
-					'key' => 'proc.cpu.util[<name>,<user>,<state>,<cmdline>,<mode>,<scope>]',
+					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
 					'description' => _('Process CPU utilisation in percent. Returns float')
 				],
 				[
