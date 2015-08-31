@@ -850,3 +850,36 @@ function makeDebugButton()
 			)
 	))->addClass(ZBX_STYLE_BTN_DEBUG);
 }
+
+/**
+ * Returns css for trigger severity backgrounds
+ *
+ * @param array $config
+ * @param array $config[severity_color_0]
+ * @param array $config[severity_color_1]
+ * @param array $config[severity_color_2]
+ * @param array $config[severity_color_3]
+ * @param array $config[severity_color_4]
+ * @param array $config[severity_color_5]
+ *
+ * @return string
+ */
+function getTriggerSeverityCss($config)
+{
+	$severities = [
+		ZBX_STYLE_NA_BG => $config['severity_color_0'],
+		ZBX_STYLE_INFO_BG => $config['severity_color_1'],
+		ZBX_STYLE_WARNING_BG => $config['severity_color_2'],
+		ZBX_STYLE_AVERAGE_BG => $config['severity_color_3'],
+		ZBX_STYLE_HIGH_BG => $config['severity_color_4'],
+		ZBX_STYLE_DISASTER_BG => $config['severity_color_5']
+	];
+
+	$css = '';
+
+	foreach ($severities as $class => $color) {
+		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label { background-color: #'.$color.' }'."\n";
+	}
+
+	return $css;
+}
