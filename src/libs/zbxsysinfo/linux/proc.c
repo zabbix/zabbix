@@ -991,7 +991,7 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 	if (-1 == (fd = open(tmp, O_RDONLY)))
 		return -errno;
 
-	if (-1 == (n = read(fd, tmp, sizeof(tmp))))
+	if (-1 == (n = read(fd, tmp, sizeof(tmp) - 1)))
 	{
 		ret = -errno;
 		goto out;
@@ -1148,7 +1148,7 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 {
 	char			*procname = NULL, *cmdline = NULL, *name_arg0 = NULL;
-	uid_t			uid;
+	uid_t			uid = 0;
 	zbx_sysinfo_proc_t	*proc = NULL;
 	int			ret = FAIL;
 
