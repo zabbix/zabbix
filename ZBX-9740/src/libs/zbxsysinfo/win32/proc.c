@@ -21,6 +21,7 @@
 #include "sysinfo.h"
 
 #include <tlhelp32.h>
+#include <Processsnapshot.h>
 
 #include "symbols.h"
 #include "log.h"
