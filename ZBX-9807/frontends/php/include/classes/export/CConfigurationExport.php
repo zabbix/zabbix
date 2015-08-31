@@ -825,10 +825,17 @@ class CConfigurationExport {
 					continue 2;
 				}
 
-				foreach ($items[$item['itemid']]['applications'] as $application) {
-					if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-						unset($triggers[$idx]);
-						continue 3;
+				/*
+				 * Function processes both triggers and trigger prototypes. Triggers can have items that belong to
+				 * discovered applications. Those triggers are removed. Trigger prototypes can have item prototypes that
+				 * also belong to applications, but those applications are regular applications. No discovered ones.
+				 */
+				if (array_key_exists($item['itemid'], $items)) {
+					foreach ($items[$item['itemid']]['applications'] as $application) {
+						if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+							unset($triggers[$idx]);
+							continue 3;
+						}
 					}
 				}
 			}
