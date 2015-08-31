@@ -74,6 +74,7 @@ class CUserGroup extends CApiService {
 			'editable'					=> null,
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
+			'selectUsrgrpRights'		=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
@@ -687,6 +688,29 @@ class CUserGroup extends CApiService {
 			]);
 
 			$result = $relationMap->mapMany($result, $dbUsers, 'users');
+		}
+
+		// adding usergroup rights
+		if ($options['selectUsrgrpRights'] !== null && $options['selectUsrgrpRights'] != API_OUTPUT_COUNT) {
+			// create relationMap with usrgrpid as foreign key
+			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'usrgrpid', 'users_groups');
+
+			// get usergroup ids
+			$usrgrpIds = array_keys($result);
+
+			// get usergroup rights
+			$usrgrpRights = [];
+			$usrgrpRightsDb = DBselect(
+				'SELECT groupid,permission,id'.
+				' FROM rights'.
+				' WHERE '.dbConditionInt('groupid', $usrgrpIds)
+			);
+			while ($rights = DBfetch($usrgrpRightsDb)) {
+				$usrgrpRights[$rights['groupid']][$rights['id']] = $rights['permission'];
+			}
+
+			// add usrgrprights in result
+			$result = $relationMap->mapMany($result, $usrgrpRights, 'usrgrprights');
 		}
 
 		return $result;
