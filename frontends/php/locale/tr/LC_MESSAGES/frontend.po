@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-31 12:52+0300\n"
-"PO-Revision-Date: 2014-02-02 00:22+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"POT-Creation-Date: 2015-08-31 13:04+0300\n"
+"PO-Revision-Date: 2015-08-28 12:31+0300\n"
+"Last-Translator: mcsaygili <mcagdas@mcsaygili.net>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391293363.0\n"
+"X-POOTLE-MTIME: 1440757913.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -36,8 +36,8 @@ msgstr ""
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d gün"
+msgstr[1] "%1$d gün"
 
 #: include/blocks.inc.php:1125
 #, c-format
@@ -62,38 +62,38 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s Öğe"
+msgstr[1] "%1$s Öğe"
 
 #: include/views/configuration.item.edit.php:327
 #: include/views/configuration.item.edit.php:343
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s gün"
+msgstr[1] "%1$s gün"
 
 #: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s dakika"
+msgstr[1] "%1$s dakika"
 
 #: include/classes/screens/CScreenActions.php:151
 #: include/views/administration.auditacts.list.php:90
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kalan deneme sayısı %1$s"
+msgstr[1] "Kalan deneme sayısı %1$s"
 
 #: jsLoader.php:222 jsLoader.php:223
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s saniye"
+msgstr[1] "%1$s saniye"
 
 #: include/page_header.php:344
 #, c-format
@@ -123,7 +123,7 @@ msgstr "(0 - belirsiz)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:159
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Sadece super admin yetkisine sahip kullanıcılar grup oluşturabilir)"
 
 #: include/forms.inc.php:580 include/forms.inc.php:595
 msgid "(in days)"
@@ -201,15 +201,16 @@ msgid "<manual>"
 msgstr "<elle>"
 
 #: include/views/administration.auditacts.list.php:31
+#, fuzzy
 msgid "ACTION LOG"
-msgstr ""
+msgstr "EYLEM GÜNLÜĞÜ"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:194
 msgid "ALARM ACKNOWLEDGES"
@@ -220,8 +221,9 @@ msgid "AND"
 msgstr "VE"
 
 #: include/views/administration.auditlogs.list.php:31
+#, fuzzy
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "HESAP GÜNLÜĞÜ"
 
 #: report2.php:163
 msgid "AVAILABILITY REPORT"
@@ -253,7 +255,7 @@ msgstr "Erişim reddedildi!"
 
 #: include/func.inc.php:1681
 msgid "Access denied."
-msgstr ""
+msgstr "Erişim engellendi."
 
 #: include/classes/api/services/CUser.php:988
 #, c-format
@@ -342,7 +344,7 @@ msgstr "Eylem"
 #: include/classes/api/services/CAction.php:2057
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" eylemi zaten mevcut."
 
 #: include/classes/api/services/CAction.php:1905
 #: include/classes/api/services/CAction.php:2004
@@ -366,8 +368,8 @@ msgstr "Eylem silindi"
 #: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Eylem devre dışı"
+msgstr[1] "Eylemler devre dışı"
 
 #: actionconf.php:364
 msgid "Action enabled"
