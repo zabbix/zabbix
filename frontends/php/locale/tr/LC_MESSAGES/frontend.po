@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 11:29+0300\n"
+"POT-Creation-Date: 2015-08-31 12:39+0300\n"
 "PO-Revision-Date: 2014-03-24 15:26+0300\n"
 "Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: American English <>\n"
@@ -45,7 +45,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] "%2$d sorunun %1$d'i gösteriliyor"
 msgstr[1] "%2$d sorunun %1$d'i gösteriliyor"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (yıl %2$s)"
@@ -1852,7 +1852,7 @@ msgstr[1] "Web senaryoları devre dışı bırakılamıyor"
 msgid "Cannot display item queue."
 msgstr "Öğe kuyruğu görüntülenemez."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "\"Graph sum\" tipinde birden fazla öğe görüntülenemez"
 
@@ -5465,7 +5465,7 @@ msgstr "GUI erişimi devre dışı."
 msgid "General"
 msgstr "Genel"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:779
 #, c-format
 msgid "Generated in %s sec"
@@ -9813,7 +9813,7 @@ msgstr ""
 msgid "No item with itemid=\"%1$s\"."
 msgstr ""
 
-#: chart3.php:121
+#: chart3.php:123
 msgid "No items defined."
 msgstr "Hiçbir öğe tanımlanmamış."
 
@@ -10075,7 +10075,7 @@ msgstr "Tetik yok"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr ""
 
-#: chart4.php:40 tr_comments.php:41
+#: chart4.php:42 tr_comments.php:41
 msgid "No triggers defined."
 msgstr "Hiçbir tetik tanımlanmamış."
 
@@ -10444,7 +10444,7 @@ msgstr "Sayısal (işaretsiz)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
+#: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
 #: include/maps.inc.php:945 include/setup.inc.php:198
@@ -10963,7 +10963,7 @@ msgstr "PHP xmlwriter eklentisi eksik."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "SORUN"
@@ -11330,7 +11330,7 @@ msgstr "Sorun, eğer bütün altlarda sorun varsa"
 msgid "Problem, if at least one child has a problem"
 msgstr "Sorun, eğer en az alttakilerden birinde sorun varsa"
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
 #: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problemler"
@@ -15698,7 +15698,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 
