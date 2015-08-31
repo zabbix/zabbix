@@ -132,7 +132,6 @@ h4 {
 	line-height: $h4-line-height;
 
 	span {
-		//font-size: $font-body-size;
 		color: $font-alt-color;
 	}
 }
@@ -1472,7 +1471,6 @@ input {
 
 	&[readonly] {
 		color: $font-color!important;
-		//cursor: text!important;
 		@extend %form-disabled;
 	}  
 }
@@ -1489,7 +1487,6 @@ textarea {
 
 	&[readonly] {
 		color: $font-color!important;
-		//cursor: text!important;
 		@extend %form-disabled;
 	}   
 }
@@ -1512,7 +1509,6 @@ select {
 
 	&[readonly] {
 		color: $font-color!important;
-		//cursor: text!important;
 		@extend %form-disabled;
 	}   
 }
@@ -2833,7 +2829,7 @@ a.blue {
 
 .na-bg {
 	color: darken($alt-blue-grey,45%);
-	background-color: $alt-blue-grey;
+	//background-color: $alt-blue-grey;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2869,7 +2865,7 @@ td.active-bg {
 
 .info-bg {
 	color: darken($alt-dark-blue,45%);
-	background-color: $alt-dark-blue;
+	//background-color: $alt-dark-blue;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2883,7 +2879,7 @@ td.info-bg {
 
 .average-bg {
 	color: darken($alt-orange,45%);
-	background-color: $alt-orange;
+	//background-color: $alt-orange;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2897,7 +2893,7 @@ td.average-bg {
 
 .warning-bg {
 	color: darken($alt-yellow,45%);
-	background-color: $alt-yellow;
+	//background-color: $alt-yellow;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2911,7 +2907,7 @@ td.warning-bg {
 
 .high-bg {
 	color: darken($alt-dark-orange,45%);
-	background-color: $alt-dark-orange;
+	//background-color: $alt-dark-orange;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2925,7 +2921,7 @@ td.high-bg {
 
 .disaster-bg {
 	color: darken($alt-red,45%);
-	background-color: $alt-red;
+	//background-color: $alt-red;
 
 	input[type="radio"] {
 		&:checked + label {
