@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 11:56+0300\n"
+"POT-Creation-Date: 2015-08-31 12:52+0300\n"
 "PO-Revision-Date: 2014-09-08 07:23+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -50,7 +50,7 @@ msgstr[1] "відображено %1$d з %2$d проблеми"
 msgstr[2] "відображено %1$d з %2$d проблем"
 msgstr[3] "відображено %1$d з %2$d проблем"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (рік %2$s)"
@@ -1962,7 +1962,7 @@ msgstr[3] "Не вдалося відключити веб-сценарій"
 msgid "Cannot display item queue."
 msgstr "Не вдалося відобразити чергу елементів даних."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Не удалось відобразити більше одного елемента даних з типом \"Сума графіку\". "
 
@@ -5746,7 +5746,7 @@ msgstr "Доступ до GUI відключено."
 msgid "General"
 msgstr "Загальні парам."
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -8384,7 +8384,7 @@ msgstr "Елемент даних використовує інтерфейс н
 msgid "Item uses incorrect interface type."
 msgstr "Елемент даних використовує некоректний тип інтерфейсу."
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr ""
 
@@ -10280,7 +10280,7 @@ msgstr "Немає елемента даних з itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Немає елемента даних з itemid=\"%1$s\"."
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr "Елементів даних не визначено."
 
@@ -10583,7 +10583,7 @@ msgstr "Немає тригера"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Немає тригера з triggerid \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr "Тригерів не визначено."
 
@@ -10887,7 +10887,7 @@ msgstr "Числовий (ціле додатне)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -11431,7 +11431,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11806,7 +11806,7 @@ msgstr "Проблема, якщо всі підлеглі мають пробл
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблема, якщо хоча б у одного із підлеглих наявна проблема"
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Проблеми"
@@ -16261,7 +16261,7 @@ msgctxt "day short"
 msgid "d"
 msgstr "д"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d M"
 

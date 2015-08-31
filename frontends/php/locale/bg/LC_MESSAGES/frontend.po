@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 11:56+0300\n"
+"POT-Creation-Date: 2015-08-31 12:52+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -46,7 +46,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] ""
 msgstr[1] ""
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (година %2$s)"
@@ -1906,7 +1906,7 @@ msgstr[1] "Не може да се изключи уеб сценарий"
 msgid "Cannot display item queue."
 msgstr ""
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
@@ -5659,7 +5659,7 @@ msgstr "GUI достъп забранен."
 msgid "General"
 msgstr "Общ"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -8283,7 +8283,7 @@ msgstr "Елемент на данните използва интерфейс �
 msgid "Item uses incorrect interface type."
 msgstr "Елемент на данните използва невалиден тип интерфейс."
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr ""
 
@@ -10171,7 +10171,7 @@ msgstr "Няма елемент на данните с itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Няма елемент на данните с itemid=\"%1$s\"."
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr "Не са дефинирани елементи на данните."
 
@@ -10474,7 +10474,7 @@ msgstr "Няма тригер"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Няма тригер с triggerid \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr "Не са дефинирани тригери."
 
@@ -10778,7 +10778,7 @@ msgstr "Числен (цяло положително)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -11324,7 +11324,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11700,7 +11700,7 @@ msgstr "Проблем, ако всички деца имат проблеми"
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблем, ако най-малко едно дете има проблем"
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Проблеми"
@@ -16136,7 +16136,7 @@ msgctxt "day short"
 msgid "d"
 msgstr "д"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

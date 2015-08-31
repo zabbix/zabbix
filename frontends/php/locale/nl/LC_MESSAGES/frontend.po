@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 11:56+0300\n"
+"POT-Creation-Date: 2015-08-31 12:52+0300\n"
 "PO-Revision-Date: 2015-04-09 17:33+0300\n"
 "Last-Translator: acropia <acropia@gmail.com>\n"
 "Language-Team: NL\n"
@@ -48,7 +48,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] "%1$d van %2$d probleem wordt getoond"
 msgstr[1] "%1$d van %2$d problemen wordt getoond"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (jaar %2$s)"
@@ -1904,7 +1904,7 @@ msgstr[1] "Kan web scenario niet uitschakelen"
 msgid "Cannot display item queue."
 msgstr "Kan artikel wachtrij niet weergeven."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Kan niet meer dan één item weergeven met type \"Graph sum\"."
 
@@ -5652,7 +5652,7 @@ msgstr "GUI toegang uitgeschakeld."
 msgid "General"
 msgstr "Algemeen"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -8271,7 +8271,7 @@ msgstr "Item maakt gebruik van de host interface van niet-ouder host."
 msgid "Item uses incorrect interface type."
 msgstr "Item maakt gebruik van verkeerd interface type."
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr ""
 
@@ -10155,7 +10155,7 @@ msgstr "Geen item met item ID \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Geen item met item ID=\"%1$s\"."
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr ""
 
@@ -10458,7 +10458,7 @@ msgstr "Geen trigger"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Geen trigger met ID \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr "Geen triggers gedefinieerd."
 
@@ -10762,7 +10762,7 @@ msgstr "Numeriek (integer 64bit)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -11306,7 +11306,7 @@ msgstr "PHP-extensie xmlwriter ontbreekt."
 msgid "POP"
 msgstr ""
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11681,7 +11681,7 @@ msgstr ""
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Problemen"
@@ -16105,7 +16105,7 @@ msgctxt "day short"
 msgid "d"
 msgstr ""
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 
