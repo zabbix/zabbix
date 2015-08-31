@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-31 12:30+0300\n"
-"PO-Revision-Date: 2014-04-27 20:08+0300\n"
-"Last-Translator: dotneft <dotneft@gmail.com>\n"
+"POT-Creation-Date: 2015-08-31 12:31+0300\n"
+"PO-Revision-Date: 2015-08-29 14:41+0300\n"
+"Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1398622081.0\n"
+"X-POOTLE-MTIME: 1440852066.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:575 api/classes/CMaintenance.php:580
@@ -7451,7 +7451,7 @@ msgstr "Преобразование значения \"%1$s\" не уникал
 #: include/views/administration.general.iconmap.edit.php:132
 #: include/views/administration.general.valuemapping.edit.php:43
 msgid "Mappings"
-msgstr "Соответствия"
+msgstr "Преобразования значений"
 
 #: dashboard.php:274 include/blocks.inc.php:1296 include/menu.inc.php:72
 #: include/menu.inc.php:206 include/views/conf.import.php:36 popup.php:97
