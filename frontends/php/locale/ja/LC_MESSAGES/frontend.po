@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 11:28+0300\n"
+"POT-Creation-Date: 2015-08-31 12:30+0300\n"
 "PO-Revision-Date: 2015-08-06 03:13+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -42,7 +42,7 @@ msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
 msgstr[0] "%1$dシナリオ"
 
-#: chart4.php:90 chart5.php:83
+#: chart4.php:92 chart5.php:85
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (%2$s年)"
@@ -4667,7 +4667,7 @@ msgstr "GUIアクセスを無効にしました"
 msgid "General"
 msgstr "一般設定"
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
+#: chart4.php:182 chart5.php:202 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr "Generated in %s sec"
@@ -8192,7 +8192,7 @@ msgstr "グラフID\"%s\"のグラフアイテムがありません。"
 msgid "No graph prototypes defined."
 msgstr "グラフのプロトタイプが設定されていません。"
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
+#: chart2.php:51 chart6.php:53 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1340
@@ -8324,7 +8324,7 @@ msgstr "アイテムID\"%1$s\"を持つアイテムは存在しません。"
 msgid "No item with itemid=\"%1$s\"."
 msgstr "アイテムID\"%1$s\"を持つアイテムは存在しません。"
 
-#: chart.php:49 include/items.inc.php:725
+#: chart.php:51 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:953 popup.php:1088
 msgid "No items defined."
@@ -8552,7 +8552,7 @@ msgstr "トリガーがありません"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "トリガーID\"%1$s\"を持つトリガーは存在しません。"
 
-#: chart4.php:40 include/triggers.inc.php:1193
+#: chart4.php:42 include/triggers.inc.php:1193
 #: include/views/configuration.triggers.list.php:90 popup.php:973
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8810,7 +8810,7 @@ msgstr "数値 (整数)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:167 chart5.php:192 httpdetails.php:147 httpdetails.php:213
+#: chart4.php:169 chart5.php:194 httpdetails.php:147 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:843
 #: include/maps.inc.php:940 include/setup.inc.php:200
@@ -9299,7 +9299,7 @@ msgstr "PHP xmlwriterモジュールが存在しません"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:637 include/triggers.inc.php:166
+#: chart5.php:198 include/maps.inc.php:637 include/triggers.inc.php:166
 msgid "PROBLEM"
 msgstr "障害"
 
@@ -9649,7 +9649,7 @@ msgstr "すべての子に障害があった場合に障害として検知"
 msgid "Problem, if at least one child has a problem"
 msgstr "子に一つでも障害があった場合に障害として検知"
 
-#: chart4.php:171 include/maps.inc.php:689 include/maps.inc.php:779
+#: chart4.php:173 include/maps.inc.php:689 include/maps.inc.php:779
 #: include/maps.inc.php:877 report2.php:237 report3.php:85
 msgid "Problems"
 msgstr "障害"
@@ -12264,7 +12264,7 @@ msgstr "選択したユーザーのブロックを解除しますか？"
 msgid "Units"
 msgstr "単位"
 
-#: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
+#: chart4.php:177 events.php:506 events.php:507 events.php:516 events.php:517
 #: events.php:518 events.php:519 hosts.php:807 httpdetails.php:160
 #: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
 #: include/actions.inc.php:105 include/actions.inc.php:129
@@ -12817,7 +12817,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "警告"
 
-#: chart7.php:76
+#: chart7.php:78
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "警告。グラフの合計値は2つ以上表示できません。"
 
@@ -13514,7 +13514,7 @@ msgstr "Y/m/d H:i"
 msgid "d M Y H:i:s"
 msgstr "Y/m/d H:i:s"
 
-#: chart4.php:127 chart5.php:137
+#: chart4.php:129 chart5.php:139
 msgid "d.M"
 msgstr "m/d"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-27 11:28+0300\n"
+"POT-Creation-Date: 2015-08-31 12:30+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -43,7 +43,7 @@ msgid_plural "%1$d scenarios"
 msgstr[0] "%1$d сценарий"
 msgstr[1] "%1$d сценарий"
 
-#: chart4.php:90 chart5.php:83
+#: chart4.php:92 chart5.php:85
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (година %2$s)"
@@ -4686,7 +4686,7 @@ msgstr "GUI достъп забранен."
 msgid "General"
 msgstr "Общ"
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
+#: chart4.php:182 chart5.php:202 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr "Генерирано за %s сек"
@@ -8224,7 +8224,7 @@ msgstr "Няма елемент на графика с graphid \"%s\"."
 msgid "No graph prototypes defined."
 msgstr "Не са дефинирани прототипи за графика."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
+#: chart2.php:51 chart6.php:53 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1340
@@ -8357,7 +8357,7 @@ msgstr "Няма елемент на данните с itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Няма елемент на данните с itemid=\"%1$s\"."
 
-#: chart.php:49 include/items.inc.php:725
+#: chart.php:51 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:953 popup.php:1088
 msgid "No items defined."
@@ -8585,7 +8585,7 @@ msgstr "Няма тригер"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Няма тригер с triggerid \"%1$s\"."
 
-#: chart4.php:40 include/triggers.inc.php:1193
+#: chart4.php:42 include/triggers.inc.php:1193
 #: include/views/configuration.triggers.list.php:90 popup.php:973
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8843,7 +8843,7 @@ msgstr "Числен (цяло положително)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:167 chart5.php:192 httpdetails.php:147 httpdetails.php:213
+#: chart4.php:169 chart5.php:194 httpdetails.php:147 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:843
 #: include/maps.inc.php:940 include/setup.inc.php:200
@@ -9334,7 +9334,7 @@ msgstr "Липсва разширение PHP xmlwriter"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:637 include/triggers.inc.php:166
+#: chart5.php:198 include/maps.inc.php:637 include/triggers.inc.php:166
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМ"
 
@@ -9684,7 +9684,7 @@ msgstr "Проблем, ако всички деца имат проблеми"
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблем, ако най-малко едно дете има проблем"
 
-#: chart4.php:171 include/maps.inc.php:689 include/maps.inc.php:779
+#: chart4.php:173 include/maps.inc.php:689 include/maps.inc.php:779
 #: include/maps.inc.php:877 report2.php:237 report3.php:85
 msgid "Problems"
 msgstr "Проблеми"
@@ -12306,7 +12306,7 @@ msgstr "Деблокиране на избраните потребители?"
 msgid "Units"
 msgstr "Единици за измерване"
 
-#: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
+#: chart4.php:177 events.php:506 events.php:507 events.php:516 events.php:517
 #: events.php:518 events.php:519 hosts.php:807 httpdetails.php:160
 #: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
 #: include/actions.inc.php:105 include/actions.inc.php:129
@@ -12860,7 +12860,7 @@ msgstr "Ср"
 msgid "Warning"
 msgstr "Внимание"
 
-#: chart7.php:76
+#: chart7.php:78
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "Внимание. Не може да се покаже повече от един елемент с тип \"Сумарна графика\"."
 
@@ -13560,7 +13560,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
 
-#: chart4.php:127 chart5.php:137
+#: chart4.php:129 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 
