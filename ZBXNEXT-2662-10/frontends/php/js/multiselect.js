@@ -904,13 +904,6 @@ jQuery(function($) {
 	function setReadonly(obj) {
 		$('input[type="text"]', obj).css({'display': 'none'});
 		$(obj).removeClass('active');
-
-		var item = $('.selected li', obj),
-			item_margins = item.outerHeight(true) - item.height();
-
-		$('.selected ul', obj).css({
-			'padding-bottom': item_margins
-		});
 	}
 
 	function getLimit(values, options) {
