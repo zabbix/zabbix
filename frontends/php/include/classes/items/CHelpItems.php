@@ -142,7 +142,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-					'description' => _('Process CPU utilisation in percent. Returns float')
+					'description' => _('Process CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
@@ -190,7 +190,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU utilisation in percent. Returns float')
+					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
@@ -424,7 +424,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-					'description' => _('Process CPU utilisation in percent. Returns float')
+					'description' => _('Process CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
@@ -472,7 +472,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU utilisation in percent. Returns float')
+					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
