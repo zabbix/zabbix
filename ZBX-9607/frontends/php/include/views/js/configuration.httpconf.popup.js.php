@@ -3,7 +3,7 @@
 		var new_variable = window.opener.document.createElement('input');
 		new_variable.type = 'hidden';
 		new_variable.name = name;
-		jQuery(new_variable).val(value);
+		new_variable.value = value;
 		obj.appendChild(new_variable);
 	}
 
