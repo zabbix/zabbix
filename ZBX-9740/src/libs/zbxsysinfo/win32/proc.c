@@ -162,7 +162,7 @@ int	new_proc_num_walk(char *procName, char *userName, AGENT_RESULT *result)
 	/* take the shortcut if no process or user name provided */
 	if ((NULL == procName || '\0' == *procName) && (NULL == userName || '\0' == *userName))
 	{
-		if (ERROR_SUCCESS == PssQuerySnapshot(SnapshotHandle, PSS_QUERY_HANDLE_INFORMATION, HandleInformation,
+		if (ERROR_SUCCESS == PssQuerySnapshot(SnapshotHandle, PSS_QUERY_HANDLE_INFORMATION, &HandleInformation,
 				sizeof(PSS_HANDLE_INFORMATION)))
 		{
 			SET_UI64_RESULT(result, HandleInformation.HandlesCaptured);
@@ -182,7 +182,7 @@ int	new_proc_num_walk(char *procName, char *userName, AGENT_RESULT *result)
 	{
 		proc_ok = 1;
 
-		if (NULL != procName && '\0' != *procName && 0 != HandleEntry.Flags | PSS_HANDLE_HAVE_NAME)
+		if (NULL != procName && '\0' != *procName && 0 != (HandleEntry.Flags | PSS_HANDLE_HAVE_NAME))
 		{
 			zbx_unicode_to_utf8_static(HandleEntry.ObjectName, baseName, MIN(MAX_NAME,
 					zbx_strlen_utf8_nchars(HandleEntry.ObjectName, HandleEntry.ObjectNameLength)));
@@ -195,7 +195,7 @@ int	new_proc_num_walk(char *procName, char *userName, AGENT_RESULT *result)
 				HandleEntry.Flags | PSS_HANDLE_HAVE_TYPE_SPECIFIC_INFORMATION)
 		{
 			hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
-					HandleEntry.TypeSpecificInformation.ProcessId);
+					HandleEntry.TypeSpecificInformation.Process.ProcessId);
 
 			if (NULL == hProcess || SUCCEED != zbx_get_process_username(hProcess, uname) ||
 					0 != stricmp(uname, userName))
