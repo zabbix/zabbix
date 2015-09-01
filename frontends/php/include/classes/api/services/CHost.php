@@ -542,7 +542,6 @@ class CHost extends CHostGeneral {
 				}
 
 				$this->encryptionValidation($host);
-				$host = $this->cleanEncryptionFields($host);
 			}
 		}
 
@@ -720,6 +719,8 @@ class CHost extends CHostGeneral {
 		$hostids = [];
 
 		$this->checkInput($hosts, __FUNCTION__);
+
+		$hosts = $this->cleanEncryptionFields($hosts);
 
 		foreach ($hosts as $host) {
 			$hostid = DB::insert('hosts', [$host]);
@@ -947,7 +948,7 @@ class CHost extends CHostGeneral {
 		}
 
 		$this->encryptionValidation($data);
-		$data = $this->cleanEncryptionFields($data);
+		$data = reset($this->cleanEncryptionFields([$data]));
 
 		if (isset($data['host'])) {
 			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $data['host'])) {
@@ -1675,33 +1676,32 @@ class CHost extends CHostGeneral {
 	}
 
 	/**
-	 * Clean extra PSK and certificate fields.
+	 * Clean extra PSK and certificate fields for security reasons.
 	 *
-	 * @param array $data		host data array
+	 * @param array $hosts		hosts data array
 	 *
 	 * @return array
 	 */
-	protected function cleanEncryptionFields(array $data) {
-		// PSK fields
-		if ((!array_key_exists('tls_connect', $data)
-				|| (array_key_exists('tls_connect', $data) && $data['tls_connect'] != HOST_ENCRYPTION_PSK))
-					&& (!array_key_exists('tls_accept', $data)
-						|| (array_key_exists('tls_accept', $data)
-							&& $data['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK)) {
-			$data['tls_psk_identity'] = '';
-			$data['tls_psk'] = '';
-		}
+	protected function cleanEncryptionFields(array $hosts) {
+		foreach ($hosts as &$host) {
+			// PSK fields
+			if ((array_key_exists('tls_connect', $host) && $host['tls_connect'] != HOST_ENCRYPTION_PSK)
+					&& ((array_key_exists('tls_accept', $host)
+						&& $host['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK)) {
+				$host['tls_psk_identity'] = '';
+				$host['tls_psk'] = '';
+			}
 
-		// certificate fields
-		if ((!array_key_exists('tls_connect', $data)
-				|| (array_key_exists('tls_connect', $data) && $data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE))
-					&& (!array_key_exists('tls_accept', $data)
-						|| (array_key_exists('tls_accept', $data)
-							&& $data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE)) {
-			$data['tls_issuer'] = '';
-			$data['tls_subject'] = '';
+			// certificate fields
+			if ((array_key_exists('tls_connect', $host) && $host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE)
+					&& (array_key_exists('tls_accept', $host)
+						&& $host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
+				$host['tls_issuer'] = '';
+				$host['tls_subject'] = '';
+			}
 		}
+		unset($host);
 
-		return $data;
+		return $hosts;
 	}
 }
