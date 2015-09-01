@@ -841,9 +841,7 @@ footer {
 .subfilter-enabled {
 	display: inline-block;
 	position: relative;
-	//padding: 0 9px 0 4px;
 	height: 18px;
-	//line-height: 18px;
 	padding: 0 4px;
 	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
@@ -907,10 +905,7 @@ footer {
 		background: none;
 		box-sizing: border-box;
 		width: 100%;
-		//padding-top: 1px;
-		//padding-top: 2px;
 		padding-bottom: 2px;
-		//min-height: 1.8em;
 		min-height: 20px;
 	}
 
@@ -1546,12 +1541,8 @@ legend {
 }
 
 %form-input-height-padding {
-	//padding: 4px 5px;
 	padding: 0 5px;
-	//min-height: 2em;
 	min-height: 24px;
-	//line-height: 22px;
-	//zoom: 1;
 }
 
 %form-input-style {
@@ -2832,7 +2823,6 @@ a.blue {
 
 .na-bg {
 	color: darken($alt-blue-grey,45%);
-	//background-color: $alt-blue-grey;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2876,7 +2866,6 @@ td.active-bg {
 
 .info-bg {
 	color: darken($alt-dark-blue,45%);
-	//background-color: $alt-dark-blue;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2898,7 +2887,6 @@ td.log-info-bg {
 
 .average-bg {
 	color: darken($alt-orange,45%);
-	//background-color: $alt-orange;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2912,7 +2900,6 @@ td.average-bg {
 
 .warning-bg {
 	color: darken($alt-yellow,45%);
-	//background-color: $alt-yellow;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2935,7 +2922,6 @@ td.log-warning-bg {
 
 .high-bg {
 	color: darken($alt-dark-orange,45%);
-	//background-color: $alt-dark-orange;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2957,7 +2943,6 @@ td.log-high-bg {
 
 .disaster-bg {
 	color: darken($alt-red,45%);
-	//background-color: $alt-red;
 
 	input[type="radio"] {
 		&:checked + label {
