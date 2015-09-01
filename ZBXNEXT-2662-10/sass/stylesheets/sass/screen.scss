@@ -909,13 +909,14 @@ footer {
 		width: 100%;
 		//padding-top: 1px;
 		//padding-top: 2px;
+		padding-bottom: 2px;
 		//min-height: 1.8em;
-		min-height: 22px;
+		min-height: 20px;
 	}
 
 	.multiselect-list {
 		padding-left: 2px;
-		//padding-bottom: 2px;
+		padding-bottom: 2px;
 
 		li {
 			display: inline-block;
