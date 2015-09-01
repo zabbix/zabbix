@@ -41,7 +41,7 @@ class CCollapsibleUiWidget extends CUiWidget {
 	 * @param string|array|CTag $caption
 	 * @param array              $icons
 	 */
-	public function setHeader($caption = null, array $icons = [], $cursor_move = false, $url = null) {
+	public function setHeader($caption = null, array $icons = [], $cursor_move = false, $url = '') {
 		$icon = (new CRedirectButton(null, null))
 			->setId($this->id.'_icon')
 			->onClick('changeWidgetState(this, "'.$this->id.'", "'.$url.'");');
