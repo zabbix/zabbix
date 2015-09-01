@@ -907,14 +907,15 @@ footer {
 		background: none;
 		box-sizing: border-box;
 		width: 100%;
-		padding-top: 1px;
+		//padding-top: 1px;
 		//padding-top: 2px;
-		min-height: 1.8em;
+		//min-height: 1.8em;
+		min-height: 22px;
 	}
 
 	.multiselect-list {
 		padding-left: 2px;
-		padding-bottom: 2px;
+		//padding-bottom: 2px;
 
 		li {
 			display: inline-block;
@@ -1546,7 +1547,8 @@ legend {
 %form-input-height-padding {
 	//padding: 4px 5px;
 	padding: 0 5px;
-	min-height: 2em;
+	//min-height: 2em;
+	min-height: 24px;
 	//line-height: 22px;
 	//zoom: 1;
 }
