@@ -279,14 +279,16 @@ $inventoryFormList->addRow(
 	[
 		_('Inventory mode'),
 		SPACE,
-		(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode', _('Original')))
+		(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode_div', _('Original')))
 			->setChecked(isset($data['visible']['inventory_mode']))
 	],
-	new CComboBox('inventory_mode', $data['inventory_mode'], null, [
-		HOST_INVENTORY_DISABLED => _('Disabled'),
-		HOST_INVENTORY_MANUAL => _('Manual'),
-		HOST_INVENTORY_AUTOMATIC => _('Automatic')
-	])
+	(new CDiv(
+		(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
+			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+			->setModern(true)
+	))->setId('inventory_mode_div')
 );
 
 $hostInventoryTable = DB::getSchema('host_inventory');
