@@ -9,6 +9,14 @@
 			window.flickerfreeScreenShadow.responsiveness = <?php echo SCREEN_REFRESH_RESPONSIVENESS * 1000; ?>;
 		<?php endif ?>
 
+		<?php if (isset($page['scripts']) && in_array('gtlc.js', $page['scripts'])): ?>
+			jQuery('form#id').submit(function(e) {
+				if (jQuery(this).find("button:focus").parents().eq(2).attr('id') == 'scrollbar_cntr') {
+					e.preventDefault();
+				}
+			});
+		<?php endif ?>
+
 		// the chkbxRange.init() method must be called after the inserted post scripts and initializing cookies
 		cookie.init();
 		chkbxRange.init();
