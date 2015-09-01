@@ -704,6 +704,7 @@ calendar.prototype = {
 
 		// done
 		this.clndr_done = document.createElement('button');
+		this.clndr_done.setAttribute('type', 'button');
 		this.clndr_done.appendChild(document.createTextNode(locale['S_DONE']));
 		line_div.appendChild(this.clndr_done);
 		this.clndr_calendar.appendChild(line_div);

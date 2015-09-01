@@ -239,9 +239,9 @@ else {
 			$filterForm->removeButtons();
 
 			$filterForm->addVar('action', $this->data['action']);
-			$filterForm->addVar('itemids', $this->data['itemids']);
 		}
 
+		$filterForm->addVar('itemids', $this->data['itemids']);
 		$filterForm->addNavigator();
 		$historyWidget->addItem($filterForm);
 	}
