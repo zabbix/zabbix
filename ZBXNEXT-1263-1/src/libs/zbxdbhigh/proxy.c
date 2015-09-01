@@ -2794,7 +2794,7 @@ exit:
  *                                                                            *
  * Function: process_areg_data                                                *
  *                                                                            *
- * Purpose: update auto-registration data, received from proxy                *
+ * Purpose: update auto registration data, received from proxy                *
  *                                                                            *
  ******************************************************************************/
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)

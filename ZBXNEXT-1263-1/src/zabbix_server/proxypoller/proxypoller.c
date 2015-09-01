@@ -258,8 +258,8 @@ static int	process_proxy(void)
 				if ('\0' == *answer)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no host"
-							" availability data. Check allowed connection types and access"
-							" rights.", proxy.host, proxy.addr);
+							" availability data: check allowed connection types and"
+							" access rights", proxy.host, proxy.addr);
 					zbx_free(answer);
 					goto network_error;
 				}
@@ -278,7 +278,7 @@ retry_history:
 				if ('\0' == *answer)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no history"
-							" data. Check allowed connection types and access rights.",
+							" data: check allowed connection types and access rights",
 							proxy.host, proxy.addr);
 					zbx_free(answer);
 					goto network_error;
@@ -309,7 +309,7 @@ retry_dhistory:
 				if ('\0' == *answer)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no discovery"
-							" data. Check allowed connection types and access rights.",
+							" data: check allowed connection types and access rights",
 							proxy.host, proxy.addr);
 					zbx_free(answer);
 					goto network_error;
@@ -339,9 +339,9 @@ retry_autoreg_host:
 			{
 				if ('\0' == *answer)
 				{
-					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no"
-							" autoregistration data. Check allowed connection types and"
-							" access rights.", proxy.host, proxy.addr);
+					zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" at \"%s\" returned no auto"
+							" registration data: check allowed connection types and"
+							" access rights", proxy.host, proxy.addr);
 					zbx_free(answer);
 					goto network_error;
 				}

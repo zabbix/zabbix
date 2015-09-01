@@ -28,7 +28,7 @@
  *                                                                            *
  * Function: recv_areg_data                                                   *
  *                                                                            *
- * Purpose: receive auto-registration data from proxy                         *
+ * Purpose: receive auto registration data from proxy                         *
  *                                                                            *
  * Author: Alexander Vladishev                                                *
  *                                                                            *
@@ -63,7 +63,7 @@ out:
  *                                                                            *
  * Function: send_areg_data                                                   *
  *                                                                            *
- * Purpose: send auto-registration data from proxy to a server                *
+ * Purpose: send auto registration data from proxy to a server                *
  *                                                                            *
  ******************************************************************************/
 void	send_areg_data(zbx_socket_t *sock)
@@ -77,9 +77,9 @@ void	send_areg_data(zbx_socket_t *sock)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "auto-registration data request"))
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_DO_NOT_SEND_RESPONSE, "auto registration data request"))
 	{
-		/* do not send any reply to server in this case as the server expects auto-registration data */
+		/* do not send any reply to server in this case as the server expects auto registration data */
 		goto out1;
 	}
 
@@ -109,7 +109,7 @@ void	send_areg_data(zbx_socket_t *sock)
 out:
 	if (SUCCEED != ret)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot send auto-registration data to server at \"%s\": %s",
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send auto registration data to server at \"%s\": %s",
 				get_ip_by_socket(sock), error);
 	}
 
