@@ -647,14 +647,12 @@ function changeWidgetState(obj, widgetId, url) {
 
 	obj.title = (state == 1) ? locale['S_COLLAPSE'] : locale['S_EXPAND'];
 
-	if (url !== null) {
-		sendAjaxData(url, {
-			data: {
-				widget: widgetId,
-				state: state
-			}
-		});
-	}
+	sendAjaxData(url, {
+		data: {
+			widget: widgetId,
+			state: state
+		}
+	});
 }
 
 /**
