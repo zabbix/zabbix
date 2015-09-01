@@ -1148,7 +1148,7 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 {
 	char			*procname = NULL, *cmdline = NULL, *name_arg0 = NULL;
-	uid_t			uid = 0;
+	uid_t			uid = -1;
 	zbx_sysinfo_proc_t	*proc = NULL;
 	int			ret = FAIL;
 
