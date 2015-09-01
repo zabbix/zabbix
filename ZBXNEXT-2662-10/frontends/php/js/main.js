@@ -629,7 +629,7 @@ function updateUserProfile(idx, value_int) {
 	});
 }
 
-function changeWidgetState(obj, widgetId) {
+function changeWidgetState(obj, widgetId, url) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
 		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
@@ -647,12 +647,14 @@ function changeWidgetState(obj, widgetId) {
 
 	obj.title = (state == 1) ? locale['S_COLLAPSE'] : locale['S_EXPAND'];
 
-	sendAjaxData('zabbix.php?action=dashboard.widget', {
-		data: {
-			widget: widgetId,
-			state: state
-		}
-	});
+	if (url !== null) {
+		sendAjaxData(url, {
+			data: {
+				widget: widgetId,
+				state: state
+			}
+		});
+	}
 }
 
 /**
