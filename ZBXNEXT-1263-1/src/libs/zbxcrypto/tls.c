@@ -4782,17 +4782,12 @@ void	zbx_tls_close(zbx_socket_t *s)
 		while (GNUTLS_E_SUCCESS != (res = gnutls_bye(s->tls_ctx, GNUTLS_SHUT_RDWR)))
 		{
 			if (GNUTLS_E_INTERRUPTED == res || GNUTLS_E_AGAIN == res)
-			{
 				continue;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() returned: %d %s", res,
-						gnutls_strerror(res));
 
-				if (0 != gnutls_error_is_fatal(res))
-					break;
-			}
+			zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() returned: %d %s", res, gnutls_strerror(res));
+
+			if (0 != gnutls_error_is_fatal(res))
+				break;
 		}
 
 		gnutls_credentials_clear(s->tls_ctx);
