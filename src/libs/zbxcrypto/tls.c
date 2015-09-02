@@ -1418,7 +1418,84 @@ out:
 }
 #endif
 
-#if defined(HAVE_OPENSSL)
+#if defined(HAVE_POLARSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_log_ciphersuites                                             *
+ *                                                                            *
+ * Purpose: write names of enabled mbed TLS ciphersuites into Zabbix log for  *
+ *          debugging                                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     title1     - [IN] name of the calling function                         *
+ *     title2     - [IN] name of the group of ciphersuites                    *
+ *     cipher_ids - [IN] list of ciphersuite ids, terminated by 0             *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_log_ciphersuites(const char *title1, const char *title2, const int *cipher_ids)
+{
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		char		*msg = NULL;
+		size_t		msg_alloc = 0, msg_offset = 0;
+		const int	*p;
+
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): %s ciphersuites:", title1, title2);
+
+		for (p = cipher_ids; 0 != *p; p++)
+			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", ssl_get_ciphersuite_name(*p));
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
+		zbx_free(msg);
+	}
+}
+#elif defined(HAVE_GNUTLS)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_log_ciphersuites                                             *
+ *                                                                            *
+ * Purpose: write names of enabled GnuTLS ciphersuites into Zabbix log for    *
+ *          debugging                                                         *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     title1  - [IN] name of the calling function                            *
+ *     title2  - [IN] name of the group of ciphersuites                       *
+ *     ciphers - [IN] list of ciphersuites                                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_log_ciphersuites(const char *title1, const char *title2, gnutls_priority_t ciphers)
+{
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		char		*msg = NULL;
+		size_t		msg_alloc = 0, msg_offset = 0;
+		int		res;
+		unsigned int	idx = 0, sidx;
+		const char	*name;
+
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): %s ciphersuites:", title1, title2);
+
+		while (1)
+		{
+			if (GNUTLS_E_SUCCESS == (res = gnutls_priority_get_cipher_suite_index(ciphers, idx++, &sidx)))
+			{
+				if (NULL != (name = gnutls_cipher_suite_info(sidx, NULL, NULL, NULL, NULL, NULL)))
+					zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", name);
+			}
+			else if (GNUTLS_E_REQUESTED_DATA_NOT_AVAILABLE == res)
+			{
+				break;
+			}
+
+			/* ignore the 3rd possibility GNUTLS_E_UNKNOWN_CIPHER_SUITE */
+			/* (see "man gnutls_priority_get_cipher_suite_index") */
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
+		zbx_free(msg);
+	}
+}
+#elif defined(HAVE_OPENSSL)
 /******************************************************************************
  *                                                                            *
  * Function: zbx_log_ciphersuites                                             *
@@ -1426,20 +1503,29 @@ out:
  * Purpose: write names of enabled OpenSSL ciphersuites into Zabbix log for   *
  *          debugging                                                         *
  *                                                                            *
+ * Parameters:                                                                *
+ *     title1  - [IN] name of the calling function                            *
+ *     title2  - [IN] name of the group of ciphersuites                       *
+ *     ciphers - [IN] stack of ciphersuites                                   *
+ *                                                                            *
  ******************************************************************************/
-static void	zbx_log_ciphersuites(const char *title, const SSL *ctx)
+static void	zbx_log_ciphersuites(const char *title1, const char *title2, SSL_CTX *ciphers)
 {
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		const char	*cipher_name;
 		char		*msg = NULL;
 		size_t		msg_alloc = 0, msg_offset = 0;
-		int		i = 0;
+		int		i, num;
 
-		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s() ciphersuites:", title);
+		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): %s ciphersuites:", title1, title2);
 
-		while (NULL != (cipher_name = SSL_get_cipher_list(ctx, i++)))
-			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s", cipher_name);
+		num = sk_SSL_CIPHER_num(ciphers->cipher_list);
+
+		for (i = 0; i < num; i++)
+		{
+			zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, " %s",
+					sk_SSL_CIPHER_value(ciphers->cipher_list, i)->name);
+		}
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s", msg);
 		zbx_free(msg);
@@ -2371,7 +2457,6 @@ void	zbx_tls_init_child(void)
 {
 	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
-	unsigned int	cipher_count;
 	sigset_t	mask, orig_mask;
 	unsigned char	pers[64];	/* personalization string obtained from SHA-512 in SHA-384 mode */
 
@@ -2517,18 +2602,16 @@ void	zbx_tls_init_child(void)
 	/* Certificate always comes from configuration file. Set up ciphersuites. */
 	if (NULL != my_cert)
 	{
-		cipher_count = zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_cert);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): set up a list of %u certificate ciphersuites", __function_name,
-				cipher_count);
+		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_CERT, &ciphersuites_cert);
+		zbx_log_ciphersuites(__function_name, "certificate", ciphersuites_cert);
 	}
 
 	/* PSK can come from configuration file (in proxy, agentd) and later from database (in server, proxy). */
 	/* Configure ciphersuites just in case they will be used. */
 	if (NULL != my_psk || 0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY)))
 	{
-		cipher_count = zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_PSK, &ciphersuites_psk);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): set up a list of %u PSK ciphersuites", __function_name,
-				cipher_count);
+		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_PSK, &ciphersuites_psk);
+		zbx_log_ciphersuites(__function_name, "PSK", ciphersuites_psk);
 	}
 
 	/* Sometimes we need to be ready for both certificate and PSK whichever comes in. Set up a combined list of */
@@ -2536,9 +2619,8 @@ void	zbx_tls_init_child(void)
 	if (NULL != my_cert && (NULL != my_psk ||
 			0 != (program_type & (ZBX_PROGRAM_TYPE_SERVER | ZBX_PROGRAM_TYPE_PROXY))))
 	{
-		cipher_count = zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_ALL, &ciphersuites_all);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): set up a list of %u certificate and PSK ciphersuites",
-				__function_name, cipher_count);
+		zbx_ciphersuites(ZBX_TLS_CIPHERSUITE_ALL, &ciphersuites_all);
+		zbx_log_ciphersuites(__function_name, "certificate and PSK", ciphersuites_all);
 	}
 
 	entropy = zbx_malloc(entropy, sizeof(entropy_context));
@@ -2744,6 +2826,8 @@ void	zbx_tls_init_child(void)
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_log_ciphersuites(__function_name, "certificate", ciphersuites_cert);
 	}
 
 	/* PSK can come from configuration file (in proxy, agentd) and later from database (in server, proxy). */
@@ -2761,6 +2845,8 @@ void	zbx_tls_init_child(void)
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_log_ciphersuites(__function_name, "PSK", ciphersuites_psk);
 	}
 
 	/* Sometimes we need to be ready for both certificate and PSK whichever comes in. Set up a combined list of */
@@ -2778,6 +2864,8 @@ void	zbx_tls_init_child(void)
 			zbx_tls_free();
 			exit(EXIT_FAILURE);
 		}
+
+		zbx_log_ciphersuites(__function_name, "certificate and PSK", ciphersuites_all);
 	}
 
 #ifndef _WINDOWS
@@ -2989,23 +3077,38 @@ void	zbx_tls_init_child(void)
 
 	/* set up ciphersuites */
 
-	if (NULL != ctx_cert && 1 != SSL_CTX_set_cipher_list(ctx_cert, "EECDH+aRSA+AES128:RSA+aRSA+AES128"))
+	if (NULL != ctx_cert)
 	{
-		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of certificate ciphersuites:");
-		goto out;
+		if (1 != SSL_CTX_set_cipher_list(ctx_cert, "EECDH+aRSA+AES128:RSA+aRSA+AES128"))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of certificate"
+					" ciphersuites:");
+			goto out;
+		}
+
+		zbx_log_ciphersuites(__function_name, "certificate", ctx_cert);
 	}
 
-	if (NULL != ctx_psk && 1 != SSL_CTX_set_cipher_list(ctx_psk, "PSK-AES128-CBC-SHA"))
+	if (NULL != ctx_psk)
 	{
-		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
-		goto out;
+		if (1 != SSL_CTX_set_cipher_list(ctx_psk, "PSK-AES128-CBC-SHA"))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of PSK ciphersuites:");
+			goto out;
+		}
+
+		zbx_log_ciphersuites(__function_name, "PSK", ctx_psk);
 	}
 
-	if (NULL != ctx_all &&
-			1 != SSL_CTX_set_cipher_list(ctx_all, "EECDH+aRSA+AES128:RSA+aRSA+AES128:PSK-AES128-CBC-SHA"))
+	if (NULL != ctx_all)
 	{
-		zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of all ciphersuites:");
-		goto out;
+		if (1 != SSL_CTX_set_cipher_list(ctx_all, "EECDH+aRSA+AES128:RSA+aRSA+AES128:PSK-AES128-CBC-SHA"))
+		{
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set list of all ciphersuites:");
+			goto out;
+		}
+
+		zbx_log_ciphersuites(__function_name, "certificate and PSK", ctx_all);
 	}
 
 	/* set up PSK global variables for client callback if PSK comes only from configuration file or command line */
@@ -3833,8 +3936,6 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 		goto out;
 	}
 
-	zbx_log_ciphersuites(__function_name, s->tls_ctx);
-
 	/* TLS handshake */
 
 	info_buf[0] = '\0';	/* empty buffer for zbx_openssl_info_cb() messages */
@@ -4554,8 +4655,6 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 		*error = zbx_strdup(*error, "cannot set socket for TLS context");
 		goto out;
 	}
-
-	zbx_log_ciphersuites(__function_name, s->tls_ctx);
 
 	/* TLS handshake */
 
