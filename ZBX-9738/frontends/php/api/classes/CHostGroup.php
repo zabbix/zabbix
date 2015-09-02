@@ -829,7 +829,7 @@ class CHostGroup extends CZBXAPI {
 		));
 
 		// delete action operation groups
-		$operationids = [];
+		$operationids = array();
 		$dbOperations = DBselect(
 			'SELECT DISTINCT og.operationid'.
 			' FROM opgroup og'.
@@ -838,7 +838,9 @@ class CHostGroup extends CZBXAPI {
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
-		DB::delete('opgroup', ['groupid' => $groupids]);
+		DB::delete('opgroup', array(
+			'groupid' => $groupids
+		));
 
 		// delete action operation commands
 		$sql = 'SELECT DISTINCT ocg.operationid'.
@@ -848,10 +850,12 @@ class CHostGroup extends CZBXAPI {
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
-		DB::delete('opcommand_grp', ['groupid' => $groupids]);
+		DB::delete('opcommand_grp', array(
+			'groupid' => $groupids
+		));
 
 		// delete empty operations
-		$delOperationids = [];
+		$delOperationids = array();
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
@@ -863,17 +867,21 @@ class CHostGroup extends CZBXAPI {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('operations',['operationid' => $delOperationids]);
+		DB::delete('operations', array(
+			'operationid' => $delOperationids
+		));
 
 		// host groups
-		DB::delete('groups', ['groupid' => $groupids]);
+		DB::delete('groups', array(
+			'groupid' => $groupids
+		));
 
 		// TODO: remove audit
 		foreach ($groupids as $groupid) {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $delGroups[$groupid]['name'], 'groups', null, null);
 		}
 
-		return ['groupids' => $groupids];
+		return array('groupids' => $groupids);
 	}
 
 	/**
