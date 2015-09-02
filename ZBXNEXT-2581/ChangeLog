@@ -1,6 +1,7 @@
 Changes for 2.5.1
 
 New features:
+A......... [ZBXNEXT-2581] added permissions return with usergroup.get (Gunars, Ivo)
 ..F....... [ZBX-8820] improved bulk acknowledge of the events (Sasha)
 ..F....... [ZBXNEXT-210] changed macros type labels in template configuration form (Gunars)
 A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discovered hosts (Gunars, Sasha, wiper)
@@ -8,6 +9,8 @@ A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discover
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9791] fixed typo in maps.inc.php (Gunars)
+.......PS. [ZBX-9668] improved handling of vmware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
@@ -123,6 +126,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9668] improved handling of vmware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
@@ -787,6 +791,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9668] improved handling of vmware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
