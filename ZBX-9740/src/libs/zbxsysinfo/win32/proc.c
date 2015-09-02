@@ -182,7 +182,10 @@ int	new_proc_num_walk(char *procName, char *userName, AGENT_RESULT *result)
 	{
 		proc_ok = 1;
 
-		if (NULL != procName && '\0' != *procName && 0 != (HandleEntry.Flags | PSS_HANDLE_HAVE_NAME))
+		if (0 == (HandleEntry.Flags & PSS_OBJECT_TYPE_PROCESS))
+			proc_ok = 0;
+
+		if (0 != proc_ok && NULL != procName && '\0' != *procName && 0 != (HandleEntry.Flags & PSS_HANDLE_HAVE_NAME))
 		{
 			zbx_unicode_to_utf8_static(HandleEntry.ObjectName, baseName, MIN(MAX_NAME,
 					zbx_strlen_utf8_nchars(HandleEntry.ObjectName, HandleEntry.ObjectNameLength)));
@@ -218,6 +221,8 @@ int	new_proc_num_walk(char *procName, char *userName, AGENT_RESULT *result)
 	}
 
 	PssWalkMarkerFree(WalkMarkerHandle);
+
+	PssFreeSnapshot(GetCurrentProcess(), SnapshotHandle);
 
 	SET_UI64_RESULT(result, proccount);
 
