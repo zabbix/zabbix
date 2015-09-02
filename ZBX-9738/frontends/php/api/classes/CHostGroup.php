@@ -805,9 +805,9 @@ class CHostGroup extends CZBXAPI {
 		// actions from operations
 		$dbActions = DBselect(
 			'SELECT DISTINCT o.actionid'.
-			' FROM operations o,opgroup og'.
-			' WHERE o.operationid=og.operationid'.
-				' AND '.dbConditionInt('og.groupid', $groupids)
+			' FROM operations o, opgroup og, opcommand_grp ocg'.
+			' WHERE (o.operationid=og.operationid AND '.dbConditionInt('og.groupid', $groupids).')'.
+				' OR (o.operationid=ocg.operationid AND '.dbConditionInt('ocg.groupid', $groupids).')'
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -828,8 +828,8 @@ class CHostGroup extends CZBXAPI {
 			'value' => $groupids
 		));
 
-		// delete action operation commands
-		$operationids = array();
+		// delete action operation groups
+		$operationids = [];
 		$dbOperations = DBselect(
 			'SELECT DISTINCT og.operationid'.
 			' FROM opgroup og'.
@@ -838,41 +838,42 @@ class CHostGroup extends CZBXAPI {
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
-		DB::delete('opgroup', array(
-			'groupid' => $groupids
-		));
+		DB::delete('opgroup', ['groupid' => $groupids]);
+
+		// delete action operation commands
+		$sql = 'SELECT DISTINCT ocg.operationid'.
+				' FROM opcommand_grp ocg'.
+				' WHERE '.dbConditionInt('ocg.groupid', $groupids);
+		$dbOperations = DBselect($sql);
+		while ($dbOperation = DBfetch($dbOperations)) {
+			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+		}
+		DB::delete('opcommand_grp', ['groupid' => $groupids]);
 
 		// delete empty operations
-		$delOperationids = array();
+		$delOperationids = [];
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
 			' WHERE '.dbConditionInt('o.operationid', $operationids).
-				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'
+				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'.
+				' AND NOT EXISTS (SELECT NULL FROM opcommand_grp ocg WHERE o.operationid=ocg.operationid)'
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('operations', array(
-			'operationid' => $delOperationids,
-		));
-
-		DB::delete('opcommand_grp', array(
-			'groupid' => $groupids
-		));
+		DB::delete('operations',['operationid' => $delOperationids]);
 
 		// host groups
-		DB::delete('groups', array(
-			'groupid' => $groupids
-		));
+		DB::delete('groups', ['groupid' => $groupids]);
 
 		// TODO: remove audit
 		foreach ($groupids as $groupid) {
 			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_HOST_GROUP, $groupid, $delGroups[$groupid]['name'], 'groups', null, null);
 		}
 
-		return array('groupids' => $groupids);
+		return ['groupids' => $groupids];
 	}
 
 	/**
