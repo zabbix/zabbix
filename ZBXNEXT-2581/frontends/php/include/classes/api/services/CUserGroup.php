@@ -74,7 +74,7 @@ class CUserGroup extends CApiService {
 			'editable'					=> null,
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
-			'selectUsrgrpRights'		=> null,
+			'selectRights'				=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
@@ -691,26 +691,24 @@ class CUserGroup extends CApiService {
 		}
 
 		// adding usergroup rights
-		if ($options['selectUsrgrpRights'] !== null && $options['selectUsrgrpRights'] != API_OUTPUT_COUNT) {
-			// create relationMap with usrgrpid as foreign key
-			$relationMap = $this->createRelationMap($result, 'usrgrpid', 'usrgrpid', 'users_groups');
+		if ($options['selectRights'] !== null && $options['selectRights'] != API_OUTPUT_COUNT) {
+			$sql = 'SELECT r.groupid, r.permission, r.id'.
+				' FROM rights r'.
+				' WHERE '.dbConditionInt('r.groupid', array_keys($result));
 
-			// get usergroup ids
-			$usrgrpIds = array_keys($result);
-
-			// get usergroup rights
-			$usrgrpRights = [];
-			$usrgrpRightsDb = DBselect(
-				'SELECT groupid,permission,id'.
-				' FROM rights'.
-				' WHERE '.dbConditionInt('groupid', $usrgrpIds)
-			);
-			while ($rights = DBfetch($usrgrpRightsDb)) {
-				$usrgrpRights[$rights['groupid']][$rights['id']] = $rights['permission'];
+			// exclude DENY permissions for non-super-admin users
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+				$sql .= ' AND '.dbConditionInt('r.permission', [PERM_DENY], true);
 			}
 
-			// add usrgrprights in result
-			$result = $relationMap->mapMany($result, $usrgrpRights, 'usrgrprights');
+			$dbUsrgrpRights = DBselect($sql);
+
+			while ($rights = DBfetch($dbUsrgrpRights)) {
+				$result[$rights['groupid']]['rights'][] = [
+					'permission' => $rights['permission'],
+					'id' => $rights['id']
+				];
+			}
 		}
 
 		return $result;
