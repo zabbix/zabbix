@@ -44,6 +44,10 @@ static int	sync_in_progress = 0;
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
 #define ZBX_SNMP_OID_TYPE_MACRO		2
 
+/* trigger is functional unless its expression contains disabled or not monitored items */
+#define TRIGGER_FUNCTIONAL_TRUE		0
+#define TRIGGER_FUNCTIONAL_FALSE	1
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
@@ -58,8 +62,7 @@ typedef struct
 	unsigned char	state;
 	unsigned char	locked;
 	unsigned char	status;
-	/* trigger functionality, see TRIGGER_FUNCTIONAL_* defines */
-	unsigned char	functional;
+	unsigned char	functional;	/* see TRIGGER_FUNCTIONAL_* defines */
 }
 ZBX_DC_TRIGGER;
 
@@ -1843,7 +1846,7 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 
 		trigger->topoindex = 1;
 
-		/* reset trigger functionality, it will be updated during function synchronization */
+		/* reset trigger functionality, it will be updated in DCsync_functions() */
 		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
 	}
 
@@ -2076,7 +2079,7 @@ static void	DCsync_functions(DB_RESULT result)
 	{
 		trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[i].second;
 
-		if (TRIGGER_FUNCTIONAL_TRUE == trigger->functional)
+		if (TRIGGER_FUNCTIONAL_FALSE != trigger->functional)
 		{
 			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
 

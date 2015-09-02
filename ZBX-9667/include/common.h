@@ -555,11 +555,6 @@ const char	*zbx_trigger_value_string(unsigned char value);
 #define TRIGGER_STATE_UNKNOWN		1
 const char	*zbx_trigger_state_string(unsigned char state);
 
-/* trigger is functional if its expression does not contain */
-/* disabled or not monitored items                          */
-#define TRIGGER_FUNCTIONAL_TRUE		0
-#define TRIGGER_FUNCTIONAL_FALSE	1
-
 /* trigger severity */
 #define TRIGGER_SEVERITY_NOT_CLASSIFIED	0
 #define TRIGGER_SEVERITY_INFORMATION	1
