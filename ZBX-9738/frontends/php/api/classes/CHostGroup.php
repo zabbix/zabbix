@@ -805,9 +805,12 @@ class CHostGroup extends CZBXAPI {
 		// actions from operations
 		$dbActions = DBselect(
 			'SELECT DISTINCT o.actionid'.
-			' FROM operations o, opgroup og, opcommand_grp ocg'.
-			' WHERE (o.operationid=og.operationid AND '.dbConditionInt('og.groupid', $groupids).')'.
-				' OR (o.operationid=ocg.operationid AND '.dbConditionInt('ocg.groupid', $groupids).')'
+			' FROM operations o,opgroup og'.
+			' WHERE o.operationid=og.operationid AND '.dbConditionInt('og.groupid', $groupids).
+			' UNION' .
+			' SELECT DISTINCT o.actionid'.
+			' FROM operations o,opcommand_grp ocg'.
+			' WHERE o.operationid=ocg.operationid AND '.dbConditionInt('ocg.groupid', $groupids)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -843,10 +846,11 @@ class CHostGroup extends CZBXAPI {
 		));
 
 		// delete action operation commands
-		$sql = 'SELECT DISTINCT ocg.operationid'.
-				' FROM opcommand_grp ocg'.
-				' WHERE '.dbConditionInt('ocg.groupid', $groupids);
-		$dbOperations = DBselect($sql);
+		$dbOperations = DBselect(
+			'SELECT DISTINCT ocg.operationid'.
+			' FROM opcommand_grp ocg'.
+			' WHERE '.dbConditionInt('ocg.groupid', $groupids)
+		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
