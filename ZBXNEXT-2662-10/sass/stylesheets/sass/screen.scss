@@ -172,6 +172,10 @@ pre {
 	word-wrap: break-word;
 }
 
+:-ms-input-placeholder {
+	color: #6d6d6d !important;
+}
+
 /* Main Navigation */
 nav {
 	background-color: $main-subnav-bg-color;
@@ -2368,14 +2372,6 @@ $form-icon-btn: (
 			}
 		}
 	}
-
-//	tfoot {
-//		text-align: right;
-
-//		button {
-//			margin: 4px 0 0 10px;
-//		}
-//	}
 
 	.dashbrd-widget-head {
 		margin: -10px -10px 6px -10px;
