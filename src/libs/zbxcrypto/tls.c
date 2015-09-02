@@ -481,7 +481,6 @@ static void	zbx_tls_validate_config(void)
 			if (NULL == delim)
 				break;
 
-			*delim = ',';
 			p = delim + 1;
 		}
 
