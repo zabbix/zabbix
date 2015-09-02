@@ -4787,14 +4787,8 @@ void	zbx_tls_close(zbx_socket_t *s)
 			}
 			else
 			{
-				const char	*hint = "",
-						*hint1 = " Check allowed connection types and access rights.";
-
-				if (GNUTLS_E_PUSH_ERROR == res)
-					hint = hint1;
-
-				zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() returned: %d %s%s", res,
-						gnutls_strerror(res), hint);
+				zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() returned: %d %s", res,
+						gnutls_strerror(res));
 
 				if (0 != gnutls_error_is_fatal(res))
 					break;
