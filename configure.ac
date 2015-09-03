@@ -1516,6 +1516,14 @@ if test "x${MKDIR_P}" = "x"; then
 fi
 AC_MSG_RESULT([ok (${MKDIR_P})])
 
+dnl Check if process statistics collector should be enabled
+case "x$ARCH" in
+	xlinux|xsolaris)
+		AC_DEFINE(ZBX_PROCSTAT_COLLECTOR, 1 , [Define to 1 on linux and solaris platforms])
+		;;
+esac		
+
+
 dnl *****************************************************************
 dnl *                                                               *
 dnl *                 Output configuration results                  *

@@ -84,7 +84,7 @@ class CNewValidator {
 				 */
 				case 'not_empty':
 					if (array_key_exists($field, $this->input) && $this->input[$field] === '') {
-						$this->addError($fatal, _s('Incorrect value for field "%1$s": cannot be empty.', $field));
+						$this->addError($fatal, _s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
 						return false;
 					}
 					break;
@@ -200,7 +200,19 @@ class CNewValidator {
 				case 'required':
 					if (!array_key_exists($field, $this->input)) {
 						$this->addError($fatal, _s('Field "%1$s" is mandatory.', $field));
-						$result = false;
+						return false;
+					}
+					break;
+
+				/*
+				 * 'string' => true
+				 */
+				case 'string':
+					if (array_key_exists($field, $this->input) && !is_string($this->input[$field])) {
+						$this->addError($fatal,
+							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a character string is expected'))
+						);
+						return false;
 					}
 					break;
 
