@@ -800,6 +800,10 @@ footer {
 	white-space: nowrap;
 }
 
+.overflow-table {
+	overflow-x: auto;
+}
+
 /* Filters */
 .filter-btn-container {
 	text-align: center;
@@ -944,7 +948,9 @@ footer {
 }
 
 .multiselect-button {
-	float: left;
+	//float: left;
+	display: inline-block;
+	vertical-align: top;
 }
 
 .multiselect-suggest {
