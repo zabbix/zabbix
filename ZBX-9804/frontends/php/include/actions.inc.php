@@ -685,6 +685,14 @@ function getActionOperationDescriptions(array $actions) {
 
 					$result[$i][$j][] = [implode(', ', $templateList), BR()];
 					break;
+				case OPERATION_TYPE_HOST_INVENTORY:
+					$host_inventory_modes = getHostInventoryModes();
+					$result[$i][$j][] = bold(operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ');
+					$result[$i][$j][] = [
+						$host_inventory_modes[$operation['opinventory']['inventory_mode']],
+						BR()
+					];
+					break;
 			}
 		}
 	}
@@ -879,7 +887,8 @@ function get_operations_by_eventsource($eventsource) {
 		OPERATION_TYPE_TEMPLATE_ADD,
 		OPERATION_TYPE_TEMPLATE_REMOVE,
 		OPERATION_TYPE_HOST_ENABLE,
-		OPERATION_TYPE_HOST_DISABLE
+		OPERATION_TYPE_HOST_DISABLE,
+		OPERATION_TYPE_HOST_INVENTORY
 	];
 	$operations[EVENT_SOURCE_AUTO_REGISTRATION] = [
 		OPERATION_TYPE_MESSAGE,
@@ -887,7 +896,8 @@ function get_operations_by_eventsource($eventsource) {
 		OPERATION_TYPE_HOST_ADD,
 		OPERATION_TYPE_GROUP_ADD,
 		OPERATION_TYPE_TEMPLATE_ADD,
-		OPERATION_TYPE_HOST_DISABLE
+		OPERATION_TYPE_HOST_DISABLE,
+		OPERATION_TYPE_HOST_INVENTORY
 	];
 	$operations[EVENT_SOURCE_INTERNAL] = [
 		OPERATION_TYPE_MESSAGE
@@ -911,7 +921,8 @@ function operation_type2str($type = null) {
 		OPERATION_TYPE_GROUP_ADD => _('Add to host group'),
 		OPERATION_TYPE_GROUP_REMOVE => _('Remove from host group'),
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
-		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template')
+		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
+		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode')
 	];
 
 	if (is_null($type)) {
