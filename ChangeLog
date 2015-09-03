@@ -3,21 +3,21 @@ Changes for 2.5.1
 New features:
 A......... [ZBXNEXT-2581] added returning of permissions for usergroup.get (Gunars, Ivo)
 ..F....... [ZBX-8820] improved bulk acknowledge of the events (Sasha)
-..F....... [ZBXNEXT-210] changed macros type labels in template configuration form (Gunars)
+..F....... [ZBXNEXT-210] changed macro type labels in template configuration form (Gunars)
 A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discovered hosts (Gunars, Sasha, wiper)
-...G...... [ZBXNEXT-494] added support for proc.cpu.util key on linux and solaris platforms (wiper)
+...G...... [ZBXNEXT-494] added support for proc.cpu.util key on Linux and Solaris platforms (wiper)
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
-..F....... [ZBX-9625] fixed interface list bug in hosts form (Gunars)
+..F....... [ZBX-9625] fixed interface list bug in host form (Gunars)
 ..F....... [ZBX-9804] fixed monitoring graph scroller and calendar (Gunars)
 ..F....... [ZBX-9607] fixed step form in web scenario (Gunars, Sasha)
 ..F....... [ZBX-9791] fixed typo in maps.inc.php (Gunars)
-.......PS. [ZBX-9668] improved handling of vmware performance counter instances without data (wiper)
+.......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
-...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
-..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
+...G...PS. [ZBX-9682] fixed parsing of numeric item key parameters (igors)
+..F....... [ZBX-9516] fixed displaying of the "Go" button after deleting applications (Gunars)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ........S. [ZBX-9729] fixed replacement of {MACRO<1-9>} with {MACRO} where only {MACRO} is acceptable (gleb, wiper)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
@@ -131,9 +131,9 @@ A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Russian and Turkis
 
 Bug fixes:
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
-..F....... [ZBX-9625] fixed interface list bug in hosts form (Gunars)
+..F....... [ZBX-9625] fixed interface list bug in host form (Gunars)
 ..F....... [ZBX-9607] fixed step form in web scenario (Gunars, Sasha)
-.......PS. [ZBX-9668] improved handling of vmware performance counter instances without data (wiper)
+.......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
@@ -799,7 +799,7 @@ A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix t
 
 Bug fixes:
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
-.......PS. [ZBX-9668] improved handling of vmware performance counter instances without data (wiper)
+.......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
