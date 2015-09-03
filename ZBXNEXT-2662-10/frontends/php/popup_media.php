@@ -141,7 +141,7 @@ $mediaTab = (new CTabView())
 	->setFooter(makeFormFooter(
 		new CSubmit('add', ($media > -1) ? _('Update') : _('Add')),
 		[
-			new CButtonCancel(null, 'close_window();')
+			new CButtonCancel(null, 'window.close();')
 		]
 	));
 
