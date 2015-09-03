@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9738] fixed host group deletion (Gunars)
 ..F....... [ZBX-9625] fixed interface list bug in hosts form (Gunars)
 ..F....... [ZBX-9607] fixed step form in web scenario (Gunars, Sasha)
 .......PS. [ZBX-9668] improved handling of vmware performance counter instances without data (wiper)
