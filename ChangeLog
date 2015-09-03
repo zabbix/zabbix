@@ -1963,6 +1963,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9738] fixed host group deletion (Gunars)
 ........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
