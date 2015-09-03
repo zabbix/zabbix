@@ -21,7 +21,6 @@
 #include "sysinfo.h"
 
 #include <tlhelp32.h>
-#include <Processsnapshot.h>
 
 #include "symbols.h"
 #include "log.h"
@@ -74,20 +73,47 @@ lbl_err:
 	return res;
 }
 
-int	old_proc_num_walk(char *procName, char *userName, DWORD access, AGENT_RESULT *result)
+int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	HANDLE	hProcessSnap, hProcess;
 	PROCESSENTRY32	pe32;
+	DWORD		access;
+	const OSVERSIONINFOEX	*vi;
 	int	proccount,
 		proc_ok;
-	char	baseName[MAX_PATH],
+	char	*procName,
+		*userName,
+		baseName[MAX_PATH],
 		uname[MAX_NAME];
+
+	if (2 < request->nparam)
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	procName = get_rparam(request, 0);
+	userName = get_rparam(request, 1);
 
 	if (INVALID_HANDLE_VALUE == (hProcessSnap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}
+
+	if (NULL == (vi = zbx_win_getversion()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (6 > vi->dwMajorVersion)
+	{
+		/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
+		access = PROCESS_QUERY_INFORMATION;
+	}
+	else
+		access = PROCESS_QUERY_LIMITED_INFORMATION;
 
 	pe32.dwSize = sizeof(PROCESSENTRY32);
 
@@ -136,130 +162,6 @@ int	old_proc_num_walk(char *procName, char *userName, DWORD access, AGENT_RESULT
 	SET_UI64_RESULT(result, proccount);
 
 	return SYSINFO_RET_OK;
-}
-
-int	new_proc_num_walk(char *procName, char *userName, AGENT_RESULT *result)
-{
-	HANDLE	hProcess;
-	HPSS	SnapshotHandle;
-	HPSSWALK	WalkMarkerHandle;
-	PSS_HANDLE_INFORMATION	HandleInformation;
-	PSS_HANDLE_ENTRY	HandleEntry;
-	DWORD	error;
-	int	proccount = 0,
-		proc_ok;
-	char	baseName[MAX_PATH],
-		uname[MAX_NAME];
-
-	if (ERROR_SUCCESS != PssCaptureSnapshot(GetCurrentProcess(), PSS_CAPTURE_HANDLES |
-			PSS_CAPTURE_HANDLE_NAME_INFORMATION | PSS_CAPTURE_HANDLE_TYPE_SPECIFIC_INFORMATION, 0,
-			&SnapshotHandle))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unable to capture snapshot."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	/* take the shortcut if no process or user name provided */
-	if ((NULL == procName || '\0' == *procName) && (NULL == userName || '\0' == *userName))
-	{
-		if (ERROR_SUCCESS == PssQuerySnapshot(SnapshotHandle, PSS_QUERY_HANDLE_INFORMATION, &HandleInformation,
-				sizeof(PSS_HANDLE_INFORMATION)))
-		{
-			SET_UI64_RESULT(result, HandleInformation.HandlesCaptured);
-			return SYSINFO_RET_OK;
-		}
-	}
-
-	/* proceed the usual way */
-	if (ERROR_SUCCESS != PssWalkMarkerCreate(NULL, &WalkMarkerHandle))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unable to create walk marker."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	while (ERROR_SUCCESS == (error = PssWalkSnapshot(SnapshotHandle, PSS_WALK_HANDLES, WalkMarkerHandle,
-			&HandleEntry, sizeof(PSS_HANDLE_ENTRY))))
-	{
-		proc_ok = 1;
-
-		if (0 == (HandleEntry.Flags & PSS_OBJECT_TYPE_PROCESS))
-			proc_ok = 0;
-
-		if (0 != proc_ok && NULL != procName && '\0' != *procName && 0 != (HandleEntry.Flags & PSS_HANDLE_HAVE_NAME))
-		{
-			zbx_unicode_to_utf8_static(HandleEntry.ObjectName, baseName, MIN(MAX_NAME,
-					zbx_strlen_utf8_nchars(HandleEntry.ObjectName, HandleEntry.ObjectNameLength)));
-
-			if (0 != stricmp(baseName, procName))
-				proc_ok = 0;
-		}
-
-		if (0 != proc_ok && NULL != userName && '\0' != *userName &&
-				HandleEntry.Flags | PSS_HANDLE_HAVE_TYPE_SPECIFIC_INFORMATION)
-		{
-			hProcess = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE,
-					HandleEntry.TypeSpecificInformation.Process.ProcessId);
-
-			if (NULL == hProcess || SUCCEED != zbx_get_process_username(hProcess, uname) ||
-					0 != stricmp(uname, userName))
-			{
-				proc_ok = 0;
-			}
-
-			if (NULL != hProcess)
-				CloseHandle(hProcess);
-		}
-
-		if (0 != proc_ok)
-			proccount++;
-	}
-
-	if (ERROR_NO_MORE_ITEMS != error)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Process snapshot walking stopped short."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	PssWalkMarkerFree(WalkMarkerHandle);
-
-	PssFreeSnapshot(GetCurrentProcess(), SnapshotHandle);
-
-	SET_UI64_RESULT(result, proccount);
-
-	return SYSINFO_RET_OK;
-}
-
-int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
-{
-	const OSVERSIONINFOEX	*vi;
-	char	*procName,
-		*userName;
-
-	if (2 < request->nparam)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	procName = get_rparam(request, 0);
-	userName = get_rparam(request, 1);
-
-	if (NULL == (vi = zbx_win_getversion()))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (6 > vi->dwMajorVersion)
-	{
-		/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
-		return old_proc_num_walk(procName, userName, PROCESS_QUERY_INFORMATION, result);
-	}
-
-	if (3 > vi->dwMinorVersion)
-		return old_proc_num_walk(procName, userName, PROCESS_QUERY_LIMITED_INFORMATION, result);
-
-	return new_proc_num_walk(procName, userName, result);
 }
 
 /************ PROC INFO ****************/
