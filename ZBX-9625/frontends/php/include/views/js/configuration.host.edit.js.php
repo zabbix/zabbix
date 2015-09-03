@@ -64,7 +64,7 @@
 				jQuery('.interface-bulk', domRow).remove();
 			}
 
-			if (hostInterface.locked) {
+			if (hostInterface.locked > 0) {
 				addNotDraggableIcon(domRow);
 			}
 			else {
@@ -161,7 +161,7 @@
 				checked_main: ''
 			};
 
-			if (0 < hostInterface.items) {
+			if (hostInterface.items > 0) {
 				attrs.disabled = 'disabled="disabled"';
 			}
 
