@@ -27,6 +27,10 @@
 #include "zbxjson.h"
 #include "../libs/zbxcrypto/tls.h"
 
+#ifndef _WINDOWS
+#	include "zbxnix.h"
+#endif
+
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_sender";
 const char	syslog_app_name[] = "zabbix_sender";
