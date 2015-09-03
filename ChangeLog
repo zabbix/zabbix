@@ -5,7 +5,7 @@ A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix t
 
 Bug fixes:
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
-........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
