@@ -38,6 +38,7 @@
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #else
+#	include "zbxnix.h"
 #	include "sighandler.h"
 #endif
 #include "active.h"

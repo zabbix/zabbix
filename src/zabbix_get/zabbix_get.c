@@ -26,6 +26,10 @@
 #include "zbxgetopt.h"
 #include "../libs/zbxcrypto/tls.h"
 
+#ifndef _WINDOWS
+#	include "zbxnix.h"
+#endif
+
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_get";
 const char	syslog_app_name[] = "zabbix_get";

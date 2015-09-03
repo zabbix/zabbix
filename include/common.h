@@ -1103,7 +1103,6 @@ int	parse_serveractive_element(char *str, char **host, unsigned short *port, uns
 #define ZBX_SESSION_PASSIVE	1
 
 char	*zbx_dyn_escape_shell_single_quote(const char *text);
-int	zbx_coredump_disable(void);
 
 #define ZBX_DO_NOT_SEND_RESPONSE	0
 #define ZBX_SEND_RESPONSE		1
