@@ -2,6 +2,8 @@
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
 	<td class="interface-drag-control <?= ZBX_STYLE_TD_DRAG_ICON ?>">
 		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
 	</td>
 	<td class="interface-ip">
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}">
@@ -63,7 +65,7 @@
 
 			jQuery('#interfaces_' + hostInterface.interfaceid + '_useip_' + hostInterface.useip).prop('checked', true);
 
-			if (hostInterface.locked) {
+			if (hostInterface.locked > 0) {
 				addNotDraggableIcon(domRow);
 			}
 			else {
@@ -160,7 +162,7 @@
 				disabled: ''
 			};
 
-			if (hostInterface.items) {
+			if (hostInterface.items > 0) {
 				attrs.disabled = 'disabled="disabled"';
 			}
 

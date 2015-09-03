@@ -254,8 +254,17 @@ static void	process_trap(const char *addr, char *begin, char *end)
 			ret = SUCCEED;
 	}
 
-	if (FAIL == ret && 1 == *(unsigned char *)DCconfig_get_config_data(&i, CONFIG_SNMPTRAP_LOGGING))
-		zabbix_log(LOG_LEVEL_WARNING, "unmatched trap received from [%s]: %s", addr, trap);
+	if (FAIL == ret)
+	{
+		zbx_config_t	cfg;
+
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING);
+
+		if (ZBX_SNMPTRAP_LOGGING_ENABLED == cfg.snmptrap_logging)
+			zabbix_log(LOG_LEVEL_WARNING, "unmatched trap received from [%s]: %s", addr, trap);
+
+		zbx_config_clean(&cfg);
+	}
 
 	zbx_free(interfaceids);
 	zbx_free(trap);

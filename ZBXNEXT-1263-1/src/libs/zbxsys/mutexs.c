@@ -18,8 +18,8 @@
 **/
 
 #include "common.h"
-#include "mutexs.h"
 #include "log.h"
+#include "mutexs.h"
 
 #ifndef _WINDOWS
 #	if !HAVE_SEMUN
