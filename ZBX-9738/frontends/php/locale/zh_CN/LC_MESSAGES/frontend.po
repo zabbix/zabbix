@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-31 12:30+0300\n"
 "PO-Revision-Date: 2013-08-16 03:47+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -44,7 +44,7 @@ msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
 msgstr[0] "%1$d 方案"
 
-#: chart4.php:90 chart5.php:83
+#: chart4.php:92 chart5.php:85
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s ( %2$s 年)"
@@ -1475,7 +1475,7 @@ msgstr "无法删除脚本. 脚本 \"%1$s\" 用于动作操作\"%2$s\"."
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "无法删除脚本. 脚本ID为 \"%s\"的脚本不存在."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "无法删除所选的动作"
 
@@ -1994,7 +1994,7 @@ msgstr "无法更新服务"
 msgid "Cannot update slide show"
 msgstr "无法更新简报片显示"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "无法更新状态"
 
@@ -4669,7 +4669,7 @@ msgstr "图形化使用者接口访问已停用"
 msgid "General"
 msgstr "一般"
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
+#: chart4.php:182 chart5.php:202 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr "产生于%s秒"
@@ -8194,7 +8194,7 @@ msgstr "没有图形ID\"%s\"的图形项目."
 msgid "No graph prototypes defined."
 msgstr "没有已定义的图形原型."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
+#: chart2.php:51 chart6.php:53 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1340
@@ -8326,7 +8326,7 @@ msgstr "没有含项目ID\"%1$s\"的项目."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "没有含项目ID\"%1$s\"的项目."
 
-#: chart.php:49 include/items.inc.php:725
+#: chart.php:51 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:953 popup.php:1088
 msgid "No items defined."
@@ -8554,7 +8554,7 @@ msgstr "没有触发器"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "没有含触发器ID\"%1$s\"的触发器."
 
-#: chart4.php:40 include/triggers.inc.php:1193
+#: chart4.php:42 include/triggers.inc.php:1193
 #: include/views/configuration.triggers.list.php:90 popup.php:973
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8812,7 +8812,7 @@ msgstr "数字的 (无正负)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:167 chart5.php:192 httpdetails.php:147 httpdetails.php:213
+#: chart4.php:169 chart5.php:194 httpdetails.php:147 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:843
 #: include/maps.inc.php:940 include/setup.inc.php:200
@@ -9003,7 +9003,7 @@ msgstr "仅所有数字"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "操作\"%s\"已存在."
@@ -9301,7 +9301,7 @@ msgstr "无PHP xmlwriter拓展"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:637 include/triggers.inc.php:166
+#: chart5.php:198 include/maps.inc.php:637 include/triggers.inc.php:166
 msgid "PROBLEM"
 msgstr "问题"
 
@@ -9651,7 +9651,7 @@ msgstr "问题, 如果所有的下层都有问题"
 msgid "Problem, if at least one child has a problem"
 msgstr "问题, 如果至少一个下层有一个问题"
 
-#: chart4.php:171 include/maps.inc.php:689 include/maps.inc.php:779
+#: chart4.php:173 include/maps.inc.php:689 include/maps.inc.php:779
 #: include/maps.inc.php:877 report2.php:237 report3.php:85
 msgid "Problems"
 msgstr "问题"
@@ -10763,7 +10763,7 @@ msgstr "选择行含有值类似于"
 msgid "Selected"
 msgstr "选择的"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "所选的动作已删除"
 
@@ -11323,7 +11323,7 @@ msgstr "触发器状态"
 msgid "Status only"
 msgstr "只有状态"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "状态已更新"
 
@@ -12266,7 +12266,7 @@ msgstr "解除封锁所选的用户?"
 msgid "Units"
 msgstr "单位"
 
-#: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
+#: chart4.php:177 events.php:506 events.php:507 events.php:516 events.php:517
 #: events.php:518 events.php:519 hosts.php:807 httpdetails.php:160
 #: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
 #: include/actions.inc.php:105 include/actions.inc.php:129
@@ -12819,7 +12819,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "警告"
 
-#: chart7.php:76
+#: chart7.php:78
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "警告. 无法显示超过一个类型为\"Graph sum\"的项目."
 
@@ -13516,7 +13516,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
 
-#: chart4.php:127 chart5.php:137
+#: chart4.php:129 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

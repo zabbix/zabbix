@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-08-31 12:30+0300\n"
 "PO-Revision-Date: 2013-11-08 09:29+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -48,7 +48,7 @@ msgid_plural "%1$d scenarios"
 msgstr[0] "%1$d σενάριο"
 msgstr[1] "%1$d σενάρια"
 
-#: chart4.php:90 chart5.php:83
+#: chart4.php:92 chart5.php:85
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (έτος %2$s)"
@@ -1484,7 +1484,7 @@ msgstr "Αδύνατη η διαγραφή δεσμών ενεργειών. Η �
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Αδύνατη η διαγραφή δεσμών ενεργειών. Η Δέσμη ενεργειών με scriptid \"%s\" δεν υπάρχει."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "Αδύνατη η διαγραφή επιλεγμένων ενεργειών"
 
@@ -2005,7 +2005,7 @@ msgstr "Αδύνατη η ενημέρωση υπηρεσίας"
 msgid "Cannot update slide show"
 msgstr "Αδύνατη η ενημέρωση προβολής διαφάνειας"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Αδύνατη η ενημέρωση κατάστασης"
 
@@ -4683,7 +4683,7 @@ msgstr "Απενεργοποιημένη πρόσβαση GUI."
 msgid "General"
 msgstr "Γενικά"
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
+#: chart4.php:182 chart5.php:202 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr "Παραγόμενο σε %s δευτερόλεπτα"
@@ -8212,7 +8212,7 @@ msgstr "Χωρίς στοιχείο γραφήματος με αναγνωρισ
 msgid "No graph prototypes defined."
 msgstr "Δεν ορίσθηκαν πρωτότυπα γραφήματα."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
+#: chart2.php:51 chart6.php:53 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1340
@@ -8344,7 +8344,7 @@ msgstr "Όχι συλλέκτης με itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Όχι συλλέκτης με itemid=\"%1$s\"."
 
-#: chart.php:49 include/items.inc.php:725
+#: chart.php:51 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:953 popup.php:1088
 msgid "No items defined."
@@ -8572,7 +8572,7 @@ msgstr "Χωρίς έναυσμα"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Χωρίς έναυσμα με triggerid \"%1$s\"."
 
-#: chart4.php:40 include/triggers.inc.php:1193
+#: chart4.php:42 include/triggers.inc.php:1193
 #: include/views/configuration.triggers.list.php:90 popup.php:973
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8830,7 +8830,7 @@ msgstr "Αριθμητικό (απρόσημο)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:167 chart5.php:192 httpdetails.php:147 httpdetails.php:213
+#: chart4.php:169 chart5.php:194 httpdetails.php:147 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:843
 #: include/maps.inc.php:940 include/setup.inc.php:200
@@ -9021,7 +9021,7 @@ msgstr "Μόνο ακέραιοι αριθμοί"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "Η λειτουργία \"%s\" υπάρχει ήδη."
@@ -9319,7 +9319,7 @@ msgstr "PHP απουσία επέκτασης γραφέα xml"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:637 include/triggers.inc.php:166
+#: chart5.php:198 include/maps.inc.php:637 include/triggers.inc.php:166
 msgid "PROBLEM"
 msgstr "ΠΡΟΒΛΗΜΑ"
 
@@ -9670,7 +9670,7 @@ msgstr "Πρόβλημα, άν όλα τα θυγατρικά έχουν προ�
 msgid "Problem, if at least one child has a problem"
 msgstr "Πρόβλημα, άν τουλάχιστον ένα θυγατρικό έχει πρόβλημα"
 
-#: chart4.php:171 include/maps.inc.php:689 include/maps.inc.php:779
+#: chart4.php:173 include/maps.inc.php:689 include/maps.inc.php:779
 #: include/maps.inc.php:877 report2.php:237 report3.php:85
 msgid "Problems"
 msgstr "Προβλήματα"
@@ -10783,7 +10783,7 @@ msgstr "Επιλέξτε γραμμές με τιμή, όπως"
 msgid "Selected"
 msgstr "Επιλεγμένο"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "Επιλεγμένες ενέργειες διεγράφησαν"
 
@@ -11343,7 +11343,7 @@ msgstr "Κατάσταση των εναυσμάτων"
 msgid "Status only"
 msgstr "Κατάσταση μόνο"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Κατάσταση ενημερώθηκε"
 
@@ -12289,7 +12289,7 @@ msgstr "Απεμπλοκή επιλεγμένων χρηστών;"
 msgid "Units"
 msgstr "Μονάδες"
 
-#: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
+#: chart4.php:177 events.php:506 events.php:507 events.php:516 events.php:517
 #: events.php:518 events.php:519 hosts.php:807 httpdetails.php:160
 #: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
 #: include/actions.inc.php:105 include/actions.inc.php:129
@@ -12843,7 +12843,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "Προειδοποίηση"
 
-#: chart7.php:76
+#: chart7.php:78
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "Προειδοποίηση. Δεν μπορούν να εμφανισθούν πλέον του ενός συλλέκτες τύπου \"Graph sum\"."
 
@@ -13542,7 +13542,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
 
-#: chart4.php:127 chart5.php:137
+#: chart4.php:129 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

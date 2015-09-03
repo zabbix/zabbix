@@ -1,3 +1,17 @@
+Changes for 2.0.16rc1
+
+New features:
+A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+..F....... [ZBX-9738] fixed host group deletion (Gunars)
+........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
+...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
+
+--------------------------------------------------------------------------------
 Changes for 2.0.15
 
 2.0.15rc1 was released as 2.0.15 without any changes
@@ -16,7 +30,7 @@ Bug fixes:
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
-...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+...G...... [ZBX-9456] fixed system.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
