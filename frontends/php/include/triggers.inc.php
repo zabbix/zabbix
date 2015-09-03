@@ -1150,11 +1150,11 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  *
  * @param array  $trigger
  * @param string $pageFile		the page where the element is displayed
- * @param string $screenId
+ * @param string $screenid
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
+function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 	$ack = null;
 	$css = null;
 	$desc = [];
@@ -1170,19 +1170,18 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 			$ack = null;
 
-			if ($config['event_ack_enable'] == 1) {
+			if ($config['event_ack_enable']) {
 				if ($event = get_last_event_by_triggerid($trigger['triggerid'])) {
-					if ($screenId) {
+					if ($screenid !== null) {
 						$acknowledge = [
 							'eventid' => $event['eventid'],
-							'screenid' => $screenId,
-							'backurl' => $pageFile
+							'backurl' => $pageFile.'?screenid='.$screenid
 						];
 					}
 					else {
 						$acknowledge = [
 							'eventid' => $event['eventid'],
-							'backurl' => 'overview.php'
+							'backurl' => $pageFile
 						];
 					}
 

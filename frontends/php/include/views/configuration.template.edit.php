@@ -458,6 +458,7 @@ if (!$macros) {
 $macrosView = new CView('hostmacros', [
 	'macros' => $macros,
 	'show_inherited_macros' => $data['show_inherited_macros'],
+	'is_template' => true,
 	'readonly' => false
 ]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());

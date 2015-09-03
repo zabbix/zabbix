@@ -22,7 +22,7 @@
 define('ZABBIX_VERSION',		'2.5.1');
 define('ZABBIX_API_VERSION',	'2.5.1');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050051);
+define('ZABBIX_DB_VERSION',		2050054);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -103,6 +103,9 @@ define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
+
+// maximum number of records for create() or update() API calls
+define('ZBX_DB_MAX_INSERTS', 10000);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -510,6 +513,7 @@ define('OPERATION_TYPE_TEMPLATE_ADD',	6);
 define('OPERATION_TYPE_TEMPLATE_REMOVE',7);
 define('OPERATION_TYPE_HOST_ENABLE',	8);
 define('OPERATION_TYPE_HOST_DISABLE',	9);
+define('OPERATION_TYPE_HOST_INVENTORY',	10);
 
 define('CONDITION_EVAL_TYPE_AND_OR',		0);
 define('CONDITION_EVAL_TYPE_AND',			1);
@@ -683,6 +687,10 @@ define('EVENT_ACK_ENABLED',		'1');
 
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
+
+define('ZBX_ACKNOWLEDGE_SELECTED',	0);
+define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
+define('ZBX_ACKNOWLEDGE_ALL',		2);
 
 define('EVENT_SOURCE_TRIGGERS',				0);
 define('EVENT_SOURCE_DISCOVERY',			1);
