@@ -612,7 +612,11 @@ function getItemFilterForm(&$items) {
 
 	// subfilters
 	$table_subfilter = (new CTableInfo())
-		->addRow([new CTag('h4', true, [_('Subfilter'), SPACE, new CSpan(_('affects only filtered data'))])]);
+		->addRow([
+			new CTag('h4', true, [
+				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
+			])
+		]);
 
 	// array contains subfilters and number of items in each
 	$item_params = [
