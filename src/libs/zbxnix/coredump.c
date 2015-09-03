@@ -45,4 +45,3 @@ int	zbx_coredump_disable(void)
 
 	return SUCCEED;
 }
-
