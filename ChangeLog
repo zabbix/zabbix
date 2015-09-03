@@ -9,6 +9,7 @@ A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discover
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9625] fixed interface list bug in hosts form (Gunars)
 ..F....... [ZBX-9804] fixed monitoring graph scroller and calendar (Gunars)
 ..F....... [ZBX-9607] fixed step form in web scenario (Gunars, Sasha)
 ..F....... [ZBX-9791] fixed typo in maps.inc.php (Gunars)
