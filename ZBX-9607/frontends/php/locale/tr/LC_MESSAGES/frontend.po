@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-06 12:15+0300\n"
-"PO-Revision-Date: 2014-02-02 00:22+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"POT-Creation-Date: 2015-08-31 13:04+0300\n"
+"PO-Revision-Date: 2015-08-28 12:31+0300\n"
+"Last-Translator: mcsaygili <mcagdas@mcsaygili.net>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391293363.0\n"
+"X-POOTLE-MTIME: 1440757913.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -36,8 +36,8 @@ msgstr ""
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d gün"
+msgstr[1] "%1$d gün"
 
 #: include/blocks.inc.php:1125
 #, c-format
@@ -46,7 +46,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] ""
 msgstr[1] ""
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (yıl %2$s)"
@@ -62,38 +62,38 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s Öğe"
+msgstr[1] "%1$s Öğe"
 
 #: include/views/configuration.item.edit.php:327
 #: include/views/configuration.item.edit.php:343
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s gün"
+msgstr[1] "%1$s gün"
 
 #: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s dakika"
+msgstr[1] "%1$s dakika"
 
 #: include/classes/screens/CScreenActions.php:151
 #: include/views/administration.auditacts.list.php:90
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kalan deneme sayısı %1$s"
+msgstr[1] "Kalan deneme sayısı %1$s"
 
 #: jsLoader.php:222 jsLoader.php:223
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s saniye"
+msgstr[1] "%1$s saniye"
 
 #: include/page_header.php:344
 #, c-format
@@ -123,7 +123,7 @@ msgstr "(0 - belirsiz)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:159
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Sadece super admin yetkisine sahip kullanıcılar grup oluşturabilir)"
 
 #: include/forms.inc.php:580 include/forms.inc.php:595
 msgid "(in days)"
@@ -201,15 +201,16 @@ msgid "<manual>"
 msgstr "<elle>"
 
 #: include/views/administration.auditacts.list.php:31
+#, fuzzy
 msgid "ACTION LOG"
-msgstr ""
+msgstr "EYLEM GÜNLÜĞÜ"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:194
 msgid "ALARM ACKNOWLEDGES"
@@ -220,8 +221,9 @@ msgid "AND"
 msgstr "VE"
 
 #: include/views/administration.auditlogs.list.php:31
+#, fuzzy
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "HESAP GÜNLÜĞÜ"
 
 #: report2.php:163
 msgid "AVAILABILITY REPORT"
@@ -253,7 +255,7 @@ msgstr "Erişim reddedildi!"
 
 #: include/func.inc.php:1681
 msgid "Access denied."
-msgstr ""
+msgstr "Erişim engellendi."
 
 #: include/classes/api/services/CUser.php:988
 #, c-format
@@ -342,7 +344,7 @@ msgstr "Eylem"
 #: include/classes/api/services/CAction.php:2057
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" eylemi zaten mevcut."
 
 #: include/classes/api/services/CAction.php:1905
 #: include/classes/api/services/CAction.php:2004
@@ -363,13 +365,13 @@ msgstr "Eylem eklendi"
 msgid "Action deleted"
 msgstr "Eylem silindi"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Eylem devre dışı"
+msgstr[1] "Eylemler devre dışı"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1741,7 +1743,7 @@ msgstr "Betikler silinemedi. \"%1$s\"  betiği \"%2$s\" eylem işleminde kullan�
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Seçilen eylemler silinemedi."
 
@@ -1825,7 +1827,7 @@ msgstr "Değer haritası silinemedi"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1901,11 +1903,11 @@ msgstr[1] ""
 msgid "Cannot display item queue."
 msgstr ""
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2013,7 +2015,7 @@ msgstr ""
 msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:877
+#: include/classes/import/CConfigurationImport.php:879
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2037,42 +2039,42 @@ msgstr ""
 msgid "Cannot find icon map \"%1$s\" used in map \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1153
+#: include/classes/import/CConfigurationImport.php:1155
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1053
+#: include/classes/import/CConfigurationImport.php:1055
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MAX value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1137
+#: include/classes/import/CConfigurationImport.php:1139
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1033
+#: include/classes/import/CConfigurationImport.php:1035
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used as the Y axis MIN value for graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1172
+#: include/classes/import/CConfigurationImport.php:1174
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1073
+#: include/classes/import/CConfigurationImport.php:1075
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in graph prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1228
+#: include/classes/import/CConfigurationImport.php:1230
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1002
+#: include/classes/import/CConfigurationImport.php:1004
 #, c-format
 msgid "Cannot find item \"%1$s\" on \"%2$s\" used in trigger prototype \"%3$s\" of discovery rule \"%4$s\" on \"%5$s\"."
 msgstr ""
@@ -2109,7 +2111,7 @@ msgstr ""
 msgid "Cannot find screen \"%1$s\" used in screen \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:900
+#: include/classes/import/CConfigurationImport.php:902
 #, c-format
 msgid "Cannot find template \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -2122,12 +2124,12 @@ msgstr ""
 msgid "Cannot find trigger \"%1$s\" used in map \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:686
+#: include/classes/import/CConfigurationImport.php:688
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item \"%2$s\" on \"%3$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:844
+#: include/classes/import/CConfigurationImport.php:846
 #, c-format
 msgid "Cannot find value map \"%1$s\" used for item prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
@@ -5637,7 +5639,7 @@ msgstr "GUI erişimi etkisizleştirildi."
 msgid "General"
 msgstr "Genel"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -8137,7 +8139,7 @@ msgstr ""
 msgid "Item \"%1$s\" does not exist."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:669
+#: include/classes/import/CConfigurationImport.php:671
 #, c-format
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
@@ -8254,7 +8256,7 @@ msgstr ""
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr ""
 
@@ -10138,7 +10140,7 @@ msgstr ""
 msgid "No item with itemid=\"%1$s\"."
 msgstr ""
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr ""
 
@@ -10441,7 +10443,7 @@ msgstr "Tetik yok"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr ""
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr ""
 
@@ -10745,7 +10747,7 @@ msgstr "Sayısal (işaretsiz)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -10940,7 +10942,7 @@ msgstr "Yalnızca etkinleştirilmiş konaklara atanmış ve etkinleştirilmiş �
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "\"%s\" işlemi zaten var."
@@ -11289,7 +11291,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11664,7 +11666,7 @@ msgstr "Sorun, eğer bütün altlarda sorun varsa"
 msgid "Problem, if at least one child has a problem"
 msgstr "Sorun, eğer en az alttakilerden birinde sorun varsa"
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Problemler"
@@ -12778,7 +12780,7 @@ msgstr ""
 msgid "Selected"
 msgstr "Seçilen"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Seçilen eylemler silindi"
 
@@ -14066,8 +14068,8 @@ msgstr "Tetik"
 msgid "Trigger \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
 
-#: include/classes/import/CConfigurationImport.php:1244
-#: include/classes/import/CConfigurationImport.php:1288
+#: include/classes/import/CConfigurationImport.php:1246
+#: include/classes/import/CConfigurationImport.php:1290
 #, c-format
 msgid "Trigger \"%1$s\" depends on trigger \"%2$s\", which does not exist."
 msgstr ""
@@ -16089,7 +16091,7 @@ msgctxt "day short"
 msgid "d"
 msgstr ""
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

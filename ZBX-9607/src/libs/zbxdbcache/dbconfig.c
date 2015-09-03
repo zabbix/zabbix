@@ -107,6 +107,7 @@ typedef struct
 	unsigned char	location;
 	unsigned char	flags;
 	unsigned char	status;
+	unsigned char	unreachable;
 }
 ZBX_DC_ITEM;
 
@@ -1881,6 +1882,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
+			item->unreachable = 0;
 		}
 		else
 		{
@@ -3400,6 +3402,7 @@ static int	__config_heap_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	if (SUCCEED != is_snmp_type(i1->type))
 	{
@@ -3426,6 +3429,7 @@ static int	__config_pinger_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
 
 	return 0;
@@ -3456,6 +3460,7 @@ static int	__config_java_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	return __config_java_item_compare(i1, i2);
 }
@@ -3865,6 +3870,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
+	dst_item->unreachable = src_item->unreachable;
 
 	dst_item->db_state = src_item->db_state;
 	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
@@ -4856,7 +4862,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 		if (0 == (disable_until = DCget_disable_until(dc_item, dc_host)))
 		{
-			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
+			/* move reachable items on reachable hosts to normal pollers */
+			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type && 0 == dc_item->unreachable)
 			{
 				old_poller_type = dc_item->poller_type;
 				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
@@ -5130,6 +5137,8 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, lastclock);
 
+	dc_item->unreachable = 0;
+
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
 
@@ -5148,6 +5157,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *
 
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+
+	dc_item->unreachable = 1;
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
@@ -5213,6 +5224,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				DCrequeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:

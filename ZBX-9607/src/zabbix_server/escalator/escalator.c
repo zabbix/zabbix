@@ -460,15 +460,21 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 	DB_ROW		row;
 	zbx_db_insert_t	db_insert;
 	int		alerts_num = 0;
+	char		*buffer = NULL;
+	size_t		buffer_alloc = ZBX_KIBIBYTE, buffer_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	result = DBselect(
+	buffer = zbx_malloc(buffer, buffer_alloc);
+
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command");
 #ifdef HAVE_OPENIPMI
-				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_grp og,hosts_groups hg,hosts h"
 			" where o.operationid=og.operationid"
 				" and og.groupid=hg.groupid"
@@ -477,10 +483,13 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and h.status=%d"
 			" union "
 			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command",
+			operationid, HOST_STATUS_MONITORED);
 #ifdef HAVE_OPENIPMI
-				",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_hst oh,hosts h"
 			" where o.operationid=oh.operationid"
 				" and oh.hostid=h.hostid"
@@ -488,17 +497,21 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and h.status=%d"
 			" union "
 			"select distinct 0,null,o.type,o.scriptid,o.execute_on,o.port"
-				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command"
+				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command",
+			operationid, HOST_STATUS_MONITORED);
 #ifdef HAVE_OPENIPMI
-				",0,2,null,null"
+	zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, ",0,2,null,null");
 #endif
+	zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset,
 			" from opcommand o,opcommand_hst oh"
 			" where o.operationid=oh.operationid"
 				" and o.operationid=" ZBX_FS_UI64
 				" and oh.hostid is null",
-			operationid, HOST_STATUS_MONITORED,
-			operationid, HOST_STATUS_MONITORED,
 			operationid);
+
+	result = DBselect("%s", buffer);
+
+	zbx_free(buffer);
 
 	while (NULL != (row = DBfetch(result)))
 	{

@@ -34,6 +34,7 @@
 #include "comms.h"
 #include "threads.h"
 #include "zbxjson.h"
+#include "alias.h"
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
@@ -329,7 +330,7 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		else
 			mtime = atoi(tmp);
 
-		add_check(name, key_orig, delay, lastlogsize, mtime);
+		add_check(zbx_alias_get(name), key_orig, delay, lastlogsize, mtime);
 	}
 
 	zbx_regexp_clean_expressions(&regexps);
@@ -912,6 +913,7 @@ static void	process_active_checks(char *server, unsigned short port)
 		else
 			is_logrt = -1;
 
+		/* log or logrt */
 		if (-1 != is_logrt)
 		{
 			int		err, rc;
@@ -1033,7 +1035,7 @@ static void	process_active_checks(char *server, unsigned short port)
 
 			zbx_free(err_msg_dyn);
 		}
-		/* special processing for eventlog */
+		/* eventlog */
 		else if (0 == strncmp(active_metrics[i].key, "eventlog[", 9))
 		{
 			ret = FAIL;
@@ -1306,6 +1308,7 @@ static void	process_active_checks(char *server, unsigned short port)
 						NULL, NULL, NULL, 0);
 			}
 		}
+		/* other (not log, logrt or eventlog) */
 		else
 		{
 			if (SUCCEED == process(active_metrics[i].key, 0, &result))
@@ -1323,15 +1326,20 @@ static void	process_active_checks(char *server, unsigned short port)
 			}
 			else
 			{
-				pvalue = GET_MSG_RESULT(&result);
+				const char	*perror;
+
+				if (0 != ISSET_MSG(&result))
+					perror = *GET_MSG_RESULT(&result);
+				else
+					perror = ZBX_NOTSUPPORTED_MSG;
 
 				active_metrics[i].state = ITEM_STATE_NOTSUPPORTED;
 
-				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported",
-						active_metrics[i].key);
+				zabbix_log(LOG_LEVEL_WARNING, "active check \"%s\" is not supported: %s",
+						active_metrics[i].key, perror);
 
 				process_value(server, port, CONFIG_HOSTNAME, active_metrics[i].key_orig,
-						*pvalue, ITEM_STATE_NOTSUPPORTED,
+						perror, ITEM_STATE_NOTSUPPORTED,
 						NULL, NULL, NULL,
 						NULL, NULL, NULL, 0);
 			}
