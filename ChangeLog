@@ -126,6 +126,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9607] Fixed step form in web scenario (Gunars, Sasha)
 .......PS. [ZBX-9668] improved handling of vmware performance counter instances without data (wiper)
 ........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
