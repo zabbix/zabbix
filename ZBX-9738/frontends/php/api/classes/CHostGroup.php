@@ -804,11 +804,11 @@ class CHostGroup extends CZBXAPI {
 
 		// actions from operations
 		$dbActions = DBselect(
-			'SELECT DISTINCT o.actionid'.
+			'SELECT o.actionid'.
 			' FROM operations o,opgroup og'.
 			' WHERE o.operationid=og.operationid AND '.dbConditionInt('og.groupid', $groupids).
-			' UNION' .
-			' SELECT DISTINCT o.actionid'.
+			' UNION'.
+			' SELECT o.actionid'.
 			' FROM operations o,opcommand_grp ocg'.
 			' WHERE o.operationid=ocg.operationid AND '.dbConditionInt('ocg.groupid', $groupids)
 		);
