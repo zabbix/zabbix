@@ -1512,9 +1512,9 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, SSL_CTX
 {
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		char		*msg = NULL;
-		size_t		msg_alloc = 0, msg_offset = 0;
-		int		i, num;
+		char	*msg = NULL;
+		size_t	msg_alloc = 0, msg_offset = 0;
+		int	i, num;
 
 		zbx_snprintf_alloc(&msg, &msg_alloc, &msg_offset, "%s(): %s ciphersuites:", title1, title2);
 
@@ -3957,8 +3957,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 				{
 					if (0 == res)
 					{
-						*error = zbx_strdup(*error, "Connection closed by peer. Check"
-								" allowed connection types and access rights");
+						*error = zbx_strdup(*error, "connection closed by peer");
 					}
 					else if (-1 == res)
 					{
