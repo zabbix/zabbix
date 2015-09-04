@@ -311,7 +311,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 #elif defined(HAVE_MYSQL)
 	if (NULL == (conn = mysql_init(NULL)))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create MYSQL database connection object");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
 		exit(EXIT_FAILURE);
 	}
 
