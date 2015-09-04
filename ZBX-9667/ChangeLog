@@ -1,17 +1,56 @@
+Changes for 2.2.11rc1
+
+New features:
+A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+.......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
+...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
+...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
+.......PS. [ZBX-4284] improved handling of timeouting items on reachable hosts (wiper)
+...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
+..F....... [ZBX-7492] fixed "Undefined index" when importing host without macros (Gunars)
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.10
+
+2.2.10rc2 was released as 2.2.10 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 2.2.10rc2
+
+New features:
+A.F....... [ZBX-1357] updated Japanese translation; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
+..F....... [ZBX-9381] fixed empty host list in popup drowpdowns (Ivo)
+
+--------------------------------------------------------------------------------
 Changes for 2.2.10rc1
 
 New features:
+A.F....... [ZBX-1357] enabled Czech locale to be displayed by default (Richlv)
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese and Polish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, French, Japanese, Polish and Spanish translations; thanks to Zabbix translators (Richlv)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
 
 Bug fixes:
+...G...... [ZBX-9605] fixed an issue with start lines and end lines in vfs.file.regexp[] and vfs.file.regmatch[] (Gleb)
+..F....... [ZBX-9332] fixed correct display of green circle in maps and showing more unacknowledged problems than total number of problems (Ivo)
+..F....... [ZBX-8895] improved trigger count calculation and removed unnecessary query, thanks to Alexey Pustovalov (Krists)
+..F....... [ZBX-9381] removed 'groupid' parameter from global search URLs sometimes causing inaccessible forms due to insufficient permissions (Ivo)
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ........S. [ZBX-8949] fixed possible deadlocks when deleting items on systems with MySQL backend (wiper)
 ...G...... [ZBX-8969] fixed "system.uname" and "system.sw.arch" returning bad values on HP-UX (asaveljevs, wiper)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
-...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+...G...... [ZBX-9456] fixed system.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
@@ -1252,18 +1291,39 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.16rc1
+
+New features:
+A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
+
+Bug fixes:
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
+...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
+....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.15
+
+2.0.15rc1 was released as 2.0.15 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.15rc1
 
 New features:
 ...G...PS. [ZBXNEXT-786] made net.tcp.service[ntp] item work over UDP (asaveljevs)
 .....J.... [ZBX-8839] added timeout configuration option to Java gateway (asaveljevs)
-A.F....... [ZBX-1357] updated Polish translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech, Japanese and Polish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9703] fixed a memory leak in SSH checks when configured public and/or private key is not a regular file (Sandis)
+........S. [ZBX-9657] fixed timeout error being recognized as success when executing scripts on nodes (wiper)
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
 ...G...... [ZBX-9592] fixed possible crash due to uninitialized counterpath variable (igors)
 ...G...... [ZBX-9290] fixed log file reloading if its size is updated later than modification time (igors)
-...G...... [ZBX-9456] fixed sustem.cpu.util item to work correctly on OpenBSD 5.7 (igors)
+...G...... [ZBX-9456] fixed system.cpu.util item to work correctly on OpenBSD 5.7 (igors)
 ........S. [ZBX-4529] fixed security vulnerability in alerter script execution by using strong quoting for script arguments; thanks to Pavel for the report (wiper)
 .......PS. [ZBX-8299] fixed SQL errors in case a network discovery rule or check is deleted during processing (asaveljevs)
 ...G...... [ZBX-9467] fixed agent compilation error related to "ifnet" and "ifnet_head" structs on OpenBSD 5.5 and above (asaveljevs)
