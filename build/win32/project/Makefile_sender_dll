@@ -1,9 +1,69 @@
-TARGETNAME = zabbix_sender.dll
+# detect target archictetur
+!IF "$(CPU)" == "i386"
 TARGETDIR = ..\..\..\bin\win32\dev
-PROGNAME = $(TARGETDIR)\$(TARGETNAME)
-ADD_CFLAGS = /D ZBX_EXPORT /D WIN32
-ADD_LFLAGS = /DLL /MACHINE:X86
+ADD_LFLAGS = /MACHINE:X86
+ARCH=32
+
+!ELSEIF "$(CPU)" == "AMD64"
+TARGETDIR = ..\..\..\bin\win64\dev
+ADD_LFLAGS = /MACHINE:X64
+ARCH=64
+
+!ELSE
+!ERROR Unsupported CPU architecture: $(CPU)
+!ENDIF
+
+PROJECTNAME = zabbix_sender
+PROJECTDIR = ..\..\..\src\$(PROJECTNAME)
+TARGETNAME = zabbix_sender
+TARGETEXT = dll
+PROGNAME = $(TARGETDIR)\$(TARGETNAME).$(TARGETEXT)
+ADD_CFLAGS = /D ZBX_EXPORT
+ADD_LFLAGS = $(ADD_LFLAGS) /DLL
 
 POSTBUILD = post-build
+POSTCLEAN = post-clean
 
-!INCLUDE Makefile_sender.inc
+ADD_CFLAGS = $(ADD_CFLAGS) /D NDEBUG
+ADD_RFLAGS = /d "ZABBIX_SENDER"
+
+!INCLUDE Makefile_common.inc
+
+# the main object file must be already added in master Makefile
+OBJS = \
+	..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxcommon\iprange.o \
+	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxcommon\str.o \
+	..\..\..\src\libs\zbxcommon\xml.o \
+	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
+	..\..\..\src\libs\zbxcomms\comms.o \
+	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcrypto\base64.o \
+	..\..\..\src\libs\zbxjson\json.o \
+	..\..\..\src\libs\zbxjson\json_parser.o \
+	..\..\..\src\libs\zbxlog\log.o \
+	..\..\..\src\libs\zbxsys\mutexs.o \
+	..\..\..\src\libs\zbxsys\symbols.o \
+	..\..\..\src\libs\zbxsys\threads.o \
+	..\..\..\src\libs\zbxwin32\fatal.o \
+	..\..\..\src\zabbix_sender\win32\zabbix_sender.o
+
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
+
+!INCLUDE Makefile_tls.inc
+!INCLUDE Makefile_targets.inc
+
+# zabbix_sender dynamic link library support
+{$(PROJECTDIR)/win32}.c{$(PROJECTDIR)/win32}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
+$(TARGETDIR)\zabbix_sender.h: $(PROJECTDIR)\win32\zabbix_sender.h
+	@copy /Y $(PROJECTDIR)\win32\zabbix_sender.h $(TARGETDIR)\
+
+post-build: $(TARGETDIR)\zabbix_sender.h
+	@del /Q $(TARGETDIR)\zabbix_sender.exp 2>NUL
+
+post-clean: 
+	@del /Q $(TARGETDIR)\zabbix_sender.h 2>NUL
+	@del /Q $(TARGETDIR)\zabbix_sender.lib 2>NUL

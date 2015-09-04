@@ -10,8 +10,8 @@ bin/win64/dev/zabbix_sender.lib -text
 bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
+build/win32/project/Makefile -text
 build/win32/project/Makefile_sender_dll -text
-build/win32/project/Makefile_sender_dll_x64 -text
 create/src/data.tmpl -text
 frontends/php/app/.htaccess -text
 frontends/php/audio/alarm_average.wav -text
