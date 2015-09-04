@@ -673,24 +673,26 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	));
 
 	$items = array();
+	$itemNames = array();
 	foreach ($dbItems as $dbItem) {
-		$name = $dbItem['name_expanded'];
+		$itemId = $dbItem['itemid'];
+		$itemNames[$itemId] = $dbItem['name_expanded'];
 
 		$dbItem['hostname'] = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
 		$hostNames[$dbItem['hostid']] = $dbItem['hostname'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with
 		// inactive or active trigger with lower priority.
-		if (!isset($items[$name][$dbItem['hostname']])
-				|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-					|| (($items[$name][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-						&& $dbItem['priority'] > $items[$name][$dbItem['hostname']]['severity']))) {
-			$items[$name][$dbItem['hostname']] = array(
+		if (!isset($items[$itemId][$dbItem['hostname']])
+				|| (($items[$itemId][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+					|| (($items[$itemId][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+						&& $dbItem['priority'] > $items[$itemId][$dbItem['hostname']]['severity']))) {
+			$items[$itemId][$dbItem['hostname']] = array(
 				'itemid' => $dbItem['itemid'],
 				'value_type' => $dbItem['value_type'],
 				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
 				'units' => $dbItem['units'],
-				'name' => $name,
+				'name' => $dbItem['name_expanded'],
 				'valuemapid' => $dbItem['valuemapid'],
 				'severity' => $dbItem['priority'],
 				'tr_value' => $dbItem['tr_value'],
@@ -714,8 +716,8 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($items as $descr => $ithosts) {
-			$tableRow = array(nbsp($descr));
+		foreach ($items as $itemId => $ithosts) {
+			$tableRow = array(nbsp($itemNames[$itemId]));
 			foreach ($hostNames as $hostName) {
 				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 			}
@@ -726,8 +728,8 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		$header = array(new CCol(_('Hosts'), 'center'));
-		foreach ($items as $descr => $ithosts) {
-			$header[] = new CCol($descr, 'vertical_rotation');
+		foreach ($items as $itemId => $ithosts) {
+			$header[] = new CCol($itemNames[$itemId], 'vertical_rotation');
 		}
 		$table->setHeader($header, 'vertical_header');
 
