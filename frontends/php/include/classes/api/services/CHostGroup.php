@@ -660,9 +660,9 @@ class CHostGroup extends CApiService {
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
-		DB::delete('opcommand_grp', array(
+		DB::delete('opcommand_grp', [
 			'groupid' => $groupids
-		));
+		]);
 
 		// delete empty operations
 		$delOperationids = [];
