@@ -310,7 +310,11 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		zbx_ibm_db2_log_errors(SQL_HANDLE_DBC, ibm_db2.hdbc, ERR_Z3001, dbname);
 	}
 #elif defined(HAVE_MYSQL)
-	conn = mysql_init(NULL);
+	if (NULL == (conn = mysql_init(NULL)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
+		exit(EXIT_FAILURE);
+	}
 
 	if (NULL == mysql_real_connect(conn, host, user, password, dbname, port, dbsocket, CLIENT_MULTI_STATEMENTS))
 	{
