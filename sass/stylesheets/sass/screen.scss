@@ -506,7 +506,7 @@ article {
 	
 	li {
 		display: inline-block;
-		margin: 0 10px 0 0;
+		margin: 0 6px 0 0;
 
 		&:last-child {
 			margin: 0;
@@ -1289,6 +1289,13 @@ footer {
 
 	h4 {
 		margin-bottom: -5px;
+	}
+
+	.hor-list {
+
+		li {
+			display: inline-block;
+		}
 	}
 }
 
