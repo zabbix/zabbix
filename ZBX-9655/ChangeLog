@@ -1,10 +1,13 @@
 Changes for 2.2.11rc1
 
 New features:
-A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
+........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+.......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
@@ -1292,10 +1295,11 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.16rc1
 
 New features:
-A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-........S. [ZBX-9677] fixed compilation warnings in the ecalator.s module (igors)
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
