@@ -1453,6 +1453,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'exec_params' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
 		],
 	],
 	'users' => [
@@ -5903,24 +5909,6 @@ return [
 				'default' => '0',
 			],
 			'optional' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-		],
-	],
-	'opinventory' => [
-		'key' => 'operationid',
-		'fields' => [
-			'operationid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'operations',
-				'ref_field' => 'operationid',
-			],
-			'inventory_mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

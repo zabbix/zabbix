@@ -554,6 +554,13 @@ static int	DBpatch_2050054(void)
 
 	return DBadd_foreign_key("opinventory", 1, &field);
 }
+
+static int	DBpatch_2050055(void)
+{
+	const ZBX_FIELD field = {"exec_params", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
 #endif
 
 DBPATCH_START(2050)
@@ -607,5 +614,6 @@ DBPATCH_ADD(2050051, 0, 1)
 DBPATCH_ADD(2050052, 0, 1)
 DBPATCH_ADD(2050053, 0, 1)
 DBPATCH_ADD(2050054, 0, 1)
+DBPATCH_ADD(2050055, 0, 1)
 
 DBPATCH_END()
