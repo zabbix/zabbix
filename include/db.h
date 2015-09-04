@@ -311,6 +311,7 @@ typedef struct
 	char			*smtp_helo;
 	char			*smtp_email;
 	char			*exec_path;
+	char			*exec_params;
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
