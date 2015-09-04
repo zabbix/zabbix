@@ -9,6 +9,7 @@ A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discover
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 ..F....... [ZBX-9625] fixed interface list bug in host form (Gunars)
@@ -131,6 +132,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 ..F....... [ZBX-9625] fixed interface list bug in host form (Gunars)
@@ -800,6 +802,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 .......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
