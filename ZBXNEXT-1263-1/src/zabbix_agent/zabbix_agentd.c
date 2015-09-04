@@ -68,7 +68,7 @@ const char	*progname = NULL;
 const char	title_message[] = "zabbix_agentd"
 #if defined(_WIN64)
 				" Win64"
-#elif defined(WIN32)
+#elif defined(_WIN32)
 				" Win32"
 #endif
 #if defined(ZABBIX_SERVICE)
