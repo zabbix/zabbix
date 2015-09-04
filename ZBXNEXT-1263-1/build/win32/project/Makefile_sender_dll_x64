@@ -1,9 +1,0 @@
-TARGETNAME = zabbix_sender.dll
-TARGETDIR = ..\..\..\bin\win64\dev
-PROGNAME = $(TARGETDIR)\$(TARGETNAME)
-ADD_CFLAGS = /D ZBX_EXPORT /D _WIN64
-ADD_LFLAGS = /DLL /MACHINE:X64
-
-POSTBUILD = post-build
-
-!INCLUDE Makefile_sender.inc

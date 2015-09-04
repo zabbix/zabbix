@@ -1,7 +1,0 @@
-TARGETNAME = zabbix_agentd.exe
-TARGETDIR = ..\..\..\bin\win64
-PROGNAME = $(TARGETDIR)\$(TARGETNAME)
-ADD_CFLAGS = /D _WIN64
-ADD_LFLAGS = /MACHINE:X64
-
-!INCLUDE Makefile_agent.inc
