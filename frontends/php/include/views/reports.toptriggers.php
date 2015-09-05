@@ -33,31 +33,34 @@ $filterColumn2 = new CFormList();
 $filterColumn2->addRow(_('From'), createDateSelector('filter_from', $this->data['filter']['filter_from']));
 $filterColumn2->addRow(_('Till'), createDateSelector('filter_till', $this->data['filter']['filter_till']));
 $filterColumn2->addRow(null, [
-	(new CButton(null, _('Today')))
-		->onClick('javascript: setPeriod('.REPORT_PERIOD_TODAY.');')
-		->addClass(ZBX_STYLE_BTN_LINK),
-	(new CButton(null, _('Yesterday')))
-		->onClick('javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');')
-		->addClass(ZBX_STYLE_BTN_LINK),
-	(new CButton(null, _('Current week')))
-		->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');')
-		->addClass(ZBX_STYLE_BTN_LINK),
-	(new CButton(null, _('Current month')))
-		->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');')
-		->addClass(ZBX_STYLE_BTN_LINK),
-	(new CButton(null, _('Current year')))
-		->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');')
-		->addClass(ZBX_STYLE_BTN_LINK),
-	BR(),
-	(new CButton(null, _('Last week')))
-		->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');')
-		->addClass(ZBX_STYLE_BTN_LINK),
-	(new CButton(null, _('Last month')))
-		->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');')
-		->addClass(ZBX_STYLE_BTN_LINK),
-	(new CButton(null, _('Last year')))
-		->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');')
-		->addClass(ZBX_STYLE_BTN_LINK)
+	new CHorList([
+		(new CButton(null, _('Today')))
+			->onClick('javascript: setPeriod('.REPORT_PERIOD_TODAY.');')
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Yesterday')))
+			->onClick('javascript: setPeriod('.REPORT_PERIOD_YESTERDAY.');')
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Current week')))
+			->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_WEEK.');')
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Current month')))
+			->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_MONTH.');')
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Current year')))
+			->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]),
+	new CHorList([
+		(new CButton(null, _('Last week')))
+			->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');')
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Last month')))
+			->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_MONTH.');')
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton(null, _('Last year')))
+			->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	])
 ]);
 
 $filterColumn1->addRow(

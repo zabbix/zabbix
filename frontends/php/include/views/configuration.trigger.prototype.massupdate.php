@@ -85,17 +85,21 @@ foreach ($data['dependencies'] as $dependency) {
 	$dependenciesTable->addRow($row);
 }
 
-$addButton = (new CButton('add_dep_trigger', _('Add')))
-	->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
-		'&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1&with_triggers=1&normal_only=1&noempty=1");')
-	->addClass(ZBX_STYLE_BTN_LINK);
-$addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
-	->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger&dstfld1=new_dependency'.
-		'&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.url_param('parent_discoveryid').'&multiselect=1");')
-	->addClass(ZBX_STYLE_BTN_LINK)
-	->addStyle('margin-left: 8px');
-
-$dependenciesDiv = (new CDiv([$dependenciesTable, $addButton, $addPrototypeButton]))
+$dependenciesDiv = (new CDiv([
+	$dependenciesTable,
+	new CHorList([
+		(new CButton('add_dep_trigger', _('Add')))
+			->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
+				'&with_triggers=1&normal_only=1&noempty=1");')
+			->addClass(ZBX_STYLE_BTN_LINK),
+		(new CButton('add_dep_trigger_prototype', _('Add prototype')))
+			->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+				'&dstfld1=new_dependency&srctbl=trigger_prototypes&objname=triggers&srcfld1=triggerid'.
+				url_param('parent_discoveryid').'&multiselect=1");')
+			->addClass(ZBX_STYLE_BTN_LINK)
+	])
+]))
 	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setId('dependencies_div');

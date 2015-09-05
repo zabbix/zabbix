@@ -7,7 +7,7 @@
 		<td>
 			<input type="text" name="mappings[#{mappingNum}][newvalue]" value="#{newvalue}" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" maxlength="64">
 		</td>
-		<td>
+		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<button class="<?= ZBX_STYLE_BTN_LINK ?> removeMapping" type="button"><?= _('Remove') ?></button>
 		</td>
 	</tr>

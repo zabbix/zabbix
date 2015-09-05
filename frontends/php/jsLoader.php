@@ -103,8 +103,10 @@ $tranStrings = [
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
 		'Execute' => _('Execute'),
-		'Execution confirmation' => _('Execution confirmation'),
-		'S_DELETE' => _('Delete')
+		'Execution confirmation' => _('Execution confirmation')
+	],
+	'tr_logform.js' => [
+		'S_REMOVE' => _('Remove')
 	],
 	'class.calendar.js' => [
 		'S_JANUARY' => _('January'),

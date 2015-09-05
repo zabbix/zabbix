@@ -566,25 +566,20 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink =
-			(new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-				->setTarget('_blank');
-
-		$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))
-			->addClass(ZBX_STYLE_BTN_LINK);
-		if (array_key_exists($template['templateid'], $data['original_templates'])) {
-			$unlinkAndClearButton =
-				(new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addStyle('margin-left: 8px');
-		}
-		else {
-			$unlinkAndClearButton = null;
-		}
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
 
 		$linkedTemplateTable->addRow([
 			$templateLink,
-			(new CCol([$unlinkButton, $unlinkAndClearButton]))->addClass(ZBX_STYLE_NOWRAP)
+			(new CCol(
+				new CHorList([
+					(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK),
+					array_key_exists($template['templateid'], $data['original_templates'])
+						? (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+						: null
+				])
+			))->addClass(ZBX_STYLE_NOWRAP)
 		], null, 'conditions_'.$template['templateid']);
 
 		$ignoredTemplates[$template['templateid']] = $template['name'];

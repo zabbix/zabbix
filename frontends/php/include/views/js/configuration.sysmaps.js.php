@@ -380,10 +380,12 @@
 	<?= (new CRow([
 		'#{toElementName}',
 		'#{linktriggers}',
-		(new CButton(null, _('Edit')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('openlink')
-			->setAttribute('data-linkid', '#{linkid}')
+		(new CCol(
+			(new CButton(null, _('Edit')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('openlink')
+				->setAttribute('data-linkid', '#{linkid}')
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]))
 		->toString()
 	?>
@@ -394,10 +396,12 @@
 		'#{fromElementName}',
 		'#{toElementName}',
 		'#{linktriggers}',
-		(new CButton(null, _('Edit')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('openlink')
-			->setAttribute('data-linkid', '#{linkid}')
+		(new CCol(
+			(new CButton(null, _('Edit')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('openlink')
+				->setAttribute('data-linkid', '#{linkid}')
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]))
 		->toString()
 	?>
@@ -418,10 +422,12 @@
 			]))
 		],
 		new CColor('linktrigger_#{linktriggerid}_color', '#{color}', false),
-		(new CButton(null, _('Remove')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addClass('triggerRemove')
-			->setAttribute('data-linktriggerid', '#{linktriggerid}')
+		(new CCol(
+			(new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('triggerRemove')
+				->setAttribute('data-linktriggerid', '#{linktriggerid}')
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]))
 		->setId('linktrigger_#{linktriggerid}')
 		->toString()
@@ -432,7 +438,9 @@
 	<?= (new CRow([
 		(new CTextBox('url_#{selementurlid}_name', '#{name}'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		(new CTextBox('url_#{selementurlid}_url', '#{url}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CButton(null, _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
+		(new CCol(
+			(new CButton(null, _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]))
 		->setId('urlrow_#{selementurlid}')
 		->toString()
