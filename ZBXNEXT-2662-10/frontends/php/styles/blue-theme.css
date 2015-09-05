@@ -340,6 +340,8 @@ article, .article {
     display: inline-block;
     margin: 0 14px 0 0;
     vertical-align: middle; }
+    .object-group li:last-child {
+      margin: 0; }
   .object-group .selected, .object-group .calendar .selected:hover, .calendar .object-group .selected:hover {
     background-color: #fff;
     padding: 4px 9px;
@@ -349,6 +351,12 @@ article, .article {
     border-radius: 2px; }
   .object-group .arrow-right {
     border-left-color: #1f2c33; }
+
+.hor-list li {
+  display: inline-block;
+  margin: 0 6px 0 0; }
+  .hor-list li:last-child {
+    margin: 0; }
 
 /* Footer */
 footer, .footer {
@@ -884,6 +892,8 @@ footer, .footer {
           margin: 3px 0; }
   .table-forms h4 {
     margin-bottom: -5px; }
+  .table-forms .hor-list li {
+    display: inline-block; }
 
 .center {
   text-align: center; }

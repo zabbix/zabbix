@@ -239,15 +239,16 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 				$media['period'],
 				$mediaSeverity,
 				$status,
-				[
-					(new CButton(null, _('Edit')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->onClick('return PopUp("'.$mediaUrl.'");'),
-					SPACE, SPACE,
-					(new CButton(null, _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->onClick('javascript: removeMedia('.$id.');')
-				]
+				(new CCol(
+					new CHorList([
+						(new CButton(null, _('Edit')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('return PopUp("'.$mediaUrl.'");'),
+						(new CButton(null, _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('javascript: removeMedia('.$id.');')
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
 			]))->setId('user_medias_'.$id)
 		);
 	}

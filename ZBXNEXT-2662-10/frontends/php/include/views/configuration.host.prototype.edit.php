@@ -205,8 +205,9 @@ $groupList->addRow(_('Groups'),
 $customGroupTable = (new CTable())->setId('tbl_group_prototypes');
 
 // buttons
-$addButton = (new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK);
-$buttonColumn = (new CCol($addButton))->setAttribute('colspan', 5);
+$buttonColumn = (new CCol(
+	(new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+))->setAttribute('colspan', 5);
 
 $buttonRow = (new CRow())
 	->setId('row_new_group_prototype')
