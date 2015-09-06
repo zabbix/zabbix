@@ -206,13 +206,15 @@ $newTemplateTable = (new CTable())
 	])
 	->addRow([
 		(new CDiv([
-			(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1),
-			SPACE,
-			_('Replace'),
-			BR(),
-			(new CCheckBox('mass_clear_tpls'))->setChecked($data['mass_clear_tpls'] == 1),
-			SPACE,
-			_('Clear when unlinking')
+			new CLabel(
+				[(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1), _('Replace')],
+				'mass_replace_tpls'
+			),
+			B(),
+			new CLabel(
+				[(new CCheckBox('mass_clear_tpls'))->setChecked($data['mass_clear_tpls'] == 1), _('Clear when unlinking')],
+				'mass_clear_tpls'
+			)
 		]))->addClass('floatleft')
 	]);
 

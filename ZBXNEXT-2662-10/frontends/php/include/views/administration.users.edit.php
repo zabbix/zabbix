@@ -298,10 +298,11 @@ if ($this->data['is_profile']) {
 
 	$triggersTable = (new CTable())
 		->addRow([
-			(new CCheckBox('messages[triggers.recovery]'))
-				->setChecked($this->data['messages']['triggers.recovery'] == 1),
-			_('Recovery'),
-			'',
+			new CLabel([
+				(new CCheckBox('messages[triggers.recovery]'))
+					->setChecked($this->data['messages']['triggers.recovery'] == 1),
+				_('Recovery')], 'messages[triggers.recovery]'
+			),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -333,9 +334,11 @@ if ($this->data['is_profile']) {
 		}
 
 		$triggersTable->addRow([
-			(new CCheckBox('messages[triggers.severities]['.$severity.']'))->setChecked(isset($this->data['messages']['triggers.severities'][$severity])),
-			getSeverityName($severity, $this->data['config']),
-			'',
+			new CLabel([
+				(new CCheckBox('messages[triggers.severities]['.$severity.']'))
+					->setChecked(isset($this->data['messages']['triggers.severities'][$severity])),
+				getSeverityName($severity, $this->data['config'])], 'messages[triggers.severities]['.$severity.']'
+			),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
