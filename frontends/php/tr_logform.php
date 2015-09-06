@@ -260,8 +260,7 @@ if (hasRequest('sform')) {
 	);
 
 	$form_list->addRow(null, [
-		new CCheckBox('iregexp'),
-		'iregexp',
+		new CLabel([new CCheckBox('iregexp'), 'iregexp'], 'iregexp'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('add_key_and', _('AND')))
 			->addClass(ZBX_STYLE_BTN_GREY)
