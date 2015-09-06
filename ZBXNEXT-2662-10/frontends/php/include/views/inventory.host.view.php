@@ -62,144 +62,54 @@ if ($this->data['host']['host'] !== $this->data['host']['name']) {
 	$overviewFormList->addRow(_('Visible name'), (new CSpan($this->data['host']['name']))->addClass('text-field'));
 }
 
-$agentInterfaceRows = [];
-$snmpInterfaceRows = [];
-$ipmiInterfaceRows = [];
-$jmxInterfaceRows = [];
+$interfaces = [
+	INTERFACE_TYPE_AGENT => [],
+	INTERFACE_TYPE_SNMP => [],
+	INTERFACE_TYPE_JMX => [],
+	INTERFACE_TYPE_IPMI => []
+];
+
+$interface_names = [
+	INTERFACE_TYPE_AGENT => _('Agent interfaces'),
+	INTERFACE_TYPE_SNMP => _('SNMP interfaces'),
+	INTERFACE_TYPE_JMX => _('JMX interfaces'),
+	INTERFACE_TYPE_IPMI => _('IPMI interfaces')
+];
 
 foreach ($this->data['host']['interfaces'] as $interface) {
-	$spanClass = $interface['main'] ? 'default_interface' : null;
-
-	switch ($interface['type']) {
-		case INTERFACE_TYPE_AGENT:
-			$agentInterfaceRows[] = new CRow([
-				(new CDiv($interface['ip']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
-					->addClass($spanClass),
-				(new CDiv($interface['dns']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
-					->addClass($spanClass),
-				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH)
-					->addClass($spanClass),
-				(new CDiv($interface['port']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
-					->addClass($spanClass)
-			]);
-			break;
-
-		case INTERFACE_TYPE_SNMP:
-			$snmpInterfaceRows[] = new CRow([
-				(new CDiv($interface['ip']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
-					->addClass($spanClass),
-				(new CDiv($interface['dns']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
-					->addClass($spanClass),
-				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH)
-					->addClass($spanClass),
-				(new CDiv($interface['port']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
-					->addClass($spanClass)
-			]);
-			break;
-
-		case INTERFACE_TYPE_IPMI:
-			$ipmiInterfaceRows[] = new CRow([
-				(new CDiv($interface['ip']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
-					->addClass($spanClass),
-				(new CDiv($interface['dns']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
-					->addClass($spanClass),
-				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH)
-					->addClass($spanClass),
-				(new CDiv($interface['port']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
-					->addClass($spanClass)
-			]);
-			break;
-
-		case INTERFACE_TYPE_JMX:
-			$jmxInterfaceRows[] = new CRow([
-				(new CDiv($interface['ip']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
-					->addClass($spanClass),
-				(new CDiv($interface['dns']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
-					->addClass($spanClass),
-				(new CDiv(($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS')))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH)
-					->addClass($spanClass),
-				(new CDiv($interface['port']))
-					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
-					->addClass($spanClass)
-			]);
-			break;
-	}
+	$interfaces[$interface['type']][] = $interface;
 }
 
-$interfaceTableHeaderSet = false;
+$header_is_set = false;
 
-// Agent interface
-if ($agentInterfaceRows) {
-	$ifTab = (new CTable())->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
-	$interfaceTableHeaderSet = true;
+foreach ([INTERFACE_TYPE_AGENT, INTERFACE_TYPE_SNMP, INTERFACE_TYPE_JMX, INTERFACE_TYPE_IPMI] as $type) {
+	if ($interfaces[$type]) {
+		$ifTab = (new CTable());
 
-	foreach ($agentInterfaceRows as $interface) {
-		$ifTab->addRow($interface);
+		if (!$header_is_set) {
+			$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
+			$header_is_set = true;
+		}
+
+		foreach ($interfaces[$type] as $interface) {
+			$connect_to = ($interface['useip'] == INTERFACE_USE_IP) ? _('IP') : _('DNS');
+
+			$ifTab->addRow([
+				(new CDiv($interface['main'] ? bold($interface['ip']) : $interface['ip']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH),
+				(new CDiv($interface['main'] ? bold($interface['dns']) : $interface['dns']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH),
+				(new CDiv($interface['main'] ? bold($connect_to) : $connect_to))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_USEIP_WIDTH),
+				(new CDiv($interface['main'] ? bold($interface['port']) : $interface['port']))
+					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
+			]);
+		}
+
+		$overviewFormList->addRow($interface_names[$type],
+			(new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		);
 	}
-
-	$overviewFormList->addRow(_('Agent interfaces'), (new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
-}
-
-// SNMP interface
-if ($snmpInterfaceRows) {
-	$ifTab = (new CTable());
-
-	if (!$interfaceTableHeaderSet) {
-		$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
-		$interfaceTableHeaderSet = true;
-	}
-
-	foreach ($snmpInterfaceRows as $interface) {
-		$ifTab->addRow($interface);
-	}
-
-	$overviewFormList->addRow(_('SNMP interfaces'), (new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
-}
-
-// JMX interface
-if ($jmxInterfaceRows) {
-	$ifTab = (new CTable());
-
-	if (!$interfaceTableHeaderSet) {
-		$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
-		$interfaceTableHeaderSet = true;
-	}
-
-	foreach ($jmxInterfaceRows as $interface) {
-		$ifTab->addRow($interface);
-	}
-
-	$overviewFormList->addRow(_('JMX interfaces'), (new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
-}
-
-// IPMI interface
-if ($ipmiInterfaceRows) {
-	$ifTab = (new CTable());
-
-	if (!$interfaceTableHeaderSet) {
-		$ifTab->setHeader([_('IP address'), _('DNS name'), _('Connect to'), _('Port')]);
-	}
-
-	foreach ($ipmiInterfaceRows as $interface) {
-		$ifTab->addRow($interface);
-	}
-
-	$overviewFormList->addRow(_('IPMI interfaces'), (new CDiv($ifTab))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 }
 
 // inventory (OS, Hardware, Software)
@@ -248,25 +158,22 @@ if ($this->data['host']['description'] !== '') {
 }
 
 // latest data
-$overviewFormList->addRow(_('Monitoring'), [
-	new CLink(_('Web'), 'httpmon.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
-	(new CLink(_('Latest data'),
-		'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostids[]='.$this->data['host']['hostid'])
-	)
-		->addClass('overview-link'),
-	(new CLink(_('Triggers'),
-		'tr_status.php?filter_set=1&show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
-		'&txt_select=&show_maintenance=1&hostid='.$this->data['host']['hostid'].url_param('groupid'))
-	)
-		->addClass('overview-link'),
-	(new CLink(_('Events'),
-		'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid').'&source='.EVENT_SOURCE_TRIGGERS))
-		->addClass('overview-link'),
-	(new CLink(_('Graphs'), 'charts.php?hostid='.$this->data['host']['hostid'].url_param('groupid')))
-		->addClass('overview-link'),
-	(new CLink(_('Screens'), 'host_screen.php?hostid='.$this->data['host']['hostid'].url_param('groupid')))
-		->addClass('overview-link')
-]);
+$overviewFormList->addRow(_('Monitoring'),
+	new CHorList([
+		new CLink(_('Web'), 'httpmon.php?hostid='.$this->data['host']['hostid'].url_param('groupid')),
+		(new CLink(_('Latest data'),
+			'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostids[]='.$this->data['host']['hostid'])
+		),
+		(new CLink(_('Triggers'),
+			'tr_status.php?filter_set=1&show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
+			'&txt_select=&show_maintenance=1&hostid='.$this->data['host']['hostid'].url_param('groupid'))
+		),
+		(new CLink(_('Events'),
+			'events.php?hostid='.$this->data['host']['hostid'].url_param('groupid').'&source='.EVENT_SOURCE_TRIGGERS)),
+		(new CLink(_('Graphs'), 'charts.php?hostid='.$this->data['host']['hostid'].url_param('groupid'))),
+		(new CLink(_('Screens'), 'host_screen.php?hostid='.$this->data['host']['hostid'].url_param('groupid')))
+	])
+);
 
 // configuration
 if ($this->data['rwHost']) {
@@ -291,15 +198,17 @@ else {
 	$webLink = _('Web');
 }
 
-$overviewFormList->addRow(_('Configuration'), [
-	$hostLink,
-	(new CSpan([$applicationsLink, SPACE, '('.$this->data['host']['applications'].')']))->addClass('overview-link'),
-	(new CSpan([$itemsLink, SPACE, '('.$this->data['host']['items'].')']))->addClass('overview-link'),
-	(new CSpan([$triggersLink, SPACE, '('.$this->data['host']['triggers'].')']))->addClass('overview-link'),
-	(new CSpan([$graphsLink, SPACE, '('.$this->data['host']['graphs'].')']))->addClass('overview-link'),
-	(new CSpan([$discoveryLink, SPACE, '('.$this->data['host']['discoveries'].')']))->addClass('overview-link'),
-	(new CSpan([$webLink, SPACE, '('.$this->data['host']['httpTests'].')']))->addClass('overview-link')
-]);
+$overviewFormList->addRow(_('Configuration'),
+	new CHorList([
+		$hostLink,
+		(new CSpan([$applicationsLink, CViewHelper::showNum($this->data['host']['applications'])])),
+		(new CSpan([$itemsLink, CViewHelper::showNum($this->data['host']['items'])])),
+		(new CSpan([$triggersLink, CViewHelper::showNum($this->data['host']['triggers'])])),
+		(new CSpan([$graphsLink, CViewHelper::showNum($this->data['host']['graphs'])])),
+		(new CSpan([$discoveryLink, CViewHelper::showNum($this->data['host']['discoveries'])])),
+		(new CSpan([$webLink, CViewHelper::showNum($this->data['host']['httpTests'])]))
+	])
+);
 
 $hostInventoriesTab = (new CTabView(['remember' => true]))
 	->setSelected(0)
