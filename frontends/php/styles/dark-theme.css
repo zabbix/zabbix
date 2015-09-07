@@ -1840,6 +1840,12 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   background-color: rgba(66, 54, 1, 0.5);
   border: 1px solid rgba(66, 54, 1, 0.5); }
 
+.map-selected {
+  border: 3px dashed #e99003;
+  -webkit-transition: border-color 0.2s ease-out;
+  -moz-transition: border-color 0.2s ease-out;
+  transition: border-color 0.2s ease-out; }
+
 /* Debug */
 .debug-output {
   max-height: 600px;
