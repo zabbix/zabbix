@@ -76,10 +76,10 @@ our @EXPORT = qw($result $dbh $tld
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
 		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
-		minutes_last_month get_online_probes get_probe_times probes2tldhostids init_values push_value send_values
-		get_nsip_from_key is_service_error process_slv_ns_monthly process_slv_avail process_slv_ns_avail
-		process_slv_monthly get_results get_item_values check_lastclock sql_time_condition get_incidents
-		get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
+		minutes_last_month get_last_time_till get_online_probes get_probe_times probes2tldhostids init_values
+		push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly process_slv_avail
+		process_slv_ns_avail process_slv_monthly get_results get_item_values check_lastclock sql_time_condition
+		get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
 		get_tld_by_trigger truncate_from alerts_enabled
 		dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt
@@ -885,6 +885,14 @@ sub minutes_last_month
 	my $from = $dt->epoch;
 
 	return ($till - $from) / 60;
+}
+
+sub get_last_time_till
+{
+	my $now = shift;
+
+	# truncate to the end of previous minute
+	return $now - ($now % 60) - 1 - ROLLWEEK_SHIFT_BACK;
 }
 
 # Returns a reference to an array of probe names which are online from/till. The algorithm goes like this:
@@ -2772,6 +2780,7 @@ sub __get_reachable_times
 
 	my ($rows_ref, @times, $last_status);
 
+	# get the previous status
 	$rows_ref = db_select(
 		"select clock,value".
 		" from history_uint".

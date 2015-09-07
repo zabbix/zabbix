@@ -3,6 +3,7 @@
 use lib '/opt/zabbix/scripts';
 
 use strict;
+use warnings;
 use RSM;
 use RSMSLV;
 use ApiHelper;
@@ -48,11 +49,11 @@ if (defined($opt_from))
 my @services;
 if (opt('service'))
 {
-	push(@services, lc(getopt('service')));
+	@services = (lc(getopt('service')));
 }
 else
 {
-	push(@services, 'dns', 'dnssec', 'rdds', 'epp');
+	@services = ('dns', 'dnssec', 'rdds', 'epp');
 }
 
 my %ignore_hash;
@@ -146,8 +147,89 @@ my $config_minclock = __get_config_minclock();
 
 dbg("config_minclock:$config_minclock");
 
-my $probes_from;
-my $probes_till;
+my $last_time_till = get_last_time_till($now);
+
+my ($from, $till, $continue_file);
+
+if (opt('continue'))
+{
+	$continue_file = ah_get_continue_file();
+	my $handle;
+
+	if (! -e $continue_file)
+	{
+		info("DIMIR: using config_minclock: ", ts_str($config_minclock));
+
+		$from = truncate_from($config_minclock);
+	}
+	else
+	{
+		fail("cannot open continue file $continue_file\": $!") unless (open($handle, '<', $continue_file));
+
+		chomp(my @lines = <$handle>);
+
+		close($handle);
+
+		$from = $lines[0] + 1;	# continue from the next minute
+
+		info(sprintf("getting date from %s: %s", $continue_file, ts_str($from)));
+	}
+
+	if ($from == 0)
+	{
+		fail("no data from probes in the database yet");
+	}
+
+	if (opt('period'))
+	{
+		$till = $from + getopt('period') * 60 - 1;
+	}
+	else
+	{
+		$till = $last_time_till;
+	}
+}
+elsif (opt('from'))
+{
+	$from = $opt_from;
+
+	if (opt('period'))
+	{
+		$till = $from + getopt('period') * 60 - 1;
+	}
+	else
+	{
+		$till = $last_time_till;
+	}
+}
+elsif (opt('period'))
+{
+	# only period specified
+	$till = $last_time_till;
+	$from = $till - getopt('period') * 60 + 1;
+}
+
+fail("cannot get the beginning of calculation period") unless(defined($from));
+fail("cannot get the end of calculation period") unless(defined($till));
+
+if ($till > $last_time_till)
+{
+	my $left = ($till - $last_time_till) / 60;
+	my $left_str;
+
+	if ($left == 1)
+	{
+		$left_str = "1 minute";
+	}
+	else
+	{
+		$left_str = "$left minutes";
+	}
+
+	wrn(sprintf("cannot yet calculate for selected period (%s), please wait for %s for the data to be processed", __selected_period($from, $till), $left_str));
+
+	exit(0);
+}
 
 my $tlds_processed = 0;
 foreach (@$tlds_ref)
@@ -204,93 +286,11 @@ foreach (@$tlds_ref)
 
 		dbg("lastclock:$lastclock");
 
-		my ($from, $till, $continue_file);
-
-		if (opt('continue'))
-		{
-			$continue_file = ah_get_continue_file($ah_tld, $service);
-			my $handle;
-
-			if (! -e $continue_file)
-			{
-				$from = truncate_from(__get_min_clock($tld, $service, $config_minclock));
-			}
-			else
-			{
-				fail("cannot open continue file $continue_file\": $!") unless (open($handle, '<', $continue_file));
-
-				chomp(my @lines = <$handle>);
-
-				close($handle);
-
-				$from = $lines[0];
-			}
-
-			if ($from == 0)
-			{
-				wrn(uc($service), ": no data from probes in the database yet");
-				next;
-			}
-
-			if (opt('period'))
-			{
-				$till = $from + getopt('period') * 60 - 1;
-			}
-			else
-			{
-				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
-
-			}
-		}
-		elsif (opt('from'))
-		{
-			$from = $opt_from;
-
-			if (opt('period'))
-			{
-				$till = $from + getopt('period') * 60 - 1;
-			}
-			else
-			{
-				$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
-			}
-		}
-		elsif (opt('period'))
-		{
-			# only period specified
-			$till = $lastclock + RESULT_TIMESTAMP_SHIFT;	# include the whole minute
-			$from = $till - getopt('period') * 60 + 1;
-		}
-
-		if ($from and ((!$probes_from) or ($from < $probes_from)))
-		{
-			$probes_from = $from;
-		}
-
-		if ($till and ((!$probes_till) or ($till > $probes_till)))
-		{
-			$probes_till = $till;
-		}
-
-		# NB! This check must be done after setting $probes_from and $probes_till, otherwise
-		# calculation of probe status information may be done for the period up till now.
-		if ((defined($from) and $from > $lastclock))
-		{
-			wrn(uc($service), ": time period (" . __selected_period($from, $till) . ")". " is in the future from the latest data available (" . ts_str($lastclock) . ")");
-			next;
-		}
-
-		$servicedata->{$tld}->{$service}->{'from'} = $from;
-		$servicedata->{$tld}->{$service}->{'till'} = $till;
 		$servicedata->{$tld}->{$service}->{'lastclock'} = $lastclock;
-		$servicedata->{$tld}->{$service}->{'continue_file'} = $continue_file;
 	}
 }
 
-fail("cannot calculate beginning of the period") unless(defined($probes_from));
-fail("cannot calculate end of the period") unless(defined($probes_till));
-
-info(sprintf("getting probe states from %s till %s", ts_str($probes_from), ts_str($probes_till)));
+info(sprintf("getting probe statuses for period: %s", __selected_period($from, $till)));
 
 my $all_probes_ref = get_probes();
 
@@ -303,7 +303,7 @@ if (opt('probe'))
 	$all_probes_ref->{getopt('probe')} = $temp->{getopt('probe')};
 }
 
-my $probe_times_ref = get_probe_times($probes_from, $probes_till, $probe_avail_limit, $all_probes_ref);
+my $probe_times_ref = get_probe_times($from, $till, $probe_avail_limit, $all_probes_ref);
 
 foreach (keys(%$servicedata))
 {
@@ -314,10 +314,7 @@ foreach (keys(%$servicedata))
 
 	foreach my $service (keys(%{$servicedata->{$tld}}))
 	{
-		my $from = $servicedata->{$tld}->{$service}->{'from'};
-		my $till = $servicedata->{$tld}->{$service}->{'till'};
 		my $lastclock = $servicedata->{$tld}->{$service}->{'lastclock'};
-		my $continue_file = $servicedata->{$tld}->{$service}->{'continue_file'};
 
 		my $hostid = get_hostid($tld);
 		my $avail_key = "rsm.slv.$service.avail";
@@ -876,24 +873,21 @@ foreach (keys(%$servicedata))
 				fail("THIS SHOULD NEVER HAPPEN (unknown service \"$service\")");
 			}
 		}
-
-		if (defined($continue_file) and not opt('dry-run'))
-		{
-			my $updated = (defined($till) ? $till : $lastclock + RESULT_TIMESTAMP_SHIFT) + 1;	# include the whole minute
-
-			unless (write_file($continue_file, $updated) == SUCCESS)
-			{
-				wrn("cannot update continue file \"$continue_file\": $!");
-				next;
-			}
-
-			dbg("$service: updated till ", ts_str($updated));
-		}
 	}
 }
-
 # unset TLD (for the logs)
 $tld = undef;
+
+if (defined($continue_file) and not opt('dry-run'))
+{
+	unless (write_file($continue_file, $till) == SUCCESS)
+	{
+		wrn("cannot update continue file \"$continue_file\": $!");
+		next;
+	}
+
+	dbg("last update: ", ts_str($till));
+}
 
 unless (opt('dry-run') or opt('tld'))
 {
@@ -1834,7 +1828,9 @@ sub __get_config_minclock
 
 	$rows_ref = db_select("select min(clock) from history_uint where itemid=$config_itemid");
 
-	my $minclock = ($rows_ref->[0]->[0] ? $rows_ref->[0]->[0] : $now);
+	my $minclock = $rows_ref->[0]->[0];
+
+	fail("no data in the database yet") unless ($minclock);
 
 	return $minclock;
 }

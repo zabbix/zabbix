@@ -265,10 +265,7 @@ sub ah_save_incident_json
 
 sub ah_get_continue_file
 {
-	my $tld = shift;
-	my $service = shift;
-
-	return AH_BASE_DIR . "/$tld/$service/" . AH_CONTINUE_FILE;
+	return AH_BASE_DIR . '/' . AH_CONTINUE_FILE;
 }
 
 sub ah_get_api_tld
