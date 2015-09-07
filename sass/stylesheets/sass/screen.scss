@@ -2700,6 +2700,11 @@ $form-icon-btn: (
 	border: 1px solid rgba($yellow,0.5);
 }
 
+.map-selected {
+	border: 3px dashed $dark-yellow;
+	@include transition(border-color .2s ease-out);
+}
+
 /* Debug */
 .debug-output {
 	max-height: 600px;
