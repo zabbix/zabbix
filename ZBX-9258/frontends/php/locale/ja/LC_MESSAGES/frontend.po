@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-08-31 12:52+0300\n"
 "PO-Revision-Date: 2015-08-06 03:08+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -44,7 +44,7 @@ msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] "%2$d件中%1$d件の障害が表示されています"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (%2$s年)"
@@ -353,12 +353,12 @@ msgstr "アクションを追加しました"
 msgid "Action deleted"
 msgstr "アクションを削除しました"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "アクションを無効にしました"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "アクションを有効にしました"
@@ -1719,7 +1719,7 @@ msgstr "スクリプトを削除できません。スクリプト\"%1$s\"は実�
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "スクリプトを削除できません。スクリプトID\"%1$s\"は存在しません。"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "選択したアクションを削除できません。"
 
@@ -1803,7 +1803,7 @@ msgstr "値のマッピングを削除できません"
 msgid "Cannot delete web scenario"
 msgstr "Webシナリオを削除できません"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "アクションを無効にできません"
@@ -1867,11 +1867,11 @@ msgstr[0] "Webシナリオを無効にできません"
 msgid "Cannot display item queue."
 msgstr "アイテムのキューを表示できません。"
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "グラフの合計値は2つ以上表示できません。"
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "アクションを有効にできません"
@@ -5596,7 +5596,7 @@ msgstr "GUIアクセスを無効にしました"
 msgid "General"
 msgstr "一般設定"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -8202,7 +8202,7 @@ msgstr "アイテムが親ホストのものではないホストインターフ
 msgid "Item uses incorrect interface type."
 msgstr "アイテムに正しくないインターフェースタイプが設定されています。"
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr "アイテムの値"
 
@@ -10081,7 +10081,7 @@ msgstr "アイテムID\"%1$s\"を持つアイテムは存在しません。"
 msgid "No item with itemid=\"%1$s\"."
 msgstr "アイテムID\"%1$s\"を持つアイテムは存在しません。"
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr "アイテムが設定されていません。"
 
@@ -10384,7 +10384,7 @@ msgstr "トリガーがありません"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "トリガーID\"%1$s\"を持つトリガーは存在しません。"
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr "トリガーが設定されていません。"
 
@@ -10688,7 +10688,7 @@ msgstr "数値 (整数)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -10883,7 +10883,7 @@ msgstr "有効なホストとアイテムのトリガーのみカウント"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "実行するアクション\"%s\"はすでに存在します。"
@@ -11232,7 +11232,7 @@ msgstr "PHP xmlwriterモジュールが存在しません。"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11607,7 +11607,7 @@ msgstr "すべての子に障害があった場合に障害として検知"
 msgid "Problem, if at least one child has a problem"
 msgstr "子に一つでも障害があった場合に障害として検知"
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "障害"
@@ -12719,7 +12719,7 @@ msgstr "次の値が含まれる行を表示"
 msgid "Selected"
 msgstr "選択"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "選択したアクションを削除しました"
 
@@ -16020,7 +16020,7 @@ msgctxt "day short"
 msgid "d"
 msgstr "d"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "m/d"
 
