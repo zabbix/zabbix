@@ -1912,6 +1912,7 @@ button[disabled] {
 		}
 
 		&.ui-tabs-active {
+
 			a {
 				padding: 8px 13px 9px 13px;
 				font-weight: bold;
@@ -1920,6 +1921,15 @@ button[disabled] {
 				text-decoration: none;
 				cursor: default;
 				border-bottom: 3px solid $ui-tab-bg-selected-color;
+			}
+		}
+
+		&.ui-state-disabled {
+
+			a {
+				cursor: default;
+				color: $btn-disabled-font-color;
+				background-color: $ui-bg-color;
 			}
 		}
 	}
