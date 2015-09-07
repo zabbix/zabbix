@@ -2489,6 +2489,12 @@ return [
 				'length' => 10,
 				'default' => '365',
 			],
+			'default_inventory_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '-1',
+			],
 		],
 	],
 	'triggers' => [
@@ -5862,6 +5868,24 @@ return [
 				'default' => '0',
 			],
 			'ts_delete' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0',
+			],
+		],
+	],
+	'opinventory' => [
+		'key' => 'operationid',
+		'fields' => [
+			'operationid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'operations',
+				'ref_field' => 'operationid',
+			],
+			'inventory_mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

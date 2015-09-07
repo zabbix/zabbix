@@ -50,7 +50,8 @@
 #	define ZBX_MUTEX_VALUECACHE	9
 #	define ZBX_MUTEX_VMWARE		10
 #	define ZBX_MUTEX_SQLITE3	11
-#	define ZBX_MUTEX_COUNT		12
+#	define ZBX_MUTEX_PROCSTAT	12
+#	define ZBX_MUTEX_COUNT		13
 
 #	define ZBX_MUTEX_MAX_TRIES	20	/* seconds */
 

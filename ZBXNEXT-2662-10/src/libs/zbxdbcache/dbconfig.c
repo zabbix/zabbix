@@ -45,6 +45,10 @@ static int	sync_in_progress = 0;
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
 #define ZBX_SNMP_OID_TYPE_MACRO		2
 
+/* trigger is functional unless its expression contains disabled or not monitored items */
+#define TRIGGER_FUNCTIONAL_TRUE		0
+#define TRIGGER_FUNCTIONAL_FALSE	1
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
@@ -59,6 +63,7 @@ typedef struct
 	unsigned char	state;
 	unsigned char	locked;
 	unsigned char	status;
+	unsigned char	functional;	/* see TRIGGER_FUNCTIONAL_* defines */
 }
 ZBX_DC_TRIGGER;
 
@@ -388,6 +393,7 @@ typedef struct
 {
 	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
 	zbx_uint64_t	discovery_groupid;
+	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	/* housekeeping related configuration data */
@@ -900,6 +906,8 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 
 			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
 			config->config->discovery_groupid = 0;
+			config->config->snmptrap_logging = ZBX_SNMPTRAP_LOGGING_ENABLED;
+			config->config->default_inventory_mode = HOST_INVENTORY_DISABLED;
 
 			for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 				DCstrpool_replace(found, &config->config->severity_name[i], default_severity_names[i]);
@@ -943,6 +951,7 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 		config->config->refresh_unsupported = refresh_unsupported;
 		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
 		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
+		config->config->default_inventory_mode = atoi(row[26]);
 
 		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 			DCstrpool_replace(found, &config->config->severity_name[i], row[3 + i]);
@@ -2477,6 +2486,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		}
 
 		trigger->topoindex = 1;
+
+		/* reset trigger functionality, it will be updated in DCsync_functions() */
+		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -2702,6 +2714,30 @@ static void	DCsync_functions(DB_RESULT result)
 		zbx_vector_ptr_uniq(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
+	/* disable functionality for triggers with expression containing */
+	/* disabled or not monitored items                               */
+	for (i = 0; i < itemtrigs.values_num; i++)
+	{
+		trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[i].second;
+
+		if (TRIGGER_FUNCTIONAL_FALSE != trigger->functional)
+		{
+			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
+
+			if (ITEM_STATUS_DISABLED != item->status)
+			{
+				ZBX_DC_HOST	*host;
+
+				host = zbx_hashset_search(&config->hosts, &item->hostid);
+
+				if (HOST_STATUS_NOT_MONITORED != host->status)
+					continue;
+			}
+
+			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
+		}
+	}
+
 	/* update links from items to triggers */
 
 	zbx_vector_ptr_pair_sort(&itemtrigs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -2857,7 +2893,7 @@ static DB_RESULT	DCsync_config_select()
 				"hk_events_discovery,hk_events_autoreg,hk_services_mode,"
 				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
-				"hk_trends_global,hk_trends"
+				"hk_trends_global,hk_trends,default_inventory_mode"
 			" from config");
 }
 
@@ -5045,90 +5081,6 @@ unlock:
 	return items_num;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_config_data                                         *
- *                                                                            *
- * Purpose: get config table data                                             *
- *                                                                            *
- * Return value: pointer to the returned data                                 *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
- * Comments: data must be of correct data type                                *
- *                                                                            *
- ******************************************************************************/
-void	*DCconfig_get_config_data(void *data, int type)
-{
-	LOCK_CACHE;
-
-	switch (type)
-	{
-		case CONFIG_REFRESH_UNSUPPORTED:
-			*(int *)data = config->config->refresh_unsupported;
-			break;
-		case CONFIG_DISCOVERY_GROUPID:
-			*(zbx_uint64_t *)data = config->config->discovery_groupid;
-			break;
-		case CONFIG_SNMPTRAP_LOGGING:
-			*(unsigned char *)data = config->config->snmptrap_logging;
-			break;
-	}
-
-	UNLOCK_CACHE;
-
-	return data;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_config_hk                                           *
- *                                                                            *
- * Purpose: get housekeeping configuration data                               *
- *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_get_config_hk(zbx_config_hk_t *data)
-{
-	LOCK_CACHE;
-
-	*data = config->config->hk;
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCget_trigger_severity_name                                      *
- *                                                                            *
- * Purpose: get trigger severity name                                         *
- *                                                                            *
- * Parameters: trigger    - [IN] a trigger data with priority field;          *
- *                               TRIGGER_SEVERITY_*                           *
- *             replace_to - [OUT] pointer to a buffer that will receive       *
- *                          a null-terminated trigger severity string         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev, Rudolfs Kreicbergs                            *
- *                                                                            *
- ******************************************************************************/
-int	DCget_trigger_severity_name(unsigned char priority, char **replace_to)
-{
-	if (TRIGGER_SEVERITY_COUNT <= priority)
-		return FAIL;
-
-	LOCK_CACHE;
-
-	*replace_to = zbx_strdup(*replace_to, config->config->severity_name[priority]);
-
-	UNLOCK_CACHE;
-
-	return SUCCEED;
-}
-
 static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int lastclock)
 {
 	unsigned char	old_poller_type;
@@ -5515,7 +5467,9 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 		{
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
 					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
-					TRIGGER_STATE_NORMAL == next_trigger->state)
+					TRIGGER_STATE_NORMAL == next_trigger->state &&
+					TRIGGER_STATUS_ENABLED == next_trigger->status &&
+					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
 			{
 				return FAIL;
 			}
@@ -6772,4 +6726,75 @@ void	zbx_idset_free(zbx_idset_t *idset)
 {
 	zbx_vector_uint64_destroy(&idset->ids);
 	zbx_free(idset);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_config_get                                                   *
+ *                                                                            *
+ * Purpose: get global configuration data                                     *
+ *                                                                            *
+ * Parameters: cfg   - [OUT] the global configuration data                    *
+ *             flags - [IN] the flags specifying fields to set,               *
+ *                          see ZBX_CONFIG_FLAGS_ defines                     *
+ *                                                                            *
+ * Comments: It's recommended to cleanup this structure with zbx_config_clean *
+ *           function even if only simple fields are requested.               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
+{
+	LOCK_CACHE;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_SEVERITY_NAME))
+	{
+		int	i;
+
+		cfg->severity_name = zbx_malloc(NULL, TRIGGER_SEVERITY_COUNT * sizeof(char *));
+
+		for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+			cfg->severity_name[i] = zbx_strdup(NULL, config->config->severity_name[i]);
+	}
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID))
+		cfg->discovery_groupid = config->config->discovery_groupid;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE))
+		cfg->default_inventory_mode = config->config->default_inventory_mode;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED))
+		cfg->refresh_unsupported = config->config->refresh_unsupported;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING))
+		cfg->snmptrap_logging = config->config->snmptrap_logging;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_HOUSEKEEPER))
+		cfg->hk = config->config->hk;
+
+	UNLOCK_CACHE;
+
+	cfg->flags = flags;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_config_clean                                                 *
+ *                                                                            *
+ * Purpose: cleans global configuration data structure filled                 *
+ *          by zbx_config_get() function                                      *
+ *                                                                            *
+ * Parameters: cfg   - [IN] the global configuration data                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_config_clean(zbx_config_t *cfg)
+{
+	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_SEVERITY_NAME))
+	{
+		int	i;
+
+		for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+			zbx_free(cfg->severity_name[i]);
+
+		zbx_free(cfg->severity_name);
+	}
 }

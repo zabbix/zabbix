@@ -541,6 +541,7 @@ FIELD		|hk_history	|t_integer	|'90'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends_mode	|t_integer	|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends_global|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|hk_trends	|t_integer	|'365'	|NOT NULL	|ZBX_NODATA
+FIELD		|default_inventory_mode|t_integer|'-1'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|alert_usrgrpid
 INDEX		|2		|discovery_groupid
 
@@ -1292,7 +1293,11 @@ FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
 INDEX		|1		|applicationid
 INDEX		|2		|application_prototypeid
 
+TABLE|opinventory|operationid|ZBX_DATA
+FIELD		|operationid	|t_id		|	|NOT NULL	|0			|1|operations
+FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
+
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050058	|2050058
+ROW		|2050061	|2050061

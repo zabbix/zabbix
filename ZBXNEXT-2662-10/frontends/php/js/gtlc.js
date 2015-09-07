@@ -1289,12 +1289,14 @@ var CScrollBar = Class.create({
 		this.dom.left = document.createElement('button');
 		this.dom.sublevel.appendChild(this.dom.left);
 		this.dom.left.className = 'btn-grey';
+		this.dom.left.setAttribute('type', 'button');
 		this.dom.left.innerHTML = "<span class='arrow-left'></span>";
 		addListener(this.dom.left, 'click', this.navigateLeft.bindAsEventListener(this), true);
 
 		this.dom.right = document.createElement('button');
 		this.dom.sublevel.appendChild(this.dom.right);
 		this.dom.right.className = 'btn-grey';
+		this.dom.right.setAttribute('type', 'button');
 		this.dom.right.innerHTML = "<span class='arrow-right'></span>";
 		addListener(this.dom.right, 'click', this.navigateRight.bindAsEventListener(this), true);
 

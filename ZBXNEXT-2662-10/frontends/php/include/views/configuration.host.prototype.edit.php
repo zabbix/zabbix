@@ -328,15 +328,15 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$macrosView = new CView('hostmacros', [
 		'macros' => $macros,
 		'show_inherited_macros' => $data['show_inherited_macros'],
+		'is_template' => false,
 		'readonly' => true
 	]);
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 }
 
-$inventoryMode = (isset($hostPrototype['inventory']['inventory_mode'])) ? $hostPrototype['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
 $inventoryFormList = (new CFormList('inventorylist'))
 	->addRow(null,
-		(new CRadioButtonList('inventory_mode', (int) $inventoryMode))
+		(new CRadioButtonList('inventory_mode', (int) $hostPrototype['inventory']['inventory_mode']))
 			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
