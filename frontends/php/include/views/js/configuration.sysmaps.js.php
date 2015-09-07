@@ -439,7 +439,9 @@
 		(new CTextBox('url_#{selementurlid}_name', '#{name}'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		(new CTextBox('url_#{selementurlid}_url', '#{url}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
 		(new CCol(
-			(new CButton(null, _('Remove')))->addClass(ZBX_STYLE_BTN_LINK)
+			(new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->onClick('jQuery("#urlrow_#{selementurlid}").remove();')
 		))->addClass(ZBX_STYLE_NOWRAP)
 	]))
 		->setId('urlrow_#{selementurlid}')
