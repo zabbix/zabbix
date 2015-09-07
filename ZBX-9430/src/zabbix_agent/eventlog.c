@@ -766,10 +766,10 @@ static int	zbx_get_eventlog_message6(LPCWSTR wsource, zbx_uint64_t *which, unsig
 
 	/* obtain the information from the selected events */
 
-	renderedContent = zbx_malloc(renderedContent, size);
+	renderedContent = (EVT_VARIANT *)zbx_malloc((void *)renderedContent, size);
 
 	if (TRUE != EvtRender(*render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
-			&require, &bookmarkedCount) )
+			&require, &bookmarkedCount))
 	{
 		/* information exceeds the space allocated */
 		if (ERROR_INSUFFICIENT_BUFFER != GetLastError())
@@ -778,7 +778,7 @@ static int	zbx_get_eventlog_message6(LPCWSTR wsource, zbx_uint64_t *which, unsig
 			goto out;
 		}
 
-		renderedContent = (EVT_VARIANT*)zbx_realloc((void *)renderedContent, require);
+		renderedContent = (EVT_VARIANT *)zbx_realloc((void *)renderedContent, require);
 		size = require;
 
 		if (TRUE != EvtRender(*render_context, event_bookmark, EvtRenderEventValues, size, renderedContent,
