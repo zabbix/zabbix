@@ -2702,7 +2702,7 @@ $form-icon-btn: (
 
 .map-selected {
 	border: 3px dashed $dark-yellow;
-	@include transition(border-color .2s ease-out);
+	margin: -3px;
 }
 
 /* Debug */
