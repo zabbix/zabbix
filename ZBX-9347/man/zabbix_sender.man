@@ -43,7 +43,7 @@ Quoted and non-quoted entries are supported.
 .IP \[bu]
 Double-quote is the quoting character.
 .IP \[bu]
-Entries with spaces must be quoted.
+Entries with whitespaces must be quoted.
 .IP \[bu]
 Double-quote and backslash characters inside quoted entry must be escaped with a backslash.
 .IP \[bu]
