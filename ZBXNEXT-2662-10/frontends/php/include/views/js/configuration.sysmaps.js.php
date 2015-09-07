@@ -379,7 +379,7 @@
 <script type="text/x-jquery-tmpl" id="elementLinkTableRowTpl">
 	<?= (new CRow([
 		'#{toElementName}',
-		'#{linktriggers}',
+		(new CCol())->addClass('element-urls'),
 		(new CCol(
 			(new CButton(null, _('Edit')))
 				->addClass(ZBX_STYLE_BTN_LINK)
@@ -395,7 +395,7 @@
 	<?= (new CRow([
 		'#{fromElementName}',
 		'#{toElementName}',
-		'#{linktriggers}',
+		(new CCol())->addClass('element-urls'),
 		(new CCol(
 			(new CButton(null, _('Edit')))
 				->addClass(ZBX_STYLE_BTN_LINK)
