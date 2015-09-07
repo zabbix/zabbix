@@ -452,5 +452,4 @@ void	zbx_idset_free(zbx_idset_t *idset);
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 
-
 #endif
