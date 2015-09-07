@@ -577,8 +577,8 @@ ZABBIX.apps.map = (function($) {
 				// open link form
 				$('.element-links').delegate('.openlink', 'click', function() {
 					that.currentLinkId = $(this).attr('data-linkid');
-					$('table.element-links tr').removeClass('selected');
-					$(this).parent().parent().addClass('selected');
+					$('table.element-links tr').removeClass('map-selected');
+					$(this).parent().parent().addClass('map-selected');
 
 					var linkData = that.links[that.currentLinkId].getData();
 
@@ -972,10 +972,10 @@ ZABBIX.apps.map = (function($) {
 				this.selected = state;
 
 				if (this.selected) {
-					this.domNode.addClass('selected');
+					this.domNode.addClass('map-selected');
 				}
 				else {
-					this.domNode.removeClass('selected');
+					this.domNode.removeClass('map-selected');
 				}
 
 				return this.selected;
@@ -1708,7 +1708,7 @@ ZABBIX.apps.map = (function($) {
 			 * Hide form.
 			 */
 			hide: function() {
-				$('#linksList tr').removeClass('selected');
+				$('#linksList tr').removeClass('map-selected');
 				$('#linkForm').hide();
 				$('.element-edit-control').attr('disabled', false);
 			},
