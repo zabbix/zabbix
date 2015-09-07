@@ -1315,6 +1315,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       text-decoration: none;
       cursor: default;
       border-bottom: 3px solid #0275b8; }
+    .ui-tabs-nav li.ui-state-disabled a {
+      cursor: default;
+      color: #acbbc2;
+      background-color: #fff; }
 
 .icon-maint {
   margin: 0 18px 0 0; }
