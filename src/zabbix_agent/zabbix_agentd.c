@@ -468,7 +468,7 @@ static void	set_defaults(void)
 
 		init_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
 				NULL != (value = GET_STR_RESULT(&result)))
 		{
 			assert(*value);
