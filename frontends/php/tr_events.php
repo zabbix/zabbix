@@ -99,8 +99,11 @@ $eventTab = (new CTable())
 		new CDiv([
 			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
 				->setHeader(_('Event source details')),
-			(new CUiWidget(WIDGET_HAT_EVENTDETAILS, make_event_details($event, $trigger, $page['file'])))
-				->setHeader(_('Event details'))
+			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
+				make_event_details($event, $trigger,
+					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
+				)
+			))->setHeader(_('Event details'))
 		]),
 		new CDiv([
 			$config['event_ack_enable']
@@ -114,7 +117,11 @@ $eventTab = (new CTable())
 			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($event['alerts'])))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMCMDS.'.state', true))
 				->setHeader(_('Command actions'), [], false, 'tr_events.php'),
-			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST, make_small_eventlist($event, $page['file'])))
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
+				make_small_eventlist($event,
+					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
+				)
+			))
 				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
 				->setHeader(_('Event list [previous 20]'), [], false, 'tr_events.php')
 		])

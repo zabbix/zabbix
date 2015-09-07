@@ -527,6 +527,36 @@ static int	DBpatch_2050051(void)
 
 static int	DBpatch_2050052(void)
 {
+	const ZBX_FIELD field = {"default_inventory_mode", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_2050053(void)
+{
+	const ZBX_TABLE table =
+			{"opinventory", "operationid", 0,
+				{
+					{"operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"inventory_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050054(void)
+{
+	const ZBX_FIELD	field = {"operationid", NULL, "operations", "operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("opinventory", 1, &field);
+}
+
+static int	DBpatch_2050055(void)
+{
 	DB_RESULT	result;
 	DB_ROW		row;
 	int		ret = FAIL;
@@ -558,42 +588,42 @@ out:
 	return ret;
 }
 
-static int	DBpatch_2050053(void)
+static int	DBpatch_2050056(void)
 {
 	const ZBX_FIELD field = {"severity_color_0", "97AAB3", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
 }
 
-static int	DBpatch_2050054(void)
+static int	DBpatch_2050057(void)
 {
 	const ZBX_FIELD field = {"severity_color_1", "7499FF", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
 }
 
-static int	DBpatch_2050055(void)
+static int	DBpatch_2050058(void)
 {
 	const ZBX_FIELD field = {"severity_color_2", "FFC859", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
 }
 
-static int	DBpatch_2050056(void)
+static int	DBpatch_2050059(void)
 {
 	const ZBX_FIELD field = {"severity_color_3", "FFA059", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
 }
 
-static int	DBpatch_2050057(void)
+static int	DBpatch_2050060(void)
 {
 	const ZBX_FIELD field = {"severity_color_4", "E97659", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBset_default("config", &field);
 }
 
-static int	DBpatch_2050058(void)
+static int	DBpatch_2050061(void)
 {
 	const ZBX_FIELD field = {"severity_color_5", "E45959", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -656,5 +686,8 @@ DBPATCH_ADD(2050055, 0, 1)
 DBPATCH_ADD(2050056, 0, 1)
 DBPATCH_ADD(2050057, 0, 1)
 DBPATCH_ADD(2050058, 0, 1)
+DBPATCH_ADD(2050059, 0, 1)
+DBPATCH_ADD(2050060, 0, 1)
+DBPATCH_ADD(2050061, 0, 1)
 
 DBPATCH_END()

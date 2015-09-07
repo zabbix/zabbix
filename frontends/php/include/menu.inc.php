@@ -50,8 +50,9 @@ $ZBX_MENU = [
 			],
 			[
 				'url' => 'tr_status.php',
+				'active_if' => ['acknowledge.edit'],
 				'label' => _('Triggers'),
-				'sub_pages' => ['acknow.php', 'tr_comments.php', 'chart4.php', 'scripts_exec.php']
+				'sub_pages' => ['tr_comments.php', 'chart4.php', 'scripts_exec.php']
 			],
 			[
 				'url' => 'events.php',

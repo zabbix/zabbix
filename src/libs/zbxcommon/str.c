@@ -3338,6 +3338,31 @@ void	zbx_trim_str_list(char *list, char delimiter)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_strcmp_null                                                  *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     compares two strings where any of them can be a NULL pointer           *
+ *                                                                            *
+ * Parameters: same as strcmp() except NULL values are allowed                *
+ *                                                                            *
+ * Return value: same as strcmp()                                             *
+ *                                                                            *
+ * Comments: NULL is less than any string                                     *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strcmp_null(const char *s1, const char *s2)
+{
+	if (NULL == s1)
+		return NULL == s2 ? 0 : -1;
+
+	if (NULL == s2)
+		return 1;
+
+	return strcmp(s1, s2);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dyn_escape_shell_single_quote                                *
  *                                                                            *
  * Purpose: escape single quote in shell command arguments                    *

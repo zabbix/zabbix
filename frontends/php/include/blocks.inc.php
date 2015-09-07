@@ -265,13 +265,8 @@ function getFavouriteScreens() {
 	return $favourites;
 }
 
-function make_system_status($filter) {
+function make_system_status($filter, $backurl) {
 	$config = select_config();
-
-	$ackParams = [];
-	if (!empty($filter['screenid'])) {
-		$ackParams['screenid'] = $filter['screenid'];
-	}
 
 	$table = new CTableInfo();
 
@@ -422,14 +417,14 @@ function make_system_status($filter) {
 			if ($allTriggersNum) {
 				$allTriggersNum = (new CSpan($allTriggersNum))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint(makeTriggersPopup($data['triggers'], $ackParams, $actions, $config));
+					->setHint(makeTriggersPopup($data['triggers'], $backurl, $actions, $config));
 			}
 
 			$unackTriggersNum = $data['count_unack'];
 			if ($unackTriggersNum) {
 				$unackTriggersNum = (new CSpan($unackTriggersNum))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint(makeTriggersPopup($data['triggers_unack'], $ackParams, $actions, $config));
+					->setHint(makeTriggersPopup($data['triggers_unack'], $backurl, $actions, $config));
 			}
 
 			switch ($filter['extAck']) {
@@ -534,7 +529,6 @@ function make_status_of_zbx() {
  *
  * If no sortfield and sortorder are defined, the sort indicater in the column name will not be displayed.
  *
- * @param array  $filter['screenid']
  * @param array  $filter['groupids']
  * @param array  $filter['hostids']
  * @param array  $filter['maintenance']
@@ -543,11 +537,11 @@ function make_status_of_zbx() {
  * @param int    $filter['limit']
  * @param string $filter['sortfield']
  * @param string $filter['sortorder']
- * @param string $filter['backUrl']
+ * @param string $backurl
  *
  * @return CDiv
  */
-function make_latest_issues(array $filter = []) {
+function make_latest_issues(array $filter = [], $backurl) {
 	// hide the sort indicator if no sortfield and sortorder are given
 	$showSortIndicator = isset($filter['sortfield']) || isset($filter['sortorder']);
 
@@ -643,9 +637,6 @@ function make_latest_issues(array $filter = []) {
 	// actions
 	$actions = makeEventsActions($eventIds);
 
-	// ack params
-	$ackParams = isset($filter['screenid']) ? ['screenid' => $filter['screenid']] : [];
-
 	$config = select_config();
 
 	// indicator of sort field
@@ -735,11 +726,6 @@ function make_latest_issues(array $filter = []) {
 				'clock' => $trigger['lastEvent']['clock'],
 				'ns' => $trigger['lastEvent']['ns']
 			]));
-
-			// ack
-			$ack = getEventAckState($trigger['lastEvent'], $filter['backUrl'],
-				true, $ackParams
-			);
 		}
 		// trigger has no events
 		else {
@@ -748,13 +734,19 @@ function make_latest_issues(array $filter = []) {
 				'clock' => $trigger['lastchange'],
 				'ns' => '999999999'
 			]));
+		}
 
-			// ack
-			$ack = (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
+		if ($config['event_ack_enable']) {
+			$ack = $trigger['lastEvent']
+				? getEventAckState($trigger['lastEvent'], $backurl)
+				: (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
+		}
+		else {
+			$ack = null;
 		}
 
 		// description
-		if (!zbx_empty($trigger['url'])) {
+		if ($trigger['url'] !== '') {
 			$description = (new CLink($description, $trigger['url']))->removeSID();
 		}
 		else {
@@ -762,7 +754,9 @@ function make_latest_issues(array $filter = []) {
 		}
 		if ($trigger['lastEvent']) {
 			$description->setHint(
-				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid']), '', false
+				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid'], $backurl),
+				'',
+				$trigger['url'] === ''
 			);
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
@@ -805,13 +799,13 @@ function make_latest_issues(array $filter = []) {
  * @see make_system_status
  *
  * @param array $triggers
- * @param array $ackParams
+ * @param string $backurl
  * @param array $actions
  * @param array $config
  *
  * @return CTableInfo
  */
-function makeTriggersPopup(array $triggers, array $ackParams, array $actions, array $config) {
+function makeTriggersPopup(array $triggers, $backurl, array $actions, array $config) {
 	$popupTable = (new CTableInfo())
 		->setHeader([
 			_('Host'),
@@ -836,8 +830,8 @@ function makeTriggersPopup(array $triggers, array $ackParams, array $actions, ar
 		// ack
 		if ($config['event_ack_enable']) {
 			$ack = isset($trigger['event']['eventid'])
-				? getEventAckState($trigger['event'], 'zabbix.php?action=dashboard.view', true, $ackParams)
-				: _('No events');
+				? getEventAckState($trigger['event'], $backurl)
+				: (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 		else {
 			$ack = null;

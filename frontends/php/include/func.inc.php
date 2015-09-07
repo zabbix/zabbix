@@ -2162,7 +2162,7 @@ function checkRequiredKeys(array $array, array $keys) {
  */
 function uncheckTableRows($cookieId = null) {
 	insert_js('cookie.eraseArray("cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').
-		($cookieId !== null ? '_'.$cookieId : '').'")'
+		($cookieId === null ? '' : '_'.$cookieId).'")'
 	);
 }
 
