@@ -52,7 +52,8 @@ int	zbx_dshm_create(zbx_dshm_t *shm, int proj_id, size_t shm_size, ZBX_MUTEX_NAM
 	key_t		shm_key;
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): proj_id:%d size:" ZBX_FS_SIZE_T, __function_name, proj_id, shm_size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proj_id:%d size:" ZBX_FS_SIZE_T, __function_name, proj_id,
+			(zbx_fs_size_t)shm_size);
 
 	if (FAIL == zbx_mutex_create_force(&shm->lock, mutex))
 	{
@@ -83,7 +84,7 @@ int	zbx_dshm_create(zbx_dshm_t *shm, int proj_id, size_t shm_size, ZBX_MUTEX_NAM
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s shmid:%d", __function_name, zbx_result_string(ret), shm->shmid);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s shmid:%d", __function_name, zbx_result_string(ret), shm->shmid);
 
 	return ret;
 }
@@ -108,7 +109,7 @@ int	zbx_dshm_destroy(zbx_dshm_t *shm, char **errmsg)
 	const char	*__function_name = "zbx_dshm_destroy";
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): shmid:%d", __function_name, shm->shmid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() shmid:%d", __function_name, shm->shmid);
 
 	zbx_mutex_destroy(&shm->lock);
 
@@ -124,7 +125,7 @@ int	zbx_dshm_destroy(zbx_dshm_t *shm, char **errmsg)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): %s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -176,7 +177,7 @@ int	zbx_dshm_validate_ref(const zbx_dshm_t *shm, zbx_dshm_ref_t *shm_ref, char *
 	const char	*__function_name = "zbx_dshm_validate_ref";
 	int		ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s(): shmid:%d refid:%d", __function_name, shm->shmid, shm_ref->shmid);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() shmid:%d refid:%d", __function_name, shm->shmid, shm_ref->shmid);
 
 	if (shm->shmid != shm_ref->shmid)
 	{
@@ -203,7 +204,7 @@ int	zbx_dshm_validate_ref(const zbx_dshm_t *shm, zbx_dshm_ref_t *shm_ref, char *
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_TRACE, "End of %s(): %s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }
@@ -236,7 +237,8 @@ int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 	void		*addr, *addr_old = NULL;
 	size_t		shm_size;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): shmid:%d size:" ZBX_FS_SIZE_T, __function_name, shm->shmid, size);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() shmid:%d size:" ZBX_FS_SIZE_T, __function_name, shm->shmid,
+			(zbx_fs_size_t)size);
 
 	/* Create the new shared memory segment. The same key is used. */
 	if (-1 == (shm_key = zbx_ftok(CONFIG_FILE, shm->proj_id)))
@@ -293,7 +295,7 @@ int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): shmid:%d %s", __function_name, shm->shmid, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s shmid:%d", __function_name, zbx_result_string(ret), shm->shmid);
 
 	return ret;
 }
