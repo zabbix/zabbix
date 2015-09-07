@@ -1896,7 +1896,7 @@ ZABBIX.apps.map = (function($) {
 					linkTable,
 					rowTpl,
 					list,
-					i,
+					i, j,
 					selement,
 					tmp,
 					ln,
@@ -1949,7 +1949,7 @@ ZABBIX.apps.map = (function($) {
 							fromElementName: this.sysmap.selements[link.selementid1].data.elementName,
 							toElementName: this.sysmap.selements[link.selementid2].data.elementName,
 							linkid: link.linkid,
-							linktriggers: linktriggers.join('\n')
+							linktriggers: linktriggers
 						});
 					}
 
@@ -1987,7 +1987,17 @@ ZABBIX.apps.map = (function($) {
 					});
 
 					for (i = 0, ln = list.length; i < ln; i++) {
-						$(rowTpl.evaluate(list[i])).appendTo(linkTable.find('tbody'));
+						var row = $(rowTpl.evaluate(list[i])),
+							row_urls = $('.element-urls', row);
+
+						for (j = 0; j < list[i].linktriggers.length; j++) {
+							if (j != 0) {
+								row_urls.append($('<br>'));
+							}
+							row_urls.append($('<span>').text(list[i].linktriggers[j]));
+						}
+
+						row.appendTo(linkTable.find('tbody'));
 					}
 
 					linkTable.closest('.element-links').show();
