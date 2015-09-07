@@ -54,7 +54,7 @@ Linefeed escape sequences (\\n) are supported in quoted strings.
 Linefeed escape sequences are trimmed from the end of an entry.
 .RE
 
-Use cases:
+Examples:
 
 .RS
 .TS
@@ -74,24 +74,6 @@ some
 .br
 text
 T}
-.TE
-.RE
-
-Notes:
-
-.RS
-.IP \[bu] 2
-Single backslash characters can be used without escaping under certain conditions in quoted entries but please do not rely on it. Support for that might be removed in the future.
-.IP \[bu]
-Linefeed escape sequences (\\n) are removed from the end of an entry.
-.RE
-
-.RS
-.TS
-allbox;
-c c
-l l.
-entry	result
 "C:\\My Documents"	C:\\My Documents
 "C:\\"	Warning: [line 1] 'Key value' required
 "some\\ntext\\n\\n"	T{
