@@ -496,8 +496,8 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
  ******************************************************************************/
 void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 {
-	const char	*__function_name = "zbx_proc_get_stats";
-	int	i;
+	const char	*__function_name = "zbx_proc_get_process_stats";
+	int		i;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __function_name, procs_num);
 

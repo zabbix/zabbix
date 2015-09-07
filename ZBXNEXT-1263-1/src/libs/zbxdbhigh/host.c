@@ -4996,7 +4996,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: DBadd_host_inventory                                             *
