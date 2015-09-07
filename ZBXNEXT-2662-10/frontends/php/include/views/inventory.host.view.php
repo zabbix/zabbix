@@ -133,33 +133,40 @@ if ($data['host']['description'] !== '') {
 // latest data
 $overviewFormList->addRow(_('Monitoring'),
 	new CHorList([
-		new CLink(_('Web'), 'httpmon.php?hostid='.$data['host']['hostid'].url_param('groupid')),
+		(new CLink(_('Web'), 'httpmon.php?hostid='.$data['host']['hostid'].url_param('groupid')))
+			->removeSID(),
 		(new CLink(_('Latest data'),
-			'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostids[]='.$data['host']['hostid'])
-		),
+			'latest.php?form=1&select=&show_details=1&filter_set=Filter&hostids[]='.$data['host']['hostid']
+		))->removeSID(),
 		(new CLink(_('Triggers'),
 			'tr_status.php?filter_set=1&show_triggers=2&ack_status=1&show_events=1&show_events=0&show_details=1'.
-			'&txt_select=&show_maintenance=1&hostid='.$data['host']['hostid'].url_param('groupid'))
-		),
+			'&txt_select=&show_maintenance=1&hostid='.$data['host']['hostid'].url_param('groupid')
+		))->removeSID(),
 		(new CLink(_('Events'),
-			'events.php?hostid='.$data['host']['hostid'].url_param('groupid').'&source='.EVENT_SOURCE_TRIGGERS)),
-		(new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid'))),
-		(new CLink(_('Screens'), 'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid')))
+			'events.php?hostid='.$data['host']['hostid'].url_param('groupid').'&source='.EVENT_SOURCE_TRIGGERS
+		))->removeSID(),
+		(new CLink(_('Graphs'), 'charts.php?hostid='.$data['host']['hostid'].url_param('groupid')))->removeSID(),
+		(new CLink(_('Screens'), 'host_screen.php?hostid='.$data['host']['hostid'].url_param('groupid')))->removeSID()
 	])
 );
 
 // configuration
 if ($data['rwHost']) {
-	$hostLink = new CLink(_('Host'),
-		'hosts.php?form=update&hostid='.$data['host']['hostid'].url_param('groupid'));
-	$applicationsLink = new CLink(_('Applications'),
-		'applications.php?hostid='.$data['host']['hostid'].url_param('groupid'));
-	$itemsLink = new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$data['host']['hostid'].url_param('groupid'));
-	$triggersLink = new CLink(_('Triggers'), 'triggers.php?hostid='.$data['host']['hostid'].url_param('groupid'));
-	$graphsLink = new CLink(_('Graphs'), 'graphs.php?hostid='.$data['host']['hostid'].url_param('groupid'));
-	$discoveryLink = new CLink(_('Discovery'),
-		'host_discovery.php?hostid='.$data['host']['hostid'].url_param('groupid'));
-	$webLink = new CLink(_('Web'), 'httpconf.php?hostid='.$data['host']['hostid'].url_param('groupid'));
+	$hostLink = (new CLink(_('Host'), 'hosts.php?form=update&hostid='.$data['host']['hostid'].url_param('groupid')))
+		->removeSID();
+	$applicationsLink = (new CLink(_('Applications'),
+		'applications.php?hostid='.$data['host']['hostid'].url_param('groupid')
+	))->removeSID();
+	$itemsLink = (new CLink(_('Items'), 'items.php?filter_set=1&hostid='.$data['host']['hostid'].url_param('groupid')))
+		->removeSID();
+	$triggersLink = (new CLink(_('Triggers'), 'triggers.php?hostid='.$data['host']['hostid'].url_param('groupid')))
+		->removeSID();
+	$graphsLink = (new CLink(_('Graphs'), 'graphs.php?hostid='.$data['host']['hostid'].url_param('groupid')))
+		->removeSID();
+	$discoveryLink = (new CLink(_('Discovery'),
+		'host_discovery.php?hostid='.$data['host']['hostid'].url_param('groupid')
+	))->removeSID();
+	$webLink = (new CLink(_('Web'), 'httpconf.php?hostid='.$data['host']['hostid'].url_param('groupid')))->removeSID();
 }
 else {
 	$hostLink = _('Host');
