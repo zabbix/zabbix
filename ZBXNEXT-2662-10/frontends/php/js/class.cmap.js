@@ -577,8 +577,6 @@ ZABBIX.apps.map = (function($) {
 				// open link form
 				$('.element-links').delegate('.openlink', 'click', function() {
 					that.currentLinkId = $(this).attr('data-linkid');
-					$('table.element-links tr').removeClass('map-selected');
-					$(this).parent().parent().addClass('map-selected');
 
 					var linkData = that.links[that.currentLinkId].getData();
 
@@ -1708,7 +1706,6 @@ ZABBIX.apps.map = (function($) {
 			 * Hide form.
 			 */
 			hide: function() {
-				$('#linksList tr').removeClass('map-selected');
 				$('#linkForm').hide();
 				$('.element-edit-control').attr('disabled', false);
 			},
