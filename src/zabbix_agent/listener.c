@@ -51,7 +51,7 @@ static void	process_listener(zbx_socket_t *s)
 
 		init_result(&result);
 
-		if (SUCCEED == process(s->buffer, 0, &result))
+		if (SUCCEED == process(s->buffer, PROCESS_WITH_ALIAS, &result))
 		{
 			if (NULL != (value = GET_TEXT_RESULT(&result)))
 			{
