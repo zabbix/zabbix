@@ -1842,9 +1842,7 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
 
 .map-selected {
   border: 3px dashed #e99003;
-  -webkit-transition: border-color 0.2s ease-out;
-  -moz-transition: border-color 0.2s ease-out;
-  transition: border-color 0.2s ease-out; }
+  margin: -3px; }
 
 /* Debug */
 .debug-output {
