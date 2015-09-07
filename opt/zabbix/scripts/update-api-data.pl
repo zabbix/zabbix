@@ -158,8 +158,6 @@ if (opt('continue'))
 
 	if (! -e $continue_file)
 	{
-		info("DIMIR: using config_minclock: ", ts_str($config_minclock));
-
 		$from = truncate_from($config_minclock);
 	}
 	else
@@ -170,7 +168,17 @@ if (opt('continue'))
 
 		close($handle);
 
-		$from = $lines[0] + 1;	# continue from the next minute
+		my $ts = $lines[0];
+
+		my $next_ts = $ts + 1;	# continue with the next minute
+		my $truncated_ts = truncate_from($next_ts);
+
+		if ($truncated_ts != $next_ts)
+		{
+			wrn(sprintf("truncating last update value (%s) to %s", ts_str($ts), ts_str($truncated_ts)));
+		}
+
+		$from = $truncated_ts;
 
 		info(sprintf("getting date from %s: %s", $continue_file, ts_str($from)));
 	}
