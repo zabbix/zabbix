@@ -808,13 +808,13 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		sec = zbx_time();
 		processed += get_values(poller_type);
 		total_sec += zbx_time() - sec;
-
+#ifdef HAVE_OPENIPMI
 		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
 		{
 			last_ipmi_host_check = time(NULL);
 			delete_inactive_ipmi_hosts(last_ipmi_host_check);
 		}
-
+#endif
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
