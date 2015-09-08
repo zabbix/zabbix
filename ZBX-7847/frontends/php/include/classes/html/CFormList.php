@@ -34,7 +34,7 @@ class CFormList extends CList {
 		}
 	}
 
-	public function addRow($term, $description = null, $hidden = false, $id = null, $class = null) {
+	public function addRow($term, $description = null, $id = null, $class = null) {
 		$input_id = null;
 
 		$input = $description;
@@ -51,15 +51,6 @@ class CFormList extends CList {
 		}
 
 		$label = is_object($term) ? $term : new CLabel($term, $input_id);
-
-		$defaultClass = $hidden ? ZBX_STYLE_HIDDEN : null;
-
-		if ($class === null) {
-			$class = $defaultClass;
-		}
-		else {
-			$class .= ' '.$defaultClass;
-		}
 
 		if ($description === null) {
 			$this->addItem([
@@ -80,15 +71,10 @@ class CFormList extends CList {
 	public function addInfo($text) {
 		$this->addItem(
 			[
-				(new CDiv(_('Info')))
-					->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT)
-					->addClass('listInfoLabel'),
-				(new CDiv($text))
-					->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
-					->addClass('objectgroup')
-					->addClass('inlineblock')
-					->addClass('border_dotted')
-					->addClass('listInfoText')
+				(new CDiv(_('Info')))->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+				(new CDiv(
+					(new CDiv($text))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				))->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
 			]
 		);
 		return $this;

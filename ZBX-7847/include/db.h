@@ -306,27 +306,21 @@ typedef struct
 {
 	zbx_uint64_t		mediatypeid;
 	zbx_media_type_t	type;
-	char	*description;
-	char	*smtp_server;
-	char	*smtp_helo;
-	char	*smtp_email;
-	char	*exec_path;
-	char	*gsm_modem;
-	char	*username;
-	char	*passwd;
+	char			*description;
+	char			*smtp_server;
+	char			*smtp_helo;
+	char			*smtp_email;
+	char			*exec_path;
+	char			*gsm_modem;
+	char			*username;
+	char			*passwd;
+	unsigned short		smtp_port;
+	unsigned char		smtp_security;
+	unsigned char		smtp_verify_peer;
+	unsigned char		smtp_verify_host;
+	unsigned char		smtp_authentication;
 }
 DB_MEDIATYPE;
-
-typedef struct
-{
-	zbx_uint64_t	actionid;
-	char		*shortdata;
-	char		*longdata;
-	int		esc_period;
-	unsigned char	eventsource;
-	unsigned char	recovery_msg;
-}
-DB_ACTION;
 
 typedef struct
 {
@@ -542,6 +536,9 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
+
+void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode);
+void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode);
 
 int	DBtxn_status(void);
 int	DBtxn_ongoing(void);

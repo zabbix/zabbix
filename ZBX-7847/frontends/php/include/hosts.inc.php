@@ -971,3 +971,16 @@ function cleanInheritedMacros(array $macros) {
 
 	return $macros;
 }
+
+/**
+ * An array of available host inventory modes.
+ *
+ * @return array
+ */
+function getHostInventoryModes() {
+	return [
+		HOST_INVENTORY_DISABLED => _('Disabled'),
+		HOST_INVENTORY_MANUAL => _('Manual'),
+		HOST_INVENTORY_AUTOMATIC => _('Automatic')
+	];
+}

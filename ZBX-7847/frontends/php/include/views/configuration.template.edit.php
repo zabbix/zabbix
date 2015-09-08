@@ -386,82 +386,59 @@ $divTabs->addTab('templateTab', _('Template'), $templateList);
 // TEMPLATES{
 $tmplList = new CFormList();
 
-// create linked template table
+$ignoredTemplates = [];
+
 $linkedTemplateTable = (new CTable())
 	->setNoDataMessage(_('No templates linked.'))
-	->addClass('formElementTable')
-	->setId('linkedTemplateTable')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
-
-$ignoredTemplates = [];
 
 foreach ($data['linkedTemplates'] as $template) {
 	$tmplList->addVar('templates[]', $template['templateid']);
 	$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
 		->setTarget('_blank');
 
-	$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
-	$unlinkAndClearButton = (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
-		->addClass(ZBX_STYLE_BTN_LINK);
-	$unlinkAndClearButton->addStyle('margin-left: 8px');
-
-	$linkedTemplateTable->addRow(
-		[
-			$templateLink,
-			[
-				$unlinkButton,
-				(isset($data['original_templates'][$template['templateid']]) && !$cloneOrFullClone)
-					? $unlinkAndClearButton
+	$linkedTemplateTable->addRow([
+		$templateLink,
+		(new CCol(
+			new CHorList([
+				(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK),
+				(array_key_exists($template['templateid'], $data['original_templates']) && !$cloneOrFullClone)
+					? (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+						->addClass(ZBX_STYLE_BTN_LINK)
 					: null
-			]
-		],
-		null,
-		'conditions_'.$template['templateid']
-	);
+			])
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], null, 'conditions_'.$template['templateid']);
 
 	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
 
-$tmplList->addRow(
-	_('Linked templates'),
+$tmplList->addRow(_('Linked templates'),
 	(new CDiv($linkedTemplateTable))
-		->addClass('template-link-block')
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // create new linked template table
 $newTemplateTable = (new CTable())
-	->addClass('formElementTable')
-	->setId('newTemplateTable')
-	->setAttribute('style', 'min-width: 400px;');
+	->addRow([
+		(new CMultiSelect([
+			'name' => 'add_templates[]',
+			'objectName' => 'templates',
+			'ignored' => $ignoredTemplates,
+			'popup' => [
+				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
+					'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	])
+	->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
-$newTemplateTable->addRow([
-	(new CMultiSelect([
-		'name' => 'add_templates[]',
-		'objectName' => 'templates',
-		'ignored' => $ignoredTemplates,
-		'popup' => [
-			'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$frmHost->getName().
-				'&dstfld1=add_templates_&templated_hosts=1&multiselect=1'
-		]
-	]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-]);
-
-$newTemplateTable->addRow(
-	[
-		(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-	]
-);
-
-$tmplList->addRow(
-	_('Link new templates'),
+$tmplList->addRow(_('Link new templates'),
 	(new CDiv($newTemplateTable))
-		->addClass('template-link-block')
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 $divTabs->addTab('tmplTab', _('Linked templates'), $tmplList);
@@ -479,6 +456,7 @@ if (!$macros) {
 $macrosView = new CView('hostmacros', [
 	'macros' => $macros,
 	'show_inherited_macros' => $data['show_inherited_macros'],
+	'is_template' => true,
 	'readonly' => false
 ]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());

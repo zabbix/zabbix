@@ -21,8 +21,6 @@
 
 include('include/views/js/configuration.services.edit.js.php');
 
-global $ZBX_MESSAGES;
-
 $service = $this->data['service'];
 
 $widget = (new CWidget())->setTitle(_('IT services'));
@@ -95,29 +93,30 @@ $servicesFormList->addRow(_('Sort order (0->999)'), (new CTextBox('sortorder', $
  */
 $servicesChildTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width:500px;')
+	->setAttribute('style', 'width: 100%;')
 	->setId('service_children')
 	->setHeader([_('Services'), _('Soft'), _('Trigger'), _('Action')]);
 foreach ($this->data['children'] as $child) {
 	$childrenLink = (new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']))
 		->setAttribute('target', '_blank');
 
-	$row = new CRow([
-		[
-			$childrenLink,
-			new CVar('children['.$child['serviceid'].'][name]', $child['name']),
-			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
-		],
-		(new CCheckBox('children['.$child['serviceid'].'][soft]'))
-			->setChecked(isset($child['soft']) && !empty($child['soft'])),
-		!empty($child['trigger']) ? $child['trigger'] : '',
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-	$row->setId('children_'.$child['serviceid']);
-	$servicesChildTable->addRow($row);
+	$servicesChildTable->addRow(
+		(new CRow([
+			[
+				$childrenLink,
+				new CVar('children['.$child['serviceid'].'][name]', $child['name']),
+				new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
+			],
+			(new CCheckBox('children['.$child['serviceid'].'][soft]'))
+				->setChecked(isset($child['soft']) && !empty($child['soft'])),
+			!empty($child['trigger']) ? $child['trigger'] : '',
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->setId('children_'.$child['serviceid'])
+	);
 }
 $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
 $servicesDependenciesFormList->addRow(
@@ -127,10 +126,9 @@ $servicesDependenciesFormList->addRow(
 		(new CButton('add_child_service', _('Add')))
 			->onClick("javascript: openWinCentered('services.php?cservices=1".url_param('serviceid')."', 'ZBX_Services_List', 640, 520, 'scrollbars=1, toolbar=0, menubar=0, resizable=0');")
 			->addClass(ZBX_STYLE_BTN_LINK)
-		]))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 /*
@@ -139,8 +137,7 @@ $servicesDependenciesFormList->addRow(
 $servicesTimeFormList = new CFormList('servicesTimeFormList');
 $servicesTimeTable = (new CTable())
 	->setNoDataMessage(_('No times defined. Work 24x7.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Type'), _('Interval'), _('Note'), _('Action')]);
 
 $i = 0;
@@ -172,24 +169,33 @@ foreach ($this->data['times'] as $serviceTime) {
 		],
 		$from.' - '.$to,
 		htmlspecialchars($serviceTime['note']),
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeTime(\''.$i.'\');')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CCol(
+			(new CButton('remove', _('Remove')))
+				->onClick('javascript: removeTime(\''.$i.'\');')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	$row->setId('times_'.$i);
 	$servicesTimeTable->addRow($row);
 	$i++;
 }
-$servicesTimeFormList->addRow(
-	_('Service times'),
+$servicesTimeFormList->addRow(_('Service times'),
 	(new CDiv($servicesTimeTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // create service time table
-$serviceTimeTable = (new CTable())->addClass('formElementTable');
+$serviceTimeTable = (new CTable())
+	->addRow([
+		_('Period type'),
+		new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'submit()', [
+			SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
+			SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
+			SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
+		])
+	]);
+
 if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIME) {
 	// downtime since
 	if (isset($_REQUEST['new_service_time']['from'])) {
@@ -237,8 +243,7 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 	}
 	$servicesForm->addVar('new_service_time[to]', $serviceTimeTo);
 
-	// create calendar table
-	$timeCalendarTable = (new CTable())
+	$serviceTimeTable
 		->addRow([
 			_('Note'),
 			(new CTextBox('new_service_time[note]'))
@@ -247,8 +252,6 @@ if ($this->data['new_service_time']['type'] == SERVICE_TIME_TYPE_ONETIME_DOWNTIM
 		])
 		->addRow([_('From'), createDateSelector('new_service_time_from', $fromDate, 'new_service_time_to')])
 		->addRow([_('Till'), createDateSelector('new_service_time_to', $toDate, 'new_service_time_from')]);
-
-	$serviceTimeTable->addRow($timeCalendarTable);
 }
 else {
 	$weekFromComboBox = new CComboBox('new_service_time[from_week]', isset($_REQUEST['new_service_time']['from_week'])
@@ -276,28 +279,44 @@ else {
 		->setWidth(ZBX_TEXTAREA_2DIGITS_WIDTH)
 		->setAttribute('placeholder', _('mm'));
 
-	$serviceTimeTable->addRow([_('From'), $weekFromComboBox, new CCol([_('Time'), SPACE, $timeFromHourTextBox, ' : ', $timeFromMinuteTextBox])]);
-	$serviceTimeTable->addRow([_('Till'), $weekToComboBox, new CCol([_('Time'), SPACE, $timeToHourTextBox, ' : ', $timeToMinuteTextBox])]);
+	$serviceTimeTable->addRow([
+		_('From'),
+		[
+			$weekFromComboBox,
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			_('Time'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$timeFromHourTextBox,
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			':',
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$timeFromMinuteTextBox
+		]
+	]);
+	$serviceTimeTable->addRow([
+		_('Till'),
+		[
+			$weekToComboBox,
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			_('Time'),
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$timeToHourTextBox,
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			':',
+			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+			$timeToMinuteTextBox
+		]
+	]);
 	$servicesForm->addVar('new_service_time[note]', '');
 }
 
-$timeTypeComboBox = new CComboBox('new_service_time[type]', $this->data['new_service_time']['type'], 'submit()',
-	[
-		SERVICE_TIME_TYPE_UPTIME => _('Uptime'),
-		SERVICE_TIME_TYPE_DOWNTIME => _('Downtime'),
-		SERVICE_TIME_TYPE_ONETIME_DOWNTIME => _('One-time downtime')
-	]
-);
-$servicesTimeFormList->addRow(
-	_('New service time'),
+$servicesTimeFormList->addRow(_('New service time'),
 	(new CDiv([
-		new CDiv($timeTypeComboBox, 'time-type-combobox'),
 		$serviceTimeTable,
 		(new CButton('add_service_time', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
 	]))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 /*
