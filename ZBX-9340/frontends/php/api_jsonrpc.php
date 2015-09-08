@@ -57,11 +57,11 @@ catch (Exception $e) {
 		'jsonrpc' => '2.0',
 		'error' => array(
 			'code' => 1,
-			'message' => $e->getMessage()
+			'message' => $e->getMessage(),
+			'data' => $e->getMessage()
 		),
 		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)
 	);
 
 	echo CJs::encodeJson($response);
 }
-
