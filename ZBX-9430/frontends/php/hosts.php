@@ -831,10 +831,10 @@ else {
 
 	if ($pageFilter->groupsSelected) {
 		$hosts = API::Host()->get(array(
+			'output' => array('hostid', $sortfield),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortfield,
-			'sortorder' => $sortorder,
 			'limit' => $config['search_limit'] + 1,
 			'search' => array(
 				'name' => empty($_REQUEST['filter_host']) ? null : $_REQUEST['filter_host'],

@@ -23,6 +23,10 @@
 
 #include <sys/sockio.h>
 
+#if OpenBSD >= 201405
+#	include <net/if_var.h>	/* structs ifnet and ifnet_head are defined in this header since OpenBSD 5.5 */
+#endif
+
 static struct nlist kernel_symbols[] =
 {
 	{"_ifnet", N_UNDF, 0, 0, 0},

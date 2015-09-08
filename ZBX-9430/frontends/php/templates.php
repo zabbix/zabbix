@@ -509,6 +509,7 @@ else {
 
 	if ($pageFilter->groupsSelected) {
 		$templates = API::Template()->get(array(
+			'output' => array('templateid', $sortfield),
 			'groupids' => ($pageFilter->groupid > 0) ? $pageFilter->groupid : null,
 			'editable' => true,
 			'sortfield' => $sortfield,
