@@ -495,12 +495,9 @@ if (isset($_REQUEST['form'])) {
 
 			if (!empty($dbTest)) {
 				if (!idcmp($data['httptestid'], $dbTest['httptestid'])) {
-					$data['templates'][] = (new CLink(
-						$dbTest['name'],
-						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid']))
-							->addClass('highlight')
-							->addClass('underline')
-							->addClass('weight_normal');
+					$data['templates'][] = new CLink($dbTest['name'],
+						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid']
+					);
 					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];

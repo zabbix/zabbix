@@ -39,7 +39,7 @@ $guiTab = (new CFormList())
 		new CLabel([
 			(new CCheckBox('dropdown_first_remember'))->setChecked($data['dropdown_first_remember'] == 1),
 			_('remember selected')
-		])
+		], 'dropdown_first_remember')
 	])
 	->addRow(_('Search/Filter elements limit'),
 		(new CNumericBox('search_limit', $data['search_limit'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
