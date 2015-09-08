@@ -29,6 +29,9 @@
 /* the maximum, I believe." */
 #define IPMI_SENSOR_ID_SZ	36
 
+/* delete inactive hosts after this period */
+#define INACTIVE_HOST_LIMIT	3 * SEC_PER_HOUR
+
 #include "log.h"
 
 #include <OpenIPMI/ipmiif.h>
@@ -1228,7 +1231,7 @@ void	delete_inactive_ipmi_hosts(time_t last_check)
 
 	while (NULL != h)
 	{
-		if (last_check - h->lastaccess > SEC_PER_DAY)
+		if (last_check - h->lastaccess > INACTIVE_HOST_LIMIT)
 		{
 			next = h->next;
 
