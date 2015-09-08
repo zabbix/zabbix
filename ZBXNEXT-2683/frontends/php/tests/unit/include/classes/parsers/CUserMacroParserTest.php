@@ -740,6 +740,19 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 					'macro_name' => 'MY.MACRO',
 					'context' => ''
 				]]
+			],
+			[
+				'echo[{$ABC{$MY.MACRO:}]',
+				[[
+					'match' => '{$MY.MACRO:}',
+					'macro' => '{$MY.MACRO:}',
+					'positions' => [
+						'start' => 10,
+						'length' => 12
+					],
+					'macro_name' => 'MY.MACRO',
+					'context' => ''
+				]]
 			]
 		];
 	}

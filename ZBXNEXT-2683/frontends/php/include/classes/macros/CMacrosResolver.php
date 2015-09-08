@@ -612,22 +612,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 		unset($trigger);
 
-		foreach ($triggers as $triggerid => &$trigger) {
-			while ($exact_macros = (new CUserMacroParser($trigger[$source], false))->getMacros()) {
-				// Unresolved values stay as macros. Break the loop if cannot be resolved.
-				if (array_key_exists($exact_macros[0]['macro'], $macro_values[$triggerid])
-						&& $macro_values[$triggerid][$exact_macros[0]['macro']] !== $exact_macros[0]['macro']) {
-					$trigger[$source] = substr_replace($trigger[$source],
-						$macro_values[$triggerid][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
-						$exact_macros[0]['positions']['length']
-					);
-				}
-				else {
-					break;
-				}
+		if ($macro_values) {
+			foreach ($triggers as $triggerid => &$trigger) {
+				$trigger[$source] = $this->replaceUserMacros($trigger[$source], $macro_values[$triggerid]);
 			}
+			unset($trigger);
 		}
-		unset($trigger);
 
 		return $triggers;
 	}
@@ -990,27 +980,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to values one by one.
 		if ($macros) {
 			foreach ($macros as $key => $macro_data) {
-				// Replace user macros.
-				while ($exact_macros = (new CUserMacroParser($items[$key]['name_expanded'], false))->getMacros()) {
-					// Unresolved values stay as macros. Break the loop if cannot be resolved.
-					if (array_key_exists($exact_macros[0]['macro'], $macro_data['macros'])
-							&& $macro_data['macros'][$exact_macros[0]['macro']] !== $exact_macros[0]['macro']) {
-						$items[$key]['name_expanded'] = substr_replace($items[$key]['name_expanded'],
-							$macro_data['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
-							$exact_macros[0]['positions']['length']
-						);
-					}
-					else {
-						break;
-					}
-				}
+				$items[$key]['name_expanded'] = $this->replaceUserMacros($items[$key]['name_expanded'],
+					$macro_data['macros']
+				);
 
 				// Replace reference macros.
 				if (array_key_exists($key, $itemsWithReferenceMacros)) {
-					$items[$key]['name_expanded'] = str_replace(
-						array_keys($macro_data['macros']),
-						array_values($macro_data['macros']),
-						$items[$key]['name_expanded']
+					$items[$key]['name_expanded'] = $this->replaceReferenceMacros($items[$key]['name_expanded'],
+						$macro_data['macros']
 					);
 				}
 			}
@@ -1152,19 +1129,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value one by one.
 		if ($macros) {
 			foreach ($macros as $key => $macro_data) {
-				while ($exact_macros = (new CUserMacroParser($items[$key]['key_expanded'], false))->getMacros()) {
-					// Unresolved values stay as macros. Break the loop if cannot be resolved.
-					if (array_key_exists($exact_macros[0]['macro'], $macro_data['macros'])
-							&& $macro_data['macros'][$exact_macros[0]['macro']] !== $exact_macros[0]['macro']) {
-						$items[$key]['key_expanded'] = substr_replace($items[$key]['key_expanded'],
-							$macro_data['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
-							$exact_macros[0]['positions']['length']
-						);
-					}
-					else {
-						break;
-					}
-				}
+				$items[$key]['key_expanded'] = $this->replaceUserMacros($items[$key]['key_expanded'],
+					$macro_data['macros']
+				);
 			}
 		}
 
@@ -1224,19 +1191,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		// Replace macros to value one by one.
 		if ($macros) {
 			foreach ($macros as $key => $macro_data) {
-				while ($exact_macros = (new CUserMacroParser($data[$key]['parameter_expanded'], false))->getMacros()) {
-					// Unresolved values stay as macros. Break the loop if cannot be resolved.
-					if (array_key_exists($exact_macros[0]['macro'], $macro_data['macros'])
-							&& $macro_data['macros'][$exact_macros[0]['macro']] !== $exact_macros[0]['macro']) {
-						$data[$key]['parameter_expanded'] = substr_replace($data[$key]['parameter_expanded'],
-							$macro_data['macros'][$exact_macros[0]['macro']], $exact_macros[0]['positions']['start'],
-							$exact_macros[0]['positions']['length']
-						);
-					}
-					else {
-						break;
-					}
-				}
+				$data[$key]['parameter_expanded'] = $this->replaceUserMacros($data[$key]['parameter_expanded'],
+					$macro_data['macros']
+				);
 			}
 		}
 
@@ -1496,5 +1453,86 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		return $label;
+	}
+
+	/**
+	 * Replace user macros found in string. If there are multiple macros in a string, they are replaced one by one.
+	 * This is because once string has changed, other macro postions are now different and they need to be recalculated
+	 * after each replace. If macro cannot be replaced with value, try other corresponding macros.
+	 * For example:
+	 *		$macros[
+	 *			{$A} => {$A},
+	 *			{$B} => b,
+	 *			{$C} => {$C},
+	 *			{$D} => d
+	 *		];
+	 *
+	 *		$string = "{$A}{$B}{$C}{$D}";
+	 *
+	 *	Sequence:
+	 *	1) $string = "{$A}{$B}{$C}{$D}";	// try to replace {$A}, fail, move to {$B};
+	 *	2) $string = "{$A}b{$C}{$D}";		// try to replace {$B}, succeed, recalculate positions and restart;
+	 *	3) $string = "{$A}b{$C}{$D}";		// try to replace {$A}, fail, move to {$C}, fail, move to {$D};
+	 *	4) $string = "{$A}b{$C}d";			// try to replace {$D}, succeed, recalculate positions, no more, exit.
+	 *
+	 * @param string $string	String that contains macros.
+	 * @param array $macros		Array of macros and values.
+	 *
+	 * @return string
+	 */
+	private function replaceUserMacros($string, array $macros) {
+		$user_macros = (new CUserMacroParser($string, false))->getMacros();
+		$macro_count = count($user_macros);
+		$i = 0;
+
+		if ($user_macros) {
+			while ($user_macros || $i == ($macro_count - 1)) {
+				if (array_key_exists($user_macros[$i]['macro'], $macros)) {
+					if ($macros[$user_macros[$i]['macro']] !== $user_macros[$i]['macro']) {
+						// Replace macro to value. Note that character positions are now changed.
+						$string = substr_replace($string, $macros[$user_macros[$i]['macro']],
+							$user_macros[$i]['positions']['start'],
+							$user_macros[$i]['positions']['length']
+						);
+
+						// If there we more macros, recheck the string to get remaining macro positions.
+						if (($macro_count - 1) > $i) {
+							$user_macros = (new CUserMacroParser($string, false))->getMacros();
+							$macro_count = count($user_macros);
+							$i = 0;
+						}
+						else {
+							break;
+						}
+					}
+					else {
+						if (($macro_count - 1) > $i) {
+							$i++;
+						}
+						else {
+							// That was the last one and we could not replace it.
+							break;
+						}
+					}
+				}
+				else {
+					break;
+				}
+			}
+		}
+
+		return $string;
+	}
+
+	/**
+	 * Replace reference macros found in string.
+	 *
+	 * @param string $string	String that contains macros.
+	 * @param array $macros		Array of macros and values.
+	 *
+	 * @return string
+	 */
+	private function replaceReferenceMacros($string, array $macros) {
+		return str_replace(array_keys($macros), array_values($macros), $string);
 	}
 }

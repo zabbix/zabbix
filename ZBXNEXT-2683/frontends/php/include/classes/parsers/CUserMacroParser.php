@@ -294,6 +294,25 @@ class CUserMacroParser {
 								$state = self::STATE_MACRO_END;
 								break;
 
+							case '{':
+								/*
+								 * Current macro would look some thing like "{$ABC{", where second { can be
+								 * the beginning of a new macro.
+								 */
+								unset($this->macros[$i]);
+
+								if ($this->validate) {
+									$this->setError();
+									return;
+								}
+
+								$this->macros[$i]['match'] = $this->source[$this->pos];
+								$this->macros[$i]['macro'] = $this->source[$this->pos];
+								$this->macros[$i]['positions']['start'] = $this->pos;
+
+								$state = self::STATE_MACRO_NEW;
+								break;
+
 							default:
 								// Found other invalid characers in macro name. This is not valid macro.
 								unset($this->macros[$i]);
