@@ -24,18 +24,15 @@ $auditWidget = (new CWidget())->setTitle(_('Action log'));
 $filterForm = new CFilter('web.auditacts.filter.state');
 
 $filterColumn = new CFormList();
-$filterColumn->addRow(
-	_('Recipient'),
-	[
-		(new CTextBox('alias', $this->data['alias']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
-		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CButton('btn1', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.php?dstfrm=zbx_filter'.
-				'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
-			)
-	]
-);
+$filterColumn->addRow(_('Recipient'), [
+	(new CTextBox('alias', $this->data['alias']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
+	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+	(new CButton('btn1', _('Select')))
+		->addClass(ZBX_STYLE_BTN_GREY)
+		->onClick('return PopUp("popup.php?dstfrm=zbx_filter'.
+			'&dstfld1=alias&srctbl=users&srcfld1=alias&real_hosts=1");'
+		)
+]);
 
 $filterForm->addColumn($filterColumn);
 $filterForm->addNavigator();
