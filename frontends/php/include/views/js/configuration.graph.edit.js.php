@@ -80,7 +80,7 @@
 	<td>
 		<?= (new CColor('items[#{number}][color]', '000000'))->toString() ?>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="items_#{number}_remove" data-remove="#{number}" onclick="removeItem(this);"><?= _('Remove') ?></button>
 	</td>
 </tr>

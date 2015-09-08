@@ -191,27 +191,36 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 	$userMediaFormList = new CFormList('userMediaFormList');
 	$userForm->addVar('user_medias', $this->data['user_medias']);
 
-	$mediaTableInfo = new CTableInfo();
+	$mediaTableInfo = (new CTable())
+		->setAttribute('style', 'width: 100%;')
+		->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), ('Status'), _('Action')]);
 
 	foreach ($this->data['user_medias'] as $id => $media) {
 		if (!isset($media['active']) || !$media['active']) {
 			$status = (new CLink(_('Enabled'), '#'))
-				->addClass('enabled')
-				->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);');
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN)
+				->onClick('return create_var("'.$userForm->getName().'","disable_media",'.$id.', true);')
+				->removeSID();
 		}
 		else {
 			$status = (new CLink(_('Disabled'), '#'))
-				->addClass('disabled')
-				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);');
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_RED)
+				->onClick('return create_var("'.$userForm->getName().'","enable_media",'.$id.', true);')
+				->removeSID();
 		}
 
-		$mediaUrl = '?dstfrm='.$userForm->getName().
-						'&media='.$id.
-						'&mediatypeid='.$media['mediatypeid'].
-						'&sendto='.urlencode($media['sendto']).
-						'&period='.$media['period'].
-						'&severity='.$media['severity'].
-						'&active='.$media['active'];
+		$mediaUrl = 'popup_media.php'.
+			'?dstfrm='.$userForm->getName().
+			'&media='.$id.
+			'&mediatypeid='.$media['mediatypeid'].
+			'&sendto='.urlencode($media['sendto']).
+			'&period='.$media['period'].
+			'&severity='.$media['severity'].
+			'&active='.$media['active'];
+
+		$mediaSeverity = [];
 
 		for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 			$severityName = getSeverityName($severity, $this->data['config']);
@@ -219,35 +228,41 @@ if (uint_in_array(CWebUser::$data['type'], [USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SU
 			$mediaActive = ($media['severity'] & (1 << $severity));
 
 			$mediaSeverity[$severity] = (new CSpan(mb_substr($severityName, 0, 1)))
-				->setHint($severityName.($mediaActive ? ' ('._('on').')' : ' ('._('off').')'));
-			if ($mediaActive) {
-				$mediaSeverity[$severity]->addClass('enabled');
-			}
+				->setHint($severityName.' ('.($mediaActive ? _('on') : _('off')).')', '', false)
+				->addClass($mediaActive ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY);
 		}
 
-		$mediaTableInfo->addRow([
-			(new CCheckBox('user_medias_to_del['.$id.']'))->setChecked($id != 0),
-			(new CSpan($media['description']))->addClass(ZBX_STYLE_NOWRAP),
-			(new CSpan($media['sendto']))->addClass(ZBX_STYLE_NOWRAP),
-			(new CSpan($media['period']))->addClass(ZBX_STYLE_NOWRAP),
-			$mediaSeverity,
-			$status,
-			(new CButton('edit_media', _('Edit')))
-				->onClick('return PopUp("popup_media.php'.$mediaUrl.'");')
-				->addClass(ZBX_STYLE_BTN_LINK)
-		]);
+		$mediaTableInfo->addRow(
+			(new CRow([
+				$media['description'],
+				$media['sendto'],
+				$media['period'],
+				$mediaSeverity,
+				$status,
+				(new CCol(
+					new CHorList([
+						(new CButton(null, _('Edit')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('return PopUp("'.$mediaUrl.'");'),
+						(new CButton(null, _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('javascript: removeMedia('.$id.');')
+					])
+				))->addClass(ZBX_STYLE_NOWRAP)
+			]))->setId('user_medias_'.$id)
+		);
 	}
 
-	$userMediaFormList->addRow(_('Media'), [$mediaTableInfo,
-		(new CButton('add_media', _('Add')))
-			->onClick('return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		SPACE,
-		SPACE,
-		$this->data['user_medias']
-			? (new CSubmit('del_user_media', _('Delete selected')))->addClass(ZBX_STYLE_BTN_LINK)
-			: null
-	]);
+	$userMediaFormList->addRow(_('Media'),
+		(new CDiv([
+			$mediaTableInfo,
+			(new CButton(null, _('Add')))
+				->onClick('return PopUp("popup_media.php?dstfrm='.$userForm->getName().'");')
+				->addClass(ZBX_STYLE_BTN_LINK),
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 }
 
 /*
@@ -283,10 +298,11 @@ if ($this->data['is_profile']) {
 
 	$triggersTable = (new CTable())
 		->addRow([
-			(new CCheckBox('messages[triggers.recovery]'))
-				->setChecked($this->data['messages']['triggers.recovery'] == 1),
-			_('Recovery'),
-			'',
+			new CLabel([
+				(new CCheckBox('messages[triggers.recovery]'))
+					->setChecked($this->data['messages']['triggers.recovery'] == 1),
+				_('Recovery')], 'messages[triggers.recovery]'
+			),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
@@ -318,9 +334,11 @@ if ($this->data['is_profile']) {
 		}
 
 		$triggersTable->addRow([
-			(new CCheckBox('messages[triggers.severities]['.$severity.']'))->setChecked(isset($this->data['messages']['triggers.severities'][$severity])),
-			getSeverityName($severity, $this->data['config']),
-			'',
+			new CLabel([
+				(new CCheckBox('messages[triggers.severities]['.$severity.']'))
+					->setChecked(isset($this->data['messages']['triggers.severities'][$severity])),
+				getSeverityName($severity, $this->data['config'])], 'messages[triggers.severities]['.$severity.']'
+			),
 			[
 				$soundList,
 				(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
