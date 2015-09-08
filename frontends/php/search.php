@@ -29,21 +29,24 @@ $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
-//		VAR				TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
+//	VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'type'=>		[T_ZBX_INT, O_OPT,	P_SYS,	IN('0,1'),		null],
-	'search'=>		[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
-	// ajax
-	'widgetName' =>	[T_ZBX_STR, O_OPT, P_ACT,	null,			null],
-	'widgetState'=>	[T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,		null]
+	'type' =>	[T_ZBX_INT, O_OPT, P_SYS, IN('0,1'), null],
+	'search' =>	[T_ZBX_STR, O_OPT, P_SYS, null, null],
+	// Ajax
+	'widget' =>	[T_ZBX_STR, O_OPT, P_ACT,
+		IN('"'.WIDGET_SEARCH_HOSTS.'","'.WIDGET_SEARCH_HOSTGROUP.'","'.WIDGET_SEARCH_TEMPLATES.'"'),
+		null
+	],
+	'state'=>	[T_ZBX_INT, O_OPT, P_ACT, IN('0,1'), null]
 ];
 check_fields($fields);
 
 /*
  * Ajax
  */
-if (hasRequest('widgetName')) {
-	CProfile::update('web.search.hats.'.getRequest('widgetName').'.state', getRequest('widgetState'), PROFILE_TYPE_INT);
+if (hasRequest('widget') && hasRequest('state')) {
+	CProfile::update('web.search.hats.'.getRequest('widget').'.state', getRequest('state'), PROFILE_TYPE_INT);
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -67,8 +70,6 @@ if (zbx_empty($search)) {
 	$search = _('Search pattern is empty');
 }
 
-$searchWidget = (new CWidget())->setTitle(_('Search').':'.SPACE.$search);
-
 // FIND Hosts
 $params = [
 	'search' => [
@@ -78,7 +79,6 @@ $params = [
 		'ip' => $search
 	],
 	'limit' => $rows_per_page,
-	'selectGroups' => API_OUTPUT_EXTEND,
 	'selectInterfaces' => API_OUTPUT_EXTEND,
 	'selectItems' => API_OUTPUT_COUNT,
 	'selectTriggers' => API_OUTPUT_COUNT,
@@ -149,8 +149,7 @@ foreach ($hosts as $hnum => $host) {
 
 	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null;
 
-	$group = reset($host['groups']);
-	$link = 'groupid='.$group['groupid'].'&hostid='.$hostid;
+	$link = 'hostid='.$hostid;
 
 	// highlight visible name
 	$visibleName = make_decoration($host['name'], $search);
@@ -229,7 +228,7 @@ foreach ($hosts as $hnum => $host) {
 		$hostCell,
 		$hostip,
 		$hostdns,
-		new CLink(_('Latest data'), 'latest.php?filter_set=1&groupids[]='.$group['groupid'].'&hostids[]='.$hostid),
+		new CLink(_('Latest data'), 'latest.php?filter_set=1&hostids[]='.$hostid),
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
@@ -244,14 +243,11 @@ foreach ($hosts as $hnum => $host) {
 	]);
 }
 
-$searchHostWidget = (new CCollapsibleUiWidget('search_hosts', $table))
-	->setExpanded((bool) CProfile::get('web.search.hats.search_hosts.state', true))
-	->setHeader(_('Hosts'))
+$widgets = [];
+$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTS, $table))
+	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTS.'.state', true))
+	->setHeader(_('Hosts'), [], false, 'search.php')
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
-
-$searchWidget->addItem(new CDiv($searchHostWidget));
-//----------------
-
 
 // Find Host groups
 $params = [
@@ -344,13 +340,10 @@ foreach ($hostGroups as $hnum => $group) {
 	]);
 }
 
-$searchHostGroupWidget = (new CCollapsibleUiWidget('search_hostgroup', $table))
-	->setExpanded((bool) CProfile::get('web.search.hats.search_hostgroup.state', true))
-	->setHeader(_('Host groups'))
+$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_HOSTGROUP, $table))
+	->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_HOSTGROUP.'.state', true))
+	->setHeader(_('Host groups'), [], false, 'search.php')
 	->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
-
-$searchWidget->addItem(new CDiv($searchHostGroupWidget));
-//----------------
 
 // FIND Templates
 if ($admin) {
@@ -488,15 +481,15 @@ if ($admin) {
 		]);
 	}
 
-	$searchTemplateWidget = (new CCollapsibleUiWidget('search_templates', $table))
-		->setExpanded((bool) CProfile::get('web.search.hats.search_templates.state', true))
-		->setHeader(_('Templates'))
+	$widgets[] = (new CCollapsibleUiWidget(WIDGET_SEARCH_TEMPLATES, $table))
+		->setExpanded((bool) CProfile::get('web.search.hats.'.WIDGET_SEARCH_TEMPLATES.'.state', true))
+		->setHeader(_('Templates'), [], false, 'search.php')
 		->setFooter(new CList([_s('Displaying %1$s of %2$s found', $viewCount, $overalCount)]));
-
-	$searchWidget->addItem(new CDiv($searchTemplateWidget));
 }
-//----------------
 
-$searchWidget->show();
+(new CWidget())
+	->setTitle(_('Search').':'.SPACE.$search)
+	->addItem(new CDiv($widgets))
+	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

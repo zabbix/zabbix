@@ -241,7 +241,6 @@ else {
 
 // append items to form list
 $itemsTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
 	->setId('itemsTable')
 	->setHeader([
 		(new CColHeader())->setWidth(15),
@@ -265,25 +264,26 @@ $itemsTable = (new CTable())
 		(new CColHeader(_('Action')))->setWidth(50)
 	]);
 
-$addButton = (new CButton('add_item', _('Add')))
-	->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
-		($this->data['normal_only'] ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());')
-	->addClass(ZBX_STYLE_BTN_LINK);
-
-$addPrototypeButton = null;
-if ($this->data['parent_discoveryid']) {
-	$addPrototypeButton = (new CButton('add_protoitem', _('Add prototype')))
-		->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
-			url_param($this->data['graphtype'], false, 'graphtype').
-			url_param('parent_discoveryid').
-			($this->data['normal_only'] ? '&normal_only=1' : '').
-			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
-		->addClass(ZBX_STYLE_BTN_LINK);
-}
 $itemsTable->addRow(
 	(new CRow(
-		(new CCol([$addButton, SPACE, SPACE, SPACE, $addPrototypeButton]))->setColSpan(8)
+		(new CCol(
+			new CHorList([
+				(new CButton('add_item', _('Add')))
+					->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
+						($this->data['normal_only'] ? '&normal_only=1' : '').
+						'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());')
+					->addClass(ZBX_STYLE_BTN_LINK),
+				$this->data['parent_discoveryid']
+					? (new CButton('add_protoitem', _('Add prototype')))
+						->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
+							url_param($this->data['graphtype'], false, 'graphtype').
+							url_param('parent_discoveryid').
+							($this->data['normal_only'] ? '&normal_only=1' : '').
+							'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
+						->addClass(ZBX_STYLE_BTN_LINK)
+					: null
+			])
+		))->setColSpan(8)
 	))->setId('itemButtonsRow')
 );
 
@@ -305,13 +305,7 @@ foreach ($this->data['items'] as $n => $item) {
 	);
 }
 
-$graphFormList->addRow(
-	_('Items'),
-	(new CDiv($itemsTable))
-		->addClass('objectgroup')
-		->addClass('inlineblock')
-		->addClass('border_dotted')
-);
+$graphFormList->addRow(_('Items'), (new CDiv($itemsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
 
 // append tabs to form
 $graphTab = new CTabView();
@@ -326,12 +320,13 @@ $graphTab->addTab(
 /*
  * Preview tab
  */
-$chartImage = (new CImg('chart3.php?period=3600'))->preload();
-
 $graphPreviewTable = (new CTable())
-	->addClass('center')
-	->addClass('maxwidth')
-	->addRow((new CDiv($chartImage))->setId('previewChar'));
+	->addStyle('width: 100%;')
+	->addRow(
+		(new CRow(
+			(new CDiv())->setId('previewChar')
+		))->addClass(ZBX_STYLE_CENTER)
+	);
 $graphTab->addTab('previewTab', _('Preview'), $graphPreviewTable);
 
 // append buttons to form

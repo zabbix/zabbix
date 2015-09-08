@@ -14,60 +14,6 @@ build/win32/project/Makefile_sender_dll -text
 build/win32/project/Makefile_sender_dll_x64 -text
 create/src/data.tmpl -text
 frontends/php/app/.htaccess -text
-frontends/php/app/controllers/CControllerDashboardFavourite.php -text
-frontends/php/app/controllers/CControllerDashboardSort.php -text
-frontends/php/app/controllers/CControllerDashboardView.php -text
-frontends/php/app/controllers/CControllerDashboardWidget.php -text
-frontends/php/app/controllers/CControllerDiscoveryView.php -text
-frontends/php/app/controllers/CControllerFavouriteCreate.php -text
-frontends/php/app/controllers/CControllerFavouriteDelete.php -text
-frontends/php/app/controllers/CControllerMapView.php -text
-frontends/php/app/controllers/CControllerMediatypeCreate.php -text
-frontends/php/app/controllers/CControllerMediatypeDelete.php -text
-frontends/php/app/controllers/CControllerMediatypeDisable.php -text
-frontends/php/app/controllers/CControllerMediatypeEdit.php -text
-frontends/php/app/controllers/CControllerMediatypeEnable.php -text
-frontends/php/app/controllers/CControllerMediatypeList.php -text
-frontends/php/app/controllers/CControllerMediatypeUpdate.php -text
-frontends/php/app/controllers/CControllerProfileUpdate.php -text
-frontends/php/app/controllers/CControllerProxyDelete.php -text
-frontends/php/app/controllers/CControllerProxyEdit.php -text
-frontends/php/app/controllers/CControllerProxyHostDisable.php -text
-frontends/php/app/controllers/CControllerProxyHostEnable.php -text
-frontends/php/app/controllers/CControllerProxyUpdate.php -text
-frontends/php/app/controllers/CControllerReportStatus.php -text
-frontends/php/app/controllers/CControllerScriptCreate.php -text
-frontends/php/app/controllers/CControllerScriptDelete.php -text
-frontends/php/app/controllers/CControllerScriptEdit.php -text
-frontends/php/app/controllers/CControllerScriptList.php -text
-frontends/php/app/controllers/CControllerScriptUpdate.php -text
-frontends/php/app/controllers/CControllerSystemWarning.php -text
-frontends/php/app/controllers/CControllerWidgetDiscoveryView.php -text
-frontends/php/app/controllers/CControllerWidgetHostsView.php -text
-frontends/php/app/controllers/CControllerWidgetIssuesView.php -text
-frontends/php/app/controllers/CControllerWidgetStatusView.php -text
-frontends/php/app/controllers/CControllerWidgetSystemView.php -text
-frontends/php/app/controllers/CControllerWidgetWebView.php -text
-frontends/php/app/views/administration.mediatype.edit.js.php -text
-frontends/php/app/views/administration.proxy.edit.js.php -text
-frontends/php/app/views/layout.htmlpage.footer.php -text
-frontends/php/app/views/layout.htmlpage.header.php -text
-frontends/php/app/views/layout.htmlpage.menu.php -text
-frontends/php/app/views/layout.htmlpage.php -text
-frontends/php/app/views/layout.htmlpage.top.php -text
-frontends/php/app/views/layout.javascript.php -text
-frontends/php/app/views/layout.json.php -text
-frontends/php/app/views/layout.warning.php -text
-frontends/php/app/views/layout.widget.php -text
-frontends/php/app/views/monitoring.dashboard.view.php -text
-frontends/php/app/views/monitoring.widget.discovery.view.php -text
-frontends/php/app/views/monitoring.widget.hosts.view.php -text
-frontends/php/app/views/monitoring.widget.issues.view.php -text
-frontends/php/app/views/monitoring.widget.status.view.php -text
-frontends/php/app/views/monitoring.widget.system.view.php -text
-frontends/php/app/views/monitoring.widget.web.view.php -text
-frontends/php/app/views/report.status.php -text
-frontends/php/app/views/system.warning.php -text
 frontends/php/audio/alarm_average.wav -text
 frontends/php/audio/alarm_disaster.wav -text
 frontends/php/audio/alarm_high.wav -text
@@ -75,133 +21,25 @@ frontends/php/audio/alarm_information.wav -text
 frontends/php/audio/alarm_ok.wav -text
 frontends/php/audio/alarm_warning.wav -text
 frontends/php/audio/no_sound.wav -text
+frontends/php/favicon.ico -text svneol=unset#image/x-icon
 frontends/php/fonts/DejaVuSans.ttf -text
 frontends/php/images/flash/zbxclock.swf -text svneol=unset#unset
 frontends/php/images/general/arrow_down.png -text
-frontends/php/images/general/arrow_down2.png -text
 frontends/php/images/general/arrow_up.png -text
-frontends/php/images/general/arrow_up2.png -text
-frontends/php/images/general/bar/arrow_down.gif -text
-frontends/php/images/general/bar/arrow_sm.gif -text
-frontends/php/images/general/bar/arrow_up.gif -text
-frontends/php/images/general/bar/bar_bg.png -text
-frontends/php/images/general/bar/bar_middle.png -text
-frontends/php/images/general/bar/bg.png -text
-frontends/php/images/general/bar/cal.gif -text
-frontends/php/images/general/bar/left.png -text
-frontends/php/images/general/bar/left_arr.png -text
-frontends/php/images/general/bar/right.png -text
-frontends/php/images/general/bar/right_arr.png -text
-frontends/php/images/general/browserwarning/background.png -text
-frontends/php/images/general/browserwarning/chrome.png -text
-frontends/php/images/general/browserwarning/firefox.png -text
-frontends/php/images/general/browserwarning/ie.png -text
-frontends/php/images/general/browserwarning/opera.png -text
-frontends/php/images/general/browserwarning/safari.png -text
-frontends/php/images/general/bttn/arrowdown.png -text
-frontends/php/images/general/bttn/arrowleft.png -text
-frontends/php/images/general/bttn/arrowright.png -text
-frontends/php/images/general/bttn/arrowup.png -text
-frontends/php/images/general/bttn/close.png -text
-frontends/php/images/general/bttn/config.png -text
-frontends/php/images/general/bttn/config_hl.png -text
-frontends/php/images/general/bttn/down.png -text
-frontends/php/images/general/bttn/fullscreen.png -text
-frontends/php/images/general/bttn/help.png -text
-frontends/php/images/general/bttn/menu.png -text
-frontends/php/images/general/bttn/minus.png -text
-frontends/php/images/general/bttn/move.png -text
-frontends/php/images/general/bttn/mute.png -text
-frontends/php/images/general/bttn/plus.png -text
-frontends/php/images/general/bttn/reset.png -text
-frontends/php/images/general/bttn/snooze.png -text
-frontends/php/images/general/bttn/sound.png -text
-frontends/php/images/general/bttn/up.png -text
-frontends/php/images/general/chart.png -text
-frontends/php/images/general/dbl_arrow_down.png -text
-frontends/php/images/general/dbl_arrow_down2.png -text
-frontends/php/images/general/dbl_arrow_up.png -text
-frontends/php/images/general/dbl_arrow_up2.png -text
-frontends/php/images/general/error.png -text
-frontends/php/images/general/error2.png -text
-frontends/php/images/general/error3.png -text
-frontends/php/images/general/ipmi_available.png -text
-frontends/php/images/general/ipmi_available_bb.png -text
-frontends/php/images/general/ipmi_unavailable.png -text
-frontends/php/images/general/ipmi_unknown.png -text
-frontends/php/images/general/jmx_available.png -text
-frontends/php/images/general/jmx_available_bb.png -text
-frontends/php/images/general/jmx_unavailable.png -text
-frontends/php/images/general/jmx_unknown.png -text
-frontends/php/images/general/login/background.png -text
-frontends/php/images/general/login/glow.png -text
-frontends/php/images/general/login/logo.png -text
-frontends/php/images/general/minus.png -text
-frontends/php/images/general/multiselect.png -text
 frontends/php/images/general/no_icon.png -text
-frontends/php/images/general/ok.png -text
-frontends/php/images/general/ok_bb.png -text
-frontends/php/images/general/ok_icon.png -text
-frontends/php/images/general/ok_icon_bb.png -text
-frontends/php/images/general/plus.png -text
-frontends/php/images/general/setup/background.png -text
-frontends/php/images/general/setup/welcome_screen.png -text
-frontends/php/images/general/snmp_available.png -text
-frontends/php/images/general/snmp_available_bb.png -text
-frontends/php/images/general/snmp_unavailable.png -text
-frontends/php/images/general/snmp_unknown.png -text
-frontends/php/images/general/sort_down.png -text
-frontends/php/images/general/sort_down_blue.png -text
-frontends/php/images/general/sort_down_od.png -text
-frontends/php/images/general/sort_up.png -text
-frontends/php/images/general/sort_up_blue.png -text
-frontends/php/images/general/sort_up_od.png -text
-frontends/php/images/general/tick.png -text
 frontends/php/images/general/tr_space.gif -text
 frontends/php/images/general/tr_top_bottom.gif -text
 frontends/php/images/general/tr_top_right.gif -text
 frontends/php/images/general/tr_top_right_bottom.gif -text
-frontends/php/images/general/transparent.png -text
-frontends/php/images/general/tree/minus.gif -text
-frontends/php/images/general/tree/plus.gif -text
-frontends/php/images/general/tree/point.gif -text
-frontends/php/images/general/tree/pointc.gif -text
-frontends/php/images/general/tree/pointl.gif -text
 frontends/php/images/general/tree/zero.gif -text
-frontends/php/images/general/unknown_icon.png -text
-frontends/php/images/general/warning.png -text
-frontends/php/images/general/warning2.png -text
-frontends/php/images/general/wrench12transp.png -text
-frontends/php/images/general/zabbix.ico -text
-frontends/php/images/general/zabbix.png -text svneol=unset#unset
-frontends/php/images/general/zabbix_available.png -text
-frontends/php/images/general/zabbix_available_bb.png -text
-frontends/php/images/general/zabbix_bb.ico -text
-frontends/php/images/general/zabbix_bb.png -text
-frontends/php/images/general/zabbix_ob.ico -text
-frontends/php/images/general/zabbix_od.png -text
-frontends/php/images/general/zabbix_unavailable.png -text
-frontends/php/images/general/zabbix_unknown.png -text
-frontends/php/images/general/zero.png -text
-frontends/php/images/gradients/button.gif -text svneol=unset#unset
-frontends/php/images/gradients/gradient.png -text
-frontends/php/images/gradients/header_footer_blue.png -text svneol=unset#image/png
-frontends/php/images/gradients/header_link_blue.png -text svneol=unset#image/png
-frontends/php/images/gradients/menu_not_active.gif -text svneol=unset#unset
-frontends/php/images/gradients/menu_not_active2.gif -text
-frontends/php/images/gradients/menu_not_active_bb.gif -text
-frontends/php/images/gradients/menu_not_active_blue.png -text svneol=unset#image/png
-frontends/php/images/gradients/sla_blue.png -text
-frontends/php/images/gradients/sla_blue15.png -text
-frontends/php/images/gradients/sla_green.png -text
-frontends/php/images/gradients/sla_green15.png -text
-frontends/php/images/gradients/sla_red.png -text
-frontends/php/images/gradients/sla_red15.png -text
-frontends/php/images/gradients/table_head2_bb.gif -text
-frontends/php/images/gradients/table_head_bb.gif -text
+frontends/php/img/apple-touch-icon-120x120-precomposed.png -text svneol=unset#image/png
+frontends/php/img/apple-touch-icon-152x152-precomposed.png -text svneol=unset#image/png
+frontends/php/img/apple-touch-icon-180x180-precomposed.png -text svneol=unset#image/png
+frontends/php/img/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
 frontends/php/img/browser-sprite.png -text svneol=unset#image/png
-frontends/php/img/icon-sprite.png -text svneol=unset#image/png
-frontends/php/img/preload.gif -text svneol=unset#image/gif
+frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
+frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
+frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
 frontends/php/include/classes/helpers/CViewHelper.php -text
 frontends/php/include/classes/html/CColHeader.php -text
 frontends/php/include/classes/html/CFilter.php -text
@@ -218,7 +56,6 @@ frontends/php/js/flickerfreescreen.js -text svneol=unset#text/plain
 frontends/php/js/menupopup.js -text svneol=unset#text/plain
 frontends/php/js/multiselect.js -text svneol=unset#text/plain
 frontends/php/js/servercheck.js -text
-frontends/php/js/vendors/activity-indicator.js -text svneol=unset#text/plain
 frontends/php/locale/bg/LC_MESSAGES/frontend.po -text
 frontends/php/locale/cs/LC_MESSAGES/frontend.po -text
 frontends/php/locale/de/LC_MESSAGES/frontend.po -text
@@ -540,10 +377,11 @@ sass/browserwarning.html -text
 sass/dashboard.html -text
 sass/errors.html -text
 sass/favicon.ico -text svneol=unset#image/x-icon
+sass/forms-housekeeper.html -text
 sass/forms-inventory.html -text
 sass/img/browser-sprite.png -text svneol=unset#image/png
-sass/img/icon-sprite.png -text svneol=unset#image/png
-sass/img/preload.gif -text svneol=unset#image/gif
+sass/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
+sass/img_source/icons-sprite.ai -text
 sass/img_source/icons.ai -text
 sass/ms-tile-144x144.png -text svneol=unset#image/png
 sass/overlay-dialog_with_tables.html -text

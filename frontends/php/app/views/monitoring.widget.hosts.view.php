@@ -53,6 +53,7 @@ CArrayHelper::sort($hosts, ['name']);
 $triggers = API::Trigger()->get([
 	'output' => ['triggerid', 'priority'],
 	'selectHosts' => ['hostid'],
+	'search' => ($data['filter']['trigger_name'] !== '') ? ['description' => $data['filter']['trigger_name']] : null,
 	'filter' => [
 		'priority' => $data['filter']['severity'],
 		'value' => TRIGGER_VALUE_TRUE
@@ -65,6 +66,9 @@ if ($data['filter']['extAck']) {
 	$triggers_unack = API::Trigger()->get([
 		'output' => ['triggerid'],
 		'selectHosts' => ['hostid'],
+		'search' => ($data['filter']['trigger_name'] !== '')
+			? ['description' => $data['filter']['trigger_name']]
+			: null,
 		'filter' => [
 			'priority' => $data['filter']['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -218,18 +222,18 @@ foreach ($groups as $group) {
 		'&show_triggers='.TRIGGERS_OPTION_RECENT_PROBLEM
 	);
 	$group_row->addItem($name);
-	$group_row->addItem((new CCol($hosts_data[$group['groupid']]['ok']))->addClass('normal'));
+	$group_row->addItem((new CCol($hosts_data[$group['groupid']]['ok']))->addClass(ZBX_STYLE_NORMAL_BG));
 
 	if ($data['filter']['extAck']) {
 		if ($hosts_data[$group['groupid']]['lastUnack']) {
-			$table_inf = (new CTableInfo())->setAttribute('style', 'width: 400px;');
+			$table_inf = new CTableInfo();
 
 			// set trigger severities as table header starting from highest severity
 			$header = [];
 
 			for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
 				$header[] = ($data['filter']['severity'] === null || isset($data['filter']['severity'][$severity]))
-					? (new CColHeader(getSeverityName($severity, $data['config'])))->addClass(ZBX_STYLE_NOWAP)
+					? getSeverityName($severity, $data['config'])
 					: null;
 			}
 
@@ -271,7 +275,6 @@ foreach ($groups as $group) {
 			}
 			$lastUnack_count = (new CSpan($hosts_data[$group['groupid']]['lastUnack']))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_RED)
 				->setHint($table_inf);
 		}
 		else {
@@ -349,7 +352,7 @@ foreach ($groups as $group) {
 			$group_row->addItem($hosts_data[$group['groupid']]['lastUnack'] + $hosts_data[$group['groupid']]['ok']);
 			break;
 		case EXTACK_OPTION_BOTH:
-			$unackspan = $lastUnack_count ? new CSpan([$lastUnack_count, SPACE._('of').SPACE]) : null;
+			$unackspan = $lastUnack_count ? [$lastUnack_count, ' '._('of').' '] : null;
 			$group_row->addItem((new CCol([$unackspan, $problematic_count]))
 				->addClass(getSeverityStyle(
 					$highest_severity[$group['groupid']], $hosts_data[$group['groupid']]['problematic']

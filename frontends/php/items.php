@@ -18,7 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/include/config.inc.php';
 require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
@@ -1005,7 +1004,7 @@ elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform')
 }
 elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('group_itemid')) {
 	// render view
-	$data = getCopyElementsFormData('group_itemid', _('CONFIGURATION OF ITEMS'));
+	$data = getCopyElementsFormData('group_itemid', _('Items'));
 	$data['action'] = 'item.masscopyto';
 	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();

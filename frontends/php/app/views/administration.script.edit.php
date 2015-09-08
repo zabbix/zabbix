@@ -26,6 +26,7 @@ $widget = (new CWidget())->setTitle(_('Scripts'));
 
 $scriptForm = (new CForm())
 	->setId('scriptForm')
+	->setName('scripts')
 	->addVar('form', 1)
 	->addVar('scriptid', $data['scriptid']);
 
@@ -46,21 +47,17 @@ $scriptFormList->addRow(_('Type'),
 );
 
 // execute on
-$typeRadioButton = (new CRadioButtonList('execute_on', $data['execute_on']))
-	->makeVertical()
-	->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
-	->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER);
 $scriptFormList->addRow(_('Execute on'),
-	(new CDiv($typeRadioButton))->addClass('objectgroup inlineblock border_dotted'),
-	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
+	(new CRadioButtonList('execute_on', (int) $data['execute_on']))
+		->addValue(_('Zabbix agent'), ZBX_SCRIPT_EXECUTE_ON_AGENT)
+		->addValue(_('Zabbix server'), ZBX_SCRIPT_EXECUTE_ON_SERVER)
+		->setModern(true)
 );
 $scriptFormList->addRow(_('Commands'),
-	(new CTextArea('command', $data['command']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	($data['type'] == ZBX_SCRIPT_TYPE_IPMI)
+	(new CTextArea('command', $data['command']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 $scriptFormList->addRow(_('Command'),
-	(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	($data['type'] == ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT)
+	(new CTextBox('commandipmi', $data['commandipmi']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 );
 $scriptFormList->addRow(_('Description'),
 	(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -86,7 +83,7 @@ $scriptFormList->addRow(null, (new CMultiSelect([
 	'popup' => [
 		'parameters' => 'srctbl=host_groups&dstfrm='.$scriptForm->getName().'&dstfld1=groupid&srcfld1=groupid'
 	]
-]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), null, 'hostGroupSelection');
+]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH), 'hostGroupSelection');
 
 // access
 $scriptFormList->addRow(_('Required host permissions'), new CComboBox('host_access', $data['host_access'], null, [

@@ -30,9 +30,7 @@ if ($data['readonly'] && !$data['macros']) {
 	$table = _('No macros found.');
 }
 else {
-	$table = (new CTable())
-		->addClass('formElementTable')
-		->setId('tbl_macros');
+	$table = (new CTable())->setId('tbl_macros');
 
 	$actions_col = $data['readonly'] ? null : '';
 	if ($data['show_inherited_macros']) {
@@ -44,12 +42,12 @@ else {
 		else {
 			$link = null;
 		}
-		$table->addRow([_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '',
-			[_('Global value'), $link]
+		$table->setHeader([
+			_('Macro'), '', _('Effective value'), $actions_col, '', _('Template value'), '', [_('Global value'), $link]
 		]);
 	}
 	else {
-		$table->addRow([_('Macro'), '', _('Value'), $actions_col]);
+		$table->setHeader([_('Macro'), '', _('Value'), $actions_col]);
 	}
 
 	// fields
@@ -91,25 +89,33 @@ else {
 		if (!$data['readonly']) {
 			if ($data['show_inherited_macros']) {
 				if (($macro['type'] & MACRO_TYPE_BOTH) == MACRO_TYPE_BOTH) {
-					$row[] = (new CButton('macros['.$i.'][change]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-change');
+					$row[] = (new CCol(
+						(new CButton('macros['.$i.'][change]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-change')
+					))->addClass(ZBX_STYLE_NOWRAP);
 				}
 				elseif ($macro['type'] & MACRO_TYPE_INHERITED) {
-					$row[] = (new CButton('macros['.$i.'][change]', _('Change')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-change');
+					$row[] = (new CCol(
+						(new CButton('macros['.$i.'][change]', _('Change')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-change')
+					))->addClass(ZBX_STYLE_NOWRAP);
 				}
 				else {
-					$row[] = (new CButton('macros['.$i.'][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove');
+					$row[] = (new CCol(
+						(new CButton('macros['.$i.'][remove]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+					))->addClass(ZBX_STYLE_NOWRAP);
 				}
 			}
 			else {
-				$row[] = (new CButton('macros['.$i.'][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove');
+				$row[] = (new CCol(
+					(new CButton('macros['.$i.'][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				))->addClass(ZBX_STYLE_NOWRAP);
 			}
 		}
 
@@ -122,18 +128,29 @@ else {
 					->setAttribute('target', '_blank');
 				$row[] = '&lArr;';
 				$row[] = (new CDiv([$link, NAME_DELIMITER, '"'.$macro['template']['value'].'"']))
-					->addClass('macro-value');
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
 			}
 			else {
-				array_push($row, '', (new CDiv())->addClass('macro-value'));
+				array_push($row, '',
+					(new CDiv())
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				);
 			}
 
 			if (array_key_exists('global', $macro)) {
 				$row[] = '&lArr;';
-				$row[] = (new CDiv('"'.$macro['global']['value'].'"'))->addClass('macro-value');
+				$row[] = (new CDiv('"'.$macro['global']['value'].'"'))
+					->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH);
 			}
 			else {
-				array_push($row, '', (new CDiv())->addClass('macro-value'));
+				array_push($row, '',
+					(new CDiv())
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+				);
 			}
 		}
 
@@ -142,29 +159,23 @@ else {
 
 	// buttons
 	if (!$data['readonly']) {
-		$buttons_column = new CCol(
+		$table->setFooter(new CCol(
 			(new CButton('macro_add', _('Add')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->addClass('element-table-add')
-		);
-		$buttons_column->setAttribute('colspan', 5);
-
-		$table->addRow(new CRow($buttons_column, null, 'row_new_macro'));
+		));
 	}
 }
 
-$show_inherited_macros_filter = [
-	(new CRadioButton('show_inherited_macros', '0', !$data['show_inherited_macros']))
-		->setId('hide_inherited_macros')
-		->onChange('this.form.submit()'),
-	new CLabel(_('Host macros'), 'hide_inherited_macros'),
-	(new CRadioButton('show_inherited_macros', '1', $data['show_inherited_macros']))
-		->onChange('this.form.submit()'),
-	new CLabel(_('Inherited and host macros'), 'show_inherited_macros')
-];
-
 $macros_form_list
-	->addRow(null, (new CDiv($show_inherited_macros_filter))->addClass('jqueryinputset')->addClass('radioset'))
+	->addRow(null,
+		(new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
+			->addValue($data['is_template'] ? _('Template macros') : _('Host macros'), 0, null, 'this.form.submit()')
+			->addValue($data['is_template'] ? _('Inherited and template macros') : _('Inherited and host macros'), 1,
+				null, 'this.form.submit()'
+			)
+			->setModern(true)
+	)
 	->addRow(null, $table);
 
 return $macros_form_list;

@@ -444,6 +444,8 @@ var hintBox = {
 			wHeight = jQuery(window).height(),
 			scrollTop = jQuery(window).scrollTop(),
 			scrollLeft = jQuery(window).scrollLeft(),
+			hint_width = jQuery(target.hintBoxItem).outerWidth(),
+			hint_height = jQuery(target.hintBoxItem).outerHeight(),
 			top, left;
 
 		// uses stored clientX on afterload positioning when there is no event
@@ -453,25 +455,25 @@ var hintBox = {
 		}
 
 		// doesn't fit in the screen horizontally
-		if (target.hintBoxItem.width() + 10 > wWidth) {
+		if (hint_width + 10 > wWidth) {
 			left = scrollLeft + 2;
 		}
 		// 10px to right if fit
-		else if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+		else if (wWidth - target.clientX - 10 > hint_width) {
 			left = scrollLeft + target.clientX + 10;
 		}
 		// 10px from screen right side
 		else {
-			left = scrollLeft + wWidth - 10 - target.hintBoxItem.width();
+			left = scrollLeft + wWidth - 10 - hint_width;
 		}
 
 		// 10px below if fit
-		if (wHeight - target.clientY - target.hintBoxItem.height() - 10 > 0) {
+		if (wHeight - target.clientY - hint_height - 10 > 0) {
 			top = scrollTop + target.clientY + 10;
 		}
 		// 10px above if fit
-		else if (target.clientY - target.hintBoxItem.height() - 10 > 0) {
-			top = scrollTop + target.clientY - target.hintBoxItem.height() - 10;
+		else if (target.clientY - hint_height - 10 > 0) {
+			top = scrollTop + target.clientY - hint_height - 10;
 		}
 		// 10px below as fallback
 		else {
@@ -479,21 +481,21 @@ var hintBox = {
 		}
 
 		// fallback if doesn't fit verticaly but could fit if aligned to right or left
-		if ((top - scrollTop + target.hintBoxItem.height() > wHeight)
-				&& (target.clientX - 10 > target.hintBoxItem.width() || wWidth - target.clientX - 10 > target.hintBoxItem.width())) {
+		if ((top - scrollTop + hint_height > wHeight)
+				&& (target.clientX - 10 > hint_width || wWidth - target.clientX - 10 > hint_width)) {
 
 			// align to left if fit
-			if (wWidth - target.clientX - 10 > target.hintBoxItem.width()) {
+			if (wWidth - target.clientX - 10 > hint_width) {
 				left = scrollLeft + target.clientX + 10;
 			}
 			// align to right
 			else {
-				left = scrollLeft + target.clientX - target.hintBoxItem.width() - 10;
+				left = scrollLeft + target.clientX - hint_width - 10;
 			}
 
 			// 10px from bottom if fit
-			if (wHeight - 10 > target.hintBoxItem.height()) {
-				top = scrollTop + wHeight - target.hintBoxItem.height() - 10;
+			if (wHeight - 10 > hint_height) {
+				top = scrollTop + wHeight - hint_height - 10;
 			}
 			// 10px from top
 			else {
@@ -627,7 +629,7 @@ function updateUserProfile(idx, value_int) {
 	});
 }
 
-function changeWidgetState(obj, widgetId) {
+function changeWidgetState(obj, widgetId, url) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
 		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
@@ -643,7 +645,9 @@ function changeWidgetState(obj, widgetId) {
 		state = 1;
 	}
 
-	sendAjaxData('zabbix.php?action=dashboard.widget', {
+	obj.title = (state == 1) ? locale['S_COLLAPSE'] : locale['S_EXPAND'];
+
+	sendAjaxData(url, {
 		data: {
 			widget: widgetId,
 			state: state
@@ -869,39 +873,6 @@ function getConditionFormula(conditions, evalType) {
 jQuery(function ($) {
 	var verticalHeaderTables = {};
 
-	var tablesWidthChangeChecker = function() {
-		for (var tableId in verticalHeaderTables) {
-			if (verticalHeaderTables.hasOwnProperty(tableId)) {
-				var table = verticalHeaderTables[tableId];
-
-				if (table && table.width() != table.data('last-width')) {
-					centerVerticalCellContents(table);
-				}
-			}
-		}
-		setTimeout(tablesWidthChangeChecker, 100);
-	};
-
-	var centerVerticalCellContents = function(table) {
-		var verticalCells = $('.vertical_rotation', table);
-
-		verticalCells.each(function() {
-			var cell = $(this),
-				cellWidth = cell.width();
-
-			if (cellWidth > 30) {
-				cell.children().css({
-					position: 'relative',
-					left: (cellWidth / 2 - 12) + 'px'
-				});
-			}
-		});
-
-		table.data('last-width', table.width());
-	};
-
-	tablesWidthChangeChecker();
-
 	$.fn.makeVerticalRotation = function() {
 		this.each(function(i) {
 			var table = $(this);
@@ -916,15 +887,10 @@ jQuery(function ($) {
 
 			// insert spans
 			cellsToRotate.each(function() {
-				var cell = $(this);
-
-				var text = $('<span>', {
-					text: cell.html()
-				});
-
-				if (IE) {
-					text.css({'font-family': 'monospace'});
-				}
+				var cell = $(this),
+					text = $('<span>', {
+						text: cell.html()
+					}).css({'white-space': 'nowrap'});
 
 				cell.text('').append(text);
 			});
@@ -937,20 +903,16 @@ jQuery(function ($) {
 					width = span.width(),
 					transform = (width / 2) + 'px ' + (width / 2) + 'px';
 
-				var css = {
-					"transform-origin": transform,
-					"-webkit-transform-origin": transform,
-					"-moz-transform-origin": transform,
-					"-o-transform-origin": transform
-				};
-
-				if (IE) {
-					css['font-family'] = 'monospace';
-					css['-ms-transform-origin'] = '50% 50%';
-				}
+				var css = {};
 
 				if (IE9) {
 					css['-ms-transform-origin'] = transform;
+				}
+				else {
+					css['transform-origin'] = transform;
+					css['-webkit-transform-origin'] = transform;
+					css['-moz-transform-origin'] = transform;
+					css['-o-transform-origin'] = transform;
 				}
 
 				var divInner = $('<div>', {
@@ -971,8 +933,6 @@ jQuery(function ($) {
 			cellsToRotate.each(function(i) {
 				$(this).html(betterCells[i]);
 			});
-
-			centerVerticalCellContents(table);
 
 			table.on('remove', function() {
 				delete verticalHeaderTables[table.attr('id')];
