@@ -10,6 +10,7 @@ A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discover
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-7847] added functionality that stops polling inactive ipmi hosts (igors)
 ...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
 ..F....... [ZBXNEXT-2662] fixed a map element editing form (Sasha)
 ..F.I..... [ZBXNEXT-2662] fixed possibility to change the colours of the trigger severities (Sasha)
