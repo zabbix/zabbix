@@ -136,12 +136,15 @@ if($pageFilter->groupsSelected && $groupFieldTitle !== ''){
 
 	order_result($report, $sortField, $sortOrder);
 
-	foreach($report as $rep){
-		$row = [
-			(new CSpan(zbx_str2links($rep['inventory_field'])))->addClass('pre'),
-			new CLink($rep['host_count'],'hostinventories.php?filter_field='.$_REQUEST['groupby'].'&filter_field_value='.urlencode($rep['inventory_field']).'&filter_set=1&filter_exact=1'.url_param('groupid')),
-		];
-		$table->addRow($row);
+	foreach ($report as $rep) {
+		$table->addRow([
+			zbx_str2links($rep['inventory_field']),
+			(new CLink($rep['host_count'],
+				'hostinventories.php?filter_field='.$_REQUEST['groupby'].
+				'&filter_field_value='.urlencode($rep['inventory_field']).
+				'&filter_set=1&filter_exact=1'.url_param('groupid')
+			))->removeSID()
+		]);
 	}
 }
 

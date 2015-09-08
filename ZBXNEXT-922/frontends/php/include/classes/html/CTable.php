@@ -21,7 +21,6 @@
 
 class CTable extends CTag {
 
-	public $headerClass;
 	protected $header;
 	protected $footer;
 	protected $colnum;
@@ -32,7 +31,6 @@ class CTable extends CTag {
 		parent::__construct('table', true);
 		$this->rownum = 0;
 		$this->header = '';
-		$this->headerClass = null;
 		$this->footer = '';
 		$this->colnum = 1;
 	}
@@ -53,9 +51,10 @@ class CTable extends CTag {
 	}
 
 	public function prepareRow($item, $class = null, $id = null) {
-		if (is_null($item)) {
+		if ($item === null) {
 			return null;
 		}
+
 		if (is_object($item) && strtolower(get_class($item)) === 'ccol') {
 			if (isset($this->header) && !isset($item->attributes['colspan'])) {
 				$item->attributes['colspan'] = $this->colnum;
@@ -87,20 +86,9 @@ class CTable extends CTag {
 		return $item;
 	}
 
-	public function setHeader($value = null, $class = null) {
-		if (is_null($class)) {
-			$class = $this->headerClass;
-		}
-		if (is_object($value) && strtolower(get_class($value)) === 'crow') {
-			if ($class !== null) {
-				$value->addClass($class);
-			}
-		}
-		else {
-			$value = new CRowHeader($value, $class);
-			if ($class !== null) {
-				$value->addClass($class);
-			}
+	public function setHeader($value = null) {
+		if (!is_object($value) || strtolower(get_class($value)) !== 'crow') {
+			$value = new CRowHeader($value);
 		}
 		$this->colnum = $value->itemsCount();
 
@@ -133,6 +121,7 @@ class CTable extends CTag {
 	public function startToString() {
 		$ret = parent::startToString();
 		$ret .= $this->header;
+		$ret .= '<tbody>';
 		return $ret;
 	}
 
@@ -143,6 +132,7 @@ class CTable extends CTag {
 			$ret = $ret->toString();
 		}
 		$ret .= $this->footer;
+		$ret .= '</tbody>';
 		$ret .= parent::endToString();
 		return $ret;
 	}

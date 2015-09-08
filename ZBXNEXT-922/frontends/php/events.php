@@ -750,7 +750,7 @@ else {
 			}
 
 			// actions
-			$actions = getEventActionsStatus(zbx_objectValues($events, 'eventid'));
+			$actions = makeEventsActions(zbx_objectValues($events, 'eventid'));
 
 			// events
 			foreach ($events as $event) {
@@ -770,7 +770,7 @@ else {
 					: zbx_date2age($event['clock']);
 
 				// action
-				$action = isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ' - ';
+				$action = isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : '';
 
 				if ($csvExport) {
 					$csvRows[] = [
@@ -790,9 +790,6 @@ else {
 						->setMenuPopup(
 							CMenuPopupHelper::getTrigger($trigger, null, $event['clock'])
 						);
-
-					// acknowledge
-					$ack = getEventAckState($event, $page['file']);
 
 					// add colors and blinking to span depending on configuration and trigger parameters
 					$statusSpan = new CSpan(trigger_value2str($event['value']));
@@ -822,7 +819,7 @@ else {
 						$statusSpan,
 						getSeverityCell($trigger['priority'], $config, null, !$event['value']),
 						$event['duration'],
-						$config['event_ack_enable'] ? $ack : null,
+						$config['event_ack_enable'] ? getEventAckState($event, $page['file']) : null,
 						$action
 					]);
 				}

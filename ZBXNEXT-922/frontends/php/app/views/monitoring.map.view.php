@@ -26,11 +26,6 @@ $headerMapForm = (new CForm('get'))->cleanItems();
 $controls = new CList();
 
 if ($data['maps']) {
-	$mapTable = (new CTable())
-		->addClass('map')
-		->addClass('container')
-		->setAttribute('style', 'margin-top: 4px;');
-
 	$maps = [];
 	foreach ($data['maps'] as $sysmapid => $map) {
 		$maps[$sysmapid] = $map['name'];
@@ -58,12 +53,12 @@ if ($data['maps']) {
 	}
 
 	$actionMap = getActionMapBySysmap($data['map'], ['severity_min' => $data['severity_min']]);
-
-	$mapTable->addRow($actionMap);
-
 	$imgMap = (new CImg('map.php?sysmapid='.$data['sysmapid'].'&severity_min='.$data['severity_min']))
 		->setMap($actionMap->getName());
-	$mapTable->addRow($imgMap);
+
+	$mapTable = (new CTable())
+		->addRow($actionMap)
+		->addRow($imgMap);
 
 	$controls->addItem(get_icon('favourite', [
 		'fav' => 'web.favorite.sysmapids',
@@ -72,17 +67,12 @@ if ($data['maps']) {
 	]));
 }
 else {
-	$mapTable = (new CTable())
-		->setNoDataMessage(_('No maps found.'))
-		->addClass('map')
-		->addClass('map-container')
-		->setAttribute('style', 'margin-top: 4px;');
+	$mapTable = (new CTable())->setNoDataMessage(_('No maps found.'));
 }
 
 $controls->addItem(get_icon('fullscreen', ['fullscreen' => $data['fullscreen']]));
 
 $headerMapForm->addItem($controls);
 $mapWidget->setControls($headerMapForm)
-	->addItem((new CDiv())->addClass('table-forms-container'))
 	->addItem($mapTable)
 	->show();

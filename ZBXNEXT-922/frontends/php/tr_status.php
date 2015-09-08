@@ -240,41 +240,48 @@ $triggerWidget->addItem($filterForm);
 /*
  * Form
  */
-$triggerForm = (new CForm('get', 'acknow.php'))
+$triggerForm = (new CForm('get', 'zabbix.php'))
 	->setName('tr_status')
-	->addVar('backurl', $page['file']);
+	->addVar('backurl', $page['file'])
+	->addVar('acknowledge_type', ZBX_ACKNOWLEDGE_PROBLEM);
 
 /*
  * Table
  */
-$showEventColumn = ($config['event_ack_enable'] && $showEvents != EVENTS_OPTION_NOEVENT);
-
 $switcherName = 'trigger_switchers';
 
-$headerCheckBox = ($showEventColumn)
-	? (new CCheckBox('all_events'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_events', 'events');")
-	: (new CCheckBox('all_triggers'))->onClick("checkAll('".$triggerForm->GetName()."', 'all_triggers', 'triggers');");
-
-if ($showEvents == EVENTS_OPTION_NOEVENT) {
-	$showHideAllDiv = null;
+if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
+	$showHideAllDiv = (new CColHeader(
+		(new CDiv())
+			->addClass(ZBX_STYLE_TREEVIEW)
+			->setId($switcherName)
+			->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT))
+	))->addClass(ZBX_STYLE_CELL_WIDTH);
 }
 else {
-	$showHideAllDiv = (new CDiv())
-		->addClass(ZBX_STYLE_TREEVIEW)
-		->setId($switcherName)
-		->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT));
+	$showHideAllDiv = null;
+}
+
+if ($config['event_ack_enable']) {
+	$headerCheckBox = (new CColHeader(
+		(new CCheckBox('all_eventids'))
+			->onClick("checkAll('".$triggerForm->GetName()."', 'all_eventids', 'eventids');")
+	))->addClass(ZBX_STYLE_CELL_WIDTH);
+}
+else {
+	$headerCheckBox = null;
 }
 
 $triggerTable = (new CTableInfo())
 	->setHeader([
 		$showHideAllDiv,
-		$config['event_ack_enable'] ? $headerCheckBox : null,
+		$headerCheckBox,
 		make_sorting_header(_('Severity'), 'priority', $sortField, $sortOrder),
 		_('Status'),
 		_('Info'),
 		make_sorting_header(_('Last change'), 'lastchange', $sortField, $sortOrder),
 		_('Age'),
-		$showEventColumn ? _('Duration') : null,
+		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? _('Duration') : null,
 		$config['event_ack_enable'] ? _('Ack') : null,
 		_('Host'),
 		make_sorting_header(_('Name'), 'description', $sortField, $sortOrder),
@@ -355,7 +362,6 @@ $triggers = API::Trigger()->get($options);
 
 order_result($triggers, $sortField, $sortOrder);
 $paging = getPagingLine($triggers, $sortOrder);
-
 
 $triggers = API::Trigger()->get([
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
@@ -446,26 +452,26 @@ if ($config['event_ack_enable']) {
 	}
 }
 
-if ($showEvents != EVENTS_OPTION_NOEVENT) {
+if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
+	foreach ($triggers as &$trigger) {
+		$trigger['events'] = [];
+	}
+	unset($trigger);
+
 	$options = [
+		'output' => ['eventid', 'objectid', 'clock', 'value'],
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'objectids' => zbx_objectValues($triggers, 'triggerid'),
-		'output' => API_OUTPUT_EXTEND,
-		'select_acknowledges' => API_OUTPUT_COUNT,
 		'time_from' => time() - $config['event_expire'] * SEC_PER_DAY,
 		'time_till' => time(),
 		'sortfield' => ['clock', 'eventid'],
 		'sortorder' => ZBX_SORT_DOWN
 	];
 
-	switch ($showEvents) {
-		case EVENTS_OPTION_ALL:
-			break;
-		case EVENTS_OPTION_NOT_ACK:
-			$options['acknowledged'] = false;
-			$options['value'] = TRIGGER_VALUE_TRUE;
-			break;
+	if ($config['event_ack_enable']) {
+		$options['select_acknowledges'] = API_OUTPUT_COUNT;
+		$options['output'][] = 'acknowledged';
 	}
 	$events = API::Event()->get($options);
 
@@ -531,17 +537,7 @@ foreach ($triggers as $trigger) {
 	$trigger['groupid'] = $pageFilter->groupid;
 	$trigger['hostid'] = $pageFilter->hostid;
 
-	$description = (new CSpan($trigger['description']))
-		->addClass(ZBX_STYLE_LINK_ACTION)
-		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
-
-	if ($showDetails) {
-		$description = [
-			$description,
-			BR(),
-			(new CDiv(explode_exp($trigger['expression'], true, true)))->addClass('trigger-expression')
-		];
-	}
+	$description = [];
 
 	if (!empty($trigger['dependencies'])) {
 		$dependenciesTable = (new CTable())
@@ -552,11 +548,10 @@ foreach ($triggers as $trigger) {
 			$dependenciesTable->addRow(' - '.CMacrosResolverHelper::resolveTriggerNameById($dependency['triggerid']));
 		}
 
-		$img = (new CImg('images/general/arrow_down2.png', 'DEP_UP'))
-			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+		$description[] = (new CSpan())
+			->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint($dependenciesTable);
-
-		$description = [$img, SPACE, $description];
 	}
 
 	$dependency = false;
@@ -573,15 +568,21 @@ foreach ($triggers as $trigger) {
 	}
 
 	if ($dependency) {
-		$img = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
-			->setAttribute('style', 'vertical-align: middle; border: 0px;')
+		$description[] = (new CSpan())
+			->addClass(ZBX_STYLE_ICON_DEPEND_UP)
+			->addClass(ZBX_STYLE_CURSOR_POINTER)
 			->setHint($dependenciesTable);
-
-		$description = [$img, SPACE, $description];
 	}
 	unset($img, $dependenciesTable, $dependency);
 
-	$triggerDescription = new CSpan($description);
+	$description[] = (new CSpan($trigger['description']))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->setMenuPopup(CMenuPopupHelper::getTrigger($trigger));
+
+	if ($showDetails) {
+		$description[] = BR();
+		$description[] = explode_exp($trigger['expression'], true, true);
+	}
 
 	// host js menu
 	$hostList = [];
@@ -594,15 +595,15 @@ foreach ($triggers as $trigger) {
 			}
 		}
 
-		$host_name = [
-			(new CSpan($host['name']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->setMenuPopup(CMenuPopupHelper::getHost($hosts[$host['hostid']], $scripts))
-		];
+		$host_name = (new CSpan($host['name']))
+			->addClass(ZBX_STYLE_LINK_ACTION)
+			->setMenuPopup(CMenuPopupHelper::getHost($hosts[$host['hostid']], $scripts));
 
 		// add maintenance icon with hint if host is in maintenance
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$maintenance_icon = (new CSpan())->addClass(ZBX_STYLE_ICON_MAINT);
+			$maintenance_icon = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_MAINT)
+				->addClass(ZBX_STYLE_CURSOR_POINTER);
 
 			if (array_key_exists($host['maintenanceid'], $maintenances)) {
 				$maintenance = $maintenances[$host['maintenanceid']];
@@ -618,8 +619,7 @@ foreach ($triggers as $trigger) {
 				$maintenance_icon->setHint($hint);
 			}
 
-			$host_name[] = $maintenance_icon;
-			$host_name = (new CSpan($host_name))->addClass(ZBX_STYLE_REL_CONTAINER);
+			$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 		}
 
 		$hostList[] = $host_name;
@@ -638,74 +638,59 @@ foreach ($triggers as $trigger) {
 		$config['event_ack_enable'] ? ($trigger['event_count'] == 0) : false
 	);
 
-	$lastChangeDate = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']);
-	$lastChange = empty($trigger['lastchange'])
-		? $lastChangeDate
-		: new CLink($lastChangeDate,
-			'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
-				'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
-		);
-
+	// open or close
 	// acknowledge
 	if ($config['event_ack_enable']) {
 		if ($trigger['hasEvents']) {
+			$ack_checkbox = new CCheckBox('eventids['.$trigger['lastEvent']['eventid'].']',
+				$trigger['lastEvent']['eventid']
+			);
 			if ($trigger['event_count']) {
-				$ackColumn = new CCol([
-					(new CLink(
-						_('No'),
-						'acknow.php?'.
-							'triggers[]='.$trigger['triggerid'].
-							'&backurl='.$page['file']))
+				$ackColumn = [
+					(new CLink(_('No'),
+						'zabbix.php?action=acknowledge.edit'.
+							'&acknowledge_type='.ZBX_ACKNOWLEDGE_PROBLEM.
+							'&eventids[]='.$trigger['lastEvent']['eventid'].
+							'&backurl='.$page['file']
+					))
 						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_RED),
+						->addClass(ZBX_STYLE_RED)
+						->removeSID(),
 					CViewHelper::showNum($trigger['event_count'])
-				]);
+				];
 			}
 			else {
-				$ackColumn = new CCol(
-					(new CLink(
-						_('Yes'),
-						'acknow.php?'.
-							'eventid='.$trigger['lastEvent']['eventid'].
-							'&triggerid='.$trigger['lastEvent']['objectid'].
-							'&backurl='.$page['file']))
-						->addClass(ZBX_STYLE_LINK_ALT)
-						->addClass(ZBX_STYLE_GREEN)
-				);
+				$ackColumn = (new CLink(_('Yes'),
+					'zabbix.php?action=acknowledge.edit'.
+						'&acknowledge_type='.ZBX_ACKNOWLEDGE_PROBLEM.
+						'&eventids[]='.$trigger['lastEvent']['eventid'].
+						'&backurl='.$page['file']
+				))
+					->addClass(ZBX_STYLE_LINK_ALT)
+					->addClass(ZBX_STYLE_GREEN)
+					->removeSID();
 			}
 		}
 		else {
+			$ack_checkbox = '';
 			$ackColumn = (new CCol(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 	}
 	else {
+		$ack_checkbox = null;
 		$ackColumn = null;
 	}
 
-	// open or close
-	if ($showEvents == EVENTS_OPTION_NOEVENT) {
-		$openOrCloseDiv = null;
-	}
-	elseif ($trigger['events']) {
-		$openOrCloseDiv = (new CDiv())
-			->addClass(ZBX_STYLE_TREEVIEW)
-			->setAttribute('data-switcherid', $trigger['triggerid'])
-			->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT));
+	if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
+		$openOrCloseDiv = $trigger['events']
+			? (new CDiv())
+				->addClass(ZBX_STYLE_TREEVIEW)
+				->setAttribute('data-switcherid', $trigger['triggerid'])
+				->addItem((new CSpan())->addClass(ZBX_STYLE_ARROW_RIGHT))
+			: '';
 	}
 	else {
-		$openOrCloseDiv = '';
-	}
-
-	// severity
-	$severityColumn = getSeverityCell($trigger['priority'], $config, null, !$trigger['value']);
-	if ($showEventColumn) {
-		$severityColumn->setColSpan(2);
-	}
-
-	// unknown triggers
-	$unknown = SPACE;
-	if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
-		$unknown = makeUnknownIcon($trigger['error']);
+		$openOrCloseDiv = null;
 	}
 
 	// comments
@@ -720,70 +705,60 @@ foreach ($triggers as $trigger) {
 
 	$triggerTable->addRow([
 		$openOrCloseDiv,
-		$config['event_ack_enable'] ?
-			($showEventColumn ? null : new CCheckBox('triggers['.$trigger['triggerid'].']', $trigger['triggerid'])) : null,
-		$severityColumn,
+		$ack_checkbox,
+		getSeverityCell($trigger['priority'], $config, null, !$trigger['value']),
 		$statusSpan,
-		$unknown,
-		$lastChange,
-		empty($trigger['lastchange']) ? '' : zbx_date2age($trigger['lastchange']),
-		$showEventColumn ? SPACE : null,
+		($trigger['state'] == TRIGGER_STATE_UNKNOWN) ? makeUnknownIcon($trigger['error']) : '',
+		($trigger['lastchange'] == 0)
+			? _('Never')
+			: new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $trigger['lastchange']),
+				'events.php?filter_set=1&triggerid='.$trigger['triggerid'].'&source='.EVENT_SOURCE_TRIGGERS.
+					'&stime='.date(TIMESTAMP_FORMAT, $trigger['lastchange']).'&period='.ZBX_PERIOD_DEFAULT
+			),
+		($trigger['lastchange'] == 0) ? '' : zbx_date2age($trigger['lastchange']),
+		($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) ? '' : null,
 		$ackColumn,
 		$hostList,
-		$triggerDescription,
+		$description,
 		$comments
 	]);
 
-	if ($showEvents != EVENTS_OPTION_NOEVENT && !empty($trigger['events'])) {
-		$i = 1;
-		foreach ($trigger['events'] as $enum => $event) {
-			$i++;
+	if ($showEvents == EVENTS_OPTION_ALL || $showEvents == EVENTS_OPTION_NOT_ACK) {
+		$next_event_clock = time();
+
+		foreach (array_slice($trigger['events'], 0, $config['event_show_max']) as $enum => $event) {
+			if ($showEvents == EVENTS_OPTION_NOT_ACK) {
+				if ($event['acknowledged'] || $event['value'] != TRIGGER_VALUE_TRUE) {
+					continue;
+				}
+			}
 
 			$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
 
 			// add colors and blinking to span depending on configuration and trigger parameters
-			addTriggerValueStyle(
-				$eventStatusSpan,
-				$event['value'],
-				$event['clock'],
-				$event['acknowledged']
-			);
-
-			$statusSpan = new CCol($eventStatusSpan);
-			$statusSpan->setColSpan(2);
-
-			$ack = getEventAckState($event, $page['file']);
-
-			$ackCheckBox = ($event['acknowledged'] == 0 && $event['value'] == TRIGGER_VALUE_TRUE)
-				? new CCheckBox('events['.$event['eventid'].']', $event['eventid'])
-				: SPACE;
+			addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'],
+				$config['event_ack_enable'] && $event['acknowledged']);
 
 			$clock = new CLink(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
 				'tr_events.php?triggerid='.$trigger['triggerid'].'&eventid='.$event['eventid']);
 
-			$nextClock = isset($trigger['events'][$enum - 1]) ? $trigger['events'][$enum - 1]['clock'] : time();
-
-			$emptyColumn = new CCol(SPACE);
-			$emptyColumn->setColSpan(3);
-			$ackCheckBoxColumn = new CCol($ackCheckBox);
-			$ackCheckBoxColumn->setColSpan(2);
-
-			$row = (new CRow([
-				SPACE,
-				$config['event_ack_enable'] ? $ackCheckBoxColumn : null,
-				$statusSpan,
-				$clock,
-				zbx_date2age($event['clock']),
-				zbx_date2age($nextClock, $event['clock']),
-				($config['event_ack_enable']) ? $ack : null,
-				$emptyColumn]))
-					->setAttribute('data-parentid', $trigger['triggerid'])
-					->addStyle('display: none;');
-			$triggerTable->addRow($row);
-
-			if ($i > $config['event_show_max']) {
-				break;
+			if ($enum != 0) {
+				$next_event_clock = $trigger['events'][$enum - 1]['clock'];
 			}
+
+			$triggerTable->addRow(
+				(new CRow([
+					(new CCol())->setColSpan($config['event_ack_enable'] ? 3 : 2),
+					(new CCol($eventStatusSpan))->setColSpan(2),
+					$clock,
+					zbx_date2age($event['clock']),
+					zbx_date2age($next_event_clock, $event['clock']),
+					$config['event_ack_enable'] ? getEventAckState($event, $page['file']) : null,
+					(new CCol())->setColSpan(3)
+				]))
+					->setAttribute('data-parentid', $trigger['triggerid'])
+					->addStyle('display: none;')
+			);
 		}
 	}
 }
@@ -793,8 +768,8 @@ foreach ($triggers as $trigger) {
  */
 $footer = null;
 if ($config['event_ack_enable']) {
-	$footer = new CActionButtonList('action', $showEventColumn ? 'events' : 'triggers', [
-		'trigger.bulkacknowledge' => ['name' => _('Bulk acknowledge')]
+	$footer = new CActionButtonList('action', 'eventids', [
+		'acknowledge.edit' => ['name' => _('Bulk acknowledge')]
 	]);
 }
 

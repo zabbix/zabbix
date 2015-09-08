@@ -46,7 +46,7 @@ $slideFormList = (new CFormList())
 
 // append slide table
 $slideTable = (new CTable())
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setId('slideTable')
 	->setHeader([
 		(new CColHeader())->setWidth(15),
@@ -70,11 +70,6 @@ foreach ($this->data['slides'] as $key => $slides) {
 		->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		->setAttribute('placeholder', _('default'));
 
-	$removeButton = (new CButton('remove_'.$key, _('Remove')))
-		->onClick('javascript: removeSlide(this);')
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->setAttribute('remove_slide', $key);
-
 	$slideTable->addRow(
 		(new CRow([
 			(new CCol(
@@ -83,7 +78,12 @@ foreach ($this->data['slides'] as $key => $slides) {
 			(new CSpan($i++.':'))->addClass('rowNum')->setId('current_slide_'.$key),
 			$name,
 			$delay,
-			$removeButton
+			(new CCol(
+				(new CButton('remove_'.$key, _('Remove')))
+					->onClick('javascript: removeSlide(this);')
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->setAttribute('remove_slide', $key)
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
 			->setId('slides_'.$key)
@@ -102,7 +102,11 @@ $addButtonColumn = (new CCol(
 $addButtonColumn->setAttribute('style', 'vertical-align: middle;');
 $slideTable->addRow((new CRow($addButtonColumn))->setId('screenListFooter'));
 
-$slideFormList->addRow(_('Slides'), (new CDiv($slideTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$slideFormList->addRow(_('Slides'),
+	(new CDiv($slideTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 // append tabs to form
 $slideTab = new CTabView();
