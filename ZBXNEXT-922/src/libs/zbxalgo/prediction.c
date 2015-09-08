@@ -748,7 +748,15 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots,
 		}
 	}
 
-	res = (0 != roots_ok ? ZBX_MATH_OK : ZBX_MATH_FAIL);
+	if (0 == roots_ok)
+	{
+		*error = zbx_strdup(*error, "polynomial root finding problem is ill-defined");
+		res = ZBX_MATH_FAIL;
+	}
+	else
+	{
+		res = ZBX_MATH_OK;
+	}
 out:
 	zbx_matrix_free(denominator_multiplicands);
 	zbx_matrix_free(updates);
@@ -1072,6 +1080,14 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 	*error = zbx_strdup(*error, "invalid 'fit' parameter");
 	res = ZBX_MATH_FAIL;
 out:
+	if (ZBX_MATH_OK == res)
+	{
+		if (1e12 < *result)
+			*result = 1e12;
+		else if (-1e12 > *result)
+			*result = -1e12;
+	}
+
 	zbx_matrix_free(coefficients);
 	return res;
 }
@@ -1135,8 +1151,10 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 		goto out;
 	}
 
-	if (*result < 0 || *result != *result)
+	if (*result != *result)
 		*result = -1.0;
+	else if (0.0 > *result || 1e12 < *result)
+		*result = 1e12;
 
 out:
 	zbx_matrix_free(coefficients);
