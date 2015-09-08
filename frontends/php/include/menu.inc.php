@@ -50,8 +50,9 @@ $ZBX_MENU = [
 			],
 			[
 				'url' => 'tr_status.php',
+				'active_if' => ['acknowledge.edit'],
 				'label' => _('Triggers'),
-				'sub_pages' => ['acknow.php', 'tr_comments.php', 'chart4.php', 'scripts_exec.php']
+				'sub_pages' => ['tr_comments.php', 'chart4.php', 'scripts_exec.php']
 			],
 			[
 				'url' => 'events.php',
@@ -348,7 +349,6 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 				'menu_text' => isset($sub_page['label']) ? $sub_page['label'] : '',
 				'menu_url' => $sub_page['url'],
 				'menu_action' => array_key_exists('action', $sub_page) ? $sub_page['action'] : null,
-				'class' => 'highlight',
 				'selected' => false
 			];
 

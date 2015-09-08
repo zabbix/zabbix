@@ -2531,8 +2531,8 @@ static void	DBcopy_template_application_prototypes(zbx_uint64_t hostid, const zb
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select ap.application_prototypeid,ap.name,i_t.itemid"
-			" from items i"
-			" left join application_prototype ap"
+			" from application_prototype ap"
+			" left join items i"
 				" on ap.itemid=i.itemid"
 			" left join items i_t"
 				" on i_t.templateid=i.itemid"
@@ -4994,4 +4994,60 @@ void	DBdelete_groups(zbx_vector_uint64_t *groupids)
 	zbx_free(sql);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBadd_host_inventory                                             *
+ *                                                                            *
+ * Purpose: adds host inventory to the host                                   *
+ *                                                                            *
+ * Parameters: hostid         - [IN] host identifier                          *
+ *             inventory_mode - [IN] the host inventory mode                  *
+ *                                                                            *
+ ******************************************************************************/
+void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode)
+{
+	zbx_db_insert_t	db_insert;
+
+	zbx_db_insert_prepare(&db_insert, "host_inventory", "hostid", "inventory_mode", NULL);
+	zbx_db_insert_add_values(&db_insert, hostid, inventory_mode);
+	zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DBset_host_inventory                                             *
+ *                                                                            *
+ * Purpose: sets host inventory mode for the specified host                   *
+ *                                                                            *
+ * Parameters: hostid         - [IN] host identifier                          *
+ *             inventory_mode - [IN] the host inventory mode                  *
+ *                                                                            *
+ * Comments: The host_inventory table record is created if absent.            *
+ *                                                                            *
+ *           This function does not allow disabling host inventory - only     *
+ *           setting manual or automatic host inventory mode is supported.    *
+ *                                                                            *
+ ******************************************************************************/
+void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+
+	result = DBselect("select inventory_mode from host_inventory where hostid=" ZBX_FS_UI64, hostid);
+
+	if (NULL == (row = DBfetch(result)))
+	{
+		DBadd_host_inventory(hostid, inventory_mode);
+	}
+	else if (inventory_mode != atoi(row[0]))
+	{
+		DBexecute("update host_inventory set inventory_mode=%d where hostid=" ZBX_FS_UI64, inventory_mode,
+				hostid);
+	}
+
+	DBfree_result(result);
 }

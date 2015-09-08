@@ -276,21 +276,6 @@ static int      DBpatch_2050015(void)
 	return FAIL;
 }
 
-static int      DBpatch_2050016(void)
-{
-	return SUCCEED;
-}
-
-static int      DBpatch_2050017(void)
-{
-	return SUCCEED;
-}
-
-static int      DBpatch_2050018(void)
-{
-	return SUCCEED;
-}
-
 static int	DBpatch_2050019(void)
 {
 	const ZBX_FIELD	field = {"smtp_port", "25", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
@@ -324,69 +309,6 @@ static int	DBpatch_2050023(void)
 	const ZBX_FIELD	field = {"smtp_authentication", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("media_type", &field);
-}
-
-static int	DBpatch_2050024(void)
-{
-	return DBdrop_table("graph_theme");
-}
-
-static int	DBpatch_2050025(void)
-{
-	const ZBX_TABLE table =
-		{"graph_theme",	"graphthemeid",	0,
-			{
-				{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-				{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"backgroundcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"graphcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"gridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"maingridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"gridbordercolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"textcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"highlightcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"leftpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"rightpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"nonworktimecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"gridview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{"legendview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-				{0}
-			},
-			NULL
-		};
-
-	return DBcreate_table(&table);
-}
-
-static int	DBpatch_2050026(void)
-{
-	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
-}
-
-static int	DBpatch_2050027(void)
-{
-	if (ZBX_DB_OK <= DBexecute(
-			"insert into graph_theme"
-			" values (1,'blue-theme','FFFFFF','FFFFFF','CCCCCC','AAAAAA','ACBBC2','1F2C33','E33734',"
-				"'429E47','E33734','EBEEF0',1,1)"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
-}
-
-static int	DBpatch_2050028(void)
-{
-	if (ZBX_DB_OK <= DBexecute(
-			"insert into graph_theme"
-			" values (2,'dark-theme','2B2B2B','2B2B2B','222222','4F4F4F','4F4F4F','F2F2F2','E45959',"
-				"'59DB8f','E45959','333333',1,1)"))
-	{
-		return SUCCEED;
-	}
-
-	return FAIL;
 }
 
 static int	DBpatch_2050029(void)
@@ -533,6 +455,180 @@ static int	DBpatch_2050045(void)
 	return DBadd_field("applications", &field);
 }
 
+static int	DBpatch_2050046(void)
+{
+	return DBdrop_table("graph_theme");
+}
+
+static int	DBpatch_2050047(void)
+{
+	const ZBX_TABLE table =
+		{"graph_theme",	"graphthemeid",	0,
+			{
+				{"graphthemeid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"theme", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"backgroundcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"graphcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"maingridcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridbordercolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"textcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"highlightcolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"leftpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"rightpercentilecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"nonworktimecolor", "", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+				{"gridview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{"legendview", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			NULL
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050048(void)
+{
+	return DBcreate_index("graph_theme", "graph_theme_1", "theme", 1);
+}
+
+static int	DBpatch_2050049(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (1,'blue-theme','FFFFFF','FFFFFF','CCD5D9','ACBBC2','ACBBC2','1F2C33','E33734',"
+				"'429E47','E33734','EBEBEB',1,1)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2050050(void)
+{
+	if (ZBX_DB_OK <= DBexecute(
+			"insert into graph_theme"
+			" values (2,'dark-theme','2B2B2B','2B2B2B','454545','4F4F4F','4F4F4F','F2F2F2','E45959',"
+				"'59DB8F','E45959','333333',1,1)"))
+	{
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	DBpatch_2050051(void)
+{
+	const ZBX_FIELD	field = {"iprange", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("drules", &field);
+}
+
+static int	DBpatch_2050052(void)
+{
+	const ZBX_FIELD field = {"default_inventory_mode", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_2050053(void)
+{
+	const ZBX_TABLE table =
+			{"opinventory", "operationid", 0,
+				{
+					{"operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"inventory_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050054(void)
+{
+	const ZBX_FIELD	field = {"operationid", NULL, "operations", "operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("opinventory", 1, &field);
+}
+
+static int	DBpatch_2050055(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	if (NULL == (result = DBselect(
+			"select severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,"
+				"severity_color_5"
+			" from config")))
+		return FAIL;
+
+	if (NULL == (row = DBfetch(result))) {
+		goto out;
+	}
+
+	if (0 == strcmp(row[0], "DBDBDB") && 0 == strcmp(row[1], "D6F6FF") &&
+			0 == strcmp(row[2], "FFF6A5") && 0 == strcmp(row[3], "FFB689") &&
+			0 == strcmp(row[4], "FF9999") && 0 == strcmp(row[5], "FF3838")) {
+		if (ZBX_DB_OK > DBexecute(
+				"update config set severity_color_0='97AAB3',severity_color_1='7499FF',"
+					"severity_color_2='FFC859',severity_color_3='FFA059',"
+					"severity_color_4='E97659',severity_color_5='E45959'"))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_2050056(void)
+{
+	const ZBX_FIELD field = {"severity_color_0", "97AAB3", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050057(void)
+{
+	const ZBX_FIELD field = {"severity_color_1", "7499FF", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050058(void)
+{
+	const ZBX_FIELD field = {"severity_color_2", "FFC859", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050059(void)
+{
+	const ZBX_FIELD field = {"severity_color_3", "FFA059", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050060(void)
+{
+	const ZBX_FIELD field = {"severity_color_4", "E97659", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050061(void)
+{
+	const ZBX_FIELD field = {"severity_color_5", "E45959", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
 #endif
 
 DBPATCH_START(2050)
@@ -555,19 +651,11 @@ DBPATCH_ADD(2050012, 0, 1)
 DBPATCH_ADD(2050013, 0, 0)
 DBPATCH_ADD(2050014, 0, 1)
 DBPATCH_ADD(2050015, 0, 1)
-DBPATCH_ADD(2050016, 0, 1)
-DBPATCH_ADD(2050017, 0, 1)
-DBPATCH_ADD(2050018, 0, 1)
 DBPATCH_ADD(2050019, 0, 1)
 DBPATCH_ADD(2050020, 0, 1)
 DBPATCH_ADD(2050021, 0, 1)
 DBPATCH_ADD(2050022, 0, 1)
 DBPATCH_ADD(2050023, 0, 1)
-DBPATCH_ADD(2050024, 0, 1)
-DBPATCH_ADD(2050025, 0, 1)
-DBPATCH_ADD(2050026, 0, 1)
-DBPATCH_ADD(2050027, 0, 1)
-DBPATCH_ADD(2050028, 0, 1)
 DBPATCH_ADD(2050029, 0, 1)
 DBPATCH_ADD(2050030, 0, 1)
 DBPATCH_ADD(2050031, 0, 1)
@@ -585,5 +673,21 @@ DBPATCH_ADD(2050042, 0, 1)
 DBPATCH_ADD(2050043, 0, 1)
 DBPATCH_ADD(2050044, 0, 1)
 DBPATCH_ADD(2050045, 0, 1)
+DBPATCH_ADD(2050046, 0, 1)
+DBPATCH_ADD(2050047, 0, 1)
+DBPATCH_ADD(2050048, 0, 1)
+DBPATCH_ADD(2050049, 0, 1)
+DBPATCH_ADD(2050050, 0, 1)
+DBPATCH_ADD(2050051, 0, 1)
+DBPATCH_ADD(2050052, 0, 1)
+DBPATCH_ADD(2050053, 0, 1)
+DBPATCH_ADD(2050054, 0, 1)
+DBPATCH_ADD(2050055, 0, 1)
+DBPATCH_ADD(2050056, 0, 1)
+DBPATCH_ADD(2050057, 0, 1)
+DBPATCH_ADD(2050058, 0, 1)
+DBPATCH_ADD(2050059, 0, 1)
+DBPATCH_ADD(2050060, 0, 1)
+DBPATCH_ADD(2050061, 0, 1)
 
 DBPATCH_END()

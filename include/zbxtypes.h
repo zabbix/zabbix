@@ -129,4 +129,6 @@ typedef struct
 }
 zbx_uint128_t;
 
+#define ZBX_SIZE_T_ALIGN8(size)	(((size) + 7) & ~(size_t)7)
+
 #endif

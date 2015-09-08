@@ -201,7 +201,7 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 	$result = DBend($result);
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows($pageFilter->hostid);
 	}
 	show_messages($result,
 		_n('Application deleted', 'Applications deleted', $deleted),
@@ -386,15 +386,13 @@ else {
 
 		// Info column is show when all hosts are selected or current host is not a template.
 		if ($pageFilter->hostid > 0) {
-			$host = API::Host()->get([
+			$hosts = API::Host()->get([
 				'output' => ['status'],
 				'hostids' => [$pageFilter->hostid]
 			]);
-			reset($host);
 
-			if ($host && $host['status'] != HOST_STATUS_TEMPLATE) {
-				$data['showInfoColumn'] = true;
-			}
+			$data['showInfoColumn'] = $hosts
+				&& ($hosts[0]['status'] == HOST_STATUS_MONITORED || $hosts[0]['status'] == HOST_STATUS_NOT_MONITORED);
 		}
 		else {
 			$data['showInfoColumn'] = true;

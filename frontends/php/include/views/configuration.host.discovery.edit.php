@@ -95,25 +95,25 @@ if (!empty($this->data['interfaces'])) {
 		->setId('interface_not_defined')
 		->setAttribute('style', 'display: none;');
 
-	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], false, 'interface_row');
+	$itemFormList->addRow(_('Host interface'), [$interfacesComboBox, $span], 'interface_row');
 	$itemForm->addVar('selectedInterfaceId', $this->data['interfaceid']);
 }
 $itemFormList->addRow(_('SNMP OID'),
 	(new CTextBox('snmp_oid', $this->data['snmp_oid'], $this->data['limited']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmp_oid'
+	'row_snmp_oid'
 );
 $itemFormList->addRow(_('Context name'),
 	(new CTextBox('snmpv3_contextname', $this->data['snmpv3_contextname']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmpv3_contextname'
+	'row_snmpv3_contextname'
 );
 $itemFormList->addRow(_('SNMP community'),
 	(new CTextBox('snmp_community', $this->data['snmp_community'], false, 64))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmp_community'
+	'row_snmp_community'
 );
 $itemFormList->addRow(_('Security name'),
 	(new CTextBox('snmpv3_securityname', $this->data['snmpv3_securityname'], false, 64))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmpv3_securityname'
+	'row_snmpv3_securityname'
 );
 
 // append snmpv3 security level to form list
@@ -122,52 +122,38 @@ $securityLevelComboBox = new CComboBox('snmpv3_securitylevel', $this->data['snmp
 	ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV => 'authNoPriv',
 	ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV => 'authPriv'
 ]);
-$itemFormList->addRow(_('Security level'), $securityLevelComboBox, false, 'row_snmpv3_securitylevel');
-$authProtocolRadioButton = [
-	(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_MD5))
-		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
-	new CLabel(_('MD5'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5),
-	(new CRadioButton('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_SHA, $this->data['snmpv3_authprotocol'] == ITEM_AUTHPROTOCOL_SHA))
-		->setId('snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA),
-	new CLabel(_('SHA'), 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
-];
+$itemFormList->addRow(_('Security level'), $securityLevelComboBox, 'row_snmpv3_securitylevel');
 $itemFormList->addRow(_('Authentication protocol'),
-	(new CDiv($authProtocolRadioButton))
-		->addClass('jqueryinputset')
-		->addClass('radioset'),
-	false, 'row_snmpv3_authprotocol'
+	(new CRadioButtonList('snmpv3_authprotocol', (int) $this->data['snmpv3_authprotocol']))
+		->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5)
+		->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA)
+		->setModern(true),
+	'row_snmpv3_authprotocol'
 );
 $itemFormList->addRow(_('Authentication passphrase'),
 	(new CTextBox('snmpv3_authpassphrase', $this->data['snmpv3_authpassphrase'], false, 64))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmpv3_authpassphrase'
+	'row_snmpv3_authpassphrase'
 );
-$privProtocolRadioButton = [
-	(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_DES))
-		->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
-	new CLabel(_('DES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES),
-	(new CRadioButton('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_AES, $this->data['snmpv3_privprotocol'] == ITEM_PRIVPROTOCOL_AES))
-		->setId('snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES),
-	new CLabel(_('AES'), 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
-];
 $itemFormList->addRow(_('Privacy protocol'),
-	(new CDiv($privProtocolRadioButton))
-		->addClass('jqueryinputset')
-		->addClass('radioset'),
-	false, 'row_snmpv3_privprotocol'
+	(new CRadioButtonList('snmpv3_privprotocol', (int) $this->data['snmpv3_privprotocol']))
+		->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES)
+		->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES)
+		->setModern(true),
+	'row_snmpv3_privprotocol'
 );
 $itemFormList->addRow(_('Privacy passphrase'),
 	(new CTextBox('snmpv3_privpassphrase', $this->data['snmpv3_privpassphrase'], false, 64))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_snmpv3_privpassphrase'
+	'row_snmpv3_privpassphrase'
 );
 $itemFormList->addRow(_('Port'),
-	(new CTextBox('port', $this->data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), false, 'row_port'
+	(new CTextBox('port', $this->data['port'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH), 'row_port'
 );
 $itemFormList->addRow(_('IPMI sensor'),
 	(new CTextBox('ipmi_sensor', $this->data['ipmi_sensor'], $this->data['limited'], 128))
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_ipmi_sensor'
+	'row_ipmi_sensor'
 );
 
 // append authentication method to form list
@@ -175,42 +161,41 @@ $authTypeComboBox = new CComboBox('authtype', $this->data['authtype'], null, [
 	ITEM_AUTHTYPE_PASSWORD => _('Password'),
 	ITEM_AUTHTYPE_PUBLICKEY => _('Public key')
 ]);
-$itemFormList->addRow(_('Authentication method'), $authTypeComboBox, false, 'row_authtype');
+$itemFormList->addRow(_('Authentication method'), $authTypeComboBox, 'row_authtype');
 $itemFormList->addRow(_('User name'),
 	(new CTextBox('username', $this->data['username'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	false, 'row_username'
+	'row_username'
 );
 $itemFormList->addRow(_('Public key file'),
 	(new CTextBox('publickey', $this->data['publickey'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	false, 'row_publickey'
+	'row_publickey'
 );
 $itemFormList->addRow(_('Private key file'),
 	(new CTextBox('privatekey', $this->data['privatekey'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	false,  'row_privatekey'
+	'row_privatekey'
 );
 $itemFormList->addRow(_('Password'),
 	(new CTextBox('password', $this->data['password'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-	false, 'row_password'
+	'row_password'
 );
 $itemFormList->addRow(_('Executed script'),
 	(new CTextArea('params_es', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'label_executed_script'
+	'label_executed_script'
 );
 $itemFormList->addRow(_('SQL query'),
 	(new CTextArea('params_ap', $this->data['params']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false,
 	'label_params'
 );
 
 $itemFormList->addRow(_('Update interval (in sec)'),
 	(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-	false, 'row_delay'
+	'row_delay'
 );
 
 // append delay flex to form list
 $delayFlexTable = (new CTable())
 	->setNoDataMessage(_('No flexible intervals defined.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setId('delayFlexTable')
 	->setHeader([_('Interval'), _('Period'), _('Action')]);
 $i = 0;
@@ -238,8 +223,11 @@ foreach ($this->data['delay_flex'] as $delayFlex) {
 		break;
 	}
 }
-$itemFormList->addRow(_('Flexible intervals'), (new CDiv($delayFlexTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
-	false, 'row_flex_intervals'
+$itemFormList->addRow(_('Flexible intervals'),
+	(new CDiv($delayFlexTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+	'row_flex_intervals'
 );
 
 // append new flexible interval to form list
@@ -264,13 +252,13 @@ $maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
 	->setAttribute('style', 'display: none;');
 
 $itemFormList
-	->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], false, 'row_new_delay_flex', 'new')
+	->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], 'row_new_delay_flex', 'new')
 	->addRow(_('Keep lost resources period (in days)'),
 		(new CTextBox('lifetime', $this->data['lifetime'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	)
 	->addRow(_('Allowed hosts'),
 		(new CTextBox('trapper_hosts', $this->data['trapper_hosts']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_trapper_hosts');
+	'row_trapper_hosts');
 
 // append description to form list
 $itemFormList->addRow(_('Description'),
@@ -287,14 +275,6 @@ $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 $conditionFormList = new CFormList();
 
 // type of calculation
-$formula = (new CTextBox('formula', $this->data['formula']))
-	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	->setId('formula')
-	->setAttribute('placeholder', 'A or (B and C) &hellip;');
-
-if ($this->data['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION)  {
-	$formula->addClass('hidden');
-}
 $conditionFormList->addRow(_('Type of calculation'),
 	[
 		new CComboBox('evaltype', $this->data['evaltype'], null, [
@@ -303,20 +283,23 @@ $conditionFormList->addRow(_('Type of calculation'),
 			CONDITION_EVAL_TYPE_OR => _('Or'),
 			CONDITION_EVAL_TYPE_EXPRESSION => _('Custom expression')
 		]),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CSpan(''))
-			->addClass($this->data['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION ? 'hidden' : '')
 			->setId('expression'),
-		$formula
+		(new CTextBox('formula', $this->data['formula']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('formula')
+			->setAttribute('placeholder', 'A or (B and C) &hellip;')
 	],
-	(count($this->data['conditions']) < 2), 'conditionRow'
+	'conditionRow'
 );
 
 // macros
 $conditionTable = (new CTable())
 	->setNoDataMessage('')
-	->addClass('formElementTable')
 	->setId('conditions')
-	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), '']);
+	->setAttribute('style', 'width: 100%;')
+	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
 $conditions = $this->data['conditions'];
 if (!$conditions) {
@@ -353,7 +336,9 @@ foreach ($conditions as $i => $condition) {
 			->addClass('element-table-remove')
 	];
 
-	$row = [$formulaId, $macro, new CSpan(_('matches')), $value, $deleteButtonCell];
+	$row = [$formulaId, $macro, new CSpan(_('matches')), $value,
+		(new CCol($deleteButtonCell))->addClass(ZBX_STYLE_NOWRAP)
+	];
 	$conditionTable->addRow($row, 'form_row');
 }
 
@@ -363,7 +348,11 @@ $conditionTable->setFooter(new CCol(
 		->addClass('element-table-add')
 ));
 
-$conditionFormList->addRow(_('Filters'), (new CDiv($conditionTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$conditionFormList->addRow(_('Filters'),
+	(new CDiv($conditionTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 // append tabs to form
 $itemTab = (new CTabView())

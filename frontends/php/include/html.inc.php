@@ -158,18 +158,14 @@ function get_table_header($columnLeft, $columnRights = SPACE) {
 	}
 
 	$table = (new CTable())
-		->addClass('ui-widget-header')
-		->addClass('header');
-	$table->setCellSpacing(0);
-	$table->setCellPadding(1);
-	$table->addRow([
-		(new CCol($columnLeft))
-			->addClass('header_l')
-			->addClass('left'),
-		(new CCol($rights))
-			->addClass('header_r')
-			->addClass('right')
-	]);
+		->addRow([
+			(new CCol($columnLeft))
+				->addClass('header_l')
+				->addClass('left'),
+			(new CCol($rights))
+				->addClass('header_r')
+				->addClass('right')
+		]);
 
 	return $table;
 }
@@ -281,7 +277,7 @@ function get_header_host_table($current_element, $hostid, $lld_ruleid = 0) {
 
 	if (!$db_host) {
 		$options = [
-			'output' => ['templateid', 'name'],
+			'output' => ['templateid', 'name', 'flags'],
 			'templateids' => [$hostid],
 			'editable' => true
 		];
@@ -563,6 +559,7 @@ function getHostAvailabilityTable($host) {
 			case HOST_AVAILABLE_FALSE:
 				$ai = (new CSpan($type))
 					->addClass(ZBX_STYLE_STATUS_RED)
+					->addClass(ZBX_STYLE_CURSOR_POINTER)
 					->setHint($host[$prefix.'error'], ZBX_STYLE_RED);
 				break;
 			case HOST_AVAILABLE_UNKNOWN:
@@ -800,6 +797,7 @@ function makeErrorIcon($error)
 {
 	return (new CSpan(bold('&times;')))
 		->addClass(ZBX_STYLE_STATUS_RED)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($error, ZBX_STYLE_RED);
 }
 
@@ -814,6 +812,7 @@ function makeUnknownIcon($error)
 {
 	return (new CSpan(bold('?')))
 		->addClass(ZBX_STYLE_STATUS_GREY)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($error, ZBX_STYLE_RED);
 }
 
@@ -828,6 +827,7 @@ function makeWarningIcon($error)
 {
 	return (new CSpan(bold('!')))
 		->addClass(ZBX_STYLE_STATUS_YELLOW)
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setHint($error);
 }
 
@@ -849,4 +849,37 @@ function makeDebugButton()
 				"showHideByName('zbx_debug_info', this.state);"
 			)
 	))->addClass(ZBX_STYLE_BTN_DEBUG);
+}
+
+/**
+ * Returns css for trigger severity backgrounds
+ *
+ * @param array $config
+ * @param array $config[severity_color_0]
+ * @param array $config[severity_color_1]
+ * @param array $config[severity_color_2]
+ * @param array $config[severity_color_3]
+ * @param array $config[severity_color_4]
+ * @param array $config[severity_color_5]
+ *
+ * @return string
+ */
+function getTriggerSeverityCss($config)
+{
+	$severities = [
+		ZBX_STYLE_NA_BG => $config['severity_color_0'],
+		ZBX_STYLE_INFO_BG => $config['severity_color_1'],
+		ZBX_STYLE_WARNING_BG => $config['severity_color_2'],
+		ZBX_STYLE_AVERAGE_BG => $config['severity_color_3'],
+		ZBX_STYLE_HIGH_BG => $config['severity_color_4'],
+		ZBX_STYLE_DISASTER_BG => $config['severity_color_5']
+	];
+
+	$css = '';
+
+	foreach ($severities as $class => $color) {
+		$css .= '.'.$class.', .'.$class.' input[type="radio"]:checked + label { background-color: #'.$color.' }'."\n";
+	}
+
+	return $css;
 }

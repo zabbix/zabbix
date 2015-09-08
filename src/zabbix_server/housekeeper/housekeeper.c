@@ -37,8 +37,8 @@ static int	hk_period;
 /* the maximum number of housekeeping periods to be removed per single housekeeping cycle */
 #define HK_MAX_DELETE_PERIODS		4
 
-/* the housekeeping configuration */
-static zbx_config_hk_t	hk_config;
+/* global configuration data containing housekeeping configuration */
+static zbx_config_t	cfg;
 
 /* Housekeeping rule definition.                                */
 /* A housekeeping rule describes table from which records older */
@@ -80,13 +80,13 @@ zbx_hk_cleanup_table_t;
 /* This mapping is used to exclude disabled tables from housekeeping  */
 /* cleanup procedure.                                                 */
 static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
-	{"history", &hk_config.history_mode},
-	{"history_log", &hk_config.history_mode},
-	{"history_str", &hk_config.history_mode},
-	{"history_text", &hk_config.history_mode},
-	{"history_uint", &hk_config.history_mode},
-	{"trends", &hk_config.trends_mode},
-	{"trends_uint", &hk_config.trends_mode},
+	{"history", &cfg.hk.history_mode},
+	{"history_log", &cfg.hk.history_mode},
+	{"history_str", &cfg.hk.history_mode},
+	{"history_text", &cfg.hk.history_mode},
+	{"history_uint", &cfg.hk.history_mode},
+	{"trends", &cfg.hk.trends_mode},
+	{"trends_uint", &cfg.hk.trends_mode},
 	{NULL}
 };
 
@@ -141,13 +141,13 @@ zbx_hk_history_rule_t;
 
 /* the history item rules, used for housekeeping history and trends tables */
 static zbx_hk_history_rule_t	hk_history_rules[] = {
-	{"history", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_str", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_log", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_uint", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"history_text", "history", &hk_config.history_mode, &hk_config.history_global, &hk_config.history},
-	{"trends", "trends", &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
-	{"trends_uint","trends", &hk_config.trends_mode, &hk_config.trends_global, &hk_config.trends},
+	{"history", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
+	{"history_str", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
+	{"history_log", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
+	{"history_uint", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
+	{"history_text", "history", &cfg.hk.history_mode, &cfg.hk.history_global, &cfg.hk.history},
+	{"trends", "trends", &cfg.hk.trends_mode, &cfg.hk.trends_global, &cfg.hk.trends},
+	{"trends_uint","trends", &cfg.hk.trends_mode, &cfg.hk.trends_global, &cfg.hk.trends},
 	{NULL}
 };
 
@@ -601,7 +601,7 @@ static int	housekeeping_cleanup()
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	/* first handle the trivial case when history and trend housekeeping is disabled */
-	if (ZBX_HK_OPTION_DISABLED == hk_config.history_mode && ZBX_HK_OPTION_DISABLED == hk_config.trends_mode)
+	if (ZBX_HK_OPTION_DISABLED == cfg.hk.history_mode && ZBX_HK_OPTION_DISABLED == cfg.hk.trends_mode)
 		goto out;
 
 	zbx_vector_uint64_create(&housekeeperids);
@@ -721,9 +721,9 @@ static int	housekeeping_sessions(int now)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() now:%d", __function_name, now);
 
-	if (ZBX_HK_OPTION_ENABLED == hk_config.sessions_mode)
+	if (ZBX_HK_OPTION_ENABLED == cfg.hk.sessions_mode)
 	{
-		rc = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_DAY * hk_config.sessions);
+		rc = DBexecute("delete from sessions where lastaccess<%d", now - SEC_PER_DAY * cfg.hk.sessions);
 
 		if (ZBX_DB_OK <= rc)
 			deleted = rc;
@@ -736,9 +736,9 @@ static int	housekeeping_sessions(int now)
 
 static int	housekeeping_services(int now)
 {
-	static zbx_hk_rule_t	rule = {"service_alarms", "", 0, &hk_config.services};
+	static zbx_hk_rule_t	rule = {"service_alarms", "", 0, &cfg.hk.services};
 
-	if (ZBX_HK_OPTION_ENABLED == hk_config.services_mode)
+	if (ZBX_HK_OPTION_ENABLED == cfg.hk.services_mode)
 		return housekeeping_process_rule(now, &rule);
 
 	return 0;
@@ -746,9 +746,9 @@ static int	housekeeping_services(int now)
 
 static int	housekeeping_audit(int now)
 {
-	static zbx_hk_rule_t	rule = {"auditlog", "", 0, &hk_config.audit};
+	static zbx_hk_rule_t	rule = {"auditlog", "", 0, &cfg.hk.audit};
 
-	if (ZBX_HK_OPTION_ENABLED == hk_config.audit_mode)
+	if (ZBX_HK_OPTION_ENABLED == cfg.hk.audit_mode)
 		return housekeeping_process_rule(now, &rule);
 
 	return 0;
@@ -758,26 +758,26 @@ static int	housekeeping_events(int now)
 {
 	static zbx_hk_rule_t 	rules[] = {
 		{"events", "source=" ZBX_STR(EVENT_SOURCE_TRIGGERS)
-			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &hk_config.events_trigger},
+			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &cfg.hk.events_trigger},
 		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &hk_config.events_discovery},
+			" and object=" ZBX_STR(EVENT_OBJECT_DHOST), 0, &cfg.hk.events_discovery},
 		{"events", "source=" ZBX_STR(EVENT_SOURCE_DISCOVERY)
-			" and object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &hk_config.events_discovery},
+			" and object=" ZBX_STR(EVENT_OBJECT_DSERVICE), 0, &cfg.hk.events_discovery},
 		{"events", "source=" ZBX_STR(EVENT_SOURCE_AUTO_REGISTRATION)
-			" and object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &hk_config.events_autoreg},
+			" and object=" ZBX_STR(EVENT_OBJECT_ZABBIX_ACTIVE), 0, &cfg.hk.events_autoreg},
 		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &hk_config.events_internal},
+			" and object=" ZBX_STR(EVENT_OBJECT_TRIGGER), 0, &cfg.hk.events_internal},
 		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_ITEM), 0, &hk_config.events_internal},
+			" and object=" ZBX_STR(EVENT_OBJECT_ITEM), 0, &cfg.hk.events_internal},
 		{"events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL)
-			" and object=" ZBX_STR(EVENT_OBJECT_LLDRULE), 0, &hk_config.events_internal},
+			" and object=" ZBX_STR(EVENT_OBJECT_LLDRULE), 0, &cfg.hk.events_internal},
 		{NULL}
 	};
 
 	int			deleted = 0;
 	zbx_hk_rule_t		*rule;
 
-	if (ZBX_HK_OPTION_ENABLED != hk_config.events_mode)
+	if (ZBX_HK_OPTION_ENABLED != cfg.hk.events_mode)
 		return 0;
 
 	for (rule = rules; NULL != rule->table; rule++)
@@ -844,7 +844,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
 
-		DCconfig_get_config_hk(&hk_config);
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_HOUSEKEEPER);
 
 		zbx_setproctitle("%s [removing old history and trends]", get_process_type_string(process_type));
 		sec = zbx_time();
@@ -871,6 +871,9 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 				" %d audit items in " ZBX_FS_DBL " sec, %s]",
 				get_process_type_string(process_type), d_history_and_trends, d_cleanup, d_events,
 				d_sessions, d_services, d_audit, sec, sleeptext);
+
+		zbx_config_clean(&cfg);
+
 		DBclose();
 
 		zbx_setproctitle("%s [deleted %d hist/trends, %d items, %d events, %d sessions, %d alarms, %d audit "
