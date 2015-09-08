@@ -132,7 +132,9 @@ abstract class CTriggerGeneral extends CApiService {
 			$newTrigger['dependencies'] = replace_template_dependencies($deps, $chdHost['hostid']);
 		}
 		$expressionData = new CTriggerExpression();
-		$expressionData->parse($trigger['expression']);
+		if (!$expressionData->parse($trigger['expression'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+		}
 
 		$newTrigger['expression'] = $trigger['expression'];
 		// replace template separately in each expression, only in beginning (host part)
