@@ -1,6 +1,7 @@
 Changes for 2.5.1
 
 New features:
+..F....... [ZBXNEXT-2662] added a new predefined period (3 days) for the timeline (Sasha)
 A......... [ZBXNEXT-2581] added returning of permissions for usergroup.get (Gunars, Ivo)
 ..F....... [ZBX-8820] improved bulk acknowledge of the events (Sasha)
 ..F....... [ZBXNEXT-210] changed macro type labels in template configuration form (Gunars)
@@ -9,15 +10,27 @@ A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discover
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-9807] fixed undefined offset errors in configuration export when processing triggers that have items with discovered applications (Ivo)
+A.F....... [ZBX-9810] fixed trigger prototype expression inheritance incorrectly assigning an invalid expression to child objects and trigger expression test popup displaying a missing class (Ivo)
+.......PS. [ZBX-7847] added functionality that stops polling inactive ipmi hosts (igors)
+...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
+..F....... [ZBXNEXT-2662] fixed a map element editing form (Sasha)
+..F.I..... [ZBXNEXT-2662] fixed possibility to change the colours of the trigger severities (Sasha)
+..F....... [ZBXNEXT-2662] fixed layout of the checkboxes with labels (Sasha)
+..F....... [ZBXNEXT-2662] fixed layout of the host inventory form (Sasha)
+..F....... [ZBXNEXT-2662] fixed editind of medias in the user form (Sasha)
+..F....... [ZBXNEXT-2662] fixed saving of the collapsible widgets in the "Event detais" and "Global search" pages (Sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of the vertical headers under IE10, IE11 and Edge (Sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of the eventlog severities (Sasha)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
-........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
+........S. [ZBX-9667] fixed disabled triggers or triggers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 ..F....... [ZBX-9625] fixed interface list bug in host form (Gunars)
 ..F....... [ZBX-9804] fixed monitoring graph scroller and calendar (Gunars)
 ..F....... [ZBX-9607] fixed step form in web scenario (Gunars, Sasha)
 ..F....... [ZBX-9791] fixed typo in maps.inc.php (Gunars)
 .......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
-........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of numeric item key parameters (igors)
 ..F....... [ZBX-9516] fixed displaying of the "Go" button after deleting applications (Gunars)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
@@ -31,6 +44,7 @@ A......... [ZBX-9738] fixed deletion of related action operations when deleting 
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-2662] implemented a new design for the Zabbix Web interface (Alexei, Sasha)
 ..F....... [ZBXNEXT-2703] implemented feature to filter dashboard by trigger name (Ivo)
 A.F.I...S. [ZBXNEXT-2892] increased IP range length and added support for tabulation, carriage return and newline characters (Ivo, wiper)
 ........S. [ZBXNEXT-2760] added zabbix[host,,items] and zabbix[host,,items_unsupported] keys to monitor the number of (unsupported) items per host (wiper)
@@ -132,13 +146,14 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 ..F....... [ZBX-9625] fixed interface list bug in host form (Gunars)
 ..F....... [ZBX-9607] fixed step form in web scenario (Gunars, Sasha)
 .......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
-........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
@@ -802,11 +817,12 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 .......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
-........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
 ...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
@@ -2098,7 +2114,7 @@ A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix t
 
 Bug fixes:
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
-........S. [ZBX-9677] fixed compilation warnings in the escalator.s module (igors)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
 ..F....... [ZBX-9639] fixed chart width validation (Gunars)
 ..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)

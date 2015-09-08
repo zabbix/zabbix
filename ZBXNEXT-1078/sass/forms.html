@@ -5,8 +5,8 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>Zabbix | Hosts</title>
-		<!--<link rel="stylesheet" href="stylesheets/screen.css">-->
-		<link rel="stylesheet" href="stylesheets/dark-theme.css">
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
         <link rel="icon" href="favicon.ico">
         <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
         <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
@@ -36,14 +36,17 @@
 	<form>
 	<div class="table-forms-container">
 	
-	<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
+	<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
 
 		<ul class="table-forms">
 		<li>
 		<div class="table-forms-td-left"><label for="HostName">Host name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="Disabled input field" disabled><button class="icon-help"></button><div class="red">You can't leave this empty.</div></div>
 		</li>
 		<li>
-		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Read only input field" readonly><button class="icon-cal"></button><div class="red">You can't leave this empty.</div></div>
+		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Read only input field" readonly><button class="icon-cal"></button></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Standard input field"></div>
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label>Groups</label></div><div class="table-forms-td-right">
@@ -60,7 +63,7 @@
 		<thead><tr><th></th><th>IP address</th><th>DNS name</th><th>Connect to</th><th>Port</th><th>Default</th><th></th></tr></thead>
 		<tbody>
 		<tr>
-		<td class="td-drag-icon"><div class="drag-icon disabled"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW" disabled><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew" disabled><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link" disabled>Remove</button></td>
+		<td class="td-drag-icon"><div class="drag-icon disabled"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW" disabled><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew" disabled><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link" disabled>Remove</button></td>
 		</tr>
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>

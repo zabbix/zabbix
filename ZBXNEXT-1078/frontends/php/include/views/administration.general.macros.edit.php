@@ -52,7 +52,9 @@ foreach ($data['macros'] as $i => $macro) {
 		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
 	}
 
-	$table->addRow([$macro_input, '&rArr;', $value_input, $button_cell], 'form_row');
+	$table->addRow([
+		$macro_input, '&rArr;', $value_input, (new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
+	], 'form_row');
 }
 
 // buttons
