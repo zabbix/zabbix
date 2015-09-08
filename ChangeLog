@@ -10,6 +10,7 @@ A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discover
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBXNEXT-1078] removed 'proc.mem[]' 5-th parameter (memtype) value 'dvm' on AIX (Andris)
 A......... [ZBX-9807] fixed undefined offset errors in configuration export when processing triggers that have items with discovered applications (Ivo)
 A.F....... [ZBX-9810] fixed trigger prototype expression inheritance incorrectly assigning an invalid expression to child objects and trigger expression test popup displaying a missing class (Ivo)
 .......PS. [ZBX-7847] added functionality that stops polling inactive ipmi hosts (igors)
