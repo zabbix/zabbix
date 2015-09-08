@@ -3,15 +3,14 @@
 			(new CCol(
 				(new CSpan('#{name}'))->addClass('bold')
 			))->setId('dcheckCell_#{dcheckid}'),
-			[
+			new CHorList([
 				(new CButton(null, _('Edit')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->onClick("javascript: showNewCheckForm(null, '#{dcheckid}');"),
 				(new CButton(null, _('Remove')))
 					->addClass(ZBX_STYLE_BTN_LINK)
 					->onClick("javascript: removeDCheckRow('#{dcheckid}');")
-					->addStyle('margin-left: 8px')
-			]
+			])
 		]))
 			->setId('dcheckRow_#{dcheckid}')
 			->toString()
@@ -102,16 +101,11 @@
 				</tr>
 				</tbody>
 			</table>
-			<table>
-				<tr>
-					<td>
-						<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" id="add_new_dcheck" name="add_new_dcheck"><?= _('Add') ?></button>
-					</td>
-					<td>
-						<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" id="cancel_new_dcheck" name="cancel_new_dcheck"><?= _('Cancel') ?></button>
-					</td>
-				</tr>
-			</table>
+			<?= (new CHorList([
+				(new CButton('add_new_dcheck', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
+				(new CButton('cancel_new_dcheck', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+			]))->toString()
+			?>
 		</div>
 	</div>
 </script>

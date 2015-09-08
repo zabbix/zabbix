@@ -1,6 +1,7 @@
 Changes for 2.5.1
 
 New features:
+..F....... [ZBXNEXT-2662] added a new predefined period (3 days) for the timeline (Sasha)
 A......... [ZBXNEXT-2581] added returning of permissions for usergroup.get (Gunars, Ivo)
 ..F....... [ZBX-8820] improved bulk acknowledge of the events (Sasha)
 ..F....... [ZBXNEXT-210] changed macro type labels in template configuration form (Gunars)
@@ -9,6 +10,14 @@ A.F.I..PS. [ZBXNEXT-1241] added host inventory mode setting for new and discover
 A.F....... [ZBX-1357] updated Czech and Japanese translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBXNEXT-2662] fixed a map element editing form (Sasha)
+..F.I..... [ZBXNEXT-2662] fixed possibility to change the colours of the trigger severities (Sasha)
+..F....... [ZBXNEXT-2662] fixed layout of the checkboxes with labels (Sasha)
+..F....... [ZBXNEXT-2662] fixed layout of the host inventory form (Sasha)
+..F....... [ZBXNEXT-2662] fixed editind of medias in the user form (Sasha)
+..F....... [ZBXNEXT-2662] fixed saving of the collapsible widgets in the "Event detais" and "Global search" pages (Sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of the vertical headers under IE10, IE11 and Edge (Sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of the eventlog severities (Sasha)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or triggers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
@@ -31,6 +40,7 @@ A......... [ZBX-9738] fixed deletion of related action operations when deleting 
 Changes for 2.5.0
 
 New features:
+..F....... [ZBXNEXT-2662] implemented a new design for the Zabbix Web interface (Alexei, Sasha)
 ..F....... [ZBXNEXT-2703] implemented feature to filter dashboard by trigger name (Ivo)
 A.F.I...S. [ZBXNEXT-2892] increased IP range length and added support for tabulation, carriage return and newline characters (Ivo, wiper)
 ........S. [ZBXNEXT-2760] added zabbix[host,,items] and zabbix[host,,items_unsupported] keys to monitor the number of (unsupported) items per host (wiper)

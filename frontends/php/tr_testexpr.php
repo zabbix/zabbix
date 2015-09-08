@@ -178,7 +178,7 @@ if ($allowedTesting && $test) {
 	}
 }
 
-$resultTable->setFooter([$outline, (new CCol($result))->addClass($style)], $resultTable->headerClass);
+$resultTable->setFooter([$outline, (new CCol($result))->addClass($style)]);
 
 $form_list->addRow(_('Result'),
 	(new CDiv($resultTable))

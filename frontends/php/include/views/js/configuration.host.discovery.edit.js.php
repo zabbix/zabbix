@@ -23,7 +23,7 @@ include dirname(__FILE__).'/common.item.edit.js.php';
 		<td>
 			<input type="text" id="conditions_#{rowNum}_value" name="conditions[#{rowNum}][value]" style="width: <?= ZBX_TEXTAREA_MACRO_VALUE_WIDTH ?>px" maxlength="255" placeholder="<?= _('regular expression') ?>">
 		</td>
-		<td>
+		<td class="<?= ZBX_STYLE_NOWRAP ?>">
 			<button class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove" type="button" id="conditions_#{rowNum}_remove" name="conditions_#{rowNum}_remove"><?= _('Remove') ?></button>
 		</td>
 	</tr>
