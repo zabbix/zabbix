@@ -22,7 +22,7 @@
 $widget = make_system_status($data['filter']);
 
 echo (new CJson())->encode([
-	'header' =>  _('System status'),
-	'body' =>  $widget->toString(),
-	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+	'header' => _('System status'),
+	'body' => $widget->toString(),
+	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
 ]);

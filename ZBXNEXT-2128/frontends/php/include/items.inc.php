@@ -1055,18 +1055,18 @@ function checkTimePeriod($period, $now) {
  * Get item minimum delay.
  *
  * @param string $delay
- * @param array $flexibe_intervals
+ * @param array $flexible_intervals
  *
  * @return string
  */
-function getItemDelay($delay, $flexibe_intervals) {
-	if (!empty($delay) || !$flexibe_intervals) {
+function getItemDelay($delay, $flexible_intervals) {
+	if (!empty($delay) || !$flexible_intervals) {
 		return $delay;
 	}
 	$minDelay = SEC_PER_YEAR;
 
-	foreach ($flexibe_intervals as $flexibe_interval) {
-		if (sscanf($flexibe_interval, "%d/%29s", $flexDelay, $flexPeriod) != 2) {
+	foreach ($flexible_intervals as $flexible_interval) {
+		if (sscanf($flexible_interval, "%d/%29s", $flexDelay, $flexPeriod) != 2) {
 			continue;
 		}
 		$minDelay = min($minDelay, $flexDelay);

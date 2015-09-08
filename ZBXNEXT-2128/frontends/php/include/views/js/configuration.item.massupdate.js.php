@@ -12,8 +12,8 @@
 			</ul>
 		</td>
 		<td>
-			<input type="text" id="delay_flex_#{rowNum}_delay" name="delay_flex[#{rowNum}][delay]"  maxlength="5" onchange="validateNumericBox(this, true, false);" placeholder="50" style="text-align: right;">
-			<input type="text"  id="delay_flex_#{rowNum}_schedule" name="delay_flex[#{rowNum}][schedule]" maxlength="255" placeholder="wd1-5h9-18" style="display: none;">
+			<input type="text" id="delay_flex_#{rowNum}_delay" name="delay_flex[#{rowNum}][delay]" maxlength="5" onchange="validateNumericBox(this, true, false);" placeholder="50" style="text-align: right;">
+			<input type="text" id="delay_flex_#{rowNum}_schedule" name="delay_flex[#{rowNum}][schedule]" maxlength="255" placeholder="wd1-5h9-18" style="display: none;">
 		</td>
 		<td>
 			<input type="text" id="delay_flex_#{rowNum}_period" name="delay_flex[#{rowNum}][period]" maxlength="255" placeholder="<?= ZBX_DEFAULT_INTERVAL ?>">
