@@ -35,15 +35,7 @@ if (!empty($DB['DB'])) {
 	$config = select_config();
 	$theme = getUserTheme($data['user']);
 
-	$severityCss = <<<CSS
-.disaster { background: #{$config['severity_color_5']} !important; }
-.high { background: #{$config['severity_color_4']} !important; }
-.average { background: #{$config['severity_color_3']} !important; }
-.warning { background: #{$config['severity_color_2']} !important; }
-.information { background: #{$config['severity_color_1']} !important; }
-.not_classified { background: #{$config['severity_color_0']} !important; }
-CSS;
-	$pageHeader->addStyle($severityCss);
+	$pageHeader->addStyle(getTriggerSeverityCss($config));
 
 	// perform Zabbix server check only for standard pages
 	if ($config['server_check_interval'] && !empty($ZBX_SERVER) && !empty($ZBX_SERVER_PORT)) {

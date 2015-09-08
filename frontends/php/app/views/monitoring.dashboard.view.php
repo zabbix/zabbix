@@ -45,9 +45,9 @@ $icon = (new CButton(null))
 
 $favouriteGraphs = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['favourite_graphs']))
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', true))
-	->setHeader(_('Favourite graphs'), [$icon], true)
+	->setHeader(_('Favourite graphs'), [$icon], true, 'zabbix.php?action=dashboard.widget')
 	->setFooter(new CList([
-		(new CLink(_('Graphs'), 'charts.php'))->addClass('highlight')
+		new CLink(_('Graphs'), 'charts.php')
 	]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.col', 0);
@@ -63,9 +63,9 @@ $icon = (new CButton(null))
 
 $favouriteMaps = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favourite_maps']))
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true))
-	->setHeader(_('Favourite maps'), [$icon], true)
+	->setHeader(_('Favourite maps'), [$icon], true, 'zabbix.php?action=dashboard.widget')
 	->setFooter(new CList([
-		(new CLink(_('Maps'), 'zabbix.php?action=map.view'))->addClass('highlight')
+		new CLink(_('Maps'), 'zabbix.php?action=map.view')
 	]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
@@ -81,10 +81,10 @@ $icon = (new CButton(null))
 
 $favouriteScreens = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']))
 	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true))
-	->setHeader(_('Favourite screens'), [$icon], true)
+	->setHeader(_('Favourite screens'), [$icon], true, 'zabbix.php?action=dashboard.widget')
 	->setFooter(new CList([
-		(new CLink(_('Screens'), 'screens.php'))->addClass('highlight'),
-		(new CLink(_('Slide shows'), 'slides.php'))->addClass('highlight')
+		new CLink(_('Screens'), 'screens.php'),
+		new CLink(_('Slide shows'), 'slides.php')
 	]));
 
 $col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);
@@ -144,7 +144,7 @@ foreach ($widgets as $widgetid => $widget) {
 
 	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass('preloader')))
 		->setExpanded($expanded)
-		->setHeader(null, [$icon], true)
+		->setHeader(null, [$icon], true, 'zabbix.php?action=dashboard.widget')
 		->setFooter(new CList([
 			(new CListItem(''))->setId($widgetid.'_footer')
 		]));
