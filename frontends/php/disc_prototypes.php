@@ -271,7 +271,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 					info(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
-				elseif (strpos($interval['period'], ';')  !== false) {
+				elseif (strpos($interval['period'], ';') !== false) {
 					$result = false;
 					info(_s('Invalid interval "%1$s".', $interval['period']));
 					break;

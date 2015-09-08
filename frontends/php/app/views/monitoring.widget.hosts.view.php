@@ -362,7 +362,7 @@ foreach ($groups as $group) {
 }
 
 echo (new CJson())->encode([
-	'header' =>  _('Host status'),
-	'body' =>  (new CDiv($table))->toString(),
-	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+	'header' => _('Host status'),
+	'body' => (new CDiv($table))->toString(),
+	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
 ]);

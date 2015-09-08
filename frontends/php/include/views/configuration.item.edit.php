@@ -227,7 +227,7 @@ if ($this->data['limited']) {
 		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH);
 }
 else {
-	$dataType = new CComboBox('data_type', $this->data['data_type'], null,  item_data_type2str());
+	$dataType = new CComboBox('data_type', $this->data['data_type'], null, item_data_type2str());
 }
 $itemFormList->addRow(_('Data type'), $dataType, 'row_data_type');
 $itemFormList->addRow(_('Units'),

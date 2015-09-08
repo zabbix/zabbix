@@ -53,13 +53,13 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 		'name' => getRequest('name'),
 		'timeout' => getRequest('timeout'),
 		'url' => getRequest('url'),
-		'posts'  => getRequest('posts'),
+		'posts' => getRequest('posts'),
 		'variables' => getRequest('variables'),
 		'required' => getRequest('required'),
 		'status_codes' => getRequest('status_codes'),
 		'headers' => getRequest('headers'),
 		'follow_redirects' => getRequest('follow_redirects'),
-		'retrieve_mode'  => getRequest('retrieve_mode')
+		'retrieve_mode' => getRequest('retrieve_mode')
 	];
 
 	if (!hasRequest('stepid')) {
