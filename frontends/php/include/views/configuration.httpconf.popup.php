@@ -58,8 +58,8 @@ if ((hasRequest('add') || hasRequest('update')) && $result) {
 		'required' => getRequest('required'),
 		'status_codes' => getRequest('status_codes'),
 		'headers' => getRequest('headers'),
-		'follow_redirects' => getRequest('follow_redirects'),
-		'retrieve_mode'  => getRequest('retrieve_mode')
+		'follow_redirects' => getRequest('follow_redirects', HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF),
+		'retrieve_mode'  => getRequest('retrieve_mode', HTTPTEST_STEP_RETRIEVE_MODE_CONTENT)
 	];
 
 	if (!hasRequest('stepid')) {

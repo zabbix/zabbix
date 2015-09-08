@@ -260,8 +260,7 @@ if (hasRequest('sform')) {
 	);
 
 	$form_list->addRow(null, [
-		new CCheckBox('iregexp'),
-		'iregexp',
+		new CLabel([new CCheckBox('iregexp'), 'iregexp'], 'iregexp'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('add_key_and', _('AND')))
 			->addClass(ZBX_STYLE_BTN_GREY)
@@ -303,15 +302,15 @@ if (hasRequest('sform')) {
 			->onMouseover('javascript: this.style.cursor = "pointer";')
 			->addClass('updown');
 
-		$del_url = (new CButton(null, _('Delete')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->onClick('javascript: remove_expression("logtr'.$id.'");');
-
 		$row = new CRow([
 			htmlspecialchars($expr['value']),
 			($expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
 			[$imgup, ' ', $imgdn],
-			$del_url
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('javascript: remove_expression("logtr'.$id.'");')
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 		$row->setId('logtr'.$id);
 		$table->addRow($row);
@@ -327,11 +326,15 @@ if (hasRequest('sform')) {
 
 	$maxId = 0;
 	foreach ($keys as $id => $val) {
-		$del_url = (new CButton(null, _('Delete')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->onClick('javascript: remove_keyword("keytr'.$id.'");');
-
-		$row = new CRow([htmlspecialchars($val['value']), $val['type'], $del_url]);
+		$row = new CRow([
+			htmlspecialchars($val['value']),
+			$val['type'],
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('javascript: remove_keyword("keytr'.$id.'");')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]);
 		$row->setId('keytr'.$id);
 		$keyTable->addRow($row);
 

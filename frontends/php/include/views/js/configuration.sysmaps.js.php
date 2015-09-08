@@ -1,502 +1,455 @@
 <script type="text/x-jquery-tmpl" id="mapElementFormTpl">
-	<div class="dashbrd-widget-head <?= ZBX_STYLE_CURSOR_MOVE ?>">
-		<h4 id="formDragHandler">Map element</h4>
-	</div>
-	<form id="selementForm" name="selementForm">
-		<input type="hidden" id="elementid" name="elementid">
-		<table id="elementFormTable" class="table-forms">
-			<tbody>
-			<tr>
-				<td class="table-forms-td-left">
-					<label for="elementType"><?= _('Type') ?></label>
-				</td>
-				<td class="table-forms-td-right">
-					<select name="elementtype" id="elementType">
-						<option value="<?= SYSMAP_ELEMENT_TYPE_HOST ?>"><?= _('Host') ?></option>
-						<option value="<?= SYSMAP_ELEMENT_TYPE_MAP ?>"><?= _('Map') ?></option>
-						<option value="<?= SYSMAP_ELEMENT_TYPE_TRIGGER ?>"><?= _('Trigger') ?></option>
-						<option value="<?= SYSMAP_ELEMENT_TYPE_HOST_GROUP ?>"><?= _('Host group') ?></option>
-						<option value="<?= SYSMAP_ELEMENT_TYPE_IMAGE ?>"><?= _('Image') ?></option>
-					</select>
-				</td>
-			</tr>
-			<tr id="subtypeRow">
-				<td class="table-forms-td-left"><?= _('Show') ?></td>
-				<td class="table-forms-td-right">
-					<div class="groupingContent">
-						<input id="subtypeHostGroup" type="radio" name="elementsubtype" value="0" checked="checked">
-						<label for="subtypeHostGroup"><?= _('Host group') ?></label>
-						<br />
-						<input id="subtypeHostGroupElements" type="radio" name="elementsubtype" value="1">
-						<label for="subtypeHostGroupElements"><?= _('Host group elements') ?></label>
-					</div>
-				</td>
-			</tr>
-			<tr id="areaTypeRow">
-				<td class="table-forms-td-left"><?= _('Area type') ?></td>
-				<td class="table-forms-td-right">
-					<div class="groupingContent">
-						<input id="areaTypeAuto" type="radio" name="areatype" value="0" checked="checked">
-						<label for="areaTypeAuto"><?= _('Fit to map') ?></label>
-						<br />
-						<input id="areaTypeCustom" type="radio" name="areatype" value="1">
-						<label for="areaTypeCustom"><?= _('Custom size') ?></label>
-					</div>
-				</td>
-			</tr>
-			<tr id="areaSizeRow">
-				<td class="table-forms-td-left"><?= _('Area size') ?></td>
-				<td class="table-forms-td-right">
-					<label for="areaSizeWidth"><?= _('Width') ?></label>
-					<input id="areaSizeWidth" type="text" name="width" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
-					<label for="areaSizeHeight"><?= _('Height') ?></label>
-					<input id="areaSizeHeight" type="text" name="height" value="200" style="width: <?= ZBX_TEXTAREA_TINY_WIDTH ?>px">
-				</td>
-			</tr>
-			<tr id="areaPlacingRow">
-				<td class="table-forms-td-left">
-					<label for="areaPlacing"><?= _('Placing algorithm') ?></label>
-				</td>
-				<td class="table-forms-td-right">
-					<select id="areaPlacing">
-						<option value="<?= SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID ?>"><?= _('Grid') ?></option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td class="table-forms-td-left">
-					<label for="elementLabel"><?= _('Label') ?></label>
-				</td>
-				<td class="table-forms-td-right">
-					<textarea id="elementLabel" cols="56" rows="4" name="label" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
-				</td>
-			</tr>
-			<tr>
-				<td class="table-forms-td-left">
-					<label for="label_location"><?= _('Label location') ?></label>
-				</td>
-				<td class="table-forms-td-right">
-					<select id="label_location" name="label_location">
-						<option value="<?= MAP_LABEL_LOC_DEFAULT ?>"><?= _('Default') ?></option>
-						<option value="<?= MAP_LABEL_LOC_BOTTOM ?>"><?= _('Bottom') ?></option>
-						<option value="<?= MAP_LABEL_LOC_LEFT ?>"><?= _('Left') ?></option>
-						<option value="<?= MAP_LABEL_LOC_RIGHT ?>"><?= _('Right') ?></option>
-						<option value="<?= MAP_LABEL_LOC_TOP ?>"><?= _('Top') ?></option>
-					</select>
-				</td>
-			</tr>
-			<tr id="hostGroupSelectRow">
-				<td class="table-forms-td-left"><?= _('Host group') ?></td>
-				<td class="table-forms-td-right">
-					<div id="elementNameHostGroup" class="multiselect" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></div>
-				</td>
-			</tr>
-			<tr id="hostSelectRow">
-				<td class="table-forms-td-left"><?= _('Host') ?></td>
-				<td class="table-forms-td-right">
-					<div id="elementNameHost" class="multiselect" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></div>
-				</td>
-			</tr>
-			<tr id="triggerSelectRow">
-				<td class="table-forms-td-left"><?= _('Trigger') ?></td>
-				<td class="table-forms-td-right">
-					<input type="hidden" id="elementExpressionTrigger" name="elementExpressionTrigger">
-					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameTrigger" name="elementName" type="text">
-					<button type="button" class="<?= ZBX_STYLE_BTN_GREY ?>" onclick="PopUp('popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1&real_hosts=1&noempty=1')"><?= _('Select') ?></button>
-				</td>
-			</tr>
-			<tr id="mapSelectRow">
-				<td class="table-forms-td-left"><?= _('Map') ?></td>
-				<td class="table-forms-td-right">
-					<input readonly="readonly" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" id="elementNameMap" name="elementName" type="text">
-					<button type="button" class="btn-grey" onclick='PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}")'><?= _('Select') ?></button>
-				</td>
-			</tr>
-			<tr id="application-select-row">
-				<td class="table-forms-td-left"><?= _('Application') ?></td>
-				<td class="table-forms-td-right">
-					<input id="application" name="application" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" type="text">
-					<button class="<?= ZBX_STYLE_BTN_GREY ?>" id="application-select" type="button"><?= _('Select') ?></button>
-				</td>
-			</tr>
-
-			<tr>
-				<td class="table-forms-td-right" colspan="2">
-					<fieldset>
-						<legend><?= _('Icons') ?></legend>
-						<table>
-							<tbody>
-							<tr id="useIconMapRow">
-								<td colspan="2">
-									<label for="use_iconmap" id=use_iconmapLabel>
-										<input type="checkbox" name="use_iconmap" id="use_iconmap" value="1">
-										<?= _('Automatic icon selection') ?>
-									</label>
-								</td>
-							</tr>
-							<tr>
-								<td>
-									<label for="iconid_off"><?= _('Default') ?></label>
-									<select name="iconid_off" id="iconid_off"></select>
-								</td>
-								<td id="iconProblemRow">
-									<label for="iconid_on"><?= _('Problem') ?></label>
-									<select name="iconid_on" id="iconid_on"></select>
-								</td>
-							</tr>
-							<tr>
-								<td id="iconMainetnanceRow">
-									<label for="iconid_maintenance"><?= _('Maintenance') ?></label>
-									<select name="iconid_maintenance" id="iconid_maintenance"></select>
-								</td>
-								<td id="iconDisabledRow">
-									<label for="iconid_disabled"><?= _('Disabled') ?></label>
-									<select name="iconid_disabled" id="iconid_disabled"></select>
-								</td>
-							</tr>
-							</tbody>
-						</table>
-					</fieldset>
-				</td>
-			</tr>
-
-			<tr>
-				<td class="table-forms-td-left"><?= _('Coordinates') ?></td>
-				<td class="table-forms-td-right">
-					<input id="x" type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" name="x">
-					<label for="x"><?= _('X') ?></label>
-					<input type="number" maxlength="5" value="0" style="width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px" id="y" name="y">
-					<label for="y"><?= _('Y') ?></label>
-				</td>
-			</tr>
-
-			<tr>
-				<td class="table-forms-td-right" colspan="2">
-					<fieldset>
-						<legend><?= _('URLs') ?></legend>
-						<table>
-							<thead>
-							<tr>
-								<td><label><?= _('Name') ?></label></td>
-								<td><label><?= _('URL') ?></label></td>
-								<td></td>
-							</tr>
-							</thead>
-							<tbody id="urlContainer"></tbody>
-							<tfoot>
-							<tr>
-								<td colspan=3>
-									<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" id="newSelementUrl"><?= _('Add') ?></button>
-								</td>
-							</tr>
-							</tfoot>
-						</table>
-					</fieldset>
-				</td>
-			</tr>
-			</tbody>
-			<tfoot>
-			<tr class="footer">
-				<td colspan="2">
-					<button class="element-edit-control" id="elementApply" type="button"><?= _('Apply') ?></button>
-					<button class="element-edit-control" id="elementRemove" type="button"><?= _('Remove') ?></button>
-					<button id="elementClose" type="button"><?= _('Close') ?></button>
-				</td>
-			</tr>
-			</tfoot>
-		</table>
-	</form>
+	<?= (new CDiv(new CTag('h4', true, _('Map element'))))
+		->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+		->addClass(ZBX_STYLE_CURSOR_MOVE)
+		->setId('formDragHandler')
+		->toString()
+	?>
+	<?= (new CForm())
+		->cleanItems()
+		->setName('selementForm')
+		->setId('selementForm')
+		->addVar('elementid', '')
+		->addItem(
+			(new CFormList())
+				->addRow(_('Type'),
+					(new CComboBox('elementtype', null, null, [
+						SYSMAP_ELEMENT_TYPE_HOST => _('Host'),
+						SYSMAP_ELEMENT_TYPE_MAP => _('Map'),
+						SYSMAP_ELEMENT_TYPE_TRIGGER => _('Trigger'),
+						SYSMAP_ELEMENT_TYPE_HOST_GROUP => _('Host group'),
+						SYSMAP_ELEMENT_TYPE_IMAGE => _('Image')
+					]))->setId('elementType')
+				)
+				->addRow(_('Show'),
+					(new CRadioButtonList('elementsubtype', null))
+						->addValue(_('Host group'), SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP, 'subtypeHostGroup')
+						->addValue(_('Host group elements'), SYSMAP_ELEMENT_SUBTYPE_HOST_GROUP_ELEMENTS, 'subtypeHostGroupElements')
+						->setModern(true),
+					'subtypeRow'
+				)
+				->addRow(_('Area type'),
+					(new CRadioButtonList('areatype', null))
+						->addValue(_('Fit to map'), SYSMAP_ELEMENT_AREA_TYPE_FIT, 'areaTypeAuto')
+						->addValue(_('Custom size'), SYSMAP_ELEMENT_AREA_TYPE_CUSTOM, 'areaTypeCustom')
+						->setModern(true),
+					'areaTypeRow'
+				)
+				->addRow(new CLabel(_('Area size'), 'areaSizeWidth'), [
+					_('Width'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CTextBox('width'))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setId('areaSizeWidth'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					_('Height'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CTextBox('height'))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setId('areaSizeHeight')
+				], 'areaSizeRow')
+				->addRow(_('Placing algorithm'),
+					(new CRadioButtonList(null, SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID))
+						->addValue(_('Grid'), SYSMAP_ELEMENT_AREA_VIEWTYPE_GRID)
+						->setModern(true),
+					'areaPlacingRow'
+				)
+				->addRow(_('Label'),
+					(new CTextArea('label'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setRows(2)
+						->setId('elementLabel')
+				)
+				->addRow(_('Label location'),
+					new CComboBox('label_location', null, null, [
+						MAP_LABEL_LOC_DEFAULT => _('Default'),
+						MAP_LABEL_LOC_BOTTOM => _('Bottom'),
+						MAP_LABEL_LOC_LEFT => _('Left'),
+						MAP_LABEL_LOC_RIGHT => _('Right'),
+						MAP_LABEL_LOC_TOP => _('Top')
+					])
+				)
+				->addRow(_('Host group'),
+					(new CMultiSelect([
+						'name' => 'elementNameHostGroup',
+						'objectName' => 'hostGroup'
+					]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					'hostGroupSelectRow'
+				)
+				->addRow(_('Host'),
+					(new CMultiSelect([
+						'name' => 'elementNameHost',
+						'objectName' => 'hosts'
+					]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					'hostSelectRow'
+				)
+				->addRow(_('Trigger'), [
+					new CVar('elementExpressionTrigger', ''),
+					(new CTextBox('elementName'))
+						->setReadonly(true)
+						->setId('elementNameTrigger')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton(null, _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->onClick('PopUp("popup.php?writeonly=1&dstfrm=selementForm&dstfld1=elementid'.
+							'&dstfld2=elementNameTrigger&dstfld3=elementExpressionTrigger&srctbl=triggers'.
+							'&srcfld1=triggerid&srcfld2=description&srcfld3=expression&with_triggers=1'.
+							'&real_hosts=1&noempty=1")')
+				], 'triggerSelectRow')
+				->addRow(_('Map'), [
+					(new CTextBox('elementName'))
+						->setReadonly(true)
+						->setId('elementNameMap')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton(null, _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->onClick('PopUp("popup.php?srctbl=sysmaps&srcfld1=sysmapid&srcfld2=name&dstfrm=selementForm'.
+							'&dstfld1=elementid&dstfld2=elementNameMap&writeonly=1&excludeids[]=#{sysmapid}")')
+				], 'mapSelectRow')
+				->addRow(_('Application'), [
+					(new CTextBox('application'))
+						->setId('application')
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton(null, _('Select')))
+						->setId('application-select')
+						->addClass(ZBX_STYLE_BTN_GREY)
+				], 'application-select-row')
+				->addRow(_('Automatic icon selection'),
+					new CCheckBox('use_iconmap'),
+					'useIconMapRow'
+				)
+				->addRow(_('Icons'),
+					(new CDiv(
+						(new CTable())
+							->addRow([new CLabel(_('Default'), 'iconid_off'), new CComboBox('iconid_off')])
+							->addRow(
+								(new CRow([new CLabel(_('Problem'), 'iconid_on'), new CComboBox('iconid_on')]))
+									->setId('iconProblemRow')
+							)
+							->addRow(
+								(new CRow([
+									new CLabel(_('Maintenance'), 'iconid_maintenance'),
+									new CComboBox('iconid_maintenance')
+								]))->setId('iconMainetnanceRow')
+							)
+							->addRow(
+								(new CRow([
+									new CLabel(_('Disabled'), 'iconid_disabled'),
+									new CComboBox('iconid_disabled')
+								]))->setId('iconDisabledRow')
+							)
+							->setAttribute('style', 'width: 100%;')
+					))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				)
+				->addRow(new CLabel(_('Coordinates'), 'x'), [
+					_('X'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CTextBox('x'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					_('Y'),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CTextBox('y'))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+				], 'areaSizeRow')
+				->addRow(_('URLs'),
+					(new CDiv([
+						(new CTable())
+							->setHeader([_('Name'), _('URL'), _('Action')])
+							->setId('urlContainer')
+							->setAttribute('style', 'width: 100%;'),
+						(new CButton(null, _('Add')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->setId('newSelementUrl')
+					]))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				)
+				->addItem([
+					(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+					(new CDiv([
+						(new CButton(null, _('Apply')))
+							->addClass('element-edit-control')
+							->setId('elementApply'),
+						(new CButton(null, _('Remove')))
+							->addClass('element-edit-control')
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->setId('elementRemove'),
+						(new CButton(null, _('Close')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->setId('elementClose')
+					]))
+						->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+						->addClass(ZBX_STYLE_TFOOT_BUTTONS)
+				])
+		)
+		->toString()
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="mapMassFormTpl">
-	<form id="massForm">
-		<table>
-			<tbody>
-			<tr class="header">
-				<td id="massDragHandler" colspan="2" class="form_row_first move">
-					<?= _('Mass update elements') ?>&nbsp;
-					(<span id="massElementCount"></span>&nbsp;<?= _('elements') ?>)
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					<?= _('Selected elements') ?>:
-					<div id="elements-selected">
-						<table>
-							<tbody id="massList"></tbody>
-						</table>
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_label" id="chkboxLabel">
-					<label for="chkboxLabel"><?= _('Label') ?></label>
-				</td>
-				<td>
-					<textarea id="massLabel" rows="4" name="label" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_label_location" id="chkboxLabelLocation">
-					<label for="chkboxLabelLocation"><?= _('Label location') ?></label>
-				</td>
-				<td>
-					<select id="massLabelLocation" name="label_location">
-						<option value="<?= MAP_LABEL_LOC_DEFAULT ?>"><?= _('Default') ?></option>
-						<option value="<?= MAP_LABEL_LOC_BOTTOM ?>"><?= _('Bottom') ?></option>
-						<option value="<?= MAP_LABEL_LOC_LEFT ?>"><?= _('Left') ?></option>
-						<option value="<?= MAP_LABEL_LOC_RIGHT ?>"><?= _('Right') ?></option>
-						<option value="<?= MAP_LABEL_LOC_TOP ?>"><?= _('Top') ?></option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_use_iconmap" id="chkboxMassUseIconmap">
-					<label for="chkboxMassUseIconmap"><?= _('Automatic icon selection') ?></label>
-				</td>
-				<td>
-					<input type="checkbox" name="use_iconmap" id="massUseIconmap" value="1">
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_iconid_off" id="chkboxMassIconidOff">
-					<label for="chkboxMassIconidOff"><?= _('Icon (default)') ?></label>
-				</td>
-				<td>
-					<select name="iconid_off" id="massIconidOff"></select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_iconid_on" id="chkboxMassIconidOn">
-					<label for="chkboxMassIconidOn"><?= _('Icon (problem)') ?></label>
-				</td>
-				<td>
-					<select name="iconid_on" id="massIconidOn"></select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_iconid_maintenance" id="chkboxMassIconidMaintenance">
-					<label for="chkboxMassIconidMaintenance"><?= _('Icon (maintenance)') ?></label>
-				</td>
-				<td>
-					<select name="iconid_maintenance" id="massIconidMaintenance"></select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<input type="checkbox" name="chkbox_iconid_disabled" id="chkboxMassIconidDisabled">
-					<label for="chkboxMassIconidDisabled"><?= _('Icon (disabled)') ?></label>
-				</td>
-				<td>
-					<select name="iconid_disabled" id="massIconidDisabled"></select>
-				</td>
-			</tr>
-			<tr class="footer">
-				<td colspan="2">
-					<button class="element-edit-control" id="massApply" type="button"><?= _('Apply') ?></button>
-					<button class="element-edit-control" id="massRemove" type="button"><?= _('Remove') ?></button>
-					<button id="massClose" type="button"><?= _('Close') ?></button>
-				</td>
-			</tr>
-			</tbody>
-		</table>
-	</form>
+	<?= (new CDiv(new CTag('h4', true, _('Mass update elements'))))
+		->addClass(ZBX_STYLE_DASHBRD_WIDGET_HEAD)
+		->addClass(ZBX_STYLE_CURSOR_MOVE)
+		->setId('massDragHandler')
+		->toString()
+	?>
+	<?= (new CForm())
+		->cleanItems()
+		->setId('massForm')
+		->addItem(
+			(new CFormList())
+				->addRow(_('Selected elements'),
+					(new CDiv(
+						(new CTable())
+							->setHeader([_('Type'), _('Name')])
+							->setAttribute('style', 'width: 100%;')
+							->setId('massList')
+					))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				)
+				->addRow(
+					new CLabel([(new CCheckBox('chkbox_label'))->setId('chkboxLabel'), _('Label')], 'chkboxLabel'),
+					(new CTextArea('label'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setRows(2)
+						->setId('massLabel')
+				)
+				->addRow(
+					new CLabel([
+						(new CCheckBox('chkbox_label_location'))->setId('chkboxLabelLocation'),
+						_('Label location')
+					], 'chkboxLabelLocation'),
+					(new CComboBox('label_location', null, null, [
+						MAP_LABEL_LOC_DEFAULT => _('Default'),
+						MAP_LABEL_LOC_BOTTOM => _('Bottom'),
+						MAP_LABEL_LOC_LEFT => _('Left'),
+						MAP_LABEL_LOC_RIGHT => _('Right'),
+						MAP_LABEL_LOC_TOP => _('Top')
+					]))->setId('massLabelLocation')
+				)
+				->addRow(
+					new CLabel([
+						(new CCheckBox('chkbox_use_iconmap'))->setId('chkboxMassUseIconmap'),
+						_('Automatic icon selection')
+					], 'chkboxMassUseIconmap'),
+					(new CCheckBox('use_iconmap'))->setId('massUseIconmap')
+				)
+				->addRow(
+					new CLabel([
+						(new CCheckBox('chkbox_iconid_off'))->setId('chkboxMassIconidOff'),
+						_('Icon (default)')
+					], 'chkboxMassIconidOff'),
+					(new CComboBox('iconid_off'))->setId('massIconidOff')
+				)
+				->addRow(
+					new CLabel([
+						(new CCheckBox('chkbox_iconid_on'))->setId('chkboxMassIconidOn'),
+						_('Icon (problem)')
+					], 'chkboxMassIconidOn'),
+					(new CComboBox('iconid_on'))->setId('massIconidOn')
+				)
+				->addRow(
+					new CLabel([
+						(new CCheckBox('chkbox_iconid_maintenance'))->setId('chkboxMassIconidMaintenance'),
+						_('Icon (maintenance)')
+					], 'chkboxMassIconidMaintenance'),
+					(new CComboBox('iconid_maintenance'))->setId('massIconidMaintenance')
+				)
+				->addRow(
+					new CLabel([
+						(new CCheckBox('chkbox_iconid_disabled'))->setId('chkboxMassIconidDisabled'),
+						_('Icon (disabled)')
+					], 'chkboxMassIconidDisabled'),
+					(new CComboBox('iconid_disabled'))->setId('massIconidDisabled')
+				)
+				->addItem([
+					(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+					(new CDiv([
+						(new CButton(null, _('Apply')))
+							->addClass('element-edit-control')
+							->setId('massApply'),
+						(new CButton(null, _('Remove')))
+							->addClass('element-edit-control')
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->setId('massRemove'),
+						(new CButton(null, _('Close')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->setId('massClose')
+					]))
+						->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+						->addClass(ZBX_STYLE_TFOOT_BUTTONS)
+				])
+		)
+		->toString()
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="mapMassFormListRow">
-	<tr>
-		<td>#{elementType}</td>
-		<td>#{elementName}</td>
-	</tr>
+	<?= (new CRow(['#{elementType}', '#{elementName}']))->toString() ?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="linkFormTpl">
-	<div id="mapLinksContainer">
-		<table id="element-links" class="element-links">
-			<caption><?= _('Links for the selected element') ?></caption>
-			<thead>
-			<tr class="header">
-				<td></td>
-				<td><?= _('Element name') ?></td>
-				<td><?= _('Link indicators') ?></td>
-			</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
-		<table id="mass-element-links" class="element-links">
-			<caption><?= _('Links between the selected elements') ?></caption>
-			<thead>
-			<tr class="header">
-				<td></td>
-				<td><?= _('From') ?></td>
-				<td><?= _('To') ?></td>
-				<td><?= _('Link indicators') ?></td>
-			</tr>
-			</thead>
-			<tbody></tbody>
-		</table>
-	</div>
-	<form id="linkForm" name="linkForm">
-		<input type="hidden" name="selementid1">
-
-		<table>
-			<tbody>
-			<tr>
-				<td>
-					<label for="linklabel"><?= _('Label') ?></label>
-				</td>
-				<td>
-					<textarea cols="48" rows="4" name="label" id="linklabel" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px"></textarea>
-				</td>
-			</tr>
-			<tr id="link-connect-to">
-				<td>
-					<label for="selementid2"><?= _('Connect to') ?></label>
-				</td>
-				<td>
-					<select name="selementid2" id="selementid2"></select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label for="drawtype"><?= _('Type (OK)') ?></label>
-				</td>
-				<td>
-					<select name="drawtype" id="drawtype">
-						<option value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>"><?= _('Line') ?></option>
-						<option value="<?= GRAPH_ITEM_DRAWTYPE_BOLD_LINE ?>"><?= _('Bold line') ?></option>
-						<option value="<?= GRAPH_ITEM_DRAWTYPE_DOT ?>"><?= _('Dot') ?></option>
-						<option value="<?= GRAPH_ITEM_DRAWTYPE_DASHED_LINE ?>"><?= _('Dashed line') ?></option>
-					</select>
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<label for="color"><?= _('Colour (OK)') ?></label>
-				</td>
-				<td>
-					<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
-						<div name="lbl_color" id="lbl_color" style="background: #{color}" title="#{color}" onclick="javascript: show_color_picker('color')"></div>
-						<input id="color" name="color" value="#{color}" class="colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('color', this.value)" type="text">
-					</div>
-				</td>
-			</tr>
-			<tr>
-				<td colspan="2">
-					<fieldset>
-						<legend><?= _('Link indicators') ?></legend>
-						<table>
-							<thead>
-							<tr>
-								<td><?= _('Triggers') ?></td>
-								<td><?= _('Type') ?></td>
-								<td><?= _('Colour') ?></td>
-								<td></td>
-							</tr>
-							</thead>
-							<tbody id="linkTriggerscontainer"></tbody>
-							<tfoot>
-							<tr>
-								<td colspan="4">
-									<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" onclick="PopUp('popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1');"><?= _('Add') ?></button>
-								</td>
-							</tr>
-							</tfoot>
-						</table>
-					</fieldset>
-				</td>
-			</tr>
-			<tr class="footer">
-				<td colspan="2">
-					<button id="formLinkApply" type="button"><?= _('Apply') ?></button>
-					<button id="formLinkRemove" type="button"><?= _('Remove') ?></button>
-					<button id="formLinkClose" type="button"><?= _('Close') ?></button>
-				</td>
-			</tr>
-			</tbody>
-		</table>
-	</form>
+	<?= (new CFormList())
+		->addRow(_('Links'),
+			(new CDiv(
+				(new CTable())
+					->setHeader([_('Element name'), _('Link indicators'), _('Action')])
+					->setAttribute('style', 'width: 100%;')
+					->setId('element-links')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+			null, 'element-links'
+		)
+		->addRow(_('Links'),
+			(new CDiv(
+				(new CTable())
+					->setHeader([_('From'), _('To'), _('Link indicators'), _('Action')])
+					->setAttribute('style', 'width: 100%;')
+					->setId('mass-element-links')
+			))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
+			null, 'element-links'
+		)
+		->setId('mapLinksContainer')
+		->toString()
+	?>
+	<?= (new CForm())
+		->cleanItems()
+		->setId('linkForm')
+		->addVar('selementid1', '')
+		->addItem(
+			(new CFormList())
+				->addRow(_('Label'),
+					(new CTextArea('label'))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setRows(2)
+						->setId('linklabel')
+				)
+				->addRow(_('Connect to'), (new CComboBox('selementid2')), 'link-connect-to')
+				->addRow(_('Type (OK)'),
+					(new CComboBox('drawtype', null, null, [
+						GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
+						GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
+						GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
+						GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+					]))
+				)
+				->addRow(_('Colour (OK)'),
+					new CColor('color', '#{color}', false)
+				)
+				->addRow(_('Link indicators'),
+					(new CDiv([
+						(new CTable())
+							->setHeader([_('Trigger'), _('Type'), _('Colour'), _('Action')])
+							->setAttribute('style', 'width: 100%;')
+							->setId('linkTriggerscontainer'),
+						(new CButton(null, _('Add')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->onClick('PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&real_hosts=1&reference=linktrigger&multiselect=1&writeonly=1&with_triggers=1&noempty=1");')
+					]))
+						->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+						->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				)
+				->addItem([
+					(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_TD_LEFT),
+					(new CDiv([
+						(new CButton(null, _('Apply')))->setId('formLinkApply'),
+						(new CButton(null, _('Remove')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->setId('formLinkRemove'),
+						(new CButton(null, _('Close')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->setId('formLinkClose')
+					]))
+						->addClass(ZBX_STYLE_TABLE_FORMS_TD_RIGHT)
+						->addClass(ZBX_STYLE_TFOOT_BUTTONS)
+				])
+		)
+		->toString()
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="elementLinkTableRowTpl">
-	<tr>
-		<td>
-			<button class="<?= ZBX_STYLE_BTN_LINK ?> openlink" type="button" data-linkid="#{linkid}"><?= _('Edit') ?></button>
-		</td>
-		<td>#{toElementName}</td>
-		<td class="pre">#{linktriggers}</td>
-	</tr>
+	<?= (new CRow([
+		'#{toElementName}',
+		(new CCol())->addClass('element-urls'),
+		(new CCol(
+			(new CButton(null, _('Edit')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('openlink')
+				->setAttribute('data-linkid', '#{linkid}')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->toString()
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="massElementLinkTableRowTpl">
-	<tr>
-		<td>
-			<button class="<?= ZBX_STYLE_BTN_LINK ?> openlink" type="button" data-linkid="#{linkid}"><?= _('Edit') ?></button>
-		</td>
-		<td>#{fromElementName}</td>
-		<td>#{toElementName}</td>
-		<td class="pre">#{linktriggers}</td>
-	</tr>
+	<?= (new CRow([
+		'#{fromElementName}',
+		'#{toElementName}',
+		(new CCol())->addClass('element-urls'),
+		(new CCol(
+			(new CButton(null, _('Edit')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('openlink')
+				->setAttribute('data-linkid', '#{linkid}')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->toString()
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="linkTriggerRow">
-	<tr id="linktrigger_#{linktriggerid}">
-		<td>#{desc_exp}</td>
-		<td>
-			<input type="hidden" name="linktrigger_#{linktriggerid}_desc_exp" value="#{desc_exp}" />
-			<input type="hidden" name="linktrigger_#{linktriggerid}_triggerid" value="#{triggerid}" />
-			<input type="hidden" name="linktrigger_#{linktriggerid}_linktriggerid" value="#{linktriggerid}" />
-			<select id="linktrigger_#{linktriggerid}_drawtype" name="linktrigger_#{linktriggerid}_drawtype">
-				<option value="<?= GRAPH_ITEM_DRAWTYPE_LINE ?>"><?= _('Line') ?></option>
-				<option value="<?= GRAPH_ITEM_DRAWTYPE_BOLD_LINE ?>"><?= _('Bold line') ?></option>
-				<option value="<?= GRAPH_ITEM_DRAWTYPE_DOT ?>"><?= _('Dot') ?></option>
-				<option value="<?= GRAPH_ITEM_DRAWTYPE_DASHED_LINE ?>"><?= _('Dashed line') ?></option>
-			</select>
-		</td>
-		<td>
-			<div class="<?= ZBX_STYLE_INPUT_COLOR_PICKER ?>">
-				<div name="lbl_linktrigger_#{linktriggerid}_color" id="lbl_linktrigger_#{linktriggerid}_color" style="background: #{color}" title="#{color}" onclick="javascript: show_color_picker('linktrigger_#{linktriggerid}_color')"></div>
-				<input id="linktrigger_#{linktriggerid}_color" name="linktrigger_#{linktriggerid}_color" value="#{color}" class="colorpicker" maxlength="6" style="width: <?= ZBX_TEXTAREA_COLOR_WIDTH ?>px" onchange="set_color_by_name('linktrigger_#{linktriggerid}_color', this.value)" type="text">
-			</div>
-		</td>
-		<td>
-			<button class="<?= ZBX_STYLE_BTN_LINK ?> triggerRemove" type="button" data-linktriggerid="#{linktriggerid}"><?= _('Remove') ?></button>
-		</td>
-	</tr>
+	<?= (new CRow([
+		'#{desc_exp}',
+		[
+			new CVar('linktrigger_#{linktriggerid}_desc_exp', '#{desc_exp}'),
+			new CVar('linktrigger_#{linktriggerid}_triggerid', '#{triggerid}'),
+			new CVar('linktrigger_#{linktriggerid}_linktriggerid', '#{linktriggerid}'),
+			(new CComboBox('linktrigger_#{linktriggerid}_drawtype', null, null, [
+				GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
+				GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
+				GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
+				GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+			]))
+		],
+		new CColor('linktrigger_#{linktriggerid}_color', '#{color}', false),
+		(new CCol(
+			(new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('triggerRemove')
+				->setAttribute('data-linktriggerid', '#{linktriggerid}')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->setId('linktrigger_#{linktriggerid}')
+		->toString()
+	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
-	<tr id="urlrow_#{selementurlid}">
-		<td><input name="url_#{selementurlid}_name" type="text" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px" value="#{name}"></td>
-		<td>
-			<input name="url_#{selementurlid}_url" type="text" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" value="#{url}">
-			<button class="<?= ZBX_STYLE_BTN_LINK ?>" type="button" onclick="jQuery('#urlrow_#{selementurlid}').remove();"><?= _('Remove') ?></button>
-		</td>
-	</tr>
+	<?= (new CRow([
+		(new CTextBox('url_#{selementurlid}_name', '#{name}'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CTextBox('url_#{selementurlid}_url', '#{url}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+		(new CCol(
+			(new CButton(null, _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->onClick('jQuery("#urlrow_#{selementurlid}").remove();')
+		))->addClass(ZBX_STYLE_NOWRAP)
+	]))
+		->setId('urlrow_#{selementurlid}')
+		->toString()
+	?>
 </script>
 
 <script type="text/javascript">
-jQuery(document).ready(function() {
-	jQuery('.print-link').click(function () {
-		ZABBIX.apps.map.object.updateImage();
-
-		jQuery('div.printless').unbind('click').click(function () {
-			printLess(false);
-			ZABBIX.apps.map.object.updateImage();
-
-			return false;
-		});
-
-		return false;
-	});
-})
-
 /**
  * @see init.js add.popup event
  */
