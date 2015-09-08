@@ -180,7 +180,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
-		(new CCol(triggerExpression($trigger, true)))->addClass('trigger-expression'),
+		triggerExpression($trigger, true),
 		$status,
 		$info
 	]);

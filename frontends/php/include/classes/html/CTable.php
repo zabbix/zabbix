@@ -51,9 +51,10 @@ class CTable extends CTag {
 	}
 
 	public function prepareRow($item, $class = null, $id = null) {
-		if (is_null($item)) {
+		if ($item === null) {
 			return null;
 		}
+
 		if (is_object($item) && strtolower(get_class($item)) === 'ccol') {
 			if (isset($this->header) && !isset($item->attributes['colspan'])) {
 				$item->attributes['colspan'] = $this->colnum;
@@ -120,6 +121,7 @@ class CTable extends CTag {
 	public function startToString() {
 		$ret = parent::startToString();
 		$ret .= $this->header;
+		$ret .= '<tbody>';
 		return $ret;
 	}
 
@@ -130,6 +132,7 @@ class CTable extends CTag {
 			$ret = $ret->toString();
 		}
 		$ret .= $this->footer;
+		$ret .= '</tbody>';
 		$ret .= parent::endToString();
 		return $ret;
 	}

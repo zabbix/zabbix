@@ -197,21 +197,24 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 	zbx_uint64_t		dhostid, hostid = 0, proxy_hostid;
 	char			*host = NULL, *host_esc, *host_unique;
 	unsigned short		port;
-	zbx_uint64_t		groupid;
 	zbx_vector_uint64_t	groupids;
 	unsigned char		svc_type, interface_type;
+	zbx_config_t		cfg;
+	zbx_db_insert_t		db_insert;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __function_name, event->eventid);
 
 	zbx_vector_uint64_create(&groupids);
 
-	if (0 == *(zbx_uint64_t *)DCconfig_get_config_data(&groupid, CONFIG_DISCOVERY_GROUPID))
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID | ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE);
+
+	if (0 == cfg.discovery_groupid)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add discovered host: group for discovered hosts is not defined");
 		goto clean;
 	}
 
-	zbx_vector_uint64_append(&groupids, groupid);
+	zbx_vector_uint64_append(&groupids, cfg.discovery_groupid);
 
 	if (EVENT_OBJECT_DHOST == event->object || EVENT_OBJECT_DSERVICE == event->object)
 	{
@@ -291,26 +294,20 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 
 				make_hostname(host);	/* replace not-allowed symbols */
 				host_unique = DBget_unique_hostname_by_sample(host);
-				host_esc = DBdyn_escape_string(host_unique);
-
 				zbx_free(host);
 
-#ifdef HAVE_MYSQL
-				/* MySQL: BLOB and TEXT columns doesn't have a default value; */
-				/* we shall add them into an insert statement */
-				DBexecute("insert into hosts (hostid,proxy_hostid,host,name,description)"
-						" values (" ZBX_FS_UI64 ",%s,'%s','%s','')",
-						hostid, DBsql_id_ins(proxy_hostid), host_esc, host_esc);
-#else
-				DBexecute("insert into hosts (hostid,proxy_hostid,host,name)"
-						" values (" ZBX_FS_UI64 ",%s,'%s','%s')",
-						hostid, DBsql_id_ins(proxy_hostid), host_esc, host_esc);
-#endif
+				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host", "name",
+						NULL);
+				zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, host_unique, host_unique);
+				zbx_db_insert_execute(&db_insert);
+				zbx_db_insert_clean(&db_insert);
+
+				if (HOST_INVENTORY_DISABLED != cfg.default_inventory_mode)
+					DBadd_host_inventory(hostid, cfg.default_inventory_mode);
 
 				DBadd_interface(hostid, interface_type, 1, row[2], row[3], port);
 
 				zbx_free(host_unique);
-				zbx_free(host_esc);
 
 				add_discovered_host_groups(hostid, &groupids);
 			}
@@ -372,17 +369,14 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event)
 			{
 				hostid = DBget_maxid("hosts");
 
-#ifdef HAVE_MYSQL
-				/* MySQL: BLOB and TEXT columns doesn't have a default value; */
-				/* we shall add them into an insert statement */
-				DBexecute("insert into hosts (hostid,proxy_hostid,host,name,description)"
-						" values (" ZBX_FS_UI64 ",%s,'%s','%s','')",
-						hostid, DBsql_id_ins(proxy_hostid), host_esc, host_esc);
-#else
-				DBexecute("insert into hosts (hostid,proxy_hostid,host,name)"
-						" values (" ZBX_FS_UI64 ",%s,'%s','%s')",
-						hostid, DBsql_id_ins(proxy_hostid), host_esc, host_esc);
-#endif
+				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host", "name",
+						NULL);
+				zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, row[1], row[1]);
+				zbx_db_insert_execute(&db_insert);
+				zbx_db_insert_clean(&db_insert);
+
+				if (HOST_INVENTORY_DISABLED != cfg.default_inventory_mode)
+					DBadd_host_inventory(hostid, cfg.default_inventory_mode);
 
 				DBadd_interface(hostid, INTERFACE_TYPE_AGENT, 1, row[2], row[3], port);
 
@@ -410,6 +404,8 @@ out:
 		DBfree_result(result);
 	}
 clean:
+	zbx_config_clean(&cfg);
+
 	zbx_vector_uint64_destroy(&groupids);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
@@ -553,6 +549,45 @@ void	op_host_disable(const DB_EVENT *event)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: op_host_inventory_mode                                           *
+ *                                                                            *
+ * Purpose: sets host inventory mode                                          *
+ *                                                                            *
+ * Parameters: event          - [IN] the source event                         *
+ *             inventory_mode - [IN] the new inventory mode, see              *
+ *                              HOST_INVENTORY_ defines                       *
+ *                                                                            *
+ * Comments: This function does not allow disabling host inventory - only     *
+ *           setting manual or automatic host inventory mode is supported.    *
+ *                                                                            *
+ ******************************************************************************/
+void	op_host_inventory_mode(const DB_EVENT *event, int inventory_mode)
+{
+	const char	*__function_name = "op_host_inventory_mode";
+	zbx_uint64_t	hostid;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	if (event->source != EVENT_SOURCE_DISCOVERY && event->source != EVENT_SOURCE_AUTO_REGISTRATION)
+		return;
+
+	if (event->object != EVENT_OBJECT_DHOST && event->object != EVENT_OBJECT_DSERVICE &&
+			event->object != EVENT_OBJECT_ZABBIX_ACTIVE)
+	{
+		return;
+	}
+
+	if (0 == (hostid = add_discovered_host(event)))
+		return;
+
+	DBset_host_inventory(hostid, inventory_mode);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}
+
 
 /******************************************************************************
  *                                                                            *

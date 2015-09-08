@@ -398,20 +398,18 @@ foreach ($data['linkedTemplates'] as $template) {
 	$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
 		->setTarget('_blank');
 
-	$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK);
-	if (isset($data['original_templates'][$template['templateid']]) && !$cloneOrFullClone) {
-		$unlinkAndClearButton =
-			(new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addStyle('margin-left: 8px');
-	}
-	else {
-		$unlinkAndClearButton = null;
-	}
-
-	$linkedTemplateTable->addRow([$templateLink, [$unlinkButton, $unlinkAndClearButton]], null,
-		'conditions_'.$template['templateid']
-	);
+	$linkedTemplateTable->addRow([
+		$templateLink,
+		(new CCol(
+			new CHorList([
+				(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK),
+				(array_key_exists($template['templateid'], $data['original_templates']) && !$cloneOrFullClone)
+					? (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+					: null
+			])
+		))->addClass(ZBX_STYLE_NOWRAP)
+	], null, 'conditions_'.$template['templateid']);
 
 	$ignoredTemplates[$template['templateid']] = $template['name'];
 }
@@ -458,6 +456,7 @@ if (!$macros) {
 $macrosView = new CView('hostmacros', [
 	'macros' => $macros,
 	'show_inherited_macros' => $data['show_inherited_macros'],
+	'is_template' => true,
 	'readonly' => false
 ]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());

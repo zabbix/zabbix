@@ -20,7 +20,7 @@
 	<header role="banner">
 		<div class="nav" role="navigation">
 			<div class="top-nav-container">
-			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			<ul class="top-nav"><li class="selected"><a href="dashboard.html">Monitoring</a></li><li><a href="filter-collapsed.html">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
 			</div>
 			<div class="top-subnav-container">
 			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
@@ -36,14 +36,17 @@
 	<form>
 	<div class="table-forms-container">
 	
-	<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
+	<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
 
 		<ul class="table-forms">
 		<li>
 		<div class="table-forms-td-left"><label for="HostName">Host name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="Disabled input field" disabled><button class="icon-help"></button><div class="red">You can't leave this empty.</div></div>
 		</li>
 		<li>
-		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Read only input field" readonly><button class="icon-cal"></button><div class="red">You can't leave this empty.</div></div>
+		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Read only input field" readonly><button class="icon-cal"></button></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Standard input field"></div>
 		</li>
 		<li>
 		<div class="table-forms-td-left"><label>Groups</label></div><div class="table-forms-td-right">
@@ -60,7 +63,7 @@
 		<thead><tr><th></th><th>IP address</th><th>DNS name</th><th>Connect to</th><th>Port</th><th>Default</th><th></th></tr></thead>
 		<tbody>
 		<tr>
-		<td class="td-drag-icon"><div class="drag-icon disabled"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW" disabled><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew" disabled><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link" disabled>Remove</button></td>
+		<td class="td-drag-icon"><div class="drag-icon disabled"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW" disabled><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew" disabled><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link" disabled>Remove</button></td>
 		</tr>
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>

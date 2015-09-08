@@ -45,13 +45,9 @@ $hostList = new CFormList('hostlist');
 if ($hostPrototype['templateid'] && $data['parents']) {
 	$parents = [];
 	foreach (array_reverse($data['parents']) as $parent) {
-		$parents[] = (new CLink(
-			$parent['parentHost']['name'],
-			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'])
-		)
-			->addClass('highlight')
-			->addClass('underline')
-			->addClass('weight_normal');
+		$parents[] = new CLink($parent['parentHost']['name'],
+			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid']
+		);
 		$parents[] = SPACE.'&rArr;'.SPACE;
 	}
 	array_pop($parents);
@@ -209,8 +205,9 @@ $groupList->addRow(_('Groups'),
 $customGroupTable = (new CTable())->setId('tbl_group_prototypes');
 
 // buttons
-$addButton = (new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK);
-$buttonColumn = (new CCol($addButton))->setAttribute('colspan', 5);
+$buttonColumn = (new CCol(
+	(new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+))->setAttribute('colspan', 5);
 
 $buttonRow = (new CRow())
 	->setId('row_new_group_prototype')
@@ -331,15 +328,15 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$macrosView = new CView('hostmacros', [
 		'macros' => $macros,
 		'show_inherited_macros' => $data['show_inherited_macros'],
+		'is_template' => false,
 		'readonly' => true
 	]);
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 }
 
-$inventoryMode = (isset($hostPrototype['inventory']['inventory_mode'])) ? $hostPrototype['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
 $inventoryFormList = (new CFormList('inventorylist'))
 	->addRow(null,
-		(new CRadioButtonList('inventory_mode', (int) $inventoryMode))
+		(new CRadioButtonList('inventory_mode', (int) $hostPrototype['inventory']['inventory_mode']))
 			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
 			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
 			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)

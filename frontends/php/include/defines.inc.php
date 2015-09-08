@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.5.0');
-define('ZABBIX_API_VERSION',	'2.5.0');
+define('ZABBIX_VERSION',		'2.5.1');
+define('ZABBIX_API_VERSION',	'2.5.1');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050051);
+define('ZABBIX_DB_VERSION',		2050061);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -103,6 +103,9 @@ define('ZBX_DB_POSTGRESQL',	'POSTGRESQL');
 define('ZBX_DB_SQLITE3',	'SQLITE3');
 
 define('ZBX_DB_MAX_ID', '9223372036854775807');
+
+// maximum number of records for create() or update() API calls
+define('ZBX_DB_MAX_INSERTS', 10000);
 
 define('PAGE_TYPE_HTML',				0);
 define('PAGE_TYPE_IMAGE',				1);
@@ -462,6 +465,9 @@ define('ALERT_STATUS_FAILED',	2);
 define('ALERT_TYPE_MESSAGE',	0);
 define('ALERT_TYPE_COMMAND',	1);
 
+define('MEDIA_STATUS_ACTIVE',	0);
+define('MEDIA_STATUS_DISABLED',	1);
+
 define('MEDIA_TYPE_STATUS_ACTIVE',		0);
 define('MEDIA_TYPE_STATUS_DISABLED',	1);
 
@@ -513,6 +519,7 @@ define('OPERATION_TYPE_TEMPLATE_ADD',	6);
 define('OPERATION_TYPE_TEMPLATE_REMOVE',7);
 define('OPERATION_TYPE_HOST_ENABLE',	8);
 define('OPERATION_TYPE_HOST_DISABLE',	9);
+define('OPERATION_TYPE_HOST_INVENTORY',	10);
 
 define('CONDITION_EVAL_TYPE_AND_OR',		0);
 define('CONDITION_EVAL_TYPE_AND',			1);
@@ -686,6 +693,10 @@ define('EVENT_ACK_ENABLED',		'1');
 
 define('EVENT_NOT_ACKNOWLEDGED',	'0');
 define('EVENT_ACKNOWLEDGED',		'1');
+
+define('ZBX_ACKNOWLEDGE_SELECTED',	0);
+define('ZBX_ACKNOWLEDGE_PROBLEM',	1);
+define('ZBX_ACKNOWLEDGE_ALL',		2);
 
 define('EVENT_SOURCE_TRIGGERS',				0);
 define('EVENT_SOURCE_DISCOVERY',			1);
@@ -958,17 +969,29 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 // overviews help
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 
-// widgets
-define('WIDGET_DISCOVERY_STATUS',	'dscvry');
-define('WIDGET_FAVOURITE_GRAPHS',	'favgrph');
-define('WIDGET_FAVOURITE_MAPS',		'favmap');
-define('WIDGET_FAVOURITE_SCREENS',	'favscr');
-define('WIDGET_HOST_STATUS',		'hoststat');
-define('WIDGET_LAST_ISSUES',		'lastiss');
-define('WIDGET_SLIDESHOW',			'hat_slides');
-define('WIDGET_SYSTEM_STATUS',		'syssum');
-define('WIDGET_WEB_OVERVIEW',		'webovr');
-define('WIDGET_ZABBIX_STATUS',		'stszbx');
+// dashboard widgets
+define('WIDGET_DISCOVERY_STATUS',		'dscvry');
+define('WIDGET_FAVOURITE_GRAPHS',		'favgrph');
+define('WIDGET_FAVOURITE_MAPS',			'favmap');
+define('WIDGET_FAVOURITE_SCREENS',		'favscr');
+define('WIDGET_HOST_STATUS',			'hoststat');
+define('WIDGET_LAST_ISSUES',			'lastiss');
+define('WIDGET_SYSTEM_STATUS',			'syssum');
+define('WIDGET_WEB_OVERVIEW',			'webovr');
+define('WIDGET_ZABBIX_STATUS',			'stszbx');
+// event details widgets
+define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
+define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
+define('WIDGET_HAT_EVENTACK',			'hat_eventack');
+define('WIDGET_HAT_EVENTACTIONMSGS',	'hat_eventactionmsgs');
+define('WIDGET_HAT_EVENTACTIONMCMDS',	'hat_eventactionmcmds');
+define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
+// search widget
+define('WIDGET_SEARCH_HOSTS',			'search_hosts');
+define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
+define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
+// slideshow
+define('WIDGET_SLIDESHOW',				'hat_slides');
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
@@ -1023,6 +1046,7 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ACTIVE_INDIC', 'active-indic');
+define('ZBX_STYLE_ACTIVE_BG', 'active-bg');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ARTICLE', 'article');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
@@ -1051,6 +1075,7 @@ define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
 define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
+define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
@@ -1070,11 +1095,13 @@ define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
+define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
+define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
@@ -1083,6 +1110,11 @@ define('ZBX_STYLE_LIST_HOR_CHECK_RADIO', 'list-hor-check-radio');
 define('ZBX_STYLE_LIST_HOR_MIN_WIDTH', 'list-hor-min-width');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
+define('ZBX_STYLE_LOG_NA_BG', 'log-na-bg');
+define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');
+define('ZBX_STYLE_LOG_WARNING_BG', 'log-warning-bg');
+define('ZBX_STYLE_LOG_HIGH_BG', 'log-high-bg');
+define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
 define('ZBX_STYLE_MSG_BAD_GLOBAL', 'msg-bad-global');
@@ -1110,12 +1142,14 @@ define('ZBX_STYLE_STATUS_GREEN', 'status-green');
 define('ZBX_STYLE_STATUS_GREY', 'status-grey');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');
 define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
+define('ZBX_STYLE_TFOOT_BUTTONS', 'tfoot-buttons');
 define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');

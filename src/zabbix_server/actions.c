@@ -1412,6 +1412,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	zbx_uint64_t		groupid, templateid;
 	zbx_vector_uint64_t	lnk_templateids, del_templateids,
 				new_groupids, del_groupids;
+	int			inventory_mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __function_name, actionid);
 
@@ -1421,10 +1422,11 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 	zbx_vector_uint64_create(&del_groupids);
 
 	result = DBselect(
-			"select o.operationtype,g.groupid,t.templateid"
+			"select o.operationtype,g.groupid,t.templateid,oi.inventory_mode"
 			" from operations o"
 				" left join opgroup g on g.operationid=o.operationid"
 				" left join optemplate t on t.operationid=o.operationid"
+				" left join opinventory oi on oi.operationid=o.operationid"
 			" where o.actionid=" ZBX_FS_UI64,
 			actionid);
 
@@ -1433,6 +1435,7 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 		operationtype = (unsigned char)atoi(row[0]);
 		ZBX_DBROW2UINT64(groupid, row[1]);
 		ZBX_DBROW2UINT64(templateid, row[2]);
+		inventory_mode = (SUCCEED == DBis_null(row[3]) ? 0 : atoi(row[3]));
 
 		switch (operationtype)
 		{
@@ -1463,6 +1466,9 @@ static void	execute_operations(const DB_EVENT *event, zbx_uint64_t actionid)
 			case OPERATION_TYPE_TEMPLATE_REMOVE:
 				if (0 != templateid)
 					zbx_vector_uint64_append(&del_templateids, templateid);
+				break;
+			case OPERATION_TYPE_HOST_INVENTORY:
+				op_host_inventory_mode(event, inventory_mode);
 				break;
 			default:
 				;
