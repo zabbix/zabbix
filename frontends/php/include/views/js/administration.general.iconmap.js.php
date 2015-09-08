@@ -28,7 +28,7 @@
 		<?php $iconid = key($this->data['iconList']) ?>
 		<img class="pointer preview" name="Preview" alt="Preview" src="imgstore.php?iconid=<?= $iconid ?>&width=24&height=24" data-image-full="imgstore.php?iconid=<?= $iconid ?>" border="0">
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button class="<?= ZBX_STYLE_BTN_LINK ?> removeMapping" type="button" id="remove" name="remove">Remove</button>
 	</td>
 </tr>
