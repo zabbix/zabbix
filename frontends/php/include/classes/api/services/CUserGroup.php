@@ -74,6 +74,7 @@ class CUserGroup extends CApiService {
 			'editable'					=> null,
 			'output'					=> API_OUTPUT_EXTEND,
 			'selectUsers'				=> null,
+			'selectRights'				=> null,
 			'countOutput'				=> null,
 			'preservekeys'				=> null,
 			'sortfield'					=> '',
@@ -687,6 +688,45 @@ class CUserGroup extends CApiService {
 			]);
 
 			$result = $relationMap->mapMany($result, $dbUsers, 'users');
+		}
+
+		// adding usergroup rights
+		if ($options['selectRights'] !== null && $options['selectRights'] != API_OUTPUT_COUNT) {
+			$relationMap = $this->createRelationMap($result, 'groupid', 'rightid', 'rights');
+
+			if (is_array($options['selectRights'])) {
+				$pk_field = $this->pk('rights');
+
+				$output_fields = [
+					$pk_field => $this->fieldId($pk_field, 'r')
+				];
+
+				foreach ($options['selectRights'] as $field) {
+					if ($this->hasField($field, 'rights')) {
+						$output_fields[$field] = $this->fieldId($field, 'r');
+					}
+				}
+
+				$output_fields = implode(',', $output_fields);
+			}
+			else {
+				$output_fields = 'r.*';
+			}
+
+			$db_rights = DBfetchArray(DBselect(
+				'SELECT '.$output_fields.
+				' FROM rights r'.
+				' WHERE '.dbConditionInt('r.rightid', $relationMap->getRelatedIds()).
+					((self::$userData['type'] == USER_TYPE_SUPER_ADMIN) ? '' : ' AND r.permission>'.PERM_DENY)
+			));
+			$db_rights = zbx_toHash($db_rights, 'rightid');
+
+			foreach ($db_rights as &$db_right) {
+				unset($db_right['rightid'], $db_right['groupid']);
+			}
+			unset($db_right);
+
+			$result = $relationMap->mapMany($result, $db_rights, 'rights');
 		}
 
 		return $result;

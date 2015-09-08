@@ -19,21 +19,17 @@
 **/
 
 
-class CCheckBox extends CInput {
+class CHorList extends CList {
 
-	public function __construct($name = 'checkbox', $value = '1') {
-		parent::__construct('checkbox', $name, $value);
-		$this->setChecked(false);
+	/**
+	 * Creates a UL horizontal list with spaces between elements.
+	 *
+	 * @param array $values			an array of items to add to the list
+	 */
+	public function __construct(array $values = []) {
+		parent::__construct($values);
+
+		$this->addClass(ZBX_STYLE_HOR_LIST);
 	}
 
-	public function setChecked($checked) {
-		if ($checked) {
-			$this->attributes['checked'] = 'checked';
-		}
-		else {
-			$this->removeAttribute('checked');
-		}
-
-		return $this;
-	}
 }

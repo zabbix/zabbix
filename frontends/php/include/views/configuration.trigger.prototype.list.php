@@ -151,7 +151,7 @@ foreach ($this->data['triggers'] as $trigger) {
 		$checkBox,
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$description,
-		(new CCol(triggerExpression($trigger, true)))->addClass('trigger-expression'),
+		triggerExpression($trigger, true),
 		$status
 	]);
 }
