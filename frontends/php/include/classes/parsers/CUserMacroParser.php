@@ -195,7 +195,6 @@ class CUserMacroParser {
 							}
 
 							// Else it just skips all other chars untill finds where macro begins.
-							break;
 					}
 					break;
 
@@ -220,7 +219,6 @@ class CUserMacroParser {
 							}
 
 							$state = self::STATE_NEW;
-							break;
 					}
 					break;
 
@@ -239,16 +237,28 @@ class CUserMacroParser {
 						unset($this->macros[$i]);
 
 						if ($this->validate) {
-							// There must be at least one valid macro char after {$.
+							// There must be at least one valid macro char after {$. Also syntax {${ is not valid.
 							$this->setError();
 							return;
 						}
 
 						/*
 						 * After {$ there was something else. This is not a valid macro. Reset and look for macros
-						 * in the rest of the string.
+						 * in the rest of the string. It's possible at this stage we have {${ and the second { may be
+						 * a beginning of a new macro.
 						 */
-						$state = self::STATE_NEW;
+						switch ($this->source[$this->pos]) {
+							case '{':
+								$this->macros[$i]['match'] = $this->source[$this->pos];
+								$this->macros[$i]['macro'] = $this->source[$this->pos];
+								$this->macros[$i]['positions']['start'] = $this->pos;
+
+								$state = self::STATE_MACRO_NEW;
+								break;
+
+							default:
+								$state = self::STATE_NEW;
+						}
 					}
 					break;
 
@@ -294,7 +304,6 @@ class CUserMacroParser {
 								}
 
 								$state = self::STATE_NEW;
-								break;
 						}
 					}
 					break;
@@ -391,7 +400,6 @@ class CUserMacroParser {
 							$this->macros[$i]['macro'] .= $this->source[$this->pos];
 
 							$state = self::STATE_CONTEXT_UNQUOTED_PROGRESS;
-							break;
 					}
 					break;
 
@@ -449,7 +457,6 @@ class CUserMacroParser {
 							$this->macros[$i]['context'] .= $this->source[$this->pos];
 							$this->macros[$i]['match'] .= $this->source[$this->pos];
 							$this->macros[$i]['macro'] .= $this->source[$this->pos];
-							break;
 					}
 					break;
 
@@ -510,7 +517,6 @@ class CUserMacroParser {
 							$this->macros[$i]['match'] .= $this->source[$this->pos];
 							$this->macros[$i]['macro'] .= $this->source[$this->pos];
 							$this->macros[$i]['context'] .= $this->source[$this->pos];
-							break;
 					}
 					break;
 
@@ -566,7 +572,6 @@ class CUserMacroParser {
 							}
 
 							$state = self::STATE_NEW;
-							break;
 					}
 					break;
 			}
