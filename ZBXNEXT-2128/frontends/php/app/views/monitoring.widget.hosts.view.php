@@ -53,6 +53,7 @@ CArrayHelper::sort($hosts, ['name']);
 $triggers = API::Trigger()->get([
 	'output' => ['triggerid', 'priority'],
 	'selectHosts' => ['hostid'],
+	'search' => ($data['filter']['trigger_name'] !== '') ? ['description' => $data['filter']['trigger_name']] : null,
 	'filter' => [
 		'priority' => $data['filter']['severity'],
 		'value' => TRIGGER_VALUE_TRUE
@@ -65,6 +66,9 @@ if ($data['filter']['extAck']) {
 	$triggers_unack = API::Trigger()->get([
 		'output' => ['triggerid'],
 		'selectHosts' => ['hostid'],
+		'search' => ($data['filter']['trigger_name'] !== '')
+			? ['description' => $data['filter']['trigger_name']]
+			: null,
 		'filter' => [
 			'priority' => $data['filter']['severity'],
 			'value' => TRIGGER_VALUE_TRUE
@@ -222,7 +226,7 @@ foreach ($groups as $group) {
 
 	if ($data['filter']['extAck']) {
 		if ($hosts_data[$group['groupid']]['lastUnack']) {
-			$table_inf = (new CTableInfo())->setAttribute('style', 'width: 400px;');
+			$table_inf = new CTableInfo();
 
 			// set trigger severities as table header starting from highest severity
 			$header = [];
@@ -362,7 +366,7 @@ foreach ($groups as $group) {
 }
 
 echo (new CJson())->encode([
-	'header' => _('Host status'),
-	'body' => (new CDiv($table))->toString(),
-	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+	'header' =>  _('Host status'),
+	'body' =>  (new CDiv($table))->toString(),
+	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
 ]);

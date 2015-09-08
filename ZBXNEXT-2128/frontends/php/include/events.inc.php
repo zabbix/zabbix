@@ -165,7 +165,7 @@ function get_next_event($currentEvent, array $eventList = []) {
 	return DBfetch(DBselect($sql, 1));
 }
 
-function make_event_details($event, $trigger) {
+function make_event_details($event, $trigger, $backurl) {
 	$config = select_config();
 	$table = (new CTableInfo())
 		->addRow([
@@ -180,16 +180,13 @@ function make_event_details($event, $trigger) {
 	if ($config['event_ack_enable']) {
 		// to make resulting link not have hint with acknowledges
 		$event['acknowledges'] = count($event['acknowledges']);
-		$table->addRow([
-			_('Acknowledged'),
-			getEventAckState($event, $page['file'])
-		]);
+		$table->addRow([_('Acknowledged'), getEventAckState($event, $backurl)]);
 	}
 
 	return $table;
 }
 
-function make_small_eventlist($startEvent) {
+function make_small_eventlist($startEvent, $backurl) {
 	$config = select_config();
 
 	$table = (new CTableInfo())
@@ -246,8 +243,6 @@ function make_small_eventlist($startEvent) {
 			$event['acknowledged']
 		);
 
-		$ack = getEventAckState($event, $page['file']);
-
 		$table->addRow([
 			(new CLink(
 				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
@@ -256,7 +251,7 @@ function make_small_eventlist($startEvent) {
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
-			$config['event_ack_enable'] ? $ack : null,
+			$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null,
 			isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : SPACE
 		]);
 	}
@@ -264,7 +259,7 @@ function make_small_eventlist($startEvent) {
 	return $table;
 }
 
-function make_popup_eventlist($triggerId, $eventId) {
+function make_popup_eventlist($triggerId, $eventId, $backurl) {
 	$config = select_config();
 
 	$table = new CTableInfo();
@@ -305,7 +300,7 @@ function make_popup_eventlist($triggerId, $eventId) {
 			$eventStatusSpan,
 			$duration,
 			zbx_date2age($event['clock']),
-			getEventAckState($event, null, false)
+			$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null
 		]);
 	}
 
@@ -320,62 +315,33 @@ function make_popup_eventlist($triggerId, $eventId) {
  * @param int			$event['acknowledged']
  * @param int			$event['eventid']
  * @param int			$event['objectid']
- * @param array			$event['acknowledges']
- * @param string		$url if not null, add url param to link with current page file name
- * @param bool			$isLink  if true, return link otherwise span
- * @param array			$params  additional params for link
+ * @param mixed			$event['acknowledges']
+ * @param string		$backurl  add url param to link with current page file name
  *
- * @return array|CLink|CSpan|null|string
+ * @return CLink
  */
-function getEventAckState($event, $url = null, $isLink = true, $params = []) {
-	$config = select_config();
-
-	if (!$config['event_ack_enable']) {
-		return null;
-	}
-
-	if ($event['acknowledged'] != 0) {
+function getEventAckState($event, $backurl) {
+	if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
 		$acknowledges_num = is_array($event['acknowledges']) ? count($event['acknowledges']) : $event['acknowledges'];
 	}
 
-	if ($isLink) {
-		if ($url === null) {
-			$backurl = '';
-		}
-		else {
-			$backurl = '&backurl='.urlencode($url);
-		}
+	$link = 'zabbix.php?action=acknowledge.edit&eventids[]='.$event['eventid'].'&backurl='.urlencode($backurl);
 
-		$additionalParams = '';
-		foreach ($params as $key => $value) {
-			$additionalParams .= '&'.$key.'='.$value;
+	if ($event['acknowledged'] == EVENT_ACKNOWLEDGED) {
+		$ack = (new CLink(_('Yes'), $link))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_GREEN)
+			->removeSID();
+		if (is_array($event['acknowledges'])) {
+			$ack->setHint(makeAckTab($event), '', false);
 		}
-
-		if ($event['acknowledged'] == 0) {
-			$ack = (new CLink(_('No'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_RED);
-		}
-		else {
-			$ackLink = (new CLink(_('Yes'), 'acknow.php?eventid='.$event['eventid'].'&triggerid='.$event['objectid'].$backurl.$additionalParams))
-				->addClass(ZBX_STYLE_LINK_ALT)
-				->addClass(ZBX_STYLE_GREEN);
-			if (is_array($event['acknowledges'])) {
-				$ackLinkHints = makeAckTab($event);
-				if (!empty($ackLinkHints)) {
-					$ackLink->setHint($ackLinkHints, '', false);
-				}
-			}
-			$ack = [$ackLink, CViewHelper::showNum($acknowledges_num)];
-		}
+		$ack = [$ack, CViewHelper::showNum($acknowledges_num)];
 	}
 	else {
-		if ($event['acknowledged'] == 0) {
-			$ack = (new CSpan(_('No')))->addClass(ZBX_STYLE_RED);
-		}
-		else {
-			$ack = [(new CSpan(_('Yes')))->addClass(ZBX_STYLE_GREEN), CViewHelper::showNum($acknowledges_num)];
-		}
+		$ack = (new CLink(_('No'), $link))
+			->addClass(ZBX_STYLE_LINK_ALT)
+			->addClass(ZBX_STYLE_RED)
+			->removeSID();
 	}
 
 	return $ack;

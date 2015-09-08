@@ -33,6 +33,10 @@ $fields = [
 	'discovery_groupid' =>		[T_ZBX_INT, O_OPT, null, DB_ID, 'isset({update})',
 		_('Group for discovered hosts')
 	],
+	'default_inventory_mode' =>	[T_ZBX_INT, O_OPT, null,
+		IN(HOST_INVENTORY_DISABLED.','.HOST_INVENTORY_MANUAL.','.HOST_INVENTORY_AUTOMATIC), 'isset({update})',
+		_('Default host inventory mode')
+	],
 	'alert_usrgrpid' =>			[T_ZBX_INT, O_OPT, null, DB_ID, 'isset({update})',
 		_('User group for database down message')
 	],
@@ -52,6 +56,7 @@ if (hasRequest('update')) {
 		'refresh_unsupported' => getRequest('refresh_unsupported'),
 		'alert_usrgrpid' => getRequest('alert_usrgrpid'),
 		'discovery_groupid' => getRequest('discovery_groupid'),
+		'default_inventory_mode' => getRequest('default_inventory_mode'),
 		'snmptrap_logging' => getRequest('snmptrap_logging', 0)
 	]);
 	$result = DBend($result);
@@ -68,6 +73,7 @@ if (hasRequest('form_refresh')) {
 	$data = [
 		'refresh_unsupported' => getRequest('refresh_unsupported', $config['refresh_unsupported']),
 		'discovery_groupid' => getRequest('discovery_groupid', $config['discovery_groupid']),
+		'default_inventory_mode' => getRequest('default_inventory_mode', $config['default_inventory_mode']),
 		'alert_usrgrpid' => getRequest('alert_usrgrpid', $config['alert_usrgrpid']),
 		'snmptrap_logging' => getRequest('snmptrap_logging', 0)
 	];
@@ -76,6 +82,7 @@ else {
 	$data = [
 		'refresh_unsupported' => $config['refresh_unsupported'],
 		'discovery_groupid' => $config['discovery_groupid'],
+		'default_inventory_mode' => $config['default_inventory_mode'],
 		'alert_usrgrpid' => $config['alert_usrgrpid'],
 		'snmptrap_logging' => $config['snmptrap_logging']
 	];

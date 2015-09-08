@@ -524,6 +524,111 @@ static int	DBpatch_2050051(void)
 
 	return DBmodify_field_type("drules", &field);
 }
+
+static int	DBpatch_2050052(void)
+{
+	const ZBX_FIELD field = {"default_inventory_mode", "-1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
+
+static int	DBpatch_2050053(void)
+{
+	const ZBX_TABLE table =
+			{"opinventory", "operationid", 0,
+				{
+					{"operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"inventory_mode", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050054(void)
+{
+	const ZBX_FIELD	field = {"operationid", NULL, "operations", "operationid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("opinventory", 1, &field);
+}
+
+static int	DBpatch_2050055(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	if (NULL == (result = DBselect(
+			"select severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,"
+				"severity_color_5"
+			" from config")))
+		return FAIL;
+
+	if (NULL == (row = DBfetch(result))) {
+		goto out;
+	}
+
+	if (0 == strcmp(row[0], "DBDBDB") && 0 == strcmp(row[1], "D6F6FF") &&
+			0 == strcmp(row[2], "FFF6A5") && 0 == strcmp(row[3], "FFB689") &&
+			0 == strcmp(row[4], "FF9999") && 0 == strcmp(row[5], "FF3838")) {
+		if (ZBX_DB_OK > DBexecute(
+				"update config set severity_color_0='97AAB3',severity_color_1='7499FF',"
+					"severity_color_2='FFC859',severity_color_3='FFA059',"
+					"severity_color_4='E97659',severity_color_5='E45959'"))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_2050056(void)
+{
+	const ZBX_FIELD field = {"severity_color_0", "97AAB3", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050057(void)
+{
+	const ZBX_FIELD field = {"severity_color_1", "7499FF", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050058(void)
+{
+	const ZBX_FIELD field = {"severity_color_2", "FFC859", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050059(void)
+{
+	const ZBX_FIELD field = {"severity_color_3", "FFA059", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050060(void)
+{
+	const ZBX_FIELD field = {"severity_color_4", "E97659", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050061(void)
+{
+	const ZBX_FIELD field = {"severity_color_5", "E45959", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
 #endif
 
 DBPATCH_START(2050)
@@ -574,5 +679,15 @@ DBPATCH_ADD(2050048, 0, 1)
 DBPATCH_ADD(2050049, 0, 1)
 DBPATCH_ADD(2050050, 0, 1)
 DBPATCH_ADD(2050051, 0, 1)
+DBPATCH_ADD(2050052, 0, 1)
+DBPATCH_ADD(2050053, 0, 1)
+DBPATCH_ADD(2050054, 0, 1)
+DBPATCH_ADD(2050055, 0, 1)
+DBPATCH_ADD(2050056, 0, 1)
+DBPATCH_ADD(2050057, 0, 1)
+DBPATCH_ADD(2050058, 0, 1)
+DBPATCH_ADD(2050059, 0, 1)
+DBPATCH_ADD(2050060, 0, 1)
+DBPATCH_ADD(2050061, 0, 1)
 
 DBPATCH_END()

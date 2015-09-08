@@ -201,7 +201,7 @@ elseif (hasRequest('action') && getRequest('action') == 'application.massdelete'
 	$result = DBend($result);
 
 	if ($result) {
-		uncheckTableRows(getRequest('hostid'));
+		uncheckTableRows($pageFilter->hostid);
 	}
 	show_messages($result,
 		_n('Application deleted', 'Applications deleted', $deleted),

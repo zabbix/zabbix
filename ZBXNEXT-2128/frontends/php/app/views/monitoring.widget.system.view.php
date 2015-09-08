@@ -19,7 +19,7 @@
 **/
 
 
-$widget = make_system_status($data['filter']);
+$widget = make_system_status($data['filter'], 'zabbix.php?action=dashboard.view');
 
 echo (new CJson())->encode([
 	'header' => _('System status'),
