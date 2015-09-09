@@ -37,18 +37,17 @@ found_openssl="yes",)
 AC_DEFUN([LIBOPENSSL_ACCEPT_VERSION],
 [
 	# Zabbix minimal supported version of OpenSSL.
-	# Version numbering scheme is described in /usr/include/openssl/opensslv.h. Specify version number without
-	# the last byte (status). E.g., version 1.0.1 is 0x1000100f, but without the last byte it is 0x1000100.
-	# Further down in "test", we need to pass the version in decimal, so we specify version 1.0.1 (0x1000100)
-	# in decimal here. We avoid using "awk" here, too, so that if "printf" does not work or a wrong argument
-	# is passed to "printf" in $found_openssl_version below and "printf" outputs 0, this is caught by "test".
-	minimal_openssl_version=16777472
+	# Version numbering scheme is described in /usr/include/openssl/opensslv.h. Specify version number without the
+	# last byte (status). E.g., version 1.0.1 is 0x1000100f, but without the last byte it is 0x1000100.
+	minimal_openssl_version=0x1000100
 
 	# get version
-	found_openssl_version=`$AWK '/^\#[ \t]*define[ \t]+OPENSSL_VERSION_NUMBER[ \t]/ {gsub(/^.*OPENSSL_VERSION_NUMBER[ \t]+/,""); gsub(/L[ \t]*$/,""); gsub(/[0-9abcdef]$/,""); print;}' "$1"`
-	found_openssl_version=`$AWK "BEGIN { printf \"%d\", $found_openssl_version }"`
+	found_openssl_version=`grep OPENSSL_VERSION_NUMBER "$1"`
+	found_openssl_version=`expr "$found_openssl_version" : '.*\(0x\w\w\w\w\w\w\w\).*'`
 
-	if test $found_openssl_version -ge $minimal_openssl_version; then
+	# compare versions lexicographically
+	openssl_version_check=`expr $found_openssl_version \>\= $minimal_openssl_version`
+	if test "$openssl_version_check" = "1"; then
 		accept_openssl_version="yes"
 	else
 		accept_openssl_version="no"
