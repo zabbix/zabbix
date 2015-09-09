@@ -38,7 +38,7 @@ AC_DEFUN([LIBOPENSSL_ACCEPT_VERSION],
 [
 	# Zabbix minimal supported version of OpenSSL.
 	# Version numbering scheme is described in /usr/include/openssl/opensslv.h. Specify version number without
-        # the last byte (status). E.g., version 1.0.1 is 0x1000100f, but without the last byte it is 0x1000100.
+	# the last byte (status). E.g., version 1.0.1 is 0x1000100f, but without the last byte it is 0x1000100.
 	# Further down in "test", we need to pass the version in decimal, so we specify version 1.0.1 (0x1000100)
 	# in decimal here. We avoid using "awk" here, too, so that if "printf" does not work or a wrong argument
 	# is passed to "printf" in $found_openssl_version below and "printf" outputs 0, this is caught by "test".
