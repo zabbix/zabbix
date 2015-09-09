@@ -258,8 +258,13 @@ typedef struct
 	unsigned char	ipmi_available;
 	unsigned char	jmx_available;
 	unsigned char	status;
+
+	/* specifies which interfaces are being used (have enabled items) */
+	/* (see ZBX_FLAG_INTERFACE_* defines)                             */
+	unsigned char	used_interfaces;
 }
 ZBX_DC_HOST;
+
 
 typedef struct
 {
@@ -1168,6 +1173,9 @@ static void	DCsync_hosts(DB_RESULT result)
 		}
 
 		host->status = status;
+
+		/* reset the used interfaces flag */
+		host->used_interfaces = ZBX_FLAG_INTERFACE_NONE;
 	}
 
 	/* remove deleted hosts from buffer */
@@ -1996,11 +2004,31 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
 				}
 			}
+
+			/* update host's used_interfaces flag */
+			switch (type)
+			{
+				case ITEM_TYPE_ZABBIX:
+					host->used_interfaces |= ZBX_FLAG_INTERFACE_AGENT;
+					break;
+				case ITEM_TYPE_SNMPv1:
+				case ITEM_TYPE_SNMPv2c:
+				case ITEM_TYPE_SNMPv3:
+					host->used_interfaces |= ZBX_FLAG_INTERFACE_SNMP;
+					break;
+				case ITEM_TYPE_IPMI:
+					host->used_interfaces |= ZBX_FLAG_INTERFACE_IPMI;
+					break;
+				case ITEM_TYPE_JMX:
+					host->used_interfaces |= ZBX_FLAG_INTERFACE_JMX;
+					break;
+			}
 		}
 		else
 		{
 			item->poller_type = ZBX_NO_POLLER;
 			item->nextcheck = 0;
+			item->unreachable = 0;
 		}
 
 		item->delay = delay;
@@ -3268,20 +3296,6 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: init_configuration_cache                                         *
- *                                                                            *
- * Purpose: Allocate shared memory for configuration cache                    *
- *                                                                            *
- * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments: helper functions __config_mem_XXX_func(), __config_XXX_hash,     *
- *           and __config_XXX_compare are only used inside this function      *
- *           for initializing hashset, vector, and heap data structures       *
- *                                                                            *
- ******************************************************************************/
-
 static zbx_hash_t	__config_item_hk_hash(const void *data)
 {
 	const ZBX_DC_ITEM_HK	*item_hk = (const ZBX_DC_ITEM_HK *)data;
@@ -3539,6 +3553,19 @@ static int	__config_regexp_compare(const void *d1, const void *d2)
 	return r1->name == r2->name ? 0 : strcmp(r1->name, r2->name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: init_configuration_cache                                         *
+ *                                                                            *
+ * Purpose: Allocate shared memory for configuration cache                    *
+ *                                                                            *
+ * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
+ *                                                                            *
+ * Comments: helper functions __config_mem_XXX_func(), __config_XXX_hash,     *
+ *           and __config_XXX_compare are only used inside this function      *
+ *           for initializing hashset, vector, and heap data structures       *
+ *                                                                            *
+ ******************************************************************************/
 void	init_configuration_cache()
 {
 	const char	*__function_name = "init_configuration_cache";
@@ -6798,3 +6825,101 @@ void	zbx_config_clean(zbx_config_t *cfg)
 		zbx_free(cfg->severity_name);
 	}
 }
+
+
+/******************************************************************************
+ *                                                                            *
+ * Function: DCreset_hosts_availability                                       *
+ *                                                                            *
+ * Purpose: resets host availability for disabled hosts and hosts without     *
+ *          enabled items for the corresponding interface                     *
+ *                                                                            *
+ * Parameters: hosts - [OUT] a vector of hostid,reset_flags pairs containing  *
+ *                     host availability reset data (sorted by hostid)        *
+ *                                                                            *
+ * Return value: SUCCEED - host availability was reseted for at least one     *
+ *                         host                                               *
+ *               FAIL    - no hosts required availability reset               *
+ *                                                                            *
+ * Comments: This function resets host availability in configuration cache.   *
+ *           The caller must perform corresponding database updates based     *
+ *           on returned host availability reset data.                        *
+ *                                                                            *
+ ******************************************************************************/
+int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
+{
+	const char		*__function_name = "DCreset_hosts_availability";
+	zbx_uint64_pair_t	pair;
+	ZBX_DC_HOST		*host;
+	zbx_hashset_iter_t	iter;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	LOCK_CACHE;
+
+	zbx_hashset_iter_reset(&config->hosts, &iter);
+
+	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) && 0 != host->proxy_hostid)
+			continue;
+
+		pair.second = ZBX_FLAG_INTERFACE_NONE;
+
+		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_AGENT) &&
+				HOST_AVAILABLE_UNKNOWN != host->available)
+		{
+			pair.second |= ZBX_FLAG_INTERFACE_AGENT;
+
+			host->available = HOST_AVAILABLE_UNKNOWN;
+			host->errors_from = 0;
+			host->disable_until = 0;
+		}
+
+		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_SNMP) &&
+				HOST_AVAILABLE_UNKNOWN != host->snmp_available)
+		{
+			pair.second |= ZBX_FLAG_INTERFACE_SNMP;
+
+			host->snmp_available = HOST_AVAILABLE_UNKNOWN;
+			host->snmp_errors_from = 0;
+			host->snmp_disable_until = 0;
+		}
+
+		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_IPMI) &&
+				HOST_AVAILABLE_UNKNOWN != host->ipmi_available)
+		{
+			pair.second |= ZBX_FLAG_INTERFACE_IPMI;
+
+			host->ipmi_available = HOST_AVAILABLE_UNKNOWN;
+			host->ipmi_errors_from = 0;
+			host->ipmi_disable_until = 0;
+		}
+
+		if (0 == (host->used_interfaces & ZBX_FLAG_INTERFACE_JMX) &&
+				HOST_AVAILABLE_UNKNOWN != host->jmx_available)
+		{
+			pair.second |= ZBX_FLAG_INTERFACE_JMX;
+
+
+			host->jmx_available = HOST_AVAILABLE_UNKNOWN;
+			host->jmx_errors_from = 0;
+			host->jmx_disable_until = 0;
+		}
+
+		if (ZBX_FLAG_INTERFACE_NONE != pair.second)
+		{
+			pair.first = host->hostid;
+			zbx_vector_uint64_pair_append_ptr(hosts, &pair);
+		}
+	}
+
+	UNLOCK_CACHE;
+
+	zbx_vector_uint64_pair_sort(hosts, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() hosts:%d", __function_name, hosts->values_num);
+
+	return 0 == hosts->values_num ? FAIL : SUCCEED;
+}
+
