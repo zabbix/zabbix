@@ -1082,32 +1082,32 @@ function getItemDelay($delay, $flexible_intervals) {
  * Return delay value that is currently applicable
  *
  * @param int $delay                 default delay
- * @param array $arrOfFlexIntervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
+ * @param array $flexible_intervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
  * @param int $now                   current timestamp
  *
  * @return int                       delay for a current timestamp
  */
-function getCurrentDelay($delay, array $arrOfFlexIntervals, $now) {
-	if (empty($arrOfFlexIntervals)) {
+function getCurrentDelay($delay, array $flexible_intervals, $now) {
+	if (!$flexible_intervals) {
 		return $delay;
 	}
 
-	$currentDelay = -1;
+	$current_delay = -1;
 
-	foreach ($arrOfFlexIntervals as $flexInterval) {
-		if (sscanf($flexInterval, '%d/%29s', $flexDelay, $flexPeriod) != 2) {
-			continue;
-		}
-		if (($currentDelay == -1 || $flexDelay < $currentDelay) && checkTimePeriod($flexPeriod, $now)) {
-			$currentDelay = $flexDelay;
+	foreach ($flexible_intervals as $flexible_interval) {
+		list($flexible_delay, $flexible_period) = explode('/', $flexible_interval);
+		$flexible_delay = (int) $flexible_delay;
+
+		if (($current_delay == -1 || $flexible_delay < $current_delay) && checkTimePeriod($flexible_period, $now)) {
+			$current_delay = $flexible_delay;
 		}
 	}
 
-	if ($currentDelay == -1) {
+	if ($current_delay == -1) {
 		return $delay;
 	}
 
-	return $currentDelay;
+	return $current_delay;
 }
 
 /**
