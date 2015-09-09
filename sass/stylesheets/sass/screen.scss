@@ -312,7 +312,7 @@ ul.top-nav-icons {
 		font-size: $font-h3-size;
 		text-decoration: none;
 		@include opacity(0.75);
-		@include transition(all .2s ease-out);
+		@include transition(opacity .5s ease-out);
 
 		&:hover {
 			@include opacity(1);
