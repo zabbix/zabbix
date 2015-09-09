@@ -1456,24 +1456,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Replace user macros found in string. If there are multiple macros in a string, they are replaced one by one.
-	 * This is because once string has changed, other macro postions are now different and they need to be recalculated
-	 * after each replace. If macro cannot be replaced with value, try other corresponding macros.
-	 * For example:
-	 *		$macros[
-	 *			{$A} => {$A},
-	 *			{$B} => b,
-	 *			{$C} => {$C},
-	 *			{$D} => d
-	 *		];
-	 *
-	 *		$string = "{$A}{$B}{$C}{$D}";
-	 *
-	 *	Sequence:
-	 *	1) $string = "{$A}{$B}{$C}{$D}";	// try to replace {$A}, fail, move to {$B};
-	 *	2) $string = "{$A}b{$C}{$D}";		// try to replace {$B}, succeed, recalculate positions and restart;
-	 *	3) $string = "{$A}b{$C}{$D}";		// try to replace {$A}, fail, move to {$C}, fail, move to {$D};
-	 *	4) $string = "{$A}b{$C}d";			// try to replace {$D}, succeed, recalculate positions, no more, exit.
+	 * Replace user macros found in string. Iterate each char and change macros to values according to parsed positions.
 	 *
 	 * @param string $string	String that contains macros.
 	 * @param array $macros		Array of macros and values.
@@ -1482,46 +1465,32 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 */
 	private function replaceUserMacros($string, array $macros) {
 		$user_macros = (new CUserMacroParser($string, false))->getMacros();
-		$macro_count = count($user_macros);
-		$i = 0;
+		$pos = 0;
+		$output = '';
 
-		if ($user_macros) {
-			while ($user_macros || $i == ($macro_count - 1)) {
-				if (array_key_exists($user_macros[$i]['macro'], $macros)) {
-					if ($macros[$user_macros[$i]['macro']] !== $user_macros[$i]['macro']) {
-						// Replace macro to value. Note that character positions are now changed.
-						$string = substr_replace($string, $macros[$user_macros[$i]['macro']],
-							$user_macros[$i]['positions']['start'],
-							$user_macros[$i]['positions']['length']
-						);
+		while (isset($string[$pos])) {
+			$found = false;
 
-						// If there we more macros, recheck the string to get remaining macro positions.
-						if (($macro_count - 1) > $i) {
-							$user_macros = (new CUserMacroParser($string, false))->getMacros();
-							$macro_count = count($user_macros);
-							$i = 0;
-						}
-						else {
-							break;
-						}
-					}
-					else {
-						if (($macro_count - 1) > $i) {
-							$i++;
-						}
-						else {
-							// That was the last one and we could not replace it.
-							break;
-						}
-					}
-				}
-				else {
+			foreach ($user_macros as $user_macro) {
+				if (array_key_exists($user_macro['macro'], $macros) && $pos == $user_macro['positions']['start']) {
+					$found = true;
+					$len = $user_macro['positions']['length'];
+					$str = $macros[$user_macro['macro']];
 					break;
 				}
 			}
+
+			if ($found) {
+				$output .= $str;
+				$pos += $len;
+			}
+			else {
+				$output .= $string[$pos];
+				$pos++;
+			}
 		}
 
-		return $string;
+		return $output;
 	}
 
 	/**
