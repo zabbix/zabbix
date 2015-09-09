@@ -1064,7 +1064,7 @@ function checkTimePeriod($period, $now) {
  * @return string
  */
 function getItemDelay($delay, $flexible_intervals) {
-	if (!empty($delay) || !$flexible_intervals) {
+	if ($delay != 0 || !$flexible_intervals) {
 		return $delay;
 	}
 	$minDelay = SEC_PER_YEAR;
