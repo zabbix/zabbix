@@ -84,6 +84,19 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 	{
 		if ('{' == *c)
 		{
+			/* skip user macros */
+			if ('$' == c[1])
+			{
+				int	macro_r, context_l, context_r;
+
+				if (SUCCEED == zbx_user_macro_parse(c, &macro_r, &context_l, &context_r))
+					c += macro_r;
+				else
+					c++;
+
+				continue;
+			}
+
 			state = ID;
 			p_functionid = c + 1;
 		}
@@ -309,6 +322,24 @@ static void	DCexpand_trigger_expression(char **expression)
 		if ('{' != (*expression)[l])
 		{
 			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, (*expression)[l]);
+			continue;
+		}
+
+		/* skip user macros */
+		if ('$' == (*expression)[l + 1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+			{
+				zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, *expression + l, macro_r + 1);
+				l += macro_r;
+				continue;
+			}
+
+			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '{');
+			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '$');
+			l++;
 			continue;
 		}
 
