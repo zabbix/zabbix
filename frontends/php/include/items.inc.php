@@ -1063,29 +1063,31 @@ function checkTimePeriod($period, $now) {
  *
  * @return string
  */
-function getItemDelay($delay, $flexible_intervals) {
+function getItemDelay($delay, array $flexible_intervals) {
 	if ($delay != 0 || !$flexible_intervals) {
 		return $delay;
 	}
-	$minDelay = SEC_PER_YEAR;
+
+	$min_delay = SEC_PER_YEAR;
 
 	foreach ($flexible_intervals as $flexible_interval) {
-		if (sscanf($flexible_interval, "%d/%29s", $flexDelay, $flexPeriod) != 2) {
-			continue;
-		}
-		$minDelay = min($minDelay, $flexDelay);
+		$flexible_interval_parts = explode('/', $flexible_interval);
+		$flexible_delay = (int) $flexible_interval_parts[0];
+
+		$min_delay = min($min_delay, $flexible_delay);
 	}
-	return $minDelay;
+
+	return $min_delay;
 }
 
 /**
  * Return delay value that is currently applicable
  *
- * @param int $delay                 default delay
- * @param array $flexible_intervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
- * @param int $now                   current timestamp
+ * @param int $delay					default delay
+ * @param array $flexible_intervals		array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
+ * @param int $now						current timestamp
  *
- * @return int                       delay for a current timestamp
+ * @return int							delay for a current timestamp
  */
 function getCurrentDelay($delay, array $flexible_intervals, $now) {
 	if (!$flexible_intervals) {
@@ -1113,14 +1115,14 @@ function getCurrentDelay($delay, array $flexible_intervals, $now) {
 /**
  * Return time of next flexible interval
  *
- * @param array $arrOfFlexIntervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
+ * @param array $flexible_intervals  array of intervals in format: "d/wd[-wd2],hh:mm-hh:mm"
  * @param int $now                   current timestamp
- * @param int $nextInterval          timestamp of a next interval
+ * @param int $next_interval          timestamp of a next interval
  *
  * @return bool                      false if no flexible intervals defined
  */
-function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
-	if (empty($arrOfFlexIntervals)) {
+function getNextDelayInterval(array $flexible_intervals, $now, &$next_interval) {
+	if (!$flexible_intervals) {
 		return false;
 	}
 
@@ -1129,9 +1131,11 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
 	$day = ($tm['tm_wday'] == 0) ? 7 : $tm['tm_wday'];
 	$sec = SEC_PER_HOUR * $tm['tm_hour'] + SEC_PER_MIN * $tm['tm_min'] + $tm['tm_sec'];
 
-	foreach ($arrOfFlexIntervals as $flexInterval) {
-		if (sscanf($flexInterval, '%d/%d-%d,%d:%d-%d:%d', $delay, $d1, $d2, $h1, $m1, $h2, $m2) != 7) {
-			if (sscanf($flexInterval, '%d/%d,%d:%d-%d:%d', $delay, $d1, $h1, $m1, $h2, $m2) != 6) {
+	foreach ($flexible_intervals as $flexible_interval) {
+		$flexible_interval_parts = explode('/', $flexible_interval);
+
+		if (sscanf($flexible_interval_parts[1], '%d-%d,%d:%d-%d:%d', $d1, $d2, $h1, $m1, $h2, $m2) != 6) {
+			if (sscanf($flexible_interval_parts[1], '%d,%d:%d-%d:%d', $d1, $h1, $m1, $h2, $m2) != 5) {
 				continue;
 			}
 			$d2 = $d1;
@@ -1182,10 +1186,12 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
 			}
 		}
 	}
+
 	if ($next != 0) {
-		$nextInterval = $next;
+		$next_interval = $next;
 	}
-	return $next != 0;
+
+	return ($next != 0);
 }
 
 /**
