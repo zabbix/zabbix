@@ -33,6 +33,7 @@ class CCheckBox extends CInput {
 		else {
 			$this->removeAttribute('checked');
 		}
+
 		return $this;
 	}
 }

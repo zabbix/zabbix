@@ -156,11 +156,10 @@ jQuery(function($) {
 	 * @param bool   options['addNew']				allow user to create new names (optional)
 	 * @param int    options['selectedLimit']		how many items can be selected (optional)
 	 * @param int    options['limit']				how many available items can be received from backend (optional)
-	 * @param object options['popup']				popup data {parameters, width, height, buttonClass} (optional)
+	 * @param object options['popup']				popup data {parameters, width, height} (optional)
 	 * @param string options['popup']['parameters']
 	 * @param int    options['popup']['width']
 	 * @param int    options['popup']['height']
-	 * @param string options['popup']['buttonClass'](optional)
 	 *
 	 * @return object
 	 */
@@ -492,7 +491,7 @@ jQuery(function($) {
 
 				var popupButton = $('<button>', {
 					type: 'button',
-					'class': options.popup.buttonClass ? options.popup.buttonClass : 'btn-grey',
+					'class': 'btn-grey',
 					text: options.labels['Select']
 				});
 
@@ -904,13 +903,6 @@ jQuery(function($) {
 	function setReadonly(obj) {
 		$('input[type="text"]', obj).css({'display': 'none'});
 		$(obj).removeClass('active');
-
-		var item = $('.selected li', obj),
-			item_margins = item.outerHeight(true) - item.height();
-
-		$('.selected ul', obj).css({
-			'padding-bottom': item_margins
-		});
 	}
 
 	function getLimit(values, options) {

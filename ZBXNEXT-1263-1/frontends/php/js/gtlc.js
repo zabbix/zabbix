@@ -1093,23 +1093,12 @@ var CScrollBar = Class.create({
 		addListener(this.dom.info_right, 'click', this.calendarShowRight.bindAsEventListener(this));
 	},
 
-	/**
-	 * Optimization:
-	 * 7200 = 2 * 3600
-	 * 10800 = 3 * 3600
-	 * 21600 = 6 * 3600
-	 * 43200 = 12 * 3600
-	 * 604800 = 7 * 86400
-	 * 1209600 = 14 * 86400
-	 * 2592000 = 30 * 86400
-	 * 7776000 = 90 * 86400
-	 * 15552000 = 180 * 86400
-	 * 31536000 = 365 * 86400
-	 */
 	appendZoomLinks: function() {
 		var timeline = timeControl.timeline.endtime() - timeControl.timeline.starttime();
 		var caption = '';
-		var zooms = [3600, 7200, 10800, 21600, 43200, 86400, 604800, 1209600, 2592000, 7776000, 15552000, 31536000];
+		var zooms = [3600, 7200, 10800, 21600, 43200, 86400, 259200, 604800, 1209600, 2592000, 7776000, 15552000,
+			31536000
+		];
 		var links = 0;
 
 		for (var key in zooms) {

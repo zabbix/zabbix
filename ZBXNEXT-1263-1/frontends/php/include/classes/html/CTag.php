@@ -117,12 +117,15 @@ class CTag extends CObject {
 	}
 
 	public function addClass($class) {
-		if (!isset($this->attributes['class']) || zbx_empty($this->attributes['class'])) {
-			$this->attributes['class'] = $class;
+		if ($class !== null) {
+			if (!array_key_exists('class', $this->attributes) || $this->attributes['class'] === '') {
+				$this->attributes['class'] = $class;
+			}
+			else {
+				$this->attributes['class'] .= ' '.$class;
+			}
 		}
-		else {
-			$this->attributes['class'] .= ' '.$class;
-		}
+
 		return $this;
 	}
 

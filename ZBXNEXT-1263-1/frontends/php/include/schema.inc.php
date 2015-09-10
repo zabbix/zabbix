@@ -2283,37 +2283,37 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'DBDBDB',
+				'default' => '97AAB3',
 			],
 			'severity_color_1' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'D6F6FF',
+				'default' => '7499FF',
 			],
 			'severity_color_2' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'FFF6A5',
+				'default' => 'FFC859',
 			],
 			'severity_color_3' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'FFB689',
+				'default' => 'FFA059',
 			],
 			'severity_color_4' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'FF9999',
+				'default' => 'E97659',
 			],
 			'severity_color_5' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'FF3838',
+				'default' => 'E45959',
 			],
 			'severity_name_0' => [
 				'null' => false,
@@ -5939,24 +5939,6 @@ return [
 				'default' => '0',
 			],
 			'optional' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-		],
-	],
-	'opinventory' => [
-		'key' => 'operationid',
-		'fields' => [
-			'operationid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'operations',
-				'ref_field' => 'operationid',
-			],
-			'inventory_mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
