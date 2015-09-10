@@ -495,6 +495,12 @@ class CHostGroup extends CZBXAPI {
 			);
 		}
 		$groupids = DB::insert('groups', $groups);
+		$created_groups = $this->get(array(
+			'output' => array('name'),
+			'groupids' => $groupids,
+			'preservekeys' => true
+		));
+		mass_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupids, $created_groups, 'groups', array(), array());
 
 		return array('groupids' => $groupids);
 	}
@@ -573,6 +579,9 @@ class CHostGroup extends CZBXAPI {
 
 			// prevents updating several groups with same name
 			$groupsNames[$group['name']] = array('groupid' => $group['groupid']);
+
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'],
+				'groups', $updGroups[$group['groupid']], $group);
 		}
 
 		DB::update('groups', $update);

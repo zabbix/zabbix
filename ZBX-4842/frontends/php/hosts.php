@@ -473,8 +473,6 @@ elseif (isset($_REQUEST['save'])) {
 			else {
 				throw new Exception();
 			}
-
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostId, $host['host'], null, null, null);
 		}
 		else {
 			$hostId = $host['hostid'] = $_REQUEST['hostid'];
@@ -489,8 +487,6 @@ elseif (isset($_REQUEST['save'])) {
 				'output' => API_OUTPUT_EXTEND
 			));
 			$hostNew = reset($hostNew);
-
-			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $hostNew['hostid'], $hostNew['host'], 'hosts', $hostOld, $hostNew);
 		}
 
 		if ($_REQUEST['form'] == 'full_clone') {

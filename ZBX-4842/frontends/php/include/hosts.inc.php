@@ -555,6 +555,7 @@ function updateHostStatus($hostids, $status) {
 
 	$hostIds = array();
 	$oldStatus = ($status == HOST_STATUS_MONITORED ? HOST_STATUS_NOT_MONITORED : HOST_STATUS_MONITORED);
+	$auditAction = ($status == HOST_STATUS_MONITORED) ? AUDIT_ACTION_ENABLE : AUDIT_ACTION_DISABLE;
 
 	$db_hosts = DBselect(
 		'SELECT h.hostid,h.host,h.status'.
@@ -567,7 +568,7 @@ function updateHostStatus($hostids, $status) {
 
 		$host_new = $host;
 		$host_new['status'] = $status;
-		add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
+		add_audit_ext($auditAction, AUDIT_RESOURCE_HOST, $host['hostid'], $host['host'], 'hosts', $host, $host_new);
 		info(_('Updated status of host').' "'.$host['host'].'"');
 	}
 

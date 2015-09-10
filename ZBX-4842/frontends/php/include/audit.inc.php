@@ -175,3 +175,23 @@ function add_audit_details($action, $resourcetype, $resourceid, $resourcename, $
 		return false;
 	}
 }
+
+/**
+ * Auditlog for mass oparations
+ * @param int $action
+ * @param int $resourcetype
+ * @param int $resourceid
+ * @param str $resourcename
+ * @param str $table_name
+ * @param array $values_old
+ * @param array $values_new
+ */
+function mass_audit($action, $resourcetype, array $resourceids, array $resourcenames, $table_name,
+		array $values_old, array $values_new) {
+	foreach ($resourceids as $resourceid) {
+		$tmp_values_old = (array_key_exists($resourceid, $values_old)) ? $values_old[$resourceid] : null;
+		$resource_name = (array_key_exists($resourceid, $resourcenames)) ? $resourcenames[$resourceid]['name'] : '';
+
+		add_audit_ext($action, $resourcetype, $resourceid, $resource_name, $table_name, $tmp_values_old, $values_new);
+	}
+}

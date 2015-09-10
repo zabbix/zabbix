@@ -168,13 +168,6 @@ elseif (isset($_REQUEST['save'])) {
 
 				$result &= (bool) API::HostGroup()->massRemove($massRemove);
 			}
-
-			if ($result) {
-				$group = reset($groups);
-
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'],
-					'groups', array('name' => $oldGroup['name']), array('name' => $group['name']));
-			}
 		}
 
 		$result = DBend($result);
@@ -198,12 +191,6 @@ elseif (isset($_REQUEST['save'])) {
 				'templates' => $templates,
 				'groups' => $groups
 			));
-
-			if ($result) {
-				$group = reset($groups);
-
-				add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $group['groupid'], $group['name'], null, null, null);
-			}
 		}
 
 		$result = DBend($result);
@@ -258,20 +245,6 @@ elseif (str_in_array(getRequest('go'), array('activate', 'disable'))) {
 				'hosts' => $hosts,
 				'status' => $status
 			));
-
-			if ($result) {
-				foreach ($hosts as $host) {
-					add_audit_ext(
-						$auditAction,
-						AUDIT_RESOURCE_HOST,
-						$host['hostid'],
-						$host['host'],
-						'hosts',
-						array('status' => $host['status']),
-						array('status' => $status)
-					);
-				}
-			}
 		}
 		else {
 			$result = true;

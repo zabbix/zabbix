@@ -1021,6 +1021,9 @@ class CUser extends CZBXAPI {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot logout.'));
 		}
 
+		add_audit_details(AUDIT_ACTION_LOGOUT, AUDIT_RESOURCE_USER, $session['userid'], CWebUser::$data['alias'],
+			_('Logout')
+		);
 		DBexecute('DELETE FROM sessions WHERE status='.ZBX_SESSION_PASSIVE.' AND userid='.zbx_dbstr($session['userid']));
 		DBexecute('UPDATE sessions SET status='.ZBX_SESSION_PASSIVE.' WHERE sessionid='.zbx_dbstr($sessionId));
 
@@ -1141,8 +1144,6 @@ class CUser extends CZBXAPI {
 		$sessionid = md5(time().$password.$name.rand(0, 10000000));
 		DBexecute('INSERT INTO sessions (sessionid,userid,lastaccess,status) VALUES ('.zbx_dbstr($sessionid).','.$userInfo['userid'].','.time().','.ZBX_SESSION_ACTIVE.')');
 
-		add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Correct login "%s".', $name));
-
 		$userData = $this->_getUserData($userInfo['userid']);
 		$userData['sessionid'] = $sessionid;
 		$userData['gui_access'] = $guiAccess;
@@ -1153,6 +1154,7 @@ class CUser extends CZBXAPI {
 		}
 
 		CWebUser::$data = self::$userData = $userData;
+		add_audit(AUDIT_ACTION_LOGIN, AUDIT_RESOURCE_USER, _s('Correct login "%s".', $name));
 
 		return isset($user['userData']) ? $userData : $userData['sessionid'];
 	}

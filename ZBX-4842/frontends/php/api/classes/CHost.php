@@ -879,6 +879,7 @@ class CHost extends CHostGeneral {
 		foreach ($hosts as $host) {
 			$hostid = DB::insert('hosts', array($host));
 			$hostids[] = $hostid = reset($hostid);
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST, $hostid, $host['host'], 'hosts', NULL, NULL);
 
 			$host['hostid'] = $hostid;
 
@@ -1179,6 +1180,7 @@ class CHost extends CHostGeneral {
 				'values' => $data,
 				'where' => array('hostid' => $hostids)
 			));
+			mass_audit(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_HOST, $hostids, $updHosts, 'hosts', $updHosts, $data);
 		}
 
 		if (isset($updateStatus)) {
