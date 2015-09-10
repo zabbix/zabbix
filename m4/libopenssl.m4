@@ -43,7 +43,7 @@ AC_DEFUN([LIBOPENSSL_ACCEPT_VERSION],
 
 	# get version
 	found_openssl_version=`grep OPENSSL_VERSION_NUMBER "$1"`
-	found_openssl_version=`expr "$found_openssl_version" : '.*\(0x\w\w\w\w\w\w\w\).*'`
+	found_openssl_version=`expr "$found_openssl_version" : '.*\(0x[[0-f]][[0-f]][[0-f]][[0-f]][[0-f]][[0-f]][[0-f]]\).*'`
 
 	# compare versions lexicographically
 	openssl_version_check=`expr $found_openssl_version \>\= $minimal_openssl_version`
