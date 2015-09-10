@@ -216,9 +216,9 @@ ul.top-nav-icons {
     text-decoration: none;
     opacity: 0.75;
     filter: alpha(opacity=75);
-    -webkit-transition: all 0.2s ease-out;
-    -moz-transition: all 0.2s ease-out;
-    transition: all 0.2s ease-out; }
+    -webkit-transition: opacity 0.2s ease-out;
+    -moz-transition: opacity 0.2s ease-out;
+    transition: opacity 0.2s ease-out; }
     ul.top-nav-icons a:hover {
       opacity: 1;
       filter: alpha(opacity=100); }
