@@ -715,6 +715,18 @@ static void	lld_expression_simplify(char **expression, zbx_vector_ptr_t *functio
 		if ('{' != (*expression)[l])
 			continue;
 
+		if ('$' == (*expression)[l + 1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+				l += macro_r;
+			else
+				l++;
+
+			continue;
+		}
+
 		for (r = l + 1; '\0' != (*expression)[r] && '}' != (*expression)[r]; r++)
 			;
 
@@ -771,6 +783,18 @@ static char	*lld_expression_expand(const char *expression, zbx_vector_ptr_t *fun
 
 		if ('{' != expression[l])
 			continue;
+
+		if ('$' == expression[l + 1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (SUCCEED == zbx_user_macro_parse(expression + l, &macro_r, &context_l, &context_r))
+				l += macro_r;
+			else
+				l++;
+
+			continue;
+		}
 
 		for (r = l + 1; '\0' != expression[r] && '}' != expression[r]; r++)
 			;
@@ -1640,6 +1664,18 @@ static void	lld_expression_create(char **expression, zbx_vector_ptr_t *functions
 	{
 		if ('{' != (*expression)[l])
 			continue;
+
+		if ('$' == (*expression)[l + 1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+				l += macro_r;
+			else
+				l++;
+
+			continue;
+		}
 
 		for (r = l + 1; '\0' != (*expression)[r] && '}' != (*expression)[r]; r++)
 			;
