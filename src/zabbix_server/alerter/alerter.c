@@ -102,11 +102,10 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 			for (pstart = mediatype->exec_params; NULL != (pend = strchr(pstart, '\n')); pstart = pend + 1)
 			{
-				char	*param, *param_esc;
+				char	*param = NULL, *param_esc;
+				size_t	param_alloc = 0, param_offset = 0;
 
-				param = zbx_malloc(NULL, pend - pstart + 1);
-				memcpy(param, pstart, pend - pstart);
-				param[pend - pstart] = '\0';
+				zbx_strncpy_alloc(&param, &param_alloc, &param_offset, pstart, pend - pstart);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, alert, NULL, &param,
 						MACRO_TYPE_ALERT, NULL, 0);
