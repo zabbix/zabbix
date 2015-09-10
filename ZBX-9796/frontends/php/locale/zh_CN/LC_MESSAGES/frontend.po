@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-08-31 12:39+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -44,7 +44,7 @@ msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] ""
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (年 %2$s)"
@@ -332,12 +332,12 @@ msgstr "动作已添加"
 msgid "Action deleted"
 msgstr "动作已删除"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1676,7 +1676,7 @@ msgstr "无法删除脚本. 脚本 \"%1$s\" 用于动作操作 \"%2$s\"."
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "无法删除所选的动作"
 
@@ -1766,7 +1766,7 @@ msgstr "无法删除值对应"
 msgid "Cannot delete web scenario"
 msgstr "无法删除 web 场景"
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1832,11 +1832,11 @@ msgstr[0] "无法禁止 web 场景"
 msgid "Cannot display item queue."
 msgstr "无法显示监控项队列."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -5429,7 +5429,7 @@ msgstr "图形化使用者介面存取已停用"
 msgid "General"
 msgstr "一般"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:779
 #, c-format
 msgid "Generated in %s sec"
@@ -9763,7 +9763,7 @@ msgstr "没有含项目ID\"%1$s\"的项目."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "没有含项目ID\"%1$s\"的项目."
 
-#: chart3.php:121
+#: chart3.php:123
 msgid "No items defined."
 msgstr "没有已定义的项目."
 
@@ -10025,7 +10025,7 @@ msgstr "没有触发器"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "没有含触发器ID\"%1$s\"的触发器."
 
-#: chart4.php:40 tr_comments.php:41
+#: chart4.php:42 tr_comments.php:41
 msgid "No triggers defined."
 msgstr "没有已定义的触发器."
 
@@ -10394,7 +10394,7 @@ msgstr "数字的 (无正负)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
+#: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
 #: include/maps.inc.php:945 include/setup.inc.php:198
@@ -10586,7 +10586,7 @@ msgstr "只计算指派给启用的主机的和相依于启用的项目的触发
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "操作\"%s\"已存在."
@@ -10913,7 +10913,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "问题"
@@ -11280,7 +11280,7 @@ msgstr "问题, 如果所有的下层都有问题"
 msgid "Problem, if at least one child has a problem"
 msgstr "问题, 如果至少一个下层有一个问题"
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
 #: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "问题"
@@ -12405,7 +12405,7 @@ msgstr "选择行含有值类似于"
 msgid "Selected"
 msgstr "选择的"
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr "所选的动作已删除"
 
@@ -15637,7 +15637,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

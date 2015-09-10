@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-08-31 12:39+0300\n"
 "PO-Revision-Date: 2015-06-28 18:18+0300\n"
 "Last-Translator: antonin <antonin.sommier@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -44,7 +44,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] "%1$d problème sur %2$d est affiché"
 msgstr[1] "%1$d problèmes sur %2$d sont affichés"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (année %2$s)"
@@ -336,13 +336,13 @@ msgstr "Action ajoutée"
 msgid "Action deleted"
 msgstr "Action supprimée"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Action désactivée"
 msgstr[1] "Actions désactivées"
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Action activée"
@@ -1685,7 +1685,7 @@ msgstr "Impossible de supprimer les scripts. Le script \"%1$s\" est utilisé dan
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Impossible de supprimer des scripts. Le script avec l'identifiant \"%1$s\" n'existe pas."
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "Impossible de supprimer les actions sélectionnées"
 
@@ -1775,7 +1775,7 @@ msgstr "Impossible de supprimer la table de correspondance"
 msgid "Cannot delete web scenario"
 msgstr "Impossible de supprimer le scénario web"
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Impossible de désactiver l'action"
@@ -1851,11 +1851,11 @@ msgstr[1] "Impossible de désactiver les scénarios web"
 msgid "Cannot display item queue."
 msgstr "Impossible d'afficher la file d'attente des éléments."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Impossible d'afficher plus d'un élément de type \"Somme de graphique\"."
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Impossible d'activer l'action"
@@ -5468,7 +5468,7 @@ msgstr "Accès GUI désactivé."
 msgid "General"
 msgstr "Général"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:779
 #, c-format
 msgid "Generated in %s sec"
@@ -9820,7 +9820,7 @@ msgstr "Aucun élément avec l'identifiant (itemid) \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Aucun élément avec idemid=\"%1$s\"."
 
-#: chart3.php:121
+#: chart3.php:123
 msgid "No items defined."
 msgstr "Aucun élément défini."
 
@@ -10082,7 +10082,7 @@ msgstr "Aucun déclencheur"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Aucun déclencheur avec l'identifiant (triggerid) \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:41
+#: chart4.php:42 tr_comments.php:41
 msgid "No triggers defined."
 msgstr "Aucun déclencheur défini."
 
@@ -10452,7 +10452,7 @@ msgstr "Numérique (non signé)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
+#: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
 #: include/maps.inc.php:945 include/setup.inc.php:198
@@ -10644,7 +10644,7 @@ msgstr "Seuls les déclencheurs assignés à des hôtes activés et dépendant d
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "L'opération \"%s\" existe déjà."
@@ -10973,7 +10973,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "PROBLÈME"
@@ -11340,7 +11340,7 @@ msgstr "Problème si tous les enfants ont un problème"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problème si au moins un enfant a un problème"
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
 #: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problèmes"
@@ -12466,7 +12466,7 @@ msgstr "Sélection les lignes avec une valeur comme"
 msgid "Selected"
 msgstr "Sélectionné"
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr "Actions sélectionnées supprimées"
 
@@ -15709,7 +15709,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d M"
 

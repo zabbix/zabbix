@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-08-31 12:39+0300\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -46,7 +46,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] "%1$d van %2$d probleem wordt getoond"
 msgstr[1] "%1$d van %2$d problemen wordt getoond"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (jaar %2$s)"
@@ -338,13 +338,13 @@ msgstr "Actie toegevoegd"
 msgid "Action deleted"
 msgstr "Actie verwijderd"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1687,7 +1687,7 @@ msgstr "Kan de scripts niet verwijderen. Het script \"%1$s\" wordt gebruikt in e
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Kan scripts niet verwijderen. Scripts met scriptid \"%1$s\" bestaat niet."
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "Kan de geslecteerde acties niet verwijderen"
 
@@ -1777,7 +1777,7 @@ msgstr "Kan waarde relaties niet verwijderen"
 msgid "Cannot delete web scenario"
 msgstr "Kan web scenario niet verwijderen"
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1855,11 +1855,11 @@ msgstr[1] "Kan web scenario niet uitschakelen"
 msgid "Cannot display item queue."
 msgstr "Kan artikel wachtrij niet weergeven."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Kan niet meer dan één item weergeven met type \"Graph sum\"."
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -5469,7 +5469,7 @@ msgstr "GUI toegang uitgeschakeld."
 msgid "General"
 msgstr "Algemeen"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:779
 #, c-format
 msgid "Generated in %s sec"
@@ -9822,7 +9822,7 @@ msgstr ""
 msgid "No item with itemid=\"%1$s\"."
 msgstr ""
 
-#: chart3.php:121
+#: chart3.php:123
 msgid "No items defined."
 msgstr ""
 
@@ -10084,7 +10084,7 @@ msgstr ""
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr ""
 
-#: chart4.php:40 tr_comments.php:41
+#: chart4.php:42 tr_comments.php:41
 msgid "No triggers defined."
 msgstr ""
 
@@ -10453,7 +10453,7 @@ msgstr "Numeriek (integer 64bit)"
 msgid "OEM"
 msgstr ""
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
+#: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
 #: include/maps.inc.php:945 include/setup.inc.php:198
@@ -10645,7 +10645,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -10972,7 +10972,7 @@ msgstr ""
 msgid "POP"
 msgstr ""
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr ""
@@ -11339,7 +11339,7 @@ msgstr ""
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
 #: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Problemen"
@@ -12465,7 +12465,7 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr ""
 
@@ -15704,7 +15704,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M H:i:s"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 
