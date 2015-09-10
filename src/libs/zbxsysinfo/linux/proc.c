@@ -22,7 +22,6 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
-#include "db.h"
 
 typedef struct
 {

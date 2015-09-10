@@ -513,7 +513,7 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 
 		init_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
+		if (SUCCEED == process(CONFIG_HOST_METADATA_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
 				NULL != (value = GET_STR_RESULT(&result)) && NULL != *value)
 		{
 			if (SUCCEED != zbx_is_utf8(*value))

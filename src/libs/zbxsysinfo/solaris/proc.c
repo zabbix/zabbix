@@ -20,7 +20,7 @@
 #include <procfs.h>
 
 #ifdef HAVE_ZONE_H
-#	include "<zone.h>
+#	include <zone.h>
 #endif
 
 #include "common.h"

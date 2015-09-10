@@ -274,18 +274,17 @@ function prepareSubfilterOutput($label, $data, $subfilter, $subfilterName) {
 
 		// is activated
 		if (str_in_array($id, $subfilter)) {
-			$link = (new CSpan($element['name']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(ZBX_STYLE_GREEN)
-				->onClick(CHtml::encode(
-					'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
-					'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
-				));
-			$output[] = $link;
-			$output[] = SPACE;
-			$output[] = new CSup($element['count']);
+			$output[] = (new CSpan([
+				(new CSpan($element['name']))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->onClick(CHtml::encode(
+						'javascript: create_var("zbx_filter", "subfilter_set", "1", false);'.
+						'create_var("zbx_filter", '.CJs::encodeJson($subfilterName.'['.$id.']').', null, true);'
+					)),
+				SPACE,
+				new CSup($element['count'])
+			]))->addClass(ZBX_STYLE_SUBFILTER_ENABLED);
 		}
-
 		// isn't activated
 		else {
 			// subfilter has 0 items
@@ -612,16 +611,12 @@ function getItemFilterForm(&$items) {
 	$form->addColumn($filterColumn4);
 
 	// subfilters
-	$table_subfilter = new CTableInfo();
-	$table_subfilter->addRow(
-		[
-			new CTag('h4', true,
-				[
-					_('Subfilter').SPACE,
-					new CSpan(_('affects only filtered data'))
-				]
-			)]
-	);
+	$table_subfilter = (new CTableInfo())
+		->addRow([
+			new CTag('h4', true, [
+				_('Subfilter'), SPACE, (new CSpan(_('affects only filtered data')))->addClass(ZBX_STYLE_GREY)
+			])
+		]);
 
 	// array contains subfilters and number of items in each
 	$item_params = [
@@ -1061,26 +1056,23 @@ function getItemFormData(array $item = [], array $options = []) {
 					}
 					// discovery rule
 					elseif ($data['is_discovery_rule']) {
-						$data['templates'][] = (new CLink($host['name'], 'host_discovery.php?form=update&itemid='.$item['itemid']))
-							->addClass('highlight')
-							->addClass('underline')
-							->addClass('weight_normal');
+						$data['templates'][] = new CLink($host['name'],
+							'host_discovery.php?form=update&itemid='.$item['itemid']
+						);
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// item prototype
 					elseif ($item['discoveryRule']) {
-						$data['templates'][] = (new CLink($host['name'], 'disc_prototypes.php?form=update&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']))
-							->addClass('highlight')
-							->addClass('underline')
-							->addClass('weight_normal');
+						$data['templates'][] = new CLink($host['name'], 'disc_prototypes.php?form=update'.
+							'&itemid='.$item['itemid'].'&parent_discoveryid='.$item['discoveryRule']['itemid']
+						);
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 					// plain item
 					else {
-						$data['templates'][] = (new CLink($host['name'], 'items.php?form=update&itemid='.$item['itemid']))
-							->addClass('highlight')
-							->addClass('underline')
-							->addClass('weight_normal');
+						$data['templates'][] = new CLink($host['name'],
+							'items.php?form=update&itemid='.$item['itemid']
+						);
 						$data['templates'][] = SPACE.'&rArr;'.SPACE;
 					}
 				}
@@ -1460,10 +1452,7 @@ function getTriggerFormData($exprAction) {
 					$link = 'triggers.php?form=update&triggerid='.$db_triggers['triggerid'].'&hostid='.$db_triggers['hostid'];
 				}
 
-				$data['templates'][] = (new CLink(CHtml::encode($db_triggers['name']), $link))
-					->addClass('highlight')
-					->addClass('underline')
-					->addClass('weight_normal');
+				$data['templates'][] = new CLink(CHtml::encode($db_triggers['name']), $link);
 				$data['templates'][] = SPACE.'&rArr;'.SPACE;
 			}
 			$tmp_triggerid = $db_triggers['templateid'];
@@ -1722,50 +1711,115 @@ function get_timeperiod_form() {
 				->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 		]);
 
-		$tabDays = new CTable();
-		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')]);
-		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')]);
-		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')]);
-		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')]);
-		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')]);
-		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')]);
-		$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')]);
+		$tabDays = (new CTable())
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')],
+					'new_timeperiod[dayofweek_mo]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')],
+					'new_timeperiod[dayofweek_tu]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')],
+					'new_timeperiod[dayofweek_we]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')],
+					'new_timeperiod[dayofweek_th]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')],
+					'new_timeperiod[dayofweek_fr]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')],
+					'new_timeperiod[dayofweek_sa]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')],
+					'new_timeperiod[dayofweek_su]'
+				)
+			]);
 		$tblPeriod->addRow([_('Day of week'), $tabDays]);
 	}
 	elseif ($new_timeperiod['timeperiod_type'] == TIMEPERIOD_TYPE_MONTHLY) {
 		$tblPeriod->addItem(new CVar('new_timeperiod[start_date]', $new_timeperiod['start_date']));
 
-		$tabMonths = new CTable();
-		$tabMonths->addRow([
-			(new CCheckBox('new_timeperiod[month_jan]'))->setChecked($month[0] == 1), _('January'),
-			SPACE, SPACE,
-			(new CCheckBox('new_timeperiod[month_jul]'))->setChecked($month[6] == 1), _('July')
-		]);
-		$tabMonths->addRow([
-			(new CCheckBox('new_timeperiod[month_feb]'))->setChecked($month[1] == 1), _('February'),
-			SPACE, SPACE,
-			(new CCheckBox('new_timeperiod[month_aug]'))->setChecked($month[7] == 1), _('August')
-		]);
-		$tabMonths->addRow([
-			(new CCheckBox('new_timeperiod[month_mar]'))->setChecked($month[2] == 1), _('March'),
-			SPACE, SPACE,
-			(new CCheckBox('new_timeperiod[month_sep]'))->setChecked($month[8] == 1), _('September')
-		]);
-		$tabMonths->addRow([
-			(new CCheckBox('new_timeperiod[month_apr]'))->setChecked($month[3] == 1), _('April'),
-			SPACE, SPACE,
-			(new CCheckBox('new_timeperiod[month_oct]'))->setChecked($month[9] == 1), _('October')
-		]);
-		$tabMonths->addRow([
-			(new CCheckBox('new_timeperiod[month_may]'))->setChecked($month[4] == 1), _('May'),
-			SPACE, SPACE,
-			(new CCheckBox('new_timeperiod[month_nov]'))->setChecked($month[10] == 1), _('November')
-		]);
-		$tabMonths->addRow([
-			(new CCheckBox('new_timeperiod[month_jun]'))->setChecked($month[5] == 1), _('June'),
-			SPACE, SPACE,
-			(new CCheckBox('new_timeperiod[month_dec]'))->setChecked($month[11] == 1), _('December')
-		]);
+		$tabMonths = (new CTable())
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_jan]'))->setChecked($month[0] == 1), _('January')],
+					'new_timeperiod[month_jan]'
+				),
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_jul]'))->setChecked($month[6] == 1), _('July')],
+					'new_timeperiod[month_jul]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_feb]'))->setChecked($month[1] == 1), _('February')],
+					'new_timeperiod[month_feb]'
+				),
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_aug]'))->setChecked($month[7] == 1), _('August')],
+					'new_timeperiod[month_aug]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_mar]'))->setChecked($month[2] == 1), _('March')],
+					'new_timeperiod[month_mar]'
+				),
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_sep]'))->setChecked($month[8] == 1), _('September')],
+					'new_timeperiod[month_sep]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_apr]'))->setChecked($month[3] == 1), _('April')],
+					'new_timeperiod[month_apr]'
+				),
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_oct]'))->setChecked($month[9] == 1), _('October')],
+					'new_timeperiod[month_oct]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_may]'))->setChecked($month[4] == 1), _('May')],
+					'new_timeperiod[month_may]'
+				),
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_nov]'))->setChecked($month[10] == 1), _('November')],
+					'new_timeperiod[month_nov]'
+				)
+			])
+			->addRow([
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_jun]'))->setChecked($month[5] == 1), _('June')],
+					'new_timeperiod[month_jun]'
+				),
+				new CLabel(
+					[(new CCheckBox('new_timeperiod[month_dec]'))->setChecked($month[11] == 1), _('December')],
+					'new_timeperiod[month_dec]'
+				)
+			]);
 		$tblPeriod->addRow([_('Month'), $tabMonths]);
 
 		$tblPeriod->addRow([_('Date'),
@@ -1787,15 +1841,50 @@ function get_timeperiod_form() {
 
 			$td = (new CCol($cmbCount))->setColSpan(2);
 
-			$tabDays = new CTable();
-			$tabDays->addRow($td);
-			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')]);
-			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')]);
-			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')]);
-			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')]);
-			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')]);
-			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')]);
-			$tabDays->addRow([(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')]);
+			$tabDays = (new CTable())
+				->addRow($td)
+				->addRow([
+					new CLabel(
+						[(new CCheckBox('new_timeperiod[dayofweek_mo]'))->setChecked($dayofweek[0] == 1), _('Monday')],
+						'new_timeperiod[dayofweek_mo]'
+					)
+				])
+				->addRow([
+					new CLabel(
+						[(new CCheckBox('new_timeperiod[dayofweek_tu]'))->setChecked($dayofweek[1] == 1), _('Tuesday')],
+						'new_timeperiod[dayofweek_tu]'
+					)
+				])
+				->addRow([
+					new CLabel(
+						[(new CCheckBox('new_timeperiod[dayofweek_we]'))->setChecked($dayofweek[2] == 1), _('Wednesday')],
+						'new_timeperiod[dayofweek_we]'
+					)
+				])
+				->addRow([
+					new CLabel(
+						[(new CCheckBox('new_timeperiod[dayofweek_th]'))->setChecked($dayofweek[3] == 1), _('Thursday')],
+						'new_timeperiod[dayofweek_th]'
+					)
+				])
+				->addRow([
+					new CLabel(
+						[(new CCheckBox('new_timeperiod[dayofweek_fr]'))->setChecked($dayofweek[4] == 1), _('Friday')],
+						'new_timeperiod[dayofweek_fr]'
+					)
+				])
+				->addRow([
+					new CLabel(
+						[(new CCheckBox('new_timeperiod[dayofweek_sa]'))->setChecked($dayofweek[5] == 1), _('Saturday')],
+						'new_timeperiod[dayofweek_sa]'
+					)
+				])
+				->addRow([
+					new CLabel(
+						[(new CCheckBox('new_timeperiod[dayofweek_su]'))->setChecked($dayofweek[6] == 1), _('Sunday')],
+						'new_timeperiod[dayofweek_su]'
+					)
+				]);
 			$tblPeriod->addRow([_('Day of week'), $tabDays]);
 		}
 		else {

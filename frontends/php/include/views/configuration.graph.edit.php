@@ -264,26 +264,26 @@ $itemsTable = (new CTable())
 		(new CColHeader(_('Action')))->setWidth(50)
 	]);
 
-$addButton = (new CButton('add_item', _('Add')))
-	->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
-		($this->data['normal_only'] ? '&normal_only=1' : '').
-		'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());')
-	->addClass(ZBX_STYLE_BTN_LINK);
-
-$addPrototypeButton = null;
-if ($this->data['parent_discoveryid']) {
-	$addPrototypeButton = (new CButton('add_protoitem', _('Add prototype')))
-		->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
-			url_param($this->data['graphtype'], false, 'graphtype').
-			url_param('parent_discoveryid').
-			($this->data['normal_only'] ? '&normal_only=1' : '').
-			'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
-		->addClass(ZBX_STYLE_BTN_LINK)
-		->addStyle('margin-left: 8px');
-}
 $itemsTable->addRow(
 	(new CRow(
-		(new CCol([$addButton, $addPrototypeButton]))->setColSpan(8)
+		(new CCol(
+			new CHorList([
+				(new CButton('add_item', _('Add')))
+					->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
+						($this->data['normal_only'] ? '&normal_only=1' : '').
+						'&srctbl=items&srcfld1=itemid&srcfld2=name&numeric=1" + getOnlyHostParam());')
+					->addClass(ZBX_STYLE_BTN_LINK),
+				$this->data['parent_discoveryid']
+					? (new CButton('add_protoitem', _('Add prototype')))
+						->onClick('return PopUp("popup.php?writeonly=1&multiselect=1&dstfrm='.$graphForm->getName().
+							url_param($this->data['graphtype'], false, 'graphtype').
+							url_param('parent_discoveryid').
+							($this->data['normal_only'] ? '&normal_only=1' : '').
+							'&srctbl=item_prototypes&srcfld1=itemid&srcfld2=name&numeric=1");')
+						->addClass(ZBX_STYLE_BTN_LINK)
+					: null
+			])
+		))->setColSpan(8)
 	))->setId('itemButtonsRow')
 );
 
