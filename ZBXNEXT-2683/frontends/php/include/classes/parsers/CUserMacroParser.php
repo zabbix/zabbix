@@ -96,14 +96,14 @@ class CUserMacroParser {
 		 * If there are macros, populate the array with data:
 		 * $macros[]['match'] - full match with all the escaped quotes
 		 * $macros[]['macro'] - matches only macro with context and trims spaces
-		 * $macros[]['poitions']['start'] - starting position of the macro
-		 * $macros[]['poitions']['length'] - macro length (with context)
+		 * $macros[]['positions']['start'] - starting position of the macro
+		 * $macros[]['positions']['length'] - macro length (with context)
 		 * $macros[]['macro_name'] - only macro name
 		 * $macros[]['context'] - context with no quotes
 		 */
 		$this->macros = [];
 
-		// True when there is a quote before macro. For example abd"def{MACRO}
+		// True when there is a quote before macro. For example abc"def{$MACRO}
 		$quoted_string = false;
 
 		// Macro counter.
@@ -170,7 +170,7 @@ class CUserMacroParser {
 									if ($quoted_string) {
 										/*
 										 * There was already a quote, and this is the second one. Close and start over.
-										 * possile valid macro can looke like this: abc"def"ghi{$MACRO:"abc"}
+										 * Possible valid macro can look like this: abc"def"ghi{$MACRO:"abc"}
 										 */
 										$quoted_string = false;
 									}
@@ -194,14 +194,14 @@ class CUserMacroParser {
 								return;
 							}
 
-							// Else it just skips all other chars untill finds where macro begins.
+							// Else it just skips all other chars until it finds where macro begins.
 					}
 					break;
 
 				case self::STATE_MACRO_NEW:
 					switch ($this->source[$this->pos]) {
 						case '$':
-							// Even greater potential that following chars will me a real macro.
+							// Even greater potential that following chars will be a real macro.
 							$this->macros[$i]['match'] .= $this->source[$this->pos];
 							$this->macros[$i]['macro'] .= $this->source[$this->pos];
 
@@ -229,9 +229,7 @@ class CUserMacroParser {
 						$this->macros[$i]['match'] .= $this->source[$this->pos];
 						$this->macros[$i]['macro'] .= $this->source[$this->pos];
 
-						if ($state != self::STATE_MACRO_PROGRESS) {
-							$state = self::STATE_MACRO_PROGRESS;
-						}
+						$state = self::STATE_MACRO_PROGRESS;
 					}
 					else {
 						unset($this->macros[$i]);
@@ -264,7 +262,7 @@ class CUserMacroParser {
 
 				case self::STATE_MACRO_PROGRESS:
 					if ($this->isMacroChar($this->source[$this->pos])) {
-						// The following chars are macro chars. Everthing is going fine so far.
+						// The following chars are macro chars. Everything is going fine so far.
 						$this->macros[$i]['macro_name'] .= $this->source[$this->pos];
 						$this->macros[$i]['match'] .= $this->source[$this->pos];
 						$this->macros[$i]['macro'] .= $this->source[$this->pos];
@@ -296,7 +294,7 @@ class CUserMacroParser {
 
 							case '{':
 								/*
-								 * Current macro would look some thing like "{$ABC{", where second { can be
+								 * Current macro would look something like "{$ABC{", where second { can be
 								 * the beginning of a new macro.
 								 */
 								unset($this->macros[$i]);
@@ -499,10 +497,10 @@ class CUserMacroParser {
 									}
 									else {
 										// Example: "{$MACRO:\"abc\"
+										$this->macros[$i]['context'] = substr($this->macros[$i]['context'], 0, -1);
 										$this->macros[$i]['match'] .= $this->source[$this->pos];
 										$this->macros[$i]['macro'] = substr($this->macros[$i]['macro'], 0, -1);
 										$this->macros[$i]['macro'] .= $this->source[$this->pos];
-										$this->macros[$i]['context'] = substr($this->macros[$i]['context'], 0, -1);
 
 										$state = self::STATE_CONTEXT_QUOTED_PROGRESS_END;
 									}
