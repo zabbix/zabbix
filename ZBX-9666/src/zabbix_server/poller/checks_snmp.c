@@ -26,13 +26,54 @@
 
 extern int	CONFIG_SNMP_BULK_REQUESTS;
 
+/*
+ * SNMP Dynamic Index Cache
+ * ========================
+ *
+ * Description
+ * -----------
+ *
+ * Zabbix caches the whole index table for the particular OID separately based on:
+ *   * IP address;
+ *   * port;
+ *   * community string (SNMPv2c);
+ *   * context, security name (SNMPv3).
+ *
+ * Zabbix revalidates each index before using it to get a value and rebuilds the index cache for the OID if the
+ * index is invalid.
+ *
+ * Example
+ * -------
+ *
+ * OID for getting memory usage of process by PID (index):
+ *   HOST-RESOURCES-MIB::hrSWRunPerfMem:<PID>
+ *
+ * OID for getting PID (index) by process name (value):
+ *   HOST-RESOURCES-MIB::hrSWRunPath:<PID> <NAME>
+ *
+ * SNMP OID as configured in Zabbix to get memory usage of "snmpd" process:
+ *   HOST-RESOURCES-MIB::hrSWRunPerfMem["index","HOST-RESOURCES-MIB::hrSWRunPath", "snmpd"]
+ *
+ * 1. Zabbix walks hrSWRunPath table and caches all <PID> and <NAME> pairs of particular SNMP agent/user.
+ * 2. Before each GET request Zabbix revalidates the cached <PID> by getting its <NAME> from hrSWRunPath table.
+ * 3. If the names match then Zabbix uses the cached <PID> in the GET request for the hrSWRunPerfMem.
+ *    Otherwise Zabbix rebuilds the hrSWRunPath cache for the particular agent/user (see 1.).
+ *
+ * Implementation
+ * --------------
+ *
+ * The cache is implemented using hash tables. In ERD:
+ * zbx_snmpidx_main_key_t -------------------------------------------0< zbx_snmpidx_mapping_t
+ * (OID, host, <v2c: community|v3: (context, security name)>)           (index, value)
+ */
+
 typedef struct
 {
 	char		*addr;
 	unsigned short	port;
-	char		*oid;
-	char		*community_context;	/* community (SNMPv1 or v2c) or contextName (SNMPv3) */
-	char		*security_name;		/* only SNMPv3, empty string in case of other versions */
+	char	*oid;
+	char	*community_context;	/* community (SNMPv1 or v2c) or contextName (SNMPv3) */
+	char	*security_name;		/* only SNMPv3, empty string in case of other versions */
 	zbx_hashset_t	*mappings;
 }
 zbx_snmpidx_main_key_t;
@@ -44,7 +85,7 @@ typedef struct
 }
 zbx_snmpidx_mapping_t;
 
-static zbx_hashset_t	snmpidx;
+static zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
 {
@@ -136,7 +177,29 @@ static char	*get_item_security_name(const DC_ITEM *item)
 	return "";
 }
 
-static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, char **idx, size_t *idx_alloc)
+/******************************************************************************
+ *                                                                            *
+ * Function: cache_get_snmp_index                                             *
+ *                                                                            *
+ * Purpose: retrieve index that matches value from the relevant index cache   *
+ *                                                                            *
+ * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ *                              IP address, port, community string, context,  *
+ *                              security name                                 *
+ *             oid       - [IN] OID of the table which contains the indexes   *
+ *             value     - [IN] value for which to look up the index          *
+ *             idx       - [IN/OUT] destination pointer for the               *
+ *                                  heap-(re)allocated index                  *
+ *             idx_alloc - [IN/OUT] size of the (re)allocated index           *
+ *                                                                            *
+ * Return value: FAIL    - dynamic index cache is empty or cache does not     *
+ *                         contain index matching the value                   *
+ *               SUCCEED - idx contains the found index,                      *
+ *                         idx_alloc contains the current size of the         *
+ *                         heap-(re)allocated idx                             *
+ *                                                                            *
+ ******************************************************************************/
+static int	cache_get_snmp_index(const DC_ITEM *item, const char *oid, const char *value, char **idx, size_t *idx_alloc)
 {
 	const char		*__function_name = "cache_get_snmp_index";
 
@@ -152,7 +215,7 @@ static int	cache_get_snmp_index(const DC_ITEM *item, char *oid, char *value, cha
 
 	main_key_local.addr = item->interface.addr;
 	main_key_local.port = item->interface.port;
-	main_key_local.oid = oid;
+	main_key_local.oid = (char *)oid;
 
 	main_key_local.community_context = get_item_community_context(item);
 	main_key_local.security_name = get_item_security_name(item);
@@ -172,7 +235,21 @@ end:
 	return ret;
 }
 
-static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, const char *idx)
+/******************************************************************************
+ *                                                                            *
+ * Function: cache_put_snmp_index                                             *
+ *                                                                            *
+ * Purpose: store the index-value pair in the relevant index cache            *
+ *                                                                            *
+ * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ *                              IP address, port, community string, context,  *
+ *                              security name                                 *
+ *             oid       - [IN] OID of the table which contains the indexes   *
+ *             value     - [IN] value part of the index-value pair            *
+ *             idx       - [IN] index part of the index-value pair            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cache_put_snmp_index(const DC_ITEM *item, const char *oid, const char *value, const char *idx)
 {
 	const char		*__function_name = "cache_put_snmp_index";
 
@@ -190,7 +267,7 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 
 	main_key_local.addr = item->interface.addr;
 	main_key_local.port = item->interface.port;
-	main_key_local.oid = oid;
+	main_key_local.oid = (char *)oid;
 
 	main_key_local.community_context = get_item_community_context(item);
 	main_key_local.security_name = get_item_security_name(item);
@@ -227,6 +304,21 @@ static void	cache_put_snmp_index(const DC_ITEM *item, char *oid, char *value, co
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: cache_del_snmp_index_subtree                                     *
+ *                                                                            *
+ * Purpose: delete index-value mappings from the specified index cache        *
+ *                                                                            *
+ * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ *                              IP address, port, community string, context,  *
+ *                              security name                                 *
+ *             oid       - [IN] OID of the table which contains the indexes   *
+ *                                                                            *
+ * Comments: does nothing if the index cache is empty or if it does not       *
+ *           contain the cache for the specified OID                          *
+ *                                                                            *
+ ******************************************************************************/
 static void	cache_del_snmp_index_subtree(const DC_ITEM *item, const char *oid)
 {
 	const char		*__function_name = "cache_del_snmp_index_subtree";
