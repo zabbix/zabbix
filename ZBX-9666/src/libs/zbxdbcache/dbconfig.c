@@ -44,6 +44,10 @@ static int	sync_in_progress = 0;
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
 #define ZBX_SNMP_OID_TYPE_MACRO		2
 
+/* trigger is functional unless its expression contains disabled or not monitored items */
+#define TRIGGER_FUNCTIONAL_TRUE		0
+#define TRIGGER_FUNCTIONAL_FALSE	1
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
@@ -58,6 +62,7 @@ typedef struct
 	unsigned char	state;
 	unsigned char	locked;
 	unsigned char	status;
+	unsigned char	functional;	/* see TRIGGER_FUNCTIONAL_* defines */
 }
 ZBX_DC_TRIGGER;
 
@@ -107,6 +112,7 @@ typedef struct
 	unsigned char	location;
 	unsigned char	flags;
 	unsigned char	status;
+	unsigned char	unreachable;
 }
 ZBX_DC_ITEM;
 
@@ -1249,6 +1255,7 @@ static void	DCsync_items(DB_RESULT result)
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
+			item->unreachable = 0;
 		}
 		else
 		{
@@ -1840,6 +1847,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		}
 
 		trigger->topoindex = 1;
+
+		/* reset trigger functionality, it will be updated in DCsync_functions() */
+		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -2063,6 +2073,30 @@ static void	DCsync_functions(DB_RESULT result)
 	{
 		zbx_vector_ptr_sort(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		zbx_vector_ptr_uniq(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
+	}
+
+	/* disable functionality for triggers with expression containing */
+	/* disabled or not monitored items                               */
+	for (i = 0; i < itemtrigs.values_num; i++)
+	{
+		trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[i].second;
+
+		if (TRIGGER_FUNCTIONAL_FALSE != trigger->functional)
+		{
+			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
+
+			if (ITEM_STATUS_DISABLED != item->status)
+			{
+				ZBX_DC_HOST	*host;
+
+				host = zbx_hashset_search(&config->hosts, &item->hostid);
+
+				if (HOST_STATUS_NOT_MONITORED != host->status)
+					continue;
+			}
+
+			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
+		}
 	}
 
 	/* update links from items to triggers */
@@ -3322,6 +3356,7 @@ static int	__config_heap_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	if (SUCCEED != is_snmp_type(i1->type))
 	{
@@ -3348,6 +3383,7 @@ static int	__config_pinger_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
 
 	return 0;
@@ -3378,6 +3414,7 @@ static int	__config_java_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	return __config_java_item_compare(i1, i2);
 }
@@ -3753,6 +3790,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
+	dst_item->unreachable = src_item->unreachable;
 
 	dst_item->db_state = src_item->db_state;
 	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
@@ -4723,7 +4761,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 		if (0 == (disable_until = DCget_disable_until(dc_item, dc_host)))
 		{
-			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
+			/* move reachable items on reachable hosts to normal pollers */
+			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type && 0 == dc_item->unreachable)
 			{
 				old_poller_type = dc_item->poller_type;
 				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
@@ -5007,6 +5046,8 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, lastclock);
 
+	dc_item->unreachable = 0;
+
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
 
@@ -5025,6 +5066,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *
 
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+
+	dc_item->unreachable = 1;
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
@@ -5090,6 +5133,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				DCrequeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:
@@ -5380,7 +5424,9 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 		{
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
 					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
-					TRIGGER_STATE_NORMAL == next_trigger->state)
+					TRIGGER_STATE_NORMAL == next_trigger->state &&
+					TRIGGER_STATUS_ENABLED == next_trigger->status &&
+					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
 			{
 				return FAIL;
 			}
