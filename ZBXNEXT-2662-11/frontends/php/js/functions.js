@@ -658,7 +658,7 @@ function overlayDialogue(params) {
 function executeScript(hostid, scriptid, confirmation) {
 	var execute = function() {
 		if (hostid !== null) {
-			openWinCentered('scripts_exec.php?hostid=' + hostid + '&scriptid=' + scriptid, 'Tools', 560, 470,
+			openWinCentered('scripts_exec.php?hostid=' + hostid + '&scriptid=' + scriptid, 'Tools', 950, 470,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 		}
