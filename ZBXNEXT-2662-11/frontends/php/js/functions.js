@@ -620,6 +620,24 @@ function overlayDialogue(params) {
 		})
 		.show();
 
+	var focusable = jQuery(':focusable', overlay_dialogue),
+		first_focusable = focusable.filter(':first'),
+		last_focusable = focusable.filter(':last');
+
+	first_focusable.on('keydown', function(e) {
+		if (e.keyCode == 9 && e.shiftKey) {
+			last_focusable.focus();
+			return false;
+		}
+	});
+
+	last_focusable.on('keydown', function(e) {
+		if (e.keyCode == 9 && !e.shiftKey) {
+			first_focusable.focus();
+			return false;
+		}
+	});
+
 	jQuery('body').css({'overflow': 'hidden'});
 
 	if (button_focused !== null) {
