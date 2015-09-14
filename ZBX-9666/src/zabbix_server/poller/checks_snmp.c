@@ -71,9 +71,9 @@ typedef struct
 {
 	char		*addr;
 	unsigned short	port;
-	char	*oid;
-	char	*community_context;	/* community (SNMPv1 or v2c) or contextName (SNMPv3) */
-	char	*security_name;		/* only SNMPv3, empty string in case of other versions */
+	char		*oid;
+	char		*community_context;	/* community (SNMPv1 or v2c) or contextName (SNMPv3) */
+	char		*security_name;		/* only SNMPv3, empty string in case of other versions */
 	zbx_hashset_t	*mappings;
 }
 zbx_snmpidx_main_key_t;
