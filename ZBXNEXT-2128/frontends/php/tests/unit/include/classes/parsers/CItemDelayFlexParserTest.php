@@ -399,7 +399,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/30',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '30']
+						['from' => '', 'till' => '', 'step' => '30']
 					]
 				]],
 				['md/30']
@@ -410,7 +410,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-31/30',
 					'md' => [
-						['from' => '1', 'to' => '31', 'step' => '30']
+						['from' => '1', 'till' => '31', 'step' => '30']
 					]
 				]],
 				['md1-31/30']
@@ -421,7 +421,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-1',
 					'md' => [
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				]],
 				['md1-1']
@@ -432,7 +432,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md28-30',
 					'md' => [
-						['from' => '28', 'to' => '30', 'step' => '']
+						['from' => '28', 'till' => '30', 'step' => '']
 					]
 				]],
 				['md28-30']
@@ -443,7 +443,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01-31',
 					'md' => [
-						['from' => '01', 'to' => '31', 'step' => '']
+						['from' => '01', 'till' => '31', 'step' => '']
 					]
 				]],
 				['md01-31']
@@ -454,7 +454,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01-31/30',
 					'md' => [
-						['from' => '01', 'to' => '31', 'step' => '30']
+						['from' => '01', 'till' => '31', 'step' => '30']
 					]
 				]],
 				['md01-31/30']
@@ -465,8 +465,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-5,8-31',
 					'md' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '8', 'to' => '31', 'step' => '']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '8', 'till' => '31', 'step' => '']
 					]
 				]],
 				['md1-5,8-31']
@@ -477,9 +477,9 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/30,1-5/4,8-31/23',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '30'],
-						['from' => '1', 'to' => '5', 'step' => '4'],
-						['from' => '8', 'to' => '31', 'step' => '23']
+						['from' => '', 'till' => '', 'step' => '30'],
+						['from' => '1', 'till' => '5', 'step' => '4'],
+						['from' => '8', 'till' => '31', 'step' => '23']
 					]
 				]],
 				['md/30,1-5/4,8-31/23']
@@ -490,9 +490,9 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-5/4,8-31/23,/30',
 					'md' => [
-						['from' => '1', 'to' => '5', 'step' => '4'],
-						['from' => '8', 'to' => '31', 'step' => '23'],
-						['from' => '', 'to' => '', 'step' => '30']
+						['from' => '1', 'till' => '5', 'step' => '4'],
+						['from' => '8', 'till' => '31', 'step' => '23'],
+						['from' => '', 'till' => '', 'step' => '30']
 					]
 				]],
 				['md1-5/4,8-31/23,/30']
@@ -503,7 +503,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md31-31',
 					'md' => [
-						['from' => '31', 'to' => '31', 'step' => '']
+						['from' => '31', 'till' => '31', 'step' => '']
 					]
 				]],
 				['md31-31']
@@ -514,7 +514,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01',
 					'md' => [
-						['from' => '01', 'to' => '', 'step' => '']
+						['from' => '01', 'till' => '', 'step' => '']
 					]
 				]],
 				['md01']
@@ -525,7 +525,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => '']
 					]
 				]],
 				['md1']
@@ -536,7 +536,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md10',
 					'md' => [
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '10', 'till' => '', 'step' => '']
 					]
 				]],
 				['md10']
@@ -547,7 +547,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md31',
 					'md' => [
-						['from' => '31', 'to' => '', 'step' => '']
+						['from' => '31', 'till' => '', 'step' => '']
 					]
 				]],
 				['md31']
@@ -558,8 +558,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1,10',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '10', 'till' => '', 'step' => '']
 					]
 				]],
 				['md1,10']
@@ -570,8 +570,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01,10',
 					'md' => [
-						['from' => '01', 'to' => '', 'step' => ''],
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '01', 'till' => '', 'step' => ''],
+						['from' => '10', 'till' => '', 'step' => '']
 					]
 				]],
 				['md01,10']
@@ -582,37 +582,37 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01',
 					'md' => [
-						['from' => '01', 'to' => '', 'step' => '']
+						['from' => '01', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md31',
 					'md' => [
-						['from' => '31', 'to' => '', 'step' => '']
+						['from' => '31', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1,10',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '10', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01,10',
 					'md' => [
-						['from' => '01', 'to' => '', 'step' => ''],
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '01', 'till' => '', 'step' => ''],
+						['from' => '10', 'till' => '', 'step' => '']
 					]
 				]],
 				['md01', 'md1', 'md31', 'md1,10', 'md01,10']
@@ -623,7 +623,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01-10/9',
 					'md' => [
-						['from' => '01', 'to' => '10', 'step' => '9']
+						['from' => '01', 'till' => '10', 'step' => '9']
 					]
 				]],
 				['md01-10/9']
@@ -634,7 +634,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-10/9',
 					'md' => [
-						['from' => '1', 'to' => '10', 'step' => '9']
+						['from' => '1', 'till' => '10', 'step' => '9']
 					]
 				]],
 				['md1-10/9']
@@ -645,7 +645,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/9',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '9']
+						['from' => '', 'till' => '', 'step' => '9']
 					]
 				]],
 				['md/9']
@@ -656,7 +656,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/30',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '30']
+						['from' => '', 'till' => '', 'step' => '30']
 					]
 				]],
 				['md/30']
@@ -667,14 +667,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/30',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '30']
+						['from' => '', 'till' => '', 'step' => '30']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/25',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '25']
+						['from' => '', 'till' => '', 'step' => '25']
 					]
 				]],
 				['md/30', 'md/25']
@@ -685,14 +685,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-31/30',
 					'md' => [
-						['from' => '1', 'to' => '31', 'step' => '30']
+						['from' => '1', 'till' => '31', 'step' => '30']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/30',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '30']
+						['from' => '', 'till' => '', 'step' => '30']
 					]
 				]],
 				['md1-31/30', 'md/30']
@@ -703,14 +703,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01-31/30',
 					'md' => [
-						['from' => '01', 'to' => '31', 'step' => '30']
+						['from' => '01', 'till' => '31', 'step' => '30']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/30',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '30']
+						['from' => '', 'till' => '', 'step' => '30']
 					]
 				]],
 				['md01-31/30', 'md/30']
@@ -721,14 +721,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01-31',
 					'md' => [
-						['from' => '01', 'to' => '31', 'step' => '']
+						['from' => '01', 'till' => '31', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/30',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '30']
+						['from' => '', 'till' => '', 'step' => '30']
 					]
 				]],
 				['md01-31', 'md/30']
@@ -739,7 +739,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-31/01',
 					'md' => [
-						['from' => '1', 'to' => '31', 'step' => '01']
+						['from' => '1', 'till' => '31', 'step' => '01']
 					]
 				]],
 				['md1-31/01']
@@ -750,8 +750,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1,/1',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				]],
 				['md1,/1']
@@ -763,7 +763,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01-01/01',
 					'md' => [
-						['from' => '01', 'to' => '01', 'step' => '01']
+						['from' => '01', 'till' => '01', 'step' => '01']
 					]
 				]],
 				['md01-01/01']
@@ -774,7 +774,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01-02/01',
 					'md' => [
-						['from' => '01', 'to' => '02', 'step' => '01']
+						['from' => '01', 'till' => '02', 'step' => '01']
 					]
 				]],
 				['md01-02/01']
@@ -785,7 +785,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md02-02/01',
 					'md' => [
-						['from' => '02', 'to' => '02', 'step' => '01']
+						['from' => '02', 'till' => '02', 'step' => '01']
 					]
 				]],
 				['md02-02/01']
@@ -796,7 +796,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md03-02/01',
 					'md' => [
-						['from' => '03', 'to' => '02', 'step' => '01']
+						['from' => '03', 'till' => '02', 'step' => '01']
 					]
 				]],
 				['md03-02/01']
@@ -807,7 +807,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md03-02/1',
 					'md' => [
-						['from' => '03', 'to' => '02', 'step' => '1']
+						['from' => '03', 'till' => '02', 'step' => '1']
 					]
 				]],
 				['md03-02/1']
@@ -818,7 +818,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md03-02/10',
 					'md' => [
-						['from' => '03', 'to' => '02', 'step' => '10']
+						['from' => '03', 'till' => '02', 'step' => '10']
 					]
 				]],
 				['md03-02/10']
@@ -829,7 +829,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md03-02/99',
 					'md' => [
-						['from' => '03', 'to' => '02', 'step' => '99']
+						['from' => '03', 'till' => '02', 'step' => '99']
 					]
 				]],
 				['md03-02/99']
@@ -840,7 +840,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md03-02',
 					'md' => [
-						['from' => '03', 'to' => '02', 'step' => '']
+						['from' => '03', 'till' => '02', 'step' => '']
 					]
 				]],
 				['md03-02']
@@ -851,7 +851,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md00-00',
 					'md' => [
-						['from' => '00', 'to' => '00', 'step' => '']
+						['from' => '00', 'till' => '00', 'step' => '']
 					]
 				]],
 				['md00-00']
@@ -862,7 +862,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md00-99',
 					'md' => [
-						['from' => '00', 'to' => '99', 'step' => '']
+						['from' => '00', 'till' => '99', 'step' => '']
 					]
 				]],
 				['md00-99']
@@ -873,7 +873,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md99-99',
 					'md' => [
-						['from' => '99', 'to' => '99', 'step' => '']
+						['from' => '99', 'till' => '99', 'step' => '']
 					]
 				]],
 				['md99-99']
@@ -884,7 +884,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md99-00',
 					'md' => [
-						['from' => '99', 'to' => '00', 'step' => '']
+						['from' => '99', 'till' => '00', 'step' => '']
 					]
 				]],
 				['md99-00']
@@ -895,7 +895,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md99-99/88',
 					'md' => [
-						['from' => '99', 'to' => '99', 'step' => '88']
+						['from' => '99', 'till' => '99', 'step' => '88']
 					]
 				]],
 				['md99-99/88']
@@ -906,8 +906,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md99,99-99/88',
 					'md' => [
-						['from' => '99', 'to' => '', 'step' => ''],
-						['from' => '99', 'to' => '99', 'step' => '88']
+						['from' => '99', 'till' => '', 'step' => ''],
+						['from' => '99', 'till' => '99', 'step' => '88']
 					]
 				]],
 				['md99,99-99/88']
@@ -918,8 +918,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md0,0-0/0',
 					'md' => [
-						['from' => '0', 'to' => '', 'step' => ''],
-						['from' => '0', 'to' => '0', 'step' => '0'],
+						['from' => '0', 'till' => '', 'step' => ''],
+						['from' => '0', 'till' => '0', 'step' => '0'],
 					]
 				]],
 				['md0,0-0/0']
@@ -930,7 +930,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/99',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '99']
+						['from' => '', 'till' => '', 'step' => '99']
 					]
 				]],
 				['md/99']
@@ -941,7 +941,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/0',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '0']
+						['from' => '', 'till' => '', 'step' => '0']
 					]
 				]],
 				['md/0']
@@ -953,7 +953,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6']
+						['from' => '', 'till' => '', 'step' => '6']
 					]
 				]],
 				['wd/6']
@@ -964,7 +964,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					]
 				]],
 				['wd1-7']
@@ -975,7 +975,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				]],
 				['wd1-7/6']
@@ -986,7 +986,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-1',
 					'wd' => [
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				]],
 				['wd1-1']
@@ -997,7 +997,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd7-7',
 					'wd' => [
-						['from' => '7', 'to' => '7', 'step' => '']
+						['from' => '7', 'till' => '7', 'step' => '']
 					]
 				]],
 				['wd7-7']
@@ -1008,8 +1008,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-5,6-7',
 					'wd' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '6', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '6', 'till' => '7', 'step' => '']
 					]
 				]],
 				['wd1-5,6-7']
@@ -1020,9 +1020,9 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6,1-5/4,2-7/5',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6'],
-						['from' => '1', 'to' => '5', 'step' => '4'],
-						['from' => '2', 'to' => '7', 'step' => '5']
+						['from' => '', 'till' => '', 'step' => '6'],
+						['from' => '1', 'till' => '5', 'step' => '4'],
+						['from' => '2', 'till' => '7', 'step' => '5']
 					]
 				]],
 				['wd/6,1-5/4,2-7/5']
@@ -1033,9 +1033,9 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-5/4,3-7/4,/6',
 					'wd' => [
-						['from' => '1', 'to' => '5', 'step' => '4'],
-						['from' => '3', 'to' => '7', 'step' => '4'],
-						['from' => '', 'to' => '', 'step' => '6']
+						['from' => '1', 'till' => '5', 'step' => '4'],
+						['from' => '3', 'till' => '7', 'step' => '4'],
+						['from' => '', 'till' => '', 'step' => '6']
 					]
 				]],
 				['wd1-5/4,3-7/4,/6']
@@ -1046,7 +1046,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => '']
 					]
 				]],
 				['wd1']
@@ -1057,7 +1057,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd7',
 					'wd' => [
-						['from' => '7', 'to' => '', 'step' => '']
+						['from' => '7', 'till' => '', 'step' => '']
 					]
 				]],
 				['wd7']
@@ -1068,8 +1068,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1,7',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '7', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '7', 'till' => '', 'step' => '']
 					]
 				]],
 				['wd1,7']
@@ -1080,10 +1080,10 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1,7,6,2',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '7', 'to' => '', 'step' => ''],
-						['from' => '6', 'to' => '', 'step' => ''],
-						['from' => '2', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '7', 'till' => '', 'step' => ''],
+						['from' => '6', 'till' => '', 'step' => ''],
+						['from' => '2', 'till' => '', 'step' => '']
 					]
 				]],
 				['wd1,7,6,2']
@@ -1094,31 +1094,31 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd7',
 					'wd' => [
-						['from' => '7', 'to' => '', 'step' => '']
+						['from' => '7', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1,4,5-7',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '4', 'to' => '', 'step' => ''],
-						['from' => '5', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '4', 'till' => '', 'step' => ''],
+						['from' => '5', 'till' => '7', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1,7',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '7', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '7', 'till' => '', 'step' => '']
 					]
 				]],
 				['wd1', 'wd7', 'wd1,4,5-7', 'wd1,7']
@@ -1129,7 +1129,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-3/2',
 					'wd' => [
-						['from' => '1', 'to' => '3', 'step' => '2']
+						['from' => '1', 'till' => '3', 'step' => '2']
 					]
 				]],
 				['wd1-3/2']
@@ -1140,7 +1140,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/1',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				]],
 				['wd/1']
@@ -1151,14 +1151,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6']
+						['from' => '', 'till' => '', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/4',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '4']
+						['from' => '', 'till' => '', 'step' => '4']
 					]
 				]],
 				['wd/6', 'wd/4']
@@ -1169,29 +1169,29 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6']
+						['from' => '', 'till' => '', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/2',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '2']
+						['from' => '', 'till' => '', 'step' => '2']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-2/1,3-5/2',
 					'wd' => [
-						['from' => '1', 'to' => '2', 'step' => '1'],
-						['from' => '3', 'to' => '5', 'step' => '2']
+						['from' => '1', 'till' => '2', 'step' => '1'],
+						['from' => '3', 'till' => '5', 'step' => '2']
 					]
 				]],
 				['wd1-7/6', 'wd/6', 'wd/2', 'wd1-2/1,3-5/2']
@@ -1202,31 +1202,31 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7,1-1',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => ''],
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => ''],
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd7-9',
 					'wd' => [
-						['from' => '7', 'to' => '9', 'step' => '']
+						['from' => '7', 'till' => '9', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1,3,5-7',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '3', 'to' => '', 'step' => ''],
-						['from' => '5', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '3', 'till' => '', 'step' => ''],
+						['from' => '5', 'till' => '7', 'step' => '']
 					]
 				]],
 				['wd1-7,1-1', 'wd1-7', 'wd7-9', 'wd1,3,5-7']
@@ -1237,14 +1237,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6']
+						['from' => '', 'till' => '', 'step' => '6']
 					]
 				]],
 				['wd1-7/6', 'wd/6']
@@ -1255,7 +1255,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				]],
 				['wd1-7/6']
@@ -1267,7 +1267,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd0-0/0',
 					'wd' => [
-						['from' => '0', 'to' => '0', 'step' => '0']
+						['from' => '0', 'till' => '0', 'step' => '0']
 					]
 				]],
 				['wd0-0/0']
@@ -1278,7 +1278,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-1/1',
 					'wd' => [
-						['from' => '1', 'to' => '1', 'step' => '1']
+						['from' => '1', 'till' => '1', 'step' => '1']
 					]
 				]],
 				['wd1-1/1']
@@ -1289,7 +1289,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd9-9/9',
 					'wd' => [
-						['from' => '9', 'to' => '9', 'step' => '9']
+						['from' => '9', 'till' => '9', 'step' => '9']
 					]
 				]],
 				['wd9-9/9']
@@ -1300,7 +1300,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd9-9',
 					'wd' => [
-						['from' => '9', 'to' => '9', 'step' => '']
+						['from' => '9', 'till' => '9', 'step' => '']
 					]
 				]],
 				['wd9-9']
@@ -1311,7 +1311,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/9',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '9']
+						['from' => '', 'till' => '', 'step' => '9']
 					]
 				]],
 				['wd/9']
@@ -1322,7 +1322,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/0',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '0']
+						['from' => '', 'till' => '', 'step' => '0']
 					]
 				]],
 				['wd/0']
@@ -1333,7 +1333,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd9-7',
 					'wd' => [
-						['from' => '9', 'to' => '7', 'step' => '']
+						['from' => '9', 'till' => '7', 'step' => '']
 					]
 				]],
 				['wd9-7']
@@ -1344,7 +1344,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd7-7/7',
 					'wd' => [
-						['from' => '7', 'to' => '7', 'step' => '7']
+						['from' => '7', 'till' => '7', 'step' => '7']
 					]
 				]],
 				['wd7-7/7']
@@ -1355,7 +1355,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/7',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '7']
+						['from' => '', 'till' => '', 'step' => '7']
 					]
 				]],
 				['wd/7']
@@ -1366,7 +1366,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd6-1/0',
 					'wd' => [
-						['from' => '6', 'to' => '1', 'step' => '0']
+						['from' => '6', 'till' => '1', 'step' => '0']
 					]
 				]],
 				['wd6-1/0']
@@ -1378,14 +1378,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => '']
 					]
 				]],
 				['wd1-7/6', 'md1']
@@ -1396,14 +1396,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-31',
 					'md' => [
-						['from' => '1', 'to' => '31', 'step' => '']
+						['from' => '1', 'till' => '31', 'step' => '']
 					]
 				]],
 				['wd1-7/6', 'md1-31']
@@ -1414,15 +1414,15 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-31,1-1',
 					'md' => [
-						['from' => '1', 'to' => '31', 'step' => ''],
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '31', 'step' => ''],
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				]],
 				['wd1-7/6', 'md1-31,1-1']
@@ -1433,14 +1433,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md/1',
 					'md' => [
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				]],
 				['wd1-7/6', 'md/1']
@@ -1451,27 +1451,27 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1-31wd1-7',
 					'md' => [
-						['from' => '1', 'to' => '31', 'step' => '']
+						['from' => '1', 'till' => '31', 'step' => '']
 					],
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6']
+						['from' => '', 'till' => '', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md05-10wd5',
 					'md' => [
-						['from' => '05', 'to' => '10', 'step' => '']
+						['from' => '05', 'till' => '10', 'step' => '']
 					],
 					'wd' => [
-						['from' => '5', 'to' => '', 'step' => '']
+						['from' => '5', 'till' => '', 'step' => '']
 					]
 				]],
 				['md1-31wd1-7', 'wd/6', 'md05-10wd5']
@@ -1483,7 +1483,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h/1',
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				]],
 				['h/1']
@@ -1494,7 +1494,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h/01',
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '01']
+						['from' => '', 'till' => '', 'step' => '01']
 					]
 				]],
 				['h/01']
@@ -1505,7 +1505,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h/02',
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				]],
 				['h/02']
@@ -1516,14 +1516,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h/1',
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h23',
 					'h' => [
-						['from' => '23', 'to' => '', 'step' => '']
+						['from' => '23', 'till' => '', 'step' => '']
 					]
 				]],
 				['h/1', 'h23']
@@ -1534,7 +1534,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-1',
 					'h' => [
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				]],
 				['h1-1']
@@ -1545,7 +1545,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-23',
 					'h' => [
-						['from' => '1', 'to' => '23', 'step' => '']
+						['from' => '1', 'till' => '23', 'step' => '']
 					]
 				]],
 				['h1-23']
@@ -1556,7 +1556,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h01-1',
 					'h' => [
-						['from' => '01', 'to' => '1', 'step' => '']
+						['from' => '01', 'till' => '1', 'step' => '']
 					]
 				]],
 				['h01-1']
@@ -1567,7 +1567,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h01-01',
 					'h' => [
-						['from' => '01', 'to' => '01', 'step' => '']
+						['from' => '01', 'till' => '01', 'step' => '']
 					]
 				]],
 				['h01-01']
@@ -1578,7 +1578,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h01-23',
 					'h' => [
-						['from' => '01', 'to' => '23', 'step' => '']
+						['from' => '01', 'till' => '23', 'step' => '']
 					]
 				]],
 				['h01-23']
@@ -1589,7 +1589,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h0-23',
 					'h' => [
-						['from' => '0', 'to' => '23', 'step' => '']
+						['from' => '0', 'till' => '23', 'step' => '']
 					]
 				]],
 				['h0-23']
@@ -1600,7 +1600,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h00-23/23',
 					'h' => [
-						['from' => '00', 'to' => '23', 'step' => '23']
+						['from' => '00', 'till' => '23', 'step' => '23']
 					]
 				]],
 				['h00-23/23']
@@ -1611,7 +1611,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h01-23/22',
 					'h' => [
-						['from' => '01', 'to' => '23', 'step' => '22']
+						['from' => '01', 'till' => '23', 'step' => '22']
 					]
 				]],
 				['h01-23/22']
@@ -1622,8 +1622,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '']
 					]
 				]],
 				['h1-5,7-10']
@@ -1634,8 +1634,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/3',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '3']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '3']
 					]
 				]],
 				['h1-5,7-10/3']
@@ -1646,8 +1646,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					]
 				]],
 				['h1-5,7-10/03']
@@ -1658,15 +1658,15 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h/02',
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					]
 				]],
 				['h/02', 'h1-5,7-10/03']
@@ -1677,7 +1677,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h0-0',
 					'h' => [
-						['from' => '0', 'to' => '0', 'step' => '']
+						['from' => '0', 'till' => '0', 'step' => '']
 					]
 				]],
 				['h0-0']
@@ -1688,7 +1688,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h0-00',
 					'h' => [
-						['from' => '0', 'to' => '00', 'step' => '']
+						['from' => '0', 'till' => '00', 'step' => '']
 					]
 				]],
 				['h0-00']
@@ -1699,7 +1699,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h00-0',
 					'h' => [
-						['from' => '00', 'to' => '0', 'step' => '']
+						['from' => '00', 'till' => '0', 'step' => '']
 					]
 				]],
 				['h00-0']
@@ -1710,7 +1710,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h00-00',
 					'h' => [
-						['from' => '00', 'to' => '00', 'step' => '']
+						['from' => '00', 'till' => '00', 'step' => '']
 					]
 				]],
 				['h00-00']
@@ -1722,7 +1722,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h99',
 					'h' => [
-						['from' => '99', 'to' => '', 'step' => '']
+						['from' => '99', 'till' => '', 'step' => '']
 					]
 				]],
 				['h99']
@@ -1733,7 +1733,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h99-99',
 					'h' => [
-						['from' => '99', 'to' => '99', 'step' => '']
+						['from' => '99', 'till' => '99', 'step' => '']
 					]
 				]],
 				['h99-99']
@@ -1744,7 +1744,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h/99',
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '99']
+						['from' => '', 'till' => '', 'step' => '99']
 					]
 				]],
 				['h/99']
@@ -1755,7 +1755,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h99-99/99',
 					'h' => [
-						['from' => '99', 'to' => '99', 'step' => '99']
+						['from' => '99', 'till' => '99', 'step' => '99']
 					]
 				]],
 				['h99-99/99']
@@ -1766,7 +1766,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h7-0/99',
 					'h' => [
-						['from' => '7', 'to' => '0', 'step' => '99']
+						['from' => '7', 'till' => '0', 'step' => '99']
 					]
 				]],
 				['h7-0/99']
@@ -1777,7 +1777,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h00-24/23',
 					'h' => [
-						['from' => '00', 'to' => '24', 'step' => '23']
+						['from' => '00', 'till' => '24', 'step' => '23']
 					]
 				]],
 				['h00-24/23']
@@ -1788,7 +1788,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h/24',
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '24']
+						['from' => '', 'till' => '', 'step' => '24']
 					]
 				]],
 				['h/24']
@@ -1799,7 +1799,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h23-15/1',
 					'h' => [
-						['from' => '23', 'to' => '15', 'step' => '1']
+						['from' => '23', 'till' => '15', 'step' => '1']
 					]
 				]],
 				['h23-15/1']
@@ -1810,7 +1810,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h00-00/00',
 					'h' => [
-						['from' => '00', 'to' => '00', 'step' => '00']
+						['from' => '00', 'till' => '00', 'step' => '00']
 					]
 				]],
 				['h00-00/00']
@@ -1821,7 +1821,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h01-01/01',
 					'h' => [
-						['from' => '01', 'to' => '01', 'step' => '01']
+						['from' => '01', 'till' => '01', 'step' => '01']
 					]
 				]],
 				['h01-01/01']
@@ -1833,20 +1833,20 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6,1-5/4,2-7/5h/02',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6'],
-						['from' => '1', 'to' => '5', 'step' => '4'],
-						['from' => '2', 'to' => '7', 'step' => '5']
+						['from' => '', 'till' => '', 'step' => '6'],
+						['from' => '1', 'till' => '5', 'step' => '4'],
+						['from' => '2', 'till' => '7', 'step' => '5']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					]
 				]],
 				['wd/6,1-5/4,2-7/5h/02', 'h1-5,7-10/03']
@@ -1857,20 +1857,20 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-5/4,3-7/4,/6h/02',
 					'wd' => [
-						['from' => '1', 'to' => '5', 'step' => '4'],
-						['from' => '3', 'to' => '7', 'step' => '4'],
-						['from' => '', 'to' => '', 'step' => '6']
+						['from' => '1', 'till' => '5', 'step' => '4'],
+						['from' => '3', 'till' => '7', 'step' => '4'],
+						['from' => '', 'till' => '', 'step' => '6']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					]
 				]],
 				['wd1-5/4,3-7/4,/6h/02', 'h1-5,7-10/03']
@@ -1881,43 +1881,43 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7/6',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '6']
+						['from' => '1', 'till' => '7', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6']
+						['from' => '', 'till' => '', 'step' => '6']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/2h/02',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '2']
+						['from' => '', 'till' => '', 'step' => '2']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-2/1,1-2/1h/02',
 					'wd' => [
-						['from' => '1', 'to' => '2', 'step' => '1'],
-						['from' => '1', 'to' => '2', 'step' => '1']
+						['from' => '1', 'till' => '2', 'step' => '1'],
+						['from' => '1', 'till' => '2', 'step' => '1']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					]
 				]],
 				['wd1-7/6', 'wd/6', 'wd/2h/02', 'wd1-2/1,1-2/1h/02', 'h1-5,7-10/03']
@@ -1929,51 +1929,51 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01',
 					'md' => [
-						['from' => '01', 'to' => '', 'step' => '']
+						['from' => '01', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1h/02',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md31',
 					'md' => [
-						['from' => '31', 'to' => '', 'step' => '']
+						['from' => '31', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1,10h/02',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '10', 'till' => '', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01,10',
 					'md' => [
-						['from' => '01', 'to' => '', 'step' => ''],
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '01', 'till' => '', 'step' => ''],
+						['from' => '10', 'till' => '', 'step' => '']
 					]
 				]],
 				['md01', 'md1h/02', 'md31', 'md1,10h/02', 'h1-5,7-10/03', 'md01,10']
@@ -1985,52 +1985,52 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7,1-1',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => ''],
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => ''],
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7h/02',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd7-9',
 					'wd' => [
-						['from' => '7', 'to' => '9', 'step' => '']
+						['from' => '7', 'till' => '9', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1,3,5-7h/02',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '3', 'to' => '', 'step' => ''],
-						['from' => '5', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '3', 'till' => '', 'step' => ''],
+						['from' => '5', 'till' => '7', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					]
 				]],
 				['wd1-7,1-1', 'wd1-7', 'wd1-7h/02', 'wd7-9', 'wd1,3,5-7h/02', 'h1-5,7-10/03']
@@ -2042,135 +2042,135 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01',
 					'md' => [
-						['from' => '01', 'to' => '', 'step' => '']
+						['from' => '01', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1h/02',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7,1-1',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => ''],
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => ''],
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7h/02',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd7-9',
 					'wd' => [
-						['from' => '7', 'to' => '9', 'step' => '']
+						['from' => '7', 'till' => '9', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1,3,5-7h/02',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '3', 'to' => '', 'step' => ''],
-						['from' => '5', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '3', 'till' => '', 'step' => ''],
+						['from' => '5', 'till' => '7', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md31',
 					'md' => [
-						['from' => '31', 'to' => '', 'step' => '']
+						['from' => '31', 'till' => '', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md1,10h/02',
 					'md' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '10', 'till' => '', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'md01,10wd1-7,1-1',
 					'md' => [
-						['from' => '01', 'to' => '', 'step' => ''],
-						['from' => '10', 'to' => '', 'step' => '']
+						['from' => '01', 'till' => '', 'step' => ''],
+						['from' => '10', 'till' => '', 'step' => '']
 					],
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => ''],
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => ''],
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1-7h/02',
 					'wd' => [
-						['from' => '1', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '7', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd7-9',
 					'wd' => [
-						['from' => '7', 'to' => '9', 'step' => '']
+						['from' => '7', 'till' => '9', 'step' => '']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd1,3,5-7h/02',
 					'wd' => [
-						['from' => '1', 'to' => '', 'step' => ''],
-						['from' => '3', 'to' => '', 'step' => ''],
-						['from' => '5', 'to' => '7', 'step' => '']
+						['from' => '1', 'till' => '', 'step' => ''],
+						['from' => '3', 'till' => '', 'step' => ''],
+						['from' => '5', 'till' => '7', 'step' => '']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					]
 				]],
 				['md01', 'md1h/02', 'wd1-7,1-1', 'wd1-7', 'wd1-7h/02', 'wd7-9', 'wd1,3,5-7h/02', 'md31', 'md1,10h/02',
@@ -2184,7 +2184,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/1',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				]],
 				['m/1']
@@ -2195,7 +2195,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/01',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '01']
+						['from' => '', 'till' => '', 'step' => '01']
 					]
 				]],
 				['m/01']
@@ -2206,7 +2206,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/02',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				]],
 				['m/02']
@@ -2217,7 +2217,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/59',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '', 'till' => '', 'step' => '59']
 					]
 				]],
 				['m/59']
@@ -2228,14 +2228,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/1',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm59',
 					'm' => [
-						['from' => '59', 'to' => '', 'step' => '']
+						['from' => '59', 'till' => '', 'step' => '']
 					]
 				]],
 				['m/1', 'm59']
@@ -2246,7 +2246,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-1',
 					'm' => [
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				]],
 				['m1-1']
@@ -2257,7 +2257,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-23',
 					'm' => [
-						['from' => '1', 'to' => '23', 'step' => '']
+						['from' => '1', 'till' => '23', 'step' => '']
 					]
 				]],
 				['m1-23']
@@ -2268,7 +2268,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm01-1',
 					'm' => [
-						['from' => '01', 'to' => '1', 'step' => '']
+						['from' => '01', 'till' => '1', 'step' => '']
 					]
 				]],
 				['m01-1']
@@ -2279,7 +2279,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm01-01',
 					'm' => [
-						['from' => '01', 'to' => '01', 'step' => '']
+						['from' => '01', 'till' => '01', 'step' => '']
 					]
 				]],
 				['m01-01']
@@ -2290,7 +2290,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm01-23',
 					'm' => [
-						['from' => '01', 'to' => '23', 'step' => '']
+						['from' => '01', 'till' => '23', 'step' => '']
 					]
 				]],
 				['m01-23']
@@ -2301,7 +2301,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm0-23',
 					'm' => [
-						['from' => '0', 'to' => '23', 'step' => '']
+						['from' => '0', 'till' => '23', 'step' => '']
 					]
 				]],
 				['m0-23']
@@ -2312,7 +2312,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm00-59/59',
 					'm' => [
-						['from' => '00', 'to' => '59', 'step' => '59']
+						['from' => '00', 'till' => '59', 'step' => '59']
 					]
 				]],
 				['m00-59/59']
@@ -2323,7 +2323,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm01-59/58',
 					'm' => [
-						['from' => '01', 'to' => '59', 'step' => '58']
+						['from' => '01', 'till' => '59', 'step' => '58']
 					]
 				]],
 				['m01-59/58']
@@ -2334,8 +2334,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-5,33-59',
 					'm' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '33', 'to' => '59', 'step' => '']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '33', 'till' => '59', 'step' => '']
 					]
 				]],
 				['m1-5,33-59']
@@ -2346,8 +2346,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-5,28-45/17',
 					'm' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '28', 'to' => '45', 'step' => '17']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '28', 'till' => '45', 'step' => '17']
 					]
 				]],
 				['m1-5,28-45/17']
@@ -2358,8 +2358,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-5,44-45/01',
 					'm' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '44', 'to' => '45', 'step' => '01']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '44', 'till' => '45', 'step' => '01']
 					]
 				]],
 				['m1-5,44-45/01']
@@ -2370,8 +2370,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-5,44-45/1',
 					'm' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '44', 'to' => '45', 'step' => '1']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '44', 'till' => '45', 'step' => '1']
 					]
 				]],
 				['m1-5,44-45/1']
@@ -2382,15 +2382,15 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/02',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-5,44-45/1',
 					'm' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '44', 'to' => '45', 'step' => '1']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '44', 'till' => '45', 'step' => '1']
 					]
 				]],
 				['m/02', 'm1-5,44-45/1']
@@ -2401,7 +2401,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm0-0',
 					'm' => [
-						['from' => '0', 'to' => '0', 'step' => '']
+						['from' => '0', 'till' => '0', 'step' => '']
 					]
 				]],
 				['m0-0']
@@ -2412,7 +2412,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm0',
 					'm' => [
-						['from' => '0', 'to' => '', 'step' => '']
+						['from' => '0', 'till' => '', 'step' => '']
 					]
 				]],
 				['m0']
@@ -2423,7 +2423,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm0-00',
 					'm' => [
-						['from' => '0', 'to' => '00', 'step' => '']
+						['from' => '0', 'till' => '00', 'step' => '']
 					]
 				]],
 				['m0-00']
@@ -2434,7 +2434,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm00-0',
 					'm' => [
-						['from' => '00', 'to' => '0', 'step' => '']
+						['from' => '00', 'till' => '0', 'step' => '']
 					]
 				]],
 				['m00-0']
@@ -2445,7 +2445,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm00-00',
 					'm' => [
-						['from' => '00', 'to' => '00', 'step' => '']
+						['from' => '00', 'till' => '00', 'step' => '']
 					]
 				]],
 				['m00-00']
@@ -2456,10 +2456,10 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-1,58-59/1,/1,/59',
 					'm' => [
-						['from' => '1', 'to' => '1', 'step' => ''],
-						['from' => '58', 'to' => '59', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '1', 'till' => '1', 'step' => ''],
+						['from' => '58', 'till' => '59', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '59']
 					]
 				]],
 				['m1-1,58-59/1,/1,/59']
@@ -2470,12 +2470,12 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/30,1-4,05-09,58-59/1,/1,/59',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '30'],
-						['from' => '1', 'to' => '4', 'step' => ''],
-						['from' => '05', 'to' => '09', 'step' => ''],
-						['from' => '58', 'to' => '59', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '', 'till' => '', 'step' => '30'],
+						['from' => '1', 'till' => '4', 'step' => ''],
+						['from' => '05', 'till' => '09', 'step' => ''],
+						['from' => '58', 'till' => '59', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '59']
 					]
 				]],
 				['m/30,1-4,05-09,58-59/1,/1,/59']
@@ -2487,7 +2487,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm99',
 					'm' => [
-						['from' => '99', 'to' => '', 'step' => '']
+						['from' => '99', 'till' => '', 'step' => '']
 					]
 				]],
 				['m99']
@@ -2498,7 +2498,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm99-99',
 					'm' => [
-						['from' => '99', 'to' => '99', 'step' => '']
+						['from' => '99', 'till' => '99', 'step' => '']
 					]
 				]],
 				['m99-99']
@@ -2509,7 +2509,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm99-99/99',
 					'm' => [
-						['from' => '99', 'to' => '99', 'step' => '99']
+						['from' => '99', 'till' => '99', 'step' => '99']
 					]
 				]],
 				['m99-99/99']
@@ -2520,7 +2520,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/99',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '99']
+						['from' => '', 'till' => '', 'step' => '99']
 					]
 				]],
 				['m/99']
@@ -2531,7 +2531,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm60-0/99',
 					'm' => [
-						['from' => '60', 'to' => '0', 'step' => '99']
+						['from' => '60', 'till' => '0', 'step' => '99']
 					]
 				]],
 				['m60-0/99']
@@ -2542,7 +2542,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm59-0/99',
 					'm' => [
-						['from' => '59', 'to' => '0', 'step' => '99']
+						['from' => '59', 'till' => '0', 'step' => '99']
 					]
 				]],
 				['m59-0/99']
@@ -2553,7 +2553,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm00-60',
 					'm' => [
-						['from' => '00', 'to' => '60', 'step' => '']
+						['from' => '00', 'till' => '60', 'step' => '']
 					]
 				]],
 				['m00-60']
@@ -2564,7 +2564,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm/60',
 					'm' => [
-						['from' => '', 'to' => '', 'step' => '60']
+						['from' => '', 'till' => '', 'step' => '60']
 					]
 				]],
 				['m/60']
@@ -2575,7 +2575,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm0-2/60',
 					'm' => [
-						['from' => '0', 'to' => '2', 'step' => '60']
+						['from' => '0', 'till' => '2', 'step' => '60']
 					]
 				]],
 				['m0-2/60']
@@ -2586,7 +2586,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm59-15/1',
 					'm' => [
-						['from' => '59', 'to' => '15', 'step' => '1']
+						['from' => '59', 'till' => '15', 'step' => '1']
 					]
 				]],
 				['m59-15/1']
@@ -2597,7 +2597,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm00-00/00',
 					'm' => [
-						['from' => '00', 'to' => '00', 'step' => '00']
+						['from' => '00', 'till' => '00', 'step' => '00']
 					]
 				]],
 				['m00-00/00']
@@ -2608,7 +2608,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm01-01/01',
 					'm' => [
-						['from' => '01', 'to' => '01', 'step' => '01']
+						['from' => '01', 'till' => '01', 'step' => '01']
 					]
 				]],
 				['m01-01/01']
@@ -2620,26 +2620,26 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6,1-5/4,2-7/5h/02',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6'],
-						['from' => '1', 'to' => '5', 'step' => '4'],
-						['from' => '2', 'to' => '7', 'step' => '5']
+						['from' => '', 'till' => '', 'step' => '6'],
+						['from' => '1', 'till' => '5', 'step' => '4'],
+						['from' => '2', 'till' => '7', 'step' => '5']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03m1-1,58-59/1,/1,/59',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					],
 					'm' => [
-						['from' => '1', 'to' => '1', 'step' => ''],
-						['from' => '58', 'to' => '59', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '1', 'till' => '1', 'step' => ''],
+						['from' => '58', 'till' => '59', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '59']
 					]
 				]],
 				['wd/6,1-5/4,2-7/5h/02', 'h1-5,7-10/03m1-1,58-59/1,/1,/59']
@@ -2651,7 +2651,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/1',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				]],
 				['s/1']
@@ -2662,7 +2662,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/01',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '01']
+						['from' => '', 'till' => '', 'step' => '01']
 					]
 				]],
 				['s/01']
@@ -2673,7 +2673,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/02',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				]],
 				['s/02']
@@ -2684,7 +2684,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/59',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '', 'till' => '', 'step' => '59']
 					]
 				]],
 				['s/59']
@@ -2695,14 +2695,14 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/1',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '1']
+						['from' => '', 'till' => '', 'step' => '1']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm59',
 					'm' => [
-						['from' => '59', 'to' => '', 'step' => '']
+						['from' => '59', 'till' => '', 'step' => '']
 					]
 				]],
 				['s/1', 'm59']
@@ -2713,7 +2713,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's1-1',
 					's' => [
-						['from' => '1', 'to' => '1', 'step' => '']
+						['from' => '1', 'till' => '1', 'step' => '']
 					]
 				]],
 				['s1-1']
@@ -2724,7 +2724,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's1-23',
 					's' => [
-						['from' => '1', 'to' => '23', 'step' => '']
+						['from' => '1', 'till' => '23', 'step' => '']
 					]
 				]],
 				['s1-23']
@@ -2735,7 +2735,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's01-1',
 					's' => [
-						['from' => '01', 'to' => '1', 'step' => '']
+						['from' => '01', 'till' => '1', 'step' => '']
 					]
 				]],
 				['s01-1']
@@ -2746,7 +2746,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's01-01',
 					's' => [
-						['from' => '01', 'to' => '01', 'step' => '']
+						['from' => '01', 'till' => '01', 'step' => '']
 					]
 				]],
 				['s01-01']
@@ -2757,7 +2757,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's01-23',
 					's' => [
-						['from' => '01', 'to' => '23', 'step' => '']
+						['from' => '01', 'till' => '23', 'step' => '']
 					]
 				]],
 				['s01-23']
@@ -2768,7 +2768,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's0-23',
 					's' => [
-						['from' => '0', 'to' => '23', 'step' => '']
+						['from' => '0', 'till' => '23', 'step' => '']
 					]
 				]],
 				['s0-23']
@@ -2779,7 +2779,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's00-59/59',
 					's' => [
-						['from' => '00', 'to' => '59', 'step' => '59']
+						['from' => '00', 'till' => '59', 'step' => '59']
 					]
 				]],
 				['s00-59/59']
@@ -2790,7 +2790,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's01-59/58',
 					's' => [
-						['from' => '01', 'to' => '59', 'step' => '58']
+						['from' => '01', 'till' => '59', 'step' => '58']
 					]
 				]],
 				['s01-59/58']
@@ -2801,8 +2801,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's1-5,33-59',
 					's' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '33', 'to' => '59', 'step' => '']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '33', 'till' => '59', 'step' => '']
 					]
 				]],
 				['s1-5,33-59']
@@ -2813,8 +2813,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's1-5,28-45/17',
 					's' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '28', 'to' => '45', 'step' => '17']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '28', 'till' => '45', 'step' => '17']
 					]
 				]],
 				['s1-5,28-45/17']
@@ -2825,8 +2825,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's1-5,44-45/01',
 					's' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '44', 'to' => '45', 'step' => '01']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '44', 'till' => '45', 'step' => '01']
 					]
 				]],
 				['s1-5,44-45/01']
@@ -2837,8 +2837,8 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's1-5,44-45/1',
 					's' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '44', 'to' => '45', 'step' => '1']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '44', 'till' => '45', 'step' => '1']
 					]
 				]],
 				['s1-5,44-45/1']
@@ -2849,15 +2849,15 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/02',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'm1-5,44-45/1',
 					'm' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '44', 'to' => '45', 'step' => '1']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '44', 'till' => '45', 'step' => '1']
 					]
 				]],
 				['s/02', 'm1-5,44-45/1']
@@ -2868,7 +2868,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's0-0',
 					's' => [
-						['from' => '0', 'to' => '0', 'step' => '']
+						['from' => '0', 'till' => '0', 'step' => '']
 					]
 				]],
 				['s0-0']
@@ -2879,7 +2879,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's0-00',
 					's' => [
-						['from' => '0', 'to' => '00', 'step' => '']
+						['from' => '0', 'till' => '00', 'step' => '']
 					]
 				]],
 				['s0-00']
@@ -2890,7 +2890,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's00-0',
 					's' => [
-						['from' => '00', 'to' => '0', 'step' => '']
+						['from' => '00', 'till' => '0', 'step' => '']
 					]
 				]],
 				['s00-0']
@@ -2901,7 +2901,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's00-00',
 					's' => [
-						['from' => '00', 'to' => '00', 'step' => '']
+						['from' => '00', 'till' => '00', 'step' => '']
 					]
 				]],
 				['s00-00']
@@ -2912,10 +2912,10 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's1-1,58-59/1,/1,/59',
 					's' => [
-						['from' => '1', 'to' => '1', 'step' => ''],
-						['from' => '58', 'to' => '59', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '1', 'till' => '1', 'step' => ''],
+						['from' => '58', 'till' => '59', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '59']
 					]
 				]],
 				['s1-1,58-59/1,/1,/59']
@@ -2926,12 +2926,12 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/30,1-4,05-09,58-59/1,/1,/59',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '30'],
-						['from' => '1', 'to' => '4', 'step' => ''],
-						['from' => '05', 'to' => '09', 'step' => ''],
-						['from' => '58', 'to' => '59', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '', 'till' => '', 'step' => '30'],
+						['from' => '1', 'till' => '4', 'step' => ''],
+						['from' => '05', 'till' => '09', 'step' => ''],
+						['from' => '58', 'till' => '59', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '59']
 					]
 				]],
 				['s/30,1-4,05-09,58-59/1,/1,/59']
@@ -2943,7 +2943,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's99',
 					's' => [
-						['from' => '99', 'to' => '', 'step' => '']
+						['from' => '99', 'till' => '', 'step' => '']
 					]
 				]],
 				['s99']
@@ -2954,7 +2954,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's99-99',
 					's' => [
-						['from' => '99', 'to' => '99', 'step' => '']
+						['from' => '99', 'till' => '99', 'step' => '']
 					]
 				]],
 				['s99-99']
@@ -2965,7 +2965,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's99-99/99',
 					's' => [
-						['from' => '99', 'to' => '99', 'step' => '99']
+						['from' => '99', 'till' => '99', 'step' => '99']
 					]
 				]],
 				['s99-99/99']
@@ -2976,7 +2976,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/99',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '99']
+						['from' => '', 'till' => '', 'step' => '99']
 					]
 				]],
 				['s/99']
@@ -2987,7 +2987,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's60-0/99',
 					's' => [
-						['from' => '60', 'to' => '0', 'step' => '99']
+						['from' => '60', 'till' => '0', 'step' => '99']
 					]
 				]],
 				['s60-0/99']
@@ -2998,7 +2998,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's59-0/99',
 					's' => [
-						['from' => '59', 'to' => '0', 'step' => '99']
+						['from' => '59', 'till' => '0', 'step' => '99']
 					]
 				]],
 				['s59-0/99']
@@ -3009,7 +3009,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's00-60',
 					's' => [
-						['from' => '00', 'to' => '60', 'step' => '']
+						['from' => '00', 'till' => '60', 'step' => '']
 					]
 				]],
 				['s00-60']
@@ -3020,7 +3020,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's/60',
 					's' => [
-						['from' => '', 'to' => '', 'step' => '60']
+						['from' => '', 'till' => '', 'step' => '60']
 					]
 				]],
 				['s/60']
@@ -3031,7 +3031,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's0-2/60',
 					's' => [
-						['from' => '0', 'to' => '2', 'step' => '60']
+						['from' => '0', 'till' => '2', 'step' => '60']
 					]
 				]],
 				['s0-2/60']
@@ -3042,7 +3042,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's59-15/1',
 					's' => [
-						['from' => '59', 'to' => '15', 'step' => '1']
+						['from' => '59', 'till' => '15', 'step' => '1']
 					]
 				]],
 				['s59-15/1']
@@ -3053,7 +3053,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's00-00/00',
 					's' => [
-						['from' => '00', 'to' => '00', 'step' => '00']
+						['from' => '00', 'till' => '00', 'step' => '00']
 					]
 				]],
 				['s00-00/00']
@@ -3064,7 +3064,7 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 's01-01/01',
 					's' => [
-						['from' => '01', 'to' => '01', 'step' => '01']
+						['from' => '01', 'till' => '01', 'step' => '01']
 					]
 				]],
 				['s01-01/01']
@@ -3076,34 +3076,34 @@ class CItemDelayFlexParserTest extends PHPUnit_Framework_TestCase {
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'wd/6,1-5/4,2-7/5h/02',
 					'wd' => [
-						['from' => '', 'to' => '', 'step' => '6'],
-						['from' => '1', 'to' => '5', 'step' => '4'],
-						['from' => '2', 'to' => '7', 'step' => '5']
+						['from' => '', 'till' => '', 'step' => '6'],
+						['from' => '1', 'till' => '5', 'step' => '4'],
+						['from' => '2', 'till' => '7', 'step' => '5']
 					],
 					'h' => [
-						['from' => '', 'to' => '', 'step' => '02']
+						['from' => '', 'till' => '', 'step' => '02']
 					]
 				],
 				[
 					'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING,
 					'interval' => 'h1-5,7-10/03m1-1,58-59/1,/1,/59s/30,1-4,05-09,58-59/1,/1,/59',
 					'h' => [
-						['from' => '1', 'to' => '5', 'step' => ''],
-						['from' => '7', 'to' => '10', 'step' => '03']
+						['from' => '1', 'till' => '5', 'step' => ''],
+						['from' => '7', 'till' => '10', 'step' => '03']
 					],
 					'm' => [
-						['from' => '1', 'to' => '1', 'step' => ''],
-						['from' => '58', 'to' => '59', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '1', 'till' => '1', 'step' => ''],
+						['from' => '58', 'till' => '59', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '59']
 					],
 					's' => [
-						['from' => '', 'to' => '', 'step' => '30'],
-						['from' => '1', 'to' => '4', 'step' => ''],
-						['from' => '05', 'to' => '09', 'step' => ''],
-						['from' => '58', 'to' => '59', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '1'],
-						['from' => '', 'to' => '', 'step' => '59']
+						['from' => '', 'till' => '', 'step' => '30'],
+						['from' => '1', 'till' => '4', 'step' => ''],
+						['from' => '05', 'till' => '09', 'step' => ''],
+						['from' => '58', 'till' => '59', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '1'],
+						['from' => '', 'till' => '', 'step' => '59']
 					]
 				]],
 				['wd/6,1-5/4,2-7/5h/02', 'h1-5,7-10/03m1-1,58-59/1,/1,/59s/30,1-4,05-09,58-59/1,/1,/59']
