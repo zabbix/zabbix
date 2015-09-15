@@ -376,7 +376,6 @@ sass/apple-touch-icon-76x76-precomposed.png -text svneol=unset#image/png
 sass/browserwarning.html -text
 sass/dashboard.html -text
 sass/errors.html -text
-sass/favicon.ico -text svneol=unset#image/x-icon
 sass/forms-housekeeper.html -text
 sass/forms-inventory.html -text
 sass/img/browser-sprite.png -text svneol=unset#image/png
