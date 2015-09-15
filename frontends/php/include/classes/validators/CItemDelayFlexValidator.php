@@ -92,26 +92,26 @@ class CItemDelayFlexValidator extends CValidator {
 	 * Validate scheduling interval month days, week days, hours, minutes and seconds.
 	 *
 	 * @param array $interval						Data of scheduling interval array.
-	 * @param string $interval[]['interval']		An array containing month days, week days, hours, minutes and seconds.
+	 * @param string $interval[]['interval']		An array containing month days, week days, hours, minutes, seconds.
 	 * @param array $interval[]['md']				An array of month month days.
 	 * @param string $interval[]['md'][]['from']	Month day "from".
-	 * @param string $interval[]['md'][]['to']		Month day "to".
+	 * @param string $interval[]['md'][]['till']	Month day "till".
 	 * @param string $interval[]['md'][]['step']	Month "step".
 	 * @param array $interval[]['wd']				An array of week days.
 	 * @param string $interval[]['wd'][]['from']	Week "from".
-	 * @param string $interval[]['wd'][]['to']		Week "to".
+	 * @param string $interval[]['wd'][]['till']	Week "till".
 	 * @param string $interval[]['wd'][]['step']	Week "step".
 	 * @param array $interval[]['h']				An array of hours.
 	 * @param string $interval[]['h'][]['from']		Hours "from".
-	 * @param string $interval[]['h'][]['to']		Hours "to".
+	 * @param string $interval[]['h'][]['till']		Hours "till".
 	 * @param string $interval[]['h'][]['step']		Hours step
 	 * @param array $interval[]['m']				An array of minutes.
 	 * @param string $interval[]['m'][]['from']		Minutes "from".
-	 * @param string $interval[]['m'][]['to']		Minutes "to".
+	 * @param string $interval[]['m'][]['till']		Minutes "till".
 	 * @param string $interval[]['m'][]['step']		Minutes "step".
 	 * @param array $interval[]['s']				An array of seconds.
 	 * @param string $interval[]['s'][]['from']		Seconds "from".
-	 * @param string $interval[]['s'][]['to']		Seconds "to".
+	 * @param string $interval[]['s'][]['till']		Seconds "till".
 	 * @param string $interval[]['s'][]['step']		Seconds "step".
 	 *
 	 * return bool
@@ -124,24 +124,29 @@ class CItemDelayFlexValidator extends CValidator {
 					$month_from = (int) $month['from'];
 
 					if ($month_from < 1 || $month_from > 31) {
-						$this->setError(_s('Invalid month day "%1$s".', $month['from']));
+						$this->setError(_s('Invalid interval "%1$s": invalid month day "%2$s".', $interval['interval'],
+							$month['from']
+						));
 						return false;
 					}
 
 					// Ending month day is optional.
-					if ($month['to'] !== '') {
-						$month_to = (int) $month['to'];
+					if ($month['till'] !== '') {
+						$month_till = (int) $month['till'];
 
 						// Should be a valid month day.
-						if ($month_to < 1 || $month_to > 31) {
-							$this->setError(_s('Invalid month day "%1$s".', $month['to']));
+						if ($month_till < 1 || $month_till > 31) {
+							$this->setError(_s('Invalid interval "%1$s": invalid month day "%2$s".',
+								$interval['interval'],
+								$month['till']
+							));
 							return false;
 						}
 
 						// If entered, it cannot be greater than starting month day.
-						if ($month_from > $month_to) {
+						if ($month_from > $month_till) {
 							$this->setError(_s(
-								'Invalid interval "%1$s": starting month day must be less than ending month day.',
+								'Invalid interval "%1$s": starting month day must be less or equal to ending month day.',
 								$interval['interval']
 							));
 							return false;
@@ -152,9 +157,12 @@ class CItemDelayFlexValidator extends CValidator {
 							$month_step = (int) $month['step'];
 
 							if ($month_step < 1 || $month_step > 30
-									|| ($month_step > ($month_to - $month_from))
-									|| ($month_from == $month_to && $month_step != 1)) {
-								$this->setError(_s('Invalid month step "%1$s".', $month['step']));
+									|| ($month_step > ($month_till - $month_from))
+									|| ($month_from == $month_till && $month_step != 1)) {
+								$this->setError(_s('Invalid interval "%1$s": invalid month step "%2$s".',
+									$interval['interval'],
+									$month['step']
+								));
 								return false;
 							}
 						}
@@ -165,7 +173,9 @@ class CItemDelayFlexValidator extends CValidator {
 
 					// If month day is ommited, month step is mandatory.
 					if ($month_step < 1 || $month_step > 30) {
-						$this->setError(_s('Invalid month step "%1$s".', $month['step']));
+						$this->setError(_s('Invalid interval "%1$s": invalid month step "%2$s".', $interval['interval'],
+							$month['step']
+						));
 						return false;
 					}
 				}
@@ -179,24 +189,29 @@ class CItemDelayFlexValidator extends CValidator {
 					$week_from = (int) $week['from'];
 
 					if ($week_from < 1 || $week_from > 7) {
-						$this->setError(_s('Invalid week day "%1$s".', $week['from']));
+						$this->setError(_s('Invalid interval "%1$s": invalid week day "%2$s".', $interval['interval'],
+							$week['from']
+						));
 						return false;
 					}
 
 					// Ending week day is optional.
-					if ($week['to'] !== '') {
-						$week_to = (int) $week['to'];
+					if ($week['till'] !== '') {
+						$week_till = (int) $week['till'];
 
 						// Should be a valid week day.
-						if ($week_to < 1 || $week_to > 7) {
-							$this->setError(_s('Invalid week day "%1$s".', $week['to']));
+						if ($week_till < 1 || $week_till > 7) {
+							$this->setError(_s('Invalid interval "%1$s": invalid week day "%2$s".',
+								$interval['interval'],
+								$week['till']
+							));
 							return false;
 						}
 
 						// If entered, it cannot be greater than starting week day.
-						if ($week_from > $week_to) {
+						if ($week_from > $week_till) {
 							$this->setError(_s(
-								'Invalid interval "%1$s": starting week day must be less than ending week day.',
+								'Invalid interval "%1$s": starting week day must be less or equal to ending week day.',
 								$interval['interval']
 							));
 							return false;
@@ -207,9 +222,12 @@ class CItemDelayFlexValidator extends CValidator {
 							$week_step = (int) $week['step'];
 
 							if ($week_step < 1 || $week_step > 6
-									|| ($week_step > ($week_to - $week_from))
-									|| ($week_from == $week_to && $week_step != 1)) {
-								$this->setError(_s('Invalid week step "%1$s".', $week['step']));
+									|| ($week_step > ($week_till - $week_from))
+									|| ($week_from == $week_till && $week_step != 1)) {
+								$this->setError(_s('Invalid interval "%1$s": invalid week step "%2$s".',
+									$interval['interval'],
+									$week['step']
+								));
 								return false;
 							}
 						}
@@ -220,7 +238,9 @@ class CItemDelayFlexValidator extends CValidator {
 
 					// If week day is ommited, week step is mandatory.
 					if ($week_step < 1 || $week_step > 6) {
-						$this->setError(_s('Invalid week step "%1$s".', $week['step']));
+						$this->setError(_s('Invalid interval "%1$s": invalid week step "%2$s".', $interval['interval'],
+							$week['step']
+						));
 						return false;
 					}
 				}
@@ -234,24 +254,28 @@ class CItemDelayFlexValidator extends CValidator {
 					$hour_from = (int) $hour['from'];
 
 					if ($hour_from > 23) {
-						$this->setError(_s('Invalid hours "%1$s".', $hour['from']));
+						$this->setError(_s('Invalid interval "%1$s": invalid hours "%2$s".', $interval['interval'],
+							$hour['from']
+						));
 						return false;
 					}
 
 					// Ending hour is optional.
-					if ($hour['to'] !== '') {
-						$hour_to = (int) $hour['to'];
+					if ($hour['till'] !== '') {
+						$hour_till = (int) $hour['till'];
 
 						// Should be a valid hour.
-						if ($hour_to > 23) {
-							$this->setError(_s('Invalid hours "%1$s".', $hour['to']));
+						if ($hour_till > 23) {
+							$this->setError(_s('Invalid interval "%1$s": invalid hours "%2$s".', $interval['interval'],
+								$hour['till']
+							));
 							return false;
 						}
 
 						// If entered, it cannot be greater than starting hour.
-						if ($hour_from > $hour_to) {
+						if ($hour_from > $hour_till) {
 							$this->setError(_s(
-								'Invalid interval "%1$s": starting hours must be less than ending hours.',
+								'Invalid interval "%1$s": starting hours must be less or equal to ending hours.',
 								$interval['interval']
 							));
 							return false;
@@ -262,9 +286,12 @@ class CItemDelayFlexValidator extends CValidator {
 							$hour_step = (int) $hour['step'];
 
 							if ($hour_step < 1 || $hour_step > 23
-									|| ($hour_step > ($hour_to - $hour_from))
-									|| ($hour_from == $hour_to && $hour_step != 1)) {
-								$this->setError(_s('Invalid hours step "%1$s".', $hour['step']));
+									|| ($hour_step > ($hour_till - $hour_from))
+									|| ($hour_from == $hour_till && $hour_step != 1)) {
+								$this->setError(_s('Invalid interval "%1$s": invalid hours step "%2$s".',
+									$interval['interval'],
+									$hour['step']
+								));
 								return false;
 							}
 						}
@@ -275,7 +302,9 @@ class CItemDelayFlexValidator extends CValidator {
 
 					// If hour is ommited, hour step is mandatory.
 					if ($hour_step < 1 || $hour_step > 23) {
-						$this->setError(_s('Invalid hours step "%1$s".', $hour['step']));
+						$this->setError(_s('Invalid interval "%1$s": invalid hours step "%2$s".', $interval['interval'],
+							$hour['step']
+						));
 						return false;
 					}
 				}
@@ -289,24 +318,28 @@ class CItemDelayFlexValidator extends CValidator {
 					$minute_from = (int) $minute['from'];
 
 					if ($minute_from > 59) {
-						$this->setError(_s('Invalid minutes "%1$s".', $minute['from']));
+						$this->setError(_s('Invalid interval "%1$s": invalid minutes "%2$s".', $interval['interval'],
+							$minute['from']
+						));
 						return false;
 					}
 
 					// Ending minute is optional.
-					if ($minute['to'] !== '') {
-						$minute_to = (int) $minute['to'];
+					if ($minute['till'] !== '') {
+						$minute_till = (int) $minute['till'];
 
 						// Should be a valid minute.
-						if ($minute_to > 59) {
-							$this->setError(_s('Invalid minutes "%1$s".', $minute['to']));
+						if ($minute_till > 59) {
+							$this->setError(_s('Invalid interval "%1$s": invalid minutes "%2$s".', $interval['interval'],
+								$minute['till']
+							));
 							return false;
 						}
 
 						// If entered, it cannot be greater than starting minute.
-						if ($minute_from > $minute_to) {
+						if ($minute_from > $minute_till) {
 							$this->setError(_s(
-								'Invalid interval "%1$s": starting minutes must be less than ending minutes.',
+								'Invalid interval "%1$s": starting minutes must be less or equal to ending minutes.',
 								$interval['interval']
 							));
 							return false;
@@ -317,9 +350,12 @@ class CItemDelayFlexValidator extends CValidator {
 							$minute_step = (int) $minute['step'];
 
 							if ($minute_step < 1 || $minute_step > 59
-									|| ($minute_step > ($minute_to - $minute_from))
-									|| ($minute_from == $minute_to && $minute_step != 1)) {
-								$this->setError(_s('Invalid minutes step "%1$s".', $minute['step']));
+									|| ($minute_step > ($minute_till - $minute_from))
+									|| ($minute_from == $minute_till && $minute_step != 1)) {
+								$this->setError(_s('Invalid interval "%1$s": invalid minutes step "%2$s".',
+									$interval['interval'],
+									$minute['step']
+								));
 								return false;
 							}
 						}
@@ -330,7 +366,10 @@ class CItemDelayFlexValidator extends CValidator {
 
 					// If minute is ommited, minute step is mandatory.
 					if ($minute_step < 1 || $minute_step > 59) {
-						$this->setError(_s('Invalid minutes step "%1$s".', $minute['step']));
+						$this->setError(_s('Invalid interval "%1$s": invalid minutes step "%2$s".',
+							$interval['interval'],
+							$minute['step']
+						));
 						return false;
 					}
 				}
@@ -344,24 +383,28 @@ class CItemDelayFlexValidator extends CValidator {
 					$second_from = (int) $second['from'];
 
 					if ($second_from > 59) {
-						$this->setError(_s('Invalid seconds "%1$s".', $second['from']));
+						$this->setError(_s('Invalid interval "%1$s": invalid seconds "%2$s".', $interval['interval'],
+							$second['from']
+						));
 						return false;
 					}
 
 					// Ending second is optional.
-					if ($second['to'] !== '') {
-						$second_to = (int) $second['to'];
+					if ($second['till'] !== '') {
+						$second_till = (int) $second['till'];
 
 						// Should be a valid second.
-						if ($second_to > 59) {
-							$this->setError(_s('Invalid seconds "%1$s".', $second['to']));
+						if ($second_till > 59) {
+							$this->setError(_s('Invalid interval "%1$s": invalid seconds "%2$s".', $interval['interval'],
+								$second['till']
+							));
 							return false;
 						}
 
 						// If entered, it cannot be greater than starting second.
-						if ($second_from > $second_to) {
+						if ($second_from > $second_till) {
 							$this->setError(_s(
-								'Invalid interval "%1$s": starting seconds must be less than ending seconds.',
+								'Invalid interval "%1$s": starting seconds must be less or equal to ending seconds.',
 								$interval['interval']
 							));
 							return false;
@@ -372,9 +415,12 @@ class CItemDelayFlexValidator extends CValidator {
 							$second_step = (int) $second['step'];
 
 							if ($second_step < 1 || $second_step > 59
-									|| ($second_step > ($second_to - $second_from))
-									|| ($second_from == $second_to && $second_step != 1)) {
-								$this->setError(_s('Invalid seconds step "%1$s".', $second['step']));
+									|| ($second_step > ($second_till - $second_from))
+									|| ($second_from == $second_till && $second_step != 1)) {
+								$this->setError(_s('Invalid interval "%1$s": invalid seconds step "%2$s".',
+									$interval['interval'],
+									$second['step']
+								));
 								return false;
 							}
 						}
@@ -385,7 +431,10 @@ class CItemDelayFlexValidator extends CValidator {
 
 					// If second is ommited, second step is mandatory.
 					if ($second_step < 1 || $second_step > 59) {
-						$this->setError(_s('Invalid seconds step "%1$s".', $second['step']));
+						$this->setError(_s('Invalid interval "%1$s": invalid seconds step "%2$s".',
+							$interval['interval'],
+							$second['step']
+						));
 						return false;
 					}
 				}
