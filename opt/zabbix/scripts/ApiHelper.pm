@@ -214,7 +214,7 @@ sub ah_save_incident
 {
 	my $tld = shift;
 	my $service = shift;
-	my $eventid = shift;	# incident is identOAified by event ID
+	my $eventid = shift;	# incident is identified by event ID
 	my $start = shift;
 	my $end = shift;
 	my $false_positive = shift;

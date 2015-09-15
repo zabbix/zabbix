@@ -321,6 +321,12 @@ foreach (@$tlds_ref)
 		if ($lastclock == 0)
 		{
 			wrn(uc($service), ": no rolling week data in the database yet");
+
+			if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+			{
+				fail("cannot save alarmed: ", ah_get_error());
+			}
+
 			next;
 		}
 
