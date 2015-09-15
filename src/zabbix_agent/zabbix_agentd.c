@@ -758,7 +758,12 @@ static void	zbx_load_config(int requirement)
 	zbx_free(active_hosts);
 
 	if (ZBX_CFG_FILE_REQUIRED == requirement)
+	{
 		zbx_validate_config();
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		zbx_tls_validate_config();
+#endif
+	}
 }
 
 /******************************************************************************

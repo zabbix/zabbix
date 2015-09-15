@@ -668,6 +668,9 @@ static void	zbx_load_config(void)
 	zbx_set_defaults();
 
 	zbx_validate_config();
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_validate_config();
+#endif
 }
 
 /******************************************************************************

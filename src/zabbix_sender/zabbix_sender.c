@@ -996,6 +996,7 @@ int	main(int argc, char **argv)
 	sendval_args.port = ZABBIX_SERVER_PORT;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_validate_config();
 #if defined(_WINDOWS)
 	zbx_tls_init_parent();
 #endif
