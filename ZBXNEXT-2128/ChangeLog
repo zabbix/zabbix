@@ -1,4 +1,12 @@
-Changes for 2.5.1
+Changes for 3.0.0alpha3
+
+New features:
+
+Bug fixes:
+.......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (igors, Sandis, dimir)
+
+--------------------------------------------------------------------------------
+Changes for 3.0.0alpha2
 
 New features:
 ..F....... [ZBXNEXT-2662] added a new predefined period (3 days) for the timeline (Sasha)
@@ -147,6 +155,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (igors, Sandis, dimir)
 ...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
@@ -818,6 +827,8 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (igors, Sandis, dimir)
+...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
 ...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
