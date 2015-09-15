@@ -33,7 +33,30 @@ typedef struct
 	int	rows;
 	int	columns;
 	double	*elements;
-} zbx_matrix_t;
+}
+zbx_matrix_t;
+
+typedef enum
+{
+	FIT_LINEAR,
+	FIT_POLYNOMIAL,
+	FIT_EXPONENTIAL,
+	FIT_LOGARITHMIC,
+	FIT_POWER,
+	FIT_INVALID
+}
+zbx_fit_t;
+
+typedef enum
+{
+	MODE_VALUE,
+	MODE_MAX,
+	MODE_MIN,
+	MODE_DELTA,
+	MODE_AVG,
+	MODE_INVALID
+}
+zbx_mode_t;
 
 static int	zbx_matrix_struct_alloc(zbx_matrix_t **pm)
 {
@@ -352,12 +375,11 @@ out:
 	return res;
 }
 
-static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char **error)
+static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m, char **error)
 {
 	int	i;
 
-	if ('\0' == *fit || 0 == strcmp(fit, "linear") || 0 == strncmp(fit, "polynomial", strlen("polynomial")) ||
-			0 == strcmp(fit, "logarithmic"))
+	if (FIT_LINEAR == fit || FIT_POLYNOMIAL == fit || FIT_LOGARITHMIC == fit)
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 1, error))
 			return ZBX_MATH_FAIL;
@@ -365,7 +387,7 @@ static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char
 		for (i = 0; i < n; ++i)
 			ZBX_MATRIX_EL(m, i, 0) = x[i];
 	}
-	else if (0 == strcmp(fit, "exponential") || 0 == strcmp(fit, "power"))
+	else if (FIT_EXPONENTIAL == fit || FIT_POWER == fit)
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 1, error))
 			return ZBX_MATH_FAIL;
@@ -381,22 +403,17 @@ static int	zbx_fill_dependent(double *x, int n, char *fit, zbx_matrix_t *m, char
 			ZBX_MATRIX_EL(m, i, 0) = log(x[i]);
 		}
 	}
-	else
-	{
-		*error = zbx_strdup(*error, "invalid 'fit' parameter");
-		return ZBX_MATH_FAIL;
-	}
 
 	return ZBX_MATH_OK;
 }
 
-static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, char **error)
+static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, zbx_matrix_t *m, char **error)
 {
 	double		element;
 	int		i, j;
 	unsigned int	k;
 
-	if ('\0' == *fit || 0 == strcmp(fit, "linear") || 0 == strcmp(fit, "exponential"))
+	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit)
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 2, error))
 			return ZBX_MATH_FAIL;
@@ -407,7 +424,7 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 			ZBX_MATRIX_EL(m, i, 1) = t[i];
 		}
 	}
-	else if (0 == strcmp(fit, "logarithmic") || 0 == strcmp(fit, "power"))
+	else if (FIT_LOGARITHMIC == fit || FIT_POWER == fit)
 	{
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 2, error))
 			return ZBX_MATH_FAIL;
@@ -418,7 +435,7 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 			ZBX_MATRIX_EL(m, i, 1) = log(t[i]);
 		}
 	}
-	else if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
+	else if (FIT_POLYNOMIAL == fit)
 	{
 		if (SUCCEED != is_uint_range(fit + strlen("polynomial"), &k, 1, 6))
 		{
@@ -445,16 +462,11 @@ static int	zbx_fill_independent(double *t, int n, char *fit, zbx_matrix_t *m, ch
 			ZBX_MATRIX_EL(m, i, k) = element;
 		}
 	}
-	else
-	{
-		*error = zbx_strdup(*error, "invalid 'fit' parameter");
-		return ZBX_MATH_FAIL;
-	}
 
 	return ZBX_MATH_OK;
 }
 
-static int	zbx_regression(double *t, double *x, int n, char *fit, zbx_matrix_t *coefficients, char **error)
+static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, zbx_matrix_t *coefficients, char **error)
 {
 	zbx_matrix_t	*independent = NULL, *dependent = NULL;
 	int		res;
@@ -768,8 +780,8 @@ out:
 #undef Re
 #undef Im
 
-static int	zbx_polynomial_minmax(double now, double time, char *mode, zbx_matrix_t *coefficients, double *result,
-		char **error)
+static int	zbx_polynomial_minmax(double now, double time, zbx_mode_t mode, zbx_matrix_t *coefficients,
+		double *result, char **error)
 {
 	zbx_matrix_t	*derivative = NULL, *derivative_roots = NULL;
 	double		min, max, tmp;
@@ -826,11 +838,11 @@ static int	zbx_polynomial_minmax(double now, double time, char *mode, zbx_matrix
 			max = tmp;
 	}
 
-	if (0 == strcmp(mode, "max"))
+	if (MODE_MAX == mode)
 		*result = max;
-	else if (0 == strcmp(mode, "min"))
+	else if (MODE_MIN == mode)
 		*result = min;
-	else /* if (0 == strcmp(mode, "delta")) */
+	else /* if (MODE_DELTA == mode) */
 		*result = max - min;
 
 out:
@@ -902,7 +914,7 @@ out:
 
 #undef ZBX_MATH_EPSILON
 
-static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, char *fit, double *value, char **error)
+static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t fit, double *value, char **error)
 {
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
@@ -910,60 +922,89 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, char *fit, 
 		return ZBX_MATH_FAIL;
 	}
 
-	if ('\0' == *fit || 0 == strcmp(fit, "linear"))
-	{
+	if (FIT_LINEAR == fit)
 		*value = ZBX_MATRIX_EL(coefficients, 0, 0) + ZBX_MATRIX_EL(coefficients, 1, 0) * t;
-	}
-	else if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
-	{
+	else if (FIT_POLYNOMIAL == fit)
 		*value = zbx_polynomial_value(t, coefficients);
-	}
-	else if (0 == strcmp(fit, "exponential"))
-	{
+	else if (FIT_EXPONENTIAL == fit)
 		*value = exp(ZBX_MATRIX_EL(coefficients, 0, 0) + ZBX_MATRIX_EL(coefficients, 1, 0) * t);
-	}
-	else if (0 == strcmp(fit, "logarithmic"))
-	{
+	else if (FIT_LOGARITHMIC == fit)
 		*value = ZBX_MATRIX_EL(coefficients, 0, 0) + ZBX_MATRIX_EL(coefficients, 1, 0) * log(t);
-	}
-	else if (0 == strcmp(fit, "power"))
-	{
+	else if (FIT_POWER == fit)
 		*value = exp(ZBX_MATRIX_EL(coefficients, 0, 0) + ZBX_MATRIX_EL(coefficients, 1, 0) * log(t));
-	}
-	else
+
+	return ZBX_MATH_OK;
+}
+
+zbx_fit_t	zbx_fit_code(char *fit_str)
+{
+	if ('\0' == *fit || 0 == strcmp(fit, "linear"))
+		return = FIT_LINEAR;
+
+	if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
+		return FIT_POLYNOMIAL;
+
+	if (0 == strcmp(fit, "exponential"))
+		return FIT_EXPONENTIAL;
+
+	if (0 == strcmp(fit, "logarithmic"))
+		return FIT_LOGARITHMIC;
+
+	if (0 == strcmp(fit, "power"))
+		return FIT_POWER;
+
+	return FIT_INVALID;
+}
+
+zbx_mode_t	zbx_mode_code(char *mode_str)
+{
+	if ('\0' == *mode || 0 == strcmp(mode, "value"))
+		return MODE_VALUE;
+
+	if (0 == strcmp(mode, "max"))
+		return MODE_MAX;
+
+	if (0 == strcmp(mode, "min"))
+		return MODE_MIN;
+
+	if (0 == strcmp(mode, "delta"))
+		return MODE_DELTA;
+
+	if (0 == strcmp(mode, "avg"))
+		return MODE_AVG;
+
+	return MODE_INVALID;
+}
+
+int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit_str, char *mode_str,
+	double *result, char **error)
+{
+	zbx_matrix_t	*coefficients = NULL;
+	zbx_fit_t	fit;
+	zbx_mode_t	mode;
+	double		left, right;
+	int		res;
+
+	if (FIT_INVALID == (fit = zbx_fit_code(fit_str)))
 	{
 		*error = zbx_strdup(*error, "invalid 'fit' parameter");
 		return ZBX_MATH_FAIL;
 	}
 
-	return ZBX_MATH_OK;
-}
-
-int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit, char *mode, double *result,
-	char **error)
-{
-	zbx_matrix_t	*coefficients = NULL;
-	double		left, right;
-	int		res;
+	if (MODE_INVALID == (mode = zbx_mode_code(mode_str)))
+	{
+		*error = zbx_strdup(*error, "invalid 'mode' parameter");
+		return ZBX_MATH_FAIL;
+	}
 
 	if (1 == n)
 	{
-		if ('\0' == *mode || 0 == strcmp(mode, "value") || 0 == strcmp(mode, "max") ||
-				0 == strcmp(mode, "min") || 0 == strcmp(mode, "avg"))
-		{
+		if (MODE_VALUE == mode || MODE_MAX == mode || MODE_MIN == mode || MODE_AVG == mode)
 			*result = x[0];
-			return ZBX_MATH_OK;
-		}
-		else if (0 == strcmp(mode, "delta"))
-		{
+		else if (MODE_DELTA == mode)
 			*result = 0.0;
-			return ZBX_MATH_OK;
-		}
-		else
-		{
-			*error = zbx_strdup(*error, "invalid 'mode' parameter");
-			return ZBX_MATH_FAIL;
-		}
+
+		return ZBX_MATH_OK;
 	}
 
 	if (ZBX_MATH_OK != (res = zbx_matrix_struct_alloc(&coefficients)))
@@ -972,7 +1013,7 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, coefficients, error)))
 		goto out;
 
-	if ('\0' == *mode || 0 == strcmp(mode, "value"))
+	if (MODE_VALUE == mode)
 	{
 		res = zbx_calculate_value(now + time, coefficients, fit, result, error);
 		goto out;
@@ -980,26 +1021,20 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 
 	if (0.0 == time)
 	{
-		if (0 == strcmp(mode, "max") || 0 == strcmp(mode, "min") || 0 == strcmp(mode, "avg"))
+		if (MODE_MAX == mode || MODE_MIN == mode || MODE_AVG == mode)
 		{
 			res = zbx_calculate_value(now + time, coefficients, fit, result, error);
 		}
-		else if (0 == strcmp(mode, "delta"))
+		else if (MODE_DELTA == mode)
 		{
 			*result = 0.0;
 			res = ZBX_MATH_OK;
-		}
-		else
-		{
-			*error = zbx_strdup(*error, "invalid 'mode' parameter");
-			res = ZBX_MATH_FAIL;
 		}
 
 		goto out;
 	}
 
-	if ('\0' == *fit || 0 == strcmp(fit, "linear") || 0 == strcmp(fit, "exponential") ||
-			0 == strcmp(fit, "logarithmic") || 0 == strcmp(fit, "power"))
+	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit || FIT_LOGARITHMIC == fit || FIT_POWER == fit)
 	{
 		/* fit is monotone, therefore maximum and minimum are either at now or at now + time */
 		if (ZBX_MATH_OK != zbx_calculate_value(now, coefficients, fit, &left, error) ||
@@ -1009,34 +1044,34 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 			goto out;
 		}
 
-		if (0 == strcmp(mode, "max"))
+		if (MODE_MAX == mode)
 		{
 			*result = (left > right ? left : right);
 		}
-		else if (0 == strcmp(mode, "min"))
+		else if (MODE_MIN == mode)
 		{
 			*result = (left < right ? left : right);
 		}
-		else if (0 == strcmp(mode, "delta"))
+		else if (MODE_DELTA == mode)
 		{
 			*result = (left > right ? left - right : right - left);
 		}
-		else if (0 == strcmp(mode, "avg"))
+		else if (MODE_AVG == mode)
 		{
-			if ('\0' == *fit || 0 == strcmp(fit, "linear"))
+			if (FIT_LINEAR == fit)
 			{
 				*result = 0.5 * (left + right);
 			}
-			else if (0 == strcmp(fit, "exponential"))
+			else if (FIT_EXPONENTIAL == fit)
 			{
 				*result = (right - left) / time / ZBX_MATRIX_EL(coefficients, 1, 0);
 			}
-			else if (0 == strcmp(fit, "logarithmic"))
+			else if (FIT_LOGARITHMIC == fit)
 			{
 				*result = right + ZBX_MATRIX_EL(coefficients, 1, 0) *
 						(log(1.0 + time / now) * now / time - 1.0);
 			}
-			else /* if (0 == strcmp(fit, "power")) */
+			else if (FIT_POWER == fit)
 			{
 				if (-1.0 != ZBX_MATRIX_EL(coefficients, 1, 0))
 					*result = (right * (now + time) - left * now) / time /
@@ -1045,40 +1080,23 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 					*result = exp(ZBX_MATRIX_EL(coefficients, 0, 0)) * log(1.0 + time / now) / time;
 			}
 		}
-		else
-		{
-			*error = zbx_strdup(*error, "invalid 'mode' parameter");
-			res = ZBX_MATH_FAIL;
-			goto out;
-		}
 
 		res = ZBX_MATH_OK;
-		goto out;
 	}
 
-	if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
+	if (FIT_POLYNOMIAL == fit)
 	{
-		if (0 == strcmp(mode, "max") || 0 == strcmp(mode, "min") || 0 == strcmp(mode, "delta"))
-		{
+		if (MODE_MAX == mode || MODE_MIN == mode || MODE_DELTA == mode)
 			res = zbx_polynomial_minmax(now, time, mode, coefficients, result, error);
-			goto out;
-		}
 
-		if (0 == strcmp(mode, "avg"))
+		if (MODE_AVG == mode)
 		{
 			*result = (zbx_polynomial_antiderivative(now + time, coefficients) -
 					zbx_polynomial_antiderivative(now, coefficients)) / time;
 			res = ZBX_MATH_OK;
-			goto out;
 		}
-
-		*error = zbx_strdup(*error, "invalid 'mode' parameter");
-		res = ZBX_MATH_FAIL;
-		goto out;
 	}
 
-	*error = zbx_strdup(*error, "invalid 'fit' parameter");
-	res = ZBX_MATH_FAIL;
 out:
 	if (ZBX_MATH_OK == res)
 	{
@@ -1092,11 +1110,18 @@ out:
 	return res;
 }
 
-int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char *fit, double *result, char **error)
+int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char *fit_str, double *result, char **error)
 {
 	zbx_matrix_t	*coefficients = NULL;
+	zbx_fit_t	fit;
 	double		current;
 	int		res;
+
+	if (FIT_INVALID == (fit = zbx_fit_code(fit_str)))
+	{
+		*error = zbx_strdup(*error, "invalid 'fit' parameter");
+		return ZBX_MATH_FAIL;
+	}
 
 	if (1 == n)
 	{
@@ -1120,36 +1145,20 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 		goto out;
 	}
 
-	if ('\0' == *fit || 0 == strcmp(fit, "linear"))
-	{
+	if (FIT_LINEAR == fit)
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) /
 				ZBX_MATRIX_EL(coefficients, 1, 0) - now : -1.0);
-	}
-	else if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
-	{
+	else if (FIT_POLYNOMIAL == fit)
 		res = zbx_polynomial_timeleft(now, threshold, coefficients, result, error);
-	}
-	else if (0 == strcmp(fit, "exponential"))
-	{
+	else if (FIT_EXPONENTIAL == fit)
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (log(threshold) -
 				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now : -1.0);
-	}
-	else if (0 == strcmp(fit, "logarithmic"))
-	{
+	else if (FIT_LOGARITHMIC == fit)
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((threshold -
 				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : -1.0);
-	}
-	else if (0 == strcmp(fit, "power"))
-	{
+	else if (FIT_POWER == fit)
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((log(threshold) -
 				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : -1.0);
-	}
-	else
-	{
-		*error = zbx_strdup(*error, "invalid 'fit' parameter");
-		res = ZBX_MATH_FAIL;
-		goto out;
-	}
 
 	if (*result != *result)
 		*result = -1.0;
