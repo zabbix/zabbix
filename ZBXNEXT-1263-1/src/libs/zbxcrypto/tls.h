@@ -73,6 +73,7 @@ void	zbx_tls_pass_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args);
 #endif	/* #if defined(_WINDOWS) */
 
+void	zbx_tls_validate_config(void);
 void	zbx_tls_library_deinit(void);
 void	zbx_tls_init_parent(void);
 void	zbx_tls_init_child(void);

@@ -413,7 +413,7 @@ static void	zbx_parameter_not_empty(const char *param, const char *param_name)
  *           must match the value of CONFIG_TLS_ACCEPT parameter.             *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_tls_validate_config(void)
+void	zbx_tls_validate_config(void)
 {
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
 	/* parameter (in zabbix_get and zabbix_sender) */
@@ -2468,9 +2468,7 @@ void	zbx_tls_init_child(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
-#endif
-	zbx_tls_validate_config();
-#if !defined(_WINDOWS)
+
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
 	/* 'TLSCAFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
@@ -2664,9 +2662,7 @@ void	zbx_tls_init_child(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
-#endif
-	zbx_tls_validate_config();
-#if !defined(_WINDOWS)
+
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
 	/* need to allocate certificate credentials store? */
@@ -2889,9 +2885,7 @@ void	zbx_tls_init_child(void)
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
-#endif
-	zbx_tls_validate_config();
-#if !defined(_WINDOWS)
+
 	zbx_tls_library_init();		/* on Unix initialize crypto libraries in child processes */
 #endif
 	if (1 != RAND_status())		/* protect against not properly seeded PRNG */
