@@ -46,14 +46,17 @@ if (defined($opt_from))
 	dbg("option \"from\" truncated to the start of a minute: $opt_from") if ($opt_from != getopt('from'));
 }
 
-my @services;
+my %services;
 if (opt('service'))
 {
-	@services = (lc(getopt('service')));
+	$services{lc(getopt('service'))} = undef;
 }
 else
 {
-	@services = ('dns', 'dnssec', 'rdds', 'epp');
+	foreach my $service ('dns', 'dnssec', 'rdds', 'epp')
+	{
+		$services{$service} = undef;
+	}
 }
 
 my %ignore_hash;
@@ -72,58 +75,54 @@ if (opt('ignore-file'))
 	%ignore_hash = map { $_ => 1 } @lines;
 }
 
-my $cfg_dns_delay;
-my $cfg_dns_valuemaps;
+my $cfg_dns_delay = undef;
 my $cfg_dns_minns;
-my $cfg_dns_key_status;
-my $cfg_dns_key_rtt;
-
-my $cfg_rdds_delay;
-my $cfg_rdds_valuemaps;
-my $cfg_rdds_key_status;
-my $cfg_rdds_key_43_rtt;
-my $cfg_rdds_key_43_ip;
-my $cfg_rdds_key_43_upd;
-my $cfg_rdds_key_80_rtt;
-my $cfg_rdds_key_80_ip;
-
-my $cfg_epp_delay;
-my $cfg_epp_valuemaps;
-my $cfg_epp_key_status;
-my $cfg_epp_key_ip;
-my $cfg_epp_key_rtt;
+my $cfg_dns_valuemaps;
 
 my $cfg_dns_statusmaps = get_statusmaps('dns');
 
-my %services_hash = map { $_ => 1 } @services;
+foreach my $service (keys(%services))
+{
+	if ($service eq 'dns' || $service eq 'dnssec')
+	{
+		if (!$cfg_dns_delay)
+		{
+			$cfg_dns_delay = get_macro_dns_udp_delay();
+			$cfg_dns_minns = get_macro_minns();
+			$cfg_dns_valuemaps = get_valuemaps('dns');
+		}
 
-if (exists($services_hash{'dns'}) or exists($services_hash{'dnssec'}))
-{
-	$cfg_dns_delay = get_macro_dns_udp_delay();
-	$cfg_dns_minns = get_macro_minns();
-	$cfg_dns_valuemaps = get_valuemaps('dns');
-	$cfg_dns_key_status = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
-	$cfg_dns_key_rtt = 'rsm.dns.udp.rtt[{$RSM.TLD},';
+		$services{$service}{'delay'} = $cfg_dns_delay;
+		$services{$service}{'minns'} = $cfg_dns_minns;
+		$services{$service}{'valuemaps'} = $cfg_dns_valuemaps;
+		$services{$service}{'key_status'} = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
+		$services{$service}{'key_rtt'} = 'rsm.dns.udp.rtt[{$RSM.TLD},';
+	}
+
+	if ($service eq 'rdds')
+	{
+		$services{$service}{'delay'} = get_macro_rdds_delay();
+		$services{$service}{'valuemaps'} = get_valuemaps($service);
+		$services{$service}{'key_status'} = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
+		$services{$service}{'key_43_rtt'} = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
+		$services{$service}{'key_43_ip'} = 'rsm.rdds.43.ip[{$RSM.TLD}]';
+		$services{$service}{'key_43_upd'} = 'rsm.rdds.43.upd[{$RSM.TLD}]';
+		$services{$service}{'key_80_rtt'} = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
+		$services{$service}{'key_80_ip'} = 'rsm.rdds.80.ip[{$RSM.TLD}]';
+
+	}
+
+	if ($service eq 'epp')
+	{
+		$services{$service}{'delay'} = get_macro_epp_delay();
+		$services{$service}{'valuemaps'} = get_valuemaps($service);
+		$services{$service}{'key_status'} = 'rsm.epp[{$RSM.TLD},'; # 0 - down, 1 - up
+		$services{$service}{'key_ip'} = 'rsm.epp.ip[{$RSM.TLD}]';
+		$services{$service}{'key_rtt'} = 'rsm.epp.rtt[{$RSM.TLD},';
+	}
 }
-if (exists($services_hash{'rdds'}))
-{
-	$cfg_rdds_delay = get_macro_rdds_delay();
-	$cfg_rdds_valuemaps = get_valuemaps('rdds');
-	$cfg_rdds_key_status = 'rsm.rdds[{$RSM.TLD}'; # 0 - down, 1 - up, 2 - only 43, 3 - only 80
-	$cfg_rdds_key_43_rtt = 'rsm.rdds.43.rtt[{$RSM.TLD}]';
-	$cfg_rdds_key_43_ip = 'rsm.rdds.43.ip[{$RSM.TLD}]';
-	$cfg_rdds_key_43_upd = 'rsm.rdds.43.upd[{$RSM.TLD}]';
-	$cfg_rdds_key_80_rtt = 'rsm.rdds.80.rtt[{$RSM.TLD}]';
-	$cfg_rdds_key_80_ip = 'rsm.rdds.80.ip[{$RSM.TLD}]';
-}
-if (exists($services_hash{'epp'}))
-{
-	$cfg_epp_delay = get_macro_epp_delay();
-	$cfg_epp_valuemaps = get_valuemaps('epp');
-	$cfg_epp_key_status = 'rsm.epp[{$RSM.TLD},'; # 0 - down, 1 - up
-	$cfg_epp_key_ip = 'rsm.epp.ip[{$RSM.TLD}]';
-	$cfg_epp_key_rtt = 'rsm.epp.rtt[{$RSM.TLD},';
-}
+
+print(Dumper(%services));
 
 my $now = time();
 
@@ -239,6 +238,39 @@ if ($till > $last_time_till)
 	exit(0);
 }
 
+# adjust test and probe periods we need to calculate for
+foreach my $service (keys(%services))
+{
+	my $delay = $services{$service}{'delay'};
+
+	$services{$service}{'from'} = undef;
+	$services{$service}{'till'} = undef;
+
+	my ($period_from, $period_till);
+	for ($period_from = $from, $period_till = $period_from + 59; $period_from < $till; $period_from += 60, $period_till += 60)
+	{
+		my $test_from = get_test_start_time($period_till, $delay);
+
+		if ($test_from != 0)
+		{
+			if ($test_from < $from)
+			{
+				$from = $test_from;
+			}
+
+			if (!$services{$service}{'from'} || $test_from < $services{$service}{'from'})
+			{
+				$services{$service}{'from'} = $test_from;
+			}
+
+			if (!$services{$service}{'till'} || $period_till > $services{$service}{'till'})
+			{
+				$services{$service}{'till'} = $period_till;
+			}
+		}
+	}
+}
+
 my $tlds_processed = 0;
 foreach (@$tlds_ref)
 {
@@ -257,7 +289,7 @@ foreach (@$tlds_ref)
 
 	my $ah_tld = ah_get_api_tld($tld);
 
-	foreach my $service (@services)
+	foreach my $service (keys(%services))
 	{
 		if (tld_service_enabled($tld, $service) != SUCCESS)
 		{
@@ -324,6 +356,17 @@ foreach (keys(%$servicedata))
 	{
 		my $lastclock = $servicedata->{$tld}->{$service}->{'lastclock'};
 
+		my $delay = $services{$service}{'delay'};
+		my $service_from = $services{$service}{'from'};
+		my $service_till = $services{$service}{'till'};
+
+		if (!$service_from || !$service_till)
+		{
+			# this is not the time to calculate the service yet,
+			# it will be done in a later runs
+			next;
+		}
+
 		my $hostid = get_hostid($tld);
 		my $avail_key = "rsm.slv.$service.avail";
 		my $avail_itemid = get_itemid_by_hostid($hostid, $avail_key);
@@ -350,21 +393,7 @@ foreach (keys(%$servicedata))
 		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
 		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
-		my $service_delay;
-		if ($service eq 'dns' or $service eq 'dnssec')
-		{
-			$service_delay = $cfg_dns_delay;
-		}
-		elsif ($service eq 'rdds')
-		{
-			$service_delay = $cfg_rdds_delay;
-		}
-		elsif ($service eq 'epp')
-		{
-			$service_delay = $cfg_epp_delay;
-		}
-
-		__prnt("period: ", __selected_period($from, $till), " (", uc($service), ")") if (opt('dry-run') or opt('debug'));
+		__prnt("period: ", __selected_period($service_from, $service_till), " (", uc($service), ")") if (opt('dry-run') or opt('debug'));
 
 		if (opt('dry-run'))
 		{
@@ -406,10 +435,10 @@ foreach (keys(%$servicedata))
 
 		my ($nsips_ref, $dns_items_ref, $rdds_dbl_items_ref, $rdds_str_items_ref, $epp_dbl_items_ref, $epp_str_items_ref);
 
-		if ($service eq 'dns' or $service eq 'dnssec')
+		if ($service eq 'dns' || $service eq 'dnssec')
 		{
-			$nsips_ref = get_nsips($tld, $cfg_dns_key_rtt, 1); # templated
-			$dns_items_ref = __get_dns_itemids($nsips_ref, $cfg_dns_key_rtt, $tld, getopt('probe'));
+			$nsips_ref = get_nsips($tld, $services{$service}{'key_rtt'}, 1);	# templated
+			$dns_items_ref = __get_dns_itemids($nsips_ref, $services{$service}{'key_rtt'}, $tld, getopt('probe'));
 		}
 		elsif ($service eq 'rdds')
 		{
@@ -422,7 +451,7 @@ foreach (keys(%$servicedata))
 			$epp_str_items_ref = __get_epp_str_itemids($tld, getopt('probe'));
 		}
 
-		$incidents = get_incidents($avail_itemid, $from, $till);
+		$incidents = get_incidents($avail_itemid, $service_from, $service_till);
 
 		foreach (@$incidents)
 		{
@@ -434,16 +463,16 @@ foreach (keys(%$servicedata))
 			my $start = $event_start;
 			my $end = $event_end;
 
-			if (defined($from) and $from > $event_start)
+			if (defined($service_from) and $service_from > $event_start)
 			{
-				$start = $from;
+				$start = $service_from;
 			}
 
-			if (defined($till))
+			if (defined($service_till))
 			{
-				if (not defined($event_end) or (defined($event_end) and $till < $event_end))
+				if (not defined($event_end) or (defined($event_end) and $service_till < $event_end))
 				{
-					$end = $till;
+					$end = $service_till;
 				}
 			}
 
@@ -480,7 +509,7 @@ foreach (keys(%$servicedata))
 				#   |.....................................|...................................|
 				#   0 seconds <--zero or more minutes--> 30                                  59
 				#
-				$result->{'start'} = $clock - $service_delay + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
+				$result->{'start'} = $clock - $delay + RESULT_TIMESTAMP_SHIFT + 1; # we need to start at 0
 				$result->{'end'} = $clock + RESULT_TIMESTAMP_SHIFT;
 
 				if (opt('dry-run'))
@@ -528,6 +557,8 @@ foreach (keys(%$servicedata))
 
 			if ($service eq 'dns' or $service eq 'dnssec')
 			{
+				my $minns = $services{$service}{'minns'};
+
 				my $values_ref = __get_dns_test_values($dns_items_ref, $values_from, $values_till);
 
 				# run through values from probes (ordered by clock)
@@ -603,7 +634,7 @@ foreach (keys(%$servicedata))
 				}
 
 				# get results from probes: number of working Name Servers
-				my $itemids_ref = __get_status_itemids($tld, $cfg_dns_key_status);
+				my $itemids_ref = __get_status_itemids($tld, $services{$service}{'key_status'});
 				my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
 
 				foreach my $tr_ref (@test_results)
@@ -625,7 +656,7 @@ foreach (keys(%$servicedata))
 
 							if (not defined($probes_ref->{$probe}->{'status'}))
 							{
-								$probes_ref->{$probe}->{'status'} = ($status_ref->{'value'} >= $cfg_dns_minns ? "Up" : "Down");
+								$probes_ref->{$probe}->{'status'} = ($status_ref->{'value'} >= $minns ? "Up" : "Down");
 							}
 						}
 					}
@@ -720,7 +751,7 @@ foreach (keys(%$servicedata))
 				}
 
 				# get results from probes: working services (rdds43, rdds80)
-				my $itemids_ref = __get_status_itemids($tld, $cfg_rdds_key_status);
+				my $itemids_ref = __get_status_itemids($tld, $services{$service}{'key_status'});
 				my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
 
 				foreach my $tr_ref (@test_results)
@@ -835,7 +866,7 @@ foreach (keys(%$servicedata))
 				}
 
 				# get results from probes: EPP down (0) or up (1)
-				my $itemids_ref = __get_status_itemids($tld, $cfg_epp_key_status);
+				my $itemids_ref = __get_status_itemids($tld, $services{$service}{'key_status'});
                                 my $statuses_ref = __get_probe_statuses($itemids_ref, $values_from, $values_till);
 
 				foreach my $tr_ref (@test_results)
@@ -974,7 +1005,7 @@ sub __get_dns_test_values
 				next;
 			}
 
-			$result{$probe}->{$nsip}->{$clock} = get_detailed_result($cfg_dns_valuemaps, $value);
+			$result{$probe}->{$nsip}->{$clock} = get_detailed_result($services{'dns'}{'valuemaps'}, $value);
 		}
 	}
 
@@ -1099,7 +1130,7 @@ sub __get_rdds_test_values
 			fail("unknown RDDS port in item (id:$itemid)");
 		}
 
-		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($cfg_rdds_valuemaps, $value) : int($value);
+		$pre_result{$probe}->{$subservice}->{$clock}->{$type} = ($type eq 'rtt') ? get_detailed_result($services{'rdds'}{'valuemaps'}, $value) : int($value);
 	}
 
 	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
@@ -1222,7 +1253,7 @@ sub __get_epp_test_values
 
 		my $type = __get_epp_dbl_type($key);
 
-		$result{$probe}->{$clock}->{$type} = get_detailed_result($cfg_epp_valuemaps, $value);
+		$result{$probe}->{$clock}->{$type} = get_detailed_result($services{'epp'}{'valuemaps'}, $value);
 	}
 
 	my $str_rows_ref = db_select("select itemid,value,clock from history_str where itemid in ($str_itemids_str) and " . sql_time_condition($start, $end). " order by clock");
@@ -1356,7 +1387,7 @@ sub __get_rdds_dbl_itemids
 	my $tld = shift;
 	my $probe = shift;
 
-	return __get_itemids_by_complete_key($tld, $probe, $cfg_rdds_key_43_rtt, $cfg_rdds_key_80_rtt, $cfg_rdds_key_43_upd);
+	return __get_itemids_by_complete_key($tld, $probe, $services{'rdds'}{'key_43_rtt'}, $services{'rdds'}{'key_80_rtt'}, $services{'rdds'}{'key_43_upd'});
 }
 
 # return itemids of string items grouped by Probes:
@@ -1376,7 +1407,7 @@ sub __get_rdds_str_itemids
 	my $tld = shift;
 	my $probe = shift;
 
-	return __get_itemids_by_complete_key($tld, $probe, $cfg_rdds_key_43_ip, $cfg_rdds_key_80_ip);
+	return __get_itemids_by_complete_key($tld, $probe, $services{'rdds'}{'key_43_ip'}, $services{'rdds'}{'key_80_ip'});
 }
 
 sub __get_epp_dbl_itemids
@@ -1384,7 +1415,7 @@ sub __get_epp_dbl_itemids
 	my $tld = shift;
 	my $probe = shift;
 
-	return __get_itemids_by_incomplete_key($tld, $probe, $cfg_epp_key_rtt);
+	return __get_itemids_by_incomplete_key($tld, $probe, $services{'epp'}{'key_rtt'});
 }
 
 sub __get_epp_str_itemids
@@ -1392,7 +1423,7 @@ sub __get_epp_str_itemids
 	my $tld = shift;
 	my $probe = shift;
 
-	return __get_itemids_by_complete_key($tld, $probe, $cfg_epp_key_ip);
+	return __get_itemids_by_complete_key($tld, $probe, $services{'epp'}{'key_ip'});
 }
 
 # $keys_str - list of complete keys
@@ -1752,17 +1783,13 @@ sub __get_min_clock
 	my $config_minclock = shift;
 
 	my $key_condition;
-	if ($service eq 'dns' or $service eq 'dnssec')
+	if ($service eq 'dns' || $service eq 'dnssec' || $service eq 'epp')
 	{
-		$key_condition = "key_='$cfg_dns_key_status'";
+		$key_condition = "key_='" . $services{$service}{'key_status'} . "'";
 	}
 	elsif ($service eq 'rdds')
 	{
-		$key_condition = "key_ like '$cfg_rdds_key_status%'";
-	}
-	elsif ($service eq 'epp')
-	{
-		$key_condition = "key_='$cfg_epp_key_status'";
+		$key_condition = "key_ like '" . $services{$service}{'key_status'} . "%'";
 	}
 
 	my $rows_ref = db_select("select hostid from hosts where host like '$tld %'");

@@ -81,7 +81,7 @@ our @EXPORT = qw($result $dbh $tld
 		process_slv_ns_avail process_slv_monthly get_results get_item_values check_lastclock sql_time_condition
 		get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
-		get_tld_by_trigger truncate_from alerts_enabled
+		get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
 		dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt
 		setopt optkeys ts_str write_file usage);
 
@@ -2458,6 +2458,26 @@ sub alerts_enabled
 	return SUCCESS if ($config && $config->{'redis'} && $config->{'redis'}->{'enabled'} && ($config->{'redis'}->{'enabled'} ne "0"));
 
 	return E_FAIL;
+}
+
+# returns beginning of the test period if specified upper bound is within it,
+# 0 otherwise
+sub get_test_start_time
+{
+	my $till = shift;	# must be :59 seconds
+	my $delay = shift;	# service delay in seconds (e. g. DNS: 60)
+
+	my $remainder = $till % 60;
+
+	fail("internal error: first argument to get_test_start_time() must be :59 seconds") unless ($remainder == 59);
+
+	$till++;
+
+	$remainder = $till % $delay;
+
+	return 0 if ($remainder != 0);
+
+	return $till - $delay;
 }
 
 sub format_stats_time
