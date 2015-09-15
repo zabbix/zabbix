@@ -1903,15 +1903,15 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	if (3 > nparams)
 		goto out;
 
-	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 3, &time, &time_flag) ||
-			ZBX_FLAG_SEC != time_flag)
-		goto out;
-
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 			&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 3, &time, &time_flag) ||
+			ZBX_FLAG_SEC != time_flag)
 		goto out;
 
 	if (4 <= nparams)
@@ -2032,14 +2032,14 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 	if (3 > nparams)
 		goto out;
 
-	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &threshold))
-		goto out;
-
 	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
 		goto out;
 
 	if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
 			&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &threshold))
 		goto out;
 
 	if (4 == nparams)
