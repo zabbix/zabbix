@@ -349,18 +349,31 @@ abstract class CItemGeneral extends CApiService {
 					continue;
 				}
 
-				$parser = new CItemDelayFlexParser($fullItem['delay_flex']);
-				if ($parser->isValid()) {
-					$nextCheck = calculateItemNextCheck(0, $fullItem['delay'], $parser->getFlexibleIntervals(), time());
-					if ($nextCheck == ZBX_JAN_2038) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Item will not be refreshed. Please enter a correct update interval.')
+				// Validate item delay_flex string. First check syntax with parser, then validate time ranges.
+				$item_delay_flex_parser = new CItemDelayFlexParser($fullItem['delay_flex']);
+
+				if ($item_delay_flex_parser->isValid()) {
+					$delay_flex_validator = new CItemDelayFlexValidator();
+
+					if ($delay_flex_validator->validate($item_delay_flex_parser->getIntervals())) {
+						$nextCheck = calculateItemNextCheck(0, $fullItem['delay'],
+							$item_delay_flex_parser->getFlexibleIntervals(),
+							time()
 						);
+						if ($nextCheck == ZBX_JAN_2038) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('Item will not be refreshed. Please enter a correct update interval.')
+							);
+						}
+					}
+					else {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $delay_flex_validator->getError());
 					}
 				}
 				else {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid interval "%1$s": %2$s.', $fullItem['delay_flex'], $parser->getError())
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid interval "%1$s": %2$s.',
+						$fullItem['delay_flex'],
+						$item_delay_flex_parser->getError())
 					);
 				}
 			}
