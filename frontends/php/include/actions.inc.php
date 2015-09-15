@@ -1140,8 +1140,8 @@ function getActionMessages(array $alerts) {
 			$retries = '';
 		}
 		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
-			$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_ORANGE);
+			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
+			$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_YELLOW);
 		}
 		else {
 			$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
@@ -1195,7 +1195,7 @@ function getActionCommands(array $alerts) {
 				break;
 
 			case ALERT_STATUS_NOT_SENT:
-				$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
+				$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 				break;
 
 			default:
@@ -1221,7 +1221,7 @@ function makeActionHints($alerts, $mediatypes, $users, $status) {
 	foreach ($alerts as $alert) {
 		switch ($status) {
 			case ALERT_STATUS_NOT_SENT:
-				$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
+				$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_YELLOW);
 				break;
 
 			case ALERT_STATUS_SENT:
@@ -1335,7 +1335,7 @@ function makeEventsActions($eventids) {
 			count($event[ALERT_STATUS_NOT_SENT]) != 0
 				? (new CSpan(count($event[ALERT_STATUS_NOT_SENT])))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->addClass(ZBX_STYLE_ORANGE)
+					->addClass(ZBX_STYLE_YELLOW)
 					->setHint(
 						makeActionHints($event[ALERT_STATUS_NOT_SENT], $mediatypes, $users, ALERT_STATUS_NOT_SENT)
 					)
