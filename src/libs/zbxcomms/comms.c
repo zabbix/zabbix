@@ -402,7 +402,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
-		zbx_set_socket_strerror("Support for TLS was not compiled in.");
+		zbx_set_socket_strerror("support for TLS was not compiled in");
 		return FAIL;
 	}
 #endif
@@ -497,7 +497,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
-		zbx_set_socket_strerror("Support for TLS was not compiled in.");
+		zbx_set_socket_strerror("support for TLS was not compiled in");
 		return FAIL;
 	}
 #endif

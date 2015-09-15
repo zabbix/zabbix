@@ -58,7 +58,6 @@ extern unsigned int	configured_tls_connect_mode;
 extern unsigned int	configured_tls_accept_modes;
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-extern ZBX_THREAD_LOCAL unsigned char	process_type;
 extern unsigned char			program_type;
 extern char				*CONFIG_TLS_CONNECT;
 extern char				*CONFIG_TLS_ACCEPT;
