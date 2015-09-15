@@ -1151,6 +1151,7 @@ define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
+define('ZBX_STYLE_YELLOW', 'yellow');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');
