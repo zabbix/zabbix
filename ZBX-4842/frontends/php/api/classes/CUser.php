@@ -460,6 +460,11 @@ class CUser extends CZBXAPI {
 					self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
 				}
 			}
+
+			$name = 'User alias ['.(array_key_exists('alias', $user) ? $user['alias'] : '').']';
+			$name .= ' name ['.(array_key_exists('name', $user) ? $user['name'] : '').']';
+			$name .= ' surname ['.(array_key_exists('surname', $user) ? $user['surname'] : '').']';
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_USER, $userid, $name, 'users', null, null);
 		}
 
 		return array('userids' => $userids);
@@ -496,16 +501,24 @@ class CUser extends CZBXAPI {
 		$userids = zbx_objectValues($users, 'userid');
 
 		$this->checkInput($users, __FUNCTION__);
+		$db_users = self::get(array(
+			'output' => API_OUTPUT_EXTEND,
+			'userids' => $userids,
+			'preservekeys' => true
+		));
 
 		foreach ($users as $user) {
-			$self = (bccomp(self::$userData['userid'], $user['userid']) == 0);
-
+			$userid = $user['userid'];
 			$result = DB::update('users', array(
 				array(
 					'values' => $user,
-					'where' => array('userid' => $user['userid'])
+					'where' => array('userid' => $userid)
 				)
 			));
+
+			add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_USER, $userid,
+				'User alias ['.$db_users[$userid]['alias'].'] name ['.$db_users[$userid]['name'].'] surname ['.$db_users[$userid]['surname'].']',
+				'users', $db_users[$userid], $user);
 
 			if (!$result) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -515,10 +528,10 @@ class CUser extends CZBXAPI {
 				$newUsrgrpids = zbx_objectValues($user['usrgrps'], 'usrgrpid');
 
 				// deleting all relations with groups, but not touching those, where user still must be after update
-				DBexecute('DELETE FROM users_groups WHERE userid='.$user['userid'].' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
+				DBexecute('DELETE FROM users_groups WHERE userid='.zbx_dbstr($userid).' AND '.dbConditionInt('usrgrpid', $newUsrgrpids, true));
 
 				// getting the list of groups user is currently in
-				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($user['userid']));
+				$dbGroupsUserIn = DBSelect('SELECT usrgrpid FROM users_groups WHERE userid='.zbx_dbstr($userid));
 				$groupsUserIn = array();
 				while ($grp = DBfetch($dbGroupsUserIn)) {
 					$groupsUserIn[$grp['usrgrpid']] = $grp['usrgrpid'];
@@ -536,7 +549,7 @@ class CUser extends CZBXAPI {
 					}
 
 					$usersGroupdId = get_dbid('users_groups', 'id');
-					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.zbx_dbstr($usersGroupdId).','.zbx_dbstr($groupid).','.zbx_dbstr($user['userid']).')';
+					$sql = 'INSERT INTO users_groups (id,usrgrpid,userid) VALUES ('.zbx_dbstr($usersGroupdId).','.zbx_dbstr($groupid).','.zbx_dbstr($userid).')';
 
 					if (!DBexecute($sql)) {
 						self::exception(ZBX_API_ERROR_PARAMETERS, 'DBerror');
@@ -618,6 +631,18 @@ class CUser extends CZBXAPI {
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+		}
+
+		$db_users = self::get(array(
+				'output' => array('alias', 'name', 'surname'),
+				'userids' => $userIds,
+				'preservekeys' => true
+		));
+
+		foreach ($db_users as $user) {
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, $user['userid'],
+				'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']',
+				'users', null, null);
 		}
 
 		DB::delete('operations', array('operationid' => $delOperationids));

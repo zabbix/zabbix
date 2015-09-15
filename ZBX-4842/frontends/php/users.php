@@ -224,7 +224,6 @@ elseif (isset($_REQUEST['save'])) {
 		$user['usrgrps'] = $usrgrps;
 
 		if (isset($_REQUEST['userid'])) {
-			$action = AUDIT_ACTION_UPDATE;
 			$user['userid'] = $_REQUEST['userid'];
 
 			DBstart();
@@ -244,12 +243,10 @@ elseif (isset($_REQUEST['save'])) {
 			DBstart();
 			$result = DBend(API::User()->create($user));
 
-			$action = AUDIT_ACTION_ADD;
 			show_messages($result, _('User added'), _('Cannot add user'));
 		}
 
 		if ($result) {
-			add_audit($action, AUDIT_RESOURCE_USER, 'User alias ['.$_REQUEST['alias'].'] name ['.$_REQUEST['name'].'] surname ['.$_REQUEST['surname'].']');
 			unset($_REQUEST['form']);
 			clearCookies($result);
 		}
@@ -278,7 +275,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['userid'])) {
 	clearCookies($result);
 
 	if ($result) {
-		add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$user['alias'].'] name ['.$user['name'].'] surname ['.$user['surname'].']');
 		unset($_REQUEST['userid'], $_REQUEST['form']);
 	}
 }
@@ -373,12 +369,7 @@ elseif ($_REQUEST['go'] == 'delete' && isset($_REQUEST['group_userid'])) {
 		}
 
 		$userData = $dbUsers[$userId];
-
 		$goResult |= (bool) API::User()->delete(array($userId));
-
-		if ($goResult) {
-			add_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_USER, 'User alias ['.$userData['alias'].'] name ['.$userData['name'].'] surname ['.$userData['surname'].']');
-		}
 	}
 
 	$goResult = DBend($goResult);

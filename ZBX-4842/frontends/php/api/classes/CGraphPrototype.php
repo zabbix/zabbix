@@ -603,7 +603,10 @@ class CGraphPrototype extends CGraphGeneral {
 			}
 		}
 
+		API::GraphItem()->deleteByGraphId($graphids);
+
 		DB::delete('graphs', array('graphid' => $graphids));
+		mass_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, $graphids, $delGraphs, '', array(), array());
 
 		foreach ($delGraphs as $graph) {
 			info(_s('Graph prototype "%s" deleted.', $graph['name']));

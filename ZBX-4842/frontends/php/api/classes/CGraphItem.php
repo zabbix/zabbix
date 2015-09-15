@@ -195,4 +195,21 @@ class CGraphItem extends CZBXAPI {
 
 		return $result;
 	}
+
+	/**
+	 * Delete graph items by graph id
+	 * @param array $graph_id
+	 */
+	public function deleteByGraphId(array $graphids) {
+		$dbgraphitems = self::get(array(
+				'graphids' => $graphids,
+				'output' => array('gitemid'),
+				'preservekeys' => true
+		));
+		$result = DB::delete('graphs_items', array('graphid' => $graphids));
+		$dbgitemids = zbx_toHash(zbx_objectValues($dbgraphitems, 'gitemid'));
+		mass_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH_ELEMENT, $dbgitemids, array(), '', array(), array());
+
+		return $result;
+	}
 }

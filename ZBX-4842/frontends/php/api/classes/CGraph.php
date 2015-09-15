@@ -586,9 +586,12 @@ class CGraph extends CGraphGeneral {
 			'value_id' => $graphids
 		));
 
+		API::GraphItem()->deleteByGraphId($graphids);
+
 		DB::delete('graphs', array(
 			'graphid' => $graphids
 		));
+		mass_audit(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_GRAPH, $graphids, $delGraphs, '', array(), array());
 
 		foreach ($delGraphs as $graph) {
 			$host = reset($graph['hosts']);

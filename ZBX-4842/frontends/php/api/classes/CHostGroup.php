@@ -495,12 +495,11 @@ class CHostGroup extends CZBXAPI {
 			);
 		}
 		$groupids = DB::insert('groups', $groups);
-		$created_groups = $this->get(array(
-			'output' => array('name'),
-			'groupids' => $groupids,
-			'preservekeys' => true
-		));
-		mass_audit(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupids, $created_groups, 'groups', array(), array());
+
+		foreach ($groups as $gnum => $group) {
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_HOST_GROUP, $groupids[$gnum], $group['name'],
+				'groups', null, null);
+		}
 
 		return array('groupids' => $groupids);
 	}
