@@ -1723,7 +1723,8 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     background-color: transparent; }
 
 .calendar-year, .calendar-month {
-  height: 24px; }
+  height: 24px;
+  line-height: 26px; }
   .calendar-year button:first-child, .calendar-month button:first-child {
     float: left; }
   .calendar-year button:last-child, .calendar-month button:last-child {
@@ -2298,6 +2299,4 @@ td.active-bg {
     margin-right: 0; }
 
 .uppercase {
-  text-transform: uppercase;
-  letter-spacing: 0.0688em;
-  text-rendering: optimizeLegibility; }
+  text-transform: uppercase; }
