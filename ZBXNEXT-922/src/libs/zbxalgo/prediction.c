@@ -21,8 +21,11 @@
 
 #include "zbxalgo.h"
 
-#define ZBX_MATH_OK	0
-#define ZBX_MATH_FAIL	1
+#define ZBX_MATH_OK	SUCCEED
+#define ZBX_MATH_FAIL	FAIL
+
+#define DB_INFINITY	(1e12-1e-4)
+#define ERROR_CODE	-1.0
 
 #define ZBX_VALID_MATRIX(m)		(0 < m->rows && 0 < m->columns && NULL != m->elements)
 #define ZBX_MATRIX_EL(m, row, col)	(m->elements[(row) * m->columns + (col)])
@@ -1100,10 +1103,10 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 out:
 	if (ZBX_MATH_OK == res)
 	{
-		if (1e12 < *result)
-			*result = 1e12;
-		else if (-1e12 > *result)
-			*result = -1e12;
+		if (DB_INFINITY < *result)
+			*result = DB_INFINITY;
+		else if (-DB_INFINITY > *result)
+			*result = -DB_INFINITY;
 	}
 
 	zbx_matrix_free(coefficients);
@@ -1123,9 +1126,15 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 		return ZBX_MATH_FAIL;
 	}
 
+	if ((FIT_EXPONENTIAL == fit || FIT_POWER == fit) && 0.0 >= threshold)
+	{
+		*error = zbx_strdup(*error, "exponential and power functions are always positive");
+		return ZBX_MATH_FAIL;
+	}
+
 	if (1 == n)
 	{
-		*result = (x[0] == threshold ? 0.0 : -1.0);
+		*result = (x[0] == threshold ? 0.0 : DB_INFINITY);
 		return ZBX_MATH_OK;
 	}
 
@@ -1147,23 +1156,23 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 
 	if (FIT_LINEAR == fit)
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) /
-				ZBX_MATRIX_EL(coefficients, 1, 0) - now : -1.0);
+				ZBX_MATRIX_EL(coefficients, 1, 0) - now : ERROR_CODE);
 	else if (FIT_POLYNOMIAL == fit)
 		res = zbx_polynomial_timeleft(now, threshold, coefficients, result, error);
 	else if (FIT_EXPONENTIAL == fit)
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (log(threshold) -
-				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now : -1.0);
+				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now : ERROR_CODE);
 	else if (FIT_LOGARITHMIC == fit)
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((threshold -
-				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : -1.0);
+				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : ERROR_CODE);
 	else if (FIT_POWER == fit)
 		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((log(threshold) -
-				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : -1.0);
+				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : ERROR_CODE);
 
 	if (*result != *result)
-		*result = -1.0;
-	else if (0.0 > *result || 1e12 < *result)
-		*result = 1e12;
+		*result = ERROR_CODE;
+	else if (0.0 > *result || DB_INFINITY < *result)
+		*result = DB_INFINITY;
 
 out:
 	zbx_matrix_free(coefficients);
@@ -1173,6 +1182,9 @@ out:
 #undef ZBX_VALID_MATRIX
 #undef ZBX_MATRIX_EL
 #undef ZBX_MATRIX_ROW
+
+#undef DB_INFINITY
+#undef ERROR_CODE
 
 #undef ZBX_MATH_OK
 #undef ZBX_MATH_FAIL
