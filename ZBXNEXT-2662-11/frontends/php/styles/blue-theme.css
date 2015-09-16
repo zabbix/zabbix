@@ -342,11 +342,15 @@ article, .article {
   margin: 0 0 10px 0; }
   .object-group li {
     display: inline-block;
+    padding: 0 5px 0 0;
     vertical-align: middle; }
-    .object-group li:last-child {
-      margin: 0; }
+    .object-group li span {
+      padding: 4px 7px; }
+    .object-group li .status-container span {
+      padding: 2px 3px 1px 3px; }
   .object-group .selected, .object-group .calendar .selected:hover, .calendar .object-group .selected:hover {
     background-color: #fff;
+    margin: -1px;
     border: 1px solid #dfe4e7;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
