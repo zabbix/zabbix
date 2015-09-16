@@ -1103,7 +1103,9 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 out:
 	if (ZBX_MATH_OK == res)
 	{
-		if (DB_INFINITY < *result)
+		if (*result != *result)
+			*result = ERROR_CODE;
+		else if (DB_INFINITY < *result)
 			*result = DB_INFINITY;
 		else if (-DB_INFINITY > *result)
 			*result = -DB_INFINITY;
@@ -1155,19 +1157,18 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 	}
 
 	if (FIT_LINEAR == fit)
-		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) /
-				ZBX_MATRIX_EL(coefficients, 1, 0) - now : ERROR_CODE);
+		*result = (threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now;
 	else if (FIT_POLYNOMIAL == fit)
 		res = zbx_polynomial_timeleft(now, threshold, coefficients, result, error);
 	else if (FIT_EXPONENTIAL == fit)
-		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? (log(threshold) -
-				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0) - now : ERROR_CODE);
+		*result = (log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)
+				- now;
 	else if (FIT_LOGARITHMIC == fit)
-		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((threshold -
-				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : ERROR_CODE);
+		*result = exp((threshold - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0))
+				- now;
 	else if (FIT_POWER == fit)
-		*result = (0.0 != ZBX_MATRIX_EL(coefficients, 1, 0) ? exp((log(threshold) -
-				ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0)) - now : ERROR_CODE);
+		*result = exp((log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0))
+				- now;
 
 	if (*result != *result)
 		*result = ERROR_CODE;
