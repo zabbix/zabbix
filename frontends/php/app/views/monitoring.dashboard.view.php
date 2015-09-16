@@ -95,18 +95,22 @@ foreach ($widgets as $widgetid => $widget) {
 $widgets = [
 	WIDGET_SYSTEM_STATUS => [
 		'action' => 'widget.system.view',
+		'header' => _('System status'),
 		'defaults' => ['col' => 1, 'row' => 1]
 	],
 	WIDGET_HOST_STATUS => [
 		'action' => 'widget.hosts.view',
+		'header' => _('Host status'),
 		'defaults' => ['col' => 1, 'row' => 2]
 	],
 	WIDGET_LAST_ISSUES => [
 		'action' => 'widget.issues.view',
+		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
 		'defaults' => ['col' => 1, 'row' => 3]
 	],
 	WIDGET_WEB_OVERVIEW => [
 		'action' => 'widget.web.view',
+		'header' => _('Web monitoring'),
 		'defaults' => ['col' => 1, 'row' => 4]
 	],
 ];
@@ -114,12 +118,14 @@ $widgets = [
 if ($data['show_status_widget']) {
 	$widgets[WIDGET_ZABBIX_STATUS] = [
 		'action' => 'widget.status.view',
+		'header' => _('Status of Zabbix'),
 		'defaults' => ['col' => 1, 'row' => 0]
 	];
 }
 if ($data['show_discovery_widget']) {
 	$widgets[WIDGET_DISCOVERY_STATUS] = [
 		'action' => 'widget.discovery.view',
+		'header' => _('Discovery status'),
 		'defaults' => ['col' => 1, 'row' => 5]
 	];
 }
@@ -139,7 +145,7 @@ foreach ($widgets as $widgetid => $widget) {
 
 	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass('preloader')))
 		->setExpanded($expanded)
-		->setHeader(null, [$icon], true, 'zabbix.php?action=dashboard.widget')
+		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
 		->setFooter(new CList([
 			(new CListItem(''))->setId($widgetid.'_footer')
 		]));
