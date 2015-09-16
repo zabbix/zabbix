@@ -495,6 +495,7 @@ article {
 		}
 
 		.status-container {
+			margin: 0 5px 0 0;
 
 			span {
 				padding: 2px 3px 1px 3px;
@@ -504,8 +505,8 @@ article {
 
 	.selected {
 		background-color: $ui-bg-color;
-		margin: -1px;
-		border: 1px solid $ui-border-color;
+		//border: 1px solid $ui-border-color;
+		@include box-shadow(inset 0 0 0 1px $ui-border-color);
 		@include border-radius(2px);
 	}
 
@@ -1927,7 +1928,7 @@ button[disabled] {
 
 			a {
 				padding: 8px 13px 9px 13px;
-				font-weight: bold;
+				//font-weight: bold;
 				background-color: $ui-bg-color;
 				color: $font-color;
 				text-decoration: none;
