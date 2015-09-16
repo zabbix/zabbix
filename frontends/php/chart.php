@@ -36,12 +36,13 @@ $fields = [
 	'profileIdx2' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'updateProfile' =>	[T_ZBX_STR, O_OPT, null,	null,		null],
 	'from' =>			[T_ZBX_INT, O_OPT, null,	'{} >= 0',	null],
-	'width' =>			[T_ZBX_INT, O_OPT, null,	'{} > 0',	null],
+	'width' =>			[T_ZBX_INT, O_OPT, null,	BETWEEN(20, 65535),	null],
 	'height' =>			[T_ZBX_INT, O_OPT, null,	'{} > 0',	null],
-	'border' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 	'batch' =>			[T_ZBX_INT, O_OPT, null,	IN('0,1'),	null],
 ];
-check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 $itemIds = getRequest('itemids');
 
@@ -109,9 +110,6 @@ if (isset($_REQUEST['width'])) {
 }
 if (isset($_REQUEST['height'])) {
 	$graph->setHeight($_REQUEST['height']);
-}
-if (isset($_REQUEST['border'])) {
-	$graph->setBorder(0);
 }
 
 foreach ($items as $item) {

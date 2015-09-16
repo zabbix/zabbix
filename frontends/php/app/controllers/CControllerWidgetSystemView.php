@@ -40,6 +40,7 @@ class CControllerWidgetSystemView extends CController {
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
+			'trigger_name' => '',
 			'extAck' => 0
 		];
 
@@ -95,6 +96,7 @@ class CControllerWidgetSystemView extends CController {
 			$severity = CProfile::get('web.dashconf.triggers.severity', null);
 			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
 			$filter['severity'] = zbx_toHash($filter['severity']);
+			$filter['trigger_name'] = CProfile::get('web.dashconf.triggers.name', '');
 
 			$config = select_config();
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;

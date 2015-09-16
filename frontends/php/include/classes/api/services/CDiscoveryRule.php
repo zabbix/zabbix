@@ -659,7 +659,7 @@ class CDiscoveryRule extends CItemGeneral {
 			'selectHosts' => ['name'],
 			'selectFilter' => ['evaltype'],
 			'nopermissions' => true,
-			'preservekeys' => true,
+			'preservekeys' => true
 		]);
 
 		$data = [];
@@ -1011,9 +1011,17 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	protected function copyItemPrototypes(array $srcDiscovery, array $dstDiscovery, array $dstHost) {
 		$prototypes = API::ItemPrototype()->get([
+			'output' => [
+				'itemid', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_', 'delay', 'history',
+				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+				'formula', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor',
+				'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
+				'interfaceid', 'port', 'description', 'snmpv3_authprotocol', 'snmpv3_privprotocol', 'snmpv3_contextname'
+			],
+			'selectApplications' => ['applicationid'],
+			'selectApplicationPrototypes' => ['name'],
 			'discoveryids' => $srcDiscovery['itemid'],
-			'selectApplications' => API_OUTPUT_EXTEND,
-			'output' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		]);
 
@@ -1022,8 +1030,6 @@ class CDiscoveryRule extends CItemGeneral {
 			foreach ($prototypes as $key => $prototype) {
 				$prototype['ruleid'] = $dstDiscovery['itemid'];
 				$prototype['hostid'] = $dstDiscovery['hostid'];
-
-				unset($prototype['templateid'], $prototype['state']);
 
 				// map prototype interfaces
 				if ($dstHost['status'] != HOST_STATUS_TEMPLATE) {

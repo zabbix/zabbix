@@ -2051,7 +2051,7 @@ zbx_hash_t	zbx_lld_trigger_ref_hash_func(const void *data)
 	if (0 == trigger_node->trigger_ref.triggerid)
 		ptr = trigger_node->trigger_ref.trigger;
 
-	return zbx_hash_modfnv(&ptr, sizeof(trigger_node->trigger_ref.trigger), hash);
+	return ZBX_DEFAULT_PTR_HASH_ALGO(&ptr, sizeof(trigger_node->trigger_ref.trigger), hash);
 }
 
 int	zbx_lld_trigger_ref_compare_func(const void *d1, const void *d2)

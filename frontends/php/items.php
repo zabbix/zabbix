@@ -1004,7 +1004,7 @@ elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform')
 }
 elseif (hasRequest('action') && getRequest('action') == 'item.masscopyto' && hasRequest('group_itemid')) {
 	// render view
-	$data = getCopyElementsFormData('group_itemid', _('CONFIGURATION OF ITEMS'));
+	$data = getCopyElementsFormData('group_itemid', _('Items'));
 	$data['action'] = 'item.masscopyto';
 	$graphView = new CView('configuration.copy.elements', $data);
 	$graphView->render();

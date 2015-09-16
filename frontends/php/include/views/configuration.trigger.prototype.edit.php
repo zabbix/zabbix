@@ -133,72 +133,73 @@ $triggersFormList->addRow(_('Expression'), $expressionRow);
 // append expression table to form list
 if ($this->data['input_method'] == IM_TREE) {
 	$expressionTable = (new CTable())
-		->setAttribute('style', 'min-width: 500px;')
+		->setAttribute('style', 'width: 100%;')
 		->setId('exp_list')
 		->setHeader([
 			$this->data['limited'] ? null : _('Target'),
 			_('Expression'),
-			_('Error'),
-			$this->data['limited'] ? null : _('Action')
+			$this->data['limited'] ? null : _('Action'),
+			_('Info')
 		]);
 
 	$allowedTesting = true;
 	if (!empty($this->data['eHTMLTree'])) {
 		foreach ($this->data['eHTMLTree'] as $i => $e) {
-			if (!$this->data['limited']) {
-				$deleteUrl = (new CButton(null, _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->onClick('javascript:'.
-						' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
-							' delete_expression("'.$e['id'] .'");'.
-							' document.forms["'.$triggersForm->getName().'"].submit();'.
-						' }'
-					);
-				$triggerCheckbox = (new CCheckBox('expr_target_single',$e['id']))
-					->setChecked($i == 0)
-					->onClick('check_target(this);');
-			}
-			else {
-				$triggerCheckbox = null;
-			}
-
 			if (!isset($e['expression']['levelErrors'])) {
-				$errorImg = (new CImg('images/general/ok_icon.png', 'expression_no_errors'))
-					->setHint(_('No errors found.'));
+				$errorImg = '';
 			}
 			else {
 				$allowedTesting = false;
-				$errorImg = new CImg('images/general/error2.png', 'expression_errors');
-				$errorTexts = [];
+				$errors = [];
 
 				if (is_array($e['expression']['levelErrors'])) {
 					foreach ($e['expression']['levelErrors'] as $expVal => $errTxt) {
-						if (count($errorTexts) > 0) {
-							array_push($errorTexts, BR());
+						if ($errors) {
+							$errors[] = BR();
 						}
-						array_push($errorTexts, $expVal, ':', $errTxt);
+						$errors[] = $expVal.':'.$errTxt;
 					}
 				}
 
-				$errorImg->setHint($errorTexts, 'left');
+				$errorImg = makeErrorIcon($errors);
 			}
-
-			$errorColumn = new CCol($errorImg, 'center');
 
 			// templated trigger
 			if ($this->data['limited']) {
 				// make all links inside inactive
-				$listSize = count($e['list']);
-				for ($i = 0; $i < $listSize; $i++) {
-					if (gettype($e['list'][$i]) == 'object' && get_class($e['list'][$i]) == 'CSpan' && $e['list'][$i]->getAttribute('class') == 'link') {
-						$e['list'][$i]->removeAttribute('class');
-						$e['list'][$i]->onClick('');
+				foreach ($e['list'] as &$obj) {
+					if (gettype($obj) == 'object' && get_class($obj) == 'CSpan'
+							&& $obj->getAttribute('class') == ZBX_STYLE_LINK_ACTION) {
+						$obj->removeAttribute('class');
+						$obj->onClick(null);
 					}
 				}
+				unset($obj);
 			}
 
-			$row = new CRow([$triggerCheckbox, $e['list'], $errorColumn, isset($deleteUrl) ? $deleteUrl : null]);
-			$expressionTable->addRow($row);
+			$expressionTable->addRow(
+				new CRow([
+					!$this->data['limited']
+						? (new CCheckBox('expr_target_single',$e['id']))
+							->setChecked($i == 0)
+							->onClick('check_target(this);')
+						: null,
+					$e['list'],
+					!$this->data['limited']
+						? (new CCol(
+							(new CButton(null, _('Remove')))
+								->addClass(ZBX_STYLE_BTN_LINK)
+								->onClick('javascript:'.
+									' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) {'.
+										' delete_expression("'.$e['id'] .'");'.
+										' document.forms["'.$triggersForm->getName().'"].submit();'.
+									' }'
+								)
+						))->addClass(ZBX_STYLE_NOWRAP)
+						: null,
+					$errorImg
+				])
+			);
 		}
 	}
 	else {
@@ -208,7 +209,7 @@ if ($this->data['input_method'] == IM_TREE) {
 
 	$testButton = (new CButton('test_expression', _('Test')))
 		->onClick('openWinCentered("tr_testexpr.php?expression=" + encodeURIComponent(this.form.elements["expression"].value),'.
-			'"ExpressionTest", 850, 400, "titlebar=no, resizable=yes, scrollbars=yes"); return false;')
+			'"ExpressionTest", 950, 650, "titlebar=no, resizable=yes, scrollbars=yes"); return false;')
 		->addClass(ZBX_STYLE_BTN_LINK);
 	if (!$allowedTesting) {
 		$testButton->setAttribute('disabled', 'disabled');
@@ -222,7 +223,9 @@ if ($this->data['input_method'] == IM_TREE) {
 		$wrapOutline,
 		BR(),
 		BR(),
-		(new CDiv([$expressionTable, $testButton]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv([$expressionTable, $testButton]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	]);
 
 	$inputMethodToggle = (new CButton(null, _('Close expression constructor')))
@@ -242,7 +245,7 @@ $triggersFormList
 		(new CTextArea('comments', $this->data['comments']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('URL'), (new CTextBox('url', $this->data['url']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => $this->data['priority']]));
+	->addRow(_('Severity'), new CSeverity(['name' => 'priority', 'value' => (int) $this->data['priority']]));
 
 // append status to form list
 if (empty($this->data['triggerid']) && empty($this->data['form_refresh'])) {
@@ -267,8 +270,7 @@ $triggersTab->addTab('triggersTab',	_('Trigger prototype'), $triggersFormList);
  */
 $dependenciesFormList = new CFormList('dependenciesFormList');
 $dependenciesTable = (new CTable())
-	->setNoDataMessage(_('No dependencies defined.'))
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($this->data['db_dependencies'] as $dependency) {
@@ -290,26 +292,33 @@ foreach ($this->data['db_dependencies'] as $dependency) {
 	}
 
 	$row = new CRow([$description,
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CCol(
+			(new CButton('remove', _('Remove')))
+				->onClick('javascript: removeDependency("'.$dependency['triggerid'].'");')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 
 	$row->setId('dependency_'.$dependency['triggerid']);
 	$dependenciesTable->addRow($row);
 }
 
-$addButton = (new CButton('add_dep_trigger', _('Add')))
-	->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger&multiselect=1'.
-			'&with_triggers=1&normal_only=1&noempty=1");')
-	->addClass(ZBX_STYLE_BTN_LINK);
-$addPrototypeButton = (new CButton('add_dep_trigger_prototype', _('Add prototype')))
-	->onClick('return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
-			url_param('parent_discoveryid').'&multiselect=1");')
-	->addClass(ZBX_STYLE_BTN_LINK)
-	->addStyle('margin-left: 8px');
 $dependenciesFormList->addRow(_('Dependencies'),
-	(new CDiv([$dependenciesTable, $addButton, $addPrototypeButton]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	(new CDiv([
+		$dependenciesTable,
+		new CHorList([
+			(new CButton('add_dep_trigger', _('Add')))
+				->onClick('return PopUp("popup.php?srctbl=triggers&srcfld1=triggerid&reference=deptrigger'.
+					'&multiselect=1&with_triggers=1&normal_only=1&noempty=1");')
+				->addClass(ZBX_STYLE_BTN_LINK),
+			(new CButton('add_dep_trigger_prototype', _('Add prototype')))
+				->onClick('return PopUp("popup.php?srctbl=trigger_prototypes&srcfld1=triggerid&reference=deptrigger'.
+					url_param('parent_discoveryid').'&multiselect=1");')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		])
+	]))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 $triggersTab->addTab('dependenciesTab', _('Dependencies'), $dependenciesFormList);
 

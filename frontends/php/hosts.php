@@ -704,6 +704,8 @@ $pageFilter = new CPageFilter([
 $_REQUEST['groupid'] = $pageFilter->groupid;
 $_REQUEST['hostid'] = getRequest('hostid', 0);
 
+$config = select_config();
+
 if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && hasRequest('hosts')) {
 	$data = [
 		'hosts' => getRequest('hosts'),
@@ -798,7 +800,7 @@ elseif (hasRequest('form')) {
 		'show_inherited_macros' => getRequest('show_inherited_macros', 0),
 
 		// Host inventory
-		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
+		'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
 		'host_inventory' => getRequest('host_inventory', []),
 		'inventory_items' => []
 	];
@@ -874,7 +876,7 @@ elseif (hasRequest('form')) {
 			// Host inventory
 			$data['inventory_mode'] = array_key_exists('inventory_mode', $dbHost['inventory'])
 				? $dbHost['inventory']['inventory_mode']
-				: HOST_INVENTORY_DISABLED;
+				: $config['default_inventory_mode'];
 			$data['host_inventory'] = $dbHost['inventory'];
 			unset($data['host_inventory']['inventory_mode']);
 

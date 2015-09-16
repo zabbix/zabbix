@@ -324,17 +324,6 @@ DB_MEDIATYPE;
 
 typedef struct
 {
-	zbx_uint64_t	actionid;
-	char		*shortdata;
-	char		*longdata;
-	int		esc_period;
-	unsigned char	eventsource;
-	unsigned char	recovery_msg;
-}
-DB_ACTION;
-
-typedef struct
-{
 	zbx_uint64_t	conditionid;
 	zbx_uint64_t	actionid;
 	char		*value;
@@ -547,6 +536,9 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
+
+void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode);
+void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode);
 
 int	DBtxn_status(void);
 int	DBtxn_ongoing(void);
