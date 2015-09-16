@@ -22,7 +22,7 @@ Bug fixes:
 ...G...... [ZBXNEXT-1078] removed 'proc.mem[]' 5-th parameter (memtype) value 'dvm' on AIX (Andris)
 A......... [ZBX-9807] fixed undefined offset errors in configuration export when processing triggers that have items with discovered applications (Ivo)
 A.F....... [ZBX-9810] fixed trigger prototype expression inheritance incorrectly assigning an invalid expression to child objects and trigger expression test popup displaying a missing class (Ivo)
-.......PS. [ZBX-7847] added functionality that stops polling inactive ipmi hosts (igors)
+.......PS. [ZBX-7847] added functionality that stops polling inactive IPMI hosts (igors)
 ...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
 ..F....... [ZBXNEXT-2662] fixed a map element editing form (Sasha)
 ..F.I..... [ZBXNEXT-2662] fixed possibility to change the colours of the trigger severities (Sasha)
