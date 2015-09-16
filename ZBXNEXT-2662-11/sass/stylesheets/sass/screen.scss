@@ -482,17 +482,21 @@ article {
 	
 	li {
 		display: inline-block;
-		margin: 0 14px 0 0;
+		//margin: 0 14px 0 0;
 		vertical-align: middle;
 
 		&:last-child {
 			margin: 0;
 		}
+
+		//span {
+		//	padding: 4px 9px;
+		//}
 	}
 
 	.selected {
 		background-color: $ui-bg-color;
-		padding: 4px 9px;
+		//padding: 4px 9px;
 		border: 1px solid $ui-border-color;
 		@include border-radius(2px);
 	}
@@ -3389,7 +3393,7 @@ $browser-logos: (
 
 	li {
 		display: inline-block;
-		min-width: 2em;
+		min-width: 1.4em;
 		margin-right: .4em;
 
 		&:last-child {
