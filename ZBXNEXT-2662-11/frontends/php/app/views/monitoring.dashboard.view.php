@@ -46,8 +46,7 @@ $widgets = [
 		'links' => [
 			['name' => _('Graphs'), 'url' => 'charts.php']
 		],
-		'col' => 0,
-		'row' => 0
+		'defaults' => ['col' => 0, 'row' => 0]
 	],
 	WIDGET_FAVOURITE_SCREENS => [
 		'id' => 'favouriteScreens',
@@ -58,8 +57,7 @@ $widgets = [
 			['name' => _('Screens'), 'url' => 'screens.php'],
 			['name' => _('Slide shows'), 'url' => 'slides.php']
 		],
-		'col' => 0,
-		'row' => 1
+		'defaults' => ['col' => 0, 'row' => 1]
 	],
 	WIDGET_FAVOURITE_MAPS => [
 		'id' => 'favouriteMaps',
@@ -69,8 +67,7 @@ $widgets = [
 		'links' => [
 			['name' => _('Maps'), 'url' => 'zabbix.php?action=map.view']
 		],
-		'col' => 0,
-		'row' => 2
+		'defaults' => ['col' => 0, 'row' => 2]
 	]
 ];
 
@@ -86,8 +83,8 @@ foreach ($widgets as $widgetid => $widget) {
 		$footer->addItem(new CLink($link['name'], $link['url']));
 	}
 
-	$col = CProfile::get('web.dashboard.widget.'.$widgetid.'.col', $widget['col']);
-	$row = CProfile::get('web.dashboard.widget.'.$widgetid.'.row', $widget['row']);
+	$col = CProfile::get('web.dashboard.widget.'.$widgetid.'.col', $widget['defaults']['col']);
+	$row = CProfile::get('web.dashboard.widget.'.$widgetid.'.row', $widget['defaults']['row']);
 
 	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, $widget['data']))
 		->setExpanded((bool) CProfile::get('web.dashboard.widget.'.$widgetid.'.state', true))
@@ -98,38 +95,32 @@ foreach ($widgets as $widgetid => $widget) {
 $widgets = [
 	WIDGET_SYSTEM_STATUS => [
 		'action' => 'widget.system.view',
-		'col' => 1,
-		'row' => 1
+		'defaults' => ['col' => 1, 'row' => 1]
 	],
 	WIDGET_HOST_STATUS => [
 		'action' => 'widget.hosts.view',
-		'col' => 1,
-		'row' => 2
+		'defaults' => ['col' => 1, 'row' => 2]
 	],
 	WIDGET_LAST_ISSUES => [
 		'action' => 'widget.issues.view',
-		'col' => 1,
-		'row' => 3
+		'defaults' => ['col' => 1, 'row' => 3]
 	],
 	WIDGET_WEB_OVERVIEW => [
 		'action' => 'widget.web.view',
-		'col' => 1,
-		'row' => 4
+		'defaults' => ['col' => 1, 'row' => 4]
 	],
 ];
 
 if ($data['show_status_widget']) {
 	$widgets[WIDGET_ZABBIX_STATUS] = [
 		'action' => 'widget.status.view',
-		'col' => 1,
-		'row' => 0
+		'defaults' => ['col' => 1, 'row' => 0]
 	];
 }
 if ($data['show_discovery_widget']) {
 	$widgets[WIDGET_DISCOVERY_STATUS] = [
 		'action' => 'widget.discovery.view',
-		'col' => 1,
-		'row' => 5
+		'defaults' => ['col' => 1, 'row' => 5]
 	];
 }
 
@@ -138,8 +129,8 @@ foreach ($widgets as $widgetid => $widget) {
 
 	$rate = CProfile::get($profile.'.rf_rate', 60);
 	$expanded = (bool) CProfile::get($profile.'.state', true);
-	$col = CProfile::get($profile.'.col', $widget['col']);
-	$row = CProfile::get($profile.'.row', $widget['row']);
+	$col = CProfile::get($profile.'.col', $widget['defaults']['col']);
+	$row = CProfile::get($profile.'.row', $widget['defaults']['row']);
 
 	$icon = (new CButton(null))
 		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
