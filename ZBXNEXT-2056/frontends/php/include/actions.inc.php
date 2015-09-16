@@ -413,8 +413,8 @@ function getActionOperationDescriptions(array $actions) {
 	$userIds = [];
 	$usrGrpIds = [];
 	$hostIds = [];
-	$groupIds = [];
-	$templateIds = [];
+	$groupids = [];
+	$templateids = [];
 
 	foreach ($actions as $i => $action) {
 		$result[$i] = [];
@@ -454,22 +454,22 @@ function getActionOperationDescriptions(array $actions) {
 
 					if (isset($operation['opcommand_grp']) && $operation['opcommand_grp']) {
 						foreach ($operation['opcommand_grp'] as $hostGroup) {
-							$groupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
+							$groupids[$hostGroup['groupid']] = true;
 						}
 					}
 					break;
 
 				case OPERATION_TYPE_GROUP_ADD:
 				case OPERATION_TYPE_GROUP_REMOVE:
-					foreach ($operation['opgroup'] as $hostGroup) {
-						$groupIds[$hostGroup['groupid']] = $hostGroup['groupid'];
+					foreach ($operation['groupids'] as $groupid) {
+						$groupids[$groupid] = true;
 					}
 					break;
 
 				case OPERATION_TYPE_TEMPLATE_ADD:
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
-					foreach ($operation['optemplate'] as $template) {
-						$templateIds[$template['templateid']] = $template['templateid'];
+					foreach ($operation['templateids'] as $templateid) {
+						$templateids[$templateid] = true;
 					}
 					break;
 			}
@@ -520,18 +520,18 @@ function getActionOperationDescriptions(array $actions) {
 		]);
 	}
 
-	if ($groupIds) {
+	if ($groupids) {
 		$hostGroups = API::HostGroup()->get([
 			'output' => ['name'],
-			'groupids' => $groupIds,
+			'groupids' => array_keys($groupids),
 			'preservekeys' => true
 		]);
 	}
 
-	if ($templateIds) {
+	if ($templateids) {
 		$templates = API::Template()->get([
 			'output' => ['name'],
-			'templateids' => $templateIds,
+			'templateids' => array_keys($templateids),
 			'preservekeys' => true
 		]);
 	}
@@ -646,9 +646,9 @@ function getActionOperationDescriptions(array $actions) {
 				case OPERATION_TYPE_GROUP_REMOVE:
 					$hostGroupList = [];
 
-					foreach ($operation['opgroup'] as $hostGroup) {
-						if (isset($hostGroups[$hostGroup['groupid']])) {
-							$hostGroupList[] = $hostGroups[$hostGroup['groupid']]['name'];
+					foreach ($operation['groupids'] as $groupid) {
+						if (array_key_exists($groupid, $hostGroups)) {
+							$hostGroupList[] = $hostGroups[$groupid]['name'];
 						}
 					}
 
@@ -668,9 +668,9 @@ function getActionOperationDescriptions(array $actions) {
 				case OPERATION_TYPE_TEMPLATE_REMOVE:
 					$templateList = [];
 
-					foreach ($operation['optemplate'] as $template) {
-						if (isset($templates[$template['templateid']])) {
-							$templateList[] = $templates[$template['templateid']]['name'];
+					foreach ($operation['templateids'] as $templateid) {
+						if (array_key_exists($templateid, $templates)) {
+							$templateList[] = $templates[$templateid]['name'];
 						}
 					}
 
@@ -684,6 +684,14 @@ function getActionOperationDescriptions(array $actions) {
 					}
 
 					$result[$i][$j][] = [implode(', ', $templateList), BR()];
+					break;
+				case OPERATION_TYPE_HOST_INVENTORY:
+					$host_inventory_modes = getHostInventoryModes();
+					$result[$i][$j][] = bold(operation_type2str(OPERATION_TYPE_HOST_INVENTORY).': ');
+					$result[$i][$j][] = [
+						$host_inventory_modes[$operation['opinventory']['inventory_mode']],
+						BR()
+					];
 					break;
 			}
 		}
@@ -712,22 +720,20 @@ function getActionOperationDescriptions(array $actions) {
 function getActionOperationHints(array $operations, array $defaultMessage) {
 	$result = [];
 
-	$scriptIds = [];
+	$scriptids = [];
+	$scripts = [];
 
 	foreach ($operations as $operation) {
 		if ($operation['operationtype'] == OPERATION_TYPE_COMMAND
 				&& $operation['opcommand']['type'] == ZBX_SCRIPT_TYPE_GLOBAL_SCRIPT) {
-			$scriptId = $operation['opcommand']['scriptid'];
-			$scriptIds[$scriptId] = $scriptId;
+			$scriptids[$operation['opcommand']['scriptid']] = true;
 		}
 	}
 
-	$scripts = [];
-
-	if ($scriptIds) {
+	if ($scriptids) {
 		$scripts = API::Script()->get([
 			'output' => ['name'],
-			'scriptids' => $scriptIds,
+			'scriptids' => array_keys($scriptids),
 			'preservekeys' => true
 		]);
 	}
@@ -742,13 +748,11 @@ function getActionOperationHints(array $operations, array $defaultMessage) {
 					? $defaultMessage['subject']
 					: $operation['opmessage']['subject'];
 
-				$result[$key][] = [bold(_('Subject').': '), BR(), zbx_nl2br($subject)];
-
 				$message = (isset($operation['opmessage']['default_msg']) && $operation['opmessage']['default_msg'])
 					? $defaultMessage['message']
 					: $operation['opmessage']['message'];
 
-				$result[$key][] = [bold(_('Message').': '), BR(), zbx_nl2br($message)];
+				$result[$key][] = [bold($subject), BR(), BR(), zbx_nl2br($message)];
 				break;
 
 			case OPERATION_TYPE_COMMAND:
@@ -883,7 +887,8 @@ function get_operations_by_eventsource($eventsource) {
 		OPERATION_TYPE_TEMPLATE_ADD,
 		OPERATION_TYPE_TEMPLATE_REMOVE,
 		OPERATION_TYPE_HOST_ENABLE,
-		OPERATION_TYPE_HOST_DISABLE
+		OPERATION_TYPE_HOST_DISABLE,
+		OPERATION_TYPE_HOST_INVENTORY
 	];
 	$operations[EVENT_SOURCE_AUTO_REGISTRATION] = [
 		OPERATION_TYPE_MESSAGE,
@@ -891,7 +896,8 @@ function get_operations_by_eventsource($eventsource) {
 		OPERATION_TYPE_HOST_ADD,
 		OPERATION_TYPE_GROUP_ADD,
 		OPERATION_TYPE_TEMPLATE_ADD,
-		OPERATION_TYPE_HOST_DISABLE
+		OPERATION_TYPE_HOST_DISABLE,
+		OPERATION_TYPE_HOST_INVENTORY
 	];
 	$operations[EVENT_SOURCE_INTERNAL] = [
 		OPERATION_TYPE_MESSAGE
@@ -915,7 +921,8 @@ function operation_type2str($type = null) {
 		OPERATION_TYPE_GROUP_ADD => _('Add to host group'),
 		OPERATION_TYPE_GROUP_REMOVE => _('Remove from host group'),
 		OPERATION_TYPE_TEMPLATE_ADD => _('Link to template'),
-		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template')
+		OPERATION_TYPE_TEMPLATE_REMOVE => _('Unlink from template'),
+		OPERATION_TYPE_HOST_INVENTORY => _('Set host inventory mode')
 	];
 
 	if (is_null($type)) {
@@ -1117,10 +1124,9 @@ function getActionMessages(array $alerts) {
 		'preservekeys' => true
 	]);
 
-	$table = (new CTableInfo())
-		->setHeader([
-			_('Step'), _('Time'), _('Type'), _('Status'), _('Retries left'), _('Recipient(s)'), _('Message'), _('Info')
-		]);
+	$table = (new CTableInfo())->setHeader([
+		_('Step'), _('Time'), _('Type'), _('Status'), _('Retries left'), _('Recipient(s)'), _('Message'), _('Info')
+	]);
 
 	foreach ($alerts as $alert) {
 		if ($alert['alerttype'] != ALERT_TYPE_MESSAGE) {
@@ -1130,15 +1136,15 @@ function getActionMessages(array $alerts) {
 		$mediaType = array_pop($alert['mediatypes']);
 
 		if ($alert['status'] == ALERT_STATUS_SENT) {
-			$status = (new CSpan(_('sent')))->addClass(ZBX_STYLE_GREEN);
-			$retries = (new CSpan(SPACE))->addClass(ZBX_STYLE_GREEN);
+			$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
+			$retries = '';
 		}
 		elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
 			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
 			$retries = (new CSpan(ALERT_MAX_RETRIES - $alert['retries']))->addClass(ZBX_STYLE_ORANGE);
 		}
 		else {
-			$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
+			$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 			$retries = (new CSpan('0'))->addClass(ZBX_STYLE_RED);
 		}
 
@@ -1146,33 +1152,15 @@ function getActionMessages(array $alerts) {
 			? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 			: $alert['sendto'];
 
-		$message = [
-			bold(_('Subject').NAME_DELIMITER),
-			br(),
-			$alert['subject'],
-			br(),
-			br(),
-			bold(_('Message').NAME_DELIMITER)
-		];
-
-		array_push($message, BR(), zbx_nl2br($alert['message']));
-
-		if (zbx_empty($alert['error'])) {
-			$info = '';
-		}
-		else {
-			$info = makeErrorIcon($alert['error']);
-		}
-
 		$table->addRow([
 			$alert['esc_step'],
 			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
-			new CCol((isset($mediaType['description']) ? $mediaType['description'] : '')),
-			new CCol($status),
-			new CCol($retries),
-			new CCol($recipient),
-			new CCol($message),
-			new CCol($info)
+			isset($mediaType['description']) ? $mediaType['description'] : '',
+			$status,
+			$retries,
+			$recipient,
+			[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
+			$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
 		]);
 	}
 
@@ -1203,7 +1191,7 @@ function getActionCommands(array $alerts) {
 
 		switch ($alert['status']) {
 			case ALERT_STATUS_SENT:
-				$status = (new CSpan(_('executed')))->addClass(ZBX_STYLE_GREEN);
+				$status = (new CSpan(_('Executed')))->addClass(ZBX_STYLE_GREEN);
 				break;
 
 			case ALERT_STATUS_NOT_SENT:
@@ -1211,7 +1199,7 @@ function getActionCommands(array $alerts) {
 				break;
 
 			default:
-				$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
+				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 				break;
 		}
 
@@ -1227,192 +1215,142 @@ function getActionCommands(array $alerts) {
 	return $table;
 }
 
-function get_actions_hint_by_eventid($eventid, $status = null) {
-	$tab_hint = (new CTableInfo())
-		->setHeader([
-			_('User'),
-			_('Details'),
-			_('Status')
-		]);
+function makeActionHints($alerts, $mediatypes, $users, $status) {
+	$table = (new CTableInfo())->setHeader([_('User'), _('Details'), _('Status'), _('Info')]);
 
-	$sql = 'SELECT a.alertid,mt.description,u.alias,u.name,u.surname,a.subject,a.message,a.sendto,a.status,a.retries,a.alerttype'.
-			' FROM events e,alerts a'.
-				' LEFT JOIN users u ON u.userid=a.userid'.
-				' LEFT JOIN media_type mt ON mt.mediatypeid=a.mediatypeid'.
-			' WHERE a.eventid='.zbx_dbstr($eventid).
-				(is_null($status)?'':' AND a.status='.zbx_dbstr($status)).
-				' AND e.eventid=a.eventid'.
-				' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-			' ORDER BY a.alertid';
-	$result = DBselect($sql, 30);
+	foreach ($alerts as $alert) {
+		switch ($status) {
+			case ALERT_STATUS_NOT_SENT:
+				$status_str = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
+				break;
 
-	while ($row = DBfetch($result)) {
-		if ($row['status'] == ALERT_STATUS_SENT) {
-			$status = (new CSpan(_('Sent')))->addClass(ZBX_STYLE_GREEN);
-		}
-		elseif ($row['status'] == ALERT_STATUS_NOT_SENT) {
-			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
-		}
-		else {
-			$status = (new CSpan(_('not sent')))->addClass(ZBX_STYLE_RED);
+			case ALERT_STATUS_SENT:
+				$status_str = (new CSpan($alert['alerttype'] == ALERT_TYPE_COMMAND ? _('Executed') : _('Sent')))
+					->addClass(ZBX_STYLE_GREEN);
+				break;
+
+			default:
+				$status_str = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
 		}
 
-		switch ($row['alerttype']) {
+		switch ($alert['alerttype']) {
 			case ALERT_TYPE_MESSAGE:
-				$message = empty($row['description']) ? '' : $row['description'];
+				$user = array_key_exists($alert['userid'], $users) ? getUserFullname($users[$alert['userid']]) : '';
+				$message = array_key_exists($alert['mediatypeid'], $mediatypes)
+					? $mediatypes[$alert['mediatypeid']]['description']
+					: '';
 				break;
 			case ALERT_TYPE_COMMAND:
-				$message = [bold(_('Command').NAME_DELIMITER)];
-				$msg = explode("\n", $row['message']);
-				foreach ($msg as $m) {
-					array_push($message, BR(), $m);
-				}
+				$user = '';
+				$message = [bold(_('Command').NAME_DELIMITER), BR(), zbx_nl2br($alert['message'])];
 				break;
 			default:
+				$user = '';
 				$message = '';
 		}
 
-		if (!$row['alias']) {
-			$row['alias'] = ' - ';
-		}
-		else {
-			$fullname = '';
-			if ($row['name']) {
-				$fullname = $row['name'];
-			}
-			if ($row['surname']) {
-				$fullname .= $fullname ? ' '.$row['surname'] : $row['surname'];
-			}
-			if ($fullname) {
-				$row['alias'] .= ' ('.$fullname.')';
-			}
+		$table->addRow([$user, $message, $status_str, $alert['error'] === '' ? '' : makeErrorIcon($alert['error'])]);
+	}
+
+	return $table;
+}
+
+function makeEventsActions($eventids) {
+	if (!$eventids) {
+		return [];
+	}
+
+	$result = DBselect(
+		'SELECT a.eventid,a.mediatypeid,a.userid,a.message,a.status,a.alerttype,a.error'.
+		' FROM alerts a'.
+		' WHERE '.dbConditionInt('a.eventid', $eventids).
+			' AND a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
+		' ORDER BY a.alertid'
+	);
+
+	$events = [];
+	$userids = [];
+	$mediatypeids = [];
+
+	while ($row = DBfetch($result)) {
+		if (!array_key_exists($row['eventid'], $events)) {
+			$events[$row['eventid']] = [
+				ALERT_STATUS_NOT_SENT => [],
+				ALERT_STATUS_SENT => [],
+				ALERT_STATUS_FAILED => []
+			];
 		}
 
-		$tab_hint->addRow([
-			$row['alias'],
-			$message,
-			$status
+		$event = [
+			'alerttype' => $row['alerttype'],
+			'error' => $row['error']
+		];
+
+		switch ($event['alerttype']) {
+			case ALERT_TYPE_COMMAND:
+				$event['message'] = $row['message'];
+				break;
+
+			case ALERT_TYPE_MESSAGE:
+				$event['mediatypeid'] = $row['mediatypeid'];
+				$event['userid'] = $row['userid'];
+
+				if ($event['mediatypeid'] != 0) {
+					$mediatypeids[$row['mediatypeid']] = true;
+				}
+
+				if ($event['userid'] != 0) {
+					$userids[$row['userid']] = true;
+				}
+				break;
+		}
+
+		$events[$row['eventid']][$row['status']][] = $event;
+	}
+
+	if ($mediatypeids) {
+		$mediatypes = API::Mediatype()->get([
+			'output' => ['description'],
+			'mediatypeids' => array_keys($mediatypeids),
+			'preservekeys' => true
 		]);
 	}
 
-	return $tab_hint;
-}
-
-function getEventActionsStatus($eventIds) {
-	if (empty($eventIds)) {
-		return [];
+	if ($userids) {
+		$users = API::User()->get([
+			'output' => ['alias', 'name', 'surname'],
+			'userids' => array_keys($userids),
+			'preservekeys' => true
+		]);
 	}
 
-	$actions = [];
-
-	$alerts = DBselect(
-		'SELECT a.eventid,a.status,COUNT(a.alertid) AS cnt'.
-		' FROM alerts a'.
-		' WHERE a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-			' AND '.dbConditionInt('a.eventid', $eventIds).
-		' GROUP BY eventid,status'
-	);
-
-	while ($alert = DBfetch($alerts)) {
-		$actions[$alert['eventid']][$alert['status']] = $alert['cnt'];
+	foreach ($events as $eventid => &$event) {
+		$event = (new CList([
+			count($event[ALERT_STATUS_SENT]) != 0
+				? (new CSpan(count($event[ALERT_STATUS_SENT])))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_GREEN)
+					->setHint(makeActionHints($event[ALERT_STATUS_SENT], $mediatypes, $users, ALERT_STATUS_SENT))
+				: '',
+			count($event[ALERT_STATUS_NOT_SENT]) != 0
+				? (new CSpan(count($event[ALERT_STATUS_NOT_SENT])))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_ORANGE)
+					->setHint(
+						makeActionHints($event[ALERT_STATUS_NOT_SENT], $mediatypes, $users, ALERT_STATUS_NOT_SENT)
+					)
+				: '',
+			count($event[ALERT_STATUS_FAILED]) != 0
+				? (new CSpan(count($event[ALERT_STATUS_FAILED])))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_RED)
+					->setHint(makeActionHints($event[ALERT_STATUS_FAILED], $mediatypes, $users, ALERT_STATUS_FAILED))
+				: ''
+		]))->addClass(ZBX_STYLE_LIST_HOR_MIN_WIDTH);
 	}
+	unset($event);
 
-	foreach ($actions as $eventId => $action) {
-		$sendCount = isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : 0;
-		$notSendCount = isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : 0;
-		$failedCount = isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : 0;
-
-		// calculate total
-		$mixed = 0;
-		if ($sendCount > 0) {
-			$mixed += ALERT_STATUS_SENT;
-		}
-		if ($failedCount > 0) {
-			$mixed += ALERT_STATUS_FAILED;
-		}
-
-		// display
-		if ($notSendCount > 0) {
-			$status = (new CSpan(_('In progress')))->addClass(ZBX_STYLE_ORANGE);
-		}
-		elseif ($mixed == ALERT_STATUS_SENT) {
-			$status = (new CSpan(_('Ok')))->addClass(ZBX_STYLE_GREEN);
-		}
-		elseif ($mixed == ALERT_STATUS_FAILED) {
-			$status = (new CSpan(_('Failed')))->addClass(ZBX_STYLE_RED);
-		}
-		else {
-			$columnLeft = (new CCol(($sendCount > 0)
-				? (new CSpan($sendCount))->addClass(ZBX_STYLE_GREEN)
-				: SPACE)
-			)
-				->setAttribute('width', '10');
-
-			$columnRight = (new CCol(($failedCount > 0)
-				? (new CSpan($failedCount))->addClass(ZBX_STYLE_RED)
-				: SPACE)
-			)
-				->setAttribute('width', '10');
-
-			$status = new CRow([$columnLeft, $columnRight]);
-		}
-
-		$actions[$eventId] = (new CTable())
-			->setNoDataMessage(' - ')
-			->addRow($status);
-	}
-
-	return $actions;
-}
-
-function getEventActionsStatHints($eventIds) {
-	if (empty($eventIds)) {
-		return [];
-	}
-
-	$actions = [];
-
-	$alerts = DBselect(
-		'SELECT a.eventid,a.status,COUNT(a.alertid) AS cnt'.
-		' FROM alerts a'.
-		' WHERE a.alerttype IN ('.ALERT_TYPE_MESSAGE.','.ALERT_TYPE_COMMAND.')'.
-			' AND '.dbConditionInt('a.eventid', $eventIds).
-		' GROUP BY eventid,status'
-	);
-
-	while ($alert = DBfetch($alerts)) {
-		if ($alert['cnt'] > 0) {
-			if ($alert['status'] == ALERT_STATUS_SENT) {
-				$style = ZBX_STYLE_GREEN;
-			}
-			elseif ($alert['status'] == ALERT_STATUS_NOT_SENT) {
-				$style = ZBX_STYLE_ORANGE;
-			}
-			else {
-				$style = ZBX_STYLE_RED;
-			}
-
-			$hint = (new CSpan($alert['cnt']))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass($style)
-				->setHint(get_actions_hint_by_eventid($alert['eventid'], $alert['status']));
-
-			$actions[$alert['eventid']][$alert['status']] = $hint;
-		}
-	}
-
-	foreach ($actions as &$action) {
-		$action = [
-			isset($action[ALERT_STATUS_SENT]) ? $action[ALERT_STATUS_SENT] : '',
-			' ',
-			isset($action[ALERT_STATUS_NOT_SENT]) ? $action[ALERT_STATUS_NOT_SENT] : '',
-			' ',
-			isset($action[ALERT_STATUS_FAILED]) ? $action[ALERT_STATUS_FAILED] : ''
-		];
-	}
-	unset($action);
-
-	return $actions;
+	return $events;
 }
 
 /**

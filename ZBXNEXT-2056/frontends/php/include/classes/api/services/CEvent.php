@@ -425,6 +425,18 @@ class CEvent extends CApiService {
 	 * @return void
 	 */
 	protected function validateAcknowledge(array $data) {
+		$dbfields = ['eventids' => null, 'message' => null];
+
+		if (!check_db_fields($dbfields, $data)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+		}
+
+		if ($data['message'] === '') {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect value for field "%1$s": %2$s.', 'message', _('cannot be empty'))
+			);
+		}
+
 		$this->checkCanBeAcknowledged($data['eventids']);
 	}
 

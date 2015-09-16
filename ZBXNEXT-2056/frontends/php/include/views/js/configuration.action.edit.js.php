@@ -1,28 +1,3 @@
-<!-- Discovery Actions-->
-<script type="text/x-jquery-tmpl" id="opGroupRowTPL">
-<tr id="opGroupRow_#{groupid}">
-	<td>
-		<input name="new_operation[opgroup][#{groupid}][groupid]" type="hidden" value="#{groupid}" />
-		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
-	</td>
-	<td>
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpGroupRow('#{groupid}');"><?= _('Remove') ?></button>
-	</td>
-</tr>
-</script>
-
-<script type="text/x-jquery-tmpl" id="opTemplateRowTPL">
-<tr id="opTemplateRow_#{templateid}">
-	<td>
-		<input name="new_operation[optemplate][#{templateid}][templateid]" type="hidden" value="#{templateid}" />
-		<span style="font-size: 1.1em; font-weight: bold;"> #{name} </span>
-	</td>
-	<td>
-		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpTemplateRow('#{templateid}');"><?= _('Remove') ?></button>
-	</td>
-</tr>
-</script>
-
 <!-- Trigger Actions-->
 <script type="text/x-jquery-tmpl" id="opmsgUsrgrpRowTPL">
 <tr id="opmsgUsrgrpRow_#{usrgrpid}">
@@ -30,7 +5,7 @@
 		<input name="new_operation[opmessage_grp][#{usrgrpid}][usrgrpid]" type="hidden" value="#{usrgrpid}" />
 		<span>#{name}</span>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUsrgrpRow('#{usrgrpid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -42,7 +17,7 @@
 		<input name="new_operation[opmessage_usr][#{userid}][userid]" type="hidden" value="#{userid}" />
 		<span>#{fullname}</span>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpmsgUserRow('#{userid}');"><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -56,7 +31,7 @@
 		#{objectCaption}
 		<span>#{name}</span>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{groupid}', 'groupid');"><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -70,57 +45,46 @@
 		#{objectCaption}
 		<span>#{name}</span>
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="remove" onclick="removeOpCmdRow('#{hostid}', 'hostid');"><?= _('Remove') ?></button>
 	</td>
 </tr>
 </script>
 
 <script type="text/x-jquery-tmpl" id="opcmdEditFormTPL">
-<div id="opcmdEditForm">
-	<table class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: 310px;">
-		<tbody>
-		<tr>
-			<td><?= _('Target') ?></td>
-			<td>
-				<select name="opCmdTarget" class="input select">
-					<option value="current"><?= CHtml::encode(_('Current host')) ?></option>
-					<option value="host"><?= CHtml::encode(_('Host')) ?></option>
-					<option value="hostGroup"><?= CHtml::encode(_('Host group')) ?></option>
-				</select>
-			</td>
-			<td style="padding-left: 0;">
-				<div id="opCmdTargetSelect" class="inlineblock">
-					<input name="opCmdId" type="hidden" value="#{opcmdid}" />
-				</div>
-			</td>
-		</tr>
-		<tr>
-			<td colspan="3">
-				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="save">#{operationName}</button>
-				&nbsp;
-				<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="cancel"><?= CHtml::encode(_('Cancel')) ?></button>
-			</td>
-		</tr>
-		</tbody>
-	</table>
-</div>
-</script>
-
-<!-- Script -->
-<script type="text/x-jquery-tmpl" id="operationTypesTPL">
-<tr id="operationTypeScriptElements" class="hidden">
-	<td><?= CHtml::encode(_('Execute on')) ?></td>
+<tr>
+	<td></td>
 	<td>
-		<div class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" id="uniqList">
-			<div>
-				<input type="radio" id="execute_on_agent" name="execute_on" value="0" class="input radio">
-				<label for="execute_on_agent"><?= CHtml::encode(_('Zabbix agent')) ?></label>
-			</div>
-			<div>
-				<input type="radio" id="execute_on_server" name="execute_on" value="1" class="input radio">
-				<label for="execute_on_server"><?= CHtml::encode(_('Zabbix server')) ?></label>
-			</div>
+		<div id="opcmdEditForm" class="<?= ZBX_STYLE_TABLE_FORMS_SEPARATOR ?>" style="min-width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
+			<table style="width: 100%;">
+				<tbody>
+				<tr>
+					<?= (new CCol([
+						_('Target'),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CComboBox('opCmdTarget', null, null, [
+							'current' => _('Current host'),
+							'host' => _('Host'),
+							'hostGroup' => _('Host group')
+						]),
+						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+						new CVar('opCmdId', '#{opcmdid}')
+					]))->toString()
+					?>
+				</tr>
+				<tr>
+					<?= (new CCol(
+						new CHorList([
+							(new CButton('save', '#{operationName}'))->addClass(ZBX_STYLE_BTN_LINK),
+							(new CButton('cancel', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+						])
+					))
+						->setColSpan(3)
+						->toString()
+					?>
+				</tr>
+				</tbody>
+			</table>
 		</div>
 	</td>
 </tr>
@@ -171,26 +135,6 @@
 					tpl = new Template(jQuery('#opmsgUsrgrpRowTPL').html());
 
 					container = jQuery('#opmsgUsrgrpListFooter');
-					container.before(tpl.evaluate(value));
-					break;
-
-				case 'dsc_groupid':
-					if (jQuery('#opGroupRow_' + value.groupid).length) {
-						continue;
-					}
-
-					tpl = new Template(jQuery('#opGroupRowTPL').html());
-					container = jQuery('#opGroupListFooter');
-					container.before(tpl.evaluate(value));
-					break;
-
-				case 'dsc_templateid':
-					if (jQuery('#opTemplateRow_' + value.templateid).length) {
-						continue;
-					}
-
-					tpl = new Template(jQuery('#opTemplateRowTPL').html());
-					container = jQuery('#opTemplateListFooter');
 					container.before(tpl.evaluate(value));
 					break;
 
@@ -278,25 +222,25 @@
 	}
 
 	function showOpCmdForm(opCmdId) {
-		var objectTPL = {},
+		var objectTPL = {
+				opcmdid: 'new',
+				objectid: 0,
+				name: '',
+				target: 'current',
+				operationName: <?= CJs::encodeJson(_('Add')) ?>
+			},
 			tpl;
 
-		if (jQuery('#opcmdEditForm').length > 0 && !closeOpCmdForm()) {
-			return true;
+		if (jQuery('#opcmdEditForm').length > 0) {
+			closeOpCmdForm();
 		}
 
-		objectTPL.opcmdid = 'new';
-		objectTPL.objectid = 0;
-		objectTPL.name = '';
-		objectTPL.target = 'current';
-		objectTPL.operationName = <?= CJs::encodeJson(_('Add')) ?>;
-
 		tpl = new Template(jQuery('#opcmdEditFormTPL').html());
-		jQuery('#opCmdList').after(tpl.evaluate(objectTPL));
+		jQuery('#opCmdList').closest('tr').after(tpl.evaluate(objectTPL));
 
 		// actions
 		jQuery('#opcmdEditForm')
-			.find('#opCmdTargetSelect')
+			.find('#pCmdTargetSelect')
 			.toggle(objectTPL.target != 'current').end()
 			.find('button[name="save"]').click(saveOpCmdForm).end()
 			.find('button[name="cancel"]').click(closeOpCmdForm).end()
@@ -389,31 +333,32 @@
 			addPopupValues({object: object.object, values: [object]});
 		}
 
-		jQuery(objectForm).remove();
+		closeOpCmdForm();
 	}
 
 	function changeOpCmdTarget() {
-		var opCmdTarget = jQuery('#opcmdEditForm select[name="opCmdTarget"]').val();
+		var opCmdTarget = jQuery('#opcmdEditForm select[name="opCmdTarget"]'),
+			opCmdTargetVal = opCmdTarget.val();
 
-		jQuery('#opCmdTargetSelect').toggle(opCmdTarget != 'current');
+		if (jQuery('#opCmdTargetObject').length > 0) {
+			jQuery('.multiselect-wrapper').remove();
+		}
 
 		// multiselect
-		if (opCmdTarget != 'current') {
-			jQuery('.multiselect-wrapper').remove();
-
+		if (opCmdTargetVal != 'current') {
 			var opCmdTargetObject = jQuery('<div>', {
 				id: 'opCmdTargetObject',
 				'class': 'multiselect'
 			});
 
-			jQuery('#opCmdTargetSelect').append(opCmdTargetObject);
+			opCmdTarget.parent().append(opCmdTargetObject);
 
-			var srctbl = (opCmdTarget == 'host') ? 'hosts' : 'host_groups',
-				srcfld1 = (opCmdTarget == 'host') ? 'hostid' : 'groupid';
+			var srctbl = (opCmdTargetVal == 'host') ? 'hosts' : 'host_groups',
+				srcfld1 = (opCmdTargetVal == 'host') ? 'hostid' : 'groupid';
 
 			jQuery(opCmdTargetObject).multiSelectHelper({
 				id: 'opCmdTargetObject',
-				objectName: (opCmdTarget == 'host') ? 'hosts' : 'hostGroup',
+				objectName: (opCmdTargetVal == 'host') ? 'hosts' : 'hostGroup',
 				name: 'opCmdTargetObjectName[]',
 				objectOptions: {
 					editable: true
@@ -429,17 +374,13 @@
 	}
 
 	function closeOpCmdForm() {
-		jQuery('#opCmdDraft').attr('id', jQuery('#opCmdDraft').attr('origid'));
-		jQuery('#opcmdEditForm').remove();
-
-		return true;
+		jQuery('#opcmdEditForm').closest('tr').remove();
 	}
 
 	function showOpTypeForm() {
 		var currentOpType,
-			opTypeFields,
-			showFields = [],
-			fieldClass,
+			opTypeFieldIds,
+			fieldId,
 			f;
 
 		if (jQuery('#new_operation_opcommand_type').length == 0) {
@@ -448,80 +389,73 @@
 
 		currentOpType = jQuery('#new_operation_opcommand_type').val();
 
-		opTypeFields = {
-			class_opcommand_userscript: [ZBX_SCRIPT_TYPES.userscript],
-			class_opcommand_execute_on: [ZBX_SCRIPT_TYPES.script],
-			class_opcommand_port: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			class_opcommand_command: [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			class_opcommand_command_ipmi: [ZBX_SCRIPT_TYPES.ipmi],
-			class_authentication_method: [ZBX_SCRIPT_TYPES.ssh],
-			class_authentication_username: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			class_authentication_publickey: [],
-			class_authentication_privatekey: [],
-			class_authentication_password: [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
-			class_authentication_passphrase: [ZBX_SCRIPT_TYPES.ssh]
+		opTypeFieldIds = {
+			'#new_operation_opcommand_script': [ZBX_SCRIPT_TYPES.userscript],
+			'#new_operation_opcommand_execute_on': [ZBX_SCRIPT_TYPES.script],
+			'#new_operation_opcommand_port': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			'#new_operation_opcommand_command': [ZBX_SCRIPT_TYPES.script, ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
+			'#new_operation_opcommand_command_ipmi': [ZBX_SCRIPT_TYPES.ipmi],
+			'#new_operation_opcommand_authtype': [ZBX_SCRIPT_TYPES.ssh],
+			'#new_operation_opcommand_username': [ZBX_SCRIPT_TYPES.ssh, ZBX_SCRIPT_TYPES.telnet],
 		};
 
-		for (fieldClass in opTypeFields) {
-			jQuery('#operationlist .' + fieldClass).toggleClass('hidden', true).find(':input').prop('disabled', true);
+		for (fieldId in opTypeFieldIds) {
+			var show = false;
 
-			for (f = 0; f < opTypeFields[fieldClass].length; f++) {
-				if (currentOpType == opTypeFields[fieldClass][f]) {
-					showFields.push(fieldClass);
+			for (f = 0; f < opTypeFieldIds[fieldId].length; f++) {
+				if (currentOpType == opTypeFieldIds[fieldId][f]) {
+					show = true;
 				}
 			}
+
+			jQuery(fieldId)
+				.closest('tr')
+				.toggle(show)
+				.find(':input')
+				.prop('disabled', !show);
 		}
 
-		for (f = 0; f < showFields.length; f++) {
-			jQuery('#operationlist .' + showFields[f]).toggleClass('hidden', false).find(':input').prop('disabled', false);
-		}
-
-		if (jQuery.inArray('class_authentication_method', showFields) !== -1) {
-			showOpTypeAuth();
-		}
+		showOpTypeAuth();
 	}
 
 	function showOpTypeAuth() {
-		var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
+		var currentOpType = parseInt(jQuery('#new_operation_opcommand_type').val(), 10),
+			show_password = false,
+			show_publickey = false;
 
-		if (currentOpTypeAuth === <?= ITEM_AUTHTYPE_PASSWORD ?>) {
-			jQuery('#operationlist .class_authentication_publickey').toggleClass('hidden', true);
-			jQuery('#new_operation_opcommand_publickey').prop('disabled', true);
-			jQuery('#operationlist .class_authentication_privatekey').toggleClass('hidden', true);
-			jQuery('#new_operation_opcommand_privatekey').prop('disabled', true);
-			jQuery('.class_authentication_password').toggleClass('hidden', false);
-			jQuery('.class_authentication_passphrase').toggleClass('hidden', true);
-			jQuery('#new_operation_opcommand_password').prop('disabled', false);
-			jQuery('#new_operation_opcommand_passphrase').prop('disabled', true);
+		if (currentOpType === <?= ZBX_SCRIPT_TYPE_SSH ?>) {
+			var currentOpTypeAuth = parseInt(jQuery('#new_operation_opcommand_authtype').val(), 10);
+
+			show_password = (currentOpTypeAuth === <?= ITEM_AUTHTYPE_PASSWORD ?>);
+			show_publickey = !show_password;
 		}
-		else {
-			jQuery('#operationlist .class_authentication_publickey').toggleClass('hidden', false).prop('disabled', false);
-			jQuery('#new_operation_opcommand_publickey').prop('disabled', false);
-			jQuery('#operationlist .class_authentication_privatekey').toggleClass('hidden', false).prop('disabled', false);
-			jQuery('#new_operation_opcommand_privatekey').prop('disabled', false);
-			jQuery('.class_authentication_password').toggleClass('hidden', true);
-			jQuery('.class_authentication_passphrase').toggleClass('hidden', false);
-			jQuery('#new_operation_opcommand_password').prop('disabled', true);
-			jQuery('#new_operation_opcommand_passphrase').prop('disabled', false);
+		else if (currentOpType === <?= ZBX_SCRIPT_TYPE_TELNET ?>) {
+			show_password = true;
 		}
+
+		jQuery('#new_operation_opcommand_password')
+			.closest('tr')
+			.toggle(show_password)
+			.find(':input')
+			.prop('disabled', !show_password);
+		jQuery('#new_operation_opcommand_publickey,#new_operation_opcommand_privatekey,#new_operation_opcommand_passphrase')
+			.closest('tr')
+			.toggle(show_publickey)
+			.find(':input')
+			.prop('disabled', !show_publickey);
 	}
 
 	function processTypeOfCalculation() {
-		if(jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>) {
-			jQuery('#conditionLabel').hide();
-			jQuery('#formula').show();
-		}
-		else {
-			jQuery('#conditionLabel').show();
-			jQuery('#formula').hide();
-		}
+		var show_formula = (jQuery('#evaltype').val() == <?= CONDITION_EVAL_TYPE_EXPRESSION ?>),
+			labels = jQuery('#conditionTable .label');
 
-		var labels = jQuery('#conditionTable .label');
+		jQuery('#evaltype').closest('li').toggle(labels.length > 1);
+		jQuery('#conditionLabel').toggle(!show_formula);
+		jQuery('#formula').toggle(show_formula);
 
 		if (labels.length > 1) {
-			jQuery('#conditionRow').css('display', '');
-
 			var conditions = [];
+
 			labels.each(function(index, label) {
 				label = jQuery(label);
 
@@ -533,18 +467,16 @@
 
 			jQuery('#conditionLabel').html(getConditionFormula(conditions, +jQuery('#evaltype').val()));
 		}
-		else {
-			jQuery('#conditionRow').css('display', 'none');
-		}
 	}
 
 	function processOperationTypeOfCalculation() {
 		var labels = jQuery('#operationConditionTable .label');
 
-		if (labels.length > 1) {
-			jQuery('#operationConditionRow').css('display', '');
+		jQuery('#operationEvaltype').closest('tr').toggle(labels.length > 1);
 
+		if (labels.length > 1) {
 			var conditions = [];
+
 			labels.each(function(index, label) {
 				label = jQuery(label);
 
@@ -556,56 +488,32 @@
 
 			jQuery('#operationConditionLabel').html(getConditionFormula(conditions, +jQuery('#operationEvaltype').val()));
 		}
-		else {
-			jQuery('#operationConditionRow').css('display', 'none');
-		}
-	}
-
-	function addDiscoveryTemplates() {
-		var values = jQuery('#discoveryTemplates').multiSelect('getData');
-
-		for (var key in values) {
-			var data = values[key];
-
-			if (!empty(data.id)) {
-				addPopupValues({
-					object: 'dsc_templateid',
-					values: [{
-						templateid: data.id,
-						name: data.name
-					}]
-				});
-			}
-		}
-
-		jQuery('#discoveryTemplates').multiSelect('clean');
-	}
-
-	function addDiscoveryHostGroup() {
-		var values = jQuery('#discoveryHostGroup').multiSelect('getData');
-
-		for (var key in values) {
-			var data = values[key];
-
-			if (!empty(data.id)) {
-				addPopupValues({
-					object: 'dsc_groupid',
-					values: [{
-						groupid: data.id,
-						name: data.name
-					}]
-				});
-			}
-		}
-
-		jQuery('#discoveryHostGroup').multiSelect('clean');
 	}
 
 	jQuery(document).ready(function() {
+		jQuery('#new_operation_opmessage_default_msg').on('change', function() {
+			var default_message = jQuery(this).is(':checked');
+
+			jQuery('#new_operation_opmessage_subject').closest('tr').toggle(!default_message);
+			jQuery('#new_operation_opmessage_message').closest('tr').toggle(!default_message);
+		});
+
+		jQuery('#new_operation_opmessage_default_msg').trigger('change');
+
+		jQuery('#recovery_msg').on('change', function() {
+			var recovery_msg = jQuery(this).is(':checked');
+
+			jQuery('#r_shortdata').closest('li').toggle(recovery_msg);
+			jQuery('#r_longdata').closest('li').toggle(recovery_msg);
+		});
+
+		jQuery('#recovery_msg').trigger('change');
+
 		// clone button
 		jQuery('#clone').click(function() {
 			jQuery('#actionid, #delete, #clone').remove();
-			jQuery('#update').button('option', 'label', <?= CJs::encodeJson(_('Add')) ?>)
+			jQuery('#update')
+				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
 
 			var operationIdNameRegex = /operations\[\d+\]\[operationid\]/;

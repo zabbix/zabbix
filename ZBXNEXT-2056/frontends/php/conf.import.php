@@ -33,8 +33,8 @@ $fields = [
 	'rules' => [T_ZBX_STR, O_OPT, null, null, null],
 	'import' => [T_ZBX_STR, O_OPT, P_SYS|P_ACT, null, null],
 	'rules_preset' => [T_ZBX_STR, O_OPT, null, null, null],
-	'cancel' => [T_ZBX_STR, O_OPT, P_SYS, null, null],
-	'form_refresh' => [T_ZBX_INT, O_OPT, null, null, null]
+	'backurl' => [T_ZBX_STR, O_OPT, null, null, null],
+	'cancel' => [T_ZBX_STR, O_OPT, P_SYS, null, null]
 ];
 check_fields($fields);
 
@@ -45,20 +45,23 @@ if (isset($_REQUEST['cancel'])) {
 }
 ob_end_flush();
 
-$data['rules'] = [
-	'groups' => ['createMissing' => false],
-	'hosts' => ['updateExisting' => false, 'createMissing' => false],
-	'templates' => ['updateExisting' => false, 'createMissing' => false],
-	'templateScreens' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-	'templateLinkage' => ['createMissing' => false],
-	'applications' => ['createMissing' => false, 'deleteMissing' => false],
-	'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-	'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-	'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-	'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
-	'screens' => ['updateExisting' => false, 'createMissing' => false],
-	'maps' => ['updateExisting' => false, 'createMissing' => false],
-	'images' => ['updateExisting' => false, 'createMissing' => false]
+$data = [
+	'rules' => [
+		'groups' => ['createMissing' => false],
+		'hosts' => ['updateExisting' => false, 'createMissing' => false],
+		'templates' => ['updateExisting' => false, 'createMissing' => false],
+		'templateScreens' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+		'templateLinkage' => ['createMissing' => false],
+		'applications' => ['createMissing' => false, 'deleteMissing' => false],
+		'items' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+		'discoveryRules' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+		'triggers' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+		'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+		'screens' => ['updateExisting' => false, 'createMissing' => false],
+		'maps' => ['updateExisting' => false, 'createMissing' => false],
+		'images' => ['updateExisting' => false, 'createMissing' => false]
+	],
+	'backurl' => getRequest('backurl', 'zabbix.php?action=dashboard.view')
 ];
 
 // rules presets
@@ -92,6 +95,8 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 				'deleteMissing' => false
 			];
 			$data['rules']['templateLinkage'] = ['createMissing' => true];
+
+			$data['backurl'] = 'hosts.php';
 			break;
 
 		case 'template':
@@ -127,14 +132,20 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 				'deleteMissing' => false
 			];
 			$data['rules']['templateLinkage'] = ['createMissing' => true];
+
+			$data['backurl'] = 'templates.php';
 			break;
 
 		case 'map':
 			$data['rules']['maps'] = ['updateExisting' => true, 'createMissing' => true];
+
+			$data['backurl'] = 'sysmaps.php';
 			break;
 
 		case 'screen':
 			$data['rules']['screens'] = ['updateExisting' => true, 'createMissing' => true];
+
+			$data['backurl'] = 'screenconf.php';
 			break;
 
 	}

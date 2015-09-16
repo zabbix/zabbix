@@ -75,7 +75,6 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_SDSIZE	6
 #define ZBX_DRSS	7
 #define ZBX_TRSS	8
-#define ZBX_DVM		9
 
 	char			*param, *procname, *proccomm, *mem_type = NULL;
 	struct passwd		*usrinfo;
@@ -157,10 +156,6 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		mem_type_code = ZBX_TRSS;		/* text resident set size */
 	}
-	else if (0 == strcmp(mem_type, "dvm"))
-	{
-		mem_type_code = ZBX_DVM;		/* data virtual memory size */
-	}
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
@@ -197,7 +192,6 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 				pct_value = procentry.pi_prm;
 				break;
 			case ZBX_SIZE:
-			case ZBX_DVM:
 				/* try to be compatible with "ps gvw" SIZE column */
 				byte_value = (zbx_uint64_t)procentry.pi_dvm << procentry.pi_data_l2psize;
 				break;
@@ -275,7 +269,6 @@ out:
 #undef ZBX_SDSIZE
 #undef ZBX_DRSS
 #undef ZBX_TRSS
-#undef ZBX_DVM
 }
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)

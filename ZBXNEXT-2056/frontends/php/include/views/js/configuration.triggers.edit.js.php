@@ -1,11 +1,4 @@
 <script type="text/javascript">
-	jQuery(document).ready(function() {
-		// create jQuery buttonset object when VisibilityBox is switched on
-		jQuery('#visible_priority').one('click', function() {
-			jQuery('#priority_div').buttonset();
-		});
-	});
-
 	/**
 	 * @see init.js add.popup event
 	 */

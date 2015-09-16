@@ -86,10 +86,23 @@ class CConditionFormulaTest extends PHPUnit_Framework_TestCase {
 
 	public function parseConstantsProvider() {
 		return [
-			['A', ['A']],
-			['A and B', ['A', 'B']],
-			['A and B or C', ['A', 'B', 'C']],
-			['A and B or A', ['A', 'B']],
+			['A', [
+				['value' => 'A', 'pos' => 0]
+			]],
+			['A and B', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'B', 'pos' => 6]
+			]],
+			['A and B or C', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'B', 'pos' => 6],
+				['value' => 'C', 'pos' => 11]
+			]],
+			['A and B or A', [
+				['value' => 'A', 'pos' => 0],
+				['value' => 'B', 'pos' => 6],
+				['value' => 'A', 'pos' => 11]
+			]]
 		];
 	}
 
