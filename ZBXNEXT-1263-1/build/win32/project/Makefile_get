@@ -24,7 +24,8 @@ ADD_RFLAGS = /d "ZABBIX_GET"
 
 !INCLUDE Makefile_common.inc
 
-OBJS  = ..\..\..\src\libs\zbxcommon\comms.o \
+OBJS = \
+	..\..\..\src\libs\zbxcommon\comms.o \
 	..\..\..\src\libs\zbxcommon\iprange.o \
 	..\..\..\src\libs\zbxcommon\misc.o \
 	..\..\..\src\libs\zbxcommon\str.o \
@@ -44,4 +45,3 @@ LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.l
 
 !INCLUDE Makefile_tls.inc
 !INCLUDE Makefile_targets.inc
-

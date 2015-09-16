@@ -1,4 +1,4 @@
-# detect target archictetur
+# detect target architecture
 !IF "$(CPU)" == "i386"
 TARGETDIR = ..\..\..\bin\win32
 ADD_LFLAGS = /MACHINE:X86

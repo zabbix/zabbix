@@ -1,4 +1,4 @@
-# detect target archictetur
+# detect target architecture
 !IF "$(CPU)" == "i386"
 TARGETDIR = ..\..\..\bin\win32\dev
 ADD_LFLAGS = /MACHINE:X86
@@ -64,6 +64,6 @@ $(TARGETDIR)\zabbix_sender.h: $(PROJECTDIR)\win32\zabbix_sender.h
 post-build: $(TARGETDIR)\zabbix_sender.h
 	@del /Q $(TARGETDIR)\zabbix_sender.exp 2>NUL
 
-post-clean: 
+post-clean:
 	@del /Q $(TARGETDIR)\zabbix_sender.h 2>NUL
 	@del /Q $(TARGETDIR)\zabbix_sender.lib 2>NUL
