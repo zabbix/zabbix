@@ -314,7 +314,11 @@ ul.top-nav-icons {
   height: 0;
   font-size: 0;
   line-height: 0;
-  display: inline-block; }
+  display: inline-block;
+  -webkit-transform: scale(0.9999);
+  -moz-transform: scale(0.9999);
+  -ms-transform: scale(0.9999);
+  transform: scale(0.9999); }
 
 .header-title {
   position: relative;
@@ -338,13 +342,11 @@ article, .article {
   margin: 0 0 10px 0; }
   .object-group li {
     display: inline-block;
-    margin: 0 14px 0 0;
     vertical-align: middle; }
     .object-group li:last-child {
       margin: 0; }
   .object-group .selected, .object-group .calendar .selected:hover, .calendar .object-group .selected:hover {
     background-color: #2b2b2b;
-    padding: 4px 9px;
     border: 1px solid #303030;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
@@ -2292,7 +2294,7 @@ td.active-bg {
 
 .list-hor-min-width li {
   display: inline-block;
-  min-width: 2em;
+  min-width: 1.4em;
   margin-right: .4em; }
   .list-hor-min-width li:last-child {
     min-width: auto;
