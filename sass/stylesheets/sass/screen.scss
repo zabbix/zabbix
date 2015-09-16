@@ -483,21 +483,28 @@ article {
 	
 	li {
 		display: inline-block;
-		//margin: 0 14px 0 0;
+		padding: 0 5px 0 0;
 		vertical-align: middle;
 
-		&:last-child {
-			margin: 0;
+		//&:last-child {
+		//	margin: 0;
+		//}
+
+		span {
+			padding: 4px 7px;
 		}
 
-		//span {
-		//	padding: 4px 9px;
-		//}
+		.status-container {
+
+			span {
+				padding: 2px 3px 1px 3px;
+			}
+		}
 	}
 
 	.selected {
 		background-color: $ui-bg-color;
-		//padding: 4px 9px;
+		margin: -1px;
 		border: 1px solid $ui-border-color;
 		@include border-radius(2px);
 	}
