@@ -600,6 +600,10 @@ static void	parse_commandline(int argc, char **argv)
 	char		ch = '\0';
 	int		opt_c = 0, opt_cap_i = 0, opt_z = 0, opt_p = 0, opt_s = 0, opt_k = 0, opt_o = 0, opt_i = 0,
 			opt_cap_t = 0, opt_r = 0, opt_v = 0;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	int		opt_1 = 0, opt_2 = 0, opt_3 = 0, opt_4 = 0, opt_5 = 0, opt_6 = 0, opt_7 = 0, opt_8 = 0,
+			opt_9 = 0;
+#endif
 	unsigned int	opt_mask = 0;
 
 	/* parse the command-line */
@@ -671,30 +675,39 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			case '1':
+				opt_1++;
 				CONFIG_TLS_CONNECT = zbx_strdup(CONFIG_TLS_CONNECT, zbx_optarg);
 				break;
 			case '2':
+				opt_2++;
 				CONFIG_TLS_CA_FILE = zbx_strdup(CONFIG_TLS_CA_FILE, zbx_optarg);
 				break;
 			case '3':
+				opt_3++;
 				CONFIG_TLS_CRL_FILE = zbx_strdup(CONFIG_TLS_CRL_FILE, zbx_optarg);
 				break;
 			case '4':
+				opt_4++;
 				CONFIG_TLS_SERVER_CERT_ISSUER = zbx_strdup(CONFIG_TLS_SERVER_CERT_ISSUER, zbx_optarg);
 				break;
 			case '5':
+				opt_5++;
 				CONFIG_TLS_SERVER_CERT_SUBJECT = zbx_strdup(CONFIG_TLS_SERVER_CERT_SUBJECT, zbx_optarg);
 				break;
 			case '6':
+				opt_6++;
 				CONFIG_TLS_CERT_FILE = zbx_strdup(CONFIG_TLS_CERT_FILE, zbx_optarg);
 				break;
 			case '7':
+				opt_7++;
 				CONFIG_TLS_KEY_FILE = zbx_strdup(CONFIG_TLS_KEY_FILE, zbx_optarg);
 				break;
 			case '8':
+				opt_8++;
 				CONFIG_TLS_PSK_IDENTITY = zbx_strdup(CONFIG_TLS_PSK_IDENTITY, zbx_optarg);
 				break;
 			case '9':
+				opt_9++;
 				CONFIG_TLS_PSK_FILE = zbx_strdup(CONFIG_TLS_PSK_FILE, zbx_optarg);
 				break;
 #else
@@ -720,34 +733,63 @@ static void	parse_commandline(int argc, char **argv)
 	}
 
 	/* every option may be specified only once */
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (1 < opt_c || 1 < opt_cap_i || 1 < opt_z || 1 < opt_p || 1 < opt_s || 1 < opt_k || 1 < opt_o || 1 < opt_i ||
+			1 < opt_cap_t || 1 < opt_r || 2 < opt_v || 1 < opt_1 || 1 < opt_2 || 1 < opt_3 || 1 < opt_4 ||
+			1 < opt_5 || 1 < opt_6 || 1 < opt_7 || 1 < opt_8 || 1 < opt_9)
+#else
 	if (1 < opt_c || 1 < opt_cap_i || 1 < opt_z || 1 < opt_p || 1 < opt_s || 1 < opt_k || 1 < opt_o || 1 < opt_i ||
 			1 < opt_cap_t || 1 < opt_r || 2 < opt_v)
+#endif
 	{
+#define FMT	"option \"%s\" specified multiple times"
+
 		if (1 < opt_c)
-			zbx_error("option \"-c\" or \"--config\" specified multiple times");
+			zbx_error(FMT, "-c\" or \"--config");
 		if (1 < opt_cap_i)
-			zbx_error("option \"-I\" or \"--source-address\" specified multiple times");
+			zbx_error(FMT, "-I\" or \"--source-address");
 		if (1 < opt_z)
-			zbx_error("option \"-z\" or \"--zabbix-server\" specified multiple times");
+			zbx_error(FMT, "-z\" or \"--zabbix-server");
 		if (1 < opt_p)
-			zbx_error("option \"-p\" or \"--port\" specified multiple times");
+			zbx_error(FMT, "-p\" or \"--port");
 		if (1 < opt_s)
-			zbx_error("option \"-s\" or \"--host\" specified multiple times");
+			zbx_error(FMT, "-s\" or \"--host");
 		if (1 < opt_k)
-			zbx_error("option \"-k\" or \"--key\" specified multiple times");
+			zbx_error(FMT, "-k\" or \"--key");
 		if (1 < opt_o)
-			zbx_error("option \"-o\" or \"--value\" specified multiple times");
+			zbx_error(FMT, "-o\" or \"--value");
 		if (1 < opt_i)
-			zbx_error("option \"-i\" or \"--input-file\" specified multiple times");
+			zbx_error(FMT, "-i\" or \"--input-file");
 		if (1 < opt_cap_t)
-			zbx_error("option \"-T\" or \"--with-timestamps\" specified multiple times");
+			zbx_error(FMT, "-T\" or \"--with-timestamps");
 		if (1 < opt_r)
-			zbx_error("option \"-r\" or \"--real-time\" specified multiple times");
+			zbx_error(FMT, "-r\" or \"--real-time");
 		/* '-v' or '-vv' can be specified */
 		if (2 < opt_v)
 			zbx_error("option \"-v\" or \"--verbose\" specified more than 2 times");
-
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		if (1 < opt_1)
+			zbx_error(FMT, "--tls-connect");
+		if (1 < opt_2)
+			zbx_error(FMT, "--tls-ca-file");
+		if (1 < opt_3)
+			zbx_error(FMT, "--tls-crl-file");
+		if (1 < opt_4)
+			zbx_error(FMT, "--tls-server-cert-issuer");
+		if (1 < opt_5)
+			zbx_error(FMT, "--tls-server-cert-subject");
+		if (1 < opt_6)
+			zbx_error(FMT, "--tls-cert-file");
+		if (1 < opt_7)
+			zbx_error(FMT, "--tls-key-file");
+		if (1 < opt_8)
+			zbx_error(FMT, "--tls-psk-identity");
+		if (1 < opt_9)
+			zbx_error(FMT, "--tls-psk-file");
+#endif
 		exit(EXIT_FAILURE);
+#undef FMT
 	}
 
 	/* check for mutually exclusive options    */
