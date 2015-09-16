@@ -8,7 +8,6 @@ use RSM;
 use RSMSLV;
 use ApiHelper;
 use JSON::XS;
-use Data::Dumper;
 
 use constant JSON_RDDS_SUBSERVICE => 'subService';
 use constant JSON_RDDS_43 => 'RDDS43';
@@ -121,8 +120,6 @@ foreach my $service (keys(%services))
 		$services{$service}{'key_rtt'} = 'rsm.epp.rtt[{$RSM.TLD},';
 	}
 }
-
-print(Dumper(%services));
 
 my $now = time();
 
