@@ -280,6 +280,8 @@ class CProxy extends CApiService {
 
 		foreach ($proxies as &$proxy) {
 			$status = array_key_exists('status', $proxy) ? $proxy['status'] : $db_proxies[$proxy['proxyid']]['status'];
+
+			// Clean encryption fields.
 			$tls_connect = array_key_exists('tls_connect', $proxy)
 				? $proxy['tls_connect']
 				: $db_proxies[$proxy['proxyid']]['tls_connect'];
@@ -287,7 +289,6 @@ class CProxy extends CApiService {
 				? $proxy['tls_accept']
 				: $db_proxies[$proxy['proxyid']]['tls_accept'];
 
-			// Clean encryption fields.
 			if ($status == HOST_STATUS_PROXY_PASSIVE) {
 				if ($tls_connect != HOST_ENCRYPTION_PSK) {
 					$proxy['tls_psk_identity'] = '';
@@ -625,7 +626,7 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Validate connections from host and PSK fields.
+	 * Validate encryption fields.
 	 *
 	 * @throws APIException		if incorrect encryption options
 	 *
@@ -673,7 +674,7 @@ class CProxy extends CApiService {
 	/**
 	 * Validate proxies data on create method.
 	 *
-	 * @param array $proxies	proxy data array
+	 * @param array $proxies	proxies data array
 	 */
 	protected function validateCreate(array $proxies) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
@@ -757,8 +758,8 @@ class CProxy extends CApiService {
 	/**
 	 * Validate proxies data on update method.
 	 *
-	 * @param array $proxies		proxy data array
-	 * @param array $db_proxies		db proxy data array
+	 * @param array $proxies		proxies data array
+	 * @param array $db_proxies		db proxies data array
 	 */
 	protected function validateUpdate(array $proxies, array $db_proxies) {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
@@ -768,6 +769,7 @@ class CProxy extends CApiService {
 
 		// permissions
 		$proxy_db_fields = ['proxyid' => null];
+		$proxies_full = [];
 
 		foreach ($proxies as &$proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
@@ -831,10 +833,12 @@ class CProxy extends CApiService {
 						_('No permissions to referred object or it does not exist!'));
 				}
 			}
+
+			$proxies_full[] = zbx_array_merge($db_proxies[$proxy['proxyid']], $proxy);
 		}
 		unset($proxy);
 
-		$this->encryptionValidation($proxies);
+		$this->encryptionValidation($proxies_full);
 
 		// Check if any of the affected hosts are discovered.
 		$hostids = [];
