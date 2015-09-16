@@ -264,10 +264,10 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 		for (i = 0; i < ZBX_CPU_STATE_COUNT; i++)
 			cpu->h_counter[i][index] = counter[i];
 
-		cpu->h_status[index] = SYSINFO_RET_OK;
+		cpu->h_status[index] = ZBX_CPU_STATUS_ONLINE;
 	}
 	else
-		cpu->h_status[index] = SYSINFO_RET_FAIL;
+		cpu->h_status[index] = ZBX_CPU_STATUS_OFFLINE;
 
 	UNLOCK_CPUSTATS;
 }
@@ -706,35 +706,55 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 }
 #endif	/* not _WINDOWS */
 
-int	get_cpu_statuses(zbx_vector_uint64_t *vector)
+#ifdef _WINDOWS
+static int	get_cpu_status(int pc_status)
 {
-	int				i;
-#ifndef _WINDOWS
-	int				index;
-	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
+	switch (pc_status)
+	{
+		case PERF_COUNTER_ACTIVE:
+			return ZBX_CPU_STATUS_ONLINE;
+		case PERF_COUNTER_INITIALIZED:
+			return ZBX_CPU_STATUS_UNKNOWN;
+	}
+
+	return ZBX_CPU_STATUS_OFFLINE;
+}
 #endif
-	ZBX_CPUS_STAT_DATA		*pcpus;
+
+int	get_cpus(zbx_vector_uint64_pair_t *vector)
+{
+	ZBX_CPUS_STAT_DATA	*pcpus;
+	int			i, ret = FAIL;
 
 	if (!CPU_COLLECTOR_STARTED(collector) || NULL == (pcpus = &collector->cpus))
-		return FAIL;
+		goto out;
 
 	LOCK_CPUSTATS;
 
-	for (i = 0; i < pcpus->count; i++)
+	for (i = 1; i <= pcpus->count; i++)
 	{
+		zbx_uint64_pair_t		pair;
 #ifndef _WINDOWS
-		cpu = get_cpustat_by_num(pcpus, i + 1);
+		ZBX_SINGLE_CPU_STAT_DATA	*cpu;
+		int				index;
+
+		cpu = &pcpus->cpu[i];
 
 		if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
 			index -= MAX_COLLECTOR_HISTORY;
 
-		zbx_vector_uint64_append(vector, cpu->h_status[index]);
+		pair.first = cpu->cpu_num;
+		pair.second = cpu->h_status[index];
 #else
-		zbx_vector_uint64_append(vector, pcpus->cpu_counter[i + 1]->status);
+		pair.first = i;
+		pair.second = pcpus->cpu_counter[i]->status;
 #endif
+		zbx_vector_uint64_pair_append(vector, pair);
 	}
 
 	UNLOCK_CPUSTATS;
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	return ret;
 }

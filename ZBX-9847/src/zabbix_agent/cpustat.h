@@ -69,8 +69,12 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
 #ifndef _WINDOWS
 void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
 int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
-#endif /* not _WINDOWS */
+#endif
 
-int	get_cpu_statuses(zbx_vector_uint64_t *vector);
+#define ZBX_CPU_STATUS_ONLINE	0
+#define ZBX_CPU_STATUS_OFFLINE	1
+#define ZBX_CPU_STATUS_UNKNOWN	2
+
+int	get_cpus(zbx_vector_uint64_pair_t *vector);
 
 #endif
