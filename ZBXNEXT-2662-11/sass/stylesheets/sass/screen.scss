@@ -447,6 +447,7 @@ ul.top-nav-icons {
 	font-size: 0;
 	line-height: 0;
 	display: inline-block;
+	@include transform(scale(.9999));
 }
 
 .header-title {
