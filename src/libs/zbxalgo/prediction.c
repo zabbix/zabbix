@@ -979,6 +979,8 @@ zbx_mode_t	zbx_mode_code(char *mode_str)
 	return MODE_INVALID;
 }
 
+#define ZBX_IS_NAN(x)	(x != x)
+
 int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit_str, char *mode_str,
 	double *result, char **error)
 {
@@ -1103,7 +1105,7 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 out:
 	if (ZBX_MATH_OK == res)
 	{
-		if (*result != *result)
+		if (ZBX_IS_NAN(*result))
 			*result = ERROR_CODE;
 		else if (DB_INFINITY < *result)
 			*result = DB_INFINITY;
@@ -1170,7 +1172,7 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 		*result = exp((log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0))
 				- now;
 
-	if (*result != *result)
+	if (ZBX_IS_NAN(*result))
 		*result = ERROR_CODE;
 	else if (0.0 > *result || DB_INFINITY < *result)
 		*result = DB_INFINITY;
@@ -1179,6 +1181,8 @@ out:
 	zbx_matrix_free(coefficients);
 	return res;
 }
+
+#undef ZBX_IS_NAN
 
 #undef ZBX_VALID_MATRIX
 #undef ZBX_MATRIX_EL
