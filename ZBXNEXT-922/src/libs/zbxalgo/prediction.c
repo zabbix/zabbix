@@ -410,11 +410,10 @@ static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m, 
 	return ZBX_MATH_OK;
 }
 
-static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, zbx_matrix_t *m, char **error)
+static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, unsigned k, zbx_matrix_t *m, char **error)
 {
 	double		element;
 	int		i, j;
-	unsigned int	k;
 
 	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit)
 	{
@@ -440,15 +439,6 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, zbx_matrix_t *m
 	}
 	else if (FIT_POLYNOMIAL == fit)
 	{
-		if (SUCCEED != is_uint_range(fit + strlen("polynomial"), &k, 1, 6))
-		{
-			*error = zbx_strdup(*error, "polynomial degree is invalid");
-			return ZBX_MATH_FAIL;
-		}
-
-		if (k > n - 1)
-			k = n - 1;
-
 		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, k+1, error))
 			return ZBX_MATH_FAIL;
 
@@ -469,7 +459,8 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, zbx_matrix_t *m
 	return ZBX_MATH_OK;
 }
 
-static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, zbx_matrix_t *coefficients, char **error)
+static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, unsigned k, zbx_matrix_t *coefficients,
+		char **error)
 {
 	zbx_matrix_t	*independent = NULL, *dependent = NULL;
 	int		res;
@@ -481,7 +472,7 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, zbx_matrix
 		goto out;
 	}
 
-	if (ZBX_MATH_OK != (res = zbx_fill_independent(t, n, fit, independent, error)))
+	if (ZBX_MATH_OK != (res = zbx_fill_independent(t, n, fit, k, independent, error)))
 		goto out;
 
 	if (ZBX_MATH_OK != (res = zbx_fill_dependent(x, n, fit, dependent, error)))
@@ -939,44 +930,75 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t f
 	return ZBX_MATH_OK;
 }
 
-zbx_fit_t	zbx_fit_code(char *fit_str)
+int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, int n, char **error)
 {
-	if ('\0' == *fit || 0 == strcmp(fit, "linear"))
-		return = FIT_LINEAR;
+	if ('\0' == *fit_str || 0 == strcmp(fit_str, "linear"))
+	{
+		*fit = FIT_LINEAR;
+	}
+	else if (0 == strncmp(fit_str, "polynomial", strlen("polynomial")))
+	{
+		*fit = FIT_POLYNOMIAL;
 
-	if (0 == strncmp(fit, "polynomial", strlen("polynomial")))
-		return FIT_POLYNOMIAL;
+		if (SUCCEED != is_uint_range(fit_str + strlen("polynomial"), k, 1, 6))
+		{
+			*error = zbx_strdup(*error, "polynomial degree is invalid");
+			return ZBX_MATH_FAIL;
+		}
 
-	if (0 == strcmp(fit, "exponential"))
-		return FIT_EXPONENTIAL;
+		if (*k > n - 1)
+			*k = n - 1;
+	}
+	else if (0 == strcmp(fit_str, "exponential"))
+	{
+		*fit = FIT_EXPONENTIAL;
+	}
+	else if (0 == strcmp(fit_str, "logarithmic"))
+	{
+		*fit = FIT_LOGARITHMIC;
+	}
+	else if (0 == strcmp(fit_str, "power"))
+	{
+		*fit = FIT_POWER;
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid 'fit' parameter");
+		return ZBX_MATH_FAIL;
+	}
 
-	if (0 == strcmp(fit, "logarithmic"))
-		return FIT_LOGARITHMIC;
-
-	if (0 == strcmp(fit, "power"))
-		return FIT_POWER;
-
-	return FIT_INVALID;
+	return ZBX_MATH_OK;
 }
 
-zbx_mode_t	zbx_mode_code(char *mode_str)
+int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error)
 {
-	if ('\0' == *mode || 0 == strcmp(mode, "value"))
-		return MODE_VALUE;
+	if ('\0' == *mode || 0 == strcmp(mode_str, "value"))
+	{
+		*mode = MODE_VALUE;
+	}
+	else if (0 == strcmp(mode_str, "max"))
+	{
+		*mode = MODE_MAX;
+	}
+	else if (0 == strcmp(mode_str, "min"))
+	{
+		*mode = MODE_MIN;
+	}
+	else if (0 == strcmp(mode_str, "delta"))
+	{
+		*mode = MODE_DELTA;
+	}
+	else if (0 == strcmp(mode_str, "avg"))
+	{
+		*mode = MODE_AVG;
+	}
+	else
+	{
+		*error = zbx_strdup(*error, "invalid 'mode' parameter");
+		return ZBX_MATH_FAIL;
+	}
 
-	if (0 == strcmp(mode, "max"))
-		return MODE_MAX;
-
-	if (0 == strcmp(mode, "min"))
-		return MODE_MIN;
-
-	if (0 == strcmp(mode, "delta"))
-		return MODE_DELTA;
-
-	if (0 == strcmp(mode, "avg"))
-		return MODE_AVG;
-
-	return MODE_INVALID;
+	return ZBX_MATH_OK;
 }
 
 #define ZBX_IS_NAN(x)	(x != x)
@@ -989,18 +1011,13 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 	zbx_mode_t	mode;
 	double		left, right;
 	int		res;
+	unsigned	k;
 
-	if (FIT_INVALID == (fit = zbx_fit_code(fit_str)))
-	{
-		*error = zbx_strdup(*error, "invalid 'fit' parameter");
+	if (ZBX_MATH_OK != zbx_fit_code(fit_str, &fit, &k, n, error))
 		return ZBX_MATH_FAIL;
-	}
 
-	if (MODE_INVALID == (mode = zbx_mode_code(mode_str)))
-	{
-		*error = zbx_strdup(*error, "invalid 'mode' parameter");
+	if (ZBX_MATH_OK != zbx_mode_code(mode_str, &mode, error))
 		return ZBX_MATH_FAIL;
-	}
 
 	if (1 == n)
 	{
@@ -1015,7 +1032,7 @@ int	zbx_forecast(double *t, double *x, int n, double now, double time, char *fit
 	if (ZBX_MATH_OK != (res = zbx_matrix_struct_alloc(&coefficients)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, coefficients, error)))
+	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, k, coefficients, error)))
 		goto out;
 
 	if (MODE_VALUE == mode)
@@ -1117,18 +1134,17 @@ out:
 	return res;
 }
 
-int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char *fit_str, double *result, char **error)
+int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char *fit_str, double *result,
+	char **error)
 {
 	zbx_matrix_t	*coefficients = NULL;
 	zbx_fit_t	fit;
 	double		current;
 	int		res;
+	unsigned	k;
 
-	if (FIT_INVALID == (fit = zbx_fit_code(fit_str)))
-	{
-		*error = zbx_strdup(*error, "invalid 'fit' parameter");
+	if (ZBX_MATH_OK != zbx_fit_code(fit_str, &fit, &k, n, error))
 		return ZBX_MATH_FAIL;
-	}
 
 	if ((FIT_EXPONENTIAL == fit || FIT_POWER == fit) && 0.0 >= threshold)
 	{
@@ -1145,7 +1161,7 @@ int	zbx_timeleft(double *t, double *x, int n, double now, double threshold, char
 	if (ZBX_MATH_OK != (res = zbx_matrix_struct_alloc(&coefficients)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, coefficients, error)))
+	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, k, coefficients, error)))
 		goto out;
 
 	if (ZBX_MATH_OK != (res = zbx_calculate_value(now, coefficients, fit, &current, error)))
