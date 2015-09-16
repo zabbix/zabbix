@@ -3,15 +3,14 @@ all: $(PROGNAME) $(POSTBUILD)
 clean: $(POSTCLEAN)
 # break this down because del has limit for command-line args length (NMAKE : fatal error U1077: 'del' : return code '0x1')
 	echo VERSION $(_NMAKE_VER)
-	del $(OBJS) 2>nul
+	del $(OBJS) 2>NUL
 	del $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin $(TARGETNAME).$(TARGETEXT).manifest \
-		$(TARGETDIR)\$(TARGETNAME).pdb $(TARGETNAME).pdb $(TARGETNAME).idb  2>nul
+		$(TARGETDIR)\$(TARGETNAME).pdb $(TARGETNAME).pdb $(TARGETNAME).idb 2>NUL
 
 $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
 	$(LINKER) $(OBJS) $(RESOURCE_RES) $(LFLAGS) /OUT:$(PROGNAME) $(LIBS)
 	$(MT) /outputresource:"$(PROGNAME);#1" /manifest $(TARGETNAME).$(TARGETEXT).manifest /nologo
 
-#!INCLUDE Makefile_targets.inc
 $(MESSAGES_H): messages.mc
 	$(MC) -U -h ".\\" -r ".\\" messages.mc
 
@@ -74,4 +73,3 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 {$(PROJECTDIR)}.c{$(PROJECTDIR)}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
-

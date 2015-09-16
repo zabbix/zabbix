@@ -28,7 +28,8 @@ ADD_RFLAGS = /d "ZABBIX_AGENT"
 
 !INCLUDE Makefile_common.inc
 
-OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
+OBJS = \
+	..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxalgo\vector.o \
 	..\..\..\src\libs\zbxcommon\alias.o \
 	..\..\..\src\libs\zbxcommon\comms.o \
@@ -94,4 +95,3 @@ LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.l
 
 !INCLUDE Makefile_tls.inc
 !INCLUDE Makefile_targets.inc
-

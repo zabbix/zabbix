@@ -2,7 +2,7 @@ CC = cl.exe
 LINKER = link.exe
 MC = mc.exe
 MT = mt.exe
-RC = rc.exe 
+RC = rc.exe
 
 MESSAGES_H = messages.h
 RESOURCE_H = resource.h
@@ -22,6 +22,6 @@ CPPFLAGS = $(INCS) $(ADD_CFLAGS) $(COMMON_FLAGS) /TP
 
 LFLAGS = /NOLOGO $(ADD_LFLAGS) /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"$(TARGETNAME).$(TARGETEXT).manifest" \
 	/MANIFESTUAC:"level='asInvoker' uiAccess='false'" /SUBSYSTEM:CONSOLE /DYNAMICBASE:NO \
-  /PDB:$(TARGETDIR)\$(TARGETNAME).pdb
+	/PDB:$(TARGETDIR)\$(TARGETNAME).pdb
 
 RFLAGS = $(ADD_RFLAGS) /d _WINDOWS
