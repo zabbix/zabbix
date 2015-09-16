@@ -2227,9 +2227,13 @@ $form-icon-btn: (
 	}
 
 	.debug-output {
-		margin: 0 10px;
+		margin: 10px 10px 0 10px;
 		max-height: 300px;
 		border-color: $table-border-color;
+	}
+
+	.msg-good, .msg-bad {
+		margin: 0 10px;
 	}
 }
 
