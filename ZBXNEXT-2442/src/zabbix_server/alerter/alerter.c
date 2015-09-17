@@ -158,13 +158,13 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
 			server_num, get_process_type_string(process_type), process_num);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
 	for (;;)
 	{
-		zbx_setproctitle("%s [sending alerts]", get_process_type_string(process_type));
+		zbx_setproctitle("%s #%d [sending alerts]", get_process_type_string(process_type), process_num);
 
 		sec = zbx_time();
 
@@ -176,10 +176,12 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 					"mt.gsm_modem,mt.username,mt.passwd,mt.smtp_port,mt.smtp_security,"
 					"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,a.retries"
 				" from alerts a,media_type mt"
-				" where a.mediatypeid=mt.mediatypeid"
+				" where MOD(a.alertid, %d)=0"
+					" and a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
 					" and a.alerttype=%d"
 				" order by a.alertid",
+				process_num,
 				ALERT_STATUS_NOT_SENT,
 				ALERT_TYPE_MESSAGE);
 
@@ -250,8 +252,8 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), alerts_success, alerts_fail, sec,
+		zbx_setproctitle("%s #%d [sent alerts: %d success, %d fail in " ZBX_FS_DBL " sec, idle %d sec]",
+				get_process_type_string(process_type), process_num, alerts_success, alerts_fail, sec,
 				CONFIG_SENDER_FREQUENCY);
 
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
