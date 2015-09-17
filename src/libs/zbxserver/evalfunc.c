@@ -1945,7 +1945,10 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 		nvalues = arg1;
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
+	{
+		*error = zbx_strdup(*error, "unable to get values from value cache");
 		goto out;
+	}
 
 	if (0 < values.values_num)
 	{
@@ -2064,7 +2067,10 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 		nvalues = arg1;
 
 	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
+	{
+		*error = zbx_strdup(*error, "unable to get values from value cache");
 		goto out;
+	}
 
 	if (0 < values.values_num)
 	{
