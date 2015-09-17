@@ -19,7 +19,7 @@
 **/
 
 
-include('include/views/js/administration.general.triggerDisplayOptions.js.php');
+include('include/views/js/administration.general.trigger.options.js.php');
 
 $widget = (new CWidget())
 	->setTitle(_('Trigger displaying options'))
