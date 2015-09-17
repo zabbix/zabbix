@@ -1883,12 +1883,15 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 		char **error)
 {
 	const char			*__function_name = "evaluate_FORECAST";
-	char				*fit = NULL, *mode = NULL;
-	double				*t = NULL, *x = NULL, prediction;
+	char				*fit_str = NULL, *mode_str = NULL;
+	double				*t = NULL, *x = NULL;
 	int				nparams, time, time_flag, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0,
 					time_shift, time_shift_flag;
+	unsigned			k;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			zero_time;
+	zbx_fit_t			fit;
+	zbx_mode_t			mode;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -1916,22 +1919,24 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 
 	if (4 <= nparams)
 	{
-		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 4, &fit))
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 4, &fit_str) ||
+				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
 			goto out;
 	}
 	else
 	{
-		fit = zbx_strdup(NULL, "");
+		fit = FIT_LINEAR;
 	}
 
 	if (5 == nparams)
 	{
-		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 5, &mode))
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 5, &mode_str) ||
+				SUCCEED != zbx_mode_code(mode_str, &mode, error))
 			goto out;
 	}
 	else
 	{
-		mode = zbx_strdup(NULL, "");
+		mode = MODE_VALUE;
 	}
 
 	if (ZBX_FLAG_SEC == flag)
@@ -1944,8 +1949,6 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 
 	if (0 < values.values_num)
 	{
-		history_value_t	result = {0};
-
 		t = zbx_malloc(t, values.values_num * sizeof(double));
 		x = zbx_malloc(x, values.values_num * sizeof(double));
 
@@ -1970,22 +1973,16 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 				x[i] = values.values[i].value.ui64;
 			}
 		}
-
-		if (SUCCEED != zbx_forecast(t, x, values.values_num, now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1),
-				time, fit, mode, &prediction, error))
-			goto out;
-
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, prediction);
-
-		ret = SUCCEED;
 	}
-	else
-		*error = zbx_strdup(*error, "no data available");
+
+	zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_forecast(t, x, values.values_num,
+			now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), time, fit, k, mode));
+	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	zbx_free(fit);
-	zbx_free(mode);
+	zbx_free(fit_str);
+	zbx_free(mode_str);
 
 	zbx_free(t);
 	zbx_free(x);
@@ -2012,12 +2009,14 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 		char **error)
 {
 	const char			*__function_name = "evaluate_TIMELEFT";
-	char				*fit = NULL;
-	double				*t = NULL, *x = NULL, threshold, timeleft;
+	char				*fit_str = NULL;
+	double				*t = NULL, *x = NULL, threshold;
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift,
 					time_shift_flag;
+	unsigned			k;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			zero_time;
+	zbx_fit_t			fit;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -2044,12 +2043,19 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 
 	if (4 == nparams)
 	{
-		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 4, &fit))
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 4, &fit_str) ||
+				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
 			goto out;
 	}
 	else
 	{
-		fit = zbx_strdup(NULL, "");
+		fit = FIT_LINEAR;
+	}
+
+	if ((FIT_EXPONENTIAL == fit || FIT_POWER == fit) && 0.0 >= threshold)
+	{
+		*error = zbx_strdup(*error, "exponential and power functions are always positive");
+		goto out;
 	}
 
 	if (ZBX_FLAG_SEC == flag)
@@ -2062,8 +2068,6 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 
 	if (0 < values.values_num)
 	{
-		history_value_t	result = {0};
-
 		t = zbx_malloc(t, values.values_num * sizeof(double));
 		x = zbx_malloc(x, values.values_num * sizeof(double));
 
@@ -2088,21 +2092,15 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 				x[i] = values.values[i].value.ui64;
 			}
 		}
-
-		if (SUCCEED != zbx_timeleft(t, x, values.values_num, now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1),
-				threshold, fit, &timeleft, error))
-			goto out;
-
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, timeleft);
-
-		ret = SUCCEED;
 	}
-	else
-		*error = zbx_strdup(*error, "no data available");
+
+	zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_timeleft(t, x, values.values_num,
+			now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), threshold, fit, k));
+	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
 
-	zbx_free(fit);
+	zbx_free(fit_str);
 
 	zbx_free(t);
 	zbx_free(x);
