@@ -259,3 +259,4 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 		zbx_sleep_loop(CONFIG_SENDER_FREQUENCY);
 	}
 }
+
