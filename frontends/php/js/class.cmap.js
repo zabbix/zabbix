@@ -198,7 +198,7 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = $('<div></div>', {
 					id: 'map-window',
 					class: 'overlay-dialogue',
-					style: 'display:none; position:absolute; top: 50px; left: 500px'})
+					style: 'display:none; top: 50px; left: 500px'})
 				.appendTo('body')
 				.draggable({
 					containment: [0, 0, 3200, 3200]
@@ -577,8 +577,6 @@ ZABBIX.apps.map = (function($) {
 				// open link form
 				$('.element-links').delegate('.openlink', 'click', function() {
 					that.currentLinkId = $(this).attr('data-linkid');
-					$('table.element-links tr').removeClass('selected');
-					$(this).parent().parent().addClass('selected');
 
 					var linkData = that.links[that.currentLinkId].getData();
 
@@ -623,17 +621,10 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				// changes for color inputs
-				this.linkForm.domNode.delegate('.colorpicker', 'change', function() {
+				this.linkForm.domNode.delegate('.input-color-picker input', 'change', function() {
 					var id = $(this).attr('id');
 
 					set_color_by_name(id, this.value);
-				});
-
-				this.linkForm.domNode.delegate('.colorpickerLabel', 'click', function() {
-					var id = $(this).attr('id'),
-						input = id.match(/^lbl_(.+)$/);
-
-					show_color_picker(input[1]);
 				});
 			},
 
@@ -979,10 +970,10 @@ ZABBIX.apps.map = (function($) {
 				this.selected = state;
 
 				if (this.selected) {
-					this.domNode.addClass('selected');
+					this.domNode.addClass('map-selected');
 				}
 				else {
-					this.domNode.removeClass('selected');
+					this.domNode.removeClass('map-selected');
 				}
 
 				return this.selected;
@@ -1245,9 +1236,6 @@ ZABBIX.apps.map = (function($) {
 				.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
 			$('#iconid_on, #iconid_maintenance, #iconid_disabled').val(0);
 
-			// apply jQuery UI elements
-			$('#elementApply, #elementRemove, #elementClose').button();
-
 			if (this.sysmap.data.iconmapid === '0') {
 				$('#use_iconmapLabel')
 					.mouseenter(function(e) {
@@ -1269,8 +1257,7 @@ ZABBIX.apps.map = (function($) {
 				},
 				popup: {
 					parameters: 'srctbl=hosts&dstfrm=selementForm&dstfld1=elementNameHost' +
-						'&srcfld1=hostid&writeonly=1',
-					buttonClass: 'btn-grey'
+						'&srcfld1=hostid&writeonly=1'
 				}
 			});
 
@@ -1285,8 +1272,7 @@ ZABBIX.apps.map = (function($) {
 				},
 				popup: {
 					parameters: 'srctbl=host_groups&dstfrm=selementForm&dstfld1=elementNameHostGroup' +
-						'&srcfld1=groupid&writeonly=1',
-					buttonClass: 'btn-grey'
+						'&srcfld1=groupid&writeonly=1'
 				}
 			});
 
@@ -1331,11 +1317,11 @@ ZABBIX.apps.map = (function($) {
 					url = urls[i];
 
 					// generate unique urlid
-					url.selementurlid = $('#urlContainer tr[id^=urlrow]').length;
+					url.selementurlid = $('#urlContainer tbody tr[id^=urlrow]').length;
 					while ($('#urlrow_' + url.selementurlid).length) {
 						url.selementurlid++;
 					}
-					$(tpl.evaluate(url)).appendTo('#urlContainer');
+					$(tpl.evaluate(url)).appendTo('#urlContainer tbody');
 				}
 			},
 
@@ -1361,7 +1347,7 @@ ZABBIX.apps.map = (function($) {
 				}
 
 				// clear urls
-				$('#urlContainer tr').remove();
+				$('#urlContainer tbody tr').remove();
 				this.addUrls(selement.urls);
 
 				// should be unchecked before action processor
@@ -1575,9 +1561,6 @@ ZABBIX.apps.map = (function($) {
 			$('#massIconidOn, #massIconidMaintenance, #massIconidDisabled')
 				.prepend('<option value="0">' + locale['S_DEFAULT'] + '</option>');
 
-			// apply jQuery UI elements
-			$('#massApply, #massRemove, #massClose').button();
-
 			this.actionProcessor = new ActionProcessor(formActions);
 			this.actionProcessor.process();
 		}
@@ -1588,7 +1571,6 @@ ZABBIX.apps.map = (function($) {
 			 */
 			show: function() {
 				this.formContainer.draggable('option', 'handle', '#massDragHandler');
-				$('#massElementCount').text(this.sysmap.selection.count);
 				this.formContainer.show();
 				this.domNode.show();
 				this.updateList();
@@ -1646,7 +1628,7 @@ ZABBIX.apps.map = (function($) {
 					i,
 					ln;
 
-				$('#massList').empty();
+				$('#massList tbody').empty();
 
 				for (id in this.sysmap.selection.selements) {
 					element = this.sysmap.selements[id];
@@ -1693,7 +1675,7 @@ ZABBIX.apps.map = (function($) {
 				});
 
 				for (i = 0, ln = list.length; i < ln; i++) {
-					$(tpl.evaluate(list[i])).appendTo('#massList');
+					$(tpl.evaluate(list[i])).appendTo('#massList tbody');
 				}
 			}
 		};
@@ -1709,9 +1691,6 @@ ZABBIX.apps.map = (function($) {
 			this.formContainer = formContainer;
 			this.triggerids = {};
 			this.domNode = $(new Template($('#linkFormTpl').html()).evaluate()).appendTo(formContainer);
-
-			// apply jQuery UI elements
-			$('#formLinkApply, #formLinkRemove, #formLinkClose').button();
 		}
 
 		LinkForm.prototype = {
@@ -1720,16 +1699,15 @@ ZABBIX.apps.map = (function($) {
 			 */
 			show: function() {
 				this.domNode.show();
-				$('.element-edit-control').button('disable');
+				$('.element-edit-control').attr('disabled', true);
 			},
 
 			/**
 			 * Hide form.
 			 */
 			hide: function() {
-				$('#linksList tr').removeClass('selected');
 				$('#linkForm').hide();
-				$('.element-edit-control').button('enable');
+				$('.element-edit-control').attr('disabled', false);
 			},
 
 			/**
@@ -1848,7 +1826,7 @@ ZABBIX.apps.map = (function($) {
 
 				// clear triggers
 				this.triggerids = {};
-				$('#linkTriggerscontainer tr').remove();
+				$('#linkTriggerscontainer tbody tr').remove();
 				this.addTriggers(link.linktriggers);
 			},
 
@@ -1863,11 +1841,11 @@ ZABBIX.apps.map = (function($) {
 
 				for (linkTrigger in triggers) {
 					this.triggerids[triggers[linkTrigger].triggerid] = linkTrigger;
-					$(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer');
+					$(tpl.evaluate(triggers[linkTrigger])).appendTo('#linkTriggerscontainer tbody');
 					$('#linktrigger_' + triggers[linkTrigger].linktriggerid + '_drawtype').val(triggers[linkTrigger].drawtype);
 				}
 
-				$('.colorpicker', this.domNode).change();
+				$('.input-color-picker input', this.domNode).change();
 			},
 
 			/**
@@ -1899,10 +1877,10 @@ ZABBIX.apps.map = (function($) {
 					linkTrigger.linktriggerid = linktriggerid;
 					linkTrigger.desc_exp = triggers[i].description;
 					linkTrigger.triggerid = triggers[i].triggerid;
-					$(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer');
+					$(tpl.evaluate(linkTrigger)).appendTo('#linkTriggerscontainer tbody');
 				}
 
-				$('.colorpicker', this.domNode).change();
+				$('.input-color-picker input', this.domNode).change();
 			},
 
 			/**
@@ -1915,7 +1893,7 @@ ZABBIX.apps.map = (function($) {
 					linkTable,
 					rowTpl,
 					list,
-					i,
+					i, j,
 					selement,
 					tmp,
 					ln,
@@ -1968,7 +1946,7 @@ ZABBIX.apps.map = (function($) {
 							fromElementName: this.sysmap.selements[link.selementid1].data.elementName,
 							toElementName: this.sysmap.selements[link.selementid2].data.elementName,
 							linkid: link.linkid,
-							linktriggers: linktriggers.join('\n')
+							linktriggers: linktriggers
 						});
 					}
 
@@ -2006,10 +1984,20 @@ ZABBIX.apps.map = (function($) {
 					});
 
 					for (i = 0, ln = list.length; i < ln; i++) {
-						$(rowTpl.evaluate(list[i])).appendTo(linkTable.find('tbody'));
+						var row = $(rowTpl.evaluate(list[i])),
+							row_urls = $('.element-urls', row);
+
+						for (j = 0; j < list[i].linktriggers.length; j++) {
+							if (j != 0) {
+								row_urls.append($('<br>'));
+							}
+							row_urls.append($('<span>').text(list[i].linktriggers[j]));
+						}
+
+						row.appendTo(linkTable.find('tbody'));
 					}
 
-					linkTable.show();
+					linkTable.closest('.element-links').show();
 				}
 				else {
 					$('#mapLinksContainer').hide();

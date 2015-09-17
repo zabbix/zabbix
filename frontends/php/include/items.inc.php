@@ -57,16 +57,20 @@ function get_item_logtype_style($logtype) {
 		case ITEM_LOGTYPE_INFORMATION:
 		case ITEM_LOGTYPE_SUCCESS_AUDIT:
 		case ITEM_LOGTYPE_VERBOSE:
-			return 'information';
+			return ZBX_STYLE_LOG_INFO_BG;
+
 		case ITEM_LOGTYPE_WARNING:
-			return 'warning';
+			return ZBX_STYLE_LOG_WARNING_BG;
+
 		case ITEM_LOGTYPE_ERROR:
 		case ITEM_LOGTYPE_FAILURE_AUDIT:
-			return 'high';
+			return ZBX_STYLE_LOG_HIGH_BG;
+
 		case ITEM_LOGTYPE_CRITICAL:
-			return 'disaster';
+			return ZBX_STYLE_LOG_DISASTER_BG;
+
 		default:
-			return 'normal';
+			return ZBX_STYLE_LOG_NA_BG;
 	}
 }
 
