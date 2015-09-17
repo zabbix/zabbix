@@ -937,6 +937,49 @@ int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error)
 	return ZBX_MATH_OK;
 }
 
+static void	zbx_log_expression(double now, zbx_fit_t fit, int k, zbx_matrix_t *coeffs)
+{
+	/* x is item value, t is time in seconds counted from now */
+	if (FIT_LINEAR == fit)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") + (" ZBX_FS_DBL ") * (" ZBX_FS_DBL " + t)",
+				ZBX_MATRIX_EL(coeffs, 0, 0), ZBX_MATRIX_EL(coeffs, 1, 0), now);
+	}
+	else if (FIT_POLYNOMIAL == fit)
+	{
+		char	*polynomial = NULL;
+		size_t	alloc, offset;
+
+		while (0 <= k)
+		{
+			zbx_snprintf_alloc(&polynomial, &alloc, &offset, "(" ZBX_FS_DBL ") * (" ZBX_FS_DBL " + t) ^ %d",
+					ZBX_MATRIX_EL(coeffs, k, 0), now, k);
+
+			if (0 < k--)
+				zbx_snprintf_alloc(&polynomial, &alloc, &offset, " + ");
+		}
+
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = %s", polynomial);
+
+		zbx_free(polynomial);
+	}
+	else if (FIT_EXPONENTIAL == fit)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") * exp( (" ZBX_FS_DBL ") * (" ZBX_FS_DBL " + t) )",
+				exp(ZBX_MATRIX_EL(coeffs, 0, 0)), ZBX_MATRIX_EL(coeffs, 1, 0), now);
+	}
+	else if (FIT_LOGARITHMIC == fit)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") + (" ZBX_FS_DBL ") * log(" ZBX_FS_DBL " + t)",
+				ZBX_MATRIX_EL(coeffs, 0, 0), ZBX_MATRIX_EL(coeffs, 1, 0), now);
+	}
+	else if (FIT_POWER == fit)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "fitted expression is: x = (" ZBX_FS_DBL ") * (" ZBX_FS_DBL " + t) ^ (" ZBX_FS_DBL ")",
+				exp(ZBX_MATRIX_EL(coeffs, 0, 0)), now, ZBX_MATRIX_EL(coeffs, 1, 0));
+	}
+}
+
 double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode)
 {
 	zbx_matrix_t	*coefficients = NULL;
@@ -962,6 +1005,8 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 
 	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, k, coefficients)))
 		goto out;
+
+	zbx_log_expression(now, fit, k, coefficients);
 
 	if (MODE_VALUE == mode)
 	{
@@ -1089,6 +1134,8 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 
 	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, k, coefficients)))
 		goto out;
+
+	zbx_log_expression(now, fit, k, coefficients);
 
 	if (ZBX_MATH_OK != (res = zbx_calculate_value(now, coefficients, fit, &current)))
 	{
