@@ -383,7 +383,7 @@ int	main(int argc, char **argv)
 			case '8':
 			case '9':
 				zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS"
-						" support.");
+						" support");
 				exit(EXIT_FAILURE);
 				break;
 #endif
@@ -467,16 +467,6 @@ int	main(int argc, char **argv)
 	zbx_tls_init_parent();
 #endif
 	zbx_tls_init_child();
-#else
-	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
-			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
-			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
-			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
-	{
-		zbx_error("TLS parameters cannot be used: 'zabbix_get' was compiled without TLS support.");
-		ret = FAIL;
-		goto out;
-	}
 #endif
 #if !defined(_WINDOWS)
 	signal(SIGINT,  get_signal_handler);
