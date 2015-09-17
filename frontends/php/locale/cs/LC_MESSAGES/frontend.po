@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 15:22+0300\n"
-"PO-Revision-Date: 2015-08-26 09:02+0300\n"
+"POT-Creation-Date: 2015-09-17 15:31+0300\n"
+"PO-Revision-Date: 2015-09-14 13:43+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1440572567.0\n"
+"X-POOTLE-MTIME: 1442230984.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -4251,7 +4251,7 @@ msgstr "Rozdíl mezi poslední a předcházející hodnotou je NOT N"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:439
 msgid "Different information about specific process(es). Returns float"
-msgstr ""
+msgstr "Rozdílné informace o specifických procesech. Vráti desetinné číslo"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -4293,7 +4293,7 @@ msgstr "Zakázat host?"
 #: app/views/administration.proxy.list.php:105
 #: include/views/configuration.hostgroups.list.php:145
 msgid "Disable hosts"
-msgstr ""
+msgstr "Zakázat hosty"
 
 #: include/views/configuration.hostgroups.list.php:146
 msgid "Disable hosts in the selected host groups?"
@@ -4510,12 +4510,12 @@ msgstr "Stav průzkumu"
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:547
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr ""
+msgstr "Čítače statistiky disku. Vrátí celé číslo pro položky v sektorech, operacích, bytech nebo desetinné číslo pro položky v sps, ops, bsp"
 
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:591
 msgid "Disk space in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Volné místo na disku v bytech nebo v procentech. Vráti celé číslo pro byty nebo desetinné číslo pro procenta"
 
 #: include/classes/items/CHelpItems.php:269
 #: include/classes/items/CHelpItems.php:551
@@ -4738,7 +4738,7 @@ msgstr "Prázdná podmínka akce."
 #: include/classes/api/services/CItemPrototype.php:300
 #, c-format
 msgid "Empty application prototype name in item prototype \"%1$s\"."
-msgstr ""
+msgstr "Prázdné jméno prototyp aplikace v prototypu položky \"%1$s\"."
 
 #: include/classes/validators/CColorValidator.php:33
 msgid "Empty color."
@@ -4899,7 +4899,7 @@ msgstr "Povolit hosta?"
 #: app/views/administration.proxy.list.php:102
 #: include/views/configuration.hostgroups.list.php:144
 msgid "Enable hosts"
-msgstr ""
+msgstr "Povolit hosty"
 
 #: app/views/administration.proxy.list.php:103
 msgid "Enable hosts monitored by selected proxies?"
@@ -5067,7 +5067,7 @@ msgstr "Seznam událostí [posledních 20]"
 
 #: include/classes/items/CHelpItems.php:347
 msgid "Event log monitoring. Returns log"
-msgstr ""
+msgstr "Monitoring logu událostí. Vráti log"
 
 #: include/views/configuration.action.list.php:27
 msgid "Event source"
@@ -5116,7 +5116,7 @@ msgstr "SQL chyba při spuštění [%1$s] v [%2$s]."
 #: include/classes/items/CHelpItems.php:329
 #: include/classes/items/CHelpItems.php:611
 msgid "Execute WMI query and return the first selected object. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Spustí WMI dotaz a vrátí první vybraný objekt. Vráti celé, desetinné číslo, řetězec nebo text (závisí od dotazu)"
 
 #: app/views/administration.script.edit.php:50
 #: app/views/administration.script.list.php:44
@@ -5170,7 +5170,7 @@ msgstr "Rozdělený koláčový"
 #: include/views/configuration.screen.list.php:66
 #: include/views/configuration.sysmap.list.php:61 templates.php:761
 msgid "Export"
-msgstr ""
+msgstr "Export"
 
 #: events.php:317
 msgid "Export to CSV"
@@ -5263,7 +5263,7 @@ msgstr "Neúspěšný audit"
 
 #: app/views/system.warning.php:21 app/views/system.warning.php:33
 msgid "Fatal error, please report to the Zabbix team"
-msgstr ""
+msgstr "Fatální chyba, prosím reportuje ji Zabbix týmu"
 
 #: app/views/monitoring.dashboard.view.php:48 jsLoader.php:191
 msgid "Favourite graphs"
@@ -5316,7 +5316,7 @@ msgstr "Pole \"%1$s\" je povinné."
 #: include/validate.inc.php:220
 #, c-format
 msgid "Field \"%1$s\" is not correct: %2$s"
-msgstr ""
+msgstr "Pole \"%1$s\" není správné: %2$s"
 
 #: include/validate.inc.php:146
 #, c-format
@@ -5348,7 +5348,7 @@ msgstr "Pole \"name\" je vyžadované."
 #: include/classes/items/CHelpItems.php:273
 #: include/classes/items/CHelpItems.php:555
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer"
-msgstr ""
+msgstr "Kontrolní součet souboru kalkulovaný UNIX cksum algoritmem. Vráti celé číslo"
 
 #: include/classes/api/services/CImage.php:562
 msgid "File format is unsupported."
@@ -5367,12 +5367,12 @@ msgstr "Soubor poskytnutý pro náhled neexistuje. \"%s\" nebylo nalezeno."
 #: include/classes/items/CHelpItems.php:297
 #: include/classes/items/CHelpItems.php:579
 msgid "File size (in bytes). Returns integer"
-msgstr ""
+msgstr "Velikost souboru (v bytech). Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:301
 #: include/classes/items/CHelpItems.php:583
 msgid "File time information. Returns integer (Unix timestamp)"
-msgstr ""
+msgstr "Informace o čase souboru. Vráti celé číslo (Unix timestamp)"
 
 #: include/graphs.inc.php:57
 msgid "Filled region"
@@ -5417,17 +5417,17 @@ msgstr "Najdi řetězec V v poslední hodnotě. N NOT 1 - když se najde, 0 - ji
 #: include/classes/items/CHelpItems.php:293
 #: include/classes/items/CHelpItems.php:575
 msgid "Find string in a file. Returns 0 - match not found; 1 - found"
-msgstr ""
+msgstr "Najdi řetězec v souboru. Vráti 0 - nenalezený, 1 - nalezený"
 
 #: include/classes/items/CHelpItems.php:289
 #: include/classes/items/CHelpItems.php:571
 msgid "Find string in a file. Returns the line containing the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "Najdi řetězec v souboru. Vráti řádek obsahující vybraný řetězec nebo výstup definovaný ve volitelném výstupním parametru"
 
 #: include/classes/items/CHelpItems.php:325
 #: include/classes/items/CHelpItems.php:607
 msgid "Find string on a web page. Returns the matched string, or as specified by the optional output parameter"
-msgstr ""
+msgstr "Najdi řetězec ve web stránce. Vráti vybraný řetězec nebo výstup definovaný ve volitelném výstupním parametru"
 
 #: include/classes/setup/CSetupWizard.php:118
 msgid "Finish"
@@ -5561,7 +5561,7 @@ msgstr "Německy (de_DE)"
 #: include/classes/items/CHelpItems.php:317
 #: include/classes/items/CHelpItems.php:599
 msgid "Get content of web page. Returns web page source as text"
-msgstr ""
+msgstr "Získat obsah web stránky. Vráti zdrojový kód web stránky jako text"
 
 #: include/triggers.inc.php:1606 tr_testexpr.php:35
 msgid "Given expression is not a macro"
@@ -5581,7 +5581,7 @@ msgstr "Globální skripty"
 
 #: include/views/hostmacros.php:46
 msgid "Global value"
-msgstr ""
+msgstr "Globální hodnota"
 
 #: jsLoader.php:200
 msgid "Go to"
@@ -5942,7 +5942,7 @@ msgstr "Hardware (podrobně)"
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:443
 msgid "Hardware sensor reading. Returns float"
-msgstr ""
+msgstr "Čtení hardwarového senzoru. Vráti desetinné číslo"
 
 #: include/views/configuration.httpconf.edit.php:110
 #: include/views/configuration.httpconf.popup.php:97
@@ -5977,7 +5977,7 @@ msgstr "Skrýt vše"
 
 #: include/html.inc.php:847
 msgid "Hide debug"
-msgstr ""
+msgstr "Skrýt debug"
 
 #: include/views/monitoring.history.php:154
 msgid "Hide selected"
@@ -6003,7 +6003,7 @@ msgstr "Historie"
 
 #: include/forms.inc.php:573
 msgid "History (in days)"
-msgstr ""
+msgstr "Historie (ve dnech)"
 
 #: httpconf.php:183 httpconf.php:190 httpconf.php:439 httpconf.php:451
 #: items.php:531 items.php:538 items.php:792 items.php:804
@@ -6241,7 +6241,7 @@ msgstr "Typ popisu hosta"
 
 #: include/views/hostmacros.php:173
 msgid "Host macros"
-msgstr ""
+msgstr "Host makra"
 
 #: include/actions.inc.php:94
 msgid "Host metadata"
@@ -6501,7 +6501,7 @@ msgstr "IP a DNS nemůže být prázdné pro hostovo rozhraní."
 
 #: include/views/configuration.host.list.php:41
 msgid "IP like"
-msgstr ""
+msgstr "IP jako"
 
 #: include/views/configuration.discovery.edit.php:51
 #: include/views/configuration.discovery.list.php:38
@@ -6841,7 +6841,7 @@ msgstr "Včetně"
 #: include/classes/items/CHelpItems.php:97
 #: include/classes/items/CHelpItems.php:379
 msgid "Incoming traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Statistika příchozího provozu na síťovém rozhraní. Vráti celé číslo"
 
 #: include/classes/api/services/CService.php:1129
 #, c-format
@@ -7333,7 +7333,7 @@ msgstr "Neplatný počet maximálních sloupců v prvku obrazovky."
 #: include/classes/api/services/CMediatype.php:253
 #, c-format
 msgid "Incorrect media type port \"%1$s\" provided."
-msgstr ""
+msgstr "Poskytován nesprávný média type port  \"%1$s\"."
 
 #: include/classes/api/services/CScript.php:532
 #, c-format
@@ -7664,11 +7664,11 @@ msgstr "Informační"
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:447
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
-msgstr ""
+msgstr "Informace o službě. Vrací celé číslo s parametrem jako status, startup; řetězec - s parametrem jako displayname, cesta, uživatel; text - s parametrem jako description; Speciálně pro status: 0 - běží, 1 - pauza, 2 - start čeká, 3 - pauza čeká, 4 - pokračovat čeká, 5 - stop čeká, 6 - zastavena, 7 - neznámý, 255 - žádná služba; Speciálně pro startup: 0 - automaticky, 1 - automaticky zpožděný, 2 - manuální, 3 - zakázána, 4 - neznámý"
 
 #: include/views/hostmacros.php:174
 msgid "Inherited and host macros"
-msgstr ""
+msgstr "Dědičná a hostitelská makra"
 
 #: include/views/hostmacros.php:174
 msgid "Inherited and template macros"
@@ -7686,7 +7686,7 @@ msgstr "Vložit výraz"
 #: include/classes/setup/CSetupWizard.php:55
 #: include/classes/setup/CSetupWizard.php:405
 msgid "Install"
-msgstr ""
+msgstr "Instalovat"
 
 #: setup.php:102
 msgid "Installation"
@@ -7827,7 +7827,7 @@ msgstr "Neplatný požadavek."
 #: include/classes/import/validators/CXmlValidator.php:62
 #, c-format
 msgid "Invalid XML tag \"%1$s\": %2$s."
-msgstr ""
+msgstr "Neplatný XML tag \"%1$s\": %2$s."
 
 #: maintenance.php:144 maintenance.php:158 services.php:187 services.php:201
 #, c-format
@@ -8288,7 +8288,7 @@ msgstr "Klíč \"%1$s\" nevybral <grpmax|grpmin|grpsum|grpavg>[\"Skupinu(y)\", \
 
 #: include/forms.inc.php:603
 msgid "Key like"
-msgstr ""
+msgstr "Klíč jako"
 
 #: include/views/configuration.action.edit.php:851
 #: include/views/js/common.item.edit.js.php:190
@@ -8419,7 +8419,7 @@ msgstr "Graf za poslední hodinu"
 
 #: include/views/reports.toptriggers.php:57
 msgid "Last month"
-msgstr ""
+msgstr "Minulý měsíc"
 
 #: jsLoader.php:208
 msgid "Last month graph"
@@ -8440,7 +8440,7 @@ msgstr "Poslední hodnota"
 
 #: include/views/reports.toptriggers.php:54
 msgid "Last week"
-msgstr ""
+msgstr "Minulý týden"
 
 #: jsLoader.php:209
 msgid "Last week graph"
@@ -8448,7 +8448,7 @@ msgstr "Graf za minulý týden"
 
 #: include/views/reports.toptriggers.php:60
 msgid "Last year"
-msgstr ""
+msgstr "Minulý rok"
 
 #: include/menu.inc.php:48 include/views/inventory.host.view.php:138
 #: jsLoader.php:205 latest.php:26 latest.php:336 search.php:128 search.php:231
@@ -8563,22 +8563,22 @@ msgstr "Seznam je prázdný"
 #: include/classes/items/CHelpItems.php:213
 #: include/classes/items/CHelpItems.php:495
 msgid "Listing of MAC addresses. Returns string"
-msgstr ""
+msgstr "Seznam MAC adres. Vráti řetězec"
 
 #: include/classes/items/CHelpItems.php:209
 #: include/classes/items/CHelpItems.php:491
 msgid "Listing of PCI or USB devices. Returns text"
-msgstr ""
+msgstr "Seznam PCI a USB zařízení. Vráti text"
 
 #: include/classes/items/CHelpItems.php:237
 #: include/classes/items/CHelpItems.php:519
 msgid "Listing of installed packages. Returns text"
-msgstr ""
+msgstr "Seznam nainstalovaných balíčků. Vráti text"
 
 #: include/classes/items/CHelpItems.php:169
 #: include/classes/items/CHelpItems.php:451
 msgid "Listing of services. Returns 0 - if empty; text - list of services separated by a newline"
-msgstr ""
+msgstr "Seznam služeb. Vráti 0 - když nejsou žádné služby nebo text - seznam služeb oddělených novým řádkem"
 
 #: include/locales.inc.php:69
 msgid "Lithuanian (lt_LT)"
@@ -8587,7 +8587,7 @@ msgstr "Litevsky (lt_LT)"
 #: include/classes/items/CHelpItems.php:321
 #: include/classes/items/CHelpItems.php:603
 msgid "Loading time of full web page (in seconds). Returns float"
-msgstr ""
+msgstr "Načítání celé web stránky (v sekundách). Vrátí desetinné číslo"
 
 #: include/classes/screens/CScreenHistory.php:147
 #: include/views/configuration.screen.constructor.edit.php:610
@@ -8615,11 +8615,11 @@ msgstr "Log"
 
 #: include/classes/items/CHelpItems.php:363
 msgid "Log file monitoring with log rotation support. Returns log"
-msgstr ""
+msgstr "Log monitoring s podporou rotování log souborů. Vráti log"
 
 #: include/classes/items/CHelpItems.php:359
 msgid "Log file monitoring. Returns log"
-msgstr ""
+msgstr "Log monitoring. Vrátí log"
 
 #: popup_trexpr.php:478
 msgid "Log severity of the last log entry is < N"
@@ -8735,7 +8735,7 @@ msgstr "MD5"
 #: include/classes/items/CHelpItems.php:285
 #: include/classes/items/CHelpItems.php:567
 msgid "MD5 checksum of file. Returns character string (MD5 hash of the file)"
-msgstr ""
+msgstr "MD5 kontrolní součet souboru. Vráti řetězec (MD5 hash souboru)"
 
 #: include/audit.inc.php:49
 #: include/views/administration.general.macros.edit.php:33
@@ -8997,12 +8997,12 @@ msgstr "Maximální číslo flexibilních intervalů bylo přidané"
 #: include/classes/items/CHelpItems.php:77
 #: include/classes/items/CHelpItems.php:351
 msgid "Maximum number of opened files supported by OS. Returns integer"
-msgstr ""
+msgstr "Maximální počet otevřených souborů podporovaný OS. Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:81
 #: include/classes/items/CHelpItems.php:355
 msgid "Maximum number of processes supported by OS. Returns integer"
-msgstr ""
+msgstr "Maximální počet procesů podporovaný OS. Vráti celé číslo"
 
 #: include/classes/screens/CScreenBase.php:352 include/graphs.inc.php:415
 #, c-format
@@ -9053,7 +9053,7 @@ msgstr "Typ média"
 #: include/classes/api/services/CMediatype.php:239
 #, c-format
 msgid "Media type \"%1$s\" already exists."
-msgstr ""
+msgstr "Media type \"%1$s\" již existuje."
 
 #: app/controllers/CControllerMediatypeCreate.php:115
 msgid "Media type added"
@@ -9102,17 +9102,17 @@ msgstr "Členové"
 #: include/classes/debug/CProfiler.php:139
 #, c-format
 msgid "Memory limit: %1$s"
-msgstr ""
+msgstr "Limit paměti: %1$s"
 
 #: include/classes/items/CHelpItems.php:313
 #: include/classes/items/CHelpItems.php:595
 msgid "Memory size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Velikost paměti v bytech nebo v procentech. Vráti celé číslo pro byty nebo desetinné číslo pro procenta"
 
 #: include/classes/items/CHelpItems.php:149
 #: include/classes/items/CHelpItems.php:431
 msgid "Memory used by process in bytes. Returns integer"
-msgstr ""
+msgstr "Paměť použitá procesem v bytech. Vráti celé číslo"
 
 #: app/views/monitoring.acknowledge.edit.php:23
 #: app/views/monitoring.acknowledge.edit.php:32 include/acknow.inc.php:49
@@ -9234,7 +9234,7 @@ msgstr "Chybějící \"itemid\" pole pro položku."
 #: include/classes/api/services/CItemPrototype.php:294
 #, c-format
 msgid "Missing \"name\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "Chybějící \"name\" pro prototyp aplikace v prototypu položky \"%1$s\"."
 
 #: include/classes/api/services/CGraphPrototype.php:39
 msgid "Missing \"name\" field for graph prototype."
@@ -9438,7 +9438,7 @@ msgstr "Jméno pro prototyp skupiny \"%1$s\" musí obsahovat makra."
 
 #: include/forms.inc.php:586 include/views/configuration.host.list.php:35
 msgid "Name like"
-msgstr ""
+msgstr "Jméno jako"
 
 #: include/views/administration.general.housekeeper.edit.php:50
 msgid "Network discovery data storage period (in days)"
@@ -9456,7 +9456,7 @@ msgstr "Perioda uložení údajů událostí a poplachů objevování sítí (ve
 #: include/classes/items/CHelpItems.php:101
 #: include/classes/items/CHelpItems.php:383
 msgid "Network interface list (includes interface type, status, IPv4 address, description). Returns text"
-msgstr ""
+msgstr "Seznam síťových rozhraní (zahrnuje typ rozhraní, status, IPv4 adresu, popis). Vráti text"
 
 #: sysmaps.php:174
 msgid "Network map added"
@@ -9501,7 +9501,7 @@ msgstr "Nová aplikace"
 
 #: include/views/configuration.item.prototype.edit.php:397
 msgid "New application prototype"
-msgstr ""
+msgstr "Nový prototyp aplikace"
 
 #: include/views/configuration.action.edit.php:356
 msgid "New condition"
@@ -9540,7 +9540,7 @@ msgstr "Nový servisní čas"
 #: include/classes/setup/CSetupWizard.php:271
 #: include/classes/setup/CSetupWizard.php:341
 msgid "Next step"
-msgstr ""
+msgstr "Další krok"
 
 #: events.php:783 include/events.inc.php:341 include/func.inc.php:1945
 #: include/triggers.inc.php:1474
@@ -9689,7 +9689,7 @@ msgstr "Bez sběru dat"
 
 #: include/classes/html/CTableInfo.php:27
 msgid "No data found."
-msgstr ""
+msgstr "Nebyla nalezena žádná data."
 
 #: popup_trexpr.php:536
 msgid "No data received during period of time T, then N = 1, 0 - otherwise"
@@ -9765,7 +9765,7 @@ msgstr "Žádné grafy nebyly přidané."
 #: include/classes/api/services/CHost.php:533
 #, c-format
 msgid "No groups for host \"%1$s\"."
-msgstr ""
+msgstr "Žádné skupiny pro host \"%1$s\"."
 
 #: include/classes/api/services/CHost.php:934
 msgid "No groups for hosts."
@@ -10098,7 +10098,7 @@ msgstr "Normální"
 
 #: app/views/administration.mediatype.edit.php:76
 msgid "Normal password"
-msgstr ""
+msgstr "Normální heslo"
 
 #: include/html.inc.php:211
 msgid "Normal view"
@@ -10188,11 +10188,11 @@ msgstr "Nyní"
 #: include/classes/items/CHelpItems.php:185
 #: include/classes/items/CHelpItems.php:467
 msgid "Number of CPUs. Returns integer"
-msgstr ""
+msgstr "Počet procesorů. Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:887
 msgid "Number of enabled items on the host."
-msgstr ""
+msgstr "Počet povolených položek na hostitele."
 
 #: include/blocks.inc.php:478 include/blocks.inc.php:479
 msgid "Number of hosts (enabled/disabled/templates)"
@@ -10221,7 +10221,7 @@ msgstr "Počet monitorovaných hostů"
 #: include/classes/items/CHelpItems.php:93
 #: include/classes/items/CHelpItems.php:375
 msgid "Number of out-of-window collisions. Returns integer"
-msgstr ""
+msgstr "Počet out-of-window kolízí. Vráti celé číslo"
 
 #: include/classes/items/CHelpItems.php:691
 msgid "Number of processor cores on VMware hypervisor, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -11002,19 +11002,19 @@ msgstr ""
 
 #: popup_trexpr.php:304
 msgid "Percentile P of a period T is < N"
-msgstr ""
+msgstr "Percentil P za čas T je < N"
 
 #: popup_trexpr.php:314
 msgid "Percentile P of a period T is = N"
-msgstr ""
+msgstr "Percentil P za čas T je = N"
 
 #: popup_trexpr.php:309
 msgid "Percentile P of a period T is > N"
-msgstr ""
+msgstr "Percentil P za čas T je > N"
 
 #: popup_trexpr.php:319
 msgid "Percentile P of a period T is NOT N"
-msgstr ""
+msgstr "Percentil P za čas T je NOT N"
 
 #: graphs.php:52 include/views/configuration.graph.edit.php:93
 msgid "Percentile line (left)"
@@ -11027,7 +11027,7 @@ msgstr "Procentuální čára (vpravo)"
 #: include/classes/items/CHelpItems.php:89
 #: include/classes/items/CHelpItems.php:371
 msgid "Performs a DNS query. Returns character string with the required type of information"
-msgstr ""
+msgstr "Vykonat DNS dotaz. Vrátí řetězec s požadovaným typem informace"
 
 #: include/views/configuration.host.discovery.edit.php:200
 #: include/views/configuration.host.discovery.edit.php:240
@@ -11090,16 +11090,16 @@ msgstr "Přehrávat zvuk"
 #: include/classes/setup/CSetupWizard.php:341
 #, c-format
 msgid "Please check configuration parameters. If all is correct, press \"%1$s\" button, or \"%2$s\" button to change configuration parameters."
-msgstr ""
+msgstr "Zkontrolujte konfigurační parametry. Je-li vše v pořádku, stiskni \"%1$s\" tlačítko, nebo \"%2$s\" tlačítko pro změnu konfiguračních parametrů."
 
 #: include/classes/setup/CSetupWizard.php:271
 #, c-format
 msgid "Please create database manually, and set the configuration parameters for connection to this database. Press \"%1$s\" button when done."
-msgstr ""
+msgstr "Prosím, vytvořit databázi ručně, a nastav konfigurační parametry pro připojení k této databázi. Stiskni \"%1$s\" tlačítko pokud jsi to udělal."
 
 #: include/classes/setup/CSetupWizard.php:300
 msgid "Please enter the host name or host IP address and port number of the Zabbix server, as well as the name of the installation (optional)."
-msgstr ""
+msgstr "Prosím, zadej název hostitele nebo host IP addresu a číslo portu Zabbix serveru, stejně jako jméno instalace (volitelné)."
 
 #: jsLoader.php:146
 msgid "Please select two elements"
@@ -11136,7 +11136,7 @@ msgstr "Port nemůže být prázdny pro rozhraní hosta."
 
 #: include/forms.inc.php:479 include/views/configuration.host.list.php:44
 msgid "Port like"
-msgstr ""
+msgstr "Port jako"
 
 #: include/views/js/configuration.discovery.edit.js.php:40
 msgid "Port range"
@@ -12031,11 +12031,11 @@ msgstr "SSL verifikace certifikátu hosta"
 
 #: app/views/administration.mediatype.edit.php:68
 msgid "SSL/TLS"
-msgstr ""
+msgstr "SSL/TLS"
 
 #: app/views/administration.mediatype.edit.php:67
 msgid "STARTTLS"
-msgstr ""
+msgstr "STARTTLS"
 
 #: include/httptest.inc.php:301
 msgid "Safari"
@@ -12053,7 +12053,7 @@ msgstr "Sobota"
 #: include/classes/setup/CSetupWizard.php:387
 #, c-format
 msgid "Save it as \"%1$s\""
-msgstr ""
+msgstr "Uložte jej jako \"%1$s\""
 
 #: include/views/configuration.httpconf.edit.php:251
 msgid "Scenario"
@@ -12169,7 +12169,7 @@ msgstr "Skript byl přidán"
 #: include/classes/api/services/CScript.php:398
 #: include/classes/api/services/CScript.php:442
 msgid "Script command cannot be empty."
-msgstr ""
+msgstr "Skript nemůže být prázdný."
 
 #: app/controllers/CControllerScriptDelete.php:72
 msgid "Script deleted"
@@ -12197,7 +12197,7 @@ msgstr "Skript se jménem \"%1$s\" již existuje v menu cestě pro skript \"%2$s
 #: include/classes/api/services/CScript.php:395
 #: include/classes/api/services/CScript.php:437
 msgid "Script name cannot be empty."
-msgstr ""
+msgstr "Jméno skriptu nemůže být prázdné."
 
 #: include/classes/debug/CProfiler.php:124
 msgid "Script profiler"
@@ -12289,7 +12289,7 @@ msgstr "Bezpečnostní jméno"
 
 #: include/forms.inc.php:470
 msgid "Security name like"
-msgstr ""
+msgstr "Název security jako"
 
 #: events.php:359 include/classes/html/CMultiSelect.php:54
 #: include/forms.inc.php:562
@@ -12632,7 +12632,7 @@ msgstr "Přihlásit se"
 
 #: app/views/layout.htmlpage.menu.php:71
 msgid "Sign out"
-msgstr ""
+msgstr "Odhlásit se"
 
 #: include/views/js/configuration.graph.edit.js.php:31
 msgid "Simple"
@@ -12786,7 +12786,7 @@ msgstr "Software aplikace E"
 #: include/classes/items/CHelpItems.php:229
 #: include/classes/items/CHelpItems.php:511
 msgid "Software architecture information. Returns string"
-msgstr ""
+msgstr "Software architektura. Vrátí řetězec"
 
 #: include/views/configuration.screen.constructor.edit.php:453
 msgid "Sort entries by"
@@ -12940,7 +12940,7 @@ msgstr "Trvání kroku"
 
 #: include/views/configuration.httpconf.popup.php:114 popup_httpstep.php:24
 msgid "Step of web scenario"
-msgstr ""
+msgstr "Krok web scénáře"
 
 #: include/views/configuration.httpconf.popup.php:33
 #, c-format
@@ -13087,7 +13087,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:539
 msgid "System uptime in seconds. Returns integer"
-msgstr ""
+msgstr "Systém uptime v sekundách. Vráti celé číslo"
 
 #: jsLoader.php:127
 msgctxt "Thursday short"
@@ -13226,7 +13226,7 @@ msgstr "Šablona byla aktualizována"
 
 #: include/views/hostmacros.php:46
 msgid "Template value"
-msgstr ""
+msgstr "Šablona hodnota"
 
 #: include/classes/api/services/CTemplate.php:995
 #, c-format
@@ -13327,11 +13327,11 @@ msgstr "Souřadnice Y prvku obrazovky umístěného na X - %1$s a Y - %2$s obraz
 #: include/views/configuration.application.list.php:97
 #, c-format
 msgid "The application is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s)."
-msgstr ""
+msgstr "Aplikace není objevena a již bude smazána v %1$s (%2$s %3$s)."
 
 #: include/views/configuration.application.list.php:92
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr ""
+msgstr "Aplikace není objevena a již bude odstraněna při příštím objevovacím pravidle  bude zpracováno."
 
 #: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
@@ -13392,7 +13392,7 @@ msgstr "Položka již není objevovaná a bude smazána při dalším objevován
 #: include/classes/items/CHelpItems.php:153
 #: include/classes/items/CHelpItems.php:435
 msgid "The number of processes. Returns integer"
-msgstr ""
+msgstr "Počet procesů. Vráti celé číslo"
 
 #: include/classes/core/CJsonRpc.php:175
 msgid "The received JSON is not a valid JSON-RPC Request."
@@ -13567,12 +13567,12 @@ msgstr "Celkem"
 #: include/classes/debug/CProfiler.php:128
 #, c-format
 msgid "Total SQL time: %1$s"
-msgstr ""
+msgstr "Celkový čas SQL: %1$s"
 
 #: include/classes/debug/CProfiler.php:126
 #, c-format
 msgid "Total time: %1$s"
-msgstr ""
+msgstr "Celkový čas: %1$s"
 
 #: include/page_footer.php:46
 msgid "Transaction has not been closed. Aborting..."
@@ -13580,7 +13580,7 @@ msgstr "Operace nebyla ukončená. Ukončuji ji..."
 
 #: include/classes/items/CHelpItems.php:981
 msgid "Transform SQL query result into a JSON object for low-level discovery."
-msgstr ""
+msgstr "Změň výstup SQL dotazu na JSON objekt pro nízko úrovňové objevování."
 
 #: include/classes/core/CJsonRpc.php:204
 msgid "Transport error."
@@ -13615,7 +13615,7 @@ msgstr "Trendy"
 
 #: include/forms.inc.php:590
 msgid "Trends (in days)"
-msgstr ""
+msgstr "Trendy (ve dnech)"
 
 #: events.php:312 events.php:355 include/actions.inc.php:56
 #: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:486
@@ -14985,7 +14985,7 @@ msgstr "Mapování hodnot musí mít nejméně jedno mapování."
 #: include/classes/items/CHelpItems.php:141
 #: include/classes/items/CHelpItems.php:423
 msgid "Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)"
-msgstr ""
+msgstr "Hodnota Windows čítače výkonu. Vráti celé, desetinné číslo, řetězec nebo text (závisí na dotazu)"
 
 #: include/classes/graphdraw/CPieGraphDraw.php:345
 msgid "Value: no data"
@@ -15011,7 +15011,7 @@ msgstr "Upovídaný"
 #: include/classes/items/CHelpItems.php:73
 #: include/classes/items/CHelpItems.php:343
 msgid "Version of Zabbix agent. Returns string"
-msgstr ""
+msgstr "Verze Zabbix agenta. Vráti řetězec"
 
 #: include/views/configuration.screen.constructor.edit.php:649
 msgid "Vertical"
@@ -15081,7 +15081,7 @@ msgstr "Sledování webů"
 #: httpconf.php:182 httpconf.php:330 httpconf.php:387 httpconf.php:438
 #: include/audit.inc.php:42 include/classes/api/services/CHttpTest.php:416
 msgid "Web scenario"
-msgstr ""
+msgstr "Web scénář"
 
 #: include/classes/api/managers/CHttpTestManager.php:385
 #: include/classes/api/managers/CHttpTestManager.php:393
@@ -15098,7 +15098,7 @@ msgstr "Web scénář \"%1$s\" již existuje."
 
 #: httpconf.php:200
 msgid "Web scenario added"
-msgstr ""
+msgstr "Web scénář přidaný"
 
 #: httpconf.php:150 httpconf.php:460
 msgid "Web scenario deleted"
@@ -15156,7 +15156,7 @@ msgstr "Číslo kroku web scénáře nemůže být menší než 1."
 
 #: httpconf.php:195
 msgid "Web scenario updated"
-msgstr ""
+msgstr "Web scénář aktualizovaný"
 
 #: include/html.inc.php:449 include/views/configuration.host.edit.php:549
 #: include/views/configuration.template.edit.php:375
@@ -15179,11 +15179,11 @@ msgstr "Týdně"
 
 #: include/classes/setup/CSetupWizard.php:35
 msgid "Welcome"
-msgstr ""
+msgstr "Vítejte"
 
 #: include/classes/setup/CSetupWizard.php:152
 msgid "Welcome to"
-msgstr ""
+msgstr "Vítejte v"
 
 #: include/views/administration.users.edit.php:196 popup_media.php:135
 msgid "When active"
@@ -15262,7 +15262,7 @@ msgstr "Nesprávné pole pro element."
 #: include/classes/api/services/CHost.php:511
 #, c-format
 msgid "Wrong fields for host \"%1$s\"."
-msgstr ""
+msgstr "Nesprávné pole pro hosta \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:457
 #, c-format
@@ -15389,7 +15389,7 @@ msgstr "Y-m-d H:i:s"
 #: include/classes/import/validators/C30XmlValidator.php:867
 msgctxt "XML date and time format"
 msgid "YYYY-MM-DDThh:mm:ssZ"
-msgstr ""
+msgstr "YYYY-MM-DDThh:mm:ssZ"
 
 #: report3.php:76 report3.php:90 report4.php:113 report4.php:133
 msgid "Year"
@@ -15695,7 +15695,7 @@ msgstr "zkontroluj výraz začínající od \"%1$s\""
 
 #: include/views/hostmacros.php:38
 msgid "configure"
-msgstr ""
+msgstr "konfigurace"
 
 #: include/func.inc.php:552 jsLoader.php:99
 msgctxt "day short"
@@ -15785,7 +15785,7 @@ msgstr "hh"
 #: include/classes/import/validators/C10XmlValidator.php:361
 msgctxt "XML time format"
 msgid "hh.mm"
-msgstr ""
+msgstr "hh.mm"
 
 #: include/classes/api/services/CMap.php:361
 msgid "host"
