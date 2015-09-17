@@ -70,7 +70,7 @@ class CItemDelayFlexValidator extends CValidator {
 	 */
 	private function validateFlexibleInterval($interval) {
 		if ($interval['delay'] > SEC_PER_DAY) {
-			$this->setError(_s('Invalid flexible interval delay "%1$s": delay exceeds maximum delay "%2$s".',
+			$this->setError(_s('Invalid flexible interval delay: "%1$s" exceeds maximum delay of "%2$s".',
 				$interval['delay'],
 				SEC_PER_DAY
 			));
