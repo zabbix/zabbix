@@ -346,12 +346,15 @@ article, .article {
     vertical-align: middle; }
     .object-group li span {
       padding: 4px 7px; }
-    .object-group li .status-container span {
-      padding: 2px 3px 1px 3px; }
+    .object-group li .status-container {
+      margin: 0 5px 0 0; }
+      .object-group li .status-container span {
+        padding: 2px 3px 1px 3px; }
   .object-group .selected, .object-group .calendar .selected:hover, .calendar .object-group .selected:hover {
     background-color: #fff;
-    margin: -1px;
-    border: 1px solid #dfe4e7;
+    -webkit-box-shadow: inset 0 0 0 1px #dfe4e7;
+    -moz-box-shadow: inset 0 0 0 1px #dfe4e7;
+    box-shadow: inset 0 0 0 1px #dfe4e7;
     -webkit-border-radius: 2px;
     -moz-border-radius: 2px;
     border-radius: 2px; }
@@ -1315,7 +1318,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
       border-left: 0; }
     .ui-tabs-nav li.ui-tabs-active a {
       padding: 8px 13px 9px 13px;
-      font-weight: bold;
       background-color: #fff;
       color: #1f2c33;
       text-decoration: none;
@@ -1514,9 +1516,11 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     .dashbrd-widget .list-table tbody tr:last-child td {
       border-bottom: 1px solid #ebeef0; }
   .dashbrd-widget .debug-output {
-    margin: 0 10px;
+    margin: 10px 10px 0 10px;
     max-height: 300px;
     border-color: #ebeef0; }
+  .dashbrd-widget .msg-good, .dashbrd-widget .msg-bad {
+    margin: 0 10px; }
 
 .list-table tbody tr.nothing-to-show {
   text-align: center;
