@@ -28,6 +28,10 @@
 #define DB_INFINITY	(1e12-1e-4)
 #define ERROR_CODE	-1.0
 
+#define ZBX_MATH_EPSILON	(1.0e-6)
+
+#define ZBX_IS_NAN(x)	(x != x)
+
 #define ZBX_VALID_MATRIX(m)		(0 < m->rows && 0 < m->columns && NULL != m->elements)
 #define ZBX_MATRIX_EL(m, row, col)	(m->elements[(row) * m->columns + (col)])
 #define ZBX_MATRIX_ROW(m, row)		(m->elements + (row) * m->columns)
@@ -53,7 +57,7 @@ static int	zbx_matrix_alloc(zbx_matrix_t *m, int rows, int columns)
 {
 	if (0 >= rows || 0 >= columns)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "invalid matrix dimensions");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -77,7 +81,7 @@ static int	zbx_matrix_copy(zbx_matrix_t *dest, zbx_matrix_t *src)
 {
 	if (!ZBX_VALID_MATRIX(src))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "source matrix is not valid");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -108,7 +112,7 @@ static int	zbx_transpose_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 
 	if (!ZBX_VALID_MATRIX(m))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "matrix to transpose is not valid");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -157,15 +161,9 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 	double		pivot, factor, det;
 	int		i, j, k, n, res;
 
-	if (!ZBX_VALID_MATRIX(m))
+	if (!ZBX_VALID_MATRIX(m) || m->rows != m->columns)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "matrix to invert is not valid");
-		return ZBX_MATH_FAIL;
-	}
-
-	if (m->rows != m->columns)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "matrix to invert is not square");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -279,15 +277,9 @@ static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t
 	double	element;
 	int	i, j, k;
 
-	if (!ZBX_VALID_MATRIX(left) || !ZBX_VALID_MATRIX(right))
+	if (!ZBX_VALID_MATRIX(left) || !ZBX_VALID_MATRIX(right) || left->columns != right->rows)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "matrices to multiplicate are not valid");
-		return ZBX_MATH_FAIL;
-	}
-
-	if (left->columns != right->rows)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "matrices to multiplicate are of incompatible dimensions");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -336,9 +328,7 @@ static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent,
 	if (ZBX_MATH_OK != (res = zbx_matrix_mult(independent_transposed, dependent, right_part)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_matrix_mult(left_part, right_part, coefficients)))
-		goto out;
-
+	res = zbx_matrix_mult(left_part, right_part, coefficients);
 out:
 	zbx_matrix_free(independent_transposed);
 	zbx_matrix_free(to_be_inverted);
@@ -445,9 +435,7 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, unsigned k
 	if (ZBX_MATH_OK != (res = zbx_fill_dependent(x, n, fit, dependent)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_least_squares(independent, dependent, coefficients)))
-		goto out;
-
+	res = zbx_least_squares(independent, dependent, coefficients);
 out:
 	zbx_matrix_free(independent);
 	zbx_matrix_free(dependent);
@@ -482,7 +470,7 @@ static int	zbx_derive_polynomial(zbx_matrix_t *polynomial, zbx_matrix_t *derivat
 
 	if (!ZBX_VALID_MATRIX(polynomial))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "polynomial to derive is not valid");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -498,6 +486,8 @@ static int	zbx_derive_polynomial(zbx_matrix_t *polynomial, zbx_matrix_t *derivat
 	return ZBX_MATH_OK;
 }
 
+static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots)
+{
 #define Re(z)	(z)[0]
 #define Im(z)	(z)[1]
 
@@ -511,12 +501,8 @@ do							\
 }							\
 while(0)
 
-#define ZBX_MATH_EPSILON	(1.0e-6)
-
 #define ZBX_MAX_ITERATIONS	200
 
-static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots)
-{
 	zbx_matrix_t	*denominator_multiplicands = NULL, *updates = NULL;
 	double		z[2], mult[2], denominator[2], zpower[2], polynomial[2], highest_degree_coefficient,
 			lower_bound, upper_bound, radius, max_update, min_distance, residual, temp;
@@ -524,7 +510,7 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots)
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "polynomial to find roots of is not valid");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -538,7 +524,8 @@ static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots)
 	{
 		if (0.0 == highest_degree_coefficient)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "every number is a root, cannot return anything meaningful");
+			/* attempt to solve equation 0 == 0, please check this case explicitly */
+			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_MATH_FAIL;
 		}
 
@@ -730,12 +717,12 @@ out:
 	zbx_matrix_free(denominator_multiplicands);
 	zbx_matrix_free(updates);
 	return res;
-}
 
 #undef ZBX_MAX_ITERATIONS
 
 #undef Re
 #undef Im
+}
 
 static int	zbx_polynomial_minmax(double now, double time, zbx_mode_t mode, zbx_matrix_t *coefficients,
 		double *result)
@@ -746,7 +733,7 @@ static int	zbx_polynomial_minmax(double now, double time, zbx_mode_t mode, zbx_m
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "polynomial to find extrema of is not valid");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -812,7 +799,7 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "polynomial is not valid");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -860,13 +847,11 @@ out:
 	return res;
 }
 
-#undef ZBX_MATH_EPSILON
-
 static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t fit, double *value)
 {
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "coefficients are not valid");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return ZBX_MATH_FAIL;
 	}
 
@@ -952,15 +937,13 @@ int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error)
 	return ZBX_MATH_OK;
 }
 
-#define ZBX_IS_NAN(x)	(x != x)
-
 double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode)
 {
 	zbx_matrix_t	*coefficients = NULL;
 	double		left, right, result;
 	int		res;
 
-	if (0 == n)
+	if (0 >= n)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
 		return ERROR_CODE;
@@ -1082,7 +1065,7 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	double		current, result;
 	int		res;
 
-	if (0 == n)
+	if (0 >= n)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
 		return ERROR_CODE;
@@ -1127,15 +1110,3 @@ out:
 	zbx_matrix_free(coefficients);
 	return result;
 }
-
-#undef ZBX_IS_NAN
-
-#undef ZBX_VALID_MATRIX
-#undef ZBX_MATRIX_EL
-#undef ZBX_MATRIX_ROW
-
-#undef DB_INFINITY
-#undef ERROR_CODE
-
-#undef ZBX_MATH_OK
-#undef ZBX_MATH_FAIL
