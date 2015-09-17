@@ -220,21 +220,22 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 #endif
 
 /* TLS parameters */
-unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in server, just for linking with */
-									/* tls.c */
-unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in server, just for linking with */
-									/* tls.c */
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-char	*CONFIG_TLS_CONNECT		= NULL; /* not used in server, just for linking with tls.c */
-char	*CONFIG_TLS_ACCEPT		= NULL; /* not used in server, just for linking with tls.c */
+unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in server, defined for linking */
+									/* with tls.c */
+unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in server, defined for linking */
+									/* with tls.c */
 char	*CONFIG_TLS_CA_FILE		= NULL;
 char	*CONFIG_TLS_CRL_FILE		= NULL;
-char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;	/* not used in server, just for linking with tls.c */
-char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;	/* not used in server, just for linking with tls.c */
 char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
-char	*CONFIG_TLS_PSK_IDENTITY	= NULL;	/* not used in server, just for linking with tls.c */
-char	*CONFIG_TLS_PSK_FILE		= NULL;	/* not used in server, just for linking with tls.c */
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/* the following TLS parameters are not used in server, they are defined for linking with tls.c */
+char	*CONFIG_TLS_CONNECT		= NULL;
+char	*CONFIG_TLS_ACCEPT		= NULL;
+char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
+char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
+char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
 #endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
@@ -446,6 +447,15 @@ static void	zbx_validate_config(void)
 		exit(EXIT_FAILURE);
 	}
 #endif
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	if (NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE || NULL != CONFIG_TLS_CERT_FILE ||
+			NULL != CONFIG_TLS_KEY_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix server was compiled without TLS"
+				" support");
+		exit(EXIT_FAILURE);
+	}
+#endif
 }
 
 /******************************************************************************
@@ -601,7 +611,6 @@ static void	zbx_load_config(void)
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
@@ -610,7 +619,6 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			0},
 		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
 		{NULL}
 	};
 

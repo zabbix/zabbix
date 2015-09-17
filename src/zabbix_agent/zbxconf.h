@@ -43,7 +43,7 @@ extern char	*CONFIG_USER;
 
 extern unsigned int	configured_tls_connect_mode;
 extern unsigned int	configured_tls_accept_modes;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+
 extern char	*CONFIG_TLS_CONNECT;
 extern char	*CONFIG_TLS_ACCEPT;
 extern char	*CONFIG_TLS_CA_FILE;
@@ -54,7 +54,6 @@ extern char	*CONFIG_TLS_CERT_FILE;
 extern char	*CONFIG_TLS_KEY_FILE;
 extern char	*CONFIG_TLS_PSK_IDENTITY;
 extern char	*CONFIG_TLS_PSK_FILE;
-#endif
 
 void	load_aliases(char **lines);
 void	load_user_parameters(char **lines);

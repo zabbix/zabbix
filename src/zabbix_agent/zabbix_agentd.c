@@ -556,6 +556,17 @@ static void	zbx_validate_config(void)
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
 		exit(EXIT_FAILURE);
 	}
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_ACCEPT || NULL != CONFIG_TLS_CA_FILE ||
+			NULL != CONFIG_TLS_CRL_FILE || NULL != CONFIG_TLS_SERVER_CERT_ISSUER ||
+			NULL != CONFIG_TLS_SERVER_CERT_SUBJECT || NULL != CONFIG_TLS_CERT_FILE ||
+			NULL != CONFIG_TLS_KEY_FILE || NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix agentd was compiled without TLS"
+				" support");
+		exit(EXIT_FAILURE);
+	}
+#endif
 }
 
 static int	add_activechk_host(const char *host, unsigned short port)
@@ -708,7 +719,6 @@ static void	zbx_load_config(int requirement)
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
@@ -729,7 +739,6 @@ static void	zbx_load_config(int requirement)
 			PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
 		{NULL}
 	};
 

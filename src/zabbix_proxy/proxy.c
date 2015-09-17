@@ -228,7 +228,7 @@ char	*CONFIG_SSL_KEY_LOCATION	= NULL;
 /* TLS parameters */
 unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
 unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+
 char	*CONFIG_TLS_CONNECT		= NULL;
 char	*CONFIG_TLS_ACCEPT		= NULL;
 char	*CONFIG_TLS_CA_FILE		= NULL;
@@ -239,7 +239,6 @@ char	*CONFIG_TLS_CERT_FILE		= NULL;
 char	*CONFIG_TLS_KEY_FILE		= NULL;
 char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
 char	*CONFIG_TLS_PSK_FILE		= NULL;
-#endif
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
@@ -484,6 +483,17 @@ static void	zbx_validate_config(void)
 		exit(EXIT_FAILURE);
 	}
 #endif
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_ACCEPT || NULL != CONFIG_TLS_CA_FILE ||
+			NULL != CONFIG_TLS_CRL_FILE || NULL != CONFIG_TLS_SERVER_CERT_ISSUER ||
+			NULL != CONFIG_TLS_SERVER_CERT_SUBJECT || NULL != CONFIG_TLS_CERT_FILE ||
+			NULL != CONFIG_TLS_KEY_FILE || NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix proxy was compiled without TLS"
+				" support");
+		exit(EXIT_FAILURE);
+	}
+#endif
 }
 
 /******************************************************************************
@@ -635,7 +645,6 @@ static void	zbx_load_config(void)
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
@@ -656,7 +665,6 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			0},
 		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
 		{NULL}
 	};
 

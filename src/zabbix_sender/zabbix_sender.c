@@ -721,7 +721,7 @@ static void	parse_commandline(int argc, char **argv)
 			case '8':
 			case '9':
 				zbx_error("TLS parameters cannot be used: Zabbix sender was compiled without TLS"
-						" support.");
+						" support");
 				exit(EXIT_FAILURE);
 				break;
 #endif
@@ -1050,7 +1050,7 @@ int	main(int argc, char **argv)
 			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
-				" support.");
+				" support");
 		goto exit;
 	}
 #endif
