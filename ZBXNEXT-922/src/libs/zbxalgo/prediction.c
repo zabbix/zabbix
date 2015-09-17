@@ -960,6 +960,12 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 	double		left, right, result;
 	int		res;
 
+	if (0 == n)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
+		return ERROR_CODE;
+	}
+
 	if (1 == n)
 	{
 		if (MODE_VALUE == mode || MODE_MAX == mode || MODE_MIN == mode || MODE_AVG == mode)
@@ -1075,6 +1081,12 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	zbx_matrix_t	*coefficients = NULL;
 	double		current, result;
 	int		res;
+
+	if (0 == n)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
+		return ERROR_CODE;
+	}
 
 	if (1 == n)
 		return (x[0] == threshold ? 0.0 : DB_INFINITY);
