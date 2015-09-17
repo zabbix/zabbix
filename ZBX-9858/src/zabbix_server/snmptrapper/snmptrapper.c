@@ -459,8 +459,8 @@ static int	open_trap_file()
 	{
 		if (0 == overflow_warning)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot process SNMP trapper file \"%s\": "
-					"file size exceeds the maximum supported size of 2 GB",
+			zabbix_log(LOG_LEVEL_CRIT, "cannot process SNMP trapper file \"%s\":"
+					" file size exceeds the maximum supported size of 2 GB",
 					CONFIG_SNMPTRAP_FILE);
 			overflow_warning = 1;
 		}
@@ -472,8 +472,10 @@ static int	open_trap_file()
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
-			zabbix_log(LOG_LEVEL_CRIT, "cannot open SNMP trapper file\"%s\": %s", CONFIG_SNMPTRAP_FILE,
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
 					zbx_strerror(errno));
+		}
 		goto out;
 	}
 
