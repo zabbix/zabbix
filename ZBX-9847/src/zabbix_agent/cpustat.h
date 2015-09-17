@@ -36,7 +36,9 @@ ZBX_CPUS_STAT_DATA;
 
 #define CPU_COLLECTOR_STARTED(collector)	((collector) && (collector)->cpus.queue_counter)
 
-#else /* not _WINDOWS */
+int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **error);
+
+#else	/* not _WINDOWS */
 
 typedef struct
 {
@@ -61,15 +63,16 @@ ZBX_CPUS_STAT_DATA;
 
 #define CPU_COLLECTOR_STARTED(collector)	(collector)
 
-#endif /* _WINDOWS */
+void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
+int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
+
+#endif	/* _WINDOWS */
 
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
 void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus);
 
-#ifndef _WINDOWS
-void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus);
-int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode);
-#endif
+#define ZBX_CPUNUM_UNDEF	-1	/* unidentified yet CPUs */
+#define ZBX_CPUNUM_ALL		-2	/* request data for all CPUs */
 
 #define ZBX_CPU_STATUS_ONLINE	0
 #define ZBX_CPU_STATUS_OFFLINE	1

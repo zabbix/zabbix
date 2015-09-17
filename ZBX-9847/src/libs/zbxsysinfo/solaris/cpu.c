@@ -70,14 +70,12 @@ int	SYSTEM_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 	tmp = get_rparam(request, 0);
 
 	if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "all"))
-		cpu_num = 0;
+		cpu_num = ZBX_CPUNUM_ALL;
 	else if (SUCCEED != is_uint31_1(tmp, &cpu_num))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 		return SYSINFO_RET_FAIL;
 	}
-	else
-		cpu_num++;
 
 	tmp = get_rparam(request, 1);
 
