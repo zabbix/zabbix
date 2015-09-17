@@ -972,7 +972,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$dstDiscovery = $srcDiscovery;
 		$dstDiscovery['hostid'] = $hostid;
-		unset($dstDiscovery['templateid'], $dstDiscovery['state'], $dstDiscovery['itemid']);
+		unset($dstDiscovery['templateid'], $dstDiscovery['state'], $dstDiscovery['itemid'], $dstDiscovery['error']);
 		if ($dstDiscovery['filter']) {
 			foreach ($dstDiscovery['filter']['conditions'] as &$condition) {
 				unset($condition['itemid'], $condition['item_conditionid']);
