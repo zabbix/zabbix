@@ -153,7 +153,7 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 Changes for 2.4.7rc1
 
 New features:
-A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
