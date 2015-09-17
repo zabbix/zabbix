@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 11:59+0300\n"
-"PO-Revision-Date: 2015-08-30 18:01+0300\n"
+"POT-Creation-Date: 2015-09-17 12:03+0300\n"
+"PO-Revision-Date: 2015-09-10 07:00+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1440950493.0\n"
+"X-POOTLE-MTIME: 1441861210.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -8496,7 +8496,7 @@ msgstr "Формат времени в журнале (логе)"
 
 #: include/views/administration.general.other.edit.php:38
 msgid "Log unmatched SNMP traps"
-msgstr "Записывать несовпадающие SNMP трапы"
+msgstr "Журналировать не совпадающие SNMP трапы"
 
 #: include/classes/class.cserverinfo.php:43
 msgid "Logged in as"
@@ -14814,11 +14814,11 @@ msgstr "Размер ballooned памяти виртуальной машины 
 
 #: include/classes/items/CHelpItems.php:771
 msgid "VMware virtual machine committed storage space, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Размер зарезервированого хранилища для витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
+msgstr "Размер зарезервированого хранилища для виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:727
 msgid "VMware virtual machine compressed memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Размер сжатой памяти витруальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
+msgstr "Размер сжатой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:787
 msgid "VMware virtual machine disk device read statistics, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <instance> - disk device instance, <mode> - bps/ops - bytes/operations per second"
@@ -14874,7 +14874,7 @@ msgstr "Использование процессора виртуальной �
 
 #: include/classes/items/CHelpItems.php:735
 msgid "VMware virtual machine shared memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr "Размер разделяемой памяти вируальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
+msgstr "Размер разделяемой памяти виртуальной машины VMware, <url> - URL службы VMware, <uuid> - имя хоста виртуальной машины VMware"
 
 #: include/classes/items/CHelpItems.php:739
 msgid "VMware virtual machine swapped memory size, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
