@@ -59,7 +59,7 @@ int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addobject(&json, NULL);
 
 		zbx_json_adduint64(&json, "{#CPU.NUMBER}", cpus.values[i].first);
-		zbx_json_addstring(&json, "{#CPU.STATUS}", get_cpu_status_string(cpus.values[i].second),
+		zbx_json_addstring(&json, "{#CPU.STATUS}", get_cpu_status_string((int)cpus.values[i].second),
 				ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
