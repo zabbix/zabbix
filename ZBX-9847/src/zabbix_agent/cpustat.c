@@ -721,6 +721,19 @@ static int	get_cpu_status(int pc_status)
 }
 #endif
 
+/******************************************************************************
+ *                                                                            *
+ * Function: get_cpus                                                         *
+ *                                                                            *
+ * Purpose: Retrieve list of available CPUs in the collector                  *
+ *                                                                            *
+ * Parameters: vector [OUT] - vector for CPUNUM/STATUS pairs                  *
+ *                                                                            *
+ * Return value: SUCCEED if collector started and has at least one CPU        *
+ *               FAIL otherwise                                               *
+ * Comments: The data returned is designed for item system.cpu.discovery.     *
+ *                                                                            *
+ ******************************************************************************/
 int	get_cpus(zbx_vector_uint64_pair_t *vector)
 {
 	ZBX_CPUS_STAT_DATA	*pcpus;
@@ -730,6 +743,9 @@ int	get_cpus(zbx_vector_uint64_pair_t *vector)
 		goto out;
 
 	LOCK_CPUSTATS;
+
+	/* Per-CPU information is stored in the ZBX_SINGLE_CPU_STAT_DATA array */
+	/* starting with index 1. Index 0 contains information about all CPUs. */
 
 	for (i = 1; i <= pcpus->count; i++)
 	{
