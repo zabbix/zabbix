@@ -1049,12 +1049,23 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 out:
 	zbx_matrix_free(coefficients);
 
-	if (ZBX_MATH_OK != res || ZBX_IS_NAN(result))
+	if (ZBX_MATH_OK != res)
+	{
 		result = ERROR_CODE;
+	}
+	else if (ZBX_IS_NAN(result))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
+		result = ERROR_CODE;
+	}
 	else if (DB_INFINITY < result)
+	{
 		result = DB_INFINITY;
+	}
 	else if (-DB_INFINITY > result)
+	{
 		result = -DB_INFINITY;
+	}
 
 	return result;
 }
@@ -1102,9 +1113,14 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 				- now;
 
 	if (ZBX_IS_NAN(result))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ERROR_CODE;
+	}
 	else if (0.0 > result || DB_INFINITY < result)
+	{
 		result = DB_INFINITY;
+	}
 
 out:
 	zbx_matrix_free(coefficients);
