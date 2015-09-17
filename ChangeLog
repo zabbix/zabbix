@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha3
 
 New features:
+...G...... [ZBXNEXT-494] fixed proc.cpu.util help item description (wiper)
 ....I..... [ZBXNEXT-2056] added an HTTP response code value map (Richlv)
 
 Bug fixes:
