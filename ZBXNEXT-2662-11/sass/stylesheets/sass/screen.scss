@@ -1540,6 +1540,10 @@ select {
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
+	option {
+		color: $font-color;
+	}
+
 	&.select-multiple {
 		padding: 4px 5px;
 		width: 300px;
@@ -2759,6 +2763,17 @@ a.green {
 
 a.red {
 	@extend .red;
+}
+
+select.red {
+	@extend .red;
+}
+
+select {
+
+	option.red {
+		@extend .red;
+	}
 }
 
 .orange {
