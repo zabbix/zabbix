@@ -1,7 +1,7 @@
 Changes for 2.2.11rc1
 
 New features:
-A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
 .......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
