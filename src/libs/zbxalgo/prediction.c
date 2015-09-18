@@ -325,7 +325,8 @@ static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent,
 	if (SUCCEED != (res = zbx_matrix_mult(independent_transposed, dependent, right_part)))
 		goto out;
 
-	res = zbx_matrix_mult(left_part, right_part, coefficients);
+	if (SUCCEED != (res = zbx_matrix_mult(left_part, right_part, coefficients)))
+		goto out;
 out:
 	zbx_matrix_free(independent_transposed);
 	zbx_matrix_free(to_be_inverted);
@@ -432,7 +433,8 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, unsigned k
 	if (SUCCEED != (res = zbx_fill_dependent(x, n, fit, dependent)))
 		goto out;
 
-	res = zbx_least_squares(independent, dependent, coefficients);
+	if (SUCCEED != (res = zbx_least_squares(independent, dependent, coefficients)))
+		goto out;
 out:
 	zbx_matrix_free(independent);
 	zbx_matrix_free(dependent);
