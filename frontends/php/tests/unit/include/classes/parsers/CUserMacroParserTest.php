@@ -26,16 +26,13 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testValidProvider() {
 		return [
-			// normal macros
+			// Normal macros without context.
 			[
 				'{$MACRO}',
 				[[
 					'match' => '{$MACRO}',
 					'macro' => '{$MACRO}',
-					'positions' => [
-						'start' => 0,
-						'length' => 8
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => null
 				]]
@@ -45,10 +42,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO_}',
 					'macro' => '{$MACRO_}',
-					'positions' => [
-						'start' => 0,
-						'length' => 9
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO_',
 					'context' => null
 				]]
@@ -58,10 +52,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO_12}',
 					'macro' => '{$MACRO_12}',
-					'positions' => [
-						'start' => 0,
-						'length' => 11
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO_12',
 					'context' => null
 				]]
@@ -71,24 +62,18 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO_1.2}',
 					'macro' => '{$MACRO_1.2}',
-					'positions' => [
-						'start' => 0,
-						'length' => 12
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO_1.2',
 					'context' => null
 				]]
 			],
-			// context based unquoted macros
+			// Context based unquoted macros.
 			[
 				'{$MACRO:}',
 				[[
 					'match' => '{$MACRO:}',
 					'macro' => '{$MACRO:}',
-					'positions' => [
-						'start' => 0,
-						'length' => 9
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
@@ -98,10 +83,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO: }',
 					'macro' => '{$MACRO:}',
-					'positions' => [
-						'start' => 0,
-						'length' => 10
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
@@ -111,10 +93,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:   }',
 					'macro' => '{$MACRO:}',
-					'positions' => [
-						'start' => 0,
-						'length' => 12
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
@@ -124,10 +103,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:\'\'}',
 					'macro' => '{$MACRO:\'\'}',
-					'positions' => [
-						'start' => 0,
-						'length' => 11
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '\'\''
 				]]
@@ -137,10 +113,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:A }',
 					'macro' => '{$MACRO:A }',
-					'positions' => [
-						'start' => 0,
-						'length' => 11
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'A '
 				]]
@@ -150,10 +123,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:A}',
 					'macro' => '{$MACRO:A}',
-					'positions' => [
-						'start' => 0,
-						'length' => 10
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'A'
 				]]
@@ -163,10 +133,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:A"}',
 					'macro' => '{$MACRO:A"}',
-					'positions' => [
-						'start' => 0,
-						'length' => 11
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'A"'
 				]]
@@ -176,10 +143,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:context}',
 					'macro' => '{$MACRO:context}',
-					'positions' => [
-						'start' => 0,
-						'length' => 16
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'context'
 				]]
@@ -189,24 +153,18 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:<context>}',
 					'macro' => '{$MACRO:<context>}',
-					'positions' => [
-						'start' => 0,
-						'length' => 18
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '<context>'
 				]]
 			],
 			[
-				'{$MACRO:\"}',
+				'{$MACRO1:\"}',
 				[[
-					'match' => '{$MACRO:\"}',
-					'macro' => '{$MACRO:\"}',
-					'positions' => [
-						'start' => 0,
-						'length' => 11
-					],
-					'macro_name' => 'MACRO',
+					'match' => '{$MACRO1:\"}',
+					'macro' => '{$MACRO1:\"}',
+					'pos' => 0,
+					'macro_name' => 'MACRO1',
 					'context' => '\"'
 				]]
 			],
@@ -215,10 +173,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:{}',
 					'macro' => '{$MACRO:{}',
-					'positions' => [
-						'start' => 0,
-						'length' => 10
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '{'
 				]]
@@ -228,10 +183,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:\}',
 					'macro' => '{$MACRO:\}',
-					'positions' => [
-						'start' => 0,
-						'length' => 10
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '\\'
 				]]
@@ -241,10 +193,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:\\\\}',
 					'macro' => '{$MACRO:\\\\}',
-					'positions' => [
-						'start' => 0,
-						'length' => 11
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '\\\\'
 				]]
@@ -254,10 +203,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:\"\}',
 					'macro' => '{$MACRO:\"\}',
-					'positions' => [
-						'start' => 0,
-						'length' => 12
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '\"\\'
 				]]
@@ -267,10 +213,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:abc"def}',
 					'macro' => '{$MACRO:abc"def}',
-					'positions' => [
-						'start' => 0,
-						'length' => 16
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'abc"def'
 				]]
@@ -280,10 +223,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:abc"def"}',
 					'macro' => '{$MACRO:abc"def"}',
-					'positions' => [
-						'start' => 0,
-						'length' => 17
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'abc"def"'
 				]]
@@ -293,10 +233,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:abc"def"ghi}',
 					'macro' => '{$MACRO:abc"def"ghi}',
-					'positions' => [
-						'start' => 0,
-						'length' => 20
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'abc"def"ghi'
 				]]
@@ -306,24 +243,18 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:abc"\\}',
 					'macro' => '{$MACRO:abc"\\}',
-					'positions' => [
-						'start' => 0,
-						'length' => 14
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'abc"\\'
 				]]
 			],
-			// context based quoted macros
+			// Context based quoted macros.
 			[
 				'{$MACRO:""}',
 				[[
 					'match' => '{$MACRO:""}',
 					'macro' => '{$MACRO:""}',
-					'positions' => [
-						'start' => 0,
-						'length' => 11
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
@@ -333,10 +264,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO: " " }',
 					'macro' => '{$MACRO:" "}',
-					'positions' => [
-						'start' => 0,
-						'length' => 14
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => ' '
 				]]
@@ -346,10 +274,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO: ""}',
 					'macro' => '{$MACRO:""}',
-					'positions' => [
-						'start' => 0,
-						'length' => 12
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
@@ -359,10 +284,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:"" }',
 					'macro' => '{$MACRO:""}',
-					'positions' => [
-						'start' => 0,
-						'length' => 12
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
@@ -372,10 +294,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO: "    " }',
 					'macro' => '{$MACRO:"    "}',
-					'positions' => [
-						'start' => 0,
-						'length' => 17
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '    '
 				]]
@@ -385,10 +304,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:    "    "      }',
 					'macro' => '{$MACRO:"    "}',
-					'positions' => [
-						'start' => 0,
-						'length' => 25
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '    '
 				]]
@@ -398,10 +314,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:    ""      }',
 					'macro' => '{$MACRO:""}',
-					'positions' => [
-						'start' => 0,
-						'length' => 21
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
@@ -411,10 +324,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:"A" }',
 					'macro' => '{$MACRO:"A"}',
-					'positions' => [
-						'start' => 0,
-						'length' => 13
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'A'
 				]]
@@ -424,10 +334,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:"{#MACRO}"}',
 					'macro' => '{$MACRO:"{#MACRO}"}',
-					'positions' => [
-						'start' => 0,
-						'length' => 19
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '{#MACRO}'
 				]]
@@ -437,10 +344,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:"\abc"}',
 					'macro' => '{$MACRO:"\abc"}',
-					'positions' => [
-						'start' => 0,
-						'length' => 15
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '\abc'
 				]]
@@ -450,10 +354,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:"abc\def"}',
 					'macro' => '{$MACRO:"abc\def"}',
-					'positions' => [
-						'start' => 0,
-						'length' => 18
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => 'abc\def'
 				]]
@@ -463,24 +364,18 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:"\abc\    "}',
 					'macro' => '{$MACRO:"\abc\    "}',
-					'positions' => [
-						'start' => 0,
-						'length' => 20
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO',
 					'context' => '\abc\    '
 				]]
 			],
 			[
-				'{$MACRO:"\\""}',
+				'{$MACRO2:"\\\""}',
 				[[
-					'match' => '{$MACRO:"\\""}',
-					'macro' => '{$MACRO:"\\""}',
-					'positions' => [
-						'start' => 0,
-						'length' => 13
-					],
-					'macro_name' => 'MACRO',
+					'match' => '{$MACRO2:"\\\""}',
+					'macro' => '{$MACRO2:"\\\""}',
+					'pos' => 0,
+					'macro_name' => 'MACRO2',
 					'context' => '\"'
 				]]
 			]
@@ -492,6 +387,30 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 	 */
 	public function testInvalidProvider() {
 		return [
+			['', 'macro is empty'],
+			['{', 'unexpected end of macro'],
+			['{{', 'incorrect syntax near "{"'],
+			['{{{', 'incorrect syntax near "{{"'],
+			['{$', 'unexpected end of macro'],
+			['{${$', 'incorrect syntax near "{$"'],
+			['{${{$', 'incorrect syntax near "{{$"'],
+			['{$${$', 'incorrect syntax near "${$"'],
+			['{${$$', 'incorrect syntax near "{$$"'],
+			['{${{$${$', 'incorrect syntax near "{{$${$"'],
+			['{$M', 'unexpected end of macro'],
+			['{$.', 'unexpected end of macro'],
+			['{$"', 'incorrect syntax near """'],
+			['{$-', 'incorrect syntax near "-"'],
+			['{$M:', 'unexpected end of macro'],
+			['{$M:"', 'unexpected end of macro'],
+			['{$M:""', 'unexpected end of macro'],
+			['{$M:""{', 'incorrect syntax near "{"'],
+			['{$M:""{$', 'incorrect syntax near "{$"'],
+			['{$M:""{$M', 'incorrect syntax near "{$M"'],
+			['{$M:""{$M:', 'incorrect syntax near "{$M:"'],
+			['{$M:""{$M:"', 'incorrect syntax near "{$M:""'],
+			['{$M:""{$M:""', 'incorrect syntax near "{$M:"""'],
+			['{$MACRO:"abc\"}', 'unexpected end of macro'],
 			['{', 'unexpected end of macro'],
 			['{MACRO', 'incorrect syntax near "MACRO"'],
 			['{MACRO$', 'incorrect syntax near "MACRO$"'],
@@ -535,20 +454,14 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO1}',
 					'macro' => '{$MACRO1}',
-					'positions' => [
-						'start' => 0,
-						'length' => 9
-					],
+					'pos' => 0,
 					'macro_name' => 'MACRO1',
 					'context' => null
 				],
 				[
 					'match' => '{$MACRO2}',
 					'macro' => '{$MACRO2}',
-					'positions' => [
-						'start' => 9,
-						'length' => 9
-					],
+					'pos' => 9,
 					'macro_name' => 'MACRO2',
 					'context' => null
 				]]
@@ -558,10 +471,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO}',
 					'macro' => '{$MACRO}',
-					'positions' => [
-						'start' => 11,
-						'length' => 8
-					],
+					'pos' => 11,
 					'macro_name' => 'MACRO',
 					'context' => null
 				]]
@@ -571,10 +481,7 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:""}',
 					'macro' => '{$MACRO:""}',
-					'positions' => [
-						'start' => 11,
-						'length' => 11
-					],
+					'pos' => 11,
 					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
@@ -584,102 +491,119 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO:\""}',
 					'macro' => '{$MACRO:\""}',
-					'positions' => [
-						'start' => 11,
-						'length' => 12
-					],
+					'pos' => 11,
 					'macro_name' => 'MACRO',
 					'context' => '\""'
 				]]
 			],
 			[
 				'abc"def\"ghi{$MACRO:""}',
-				[]
+				[[
+					'match' => '{$MACRO:""}',
+					'macro' => '{$MACRO:""}',
+					'pos' => 12,
+					'macro_name' => 'MACRO',
+					'context' => ''
+				]]
 			],
 			[
 				'abc"def{$MACRO:\""}',
-				[]
+				[[
+					'match' => '{$MACRO:\""}',
+					'macro' => '{$MACRO:\""}',
+					'pos' => 7,
+					'macro_name' => 'MACRO',
+					'context' => '\""'
+				]]
 			],
 			[
 				'abc"def{$MACRO:\"\"}',
 				[[
 					'match' => '{$MACRO:\"\"}',
-					'macro' => '{$MACRO:""}',
-					'positions' => [
-						'start' => 7,
-						'length' => 13
-					],
+					'macro' => '{$MACRO:\"\"}',
+					'pos' => 7,
 					'macro_name' => 'MACRO',
-					'context' => ''
+					'context' => '\"\"'
 				]]
 			],
 			[
 				'abc"def{$MACRO:\"abc\"}',
 				[[
 					'match' => '{$MACRO:\"abc\"}',
+					'macro' => '{$MACRO:\"abc\"}',
+					'pos' => 7,
+					'macro_name' => 'MACRO',
+					'context' => '\"abc\"'
+				]]
+			],
+			[
+				'abc"def{$MACRO:"abc"}',
+				[[
+					'match' => '{$MACRO:"abc"}',
 					'macro' => '{$MACRO:"abc"}',
-					'positions' => [
-						'start' => 7,
-						'length' => 16
-					],
+					'pos' => 7,
 					'macro_name' => 'MACRO',
 					'context' => 'abc'
 				]]
 			],
 			[
-				'abc"def{$MACRO69:\"abc\"def\"\"}',
-				[]
+				'{$MACRO1:"\"xyz\""}',
+				[[
+					'match' => '{$MACRO1:"\"xyz\""}',
+					'macro' => '{$MACRO1:"\"xyz\""}',
+					'pos' => 0,
+					'macro_name' => 'MACRO1',
+					'context' => '"xyz"'
+				]]
+			],
+			[
+				'{$MACRO2:\"xyz\"}',
+				[[
+					'match' => '{$MACRO2:\"xyz\"}',
+					'macro' => '{$MACRO2:\"xyz\"}',
+					'pos' => 0,
+					'macro_name' => 'MACRO2',
+					'context' => '\"xyz\"'
+				]]
+			],
+			[
+				'{$MACRO3:"\\\\"xyz\\\\""}',
+				[[
+					'match' => '{$MACRO3:"\\\\"xyz\\\\""}',
+					'macro' => '{$MACRO3:"\\\\"xyz\\\\""}',
+					'pos' => 0,
+					'macro_name' => 'MACRO3',
+					'context' => '\\"xyz\\"'
+				]]
+			],
+			[
+				'{$MACRO3:\\"xyz\\"}',
+				[[
+					'match' => '{$MACRO3:\\"xyz\\"}',
+					'macro' => '{$MACRO3:\\"xyz\\"}',
+					'pos' => 0,
+					'macro_name' => 'MACRO3',
+					'context' => '\\"xyz\\"'
+				]]
+			],
+			[
+				'abc"def{$MACRO:\"abc\"def\"\"}',
+				[[
+					'match' => '{$MACRO:\"abc\"def\"\"}',
+					'macro' => '{$MACRO:\"abc\"def\"\"}',
+					'pos' => 7,
+					'macro_name' => 'MACRO',
+					'context' => '\"abc\"def\"\"'
+				]]
 			],
 			[
 				'abc"def{$MACRO:\\"abc\\\\"defgh\\\\"\\"}',
 				[[
 					'match' => '{$MACRO:\\"abc\\\\"defgh\\\\"\\"}',
-					'macro' => '{$MACRO:"abc\\"defgh\\""}',
-					'positions' => [
-						'start' => 7,
-						'length' => 27
-					],
+					'macro' => '{$MACRO:\\"abc\\\\"defgh\\\\"\\"}',
+					'pos' => 7,
 					'macro_name' => 'MACRO',
-					'context' => 'abc"defgh"'
-				]]
-			],
-			[
-				'"def{$MACRO:\"abc\\\\"defxyz\\\\"\"}',
-				[[
-					'match' => '{$MACRO:\"abc\\\\"defxyz\\\\"\"}',
-					'macro' => '{$MACRO:"abc\"defxyz\""}',
-					'positions' => [
-						'start' => 4,
-						'length' => 28
-					],
-					'macro_name' => 'MACRO',
-					'context' => 'abc"defxyz"'
-				]]
-			],
-			[
-				'     "def{$MACRO:\"abc\\\\"qwerty\\\\"\"}',
-				[[
-					'match' => '{$MACRO:\"abc\\\\"qwerty\\\\"\"}',
-					'macro' => '{$MACRO:"abc\"qwerty\""}',
-					'positions' => [
-						'start' => 9,
-						'length' => 28
-					],
-					'macro_name' => 'MACRO',
-					'context' => 'abc"qwerty"'
-				]]
-			],
-			[
-				'     "def{$MACRO:     \"abc\\\\"def\\\\"\"}',
-				[[
-					'match' => '{$MACRO:     \"abc\\\\"def\\\\"\"}',
-					'macro' => '{$MACRO:"abc\"def\""}',
-					'positions' => [
-						'start' => 9,
-						'length' => 30
-					],
-					'macro_name' => 'MACRO',
-					'context' => 'abc"def"'
+					'context' => '\\"abc\\\\"defgh\\\\"\\"'
 				]]
 			],
 			[
@@ -687,20 +611,14 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO}',
 					'macro' => '{$MACRO}',
-					'positions' => [
-						'start' => 14,
-						'length' => 8
-					],
+					'pos' => 14,
 					'macro_name' => 'MACRO',
 					'context' => null
 				],
 				[
 					'match' => '{$MACRO}',
 					'macro' => '{$MACRO}',
-					'positions' => [
-						'start' => 22,
-						'length' => 8
-					],
+					'pos' => 22,
 					'macro_name' => 'MACRO',
 					'context' => null
 				]]
@@ -710,48 +628,197 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 				[[
 					'match' => '{$MACRO1}',
 					'macro' => '{$MACRO1}',
-					'positions' => [
-						'start' => 13,
-						'length' => 9
-					],
+					'pos' => 13,
 					'macro_name' => 'MACRO1',
 					'context' => null
 				],
 				[
 					'match' => '{$MACRO2:\"\"}',
-					'macro' => '{$MACRO2:""}',
-					'positions' => [
-						'start' => 33,
-						'length' => 14
-					],
+					'macro' => '{$MACRO2:\"\"}',
+					'pos' => 33,
 					'macro_name' => 'MACRO2',
+					'context' => '\"\"'
+				]]
+			],
+			[
+				'echo[{{$MACRO:}]',
+				[[
+					'match' => '{$MACRO:}',
+					'macro' => '{$MACRO:}',
+					'pos' => 6,
+					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
 			],
 			[
-				'echo[{${$MY.MACRO:}]',
+				'echo[{${$MACRO:}]',
 				[[
-					'match' => '{$MY.MACRO:}',
-					'macro' => '{$MY.MACRO:}',
-					'positions' => [
-						'start' => 7,
-						'length' => 12
-					],
-					'macro_name' => 'MY.MACRO',
+					'match' => '{$MACRO:}',
+					'macro' => '{$MACRO:}',
+					'pos' => 7,
+					'macro_name' => 'MACRO',
 					'context' => ''
 				]]
 			],
 			[
-				'echo[{$ABC{$MY.MACRO:}]',
+				'echo[{$ABC{$MACRO:}]',
 				[[
-					'match' => '{$MY.MACRO:}',
-					'macro' => '{$MY.MACRO:}',
-					'positions' => [
-						'start' => 10,
-						'length' => 12
-					],
-					'macro_name' => 'MY.MACRO',
+					'match' => '{$MACRO:}',
+					'macro' => '{$MACRO:}',
+					'pos' => 10,
+					'macro_name' => 'MACRO',
 					'context' => ''
+				]]
+			],
+			[
+				'echo[{$ABC:"abc{$MACRO:}]',
+				[[
+					'match' => '{$MACRO:}',
+					'macro' => '{$MACRO:}',
+					'pos' => 15,
+					'macro_name' => 'MACRO',
+					'context' => ''
+				]]
+			],
+			[
+				'echo[{$ABC:"abc"{$MACRO:}]',
+				[[
+					'match' => '{$MACRO:}',
+					'macro' => '{$MACRO:}',
+					'pos' => 16,
+					'macro_name' => 'MACRO',
+					'context' => ''
+				]]
+			],
+			[
+				'echo[{$ABC:"abc\"{$MACRO:}]',
+				[[
+					'match' => '{$MACRO:}',
+					'macro' => '{$MACRO:}',
+					'pos' => 17,
+					'macro_name' => 'MACRO',
+					'context' => ''
+				]]
+			],
+			[
+				'{$MACRO:{"abc"}',
+				[[
+					'match' => '{$MACRO:{"abc"}',
+					'macro' => '{$MACRO:{"abc"}',
+					'pos' => 0,
+					'macro_name' => 'MACRO',
+					'context' => '{"abc"'
+				]]
+			],
+			[
+				'{$ABC:"{$MACRO:{"abc"}',
+				[[
+					'match' => '{$MACRO:{"abc"}',
+					'macro' => '{$MACRO:{"abc"}',
+					'pos' => 7,
+					'macro_name' => 'MACRO',
+					'context' => '{"abc"'
+				]]
+			],
+			[
+				'{$ABC:"abc\{$MACRO:{"abc"}"}',
+				[[
+					'match' => '{$MACRO:{"abc"}',
+					'macro' => '{$MACRO:{"abc"}',
+					'pos' => 11,
+					'macro_name' => 'MACRO',
+					'context' => '{"abc"'
+				]]
+			],
+			[
+				'{$ABC:"abc\"{$MACRO:{"abc"}}',
+				[[
+					'match' => '{$MACRO:{"abc"}',
+					'macro' => '{$MACRO:{"abc"}',
+					'pos' => 12,
+					'macro_name' => 'MACRO',
+					'context' => '{"abc"'
+				]]
+			],
+			[
+				'{$MACRO:"abc{$A:{"xyz"}\"{$B:{"qrt"}}',
+				[[
+					'match' => '{$A:{"xyz"}',
+					'macro' => '{$A:{"xyz"}',
+					'pos' => 12,
+					'macro_name' => 'A',
+					'context' => '{"xyz"'
+				],
+				[
+					'match' => '{$B:{"qrt"}',
+					'macro' => '{$B:{"qrt"}',
+					'pos' => 25,
+					'macro_name' => 'B',
+					'context' => '{"qrt"'
+				]]
+			],
+			[
+				'{$MACRO1:"{$MACRO2}"}',
+				[[
+					'match' => '{$MACRO1:"{$MACRO2}"}',
+					'macro' => '{$MACRO1:"{$MACRO2}"}',
+					'pos' => 0,
+					'macro_name' => 'MACRO1',
+					'context' => '{$MACRO2}'
+				]]
+			],
+			[
+				'{$MACRO:"abc{$A:{"xyz"}{$A:{"xyz"}\"{$B:{"qrt"}}',
+				[[
+					'match' => '{$A:{"xyz"}',
+					'macro' => '{$A:{"xyz"}',
+					'pos' => 12,
+					'macro_name' => 'A',
+					'context' => '{"xyz"'
+				],
+				[
+					'match' => '{$A:{"xyz"}',
+					'macro' => '{$A:{"xyz"}',
+					'pos' => 23,
+					'macro_name' => 'A',
+					'context' => '{"xyz"'
+				],
+				[
+					'match' => '{$B:{"qrt"}',
+					'macro' => '{$B:{"qrt"}',
+					'pos' => 36,
+					'macro_name' => 'B',
+					'context' => '{"qrt"'
+				]]
+			],
+			[
+				'${${{{{{${${${${{{{${${{$M1{{{$M2{$M3{$M4:{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""}}}}}}}}}}}}}}}}}}}}}}}}}}}}}',
+				[[
+					'match' => '{$M4:{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""}',
+					'macro' => '{$M4:{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""}',
+					'pos' => 37,
+					'macro_name' => 'M4',
+					'context' => '{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""'
+				]]
+			],
+			[
+				'{$MACRO::"abc"}',
+				[[
+					'match' => '{$MACRO::"abc"}',
+					'macro' => '{$MACRO::"abc"}',
+					'pos' => 0,
+					'macro_name' => 'MACRO',
+					'context' => ':"abc"'
+				]]
+			],
+			[
+				'{$ABC:{$MY.MACRO:}',
+				[[
+					'match' => '{$ABC:{$MY.MACRO:}',
+					'macro' => '{$ABC:{$MY.MACRO:}',
+					'pos' => 0,
+					'macro_name' => 'ABC',
+					'context' => '{$MY.MACRO:'
 				]]
 			]
 		];
