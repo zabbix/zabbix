@@ -367,7 +367,7 @@ static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m)
 	return SUCCEED;
 }
 
-static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, unsigned k, zbx_matrix_t *m)
+static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, int k, zbx_matrix_t *m)
 {
 	double		element;
 	int		i, j;
@@ -419,7 +419,7 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, unsigned k, zbx
 	return SUCCEED;
 }
 
-static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, unsigned k, zbx_matrix_t *coefficients)
+static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, int k, zbx_matrix_t *coefficients)
 {
 	zbx_matrix_t	*independent = NULL, *dependent = NULL;
 	int		res;
@@ -868,7 +868,7 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t f
 	return SUCCEED;
 }
 
-int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
+int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, int *k, char **error)
 {
 	if ('\0' == *fit_str || 0 == strcmp(fit_str, "linear"))
 	{
@@ -878,7 +878,7 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
 	{
 		*fit = FIT_POLYNOMIAL;
 
-		if (SUCCEED != is_uint_range(fit_str + strlen("polynomial"), k, 1, 6))
+		if (SUCCEED != is_uint_range(fit_str + strlen("polynomial"), (unsigned int)k, 1, 6))
 		{
 			*error = zbx_strdup(*error, "polynomial degree is invalid");
 			return FAIL;
