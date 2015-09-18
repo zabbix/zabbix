@@ -1157,8 +1157,12 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	else if (FIT_POWER == fit)
 		result = exp((log(threshold) - ZBX_MATRIX_EL(coefficients, 0, 0)) / ZBX_MATRIX_EL(coefficients, 1, 0))
 				- now;
-
-	if (ZBX_IS_NAN(result))
+out:
+	if (SUCCEED != res)
+	{
+		result = ERROR_CODE;
+	}
+	else if (ZBX_IS_NAN(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ERROR_CODE;
@@ -1168,7 +1172,6 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 		result = DB_INFINITY;
 	}
 
-out:
 	zbx_matrix_free(coefficients);
 	return result;
 }
