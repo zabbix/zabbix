@@ -57,9 +57,9 @@ const char	*progname = NULL;
 
 /* default config file location */
 #ifdef _WINDOWS
-	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
+#	define DEFAULT_CONFIG_FILE	"C:\\zabbix_agentd.conf"
 #else
-	static char	DEFAULT_CONFIG_FILE[]	= SYSCONFDIR "/zabbix_agentd.conf";
+#	define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_agentd.conf"
 #endif
 
 /* application TITLE */
@@ -104,6 +104,7 @@ const char	*help_message[] = {
 	"",
 	"Options:",
 	"  -c --config config-file               Absolute path to the configuration file",
+	"                                        (default: \"" DEFAULT_CONFIG_FILE "\")",
 	"  -p --print                            Print known items and exit",
 	"  -t --test item-key                    Test specified item and exit",
 #ifdef _WINDOWS
@@ -434,14 +435,12 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 
 	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = DEFAULT_CONFIG_FILE;
+		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 out:
 	if (FAIL == ret)
 	{
 		zbx_free(TEST_METRIC);
-
-		if (DEFAULT_CONFIG_FILE != CONFIG_FILE)
-			zbx_free(CONFIG_FILE);
+		zbx_free(CONFIG_FILE);
 	}
 
 	return ret;
