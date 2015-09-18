@@ -2,10 +2,10 @@ Changes for 3.0.0alpha3
 
 New features:
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
-...G...... [ZBXNEXT-494] fixed proc.cpu.util help item description (wiper)
 ....I..... [ZBXNEXT-2056] added an HTTP response code value map (Richlv)
 
 Bug fixes:
+...G...... [ZBXNEXT-494] fixed proc.cpu.util help item description (wiper)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
 .......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
 
