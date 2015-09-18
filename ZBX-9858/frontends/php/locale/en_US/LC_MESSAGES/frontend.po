@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-31 12:30+0300\n"
+"POT-Creation-Date: 2015-09-17 11:56+0300\n"
 "PO-Revision-Date: 2013-11-05 22:47+0300\n"
 "Last-Translator: Jonathan <linuxgurugamer@gmail.com>\n"
 "Language-Team: RedPrairie\n"
@@ -13262,9 +13262,9 @@ msgstr "You did not specify targets for action operation global script \"%s\"."
 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
-#: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
-#: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
-#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1602
+#: api/classes/CHostGroup.php:912 api/classes/CHostGroup.php:967
+#: api/classes/CHostGroup.php:1012 api/classes/CHostGroup.php:1025
+#: api/classes/CHostGroup.php:1041 api/classes/CHost.php:1602
 #: api/classes/CHost.php:1656 api/classes/CHost.php:1970
 #: api/classes/CMaintenance.php:618 api/classes/CMaintenance.php:725
 #: api/classes/CMaintenance.php:737 api/classes/CScript.php:258
