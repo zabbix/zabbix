@@ -114,8 +114,8 @@ static int	zbx_execute_ipmi_command(DC_HOST *host, const char *command, char *er
 	}
 
 	port = zbx_strdup(port, item.interface.port_orig);
-	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
-			&port, MACRO_TYPE_COMMON, NULL, 0);
+	substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL, &port,
+			MACRO_TYPE_COMMON, NULL, 0);
 
 	if (SUCCEED != (ret = is_ushort(port, &item.interface.port)))
 	{
@@ -361,9 +361,9 @@ int	zbx_execute_script(DC_HOST *host, zbx_script_t *script, char **result, char 
 			break;
 		case ZBX_SCRIPT_TYPE_SSH:
 #ifdef HAVE_SSH2
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					&script->publickey, MACRO_TYPE_COMMON, NULL, 0);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, &host->hostid, NULL, NULL, NULL, NULL,
 					&script->privatekey, MACRO_TYPE_COMMON, NULL, 0);
 			/* break; is not missing here */
 #else
