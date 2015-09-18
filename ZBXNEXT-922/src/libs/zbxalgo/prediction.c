@@ -22,19 +22,16 @@
 
 #include "zbxalgo.h"
 
-#define ZBX_MATH_OK	SUCCEED
-#define ZBX_MATH_FAIL	FAIL
-
 #define DB_INFINITY	(1e12-1e-4)
 #define ERROR_CODE	-1.0
 
 #define ZBX_MATH_EPSILON	(1.0e-6)
 
-#define ZBX_IS_NAN(x)	(x != x)
+#define ZBX_IS_NAN(x)	((x) != (x))
 
-#define ZBX_VALID_MATRIX(m)		(0 < m->rows && 0 < m->columns && NULL != m->elements)
-#define ZBX_MATRIX_EL(m, row, col)	(m->elements[(row) * m->columns + (col)])
-#define ZBX_MATRIX_ROW(m, row)		(m->elements + (row) * m->columns)
+#define ZBX_VALID_MATRIX(m)		(0 < (m)->rows && 0 < (m)->columns && NULL != (m)->elements)
+#define ZBX_MATRIX_EL(m, row, col)	((m)->elements[(row) * (m)->columns + (col)])
+#define ZBX_MATRIX_ROW(m, row)		((m)->elements + (row) * (m)->columns)
 
 typedef struct
 {
@@ -58,7 +55,7 @@ static int	zbx_matrix_alloc(zbx_matrix_t *m, int rows, int columns)
 	if (0 >= rows || 0 >= columns)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
 	m->rows = rows;
@@ -66,7 +63,7 @@ static int	zbx_matrix_alloc(zbx_matrix_t *m, int rows, int columns)
 
 	m->elements = (double *)zbx_malloc(m->elements, sizeof(double) * rows * columns);
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static void	zbx_matrix_free(zbx_matrix_t *m)
@@ -82,28 +79,28 @@ static int	zbx_matrix_copy(zbx_matrix_t *dest, zbx_matrix_t *src)
 	if (!ZBX_VALID_MATRIX(src))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
-	if (ZBX_MATH_OK != zbx_matrix_alloc(dest, src->rows, src->columns))
-		return ZBX_MATH_FAIL;
+	if (SUCCEED != zbx_matrix_alloc(dest, src->rows, src->columns))
+		return FAIL;
 
 	memcpy(dest->elements, src->elements, sizeof(double) * src->rows * src->columns);
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static int	zbx_identity_matrix(zbx_matrix_t *m, int n)
 {
 	int	i, j;
 
-	if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, n))
-		return ZBX_MATH_FAIL;
+	if (SUCCEED != zbx_matrix_alloc(m, n, n))
+		return FAIL;
 
 	for (i = 0; i < n; ++i)
 		for (j = 0; j < n; ++j)
 			ZBX_MATRIX_EL(m, i, j) = (i == j ? 1.0 : 0.0);
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static int	zbx_transpose_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
@@ -113,17 +110,17 @@ static int	zbx_transpose_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 	if (!ZBX_VALID_MATRIX(m))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
-	if (ZBX_MATH_OK != zbx_matrix_alloc(r, m->columns, m->rows))
-		return ZBX_MATH_FAIL;
+	if (SUCCEED != zbx_matrix_alloc(r, m->columns, m->rows))
+		return FAIL;
 
 	for (i = 0; i < r->rows; ++i)
 		for (j = 0; j < r->columns; ++j)
 			ZBX_MATRIX_EL(r, i, j) = ZBX_MATRIX_EL(m, j, i);
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static void	zbx_matrix_swap_rows(zbx_matrix_t *m, int r1, int r2)
@@ -164,37 +161,37 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 	if (!ZBX_VALID_MATRIX(m) || m->rows != m->columns)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
 	n = m->rows;
 
 	if (1 == n)
 	{
-		if (ZBX_MATH_OK != zbx_matrix_alloc(r, 1, 1))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(r, 1, 1))
+			return FAIL;
 
 		if (0.0 == ZBX_MATRIX_EL(m, 0, 0))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "matrix is singular");
-			res = ZBX_MATH_FAIL;
+			res = FAIL;
 			goto out;
 		}
 
 		ZBX_MATRIX_EL(r, 0, 0) = 1.0 / ZBX_MATRIX_EL(m, 0, 0);
-		return ZBX_MATH_OK;
+		return SUCCEED;
 	}
 
 	if (2 == n)
 	{
-		if (ZBX_MATH_OK != zbx_matrix_alloc(r, 2, 2))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(r, 2, 2))
+			return FAIL;
 
 		if (0.0 == (det = ZBX_MATRIX_EL(m, 0, 0) * ZBX_MATRIX_EL(m, 1, 1) -
 				ZBX_MATRIX_EL(m, 0, 1) * ZBX_MATRIX_EL(m, 1, 0)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "matrix is singular");
-			res = ZBX_MATH_FAIL;
+			res = FAIL;
 			goto out;
 		}
 
@@ -202,15 +199,15 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 		ZBX_MATRIX_EL(r, 0, 1) = -ZBX_MATRIX_EL(m, 0, 1) / det;
 		ZBX_MATRIX_EL(r, 1, 0) = -ZBX_MATRIX_EL(m, 1, 0) / det;
 		ZBX_MATRIX_EL(r, 1, 1) = ZBX_MATRIX_EL(m, 0, 0) / det;
-		return ZBX_MATH_OK;
+		return SUCCEED;
 	}
 
-	if (ZBX_MATH_OK != zbx_identity_matrix(r, n))
-		return ZBX_MATH_FAIL;
+	if (SUCCEED != zbx_identity_matrix(r, n))
+		return FAIL;
 
 	zbx_matrix_struct_alloc(&l);
 
-	if (ZBX_MATH_OK != (res = zbx_matrix_copy(l, m)))
+	if (SUCCEED != (res = zbx_matrix_copy(l, m)))
 		goto out;
 
 	/* Gauss-Jordan elimination with partial (row) pivoting */
@@ -231,7 +228,7 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 		if (0.0 == pivot)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "matrix is singular");
-			res = ZBX_MATH_FAIL;
+			res = FAIL;
 			goto out;
 		}
 
@@ -266,7 +263,7 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 	for (i = 0; i < n; ++i)
 		zbx_matrix_divide_row_by(r, i, ZBX_MATRIX_EL(l, i, i));
 
-	res = ZBX_MATH_OK;
+	res = SUCCEED;
 out:
 	zbx_matrix_free(l);
 	return res;
@@ -280,11 +277,11 @@ static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t
 	if (!ZBX_VALID_MATRIX(left) || !ZBX_VALID_MATRIX(right) || left->columns != right->rows)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
-	if (ZBX_MATH_OK != zbx_matrix_alloc(result, left->rows, right->columns))
-		return ZBX_MATH_FAIL;
+	if (SUCCEED != zbx_matrix_alloc(result, left->rows, right->columns))
+		return FAIL;
 
 	for (i = 0; i < result->rows; ++i)
 	{
@@ -299,7 +296,7 @@ static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t
 		}
 	}
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent, zbx_matrix_t *coefficients)
@@ -316,16 +313,16 @@ static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent,
 	zbx_matrix_struct_alloc(&left_part);
 	zbx_matrix_struct_alloc(&right_part);
 
-	if (ZBX_MATH_OK != (res = zbx_transpose_matrix(independent, independent_transposed)))
+	if (SUCCEED != (res = zbx_transpose_matrix(independent, independent_transposed)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_matrix_mult(independent_transposed, independent, to_be_inverted)))
+	if (SUCCEED != (res = zbx_matrix_mult(independent_transposed, independent, to_be_inverted)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_inverse_matrix(to_be_inverted, left_part)))
+	if (SUCCEED != (res = zbx_inverse_matrix(to_be_inverted, left_part)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_matrix_mult(independent_transposed, dependent, right_part)))
+	if (SUCCEED != (res = zbx_matrix_mult(independent_transposed, dependent, right_part)))
 		goto out;
 
 	res = zbx_matrix_mult(left_part, right_part, coefficients);
@@ -343,30 +340,30 @@ static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m)
 
 	if (FIT_LINEAR == fit || FIT_POLYNOMIAL == fit || FIT_LOGARITHMIC == fit)
 	{
-		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 1))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(m, n, 1))
+			return FAIL;
 
 		for (i = 0; i < n; ++i)
 			ZBX_MATRIX_EL(m, i, 0) = x[i];
 	}
 	else if (FIT_EXPONENTIAL == fit || FIT_POWER == fit)
 	{
-		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 1))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(m, n, 1))
+			return FAIL;
 
 		for (i = 0; i < n; ++i)
 		{
 			if (0.0 >= x[i])
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "data contains negative or zero values");
-				return ZBX_MATH_FAIL;
+				return FAIL;
 			}
 
 			ZBX_MATRIX_EL(m, i, 0) = log(x[i]);
 		}
 	}
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, unsigned k, zbx_matrix_t *m)
@@ -376,8 +373,8 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, unsigned k, zbx
 
 	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit)
 	{
-		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 2))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(m, n, 2))
+			return FAIL;
 
 		for (i = 0; i < n; ++i)
 		{
@@ -387,8 +384,8 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, unsigned k, zbx
 	}
 	else if (FIT_LOGARITHMIC == fit || FIT_POWER == fit)
 	{
-		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, 2))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(m, n, 2))
+			return FAIL;
 
 		for (i = 0; i < n; ++i)
 		{
@@ -401,8 +398,8 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, unsigned k, zbx
 		if (k > n - 1)
 			k = n - 1;
 
-		if (ZBX_MATH_OK != zbx_matrix_alloc(m, n, k+1))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(m, n, k+1))
+			return FAIL;
 
 		for (i = 0; i < n; ++i)
 		{
@@ -418,7 +415,7 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, unsigned k, zbx
 		}
 	}
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, unsigned k, zbx_matrix_t *coefficients)
@@ -429,10 +426,10 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, unsigned k
 	zbx_matrix_struct_alloc(&independent);
 	zbx_matrix_struct_alloc(&dependent);
 
-	if (ZBX_MATH_OK != (res = zbx_fill_independent(t, n, fit, k, independent)))
+	if (SUCCEED != (res = zbx_fill_independent(t, n, fit, k, independent)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_fill_dependent(x, n, fit, dependent)))
+	if (SUCCEED != (res = zbx_fill_dependent(x, n, fit, dependent)))
 		goto out;
 
 	res = zbx_least_squares(independent, dependent, coefficients);
@@ -471,11 +468,11 @@ static int	zbx_derive_polynomial(zbx_matrix_t *polynomial, zbx_matrix_t *derivat
 	if (!ZBX_VALID_MATRIX(polynomial))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
-	if (ZBX_MATH_OK != zbx_matrix_alloc(derivative, (polynomial->rows > 1 ? polynomial->rows - 1 : 1), 1))
-		return ZBX_MATH_FAIL;
+	if (SUCCEED != zbx_matrix_alloc(derivative, (polynomial->rows > 1 ? polynomial->rows - 1 : 1), 1))
+		return FAIL;
 
 	for (i = 1; i < polynomial->rows; ++i)
 		ZBX_MATRIX_EL(derivative, i - 1, 0) = ZBX_MATRIX_EL(polynomial, i, 0) * i;
@@ -483,7 +480,7 @@ static int	zbx_derive_polynomial(zbx_matrix_t *polynomial, zbx_matrix_t *derivat
 	if (1 == i)
 		ZBX_MATRIX_EL(derivative, 0, 0) = 0.0;
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static int	zbx_polynomial_roots(zbx_matrix_t *coefficients, zbx_matrix_t *roots)
@@ -511,7 +508,7 @@ while(0)
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
 	degree = coefficients->rows - 1;
@@ -526,27 +523,27 @@ while(0)
 		{
 			/* attempt to solve equation 0 == 0, please check this case explicitly */
 			THIS_SHOULD_NEVER_HAPPEN;
-			return ZBX_MATH_FAIL;
+			return FAIL;
 		}
 
-		return ZBX_MATH_OK;
+		return SUCCEED;
 	}
 
 	if (1 == degree)
 	{
-		if (ZBX_MATH_OK != zbx_matrix_alloc(roots, 1, 2))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(roots, 1, 2))
+			return FAIL;
 
 		Re(ZBX_MATRIX_ROW(roots, 0)) = -ZBX_MATRIX_EL(coefficients, 0, 0) / ZBX_MATRIX_EL(coefficients, 1, 0);
 		Im(ZBX_MATRIX_ROW(roots, 0)) = 0.0;
 
-		return ZBX_MATH_OK;
+		return SUCCEED;
 	}
 
 	if (2 == degree)
 	{
-		if (ZBX_MATH_OK != zbx_matrix_alloc(roots, 2, 2))
-			return ZBX_MATH_FAIL;
+		if (SUCCEED != zbx_matrix_alloc(roots, 2, 2))
+			return FAIL;
 
 		if (0.0 < (temp = ZBX_MATRIX_EL(coefficients, 1, 0) * ZBX_MATRIX_EL(coefficients, 1, 0) -
 				4 * ZBX_MATRIX_EL(coefficients, 2, 0) * ZBX_MATRIX_EL(coefficients, 0, 0)))
@@ -566,17 +563,17 @@ while(0)
 					ZBX_MATRIX_EL(coefficients, 2, 0);
 		}
 
-		return ZBX_MATH_OK;
+		return SUCCEED;
 	}
 
 	zbx_matrix_struct_alloc(&denominator_multiplicands);
 	zbx_matrix_struct_alloc(&updates);
 
-	if (ZBX_MATH_OK != zbx_matrix_alloc(roots, degree, 2) ||
-			ZBX_MATH_OK != zbx_matrix_alloc(denominator_multiplicands, degree, 2) ||
-			ZBX_MATH_OK != zbx_matrix_alloc(updates, degree, 2))
+	if (SUCCEED != zbx_matrix_alloc(roots, degree, 2) ||
+			SUCCEED != zbx_matrix_alloc(denominator_multiplicands, degree, 2) ||
+			SUCCEED != zbx_matrix_alloc(updates, degree, 2))
 	{
-		res = ZBX_MATH_FAIL;
+		res = FAIL;
 		goto out;
 	}
 
@@ -707,11 +704,11 @@ while(0)
 	if (0 == roots_ok)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "polynomial root finding problem is ill-defined");
-		res = ZBX_MATH_FAIL;
+		res = FAIL;
 	}
 	else
 	{
-		res = ZBX_MATH_OK;
+		res = SUCCEED;
 	}
 out:
 	zbx_matrix_free(denominator_multiplicands);
@@ -734,16 +731,16 @@ static int	zbx_polynomial_minmax(double now, double time, zbx_mode_t mode, zbx_m
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
 	zbx_matrix_struct_alloc(&derivative);
 	zbx_matrix_struct_alloc(&derivative_roots);
 
-	if (ZBX_MATH_OK != (res = zbx_derive_polynomial(coefficients, derivative)))
+	if (SUCCEED != (res = zbx_derive_polynomial(coefficients, derivative)))
 		goto out;
 
-	if (ZBX_MATH_OK != (res = zbx_polynomial_roots(derivative, derivative_roots)))
+	if (SUCCEED != (res = zbx_polynomial_roots(derivative, derivative_roots)))
 		goto out;
 
 	/* choose min and max among now, now + time and derivative roots inbetween (these are potential local extrema) */
@@ -800,18 +797,18 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
 	zbx_matrix_struct_alloc(&shifted_coefficients);
 	zbx_matrix_struct_alloc(&roots);
 
-	if (ZBX_MATH_OK != (res = zbx_matrix_copy(shifted_coefficients, coefficients)))
+	if (SUCCEED != (res = zbx_matrix_copy(shifted_coefficients, coefficients)))
 		goto out;
 
 	ZBX_MATRIX_EL(shifted_coefficients, 0, 0) -= threshold;
 
-	if (ZBX_MATH_OK != (res = zbx_polynomial_roots(shifted_coefficients, roots)))
+	if (SUCCEED != (res = zbx_polynomial_roots(shifted_coefficients, roots)))
 		goto out;
 
 	/* choose the closest root right from now or set result to -1 otherwise */
@@ -852,7 +849,7 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t f
 	if (!ZBX_VALID_MATRIX(coefficients))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
 	if (FIT_LINEAR == fit)
@@ -866,7 +863,7 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t f
 	else if (FIT_POWER == fit)
 		*value = exp(ZBX_MATRIX_EL(coefficients, 0, 0) + ZBX_MATRIX_EL(coefficients, 1, 0) * log(t));
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
@@ -882,7 +879,7 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
 		if (SUCCEED != is_uint_range(fit_str + strlen("polynomial"), k, 1, 6))
 		{
 			*error = zbx_strdup(*error, "polynomial degree is invalid");
-			return ZBX_MATH_FAIL;
+			return FAIL;
 		}
 	}
 	else if (0 == strcmp(fit_str, "exponential"))
@@ -900,10 +897,10 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
 	else
 	{
 		*error = zbx_strdup(*error, "invalid 'fit' parameter");
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error)
@@ -931,10 +928,10 @@ int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error)
 	else
 	{
 		*error = zbx_strdup(*error, "invalid 'mode' parameter");
-		return ZBX_MATH_FAIL;
+		return FAIL;
 	}
 
-	return ZBX_MATH_OK;
+	return SUCCEED;
 }
 
 static void	zbx_log_expression(double now, zbx_fit_t fit, int k, zbx_matrix_t *coeffs)
@@ -1003,7 +1000,7 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 
 	zbx_matrix_struct_alloc(&coefficients);
 
-	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, k, coefficients)))
+	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
 		goto out;
 
 	zbx_log_expression(now, fit, k, coefficients);
@@ -1023,7 +1020,7 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 		else if (MODE_DELTA == mode)
 		{
 			result = 0.0;
-			res = ZBX_MATH_OK;
+			res = SUCCEED;
 		}
 
 		goto out;
@@ -1032,10 +1029,10 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit || FIT_LOGARITHMIC == fit || FIT_POWER == fit)
 	{
 		/* fit is monotone, therefore maximum and minimum are either at now or at now + time */
-		if (ZBX_MATH_OK != zbx_calculate_value(now, coefficients, fit, &left) ||
-				ZBX_MATH_OK != zbx_calculate_value(now + time, coefficients, fit, &right))
+		if (SUCCEED != zbx_calculate_value(now, coefficients, fit, &left) ||
+				SUCCEED != zbx_calculate_value(now + time, coefficients, fit, &right))
 		{
-			res = ZBX_MATH_FAIL;
+			res = FAIL;
 			goto out;
 		}
 
@@ -1076,7 +1073,7 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 			}
 		}
 
-		res = ZBX_MATH_OK;
+		res = SUCCEED;
 	}
 	else if (FIT_POLYNOMIAL == fit)
 	{
@@ -1087,14 +1084,14 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 		{
 			result = (zbx_polynomial_antiderivative(now + time, coefficients) -
 					zbx_polynomial_antiderivative(now, coefficients)) / time;
-			res = ZBX_MATH_OK;
+			res = SUCCEED;
 		}
 	}
 
 out:
 	zbx_matrix_free(coefficients);
 
-	if (ZBX_MATH_OK != res)
+	if (SUCCEED != res)
 	{
 		result = ERROR_CODE;
 	}
@@ -1132,12 +1129,12 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 
 	zbx_matrix_struct_alloc(&coefficients);
 
-	if (ZBX_MATH_OK != (res = zbx_regression(t, x, n, fit, k, coefficients)))
+	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
 		goto out;
 
 	zbx_log_expression(now, fit, k, coefficients);
 
-	if (ZBX_MATH_OK != (res = zbx_calculate_value(now, coefficients, fit, &current)))
+	if (SUCCEED != (res = zbx_calculate_value(now, coefficients, fit, &current)))
 	{
 		goto out;
 	}
