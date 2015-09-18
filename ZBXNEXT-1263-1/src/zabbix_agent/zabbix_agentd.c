@@ -522,51 +522,104 @@ static void	set_defaults(void)
 static void	zbx_validate_config(void)
 {
 	char	*ch_error;
+	int	err = 0;
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
-
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
+	else if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s': %s", CONFIG_HOSTNAME,
 				ch_error);
 		zbx_free(ch_error);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < zbx_strlen_utf8(CONFIG_HOST_METADATA))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostMetadata\" configuration parameter cannot be longer than"
 				" %d characters", HOST_METADATA_LEN);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	/* make sure active or passive check is enabled */
 	if (0 == CONFIG_ACTIVE_FORKS && 0 == CONFIG_PASSIVE_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_ACCEPT || NULL != CONFIG_TLS_CA_FILE ||
-			NULL != CONFIG_TLS_CRL_FILE || NULL != CONFIG_TLS_SERVER_CERT_ISSUER ||
-			NULL != CONFIG_TLS_SERVER_CERT_SUBJECT || NULL != CONFIG_TLS_CERT_FILE ||
-			NULL != CONFIG_TLS_KEY_FILE || NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+#define FMT	"\"%s\" configuration parameter cannot be used: Zabbix agentd was compiled without TLS support"
+	if (NULL != CONFIG_TLS_CONNECT)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix agentd was compiled without TLS"
-				" support");
-		exit(EXIT_FAILURE);
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSConnect");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_ACCEPT)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSAccept");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_CA_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCAFile");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_CRL_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCRLFile");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_SERVER_CERT_ISSUER)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSServerCertIssuer");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_SERVER_CERT_SUBJECT)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSServerCertSubject");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_CERT_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCertFile");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_KEY_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSKeyFile");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_PSK_IDENTITY)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSPSKIdentity");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_PSK_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSPSKFile");
+		err = 1;
 	}
 #endif
+	if (0 != err)
+		exit(EXIT_FAILURE);
 }
 
 static int	add_activechk_host(const char *host, unsigned short port)

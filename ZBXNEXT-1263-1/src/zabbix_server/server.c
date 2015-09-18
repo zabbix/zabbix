@@ -176,9 +176,7 @@ char	*CONFIG_ALERT_SCRIPTS_PATH	= NULL;
 char	*CONFIG_EXTERNALSCRIPTS		= NULL;
 char	*CONFIG_TMPDIR			= NULL;
 char	*CONFIG_FPING_LOCATION		= NULL;
-#ifdef HAVE_IPV6
 char	*CONFIG_FPING6_LOCATION		= NULL;
-#endif
 char	*CONFIG_DBHOST			= NULL;
 char	*CONFIG_DBNAME			= NULL;
 char	*CONFIG_DBSCHEMA		= NULL;
@@ -213,11 +211,9 @@ char	**CONFIG_LOAD_MODULE		= NULL;
 char	*CONFIG_USER			= NULL;
 
 /* web monitoring */
-#ifdef HAVE_LIBCURL
 char	*CONFIG_SSL_CA_LOCATION		= NULL;
 char	*CONFIG_SSL_CERT_LOCATION	= NULL;
 char	*CONFIG_SSL_KEY_LOCATION	= NULL;
-#endif
 
 /* TLS parameters */
 unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in server, defined for linking */
@@ -413,49 +409,134 @@ static void	zbx_set_defaults(void)
  ******************************************************************************/
 static void	zbx_validate_config(void)
 {
+	int	err = 0;
+
 	if (0 == CONFIG_UNREACHABLE_POLLER_FORKS && 0 != CONFIG_POLLER_FORKS + CONFIG_IPMIPOLLER_FORKS +
 			CONFIG_JAVAPOLLER_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"StartPollersUnreachable\" configuration parameter must not be 0"
 				" if regular, IPMI or Java pollers are started");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) && CONFIG_JAVAPOLLER_FORKS > 0)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (0 != CONFIG_VALUE_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_VALUE_CACHE_SIZE)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"ValueCacheSize\" configuration parameter must be either 0"
 				" or greater than 128KB");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
+#if !defined(HAVE_IPV6)
+	if (NULL != CONFIG_FPING6_LOCATION)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"Fping6Location\" configuration parameter cannot be used: Zabbix server"
+				" was compiled without IPv6 support");
+		err = 1;
+	}
+#endif
+
+#if !defined(HAVE_LIBCURL)
+#define FMT	"\"%s\" configuration parameter cannot be used: Zabbix server was compiled without cURL library"
+
+	if (NULL != CONFIG_SSL_CA_LOCATION)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "SSLCALocation");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_SSL_CERT_LOCATION)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "SSLCertLocation");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_SSL_KEY_LOCATION)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "SSLKeyLocation");
+		err = 1;
+	}
+
+#undef FMT
+#endif
+
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
+#define FMT	"\"%s\" configuration parameter cannot be used: Zabbix server was compiled without VMware support"
+
 	if (0 != CONFIG_VMWARE_FORKS)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot start vmware collector because Zabbix server is built without VMware"
-				" support");
-		exit(EXIT_FAILURE);
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "StartVMwareCollectors");
+		err = 1;
 	}
-#endif
-#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	if (NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE || NULL != CONFIG_TLS_CERT_FILE ||
-			NULL != CONFIG_TLS_KEY_FILE)
+
+	if (0 != CONFIG_VMWARE_FREQUENCY)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix server was compiled without TLS"
-				" support");
-		exit(EXIT_FAILURE);
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "VMwareFrequency");
+		err = 1;
 	}
+
+	if (0 != CONFIG_VMWARE_PERF_FREQUENCY)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "VMwarePerfFrequency");
+		err = 1;
+	}
+
+	if (0 != CONFIG_VMWARE_CACHE_SIZE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "VMwareCacheSize");
+		err = 1;
+	}
+
+	if (0 != CONFIG_VMWARE_TIMEOUT)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "VMwareTimeout");
+		err = 1;
+	}
+
+#undef FMT
 #endif
+
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+#define FMT	"\"%s\" configuration parameter cannot be used: Zabbix server was compiled without TLS support"
+
+	if (NULL != CONFIG_TLS_CA_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCAFile");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_CRL_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCRLFile");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_CERT_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCertFile");
+		err = 1;
+	}
+
+	if (NULL != CONFIG_TLS_KEY_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSKeyFile");
+		err = 1;
+	}
+
+#undef FMT
+#endif
+	if (0 != err)
+		exit(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -529,10 +610,8 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			0},
 		{"FpingLocation",		&CONFIG_FPING_LOCATION,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-#ifdef HAVE_IPV6
 		{"Fping6Location",		&CONFIG_FPING6_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
 		{"Timeout",			&CONFIG_TIMEOUT,			TYPE_INT,
 			PARM_OPT,	1,			30},
 		{"TrapperTimeout",		&CONFIG_TRAPPER_TIMEOUT,		TYPE_INT,
@@ -603,14 +682,12 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			1},
 		{"User",			&CONFIG_USER,				TYPE_STRING,
 			PARM_OPT,	0,			0},
-#ifdef HAVE_LIBCURL
 		{"SSLCALocation",		&CONFIG_SSL_CA_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SSLCertLocation",		&CONFIG_SSL_CERT_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"SSLKeyLocation",		&CONFIG_SSL_KEY_LOCATION,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-#endif
 		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
