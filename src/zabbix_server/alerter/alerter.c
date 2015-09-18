@@ -54,7 +54,7 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 {
 	const char	*__function_name = "execute_action";
 
-	int 	res = FAIL;
+	int		res = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(): alertid [" ZBX_FS_UI64 "] mediatype [%d]",
 			__function_name, alert->alertid, mediatype->type);
@@ -98,12 +98,14 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 
 		if (0 == access(cmd, X_OK))
 		{
-			char	*pstart, *pend;
+			char	*pstart, *pend, *param = NULL;
+			size_t	param_alloc = 0, param_offset;
 
 			for (pstart = mediatype->exec_params; NULL != (pend = strchr(pstart, '\n')); pstart = pend + 1)
 			{
-				char	*param = NULL, *param_esc;
-				size_t	param_alloc = 0, param_offset = 0;
+				char	*param_esc;
+
+				param_offset = 0;
 
 				zbx_strncpy_alloc(&param, &param_alloc, &param_offset, pstart, pend - pstart);
 
@@ -115,8 +117,9 @@ int	execute_action(DB_ALERT *alert, DB_MEDIATYPE *mediatype, char *error, int ma
 				zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, " '%s'", param_esc);
 
 				zbx_free(param_esc);
-				zbx_free(param);
 			}
+
+			zbx_free(param);
 
 			if (SUCCEED == (res = zbx_execute(cmd, &output, error, max_error_len, ALARM_ACTION_TIMEOUT)))
 			{
