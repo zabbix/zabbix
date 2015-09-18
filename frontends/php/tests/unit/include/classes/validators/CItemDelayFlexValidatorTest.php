@@ -119,7 +119,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 					'delay' => '86401',
 					'period' => '7,0:01-0:02'
 				]],
-				'Invalid flexible interval delay "86401": delay exceeds maximum delay "86400".'
+				'Invalid flexible interval delay: "86401" exceeds maximum delay of "86400".'
 			],
 			[
 				[[
@@ -128,7 +128,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 					'delay' => '99999',
 					'period' => '7,0:01-0:02'
 				]],
-				'Invalid flexible interval delay "99999": delay exceeds maximum delay "86400".'
+				'Invalid flexible interval delay: "99999" exceeds maximum delay of "86400".'
 			],
 			[
 				[[
