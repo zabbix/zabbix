@@ -158,7 +158,7 @@ class CFunctionMacroParser extends CParser {
 			$macros = (new CUserMacroParser($this->source, false, $this->pos))->getMacros();
 
 			if ($macros) {
-				$this->pos += $macros[0]['positions']['length'];
+				$this->pos += strlen($macros[0]['match']);
 			}
 			// numeric parameter or empty parameter
 			else {

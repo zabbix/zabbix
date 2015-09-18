@@ -602,19 +602,21 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			preg_match_all($pattern, $trigger[$source], $matches, PREG_OFFSET_CAPTURE);
 
 			for ($i = count($matches[0]) - 1; $i >= 0; $i--) {
-				$matche = $matches[0][$i];
+				$match = $matches[0][$i];
 
-				$macrosValue = isset($macro_values[$triggerid][$matche[0]])
-					? $macro_values[$triggerid][$matche[0]]
-					: $matche[0];
-				$trigger[$source] = substr_replace($trigger[$source], $macrosValue, $matche[1], strlen($matche[0]));
+				$macros_value = isset($macro_values[$triggerid][$match[0]])
+					? $macro_values[$triggerid][$match[0]]
+					: $match[0];
+				$trigger[$source] = substr_replace($trigger[$source], $macros_value, $match[1], strlen($match[0]));
 			}
 		}
 		unset($trigger);
 
 		if ($macro_values) {
 			foreach ($triggers as $triggerid => &$trigger) {
-				$trigger[$source] = $this->replaceUserMacros($trigger[$source], $macro_values[$triggerid]);
+				if (array_key_exists($triggerid, $macro_values)) {
+					$trigger[$source] = $this->replaceUserMacros($trigger[$source], $macro_values[$triggerid]);
+				}
 			}
 			unset($trigger);
 		}
@@ -977,7 +979,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 		}
 
-		// Replace macros to values one by one.
+		// Replace macros to values.
 		if ($macros) {
 			foreach ($macros as $key => $macro_data) {
 				$items[$key]['name_expanded'] = $this->replaceUserMacros($items[$key]['name_expanded'],
@@ -1093,7 +1095,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		// user macros
-		$userMacros = [];
+		$usermacros = [];
 
 		foreach ($items as $item) {
 			$itemKey = new CItemKey($item['key_expanded']);
@@ -1102,31 +1104,32 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$matched_macros = $this->findUserMacros([$item['key_expanded']]);
 
 				foreach ($matched_macros as $matched_macro) {
-					if (!array_key_exists($item['hostid'], $userMacros)) {
-						$userMacros[$item['hostid']] = [
+					if (!array_key_exists($item['hostid'], $usermacros)) {
+						$usermacros[$item['hostid']] = [
 							'hostids' => [$item['hostid']],
 							'macros' => []
 						];
 					}
 
-					$userMacros[$item['hostid']]['macros'][$matched_macro] = null;
+					$usermacros[$item['hostid']]['macros'][$matched_macro] = null;
 				}
 			}
 		}
 
-		if ($userMacros) {
-			$userMacros = $this->getUserMacros($userMacros);
+		// Get values for user macros.
+		if ($usermacros) {
+			$usermacros = $this->getUserMacros($usermacros);
 
 			foreach ($items as $key => $item) {
-				if (isset($userMacros[$item['hostid']])) {
+				if (isset($usermacros[$item['hostid']])) {
 					$macros[$key]['macros'] = isset($macros[$key])
-						? zbx_array_merge($macros[$key]['macros'], $userMacros[$item['hostid']]['macros'])
-						: $userMacros[$item['hostid']]['macros'];
+						? zbx_array_merge($macros[$key]['macros'], $usermacros[$item['hostid']]['macros'])
+						: $usermacros[$item['hostid']]['macros'];
 				}
 			}
 		}
 
-		// Replace macros to value one by one.
+		// Replace macros to values.
 		if ($macros) {
 			foreach ($macros as $key => $macro_data) {
 				$items[$key]['key_expanded'] = $this->replaceUserMacros($items[$key]['key_expanded'],
@@ -1459,7 +1462,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Replace user macros found in string. Iterate each char and change macros to values according to parsed positions.
 	 *
 	 * @param string $string	String that contains macros.
-	 * @param array $macros		Array of macros and values.
+	 * @param array $macros		An array of macros and values.
 	 *
 	 * @return string
 	 */
@@ -1468,21 +1471,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$pos = 0;
 		$output = '';
 
+		$user_macros = zbx_toHash($user_macros, 'pos');
+
 		while (isset($string[$pos])) {
-			$found = false;
-
-			foreach ($user_macros as $user_macro) {
-				if (array_key_exists($user_macro['macro'], $macros) && $pos == $user_macro['positions']['start']) {
-					$found = true;
-					$len = $user_macro['positions']['length'];
-					$str = $macros[$user_macro['macro']];
-					break;
-				}
-			}
-
-			if ($found) {
-				$output .= $str;
-				$pos += $len;
+			if (array_key_exists($pos, $user_macros) && array_key_exists($user_macros[$pos]['macro'], $macros)) {
+				$output .= $macros[$user_macros[$pos]['macro']];
+				$pos += strlen($user_macros[$pos]['match']);
 			}
 			else {
 				$output .= $string[$pos];

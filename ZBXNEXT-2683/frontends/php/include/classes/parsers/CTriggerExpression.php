@@ -631,10 +631,10 @@ class CTriggerExpression {
 			return false;
 		}
 
-		$this->pos += $macros[0]['positions']['length'] - 1;
+		$this->pos += strlen($macros[0]['match']) - 1;
 
 		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO, $macros[0]['match'],
-			$macros[0]['positions']['start'], $macros[0]['positions']['length']
+			$macros[0]['pos'], strlen($macros[0]['match'])
 		);
 
 		return true;
