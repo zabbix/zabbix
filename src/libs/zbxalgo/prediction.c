@@ -849,10 +849,7 @@ out:
 static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t fit, double *value)
 {
 	if (!ZBX_VALID_MATRIX(coefficients))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
+		goto error;
 
 	if (FIT_LINEAR == fit)
 		*value = ZBX_MATRIX_EL(coefficients, 0, 0) + ZBX_MATRIX_EL(coefficients, 1, 0) * t;
@@ -864,8 +861,14 @@ static int	zbx_calculate_value(double t, zbx_matrix_t *coefficients, zbx_fit_t f
 		*value = ZBX_MATRIX_EL(coefficients, 0, 0) + ZBX_MATRIX_EL(coefficients, 1, 0) * log(t);
 	else if (FIT_POWER == fit)
 		*value = exp(ZBX_MATRIX_EL(coefficients, 0, 0) + ZBX_MATRIX_EL(coefficients, 1, 0) * log(t));
+	else
+		goto error;
 
 	return SUCCEED;
+
+error:
+	THIS_SHOULD_NEVER_HAPPEN;
+	return FAIL;
 }
 
 int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, int *k, char **error)
