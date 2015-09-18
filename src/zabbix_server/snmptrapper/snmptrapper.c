@@ -33,6 +33,7 @@ static ino_t	trap_ino = 0;
 static char	*buffer = NULL;
 static int	offset = 0;
 static int	force = 0;
+static int	overflow_warning = 0;
 
 static void	DBget_lastsize()
 {
@@ -237,7 +238,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
 	}
 
 	if (FAIL == ret && 1 == *(unsigned char *)DCconfig_get_config_data(&i, CONFIG_SNMPTRAP_LOGGING))
-		zabbix_log(LOG_LEVEL_WARNING, "unmatched trap received from [%s]: %s", addr, trap);
+		zabbix_log(LOG_LEVEL_WARNING, "unmatched trap received from \"%s\": %s", addr, trap);
 
 	zbx_free(interfaceids);
 	zbx_free(trap);
@@ -371,14 +372,15 @@ static int	read_traps()
 
 	if ((off_t)-1 == lseek(trap_fd, (off_t)trap_lastsize, SEEK_SET))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to [%d] for [%s]: %s", trap_lastsize,
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set position to %d for \"%s\": %s", trap_lastsize,
 				CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 		goto exit;
 	}
 
 	if (-1 == (nbytes = read(trap_fd, buffer + offset, MAX_BUFFER_LEN - offset - 1)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot read from [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot read from SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+				zbx_strerror(errno));
 		goto exit;
 	}
 
@@ -430,19 +432,39 @@ static int	open_trap_file()
 {
 	zbx_stat_t	file_buf;
 
+	if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot stat SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+				zbx_strerror(errno));
+		goto out;
+	}
+
+	if (INT_MAX < file_buf.st_size)
+	{
+		if (0 == overflow_warning)
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot process SNMP trapper file \"%s\":"
+					" file size exceeds the maximum supported size of 2 GB",
+					CONFIG_SNMPTRAP_FILE);
+			overflow_warning = 1;
+		}
+		goto out;
+	}
+
+	overflow_warning = 0;
+
 	if (-1 == (trap_fd = open(CONFIG_SNMPTRAP_FILE, O_RDONLY)))
 	{
 		if (ENOENT != errno)	/* file exists but cannot be opened */
-			zabbix_log(LOG_LEVEL_CRIT, "cannot open [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
+		{
+			zabbix_log(LOG_LEVEL_CRIT, "cannot open SNMP trapper file \"%s\": %s", CONFIG_SNMPTRAP_FILE,
+					zbx_strerror(errno));
+		}
+		goto out;
 	}
-	else if (0 != zbx_stat(CONFIG_SNMPTRAP_FILE, &file_buf))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s", CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
-		close_trap_file();
-	}
-	else
-		trap_ino = file_buf.st_ino;	/* a new file was opened */
 
+	trap_ino = file_buf.st_ino;	/* a new file was opened */
+out:
 	return trap_fd;
 }
 
@@ -471,8 +493,8 @@ static int	get_latest_data()
 
 			if (ENOENT != errno)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "cannot stat [%s]: %s", CONFIG_SNMPTRAP_FILE,
-						zbx_strerror(errno));
+				zabbix_log(LOG_LEVEL_CRIT, "cannot stat SNMP trapper file \"%s\": %s",
+						CONFIG_SNMPTRAP_FILE, zbx_strerror(errno));
 			}
 
 			while (0 < read_traps())
@@ -481,6 +503,10 @@ static int	get_latest_data()
 			if (0 != offset)
 				parse_traps(1);
 
+			close_trap_file();
+		}
+		else if (INT_MAX < file_buf.st_size)
+		{
 			close_trap_file();
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
