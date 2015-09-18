@@ -270,7 +270,9 @@ int	zbx_dshm_realloc(zbx_dshm_t *shm, size_t size, char **errmsg)
 
 	if ((void *)(-1) == (addr = shmat(shmid, NULL, 0)))
 	{
-		shmdt(addr_old);
+		if (NULL != addr_old)
+			(void)shmdt(addr_old);
+
 		*errmsg = zbx_dsprintf(*errmsg, "cannot attach new shared memory: %s", zbx_strerror(errno));
 		goto out;
 	}
