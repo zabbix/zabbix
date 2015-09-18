@@ -30,15 +30,16 @@ Load values from input file. Specify \fB-\fR to read values from standard input.
 
 Each value corresponds to one line of the input file. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument. All entries are sent in a sequential order top-down.
 
-Zabbix sender will send up to 250 values in one connection.
-
-All entries from an input file are sent in a sequential order top-down.
-
-If an input file is used with -T option (see below) and the target item has triggers referencing it, all timestamps in an input file must be in an increasing order, otherwise event calculation will not be correct.
-
 An example of a line of the input file:
 
 \fB "Zabbix server" item1 sometext\fR
+
+Zabbix sender will send up to 250 values in one connection. For example when specifying input file with 300 values an output might look something like this:
+
+  # zabbix_sender -z 127.0.0.1 -i /tmp/traptest.txt
+  Info from server: "Processed 250 Failed 0 Total 250 Seconds spent 0.002668"
+  Info from server: "Processed 50 Failed 0 Total 50 Seconds spent 0.000540"
+  sent: 300; skipped: 0; total: 300
 
 Entries must be formatted using the following rules:
 
