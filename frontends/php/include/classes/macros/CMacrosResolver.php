@@ -908,7 +908,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$macros[$key] = ['macros' => []];
 
 				foreach ($matched_macros as $matched_macro) {
-					$macros[$key]['macros'][$matched_macro] = null;
+					$macros[$key]['macros'][$matched_macro] = '';
 				}
 
 				$itemsWithReferenceMacros[$key] = $item;
@@ -931,18 +931,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 			}
 
+			$item_key_parser = new CItemKey();
 			// reference macros - $1..$9
 			foreach ($itemsWithReferenceMacros as $key => $item) {
-				$itemKey = new CItemKey($item['key_expanded']);
-
-				if ($itemKey->isValid()) {
-					foreach ($itemKey->getParameters() as $n => $keyParameter) {
-						$paramNum = '$'.++$n;
-
-						if (array_key_exists($paramNum, $macros[$key]['macros'])) {
-							$macros[$key]['macros'][$paramNum] = $keyParameter;
+				if ($item_key_parser->parse($item['key_expanded']) == CItemKey::PARSE_SUCCESS) {
+					foreach ($macros[$key]['macros'] as $macro => &$value) {
+						$param = $item_key_parser->getParam($macro[1] - 1);
+						if ($param !== null) {
+							$value = $param;
 						}
 					}
+					unset($value);
 				}
 			}
 		}
@@ -980,18 +979,16 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		}
 
 		// Replace macros to values.
-		if ($macros) {
-			foreach ($macros as $key => $macro_data) {
-				$items[$key]['name_expanded'] = $this->replaceUserMacros($items[$key]['name_expanded'],
+		foreach ($macros as $key => $macro_data) {
+			$items[$key]['name_expanded'] = $this->replaceUserMacros($items[$key]['name_expanded'],
+				$macro_data['macros']
+			);
+
+			// Replace reference macros.
+			if (array_key_exists($key, $itemsWithReferenceMacros)) {
+				$items[$key]['name_expanded'] = $this->replaceReferenceMacros($items[$key]['name_expanded'],
 					$macro_data['macros']
 				);
-
-				// Replace reference macros.
-				if (array_key_exists($key, $itemsWithReferenceMacros)) {
-					$items[$key]['name_expanded'] = $this->replaceReferenceMacros($items[$key]['name_expanded'],
-						$macro_data['macros']
-					);
-				}
 			}
 		}
 
@@ -1098,21 +1095,17 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($items as $item) {
-			$itemKey = new CItemKey($item['key_expanded']);
+			$matched_macros = $this->findUserMacros([$item['key_expanded']]);
 
-			if ($itemKey->isValid()) {
-				$matched_macros = $this->findUserMacros([$item['key_expanded']]);
-
-				foreach ($matched_macros as $matched_macro) {
-					if (!array_key_exists($item['hostid'], $usermacros)) {
-						$usermacros[$item['hostid']] = [
-							'hostids' => [$item['hostid']],
-							'macros' => []
-						];
-					}
-
-					$usermacros[$item['hostid']]['macros'][$matched_macro] = null;
+			foreach ($matched_macros as $matched_macro) {
+				if (!array_key_exists($item['hostid'], $usermacros)) {
+					$usermacros[$item['hostid']] = [
+						'hostids' => [$item['hostid']],
+						'macros' => []
+					];
 				}
+
+				$usermacros[$item['hostid']]['macros'][$matched_macro] = null;
 			}
 		}
 
