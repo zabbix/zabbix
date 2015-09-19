@@ -31,549 +31,660 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 		return [
 			// valid keys
 			[
-				'key',
+				'key', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key',
 					'key_id' => 'key',
 					'parameters' => []
-				]
+				],
+				[]
 			],
 			[
-				'key[a]',
+				'key[]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[]',
 					'key_id' => 'key',
-					'parameters' => ['a']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['']
 			],
 			[
-				'key[a, b, c]',
+				'key[][]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[][]',
 					'key_id' => 'key',
-					'parameters' => ['a', 'b', 'c']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 1
+								]
+							]
+						],
+						1 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[]',
+							'pos' => 5,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['', '']
 			],
 			[
-				'key[ a, b, c]', // whitespace before 'a' should be ignored
+				'key[""]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[""]',
 					'key_id' => 'key',
-					'parameters' => ['a', 'b', 'c']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[""]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '""',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['']
 			],
 			[
-				'key[    a,    b,     c]',
+				'key[ ]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[ ]',
 					'key_id' => 'key',
-					'parameters' => ['a', 'b', 'c']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[ ]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 2
+								]
+							]
+						]
+					]
+				],
+				['']
 			],
 			[
-				'key[a , b  , c   ]',
+				'key[ ""]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[ ""]',
 					'key_id' => 'key',
-					'parameters' => ['a ', 'b  ', 'c   ']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[ ""]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '""',
+									'pos' => 2
+								]
+							]
+						]
+					]
+				],
+				['']
 			],
 			[
-				'key[   a ,   b  ,  c   ]',
+				'key[ "" ]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[ "" ]',
 					'key_id' => 'key',
-					'parameters' => ['a ', 'b  ', 'c   ']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[ "" ]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '""',
+									'pos' => 2
+								]
+							]
+						]
+					]
+				],
+				['']
 			],
 			[
-				'key[echo.one, !@##$%$%^&*(, ryrt"rtyrty]',
+				'key[a]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[a]',
 					'key_id' => 'key',
-					'parameters' => ['echo.one', '!@##$%$%^&*(', 'ryrt"rtyrty']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[a]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'a',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['a']
 			],
 			[
-				'key["a","b","c"]',
+				'key[ a]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[ a]',
 					'key_id' => 'key',
-					'parameters' => ['a', 'b', 'c']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[ a]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'a',
+									'pos' => 2
+								]
+							]
+						]
+					]
+				],
+				['a']
 			],
 			[
-				'key[  "a",  "b", "c"]',
+				'key[ a ]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[ a ]',
 					'key_id' => 'key',
-					'parameters' => ['a', 'b', 'c']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[ a ]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'a ',
+									'pos' => 2
+								]
+							]
+						]
+					]
+				],
+				['a ']
 			],
 			[
-				'key[  "a"  ,  "b"  , "c"  ]',
+				'key["a"]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key["a"]',
 					'key_id' => 'key',
-					'parameters' => ['a', 'b', 'c']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '["a"]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"a"',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['a']
 			],
 			[
-				'key["a ", " b ", " c"]',
+				'key["a",]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key["a",]',
 					'key_id' => 'key',
-					'parameters' => ['a ', ' b ', ' c']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '["a",]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"a"',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 5
+								]
+							]
+						]
+					]
+				],
+				['a', '']
 			],
 			[
-				'key[  "  a "  , "  b  "  ,  " c "  ]',
+				'key[a,b,c]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key[a,b,c]',
 					'key_id' => 'key',
-					'parameters' => ['  a ', '  b  ', ' c ']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[a,b,c]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'a',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'b',
+									'pos' => 3
+								],
+								2 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'c',
+									'pos' => 5
+								]
+							]
+						]
+					]
+				],
+				['a', 'b', 'c']
 			],
 			[
-				'key[123"456, 456"789]',
+				'key["a","b","c"]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key["a","b","c"]',
 					'key_id' => 'key',
-					'parameters' => ['123"456', '456"789']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '["a","b","c"]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"a"',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"b"',
+									'pos' => 5
+								],
+								2 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"c"',
+									'pos' => 9
+								]
+							]
+						]
+					]
+				],
+				['a', 'b', 'c']
 			],
 			[
-				'key[123\"456, 456"789]',
+				'key["a","b","c"]["d"]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key["a","b","c"]["d"]',
 					'key_id' => 'key',
-					'parameters' => ['123\"456', '456"789']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '["a","b","c"]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"a"',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"b"',
+									'pos' => 5
+								],
+								2 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"c"',
+									'pos' => 9
+								]
+							]
+						],
+						1 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '["d"]',
+							'pos' => 16,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"d"',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['a', 'b', 'c', 'd']
 			],
 			[
-				'key["I am \"testing\""]',
+				'key["a","b","c",[["d", ["e\",]" ] ], f"]]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key["a","b","c",[["d", ["e\",]" ] ], f"]]',
 					'key_id' => 'key',
-					'parameters' => ['I am "testing"']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '["a","b","c",[["d", ["e\",]" ] ], f"]]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"a"',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"b"',
+									'pos' => 5
+								],
+								2 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"c"',
+									'pos' => 9
+								],
+								3 => [
+									'type' => CItemKey::PARAM_ARRAY,
+									'raw' => '[["d", ["e\",]" ] ], f"]',
+									'pos' => 13,
+									'parameters' => [
+										0 => [
+											'type' => CItemKey::PARAM_ARRAY,
+											'raw' => '["d", ["e\",]" ] ]',
+											'pos' => 1,
+											'parameters' => [
+												0 => [
+													'type' => CItemKey::PARAM_QUOTED,
+													'raw' => '"d"',
+													'pos' => 1
+												],
+												1 => [
+													'type' => CItemKey::PARAM_ARRAY,
+													'raw' => '["e\",]" ]',
+													'pos' => 6,
+													'parameters' => [
+														0 => [
+															'type' => CItemKey::PARAM_QUOTED,
+															'raw' => '"e\",]"',
+															'pos' => 1
+														]
+													]
+												]
+											]
+										],
+										1 => [
+											'type' => CItemKey::PARAM_UNQUOTED,
+											'raw' => 'f"',
+											'pos' => 21
+										]
+									]
+								]
+							]
+						]
+					]
+				],
+				['a', 'b', 'c', '["d", ["e\",]" ] ], f"']
 			],
 			[
-				'key["I am \"testing\"  "]',
+				'key["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]', 0,
 				[
-					'valid' => true,
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => 'key["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]',
 					'key_id' => 'key',
-					'parameters' => ['I am "testing"  ']
-				]
-			],
-			[
-				'key["123", "456", 789]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['123', '456', '789']
-				]
-			],
-			[
-				'key["12\"3", "456", 789]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['12"3', '456', '789']
-				]
-			],
-			[
-				'key[abc[]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['abc[']
-				]
-			],
-			[
-				'key["a[][][]]],\"!@$#$^%*&*)"]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a[][][]]],"!@$#$^%*&*)']
-				]
-			],
-			[
-				'key[["a"],b]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['"a"', 'b']
-				]
-			],
-			[
-				'complex.key[a, b, c]',
-				[
-					'valid' => true,
-					'key_id' => 'complex.key',
-					'parameters' => ['a', 'b', 'c']
-				]
-			],
-			[
-				'complex.key[[a, b], c]',
-				[
-					'valid' => true,
-					'key_id' => 'complex.key',
-					'parameters' => ['a, b', 'c']
-				]
-			],
-			[
-				'complex.key[abc"efg"h]',
-				[
-					'valid' => true,
-					'key_id' => 'complex.key',
-					'parameters' => ['abc"efg"h']
-				]
-			],
-			[
-				'complex.key[a][b]',
-				[
-					'valid' => true,
-					'key_id' => 'complex.key',
-					'parameters' => ['a', 'b']
-				]
-			],
-			[
-				'complex.key["a"]["b"]',
-			[
-					'valid' => true,
-					'key_id' => 'complex.key',
-					'parameters' => ['a', 'b']
-				]
-			],
-			[
-				'complex.key["a"][b]',
-				[
-					'valid' => true,
-					'key_id' => 'complex.key',
-					'parameters' => ['a', 'b']
-				]
-			],
-			[
-				'complex.key[a, b][c, d]',
-				[
-					'valid' => true,
-					'key_id' => 'complex.key',
-					'parameters' => ['a', 'b', 'c', 'd']
-				]
-			],
-			[
-				'complex.key["a", "b"]["c", "d"]',
-				[
-					'valid' => true,
-					'key_id' => 'complex.key',
-					'parameters' => ['a', 'b', 'c', 'd']
-				]
-			],
-			[
-				'more.complex.key[1, 2, [A, B, [a, b], C], 3]',
-				[
-					'valid' => true,
-					'key_id' => 'more.complex.key',
-					'parameters' => ['1', '2', 'A, B, [a, b], C', '3']
-				]
-			],
-			[
-				'more.complex.key["1", "2", ["A", "B", ["a", "b"], "C"], "3"]',
-				[
-					'valid' => true,
-					'key_id' => 'more.complex.key',
-					'parameters' => ['1', '2', '"A", "B", ["a", "b"], "C"', '3']
-				]
-			],
-			[
-				'more.complex.key[["1"]]',
-				[
-					'valid' => true,
-					'key_id' => 'more.complex.key',
-					'parameters' => ['"1"']
-				]
-			],
-			[
-				'key[,,]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['', '', '']
-				]
-			],
-			[
-				'key[a"]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a"']
-				]
-			],
-			[
-				'key[a\"]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a\"']
-				]
-			],
-			[
-				'key["\""]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['"']
-				]
-			],
-			[
-				'key["\\""]', // key["\""]
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['"']
-				]
-			],
-			[
-				'key["\\\""]', // key["\\""]
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['\\"']
-				]
-			],
-			[
-				'key["\\\\""]', // key["\\""]
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['\"']
-				]
-			],
-			[
-				'key["\ "]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['\ ']
-				]
-			],
-			[
-				'key["\\ "]', // key["\ "]
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['\\ ']
-				]
-			],
-			[
-				'key["\\\\ "]',  // key["\\ "]
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['\\\\ ']
-				]
-			],
-			['key["\"]', false],
-			['key["\\"]', false],
-			['key["\\\"]', false],
-			['key["\\\\"]', false],
-			[
-				'key[a,]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a', '']
-				]
-			],
-			[
-				'key["a",]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a', '']
-				]
-			],
-			[
-				'system.run["echo \'a\"b\' | cut -d\'\"\' -f1"]',
-				[
-					'valid' => true,
-					'key_id' => 'system.run',
-					'parameters' => ['echo \'a"b\' | cut -d\'"\' -f1']
-				]
-			],
-			[
-				'012345',
-				[
-					'valid' => true,
-					'key_id' => '012345',
-					'parameters' => []
-				]
-			],
-			[
-				'key[ГУГЛ]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['ГУГЛ']
-				]
-			],
-			[
-				'key["ГУГЛ"]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['ГУГЛ']
-				]
-			],
-			[
-				'key[["a", "b", "c"], "d"]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['"a", "b", "c"', 'd']
-				]
-			],
-			[
-				'key["a", ["b", "c"], "d"]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a', '"b", "c"', 'd']
-				]
-			],
-			[
-				'key[[a, b, c], d]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a, b, c', 'd']
-				]
-			],
-			[
-				'key[a, [b, c], d]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a', 'b, c', 'd']
-				]
-			],
-			[
-				'key["a", "b", "c"]["d"]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a', 'b', 'c', 'd']
-				]
-			],
-			[
-				'key[a, b, c][d]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a', 'b', 'c', 'd']
-				]
-			],
-			[
-				'key["12\"3", "456", 789]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['12"3', '456', '789']
-				]
-			],
-			[
-				'key',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => []
-				]
-			],
-			[
-				'key[]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['']
-				]
-			],
-			[
-				'key[""]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['']
-				]
-			],
-			[
-				'key["", "", ""]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['', '', '']
-				]
-			],
-			[
-				'key[, abc]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['', 'abc']
-				]
-			],
-			[
-				'key["", abc]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['', 'abc']
-				]
-			],
-			[
-				'key[][abc]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['', 'abc']
-				]
-			],
-			[
-				'key[ab"\"c]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['ab"\"c']
-				]
-			],
-			[
-				'key[[a, b, c]][a]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['a, b, c', 'a']
-				]
-			],
-			[
-				'key[["a", "b", "c"]]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['"a", "b", "c"']
-				]
-			],
-			[
-				'key[["\"a\"", "\"b\"", "\"c\""]]',
-				[
-					'valid' => true,
-					'key_id' => 'key',
-					'parameters' => ['"\"a\"", "\"b\"", "\"c\""']
-				]
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"\"aaa\""',
+									'pos' => 1
+								],
+								1 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"bbb"',
+									'pos' => 12
+								],
+								2 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"ccc"',
+									'pos' => 18
+								],
+								3 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '"ddd"',
+									'pos' => 26
+								],
+								4 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '""',
+									'pos' => 33
+								],
+								5 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '""',
+									'pos' => 37
+								],
+								6 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '""',
+									'pos' => 40
+								],
+								7 => [
+									'type' => CItemKey::PARAM_QUOTED,
+									'raw' => '""',
+									'pos' => 45
+								],
+								8 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 49
+								],
+								9 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 51
+								],
+								10 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => '',
+									'pos' => 54
+								],
+								11 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'eee',
+									'pos' => 55
+								],
+								12 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'fff',
+									'pos' => 60
+								],
+								13 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'ggg ',
+									'pos' => 64
+								],
+								14 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'hhh" ',
+									'pos' => 70
+								]
+							]
+						]
+					]
+				],
+				['"aaa"', 'bbb', 'ccc', 'ddd', '', '', '', '', '', '', '', 'eee', 'fff', 'ggg ', 'hhh" ']
 			],
 
 			// invalid keys
-			['key[["a",]', false],
-			['key[a]654', false],
+			[
+				'key[["a",]', 0,
+				[
+					'rc' => CItemKey::PARSE_SUCCESS_PART,
+					'error' => 'unexpected end of key',
+					'key' => 'key',
+					'key_id' => 'key',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key[ГУГЛ]654', 0,
+				[
+					'rc' => CItemKey::PARSE_SUCCESS_PART,
+					'error' => 'incorrect syntax near "654"',
+					'key' => 'key[ГУГЛ]',
+					'key_id' => 'key',
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[ГУГЛ]',
+							'pos' => 3,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'ГУГЛ',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['ГУГЛ']
+			],
+			[
+				'key[ГУГЛ]654', 2,
+				[
+					'rc' => CItemKey::PARSE_SUCCESS_PART,
+					'error' => 'incorrect syntax near "654"',
+					'key' => 'y[ГУГЛ]',
+					'key_id' => 'y',
+					'parameters' => [
+						0 => [
+							'type' => CItemKey::PARAM_ARRAY,
+							'raw' => '[ГУГЛ]',
+							'pos' => 1,
+							'parameters' => [
+								0 => [
+									'type' => CItemKey::PARAM_UNQUOTED,
+									'raw' => 'ГУГЛ',
+									'pos' => 1
+								]
+							]
+						]
+					]
+				],
+				['ГУГЛ']
+			],
+			[
+				'key[a]654', 8,
+				[
+					'rc' => CItemKey::PARSE_SUCCESS,
+					'error' => '',
+					'key' => '4',
+					'key_id' => '4',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'key[a]654', 9,
+				[
+					'rc' => CItemKey::PARSE_FAIL,
+					'error' => 'key is empty',
+					'key' => '',
+					'key_id' => '',
+					'parameters' => []
+				],
+				[]
+			],
+/*	*/
+/*			['key[a]654', false],
 			['key["a"]654', false],
 			['key[a][[b]', false],
 			['key["a"][["b"]', false],
@@ -592,27 +703,34 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			['telnet,', false],
 			['telnet,1023', false],
 			['telnet,1023[]', false],
-			['[]', false]
+			['[]', false]*/
 		];
 	}
 
 	/**
 	* @dataProvider provider
 	*/
-	public function test_parseItemKey($key, $expectedResult) {
+	public function test_parseItemKey($key, $pos, $expectedResult, $unquoted_params) {
+		static $item_key_parser = null;
 
-		$itemKey = new CItemKey($key);
-		$result = [
-			'valid' => $itemKey->isValid(),
-			'key_id' => $itemKey->getKeyId(),
-			'parameters' => $itemKey->getParameters()
-		];
-		if ($expectedResult === false) {
-			$this->assertFalse($result['valid'], "I was expecting key $key to be invalid, but got: \n".print_r($result, true));
+		if ($item_key_parser === null) {
+			$item_key_parser = new CItemKey();
 		}
-		else {
-			unset($result['error']); // no error descriptions in data providers
-			$this->assertEquals($result, $expectedResult, "I was expecting: \n".print_r($expectedResult, true)."but got: \n".print_r($result, true).' for key '.$key);
+
+		$rc = $item_key_parser->parse($key, $pos);
+
+		$result = [
+			'rc' => $rc,
+			'error' => $item_key_parser->getError(),
+			'key' => $item_key_parser->getKey(),
+			'key_id' => $item_key_parser->getKeyId(),
+			'parameters' => $item_key_parser->getParamsRaw()
+		];
+		$this->assertEquals($expectedResult, $result);
+		$this->assertEquals(count($unquoted_params), $item_key_parser->getParamsNum());
+
+		for ($n = 0, $count = $item_key_parser->getParamsNum(); $n < $count; $n++) {
+			$this->assertEquals($unquoted_params[$n], $item_key_parser->getParam($n));
 		}
 	}
 }
