@@ -65,39 +65,39 @@ Examples:
 
 .RS
 .TS
-allbox;
+tab(|) allbox;
 c c
 l l.
-entry	result
-sometext	sometext
-"some text"	some text
-"some \\"text\\""	some "text"
-"C:\\\\"	C:\\ 
-C:\\	C:\\ 
-some\\ntext	some\\ntext
-"some\\ttext"	some\\ttext
-"some\\ntext"	T{
+entry|result
+sometext|sometext
+"some text"|some text
+"some \\"text\\""|some "text"
+"C:\\\\"|C:\\ 
+C:\\ |C:\\ 
+"C:\\My Documents"|C:\\My Documents
+"C:\\"|Warning: [line 1] 'Key value' required
+some\\ntext|some\\ntext
+"some\\ttext"|some\\ttext
+"some\\ntext"|T{
 some
 .br
 text
 T}
-"C:\\My Documents"	C:\\My Documents
-"C:\\"	Warning: [line 1] 'Key value' required
-"some\\ntext\\n\\n"	T{
+"some\\ntext\\n\\n"|T{
 some
 .br
 text
 T}
-"\\n\\nsome\\ntext"	T{
+"\\n\\nsome\\ntext"|T{
+.BR
 .br
-
+.BR
 .br
-
 some
 .br
 text
 T}
-"\\n\\n"	
+"\\n\\n"|
 .TE
 .RE
 
