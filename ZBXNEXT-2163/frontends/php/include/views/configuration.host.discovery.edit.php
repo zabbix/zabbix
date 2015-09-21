@@ -336,7 +336,9 @@ foreach ($conditions as $i => $condition) {
 			->addClass('element-table-remove')
 	];
 
-	$row = [$formulaId, $macro, new CSpan(_('matches')), $value, $deleteButtonCell];
+	$row = [$formulaId, $macro, new CSpan(_('matches')), $value,
+		(new CCol($deleteButtonCell))->addClass(ZBX_STYLE_NOWRAP)
+	];
 	$conditionTable->addRow($row, 'form_row');
 }
 

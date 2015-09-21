@@ -18,22 +18,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/class.czabbixtest.php';
 
-class API_JSON_APIInfo extends CZabbixTest {
+class CHorList extends CList {
 
-	public function testAPIInfo_VersionWithAuth() {
-		$result = $this->api_acall('apiinfo.version', [], $debug);
+	/**
+	 * Creates a UL horizontal list with spaces between elements.
+	 *
+	 * @param array $values			an array of items to add to the list
+	 */
+	public function __construct(array $values = []) {
+		parent::__construct($values);
 
-		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '3.0.0');
-	}
-
-	public function testAPIInfo_VersionWithoutAuth() {
-		$result = $this->api_call('apiinfo.version', [], $debug);
-
-		$this->assertTrue(isset($result['result']), $debug);
-		$this->assertSame($result['result'], '3.0.0');
+		$this->addClass(ZBX_STYLE_HOR_LIST);
 	}
 
 }
