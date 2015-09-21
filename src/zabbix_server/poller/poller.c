@@ -773,7 +773,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	int		nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t		last_stat_time;
+	time_t		last_stat_time, last_ipmi_host_check;
 	unsigned char	poller_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -792,7 +792,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		init_snmp(progname);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
-	last_stat_time = time(NULL);
+	last_stat_time = last_ipmi_host_check = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -808,7 +808,13 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		sec = zbx_time();
 		processed += get_values(poller_type);
 		total_sec += zbx_time() - sec;
-
+#ifdef HAVE_OPENIPMI
+		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
+		{
+			last_ipmi_host_check = time(NULL);
+			delete_inactive_ipmi_hosts(last_ipmi_host_check);
+		}
+#endif
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 

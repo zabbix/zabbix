@@ -32,8 +32,8 @@ $filterColumn2 = new CFormList();
 
 $filterColumn2->addRow(_('From'), createDateSelector('filter_from', $this->data['filter']['filter_from']));
 $filterColumn2->addRow(_('Till'), createDateSelector('filter_till', $this->data['filter']['filter_till']));
-$filterColumn2->addRow(null,
-	[
+$filterColumn2->addRow(null, [
+	new CHorList([
 		(new CButton(null, _('Today')))
 			->onClick('javascript: setPeriod('.REPORT_PERIOD_TODAY.');')
 			->addClass(ZBX_STYLE_BTN_LINK),
@@ -48,8 +48,9 @@ $filterColumn2->addRow(null,
 			->addClass(ZBX_STYLE_BTN_LINK),
 		(new CButton(null, _('Current year')))
 			->onClick('javascript: setPeriod('.REPORT_PERIOD_CURRENT_YEAR.');')
-			->addClass(ZBX_STYLE_BTN_LINK),
-		BR(),
+			->addClass(ZBX_STYLE_BTN_LINK)
+	]),
+	new CHorList([
 		(new CButton(null, _('Last week')))
 			->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_WEEK.');')
 			->addClass(ZBX_STYLE_BTN_LINK),
@@ -59,8 +60,8 @@ $filterColumn2->addRow(null,
 		(new CButton(null, _('Last year')))
 			->onClick('javascript: setPeriod('.REPORT_PERIOD_LAST_YEAR.');')
 			->addClass(ZBX_STYLE_BTN_LINK)
-	]
-);
+	])
+]);
 
 $filterColumn1->addRow(
 	'Host groups',
@@ -89,25 +90,21 @@ $filterColumn1->addRow(
 );
 
 // severities
-$severitiesTable = (new CTable())->addClass('severities-table');
+$severity_columns = [0 => [], 1 => []];
 
 for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_COUNT; $severity++) {
-	$serverityCheckBox = (new CCheckBox('severities['.$severity.']'))
-		->setChecked(in_array($severity, $this->data['filter']['severities']));
-
-	if ($severity % 2) {
-		$severitiesCol2[] = new CCol([$serverityCheckBox, getSeverityName($severity, $this->data['config'])]);
-	}
-	else {
-		$severitiesCol1[] = new CCol([$serverityCheckBox, getSeverityName($severity, $this->data['config'])]);
-	}
+	$severity_columns[$severity % 2][] = new CLabel([
+		(new CCheckBox('severities['.$severity.']'))
+			->setChecked(in_array($severity, $this->data['filter']['severities'])),
+		getSeverityName($severity, $this->data['config'])
+	], 'severities['.$severity.']');
 }
 
-$severitiesTable->
-	addRow($severitiesCol1)
-	->addRow($severitiesCol2);
-
-$filterColumn1->addRow(_('Severity'), $severitiesTable);
+$filterColumn1->addRow(_('Severity'),
+	(new CTable())
+		->addRow($severity_columns[0])
+		->addRow($severity_columns[1])
+);
 
 $filterForm
 	->addColumn($filterColumn1)

@@ -130,11 +130,6 @@ h4 {
 	font-size: $font-h4-size;
 	color: $font-color;
 	line-height: $h4-line-height;
-
-	span {
-		font-size: $font-body-size;
-		color: $font-alt-color;
-	}
 }
 
 sup {
@@ -175,6 +170,10 @@ pre {
 	display: block;
 	white-space: pre-wrap;
 	word-wrap: break-word;
+}
+
+:-ms-input-placeholder {
+	color: #6d6d6d !important;
 }
 
 /* Main Navigation */
@@ -452,7 +451,7 @@ ul.top-nav-icons {
 
 .header-title {
 	position: relative;
-	margin: 0 0 12px 0;
+	margin: 0 0 10px 0;
 
 	ul {
 		position: absolute;
@@ -479,12 +478,16 @@ article {
 
 /* Obgect Group Navigation */
 .object-group {
-	margin: 0 0 11px 0;
+	margin: 0 0 10px 0;
 	
 	li {
 		display: inline-block;
 		margin: 0 14px 0 0;
 		vertical-align: middle;
+
+		&:last-child {
+			margin: 0;
+		}
 	}
 
 	.selected {
@@ -496,6 +499,18 @@ article {
 
 	.arrow-right {
 		border-left-color: $font-color;
+	}
+}
+
+.hor-list {
+	
+	li {
+		display: inline-block;
+		margin: 0 6px 0 0;
+
+		&:last-child {
+			margin: 0;
+		}
 	}
 }
 
@@ -801,6 +816,10 @@ footer {
 	white-space: nowrap;
 }
 
+.overflow-table {
+	overflow-x: auto;
+}
+
 /* Filters */
 .filter-btn-container {
 	text-align: center;
@@ -842,9 +861,8 @@ footer {
 .subfilter-enabled {
 	display: inline-block;
 	position: relative;
-	padding: 0 9px 0 4px;
 	height: 18px;
-	line-height: 18px;
+	padding: 0 4px;
 	background-color: $ui-bg-selected-color;
 	@include border-radius(2px);
 
@@ -880,7 +898,7 @@ footer {
 	}
 
 	button {
-		margin: 10px 7px 0 7px;
+		margin: 10px 5px 0 5px;
 	}
 }
 
@@ -907,8 +925,8 @@ footer {
 		background: none;
 		box-sizing: border-box;
 		width: 100%;
-		padding-top: 2px;
-
+		padding-bottom: 2px;
+		min-height: 20px;
 	}
 
 	.multiselect-list {
@@ -919,6 +937,11 @@ footer {
 			display: inline-block;
 			margin: 2px 14px 0 0;
 			white-space: nowrap;
+
+			.subfilter-enabled {
+				padding: 0 9px 0 4px;
+				line-height: 18px;
+			}
 
 			&.selected {
 
@@ -941,7 +964,9 @@ footer {
 }
 
 .multiselect-button {
-	float: left;
+	//float: left;
+	display: inline-block;
+	vertical-align: top;
 }
 
 .multiselect-suggest {
@@ -1026,6 +1051,8 @@ footer {
 	}
 
 	.btn-grey {
+		height: 22px;
+		line-height: 22px;
 		background-color: $btn-form-bg-color;
 		margin-top: -1px;
 	}
@@ -1194,7 +1221,7 @@ footer {
 		}
 
 		button {
-			margin: 0 14px 0 0;
+			margin: 0 10px 0 0;
 		}
 	}
 
@@ -1262,6 +1289,13 @@ footer {
 
 	h4 {
 		margin-bottom: -5px;
+	}
+
+	.hor-list {
+
+		li {
+			display: inline-block;
+		}
 	}
 }
 
@@ -1344,6 +1378,10 @@ footer {
 
 		&:last-child label {
 			@include border-radius(0 2px 2px 0);
+		}
+
+		&:only-child label {
+			@include border-radius(2px);
 		}
 	}
 
@@ -1463,7 +1501,6 @@ input {
 
 	&[readonly] {
 		color: $font-color!important;
-		cursor: text!important;
 		@extend %form-disabled;
 	}  
 }
@@ -1480,7 +1517,6 @@ textarea {
 
 	&[readonly] {
 		color: $font-color!important;
-		cursor: text!important;
 		@extend %form-disabled;
 	}   
 }
@@ -1503,21 +1539,8 @@ select {
 
 	&[readonly] {
 		color: $font-color!important;
-		cursor: text!important;
 		@extend %form-disabled;
 	}   
-}
-
-fieldset {
-	border: 1px solid $table-border-color;
-	padding: 0 10px 10px 15px;
-}
-
-legend {
-	margin-left: -5px;
-	padding: 0 5px 0 5px;
-	text-transform: $font-transform;
-	font-size: $font-h3-size;
 }
 
 .form-input-margin {
@@ -1539,8 +1562,8 @@ legend {
 }
 
 %form-input-height-padding {
-	padding: 4px 5px;
-	zoom: 1;
+	padding: 0 5px;
+	min-height: 24px;
 }
 
 %form-input-style {
@@ -1838,11 +1861,11 @@ button[disabled] {
 }
 
 .action-buttons {
-	margin: 15px 0 0 0;
+	margin: 10px 0 0 0;
 	color: $font-alt-color;
 
 	button {
-		margin: 0 14px 10px 0;
+		margin: 0 10px 10px 0;
 	}
 }
 
@@ -1889,6 +1912,7 @@ button[disabled] {
 		}
 
 		&.ui-tabs-active {
+
 			a {
 				padding: 8px 13px 9px 13px;
 				font-weight: bold;
@@ -1897,6 +1921,15 @@ button[disabled] {
 				text-decoration: none;
 				cursor: default;
 				border-bottom: 3px solid $ui-tab-bg-selected-color;
+			}
+		}
+
+		&.ui-state-disabled {
+
+			a {
+				cursor: default;
+				color: $btn-disabled-font-color;
+				background-color: $ui-bg-color;
 			}
 		}
 	}
@@ -2064,7 +2097,7 @@ $form-icon-btn: (
 	}
 
 	button {
-		margin: 0 0 0 14px;
+		margin: 0 0 0 10px;
 
 		&.float-left {
 			margin: 0;
@@ -2364,11 +2397,11 @@ $form-icon-btn: (
 
 	.table-forms-td-left {
 		text-align: left;
-		width: auto;
+	//	width: auto;
 	}
 
 	.table-forms-td-right {
-		width: auto;
+		//width: auto;
 
 		td {
 			vertical-align: middle;
@@ -2377,18 +2410,6 @@ $form-icon-btn: (
 				display: block;
 			}
 		}
-	}
-
-	tfoot {
-		text-align: right;
-
-		button {
-			margin: 4px 0 0 14px;
-		}
-	}
-
-	fieldset {
-		margin-left: -10px;
 	}
 
 	.dashbrd-widget-head {
@@ -2411,7 +2432,7 @@ $form-icon-btn: (
 	text-align: right;
 
 	button {
-		margin: 0 0 0 14px;
+		margin: 0 0 0 10px;
 	}
 }
 
@@ -2630,6 +2651,25 @@ $form-icon-btn: (
 			border-bottom: 1px solid $table-border-color;
 		}
 	}
+
+	.dashbrd-widget {
+		margin: 0;
+		border: none;
+	}
+
+	.dashbrd-widget-head {
+		font-weight: normal;
+		text-align: left;
+		padding: 8px;
+	}
+
+	.dashbrd-widget-foot {
+		margin: 0;
+	}
+
+	.nothing-to-show {
+		text-align: center !important;
+	}
 }
 
 .dashed-border {
@@ -2658,6 +2698,11 @@ $form-icon-btn: (
 	overflow: hidden;
 	background-color: rgba($yellow,0.5);
 	border: 1px solid rgba($yellow,0.5);
+}
+
+.map-selected {
+	border: 3px dashed $dark-yellow;
+	margin: -3px;
 }
 
 /* Debug */
@@ -2704,6 +2749,14 @@ a.red {
 
 a.orange {
 	@extend .orange;
+}
+
+.yellow {
+	color: $dark-yellow;
+}
+
+a.yellow {
+	@extend .yellow;
 }
 
 .grey {
@@ -2794,7 +2847,6 @@ a.blue {
 
 .na-bg {
 	color: darken($alt-blue-grey,45%);
-	background-color: $alt-blue-grey;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2810,6 +2862,14 @@ td.na-bg {
 	}
 }
 
+.log-na-bg {
+	color: darken($alt-blue-grey,45%);
+	background-color: $alt-blue-grey;
+}
+td.log-na-bg {
+	@extend td.na-bg;
+}
+
 .normal-bg {
 	color: darken($alt-green,45%);
 	@extend .green-bg;
@@ -2818,9 +2878,18 @@ td.normal-bg {
 	@extend td.na-bg;
 }
 
+.active-bg {
+	color: darken($alt-green,45%);
+	@extend .green-bg;
+}
+
+td.active-bg {
+	color: darken($alt-green,45%);
+	@extend .active-bg;
+}
+
 .info-bg {
 	color: darken($alt-dark-blue,45%);
-	background-color: $alt-dark-blue;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2832,9 +2901,16 @@ td.info-bg {
 	@extend td.na-bg;
 }
 
+.log-info-bg {
+	color: darken($alt-dark-blue,45%);
+	background-color: $alt-dark-blue;
+}
+td.log-info-bg {
+	@extend td.na-bg;
+}
+
 .average-bg {
 	color: darken($alt-orange,45%);
-	background-color: $alt-orange;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2848,7 +2924,6 @@ td.average-bg {
 
 .warning-bg {
 	color: darken($alt-yellow,45%);
-	background-color: $alt-yellow;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2860,9 +2935,17 @@ td.warning-bg {
 	@extend td.na-bg;
 }
 
+.log-warning-bg {
+	color: darken($alt-yellow,45%);
+	background-color: $alt-yellow;
+}
+td.log-warning-bg {
+	@extend td.na-bg;
+}
+
+
 .high-bg {
 	color: darken($alt-dark-orange,45%);
-	background-color: $alt-dark-orange;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2874,9 +2957,16 @@ td.high-bg {
 	@extend td.na-bg;
 }
 
+.log-high-bg {
+	color: darken($alt-dark-orange,45%);
+	background-color: $alt-dark-orange;
+}
+td.log-high-bg {
+	@extend td.na-bg;
+}
+
 .disaster-bg {
 	color: darken($alt-red,45%);
-	background-color: $alt-red;
 
 	input[type="radio"] {
 		&:checked + label {
@@ -2886,6 +2976,23 @@ td.high-bg {
 }
 td.disaster-bg {
 	@extend td.na-bg;
+}
+
+.log-disaster-bg {
+	color: darken($alt-red,45%);
+	background-color: $alt-red;
+}
+td.log-disaster-bg {
+	@extend td.na-bg;
+}
+
+.inactive-bg {
+	color: darken($alt-red,45%);
+	background-color: $alt-red;
+}
+
+td.inactive-bg {
+	@extend .inactive-bg;
 }
 
 %found-bg {
@@ -3282,9 +3389,17 @@ $browser-logos: (
 	li {
 		display: inline-block;
 		min-width: 2em;
+		margin-right: .4em;
 
 		&:last-child {
 			min-width: auto;
+			margin-right: 0;
 		}
 	}
+}
+
+.uppercase {
+	text-transform: $font-transform;
+	letter-spacing: 0.0688em;
+	text-rendering: optimizeLegibility;
 }

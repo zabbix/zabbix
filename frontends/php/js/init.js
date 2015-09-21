@@ -107,12 +107,6 @@ jQuery(function($) {
 		return false;
 	});
 
-	$('.print-link').click(function() {
-		printLess(true);
-
-		return false;
-	});
-
 	/*
 	 * add.popup event
 	 *
