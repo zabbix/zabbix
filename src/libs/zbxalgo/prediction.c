@@ -1015,7 +1015,7 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 
 	if (0.0 == time)
 	{
-		if (MODE_VALUE == mode || MODE_MAX == mode || MODE_MIN == mode || MODE_AVG == mode)
+		if (MODE_MAX == mode || MODE_MIN == mode || MODE_AVG == mode)
 		{
 			res = zbx_calculate_value(now + time, coefficients, fit, &result);
 		}
