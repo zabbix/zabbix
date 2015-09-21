@@ -116,6 +116,48 @@ $paramSecIntCount = [
 		'T' => T_ZBX_INT
 	]
 ];
+$paramForecast = [
+	[
+		'C' => _('Last of').' (T)',
+		'T' => T_ZBX_INT,
+		'M' => $metrics
+	],
+	[
+		'C' => _('Time shift'),
+		'T' => T_ZBX_INT
+	],
+	[
+		'C' => _('Time').' (t)',
+		'T' => T_ZBX_INT
+	],
+	[
+		'C' => _('Fit'),
+		'T' => T_ZBX_STR
+	],
+	[
+		'C' => _('Mode'),
+		'T' => T_ZBX_STR
+	]
+];
+$paramTimeleft = [
+	[
+		'C' => _('Last of').' (T)',
+		'T' => T_ZBX_INT,
+		'M' => $metrics
+	],
+	[
+		'C' => _('Time shift'),
+		'T' => T_ZBX_INT
+	],
+	[
+		'C' => _('Threshold'),
+		'T' => T_ZBX_DBL
+	],
+	[
+		'C' => _('Fit'),
+		'T' => T_ZBX_STR
+	]
+];
 $allowedTypesAny = [
 	ITEM_VALUE_TYPE_FLOAT => 1,
 	ITEM_VALUE_TYPE_STR => 1,
@@ -551,6 +593,46 @@ $functions = [
 		'description' =>  _('Bitwise AND of last (most recent) T value and mask is NOT N'),
 		'params' => $paramSecIntCount,
 		'allowed_types' => $allowedTypesInt
+	],
+	'forecast[<]' => [
+		'description' => _('Forecast for next t seconds based on period T is < N'),
+		'params' => $paramForecast,
+		'allowed_types' => $allowedTypesNumeric
+	],
+	'forecast[>]' => [
+		'description' => _('Forecast for next t seconds based on period T is > N'),
+		'params' => $paramForecast,
+		'allowed_types' => $allowedTypesNumeric
+	],
+	'forecast[=]' => [
+		'description' => _('Forecast for next t seconds based on period T is = N'),
+		'params' => $paramForecast,
+		'allowed_types' => $allowedTypesNumeric
+	],
+	'forecast[<>]' => [
+		'description' => _('Forecast for next t seconds based on period T is NOT N'),
+		'params' => $paramForecast,
+		'allowed_types' => $allowedTypesNumeric
+	],
+	'timeleft[<]' => [
+		'description' => _('Time to reach threshold estimated based on period T is < N'),
+		'params' => $paramTimeleft,
+		'allowed_types' => $allowedTypesNumeric
+	],
+	'timeleft[>]' => [
+		'description' => _('Time to reach threshold estimated based on period T is > N'),
+		'params' => $paramTimeleft,
+		'allowed_types' => $allowedTypesNumeric
+	],
+	'timeleft[=]' => [
+		'description' => _('Time to reach threshold estimated based on period T is = N'),
+		'params' => $paramTimeleft,
+		'allowed_types' => $allowedTypesNumeric
+	],
+	'timeleft[<>]' => [
+		'description' => _('Time to reach threshold estimated based on period T is NOT N'),
+		'params' => $paramTimeleft,
+		'allowed_types' => $allowedTypesNumeric
 	]
 ];
 order_result($functions, 'description');
