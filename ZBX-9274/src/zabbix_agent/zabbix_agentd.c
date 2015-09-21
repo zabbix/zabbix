@@ -110,7 +110,6 @@ const char	*help_message[] = {
 #ifdef _WINDOWS
 	"  -m --multiple-agents                  For -i -d -s -x functions service name will include Hostname specified",
 	"                                        in configuration file. This allows running multiple agents on the same host",
-	"",
 	"Functions:",
 	"",
 	"  -i --install                          Install Zabbix agent as service",
