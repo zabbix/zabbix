@@ -108,6 +108,8 @@ const char	*help_message[] = {
 	"  -p --print                            Print known items and exit",
 	"  -t --test item-key                    Test specified item and exit",
 #ifdef _WINDOWS
+	"  -m --multiple-agents                  For -i -d -s -x functions service name will include Hostname specified",
+	"                                        in configuration file. This allows running multiple agents on the same host",
 	"",
 	"Functions:",
 	"",
@@ -116,8 +118,6 @@ const char	*help_message[] = {
 
 	"  -s --start                            Start Zabbix agent service",
 	"  -x --stop                             Stop Zabbix agent service",
-
-	"  -m --multiple-agents                  Service name will include hostname",
 #else
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
@@ -134,7 +134,11 @@ const char	*help_message[] = {
 	"  -h --help                             Display this help message",
 	"  -V --version                          Display version number",
 	"",
+#ifdef _WINDOWS
+	"Example: zabbix_agentd -c C:\\zabbix\\zabbix_agentd.conf",
+#else
 	"Example: zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf",
+#endif
 	NULL	/* end of text */
 };
 /* end of application HELP message */
