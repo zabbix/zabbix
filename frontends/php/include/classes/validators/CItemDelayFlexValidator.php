@@ -127,6 +127,7 @@ class CItemDelayFlexValidator extends CValidator {
 						$this->setError(_s('Invalid interval "%1$s": invalid month day "%2$s".', $interval['interval'],
 							$month['from']
 						));
+
 						return false;
 					}
 
@@ -140,6 +141,7 @@ class CItemDelayFlexValidator extends CValidator {
 								$interval['interval'],
 								$month['till']
 							));
+
 							return false;
 						}
 
@@ -149,6 +151,7 @@ class CItemDelayFlexValidator extends CValidator {
 								'Invalid interval "%1$s": starting month day must be less or equal to ending month day.',
 								$interval['interval']
 							));
+
 							return false;
 						}
 
@@ -163,6 +166,7 @@ class CItemDelayFlexValidator extends CValidator {
 									$interval['interval'],
 									$month['step']
 								));
+
 								return false;
 							}
 						}
@@ -176,6 +180,7 @@ class CItemDelayFlexValidator extends CValidator {
 						$this->setError(_s('Invalid interval "%1$s": invalid month step "%2$s".', $interval['interval'],
 							$month['step']
 						));
+
 						return false;
 					}
 				}
@@ -192,6 +197,7 @@ class CItemDelayFlexValidator extends CValidator {
 						$this->setError(_s('Invalid interval "%1$s": invalid week day "%2$s".', $interval['interval'],
 							$week['from']
 						));
+
 						return false;
 					}
 
@@ -205,6 +211,7 @@ class CItemDelayFlexValidator extends CValidator {
 								$interval['interval'],
 								$week['till']
 							));
+
 							return false;
 						}
 
@@ -214,6 +221,7 @@ class CItemDelayFlexValidator extends CValidator {
 								'Invalid interval "%1$s": starting week day must be less or equal to ending week day.',
 								$interval['interval']
 							));
+
 							return false;
 						}
 
@@ -228,6 +236,7 @@ class CItemDelayFlexValidator extends CValidator {
 									$interval['interval'],
 									$week['step']
 								));
+
 								return false;
 							}
 						}
@@ -241,6 +250,7 @@ class CItemDelayFlexValidator extends CValidator {
 						$this->setError(_s('Invalid interval "%1$s": invalid week step "%2$s".', $interval['interval'],
 							$week['step']
 						));
+
 						return false;
 					}
 				}
@@ -257,6 +267,7 @@ class CItemDelayFlexValidator extends CValidator {
 						$this->setError(_s('Invalid interval "%1$s": invalid hours "%2$s".', $interval['interval'],
 							$hour['from']
 						));
+
 						return false;
 					}
 
@@ -269,6 +280,7 @@ class CItemDelayFlexValidator extends CValidator {
 							$this->setError(_s('Invalid interval "%1$s": invalid hours "%2$s".', $interval['interval'],
 								$hour['till']
 							));
+
 							return false;
 						}
 
@@ -278,6 +290,7 @@ class CItemDelayFlexValidator extends CValidator {
 								'Invalid interval "%1$s": starting hours must be less or equal to ending hours.',
 								$interval['interval']
 							));
+
 							return false;
 						}
 
@@ -292,6 +305,7 @@ class CItemDelayFlexValidator extends CValidator {
 									$interval['interval'],
 									$hour['step']
 								));
+
 								return false;
 							}
 						}
@@ -305,6 +319,7 @@ class CItemDelayFlexValidator extends CValidator {
 						$this->setError(_s('Invalid interval "%1$s": invalid hours step "%2$s".', $interval['interval'],
 							$hour['step']
 						));
+
 						return false;
 					}
 				}
@@ -321,6 +336,7 @@ class CItemDelayFlexValidator extends CValidator {
 						$this->setError(_s('Invalid interval "%1$s": invalid minutes "%2$s".', $interval['interval'],
 							$minute['from']
 						));
+
 						return false;
 					}
 
@@ -333,6 +349,7 @@ class CItemDelayFlexValidator extends CValidator {
 							$this->setError(_s('Invalid interval "%1$s": invalid minutes "%2$s".', $interval['interval'],
 								$minute['till']
 							));
+
 							return false;
 						}
 
@@ -342,6 +359,7 @@ class CItemDelayFlexValidator extends CValidator {
 								'Invalid interval "%1$s": starting minutes must be less or equal to ending minutes.',
 								$interval['interval']
 							));
+
 							return false;
 						}
 
@@ -356,6 +374,7 @@ class CItemDelayFlexValidator extends CValidator {
 									$interval['interval'],
 									$minute['step']
 								));
+
 								return false;
 							}
 						}
@@ -370,6 +389,7 @@ class CItemDelayFlexValidator extends CValidator {
 							$interval['interval'],
 							$minute['step']
 						));
+
 						return false;
 					}
 				}
@@ -386,6 +406,7 @@ class CItemDelayFlexValidator extends CValidator {
 						$this->setError(_s('Invalid interval "%1$s": invalid seconds "%2$s".', $interval['interval'],
 							$second['from']
 						));
+
 						return false;
 					}
 
@@ -398,6 +419,7 @@ class CItemDelayFlexValidator extends CValidator {
 							$this->setError(_s('Invalid interval "%1$s": invalid seconds "%2$s".', $interval['interval'],
 								$second['till']
 							));
+
 							return false;
 						}
 
@@ -407,6 +429,7 @@ class CItemDelayFlexValidator extends CValidator {
 								'Invalid interval "%1$s": starting seconds must be less or equal to ending seconds.',
 								$interval['interval']
 							));
+
 							return false;
 						}
 
@@ -421,6 +444,7 @@ class CItemDelayFlexValidator extends CValidator {
 									$interval['interval'],
 									$second['step']
 								));
+
 								return false;
 							}
 						}
@@ -435,6 +459,7 @@ class CItemDelayFlexValidator extends CValidator {
 							$interval['interval'],
 							$second['step']
 						));
+
 						return false;
 					}
 				}
