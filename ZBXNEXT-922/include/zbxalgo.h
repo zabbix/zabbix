@@ -329,6 +329,8 @@ int	evaluate(double *value, const char *expression, char *error, int max_error_l
 
 /* forecasting */
 
+#define ERROR_CODE	-1.0
+
 typedef enum
 {
 	FIT_LINEAR,

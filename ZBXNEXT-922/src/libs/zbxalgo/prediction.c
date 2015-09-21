@@ -23,7 +23,6 @@
 #include "zbxalgo.h"
 
 #define DB_INFINITY	(1e12-1e-4)
-#define ERROR_CODE	-1.0
 
 #define ZBX_MATH_EPSILON	(1.0e-6)
 
@@ -876,6 +875,7 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, int *k, char **error)
 	if ('\0' == *fit_str || 0 == strcmp(fit_str, "linear"))
 	{
 		*fit = FIT_LINEAR;
+		*k = 0;
 	}
 	else if (0 == strncmp(fit_str, "polynomial", strlen("polynomial")))
 	{
@@ -890,14 +890,17 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, int *k, char **error)
 	else if (0 == strcmp(fit_str, "exponential"))
 	{
 		*fit = FIT_EXPONENTIAL;
+		*k = 0;
 	}
 	else if (0 == strcmp(fit_str, "logarithmic"))
 	{
 		*fit = FIT_LOGARITHMIC;
+		*k = 0;
 	}
 	else if (0 == strcmp(fit_str, "power"))
 	{
 		*fit = FIT_POWER;
+		*k = 0;
 	}
 	else
 	{
@@ -987,12 +990,6 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 	zbx_matrix_t	*coefficients = NULL;
 	double		left, right, result;
 	int		res;
-
-	if (0 >= n)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-		return ERROR_CODE;
-	}
 
 	if (1 == n)
 	{
@@ -1122,12 +1119,6 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	zbx_matrix_t	*coefficients = NULL;
 	double		current, result;
 	int		res;
-
-	if (0 >= n)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-		return ERROR_CODE;
-	}
 
 	if (1 == n)
 		return (x[0] == threshold ? 0.0 : DB_INFINITY);
