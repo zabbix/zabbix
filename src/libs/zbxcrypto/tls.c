@@ -368,23 +368,71 @@ static void	zbx_tls_cert_error_msg(unsigned int flags, char **error)
  * Function: zbx_parameter_not_empty                                          *
  *                                                                            *
  * Purpose:                                                                   *
- *     Enforce if a configuration parameter is defined it must not be empty   *
+ *     Helper function: check if a configuration parameter is defined it must *
+ *     not be empty. Otherwise log error and exit.                            *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     param - [IN] pointer to TLS parameter                                  *
+ *     name1 - [IN] source of parameter value in case of 'zabbix_sender'      *
+ *     name2 - [IN] source of parameter value in case of 'zabbix_get'         *
+ *     name3 - [IN] source of parameter value in case of server, proxy,       *
+ *                  agentd                                                    *
  *                                                                            *
  ******************************************************************************/
-static void	zbx_parameter_not_empty(const char *param, const char *param_name)
+static void	zbx_parameter_not_empty(const char *param, const char *name1, const char *name2, const char *name3)
 {
 	if (NULL != param)
 	{
+		const char	*p;
+
 		while ('\0' != *param)
 		{
 			if (0 == isspace(*param++))
 				return;
 		}
 
-		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"%s\" is defined but empty", param_name);
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SENDER))
+			p = name1;
+		else if (0 != (program_type & ZBX_PROGRAM_TYPE_GET))
+			p = name2;
+		else
+			p = name3;
+
+		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"%s\" is defined but empty", p);
 		zbx_tls_free();
 		exit(EXIT_FAILURE);
 	}
+}
+#endif
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_log_error                                                    *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Helper function: log error message depending on program type and exit  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     msg1 - [IN] message in case of 'zabbix_sender'                         *
+ *     msg2 - [IN] message in case of 'zabbix_get'                            *
+ *     msg3 - [IN] message in case of server, proxy, agentd                   *
+ *                                                                            *
+ ******************************************************************************/
+static void	zbx_log_error(const char *msg1, const char *msg2, const char *msg3)
+{
+	const char	*p;
+
+	if (0 != (program_type & ZBX_PROGRAM_TYPE_SENDER))
+		p = msg1;
+	else if (0 != (program_type & ZBX_PROGRAM_TYPE_GET))
+		p = msg2;
+	else
+		p = msg3;
+
+	zabbix_log(LOG_LEVEL_CRIT, "%s", p);
+	zbx_tls_free();
+	exit(EXIT_FAILURE);
 }
 #endif
 
@@ -414,13 +462,35 @@ static void	zbx_parameter_not_empty(const char *param, const char *param_name)
  ******************************************************************************/
 void	zbx_tls_validate_config(void)
 {
+	zbx_parameter_not_empty(CONFIG_TLS_CONNECT, "TLSConnect\" or \"--tls-connect", "--tls-connect", "TLSConnect");
+
+	zbx_parameter_not_empty(CONFIG_TLS_ACCEPT, "", "", "TLSAccept");
+
+	zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "TLSCAFile\" or \"--tls-ca-file", "--tls-ca-file", "TLSCAFile");
+
+	zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "TLSCRLFile\" or \"--tls-crl-file", "--tls-crl-file",
+			"TLSCRLFile");
+
+	zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_ISSUER, "TLSServerCertIssuer\" or \"--tls-server-cert-issuer",
+			"--tls-agent-cert-issuer", "TLSServerCertIssuer");
+
+	zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_SUBJECT, "TLSServerCertSubject\" or \"--tls-server-cert-subject",
+			"--tls-agent-cert-subject", "TLSServerCertSubject");
+
+	zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "TLSCertFile\" or \"--tls-cert-file", "--tls-cert-file",
+			"TLSCertFile");
+
+	zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "TLSKeyFile\" or \"--tls-key-file", "--tls-key-file",
+			"TLSKeyFile");
+
+	zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "TLSPSKIdentity\" or \"--tls-psk-identity",
+			"--tls-psk-identity", "TLSPSKIdentity");
+
+	zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "TLSPSKFile\" or \"--tls-psk-file", "--tls-psk-file",
+			"TLSPSKFile");
+
 	/* parse and validate 'TLSConnect' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) and '--tls-connect' */
 	/* parameter (in zabbix_get and zabbix_sender) */
-
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		zbx_parameter_not_empty(CONFIG_TLS_CONNECT, "--tls-connect");
-	else
-		zbx_parameter_not_empty(CONFIG_TLS_CONNECT, "TLSConnect");
 
 	if (NULL != CONFIG_TLS_CONNECT)
 	{
@@ -434,18 +504,13 @@ void	zbx_tls_validate_config(void)
 			configured_tls_connect_mode = ZBX_TCP_SEC_TLS_PSK;
 		else
 		{
-			if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-				zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"--tls-connect\" parameter");
-			else
-				zabbix_log(LOG_LEVEL_CRIT, "invalid value of \"TLSConnect\" parameter");
-
-			goto out;
+			zbx_log_error("invalid value of \"TLSConnect\" or \"--tls-connect\" parameter",
+					"invalid value of \"--tls-connect\" parameter",
+					"invalid value of \"TLSConnect\" parameter");
 		}
 	}
 
 	/* parse and validate 'TLSAccept' parameter (in zabbix_proxy.conf, zabbix_agentd.conf) */
-
-	zbx_parameter_not_empty(CONFIG_TLS_ACCEPT, "TLSAccept");
 
 	if (NULL != CONFIG_TLS_ACCEPT)
 	{
@@ -490,203 +555,101 @@ void	zbx_tls_validate_config(void)
 
 	/* either both a certificate and a private key must be defined or none of them */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
-	{
-		zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "--tls-ca-file");
-		zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "--tls-crl-file");
-
-		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_ISSUER, 0 != (program_type & ZBX_PROGRAM_TYPE_SENDER) ?
-				"--tls-server-cert-issuer" : "--tls-agent-cert-issuer");
-		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_SUBJECT, 0 != (program_type & ZBX_PROGRAM_TYPE_SENDER) ?
-				"--tls-server-cert-subject" : "--tls-agent-cert-subject");
-
-		zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "--tls-cert-file");
-		zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "--tls-key-file");
-	}
-	else
-	{
-		zbx_parameter_not_empty(CONFIG_TLS_CA_FILE, "TLSCAFile");
-		zbx_parameter_not_empty(CONFIG_TLS_CRL_FILE, "TLSCRLFile");
-		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_ISSUER, "TLSServerCertIssuer");
-		zbx_parameter_not_empty(CONFIG_TLS_SERVER_CERT_SUBJECT, "TLSServerCertSubject");
-		zbx_parameter_not_empty(CONFIG_TLS_CERT_FILE, "TLSCertFile");
-		zbx_parameter_not_empty(CONFIG_TLS_KEY_FILE, "TLSKeyFile");
-	}
-
 	if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_KEY_FILE)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-cert-file\" is defined but"
-					" \"--tls-key-file\" is not defined");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but"
-					" \"TLSKeyFile\" is not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSCertFile\" or \"--tls-cert-file\" is defined but neither \"TLSKeyFile\""
+				" nor \"--tls-key-file\" is defined",
+				"parameter \"--tls-cert-file\" is defined but \"--tls-key-file\" is not defined",
+				"configuration parameter \"TLSCertFile\" is defined but \"TLSKeyFile\" is not defined");
 	}
 
 	if (NULL != CONFIG_TLS_KEY_FILE && NULL == CONFIG_TLS_CERT_FILE)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-key-file\" is defined but"
-					" \"--tls-cert-file\" is not defined");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSKeyFile\" is defined but"
-					" \"TLSCertFile\" is not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSKeyFile\" or \"--tls-key-file\" is defined but neither \"TLSCertFile\""
+				" nor \"--tls-cert-file\" is defined",
+				"parameter \"--tls-key-file\" is defined but \"--tls-cert-file\" is not defined",
+				"configuration parameter \"TLSKeyFile\" is defined but \"TLSCertFile\" is not defined");
 	}
 
 	/* CA file must be defined only together with a certificate */
 
 	if (NULL != CONFIG_TLS_CERT_FILE && NULL == CONFIG_TLS_CA_FILE)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-cert-file\" is defined but"
-					" \"--tls-ca-file\" is not defined");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCertFile\" is defined but"
-					" \"TLSCAFile\" is not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSCertFile\" or \"--tls-cert-file\" is defined but neither"
+				" \"TLSCAFile\" nor \"--tls-ca-file\" is defined",
+				"parameter \"--tls-cert-file\" is defined but \"--tls-ca-file\" is not defined",
+				"configuration parameter \"TLSCertFile\" is defined but \"TLSCAFile\" is not defined");
 	}
 
 	if (NULL != CONFIG_TLS_CA_FILE && NULL == CONFIG_TLS_CERT_FILE)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-ca-file\" is defined but"
-					" \"--tls-cert-file\" and \"--tls-key-file\" are not defined");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCAFile\" is defined but"
-					" \"TLSCertFile\" and \"TLSKeyFile\" are not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSCAFile\" or \"--tls-ca-file\" is defined but neither \"TLSCertFile\" nor"
+				" \"--tls-cert-file\" is defined",
+				"parameter \"--tls-ca-file\" is defined but \"--tls-cert-file\" is not defined",
+				"configuration parameter \"TLSCAFile\" is defined but \"TLSCertFile\" is not defined");
 	}
 
 	/* CRL file is optional but must be defined only together with a certificate */
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_CRL_FILE)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-crl-file\" is defined but"
-					" \"--tls-cert-file\" and \"--tls-key-file\" are not defined");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSCRLFile\" is defined but"
-					" \"TLSCertFile\" and \"TLSKeyFile\" are not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"--tls-crl-file\" is defined but neither \"TLSCertFile\" nor"
+				" \"--tls-cert-file\" is defined",
+				"parameter \"--tls-crl-file\" is defined but \"--tls-cert-file\" is not defined",
+				"configuration parameter \"TLSCRLFile\" is defined but \"TLSCertFile\" is not defined");
 	}
 
 	/* Server certificate issuer is optional but must be defined only together with a certificate */
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_ISSUER)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_SENDER | ZBX_PROGRAM_TYPE_GET)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" is defined but \"--tls-cert-file\" and"
-					" \"--tls-key-file\" are not defined",
-					0 != (program_type & ZBX_PROGRAM_TYPE_SENDER) ? "--tls-server-cert-issuer" :
-					"--tls-agent-cert-issuer");
-		}
-		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSServerCertIssuer\" is defined but"
-					" \"TLSCertFile\" and \"TLSKeyFile\" are not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSServerCertIssuer\" or \"--tls-server-cert-issuer\" is defined but"
+				" neither \"TLSCertFile\" nor \"--tls-cert-file\" is defined",
+				"parameter \"--tls-agent-cert-issuer\" is defined but \"--tls-cert-file\" is not"
+				" defined",
+				"configuration parameter \"TLSServerCertIssuer\" is defined but \"TLSCertFile\" is not"
+				" defined");
 	}
 
 	/* Server certificate subject is optional but must be defined only together with a certificate */
 
 	if (NULL == CONFIG_TLS_CERT_FILE && NULL != CONFIG_TLS_SERVER_CERT_SUBJECT)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"%s\" is defined but \"--tls-cert-file\" and"
-					" \"--tls-key-file\" are not defined",
-					0 != (program_type & ZBX_PROGRAM_TYPE_SENDER) ? "--tls-server-cert-subject" :
-					"--tls-agent-cert-subject");
-		}
-		else if (0 != (program_type & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_AGENTD)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSServerCertSubject\" is defined but"
-					" \"TLSCertFile\" and \"TLSKeyFile\" are not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSServerCertSubject\" or \"--tls-server-cert-subject\" is defined but"
+				" neither \"TLSCertFile\" nor \"--tls-cert-file\" is defined",
+				"parameter \"--tls-agent-cert-subject\" is defined but \"--tls-cert-file\" is not"
+				" defined",
+				"configuration parameter \"TLSServerCertSubject\" is defined but \"TLSCertFile\" is not"
+				" defined");
 	}
 
 	/* either both a PSK and a PSK identity must be defined or none of them */
 
-	if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-	{
-		zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "--tls-psk-identity");
-		zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "--tls-psk-file");
-	}
-	else
-	{
-		zbx_parameter_not_empty(CONFIG_TLS_PSK_IDENTITY, "TLSPSKIdentity");
-		zbx_parameter_not_empty(CONFIG_TLS_PSK_FILE, "TLSPSKFile");
-	}
-
 	if (NULL != CONFIG_TLS_PSK_FILE && NULL == CONFIG_TLS_PSK_IDENTITY)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-psk-file\" is defined but"
-					" \"--tls-psk-identity\" is not defined");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPSKFile\" is defined but"
-					" \"TLSPSKIdentity\" is not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSPSKFile\" or \"--tls-psk-file\" is defined but neither \"TLSPSKIdentity\""
+				" nor \"--tls-psk-identity\" is defined",
+				"parameter \"--tls-psk-file\" is defined but \"--tls-psk-identity\" is not defined",
+				"configuration parameter \"TLSPSKFile\" is defined but \"TLSPSKIdentity\" is not"
+				" defined");
 	}
 
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && NULL == CONFIG_TLS_PSK_FILE)
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-psk-identity\" is defined but"
-					" \"--tls-psk-file\" is not defined");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPSKIdentity\" is defined but"
-					" \"TLSPSKFile\" is not defined");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSPSKIdentity\" or \"--tls-psk-identity\" is defined but neither"
+				" \"TLSPSKFile\" nor \"--tls-psk-file\" is defined",
+				"parameter \"--tls-psk-identity\" is defined but \"--tls-psk-file\" is not defined",
+				"configuration parameter \"TLSPSKIdentity\" is defined but \"TLSPSKFile\" is not"
+				" defined");
 	}
 
 	/* PSK identity must be a valid UTF-8 string (RFC4279 says Unicode) */
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
 	{
-		if (0 != (program_type & (ZBX_PROGRAM_TYPE_GET | ZBX_PROGRAM_TYPE_SENDER)))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "parameter \"--tls-psk-identity\" value is not a valid"
-					" UTF-8 string");
-		}
-		else
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"TLSPSKIdentity\" value is not a valid"
-					" UTF-8 string");
-		}
-		goto out;
+		zbx_log_error("parameter \"TLSPSKIdentity\" or \"--tls-psk-identity\" value is not a valid UTF-8"
+				" string",
+				"parameter \"--tls-psk-identity\" value is not a valid UTF-8 string",
+				"configuration parameter \"TLSPSKIdentity\" value is not a valid UTF-8 string");
 	}
 
 	/* agentd and active proxy specific validation */
