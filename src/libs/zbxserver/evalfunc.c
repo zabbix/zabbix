@@ -1887,7 +1887,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	double				*t = NULL, *x = NULL;
 	int				nparams, time, time_flag, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0,
 					time_shift, time_shift_flag;
-	int				k;
+	int				k = 0;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			zero_time;
 	zbx_fit_t			fit;
@@ -2022,7 +2022,7 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 	double				*t = NULL, *x = NULL, threshold;
 	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift,
 					time_shift_flag;
-	unsigned			k;
+	unsigned			k = 0;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			zero_time;
 	zbx_fit_t			fit;
