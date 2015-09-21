@@ -1033,6 +1033,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					default:
 						*error = zbx_dsprintf(*error, "unsupported field type %d in \"%s.%s\"",
 								fields[f]->type, table->table, fields[f]->name);
+						zbx_free(value);
 						goto clean;
 
 				}
