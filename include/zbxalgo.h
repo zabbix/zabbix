@@ -327,4 +327,35 @@ unsigned int	zbx_isqrt32(unsigned int value);
 
 int	evaluate(double *value, const char *expression, char *error, int max_error_len);
 
+/* forecasting */
+
+#define ERROR_CODE	-1.0
+
+typedef enum
+{
+	FIT_LINEAR,
+	FIT_POLYNOMIAL,
+	FIT_EXPONENTIAL,
+	FIT_LOGARITHMIC,
+	FIT_POWER,
+	FIT_INVALID
+}
+zbx_fit_t;
+
+typedef enum
+{
+	MODE_VALUE,
+	MODE_MAX,
+	MODE_MIN,
+	MODE_DELTA,
+	MODE_AVG,
+	MODE_INVALID
+}
+zbx_mode_t;
+
+int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, int *k, char **error);
+int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error);
+double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode);
+double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, zbx_fit_t fit, unsigned k);
+
 #endif

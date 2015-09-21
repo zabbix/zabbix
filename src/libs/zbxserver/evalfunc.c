@@ -1868,6 +1868,268 @@ clean:
 
 /******************************************************************************
  *                                                                            *
+ * Function: evaluate_FORECAST                                                *
+ *                                                                            *
+ * Purpose: evaluate function 'forecast' for the item                         *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
+		char **error)
+{
+	const char			*__function_name = "evaluate_FORECAST";
+	char				*fit_str = NULL, *mode_str = NULL;
+	double				*t = NULL, *x = NULL;
+	int				nparams, time, time_flag, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0,
+					time_shift, time_shift_flag;
+	int				k = 0;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			zero_time;
+	zbx_fit_t			fit;
+	zbx_mode_t			mode;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+		goto out;
+
+	if (5 < (nparams = num_param(parameters)))
+		goto out;
+
+	if (3 > nparams)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
+			&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 3, &time, &time_flag) ||
+			ZBX_FLAG_SEC != time_flag)
+		goto out;
+
+	if (4 <= nparams)
+	{
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 4, &fit_str) ||
+				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
+			goto out;
+	}
+	else
+	{
+		fit = FIT_LINEAR;
+	}
+
+	if (5 == nparams)
+	{
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 5, &mode_str) ||
+				SUCCEED != zbx_mode_code(mode_str, &mode, error))
+			goto out;
+	}
+	else
+	{
+		mode = MODE_VALUE;
+	}
+
+	if (ZBX_FLAG_SEC == flag)
+		seconds = arg1;
+	else
+		nvalues = arg1;
+
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
+	{
+		*error = zbx_strdup(*error, "unable to get values from value cache");
+		goto out;
+	}
+
+	if (0 < values.values_num)
+	{
+		t = zbx_malloc(t, values.values_num * sizeof(double));
+		x = zbx_malloc(x, values.values_num * sizeof(double));
+
+		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
+		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			for (i = 0; i < values.values_num; i++)
+			{
+				t[i] = values.values[i].timestamp.sec - zero_time.sec + 1.0e-9 *
+						(values.values[i].timestamp.ns - zero_time.ns + 1);
+				x[i] = values.values[i].value.dbl;
+			}
+		}
+		else
+		{
+			for (i = 0; i < values.values_num; i++)
+			{
+				t[i] = values.values[i].timestamp.sec - zero_time.sec + 1.0e-9 *
+						(values.values[i].timestamp.ns - zero_time.ns + 1);
+				x[i] = values.values[i].value.ui64;
+			}
+		}
+
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_forecast(t, x, values.values_num,
+				now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), time, fit, k, mode));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ERROR_CODE);
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zbx_free(fit_str);
+	zbx_free(mode_str);
+
+	zbx_free(t);
+	zbx_free(x);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: evaluate_TIMELEFT                                                *
+ *                                                                            *
+ * Purpose: evaluate function 'timeleft' for the item                         *
+ *                                                                            *
+ * Parameters: item - item (performance metric)                               *
+ *             parameters - number of seconds/values and time shift (optional)*
+ *                                                                            *
+ * Return value: SUCCEED - evaluated successfully, result is stored in 'value'*
+ *               FAIL - failed to evaluate function                           *
+ *                                                                            *
+ ******************************************************************************/
+static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, const char *parameters, time_t now,
+		char **error)
+{
+	const char			*__function_name = "evaluate_TIMELEFT";
+	char				*fit_str = NULL;
+	double				*t = NULL, *x = NULL, threshold;
+	int				nparams, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0, time_shift,
+					time_shift_flag;
+	unsigned			k = 0;
+	zbx_vector_history_record_t	values;
+	zbx_timespec_t			zero_time;
+	zbx_fit_t			fit;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_history_record_vector_create(&values);
+
+	if (ITEM_VALUE_TYPE_FLOAT != item->value_type && ITEM_VALUE_TYPE_UINT64 != item->value_type)
+		goto out;
+
+	if (4 < (nparams = num_param(parameters)))
+		goto out;
+
+	if (3 > nparams)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31(item->host.hostid, parameters, 1, &arg1, &flag) || 0 == arg1)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_uint31_default(item->host.hostid, parameters, 2, &time_shift,
+			&time_shift_flag, 0, ZBX_FLAG_SEC) || ZBX_FLAG_SEC != time_shift_flag)
+		goto out;
+
+	if (SUCCEED != get_function_parameter_float(item->host.hostid, parameters, 3, &threshold))
+		goto out;
+
+	if (4 == nparams)
+	{
+		if (SUCCEED != get_function_parameter_str(item->host.hostid, parameters, 4, &fit_str) ||
+				SUCCEED != zbx_fit_code(fit_str, &fit, &k, error))
+			goto out;
+	}
+	else
+	{
+		fit = FIT_LINEAR;
+	}
+
+	if ((FIT_EXPONENTIAL == fit || FIT_POWER == fit) && 0.0 >= threshold)
+	{
+		*error = zbx_strdup(*error, "exponential and power functions are always positive");
+		goto out;
+	}
+
+	if (ZBX_FLAG_SEC == flag)
+		seconds = arg1;
+	else
+		nvalues = arg1;
+
+	if (FAIL == zbx_vc_get_value_range(item->itemid, item->value_type, &values, seconds, nvalues, now - time_shift))
+	{
+		*error = zbx_strdup(*error, "unable to get values from value cache");
+		goto out;
+	}
+
+	if (0 < values.values_num)
+	{
+		t = zbx_malloc(t, values.values_num * sizeof(double));
+		x = zbx_malloc(x, values.values_num * sizeof(double));
+
+		zero_time.sec = values.values[values.values_num - 1].timestamp.sec;
+		zero_time.ns = values.values[values.values_num - 1].timestamp.ns;
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
+		{
+			for (i = 0; i < values.values_num; i++)
+			{
+				t[i] = values.values[i].timestamp.sec - zero_time.sec + 1.0e-9 *
+						(values.values[i].timestamp.ns - zero_time.ns + 1);
+				x[i] = values.values[i].value.dbl;
+			}
+		}
+		else
+		{
+			for (i = 0; i < values.values_num; i++)
+			{
+				t[i] = values.values[i].timestamp.sec - zero_time.sec + 1.0e-9 *
+						(values.values[i].timestamp.ns - zero_time.ns + 1);
+				x[i] = values.values[i].value.ui64;
+			}
+		}
+
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_timeleft(t, x, values.values_num,
+				now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), threshold, fit, k));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ERROR_CODE);
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_history_record_vector_destroy(&values, item->value_type);
+
+	zbx_free(fit_str);
+
+	zbx_free(t);
+	zbx_free(x);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: evaluate_function                                                *
  *                                                                            *
  * Purpose: evaluate function                                                 *
@@ -2001,6 +2263,14 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 	else if (0 == strcmp(function, "band"))
 	{
 		ret = evaluate_BAND(value, item, function, parameter, now);
+	}
+	else if (0 == strcmp(function, "forecast"))
+	{
+		ret = evaluate_FORECAST(value, item, function, parameter, now, error);
+	}
+	else if (0 == strcmp(function, "timeleft"))
+	{
+		ret = evaluate_TIMELEFT(value, item, function, parameter, now, error);
 	}
 	else
 	{
@@ -2404,7 +2674,7 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 		{
 			zbx_format_value(value, MAX_BUFFER_LEN, item.valuemapid, item.units, item.value_type);
 		}
-		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum", function, ','))
+		else if (SUCCEED == str_in_list("abschange,avg,change,delta,max,min,percentile,sum,forecast", function, ','))
 		{
 			switch (item.value_type)
 			{
@@ -2415,6 +2685,10 @@ int	evaluate_macro_function(char *value, const char *host, const char *key, cons
 				default:
 					;
 			}
+		}
+		else if (SUCCEED == str_in_list("timeleft", function, ','))
+		{
+			add_value_suffix(value, MAX_BUFFER_LEN, "s", ITEM_VALUE_TYPE_FLOAT);
 		}
 	}
 
