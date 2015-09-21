@@ -108,7 +108,7 @@ const char	*help_message[] = {
 	"  -p --print                            Print known items and exit",
 	"  -t --test item-key                    Test specified item and exit",
 #ifdef _WINDOWS
-	"  -m --multiple-agents                  For -i -d -s -x functions service name will include Hostname specified",
+	"  -m --multiple-agents                  For -i -d -s -x functions service name will include Hostname parameter specified",
 	"                                        in configuration file. This allows running multiple agents on the same host",
 	"Functions:",
 	"",
