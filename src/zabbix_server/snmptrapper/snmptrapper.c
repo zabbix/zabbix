@@ -386,6 +386,12 @@ static int	read_traps()
 
 	if (0 < nbytes)
 	{
+		if (INT_MAX < (zbx_uint64_t)trap_lastsize + nbytes)
+		{
+			nbytes = 0;
+			goto exit;
+		}
+
 		buffer[nbytes + offset] = '\0';
 		trap_lastsize += nbytes;
 		DBupdate_lastsize();
