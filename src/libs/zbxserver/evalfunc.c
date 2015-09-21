@@ -1976,10 +1976,16 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 				x[i] = values.values[i].value.ui64;
 			}
 		}
+
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_forecast(t, x, values.values_num,
+				now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), time, fit, k, mode));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ERROR_CODE);
 	}
 
-	zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_forecast(t, x, values.values_num,
-			now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), time, fit, k, mode));
 	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
@@ -2098,10 +2104,16 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 				x[i] = values.values[i].value.ui64;
 			}
 		}
+
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_timeleft(t, x, values.values_num,
+				now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), threshold, fit, k));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ERROR_CODE);
 	}
 
-	zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, zbx_timeleft(t, x, values.values_num,
-			now - zero_time.sec - 1.0e-9 * (zero_time.ns + 1), threshold, fit, k));
 	ret = SUCCEED;
 out:
 	zbx_history_record_vector_destroy(&values, item->value_type);
