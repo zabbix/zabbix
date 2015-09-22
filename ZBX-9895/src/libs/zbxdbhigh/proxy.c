@@ -432,31 +432,25 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
  ******************************************************************************/
 int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error)
 {
-	typedef struct
+	static const char *proxytable[] =
 	{
-		const char	*table;
-	}
-	proxytable_t;
-
-	static const proxytable_t pt[] =
-	{
-		{"globalmacro"},
-		{"hosts"},
-		{"interface"},
-		{"hosts_templates"},
-		{"hostmacro"},
-		{"items"},
-		{"drules"},
-		{"dchecks"},
-		{"regexps"},
-		{"expressions"},
-		{"groups"},
-		{"config"},
-		{"httptest"},
-		{"httptestitem"},
-		{"httpstep"},
-		{"httpstepitem"},
-		{NULL}
+		"globalmacro",
+		"hosts",
+		"interface",
+		"hosts_templates",
+		"hostmacro",
+		"items",
+		"drules",
+		"dchecks",
+		"regexps",
+		"expressions",
+		"groups",
+		"config",
+		"httptest",
+		"httptestitem",
+		"httpstep",
+		"httpstepitem",
+		NULL
 	};
 
 	const char		*__function_name = "get_proxyconfig_data";
@@ -475,9 +469,9 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 	get_proxy_monitored_hosts(proxy_hostid, &hosts);
 	get_proxy_monitored_httptests(proxy_hostid, &httptests);
 
-	for (i = 0; NULL != pt[i].table; i++)
+	for (i = 0; NULL != proxytable[i]; i++)
 	{
-		table = DBget_table(pt[i].table);
+		table = DBget_table(proxytable[i]);
 		assert(NULL != table);
 
 		if (SUCCEED != get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests))
