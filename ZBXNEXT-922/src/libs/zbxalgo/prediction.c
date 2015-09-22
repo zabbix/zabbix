@@ -24,7 +24,7 @@
 
 #define DB_INFINITY	(1e12 - 1e-4)
 
-#define ZBX_MATH_EPSILON	(1.0e-6)
+#define ZBX_MATH_EPSILON	(1e-6)
 
 #define ZBX_IS_NAN(x)	((x) != (x))
 
@@ -670,10 +670,12 @@ while(0)
 				Im(ZBX_MATRIX_ROW(updates, i)) = (Im(polynomial) * Re(denominator) -
 						Re(polynomial) * Im(denominator)) / temp;
 			}
-			else /* Denominator is zero iff two or more root approximations are equal. */
+			else	/* Denominator is zero iff two or more root approximations are equal. */
 				/* Since root approximations are initially different their equality means that they */
 				/* converged to a multiple root (hopefully) and no updates are required in this case. */
+			{
 				Re(ZBX_MATRIX_ROW(updates, i)) = Im(ZBX_MATRIX_ROW(updates, i)) = 0.0;
+			}
 
 			temp = ZBX_MATRIX_EL(updates, i, 0) * ZBX_MATRIX_EL(updates, i, 0) +
 					ZBX_MATRIX_EL(updates, i, 1) * ZBX_MATRIX_EL(updates, i, 1);
