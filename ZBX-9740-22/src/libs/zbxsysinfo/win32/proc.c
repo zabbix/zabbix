@@ -77,6 +77,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	HANDLE	hProcessSnap, hProcess;
 	PROCESSENTRY32	pe32;
+	DWORD		access;
+	const OSVERSIONINFOEX	*vi;
 	int	proccount,
 		proc_ok;
 	char	*procName,
@@ -95,6 +97,20 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain system information."));
 		return SYSINFO_RET_FAIL;
 	}
+
+	if (NULL == (vi = zbx_win_getversion()))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot retrieve system version."));
+		return SYSINFO_RET_FAIL;
+	}
+
+	if (6 > vi->dwMajorVersion)
+	{
+		/* PROCESS_QUERY_LIMITED_INFORMATION is not supported on Windows Server 2003 and XP */
+		access = PROCESS_QUERY_INFORMATION;
+	}
+	else
+		access = PROCESS_QUERY_LIMITED_INFORMATION;
 
 	pe32.dwSize = sizeof(PROCESSENTRY32);
 
@@ -121,7 +137,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (0 != proc_ok && NULL != userName && '\0' != *userName)
 		{
-			hProcess = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ProcessID);
+			hProcess = OpenProcess(access, FALSE, pe32.th32ProcessID);
 
 			if (NULL == hProcess || SUCCEED != zbx_get_process_username(hProcess, uname) ||
 					0 != stricmp(uname, userName))
