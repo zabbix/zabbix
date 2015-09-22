@@ -4,7 +4,7 @@ clean: $(POSTCLEAN)
 # break this down because del has limit for command-line args length (NMAKE : fatal error U1077: 'del' : return code '0x1')
 	del $(OBJS) 2>NUL
 	del $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin $(TARGETNAME).$(TARGETEXT).manifest \
-		$(TARGETDIR)\$(TARGETNAME).pdb $(TARGETNAME).pdb $(TARGETNAME).idb 2>NUL
+		$(PDBS) $(TARGETNAME).idb 2>NUL
 
 $(PROGNAME): $(MESSAGES_H) $(OBJS) $(RESOURCE_RES)
 	$(LINKER) $(OBJS) $(RESOURCE_RES) $(LFLAGS) /OUT:$(PROGNAME) $(LIBS)
