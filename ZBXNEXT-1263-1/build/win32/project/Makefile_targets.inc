@@ -2,7 +2,6 @@ all: $(PROGNAME) $(POSTBUILD)
 
 clean: $(POSTCLEAN)
 # break this down because del has limit for command-line args length (NMAKE : fatal error U1077: 'del' : return code '0x1')
-	echo VERSION $(_NMAKE_VER)
 	del $(OBJS) 2>NUL
 	del $(RESOURCE_RES) $(MESSAGES_H) $(PROGNAME) messages.rc MSG00001.bin $(TARGETNAME).$(TARGETEXT).manifest \
 		$(TARGETDIR)\$(TARGETNAME).pdb $(TARGETNAME).pdb $(TARGETNAME).idb 2>NUL

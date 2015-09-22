@@ -2,12 +2,10 @@
 !IF "$(CPU)" == "i386"
 TARGETDIR = ..\..\..\bin\win32\dev
 ADD_LFLAGS = /MACHINE:X86
-ARCH=32
 
 !ELSEIF "$(CPU)" == "AMD64"
 TARGETDIR = ..\..\..\bin\win64\dev
 ADD_LFLAGS = /MACHINE:X64
-ARCH=64
 
 !ELSE
 !ERROR Unsupported CPU architecture: $(CPU)
