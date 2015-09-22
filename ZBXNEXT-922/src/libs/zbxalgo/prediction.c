@@ -95,8 +95,8 @@ static int	zbx_identity_matrix(zbx_matrix_t *m, int n)
 	if (SUCCEED != zbx_matrix_alloc(m, n, n))
 		return FAIL;
 
-	for (i = 0; i < n; ++i)
-		for (j = 0; j < n; ++j)
+	for (i = 0; i < n; i++)
+		for (j = 0; j < n; j++)
 			ZBX_MATRIX_EL(m, i, j) = (i == j ? 1.0 : 0.0);
 
 	return SUCCEED;
@@ -112,8 +112,8 @@ static int	zbx_transpose_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 	if (SUCCEED != zbx_matrix_alloc(r, m->columns, m->rows))
 		return FAIL;
 
-	for (i = 0; i < r->rows; ++i)
-		for (j = 0; j < r->columns; ++j)
+	for (i = 0; i < r->rows; i++)
+		for (j = 0; j < r->columns; j++)
 			ZBX_MATRIX_EL(r, i, j) = ZBX_MATRIX_EL(m, j, i);
 
 	return SUCCEED;
@@ -127,7 +127,7 @@ static void	zbx_matrix_swap_rows(zbx_matrix_t *m, int r1, int r2)
 	double	tmp;
 	int	i;
 
-	for (i = 0; i < m->columns; ++i)
+	for (i = 0; i < m->columns; i++)
 	{
 		tmp = ZBX_MATRIX_EL(m, r1, i);
 		ZBX_MATRIX_EL(m, r1, i) = ZBX_MATRIX_EL(m, r2, i);
@@ -139,7 +139,7 @@ static void	zbx_matrix_divide_row_by(zbx_matrix_t *m, int row, double denominato
 {
 	int	i;
 
-	for (i = 0; i < m->columns; ++i)
+	for (i = 0; i < m->columns; i++)
 		ZBX_MATRIX_EL(m, row, i) /= denominator;
 }
 
@@ -147,7 +147,7 @@ static void	zbx_matrix_add_rows_with_factor(zbx_matrix_t *m, int dest, int src, 
 {
 	int	i;
 
-	for (i = 0; i < m->columns; ++i)
+	for (i = 0; i < m->columns; i++)
 		ZBX_MATRIX_EL(m, dest, i) += ZBX_MATRIX_EL(m, src, i) * factor;
 }
 
@@ -207,12 +207,12 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 		goto out;
 
 	/* Gauss-Jordan elimination with partial (row) pivoting */
-	for (i = 0; i < n; ++i)
+	for (i = 0; i < n; i++)
 	{
 		k = i;
 		pivot = ZBX_MATRIX_EL(l, i, i);
 
-		for (j = i; j < n; ++j)
+		for (j = i; j < n; j++)
 		{
 			if (fabs(ZBX_MATRIX_EL(l, j, i)) > fabs(pivot))
 			{
@@ -234,7 +234,7 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 			zbx_matrix_swap_rows(r, i, k);
 		}
 
-		for (j = i + 1; j < n; ++j)
+		for (j = i + 1; j < n; j++)
 		{
 			if (0.0 != (factor = -ZBX_MATRIX_EL(l, j, i) / ZBX_MATRIX_EL(l, i, i)))
 			{
@@ -244,9 +244,9 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 		}
 	}
 
-	for (i = n - 1; i > 0; --i)
+	for (i = n - 1; i > 0; i--)
 	{
-		for (j = 0; j < i; ++j)
+		for (j = 0; j < i; j++)
 		{
 			if (0.0 != (factor = -ZBX_MATRIX_EL(l, j, i) / ZBX_MATRIX_EL(l, i, i)))
 			{
@@ -256,7 +256,7 @@ static int	zbx_inverse_matrix(zbx_matrix_t *m, zbx_matrix_t *r)
 		}
 	}
 
-	for (i = 0; i < n; ++i)
+	for (i = 0; i < n; i++)
 		zbx_matrix_divide_row_by(r, i, ZBX_MATRIX_EL(l, i, i));
 
 	res = SUCCEED;
@@ -279,13 +279,13 @@ static int	zbx_matrix_mult(zbx_matrix_t *left, zbx_matrix_t *right, zbx_matrix_t
 	if (SUCCEED != zbx_matrix_alloc(result, left->rows, right->columns))
 		return FAIL;
 
-	for (i = 0; i < result->rows; ++i)
+	for (i = 0; i < result->rows; i++)
 	{
-		for (j = 0; j < result->columns; ++j)
+		for (j = 0; j < result->columns; j++)
 		{
 			element = 0;
 
-			for (k = 0; k < left->columns; ++k)
+			for (k = 0; k < left->columns; k++)
 				element += ZBX_MATRIX_EL(left, i, k) * ZBX_MATRIX_EL(right, k, j);
 
 			ZBX_MATRIX_EL(result, i, j) = element;
@@ -326,6 +326,7 @@ static int	zbx_least_squares(zbx_matrix_t *independent, zbx_matrix_t *dependent,
 
 	if (SUCCEED != (res = zbx_matrix_mult(left_part, right_part, coefficients)))
 		goto out;
+
 out:
 	zbx_matrix_free(independent_transposed);
 	zbx_matrix_free(to_be_inverted);
@@ -343,7 +344,7 @@ static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m)
 		if (SUCCEED != zbx_matrix_alloc(m, n, 1))
 			return FAIL;
 
-		for (i = 0; i < n; ++i)
+		for (i = 0; i < n; i++)
 			ZBX_MATRIX_EL(m, i, 0) = x[i];
 	}
 	else if (FIT_EXPONENTIAL == fit || FIT_POWER == fit)
@@ -351,7 +352,7 @@ static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m)
 		if (SUCCEED != zbx_matrix_alloc(m, n, 1))
 			return FAIL;
 
-		for (i = 0; i < n; ++i)
+		for (i = 0; i < n; i++)
 		{
 			if (0.0 >= x[i])
 			{
@@ -376,7 +377,7 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, int k, zbx_matr
 		if (SUCCEED != zbx_matrix_alloc(m, n, 2))
 			return FAIL;
 
-		for (i = 0; i < n; ++i)
+		for (i = 0; i < n; i++)
 		{
 			ZBX_MATRIX_EL(m, i, 0) = 1.0;
 			ZBX_MATRIX_EL(m, i, 1) = t[i];
@@ -387,7 +388,7 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, int k, zbx_matr
 		if (SUCCEED != zbx_matrix_alloc(m, n, 2))
 			return FAIL;
 
-		for (i = 0; i < n; ++i)
+		for (i = 0; i < n; i++)
 		{
 			ZBX_MATRIX_EL(m, i, 0) = 1.0;
 			ZBX_MATRIX_EL(m, i, 1) = log(t[i]);
@@ -401,11 +402,11 @@ static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, int k, zbx_matr
 		if (SUCCEED != zbx_matrix_alloc(m, n, k+1))
 			return FAIL;
 
-		for (i = 0; i < n; ++i)
+		for (i = 0; i < n; i++)
 		{
 			element = 1.0;
 
-			for (j = 0; j < k; ++j)
+			for (j = 0; j < k; j++)
 			{
 				ZBX_MATRIX_EL(m, i, j) = element;
 				element *= t[i];
@@ -434,6 +435,7 @@ static int	zbx_regression(double *t, double *x, int n, zbx_fit_t fit, int k, zbx
 
 	if (SUCCEED != (res = zbx_least_squares(independent, dependent, coefficients)))
 		goto out;
+
 out:
 	zbx_matrix_free(independent);
 	zbx_matrix_free(dependent);
@@ -445,7 +447,7 @@ static double	zbx_polynomial_value(double t, zbx_matrix_t *coefficients)
 	double	pow = 1.0, res = 0.0;
 	int	i;
 
-	for (i = 0; i < coefficients->rows; ++i, pow *= t)
+	for (i = 0; i < coefficients->rows; i++, pow *= t)
 		res += ZBX_MATRIX_EL(coefficients, i, 0) * pow;
 
 	return res;
@@ -456,7 +458,7 @@ static double	zbx_polynomial_antiderivative(double t, zbx_matrix_t *coefficients
 	double	pow = t, res = 0.0;
 	int	i;
 
-	for (i = 0; i < coefficients->rows; ++i, pow *= t)
+	for (i = 0; i < coefficients->rows; i++, pow *= t)
 		res += ZBX_MATRIX_EL(coefficients, i, 0) * pow / (i + 1);
 
 	return res;
@@ -472,7 +474,7 @@ static int	zbx_derive_polynomial(zbx_matrix_t *polynomial, zbx_matrix_t *derivat
 	if (SUCCEED != zbx_matrix_alloc(derivative, (polynomial->rows > 1 ? polynomial->rows - 1 : 1), 1))
 		return FAIL;
 
-	for (i = 1; i < polynomial->rows; ++i)
+	for (i = 1; i < polynomial->rows; i++)
 		ZBX_MATRIX_EL(derivative, i - 1, 0) = ZBX_MATRIX_EL(polynomial, i, 0) * i;
 
 	if (1 == i)
@@ -573,13 +575,13 @@ while(0)
 	}
 
 	/* if n lower coefficients are zeros, zero is a root of multiplicity n */
-	for (first_nonzero = 0; 0.0 == ZBX_MATRIX_EL(coefficients, first_nonzero, 0); ++first_nonzero)
+	for (first_nonzero = 0; 0.0 == ZBX_MATRIX_EL(coefficients, first_nonzero, 0); first_nonzero++)
 		Re(ZBX_MATRIX_ROW(roots, first_nonzero)) = Im(ZBX_MATRIX_ROW(roots, first_nonzero)) = 0.0;
 
 	/* compute bounds for the roots */
 	upper_bound = lower_bound = 1.0;
 
-	for (i = first_nonzero; i < degree; ++i)
+	for (i = first_nonzero; i < degree; i++)
 	{
 		if (upper_bound < fabs(ZBX_MATRIX_EL(coefficients, i, 0) / highest_degree_coefficient))
 			upper_bound = fabs(ZBX_MATRIX_EL(coefficients, i, 0) / highest_degree_coefficient);
@@ -599,7 +601,7 @@ while(0)
 		{
 			if (radius <= upper_bound)
 			{
-				for (i = 0; i < degree - first_nonzero; ++i)
+				for (i = 0; i < degree - first_nonzero; i++)
 				{
 					Re(ZBX_MATRIX_ROW(roots, i)) = radius * cos((2.0 * M_PI * (i + 0.25)) /
 							(degree - first_nonzero));
@@ -610,16 +612,14 @@ while(0)
 				radius *= 2.0;
 			}
 			else
-			{
 				root_init = 1;
-			}
 		}
 
 		roots_ok = 1;
 		max_update = 0.0;
 		min_distance = HUGE_VAL;
 
-		for (i = first_nonzero; i < degree; ++i)
+		for (i = first_nonzero; i < degree; i++)
 		{
 			Re(z) = Re(ZBX_MATRIX_ROW(roots, i));
 			Im(z) = Im(ZBX_MATRIX_ROW(roots, i));
@@ -628,7 +628,7 @@ while(0)
 			Re(denominator) = highest_degree_coefficient;
 			Im(denominator) = 0.0;
 
-			for (j = first_nonzero; j < degree; ++j)
+			for (j = first_nonzero; j < degree; j++)
 			{
 				if (j == i)
 					continue;
@@ -651,7 +651,7 @@ while(0)
 			Re(polynomial) = ZBX_MATRIX_EL(coefficients, first_nonzero, 0);
 			Im(polynomial) = 0.0;
 
-			for (j = first_nonzero + 1; j <= degree; ++j)
+			for (j = first_nonzero + 1; j <= degree; j++)
 			{
 				ZBX_COMPLEX_MULT(zpower, z, mult);
 				Re(polynomial) += Re(zpower) * ZBX_MATRIX_EL(coefficients, j, 0);
@@ -673,9 +673,7 @@ while(0)
 			else /* Denominator is zero iff two or more root approximations are equal. */
 				/* Since root approximations are initially different their equality means that they */
 				/* converged to a multiple root (hopefully) and no updates are required in this case. */
-			{
 				Re(ZBX_MATRIX_ROW(updates, i)) = Im(ZBX_MATRIX_ROW(updates, i)) = 0.0;
-			}
 
 			temp = ZBX_MATRIX_EL(updates, i, 0) * ZBX_MATRIX_EL(updates, i, 0) +
 					ZBX_MATRIX_EL(updates, i, 1) * ZBX_MATRIX_EL(updates, i, 1);
@@ -689,7 +687,7 @@ while(0)
 		else
 			root_init = 1;
 
-		for (i = first_nonzero; i < degree; ++i)
+		for (i = first_nonzero; i < degree; i++)
 		{
 			Re(ZBX_MATRIX_ROW(roots, i)) -= Re(ZBX_MATRIX_ROW(updates, i));
 			Im(ZBX_MATRIX_ROW(roots, i)) -= Im(ZBX_MATRIX_ROW(updates, i));
@@ -702,9 +700,8 @@ while(0)
 		res = FAIL;
 	}
 	else
-	{
 		res = SUCCEED;
-	}
+
 out:
 	zbx_matrix_free(denominator_multiplicands);
 	zbx_matrix_free(updates);
@@ -751,11 +748,9 @@ static int	zbx_polynomial_minmax(double now, double time, zbx_mode_t mode, zbx_m
 		min = tmp;
 	}
 	else
-	{
 		max = tmp;
-	}
 
-	for (i = 0; i < derivative_roots->rows; ++i)
+	for (i = 0; i < derivative_roots->rows; i++)
 	{
 		tmp = ZBX_MATRIX_EL(derivative_roots, i, 0);
 
@@ -811,7 +806,7 @@ static int	zbx_polynomial_timeleft(double now, double threshold, zbx_matrix_t *c
 	/* choose the closest root right from now or set result to -1 otherwise */
 	/* if zbx_polynomial_value(tmp) is not close enough to zero it must be a complex root and must be skipped */
 
-	for (i = 0; i < roots->rows; ++i)
+	for (i = 0; i < roots->rows; i++)
 	{
 		tmp = ZBX_MATRIX_EL(roots, i, 0);
 
@@ -982,9 +977,7 @@ static void	zbx_log_expression(double now, zbx_fit_t fit, int k, zbx_matrix_t *c
 				exp(ZBX_MATRIX_EL(coeffs, 0, 0)), now, ZBX_MATRIX_EL(coeffs, 1, 0));
 	}
 	else
-	{
 		THIS_SHOULD_NEVER_HAPPEN;
-	}
 }
 
 double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode)
