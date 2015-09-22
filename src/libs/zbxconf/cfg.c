@@ -370,11 +370,10 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 #define ZBX_CFG_LTRIM_CHARS	"\t "
 #define ZBX_CFG_RTRIM_CHARS	ZBX_CFG_LTRIM_CHARS "\r\n"
-#define ZBX_CFG_EOL_CHAR	'\n'
 
 	FILE		*file;
-	int		i, lineno, param_valid, line_length;
-	char		line[MAX_STRING_LEN], *parameter, *value;
+	int		i, lineno, param_valid;
+	char		line[MAX_STRING_LEN + 1], *parameter, *value;
 	zbx_uint64_t	var;
 #ifdef _WINDOWS
 	wchar_t		*wcfg_file;
@@ -401,8 +400,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
 			/* only 2048 character (inc. '\n' or '\0') single lines supported in the config file */
-			line_length = strlen(line);
-			if (ZBX_CFG_EOL_CHAR != line[line_length - 1] && !feof(file))
+			if(MAX_STRING_LEN <= strlen(line))
 				goto line_too_long;
 
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
