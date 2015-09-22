@@ -329,7 +329,7 @@ int	evaluate(double *value, const char *expression, char *error, int max_error_l
 
 /* forecasting */
 
-#define ERROR_CODE	-1.0
+#define ZBX_MATH_ERROR	-1.0
 
 typedef enum
 {
@@ -353,7 +353,7 @@ typedef enum
 }
 zbx_mode_t;
 
-int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, int *k, char **error);
+int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error);
 int	zbx_mode_code(char *mode_str, zbx_mode_t *mode, char **error);
 double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fit_t fit, unsigned k, zbx_mode_t mode);
 double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, zbx_fit_t fit, unsigned k);
