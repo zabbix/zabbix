@@ -22,7 +22,7 @@
 
 #include "zbxalgo.h"
 
-#define DB_INFINITY	(1e12-1e-4)
+#define DB_INFINITY	(1e12 - 1e-4)
 
 #define ZBX_MATH_EPSILON	(1.0e-6)
 
@@ -369,8 +369,8 @@ static int	zbx_fill_dependent(double *x, int n, zbx_fit_t fit, zbx_matrix_t *m)
 
 static int	zbx_fill_independent(double *t, int n, zbx_fit_t fit, int k, zbx_matrix_t *m)
 {
-	double		element;
-	int		i, j;
+	double	element;
+	int	i, j;
 
 	if (FIT_LINEAR == fit || FIT_EXPONENTIAL == fit)
 	{
@@ -995,7 +995,7 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 			return 0.0;
 
 		THIS_SHOULD_NEVER_HAPPEN;
-		return ERROR_CODE;
+		return ZBX_MATH_ERROR;
 	}
 
 	zbx_matrix_struct_alloc(&coefficients);
@@ -1121,12 +1121,12 @@ out:
 
 	if (SUCCEED != res)
 	{
-		result = ERROR_CODE;
+		result = ZBX_MATH_ERROR;
 	}
 	else if (ZBX_IS_NAN(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
-		result = ERROR_CODE;
+		result = ZBX_MATH_ERROR;
 	}
 	else if (DB_INFINITY < result)
 	{
@@ -1196,12 +1196,12 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 out:
 	if (SUCCEED != res)
 	{
-		result = ERROR_CODE;
+		result = ZBX_MATH_ERROR;
 	}
 	else if (ZBX_IS_NAN(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
-		result = ERROR_CODE;
+		result = ZBX_MATH_ERROR;
 	}
 	else if (0.0 > result || DB_INFINITY < result)
 	{

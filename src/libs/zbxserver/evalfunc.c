@@ -1983,7 +1983,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ERROR_CODE);
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ZBX_MATH_ERROR);
 	}
 
 	ret = SUCCEED;
@@ -2111,7 +2111,7 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ERROR_CODE);
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ZBX_MATH_ERROR);
 	}
 
 	ret = SUCCEED;
