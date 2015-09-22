@@ -736,7 +736,7 @@ static void	zbx_free_config(void)
 int	main(int argc, char **argv)
 {
 	ZBX_TASK_EX	t = {ZBX_TASK_START};
-	char		ch = '\0';
+	char		ch;
 	int		opt_c = 0, opt_r = 0;
 
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
@@ -780,9 +780,9 @@ int	main(int argc, char **argv)
 	if (1 < opt_c || 1 < opt_r)
 	{
 		if (1 < opt_c)
-			zbx_error("option \"-c\" specified multiple times");
+			zbx_error("option \"-c\" or \"--config\" specified multiple times");
 		if (1 < opt_r)
-			zbx_error("option \"-R\" specified multiple times");
+			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
 
 		exit(EXIT_FAILURE);
 	}
@@ -813,7 +813,6 @@ int	main(int argc, char **argv)
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
 #endif
-
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
 }
 

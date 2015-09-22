@@ -856,9 +856,9 @@ int	main(int argc, char **argv)
 	if (1 < opt_c || 1 < opt_r)
 	{
 		if (1 < opt_c)
-			zbx_error("option \"-c\" specified multiple times");
+			zbx_error("option \"-c\" or \"--config\" specified multiple times");
 		if (1 < opt_r)
-			zbx_error("option \"-R\" specified multiple times");
+			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
 
 		exit(EXIT_FAILURE);
 	}
@@ -889,7 +889,6 @@ int	main(int argc, char **argv)
 #ifdef HAVE_OPENIPMI
 	init_ipmi_handler();
 #endif
-
 	return daemon_start(CONFIG_ALLOW_ROOT, CONFIG_USER);
 }
 

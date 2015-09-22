@@ -254,28 +254,26 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 
 static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	char		ch = '\0';
-	int		opt_c = 0, opt_p = 0, opt_t = 0, opt_r = 0, ret = SUCCEED;
-#ifdef _WINDOWS
-	int		opt_i = 0, opt_d = 0, opt_s = 0, opt_x = 0, opt_m = 0;
+	int		i, ret = SUCCEED;
+	char		ch;
 	unsigned int	opt_mask = 0;
-#endif
+	unsigned short	opt_count[256] = {};
 
 	t->task = ZBX_TASK_START;
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
+		opt_count[ch]++;
+
 		switch (ch)
 		{
 			case 'c':
-				opt_c++;
 				if (NULL == CONFIG_FILE)
 					CONFIG_FILE = strdup(zbx_optarg);
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				opt_r++;
 				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->flags))
 					exit(EXIT_FAILURE);
 
@@ -289,12 +287,10 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				t->task = ZBX_TASK_SHOW_VERSION;
 				goto out;
 			case 'p':
-				opt_p++;
 				if (ZBX_TASK_START == t->task)
 					t->task = ZBX_TASK_PRINT_SUPPORTED;
 				break;
 			case 't':
-				opt_t++;
 				if (ZBX_TASK_START == t->task)
 				{
 					t->task = ZBX_TASK_TEST_METRIC;
@@ -303,23 +299,18 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifdef _WINDOWS
 			case 'i':
-				opt_i++;
 				t->task = ZBX_TASK_INSTALL_SERVICE;
 				break;
 			case 'd':
-				opt_d++;
 				t->task = ZBX_TASK_UNINSTALL_SERVICE;
 				break;
 			case 's':
-				opt_s++;
 				t->task = ZBX_TASK_START_SERVICE;
 				break;
 			case 'x':
-				opt_x++;
 				t->task = ZBX_TASK_STOP_SERVICE;
 				break;
 			case 'm':
-				opt_m++;
 				t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 				break;
 #endif
@@ -330,38 +321,29 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 
 	/* every option may be specified only once */
-	if (1 < opt_c || 1 < opt_p || 1 < opt_t || 1 < opt_r)
-	{
-		if (1 < opt_c)
-			zbx_error("option \"-c\" or \"--config\" specified multiple times");
-		if (1 < opt_p)
-			zbx_error("option \"-p\" or \"--print\" specified multiple times");
-		if (1 < opt_t)
-			zbx_error("option \"-t\" or \"--test\" specified multiple times");
-		if (1 < opt_r)
-			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
 
-		ret = FAIL;
-		goto out;
+	for (i = 0; NULL != longopts[i].name; i++)
+	{
+		ch = longopts[i].val;
+
+		if ('h' == ch || 'V' == ch)
+			continue;
+
+		if (1 < opt_count[ch])
+		{
+			if (NULL == strchr(shortopts, ch))
+				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
+			else
+				zbx_error("option \"-%c\" or \"--%s\" specified multiple times", ch, longopts[i].name);
+
+			ret = FAIL;
+		}
 	}
+
+	if (FAIL == ret)
+		goto out;
+
 #ifdef _WINDOWS
-	if (1 < opt_i || 1 < opt_d || 1 < opt_s || 1 < opt_x || 1 < opt_m)
-	{
-		if (1 < opt_i)
-			zbx_error("option \"-i\" or \"--install\" specified multiple times");
-		if (1 < opt_d)
-			zbx_error("option \"-d\" or \"--uninstall\" specified multiple times");
-		if (1 < opt_s)
-			zbx_error("option \"-s\" or \"--start\" specified multiple times");
-		if (1 < opt_x)
-			zbx_error("option \"-x\" or \"--stop\" specified multiple times");
-		if (1 < opt_m)
-			zbx_error("option \"-m\" or \"--multiple-agents\" specified multiple times");
-
-		ret = FAIL;
-		goto out;
-	}
-
 	/* check for mutually exclusive options */
 	/* Allowed option combinations.		*/
 	/* Option 'c' is always optional.	*/
@@ -380,19 +362,19 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/*   -  -  -  -  -  x  m	0x03	*/
 	/*   -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
 
-	if (0 < opt_p)
+	if (0 < opt_count['p'])
 		opt_mask |= 0x40;
-	if (0 < opt_t)
+	if (0 < opt_count['t'])
 		opt_mask |= 0x20;
-	if (0 < opt_i)
+	if (0 < opt_count['i'])
 		opt_mask |= 0x10;
-	if (0 < opt_d)
+	if (0 < opt_count['d'])
 		opt_mask |= 0x08;
-	if (0 < opt_s)
+	if (0 < opt_count['s'])
 		opt_mask |= 0x04;
-	if (0 < opt_x)
+	if (0 < opt_count['x'])
 		opt_mask |= 0x02;
-	if (0 < opt_m)
+	if (0 < opt_count['m'])
 		opt_mask |= 0x01;
 
 	switch (opt_mask)
@@ -418,10 +400,10 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 #else
 	/* check for mutually exclusive options */
-	if (1 < opt_p + opt_t + opt_r)
+	if (1 < opt_count['p'] + opt_count['t'] + opt_count['R'])
 	{
-		zbx_error("only one of options \"-p\", \"--print\", \"-t\", \"--test\", \"-R\" or \"--runtime-control\""
-				" can be used");
+		zbx_error("only one of options \"-p\" or \"--print\", \"-t\" or \"--test\","
+				" \"-R\" or \"--runtime-control\" can be used");
 		ret = FAIL;
 		goto out;
 	}
@@ -430,8 +412,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
 	if (argc > zbx_optind)
 	{
-		int	i;
-
 		for (i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
