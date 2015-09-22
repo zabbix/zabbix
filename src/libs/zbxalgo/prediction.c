@@ -868,7 +868,7 @@ error:
 	return FAIL;
 }
 
-int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, int *k, char **error)
+int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, unsigned *k, char **error)
 {
 	if ('\0' == *fit_str || 0 == strcmp(fit_str, "linear"))
 	{
@@ -879,7 +879,7 @@ int	zbx_fit_code(char *fit_str, zbx_fit_t *fit, int *k, char **error)
 	{
 		*fit = FIT_POLYNOMIAL;
 
-		if (SUCCEED != is_uint_range(fit_str + strlen("polynomial"), (unsigned int *)k, 1, 6))
+		if (SUCCEED != is_uint_range(fit_str + strlen("polynomial"), k, 1, 6))
 		{
 			*error = zbx_strdup(*error, "polynomial degree is invalid");
 			return FAIL;
@@ -1010,7 +1010,7 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
 		goto out;
 
-	zbx_log_expression(now, fit, k, coefficients);
+	zbx_log_expression(now, fit, (int)k, coefficients);
 
 	if (MODE_VALUE == mode)
 	{
@@ -1161,7 +1161,7 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	if (SUCCEED != (res = zbx_regression(t, x, n, fit, k, coefficients)))
 		goto out;
 
-	zbx_log_expression(now, fit, k, coefficients);
+	zbx_log_expression(now, fit, (int)k, coefficients);
 
 	if (SUCCEED != (res = zbx_calculate_value(now, coefficients, fit, &current)))
 	{
