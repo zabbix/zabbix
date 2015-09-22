@@ -2076,6 +2076,7 @@ function get_item_function_info($expr) {
 		'dayofweek' =>	['value_type' => '1-7',		'type' => T_ZBX_INT,			'validation' => IN('1,2,3,4,5,6,7')],
 		'delta' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
 		'diff' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
+		'forecast' =>		['value_type' => $value_type, $type_of_value_type,	'validation' => NOT_EMPTY],
 		'fuzzytime' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'iregexp' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'last' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
@@ -2092,7 +2093,8 @@ function get_item_function_info($expr) {
 		'str' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'strlen' =>		['value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
 		'sum' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'time' =>		['value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6']
+		'time' =>		['value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6'],
+		'timeleft' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY]
 	];
 
 	$expressionData = new CTriggerExpression();
