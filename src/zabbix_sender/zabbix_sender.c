@@ -597,22 +597,19 @@ static void    zbx_load_config(const char *config_file)
 
 static void	parse_commandline(int argc, char **argv)
 {
-	char		ch = '\0';
-	int		opt_c = 0, opt_cap_i = 0, opt_z = 0, opt_p = 0, opt_s = 0, opt_k = 0, opt_o = 0, opt_i = 0,
-			opt_cap_t = 0, opt_r = 0, opt_v = 0;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	int		opt_1 = 0, opt_2 = 0, opt_3 = 0, opt_4 = 0, opt_5 = 0, opt_6 = 0, opt_7 = 0, opt_8 = 0,
-			opt_9 = 0;
-#endif
+	int		i, fatal = 0;
+	char		ch;
 	unsigned int	opt_mask = 0;
+	unsigned short	opt_count[256] = {};
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
+		opt_count[ch]++;
+
 		switch (ch)
 		{
 			case 'c':
-				opt_c++;
 				if (NULL == CONFIG_FILE)
 					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
@@ -625,49 +622,39 @@ static void	parse_commandline(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'I':
-				opt_cap_i++;
 				if (NULL == CONFIG_SOURCE_IP)
 					CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
 				break;
 			case 'z':
-				opt_z++;
 				if (NULL == ZABBIX_SERVER)
 					ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, zbx_optarg);
 				break;
 			case 'p':
-				opt_p++;
 				ZABBIX_SERVER_PORT = (unsigned short)atoi(zbx_optarg);
 				break;
 			case 's':
-				opt_s++;
 				if (NULL == ZABBIX_HOSTNAME)
 					ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, zbx_optarg);
 				break;
 			case 'k':
-				opt_k++;
 				if (NULL == ZABBIX_KEY)
 					ZABBIX_KEY = zbx_strdup(ZABBIX_KEY, zbx_optarg);
 				break;
 			case 'o':
-				opt_o++;
 				if (NULL == ZABBIX_KEY_VALUE)
 					ZABBIX_KEY_VALUE = zbx_strdup(ZABBIX_KEY_VALUE, zbx_optarg);
 				break;
 			case 'i':
-				opt_i++;
 				if (NULL == INPUT_FILE)
 					INPUT_FILE = zbx_strdup(INPUT_FILE, zbx_optarg);
 				break;
 			case 'T':
-				opt_cap_t++;
 				WITH_TIMESTAMPS = 1;
 				break;
 			case 'r':
-				opt_r++;
 				REAL_TIME = 1;
 				break;
 			case 'v':
-				opt_v++;
 				if (LOG_LEVEL_WARNING > CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
 				else if (LOG_LEVEL_DEBUG > CONFIG_LOG_LEVEL)
@@ -675,39 +662,30 @@ static void	parse_commandline(int argc, char **argv)
 				break;
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			case '1':
-				opt_1++;
 				CONFIG_TLS_CONNECT = zbx_strdup(CONFIG_TLS_CONNECT, zbx_optarg);
 				break;
 			case '2':
-				opt_2++;
 				CONFIG_TLS_CA_FILE = zbx_strdup(CONFIG_TLS_CA_FILE, zbx_optarg);
 				break;
 			case '3':
-				opt_3++;
 				CONFIG_TLS_CRL_FILE = zbx_strdup(CONFIG_TLS_CRL_FILE, zbx_optarg);
 				break;
 			case '4':
-				opt_4++;
 				CONFIG_TLS_SERVER_CERT_ISSUER = zbx_strdup(CONFIG_TLS_SERVER_CERT_ISSUER, zbx_optarg);
 				break;
 			case '5':
-				opt_5++;
 				CONFIG_TLS_SERVER_CERT_SUBJECT = zbx_strdup(CONFIG_TLS_SERVER_CERT_SUBJECT, zbx_optarg);
 				break;
 			case '6':
-				opt_6++;
 				CONFIG_TLS_CERT_FILE = zbx_strdup(CONFIG_TLS_CERT_FILE, zbx_optarg);
 				break;
 			case '7':
-				opt_7++;
 				CONFIG_TLS_KEY_FILE = zbx_strdup(CONFIG_TLS_KEY_FILE, zbx_optarg);
 				break;
 			case '8':
-				opt_8++;
 				CONFIG_TLS_PSK_IDENTITY = zbx_strdup(CONFIG_TLS_PSK_IDENTITY, zbx_optarg);
 				break;
 			case '9':
-				opt_9++;
 				CONFIG_TLS_PSK_FILE = zbx_strdup(CONFIG_TLS_PSK_FILE, zbx_optarg);
 				break;
 #else
@@ -734,63 +712,31 @@ static void	parse_commandline(int argc, char **argv)
 
 	/* every option may be specified only once */
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (1 < opt_c || 1 < opt_cap_i || 1 < opt_z || 1 < opt_p || 1 < opt_s || 1 < opt_k || 1 < opt_o || 1 < opt_i ||
-			1 < opt_cap_t || 1 < opt_r || 2 < opt_v || 1 < opt_1 || 1 < opt_2 || 1 < opt_3 || 1 < opt_4 ||
-			1 < opt_5 || 1 < opt_6 || 1 < opt_7 || 1 < opt_8 || 1 < opt_9)
-#else
-	if (1 < opt_c || 1 < opt_cap_i || 1 < opt_z || 1 < opt_p || 1 < opt_s || 1 < opt_k || 1 < opt_o || 1 < opt_i ||
-			1 < opt_cap_t || 1 < opt_r || 2 < opt_v)
-#endif
+	for (i = 0; NULL != longopts[i].name; i++)
 	{
-#define FMT	"option \"%s\" specified multiple times"
+		ch = longopts[i].val;
 
-		if (1 < opt_c)
-			zbx_error(FMT, "-c\" or \"--config");
-		if (1 < opt_cap_i)
-			zbx_error(FMT, "-I\" or \"--source-address");
-		if (1 < opt_z)
-			zbx_error(FMT, "-z\" or \"--zabbix-server");
-		if (1 < opt_p)
-			zbx_error(FMT, "-p\" or \"--port");
-		if (1 < opt_s)
-			zbx_error(FMT, "-s\" or \"--host");
-		if (1 < opt_k)
-			zbx_error(FMT, "-k\" or \"--key");
-		if (1 < opt_o)
-			zbx_error(FMT, "-o\" or \"--value");
-		if (1 < opt_i)
-			zbx_error(FMT, "-i\" or \"--input-file");
-		if (1 < opt_cap_t)
-			zbx_error(FMT, "-T\" or \"--with-timestamps");
-		if (1 < opt_r)
-			zbx_error(FMT, "-r\" or \"--real-time");
-		/* '-v' or '-vv' can be specified */
-		if (2 < opt_v)
+		if ('v' == ch && 2 < opt_count[ch])	/* '-v' or '-vv' can be specified */
+		{
 			zbx_error("option \"-v\" or \"--verbose\" specified more than 2 times");
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		if (1 < opt_1)
-			zbx_error(FMT, "--tls-connect");
-		if (1 < opt_2)
-			zbx_error(FMT, "--tls-ca-file");
-		if (1 < opt_3)
-			zbx_error(FMT, "--tls-crl-file");
-		if (1 < opt_4)
-			zbx_error(FMT, "--tls-server-cert-issuer");
-		if (1 < opt_5)
-			zbx_error(FMT, "--tls-server-cert-subject");
-		if (1 < opt_6)
-			zbx_error(FMT, "--tls-cert-file");
-		if (1 < opt_7)
-			zbx_error(FMT, "--tls-key-file");
-		if (1 < opt_8)
-			zbx_error(FMT, "--tls-psk-identity");
-		if (1 < opt_9)
-			zbx_error(FMT, "--tls-psk-file");
-#endif
-		exit(EXIT_FAILURE);
-#undef FMT
+
+			fatal = 1;
+			continue;
+		}
+
+		if ('v' != ch && 1 < opt_count[ch])
+		{
+			if (NULL == strchr(shortopts, ch))
+				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
+			else
+				zbx_error("option \"-%c\" or \"--%s\" specified multiple times", ch, longopts[i].name);
+
+			fatal = 1;
+		}
 	}
+
+	if (1 == fatal)
+		exit(EXIT_FAILURE);
 
 	/* check for mutually exclusive options    */
 
@@ -920,7 +866,7 @@ static void	parse_commandline(int argc, char **argv)
 	/*   c  z  s  k  o  -  -  -  p  -  0x3e2                    */
 	/*   c  z  s  k  o  -  -  -  p  I  0x3e3                    */
 
-	if (0 == opt_c + opt_z)
+	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
 		usage();
@@ -928,39 +874,39 @@ static void	parse_commandline(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (0 < opt_c)
+	if (0 < opt_count['c'])
 		opt_mask |= 0x200;
-	if (0 < opt_z)
+	if (0 < opt_count['z'])
 		opt_mask |= 0x100;
-	if (0 < opt_s)
+	if (0 < opt_count['s'])
 		opt_mask |= 0x80;
-	if (0 < opt_k)
+	if (0 < opt_count['k'])
 		opt_mask |= 0x40;
-	if (0 < opt_o)
+	if (0 < opt_count['o'])
 		opt_mask |= 0x20;
-	if (0 < opt_i)
+	if (0 < opt_count['i'])
 		opt_mask |= 0x10;
-	if (0 < opt_cap_t)
+	if (0 < opt_count['T'])
 		opt_mask |= 0x08;
-	if (0 < opt_r)
+	if (0 < opt_count['r'])
 		opt_mask |= 0x04;
-	if (0 < opt_p)
+	if (0 < opt_count['p'])
 		opt_mask |= 0x02;
-	if (0 < opt_cap_i)
+	if (0 < opt_count['I'])
 		opt_mask |= 0x01;
 
 	if (
-			(0 == opt_c && 1 == opt_i &&	/* !c i */
+			(0 == opt_count['c'] && 1 == opt_count['i'] &&	/* !c i */
 					!((0x110 <= opt_mask && opt_mask <= 0x11f) ||
 					(0x190 <= opt_mask && opt_mask <= 0x19f))) ||
-			(0 == opt_c && 0 == opt_i &&	/* !c !i */
+			(0 == opt_count['c'] && 0 == opt_count['i'] &&	/* !c !i */
 					!(0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
-			(1 == opt_c && 1 == opt_i &&	/* c i */
+			(1 == opt_count['c'] && 1 == opt_count['i'] &&	/* c i */
 					!((0x210 <= opt_mask && opt_mask <= 0x21f) ||
 					(0x310 <= opt_mask && opt_mask <= 0x31f) ||
 					(0x290 <= opt_mask && opt_mask <= 0x29f) ||
 					(0x390 <= opt_mask && opt_mask <= 0x39f))) ||
-			(1 == opt_c && 0 == opt_i &&	/* c !i */
+			(1 == opt_count['c'] && 0 == opt_count['i'] &&	/* c !i */
 					!((0x260 <= opt_mask && opt_mask <= 0x263) ||
 					(0x2e0 <= opt_mask && opt_mask <= 0x2e3) ||
 					(0x360 <= opt_mask && opt_mask <= 0x363) ||
@@ -975,8 +921,6 @@ static void	parse_commandline(int argc, char **argv)
 	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
 	if (argc > zbx_optind)
 	{
-		int	i;
-
 		for (i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
