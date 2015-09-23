@@ -95,11 +95,9 @@ class CControllerMediatypeUpdate extends CController {
 			case MEDIA_TYPE_EXEC:
 				$this->getInputs($mediatype, ['exec_path']);
 
-				if ($this->hasInput('exec_params')) {
-					$mediatype['exec_params'] = implode("\n",
-						zbx_objectValues($this->getInput('exec_params'), 'exec_param')
-					);
-				}
+				$mediatype['exec_params'] = implode("\n",
+					zbx_objectValues($this->getInput('exec_params'), 'exec_param')
+				);
 				break;
 
 			case MEDIA_TYPE_SMS:
