@@ -1660,7 +1660,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '1', 'till' => '31', 'step' => '88']
 					]
 				]],
-				'Invalid interval "md1-31/88": invalid month step "88".'
+				'Invalid interval "md1-31/88": invalid month day step "88".'
 			],
 			[
 				[[
@@ -1693,7 +1693,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '1', 'till' => '31', 'step' => '0']
 					]
 				]],
-				'Invalid interval "md1,1-31/0": invalid month step "0".'
+				'Invalid interval "md1,1-31/0": invalid month day step "0".'
 			],
 			[
 				[[
@@ -1703,7 +1703,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '99']
 					]
 				]],
-				'Invalid interval "md/99": invalid month step "99".'
+				'Invalid interval "md/99": invalid month day step "99".'
 			],
 			[
 				[[
@@ -1713,7 +1713,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '0']
 					]
 				]],
-				'Invalid interval "md/0": invalid month step "0".'
+				'Invalid interval "md/0": invalid month day step "0".'
 			],
 			[
 				[[
@@ -1723,7 +1723,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '01', 'till' => '01', 'step' => '01']
 					]
 				]],
-				'Invalid interval "md01-01/01": invalid month step "01".'
+				'Invalid interval "md01-01/01": invalid month day step "01".'
 			],
 			[
 				[[
@@ -1733,7 +1733,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '02', 'till' => '02', 'step' => '01']
 					]
 				]],
-				'Invalid interval "md02-02/01": invalid month step "01".'
+				'Invalid interval "md02-02/01": invalid month day step "01".'
 			],
 			// Invalid scheduling week days.
 			[
@@ -1754,7 +1754,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '1', 'till' => '1', 'step' => '1']
 					]
 				]],
-				'Invalid interval "wd1-1/1": invalid week step "1".'
+				'Invalid interval "wd1-1/1": invalid week day step "1".'
 			],
 			[
 				[[
@@ -1784,7 +1784,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '9']
 					]
 				]],
-				'Invalid interval "wd/9": invalid week step "9".'
+				'Invalid interval "wd/9": invalid week day step "9".'
 			],
 			[
 				[[
@@ -1794,7 +1794,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '0']
 					]
 				]],
-				'Invalid interval "wd/0": invalid week step "0".'
+				'Invalid interval "wd/0": invalid week day step "0".'
 			],
 			[
 				[[
@@ -1814,7 +1814,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '7', 'till' => '7', 'step' => '7']
 					]
 				]],
-				'Invalid interval "wd7-7/7": invalid week step "7".'
+				'Invalid interval "wd7-7/7": invalid week day step "7".'
 			],
 			[
 				[[
@@ -1824,7 +1824,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '7']
 					]
 				]],
-				'Invalid interval "wd/7": invalid week step "7".'
+				'Invalid interval "wd/7": invalid week day step "7".'
 			],
 			[
 				[[
@@ -1865,7 +1865,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '99']
 					]
 				]],
-				'Invalid interval "h/99": invalid hours step "99".'
+				'Invalid interval "h/99": invalid hour step "99".'
 			],
 			[
 				[[
@@ -1885,7 +1885,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '7', 'till' => '0', 'step' => '99']
 					]
 				]],
-				'Invalid interval "h7-0/99": starting hours must be less or equal to ending hours.'
+				'Invalid interval "h7-0/99": starting hour must be less or equal to ending hour.'
 			],
 			[
 				[[
@@ -1905,7 +1905,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '24']
 					]
 				]],
-				'Invalid interval "h/24": invalid hours step "24".'
+				'Invalid interval "h/24": invalid hour step "24".'
 			],
 			[
 				[[
@@ -1915,7 +1915,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '23', 'till' => '15', 'step' => '1']
 					]
 				]],
-				'Invalid interval "h23-15/1": starting hours must be less or equal to ending hours.'
+				'Invalid interval "h23-15/1": starting hour must be less or equal to ending hour.'
 			],
 			[
 				[[
@@ -1925,7 +1925,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '00', 'till' => '00', 'step' => '00']
 					]
 				]],
-				'Invalid interval "h00-00/00": invalid hours step "00".'
+				'Invalid interval "h00-00/00": invalid hour step "00".'
 			],
 			[
 				[[
@@ -1935,7 +1935,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '01', 'till' => '01', 'step' => '01']
 					]
 				]],
-				'Invalid interval "h01-01/01": invalid hours step "01".'
+				'Invalid interval "h01-01/01": invalid hour step "01".'
 			],
 			// Mixed week days and hours.
 			[
@@ -2171,7 +2171,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '99']
 					]
 				]],
-				'Invalid interval "m/99": invalid minutes step "99".'
+				'Invalid interval "m/99": invalid minute step "99".'
 			],
 			[
 				[[
@@ -2191,7 +2191,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '59', 'till' => '0', 'step' => '99']
 					]
 				]],
-				'Invalid interval "m59-0/99": starting minutes must be less or equal to ending minutes.'
+				'Invalid interval "m59-0/99": starting minute must be less or equal to ending minute.'
 			],
 			[
 				[[
@@ -2211,7 +2211,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '60']
 					]
 				]],
-				'Invalid interval "m/60": invalid minutes step "60".'
+				'Invalid interval "m/60": invalid minute step "60".'
 			],
 			[
 				[[
@@ -2221,7 +2221,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '0', 'till' => '2', 'step' => '60']
 					]
 				]],
-				'Invalid interval "m0-2/60": invalid minutes step "60".'
+				'Invalid interval "m0-2/60": invalid minute step "60".'
 			],
 			[
 				[[
@@ -2231,7 +2231,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '59', 'till' => '15', 'step' => '1']
 					]
 				]],
-				'Invalid interval "m59-15/1": starting minutes must be less or equal to ending minutes.'
+				'Invalid interval "m59-15/1": starting minute must be less or equal to ending minute.'
 			],
 			[
 				[[
@@ -2241,7 +2241,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '00', 'till' => '00', 'step' => '00']
 					]
 				]],
-				'Invalid interval "m00-00/00": invalid minutes step "00".'
+				'Invalid interval "m00-00/00": invalid minute step "00".'
 			],
 			[
 				[[
@@ -2251,7 +2251,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '01', 'till' => '01', 'step' => '01']
 					]
 				]],
-				'Invalid interval "m01-01/01": invalid minutes step "01".'
+				'Invalid interval "m01-01/01": invalid minute step "01".'
 			],
 			// Invalid scheduling seconds.
 			[
@@ -2292,7 +2292,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '99']
 					]
 				]],
-				'Invalid interval "s/99": invalid seconds step "99".'
+				'Invalid interval "s/99": invalid second step "99".'
 			],
 			[
 				[[
@@ -2312,7 +2312,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '59', 'till' => '0', 'step' => '99']
 					]
 				]],
-				'Invalid interval "s59-0/99": starting seconds must be less or equal to ending seconds.'
+				'Invalid interval "s59-0/99": starting second must be less or equal to ending second.'
 			],
 			[
 				[[
@@ -2332,7 +2332,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '', 'till' => '', 'step' => '60']
 					]
 				]],
-				'Invalid interval "s/60": invalid seconds step "60".'
+				'Invalid interval "s/60": invalid second step "60".'
 			],
 			[
 				[[
@@ -2342,7 +2342,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '0', 'till' => '2', 'step' => '60']
 					]
 				]],
-				'Invalid interval "s0-2/60": invalid seconds step "60".'
+				'Invalid interval "s0-2/60": invalid second step "60".'
 			],
 			[
 				[[
@@ -2352,7 +2352,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '59', 'till' => '15', 'step' => '1']
 					]
 				]],
-				'Invalid interval "s59-15/1": starting seconds must be less or equal to ending seconds.'
+				'Invalid interval "s59-15/1": starting second must be less or equal to ending second.'
 			],
 			[
 				[[
@@ -2362,7 +2362,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '00', 'till' => '00', 'step' => '00']
 					]
 				]],
-				'Invalid interval "s00-00/00": invalid seconds step "00".'
+				'Invalid interval "s00-00/00": invalid second step "00".'
 			],
 			[
 				[[
@@ -2372,7 +2372,7 @@ class CItemDelayFlexValidatorTest extends PHPUnit_Framework_TestCase {
 						['from' => '01', 'till' => '01', 'step' => '01']
 					]
 				]],
-				'Invalid interval "s01-01/01": invalid seconds step "01".'
+				'Invalid interval "s01-01/01": invalid second step "01".'
 			]
 		];
 	}

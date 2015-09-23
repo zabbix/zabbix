@@ -105,20 +105,20 @@ class CItemDelayFlexParser {
 		 * For example week days can only be one character. Months, hours, minutes are either one or two characters.
 		 * If more are entered, parser will raise and error.
 		 */
-		$month_from = '';
-		$month_till = '';
-		$month_step = '';
-		$week_from = '';
-		$week_till = '';
-		$week_step = '';
-		$hour_from = '';
-		$hour_till = '';
+		$month_day_from = '';
+		$month_day_till = '';
+		$month_day_step = '';
+		$week_day_from = '';
+		$week_day_till = '';
+		$week_day_step = '';
+		$hours_from = '';
+		$hours_till = '';
 		$hour_step = '';
-		$minute_from = '';
-		$minute_till = '';
+		$minutes_from = '';
+		$minutes_till = '';
 		$minute_step = '';
-		$second_from = '';
-		$second_till = '';
+		$seconds_from = '';
+		$seconds_till = '';
 		$second_step = '';
 
 		// Each month, week, hour, minute and second can have multiple <from's> and <to's> separated by a comma.
@@ -250,7 +250,7 @@ class CItemDelayFlexParser {
 				case self::STATE_FLEXIBLE_PERIOD:
 					switch ($this->source[$this->pos]) {
 						case '-':
-							if (strlen($week_from) != 1 || strlen($week_till) > 1
+							if (strlen($week_day_from) != 1 || strlen($week_day_till) > 1
 									|| $this->source[$this->pos - 2] !== '/') {
 								$this->setError();
 								return;
@@ -258,18 +258,19 @@ class CItemDelayFlexParser {
 							break;
 
 						case ',':
-							if (strlen($week_from) != 1 || (strlen($week_from) == 1) && strlen($week_till) > 1) {
+							if (strlen($week_day_from) != 1
+									|| (strlen($week_day_from) == 1 && strlen($week_day_till) > 1)) {
 								$this->setError();
 								return;
 							}
 
-							if (strlen($week_till)) {
-								$this->intervals[$i]['interval'] .= $week_from.'-'.$week_till.',';
-								$this->intervals[$i]['period'] .= $week_from.'-'.$week_till.',';
+							if (strlen($week_day_till)) {
+								$this->intervals[$i]['interval'] .= $week_day_from.'-'.$week_day_till.',';
+								$this->intervals[$i]['period'] .= $week_day_from.'-'.$week_day_till.',';
 							}
 							else {
-								$this->intervals[$i]['interval'] .= $week_from.',';
-								$this->intervals[$i]['period'] .= $week_from.',';
+								$this->intervals[$i]['interval'] .= $week_day_from.',';
+								$this->intervals[$i]['period'] .= $week_day_from.',';
 							}
 
 							$state = self::STATE_FLEXIBLE_HOUR_FROM;
@@ -277,16 +278,16 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								if (strlen($week_from)) {
-									$week_till = $this->source[$this->pos];
+								if (strlen($week_day_from)) {
+									$week_day_till = $this->source[$this->pos];
 
-									if (strlen($week_till) != 1 || $this->source[$this->pos - 1] !== '-') {
+									if (strlen($week_day_till) != 1 || $this->source[$this->pos - 1] !== '-') {
 										$this->setError();
 										return;
 									}
 								}
 								else {
-									$week_from = $this->source[$this->pos];
+									$week_day_from = $this->source[$this->pos];
 								}
 							}
 							else {
@@ -299,22 +300,22 @@ class CItemDelayFlexParser {
 				case self::STATE_FLEXIBLE_HOUR_FROM:
 					switch ($this->source[$this->pos]) {
 						case ':':
-							if (strlen($hour_from) != 1 && strlen($hour_from) != 2) {
+							if (strlen($hours_from) != 1 && strlen($hours_from) != 2) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_from.':';
-							$this->intervals[$i]['period'] .= $hour_from.':';
+							$this->intervals[$i]['interval'] .= $hours_from.':';
+							$this->intervals[$i]['period'] .= $hours_from.':';
 
 							$state = self::STATE_FLEXIBLE_MINUTE_FROM;
 							break;
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$hour_from .= $this->source[$this->pos];
+								$hours_from .= $this->source[$this->pos];
 
-								if (strlen($hour_from) != 1 && strlen($hour_from) != 2) {
+								if (strlen($hours_from) != 1 && strlen($hours_from) != 2) {
 									$this->setError();
 									return;
 								}
@@ -329,22 +330,22 @@ class CItemDelayFlexParser {
 				case self::STATE_FLEXIBLE_MINUTE_FROM:
 					switch ($this->source[$this->pos]) {
 						case '-':
-							if (strlen($minute_from) != 2) {
+							if (strlen($minutes_from) != 2) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_from.'-';
-							$this->intervals[$i]['period'] .= $minute_from.'-';
+							$this->intervals[$i]['interval'] .= $minutes_from.'-';
+							$this->intervals[$i]['period'] .= $minutes_from.'-';
 
 							$state = self::STATE_FLEXIBLE_HOUR_TILL;
 							break;
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$minute_from .= $this->source[$this->pos];
+								$minutes_from .= $this->source[$this->pos];
 
-								if (strlen($minute_from) != 1 && strlen($minute_from) != 2) {
+								if (strlen($minutes_from) != 1 && strlen($minutes_from) != 2) {
 									$this->setError();
 									return;
 								}
@@ -359,22 +360,22 @@ class CItemDelayFlexParser {
 				case self::STATE_FLEXIBLE_HOUR_TILL:
 					switch ($this->source[$this->pos]) {
 						case ':':
-							if (strlen($hour_till) != 1 && strlen($hour_till) != 2) {
+							if (strlen($hours_till) != 1 && strlen($hours_till) != 2) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_till.':';
-							$this->intervals[$i]['period'] .= $hour_till.':';
+							$this->intervals[$i]['interval'] .= $hours_till.':';
+							$this->intervals[$i]['period'] .= $hours_till.':';
 
 							$state = self::STATE_FLEXIBLE_MINUTE_TILL;
 							break;
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$hour_till .= $this->source[$this->pos];
+								$hours_till .= $this->source[$this->pos];
 
-								if (strlen($hour_till) != 1 && strlen($hour_till) != 2) {
+								if (strlen($hours_till) != 1 && strlen($hours_till) != 2) {
 									$this->setError();
 									return;
 								}
@@ -389,30 +390,30 @@ class CItemDelayFlexParser {
 				case self::STATE_FLEXIBLE_MINUTE_TILL:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (strlen($minute_till) != 2) {
+							if (strlen($minutes_till) != 2) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_till;
-							$this->intervals[$i]['period'] .= $minute_till;
+							$this->intervals[$i]['interval'] .= $minutes_till;
+							$this->intervals[$i]['period'] .= $minutes_till;
 
 							$state = self::STATE_NEW;
 
-							$week_from = '';
-							$week_till = '';
-							$hour_from = '';
-							$hour_till = '';
-							$minute_from = '';
-							$minute_till = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$hours_from = '';
+							$hours_till = '';
+							$minutes_from = '';
+							$minutes_till = '';
 							$i++;
 							break;
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$minute_till .= $this->source[$this->pos];
+								$minutes_till .= $this->source[$this->pos];
 
-								if (strlen($minute_till) != 1 && strlen($minute_till) != 2) {
+								if (strlen($minutes_till) != 1 && strlen($minutes_till) != 2) {
 									$this->setError();
 									return;
 								}
@@ -427,25 +428,25 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_MONTH_FROM:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingMonthFrom($month_from)) {
+							if (!$this->validateSchedulingMonthFrom($month_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_from;
-							$this->intervals[$i]['md'][$months]['from'] .= $month_from;
+							$this->intervals[$i]['interval'] .= $month_day_from;
+							$this->intervals[$i]['md'][$months]['from'] .= $month_day_from;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
+							$month_day_from = '';
 							$months = 0;
 							break;
 
 						case '/':
 							// Step can be entered of first month day is ommited.
-							if (strlen($month_from) == 0) {
+							if (strlen($month_day_from) == 0) {
 								$this->intervals[$i]['interval'] .= '/';
 
 								$state = self::STATE_SCHEDULING_MONTH_STEP;
@@ -457,41 +458,41 @@ class CItemDelayFlexParser {
 							break;
 
 						case '-':
-							if (!$this->validateSchedulingMonthFrom($month_from)) {
+							if (!$this->validateSchedulingMonthFrom($month_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_from.'-';
-							$this->intervals[$i]['md'][$months]['from'] .= $month_from;
+							$this->intervals[$i]['interval'] .= $month_day_from.'-';
+							$this->intervals[$i]['md'][$months]['from'] .= $month_day_from;
 
 							$state = self::STATE_SCHEDULING_MONTH_TILL;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingMonthFrom($month_from)) {
+							if (!$this->validateSchedulingMonthFrom($month_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_from.',';
-							$this->intervals[$i]['md'][$months]['from'] .= $month_from;
+							$this->intervals[$i]['interval'] .= $month_day_from.',';
+							$this->intervals[$i]['md'][$months]['from'] .= $month_day_from;
 
-							$month_from = '';
+							$month_day_from = '';
 							$months++;
 							$this->intervals[$i]['md'][$months] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case 'w':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingMonthFrom($month_from)) {
+									|| !$this->validateSchedulingMonthFrom($month_day_from)) {
 								$this->setError();
 								return;
 							}
 
 							if ($this->source[$this->pos + 1] === 'd') {
-								$this->intervals[$i]['interval'] .= $month_from.'wd';
-								$this->intervals[$i]['md'][$months]['from'] .= $month_from;
+								$this->intervals[$i]['interval'] .= $month_day_from.'wd';
+								$this->intervals[$i]['md'][$months]['from'] .= $month_day_from;
 								$this->intervals[$i]['wd'][$weeks] = ['from' => '', 'till' => '', 'step' => ''];
 
 								$state = self::STATE_SCHEDULING_WEEK_FROM;
@@ -505,13 +506,13 @@ class CItemDelayFlexParser {
 							break;
 
 						case 'h':
-							if (!$this->validateSchedulingMonthFrom($month_from)) {
+							if (!$this->validateSchedulingMonthFrom($month_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_from.'h';
-							$this->intervals[$i]['md'][$months]['from'] .= $month_from;
+							$this->intervals[$i]['interval'] .= $month_day_from.'h';
+							$this->intervals[$i]['md'][$months]['from'] .= $month_day_from;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_HOUR_FROM;
@@ -519,28 +520,28 @@ class CItemDelayFlexParser {
 
 						case 'm':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingMonthFrom($month_from)
+									|| !$this->validateSchedulingMonthFrom($month_day_from)
 									|| ($this->source[$this->pos + 1] !== '/'
 										&& !is_numeric($this->source[$this->pos + 1]))) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_from.'m';
-							$this->intervals[$i]['md'][$months]['from'] .= $month_from;
+							$this->intervals[$i]['interval'] .= $month_day_from.'m';
+							$this->intervals[$i]['md'][$months]['from'] .= $month_day_from;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingMonthFrom($month_from)) {
+							if (!$this->validateSchedulingMonthFrom($month_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_from.'s';
-							$this->intervals[$i]['md'][$months]['from'] .= $month_from;
+							$this->intervals[$i]['interval'] .= $month_day_from.'s';
+							$this->intervals[$i]['md'][$months]['from'] .= $month_day_from;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -548,9 +549,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$month_from .= $this->source[$this->pos];
+								$month_day_from .= $this->source[$this->pos];
 
-								if (strlen($month_from) != 1 && strlen($month_from) != 2) {
+								if (strlen($month_day_from) != 1 && strlen($month_day_from) != 2) {
 									$this->setError();
 									return;
 								}
@@ -565,63 +566,63 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_MONTH_TILL:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingMonthTo($month_till)) {
+							if (!$this->validateSchedulingMonthTo($month_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_till;
-							$this->intervals[$i]['md'][$months]['till'] .= $month_till;
+							$this->intervals[$i]['interval'] .= $month_day_till;
+							$this->intervals[$i]['md'][$months]['till'] .= $month_day_till;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
+							$month_day_from = '';
+							$month_day_till = '';
 							$months = 0;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingMonthTo($month_till)) {
+							if (!$this->validateSchedulingMonthTo($month_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_till.',';
-							$this->intervals[$i]['md'][$months]['till'] .= $month_till;
+							$this->intervals[$i]['interval'] .= $month_day_till.',';
+							$this->intervals[$i]['md'][$months]['till'] .= $month_day_till;
 
 							$state = self::STATE_SCHEDULING_MONTH_FROM;
 
-							$month_from = '';
-							$month_till = '';
+							$month_day_from = '';
+							$month_day_till = '';
 							$months++;
 							$this->intervals[$i]['md'][$months] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case '/':
 							// Step can be entered of first week day is ommited.
-							if (!$this->validateSchedulingMonthTo($month_till)) {
+							if (!$this->validateSchedulingMonthTo($month_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_till.'/';
-							$this->intervals[$i]['md'][$months]['till'] .= $month_till;
+							$this->intervals[$i]['interval'] .= $month_day_till.'/';
+							$this->intervals[$i]['md'][$months]['till'] .= $month_day_till;
 
 							$state = self::STATE_SCHEDULING_MONTH_STEP;
 							break;
 
 						case 'w':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingMonthTo($month_till)) {
+									|| !$this->validateSchedulingMonthTo($month_day_till)) {
 								$this->setError();
 								return;
 							}
 
 							if ($this->source[$this->pos + 1] === 'd') {
-								$this->intervals[$i]['interval'] .= $month_till.'wd';
-								$this->intervals[$i]['md'][$months]['till'] .= $month_till;
+								$this->intervals[$i]['interval'] .= $month_day_till.'wd';
+								$this->intervals[$i]['md'][$months]['till'] .= $month_day_till;
 								$this->intervals[$i]['wd'][$weeks] = ['from' => '', 'till' => '', 'step' => ''];
 
 								$state = self::STATE_SCHEDULING_WEEK_FROM;
@@ -635,13 +636,13 @@ class CItemDelayFlexParser {
 							break;
 
 						case 'h':
-							if (!$this->validateSchedulingMonthTo($month_till)) {
+							if (!$this->validateSchedulingMonthTo($month_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_till.'h';
-							$this->intervals[$i]['md'][$months]['till'] .= $month_till;
+							$this->intervals[$i]['interval'] .= $month_day_till.'h';
+							$this->intervals[$i]['md'][$months]['till'] .= $month_day_till;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_HOUR_FROM;
@@ -649,28 +650,28 @@ class CItemDelayFlexParser {
 
 						case 'm':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingMonthTo($month_till)
+									|| !$this->validateSchedulingMonthTo($month_day_till)
 									|| ($this->source[$this->pos + 1] !== '/'
 										&& !is_numeric($this->source[$this->pos + 1]))) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_till.'m';
-							$this->intervals[$i]['md'][$months]['till'] .= $month_till;
+							$this->intervals[$i]['interval'] .= $month_day_till.'m';
+							$this->intervals[$i]['md'][$months]['till'] .= $month_day_till;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingMonthTo($month_till)) {
+							if (!$this->validateSchedulingMonthTo($month_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_till.'s';
-							$this->intervals[$i]['md'][$months]['till'] .= $month_till;
+							$this->intervals[$i]['interval'] .= $month_day_till.'s';
+							$this->intervals[$i]['md'][$months]['till'] .= $month_day_till;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -678,9 +679,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$month_till .= $this->source[$this->pos];
+								$month_day_till .= $this->source[$this->pos];
 
-								if (strlen($month_till) != 1 && strlen($month_till) != 2) {
+								if (strlen($month_day_till) != 1 && strlen($month_day_till) != 2) {
 									$this->setError();
 									return;
 								}
@@ -695,52 +696,52 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_MONTH_STEP:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingMonthStep($month_step)) {
+							if (!$this->validateSchedulingMonthStep($month_day_step)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_step;
-							$this->intervals[$i]['md'][$months]['step'] .= $month_step;
+							$this->intervals[$i]['interval'] .= $month_day_step;
+							$this->intervals[$i]['md'][$months]['step'] .= $month_day_step;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingMonthStep($month_step)) {
+							if (!$this->validateSchedulingMonthStep($month_day_step)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_step.',';
-							$this->intervals[$i]['md'][$months]['step'] .= $month_step;
+							$this->intervals[$i]['interval'] .= $month_day_step.',';
+							$this->intervals[$i]['md'][$months]['step'] .= $month_day_step;
 
 							$state = self::STATE_SCHEDULING_MONTH_FROM;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months++;
 							$this->intervals[$i]['md'][$months] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case 'w':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingMonthStep($month_step)) {
+									|| !$this->validateSchedulingMonthStep($month_day_step)) {
 								$this->setError();
 								return;
 							}
 
 							if ($this->source[$this->pos + 1] === 'd') {
-								$this->intervals[$i]['interval'] .= $month_step.'wd';
-								$this->intervals[$i]['md'][$months]['step'] .= $month_step;
+								$this->intervals[$i]['interval'] .= $month_day_step.'wd';
+								$this->intervals[$i]['md'][$months]['step'] .= $month_day_step;
 								$this->intervals[$i]['wd'][$weeks] = ['from' => '', 'till' => '', 'step' => ''];
 
 								$state = self::STATE_SCHEDULING_WEEK_FROM;
@@ -750,13 +751,13 @@ class CItemDelayFlexParser {
 							break;
 
 						case 'h':
-							if (!$this->validateSchedulingMonthStep($month_step)) {
+							if (!$this->validateSchedulingMonthStep($month_day_step)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_step.'h';
-							$this->intervals[$i]['md'][$months]['step'] .= $month_step;
+							$this->intervals[$i]['interval'] .= $month_day_step.'h';
+							$this->intervals[$i]['md'][$months]['step'] .= $month_day_step;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_HOUR_FROM;
@@ -764,28 +765,28 @@ class CItemDelayFlexParser {
 
 						case 'm':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingMonthStep($month_step)
+									|| !$this->validateSchedulingMonthStep($month_day_step)
 									|| ($this->source[$this->pos + 1] !== '/'
 										&& !is_numeric($this->source[$this->pos + 1]))) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_step.'m';
-							$this->intervals[$i]['md'][$months]['step'] .= $month_step;
+							$this->intervals[$i]['interval'] .= $month_day_step.'m';
+							$this->intervals[$i]['md'][$months]['step'] .= $month_day_step;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingMonthStep($month_step)) {
+							if (!$this->validateSchedulingMonthStep($month_day_step)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $month_step.'s';
-							$this->intervals[$i]['md'][$months]['step'] .= $month_step;
+							$this->intervals[$i]['interval'] .= $month_day_step.'s';
+							$this->intervals[$i]['md'][$months]['step'] .= $month_day_step;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -793,9 +794,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$month_step .= $this->source[$this->pos];
+								$month_day_step .= $this->source[$this->pos];
 
-								if (strlen($month_step) != 1 && strlen($month_step) != 2) {
+								if (strlen($month_day_step) != 1 && strlen($month_day_step) != 2) {
 									$this->setError();
 									return;
 								}
@@ -810,29 +811,29 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_WEEK_FROM:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingWeekFrom($week_from)) {
+							if (!$this->validateSchedulingWeekFrom($week_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_from;
-							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_from;
+							$this->intervals[$i]['interval'] .= $week_day_from;
+							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_day_from;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
+							$week_day_from = '';
 							$weeks = 0;
 							break;
 
 						case '/':
-							if (strlen($week_from) == 0) {
+							if (strlen($week_day_from) == 0) {
 								$this->intervals[$i]['interval'] .= '/';
 
 								$state = self::STATE_SCHEDULING_WEEK_STEP;
@@ -844,67 +845,68 @@ class CItemDelayFlexParser {
 							break;
 
 						case '-':
-							if (!$this->validateSchedulingWeekFrom($week_from)) {
+							if (!$this->validateSchedulingWeekFrom($week_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_from.'-';
-							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_from;
+							$this->intervals[$i]['interval'] .= $week_day_from.'-';
+							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_day_from;
 
 							$state = self::STATE_SCHEDULING_WEEK_TILL;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingWeekFrom($week_from)) {
+							if (!$this->validateSchedulingWeekFrom($week_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_from.',';
-							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_from;
+							$this->intervals[$i]['interval'] .= $week_day_from.',';
+							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_day_from;
 
-							$week_from = '';
+							$week_day_from = '';
 							$weeks++;
 							$this->intervals[$i]['wd'][$weeks] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case 'h':
-							if (!$this->validateSchedulingWeekFrom($week_from)) {
+							if (!$this->validateSchedulingWeekFrom($week_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_from.'h';
-							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_from;
+							$this->intervals[$i]['interval'] .= $week_day_from.'h';
+							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_day_from;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_HOUR_FROM;
 							break;
 
 						case 'm':
-							if (!isset($this->source[$this->pos + 1]) || !$this->validateSchedulingWeekFrom($week_from)
+							if (!isset($this->source[$this->pos + 1])
+									|| !$this->validateSchedulingWeekFrom($week_day_from)
 									|| ($this->source[$this->pos + 1] !== '/'
 										&& !is_numeric($this->source[$this->pos + 1]))) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_from.'m';
-							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_from;
+							$this->intervals[$i]['interval'] .= $week_day_from.'m';
+							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_day_from;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingWeekFrom($week_from)) {
+							if (!$this->validateSchedulingWeekFrom($week_day_from)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_from.'s';
-							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_from;
+							$this->intervals[$i]['interval'] .= $week_day_from.'s';
+							$this->intervals[$i]['wd'][$weeks]['from'] .= $week_day_from;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -912,9 +914,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$week_from .= $this->source[$this->pos];
+								$week_day_from .= $this->source[$this->pos];
 
-								if (strlen($week_from) != 1) {
+								if (strlen($week_day_from) != 1) {
 									$this->setError();
 									return;
 								}
@@ -929,65 +931,65 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_WEEK_TILL:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingWeekTo($week_till)) {
+							if (!$this->validateSchedulingWeekTo($week_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_till;
-							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_till;
+							$this->intervals[$i]['interval'] .= $week_day_till;
+							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_day_till;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
+							$week_day_from = '';
+							$week_day_till = '';
 							$weeks = 0;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingWeekTo($week_till)) {
+							if (!$this->validateSchedulingWeekTo($week_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_till.',';
-							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_till;
+							$this->intervals[$i]['interval'] .= $week_day_till.',';
+							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_day_till;
 
 							$state = self::STATE_SCHEDULING_WEEK_FROM;
 
-							$week_from = '';
-							$week_till = '';
+							$week_day_from = '';
+							$week_day_till = '';
 							$weeks++;
 							$this->intervals[$i]['wd'][$weeks] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case '/':
-							if (!$this->validateSchedulingWeekTo($week_till)) {
+							if (!$this->validateSchedulingWeekTo($week_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_till.'/';
-							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_till;
+							$this->intervals[$i]['interval'] .= $week_day_till.'/';
+							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_day_till;
 
 							$state = self::STATE_SCHEDULING_WEEK_STEP;
 							break;
 
 						case 'h':
-							if (!$this->validateSchedulingWeekTo($week_till)) {
+							if (!$this->validateSchedulingWeekTo($week_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_till.'h';
-							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_till;
+							$this->intervals[$i]['interval'] .= $week_day_till.'h';
+							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_day_till;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_HOUR_FROM;
@@ -995,28 +997,28 @@ class CItemDelayFlexParser {
 
 						case 'm':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingWeekTo($week_till)
+									|| !$this->validateSchedulingWeekTo($week_day_till)
 									|| ($this->source[$this->pos + 1] !== '/'
 										&& !is_numeric($this->source[$this->pos + 1]))) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_till.'m';
-							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_till;
+							$this->intervals[$i]['interval'] .= $week_day_till.'m';
+							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_day_till;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingWeekTo($week_till)) {
+							if (!$this->validateSchedulingWeekTo($week_day_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_till.'s';
-							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_till;
+							$this->intervals[$i]['interval'] .= $week_day_till.'s';
+							$this->intervals[$i]['wd'][$weeks]['till'] .= $week_day_till;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -1024,9 +1026,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$week_till .= $this->source[$this->pos];
+								$week_day_till .= $this->source[$this->pos];
 
-								if (strlen($week_till) != 1) {
+								if (strlen($week_day_till) != 1) {
 									$this->setError();
 									return;
 								}
@@ -1041,55 +1043,55 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_WEEK_STEP:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingWeekStep($week_step)) {
+							if (!$this->validateSchedulingWeekStep($week_day_step)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_step;
-							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_step;
+							$this->intervals[$i]['interval'] .= $week_day_step;
+							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_day_step;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingWeekStep($week_step)) {
+							if (!$this->validateSchedulingWeekStep($week_day_step)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_step.',';
-							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_step;
+							$this->intervals[$i]['interval'] .= $week_day_step.',';
+							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_day_step;
 
 							$state = self::STATE_SCHEDULING_WEEK_FROM;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks++;
 							$this->intervals[$i]['wd'][$weeks] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case 'h':
-							if (!$this->validateSchedulingWeekStep($week_step)) {
+							if (!$this->validateSchedulingWeekStep($week_day_step)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_step.'h';
-							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_step;
+							$this->intervals[$i]['interval'] .= $week_day_step.'h';
+							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_day_step;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_HOUR_FROM;
@@ -1097,28 +1099,28 @@ class CItemDelayFlexParser {
 
 						case 'm':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingWeekStep($week_step)
+									|| !$this->validateSchedulingWeekStep($week_day_step)
 									|| ($this->source[$this->pos + 1] !== '/'
 										&& !is_numeric($this->source[$this->pos + 1]))) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_step.'m';
-							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_step;
+							$this->intervals[$i]['interval'] .= $week_day_step.'m';
+							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_day_step;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingWeekStep($week_step)) {
+							if (!$this->validateSchedulingWeekStep($week_day_step)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $week_step.'s';
-							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_step;
+							$this->intervals[$i]['interval'] .= $week_day_step.'s';
+							$this->intervals[$i]['wd'][$weeks]['step'] .= $week_day_step;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -1126,9 +1128,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$week_step .= $this->source[$this->pos];
+								$week_day_step .= $this->source[$this->pos];
 
-								if (strlen($week_step) != 1) {
+								if (strlen($week_day_step) != 1) {
 									$this->setError();
 									return;
 								}
@@ -1143,35 +1145,35 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_HOUR_FROM:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingTimeFrom($hour_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($hours_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_from;
-							$this->intervals[$i]['h'][$hours]['from'] .= $hour_from;
+							$this->intervals[$i]['interval'] .= $hours_from;
+							$this->intervals[$i]['h'][$hours]['from'] .= $hours_from;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
+							$hours_from = '';
 							$hours = 0;
 							break;
 
 						case '/':
 							// Step can be entered of first hour is ommited.
-							if (strlen($hour_from) == 0) {
+							if (strlen($hours_from) == 0) {
 								$this->intervals[$i]['interval'] .= '/';
 
 								$state = self::STATE_SCHEDULING_HOUR_STEP;
@@ -1183,55 +1185,55 @@ class CItemDelayFlexParser {
 							break;
 
 						case '-':
-							if (!$this->validateSchedulingTimeFrom($hour_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($hours_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_from.'-';
-							$this->intervals[$i]['h'][$hours]['from'] .= $hour_from;
+							$this->intervals[$i]['interval'] .= $hours_from.'-';
+							$this->intervals[$i]['h'][$hours]['from'] .= $hours_from;
 
 							$state = self::STATE_SCHEDULING_HOUR_TILL;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingTimeFrom($hour_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($hours_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_from.',';
-							$this->intervals[$i]['h'][$hours]['from'] .= $hour_from;
+							$this->intervals[$i]['interval'] .= $hours_from.',';
+							$this->intervals[$i]['h'][$hours]['from'] .= $hours_from;
 
-							$hour_from = '';
+							$hours_from = '';
 							$hours++;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case 'm':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingTimeFrom($hour_from, $state)
+									|| !$this->validateSchedulingTimeFrom($hours_from, $state)
 									|| ($this->source[$this->pos + 1] !== '/'
 										&& !is_numeric($this->source[$this->pos + 1]))) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_from.'m';
-							$this->intervals[$i]['h'][$hours]['from'] .= $hour_from;
+							$this->intervals[$i]['interval'] .= $hours_from.'m';
+							$this->intervals[$i]['h'][$hours]['from'] .= $hours_from;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingTimeFrom($hour_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($hours_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_from.'s';
-							$this->intervals[$i]['h'][$hours]['from'] .= $hour_from;
+							$this->intervals[$i]['interval'] .= $hours_from.'s';
+							$this->intervals[$i]['h'][$hours]['from'] .= $hours_from;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -1239,9 +1241,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$hour_from .= $this->source[$this->pos];
+								$hours_from .= $this->source[$this->pos];
 
-								if (strlen($hour_from) != 1 && strlen($hour_from) != 2) {
+								if (strlen($hours_from) != 1 && strlen($hours_from) != 2) {
 									$this->setError();
 									return;
 								}
@@ -1256,86 +1258,86 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_HOUR_TILL:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingTimeTo($hour_till)) {
+							if (!$this->validateSchedulingTimeTo($hours_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_till;
-							$this->intervals[$i]['h'][$hours]['till'] .= $hour_till;
+							$this->intervals[$i]['interval'] .= $hours_till;
+							$this->intervals[$i]['h'][$hours]['till'] .= $hours_till;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hours = 0;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingTimeTo($hour_till)) {
+							if (!$this->validateSchedulingTimeTo($hours_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_till.',';
-							$this->intervals[$i]['h'][$hours]['till'] .= $hour_till;
+							$this->intervals[$i]['interval'] .= $hours_till.',';
+							$this->intervals[$i]['h'][$hours]['till'] .= $hours_till;
 
 							$state = self::STATE_SCHEDULING_HOUR_FROM;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hours++;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case '/':
-							if (!$this->validateSchedulingTimeTo($hour_till)) {
+							if (!$this->validateSchedulingTimeTo($hours_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_till.'/';
-							$this->intervals[$i]['h'][$hours]['till'] .= $hour_till;
+							$this->intervals[$i]['interval'] .= $hours_till.'/';
+							$this->intervals[$i]['h'][$hours]['till'] .= $hours_till;
 
 							$state = self::STATE_SCHEDULING_HOUR_STEP;
 							break;
 
 						case 'm':
 							if (!isset($this->source[$this->pos + 1])
-									|| !$this->validateSchedulingTimeTo($hour_till)
+									|| !$this->validateSchedulingTimeTo($hours_till)
 									|| ($this->source[$this->pos + 1] !== '/'
 										&& !is_numeric($this->source[$this->pos + 1]))) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_till.'m';
-							$this->intervals[$i]['h'][$hours]['till'] .= $hour_till;
+							$this->intervals[$i]['interval'] .= $hours_till.'m';
+							$this->intervals[$i]['h'][$hours]['till'] .= $hours_till;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingTimeTo($hour_till)) {
+							if (!$this->validateSchedulingTimeTo($hours_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $hour_till.'s';
-							$this->intervals[$i]['h'][$hours]['till'] .= $hour_till;
+							$this->intervals[$i]['interval'] .= $hours_till.'s';
+							$this->intervals[$i]['h'][$hours]['till'] .= $hours_till;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -1343,9 +1345,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$hour_till .= $this->source[$this->pos];
+								$hours_till .= $this->source[$this->pos];
 
-								if (strlen($hour_till) != 1 && strlen($hour_till) != 2) {
+								if (strlen($hours_till) != 1 && strlen($hours_till) != 2) {
 									$this->setError();
 									return;
 								}
@@ -1372,18 +1374,18 @@ class CItemDelayFlexParser {
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hour_step = '';
 							$hours = 0;
 							break;
@@ -1399,8 +1401,8 @@ class CItemDelayFlexParser {
 
 							$state = self::STATE_SCHEDULING_HOUR_FROM;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hour_step = '';
 							$hours++;
 							$this->intervals[$i]['h'][$hours] = ['from' => '', 'till' => '', 'step' => ''];
@@ -1454,39 +1456,39 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_MINUTE_FROM:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingTimeFrom($minute_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($minutes_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_from;
-							$this->intervals[$i]['h'][$minutes]['from'] .= $minute_from;
+							$this->intervals[$i]['interval'] .= $minutes_from;
+							$this->intervals[$i]['h'][$minutes]['from'] .= $minutes_from;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hour_step = '';
 							$hours = 0;
 
-							$minute_from = '';
+							$minutes_from = '';
 							$minutes = 0;
 							break;
 
 						case '/':
-							if (strlen($minute_from) == 0) {
+							if (strlen($minutes_from) == 0) {
 								$this->intervals[$i]['interval'] .= '/';
 
 								$state = self::STATE_SCHEDULING_MINUTE_STEP;
@@ -1498,39 +1500,39 @@ class CItemDelayFlexParser {
 							break;
 
 						case '-':
-							if (!$this->validateSchedulingTimeFrom($minute_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($minutes_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_from.'-';
-							$this->intervals[$i]['m'][$minutes]['from'] .= $minute_from;
+							$this->intervals[$i]['interval'] .= $minutes_from.'-';
+							$this->intervals[$i]['m'][$minutes]['from'] .= $minutes_from;
 
 							$state = self::STATE_SCHEDULING_MINUTE_TILL;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingTimeFrom($minute_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($minutes_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_from.',';
-							$this->intervals[$i]['m'][$minutes]['from'] .= $minute_from;
+							$this->intervals[$i]['interval'] .= $minutes_from.',';
+							$this->intervals[$i]['m'][$minutes]['from'] .= $minutes_from;
 
-							$minute_from = '';
+							$minutes_from = '';
 							$minutes++;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingTimeFrom($minute_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($minutes_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_from.'s';
-							$this->intervals[$i]['m'][$minutes]['from'] .= $minute_from;
+							$this->intervals[$i]['interval'] .= $minutes_from.'s';
+							$this->intervals[$i]['m'][$minutes]['from'] .= $minutes_from;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -1538,9 +1540,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$minute_from .= $this->source[$this->pos];
+								$minutes_from .= $this->source[$this->pos];
 
-								if (strlen($minute_from) != 1 && strlen($minute_from) != 2) {
+								if (strlen($minutes_from) != 1 && strlen($minutes_from) != 2) {
 									$this->setError();
 									return;
 								}
@@ -1555,75 +1557,75 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_MINUTE_TILL:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingTimeTo($minute_till)) {
+							if (!$this->validateSchedulingTimeTo($minutes_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_till;
-							$this->intervals[$i]['m'][$minutes]['till'] .= $minute_till;
+							$this->intervals[$i]['interval'] .= $minutes_till;
+							$this->intervals[$i]['m'][$minutes]['till'] .= $minutes_till;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hour_step = '';
 							$hours = 0;
 
-							$minute_from = '';
-							$minute_till = '';
+							$minutes_from = '';
+							$minutes_till = '';
 							$minutes = 0;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingTimeTo($minute_till)) {
+							if (!$this->validateSchedulingTimeTo($minutes_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_till.',';
-							$this->intervals[$i]['m'][$minutes]['till'] .= $minute_till;
+							$this->intervals[$i]['interval'] .= $minutes_till.',';
+							$this->intervals[$i]['m'][$minutes]['till'] .= $minutes_till;
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 
-							$minute_from = '';
-							$minute_till = '';
+							$minutes_from = '';
+							$minutes_till = '';
 							$minutes++;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case '/':
-							if (!$this->validateSchedulingTimeTo($minute_till)) {
+							if (!$this->validateSchedulingTimeTo($minutes_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_till.'/';
-							$this->intervals[$i]['m'][$minutes]['till'] .= $minute_till;
+							$this->intervals[$i]['interval'] .= $minutes_till.'/';
+							$this->intervals[$i]['m'][$minutes]['till'] .= $minutes_till;
 
 							$state = self::STATE_SCHEDULING_MINUTE_STEP;
 							break;
 
 						case 's':
-							if (!$this->validateSchedulingTimeTo($minute_till)) {
+							if (!$this->validateSchedulingTimeTo($minutes_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $minute_till.'s';
-							$this->intervals[$i]['m'][$minutes]['till'] .= $minute_till;
+							$this->intervals[$i]['interval'] .= $minutes_till.'s';
+							$this->intervals[$i]['m'][$minutes]['till'] .= $minutes_till;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
@@ -1631,9 +1633,9 @@ class CItemDelayFlexParser {
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$minute_till .= $this->source[$this->pos];
+								$minutes_till .= $this->source[$this->pos];
 
-								if (strlen($minute_till) != 1 && strlen($minute_till) != 2) {
+								if (strlen($minutes_till) != 1 && strlen($minutes_till) != 2) {
 									$this->setError();
 									return;
 								}
@@ -1660,23 +1662,23 @@ class CItemDelayFlexParser {
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hour_step = '';
 							$hours = 0;
 
-							$minute_from = '';
-							$minute_till = '';
+							$minutes_from = '';
+							$minutes_till = '';
 							$minute_step = '';
 							$minutes = 0;
 							break;
@@ -1692,8 +1694,8 @@ class CItemDelayFlexParser {
 
 							$state = self::STATE_SCHEDULING_MINUTE_FROM;
 
-							$minute_from = '';
-							$minute_till = '';
+							$minutes_from = '';
+							$minutes_till = '';
 							$minute_step = '';
 							$minutes++;
 							$this->intervals[$i]['m'][$minutes] = ['from' => '', 'till' => '', 'step' => ''];
@@ -1731,44 +1733,44 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_SECOND_FROM:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingTimeFrom($second_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($seconds_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $second_from;
-							$this->intervals[$i]['s'][$seconds]['from'] .= $second_from;
+							$this->intervals[$i]['interval'] .= $seconds_from;
+							$this->intervals[$i]['s'][$seconds]['from'] .= $seconds_from;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hour_step = '';
 							$hours = 0;
 
-							$minute_from = '';
-							$minute_till = '';
+							$minutes_from = '';
+							$minutes_till = '';
 							$minute_step = '';
 							$minutes = 0;
 
-							$second_from = '';
+							$seconds_from = '';
 							$seconds = 0;
 							break;
 
 						case '/':
-							if (strlen($second_from) == 0) {
+							if (strlen($seconds_from) == 0) {
 								$this->intervals[$i]['interval'] .= '/';
 
 								$state = self::STATE_SCHEDULING_SECOND_STEP;
@@ -1780,36 +1782,36 @@ class CItemDelayFlexParser {
 							break;
 
 						case '-':
-							if (!$this->validateSchedulingTimeFrom($second_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($seconds_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $second_from.'-';
-							$this->intervals[$i]['s'][$seconds]['from'] .= $second_from;
+							$this->intervals[$i]['interval'] .= $seconds_from.'-';
+							$this->intervals[$i]['s'][$seconds]['from'] .= $seconds_from;
 
 							$state = self::STATE_SCHEDULING_SECOND_TILL;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingTimeFrom($second_from, $state)) {
+							if (!$this->validateSchedulingTimeFrom($seconds_from, $state)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $second_from.',';
-							$this->intervals[$i]['s'][$seconds]['from'] .= $second_from;
+							$this->intervals[$i]['interval'] .= $seconds_from.',';
+							$this->intervals[$i]['s'][$seconds]['from'] .= $seconds_from;
 
-							$second_from = '';
+							$seconds_from = '';
 							$seconds++;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$second_from .= $this->source[$this->pos];
+								$seconds_from .= $this->source[$this->pos];
 
-								if (strlen($second_from) != 1 && strlen($second_from) != 2) {
+								if (strlen($seconds_from) != 1 && strlen($seconds_from) != 2) {
 									$this->setError();
 									return;
 								}
@@ -1824,77 +1826,77 @@ class CItemDelayFlexParser {
 				case self::STATE_SCHEDULING_SECOND_TILL:
 					switch ($this->source[$this->pos]) {
 						case ';':
-							if (!$this->validateSchedulingTimeTo($second_till)) {
+							if (!$this->validateSchedulingTimeTo($seconds_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $second_till;
-							$this->intervals[$i]['s'][$seconds]['till'] .= $second_till;
+							$this->intervals[$i]['interval'] .= $seconds_till;
+							$this->intervals[$i]['s'][$seconds]['till'] .= $seconds_till;
 
 							$state = self::STATE_NEW;
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hour_step = '';
 							$hours = 0;
 
-							$minute_from = '';
-							$minute_till = '';
+							$minutes_from = '';
+							$minutes_till = '';
 							$minute_step = '';
 							$minutes = 0;
 
-							$second_from = '';
-							$second_till = '';
+							$seconds_from = '';
+							$seconds_till = '';
 							$seconds = 0;
 							break;
 
 						case ',':
-							if (!$this->validateSchedulingTimeTo($second_till)) {
+							if (!$this->validateSchedulingTimeTo($seconds_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $second_till.',';
-							$this->intervals[$i]['s'][$seconds]['till'] .= $second_till;
+							$this->intervals[$i]['interval'] .= $seconds_till.',';
+							$this->intervals[$i]['s'][$seconds]['till'] .= $seconds_till;
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
 
-							$second_from = '';
-							$second_till = '';
+							$seconds_from = '';
+							$seconds_till = '';
 							$seconds++;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
 							break;
 
 						case '/':
-							if (!$this->validateSchedulingTimeTo($second_till)) {
+							if (!$this->validateSchedulingTimeTo($seconds_till)) {
 								$this->setError();
 								return;
 							}
 
-							$this->intervals[$i]['interval'] .= $second_till.'/';
-							$this->intervals[$i]['s'][$seconds]['till'] .= $second_till;
+							$this->intervals[$i]['interval'] .= $seconds_till.'/';
+							$this->intervals[$i]['s'][$seconds]['till'] .= $seconds_till;
 
 							$state = self::STATE_SCHEDULING_SECOND_STEP;
 							break;
 
 						default:
 							if (is_numeric($this->source[$this->pos])) {
-								$second_till .= $this->source[$this->pos];
+								$seconds_till .= $this->source[$this->pos];
 
-								if (strlen($second_till) != 1 && strlen($second_till) != 2) {
+								if (strlen($seconds_till) != 1 && strlen($seconds_till) != 2) {
 									$this->setError();
 									return;
 								}
@@ -1921,28 +1923,28 @@ class CItemDelayFlexParser {
 
 							$i++;
 
-							$month_from = '';
-							$month_till = '';
-							$month_step = '';
+							$month_day_from = '';
+							$month_day_till = '';
+							$month_day_step = '';
 							$months = 0;
 
-							$week_from = '';
-							$week_till = '';
-							$week_step = '';
+							$week_day_from = '';
+							$week_day_till = '';
+							$week_day_step = '';
 							$weeks = 0;
 
-							$hour_from = '';
-							$hour_till = '';
+							$hours_from = '';
+							$hours_till = '';
 							$hour_step = '';
 							$hours = 0;
 
-							$minute_from = '';
-							$minute_till = '';
+							$minutes_from = '';
+							$minutes_till = '';
 							$minute_step = '';
 							$minutes = 0;
 
-							$second_from = '';
-							$second_till = '';
+							$seconds_from = '';
+							$seconds_till = '';
 							$second_step = '';
 							$seconds = 0;
 							break;
@@ -1958,8 +1960,8 @@ class CItemDelayFlexParser {
 
 							$state = self::STATE_SCHEDULING_SECOND_FROM;
 
-							$second_from = '';
-							$second_till = '';
+							$seconds_from = '';
+							$seconds_till = '';
 							$second_step = '';
 							$seconds++;
 							$this->intervals[$i]['s'][$seconds] = ['from' => '', 'till' => '', 'step' => ''];
@@ -1988,93 +1990,93 @@ class CItemDelayFlexParser {
 		// String can end at any state. Validate the last entered characters depeding on the last state once more.
 		switch ($state) {
 			case self::STATE_FLEXIBLE_MINUTE_TILL:
-				if (strlen($minute_till) != 2) {
+				if (strlen($minutes_till) != 2) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $minute_till;
-				$this->intervals[$i]['period'] .= $minute_till;
+				$this->intervals[$i]['interval'] .= $minutes_till;
+				$this->intervals[$i]['period'] .= $minutes_till;
 				break;
 
 			case self::STATE_SCHEDULING_MONTH_FROM:
-				if (!$this->validateSchedulingMonthFrom($month_from)) {
+				if (!$this->validateSchedulingMonthFrom($month_day_from)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $month_from;
-				$this->intervals[$i]['md'][$months]['from'] .= $month_from;
+				$this->intervals[$i]['interval'] .= $month_day_from;
+				$this->intervals[$i]['md'][$months]['from'] .= $month_day_from;
 				break;
 
 			case self::STATE_SCHEDULING_MONTH_TILL:
-				if (!$this->validateSchedulingMonthTo($month_till)) {
+				if (!$this->validateSchedulingMonthTo($month_day_till)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $month_till;
-				$this->intervals[$i]['md'][$months]['till'] .= $month_till;
+				$this->intervals[$i]['interval'] .= $month_day_till;
+				$this->intervals[$i]['md'][$months]['till'] .= $month_day_till;
 				break;
 
 			case self::STATE_SCHEDULING_MONTH_STEP:
-				if (!$this->validateSchedulingMonthStep($month_step)) {
+				if (!$this->validateSchedulingMonthStep($month_day_step)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $month_step;
-				$this->intervals[$i]['md'][$months]['step'] .= $month_step;
+				$this->intervals[$i]['interval'] .= $month_day_step;
+				$this->intervals[$i]['md'][$months]['step'] .= $month_day_step;
 				break;
 
 			case self::STATE_SCHEDULING_WEEK_FROM:
-				if (!$this->validateSchedulingWeekFrom($week_from)) {
+				if (!$this->validateSchedulingWeekFrom($week_day_from)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $week_from;
-				$this->intervals[$i]['wd'][$weeks]['from'] .= $week_from;
+				$this->intervals[$i]['interval'] .= $week_day_from;
+				$this->intervals[$i]['wd'][$weeks]['from'] .= $week_day_from;
 				break;
 
 			case self::STATE_SCHEDULING_WEEK_TILL:
-				if (!$this->validateSchedulingWeekTo($week_till)) {
+				if (!$this->validateSchedulingWeekTo($week_day_till)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $week_till;
-				$this->intervals[$i]['wd'][$weeks]['till'] .= $week_till;
+				$this->intervals[$i]['interval'] .= $week_day_till;
+				$this->intervals[$i]['wd'][$weeks]['till'] .= $week_day_till;
 				break;
 
 			case self::STATE_SCHEDULING_WEEK_STEP:
-				if (!$this->validateSchedulingWeekStep($week_step)) {
+				if (!$this->validateSchedulingWeekStep($week_day_step)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $week_step;
-				$this->intervals[$i]['wd'][$weeks]['step'] .= $week_step;
+				$this->intervals[$i]['interval'] .= $week_day_step;
+				$this->intervals[$i]['wd'][$weeks]['step'] .= $week_day_step;
 				break;
 
 			case self::STATE_SCHEDULING_HOUR_FROM:
-				if (!$this->validateSchedulingTimeFrom($hour_from, $state)) {
+				if (!$this->validateSchedulingTimeFrom($hours_from, $state)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $hour_from;
-				$this->intervals[$i]['h'][$hours]['from'] .= $hour_from;
+				$this->intervals[$i]['interval'] .= $hours_from;
+				$this->intervals[$i]['h'][$hours]['from'] .= $hours_from;
 				break;
 
 			case self::STATE_SCHEDULING_HOUR_TILL:
-				if (!$this->validateSchedulingTimeTo($hour_till)) {
+				if (!$this->validateSchedulingTimeTo($hours_till)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $hour_till;
-				$this->intervals[$i]['h'][$hours]['till'] .= $hour_till;
+				$this->intervals[$i]['interval'] .= $hours_till;
+				$this->intervals[$i]['h'][$hours]['till'] .= $hours_till;
 				break;
 
 			case self::STATE_SCHEDULING_HOUR_STEP:
@@ -2088,23 +2090,23 @@ class CItemDelayFlexParser {
 				break;
 
 			case self::STATE_SCHEDULING_MINUTE_FROM:
-				if (!$this->validateSchedulingTimeFrom($minute_from, $state)) {
+				if (!$this->validateSchedulingTimeFrom($minutes_from, $state)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $minute_from;
-				$this->intervals[$i]['m'][$minutes]['from'] .= $minute_from;
+				$this->intervals[$i]['interval'] .= $minutes_from;
+				$this->intervals[$i]['m'][$minutes]['from'] .= $minutes_from;
 				break;
 
 			case self::STATE_SCHEDULING_MINUTE_TILL:
-				if (!$this->validateSchedulingTimeTo($minute_till)) {
+				if (!$this->validateSchedulingTimeTo($minutes_till)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $minute_till;
-				$this->intervals[$i]['m'][$minutes]['till'] .= $minute_till;
+				$this->intervals[$i]['interval'] .= $minutes_till;
+				$this->intervals[$i]['m'][$minutes]['till'] .= $minutes_till;
 				break;
 
 			case self::STATE_SCHEDULING_MINUTE_STEP:
@@ -2118,23 +2120,23 @@ class CItemDelayFlexParser {
 				break;
 
 			case self::STATE_SCHEDULING_SECOND_FROM:
-				if (!$this->validateSchedulingTimeFrom($second_from, $state)) {
+				if (!$this->validateSchedulingTimeFrom($seconds_from, $state)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $second_from;
-				$this->intervals[$i]['s'][$seconds]['from'] .= $second_from;
+				$this->intervals[$i]['interval'] .= $seconds_from;
+				$this->intervals[$i]['s'][$seconds]['from'] .= $seconds_from;
 				break;
 
 			case self::STATE_SCHEDULING_SECOND_TILL:
-				if (!$this->validateSchedulingTimeTo($second_till)) {
+				if (!$this->validateSchedulingTimeTo($seconds_till)) {
 					$this->setError();
 					return;
 				}
 
-				$this->intervals[$i]['interval'] .= $second_till;
-				$this->intervals[$i]['s'][$seconds]['till'] .= $second_till;
+				$this->intervals[$i]['interval'] .= $seconds_till;
+				$this->intervals[$i]['s'][$seconds]['till'] .= $seconds_till;
 				break;
 
 			case self::STATE_SCHEDULING_SECOND_STEP:
@@ -2348,10 +2350,10 @@ class CItemDelayFlexParser {
 	}
 
 	/**
-	 * Validate the three time parameters "hour from", "minute from" and "second from" with single function depeding on
-	 * "state". Hours, minutes and seconds have either one or two digits. If it is a single digit, depeding if "state"
-	 * valide previous character ("h" for hours, "m" for minutes, "s" for seconds or "," for all states). Otherwise it
-	 * checks behind two previous characters for "h", "m", "s" or ",".
+	 * Validate the three time parameters "hours from", "minutes from" and "seconds from" with single function depeding
+	 * on "state". Hours, minutes and seconds have either one or two digits. If it is a single digit, depeding if
+	 * "state" valide previous character ("h" for hours, "m" for minutes, "s" for seconds or "," for all states).
+	 * Otherwise it checks behind two previous characters for "h", "m", "s" or ",".
 	 *
 	 * Example: h1;h09,10;m1;m09,10,25;s1;s09,10,50
 	 *
@@ -2389,8 +2391,8 @@ class CItemDelayFlexParser {
 	}
 
 	/**
-	 * Validate the three time parameters "hour till", "minute till" and "second till" with single function depeding on
-	 * "state". Hours, minutes and seconds must be either one or two digits. If it is single digit previous character
+	 * Validate the three time parameters "hours till", "minutes till" and "seconds till" with single function depeding
+	 * on "state". Hours, minutes and seconds must be either one or two digits. If it is single digit previous character
 	 * must be "-". Otherwise it checks behind two previous characters for "-".
 	 *
 	 * Example: h1-9;h12-17;h09-23,10;h00-23;m1-9;m30-59;m09-59,10-30,25-26;s1-5;s30-59;s09-59,10-30,50
