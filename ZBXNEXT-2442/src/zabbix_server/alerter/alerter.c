@@ -34,6 +34,7 @@
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
+extern int		CONFIG_ALERTER_FORKS;
 
 /******************************************************************************
  *                                                                            *
@@ -176,12 +177,13 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 					"mt.gsm_modem,mt.username,mt.passwd,mt.smtp_port,mt.smtp_security,"
 					"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,a.retries"
 				" from alerts a,media_type mt"
-				" where MOD(a.alertid, %d)=0"
+				" where MOD(a.alertid, %d)=%d"
 					" and a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
 					" and a.alerttype=%d"
 				" order by a.alertid",
-				process_num,
+				CONFIG_ALERTER_FORKS,
+				process_num - 1,
 				ALERT_STATUS_NOT_SENT,
 				ALERT_TYPE_MESSAGE);
 
