@@ -2918,7 +2918,7 @@ void	zbx_tls_init_child(void)
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot open file \"%s\": %s",
 					CONFIG_TLS_CRL_FILE, zbx_strerror(errno));
-			goto out;
+			goto out2;
 		}
 
 		if (NULL == PEM_read_X509_CRL(f, &my_crl, NULL, NULL))
@@ -2933,7 +2933,7 @@ void	zbx_tls_init_child(void)
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot close file \"%s\": %s",
 					CONFIG_TLS_CRL_FILE, zbx_strerror(errno));
-			goto out;
+			goto out2;
 		}
 
 		if ((NULL != ctx_cert && 1 != X509_STORE_add_crl(SSL_CTX_get_cert_store(ctx_cert), my_crl)) ||
@@ -2976,16 +2976,15 @@ void	zbx_tls_init_child(void)
 	/* Load certificate. */
 	if (NULL != CONFIG_TLS_CERT_FILE)
 	{
-		if (1 != SSL_CTX_use_certificate_file(ctx_cert, CONFIG_TLS_CERT_FILE, SSL_FILETYPE_PEM) ||
-				(NULL != ctx_all && 1 != SSL_CTX_use_certificate_file(ctx_all, CONFIG_TLS_CERT_FILE,
-				SSL_FILETYPE_PEM)))
+		if (1 != SSL_CTX_use_certificate_chain_file(ctx_cert, CONFIG_TLS_CERT_FILE) || (NULL != ctx_all &&
+				1 != SSL_CTX_use_certificate_chain_file(ctx_all, CONFIG_TLS_CERT_FILE)))
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load certificate from file"
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load certificate(s) from file"
 					" \"%s\":", CONFIG_TLS_CERT_FILE);
 			goto out;
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate from file \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded certificate(s) from file \"%s\"", __function_name,
 				CONFIG_TLS_CERT_FILE);
 	}
 
@@ -3141,6 +3140,7 @@ out_method:
 	zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot initialize TLS method:");
 out:
 	zbx_tls_error_msg(&error, &error_alloc, &error_offset);
+out2:
 	zabbix_log(LOG_LEVEL_CRIT, "%s", error);
 	zbx_free(error);
 	zbx_tls_free();
