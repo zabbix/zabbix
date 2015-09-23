@@ -238,27 +238,6 @@ int	get_process_type_by_name(const char *proc_type_str)
 	return ZBX_PROCESS_TYPE_UNKNOWN;
 }
 
-const char	*get_program_type_string(unsigned char program_type)
-{
-	switch (program_type)
-	{
-		case ZBX_PROGRAM_TYPE_SERVER:
-			return "server";
-		case ZBX_PROGRAM_TYPE_PROXY_ACTIVE:
-		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
-			return "proxy";
-		case ZBX_PROGRAM_TYPE_AGENTD:
-		case ZBX_PROGRAM_TYPE_AGENT:
-			return "agent";
-		case ZBX_PROGRAM_TYPE_SENDER:
-			return "sender";
-		case ZBX_PROGRAM_TYPE_GET:
-			return "get";
-		default:
-			return "unknown";
-	}
-}
-
 #ifndef _WINDOWS
 /******************************************************************************
  *                                                                            *

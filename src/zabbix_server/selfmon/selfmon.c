@@ -28,7 +28,7 @@ extern int		server_num, process_num;
 
 ZBX_THREAD_ENTRY(selfmon_thread, args)
 {
-	double		sec;
+	double	sec;
 
 	process_type = ((zbx_thread_args_t *)args)->process_type;
 	server_num = ((zbx_thread_args_t *)args)->server_num;

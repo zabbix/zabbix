@@ -375,7 +375,9 @@ static void	zbx_set_defaults(void)
 		free_result(&result);
 	}
 	else if (NULL != CONFIG_HOSTNAME_ITEM)
+	{
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]", CONFIG_HOSTNAME);
+	}
 
 	if (NULL == CONFIG_DBHOST)
 		CONFIG_DBHOST = zbx_strdup(CONFIG_DBHOST, "localhost");
@@ -471,137 +473,31 @@ static void	zbx_validate_config(void)
 		err = 1;
 	}
 #if !defined(HAVE_IPV6)
-	if (NULL != CONFIG_FPING6_LOCATION)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"Fping6Location\" configuration parameter cannot be used: Zabbix proxy"
-				" was compiled without IPv6 support");
-		err = 1;
-	}
+	err |= (FAIL == check_cfg_feature_str("Fping6Location", CONFIG_FPING6_LOCATION, "IPv6 support"));
 #endif
-
 #if !defined(HAVE_LIBCURL)
-#define FMT	"\"%s\" configuration parameter cannot be used: Zabbix proxy was compiled without cURL library"
-
-	if (NULL != CONFIG_SSL_CA_LOCATION)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "SSLCALocation");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_SSL_CERT_LOCATION)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "SSLCertLocation");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_SSL_KEY_LOCATION)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "SSLKeyLocation");
-		err = 1;
-	}
-
-#undef FMT
+	err |= (FAIL == check_cfg_feature_str("SSLCALocation", CONFIG_SSL_CA_LOCATION, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("SSLCertLocation", CONFIG_SSL_CERT_LOCATION, "cURL library"));
+	err |= (FAIL == check_cfg_feature_str("SSLKeyLocation", CONFIG_SSL_KEY_LOCATION, "cURL library"));
 #endif
-
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
-#define FMT	"\"%s\" configuration parameter cannot be used: Zabbix proxy was compiled without VMware support"
-	if (0 != CONFIG_VMWARE_FORKS)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "StartVMwareCollectors");
-		err = 1;
-	}
-
-	if (0 != CONFIG_VMWARE_FREQUENCY)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "VMwareFrequency");
-		err = 1;
-	}
-
-	if (0 != CONFIG_VMWARE_PERF_FREQUENCY)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "VMwarePerfFrequency");
-		err = 1;
-	}
-
-	if (0 != CONFIG_VMWARE_CACHE_SIZE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "VMwareCacheSize");
-		err = 1;
-	}
-
-	if (0 != CONFIG_VMWARE_TIMEOUT)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "VMwareTimeout");
-		err = 1;
-	}
-
-#undef FMT
+	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_VMWARE_FORKS, "VMware support"));
+	err |= (FAIL == check_cfg_feature_int("VMwareFrequency", CONFIG_VMWARE_FREQUENCY, "VMware support"));
+	err |= (FAIL == check_cfg_feature_int("VMwarePerfFrequency", CONFIG_VMWARE_PERF_FREQUENCY, "VMware support"));
+	err |= (FAIL == check_cfg_feature_int("VMwareCacheSize", CONFIG_VMWARE_CACHE_SIZE, "VMware support"));
+	err |= (FAIL == check_cfg_feature_int("VMwareTimeout", CONFIG_VMWARE_TIMEOUT, "VMware support"));
 #endif
-
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-#define FMT	"\"%s\" configuration parameter cannot be used: Zabbix proxy was compiled without TLS support"
-
-	if (NULL != CONFIG_TLS_CONNECT)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSConnect");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_ACCEPT)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSAccept");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_CA_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCAFile");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_CRL_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCRLFile");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_SERVER_CERT_ISSUER)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSServerCertIssuer");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_SERVER_CERT_SUBJECT)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSServerCertSubject");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_CERT_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCertFile");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_KEY_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSKeyFile");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_PSK_IDENTITY)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSPSKIdentity");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_PSK_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSPSKFile");
-		err = 1;
-	}
-
-#undef FMT
+	err |= (FAIL == check_cfg_feature_str("TLSConnect", CONFIG_TLS_CONNECT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSAccept", CONFIG_TLS_ACCEPT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", CONFIG_TLS_CA_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", CONFIG_TLS_SERVER_CERT_ISSUER, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", CONFIG_TLS_SERVER_CERT_SUBJECT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", CONFIG_TLS_KEY_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", CONFIG_TLS_PSK_IDENTITY, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", CONFIG_TLS_PSK_FILE, "TLS support"));
 #endif
 	if (0 != err)
 		exit(EXIT_FAILURE);

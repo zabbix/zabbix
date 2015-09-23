@@ -537,66 +537,16 @@ static void	zbx_validate_config(void)
 		err = 1;
 	}
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-#define FMT	"\"%s\" configuration parameter cannot be used: Zabbix agentd was compiled without TLS support"
-	if (NULL != CONFIG_TLS_CONNECT)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSConnect");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_ACCEPT)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSAccept");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_CA_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCAFile");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_CRL_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCRLFile");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_SERVER_CERT_ISSUER)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSServerCertIssuer");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_SERVER_CERT_SUBJECT)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSServerCertSubject");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_CERT_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSCertFile");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_KEY_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSKeyFile");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_PSK_IDENTITY)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSPSKIdentity");
-		err = 1;
-	}
-
-	if (NULL != CONFIG_TLS_PSK_FILE)
-	{
-		zabbix_log(LOG_LEVEL_CRIT, FMT, "TLSPSKFile");
-		err = 1;
-	}
+	err |= (FAIL == check_cfg_feature_str("TLSConnect", CONFIG_TLS_CONNECT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSAccept", CONFIG_TLS_ACCEPT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", CONFIG_TLS_CA_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", CONFIG_TLS_SERVER_CERT_ISSUER, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", CONFIG_TLS_SERVER_CERT_SUBJECT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", CONFIG_TLS_KEY_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", CONFIG_TLS_PSK_IDENTITY, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", CONFIG_TLS_PSK_FILE, "TLS support"));
 #endif
 	if (0 != err)
 		exit(EXIT_FAILURE);
