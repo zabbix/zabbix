@@ -24,7 +24,6 @@
 #include "sysinfo.h"
 #include "zbxdbupgrade.h"
 #include "dbupgrade.h"
-#include "zbxself.h"
 
 typedef struct
 {

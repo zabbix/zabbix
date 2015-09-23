@@ -464,6 +464,7 @@ zbx_group_status_type_t;
 #define ZBX_PROGRAM_TYPE_AGENT		0x10
 #define ZBX_PROGRAM_TYPE_SENDER		0x20
 #define ZBX_PROGRAM_TYPE_GET		0x40
+const char	*get_program_type_string(unsigned char program_type);
 
 /* maintenance */
 typedef enum

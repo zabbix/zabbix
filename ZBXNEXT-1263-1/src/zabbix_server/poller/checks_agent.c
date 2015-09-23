@@ -20,7 +20,6 @@
 #include "common.h"
 #include "comms.h"
 #include "log.h"
-#include "zbxself.h"
 
 #include "checks_agent.h"
 
