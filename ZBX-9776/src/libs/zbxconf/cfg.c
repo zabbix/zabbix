@@ -148,7 +148,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 
 	if (NULL != strchr(p + 1, PATH_SEPARATOR))
 	{
-		zbx_error("%s: glob pattern should be the last component of the path\n", glob);
+		zbx_error("%s: glob pattern should be the last component of the path", glob);
 		return FAIL;
 	}
 
@@ -156,7 +156,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 	{
 		if (glob == p)
 		{
-			zbx_error("%s: path should be absolute\n", glob);
+			zbx_error("%s: path should be absolute", glob);
 			return FAIL;
 		}
 
@@ -264,7 +264,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line 
 
 	if (NULL == (dir = opendir(path)))
 	{
-		zbx_error("%s: %s\n", path, zbx_strerror(errno));
+		zbx_error("%s: %s", path, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -286,7 +286,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line 
 close:
 	if (0 != closedir(dir))
 	{
-		zbx_error("%s: %s\n", path, zbx_strerror(errno));
+		zbx_error("%s: %s", path, zbx_strerror(errno));
 		ret = FAIL;
 	}
 
@@ -322,7 +322,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (0 != zbx_stat(path, &sb))
 	{
-		zbx_error("%s: %s\n", path, zbx_strerror(errno));
+		zbx_error("%s: %s", path, zbx_strerror(errno));
 		goto clean;
 	}
 
@@ -334,7 +334,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 			goto clean;
 		}
 
-		zbx_error("%s: base path is not a directory\n", cfg_file);
+		zbx_error("%s: base path is not a directory", cfg_file);
 		goto clean;
 	}
 
@@ -516,32 +516,32 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 cannot_open:
 	if (0 != optional)
 		return SUCCEED;
-	zbx_error("cannot open config file [%s]: %s", cfg_file, zbx_strerror(errno));
+	zbx_error("cannot open config file \"%s\": %s", cfg_file, zbx_strerror(errno));
 	goto error;
 line_too_long:
 	fclose(file);
-	zbx_error("line %d (%s) in config file [%s] is too long (max %d bytes)",
-			lineno, line, cfg_file, MAX_STRING_LEN - 1);
+	zbx_error("line %d in config file \"%s\" is too long \"max %d bytes\"",
+			lineno, cfg_file, MAX_STRING_LEN - 1);
 	goto error;
 non_utf8:
 	fclose(file);
-	zbx_error("non-UTF-8 character at line %d (%s) in config file [%s]", lineno, line, cfg_file);
+	zbx_error("non-UTF-8 character at line %d \"%s\" in config file \"%s\"", lineno, line, cfg_file);
 	goto error;
 non_key_value:
 	fclose(file);
-	zbx_error("invalid entry [%s] (not following \"parameter=value\" notation) in config file [%s], line %d",
+	zbx_error("invalid entry \"%s\" (not following \"parameter=value\" notation) in config file \"%s\", line %d",
 			line, cfg_file, lineno);
 	goto error;
 incorrect_config:
 	fclose(file);
-	zbx_error("wrong value of [%s] in config file [%s], line %d", cfg[i].parameter, cfg_file, lineno);
+	zbx_error("wrong value of \"%s\" in config file \"%s\", line %d", cfg[i].parameter, cfg_file, lineno);
 	goto error;
 unknown_parameter:
 	fclose(file);
-	zbx_error("unknown parameter [%s] in config file [%s], line %d", parameter, cfg_file, lineno);
+	zbx_error("unknown parameter \"%s\" in config file \"%s\", line %d", parameter, cfg_file, lineno);
 	goto error;
 missing_mandatory:
-	zbx_error("missing mandatory parameter [%s] in config file [%s]", cfg[i].parameter, cfg_file);
+	zbx_error("missing mandatory parameter \"%s\" in config file \"%s\"", cfg[i].parameter, cfg_file);
 error:
 	exit(EXIT_FAILURE);
 }
