@@ -41,6 +41,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
+			'exec_params' =>			'array media_type.exec_params',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'jabber_username' =>		'db media_type.username',
 			'eztext_username' =>		'db media_type.username',
@@ -67,7 +68,7 @@ class CControllerMediatypeEdit extends CController {
 			$mediatypes = API::Mediatype()->get([
 				'output' => ['mediatypeid', 'type', 'description', 'smtp_server', 'smtp_port', 'smtp_helo',
 					'smtp_email', 'exec_path', 'gsm_modem', 'username', 'passwd', 'status', 'smtp_security',
-					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication'
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'exec_params'
 				],
 				'mediatypeids' => $this->getInput('mediatypeid'),
 				'editable' => true
@@ -98,6 +99,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_peer' => '0',
 			'smtp_verify_host' => '0',
 			'smtp_authentication' => '0',
+			'exec_params' => [],
 			'exec_path' => '',
 			'gsm_modem' => '/dev/ttyS0',
 			'jabber_username' => 'user@server',
@@ -121,6 +123,12 @@ class CControllerMediatypeEdit extends CController {
 			$data['smtp_verify_host'] = $this->mediatype['smtp_verify_host'];
 			$data['smtp_authentication'] = $this->mediatype['smtp_authentication'];
 			$data['exec_path'] = $this->mediatype['exec_path'];
+
+			$this->mediatype['exec_params'] = explode("\n", $this->mediatype['exec_params']);
+			foreach ($this->mediatype['exec_params'] as $exec_param) {
+				$data['exec_params'][] = ['exec_param' => $exec_param];
+			}
+
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
 			$data['passwd'] = $this->mediatype['passwd'];
 			$data['status'] = $this->mediatype['status'];
@@ -152,6 +160,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_peer',
 			'smtp_verify_host',
 			'smtp_authentication',
+			'exec_params',
 			'exec_path',
 			'gsm_modem',
 			'jabber_username',
@@ -160,6 +169,10 @@ class CControllerMediatypeEdit extends CController {
 			'passwd',
 			'status'
 		]);
+
+		if (!$data['exec_params']) {
+			$data['exec_params'][] = ['exec_param' => ''];
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

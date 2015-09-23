@@ -1,3 +1,13 @@
+<script type="text/x-jquery-tmpl" id="execParamsRow">
+	<tr class="form_row">
+		<td>
+			<input type="text" id="exec_params_#{rowNum}_exec_param" name="exec_params[#{rowNum}][exec_param]" maxlength="255" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
+		</td>
+		<td>
+			<button type="button" id="exec_params_#{rowNum}_remove" name="exec_params[#{rowNum}][remove]" class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove"><?= _('Remove') ?></button>
+		</td>
+	</tr>
+</script>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
 		// type of media
@@ -5,7 +15,7 @@
 			switch ($(this).val()) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication').closest('li').show();
-					$('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit')
+					$('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #execParamsTable')
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
@@ -16,7 +26,7 @@
 					break;
 
 				case '<?= MEDIA_TYPE_EXEC ?>':
-					$('#exec_path').closest('li').show();
+					$('#exec_path, #execParamsTable').closest('li').show();
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication')
 						.closest('li')
 						.hide();
@@ -25,7 +35,7 @@
 
 				case '<?= MEDIA_TYPE_SMS ?>':
 					$('#gsm_modem').closest('li').show();
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication')
+					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #execParamsTable')
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
@@ -33,7 +43,7 @@
 
 				case '<?= MEDIA_TYPE_JABBER ?>':
 					$('#jabber_username, #passwd').closest('li').show();
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication')
+					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #execParamsTable')
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
@@ -42,7 +52,7 @@
 				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
 					$('#eztext_username, #eztext_limit, #passwd').closest('li').show();
 					$('#eztext_link').show();
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication')
+					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #execParamsTable')
 						.closest('li')
 						.hide();
 					break;
@@ -57,7 +67,7 @@
 			$('#description').focus();
 		});
 
-		// Trim spaces on sumbit.
+		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
 		$('#mediaTypeForm').submit(function() {
 			$('#description').val($.trim($('#description').val()));
 			$('#smtp_server').val($.trim($('#smtp_server').val()));
@@ -105,5 +115,9 @@
 				$('#smtp_username, #passwd').val('').closest('li').hide();
 			}
 		}
+
+		$('#execParamsTable').dynamicRows({
+			template: '#execParamsRow'
+		});
 	});
 </script>
