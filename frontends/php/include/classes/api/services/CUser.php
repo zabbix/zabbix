@@ -553,7 +553,8 @@ class CUser extends CApiService {
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
 			' WHERE '.dbConditionInt('o.operationid', $operationids).
-				' AND NOT EXISTS(SELECT om.opmessage_usrid FROM opmessage_usr om WHERE om.operationid=o.operationid)'
+				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
+				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
@@ -564,6 +565,8 @@ class CUser extends CApiService {
 		DB::delete('profiles', ['userid' => $userIds]);
 		DB::delete('users_groups', ['userid' => $userIds]);
 		DB::delete('users', ['userid' => $userIds]);
+
+		API::Action()->disableActionsWithoutOperations();
 
 		return ['userids' => $userIds];
 	}

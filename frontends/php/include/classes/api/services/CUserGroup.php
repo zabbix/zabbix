@@ -546,21 +546,26 @@ class CUserGroup extends CApiService {
 			$operationIds[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
+		DB::delete('opmessage_grp', ['usrgrpid' => $userGroupIds]);
+
+		// delete empty operations
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
 			' WHERE '.dbConditionInt('o.operationid', $operationIds).
-				' AND NOT EXISTS(SELECT om.opmessage_grpid FROM opmessage_grp om WHERE om.operationid=o.operationid)'
+				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
+				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delelteOperationIds[$dbOperation['operationid']] = $dbOperation['operationid'];
 		}
 
-		DB::delete('opmessage_grp', ['usrgrpid' => $userGroupIds]);
 		DB::delete('operations', ['operationid' => $delelteOperationIds]);
 		DB::delete('rights', ['groupid' => $userGroupIds]);
 		DB::delete('users_groups', ['usrgrpid' => $userGroupIds]);
 		DB::delete('usrgrp', ['usrgrpid' => $userGroupIds]);
+
+		API::Action()->disableActionsWithoutOperations();
 
 		return ['usrgrpids' => $userGroupIds];
 	}

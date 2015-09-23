@@ -2245,4 +2245,35 @@ class CAction extends CApiService {
 			);
 		}
 	}
+
+	/**
+	 * Disable actions that do not have operations
+	 */
+	public function disableActionsWithoutOperations() {
+		$actions = DBFetchArray(DBselect(
+			'SELECT a.actionid'.
+			' FROM actions a'.
+			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'
+		));
+
+		self::disableActions(zbx_objectValues($actions, 'actionid'));
+	}
+
+	/**
+	 * Disable actions
+	 * @param array $actionids
+	 */
+	public function disableActions(array $actionids) {
+		if (!empty($actionids)) {
+			$update = [
+					'values' => ['status' => ACTION_STATUS_DISABLED],
+					'where' => ['actionid' => $actionids]
+			];
+			DB::update('actions', $update);
+
+			foreach($actionids as $actionid) {
+				add_audit_ext(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '', '', null, null);
+			}
+		}
+	}
 }
