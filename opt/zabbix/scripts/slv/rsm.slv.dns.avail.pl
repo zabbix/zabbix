@@ -25,8 +25,12 @@ my $probe_avail_limit = get_macro_probe_avail_limit();
 
 my $cfg_minns = get_macro_minns();
 
-my $clock = (opt('from') ? getopt('from') : time());
+my $now = time();
+
+my $clock = (opt('from') ? getopt('from') : $now - $interval - AVAIL_SHIFT_BACK);
 my $period = (opt('period') ? getopt('period') : 1);
+
+my $last_avail_time = get_last_time_till($now);
 
 my $tlds_ref = get_tlds();
 
@@ -36,6 +40,8 @@ while ($period > 0)
 
 	$period -= $interval / 60;
 	$clock += $interval;
+
+	next if ($till > $last_avail_time);
 
 	my $probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
 

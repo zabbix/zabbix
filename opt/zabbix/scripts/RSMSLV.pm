@@ -71,7 +71,7 @@ our %OPTS; # specified command-line options
 our @EXPORT = qw($result $dbh $tld
 		SUCCESS E_FAIL E_ID_NONEXIST E_ID_MULTIPLE UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR
 		MAX_LOGIN_ERROR MIN_INFO_ERROR MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT PROBE_ONLINE_STR PROBE_OFFLINE_STR
-		PROBE_NORESULT_STR
+		PROBE_NORESULT_STR AVAIL_SHIFT_BACK
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
@@ -825,21 +825,10 @@ sub get_interval_bounds
 	my $delay = shift;
 	my $clock = shift;
 
-	my $till = truncate_from($clock ? $clock : time());
+	$clock = time() unless ($clock);
 
-	$till -= AVAIL_SHIFT_BACK;
-	$till--;
-
-	my $from;
-
-	while (1)
-	{
-		$from = get_test_start_time($till, $delay);
-
-		last if ($from != 0);
-
-		$till -= 60;
-	}
+	my $from = truncate_from($clock, $delay);
+	my $till = $from + $delay - 1;
 
 	return ($from, $till, $till - RESULT_TIMESTAMP_SHIFT);
 }
@@ -916,7 +905,7 @@ sub get_last_time_till
 	my $now = shift;
 
 	# truncate to the end of previous minute
-	return $now - ($now % 60) - 1 - ROLLWEEK_SHIFT_BACK;
+	return $now - ($now % 60) - 1 - AVAIL_SHIFT_BACK;
 }
 
 # Returns a reference to an array of probe names which are online from/till. The algorithm goes like this:
@@ -2503,9 +2492,12 @@ sub get_tld_by_trigger
 sub truncate_from
 {
 	my $ts = shift;
+	my $delay = shift;
+
+	$delay = 60 unless ($delay);
 
 	# truncate to the beginning of the minute
-	return $ts - ($ts % 60);
+	return $ts - ($ts % $delay);
 }
 
 # whether additional alerts through Redis are enabled, disable in config passed with set_slv_config()

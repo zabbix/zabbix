@@ -94,8 +94,7 @@ foreach my $service (keys(%services))
 		$services{$service}{'key_status'} = 'rsm.dns.udp[{$RSM.TLD}]'; # 0 - down, 1 - up
 		$services{$service}{'key_rtt'} = 'rsm.dns.udp.rtt[{$RSM.TLD},';
 	}
-
-	if ($service eq 'rdds')
+	elsif ($service eq 'rdds')
 	{
 		$services{$service}{'delay'} = get_macro_rdds_delay();
 		$services{$service}{'valuemaps'} = get_valuemaps($service);
@@ -107,8 +106,7 @@ foreach my $service (keys(%services))
 		$services{$service}{'key_80_ip'} = 'rsm.rdds.80.ip[{$RSM.TLD}]';
 
 	}
-
-	if ($service eq 'epp')
+	elsif ($service eq 'epp')
 	{
 		$services{$service}{'delay'} = get_macro_epp_delay();
 		$services{$service}{'valuemaps'} = get_valuemaps($service);
@@ -116,6 +114,8 @@ foreach my $service (keys(%services))
 		$services{$service}{'key_ip'} = 'rsm.epp.ip[{$RSM.TLD}]';
 		$services{$service}{'key_rtt'} = 'rsm.epp.rtt[{$RSM.TLD},';
 	}
+
+	$services{$service}{'avail_key'} = "rsm.slv.$service.avail";
 }
 
 my $now = time();
@@ -173,7 +173,7 @@ if (opt('continue'))
 
 		$check_from = $truncated_ts;
 
-		info(sprintf("getting date from %s: %s", $continue_file, ts_str($check_from)));
+		info(sprintf("getting date from %s: %s (%d)", $continue_file, ts_str($check_from), $check_from));
 	}
 
 	if ($check_from == 0)
@@ -334,6 +334,7 @@ foreach (keys(%$servicedata))
 		my $delay = $services{$service}{'delay'};
 		my $service_from = $services{$service}{'from'};
 		my $service_till = $services{$service}{'till'};
+		my $avail_key = $services{$service}{'avail_key'};
 
 		if (!$service_from || !$service_till)
 		{
@@ -343,7 +344,6 @@ foreach (keys(%$servicedata))
 		}
 
 		my $hostid = get_hostid($tld);
-		my $avail_key = "rsm.slv.$service.avail";
 		my $avail_itemid = get_itemid_by_hostid($hostid, $avail_key);
 
 		if ($avail_itemid < 0)

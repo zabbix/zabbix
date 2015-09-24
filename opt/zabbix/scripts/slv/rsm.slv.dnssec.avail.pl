@@ -24,8 +24,12 @@ my $interval = get_macro_dns_udp_delay();
 my $cfg_minonline = get_macro_dns_probe_online();
 my $probe_avail_limit = get_macro_probe_avail_limit();
 
-my $clock = (opt('from') ? getopt('from') : time());
+my $now = time();
+
+my $clock = (opt('from') ? getopt('from') : $now - $interval - AVAIL_SHIFT_BACK);
 my $period = (opt('period') ? getopt('period') : 1);
+
+my $last_avail_time = get_last_time_till($now);
 
 my $tlds_ref = get_tlds();
 
@@ -35,6 +39,8 @@ while ($period > 0)
 
 	$period -= $interval / 60;
 	$clock += $interval;
+
+	next if ($till > $last_avail_time);
 
 	my $probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
 	my $probes_count = scalar(@$probes_ref);
