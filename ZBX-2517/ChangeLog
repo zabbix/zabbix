@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha3
 
 New features:
+..F....... [ZBX-2517] minimum period for time navigator set to 5 minutes; thanks to Zabbix community (Alexei)
 ..F.....S. [ZBXNEXT-922] added forecasting trigger functions (gleb, Sandis)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 ....I..... [ZBXNEXT-2056] added an HTTP response code value map (Richlv)

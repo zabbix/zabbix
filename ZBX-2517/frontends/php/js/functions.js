@@ -415,6 +415,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 
 	var days = Math.floor((timestamp - years * 31536000 - months * 2592000) / 86400),
 		hours = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600);
+		minutes = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400 - hours * 3600) / 60);
 
 	// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
 	if (months == 12) {
@@ -432,7 +433,10 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		if (hours.toString().length == 1) {
 			hours = '0' + hours;
 		}
-	}
+		if (minutes.toString().length == 1) {
+			minutes = '0' + minutes;
+		}
+}
 
 	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
 	str += (months == 0) ? '' : months + locale['S_MONTH_SHORT'] + ' ';
@@ -440,7 +444,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		? days + locale['S_DAY_SHORT'] + ' '
 		: ((days == 0) ? '' : days + locale['S_DAY_SHORT'] + ' ');
 	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
-
+	str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
 	return str;
 }
 
