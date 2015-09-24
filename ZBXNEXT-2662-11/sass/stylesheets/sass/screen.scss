@@ -831,6 +831,7 @@ footer {
 
 .overflow-table {
 	overflow-x: auto;
+	position: relative;
 }
 
 /* Filters */
@@ -3040,7 +3041,7 @@ td.inactive-bg {
 	right: -6px;
 	border: 2px solid $body-bg-color;
 	background-color: darken(desaturate($alt-green, 10%), 16%);
-	@include border-radius(50%);
+	@include border-radius(4px);
 }
 
 .msg-good {
@@ -3159,7 +3160,7 @@ td.inactive-bg {
 	display: none;
 	position: fixed;
 	bottom: 0;
-	z-index: 10000;
+	z-index: 20000;
 	width: 100%;
 	padding: 5px 5px;
 	text-align: center;
