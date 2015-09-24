@@ -17,7 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-$this->includeJSfile('app/views/monitoring.acknowledge.edit.js');
+$this->includeJSfile('app/views/monitoring.acknowledge.edit.js.php');
 $form_list = (new CFormList())
 	->addRow(_('Message'),
 		(new CTextArea('message', '', ['maxlength' => 255]))
@@ -80,6 +80,7 @@ $footer_buttons = makeFormFooter(
 	->setTitle(_('Alarm acknowledgements'))
 	->addItem(
 		(new CForm())
+			->setId('acknowledgeForm')
 			->addVar('eventids', $data['eventids'])
 			->addVar('backurl', $data['backurl'])
 			->addItem(
