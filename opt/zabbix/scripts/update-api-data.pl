@@ -13,9 +13,6 @@ use constant JSON_RDDS_SUBSERVICE => 'subService';
 use constant JSON_RDDS_43 => 'RDDS43';
 use constant JSON_RDDS_80 => 'RDDS80';
 
-use constant PROBE_OFFLINE_STR => 'Offline';
-use constant PROBE_NORESULT_STR => 'No result';
-
 use constant AUDIT_RESOURCE_INCIDENT => 32;
 
 parse_opts('tld=s', 'service=s', 'period=n', 'from=n', 'continue!', 'ignore-file=s', 'probe=s', 'limit=n');
@@ -145,7 +142,7 @@ dbg("config_minclock:$config_minclock");
 
 my $last_time_till = get_last_time_till($now);
 
-my ($from, $till, $continue_file);
+my ($check_from, $check_till, $continue_file);
 
 if (opt('continue'))
 {
@@ -154,7 +151,7 @@ if (opt('continue'))
 
 	if (! -e $continue_file)
 	{
-		$from = truncate_from($config_minclock);
+		$check_from = truncate_from($config_minclock);
 	}
 	else
 	{
@@ -174,51 +171,51 @@ if (opt('continue'))
 			wrn(sprintf("truncating last update value (%s) to %s", ts_str($ts), ts_str($truncated_ts)));
 		}
 
-		$from = $truncated_ts;
+		$check_from = $truncated_ts;
 
-		info(sprintf("getting date from %s: %s", $continue_file, ts_str($from)));
+		info(sprintf("getting date from %s: %s", $continue_file, ts_str($check_from)));
 	}
 
-	if ($from == 0)
+	if ($check_from == 0)
 	{
 		fail("no data from probes in the database yet");
 	}
 
 	if (opt('period'))
 	{
-		$till = $from + getopt('period') * 60 - 1;
+		$check_till = $check_from + getopt('period') * 60 - 1;
 	}
 	else
 	{
-		$till = $last_time_till;
+		$check_till = $last_time_till;
 	}
 }
 elsif (opt('from'))
 {
-	$from = $opt_from;
+	$check_from = $opt_from;
 
 	if (opt('period'))
 	{
-		$till = $from + getopt('period') * 60 - 1;
+		$check_till = $check_from + getopt('period') * 60 - 1;
 	}
 	else
 	{
-		$till = $last_time_till;
+		$check_till = $last_time_till;
 	}
 }
 elsif (opt('period'))
 {
 	# only period specified
-	$till = $last_time_till;
-	$from = $till - getopt('period') * 60 + 1;
+	$check_till = $last_time_till;
+	$check_from = $check_till - getopt('period') * 60 + 1;
 }
 
-fail("cannot get the beginning of calculation period") unless(defined($from));
-fail("cannot get the end of calculation period") unless(defined($till));
+fail("cannot get the beginning of calculation period") unless(defined($check_from));
+fail("cannot get the end of calculation period") unless(defined($check_till));
 
-if ($till > $last_time_till)
+if ($check_till > $last_time_till)
 {
-	my $left = ($till - $last_time_till) / 60;
+	my $left = ($check_till - $last_time_till) / 60;
 	my $left_str;
 
 	if ($left == 1)
@@ -230,42 +227,17 @@ if ($till > $last_time_till)
 		$left_str = "$left minutes";
 	}
 
-	wrn(sprintf("cannot yet calculate for selected period (%s), please wait for %s for the data to be processed", __selected_period($from, $till), $left_str));
+	wrn(sprintf("cannot yet calculate for selected period (%s), please wait for %s for the data to be processed", selected_period($check_from, $check_till), $left_str));
 
 	exit(0);
 }
 
-# adjust test and probe periods we need to calculate for
-foreach my $service (keys(%services))
+my ($from, $till) = get_real_services_period(\%services, $check_from, $check_till);
+
+if (!$from)
 {
-	my $delay = $services{$service}{'delay'};
-
-	$services{$service}{'from'} = undef;
-	$services{$service}{'till'} = undef;
-
-	my ($period_from, $period_till);
-	for ($period_from = $from, $period_till = $period_from + 59; $period_from < $till; $period_from += 60, $period_till += 60)
-	{
-		my $test_from = get_test_start_time($period_till, $delay);
-
-		if ($test_from != 0)
-		{
-			if ($test_from < $from)
-			{
-				$from = $test_from;
-			}
-
-			if (!$services{$service}{'from'} || $test_from < $services{$service}{'from'})
-			{
-				$services{$service}{'from'} = $test_from;
-			}
-
-			if (!$services{$service}{'till'} || $period_till > $services{$service}{'till'})
-			{
-				$services{$service}{'till'} = $period_till;
-			}
-		}
-	}
+    info("no full test periods within specified time range: ", selected_period($check_from, $check_till));
+    exit(0);
 }
 
 my $tlds_processed = 0;
@@ -333,7 +305,7 @@ foreach (@$tlds_ref)
 	}
 }
 
-info(sprintf("getting probe statuses for period: %s", __selected_period($from, $till)));
+__prnt(sprintf("getting probe statuses for period: %s", selected_period($from, $till)));
 
 my $all_probes_ref = get_probes();
 
@@ -396,7 +368,7 @@ foreach (keys(%$servicedata))
 		my ($rollweek_from, $rollweek_till) = get_rollweek_bounds();
 		my $downtime = get_downtime($avail_itemid, $rollweek_from, $rollweek_till);
 
-		__prnt("period: ", __selected_period($service_from, $service_till), " (", uc($service), ")") if (opt('dry-run') or opt('debug'));
+		__prnt(uc($service), " period: ", selected_period($service_from, $service_till)) if (opt('dry-run') or opt('debug'));
 
 		if (opt('dry-run'))
 		{
@@ -601,7 +573,7 @@ foreach (keys(%$servicedata))
 							my $tr_ref = $test_results[$test_result_index];
 							$tr_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
 
-							if (__probe_offline_at($probe, $clock) != 0)
+							if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
 							{
 								$tr_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
 							}
@@ -714,7 +686,7 @@ foreach (keys(%$servicedata))
 							my $tr_ref = $test_results[$test_result_index];
 							$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = undef;	# the status is set later
 
-							if (__probe_offline_at($probe, $clock) != 0)
+							if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
 							{
 								$tr_ref->{+JSON_RDDS_SUBSERVICE}->{$subservice}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
 							}
@@ -834,7 +806,7 @@ foreach (keys(%$servicedata))
 						my $tr_ref = $test_results[$test_result_index];
 						$tr_ref->{'probes'}->{$probe}->{'status'} = undef;	# the status is set later
 
-						if (__probe_offline_at($probe, $clock) != 0)
+						if (probe_offline_at($probe_times_ref, $probe, $clock) != 0)
 						{
 							$tr_ref->{'probes'}->{$probe}->{'status'} = PROBE_OFFLINE_STR;
 						}
@@ -1643,18 +1615,6 @@ sub __prnt_json
 	}
 }
 
-sub __selected_period
-{
-	my $from = shift;
-	my $till = shift;
-
-	return "till " . ts_str($till) if (!$from and $till);
-	return "from " . ts_str($from) if ($from and !$till);
-	return "from " . ts_str($from) . " till " . ts_str($till) if ($from and $till);
-
-	return "any time";
-}
-
 sub __tld_ignored
 {
 	my $tld = shift;
@@ -1810,30 +1770,6 @@ sub __get_min_clock
 	$rows_ref = db_select("select min(clock) from history_uint where itemid in ($itemids_str) and clock<$config_minclock");
 
 	return $rows_ref->[0]->[0] ? $rows_ref->[0]->[0] : $config_minclock;
-}
-
-sub __probe_offline_at
-{
-	my $probe = shift;
-	my $clock = shift;
-
-	# if a probe was down for the whole period it won't be in a hash
-	return 1 unless exists($probe_times_ref->{$probe});	# offline
-
-	my $times_ref = $probe_times_ref->{$probe};
-
-	my $clocks_count = scalar(@$times_ref);
-
-	my $clock_index = 0;
-	while ($clock_index < $clocks_count)
-	{
-		my $from = $times_ref->[$clock_index++];
-		my $till = $times_ref->[$clock_index++];
-
-		return 0 if (($from < $clock) and ($clock < $till));	# online
-	}
-
-	return 1;	# offline
 }
 
 sub __no_status_result

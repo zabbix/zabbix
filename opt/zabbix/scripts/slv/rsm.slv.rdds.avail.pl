@@ -32,6 +32,8 @@ while ($period > 0)
 {
 	my ($from, $till, $value_ts) = get_interval_bounds($interval, $clock);
 
+	dbg("selecting period ", selected_period($from, $till), " (value_ts:", ts_str($value_ts), ")");
+
 	$period -= $interval / 60;
 	$clock += $interval;
 

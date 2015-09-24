@@ -23,6 +23,8 @@ my ($from, $till, $value_ts) = get_rollweek_bounds();
 my $interval = get_macro_rdds_delay($from);
 my $cfg_sla = get_macro_rdds_rollweek_sla();
 
+dbg("selecting period ", selected_period($from, $till), " (value_ts:", ts_str($value_ts), ")");
+
 my $tlds_ref = get_tlds('RDDS');
 
 init_values();

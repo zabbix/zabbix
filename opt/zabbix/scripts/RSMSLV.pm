@@ -56,6 +56,10 @@ use constant ROLLWEEK_SHIFT_BACK => 180; # seconds (must be divisible by 60 with
 
 use constant RESULT_TIMESTAMP_SHIFT => 29; # seconds (shift back from upper time bound of the period for the value timestamp)
 
+use constant PROBE_ONLINE_STR => 'Online';
+use constant PROBE_OFFLINE_STR => 'Offline';
+use constant PROBE_NORESULT_STR => 'No result';
+
 our ($result, $dbh, $tld);
 
 my $total_sec;
@@ -66,7 +70,8 @@ our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld
 		SUCCESS E_FAIL E_ID_NONEXIST E_ID_MULTIPLE UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR
-		MAX_LOGIN_ERROR MIN_INFO_ERROR MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT
+		MAX_LOGIN_ERROR MIN_INFO_ERROR MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT PROBE_ONLINE_STR PROBE_OFFLINE_STR
+		PROBE_NORESULT_STR
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
@@ -76,14 +81,15 @@ our @EXPORT = qw($result $dbh $tld
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
 		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
-		minutes_last_month get_last_time_till get_online_probes get_probe_times probes2tldhostids init_values
+		minutes_last_month get_last_time_till get_online_probes get_probe_times probe_offline_at
+		probes2tldhostids init_values
 		push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly process_slv_avail
 		process_slv_ns_avail process_slv_monthly get_results get_item_values check_lastclock sql_time_condition
 		get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
-		get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
+		get_tld_by_trigger truncate_from alerts_enabled get_test_start_time get_real_services_period
 		dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt
-		setopt optkeys ts_str write_file usage);
+		setopt optkeys ts_str selected_period write_file usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -455,14 +461,20 @@ sub get_tlds
 sub get_probes
 {
 	my $service = shift;
+	my $name = shift;
 
 	$service = defined($service) ? uc($service) : 'DNS';
+
+	my $name_cond = "";
+
+	$name_cond = " and h.host='$name'" if ($name);
 
 	my $rows_ref = db_select(
 		"select h.host,h.hostid".
 		" from hosts h, hosts_groups hg, groups g".
 		" where h.hostid=hg.hostid".
 			" and hg.groupid=g.groupid".
+			$name_cond.
 			" and g.name='".PROBE_GROUP_NAME."'");
 
 	my %result;
@@ -810,14 +822,24 @@ sub set_slv_config
 # Get time bounds of the last test guaranteed to have all probe results.
 sub get_interval_bounds
 {
-	my $interval = shift;
+	my $delay = shift;
 	my $clock = shift;
 
-	my $t = ($clock ? $clock : time());
-	my $till = int($t / 60) * 60 - AVAIL_SHIFT_BACK;
-	my $from = $till - $interval;
+	my $till = truncate_from($clock ? $clock : time());
 
+	$till -= AVAIL_SHIFT_BACK;
 	$till--;
+
+	my $from;
+
+	while (1)
+	{
+		$from = get_test_start_time($till, $delay);
+
+		last if ($from != 0);
+
+		$till -= 60;
+	}
 
 	return ($from, $till, $till - RESULT_TIMESTAMP_SHIFT);
 }
@@ -826,10 +848,12 @@ sub get_interval_bounds
 sub get_rollweek_bounds
 {
 	my $t = time();
-	my $till = int($t / 60) * 60 - ROLLWEEK_SHIFT_BACK;
 
-	# mind the rollweek threshold setting
 	my $rollweek_seconds = __get_macro('{$RSM.ROLLWEEK.SECONDS}');
+
+	my $till = truncate_from($t);
+
+	$till -= ROLLWEEK_SHIFT_BACK;
 
 	my $from = $till - $rollweek_seconds;
 
@@ -1174,6 +1198,38 @@ sub get_probe_times
 	}
 
 	return \%result;
+}
+
+sub probe_offline_at
+{
+	my $probe_times_ref = shift;	# reference to a hash returned by get_probe_times()
+	my $probe = shift;
+	my $clock = shift;
+
+	# if a probe was down for the whole period it won't be in a hash
+	unless (exists($probe_times_ref->{$probe}))
+	{
+		dbg("Probe $probe does not exist in a hash, OFFLINE");
+		return 1;	# offline
+	}
+
+	my $times_ref = $probe_times_ref->{$probe};
+
+	my $clocks_count = scalar(@$times_ref);
+
+	my $clock_index = 0;
+	while ($clock_index < $clocks_count)
+	{
+		my $from = $times_ref->[$clock_index++];
+		my $till = $times_ref->[$clock_index++];
+
+		if (($from < $clock) and ($clock < $till))
+		{
+			return 0;	# online
+		}
+	}
+
+	return 1;	# offline
 }
 
 # Translate probe names to hostids of appropriate tld hosts.
@@ -2480,6 +2536,75 @@ sub get_test_start_time
 	return $till - $delay;
 }
 
+# $services is a hash reference of services that need to be checked.
+# For each service the delay must be provided. "from" and "till" values
+# will be set for services whose tests fall under given time between
+# $check_from and $check_till.
+#
+# Input:
+#
+# [
+#   {'dns' => 60},
+#   {'rdds' => 300}
+# ]
+#
+# Output:
+#
+# [
+#   {'dns' => 60, 'from' => 1234234200, 'till' => 1234234259},	# <- test period found
+#   {'rdds' => 300}						# <- test period not found
+# ]
+#
+# The return value is min($from), max($till) from all found periods
+#
+sub get_real_services_period
+{
+	my $services = shift;
+	my $check_from = shift;
+	my $check_till = shift;
+
+	my ($from, $till);
+
+	# adjust test and probe periods we need to calculate for
+	foreach my $service (keys(%$services))
+	{
+		my $delay = $services->{$service}{'delay'};
+
+		my ($loop_from, $loop_till);
+
+		# go through the check period minute by minute selecting test cycles
+		for ($loop_from = $check_from, $loop_till = $loop_from + 59; $loop_from < $check_till; $loop_from += 60, $loop_till += 60)
+		{
+			my $test_from = get_test_start_time($loop_till, $delay);
+
+			if ($test_from != 0)
+			{
+				if (!$from || $from > $test_from)
+				{
+					$from = $test_from;
+				}
+
+				if (!$till || $till < $loop_till)
+				{
+					$till = $loop_till;
+				}
+
+				if (!$services->{$service}{'from'})
+				{
+					$services->{$service}{'from'} = $test_from;
+				}
+
+				if (!$services->{$service}{'till'} || $services->{$service}{'till'} < $loop_till)
+				{
+					$services->{$service}{'till'} = $loop_till;
+				}
+			}
+		}
+	}
+
+	return ($from, $till);
+}
+
 sub format_stats_time
 {
 	my $time = shift;
@@ -2628,6 +2753,18 @@ sub ts_str
 	$mon++;
 
 	return sprintf("%4.2d/%2.2d/%2.2d %2.2d:%2.2d:%2.2d", $year, $mon, $mday, $hour, $min, $sec);
+}
+
+sub selected_period
+{
+	my $from = shift;
+	my $till = shift;
+
+	return "till " . ts_str($till) if (!$from and $till);
+	return "from " . ts_str($from) if ($from and !$till);
+	return "from " . ts_str($from) . " till " . ts_str($till) if ($from and $till);
+
+	return "any time";
 }
 
 sub write_file
