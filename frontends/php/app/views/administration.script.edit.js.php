@@ -68,7 +68,7 @@
 
 		// trim spaces on sumbit
 		jQuery('#scriptForm').submit(function() {
-			jQuery(this).trimValues(['#name','#command','#description']);
+			jQuery(this).trimValues(['#name', '#command', '#description']);
 		});
 	});
 </script>
