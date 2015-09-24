@@ -884,45 +884,53 @@ static int	scheduler_interval_parse(zbx_scheduler_interval_t *interval, const ch
 			case '\0':
 				return FAIL;
 			case 'h':
-				ret = scheduler_parse_filter(&interval->hours, text + 1, &len, 0, 23, 2);
+				if (ZBX_SCHEDULER_FILTER_HOUR < interval->filter_level)
+					return FAIL;
 
-				if (ZBX_SCHEDULER_FILTER_HOUR > interval->filter_level)
-					interval->filter_level = ZBX_SCHEDULER_FILTER_HOUR;
+				ret = scheduler_parse_filter(&interval->hours, text + 1, &len, 0, 23, 2);
+				interval->filter_level = ZBX_SCHEDULER_FILTER_HOUR;
+
 				break;
 			case 's':
-				ret = scheduler_parse_filter(&interval->seconds, text + 1, &len, 0, 59, 2);
+				if (ZBX_SCHEDULER_FILTER_SECOND < interval->filter_level)
+					return FAIL;
 
-				if (ZBX_SCHEDULER_FILTER_SECOND > interval->filter_level)
-					interval->filter_level = ZBX_SCHEDULER_FILTER_SECOND;
+				ret = scheduler_parse_filter(&interval->seconds, text + 1, &len, 0, 59, 2);
+				interval->filter_level = ZBX_SCHEDULER_FILTER_SECOND;
+
 				break;
 			case 'w':
 				if ('d' != text[1])
 					return FAIL;
 
+				if (ZBX_SCHEDULER_FILTER_DAY < interval->filter_level)
+					return FAIL;
+
 				len--;
 				ret = scheduler_parse_filter(&interval->wdays, text + 2, &len, 1, 7, 1);
-
-				if (ZBX_SCHEDULER_FILTER_DAY > interval->filter_level)
-					interval->filter_level = ZBX_SCHEDULER_FILTER_DAY;
+				interval->filter_level = ZBX_SCHEDULER_FILTER_DAY;
 
 				break;
 			case 'm':
 				if ('d' == text[1])
 				{
+					if (ZBX_SCHEDULER_FILTER_DAY < interval->filter_level ||
+							NULL != interval->wdays)
+					{
+						return FAIL;
+					}
+
 					len--;
 					ret = scheduler_parse_filter(&interval->mdays, text + 2, &len, 1, 31, 2);
-
-					if (ZBX_SCHEDULER_FILTER_DAY > interval->filter_level)
-						interval->filter_level = ZBX_SCHEDULER_FILTER_DAY;
-
+					interval->filter_level = ZBX_SCHEDULER_FILTER_DAY;
 				}
 				else
 				{
+					if (ZBX_SCHEDULER_FILTER_MINUTE < interval->filter_level)
+						return FAIL;
+
 					ret = scheduler_parse_filter(&interval->minutes, text + 1, &len, 0, 59, 2);
-
-					if (ZBX_SCHEDULER_FILTER_MINUTE > interval->filter_level)
-						interval->filter_level = ZBX_SCHEDULER_FILTER_MINUTE;
-
+					interval->filter_level = ZBX_SCHEDULER_FILTER_MINUTE;
 				}
 
 				break;
