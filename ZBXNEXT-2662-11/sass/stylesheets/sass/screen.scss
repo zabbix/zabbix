@@ -2750,10 +2750,14 @@ $form-icon-btn: (
 }
 
 .overlay-descr {
-	max-height: 300px;
+	max-height: 150px;
 	margin: 5px 0;
 	background-color: $ui-bg-color;
 	@extend .debug-output;
+}
+
+.overlay-descr-url {
+	padding: 3px 11px 0 11px;
 }
 
 /* Alerts */
