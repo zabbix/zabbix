@@ -520,8 +520,7 @@ cannot_open:
 	goto error;
 line_too_long:
 	fclose(file);
-	zbx_error("line %d in config file \"%s\" is too long \"max %d bytes\"",
-			lineno, cfg_file, MAX_STRING_LEN - 1);
+	zbx_error("line %d exceeds %d byte length limit in config file \"%s\"", lineno, MAX_STRING_LEN - 1, cfg_file);
 	goto error;
 non_utf8:
 	fclose(file);
