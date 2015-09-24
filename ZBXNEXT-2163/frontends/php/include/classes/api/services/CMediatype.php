@@ -179,6 +179,10 @@ class CMediatype extends CApiService {
 		$required_fields = ['type', 'description'];
 
 		foreach ($mediatypes as $mediatype) {
+			if (!is_array($mediatype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
 			$missing_keys = checkRequiredKeys($mediatype, $required_fields);
 
 			if ($missing_keys) {
@@ -354,6 +358,10 @@ class CMediatype extends CApiService {
 		$required_fields = ['mediatypeid'];
 
 		foreach ($mediatypes as $mediatype) {
+			if (!is_array($mediatype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+
 			$missing_keys = checkRequiredKeys($mediatype, $required_fields);
 
 			if ($missing_keys) {
@@ -472,11 +480,9 @@ class CMediatype extends CApiService {
 								 * Otherwise the password is not changed.
 								 */
 
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-									'Field "%1$s" is missing a value for media type "%2$s".',
-									'passwd',
-									$mediatype['description']
-								));
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Password required for media type "%1$s".', $mediatype['description'])
+								);
 							}
 							elseif ($db_mediatype['smtp_authentication'] != $mediatype['smtp_authentication']
 									&& (!array_key_exists('passwd', $mediatype)
@@ -486,11 +492,9 @@ class CMediatype extends CApiService {
 								 * 'none' to 'normal' and then validate it.
 								 */
 
-								self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-									'Field "%1$s" is missing a value for media type "%2$s".',
-									'passwd',
-									$mediatype['description']
-								));
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Password required for media type "%1$s".', $mediatype['description'])
+								);
 							}
 						}
 					}
@@ -499,11 +503,9 @@ class CMediatype extends CApiService {
 							&& ($mediatype['passwd'] === '' || $mediatype['passwd'] === null)) {
 						// Check 'passwd' field depeding on authentication set from DB and when it is set to 'normal'.
 
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-							'Field "%1$s" is missing a value for media type "%2$s".',
-							'passwd',
-							$mediatype['description']
-						));
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Password required for media type "%1$s".', $mediatype['description'])
+						);
 					}
 
 					// Validate optional 'smtp_port' field.
