@@ -2458,12 +2458,6 @@ $form-icon-btn: (
 	}
 }
 
-.overlay-descr {
-	padding: 0 10px 11px 10px;
-	margin: 0 0 5px 0; 
-	border-bottom: 1px dashed $table-border-color;
-}
-
 .overlay-bg {
 	background-color: $white;
 	width: 100%;
@@ -2734,7 +2728,7 @@ $form-icon-btn: (
 	margin: -3px;
 }
 
-/* Debug */
+/* Debug, Overlay Description */
 .debug-output {
 	max-height: 600px;
 	overflow-y: auto;
@@ -2753,6 +2747,13 @@ $form-icon-btn: (
 	padding: 4px 11px;
 	background-color: rgba($body-bg-color,0.7);
 	@include border-radius(2px);
+}
+
+.overlay-descr {
+	max-height: 300px;
+	margin: 5px 0;
+	background-color: $ui-bg-color;
+	@extend .debug-output;
 }
 
 /* Alerts */
