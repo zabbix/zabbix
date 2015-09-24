@@ -20,6 +20,7 @@
 
 
 $this->includeJSfile('app/views/monitoring.acknowledge.edit.js.php');
+
 $form_list = (new CFormList())
 	->addRow(_('Message'),
 		(new CTextArea('message', '', ['maxlength' => 255]))
