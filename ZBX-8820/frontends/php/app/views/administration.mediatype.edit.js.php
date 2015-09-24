@@ -57,17 +57,12 @@
 			$('#description').focus();
 		});
 
-		// Trim spaces on sumbit.
 		$('#mediaTypeForm').submit(function() {
 			$(this).trimValues([
-				'#description','#smtp_server','#smtp_port',
-				'smtp_helo',
-				'smtp_email',
-				'#exec_path',
-				'#gsm_modem',
-				'#jabber_username',
-				'#eztext_username',
-				'#smtp_username',
+				'#description', '#smtp_server', '#smtp_port',
+				'smtp_helo', 'smtp_email', '#exec_path',
+				'#gsm_modem', '#jabber_username', '#eztext_username',
+				'#smtp_username'
 			]);
 		});
 
