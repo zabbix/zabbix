@@ -583,7 +583,7 @@ jQuery.fn.trimValues = function(selectors) {
 		obj;
 
 	jQuery.each(selectors, function(i, value) {
-		obj = form.find(value);
+		obj = jQuery(value, form);
 		obj.val(jQuery.trim(obj.val()));
 	});
 };
