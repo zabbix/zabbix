@@ -2751,13 +2751,39 @@ $form-icon-btn: (
 
 .overlay-descr {
 	max-height: 150px;
+	overflow-y: auto;
+	padding: 0 11px 0 11px;
 	margin: 5px 0;
 	background-color: $ui-bg-color;
-	@extend .debug-output;
+	@extend %webkit-scrollbar;
+	//@extend .debug-output;
+	@extend %scroll-vert-shadow;
 }
 
 .overlay-descr-url {
-	padding: 3px 11px 0 11px;
+	padding: 2px 11px 5px 11px;
+	margin: 0 0 3px 0;
+	border-bottom: 1px dashed $table-border-color;
+}
+
+%scroll-vert-shadow {
+	background:
+	/* Shadow covers */
+	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color,0)),
+	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
+	/* Shadows */
+	radial-gradient(50% 0, farthest-side, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)),
+	radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)) 0 100%;
+	background:
+	/* Shadow covers */
+	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color,0)),
+	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
+	/* Shadows */
+	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)),
+	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)) 0 100%;
+	background-repeat: no-repeat;
+	background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
+	background-attachment: local, local, scroll, scroll;
 }
 
 /* Alerts */
@@ -3427,6 +3453,8 @@ $browser-logos: (
 	font-size: $font-msg-reset-size;
 	max-width: 180px;
 	padding: 4px 7px;
+	position: absolute;
+	z-index: 100;
 }
 
 .list-hor-min-width {
