@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and
 ....I..... [ZBXNEXT-2056] added an HTTP response code value map (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8820] added js multiple elements triming functionality (vitalijs.cemeris, Sasha)
 .......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
 ...G...PS. [ZBX-9776] added check for line length when parsing configuration file (viktors)
 ...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
