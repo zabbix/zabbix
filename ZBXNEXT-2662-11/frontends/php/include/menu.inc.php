@@ -394,7 +394,9 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		else {
 			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
 		}
-		$mmenu_entry = (new CListItem(new CLink($menu['label'], 'javascript:void(0);')))
+		$mmenu_entry = (new CListItem(
+			(new CLink($menu['label'], 'javascript:void(0);'))->removeSID()
+		))
 			->addClass($menu_class)
 			->setId($label);
 		$mmenu_entry->onClick('javascript: MMenu.mouseOver(\''.$label.'\');');
