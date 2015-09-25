@@ -194,21 +194,43 @@ else {
 	// time till
 	$maxTime = ($year == $currentYear) ? time() : mktime(0, 0, 0, 1, 1, $year + 1);
 
-	// fetch alerts
-	$alerts = array();
-	foreach (eventSourceObjects() as $sourceObject) {
-		$alerts = array_merge($alerts, API::Alert()->get(array(
-			'output' => array('mediatypeid', 'userid', 'clock'),
-			'eventsource' => $sourceObject['source'],
-			'eventobject' => $sourceObject['object'],
-			'mediatypeids' => (get_request('media_type')) ? get_request('media_type') : null,
-			'time_from' => $minTime,
-			'time_till' => $maxTime
-		)));
-	}
-	// sort alerts in chronological order so we could easily iterate through them later
-	CArrayHelper::sort($alerts, array('clock'));
+	// run one query for all periods
+	$i = 0;
+	$sql = '';
+	$periods = array();
+	foreach ($intervals as $from => $till) {
+		if ($i > 0) {
+			$sql .= ' UNION ';
+		}
 
+		$sql .= 'SELECT count(a.alertid) as alerts_count,a.userid,a.mediatypeid,'.zbx_dbstr($from).' as period_from'.
+				' FROM alerts a'.
+				' WHERE a.clock>='.zbx_dbstr($from).
+					' AND a.clock<'.zbx_dbstr($till).
+					(get_request('media_type') ? ' AND a.mediatypeid='.zbx_dbstr(get_request('media_type')) : null).
+				' GROUP BY a.userid, a.mediatypeid';
+
+		$i++;
+
+		$periods[$from] = array();
+		foreach ($users as $userid => $alias) {
+			$periods[$from][$userid] = array();
+			$periods[$from][$userid]['total'] = 0;
+			$periods[$from][$userid]['medias'] = array();
+			foreach ($media_types as $media_type_nr => $mt) {
+				$periods[$from][$userid]['medias'][$media_type_nr] = 0;
+			}
+		}
+	}
+	$all_alerts = DBfetchArray(DBselect($sql));
+
+	// collect data by period
+	foreach($all_alerts as $alerts) {
+		$periods[$alerts['period_from']][$alerts['userid']]['medias'][$alerts['mediatypeid']] = $alerts['alerts_count'];
+		$periods[$alerts['period_from']][$alerts['userid']]['total'] += $alerts['alerts_count'];
+	}
+
+	// generate data table
 	$table->setHeader($header, 'vertical_header');
 	foreach ($intervals as $from => $till) {
 		// interval start
@@ -219,37 +241,7 @@ else {
 			$row[] = zbx_date2str($dateFormat, min($till, time()));
 		}
 
-		// counting alert count for each user and media type
-		$summary = array();
-		foreach ($users as $userid => $alias) {
-			$summary[$userid] = array();
-			$summary[$userid]['total'] = 0;
-			$summary[$userid]['medias'] = array();
-			foreach ($media_types as $media_type_nr => $mt) {
-				$summary[$userid]['medias'][$media_type_nr] = 0;
-			}
-		}
-
-		// loop through alerts until we reach an alert from the next interval
-		while ($alert = current($alerts)) {
-			if ($alert['clock'] >= $till) {
-				break;
-			}
-
-			if (isset($summary[$alert['userid']])) {
-				$summary[$alert['userid']]['total']++;
-				if (isset($summary[$alert['userid']]['medias'][$alert['mediatypeid']])) {
-					$summary[$alert['userid']]['medias'][$alert['mediatypeid']]++;
-				}
-				else {
-					$summary[$alert['userid']]['medias'][$alert['mediatypeid']] = 1;
-				}
-			}
-
-			next($alerts);
-		}
-
-		foreach ($summary as $s) {
+		foreach ($periods[$from] as $s) {
 			array_push($row, array($s['total'], ($media_type == 0) ? SPACE.'('.implode('/', $s['medias']).')' : ''));
 		}
 
