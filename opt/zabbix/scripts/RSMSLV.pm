@@ -88,8 +88,8 @@ our @EXPORT = qw($result $dbh $tld
 		get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
 		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
 		get_tld_by_trigger truncate_from alerts_enabled get_test_start_time get_real_services_period
-		dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts parse_avail_opts opt getopt
-		setopt optkeys ts_str selected_period write_file usage);
+		dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts parse_avail_opts
+		parse_rollweek_opts opt getopt setopt optkeys ts_str selected_period write_file usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -836,15 +836,25 @@ sub get_interval_bounds
 # Get time bounds of the rolling week, shift back to guarantee all probe results.
 sub get_rollweek_bounds
 {
-	my $t = time();
+	my $from = shift;	# beginning of rolling week (till current time if not specified)
 
 	my $rollweek_seconds = __get_macro('{$RSM.ROLLWEEK.SECONDS}');
 
-	my $till = truncate_from($t);
+	my $till;
 
-	$till -= ROLLWEEK_SHIFT_BACK;
+	if ($from)
+	{
+		$from = truncate_from($from);
+		$till = $from + $rollweek_seconds;
+	}
+	else
+	{
+		# select till current time
+		$till = time() - ROLLWEEK_SHIFT_BACK;
 
-	my $from = $till - $rollweek_seconds;
+		$till = truncate_from($till);
+		$from = $till - $rollweek_seconds;
+	}
 
 	$till--;
 
@@ -1949,7 +1959,7 @@ sub get_incidents
 			my $value = $row_ref->[2];
 			my $false_positive = $row_ref->[3];
 
-			dbg("pre-incident $eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if (opt('debug'));
+			dbg("reading pre-event $eventid: clock:" . ts_str($clock) . " ($clock), value:", ($value == 0 ? 'OK' : 'PROBLEM'), ", false_positive:$false_positive") if (opt('debug'));
 
 			# do not add 'value=TRIGGER_VALUE_TRUE' to SQL above just for corner case of 2 events at the same second
 			if ($value == TRIGGER_VALUE_TRUE)
@@ -1978,7 +1988,21 @@ sub get_incidents
 		my $value = $row_ref->[2];
 		my $false_positive = $row_ref->[3];
 
-		dbg("$eventid: clock:" . ts_str($clock) . " ($clock), value:$value, false_positive:$false_positive") if (opt('debug'));
+		dbg("reading event $eventid: clock:" . ts_str($clock) . " ($clock), value:", ($value == 0 ? 'OK' : 'PROBLEM'), ", false_positive:$false_positive") if (opt('debug'));
+
+		# ignore non-resolved false_positive incidents (corner case)
+		if ($value == TRIGGER_VALUE_TRUE && $last_trigger_value == TRIGGER_VALUE_TRUE)
+		{
+			my $idx = scalar(@incidents) - 1;
+
+			if ($incidents[$idx]->{'false_positive'} != 0)
+			{
+				# replace with current
+				$incidents[$idx]->{'eventid'} = $eventid;
+				$incidents[$idx]->{'false_positive'} = $false_positive;
+				$incidents[$idx]->{'start'} = $clock;
+			}
+		}
 
 		next if ($value == $last_trigger_value);
 
@@ -2700,9 +2724,16 @@ sub parse_opts
 
 sub parse_avail_opts
 {
-	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.usage';
+	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.avail.usage';
 
 	parse_opts('from=n', 'period=n');
+}
+
+sub parse_rollweek_opts
+{
+	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.rollweek.usage';
+
+	parse_opts('from=n', 'tld=s');
 }
 
 sub opt

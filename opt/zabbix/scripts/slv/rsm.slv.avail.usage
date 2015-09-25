@@ -1,10 +1,10 @@
 =head1 NAME
 
-rsm.slv.*.pl - scripts to calculate different service status results and save to the database
+rsm.slv.*.avail.pl - scripts to calculate different service status results and save to the database
 
 =head1 SYNOPSIS
 
-rsm.slv.*.pl [--from <timestamp>] [--period minutes] [--dry-run] [--warnslow <seconds>] [--debug] [--help]
+rsm.slv.*.avail.pl [--from <timestamp>] [--period minutes] [--dry-run] [--warnslow <seconds>] [--debug] [--help]
 
 =head1 OPTIONS
 
@@ -43,11 +43,11 @@ Print a brief help message and exit.
 
 =head1 DESCRIPTION
 
-B<These scripts> are meant to be run by cron but can be run manually in order to conver the data in
+B<These scripts> are meant to be run by cron but can be run manually in order to cover the data in
 time periods when cron was not running.
 
 =head1 EXAMPLES
 
-./rsm.slv.*.pl --from 1420063200 --period 10
+./rsm.slv.*.avail.pl --from 1420063200 --period 10
 
 =cut
