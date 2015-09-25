@@ -2756,14 +2756,11 @@ $form-icon-btn: (
 	margin: 5px 0;
 	background-color: $ui-bg-color;
 	@extend %webkit-scrollbar;
-	//@extend .debug-output;
 	@extend %scroll-vert-shadow;
 }
 
 .overlay-descr-url {
-	padding: 2px 11px 5px 11px;
-	margin: 0 0 3px 0;
-	border-bottom: 1px dashed $table-border-color;
+	padding: 3px 11px 7px 11px;
 }
 
 %scroll-vert-shadow {
