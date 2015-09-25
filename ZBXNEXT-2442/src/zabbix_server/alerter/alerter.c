@@ -34,7 +34,37 @@
 
 extern unsigned char	process_type, daemon_type;
 extern int		server_num, process_num;
-extern int		CONFIG_ALERTER_FORKS;
+
+/******************************************************************************
+ *                                                                            *
+ * Function: ger_alerter_process_type_of_media                                *
+ *                                                                            *
+ * Purpose: returns type of media handled by particular alerter type          *
+ *                                                                            *
+ * Parameters: proc_type - [IN] process type; ZBX_PROCESS_TYPE_*_ALERTER      *
+ *                                                                            *
+ * Return value: type of media handle by the alerter (see zbx_media_type_t)   *
+ *                                                                            *
+ ******************************************************************************/
+static int	ger_alerter_process_type_of_media(unsigned char proc_type)
+{
+	switch (proc_type)
+	{
+		case ZBX_PROCESS_TYPE_EMAIL_ALERTER:
+			return MEDIA_TYPE_EMAIL;
+		case ZBX_PROCESS_TYPE_SCRIPT_ALERTER:
+			return MEDIA_TYPE_EXEC;
+		case ZBX_PROCESS_TYPE_SMS_ALERTER:
+			return MEDIA_TYPE_SMS;
+		case ZBX_PROCESS_TYPE_JABBER_ALERTER:
+			return MEDIA_TYPE_JABBER;
+		case ZBX_PROCESS_TYPE_EZ_TEXTING_ALERTER:
+			return MEDIA_TYPE_EZ_TEXTING;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	exit(EXIT_FAILURE);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -178,12 +208,14 @@ ZBX_THREAD_ENTRY(alerter_thread, args)
 					"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,a.retries"
 				" from alerts a,media_type mt"
 				" where MOD(a.alertid, %d)=%d"
+					" and mt.type=%d"
 					" and a.mediatypeid=mt.mediatypeid"
 					" and a.status=%d"
 					" and a.alerttype=%d"
 				" order by a.alertid",
-				CONFIG_ALERTER_FORKS,
+				get_process_type_forks(process_type),
 				process_num - 1,
+				ger_alerter_process_type_of_media(process_type),
 				ALERT_STATUS_NOT_SENT,
 				ALERT_TYPE_MESSAGE);
 

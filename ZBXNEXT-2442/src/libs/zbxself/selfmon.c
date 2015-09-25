@@ -66,7 +66,11 @@ extern int	CONFIG_PROXYPOLLER_FORKS;
 extern int	CONFIG_ESCALATOR_FORKS;
 extern int	CONFIG_HISTSYNCER_FORKS;
 extern int	CONFIG_DISCOVERER_FORKS;
-extern int	CONFIG_ALERTER_FORKS;
+extern int	CONFIG_EMAIL_ALERTER_FORKS;
+extern int	CONFIG_SCRIPT_ALERTER_FORKS;
+extern int	CONFIG_SMS_ALERTER_FORKS;
+extern int	CONFIG_JABBER_ALERTER_FORKS;
+extern int	CONFIG_EZ_TEXTING_ALERTER_FORKS;
 extern int	CONFIG_TIMER_FORKS;
 extern int	CONFIG_HOUSEKEEPER_FORKS;
 extern int	CONFIG_WATCHDOG_FORKS;
@@ -123,8 +127,16 @@ int	get_process_type_forks(unsigned char proc_type)
 			return CONFIG_HISTSYNCER_FORKS;
 		case ZBX_PROCESS_TYPE_DISCOVERER:
 			return CONFIG_DISCOVERER_FORKS;
-		case ZBX_PROCESS_TYPE_ALERTER:
-			return CONFIG_ALERTER_FORKS;
+		case ZBX_PROCESS_TYPE_EMAIL_ALERTER:
+			return CONFIG_EMAIL_ALERTER_FORKS;
+		case ZBX_PROCESS_TYPE_SCRIPT_ALERTER:
+			return CONFIG_SCRIPT_ALERTER_FORKS;
+		case ZBX_PROCESS_TYPE_SMS_ALERTER:
+			return CONFIG_SMS_ALERTER_FORKS;
+		case ZBX_PROCESS_TYPE_JABBER_ALERTER:
+			return CONFIG_JABBER_ALERTER_FORKS;
+		case ZBX_PROCESS_TYPE_EZ_TEXTING_ALERTER:
+			return CONFIG_EZ_TEXTING_ALERTER_FORKS;
 		case ZBX_PROCESS_TYPE_TIMER:
 			return CONFIG_TIMER_FORKS;
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:
@@ -195,8 +207,16 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "history syncer";
 		case ZBX_PROCESS_TYPE_DISCOVERER:
 			return "discoverer";
-		case ZBX_PROCESS_TYPE_ALERTER:
-			return "alerter";
+		case ZBX_PROCESS_TYPE_EMAIL_ALERTER:
+			return "e-mail alerter";
+		case ZBX_PROCESS_TYPE_SCRIPT_ALERTER:
+			return "script alerter";
+		case ZBX_PROCESS_TYPE_SMS_ALERTER:
+			return "sms alerter";
+		case ZBX_PROCESS_TYPE_JABBER_ALERTER:
+			return "jabber alerter";
+		case ZBX_PROCESS_TYPE_EZ_TEXTING_ALERTER:
+			return "ez texting alerter";
 		case ZBX_PROCESS_TYPE_TIMER:
 			return "timer";
 		case ZBX_PROCESS_TYPE_HOUSEKEEPER:

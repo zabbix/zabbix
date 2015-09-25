@@ -116,26 +116,30 @@ unsigned char	process_type		= ZBX_PROCESS_TYPE_UNKNOWN;
 int		process_num		= 0;
 int		server_num		= 0;
 
-int	CONFIG_ALERTER_FORKS		= 1;
-int	CONFIG_DISCOVERER_FORKS		= 1;
-int	CONFIG_HOUSEKEEPER_FORKS	= 1;
-int	CONFIG_PINGER_FORKS		= 1;
-int	CONFIG_POLLER_FORKS		= 5;
-int	CONFIG_UNREACHABLE_POLLER_FORKS	= 1;
-int	CONFIG_HTTPPOLLER_FORKS		= 1;
-int	CONFIG_IPMIPOLLER_FORKS		= 0;
-int	CONFIG_TIMER_FORKS		= 1;
-int	CONFIG_TRAPPER_FORKS		= 5;
-int	CONFIG_SNMPTRAPPER_FORKS	= 0;
-int	CONFIG_JAVAPOLLER_FORKS		= 0;
-int	CONFIG_ESCALATOR_FORKS		= 1;
-int	CONFIG_SELFMON_FORKS		= 1;
-int	CONFIG_WATCHDOG_FORKS		= 1;
-int	CONFIG_DATASENDER_FORKS		= 0;
-int	CONFIG_HEARTBEAT_FORKS		= 0;
-int	CONFIG_COLLECTOR_FORKS		= 0;
-int	CONFIG_PASSIVE_FORKS		= 0;
-int	CONFIG_ACTIVE_FORKS		= 0;
+int	CONFIG_EMAIL_ALERTER_FORKS		= 1;
+int	CONFIG_SCRIPT_ALERTER_FORKS		= 1;
+int	CONFIG_SMS_ALERTER_FORKS		= 1;
+int	CONFIG_JABBER_ALERTER_FORKS		= 1;
+int	CONFIG_EZ_TEXTING_ALERTER_FORKS		= 1;
+int	CONFIG_DISCOVERER_FORKS			= 1;
+int	CONFIG_HOUSEKEEPER_FORKS		= 1;
+int	CONFIG_PINGER_FORKS			= 1;
+int	CONFIG_POLLER_FORKS			= 5;
+int	CONFIG_UNREACHABLE_POLLER_FORKS		= 1;
+int	CONFIG_HTTPPOLLER_FORKS			= 1;
+int	CONFIG_IPMIPOLLER_FORKS			= 0;
+int	CONFIG_TIMER_FORKS			= 1;
+int	CONFIG_TRAPPER_FORKS			= 5;
+int	CONFIG_SNMPTRAPPER_FORKS		= 0;
+int	CONFIG_JAVAPOLLER_FORKS			= 0;
+int	CONFIG_ESCALATOR_FORKS			= 1;
+int	CONFIG_SELFMON_FORKS			= 1;
+int	CONFIG_WATCHDOG_FORKS			= 1;
+int	CONFIG_DATASENDER_FORKS			= 0;
+int	CONFIG_HEARTBEAT_FORKS			= 0;
+int	CONFIG_COLLECTOR_FORKS			= 0;
+int	CONFIG_PASSIVE_FORKS			= 0;
+int	CONFIG_ACTIVE_FORKS			= 0;
 
 int	CONFIG_LISTEN_PORT		= ZBX_DEFAULT_SERVER_PORT;
 char	*CONFIG_LISTEN_IP		= NULL;
@@ -254,10 +258,30 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		*local_process_type = ZBX_PROCESS_TYPE_PINGER;
 		*local_process_num = local_server_num - server_count + CONFIG_PINGER_FORKS;
 	}
-	else if (local_server_num <= (server_count += CONFIG_ALERTER_FORKS))
+	else if (local_server_num <= (server_count += CONFIG_EMAIL_ALERTER_FORKS))
 	{
-		*local_process_type = ZBX_PROCESS_TYPE_ALERTER;
-		*local_process_num = local_server_num - server_count + CONFIG_ALERTER_FORKS;
+		*local_process_type = ZBX_PROCESS_TYPE_EMAIL_ALERTER;
+		*local_process_num = local_server_num - server_count + CONFIG_EMAIL_ALERTER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_SCRIPT_ALERTER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SCRIPT_ALERTER;
+		*local_process_num = local_server_num - server_count + CONFIG_SCRIPT_ALERTER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_SMS_ALERTER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_SMS_ALERTER;
+		*local_process_num = local_server_num - server_count + CONFIG_SMS_ALERTER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_JABBER_ALERTER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_JABBER_ALERTER;
+		*local_process_num = local_server_num - server_count + CONFIG_JABBER_ALERTER_FORKS;
+	}
+	else if (local_server_num <= (server_count += CONFIG_EZ_TEXTING_ALERTER_FORKS))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_EZ_TEXTING_ALERTER;
+		*local_process_num = local_server_num - server_count + CONFIG_EZ_TEXTING_ALERTER_FORKS;
 	}
 	else if (local_server_num <= (server_count += CONFIG_HOUSEKEEPER_FORKS))
 	{
@@ -465,7 +489,15 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			1000},
 		{"StartJavaPollers",		&CONFIG_JAVAPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
-		{"StartAlerters",		&CONFIG_ALERTER_FORKS,			TYPE_INT,
+		{"StartEmailAlerters",		&CONFIG_EMAIL_ALERTER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartScriptAlerters",		&CONFIG_SCRIPT_ALERTER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartSMSAlerters",		&CONFIG_SMS_ALERTER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartJabberAlerters",		&CONFIG_JABBER_ALERTER_FORKS,		TYPE_INT,
+			PARM_OPT,	0,			1000},
+		{"StartEzTextingAlerters",	&CONFIG_EZ_TEXTING_ALERTER_FORKS,	TYPE_INT,
 			PARM_OPT,	0,			1000},
 		{"JavaGateway",			&CONFIG_JAVA_GATEWAY,			TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -823,11 +855,12 @@ int	MAIN_ZABBIX_ENTRY()
 
 	threads_num = CONFIG_CONFSYNCER_FORKS + CONFIG_WATCHDOG_FORKS + CONFIG_POLLER_FORKS
 			+ CONFIG_UNREACHABLE_POLLER_FORKS + CONFIG_TRAPPER_FORKS + CONFIG_PINGER_FORKS
-			+ CONFIG_ALERTER_FORKS + CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS
-			+ CONFIG_HTTPPOLLER_FORKS + CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS
-			+ CONFIG_ESCALATOR_FORKS + CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS
-			+ CONFIG_SNMPTRAPPER_FORKS + CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS
-			+ CONFIG_VMWARE_FORKS;
+			+ CONFIG_EMAIL_ALERTER_FORKS + CONFIG_SCRIPT_ALERTER_FORKS + CONFIG_SMS_ALERTER_FORKS
+			+ CONFIG_JABBER_ALERTER_FORKS + CONFIG_EZ_TEXTING_ALERTER_FORKS
+			+ CONFIG_HOUSEKEEPER_FORKS + CONFIG_TIMER_FORKS + CONFIG_HTTPPOLLER_FORKS
+			+ CONFIG_DISCOVERER_FORKS + CONFIG_HISTSYNCER_FORKS + CONFIG_ESCALATOR_FORKS
+			+ CONFIG_IPMIPOLLER_FORKS + CONFIG_JAVAPOLLER_FORKS + CONFIG_SNMPTRAPPER_FORKS
+			+ CONFIG_PROXYPOLLER_FORKS + CONFIG_SELFMON_FORKS + CONFIG_VMWARE_FORKS;
 	threads = zbx_calloc(threads, threads_num, sizeof(pid_t));
 
 	if (0 != CONFIG_TRAPPER_FORKS)
@@ -880,7 +913,11 @@ int	MAIN_ZABBIX_ENTRY()
 			case ZBX_PROCESS_TYPE_PINGER:
 				threads[i] = zbx_thread_start(pinger_thread, &thread_args);
 				break;
-			case ZBX_PROCESS_TYPE_ALERTER:
+			case ZBX_PROCESS_TYPE_EMAIL_ALERTER:
+			case ZBX_PROCESS_TYPE_SCRIPT_ALERTER:
+			case ZBX_PROCESS_TYPE_SMS_ALERTER:
+			case ZBX_PROCESS_TYPE_JABBER_ALERTER:
+			case ZBX_PROCESS_TYPE_EZ_TEXTING_ALERTER:
 				threads[i] = zbx_thread_start(alerter_thread, &thread_args);
 				break;
 			case ZBX_PROCESS_TYPE_HOUSEKEEPER:
