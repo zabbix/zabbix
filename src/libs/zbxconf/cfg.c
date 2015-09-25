@@ -373,7 +373,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	FILE		*file;
 	int		i, lineno, param_valid;
-	char		line[MAX_STRING_LEN + 1], *parameter, *value;
+	char		line[MAX_STRING_LEN + 1], *parameter, *value, *s;
 	zbx_uint64_t	var;
 #ifdef _WINDOWS
 	wchar_t		*wcfg_file;
@@ -399,8 +399,10 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
-			/* only 2048 character (inc. '\n' or '\0') single lines supported in the config file */
-			if(MAX_STRING_LEN <= strlen(line))
+			/* check if line length exceeds limit (max. 2047 bytes) */
+			s = line;
+			zbx_rtrim(s, "\r\n");
+			if (MAX_STRING_LEN <= strlen(s))
 				goto line_too_long;
 
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
