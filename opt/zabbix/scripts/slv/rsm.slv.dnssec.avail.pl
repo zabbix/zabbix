@@ -31,7 +31,17 @@ my $period = (opt('period') ? getopt('period') : 1);
 
 my $last_avail_time = get_last_time_till($now);
 
-my $tlds_ref = get_tlds();
+my $tlds_ref;
+if (opt('tld'))
+{
+        fail("TLD ", getopt('tld'), " does not exist.") if (tld_exists(getopt('tld')) == 0);
+
+        $tlds_ref = [ getopt('tld') ];
+}
+else
+{
+        $tlds_ref = get_tlds();
+}
 
 while ($period > 0)
 {
@@ -51,9 +61,11 @@ while ($period > 0)
 	{
 		$tld = $_;
 
-		my $lastclock = get_lastclock($tld, $cfg_key_out);
-		fail("configuration error: item \"$cfg_key_out\" not found at host \"$tld\"") if ($lastclock == E_FAIL);
-		next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
+		if (avail_value_exists($value_ts, get_itemid_by_host($tld, $cfg_key_out)) == SUCCESS)
+		{
+			# value already exists
+			next unless (opt('dry-run'));
+		}
 
 		if ($probes_count < $cfg_minonline)
 		{

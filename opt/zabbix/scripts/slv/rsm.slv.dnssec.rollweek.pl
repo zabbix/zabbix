@@ -34,7 +34,7 @@ if (opt('tld'))
 }
 else
 {
-        $tlds_ref = get_tlds('RDDS');
+        $tlds_ref = get_tlds();
 }
 
 init_values();
@@ -45,7 +45,12 @@ foreach (@$tlds_ref)
 	$tld = $_;
 
 	my ($itemid_in, $itemid_out, $lastclock) = get_item_data($tld, $cfg_key_in, $cfg_key_out);
-	next if (check_lastclock($lastclock, $value_ts, $interval) != SUCCESS);
+
+	if (rollweek_value_exists($value_ts, $itemid_out) == SUCCESS)
+	{
+		# value already exists
+		next unless (opt('dry-run'));
+	}
 
 	my $downtime = get_downtime($itemid_in, $from, $till);
 	my $perc = sprintf("%.3f", $downtime * 100 / $cfg_sla);

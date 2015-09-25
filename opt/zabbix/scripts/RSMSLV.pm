@@ -84,12 +84,13 @@ our @EXPORT = qw($result $dbh $tld
 		minutes_last_month get_last_time_till get_online_probes get_probe_times probe_offline_at
 		probes2tldhostids init_values
 		push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly process_slv_avail
-		process_slv_ns_avail process_slv_monthly get_results get_item_values check_lastclock sql_time_condition
-		get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg get_current_value
-		get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result get_result_string
-		get_tld_by_trigger truncate_from alerts_enabled get_test_start_time get_real_services_period
-		dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts parse_avail_opts
-		parse_rollweek_opts opt getopt setopt optkeys ts_str selected_period write_file usage);
+		process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
+		rollweek_value_exists
+		sql_time_condition get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
+		get_current_value get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result
+		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
+		get_real_services_period dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts
+		parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str selected_period write_file usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -1820,21 +1821,28 @@ sub get_item_values
 	return \%result;
 }
 
-sub check_lastclock
+sub avail_value_exists
 {
-	my $lastclock = shift;
-	my $value_ts = shift;
-	my $interval = shift;
+        my $clock = shift;
+        my $itemid = shift;
 
-	return SUCCESS if (opt('dry-run'));
+        my $rows_ref = db_select("select 1 from history_uint where itemid=$itemid and clock=$clock");
 
-	if ($lastclock + $interval > $value_ts)
-	{
-		dbg("lastclock:$lastclock value calculation not needed");
-		return E_FAIL;
-	}
+        return SUCCESS if ($rows_ref->[0]->[0]);
 
-	return SUCCESS;
+        return E_FAIL;
+}
+
+sub rollweek_value_exists
+{
+        my $clock = shift;
+        my $itemid = shift;
+
+        my $rows_ref = db_select("select 1 from history where itemid=$itemid and clock=$clock");
+
+        return SUCCESS if ($rows_ref->[0]->[0]);
+
+        return E_FAIL;
 }
 
 sub __make_incident
@@ -2726,14 +2734,14 @@ sub parse_avail_opts
 {
 	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.avail.usage';
 
-	parse_opts('from=n', 'period=n');
+	parse_opts('tld=s', 'from=n', 'period=n');
 }
 
 sub parse_rollweek_opts
 {
 	$POD2USAGE_FILE = '/opt/zabbix/scripts/slv/rsm.slv.rollweek.usage';
 
-	parse_opts('from=n', 'tld=s');
+	parse_opts('tld=s', 'from=n');
 }
 
 sub opt
