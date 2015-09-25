@@ -432,7 +432,7 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
  ******************************************************************************/
 int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error)
 {
-	static const char *proxytable[] =
+	static const char	*proxytable[] =
 	{
 		"globalmacro",
 		"hosts",
@@ -1026,7 +1026,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 						break;
 					default:
 						*error = zbx_dsprintf(*error, "unsupported field type %d in \"%s.%s\"",
-								fields[f]->type, table->table, fields[f]->name);
+								(int)fields[f]->type, table->table, fields[f]->name);
 						zbx_free(value);
 						goto clean;
 
