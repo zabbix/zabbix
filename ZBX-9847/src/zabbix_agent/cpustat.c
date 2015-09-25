@@ -180,19 +180,16 @@ clean:
 		exit(EXIT_FAILURE);
 	}
 
+	pcpus->cpu[0].cpu_num = ZBX_CPUNUM_ALL;
+
 #ifndef HAVE_KSTAT_H
-	for (idx = 0; idx <= pcpus->count; idx++)
-	{
-		if (0 == idx)
-			pcpus->cpu[idx].cpu_num = 0;
-		else
-			pcpus->cpu[idx].cpu_num = idx - 1;
-	}
+
+	for (idx = 1; idx <= pcpus->count; idx++)
+		pcpus->cpu[idx].cpu_num = idx - 1;
 #else
 	/* Solaris */
 
 	/* CPU instance numbers on Solaris can be non-contiguous, we don't know them yet */
-	pcpus->cpu[0].cpu_num = 0;
 	for (idx = 1; idx <= pcpus->count; idx++)
 		pcpus->cpu[idx].cpu_num = ZBX_CPUNUM_UNDEF;
 
@@ -427,7 +424,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		}
 		else
 		{
-			if (-1 == pstat_getprocessor(&psp, sizeof(psp), 1, &pcpus->cpu[idx].cpu_num))
+			if (-1 == pstat_getprocessor(&psp, sizeof(psp), 1, pcpus->cpu[idx].cpu_num))
 			{
 				update_cpu_counters(&pcpus->cpu[idx], NULL);
 				continue;
@@ -650,10 +647,7 @@ static ZBX_SINGLE_CPU_STAT_DATA	*get_cpustat_by_num(ZBX_CPUS_STAT_DATA *pcpus, i
 {
 	int	idx;
 
-	if (ZBX_CPUNUM_ALL == cpu_num)
-		return &pcpus->cpu[0];
-
-	for (idx = 1; idx <= pcpus->count; idx++)
+	for (idx = 0; idx <= pcpus->count; idx++)
 	{
 		if (pcpus->cpu[idx].cpu_num == cpu_num)
 			return &pcpus->cpu[idx];
