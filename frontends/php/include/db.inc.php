@@ -52,13 +52,19 @@ function DBconnect(&$error) {
 
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
-				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
-				if (!$DB['DB']) {
-					$error = 'Error connecting to database: '.trim(mysqli_connect_error());
-					$result = false;
+				if(function_exists('mysqli_connect')) {
+					$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
+					if (!$DB['DB']) {
+						$error = 'Error connecting to database: '.trim(mysqli_connect_error());
+						$result = false;
+					}
+					else {
+						DBexecute('SET NAMES utf8');
+					}
 				}
 				else {
-					DBexecute('SET NAMES utf8');
+					$error = 'Missing database';
+					$result = false;
 				}
 
 				if ($result) {
@@ -73,27 +79,33 @@ function DBconnect(&$error) {
 					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
 					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
-				$DB['DB']= @pg_connect($pg_connection_string);
-				if (!$DB['DB']) {
-					$error = 'Error connecting to database.';
-					$result = false;
-				}
-				else {
-					$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'), true);
-
-					if(!$schemaSet) {
-						clear_messages();
-						$error = pg_last_error();
+				if(function_exists('pg_connect')) {
+					$DB['DB']= @pg_connect($pg_connection_string);
+					if (!$DB['DB']) {
+						$error = 'Error connecting to database.';
 						$result = false;
 					}
 					else {
-						if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
-							if ((int) $pgsql_version >= 9) {
-								// change the output format for values of type bytea from hex (the default) to escape
-								DBexecute('SET bytea_output = escape');
+						$schemaSet = DBexecute('SET search_path = '.zbx_dbstr($DB['SCHEMA'] ? $DB['SCHEMA'] : 'public'), true);
+
+						if(!$schemaSet) {
+							clear_messages();
+							$error = pg_last_error();
+							$result = false;
+						}
+						else {
+							if (false !== ($pgsql_version = pg_parameter_status('server_version'))) {
+								if ((int) $pgsql_version >= 9) {
+									// change the output format for values of type bytea from hex (the default) to escape
+									DBexecute('SET bytea_output = escape');
+								}
 							}
 						}
 					}
+				}
+				else {
+					$error = 'Missing database';
+					$result = false;
 				}
 
 				if ($result) {
@@ -113,13 +125,19 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
-				if ($DB['DB']) {
-					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
+				if(function_exists('oci_connect')) {
+					$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
+					if ($DB['DB']) {
+						DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
+					}
+					else {
+						$ociError = oci_error();
+						$error = 'Error connecting to database: '.$ociError['message'];
+						$result = false;
+					}
 				}
 				else {
-					$ociError = oci_error();
-					$error = 'Error connecting to database: '.$ociError['message'];
+					$error = 'Missing database';
 					$result = false;
 				}
 
@@ -136,19 +154,25 @@ function DBconnect(&$error) {
 				$connect .= 'UID='.$DB['USER'].';';
 				$connect .= 'PWD='.$DB['PASSWORD'].';';
 
-				$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
-				if (!$DB['DB']) {
-					$error = 'Error connecting to database: '.db2_conn_errormsg();
-					$result = false;
+				if(function_exists('db2_connect')) {
+					$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
+					if (!$DB['DB']) {
+						$error = 'Error connecting to database: '.db2_conn_errormsg();
+						$result = false;
+					}
+					else {
+						$options = [
+							'db2_attr_case' => DB2_CASE_LOWER,
+						];
+						db2_set_option($DB['DB'], $options, 1);
+						if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
+							DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
+						}
+					}
 				}
 				else {
-					$options = [
-						'db2_attr_case' => DB2_CASE_LOWER,
-					];
-					db2_set_option($DB['DB'], $options, 1);
-					if (isset($DB['SCHEMA']) && $DB['SCHEMA'] != '') {
-						DBexecute('SET CURRENT SCHEMA='.zbx_dbstr($DB['SCHEMA']));
-					}
+					$error = 'Missing database';
+					$result = false;
 				}
 
 				if ($result) {
