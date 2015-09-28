@@ -46,11 +46,7 @@
 
 		// Trim spaces on submit and depending on checkboxes, create a value for hidden field 'tls_accept'.
 		jQuery('#proxyForm').submit(function() {
-			jQuery('#host').val(jQuery.trim(jQuery('#host').val()));
-			jQuery('#ip').val(jQuery.trim(jQuery('#ip').val()));
-			jQuery('#dns').val(jQuery.trim(jQuery('#dns').val()));
-			jQuery('#port').val(jQuery.trim(jQuery('#port').val()));
-			jQuery('#description').val(jQuery.trim(jQuery('#description').val()));
+			jQuery(this).trimValues(['#host', '#ip', '#dns', '#port', '#description']);
 			jQuery('#tls_accept').val(getTlsAccept());
 		});
 

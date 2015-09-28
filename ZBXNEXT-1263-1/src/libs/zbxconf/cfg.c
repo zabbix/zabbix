@@ -150,7 +150,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 
 	if (NULL != strchr(p + 1, PATH_SEPARATOR))
 	{
-		zbx_error("%s: glob pattern should be the last component of the path\n", glob);
+		zbx_error("%s: glob pattern should be the last component of the path", glob);
 		return FAIL;
 	}
 
@@ -158,7 +158,7 @@ static int	parse_glob(const char *glob, char **path, char **pattern)
 	{
 		if (glob == p)
 		{
-			zbx_error("%s: path should be absolute\n", glob);
+			zbx_error("%s: path should be absolute", glob);
 			return FAIL;
 		}
 
@@ -266,7 +266,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line 
 
 	if (NULL == (dir = opendir(path)))
 	{
-		zbx_error("%s: %s\n", path, zbx_strerror(errno));
+		zbx_error("%s: %s", path, zbx_strerror(errno));
 		goto out;
 	}
 
@@ -288,7 +288,7 @@ static int	parse_cfg_dir(const char *path, const char *pattern, struct cfg_line 
 close:
 	if (0 != closedir(dir))
 	{
-		zbx_error("%s: %s\n", path, zbx_strerror(errno));
+		zbx_error("%s: %s", path, zbx_strerror(errno));
 		ret = FAIL;
 	}
 
@@ -324,7 +324,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	if (0 != zbx_stat(path, &sb))
 	{
-		zbx_error("%s: %s\n", path, zbx_strerror(errno));
+		zbx_error("%s: %s", path, zbx_strerror(errno));
 		goto clean;
 	}
 
@@ -336,7 +336,7 @@ static int	parse_cfg_object(const char *cfg_file, struct cfg_line *cfg, int leve
 			goto clean;
 		}
 
-		zbx_error("%s: base path is not a directory\n", cfg_file);
+		zbx_error("%s: base path is not a directory", cfg_file);
 		goto clean;
 	}
 
@@ -375,7 +375,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	FILE		*file;
 	int		i, lineno, param_valid;
-	char		line[MAX_STRING_LEN], *parameter, *value;
+	char		line[MAX_STRING_LEN + 1], *parameter, *value;
 	zbx_uint64_t	var;
 #ifdef _WINDOWS
 	wchar_t		*wcfg_file;
@@ -401,6 +401,10 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
+			/* only 2048 character (inc. '\n' or '\0') single lines supported in the config file */
+			if(MAX_STRING_LEN <= strlen(line))
+				goto line_too_long;
+
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
 			zbx_rtrim(line, ZBX_CFG_RTRIM_CHARS);
 
@@ -514,27 +518,31 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 cannot_open:
 	if (0 != optional)
 		return SUCCEED;
-	zbx_error("cannot open config file [%s]: %s", cfg_file, zbx_strerror(errno));
+	zbx_error("cannot open config file \"%s\": %s", cfg_file, zbx_strerror(errno));
+	goto error;
+line_too_long:
+	fclose(file);
+	zbx_error("line %d exceeds %d byte length limit in config file \"%s\"", lineno, MAX_STRING_LEN - 1, cfg_file);
 	goto error;
 non_utf8:
 	fclose(file);
-	zbx_error("non-UTF-8 character at line %d (%s) in config file [%s]", lineno, line, cfg_file);
+	zbx_error("non-UTF-8 character at line %d \"%s\" in config file \"%s\"", lineno, line, cfg_file);
 	goto error;
 non_key_value:
 	fclose(file);
-	zbx_error("invalid entry [%s] (not following \"parameter=value\" notation) in config file [%s], line %d",
+	zbx_error("invalid entry \"%s\" (not following \"parameter=value\" notation) in config file \"%s\", line %d",
 			line, cfg_file, lineno);
 	goto error;
 incorrect_config:
 	fclose(file);
-	zbx_error("wrong value of [%s] in config file [%s], line %d", cfg[i].parameter, cfg_file, lineno);
+	zbx_error("wrong value of \"%s\" in config file \"%s\", line %d", cfg[i].parameter, cfg_file, lineno);
 	goto error;
 unknown_parameter:
 	fclose(file);
-	zbx_error("unknown parameter [%s] in config file [%s], line %d", parameter, cfg_file, lineno);
+	zbx_error("unknown parameter \"%s\" in config file \"%s\", line %d", parameter, cfg_file, lineno);
 	goto error;
 missing_mandatory:
-	zbx_error("missing mandatory parameter [%s] in config file [%s]", cfg[i].parameter, cfg_file);
+	zbx_error("missing mandatory parameter \"%s\" in config file \"%s\"", cfg[i].parameter, cfg_file);
 error:
 	exit(EXIT_FAILURE);
 }
