@@ -535,38 +535,29 @@ class CUser extends CApiService {
 		$this->validateDelete($userIds);
 
 		// delete action operation msg
-		$operationids = [];
-		$dbOperations = DBselect(
+		$dbOperations = DBFetchArray(DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
 			' WHERE '.dbConditionInt('om.userid', $userIds)
-		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-		}
+		));
 
 		DB::delete('opmessage_usr', ['userid' => $userIds]);
 
 		// delete empty operations
-		$delOperationids = [];
-		$dbOperations = DBselect(
-			'SELECT DISTINCT o.operationid'.
+		$delOperations = DBFetchArray(DBselect(
+			'SELECT DISTINCT o.operationid,o.actionid'.
 			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', $operationids).
+			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($dbOperations, 'operationid')).
 				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
 				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
-		);
-		while ($dbOperation = DBfetch($dbOperations)) {
-			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];
-		}
+		));
 
-		DB::delete('operations', ['operationid' => $delOperationids]);
+		DB::delete('operations', ['operationid' => zbx_objectValues($delOperations, 'operationid')]);
 		DB::delete('media', ['userid' => $userIds]);
 		DB::delete('profiles', ['userid' => $userIds]);
 		DB::delete('users_groups', ['userid' => $userIds]);
 		DB::delete('users', ['userid' => $userIds]);
-
-		API::Action()->disableActionsWithoutOperations();
+		disableActionsWithoutOperations(zbx_objectValues($delOperations, 'actionid'));
 
 		return ['userids' => $userIds];
 	}
