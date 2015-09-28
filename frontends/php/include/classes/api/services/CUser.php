@@ -527,39 +527,39 @@ class CUser extends CApiService {
 	/**
 	 * Delete user.
 	 *
-	 * @param array $userIds
+	 * @param array $userids
 	 *
 	 * @return array
 	 */
-	public function delete(array $userIds) {
-		$this->validateDelete($userIds);
+	public function delete(array $userids) {
+		$this->validateDelete($userids);
 
 		// delete action operation msg
-		$dbOperations = DBFetchArray(DBselect(
+		$db_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_usr om'.
-			' WHERE '.dbConditionInt('om.userid', $userIds)
+			' WHERE '.dbConditionInt('om.userid', $userids)
 		));
 
-		DB::delete('opmessage_usr', ['userid' => $userIds]);
+		DB::delete('opmessage_usr', ['userid' => $userids]);
 
 		// delete empty operations
-		$delOperations = DBFetchArray(DBselect(
+		$del_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT o.operationid,o.actionid'.
 			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($dbOperations, 'operationid')).
+			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($db_operations, 'operationid')).
 				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
 				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
 		));
 
-		DB::delete('operations', ['operationid' => zbx_objectValues($delOperations, 'operationid')]);
-		DB::delete('media', ['userid' => $userIds]);
-		DB::delete('profiles', ['userid' => $userIds]);
-		DB::delete('users_groups', ['userid' => $userIds]);
-		DB::delete('users', ['userid' => $userIds]);
-		disableActionsWithoutOperations(zbx_objectValues($delOperations, 'actionid'));
+		DB::delete('operations', ['operationid' => zbx_objectValues($del_operations, 'operationid')]);
+		DB::delete('media', ['userid' => $userids]);
+		DB::delete('profiles', ['userid' => $userids]);
+		DB::delete('users_groups', ['userid' => $userids]);
+		DB::delete('users', ['userid' => $userids]);
+		disableActionsWithoutOperations(zbx_objectValues($del_operations, 'actionid'));
 
-		return ['userids' => $userIds];
+		return ['userids' => $userids];
 	}
 
 	/**
