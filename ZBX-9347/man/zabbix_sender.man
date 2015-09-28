@@ -34,12 +34,7 @@ An example of a line of the input file:
 
 \fB "Zabbix server" item1 sometext\fR
 
-Zabbix sender will send up to 250 values in one connection. For example when specifying input file with 300 values an output might look something like this:
-
-  # zabbix_sender -z 127.0.0.1 -i /tmp/traptest.txt
-  Info from server: "Processed 250 Failed 0 Total 250 Seconds spent 0.002668"
-  Info from server: "Processed 50 Failed 0 Total 50 Seconds spent 0.000540"
-  sent: 300; skipped: 0; total: 300
+Zabbix sender will send up to 250 values in one connection.
 
 Entries must be formatted using the following rules:
 
