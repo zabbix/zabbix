@@ -53,6 +53,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexec\execute.o \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
 	..\..\..\src\libs\zbxsysinfo\common\common.o \
+	..\..\..\src\libs\zbxsysinfo\common\cpu.o \
 	..\..\..\src\libs\zbxsysinfo\common\file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
