@@ -528,37 +528,37 @@ class CUserGroup extends CApiService {
 	/**
 	 * Delete user groups.
 	 *
-	 * @param array $userGroupIds
+	 * @param array $usergroupids
 	 *
 	 * @return array
 	 */
-	public function delete(array $userGroupIds) {
-		$this->validateDelete($userGroupIds);
+	public function delete(array $usergroupids) {
+		$this->validateDelete($usergroupids);
 
-		$dbOperations = DBFetchArray(DBselect(
+		$db_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT om.operationid'.
 			' FROM opmessage_grp om'.
-			' WHERE '.dbConditionInt('om.usrgrpid', $userGroupIds)
+			' WHERE '.dbConditionInt('om.usrgrpid', $usergroupids)
 		));
 
-		DB::delete('opmessage_grp', ['usrgrpid' => $userGroupIds]);
+		DB::delete('opmessage_grp', ['usrgrpid' => $usergroupids]);
 
 		// delete empty operations
-		$delOperations = DBFetchArray(DBselect(
+		$del_operations = DBFetchArray(DBselect(
 			'SELECT DISTINCT o.operationid,o.actionid'.
 			' FROM operations o'.
-			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($dbOperations, 'operationid')).
+			' WHERE '.dbConditionInt('o.operationid', zbx_objectValues($db_operations, 'operationid')).
 				' AND NOT EXISTS(SELECT NULL FROM opmessage_grp omg WHERE omg.operationid=o.operationid)'.
 				' AND NOT EXISTS(SELECT NULL FROM opmessage_usr omu WHERE omu.operationid=o.operationid)'
 		));
 
-		DB::delete('operations', ['operationid' => zbx_objectValues($delOperations, 'operationid')]);
-		DB::delete('rights', ['groupid' => $userGroupIds]);
-		DB::delete('users_groups', ['usrgrpid' => $userGroupIds]);
-		DB::delete('usrgrp', ['usrgrpid' => $userGroupIds]);
-		disableActionsWithoutOperations(zbx_objectValues($delOperations, 'actionid'));
+		DB::delete('operations', ['operationid' => zbx_objectValues($del_operations, 'operationid')]);
+		DB::delete('rights', ['groupid' => $usergroupids]);
+		DB::delete('users_groups', ['usrgrpid' => $usergroupids]);
+		DB::delete('usrgrp', ['usrgrpid' => $usergroupids]);
+		disableActionsWithoutOperations(zbx_objectValues($del_operations, 'actionid'));
 
-		return ['usrgrpids' => $userGroupIds];
+		return ['usrgrpids' => $usergroupids];
 	}
 
 	/**
