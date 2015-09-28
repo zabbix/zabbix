@@ -28,7 +28,7 @@ my $now = time();
 my $clock = (opt('from') ? getopt('from') : $now - $interval - AVAIL_SHIFT_BACK);
 my $period = (opt('period') ? getopt('period') : 1);
 
-my $last_avail_time = get_last_time_till($now);
+my $max_avail_time = max_avail_time($now);
 
 my $tlds_ref;
 if (opt('tld'))
@@ -51,7 +51,7 @@ while ($period > 0)
 	$period -= $interval / 60;
 	$clock += $interval;
 
-	next if ($till > $last_avail_time);
+	next if ($till > $max_avail_time);
 
 	my $probes_ref = get_online_probes($from, $till, $probe_avail_limit, undef);
 

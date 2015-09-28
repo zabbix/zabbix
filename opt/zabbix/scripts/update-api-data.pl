@@ -140,7 +140,8 @@ my $config_minclock = __get_config_minclock();
 
 dbg("config_minclock:$config_minclock");
 
-my $last_time_till = get_last_time_till($now);
+# in order to make sure all availability data points are saved we need to go back extra minute
+my $last_time_till = max_avail_time($now) - 60;
 
 my ($check_from, $check_till, $continue_file);
 
@@ -212,6 +213,14 @@ elsif (opt('period'))
 
 fail("cannot get the beginning of calculation period") unless(defined($check_from));
 fail("cannot get the end of calculation period") unless(defined($check_till));
+
+dbg("check_from:", ts_full($check_from), " check_till:", ts_full($check_till), " last_time_till:", ts_full($last_time_till));
+
+if ($check_till < $check_from)
+{
+	info("cannot yet calculate, the latest data not fully available");
+	exit(0);
+}
 
 if ($check_till > $last_time_till)
 {
@@ -382,7 +391,7 @@ foreach (keys(%$servicedata))
 			}
 		}
 
-		dbg("getting current $service availability");
+		dbg("getting current $service availability (delay:$delay)");
 
 		# get availability
 		my $incidents = get_incidents($avail_itemid, $now);

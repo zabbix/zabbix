@@ -81,16 +81,16 @@ our @EXPORT = qw($result $dbh $tld
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
 		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select
 		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
-		minutes_last_month get_last_time_till get_online_probes get_probe_times probe_offline_at
-		probes2tldhostids init_values
-		push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly process_slv_avail
-		process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
+		minutes_last_month max_avail_time get_online_probes get_probe_times probe_offline_at probes2tldhostids
+		init_values push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly
+		process_slv_avail process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
 		rollweek_value_exists
 		sql_time_condition get_incidents get_downtime get_downtime_prepare get_downtime_execute avail_result_msg
 		get_current_value get_itemids_by_hostids get_nsip_values get_valuemaps get_statusmaps get_detailed_result
 		get_result_string get_tld_by_trigger truncate_from alerts_enabled get_test_start_time
 		get_real_services_period dbg info wrn fail format_stats_time slv_exit exit_if_running trim parse_opts
-		parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str selected_period write_file usage);
+		parse_avail_opts parse_rollweek_opts opt getopt setopt optkeys ts_str ts_full selected_period write_file
+		usage);
 
 # configuration, set in set_slv_config()
 my $config = undef;
@@ -911,7 +911,8 @@ sub minutes_last_month
 	return ($till - $from) / 60;
 }
 
-sub get_last_time_till
+# maximum timestamp for calculation of service availability
+sub max_avail_time
 {
 	my $now = shift;
 
@@ -2776,6 +2777,7 @@ sub optkeys
 sub ts_str
 {
 	my $ts = shift;
+
 	$ts = time() unless ($ts);
 
 	my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime($ts);
@@ -2784,6 +2786,17 @@ sub ts_str
 	$mon++;
 
 	return sprintf("%4.2d/%2.2d/%2.2d %2.2d:%2.2d:%2.2d", $year, $mon, $mday, $hour, $min, $sec);
+}
+
+sub ts_full
+{
+	my $ts = shift;
+
+	$ts = time() unless ($ts);
+
+	my $str = ts_str($ts);
+
+	return "$str ($ts)";
 }
 
 sub selected_period
