@@ -1,6 +1,0 @@
-JSONRPC web tool is separate web page for more convenient interactions with Zabbix API.
-There are no local dependencies for this tool, but it uses external resources from 'http://yandex.st/' and 'http://yui.yahooapis.com/'.
-In Path field you should specify path to Zabbix frontend, without 'http://' part.
-
-This tool is not officially supported by Zabbix SIA.
-If you would like to improve something, patches welcome.
