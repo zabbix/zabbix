@@ -373,7 +373,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	FILE		*file;
 	int		i, lineno, param_valid;
-	char		line[MAX_STRING_LEN + 2], *parameter, *value;
+	char		line[MAX_STRING_LEN + 3], *parameter, *value;
 	zbx_uint64_t	var;
 	size_t		len;
 #ifdef _WINDOWS
@@ -400,9 +400,9 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 #endif
 		for (lineno = 1; NULL != fgets(line, sizeof(line), file); lineno++)
 		{
-			/* check if line length exceeds limit (max. 2047 bytes) */
+			/* check if line length exceeds limit (max. 2048 bytes) */
 			len = strlen(line);
-			if (MAX_STRING_LEN <= len && NULL != strchr("\r\n", line[MAX_STRING_LEN - 1]))
+			if (MAX_STRING_LEN < len && NULL == strchr("\r\n", line[MAX_STRING_LEN]))
 				goto line_too_long;
 
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
@@ -522,7 +522,7 @@ cannot_open:
 	goto error;
 line_too_long:
 	fclose(file);
-	zbx_error("line %d exceeds %d byte length limit in config file \"%s\"", lineno, MAX_STRING_LEN - 1, cfg_file);
+	zbx_error("line %d exceeds %d byte length limit in config file \"%s\"", lineno, MAX_STRING_LEN, cfg_file);
 	goto error;
 non_utf8:
 	fclose(file);
