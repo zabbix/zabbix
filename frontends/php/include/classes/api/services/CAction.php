@@ -1935,7 +1935,7 @@ class CAction extends CApiService {
 	 *
 	 * @param $actions
 	 */
-	public function validateCreate($actions) {
+	protected function validateCreate($actions) {
 		$actionDbFields = [
 			'name'        => null,
 			'eventsource' => null
@@ -2024,7 +2024,7 @@ class CAction extends CApiService {
 	 *
 	 * @internal param array $actionDb
 	 */
-	public function validateUpdate($actions, $actionsDb) {
+	protected function validateUpdate($actions, $actionsDb) {
 		foreach ($actions as $action) {
 			if (isset($action['actionid']) && !isset($actionsDb[$action['actionid']])) {
 				self::exception(
@@ -2243,37 +2243,6 @@ class CAction extends CApiService {
 				ZBX_API_ERROR_PARAMETERS,
 				_('Incorrect action condition proxy. Proxy does not exist or you have no access to it.')
 			);
-		}
-	}
-
-	/**
-	 * Disable actions that do not have operations
-	 */
-	public function disableActionsWithoutOperations() {
-		$actions = DBFetchArray(DBselect(
-			'SELECT a.actionid'.
-			' FROM actions a'.
-			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'
-		));
-
-		self::disableActions(zbx_objectValues($actions, 'actionid'));
-	}
-
-	/**
-	 * Disable actions
-	 * @param array $actionids
-	 */
-	public function disableActions(array $actionids) {
-		if (!empty($actionids)) {
-			$update = [
-					'values' => ['status' => ACTION_STATUS_DISABLED],
-					'where' => ['actionid' => $actionids]
-			];
-			DB::update('actions', $update);
-
-			foreach($actionids as $actionid) {
-				add_audit_ext(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '', '', null, null);
-			}
 		}
 	}
 }
