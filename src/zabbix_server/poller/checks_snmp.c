@@ -713,7 +713,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 		}
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type || ASN_UNSIGNED64 == var->type ||
+	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type || ASN_OPAQUE_U64 == var->type ||
 			ASN_TIMETICKS == var->type || ASN_GAUGE == var->type)
 #else
 	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type ||
@@ -722,13 +722,17 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	{
 		SET_UI64_RESULT(result, (unsigned long)*var->val.integer);
 	}
+#ifdef OPAQUE_SPECIAL_TYPES
+	else if (ASN_COUNTER64 == var->type || ASN_OPAQUE_COUNTER64 == var->type)
+#else
 	else if (ASN_COUNTER64 == var->type)
+#endif
 	{
 		SET_UI64_RESULT(result, (((zbx_uint64_t)var->val.counter64->high) << 32) +
 				(zbx_uint64_t)var->val.counter64->low);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_INTEGER == var->type || ASN_INTEGER64 == var->type)
+	else if (ASN_INTEGER == var->type || ASN_OPAQUE_I64 == var->type)
 #else
 	else if (ASN_INTEGER == var->type)
 #endif
@@ -741,11 +745,11 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 			ret = NOTSUPPORTED;
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_FLOAT == var->type)
+	else if (ASN_OPAQUE_FLOAT == var->type)
 	{
 		SET_DBL_RESULT(result, *var->val.floatVal);
 	}
-	else if (ASN_DOUBLE == var->type)
+	else if (ASN_OPAQUE_DOUBLE == var->type)
 	{
 		SET_DBL_RESULT(result, *var->val.doubleVal);
 	}
