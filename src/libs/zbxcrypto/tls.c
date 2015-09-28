@@ -2981,7 +2981,7 @@ void	zbx_tls_init_child(void)
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot open file \"%s\": %s",
 					CONFIG_TLS_CRL_FILE, zbx_strerror(errno));
-			goto out2;
+			goto out1;
 		}
 
 		if (NULL == PEM_read_X509_CRL(f, &my_crl, NULL, NULL))
@@ -2996,7 +2996,7 @@ void	zbx_tls_init_child(void)
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot close file \"%s\": %s",
 					CONFIG_TLS_CRL_FILE, zbx_strerror(errno));
-			goto out2;
+			goto out1;
 		}
 
 		if ((NULL != ctx_cert && 1 != X509_STORE_add_crl(SSL_CTX_get_cert_store(ctx_cert), my_crl)) ||
@@ -3203,7 +3203,7 @@ out_method:
 	zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot initialize TLS method:");
 out:
 	zbx_tls_error_msg(&error, &error_alloc, &error_offset);
-out2:
+out1:
 	zabbix_log(LOG_LEVEL_CRIT, "%s", error);
 	zbx_free(error);
 	zbx_tls_free();
