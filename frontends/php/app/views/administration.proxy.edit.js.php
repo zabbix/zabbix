@@ -76,7 +76,7 @@
 		}
 
 		/**
-		 * Show/hide they based on connections to/from proxy fields and enabling or disabling additional encryption
+		 * Show/hide them based on connections to/from proxy fields and enabling or disabling additional encryption
 		 * fields based on proxy mode:
 		 *  if selected or checked certificate then show "Issuer" and "Subject" fields;
 		 *  if selected or checked PSK then show "PSK identity" and "PSK" fields;
@@ -97,8 +97,8 @@
 
 			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
 					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
-					|| (jQuery('#tls_in_cert').is(':checked'))
-					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
+					|| (jQuery('#tls_in_cert').is(':checked')
+					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>)) {
 				jQuery('#tls_issuer, #tls_subject').prop('disabled', false);
 			}
 			else {
@@ -115,8 +115,8 @@
 
 			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?>
 					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
-					|| (jQuery('#tls_in_psk').is(':checked'))
-					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
+					|| (jQuery('#tls_in_psk').is(':checked')
+					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>)) {
 				jQuery('#tls_psk, #tls_psk_identity').prop('disabled', false);
 			}
 			else {
