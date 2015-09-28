@@ -1,9 +1,28 @@
 Changes for 2.4.7rc1
 
 New features:
-A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
+.......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
+...G...... [ZBX-9847] fixed possible Zabbix agent crash when executing system.cpu.discovery (dimir)
+.......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
+...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
+........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
+.......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
+...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
+.......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
+........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+..F....... [ZBX-9625] fixed interface list bug in host form (Gunars)
+..F....... [ZBX-9607] fixed step form in web scenario (Gunars, Sasha)
+.......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
+...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
+..F....... [ZBX-9516] fixed "Go" button display after deleting applications (Gunars)
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
 ...G...... [ZBX-9258] fixed Alias for log[], logrt[] and eventlog[] (gleb)
 .......PS. [ZBX-4284] improved handling of timeouting items on reachable hosts (wiper)
@@ -660,9 +679,24 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 Changes for 2.2.11rc1
 
 New features:
-A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
+.......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
+.......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
+........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
+.......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
+...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
+...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
+.......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
+........S. [ZBX-9667] fixed disabled triggers or trigers having disabled hosts or items affecting trigger dependency calculations (wiper)
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+.......PS. [ZBX-9668] improved handling of VMware performance counter instances without data (wiper)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
+...G...PS. [ZBX-9682] fixed parsing of the numeric item key parameters (igors)
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9716] fixed possible event record number wraparound issues in the old Windows Eventing support (wiper)
 .......PS. [ZBX-4284] improved handling of timeouting items on reachable hosts (wiper)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
@@ -1947,9 +1981,14 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 Changes for 2.0.16rc1
 
 New features:
-A.F....... [ZBX-1357] updated Czech translation; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
+A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
+........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
+..F....... [ZBX-9639] fixed chart width validation (Gunars)
+..F....... [ZBX-9809] fixed action operation validation (Gunars)
 ...G...... [ZBX-9721] fixed agent log message for log[] item in case of log records longer than 256kB (gleb)
 ....I....T [ZBX-8989] moved Total memory item from Filesystems to Memory application in Template OS Windows (gleb)
 

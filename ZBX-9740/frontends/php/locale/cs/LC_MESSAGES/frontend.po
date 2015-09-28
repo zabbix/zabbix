@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:05+0300\n"
+"POT-Creation-Date: 2015-09-17 12:18+0300\n"
 "PO-Revision-Date: 2015-08-11 08:36+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -48,7 +48,7 @@ msgstr[0] "Zobrazený %1$d z %2$d problémů"
 msgstr[1] "Zobrazené %1$d z %2$d problémů"
 msgstr[2] "Zobrazené %1$d z %2$d problémů"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (rok %2$s)"
@@ -373,14 +373,14 @@ msgstr "Akce byla přidána"
 msgid "Action deleted"
 msgstr "Akce byla smazána"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Akce vypnutá"
 msgstr[1] "Akce vypnuty"
 msgstr[2] "Akce vypnuty"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Akce zapnuta"
@@ -1755,7 +1755,7 @@ msgstr "Není možné smazat skripty. Skript \"%1$s\" se používá v operaci ak
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Není možné smazat skripty. Skript se scriptid \"%1$s\" neexistuje."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Není možné smazat označené akce"
 
@@ -1839,7 +1839,7 @@ msgstr "Nelze smazat mapu hodnot"
 msgid "Cannot delete web scenario"
 msgstr "Není možné smazat web scénář"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Není možné vypnout akci"
@@ -1927,11 +1927,11 @@ msgstr[2] "Není možné zakázat web scenáře"
 msgid "Cannot display item queue."
 msgstr "Není možné zobrazit frontu položek."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Není možné zobrazit víc jak jednu položku s typem \"Souhrn grafu\"."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Není možné vypnout akci"
@@ -2517,9 +2517,9 @@ msgstr "Nelze upravit skupinu"
 msgid "Cannot update group."
 msgstr "Není možné aktualizovat skupinu."
 
-#: include/classes/api/services/CHostGroup.php:900
-#: include/classes/api/services/CHostGroup.php:1005
-#: include/classes/api/services/CHostGroup.php:1146
+#: include/classes/api/services/CHostGroup.php:917
+#: include/classes/api/services/CHostGroup.php:1022
+#: include/classes/api/services/CHostGroup.php:1163
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Není možné aktualizovat skupiny pro objeveného hosta \"%1$s\"."
@@ -3600,7 +3600,7 @@ msgstr "DISCOVERED"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:132
+#: include/views/js/configuration.host.edit.js.php:24 search.php:132
 msgid "DNS"
 msgstr "DNS"
 
@@ -5692,7 +5692,7 @@ msgstr "GUI přístup vypnut."
 msgid "General"
 msgstr "Obecné"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -6700,7 +6700,7 @@ msgstr "IMAP"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:131
+#: include/views/js/configuration.host.edit.js.php:24 search.php:131
 msgid "IP"
 msgstr "IP"
 
@@ -7915,7 +7915,7 @@ msgstr "Rozhraní"
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Rozhraní je připojené na položku \"%1$s\" na \"%2$s\"."
 
-#: include/views/js/configuration.host.edit.js.php:143
+#: include/views/js/configuration.host.edit.js.php:145
 msgid "Interface is used by items that require this type of the interface."
 msgstr "Rozhraní je používané položkami, které požadují tento typ rozhraní."
 
@@ -8318,7 +8318,7 @@ msgstr "Položka používá rozhraní z ne nadřazeného hosta."
 msgid "Item uses incorrect interface type."
 msgstr "Položka používá neplatný typ rozhraní."
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr "Hodnoty položky"
 
@@ -10207,7 +10207,7 @@ msgstr "Žádná položka s itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Žádná položka s itemid=\"%1$s\"."
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr "Žádná definovaná položka."
 
@@ -10334,11 +10334,11 @@ msgstr "Žádné oprávnění pro přístup do systému."
 #: include/classes/api/services/CHostGeneral.php:115
 #: include/classes/api/services/CHostGroup.php:484
 #: include/classes/api/services/CHostGroup.php:562
-#: include/classes/api/services/CHostGroup.php:934
-#: include/classes/api/services/CHostGroup.php:964
-#: include/classes/api/services/CHostGroup.php:1093
-#: include/classes/api/services/CHostGroup.php:1195
-#: include/classes/api/services/CHostGroup.php:1222
+#: include/classes/api/services/CHostGroup.php:951
+#: include/classes/api/services/CHostGroup.php:981
+#: include/classes/api/services/CHostGroup.php:1110
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1239
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10510,7 +10510,7 @@ msgstr "Není spouštěč"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Žádný spouštěč s triggerid \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr "Žádné definované spouštěče."
 
@@ -10814,7 +10814,7 @@ msgstr "Číslo (unsigned)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -10905,9 +10905,9 @@ msgstr "Při změně stavu spouštěč blikat po dobu"
 msgid "Once"
 msgstr "Jednou"
 
-#: include/classes/api/services/CHostGroup.php:1102
-#: include/classes/api/services/CHostGroup.php:1111
-#: include/classes/api/services/CHostGroup.php:1204
+#: include/classes/api/services/CHostGroup.php:1119
+#: include/classes/api/services/CHostGroup.php:1128
+#: include/classes/api/services/CHostGroup.php:1221
 msgid "One of the objects is left without a host group."
 msgstr "Jeden z objektů je bez skupiny hostů."
 
@@ -11009,7 +11009,7 @@ msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelů
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operace \"%s\" již existuje."
@@ -11358,7 +11358,7 @@ msgstr "PHP modul xmlwriter chybí."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11733,7 +11733,7 @@ msgstr "Problém, když všechny podřazené mají problém"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problém, když alespoň jeden podřazený má problém"
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Problémy"
@@ -12004,7 +12004,7 @@ msgstr "Vzdálený příkaz"
 #: include/views/js/configuration.discovery.edit.js.php:11
 #: include/views/js/configuration.graph.edit.js.php:90
 #: include/views/js/configuration.host.discovery.edit.js.php:31
-#: include/views/js/configuration.host.edit.js.php:33
+#: include/views/js/configuration.host.edit.js.php:35
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:75
 #: include/views/js/configuration.slideconf.edit.js.php:19
@@ -12847,7 +12847,7 @@ msgstr "Vybrat řádky s hodnotou jako"
 msgid "Selected"
 msgstr "Vybrané"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Označené akce smazané"
 
@@ -14952,8 +14952,8 @@ msgstr "Doba provozu Zabbix server procesů v sekundách."
 msgid "Uptime/Downtime"
 msgstr "Doba dostupnosti/nedostupnosti"
 
-#: include/views/js/configuration.host.edit.js.php:12
-#: include/views/js/configuration.host.edit.js.php:365
+#: include/views/js/configuration.host.edit.js.php:14
+#: include/views/js/configuration.host.edit.js.php:367
 msgid "Use bulk requests"
 msgstr "Použít hromadné žádosti"
 
@@ -16174,7 +16174,7 @@ msgctxt "day short"
 msgid "d"
 msgstr "d"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "j. M"
 

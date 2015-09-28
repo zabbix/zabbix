@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-09-17 12:18+0300\n"
 "PO-Revision-Date: 2014-09-08 07:23+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -50,7 +50,7 @@ msgstr[1] "відображено %1$d з %2$d проблеми"
 msgstr[2] "відображено %1$d з %2$d проблем"
 msgstr[3] "відображено %1$d з %2$d проблем"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (рік %2$s)"
@@ -383,7 +383,7 @@ msgstr "Дію додано"
 msgid "Action deleted"
 msgstr "Дію видалено"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
@@ -391,7 +391,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1776,7 +1776,7 @@ msgstr "Не вдалося видалити скрипт. Скрипт \"%1$s\"
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Не вдалося видалити скрипти. Скрипт з scriptid \"%1$s\" не існує."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Не вдалося видалити вибрані дії"
 
@@ -1860,7 +1860,7 @@ msgstr "Не вдалося видалити перетворення значе
 msgid "Cannot delete web scenario"
 msgstr "Не вдалося видалити веб-сценарій"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1962,11 +1962,11 @@ msgstr[3] "Не вдалося відключити веб-сценарій"
 msgid "Cannot display item queue."
 msgstr "Не вдалося відобразити чергу елементів даних."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Не удалось відобразити більше одного елемента даних з типом \"Сума графіку\". "
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2567,9 +2567,9 @@ msgstr "Не вдалося оновити групу"
 msgid "Cannot update group."
 msgstr "Не вдалося оновити групу."
 
-#: include/classes/api/services/CHostGroup.php:900
-#: include/classes/api/services/CHostGroup.php:1005
-#: include/classes/api/services/CHostGroup.php:1146
+#: include/classes/api/services/CHostGroup.php:917
+#: include/classes/api/services/CHostGroup.php:1022
+#: include/classes/api/services/CHostGroup.php:1163
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не вдалося оновити групи для виявленого вузла мережі \"%1$s\"."
@@ -3651,7 +3651,7 @@ msgstr "ВИЯВЛЕНО"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:132
+#: include/views/js/configuration.host.edit.js.php:24 search.php:132
 msgid "DNS"
 msgstr "DNS"
 
@@ -5746,7 +5746,7 @@ msgstr "Доступ до GUI відключено."
 msgid "General"
 msgstr "Загальні парам."
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -6762,7 +6762,7 @@ msgstr "IMAP"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:131
+#: include/views/js/configuration.host.edit.js.php:24 search.php:131
 msgid "IP"
 msgstr "IP"
 
@@ -7977,7 +7977,7 @@ msgstr "Інтерфейс"
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Інтерфейс зв'язаний з елементом даних \"%1$s\" у \"%2$s\"."
 
-#: include/views/js/configuration.host.edit.js.php:143
+#: include/views/js/configuration.host.edit.js.php:145
 msgid "Interface is used by items that require this type of the interface."
 msgstr "Інтерфейс використовується елементами даних, яким потрібен цей тип інтерфейсу."
 
@@ -8384,7 +8384,7 @@ msgstr "Елемент даних використовує інтерфейс н
 msgid "Item uses incorrect interface type."
 msgstr "Елемент даних використовує некоректний тип інтерфейсу."
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr ""
 
@@ -10280,7 +10280,7 @@ msgstr "Немає елемента даних з itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Немає елемента даних з itemid=\"%1$s\"."
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr "Елементів даних не визначено."
 
@@ -10407,11 +10407,11 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CHostGeneral.php:115
 #: include/classes/api/services/CHostGroup.php:484
 #: include/classes/api/services/CHostGroup.php:562
-#: include/classes/api/services/CHostGroup.php:934
-#: include/classes/api/services/CHostGroup.php:964
-#: include/classes/api/services/CHostGroup.php:1093
-#: include/classes/api/services/CHostGroup.php:1195
-#: include/classes/api/services/CHostGroup.php:1222
+#: include/classes/api/services/CHostGroup.php:951
+#: include/classes/api/services/CHostGroup.php:981
+#: include/classes/api/services/CHostGroup.php:1110
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1239
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10583,7 +10583,7 @@ msgstr "Немає тригера"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Немає тригера з triggerid \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr "Тригерів не визначено."
 
@@ -10887,7 +10887,7 @@ msgstr "Числовий (ціле додатне)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -10978,9 +10978,9 @@ msgstr "Мигання тригерів при зміні стану протя�
 msgid "Once"
 msgstr "Один раз"
 
-#: include/classes/api/services/CHostGroup.php:1102
-#: include/classes/api/services/CHostGroup.php:1111
-#: include/classes/api/services/CHostGroup.php:1204
+#: include/classes/api/services/CHostGroup.php:1119
+#: include/classes/api/services/CHostGroup.php:1128
+#: include/classes/api/services/CHostGroup.php:1221
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -11082,7 +11082,7 @@ msgstr "Підраховуються тригери тільки у вузлів
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Операція \"%s\" вже існує."
@@ -11431,7 +11431,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11806,7 +11806,7 @@ msgstr "Проблема, якщо всі підлеглі мають пробл
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблема, якщо хоча б у одного із підлеглих наявна проблема"
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Проблеми"
@@ -12078,7 +12078,7 @@ msgstr "Віддалена команда"
 #: include/views/js/configuration.discovery.edit.js.php:11
 #: include/views/js/configuration.graph.edit.js.php:90
 #: include/views/js/configuration.host.discovery.edit.js.php:31
-#: include/views/js/configuration.host.edit.js.php:33
+#: include/views/js/configuration.host.edit.js.php:35
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:75
 #: include/views/js/configuration.slideconf.edit.js.php:19
@@ -12921,7 +12921,7 @@ msgstr "Відібрати рядки, які В ЗНАЧЕННІ містять
 msgid "Selected"
 msgstr "Відібрані"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Вибрані дії видалено"
 
@@ -15035,8 +15035,8 @@ msgstr ""
 msgid "Uptime/Downtime"
 msgstr "Доступний/Недоступний"
 
-#: include/views/js/configuration.host.edit.js.php:12
-#: include/views/js/configuration.host.edit.js.php:365
+#: include/views/js/configuration.host.edit.js.php:14
+#: include/views/js/configuration.host.edit.js.php:367
 msgid "Use bulk requests"
 msgstr ""
 
@@ -16261,7 +16261,7 @@ msgctxt "day short"
 msgid "d"
 msgstr "д"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d M"
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
+"POT-Creation-Date: 2015-09-17 12:18+0300\n"
 "PO-Revision-Date: 2014-02-02 00:19+0300\n"
 "Last-Translator: Anonymous Pootle User\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -46,7 +46,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] ""
 msgstr[1] ""
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr ""
@@ -363,13 +363,13 @@ msgstr "Åtgärd lades till"
 msgid "Action deleted"
 msgstr "Åtgärd borttagen"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1740,7 +1740,7 @@ msgstr ""
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr ""
 
@@ -1824,7 +1824,7 @@ msgstr "Kan inte ta bort värdeskarta"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1900,11 +1900,11 @@ msgstr[1] ""
 msgid "Cannot display item queue."
 msgstr ""
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2476,9 +2476,9 @@ msgstr "Kan inte uppdatera grupp"
 msgid "Cannot update group."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:900
-#: include/classes/api/services/CHostGroup.php:1005
-#: include/classes/api/services/CHostGroup.php:1146
+#: include/classes/api/services/CHostGroup.php:917
+#: include/classes/api/services/CHostGroup.php:1022
+#: include/classes/api/services/CHostGroup.php:1163
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -3547,7 +3547,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:132
+#: include/views/js/configuration.host.edit.js.php:24 search.php:132
 msgid "DNS"
 msgstr ""
 
@@ -5636,7 +5636,7 @@ msgstr ""
 msgid "General"
 msgstr "Allmänt"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -6639,7 +6639,7 @@ msgstr ""
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:131
+#: include/views/js/configuration.host.edit.js.php:24 search.php:131
 msgid "IP"
 msgstr "IP"
 
@@ -7854,7 +7854,7 @@ msgstr ""
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/views/js/configuration.host.edit.js.php:143
+#: include/views/js/configuration.host.edit.js.php:145
 msgid "Interface is used by items that require this type of the interface."
 msgstr ""
 
@@ -8253,7 +8253,7 @@ msgstr ""
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr ""
 
@@ -10137,7 +10137,7 @@ msgstr ""
 msgid "No item with itemid=\"%1$s\"."
 msgstr ""
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr ""
 
@@ -10264,11 +10264,11 @@ msgstr ""
 #: include/classes/api/services/CHostGeneral.php:115
 #: include/classes/api/services/CHostGroup.php:484
 #: include/classes/api/services/CHostGroup.php:562
-#: include/classes/api/services/CHostGroup.php:934
-#: include/classes/api/services/CHostGroup.php:964
-#: include/classes/api/services/CHostGroup.php:1093
-#: include/classes/api/services/CHostGroup.php:1195
-#: include/classes/api/services/CHostGroup.php:1222
+#: include/classes/api/services/CHostGroup.php:951
+#: include/classes/api/services/CHostGroup.php:981
+#: include/classes/api/services/CHostGroup.php:1110
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1239
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10440,7 +10440,7 @@ msgstr ""
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr ""
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr ""
 
@@ -10744,7 +10744,7 @@ msgstr "Numerisk (heltal 64-bit)"
 msgid "OEM"
 msgstr ""
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -10835,9 +10835,9 @@ msgstr ""
 msgid "Once"
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:1102
-#: include/classes/api/services/CHostGroup.php:1111
-#: include/classes/api/services/CHostGroup.php:1204
+#: include/classes/api/services/CHostGroup.php:1119
+#: include/classes/api/services/CHostGroup.php:1128
+#: include/classes/api/services/CHostGroup.php:1221
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -10939,7 +10939,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -11288,7 +11288,7 @@ msgstr ""
 msgid "POP"
 msgstr ""
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11663,7 +11663,7 @@ msgstr ""
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Problem"
@@ -11933,7 +11933,7 @@ msgstr "Fjärrkommando"
 #: include/views/js/configuration.discovery.edit.js.php:11
 #: include/views/js/configuration.graph.edit.js.php:90
 #: include/views/js/configuration.host.discovery.edit.js.php:31
-#: include/views/js/configuration.host.edit.js.php:33
+#: include/views/js/configuration.host.edit.js.php:35
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:75
 #: include/views/js/configuration.slideconf.edit.js.php:19
@@ -12776,7 +12776,7 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr ""
 
@@ -14872,8 +14872,8 @@ msgstr ""
 msgid "Uptime/Downtime"
 msgstr ""
 
-#: include/views/js/configuration.host.edit.js.php:12
-#: include/views/js/configuration.host.edit.js.php:365
+#: include/views/js/configuration.host.edit.js.php:14
+#: include/views/js/configuration.host.edit.js.php:367
 msgid "Use bulk requests"
 msgstr ""
 
@@ -16087,7 +16087,7 @@ msgctxt "day short"
 msgid "d"
 msgstr ""
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr ""
 

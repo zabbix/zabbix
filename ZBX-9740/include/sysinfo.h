@@ -172,8 +172,9 @@ extern int	CONFIG_UNSAFE_USER_PARAMETERS;
 int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 
 /* flags for process */
-#define PROCESS_LOCAL_COMMAND	1
-#define PROCESS_MODULE_COMMAND	2
+#define PROCESS_LOCAL_COMMAND	0x1
+#define PROCESS_MODULE_COMMAND	0x2
+#define PROCESS_WITH_ALIAS	0x4
 
 void	init_metrics();
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);

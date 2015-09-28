@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
-"PO-Revision-Date: 2014-02-02 00:22+0300\n"
-"Last-Translator: Anonymous Pootle User\n"
+"POT-Creation-Date: 2015-09-17 12:18+0300\n"
+"PO-Revision-Date: 2015-08-28 12:31+0300\n"
+"Last-Translator: mcsaygili <mcagdas@mcsaygili.net>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: tr\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1391293363.0\n"
+"X-POOTLE-MTIME: 1440757913.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -36,8 +36,8 @@ msgstr ""
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d gün"
+msgstr[1] "%1$d gün"
 
 #: include/blocks.inc.php:1125
 #, c-format
@@ -46,7 +46,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] ""
 msgstr[1] ""
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (yıl %2$s)"
@@ -62,38 +62,38 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s Item"
 msgid_plural "%1$s Items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s Öğe"
+msgstr[1] "%1$s Öğe"
 
 #: include/views/configuration.item.edit.php:327
 #: include/views/configuration.item.edit.php:343
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s gün"
+msgstr[1] "%1$s gün"
 
 #: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s dakika"
+msgstr[1] "%1$s dakika"
 
 #: include/classes/screens/CScreenActions.php:151
 #: include/views/administration.auditacts.list.php:90
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Kalan deneme sayısı %1$s"
+msgstr[1] "Kalan deneme sayısı %1$s"
 
 #: jsLoader.php:222 jsLoader.php:223
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s saniye"
+msgstr[1] "%1$s saniye"
 
 #: include/page_header.php:344
 #, c-format
@@ -123,7 +123,7 @@ msgstr "(0 - belirsiz)"
 #: include/views/configuration.hostgroups.list.php:31
 #: include/views/configuration.template.edit.php:159
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Sadece super admin yetkisine sahip kullanıcılar grup oluşturabilir)"
 
 #: include/forms.inc.php:580 include/forms.inc.php:595
 msgid "(in days)"
@@ -201,15 +201,16 @@ msgid "<manual>"
 msgstr "<elle>"
 
 #: include/views/administration.auditacts.list.php:31
+#, fuzzy
 msgid "ACTION LOG"
-msgstr ""
+msgstr "EYLEM GÜNLÜĞÜ"
 
 #: include/views/configuration.host.discovery.edit.php:144
 #: include/views/configuration.item.edit.php:150
 #: include/views/configuration.item.massupdate.php:172
 #: include/views/js/configuration.discovery.edit.js.php:95
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: acknow.php:194
 msgid "ALARM ACKNOWLEDGES"
@@ -220,8 +221,9 @@ msgid "AND"
 msgstr "VE"
 
 #: include/views/administration.auditlogs.list.php:31
+#, fuzzy
 msgid "AUDIT LOG"
-msgstr ""
+msgstr "HESAP GÜNLÜĞÜ"
 
 #: report2.php:163
 msgid "AVAILABILITY REPORT"
@@ -253,7 +255,7 @@ msgstr "Erişim reddedildi!"
 
 #: include/func.inc.php:1681
 msgid "Access denied."
-msgstr ""
+msgstr "Erişim engellendi."
 
 #: include/classes/api/services/CUser.php:988
 #, c-format
@@ -342,7 +344,7 @@ msgstr "Eylem"
 #: include/classes/api/services/CAction.php:2057
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "\"%1$s\" eylemi zaten mevcut."
 
 #: include/classes/api/services/CAction.php:1905
 #: include/classes/api/services/CAction.php:2004
@@ -363,13 +365,13 @@ msgstr "Eylem eklendi"
 msgid "Action deleted"
 msgstr "Eylem silindi"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Eylem devre dışı"
+msgstr[1] "Eylemler devre dışı"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1741,7 +1743,7 @@ msgstr "Betikler silinemedi. \"%1$s\"  betiği \"%2$s\" eylem işleminde kullan�
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Seçilen eylemler silinemedi."
 
@@ -1825,7 +1827,7 @@ msgstr "Değer haritası silinemedi"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1901,11 +1903,11 @@ msgstr[1] ""
 msgid "Cannot display item queue."
 msgstr ""
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2477,9 +2479,9 @@ msgstr "Grup güncellenemedi"
 msgid "Cannot update group."
 msgstr ""
 
-#: include/classes/api/services/CHostGroup.php:900
-#: include/classes/api/services/CHostGroup.php:1005
-#: include/classes/api/services/CHostGroup.php:1146
+#: include/classes/api/services/CHostGroup.php:917
+#: include/classes/api/services/CHostGroup.php:1022
+#: include/classes/api/services/CHostGroup.php:1163
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -3548,7 +3550,7 @@ msgstr "KEŞFEDİLMİŞ"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:132
+#: include/views/js/configuration.host.edit.js.php:24 search.php:132
 msgid "DNS"
 msgstr "DNS"
 
@@ -5637,7 +5639,7 @@ msgstr "GUI erişimi etkisizleştirildi."
 msgid "General"
 msgstr "Genel"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -6640,7 +6642,7 @@ msgstr "IMAP"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:131
+#: include/views/js/configuration.host.edit.js.php:24 search.php:131
 msgid "IP"
 msgstr "IP"
 
@@ -7855,7 +7857,7 @@ msgstr "Arabirim"
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr ""
 
-#: include/views/js/configuration.host.edit.js.php:143
+#: include/views/js/configuration.host.edit.js.php:145
 msgid "Interface is used by items that require this type of the interface."
 msgstr ""
 
@@ -8254,7 +8256,7 @@ msgstr ""
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr ""
 
@@ -10138,7 +10140,7 @@ msgstr ""
 msgid "No item with itemid=\"%1$s\"."
 msgstr ""
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr ""
 
@@ -10265,11 +10267,11 @@ msgstr "Sistem erişimi için izin yok."
 #: include/classes/api/services/CHostGeneral.php:115
 #: include/classes/api/services/CHostGroup.php:484
 #: include/classes/api/services/CHostGroup.php:562
-#: include/classes/api/services/CHostGroup.php:934
-#: include/classes/api/services/CHostGroup.php:964
-#: include/classes/api/services/CHostGroup.php:1093
-#: include/classes/api/services/CHostGroup.php:1195
-#: include/classes/api/services/CHostGroup.php:1222
+#: include/classes/api/services/CHostGroup.php:951
+#: include/classes/api/services/CHostGroup.php:981
+#: include/classes/api/services/CHostGroup.php:1110
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1239
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10441,7 +10443,7 @@ msgstr "Tetik yok"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr ""
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr ""
 
@@ -10745,7 +10747,7 @@ msgstr "Sayısal (işaretsiz)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -10836,9 +10838,9 @@ msgstr ""
 msgid "Once"
 msgstr "Birkere"
 
-#: include/classes/api/services/CHostGroup.php:1102
-#: include/classes/api/services/CHostGroup.php:1111
-#: include/classes/api/services/CHostGroup.php:1204
+#: include/classes/api/services/CHostGroup.php:1119
+#: include/classes/api/services/CHostGroup.php:1128
+#: include/classes/api/services/CHostGroup.php:1221
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -10940,7 +10942,7 @@ msgstr "Yalnızca etkinleştirilmiş konaklara atanmış ve etkinleştirilmiş �
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "\"%s\" işlemi zaten var."
@@ -11289,7 +11291,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11664,7 +11666,7 @@ msgstr "Sorun, eğer bütün altlarda sorun varsa"
 msgid "Problem, if at least one child has a problem"
 msgstr "Sorun, eğer en az alttakilerden birinde sorun varsa"
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Problemler"
@@ -11935,7 +11937,7 @@ msgstr "Uzak komut"
 #: include/views/js/configuration.discovery.edit.js.php:11
 #: include/views/js/configuration.graph.edit.js.php:90
 #: include/views/js/configuration.host.discovery.edit.js.php:31
-#: include/views/js/configuration.host.edit.js.php:33
+#: include/views/js/configuration.host.edit.js.php:35
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:75
 #: include/views/js/configuration.slideconf.edit.js.php:19
@@ -12778,7 +12780,7 @@ msgstr ""
 msgid "Selected"
 msgstr "Seçilen"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Seçilen eylemler silindi"
 
@@ -14874,8 +14876,8 @@ msgstr ""
 msgid "Uptime/Downtime"
 msgstr "Çalışma Süresi/Aksama Süresi"
 
-#: include/views/js/configuration.host.edit.js.php:12
-#: include/views/js/configuration.host.edit.js.php:365
+#: include/views/js/configuration.host.edit.js.php:14
+#: include/views/js/configuration.host.edit.js.php:367
 msgid "Use bulk requests"
 msgstr ""
 
@@ -16089,7 +16091,7 @@ msgctxt "day short"
 msgid "d"
 msgstr ""
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

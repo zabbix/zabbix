@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 21:04+0300\n"
-"PO-Revision-Date: 2015-03-16 16:45+0300\n"
+"POT-Creation-Date: 2015-09-17 12:25+0300\n"
+"PO-Revision-Date: 2015-09-01 10:07+0300\n"
 "Last-Translator: quadrata <dimitri.bellini@quadrata.it>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: it\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1426517101.0\n"
+"X-POOTLE-MTIME: 1441094856.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -46,7 +46,7 @@ msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] "%1$d di %2$d problemi visualizzati"
 msgstr[1] "%1$d di %2$d problemi visualizzati"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (anno %2$s)"
@@ -363,13 +363,13 @@ msgstr "Azione aggiunta"
 msgid "Action deleted"
 msgstr "Azione rimossa"
 
-#: actionconf.php:362
+#: actionconf.php:365
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] "Azione disabilitata"
 msgstr[1] "Azioni disabilitate"
 
-#: actionconf.php:361
+#: actionconf.php:364
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Azione abilitata"
@@ -1737,7 +1737,7 @@ msgstr "Impossibile rimuovere gli script. Lo script \"%1$s\" e' utilizzato nell'
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Impossibile rimuovere gli scripts. Lo script con scriptid \"%s\" non esiste."
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Cannot delete selected actions"
 msgstr "Impossibile rimuovere azioni selezionate."
 
@@ -1821,7 +1821,7 @@ msgstr "Impossibile rimuovere mappa valori"
 msgid "Cannot delete web scenario"
 msgstr "Impossibile rimuovere scenario web"
 
-#: actionconf.php:365
+#: actionconf.php:368
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] "Impossibile disabilitare azione"
@@ -1897,11 +1897,11 @@ msgstr[1] "Impossibile disabilitare scenario web"
 msgid "Cannot display item queue."
 msgstr "Impossibile visualizzare coda item."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Impossibile visualizzare più di un item del tipo \"Somma grafici\"."
 
-#: actionconf.php:364
+#: actionconf.php:367
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] "Impossibile abilitare l'azione"
@@ -2473,9 +2473,9 @@ msgstr "Impossibile aggiornare il gruppo"
 msgid "Cannot update group."
 msgstr "Impossibile aggiornare il gruppo."
 
-#: include/classes/api/services/CHostGroup.php:900
-#: include/classes/api/services/CHostGroup.php:1005
-#: include/classes/api/services/CHostGroup.php:1146
+#: include/classes/api/services/CHostGroup.php:917
+#: include/classes/api/services/CHostGroup.php:1022
+#: include/classes/api/services/CHostGroup.php:1163
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Impossibile aggiornare gruppi per l'host discoverato \"%1$s\"."
@@ -3555,7 +3555,7 @@ msgstr "DA DISCOVERY"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:132
+#: include/views/js/configuration.host.edit.js.php:24 search.php:132
 msgid "DNS"
 msgstr "DNS"
 
@@ -5644,7 +5644,7 @@ msgstr "Accesso GUI disabilitato."
 msgid "General"
 msgstr "Generale"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:797
 #, c-format
 msgid "Generated in %s sec"
@@ -6646,7 +6646,7 @@ msgstr "IMAP"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:131
+#: include/views/js/configuration.host.edit.js.php:24 search.php:131
 msgid "IP"
 msgstr "IP"
 
@@ -7861,7 +7861,7 @@ msgstr "Interfaccia"
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "L'interfaccia è collegata all'item \"%1$s\" su \"%2$s\"."
 
-#: include/views/js/configuration.host.edit.js.php:143
+#: include/views/js/configuration.host.edit.js.php:145
 msgid "Interface is used by items that require this type of the interface."
 msgstr "L'interfaccia è usata dagli item che richiedono questo tipo di interfaccia.L'interfaccia è usata dagli item che richiedono questo tipo di interfaccia."
 
@@ -8260,7 +8260,7 @@ msgstr "L'item utilizza un'interfaccia utente da un host non-primario."
 msgid "Item uses incorrect interface type."
 msgstr "L'item utilizza un tipo di interfaccia errato."
 
-#: chart.php:94 chart.php:97
+#: chart.php:96 chart.php:99
 msgid "Item values"
 msgstr "Valori item"
 
@@ -10144,7 +10144,7 @@ msgstr "Nessun item con itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Nessun item con itemid=\"%1$s\"."
 
-#: chart3.php:120
+#: chart3.php:122
 msgid "No items defined."
 msgstr "Nessun item definito."
 
@@ -10271,11 +10271,11 @@ msgstr "Nessun permesso per l'accesso al sistema."
 #: include/classes/api/services/CHostGeneral.php:115
 #: include/classes/api/services/CHostGroup.php:484
 #: include/classes/api/services/CHostGroup.php:562
-#: include/classes/api/services/CHostGroup.php:934
-#: include/classes/api/services/CHostGroup.php:964
-#: include/classes/api/services/CHostGroup.php:1093
-#: include/classes/api/services/CHostGroup.php:1195
-#: include/classes/api/services/CHostGroup.php:1222
+#: include/classes/api/services/CHostGroup.php:951
+#: include/classes/api/services/CHostGroup.php:981
+#: include/classes/api/services/CHostGroup.php:1110
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1239
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10447,7 +10447,7 @@ msgstr "Nessun trigger"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Nessun trigger con triggerid \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:43
+#: chart4.php:42 tr_comments.php:43
 msgid "No triggers defined."
 msgstr "Nessun trigger definito."
 
@@ -10751,7 +10751,7 @@ msgstr "Numerico (senza segno)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:150 httpdetails.php:238
+#: chart4.php:161 chart5.php:194 httpdetails.php:150 httpdetails.php:238
 #: httpmon.php:164 include/classes/setup/CSetupWizard.php:198
 #: include/classes/setup/CSetupWizard.php:239
 #: include/classes/setup/CSetupWizard.php:351
@@ -10842,9 +10842,9 @@ msgstr "Al cambio di stato i trigger lampeggiano per"
 msgid "Once"
 msgstr "Una volta"
 
-#: include/classes/api/services/CHostGroup.php:1102
-#: include/classes/api/services/CHostGroup.php:1111
-#: include/classes/api/services/CHostGroup.php:1204
+#: include/classes/api/services/CHostGroup.php:1119
+#: include/classes/api/services/CHostGroup.php:1128
+#: include/classes/api/services/CHostGroup.php:1221
 msgid "One of the objects is left without a host group."
 msgstr "Uno degli oggetti è rimasto senza gruppo host."
 
@@ -10946,7 +10946,7 @@ msgstr "Solo i trigger assegnati agli host abilitati e dipendenti da item abilit
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:296
+#: actionconf.php:299
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "L'operazione \"%s\" esiste già."
@@ -11295,7 +11295,7 @@ msgstr "Estensione PHP xmlwriter assente."
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:485 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:485 include/triggers.inc.php:155
 #: include/views/monitoring.overview.items.php:37
 #: include/views/monitoring.overview.triggers.php:40
 msgid "PROBLEM"
@@ -11670,7 +11670,7 @@ msgstr "Problema, se tutti i figli hanno problemi"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problema, se almeno un servizio derivato ha un problema"
 
-#: chart4.php:163 include/maps.inc.php:533 include/maps.inc.php:616
+#: chart4.php:165 include/maps.inc.php:533 include/maps.inc.php:616
 #: include/maps.inc.php:707 report2.php:395 report3.php:83
 msgid "Problems"
 msgstr "Problemi"
@@ -11940,7 +11940,7 @@ msgstr "Comando remoto"
 #: include/views/js/configuration.discovery.edit.js.php:11
 #: include/views/js/configuration.graph.edit.js.php:90
 #: include/views/js/configuration.host.discovery.edit.js.php:31
-#: include/views/js/configuration.host.edit.js.php:33
+#: include/views/js/configuration.host.edit.js.php:35
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:75
 #: include/views/js/configuration.slideconf.edit.js.php:19
@@ -12783,7 +12783,7 @@ msgstr "Seleziona righe con valori contenenti"
 msgid "Selected"
 msgstr "Selezionati"
 
-#: actionconf.php:380
+#: actionconf.php:383
 msgid "Selected actions deleted"
 msgstr "Azioni selezionate eliminate"
 
@@ -14879,8 +14879,8 @@ msgstr "Uptime del processo Zabbix server in secondi."
 msgid "Uptime/Downtime"
 msgstr "Tempo di attività/inattività"
 
-#: include/views/js/configuration.host.edit.js.php:12
-#: include/views/js/configuration.host.edit.js.php:365
+#: include/views/js/configuration.host.edit.js.php:14
+#: include/views/js/configuration.host.edit.js.php:367
 msgid "Use bulk requests"
 msgstr "Utilizza rechieste bulk"
 
@@ -15138,7 +15138,7 @@ msgstr "VMware hypervisor statistiche di output di rete, <url> - URL servizio VM
 
 #: include/classes/items/CHelpItems.php:683
 msgid "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMware hypervisor performance counter, <url> - VMware service URL, <uuid> - VMware hypervisor host name, <path> - performance counter path, <instance> - performance counter instance"
 
 #: include/classes/items/CHelpItems.php:635
 msgid "VMware hypervisor processor frequency, <url> - VMware service URL, <uuid> - VMware hypervisor host name"
@@ -15234,7 +15234,7 @@ msgstr "Macchina virtuale VMware statistiche traffico interfaccia di rete in Out
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
-msgstr ""
+msgstr "VMware virtual machine performance counter, <url> - VMware service URL, <uuid> - VMware virtual machine host name, <path> - performance counter path, <instance> - performance counter instance"
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine power state, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -16097,7 +16097,7 @@ msgctxt "day short"
 msgid "d"
 msgstr "d"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

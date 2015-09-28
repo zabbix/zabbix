@@ -2245,7 +2245,9 @@ function checkRequiredKeys(array $array, array $keys) {
  * @param string $id	parent id, is used as cookie suffix
  */
 function uncheckTableRows($cookieId = null) {
-	insert_js('cookie.eraseArray("cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').($cookieId ? '_'.$cookieId : '').'")');
+	insert_js('cookie.eraseArray("cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').
+		($cookieId === null ? '' : '_'.$cookieId).'")'
+	);
 }
 
 /**
