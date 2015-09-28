@@ -373,7 +373,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 
 	FILE		*file;
 	int		i, lineno, param_valid;
-	char		line[MAX_STRING_LEN + 1], *parameter, *value;
+	char		line[MAX_STRING_LEN + 2], *parameter, *value;
 	zbx_uint64_t	var;
 	size_t		len;
 #ifdef _WINDOWS
@@ -402,7 +402,7 @@ static int	__parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int leve
 		{
 			/* check if line length exceeds limit (max. 2047 bytes) */
 			len = strlen(line);
-			if (MAX_STRING_LEN == len && '\r' != line[len - 1] && '\n' != line[len - 1])
+			if (MAX_STRING_LEN <= len && NULL != strchr("\r\n", line[MAX_STRING_LEN - 1]))
 				goto line_too_long;
 
 			zbx_ltrim(line, ZBX_CFG_LTRIM_CHARS);
