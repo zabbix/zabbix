@@ -637,7 +637,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			}
 		}
 		else
-			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format [%s]", s);
+			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format: \"%s\"", s);
 
 		if (NULL != delim)
 			s = delim + 1;
@@ -1004,9 +1004,9 @@ static int	preprocess_flexible_interval(const char *text, zbx_scheduler_interval
 		size_t	errmsg_alloc = 0, errmsg_offset = 0;
 
 		zbx_free(*errmsg);
-		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "Invalid scheduling interval: \"");
+		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "invalid scheduling interval: \"");
 		zbx_strncpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, text, ptr - text + 1);
-		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "\".");
+		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "\"");
 
 		scheduler_interval_free(new_interval);
 		return FAIL;
