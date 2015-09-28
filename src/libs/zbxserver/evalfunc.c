@@ -1887,7 +1887,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	double				*t = NULL, *x = NULL;
 	int				nparams, time, time_flag, arg1, flag, i, ret = FAIL, seconds = 0, nvalues = 0,
 					time_shift, time_shift_flag;
-	int				k = 0;
+	unsigned			k = 0;
 	zbx_vector_history_record_t	values;
 	zbx_timespec_t			zero_time;
 	zbx_fit_t			fit;
@@ -1983,7 +1983,7 @@ static int	evaluate_FORECAST(char *value, DC_ITEM *item, const char *function, c
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ERROR_CODE);
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ZBX_MATH_ERROR);
 	}
 
 	ret = SUCCEED;
@@ -2111,7 +2111,7 @@ static int	evaluate_TIMELEFT(char *value, DC_ITEM *item, const char *function, c
 	else
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "no data available");
-		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ERROR_CODE);
+		zbx_snprintf(value, MAX_BUFFER_LEN, ZBX_FS_DBL, ZBX_MATH_ERROR);
 	}
 
 	ret = SUCCEED;
