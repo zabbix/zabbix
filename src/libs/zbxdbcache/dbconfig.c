@@ -6826,7 +6826,6 @@ void	zbx_config_clean(zbx_config_t *cfg)
 	}
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: DCreset_hosts_availability                                       *
