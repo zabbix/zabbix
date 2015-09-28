@@ -153,7 +153,7 @@ class CHelpItems {
 					'description' => _('The number of processes. Returns integer')
 				],
 				[
-					'key' => 'proc_info[<process>,<attribute>,<type>]',
+					'key' => 'proc_info[process,<attribute>,<type>]',
 					'description' => _('Different information about specific process(es). Returns float')
 				],
 				[
