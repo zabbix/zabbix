@@ -29,7 +29,7 @@
 #define DEVICE_DIR	"/proc/sys/dev/sensors"
 #else
 #define DEVICE_DIR	"/sys/class/hwmon"
-	char	*locations[] = {"", "/device", NULL};
+char	*locations[] = {"", "/device", NULL};
 #endif
 
 #define ATTR_MAX	128
