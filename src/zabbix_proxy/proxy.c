@@ -55,6 +55,8 @@
 #include "setproctitle.h"
 #include "../libs/zbxcrypto/tls.h"
 
+#define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_proxy.conf"
+
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_proxy";
 const char	syslog_app_name[] = "zabbix_proxy";
@@ -72,6 +74,7 @@ const char	*help_message[] = {
 	"",
 	"Options:",
 	"  -c --config config-file               Absolute path to the configuration file",
+	"                                        (default: \"" DEFAULT_CONFIG_FILE "\")",
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
@@ -107,7 +110,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:n:hVR:";
+static char	shortopts[] = "c:hVR:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -772,7 +775,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(CONFIG_FILE, SYSCONFDIR "/zabbix_proxy.conf");
+		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
 	init_metrics();

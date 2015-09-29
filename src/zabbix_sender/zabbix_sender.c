@@ -90,7 +90,7 @@ const char	*help_message[] = {
 	"                             server or proxy. When used together with --config,",
 	"                             overrides the port of the first entry of",
 	"                             \"ServerActive\" parameter specified in agentd",
-	"                             configuration file. Default is " ZBX_DEFAULT_SERVER_PORT_STR,
+	"                             configuration file (default: " ZBX_DEFAULT_SERVER_PORT_STR ")",
 	"",
 	"  -I --source-address IP-address   Specify source IP address. When used",
 	"                             together with --config, overrides \"SourceIP\"",
