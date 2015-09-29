@@ -6,6 +6,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and
 ....I..... [ZBXNEXT-2056] added an HTTP response code value map (Richlv)
 
 Bug fixes:
+..F....... [ZBX-8820] added functionality to trim miltiple JS elements (Sasha, vitalijs.cemeris)
 ...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
 .......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
 ...G...... [ZBX-9847] fixed possible Zabbix agent crash when executing system.cpu.discovery (dimir)
