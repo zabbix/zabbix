@@ -572,18 +572,3 @@ function daysInMonth(year, month) {
 function appendZero(val) {
 	return val < 10 ? '0' + val : val;
 }
-
-/**
- * Trims all elements values that have currect selector and are inside Jquery object first element.
- *
- * @param array selectors
- */
-jQuery.fn.trimValues = function(selectors) {
-	var form = this,
-		obj;
-
-	jQuery.each(selectors, function(i, value) {
-		obj = jQuery(value, form);
-		obj.val(jQuery.trim(obj.val()));
-	});
-};
