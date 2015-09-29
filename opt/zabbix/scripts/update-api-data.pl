@@ -1869,10 +1869,8 @@ Continue calculation from the timestamp of the last run with --continue. In case
 of the period with --period option (see above). If you don't specify the end point the timestamp
 of the newest available data in the database will be used.
 
-The continue token is saved per each TLD-service pair separately.
-
-Note, that continue token is not be updated if this option was specified together with --dry-run
-or when you use --from option.
+Note, that continue token is not updated if this option was specified together with --dry-run or when you use
+--from option.
 
 =item B<--probe> name
 
