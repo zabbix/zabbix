@@ -86,12 +86,10 @@ static int	zbx_open_eventlog(LPCTSTR wsource, HANDLE *eventlog_handle, zbx_uint6
 	*FirstID = dwOldestRecord;
 	*LastID = dwOldestRecord + dwNumRecords - 1;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64 " numIDs:%lu",
-			__function_name, zbx_result_string(ret), *FirstID, *LastID, dwNumRecords);
-
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s FirstID:" ZBX_FS_UI64 " LastID:" ZBX_FS_UI64 " numIDs:%lu",
+			__function_name, zbx_result_string(ret), *FirstID, *LastID, dwNumRecords);
 
 	return ret;
 }
