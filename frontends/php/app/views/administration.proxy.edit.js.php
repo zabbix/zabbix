@@ -25,7 +25,11 @@
 
 		// trim spaces on sumbit
 		jQuery('#proxyForm').submit(function() {
-			jQuery(this).trimValues(['#host', '#ip', '#dns', '#port', '#description']);
+			jQuery('#host').val(jQuery.trim(jQuery('#host').val()));
+			jQuery('#ip').val(jQuery.trim(jQuery('#ip').val()));
+			jQuery('#dns').val(jQuery.trim(jQuery('#dns').val()));
+			jQuery('#port').val(jQuery.trim(jQuery('#port').val()));
+			jQuery('#description').val(jQuery.trim(jQuery('#description').val()));
 		});
 
 		// refresh field visibility on document load
