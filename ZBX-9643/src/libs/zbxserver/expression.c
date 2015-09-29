@@ -2508,12 +2508,12 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
 	{
-		char *expression;
+		char	*expression;
 
 		expression = zbx_strdup(NULL, event->trigger.expression);
 
-		substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host, dc_item,
-					&expression, MACRO_TYPE_TRIGGER_EXPRESSION, error, maxerrlen);
+		substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host, dc_item, &expression,
+				MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
 
 		expand_trigger_description_constants(data, expression);
 
