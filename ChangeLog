@@ -4,6 +4,7 @@ New features:
 ..F.....S. [ZBXNEXT-922] added forecasting trigger functions (gleb, Sandis)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 ....I..... [ZBXNEXT-2056] added an HTTP response code value map (Richlv)
+...G...PS. [ZBX-9274] added printing defaults when Zabbix programs are executed with --help option (dimir)
 
 Bug fixes:
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
