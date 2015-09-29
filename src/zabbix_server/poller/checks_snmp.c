@@ -1778,7 +1778,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 		ret = zbx_snmp_get_values(ss, items, to_verify_oids, results, errcodes, query_and_ignore_type, num, 0,
 				error, max_error_len, max_succeed, min_fail);
 
-		if (SUCCEED != ret)
+		if (SUCCEED != ret && NOTSUPPORTED != ret)
 			goto exit;
 
 		for (i = 0; i < to_verify_num; i++)
