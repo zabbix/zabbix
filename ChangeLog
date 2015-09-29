@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
 ...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
 .......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
 ...G...... [ZBX-9847] fixed possible Zabbix agent crash when executing system.cpu.discovery (dimir)
@@ -682,6 +683,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+.......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
 ...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
 .......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
 .......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
