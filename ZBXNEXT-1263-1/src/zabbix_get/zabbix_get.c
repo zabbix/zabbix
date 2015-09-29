@@ -285,7 +285,7 @@ int	main(int argc, char **argv)
 {
 	int		i, ret = SUCCEED;
 	char		*host = NULL, *key = NULL, *source_ip = NULL, ch;
-	unsigned short	opt_count[256] = {}, port = ZBX_DEFAULT_AGENT_PORT;
+	unsigned short	opt_count[256] = {0}, port = ZBX_DEFAULT_AGENT_PORT;
 
 #ifndef _WINDOWS
 	if (SUCCEED != zbx_coredump_disable())
