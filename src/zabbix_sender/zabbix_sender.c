@@ -600,7 +600,7 @@ static void	parse_commandline(int argc, char **argv)
 	int		i, fatal = 0;
 	char		ch;
 	unsigned int	opt_mask = 0;
-	unsigned short	opt_count[256] = {};
+	unsigned short	opt_count[256] = {0};
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
