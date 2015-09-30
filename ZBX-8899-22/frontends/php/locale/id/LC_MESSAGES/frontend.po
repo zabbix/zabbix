@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-09-17 11:59+0300\n"
 "PO-Revision-Date: 2013-10-10 08:26+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -41,7 +41,7 @@ msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
 msgstr[0] ""
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (tahun %2$s)"
@@ -329,12 +329,12 @@ msgstr "Aksi ditambahkan"
 msgid "Action deleted"
 msgstr "Aksi dihapus"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1673,7 +1673,7 @@ msgstr "Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operas
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr ""
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "Tidak dapat menghapus aksi yang dipilih"
 
@@ -1763,7 +1763,7 @@ msgstr "Tidak dapat menghapus nilai peta"
 msgid "Cannot delete web scenario"
 msgstr ""
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1828,11 +1828,11 @@ msgstr[0] ""
 msgid "Cannot display item queue."
 msgstr ""
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2358,8 +2358,8 @@ msgstr "Tidak dapat perbarui grup"
 msgid "Cannot update group."
 msgstr "Tidak dapat perbarui grup."
 
-#: api/classes/CHostGroup.php:943 api/classes/CHostGroup.php:1048
-#: api/classes/CHostGroup.php:1189
+#: api/classes/CHostGroup.php:960 api/classes/CHostGroup.php:1065
+#: api/classes/CHostGroup.php:1206
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -5424,7 +5424,7 @@ msgstr "Akses GUI non-aktif."
 msgid "General"
 msgstr "Umum"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:779
 #, c-format
 msgid "Generated in %s sec"
@@ -9757,7 +9757,7 @@ msgstr "Tidak ada item dengan itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Tidak ada item dengan itemid=\"%1$s\"."
 
-#: chart3.php:121
+#: chart3.php:123
 msgid "No items defined."
 msgstr "Tidak item yang didefinisikan."
 
@@ -9872,9 +9872,9 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:65
 #: api/classes/CHostGeneral.php:115 api/classes/CHostGroup.php:529
-#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:977
-#: api/classes/CHostGroup.php:1007 api/classes/CHostGroup.php:1136
-#: api/classes/CHostGroup.php:1238 api/classes/CHostGroup.php:1265
+#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:994
+#: api/classes/CHostGroup.php:1024 api/classes/CHostGroup.php:1153
+#: api/classes/CHostGroup.php:1255 api/classes/CHostGroup.php:1282
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
@@ -10019,7 +10019,7 @@ msgstr "Tidak ada trigger"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Tidak ada trigger dengan triggerid \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:41
+#: chart4.php:42 tr_comments.php:41
 msgid "No triggers defined."
 msgstr "Tidak ada trigger yang didefinisikan."
 
@@ -10388,7 +10388,7 @@ msgstr "Numerik (unsigned)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
+#: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
 #: include/maps.inc.php:945 include/setup.inc.php:198
@@ -10479,8 +10479,8 @@ msgstr "Pada perubahan status trigger berkedip untuk"
 msgid "Once"
 msgstr "Sekali"
 
-#: api/classes/CHostGroup.php:1145 api/classes/CHostGroup.php:1154
-#: api/classes/CHostGroup.php:1247
+#: api/classes/CHostGroup.php:1162 api/classes/CHostGroup.php:1171
+#: api/classes/CHostGroup.php:1264
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -10580,7 +10580,7 @@ msgstr "Hanya trigger yang ditugaskan ke host aktif dan tergantung pada item akt
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operasi \"%s\" sudah ada."
@@ -10907,7 +10907,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "MASALAH"
@@ -11274,7 +11274,7 @@ msgstr "Masalah, jika semua turunan memiliki masalah"
 msgid "Problem, if at least one child has a problem"
 msgstr "Masalah, jika setidaknya satu turunan memiliki masalah"
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
 #: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Masalah"
@@ -12399,7 +12399,7 @@ msgstr "Pilih baris dengan nilai seperti"
 msgid "Selected"
 msgstr "Dipilih"
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr "Aksi yang dipilih dihapus"
 
@@ -15630,7 +15630,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

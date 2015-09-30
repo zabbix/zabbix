@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-14 11:01+0300\n"
+"POT-Creation-Date: 2015-09-17 11:59+0300\n"
 "PO-Revision-Date: 2014-01-05 18:51+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -48,7 +48,7 @@ msgstr[1] "відображено %1$d з %2$d проблеми"
 msgstr[2] "відображено %1$d з %2$d проблем"
 msgstr[3] "відображено %1$d з %2$d проблем"
 
-#: chart4.php:89 chart5.php:83
+#: chart4.php:91 chart5.php:85
 #, c-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (рік %2$s)"
@@ -348,7 +348,7 @@ msgstr "Дію додано"
 msgid "Action deleted"
 msgstr "Дію видалено"
 
-#: actionconf.php:347
+#: actionconf.php:350
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
@@ -356,7 +356,7 @@ msgstr[1] ""
 msgstr[2] ""
 msgstr[3] ""
 
-#: actionconf.php:346
+#: actionconf.php:349
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
@@ -1707,7 +1707,7 @@ msgstr "Не вдалося видалити скрипт. Скрипт \"%1$s\"
 msgid "Cannot delete scripts. Script with scriptid \"%1$s\" does not exist."
 msgstr "Не вдалося видалити скрипти. Скрипт з scriptid \"%1$s\" не існує."
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Cannot delete selected actions"
 msgstr "Не вдалося видалити вибрані дії"
 
@@ -1797,7 +1797,7 @@ msgstr "Не вдалося видалити перетворення значе
 msgid "Cannot delete web scenario"
 msgstr "Не вдалося видалити веб-сценарій"
 
-#: actionconf.php:350
+#: actionconf.php:353
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
@@ -1897,11 +1897,11 @@ msgstr[3] "Не вдалося відключити веб-сценарії"
 msgid "Cannot display item queue."
 msgstr "Не вдалося відобразити чергу елементів даних."
 
-#: chart7.php:78
+#: chart7.php:80
 msgid "Cannot display more than one item with type \"Graph sum\"."
 msgstr "Не удалось відобразити більше одного елемента даних з типом \"Сума графіку\"."
 
-#: actionconf.php:349
+#: actionconf.php:352
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
@@ -2468,8 +2468,8 @@ msgstr "Не вдалося оновити групу"
 msgid "Cannot update group."
 msgstr "Не вдалося оновити групу."
 
-#: api/classes/CHostGroup.php:943 api/classes/CHostGroup.php:1048
-#: api/classes/CHostGroup.php:1189
+#: api/classes/CHostGroup.php:960 api/classes/CHostGroup.php:1065
+#: api/classes/CHostGroup.php:1206
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Не вдалося оновити групи для виявленого вузла мережі \"%1$s\"."
@@ -5544,7 +5544,7 @@ msgstr "Доступ до GUI відключено."
 msgid "General"
 msgstr "Загальні"
 
-#: chart4.php:168 chart5.php:200
+#: chart4.php:170 chart5.php:202
 #: include/classes/graphdraw/CBarGraphDraw.php:779
 #, c-format
 msgid "Generated in %s sec"
@@ -9926,7 +9926,7 @@ msgstr "Немає елемента даних з itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Немає елемента даних з itemid=\"%1$s\"."
 
-#: chart3.php:121
+#: chart3.php:123
 msgid "No items defined."
 msgstr "Елементів даних не визначено."
 
@@ -10041,9 +10041,9 @@ msgstr "Немає прав доступу до системи."
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:65
 #: api/classes/CHostGeneral.php:115 api/classes/CHostGroup.php:529
-#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:977
-#: api/classes/CHostGroup.php:1007 api/classes/CHostGroup.php:1136
-#: api/classes/CHostGroup.php:1238 api/classes/CHostGroup.php:1265
+#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:994
+#: api/classes/CHostGroup.php:1024 api/classes/CHostGroup.php:1153
+#: api/classes/CHostGroup.php:1255 api/classes/CHostGroup.php:1282
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
@@ -10188,7 +10188,7 @@ msgstr "Немає тригера"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Немає тригера з triggerid \"%1$s\"."
 
-#: chart4.php:40 tr_comments.php:41
+#: chart4.php:42 tr_comments.php:41
 msgid "No triggers defined."
 msgstr "Тригерів не визначено."
 
@@ -10557,7 +10557,7 @@ msgstr "Числовий (ціле додатне)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:159 chart5.php:192 httpdetails.php:152 httpdetails.php:240
+#: chart4.php:161 chart5.php:194 httpdetails.php:152 httpdetails.php:240
 #: httpmon.php:163 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:683 include/maps.inc.php:765 include/maps.inc.php:855
 #: include/maps.inc.php:945 include/setup.inc.php:198
@@ -10648,8 +10648,8 @@ msgstr "Мигання тригерів при зміні стану протя�
 msgid "Once"
 msgstr "Один раз"
 
-#: api/classes/CHostGroup.php:1145 api/classes/CHostGroup.php:1154
-#: api/classes/CHostGroup.php:1247
+#: api/classes/CHostGroup.php:1162 api/classes/CHostGroup.php:1171
+#: api/classes/CHostGroup.php:1264
 msgid "One of the objects is left without a host group."
 msgstr ""
 
@@ -10749,7 +10749,7 @@ msgstr "Підраховуються тригери тільки у вузлів
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:280
+#: actionconf.php:283
 #, c-format
 msgid "Operation \"%s\" already exists."
 msgstr "Операція \"%s\" вже існує."
@@ -11076,7 +11076,7 @@ msgstr ""
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:667 include/triggers.inc.php:155
+#: chart5.php:198 include/maps.inc.php:667 include/triggers.inc.php:155
 #: include/views/monitoring.overview.php:45
 msgid "PROBLEM"
 msgstr "ПРОБЛЕМА"
@@ -11443,7 +11443,7 @@ msgstr "Проблема, якщо всі підлеглі мають пробл
 msgid "Problem, if at least one child has a problem"
 msgstr "Проблема, якщо хоча б у одного із підлеглих наявна проблема"
 
-#: chart4.php:163 include/maps.inc.php:715 include/maps.inc.php:798
+#: chart4.php:165 include/maps.inc.php:715 include/maps.inc.php:798
 #: include/maps.inc.php:889 report2.php:402 report3.php:83
 msgid "Problems"
 msgstr "Проблеми"
@@ -12571,7 +12571,7 @@ msgstr "Відібрати рядки, які В ЗНАЧЕННІ містять
 msgid "Selected"
 msgstr "Відібрані"
 
-#: actionconf.php:358
+#: actionconf.php:361
 msgid "Selected actions deleted"
 msgstr "Вибрані дії видалено"
 
@@ -15835,7 +15835,7 @@ msgstr "d.m.Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d.m.Y H:i:s"
 
-#: chart4.php:124 chart5.php:137
+#: chart4.php:126 chart5.php:139
 msgid "d.M"
 msgstr "d M"
 
