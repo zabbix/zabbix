@@ -28,62 +28,74 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
 	);
 
-$valueMappingForm = (new CForm())
-	->setName('valueMappingForm')
-	->addVar('form', $this->data['form']);
+$form = (new CForm())
+	->setName('valuemap_form')
+	->addVar('form', $data['form']);
 
-if ($this->data['valuemapid'] != 0) {
-	$valueMappingForm->addVar('valuemapid', $this->data['valuemapid']);
+if ($data['valuemapid'] != 0) {
+	$form->addVar('valuemapid', $data['valuemapid']);
 }
 
-$valueMappingFormList = (new CFormList())
+$form_list = (new CFormList())
 	->addRow(_('Name'),
-		(new CTextBox('mapname', $this->data['mapname'], false, 64))
+		(new CTextBox('name', $data['name'], false, 64))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	);
 
-// mappings
-$mappingsTable = (new CTable())
-	->setNoDataMessage(null)
-	->setId('mappingsTable')
-	->addRow([_('Value'), SPACE, _('Mapped to'), SPACE])
-	->addRow((new CCol(
-		(new CButton('addMapping', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-	))->setColSpan(4));
-$valueMappingFormList->addRow(_('Mappings'), (new CDiv($mappingsTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$mappings_table = (new CTable())
+	->setId('mappings_table')
+	->setHeader([_('Value'), '', _('Mapped to'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
 
-// add mappings to form by js
-if ($this->data['mappings']) {
-	zbx_add_post_js('mappingsManager.addExisting('.zbx_jsvalue($this->data['mappings']).');');
-}
-else {
-	zbx_add_post_js('mappingsManager.addNew();');
+foreach ($data['mappings'] as $i => $mapping) {
+	$mappings_table->addRow([
+		(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		'&rArr;',
+		(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CButton('mappings['.$i.'][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+		],
+		'form_row'
+	);
 }
 
-// append tab
-$valueMappingTab = new CTabView();
-$valueMappingTab->addTab('valuemapping', _('Value mapping'), $valueMappingFormList);
+$mappings_table->addRow([(new CButton('mapping_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
+
+$form_list->addRow(_('Mappings'),
+	(new CDiv($mappings_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+	'row_mappings'
+);
+
+// append form list to tab
+$tab = (new CTabView())->addTab('valuemap_tab', _('Value mapping'), $form_list);
 
 // append buttons
-if ($this->data['valuemapid'] != 0) {
-	$valueMappingTab->setFooter(makeFormFooter(
+if ($data['valuemapid'] != 0) {
+	$tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CButtonDelete($this->data['confirmMessage'], url_param('valuemapid')),
+			new CButtonDelete($data['confirmMessage'], url_param('valuemapid')),
 			new CButtonCancel()
 		]
 	));
 }
 else {
-	$valueMappingTab->setFooter(makeFormFooter(
+	$tab->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel()]
 	));
 }
 
-$valueMappingForm->addItem($valueMappingTab);
+$form->addItem($tab);
 
-$widget->addItem($valueMappingForm);
+$widget->addItem($form);
 
 return $widget;
