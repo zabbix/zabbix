@@ -6,7 +6,7 @@ zabbix_sender \- Zabbix sender utility.
 .B zabbix_sender [-hpzvIV] {-kso | [-T] -i \fI<inputfile>\fB} [-c \fI<config-file>\fB]
 .SH DESCRIPTION
 .B zabbix_sender
-is a command line utility for sending data to a remote Zabbix server. On the Zabbix server an item of type \fBZabbix trapper\fR should be created with corresponding key. Note that incoming values will only be accepted from hosts specified in \fBAllowed hosts\fR field for this item.
+is a command line utility for sending performance data to a remote Zabbix server. On the Zabbix server an item of type \fBZabbix trapper\fR should be created with corresponding key. Note that incoming values will only be accepted from hosts specified in \fBAllowed hosts\fR field for this item.
 
 .SS Options
 .IP "-c, --config \fI<config-file>\fR"
@@ -28,11 +28,11 @@ Specify value.
 
 Load values from input file. Specify \fB-\fR to read values from standard input.
 
-Each value must be specified on its own line. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR, where "hostname" is the name of monitored host as registered in Zabbix frontend, "key" is target item key and "value" - the value to be sent for the item. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument. All entries are sent in a sequential order top-down.
+Each value must be specified on its own line. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR, where "hostname" is the name of monitored host as registered in Zabbix frontend, "key" is target item key and "value" - the value to send. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument. All entries are sent in a sequential order top-down.
 
 An example of a line of the input file:
 
-\fB "Zabbix server" db.connections 43\fR
+\fB "Linux DB3" db.connections 43\fR
 
 Note, that the value type must be correctly set in item configuration of Zabbix frontend.
 
@@ -68,9 +68,9 @@ Each line of the input file must contain 4 whitespace delimited entries: \fB<hos
 
 An example of a line of the input file:
 
-\fB "Zabbix server" db.connections 1429533600 43\fR
+\fB "Linux DB3" db.connections 1429533600 43\fR
 
-For more examples on the input file format please see option \fB--input-file\fR.
+For more details please see option \fB--input-file\fR.
 
 .IP "-r, --real-time"
 Send values one by one as soon as they are received. This can be used when reading from standard input.
