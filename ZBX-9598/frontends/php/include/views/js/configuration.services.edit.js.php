@@ -70,6 +70,7 @@
 
 			// column "action"
 			var td = document.createElement('td');
+			td.setAttribute('class', '<?= ZBX_STYLE_NOWRAP ?>');
 			var inputRemove = document.createElement('button');
 			inputRemove.setAttribute('class', '<?= ZBX_STYLE_BTN_LINK ?>');
 			inputRemove.setAttribute('onclick', 'javascript: removeDependentChild(\'' + serviceid + '\');');
@@ -78,11 +79,7 @@
 			td.appendChild(inputRemove);
 			tr.appendChild(td);
 			document.getElementById('service_children').firstChild.appendChild(tr);
-			jQuery('#service_children .message').css('display', 'none');
-
-			if (IE8) {
-				jQuery('#service_children').parent().addClass('ie8fix-inline').removeClass('ie8fix-inline');
-			}
+			jQuery('#service_children .nothing-to-show').css('display', 'none');
 		}
 	}
 
@@ -90,10 +87,6 @@
 		removeObjectById('children_' + serviceid);
 		removeObjectById('children_' + serviceid + '_name');
 		removeObjectById('children_' + serviceid + '_serviceid');
-
-		if (IE8) {
-			jQuery('#service_children').parent().addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function removeTime(id) {
@@ -104,9 +97,5 @@
 		removeObjectById('times_' + id + '_from');
 		removeObjectById('times_' + id + '_to');
 		removeObjectById('times_' + id + '_note');
-
-		if (IE8) {
-			parent.closest('table').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 </script>

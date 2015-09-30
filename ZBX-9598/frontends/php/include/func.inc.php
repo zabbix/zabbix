@@ -934,10 +934,10 @@ function zbx_arrayFindDuplicates(array $array) {
 /************* STRING *************/
 function zbx_nl2br($str) {
 	$str_res = [];
-	$str_arr = explode("\n", $str);
-	foreach ($str_arr as $id => $str_line) {
+	foreach (explode("\n", $str) as $str_line) {
 		array_push($str_res, $str_line, BR());
 	}
+	array_pop($str_res);
 
 	return $str_res;
 }
@@ -1160,7 +1160,7 @@ function zbx_value2array(&$values) {
 	}
 }
 
-// creates chain of relation parent -> childs, for all chain levels
+// creates chain of relation parent -> child, for all chain levels
 function createParentToChildRelation(&$chain, $link, $parentField, $childField) {
 	if (!isset($chain[$link[$parentField]])) {
 		$chain[$link[$parentField]] = [];
@@ -1350,18 +1350,22 @@ function zbx_array_mintersect($keys, $array) {
 
 function zbx_str2links($text) {
 	$result = [];
-	if (zbx_empty($text)) {
-		return $result;
-	}
-	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
 
-	$start = 0;
-	foreach ($matches[0] as $match) {
-		$result[] = mb_substr($text, $start, $match[1] - $start);
-		$result[] = (new CLink($match[0], $match[0]))->removeSID();
-		$start = $match[1] + mb_strlen($match[0]);
+	foreach (explode("\n", $text) as $line) {
+		$line = rtrim($line, "\r ");
+
+		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches, PREG_OFFSET_CAPTURE);
+
+		$start = 0;
+		foreach ($matches[0] as $match) {
+			$result[] = mb_substr($line, $start, $match[1] - $start);
+			$result[] = (new CLink($match[0], $match[0]))->removeSID();
+			$start = $match[1] + mb_strlen($match[0]);
+		}
+		$result[] = mb_substr($line, $start);
+		$result[] = BR();
 	}
-	$result[] = mb_substr($text, $start, mb_strlen($text));
+	array_pop($result);
 
 	return $result;
 }
@@ -1394,10 +1398,10 @@ function make_sorting_header($obj, $tabfield, $sortField, $sortOrder) {
 	$arrow = null;
 	if ($tabfield == $sortField) {
 		if ($sortorder == ZBX_SORT_UP) {
-			$arrow = (new CSpan())->addClass('arrow-down');
+			$arrow = (new CSpan())->addClass(ZBX_STYLE_ARROW_DOWN);
 		}
 		else {
-			$arrow = (new CSpan())->addClass('arrow-up');
+			$arrow = (new CSpan())->addClass(ZBX_STYLE_ARROW_UP);
 		}
 	}
 
@@ -1691,14 +1695,15 @@ function detect_page_type($default = PAGE_TYPE_HTML) {
 function makeMessageBox($good, array $messages, $title = null, $show_close_box = true, $show_details = false)
 {
 	$msg_box = (new CDiv($title))
-		->addClass($good ? 'msg-good' : 'msg-bad');
+		->addClass($good ? ZBX_STYLE_MSG_GOOD : ZBX_STYLE_MSG_BAD);
 
 	if ($show_close_box) {
-		$msg_box->setId('global-message');
+		$id = $good ? 'global-message-good' : 'global-message-bad';
+		$msg_box->setId($id);
 	}
 
 	if ($messages) {
-		$msg_details = (new CDiv())->addClass('msg-details');
+		$msg_details = (new CDiv())->addClass(ZBX_STYLE_MSG_DETAILS);
 
 		if ($title !== null) {
 			$link = (new CLink(_('Details')))
@@ -1710,7 +1715,9 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 
 		$list = new CList();
 		if ($title !== null) {
-			$list->setId('msg-messages');
+			$list
+				->addClass(ZBX_STYLE_MSG_DETAILS_BORDER)
+				->setId('msg-messages');
 
 			if (!$show_details) {
 				$list->setAttribute('style', 'display: none;');
@@ -1724,17 +1731,17 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 		$msg_box->addItem($msg_details);
 	}
 
-	if ($title !== null && $show_close_box) {
+	if ($show_close_box) {
 		$msg_box->addItem((new CSpan())
 			->addClass(ZBX_STYLE_OVERLAY_CLOSE_BTN)
-			->onClick('javascript: showHide("global-message", IE ? "block" : "");')
+			->onClick('javascript: showHide("'.$id.'", IE ? "block" : "");')
 			->setAttribute('title', _('Close')));
 	}
 
 	return $msg_box;
 }
 
-function show_messages($bool = true, $okmsg = null, $errmsg = null) {
+function show_messages($good = false, $okmsg = null, $errmsg = null) {
 	global $page, $ZBX_MESSAGES;
 
 	if (!defined('PAGE_HEADER_LOADED')) {
@@ -1749,63 +1756,48 @@ function show_messages($bool = true, $okmsg = null, $errmsg = null) {
 
 	$imageMessages = [];
 
-	if (!$bool && !is_null($errmsg)) {
-		$msg = $errmsg;
-	}
-	elseif ($bool && !is_null($okmsg)) {
-		$msg = $okmsg;
-	}
+	$title = $good ? $okmsg : $errmsg;
+	$messages = isset($ZBX_MESSAGES) ? $ZBX_MESSAGES : [];
 
-	if (isset($msg)) {
-		switch ($page['type']) {
-			case PAGE_TYPE_IMAGE:
-				// save all of the messages in an array to display them later in an image
+	$ZBX_MESSAGES = [];
+
+	switch ($page['type']) {
+		case PAGE_TYPE_IMAGE:
+			if ($title !== null) {
 				$imageMessages[] = [
-					'text' => $msg,
-					'color' => (!$bool) ? ['R' => 255, 'G' => 0, 'B' => 0] : ['R' => 34, 'G' => 51, 'B' => 68]
+					'text' => $title,
+					'color' => (!$good) ? ['R' => 255, 'G' => 0, 'B' => 0] : ['R' => 34, 'G' => 51, 'B' => 68]
 				];
-				break;
-			case PAGE_TYPE_XML:
-				echo htmlspecialchars($msg)."\n";
-				break;
-			case PAGE_TYPE_HTML:
-			default:
-				$messages = (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) ? $ZBX_MESSAGES : [];
-				$msg_box = makeMessageBox($bool, $messages, $msg);
-
-				$msg_box->show();
-				break;
-		}
-	}
-
-	if (isset($ZBX_MESSAGES) && !empty($ZBX_MESSAGES)) {
-		if ($page['type'] == PAGE_TYPE_IMAGE) {
-			foreach ($ZBX_MESSAGES as $msg) {
-				// save all of the messages in an array to display them later in an image
-				if ($msg['type'] == 'error') {
-					$imageMessages[] = [
-						'text' => $msg['message'],
-						'color' => ['R' => 255, 'G' => 55, 'B' => 55]
-					];
-				}
-				else {
-					$imageMessages[] = [
-						'text' => $msg['message'],
-						'color' => ['R' => 155, 'G' => 155, 'B' => 55]
-					];
-				}
 			}
-		}
-		elseif ($page['type'] == PAGE_TYPE_XML) {
-			foreach ($ZBX_MESSAGES as $msg) {
-				echo '['.$msg['type'].'] '.$msg['message']."\n";
+
+			foreach ($messages as $message) {
+				$imageMessages[] = [
+					'text' => $message['message'],
+					'color' => $message['type'] == 'error'
+						? ['R' => 255, 'G' => 55, 'B' => 55]
+						: ['R' => 155, 'G' => 155, 'B' => 55]
+				];
 			}
-		}
-		$ZBX_MESSAGES = null;
+			break;
+		case PAGE_TYPE_XML:
+			if ($title !== null) {
+				echo htmlspecialchars($title)."\n";
+			}
+
+			foreach ($messages as $message) {
+				echo '['.$message['type'].'] '.$message['message']."\n";
+			}
+			break;
+		case PAGE_TYPE_HTML:
+		default:
+			if ($title || $messages) {
+				makeMessageBox($good, $messages, $title, true, !$good)->show();
+			}
+			break;
 	}
 
 	// draw an image with the messages
-	if ($page['type'] == PAGE_TYPE_IMAGE && count($imageMessages) > 0) {
+	if ($imageMessages) {
 		$imageFontSize = 8;
 
 		// calculate the size of the text
@@ -1854,44 +1846,46 @@ function show_error_message($msg) {
 function info($msgs) {
 	global $ZBX_MESSAGES;
 
-	zbx_value2array($msgs);
-	if (is_null($ZBX_MESSAGES)) {
+	if (!isset($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = [];
 	}
+
+	zbx_value2array($msgs);
+
 	foreach ($msgs as $msg) {
-		array_push($ZBX_MESSAGES, ['type' => 'info', 'message' => $msg]);
+		$ZBX_MESSAGES[] = ['type' => 'info', 'message' => $msg];
 	}
 }
 
 function error($msgs) {
 	global $ZBX_MESSAGES;
 
-	if (is_null($ZBX_MESSAGES)) {
+	if (!isset($ZBX_MESSAGES)) {
 		$ZBX_MESSAGES = [];
 	}
 
 	$msgs = zbx_toArray($msgs);
+
 	foreach ($msgs as $msg) {
-		if (isset(CWebUser::$data['debug_mode']) && !is_object($msg) && !CWebUser::$data['debug_mode']) {
-			$msg = preg_replace('/^\[.+?::.+?\]/', '', $msg);
-		}
-		array_push($ZBX_MESSAGES, ['type' => 'error', 'message' => $msg]);
+		$ZBX_MESSAGES[] = ['type' => 'error', 'message' => $msg];
 	}
 }
 
 function clear_messages($count = null) {
 	global $ZBX_MESSAGES;
 
-	$result = [];
-	if (!is_null($count)) {
+	if ($count != null) {
+		$result = [];
+
 		while ($count-- > 0) {
 			array_unshift($result, array_pop($ZBX_MESSAGES));
 		}
 	}
 	else {
 		$result = $ZBX_MESSAGES;
-		$ZBX_MESSAGES = null;
+		$ZBX_MESSAGES = [];
 	}
+
 	return $result;
 }
 
@@ -2137,7 +2131,7 @@ function imageOut(&$image, $format = null) {
 function hasErrorMesssages() {
 	global $ZBX_MESSAGES;
 
-	if ($ZBX_MESSAGES !== null) {
+	if (isset($ZBX_MESSAGES)) {
 		foreach ($ZBX_MESSAGES as $message) {
 			if ($message['type'] === 'error') {
 				return true;
@@ -2168,7 +2162,7 @@ function checkRequiredKeys(array $array, array $keys) {
  */
 function uncheckTableRows($cookieId = null) {
 	insert_js('cookie.eraseArray("cb_'.basename($_SERVER['SCRIPT_NAME'], '.php').
-		($cookieId !== null ? '_'.$cookieId : '').'")'
+		($cookieId === null ? '' : '_'.$cookieId).'")'
 	);
 }
 

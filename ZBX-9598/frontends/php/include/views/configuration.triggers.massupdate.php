@@ -38,30 +38,24 @@ foreach ($data['g_triggerid'] as $triggerid) {
 	$triggersForm->addVar('g_triggerid['.$triggerid.']', $triggerid);
 }
 
-// create form list
-$triggersFormList = new CFormList('triggersFormList');
-
-// append severity to form list
-$severityDiv = new CSeverity([
-	'id' => 'priority_div',
-	'name' => 'priority',
-	'value' => $data['priority']
-]);
-
-$triggersFormList->addRow(
-	[_('Severity'), SPACE,
-		(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
-			->setChecked(isset($data['visible']['priority']))
-	],
-	$severityDiv
-);
+$triggersFormList = (new CFormList('triggersFormList'))
+	->addRow(
+		[_('Severity'), SPACE,
+			(new CVisibilityBox('visible[priority]', 'priority_div', _('Original')))
+				->setChecked(isset($data['visible']['priority']))
+		],
+		(new CDiv(
+			new CSeverity([
+				'name' => 'priority',
+				'value' => (int) $data['priority']
+			])
+		))->setId('priority_div')
+	);
 
 // append dependencies to form list
 $dependenciesTable = (new CTable())
 	->setNoDataMessage(_('No dependencies defined.'))
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
-	->setId('dependenciesTable')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Name'), _('Action')]);
 
 foreach ($data['dependencies'] as $dependency) {
@@ -80,28 +74,28 @@ foreach ($data['dependencies'] as $dependency) {
 		$description = $depTriggerDescription;
 	}
 
-	$row = new CRow([$description,
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-
-	$row->setId('dependency_'.$dependency['triggerid']);
-	$dependenciesTable->addRow($row);
+	$dependenciesTable->addRow(
+		(new CRow([
+			$description,
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->onClick('javascript: removeDependency(\''.$dependency['triggerid'].'\');')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->setId('dependency_'.$dependency['triggerid'])
+	);
 }
 
-$dependenciesDiv = (new CDiv(
-	[
-		$dependenciesTable,
-		(new CButton('btn1', _('Add')))
-			->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
-					'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
-					'&with_triggers=1&noempty=1");')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]))
-	->addClass('objectgroup')
-	->addClass('inlineblock')
-	->addClass('border_dotted')
+$dependenciesDiv = (new CDiv([
+	$dependenciesTable,
+	(new CButton('btn1', _('Add')))
+		->onClick('return PopUp("popup.php?dstfrm=massupdate&dstact=add_dependency&reference=deptrigger'.
+				'&dstfld1=new_dependency&srctbl=triggers&objname=triggers&srcfld1=triggerid&multiselect=1'.
+				'&with_triggers=1&noempty=1");')
+		->addClass(ZBX_STYLE_BTN_LINK)
+]))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	->setId('dependencies_div');
 
 $triggersFormList->addRow(

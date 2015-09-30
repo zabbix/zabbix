@@ -123,10 +123,9 @@ function cancelEvent(e) {
 		e = window.event;
 	}
 
-	if (!IE8) {
-		e.stopPropagation();
-		e.preventDefault();
-	}
+	e.stopPropagation();
+	e.preventDefault();
+
 	if (IE) {
 		e.cancelBubble = true;
 		e.returnValue = false;
@@ -573,3 +572,18 @@ function daysInMonth(year, month) {
 function appendZero(val) {
 	return val < 10 ? '0' + val : val;
 }
+
+/**
+ * Trims selected elements values.
+ *
+ * @param array selectors
+ */
+jQuery.fn.trimValues = function(selectors) {
+	var form = this,
+		obj;
+
+	jQuery.each(selectors, function(i, value) {
+		obj = jQuery(value, form);
+		obj.val(jQuery.trim(obj.val()));
+	});
+};

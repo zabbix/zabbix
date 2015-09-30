@@ -28,8 +28,9 @@ class CDiv extends CTag {
 		return $this;
 	}
 
-	public function useJQueryStyle() {
-		$this->addClass('jqueryinputset');
+	public function setWidth($value) {
+		$this->addStyle('width: '.$value.'px;');
+
 		return $this;
 	}
 }

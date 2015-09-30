@@ -10,9 +10,9 @@
 	</td>
 	<td>#{name}</td>
 	<td>
-		<input class="input text" type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?= CHtml::encode(_('default')); ?>" value="" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right; width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px">
+		<input type="text" id="slides_#{rowId}_delay" name="slides[#{rowId}][delay]" placeholder="<?= CHtml::encode(_('default')); ?>" value="" maxlength="5" onchange="validateNumericBox(this, true, false);" style="text-align: right; width: <?= ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH ?>px">
 	</td>
-	<td>
+	<td class="<?= ZBX_STYLE_NOWRAP ?>">
 		<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" id="remove_#{rowId}" remove_slide="#{rowId}" onclick="removeSlide(this);"><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -31,10 +31,6 @@
 		}
 
 		recalculateSortOrder();
-
-		if (IE8) {
-			jQuery('#slideTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function recalculateSortOrder() {
@@ -107,10 +103,6 @@
 		if (initSize < 2) {
 			initSortable();
 		}
-
-		if (IE8) {
-			jQuery('#slideTable').addClass('ie8fix-inline').removeClass('ie8fix-inline');
-		}
 	}
 
 	function initSortable() {
@@ -144,7 +136,7 @@
 				});
 
 				// when dragging element on safari, it jumps out of the table on IE it moves about 4 pixels to right
-				if (SF || IE8) {
+				if (SF) {
 					// move back draggable element to proper position
 					ui.css('left', (ui.offset().left - 4) + 'px');
 				}

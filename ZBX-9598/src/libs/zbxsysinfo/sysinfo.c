@@ -411,7 +411,7 @@ void	test_parameter(const char *key)
 
 	init_result(&result);
 
-	if (SUCCEED == process(key, 0, &result))
+	if (SUCCEED == process(key, PROCESS_WITH_ALIAS, &result))
 	{
 		if (0 != ISSET_UI64(&result))
 			printf(" [u|" ZBX_FS_UI64 "]", result.ui64);
@@ -565,6 +565,7 @@ static int	replace_param(const char *cmd, AGENT_REQUEST *request, char **out, ch
  * Parameters: in_command - item key                                          *
  *             flags - PROCESS_LOCAL_COMMAND, allow execution of system.run   *
  *                     PROCESS_MODULE_COMMAND, execute item from a module     *
+ *                     PROCESS_WITH_ALIAS, substitute agent Alias             *
  *                                                                            *
  * Return value: SUCCEED - successful execution                               *
  *               NOTSUPPORTED - item key is not supported or other error      *
@@ -580,7 +581,8 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 	init_result(result);
 	init_request(&request);
 
-	if (SUCCEED != parse_item_key(zbx_alias_get(in_command), &request))
+	if (SUCCEED != parse_item_key((0 == (flags & PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command)),
+			&request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto notsupported;
@@ -609,7 +611,10 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 
 	/* expected item from a module */
 	if (0 != (flags & PROCESS_MODULE_COMMAND) && 0 == (command->flags & CF_MODULE))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
 		goto notsupported;
+	}
 
 	/* command does not accept parameters but was called with parameters */
 	if (0 == (command->flags & CF_HAVEPARAMS) && 0 != request.nparam)
@@ -645,7 +650,7 @@ int	process(const char *in_command, unsigned flags, AGENT_RESULT *result)
 		/* "return NOTSUPPORTED;" would be more appropriate here for preserving original error */
 		/* message in "result" but would break things relying on ZBX_NOTSUPPORTED message. */
 		if (0 != (command->flags & CF_MODULE) && 0 == ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Item is not supported."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
 
 		goto notsupported;
 	}

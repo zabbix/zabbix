@@ -47,21 +47,18 @@ function local_generateHeader($data) {
 	]);
 	echo $pageHeader->getOutput();
 
-	$pageTop = new CView('layout.htmlpage.top', [
-		'fullscreen' => $data['fullscreen'],
-		'user' => [
-			'debug_mode' => CWebUser::$data['debug_mode'],
-			'is_guest' => CWebUser::isGuest()
-		]
-	]);
-	echo $pageTop->getOutput();
-
 	if ($data['fullscreen'] == 0) {
 		$pageMenu = new CView('layout.htmlpage.menu', [
 			'menu' => [
 				'main_menu' => $main_menu,
 				'sub_menus' => $sub_menus,
 				'selected' => $page['menu']
+			],
+			'user' => [
+				'is_guest' => CWebUser::isGuest(),
+				'alias' => CWebUser::$data['alias'],
+				'name' => CWebUser::$data['name'],
+				'surname' => CWebUser::$data['surname']
 			]
 		]);
 		echo $pageMenu->getOutput();

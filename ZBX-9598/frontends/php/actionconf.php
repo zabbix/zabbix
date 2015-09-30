@@ -118,11 +118,36 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		'operations' => getRequest('operations', [])
 	];
 
-	foreach ($action['operations'] as $num => $operation) {
+	foreach ($action['operations'] as &$operation) {
 		if (isset($operation['opmessage']) && !isset($operation['opmessage']['default_msg'])) {
-			$action['operations'][$num]['opmessage']['default_msg'] = 0;
+			$operation['opmessage']['default_msg'] = 0;
+		}
+
+		switch ($operation['operationtype']) {
+			case OPERATION_TYPE_GROUP_ADD:
+			case OPERATION_TYPE_GROUP_REMOVE:
+				$operation['opgroup'] = [];
+
+				foreach ($operation['groupids'] as $groupid) {
+					$operation['opgroup'][] = ['groupid' => $groupid];
+				}
+				unset($operation['groupids']);
+
+				break;
+
+			case OPERATION_TYPE_TEMPLATE_ADD:
+			case OPERATION_TYPE_TEMPLATE_REMOVE:
+				$operation['optemplate'] = [];
+
+				foreach ($operation['templateids'] as $templateid) {
+					$operation['optemplate'][] = ['templateid' => $templateid];
+				}
+				unset($operation['templateids']);
+
+				break;
 		}
 	}
+	unset($operation);
 
 	$filter = [
 		'conditions' => getRequest('conditions', []),
@@ -275,6 +300,32 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 	$new_operation = $_REQUEST['new_operation'];
 	$result = true;
 
+	switch ($new_operation['operationtype']) {
+		case OPERATION_TYPE_GROUP_ADD:
+		case OPERATION_TYPE_GROUP_REMOVE:
+			$new_operation['opgroup'] = [];
+
+			if (array_key_exists('groupids', $new_operation)) {
+				foreach ($new_operation['groupids'] as $groupid) {
+					$new_operation['opgroup'][] = ['groupid' => $groupid];
+				}
+				unset($new_operation['groupids']);
+			}
+			break;
+
+		case OPERATION_TYPE_TEMPLATE_ADD:
+		case OPERATION_TYPE_TEMPLATE_REMOVE:
+			$new_operation['optemplate'] = [];
+
+			if (array_key_exists('templateids', $new_operation)) {
+				foreach ($new_operation['templateids'] as $templateid) {
+					$new_operation['optemplate'][] = ['templateid' => $templateid];
+				}
+				unset($new_operation['templateids']);
+			}
+			break;
+	}
+
 	if (API::Action()->validateOperationsIntegrity($new_operation)) {
 		$_REQUEST['operations'] = getRequest('operations', []);
 
@@ -282,17 +333,21 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 			OPERATION_TYPE_HOST_ADD => 0,
 			OPERATION_TYPE_HOST_REMOVE => 0,
 			OPERATION_TYPE_HOST_ENABLE => 0,
-			OPERATION_TYPE_HOST_DISABLE => 0
+			OPERATION_TYPE_HOST_DISABLE => 0,
+			OPERATION_TYPE_HOST_INVENTORY => 0
 		];
-		if (isset($uniqOperations[$new_operation['operationtype']])) {
-			foreach ($_REQUEST['operations'] as $operation) {
-				if (isset($uniqOperations[$operation['operationtype']])) {
+		if (array_key_exists($new_operation['operationtype'], $uniqOperations)) {
+			$uniqOperations[$new_operation['operationtype']]++;
+			foreach ($_REQUEST['operations'] as $operationId => $operation) {
+				if (array_key_exists($operation['operationtype'], $uniqOperations)
+					&& (!array_key_exists('id', $new_operation)
+						|| bccomp($new_operation['id'], $operationId) != 0)) {
 					$uniqOperations[$operation['operationtype']]++;
 				}
 			}
-			if ($uniqOperations[$new_operation['operationtype']]) {
+			if ($uniqOperations[$new_operation['operationtype']] > 1) {
 				$result = false;
-				info(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
+				error(_s('Operation "%s" already exists.', operation_type2str($new_operation['operationtype'])));
 				show_messages();
 			}
 		}
@@ -302,11 +357,11 @@ elseif (isset($_REQUEST['add_operation']) && isset($_REQUEST['new_operation'])) 
 				CProfile::get('web.actionconf.eventsource', EVENT_SOURCE_TRIGGERS)
 			);
 
-			if (isset($new_operation['id'])) {
-				$_REQUEST['operations'][$new_operation['id']] = $new_operation;
+			if (isset($_REQUEST['new_operation']['id'])) {
+				$_REQUEST['operations'][$_REQUEST['new_operation']['id']] = $_REQUEST['new_operation'];
 			}
 			else {
-				$_REQUEST['operations'][] = $new_operation;
+				$_REQUEST['operations'][] = $_REQUEST['new_operation'];
 			}
 
 			sortOperations($eventsource, $_REQUEST['operations']);
@@ -395,7 +450,6 @@ if (hasRequest('form')) {
 		'config' => $config
 	];
 
-	$action = null;
 	if ($data['actionid']) {
 		$data['action'] = API::Action()->get([
 			'actionids' => $data['actionid'],
@@ -405,6 +459,31 @@ if (hasRequest('form')) {
 			'editable' => true
 		]);
 		$data['action'] = reset($data['action']);
+
+		foreach ($data['action']['operations'] as &$operation) {
+			switch ($operation['operationtype']) {
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					$operation = [
+						'actionid' => $operation['actionid'],
+						'operationid' => $operation['operationid'],
+						'operationtype' => $operation['operationtype'],
+						'groupids' => zbx_objectValues($operation['opgroup'], 'groupid')
+					];
+					break;
+
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					$operation = [
+						'actionid' => $operation['actionid'],
+						'operationid' => $operation['operationid'],
+						'operationtype' => $operation['operationtype'],
+						'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
+					];
+					break;
+			}
+		}
+		unset($operation);
 
 		$data['eventsource'] = $data['action']['eventsource'];
 	}
@@ -497,15 +576,71 @@ if (hasRequest('form')) {
 	}
 
 	// new operation
-	if (!empty($data['new_operation'])) {
-		if (!is_array($data['new_operation'])) {
-			$data['new_operation'] = [
-				'operationtype' => 0,
-				'esc_period' => 0,
-				'esc_step_from' => 1,
-				'esc_step_to' => 1,
-				'evaltype' => 0
-			];
+	if (!empty($data['new_operation']) && !is_array($data['new_operation'])) {
+		$data['new_operation'] = [
+			'operationtype' => 0,
+			'esc_period' => 0,
+			'esc_step_from' => 1,
+			'esc_step_to' => 1,
+			'evaltype' => 0
+		];
+	}
+
+	if (is_array($data['new_operation'])) {
+		switch ($data['new_operation']['operationtype']) {
+			case OPERATION_TYPE_GROUP_ADD:
+			case OPERATION_TYPE_GROUP_REMOVE:
+				if (!array_key_exists('groupids', $data['new_operation'])) {
+					$data['new_operation']['groupids'] = [];
+				}
+
+				if ($data['new_operation']['groupids']) {
+					$data['new_operation']['groups'] = API::HostGroup()->get([
+						'groupids' => $data['new_operation']['groupids'],
+						'output' => ['groupid', 'name'],
+						'editable' => true
+					]);
+
+					foreach ($data['new_operation']['groups'] as &$group) {
+						$group['id'] = $group['groupid'];
+						unset($group['groupid']);
+					}
+					unset($group);
+				}
+				else {
+					$data['new_operation']['groups'] = [];
+				}
+				break;
+
+			case OPERATION_TYPE_TEMPLATE_ADD:
+			case OPERATION_TYPE_TEMPLATE_REMOVE:
+				if (!array_key_exists('templateids', $data['new_operation'])) {
+					$data['new_operation']['templateids'] = [];
+				}
+
+				if ($data['new_operation']['templateids']) {
+					$data['new_operation']['templates'] = API::Template()->get([
+						'templateids' => $data['new_operation']['templateids'],
+						'output' => ['templateid', 'name'],
+						'editable' => true
+					]);
+
+					foreach ($data['new_operation']['templates'] as &$template) {
+						$template['id'] = $template['templateid'];
+						unset($template['templateid']);
+					}
+					unset($template);
+				}
+				else {
+					$data['new_operation']['templates'] = [];
+				}
+				break;
+
+			case OPERATION_TYPE_HOST_INVENTORY:
+				if (!array_key_exists('opinventory', $data['new_operation'])) {
+					$data['new_operation']['opinventory'] = ['inventory_mode' => HOST_INVENTORY_MANUAL];
+				}
+				break;
 		}
 	}
 
@@ -537,6 +672,32 @@ else {
 		'sortfield' => $sortField,
 		'limit' => $config['search_limit'] + 1
 	]);
+
+	foreach ($data['actions'] as &$action) {
+		foreach ($action['operations'] as &$operation) {
+			switch ($operation['operationtype']) {
+				case OPERATION_TYPE_GROUP_ADD:
+				case OPERATION_TYPE_GROUP_REMOVE:
+					$operation = [
+						'operationtype' => $operation['operationtype'],
+						'groupids' => zbx_objectValues($operation['opgroup'], 'groupid')
+					];
+					break;
+
+				case OPERATION_TYPE_TEMPLATE_ADD:
+				case OPERATION_TYPE_TEMPLATE_REMOVE:
+					$operation = [
+						'operationtype' => $operation['operationtype'],
+						'templateids' => zbx_objectValues($operation['optemplate'], 'templateid')
+					];
+					break;
+			}
+		}
+		unset($operation);
+	}
+	unset($action);
+
+
 
 	// sorting && paging
 	order_result($data['actions'], $sortField, $sortOrder);

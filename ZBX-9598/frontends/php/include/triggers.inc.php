@@ -20,23 +20,25 @@
 
 
 function getSeverityStyle($severity, $type = true) {
-	$styles = [
-		TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG,
-		TRIGGER_SEVERITY_HIGH => ZBX_STYLE_HIGH_BG,
-		TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
-		TRIGGER_SEVERITY_WARNING => ZBX_STYLE_WARNING_BG,
-		TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
-		TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG
-	];
-
 	if (!$type) {
 		return ZBX_STYLE_NORMAL_BG;
 	}
-	elseif (isset($styles[$severity])) {
-		return $styles[$severity];
-	}
-	else {
-		return '';
+
+	switch ($severity) {
+		case TRIGGER_SEVERITY_DISASTER:
+			return ZBX_STYLE_DISASTER_BG;
+		case TRIGGER_SEVERITY_HIGH:
+			return ZBX_STYLE_HIGH_BG;
+		case TRIGGER_SEVERITY_AVERAGE:
+			return ZBX_STYLE_AVERAGE_BG;
+		case TRIGGER_SEVERITY_WARNING:
+			return ZBX_STYLE_WARNING_BG;
+		case TRIGGER_SEVERITY_INFORMATION:
+			return ZBX_STYLE_INFO_BG;
+		case TRIGGER_SEVERITY_NOT_CLASSIFIED:
+			return ZBX_STYLE_NA_BG;
+		default:
+			return null;
 	}
 }
 
@@ -772,13 +774,21 @@ function triggerExpression($trigger, $html = false) {
 						$link = (new CSpan($function_data['host'].':'.CHtml::encode($function_data['key_'])))->addClass($style);
 					}
 					elseif ($function_data['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
+						$link = (new CLink(
+							$function_data['host'].':'.CHtml::encode($function_data['key_']),
 							'disc_prototypes.php?form=update&itemid='.$function_data['itemid'].'&parent_discoveryid='.
-							$trigger['discoveryRuleid']))->addClass($style);
+							$trigger['discoveryRuleid']
+						))
+							->addClass(ZBX_STYLE_LINK_ALT)
+							->addClass($style);
 					}
 					else {
-						$link = (new CLink($function_data['host'].':'.CHtml::encode($function_data['key_']),
-							'items.php?form=update&itemid='.$function_data['itemid']))->addClass($style);
+						$link = (new CLink(
+							$function_data['host'].':'.CHtml::encode($function_data['key_']),
+							'items.php?form=update&itemid='.$function_data['itemid']
+						))
+							->addClass(ZBX_STYLE_LINK_ALT)
+							->addClass($style);
 					}
 					array_push(
 						$exp,
@@ -1051,6 +1061,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 						|| (($data[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
 							&& $trigger['priority'] > $data[$trigger['description']][$host['name']]['priority']))) {
 				$data[$trigger['description']][$host['name']] = [
+					'groupid' => $trigger['groupid'],
 					'hostid' => $host['hostid'],
 					'triggerid' => $trigger['triggerid'],
 					'value' => $trigger['value'],
@@ -1082,7 +1093,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 		foreach ($hostNames as $hostName) {
 			$header[] = (new CColHeader($hostName))->addClass('vertical_rotation');
 		}
-		$triggerTable->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader($header);
 
 		// data
 		foreach ($data as $description => $triggerHosts) {
@@ -1107,7 +1118,7 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 			$header[] = (new CColHeader($description))->addClass('vertical_rotation');
 		}
 
-		$triggerTable->setHeader($header, 'vertical_header');
+		$triggerTable->setHeader($header);
 
 		// data
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
@@ -1139,12 +1150,13 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  *
  * @param array  $trigger
  * @param string $pageFile		the page where the element is displayed
- * @param string $screenId
+ * @param string $screenid
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
-	$ack = $css = $style = null;
+function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
+	$ack = null;
+	$css = null;
 	$desc = [];
 	$acknowledge = [];
 
@@ -1152,38 +1164,32 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 	$config = select_config();
 
 	if ($trigger) {
-		$style = 'cursor: pointer; ';
+		$css = getSeverityStyle($trigger['priority'], $trigger['value'] == TRIGGER_VALUE_TRUE);
 
 		// problem trigger
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
-			$css = getSeverityStyle($trigger['priority']);
 			$ack = null;
 
-			if ($config['event_ack_enable'] == 1) {
+			if ($config['event_ack_enable']) {
 				if ($event = get_last_event_by_triggerid($trigger['triggerid'])) {
-					if ($screenId) {
+					if ($screenid !== null) {
 						$acknowledge = [
 							'eventid' => $event['eventid'],
-							'screenid' => $screenId,
-							'backurl' => $pageFile
+							'backurl' => $pageFile.'?screenid='.$screenid
 						];
 					}
 					else {
 						$acknowledge = [
 							'eventid' => $event['eventid'],
-							'backurl' => 'overview.php'
+							'backurl' => $pageFile
 						];
 					}
 
 					if ($event['acknowledged'] == 1) {
-						$ack = new CImg('images/general/tick.png', 'ack');
+						$ack = (new CSpan())->addClass(ZBX_STYLE_ICON_ACKN);
 					}
 				}
 			}
-		}
-		// ok trigger
-		else {
-			$css = 'normal';
 		}
 
 		// dependency: triggers on which depends this
@@ -1202,11 +1208,9 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = (new CImg('images/general/arrow_down2.png', 'DEP_DOWN'))
-				->setAttribute('style', 'vertical-align: middle; border: 0px;')
+			$desc[] = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_DEPEND_DOWN)
 				->setHint($dependencyTable, '', false);
-
-			$desc[] = $icon;
 		}
 
 		// trigger dependency UP
@@ -1222,19 +1226,19 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		}
 
 		if ($isDependencyFound) {
-			$icon = (new CImg('images/general/arrow_up2.png', 'DEP_UP'))
-				->setAttribute('style', 'vertical-align: middle; border: none;')
+			$desc[] = (new CSpan())
+				->addClass(ZBX_STYLE_ICON_DEPEND_UP)
 				->setHint($dependencyTable, '', false);
-
-			$desc[] = $icon;
 		}
 	}
 
-	$column = ((is_array($desc) && count($desc) > 0) || $ack)
-		? (new CCol([$desc, $ack]))->addClass($css)->addClass('hosts')
-		: (new CCol(SPACE))->addClass($css)->addClass('hosts');
+	$column = new CCol([$desc, $ack]);
 
-	$column->setAttribute('style', $style);
+	if ($css !== null) {
+		$column
+			->addClass($css)
+			->addClass(ZBX_STYLE_CURSOR_POINTER);
+	}
 
 	if ($trigger && $config['blink_period'] > 0 && time() - $trigger['lastchange'] < $config['blink_period']) {
 		$column->addClass('blink');
@@ -1557,14 +1561,15 @@ function buildExpressionHtmlTree(array $expressionTree, array &$next, &$letterNu
 				}
 
 				if (defined('NO_LINK_IN_TESTING')) {
-					$url = new CSpan($element['expression']);
+					$url = $element['expression'];
 				}
 				else {
 					$expressionId = 'expr_'.$element['id'];
 
-					$url = new CSpan($element['expression'], 'link');
-					$url->setId($expressionId);
-					$url->onClick('javascript: copy_expression("'.$expressionId.'");');
+					$url = (new CSpan($element['expression']))
+						->addClass(ZBX_STYLE_LINK_ACTION)
+						->setId($expressionId)
+						->onClick('javascript: copy_expression("'.$expressionId.'");');
 				}
 				$expr = expressionLevelDraw($next, $level);
 				$expr[] = SPACE;
@@ -2071,6 +2076,7 @@ function get_item_function_info($expr) {
 		'dayofweek' =>	['value_type' => '1-7',		'type' => T_ZBX_INT,			'validation' => IN('1,2,3,4,5,6,7')],
 		'delta' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
 		'diff' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
+		'forecast' =>		['value_type' => $value_type, $type_of_value_type,	'validation' => NOT_EMPTY],
 		'fuzzytime' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'iregexp' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'last' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
@@ -2087,7 +2093,8 @@ function get_item_function_info($expr) {
 		'str' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'strlen' =>		['value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
 		'sum' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'time' =>		['value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6']
+		'time' =>		['value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6'],
+		'timeleft' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY]
 	];
 
 	$expressionData = new CTriggerExpression();

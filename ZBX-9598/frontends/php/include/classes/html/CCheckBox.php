@@ -23,8 +23,6 @@ class CCheckBox extends CInput {
 
 	public function __construct($name = 'checkbox', $value = '1') {
 		parent::__construct('checkbox', $name, $value);
-		$this->addClass('checkbox');
-		$this->addClass('pointer');
 		$this->setChecked(false);
 	}
 
@@ -35,6 +33,7 @@ class CCheckBox extends CInput {
 		else {
 			$this->removeAttribute('checked');
 		}
+
 		return $this;
 	}
 }

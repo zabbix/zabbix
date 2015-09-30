@@ -610,10 +610,13 @@ class CHostGroup extends CApiService {
 
 		// actions from operations
 		$dbActions = DBselect(
-			'SELECT DISTINCT o.actionid'.
+			'SELECT o.actionid'.
 			' FROM operations o,opgroup og'.
-			' WHERE o.operationid=og.operationid'.
-				' AND '.dbConditionInt('og.groupid', $groupids)
+			' WHERE o.operationid=og.operationid AND '.dbConditionInt('og.groupid', $groupids).
+			' UNION'.
+			' SELECT o.actionid'.
+			' FROM operations o,opcommand_grp ocg'.
+			' WHERE o.operationid=ocg.operationid AND '.dbConditionInt('ocg.groupid', $groupids)
 		);
 		while ($dbAction = DBfetch($dbActions)) {
 			$actionids[$dbAction['actionid']] = $dbAction['actionid'];
@@ -634,7 +637,7 @@ class CHostGroup extends CApiService {
 			'value' => $groupids
 		]);
 
-		// delete action operation commands
+		// delete action operation groups
 		$operationids = [];
 		$dbOperations = DBselect(
 			'SELECT DISTINCT og.operationid'.
@@ -648,13 +651,27 @@ class CHostGroup extends CApiService {
 			'groupid' => $groupids
 		]);
 
+		// delete action operation commands
+		$dbOperations = DBselect(
+			'SELECT DISTINCT ocg.operationid'.
+			' FROM opcommand_grp ocg'.
+			' WHERE '.dbConditionInt('ocg.groupid', $groupids)
+		);
+		while ($dbOperation = DBfetch($dbOperations)) {
+			$operationids[$dbOperation['operationid']] = $dbOperation['operationid'];
+		}
+		DB::delete('opcommand_grp', [
+			'groupid' => $groupids
+		]);
+
 		// delete empty operations
 		$delOperationids = [];
 		$dbOperations = DBselect(
 			'SELECT DISTINCT o.operationid'.
 			' FROM operations o'.
 			' WHERE '.dbConditionInt('o.operationid', $operationids).
-				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'
+				' AND NOT EXISTS (SELECT NULL FROM opgroup og WHERE o.operationid=og.operationid)'.
+				' AND NOT EXISTS (SELECT NULL FROM opcommand_grp ocg WHERE o.operationid=ocg.operationid)'
 		);
 		while ($dbOperation = DBfetch($dbOperations)) {
 			$delOperationids[$dbOperation['operationid']] = $dbOperation['operationid'];

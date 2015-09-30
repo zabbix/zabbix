@@ -324,6 +324,7 @@ ROW   |5         |APC Battery Status                   |
 ROW   |7         |Dell Open Manage System Status       |
 ROW   |6         |HP Insight System Status             |
 ROW   |2         |Host status                          |
+ROW   |17        |HTTP response status code            |
 ROW   |14        |Maintenance status                   |
 ROW   |9         |SNMP device status (hrDeviceStatus)  |
 ROW   |11        |SNMP interface status (ifAdminStatus)|
@@ -2174,9 +2175,9 @@ ROW   |1816   |545    |23022 |5       |0        |00C800|0        |2       |0   |
 ROW   |1818   |546    |23158 |5       |0        |00C800|0        |2       |0   |
 
 TABLE |graph_theme
-FIELDS|graphthemeid|description|theme     |backgroundcolor|graphcolor|graphbordercolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|gridview|legendview|
-ROW   |1           |blue-theme |blue-theme|F0F0F0         |FFFFFF    |333333          |CCCCCC   |AAAAAA       |000000         |222222   |AA4444        |11CC11             |CC1111              |E0E0E0          |1       |1         |
-ROW   |2           |dark-theme |dark-theme|333333         |0A0A0A    |888888          |222222   |4F4F4F       |EFEFEF         |0088FF   |CC4444        |1111FF             |FF1111              |1F1F1F          |1       |1         |
+FIELDS|graphthemeid|theme     |backgroundcolor|graphcolor|gridcolor|maingridcolor|gridbordercolor|textcolor|highlightcolor|leftpercentilecolor|rightpercentilecolor|nonworktimecolor|gridview|legendview|
+ROW   |1           |blue-theme|FFFFFF         |FFFFFF    |CCD5D9   |ACBBC2       |ACBBC2         |1F2C33   |E33734        |429E47             |E33734              |EBEBEB          |1       |1         |
+ROW   |2           |dark-theme|2B2B2B         |2B2B2B    |454545   |4F4F4F       |4F4F4F         |F2F2F2   |E45959        |59DB8F             |E45959              |333333          |1       |1         |
 
 TABLE |globalmacro
 FIELDS|globalmacroid|macro            |value |
@@ -2761,7 +2762,6 @@ ROW   |5228     |322          |23134 |
 ROW   |5230     |322          |23135 |
 ROW   |5423     |322          |23136 |
 ROW   |5425     |322          |23137 |
-ROW   |5240     |322          |23159 |
 ROW   |5247     |322          |23164 |
 ROW   |5253     |322          |23165 |
 ROW   |5266     |322          |23167 |
@@ -2775,6 +2775,7 @@ ROW   |5243     |325          |23145 |
 ROW   |5234     |328          |23147 |
 ROW   |5235     |328          |23148 |
 ROW   |5226     |328          |23158 |
+ROW   |5240     |328          |23159 |
 ROW   |5241     |329          |23160 |
 ROW   |5242     |329          |23161 |
 ROW   |5522     |329          |23326 |
@@ -3058,72 +3059,149 @@ ROW   |5873     |458          |23658 |
 ROW   |5874     |458          |23659 |
 
 TABLE |mappings
-FIELDS|mappingid|valuemapid|value|newvalue          |
-ROW   |1        |1         |0    |Down              |
-ROW   |2        |1         |1    |Up                |
-ROW   |3        |2         |0    |Up                |
-ROW   |4        |2         |2    |Unreachable       |
-ROW   |13       |6         |1    |Other             |
-ROW   |14       |6         |2    |OK                |
-ROW   |15       |6         |3    |Degraded          |
-ROW   |17       |7         |1    |Other             |
-ROW   |18       |7         |2    |Unknown           |
-ROW   |19       |7         |3    |OK                |
-ROW   |20       |7         |4    |NonCritical       |
-ROW   |21       |7         |5    |Critical          |
-ROW   |22       |7         |6    |NonRecoverable    |
-ROW   |23       |5         |1    |unknown           |
-ROW   |24       |5         |2    |batteryNormal     |
-ROW   |25       |5         |3    |batteryLow        |
-ROW   |26       |4         |1    |unknown           |
-ROW   |27       |4         |2    |notInstalled      |
-ROW   |28       |4         |3    |ok                |
-ROW   |29       |4         |4    |failed            |
-ROW   |30       |4         |5    |highTemperature   |
-ROW   |31       |4         |6    |replaceImmediately|
-ROW   |32       |4         |7    |lowCapacity       |
-ROW   |33       |3         |0    |Running           |
-ROW   |34       |3         |1    |Paused            |
-ROW   |35       |3         |3    |Pause pending     |
-ROW   |36       |3         |4    |Continue pending  |
-ROW   |37       |3         |5    |Stop pending      |
-ROW   |38       |3         |6    |Stopped           |
-ROW   |39       |3         |7    |Unknown           |
-ROW   |40       |3         |255  |No such service   |
-ROW   |41       |3         |2    |Start pending     |
-ROW   |49       |9         |1    |unknown           |
-ROW   |50       |9         |2    |running           |
-ROW   |51       |9         |3    |warning           |
-ROW   |52       |9         |4    |testing           |
-ROW   |53       |9         |5    |down              |
-ROW   |61       |8         |1    |up                |
-ROW   |62       |8         |2    |down              |
-ROW   |63       |8         |3    |testing           |
-ROW   |64       |8         |4    |unknown           |
-ROW   |65       |8         |5    |dormant           |
-ROW   |66       |8         |6    |notPresent        |
-ROW   |67       |8         |7    |lowerLayerDown    |
-ROW   |68       |10        |1    |Up                |
-ROW   |69       |11        |1    |up                |
-ROW   |70       |11        |2    |down              |
-ROW   |71       |11        |3    |testing           |
-ROW   |72       |12        |0    |poweredOff        |
-ROW   |73       |12        |1    |poweredOn         |
-ROW   |74       |12        |2    |suspended         |
-ROW   |75       |13        |0    |gray              |
-ROW   |76       |13        |1    |green             |
-ROW   |77       |13        |2    |yellow            |
-ROW   |78       |13        |3    |red               |
-ROW   |79       |14        |0    |normal            |
-ROW   |80       |14        |1    |in maintenance    |
-ROW   |81       |14        |2    |no data collection|
-ROW   |82       |15        |0    |Normal            |
-ROW   |83       |15        |1    |Low memory        |
-ROW   |84       |16        |0    |Automatic         |
-ROW   |85       |16        |1    |Automatic delayed |
-ROW   |86       |16        |2    |Manual            |
-ROW   |87       |16        |3    |Disabled          |
-ROW   |88       |16        |4    |Unknown           |
+FIELDS|mappingid|valuemapid|value|newvalue                              |
+ROW   |1        |1         |0    |Down                                  |
+ROW   |2        |1         |1    |Up                                    |
+ROW   |3        |2         |0    |Up                                    |
+ROW   |4        |2         |2    |Unreachable                           |
+ROW   |13       |6         |1    |Other                                 |
+ROW   |14       |6         |2    |OK                                    |
+ROW   |15       |6         |3    |Degraded                              |
+ROW   |17       |7         |1    |Other                                 |
+ROW   |18       |7         |2    |Unknown                               |
+ROW   |19       |7         |3    |OK                                    |
+ROW   |20       |7         |4    |NonCritical                           |
+ROW   |21       |7         |5    |Critical                              |
+ROW   |22       |7         |6    |NonRecoverable                        |
+ROW   |23       |5         |1    |unknown                               |
+ROW   |24       |5         |2    |batteryNormal                         |
+ROW   |25       |5         |3    |batteryLow                            |
+ROW   |26       |4         |1    |unknown                               |
+ROW   |27       |4         |2    |notInstalled                          |
+ROW   |28       |4         |3    |ok                                    |
+ROW   |29       |4         |4    |failed                                |
+ROW   |30       |4         |5    |highTemperature                       |
+ROW   |31       |4         |6    |replaceImmediately                    |
+ROW   |32       |4         |7    |lowCapacity                           |
+ROW   |33       |3         |0    |Running                               |
+ROW   |34       |3         |1    |Paused                                |
+ROW   |35       |3         |3    |Pause pending                         |
+ROW   |36       |3         |4    |Continue pending                      |
+ROW   |37       |3         |5    |Stop pending                          |
+ROW   |38       |3         |6    |Stopped                               |
+ROW   |39       |3         |7    |Unknown                               |
+ROW   |40       |3         |255  |No such service                       |
+ROW   |41       |3         |2    |Start pending                         |
+ROW   |49       |9         |1    |unknown                               |
+ROW   |50       |9         |2    |running                               |
+ROW   |51       |9         |3    |warning                               |
+ROW   |52       |9         |4    |testing                               |
+ROW   |53       |9         |5    |down                                  |
+ROW   |61       |8         |1    |up                                    |
+ROW   |62       |8         |2    |down                                  |
+ROW   |63       |8         |3    |testing                               |
+ROW   |64       |8         |4    |unknown                               |
+ROW   |65       |8         |5    |dormant                               |
+ROW   |66       |8         |6    |notPresent                            |
+ROW   |67       |8         |7    |lowerLayerDown                        |
+ROW   |68       |10        |1    |Up                                    |
+ROW   |69       |11        |1    |up                                    |
+ROW   |70       |11        |2    |down                                  |
+ROW   |71       |11        |3    |testing                               |
+ROW   |72       |12        |0    |poweredOff                            |
+ROW   |73       |12        |1    |poweredOn                             |
+ROW   |74       |12        |2    |suspended                             |
+ROW   |75       |13        |0    |gray                                  |
+ROW   |76       |13        |1    |green                                 |
+ROW   |77       |13        |2    |yellow                                |
+ROW   |78       |13        |3    |red                                   |
+ROW   |79       |14        |0    |normal                                |
+ROW   |80       |14        |1    |in maintenance                        |
+ROW   |81       |14        |2    |no data collection                    |
+ROW   |82       |15        |0    |Normal                                |
+ROW   |83       |15        |1    |Low memory                            |
+ROW   |84       |16        |0    |Automatic                             |
+ROW   |85       |16        |1    |Automatic delayed                     |
+ROW   |86       |16        |2    |Manual                                |
+ROW   |87       |16        |3    |Disabled                              |
+ROW   |88       |16        |4    |Unknown                               |
+ROW   |89       |17        |100  |Continue                              |
+ROW   |90       |17        |101  |Switching Protocols                   |
+ROW   |91       |17        |102  |Processing                            |
+ROW   |92       |17        |200  |OK                                    |
+ROW   |93       |17        |201  |Created                               |
+ROW   |94       |17        |202  |Accepted                              |
+ROW   |95       |17        |203  |Non-Authoritative Information         |
+ROW   |96       |17        |204  |No Content                            |
+ROW   |97       |17        |205  |Reset Content                         |
+ROW   |98       |17        |206  |Partial Content                       |
+ROW   |99       |17        |207  |Multi-Status                          |
+ROW   |100      |17        |208  |Already Reported                      |
+ROW   |101      |17        |226  |IM Used                               |
+ROW   |102      |17        |300  |Multiple Choices                      |
+ROW   |103      |17        |301  |Moved Permanently                     |
+ROW   |104      |17        |302  |Found                                 |
+ROW   |105      |17        |303  |See Other                             |
+ROW   |106      |17        |304  |Not Modified                          |
+ROW   |107      |17        |305  |Use Proxy                             |
+ROW   |108      |17        |306  |Switch Proxy                          |
+ROW   |109      |17        |307  |Temporary Redirect                    |
+ROW   |110      |17        |308  |Permanent Redirect/Resume Incomplete  |
+ROW   |111      |17        |400  |Bad Request                           |
+ROW   |112      |17        |401  |Unauthorized                          |
+ROW   |113      |17        |402  |Payment Required                      |
+ROW   |114      |17        |403  |Forbidden                             |
+ROW   |115      |17        |404  |Not Found                             |
+ROW   |116      |17        |405  |Method Not Allowed                    |
+ROW   |117      |17        |406  |Not Acceptable                        |
+ROW   |118      |17        |407  |Proxy Authentication Required         |
+ROW   |119      |17        |408  |Request Timeout                       |
+ROW   |120      |17        |409  |Conflict                              |
+ROW   |121      |17        |410  |Gone                                  |
+ROW   |122      |17        |411  |Length Required                       |
+ROW   |123      |17        |412  |Precondition Failed                   |
+ROW   |124      |17        |413  |Payload Too Large                     |
+ROW   |125      |17        |414  |Request-URI Too Long                  |
+ROW   |126      |17        |415  |Unsupported Media Type                |
+ROW   |127      |17        |416  |Requested Range Not Satisfiable       |
+ROW   |128      |17        |417  |Expectation Failed                    |
+ROW   |129      |17        |418  |I'm a Teapot                          |
+ROW   |130      |17        |419  |Authentication Timeout                |
+ROW   |131      |17        |420  |Method Failure/Enhance Your Calm      |
+ROW   |132      |17        |421  |Misdirected Request                   |
+ROW   |133      |17        |422  |Unprocessable Entity                  |
+ROW   |134      |17        |423  |Locked                                |
+ROW   |135      |17        |424  |Failed Dependency                     |
+ROW   |136      |17        |426  |Upgrade Required                      |
+ROW   |137      |17        |428  |Precondition Required                 |
+ROW   |138      |17        |429  |Too Many Requests                     |
+ROW   |139      |17        |431  |Request Header Fields Too Large       |
+ROW   |140      |17        |440  |Login Timeout                         |
+ROW   |141      |17        |444  |No Response                           |
+ROW   |142      |17        |449  |Retry With                            |
+ROW   |143      |17        |450  |Blocked by Windows Parental Controls  |
+ROW   |144      |17        |451  |Unavailable for Legal Reasons/Redirect|
+ROW   |145      |17        |494  |Request Header Too Large              |
+ROW   |146      |17        |495  |Cert Error                            |
+ROW   |147      |17        |496  |No Cert                               |
+ROW   |148      |17        |497  |HTTP to HTTPS                         |
+ROW   |149      |17        |498  |Token Expired/Invalid                 |
+ROW   |150      |17        |499  |Client Closed Request/Token Required  |
+ROW   |151      |17        |500  |Internal Server Error                 |
+ROW   |152      |17        |501  |Not Implemented                       |
+ROW   |153      |17        |502  |Bad Gateway                           |
+ROW   |154      |17        |503  |Service Unavailable                   |
+ROW   |155      |17        |504  |Gateway Timeout                       |
+ROW   |156      |17        |505  |HTTP Version Not Supported            |
+ROW   |157      |17        |506  |Variant Also Negotiates               |
+ROW   |158      |17        |507  |Insufficient Storage                  |
+ROW   |159      |17        |508  |Loop Detected                         |
+ROW   |160      |17        |509  |Bandwidth Limit Exceeded              |
+ROW   |161      |17        |510  |Not Extended                          |
+ROW   |162      |17        |511  |Network Authentication Required       |
+ROW   |163      |17        |520  |Unknown Error                         |
+ROW   |164      |17        |598  |Network Read Timeout Error            |
+ROW   |165      |17        |599  |Network Connect Timeout Error         |
 
 TABLE |sysmaps
 FIELDS|sysmapid|name         |width|height|backgroundid|label_type|label_location|highlight|expandproblem|markelements|show_unack|grid_size|grid_show|grid_align|label_format|label_type_host|label_type_hostgroup|label_type_trigger|label_type_map|label_type_image|label_string_host|label_string_hostgroup|label_string_trigger|label_string_map|label_string_image|iconmapid|expand_macros|severity_min|

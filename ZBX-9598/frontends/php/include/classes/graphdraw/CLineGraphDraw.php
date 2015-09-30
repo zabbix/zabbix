@@ -1174,21 +1174,12 @@ class CLineGraphDraw extends CGraphDraw {
 	public function drawXYAxisScale() {
 		$gbColor = $this->getColor($this->graphtheme['gridbordercolor'], 0);
 
-		dashedRectangle(
-			$this->im,
-			$this->shiftXleft + $this->shiftXCaption - 1,
-			$this->shiftY - 1,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
-			$this->sizeY + $this->shiftY + 1,
-			$this->getColor($this->graphtheme['gridcolor'], 0)
-		);
-
 		if ($this->yaxisleft) {
 			zbx_imageline(
 				$this->im,
-				$this->shiftXleft + $this->shiftXCaption - 1,
+				$this->shiftXleft + $this->shiftXCaption,
 				$this->shiftY - 5,
-				$this->shiftXleft + $this->shiftXCaption - 1,
+				$this->shiftXleft + $this->shiftXCaption,
 				$this->sizeY + $this->shiftY + 4,
 				$gbColor
 			);
@@ -1196,24 +1187,34 @@ class CLineGraphDraw extends CGraphDraw {
 			imagefilledpolygon(
 				$this->im,
 				[
-					$this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption + 2, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption - 1, $this->shiftY - 10,
+					$this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
+					$this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
+					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
 				],
 				3,
 				$this->getColor('White')
 			);
 
 			/* draw left axis triangle */
-			zbx_imageline($this->im, $this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption + 2, $this->shiftY - 5,
+			zbx_imageline($this->im, $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
+					$this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
 					$gbColor);
-			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption - 4, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption - 1, $this->shiftY - 10,
+			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption - 3, $this->shiftY - 5,
+					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
 					$gbColor);
-			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption + 2, $this->shiftY - 5,
-					$this->shiftXleft + $this->shiftXCaption - 1, $this->shiftY - 10,
+			zbx_imagealine($this->im, $this->shiftXleft + $this->shiftXCaption + 3, $this->shiftY - 5,
+					$this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
 					$gbColor);
+		}
+		else {
+			dashedLine(
+				$this->im,
+				$this->shiftXleft + $this->shiftXCaption,
+				$this->shiftY,
+				$this->shiftXleft + $this->shiftXCaption,
+				$this->sizeY + $this->shiftY,
+				$this->getColor($this->graphtheme['gridcolor'], 0)
+			);
 		}
 
 		if ($this->yaxisright) {
@@ -1248,10 +1249,20 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->sizeX + $this->shiftXleft + $this->shiftXCaption, $this->shiftY - 10,
 				$gbColor);
 		}
+		else {
+			dashedLine(
+				$this->im,
+				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
+				$this->shiftY,
+				$this->sizeX + $this->shiftXleft + $this->shiftXCaption,
+				$this->sizeY + $this->shiftY,
+				$this->getColor($this->graphtheme['gridcolor'], 0)
+			);
+		}
 
 		zbx_imageline(
 			$this->im,
-			$this->shiftXleft + $this->shiftXCaption - 4,
+			$this->shiftXleft + $this->shiftXCaption - 3,
 			$this->sizeY + $this->shiftY + 1,
 			$this->sizeX + $this->shiftXleft + $this->shiftXCaption + 5,
 			$this->sizeY + $this->shiftY + 1,
@@ -1295,7 +1306,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 		$xLeft = $this->shiftXleft;
 		$xRight = $this->shiftXleft + $this->sizeX;
-		$lineColor = $this->getColor($this->graphtheme['maingridcolor'], 0);
+		$lineColor = $this->getColor($this->graphtheme['gridcolor'], 0);
 
 		for ($y = $this->shiftY + $this->sizeY - $stepY; $y > $this->shiftY; $y -= $stepY) {
 			dashedLine($this->im, $xLeft, $y, $xRight, $y, $lineColor);
@@ -2416,7 +2427,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->drawWorkPeriod();
 		$this->drawTimeGrid();
 		$this->drawHorizontalGrid();
-		$this->drawXYAxisScale($this->graphtheme['gridbordercolor']);
+		$this->drawXYAxisScale();
 
 		$maxX = $this->sizeX;
 

@@ -48,25 +48,22 @@ abstract class CGraphDraw {
 		$this->shiftXright = 50;
 		$this->shiftXCaption = 0;
 		$this->shiftY = 36;
-		$this->border = 1;
 		$this->num = 0;
 		$this->type = $type; // graph type
 		$this->drawLegend = 1;
 		$this->axis_valuetype = []; // overal items type (int/float)
 		$this->graphtheme = [
-			'description' => 'default',
-			'frontendtheme' => 'default.css',
-			'textcolor' => '202020',
-			'highlightcolor' => 'aa4444',
-			'backgroundcolor' => 'f0f0f0',
-			'graphcolor' => 'ffffff',
-			'graphbordercolor' => '333333',
-			'gridcolor' => 'cccccc',
-			'maingridcolor' => 'aaaaaa',
-			'gridbordercolor' => '000000',
-			'nonworktimecolor' => 'eaeaea',
-			'leftpercentilecolor' => '00AA00',
-			'righttpercentilecolor' => 'AA0000',
+			'theme' => 'blue-theme',
+			'textcolor' => '1F2C33',
+			'highlightcolor' => 'E33734',
+			'backgroundcolor' => 'FFFFFF',
+			'graphcolor' => 'FFFFFF',
+			'gridcolor' => 'CCD5D9',
+			'maingridcolor' => 'ACBBC2',
+			'gridbordercolor' => 'ACBBC2',
+			'nonworktimecolor' => 'EBEBEB',
+			'leftpercentilecolor' => '429E47',
+			'righttpercentilecolor' => 'E33734',
 			'legendview' => '1',
 			'gridview' => '1'
 		];
@@ -118,12 +115,11 @@ abstract class CGraphDraw {
 	 * Load the graph theme from the database.
 	 */
 	public function applyGraphTheme() {
-		$theme = DB::find('graph_theme', [
+		$themes = DB::find('graph_theme', [
 			'theme' => getUserTheme(CWebUser::$data)
 		]);
-		$theme = reset($theme);
-		if ($theme) {
-			$this->graphtheme = $theme;
+		if ($themes) {
+			$this->graphtheme = $themes[0];
 		}
 	}
 
@@ -169,10 +165,6 @@ abstract class CGraphDraw {
 		$this->sizeY = $value;
 	}
 
-	public function setBorder($border) {
-		$this->border = $border;
-	}
-
 	public function getLastValue($num) {
 		$data = &$this->data[$this->items[$num]['itemid']][$this->items[$num]['calc_type']];
 
@@ -201,24 +193,6 @@ abstract class CGraphDraw {
 			$this->fullSizeX,
 			$this->fullSizeY,
 			$this->getColor($this->graphtheme['backgroundcolor'], 0)
-		);
-
-		if ($this->border == 1) {
-			imagerectangle($this->im, 0, 0,
-				$this->fullSizeX - 1,
-				$this->fullSizeY - 1,
-				$this->getColor($this->graphtheme['graphbordercolor'], 0)
-			);
-		}
-	}
-
-	public function drawSmallRectangle() {
-		dashedRectangle($this->im,
-			$this->shiftXleft + $this->shiftXCaption - 1,
-			$this->shiftY - 1,
-			$this->sizeX + $this->shiftXleft + $this->shiftXCaption - 1,
-			$this->sizeY + $this->shiftY + 1,
-			$this->getColor('Black No Alpha')
 		);
 	}
 
