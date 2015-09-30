@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
 ...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
 .......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
@@ -683,6 +684,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
 ...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
 .......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
