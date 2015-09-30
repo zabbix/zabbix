@@ -235,7 +235,7 @@ class CFrontendSetup {
 	public function checkPhpDatabases() {
 		$current = [];
 
-		$databases = $this->getSupportedDatabases();
+		$databases = self::getSupportedDatabases();
 		foreach ($databases as $database => $name) {
 			$current[] = $name;
 			$current[] = BR();
@@ -255,14 +255,16 @@ class CFrontendSetup {
 	 *
 	 * @return array
 	 */
-	public function getSupportedDatabases() {
+	public static function getSupportedDatabases() {
 		$allowedDb = [];
 		if (zbx_is_callable(['mysqli_connect', 'mysqli_connect_error', 'mysqli_error', 'mysqli_query',
 				'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_real_escape_string', 'mysqli_close'])) {
 			$allowedDb[ZBX_DB_MYSQL] = 'MySQL';
 		}
 
-		if (zbx_is_callable(['pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'])) {
+		if (zbx_is_callable(['pg_connect', 'pg_query', 'pg_unescape_bytea', 'pg_escape_bytea',
+				'pg_escape_string', 'pg_connect_escape', 'pg_last_error', 'pg_parameter_status',
+				'pg_close', 'pg_query', 'pg_free_result'])) {
 			$allowedDb[ZBX_DB_POSTGRESQL] = 'PostgreSQL';
 		}
 
@@ -273,8 +275,8 @@ class CFrontendSetup {
 		}
 
 		if (zbx_is_callable(['db2_connect', 'db2_set_option', 'db2_commit', 'db2_rollback', 'db2_autocommit',
-				'db2_prepare', 'db2_execute', 'db2_stmt_errormsg', 'db2_fetch_assoc', 'db2_free_result',
-				'db2_escape_string', 'db2_close'])) {
+				'db2_prepare', 'db2_conn_errormsg', 'db2_bind_param', 'db2_execute', 'db2_attr_case',
+				'db2_stmt_errormsg', 'db2_fetch_assoc', 'db2_free_result', 'db2_escape_string', 'db2_close'])) {
 			$allowedDb[ZBX_DB_DB2] = 'IBM DB2';
 		}
 
