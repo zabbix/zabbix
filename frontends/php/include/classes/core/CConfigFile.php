@@ -30,6 +30,17 @@ class CConfigFile {
 	public $config = [];
 	public $error = '';
 
+	public static function getDbNames($bool = true){
+		$dbNames = [
+			ZBX_DB_MYSQL => 'MySQL', ZBX_DB_POSTGRESQL => 'PostgreSQL', ZBX_DB_ORACLE => 'Oracle',
+			ZBX_DB_DB2 => 'IBM DB2', ZBX_DB_SQLITE3 => 'SQLite3'
+		];
+		if($bool === false) {
+			return array_keys($dbNames);
+		}
+		return $dbNames;
+	}
+
 	private static function exception($error, $code = self::CONFIG_ERROR) {
 		throw new ConfigFileException($error, $code);
 	}
@@ -58,13 +69,11 @@ class CConfigFile {
 		include($this->configFile);
 		ob_end_clean();
 
-		// config file in plain php is bad
-		$dbs = [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3];
 		if (!isset($DB['TYPE'])) {
 			self::exception('DB type is not set.');
 		}
-		elseif (isset($DB['TYPE']) && !in_array($DB['TYPE'], $dbs)) {
-			self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
+		elseif (isset($DB['TYPE']) && !in_array($DB['TYPE'], self::getDbNames(false))) {
+			self::exception('DB type has wrong value. Possible values '.implode(', ', self::getDbNames(false)));
 		}
 		elseif (!isset($DB['DATABASE'])) {
 			self::exception('DB database is not set.');
@@ -190,13 +199,11 @@ $IMAGE_FORMAT_DEFAULT = IMAGE_FORMAT_PNG;
 	}
 
 	protected function check() {
-		$dbs = [ZBX_DB_MYSQL, ZBX_DB_POSTGRESQL, ZBX_DB_ORACLE, ZBX_DB_DB2, ZBX_DB_SQLITE3];
-
 		if (!isset($this->config['DB']['TYPE'])) {
 			self::exception('DB type is not set.');
 		}
-		elseif (!in_array($this->config['DB']['TYPE'], $dbs)) {
-			self::exception('DB type has wrong value. Possible values '.implode(', ', $dbs));
+		elseif (!in_array($this->config['DB']['TYPE'], self::getDbNames(false))) {
+			self::exception('DB type has wrong value. Possible values '.implode(', ', self::getDbNames(false)));
 		}
 		elseif (!isset($this->config['DB']['DATABASE'])) {
 			self::exception('DB database is not set.');

@@ -22,6 +22,8 @@
 class CSetupWizard extends CForm {
 
 	function __construct($ZBX_CONFIG) {
+		require_once realpath(dirname(__FILE__).'/../../../include/db.inc.php');
+
 		$this->DISABLE_CANCEL_BUTTON = false;
 		$this->DISABLE_BACK_BUTTON = false;
 		$this->SHOW_RETRY_BUTTON = false;
@@ -210,7 +212,7 @@ class CSetupWizard extends CForm {
 		$table = new CFormList();
 
 		$table->addRow(_('Database type'),
-			new CComboBox('type', $DB['TYPE'], 'submit()', $this->frontendSetup->getSupportedDatabases())
+			new CComboBox('type', $DB['TYPE'], 'submit()', CFrontendSetup::getSupportedDatabases())
 		);
 
 		switch ($DB['TYPE']) {
@@ -305,7 +307,7 @@ class CSetupWizard extends CForm {
 
 	function stage4() {
 		$db_type = $this->getConfig('DB_TYPE');
-		$databases = $this->frontendSetup->getSupportedDatabases();
+		$databases = CFrontendSetup::getSupportedDatabases();
 
 		$table = new CFormList();
 		$table->addRow((new CSpan(_('Database type')))->addClass(ZBX_STYLE_GREY), $databases[$db_type]);
