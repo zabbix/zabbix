@@ -39,7 +39,9 @@ $ZBX_MENU = [
 				'label' => _('Overview')
 			],
 			[
-				'url' => 'httpmon.php',
+				'url' => 'zabbix.php',
+				'action' => 'web.view',
+				'active_if' => ['web.view'],
 				'label' => _('Web'),
 				'sub_pages' => ['httpdetails.php']
 			],
