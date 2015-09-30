@@ -4,6 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
 ...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
@@ -684,6 +685,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
 ...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
