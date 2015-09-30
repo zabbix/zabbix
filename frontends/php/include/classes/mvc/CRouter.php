@@ -87,6 +87,7 @@ class CRouter {
 		'script.list'			=> ['CControllerScriptList',			'layout.htmlpage',		'administration.script.list'],
 		'script.update'			=> ['CControllerScriptUpdate',			null,					null],
 		'system.warning'		=> ['CControllerSystemWarning',			'layout.warning',		'system.warning'],
+		'web.view'				=> ['CControllerWebView',				'layout.htmlpage',		'monitoring.web.view'],
 		'widget.discovery.view'	=> ['CControllerWidgetDiscoveryView',	'layout.widget',		'monitoring.widget.discovery.view'],
 		'widget.hosts.view'		=> ['CControllerWidgetHostsView',		'layout.widget',		'monitoring.widget.hosts.view'],
 		'widget.issues.view'	=> ['CControllerWidgetIssuesView',		'layout.widget',		'monitoring.widget.issues.view'],

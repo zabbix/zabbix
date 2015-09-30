@@ -233,7 +233,7 @@ foreach ($hosts as $hnum => $host) {
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
 		new CLink(_('Screens'), 'host_screen.php?hostid='.$hostid),
-		new CLink(_('Web'), 'httpmon.php?'.$link),
+		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
 		$applications_link,
 		$items_link,
 		$triggers_link,
@@ -334,7 +334,7 @@ foreach ($hostGroups as $hnum => $group) {
 		new CLink(_('Triggers'), 'tr_status.php?'.$link),
 		new CLink(_('Events'), 'events.php?source='.EVENT_SOURCE_TRIGGERS.'&'.$link),
 		new CLink(_('Graphs'), 'charts.php?'.$link),
-		new CLink(_('Web'), 'httpmon.php?'.$link),
+		new CLink(_('Web'), 'zabbix.php?action=web.view&'.$link),
 		$hostsLink,
 		$templatesLink
 	]);

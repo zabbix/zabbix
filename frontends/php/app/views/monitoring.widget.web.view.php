@@ -87,7 +87,7 @@ foreach ($result as $row) {
 foreach ($groups as $group) {
 	if (!empty($data[$group['groupid']])) {
 		$table->addRow([
-			new CLink($group['name'], 'httpmon.php?groupid='.$group['groupid'].'&hostid=0'),
+			new CLink($group['name'], 'zabbix.php?action=web.view&groupid='.$group['groupid'].'&hostid=0'),
 			(new CSpan(empty($data[$group['groupid']]['ok']) ? 0 : $data[$group['groupid']]['ok']))->addClass(ZBX_STYLE_GREEN),
 			(new CSpan(empty($data[$group['groupid']]['failed']) ? 0 : $data[$group['groupid']]['failed']))
 				->addClass(empty($data[$group['groupid']]['failed']) ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
