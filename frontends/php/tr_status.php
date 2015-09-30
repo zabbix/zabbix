@@ -376,7 +376,7 @@ $triggers = API::Trigger()->get([
 	'preservekeys' => true
 ]);
 
-$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 order_result($triggers, $sortField, $sortOrder);
 

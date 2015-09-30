@@ -24,6 +24,17 @@
  */
 class C10ItemKeyConverter extends CConverter {
 
+	/**
+	 * Parser for user macros.
+	 *
+	 * @var CUserMacroParser
+	 */
+	protected $user_macro_parser;
+
+	public function __construct() {
+		$this->user_macro_parser = new CUserMacroParser();
+	}
+
 	public function convert($value) {
 		$keys = ['tcp', 'ftp', 'http', 'imap', 'ldap', 'nntp', 'ntp', 'pop', 'smtp', 'ssh'];
 
@@ -37,9 +48,7 @@ class C10ItemKeyConverter extends CConverter {
 			$key = $parts[0];
 
 			if (isset($parts[1]) && $parts[1] !== '') {
-				$macros = (new CUserMacroParser($parts[1], false))->getMacros();
-
-				if ($macros && !isset($parts[1][strlen($macros[0]['match'])])) {
+				if ($this->user_macro_parser->parse($parts[1] == CUserMacroParser::PARSE_SUCCESS)) {
 					$port = ',,'.$parts[1];
 				}
 				// numeric parameter or empty parameter

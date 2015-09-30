@@ -1043,9 +1043,9 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
 	$data = [];
 	$hostNames = [];
 
-	foreach ($triggers as $trigger) {
-		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers, true);
 
+	foreach ($triggers as $trigger) {
 		foreach ($trigger['hosts'] as $host) {
 			// triggers may belong to hosts that are filtered out and shouldn't be displayed, skip them
 			if (!isset($hosts[$host['hostid']])) {

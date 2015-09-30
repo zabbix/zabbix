@@ -315,7 +315,7 @@ class CItemKey {
 	/*
 	 * Unquotes special symbols in item key parameter
 	 *
-	 * @param string $value
+	 * @param string $param
 	 *
 	 * @return string
 	 */
@@ -323,7 +323,7 @@ class CItemKey {
 		$unquoted = '';
 
 		for ($p = 1; isset($param[$p]); $p++) {
-			if ('\\' == $param[$p] && '"' == $param[$p + 1]) {
+			if ($param[$p] == '\\' && $param[$p + 1] == '"') {
 				continue;
 			}
 

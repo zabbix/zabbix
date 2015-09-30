@@ -277,6 +277,8 @@ class CFunctionValidator extends CValidator {
 			_('Invalid fourth parameter.')
 		];
 
+		$user_macro_parser = new CUserMacroParser();
+
 		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
 			// mandatory check
 			if (isset($arg['mandat']) && $arg['mandat'] && !isset($value['functionParamList'][$aNum])) {
@@ -294,9 +296,7 @@ class CFunctionValidator extends CValidator {
 			}
 
 			// user macro
-			$parser = new CUserMacroParser($value['functionParamList'][$aNum]);
-
-			if ($parser->isValid()) {
+			if ($user_macro_parser->parse($value['functionParamList'][$aNum]) == CUserMacroParser::PARSE_SUCCESS) {
 				continue;
 			}
 

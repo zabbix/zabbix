@@ -773,6 +773,8 @@ function isTemplate($hostId) {
  * @return array
  */
 function getInheritedMacros(array $hostids) {
+	$user_macro_parser = new CUserMacroParser();
+
 	$all_macros = [];
 	$global_macros = [];
 
@@ -821,9 +823,9 @@ function getInheritedMacros(array $hostids) {
 					$all_macros[$dbMacro['macro']] = true;
 				}
 				else {
-					$parsed_macro = (new CUserMacroParser($dbMacro['macro']))->getMacros()[0];
-					$tpl_macro_name = $parsed_macro['macro_name'];
-					$tpl_context = $parsed_macro['context'];
+					$user_macro_parser->parse($dbMacro['macro']);
+					$tpl_macro_name = $user_macro_parser->getMacroName();
+					$tpl_context = $user_macro_parser->getContext();
 
 					if ($tpl_context === null) {
 						$hosts[$hostid]['macros'][$dbMacro['macro']] = $dbMacro['value'];
@@ -833,9 +835,9 @@ function getInheritedMacros(array $hostids) {
 						$match_found = false;
 
 						foreach ($global_macros as $global_macro => $global_value) {
-							$parsed_macro = (new CUserMacroParser($global_macro))->getMacros()[0];
-							$gbl_macro_name = $parsed_macro['macro_name'];
-							$gbl_context = $parsed_macro['context'];
+							$user_macro_parser->parse($global_macro);
+							$gbl_macro_name = $user_macro_parser->getMacroName();
+							$gbl_context = $user_macro_parser->getContext();
 
 							if ($tpl_macro_name === $gbl_macro_name && $tpl_context === $gbl_context) {
 								$match_found = true;
@@ -970,6 +972,8 @@ function getInheritedMacros(array $hostids) {
  * @return array
  */
 function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
+	$user_macro_parser = new CUserMacroParser();
+
 	foreach ($inherited_macros as &$inherited_macro) {
 		$inherited_macro['type'] = MACRO_TYPE_INHERITED;
 		$inherited_macro['value'] = array_key_exists('template', $inherited_macro)
@@ -992,10 +996,9 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 			 * Cannot use array dereferencing because "$host_macro['macro']" may contain invalid macros
 			 * which results in empty array.
 			 */
-			$parsed_macros = (new CUserMacroParser($host_macro['macro']))->getMacros();
-			if ($parsed_macros) {
-				$host_macro_name = $parsed_macros[0]['macro_name'];
-				$host_context = $parsed_macros[0]['context'];
+			if ($user_macro_parser->parse($host_macro['macro']) == CUserMacroParser::PARSE_SUCCESS) {
+				$host_macro_name = $user_macro_parser->getMacroName();
+				$host_context = $user_macro_parser->getContext();
 
 				if ($host_context === null) {
 					$host_macro['type'] = 0x00;
@@ -1005,9 +1008,9 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 
 					foreach ($inherited_macros as $inherited_macro => $inherited_values) {
 						// Safe to use array dereferencing since these values come from database.
-						$parsed_macro = (new CUserMacroParser($inherited_macro))->getMacros()[0];
-						$inherited_macro_name = $parsed_macro['macro_name'];
-						$inherited_context = $parsed_macro['context'];
+						$user_macro_parser->parse($inherited_macro);
+						$inherited_macro_name = $user_macro_parser->getMacroName();
+						$inherited_context = $user_macro_parser->getContext();
 
 						if ($host_macro_name === $inherited_macro_name && $host_context === $inherited_context) {
 							$match_found = true;

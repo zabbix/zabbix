@@ -27,843 +27,712 @@ class CUserMacroParserTest extends PHPUnit_Framework_TestCase {
 	public function testValidProvider() {
 		return [
 			// Normal macros without context.
-			[
-				'{$MACRO}',
-				[[
-					'match' => '{$MACRO}',
-					'macro' => '{$MACRO}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => null
-				]]
-			],
-			[
-				'{$MACRO_}',
-				[[
-					'match' => '{$MACRO_}',
-					'macro' => '{$MACRO_}',
-					'pos' => 0,
-					'macro_name' => 'MACRO_',
-					'context' => null
-				]]
-			],
-			[
-				'{$MACRO_12}',
-				[[
-					'match' => '{$MACRO_12}',
-					'macro' => '{$MACRO_12}',
-					'pos' => 0,
-					'macro_name' => 'MACRO_12',
-					'context' => null
-				]]
-			],
-			[
-				'{$MACRO_1.2}',
-				[[
-					'match' => '{$MACRO_1.2}',
-					'macro' => '{$MACRO_1.2}',
-					'pos' => 0,
-					'macro_name' => 'MACRO_1.2',
-					'context' => null
-				]]
-			],
+			['{$MACRO}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO}',
+				'macro_name' => 'MACRO',
+				'context' => null,
+				'error' => ''
+			]],
+			['{$MACRO_}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO_}',
+				'macro_name' => 'MACRO_',
+				'context' => null,
+				'error' => ''
+			]],
+			['{$MACRO_12}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO_12}',
+				'macro_name' => 'MACRO_12',
+				'context' => null,
+				'error' => ''
+			]],
+			['{$MACRO_1.2}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO_1.2}',
+				'macro_name' => 'MACRO_1.2',
+				'context' => null,
+				'error' => ''
+			]],
 			// Context based unquoted macros.
-			[
-				'{$MACRO:}',
-				[[
-					'match' => '{$MACRO:}',
-					'macro' => '{$MACRO:}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'{$MACRO: }',
-				[[
-					'match' => '{$MACRO: }',
-					'macro' => '{$MACRO:}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'{$MACRO:   }',
-				[[
-					'match' => '{$MACRO:   }',
-					'macro' => '{$MACRO:}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'{$MACRO:\'\'}',
-				[[
-					'match' => '{$MACRO:\'\'}',
-					'macro' => '{$MACRO:\'\'}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '\'\''
-				]]
-			],
-			[
-				'{$MACRO:A }',
-				[[
-					'match' => '{$MACRO:A }',
-					'macro' => '{$MACRO:A }',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'A '
-				]]
-			],
-			[
-				'{$MACRO:A}',
-				[[
-					'match' => '{$MACRO:A}',
-					'macro' => '{$MACRO:A}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'A'
-				]]
-			],
-			[
-				'{$MACRO:A"}',
-				[[
-					'match' => '{$MACRO:A"}',
-					'macro' => '{$MACRO:A"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'A"'
-				]]
-			],
-			[
-				'{$MACRO:context}',
-				[[
-					'match' => '{$MACRO:context}',
-					'macro' => '{$MACRO:context}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'context'
-				]]
-			],
-			[
-				'{$MACRO:<context>}',
-				[[
-					'match' => '{$MACRO:<context>}',
-					'macro' => '{$MACRO:<context>}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '<context>'
-				]]
-			],
-			[
-				'{$MACRO1:\"}',
-				[[
-					'match' => '{$MACRO1:\"}',
-					'macro' => '{$MACRO1:\"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO1',
-					'context' => '\"'
-				]]
-			],
-			[
-				'{$MACRO:{}',
-				[[
-					'match' => '{$MACRO:{}',
-					'macro' => '{$MACRO:{}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '{'
-				]]
-			],
-			[
-				'{$MACRO:\}',
-				[[
-					'match' => '{$MACRO:\}',
-					'macro' => '{$MACRO:\}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '\\'
-				]]
-			],
-			[
-				'{$MACRO:\\\\}',
-				[[
-					'match' => '{$MACRO:\\\\}',
-					'macro' => '{$MACRO:\\\\}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '\\\\'
-				]]
-			],
-			[
-				'{$MACRO:\"\}',
-				[[
-					'match' => '{$MACRO:\"\}',
-					'macro' => '{$MACRO:\"\}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '\"\\'
-				]]
-			],
-			[
-				'{$MACRO:abc"def}',
-				[[
-					'match' => '{$MACRO:abc"def}',
-					'macro' => '{$MACRO:abc"def}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'abc"def'
-				]]
-			],
-			[
-				'{$MACRO:abc"def"}',
-				[[
-					'match' => '{$MACRO:abc"def"}',
-					'macro' => '{$MACRO:abc"def"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'abc"def"'
-				]]
-			],
-			[
-				'{$MACRO:abc"def"ghi}',
-				[[
-					'match' => '{$MACRO:abc"def"ghi}',
-					'macro' => '{$MACRO:abc"def"ghi}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'abc"def"ghi'
-				]]
-			],
-			[
-				'{$MACRO:abc"\\}',
-				[[
-					'match' => '{$MACRO:abc"\\}',
-					'macro' => '{$MACRO:abc"\\}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'abc"\\'
-				]]
-			],
+			['{$MACRO:}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:}',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => ''
+			]],
+			['{$MACRO: }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO: }',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => ''
+			]],
+			['{$MACRO:   }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:   }',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => ''
+			]],
+			['{$MACRO:\'\'}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:\'\'}',
+				'macro_name' => 'MACRO',
+				'context' => '\'\'',
+				'error' => ''
+			] ],
+			['{$MACRO:A }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:A }',
+				'macro_name' => 'MACRO',
+				'context' => 'A ',
+				'error' => ''
+			]],
+			['{$MACRO:A}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:A}',
+				'macro_name' => 'MACRO',
+				'context' => 'A',
+				'error' => ''
+			]],
+			['{$MACRO:A"}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:A"}',
+				'macro_name' => 'MACRO',
+				'context' => 'A"',
+				'error' => ''
+			]],
+			['{$MACRO:context}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:context}',
+				'macro_name' => 'MACRO',
+				'context' => 'context',
+				'error' => ''
+			]],
+			['{$MACRO:<context>}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:<context>}',
+				'macro_name' => 'MACRO',
+				'context' => '<context>',
+				'error' => ''
+			]],
+			['{$MACRO1:\"}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO1:\"}',
+				'macro_name' => 'MACRO1',
+				'context' => '\"',
+				'error' => ''
+			]],
+			['{$MACRO:{}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:{}',
+				'macro_name' => 'MACRO',
+				'context' => '{',
+				'error' => ''
+			]],
+			['{$MACRO:\}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:\}',
+				'macro_name' => 'MACRO',
+				'context' => '\\',
+				'error' => ''
+			]],
+			['{$MACRO:\\\\}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:\\\\}',
+				'macro_name' => 'MACRO',
+				'context' => '\\\\',
+				'error' => ''
+			]],
+			['{$MACRO:\"\}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:\"\}',
+				'macro_name' => 'MACRO',
+				'context' => '\"\\',
+				'error' => ''
+			]],
+			['{$MACRO:abc"def}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:abc"def}',
+				'macro_name' => 'MACRO',
+				'context' => 'abc"def',
+				'error' => ''
+			]],
+			['{$MACRO:abc"def"}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:abc"def"}',
+				'macro_name' => 'MACRO',
+				'context' => 'abc"def"',
+				'error' => ''
+			]],
+			['{$MACRO:abc"def"ghi}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:abc"def"ghi}',
+				'macro_name' => 'MACRO',
+				'context' => 'abc"def"ghi',
+				'error' => ''
+			]],
+			['{$MACRO:abc"\\}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:abc"\\}',
+				'macro_name' => 'MACRO',
+				'context' => 'abc"\\',
+				'error' => ''
+			]],
 			// Context based quoted macros.
-			[
-				'{$MACRO:""}',
-				[[
-					'match' => '{$MACRO:""}',
-					'macro' => '{$MACRO:""}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'{$MACRO: " " }',
-				[[
-					'match' => '{$MACRO: " " }',
-					'macro' => '{$MACRO:" "}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ' '
-				]]
-			],
-			[
-				'{$MACRO: ""}',
-				[[
-					'match' => '{$MACRO: ""}',
-					'macro' => '{$MACRO:""}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'{$MACRO:"" }',
-				[[
-					'match' => '{$MACRO:"" }',
-					'macro' => '{$MACRO:""}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'{$MACRO: "    " }',
-				[[
-					'match' => '{$MACRO: "    " }',
-					'macro' => '{$MACRO:"    "}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '    '
-				]]
-			],
-			[
-				'{$MACRO:    "    "      }',
-				[[
-					'match' => '{$MACRO:    "    "      }',
-					'macro' => '{$MACRO:"    "}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '    '
-				]]
-			],
-			[
-				'{$MACRO:    ""      }',
-				[[
-					'match' => '{$MACRO:    ""      }',
-					'macro' => '{$MACRO:""}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'{$MACRO:"A" }',
-				[[
-					'match' => '{$MACRO:"A" }',
-					'macro' => '{$MACRO:"A"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'A'
-				]]
-			],
-			[
-				'{$MACRO:"{#MACRO}"}',
-				[[
-					'match' => '{$MACRO:"{#MACRO}"}',
-					'macro' => '{$MACRO:"{#MACRO}"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '{#MACRO}'
-				]]
-			],
-			[
-				'{$MACRO:"\abc"}',
-				[[
-					'match' => '{$MACRO:"\abc"}',
-					'macro' => '{$MACRO:"\abc"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '\abc'
-				]]
-			],
-			[
-				'{$MACRO:"abc\def"}',
-				[[
-					'match' => '{$MACRO:"abc\def"}',
-					'macro' => '{$MACRO:"abc\def"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => 'abc\def'
-				]]
-			],
-			[
-				'{$MACRO:"\abc\    "}',
-				[[
-					'match' => '{$MACRO:"\abc\    "}',
-					'macro' => '{$MACRO:"\abc\    "}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '\abc\    '
-				]]
-			],
-			[
-				'{$MACRO2:"\\\""}',
-				[[
-					'match' => '{$MACRO2:"\\\""}',
-					'macro' => '{$MACRO2:"\\\""}',
-					'pos' => 0,
-					'macro_name' => 'MACRO2',
-					'context' => '\"'
-				]]
-			]
-		];
-	}
-
-	/**
-	 * An array of invalid macros and error messages.
-	 */
-	public function testInvalidProvider() {
-		return [
-			['', 'macro is empty'],
-			['{', 'unexpected end of macro'],
-			['{{', 'incorrect syntax near "{"'],
-			['{{{', 'incorrect syntax near "{{"'],
-			['{$', 'unexpected end of macro'],
-			['{${$', 'incorrect syntax near "{$"'],
-			['{${{$', 'incorrect syntax near "{{$"'],
-			['{$${$', 'incorrect syntax near "${$"'],
-			['{${$$', 'incorrect syntax near "{$$"'],
-			['{${{$${$', 'incorrect syntax near "{{$${$"'],
-			['{$M', 'unexpected end of macro'],
-			['{$.', 'unexpected end of macro'],
-			['{$"', 'incorrect syntax near """'],
-			['{$-', 'incorrect syntax near "-"'],
-			['{$M:', 'unexpected end of macro'],
-			['{$M:"', 'unexpected end of macro'],
-			['{$M:""', 'unexpected end of macro'],
-			['{$M:""{', 'incorrect syntax near "{"'],
-			['{$M:""{$', 'incorrect syntax near "{$"'],
-			['{$M:""{$M', 'incorrect syntax near "{$M"'],
-			['{$M:""{$M:', 'incorrect syntax near "{$M:"'],
-			['{$M:""{$M:"', 'incorrect syntax near "{$M:""'],
-			['{$M:""{$M:""', 'incorrect syntax near "{$M:"""'],
-			['{$MACRO:"abc\"}', 'unexpected end of macro'],
-			['{', 'unexpected end of macro'],
-			['{MACRO', 'incorrect syntax near "MACRO"'],
-			['{MACRO$', 'incorrect syntax near "MACRO$"'],
-			['{MACRO}', 'incorrect syntax near "MACRO}"'],
-			['{$macro}', 'incorrect syntax near "macro}"'],
-			['{#macro}', 'incorrect syntax near "#macro}"'],
-			['{$MACRO', 'unexpected end of macro'],
-			['{$MACR-O}', 'incorrect syntax near "-O}"'],
-			['{$MACR,O}', 'incorrect syntax near ",O}"'],
-			['{$MACR"O}', 'incorrect syntax near ""O}"'],
-			['{$MACR\O}', 'incorrect syntax near "\O}"'],
-			['{$MACR\'O}', 'incorrect syntax near "\'O}"'],
-			["{\$MACR'O}", 'incorrect syntax near "\'O}"'],
-			['{$MACRo}', 'incorrect syntax near "o}"'],
-			['{$MACRO}:', 'incorrect syntax near ":"'],
-			['{$MACRO:{#MACRO}}', 'incorrect syntax near "}"'],
-			['{$MACRO:"}', 'unexpected end of macro'],
-			['{$MACRO:""A""}', 'incorrect syntax near "A""}"'],
-			['{$MACRO:"\}', 'unexpected end of macro'],
-			['{$MACRO:"\"}', 'unexpected end of macro'],
-			['{$MACRO:A}}', 'incorrect syntax near "}"'],
-			['{$MACRO:""}}', 'incorrect syntax near "}"'],
-			['{$MACRO:}}', 'incorrect syntax near "}"'],
-			['{$MACRO:"abc\"}', 'unexpected end of macro'],
-			['{$MACR€}', 'incorrect syntax near "€}"'],
-			['{$MACR�}', 'incorrect syntax near "�}"'],
-			['{$MACRƒabcdefghijklimnopqrstuv123123456456789789000aaabbbcccdddeeefffggghhhiiijjjkkklllmmmnnnooo111}', 'incorrect syntax near "ƒabcdefghijklimnopqrstuv123123456456789789000aaabb ..."'],
-			['{$MACRƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ}', 'incorrect syntax near "ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ}"'],
-			['�', 'incorrect syntax near "�"'],
-			['�', 'incorrect syntax near "�"']
-		];
-	}
-
-	/**
-	 * An array of strings containing none or multiple macros and parsed results.
-	 */
-	public function testMixedProvider() {
-		return [
-			[
-				'{$MACRO1}{$MACRO2}',
-				[[
-					'match' => '{$MACRO1}',
-					'macro' => '{$MACRO1}',
-					'pos' => 0,
-					'macro_name' => 'MACRO1',
-					'context' => null
-				],
-				[
-					'match' => '{$MACRO2}',
-					'macro' => '{$MACRO2}',
-					'pos' => 9,
-					'macro_name' => 'MACRO2',
-					'context' => null
-				]]
-			],
-			[
-				'abc"def"ghi{$MACRO}',
-				[[
-					'match' => '{$MACRO}',
-					'macro' => '{$MACRO}',
-					'pos' => 11,
-					'macro_name' => 'MACRO',
-					'context' => null
-				]]
-			],
-			[
-				'abc"def"ghi{$MACRO:""}',
-				[[
-					'match' => '{$MACRO:""}',
-					'macro' => '{$MACRO:""}',
-					'pos' => 11,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'abc"def"ghi{$MACRO:\""}',
-				[[
-					'match' => '{$MACRO:\""}',
-					'macro' => '{$MACRO:\""}',
-					'pos' => 11,
-					'macro_name' => 'MACRO',
-					'context' => '\""'
-				]]
-			],
-			[
-				'abc"def\"ghi{$MACRO:""}',
-				[[
-					'match' => '{$MACRO:""}',
-					'macro' => '{$MACRO:""}',
-					'pos' => 12,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'abc"def{$MACRO:\""}',
-				[[
-					'match' => '{$MACRO:\""}',
-					'macro' => '{$MACRO:\""}',
-					'pos' => 7,
-					'macro_name' => 'MACRO',
-					'context' => '\""'
-				]]
-			],
-			[
-				'abc"def{$MACRO:\"\"}',
-				[[
-					'match' => '{$MACRO:\"\"}',
-					'macro' => '{$MACRO:\"\"}',
-					'pos' => 7,
-					'macro_name' => 'MACRO',
-					'context' => '\"\"'
-				]]
-			],
-			[
-				'abc"def{$MACRO:\"abc\"}',
-				[[
-					'match' => '{$MACRO:\"abc\"}',
-					'macro' => '{$MACRO:\"abc\"}',
-					'pos' => 7,
-					'macro_name' => 'MACRO',
-					'context' => '\"abc\"'
-				]]
-			],
-			[
-				'abc"def{$MACRO:"abc"}',
-				[[
-					'match' => '{$MACRO:"abc"}',
-					'macro' => '{$MACRO:"abc"}',
-					'pos' => 7,
-					'macro_name' => 'MACRO',
-					'context' => 'abc'
-				]]
-			],
-			[
-				'{$MACRO1:"\"xyz\""}',
-				[[
-					'match' => '{$MACRO1:"\"xyz\""}',
-					'macro' => '{$MACRO1:"\"xyz\""}',
-					'pos' => 0,
-					'macro_name' => 'MACRO1',
-					'context' => '"xyz"'
-				]]
-			],
-			[
-				'{$MACRO2:\"xyz\"}',
-				[[
-					'match' => '{$MACRO2:\"xyz\"}',
-					'macro' => '{$MACRO2:\"xyz\"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO2',
-					'context' => '\"xyz\"'
-				]]
-			],
-			[
-				'{$MACRO3:"\\\\"xyz\\\\""}',
-				[[
-					'match' => '{$MACRO3:"\\\\"xyz\\\\""}',
-					'macro' => '{$MACRO3:"\\\\"xyz\\\\""}',
-					'pos' => 0,
-					'macro_name' => 'MACRO3',
-					'context' => '\\"xyz\\"'
-				]]
-			],
-			[
-				'{$MACRO3:\\"xyz\\"}',
-				[[
-					'match' => '{$MACRO3:\\"xyz\\"}',
-					'macro' => '{$MACRO3:\\"xyz\\"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO3',
-					'context' => '\\"xyz\\"'
-				]]
-			],
-			[
-				'abc"def{$MACRO:\"abc\"def\"\"}',
-				[[
-					'match' => '{$MACRO:\"abc\"def\"\"}',
-					'macro' => '{$MACRO:\"abc\"def\"\"}',
-					'pos' => 7,
-					'macro_name' => 'MACRO',
-					'context' => '\"abc\"def\"\"'
-				]]
-			],
-			[
-				'abc"def{$MACRO:\\"abc\\\\"defgh\\\\"\\"}',
-				[[
-					'match' => '{$MACRO:\\"abc\\\\"defgh\\\\"\\"}',
-					'macro' => '{$MACRO:\\"abc\\\\"defgh\\\\"\\"}',
-					'pos' => 7,
-					'macro_name' => 'MACRO',
-					'context' => '\\"abc\\\\"defgh\\\\"\\"'
-				]]
-			],
-			[
-				'a  abc"def"ghi{$MACRO}{$MACRO}test',
-				[[
-					'match' => '{$MACRO}',
-					'macro' => '{$MACRO}',
-					'pos' => 14,
-					'macro_name' => 'MACRO',
-					'context' => null
-				],
-				[
-					'match' => '{$MACRO}',
-					'macro' => '{$MACRO}',
-					'pos' => 22,
-					'macro_name' => 'MACRO',
-					'context' => null
-				]]
-			],
-			[
-				'a  abc"defghi{$MACRO1}{}{{{$:${$${$MACRO2:\"\"}   ',
-				[[
-					'match' => '{$MACRO1}',
-					'macro' => '{$MACRO1}',
-					'pos' => 13,
-					'macro_name' => 'MACRO1',
-					'context' => null
-				],
-				[
-					'match' => '{$MACRO2:\"\"}',
-					'macro' => '{$MACRO2:\"\"}',
-					'pos' => 33,
-					'macro_name' => 'MACRO2',
-					'context' => '\"\"'
-				]]
-			],
-			[
-				'echo[{{$MACRO:}]',
-				[[
-					'match' => '{$MACRO:}',
-					'macro' => '{$MACRO:}',
-					'pos' => 6,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'echo[{${$MACRO:}]',
-				[[
-					'match' => '{$MACRO:}',
-					'macro' => '{$MACRO:}',
-					'pos' => 7,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'echo[{$ABC{$MACRO:}]',
-				[[
-					'match' => '{$MACRO:}',
-					'macro' => '{$MACRO:}',
-					'pos' => 10,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'echo[{$ABC:"abc{$MACRO:}]',
-				[[
-					'match' => '{$MACRO:}',
-					'macro' => '{$MACRO:}',
-					'pos' => 15,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'echo[{$ABC:"abc"{$MACRO:}]',
-				[[
-					'match' => '{$MACRO:}',
-					'macro' => '{$MACRO:}',
-					'pos' => 16,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'echo[{$ABC:"abc\"{$MACRO:}]',
-				[[
-					'match' => '{$MACRO:}',
-					'macro' => '{$MACRO:}',
-					'pos' => 17,
-					'macro_name' => 'MACRO',
-					'context' => ''
-				]]
-			],
-			[
-				'{$MACRO:{"abc"}',
-				[[
-					'match' => '{$MACRO:{"abc"}',
-					'macro' => '{$MACRO:{"abc"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => '{"abc"'
-				]]
-			],
-			[
-				'{$ABC:"{$MACRO:{"abc"}',
-				[[
-					'match' => '{$MACRO:{"abc"}',
-					'macro' => '{$MACRO:{"abc"}',
-					'pos' => 7,
-					'macro_name' => 'MACRO',
-					'context' => '{"abc"'
-				]]
-			],
-			[
-				'{$ABC:"abc\{$MACRO:{"abc"}"}',
-				[[
-					'match' => '{$MACRO:{"abc"}',
-					'macro' => '{$MACRO:{"abc"}',
-					'pos' => 11,
-					'macro_name' => 'MACRO',
-					'context' => '{"abc"'
-				]]
-			],
-			[
-				'{$ABC:"abc\"{$MACRO:{"abc"}}',
-				[[
-					'match' => '{$MACRO:{"abc"}',
-					'macro' => '{$MACRO:{"abc"}',
-					'pos' => 12,
-					'macro_name' => 'MACRO',
-					'context' => '{"abc"'
-				]]
-			],
-			[
-				'{$MACRO:"abc{$A:{"xyz"}\"{$B:{"qrt"}}',
-				[[
-					'match' => '{$A:{"xyz"}',
-					'macro' => '{$A:{"xyz"}',
-					'pos' => 12,
-					'macro_name' => 'A',
-					'context' => '{"xyz"'
-				],
-				[
-					'match' => '{$B:{"qrt"}',
-					'macro' => '{$B:{"qrt"}',
-					'pos' => 25,
-					'macro_name' => 'B',
-					'context' => '{"qrt"'
-				]]
-			],
-			[
-				'{$MACRO1:"{$MACRO2}"}',
-				[[
-					'match' => '{$MACRO1:"{$MACRO2}"}',
-					'macro' => '{$MACRO1:"{$MACRO2}"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO1',
-					'context' => '{$MACRO2}'
-				]]
-			],
-			[
-				'{$MACRO:"abc{$A:{"xyz"}{$A:{"xyz"}\"{$B:{"qrt"}}',
-				[[
-					'match' => '{$A:{"xyz"}',
-					'macro' => '{$A:{"xyz"}',
-					'pos' => 12,
-					'macro_name' => 'A',
-					'context' => '{"xyz"'
-				],
-				[
-					'match' => '{$A:{"xyz"}',
-					'macro' => '{$A:{"xyz"}',
-					'pos' => 23,
-					'macro_name' => 'A',
-					'context' => '{"xyz"'
-				],
-				[
-					'match' => '{$B:{"qrt"}',
-					'macro' => '{$B:{"qrt"}',
-					'pos' => 36,
-					'macro_name' => 'B',
-					'context' => '{"qrt"'
-				]]
-			],
-			[
-				'${${{{{{${${${${{{{${${{$M1{{{$M2{$M3{$M4:{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""}}}}}}}}}}}}}}}}}}}}}}}}}}}}}',
-				[[
-					'match' => '{$M4:{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""}',
-					'macro' => '{$M4:{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""}',
-					'pos' => 37,
-					'macro_name' => 'M4',
-					'context' => '{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""'
-				]]
-			],
-			[
-				'{$MACRO::"abc"}',
-				[[
-					'match' => '{$MACRO::"abc"}',
-					'macro' => '{$MACRO::"abc"}',
-					'pos' => 0,
-					'macro_name' => 'MACRO',
-					'context' => ':"abc"'
-				]]
-			],
-			[
-				'{$ABC:{$MY.MACRO:}',
-				[[
-					'match' => '{$ABC:{$MY.MACRO:}',
-					'macro' => '{$ABC:{$MY.MACRO:}',
-					'pos' => 0,
-					'macro_name' => 'ABC',
-					'context' => '{$MY.MACRO:'
-				]]
-			]
+			['{$MACRO:""}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:""}',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => ''
+			]],
+			['{$MACRO: " " }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO: " " }',
+				'macro_name' => 'MACRO',
+				'context' => ' ',
+				'error' => ''
+			]],
+			['{$MACRO: ""}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO: ""}',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => ''
+			]],
+			['{$MACRO:"" }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:"" }',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => ''
+			]],
+			['{$MACRO: "    " }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO: "    " }',
+				'macro_name' => 'MACRO',
+				'context' => '    ',
+				'error' => ''
+			]],
+			['{$MACRO:    "    "      }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:    "    "      }',
+				'macro_name' => 'MACRO',
+				'context' => '    ',
+				'error' => ''
+			]],
+			['{$MACRO:    ""      }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:    ""      }',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => ''
+			]],
+			['{$MACRO:"A" }', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:"A" }',
+				'macro_name' => 'MACRO',
+				'context' => 'A',
+				'error' => ''
+			]],
+			['{$MACRO:"{#MACRO}"}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:"{#MACRO}"}',
+				'macro_name' => 'MACRO',
+				'context' => '{#MACRO}',
+				'error' => ''
+			]],
+			['{$MACRO:"\abc"}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:"\abc"}',
+				'macro_name' => 'MACRO',
+				'context' => '\abc',
+				'error' => ''
+			]],
+			['{$MACRO:"abc\def"}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:"abc\def"}',
+				'macro_name' => 'MACRO',
+				'context' => 'abc\def',
+				'error' => ''
+			]],
+			['{$MACRO:"\abc\    "}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:"\abc\    "}',
+				'macro_name' => 'MACRO',
+				'context' => '\abc\    ',
+				'error' => ''
+			]],
+			['{$MACRO2:"\\\""}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO2:"\\\""}',
+				'macro_name' => 'MACRO2',
+				'context' => '\"',
+				'error' => ''
+			]],
+			['{$MACRO1}{$MACRO2}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS_PART,
+				'macro' => '{$MACRO1}',
+				'macro_name' => 'MACRO1',
+				'context' => null,
+				'error' => 'incorrect syntax near "{$MACRO2}"'
+			],],
+			['{$MACRO1}{$MACRO2}', 9, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO2}',
+				'macro_name' => 'MACRO2',
+				'context' => null,
+				'error' => ''
+			],],
+			['abc"def"ghi{$MACRO:""}', 11, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:""}',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => ''
+			]],
+			['abc"def"ghi{$MACRO:\""}}', 11, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS_PART,
+				'macro' => '{$MACRO:\""}',
+				'macro_name' => 'MACRO',
+				'context' => '\""',
+				'error' => 'incorrect syntax near "}"'
+			]],
+			['abc"def{$MACRO:\"\"}', 7, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO:\"\"}',
+				'macro_name' => 'MACRO',
+				'context' => '\"\"',
+				'error' => ''
+			]],
+			['{$MACRO3:"\\\\"xyz\\\\""}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO3:"\\\\"xyz\\\\""}',
+				'macro_name' => 'MACRO3',
+				'context' => '\\"xyz\\"',
+				'error' => ''
+			]],
+			['${${{{{{${${${${{{{${${{$M1{{{$M2{$M3{$M4:{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""}}}}}}}}}}}}}}}', 37, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS_PART,
+				'macro' => '{$M4:{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""}',
+				'macro_name' => 'M4',
+				'context' => '{M5:{$M6:{$M7:"{$M8:""{$M9:""a{$M10:""',
+				'error' => 'incorrect syntax near "}}}}}}}}}}}}}}"'
+			]],
+			['{$MACRO::"abc"}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS,
+				'macro' => '{$MACRO::"abc"}',
+				'macro_name' => 'MACRO',
+				'context' => ':"abc"',
+				'error' => ''
+			]],
+			['{$MACRO}:', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS_PART,
+				'macro' => '{$MACRO}',
+				'macro_name' => 'MACRO',
+				'context' => null,
+				'error' => 'incorrect syntax near ":"'
+			]],
+			['{$MACRO:{#MACRO}}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS_PART,
+				'macro' => '{$MACRO:{#MACRO}',
+				'macro_name' => 'MACRO',
+				'context' => '{#MACRO',
+				'error' => 'incorrect syntax near "}"'
+			]],
+			['{$MACRO:A}}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS_PART,
+				'macro' => '{$MACRO:A}',
+				'macro_name' => 'MACRO',
+				'context' => 'A',
+				'error' => 'incorrect syntax near "}"'
+			]],
+			['{$MACRO:""}}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS_PART,
+				'macro' => '{$MACRO:""}',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => 'incorrect syntax near "}"'
+			]],
+			['{$MACRO:}}', 0, [
+				'rc' => CUserMacroParser::PARSE_SUCCESS_PART,
+				'macro' => '{$MACRO:}',
+				'macro_name' => 'MACRO',
+				'context' => '',
+				'error' => 'incorrect syntax near "}"'
+			]],
+			['', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'macro is empty'
+			]],
+			['{', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{{', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{"'
+			]],
+			['{{{', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{{"'
+			]],
+			['{$', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{${$', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{$"'
+			]],
+			['{${{$', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{{$"'
+			]],
+			['{$${$', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "${$"'
+			]],
+			['{${$$', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{$$"'
+			]],
+			['{${{$${$', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{{$${$"'
+			]],
+			['{$M', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$.', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$"', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near """'
+			]],
+			['{$-', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "-"'
+			]],
+			['{$M:', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$M:"', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$M:""', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$M:""{', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{"'
+			]],
+			['{$M:""{$', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{$"'
+			]],
+			['{$M:""{$M', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{$M"'
+			]],
+			['{$M:""{$M:', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{$M:"'
+			]],
+			['{$M:""{$M:"', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{$M:""'
+			]],
+			['{$M:""{$M:""', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "{$M:"""'
+			]],
+			['{$MACRO:"abc\"}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{MACRO', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "MACRO"'
+			]],
+			['{MACRO$', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "MACRO$"'
+			]],
+			['{MACRO}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "MACRO}"'
+			]],
+			['{$macro}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "macro}"'
+			]],
+			['{#macro}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "#macro}"'
+			]],
+			['{$MACRO', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$MACR-O}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "-O}"'
+			]],
+			['{$MACR,O}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near ",O}"'
+			]],
+			['{$MACR"O}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near ""O}"'
+			]],
+			['{$MACR\O}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "\O}"'
+			]],
+			['{$MACR\'O}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "\'O}"'
+			]],
+			["{\$MACR'O}", 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "\'O}"'
+			]],
+			['{$MACRo}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "o}"'
+			]],
+			['{$MACRO:"}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$MACRO:""A""}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "A""}"'
+			]],
+			['{$MACRO:"\}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$MACRO:"\"}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$MACRO:"abc\"}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'unexpected end of macro'
+			]],
+			['{$MACR€}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "€}"'
+			]],
+			['{$MACR�}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "�}"'
+			]],
+			['{$MACRƒabcdefghijklimnopqrstuv123123456456789789000aaabbbcccdddeeefffggghhhiiijjjkkklllmmmnnnooo111}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "ƒabcdefghijklimnopqrstuv123123456456789789000aaabb ..."'
+			]],
+			['{$MACRƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ}', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "ƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒƒ}"'
+			]],
+			['�', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "�"'
+			]],
+			['�', 0, [
+				'rc' => CUserMacroParser::PARSE_FAIL,
+				'macro' => '',
+				'macro_name' => '',
+				'context' => null,
+				'error' => 'incorrect syntax near "�"'
+			]]
 		];
 	}
 
 	/**
 	 * @dataProvider testValidProvider
 	 *
-	 * @param string $source		source string to parse
-	 * @param array $result			expected resulting array
-	 */
-	public function testParseValid($source, $result) {
-		$parser = new CUserMacroParser($source);
-
-		$this->assertTrue($parser->isValid());
-		$this->assertEmpty($parser->getError());
-		$this->assertEquals($result, $parser->getMacros());
-	}
-
-	/**
-	 * @dataProvider testInvalidProvider
-	 *
-	 * @param string $source		source string to parse
-	 * @param string $error		expected error message
-	 */
-	public function testParseInvalid($source, $error) {
-		$parser = new CUserMacroParser($source);
-
-		$this->assertFalse($parser->isValid());
-		$this->assertEquals($error, $parser->getError());
-		$this->assertEmpty($parser->getMacros());
-	}
-
-	/**
-	 * @dataProvider testMixedProvider
-	 *
 	 * @param string $source
-	 * @param array $result
+	 * @param int    $pos
+	 * @param array  $expected
 	 */
+	public function testParseValid($source, $pos, $expected) {
+		static $user_macro_parser = null;
 
-	public function testMixed($source, $result) {
-		$parser = new CUserMacroParser($source, false);
+		if ($user_macro_parser === null) {
+			$user_macro_parser = new CUserMacroParser();
+		}
+		$rc = $user_macro_parser->parse($source, $pos);
 
-		$this->assertFalse($parser->isValid());
-		$this->assertEmpty($parser->getError());
-		$this->assertEquals($result, $parser->getMacros());
+		$result = [
+			'rc' => $rc,
+			'macro' => $user_macro_parser->getMacro(),
+			'macro_name' => $user_macro_parser->getMacroName(),
+			'context' => $user_macro_parser->getContext(),
+			'error' => $user_macro_parser->getError()
+		];
+		$this->assertEquals($expected, $result);
 	}
 }

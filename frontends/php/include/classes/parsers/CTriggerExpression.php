@@ -121,6 +121,13 @@ class CTriggerExpression {
 	protected $lldMacroParser;
 
 	/**
+	 * Parser for user macros.
+	 *
+	 * @var CUserMacroParser
+	 */
+	protected $user_macro_parser;
+
+	/**
 	 * Chars that should be treated as spaces.
 	 *
 	 * @var array
@@ -149,6 +156,7 @@ class CTriggerExpression {
 		$this->macroParser = new CSetParser(['{TRIGGER.VALUE}']);
 		$this->functionMacroParser = new CFunctionMacroParser();
 		$this->lldMacroParser = new CLLDMacroParser();
+		$this->user_macro_parser = new CUserMacroParser();
 	}
 
 	/**
@@ -623,19 +631,16 @@ class CTriggerExpression {
 	 * @return bool
 	 */
 	private function parseUserMacro() {
-		$pos = $this->pos;
-
-		$macros = (new CUserMacroParser($this->expression, false, $pos))->getMacros();
-
-		if (!$macros) {
+		if ($this->user_macro_parser->parse($this->expression, $this->pos) == CUserMacroParser::PARSE_FAIL) {
 			return false;
 		}
 
-		$this->pos += strlen($macros[0]['match']) - 1;
+		$macro = $this->user_macro_parser->getMacro();
+		$macro_len = strlen($macro);
 
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO, $macros[0]['match'],
-			$macros[0]['pos'], strlen($macros[0]['match'])
-		);
+		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO, $macro, $this->pos, $macro_len);
+
+		$this->pos += $macro_len - 1;
 
 		return true;
 	}
