@@ -29,7 +29,7 @@
 #define DEVICE_DIR	"/proc/sys/dev/sensors"
 #else
 #define DEVICE_DIR	"/sys/class/hwmon"
-char	*locations[] = {"", "/device", NULL};
+static char	*locations[] = {"", "/device", NULL};
 #endif
 
 #define ATTR_MAX	128
@@ -95,7 +95,7 @@ static void	count_sensor(int do_task, const char *filename, double *aggr, int *c
  * Comments: attribute string must be freed by caller after it's been used.      *
  *                                                                               *
  *********************************************************************************/
-static char	**sysfs_read_attr(const char *device, char **attribute)
+static const char	*sysfs_read_attr(const char *device, char **attribute)
 {
 	char	path[MAX_STRING_LEN], buf[ATTR_MAX], *p, **location;
 	FILE	*f;
@@ -116,17 +116,18 @@ static char	**sysfs_read_attr(const char *device, char **attribute)
 			buf[strlen(buf) - 1] = '\0';
 
 			*attribute = zbx_strdup(*attribute, buf);
-			return location;
+			return *location;
 		}
 	}
 
 	return NULL;
 }
 
-int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, char ***name_subfolder)
+int	get_device_info(const char *dev_path, const char *dev_name, char *device_info, const char **name_subfolder)
 {
 	char		bus_path[MAX_STRING_LEN], linkpath[MAX_STRING_LEN], subsys_path[MAX_STRING_LEN];
-	char		*subsys, *prefix = NULL, *bus_attr = NULL, **bus_subfolder;
+	char		*subsys, *prefix = NULL, *bus_attr = NULL;
+	const char	*bus_subfolder;
 	int		domain, bus, slot, fn, addr, vendor, product, sub_len, ret = FAIL;
 	short int	bus_spi, bus_i2c;
 
@@ -186,7 +187,7 @@ int	get_device_info(const char *dev_path, const char *dev_name, char *device_inf
 			zbx_snprintf(bus_path, sizeof(bus_path), "/sys/class/i2c-adapter/i2c-%d", bus_i2c);
 			bus_subfolder = sysfs_read_attr(bus_path, &bus_attr);
 
-			if (NULL != *bus_subfolder && '\0' != **bus_subfolder)
+			if (NULL != bus_subfolder && '\0' != *bus_subfolder)
 			{
 				if (0 != strncmp(bus_attr, "ISA ", 4))
 					goto out;
@@ -306,7 +307,8 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 	DIR		*sensordir = NULL, *devicedir = NULL;
 	struct dirent	*sensorent, *deviceent;
 	char		hwmon_dir[MAX_STRING_LEN], devicepath[MAX_STRING_LEN], deviced[MAX_STRING_LEN],
-			device_info[MAX_STRING_LEN], **subfolder, regex[MAX_STRING_LEN], *device_p;
+			device_info[MAX_STRING_LEN], regex[MAX_STRING_LEN], *device_p;
+	const char	*subfolder;
 	int		err, dev_len;
 
 	zbx_snprintf(hwmon_dir, sizeof(hwmon_dir), "%s", DEVICE_DIR);
@@ -347,7 +349,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 		if (SUCCEED == err && 0 == strcmp(device_info, device))
 		{
 			zbx_snprintf(devicepath, sizeof(devicepath), "%s/%s%s", DEVICE_DIR, deviceent->d_name,
-					*subfolder);
+					subfolder);
 
 			if (DO_ONE == do_task)
 			{
