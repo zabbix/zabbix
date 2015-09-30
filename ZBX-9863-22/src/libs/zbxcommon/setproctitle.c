@@ -37,7 +37,6 @@ static char	**environ_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
 static char	**argv_int = NULL, **environ_int = NULL;
-static char	*empty_str = '\0';
 
 /* ps display buffer */
 static char	*ps_buf = NULL;
@@ -66,8 +65,8 @@ static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
 #if defined(PS_OVERWRITE_ARGV)
 char **	setproctitle_save_env(int argc, char **argv)
 {
-	int	i = 0;
-	char	*arg_next = NULL;
+	int	i;
+	char	*arg_next;
 
 	if (NULL == argv || 0 == argc)
 		return argv;
@@ -86,22 +85,18 @@ char **	setproctitle_save_env(int argc, char **argv)
 
 	for (i = argc_ext_copied_first, arg_next = argv[argc_ext_copied_first]; arg_next == argv[i]; i++)
 	{
-		arg_next = argv[i] + strlen(argv[i]) + 1;
+		arg_next += strlen(argv[i]) + 1;
 		argv_int[i] = zbx_strdup(NULL, argv[i]);
-		argc_ext_copied_last = i;
-
-		/* argv[argc_ext_copied_first] will be used to display status messages. The rest of arguments can be */
-		/* overwritten and their argv[] pointers will point to wrong strings. */
-		if (argc_ext_copied_first < i)
-			argv[i] = empty_str;
 	}
+
+	argc_ext_copied_last = i;
 
 	for (; i < argc; i++)
 		argv_int[i] = argv[i];
 
 	argv_int[argc] = NULL;	/* C standard: "argv[argc] shall be a null pointer" */
 
-	if (argc_ext_copied_last == argc - 1)
+	if (argc_ext_copied_last == argc)
 	{
 		int	envc = 0;
 
@@ -114,14 +109,11 @@ char **	setproctitle_save_env(int argc, char **argv)
 
 		for (i = 0; arg_next == environ[i]; i++)
 		{
-			arg_next = environ[i] + strlen(environ[i]) + 1;
+			arg_next += strlen(environ[i]) + 1;
 			environ_int[i] = zbx_strdup(NULL, environ[i]);
-			environ_ext_copied++;
-
-			/* environment variables can be overwritten by status messages in argv[0] */
-			/* and environ[] pointers will point to wrong strings */
-			environ[i] = empty_str;
 		}
+
+		environ_ext_copied = i;
 
 		for (;  i < envc; i++)
 			environ_int[i] = environ[i];
@@ -142,8 +134,10 @@ char **	setproctitle_save_env(int argc, char **argv)
 			len = strlen(argv_int[i - 1]);
 			p += len;
 			size -= len;
+
 			if (2 >= size)
 				break;
+
 			zbx_strlcpy(p++, " ", size--);
 			zbx_strlcpy(p, argv_int[i], size);
 		}
@@ -259,7 +253,7 @@ void	setproctitle_free_env(void)
 	if (environ == environ_int)
 		environ = environ_ext;
 
-	for (i = argc_ext_copied_first; i <= argc_ext_copied_last; i++)
+	for (i = argc_ext_copied_first; i < argc_ext_copied_last; i++)
 		zbx_free(argv_int[i]);
 
 	for (i = 0; i <= environ_ext_copied; i++)
