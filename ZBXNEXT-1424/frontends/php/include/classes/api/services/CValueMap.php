@@ -133,6 +133,12 @@ class CValueMap extends CApiService {
 
 		DB::insertBatch('mappings', $mappings);
 
+		foreach ($db_valuemaps as $db_valuemap) {
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $db_valuemap['valuemapid'], $db_valuemap['name'],
+				null, null, null
+			);
+		}
+
 		return ['valuemapids' => $valuemapids];
 	}
 
@@ -156,6 +162,8 @@ class CValueMap extends CApiService {
 		$update = [];
 		$mappings_create = [];
 		$mappings_delete = [];
+
+		$valuemapids = zbx_objectValues($valuemaps, 'valuemapid');
 
 		foreach ($valuemaps as $valuemap) {
 			// Old mappings are deleted and new ones are created.
@@ -184,10 +192,23 @@ class CValueMap extends CApiService {
 		}
 
 		if ($update) {
+			$db_old_valuemaps = API::getApiService()->select('valuemaps', [
+				'output' => ['name'],
+				'valuemapids' => $valuemapids
+			]);
+
+			$valuemaps = zbx_toHash($valuemaps, 'valuemapid');
+
+			foreach ($db_old_valuemaps as $db_old_valuemap) {
+				$new_name = $valuemaps[$db_old_valuemap['valuemapid']]['name'];
+
+				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $db_old_valuemap['valuemapid'],
+					$new_name, 'valuemaps', ['name' => $db_old_valuemap['name']], ['name' => $new_name]
+				);
+			}
+
 			DB::update('valuemaps', $update);
 		}
-
-		$valuemapids = zbx_objectValues($valuemaps, 'valuemapid');
 
 		// Update mappings.
 		if ($mappings_delete) {
@@ -217,21 +238,42 @@ class CValueMap extends CApiService {
 
 		// Check if value map exists.
 		$db_valuemaps = API::getApiService()->select('valuemaps', [
-			'output' => ['valuemapid'],
+			'output' => ['valuemapid', 'name'],
 			'valuemapids' => $valuemapids,
 			'preservekeys' => true
 		]);
 
 		foreach ($valuemapids as $valuemapid) {
-			if (!array_key_exists($valuemapid, $db_valuemaps)) {
+			if (!is_int($valuemapid) && !is_string($valuemapid)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+			}
+			elseif (!array_key_exists($valuemapid, $db_valuemaps)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
 		}
 
-		// Mappings are handled with cascade delete.
-		$this->deleteByIds($valuemapids);
+		$update_items = [];
+
+		foreach ($db_valuemaps as $db_valuemap) {
+			$update_items[] = [
+				'values' => ['valuemapid' => 0],
+				'where' => ['valuemapid' => $db_valuemap['valuemapid']]
+			];
+		}
+
+		// Mappings are handled with cascade delete, but items.valuemapid reference should be removed first.
+		$result = DB::update('items', $update_items);
+		if ($result) {
+			$this->deleteByIds($valuemapids);
+		}
+
+		foreach ($db_valuemaps as $db_valuemap) {
+			add_audit_ext(AUDIT_ACTION_DELETE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemap['valuemapid'],
+				$db_valuemap['name'], null, null, null
+			);
+		}
 
 		return ['valuemapids' => $valuemapids];
 	}
@@ -328,17 +370,9 @@ class CValueMap extends CApiService {
 			_('Incorrect value map ID.')
 		);
 
-		// Check for duplicate names.
-		$duplicate_name = CArrayHelper::findDuplicate($valuemaps, 'name');
-		if ($duplicate_name) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "name" value "%1$s" for value map.', $duplicate_name['name'])
-			);
-		}
-
 		$valuemapids = zbx_objectValues($valuemaps, 'valuemapid');
 
-		// Check
+		// Check value map names.
 		$db_valuemaps = API::getApiService()->select('valuemaps', [
 			'output' => ['valuemapid', 'name'],
 			'valuemapids' => $valuemapids,
@@ -390,6 +424,14 @@ class CValueMap extends CApiService {
 		// Populate "name" field, if not set.
 		$valuemaps = $this->extendFromObjects(zbx_toHash($valuemaps, 'valuemapid'), $db_valuemaps, ['name']);
 
+		// Check for duplicate names. 'name' must be set.
+		$duplicate_name = CArrayHelper::findDuplicate($valuemaps, 'name');
+		if ($duplicate_name) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate "name" value "%1$s" for value map.', $duplicate_name['name'])
+			);
+		}
+
 		// Validate "mappings" field and its properties.
 		$this->checkMappings($valuemaps);
 	}
@@ -422,19 +464,15 @@ class CValueMap extends CApiService {
 			}
 
 			foreach ($valuemap['mappings'] as $mapping) {
+				if (!is_array($mapping)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+
 				$missing_keys = checkRequiredKeys($mapping, $required_mapping_fields);
 
-				if ($missing_keys === null) {
-					// object {"value":"1", "newvalue":"2"} given instead of an array [{"value":"1", "newvalue":"2"}].
+				if ($missing_keys) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'"mappings" property is missing parameters: %1$s for value map "%2$s".',
-						implode(', ', $required_mapping_fields),
-						$valuemap['name']
-					));
-				}
-				elseif ($missing_keys) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-						'"mappings" property is missing parameters: %1$s for value map "%2$s".',
+						'Mapping is missing parameters: %1$s for value map "%2$s".',
 						implode(', ', $missing_keys),
 						$valuemap['name']
 					));
@@ -444,15 +482,23 @@ class CValueMap extends CApiService {
 						if (is_array($mapping[$field])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 						}
-						elseif ($mapping[$field] === '' || $mapping[$field] === null || $mapping[$field] === false) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-								'Field "%1$s" in "mappings" property is missing a value for value map "%2$s".',
-								$field,
-								$valuemap['name']
-							));
-						}
 					}
 				}
+
+				if ($mapping['newvalue'] === '' || $mapping['newvalue'] === null || $mapping['newvalue'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Empty new value in value map "%1$s".', $valuemap['name'])
+					);
+				}
+			}
+
+			$duplicate_mapping = CArrayHelper::findDuplicate($valuemap['mappings'], 'value');
+			if ($duplicate_mapping) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Duplicate mapping value "%1$s" for value map "%2$s".',
+					$duplicate_mapping['value'],
+					$valuemap['name']
+				));
 			}
 		}
 	}
