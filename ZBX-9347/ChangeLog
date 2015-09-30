@@ -4,7 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-.D........ [ZBX-9347] added information about incoming file format for zabbix_sender utility (dimir, Richlv)
+.D........ [ZBX-9347] added information about input file format for zabbix_sender utility (dimir, Richlv)
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
 ...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
 .......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)

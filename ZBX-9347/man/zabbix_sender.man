@@ -28,11 +28,11 @@ Specify value.
 
 Load values from input file. Specify \fB-\fR to read values from standard input.
 
-Each value corresponds to one line of the input file. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument. All entries are sent in a sequential order top-down.
+Each value must be specified on its own line. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR, where "hostname" is the name of monitored host as registered in Zabbix frontend, "key" is target item key and "value" - the value to be sent for the item. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument. All entries are sent in a sequential order top-down.
 
 An example of a line of the input file:
 
-\fB "Zabbix server" mysql.ping 1\fR
+\fB "Zabbix server" db.connections 43\fR
 
 Note, that the value type must be correctly set in item configuration of Zabbix frontend.
 
@@ -68,7 +68,7 @@ Each line of the input file must contain 4 whitespace delimited entries: \fB<hos
 
 An example of a line of the input file:
 
-\fB "Zabbix server" mysql.ping 1429533600 1\fR
+\fB "Zabbix server" db.connections 1429533600 43\fR
 
 For more examples on the input file format please see option \fB--input-file\fR.
 
@@ -87,7 +87,7 @@ If data was sent, but processing of at least one of the values failed, the exit 
 If data sending failed, the exit status is 1.
 
 .SH "EXAMPLES"
-.B zabbix_sender -c /usr/local/etc/zabbix_agentd.conf -s """Monitored Host""" -k mysql.queries -o 342.45
+.B zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -s """Monitored Host""" -k mysql.queries -o 342.45
 
 Send \fB342.45\fR as the value for \fBmysql.queries\fR key in \fBMonitored Host\fR host using Zabbix server defined in agent daemon configuration file.
 
