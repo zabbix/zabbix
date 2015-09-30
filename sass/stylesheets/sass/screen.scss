@@ -5,6 +5,27 @@
 
 /* ----------- Zabbix Styles ----------- */
 
+
+
+//doc
+//---
+//title: Buttons
+//name: button
+//category: home
+//---
+
+//Button styles can be applied to any element. Typically you'll want
+//to use either a `<button>` or an `<a>` element:
+
+//```html_example <button class="btn btnDefault">Click</button> <a
+//class="btn btnDefault" href="trulia.com">Trulia!</a> ```
+
+//If your button is actually a link to another page, please use the
+//`<a>` element, while if your button performs an action, such as
+//submitting a form or triggering some javascript event, then use a
+//`<button>` element.
+
+
 html {
 	position: relative;
 	min-height: 100%;
@@ -371,15 +392,23 @@ ul.top-nav-icons {
 	height: 36px;
 	line-height: 36px;
 	background-color: $main-subnav-bg-color;
+	position: relative;
+	padding: 0 13px;
 }
 
 .top-subnav {
 	background-color: $main-subnav-bg-color;
+	position: absolute;
+	left: 0;
 
 	li {
 		display: block;
 		float: left;
 		padding: 0 5px;
+
+		&:last-child {
+			@include box-shadow (25px 0px 10px -10px rgba($main-subnav-bg-color, 1));
+		}
 	}
 }
 
@@ -832,6 +861,7 @@ footer {
 .overflow-table {
 	overflow-x: auto;
 	position: relative;
+	@extend %webkit-hor-scrollbar;
 }
 
 /* Filters */
@@ -1932,8 +1962,7 @@ button[disabled] {
 		&.ui-tabs-active {
 
 			a {
-				padding: 8px 13px 9px 13px;
-				//font-weight: bold;
+				padding: 11px 13px 9px 13px;
 				background-color: $ui-bg-color;
 				color: $font-color;
 				text-decoration: none;
@@ -2734,7 +2763,7 @@ $form-icon-btn: (
 	overflow-y: auto;
 	padding: 11px;
 	margin: 10px 13px 0 13px;
-	background-color: $lighter-yellow;
+	background-color: $lighter-yellow !important;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
 }
@@ -2779,6 +2808,7 @@ $form-icon-btn: (
 	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)),
 	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)) 0 100%;
 	background-repeat: no-repeat;
+	background-color: $ui-bg-color;
 	background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
 	background-attachment: local, local, scroll, scroll;
 }
@@ -3407,7 +3437,16 @@ $browser-logos: (
 	&::-webkit-scrollbar-thumb {
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid darken($scrollbar-thumb-color,5%);
+		border-radius: 6px;
 	}
+}
+
+%webkit-hor-scrollbar {
+	&::-webkit-scrollbar {
+		height: 9px;
+	}
+
+	@extend %webkit-scrollbar;
 }
 
 .cursor-move {
@@ -3447,11 +3486,11 @@ $browser-logos: (
 }
 
 .server-name {
-	font-size: $font-msg-reset-size;
-	max-width: 180px;
-	padding: 4px 7px;
-	position: absolute;
-	z-index: 100;
+	color: $font-alt-color;
+	float: right;
+	white-space: nowrap;
+	overflow: hidden;
+	@extend %overflow-ellipsis;
 }
 
 .list-hor-min-width {
