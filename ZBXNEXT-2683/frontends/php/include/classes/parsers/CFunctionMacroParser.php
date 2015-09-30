@@ -155,10 +155,10 @@ class CFunctionMacroParser extends CParser {
 				&& isset($this->source[$this->pos]) && $this->source[$this->pos] === ',') {
 			$this->pos++;
 
-			$macros = (new CUserMacroParser($this->source, false, $this->pos))->getMacros();
+			$user_macro_parser = new CUserMacroParser();
 
-			if ($macros) {
-				$this->pos += strlen($macros[0]['match']);
+			if ($user_macro_parser->parse($this->source, $this->pos) != CUserMacroParser::PARSE_FAIL) {
+				$this->pos += strlen($user_macro_parser->getMacro());
 			}
 			// numeric parameter or empty parameter
 			else {

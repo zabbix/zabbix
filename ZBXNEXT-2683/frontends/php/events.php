@@ -721,7 +721,7 @@ else {
 				'preservekeys' => true
 			]);
 
-			$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+			$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 			// fetch hosts
 			$hosts = [];

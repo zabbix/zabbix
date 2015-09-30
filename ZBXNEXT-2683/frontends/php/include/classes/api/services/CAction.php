@@ -1354,9 +1354,10 @@ class CAction extends CApiService {
 							}
 						}
 						else {
-							$parser = new CUserMacroParser($operation['opcommand']['port']);
+							$user_macro_parser = new CUserMacroParser();
 
-							if (!$parser->isValid()) {
+							if ($user_macro_parser->parse($operation['opcommand']['port'])
+									!= CUserMacroParser::PARSE_SUCCESS) {
 								self::exception(ZBX_API_ERROR_PARAMETERS,
 									_s('Incorrect action operation port "%s".', $operation['opcommand']['port'])
 								);

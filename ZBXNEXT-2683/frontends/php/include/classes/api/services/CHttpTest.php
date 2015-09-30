@@ -743,9 +743,9 @@ class CHttpTest extends CApiService {
 	 * @return bool
 	 */
 	protected  function checkStatusCode($statusCodeRange) {
-		$parser = new CUserMacroParser($statusCodeRange);
+		$user_macro_parser = new CUserMacroParser();
 
-		if ($statusCodeRange === '' || $parser->isValid()) {
+		if ($statusCodeRange === '' || $user_macro_parser->parse($statusCodeRange) == CUserMacroParser::PARSE_SUCCESS) {
 			return true;
 		}
 		else {

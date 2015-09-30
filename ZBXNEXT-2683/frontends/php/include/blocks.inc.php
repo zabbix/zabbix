@@ -586,7 +586,7 @@ function make_latest_issues(array $filter = []) {
 		'preservekeys' => true
 	]));
 
-	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 	// don't use withLastEventUnacknowledged and skipDependent because of performance issues
 	$triggersTotalCount = API::Trigger()->get(array_merge($options, [

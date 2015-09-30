@@ -417,9 +417,7 @@ function validateNumber($value, $min = null, $max = null) {
 }
 
 function validateUserMacro($value) {
-	$parser = new CUserMacroParser($value);
-
-	return $parser->isValid();
+	return ((new CUserMacroParser())->parse($value) == CUserMacroParser::PARSE_SUCCESS);
 }
 
 /**
