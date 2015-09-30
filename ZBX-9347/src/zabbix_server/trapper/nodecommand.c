@@ -251,7 +251,7 @@ int	node_process_command(zbx_sock_t *sock, const char *data, struct zbx_json_par
 	{
 		ret = execute_script(scriptid, hostid, &result);
 
-		response = (FAIL == ret) ? ZBX_PROTO_VALUE_FAILED : ZBX_PROTO_VALUE_SUCCESS;
+		response = (SUCCEED != ret) ? ZBX_PROTO_VALUE_FAILED : ZBX_PROTO_VALUE_SUCCESS;
 
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, response, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, result, ZBX_JSON_TYPE_STRING);

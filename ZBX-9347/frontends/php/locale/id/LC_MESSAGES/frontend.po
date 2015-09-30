@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-09-17 11:56+0300\n"
 "PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
@@ -40,7 +40,7 @@ msgid "%1$d scenario"
 msgid_plural "%1$d scenarios"
 msgstr[0] "%1$d skenario"
 
-#: chart4.php:90 chart5.php:83
+#: chart4.php:92 chart5.php:85
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (tahun %2$s)"
@@ -1471,7 +1471,7 @@ msgstr "Tidak dapat menghapus script. Script %1$s\" sedang digunakan pada operas
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Tidak dapat menghapus script. Script dengan scriptid \"%s\" tidak ada."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "Tidak dapat menghapus aksi yang dipilih"
 
@@ -1990,7 +1990,7 @@ msgstr "Tidak dapat perbarui service"
 msgid "Cannot update slide show"
 msgstr "Tidak dapat perbarui slide show"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Tidak dapat perbarui status"
 
@@ -4664,7 +4664,7 @@ msgstr "Akses GUI non-aktif."
 msgid "General"
 msgstr "Umum"
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
+#: chart4.php:182 chart5.php:202 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr "Pembuatan dalam %s det"
@@ -8189,7 +8189,7 @@ msgstr "Tidak ada item grafik dengan graphid \"%s\"."
 msgid "No graph prototypes defined."
 msgstr "Tidak ada prototipe grafik yang didefinisikan."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
+#: chart2.php:51 chart6.php:53 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1340
@@ -8321,7 +8321,7 @@ msgstr "Tidak ada item dengan itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Tidak ada item dengan itemid=\"%1$s\"."
 
-#: chart.php:49 include/items.inc.php:725
+#: chart.php:51 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:953 popup.php:1088
 msgid "No items defined."
@@ -8549,7 +8549,7 @@ msgstr "Tidak ada trigger"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Tidak ada trigger dengan triggerid \"%1$s\"."
 
-#: chart4.php:40 include/triggers.inc.php:1193
+#: chart4.php:42 include/triggers.inc.php:1193
 #: include/views/configuration.triggers.list.php:90 popup.php:973
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8807,7 +8807,7 @@ msgstr "Numerik (unsigned)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:167 chart5.php:192 httpdetails.php:147 httpdetails.php:213
+#: chart4.php:169 chart5.php:194 httpdetails.php:147 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:843
 #: include/maps.inc.php:940 include/setup.inc.php:200
@@ -8998,7 +8998,7 @@ msgstr "Hanya seluruh nomor"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operasi \"%s\" sudah ada."
@@ -9296,7 +9296,7 @@ msgstr "Ekstensi PHP xmlwriter hilang"
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:637 include/triggers.inc.php:166
+#: chart5.php:198 include/maps.inc.php:637 include/triggers.inc.php:166
 msgid "PROBLEM"
 msgstr "MASALAH"
 
@@ -9646,7 +9646,7 @@ msgstr "Masalah, jika semua turunan memiliki masalah"
 msgid "Problem, if at least one child has a problem"
 msgstr "Masalah, jika setidaknya satu turunan memiliki masalah"
 
-#: chart4.php:171 include/maps.inc.php:689 include/maps.inc.php:779
+#: chart4.php:173 include/maps.inc.php:689 include/maps.inc.php:779
 #: include/maps.inc.php:877 report2.php:237 report3.php:85
 msgid "Problems"
 msgstr "Masalah"
@@ -10758,7 +10758,7 @@ msgstr "Pilih baris dengan nilai seperti"
 msgid "Selected"
 msgstr "Dipilih"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "Aksi yang dipilih dihapus"
 
@@ -11318,7 +11318,7 @@ msgstr "Status trigger"
 msgid "Status only"
 msgstr "Status saja"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Status diperbarui"
 
@@ -12261,7 +12261,7 @@ msgstr "Membuka blokir user yang dipilih?"
 msgid "Units"
 msgstr "Unit"
 
-#: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
+#: chart4.php:177 events.php:506 events.php:507 events.php:516 events.php:517
 #: events.php:518 events.php:519 hosts.php:807 httpdetails.php:160
 #: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
 #: include/actions.inc.php:105 include/actions.inc.php:129
@@ -12814,7 +12814,7 @@ msgstr "W"
 msgid "Warning"
 msgstr "Peringatan"
 
-#: chart7.php:76
+#: chart7.php:78
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr "Peringatan. Tidak dapat menampilkan item lebih dari satu dengan tipe \"Grafik sum\"."
 
@@ -13240,9 +13240,9 @@ msgstr "Anda tidak dapat menentukan target untuk skrip global aksi operasi \"%s\
 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
-#: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
-#: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
-#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1602
+#: api/classes/CHostGroup.php:912 api/classes/CHostGroup.php:967
+#: api/classes/CHostGroup.php:1012 api/classes/CHostGroup.php:1025
+#: api/classes/CHostGroup.php:1041 api/classes/CHost.php:1602
 #: api/classes/CHost.php:1656 api/classes/CHost.php:1970
 #: api/classes/CMaintenance.php:618 api/classes/CMaintenance.php:725
 #: api/classes/CMaintenance.php:737 api/classes/CScript.php:258
@@ -13511,7 +13511,7 @@ msgstr "d M Y H:i"
 msgid "d M Y H:i:s"
 msgstr "d M Y H:i:s"
 
-#: chart4.php:127 chart5.php:137
+#: chart4.php:129 chart5.php:139
 msgid "d.M"
 msgstr "d.M"
 

@@ -3194,3 +3194,47 @@ void	zbx_replace_string(char **data, size_t l, size_t *r, const char *value)
 
 	memcpy(&(*data)[l], value, sz_value);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_dyn_escape_shell_single_quote                                *
+ *                                                                            *
+ * Purpose: escape single quote in shell command arguments                    *
+ *                                                                            *
+ * Parameters: arg - [IN] the argument to escape                              *
+ *                                                                            *
+ * Return value: The escaped argument.                                        *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_dyn_escape_shell_single_quote(const char *arg)
+{
+	int		len = 1; /* include terminating zero character */
+	const char	*pin;
+	char		*arg_esc, *pout;
+
+	for (pin = arg; '\0' != *pin; pin++)
+	{
+		if ('\'' == *pin)
+			len += 3;
+		len++;
+	}
+
+	pout = arg_esc = zbx_malloc(NULL, len);
+
+	for (pin = arg; '\0' != *pin; pin++)
+	{
+		if ('\'' == *pin)
+		{
+			*pout++ = '\'';
+			*pout++ = '\\';
+			*pout++ = '\'';
+			*pout++ = '\'';
+		}
+		else
+			*pout++ = *pin;
+	}
+
+	*pout = '\0';
+
+	return arg_esc;
+}
