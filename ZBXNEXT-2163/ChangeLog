@@ -1,10 +1,23 @@
 Changes for 3.0.0alpha3
 
 New features:
+..F.....S. [ZBXNEXT-922] added forecasting trigger functions (gleb, Sandis)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 ....I..... [ZBXNEXT-2056] added an HTTP response code value map (Richlv)
+...G...PS. [ZBX-9274] added printing defaults when Zabbix programs are executed with --help option (dimir)
 
 Bug fixes:
+........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
+...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
+...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
+.......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
+..F....... [ZBX-8820] added functionality to trim multiple JS elements (Sasha, vitalijs.cemeris)
+...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
+.......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
+...G...... [ZBX-9847] fixed possible Zabbix agent crash when executing system.cpu.discovery (dimir)
+.......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
+...G...PS. [ZBX-9776] added check for line length when parsing configuration file (viktors)
+...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
 ...G...... [ZBXNEXT-494] fixed proc.cpu.util help item description (wiper)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
 .......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
@@ -159,6 +172,15 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
+...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
+...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
+.......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
+...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
+.......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
+...G...... [ZBX-9847] fixed possible Zabbix agent crash when executing system.cpu.discovery (dimir)
+.......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
+...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
 .......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
 ...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
@@ -832,6 +854,13 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
+...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
+...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
+.......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
+...G...... [ZBX-9740] improved proc.num for protected Windows processes (gleb)
+.......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
+.......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
 .......PS. [ZBX-9666] fixed invalid SNMP dynamic index cache if 2 SNMP agents have the same IP, port and OID (dimir, igors, Sandis)
 ...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
