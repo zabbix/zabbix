@@ -7,6 +7,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and
 ...G...PS. [ZBX-9274] added printing defaults when Zabbix programs are executed with --help option (dimir)
 
 Bug fixes:
+........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
@@ -171,6 +172,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
@@ -852,6 +854,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
 .......PS. [ZBX-9855] fixed SNMP dynamic index cache refresh when SNMP OID changes (dimir)
