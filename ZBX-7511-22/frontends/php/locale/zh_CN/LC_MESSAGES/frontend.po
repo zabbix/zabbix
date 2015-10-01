@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-31 12:39+0300\n"
+"POT-Creation-Date: 2015-09-17 11:59+0300\n"
 "PO-Revision-Date: 2013-08-25 15:11+0200\n"
 "Last-Translator: solutionware <shiys@solutionware.com.cn>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -2362,8 +2362,8 @@ msgstr "无法更新群组"
 msgid "Cannot update group."
 msgstr "无法更新群组."
 
-#: api/classes/CHostGroup.php:943 api/classes/CHostGroup.php:1048
-#: api/classes/CHostGroup.php:1189
+#: api/classes/CHostGroup.php:960 api/classes/CHostGroup.php:1065
+#: api/classes/CHostGroup.php:1206
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr ""
@@ -9878,9 +9878,9 @@ msgstr "没有系统存取的许可权"
 #: api/classes/CGraphPrototype.php:693 api/classes/CGraphPrototype.php:756
 #: api/classes/CHostBase.php:45 api/classes/CHostGeneral.php:65
 #: api/classes/CHostGeneral.php:115 api/classes/CHostGroup.php:529
-#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:977
-#: api/classes/CHostGroup.php:1007 api/classes/CHostGroup.php:1136
-#: api/classes/CHostGroup.php:1238 api/classes/CHostGroup.php:1265
+#: api/classes/CHostGroup.php:608 api/classes/CHostGroup.php:994
+#: api/classes/CHostGroup.php:1024 api/classes/CHostGroup.php:1153
+#: api/classes/CHostGroup.php:1255 api/classes/CHostGroup.php:1282
 #: api/classes/CHostInterface.php:319 api/classes/CHostInterface.php:335
 #: api/classes/CHostInterface.php:476 api/classes/CHostInterface.php:687
 #: api/classes/CHost.php:671 api/classes/CHost.php:689
@@ -10485,8 +10485,8 @@ msgstr "于状态改变时, 触发器因此闪烁于"
 msgid "Once"
 msgstr "一次"
 
-#: api/classes/CHostGroup.php:1145 api/classes/CHostGroup.php:1154
-#: api/classes/CHostGroup.php:1247
+#: api/classes/CHostGroup.php:1162 api/classes/CHostGroup.php:1171
+#: api/classes/CHostGroup.php:1264
 msgid "One of the objects is left without a host group."
 msgstr "其中的一个对象被留下没有主机组."
 
