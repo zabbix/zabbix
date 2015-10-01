@@ -3357,14 +3357,22 @@ a.overlay-close-btn {
 	}
 }
 
+.preloader-container {
+	border-radius: 50%;
+	padding: 7px;
+	display: inline-block;
+	margin: 0 auto;
+	background-color: rgba($ui-bg-color, .8);
+}
+
 .preloader {
 	border-radius: 50%;
-	width: 24px;
-	height: 24px;
+	width: 20px;
+	height: 20px;
 	margin: 0 auto;
 	border: 2px solid #ccd5d9;
 	border-bottom: 2px solid #0275b8;
-	animation: load 0.8s infinite linear;
+	animation: load 0.6s infinite linear;
 }
 
 @keyframes load {
