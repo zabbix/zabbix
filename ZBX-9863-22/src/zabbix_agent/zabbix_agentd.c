@@ -760,7 +760,7 @@ int	main(int argc, char **argv)
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
 #if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
-	argv = setproctitle_save_env(argc, argv);
+	setproctitle_save_env(argc, argv);
 #endif
 	memset(&t, 0, sizeof(t));
 	t.task = ZBX_TASK_START;

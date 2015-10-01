@@ -33,10 +33,10 @@
 /* external environment we got on startup */
 extern char	**environ;
 static int	argc_ext_copied_first = 0, argc_ext_copied_last = 0, environ_ext_copied = 0;
-static char	**environ_ext = NULL;
+static char	**argv_ext = NULL, **environ_ext = NULL;
 
-/* internal copy of argv[] and environment variables */
-static char	**argv_int = NULL, **environ_int = NULL;
+/* internal copy of environment variables */
+static char	**environ_int = NULL;
 
 /* ps display buffer */
 static char	*ps_buf = NULL;
@@ -63,38 +63,30 @@ static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
  *                                                                            *
  ******************************************************************************/
 #if defined(PS_OVERWRITE_ARGV)
-char **	setproctitle_save_env(int argc, char **argv)
+void	setproctitle_save_env(int argc, char **argv)
 {
 	int	i;
 	char	*arg_next;
 
 	if (NULL == argv || 0 == argc)
-		return argv;
+		return;
 
 	/* measure a size of continuous argv[] area and make a copy */
-
-	argv_int = zbx_malloc(argv_int, ((unsigned int)argc + 1) * sizeof(char *));
 
 #if defined(PS_APPEND_ARGV)
 	argc_ext_copied_first = argc - 1;
 #else
 	argc_ext_copied_first = 0;
 #endif
-	for (i = 0; i < argc_ext_copied_first; i++)
-		argv_int[i] = argv[i];
+	ps_buf = argv[argc_ext_copied_first];
 
 	for (i = argc_ext_copied_first, arg_next = argv[argc_ext_copied_first]; arg_next == argv[i]; i++)
 	{
 		arg_next += strlen(argv[i]) + 1;
-		argv_int[i] = zbx_strdup(NULL, argv[i]);
+		argv[i] = zbx_strdup(NULL, argv[i]);
 	}
 
 	argc_ext_copied_last = i;
-
-	for (; i < argc; i++)
-		argv_int[i] = argv[i];
-
-	argv_int[argc] = NULL;	/* C standard: "argv[argc] shall be a null pointer" */
 
 	if (argc_ext_copied_last == argc)
 	{
@@ -121,8 +113,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 		environ_int[envc] = NULL;
 	}
 
-	ps_buf_size = (size_t)(arg_next - argv[argc_ext_copied_first]);
-	ps_buf = argv[argc_ext_copied_first];
+	ps_buf_size = (size_t)(arg_next - ps_buf);
 
 #if defined(PS_CONCAT_ARGV)
 	{
@@ -150,10 +141,10 @@ char **	setproctitle_save_env(int argc, char **argv)
 	environ_ext = environ;
 	environ = environ_int;		/* switch environment to internal copy */
 
-	return argv_int;
+	argv_ext = argv;
 }
 #elif defined(PS_PSTAT_ARGV)
-char **	setproctitle_save_env(int argc, char **argv)
+void	setproctitle_save_env(int argc, char **argv)
 {
 	size_t	len0;
 
@@ -166,7 +157,6 @@ char **	setproctitle_save_env(int argc, char **argv)
 		p_msg = ps_buf + len0 + 2;
 		ps_buf_size_msg = ps_buf_size - len0 - 2;	/* space after "argv[0]: " for status message */
 	}
-	return argv;
 }
 #endif	/* defined(PS_PSTAT_ARGV) */
 
@@ -254,12 +244,11 @@ void	setproctitle_free_env(void)
 		environ = environ_ext;
 
 	for (i = argc_ext_copied_first; i < argc_ext_copied_last; i++)
-		zbx_free(argv_int[i]);
+		zbx_free(argv_ext[i]);
 
 	for (i = 0; i <= environ_ext_copied; i++)
 		zbx_free(environ_int[i]);
 
-	zbx_free(argv_int);
 	zbx_free(environ_int);
 }
 #endif	/* PS_OVERWRITE_ARGV */
