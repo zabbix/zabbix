@@ -1,4 +1,4 @@
-<script type="text/x-jquery-tmpl" id="execParamsRow">
+<script type="text/x-jquery-tmpl" id="exec_params_row">
 	<tr class="form_row">
 		<td>
 			<input type="text" id="exec_params_#{rowNum}_exec_param" name="exec_params[#{rowNum}][exec_param]" maxlength="255" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px;">
@@ -117,7 +117,7 @@
 		}
 
 		$('#exec_params_table').dynamicRows({
-			template: '#execParamsRow'
+			template: '#exec_params_row'
 		});
 	});
 </script>
