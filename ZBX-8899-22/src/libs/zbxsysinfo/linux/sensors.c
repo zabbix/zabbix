@@ -115,7 +115,9 @@ static const char	*sysfs_read_attr(const char *device, char **attribute)
 			/* Last byte is a '\n'; chop that off */
 			buf[strlen(buf) - 1] = '\0';
 
-			*attribute = zbx_strdup(*attribute, buf);
+			if (NULL != attribute)
+				*attribute = zbx_strdup(*attribute, buf);
+
 			return *location;
 		}
 	}
@@ -338,6 +340,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 			if (0 == strcmp(device, device_p))
 			{
 				zbx_snprintf(device_info, sizeof(device_info), "%s", device);
+				subfolder = sysfs_read_attr(devicepath, NULL);
 				err = SUCCEED;
 			}
 			else
