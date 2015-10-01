@@ -15,7 +15,7 @@
 			switch ($(this).val()) {
 				case '<?= MEDIA_TYPE_EMAIL ?>':
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #smtp_security, #smtp_authentication').closest('li').show();
-					$('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #execParamsTable')
+					$('#exec_path, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #exec_params_table')
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
@@ -26,7 +26,7 @@
 					break;
 
 				case '<?= MEDIA_TYPE_EXEC ?>':
-					$('#exec_path, #execParamsTable').closest('li').show();
+					$('#exec_path, #exec_params_table').closest('li').show();
 					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #gsm_modem, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication')
 						.closest('li')
 						.hide();
@@ -35,7 +35,7 @@
 
 				case '<?= MEDIA_TYPE_SMS ?>':
 					$('#gsm_modem').closest('li').show();
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #execParamsTable')
+					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #jabber_username, #eztext_username, #eztext_limit, #passwd, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_params_table')
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
@@ -43,7 +43,7 @@
 
 				case '<?= MEDIA_TYPE_JABBER ?>':
 					$('#jabber_username, #passwd').closest('li').show();
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #execParamsTable')
+					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #eztext_username, #eztext_limit, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_params_table')
 						.closest('li')
 						.hide();
 					$('#eztext_link').hide();
@@ -52,7 +52,7 @@
 				case '<?= MEDIA_TYPE_EZ_TEXTING ?>':
 					$('#eztext_username, #eztext_limit, #passwd').closest('li').show();
 					$('#eztext_link').show();
-					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #execParamsTable')
+					$('#smtp_server, #smtp_port, #smtp_helo, #smtp_email, #exec_path, #gsm_modem, #jabber_username, #smtp_verify_peer, #smtp_verify_host, #smtp_username, #smtp_security, #smtp_authentication, #exec_params_table')
 						.closest('li')
 						.hide();
 					break;
@@ -116,7 +116,7 @@
 			}
 		}
 
-		$('#execParamsTable').dynamicRows({
+		$('#exec_params_table').dynamicRows({
 			template: '#execParamsRow'
 		});
 	});

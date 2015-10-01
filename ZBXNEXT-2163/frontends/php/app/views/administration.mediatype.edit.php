@@ -80,7 +80,7 @@ $mediaTypeFormList
 	->addRow(_('Script name'), (new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
 
 $exec_params_table = (new CTable())
-	->setId('execParamsTable')
+	->setId('exec_params_table')
 	->setHeader([_('Parameter'), _('Action')])
 	->setAttribute('style', 'width: 100%;');
 
