@@ -2774,6 +2774,7 @@ $form-icon-btn: (
 	right: 13px;
 	z-index: 10000;
 	padding: 4px 11px;
+	border: 1px solid $ui-border-color;
 	background-color: rgba($body-bg-color,0.7);
 	@include border-radius(2px);
 }
