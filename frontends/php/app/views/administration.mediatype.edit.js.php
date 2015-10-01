@@ -69,16 +69,10 @@
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
 		$('#mediaTypeForm').submit(function() {
-			$('#description').val($.trim($('#description').val()));
-			$('#smtp_server').val($.trim($('#smtp_server').val()));
-			$('#smtp_port').val($.trim($('#smtp_port').val()));
-			$('#smtp_helo').val($.trim($('#smtp_helo').val()));
-			$('#smtp_email').val($.trim($('#smtp_email').val()));
-			$('#exec_path').val($.trim($('#exec_path').val()));
-			$('#gsm_modem').val($.trim($('#gsm_modem').val()));
-			$('#jabber_username').val($.trim($('#jabber_username').val()));
-			$('#eztext_username').val($.trim($('#eztext_username').val()));
-			$('#smtp_username').val($.trim($('#smtp_username').val()));
+			$(this).trimValues([
+				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
+				'#jabber_username', '#eztext_username', '#smtp_username'
+			]);
 		});
 
 		// Refresh field visibility on document load.
