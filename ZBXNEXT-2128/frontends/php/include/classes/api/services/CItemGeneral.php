@@ -344,6 +344,13 @@ abstract class CItemGeneral extends CApiService {
 
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
+				// When delay is 0, at least one interval must be set.
+				if ($fullItem['delay'] == 0 && $fullItem['delay_flex'] === '') {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Item will not be refreshed. Please enter a correct update interval.')
+					);
+				}
+
 				// Don't parse empty strings, they will not be valid.
 				if ($fullItem['delay_flex'] === '') {
 					continue;
@@ -356,10 +363,19 @@ abstract class CItemGeneral extends CApiService {
 					$delay_flex_validator = new CItemDelayFlexValidator();
 
 					if ($delay_flex_validator->validate($item_delay_flex_parser->getIntervals())) {
+						// Some valid intervals exist at this point.
+						$flexible_intervals = $item_delay_flex_parser->getFlexibleIntervals();
+
+						// If there are no flexible intervals, skip the next check calculation.
+						if (!$flexible_intervals) {
+							continue;
+						}
+
 						$nextCheck = calculateItemNextCheck(0, $fullItem['delay'],
-							$item_delay_flex_parser->getFlexibleIntervals(),
+							$item_delay_flex_parser->getFlexibleIntervals($flexible_intervals),
 							time()
 						);
+
 						if ($nextCheck == ZBX_JAN_2038) {
 							self::exception(ZBX_API_ERROR_PARAMETERS,
 								_('Item will not be refreshed. Please enter a correct update interval.')
