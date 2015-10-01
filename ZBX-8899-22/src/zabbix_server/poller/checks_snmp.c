@@ -667,7 +667,6 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 		strval_dyn[var->val_len] = '\0';
 	}
 
-	zbx_lrtrim(strval_dyn, ZBX_WHITESPACE);
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, ZBX_NULL2STR(strval_dyn));
 
