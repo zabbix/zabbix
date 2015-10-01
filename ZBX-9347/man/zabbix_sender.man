@@ -38,6 +38,8 @@ Note, that the value type must be correctly set in item configuration of Zabbix 
 
 Zabbix sender will send up to 250 values in one connection.
 
+The contents of the file is accepted in UTF-8 encoding (for both UNIX-like systems and Windows).
+
 Entries must be formatted using the following rules:
 
 .RS
