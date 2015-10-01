@@ -183,8 +183,8 @@ class CMediatype extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
+			// Check required parameters.
 			$missing_keys = checkRequiredKeys($mediatype, $required_fields);
-
 			if ($missing_keys) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Media type is missing parameters: %1$s', implode(', ', $missing_keys))
@@ -201,11 +201,22 @@ class CMediatype extends CApiService {
 					}
 				}
 			}
+		}
 
+		// Check for duplicate names.
+		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'description');
+		if ($duplicate_name) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate "description" value "%1$s" for value map.', $duplicate_name['description'])
+			);
+		}
+
+		foreach ($mediatypes as $mediatype) {
 			// Check if media type already exists.
-			$db_mediatype = API::getApiService()->select($this->tableName(), [
+			$db_mediatype = API::getApiService()->select('media_type', [
 				'output' => ['description'],
-				'filter' => ['description' => $mediatype['description']]
+				'filter' => ['description' => $mediatype['description']],
+				'limit' => 1
 			]);
 
 			if ($db_mediatype) {
@@ -355,59 +366,74 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
 		}
 
-		$required_fields = ['mediatypeid'];
-
-		foreach ($mediatypes as $mediatype) {
-			if (!is_array($mediatype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
-			}
-
-			$missing_keys = checkRequiredKeys($mediatype, $required_fields);
-
-			if ($missing_keys) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Media type is missing parameters: %1$s', implode(', ', $missingkeys))
-				);
-			}
-		}
+		// Validate given IDs.
+		$this->checkObjectIds($mediatypes, 'mediatypeid',
+			_('No "%1$s" given for media type.'),
+			_('Empty media type ID.'),
+			_('Incorrect media type ID.')
+		);
 
 		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
 
-		$db_mediatypes = $this->get([
-			'mediatypeids' => $mediatypeids,
-			'countOutput' => true
-		]);
-
-		if ($db_mediatypes != count($mediatypes)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		$db_mediatypes = API::getApiService()->select($this->tableName(), [
+		// Check value map names.
+		$db_mediatypes = API::getApiService()->select('media_type', [
 			'output' => ['mediatypeid', 'type', 'description', 'exec_path', 'smtp_authentication', 'status'],
 			'mediatypeids' => $mediatypeids,
 			'preservekeys' => true
 		]);
 
+		$check_names = [];
+
 		foreach ($mediatypes as $mediatype) {
-			// If description changed, check if matches any of existing descriptions.
-			if (array_key_exists('description', $mediatype)
-					&& $db_mediatypes[$mediatype['mediatypeid']]['description'] !== $mediatype['description']) {
-				foreach ($db_mediatypes as $db_mediatype) {
-					if ($db_mediatype['description'] === $mediatype['description']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('Media type "%1$s" already exists.', $mediatype['description'])
-						);
-					}
+			// Check if this media type exists.
+			if (!array_key_exists($mediatype['mediatypeid'], $db_mediatypes)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			// Validate "description" field.
+			if (array_key_exists('description', $mediatype)) {
+				if (is_array($mediatype['description'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($mediatype['description'] === '' || $mediatype['description'] === null
+						|| $mediatype['description'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'description', _('cannot be empty'))
+					);
+				}
+
+				$check_names[$mediatype['description']] = true;
+			}
+		}
+
+		if ($check_names) {
+			$db_mediatype_names = API::getApiService()->select('media_type', [
+				'output' => ['mediatypeid', 'description'],
+				'filter' => ['name' => array_keys($check_names)]
+			]);
+			$db_mediatype_names = zbx_toHash($db_mediatype_names, 'description');
+
+			foreach ($mediatypes as $mediatype) {
+				if (array_key_exists('description', $mediatype)
+						&& array_key_exists($mediatype['description'], $db_mediatype_names)
+						&& !idcmp($db_mediatype_names[$mediatype['description']]['mediatypeid'],
+							$mediatype['mediatypeid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Media type "%1$s" already exists.', $mediatype['description'])
+					);
 				}
 			}
+		}
 
+		// Populate "description" field, if not set. Type field should not be populated at this point.
+		$mediatypes = $this->extendFromObjects(zbx_toHash($mediatypes, 'mediatypeid'), $db_mediatypes, ['description']);
+
+		foreach ($mediatypes as $mediatype) {
 			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
 
-			// Populate 'description' field from DB, if not set since it is required in validation messages.
-			if (!array_key_exists('description', $mediatype)) {
-				$mediatype['description'] = $db_mediatype['description'];
-			}
-
+			// Recheck mandatory fields if type changed.
 			if (array_key_exists('type', $mediatype) && $db_mediatype['type'] != $mediatype['type']) {
 				$this->checkRequiredFieldsByType($mediatype);
 			}
@@ -431,7 +457,7 @@ class CMediatype extends CApiService {
 					}
 				}
 
-				// Populate 'type' field from DB, since it is not set and is required for validation.
+				// Populate "type" field from DB, since it is not set and is required for further validation.
 				$mediatype['type'] = $db_mediatype['type'];
 			}
 
