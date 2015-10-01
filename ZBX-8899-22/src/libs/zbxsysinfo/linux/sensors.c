@@ -340,8 +340,7 @@ static void	get_device_sensors(int do_task, const char *device, const char *name
 			if (0 == strcmp(device, device_p))
 			{
 				zbx_snprintf(device_info, sizeof(device_info), "%s", device);
-				subfolder = sysfs_read_attr(devicepath, NULL);
-				err = SUCCEED;
+				err = (NULL != (subfolder = sysfs_read_attr(devicepath, NULL)) ? SUCCEED : FAIL);
 			}
 			else
 			{
