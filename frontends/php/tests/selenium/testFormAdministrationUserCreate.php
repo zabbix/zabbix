@@ -18,26 +18,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../include/class.cwebtest.php';
 
 class testFormAdministrationUserCreate extends CWebTest {
 	public function testFormAdministrationUserCreate_CreateUser() {
 		$this->zbxTestLogin('users.php');
 		$this->zbxTestCheckTitle('Configuration of users');
-		$this->zbxTestClickWait("link=Users");
-		$this->zbxTestClickWait("id=form");
-		$this->input_type("alias", "User alias");
-		$this->input_type("name", "User name");
-		$this->input_type("surname", "User surname");
-		$this->click("id=add_group");
-		$this->waitForPopUp("zbx_popup", "30000");
-		$this->selectWindow("name=zbx_popup");
-		$this->click("id=new_groups_7");
-		$this->click("id=select");
-		$this->waitForPageToLoad("30000");
-		$this->selectWindow("null");
-		$this->input_type("password1", "123");
-		$this->input_type("password2", "123");
-		$this->zbxTestClickWait("add");
+		$this->zbxTestClickWait('link=Users');
+		$this->zbxTestClickWait('id=form');
+		$this->input_type('alias', 'User alias');
+		$this->input_type('name', 'User name');
+		$this->input_type('surname', 'User surname');
+		$this->click('id=add_group');
+		$this->waitForPopUp('zbx_popup', '30000');
+		$this->selectWindow('name=zbx_popup');
+		$this->click('id=new_groups_7');
+		$this->click('id=select');
+		$this->waitForPageToLoad('30000');
+		$this->selectWindow('null');
+		$this->input_type('password1', '123');
+		$this->input_type('password2', '123');
+		$this->zbxTestClickWait('add');
 	}
 }
