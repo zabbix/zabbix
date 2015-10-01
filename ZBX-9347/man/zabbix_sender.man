@@ -40,6 +40,8 @@ Zabbix sender will send up to 250 values in one connection.
 
 The contents of the file is accepted in UTF-8 encoding (for both UNIX-like systems and Windows).
 
+All values from an input file are sent in a sequential order top-down.
+
 Entries must be formatted using the following rules:
 
 .RS
