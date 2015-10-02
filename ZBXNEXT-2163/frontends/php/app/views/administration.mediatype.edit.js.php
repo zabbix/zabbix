@@ -68,7 +68,7 @@
 		});
 
 		// Trim spaces on sumbit. Spaces for script parameters should not be trimmed.
-		$('#mediaTypeForm').submit(function() {
+		$('#media_type_form').submit(function() {
 			$(this).trimValues([
 				'#description', '#smtp_server', '#smtp_port', '#smtp_helo', '#smtp_email', '#exec_path', '#gsm_modem',
 				'#jabber_username', '#eztext_username', '#smtp_username'
@@ -110,8 +110,16 @@
 			}
 		}
 
+		// When adding and removing dynamic rows, store counter in hidden field.
 		$('#exec_params_table').dynamicRows({
-			template: '#exec_params_row'
+			template: '#exec_params_row',
+			dataCallback: function() {
+				$('#exec_params_count').val(parseInt($('#exec_params_count').val()) + 1);
+			}
+		});
+
+		$('#exec_params_table').on('click', 'button.element-table-remove', function() {
+			$('#exec_params_count').val($('#exec_params_table .form_row input[type="text"]').length);
 		});
 	});
 </script>

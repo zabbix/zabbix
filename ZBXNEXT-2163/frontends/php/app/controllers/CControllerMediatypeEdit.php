@@ -42,6 +42,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
 			'exec_params' =>			'array media_type.exec_params',
+			'exec_params_count' =>		'int32',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'jabber_username' =>		'db media_type.username',
 			'eztext_username' =>		'db media_type.username',
@@ -100,6 +101,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_host' => '0',
 			'smtp_authentication' => '0',
 			'exec_params' => [],
+			'exec_params_count' => '0',
 			'exec_path' => '',
 			'gsm_modem' => '/dev/ttyS0',
 			'jabber_username' => 'user@server',
@@ -128,6 +130,10 @@ class CControllerMediatypeEdit extends CController {
 			foreach ($this->mediatype['exec_params'] as $exec_param) {
 				$data['exec_params'][] = ['exec_param' => $exec_param];
 			}
+			// Remove last empty new line param.
+			array_pop($data['exec_params']);
+
+			$data['exec_params_count'] = count($data['exec_params']);
 
 			$data['gsm_modem'] = $this->mediatype['gsm_modem'];
 			$data['passwd'] = $this->mediatype['passwd'];
@@ -161,6 +167,7 @@ class CControllerMediatypeEdit extends CController {
 			'smtp_verify_host',
 			'smtp_authentication',
 			'exec_params',
+			'exec_params_count',
 			'exec_path',
 			'gsm_modem',
 			'jabber_username',
@@ -169,10 +176,6 @@ class CControllerMediatypeEdit extends CController {
 			'passwd',
 			'status'
 		]);
-
-		if (!$data['exec_params']) {
-			$data['exec_params'][] = ['exec_param' => ''];
-		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));
