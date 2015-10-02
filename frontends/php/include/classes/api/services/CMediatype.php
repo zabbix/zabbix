@@ -207,7 +207,7 @@ class CMediatype extends CApiService {
 		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'description');
 		if ($duplicate_name) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "description" value "%1$s" for value map.', $duplicate_name['description'])
+				_s('Duplicate "description" value "%1$s" for media type.', $duplicate_name['description'])
 			);
 		}
 
@@ -429,6 +429,13 @@ class CMediatype extends CApiService {
 
 		// Populate "description" field, if not set. Type field should not be populated at this point.
 		$mediatypes = $this->extendFromObjects(zbx_toHash($mediatypes, 'mediatypeid'), $db_mediatypes, ['description']);
+
+		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'description');
+		if ($duplicate_name) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate "description" value "%1$s" for media type.', $duplicate_name['description'])
+			);
+		}
 
 		foreach ($mediatypes as $mediatype) {
 			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
