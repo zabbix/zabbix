@@ -172,7 +172,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 
 		$graphPrototypeItems = API::GraphItem()->get([
 			'output' => [
-				'gitemid', 'itemid', 'sortorder', 'flags', 'type', 'calc_fnc',  'drawtype', 'yaxisside', 'color'
+				'gitemid', 'itemid', 'sortorder', 'flags', 'type', 'calc_fnc', 'drawtype', 'yaxisside', 'color'
 			],
 			'graphids' => [$graphPrototype['graphid']]
 		]);
