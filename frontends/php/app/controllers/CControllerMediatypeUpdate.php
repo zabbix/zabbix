@@ -36,6 +36,7 @@ class CControllerMediatypeUpdate extends CController {
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
 			'exec_params' =>			'array media_type.exec_params',
+			'exec_params_count' =>		'int32',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'jabber_username' =>		'db media_type.username',
 			'eztext_username' =>		'db media_type.username',
@@ -95,9 +96,15 @@ class CControllerMediatypeUpdate extends CController {
 			case MEDIA_TYPE_EXEC:
 				$this->getInputs($mediatype, ['exec_path']);
 
-				$mediatype['exec_params'] = implode("\n",
-					zbx_objectValues($this->getInput('exec_params'), 'exec_param')
-				);
+				$mediatype['exec_params'] = '';
+
+				if ($this->hasInput('exec_params')) {
+					$exec_params = zbx_objectValues($this->getInput('exec_params'), 'exec_param');
+
+					foreach ($exec_params as $exec_param) {
+						$mediatype['exec_params'] .= $exec_param."\n";
+					}
+				}
 				break;
 
 			case MEDIA_TYPE_SMS:
