@@ -201,7 +201,7 @@ function createServiceMonitoringTree(array $services, array $slaData, $period, &
 
 		$caption = [new CLink(
 			$service['name'],
-			'report3.php?serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period]
+			'zabbix.php?action=report.services&serviceid='.$service['serviceid'].'&year='.date('Y').'&period='.$periods[$period]
 		)];
 		$trigger = $service['trigger'];
 		if ($trigger) {
