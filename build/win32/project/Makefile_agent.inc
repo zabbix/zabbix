@@ -32,6 +32,7 @@ OBJS  = ..\..\..\src\libs\zbxalgo\algodefs.o \
 	..\..\..\src\libs\zbxexec\execute.o \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
 	..\..\..\src\libs\zbxsysinfo\common\common.o \
+	..\..\..\src\libs\zbxsysinfo\common\cpu.o \
 	..\..\..\src\libs\zbxsysinfo\common\file.o \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
@@ -164,6 +165,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 
 ..\..\..\src\libs\zbxsysinfo\common\common.o: ..\..\..\src\libs\zbxsysinfo\common\common.c
 	$(CC) ..\..\..\src\libs\zbxsysinfo\common\common.c /Fo"..\..\..\src\libs\zbxsysinfo\common\common.o" $(CFLAGS)
+
+..\..\..\src\libs\zbxsysinfo\common\cpu.o: ..\..\..\src\libs\zbxsysinfo\common\cpu.c
+	$(CC) ..\..\..\src\libs\zbxsysinfo\common\cpu.c /Fo"..\..\..\src\libs\zbxsysinfo\common\cpu.o" $(CFLAGS)
 
 ..\..\..\src\libs\zbxsysinfo\common\file.o: ..\..\..\src\libs\zbxsysinfo\common\file.c
 	$(CC) ..\..\..\src\libs\zbxsysinfo\common\file.c /Fo"..\..\..\src\libs\zbxsysinfo\common\file.o" $(CFLAGS)
