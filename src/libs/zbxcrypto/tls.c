@@ -3176,6 +3176,9 @@ void	zbx_tls_init_child(void)
 
 		/* do not connect to unpatched servers */
 		SSL_CTX_clear_options(ctx_cert, SSL_OP_LEGACY_SERVER_CONNECT);
+
+		/* disable session caching */
+		SSL_CTX_set_session_cache_mode(ctx_cert, SSL_SESS_CACHE_OFF);
 	}
 
 	if (NULL != ctx_psk)
@@ -3183,6 +3186,7 @@ void	zbx_tls_init_child(void)
 		SSL_CTX_set_mode(ctx_psk, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_options(ctx_psk, SSL_OP_CIPHER_SERVER_PREFERENCE);
 		SSL_CTX_clear_options(ctx_psk, SSL_OP_LEGACY_SERVER_CONNECT);
+		SSL_CTX_set_session_cache_mode(ctx_psk, SSL_SESS_CACHE_OFF);
 	}
 
 	if (NULL != ctx_all)
@@ -3190,6 +3194,7 @@ void	zbx_tls_init_child(void)
 		SSL_CTX_set_mode(ctx_all, SSL_MODE_AUTO_RETRY);
 		SSL_CTX_set_options(ctx_all, SSL_OP_CIPHER_SERVER_PREFERENCE);
 		SSL_CTX_clear_options(ctx_all, SSL_OP_LEGACY_SERVER_CONNECT);
+		SSL_CTX_set_session_cache_mode(ctx_all, SSL_SESS_CACHE_OFF);
 	}
 
 #ifndef _WINDOWS
