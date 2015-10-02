@@ -122,7 +122,7 @@ void	setproctitle_save_env(int argc, char **argv)
 
 		for (i = argc_ext_copied_first + 1; i < argc; i++)
 		{
-			len = strlen(argv_int[i - 1]);
+			len = strlen(argv[i - 1]);
 			p += len;
 			size -= len;
 
@@ -130,13 +130,13 @@ void	setproctitle_save_env(int argc, char **argv)
 				break;
 
 			zbx_strlcpy(p++, " ", size--);
-			zbx_strlcpy(p, argv_int[i], size);
+			zbx_strlcpy(p, argv[i], size);
 		}
 	}
 #endif
 
 #if defined(PS_DARWIN_ARGV)
-	*_NSGetArgv() = argv_int;
+	*_NSGetArgv() = argv;
 #endif
 	environ_ext = environ;
 	environ = environ_int;		/* switch environment to internal copy */
@@ -196,7 +196,7 @@ void	setproctitle_set_status(const char *status)
 		/* argv[] changing takes place only in child processes.						*/
 
 #if defined(PS_CONCAT_ARGV)
-		start_pos = strlen(argv_int[0]);
+		start_pos = strlen(argv_ext[0]);
 #else
 		start_pos = strlen(ps_buf);
 #endif
