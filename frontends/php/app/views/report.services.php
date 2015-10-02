@@ -67,6 +67,8 @@ switch ($data['period']) {
 }
 $table->setHeader($header);
 
+order_result($data['sla']['sla'], 'from', ZBX_SORT_DOWN);
+
 foreach ($data['sla']['sla'] as $sla) {
 	$ok = (new CSpan(
 		sprintf('%dd %dh %dm',
