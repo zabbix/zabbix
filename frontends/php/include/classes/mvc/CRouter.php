@@ -80,6 +80,7 @@ class CRouter {
 		'proxy.hostenable'		=> ['CControllerProxyHostEnable',		null,					null],
 		'proxy.list'			=> ['CControllerProxyList',				'layout.htmlpage',		'administration.proxy.list'],
 		'proxy.update'			=> ['CControllerProxyUpdate',			null,					null],
+		'report.services'		=> ['CControllerReportServices',		'layout.htmlpage',		'report.services'],
 		'report.status'			=> ['CControllerReportStatus',			'layout.htmlpage',		'report.status'],
 		'script.create'			=> ['CControllerScriptCreate',			null,					null],
 		'script.delete'			=> ['CControllerScriptDelete',			null,					null],

@@ -87,6 +87,7 @@ $ZBX_MENU = [
 			],
 			[
 				'url' => 'srv_status.php',
+				'active_if' => ['report.services'],
 				'label' => _('IT services'),
 				'sub_pages' => ['report3.php', 'chart5.php']
 			],
