@@ -324,92 +324,77 @@ $itemFormList->addRow(
 	(new CNumericBox('delay', $this->data['delay'], 5))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 );
 
-// append delay flex to form list
+// Append delay_flex to form list.
 $delayFlexTable = (new CTable())
-	->setNoDataMessage(_('No flexible intervals defined.'))
-	->setAttribute('style', 'width: 100%;')
 	->setId('delayFlexTable')
-	->setHeader([_('Interval'), _('Period'), _('Action')]);
-$i = 0;
-$this->data['maxReached'] = false;
-foreach ($this->data['delay_flex'] as $delayFlex) {
-	if (!isset($delayFlex['delay']) && !isset($delayFlex['period'])) {
-		continue;
-	}
-	$itemForm->addVar('delay_flex['.$i.'][delay]', $delayFlex['delay']);
-	$itemForm->addVar('delay_flex['.$i.'][period]', $delayFlex['period']);
+	->setHeader([_('Type'), _('Interval'), _('Period'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
 
-	$row = (new CRow([
-		$delayFlex['delay'],
-		$delayFlex['period'],
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeDelayFlex('.$i.');')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]))->setId('delayFlex_'.$i);
-	$delayFlexTable->addRow($row);
+foreach ($data['delay_flex'] as $i => $delay_flex) {
+	$type_input = (new CRadioButtonList('delay_flex['.$i.'][type]', (int) $delay_flex['type']))
+		->addValue(_('Flexible'), ITEM_DELAY_FLEX_TYPE_FLEXIBLE)
+		->addValue(_('Scheduling'), ITEM_DELAY_FLEX_TYPE_SCHEDULING)
+		->setModern(true);
 
-	// limit count of intervals, 7 intervals by 30 symbols = 210 characters, db storage field is 256
-	$i++;
-	if ($i == 7) {
-		$this->data['maxReached'] = true;
-		break;
+	if ($delay_flex['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', $delay_flex['delay'], 5, false, true, false))
+			->setAttribute('placeholder', 50);
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', $delay_flex['period'], false, 255))
+			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL);
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', '', false, 255))
+			->setAttribute('placeholder', 'wd1-5h9-18')
+			->setAttribute('style', 'display: none;');
 	}
+	else {
+		$delay_input = (new CNumericBox('delay_flex['.$i.'][delay]', '', 5, false, true, false))
+			->setAttribute('placeholder', 50)
+			->setAttribute('style', 'display: none;');
+		$period_input = (new CTextBox('delay_flex['.$i.'][period]', '', false, 255))
+			->setAttribute('placeholder', ZBX_DEFAULT_INTERVAL)
+			->setAttribute('style', 'display: none;');
+		$schedule_input = (new CTextBox('delay_flex['.$i.'][schedule]', $delay_flex['schedule'], false, 255))
+			->setAttribute('placeholder', 'wd1-5h9-18');
+	}
+
+	$button = (new CButton('delay_flex['.$i.'][remove]', _('Remove')))
+		->addClass(ZBX_STYLE_BTN_LINK)
+		->addClass('element-table-remove');
+
+	$delayFlexTable->addRow([$type_input, [$delay_input, $schedule_input], $period_input, $button], 'form_row');
 }
+
+$delayFlexTable->addRow([(new CButton('interval_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
+
 $itemFormList->addRow(
 	[
-		_('Flexible intervals'),
+		_('Custom intervals'),
 		SPACE,
-		(new CVisibilityBox('visible[delay_flex]', ['delayFlexDiv', 'row-new-delay-flex-fields'], _('Original')))
+		(new CVisibilityBox('visible[delay_flex]', 'delayFlexDiv', _('Original')))
 			->setChecked(isset($this->data['visible']['delay_flex']))
 	],
 	(new CDiv($delayFlexTable))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('delayFlexDiv')
-);
-
-// append new delay to form list
-$newFlexInt = (new CDiv([
-		_('Interval (in sec)'),
-		SPACE,
-		(new CNumericBox('new_delay_flex[delay]', 50, 5, false, false, false))
-			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH),
-		SPACE,
-		_('Period'),
-		SPACE,
-		(new CTextBox('new_delay_flex[period]', ZBX_DEFAULT_INTERVAL))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		SPACE,
-		(new CSubmit('add_delay_flex', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
-]))
-	->setId('row-new-delay-flex-fields');
-
-$maxFlexMsg = (new CSpan(_('Maximum number of flexible intervals added')))
-	->addClass(ZBX_STYLE_RED)
-	->setId('row-new-delay-flex-max-reached')
-	->setAttribute('style', 'display: none;');
-
-$itemFormList->addRow(_('New flexible interval'), [$newFlexInt, $maxFlexMsg], 'row_new_delay_flex', 'new');
-
-// append history to form list
-$itemFormList->addRow(
-	[
-		_('History storage period (in days)'),
-		SPACE,
-		(new CVisibilityBox('visible[history]', 'history', _('Original')))
-			->setChecked(isset($this->data['visible']['history']))
-	],
-	(new CNumericBox('history', $this->data['history'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
-);
-
-// append trends to form list
-$itemFormList->addRow(
-	[
-		_('Trend storage period (in days)'),
-		SPACE,
-		(new CVisibilityBox('visible[trends]', 'trends', _('Original')))
+)
+	->addRow(
+		[
+			_('History storage period (in days)'), SPACE,
+			(new CVisibilityBox('visible[history]', 'history', _('Original')))
+				->setChecked(isset($this->data['visible']['history']))
+		],
+		(new CNumericBox('history', $this->data['history'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+)
+	->addRow(
+		[
+			_('Trend storage period (in days)'),
+			SPACE,
+			(new CVisibilityBox('visible[trends]', 'trends', _('Original')))
 			->setChecked(isset($this->data['visible']['trends']))
-	],
-	(new CNumericBox('trends', $this->data['trends'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
+		],
+		(new CNumericBox('trends', $this->data['trends'], 8))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 );
 
 // append status to form list

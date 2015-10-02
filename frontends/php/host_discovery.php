@@ -51,10 +51,7 @@ $fields = [
 	'delay' =>				[T_ZBX_INT, O_OPT, null, BETWEEN(0, SEC_PER_DAY),
 		'(isset({add}) || isset({update})) && isset({type}) && {type} != '.ITEM_TYPE_TRAPPER.' && {type} != '.ITEM_TYPE_SNMPTRAP,
 		_('Update interval (in sec)')],
-	'delay_flex' =>			[T_ZBX_STR, O_OPT, null,	'',			null],
-	'add_delay_flex' =>		[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'new_delay_flex' =>		[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add_delay_flex}) && isset({type}) && {type} != 2',
-		_('New flexible interval')],
+	'delay_flex' =>			[T_ZBX_STR, O_OPT, null,	null,			null],
 	'status' =>					[T_ZBX_INT, O_OPT, null,	IN(ITEM_STATUS_ACTIVE), null],
 	'type' =>				[T_ZBX_INT, O_OPT, null,
 		IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_SNMPV1, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMPV2C,
@@ -161,20 +158,7 @@ else {
 /*
  * Actions
  */
-if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator(['allowMultiple' => false]);
-	$_REQUEST['delay_flex'] = getRequest('delay_flex', []);
-
-	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
-		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
-		unset($_REQUEST['new_delay_flex']);
-	}
-	else {
-		error($timePeriodValidator->getError());
-		show_messages(false, null, _('Invalid time period'));
-	}
-}
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
+if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = API::DiscoveryRule()->delete([getRequest('itemid')]);
 
 	if ($result) {
@@ -185,114 +169,162 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	unset($_REQUEST['itemid'], $_REQUEST['form']);
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$delay_flex = getRequest('delay_flex', []);
+	$result = true;
 
-	$db_delay_flex = '';
-	foreach ($delay_flex as $val) {
-		$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
-	}
-	$db_delay_flex = trim($db_delay_flex, ';');
+	/*
+	 * Intially validate "delay_flex" field one by one to make sure it does not have interval separator ";".
+	 * Skip empty fields and convert "delay_flex" array to string glued with ";" which is later validated through API.
+	 */
+	$delay_flex = '';
+	$intervals = [];
 
-	$newItem = [
-		'itemid' => getRequest('itemid'),
-		'interfaceid' => getRequest('interfaceid'),
-		'name' => getRequest('name'),
-		'description' => getRequest('description'),
-		'key_' => getRequest('key'),
-		'hostid' => getRequest('hostid'),
-		'delay' => getRequest('delay'),
-		'status' => getRequest('status', ITEM_STATUS_DISABLED),
-		'type' => getRequest('type'),
-		'snmp_community' => getRequest('snmp_community'),
-		'snmp_oid' => getRequest('snmp_oid'),
-		'trapper_hosts' => getRequest('trapper_hosts'),
-		'port' => getRequest('port'),
-		'snmpv3_contextname' => getRequest('snmpv3_contextname'),
-		'snmpv3_securityname' => getRequest('snmpv3_securityname'),
-		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
-		'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
-		'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
-		'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
-		'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
-		'delay_flex' => $db_delay_flex,
-		'authtype' => getRequest('authtype'),
-		'username' => getRequest('username'),
-		'password' => getRequest('password'),
-		'publickey' => getRequest('publickey'),
-		'privatekey' => getRequest('privatekey'),
-		'params' => getRequest('params'),
-		'ipmi_sensor' => getRequest('ipmi_sensor'),
-		'lifetime' => getRequest('lifetime')
-	];
+	if (getRequest('delay_flex')) {
+		foreach (getRequest('delay_flex') as $interval) {
+			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+				if ($interval['delay'] === '' && $interval['period'] === '') {
+					continue;
+				}
 
-	// add macros; ignore empty new macros
-	$filter = [
-		'evaltype' => getRequest('evaltype'),
-		'conditions' => []
-	];
-	$conditions = getRequest('conditions', []);
-	ksort($conditions);
-	$conditions = array_values($conditions);
-	foreach ($conditions as $condition) {
-		if (!zbx_empty($condition['macro'])) {
-			$condition['macro'] = mb_strtoupper($condition['macro']);
-
-			$filter['conditions'][] = $condition;
-		}
-	}
-	if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-		// if only one or no conditions are left, reset the evaltype to and/or and clear the formula
-		if (count($filter['conditions']) <= 1) {
-			$filter['formula'] = '';
-			$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
-		}
-		else {
-			$filter['formula'] = getRequest('formula');
-		}
-	}
-	$newItem['filter'] = $filter;
-
-	if (hasRequest('update')) {
-		DBstart();
-
-		// unset snmpv3 fields
-		if ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
-			$newItem['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
-			$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-		}
-		elseif ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
-			$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
-		}
-
-		// unset unchanged values
-		$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
-
-		// don't update the filter if it hasn't changed
-		$conditionsChanged = false;
-		if (count($newItem['filter']['conditions']) != count($item['filter']['conditions'])) {
-			$conditionsChanged = true;
-		}
-		else {
-			$conditions = $item['filter']['conditions'];
-			foreach ($newItem['filter']['conditions'] as $i => $condition) {
-				if (CArrayHelper::unsetEqualValues($condition, $conditions[$i])) {
-					$conditionsChanged = true;
+				if (strpos($interval['delay'], ';') !== false) {
+					$result = false;
+					info(_s('Invalid interval "%1$s".', $interval['delay']));
 					break;
 				}
+				elseif (strpos($interval['period'], ';')  !== false) {
+					$result = false;
+					info(_s('Invalid interval "%1$s".', $interval['period']));
+					break;
+				}
+
+				$intervals[] = $interval['delay'].'/'.$interval['period'];
+			}
+			else {
+				if ($interval['schedule'] === '') {
+					continue;
+				}
+
+				if (strpos($interval['schedule'], ';') !== false) {
+					$result = false;
+					info(_s('Invalid interval "%1$s".', $interval['schedule']));
+					break;
+				}
+
+				$intervals[] = $interval['schedule'];
 			}
 		}
-		$filter = CArrayHelper::unsetEqualValues($newItem['filter'], $item['filter']);
-		if (!isset($filter['evaltype']) && !isset($filter['formula']) && !$conditionsChanged) {
-			unset($newItem['filter']);
-		}
 
-		$result = API::DiscoveryRule()->update($newItem);
-		$result = DBend($result);
-		show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
+		if ($intervals) {
+			$delay_flex = join(';', $intervals);
+		}
+	}
+
+	if ($result) {
+		$newItem = [
+			'itemid' => getRequest('itemid'),
+			'interfaceid' => getRequest('interfaceid'),
+			'name' => getRequest('name'),
+			'description' => getRequest('description'),
+			'key_' => getRequest('key'),
+			'hostid' => getRequest('hostid'),
+			'delay' => getRequest('delay'),
+			'status' => getRequest('status', ITEM_STATUS_DISABLED),
+			'type' => getRequest('type'),
+			'snmp_community' => getRequest('snmp_community'),
+			'snmp_oid' => getRequest('snmp_oid'),
+			'trapper_hosts' => getRequest('trapper_hosts'),
+			'port' => getRequest('port'),
+			'snmpv3_contextname' => getRequest('snmpv3_contextname'),
+			'snmpv3_securityname' => getRequest('snmpv3_securityname'),
+			'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel'),
+			'snmpv3_authprotocol' => getRequest('snmpv3_authprotocol'),
+			'snmpv3_authpassphrase' => getRequest('snmpv3_authpassphrase'),
+			'snmpv3_privprotocol' => getRequest('snmpv3_privprotocol'),
+			'snmpv3_privpassphrase' => getRequest('snmpv3_privpassphrase'),
+			'delay_flex' => $delay_flex,
+			'authtype' => getRequest('authtype'),
+			'username' => getRequest('username'),
+			'password' => getRequest('password'),
+			'publickey' => getRequest('publickey'),
+			'privatekey' => getRequest('privatekey'),
+			'params' => getRequest('params'),
+			'ipmi_sensor' => getRequest('ipmi_sensor'),
+			'lifetime' => getRequest('lifetime')
+		];
+
+		// add macros; ignore empty new macros
+		$filter = [
+			'evaltype' => getRequest('evaltype'),
+			'conditions' => []
+		];
+		$conditions = getRequest('conditions', []);
+		ksort($conditions);
+		$conditions = array_values($conditions);
+		foreach ($conditions as $condition) {
+			if (!zbx_empty($condition['macro'])) {
+				$condition['macro'] = mb_strtoupper($condition['macro']);
+
+				$filter['conditions'][] = $condition;
+			}
+		}
+		if ($filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+			// if only one or no conditions are left, reset the evaltype to and/or and clear the formula
+			if (count($filter['conditions']) <= 1) {
+				$filter['formula'] = '';
+				$filter['evaltype'] = CONDITION_EVAL_TYPE_AND_OR;
+			}
+			else {
+				$filter['formula'] = getRequest('formula');
+			}
+		}
+		$newItem['filter'] = $filter;
+
+		if (hasRequest('update')) {
+			DBstart();
+
+			// unset snmpv3 fields
+			if ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV) {
+				$newItem['snmpv3_authprotocol'] = ITEM_AUTHPROTOCOL_MD5;
+				$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+			}
+			elseif ($newItem['snmpv3_securitylevel'] == ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV) {
+				$newItem['snmpv3_privprotocol'] = ITEM_PRIVPROTOCOL_DES;
+			}
+
+			// unset unchanged values
+			$newItem = CArrayHelper::unsetEqualValues($newItem, $item, ['itemid']);
+
+			// don't update the filter if it hasn't changed
+			$conditionsChanged = false;
+			if (count($newItem['filter']['conditions']) != count($item['filter']['conditions'])) {
+				$conditionsChanged = true;
+			}
+			else {
+				$conditions = $item['filter']['conditions'];
+				foreach ($newItem['filter']['conditions'] as $i => $condition) {
+					if (CArrayHelper::unsetEqualValues($condition, $conditions[$i])) {
+						$conditionsChanged = true;
+						break;
+					}
+				}
+			}
+			$filter = CArrayHelper::unsetEqualValues($newItem['filter'], $item['filter']);
+			if (!isset($filter['evaltype']) && !isset($filter['formula']) && !$conditionsChanged) {
+				unset($newItem['filter']);
+			}
+
+			$result = API::DiscoveryRule()->update($newItem);
+			$result = DBend($result);
+		}
+		else {
+			$result = API::DiscoveryRule()->create([$newItem]);
+		}
+	}
+
+	if (hasRequest('add')) {
+		show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
 	}
 	else {
-		$result = API::DiscoveryRule()->create([$newItem]);
-		show_messages($result, _('Discovery rule created'), _('Cannot add discovery rule'));
+		show_messages($result, _('Discovery rule updated'), _('Cannot update discovery rule'));
 	}
 
 	if ($result) {
