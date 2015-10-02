@@ -17,7 +17,7 @@ Bug fixes:
 .......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
 ...G...... [ZBX-9847] fixed possible Zabbix agent crash when executing system.cpu.discovery (dimir)
 .......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
-...G...PS. [ZBX-9776] added check for line length when parsing configuration file (viktors, asaveljevs)
+...G...PS. [ZBX-9776] added check for line length when parsing configuration file (asaveljevs, viktors)
 ...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
 ...G...... [ZBXNEXT-494] fixed proc.cpu.util help item description (wiper)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
