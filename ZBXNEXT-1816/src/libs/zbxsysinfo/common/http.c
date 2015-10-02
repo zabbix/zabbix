@@ -29,8 +29,85 @@
 
 #define ZBX_MAX_WEBPAGE_SIZE	(1 * 1024 * 1024)
 
+#ifdef HAVE_LIBCURL
+struct MemoryStruct
+{
+	char *memory;
+	size_t size;
+};
+
+static size_t write_memory_callback(void *contents, size_t size, size_t nmemb, void *userp)
+{
+	const char	*__function_name = "write_memory_callback";
+	size_t		realsize = size * nmemb;
+	struct		MemoryStruct *mem = (struct MemoryStruct *) userp;
+
+	mem->memory = zbx_realloc(mem->memory, mem->size + realsize + 1);
+	if (mem->memory == NULL)
+	{
+		/* out of memory! */
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() not enough memory (realloc returned NULL)",__function_name);
+		return FAIL;
+	}
+
+	memcpy(&(mem->memory[mem->size]), contents, realsize);
+	mem->size += realsize;
+	mem->memory[mem->size] = 0;
+
+	return realsize;
+}
+#endif
+
 static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, size_t max_buffer_len)
 {
+#ifdef HAVE_LIBCURL
+	CURL		*curl_handle;
+	CURLcode	ret;
+
+	struct MemoryStruct chunk;
+
+	chunk.memory = zbx_malloc(chunk.memory, 1); /* will be grown as needed by the realloc above */
+	chunk.size = 0; /* no data at this point */
+
+	/* init the curl session */
+	curl_handle = curl_easy_init();
+
+	/* specify URL to get */
+	curl_easy_setopt(curl_handle, CURLOPT_URL, host);
+
+	/* pass headers to the data stream */
+	curl_easy_setopt(curl_handle, CURLOPT_HEADER, 1L);
+
+	/* send all data to this function  */
+	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_memory_callback);
+
+	/* we pass our 'chunk' struct to the callback function */
+	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void * )&chunk);
+
+	/* some servers don't like requests that are made without a user-agent field, so we provide one */
+	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
+
+	/* get it! */
+	ret = curl_easy_perform(curl_handle);
+
+	/* check for errors */
+	if (ret != CURLE_OK)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "curl_easy_perform() failed: %s\n", curl_easy_strerror(ret));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%lu bytes retrieved\n", (long) chunk.size);
+		zbx_strlcpy(buffer, chunk.memory, max_buffer_len);
+	}
+
+	/* cleanup curl stuff */
+	curl_easy_cleanup(curl_handle);
+
+	free(chunk.memory);
+
+	return ret;
+#else
 	int		ret;
 	char		request[MAX_STRING_LEN];
 	zbx_socket_t	s;
@@ -63,6 +140,7 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 	}
 
 	return SYSINFO_RET_OK;
+#endif /* HAVE_LIBCURL */
 }
 
 int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
