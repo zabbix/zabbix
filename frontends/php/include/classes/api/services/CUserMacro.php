@@ -645,7 +645,7 @@ class CUserMacro extends CApiService {
 
 		$user_macro_parser = new CUserMacroParser();
 
-		if ($user_macro_parser->parse($macro['macro']) != CUserMacroParser::PARSE_SUCCESS) {
+		if ($user_macro_parser->parse($macro['macro']) != CParser::PARSE_SUCCESS) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Invalid macro "%1$s": %2$s.', $macro['macro'], $user_macro_parser->getError())
 			);
@@ -703,7 +703,7 @@ class CUserMacro extends CApiService {
 
 			$user_macro_parser->parse($macro['macro']);
 
-			$macro_name = $user_macro_parser->getMacroName();
+			$macro_name = $user_macro_parser->getMacro();
 			$context = $user_macro_parser->getContext();
 
 			/*
@@ -743,7 +743,7 @@ class CUserMacro extends CApiService {
 		foreach ($hostmacros as $hostmacro) {
 			$user_macro_parser->parse($hostmacro['macro']);
 
-			$macro_name = $user_macro_parser->getMacroName();
+			$macro_name = $user_macro_parser->getMacro();
 			$context = $user_macro_parser->getContext();
 
 			if ($context === null) {
@@ -769,7 +769,7 @@ class CUserMacro extends CApiService {
 		foreach ($db_hostmacros as $db_hostmacro) {
 			$user_macro_parser->parse($db_hostmacro['macro']);
 
-			$macro_name = $user_macro_parser->getMacroName();
+			$macro_name = $user_macro_parser->getMacro();
 			$context = $user_macro_parser->getContext();
 
 			$existing_macros[$db_hostmacro['hostid']][$macro_name][$db_hostmacro['hostmacroid']] = $context;
@@ -781,7 +781,7 @@ class CUserMacro extends CApiService {
 
 			$user_macro_parser->parse($hostmacro['macro']);
 
-			$macro_name = $user_macro_parser->getMacroName();
+			$macro_name = $user_macro_parser->getMacro();
 			$context = $user_macro_parser->getContext();
 
 			if (array_key_exists($hostid, $existing_macros) && array_key_exists($macro_name, $existing_macros[$hostid])
@@ -849,7 +849,7 @@ class CUserMacro extends CApiService {
 		foreach ($globalmacros as $globalmacro) {
 			$user_macro_parser->parse($globalmacro['macro']);
 
-			$macro_name = $user_macro_parser->getMacroName();
+			$macro_name = $user_macro_parser->getMacro();
 			$context = $user_macro_parser->getContext();
 
 			if ($context === null) {
@@ -874,7 +874,7 @@ class CUserMacro extends CApiService {
 		foreach ($db_macros as $db_macro) {
 			$user_macro_parser->parse($db_macro['macro']);
 
-			$macro_name = $user_macro_parser->getMacroName();
+			$macro_name = $user_macro_parser->getMacro();
 			$context = $user_macro_parser->getContext();
 
 			$existing_macros[$macro_name][$db_macro['globalmacroid']] = $context;
@@ -884,7 +884,7 @@ class CUserMacro extends CApiService {
 		foreach ($globalmacros as $globalmacro) {
 			$user_macro_parser->parse($globalmacro['macro']);
 
-			$macro_name = $user_macro_parser->getMacroName();
+			$macro_name = $user_macro_parser->getMacro();
 			$context = $user_macro_parser->getContext();
 
 			if (array_key_exists($macro_name, $existing_macros)

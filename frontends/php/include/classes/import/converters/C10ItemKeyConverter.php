@@ -48,7 +48,7 @@ class C10ItemKeyConverter extends CConverter {
 			$key = $parts[0];
 
 			if (isset($parts[1]) && $parts[1] !== '') {
-				if ($this->user_macro_parser->parse($parts[1] == CUserMacroParser::PARSE_SUCCESS)) {
+				if ($this->user_macro_parser->parse($parts[1] == CParser::PARSE_SUCCESS)) {
 					$port = ',,'.$parts[1];
 				}
 				// numeric parameter or empty parameter

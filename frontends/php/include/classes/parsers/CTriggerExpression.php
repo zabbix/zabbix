@@ -46,8 +46,6 @@ class CTriggerExpression {
 	 * An array of trigger functions like {Zabbix server:agent.ping.last(0)}
 	 * The array isn't unique. Same functions can repeat.
 	 *
-	 * @see CFunctionMacroParserResult::$expression     for a detailed array structure
-	 *
 	 * @deprecated  use result tokens instead
 	 *
 	 * @var array
@@ -111,14 +109,21 @@ class CTriggerExpression {
 	 *
 	 * @var CFunctionMacroParser
 	 */
-	protected $functionMacroParser;
+	protected $function_macro_parser;
+
+	/**
+	 * Parser for trigger functions.
+	 *
+	 * @var CFunctionParser
+	 */
+	protected $function_parser;
 
 	/**
 	 * Parser for LLD macros.
 	 *
 	 * @var CLLDMacroParser
 	 */
-	protected $lldMacroParser;
+	protected $lld_macro_parser;
 
 	/**
 	 * Parser for user macros.
@@ -154,8 +159,9 @@ class CTriggerExpression {
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
 		$this->notOperatorParser = new CSetParser(['not']);
 		$this->macroParser = new CSetParser(['{TRIGGER.VALUE}']);
-		$this->functionMacroParser = new CFunctionMacroParser();
-		$this->lldMacroParser = new CLLDMacroParser();
+		$this->function_macro_parser = new CFunctionMacroParser();
+		$this->function_parser = new CFunctionParser();
+		$this->lld_macro_parser = new CLLDMacroParser();
 		$this->user_macro_parser = new CUserMacroParser();
 	}
 
@@ -493,22 +499,17 @@ class CTriggerExpression {
 	 * @param CParser   $parser
 	 * @param int       $tokenType
 	 *
-	 * @return CParserResult|bool		CParserResult object if a match has been found, false otherwise
+	 * @return bool
 	 */
 	protected function parseUsing(CParser $parser, $tokenType) {
-		$j = $this->pos;
-
-		$result = $parser->parse($this->expression, $j);
-
-		if (!$result) {
+		if ($parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
 
-		$this->pos += $result->length - 1;
+		$this->result->addToken($tokenType, $parser->getMatch(), $this->pos, $parser->getLength());
+		$this->pos += $parser->getLength() - 1;
 
-		$this->result->addToken($tokenType, $result->match, $result->pos, $result->length);
-
-		return $result;
+		return true;
 	}
 
 	/**
@@ -524,14 +525,15 @@ class CTriggerExpression {
 	 * @return bool returns true if parsed successfully, false otherwise
 	 */
 	private function parseConstant() {
-		if ($this->parseFunctionMacro() || $this->parseNumber() || $this->parseUserMacro()
+		if ($this->parseFunctionMacro() || $this->parseNumber()
+				|| $this->parseUsing($this->user_macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)
 				|| $this->parseUsing($this->macroParser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)) {
 			return true;
 		}
 
 		// LLD macro support for trigger prototypes
 		if ($this->options['lldmacros']
-				&& $this->parseUsing($this->lldMacroParser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
+				&& $this->parseUsing($this->lld_macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
 			return true;
 		}
 
@@ -547,26 +549,43 @@ class CTriggerExpression {
 	private function parseFunctionMacro() {
 		$startPos = $this->pos;
 
-		$result = $this->functionMacroParser->parse($this->expression, $this->pos);
-
-		if (!$result) {
+		if ($this->function_macro_parser->parse($this->expression, $this->pos) == CParser::PARSE_FAIL) {
 			return false;
 		}
 
-		$this->pos += $result->length - 1;
+		if ($this->function_parser->parse($this->function_macro_parser->getFunction()) == CParser::PARSE_FAIL) {
+			return false;
+		}
 
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO, $result->match,
-			$startPos, $result->length,
+		$this->pos += $this->function_macro_parser->getLength() - 1;
+
+		$function_param_list = [];
+
+		for ($n = 0; $n < $this->function_parser->getParamsNum(); $n++) {
+			$function_param_list[] = $this->function_parser->getParam($n);
+		}
+
+		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_FUNCTION_MACRO,
+			$this->function_macro_parser->getMatch(), $startPos, $this->function_macro_parser->getLength(),
 			[
-				'host' => $result->expression['host'],
-				'item' => $result->expression['item'],
-				'function' => $result->expression['function'],
-				'functionName' => $result->expression['functionName'],
-				'functionParams' => $result->expression['functionParamList']
+				'host' => $this->function_macro_parser->getHost(),
+				'item' => $this->function_macro_parser->getItem(),
+				'function' => $this->function_macro_parser->getFunction(),
+				'functionName' => $this->function_parser->getFunction(),
+				'functionParams' => $function_param_list
 			]
 		);
 
-		$this->expressions[] = $result->expression;
+		$this->expressions[] = [
+			'expression' => $this->function_macro_parser->getMatch(),
+			'pos' => $startPos,
+			'host' => $this->function_macro_parser->getHost(),
+			'item' => $this->function_macro_parser->getItem(),
+			'function' => $this->function_macro_parser->getFunction(),
+			'functionName' => $this->function_parser->getFunction(),
+			'functionParam' => $this->function_parser->getParameters(),
+			'functionParamList' => $function_param_list
+		];
 
 		return true;
 	}
@@ -621,26 +640,6 @@ class CTriggerExpression {
 		);
 
 		$this->pos = $j - 1;
-
-		return true;
-	}
-
-	/**
-	 * Parse user macros in trigger expression.
-	 *
-	 * @return bool
-	 */
-	private function parseUserMacro() {
-		if ($this->user_macro_parser->parse($this->expression, $this->pos) == CUserMacroParser::PARSE_FAIL) {
-			return false;
-		}
-
-		$macro = $this->user_macro_parser->getMacro();
-		$macro_len = strlen($macro);
-
-		$this->result->addToken(CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO, $macro, $this->pos, $macro_len);
-
-		$this->pos += $macro_len - 1;
 
 		return true;
 	}

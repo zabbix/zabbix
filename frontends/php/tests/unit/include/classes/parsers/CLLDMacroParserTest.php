@@ -25,25 +25,21 @@ class CLLDMacroParserTest extends CParserTest {
 		return new CLLDMacroParser();
 	}
 
-	public function validProvider() {
+	public function testProvider() {
 		return [
-			['{#M}', 0, '{#M}', 4],
-			['{#MACRO12.A_Z}', 0, '{#MACRO12.A_Z}', 14],
-			['{#MACRO} = 0', 0, '{#MACRO}', 8],
-			['not {#MACRO} = 0', 4, '{#MACRO}', 8],
-		];
-	}
+			['{#M}', 0, CParser::PARSE_SUCCESS, '{#M}'],
+			['{#MACRO12.A_Z}', 0, CParser::PARSE_SUCCESS, '{#MACRO12.A_Z}'],
+			['{#MACRO} = 0', 0, CParser::PARSE_SUCCESS_CONT, '{#MACRO}'],
+			['not {#MACRO} = 0', 4, CParser::PARSE_SUCCESS_CONT, '{#MACRO}'],
 
-	public function invalidProvider() {
-		return [
-			['', 0, 0],
-			['A', 0, 0],
-			['{A', 0, 1],
-			['{#', 0, 2],
-			['{#}', 0, 2],
-			['{#A', 0, 3],
-			['{#a}', 0, 2],
-			['{#+}', 0, 2],
+			['', 0, CParser::PARSE_FAIL, ''],
+			['A', 0, CParser::PARSE_FAIL, ''],
+			['{A', 0, CParser::PARSE_FAIL, ''],
+			['{#', 0, CParser::PARSE_FAIL, ''],
+			['{#}', 0, CParser::PARSE_FAIL, ''],
+			['{#A', 0, CParser::PARSE_FAIL, ''],
+			['{#a}', 0, CParser::PARSE_FAIL, ''],
+			['{#+}', 0, CParser::PARSE_FAIL, '']
 		];
 	}
 }

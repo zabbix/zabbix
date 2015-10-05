@@ -824,7 +824,7 @@ function getInheritedMacros(array $hostids) {
 				}
 				else {
 					$user_macro_parser->parse($dbMacro['macro']);
-					$tpl_macro_name = $user_macro_parser->getMacroName();
+					$tpl_macro = $user_macro_parser->getMacro();
 					$tpl_context = $user_macro_parser->getContext();
 
 					if ($tpl_context === null) {
@@ -836,10 +836,10 @@ function getInheritedMacros(array $hostids) {
 
 						foreach ($global_macros as $global_macro => $global_value) {
 							$user_macro_parser->parse($global_macro);
-							$gbl_macro_name = $user_macro_parser->getMacroName();
+							$gbl_macro = $user_macro_parser->getMacro();
 							$gbl_context = $user_macro_parser->getContext();
 
-							if ($tpl_macro_name === $gbl_macro_name && $tpl_context === $gbl_context) {
+							if ($tpl_macro === $gbl_macro && $tpl_context === $gbl_context) {
 								$match_found = true;
 
 								unset($global_macros[$global_macro], $hosts[$hostid][$global_macro],
@@ -996,11 +996,11 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 			 * Cannot use array dereferencing because "$host_macro['macro']" may contain invalid macros
 			 * which results in empty array.
 			 */
-			if ($user_macro_parser->parse($host_macro['macro']) == CUserMacroParser::PARSE_SUCCESS) {
-				$host_macro_name = $user_macro_parser->getMacroName();
-				$host_context = $user_macro_parser->getContext();
+			if ($user_macro_parser->parse($host_macro['macro']) == CParser::PARSE_SUCCESS) {
+				$hst_macro = $user_macro_parser->getMacro();
+				$hst_context = $user_macro_parser->getContext();
 
-				if ($host_context === null) {
+				if ($hst_context === null) {
 					$host_macro['type'] = 0x00;
 				}
 				else {
@@ -1009,10 +1009,10 @@ function mergeInheritedMacros(array $host_macros, array $inherited_macros) {
 					foreach ($inherited_macros as $inherited_macro => $inherited_values) {
 						// Safe to use array dereferencing since these values come from database.
 						$user_macro_parser->parse($inherited_macro);
-						$inherited_macro_name = $user_macro_parser->getMacroName();
-						$inherited_context = $user_macro_parser->getContext();
+						$inh_macro = $user_macro_parser->getMacro();
+						$inh_context = $user_macro_parser->getContext();
 
-						if ($host_macro_name === $inherited_macro_name && $host_context === $inherited_context) {
+						if ($hst_macro === $inh_macro && $hst_context === $inh_context) {
 							$match_found = true;
 
 							$host_macro = array_merge($inherited_macros[$inherited_macro], $host_macro);

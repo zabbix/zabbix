@@ -411,9 +411,11 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if ($matched_macros['references']) {
-				$macro_values[$triggerid] = array_merge($macro_values[$triggerid],
-					$this->resolveTriggerReferences($trigger['expression'], $matched_macros['references'])
-				);
+				$references = $this->resolveTriggerReferences($trigger['expression'], $matched_macros['references']);
+
+				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
+					? array_merge($macro_values[$triggerid], $references)
+					: $references;
 			}
 		}
 
@@ -1050,7 +1052,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			$item_key_parser = new CItemKey();
 
 			foreach ($expanded_keys as $key => $expanded_key) {
-				if ($item_key_parser->parse($expanded_key) == CItemKey::PARSE_SUCCESS) {
+				if ($item_key_parser->parse($expanded_key) == CParser::PARSE_SUCCESS) {
 					foreach ($macro_values[$key] as $macro => &$value) {
 						if (($param = $item_key_parser->getParam($macro[1] - 1)) !== null) {
 							$value = $param;

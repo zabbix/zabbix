@@ -578,7 +578,7 @@ class CHostInterface extends CApiService {
 		$user_macro_parser = new CUserMacroParser();
 
 		if (!preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])
-				&& $user_macro_parser->parse($interface['dns']) != CUserMacroParser::PARSE_SUCCESS) {
+				&& $user_macro_parser->parse($interface['dns']) != CParser::PARSE_SUCCESS) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect interface DNS parameter "%s" provided.', $interface['dns'])
 			);
@@ -601,7 +601,7 @@ class CHostInterface extends CApiService {
 		$user_macro_parser = new CUserMacroParser();
 
 		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/', $interface['ip'])
-				|| $user_macro_parser->parse($interface['ip']) == CUserMacroParser::PARSE_SUCCESS) {
+				|| $user_macro_parser->parse($interface['ip']) == CParser::PARSE_SUCCESS) {
 			return;
 		}
 

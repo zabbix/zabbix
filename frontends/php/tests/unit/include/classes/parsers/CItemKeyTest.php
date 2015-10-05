@@ -19,24 +19,17 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/func.inc.php';
-require_once dirname(__FILE__).'/../../include/classes/parsers/CItemKey.php';
-require_once dirname(__FILE__).'/../../include/gettextwrapper.inc.php';
-require_once dirname(__FILE__).'/../../include/defines.inc.php';
-require_once dirname(__FILE__).'/../../include/locales.inc.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
-
-class class_cItemKey extends PHPUnit_Framework_TestCase {
+class CItemKeyTest extends PHPUnit_Framework_TestCase {
 	public static function provider() {
 		return [
 			// valid keys
 			[
 				'key', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
+					'match' => 'key',
 					'key' => 'key',
-					'key_id' => 'key',
 					'parameters' => []
 				],
 				[]
@@ -44,10 +37,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[]',
-					'key_id' => 'key',
+					'match' => 'key[]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -68,10 +61,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[][]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[][]',
-					'key_id' => 'key',
+					'match' => 'key[][]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -104,10 +97,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[""]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[""]',
-					'key_id' => 'key',
+					'match' => 'key[""]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -128,10 +121,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[ ]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[ ]',
-					'key_id' => 'key',
+					'match' => 'key[ ]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -152,10 +145,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[ ""]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[ ""]',
-					'key_id' => 'key',
+					'match' => 'key[ ""]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -176,10 +169,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[ "" ]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[ "" ]',
-					'key_id' => 'key',
+					'match' => 'key[ "" ]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -200,10 +193,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[a]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[a]',
-					'key_id' => 'key',
+					'match' => 'key[a]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -224,10 +217,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[ a]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[ a]',
-					'key_id' => 'key',
+					'match' => 'key[ a]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -248,10 +241,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[ a ]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[ a ]',
-					'key_id' => 'key',
+					'match' => 'key[ a ]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -272,10 +265,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key["a"]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key["a"]',
-					'key_id' => 'key',
+					'match' => 'key["a"]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -296,10 +289,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key["a",]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key["a",]',
-					'key_id' => 'key',
+					'match' => 'key["a",]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -325,10 +318,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[a,b,c]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key[a,b,c]',
-					'key_id' => 'key',
+					'match' => 'key[a,b,c]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -359,10 +352,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key["a","b","c"]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key["a","b","c"]',
-					'key_id' => 'key',
+					'match' => 'key["a","b","c"]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -393,10 +386,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key["a","b","c"]["d"]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key["a","b","c"]["d"]',
-					'key_id' => 'key',
+					'match' => 'key["a","b","c"]["d"]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -439,10 +432,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key["a","b","c",[["d", ["e\",]" ] ], f"]]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key["a","b","c",[["d", ["e\",]" ] ], f"]]',
-					'key_id' => 'key',
+					'match' => 'key["a","b","c",[["d", ["e\",]" ] ], f"]]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -509,10 +502,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
-					'key' => 'key["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]',
-					'key_id' => 'key',
+					'match' => 'key["\"aaa\"", "bbb","ccc" , "ddd" ,"", "","" , "" ,, ,  ,eee, fff,ggg , hhh" ]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -605,10 +598,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[["a",]', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS_PART,
+					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'error' => 'unexpected end of key',
+					'match' => 'key',
 					'key' => 'key',
-					'key_id' => 'key',
 					'parameters' => []
 				],
 				[]
@@ -616,10 +609,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[ГУГЛ]654', 0,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS_PART,
+					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'error' => 'incorrect syntax near "654"',
-					'key' => 'key[ГУГЛ]',
-					'key_id' => 'key',
+					'match' => 'key[ГУГЛ]',
+					'key' => 'key',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -640,10 +633,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[ГУГЛ]654', 2,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS_PART,
+					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'error' => 'incorrect syntax near "654"',
-					'key' => 'y[ГУГЛ]',
-					'key_id' => 'y',
+					'match' => 'y[ГУГЛ]',
+					'key' => 'y',
 					'parameters' => [
 						0 => [
 							'type' => CItemKey::PARAM_ARRAY,
@@ -664,10 +657,10 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[a]654', 8,
 				[
-					'rc' => CItemKey::PARSE_SUCCESS,
+					'rc' => CParser::PARSE_SUCCESS,
 					'error' => '',
+					'match' => '4',
 					'key' => '4',
-					'key_id' => '4',
 					'parameters' => []
 				],
 				[]
@@ -675,35 +668,25 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 			[
 				'key[a]654', 9,
 				[
-					'rc' => CItemKey::PARSE_FAIL,
+					'rc' => CParser::PARSE_FAIL,
 					'error' => 'key is empty',
+					'match' => '',
 					'key' => '',
-					'key_id' => '',
 					'parameters' => []
 				],
 				[]
 			],
-/*	*/
-/*			['key[a]654', false],
-			['key["a"]654', false],
-			['key[a][[b]', false],
-			['key["a"][["b"]', false],
-			['key["a"] ["b"]', false],
-			['key(a)', false],
-			['key[a]]', false],
-			['key["a"]]', false],
-			['key["a]', false],
-			['abc:def', false],
-			// 256 char long key (decided that this key is valid)
-			//array('0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000', false),
-			// UTF8 chars
-			['ГУГЛ', false],
-			['', false],
-			[',telnet', false],
-			['telnet,', false],
-			['telnet,1023', false],
-			['telnet,1023[]', false],
-			['[]', false]*/
+			[
+				'ssh,21', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => 'incorrect syntax near ",21"',
+					'match' => 'ssh',
+					'key' => 'ssh',
+					'parameters' => []
+				],
+				[]
+			]
 		];
 	}
 
@@ -722,8 +705,84 @@ class class_cItemKey extends PHPUnit_Framework_TestCase {
 		$result = [
 			'rc' => $rc,
 			'error' => $item_key_parser->getError(),
+			'match' => $item_key_parser->getMatch(),
 			'key' => $item_key_parser->getKey(),
-			'key_id' => $item_key_parser->getKeyId(),
+			'parameters' => $item_key_parser->getParamsRaw()
+		];
+		$this->assertEquals($expectedResult, $result);
+		$this->assertEquals(count($unquoted_params), $item_key_parser->getParamsNum());
+
+		for ($n = 0, $count = $item_key_parser->getParamsNum(); $n < $count; $n++) {
+			$this->assertEquals($unquoted_params[$n], $item_key_parser->getParam($n));
+		}
+	}
+
+	public static function provider18() {
+		return [
+			[
+				'ssh,21', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'ssh,21',
+					'key' => 'ssh,21',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'ssh,{$SSH.PORT}', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'error' => '',
+					'match' => 'ssh,{$SSH.PORT}',
+					'key' => 'ssh,{$SSH.PORT}',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'ssh,{$SSH.PORT},2', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => 'incorrect syntax near ",2"',
+					'match' => 'ssh,{$SSH.PORT}',
+					'key' => 'ssh,{$SSH.PORT}',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'ssh,{$SSH.PORT}[a]', 0,
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'error' => 'incorrect syntax near "[a]"',
+					'match' => 'ssh,{$SSH.PORT}',
+					'key' => 'ssh,{$SSH.PORT}',
+					'parameters' => []
+				],
+				[]
+			]
+		];
+	}
+
+	/**
+	* @dataProvider provider18
+	*/
+	public function test_parseItemKey18($key, $pos, $expectedResult, $unquoted_params) {
+		static $item_key_parser = null;
+
+		if ($item_key_parser === null) {
+			$item_key_parser = new CItemKey(['18_simple_checks' => true]);
+		}
+
+		$rc = $item_key_parser->parse($key, $pos);
+
+		$result = [
+			'rc' => $rc,
+			'error' => $item_key_parser->getError(),
+			'match' => $item_key_parser->getMatch(),
+			'key' => $item_key_parser->getKey(),
 			'parameters' => $item_key_parser->getParamsRaw()
 		];
 		$this->assertEquals($expectedResult, $result);

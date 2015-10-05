@@ -19,7 +19,7 @@
 **/
 
 
-class CUserMacroParser {
+class CUserMacroParser extends CParser {
 
 	const STATE_NEW = 0;
 	const STATE_END = 1;
@@ -27,12 +27,7 @@ class CUserMacroParser {
 	const STATE_QUOTED = 3;
 	const STATE_END_OF_MACRO = 4;
 
-	const PARSE_FAIL = -1;
-	const PARSE_SUCCESS = 0;
-	const PARSE_SUCCESS_PART = 1;
-
 	private $macro = '';
-	private $macro_name = '';
 	private $context = null;
 	private $context_quoted = false;
 	private $error = '';
@@ -40,76 +35,78 @@ class CUserMacroParser {
 	/**
 	 * Returns an error message depending on input parameters.
 	 *
-	 * @param string $data
+	 * @param string $source
 	 * @param int $pos
 	 *
 	 * @return string
 	 */
-	private function errorMessage($data, $pos) {
-		if (!isset($data[$pos])) {
+	private function errorMessage($source, $pos) {
+		if (!isset($source[$pos])) {
 			return ($pos == 0) ? _('macro is empty') : _('unexpected end of macro');
 		}
 
-		for ($p = $pos, $chunk = '', $maxChunkSize = 50; isset($data[$p]); $p++) {
-			if (0x80 != (0xc0 & ord($data[$p])) && $maxChunkSize-- == 0) {
+		for ($p = $pos, $chunk = '', $maxChunkSize = 50; isset($source[$p]); $p++) {
+			if (0x80 != (0xc0 & ord($source[$p])) && $maxChunkSize-- == 0) {
 				break;
 			}
-			$chunk .= $data[$p];
+			$chunk .= $source[$p];
 		}
 
-		if (isset($data[$p])) {
+		if (isset($source[$p])) {
 			$chunk .= ' ...';
 		}
 
 		return _s('incorrect syntax near "%1$s"', $chunk);
 	}
 
-	public function parse($data, $offset = 0) {
+	public function parse($source, $pos = 0) {
+		$this->length = 0;
+		$this->match = '';
 		$this->macro = '';
-		$this->macro_name = '';
 		$this->context = null;
 		$this->context_quoted = false;
 		$this->error = '';
 
-		$p = $offset;
+		$p = $pos;
 
-		if (!isset($data[$p]) || $data[$p] != '{') {
-			$this->error = $this->errorMessage(substr($data, $offset), $p - $offset);
+		if (!isset($source[$p]) || $source[$p] != '{') {
+			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
-		if (!isset($data[$p]) || $data[$p] != '$') {
-			$this->error = $this->errorMessage(substr($data, $offset), $p - $offset);
+		if (!isset($source[$p]) || $source[$p] != '$') {
+			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
-		for (; isset($data[$p]) && $this->isMacroChar($data[$p]); $p++)
+		for (; isset($source[$p]) && $this->isMacroChar($source[$p]); $p++)
 			;
 
-		if ($p == $offset + 2 || !isset($data[$p])) {
-			$this->error = $this->errorMessage(substr($data, $offset), $p - $offset);
+		if ($p == $pos + 2 || !isset($source[$p])) {
+			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
 			return self::PARSE_FAIL;
 		}
 
-		$this->macro_name = substr($data, $offset + 2, $p - $offset - 2);
+		$this->macro = substr($source, $pos + 2, $p - $pos - 2);
 
-		if ($data[$p] == '}') {
+		if ($source[$p] == '}') {
 			$p++;
-			$this->macro = substr($data, $offset, $p - $offset);
+			$this->length = $p - $pos;
+			$this->match = substr($source, $pos, $this->length);
 
-			if (isset($data[$p])) {
-				$this->error = $this->errorMessage(substr($data, $offset), $p - $offset);
-				return self::PARSE_SUCCESS_PART;
+			if (isset($source[$p])) {
+				$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+				return self::PARSE_SUCCESS_CONT;
 			}
 
 			return self::PARSE_SUCCESS;
 		}
 
-		if ($data[$p] != ':') {
-			$this->macro_name = '';
-			$this->error = $this->errorMessage(substr($data, $offset), $p - $offset);
+		if ($source[$p] != ':') {
+			$this->macro = '';
+			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
 			return self::PARSE_FAIL;
 		}
 		$p++;
@@ -118,10 +115,10 @@ class CUserMacroParser {
 		$this->context_quoted = false;
 		$state = self::STATE_NEW;
 
-		for (; isset($data[$p]); $p++) {
+		for (; isset($source[$p]); $p++) {
 			switch ($state) {
 				case self::STATE_NEW:
-					switch ($data[$p]) {
+					switch ($source[$p]) {
 						case ' ':
 							break;
 
@@ -130,13 +127,13 @@ class CUserMacroParser {
 							break;
 
 						case '"':
-							$this->context .= $data[$p];
+							$this->context .= $source[$p];
 							$this->context_quoted = true;
 							$state = self::STATE_QUOTED;
 							break;
 
 						default:
-							$this->context .= $data[$p];
+							$this->context .= $source[$p];
 							$this->context_quoted = false;
 							$state = self::STATE_UNQUOTED;
 							break;
@@ -144,26 +141,26 @@ class CUserMacroParser {
 					break;
 
 				case self::STATE_QUOTED:
-					$this->context .= $data[$p];
-					if ($data[$p] == '"' && $data[$p - 1] != '\\') {
+					$this->context .= $source[$p];
+					if ($source[$p] == '"' && $source[$p - 1] != '\\') {
 						$state = self::STATE_END;
 					}
 					break;
 
 				case self::STATE_UNQUOTED:
-					switch ($data[$p]) {
+					switch ($source[$p]) {
 						case '}':
 							$state = self::STATE_END_OF_MACRO;
 							break;
 
 						default:
-							$this->context .= $data[$p];
+							$this->context .= $source[$p];
 							break;
 					}
 					break;
 
 				case self::STATE_END:
-					switch ($data[$p]) {
+					switch ($source[$p]) {
 						case ' ':
 							break;
 
@@ -182,18 +179,19 @@ class CUserMacroParser {
 		}
 
 		if ($state != self::STATE_END_OF_MACRO) {
-			$this->macro_name = '';
+			$this->macro = '';
 			$this->context = null;
 			$this->context_quoted = false;
-			$this->error = $this->errorMessage(substr($data, $offset), $p - $offset);
+			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
 			return self::PARSE_FAIL;
 		}
 
-		$this->macro = substr($data, $offset, $p - $offset);
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
 
-		if (isset($data[$p])) {
-			$this->error = $this->errorMessage(substr($data, $offset), $p - $offset);
-			return self::PARSE_SUCCESS_PART;
+		if (isset($source[$p])) {
+			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+			return self::PARSE_SUCCESS_CONT;
 		}
 
 		return self::PARSE_SUCCESS;
@@ -232,21 +230,12 @@ class CUserMacroParser {
 	}
 
 	/**
-	 * Returns parsed macro.
+	 * Returns parsed macro name.
 	 *
 	 * @return string
 	 */
 	public function getMacro() {
 		return $this->macro;
-	}
-
-	/**
-	 * Returns parsed macro name.
-	 *
-	 * @return string
-	 */
-	public function getMacroName() {
-		return $this->macro_name;
 	}
 
 	/**
