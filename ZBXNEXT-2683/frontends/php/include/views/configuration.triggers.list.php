@@ -180,7 +180,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
-		(new CCol(triggerExpression($trigger, true)))->addClass('trigger-expression'),
+		triggerExpression($trigger, true),
 		$status,
 		$info
 	]);
@@ -196,7 +196,7 @@ $triggersForm->addItem([
 		[
 			'trigger.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected triggers?')],
 			'trigger.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected triggers?')],
-			'trigger.masscopyto' =>  ['name' => _('Copy')],
+			'trigger.masscopyto' => ['name' => _('Copy')],
 			'trigger.massupdateform' => ['name' => _('Mass update')],
 			'trigger.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected triggers?')]
 		],

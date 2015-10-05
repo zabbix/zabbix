@@ -594,6 +594,7 @@ const char	*zbx_item_logtype_string(unsigned char logtype);
 #define OPERATION_TYPE_TEMPLATE_REMOVE	7
 #define OPERATION_TYPE_HOST_ENABLE	8
 #define OPERATION_TYPE_HOST_DISABLE	9
+#define OPERATION_TYPE_HOST_INVENTORY	10
 
 /* algorithms for service status calculation */
 #define SERVICE_ALGORITHM_NONE	0
@@ -787,26 +788,28 @@ int	is_int_prefix(const char *c);
 int	is_uint_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 int	is_hex_n_range(const char *str, size_t n, void *value, size_t size, zbx_uint64_t min, zbx_uint64_t max);
 
+#define SIZE_T_MAX	(~(size_t)0)
+
 #define is_ushort(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, sizeof(unsigned short), 0x0, 0xFFFF)
+	is_uint_n_range(str, (size_t)SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
 
 #define is_uint32(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0xFFFFFFFF)
+	is_uint_n_range(str, (size_t)SIZE_T_MAX, value, 4, 0x0, 0xFFFFFFFF)
 
 #define is_uint64(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
+	is_uint_n_range(str, (size_t)SIZE_T_MAX, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
 #define is_uint64_n(str, n, value) \
 	is_uint_n_range(str, n, value, 8, 0x0, __UINT64_C(0xFFFFFFFFFFFFFFFF))
 
 #define is_uint31(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFF)
+	is_uint_n_range(str, (size_t)SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFF)
 
 #define is_uint31_1(str, value) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, 4, 0x0, 0x7FFFFFFE)
+	is_uint_n_range(str, (size_t)SIZE_T_MAX, value, 4, 0x0, 0x7FFFFFFE)
 
 #define is_uint_range(str, value, min, max) \
-	is_uint_n_range(str, ZBX_MAX_UINT64_LEN, value, sizeof(unsigned int), min, max)
+	is_uint_n_range(str, (size_t)SIZE_T_MAX, value, sizeof(unsigned int), min, max)
 
 int	is_boolean(const char *str, zbx_uint64_t *value);
 int	is_uoct(const char *str);

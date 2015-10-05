@@ -1150,11 +1150,11 @@ function getTriggersOverview(array $hosts, array $triggers, $pageFile, $viewMode
  *
  * @param array  $trigger
  * @param string $pageFile		the page where the element is displayed
- * @param string $screenId
+ * @param string $screenid
  *
  * @return CCol
  */
-function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
+function getTriggerOverviewCells($trigger, $pageFile, $screenid = null) {
 	$ack = null;
 	$css = null;
 	$desc = [];
@@ -1170,19 +1170,18 @@ function getTriggerOverviewCells($trigger, $pageFile, $screenId = null) {
 		if ($trigger['value'] == TRIGGER_VALUE_TRUE) {
 			$ack = null;
 
-			if ($config['event_ack_enable'] == 1) {
+			if ($config['event_ack_enable']) {
 				if ($event = get_last_event_by_triggerid($trigger['triggerid'])) {
-					if ($screenId) {
+					if ($screenid !== null) {
 						$acknowledge = [
 							'eventid' => $event['eventid'],
-							'screenid' => $screenId,
-							'backurl' => $pageFile
+							'backurl' => $pageFile.'?screenid='.$screenid
 						];
 					}
 					else {
 						$acknowledge = [
 							'eventid' => $event['eventid'],
-							'backurl' => 'overview.php'
+							'backurl' => $pageFile
 						];
 					}
 
@@ -2077,6 +2076,7 @@ function get_item_function_info($expr) {
 		'dayofweek' =>	['value_type' => '1-7',		'type' => T_ZBX_INT,			'validation' => IN('1,2,3,4,5,6,7')],
 		'delta' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
 		'diff' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
+		'forecast' =>		['value_type' => $value_type, $type_of_value_type,	'validation' => NOT_EMPTY],
 		'fuzzytime' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'iregexp' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'last' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
@@ -2093,7 +2093,8 @@ function get_item_function_info($expr) {
 		'str' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'strlen' =>		['value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
 		'sum' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
-		'time' =>		['value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6']
+		'time' =>		['value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6'],
+		'timeleft' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY]
 	];
 
 	$expressionData = new CTriggerExpression();

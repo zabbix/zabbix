@@ -21,16 +21,21 @@
 #define ZABBIX_STATS_H
 
 #include "threads.h"
+#include "mutexs.h"
+
 #ifndef _WINDOWS
 #	include "diskdevices.h"
+#	include "ipc.h"
 #endif
+
 #include "cpustat.h"
+
 #ifdef _AIX
 #	include "vmstats.h"
 #endif
 
-#ifndef _WINDOWS
-#	define NONEXISTENT_SHMID	(-1)
+#ifdef ZBX_PROCSTAT_COLLECTOR
+#	include "procstat.h"
 #endif
 
 typedef struct
@@ -39,15 +44,11 @@ typedef struct
 #ifndef _WINDOWS
 	int 			diskstat_shmid;
 #endif
+#ifdef ZBX_PROCSTAT_COLLECTOR
+	zbx_dshm_t		procstat;
+#endif
 #ifdef _AIX
 	ZBX_VMSTAT_DATA		vmstat;
-#endif
-#ifndef _LP64
-	long			padding;	/* The goal of padding is to make sizeof(ZBX_COLLECTOR_DATA) */
-						/* a multiple of 8. In 32-bit environment the padding will be */
-						/* be 4 bytes. In 64-bit environment the padding is currently not */
-						/* necessary, but harmless if used. The padding size must be */
-						/* adjusted if structure or its components change. */
 #endif
 }
 ZBX_COLLECTOR_DATA;

@@ -23,6 +23,6 @@ $widget = make_status_of_zbx();
 
 echo (new CJson())->encode([
 	'header' => _('Status of Zabbix'),
-	'body' =>  $widget->toString(),
-	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+	'body' => $widget->toString(),
+	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
 ]);

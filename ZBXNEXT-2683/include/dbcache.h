@@ -44,6 +44,8 @@
 
 #define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
 
+#define ZBX_SNMPTRAP_LOGGING_ENABLED	1
+
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 
@@ -234,6 +236,30 @@ typedef struct
 }
 zbx_config_hk_t;
 
+/* global configuration data (loaded from config table) */
+typedef struct
+{
+	/* the fields set by zbx_config_get() function, see ZBX_CONFIG_FLAGS_ defines */
+	zbx_uint64_t	flags;
+
+	char		**severity_name;
+	zbx_uint64_t	discovery_groupid;
+	int		default_inventory_mode;
+	int		refresh_unsupported;
+	unsigned char	snmptrap_logging;
+
+	/* housekeeping related configuration data */
+	zbx_config_hk_t	hk;
+}
+zbx_config_t;
+
+#define ZBX_CONFIG_FLAGS_SEVERITY_NAME			0x00000001
+#define ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID		0x00000002
+#define ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE		0x00000004
+#define ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED		0x00000008
+#define ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING		0x00000010
+#define ZBX_CONFIG_FLAGS_HOUSEKEEPER			0x00000020
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -329,16 +355,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
-#define	CONFIG_REFRESH_UNSUPPORTED	1
-#define	CONFIG_DISCOVERY_GROUPID	2
-#define	CONFIG_SNMPTRAP_LOGGING		3
-
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
-
-void	*DCconfig_get_config_data(void *data, int type);
-void	DCconfig_get_config_hk(zbx_config_hk_t *data);
-int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
 
 void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
 		int *mtimes, int *errcodes, size_t num);
@@ -377,8 +395,8 @@ void	DCset_delta_items(zbx_hashset_t *items);
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
-int	DCget_item_count();
-int	DCget_item_unsupported_count();
+int	DCget_item_count(zbx_uint64_t hostid);
+int	DCget_item_unsupported_count(zbx_uint64_t hostid);
 int	DCget_trigger_count();
 double	DCget_required_performance();
 int	DCget_host_count();
@@ -407,5 +425,10 @@ const char	*zbx_umc_get_macro_value(zbx_hashset_t *cache, zbx_uint64_t objectid,
 void	DCget_bulk_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids);
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	zbx_idset_free(zbx_idset_t *idset);
+
+/* global configuration support */
+void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
+void	zbx_config_clean(zbx_config_t *cfg);
+
 
 #endif

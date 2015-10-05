@@ -89,25 +89,33 @@ else {
 		if (!$data['readonly']) {
 			if ($data['show_inherited_macros']) {
 				if (($macro['type'] & MACRO_TYPE_BOTH) == MACRO_TYPE_BOTH) {
-					$row[] = (new CButton('macros['.$i.'][change]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-change');
+					$row[] = (new CCol(
+						(new CButton('macros['.$i.'][change]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-change')
+					))->addClass(ZBX_STYLE_NOWRAP);
 				}
 				elseif ($macro['type'] & MACRO_TYPE_INHERITED) {
-					$row[] = (new CButton('macros['.$i.'][change]', _('Change')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-change');
+					$row[] = (new CCol(
+						(new CButton('macros['.$i.'][change]', _('Change')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-change')
+					))->addClass(ZBX_STYLE_NOWRAP);
 				}
 				else {
-					$row[] = (new CButton('macros['.$i.'][remove]', _('Remove')))
-						->addClass(ZBX_STYLE_BTN_LINK)
-						->addClass('element-table-remove');
+					$row[] = (new CCol(
+						(new CButton('macros['.$i.'][remove]', _('Remove')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+							->addClass('element-table-remove')
+					))->addClass(ZBX_STYLE_NOWRAP);
 				}
 			}
 			else {
-				$row[] = (new CButton('macros['.$i.'][remove]', _('Remove')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addClass('element-table-remove');
+				$row[] = (new CCol(
+					(new CButton('macros['.$i.'][remove]', _('Remove')))
+						->addClass(ZBX_STYLE_BTN_LINK)
+						->addClass('element-table-remove')
+				))->addClass(ZBX_STYLE_NOWRAP);
 			}
 		}
 
@@ -162,8 +170,10 @@ else {
 $macros_form_list
 	->addRow(null,
 		(new CRadioButtonList('show_inherited_macros', (int) $data['show_inherited_macros']))
-			->addValue(_('Host macros'), 0, null, 'this.form.submit()')
-			->addValue(_('Inherited and host macros'), 1, null, 'this.form.submit()')
+			->addValue($data['is_template'] ? _('Template macros') : _('Host macros'), 0, null, 'this.form.submit()')
+			->addValue($data['is_template'] ? _('Inherited and template macros') : _('Inherited and host macros'), 1,
+				null, 'this.form.submit()'
+			)
 			->setModern(true)
 	)
 	->addRow(null, $table);
