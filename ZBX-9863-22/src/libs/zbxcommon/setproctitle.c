@@ -42,8 +42,11 @@ static char	**environ_int = NULL;
 static char	*ps_buf = NULL;
 static size_t	ps_buf_size = 0;
 #elif defined(PS_COPY_ARGV)
-#define PS_BUF_SIZE	128
 static char	**argv_int = NULL, **argv_ext = NULL;
+
+/* ps display buffer */
+static char	*ps_buf = NULL;
+static size_t	ps_buf_size = 0;
 #elif defined(PS_PSTAT_ARGV)
 #define PS_BUF_SIZE	512
 static char	ps_buf[PS_BUF_SIZE], *p_msg = NULL;
@@ -132,12 +135,13 @@ char **	setproctitle_save_env(int argc, char **argv)
 
 	argv_int = zbx_malloc(argv_int, ((unsigned int)argc + 1) * sizeof(char *));
 
-	for (i = 0; i <= argc; i++)
+	for (i = 0; i < argc; i++)
 	{
 		argv_int[i] = argv[i];
-		ps_buf_size = strlen(argv[i]);
+		ps_buf_size += strlen(argv[i]);
 	}
 
+	argv_int[argc] = NULL;
 	ps_buf_size += argc;
 	argv[0] = ps_buf = (char *)zbx_malloc(ps_buf, ps_buf_size);
 	argv[1] = NULL;
