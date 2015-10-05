@@ -330,6 +330,20 @@ class CMediatype extends CApiService {
 						}
 					}
 					break;
+
+				case MEDIA_TYPE_EXEC:
+					if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
+						$pos = strrpos($mediatype['exec_params'], "\n");
+
+						if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
+								$mediatype['exec_params'],
+								$mediatype['description']
+							));
+						}
+					}
+					break;
 			}
 
 			// Validate optional 'status' field.
@@ -602,6 +616,20 @@ class CMediatype extends CApiService {
 								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
 								$mediatype['smtp_verify_host'],
 								'smtp_verify_host',
+								$mediatype['description']
+							));
+						}
+					}
+					break;
+
+				case MEDIA_TYPE_EXEC:
+					if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
+						$pos = strrpos($mediatype['exec_params'], "\n");
+
+						if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
+								$mediatype['exec_params'],
 								$mediatype['description']
 							));
 						}
