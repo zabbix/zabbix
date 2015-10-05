@@ -485,10 +485,9 @@ static void	zbx_validate_config(void)
 #endif
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
 	err |= (FAIL == check_cfg_feature_int("StartVMwareCollectors", CONFIG_VMWARE_FORKS, "VMware support"));
-	err |= (FAIL == check_cfg_feature_int("VMwareFrequency", CONFIG_VMWARE_FREQUENCY, "VMware support"));
-	err |= (FAIL == check_cfg_feature_int("VMwarePerfFrequency", CONFIG_VMWARE_PERF_FREQUENCY, "VMware support"));
-	err |= (FAIL == check_cfg_feature_int("VMwareCacheSize", CONFIG_VMWARE_CACHE_SIZE, "VMware support"));
-	err |= (FAIL == check_cfg_feature_int("VMwareTimeout", CONFIG_VMWARE_TIMEOUT, "VMware support"));
+
+	/* parameters VMwareFrequency, VMwarePerfFrequency, VMwareCacheSize, VMwareTimeout are not checked here */
+	/* because they have non-zero default values */
 #endif
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	err |= (FAIL == check_cfg_feature_str("TLSConnect", CONFIG_TLS_CONNECT, "TLS support"));
