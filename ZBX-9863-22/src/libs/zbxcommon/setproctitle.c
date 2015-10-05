@@ -72,7 +72,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 	char	*arg_next;
 
 	if (NULL == argv || 0 == argc)
-		return;
+		return NULL;
 
 	/* measure a size of continuous argv[] area and make a copy */
 
@@ -294,7 +294,7 @@ void	setproctitle_free_env(void)
 
 	zbx_free(environ_int);
 }
-#elif defuned(PS_COPY_ARGV)
+#elif defined(PS_COPY_ARGV)
 void	setproctitle_free_env(void)
 {
 	zbx_free(argv_int);
