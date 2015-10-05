@@ -100,21 +100,23 @@ foreach ($this->data['children'] as $child) {
 	$childrenLink = (new CLink($child['name'], 'services.php?form=1&serviceid='.$child['serviceid']))
 		->setAttribute('target', '_blank');
 
-	$row = new CRow([
-		[
-			$childrenLink,
-			new CVar('children['.$child['serviceid'].'][name]', $child['name']),
-			new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
-		],
-		(new CCheckBox('children['.$child['serviceid'].'][soft]'))
-			->setChecked(isset($child['soft']) && !empty($child['soft'])),
-		!empty($child['trigger']) ? $child['trigger'] : '',
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')
-			->addClass(ZBX_STYLE_BTN_LINK)
-	]);
-	$row->setId('children_'.$child['serviceid']);
-	$servicesChildTable->addRow($row);
+	$servicesChildTable->addRow(
+		(new CRow([
+			[
+				$childrenLink,
+				new CVar('children['.$child['serviceid'].'][name]', $child['name']),
+				new CVar('children['.$child['serviceid'].'][serviceid]', $child['serviceid'])
+			],
+			(new CCheckBox('children['.$child['serviceid'].'][soft]'))
+				->setChecked(isset($child['soft']) && !empty($child['soft'])),
+			!empty($child['trigger']) ? $child['trigger'] : '',
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->onClick('javascript: removeDependentChild(\''.$child['serviceid'].'\');')
+					->addClass(ZBX_STYLE_BTN_LINK)
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))->setId('children_'.$child['serviceid'])
+	);
 }
 $servicesDependenciesFormList = new CFormList('servicesDependensiesFormList');
 $servicesDependenciesFormList->addRow(
@@ -167,9 +169,11 @@ foreach ($this->data['times'] as $serviceTime) {
 		],
 		$from.' - '.$to,
 		htmlspecialchars($serviceTime['note']),
-		(new CButton('remove', _('Remove')))
-			->onClick('javascript: removeTime(\''.$i.'\');')
-			->addClass(ZBX_STYLE_BTN_LINK)
+		(new CCol(
+			(new CButton('remove', _('Remove')))
+				->onClick('javascript: removeTime(\''.$i.'\');')
+				->addClass(ZBX_STYLE_BTN_LINK)
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	$row->setId('times_'.$i);
 	$servicesTimeTable->addRow($row);

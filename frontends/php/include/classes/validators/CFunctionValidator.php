@@ -125,6 +125,16 @@ class CFunctionValidator extends CValidator {
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
 			],
+			'forecast' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true],
+					['type' => 'sec_zero', 'mandat' => true],
+					['type' => 'str', 'can_be_empty' => true],
+					['type' => 'str', 'can_be_empty' => true]
+				],
+				'value_types' => $valueTypesNum
+			],
 			'fuzzytime' => [
 				'args' => [
 					['type' => 'sec_zero', 'mandat' => true]
@@ -228,6 +238,15 @@ class CFunctionValidator extends CValidator {
 			'time' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
+			],
+			'timeleft' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true],
+					['type' => 'num', 'mandat' => true],
+					['type' => 'str', 'can_be_empty' => true],
+				],
+				'value_types' => $valueTypesNum
 			]
 		];
 	}

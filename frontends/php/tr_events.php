@@ -40,18 +40,21 @@ $fields = [
 	'triggerid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
 	'eventid' =>	[T_ZBX_INT, O_OPT, P_SYS,	DB_ID,		PAGE_TYPE_HTML.'=='.$page['type']],
 	'fullscreen' =>	[T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null],
-	// ajax
-	'favobj' =>		[T_ZBX_STR, O_OPT, P_ACT,	IN('"filter","hat"'), null],
-	'favref' =>		[T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})'],
-	'favstate' =>	[T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	'isset({favobj})']
+	// Ajax
+	'widget' =>	[T_ZBX_STR, O_OPT, P_ACT,
+		IN('"'.WIDGET_HAT_EVENTACK.'","'.WIDGET_HAT_EVENTACTIONMSGS.'","'.WIDGET_HAT_EVENTACTIONMCMDS.'","'.
+			WIDGET_HAT_EVENTLIST.'"'),
+		null
+	],
+	'state'=>	[T_ZBX_INT, O_OPT, P_ACT, IN('0,1'), null]
 ];
 check_fields($fields);
 
 /*
  * Ajax
  */
-if (getRequest('favobj') === 'hat') {
-	CProfile::update('web.tr_events.hats.'.getRequest('favobj').'.state', getRequest('favstate'), PROFILE_TYPE_INT);
+if (hasRequest('widget') && hasRequest('state')) {
+	CProfile::update('web.tr_events.hats.'.getRequest('widget').'.state', getRequest('state'), PROFILE_TYPE_INT);
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -91,46 +94,43 @@ $event = reset($events);
  */
 $config = select_config();
 
+$eventTab = (new CTable())
+	->addRow([
+		new CDiv([
+			(new CUiWidget(WIDGET_HAT_TRIGGERDETAILS, make_trigger_details($trigger)))
+				->setHeader(_('Event source details')),
+			(new CUiWidget(WIDGET_HAT_EVENTDETAILS,
+				make_event_details($event, $trigger,
+					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
+				)
+			))->setHeader(_('Event details'))
+		]),
+		new CDiv([
+			$config['event_ack_enable']
+				? (new CCollapsibleUiWidget(WIDGET_HAT_EVENTACK, makeAckTab($event)))
+					->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACK.'.state', true))
+					->setHeader(_('Acknowledges'), [], false, 'tr_events.php')
+				: null,
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMSGS, getActionMessages($event['alerts'])))
+				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMSGS.'.state', true))
+				->setHeader(_('Message actions'), [], false, 'tr_events.php'),
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTACTIONMCMDS, getActionCommands($event['alerts'])))
+				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTACTIONMCMDS.'.state', true))
+				->setHeader(_('Command actions'), [], false, 'tr_events.php'),
+			(new CCollapsibleUiWidget(WIDGET_HAT_EVENTLIST,
+				make_small_eventlist($event,
+					$page['file'].'?triggerid='.getRequest('triggerid').'&eventid='.getRequest('eventid')
+				)
+			))
+				->setExpanded((bool) CProfile::get('web.tr_events.hats.'.WIDGET_HAT_EVENTLIST.'.state', true))
+				->setHeader(_('Event list [previous 20]'), [], false, 'tr_events.php')
+		])
+	]);
+
 $eventWidget = (new CWidget())
 	->setTitle(_('Event details'))
-	->setControls((new CList())->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])));
-
-// if acknowledges are not disabled in configuration, let's show them
-if ($config['event_ack_enable']) {
-	$eventAcknowledgesWidget = (new CCollapsibleUiWidget('hat_eventack', makeAckTab($event)))
-		->setHeader(_('Acknowledges'))
-		->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventack.state', true));
-}
-else {
-	$eventAcknowledgesWidget = null;
-}
-
-// actions messages
-$actionMessagesWidget = (new CCollapsibleUiWidget('hat_eventactionmsgs', getActionMessages($event['alerts'])))
-	->setHeader(_('Message actions'))
-	->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventactionmsgs.state', true));
-
-// actions commands
-$actionCommandWidget = (new CCollapsibleUiWidget('hat_eventactionmcmds', getActionCommands($event['alerts'])))
-	->setHeader(_('Command actions'))
-	->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventactioncmds.state', true));
-
-// event history
-$eventHistoryWidget = (new CCollapsibleUiWidget('hat_eventlist', make_small_eventlist($event, $page['file'])))
-	->setHeader(_('Event list [previous 20]'))
-	->setExpanded((bool) CProfile::get('web.tr_events.hats.hat_eventlist.state', true));
-
-$eventTab = new CTable();
-$eventTab->addRow([
-	new CDiv([
-		(new CUiWidget('hat_triggerdetails', make_trigger_details($trigger)))
-			->setHeader(_('Event source details')),
-		(new CUiWidget('hat_eventdetails', make_event_details($event, $trigger, $page['file'])))
-			->setHeader(_('Event details'))
-	]),
-	new CDiv([$eventAcknowledgesWidget, $actionMessagesWidget, $actionCommandWidget, $eventHistoryWidget])
-]);
-
-$eventWidget->addItem($eventTab)->show();
+	->setControls((new CList())->addItem(get_icon('fullscreen', ['fullscreen' => getRequest('fullscreen')])))
+	->addItem($eventTab)
+	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

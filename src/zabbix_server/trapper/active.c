@@ -191,14 +191,15 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 	if (0 != itemids.values_num)
 	{
-		DC_ITEM	*dc_items;
-		int	*errcodes, refresh_unsupported, now;
+		DC_ITEM		*dc_items;
+		int		*errcodes, now;
+		zbx_config_t	cfg;
 
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-		DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED);
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 		now = time(NULL);
 
@@ -219,13 +220,18 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 
 			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
-				if (0 == refresh_unsupported || dc_items[i].lastclock + refresh_unsupported > now)
+				if (0 == cfg.refresh_unsupported)
+					continue;
+
+				if (dc_items[i].lastclock + cfg.refresh_unsupported > now)
 					continue;
 			}
 
 			zbx_snprintf_alloc(&buffer, &buffer_alloc, &buffer_offset, "%s:%d:" ZBX_FS_UI64 "\n",
 					dc_items[i].key_orig, dc_items[i].delay, dc_items[i].lastlogsize);
 		}
+
+		zbx_config_clean(&cfg);
 
 		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
 
@@ -404,14 +410,15 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 	if (0 != itemids.values_num)
 	{
-		DC_ITEM	*dc_items;
-		int	*errcodes, refresh_unsupported, now;
+		DC_ITEM		*dc_items;
+		int		*errcodes, now;
+		zbx_config_t	cfg;
 
 		dc_items = zbx_malloc(NULL, sizeof(DC_ITEM) * itemids.values_num);
 		errcodes = zbx_malloc(NULL, sizeof(int) * itemids.values_num);
 
 		DCconfig_get_items_by_itemids(dc_items, itemids.values, errcodes, itemids.values_num);
-		DCconfig_get_config_data(&refresh_unsupported, CONFIG_REFRESH_UNSUPPORTED);
+		zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED);
 
 		now = time(NULL);
 
@@ -432,7 +439,10 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 			if (ITEM_STATE_NOTSUPPORTED == dc_items[i].state)
 			{
-				if (0 == refresh_unsupported || dc_items[i].lastclock + refresh_unsupported > now)
+				if (0 == cfg.refresh_unsupported)
+					continue;
+
+				if (dc_items[i].lastclock + cfg.refresh_unsupported > now)
 					continue;
 			}
 
@@ -457,6 +467,8 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 
 			zbx_free(dc_items[i].key);
 		}
+
+		zbx_config_clean(&cfg);
 
 		DCconfig_clean_items(dc_items, errcodes, itemids.values_num);
 

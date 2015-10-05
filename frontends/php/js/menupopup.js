@@ -653,8 +653,7 @@ function getMenuPopupServiceConfiguration(options) {
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
  * @param object options['acknowledge']				link to acknowledge page (optional)
  * @param string options['acknowledge']['eventid']	event id
- * @param string options['acknowledge']['screenid']	screen id (optional)
- * @param string options['acknowledge']['backurl']	return url (optional)
+ * @param string options['acknowledge']['backurl']	return url
  * @param int    options['eventTime']				event page url navigation time parameter (optional)
  * @param object options['configuration']			link to trigger configuration page (optional)
  * @param string options['url']						trigger url link (optional)
@@ -687,11 +686,7 @@ function getMenuPopupTrigger(options) {
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
-		var url = new Curl('acknow.php');
-
-		jQuery.each(options.acknowledge, function(name, value) {
-			url.setArgument(name, value);
-		});
+		var url = new Curl('zabbix.php?action=acknowledge.edit&eventids[]=' + options.acknowledge.eventid + '&backurl=' + options.acknowledge.backurl);
 
 		items[items.length] = {
 			label: t('Acknowledge'),
@@ -767,8 +762,8 @@ function getMenuPopupTriggerLog(options) {
 			openWinCentered(
 				'tr_logform.php?sform=1&itemid=' + options.itemid,
 				'TriggerLog',
-				950,
-				650,
+				1000,
+				700,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 
@@ -791,8 +786,8 @@ function getMenuPopupTriggerLog(options) {
 					openWinCentered(
 						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
 						'TriggerLog',
-						950,
-						650,
+						1000,
+						700,
 						'titlebar=no, resizable=yes, scrollbars=yes'
 					);
 

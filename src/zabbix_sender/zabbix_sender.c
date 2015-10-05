@@ -52,7 +52,7 @@ const char	*help_message[] = {
 	"  -p --port port                       Specify port number of trapper process of Zabbix server or proxy.",
 	"                                       When used together with --config, overrides the port of the first entry of",
 	"                                       \"ServerActive\" parameter specified in agentd configuration file",
-	"                                       Default is " ZBX_DEFAULT_SERVER_PORT_STR,
+	"                                       (default: " ZBX_DEFAULT_SERVER_PORT_STR ")",
 	"  -I --source-address IP-address       Specify source IP address",
 	"                                       When used together with --config, overrides \"SourceIP\" parameter",
 	"                                       specified in agentd configuration file",

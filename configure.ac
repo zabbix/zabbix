@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[2.5.0])
+AC_INIT([Zabbix],[3.0.0alpha3])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE
 
@@ -1436,6 +1436,14 @@ if test "x${MKDIR_P}" = "x"; then
         AC_SUBST([MKDIR_P], ${mkdir_p})
 fi
 AC_MSG_RESULT([ok (${MKDIR_P})])
+
+dnl Check if process statistics collector should be enabled
+case "x$ARCH" in
+	xlinux|xsolaris)
+		AC_DEFINE(ZBX_PROCSTAT_COLLECTOR, 1 , [Define to 1 on linux and solaris platforms])
+		;;
+esac		
+
 
 dnl *****************************************************************
 dnl *                                                               *

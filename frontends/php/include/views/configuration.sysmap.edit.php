@@ -185,7 +185,12 @@ $templateUrlEtype->setAttribute('disabled', 'disabled');
 $templateRemoveButton = (new CButton(null, _('Remove')))
 	->onClick('$("entry_#{id}").remove();')
 	->addClass(ZBX_STYLE_BTN_LINK);
-$templateUrlRow = (new CRow([$templateUrlLabel, $templateUrlLink, $templateUrlEtype, $templateRemoveButton]))
+$templateUrlRow = (new CRow([
+	$templateUrlLabel,
+	$templateUrlLink,
+	$templateUrlEtype,
+	(new CCol($templateRemoveButton))->addClass(ZBX_STYLE_NOWRAP)
+]))
 	->addStyle('display: none')
 	->setId('urlEntryTpl');
 $urlTable->addRow($templateUrlRow);

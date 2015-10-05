@@ -45,9 +45,7 @@ $fields = [
 	'delay' =>					[T_ZBX_INT, O_OPT, null,	BETWEEN(0, SEC_PER_DAY),
 		'(isset({add}) || isset({update})) && isset({type}) && {type}!='.ITEM_TYPE_TRAPPER.' && {type}!='.ITEM_TYPE_SNMPTRAP,
 		_('Update interval (in sec)')],
-	'new_delay_flex' =>			[T_ZBX_STR, O_OPT, null,	NOT_EMPTY, 'isset({add_delay_flex}) && isset({type}) && {type} != 2',
-		_('New flexible interval')],
-	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	'',			null],
+	'delay_flex' =>				[T_ZBX_STR, O_OPT, null,	null,			null],
 	'history' =>				[T_ZBX_INT, O_OPT, null,	BETWEEN(0, 65535), 'isset({add}) || isset({update})',
 		_('History storage period')
 	],
@@ -123,7 +121,6 @@ $fields = [
 	'applications' =>			[T_ZBX_INT, O_OPT, null,	DB_ID,		null],
 	'new_applications' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
 	'del_history' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
-	'add_delay_flex' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,	null],
 	// actions
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT,
 									IN('"item.massclearhistory","item.masscopyto","item.massdelete",'.
@@ -363,20 +360,7 @@ if (!hasRequest('form') && $filterHostId) {
  * Actions
  */
 $result = false;
-if (isset($_REQUEST['add_delay_flex']) && isset($_REQUEST['new_delay_flex'])) {
-	$timePeriodValidator = new CTimePeriodValidator(['allowMultiple' => false]);
-	$_REQUEST['delay_flex'] = getRequest('delay_flex', []);
-
-	if ($timePeriodValidator->validate($_REQUEST['new_delay_flex']['period'])) {
-		array_push($_REQUEST['delay_flex'], $_REQUEST['new_delay_flex']);
-		unset($_REQUEST['new_delay_flex']);
-	}
-	else {
-		error($timePeriodValidator->getError());
-		show_messages(false, null, _('Invalid time period'));
-	}
-}
-elseif (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
+if (isset($_REQUEST['delete']) && isset($_REQUEST['itemid'])) {
 	$result = false;
 	if ($item = get_item_by_itemid($_REQUEST['itemid'])) {
 		$result = API::Item()->delete([getRequest('itemid')]);
@@ -393,13 +377,6 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['itemid'])) {
 	$_REQUEST['form'] = 'clone';
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-	$delay_flex = getRequest('delay_flex', []);
-	$db_delay_flex = '';
-	foreach ($delay_flex as $value) {
-		$db_delay_flex .= $value['delay'].'/'.$value['period'].';';
-	}
-	$db_delay_flex = trim($db_delay_flex, ';');
-
 	$applications = getRequest('applications', []);
 	$application = reset($applications);
 	if (empty($application)) {
@@ -420,6 +397,53 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		}
 		else {
 			$result = false;
+		}
+	}
+
+	/*
+	 * Intially validate "delay_flex" field one by one to make sure it does not have interval separator ";".
+	 * Skip empty fields and convert "delay_flex" array to string glued with ";" which is later validated through API.
+	 */
+	$delay_flex = '';
+	$intervals = [];
+
+	if (getRequest('delay_flex')) {
+		foreach (getRequest('delay_flex') as $interval) {
+			if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+				if ($interval['delay'] === '' && $interval['period'] === '') {
+					continue;
+				}
+
+				if (strpos($interval['delay'], ';') !== false) {
+					$result = false;
+					info(_s('Invalid interval "%1$s".', $interval['delay']));
+					break;
+				}
+				elseif (strpos($interval['period'], ';')  !== false) {
+					$result = false;
+					info(_s('Invalid interval "%1$s".', $interval['period']));
+					break;
+				}
+
+				$intervals[] = $interval['delay'].'/'.$interval['period'];
+			}
+			else {
+				if ($interval['schedule'] === '') {
+					continue;
+				}
+
+				if (strpos($interval['schedule'], ';') !== false) {
+					$result = false;
+					info(_s('Invalid interval "%1$s".', $interval['schedule']));
+					break;
+				}
+
+				$intervals[] = $interval['schedule'];
+			}
+		}
+
+		if ($intervals) {
+			$delay_flex = join(';', $intervals);
 		}
 	}
 
@@ -453,7 +477,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'trends' => getRequest('trends'),
 			'logtimefmt' => getRequest('logtimefmt'),
 			'valuemapid' => getRequest('valuemapid'),
-			'delay_flex' => $db_delay_flex,
+			'delay_flex' => $delay_flex,
 			'authtype' => getRequest('authtype'),
 			'username' => getRequest('username'),
 			'password' => getRequest('password'),
@@ -540,21 +564,55 @@ elseif (hasRequest('del_history') && hasRequest('itemid')) {
 // mass update
 elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 	$visible = getRequest('visible', []);
+
+	$result = true;
+
 	if (isset($visible['delay_flex'])) {
-		$delay_flex = getRequest('delay_flex');
-		if (!is_null($delay_flex)) {
-			$db_delay_flex = '';
-			foreach ($delay_flex as $val) {
-				$db_delay_flex .= $val['delay'].'/'.$val['period'].';';
+		$delay_flex = '';
+		$intervals = [];
+
+		if (getRequest('delay_flex')) {
+			foreach (getRequest('delay_flex') as $interval) {
+				if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+					if ($interval['delay'] === '' && $interval['period'] === '') {
+						continue;
+					}
+
+					if (strpos($interval['delay'], ';') !== false) {
+						$result = false;
+						info(_s('Invalid interval "%1$s".', $interval['delay']));
+						break;
+					}
+					elseif (strpos($interval['period'], ';')  !== false) {
+						$result = false;
+						info(_s('Invalid interval "%1$s".', $interval['period']));
+						break;
+					}
+
+					$intervals[] = $interval['delay'].'/'.$interval['period'];
+				}
+				else {
+					if ($interval['schedule'] === '') {
+						continue;
+					}
+
+					if (strpos($interval['schedule'], ';') !== false) {
+						$result = false;
+						info(_s('Invalid interval "%1$s".', $interval['schedule']));
+						break;
+					}
+
+					$intervals[] = $interval['schedule'];
+				}
 			}
-			$db_delay_flex = trim($db_delay_flex, ';');
-		}
-		else {
-			$db_delay_flex = '';
+
+			if ($intervals) {
+				$delay_flex = join(';', $intervals);
+			}
 		}
 	}
 	else {
-		$db_delay_flex = null;
+		$delay_flex = null;
 	}
 
 	$formula = getRequest('formula');
@@ -652,7 +710,7 @@ elseif (hasRequest('massupdate') && hasRequest('group_itemid')) {
 			'trends' => getRequest('trends'),
 			'logtimefmt' => getRequest('logtimefmt'),
 			'valuemapid' => getRequest('valuemapid'),
-			'delay_flex' => $db_delay_flex,
+			'delay_flex' => $delay_flex,
 			'authtype' => getRequest('authtype'),
 			'username' => getRequest('username'),
 			'password' => getRequest('password'),
@@ -996,6 +1054,10 @@ elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform')
 	));
 
 	order_result($data['valuemaps'], 'name');
+
+	if (!$data['delay_flex']) {
+		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE];
+	}
 
 	// render view
 	$itemView = new CView('configuration.item.massupdate', $data);
