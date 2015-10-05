@@ -2316,18 +2316,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
-	{
-		char	*expression;
-
-		expression = zbx_strdup(NULL, event->trigger.expression);
-
-		substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host, dc_item, &expression,
-				MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
-
-		expand_trigger_description_constants(data, expression);
-
-		zbx_free(expression);
-	}
+		expand_trigger_description_constants(data, event->trigger.expression);
 
 	p = *data;
 	if (NULL == (m = bl = strchr(p, '{')))
