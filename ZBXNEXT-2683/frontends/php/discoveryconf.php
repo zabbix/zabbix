@@ -98,7 +98,7 @@ if (isset($_REQUEST['output']) && $_REQUEST['output'] == 'ajax') {
 					}
 					break;
 				case 'itemKey':
-					if ($item_key_parser->parse($check['value']) != CItemKey::PARSE_SUCCESS) {
+					if ($item_key_parser->parse($check['value']) != CParser::PARSE_SUCCESS) {
 						$ajaxResponse->error(
 							_s('Invalid key "%1$s": %2$s.', $check['value'], $item_key_parser->getError())
 						);

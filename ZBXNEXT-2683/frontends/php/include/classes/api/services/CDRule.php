@@ -246,7 +246,7 @@ class CDRule extends CApiService {
 						self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect key.'));
 					}
 
-					if ($item_key_parser->parse($dCheck['key_']) != CItemKey::PARSE_SUCCESS) {
+					if ($item_key_parser->parse($dCheck['key_']) != CParser::PARSE_SUCCESS) {
 						self::exception(ZBX_API_ERROR_PARAMETERS,
 							_s('Invalid key "%1$s": %2$s.', $dCheck['key_'], $item_key_parser->getError())
 						);

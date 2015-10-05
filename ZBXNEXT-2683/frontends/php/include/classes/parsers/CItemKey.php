@@ -22,7 +22,7 @@
 /**
  * Class is used to validate and parse item keys.
  */
-class CItemKey {
+class CItemKey extends CParser {
 
 	const STATE_NEW = 0;
 	const STATE_END = 1;
@@ -30,18 +30,32 @@ class CItemKey {
 	const STATE_QUOTED = 3;
 	const STATE_END_OF_PARAMS = 4;
 
-	const PARSE_FAIL = -1;
-	const PARSE_SUCCESS = 0;
-	const PARSE_SUCCESS_PART = 1;
-
 	const PARAM_ARRAY = 0;
 	const PARAM_UNQUOTED = 1;
 	const PARAM_QUOTED = 2;
 
-	private $key = '';
-	private $keyId = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
+	private $key = ''; // main part of the key (for 'key[1, 2, 3]' key id would be 'key')
 	private $parameters = [];
 	private $error = '';
+
+	/**
+	 * An options array
+	 *
+	 * Supported options:
+	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
+	 *
+	 * @var array
+	 */
+	private $options = ['18_simple_checks' => false];
+
+	/**
+	 * @param array $options
+	 */
+	public function __construct($options = []) {
+		if (array_key_exists('18_simple_checks', $options)) {
+			$this->options['18_simple_checks'] = $options['18_simple_checks'];
+		}
+	}
 
 	/**
 	 * Returns an error message depending on input parameters.
@@ -90,8 +104,9 @@ class CItemKey {
 	 * @param int		$offset
 	 */
 	public function parse($data, $offset = 0) {
+		$this->length = 0;
+		$this->match = '';
 		$this->key = '';
-		$this->keyId = '';
 		$this->parameters = [];
 
 		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++)
@@ -103,27 +118,51 @@ class CItemKey {
 			return self::PARSE_FAIL;
 		}
 
-		$this->keyId = substr($data, $offset, $p - $offset);
+		$_18_simple_check = false;
 
-		// Zapcat compatibility
-		for ($p2 = $p; isset($data[$p2]) && $data[$p2] == '['; $p = $p2) {
-			$_parameters = [
-				'type' => self::PARAM_ARRAY,
-				'raw' => '',
-				'pos' => $p2 - $offset,
-				'parameters' => []
-			];
+		// old-style simple checks
+		if ($this->options['18_simple_checks'] && isset($data[$p]) && $data[$p] === ',') {
+			$p++;
 
-			if (!$this->parseKeyParameters($data, $p2, $_parameters['parameters'])) {
-				break;
+			$user_macro_parser = new CUserMacroParser();
+
+			if ($user_macro_parser->parse($data, $p) != CParser::PARSE_FAIL) {
+				$p += $user_macro_parser->getLength();
+			}
+			// numeric parameter or empty parameter
+			else {
+				for (; isset($data[$p]) && $data[$p] > '0' && $data[$p] < '9'; $p++) {
+				}
 			}
 
-			$_parameters['raw'] = substr($data, $p, $p2 - $p);
-
-			$this->parameters[] = $_parameters;
+			$_18_simple_check = true;
 		}
 
 		$this->key = substr($data, $offset, $p - $offset);
+		$p2 = $p;
+
+		if (!$_18_simple_check) {
+			// Zapcat compatibility
+			for (; isset($data[$p2]) && $data[$p2] == '['; $p = $p2) {
+				$_parameters = [
+					'type' => self::PARAM_ARRAY,
+					'raw' => '',
+					'pos' => $p2 - $offset,
+					'parameters' => []
+				];
+
+				if (!$this->parseKeyParameters($data, $p2, $_parameters['parameters'])) {
+					break;
+				}
+
+				$_parameters['raw'] = substr($data, $p, $p2 - $p);
+
+				$this->parameters[] = $_parameters;
+			}
+		}
+
+		$this->length = $p - $offset;
+		$this->match = substr($data, $offset, $this->length);
 
 		if (!isset($data[$p])) {
 			$this->error = '';
@@ -134,7 +173,7 @@ class CItemKey {
 			? _('unexpected end of key')
 			: $this->errorMessage(substr($data, $offset), $p2 - $offset);
 
-		return self::PARSE_SUCCESS_PART;
+		return self::PARSE_SUCCESS_CONT;
 	}
 
 	private function parseKeyParameters($data, &$pos, array &$parameters) {
@@ -272,21 +311,12 @@ class CItemKey {
 	}
 
 	/**
-	 * Returns parsed key.
+	 * Returns the left part of key without parameters.
 	 *
 	 * @return string
 	 */
 	public function getKey() {
 		return $this->key;
-	}
-
-	/**
-	 * Returns the left part of key without parameters.
-	 *
-	 * @return string
-	 */
-	public function getKeyId() {
-		return $this->keyId;
 	}
 
 	/**

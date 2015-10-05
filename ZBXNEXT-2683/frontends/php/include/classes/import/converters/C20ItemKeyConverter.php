@@ -43,11 +43,11 @@ class C20ItemKeyConverter extends CConverter {
 	 * @return string			converted item key
 	 */
 	public function convert($value) {
-		if ($this->item_key_parser->parse($value) != CItemKey::PARSE_SUCCESS) {
+		if ($this->item_key_parser->parse($value) != CParser::PARSE_SUCCESS) {
 			return $value;
 		}
 
-		if (!in_array($this->item_key_parser->getKeyId(), ['net.tcp.service', 'net.tcp.service.perf'], true)) {
+		if (!in_array($this->item_key_parser->getKey(), ['net.tcp.service', 'net.tcp.service.perf'], true)) {
 			return $value;
 		}
 

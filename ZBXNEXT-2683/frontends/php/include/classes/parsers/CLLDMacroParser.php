@@ -26,51 +26,38 @@ class CLLDMacroParser extends CParser {
 
 	/**
 	 * @param string    $source
-	 * @param int       $startPos
+	 * @param int       $pos
 	 *
-	 * @return bool|CParserResult
+	 * @return int
 	 */
-	public function parse($source, $startPos = 0) {
-		$this->pos = $startPos;
+	public function parse($source, $pos = 0) {
+		$this->length = 0;
+		$this->match = '';
 
-		if (!isset($source[$this->pos]) || $source[$this->pos] !== '{') {
-			return false;
+		$p = $pos;
+
+		if (!isset($source[$p]) || $source[$p] !== '{') {
+			return CParser::PARSE_FAIL;
+		}
+		$p++;
+
+		if (!isset($source[$p]) || $source[$p] !== '#') {
+			return CParser::PARSE_FAIL;
+		}
+		$p++;
+
+		for (; isset($source[$p]) && $this->isMacroChar($source[$p]); $p++) {
 		}
 
-		$this->pos++;
-
-		if (!isset($source[$this->pos]) || $source[$this->pos] !== '#') {
-			return false;
+		if ($p == $pos + 2 || !isset($source[$p]) || $source[$p] !== '}') {
+			return CParser::PARSE_FAIL;
 		}
+		$p++;
 
-		$this->pos++;
+		$this->length = $p - $pos;
+		$this->match = substr($source, $pos, $this->length);
 
-		// make sure there's at least one valid macro char
-		if (!isset($source[$this->pos]) || !$this->isMacroChar($source[$this->pos])) {
-			return false;
-		}
-
-		$this->pos++;
-
-		// skip the remaining macro chars
-		while (isset($source[$this->pos]) && $this->isMacroChar($source[$this->pos])) {
-			$this->pos++;
-		}
-
-		if (!isset($source[$this->pos]) || $source[$this->pos] !== '}') {
-			return false;
-		}
-
-		$macroLength = $this->pos - $startPos + 1;
-
-		$result = new CParserResult();
-
-		$result->source = $source;
-		$result->pos = $startPos;
-		$result->length = $macroLength;
-		$result->match = substr($source, $startPos, $macroLength);
-
-		return $result;
+		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
 	}
 
 	/**
@@ -81,10 +68,6 @@ class CLLDMacroParser extends CParser {
 	 * @return bool
 	 */
 	private function isMacroChar($c) {
-		if (($c >= 'A' && $c <= 'Z') || $c == '.' || $c == '_' || ($c >= '0' && $c <= '9')) {
-			return true;
-		}
-
-		return false;
+		return (($c >= 'A' && $c <= 'Z') || $c == '.' || $c == '_' || ($c >= '0' && $c <= '9'));
 	}
 }

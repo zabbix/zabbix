@@ -187,9 +187,9 @@ class CMacrosResolverHelper {
 	 * @return string
 	 */
 	public static function resolveTriggerName(array $trigger) {
-		$triggers = self::resolveTriggerNames([$trigger['trigerid'] => $trigger]);
+		$triggers = self::resolveTriggerNames([$trigger['triggerid'] => $trigger]);
 
-		return $triggers[$trigger['trigerid']]['description'];
+		return $triggers[$trigger['triggerid']]['description'];
 	}
 
 	/**

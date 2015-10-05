@@ -311,7 +311,7 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			// key
-			if ($item_key_parser->parse($fullItem['key_']) != CItemKey::PARSE_SUCCESS) {
+			if ($item_key_parser->parse($fullItem['key_']) != CParser::PARSE_SUCCESS) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_params($this->getErrorMsg(self::ERROR_INVALID_KEY), [
 						$fullItem['key_'], $fullItem['name'], $host['name'], $item_key_parser->getError()
@@ -323,13 +323,13 @@ abstract class CItemGeneral extends CApiService {
 			if ($fullItem['type'] == ITEM_TYPE_AGGREGATE) {
 				$params_num = $item_key_parser->getParamsNum();
 
-				if (!str_in_array($item_key_parser->getKeyId(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
+				if (!str_in_array($item_key_parser->getKey(), ['grpmax', 'grpmin', 'grpsum', 'grpavg'])
 						|| $params_num > 4 || $params_num < 3
 						|| ($params_num == 3 && $item_key_parser->getParam(2) !== 'last')
 						|| !str_in_array($item_key_parser->getParam(2), ['last', 'min', 'max', 'avg', 'sum', 'count'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Key "%1$s" does not match <grpmax|grpmin|grpsum|grpavg>["Host group(s)", "Item key",'.
-							' "<last|min|max|avg|sum|count>", "parameter"].', $item_key_parser->getKeyId()));
+							' "<last|min|max|avg|sum|count>", "parameter"].', $item_key_parser->getKey()));
 				}
 			}
 
@@ -367,8 +367,7 @@ abstract class CItemGeneral extends CApiService {
 
 			// snmp trap
 			if ($fullItem['type'] == ITEM_TYPE_SNMPTRAP
-					&& strcmp($fullItem['key_'], 'snmptrap.fallback') != 0
-					&& strcmp($item_key_parser->getKeyId(), 'snmptrap') != 0) {
+					&& $fullItem['key_'] !== 'snmptrap.fallback' && $item_key_parser->getKey() !== 'snmptrap') {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('SNMP trap key is invalid.'));
 			}
 

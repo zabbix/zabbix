@@ -144,11 +144,11 @@ class CMacrosResolverGeneral {
 
 		$set_parser = new CSetParser(array_map(function($macro) { return substr($macro, 1, -1); }, $macros));
 
-		if (($result = $set_parser->parse($text, $p)) === false) {
+		if ($set_parser->parse($text, $p) == CParser::PARSE_FAIL) {
 			return false;
 		}
 		$n = 0;
-		$p += $result->length;
+		$p += $set_parser->getLength();
 
 		if ($text[$p] >= '1' && $text[$p] <= '9') {
 			$n = (int) $text[$p];
@@ -162,7 +162,7 @@ class CMacrosResolverGeneral {
 
 		return [
 			'match' => substr($text, $pos, $p - $pos),
-			'macro' => $result->match,
+			'macro' => $set_parser->getMatch(),
 			'n' => $n,
 			'length' => $p - $pos
 		];
@@ -237,14 +237,13 @@ class CMacrosResolverGeneral {
 		}
 
 		for ($pos = 0; isset($text[$pos]); $pos++) {
-			if ($extract_usermacros && $user_macro_parser->parse($text, $pos) != CUserMacroParser::PARSE_FAIL) {
-				$macro = $user_macro_parser->getMacro();
-				$macros[$pos] = $macro;
-				$pos += strlen($macro) - 1;
+			if ($extract_usermacros && $user_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $user_macro_parser->getMatch();
+				$pos += $user_macro_parser->getLength() - 1;
 			}
-			elseif ($extract_macros && ($result = $set_parser->parse($text, $pos)) !== false) {
-				$macros[$pos] = $result->match;
-				$pos += $result->length - 1;
+			elseif ($extract_macros && $set_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $set_parser->getMatch();
+				$pos += $set_parser->getLength() - 1;
 			}
 			elseif ($extract_macros_n && ($result = $this->parseMacrosN($text, $pos, $types['macros_n'])) !== false) {
 				$macros[$pos] = $result['match'];
@@ -319,18 +318,17 @@ class CMacrosResolverGeneral {
 
 		foreach ($texts as $text) {
 			for ($pos = 0; isset($text[$pos]); $pos++) {
-				if ($extract_usermacros && $user_macro_parser->parse($text, $pos) != CUserMacroParser::PARSE_FAIL) {
-					$macro = $user_macro_parser->getMacro();
-					$macros['usermacros'][$macro] = null;
-					$pos += strlen($macro) - 1;
+				if ($extract_usermacros && $user_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros['usermacros'][$user_macro_parser->getMatch()] = null;
+					$pos += $user_macro_parser->getLength() - 1;
 					continue;
 				}
 
 				if ($extract_macros) {
 					foreach ($types['macros'] as $key => $set_parser) {
-						if (($result = $set_parser->parse($text, $pos)) !== false) {
-							$macros['macros'][$key][$result->match] = true;
-							$pos += $result->length - 1;
+						if ($set_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+							$macros['macros'][$key][$set_parser->getMatch()] = true;
+							$pos += $set_parser->getLength() - 1;
 							continue 2;
 						}
 					}
@@ -406,7 +404,7 @@ class CMacrosResolverGeneral {
 		$item_key_parser = new CItemKey();
 
 		$item_key_parameters = [];
-		if ($item_key_parser->parse($key) == CItemKey::PARSE_SUCCESS) {
+		if ($item_key_parser->parse($key) == CParser::PARSE_SUCCESS) {
 			$item_key_parameters = $this->getItemKeyParameters($item_key_parser->getParamsRaw());
 		}
 
@@ -467,7 +465,7 @@ class CMacrosResolverGeneral {
 	protected function resolveItemKeyMacros($key, array $macros, array $types) {
 		$item_key_parser = new CItemKey();
 
-		if ($item_key_parser->parse($key) == CItemKey::PARSE_SUCCESS) {
+		if ($item_key_parser->parse($key) == CParser::PARSE_SUCCESS) {
 			$key = $this->resolveItemKeyParamsMacros($key, $item_key_parser->getParamsRaw(), $macros, $types);
 		}
 
@@ -492,12 +490,11 @@ class CMacrosResolverGeneral {
 				$pos += $result['length'] - 1;
 				$functionids[$i++] = substr($result['match'], 1, -1);
 			}
-			elseif ($user_macro_parser->parse($expression, $pos) != CUserMacroParser::PARSE_FAIL) {
-				$macro = $user_macro_parser->getMacro();
-				$pos += strlen($macro) - 1;
+			elseif ($user_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+				$pos += $user_macro_parser->getLength() - 1;
 			}
-			elseif (($result = $set_parser->parse($expression, $pos)) !== false) {
-				$pos += $result->length - 1;
+			elseif ($set_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+				$pos += $set_parser->getLength() - 1;
 			}
 		}
 
@@ -800,11 +797,11 @@ class CMacrosResolverGeneral {
 					$hostTemplates[$dbHost['hostid']] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
 
 					foreach ($dbHost['macros'] as $dbMacro) {
-						if ($user_macro_parser->parse($dbMacro['macro']) != CUserMacroParser::PARSE_SUCCESS) {
+						if ($user_macro_parser->parse($dbMacro['macro']) != CParser::PARSE_SUCCESS) {
 							continue;
 						}
 
-						$macro_name = $user_macro_parser->getMacroName();
+						$macro_name = $user_macro_parser->getMacro();
 						$macro_context = $user_macro_parser->getContext();
 
 						if (!array_key_exists($dbHost['hostid'], $hostMacros)) {
@@ -849,8 +846,8 @@ class CMacrosResolverGeneral {
 			natsort($hostIds);
 
 			foreach ($element['macros'] as $macro => &$value) {
-				if ($user_macro_parser->parse($macro) == CUserMacroParser::PARSE_SUCCESS) {
-					$macro_name = $user_macro_parser->getMacroName();
+				if ($user_macro_parser->parse($macro) == CParser::PARSE_SUCCESS) {
+					$macro_name = $user_macro_parser->getMacro();
 					$macro_context = $user_macro_parser->getContext();
 
 					$value = $this->getHostUserMacros($hostIds, $macro_name, $macro_context, $hostTemplates,
@@ -897,11 +894,11 @@ class CMacrosResolverGeneral {
 		$global_macros = [];
 
 		foreach ($dbGlobalMacros as $dbGlobalMacro) {
-			if ($user_macro_parser->parse($dbGlobalMacro['macro']) != CUserMacroParser::PARSE_SUCCESS) {
+			if ($user_macro_parser->parse($dbGlobalMacro['macro']) != CParser::PARSE_SUCCESS) {
 				continue;
 			}
 
-			$macro_name = $user_macro_parser->getMacroName();
+			$macro_name = $user_macro_parser->getMacro();
 			$macro_context = $user_macro_parser->getContext();
 
 			if (!array_key_exists($macro_name, $global_macros)) {
@@ -918,8 +915,8 @@ class CMacrosResolverGeneral {
 
 		foreach ($data as &$element) {
 			foreach ($element['macros'] as $macro => &$value) {
-				if ($value === null && $user_macro_parser->parse($macro) == CUserMacroParser::PARSE_SUCCESS) {
-					$macro_name = $user_macro_parser->getMacroName();
+				if ($value === null && $user_macro_parser->parse($macro) == CParser::PARSE_SUCCESS) {
+					$macro_name = $user_macro_parser->getMacro();
 					$macro_context = $user_macro_parser->getContext();
 
 					if (array_key_exists($macro_name, $global_macros)) {

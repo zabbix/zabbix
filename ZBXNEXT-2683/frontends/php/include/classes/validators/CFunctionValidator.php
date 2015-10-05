@@ -296,7 +296,7 @@ class CFunctionValidator extends CValidator {
 			}
 
 			// user macro
-			if ($user_macro_parser->parse($value['functionParamList'][$aNum]) == CUserMacroParser::PARSE_SUCCESS) {
+			if ($user_macro_parser->parse($value['functionParamList'][$aNum]) == CParser::PARSE_SUCCESS) {
 				continue;
 			}
 
