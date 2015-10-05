@@ -733,7 +733,7 @@ void	zbx_on_exit(void)
 
 	zbx_free_service_resources();
 
-#if defined(PS_OVERWRITE_ARGV)
+#if defined(PS_OVERWRITE_ARGV) || defined(PS_COPY_ARGV)
 	setproctitle_free_env();
 #endif
 
@@ -759,7 +759,7 @@ int	main(int argc, char **argv)
 	/* Instead, the system sends the error to the calling process.*/
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
-#if defined(PS_OVERWRITE_ARGV) || defined(PS_PSTAT_ARGV)
+#if defined(PS_OVERWRITE_ARGV) || defined(PS_COPY_ARGV) || defined(PS_PSTAT_ARGV)
 	setproctitle_save_env(argc, argv);
 #endif
 	memset(&t, 0, sizeof(t));

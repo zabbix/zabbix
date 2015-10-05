@@ -23,11 +23,10 @@
 #if defined(__linux__)				/* Linux */
 #       define PS_OVERWRITE_ARGV
 #elif defined(_AIX)				/* AIX */
-#       define PS_OVERWRITE_ARGV
-#       define PS_CONCAT_ARGV
+#       define PS_COPY_ARGV
 #elif defined(__sun) && defined(__SVR4)		/* Solaris */
-#       define PS_OVERWRITE_ARGV
-#       define PS_APPEND_ARGV
+#       define PS_COPY_ARGV
+#	define PS_PADDING
 #elif defined(HAVE_SYS_PSTAT_H)			/* HP-UX */
 #       define PS_PSTAT_ARGV
 #elif defined(__APPLE__) && defined(__MACH__)	/* OS X */
@@ -38,7 +37,7 @@
 #	endif
 #endif
 
-void	setproctitle_save_env(int argc, char **argv);
+char **	setproctitle_save_env(int argc, char **argv);
 void	setproctitle_set_status(const char *status);
 void	setproctitle_free_env(void);
 
