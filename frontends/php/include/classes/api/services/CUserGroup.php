@@ -556,7 +556,7 @@ class CUserGroup extends CApiService {
 		DB::delete('rights', ['groupid' => $usergroupids]);
 		DB::delete('users_groups', ['usrgrpid' => $usergroupids]);
 		DB::delete('usrgrp', ['usrgrpid' => $usergroupids]);
-		disableActionsWithoutOperations(zbx_objectValues($del_operations, 'actionid'));
+		$this->disableActionsWithoutOperations(zbx_objectValues($del_operations, 'actionid'));
 
 		return ['usrgrpids' => $usergroupids];
 	}
@@ -726,5 +726,40 @@ class CUserGroup extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Disable actions that do not have operations.
+	 */
+	protected function disableActionsWithoutOperations(array $actionids) {
+		$actions = DBFetchArray(DBselect(
+			'SELECT DISTINCT a.actionid'.
+			' FROM actions a'.
+			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'.
+			($actionids ? ' AND '.dbConditionInt('a.actionid', $actionids) : '')
+		));
+
+		$this->disableActions(zbx_objectValues($actions, 'actionid'));
+	}
+
+	/**
+	 * Disable actions.
+	 *
+	 * @param array $actionids
+	 */
+	protected function disableActions(array $actionids) {
+		if ($actionids) {
+			$update = [
+				'values' => ['status' => ACTION_STATUS_DISABLED],
+				'where' => ['actionid' => $actionids]
+			];
+			DB::update('actions', $update);
+
+			foreach($actionids as $actionid) {
+				add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
+					_('Action disabled due to deletion of user group.'), null
+				);
+			}
+		}
 	}
 }
