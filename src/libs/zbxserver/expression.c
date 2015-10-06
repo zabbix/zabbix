@@ -1342,7 +1342,7 @@ static int	DBitem_lastvalue(const char *expression, char **lastvalue, int N_func
 
 		if (SUCCEED == zbx_vc_get_value(itemid, value_type, &ts, &vc_value))
 		{
-			char	tmp[MAX_STRING_LEN];
+			char	tmp[MAX_BUFFER_LEN];
 
 			zbx_vc_history_value2str(tmp, sizeof(tmp), &vc_value.value, value_type);
 			zbx_history_record_clear(&vc_value, value_type);
