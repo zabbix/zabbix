@@ -43,14 +43,37 @@ class CConditionValidator extends CValidator {
 	public $messageUnusedCondition;
 
 	/**
+	 * Error message if several triggers are compared with "and".
+	 *
+	 * @var string
+	 */
+	public $messageAndWithSeveralTriggers;
+
+	/**
 	 * Validates the given condition formula and checks if the given conditions match the formula.
 	 *
 	 * @param array $object
 	 *
 	 * @return bool
 	 */
-	public function validate($object)
-	{
+	public function validate($object) {
+		// get trigger conditions formulaid
+		$triggers = [];
+		foreach ($object['conditions'] as $condition) {
+			if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER
+				|| $condition['conditiontype'] == CONDITION_TYPE_TRIGGER_NAME) {
+
+				$triggers[] = $condition['formulaid'];
+			}
+		}
+
+		// check if multiple triggers are compared with AND
+		if ((count($triggers) > 1) && ($object['evaltype'] == CONDITION_EVAL_TYPE_AND)) {
+			$this->error($this->messageAndWithSeveralTriggers);
+
+			return false;
+		}
+
 		// validate only custom expressions
 		if ($object['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 			return true;
@@ -60,6 +83,13 @@ class CConditionValidator extends CValidator {
 		$parser = new CConditionFormula();
 		if (!$parser->parse($object['formula'])) {
 			$this->error($this->messageInvalidFormula, $object['formula'], $parser->error);
+
+			return false;
+		}
+
+		// check if multiple triggers are compared with AND
+		if ((count($triggers) > 1) && !$parser->validTriggersComparison($triggers)) {
+			$this->error($this->messageAndWithSeveralTriggers);
 
 			return false;
 		}
