@@ -325,7 +325,7 @@ var CTimeLine = Class.create({
 	_period:	null,	// selected period
 	_now:		false,	// state if time is set to NOW
 	_isNow:		false,	// state if time is set to NOW (for outside usage)
-	minperiod:	60,	// minimal allowed period
+	minperiod:	60,		// minimal allowed period
 	maxperiod:	null,	// max period in seconds
 
 	initialize: function(period, starttime, usertime, endtime, maximumPeriod, isNow) {
