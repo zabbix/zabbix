@@ -558,7 +558,7 @@ foreach ($triggers as $trigger) {
 	$dependenciesTable = (new CTable())
 		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addRow(_('Dependent').':');
-	if (!empty($triggerIdsDown[$trigger['triggerid']])) {
+	if (array_key_exists($trigger['triggerid'], $triggerIdsDown) && $triggerIdsDown[$trigger['triggerid']]) {
 		$depTriggers = CMacrosResolverHelper::resolveTriggerNameByIds($triggerIdsDown[$trigger['triggerid']]);
 
 		foreach ($depTriggers as $depTrigger) {

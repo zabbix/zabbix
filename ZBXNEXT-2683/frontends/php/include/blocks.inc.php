@@ -818,7 +818,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 
 	CArrayHelper::sort($triggers, [['field' => 'lastchange', 'order' => ZBX_SORT_DOWN]]);
 
-	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
 
 	foreach ($triggers as $trigger) {
 		// unknown triggers
