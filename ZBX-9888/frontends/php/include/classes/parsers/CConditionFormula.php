@@ -357,8 +357,6 @@ class CConditionFormula {
 			array_push($target_element[$step]['constant'], ['operator' => $this->last_operator, 'constant' => $constant]);
 			$this->last_operator = '';
 		}
-
-		return;
 	}
 
 	/**
