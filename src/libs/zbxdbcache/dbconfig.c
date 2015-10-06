@@ -1988,12 +1988,14 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type,
 							config->config->refresh_unsupported, NULL,
-							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
+							now - proxy_timediff);
+					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 				else
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16],
-							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
+							now - proxy_timediff);
+					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 			}
 		}
