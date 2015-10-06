@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha3
 
 New features:
+A.F.I...S. [ZBXNEXT-2163] implemented argument support for script media type (wiper, Ivo)
 A.F....PS. [ZBXNEXT-2128] implemented execution if an item at a specific time (wiper, Ivo)
 ..F.....S. [ZBXNEXT-922] added forecasting trigger functions (gleb, Sandis)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
