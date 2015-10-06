@@ -102,7 +102,7 @@ $maintenanceFormList->addRow(_('Description'),
 $maintenancePeriodFormList = new CFormList('maintenancePeriodFormList');
 $maintenancePeriodTable = (new CTable())
 	->setNoDataMessage(_('No maintenance periods defined.'))
-	->addClass('formElementTable')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([_('Period type'), _('Schedule'), _('Period'), _('Action')]);
 
 foreach ($this->data['timeperiods'] as $id => $timeperiod) {
@@ -110,12 +110,13 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		(new CCol(timeperiod_type2str($timeperiod['timeperiod_type'])))->addClass(ZBX_STYLE_NOWRAP),
 		shedule2str($timeperiod),
 		(new CCol(zbx_date2age(0, $timeperiod['period'])))->addClass(ZBX_STYLE_NOWRAP),
-		(new CCol([
-			(new CSubmit('edit_timeperiodid['.$id.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
-			(new CSubmit('del_timeperiodid['.$id.']', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addStyle('margin-left: 8px')
-		]))->addClass(ZBX_STYLE_NOWRAP)
+		(new CCol(
+			new CHorList([
+				(new CSubmit('edit_timeperiodid['.$id.']', _('Edit')))->addClass(ZBX_STYLE_BTN_LINK),
+				(new CSubmit('del_timeperiodid['.$id.']', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+			])
+		))->addClass(ZBX_STYLE_NOWRAP)
 	]);
 	if (isset($timeperiod['timeperiodid'])) {
 		$maintenanceForm->addVar('timeperiods['.$id.'][timeperiodid]', $timeperiod['timeperiodid']);
@@ -131,7 +132,9 @@ foreach ($this->data['timeperiods'] as $id => $timeperiod) {
 		->addVar('timeperiods['.$id.'][period]', $timeperiod['period']);
 }
 
-$periodsDiv = (new CDiv($maintenancePeriodTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR);
+$periodsDiv = (new CDiv($maintenancePeriodTable))
+	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;');
 if (!isset($_REQUEST['new_timeperiod'])) {
 	$periodsDiv->addItem((new CSubmit('new_timeperiod', _('New')))->addClass(ZBX_STYLE_BTN_LINK));
 }
@@ -145,15 +148,17 @@ if (isset($_REQUEST['new_timeperiod'])) {
 		$saveLabel = _('Add');
 	}
 
-	$footer = [
-		(new CSubmit('add_timeperiod', $saveLabel))->addClass(ZBX_STYLE_BTN_LINK),
-		(new CSubmit('cancel_new_timeperiod', _('Cancel')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->addStyle('margin-left: 8px')
-	];
-
 	$maintenancePeriodFormList->addRow(_('Maintenance period'),
-		(new CDiv([get_timeperiod_form(), $footer]))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv([
+			get_timeperiod_form(),
+			new CHorList([
+				(new CSubmit('add_timeperiod', $saveLabel))->addClass(ZBX_STYLE_BTN_LINK),
+				(new CSubmit('cancel_new_timeperiod', _('Cancel')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+			])
+		]))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 
@@ -170,11 +175,10 @@ foreach ($this->data['all_groups'] as $group) {
 	$groupsComboBox->addItem($group['groupid'], $group['name']);
 }
 $hostTable = (new CTable())
-	->addClass('formElementTable')
 	->addRow($hostTweenBox->get(_('In maintenance'), [_('Other hosts | Group').SPACE, $groupsComboBox]));
 $hostsAndGroupsFormList->addRow(_('Hosts in maintenance'), $hostTable);
 
-$groupTable = (new CTable())->addClass('formElementTable');
+$groupTable = new CTable();
 $groupTweenBox = new CTweenBox($maintenanceForm, 'groupids', $this->data['groupids'], 10);
 foreach ($this->data['all_groups'] as $group) {
 	$groupTweenBox->addItem($group['groupid'], $group['name']);

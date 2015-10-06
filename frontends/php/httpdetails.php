@@ -252,12 +252,11 @@ $filterForm = (new CFilter('web.httpdetails.filter.state'))
 	->addNavigator();
 $graphsWidget->addItem($filterForm);
 
-$graphTable = (new CTableInfo())->setId('graph');
+$graphs = [];
 
 // dims
 $graphDims = getGraphDims();
-$graphDims['shiftYtop'] += 1;
-$graphDims['width'] = -120;
+$graphDims['width'] = -50;
 $graphDims['graphHeight'] = 150;
 
 /*
@@ -275,7 +274,7 @@ $graphInScreen = new CScreenBase([
 $graphInScreen->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemIds));
 
 $src = 'chart3.php?height=150'.
-	'&name='.$httpTest['name'].
+	'&name='._('Speed').
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_IN.
 	'&httptestid='.$httpTest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
@@ -284,13 +283,10 @@ $src = 'chart3.php?height=150'.
 	'&profileIdx='.$graphInScreen->profileIdx.
 	'&profileIdx2='.$graphInScreen->profileIdx2;
 
-$graphInContainer = (new CDiv(new CLink(null, $src)))
+$graphs[] = (new CDiv(new CLink(null, $src)))
 	->addClass('flickerfreescreen')
 	->setId('flickerfreescreen_graph_in')
-	->setAttribute('style', 'position: relative')
 	->setAttribute('data-timestamp', time());
-
-$graphTable->addRow([bold(_('Speed')), $graphInContainer]);
 
 $timeControlData = [
 	'id' => 'graph_in',
@@ -319,7 +315,7 @@ $graphTimeScreen = new CScreenBase([
 ]);
 
 $src = 'chart3.php?height=150'.
-	'&name='.$httpTest['name'].
+	'&name='._('Response time').
 	'&http_item_type='.HTTPSTEP_ITEM_TYPE_TIME.
 	'&httptestid='.$httpTest['httptestid'].
 	'&graphtype='.GRAPH_TYPE_STACKED.
@@ -328,13 +324,10 @@ $src = 'chart3.php?height=150'.
 	'&profileIdx='.$graphTimeScreen->profileIdx.
 	'&profileIdx2='.$graphTimeScreen->profileIdx2;
 
-$graphTimeContainer = (new CDiv(new CLink(null, $src)))
+$graphs[] = (new CDiv(new CLink(null, $src)))
 	->addClass('flickerfreescreen')
 	->setId('flickerfreescreen_graph_time')
-	->setAttribute('style', 'position: relative')
 	->setAttribute('data-timestamp', time());
-
-$graphTable->addRow([bold(_('Response time')), $graphTimeContainer]);
 
 $timeControlData = [
 	'id' => 'graph_time',
@@ -354,6 +347,8 @@ CScreenBuilder::insertScreenScrollJs(['timeline' => $graphInScreen->timeline]);
 CScreenBuilder::insertScreenRefreshTimeJs();
 CScreenBuilder::insertProcessObjectsJs();
 
-$graphsWidget->addItem($graphTable)->show();
+$graphsWidget
+	->addItem((new CDiv($graphs))->addClass(ZBX_STYLE_TABLE_FORMS_CONTAINER))
+	->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';

@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/include/hosts.inc.php';
 require_once dirname(__FILE__).'/include/triggers.inc.php';
 require_once dirname(__FILE__).'/include/items.inc.php';
 
-$page['title'] = _('Trigger form');
+$page['title'] = _('Trigger');
 $page['file'] = 'tr_logform.php';
 $page['scripts'] = ['tr_logform.js'];
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
@@ -35,23 +35,25 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 //		VAR			TYPE	OPTIONAL FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'description' =>	[T_ZBX_STR, O_OPT,  null,			NOT_EMPTY,			'isset({add}) || isset({update})'],
-	'itemid' =>			[T_ZBX_INT, O_OPT,	 P_SYS,			DB_ID,				'isset({add}) || isset({update})'],
-	'sform' =>			[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
-	'sitems' =>			[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
-	'triggerid' =>		[T_ZBX_INT, O_OPT,  P_SYS,			DB_ID,				null],
-	'type' =>			[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
-	'priority' =>		[T_ZBX_INT, O_OPT,  null,			IN('0,1,2,3,4,5'),	'isset({add}) || isset({update})'],
-	'expressions' =>	[T_ZBX_STR, O_OPT,	 null,			NOT_EMPTY,			'isset({add}) || isset({update})'],
-	'expr_type' =>		[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
-	'comments' =>		[T_ZBX_STR, O_OPT,  null,			null,				null],
-	'url' =>			[T_ZBX_STR, O_OPT,  null,			null,				null],
-	'status' =>			[T_ZBX_INT, O_OPT,  null,			IN('0,1'),			null],
-	'form_refresh' =>	[T_ZBX_INT, O_OPT,	 null,			null,				null],
+	'description' =>	[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,			'isset({add}) || isset({update})',
+		_('Name')
+	],
+	'itemid' =>			[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				'isset({add}) || isset({update})'],
+	'sform' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'sitems' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'triggerid' =>		[T_ZBX_INT, O_OPT, P_SYS,		DB_ID,				null],
+	'type' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'priority' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1,2,3,4,5'),	'isset({add}) || isset({update})'],
+	'expressions' =>	[T_ZBX_STR, O_OPT, null,		NOT_EMPTY,			'isset({add}) || isset({update})'],
+	'expr_type' =>		[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'comments' =>		[T_ZBX_STR, O_OPT, null,		null,				null],
+	'url' =>			[T_ZBX_STR, O_OPT, null,		null,				null],
+	'status' =>			[T_ZBX_INT, O_OPT, null,		IN('0,1'),			null],
+	'form_refresh' =>	[T_ZBX_INT, O_OPT, null,		null,				null],
 	// actions
-	'add' =>			[T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null],
-	'update' =>			[T_ZBX_STR, O_OPT,	 P_SYS|P_ACT,	null,				null],
-	'keys' => 			[T_ZBX_STR, O_OPT,  null,			null,				null],
+	'add' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,				null],
+	'update' =>			[T_ZBX_STR, O_OPT, P_SYS|P_ACT,	null,				null],
+	'keys' => 			[T_ZBX_STR, O_OPT, null,		null,				null],
 ];
 check_fields($fields);
 
@@ -65,21 +67,21 @@ if (getRequest('itemid') && !API::Item()->isWritable([$_REQUEST['itemid']])
 
 $itemid = getRequest('itemid', 0);
 
-$item = API::Item()->get([
-	'output' => ['key_'],
-	'selectHosts' => ['host'],
-	'itemids' => $itemid,
-	'limit' => 1
-]);
-$item = reset($item);
-$host = reset($item['hosts']);
-
 $constructor = new CTextTriggerConstructor(new CTriggerExpression());
 
 /**
  * Save a trigger
  */
 if (hasRequest('add') || hasRequest('update')) {
+	$item = API::Item()->get([
+		'output' => ['key_'],
+		'selectHosts' => ['host'],
+		'itemids' => $itemid,
+		'limit' => 1
+	]);
+	$item = reset($item);
+	$host = reset($item['hosts']);
+
 	show_messages();
 
 	$exprs = getRequest('expressions', false);
@@ -169,13 +171,18 @@ if (hasRequest('add') || hasRequest('update')) {
 //------------------------ <FORM> ---------------------------
 
 if (hasRequest('sform')) {
-	$frmTRLog = new CFormTable(_('Trigger'), null, null, null, 'sform');
-	$frmTRLog->setName('sform');
-	$frmTRLog->setTableClass('formlongtable formtable');
+	$widget = (new CWidget())->setTitle(_('Trigger'));
+
+	$form = (new CForm())
+		->setName('sform')
+		->addVar('sform', '1')
+		->addVar('itemid', $itemid);
 
 	if (hasRequest('triggerid')) {
-		$frmTRLog->addVar('triggerid', getRequest('triggerid'));
+		$form->addVar('triggerid', getRequest('triggerid'));
 	}
+
+	$form_list = new CFormList();
 
 	if (hasRequest('triggerid') && !hasRequest('form_refresh')) {
 		$result = DBselect(
@@ -218,67 +225,69 @@ if (hasRequest('sform')) {
 
 	$keys = getRequest('keys', []);
 
-	$frmTRLog->addRow(_('Description'),
-		(new CTextBox('description', $description))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	);
+	$items = API::Item()->get([
+		'output' => ['itemid', 'hostid', 'key_', 'name'],
+		'selectHosts' => ['name'],
+		'itemids' => [$itemid]
+	]);
 
-	$itemName = '';
-
-	$dbItems = DBfetchArray(DBselect(
-		'SELECT itemid,hostid,name,key_,templateid'.
-		' FROM items'.
-		' WHERE itemid='.zbx_dbstr($itemid)
-	));
-	$dbItems = CMacrosResolverHelper::resolveItemNames($dbItems);
-	$dbItem = reset($dbItems);
-
-	if ($dbItem['templateid']) {
-		$template = get_realhost_by_itemid($dbItem['templateid']);
-		$itemName = $template['host'].NAME_DELIMITER.$dbItem['name_expanded'];
+	if ($items) {
+		$items = CMacrosResolverHelper::resolveItemNames($items);
+		$item_name = $items[0]['hosts'][0]['name'].NAME_DELIMITER.$items[0]['name_expanded'];
 	}
 	else {
-		$host = get_host_by_hostid($dbItem['hostid']);
-		$itemName = $host['name'].NAME_DELIMITER.$dbItem['name_expanded'];
+		$item_name = '';
 	}
 
-	$script = "javascript: return PopUp('popup.php?dstfrm=".$frmTRLog->getName()."&dstfld1=itemid&dstfld2=item".
-		"&srctbl=items&srcfld1=itemid&srcfld2=name');";
-
-	$frmTRLog->addRow(_('Item'), [
-		(new CTextBox('item', $itemName))
+	$form_list->addRow(_('Name'), (new CTextBox('description', $description))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+	$form_list->addRow(_('Item'), [
+		(new CTextBox('item', $item_name))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setId('item')
 			->setAttribute('disabled', 'disabled'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CSubmit('select_item', _('Select')))->onClick($script)
+		(new CButton(null, _('Select')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick("javascript: return PopUp('popup.php?dstfrm=".$form->getName()."&dstfld1=itemid&dstfld2=item".
+				"&srctbl=items&srcfld1=itemid&srcfld2=name');"
+			)
 	]);
-	$frmTRLog->addVar('itemid', $itemid);
 
-
-	$exp_select = new CComboBox('expr_type');
-	$exp_select->setId('expr_type');
-	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_MATCH, _('Include'));
-	$exp_select->addItem(CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH, _('Exclude'));
-
-	$ctb = (new CTextBox('expression'))
-		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setId('logexpr');
-
-	$cb = (new CButton('add_exp', _('Add')))->onClick('javascript: add_logexpr();');
-	$cbAdd = (new CButton('add_key_and', _('AND')))->onClick('javascript: add_keyword_and();');
-	$cbOr = (new CButton('add_key_or', _('OR')))->onClick('javascript: add_keyword_or();');
-	$cbIregexp = new CCheckBox('iregexp');
-
-	$frmTRLog->addRow(_('Expression'),
-		[$ctb, BR(), $cbIregexp, 'iregexp', SPACE, $cbAdd, SPACE, $cbOr, SPACE, $exp_select, SPACE, $cb]
+	$form_list->addRow(_('Expression'),
+		(new CTextBox('expression'))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setId('logexpr')
 	);
 
-	$keyTable = (new CTableInfo())
+	$form_list->addRow(null, [
+		new CLabel([new CCheckBox('iregexp'), 'iregexp'], 'iregexp'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('add_key_and', _('AND')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: add_keyword_and();'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('add_key_or', _('OR')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: add_keyword_or();'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CComboBox('expr_type', null, null, [
+			CTextTriggerConstructor::EXPRESSION_TYPE_MATCH => _('Include'),
+			CTextTriggerConstructor::EXPRESSION_TYPE_NO_MATCH => _('Exclude')
+		]))->setId('expr_type'),
+		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+		(new CButton('add_exp', _('Add')))
+			->addClass(ZBX_STYLE_BTN_GREY)
+			->onClick('javascript: add_logexpr();')
+	]);
+
+	$keyTable = (new CTable())
 		->setId('key_list')
+		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Keyword'), _('Type'), _('Action')]);
 
-	$table = (new CTableInfo())
+	$table = (new CTable())
 		->setId('exp_list')
+		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Expression'), _('Type'), _('Position'), _('Action')]);
 
 	$maxId = 0;
@@ -293,24 +302,21 @@ if (hasRequest('sform')) {
 			->onMouseover('javascript: this.style.cursor = "pointer";')
 			->addClass('updown');
 
-		$del_url = (new CSpan(_('Delete')))
-			->addClass('link')
-			->onClick('javascript:'.
-				' if (confirm('.CJs::encodeJson(_('Delete expression?')).')) remove_expression("logtr'.$id.'");'.
-				' return false;'
-			);
-
 		$row = new CRow([
 			htmlspecialchars($expr['value']),
 			($expr['type'] == CTextTriggerConstructor::EXPRESSION_TYPE_MATCH) ? _('Include') : _('Exclude'),
 			[$imgup, ' ', $imgdn],
-			$del_url
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('javascript: remove_expression("logtr'.$id.'");')
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 		$row->setId('logtr'.$id);
 		$table->addRow($row);
 
-		$frmTRLog->addVar('expressions['.$id.'][value]', $expr['value']);
-		$frmTRLog->addVar('expressions['.$id.'][type]', $expr['type']);
+		$form->addVar('expressions['.$id.'][value]', $expr['value']);
+		$form->addVar('expressions['.$id.'][type]', $expr['type']);
 
 		$maxId = max($maxId, $id);
 	}
@@ -320,25 +326,36 @@ if (hasRequest('sform')) {
 
 	$maxId = 0;
 	foreach ($keys as $id => $val) {
-		$del_url = (new CLink(_('Delete'), '#'))
-			->addClass('action')
-			->onClick('javascript:'.
-			' if (confirm('.CJs::encodeJson(_('Delete keyword?')).')) remove_keyword("keytr'.$id.'");'.
-			' return false;');
-		$row = new CRow([htmlspecialchars($val['value']), $val['type'], $del_url]);
+		$row = new CRow([
+			htmlspecialchars($val['value']),
+			$val['type'],
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('javascript: remove_keyword("keytr'.$id.'");')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]);
 		$row->setId('keytr'.$id);
 		$keyTable->addRow($row);
 
-		$frmTRLog->addVar('keys['.$id.'][value]', $val['value']);
-		$frmTRLog->addVar('keys['.$id.'][type]', $val['type']);
+		$form->addVar('keys['.$id.'][value]', $val['value']);
+		$form->addVar('keys['.$id.'][type]', $val['type']);
 
 		$maxId = max($maxId, $id);
 	}
 
 	zbx_add_post_js('key_count='.($maxId + 1).';');
 
-	$frmTRLog->addRow(SPACE, $keyTable);
-	$frmTRLog->addRow(SPACE, $table);
+	$form_list->addRow(null,
+		(new CDiv($keyTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
+	$form_list->addRow(null,
+		(new CDiv($table))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 
 	$sev_select = new CComboBox('priority', $priority);
 
@@ -350,24 +367,33 @@ if (hasRequest('sform')) {
 	}
 	$sev_select->addItems($severityNames);
 
-	$frmTRLog->addRow(_('Severity'), $sev_select);
-	$frmTRLog->addRow(_('Comments'), (new CTextArea('comments', $comments))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-	$frmTRLog->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
-	$frmTRLog->addRow(_('Disabled'),
+	$form_list->addRow(_('Severity'), $sev_select);
+	$form_list->addRow(_('Comments'), (new CTextArea('comments', $comments))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+	$form_list->addRow(_('URL'), (new CTextBox('url', $url))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+	$form_list->addRow(_('Disabled'),
 		(new CCheckBox('status'))->setChecked($status == TRIGGER_STATUS_DISABLED)
 	);
+
+	$tab = (new CTabView())->addTab('trigger_tab', null, $form_list);
+
 	if (hasRequest('triggerid')) {
-		$frmTRLog->addItemToBottomRow(new CSubmit('update', _('Update')));
+		$tab->setFooter(makeFormFooter(
+			new CSubmit('update', _('Update')),
+			[(new CButton('cancel', _('Cancel')))->onClick('javascript: self.close();')]
+		));
 	}
 	else {
-		$frmTRLog->addItemToBottomRow(new CSubmit('add', _('Add')));
+		$tab->setFooter(makeFormFooter(
+			new CSubmit('add', _('Add')),
+			[(new CButton('cancel', _('Cancel')))->onClick('javascript: self.close();')]
+		));
 	}
-	$frmTRLog->addItemToBottomRow(SPACE);
-	$frmTRLog->addItemToBottomRow(
-		(new CButton('cancel', _('Cancel')))->onClick('javascript: self.close();')
-	);
 
-	$frmTRLog->show();
+	$form->addItem($tab);
+
+	$widget
+		->addItem($form)
+		->show();
 }
 
 require_once dirname(__FILE__).'/include/page_footer.php';

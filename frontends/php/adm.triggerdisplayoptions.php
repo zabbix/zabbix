@@ -108,7 +108,7 @@ else {
 	];
 }
 
-$view = new CView('administration.general.triggerDisplayOptions.edit', $data);
+$view = new CView('administration.general.trigger.options.edit', $data);
 $view->render();
 $view->show();
 

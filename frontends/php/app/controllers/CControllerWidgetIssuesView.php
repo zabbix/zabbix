@@ -40,8 +40,8 @@ class CControllerWidgetIssuesView extends CController {
 			'groupids' => null,
 			'maintenance' => null,
 			'severity' => null,
-			'extAck' => 0,
-			'backUrl' => 'zabbix.php?action=dashboard.view'
+			'trigger_name' => '',
+			'extAck' => 0
 		];
 
 		if (CProfile::get('web.dashconf.filter.enable', 0) == 1) {
@@ -96,6 +96,7 @@ class CControllerWidgetIssuesView extends CController {
 			$severity = CProfile::get('web.dashconf.triggers.severity', null);
 			$filter['severity'] = zbx_empty($severity) ? null : explode(';', $severity);
 			$filter['severity'] = zbx_toHash($filter['severity']);
+			$filter['trigger_name'] = CProfile::get('web.dashconf.triggers.name', '');
 
 			$config = select_config();
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;

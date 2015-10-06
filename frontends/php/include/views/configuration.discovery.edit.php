@@ -49,36 +49,39 @@ foreach ($this->data['proxies'] as $proxy) {
 $discoveryFormList
 	->addRow(_('Discovery by proxy'), $proxyComboBox)
 	->addRow(_('IP range'),
-		(new CTextBox('iprange', $this->data['drule']['iprange']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		(new CTextArea('iprange', $this->data['drule']['iprange'], ['maxlength' => 2048]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
 	->addRow(_('Delay (in sec)'),
 		(new CNumericBox('delay', $this->data['drule']['delay'], 6))->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	);
 
-// append checks to form list
-$checkTable = (new CTable())
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-	->setFooter(
-		(new CRow(
-			(new CCol(
-				(new CButton('newCheck', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
-			))->setColSpan(2)
-		))->setId('dcheckListFooter')
-	);
-
 $discoveryFormList->addRow(_('Checks'),
-	(new CDiv($checkTable))
+	(new CDiv(
+		(new CTable())
+			->setAttribute('style', 'width: 100%;')
+			->setFooter(
+				(new CRow(
+					(new CCol(
+						(new CButton('newCheck', _('New')))->addClass(ZBX_STYLE_BTN_LINK)
+					))->setColSpan(2)
+				))->setId('dcheckListFooter')
+			)
+	))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->setId('dcheckList')
 );
 
 // append uniqueness criteria to form list
-$uniquenessCriteriaRadio = (new CRadioButtonList('uniqueness_criteria', $this->data['drule']['uniqueness_criteria']))
-	->addValue(SPACE._('IP address'), -1, true, zbx_formatDomId('uniqueness_criteria_ip'));
 $discoveryFormList->addRow(_('Device uniqueness criteria'),
-	(new CDiv($uniquenessCriteriaRadio))
+	(new CDiv(
+		(new CRadioButtonList('uniqueness_criteria', (int) $this->data['drule']['uniqueness_criteria']))
+			->makeVertical()
+			->addValue(_('IP address'), -1, zbx_formatDomId('uniqueness_criteria_ip'))
+	))
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setId('uniqList')
 );
 
 // append status to form list
@@ -97,7 +100,7 @@ if (isset($this->data['druleid']))
 	$discoveryTabs->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CSubmit('clone', _('Clone')),
+			new CButton('clone', _('Clone')),
 			new CButtonDelete(_('Delete discovery rule?'), url_param('form').url_param('druleid')),
 			new CButtonCancel()
 		]

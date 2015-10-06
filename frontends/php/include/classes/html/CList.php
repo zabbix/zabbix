@@ -42,8 +42,8 @@ class CList extends CTag {
 	}
 
 	public function prepareItem($value = null, $class = null, $id = null) {
-		if (!is_null($value)) {
-			$value = new CListItem($value, $class, $id);
+		if ($value !== null) {
+			$value = new CListItem($value);
 			if ($class !== null) {
 				$value->addClass($class);
 			}

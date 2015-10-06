@@ -57,6 +57,8 @@
 #include "valuecache.h"
 #include "setproctitle.h"
 
+#define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_server.conf"
+
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_server";
 const char	syslog_app_name[] = "zabbix_server";
@@ -73,6 +75,7 @@ const char	*help_message[] = {
 	"",
 	"Options:",
 	"  -c --config config-file               Absolute path to the configuration file",
+	"                                        (default: \"" DEFAULT_CONFIG_FILE "\")",
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
@@ -104,7 +107,7 @@ static struct zbx_option	longopts[] =
 };
 
 /* short options */
-static char	shortopts[] = "c:n:hVR:";
+static char	shortopts[] = "c:hVR:";
 
 /* end of COMMAND LINE OPTIONS */
 
@@ -516,7 +519,7 @@ static void	zbx_load_config(void)
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
-			PARM_OPT,	0,			4},
+			PARM_OPT,	0,			5},
 		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogFile",			&CONFIG_LOG_FILE,			TYPE_STRING,
@@ -678,7 +681,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = zbx_strdup(CONFIG_FILE, SYSCONFDIR "/zabbix_server.conf");
+		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* required for simple checks */
 	init_metrics();

@@ -94,7 +94,7 @@ $httpFormList->addRow(_('Agent'), $agentComboBox);
 
 $httpFormList->addRow(_('User agent string'),
 	(new CTextBox('agent_other', $this->data['agent_other']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-	false, 'row_agent_other'
+	'row_agent_other'
 );
 
 // append HTTP proxy to form list
@@ -164,7 +164,7 @@ $stepsTable = (new CTable())
 		(new CColHeader(_('Status codes')))
 			->addClass(ZBX_STYLE_NOWRAP)
 			->setWidth('90'),
-		(new CColHeader())->setWidth('50')
+		(new CColHeader(_('Action')))->setWidth('50')
 	]);
 
 $i = 1;
@@ -205,17 +205,17 @@ foreach ($this->data['steps'] as $stepid => $step) {
 	}
 
 	if ($this->data['templated']) {
-		$removeButton = '';
 		$dragHandler = '';
+		$removeButton = '';
 	}
 	else {
+		$dragHandler = (new CCol(
+			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
+		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
 		$removeButton = (new CButton('remove_'.$stepid, _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->onClick('javascript: removeStep(this);')
 			->setAttribute('remove_step', $stepid);
-		$dragHandler = (new CCol(
-			(new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)
-		))->addClass(ZBX_STYLE_TD_DRAG_ICON);
 	}
 
 	$stepsTable->addRow(
@@ -227,7 +227,7 @@ foreach ($this->data['steps'] as $stepid => $step) {
 			$url,
 			htmlspecialchars($step['required']),
 			$step['status_codes'],
-			$removeButton
+			(new CCol($removeButton))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
 			->setId('steps_'.$stepid)

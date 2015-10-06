@@ -190,7 +190,6 @@ elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	show_messages($result, _('History cleared'), _('Cannot clear history'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
-
 	if (hasRequest('update')) {
 		$action = AUDIT_ACTION_UPDATE;
 		$messageTrue = _('Web scenario updated');
@@ -205,7 +204,9 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	try {
 		DBstart();
 
-		if (!empty($_REQUEST['applicationid']) && !empty($_REQUEST['new_application'])) {
+		$new_application = getRequest('new_application');
+
+		if (!empty($_REQUEST['applicationid']) && $new_application) {
 			throw new Exception(_('Cannot create new application, web scenario is already assigned to application.'));
 		}
 
@@ -244,25 +245,35 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'headers' => getRequest('headers')
 		];
 
-		if (!empty($_REQUEST['new_application'])) {
+		if ($new_application) {
 			$exApp = API::Application()->get([
-				'output' => ['applicationid'],
+				'output' => ['applicationid', 'flags'],
 				'hostids' => $_REQUEST['hostid'],
-				'filter' => ['name' => $_REQUEST['new_application']]
+				'filter' => ['name' => $new_application]
 			]);
+
+			/*
+			 * If application exists and it is a discovered application, prevent adding it to web scenario. If it is
+			 * a normal application, assign it to web scenario. Otherwise create new application.
+			 */
 			if ($exApp) {
-				$httpTest['applicationid'] = $exApp[0]['applicationid'];
+				if ($exApp[0]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					throw new Exception(_s('Application "%1$s" already exists.', $new_application));
+				}
+				else {
+					$httpTest['applicationid'] = $exApp[0]['applicationid'];
+				}
 			}
 			else {
 				$result = API::Application()->create([
-					'name' => $_REQUEST['new_application'],
+					'name' => $new_application,
 					'hostid' => $_REQUEST['hostid']
 				]);
 				if ($result) {
 					$httpTest['applicationid'] = reset($result['applicationids']);
 				}
 				else {
-					throw new Exception(_s('Cannot add new application "%1$s".', $_REQUEST['new_application']));
+					throw new Exception(_s('Cannot add new application "%1$s".', $new_application));
 				}
 			}
 		}
@@ -484,12 +495,9 @@ if (isset($_REQUEST['form'])) {
 
 			if (!empty($dbTest)) {
 				if (!idcmp($data['httptestid'], $dbTest['httptestid'])) {
-					$data['templates'][] = (new CLink(
-						$dbTest['name'],
-						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid']))
-							->addClass('highlight')
-							->addClass('underline')
-							->addClass('weight_normal');
+					$data['templates'][] = new CLink($dbTest['name'],
+						'httpconf.php?form=update&httptestid='.$dbTest['httptestid'].'&hostid='.$dbTest['hostid']
+					);
 					$data['templates'][] = SPACE.'&rArr;'.SPACE;
 				}
 				$httpTestId = $dbTest['templateid'];
@@ -582,7 +590,12 @@ if (isset($_REQUEST['form'])) {
 
 	$data['application_list'] = [];
 	if (!empty($data['hostid'])) {
-		$dbApps = DBselect('SELECT a.applicationid,a.name FROM applications a WHERE a.hostid='.zbx_dbstr($data['hostid']));
+		$dbApps = DBselect(
+			'SELECT a.applicationid,a.name'.
+			' FROM applications a'.
+			' WHERE a.hostid='.zbx_dbstr($data['hostid']).
+				' AND a.flags='.ZBX_FLAG_DISCOVERY_NORMAL
+		);
 		while ($dbApp = DBfetch($dbApps)) {
 			$data['application_list'][$dbApp['applicationid']] = $dbApp['name'];
 		}

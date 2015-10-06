@@ -57,9 +57,9 @@ const char	*progname = NULL;
 
 /* default config file location */
 #ifdef _WINDOWS
-	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
+#	define DEFAULT_CONFIG_FILE	"C:\\zabbix_agentd.conf"
 #else
-	static char	DEFAULT_CONFIG_FILE[]	= SYSCONFDIR "/zabbix_agentd.conf";
+#	define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_agentd.conf"
 #endif
 
 /* application TITLE */
@@ -104,10 +104,13 @@ const char	*help_message[] = {
 	"",
 	"Options:",
 	"  -c --config config-file               Absolute path to the configuration file",
+	"                                        (default: \"" DEFAULT_CONFIG_FILE "\")",
 	"  -p --print                            Print known items and exit",
 	"  -t --test item-key                    Test specified item and exit",
 #ifdef _WINDOWS
-	"",
+	"  -m --multiple-agents                  For -i -d -s -x functions service name",
+	"                                        will include Hostname parameter",
+	"                                        specified in configuration file",
 	"Functions:",
 	"",
 	"  -i --install                          Install Zabbix agent as service",
@@ -115,8 +118,6 @@ const char	*help_message[] = {
 
 	"  -s --start                            Start Zabbix agent service",
 	"  -x --stop                             Stop Zabbix agent service",
-
-	"  -m --multiple-agents                  Service name will include hostname",
 #else
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
@@ -133,7 +134,11 @@ const char	*help_message[] = {
 	"  -h --help                             Display this help message",
 	"  -V --version                          Display version number",
 	"",
+#ifdef _WINDOWS
+	"Example: zabbix_agentd -c C:\\zabbix\\zabbix_agentd.conf",
+#else
 	"Example: zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf",
+#endif
 	NULL	/* end of text */
 };
 /* end of application HELP message */
@@ -434,14 +439,12 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 
 	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = DEFAULT_CONFIG_FILE;
+		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 out:
 	if (FAIL == ret)
 	{
 		zbx_free(TEST_METRIC);
-
-		if (DEFAULT_CONFIG_FILE != CONFIG_FILE)
-			zbx_free(CONFIG_FILE);
+		zbx_free(CONFIG_FILE);
 	}
 
 	return ret;
@@ -468,7 +471,7 @@ static void	set_defaults(void)
 
 		init_result(&result);
 
-		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND, &result) &&
+		if (SUCCEED == process(CONFIG_HOSTNAME_ITEM, PROCESS_LOCAL_COMMAND | PROCESS_WITH_ALIAS, &result) &&
 				NULL != (value = GET_STR_RESULT(&result)))
 		{
 			assert(*value);
@@ -671,7 +674,7 @@ static void	zbx_load_config(int requirement)
 		{"SourceIP",			&CONFIG_SOURCE_IP,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
-			PARM_OPT,	0,			4},
+			PARM_OPT,	0,			5},
 		{"StartAgents",			&CONFIG_PASSIVE_FORKS,			TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&CONFIG_REFRESH_ACTIVE_CHECKS,		TYPE_INT,

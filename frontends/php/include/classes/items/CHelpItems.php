@@ -141,6 +141,10 @@ class CHelpItems {
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
 				],
 				[
+					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+					'description' => _('Process CPU utilisation percentage. Returns float')
+				],
+				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 					'description' => _('Memory used by process in bytes. Returns integer')
 				],
@@ -158,7 +162,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'service.info[service,<param>]',
-					'description' => _('Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description')
+					'description' => _('Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown')
 				],
 				[
 					'key' => 'services[<type>,<state>,<exclude>]',
@@ -186,7 +190,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU utilisation in percent. Returns float')
+					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
@@ -419,6 +423,10 @@ class CHelpItems {
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
 				],
 				[
+					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+					'description' => _('Process CPU utilisation percentage. Returns float')
+				],
+				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
 					'description' => _('Memory used by process in bytes. Returns integer')
 				],
@@ -436,7 +444,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'service.info[service,<param>]',
-					'description' => _('Information about a service. Returns integer with param as state, startup; string with param as displayname, path, user; text with param as description')
+					'description' => _('Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown')
 				],
 				[
 					'key' => 'services[<type>,<state>,<exclude>]',
@@ -464,7 +472,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU utilisation in percent. Returns float')
+					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
@@ -605,7 +613,7 @@ class CHelpItems {
 			],
 			ITEM_TYPE_AGGREGATE => [
 				[
-					'key' => 'grpfunc[<group>,<key>,<func>,<param>]',
+					'key' => 'grpfunc[group,key,func,<param>]',
 					'description' => _('Aggregate checks do not require any agent running on a host being monitored. Zabbix server collects aggregate information by doing direct database queries. See Zabbix Manual.')
 				]
 			],
@@ -873,6 +881,14 @@ class CHelpItems {
 				[
 					'key' => 'zabbix[history_uint]',
 					'description' => _('Number of values stored in table HISTORY_UINT.')
+				],
+				[
+					'key' => 'zabbix[host,,items]',
+					'description' => _('Number of enabled items on the host.')
+				],
+				[
+					'key' => 'zabbix[host,,items_unsupported]',
+					'description' => _('Number of unsupported items on the host.')
 				],
 				[
 					'key' => 'zabbix[host,,maintenance]',

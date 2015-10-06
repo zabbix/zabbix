@@ -593,27 +593,42 @@ class CHttpTest extends CApiService {
 	 * @param array $httpTests
 	 */
 	protected function checkApplicationHost(array $httpTests) {
-		$appIds = zbx_objectValues($httpTests, 'applicationid');
-		$appIds = zbx_toHash($appIds);
-		unset($appIds['0']);
+		// applications containing 0 in ID, will be removed from web scenario
+		foreach ($httpTests as $httpTestId => $httpTest) {
+			if (array_key_exists('applicationid', $httpTest) && $httpTest['applicationid'] == 0) {
+				unset($httpTests[$httpTestId]);
+			}
+		}
 
-		if (!empty($appIds)) {
-			$appHostIds = [];
+		$applicationids = zbx_objectValues($httpTests, 'applicationid');
 
-			$dbCursor = DBselect(
-				'SELECT a.hostid,a.applicationid'.
-				' FROM applications a'.
-				' WHERE '.dbConditionInt('a.applicationid', $appIds)
-			);
-			while ($dbApp = DBfetch($dbCursor)) {
-				$appHostIds[$dbApp['applicationid']] = $dbApp['hostid'];
+		if ($applicationids) {
+			$applications = API::getApiService()->select('applications', [
+				'output' => ['applicationid', 'hostid', 'name', 'flags'],
+				'applicationids' => $applicationids,
+				'preservekeys' => true
+			]);
+
+			// check if applications exist and are normal applications
+			foreach ($applicationids as $applicationid) {
+				if (!array_key_exists($applicationid, $applications)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
+				elseif ($applications[$applicationid]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Cannot add a discovered application "%1$s" to a web scenario.',
+						$applications[$applicationid]['name']
+					));
+				}
 			}
 
 			foreach ($httpTests as $httpTest) {
-				if (isset($httpTest['applicationid'])) {
-					if (!idcmp($appHostIds[$httpTest['applicationid']], $httpTest['hostid'])) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _('The web scenario application belongs to a different host than the web scenario host.'));
-					}
+				if (!idcmp($applications[$httpTest['applicationid']]['hostid'], $httpTest['hostid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('The web scenario application belongs to a different host than the web scenario host.')
+					);
 				}
 			}
 		}
