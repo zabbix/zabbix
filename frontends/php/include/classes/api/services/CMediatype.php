@@ -172,36 +172,194 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can create media types.'));
 		}
 
-		$mediatype_db_fields = ['type' => null, 'description' => null];
+		if (!$mediatypes) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		$required_fields = ['type', 'description'];
 
 		foreach ($mediatypes as $mediatype) {
-			if (!check_db_fields($mediatype_db_fields, $mediatype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
+			if (!is_array($mediatype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 			}
 
-			$mediatype_exists = API::getApiService()->select('media_type', [
+			// Check required parameters.
+			$missing_keys = checkRequiredKeys($mediatype, $required_fields);
+			if ($missing_keys) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Media type is missing parameters: %1$s', implode(', ', $missing_keys))
+				);
+			}
+			else {
+				foreach ($required_fields as $field) {
+					if ($mediatype[$field] === '' || $mediatype[$field] === null) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Field "%1$s" is missing a value for media type "%2$s".',
+							$field,
+							$mediatype['description']
+						));
+					}
+				}
+			}
+		}
+
+		// Check for duplicate names.
+		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'description');
+		if ($duplicate_name) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate "description" value "%1$s" for media type.', $duplicate_name['description'])
+			);
+		}
+
+		foreach ($mediatypes as $mediatype) {
+			// Check if media type already exists.
+			$db_mediatype = API::getApiService()->select('media_type', [
 				'output' => ['description'],
-				'filter' => ['description' => $mediatype['description']]
+				'filter' => ['description' => $mediatype['description']],
+				'limit' => 1
 			]);
 
-			if ($mediatype_exists) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.',
-					$mediatype['description']
-				));
+			if ($db_mediatype) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Media type "%1$s" already exists.', $mediatype['description'])
+				);
 			}
 
-			if (($mediatype['type'] == MEDIA_TYPE_JABBER || $mediatype['type'] == MEDIA_TYPE_EZ_TEXTING
-						|| ($mediatype['type'] == MEDIA_TYPE_EMAIL
-						&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL))
-					&& (!array_key_exists('passwd', $mediatype) || $mediatype['passwd'] === '')) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
+			// Check additional fields and values depeding on type.
+			$this->checkRequiredFieldsByType($mediatype);
+
+			switch ($mediatype['type']) {
+				case MEDIA_TYPE_EZ_TEXTING:
+					$message_text_limit_validator = new CLimitedSetValidator([
+						'values' => [EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA]
+					]);
+
+					if (!$message_text_limit_validator->validate($mediatype['exec_path'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+							$mediatype['exec_path'],
+							'exec_path',
+							$mediatype['description']
+						));
+					}
+					break;
+
+				case MEDIA_TYPE_EMAIL:
+					if (array_key_exists('smtp_authentication', $mediatype)) {
+						$smtp_authentication_validator = new CLimitedSetValidator([
+							'values' => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL]
+						]);
+
+						if (!$smtp_authentication_validator->validate($mediatype['smtp_authentication'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['smtp_authentication'],
+								'smtp_authentication',
+								$mediatype['description']
+							));
+						}
+
+						if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
+								&& (!array_key_exists('passwd', $mediatype) || $mediatype['passwd'] === ''
+									|| $mediatype['passwd'] === null)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Password required for media type "%1$s".', $mediatype['description'])
+							);
+						}
+					}
+
+					// Validate optional 'smtp_port' field.
+					if (array_key_exists('smtp_port', $mediatype) && !validatePortNumber($mediatype['smtp_port'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+							$mediatype['smtp_port'],
+							'smtp_port',
+							$mediatype['description']
+						));
+					}
+
+					// Validate optional field 'smtp_security'.
+					if (array_key_exists('smtp_security', $mediatype)) {
+						$smtp_security_validator = new CLimitedSetValidator([
+							'values' => [
+								SMTP_CONNECTION_SECURITY_NONE,
+								SMTP_CONNECTION_SECURITY_STARTTLS,
+								SMTP_CONNECTION_SECURITY_SSL_TLS
+							]
+						]);
+
+						if (!$smtp_security_validator->validate($mediatype['smtp_security'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['smtp_security'],
+								'smtp_security',
+								$mediatype['description']
+							));
+						}
+					}
+
+					// Validate optional field 'smtp_verify_peer'.
+					if (array_key_exists('smtp_verify_peer', $mediatype)) {
+						$smtp_verify_peer_validator = new CLimitedSetValidator([
+							'values' => [0, 1]
+						]);
+
+						if (!$smtp_verify_peer_validator->validate($mediatype['smtp_verify_peer'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['smtp_verify_peer'],
+								'smtp_verify_peer',
+								$mediatype['description']
+							));
+						}
+					}
+
+					// Validate optional field 'smtp_verify_host'.
+					if (array_key_exists('smtp_verify_host', $mediatype)) {
+						$smtp_verify_host_validator = new CLimitedSetValidator([
+							'values' => [0, 1]
+						]);
+
+						if (!$smtp_verify_host_validator->validate($mediatype['smtp_verify_host'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['smtp_verify_host'],
+								'smtp_verify_host',
+								$mediatype['description']
+							));
+						}
+					}
+					break;
+
+				case MEDIA_TYPE_EXEC:
+					if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
+						$pos = strrpos($mediatype['exec_params'], "\n");
+
+						if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
+								$mediatype['exec_params'],
+								$mediatype['description']
+							));
+						}
+					}
+					break;
 			}
 
-			if ($mediatype['type'] == MEDIA_TYPE_EMAIL && array_key_exists('smtp_port', $mediatype)
-					&& !validatePortNumber($mediatype['smtp_port'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect media type port "%1$s" provided.',
-					$mediatype['smtp_port']
-				));
+			// Validate optional 'status' field.
+			if (array_key_exists('status', $mediatype)) {
+				$status_validator = new CLimitedSetValidator([
+					'values' => [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED]
+				]);
+
+				if (!$status_validator->validate($mediatype['status'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+						$mediatype['status'],
+						'status',
+						$mediatype['description']
+					));
+				}
 			}
 		}
 	}
@@ -218,41 +376,281 @@ class CMediatype extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('Only Super Admins can edit media types.'));
 		}
 
-		$mediatype_db_fields = ['mediatypeid' => null];
+		if (!$mediatypes) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('Empty input parameter.'));
+		}
+
+		// Validate given IDs.
+		$this->checkObjectIds($mediatypes, 'mediatypeid',
+			_('No "%1$s" given for media type.'),
+			_('Empty media type ID.'),
+			_('Incorrect media type ID.')
+		);
+
+		$mediatypeids = zbx_objectValues($mediatypes, 'mediatypeid');
+
+		// Check value map names.
+		$db_mediatypes = API::getApiService()->select('media_type', [
+			'output' => ['mediatypeid', 'type', 'description', 'exec_path', 'smtp_authentication', 'status'],
+			'mediatypeids' => $mediatypeids,
+			'preservekeys' => true
+		]);
+
+		$check_names = [];
 
 		foreach ($mediatypes as $mediatype) {
-			if (!check_db_fields($mediatype_db_fields, $mediatype)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Wrong fields for media type.'));
+			// Check if this media type exists.
+			if (!array_key_exists($mediatype['mediatypeid'], $db_mediatypes)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 
+			// Validate "description" field.
 			if (array_key_exists('description', $mediatype)) {
-				$existMediatypes = API::getApiService()->select('media_type', [
-					'output' => ['mediatypeid'],
-					'filter' => ['description' => $mediatype['description']],
-					'preservekeys' => true
+				if (is_array($mediatype['description'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
+				}
+				elseif ($mediatype['description'] === '' || $mediatype['description'] === null
+						|| $mediatype['description'] === false) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', 'description', _('cannot be empty'))
+					);
+				}
+
+				$check_names[$mediatype['description']] = true;
+			}
+		}
+
+		if ($check_names) {
+			$db_mediatype_names = API::getApiService()->select('media_type', [
+				'output' => ['mediatypeid', 'description'],
+				'filter' => ['name' => array_keys($check_names)]
+			]);
+			$db_mediatype_names = zbx_toHash($db_mediatype_names, 'description');
+
+			foreach ($mediatypes as $mediatype) {
+				if (array_key_exists('description', $mediatype)
+						&& array_key_exists($mediatype['description'], $db_mediatype_names)
+						&& !idcmp($db_mediatype_names[$mediatype['description']]['mediatypeid'],
+							$mediatype['mediatypeid'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Media type "%1$s" already exists.', $mediatype['description'])
+					);
+				}
+			}
+		}
+
+		// Populate "description" field, if not set. Type field should not be populated at this point.
+		$mediatypes = $this->extendFromObjects(zbx_toHash($mediatypes, 'mediatypeid'), $db_mediatypes, ['description']);
+
+		$duplicate_name = CArrayHelper::findDuplicate($mediatypes, 'description');
+		if ($duplicate_name) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Duplicate "description" value "%1$s" for media type.', $duplicate_name['description'])
+			);
+		}
+
+		foreach ($mediatypes as $mediatype) {
+			$db_mediatype = $db_mediatypes[$mediatype['mediatypeid']];
+
+			// Recheck mandatory fields if type changed.
+			if (array_key_exists('type', $mediatype) && $db_mediatype['type'] != $mediatype['type']) {
+				$this->checkRequiredFieldsByType($mediatype);
+			}
+			else {
+				$optional_fields_by_type = [
+					MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
+					MEDIA_TYPE_EXEC => ['exec_path'],
+					MEDIA_TYPE_SMS => ['gsm_modem'],
+					MEDIA_TYPE_JABBER => ['username'],
+					MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username']
+				];
+
+				foreach ($optional_fields_by_type[$db_mediatype['type']] as $field) {
+					if (array_key_exists($field, $mediatype)
+							&& ($mediatype[$field] === '' || $mediatype[$field] === null)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Field "%1$s" is missing a value for media type "%2$s".',
+							$field,
+							$mediatype['description']
+						));
+					}
+				}
+
+				// Populate "type" field from DB, since it is not set and is required for further validation.
+				$mediatype['type'] = $db_mediatype['type'];
+			}
+
+			switch ($mediatype['type']) {
+				case MEDIA_TYPE_EZ_TEXTING:
+					if (array_key_exists('exec_path', $mediatype)) {
+						$message_text_limit_validator = new CLimitedSetValidator([
+							'values' => [EZ_TEXTING_LIMIT_USA, EZ_TEXTING_LIMIT_CANADA]
+						]);
+
+						if ($db_mediatype['exec_path'] !== $mediatype['exec_path']
+								&& !$message_text_limit_validator->validate($mediatype['exec_path'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['exec_path'],
+								'exec_path',
+								$mediatype['description']
+							));
+						}
+					}
+					break;
+
+				case MEDIA_TYPE_EMAIL:
+					if (array_key_exists('smtp_authentication', $mediatype)) {
+						$smtp_authentication_validator = new CLimitedSetValidator([
+							'values' => [SMTP_AUTHENTICATION_NONE, SMTP_AUTHENTICATION_NORMAL]
+						]);
+
+						if (!$smtp_authentication_validator->validate($mediatype['smtp_authentication'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['smtp_authentication'],
+								'smtp_authentication',
+								$mediatype['description']
+							));
+						}
+
+						if ($mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL) {
+							// Check 'passwd' field when auth is set to 'normal' manually.
+
+							if ($db_mediatype['smtp_authentication'] == $mediatype['smtp_authentication']
+									&& array_key_exists('passwd', $mediatype)
+									&& ($mediatype['passwd'] === '' || $mediatype['passwd'] === null)) {
+								/*
+								 * When auth is set to 'normal', check if password field is set manually.
+								 * Otherwise the password is not changed.
+								 */
+
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Password required for media type "%1$s".', $mediatype['description'])
+								);
+							}
+							elseif ($db_mediatype['smtp_authentication'] != $mediatype['smtp_authentication']
+									&& (!array_key_exists('passwd', $mediatype)
+										|| $mediatype['passwd'] === '' || $mediatype['passwd'] === null)) {
+								/*
+								 * First check if 'passwd' field exists when authentication is changed from
+								 * 'none' to 'normal' and then validate it.
+								 */
+
+								self::exception(ZBX_API_ERROR_PARAMETERS,
+									_s('Password required for media type "%1$s".', $mediatype['description'])
+								);
+							}
+						}
+					}
+					elseif ($db_mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
+							&& array_key_exists('passwd', $mediatype)
+							&& ($mediatype['passwd'] === '' || $mediatype['passwd'] === null)) {
+						// Check 'passwd' field depeding on authentication set from DB and when it is set to 'normal'.
+
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Password required for media type "%1$s".', $mediatype['description'])
+						);
+					}
+
+					// Validate optional 'smtp_port' field.
+					if (array_key_exists('smtp_port', $mediatype)
+							&& $db_mediatype['smtp_port'] != $mediatype['smtp_port']
+							&& !validatePortNumber($mediatype['smtp_port'])) {
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+							$mediatype['smtp_port'],
+							'smtp_port',
+							$mediatype['description']
+						));
+					}
+
+					// Validate optional field 'smtp_security'.
+					if (array_key_exists('smtp_security', $mediatype)) {
+						$smtp_security_validator = new CLimitedSetValidator([
+							'values' => [
+								SMTP_CONNECTION_SECURITY_NONE,
+								SMTP_CONNECTION_SECURITY_STARTTLS,
+								SMTP_CONNECTION_SECURITY_SSL_TLS
+							]
+						]);
+
+						if (!$smtp_security_validator->validate($mediatype['smtp_security'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['smtp_security'],
+								'smtp_security',
+								$mediatype['description']
+							));
+						}
+					}
+
+					// Validate optional field 'smtp_verify_peer'.
+					if (array_key_exists('smtp_verify_peer', $mediatype)
+							&& $db_mediatype['smtp_verify_peer'] != $mediatype['smtp_verify_peer']) {
+						$smtp_verify_peer_validator = new CLimitedSetValidator([
+							'values' => [0, 1]
+						]);
+
+						if (!$smtp_verify_peer_validator->validate($mediatype['smtp_verify_peer'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['smtp_verify_peer'],
+								'smtp_verify_peer',
+								$mediatype['description']
+							));
+						}
+					}
+
+					// Validate optional field 'smtp_verify_host'.
+					if (array_key_exists('smtp_verify_host', $mediatype)
+							&& $db_mediatype['smtp_verify_host'] != $mediatype['smtp_verify_host']) {
+						$smtp_verify_host_validator = new CLimitedSetValidator([
+							'values' => [0, 1]
+						]);
+
+						if (!$smtp_verify_host_validator->validate($mediatype['smtp_verify_host'])) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+								$mediatype['smtp_verify_host'],
+								'smtp_verify_host',
+								$mediatype['description']
+							));
+						}
+					}
+					break;
+
+				case MEDIA_TYPE_EXEC:
+					if (array_key_exists('exec_params', $mediatype) && $mediatype['exec_params'] !== '') {
+						$pos = strrpos($mediatype['exec_params'], "\n");
+
+						if ($pos === false || strlen($mediatype['exec_params']) != $pos + 1) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+								'Script parameters "%1$s" are missing the last new line feed for media type "%2$s".',
+								$mediatype['exec_params'],
+								$mediatype['description']
+							));
+						}
+					}
+					break;
+			}
+
+			// Validate optional 'status' field and only when status is changed.
+			if (array_key_exists('status', $mediatype) && $db_mediatype['status'] != $mediatype['status']) {
+				$status_validator = new CLimitedSetValidator([
+					'values' => [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED]
 				]);
 
-				$existMediatype = reset($existMediatypes);
-			}
-
-			if ($existMediatype && bccomp($existMediatype['mediatypeid'], $mediatype['mediatypeid']) != 0) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Media type "%1$s" already exists.',
-					$mediatype['description']
-				));
-			}
-
-			if (($mediatype['type'] == MEDIA_TYPE_JABBER || $mediatype['type'] == MEDIA_TYPE_EZ_TEXTING
-						|| ($mediatype['type'] == MEDIA_TYPE_EMAIL
-						&& $mediatype['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL))
-					&& (!array_key_exists('passwd', $mediatype) || $mediatype['passwd'] === '')) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _('Password required for media type.'));
-			}
-
-			if ($mediatype['type'] == MEDIA_TYPE_EMAIL && array_key_exists('smtp_port', $mediatype)
-					&& !validatePortNumber($mediatype['smtp_port'])) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect media type port "%1$s" provided.',
-					$mediatype['smtp_port']
-				));
+				if (!$status_validator->validate($mediatype['status'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+						'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+						$mediatype['status'],
+						'status',
+						$mediatype['description']
+					));
+				}
 			}
 		}
 	}
@@ -272,6 +670,7 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
 	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
 	 * @param string	$mediatypes['exec_path']			script name/message text limit
+	 * @param string	$mediatypes['exec_params']			script parameters
 	 * @param string	$mediatypes['gsm_modem']			GSM modem
 	 * @param string	$mediatypes['username']				username
 	 * @param string	$mediatypes['passwd']				password
@@ -305,6 +704,7 @@ class CMediatype extends CApiService {
 	 * @param int		$mediatypes['smtp_verify_host']		SMTP verify host
 	 * @param int		$mediatypes['smtp_authentication']	SMTP authentication
 	 * @param string	$mediatypes['exec_path']			script name/message text limit
+	 * @param string	$mediatypes['exec_params']			script parameters
 	 * @param string	$mediatypes['gsm_modem']			GSM modem
 	 * @param string	$mediatypes['username']				username
 	 * @param string	$mediatypes['passwd']				password
@@ -361,6 +761,53 @@ class CMediatype extends CApiService {
 		DB::delete('media_type', ['mediatypeid' => $mediatypeids]);
 
 		return ['mediatypeids' => $mediatypeids];
+	}
+
+	/**
+	 * Check required fields by type. Values for fields must not be empty.
+	 *
+	 * @param array		$mediatype							An array of media type data.
+	 * @param string	$mediatype['description']			Name of the media type.
+	 * @param string	$mediatype['type']					E-mail, Script, SMS, Jabber and Ez Texting.
+	 *
+	 * @throws APIException if the input is invalid.
+	 */
+	protected function checkRequiredFieldsByType(array $mediatype) {
+		$type_validator = new CLimitedSetValidator([
+			'values' => array_keys(media_type2str())
+		]);
+
+		if (!$type_validator->validate($mediatype['type'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+				'Incorrect value "%1$s" in field "%2$s" for media type "%3$s".',
+				$mediatype['type'],
+				'type',
+				$mediatype['description']
+			));
+		}
+
+		$required_fields_by_type = [
+			MEDIA_TYPE_EMAIL => ['smtp_server', 'smtp_helo', 'smtp_email'],
+			MEDIA_TYPE_EXEC => ['exec_path'],
+			MEDIA_TYPE_SMS => ['gsm_modem'],
+			MEDIA_TYPE_JABBER => ['username'],
+			MEDIA_TYPE_EZ_TEXTING => ['exec_path', 'username']
+		];
+
+		foreach ($required_fields_by_type[$mediatype['type']] as $field) {
+			// Check if fields set on Create method. For update method they are checked when type is changed.
+			if (!array_key_exists($field, $mediatype)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Field "%1$s" is required for media type "%2$s".', $field, $mediatype['description'])
+				);
+			}
+			elseif (array_key_exists($field, $mediatype)
+					&& ($mediatype[$field] === '' || $mediatype[$field] === null)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Field "%1$s" is missing a value for media type "%2$s".', $field, $mediatype['description'])
+				);
+			}
+		}
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

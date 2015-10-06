@@ -34,6 +34,8 @@ class CControllerMediatypeCreate extends CController {
 			'smtp_verify_host' =>		'db media_type.smtp_verify_host|in 0,1',
 			'smtp_authentication' =>	'db media_type.smtp_authentication|in '.SMTP_AUTHENTICATION_NONE.','.SMTP_AUTHENTICATION_NORMAL,
 			'exec_path' =>				'db media_type.exec_path',
+			'exec_params' =>			'array media_type.exec_params',
+			'exec_params_count' =>		'int32',
 			'gsm_modem' =>				'db media_type.gsm_modem',
 			'jabber_username' =>		'db media_type.username',
 			'eztext_username' =>		'db media_type.username',
@@ -52,6 +54,7 @@ class CControllerMediatypeCreate extends CController {
 					$response->setMessageError(_('Cannot add media type'));
 					$this->setResponse($response);
 					break;
+
 				case self::VALIDATION_FATAL_ERROR:
 					$this->setResponse(new CControllerResponseFatal());
 					break;
@@ -70,30 +73,46 @@ class CControllerMediatypeCreate extends CController {
 
 		$this->getInputs($mediatype, ['type', 'description', 'status']);
 
-		switch($mediatype['type']) {
+		switch ($mediatype['type']) {
 			case MEDIA_TYPE_EMAIL:
-				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email',
-					'smtp_security', 'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication',
-					'passwd'
+				$this->getInputs($mediatype, ['smtp_server', 'smtp_port', 'smtp_helo', 'smtp_email', 'smtp_security',
+					'smtp_verify_peer', 'smtp_verify_host', 'smtp_authentication', 'passwd'
 				]);
+
 				if ($this->hasInput('smtp_username')) {
 					$mediatype['username'] = $this->getInput('smtp_username');
 				}
 				break;
+
 			case MEDIA_TYPE_EXEC:
 				$this->getInputs($mediatype, ['exec_path']);
+
+				$mediatype['exec_params'] = '';
+
+				if ($this->hasInput('exec_params')) {
+					$exec_params = zbx_objectValues($this->getInput('exec_params'), 'exec_param');
+
+					foreach ($exec_params as $exec_param) {
+						$mediatype['exec_params'] .= $exec_param."\n";
+					}
+				}
 				break;
+
 			case MEDIA_TYPE_SMS:
 				$this->getInputs($mediatype, ['gsm_modem']);
 				break;
+
 			case MEDIA_TYPE_JABBER:
 				$this->getInputs($mediatype, ['passwd']);
+
 				if ($this->hasInput('jabber_username')) {
 					$mediatype['username'] = $this->getInput('jabber_username');
 				}
 				break;
+
 			case MEDIA_TYPE_EZ_TEXTING:
 				$this->getInputs($mediatype, ['passwd', 'exec_path']);
+
 				if ($this->hasInput('eztext_username')) {
 					$mediatype['username'] = $this->getInput('eztext_username');
 				}
