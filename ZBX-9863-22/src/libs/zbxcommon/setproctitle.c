@@ -64,7 +64,7 @@ static size_t	ps_buf_size = PS_BUF_SIZE, ps_buf_size_msg = PS_BUF_SIZE;
  *                                                                            *
  ******************************************************************************/
 #if defined(PS_OVERWRITE_ARGV)
-char **	setproctitle_save_env(int argc, char **argv)
+char	**setproctitle_save_env(int argc, char **argv)
 {
 	int	i = 0;
 	char	*arg_next = NULL;
@@ -159,7 +159,7 @@ char **	setproctitle_save_env(int argc, char **argv)
 	return argv_int;
 }
 #elif defined(PS_PSTAT_ARGV)
-char **	setproctitle_save_env(int argc, char **argv)
+char	**setproctitle_save_env(int argc, char **argv)
 {
 	size_t	len0;
 
