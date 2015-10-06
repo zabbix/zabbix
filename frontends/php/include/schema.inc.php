@@ -1453,6 +1453,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'exec_params' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
 		],
 	],
 	'users' => [
