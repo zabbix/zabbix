@@ -557,7 +557,7 @@ class CUser extends CApiService {
 		DB::delete('profiles', ['userid' => $userids]);
 		DB::delete('users_groups', ['userid' => $userids]);
 		DB::delete('users', ['userid' => $userids]);
-		disableActionsWithoutOperations(zbx_objectValues($del_operations, 'actionid'));
+		$this->disableActionsWithoutOperations(zbx_objectValues($del_operations, 'actionid'));
 
 		return ['userids' => $userids];
 	}
@@ -1310,6 +1310,41 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Cannot delete Zabbix internal user "%1$s", try disabling that user.', ZBX_GUEST_USER)
 			);
+		}
+	}
+
+	/**
+	 * Disable actions that do not have operations.
+	 */
+	protected function disableActionsWithoutOperations(array $actionids) {
+		$actions = DBFetchArray(DBselect(
+			'SELECT DISTINCT a.actionid'.
+			' FROM actions a'.
+			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'.
+			($actionids ? ' AND '.dbConditionInt('a.actionid', $actionids) : '')
+		));
+
+		$this->disableActions(zbx_objectValues($actions, 'actionid'));
+	}
+
+	/**
+	 * Disable actions.
+	 *
+	 * @param array $actionids
+	 */
+	protected function disableActions(array $actionids) {
+		if ($actionids) {
+			$update = [
+				'values' => ['status' => ACTION_STATUS_DISABLED],
+				'where' => ['actionid' => $actionids]
+			];
+			DB::update('actions', $update);
+
+			foreach($actionids as $actionid) {
+				add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
+					_('Action disabled due to deletion of user'), null
+				);
+			}
 		}
 	}
 }

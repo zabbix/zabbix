@@ -1383,36 +1383,3 @@ function eventType($type = null) {
 		return _('Unknown');
 	}
 }
-
-/**
- * Disable actions that do not have operations.
- */
-function disableActionsWithoutOperations(array $actionids) {
-	$actions = DBFetchArray(DBselect(
-		'SELECT DISTINCT a.actionid'.
-		' FROM actions a'.
-		' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'.
-		($actionids ? ' AND '.dbConditionInt('a.actionid', $actionids) : '')
-	));
-
-	disableActions(zbx_objectValues($actions, 'actionid'));
-}
-
-/**
- * Disable actions.
- *
- * @param array $actionids
- */
-function disableActions(array $actionids) {
-	if ($actionids) {
-		$update = [
-			'values' => ['status' => ACTION_STATUS_DISABLED],
-			'where' => ['actionid' => $actionids]
-		];
-		DB::update('actions', $update);
-
-		foreach($actionids as $actionid) {
-			add_audit_ext(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '', '', null, null);
-		}
-	}
-}
