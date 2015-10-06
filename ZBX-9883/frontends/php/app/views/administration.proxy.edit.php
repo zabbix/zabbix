@@ -25,7 +25,6 @@ $widget = (new CWidget())->setTitle(_('Proxies'));
 
 $proxyForm = (new CForm())
 	->setId('proxyForm')
-	->setName('proxyForm')
 	->addVar('proxyid', $data['proxyid']);
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
