@@ -412,6 +412,35 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Extract macros from a trigger function.
+	 *
+	 * @param string $function	a trigger function, for example 'last({$LAST})'
+	 * @param array  $types		the types of macros (see extractMacros() for more details)
+	 *
+	 * @return array			see extractMacros() for more details
+	 */
+	protected function extractFunctionMacros($function, array $types) {
+		$function_parser = new CFunctionParser();
+
+		$function_parameters = [];
+		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
+			foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
+				switch ($param_raw['type']) {
+					case CFunctionParser::PARAM_UNQUOTED:
+						$function_parameters[] = $param_raw['raw'];
+						break;
+
+					case CFunctionParser::PARAM_QUOTED:
+						$function_parameters[] = CFunctionParser::unquoteParam($param_raw['raw']);
+						break;
+				}
+			}
+		}
+
+		return $this->extractMacros($function_parameters, $types);
+	}
+
+	/**
 	 * Resolves macros in the item key parameters.
 	 *
 	 * @param string $key_chain		an item key chain
@@ -470,6 +499,52 @@ class CMacrosResolverGeneral {
 		}
 
 		return $key;
+	}
+
+	/**
+	 * Resolves macros in the trigger function parameters.
+	 *
+	 * @param string $function	a trigger function
+	 * @param array  $macros	the list of macros (['{<MACRO>}' => '<value>', ...])
+	 * @param array  $types		the types of macros (see getMacroPositions() for more details)
+	 *
+	 * @return string
+	 */
+	protected function resolveFunctionMacros($function, array $macros, array $types) {
+		$function_parser = new CFunctionParser();
+
+		if ($function_parser->parse($function) == CParser::PARSE_SUCCESS) {
+			$params_raw = $function_parser->getParamsRaw();
+			$function_chain = $params_raw['raw'];
+
+			foreach (array_reverse($params_raw['parameters']) as $param_raw) {
+				$param = $param_raw['raw'];
+				$forced = false;
+
+				switch ($param_raw['type']) {
+					case CFunctionParser::PARAM_QUOTED:
+						$param = CFunctionParser::unquoteParam($param);
+						$forced = true;
+						// break; is not missing here
+
+					case CFunctionParser::PARAM_UNQUOTED:
+						$matched_macros = $this->getMacroPositions($param, $types);
+
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
+						}
+
+						$param = quoteFunctionParam($param, $forced);
+						break;
+				}
+
+				$function_chain = substr_replace($function_chain, $param, $param_raw['pos'], strlen($param_raw['raw']));
+			}
+
+			$function = substr_replace($function, $function_chain, $params_raw['pos'], strlen($params_raw['raw']));
+		}
+
+		return $function;
 	}
 
 	/**

@@ -1223,6 +1223,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @param array  $functions
 	 * @param string $functions[n]['hostid']
+	 * @param string $functions[n]['function']
 	 * @param string $functions[n]['parameter']
 	 *
 	 * @return array
@@ -1238,7 +1239,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$usermacros = [];
 
 		foreach ($functions as $key => $function) {
-			$matched_macros = $this->extractMacros([$function['parameter_expanded']], $types);
+			$matched_macros = $this->extractFunctionMacros($function['function'].'('.$function['parameter'].')',
+				$types
+			);
 
 			if ($matched_macros['usermacros']) {
 				$usermacros[$key] = ['hostids' => [$function['hostid']], 'macros' => $matched_macros['usermacros']];
@@ -1254,15 +1257,10 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = $this->transformToPositionTypes($types);
 
 		// replace macros to value
-		foreach (array_keys($macro_values) as $key) {
-			$function = &$functions[$key];
-
-			$matched_macros = $this->getMacroPositions($function['parameter_expanded'], $types);
-
-			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-				$function['parameter_expanded'] =
-					substr_replace($function['parameter_expanded'], $macro_values[$key][$macro], $pos, strlen($macro));
-			}
+		foreach ($macro_values as $key => $macros) {
+			$function = $functions[$key]['function'].'('.$functions[$key]['parameter'].')';
+			$function = $this->resolveFunctionMacros($function, $macros, $types);
+			$functions[$key]['parameter_expanded'] = substr($function, strlen($functions[$key]['function']) + 1, -1);
 		}
 
 		return $functions;
