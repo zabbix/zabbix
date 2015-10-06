@@ -4836,7 +4836,8 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments: Items leave the queue only through this function. Pollers must   *
- *           always return the items they have taken using DCrequeue_items(). *
+ *           always return the items they have taken using DCrequeue_items()  *
+ *           or DCpoller_requeue_items().                                     *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)

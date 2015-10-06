@@ -2147,8 +2147,8 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
  ******************************************************************************/
-void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
-		AGENT_VALUE *values, size_t values_num, int *processed)
+void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALUE *values, size_t values_num,
+		int *processed)
 {
 	const char	*__function_name = "process_mass_data";
 	AGENT_RESULT	agent;
