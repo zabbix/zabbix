@@ -2274,12 +2274,15 @@ function convert($value) {
  * Quoting $param if it contains special characters.
  *
  * @param string $param
+ * @param bool   $forced
  *
  * @return string
  */
-function quoteFunctionParam($param) {
-	if (!isset($param[0]) || ($param[0] != '"' && false === strpos($param, ',') && false === strpos($param, ')'))) {
-		return $param;
+function quoteFunctionParam($param, $forced = false) {
+	if (!$forced) {
+		if (!isset($param[0]) || ($param[0] != '"' && false === strpbrk($param, ',)'))) {
+			return $param;
+		}
 	}
 
 	return '"'.str_replace('"', '\\"', $param).'"';
