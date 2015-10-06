@@ -117,11 +117,31 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 
 	$triggers = API::Trigger()->get([
 		'output' => ['triggerid'],
+		'selectHosts' => ['hostid', 'status'],
 		'triggerids' => $triggerIds,
-		'selectHosts' => ['status'],
 		'preservekeys' => true,
 		'nopermissions' => true
 	]);
+
+	// Find monitored hosts and get groups that those hosts belong to.
+	$monitored_hostids = [];
+
+	foreach ($triggers as $trigger) {
+		foreach ($trigger['hosts'] as $host) {
+			if ($host['status'] == HOST_STATUS_MONITORED) {
+				$monitored_hostids[$host['hostid']] = true;
+			}
+		}
+	}
+
+	if ($monitored_hostids) {
+		$monitored_hosts = API::Host()->get([
+			'output' => ['hostid'],
+			'selectGroups' => ['groupid'],
+			'hostids' => array_keys($monitored_hostids),
+			'preservekeys' => true
+		]);
+	}
 
 	foreach ($sysmap['selements'] as $elem) {
 		$back = get_png_by_selement($mapInfo[$elem['selementid']]);
@@ -174,18 +194,28 @@ function getActionMapBySysmap($sysmap, array $options = []) {
 				break;
 
 			case SYSMAP_ELEMENT_TYPE_TRIGGER:
-				$gotos['events'] = [
-					'triggerid' => $elem['elementid']
-				];
-
 				$gotos['showEvents'] = false;
+
 				if (isset($triggers[$elem['elementid']])) {
-					foreach ($triggers[$elem['elementid']]['hosts'] as $host) {
+					$trigger = $triggers[$elem['elementid']];
+
+					foreach ($trigger['hosts'] as $host) {
 						if ($host['status'] == HOST_STATUS_MONITORED) {
 							$gotos['showEvents'] = true;
+
+							// Pass a monitored 'hostid' and corresponding first 'groupid' to menu pop-up "Events" link.
+							$gotos['events']['hostid'] = $host['hostid'];
+							$gotos['events']['groupid'] = $monitored_hosts[$host['hostid']]['groups'][0]['groupid'];
 							break;
 						}
+						else {
+							// Unmonitored will have disabled "Events" link and there is no 'groupid' or 'hostid'.
+							$gotos['events']['hostid'] = 0;
+							$gotos['events']['groupid'] = 0;
+						}
 					}
+
+					$gotos['events']['triggerid'] = $elem['elementid'];
 				}
 				break;
 
@@ -957,21 +987,21 @@ function getSelementsInfo($sysmap, array $options = []) {
 		}
 	}
 
-	$monitoredHostIds = [];
-	foreach ($allHosts as $hostId => $host) {
+	$monitored_hostids = [];
+	foreach ($allHosts as $hostid => $host) {
 		if ($host['status'] == HOST_STATUS_MONITORED) {
-			$monitoredHostIds[$hostId] = $hostId;
+			$monitored_hostids[$hostid] = true;
 		}
 	}
 
 	// triggers from all hosts/hostgroups, skip dependent
-	if ($monitoredHostIds) {
+	if ($monitored_hostids) {
 		$triggersFromMonitoredHosts = API::Trigger()->get([
 			'output' => ['triggerid', 'status', 'value', 'priority', 'lastchange', 'description', 'expression'],
 			'selectHosts' => ['hostid'],
 			'selectItems' => ['itemid'],
 			'selectLastEvent' => ['acknowledged'],
-			'hostids' => $monitoredHostIds,
+			'hostids' => array_keys($monitored_hostids),
 			'filter' => ['state' => null],
 			'monitored' => true,
 			'skipDependent' => true,

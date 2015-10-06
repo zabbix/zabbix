@@ -321,7 +321,7 @@ static int	host_get_availability(const DC_HOST *dc_host, unsigned char type, zbx
 	return SUCCEED;
 }
 
-static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
+static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available)
 {
 	const char		*__function_name = "activate_host";
 
@@ -349,11 +349,13 @@ static void	activate_host(DC_ITEM *item, zbx_timespec_t *ts)
 		zabbix_log(LOG_LEVEL_WARNING, "enabling %s checks on host \"%s\": host became available",
 				zbx_agent_type_string(item->type), item->host.host);
 	}
+
+	*available = HOST_AVAILABLE_TRUE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error)
+static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, int *available, const char *error)
 {
 	const char		*__function_name = "deactivate_host";
 
@@ -363,6 +365,11 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 			__function_name, item->host.hostid, item->itemid, (int)item->type);
 
 	if (FAIL == host_get_availability(&item->host, item->type, &in))
+		goto out;
+
+	/* if the item is still flagged as unreachable while the host is reachable, */
+	/* it means that this is item rather than network failure                   */
+	if (0 == in.errors_from && 0 != item->unreachable)
 		goto out;
 
 	if (FAIL == DChost_deactivate(ts, &in, &out))
@@ -403,6 +410,8 @@ static void	deactivate_host(DC_ITEM *item, zbx_timespec_t *ts, const char *error
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() errors_from:%d available:%d", __function_name, out.errors_from,
 			out.available);
+
+	*available = HOST_AVAILABLE_FALSE;
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
@@ -480,7 +489,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
 	if (SUCCEED != res)
 	{
 		if (!ISSET_MSG(result))
-			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED));
+			SET_MSG_RESULT(result, zbx_strdup(NULL, ZBX_NOTSUPPORTED_MSG));
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Item [%s:%s] error: %s", item->host.host, item->key_orig, result->msg);
 	}
@@ -663,19 +672,14 @@ static int	get_values(unsigned char poller_type)
 			case SUCCEED:
 			case NOTSUPPORTED:
 			case AGENT_ERROR:
+			case TIMEOUT_ERROR:
 				if (HOST_AVAILABLE_TRUE != last_available)
-				{
-					activate_host(&items[i], &timespec);
-					last_available = HOST_AVAILABLE_TRUE;
-				}
+					activate_host(&items[i], &timespec, &last_available);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
 				if (HOST_AVAILABLE_FALSE != last_available)
-				{
-					deactivate_host(&items[i], &timespec, results[i].msg);
-					last_available = HOST_AVAILABLE_FALSE;
-				}
+					deactivate_host(&items[i], &timespec, &last_available, results[i].msg);
 				break;
 			case CONFIG_ERROR:
 				/* nothing to do */
@@ -715,7 +719,7 @@ static int	get_values(unsigned char poller_type)
 			}
 
 		}
-		else if (NOTSUPPORTED == errcodes[i] || AGENT_ERROR == errcodes[i] || CONFIG_ERROR == errcodes[i])
+		else if (HOST_AVAILABLE_FALSE != last_available)
 		{
 			items[i].state = ITEM_STATE_NOTSUPPORTED;
 			dc_add_history(items[i].itemid, items[i].value_type, items[i].flags, NULL, &timespec,
@@ -769,7 +773,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 {
 	int		nextcheck, sleeptime = -1, processed = 0, old_processed = 0;
 	double		sec, total_sec = 0.0, old_total_sec = 0.0;
-	time_t		last_stat_time;
+	time_t		last_stat_time, last_ipmi_host_check;
 	unsigned char	poller_type;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -788,7 +792,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		init_snmp(progname);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
-	last_stat_time = time(NULL);
+	last_stat_time = last_ipmi_host_check = time(NULL);
 
 	DBconnect(ZBX_DB_CONNECT_NORMAL);
 
@@ -804,7 +808,13 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		sec = zbx_time();
 		processed += get_values(poller_type);
 		total_sec += zbx_time() - sec;
-
+#ifdef HAVE_OPENIPMI
+		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
+		{
+			last_ipmi_host_check = time(NULL);
+			delete_inactive_ipmi_hosts(last_ipmi_host_check);
+		}
+#endif
 		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 

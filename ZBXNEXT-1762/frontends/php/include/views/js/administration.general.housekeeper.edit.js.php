@@ -137,8 +137,6 @@ $schema = DB::getSchema('config');
 				title: <?php echo CJs::encodeJson(_('Reset confirmation')); ?>,
 				close: function(){ jQuery(this).dialog('destroy'); }
 			});
-
-			jQuery('#dialog').dialog('widget').find('.ui-dialog-buttonset .ui-button:first').addClass('main');
 		});
 	});
 </script>

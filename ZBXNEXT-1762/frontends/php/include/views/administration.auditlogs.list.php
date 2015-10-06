@@ -26,7 +26,7 @@ $filterForm = new CFilter('web.auditlogs.filter.state');
 
 $filterColumn = new CFormList();
 $filterColumn->addRow(_('User'), [
-	(new CTextBox('alias', $this->data['alias']))->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+	(new CTextBox('alias', $this->data['alias']))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('btn1', _('Select')))
 		->addClass(ZBX_STYLE_BTN_GREY)

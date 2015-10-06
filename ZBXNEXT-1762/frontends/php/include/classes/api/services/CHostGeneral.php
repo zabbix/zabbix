@@ -333,7 +333,7 @@ abstract class CHostGeneral extends CHostBase {
 		$items = [
 			ZBX_FLAG_DISCOVERY_NORMAL => [],
 			ZBX_FLAG_DISCOVERY_RULE => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
 		while ($item = DBfetch($dbItems)) {
 			$items[$item['flags']][$item['itemid']] = [
@@ -377,18 +377,48 @@ abstract class CHostGeneral extends CHostBase {
 		}
 
 		if (!empty($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])) {
+			$item_prototypeids = array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]);
+
 			if ($clear) {
-				$result = API::Itemprototype()->delete(array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE]), true);
-				if (!$result) self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
+				// This will include deletion of linked application prototypes.
+				$result = API::Itemprototype()->delete($item_prototypeids, true);
+
+				if (!$result) {
+					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear item prototypes'));
+				}
 			}
-			else{
+			else {
 				DB::update('items', [
 					'values' => ['templateid' => 0],
-					'where' => ['itemid' => array_keys($items[ZBX_FLAG_DISCOVERY_PROTOTYPE])]
+					'where' => ['itemid' => $item_prototypeids]
 				]);
 
 				foreach ($items[ZBX_FLAG_DISCOVERY_PROTOTYPE] as $item) {
 					info(_s('Unlinked: Item prototype "%1$s" on "%2$s".', $item['name'], $item['host']));
+				}
+
+				/*
+				 * Convert templated application prototypes to normal application prototypes
+				 * who are linked to these item prototypes.
+				 */
+				$application_prototypes = DBfetchArray(DBselect(
+					'SELECT ap.application_prototypeid'.
+					' FROM application_prototype ap'.
+					' WHERE EXISTS ('.
+						'SELECT NULL'.
+						' FROM item_application_prototype iap'.
+						' WHERE '.dbConditionInt('iap.itemid', $item_prototypeids).
+							' AND iap.application_prototypeid=ap.application_prototypeid'.
+					')'
+				));
+
+				if ($application_prototypes) {
+					$application_prototypeids = zbx_objectValues($application_prototypes, 'application_prototypeid');
+
+					DB::update('application_prototype', [
+						'values' => ['templateid' => 0],
+						'where' => ['application_prototypeid' => $application_prototypeids]
+					]);
 				}
 			}
 		}
@@ -449,7 +479,7 @@ abstract class CHostGeneral extends CHostBase {
 		$dbGraphs = DBSelect($sql);
 		$graphs = [
 			ZBX_FLAG_DISCOVERY_NORMAL => [],
-			ZBX_FLAG_DISCOVERY_PROTOTYPE => [],
+			ZBX_FLAG_DISCOVERY_PROTOTYPE => []
 		];
 		while ($graph = DBfetch($dbGraphs)) {
 			$graphs[$graph['flags']][$graph['graphid']] = [
@@ -561,22 +591,63 @@ abstract class CHostGeneral extends CHostBase {
 			]);
 
 			if ($clear) {
-				// delete inherited applications that are no longer linked to any templates
+				// Delete inherited applications that are no longer linked to any templates and items.
+				$applicationids = zbx_objectValues($applicationTemplates, 'applicationid');
+
 				$applications = DBfetchArray(DBselect(
 					'SELECT a.applicationid'.
 					' FROM applications a'.
-						' LEFT JOIN application_template at ON a.applicationid=at.applicationid '.
-					' WHERE '.dbConditionInt('a.applicationid', zbx_objectValues($applicationTemplates, 'applicationid')).
-						' AND at.applicationid IS NULL'
+						' LEFT JOIN application_template at ON a.applicationid=at.applicationid'.
+					' WHERE '.dbConditionInt('a.applicationid', $applicationids).
+						' AND at.applicationid IS NULL'.
+						' AND a.applicationid NOT IN ('.
+							'SELECT ia.applicationid'.
+							' FROM items_applications ia'.
+							' WHERE '.dbConditionInt('ia.applicationid', $applicationids).
+						')'
 				));
 				$result = API::Application()->delete(zbx_objectValues($applications, 'applicationid'), true);
 				if (!$result) {
 					self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot unlink and clear applications.'));
 				}
 			}
-			else{
+			else {
 				foreach ($applicationTemplates as $application) {
 					info(_s('Unlinked: Application "%1$s" on "%2$s".', $application['name'], $application['host']));
+				}
+			}
+		}
+
+		/*
+		 * Process discovered applications when parent is a host, not template.
+		 * If a discovered application has no longer linked items, remove them.
+		 */
+		if ($targetids) {
+			$discovered_applications = API::Application()->get([
+				'output' => ['applicationid'],
+				'hostids' => $targetids,
+				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED],
+				'preservekeys' => true
+			]);
+
+			if ($discovered_applications) {
+				$discovered_applications = API::Application()->get([
+					'output' => ['applicationid'],
+					'selectItems' => ['itemid'],
+					'applicationids' => array_keys($discovered_applications),
+					'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
+				]);
+
+				$applications_to_delete = [];
+
+				foreach ($discovered_applications as $discovered_application) {
+					if (!$discovered_application['items']) {
+						$applications_to_delete[$discovered_application['applicationid']] = true;
+					}
+				}
+
+				if ($applications_to_delete) {
+					API::Application()->delete(array_keys($applications_to_delete), true);
 				}
 			}
 		}

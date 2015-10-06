@@ -45,6 +45,10 @@ static int	sync_in_progress = 0;
 #define ZBX_SNMP_OID_TYPE_DYNAMIC	1
 #define ZBX_SNMP_OID_TYPE_MACRO		2
 
+/* trigger is functional unless its expression contains disabled or not monitored items */
+#define TRIGGER_FUNCTIONAL_TRUE		0
+#define TRIGGER_FUNCTIONAL_FALSE	1
+
 typedef struct
 {
 	zbx_uint64_t	triggerid;
@@ -59,6 +63,7 @@ typedef struct
 	unsigned char	state;
 	unsigned char	locked;
 	unsigned char	status;
+	unsigned char	functional;	/* see TRIGGER_FUNCTIONAL_* defines */
 }
 ZBX_DC_TRIGGER;
 
@@ -108,6 +113,7 @@ typedef struct
 	unsigned char	location;
 	unsigned char	flags;
 	unsigned char	status;
+	unsigned char	unreachable;
 }
 ZBX_DC_ITEM;
 
@@ -387,6 +393,7 @@ typedef struct
 {
 	const char	*severity_name[TRIGGER_SEVERITY_COUNT];
 	zbx_uint64_t	discovery_groupid;
+	int		default_inventory_mode;
 	int		refresh_unsupported;
 	unsigned char	snmptrap_logging;
 	/* housekeeping related configuration data */
@@ -899,6 +906,8 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 
 			config->config->refresh_unsupported = DEFAULT_REFRESH_UNSUPPORTED;
 			config->config->discovery_groupid = 0;
+			config->config->snmptrap_logging = ZBX_SNMPTRAP_LOGGING_ENABLED;
+			config->config->default_inventory_mode = HOST_INVENTORY_DISABLED;
 
 			for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 				DCstrpool_replace(found, &config->config->severity_name[i], default_severity_names[i]);
@@ -942,6 +951,7 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 		config->config->refresh_unsupported = refresh_unsupported;
 		ZBX_STR2UINT64(config->config->discovery_groupid, row[1]);
 		config->config->snmptrap_logging = (unsigned char)atoi(row[2]);
+		config->config->default_inventory_mode = atoi(row[26]);
 
 		for (i = 0; TRIGGER_SEVERITY_COUNT > i; i++)
 			DCstrpool_replace(found, &config->config->severity_name[i], row[3 + i]);
@@ -1883,6 +1893,7 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			item->data_expected_from = now;
 			item->location = ZBX_LOC_NOWHERE;
 			old_poller_type = ZBX_NO_POLLER;
+			item->unreachable = 0;
 		}
 		else
 		{
@@ -1977,12 +1988,14 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type,
 							config->config->refresh_unsupported, NULL,
-							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
+							now - proxy_timediff);
+					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 				else
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16],
-							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
+							now - proxy_timediff);
+					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 			}
 		}
@@ -2475,6 +2488,9 @@ static void	DCsync_triggers(DB_RESULT trig_result)
 		}
 
 		trigger->topoindex = 1;
+
+		/* reset trigger functionality, it will be updated in DCsync_functions() */
+		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
 	}
 
 	/* remove deleted triggers from buffer */
@@ -2700,6 +2716,30 @@ static void	DCsync_functions(DB_RESULT result)
 		zbx_vector_ptr_uniq(&config->time_triggers[i], ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 	}
 
+	/* disable functionality for triggers with expression containing */
+	/* disabled or not monitored items                               */
+	for (i = 0; i < itemtrigs.values_num; i++)
+	{
+		trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[i].second;
+
+		if (TRIGGER_FUNCTIONAL_FALSE != trigger->functional)
+		{
+			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
+
+			if (ITEM_STATUS_DISABLED != item->status)
+			{
+				ZBX_DC_HOST	*host;
+
+				host = zbx_hashset_search(&config->hosts, &item->hostid);
+
+				if (HOST_STATUS_NOT_MONITORED != host->status)
+					continue;
+			}
+
+			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
+		}
+	}
+
 	/* update links from items to triggers */
 
 	zbx_vector_ptr_pair_sort(&itemtrigs, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -2855,7 +2895,7 @@ static DB_RESULT	DCsync_config_select()
 				"hk_events_discovery,hk_events_autoreg,hk_services_mode,"
 				"hk_services,hk_audit_mode,hk_audit,hk_sessions_mode,hk_sessions,"
 				"hk_history_mode,hk_history_global,hk_history,hk_trends_mode,"
-				"hk_trends_global,hk_trends"
+				"hk_trends_global,hk_trends,default_inventory_mode"
 			" from config");
 }
 
@@ -3402,6 +3442,7 @@ static int	__config_heap_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	if (SUCCEED != is_snmp_type(i1->type))
 	{
@@ -3428,6 +3469,7 @@ static int	__config_pinger_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
 
 	return 0;
@@ -3458,6 +3500,7 @@ static int	__config_java_elem_compare(const void *d1, const void *d2)
 	const ZBX_DC_ITEM		*i2 = (const ZBX_DC_ITEM *)e2->data;
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->nextcheck, i2->nextcheck);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->unreachable, i2->unreachable);
 
 	return __config_java_item_compare(i1, i2);
 }
@@ -3530,50 +3573,50 @@ void	init_configuration_cache()
 			CONFIG_TIMER_FORKS * sizeof(zbx_vector_ptr_t));
 	config->time_triggers = (zbx_vector_ptr_t *)(config + 1);
 
-#define	INIT_HASHSET_SIZE	1000	/* should be calculated dynamically based on config_size? */
+#define CREATE_HASHSET(hashset, hashset_size)									\
+														\
+	CREATE_HASHSET_EXT(hashset, hashset_size, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
 
-#define CREATE_HASHSET(hashset)	CREATE_HASHSET_EXT(hashset, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC)
+#define CREATE_HASHSET_EXT(hashset, hashset_size, hash_func, compare_func)					\
+														\
+	zbx_hashset_create_ext(&hashset, hashset_size, hash_func, compare_func, NULL,				\
+			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
-#define CREATE_HASHSET_EXT(hashset, hash_func, compare_func)								\
-															\
-	zbx_hashset_create_ext(&hashset, INIT_HASHSET_SIZE, hash_func, compare_func, NULL,				\
-				__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
+	CREATE_HASHSET(config->items, 100);
+	CREATE_HASHSET(config->numitems, 0);
+	CREATE_HASHSET(config->snmpitems, 0);
+	CREATE_HASHSET(config->ipmiitems, 0);
+	CREATE_HASHSET(config->flexitems, 0);
+	CREATE_HASHSET(config->trapitems, 0);
+	CREATE_HASHSET(config->logitems, 0);
+	CREATE_HASHSET(config->dbitems, 0);
+	CREATE_HASHSET(config->sshitems, 0);
+	CREATE_HASHSET(config->telnetitems, 0);
+	CREATE_HASHSET(config->simpleitems, 0);
+	CREATE_HASHSET(config->jmxitems, 0);
+	CREATE_HASHSET(config->calcitems, 0);
+	CREATE_HASHSET(config->deltaitems, 0);
+	CREATE_HASHSET(config->functions, 100);
+	CREATE_HASHSET(config->triggers, 100);
+	CREATE_HASHSET(config->trigdeps, 0);
+	CREATE_HASHSET(config->hosts, 10);
+	CREATE_HASHSET(config->proxies, 0);
+	CREATE_HASHSET(config->host_inventories, 0);
+	CREATE_HASHSET(config->ipmihosts, 0);
+	CREATE_HASHSET(config->htmpls, 0);
+	CREATE_HASHSET(config->gmacros, 0);
+	CREATE_HASHSET(config->hmacros, 0);
+	CREATE_HASHSET(config->interfaces, 10);
+	CREATE_HASHSET(config->interface_snmpitems, 0);
+	CREATE_HASHSET(config->expressions, 0);
 
-	CREATE_HASHSET(config->items);
-	CREATE_HASHSET(config->numitems);
-	CREATE_HASHSET(config->snmpitems);
-	CREATE_HASHSET(config->ipmiitems);
-	CREATE_HASHSET(config->flexitems);
-	CREATE_HASHSET(config->trapitems);
-	CREATE_HASHSET(config->logitems);
-	CREATE_HASHSET(config->dbitems);
-	CREATE_HASHSET(config->sshitems);
-	CREATE_HASHSET(config->telnetitems);
-	CREATE_HASHSET(config->simpleitems);
-	CREATE_HASHSET(config->jmxitems);
-	CREATE_HASHSET(config->calcitems);
-	CREATE_HASHSET(config->deltaitems);
-	CREATE_HASHSET(config->functions);
-	CREATE_HASHSET(config->triggers);
-	CREATE_HASHSET(config->trigdeps);
-	CREATE_HASHSET(config->hosts);
-	CREATE_HASHSET(config->proxies);
-	CREATE_HASHSET(config->host_inventories);
-	CREATE_HASHSET(config->ipmihosts);
-	CREATE_HASHSET(config->htmpls);
-	CREATE_HASHSET(config->gmacros);
-	CREATE_HASHSET(config->hmacros);
-	CREATE_HASHSET(config->interfaces);
-	CREATE_HASHSET(config->interface_snmpitems);
-	CREATE_HASHSET(config->expressions);
-
-	CREATE_HASHSET_EXT(config->items_hk, __config_item_hk_hash, __config_item_hk_compare);
-	CREATE_HASHSET_EXT(config->hosts_h, __config_host_h_hash, __config_host_h_compare);
-	CREATE_HASHSET_EXT(config->gmacros_m, __config_gmacro_m_hash, __config_gmacro_m_compare);
-	CREATE_HASHSET_EXT(config->hmacros_hm, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
-	CREATE_HASHSET_EXT(config->interfaces_ht, __config_interface_ht_hash, __config_interface_ht_compare);
-	CREATE_HASHSET_EXT(config->interface_snmpaddrs, __config_interface_addr_hash, __config_interface_addr_compare);
-	CREATE_HASHSET_EXT(config->regexps, __config_regexp_hash, __config_regexp_compare);
+	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
+	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
+	CREATE_HASHSET_EXT(config->gmacros_m, 0, __config_gmacro_m_hash, __config_gmacro_m_compare);
+	CREATE_HASHSET_EXT(config->hmacros_hm, 0, __config_hmacro_hm_hash, __config_hmacro_hm_compare);
+	CREATE_HASHSET_EXT(config->interfaces_ht, 10, __config_interface_ht_hash, __config_interface_ht_compare);
+	CREATE_HASHSET_EXT(config->interface_snmpaddrs, 0, __config_interface_addr_hash, __config_interface_addr_compare);
+	CREATE_HASHSET_EXT(config->regexps, 0, __config_regexp_hash, __config_regexp_compare);
 
 	for (i = 0; i < CONFIG_TIMER_FORKS; i++)
 	{
@@ -3622,8 +3665,6 @@ void	init_configuration_cache()
 					__config_mem_free_func);
 
 	config->config = NULL;
-
-#undef	INIT_HASHSET_SIZE
 
 #undef	CREATE_HASHSET
 #undef	CREATE_HASHSET_EXT
@@ -3867,6 +3908,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	dst_item->inventory_link = src_item->inventory_link;
 	dst_item->valuemapid = src_item->valuemapid;
 	dst_item->status = src_item->status;
+	dst_item->unreachable = src_item->unreachable;
 
 	dst_item->db_state = src_item->db_state;
 	dst_item->db_error = zbx_strdup(NULL, src_item->db_error);
@@ -4858,7 +4900,8 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
 
 		if (0 == (disable_until = DCget_disable_until(dc_item, dc_host)))
 		{
-			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
+			/* move reachable items on reachable hosts to normal pollers */
+			if (ZBX_POLLER_TYPE_UNREACHABLE == poller_type && 0 == dc_item->unreachable)
 			{
 				old_poller_type = dc_item->poller_type;
 				dc_item->poller_type = poller_by_item(dc_host->proxy_hostid, dc_item->type,
@@ -5040,90 +5083,6 @@ unlock:
 	return items_num;
 }
 
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_config_data                                         *
- *                                                                            *
- * Purpose: get config table data                                             *
- *                                                                            *
- * Return value: pointer to the returned data                                 *
- *                                                                            *
- * Author: Rudolfs Kreicbergs                                                 *
- *                                                                            *
- * Comments: data must be of correct data type                                *
- *                                                                            *
- ******************************************************************************/
-void	*DCconfig_get_config_data(void *data, int type)
-{
-	LOCK_CACHE;
-
-	switch (type)
-	{
-		case CONFIG_REFRESH_UNSUPPORTED:
-			*(int *)data = config->config->refresh_unsupported;
-			break;
-		case CONFIG_DISCOVERY_GROUPID:
-			*(zbx_uint64_t *)data = config->config->discovery_groupid;
-			break;
-		case CONFIG_SNMPTRAP_LOGGING:
-			*(unsigned char *)data = config->config->snmptrap_logging;
-			break;
-	}
-
-	UNLOCK_CACHE;
-
-	return data;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCconfig_get_config_hk                                           *
- *                                                                            *
- * Purpose: get housekeeping configuration data                               *
- *                                                                            *
- * Author: Andris Zeila                                                       *
- *                                                                            *
- ******************************************************************************/
-void	DCconfig_get_config_hk(zbx_config_hk_t *data)
-{
-	LOCK_CACHE;
-
-	*data = config->config->hk;
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: DCget_trigger_severity_name                                      *
- *                                                                            *
- * Purpose: get trigger severity name                                         *
- *                                                                            *
- * Parameters: trigger    - [IN] a trigger data with priority field;          *
- *                               TRIGGER_SEVERITY_*                           *
- *             replace_to - [OUT] pointer to a buffer that will receive       *
- *                          a null-terminated trigger severity string         *
- *                                                                            *
- * Return value: upon successful completion return SUCCEED                    *
- *               otherwise FAIL                                               *
- *                                                                            *
- * Author: Alexander Vladishev, Rudolfs Kreicbergs                            *
- *                                                                            *
- ******************************************************************************/
-int	DCget_trigger_severity_name(unsigned char priority, char **replace_to)
-{
-	if (TRIGGER_SEVERITY_COUNT <= priority)
-		return FAIL;
-
-	LOCK_CACHE;
-
-	*replace_to = zbx_strdup(*replace_to, config->config->severity_name[priority]);
-
-	UNLOCK_CACHE;
-
-	return SUCCEED;
-}
-
 static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc_host, int lastclock)
 {
 	unsigned char	old_poller_type;
@@ -5131,6 +5090,8 @@ static void	DCrequeue_reachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *dc
 
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_reachable_nextcheck(dc_item, dc_host, lastclock);
+
+	dc_item->unreachable = 0;
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
@@ -5150,6 +5111,8 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *
 
 	old_nextcheck = dc_item->nextcheck;
 	dc_item->nextcheck = DCget_unreachable_nextcheck(dc_item, dc_host);
+
+	dc_item->unreachable = 1;
 
 	if (ZBX_NO_POLLER == dc_item->poller_type)
 		return;
@@ -5215,6 +5178,7 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
+			case TIMEOUT_ERROR:
 				DCrequeue_unreachable_item(dc_item, dc_host);
 				break;
 			default:
@@ -5505,7 +5469,9 @@ static int	DCconfig_check_trigger_dependencies_rec(const ZBX_DC_TRIGGER_DEPLIST 
 		{
 			if (NULL != (next_trigger = next_trigdep->trigger) &&
 					TRIGGER_VALUE_PROBLEM == next_trigger->value &&
-					TRIGGER_STATE_NORMAL == next_trigger->state)
+					TRIGGER_STATE_NORMAL == next_trigger->state &&
+					TRIGGER_STATUS_ENABLED == next_trigger->status &&
+					TRIGGER_FUNCTIONAL_TRUE == next_trigger->functional)
 			{
 				return FAIL;
 			}
@@ -6280,10 +6246,12 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to)
  *                                                                            *
  * Purpose: return the number of active items                                 *
  *                                                                            *
+ * Parameters: hostid - [IN] the host id, pass 0 to specify all hosts         *
+ *                                                                            *
  * Return value: the number of active items                                   *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_count()
+int	DCget_item_count(zbx_uint64_t hostid)
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
@@ -6301,6 +6269,9 @@ int	DCget_item_count()
 			continue;
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
+			continue;
+
+		if (0 != hostid && hostid != dc_item->hostid)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -6323,10 +6294,12 @@ int	DCget_item_count()
  *                                                                            *
  * Purpose: return the number of active unsupported items                     *
  *                                                                            *
+ * Parameters: hostid - [IN] the host id, pass 0 to specify all hosts         *
+ *                                                                            *
  * Return value: the number of active unsupported items                       *
  *                                                                            *
  ******************************************************************************/
-int	DCget_item_unsupported_count()
+int	DCget_item_unsupported_count(zbx_uint64_t hostid)
 {
 	int			count = 0;
 	zbx_hashset_iter_t	iter;
@@ -6344,6 +6317,9 @@ int	DCget_item_unsupported_count()
 			continue;
 
 		if (ZBX_FLAG_DISCOVERY_NORMAL != dc_item->flags && ZBX_FLAG_DISCOVERY_CREATED != dc_item->flags)
+			continue;
+
+		if (0 != hostid && hostid != dc_item->hostid)
 			continue;
 
 		if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &dc_item->hostid)))
@@ -6752,4 +6728,75 @@ void	zbx_idset_free(zbx_idset_t *idset)
 {
 	zbx_vector_uint64_destroy(&idset->ids);
 	zbx_free(idset);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_config_get                                                   *
+ *                                                                            *
+ * Purpose: get global configuration data                                     *
+ *                                                                            *
+ * Parameters: cfg   - [OUT] the global configuration data                    *
+ *             flags - [IN] the flags specifying fields to set,               *
+ *                          see ZBX_CONFIG_FLAGS_ defines                     *
+ *                                                                            *
+ * Comments: It's recommended to cleanup this structure with zbx_config_clean *
+ *           function even if only simple fields are requested.               *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
+{
+	LOCK_CACHE;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_SEVERITY_NAME))
+	{
+		int	i;
+
+		cfg->severity_name = zbx_malloc(NULL, TRIGGER_SEVERITY_COUNT * sizeof(char *));
+
+		for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+			cfg->severity_name[i] = zbx_strdup(NULL, config->config->severity_name[i]);
+	}
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID))
+		cfg->discovery_groupid = config->config->discovery_groupid;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE))
+		cfg->default_inventory_mode = config->config->default_inventory_mode;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED))
+		cfg->refresh_unsupported = config->config->refresh_unsupported;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING))
+		cfg->snmptrap_logging = config->config->snmptrap_logging;
+
+	if (0 != (flags & ZBX_CONFIG_FLAGS_HOUSEKEEPER))
+		cfg->hk = config->config->hk;
+
+	UNLOCK_CACHE;
+
+	cfg->flags = flags;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_config_clean                                                 *
+ *                                                                            *
+ * Purpose: cleans global configuration data structure filled                 *
+ *          by zbx_config_get() function                                      *
+ *                                                                            *
+ * Parameters: cfg   - [IN] the global configuration data                     *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_config_clean(zbx_config_t *cfg)
+{
+	if (0 != (cfg->flags & ZBX_CONFIG_FLAGS_SEVERITY_NAME))
+	{
+		int	i;
+
+		for (i = 0; i < TRIGGER_SEVERITY_COUNT; i++)
+			zbx_free(cfg->severity_name[i]);
+
+		zbx_free(cfg->severity_name);
+	}
 }

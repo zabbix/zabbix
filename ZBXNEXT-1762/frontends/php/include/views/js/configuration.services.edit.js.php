@@ -70,6 +70,7 @@
 
 			// column "action"
 			var td = document.createElement('td');
+			td.setAttribute('class', '<?= ZBX_STYLE_NOWRAP ?>');
 			var inputRemove = document.createElement('button');
 			inputRemove.setAttribute('class', '<?= ZBX_STYLE_BTN_LINK ?>');
 			inputRemove.setAttribute('onclick', 'javascript: removeDependentChild(\'' + serviceid + '\');');

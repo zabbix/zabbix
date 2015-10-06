@@ -577,6 +577,7 @@ calendar.prototype = {
 		arrow_right.className = 'arrow-right';
 
 		this.clndr_yeardown = document.createElement('button');
+		this.clndr_yeardown.setAttribute('type', 'button');
 		this.clndr_yeardown.className = 'btn-grey';
 		this.clndr_yeardown.appendChild(arrow_left);
 		year_div.appendChild(this.clndr_yeardown);
@@ -585,6 +586,7 @@ calendar.prototype = {
 		year_div.appendChild(this.clndr_year);
 
 		this.clndr_yearup = document.createElement('button');
+		this.clndr_yearup.setAttribute('type', 'button');
 		this.clndr_yearup.className = 'btn-grey';
 		this.clndr_yearup.appendChild(arrow_right);
 		year_div.appendChild(this.clndr_yearup);
@@ -600,6 +602,7 @@ calendar.prototype = {
 		arrow_right.className = 'arrow-right';
 
 		this.clndr_monthdown = document.createElement('button');
+		this.clndr_monthdown.setAttribute('type', 'button');
 		this.clndr_monthdown.className = 'btn-grey';
 		this.clndr_monthdown.appendChild(arrow_left);
 		month_div.appendChild(this.clndr_monthdown);
@@ -608,6 +611,7 @@ calendar.prototype = {
 		month_div.appendChild(this.clndr_month);
 
 		this.clndr_monthup = document.createElement('button');
+		this.clndr_monthup.setAttribute('type', 'button');
 		this.clndr_monthup.className = 'btn-grey';
 		this.clndr_monthup.appendChild(arrow_right);
 		month_div.appendChild(this.clndr_monthup);
@@ -704,6 +708,7 @@ calendar.prototype = {
 
 		// done
 		this.clndr_done = document.createElement('button');
+		this.clndr_done.setAttribute('type', 'button');
 		this.clndr_done.appendChild(document.createTextNode(locale['S_DONE']));
 		line_div.appendChild(this.clndr_done);
 		this.clndr_calendar.appendChild(line_div);
