@@ -39,7 +39,6 @@
 #endif
 
 char **	setproctitle_save_env(int argc, char **argv);
-void	setproctitle_init(const char *title);
 void	setproctitle_set_status(const char *status);
 void	setproctitle_free_env(void);
 
