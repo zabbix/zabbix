@@ -183,13 +183,11 @@ class CMacrosResolverGeneral {
 	 * Extract positions of the macros from a string.
 	 *
 	 * @param string $text
-	 * @param array  $types		supported types:
-	 * 								[
-	 * 									'usermacros' => true,
-	 * 									'macros' => [<macro_pattern>, ...]
-	 * 									'macros_n' => [<macro_pattern>, ...]
-	 * 									'references' => true
-	 * 								]
+	 * @param array  $types
+	 * @param bool   $types['usermacros']
+	 * @param array  $types['macros'][<macro_patterns>]
+	 * @param array  $types['macros_n'][<macro_patterns>]
+	 * @param bool   $types['references']
 	 *
 	 * @return array
 	 */
@@ -234,25 +232,13 @@ class CMacrosResolverGeneral {
 	 * Extract macros from a string.
 	 *
 	 * @param array  $texts
-	 * @param array  $types		supported types:
-	 * 								[
-	 * 									'usermacros' => true,
-	 * 									'macros' => [<key> => [<macro_pattern>, ...], ...],
-	 * 									'macros_n' => [<key> => [<macro_pattern>, ...], ...],
-	 * 									'references' => true
-	 * 								]
+	 * @param array  $types
+	 * @param bool   $types['usermacros']
+	 * @param array  $types['macros'][][<macro_patterns>]
+	 * @param array  $types['macros_n'][][<macro_patterns>]
+	 * @param bool   $types['references']
 	 *
 	 * @return array
-	 * 								[
-	 * 									'usermacros' => [
-	 * 										'{$MACRO}' => null,
-	 * 										'{$MACRO: context}' => null
-	 * 									],
-	 * 									'references' => [
-	 * 										'$1' => null,
-	 * 										'$2' => null
-	 * 									]
-	 * 								]
 	 */
 	protected function extractMacros(array $texts, array $types) {
 		$macros = [];
