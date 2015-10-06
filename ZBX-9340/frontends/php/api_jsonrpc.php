@@ -58,7 +58,7 @@ catch (Exception $e) {
 		'error' => array(
 			'code' => 1,
 			'message' => $e->getMessage(),
-			'data' => $e->getMessage()
+			'data' => ''
 		),
 		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)
 	);
