@@ -99,34 +99,6 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Parse functionid macros like {23425}
-	 *
-	 * @param array  $expression
-	 * @param int    $pos
-	 *
-	 * @return bool|array
-	 */
-	private function parseFunctionId($expression, $pos) {
-		if ($expression[$pos] != '{') {
-			return false;
-		}
-
-		for ($p = $pos + 1; isset($expression[$p]) && ctype_digit($expression[$p]); $p++)
-			;
-
-		if ($p == $pos + 1 || $expression[$p] != '}') {
-			return false;
-		}
-
-		$p++;
-
-		return [
-			'match' => substr($expression, $pos, $p - $pos),
-			'length' => $p - $pos
-		];
-	}
-
-	/**
 	 * Parse macros like {HOST.HOST<1-9>}
 	 *
 	 * @param array  $text
@@ -557,13 +529,14 @@ class CMacrosResolverGeneral {
 	protected function findFunctions($expression) {
 		$functionids = [];
 
+		$functionid_parser = new CFunctionIdParser();
 		$set_parser = new CSetParser(['{TRIGGER.VALUE}']);
 		$user_macro_parser = new CUserMacroParser();
 
 		for ($pos = 0, $i = 1; isset($expression[$pos]); $pos++) {
-			if (($result = $this->parseFunctionId($expression, $pos)) !== false) {
-				$pos += $result['length'] - 1;
-				$functionids[$i++] = substr($result['match'], 1, -1);
+			if ($functionid_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+				$pos += $functionid_parser->getLength() - 1;
+				$functionids[$i++] = substr($functionid_parser->getMatch(), 1, -1);
 			}
 			elseif ($user_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
 				$pos += $user_macro_parser->getLength() - 1;

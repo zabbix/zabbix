@@ -345,7 +345,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	public function resolveTriggerNames(array $triggers, $options) {
+	public function resolveTriggerNames(array $triggers, array $options) {
 		$macros = [
 			'host' => [],
 			'interface' => [],
