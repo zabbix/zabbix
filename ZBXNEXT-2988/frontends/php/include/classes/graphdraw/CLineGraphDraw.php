@@ -108,7 +108,9 @@ class CLineGraphDraw extends CGraphDraw {
 		$item['name'] = $item['name_expanded'];
 
 		$this->items[$this->num] = $item;
-		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
+
+		$parser = new CItemDelayFlexParser($item['delay_flex']);
+		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $parser->getFlexibleIntervals());
 
 		if (strpos($item['units'], ',') === false) {
 			$this->items[$this->num]['unitsLong'] = '';
