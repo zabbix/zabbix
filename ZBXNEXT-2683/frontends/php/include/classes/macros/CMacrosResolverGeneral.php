@@ -188,6 +188,8 @@ class CMacrosResolverGeneral {
 	 * @param array  $types['macros'][<macro_patterns>]
 	 * @param array  $types['macros_n'][<macro_patterns>]
 	 * @param bool   $types['references']
+	 * @param bool   $types['lldmacros']
+	 * @param bool   $types['functionids']
 	 *
 	 * @return array
 	 */
@@ -197,6 +199,8 @@ class CMacrosResolverGeneral {
 		$extract_macros = array_key_exists('macros', $types);
 		$extract_macros_n = array_key_exists('macros_n', $types);
 		$extract_references = array_key_exists('references', $types);
+		$extract_lldmacros = array_key_exists('lldmacros', $types);
+		$extract_functionids = array_key_exists('functionids', $types);
 
 		if ($extract_usermacros) {
 			$user_macro_parser = new CUserMacroParser();
@@ -204,6 +208,14 @@ class CMacrosResolverGeneral {
 
 		if ($extract_macros) {
 			$set_parser = new CSetParser($types['macros']);
+		}
+
+		if ($extract_lldmacros) {
+			$lld_macro_parser = new CLLDMacroParser();
+		}
+
+		if ($extract_functionids) {
+			$functionid_parser = new CFunctionIdParser();
 		}
 
 		for ($pos = 0; isset($text[$pos]); $pos++) {
@@ -223,6 +235,14 @@ class CMacrosResolverGeneral {
 				$macros[$pos] = $result['match'];
 				$pos += $result['length'] - 1;
 			}
+			elseif ($extract_lldmacros && $lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $lld_macro_parser->getMatch();
+				$pos += $lld_macro_parser->getLength() - 1;
+			}
+			elseif ($extract_functionids && $functionid_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $functionid_parser->getMatch();
+				$pos += $functionid_parser->getLength() - 1;
+			}
 		}
 
 		return $macros;
@@ -237,6 +257,8 @@ class CMacrosResolverGeneral {
 	 * @param array  $types['macros'][][<macro_patterns>]
 	 * @param array  $types['macros_n'][][<macro_patterns>]
 	 * @param bool   $types['references']
+	 * @param bool   $types['lldmacros']
+	 * @param bool   $types['functionids']
 	 *
 	 * @return array
 	 */
@@ -246,6 +268,8 @@ class CMacrosResolverGeneral {
 		$extract_macros = array_key_exists('macros', $types);
 		$extract_macros_n = array_key_exists('macros_n', $types);
 		$extract_references = array_key_exists('references', $types);
+		$extract_lldmacros = array_key_exists('lldmacros', $types);
+		$extract_functionids = array_key_exists('functionids', $types);
 
 		if ($extract_usermacros) {
 			$macros['usermacros'] = [];
@@ -272,6 +296,18 @@ class CMacrosResolverGeneral {
 
 		if ($extract_references) {
 			$macros['references'] = [];
+		}
+
+		if ($extract_lldmacros) {
+			$macros['lldmacros'] = [];
+
+			$lld_macro_parser = new CLLDMacroParser();
+		}
+
+		if ($extract_functionids) {
+			$macros['functionids'] = [];
+
+			$functionid_parser = new CFunctionIdParser();
 		}
 
 		foreach ($texts as $text) {
@@ -305,6 +341,18 @@ class CMacrosResolverGeneral {
 				if ($extract_references && ($result = $this->parseReferenceMacro($text, $pos)) !== false) {
 					$macros['references'][$result['match']] = null;
 					$pos += $result['length'] - 1;
+					continue;
+				}
+
+				if ($extract_lldmacros && $lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros['lldmacros'][$lld_macro_parser->getMatch()] = null;
+					$pos += $lld_macro_parser->getLength() - 1;
+					continue;
+				}
+
+				if ($extract_functionids && $functionid_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros['functionids'][$functionid_parser->getMatch()] = null;
+					$pos += $functionid_parser->getLength() - 1;
 					continue;
 				}
 			}
