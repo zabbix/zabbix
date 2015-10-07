@@ -4760,6 +4760,36 @@ unlock:
 
 /******************************************************************************
  *                                                                            *
+ * Function: dc_config_get_queue_nextcheck                                    *
+ *                                                                            *
+ * Purpose: Get nextcheck for selected queue                                  *
+ *                                                                            *
+ * Parameters: queue - [IN] the queue                                         *
+ *                                                                            *
+ * Return value: nextcheck or FAIL if no items for the specified queue        *
+ *                                                                            *
+ ******************************************************************************/
+static int	dc_config_get_queue_nextcheck(zbx_binary_heap_t *queue)
+{
+	int				nextcheck;
+	const zbx_binary_heap_elem_t	*min;
+	const ZBX_DC_ITEM		*dc_item;
+
+	if (FAIL == zbx_binary_heap_empty(queue))
+	{
+		min = zbx_binary_heap_find_min(queue);
+		dc_item = (const ZBX_DC_ITEM *)min->data;
+
+		nextcheck = dc_item->nextcheck;
+	}
+	else
+		nextcheck = FAIL;
+
+	return nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: DCconfig_get_poller_nextcheck                                    *
  *                                                                            *
  * Purpose: Get nextcheck for selected poller                                 *
@@ -4773,12 +4803,10 @@ unlock:
  ******************************************************************************/
 int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 {
-	const char			*__function_name = "DCconfig_get_poller_nextcheck";
+	const char		*__function_name = "DCconfig_get_poller_nextcheck";
 
-	int				nextcheck;
-	zbx_binary_heap_t		*queue;
-	const zbx_binary_heap_elem_t	*min;
-	const ZBX_DC_ITEM		*dc_item;
+	int			nextcheck;
+	zbx_binary_heap_t	*queue;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __function_name, (int)poller_type);
 
@@ -4786,15 +4814,7 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
 
 	LOCK_CACHE;
 
-	if (FAIL == zbx_binary_heap_empty(queue))
-	{
-		min = zbx_binary_heap_find_min(queue);
-		dc_item = (const ZBX_DC_ITEM *)min->data;
-
-		nextcheck = dc_item->nextcheck;
-	}
-	else
-		nextcheck = FAIL;
+	nextcheck = dc_config_get_queue_nextcheck(queue);
 
 	UNLOCK_CACHE;
 
@@ -4818,7 +4838,8 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
  *                                                                            *
  * Comments: Items leave the queue only through this function. Pollers must   *
- *           always return the items they have taken using DCrequeue_items(). *
+ *           always return the items they have taken using DCrequeue_items()  *
+ *           or DCpoller_requeue_items().                                     *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
@@ -5129,14 +5150,12 @@ static void	DCrequeue_unreachable_item(ZBX_DC_ITEM *dc_item, const ZBX_DC_HOST *
 	DCupdate_item_queue(dc_item, old_poller_type, old_nextcheck);
 }
 
-void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
-		int *mtimes, int *errcodes, size_t num)
+static void	dc_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks,
+		zbx_uint64_t *lastlogsizes, int *mtimes, int *errcodes, size_t num)
 {
 	size_t		i;
 	ZBX_DC_ITEM	*dc_item;
 	ZBX_DC_HOST	*dc_host;
-
-	LOCK_CACHE;
 
 	for (i = 0; i < num; i++)
 	{
@@ -5185,6 +5204,25 @@ void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastcloc
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 	}
+}
+
+void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
+		int *mtimes, int *errcodes, size_t num)
+{
+	LOCK_CACHE;
+
+	dc_requeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes, num);
+
+	UNLOCK_CACHE;
+}
+
+void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
+		int *mtimes, int *errcodes, size_t num, unsigned char poller_type, int *nextcheck)
+{
+	LOCK_CACHE;
+
+	dc_requeue_items(itemids, states, lastclocks, lastlogsizes, mtimes, errcodes, num);
+	*nextcheck = dc_config_get_queue_nextcheck(&config->queues[poller_type]);
 
 	UNLOCK_CACHE;
 }
