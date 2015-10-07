@@ -37,7 +37,7 @@ static char	**environ_ext = NULL;
 
 /* internal copy of argv[] and environment variables */
 static char	**argv_int = NULL, **environ_int = NULL;
-static char	terminator = '\0';
+static char	*empty_str = "";
 
 /* ps display buffer */
 static char	*ps_buf = NULL;
@@ -93,7 +93,7 @@ char	**setproctitle_save_env(int argc, char **argv)
 		/* argv[argc_ext_copied_first] will be used to display status messages. The rest of arguments can be */
 		/* overwritten and their argv[] pointers will point to wrong strings. */
 		if (argc_ext_copied_first < i)
-			argv[i] = &terminator;
+			argv[i] = empty_str;
 	}
 
 	for (; i < argc; i++)
@@ -120,7 +120,7 @@ char	**setproctitle_save_env(int argc, char **argv)
 
 			/* environment variables can be overwritten by status messages in argv[0] */
 			/* and environ[] pointers will point to wrong strings */
-			environ[i] = &terminator;
+			environ[i] = empty_str;
 		}
 
 		for (;  i < envc; i++)
