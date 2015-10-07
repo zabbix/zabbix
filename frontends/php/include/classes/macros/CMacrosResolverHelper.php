@@ -299,6 +299,31 @@ class CMacrosResolverHelper {
 	}
 
 	/**
+	 * Resolve macros in trigger expressions.
+	 *
+	 * @static
+	 *
+	 * @param array  $triggers
+	 * @param string $triggers[]['triggerid']
+	 * @param string $triggers[]['expression']
+	 * @param array  $options
+	 * @param bool   $options['html']				(optional) returns formatted trigger expression
+	 * @param bool   $options['resolve_usermacros']	(optional) resolve user macros
+	 * @param bool   $options['resolve_macros']		(optional) resolve macros in item keys and functions
+	 *
+	 * @return array
+	 */
+	public static function resolveTriggerExpressions(array $triggers, $options) {
+		self::init();
+
+		return self::$macrosResolver->resolveTriggerExpressions($triggers, [
+			'html' => array_key_exists('html', $options) && $options['html'],
+			'resolve_usermacros' => array_key_exists('resolve_usermacros', $options) && $options['resolve_usermacros'],
+			'resolve_macros' => array_key_exists('resolve_macros', $options) && $options['resolve_macros']
+		]);
+	}
+
+	/**
 	 * Resolve user macros in trigger expression.
 	 *
 	 * @static

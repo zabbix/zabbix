@@ -383,6 +383,9 @@ $triggers = API::Trigger()->get([
 ]);
 
 $triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
+$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+	['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]
+);
 
 order_result($triggers, $sortField, $sortOrder);
 
@@ -581,7 +584,7 @@ foreach ($triggers as $trigger) {
 
 	if ($showDetails) {
 		$description[] = BR();
-		$description[] = explode_exp($trigger['expression'], true, true);
+		$description[] = $trigger['expression'];
 	}
 
 	// host js menu

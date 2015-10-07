@@ -441,9 +441,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				// get user macros values
-				foreach ($this->getUserMacros($usermacros) as $treiggerid => $usermacros_data) {
-					$macro_values[$treiggerid] = array_key_exists($treiggerid, $macro_values)
-						? array_merge($macro_values[$treiggerid], $usermacros_data['macros'])
+				foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
+					$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
+						? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
 						: $usermacros_data['macros'];
 				}
 			}
@@ -558,9 +558,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// get user macros values
-			foreach ($this->getUserMacros($usermacros) as $treiggerid => $usermacros_data) {
-				$macro_values[$treiggerid] = array_key_exists($treiggerid, $macro_values)
-					? array_merge($macro_values[$treiggerid], $usermacros_data['macros'])
+			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
+				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
+					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
 					: $usermacros_data['macros'];
 			}
 		}
@@ -671,9 +671,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// get user macros values
-			foreach ($this->getUserMacros($usermacros) as $treiggerid => $usermacros_data) {
-				$macro_values[$treiggerid] = array_key_exists($treiggerid, $macro_values)
-					? array_merge($macro_values[$treiggerid], $usermacros_data['macros'])
+			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
+				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
+					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
 					: $usermacros_data['macros'];
 			}
 		}
@@ -687,6 +687,259 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 				$trigger['url'] =
 					substr_replace($trigger['url'], $macro_values[$triggerid][$macro], $pos, strlen($macro));
+			}
+		}
+		unset($trigger);
+
+		return $triggers;
+	}
+
+	/**
+	 * Purpose: Translate {10}>10 to something like {localhost:system.cpu.load.last()}>10
+	 *
+	 * @param array  $triggers
+	 * @param string $triggers[]['triggerid']		mandatory with $options['resolve_usermacros'] = true
+	 * @param string $triggers[]['expression']
+	 * @param array  $options
+	 * @param bool   $options['html']				returns formatted trigger expression
+	 * @param bool   $options['resolve_usermacros']	resolve user macros
+	 * @param bool   $options['resolve_macros']		resolve macros in item keys and functions
+	 *
+	 * @return string|array
+	 */
+	public function resolveTriggerExpressions(array $triggers, array $options) {
+		$functionids = [];
+		$usermacros = [];
+		$macro_values = [];
+
+		$types = [
+			'macros' => [
+				'trigger' => ['{TRIGGER.VALUE}']
+			],
+			'functionids' => true,
+			'lldmacros' => true,
+			'usermacros' => true
+		];
+
+		// find macros
+		foreach ($triggers as $key => $trigger) {
+			$matched_macros = $this->extractMacros([$trigger['expression']], $types);
+
+			if ($matched_macros['functionids']) {
+				$macro_values[$trigger['triggerid']] = $matched_macros['functionids'];
+
+				foreach (array_keys($matched_macros['functionids']) as $macro) {
+					$functionids[] = substr($macro, 1, -1); // strip curly braces
+				}
+			}
+
+			if ($options['resolve_usermacros'] && $matched_macros['usermacros']) {
+				$usermacros[$trigger['triggerid']] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
+			}
+		}
+
+		// get macro values
+		if ($functionids) {
+			$functions = [];
+
+			// selecting functions
+			$result = DBselect(
+				'SELECT f.functionid,f.triggerid,f.itemid,f.function,f.parameter'.
+				' FROM functions f'.
+				' WHERE '.dbConditionInt('f.functionid', $functionids)
+			);
+
+			$hostids = [];
+			$itemids = [];
+			$hosts = [];
+			$items = [];
+
+			while ($row = DBfetch($result)) {
+				$itemids[$row['itemid']] = true;
+
+				$functions['{'.$row['functionid'].'}'] = $row;
+				unset($functions['{'.$row['functionid'].'}']['functionid']);
+			}
+
+			// selecting items
+			if ($itemids) {
+				if ($options['html']) {
+					$sql = 'SELECT i.itemid,i.hostid,i.key_,i.type,i.flags,i.status,i.state,id.parent_itemid'.
+						' FROM items i'.
+							' LEFT JOIN item_discovery id ON i.itemid=id.itemid'.
+						' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
+				}
+				else {
+					$sql = 'SELECT i.itemid,i.hostid,i.key_'.
+						' FROM items i'.
+						' WHERE '.dbConditionInt('i.itemid', array_keys($itemids));
+				}
+				$result = DBselect($sql);
+
+				while ($row = DBfetch($result)) {
+					$hostids[$row['hostid']] = true;
+					$items[$row['itemid']] = $row;
+				}
+			}
+
+			// selecting hosts
+			if ($hostids) {
+				$result = DBselect(
+					'SELECT h.hostid,h.host FROM hosts h WHERE '.dbConditionInt('h.hostid', array_keys($hostids))
+				);
+
+				while ($row = DBfetch($result)) {
+					$hosts[$row['hostid']] = $row;
+				}
+			}
+
+			if ($options['resolve_macros']) {
+				$items = $this->resolveItemKeys($items);
+				foreach ($items as &$item) {
+					$item['key_'] = $item['key_expanded'];
+					unset($item['key_expanded']);
+				}
+				unset($item);
+			}
+
+			foreach ($functions as $macro => &$function) {
+				if (!array_key_exists($function['itemid'], $items)) {
+					unset($functions[$macro]);
+					continue;
+				}
+				$item = $items[$function['itemid']];
+
+				if (!array_key_exists($item['hostid'], $hosts)) {
+					unset($functions[$macro]);
+					continue;
+				}
+				$host = $hosts[$item['hostid']];
+
+				$function['hostid'] = $item['hostid'];
+				$function['host'] = $host['host'];
+				$function['key_'] = $item['key_'];
+				if ($options['html']) {
+					$function['type'] = $item['type'];
+					$function['flags'] = $item['flags'];
+					$function['status'] = $item['status'];
+					$function['state'] = $item['state'];
+					$function['parent_itemid'] = $item['parent_itemid'];
+				}
+			}
+			unset($function);
+
+			if ($options['resolve_macros']) {
+				$functions = $this->resolveFunctionParameters($functions);
+				foreach ($functions as &$function) {
+					$function['parameter'] = $function['parameter_expanded'];
+					unset($function['parameter_expanded']);
+				}
+				unset($function);
+			}
+
+			foreach ($macro_values as &$macros) {
+				foreach ($macros as $macro => &$value) {
+					if (array_key_exists($macro, $functions)) {
+						$function = $functions[$macro];
+
+						if ($options['html']) {
+							$style = ($function['status'] == ITEM_STATUS_ACTIVE)
+								? ($function['state'] == ITEM_STATE_NORMAL) ? ZBX_STYLE_GREEN : ZBX_STYLE_GREY
+								: $style = ZBX_STYLE_RED;
+
+							if ($function['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+									|| $function['type'] == ITEM_TYPE_HTTPTEST) {
+								$link = (new CSpan($function['host'].':'.$function['key_']))->addClass($style);
+							}
+							elseif ($function['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+								$link = (new CLink($function['host'].':'.$function['key_'],
+									'disc_prototypes.php?form=update&itemid='.$function['itemid'].
+									'&parent_discoveryid='.$function['parent_itemid']
+								))
+									->addClass(ZBX_STYLE_LINK_ALT)
+									->addClass($style);
+							}
+							else {
+								$link = (new CLink($function['host'].':'.$function['key_'],
+									'items.php?form=update&itemid='.$function['itemid']
+								))
+									->addClass(ZBX_STYLE_LINK_ALT)
+									->addClass($style);
+							}
+
+							$value = [
+								'{', $link, '.', bold($function['function'].'('), $function['parameter'], bold(')'), '}'
+							];
+						}
+						else {
+							$value = '{'.
+								$function['host'].':'.
+								$function['key_'].'.'.
+								$function['function'].'('.$function['parameter'].')'.
+							'}';
+						}
+					}
+					else {
+						$value = $options['html'] ? (new CSpan('*ERROR*'))->addClass(ZBX_STYLE_RED) : '*ERROR*';
+					}
+				}
+				unset($value);
+			}
+			unset($macros);
+
+			if ($usermacros) {
+				foreach ($functions as $function) {
+					if (array_key_exists($function['triggerid'], $usermacros)) {
+						$usermacros[$function['triggerid']]['hostids'][$function['hostid']] = true;
+					}
+				}
+
+				foreach ($usermacros as &$usermacros_data) {
+					$usermacros_data['hostids'] = array_keys($usermacros_data['hostids']);
+				}
+				unset($usermacros_data);
+			}
+
+			// get user macros values
+			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
+				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
+					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
+					: $usermacros_data['macros'];
+			}
+		}
+
+		$types = $this->transformToPositionTypes($types);
+
+		// replace macros to value
+		foreach ($triggers as &$trigger) {
+			$matched_macros = $this->getMacroPositions($trigger['expression'], $types);
+
+			if ($options['html']) {
+				$expression = [];
+				$pos_left = 0;
+
+				foreach ($matched_macros as $pos => $macro) {
+					if (array_key_exists($macro, $macro_values[$trigger['triggerid']])) {
+						if ($pos_left != $pos) {
+							$expression[] = substr($trigger['expression'], $pos_left, $pos - $pos_left);
+						}
+
+						$expression[] = $macro_values[$trigger['triggerid']][$macro];
+
+						$pos_left = $pos + strlen($macro);
+					}
+				}
+				$expression[] = substr($trigger['expression'], $pos_left);
+
+				$trigger['expression'] = $expression;
+			}
+			else {
+				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+					if (array_key_exists($macro, $macro_values[$trigger['triggerid']])) {
+						$trigger['expression'] = substr_replace($trigger['expression'],
+							$macro_values[$trigger['triggerid']][$macro], $pos, strlen($macro));
+					}
+				}
 			}
 		}
 		unset($trigger);
@@ -732,9 +985,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			// get user macros values
-			foreach ($this->getUserMacros($usermacros) as $treiggerid => $usermacros_data) {
-				$macro_values[$treiggerid] = array_key_exists($treiggerid, $macro_values)
-					? array_merge($macro_values[$treiggerid], $usermacros_data['macros'])
+			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
+				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
+					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
 					: $usermacros_data['macros'];
 			}
 		}
