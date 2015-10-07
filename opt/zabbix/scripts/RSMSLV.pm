@@ -80,7 +80,7 @@ our @EXPORT = qw($result $dbh $tld
 		get_macro_epp_rtt_low get_macro_probe_avail_limit get_item_data get_itemid_by_key get_itemid_by_host
 		get_itemid_by_hostid get_itemid_like_by_hostid get_itemids_by_host_and_keypart get_lastclock get_tlds
 		get_probes get_nsips get_all_items get_nsip_items tld_exists tld_service_enabled db_connect db_select
-		set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
+		db_exec set_slv_config get_interval_bounds get_rollweek_bounds get_month_bounds get_curmon_bounds
 		minutes_last_month max_avail_time get_online_probes get_probe_times probe_offline_at probes2tldhostids
 		init_values push_value send_values get_nsip_from_key is_service_error process_slv_ns_monthly
 		process_slv_avail process_slv_ns_avail process_slv_monthly get_results get_item_values avail_value_exists
@@ -813,6 +813,49 @@ sub db_select
 	}
 
 	return $rows_ref;
+}
+
+sub db_exec
+{
+	$global_sql = shift;
+
+	my $sec;
+	if (opt('stats'))
+	{
+		$sec = time();
+	}
+
+	my $sth = $dbh->prepare($global_sql)
+		or fail("cannot prepare [$global_sql]: ", $dbh->errstr);
+
+	dbg("[$global_sql]");
+
+	my ($start, $total);
+	if (opt('warnslow'))
+	{
+		$start = time();
+	}
+
+	$sth->execute()
+		or fail("cannot execute [$global_sql]: ", $sth->errstr);
+
+	if (opt('warnslow'))
+	{
+		$total = time() - $start;
+
+		if ($total > getopt('warnslow'))
+		{
+			wrn("slow query: [$global_sql] took ", sprintf("%.3f seconds", $total));
+		}
+	}
+
+	if (opt('stats'))
+	{
+		$sql_time += time() - $sec;
+		$sql_count++;
+	}
+
+	return $sth->{mysql_insertid};
 }
 
 sub set_slv_config
@@ -2580,7 +2623,7 @@ sub get_test_start_time
 #   {'rdds' => 300}						# <- test period not found
 # ]
 #
-# The return value is min($from), max($till) from all found periods
+# The return value is ARRAY of 2 members: min ($from) and max ($till) from all found periods.
 #
 sub get_real_services_period
 {

@@ -116,6 +116,8 @@ foreach my $service (keys(%services))
 	}
 
 	$services{$service}{'avail_key'} = "rsm.slv.$service.avail";
+
+	fail("$service delay (", $services{$service}{'delay'}, ") is not multiple of 60") unless ($services{$service}{'delay'} % 60 == 0);
 }
 
 my $now = time();
