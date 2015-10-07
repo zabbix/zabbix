@@ -217,7 +217,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
 			}
 
-			$item_type = $this->items[$i]['calc_type'];
+			$calc_type = $this->items[$i]['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 			$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)'; // required for 'group by' support of Oracle
@@ -286,7 +286,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->data[$this->items[$i]['itemid']] = array();
 			}
 
-			$curr_data = &$this->data[$this->items[$i]['itemid']][$item_type];
+			$curr_data = &$this->data[$this->items[$i]['itemid']][$calc_type];
 
 			$curr_data['count'] = null;
 			$curr_data['min'] = null;
@@ -2463,6 +2463,10 @@ class CLineGraphDraw extends CGraphDraw {
 				}
 				else {
 					$draw = (boolean) ($diff < (ZBX_GRAPH_MAX_SKIP_DELAY * $delay));
+				}
+
+				if ($this->items[$item]['type'] == ITEM_TYPE_TRAPPER) {
+					$draw = true;
 				}
 
 				if (!$draw && !$prevDraw) {
