@@ -367,13 +367,7 @@ $triggers = API::Trigger()->get([
 	'triggerids' => zbx_objectValues($triggers, 'triggerid'),
 	'output' => API_OUTPUT_EXTEND,
 	'selectHosts' => [
-		'hostid',
-		'name',
-		'description',
-		'status',
-		'maintenanceid',
-		'maintenance_status',
-		'maintenance_type'
+		'hostid', 'name', 'description', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'
 	],
 	'selectItems' => ['itemid', 'hostid', 'name', 'key_', 'value_type'],
 	'selectDependencies' => API_OUTPUT_EXTEND,
@@ -383,9 +377,11 @@ $triggers = API::Trigger()->get([
 ]);
 
 $triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
-$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
-	['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]
-);
+if ($showDetails) {
+	$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers,
+		['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]
+	);
+}
 
 order_result($triggers, $sortField, $sortOrder);
 
