@@ -514,7 +514,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_values(unsigned char poller_type)
+static int	get_values(unsigned char poller_type, int *nextcheck)
 {
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_POLLER_ITEMS];
@@ -726,8 +726,8 @@ static int	get_values(unsigned char poller_type)
 					items[i].state, results[i].msg);
 		}
 
-		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
-				&errcodes[i], 1);
+		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
+				&errcodes[i], 1, poller_type, nextcheck);
 
 		zbx_free(items[i].key);
 
@@ -806,7 +806,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		}
 
 		sec = zbx_time();
-		processed += get_values(poller_type);
+		processed += get_values(poller_type, &nextcheck);
 		total_sec += zbx_time() - sec;
 #ifdef HAVE_OPENIPMI
 		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
@@ -815,7 +815,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			delete_inactive_ipmi_hosts(last_ipmi_host_check);
 		}
 #endif
-		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
