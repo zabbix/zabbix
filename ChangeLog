@@ -1,12 +1,17 @@
 Changes for 3.0.0alpha3
 
 New features:
+.......PS. [ZBXNEXT-2988] reduced the number of poller configuration cache locks by 1/3 (wiper)
+A.F.I...S. [ZBXNEXT-2163] implemented argument support for script media type (wiper, Ivo)
+A.F....PS. [ZBXNEXT-2128] implemented execution if an item at a specific time (wiper, Ivo)
 ..F.....S. [ZBXNEXT-922] added forecasting trigger functions (gleb, Sandis)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and Russian translations; thanks to Zabbix translators (Richlv)
 ....I..... [ZBXNEXT-2056] added an HTTP response code value map (Richlv)
 ...G...PS. [ZBX-9274] added printing defaults when Zabbix programs are executed with --help option (dimir)
 
 Bug fixes:
+........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
+........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
 ........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
@@ -16,7 +21,7 @@ Bug fixes:
 .......PS. [ZBX-9793] fixed handling of opaque types in SNMP (asaveljevs)
 ...G...... [ZBX-9847] fixed possible Zabbix agent crash when executing system.cpu.discovery (dimir)
 .......PS. [ZBX-9895] fixed memory leak in case of unsupported field type while processing configuration received over proxy protocol (Sandis)
-...G...PS. [ZBX-9776] added check for line length when parsing configuration file (viktors)
+...G...PS. [ZBX-9776] added check for line length when parsing configuration file (asaveljevs, viktors)
 ...G...... [ZBX-9796] fixed return argument for NetBSD and HP-UX; remove extra semicolon (dimir, viktors)
 ...G...... [ZBXNEXT-494] fixed proc.cpu.util help item description (wiper)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
@@ -40,14 +45,14 @@ A......... [ZBX-9807] fixed undefined offset errors in configuration export when
 A.F....... [ZBX-9810] fixed trigger prototype expression inheritance incorrectly assigning an invalid expression to child objects and trigger expression test popup displaying a missing class (Ivo)
 .......PS. [ZBX-7847] added functionality that stops polling inactive IPMI hosts (igors)
 ...G...... [ZBX-9430] fixed Windows eventlog item incorrectly interpreting 0x00000103 return value as an error (wiper)
-..F....... [ZBXNEXT-2662] fixed a map element editing form (Sasha)
-..F.I..... [ZBXNEXT-2662] fixed possibility to change the colours of the trigger severities (Sasha)
-..F....... [ZBXNEXT-2662] fixed layout of the checkboxes with labels (Sasha)
-..F....... [ZBXNEXT-2662] fixed layout of the host inventory form (Sasha)
+..F....... [ZBXNEXT-2662] fixed a map element editing form (Pavel, Sasha)
+..F.I..... [ZBXNEXT-2662] fixed possibility to change the colours of the trigger severities (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] fixed layout of the checkboxes with labels (Pavel, Sasha)
+..F....... [ZBXNEXT-2662] fixed layout of the host inventory form (Pavel, Sasha)
 ..F....... [ZBXNEXT-2662] fixed media editing in the user form (Sasha)
 ..F....... [ZBXNEXT-2662] fixed saving of the collapsible widgets in the "Event detais" and "Global search" pages (Sasha)
 ..F....... [ZBXNEXT-2662] fixed displaying of the vertical headers under IE10, IE11 and Edge (Sasha)
-..F....... [ZBXNEXT-2662] fixed displaying of the eventlog severities (Sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of the eventlog severities (Pavel, Sasha)
 .......PS. [ZBX-9655] fixed crash if MYSQL connection object initialization failed (wiper)
 ........S. [ZBX-9667] fixed disabled triggers or triggers having disabled hosts or items affecting trigger dependency calculations (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
@@ -70,7 +75,7 @@ A......... [ZBX-9738] fixed deletion of related action operations when deleting 
 Changes for 2.5.0
 
 New features:
-..F....... [ZBXNEXT-2662] implemented a new design for the Zabbix Web interface (Alexei, Sasha)
+..F....... [ZBXNEXT-2662] implemented a new design for the Zabbix Web interface (Alexei, Pavel, Sasha)
 ..F....... [ZBXNEXT-2703] implemented feature to filter dashboard by trigger name (Ivo)
 A.F.I...S. [ZBXNEXT-2892] increased IP range length and added support for tabulation, carriage return and newline characters (Ivo, wiper)
 ........S. [ZBXNEXT-2760] added zabbix[host,,items] and zabbix[host,,items_unsupported] keys to monitor the number of (unsupported) items per host (wiper)
@@ -172,6 +177,8 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
+........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
 ........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)
@@ -854,6 +861,8 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
+........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
 ........S. [ZBX-7511] removed trimming of leading and trailing spaces in SNMP strings (gleb)
 ...G...... [ZBX-8899] fixed retrieval of sensor readings on Linux 2.6 and higher (gleb, wiper)
 ...G...... [ZBX-9917] fixed log message when opening windows eventlog (wiper)

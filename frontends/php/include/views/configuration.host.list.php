@@ -247,7 +247,7 @@ $form->addItem([
 	new CActionButtonList('action', 'hosts',
 		[
 			'host.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
-			'host.massdisable' => ['name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')],
+			'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
 			'host.export' => ['name' => _('Export')],
 			'host.massupdateform' => ['name' => _('Mass update')],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]

@@ -102,7 +102,7 @@ static void	sync_config(void)
 	result = DBselect_once(
 			"select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,"
 				"mt.exec_path,mt.gsm_modem,mt.username,mt.passwd,mt.smtp_port,mt.smtp_security,"
-				"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,m.sendto"
+				"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,mt.exec_params,m.sendto"
 			" from media m,users_groups u,config c,media_type mt"
 			" where m.userid=u.userid"
 				" and u.usrgrpid=c.alert_usrgrpid"
@@ -143,6 +143,7 @@ static void	sync_config(void)
 		STR_REPLACE(recipient->mediatype.smtp_helo, row[4]);
 		STR_REPLACE(recipient->mediatype.smtp_email, row[5]);
 		STR_REPLACE(recipient->mediatype.exec_path, row[6]);
+		STR_REPLACE(recipient->mediatype.exec_params, row[15]);
 		STR_REPLACE(recipient->mediatype.gsm_modem, row[7]);
 		STR_REPLACE(recipient->mediatype.username, row[8]);
 		STR_REPLACE(recipient->mediatype.passwd, row[9]);
@@ -152,7 +153,7 @@ static void	sync_config(void)
 		ZBX_STR2UCHAR(recipient->mediatype.smtp_verify_host, row[13]);
 		ZBX_STR2UCHAR(recipient->mediatype.smtp_authentication, row[14]);
 
-		STR_REPLACE(recipient->alert.sendto, row[15]);
+		STR_REPLACE(recipient->alert.sendto, row[16]);
 
 		if (NULL == recipient->alert.subject)
 			recipient->alert.message = recipient->alert.subject = zbx_strdup(NULL, "Zabbix database is down.");
