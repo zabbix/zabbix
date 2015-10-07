@@ -51,6 +51,7 @@ class CValidationRule {
 						case ' ':
 							$pos++;
 							break;
+
 						default:
 							$is_empty = false;
 							$rule = [];
@@ -65,8 +66,8 @@ class CValidationRule {
 									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
 									&& !$this->parseDB($buffer, $pos, $rule)			// db
 									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
-									&& !$this->parseArrayDB($buffer, $pos, $rule)) {	// array_db
-
+									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
+									&& !$this->parseArray($buffer, $pos, $rule)) {		// array
 								// incorrect validation rule
 								break 3;
 							}
@@ -82,6 +83,7 @@ class CValidationRule {
 							break;
 					}
 					break;
+
 				case self::STATE_END:
 					switch ($buffer[$pos]) {
 						case ' ':
@@ -294,6 +296,45 @@ class CValidationRule {
 
 		$pos = $i;
 		$rules['db'] = [
+			'table' => $table,
+			'field' => $field
+		];
+
+		return true;
+	}
+
+	/**
+	 * array
+	 *
+	 * 'array' => true
+	 */
+	private function parseArray($buffer, &$pos, &$rules) {
+		$i = $pos;
+		if (strncmp(substr($buffer, $pos), 'array ', 6) != 0) {
+			return false;
+		}
+
+		$i += 6;
+
+		while (isset($buffer[$i]) && $buffer[$i] === ' ') {
+			$i++;
+		}
+
+		$table = '';
+
+		if (!$this->parseField($buffer, $i, $table) || !isset($buffer[$i]) || $buffer[$i++] !== '.') {
+			return false;
+		}
+
+		$field = '';
+
+		if (!$this->parseField($buffer, $i, $field)) {
+			return false;
+		}
+
+		$pos = $i;
+
+		$rules['array'] = [
 			'table' => $table,
 			'field' => $field
 		];
