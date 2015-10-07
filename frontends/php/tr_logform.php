@@ -98,15 +98,16 @@ if (hasRequest('add') || hasRequest('update')) {
 			$triggerId = getRequest('triggerid');
 			$description = getRequest('description', '');
 
-			$triggersData = API::Trigger()->get([
-				'triggerids' => [$triggerId],
-				'output' => API_OUTPUT_EXTEND
+			$db_triggers = API::Trigger()->get([
+				'output' => ['triggerid', 'description', 'expression', 'templateid'],
+				'triggerids' => [$triggerId]
 			]);
-			$triggerData = reset($triggersData);
 
-			if ($triggerData['templateid']) {
-				$description = $triggerData['description'];
-				$expression = explode_exp($triggerData['expression']);
+			if ($db_triggers[0]['templateid'] != 0) {
+				$db_triggers = CMacrosResolverHelper::resolveTriggerExpressions($db_triggers);
+
+				$description = $db_triggers[0]['description'];
+				$expression = $db_triggers[0]['expression'];
 			}
 
 			$trigger = [];
@@ -201,8 +202,12 @@ if (hasRequest('sform')) {
 		);
 
 		if ($row = DBfetch($result)) {
+			$triggers = CMacrosResolverHelper::resolveTriggerExpressions([
+				['triggerid' => getRequest('triggerid'), 'expression' => $row['expression']]
+			]);
+
 			$description = $row['description'];
-			$expression = explode_exp($row['expression']);
+			$expression = $triggers[0]['expression'];
 			$type = $row['type'];
 			$priority = $row['priority'];
 			$comments = $row['comments'];
