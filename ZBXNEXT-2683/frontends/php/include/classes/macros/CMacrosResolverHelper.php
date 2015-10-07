@@ -313,7 +313,7 @@ class CMacrosResolverHelper {
 	 *
 	 * @return array
 	 */
-	public static function resolveTriggerExpressions(array $triggers, $options) {
+	public static function resolveTriggerExpressions(array $triggers, array $options = []) {
 		self::init();
 
 		return self::$macrosResolver->resolveTriggerExpressions($triggers, [

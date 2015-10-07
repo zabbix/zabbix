@@ -167,25 +167,26 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
 		// update only changed fields
 
-		$oldTrigger = API::Trigger()->get([
-			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+		$old_triggers = API::Trigger()->get([
+			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => getRequest('triggerid')
 		]);
-		if (!$oldTrigger) {
+		if (!$old_triggers) {
 			access_deny();
 		}
 
-		$oldTrigger = reset($oldTrigger);
-		$oldTrigger['dependencies'] = zbx_toHash(zbx_objectValues($oldTrigger['dependencies'], 'triggerid'));
-		$oldTrigger['expression'] = explode_exp($oldTrigger['expression']);
+		$old_triggers = CMacrosResolverHelper::resolveTriggerExpressions($old_triggers);
+
+		$old_trigger = reset($old_triggers);
+		$old_trigger['dependencies'] = zbx_toHash(zbx_objectValues($old_trigger['dependencies'], 'triggerid'));
 
 		$newDependencies = $trigger['dependencies'];
-		$oldDependencies = $oldTrigger['dependencies'];
+		$oldDependencies = $old_trigger['dependencies'];
 
-		unset($trigger['dependencies'], $oldTrigger['dependencies']);
+		unset($trigger['dependencies'], $old_trigger['dependencies']);
 
-		$triggerToUpdate = array_diff_assoc($trigger, $oldTrigger);
+		$triggerToUpdate = array_diff_assoc($trigger, $old_trigger);
 		$triggerToUpdate['triggerid'] = getRequest('triggerid');
 
 		// dependencies
