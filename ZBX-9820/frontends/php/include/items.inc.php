@@ -673,32 +673,28 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 	));
 
 	$items = array();
-	$itemNames = array();
+	$item_counter = array();
 	foreach ($dbItems as $dbItem) {
-		$itemId = $dbItem['itemid'];
-		$itemNames[$itemId] = $dbItem['name_expanded'];
+		$name = $dbItem['name_expanded'];
+		$hostname = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
+		$hostNames[$dbItem['hostid']] = $hostname;
 
-		$dbItem['hostname'] = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
-		$hostNames[$dbItem['hostid']] = $dbItem['hostname'];
-
-		// a little tricky check for attempt to overwrite active trigger (value=1) with
-		// inactive or active trigger with lower priority.
-		if (!isset($items[$itemId][$dbItem['hostname']])
-				|| (($items[$itemId][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-					|| (($items[$itemId][$dbItem['hostname']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
-						&& $dbItem['priority'] > $items[$itemId][$dbItem['hostname']]['severity']))) {
-			$items[$itemId][$dbItem['hostname']] = array(
-				'itemid' => $dbItem['itemid'],
-				'value_type' => $dbItem['value_type'],
-				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
-				'units' => $dbItem['units'],
-				'name' => $dbItem['name_expanded'],
-				'valuemapid' => $dbItem['valuemapid'],
-				'severity' => $dbItem['priority'],
-				'tr_value' => $dbItem['tr_value'],
-				'triggerid' => $dbItem['triggerid']
-			);
+		if (!array_key_exists($hostname, $item_counter) || !array_key_exists($name, $item_counter[$hostname])) {
+			$item_counter[$hostname] = array($name => 0);
 		}
+
+		$items[$name][$item_counter[$hostname][$name]][$hostname] = array(
+			'itemid' => $dbItem['itemid'],
+			'value_type' => $dbItem['value_type'],
+			'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
+			'units' => $dbItem['units'],
+			'name' => $dbItem['name_expanded'],
+			'valuemapid' => $dbItem['valuemapid'],
+			'severity' => $dbItem['priority'],
+			'tr_value' => $dbItem['tr_value'],
+			'triggerid' => $dbItem['triggerid']
+		);
+		$item_counter[$hostname][$name]++;
 	}
 
 	$table = new CTableInfo(_('No items found.'));
@@ -716,20 +712,24 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($items as $itemId => $ithosts) {
-			$tableRow = array(nbsp($itemNames[$itemId]));
-			foreach ($hostNames as $hostName) {
-				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+		foreach ($items as $descr => $item_data) {
+			foreach ($item_data as $itemidx => $ithosts) {
+				$tableRow = array(nbsp($descr));
+				foreach ($hostNames as $hostName) {
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+				}
+				$table->addRow($tableRow);
 			}
-			$table->addRow($tableRow);
 		}
 	}
 	else {
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		$header = array(new CCol(_('Hosts'), 'center'));
-		foreach ($items as $itemId => $ithosts) {
-			$header[] = new CCol($itemNames[$itemId], 'vertical_rotation');
+		foreach ($items as $descr => $item_data) {
+			foreach ($item_data as $itemidx => $ithosts) {
+				$header[] = new CCol($descr, 'vertical_rotation');
+			}
 		}
 		$table->setHeader($header, 'vertical_header');
 
@@ -740,8 +740,10 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 			$name->setMenuPopup(getMenuPopupHost($host, $scripts[$hostId]));
 
 			$tableRow = array(new CCol($name));
-			foreach ($items as $ithosts) {
-				$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+			foreach ($items as $item_data) {
+				foreach ($item_data as $itemidx => $ithosts) {
+					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
+				}
 			}
 			$table->addRow($tableRow);
 		}
