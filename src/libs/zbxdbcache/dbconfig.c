@@ -1744,7 +1744,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x01))
 				{
 					addr = zbx_strdup(NULL, interface->ip);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 							&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->ip, addr);
 					zbx_free(addr);
@@ -1753,7 +1753,7 @@ static void	DCsync_interfaces(DB_RESULT result)
 				if (0 != (macros & 0x02))
 				{
 					addr = zbx_strdup(NULL, interface->dns);
-					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL,
+					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL,
 							&addr, MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
 					DCstrpool_replace(1, &interface->dns, addr);
 					zbx_free(addr);
@@ -1988,12 +1988,14 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type,
 							config->config->refresh_unsupported, NULL,
-							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
+							now - proxy_timediff);
+					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 				else
 				{
 					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16],
-							now - proxy_timediff) + proxy_timediff + (NULL != proxy);
+							now - proxy_timediff);
+					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 			}
 		}
