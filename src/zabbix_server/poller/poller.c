@@ -531,7 +531,10 @@ static int	get_values(unsigned char poller_type, int *nextcheck)
 	num = DCconfig_get_poller_items(poller_type, items);
 
 	if (0 == num)
+	{
+		*nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		goto exit;
+	}
 
 	/* prepare items */
 	for (i = 0; i < num; i++)
