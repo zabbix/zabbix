@@ -295,6 +295,9 @@ abstract class CItemGeneral extends CZBXAPI {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Type of information must be "Log" for log key.'));
 			}
 
+			$this->checkValueBetween($fullItem['delay'], 'delay', 0, 86400);
+			$this->checkDelayFlex($fullItem['delay_flex'], $fullItem['name']);
+
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
 				$res = calculateItemNextcheck(0, 0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'], time());
@@ -336,13 +339,29 @@ abstract class CItemGeneral extends CZBXAPI {
 				}
 			}
 
-			$this->checkDelayFlex($fullItem);
-
 			$this->checkSpecificFields($fullItem);
 		}
 		unset($item);
 
 		$this->checkExistingItems($items);
+	}
+
+	/**
+	 *
+	 * @param $value
+	 * @param string $var_name
+	 * @param int $min
+	 * @param int $max
+	 *
+	 * @return bool
+	 */
+	protected function checkValueBetween($value, $var_name, $min, $max) {
+		if($value < $min) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('%1$s must be larger than "%2$s".', $var_name, $min));
+		}
+		elseif($value > $max) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('%1$s must be less than "%2$s".', $var_name, $max));
+		}
 	}
 
 	protected function checkSpecificFields(array $item) {
@@ -735,33 +754,30 @@ abstract class CItemGeneral extends CZBXAPI {
 	 *   600/5-7,00:00-09:00;600/1-2,00:00-09:00
 	 *   600/5,0:0-9:0;600/1-2,0:0-9:0
 	 *
-	 * @param array $item
+	 * @param $delay_flex
+	 * @param $item_name
 	 *
 	 * @return bool
 	 */
-	protected function checkDelayFlex(array $item) {
-		if (array_key_exists('delay_flex', $item)) {
-			$delayFlex = $item['delay_flex'];
+	protected function checkDelayFlex($delay_flex,$item_name) {
+		if (!is_string($delay_flex)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Incorrect flexible interval in item "%1$s". Flexible interval must be a string.', $item_name));
+		}
 
-			if (!is_string($delayFlex)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect flexible interval in item "%1$s". Flexible interval must be a string.', $item['name']));
+		if ($delay_flex === '') {
+			return true;
+		}
+
+		$validator = new CTimePeriodValidator();
+		$intervals = explode(';', rtrim($delay_flex, ';'));
+		foreach ($intervals as $interval) {
+			if (!preg_match('#^\d+/(.+)$#', $interval, $matches)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect flexible interval "%1$s".', $interval));
 			}
 
-			if ($delayFlex === '') {
-				return true;
-			}
-
-			$validator = new CTimePeriodValidator();
-			$intervals = explode(';', rtrim($delayFlex, ';'));
-			foreach ($intervals as $interval) {
-				if (!preg_match('#^\d+/(.+)$#', $interval, $matches)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect flexible interval "%1$s".', $interval));
-				}
-
-				if (!$validator->validate($matches[1])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $validator->getError());
-				}
+			if (!$validator->validate($matches[1])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $validator->getError());
 			}
 		}
 	}
