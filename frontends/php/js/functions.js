@@ -326,8 +326,11 @@ function moveListBoxSelectedItem(objname, from, to, action) {
 		}
 		fromel = jQuery(fromel);
 		if (action.toLowerCase() == 'add') {
-			jQuery(this.form).append("<input name='" + objname + '[' + fromel.val() + ']'
-				+ "' id='" + objname + '_' + fromel.val() + "' value='" + fromel.val() + "' type='hidden'>");
+			jQuery(this)
+				.closest('form')
+				.append("<input name='" + objname + '[' + fromel.val() + ']' + "' id='" + objname + '_' + fromel.val()
+					+ "' value='" + fromel.val() + "' type='hidden'>"
+				);
 		}
 		else if (action.toLowerCase() == 'rmv') {
 			jQuery('#' + objname + '_' + fromel.val()).remove();
