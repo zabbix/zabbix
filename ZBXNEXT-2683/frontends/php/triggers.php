@@ -168,7 +168,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		// update only changed fields
 
 		$old_triggers = API::Trigger()->get([
-			'output' => ['triggerid', 'expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
+			'output' => ['expression', 'description', 'url', 'status', 'priority', 'comments', 'type'],
 			'selectDependencies' => ['triggerid'],
 			'triggerids' => getRequest('triggerid')
 		]);

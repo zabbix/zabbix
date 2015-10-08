@@ -304,7 +304,6 @@ class CMacrosResolverHelper {
 	 * @static
 	 *
 	 * @param array  $triggers
-	 * @param string $triggers[]['triggerid']
 	 * @param string $triggers[]['expression']
 	 * @param array  $options
 	 * @param bool   $options['html']				(optional) returns formatted trigger expression

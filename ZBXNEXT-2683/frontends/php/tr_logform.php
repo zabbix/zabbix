@@ -99,7 +99,7 @@ if (hasRequest('add') || hasRequest('update')) {
 			$description = getRequest('description', '');
 
 			$db_triggers = API::Trigger()->get([
-				'output' => ['triggerid', 'description', 'expression', 'templateid'],
+				'output' => ['description', 'expression', 'templateid'],
 				'triggerids' => [$triggerId]
 			]);
 
@@ -202,9 +202,7 @@ if (hasRequest('sform')) {
 		);
 
 		if ($row = DBfetch($result)) {
-			$triggers = CMacrosResolverHelper::resolveTriggerExpressions([
-				['triggerid' => getRequest('triggerid'), 'expression' => $row['expression']]
-			]);
+			$triggers = CMacrosResolverHelper::resolveTriggerExpressions([['expression' => $row['expression']]]);
 
 			$description = $row['description'];
 			$expression = $triggers[0]['expression'];
