@@ -273,7 +273,7 @@ abstract class CHostGeneral extends CHostBase {
 		while ($trigger = DBfetch($dbTriggers)) {
 			$triggers[$trigger['flags']][$trigger['triggerid']] = [
 				'description' => $trigger['description'],
-				'expression' => explode_exp($trigger['expression']),
+				'expression' => $trigger['expression'],
 				'triggerid' => $trigger['triggerid'],
 				'host' => $trigger['host']
 			];
