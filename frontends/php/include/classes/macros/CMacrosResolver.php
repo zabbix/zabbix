@@ -698,7 +698,6 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Purpose: Translate {10}>10 to something like {localhost:system.cpu.load.last()}>10
 	 *
 	 * @param array  $triggers
-	 * @param string $triggers[]['triggerid']		mandatory with $options['resolve_usermacros'] = true
 	 * @param string $triggers[]['expression']
 	 * @param array  $options
 	 * @param bool   $options['html']				returns formatted trigger expression
@@ -725,16 +724,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		foreach ($triggers as $key => $trigger) {
 			$matched_macros = $this->extractMacros([$trigger['expression']], $types);
 
-			if ($matched_macros['functionids']) {
-				$macro_values[$trigger['triggerid']] = $matched_macros['functionids'];
+			$macro_values[$key] = $matched_macros['functionids'];
 
-				foreach (array_keys($matched_macros['functionids']) as $macro) {
-					$functionids[] = substr($macro, 1, -1); // strip curly braces
-				}
+			foreach (array_keys($matched_macros['functionids']) as $macro) {
+				$functionids[] = substr($macro, 1, -1); // strip curly braces
 			}
 
 			if ($options['resolve_usermacros'] && $matched_macros['usermacros']) {
-				$usermacros[$trigger['triggerid']] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
+				$usermacros[$key] = ['hostids' => [], 'macros' => $matched_macros['usermacros']];
 			}
 		}
 
@@ -744,7 +741,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 			// selecting functions
 			$result = DBselect(
-				'SELECT f.functionid,f.triggerid,f.itemid,f.function,f.parameter'.
+				'SELECT f.functionid,f.itemid,f.function,f.parameter'.
 				' FROM functions f'.
 				' WHERE '.dbConditionInt('f.functionid', $functionids)
 			);
@@ -887,23 +884,20 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 			unset($macros);
 
-			if ($usermacros) {
-				foreach ($functions as $function) {
-					if (array_key_exists($function['triggerid'], $usermacros)) {
-						$usermacros[$function['triggerid']]['hostids'][$function['hostid']] = true;
+			foreach ($usermacros as $key => &$usermacros_data) {
+				foreach (array_keys($macro_values[$key]) as $macro) {
+					if (array_key_exists($macro, $functions)) {
+						$usermacros_data['hostids'][$functions[$macro]['hostid']] = true;
 					}
 				}
-
-				foreach ($usermacros as &$usermacros_data) {
-					$usermacros_data['hostids'] = array_keys($usermacros_data['hostids']);
-				}
-				unset($usermacros_data);
+				$usermacros_data['hostids'] = array_keys($usermacros_data['hostids']);
 			}
+			unset($usermacros_data);
 
 			// get user macros values
-			foreach ($this->getUserMacros($usermacros) as $triggerid => $usermacros_data) {
-				$macro_values[$triggerid] = array_key_exists($triggerid, $macro_values)
-					? array_merge($macro_values[$triggerid], $usermacros_data['macros'])
+			foreach ($this->getUserMacros($usermacros) as $key => $usermacros_data) {
+				$macro_values[$key] = array_key_exists($key, $macro_values)
+					? array_merge($macro_values[$key], $usermacros_data['macros'])
 					: $usermacros_data['macros'];
 			}
 		}
@@ -911,7 +905,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$types = $this->transformToPositionTypes($types);
 
 		// replace macros to value
-		foreach ($triggers as &$trigger) {
+		foreach ($triggers as $key => &$trigger) {
 			$matched_macros = $this->getMacroPositions($trigger['expression'], $types);
 
 			if ($options['html']) {
@@ -919,12 +913,12 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				$pos_left = 0;
 
 				foreach ($matched_macros as $pos => $macro) {
-					if (array_key_exists($macro, $macro_values[$trigger['triggerid']])) {
+					if (array_key_exists($macro, $macro_values[$key])) {
 						if ($pos_left != $pos) {
 							$expression[] = substr($trigger['expression'], $pos_left, $pos - $pos_left);
 						}
 
-						$expression[] = $macro_values[$trigger['triggerid']][$macro];
+						$expression[] = $macro_values[$key][$macro];
 
 						$pos_left = $pos + strlen($macro);
 					}
@@ -935,9 +929,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 			else {
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-					if (array_key_exists($macro, $macro_values[$trigger['triggerid']])) {
+					if (array_key_exists($macro, $macro_values[$key])) {
 						$trigger['expression'] = substr_replace($trigger['expression'],
-							$macro_values[$trigger['triggerid']][$macro], $pos, strlen($macro));
+							$macro_values[$key][$macro], $pos, strlen($macro));
 					}
 				}
 			}
