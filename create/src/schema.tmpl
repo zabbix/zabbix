@@ -322,6 +322,7 @@ FIELD		|smtp_security	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_peer|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_host|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_authentication|t_integer	|'0'	|NOT NULL	|0
+FIELD		|exec_params	|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|description
 
 TABLE|users|userid|ZBX_DATA
@@ -1300,4 +1301,4 @@ FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050061	|2050061
+ROW		|2050063	|2050063

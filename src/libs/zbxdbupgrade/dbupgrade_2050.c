@@ -629,6 +629,27 @@ static int	DBpatch_2050061(void)
 
 	return DBset_default("config", &field);
 }
+
+static int	DBpatch_2050062(void)
+{
+	const ZBX_FIELD field = {"exec_params", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050063(void)
+{
+	/* type=1 -> type=MEDIA_TYPE_EXEC */
+	if (ZBX_DB_OK > DBexecute("update media_type"
+			" set exec_params='{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n'"
+			" where type=1"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -689,5 +710,7 @@ DBPATCH_ADD(2050058, 0, 1)
 DBPATCH_ADD(2050059, 0, 1)
 DBPATCH_ADD(2050060, 0, 1)
 DBPATCH_ADD(2050061, 0, 1)
+DBPATCH_ADD(2050062, 0, 1)
+DBPATCH_ADD(2050063, 0, 1)
 
 DBPATCH_END()
