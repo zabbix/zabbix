@@ -674,16 +674,17 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 
 	$items = array();
 	$item_counter = array();
-	foreach ($dbItems as $dbItem) {
-		$name = $dbItem['name_expanded'];
-		$hostname = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
-		$hostNames[$dbItem['hostid']] = $hostname;
 
-		if (!array_key_exists($hostname, $item_counter) || !array_key_exists($name, $item_counter[$hostname])) {
-			$item_counter[$hostname] = array($name => 0);
+	foreach ($dbItems as $dbItem) {
+		$item_name = $dbItem['name_expanded'];
+		$host_name = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
+		$hostNames[$dbItem['hostid']] = $host_name;
+
+		if (!array_key_exists($host_name, $item_counter) || !array_key_exists($item_name, $item_counter[$host_name])) {
+			$item_counter[$host_name] = array($item_name => 0);
 		}
 
-		$items[$name][$item_counter[$hostname][$name]][$hostname] = array(
+		$items[$item_name][$item_counter[$host_name][$item_name]][$host_name] = array(
 			'itemid' => $dbItem['itemid'],
 			'value_type' => $dbItem['value_type'],
 			'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
@@ -694,7 +695,8 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 			'tr_value' => $dbItem['tr_value'],
 			'triggerid' => $dbItem['triggerid']
 		);
-		$item_counter[$hostname][$name]++;
+
+		$item_counter[$host_name][$item_name]++;
 	}
 
 	$table = new CTableInfo(_('No items found.'));
@@ -712,9 +714,9 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		}
 		$table->setHeader($header, 'vertical_header');
 
-		foreach ($items as $descr => $item_data) {
-			foreach ($item_data as $itemidx => $ithosts) {
-				$tableRow = array(nbsp($descr));
+		foreach ($items as $item_name => $item_data) {
+			foreach ($item_data as $ithosts) {
+				$tableRow = array(nbsp($item_name));
 				foreach ($hostNames as $hostName) {
 					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 				}
@@ -726,9 +728,9 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		$scripts = API::Script()->getScriptsByHosts(zbx_objectValues($hosts, 'hostid'));
 
 		$header = array(new CCol(_('Hosts'), 'center'));
-		foreach ($items as $descr => $item_data) {
-			foreach ($item_data as $itemidx => $ithosts) {
-				$header[] = new CCol($descr, 'vertical_rotation');
+		foreach ($items as $item_name => $item_data) {
+			foreach ($item_data as $ithosts) {
+				$header[] = new CCol($item_name, 'vertical_rotation');
 			}
 		}
 		$table->setHeader($header, 'vertical_header');
