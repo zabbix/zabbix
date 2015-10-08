@@ -514,7 +514,7 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
  * Comments:                                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	get_values(unsigned char poller_type)
+static int	get_values(unsigned char poller_type, int *nextcheck)
 {
 	const char	*__function_name = "get_values";
 	DC_ITEM		items[MAX_POLLER_ITEMS];
@@ -531,7 +531,10 @@ static int	get_values(unsigned char poller_type)
 	num = DCconfig_get_poller_items(poller_type, items);
 
 	if (0 == num)
+	{
+		*nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		goto exit;
+	}
 
 	/* prepare items */
 	for (i = 0; i < num; i++)
@@ -559,7 +562,7 @@ static int	get_values(unsigned char poller_type)
 			case ITEM_TYPE_JMX:
 				ZBX_STRDUP(port, items[i].interface.port_orig);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &port, MACRO_TYPE_COMMON, NULL, 0);
 				if (FAIL == is_ushort(port, &items[i].interface.port))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "Invalid port number [%s]",
@@ -579,13 +582,13 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmpv3_contextname, items[i].snmpv3_contextname_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SNMPv1:
 			case ITEM_TYPE_SNMPv2c:
@@ -593,7 +596,7 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].snmp_oid, items[i].snmp_oid_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 				if (SUCCEED != substitute_key_macros(&items[i].snmp_oid, &items[i].host.hostid, NULL,
 						NULL, MACRO_TYPE_SNMP_OID, error, sizeof(error)))
 				{
@@ -607,14 +610,14 @@ static int	get_values(unsigned char poller_type)
 				ZBX_STRDUP(items[i].privatekey, items[i].privatekey_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].publickey, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].privatekey, MACRO_TYPE_COMMON, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
 				substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i],
-						NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
+						NULL, NULL, &items[i].params, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 				/* break; is not missing here */
 			case ITEM_TYPE_SIMPLE:
 			case ITEM_TYPE_JMX:
@@ -622,9 +625,9 @@ static int	get_values(unsigned char poller_type)
 				items[i].password = zbx_strdup(items[i].password, items[i].password_orig);
 
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].username, MACRO_TYPE_COMMON, NULL, 0);
 				substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
+						NULL, NULL, &items[i].password, MACRO_TYPE_COMMON, NULL, 0);
 				break;
 		}
 	}
@@ -726,8 +729,8 @@ static int	get_values(unsigned char poller_type)
 					items[i].state, results[i].msg);
 		}
 
-		DCrequeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
-				&errcodes[i], 1);
+		DCpoller_requeue_items(&items[i].itemid, &items[i].state, &timespec.sec, &lastlogsizes[i], NULL,
+				&errcodes[i], 1, poller_type, nextcheck);
 
 		zbx_free(items[i].key);
 
@@ -806,7 +809,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 		}
 
 		sec = zbx_time();
-		processed += get_values(poller_type);
+		processed += get_values(poller_type, &nextcheck);
 		total_sec += zbx_time() - sec;
 #ifdef HAVE_OPENIPMI
 		if (ZBX_POLLER_TYPE_IPMI == poller_type && SEC_PER_HOUR < time(NULL) - last_ipmi_host_check)
@@ -815,7 +818,6 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			delete_inactive_ipmi_hosts(last_ipmi_host_check);
 		}
 #endif
-		nextcheck = DCconfig_get_poller_nextcheck(poller_type);
 		sleeptime = calculate_sleeptime(nextcheck, POLLER_DELAY);
 
 		if (0 != sleeptime || STAT_INTERVAL <= time(NULL) - last_stat_time)
