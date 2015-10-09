@@ -864,7 +864,7 @@ int	get_key_param(char *param, int num, char *buf, size_t max_len);
 int	num_key_param(char *param);
 size_t	zbx_get_escape_string_len(const char *src, const char *charlist);
 char	*zbx_dyn_escape_string(const char *src, const char *charlist);
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now);
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *custom_intervals, time_t now);
 time_t	calculate_proxy_nextcheck(zbx_uint64_t hostid, unsigned int delay, time_t now);
 int	check_time_period(const char *period, time_t now);
 char	zbx_num2hex(u_char c);

@@ -10,6 +10,10 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and
 ...G...PS. [ZBX-9274] added printing defaults when Zabbix programs are executed with --help option (dimir)
 
 Bug fixes:
+..F....... [ZBX-9862] added meta tag "msapplication-config" to page header (Gunars)
+A......... [ZBX-9340] fixed "data" property not being returned by API when error is generated on DB level (Gunars)
+A......... [ZBX-9866] fixed error field being needlessly copied for LLD rule when full cloning a host (Gunars)
+..F....... [ZBX-9883] fixed host assignment for proxy (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
 ........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
 ........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
@@ -178,6 +182,9 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9862] added meta tag "msapplication-config" to page header (Gunars)
+A......... [ZBX-9340] fixed "data" property not being returned by API when error is generated on DB level (Gunars)
+A......... [ZBX-9866] fixed error field being needlessly copied for LLD rule when full cloning a host (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
 ........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
 ........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
@@ -863,6 +870,8 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9862] added meta tag "msapplication-config" to page header (Gunars)
+A......... [ZBX-9340] fixed "data" property not being returned by API when error is generated on DB level (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
 ........S. [ZBX-9912] fixed ITEM.LASTVALUE macro value being truncated at bytes rather than utf-8 characters (wiper)
 ........S. [ZBX-9643] fixed value passing to action message from user defined macros (viktors)
