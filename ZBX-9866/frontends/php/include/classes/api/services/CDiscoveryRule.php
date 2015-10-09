@@ -953,8 +953,8 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get(array(
 			'itemids' => $discoveryid,
-			'output' => array('type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay', 'history',
-				'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+			'output' => array('itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay',
+				'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
 				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
 				'lastlogsize', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type',
 				'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime', 'flags', 'interfaceid', 'port',
@@ -969,7 +969,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch source and destination hosts
 		$hosts = API::Host()->get(array(
 			'hostids' => array($srcDiscovery['hostid'], $hostid),
-			'output' => array('host', 'name', 'status'),
+			'output' => array('hostid', 'host', 'name', 'status'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'templated_hosts' => true,
 			'preservekeys' => true
