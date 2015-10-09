@@ -400,7 +400,9 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				// if we have multiple hosts in trigger expression and we haven't pointed ($srcHostId) which host to replace, call error
 				if (count($srcTrigger['hosts']) > 1) {
 					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.',
-						$srcTrigger['description'], explode_exp($srcTrigger['expression'])));
+						$srcTrigger['description'],
+						CMacrosResolverHelper::resolveTriggerExpression($srcTrigger['expression'])
+					));
 					return false;
 				}
 				$host = $srcTrigger['hosts'][0]['host'];
@@ -519,6 +521,56 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	}
 
 	return true;
+}
+
+/**
+ * Purpose: Replaces host in trigger expression
+ * {localhost:agent.ping.nodata(5m)}  =>  {localhost6:agent.ping.nodata(5m)}
+ *
+ * @param string $expression	full expression with host names and item keys
+ * @param string $src_host
+ * @param string $dst_host
+ *
+ * @return string
+ */
+function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
+	$new_expression = '';
+
+	$function_macro_parser = new CFunctionMacroParser();
+	$user_macro_parser = new CUserMacroParser();
+	$macro_parser = new CSetParser(['{TRIGGER.VALUE}']);
+	$lld_macro_parser = new CLLDMacroParser();
+
+	for ($pos = 0, $pos_left = 0; isset($expression[$pos]); $pos++) {
+		if ($function_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+			$host = $function_macro_parser->getHost();
+			$item = $function_macro_parser->getItem();
+			$function = $function_macro_parser->getFunction();
+
+			if ($host === $src_host) {
+				$host = $dst_host;
+			}
+
+			$new_expression .= substr($expression, $pos_left, $pos - $pos_left);
+			$new_expression .= '{'.$host.':'.$item.'.'.$function.'}';
+			$pos_left = $pos + $function_macro_parser->getLength();
+
+			$pos += $function_macro_parser->getLength() - 1;
+		}
+		elseif ($user_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+			$pos += $user_macro_parser->getLength() - 1;
+		}
+		elseif ($macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+			$pos += $macro_parser->getLength() - 1;
+		}
+		elseif ($lld_macro_parser->parse($expression, $pos) != CParser::PARSE_FAIL) {
+			$pos += $lld_macro_parser->getLength() - 1;
+		}
+	}
+
+	$new_expression .= substr($expression, $pos_left, $pos - $pos_left);
+
+	return $new_expression;
 }
 
 /********************************************************************************
@@ -1451,6 +1503,9 @@ function make_trigger_details($trigger) {
 	}
 	array_pop($hostNames);
 
+	$expression = CMacrosResolverHelper::resolveTriggerExpression($trigger['expression'],
+		['html' => true, 'resolve_usermacros' => true, 'resolve_macros' => true]);
+
 	$table = (new CTableInfo())
 		->addRow([
 			new CCol(_n('Host', 'Hosts', count($hosts))),
@@ -1466,7 +1521,7 @@ function make_trigger_details($trigger) {
 		])
 		->addRow([
 			new CCol(_('Expression')),
-			new CCol(explode_exp($trigger['expression'], true, true))
+			new CCol($expression)
 		])
 		->addRow([_('Event generation'), _('Normal').((TRIGGER_MULT_EVENT_ENABLED == $trigger['type'])
 			? SPACE.'+'.SPACE._('Multiple PROBLEM events') : '')])
