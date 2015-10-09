@@ -181,6 +181,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9862] added meta tag "msapplication-config" to page header (Gunars)
 A......... [ZBX-9340] fixed "data" property not being returned by API when error is generated on DB level (Gunars)
 A......... [ZBX-9866] fixed error field being needlessly copied for LLD rule when full cloning a host (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
