@@ -202,10 +202,8 @@ if (hasRequest('sform')) {
 		);
 
 		if ($row = DBfetch($result)) {
-			$triggers = CMacrosResolverHelper::resolveTriggerExpressions([['expression' => $row['expression']]]);
-
 			$description = $row['description'];
-			$expression = $triggers[0]['expression'];
+			$expression = CMacrosResolverHelper::resolveTriggerExpression($row['expression']);
 			$type = $row['type'];
 			$priority = $row['priority'];
 			$comments = $row['comments'];
