@@ -35,7 +35,6 @@ typedef struct zbx_scheduler_filter_t
 	int				step;
 
 	struct zbx_scheduler_filter_t	*next;
-
 }
 zbx_scheduler_filter_t;
 
