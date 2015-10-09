@@ -3178,8 +3178,8 @@ void	zbx_tls_init_child(void)
 		/* we're using blocking sockets, deal with renegotiations automatically */
 		SSL_CTX_set_mode(ctx_cert, SSL_MODE_AUTO_RETRY);
 
-		/* use server ciphersuite preference */
-		SSL_CTX_set_options(ctx_cert, SSL_OP_CIPHER_SERVER_PREFERENCE);
+		/* use server ciphersuite preference, do not use RFC4507 ticket extension */
+		SSL_CTX_set_options(ctx_cert, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 
 		/* do not connect to unpatched servers */
 		SSL_CTX_clear_options(ctx_cert, SSL_OP_LEGACY_SERVER_CONNECT);
@@ -3191,7 +3191,7 @@ void	zbx_tls_init_child(void)
 	if (NULL != ctx_psk)
 	{
 		SSL_CTX_set_mode(ctx_psk, SSL_MODE_AUTO_RETRY);
-		SSL_CTX_set_options(ctx_psk, SSL_OP_CIPHER_SERVER_PREFERENCE);
+		SSL_CTX_set_options(ctx_psk, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 		SSL_CTX_clear_options(ctx_psk, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_psk, SSL_SESS_CACHE_OFF);
 	}
@@ -3199,7 +3199,7 @@ void	zbx_tls_init_child(void)
 	if (NULL != ctx_all)
 	{
 		SSL_CTX_set_mode(ctx_all, SSL_MODE_AUTO_RETRY);
-		SSL_CTX_set_options(ctx_all, SSL_OP_CIPHER_SERVER_PREFERENCE);
+		SSL_CTX_set_options(ctx_all, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 		SSL_CTX_clear_options(ctx_all, SSL_OP_LEGACY_SERVER_CONNECT);
 		SSL_CTX_set_session_cache_mode(ctx_all, SSL_SESS_CACHE_OFF);
 	}
