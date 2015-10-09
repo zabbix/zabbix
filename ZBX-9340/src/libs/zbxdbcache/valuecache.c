@@ -2852,10 +2852,10 @@ void	zbx_vc_history_value2str(char *buffer, size_t size, history_value_t *value,
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
-			zbx_strlcpy(buffer, value->str, size);
+			zbx_strlcpy_utf8(buffer, value->str, size);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
-			zbx_strlcpy(buffer, value->log->value, size);
+			zbx_strlcpy_utf8(buffer, value->log->value, size);
 	}
 }
 
