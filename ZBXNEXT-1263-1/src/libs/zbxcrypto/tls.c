@@ -105,7 +105,6 @@ ZBX_THREAD_LOCAL static const SSL_METHOD	*method			= NULL;
 ZBX_THREAD_LOCAL static SSL_CTX			*ctx_cert		= NULL;
 ZBX_THREAD_LOCAL static SSL_CTX			*ctx_psk		= NULL;
 ZBX_THREAD_LOCAL static SSL_CTX			*ctx_all		= NULL;
-ZBX_THREAD_LOCAL static X509_CRL		*my_crl			= NULL;
 /* variables for passing required PSK identity and PSK info to client callback function */
 ZBX_THREAD_LOCAL static char			*psk_identity_for_cb	= NULL;
 ZBX_THREAD_LOCAL static size_t			psk_identity_len_for_cb	= 0;
@@ -2542,7 +2541,7 @@ void	zbx_tls_init_child(void)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CRL certificate(s) from file \"%s\"", __function_name,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CRL(s) from file \"%s\"", __function_name,
 				CONFIG_TLS_CRL_FILE);
 	}
 
@@ -2732,12 +2731,11 @@ void	zbx_tls_init_child(void)
 		if (0 < (res = gnutls_certificate_set_x509_crl_file(my_cert_creds, CONFIG_TLS_CRL_FILE,
 				GNUTLS_X509_FMT_PEM)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "loaded %d certificate(s) from CRL file \"%s\"", res,
-					CONFIG_TLS_CRL_FILE);
+			zabbix_log(LOG_LEVEL_DEBUG, "loaded %d CRL(s) from file \"%s\"", res, CONFIG_TLS_CRL_FILE);
 		}
 		else if (0 == res)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "no certificate(s) in CRL \"%s\"", CONFIG_TLS_CRL_FILE);
+			zabbix_log(LOG_LEVEL_WARNING, "no CRL(s) in file \"%s\"", CONFIG_TLS_CRL_FILE);
 		}
 		else
 		{
@@ -2974,65 +2972,74 @@ void	zbx_tls_init_child(void)
 	/* Load CRL (certificate revocation list) file. */
 	if (NULL != CONFIG_TLS_CRL_FILE)
 	{
-		FILE			*f;
-		X509_VERIFY_PARAM	*param;
+		X509_STORE	*store_cert;
+		X509_LOOKUP	*lookup_cert;
+		int		count_cert;
 
-		if (NULL == (f = fopen(CONFIG_TLS_CRL_FILE, "r")))
+		store_cert = SSL_CTX_get_cert_store(ctx_cert);
+
+		if (NULL == (lookup_cert = X509_STORE_add_lookup(store_cert, X509_LOOKUP_file())))
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot open file \"%s\": %s",
-					CONFIG_TLS_CRL_FILE, zbx_strerror(errno));
-			goto out1;
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_add_lookup() 1 failed when"
+					" loading CRL(s) from file \"%s\":", CONFIG_TLS_CRL_FILE);
+			goto out;
 		}
 
-		if (NULL == PEM_read_X509_CRL(f, &my_crl, NULL, NULL))
+		if (0 >= (count_cert = X509_load_crl_file(lookup_cert, CONFIG_TLS_CRL_FILE, X509_FILETYPE_PEM)))
 		{
 			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load CRL(s) from file \"%s\":",
 					CONFIG_TLS_CRL_FILE);
-			fclose(f);
 			goto out;
 		}
 
-		if (0 != fclose(f))
+		if (1 != X509_STORE_set_flags(store_cert, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL))
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot close file \"%s\": %s",
-					CONFIG_TLS_CRL_FILE, zbx_strerror(errno));
-			goto out1;
-		}
-
-		if ((NULL != ctx_cert && 1 != X509_STORE_add_crl(SSL_CTX_get_cert_store(ctx_cert), my_crl)) ||
-				(NULL != ctx_all && 1 != X509_STORE_add_crl(SSL_CTX_get_cert_store(ctx_all), my_crl)))
-		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot add CRL(s) from file \"%s\":",
-					CONFIG_TLS_CRL_FILE);
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_set_flags() 1 failed when"
+					" loading CRL(s) from file \"%s\":", CONFIG_TLS_CRL_FILE);
 			goto out;
 		}
 
-		if (NULL == (param = X509_VERIFY_PARAM_new()))
+		if (NULL != ctx_all)
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot create CRL verification"
-					" parameter");
-			goto out;
+			X509_STORE	*store_all;
+			X509_LOOKUP	*lookup_all;
+			int		count_all;
+
+			store_all = SSL_CTX_get_cert_store(ctx_all);
+
+			if (NULL == (lookup_all = X509_STORE_add_lookup(store_all, X509_LOOKUP_file())))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset,
+						"X509_STORE_add_lookup() 2 failed when loading CRL(s) from file"
+						" \"%s\":", CONFIG_TLS_CRL_FILE);
+				goto out;
+			}
+
+			if (0 >= (count_all = X509_load_crl_file(lookup_all, CONFIG_TLS_CRL_FILE, X509_FILETYPE_PEM)))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot load CRL(s) from file"
+						" \"%s\":", CONFIG_TLS_CRL_FILE);
+				goto out;
+			}
+
+			if (count_cert != count_all)
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "number of CRL(s) loaded from"
+						" file \"%s\" does not match: %d and %d", CONFIG_TLS_CRL_FILE,
+						count_cert, count_all);
+				goto out1;
+			}
+
+			if (1 != X509_STORE_set_flags(store_all, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL))
+			{
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_set_flags() 2"
+						" failed when loading CRL(s) from file \"%s\":", CONFIG_TLS_CRL_FILE);
+				goto out;
+			}
 		}
 
-		if (1 != X509_VERIFY_PARAM_set_flags(param, X509_V_FLAG_CRL_CHECK_ALL))
-		{
-			X509_VERIFY_PARAM_free(param);
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set flag to CRL verification"
-					" parameter");
-			goto out;
-		}
-
-		if ((NULL != ctx_cert && 1 != SSL_CTX_set1_param(ctx_cert, param)) ||
-				(NULL != ctx_all && 1 != SSL_CTX_set1_param(ctx_all, param)))
-		{
-			X509_VERIFY_PARAM_free(param);
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "cannot set CRL verification flag:");
-			goto out;
-		}
-
-		X509_VERIFY_PARAM_free(param);
-
-		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded CRL from file \"%s\"", __function_name, CONFIG_TLS_CRL_FILE);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded %d CRL(s) from file \"%s\"", __function_name, count_cert,
+				CONFIG_TLS_CRL_FILE);
 	}
 
 	/* 'TLSCertFile' parameter (in zabbix_server.conf, zabbix_proxy.conf, zabbix_agentd.conf). */
@@ -3338,9 +3345,6 @@ void	zbx_tls_free(void)
 
 	if (NULL != ctx_all)
 		SSL_CTX_free(ctx_all);
-
-	if (NULL != my_crl)
-		X509_CRL_free(my_crl);
 
 	if (NULL != my_psk)
 	{
