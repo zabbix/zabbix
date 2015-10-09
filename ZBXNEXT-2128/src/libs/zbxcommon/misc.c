@@ -1434,13 +1434,14 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
- * Parameters: seed      - [IN] the seed value applied to delay to spread     *
- *                              item checks over the delay period             *
- *             item_type - [IN] the item type                                 *
- *             delay     - [IN] default delay value, can be overridden        *
+ * Parameters: seed             - [IN] the seed value applied to delay to     *
+ *                                     spread item checks over the delay      *
+ *                                     period                                 *
+ *             item_type        - [IN] the item type                          *
+ *             delay            - [IN] default delay value, can be overridden *
  *             custom_intervals - [IN] descriptions of flexible intervals     *
- *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
- *             now       - [IN] current timestamp                             *
+ *                                     in the form [dd/d1-d2,hh:mm-hh:mm;]    *
+ *             now              - [IN] current timestamp                      *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
