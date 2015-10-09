@@ -665,7 +665,6 @@ static char	*zbx_snmp_get_octet_string(const struct variable_list *var)
 		strval_dyn[var->val_len] = '\0';
 	}
 
-	zbx_lrtrim(strval_dyn, ZBX_WHITESPACE);
 end:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():'%s'", __function_name, ZBX_NULL2STR(strval_dyn));
 
@@ -698,7 +697,7 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 		}
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type || ASN_UNSIGNED64 == var->type ||
+	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type || ASN_OPAQUE_U64 == var->type ||
 			ASN_TIMETICKS == var->type || ASN_GAUGE == var->type)
 #else
 	else if (ASN_UINTEGER == var->type || ASN_COUNTER == var->type ||
@@ -707,13 +706,17 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 	{
 		SET_UI64_RESULT(result, (unsigned long)*var->val.integer);
 	}
+#ifdef OPAQUE_SPECIAL_TYPES
+	else if (ASN_COUNTER64 == var->type || ASN_OPAQUE_COUNTER64 == var->type)
+#else
 	else if (ASN_COUNTER64 == var->type)
+#endif
 	{
 		SET_UI64_RESULT(result, (((zbx_uint64_t)var->val.counter64->high) << 32) +
 				(zbx_uint64_t)var->val.counter64->low);
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_INTEGER == var->type || ASN_INTEGER64 == var->type)
+	else if (ASN_INTEGER == var->type || ASN_OPAQUE_I64 == var->type)
 #else
 	else if (ASN_INTEGER == var->type)
 #endif
@@ -726,11 +729,11 @@ static int	zbx_snmp_set_result(const struct variable_list *var, unsigned char va
 			ret = NOTSUPPORTED;
 	}
 #ifdef OPAQUE_SPECIAL_TYPES
-	else if (ASN_FLOAT == var->type)
+	else if (ASN_OPAQUE_FLOAT == var->type)
 	{
 		SET_DBL_RESULT(result, *var->val.floatVal);
 	}
-	else if (ASN_DOUBLE == var->type)
+	else if (ASN_OPAQUE_DOUBLE == var->type)
 	{
 		SET_DBL_RESULT(result, *var->val.doubleVal);
 	}
@@ -1597,7 +1600,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 		ret = zbx_snmp_get_values(ss, items, to_verify_oids, results, errcodes, query_and_ignore_type, num, 0,
 				error, max_error_len, max_succeed, min_fail);
 
-		if (SUCCEED != ret)
+		if (SUCCEED != ret && NOTSUPPORTED != ret)
 			goto exit;
 
 		for (i = 0; i < to_verify_num; i++)

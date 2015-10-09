@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-31 12:52+0300\n"
+"POT-Creation-Date: 2015-09-17 12:18+0300\n"
 "PO-Revision-Date: 2014-10-06 06:18+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -2477,9 +2477,9 @@ msgstr "Αδύνατη η ενημέρωση ομάδος"
 msgid "Cannot update group."
 msgstr "Αδύνατη η ενημέρωση ομάδος."
 
-#: include/classes/api/services/CHostGroup.php:900
-#: include/classes/api/services/CHostGroup.php:1005
-#: include/classes/api/services/CHostGroup.php:1146
+#: include/classes/api/services/CHostGroup.php:917
+#: include/classes/api/services/CHostGroup.php:1022
+#: include/classes/api/services/CHostGroup.php:1163
 #, c-format
 msgid "Cannot update groups for discovered host \"%1$s\"."
 msgstr "Αδύνατη η ενημέρωση ομάδων εντοπισμένων ξενιστών \"%1$s\"."
@@ -3559,7 +3559,7 @@ msgstr "ΕΝΤΟΠΙΣΜΕΝΟ"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:132
+#: include/views/js/configuration.host.edit.js.php:24 search.php:132
 msgid "DNS"
 msgstr "DNS"
 
@@ -6651,7 +6651,7 @@ msgstr "IMAP"
 #: include/views/inventory.host.view.php:66
 #: include/views/inventory.host.view.php:75
 #: include/views/inventory.host.view.php:84
-#: include/views/js/configuration.host.edit.js.php:22 search.php:131
+#: include/views/js/configuration.host.edit.js.php:24 search.php:131
 msgid "IP"
 msgstr "IP"
 
@@ -7866,7 +7866,7 @@ msgstr "Διεπαφή"
 msgid "Interface is linked to item \"%1$s\" on \"%2$s\"."
 msgstr "Η διεπαφή είναι συνδεδεμένη στο συλλέκτη \"%1$s\" επί \"%2$s\"."
 
-#: include/views/js/configuration.host.edit.js.php:143
+#: include/views/js/configuration.host.edit.js.php:145
 msgid "Interface is used by items that require this type of the interface."
 msgstr "Η διεπαφή χρησιμοποιείται απο συλλέκτες που χρειάζονται αυτόν τον τύπο διεπαφής."
 
@@ -10276,11 +10276,11 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CHostGeneral.php:115
 #: include/classes/api/services/CHostGroup.php:484
 #: include/classes/api/services/CHostGroup.php:562
-#: include/classes/api/services/CHostGroup.php:934
-#: include/classes/api/services/CHostGroup.php:964
-#: include/classes/api/services/CHostGroup.php:1093
-#: include/classes/api/services/CHostGroup.php:1195
-#: include/classes/api/services/CHostGroup.php:1222
+#: include/classes/api/services/CHostGroup.php:951
+#: include/classes/api/services/CHostGroup.php:981
+#: include/classes/api/services/CHostGroup.php:1110
+#: include/classes/api/services/CHostGroup.php:1212
+#: include/classes/api/services/CHostGroup.php:1239
 #: include/classes/api/services/CHostInterface.php:264
 #: include/classes/api/services/CHostInterface.php:280
 #: include/classes/api/services/CHostInterface.php:423
@@ -10847,9 +10847,9 @@ msgstr "Σε αλλαγή κατάστασης τα εναύσματα αναβ�
 msgid "Once"
 msgstr "Άπαξ"
 
-#: include/classes/api/services/CHostGroup.php:1102
-#: include/classes/api/services/CHostGroup.php:1111
-#: include/classes/api/services/CHostGroup.php:1204
+#: include/classes/api/services/CHostGroup.php:1119
+#: include/classes/api/services/CHostGroup.php:1128
+#: include/classes/api/services/CHostGroup.php:1221
 msgid "One of the objects is left without a host group."
 msgstr "Ένα των αντικειμένων χωρίς ομάδα ξενιστή."
 
@@ -11946,7 +11946,7 @@ msgstr "Απομακρυσμένη εντολή"
 #: include/views/js/configuration.discovery.edit.js.php:11
 #: include/views/js/configuration.graph.edit.js.php:90
 #: include/views/js/configuration.host.discovery.edit.js.php:31
-#: include/views/js/configuration.host.edit.js.php:33
+#: include/views/js/configuration.host.edit.js.php:35
 #: include/views/js/configuration.host.prototype.edit.js.php:8
 #: include/views/js/configuration.services.edit.js.php:75
 #: include/views/js/configuration.slideconf.edit.js.php:19
@@ -14885,8 +14885,8 @@ msgstr "Χρόνος διαθεσιμότητας υπηρεσίας εξυπη�
 msgid "Uptime/Downtime"
 msgstr "Χρόνος διαθεσιμότητας/Μη Διαθεσιμότητας"
 
-#: include/views/js/configuration.host.edit.js.php:12
-#: include/views/js/configuration.host.edit.js.php:365
+#: include/views/js/configuration.host.edit.js.php:14
+#: include/views/js/configuration.host.edit.js.php:367
 msgid "Use bulk requests"
 msgstr "Χρήση ομαδικών αιτήσεων"
 

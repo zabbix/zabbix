@@ -80,19 +80,21 @@ static int	refresh_kstat(ZBX_CPUS_STAT_DATA *pcpus)
 			inserted = 0;
 			for (i = 1; i <= pcpus->count; i++)	/* search in our array of ZBX_SINGLE_CPU_STAT_DATAs */
 			{
-				if (pcpus->cpu[i].cpu_num == k->ks_instance + 1)	/* CPU instance found */
+				if (pcpus->cpu[i].cpu_num == k->ks_instance)	/* CPU instance found */
 				{
 					(*ksp)[i - 1] = k;
 					inserted = 1;
+
 					break;
 				}
 
-				if (-1 == pcpus->cpu[i].cpu_num)	/* Free slot found. Most likely first-time */
-									/* initialization. */
+				if (ZBX_CPUNUM_UNDEF == pcpus->cpu[i].cpu_num)
 				{
-					pcpus->cpu[i].cpu_num = k->ks_instance + 1;
+					/* free slot found, most likely first-time initialization */
+					pcpus->cpu[i].cpu_num = k->ks_instance;
 					(*ksp)[i - 1] = k;
 					inserted = 1;
+
 					break;
 				}
 			}
@@ -120,7 +122,7 @@ static int	refresh_kstat(ZBX_CPUS_STAT_DATA *pcpus)
 int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char			*__function_name = "init_cpu_collector";
-	int				cpu_num, ret = FAIL;
+	int				idx, ret = FAIL;
 #ifdef _WINDOWS
 	wchar_t				cpu[8];
 	char				counterPath[PDH_MAX_COUNTER_PATH], *error = NULL;
@@ -136,17 +138,17 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	cpe.dwInstanceIndex = -1;
 	cpe.szCounterName = get_counter_name(PCI_PROCESSOR_TIME);
 
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
+	for (idx = 0; idx <= pcpus->count; idx++)
 	{
-		if (0 == cpu_num)
+		if (0 == idx)
 			StringCchPrintf(cpu, ARRSIZE(cpu), TEXT("_Total"));
 		else
-			_itow_s(cpu_num - 1, cpu, ARRSIZE(cpu), 10);
+			_itow_s(idx - 1, cpu, ARRSIZE(cpu), 10);
 
 		if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__function_name, &cpe, counterPath))
 			goto clean;
 
-		if (NULL == (pcpus->cpu_counter[cpu_num] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+		if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
 				&error)))
 		{
 			goto clean;
@@ -178,16 +180,18 @@ clean:
 		exit(EXIT_FAILURE);
 	}
 
+	pcpus->cpu[0].cpu_num = ZBX_CPUNUM_ALL;
+
 #ifndef HAVE_KSTAT_H
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
-		pcpus->cpu[cpu_num].cpu_num = cpu_num;
+
+	for (idx = 1; idx <= pcpus->count; idx++)
+		pcpus->cpu[idx].cpu_num = idx - 1;
 #else
 	/* Solaris */
 
 	/* CPU instance numbers on Solaris can be non-contiguous, we don't know them yet */
-	pcpus->cpu[0].cpu_num = 0;
-	for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
-		pcpus->cpu[cpu_num].cpu_num = -1;
+	for (idx = 1; idx <= pcpus->count; idx++)
+		pcpus->cpu[idx].cpu_num = ZBX_CPUNUM_UNDEF;
 
 	if (NULL == (kc = kstat_open()))
 	{
@@ -219,7 +223,7 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char	*__function_name = "free_cpu_collector";
 #ifdef _WINDOWS
-	int		i;
+	int		idx;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -227,10 +231,10 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	remove_perf_counter(pcpus->queue_counter);
 	pcpus->queue_counter = NULL;
 
-	for (i = 0; i <= pcpus->count; i++)
+	for (idx = 0; idx <= pcpus->count; idx++)
 	{
-		remove_perf_counter(pcpus->cpu_counter[i]);
-		pcpus->cpu_counter[i] = NULL;
+		remove_perf_counter(pcpus->cpu_counter[idx]);
+		pcpus->cpu_counter[idx] = NULL;
 	}
 #else
 	zbx_mutex_destroy(&cpustats_lock);
@@ -243,8 +247,35 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-#if !defined(_WINDOWS)
+#ifdef _WINDOWS
+int	get_cpu_perf_counter_value(int cpu_num, int interval, double *value, char **error)
+{
+	int	idx;
 
+	/* For Windows we identify CPU by it's index in cpus array, which is CPU ID + 1. */
+	/* At index 0 we keep information about all CPUs. */
+
+	if (ZBX_CPUNUM_ALL == cpu_num)
+		idx = 0;
+	else
+		idx = cpu_num + 1;
+
+	return get_perf_counter_value(collector->cpus.cpu_counter[idx], interval, value, error);
+}
+
+static int	get_cpu_perf_counter_status(int pc_status)
+{
+	switch (pc_status)
+	{
+		case PERF_COUNTER_ACTIVE:
+			return ZBX_CPU_STATUS_ONLINE;
+		case PERF_COUNTER_INITIALIZED:
+			return ZBX_CPU_STATUS_UNKNOWN;
+	}
+
+	return ZBX_CPU_STATUS_OFFLINE;
+}
+#else	/* not _WINDOWS */
 static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *counter)
 {
 	int	i, index;
@@ -275,7 +306,7 @@ static void	update_cpu_counters(ZBX_SINGLE_CPU_STAT_DATA *cpu, zbx_uint64_t *cou
 static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 {
 	const char	*__function_name = "update_cpustats";
-	int		cpu_num;
+	int		idx;
 	zbx_uint64_t	counter[ZBX_CPU_STATE_COUNT];
 
 #if defined(HAVE_PROC_STAT)
@@ -319,8 +350,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #define ZBX_SET_CPUS_NOTSUPPORTED()				\
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)	\
-		update_cpu_counters(&pcpus->cpu[cpu_num], NULL)
+	for (idx = 0; idx <= pcpus->count; idx++)		\
+		update_cpu_counters(&pcpus->cpu[idx], NULL)
 
 #if defined(HAVE_PROC_STAT)
 
@@ -333,8 +364,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	cpu_status = zbx_malloc(cpu_status, sizeof(unsigned char) * (pcpus->count + 1));
 
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
-		cpu_status[cpu_num] = SYSINFO_RET_FAIL;
+	for (idx = 0; idx <= pcpus->count; idx++)
+		cpu_status[idx] = SYSINFO_RET_FAIL;
 
 	while (NULL != fgets(line, sizeof(line), file))
 	{
@@ -343,12 +374,12 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 		if ('0' <= line[3] && line[3] <= '9')
 		{
-			cpu_num = atoi(line + 3) + 1;
-			if (1 > cpu_num || cpu_num > pcpus->count)
+			idx = atoi(line + 3) + 1;
+			if (1 > idx || idx > pcpus->count)
 				continue;
 		}
 		else if (' ' == line[3])
-			cpu_num = 0;
+			idx = 0;
 		else
 			continue;
 
@@ -361,28 +392,28 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 				&counter[ZBX_CPU_STATE_IOWAIT], &counter[ZBX_CPU_STATE_INTERRUPT],
 				&counter[ZBX_CPU_STATE_SOFTIRQ], &counter[ZBX_CPU_STATE_STEAL]);
 
-		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
-		cpu_status[cpu_num] = SYSINFO_RET_OK;
+		update_cpu_counters(&pcpus->cpu[idx], counter);
+		cpu_status[idx] = SYSINFO_RET_OK;
 	}
 	zbx_fclose(file);
 
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
-		if (SYSINFO_RET_FAIL == cpu_status[cpu_num])
-			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+	for (idx = 0; idx <= pcpus->count; idx++)
+		if (SYSINFO_RET_FAIL == cpu_status[idx])
+			update_cpu_counters(&pcpus->cpu[idx], NULL);
 
 	zbx_free(cpu_status);
 
 #elif defined(HAVE_SYS_PSTAT_H)
 
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
+	for (idx = 0; idx <= pcpus->count; idx++)
 	{
 		memset(counter, 0, sizeof(counter));
 
-		if (0 == cpu_num)
+		if (0 == idx)
 		{
 			if (-1 == pstat_getdynamic(&psd, sizeof(psd), 1, 0))
 			{
-				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+				update_cpu_counters(&pcpus->cpu[idx], NULL);
 				continue;
 			}
 
@@ -393,9 +424,9 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 		}
 		else
 		{
-			if (-1 == pstat_getprocessor(&psp, sizeof(psp), 1, cpu_num - 1))
+			if (-1 == pstat_getprocessor(&psp, sizeof(psp), 1, pcpus->cpu[idx].cpu_num))
 			{
-				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+				update_cpu_counters(&pcpus->cpu[idx], NULL);
 				continue;
 			}
 
@@ -405,7 +436,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)psp.psp_cpu_time[CP_IDLE];
 		}
 
-		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
+		update_cpu_counters(&pcpus->cpu[idx], counter);
 	}
 
 #elif defined(HAVE_FUNCTION_SYSCTLBYNAME) && defined(CPUSTATES)
@@ -430,8 +461,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	/* get size of result set for CPU statistics */
 	if (-1 == sysctlbyname("kern.cp_times", NULL, &nlen_alloc, NULL, 0)) {
-		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
-			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+		for (idx = 1; idx <= pcpus->count; idx++)
+			update_cpu_counters(&pcpus->cpu[idx], NULL);
 		goto exit;
 	}
 
@@ -440,24 +471,26 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	nlen = nlen_alloc;
 	if (0 == sysctlbyname("kern.cp_times", cp_times, &nlen, NULL, 0) && nlen == nlen_alloc)
 	{
-		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
+		for (idx = 1; idx <= pcpus->count; idx++)
 		{
+			int	cpu_num = pcpus->cpu[idx].cpu_num;
+
 			memset(counter, 0, sizeof(counter));
 
-			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_USER);
-			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_NICE);
-			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_SYS);
-			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES +
+			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_USER);
+			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_NICE);
+			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_SYS);
+			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES +
 					CP_INTR);
-			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)*(cp_times + (cpu_num - 1) * CPUSTATES + CP_IDLE);
+			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_IDLE);
 
-			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
+			update_cpu_counters(&pcpus->cpu[idx], counter);
 		}
 	}
 	else
 	{
-		for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
-			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+		for (idx = 1; idx <= pcpus->count; idx++)
+			update_cpu_counters(&pcpus->cpu[idx], NULL);
 	}
 
 	zbx_free(cp_times);
@@ -473,24 +506,24 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 
 	memset(total, 0, sizeof(total));
 
-	for (cpu_num = 1; cpu_num <= pcpus->count; cpu_num++)
+	for (idx = 1; idx <= pcpus->count; idx++)
 	{
 read_again:
-		if (NULL != (*ksp)[cpu_num - 1])
+		if (NULL != (*ksp)[idx - 1])
 		{
-			id = kstat_read(kc, (*ksp)[cpu_num - 1], NULL);
+			id = kstat_read(kc, (*ksp)[idx - 1], NULL);
 			if (-1 == id || kc_id != id)	/* error or our kstat chain copy is out-of-date */
 			{
 				if (SUCCEED != refresh_kstat(pcpus))
 				{
-					update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+					update_cpu_counters(&pcpus->cpu[idx], NULL);
 					continue;
 				}
 				else
 					goto read_again;
 			}
 
-			cpu = (cpu_stat_t *)(*ksp)[cpu_num - 1]->ks_data;
+			cpu = (cpu_stat_t *)(*ksp)[idx - 1]->ks_data;
 
 			memset(counter, 0, sizeof(counter));
 
@@ -499,10 +532,10 @@ read_again:
 			total[ZBX_CPU_STATE_SYSTEM] += counter[ZBX_CPU_STATE_SYSTEM] = cpu->cpu_sysinfo.cpu[CPU_KERNEL];
 			total[ZBX_CPU_STATE_IOWAIT] += counter[ZBX_CPU_STATE_IOWAIT] = cpu->cpu_sysinfo.cpu[CPU_WAIT];
 
-			update_cpu_counters(&pcpus->cpu[cpu_num], counter);
+			update_cpu_counters(&pcpus->cpu[idx], counter);
 		}
 		else
-			update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+			update_cpu_counters(&pcpus->cpu[idx], NULL);
 	}
 
 	update_cpu_counters(&pcpus->cpu[0], total);
@@ -510,11 +543,11 @@ read_again:
 #elif defined(HAVE_FUNCTION_SYSCTL_KERN_CPTIME)
 	/* OpenBSD 4.3 */
 
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
+	for (idx = 0; idx <= pcpus->count; idx++)
 	{
 		memset(counter, 0, sizeof(counter));
 
-		if (0 == cpu_num)
+		if (0 == idx)
 		{
 			mib[0] = CTL_KERN;
 			mib[1] = KERN_CPTIME;
@@ -523,7 +556,7 @@ read_again:
 
 			if (-1 == sysctl(mib, 2, &all_states, &sz, NULL, 0) || sz != sizeof(all_states))
 			{
-				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+				update_cpu_counters(&pcpus->cpu[idx], NULL);
 				continue;
 			}
 
@@ -537,13 +570,13 @@ read_again:
 		{
 			mib[0] = CTL_KERN;
 			mib[1] = KERN_CPTIME2;
-			mib[2] = cpu_num - 1;
+			mib[2] = pcpus->cpu[idx].cpu_num;
 
 			sz = sizeof(one_states);
 
 			if (-1 == sysctl(mib, 3, &one_states, &sz, NULL, 0) || sz != sizeof(one_states))
 			{
-				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+				update_cpu_counters(&pcpus->cpu[idx], NULL);
 				continue;
 			}
 
@@ -554,21 +587,21 @@ read_again:
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)one_states[CP_IDLE];
 		}
 
-		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
+		update_cpu_counters(&pcpus->cpu[idx], counter);
 	}
 
 #elif defined(HAVE_LIBPERFSTAT)
 	/* AIX 6.1 */
 
-	for (cpu_num = 0; cpu_num <= pcpus->count; cpu_num++)
+	for (idx = 0; idx <= pcpus->count; idx++)
 	{
 		memset(counter, 0, sizeof(counter));
 
-		if (0 == cpu_num)
+		if (0 == idx)
 		{
 			if (-1 == perfstat_cpu_total(NULL, &ps_cpu_total, sizeof(ps_cpu_total), 1))
 			{
-				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+				update_cpu_counters(&pcpus->cpu[idx], NULL);
 				continue;
 			}
 
@@ -579,11 +612,11 @@ read_again:
 		}
 		else
 		{
-			zbx_snprintf(ps_id.name, sizeof(ps_id.name), "cpu%d", cpu_num - 1);
+			zbx_snprintf(ps_id.name, sizeof(ps_id.name), "cpu%d", pcpus->cpu[idx].cpu_num);
 
 			if (-1 == perfstat_cpu(&ps_id, &ps_cpu, sizeof(ps_cpu), 1))
 			{
-				update_cpu_counters(&pcpus->cpu[cpu_num], NULL);
+				update_cpu_counters(&pcpus->cpu[idx], NULL);
 				continue;
 			}
 
@@ -593,7 +626,7 @@ read_again:
 			counter[ZBX_CPU_STATE_IOWAIT] = (zbx_uint64_t)ps_cpu.wait;
 		}
 
-		update_cpu_counters(&pcpus->cpu[cpu_num], counter);
+		update_cpu_counters(&pcpus->cpu[idx], counter);
 	}
 
 #endif	/* HAVE_LIBPERFSTAT */
@@ -612,14 +645,13 @@ void	collect_cpustat(ZBX_CPUS_STAT_DATA *pcpus)
 
 static ZBX_SINGLE_CPU_STAT_DATA	*get_cpustat_by_num(ZBX_CPUS_STAT_DATA *pcpus, int cpu_num)
 {
-	int	i;
+	int	idx;
 
-	for (i = 0; i <= pcpus->count; i++)
-		if (pcpus->cpu[i].cpu_num == cpu_num)
-			break;
-
-	if (i <= pcpus->count)
-		return &pcpus->cpu[i];
+	for (idx = 0; idx <= pcpus->count; idx++)
+	{
+		if (pcpus->cpu[idx].cpu_num == cpu_num)
+			return &pcpus->cpu[idx];
+	}
 
 	return NULL;
 }
@@ -704,37 +736,67 @@ int	get_cpustat(AGENT_RESULT *result, int cpu_num, int state, int mode)
 
 	return SYSINFO_RET_OK;
 }
-#endif	/* not _WINDOWS */
 
-int	get_cpu_statuses(zbx_vector_uint64_t *vector)
+static int	get_cpu_status(int pc_status)
 {
-	int				i;
-#ifndef _WINDOWS
-	int				index;
-	ZBX_SINGLE_CPU_STAT_DATA	*cpu;
-#endif
-	ZBX_CPUS_STAT_DATA		*pcpus;
+	if (SYSINFO_RET_OK == pc_status)
+		return ZBX_CPU_STATUS_ONLINE;
+
+	return ZBX_CPU_STATUS_OFFLINE;
+}
+#endif	/* _WINDOWS */
+
+/******************************************************************************
+ *                                                                            *
+ * Function: get_cpus                                                         *
+ *                                                                            *
+ * Purpose: Retrieve list of available CPUs in the collector                  *
+ *                                                                            *
+ * Parameters: vector [OUT] - vector for CPUNUM/STATUS pairs                  *
+ *                                                                            *
+ * Return value: SUCCEED if collector started and has at least one CPU        *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ * Comments: The data returned is designed for item system.cpu.discovery      *
+ *                                                                            *
+ ******************************************************************************/
+int	get_cpus(zbx_vector_uint64_pair_t *vector)
+{
+	ZBX_CPUS_STAT_DATA	*pcpus;
+	int			idx, ret = FAIL;
 
 	if (!CPU_COLLECTOR_STARTED(collector) || NULL == (pcpus = &collector->cpus))
-		return FAIL;
+		goto out;
 
 	LOCK_CPUSTATS;
 
-	for (i = 0; i < pcpus->count; i++)
+	/* Per-CPU information is stored in the ZBX_SINGLE_CPU_STAT_DATA array */
+	/* starting with index 1. Index 0 contains information about all CPUs. */
+
+	for (idx = 1; idx <= pcpus->count; idx++)
 	{
+		zbx_uint64_pair_t		pair;
 #ifndef _WINDOWS
-		cpu = get_cpustat_by_num(pcpus, i + 1);
+		ZBX_SINGLE_CPU_STAT_DATA	*cpu;
+		int				index;
+
+		cpu = &pcpus->cpu[idx];
 
 		if (MAX_COLLECTOR_HISTORY <= (index = cpu->h_first + cpu->h_count - 1))
 			index -= MAX_COLLECTOR_HISTORY;
 
-		zbx_vector_uint64_append(vector, cpu->h_status[index]);
+		pair.first = cpu->cpu_num;
+		pair.second = get_cpu_status(cpu->h_status[index]);
 #else
-		zbx_vector_uint64_append(vector, pcpus->cpu_counter[i + 1]->status);
+		pair.first = idx - 1;
+		pair.second = get_cpu_perf_counter_status(pcpus->cpu_counter[idx]->status);
 #endif
+		zbx_vector_uint64_pair_append(vector, pair);
 	}
 
 	UNLOCK_CPUSTATS;
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	return ret;
 }
