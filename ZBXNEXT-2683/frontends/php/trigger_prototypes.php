@@ -392,8 +392,6 @@ else {
 	$data['triggers'] = API::TriggerPrototype()->get([
 		'output' => ['triggerid', 'expression', 'description', 'status', 'priority', 'templateid'],
 		'selectHosts' => ['hostid', 'host'],
-		'selectItems' => ['itemid', 'type', 'hostid', 'key_', 'status', 'flags'],
-		'selectFunctions' => ['functionid', 'itemid', 'function', 'parameter'],
 		'selectDependencies' => ['triggerid', 'description'],
 		'triggerids' => zbx_objectValues($data['triggers'], 'triggerid')
 	]);
