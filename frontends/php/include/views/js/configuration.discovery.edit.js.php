@@ -18,14 +18,17 @@
 </script>
 <script type="text/x-jquery-tmpl" id="uniqRowTPL">
 	<?=	(new CListItem(
-		(new CLabel(
-			[
-				(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))->setId('uniqueness_criteria_#{dcheckid}'),
-				'#{name}'
-			],
-			'uniqueness_criteria_#{dcheckid}'
+			(new CLabel(
+				[
+					(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))->setId('uniqueness_criteria_#{dcheckid}'),
+					'#{name}'
+				],
+				'uniqueness_criteria_#{dcheckid}'
+			))
 		))
-	))->setId('uniqueness_criteria_row_#{dcheckid}')->toString() ?>
+		->setId('uniqueness_criteria_row_#{dcheckid}')
+		->toString()
+	?>
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
@@ -280,7 +283,10 @@
 
 			if (jQuery.inArray(parseInt(value.type, 10), availableDeviceTypes) > -1) {
 				if (uniquenessCriteria.length) {
-					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').text(value['name']);
+					var criteriaLabel = jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']'),
+						criteriaInput = jQuery('input', criteriaLabel).clone();
+					criteriaLabel.text(value['name']);
+					criteriaLabel.prepend(criteriaInput);
 				}
 				else {
 					jQuery('#uniqueness_criteria').append(uniqRowTpl.evaluate(value));
