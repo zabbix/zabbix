@@ -35,7 +35,6 @@ typedef struct zbx_scheduler_filter_t
 	int				step;
 
 	struct zbx_scheduler_filter_t	*next;
-
 }
 zbx_scheduler_filter_t;
 
@@ -1435,13 +1434,14 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
- * Parameters: seed      - [IN] the seed value applied to delay to spread     *
- *                              item checks over the delay period             *
- *             item_type - [IN] the item type                                 *
- *             delay     - [IN] default delay value, can be overridden        *
- *             flex_intervals - [IN] descriptions of flexible intervals       *
- *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
- *             now       - [IN] current timestamp                             *
+ * Parameters: seed             - [IN] the seed value applied to delay to     *
+ *                                     spread item checks over the delay      *
+ *                                     period                                 *
+ *             item_type        - [IN] the item type                          *
+ *             delay            - [IN] default delay value, can be overridden *
+ *             custom_intervals - [IN] descriptions of flexible intervals     *
+ *                                     in the form [dd/d1-d2,hh:mm-hh:mm;]    *
+ *             now              - [IN] current timestamp                      *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
@@ -1455,7 +1455,7 @@ static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *custom_intervals, time_t now)
 {
 	int	nextcheck = 0;
 
@@ -1475,15 +1475,15 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 		size_t	flex_alloc = 0, flex_offset = 0;
 
 		/* first try to parse out and calculate scheduled intervals */
-		if (NULL != flex_intervals)
+		if (NULL != custom_intervals)
 		{
 			zbx_scheduler_interval_t	*interval = NULL;
 			char				*errmsg = NULL;
 
-			if (SUCCEED == preprocess_flexible_interval(flex_intervals, &interval, &flex, &flex_alloc,
+			if (SUCCEED == preprocess_flexible_interval(custom_intervals, &interval, &flex, &flex_alloc,
 					&flex_offset, &errmsg))
 			{
-				flex_intervals = flex;
+				custom_intervals = flex;
 				scheduled_check = scheduler_get_nextcheck(interval, now + 1);
 				scheduler_interval_free(interval);
 			}
@@ -1504,7 +1504,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 		while (t < tmax)
 		{
 			/* calculate 'nextcheck' value for the current interval */
-			current_delay = get_current_delay(delay, flex_intervals, t);
+			current_delay = get_current_delay(delay, custom_intervals, t);
 
 			if (0 != current_delay)
 			{
@@ -1527,7 +1527,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 
 			/* 'nextcheck' < end of the current interval ? */
 			/* the end of the current interval is the beginning of the next interval - 1 */
-			if (FAIL != get_next_delay_interval(flex_intervals, t, &next_interval) &&
+			if (FAIL != get_next_delay_interval(custom_intervals, t, &next_interval) &&
 					nextcheck >= next_interval)
 			{
 				/* 'nextcheck' is beyond the current interval */
