@@ -25,7 +25,7 @@
 			],
 			'uniqueness_criteria_#{dcheckid}'
 		))
-	))->toString() ?>
+	))->setId('uniqueness_criteria_row_#{dcheckid}')->toString() ?>
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
