@@ -10,6 +10,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and
 ...G...PS. [ZBX-9274] added printing defaults when Zabbix programs are executed with --help option (dimir)
 
 Bug fixes:
+A......... [ZBX-9340] added parameter "data" in api db error response (Gunars)
 A......... [ZBX-9866] fixed error field being needlessly copied for LLD rule when full cloning a host (Gunars)
 ..F....... [ZBX-9883] fixed host assignment for proxy (Gunars)
 ...G...PS. [ZBX-9863] fixed compilation warning regarding "empty_str" initialization in setproctitle.c (gleb)
