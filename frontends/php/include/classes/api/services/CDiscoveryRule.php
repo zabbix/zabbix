@@ -953,7 +953,14 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch discovery to clone
 		$srcDiscovery = $this->get(array(
 			'itemids' => $discoveryid,
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('itemid', 'type', 'snmp_community', 'snmp_oid', 'hostid', 'name', 'key_', 'delay',
+				'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'multiplier', 'delta',
+				'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authpassphrase', 'snmpv3_privpassphrase',
+				'lastlogsize', 'logtimefmt', 'valuemapid', 'delay_flex', 'params', 'ipmi_sensor', 'data_type',
+				'authtype', 'username', 'password', 'publickey', 'privatekey', 'mtime', 'flags', 'interfaceid', 'port',
+				'description', 'inventory_link', 'lifetime', 'snmpv3_authprotocol', 'snmpv3_privprotocol',
+				'snmpv3_contextname'
+			),
 			'selectFilter' => array('evaltype', 'formula', 'conditions'),
 			'preservekeys' => true
 		));
@@ -962,7 +969,7 @@ class CDiscoveryRule extends CItemGeneral {
 		// fetch source and destination hosts
 		$hosts = API::Host()->get(array(
 			'hostids' => array($srcDiscovery['hostid'], $hostid),
-			'output' => API_OUTPUT_EXTEND,
+			'output' => array('hostid', 'host', 'name', 'status'),
 			'selectInterfaces' => API_OUTPUT_EXTEND,
 			'templated_hosts' => true,
 			'preservekeys' => true
@@ -972,7 +979,7 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$dstDiscovery = $srcDiscovery;
 		$dstDiscovery['hostid'] = $hostid;
-		unset($dstDiscovery['templateid'], $dstDiscovery['state'], $dstDiscovery['itemid']);
+		unset($dstDiscovery['itemid']);
 		if ($dstDiscovery['filter']) {
 			foreach ($dstDiscovery['filter']['conditions'] as &$condition) {
 				unset($condition['itemid'], $condition['item_conditionid']);
@@ -989,7 +996,11 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 			// no matching interface found, throw an error
 			elseif ($interface !== false) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['name'], $dstDiscovery['key_']));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+					'Cannot find host interface on "%1$s" for item key "%2$s".',
+					$dstHost['name'],
+					$dstDiscovery['key_']
+				));
 			}
 		}
 
@@ -1065,12 +1076,19 @@ class CDiscoveryRule extends CItemGeneral {
 					}
 					// no matching interface found, throw an error
 					elseif ($interface !== false) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot find host interface on "%1$s" for item key "%2$s".', $dstHost['name'], $prototype['key_']));
+						self::exception(ZBX_API_ERROR_PARAMETERS, _s(
+							'Cannot find host interface on "%1$s" for item key "%2$s".',
+							$dstHost['name'],
+							$prototype['key_']
+						));
 					}
 				}
 
 				// add new applications
-				$prototype['applications'] = get_same_applications_for_host(zbx_objectValues($prototype['applications'], 'applicationid'), $dstHost['hostid']);
+				$prototype['applications'] = get_same_applications_for_host(
+					zbx_objectValues($prototype['applications'], 'applicationid'),
+					$dstHost['hostid']
+				);
 
 				$prototypes[$key] = $prototype;
 			}
