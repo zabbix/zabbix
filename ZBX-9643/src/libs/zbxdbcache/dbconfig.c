@@ -1943,17 +1943,22 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 
 			delay_flex_changed = (SUCCEED == DCstrpool_replace(found, &flexitem->delay_flex, row[16]));
 		}
-		else if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
-		{
-			/* remove delay_flex parameter for non-flexible item */
-
-			zbx_strpool_release(flexitem->delay_flex);
-			zbx_hashset_remove(&config->flexitems, &itemid);
-
-			delay_flex_changed = 1;
-		}
 		else
-			delay_flex_changed = 0;
+		{
+			if (NULL != (flexitem = zbx_hashset_search(&config->flexitems, &itemid)))
+			{
+				/* remove delay_flex parameter for non-flexible item */
+
+				zbx_strpool_release(flexitem->delay_flex);
+				zbx_hashset_remove(&config->flexitems, &itemid);
+
+				delay_flex_changed = 1;
+			}
+			else
+				delay_flex_changed = 0;
+
+			flexitem = NULL;
+		}
 
 		if (ITEM_STATUS_ACTIVE == item->status && HOST_STATUS_MONITORED == host->status)
 		{
@@ -1993,8 +1998,8 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 				}
 				else
 				{
-					item->nextcheck = calculate_item_nextcheck(seed, type, delay, row[16],
-							now - proxy_timediff);
+					item->nextcheck = calculate_item_nextcheck(seed, type, delay,
+							(NULL == flexitem ? NULL : row[16]), now - proxy_timediff);
 					item->nextcheck += proxy_timediff + (NULL != proxy);
 				}
 			}

@@ -2320,7 +2320,18 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() data:'%s'", __function_name, *data);
 
 	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
-		expand_trigger_description_constants(data, event->trigger.expression);
+	{
+		char	*expression;
+		zabbix_log(LOG_LEVEL_DEBUG, "test 1");
+		expression = zbx_strdup(NULL, event->trigger.expression);
+
+		substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host, dc_item, NULL, NULL,
+				&expression, MACRO_TYPE_TRIGGER_EXPRESSION, NULL, 0);
+
+		expand_trigger_description_constants(data, expression);
+
+		zbx_free(expression);
+	}
 
 	p = *data;
 	if (NULL == (m = bl = strchr(p, '{')))
@@ -3252,11 +3263,26 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 					replace_to = zbx_dsprintf(replace_to, "%d", event->value);
 				else if (0 == strncmp(m, "{$", 2))	/* user defined macros */
 				{
-					const char	*value;
+					char	*value = NULL;
 
-					if (NULL != (value = zbx_umc_get_macro_value(macro_cache, event->objectid, m)))
+					if (NULL == macro_cache)
 					{
-						replace_to = zbx_strdup(replace_to, value);
+						cache_trigger_hostids(&hostids, event->trigger.expression);
+						DCget_user_macro(hostids.values, hostids.values_num, m, &value);
+					}
+					else
+					{
+						const char	*value_tmp;
+
+						value_tmp = zbx_umc_get_macro_value(macro_cache, event->objectid, m);
+
+						if (NULL != value_tmp)
+							value = zbx_strdup(NULL, value_tmp);
+					}
+
+					if (NULL != value)
+					{
+						replace_to = value;
 
 						if (FAIL == (res = is_double_suffix(replace_to)) && NULL != error)
 						{
