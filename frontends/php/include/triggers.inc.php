@@ -259,8 +259,7 @@ function getParentHostsByTriggers($triggers) {
 			'triggerids' => zbx_objectValues($triggers, 'templateid'),
 			'selectHosts' => ['hostid', 'host', 'name', 'status'],
 			'output' => ['triggerid', 'templateid'],
-			'filter' => ['flags' => null],
-			'nopermissions' => true
+			'filter' => ['flags' => null]
 		]);
 	}
 
@@ -363,7 +362,6 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 			'output' => ['host'],
 			'hostids' => $srcHostId,
 			'preservekeys' => true,
-			'nopermissions' => true,
 			'templated_hosts' => true
 		]);
 
@@ -378,19 +376,20 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	}
 	$dbSrcTriggers = API::Trigger()->get($options);
 
+	$dbSrcTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbSrcTriggers);
+
 	$dbDstHosts = API::Host()->get([
 		'output' => ['hostid', 'host'],
 		'hostids' => $dstHostIds,
 		'preservekeys' => true,
-		'nopermissions' => true,
 		'templated_hosts' => true
 	]);
 
 	$newTriggers = [];
 	// create each trigger for each host
 	foreach ($dbDstHosts as $dstHost) {
-		foreach ($dbSrcTriggers as $srcTrigger) {
-			// if $srcHostId provided, get host 'host' for explode_exp()
+		foreach ($dbSrcTriggers as &$srcTrigger) {
+			// if $srcHostId provided, get host 'host' for triggerExpressionReplaceHost()
 			if ($srcHostId != 0) {
 				$host = $srcHost['host'];
 				$srcTriggerContextHostId = $srcHostId;
@@ -400,51 +399,58 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				// if we have multiple hosts in trigger expression and we haven't pointed ($srcHostId) which host to replace, call error
 				if (count($srcTrigger['hosts']) > 1) {
 					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.',
-						$srcTrigger['description'],
-						CMacrosResolverHelper::resolveTriggerExpression($srcTrigger['expression'])
+						$srcTrigger['description'], $srcTrigger['expression']
 					));
 					return false;
 				}
 				$host = $srcTrigger['hosts'][0]['host'];
 				$srcTriggerContextHostId = $srcTrigger['hosts'][0]['hostid'];
 			}
-			// get expression for the new trigger to be added
-			$srcTrigger['expression'] = explode_exp($srcTrigger['expression'], false, false, $host, $dstHost['host']);
 
-			// the dependencies must be added after all triggers are created
-			unset($srcTrigger['dependencies']);
+			$srcTrigger['expression'] = triggerExpressionReplaceHost($srcTrigger['expression'], $host,
+				$dstHost['host']
+			);
 
-			unset($srcTrigger['templateid']);
+			// the dependddencies must be added after all triggers are created
+			$result = API::Trigger()->create([[
+				'description' => $srcTrigger['description'],
+				'expression' => $srcTrigger['expression'],
+				'url' => $srcTrigger['url'],
+				'status' => $srcTrigger['status'],
+				'priority' => $srcTrigger['priority'],
+				'comments' => $srcTrigger['comments'],
+				'type' => $srcTrigger['type']
+			]]);
 
-			if (!$result = API::Trigger()->create($srcTrigger)) {
+			if (!$result) {
 				return false;
 			}
 
 			$newTriggers[$srcTrigger['triggerid']] = [
-				'newTriggerId' =>reset($result['triggerids']),
-				'newTriggerHostId' =>  $dstHost['hostid'],
-				'newTriggerHost' =>  $dstHost['host'],
+				'newTriggerId' => reset($result['triggerids']),
+				'newTriggerHostId' => $dstHost['hostid'],
+				'newTriggerHost' => $dstHost['host'],
 				'srcTriggerContextHostId' => $srcTriggerContextHostId,
 				'srcTriggerContextHost' => $host
 			];
 		}
+		unset($srcTrigger);
 	}
 
 	$depIds = [];
 	foreach ($dbSrcTriggers as $srcTrigger) {
-		if ($srcTrigger['dependencies']) {
-			foreach ($srcTrigger['dependencies'] as $depTrigger) {
-				$depIds[] = $depTrigger['triggerid'];
-			}
+		foreach ($srcTrigger['dependencies'] as $depTrigger) {
+			$depIds[] = $depTrigger['triggerid'];
 		}
 	}
 	$depTriggers = API::Trigger()->get([
 		'triggerids' => $depIds,
-		'output' => API_OUTPUT_EXTEND,
-		'nopermissions' => true,
+		'output' => ['description', 'expression'],
 		'selectHosts' => ['hostid'],
 		'preservekeys' => true
 	]);
+
+	$depTriggers = CMacrosResolverHelper::resolveTriggerExpressions($depTriggers);
 
 	// map dependencies to the new trigger IDs and save
 	if ($newTriggers) {
@@ -479,23 +485,30 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 							'preservekeys' => true
 						]);
 
+						$targetHostTriggersByDescription =
+							CMacrosResolverHelper::resolveTriggerExpressions($targetHostTriggersByDescription);
+
 						// compare exploded expressions for exact match
-						$expr1 = explode_exp($depTriggers[$depTrigger['triggerid']]['expression']);
+						$expr1 = $depTriggers[$depTrigger['triggerid']]['expression'];
 						$depTriggerId = null;
 						foreach ($targetHostTriggersByDescription as $potentialTargetTrigger) {
-							$expr2 = explode_exp($potentialTargetTrigger['expression'], false, false, $newTrigger['newTriggerHost'], $newTrigger['srcTriggerContextHost']);
+							$expr2 = triggerExpressionReplaceHost($potentialTargetTrigger['expression'],
+								$newTrigger['newTriggerHost'], $newTrigger['srcTriggerContextHost']
+							);
 							if ($expr2 == $expr1) {
 								// matching trigger has been found
 								$depTriggerId = $potentialTargetTrigger['triggerid'];
 								break;
 							}
 						}
+
 						// if matching trigger wasn't found rise exception
 						if (is_null($depTriggerId)) {
-							$expr1 = explode_exp($srcTrigger['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
-							$expr2 = explode_exp($depTriggers[$depTrigger['triggerid']]['expression'], false, false, $newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']);
+							$expr2 = triggerExpressionReplaceHost($depTriggers[$depTrigger['triggerid']]['expression'],
+								$newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']
+							);
 							error(_s('Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
-								$srcTrigger['description'], $expr1,
+								$srcTrigger['description'], $srcTrigger['expression'],
 								$depTriggers[$depTrigger['triggerid']]['description'], $expr2));
 							return false;
 						}
@@ -504,7 +517,6 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 					else {
 						$depTriggerId = $depTrigger['triggerid'];
 					}
-
 
 					$dependencies[] = [
 						'triggerid' => $newTrigger['newTriggerId'],
@@ -571,188 +583,6 @@ function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
 	$new_expression .= substr($expression, $pos_left, $pos - $pos_left);
 
 	return $new_expression;
-}
-
-/********************************************************************************
- *                                                                              *
- * Purpose: Translate {10}>10 to something like                                 *
- * localhost:system.cpu.load.last(0)>10                                         *
- *                                                                              *
- * Comments: !!! Don't forget sync code with C !!!                              *
- *                                                                              *
- *******************************************************************************/
-function explode_exp($expressionCompressed, $html = false, $resolveMacro = false, $sourceHost = null, $destinationHost = null) {
-	$expressionExpanded = $html ? [] : '';
-	$trigger = [];
-
-	for ($i = 0, $state = '', $max = strlen($expressionCompressed); $i < $max; $i++) {
-		if ($expressionCompressed[$i] == '{') {
-			if ($expressionCompressed[$i + 1] == '$') {
-				$state = 'USERMACRO';
-				$userMacro = '';
-			}
-			elseif ($expressionCompressed[$i + 1] == '#') {
-				$state = 'LLDMACRO';
-				$lldMacro = '';
-			}
-			else {
-				$state = 'FUNCTIONID';
-				$functionId = '';
-
-				continue;
-			}
-		}
-		elseif ($expressionCompressed[$i] == '}') {
-			if ($state == 'USERMACRO') {
-				$state = '';
-				$userMacro .= '}';
-
-				if ($resolveMacro) {
-					$functionData['expression'] = $userMacro;
-					$userMacro = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($functionData);
-				}
-
-				if ($html) {
-					$expressionExpanded[] = $userMacro;
-				}
-				else {
-					$expressionExpanded .= $userMacro;
-				}
-
-				continue;
-			}
-			elseif ($state == 'LLDMACRO') {
-				$state = '';
-				$lldMacro .= '}';
-
-				if ($html) {
-					$expressionExpanded[] = $lldMacro;
-				}
-				else {
-					$expressionExpanded .= $lldMacro;
-				}
-
-				continue;
-			}
-			elseif ($functionId == 'TRIGGER.VALUE') {
-				$state = '';
-
-				if ($html) {
-					$expressionExpanded[] = '{'.$functionId.'}';
-				}
-				else {
-					$expressionExpanded .= '{'.$functionId.'}';
-				}
-
-				continue;
-			}
-
-			$state = '';
-			$error = true;
-
-			if (is_numeric($functionId)) {
-				$functionData = DBfetch(DBselect(
-					'SELECT h.host,h.hostid,i.itemid,i.key_,f.function,f.triggerid,f.parameter,i.itemid,i.status,i.type,i.flags'.
-					' FROM items i,functions f,hosts h'.
-					' WHERE f.functionid='.zbx_dbstr($functionId).
-						' AND i.itemid=f.itemid'.
-						' AND h.hostid=i.hostid'
-				));
-
-				if ($functionData) {
-					$error = false;
-
-					if ($resolveMacro) {
-						$trigger = $functionData;
-
-						// expand macros in item key
-						$items = CMacrosResolverHelper::resolveItemKeys([$functionData]);
-						$item = reset($items);
-
-						$functionData['key_'] = $item['key_expanded'];
-
-						// expand macros in function parameter
-						$functionParameters = CMacrosResolverHelper::resolveFunctionParameters([$functionData]);
-						$functionParameter = reset($functionParameters);
-						$functionData['parameter'] = $functionParameter['parameter_expanded'];
-					}
-
-					if ($sourceHost !== null && $destinationHost !== null && $sourceHost === $functionData['host']) {
-						$functionData['host'] = $destinationHost;
-					}
-
-					if ($html) {
-						if ($functionData['status'] == ITEM_STATUS_DISABLED) {
-							$style = ZBX_STYLE_RED;
-						}
-						elseif ($functionData['status'] == ITEM_STATUS_ACTIVE) {
-							$style = ZBX_STYLE_GREEN;
-						}
-						else {
-							$style = ZBX_STYLE_GREY;
-						}
-
-						if ($functionData['flags'] == ZBX_FLAG_DISCOVERY_CREATED || $functionData['type'] == ITEM_TYPE_HTTPTEST) {
-							$link = (new CSpan($functionData['host'].':'.$functionData['key_']))->addClass($style);
-						}
-						elseif ($functionData['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-							$link = (new CLink($functionData['host'].':'.$functionData['key_'],
-								'disc_prototypes.php?form=update&itemid='.$functionData['itemid'].
-								'&parent_discoveryid='.$trigger['discoveryRuleid']))
-								->addClass(ZBX_STYLE_LINK_ALT)
-								->addClass($style);
-						}
-						else {
-							$link = (new CLink($functionData['host'].':'.$functionData['key_'],
-								'items.php?form=update&itemid='.$functionData['itemid']))
-								->addClass(ZBX_STYLE_LINK_ALT)
-								->addClass($style);
-						}
-
-						$expressionExpanded[] = ['{', $link,'.', bold($functionData['function'].'('), $functionData['parameter'], bold(')'), '}'];
-					}
-					else {
-						$expressionExpanded .= '{'.$functionData['host'].':'.$functionData['key_'].'.'.$functionData['function'].'('.$functionData['parameter'].')}';
-					}
-				}
-			}
-
-			if ($error) {
-				if ($html) {
-					$expressionExpanded[] = (new CSpan('*ERROR*'))->addClass('on');
-				}
-				else {
-					$expressionExpanded .= '*ERROR*';
-				}
-			}
-
-			continue;
-		}
-
-		switch ($state) {
-			case 'FUNCTIONID':
-				$functionId .= $expressionCompressed[$i];
-				break;
-
-			case 'USERMACRO':
-				$userMacro .= $expressionCompressed[$i];
-				break;
-
-			case 'LLDMACRO':
-				$lldMacro .= $expressionCompressed[$i];
-				break;
-
-			default:
-				if ($html) {
-					$expressionExpanded[] = $expressionCompressed[$i];
-				}
-				else {
-					$expressionExpanded .= $expressionCompressed[$i];
-				}
-		}
-	}
-
-	return $expressionExpanded;
 }
 
 /**
