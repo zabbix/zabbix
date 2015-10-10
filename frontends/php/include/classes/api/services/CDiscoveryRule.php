@@ -579,13 +579,16 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// save new triggers
 		$dstTriggers = $srcTriggers;
-		foreach ($dstTriggers as $id => $trigger) {
-			unset($dstTriggers[$id]['templateid']);
-			unset($dstTriggers[$id]['triggerid']);
+		$dstTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dstTriggers);
+		foreach ($dstTriggers as $id => &$trigger) {
+			unset($dstTriggers[$id]['triggerid'], $dstTriggers[$id]['templateid']);
 
 			// update expression
-			$dstTriggers[$id]['expression'] = explode_exp($trigger['expression'], false, false, $srcHost['host'], $dstHost['host']);
+			$trigger['expression'] = triggerExpressionReplaceHost($trigger['expression'], $srcHost['host'],
+				$dstHost['host']
+			);
 		}
+		unset($trigger);
 
 		$rs = API::TriggerPrototype()->create($dstTriggers);
 		if (!$rs) {
