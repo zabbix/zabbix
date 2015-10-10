@@ -76,29 +76,6 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Parse reference macros
-	 *
-	 * @param array  $text
-	 * @param int    $pos
-	 *
-	 * @return bool|array
-	 */
-	private function parseReferenceMacro($text, $pos) {
-		if ($text[$pos] != '$' || !isset($text[$pos + 1])) {
-			return false;
-		}
-
-		if ($text[$pos + 1] < '1' || $text[$pos + 1] > '9') {
-			return false;
-		}
-
-		return [
-			'match' => substr($text, $pos, 2),
-			'length' => 2
-		];
-	}
-
-	/**
 	 * Parse macros like {HOST.HOST<1-9>}
 	 *
 	 * @param array  $text
@@ -210,6 +187,10 @@ class CMacrosResolverGeneral {
 			$set_parser = new CSetParser($types['macros']);
 		}
 
+		if ($extract_references) {
+			$reference_parser = new CReferenceParser();
+		}
+
 		if ($extract_lldmacros) {
 			$lld_macro_parser = new CLLDMacroParser();
 		}
@@ -231,9 +212,9 @@ class CMacrosResolverGeneral {
 				$macros[$pos] = $result['match'];
 				$pos += $result['length'] - 1;
 			}
-			elseif ($extract_references && ($result = $this->parseReferenceMacro($text, $pos)) != false) {
-				$macros[$pos] = $result['match'];
-				$pos += $result['length'] - 1;
+			elseif ($extract_references && $reference_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+				$macros[$pos] = $reference_parser->getMatch();
+				$pos += $reference_parser->getLength() - 1;
 			}
 			elseif ($extract_lldmacros && $lld_macro_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 				$macros[$pos] = $lld_macro_parser->getMatch();
@@ -296,6 +277,8 @@ class CMacrosResolverGeneral {
 
 		if ($extract_references) {
 			$macros['references'] = [];
+
+			$reference_parser = new CReferenceParser();
 		}
 
 		if ($extract_lldmacros) {
@@ -338,9 +321,9 @@ class CMacrosResolverGeneral {
 					}
 				}
 
-				if ($extract_references && ($result = $this->parseReferenceMacro($text, $pos)) !== false) {
-					$macros['references'][$result['match']] = null;
-					$pos += $result['length'] - 1;
+				if ($extract_references && $reference_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$macros['references'][$reference_parser->getMatch()] = null;
+					$pos += $reference_parser->getLength() - 1;
 					continue;
 				}
 
