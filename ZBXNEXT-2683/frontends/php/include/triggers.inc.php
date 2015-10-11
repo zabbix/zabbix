@@ -550,7 +550,7 @@ function triggerExpressionReplaceHost($expression, $src_host, $dst_host) {
 
 	$function_macro_parser = new CFunctionMacroParser();
 	$user_macro_parser = new CUserMacroParser();
-	$macro_parser = new CSetParser(['{TRIGGER.VALUE}']);
+	$macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
 	$lld_macro_parser = new CLLDMacroParser();
 
 	for ($pos = 0, $pos_left = 0; isset($expression[$pos]); $pos++) {

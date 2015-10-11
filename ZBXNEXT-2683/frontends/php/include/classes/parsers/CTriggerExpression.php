@@ -100,9 +100,9 @@ class CTriggerExpression {
 	/**
 	 * Parser for the {TRIGGER.VALUE} macro.
 	 *
-	 * @var CSetParser
+	 * @var CMacroParser
 	 */
-	protected $macroParser;
+	protected $macro_parser;
 
 	/**
 	 * Parser for function macros.
@@ -158,7 +158,7 @@ class CTriggerExpression {
 		$this->binaryOperatorParser = new CSetParser(['<', '>', '<=', '>=', '+', '-', '/', '*', '=', '<>']);
 		$this->logicalOperatorParser = new CSetParser(['and', 'or']);
 		$this->notOperatorParser = new CSetParser(['not']);
-		$this->macroParser = new CSetParser(['{TRIGGER.VALUE}']);
+		$this->macro_parser = new CMacroParser(['{TRIGGER.VALUE}']);
 		$this->function_macro_parser = new CFunctionMacroParser();
 		$this->function_parser = new CFunctionParser();
 		$this->lld_macro_parser = new CLLDMacroParser();
@@ -527,7 +527,7 @@ class CTriggerExpression {
 	private function parseConstant() {
 		if ($this->parseFunctionMacro() || $this->parseNumber()
 				|| $this->parseUsing($this->user_macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_USER_MACRO)
-				|| $this->parseUsing($this->macroParser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)) {
+				|| $this->parseUsing($this->macro_parser, CTriggerExpressionParserResult::TOKEN_TYPE_MACRO)) {
 			return true;
 		}
 
