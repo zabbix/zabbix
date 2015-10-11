@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 12:18+0300\n"
+"POT-Creation-Date: 2015-10-11 19:14+0300\n"
 "PO-Revision-Date: 2015-08-06 03:08+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -1503,15 +1503,15 @@ msgstr "認証方式をZabbix内部データベースに変更できません"
 msgid "Cannot clear history"
 msgstr "ヒストリを削除できません"
 
-#: include/classes/api/services/CDiscoveryRule.php:1196
+#: include/classes/api/services/CDiscoveryRule.php:1214
 msgid "Cannot clone graph prototypes."
 msgstr "グラフのプロトタイプを複製できません"
 
-#: include/classes/api/services/CDiscoveryRule.php:1244
+#: include/classes/api/services/CDiscoveryRule.php:1262
 msgid "Cannot clone host prototypes."
 msgstr "ホストのプロトタイプを複製できません"
 
-#: include/classes/api/services/CDiscoveryRule.php:1080
+#: include/classes/api/services/CDiscoveryRule.php:1098
 msgid "Cannot clone item prototypes."
 msgstr "アイテムのプロトタイプを複製できません"
 
@@ -1972,8 +1972,8 @@ msgstr "スクリーン\"%2$s\"で利用されているホスト\"%1$s\"が見�
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロトタイプ\"%2$s\"のためのホストグループ\"%1$s\"が見つかりません。"
 
-#: include/classes/api/services/CDiscoveryRule.php:992
-#: include/classes/api/services/CDiscoveryRule.php:1068
+#: include/classes/api/services/CDiscoveryRule.php:1000
+#: include/classes/api/services/CDiscoveryRule.php:1080
 #: include/classes/api/services/CItemGeneral.php:100 include/items.inc.php:380
 #: include/items.inc.php:431
 #, c-format

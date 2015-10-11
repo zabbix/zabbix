@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 12:18+0300\n"
+"POT-Creation-Date: 2015-10-11 19:14+0300\n"
 "PO-Revision-Date: 2015-03-07 10:33+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -1533,15 +1533,15 @@ msgstr "Nie je možné zmeniť metódu prihlasovania na Zabbix-internal"
 msgid "Cannot clear history"
 msgstr "Nie je možné zmazať históriu"
 
-#: include/classes/api/services/CDiscoveryRule.php:1196
+#: include/classes/api/services/CDiscoveryRule.php:1214
 msgid "Cannot clone graph prototypes."
 msgstr "Nie je možné klonovať prototypy grafov."
 
-#: include/classes/api/services/CDiscoveryRule.php:1244
+#: include/classes/api/services/CDiscoveryRule.php:1262
 msgid "Cannot clone host prototypes."
 msgstr "Nie je možné klonovať prototypy hostov."
 
-#: include/classes/api/services/CDiscoveryRule.php:1080
+#: include/classes/api/services/CDiscoveryRule.php:1098
 msgid "Cannot clone item prototypes."
 msgstr "Nie je možné klonovať prototypy položiek."
 
@@ -2057,8 +2057,8 @@ msgstr "Host \"%1$s\" použitý v obrazovke \"%2$s\" nebol nájdený."
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr "Nemôžem nájsť skupinu \"%1$s\" pre prototyp hosta \"%2$s\" zisťovacieho pravidla \"%3$s\" na \"%4$s\"."
 
-#: include/classes/api/services/CDiscoveryRule.php:992
-#: include/classes/api/services/CDiscoveryRule.php:1068
+#: include/classes/api/services/CDiscoveryRule.php:1000
+#: include/classes/api/services/CDiscoveryRule.php:1080
 #: include/classes/api/services/CItemGeneral.php:100 include/items.inc.php:380
 #: include/items.inc.php:431
 #, c-format

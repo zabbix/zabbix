@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 12:18+0300\n"
+"POT-Creation-Date: 2015-10-11 19:14+0300\n"
 "PO-Revision-Date: 2014-04-13 14:12+0300\n"
 "Last-Translator: Mohammad <mohammadsharifi666@gmail.com>\n"
 "Language-Team: none\n"
@@ -1503,15 +1503,15 @@ msgstr "روش تصدیق هویت نمی تواند به Fanoos internal تغی
 msgid "Cannot clear history"
 msgstr "تاریخچه نمی‌تواند پاک شود"
 
-#: include/classes/api/services/CDiscoveryRule.php:1196
+#: include/classes/api/services/CDiscoveryRule.php:1214
 msgid "Cannot clone graph prototypes."
 msgstr "نمونه اولیه نمودارها نمی‌توانند کپی شوند"
 
-#: include/classes/api/services/CDiscoveryRule.php:1244
+#: include/classes/api/services/CDiscoveryRule.php:1262
 msgid "Cannot clone host prototypes."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1080
+#: include/classes/api/services/CDiscoveryRule.php:1098
 msgid "Cannot clone item prototypes."
 msgstr "نمونه اولیه آیتم ها نمی‌توانند کپی شوند"
 
@@ -1976,8 +1976,8 @@ msgstr ""
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:992
-#: include/classes/api/services/CDiscoveryRule.php:1068
+#: include/classes/api/services/CDiscoveryRule.php:1000
+#: include/classes/api/services/CDiscoveryRule.php:1080
 #: include/classes/api/services/CItemGeneral.php:100 include/items.inc.php:380
 #: include/items.inc.php:431
 #, c-format

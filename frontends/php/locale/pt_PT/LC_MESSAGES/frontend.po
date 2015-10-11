@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 12:18+0300\n"
+"POT-Creation-Date: 2015-10-11 19:14+0300\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -1518,15 +1518,15 @@ msgstr "Não foi possível alterar o método de autenticação para Zabbix inter
 msgid "Cannot clear history"
 msgstr "Não foi possível limpar o histórico"
 
-#: include/classes/api/services/CDiscoveryRule.php:1196
+#: include/classes/api/services/CDiscoveryRule.php:1214
 msgid "Cannot clone graph prototypes."
 msgstr "Não foi possível clonar protótipos do gráfico."
 
-#: include/classes/api/services/CDiscoveryRule.php:1244
+#: include/classes/api/services/CDiscoveryRule.php:1262
 msgid "Cannot clone host prototypes."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1080
+#: include/classes/api/services/CDiscoveryRule.php:1098
 msgid "Cannot clone item prototypes."
 msgstr "Não foi possível clonar protótipos do item."
 
@@ -2018,8 +2018,8 @@ msgstr "Não foi possível encontrar host \"%1$s\" utilizado no ecrã \"%2$s\"."
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:992
-#: include/classes/api/services/CDiscoveryRule.php:1068
+#: include/classes/api/services/CDiscoveryRule.php:1000
+#: include/classes/api/services/CDiscoveryRule.php:1080
 #: include/classes/api/services/CItemGeneral.php:100 include/items.inc.php:380
 #: include/items.inc.php:431
 #, c-format

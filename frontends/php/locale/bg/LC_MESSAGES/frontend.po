@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 12:18+0300\n"
+"POT-Creation-Date: 2015-10-11 19:14+0300\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -1521,15 +1521,15 @@ msgstr "Не може да се промени метода на автенти�
 msgid "Cannot clear history"
 msgstr "Не може да се изчисти историята"
 
-#: include/classes/api/services/CDiscoveryRule.php:1196
+#: include/classes/api/services/CDiscoveryRule.php:1214
 msgid "Cannot clone graph prototypes."
 msgstr "Не може да се клонират графичните прототипи"
 
-#: include/classes/api/services/CDiscoveryRule.php:1244
+#: include/classes/api/services/CDiscoveryRule.php:1262
 msgid "Cannot clone host prototypes."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:1080
+#: include/classes/api/services/CDiscoveryRule.php:1098
 msgid "Cannot clone item prototypes."
 msgstr "Не може да се клонират елемент на данните прототипи"
 
@@ -2024,8 +2024,8 @@ msgstr "Не може да се намери хоста \"%1$s\" използв�
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule \"%3$s\" on \"%4$s\"."
 msgstr ""
 
-#: include/classes/api/services/CDiscoveryRule.php:992
-#: include/classes/api/services/CDiscoveryRule.php:1068
+#: include/classes/api/services/CDiscoveryRule.php:1000
+#: include/classes/api/services/CDiscoveryRule.php:1080
 #: include/classes/api/services/CItemGeneral.php:100 include/items.inc.php:380
 #: include/items.inc.php:431
 #, c-format
