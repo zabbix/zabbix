@@ -300,9 +300,16 @@ foreach (@$tlds_ref)
 		{
 			wrn(uc($service), ": no rolling week data in the database yet");
 
-			if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+			if (opt('dry-run'))
 			{
-				fail("cannot save alarmed: ", ah_get_error());
+				__prnt(uc($service), " DISABLED");
+			}
+			else
+			{
+				if (ah_save_alarmed($ah_tld, $service, AH_ALARMED_DISABLED) != AH_SUCCESS)
+				{
+					fail("cannot save alarmed: ", ah_get_error());
+				}
 			}
 
 			next;
