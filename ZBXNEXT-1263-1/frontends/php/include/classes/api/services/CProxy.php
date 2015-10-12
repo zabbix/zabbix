@@ -643,10 +643,12 @@ class CProxy extends CApiService {
 				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE)
 			];
 
-			if (array_key_exists('tls_connect', $proxy) && !in_array($proxy['tls_connect'], $available_connect_types)) {
+			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('tls_connect', $proxy)
+					&& !in_array($proxy['tls_connect'], $available_connect_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to proxy field.'));
 			}
-			if (array_key_exists('tls_accept', $proxy) && !in_array($proxy['tls_accept'], $available_accept_types)) {
+			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE && array_key_exists('tls_accept', $proxy)
+					&& !in_array($proxy['tls_accept'], $available_accept_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from proxy field.'));
 			}
 
