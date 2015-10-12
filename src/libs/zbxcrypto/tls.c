@@ -2708,8 +2708,8 @@ void	zbx_tls_init_child(void)
 		if (0 < (res = gnutls_certificate_set_x509_trust_file(my_cert_creds, CONFIG_TLS_CA_FILE,
 				GNUTLS_X509_FMT_PEM)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "loaded %d CA certificate(s) from file \"%s\"", res,
-					CONFIG_TLS_CA_FILE);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded %d CA certificate(s) from file \"%s\"",
+					__function_name, res, CONFIG_TLS_CA_FILE);
 		}
 		else if (0 == res)
 		{
@@ -2731,7 +2731,8 @@ void	zbx_tls_init_child(void)
 		if (0 < (res = gnutls_certificate_set_x509_crl_file(my_cert_creds, CONFIG_TLS_CRL_FILE,
 				GNUTLS_X509_FMT_PEM)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "loaded %d CRL(s) from file \"%s\"", res, CONFIG_TLS_CRL_FILE);
+			zabbix_log(LOG_LEVEL_DEBUG, "%s(): loaded %d CRL(s) from file \"%s\"", __function_name, res,
+					CONFIG_TLS_CRL_FILE);
 		}
 		else if (0 == res)
 		{
