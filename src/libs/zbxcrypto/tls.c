@@ -2980,8 +2980,8 @@ void	zbx_tls_init_child(void)
 
 		if (NULL == (lookup_cert = X509_STORE_add_lookup(store_cert, X509_LOOKUP_file())))
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_add_lookup() 1 failed when"
-					" loading CRL(s) from file \"%s\":", CONFIG_TLS_CRL_FILE);
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_add_lookup() #%d failed"
+					" when loading CRL(s) from file \"%s\":", 1, CONFIG_TLS_CRL_FILE);
 			goto out;
 		}
 
@@ -2994,8 +2994,8 @@ void	zbx_tls_init_child(void)
 
 		if (1 != X509_STORE_set_flags(store_cert, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL))
 		{
-			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_set_flags() 1 failed when"
-					" loading CRL(s) from file \"%s\":", CONFIG_TLS_CRL_FILE);
+			zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_set_flags() #%d failed when"
+					" loading CRL(s) from file \"%s\":", 1, CONFIG_TLS_CRL_FILE);
 			goto out;
 		}
 
@@ -3009,9 +3009,9 @@ void	zbx_tls_init_child(void)
 
 			if (NULL == (lookup_all = X509_STORE_add_lookup(store_all, X509_LOOKUP_file())))
 			{
-				zbx_snprintf_alloc(&error, &error_alloc, &error_offset,
-						"X509_STORE_add_lookup() 2 failed when loading CRL(s) from file"
-						" \"%s\":", CONFIG_TLS_CRL_FILE);
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_add_lookup() #%d"
+						" failed when loading CRL(s) from file \"%s\":", 2,
+						CONFIG_TLS_CRL_FILE);
 				goto out;
 			}
 
@@ -3032,8 +3032,9 @@ void	zbx_tls_init_child(void)
 
 			if (1 != X509_STORE_set_flags(store_all, X509_V_FLAG_CRL_CHECK | X509_V_FLAG_CRL_CHECK_ALL))
 			{
-				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_set_flags() 2"
-						" failed when loading CRL(s) from file \"%s\":", CONFIG_TLS_CRL_FILE);
+				zbx_snprintf_alloc(&error, &error_alloc, &error_offset, "X509_STORE_set_flags() #%d"
+						" failed when loading CRL(s) from file \"%s\":", 2,
+						CONFIG_TLS_CRL_FILE);
 				goto out;
 			}
 		}
