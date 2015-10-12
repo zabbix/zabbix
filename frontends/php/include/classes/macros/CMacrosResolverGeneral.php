@@ -755,214 +755,194 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get macros with values.
 	 *
-	 * @param array $data	Macros to resolve
-	 * 							[
-	 * 								<id> => [
-	 * 									'hostids' => [<hostid>, ...],
-	 * 									'macros' => [<macro> => null, ...]
-	 * 								],
-	 * 								...
-	 * 							]
+	 * @param array $data
+	 * @param array $data[<id>]			any identificator
+	 * @param array $data['hostids']	the list of host ids; [<hostid1>, ...]
+	 * @param array $data['macros']		the list of user macros to resolve, ['<usermacro1>' => null, ...]
 	 *
 	 * @return array
 	 */
 	protected function getUserMacros(array $data) {
-		/*
-		 * User macros
-		 */
-		$hostIds = [];
-
+		// User macros
+		$hostids = [];
 		foreach ($data as $element) {
-			foreach ($element['hostids'] as $hostId) {
-				$hostIds[$hostId] = $hostId;
+			foreach ($element['hostids'] as $hostid) {
+				$hostids[$hostid] = true;
 			}
 		}
 
-		if (!$hostIds) {
+		if (!$hostids) {
 			return $data;
 		}
 
 		/*
-		 *	[
-		 *		<hostid> => [<templateid>, ...],
-		 *		...
-		 *	]
+		 * @var array $host_templates
+		 * @var array $host_templates[<hostid>]		array of templates
 		 */
-		$hostTemplates = [];
+		$host_templates = [];
 
 		/*
-		 *	[
-		 *		<hostid> => [
-		 *			<macro_name> => [
-		 *				'value' => null|<value>
-		 *				'contexts' => [
-		 *					<context> => <value>,
-		 *					...
-		 *				]
-		 *			],
-		 *			...
-		 *		],
-		 *		...
-		 *	]
+		 * @var array  $host_macros
+		 * @var array  $host_macros[<hostid>]
+		 * @var array  $host_macros[<hostid>][<macro>]				macro base without curly braces
+		 * @var string $host_macros[<hostid>][<macro>]['value']		base macro value (without context); can be null
+		 * @var array  $host_macros[<hostid>][<macro>]['contexts']	context values; ['<context1>' => '<value1>', ...]
 		 */
-		$hostMacros = [];
+		$host_macros = [];
 
 		$user_macro_parser = new CUserMacroParser();
 
 		do {
-			$dbHosts = API::Host()->get([
-				'hostids' => $hostIds,
+			$db_hosts = API::Host()->get([
+				'hostids' => array_keys($hostids),
 				'templated_hosts' => true,
 				'output' => ['hostid'],
 				'selectParentTemplates' => ['templateid'],
 				'selectMacros' => ['macro', 'value']
 			]);
 
-			$hostIds = [];
+			$hostids = [];
 
-			if ($dbHosts) {
-				foreach ($dbHosts as $dbHost) {
-					$hostTemplates[$dbHost['hostid']] = zbx_objectValues($dbHost['parentTemplates'], 'templateid');
+			foreach ($db_hosts as $db_host) {
+				$host_templates[$db_host['hostid']] = zbx_objectValues($db_host['parentTemplates'], 'templateid');
 
-					foreach ($dbHost['macros'] as $dbMacro) {
-						if ($user_macro_parser->parse($dbMacro['macro']) != CParser::PARSE_SUCCESS) {
-							continue;
-						}
-
-						$macro_name = $user_macro_parser->getMacro();
-						$macro_context = $user_macro_parser->getContext();
-
-						if (!array_key_exists($dbHost['hostid'], $hostMacros)) {
-							$hostMacros[$dbHost['hostid']] = [];
-						}
-
-						if (!array_key_exists($macro_name, $hostMacros[$dbHost['hostid']])) {
-							$hostMacros[$dbHost['hostid']][$macro_name] = ['value' => null, 'contexts' => []];
-						}
-
-						if ($macro_context === null) {
-							$hostMacros[$dbHost['hostid']][$macro_name]['value'] = $dbMacro['value'];
-						}
-						else {
-							$hostMacros[$dbHost['hostid']][$macro_name]['contexts'][$macro_context] = $dbMacro['value'];
-						}
+				foreach ($db_host['macros'] as $db_macro) {
+					if ($user_macro_parser->parse($db_macro['macro']) != CParser::PARSE_SUCCESS) {
+						continue;
 					}
-				}
 
-				foreach ($dbHosts as $dbHost) {
-					// only unprocessed templates will be populated
-					foreach ($hostTemplates[$dbHost['hostid']] as $templateId) {
-						if (!array_key_exists($templateId, $hostTemplates)) {
-							$hostIds[$templateId] = $templateId;
-						}
+					$macro = $user_macro_parser->getMacro();
+					$context = $user_macro_parser->getContext();
+
+					if (!array_key_exists($db_host['hostid'], $host_macros)) {
+						$host_macros[$db_host['hostid']] = [];
+					}
+
+					if (!array_key_exists($macro, $host_macros[$db_host['hostid']])) {
+						$host_macros[$db_host['hostid']][$macro] = ['value' => null, 'contexts' => []];
+					}
+
+					if ($context === null) {
+						$host_macros[$db_host['hostid']][$macro]['value'] = $db_macro['value'];
+					}
+					else {
+						$host_macros[$db_host['hostid']][$macro]['contexts'][$context] = $db_macro['value'];
 					}
 				}
 			}
-		} while ($hostIds);
 
-		$allMacrosResolved = true;
+			foreach ($db_hosts as $db_host) {
+				// only unprocessed templates will be populated
+				foreach ($host_templates[$db_host['hostid']] as $templateid) {
+					if (!array_key_exists($templateid, $host_templates)) {
+						$hostids[$templateid] = true;
+					}
+				}
+			}
+		} while ($hostids);
+
+		$all_macros_resolved = true;
 
 		$user_macro_parser = new CUserMacroParser();
 
 		foreach ($data as &$element) {
-			$hostIds = [];
-
-			foreach ($element['hostids'] as $hostId) {
-				$hostIds[$hostId] = $hostId;
+			$hostids = [];
+			foreach ($element['hostids'] as $hostid) {
+				$hostids[$hostid] = true;
 			}
 
-			natsort($hostIds);
+			$hostids = array_keys($hostids);
+			natsort($hostids);
 
-			foreach ($element['macros'] as $macro => &$value) {
-				if ($user_macro_parser->parse($macro) == CParser::PARSE_SUCCESS) {
-					$macro_name = $user_macro_parser->getMacro();
-					$macro_context = $user_macro_parser->getContext();
-
-					$value = $this->getHostUserMacros($hostIds, $macro_name, $macro_context, $hostTemplates,
-						$hostMacros
+			foreach ($element['macros'] as $usermacro => &$value) {
+				if ($user_macro_parser->parse($usermacro) == CParser::PARSE_SUCCESS) {
+					$value = $this->getHostUserMacros($hostids, $user_macro_parser->getMacro(),
+						$user_macro_parser->getContext(), $host_templates, $host_macros
 					);
 
-					if ($value === null) {
-						$allMacrosResolved = false;
+					if ($value['value'] === null) {
+						$all_macros_resolved = false;
 					}
 				}
 				else {
-					$allMacrosResolved = false;
+					// this macro cannot be resolved
+					$value = ['value' => $usermacro, 'value_default' => null];
 				}
 			}
 			unset($value);
 		}
 		unset($element);
 
-		if ($allMacrosResolved) {
-			// there are no more hosts with unresolved macros
-			return $data;
-		}
+		if (!$all_macros_resolved) {
+			// Global macros
+			$db_global_macros = API::UserMacro()->get([
+				'output' => ['macro', 'value'],
+				'globalmacro' => true
+			]);
 
-		/*
-		 * Global macros
-		 */
-		$dbGlobalMacros = API::UserMacro()->get([
-			'output' => ['macro', 'value'],
-			'globalmacro' => true
-		]);
+			/*
+			 * @var array  $global_macros
+			 * @var array  $global_macros[<macro>]				macro base without curly braces
+			 * @var string $global_macros[<macro>]['value']		base macro value (without context); can be null
+			 * @var array  $global_macros[<macro>]['contexts']	context values; ['<context1>' => '<value1>', ...]
+			 */
+			$global_macros = [];
 
-		/*
-		 *	[
-		 *		<macro_name> => [
-		 *			'value' => null|<value>
-		 *			'contexts' => [
-		 *				<context> => <value>,
-		 *				...
-		 *			]
-		 *		],
-		 *		...
-		 *	]
-		 */
-		$global_macros = [];
+			foreach ($db_global_macros as $db_global_macro) {
+				if ($user_macro_parser->parse($db_global_macro['macro']) == CParser::PARSE_SUCCESS) {
+					$macro = $user_macro_parser->getMacro();
+					$context = $user_macro_parser->getContext();
 
-		foreach ($dbGlobalMacros as $dbGlobalMacro) {
-			if ($user_macro_parser->parse($dbGlobalMacro['macro']) != CParser::PARSE_SUCCESS) {
-				continue;
+					if (!array_key_exists($macro, $global_macros)) {
+						$global_macros[$macro] = ['value' => null, 'contexts' => []];
+					}
+
+					if ($context === null) {
+						$global_macros[$macro]['value'] = $db_global_macro['value'];
+					}
+					else {
+						$global_macros[$macro]['contexts'][$context] = $db_global_macro['value'];
+					}
+				}
 			}
 
-			$macro_name = $user_macro_parser->getMacro();
-			$macro_context = $user_macro_parser->getContext();
+			foreach ($data as &$element) {
+				foreach ($element['macros'] as $usermacro => &$value) {
+					if ($value['value'] === null && $user_macro_parser->parse($usermacro) == CParser::PARSE_SUCCESS) {
+						$macro = $user_macro_parser->getMacro();
+						$context = $user_macro_parser->getContext();
 
-			if (!array_key_exists($macro_name, $global_macros)) {
-				$global_macros[$macro_name] = ['value' => null, 'contexts' => []];
-			}
-
-			if ($macro_context === null) {
-				$global_macros[$macro_name]['value'] = $dbGlobalMacro['value'];
-			}
-			else {
-				$global_macros[$macro_name]['contexts'][$macro_context] = $dbGlobalMacro['value'];
-			}
-		}
-
-		foreach ($data as &$element) {
-			foreach ($element['macros'] as $macro => &$value) {
-				if ($value === null && $user_macro_parser->parse($macro) == CParser::PARSE_SUCCESS) {
-					$macro_name = $user_macro_parser->getMacro();
-					$macro_context = $user_macro_parser->getContext();
-
-					if (array_key_exists($macro_name, $global_macros)) {
-						if ($macro_context !== null
-								&& array_key_exists($macro_context, $global_macros[$macro_name]['contexts'])) {
-							$value = $global_macros[$macro_name]['contexts'][$macro_context];
-						}
-						elseif ($global_macros[$macro_name]['value'] !== null) {
-							$value = $global_macros[$macro_name]['value'];
+						if (array_key_exists($macro, $global_macros)) {
+							if ($context !== null && array_key_exists($context, $global_macros[$macro]['contexts'])) {
+								$value['value'] = $global_macros[$macro]['contexts'][$context];
+							}
+							elseif ($global_macros[$macro]['value'] !== null) {
+								if ($context === null) {
+									$value['value'] = $global_macros[$macro]['value'];
+								}
+								elseif ($value['value_default'] !== null) {
+									$value['value_default'] = $global_macros[$macro]['value'];
+								}
+							}
 						}
 					}
 				}
+				unset($value);
+			}
+			unset($element);
+		}
 
-				/*
-				 * Unresolved macros stay as is
-				 */
-				if ($value === null) {
-					$value = $macro;
+		foreach ($data as &$element) {
+			foreach ($element['macros'] as $usermacro => &$value) {
+				if ($value['value'] !== null) {
+					$value = $value['value'];
+				}
+				elseif ($value['value_default'] !== null) {
+					$value = $value['value_default'];
+				}
+				else {
+					// unresolved macro
+					$value = $usermacro;
 				}
 			}
 			unset($value);
@@ -975,50 +955,67 @@ class CMacrosResolverGeneral {
 	/**
 	 * Get user macro from the requested hosts.
 	 *
-	 * @param array  $hostIds			The sorted list of hosts where macros will be looked for (hostid => hostid)
-	 * @param string $macro_name		Macro to resolve
-	 * @param string $macro_context		Macro context to resolve
-	 * @param array  $hostTemplates		The list of linked templates (see getUserMacros() for more details)
-	 * @param array  $hostMacros		The list of macros on hosts (see getUserMacros() for more details)
+	 * Use the base value returned by host macro as default value when expanding expand global macro. This will ensure
+	 * the following user macro resolving priority:
+	 *  1) host/template context macro
+	 *  2) global context macro
+	 *  3) host/template base (default) macro
+	 *  4) global base (default) macro
+	 *
+	 * @param array  $hostids			The sorted list of hosts where macros will be looked for (hostid => hostid)
+	 * @param string $macro				Macro base without curly braces, for example: SNMP_COMMUNITY
+	 * @param string $context			Macro context to resolve
+	 * @param array  $host_templates	The list of linked templates (see getUserMacros() for more details)
+	 * @param array  $host_macros		The list of macros on hosts (see getUserMacros() for more details)
+	 * @param string $value_default		Value
 	 *
 	 * @return array
 	 */
-	private function getHostUserMacros(array $hostIds, $macro_name, $macro_context, array $hostTemplates,
-			array $hostMacros) {
-		foreach ($hostIds as $hostId) {
-			if (array_key_exists($hostId, $hostMacros) && array_key_exists($macro_name, $hostMacros[$hostId])) {
-				if ($macro_context !== null
-						&& array_key_exists($macro_context, $hostMacros[$hostId][$macro_name]['contexts'])) {
-					return $hostMacros[$hostId][$macro_name]['contexts'][$macro_context];
+	private function getHostUserMacros(array $hostids, $macro, $context, array $host_templates, array $host_macros,
+			$value_default = null) {
+		foreach ($hostids as $hostid) {
+			if (array_key_exists($hostid, $host_macros) && array_key_exists($macro, $host_macros[$hostid])) {
+				if ($context !== null && array_key_exists($context, $host_macros[$hostid][$macro]['contexts'])) {
+					return [
+						'value' => $host_macros[$hostid][$macro]['contexts'][$context],
+						'value_default' => $value_default
+					];
 				}
 
-				if ($hostMacros[$hostId][$macro_name]['value'] !== null) {
-					return $hostMacros[$hostId][$macro_name]['value'];
-				}
-			}
-		}
-
-		if (!$hostTemplates) {
-			return null;
-		}
-
-		$templateIds = [];
-
-		foreach ($hostIds as $hostId) {
-			if (array_key_exists($hostId, $hostTemplates)) {
-				foreach ($hostTemplates[$hostId] as $templateId) {
-					$templateIds[$templateId] = true;
+				if ($host_macros[$hostid][$macro]['value'] !== null) {
+					if ($context === null) {
+						return ['value' => $host_macros[$hostid][$macro]['value'], 'value_default' => $value_default];
+					}
+					elseif ($value_default !== null) {
+						$value_default = $host_macros[$hostid][$macro]['value'];
+					}
 				}
 			}
 		}
 
-		if ($templateIds) {
-			$templateIds = array_keys($templateIds);
-			natsort($templateIds);
-
-			return $this->getHostUserMacros($templateIds, $macro_name, $macro_context, $hostTemplates, $hostMacros);
+		if (!$host_templates) {
+			return ['value' => null, 'value_default' => $value_default];
 		}
 
-		return null;
+		$templateids = [];
+
+		foreach ($hostids as $hostid) {
+			if (array_key_exists($hostid, $host_templates)) {
+				foreach ($host_templates[$hostid] as $templateid) {
+					$templateids[$templateid] = true;
+				}
+			}
+		}
+
+		if ($templateids) {
+			$templateids = array_keys($templateids);
+			natsort($templateids);
+
+			return $this->getHostUserMacros($templateids, $macro, $context, $host_templates, $host_macros,
+				$value_default
+			);
+		}
+
+		return ['value' => null, 'value_default' => $value_default];
 	}
 }
