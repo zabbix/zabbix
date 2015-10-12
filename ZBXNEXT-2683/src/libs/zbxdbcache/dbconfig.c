@@ -6078,12 +6078,12 @@ void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *time
 	UNLOCK_CACHE;
 }
 
-static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
-		char **replace_to)
+static void	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *macro, const char *context,
+		char **value, char **value_default)
 {
 	const char	*__function_name = "DCget_host_macro";
 
-	int			i, j, ret = FAIL;
+	int			i, j;
 	ZBX_DC_HMACRO_HM	*hmacro_hm, hmacro_hm_local;
 	ZBX_DC_HTMPL		*htmpl;
 	zbx_vector_uint64_t	templateids;
@@ -6109,14 +6109,13 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 				{
 					if (0 == zbx_strcmp_null(hmacro->context, context))
 					{
-						*replace_to = zbx_strdup(*replace_to, hmacro->value);
-						ret = SUCCEED;
+						*value = zbx_strdup(*value, hmacro->value);
 						goto out;
 					}
 
 					/* check for the default (without parameters) macro value */
-					if (NULL == *replace_to && NULL != context && NULL == hmacro->context)
-						*replace_to = zbx_strdup(*replace_to, hmacro->value);
+					if (NULL == *value_default && NULL != context && NULL == hmacro->context)
+						*value_default = zbx_strdup(*value_default, hmacro->value);
 				}
 			}
 		}
@@ -6137,17 +6136,15 @@ static int	DCget_host_macro(zbx_uint64_t *hostids, int host_num, const char *mac
 	if (0 != templateids.values_num)
 	{
 		zbx_vector_uint64_sort(&templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		ret = DCget_host_macro(templateids.values, templateids.values_num, macro, context, replace_to);
+		DCget_host_macro(templateids.values, templateids.values_num, macro, context, value, value_default);
 	}
 
 	zbx_vector_uint64_destroy(&templateids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
-
-	return ret;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-static void	DCget_global_macro(const char *macro, const char *context, char **replace_to)
+static void	DCget_global_macro(const char *macro, const char *context, char **value, char **value_default)
 {
 	const char	*__function_name = "DCget_global_macro";
 	int		i;
@@ -6168,13 +6165,13 @@ static void	DCget_global_macro(const char *macro, const char *context, char **re
 			{
 				if (0 == zbx_strcmp_null(gmacro->context, context))
 				{
-					*replace_to = zbx_strdup(*replace_to, gmacro->value);
+					*value = zbx_strdup(*value, gmacro->value);
 					break;
 				}
 
 				/* check for the default (without parameters) macro value */
-				if (NULL == *replace_to && NULL != context && NULL == gmacro->context)
-					*replace_to = zbx_strdup(*replace_to, gmacro->value);
+				if (NULL == *value_default && NULL != context && NULL == gmacro->context)
+					*value_default = zbx_strdup(*value_default, gmacro->value);
 			}
 		}
 	}
@@ -6185,7 +6182,7 @@ static void	DCget_global_macro(const char *macro, const char *context, char **re
 void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, char **replace_to)
 {
 	const char	*__function_name = "DCget_user_macro";
-	char		*name = NULL, *context = NULL;
+	char		*name = NULL, *context = NULL, *value = NULL, *value_default = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() macro:'%s'", __function_name, macro);
 
@@ -6194,10 +6191,32 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 	LOCK_CACHE;
 
-	if (FAIL == DCget_host_macro(hostids, host_num, name, context, replace_to))
-		DCget_global_macro(name, context, replace_to);
+	DCget_host_macro(hostids, host_num, name, context, &value, &value_default);
+
+	/* Use the base value returned by host macro as default value when */
+	/* expanding expand global macro. This will ensure the following   */
+	/* user macro resolving priority:                                  */
+	/*  1) host context macro                                          */
+	/*  2) global context macro                                        */
+	/*  3) host base (default) macro                                   */
+	/*  4) global base (default) macro                                 */
+	if (NULL == value)
+		DCget_global_macro(name, context, &value, &value_default);
 
 	UNLOCK_CACHE;
+
+	if (NULL != value)
+	{
+		zbx_free(*replace_to);
+		*replace_to = value;
+
+		zbx_free(value_default);
+	}
+	else if (NULL != value_default)
+	{
+		zbx_free(*replace_to);
+		*replace_to = value_default;
+	}
 
 	zbx_free(context);
 	zbx_free(name);
@@ -6765,11 +6784,32 @@ void	zbx_umc_resolve(zbx_hashset_t *cache)
 		for (i = 0; i < object->macros.values_num; i++)
 		{
 			zbx_umc_macro_t	*macro = (zbx_umc_macro_t *)object->macros.values[i];
+			char		*value = NULL, *value_default = NULL;
 
-			if (FAIL == DCget_host_macro(object->hostids.values, object->hostids.values_num, macro->name,
-					macro->context, &macro->value))
+			DCget_host_macro(object->hostids.values, object->hostids.values_num, macro->name,
+					macro->context, &value, &value_default);
+
+			/* Use the base value returned by host macro as default value when */
+			/* expanding expand global macro. This will ensure the following   */
+			/* user macro resolving priority:                                  */
+			/*  1) host context macro                                          */
+			/*  2) global context macro                                        */
+			/*  3) host base (default) macro                                   */
+			/*  4) global base (default) macro                                 */
+			if (NULL == value)
+				DCget_global_macro(macro->name, macro->context, &value, &value_default);
+
+			if (NULL != value)
 			{
-				DCget_global_macro(macro->name, macro->context, &macro->value);
+				zbx_free(macro->value);
+				macro->value = value;
+
+				zbx_free(value_default);
+			}
+			else if (NULL != value_default)
+			{
+				zbx_free(macro->value);
+				macro->value = value_default;
 			}
 
 			total++;
