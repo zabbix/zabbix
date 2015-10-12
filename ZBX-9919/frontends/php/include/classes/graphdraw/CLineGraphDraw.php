@@ -95,7 +95,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->m_showTriggers = ($value == 1) ? 1 : 0;
 	}
 
-	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null, $drawtype = null) {
+	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null,
+			$drawtype = null) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
