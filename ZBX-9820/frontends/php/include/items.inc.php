@@ -743,7 +743,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 
 			$tableRow = array(new CCol($name));
 			foreach ($items as $item_data) {
-				foreach ($item_data as $itemidx => $ithosts) {
+				foreach ($item_data as $ithosts) {
 					$tableRow = getItemDataOverviewCells($tableRow, $ithosts, $hostName);
 				}
 			}

@@ -1209,31 +1209,30 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 
 	$triggers = array();
 	$hostNames = array();
+	$trcounter = array();
 
 	foreach ($dbTriggers as $trigger) {
 		$host = reset($trigger['hosts']);
+		$host_name = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
+		$host['name'] = $host_name;
+		$trigger_name = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
+		$hostNames[$host['hostid']] = $host_name;
 
-		$host['name'] = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
-		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
-		$hostNames[$host['hostid']] = $host['name'];
-
-		// a little tricky check for attempt to overwrite active trigger (value=1) with
-		// inactive or active trigger with lower priority.
-		if (!isset($triggers[$trigger['description']][$host['name']])
-				|| (($triggers[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE && $trigger['value'] == TRIGGER_VALUE_TRUE)
-					|| (($triggers[$trigger['description']][$host['name']]['value'] == TRIGGER_VALUE_FALSE || $trigger['value'] == TRIGGER_VALUE_TRUE)
-						&& $trigger['priority'] > $triggers[$trigger['description']][$host['name']]['priority']))) {
-			$triggers[$trigger['description']][$host['name']] = array(
-				'hostid' => $host['hostid'],
-				'triggerid' => $trigger['triggerid'],
-				'value' => $trigger['value'],
-				'lastchange' => $trigger['lastchange'],
-				'priority' => $trigger['priority'],
-				'flags' => $trigger['flags'],
-				'url' => $trigger['url'],
-				'hosts' => array($host)
-			);
+		if (!array_key_exists($host_name, $trcounter) || !array_key_exists($trigger_name, $trcounter[$host_name])) {
+			$trcounter[$host_name] = array($trigger_name => 0);
 		}
+
+		$triggers[$trigger_name][$trcounter[$host_name][$trigger_name]][$host_name] = array(
+			'hostid' => $host['hostid'],
+			'triggerid' => $trigger['triggerid'],
+			'value' => $trigger['value'],
+			'lastchange' => $trigger['lastchange'],
+			'priority' => $trigger['priority'],
+			'flags' => $trigger['flags'],
+			'url' => $trigger['url'],
+			'hosts' => array($host)
+		);
+		$trcounter[$host_name][$trigger_name]++;
 	}
 
 	$triggerTable = new CTableInfo(_('No triggers found.'));
@@ -1257,26 +1256,29 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		$triggerTable->setHeader($header, 'vertical_header');
 
 		// data
-		foreach ($triggers as $description => $triggerHosts) {
-			$columns = array(nbsp($description));
+		foreach ($triggers as $trigger_name => $trigger_data) {
+			foreach ($trigger_data as $trigger_hosts) {
+				$columns = array(nbsp($trigger_name));
 
-			foreach ($hostNames as $hostName) {
-				$columns[] = getTriggerOverviewCells(
-					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
-					$pageFile,
-					$screenId
-				);
+				foreach ($hostNames as $hostName) {
+					$columns[] = getTriggerOverviewCells(
+						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						$pageFile,
+						$screenId
+					);
+				}
+				$triggerTable->addRow($columns);
 			}
-
-			$triggerTable->addRow($columns);
 		}
 	}
 	else {
 		// header
 		$header = array(new CCol(_('Host'), 'center'));
 
-		foreach ($triggers as $description => $triggerHosts) {
-			$header[] = new CCol($description, 'vertical_rotation');
+		foreach ($triggers as $trigger_name => $trigger_data) {
+			foreach ($trigger_data as $trigger_hosts) {
+				$header[] = new CCol($trigger_name, 'vertical_rotation');
+			}
 		}
 
 		$triggerTable->setHeader($header, 'vertical_header');
@@ -1289,12 +1291,14 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 			$name->setMenuPopup(getMenuPopupHost($hosts[$hostId], $scripts[$hostId]));
 
 			$columns = array($name);
-			foreach ($triggers as $triggerHosts) {
-				$columns[] = getTriggerOverviewCells(
-					isset($triggerHosts[$hostName]) ? $triggerHosts[$hostName] : null,
-					$pageFile,
-					$screenId
-				);
+			foreach ($triggers as $trigger_data) {
+				foreach ($trigger_data as $trigger_hosts) {
+					$columns[] = getTriggerOverviewCells(
+						isset($trigger_hosts[$hostName]) ? $trigger_hosts[$hostName] : null,
+						$pageFile,
+						$screenId
+					);
+				}
 			}
 
 			$triggerTable->addRow($columns);
