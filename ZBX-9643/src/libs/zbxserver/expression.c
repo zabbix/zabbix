@@ -2322,7 +2322,7 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 	if (0 != (macro_type & MACRO_TYPE_TRIGGER_DESCRIPTION))
 	{
 		char	*expression;
-		zabbix_log(LOG_LEVEL_DEBUG, "test 1");
+
 		expression = zbx_strdup(NULL, event->trigger.expression);
 
 		substitute_simple_macros(actionid, event, r_event, userid, hostid, dc_host, dc_item, NULL, NULL,
