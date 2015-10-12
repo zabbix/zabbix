@@ -42,7 +42,8 @@ class CControllerProxyCreate extends CController {
 			'tls_issuer' => 	'db       hosts.tls_issuer',
 			'tls_psk' =>		'db       hosts.tls_psk',
 			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
-			'tls_subject' => 	'db       hosts.tls_subject'
+			'tls_subject' => 	'db       hosts.tls_subject',
+			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
