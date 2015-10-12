@@ -1270,6 +1270,7 @@ function makeEventsActions($eventids) {
 
 	$events = [];
 	$userids = [];
+	$users = [];
 	$mediatypeids = [];
 	$mediatypes = [];
 
