@@ -48,7 +48,8 @@ class CControllerProxyEdit extends CController {
 			'tls_issuer' => 	'db       hosts.tls_issuer',
 			'tls_psk' =>		'db       hosts.tls_psk',
 			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
-			'tls_subject' => 	'db       hosts.tls_subject'
+			'tls_subject' => 	'db       hosts.tls_subject',
+			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -94,7 +95,8 @@ class CControllerProxyEdit extends CController {
 			'tls_issuer' => '',
 			'tls_psk' => '',
 			'tls_psk_identity' => '',
-			'tls_subject' => ''
+			'tls_subject' => '',
+			'form_refresh' => 0
 		];
 
 		// get values from the dabatase
@@ -145,6 +147,7 @@ class CControllerProxyEdit extends CController {
 		$data['tls_psk'] = $this->getInput('tls_psk', $data['tls_psk']);
 		$data['tls_psk_identity'] = $this->getInput('tls_psk_identity', $data['tls_psk_identity']);
 		$data['tls_subject'] = $this->getInput('tls_subject', $data['tls_subject']);
+		$data['form_refresh'] = $this->getInput('form_refresh', $data['form_refresh']);
 
 		if ($data['status'] == HOST_STATUS_PROXY_PASSIVE && $this->hasInput('interfaceid')) {
 			$data['interfaceid'] = $this->getInput('interfaceid');

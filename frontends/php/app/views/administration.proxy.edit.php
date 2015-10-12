@@ -23,8 +23,11 @@ $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Proxies'));
 
-$tabs = (new CTabView())
-	->setSelected(0);
+$tabs = new CTabView();
+
+if ($data['form_refresh'] == 0) {
+	$tabs->setSelected(0);
+}
 
 $proxyForm = (new CForm())
 	->setId('proxyForm')
