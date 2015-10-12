@@ -344,12 +344,12 @@ class CScreenBase {
 		}
 		else {
 			if ($options['period'] < ZBX_MIN_PERIOD) {
-				show_message(_n('Minimum time period to display is %1$s hour.',
-						'Minimum time period to display is %1$s hours.', (int) ZBX_MIN_PERIOD / SEC_PER_HOUR));
+				show_error_message(_n('Minimum time period to display is %1$s minute.',
+						'Minimum time period to display is %1$s minutes.', (int) ZBX_MIN_PERIOD / SEC_PER_MIN));
 				$options['period'] = ZBX_MIN_PERIOD;
 			}
 			elseif ($options['period'] > ZBX_MAX_PERIOD) {
-				show_message(_n('Maximum time period to display is %1$s day.',
+				show_error_message(_n('Maximum time period to display is %1$s day.',
 						'Maximum time period to display is %1$s days.', (int) ZBX_MAX_PERIOD / SEC_PER_DAY));
 				$options['period'] = ZBX_MAX_PERIOD;
 			}
@@ -422,27 +422,5 @@ class CScreenBase {
 			'usertime' => $usertime,
 			'isNow' => $isNow
 		];
-	}
-
-	/**
-	 * Easy way to view time data.
-	 *
-	 * @static
-	 *
-	 * @param array		$options
-	 * @param int		$options['period']
-	 * @param string	$options['stime']
-	 * @param string	$options['stimeNow']
-	 * @param string	$options['starttime']
-	 * @param string	$options['usertime']
-	 * @param int		$options['isNow']
-	 */
-	public static function debugTime(array $time = []) {
-		return 'period='.zbx_date2age(0, $time['period']).', ('.$time['period'].')<br/>'.
-				'starttime='.date('F j, Y, g:i a', zbxDateToTime($time['starttime'])).', ('.$time['starttime'].')<br/>'.
-				'stime='.date('F j, Y, g:i a', zbxDateToTime($time['stime'])).', ('.$time['stime'].')<br/>'.
-				'stimeNow='.date('F j, Y, g:i a', zbxDateToTime($time['stimeNow'])).', ('.$time['stimeNow'].')<br/>'.
-				'usertime='.date('F j, Y, g:i a', zbxDateToTime($time['usertime'])).', ('.$time['usertime'].')<br/>'.
-				'isnow='.$time['isNow'].'<br/>';
 	}
 }
