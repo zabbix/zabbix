@@ -632,7 +632,7 @@ class CHost extends CHostGeneral {
 		$inventories = [];
 		foreach ($hosts as &$host) {
 			// If visible name is not given or empty it should be set to host name.
-			if (!array_key_exists('name', $host) || !trim($host['name'])) {
+			if (array_key_exists('host', $host) && (!array_key_exists('name', $host) || !trim($host['name']))) {
 				$host['name'] = $host['host'];
 			}
 
