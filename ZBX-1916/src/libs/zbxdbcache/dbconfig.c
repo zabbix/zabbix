@@ -32,6 +32,7 @@
 #include "macrocache.h"
 
 static int	sync_in_progress = 0;
+
 #define	LOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_lock(&config_lock)
 #define	UNLOCK_CACHE	if (0 == sync_in_progress) zbx_mutex_unlock(&config_lock)
 #define START_SYNC	LOCK_CACHE; sync_in_progress = 1
@@ -48,6 +49,11 @@ static int	sync_in_progress = 0;
 /* trigger is functional unless its expression contains disabled or not monitored items */
 #define TRIGGER_FUNCTIONAL_TRUE		0
 #define TRIGGER_FUNCTIONAL_FALSE	1
+
+/* shorthand macro for calling in_maintenance_without_data_collection() */
+#define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
+		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
+				dc_host->maintenance_type, dc_item->type)
 
 typedef struct
 {
@@ -878,15 +884,14 @@ static void	DCupdate_proxy_queue(ZBX_DC_PROXY *proxy)
 	else
 		zbx_binary_heap_update_direct(&config->pqueue, &elem);
 }
-
-#define DEFAULT_REFRESH_UNSUPPORTED	600
-static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
-
 static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 {
+	static char	*default_severity_names[] = {"Not classified", "Information", "Warning", "Average", "High", "Disaster"};
 	const char	*__function_name = "DCsync_config";
 	DB_ROW		row;
 	int		i, found = 1;
+
+#define DEFAULT_REFRESH_UNSUPPORTED	600
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -998,6 +1003,8 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+
+#undef DEFAULT_REFRESH_UNSUPPORTED
 
 	return SUCCEED;
 }
@@ -3691,8 +3698,8 @@ void	init_configuration_cache()
 
 	config->config = NULL;
 
-#undef	CREATE_HASHSET
-#undef	CREATE_HASHSET_EXT
+#undef CREATE_HASHSET
+#undef CREATE_HASHSET_EXT
 
 	zbx_strpool_create(strpool_size);
 
@@ -3776,9 +3783,6 @@ void	DCload_config()
  *               FAIL otherwise                                               *
  *                                                                            *
  ******************************************************************************/
-#define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
-		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
-				dc_host->maintenance_type, dc_item->type)
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type)
 {
@@ -6860,7 +6864,7 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		/* On server skip hosts handled by proxies, They are handled dirrectly */
+		/* On server skip hosts handled by proxies. They are handled dirrectly */
 		/* when receiving hosts' availability data from proxies.               */
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) && 0 != host->proxy_hostid)
 			continue;
