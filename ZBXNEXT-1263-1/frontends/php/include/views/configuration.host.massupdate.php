@@ -212,7 +212,7 @@ $newTemplateTable = (new CTable())
 				[(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1), _('Replace')],
 				'mass_replace_tpls'
 			),
-			B(),
+			BR(),
 			new CLabel(
 				[(new CCheckBox('mass_clear_tpls'))->setChecked($data['mass_clear_tpls'] == 1), _('Clear when unlinking')],
 				'mass_clear_tpls'
