@@ -684,6 +684,7 @@ static int	get_values(unsigned char poller_type)
 				break;
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);
+				THIS_SHOULD_NEVER_HAPPEN;
 				assert(0);
 		}
 
