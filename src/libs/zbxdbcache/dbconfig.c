@@ -4835,8 +4835,8 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  * Purpose: Get array of items for selected poller                            *
  *                                                                            *
  * Parameters: poller_type - [IN] poller type (ZBX_POLLER_TYPE_...)           *
- *             items - [OUT] array of items                                   *
- *             max_items - [IN] elements in items array                       *
+ *             items       - [OUT] array of items (Java, pinger, SNMP) or a   *
+ *                                 single item                                *
  *                                                                            *
  * Return value: number of items in items array                               *
  *                                                                            *
@@ -4844,6 +4844,7 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  *                                                                            *
  * Comments: Items leave the queue only through this function. Pollers must   *
  *           always return the items they have taken using DCrequeue_items(). *
+ *           Can return more than one Java, pinger SNMP item.                 *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
