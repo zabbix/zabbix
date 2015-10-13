@@ -1,4 +1,3 @@
-<?php
 /*
 ** Zabbix
 ** Copyright (C) 2001-2015 Zabbix SIA
@@ -15,14 +14,14 @@
 **
 ** You should have received a copy of the GNU General Public License
 ** along with this program; if not, write to the Free Software
-** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#ifndef ZABBIX_SYSINFO_COMMON_CPU_H
+#define ZABBIX_SYSINFO_COMMON_CPU_H
 
-$widget = make_status_of_zbx();
+#include "sysinfo.h"
 
-echo (new CJson())->encode([
-	'header' => _('Status of Zabbix'),
-	'body' => $widget->toString(),
-	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-]);
+int	SYSTEM_CPU_DISCOVERY(AGENT_REQUEST *request, AGENT_RESULT *result);
+
+#endif	/* ZABBIX_SYSINFO_COMMON_CPU_H */

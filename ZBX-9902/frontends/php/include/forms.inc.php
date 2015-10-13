@@ -973,7 +973,6 @@ function getItemFormData(array $item = [], array $options = []) {
 		'new_application' => getRequest('new_application', ''),
 		'applications' => getRequest('applications', []),
 		'delay_flex' => getRequest('delay_flex', []),
-		'new_delay_flex' => getRequest('new_delay_flex', ['delay' => 50, 'period' => ZBX_DEFAULT_INTERVAL]),
 		'snmpv3_contextname' => getRequest('snmpv3_contextname', ''),
 		'snmpv3_securityname' => getRequest('snmpv3_securityname', ''),
 		'snmpv3_securitylevel' => getRequest('snmpv3_securitylevel', 0),
@@ -1163,15 +1162,23 @@ function getItemFormData(array $item = [], array $options = []) {
 			$data['delta'] = $data['item']['delta'];
 			$data['trends'] = $data['item']['trends'];
 
-			$db_delay_flex = $data['item']['delay_flex'];
-			if (isset($db_delay_flex)) {
-				$arr_of_dellays = explode(';', $db_delay_flex);
-				foreach ($arr_of_dellays as $one_db_delay) {
-					$arr_of_delay = explode('/', $one_db_delay);
-					if (!isset($arr_of_delay[0]) || !isset($arr_of_delay[1])) {
-						continue;
+			$parser = new CItemDelayFlexParser($data['item']['delay_flex']);
+			if ($parser->isValid()) {
+				foreach ($parser->getIntervals() as $interval) {
+					if ($interval['type'] == ITEM_DELAY_FLEX_TYPE_FLEXIBLE) {
+						$interval_parts = explode('/', $interval['interval']);
+						$data['delay_flex'][] = [
+							'delay' => $interval_parts[0],
+							'period' => $interval_parts[1],
+							'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE
+						];
 					}
-					array_push($data['delay_flex'], ['delay' => $arr_of_delay[0], 'period' => $arr_of_delay[1]]);
+					else {
+						$data['delay_flex'][] = [
+							'schedule' => $interval['interval'],
+							'type' => ITEM_DELAY_FLEX_TYPE_SCHEDULING
+						];
+					}
 				}
 			}
 
@@ -1196,6 +1203,10 @@ function getItemFormData(array $item = [], array $options = []) {
 				);
 			}
 		}
+	}
+
+	if (!$data['delay_flex']) {
+		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE];
 	}
 
 	// applications
