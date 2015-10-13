@@ -70,7 +70,8 @@ catch (Exception $e) {
 		'jsonrpc' => '2.0',
 		'error' => [
 			'code' => 1,
-			'message' => $e->getMessage()
+			'message' => $e->getMessage(),
+			'data' => ''
 		],
 		'id' => (isset($jsonData['id']) ? $jsonData['id'] : null)
 	];
