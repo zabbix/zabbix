@@ -90,13 +90,8 @@ class CConfigFile {
 
 		$this->setDefaults();
 
-		if (isset($DB['TYPE'])) {
-			$this->config['DB']['TYPE'] = $DB['TYPE'];
-		}
-
-		if (isset($DB['DATABASE'])) {
-			$this->config['DB']['DATABASE'] = $DB['DATABASE'];
-		}
+		$this->config['DB']['TYPE'] = $DB['TYPE'];
+		$this->config['DB']['DATABASE'] = $DB['DATABASE'];
 
 		if (isset($DB['SERVER'])) {
 			$this->config['DB']['SERVER'] = $DB['SERVER'];
