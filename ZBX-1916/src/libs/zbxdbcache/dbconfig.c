@@ -6834,15 +6834,15 @@ void	zbx_config_clean(zbx_config_t *cfg)
  *          enabled items for the corresponding interface                     *
  *                                                                            *
  * Parameters: hosts - [OUT] a vector of hostid,reset_flags pairs containing  *
- *                     host availability reset data (sorted by hostid)        *
+ *                           host availability reset data (sorted by hostid)  *
  *                                                                            *
- * Return value: SUCCEED - host availability was reseted for at least one     *
- *                         host                                               *
+ * Return value: SUCCEED - host availability was reset for at least one host  *
  *               FAIL    - no hosts required availability reset               *
  *                                                                            *
  * Comments: This function resets host availability in configuration cache.   *
  *           The caller must perform corresponding database updates based     *
- *           on returned host availability reset data.                        *
+ *           on returned host availability reset data. On server the function *
+ *           skips hosts handled by proxies.                                  *
  *                                                                            *
  ******************************************************************************/
 int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
@@ -6860,6 +6860,10 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
+		/*
+		 * On server skip hosts handled by proxies, They are handled dirrectly
+		 * when receiving hosts' availability data from proxies.
+		 */
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) && 0 != host->proxy_hostid)
 			continue;
 
