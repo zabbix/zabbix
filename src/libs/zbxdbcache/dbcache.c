@@ -58,7 +58,7 @@ static int		ZBX_HISTORY_SIZE = 0;	/* must be greater than ZBX_SYNC_MAX */
 
 #define ZBX_IDS_SIZE	10
 
-#define ZBX_TOTAL_FLUSH_TIME	((SEC_PER_HOUR*11)/12)
+#define ZBX_TOTAL_FLUSH_TIME	((SEC_PER_HOUR * 55) / 60)
 
 typedef struct
 {
@@ -157,7 +157,7 @@ typedef struct
 	int		history_gap_num;
 	int		text_free;
 	int		trends_num;
-	int		trends_last_total_flush_hour;
+	int		trends_last_cleanup_hour;
 	int		itemids_alloc;
 	int		itemids_num;
 	zbx_timespec_t	last_ts;
@@ -684,7 +684,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 		DCadd_trend(&history[i], &trends, &trends_alloc, &trends_num);
 	}
 
-	if (cache->trends_last_total_flush_hour < hour && ZBX_TOTAL_FLUSH_TIME < seconds)
+	if (cache->trends_last_cleanup_hour < hour && ZBX_TOTAL_FLUSH_TIME < seconds)
 	{
 		zbx_hashset_iter_t	iter;
 		ZBX_DC_TREND		*trend;
@@ -694,10 +694,15 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 		while (NULL != (trend = (ZBX_DC_TREND *)zbx_hashset_iter_next(&iter)))
 		{
 			if (trend->clock != hour)
-				DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
+			{
+				if (0 < trend->num)
+					DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
+
+				zbx_hashset_iter_remove(&iter);
+			}
 		}
 
-		cache->trends_last_total_flush_hour = hour;
+		cache->trends_last_cleanup_hour = hour;
 	}
 
 	UNLOCK_TRENDS;
@@ -2887,7 +2892,7 @@ static void	init_trend_cache()
 	CONFIG_TRENDS_CACHE_SIZE -= sz;
 
 	cache->trends_num = 0;
-	cache->trends_last_total_flush_hour = 0;
+	cache->trends_last_cleanup_hour = 0;
 
 #define INIT_HASHSET_SIZE	100	/* Should be calculated dynamically based on trends size? */
 					/* Still does not make sense to have it more than initial */
