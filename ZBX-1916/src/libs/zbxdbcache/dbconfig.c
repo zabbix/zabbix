@@ -4844,7 +4844,6 @@ int	DCconfig_get_poller_nextcheck(unsigned char poller_type)
  *                                                                            *
  * Comments: Items leave the queue only through this function. Pollers must   *
  *           always return the items they have taken using DCrequeue_items(). *
- *           Can return more than one Java, pinger SNMP item.                 *
  *                                                                            *
  ******************************************************************************/
 int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items)
