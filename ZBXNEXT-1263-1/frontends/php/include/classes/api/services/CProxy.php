@@ -618,13 +618,13 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Validate encryption fields.
+	 * Validate connections from/to proxy and PSK fields.
 	 *
 	 * @throws APIException		if incorrect encryption options
 	 *
-	 * @param array $proxies	proxy data array
+	 * @param array $proxies	proxies data array
 	 */
-	protected function encryptionValidation(array $proxies) {
+	protected function validateEncryption(array $proxies) {
 		foreach ($proxies as $proxy) {
 			// connections from host validation
 			$available_connect_types = [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE];
@@ -735,7 +735,7 @@ class CProxy extends CApiService {
 		}
 		unset($proxy);
 
-		$this->encryptionValidation($proxies);
+		$this->validateEncryption($proxies);
 
 		// Check if any of the affected hosts are discovered.
 		$hostids = [];
@@ -832,7 +832,7 @@ class CProxy extends CApiService {
 		}
 		unset($proxy);
 
-		$this->encryptionValidation($proxies_full);
+		$this->validateEncryption($proxies_full);
 
 		// Check if any of the affected hosts are discovered.
 		$hostids = [];

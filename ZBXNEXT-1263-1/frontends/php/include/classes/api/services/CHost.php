@@ -1524,7 +1524,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @throws APIException		if incorrect encryption options
 	 *
-	 * @param array $hosts		host data array
+	 * @param array $hosts		hosts data array
 	 */
 	protected function validateEncryption(array $hosts) {
 		foreach ($hosts as $host) {
