@@ -4696,13 +4696,13 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 		if (0 == res)
 		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS connection from %s has been closed"
-					" during handshake:", get_ip_by_socket(s));
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS connection has been closed during"
+					" handshake:");
 		}
 		else
 		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake with %s returned error"
-					" code %d:", get_ip_by_socket(s), error_code);
+			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake returned error code %d:",
+					error_code);
 		}
 
 		zbx_tls_error_msg(error, &error_alloc, &error_offset);

@@ -1171,11 +1171,15 @@ int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept)
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		if (0 != (tls_accept & (ZBX_TCP_SEC_TLS_CERT | ZBX_TCP_SEC_TLS_PSK)))
 		{
-			char	*error = NULL;
+			char	*error = NULL, ip[64];
+
+			/* Get peer IP address for diagnostic logging before TLS stuff. Connection can be shut down */
+			/* during TLS handshake and it will not be possible to get peer IP address anymore. */
+			zbx_strlcpy(ip, get_ip_by_socket(s), sizeof(ip));
 
 			if (SUCCEED != zbx_tls_accept(s, &error, tls_accept))
 			{
-				zbx_set_socket_strerror("from %s: %s", get_ip_by_socket(s), error);
+				zbx_set_socket_strerror("from %s: %s", ip, error);
 				zbx_tcp_unaccept(s);
 				zbx_free(error);
 				return FAIL;
