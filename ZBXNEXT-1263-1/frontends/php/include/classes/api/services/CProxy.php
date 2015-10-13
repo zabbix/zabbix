@@ -289,25 +289,17 @@ class CProxy extends CApiService {
 				? $proxy['tls_accept']
 				: $db_proxies[$proxy['proxyid']]['tls_accept'];
 
-			if ($status == HOST_STATUS_PROXY_PASSIVE) {
-				if ($tls_connect != HOST_ENCRYPTION_PSK) {
-					$proxy['tls_psk_identity'] = '';
-					$proxy['tls_psk'] = '';
-				}
-				if ($tls_connect != HOST_ENCRYPTION_CERTIFICATE) {
-					$proxy['tls_issuer'] = '';
-					$proxy['tls_subject'] = '';
-				}
+			// Clean PSK fields.
+			if ($tls_connect != HOST_ENCRYPTION_PSK && ($tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK) {
+				$proxy['tls_psk_identity'] = '';
+				$proxy['tls_psk'] = '';
 			}
-			elseif ($status == HOST_STATUS_PROXY_ACTIVE) {
-				if (($tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK) {
-					$proxy['tls_psk_identity'] = '';
-					$proxy['tls_psk'] = '';
-				}
-				if (($tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
-					$proxy['tls_issuer'] = '';
-					$proxy['tls_subject'] = '';
-				}
+
+			// Clean certificate fields.
+			if ($tls_connect != HOST_ENCRYPTION_CERTIFICATE
+					&& ($tls_accept & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
+				$proxy['tls_issuer'] = '';
+				$proxy['tls_subject'] = '';
 			}
 
 			// mark the interface as main to pass host interface validation
