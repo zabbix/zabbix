@@ -330,14 +330,6 @@ class ZBase {
 	 */
 	protected function initDB() {
 		$error = null;
-		global $DB;
-		if (!isset($DB['TYPE'])) {
-			throw new DBException('Unknown database type.');
-		}
-		$dbNames = CConfigFile::getDbNames();
-		if (!array_key_exists($DB['TYPE'], CFrontendSetup::getSupportedDatabases())) {
-			throw new DBException($dbNames[$DB['TYPE']].' database libraries not found.');
-		}
 		if (!DBconnect($error)) {
 			throw new DBException($error);
 		}
