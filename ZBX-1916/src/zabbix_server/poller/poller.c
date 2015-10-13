@@ -78,8 +78,8 @@ static void	update_triggers_status_to_unknown(zbx_uint64_t hostid, zbx_item_type
 			zbx_snprintf(failed_type_buf, sizeof(failed_type_buf), "%d", ITEM_TYPE_JMX);
 			break;
 		default:
-			/* we should never end up here */
-			assert(0);
+			zbx_error("unknown item type: %d", type);
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
 	/*************************************************************************
@@ -685,7 +685,6 @@ static int	get_values(unsigned char poller_type)
 			default:
 				zbx_error("unknown response code returned: %d", errcodes[i]);
 				THIS_SHOULD_NEVER_HAPPEN;
-				assert(0);
 		}
 
 		if (SUCCEED == errcodes[i])
