@@ -2720,6 +2720,13 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 
 					dc_local_add_history_log(itemid, ts, log->value, log->timestamp, log->source,
 							log->severity, log->logeventid, log->lastlogsize, log->mtime);
+
+					/* increase ns of log values to avoid duplicate timestamps */
+					if (++ts->ns == 1000000000)
+					{
+						ts->sec++;
+						ts->ns = 0;
+					}
 				}
 			}
 			break;
