@@ -6860,10 +6860,8 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		/*
-		 * On server skip hosts handled by proxies, They are handled dirrectly
-		 * when receiving hosts' availability data from proxies.
-		 */
+		/* On server skip hosts handled by proxies, They are handled dirrectly */
+		/* when receiving hosts' availability data from proxies.               */
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) && 0 != host->proxy_hostid)
 			continue;
 
