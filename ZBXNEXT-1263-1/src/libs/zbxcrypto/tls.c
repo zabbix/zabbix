@@ -710,7 +710,7 @@ void	zbx_tls_validate_config(void)
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && NULL == CONFIG_TLS_PSK_FILE)
 		zbx_tls_validation_error(ZBX_TLS_VALIDATION_DEPENDENCY, &CONFIG_TLS_PSK_IDENTITY, &CONFIG_TLS_PSK_FILE);
 
-	/* PSK identity must be a valid UTF-8 string (RFC4279 says Unicode) */
+	/* PSK identity must be a valid UTF-8 string (RFC 4279 says Unicode) */
 	if (NULL != CONFIG_TLS_PSK_IDENTITY && SUCCEED != zbx_is_utf8(CONFIG_TLS_PSK_IDENTITY))
 		zbx_tls_validation_error(ZBX_TLS_VALIDATION_UTF8, &CONFIG_TLS_PSK_IDENTITY, NULL);
 
@@ -3180,7 +3180,7 @@ void	zbx_tls_init_child(void)
 		/* we're using blocking sockets, deal with renegotiations automatically */
 		SSL_CTX_set_mode(ctx_cert, SSL_MODE_AUTO_RETRY);
 
-		/* use server ciphersuite preference, do not use RFC4507 ticket extension */
+		/* use server ciphersuite preference, do not use RFC 4507 ticket extension */
 		SSL_CTX_set_options(ctx_cert, SSL_OP_CIPHER_SERVER_PREFERENCE | SSL_OP_NO_TICKET);
 
 		/* do not connect to unpatched servers */
