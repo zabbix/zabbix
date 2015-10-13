@@ -511,6 +511,9 @@ static int	get_value(DC_ITEM *item, AGENT_RESULT *result)
  *                                                                            *
  * Author: Alexei Vladishev                                                   *
  *                                                                            *
+ * Comments: processes single item at a time except for Java, SNMP items,     *
+ *           see DCconfig_get_poller_items()                                  *
+ *                                                                            *
  ******************************************************************************/
 static int	get_values(unsigned char poller_type)
 {
