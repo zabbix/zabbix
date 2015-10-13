@@ -50,7 +50,7 @@ function DBconnect(&$error) {
 	else {
 		switch ($DB['TYPE']) {
 			case ZBX_DB_MYSQL:
-				$DB['DB'] = mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
+				$DB['DB'] = @mysqli_connect($DB['SERVER'], $DB['USER'], $DB['PASSWORD'], $DB['DATABASE'], $DB['PORT']);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database: '.trim(mysqli_connect_error());
 					$result = false;
@@ -71,7 +71,7 @@ function DBconnect(&$error) {
 					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
 					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
-				$DB['DB']= pg_connect($pg_connection_string);
+				$DB['DB']= @pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database.';
 					$result = false;
@@ -111,7 +111,7 @@ function DBconnect(&$error) {
 					}
 				}
 
-				$DB['DB'] = oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
+				$DB['DB'] = @oci_connect($DB['USER'], $DB['PASSWORD'], $connect);
 				if ($DB['DB']) {
 					DBexecute('ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.zbx_dbstr('. '));
 				}
@@ -134,7 +134,7 @@ function DBconnect(&$error) {
 				$connect .= 'UID='.$DB['USER'].';';
 				$connect .= 'PWD='.$DB['PASSWORD'].';';
 
-				$DB['DB'] = db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
+				$DB['DB'] = @db2_connect($connect, $DB['USER'], $DB['PASSWORD']);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database: '.db2_conn_errormsg();
 					$result = false;
@@ -158,7 +158,7 @@ function DBconnect(&$error) {
 					init_sqlite3_access();
 					lock_sqlite3_access();
 					try{
-						$DB['DB'] = new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
+						$DB['DB'] = @new SQLite3($DB['DATABASE'], SQLITE3_OPEN_READWRITE);
 					}
 					catch (Exception $e) {
 						$error = 'Error connecting to database.';

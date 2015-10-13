@@ -22,8 +22,6 @@
 class CSetupWizard extends CForm {
 
 	function __construct($ZBX_CONFIG) {
-		require_once realpath(dirname(__FILE__).'/../../../include/db.inc.php');
-
 		$this->DISABLE_CANCEL_BUTTON = false;
 		$this->DISABLE_BACK_BUTTON = false;
 		$this->SHOW_RETRY_BUTTON = false;
