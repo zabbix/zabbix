@@ -1416,7 +1416,7 @@ static void	free_db_action(DB_ACTION *action)
 	zbx_free(action->r_longdata);
 }
 
-static int	process_escalations(int now, int *nextcheck, char escalation_source)
+static int	process_escalations(int now, int *nextcheck, unsigned int escalation_source)
 {
 	const char		*__function_name = "process_escalations";
 	DB_RESULT		result;
