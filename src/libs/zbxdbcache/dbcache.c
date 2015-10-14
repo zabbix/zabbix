@@ -58,7 +58,7 @@ static int		ZBX_HISTORY_SIZE = 0;	/* must be greater than ZBX_SYNC_MAX */
 
 #define ZBX_IDS_SIZE	10
 
-#define ZBX_TOTAL_FLUSH_TIME	((SEC_PER_HOUR * 55) / 60)
+#define ZBX_TRENDS_CLEANUP_TIME	((SEC_PER_HOUR * 55) / 60)
 
 typedef struct
 {
@@ -684,7 +684,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 		DCadd_trend(&history[i], &trends, &trends_alloc, &trends_num);
 	}
 
-	if (cache->trends_last_cleanup_hour < hour && ZBX_TOTAL_FLUSH_TIME < seconds)
+	if (cache->trends_last_cleanup_hour < hour && ZBX_TRENDS_CLEANUP_TIME < seconds)
 	{
 		zbx_hashset_iter_t	iter;
 		ZBX_DC_TREND		*trend;
