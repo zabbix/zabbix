@@ -1452,13 +1452,9 @@ static int	process_escalations(int now, int *nextcheck, char escalation_source)
 						CONFIG_ESCALATOR_FORKS, process_num - 1);
 			}
 			break;
-			filter = zbx_dsprintf(filter, "itemid is not null and "  ZBX_SQL_MOD(itemid, %d) "=%d",
-					CONFIG_ESCALATOR_FORKS, process_num - 1);
-			break;
 		case ZBX_ESCALATION_SOURCE_DEFAULT:
 			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
 					"triggerid is null and itemid is null");
-
 			if (1 < CONFIG_ESCALATOR_FORKS)
 			{
 				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
@@ -1693,8 +1689,9 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	{
 		if (0 != sleeptime)
 		{
-			zbx_setproctitle("%s #%d [processed %d escalations in " ZBX_FS_DBL " sec, processing escalations]",
-					get_process_type_string(process_type), process_num, old_escalations_count, old_total_sec);
+			zbx_setproctitle("%s #%d [processed %d escalations in " ZBX_FS_DBL
+					" sec, processing escalations]", get_process_type_string(process_type),
+					process_num, old_escalations_count, old_total_sec);
 		}
 
 		sec = zbx_time();
@@ -1713,14 +1710,14 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 			if (0 == sleeptime)
 			{
 				zbx_setproctitle("%s #%d [processed %d escalations in " ZBX_FS_DBL
-						" sec, processing escalations]", get_process_type_string(process_type), process_num,
-						escalations_count, total_sec);
+						" sec, processing escalations]", get_process_type_string(process_type),
+						process_num, escalations_count, total_sec);
 			}
 			else
 			{
 				zbx_setproctitle("%s #%d [processed %d escalations in " ZBX_FS_DBL " sec, idle %d sec]",
-						get_process_type_string(process_type), process_num, escalations_count, total_sec,
-						sleeptime);
+						get_process_type_string(process_type), process_num, escalations_count,
+						total_sec, sleeptime);
 
 				old_escalations_count = escalations_count;
 				old_total_sec = total_sec;
