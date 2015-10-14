@@ -1424,7 +1424,7 @@ static int	process_escalations(int now, int *nextcheck, char escalation_source)
 	DB_ESCALATION		escalation, last_escalation;
 	zbx_vector_uint64_t	escalationids;
 	char			*sql = NULL, *filter = NULL;
-	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset;
+	size_t			sql_alloc = ZBX_KIBIBYTE, sql_offset, filter_alloc = 0, filter_offset = 0;
 	int			res;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
@@ -1435,16 +1435,36 @@ static int	process_escalations(int now, int *nextcheck, char escalation_source)
 	switch (escalation_source)
 	{
 		case ZBX_ESCALATION_SOURCE_TRIGGER:
-			filter = zbx_dsprintf(filter, "triggerid is not null and "  ZBX_SQL_MOD(triggerid, %d) "=%d",
-					CONFIG_ESCALATOR_FORKS, process_num - 1);
+			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "triggerid is not null");
+			if (1 < CONFIG_ESCALATOR_FORKS)
+			{
+				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
+						" and " ZBX_SQL_MOD(triggerid, %d) "=%d",
+						CONFIG_ESCALATOR_FORKS, process_num - 1);
+			}
 			break;
 		case ZBX_ESCALATION_SOURCE_ITEM:
+			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset, "itemid is not null");
+			if (1 < CONFIG_ESCALATOR_FORKS)
+			{
+				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
+						" and " ZBX_SQL_MOD(itemid, %d) "=%d",
+						CONFIG_ESCALATOR_FORKS, process_num - 1);
+			}
+			break;
 			filter = zbx_dsprintf(filter, "itemid is not null and "  ZBX_SQL_MOD(itemid, %d) "=%d",
 					CONFIG_ESCALATOR_FORKS, process_num - 1);
 			break;
 		case ZBX_ESCALATION_SOURCE_DEFAULT:
-			filter = zbx_dsprintf(filter, "triggerid is null and itemid is null and "
-					ZBX_SQL_MOD(escalationid, %d) "=%d", CONFIG_ESCALATOR_FORKS, process_num - 1 );
+			zbx_strcpy_alloc(&filter, &filter_alloc, &filter_offset,
+					"triggerid is null and itemid is null");
+
+			if (1 < CONFIG_ESCALATOR_FORKS)
+			{
+				zbx_snprintf_alloc(&filter, &filter_alloc, &filter_offset,
+						" and " ZBX_SQL_MOD(escalationid, %d) "=%d",
+						CONFIG_ESCALATOR_FORKS, process_num - 1);
+			}
 			break;
 	}
 
