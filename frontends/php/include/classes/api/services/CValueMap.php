@@ -110,21 +110,14 @@ class CValueMap extends CApiService {
 
 		$this->validateCreate($valuemaps);
 
-		$valuemapids = DB::insert('valuemaps', $valuemaps);
-
-		$db_valuemaps = API::getApiService()->select('valuemaps', [
-			'output' => ['valuemapid', 'name'],
-			'valuemapids' => $valuemapids
-		]);
-
-		$db_valuemaps = zbx_toHash($db_valuemaps, 'name');
+		$valuemapids = DB::insertBatch('valuemaps', $valuemaps);
 
 		$mappings = [];
 
-		foreach ($valuemaps as $valuemap) {
+		foreach ($valuemaps as $key => $valuemap) {
 			foreach ($valuemap['mappings'] as $mapping) {
 				$mappings[] = [
-					'valuemapid' => $db_valuemaps[$valuemap['name']]['valuemapid'],
+					'valuemapid' => $valuemapids[$key],
 					'value' => $mapping['value'],
 					'newvalue' => $mapping['newvalue']
 				];
@@ -133,8 +126,8 @@ class CValueMap extends CApiService {
 
 		DB::insertBatch('mappings', $mappings);
 
-		foreach ($db_valuemaps as $db_valuemap) {
-			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $db_valuemap['valuemapid'], $db_valuemap['name'],
+		foreach ($valuemaps as $key => $valuemap) {
+			add_audit_ext(AUDIT_ACTION_ADD, AUDIT_RESOURCE_VALUE_MAP, $valuemapids[$key], $valuemap['name'],
 				null, null, null
 			);
 		}
