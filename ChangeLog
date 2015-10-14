@@ -4,7 +4,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
-..F....... [ZBX-9919] fixed y scale calculation for linear graphs (Ivo, vitalijs)
+..F....... [ZBX-9919] fixed y scale calculation for linear graphs (vitalijs)
 ...G...PS. [ZBX-9864] fixed compilation warnings regarding SIZE_T_MAX under NetBSD (Sasha)
 ..F....... [ZBX-9862] added meta tag "msapplication-config" to prevent MSIE11 requesting browserconfig.xml (Gunars)
 A......... [ZBX-9340] fixed "data" property not being returned by API when error is generated on DB level (Gunars)
