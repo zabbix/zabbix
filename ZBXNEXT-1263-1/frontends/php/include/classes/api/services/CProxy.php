@@ -163,6 +163,10 @@ class CProxy extends CApiService {
 	 * @return array
 	 */
 	public function create(array $proxies) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		$proxies = zbx_toArray($proxies);
 
 		$proxies = $this->convertDeprecatedValues($proxies);
@@ -183,6 +187,7 @@ class CProxy extends CApiService {
 						$proxy['tls_psk_identity'] = '';
 						$proxy['tls_psk'] = '';
 					}
+
 					if ($proxy['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE) {
 						$proxy['tls_issuer'] = '';
 						$proxy['tls_subject'] = '';
@@ -201,6 +206,7 @@ class CProxy extends CApiService {
 						$proxy['tls_psk_identity'] = '';
 						$proxy['tls_psk'] = '';
 					}
+
 					if (($proxy['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 						$proxy['tls_issuer'] = '';
 						$proxy['tls_subject'] = '';
@@ -208,11 +214,9 @@ class CProxy extends CApiService {
 				}
 			}
 
-			// mark the interface as main to pass host interface validation
-			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
-				if (array_key_exists('interface', $proxy)) {
-					$proxy['interface']['main'] = INTERFACE_PRIMARY;
-				}
+			// Mark the interface as main to pass host interface validation.
+			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)) {
+				$proxy['interface']['main'] = INTERFACE_PRIMARY;
 			}
 		}
 		unset($proxy);
@@ -251,6 +255,10 @@ class CProxy extends CApiService {
 	 * @return array
 	 */
 	public function update(array $proxies) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		$proxies = zbx_toArray($proxies);
 
 		$proxies = $this->convertDeprecatedValues($proxies);
@@ -285,6 +293,7 @@ class CProxy extends CApiService {
 			$tls_connect = array_key_exists('tls_connect', $proxy)
 				? $proxy['tls_connect']
 				: $db_proxies[$proxy['proxyid']]['tls_connect'];
+
 			$tls_accept = array_key_exists('tls_accept', $proxy)
 				? $proxy['tls_accept']
 				: $db_proxies[$proxy['proxyid']]['tls_accept'];
@@ -302,20 +311,17 @@ class CProxy extends CApiService {
 				$proxy['tls_subject'] = '';
 			}
 
-			// mark the interface as main to pass host interface validation
-			if ($status == HOST_STATUS_PROXY_PASSIVE) {
-				if (array_key_exists('interface', $proxy)) {
-					$proxy['interface']['main'] = INTERFACE_PRIMARY;
-				}
+			// Mark the interface as main to pass host interface validation.
+			if ($status == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)) {
+				$proxy['interface']['main'] = INTERFACE_PRIMARY;
 			}
 		}
 		unset($proxy);
 
-		$proxyids = $proxyUpdate = $hostUpdate = [];
+		$proxyUpdate = [];
+		$hostUpdate = [];
 
 		foreach ($proxies as $proxy) {
-			$proxyids[] = $proxy['proxyid'];
-
 			$proxyUpdate[] = [
 				'values' => $proxy,
 				'where' => ['hostid' => $proxy['proxyid']]
@@ -337,8 +343,9 @@ class CProxy extends CApiService {
 				];
 			}
 
-			// if this is an active proxy - delete it's interface;
-			if (isset($proxy['status']) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
+			if (array_key_exists('status', $proxy) && $proxy['status'] == HOST_STATUS_PROXY_ACTIVE) {
+				// If this is an active proxy, delete it's interface.
+
 				$interfaces = API::HostInterface()->get([
 					'hostids' => $proxy['hostid'],
 					'output' => ['interfaceid']
@@ -349,9 +356,9 @@ class CProxy extends CApiService {
 					API::HostInterface()->delete($interfaceIds);
 				}
 			}
+			elseif (array_key_exists('interface', $proxy) && is_array($proxy['interface'])) {
+				// Update the interface of a passive proxy.
 
-			// update the interface of a passive proxy
-			elseif (isset($proxy['interface']) && is_array($proxy['interface'])) {
 				$proxy['interface']['hostid'] = $proxy['hostid'];
 
 				$result = isset($proxy['interface']['interfaceid'])
@@ -620,13 +627,12 @@ class CProxy extends CApiService {
 	/**
 	 * Validate connections from/to proxy and PSK fields.
 	 *
-	 * @throws APIException		if incorrect encryption options
-	 *
 	 * @param array $proxies	proxies data array
+	 *
+	 * @throws APIException	if incorrect encryption options.
 	 */
 	protected function validateEncryption(array $proxies) {
 		foreach ($proxies as $proxy) {
-			// connections from host validation
 			$available_connect_types = [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE];
 			$available_accept_types = [
 				HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, (HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK),
@@ -639,12 +645,13 @@ class CProxy extends CApiService {
 					&& !in_array($proxy['tls_connect'], $available_connect_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to proxy field.'));
 			}
+
 			if ($proxy['status'] == HOST_STATUS_PROXY_ACTIVE && array_key_exists('tls_accept', $proxy)
 					&& !in_array($proxy['tls_accept'], $available_accept_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from proxy field.'));
 			}
 
-			// PSK validation
+			// PSK validation.
 			if ((array_key_exists('tls_connect', $proxy) && $proxy['tls_connect'] == HOST_ENCRYPTION_PSK
 					&& $proxy['status'] == HOST_STATUS_PROXY_PASSIVE)
 						|| (array_key_exists('tls_accept', $proxy)
@@ -653,9 +660,11 @@ class CProxy extends CApiService {
 				if (!array_key_exists('tls_psk_identity', $proxy) || zbx_empty($proxy['tls_psk_identity'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
 				}
+
 				if (!array_key_exists('tls_psk', $proxy) || zbx_empty($proxy['tls_psk'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
 				}
+
 				if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $proxy['tls_psk'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _(
 						'Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters.'
@@ -666,183 +675,189 @@ class CProxy extends CApiService {
 	}
 
 	/**
-	 * Validate proxies data on create method.
+	 * Validates the input parameters for the create() method.
 	 *
 	 * @param array $proxies	proxies data array
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $proxies) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!'));
-		}
-
-		// permissions
 		$proxy_db_fields = ['host' => null];
+		$names = [];
 
-		foreach ($proxies as &$proxy) {
+		foreach ($proxies as $proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%1$s".', $proxy['host']));
 			}
 
+			if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect characters used for proxy name "%1$s".', $proxy['host'])
+				);
+			}
+
+			$names[$proxy['host']] = true;
+		}
+
+		$proxy_exists = $this->get([
+			'output' => ['proxyid'],
+			'filter' => ['host' => array_keys($names)],
+			'limit' => 1
+		]);
+
+		if ($proxy_exists) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%s" already exists.', $proxy_exists[0]['host']));
+		}
+
+		$hostids = [];
+
+		foreach ($proxies as $proxy) {
 			if (!array_key_exists('status', $proxy)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('No status for proxy.'));
 			}
 			elseif ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE && $proxy['status'] != HOST_STATUS_PROXY_PASSIVE) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value used for proxy status "%1$s".', $proxy['status']));
-			}
-
-			// host
-			if (array_key_exists('host', $proxy)) {
-				if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect characters used for proxy name "%1$s".', $proxy['host']));
-				}
-
-				$proxies_exists = $this->get([
-					'output' => ['proxyid'],
-					'filter' => ['host' => $proxy['host']]
-				]);
-				foreach ($proxies_exists as $proxy_exists) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%s" already exists.', $proxy['host']));
-				}
+					_s('Incorrect value used for proxy status "%1$s".', $proxy['status'])
+				);
 			}
 
 			// interface
-			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
-				if (!array_key_exists('interface', $proxy) || !is_array($proxy['interface']) || !$proxy['interface']) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('No interface provided for proxy "%s".', $proxy['host']));
-				}
+			if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE
+					&& (!array_key_exists('interface', $proxy)
+						|| !is_array($proxy['interface']) || !$proxy['interface'])) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('No interface provided for proxy "%s".', $proxy['host']));
 			}
 
-			// check if hosts exist
 			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
-				$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
-
-				$hosts = API::Host()->get([
-					'output' => ['hostid', 'proxy_hostid', 'name'],
-					'hostids' => $hostids,
-					'editable' => true,
-					'preservekeys' => true
-				]);
-
-				if (!$hosts) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!'));
-				}
-			}
-		}
-		unset($proxy);
-
-		$this->validateEncryption($proxies);
-
-		// Check if any of the affected hosts are discovered.
-		$hostids = [];
-		foreach ($proxies as $proxy) {
-			if (array_key_exists('hosts', $proxy)) {
 				$hostids = array_merge($hostids, zbx_objectValues($proxy['hosts'], 'hostid'));
 			}
 		}
-		$this->checkValidator($hostids, new CHostNormalValidator([
-			'message' => _('Cannot update proxy for discovered host "%1$s".')
-		]));
+
+		if ($hostids) {
+			// Check if host exists.
+			$hosts = API::Host()->get([
+				'output' => ['hostid'],
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if (!$hosts) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			// Check if any of the affected hosts are discovered.
+			$this->checkValidator($hostids, new CHostNormalValidator([
+				'message' => _('Cannot update proxy for discovered host "%1$s".')
+			]));
+		}
+
+		$this->validateEncryption($proxies);
 	}
 
 	/**
-	 * Validate proxies data on update method.
+	 * Validates the input parameters for the update() method.
 	 *
 	 * @param array $proxies		proxies data array
 	 * @param array $db_proxies		db proxies data array
+	 *
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array $proxies, array $db_proxies) {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('No permissions to referred object or it does not exist!'));
-		}
-
-		// permissions
 		$proxy_db_fields = ['proxyid' => null];
-		$proxies_full = [];
+		$names = [];
 
-		foreach ($proxies as &$proxy) {
+		foreach ($proxies as $proxy) {
 			if (!check_db_fields($proxy_db_fields, $proxy)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Wrong fields for proxy "%1$s".', $proxy['host']));
 			}
 
 			if (!array_key_exists($proxy['proxyid'], $db_proxies)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No permissions to referred object or it does not exist!'));
 			}
-
-			if (array_key_exists('status', $proxy) && ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE
-					&& $proxy['status'] != HOST_STATUS_PROXY_PASSIVE)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect value used for proxy status "%1$s".', $proxy['status']));
-			}
-
-			$status = array_key_exists('status', $proxy) ? $proxy['status'] : $db_proxies[$proxy['proxyid']]['status'];
 
 			// host
 			if (array_key_exists('host', $proxy)) {
 				if (!preg_match('/^'.ZBX_PREG_HOST_FORMAT.'$/', $proxy['host'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Incorrect characters used for proxy name "%1$s".', $proxy['host']));
+						_s('Incorrect characters used for proxy name "%1$s".', $proxy['host'])
+					);
 				}
 
-				$proxies_exists = $this->get([
-					'output' => ['proxyid'],
-					'filter' => ['host' => $proxy['host']]
-				]);
-				foreach ($proxies_exists as $proxy_exists) {
-					if (bccomp($proxy_exists['proxyid'], $proxy['proxyid']) != 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%s" already exists.', $proxy['host']));
-					}
+				if ($proxy['host'] !== $db_proxies[$proxy['proxyid']]['host']) {
+					$names[$proxy['host']] = true;
 				}
 			}
-
-			// interface
-			if ($status == HOST_STATUS_PROXY_PASSIVE) {
-				if (array_key_exists('interface', $proxy)) {
-					if (!is_array($proxy['interface']) || !$proxy['interface']) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_s('No interface provided for proxy "%s".', $proxy['host']));
-					}
-				}
-			}
-
-			// check if hosts exist
-			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
-				$hostids = zbx_objectValues($proxy['hosts'], 'hostid');
-
-				$hosts = API::Host()->get([
-					'output' => ['hostid', 'proxy_hostid', 'name'],
-					'hostids' => $hostids,
-					'editable' => true,
-					'preservekeys' => true
-				]);
-
-				if (!$hosts) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('No permissions to referred object or it does not exist!'));
-				}
-			}
-
-			$proxies_full[] = zbx_array_merge($db_proxies[$proxy['proxyid']], $proxy);
 		}
-		unset($proxy);
 
-		$this->validateEncryption($proxies_full);
+		// Check names that have been changed.
+		if ($names) {
+			$proxies_exists = $this->get([
+				'output' => ['proxyid'],
+				'filter' => ['host' => array_keys($names)]
+			]);
 
-		// Check if any of the affected hosts are discovered.
+			foreach ($proxies as $proxy) {
+				if (array_key_exists('host', $proxy) && $proxy['host'] !== $db_proxies[$proxy['proxyid']]['host']) {
+					foreach ($proxies_exists as $proxy_exists) {
+						if (bccomp($proxy_exists['proxyid'], $proxy['proxyid']) != 0) {
+							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Proxy "%s" already exists.', $proxy['host']));
+						}
+					}
+				}
+			}
+		}
+
 		$hostids = [];
+
 		foreach ($proxies as $proxy) {
-			if (array_key_exists('hosts', $proxy)) {
+			if (array_key_exists('status', $proxy) && ($proxy['status'] != HOST_STATUS_PROXY_ACTIVE
+					&& $proxy['status'] != HOST_STATUS_PROXY_PASSIVE)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value used for proxy status "%1$s".', $proxy['status'])
+				);
+			}
+
+			if (array_key_exists('hosts', $proxy) && $proxy['hosts']) {
 				$hostids = array_merge($hostids, zbx_objectValues($proxy['hosts'], 'hostid'));
 			}
 		}
-		$this->checkValidator($hostids, new CHostNormalValidator([
-			'message' => _('Cannot update proxy for discovered host "%1$s".')
-		]));
+
+		if ($hostids) {
+			// Check if host exists.
+			$hosts = API::Host()->get([
+				'output' => ['hostid'],
+				'hostids' => $hostids,
+				'editable' => true
+			]);
+
+			if (!$hosts) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			// Check if any of the affected hosts are discovered.
+			$this->checkValidator($hostids, new CHostNormalValidator([
+				'message' => _('Cannot update proxy for discovered host "%1$s".')
+			]));
+
+			$status = array_key_exists('status', $proxy) ? $proxy['status'] : $db_proxies[$proxy['proxyid']]['status'];
+
+			// interface
+			if ($status == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)
+					&& !is_array($proxy['interface']) || !$proxy['interface']) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('No interface provided for proxy "%s".', $proxy['host'])
+				);
+			}
+		}
+
+		$proxies = $this->extendFromObjects(zbx_toHash($proxies, 'proxyid'), $db_proxies, [
+			'status', 'tls_connect', 'tls_accept', 'tls_psk_identity', 'tls_psk'
+		]);
+
+		$this->validateEncryption($proxies);
 	}
 }
