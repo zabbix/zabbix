@@ -320,10 +320,10 @@ class CValueMap extends CApiService {
 		}
 
 		// Check for duplicate names.
-		$duplicate_name = CArrayHelper::findDuplicate($valuemaps, 'name');
-		if ($duplicate_name) {
+		$duplicate = CArrayHelper::findDuplicate($valuemaps, 'name');
+		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "name" value "%1$s" for value map.', $duplicate_name['name'])
+				_s('Duplicate "name" value "%1$s" for value map.', $duplicate['name'])
 			);
 		}
 
@@ -425,10 +425,10 @@ class CValueMap extends CApiService {
 		$valuemaps = $this->extendFromObjects(zbx_toHash($valuemaps, 'valuemapid'), $db_valuemaps, ['name']);
 
 		// Check for duplicate names. 'name' must be set.
-		$duplicate_name = CArrayHelper::findDuplicate($valuemaps, 'name');
-		if ($duplicate_name) {
+		$duplicate = CArrayHelper::findDuplicate($valuemaps, 'name');
+		if ($duplicate) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "name" value "%1$s" for value map.', $duplicate_name['name'])
+				_s('Duplicate "name" value "%1$s" for value map.', $duplicate['name'])
 			);
 		}
 
@@ -492,13 +492,11 @@ class CValueMap extends CApiService {
 				}
 			}
 
-			$duplicate_mapping = CArrayHelper::findDuplicate($valuemap['mappings'], 'value');
-			if ($duplicate_mapping) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s(
-					'Duplicate mapping value "%1$s" for value map "%2$s".',
-					$duplicate_mapping['value'],
-					$valuemap['name']
-				));
+			$duplicate = CArrayHelper::findDuplicate($valuemap['mappings'], 'value');
+			if ($duplicate) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Duplicate mapping value "%1$s" for value map "%2$s".', $duplicate['value'], $valuemap['name'])
+				);
 			}
 		}
 	}
