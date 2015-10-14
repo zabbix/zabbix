@@ -10,6 +10,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and
 ...G...PS. [ZBX-9274] added printing defaults when Zabbix programs are executed with --help option (dimir)
 
 Bug fixes:
+........S. [ZBX-9889] fixed log item values to have unique timestamps in history table (dimir)
 ..F....... [ZBX-9919] fixed y scale calculation for linear graphs (Ivo, vitalijs)
 ..F....... [ZBX-9898] improved database exception messages (Sasha, vitalijs)
 ..F....... [ZBX-9900] marked first parameter for proc_info item as mandatory (vitalijs)
@@ -187,6 +188,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9889] fixed log item values to have unique timestamps in history table (dimir)
 ..F....... [ZBX-9919] fixed y scale calculation for linear graphs (Ivo, vitalijs)
 ...G...PS. [ZBX-9864] fixed compilation warnings regarding SIZE_T_MAX under NetBSD (Sasha)
 ..F....... [ZBX-9862] added meta tag "msapplication-config" to prevent MSIE11 requesting browserconfig.xml (Gunars)
