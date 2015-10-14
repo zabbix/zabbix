@@ -2522,7 +2522,7 @@ static dc_item_value_t	*dc_local_get_history_slot()
 	return &item_values[item_values_num++];
 }
 
-static void	dc_local_add_history_dbl(zbx_uint64_t itemid, zbx_timespec_t *ts, double value_orig)
+static void	dc_local_add_history_dbl(zbx_uint64_t itemid, const zbx_timespec_t *ts, double value_orig)
 {
 	dc_item_value_t	*item_value;
 
@@ -2536,7 +2536,7 @@ static void	dc_local_add_history_dbl(zbx_uint64_t itemid, zbx_timespec_t *ts, do
 	item_value->value.value_dbl = value_orig;
 }
 
-static void	dc_local_add_history_uint(zbx_uint64_t itemid, zbx_timespec_t *ts, zbx_uint64_t value_orig)
+static void	dc_local_add_history_uint(zbx_uint64_t itemid, const zbx_timespec_t *ts, zbx_uint64_t value_orig)
 {
 	dc_item_value_t	*item_value;
 
@@ -2550,7 +2550,7 @@ static void	dc_local_add_history_uint(zbx_uint64_t itemid, zbx_timespec_t *ts, z
 	item_value->value.value_uint = value_orig;
 }
 
-static void	dc_local_add_history_str(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *value_orig)
+static void	dc_local_add_history_str(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig)
 {
 	dc_item_value_t	*item_value;
 
@@ -2569,7 +2569,7 @@ static void	dc_local_add_history_str(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	string_values_offset += item_value->value.value_str.len;
 }
 
-static void	dc_local_add_history_text(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *value_orig)
+static void	dc_local_add_history_text(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig)
 {
 	dc_item_value_t	*item_value;
 
@@ -2588,7 +2588,7 @@ static void	dc_local_add_history_text(zbx_uint64_t itemid, zbx_timespec_t *ts, c
 	string_values_offset += item_value->value.value_str.len;
 }
 
-static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *value_orig,
+static void	dc_local_add_history_log(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig,
 		int timestamp, const char *source, int severity, int logeventid, zbx_uint64_t lastlogsize, int mtime)
 {
 	dc_item_value_t	*item_value;
@@ -2623,7 +2623,7 @@ static void	dc_local_add_history_log(zbx_uint64_t itemid, zbx_timespec_t *ts, co
 	}
 }
 
-static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *error)
+static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *error)
 {
 	dc_item_value_t	*item_value;
 
@@ -2640,7 +2640,7 @@ static void	dc_local_add_history_notsupported(zbx_uint64_t itemid, zbx_timespec_
 	string_values_offset += item_value->value.value_str.len;
 }
 
-static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, const char *value_orig)
+static void	dc_local_add_history_lld(zbx_uint64_t itemid, const zbx_timespec_t *ts, const char *value_orig)
 {
 	dc_item_value_t	*item_value;
 
@@ -2668,7 +2668,7 @@ static void	dc_local_add_history_lld(zbx_uint64_t itemid, zbx_timespec_t *ts, co
  *                                                                            *
  ******************************************************************************/
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
-		zbx_timespec_t *ts, unsigned char state, const char *error)
+		const zbx_timespec_t *ts, unsigned char state, const char *error)
 {
 	if (ITEM_STATE_NOTSUPPORTED == state)
 	{
@@ -2713,13 +2713,24 @@ void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char
 			{
 				size_t		i;
 				zbx_log_t	*log;
+				zbx_timespec_t	ts_tmp;
+
+				/* ensure that every log item value timestamp is unique */
+				ts_tmp.sec = ts->sec;
+				ts_tmp.ns = ts->ns;
 
 				for (i = 0; NULL != value->logs[i]; i++)
 				{
 					log = value->logs[i];
 
-					dc_local_add_history_log(itemid, ts, log->value, log->timestamp, log->source,
+					dc_local_add_history_log(itemid, &ts_tmp, log->value, log->timestamp, log->source,
 							log->severity, log->logeventid, log->lastlogsize, log->mtime);
+
+					if (++ts_tmp.ns == 1000000000)
+					{
+						ts_tmp.sec++;
+						ts_tmp.ns = 0;
+					}
 				}
 			}
 			break;
