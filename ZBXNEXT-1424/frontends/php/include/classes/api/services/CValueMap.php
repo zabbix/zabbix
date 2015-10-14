@@ -328,18 +328,16 @@ class CValueMap extends CApiService {
 		}
 
 		// Check if value map already exists.
-		foreach ($valuemaps as $valuemap) {
-			$db_valuemap = API::getApiService()->select('valuemaps', [
-				'output' => ['name'],
-				'filter' => ['name' => $valuemap['name']],
-				'limit' => 1
-			]);
+		$db_valuemaps = API::getApiService()->select('valuemaps', [
+			'output' => ['name'],
+			'filter' => ['name' => zbx_objectValues($valuemaps, 'name')],
+			'limit' => 1
+		]);
 
-			if ($db_valuemap) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Value map "%1$s" already exists.', $valuemap['name'])
-				);
-			}
+		if ($db_valuemaps) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('Value map "%1$s" already exists.', $db_valuemaps[0]['name'])
+			);
 		}
 
 		// Validate "mappings" field and its properties.
