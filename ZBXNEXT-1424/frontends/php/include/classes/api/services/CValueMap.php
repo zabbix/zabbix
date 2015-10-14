@@ -387,22 +387,31 @@ class CValueMap extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Value map name cannot be empty.'));
 				}
 
-				$check_names[$valuemap['name']] = true;
+				if ($db_valuemaps[$valuemap['valuemapid']]['name'] !== $valuemap['name']) {
+					$check_names[] = $valuemap;
+				}
 			}
 		}
 
-		// Check if value map already exists.
 		if ($check_names) {
+			// Check for duplicate names.
+			$duplicate = CArrayHelper::findDuplicate($check_names, 'name');
+			if ($duplicate) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Duplicate "name" value "%1$s" for value map.', $duplicate['name'])
+				);
+			}
+
+			// Check if value map already exists.
 			$db_valuemap_names = API::getApiService()->select('valuemaps', [
 				'output' => ['valuemapid', 'name'],
-				'filter' => ['name' => array_keys($check_names)]
+				'filter' => ['name' => zbx_objectValues($check_names, 'name')]
 			]);
 			$db_valuemap_names = zbx_toHash($db_valuemap_names, 'name');
 
-			foreach ($valuemaps as $valuemap) {
-				if (array_key_exists('name', $valuemap)
-						&& array_key_exists($valuemap['name'], $db_valuemap_names)
-						&& !idcmp($db_valuemap_names[$valuemap['name']]['valuemapid'], $valuemap['valuemapid'])) {
+			foreach ($check_names as $valuemap) {
+				if (array_key_exists($valuemap['name'], $db_valuemap_names)
+						&& bccomp($db_valuemap_names[$valuemap['name']]['valuemapid'], $valuemap['valuemapid']) != 0) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
 						_s('Value map "%1$s" already exists.', $valuemap['name'])
 					);
@@ -412,14 +421,6 @@ class CValueMap extends CApiService {
 
 		// Populate "name" field, if not set.
 		$valuemaps = $this->extendFromObjects(zbx_toHash($valuemaps, 'valuemapid'), $db_valuemaps, ['name']);
-
-		// Check for duplicate names. 'name' must be set.
-		$duplicate = CArrayHelper::findDuplicate($valuemaps, 'name');
-		if ($duplicate) {
-			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Duplicate "name" value "%1$s" for value map.', $duplicate['name'])
-			);
-		}
 
 		// Validate "mappings" field and its properties.
 		$this->checkMappings($valuemaps);
