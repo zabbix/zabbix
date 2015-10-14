@@ -695,9 +695,7 @@ static void	DCmass_update_trends(ZBX_DC_HISTORY *history, int history_num)
 		{
 			if (trend->clock != hour)
 			{
-				if (0 < trend->num)
-					DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
-
+				DCflush_trend(trend, &trends, &trends_alloc, &trends_num);
 				zbx_hashset_iter_remove(&iter);
 			}
 		}
