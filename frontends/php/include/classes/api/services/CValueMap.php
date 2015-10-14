@@ -35,11 +35,11 @@ class CValueMap extends CApiService {
 		parent::__construct();
 
 		$this->getOptions = array_merge($this->getOptions, [
-			'valuemapids'				=> null,
-			'editable'					=> null,
-			'selectMappings'			=> null,
-			'sortfield'					=> '',
-			'sortorder'					=> ''
+			'valuemapids'		=> null,
+			'editable'			=> null,
+			'selectMappings'	=> null,
+			'sortfield'			=> '',
+			'sortorder'			=> ''
 		]);
 	}
 
@@ -447,7 +447,7 @@ class CValueMap extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected function checkMappings(array $valuemaps) {
-		$required_mapping_fields = ['value', 'newvalue'];
+		$required_fields = ['value', 'newvalue'];
 
 		foreach ($valuemaps as $valuemap) {
 			if (!array_key_exists('mappings', $valuemap)) {
@@ -468,7 +468,7 @@ class CValueMap extends CApiService {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 				}
 
-				$missing_keys = checkRequiredKeys($mapping, $required_mapping_fields);
+				$missing_keys = checkRequiredKeys($mapping, $required_fields);
 
 				if ($missing_keys) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s(
@@ -478,7 +478,7 @@ class CValueMap extends CApiService {
 					));
 				}
 				else {
-					foreach ($required_mapping_fields as $field) {
+					foreach (['value', 'newvalue'] as $field) {
 						if (is_array($mapping[$field])) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect arguments passed to function.'));
 						}
