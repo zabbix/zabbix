@@ -67,7 +67,7 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
 		_('Availability'),
 		_('Info'),
-		(new CColHeader('Encryption'))->setColSpan(2)
+		(new CColHeader(_('Encryption')))->setColSpan(2)
 	]);
 
 $current_time = time();

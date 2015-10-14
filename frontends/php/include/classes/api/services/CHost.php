@@ -784,43 +784,32 @@ class CHost extends CHostGeneral {
 			],
 			'hostids' => $hostids,
 			'editable' => true,
-			'preservekeys' => true,
+			'preservekeys' => true
 		]);
-
-		$hosts_full = [];
 
 		foreach ($hosts as $host) {
 			if (!array_key_exists($host['hostid'], $db_hosts)) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 			}
-
-			$hosts_full[] = zbx_array_merge($db_hosts[$host['hostid']], $host);
-
-			// Clean encryption fields.
-			$tls_connect = array_key_exists('tls_connect', $host)
-				? $host['tls_connect']
-				: $db_hosts[$host['hostid']]['tls_connect'];
-
-			$tls_accept = array_key_exists('tls_accept', $host)
-				? $host['tls_accept']
-				: $db_hosts[$host['hostid']]['tls_accept'];
-
-			// Clean PSK fields.
-			if ($tls_connect != HOST_ENCRYPTION_PSK && ($tls_accept & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK) {
-				$host['tls_psk_identity'] = '';
-				$host['tls_psk'] = '';
-			}
-
-			// Clean certificate fields.
-			if ((array_key_exists('tls_connect', $host) && $host['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE)
-					&& (array_key_exists('tls_accept', $host)
-						&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE)) {
-				$host['tls_issuer'] = '';
-				$host['tls_subject'] = '';
-			}
 		}
 
-		$this->validateEncryption($hosts_full);
+		$this->validateEncryption([$data]);
+
+		// Clean PSK fields.
+		if ((array_key_exists('tls_connect', $data) && $data['tls_connect'] != HOST_ENCRYPTION_PSK)
+				&& (array_key_exists('tls_accept', $data)
+					&& ($data['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK)) {
+			$data['tls_psk_identity'] = '';
+			$data['tls_psk'] = '';
+		}
+
+		// Clean certificate fields.
+		if ((array_key_exists('tls_connect', $data) && $data['tls_connect'] != HOST_ENCRYPTION_CERTIFICATE)
+				&& (array_key_exists('tls_accept', $data)
+					&& ($data['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE)) {
+			$data['tls_issuer'] = '';
+			$data['tls_subject'] = '';
+		}
 
 		// check if hosts have at least 1 group
 		if (isset($data['groups']) && empty($data['groups'])) {
@@ -878,10 +867,7 @@ class CHost extends CHostGeneral {
 			$updateInterfaces = $data['interfaces'];
 		}
 
-		$b = isset($data['templates_clear']);
-		$c = array_key_exists('templates_clear', $data);
-		$d = array_keys($data);
-		if ($b) {
+		if (array_key_exists('templates_clear', $data)) {
 			$updateTemplatesClear = zbx_toArray($data['templates_clear']);
 		}
 
