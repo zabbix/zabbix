@@ -3189,6 +3189,8 @@ void	DCupdate_hosts_availability()
 			goto out;
 	}
 
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
 	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
 		goto out;
 
