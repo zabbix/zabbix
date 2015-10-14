@@ -42,12 +42,12 @@ $proxyTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'host', $data['sort'], $data['sortorder']),
 		_('Mode'),
+		_('Encryption'),
 		_('Last seen (age)'),
 		_('Host count'),
 		_('Item count'),
 		_('Required performance (vps)'),
-		_('Hosts'),
-		_('Encryption')
+		_('Hosts')
 	]);
 
 foreach ($data['proxies'] as $proxy) {
@@ -117,14 +117,14 @@ foreach ($data['proxies'] as $proxy) {
 		new CCheckBox('proxyids['.$proxy['proxyid'].']', $proxy['proxyid']),
 		(new CCol($name))->addClass(ZBX_STYLE_NOWRAP),
 		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? _('Active') : _('Passive'),
+		$proxy['status'] == HOST_STATUS_PROXY_ACTIVE ? $out_encryption : $in_encryption,
 		$proxy['lastaccess'] == 0
 			? (new CSpan(_('Never')))->addClass(ZBX_STYLE_RED)
 			: zbx_date2age($proxy['lastaccess']),
 		count($proxy['hosts']),
 		array_key_exists('item_count', $proxy) ? $proxy['item_count'] : 0,
 		array_key_exists('perf', $proxy) ? $proxy['perf'] : '',
-		$hosts ? $hosts : '',
-		$proxy['status'] == HOST_STATUS_PROXY_PASSIVE ? $in_encryption : $out_encryption
+		$hosts ? $hosts : ''
 	]);
 }
 
