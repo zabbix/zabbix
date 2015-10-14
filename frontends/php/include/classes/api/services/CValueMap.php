@@ -370,12 +370,10 @@ class CValueMap extends CApiService {
 			_('Incorrect value map ID.')
 		);
 
-		$valuemapids = zbx_objectValues($valuemaps, 'valuemapid');
-
 		// Check value map names.
 		$db_valuemaps = API::getApiService()->select('valuemaps', [
 			'output' => ['valuemapid', 'name'],
-			'valuemapids' => $valuemapids,
+			'valuemapids' => zbx_objectValues($valuemaps, 'valuemapid'),
 			'preservekeys' => true
 		]);
 
