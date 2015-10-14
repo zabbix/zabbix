@@ -292,7 +292,7 @@ int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
-		zbx_timespec_t *ts, unsigned char state, const char *error);
+		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
 int	DCsync_history(int sync_type);
 void	init_database_cache();
