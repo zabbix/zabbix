@@ -1522,13 +1522,12 @@ class CHost extends CHostGeneral {
 	/**
 	 * Validate connections from/to host and PSK fields.
 	 *
-	 * @throws APIException		if incorrect encryption options
-	 *
 	 * @param array $hosts		hosts data array
+	 *
+	 * @throws APIException if incorrect encryption options.
 	 */
 	protected function validateEncryption(array $hosts) {
 		foreach ($hosts as $host) {
-			// connections from host validation
 			$available_connect_types = [HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE];
 			$available_accept_types = [
 				HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, (HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK),
@@ -1540,20 +1539,23 @@ class CHost extends CHostGeneral {
 			if (array_key_exists('tls_connect', $host) && !in_array($host['tls_connect'], $available_connect_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections to host field.'));
 			}
+
 			if (array_key_exists('tls_accept', $host) && !in_array($host['tls_accept'], $available_accept_types)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, _('Incorrect value used for connections from host field.'));
 			}
 
-			// PSK validation
+			// PSK validation.
 			if ((array_key_exists('tls_connect', $host) && $host['tls_connect'] == HOST_ENCRYPTION_PSK)
 					|| (array_key_exists('tls_accept', $host)
 						&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK)) {
 				if (!array_key_exists('tls_psk_identity', $host) || zbx_empty($host['tls_psk_identity'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK identity cannot be empty.'));
 				}
+
 				if (!array_key_exists('tls_psk', $host) || zbx_empty($host['tls_psk'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _('PSK cannot be empty.'));
 				}
+
 				if (!preg_match('/^([0-9a-f]{2})*[0-9a-f]{2}$/i', $host['tls_psk'])) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _(
 						'Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters.'
@@ -1568,7 +1570,7 @@ class CHost extends CHostGeneral {
 	 *
 	 * @param array $hosts		hosts data array
 	 *
-	 * @throws APIException if the input is invalid
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateCreate(array $hosts) {
 		$host_db_fields = ['host' => null];
@@ -1729,10 +1731,10 @@ class CHost extends CHostGeneral {
 	/**
 	 * Validates the input parameters for the update() method.
 	 *
-	 * @param array $hosts			host data array
+	 * @param array $hosts			hosts data array
 	 * @param array $db_hosts		db hosts data array
 	 *
-	 * @throws APIException if the input is invalid
+	 * @throws APIException if the input is invalid.
 	 */
 	protected function validateUpdate(array $hosts, array $db_hosts) {
 		$host_db_fields = ['hostid' => null];
