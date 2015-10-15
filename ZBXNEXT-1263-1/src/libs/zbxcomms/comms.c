@@ -631,11 +631,9 @@ static ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len)
 
 		if (0 > res)
 		{
-#if defined(_WINDOWS)
-			zbx_set_socket_strerror("gnutls_record_send() failed: %Id %s", res, gnutls_strerror(res));
-#else
-			zbx_set_socket_strerror("gnutls_record_send() failed: %zd %s", res, gnutls_strerror(res));
-#endif
+			zbx_set_socket_strerror("gnutls_record_send() failed: " ZBX_FS_SSIZE_T " %s",
+					(zbx_fs_ssize_t)res, gnutls_strerror(res));
+
 			return ZBX_PROTO_ERROR;
 		}
 
