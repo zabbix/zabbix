@@ -235,7 +235,7 @@ class CFrontendSetup {
 	public function checkPhpDatabases() {
 		$current = [];
 
-		$databases = $this->getSupportedDatabases();
+		$databases = self::getSupportedDatabases();
 		foreach ($databases as $database => $name) {
 			$current[] = $name;
 			$current[] = BR();
@@ -255,35 +255,37 @@ class CFrontendSetup {
 	 *
 	 * @return array
 	 */
-	public function getSupportedDatabases() {
-		$allowedDb = [];
-		if (zbx_is_callable(['mysqli_connect', 'mysqli_connect_error', 'mysqli_error', 'mysqli_query',
-				'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_real_escape_string', 'mysqli_close'])) {
-			$allowedDb[ZBX_DB_MYSQL] = 'MySQL';
+	public static function getSupportedDatabases() {
+		$allowed_db = [];
+
+		if (zbx_is_callable(['mysqli_close', 'mysqli_connect', 'mysqli_connect_error', 'mysqli_error',
+				'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_query', 'mysqli_real_escape_string'])) {
+			$allowed_db[ZBX_DB_MYSQL] = 'MySQL';
 		}
 
-		if (zbx_is_callable(['pg_pconnect', 'pg_fetch_array', 'pg_fetch_row', 'pg_exec', 'pg_getlastoid'])) {
-			$allowedDb[ZBX_DB_POSTGRESQL] = 'PostgreSQL';
+		if (zbx_is_callable(['pg_close', 'pg_connect', 'pg_escape_bytea', 'pg_escape_string', 'pg_fetch_assoc',
+				'pg_free_result', 'pg_last_error', 'pg_parameter_status', 'pg_query', 'pg_unescape_bytea'])) {
+			$allowed_db[ZBX_DB_POSTGRESQL] = 'PostgreSQL';
 		}
 
-		if (zbx_is_callable(['oci_connect', 'oci_error', 'oci_parse', 'oci_execute', 'oci_fetch_assoc',
-				'oci_commit', 'oci_close', 'oci_rollback', 'oci_field_type', 'oci_new_descriptor',
-				'oci_bind_by_name', 'oci_free_statement'])) {
-			$allowedDb[ZBX_DB_ORACLE] = 'Oracle';
+		if (zbx_is_callable(['oci_bind_by_name', 'oci_close', 'oci_commit', 'oci_connect', 'oci_error', 'oci_execute',
+				'oci_fetch_assoc', 'oci_field_type', 'oci_free_statement', 'oci_new_descriptor', 'oci_parse',
+				'oci_rollback'])) {
+			$allowed_db[ZBX_DB_ORACLE] = 'Oracle';
 		}
 
-		if (zbx_is_callable(['db2_connect', 'db2_set_option', 'db2_commit', 'db2_rollback', 'db2_autocommit',
-				'db2_prepare', 'db2_execute', 'db2_stmt_errormsg', 'db2_fetch_assoc', 'db2_free_result',
-				'db2_escape_string', 'db2_close'])) {
-			$allowedDb[ZBX_DB_DB2] = 'IBM DB2';
+		if (zbx_is_callable(['db2_autocommit', 'db2_bind_param', 'db2_close', 'db2_commit', 'db2_conn_errormsg',
+				'db2_connect', 'db2_escape_string', 'db2_execute', 'db2_fetch_assoc', 'db2_free_result', 'db2_prepare',
+				'db2_rollback', 'db2_set_option', 'db2_stmt_errormsg'])) {
+			$allowed_db[ZBX_DB_DB2] = 'IBM DB2';
 		}
 
 		// Semaphore related functions are checked elsewhere. The 'false' is to prevent autoloading of the SQLite3 class.
-		if (class_exists('SQLite3', false) && zbx_is_callable(['ftok', 'sem_acquire', 'sem_release', 'sem_get'])) {
-			$allowedDb[ZBX_DB_SQLITE3] = 'SQLite3';
+		if (class_exists('SQLite3', false) && zbx_is_callable(['ftok', 'sem_acquire', 'sem_get', 'sem_release'])) {
+			$allowed_db[ZBX_DB_SQLITE3] = 'SQLite3';
 		}
 
-		return $allowedDb;
+		return $allowed_db;
 	}
 
 	/**
