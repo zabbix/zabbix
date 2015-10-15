@@ -338,51 +338,50 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 }
 
 // Encryption
-$encryptionFormList = new CFormList('encryption');
+$encryption_form_list = new CFormList('encryption');
 
-$encryptionFormList->addRow([
-		_('Connections to host'),
-		SPACE,
-		(new CVisibilityBox('visible[tls_connect]', 'tls_connect', _('Original')))
-			->setChecked(isset($data['visible']['tls_connect']))
-			->setAttribute('autocomplete', 'off')
-	],
-	new CComboBox('tls_connect', $data['tls_connect'], null, [
-		HOST_ENCRYPTION_NONE => _('No encryption'),
-		HOST_ENCRYPTION_PSK => _('PSK'),
-		HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
+$encryption_table = (new CTable())
+	->addRow([_('Connections to host'),
+		(new CComboBox('tls_connect', $data['tls_connect'], null, [
+			HOST_ENCRYPTION_NONE => _('No encryption'),
+			HOST_ENCRYPTION_PSK => _('PSK'),
+			HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
+		]))
 	])
-);
+	->addRow([_('Connections from host'), [
+		[(new CCheckBox('tls_in_none')), _('No encryption')],
+		BR(),
+		[(new CCheckBox('tls_in_psk')), _('PSK')],
+		BR(),
+		[(new CCheckBox('tls_in_cert')), _('Certificate')]
+	]])
+	->addRow([_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('PSK'),
+		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('Issuer'),
+		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('Subject'),
+		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	]);
 
-$from_host = (new CDiv([
-	[(new CCheckBox('tls_in_none'))->setAttribute('autocomplete', 'off'), _('No encryption')],
-	BR(),
-	[(new CCheckBox('tls_in_psk'))->setAttribute('autocomplete', 'off'), _('PSK')],
-	BR(),
-	[(new CCheckBox('tls_in_cert'))->setAttribute('autocomplete', 'off'), _('Certificate')]
-]))->setId('fromHost');
-
-$encryptionFormList->addRow([
-		_('Connections from host'),
-		SPACE,
-		(new CVisibilityBox('visible[tls_accept]', 'fromHost', _('Original')))
-			->setChecked(isset($data['visible']['tls_accept']))
-			->setAttribute('autocomplete', 'off')
+$encryption_form_list->addRow([
+	_('Connections'),
+	SPACE,
+	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))
+		->setChecked(isset($data['visible']['encryption']))
 	],
-	$from_host
-);
-
-$encryptionFormList->addRow(_('PSK identity'),
-	(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-);
-$encryptionFormList->addRow(_('PSK'),
-	(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-);
-$encryptionFormList->addRow(_('Issuer'),
-	(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-);
-$encryptionFormList->addRow(_('Subject'),
-	(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	(new CDiv($encryption_table))
+		->setId('encryption_div')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 // append tabs to form
@@ -395,7 +394,7 @@ $hostTab = (new CTabView())
 if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
-$hostTab->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
+$hostTab->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(
