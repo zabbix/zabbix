@@ -34,28 +34,29 @@ function getMappedValue($value, $valuemapid) {
 		return false;
 	}
 
-	if (isset($valuemaps[$valuemapid][$value])) {
-		return $valuemaps[$valuemapid][$value];
+	if (array_key_exists($valuemapid, $valuemaps)) {
+		return array_key_exists($value, $valuemaps[$valuemapid]) ? $valuemaps[$valuemapid][$value] : false;
 	}
 
-	$valuemap = API::ValueMap()->get([
+	$result = false;
+	$valuemaps[$valuemapid] = [];
+
+	$db_valuemaps = API::ValueMap()->get([
 		'output' => [],
 		'selectMappings' => ['value', 'newvalue'],
 		'valuemapids' => [$valuemapid]
 	]);
 
-	if ($valuemap) {
-		$valuemap = reset($valuemap);
-
-		foreach ($valuemap['mappings'] as $mapping) {
+	if ($db_valuemaps) {
+		foreach ($db_valuemaps[0]['mappings'] as $mapping) {
+			$valuemaps[$valuemapid][$mapping['value']] = $mapping['newvalue'];
 			if ($mapping['value'] === $value) {
-				$valuemaps[$valuemapid][$value] = $mapping['newvalue'];
-				return $mapping['newvalue'];
+				$result = $mapping['newvalue'];
 			}
 		}
 	}
 
-	return false;
+	return $result;
 }
 
 /**
@@ -69,7 +70,7 @@ function getMappedValue($value, $valuemapid) {
  * @return string
  */
 function applyValueMap($value, $valuemapid) {
-	$mapping = getMappedValue($value, $valuemapid);
+	$newvalue = getMappedValue($value, $valuemapid);
 
-	return ($mapping === false) ? $value : $mapping.' ('.$value.')';
+	return ($newvalue === false) ? $value : $newvalue.' ('.$value.')';
 }
