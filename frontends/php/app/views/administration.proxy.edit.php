@@ -23,9 +23,17 @@ $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Proxies'));
 
+$tabs = new CTabView();
+
+if ($data['form_refresh'] == 0) {
+	$tabs->setSelected(0);
+}
+
 $proxyForm = (new CForm())
 	->setId('proxyForm')
-	->addVar('proxyid', $data['proxyid']);
+	->addVar('proxyid', $data['proxyid'])
+	->addVar('tls_accept', $data['tls_accept']);
+
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
 }
@@ -84,17 +92,49 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 // append tabs to form
 $proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxy_form_list);
 
+// Encryption form list.
+$encryption_form_list = (new CFormList('encryption'))
+	->addRow(_('Connections to host'),
+		(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
+	)
+	->addRow(_('Connections from proxy'), [
+		[new CCheckBox('tls_in_none'), _('No encryption')],
+		BR(),
+		[new CCheckBox('tls_in_psk'), _('PSK')],
+		BR(),
+		[new CCheckBox('tls_in_cert'), _('Certificate')]
+	])
+	->addRow(_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('PSK'),
+		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('Issuer'),
+		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('Subject'),
+		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	);
+
+$tabs->addTab('proxyTab', _('Proxy'), $proxy_form_list);
+$tabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
+
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
 
 if ($data['proxyid'] == 0) {
-	$proxyTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmitButton(_('Add'), 'action', 'proxy.create'),
 		[$cancelButton]
 	));
 }
 else {
-	$proxyTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmitButton(_('Update'), 'action', 'proxy.update'),
 		[
 			(new CSimpleButton(_('Clone')))->setId('clone'),
@@ -107,5 +147,5 @@ else {
 	));
 }
 
-$proxyForm->addItem($proxyTab);
+$proxyForm->addItem($tabs);
 $widget->addItem($proxyForm)->show();

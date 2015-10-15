@@ -9,6 +9,7 @@ build/win32/examples/zabbix_sender/sender.exe
 build/win32/examples/zabbix_sender/sender.obj
 build/win32/project/*.idb
 build/win32/project/*.manifest
+build/win32/project/*.pdb
 build/win32/project/*.res
 build/win32/project/MSG00001.bin
 build/win32/project/messages.h

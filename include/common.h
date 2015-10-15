@@ -455,12 +455,16 @@ zbx_group_status_type_t;
 /* group internal flag */
 #define ZBX_INTERNAL_GROUP		1
 
-/* daemon type */
-#define ZBX_DAEMON_TYPE_SERVER		0x01
-#define ZBX_DAEMON_TYPE_PROXY_ACTIVE	0x02
-#define ZBX_DAEMON_TYPE_PROXY_PASSIVE	0x04
-#define ZBX_DAEMON_TYPE_PROXY		0x06	/* ZBX_DAEMON_TYPE_PROXY_ACTIVE | ZBX_DAEMON_TYPE_PROXY_PASSIVE */
-#define ZBX_DAEMON_TYPE_AGENT		0x08
+/* program type */
+#define ZBX_PROGRAM_TYPE_SERVER		0x01
+#define ZBX_PROGRAM_TYPE_PROXY_ACTIVE	0x02
+#define ZBX_PROGRAM_TYPE_PROXY_PASSIVE	0x04
+#define ZBX_PROGRAM_TYPE_PROXY		0x06	/* ZBX_PROGRAM_TYPE_PROXY_ACTIVE | ZBX_PROGRAM_TYPE_PROXY_PASSIVE */
+#define ZBX_PROGRAM_TYPE_AGENTD		0x08
+#define ZBX_PROGRAM_TYPE_AGENT		0x10
+#define ZBX_PROGRAM_TYPE_SENDER		0x20
+#define ZBX_PROGRAM_TYPE_GET		0x40
+const char	*get_program_type_string(unsigned char program_type);
 
 /* maintenance */
 typedef enum
@@ -677,6 +681,8 @@ void    *zbx_calloc2(const char *filename, int line, void *old, size_t nmemb, si
 void    *zbx_malloc2(const char *filename, int line, void *old, size_t size);
 void    *zbx_realloc2(const char *filename, int line, void *old, size_t size);
 char    *zbx_strdup2(const char *filename, int line, char *old, const char *str);
+
+void	*zbx_guaranteed_memset(void *v, int c, size_t n);
 
 #define zbx_free(ptr)		\
 				\
@@ -1104,5 +1110,18 @@ int	zbx_strcmp_null(const char *s1, const char *s2);
 #define ZBX_SESSION_PASSIVE	1
 
 char	*zbx_dyn_escape_shell_single_quote(const char *text);
+
+#define ZBX_DO_NOT_SEND_RESPONSE	0
+#define ZBX_SEND_RESPONSE		1
+
+/* Do not forget to synchronize HOST_TLS_* definitions with DB schema ! */
+#define HOST_TLS_ISSUER_LEN		4096				/* for up to 1024 UTF-8 characters */
+#define HOST_TLS_ISSUER_LEN_MAX		(HOST_TLS_ISSUER_LEN + 1)
+#define HOST_TLS_SUBJECT_LEN		4096				/* for up to 1024 UTF-8 characters */
+#define HOST_TLS_SUBJECT_LEN_MAX	(HOST_TLS_SUBJECT_LEN + 1)
+#define HOST_TLS_PSK_IDENTITY_LEN	512				/* for up to 128 UTF-8 characters */
+#define HOST_TLS_PSK_IDENTITY_LEN_MAX	(HOST_TLS_PSK_IDENTITY_LEN + 1)
+#define HOST_TLS_PSK_LEN		512				/* for up to 256 hex-encoded bytes (ASCII) */
+#define HOST_TLS_PSK_LEN_MAX		(HOST_TLS_PSK_LEN + 1)
 
 #endif
