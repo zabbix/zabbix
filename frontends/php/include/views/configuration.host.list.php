@@ -180,11 +180,13 @@ foreach ($data['hosts'] as $host) {
 	}
 
 	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE
-			&& ($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 		$encryption = (new CDiv((new CSpan(_('None')))->addClass('status-green')))->addClass('status-container');
 	}
 	else {
-		// input encryption
+		// Incoming encryption.
 		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
 			$in_encryption = (new CSpan(_('None')))->addClass('status-green');
 		}
@@ -195,14 +197,16 @@ foreach ($data['hosts'] as $host) {
 			$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
 		}
 
-		// output encryption
+		// Outgoing encryption.
 		$out_encryption = [];
 		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
 			$out_encryption[] = (new CSpan(_('None')))->addClass('status-green');
 		}
+
 		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
 			$out_encryption[] = (new CSpan(_('PSK')))->addClass('status-green');
 		}
+
 		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
 			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-green');
 		}

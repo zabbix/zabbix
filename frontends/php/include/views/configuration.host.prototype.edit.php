@@ -347,46 +347,45 @@ $inventoryFormList = (new CFormList('inventorylist'))
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
 
-// Encryption
-$encryptionFormList = new CFormList('encryption');
+// Encryption form list.
+$encryption_form_list = (new CFormList('encryption'))
+	->addRow(_('Connections to host'),
+		(new CRadioButtonList('tls_connect', (int) $parentHost['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
+			->setEnabled(false)
+	)
+	->addRow(_('Connections from host'), [
+		[(new CCheckBox('tls_in_none'))->setAttribute('disabled', 'disabled'), _('No encryption')],
+		BR(),
+		[(new CCheckBox('tls_in_psk'))->setAttribute('disabled', 'disabled'), _('PSK')],
+		BR(),
+		[(new CCheckBox('tls_in_cert'))->setAttribute('disabled', 'disabled'), _('Certificate')]
+	])
+	->addRow(_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $parentHost['tls_psk_identity'], false, 128))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('disabled', 'disabled')
+	)
+	->addRow(_('PSK'),
+		(new CTextBox('tls_psk', $parentHost['tls_psk'], false, 512))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('disabled', 'disabled')
+	)
+	->addRow(_('Issuer'),
+		(new CTextBox('tls_issuer', $parentHost['tls_issuer'], false, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('disabled', 'disabled')
+	)
+	->addRow(_('Subject'),
+		(new CTextBox('tls_subject', $parentHost['tls_subject'], false, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('disabled', 'disabled')
+	);
 
-$encryptionFormList->addRow(_('Connections to host'),
-	(new CRadioButtonList('tls_connect', (int) $parentHost['tls_connect']))
-		->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
-		->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
-		->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
-		->setModern(true)
-		->setEnabled(false)
-);
-$encryptionFormList->addRow(_('Connections from host'), [
-	[(new CCheckBox('tls_in_none'))->setAttribute('disabled', 'disabled'), _('No encryption')],
-	BR(),
-	[(new CCheckBox('tls_in_psk'))->setAttribute('disabled', 'disabled'), _('PSK')],
-	BR(),
-	[(new CCheckBox('tls_in_cert'))->setAttribute('disabled', 'disabled'), _('Certificate')]
-]);
-$encryptionFormList->addRow(_('PSK identity'),
-	(new CTextBox('tls_psk_identity', $parentHost['tls_psk_identity'], false, 128))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-		->setAttribute('disabled', 'disabled')
-);
-$encryptionFormList->addRow(_('PSK'),
-	(new CTextBox('tls_psk', $parentHost['tls_psk'], false, 512))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-		->setAttribute('disabled', 'disabled')
-);
-$encryptionFormList->addRow(_('Issuer'),
-	(new CTextBox('tls_issuer', $parentHost['tls_issuer'], false, 1024))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-		->setAttribute('disabled', 'disabled')
-);
-$encryptionFormList->addRow(_('Subject'),
-	(new CTextBox('tls_subject', $parentHost['tls_subject'], false, 1024))
-		->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
-		->setAttribute('disabled', 'disabled')
-);
-
-$divTabs->addTab('encryptionTab', _('Encryption'), $encryptionFormList);
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 /*
  * footer
