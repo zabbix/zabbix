@@ -88,7 +88,7 @@ foreach ($data['proxies'] as $proxy) {
 	if ($proxy['status'] == HOST_STATUS_PROXY_PASSIVE) {
 		// input encryption
 		if ($proxy['tls_connect'] == HOST_ENCRYPTION_NONE) {
-			$in_encryption = (new CSpan(_('None')))->addClass('status-grey');
+			$in_encryption = (new CSpan(_('None')))->addClass('status-green');
 		}
 		elseif ($proxy['tls_connect'] == HOST_ENCRYPTION_PSK) {
 			$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
@@ -101,7 +101,7 @@ foreach ($data['proxies'] as $proxy) {
 		// output encryption
 		$out_encryption_array = [];
 		if (($proxy['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
-			$out_encryption_array[] = (new CSpan(_('None')))->addClass('status-grey');
+			$out_encryption_array[] = (new CSpan(_('None')))->addClass('status-green');
 		}
 		if (($proxy['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
 			$out_encryption_array[] = (new CSpan(_('PSK')))->addClass('status-green');
