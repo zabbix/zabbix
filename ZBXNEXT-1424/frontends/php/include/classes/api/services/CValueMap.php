@@ -293,17 +293,11 @@ class CValueMap extends CApiService {
 			}
 		}
 
-		$update_items = [];
-
-		foreach ($db_valuemaps as $db_valuemap) {
-			$update_items[] = [
-				'values' => ['valuemapid' => 0],
-				'where' => ['valuemapid' => $db_valuemap['valuemapid']]
-			];
-		}
-
 		// Mappings are handled with cascade delete, but items.valuemapid reference should be removed first.
-		$result = DB::update('items', $update_items);
+		$result = DB::update('items', [[
+			'values' => ['valuemapid' => 0],
+			'where' => ['valuemapid' => $valuemapids]
+		]]);
 		if ($result) {
 			$this->deleteByIds($valuemapids);
 		}
