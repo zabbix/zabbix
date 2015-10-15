@@ -67,6 +67,14 @@ $fields = [
 	'ipmi_privilege' =>	[T_ZBX_INT, O_OPT, null,			BETWEEN(0, 5), null],
 	'ipmi_username' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
 	'ipmi_password' =>	[T_ZBX_STR, O_OPT, null,			null,		null],
+	'tls_connect' =>	[T_ZBX_INT, O_OPT, null,
+		IN([HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]), null],
+	'tls_accept' =>		[T_ZBX_INT, O_OPT, null,
+		BETWEEN(0, (HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)), null],
+	'tls_subject' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
+	'tls_issuer' =>		[T_ZBX_STR, O_OPT, null,		null,		null],
+	'tls_psk_identity' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
+	'tls_psk' =>		[T_ZBX_STR, O_OPT, null,			null,		null],
 	'flags' =>			[T_ZBX_INT, O_OPT, null,
 		IN([ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]), null],
 	'mass_replace_tpls' => [T_ZBX_STR, O_OPT, null,		null,		null],
@@ -243,11 +251,11 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 	try {
 		DBstart();
 
-		// filter only normal hosts, ignore discovered
+		// filter only normal and discovery created hosts
 		$hosts = API::Host()->get([
 			'output' => ['hostid'],
 			'hostids' => $hostIds,
-			'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
+			'filter' => ['flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]]
 		]);
 		$hosts = ['hosts' => $hosts];
 
@@ -269,7 +277,17 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		if (isset($visible['inventory_mode'])) {
 			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
 			$newValues['inventory'] = ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED)
-				? [] : getRequest('host_inventory', []);
+				? []
+				: getRequest('host_inventory', []);
+		}
+
+		if (array_key_exists('encryption', $visible)) {
+			$newValues['tls_connect'] = getRequest('tls_connect', HOST_ENCRYPTION_NONE);
+			$newValues['tls_accept'] = getRequest('tls_accept', HOST_ENCRYPTION_NONE);
+			$newValues['tls_issuer'] = getRequest('tls_issuer', '');
+			$newValues['tls_subject'] = getRequest('tls_subject', '');
+			$newValues['tls_psk_identity'] = getRequest('tls_psk_identity', '');
+			$newValues['tls_psk'] = getRequest('tls_psk', '');
 		}
 
 		$templateIds = [];
@@ -496,6 +514,12 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				'ipmi_privilege' => getRequest('ipmi_privilege'),
 				'ipmi_username' => getRequest('ipmi_username'),
 				'ipmi_password' => getRequest('ipmi_password'),
+				'tls_connect' => getRequest('tls_connect', HOST_ENCRYPTION_NONE),
+				'tls_accept' => getRequest('tls_accept', HOST_ENCRYPTION_NONE),
+				'tls_issuer' => getRequest('tls_issuer'),
+				'tls_subject' => getRequest('tls_subject'),
+				'tls_psk_identity' => getRequest('tls_psk_identity'),
+				'tls_psk' => getRequest('tls_psk'),
 				'groups' => $groups,
 				'templates' => $templates,
 				'interfaces' => $interfaces,
@@ -724,7 +748,13 @@ if (hasRequest('action') && getRequest('action') === 'host.massupdateform' && ha
 		'inventory_mode' => getRequest('inventory_mode', HOST_INVENTORY_DISABLED),
 		'host_inventory' => getRequest('host_inventory', []),
 		'templates' => getRequest('templates', []),
-		'inventories' => zbx_toHash(getHostInventories(), 'db_field')
+		'inventories' => zbx_toHash(getHostInventories(), 'db_field'),
+		'tls_connect' => getRequest('tls_connect', HOST_ENCRYPTION_NONE),
+		'tls_accept' => getRequest('tls_accept', HOST_ENCRYPTION_NONE),
+		'tls_issuer' => getRequest('tls_issuer', ''),
+		'tls_subject' => getRequest('tls_subject', ''),
+		'tls_psk_identity' => getRequest('tls_psk_identity', ''),
+		'tls_psk' => getRequest('tls_psk', '')
 	];
 
 	// sort templates
@@ -802,14 +832,23 @@ elseif (hasRequest('form')) {
 		// Host inventory
 		'inventory_mode' => getRequest('inventory_mode', $config['default_inventory_mode']),
 		'host_inventory' => getRequest('host_inventory', []),
-		'inventory_items' => []
+		'inventory_items' => [],
+
+		// Encryption
+		'tls_connect' => getRequest('tls_connect', HOST_ENCRYPTION_NONE),
+		'tls_accept' => getRequest('tls_accept', HOST_ENCRYPTION_NONE),
+		'tls_issuer' => getRequest('tls_issuer', ''),
+		'tls_subject' => getRequest('tls_subject', ''),
+		'tls_psk_identity' => getRequest('tls_psk_identity', ''),
+		'tls_psk' => getRequest('tls_psk', '')
 	];
 
 	if (!hasRequest('form_refresh')) {
 		if ($data['hostid'] != 0) {
 			$dbHosts = API::Host()->get([
 				'output' => ['hostid', 'proxy_hostid', 'host', 'name', 'status', 'ipmi_authtype', 'ipmi_privilege',
-					'ipmi_username', 'ipmi_password', 'flags', 'description'
+					'ipmi_username', 'ipmi_password', 'flags', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
+					'tls_subject', 'tls_psk_identity', 'tls_psk'
 				],
 				'selectGroups' => ['groupid'],
 				'selectParentTemplates' => ['templateid'],
@@ -879,6 +918,14 @@ elseif (hasRequest('form')) {
 				: $config['default_inventory_mode'];
 			$data['host_inventory'] = $dbHost['inventory'];
 			unset($data['host_inventory']['inventory_mode']);
+
+			// Encryption
+			$data['tls_connect'] = $dbHost['tls_connect'];
+			$data['tls_accept'] = $dbHost['tls_accept'];
+			$data['tls_issuer'] = $dbHost['tls_issuer'];
+			$data['tls_subject'] = $dbHost['tls_subject'];
+			$data['tls_psk_identity'] = $dbHost['tls_psk_identity'];
+			$data['tls_psk'] = $dbHost['tls_psk'];
 
 			// display empty visible name if equal to host name
 			if ($data['host'] === $data['visiblename']) {

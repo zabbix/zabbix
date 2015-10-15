@@ -26,7 +26,9 @@ $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 // create form
 $hostView = (new CForm())
 	->setName('hostForm')
-	->addVar('action', 'host.massupdate');
+	->addVar('action', 'host.massupdate')
+	->addVar('tls_accept', $data['tls_accept'])
+	->setAttribute('id', 'hostForm');
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }
@@ -210,7 +212,7 @@ $newTemplateTable = (new CTable())
 				[(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1), _('Replace')],
 				'mass_replace_tpls'
 			),
-			B(),
+			BR(),
 			new CLabel(
 				[(new CCheckBox('mass_clear_tpls'))->setChecked($data['mass_clear_tpls'] == 1), _('Clear when unlinking')],
 				'mass_clear_tpls'
@@ -335,6 +337,49 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 	);
 }
 
+// Encryption
+$encryption_form_list = new CFormList('encryption');
+
+$encryption_table = (new CTable())
+	->addRow([_('Connections to host'),
+		(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
+	])
+	->addRow([_('Connections from host'), [
+		[(new CCheckBox('tls_in_none')), _('No encryption')],
+		BR(),
+		[(new CCheckBox('tls_in_psk')), _('PSK')],
+		BR(),
+		[(new CCheckBox('tls_in_cert')), _('Certificate')]
+	]])
+	->addRow([_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('PSK'),
+		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('Issuer'),
+		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('Subject'),
+		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	]);
+
+$encryption_form_list->addRow([
+	_('Connections'),
+	SPACE,
+	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))
+		->setChecked(isset($data['visible']['encryption']))
+	],
+	(new CDiv($encryption_table))
+		->setId('encryption_div')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
+
 // append tabs to form
 $hostTab = (new CTabView())
 	->addTab('hostTab', _('Host'), $hostFormList)
@@ -345,6 +390,7 @@ $hostTab = (new CTabView())
 if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
+$hostTab->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(

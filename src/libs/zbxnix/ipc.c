@@ -109,4 +109,3 @@ int	zbx_shmget(key_t key, size_t size)
 
 	return (ret == SUCCEED) ? shm_id : -1;
 }
-
