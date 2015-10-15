@@ -2480,9 +2480,10 @@ void	zbx_tls_init_child(void)
 {
 	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
-	sigset_t	mask, orig_mask;
 	unsigned char	pers[64];	/* personalization string obtained from SHA-512 in SHA-384 mode */
-
+#ifndef _WINDOWS
+	sigset_t	mask, orig_mask;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
@@ -2675,8 +2676,9 @@ void	zbx_tls_init_child(void)
 {
 	const char	*__function_name = "zbx_tls_init_child";
 	int		res;
+#ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
-
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
@@ -2898,8 +2900,9 @@ void	zbx_tls_init_child(void)
 	const char	*__function_name = "zbx_tls_init_child";
 	char		*error = NULL;
 	size_t		error_alloc = 0, error_offset = 0;
+#ifndef _WINDOWS
 	sigset_t	mask, orig_mask;
-
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 #ifndef _WINDOWS
