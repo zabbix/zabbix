@@ -70,7 +70,7 @@ $fields = [
 	'tls_connect' =>	[T_ZBX_INT, O_OPT, null,
 		IN([HOST_ENCRYPTION_NONE, HOST_ENCRYPTION_PSK, HOST_ENCRYPTION_CERTIFICATE]), null],
 	'tls_accept' =>		[T_ZBX_INT, O_OPT, null,
-		BETWEEN(0, (HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE)), null],
+		BETWEEN(0, (HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE)), null],
 	'tls_subject' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
 	'tls_issuer' =>		[T_ZBX_STR, O_OPT, null,		null,		null],
 	'tls_psk_identity' =>	[T_ZBX_STR, O_OPT, null,		null,		null],
@@ -277,7 +277,8 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 		if (isset($visible['inventory_mode'])) {
 			$newValues['inventory_mode'] = getRequest('inventory_mode', HOST_INVENTORY_DISABLED);
 			$newValues['inventory'] = ($newValues['inventory_mode'] == HOST_INVENTORY_DISABLED)
-				? [] : getRequest('host_inventory', []);
+				? []
+				: getRequest('host_inventory', []);
 		}
 
 		if (array_key_exists('encryption', $visible)) {
