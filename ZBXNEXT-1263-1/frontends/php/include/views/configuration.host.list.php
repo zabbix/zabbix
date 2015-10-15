@@ -67,7 +67,7 @@ $table = (new CTableInfo())
 		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
 		_('Availability'),
 		_('Info'),
-		(new CColHeader(_('Encryption')))->setColSpan(2)
+		_('Agent encryption')
 	]);
 
 $current_time = time();
@@ -179,30 +179,36 @@ foreach ($data['hosts'] as $host) {
 		$lifetime_indicator = '';
 	}
 
-	// input encryption
-	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
-		$in_encryption = (new CSpan(_('None')))->addClass('status-grey');
-	}
-	elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
-		$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
+	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+		$encryption = (new CDiv((new CSpan(_('None')))->addClass('status-green')))->addClass('status-container');
 	}
 	else {
-		$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
-	}
+		// input encryption
+		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
+			$in_encryption = (new CSpan(_('None')))->addClass('status-green');
+		}
+		elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
+			$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
+		}
+		else {
+			$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
+		}
 
-	// output encryption
-	$out_encryption_array = [];
-	if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
-		$out_encryption_array[] = (new CSpan(_('None')))->addClass('status-grey');
-	}
-	if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
-		$out_encryption_array[] = (new CSpan(_('PSK')))->addClass('status-green');
-	}
-	if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
-		$out_encryption_array[] = (new CSpan(_('CERT')))->addClass('status-green');
-	}
+		// output encryption
+		$out_encryption = [];
+		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+			$out_encryption[] = (new CSpan(_('None')))->addClass('status-green');
+		}
+		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
+			$out_encryption[] = (new CSpan(_('PSK')))->addClass('status-green');
+		}
+		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
+			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-green');
+		}
 
-	$out_encryption = (new CDiv($out_encryption_array))->addClass('status-container');
+		$encryption = (new CDiv([$in_encryption, ' ', new CSpan($out_encryption)]))->addClass('status-container');
+	}
 
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
@@ -236,8 +242,7 @@ foreach ($data['hosts'] as $host) {
 		$status,
 		getHostAvailabilityTable($host),
 		$lifetime_indicator,
-		$in_encryption,
-		$out_encryption
+		$encryption
 	]);
 }
 
