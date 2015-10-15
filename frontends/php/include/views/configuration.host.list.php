@@ -207,7 +207,7 @@ foreach ($data['hosts'] as $host) {
 			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-green');
 		}
 
-		$encryption = (new CDiv([$in_encryption, ' ', new CSpan($out_encryption)]))->addClass('status-container');
+		$encryption = (new CDiv([$in_encryption, ' ', $out_encryption]))->addClass('status-container');
 	}
 
 	$table->addRow([
