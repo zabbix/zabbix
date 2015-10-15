@@ -41,6 +41,10 @@
 #		define __UINT64_C(x)	x
 #	endif
 
+#	ifndef __INT64_C
+#		define __INT64_C(x)	x
+#	endif
+
 #	define zbx_uint64_t	unsigned __int64
 #	define ZBX_FS_UI64	"%I64u"
 #	define ZBX_FS_UO64	"%I64o"
