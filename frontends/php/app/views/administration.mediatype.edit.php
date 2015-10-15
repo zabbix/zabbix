@@ -25,9 +25,10 @@ $widget = (new CWidget())->setTitle(_('Media types'));
 
 // create form
 $mediaTypeForm = (new CForm())
-	->setId('mediaTypeForm')
+	->setId('media_type_form')
 	->addVar('form', 1)
-	->addVar('mediatypeid', $data['mediatypeid']);
+	->addVar('mediatypeid', $data['mediatypeid'])
+	->addVar('exec_params_count', $data['exec_params_count']);
 
 // create form list
 $nameTextBox = (new CTextBox('description', $data['description'], false, 100))
@@ -77,8 +78,41 @@ $mediaTypeFormList
 			->setModern(true)
 	)
 	->addRow(_('Username'), (new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
-	->addRow(_('Script name'), (new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
-	->addRow(_('GSM modem'), (new CTextBox('gsm_modem', $data['gsm_modem']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+	->addRow(_('Script name'), (new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+
+$exec_params_table = (new CTable())
+	->setId('exec_params_table')
+	->setHeader([_('Parameter'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
+
+if ($data['exec_params_count'] != 0) {
+	foreach ($data['exec_params'] as $i => $exec_param) {
+		$exec_params_table->addRow([
+			(new CTextBox('exec_params['.$i.'][exec_param]', $exec_param['exec_param'], false, 255))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CButton('exec_params['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+			],
+			'form_row'
+		);
+	}
+}
+
+$exec_params_table->addRow([(new CButton('exec_param_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
+
+$mediaTypeFormList->addRow(_('Script parameters'),
+	(new CDiv($exec_params_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+	'row_exec_params'
+);
+
+$mediaTypeFormList->addRow(_('GSM modem'),
+	(new CTextBox('gsm_modem', $data['gsm_modem']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // create password field
 if ($data['passwd'] != '') {
