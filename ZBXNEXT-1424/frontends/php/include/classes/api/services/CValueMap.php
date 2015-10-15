@@ -152,64 +152,110 @@ class CValueMap extends CApiService {
 
 		$this->validateUpdate($valuemaps);
 
-		$update = [];
-		$mappings_create = [];
-		$mappings_delete = [];
-
-		$valuemapids = zbx_objectValues($valuemaps, 'valuemapid');
+		$upd_valuemaps = [];
+		$upd_mappings = [];
 
 		foreach ($valuemaps as $valuemap) {
-			// Old mappings are deleted and new ones are created.
-			if (array_key_exists('mappings', $valuemap)) {
-				$mappings_delete[$valuemap['valuemapid']] = true;
+			$valuemapid = $valuemap['valuemapid'];
 
+			if (array_key_exists('mappings', $valuemap)) {
+				$upd_mappings[$valuemapid] = [];
 				foreach ($valuemap['mappings'] as $mapping) {
-					$mappings_create[] = [
-						'valuemapid' => $valuemap['valuemapid'],
-						'value' => $mapping['value'],
-						'newvalue' => $mapping['newvalue']
-					];
+					$upd_mappings[$valuemapid][$mapping['value']] = $mapping['newvalue'];
 				}
 			}
 
-			$valuemapid = $valuemap['valuemapid'];
 			unset($valuemap['valuemapid'], $valuemap['mappings']);
 
-			// Skip updating value maps, if "name" is not given. (Does not check if name is changed).
+			// Skip updating value maps, if nothing is given.
 			if ($valuemap) {
-				$update[] = [
-					'values' => $valuemap,
-					'where' => ['valuemapid' => $valuemapid]
-				];
+				$upd_valuemaps[$valuemapid] = $valuemap;
 			}
 		}
 
-		if ($update) {
-			$db_old_valuemaps = API::getApiService()->select('valuemaps', [
-				'output' => ['name'],
-				'valuemapids' => $valuemapids
+		if ($upd_valuemaps) {
+			$db_valuemaps = API::getApiService()->select('valuemaps', [
+				'output' => ['valuemapid', 'name'],
+				'valuemapids' => array_keys($upd_valuemaps)
 			]);
 
-			$valuemaps = zbx_toHash($valuemaps, 'valuemapid');
+			$update = [];
 
-			foreach ($db_old_valuemaps as $db_old_valuemap) {
-				$new_name = $valuemaps[$db_old_valuemap['valuemapid']]['name'];
+			foreach ($db_valuemaps as $db_valuemap) {
+				$upd_valuemap = $upd_valuemaps[$db_valuemap['valuemapid']];
 
-				add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $db_old_valuemap['valuemapid'],
-					$new_name, 'valuemaps', ['name' => $db_old_valuemap['name']], ['name' => $new_name]
-				);
+				// Skip updating value maps, if name was not changed.
+				if ($upd_valuemap['name'] !== $db_valuemap['name']) {
+					$update[] = [
+						'values' => $upd_valuemap,
+						'where' => ['valuemapid' => $db_valuemap['valuemapid']]
+					];
+
+					add_audit_ext(AUDIT_ACTION_UPDATE, AUDIT_RESOURCE_VALUE_MAP, $db_valuemap['valuemapid'],
+						$upd_valuemap['name'], 'valuemaps', $db_valuemap, $upd_valuemap
+					);
+				}
 			}
 
-			DB::update('valuemaps', $update);
+			if ($update) {
+				DB::update('valuemaps', $update);
+			}
 		}
 
-		// Update mappings.
-		if ($mappings_delete) {
-			DB::delete('mappings', ['valuemapid' => array_keys($mappings_delete)]);
-			DB::insertBatch('mappings', $mappings_create);
+		if ($upd_mappings) {
+			$db_mappings = API::getApiService()->select('mappings', [
+				'output' => ['mappingid', 'valuemapid', 'value', 'newvalue'],
+				'filter' => ['valuemapid' => array_keys($upd_mappings)]
+			]);
+
+			$insert_mapings = [];
+			$update_mapings = [];
+			$delete_mapingids = [];
+
+			foreach ($db_mappings as $db_mapping) {
+				if (array_key_exists($db_mapping['valuemapid'], $upd_mappings)) {
+					$upd_mapping = &$upd_mappings[$db_mapping['valuemapid']];
+
+					if (array_key_exists($db_mapping['value'], $upd_mapping)) {
+						if ($upd_mapping[$db_mapping['value']] !== $db_mapping['newvalue']) {
+							$update_mapings[] = [
+								'values' => ['newvalue' => $upd_mapping[$db_mapping['value']]],
+								'where' => ['mappingid' => $db_mapping['mappingid']]
+							];
+						}
+						unset($upd_mapping[$db_mapping['value']]);
+					}
+					else {
+						$delete_mapingids[] = $db_mapping['mappingid'];
+					}
+
+					unset($upd_mapping);
+				}
+				else {
+					$delete_mapingids[] = $db_mapping['mappingid'];
+				}
+			}
+
+			foreach ($upd_mappings as $valuemapid => $upd_mapping) {
+				foreach ($upd_mapping as $value => $newvalue) {
+					$insert_mapings[] = ['valuemapid' => $valuemapid, 'value' => $value, 'newvalue' => $newvalue];
+				}
+			}
+
+			if ($insert_mapings) {
+				DB::insertBatch('mappings', $insert_mapings);
+			}
+
+			if ($update_mapings) {
+				DB::update('mappings', $update_mapings);
+			}
+
+			if ($delete_mapingids) {
+				DB::delete('mappings', ['mappingid' => $delete_mapingids]);
+			}
 		}
 
-		return ['valuemapids' => $valuemapids];
+		return ['valuemapids' => zbx_objectValues($valuemaps, 'valuemapid')];
 	}
 
 	/**
