@@ -1234,7 +1234,9 @@ function makeEventsActions($eventids) {
 
 	$events = [];
 	$userids = [];
+	$users = [];
 	$mediatypeids = [];
+	$mediatypes = [];
 
 	while ($row = DBfetch($result)) {
 		if (!array_key_exists($row['eventid'], $events)) {

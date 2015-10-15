@@ -309,7 +309,7 @@ function getNextColor(paletteType) {
  *
  * @return true
  */
-function moveListBoxSelectedItem(formname, objname, from, to, action) {
+function moveListBoxSelectedItem(objname, from, to, action) {
 	to = jQuery('#' + to);
 
 	jQuery('#' + from).find('option:selected').each(function(i, fromel) {
@@ -326,8 +326,11 @@ function moveListBoxSelectedItem(formname, objname, from, to, action) {
 		}
 		fromel = jQuery(fromel);
 		if (action.toLowerCase() == 'add') {
-			jQuery(document.forms[formname]).append("<input name='" + objname + '[' + fromel.val() + ']'
-				+ "' id='" + objname + '_' + fromel.val() + "' value='" + fromel.val() + "' type='hidden'>");
+			jQuery(this)
+				.closest('form')
+				.append("<input name='" + objname + '[' + fromel.val() + ']' + "' id='" + objname + '_' + fromel.val()
+					+ "' value='" + fromel.val() + "' type='hidden'>"
+				);
 		}
 		else if (action.toLowerCase() == 'rmv') {
 			jQuery('#' + objname + '_' + fromel.val()).remove();

@@ -58,13 +58,14 @@
  * * procstat_init() initialises procstat dshm structure but doesn't allocate memory from the system
  *   (zbx_dshm_create() called with size 0).
  * * the first call of procstat_add() allocates the shared memory for the header and the first query
- *   via call to zbx_dshm_reserve().
- * * The header is initialised in procstat_copy_data() which is called back from zbx_dshm_reserve().
+ *   via call to zbx_dshm_realloc().
+ * * The header is initialised in procstat_copy_data() which is called back from zbx_dshm_realloc().
  *
  * Memory allocation within dshm.
  * * Ensure that memory segment has enough free space with procstat_dshm_has_enough_space() before
  *   allocating space within segment with procstat_alloc() or functions that use it.
- * * Reserve more space if needed with zbx_dshm_reserve().
+ * * Check how much of the allocated dshm is actually used by procstat by procstat_dshm_used_size().
+ * * Change the dshm size with with zbx_dshm_realloc().
  *
  * Synchronisation.
  * * agentd processes share a single instance of ZBX_COLLECTOR_DATA (*collector) containing reference
@@ -542,7 +543,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 			exit(EXIT_FAILURE);
 		}
 
-		/* header initialised in procstat_copy_data() which is called back from zbx_dshm_reserve() */
+		/* header initialised in procstat_copy_data() which is called back from zbx_dshm_realloc() */
 		procstat_reattach();
 	}
 
