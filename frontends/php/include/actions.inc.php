@@ -26,8 +26,8 @@ function condition_operator2str($operator) {
 		CONDITION_OPERATOR_LIKE  => _('like'),
 		CONDITION_OPERATOR_NOT_LIKE  => _('not like'),
 		CONDITION_OPERATOR_IN => _('in'),
-		CONDITION_OPERATOR_MORE_EQUAL => _('>='),
-		CONDITION_OPERATOR_LESS_EQUAL => _('<='),
+		CONDITION_OPERATOR_MORE_EQUAL => '>=',
+		CONDITION_OPERATOR_LESS_EQUAL => '<=',
 		CONDITION_OPERATOR_NOT_IN => _('not in')
 	];
 
