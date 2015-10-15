@@ -290,4 +290,3 @@ int	zbx_mutex_destroy(ZBX_MUTEX *mutex)
 
 	return SUCCEED;
 }
-

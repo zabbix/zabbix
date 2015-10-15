@@ -38,7 +38,6 @@ typedef struct
 }
 zbx_sysinfo_proc_t;
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sysinfo_proc_free                                            *
@@ -54,7 +53,6 @@ void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 
 	zbx_free(proc);
 }
-
 
 static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 {
@@ -1048,7 +1046,6 @@ out:
 
 	return ret;
 }
-
 
 /******************************************************************************
  *                                                                            *

@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 1 "2015\-03\-02" Zabbix
+.TH ZABBIX_SENDER 1 "2015\-08\-06" Zabbix
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility
@@ -67,6 +67,214 @@ zabbix_sender \- Zabbix sender utility
 .B \-i
 .I input-file
 .br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-z
+.I server
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP\-address ]
+.B \-s
+.I host
+.B \-\-tls\-connect
+.B cert
+.B \-\-tls\-ca\-file
+.I CA\-file
+.RB [ \-\-tls\-crl\-file
+.IR CRL\-file ]
+.RB [ \-\-tls\-server\-cert\-issuer
+.IR cert\-issuer ]
+.RB [ \-\-tls\-server\-cert\-subject
+.IR cert\-subject ]
+.B \-\-tls\-cert\-file
+.I cert\-file
+.B \-\-tls\-key\-file
+.I key\-file
+.B \-k
+.I key
+.B \-o
+.I value
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-z
+.I server
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP\-address ]
+.RB [ \-s
+.IR host ]
+.B \-\-tls\-connect
+.B cert
+.B \-\-tls\-ca\-file
+.I CA\-file
+.RB [ \-\-tls\-crl\-file
+.IR CRL\-file ]
+.RB [ \-\-tls\-server\-cert\-issuer
+.IR cert\-issuer ]
+.RB [ \-\-tls\-server\-cert\-subject
+.IR cert\-subject ]
+.B \-\-tls\-cert\-file
+.I cert\-file
+.B \-\-tls\-key\-file
+.I key\-file
+.RB [ \-T ]
+.RB [ \-r ]
+.B \-i
+.I input\-file
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-c
+.I config-file
+.RB [ \-z
+.IR server ]
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP\-address ]
+.RB [ \-s
+.IR host ]
+.B \-\-tls\-connect
+.B cert
+.B \-\-tls\-ca\-file
+.I CA\-file
+.RB [ \-\-tls\-crl\-file
+.IR CRL\-file ]
+.RB [ \-\-tls\-server\-cert\-issuer
+.IR cert\-issuer ]
+.RB [ \-\-tls\-server\-cert\-subject
+.IR cert\-subject ]
+.B \-\-tls\-cert\-file
+.I cert\-file
+.B \-\-tls\-key\-file
+.I key\-file
+.B \-k
+.I key
+.B \-o
+.I value
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-c
+.I config-file
+.RB [ \-z
+.IR server ]
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP\-address ]
+.RB [ \-s
+.IR host ]
+.B \-\-tls\-connect
+.B cert
+.B \-\-tls\-ca\-file
+.I CA\-file
+.RB [ \-\-tls\-crl\-file
+.IR CRL\-file ]
+.RB [ \-\-tls\-server\-cert\-issuer
+.IR cert\-issuer ]
+.RB [ \-\-tls\-server\-cert\-subject
+.IR cert\-subject ]
+.B \-\-tls\-cert\-file
+.I cert\-file
+.B \-\-tls\-key\-file
+.I key\-file
+.RB [ \-T ]
+.RB [ \-r ]
+.B \-i
+.I input\-file
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-z
+.I server
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP\-address ]
+.B \-s
+.I host
+.B \-\-tls\-connect
+.B psk
+.B \-\-tls\-psk\-identity
+.I PSK\-identity
+.B \-\-tls\-psk\-file
+.I PSK\-file
+.B \-k
+.I key
+.B \-o
+.I value
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-z
+.I server
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP\-address ]
+.RB [ \-s
+.IR host ]
+.B \-\-tls\-connect
+.B psk
+.B \-\-tls\-psk\-identity
+.I PSK\-identity
+.B \-\-tls\-psk\-file
+.I PSK\-file
+.RB [ \-T ]
+.RB [ \-r ]
+.B \-i
+.I input\-file
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-c
+.I config\-file
+.RB [ \-z
+.IR server ]
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP-address ]
+.RB [ \-s
+.IR host ]
+.B \-\-tls\-connect
+.B psk
+.B \-\-tls\-psk\-identity
+.I PSK\-identity
+.B \-\-tls\-psk\-file
+.I PSK\-file
+.B \-k
+.I key
+.B \-o
+.I value
+.br
+.B zabbix_sender
+.RB [ \-v ]
+.B \-c
+.I config\-file
+.RB [ \-z
+.IR server ]
+.RB [ \-p
+.IR port ]
+.RB [ \-I
+.IR IP-address ]
+.RB [ \-s
+.IR host ]
+.B \-\-tls\-connect
+.B psk
+.B \-\-tls\-psk\-identity
+.I PSK\-identity
+.B \-\-tls\-psk\-file
+.I PSK\-file
+.RB [ \-T ]
+.RB [ \-r ]
+.B \-i
+.I input\-file
+.br
 .B zabbix_sender \-h
 .br
 .B zabbix_sender \-V
@@ -88,7 +296,7 @@ First entry from the \fBServerActive\fR parameter is used.
 .IP "\fB\-z\fR, \fB\-\-zabbix\-server\fR \fIserver\fR"
 Hostname or IP address of Zabbix server.
 If a host is monitored by a proxy, proxy hostname or IP address should be used instead.
-When used together with \fB\-\-config\fR, overrides first entry of \fBServerActive\fR parameter specified in agentd configuration file.
+When used together with \fB\-\-config\fR, overrides the first entry of \fBServerActive\fR parameter specified in agentd configuration file.
 .IP "\fB\-p\fR, \fB\-\-port\fR \fIport\fR"
 Specify port number of Zabbix server trapper running on the server.
 Default is 10051.
@@ -118,6 +326,41 @@ If target item has triggers referencing it, all timestamps must be in an increas
 .IP "\fB\-r\fR, \fB\-\-real\-time\fR"
 Send values one by one as soon as they are received.
 This can be used when reading from standard input.
+.IP "\fB\-\-tls\-connect\fR \fIvalue\fR"
+How to connect to server or proxy. Values:\fR
+.SS
+.RS 12
+.TP 12
+.B unencrypted
+connect without encryption
+.RE
+.RS 12
+.TP 12
+.B psk
+connect using TLS and a pre-shared key
+.RE
+.RS 12
+.TP 12
+.B cert
+connect using TLS and a certificate
+.RE
+.RE
+.IP "\fB\-\-tls\-ca\-file\fR \fICA\-file\fR"
+Full pathname of a file containing the top-level CA(s) certificates for peer certificate verification.
+.IP "\fB\-\-tls\-crl\-file\fR \fICRL\-file\fR"
+Full pathname of a file containing revoked certificates.
+.IP "\fB\-\-tls\-server\-cert\-issuer\fR \fIcert\-issuer\fR"
+Allowed server certificate issuer.
+.IP "\fB\-\-tls\-server\-cert\-subject\fR \fIcert\-subject\fR"
+Allowed server certificate subject.
+.IP "\fB\-\-tls\-cert\-file\fR \fIcert\-file\fR"
+Full pathname of a file containing the certificate or certificate chain.
+.IP "\fB\-\-tls\-key\-file\fR \fIkey\-file\fR"
+Full pathname of a file containing the private key.
+.IP "\fB\-\-tls\-psk\-identity\fR \fIPSK\-identity\fR"
+PSK\-identity string.
+.IP "\fB\-\-tls\-psk\-file\fR \fIPSK\-file\fR"
+Full pathname of a file containing the pre-shared key.
 .IP "\fB\-v\fR, \fB\-\-verbose\fR"
 Verbose mode, \fB\-vv\fR for more details.
 .IP "\fB\-h\fR, \fB\-\-help\fR"
@@ -140,7 +383,19 @@ Send \fB342.45\fR as the value for \fBmysql.queries\fR item of monitored host. U
 \fBzabbix_sender \-c /usr/local/etc/zabbix_agentd.conf \-s "Monitored Host" \-k mysql.queries \-o 342.45\fR
 .br
 .RS
-Send \fB342.45\fR as the value for \fBmysql.queries\fR key in \fBMonitored Host\fR host using Zabbix server defined in agent daemon configuration file.
+Send \fB342.45\fR as the value for \fBmysql.queries\fR item in \fBMonitored Host\fR host using Zabbix server defined in agent daemon configuration file.
+.RE
+
+\fBzabbix_sender \-z 192.168.1.113  \-s "Monitored Host" \-k mysql.queries \-o 342.45 \-\-tls\-connect cert \-\-tls\-ca\-file /home/zabbix/zabbix_ca_file \-\-tls\-cert\-file /home/zabbix/zabbix_agentd.crt \-\-tls\-key\-file /home/zabbix/zabbix_agentd.key\fR
+.br
+.RS
+Send \fB342.45\fR as the value for \fBmysql.queries\fR item in \fBMonitored Host\fR host to server with IP \fB192.168.1.113\fR using TLS with certificate.
+.RE
+
+\fBzabbix_sender \-z 192.168.1.113  \-s "Monitored Host" \-k mysql.queries \-o 342.45 \-\-tls\-connect psk \-\-tls\-psk\-identity "PSK ID Zabbix agentd" \-\-tls\-psk\-file /home/zabbix/zabbix_agentd.psk\fR
+.br
+.RS
+Send \fB342.45\fR as the value for \fBmysql.queries\fR item in \fBMonitored Host\fR host to server with IP \fB192.168.1.113\fR using TLS with pre-shared key (PSK).
 .RE
 
 .br
