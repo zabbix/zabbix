@@ -1675,7 +1675,7 @@ char	*get_ip_by_socket(zbx_socket_t *s)
 	ZBX_THREAD_LOCAL static char	host[64];
 	char				*error_message = NULL;
 
-	if (ZBX_PROTO_ERROR == getpeername(s->socket, (struct sockaddr*)&sa, &sz))
+	if (ZBX_PROTO_ERROR == getpeername(s->socket, (struct sockaddr *)&sa, &sz))
 	{
 		error_message = strerror_from_system(zbx_socket_last_error());
 		zbx_set_socket_strerror("connection rejected, getpeername() failed: %s", error_message);
