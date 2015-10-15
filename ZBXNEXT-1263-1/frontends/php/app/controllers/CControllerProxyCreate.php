@@ -34,11 +34,11 @@ class CControllerProxyCreate extends CController {
 			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
 				HOST_ENCRYPTION_CERTIFICATE,
 			'tls_accept' => 	'db       hosts.tls_accept     |in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
-				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK).','.
+				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK).','.
 				HOST_ENCRYPTION_CERTIFICATE.','.
-				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_CERTIFICATE).','.
-				(HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE).','.
-				(HOST_ENCRYPTION_NONE|HOST_ENCRYPTION_PSK|HOST_ENCRYPTION_CERTIFICATE),
+				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_CERTIFICATE).','.
+				(HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).','.
+				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
 			'tls_issuer' => 	'db       hosts.tls_issuer',
 			'tls_psk' =>		'db       hosts.tls_psk',
 			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
