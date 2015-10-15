@@ -842,16 +842,16 @@ class CProxy extends CApiService {
 			$this->checkValidator($hostids, new CHostNormalValidator([
 				'message' => _('Cannot update proxy for discovered host "%1$s".')
 			]));
+		}
 
-			$status = array_key_exists('status', $proxy) ? $proxy['status'] : $db_proxies[$proxy['proxyid']]['status'];
+		$status = array_key_exists('status', $proxy) ? $proxy['status'] : $db_proxies[$proxy['proxyid']]['status'];
 
-			// interface
-			if ($status == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)
-					&& !is_array($proxy['interface']) || !$proxy['interface']) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('No interface provided for proxy "%s".', $proxy['host'])
-				);
-			}
+		// interface
+		if ($status == HOST_STATUS_PROXY_PASSIVE && array_key_exists('interface', $proxy)
+				&& (!is_array($proxy['interface']) || !$proxy['interface'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS,
+				_s('No interface provided for proxy "%s".', $proxy['host'])
+			);
 		}
 
 		$proxies = $this->extendFromObjects(zbx_toHash($proxies, 'proxyid'), $db_proxies, [
