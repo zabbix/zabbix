@@ -487,14 +487,8 @@ calendar.prototype = {
 		this.clndr_minute.onchange();
 		this.clndr_hour.value = this.hour;
 		this.clndr_hour.onchange();
-		if (IE) {
-			this.clndr_month.innerHTML = this.monthname[this.month].toString();
-			this.clndr_year.innerHTML = this.year;
-		}
-		else {
-			this.clndr_month.textContent = this.monthname[this.month];
-			this.clndr_year.textContent = this.year;
-		}
+		this.clndr_month.textContent = this.monthname[this.month];
+		this.clndr_year.textContent = this.year;
 		this.createDaysTab();
 	},
 

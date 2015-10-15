@@ -109,7 +109,7 @@ var MMenu = {
 
 	mouseOver: function(show_label) {
 		clearTimeout(this.timeout_reset);
-		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 200);
+		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 10);
 		PageRefresh.restart();
 	},
 
@@ -128,6 +128,7 @@ var MMenu = {
 		var menu_div = $('sub_' + show_label);
 		if (!is_null(menu_div)) {
 			$(show_label).className = 'selected';
+			$(show_label).firstChild.focus();
 			menu_div.show();
 			for (var key in this.menus) {
 				if (key == show_label) {
@@ -136,9 +137,7 @@ var MMenu = {
 
 				var menu_cell = $(key);
 				if (!is_null(menu_cell)) {
-					if (menu_cell.tagName.toLowerCase() != 'select') {
-						menu_cell.className = '';
-					}
+					menu_cell.className = '';
 				}
 				var sub_menu_cell = $('sub_' + key);
 				if (!is_null(sub_menu_cell)) {
