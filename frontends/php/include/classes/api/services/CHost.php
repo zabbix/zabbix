@@ -793,6 +793,16 @@ class CHost extends CHostGeneral {
 			}
 		}
 
+		// Check connection fields only for massupdate action.
+		if ((array_key_exists('tls_connect', $data) || array_key_exists('tls_accept', $data)
+				|| array_key_exists('tls_psk_identity', $data) || array_key_exists('tls_psk', $data)
+				|| array_key_exists('tls_issuer', $data) || array_key_exists('tls_subject', $data))
+					&& (!array_key_exists('tls_connect', $data) || !array_key_exists('tls_accept', $data))) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _(
+				'Cannot update host encryption settings. Connection settings for both directions should be specified.'
+			));
+		}
+
 		$this->validateEncryption([$data]);
 
 		// Clean PSK fields.
