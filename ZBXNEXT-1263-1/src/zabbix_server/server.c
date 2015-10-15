@@ -503,6 +503,8 @@ static void	zbx_load_config(void)
 			PARM_OPT,	0,			1000},
 		{"StartJavaPollers",		&CONFIG_JAVAPOLLER_FORKS,		TYPE_INT,
 			PARM_OPT,	0,			1000},
+		{"StartEscalators",		&CONFIG_ESCALATOR_FORKS,		TYPE_INT,
+			PARM_OPT,	1,			100},
 		{"JavaGateway",			&CONFIG_JAVA_GATEWAY,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"JavaGatewayPort",		&CONFIG_JAVA_GATEWAY_PORT,		TYPE_INT,

@@ -1,6 +1,8 @@
 Changes for 3.0.0alpha3
 
 New features:
+..F....... [ZBXNEXT-2662] implemented on-click navigation for sub menus (Alex)
+........S. [ZBXNEXT-2844] added multiple escalator support (wiper)
 .......PS. [ZBXNEXT-2988] reduced the number of poller configuration cache locks by 1/3 (wiper)
 A.F.I...S. [ZBXNEXT-2163] implemented argument support for script media type (Ivo, wiper)
 A.F....PS. [ZBXNEXT-2128] implemented execution of an item at a specific time (Ivo, wiper)
@@ -10,6 +12,13 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and
 ...G...PS. [ZBX-9274] added printing defaults when Zabbix programs are executed with --help option (dimir)
 
 Bug fixes:
+..F....... [ZBXNEXT-2662] fixed debug messages in the dashboard widgets (Sasha)
+..F....... [ZBXNEXT-2662] fixed year and month vertical alignment in calendar (Pavel)
+..F....... [ZBXNEXT-2662] fixed displaying of month and year in calendar popup (sasha)
+..F....... [ZBXNEXT-2662] fixed script execution window layout (sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of modal dialogs (Pavel, sasha)
+..F....... [ZBXNEXT-2662] fixed top nav jumping icon bug on page zoom in Safari (Pavel)
+..F....... [ZBXNEXT-2662] fixed resizing of multiselect items in filters (sasha)
 ..F....... [ZBX-9941] fixed button attributes changes for map cloning (vitalijs)
 ........S. [ZBX-7006] implemented trend cache cleanup procedure which forces hourly flush of deleted, disabled or rarely updated item trends (dimir, gleb)
 ........S. [ZBX-9889] fixed log item values to have unique timestamps in history table (dimir)
