@@ -10,7 +10,7 @@
 
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
 			// If certificate is selected or checked.
-			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
+			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
 					|| jQuery('#tls_in_cert').is(':checked')) {
 				jQuery('#tls_issuer, #tls_subject').closest('tr').show();
 			}
@@ -19,7 +19,8 @@
 			}
 
 			// If PSK is selected or checked.
-			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?> || jQuery('#tls_in_psk').is(':checked')) {
+			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
+					|| jQuery('#tls_in_psk').is(':checked')) {
 				jQuery('#tls_psk, #tls_psk_identity').closest('tr').show();
 			}
 			else {
@@ -29,7 +30,7 @@
 
 		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
 			// If certificate is selected or checked.
-			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
+			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
 					|| jQuery('#tls_in_cert').is(':checked')) {
 				jQuery('#tls_issuer, #tls_subject').closest('tr').show();
 			}
@@ -38,7 +39,8 @@
 			}
 
 			// If PSK is selected or checked.
-			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?> || jQuery('#tls_in_psk').is(':checked')) {
+			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
+					|| jQuery('#tls_in_psk').is(':checked')) {
 				jQuery('#tls_psk, #tls_psk_identity').closest('tr').show();
 			}
 			else {
@@ -57,7 +59,7 @@
 			jQuery('#tls_in_cert').prop('checked', true);
 		}
 
-		jQuery('#tls_connect').trigger('change');
+		jQuery('input[name=tls_connect]').trigger('change');
 
 		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
 		jQuery('#hostForm').submit(function() {
