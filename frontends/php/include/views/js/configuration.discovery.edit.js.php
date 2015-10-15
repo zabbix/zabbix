@@ -518,13 +518,18 @@
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])
 						&& (typeof dCheck['snmpv3_contextname'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_contextname'] === dCheck['snmpv3_contextname'])) {
-					showModalWindow(
-						t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
-						<?= CJs::encodeJson(_('Check already exists.')) ?>,
-						[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
-							jQuery(this).dialog('destroy');
-						}}]
-					);
+
+					overlayDialogue({
+						'title': '<?= _('Discovery check error') ?>',
+						'content': jQuery('<span>').text('<?= _('Check already exists.') ?>'),
+						'buttons': [
+							{
+								'title': '<?= _('Cancel') ?>',
+								'focused': true,
+								'action': function() {}
+							}
+						]
+					});
 
 					return null;
 				}
@@ -582,14 +587,17 @@
 					}
 				},
 				error: function() {
-					showModalWindow(
-						t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
-						<?= CJs::encodeJson(_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')) ?>,
-						[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
-							jQuery(this).dialog('destroy');
-						}}]
-					);
-
+					overlayDialogue({
+						'title': '<?= _('Discovery check error') ?>',
+						'content': jQuery('<span>').text('<?= _('Cannot validate discovery check: invalid request or connection to Zabbix server failed.') ?>'),
+						'buttons': [
+							{
+								'title': '<?= _('Cancel') ?>',
+								'focused': true,
+								'action': function() {}
+							}
+						]
+					});
 					jQuery('#add_new_dcheck').prop('disabled', false);
 				}
 			});
@@ -599,13 +607,17 @@
 			jQuery('#add_new_dcheck').prop('disabled', false);
 
 			if (validationErrors.length) {
-				showModalWindow(
-					t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
-					validationErrors.join('\n'),
-					[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
-						jQuery(this).dialog('destroy');
-					}}]
-				);
+				overlayDialogue({
+					'title': '<?= _('Discovery check error') ?>',
+					'content': jQuery('<span>').text(validationErrors.join('\n') + "\n" + 'sdfkjsdhfkhsd'),
+					'buttons': [
+						{
+							'title': '<?= _('Cancel') ?>',
+							'focused': true,
+							'action': function() {}
+						}
+					]
+				});
 			}
 			else {
 				dCheck.name = jQuery('#type :selected').text();
