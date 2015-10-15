@@ -3,29 +3,6 @@
 @import '_fonts.scss';
 @import '_mixins.scss';
 
-/* ----------- Zabbix Styles ----------- */
-
-
-
-//doc
-//---
-//title: Buttons
-//name: button
-//category: home
-//---
-
-//Button styles can be applied to any element. Typically you'll want
-//to use either a `<button>` or an `<a>` element:
-
-//```html_example <button class="btn btnDefault">Click</button> <a
-//class="btn btnDefault" href="trulia.com">Trulia!</a> ```
-
-//If your button is actually a link to another page, please use the
-//`<a>` element, while if your button performs an action, such as
-//submitting a form or triggering some javascript event, then use a
-//`<button>` element.
-
-
 html {
 	position: relative;
 	min-height: 100%;
@@ -58,7 +35,7 @@ a {
 	}
 
 	&:hover {
-		color: $link-hover-color;
+		color: $link-hover-color; 
 		border-bottom: 1px solid rgba($link-hover-color, 0.5);
 	}
 
@@ -197,7 +174,7 @@ pre {
 	color: #6d6d6d !important;
 }
 
-/* Main Navigation */
+// Main Navigation
 nav {
 	background-color: $main-subnav-bg-color;
 
@@ -497,7 +474,7 @@ ul.top-nav-icons {
 	}
 }
 
-/* Article */
+// Article
 article {
 	padding: 13px 13px 0 13px;
 }
@@ -506,7 +483,7 @@ article {
 	@extend article;
 }
 
-/* Obgect Group Navigation */
+// Obgect Group Navigation
 .object-group {
 	margin: 0 0 10px 0;
 	
@@ -556,7 +533,7 @@ article {
 	}
 }
 
-/* Footer */
+// Footer
 footer {
 	position: absolute;
     bottom: 0;
@@ -587,7 +564,7 @@ footer {
 	background-size: 94px;
 }
 
-/* Tables */
+// Tables
 .list-table {
 	width: 100%;
     background-color: $ui-bg-color;
@@ -864,7 +841,7 @@ footer {
 	@extend %webkit-hor-scrollbar;
 }
 
-/* Filters */
+// Filters
 .filter-btn-container {
 	text-align: center;
 }
@@ -1213,7 +1190,7 @@ footer {
 	}
 }
 
-/* Forms */
+// Forms
 .table-forms-container {
 	margin: 0 0 10px 0;
 	background-color: $ui-bg-color;
@@ -2050,7 +2027,7 @@ $form-icon-btn: (
 	@extend %button-icon-size;
 }
 
-/* Sign in, Installation */
+// Sign in, Installation
 
 .setup-container  {
 	background-color: $ui-bg-color;
@@ -2220,7 +2197,7 @@ $form-icon-btn: (
 	width: 100%;
 }
 
-/* Dashboard */
+// Dashboard
 .widget-placeholder {
 
 	.cell {
@@ -2319,7 +2296,7 @@ $form-icon-btn: (
 	}
 } 
 
-/* Action Menus, Pop-up Menus */
+// Action Menus, Pop-up Menus
 .action-menu {
 	position: absolute;
 	z-index: 1000;
@@ -2606,7 +2583,7 @@ $form-icon-btn: (
 	}
 }
 
-/* Problem notification overlay */
+// Problem notification overlay
 .notif {
 	width: 250px;
 
@@ -2675,7 +2652,7 @@ $form-icon-btn: (
 	}
 }
 
-/* Maps, Screens, Graphs */
+// Maps, Screens, Graphs
 .box_on {
 	position: absolute;
 	z-index: 99;
@@ -2757,7 +2734,7 @@ $form-icon-btn: (
 	margin: -3px;
 }
 
-/* Debug, Overlay Description */
+// Debug, Overlay Description
 .debug-output {
 	max-height: 600px;
 	overflow-y: auto;
@@ -2772,10 +2749,10 @@ $form-icon-btn: (
 	position: fixed;
 	bottom: 13px;
 	right: 13px;
-	z-index: 10000;
+	z-index: 15000;
 	padding: 4px 11px;
 	border: 1px solid $ui-border-color;
-	background-color: rgba($body-bg-color,0.7);
+	background-color: rgba($body-bg-color, .8);
 	@include border-radius(2px);
 }
 
@@ -2795,26 +2772,26 @@ $form-icon-btn: (
 
 %scroll-vert-shadow {
 	background:
-	/* Shadow covers */
-	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color,0)),
-	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
-	/* Shadows */
-	radial-gradient(50% 0, farthest-side, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)),
-	radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)) 0 100%;
+	// Shadow covers
+	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
+	linear-gradient(rgba($ui-bg-color, 0), $ui-bg-color 70%) 0 100%,
+	// Shadows
+	radial-gradient(50% 0, farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
+	radial-gradient(50% 100%,farthest-side, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background:
-	/* Shadow covers */
-	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color,0)),
+	// Shadow covers
+	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
 	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
-	/* Shadows */
-	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)),
-	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color,.4), rgba($action-shadow-color,0)) 0 100%;
+	/// Shadows
+	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
+	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background-repeat: no-repeat;
 	background-color: $ui-bg-color;
 	background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
 	background-attachment: local, local, scroll, scroll;
 }
 
-/* Alerts */
+// Alerts
 .green {
 	color: $green;
 }
@@ -3222,10 +3199,10 @@ td.inactive-bg {
 }
 
 .msg-bad-global {
-	display: none;
+	display: block;
 	position: fixed;
 	bottom: 0;
-	z-index: 20000;
+	z-index: 10000;
 	width: 100%;
 	padding: 5px 5px;
 	text-align: center;
@@ -3242,7 +3219,7 @@ td.inactive-bg {
 	max-width: 25%;
 }
 
-/* Close/Remove icon */
+// Close/Remove icon
 
 %close-icon {
 	display: block;
@@ -3318,7 +3295,7 @@ a.overlay-close-btn {
 	}
 }
 
-/* Color picker */
+// Color picker
 .color-picker {
 	height: 20px;
 
