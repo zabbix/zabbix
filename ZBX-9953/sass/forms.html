@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileColor" content="#d40000">
+	</head>
+<body>
+	<header role="banner">
+		<div class="nav" role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="dashboard.html">Monitoring</a></li><li><a href="filter-collapsed.html">Inventory</a></li><li><a href="">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+			</div>
+		</div>
+	</header>
+	<div class="article">
+	<div class="header-title">
+	<h1>Dashboard</h1>
+	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li></ul></form>
+	</div>
+		<ul class="object-group"><li><b><a href="">All hosts</a> / Zabbix server:</b></li><li class="green">Enabled</li><li><div class="status-container"><span class="status-green">z</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-green">ipmi</span></div></li><li><div class="status-container"><span class="status-red">z</span><span class="status-red">snmp</span><span class="status-red">jmx</span><span class="status-red">ipmi</span></div></li><li><div class="status-container"><span class="status-grey">z</span><span class="status-grey">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div></li><li><span><b><a href="">Discovery</a></b></span></li><li><span><a href="">Applications</a>&nbsp;<sup>11</sup></span></li><li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li><li><span><a href="">Triggers</a>&nbsp;<sup>41</sup></span></li><li><span><a href="">Graphs</a>&nbsp;<sup>11</sup></span></li><li><span><a href="">Discovery rules</a>&nbsp;<sup>2</sup></span></li><li><span><a href="">Web scenarios</a></span></li></ul>
+	<form>
+	<div class="table-forms-container">
+	
+	<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
+
+		<ul class="table-forms">
+		<li>
+		<div class="table-forms-td-left"><label for="HostName">Host name</label></div><div class="table-forms-td-right"><input type="text" id="HostName" value="Disabled input field" disabled><button class="icon-help"></button><div class="red">You can't leave this empty.</div></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Read only input field" readonly><button class="icon-cal"></button></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="VisibleName">Visible name</label></div><div class="table-forms-td-right"><input type="text" id="VisibleName" value="Standard input field"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label>Groups</label></div><div class="table-forms-td-right">
+		<table><tbody><tr>
+		<td><label for="InGroups">In groups</label></td><td>&nbsp;</td><td><label for="OtherGroups">Other groups</label></td></tr><tr><td><select id="InGroups" size="10" class="select-multiple" multiple><option>Zabbix servers</option><option>Zabbix servers</option></select></td><td class="center"><button type="button" class="btn-grey"><span class="arrow-left"></span></button><br><button type="button" class="btn-grey"><span class="arrow-right"></span></button></td><td><select id="OtherGroups" size="10" class="select-multiple" multiple><option>Discovered hosts</option><option>Linux servers</option><option>Templates</option></select></td></tr></tbody></table></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="Groups">New group</label></div><div class="table-forms-td-right"><span class="form-new-group"><input type="text" id="Groups"></span></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label>Agent interfaces</label></div><div class="table-forms-td-right">
+		<div class="table-forms-separator" style="width: 750px">
+		<table>
+		<thead><tr><th></th><th>IP address</th><th>DNS name</th><th>Connect to</th><th>Port</th><th>Default</th><th></th></tr></thead>
+		<tbody>
+		<tr>
+		<td class="td-drag-icon"><div class="drag-icon disabled"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW" disabled><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew" disabled><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link" disabled>Remove</button></td>
+		</tr>
+		<tr>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
+		</tr>
+		<tr>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><!--<button type="button" class="btn-remove"></button>--><button type="button" class="btn-link">Remove</button></td></tr><tr><td>&nbsp;</td><td><button type="button" class="btn-link">Add</button></td></tr></tbody></table></div></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label>Agent interfaces</label></div><div class="table-forms-td-right">
+		<div class="table-forms-separator" style="width: 750px">
+		<table>
+		<tr>
+		<td>qweqwe</td><td><p>qweqweqwe</p><p>qweqweqwe</p><p>qweqweqwe</p><p>qweqweqwe</p><p>qweqweqwe</p><p>qweqweqwe</p><p>qweqweqwe</p><p>qweqweqwe</p></td>
+		</tr>
+		</table></div></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="snmp">SNMP interfaces</label></div><div class="table-forms-td-right">
+		<div class="table-forms-separator drag-drop-area" style="width: 750px">
+		<table><tbody>
+		<tr>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><!--<br><label for="BulkReq1"><input type="checkbox" id="BulkReq1" checked>Use bulk requests</label>--><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
+		</tr>
+		<tr>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><!--<br><label for="BulkReq2"><input type="checkbox" id="BulkReq2" checked>Use bulk requests</label>--><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
+		</tr><tr><td>&nbsp;</td><td><button type="button" class="btn-link">Add</button></td></tr>
+		</tbody></table>
+		</div>
+		</div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="jmx">JMX interfaces</label></div><div class="table-forms-td-right">
+		<div class="table-forms-separator" style="width: 750px"><button type="button" class="btn-link">Add</button></div></div>
+		</li>
+		<li><div class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></div><div class="table-forms-td-right">
+		<div class="table-forms-separator" style="width: 750px"><button type="button" class="btn-link">Add</button></div></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="descr">Description</label></div><div class="table-forms-td-right"><textarea name="" id="descr"></textarea></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="MonitorProxy">Monitored by proxy</label></div><div class="table-forms-td-right"><select id="MonitorProxy"><option>(no proxy)</option><option>(no proxy)</option><option>(no proxy)</option></select></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label for="Enabled">Enabled</label></div><div class="table-forms-td-right"><input type="checkbox" id="Enabled"></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label>Device uniqueness criteria</label></div><div class="table-forms-td-right"><ul class="list-check-radio"><li><label for="IpAddr"><input type="radio" id="IpAddr">IP address</label></li><li><label for="ZbbAgent"><input type="radio" id="ZbbAgent">Zabbix agent "system.uname" Source Han Sans is available in weights spanning ExtraLight, Light, Normal, Regular, Medium, Bold and Heavy. Heavy and ExtraLight were designed by hand, however the middle weights were created via software interpolation, Adobe said. Overall, Adobe is releasing 42 fonts, taking into account seven full font weights and region-specific subsets for screen and print.</label></li><li><label for="ZbbAgent2"><input type="checkbox" id="ZbbAgent2">Zabbix agent "system.uname" Source Han Sans is available in weights spanning ExtraLight, Light, Normal, Regular, Medium, Bold and Heavy. Heavy and ExtraLight were designed by hand, however the middle weights were created via software interpolation, Adobe said. Overall, Adobe is releasing 42 fonts, taking into account seven full font weights and region-specific subsets for screen and print.</label></li></ul></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label>Device uniqueness criteria</label></div><div class="table-forms-td-right"><ul class="list-hor-check-radio"><li><label for="IpAddr11"><input type="radio" id="IpAddr11">IP address</label></li><li><label for="ZbbAgent22"><input type="radio" id="ZbbAgent22">Zabbix agent "system.uname"</label></li><li><label for="ZbbAgent33"><input type="checkbox" id="ZbbAgent33">Zabbix agent "system.uname"</label></li></ul></div>
+		</li>
+		<li>
+		<div class="table-forms-td-left"><label>Device uniqueness criteria</label></div><div class="table-forms-td-right"><ul class="radio-segmented"><li class="na-bg"><input type="radio" id="NA"><label for="NA">Not classified</label></li><li class="info-bg"><input type="radio" id="Info"><label for="Info">Information</label></li><li class="warning-bg"><input type="radio" id="Warning"><label for="Warning">Warning</label></li><li class="average-bg"><input type="radio" id="Average"><label for="Average">Average</label></li><li class="high-bg"><input type="radio" id="High"><label for="High">High</label></li><li class="disaster-bg"><input type="radio" id="Disaster"><label for="Disaster">Disaster</label></li></ul></div>
+		</li>
+		</ul>
+		<ul class="table-forms">
+		<li><div class="table-forms-td-left">&nbsp;</div><div class="table-forms-td-right tfoot-buttons"><button type="button">Update</button><button type="button" class="btn-alt">Clone</button><button type="button" class="btn-alt">Full clone</button><button type="button" class="btn-alt">Delete</button><button type="button" class="btn-alt">Cancel</button></div>
+		</li>
+		</ul>
+	</div>
+	</form>
+	</div>
+	<div class="footer">
+	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
+	</div>
+</body>
+</html>
