@@ -280,15 +280,9 @@ elseif (hasRequest('action') && getRequest('action') == 'host.massupdate' && has
 				? [] : getRequest('host_inventory', []);
 		}
 
-		if (array_key_exists('tls_connect', $visible) || array_key_exists('tls_accept', $visible)) {
-			if (array_key_exists('tls_connect', $visible)) {
-				$newValues['tls_connect'] = getRequest('tls_connect', HOST_ENCRYPTION_NONE);
-			}
-
-			if (array_key_exists('tls_accept', $visible)) {
-				$newValues['tls_accept'] = getRequest('tls_accept', HOST_ENCRYPTION_NONE);
-			}
-
+		if (array_key_exists('encryption', $visible)) {
+			$newValues['tls_connect'] = getRequest('tls_connect', HOST_ENCRYPTION_NONE);
+			$newValues['tls_accept'] = getRequest('tls_accept', HOST_ENCRYPTION_NONE);
 			$newValues['tls_issuer'] = getRequest('tls_issuer', '');
 			$newValues['tls_subject'] = getRequest('tls_subject', '');
 			$newValues['tls_psk_identity'] = getRequest('tls_psk_identity', '');
