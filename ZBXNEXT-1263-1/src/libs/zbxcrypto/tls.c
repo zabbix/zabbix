@@ -465,7 +465,7 @@ static void	zbx_tls_parameter_not_empty(char **param)
 		}
 		else if (0 != (program_type & ZBX_PROGRAM_TYPE_GET))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "option \"%s\" is defined but empty",
+			zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"%s\" is defined but empty",
 					zbx_tls_parameter_name(ZBX_TLS_PARAMETER_COMMAND_LINE, param));
 		}
 		else
