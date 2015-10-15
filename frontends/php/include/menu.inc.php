@@ -394,12 +394,12 @@ function zbx_construct_menu(&$main_menu, &$sub_menus, &$page, $action = null) {
 		else {
 			$menu_url = $sub_menus[$label][$menu['default_page_id']]['menu_url'].'?action='.$sub_menus[$label][$menu['default_page_id']]['menu_action'];
 		}
-		$mmenu_entry = (new CListItem(new CLink($menu['label'], $menu_url)))
+		$mmenu_entry = (new CListItem(
+			(new CLink($menu['label'], 'javascript:void(0);'))->removeSID()
+		))
 			->addClass($menu_class)
 			->setId($label);
-// click to navigate to other sections, uncomment for old-style navigation
-//		$mmenu_entry->onMouseover('javascript: MMenu.mouseOver(\''.$label.'\');');
-//		$mmenu_entry->onMouseover('javascript: MMenu.mouseOut();');
+		$mmenu_entry->onClick('javascript: MMenu.mouseOver(\''.$label.'\');');
 		array_push($main_menu, $mmenu_entry);
 	}
 

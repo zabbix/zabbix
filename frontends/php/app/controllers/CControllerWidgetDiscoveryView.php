@@ -36,9 +36,10 @@ class CControllerWidgetDiscoveryView extends CController {
 	}
 
 	protected function doAction() {
-		$data = [];
-
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData([
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		]));
 	}
 }

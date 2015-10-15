@@ -780,7 +780,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
-			$actionHint
+			(new CCol($actionHint))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 	}
 
@@ -848,7 +848,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
-			$action
+			(new CCol($action))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 	}
 

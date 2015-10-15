@@ -57,7 +57,6 @@ else {
 			->setReadOnly(
 				$data['readonly'] || ($data['show_inherited_macros'] && ($macro['type'] & MACRO_TYPE_INHERITED))
 			)
-			->addClass('macro')
 			->setAttribute('placeholder', '{$MACRO}');
 
 		$macro_cell = [$macro_input];
