@@ -342,11 +342,11 @@ $encryption_form_list = new CFormList('encryption');
 
 $encryption_table = (new CTable())
 	->addRow([_('Connections to host'),
-		(new CComboBox('tls_connect', $data['tls_connect'], null, [
-			HOST_ENCRYPTION_NONE => _('No encryption'),
-			HOST_ENCRYPTION_PSK => _('PSK'),
-			HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
-		]))
+		(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
 	])
 	->addRow([_('Connections from host'), [
 		[(new CCheckBox('tls_in_none')), _('No encryption')],

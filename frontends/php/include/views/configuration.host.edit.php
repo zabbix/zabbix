@@ -765,11 +765,12 @@ $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
 $encryptionFormList = new CFormList('encryption');
 
 $encryptionFormList->addRow(_('Connections to host'),
-	(new CComboBox('tls_connect', $data['tls_connect'], null, [
-		HOST_ENCRYPTION_NONE => _('No encryption'),
-		HOST_ENCRYPTION_PSK => _('PSK'),
-		HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
-	]))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+	(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+		->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+		->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+		->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+		->setModern(true)
+		->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
 );
 $encryptionFormList->addRow(_('Connections from host'), [
 	[(new CCheckBox('tls_in_none'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('No encryption')],

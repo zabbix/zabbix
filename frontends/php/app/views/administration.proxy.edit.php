@@ -93,11 +93,13 @@ $proxy_form_list = (new CFormList('proxyFormList'))
 $proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxy_form_list);
 $encryptionFormList = new CFormList('encryption');
 
-$encryptionFormList->addRow(_('Connections to proxy'), new CComboBox('tls_connect', $data['tls_connect'], null, [
-	HOST_ENCRYPTION_NONE => _('No encryption'),
-	HOST_ENCRYPTION_PSK => _('PSK'),
-	HOST_ENCRYPTION_CERTIFICATE => _('Certificate')
-]));
+$encryptionFormList->addRow(_('Connections to host'),
+	(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+		->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+		->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+		->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+		->setModern(true)
+);
 $encryptionFormList->addRow(_('Connections from proxy'), [
 	[new CCheckBox('tls_in_none'), _('No encryption')],
 	BR(),

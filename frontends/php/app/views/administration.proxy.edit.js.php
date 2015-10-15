@@ -22,7 +22,7 @@
 			url.setArgument('dns', jQuery('#dns').val());
 			url.setArgument('useip', jQuery('input[name=useip]:checked').val());
 			url.setArgument('port', jQuery('#port').val());
-			url.setArgument('tls_connect', jQuery('#tls_connect').val());
+			url.setArgument('tls_connect', jQuery('input[name=tls_connect]:checked').val());
 			url.setArgument('tls_psk_identity', jQuery('#tls_psk_identity').val());
 			url.setArgument('tls_psk', jQuery('#tls_psk').val());
 			url.setArgument('tls_issuer', jQuery('#tls_issuer').val());
@@ -42,7 +42,7 @@
 			jQuery('#tls_in_cert').prop('checked', true);
 		}
 
-		jQuery('#tls_connect').trigger('change');
+		jQuery('input[name=tls_connect]').trigger('change');
 
 		// Trim spaces on submit and depending on checkboxes, create a value for hidden field 'tls_accept'.
 		jQuery('#proxyForm').submit(function() {
@@ -64,11 +64,11 @@
 		 */
 		function toggleEncryptionFields() {
 			if (jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>) {
-				jQuery('#tls_connect').prop('disabled', true);
+				jQuery('input[name=tls_connect]').prop('disabled', true);
 				jQuery('#tls_in_none, #tls_in_psk, #tls_in_cert').prop('disabled', false);
 			}
 			else {
-				jQuery('#tls_connect').prop('disabled', false);
+				jQuery('input[name=tls_connect]').prop('disabled', false);
 				jQuery('#tls_in_none, #tls_in_psk, #tls_in_cert').prop('disabled', true);
 			}
 
@@ -87,7 +87,7 @@
 		 */
 		function displayAdditionalEncryptionFields() {
 			// If certificate is selected or checked.
-			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
+			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
 					|| jQuery('#tls_in_cert').is(':checked')) {
 				jQuery('#tls_issuer, #tls_subject').closest('li').show();
 			}
@@ -95,7 +95,7 @@
 				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
 			}
 
-			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
+			if ((jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
 					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
 					|| (jQuery('#tls_in_cert').is(':checked')
 					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>)) {
@@ -106,14 +106,15 @@
 			}
 
 			// If PSK is selected or checked.
-			if (jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?> || jQuery('#tls_in_psk').is(':checked')) {
+			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
+					|| jQuery('#tls_in_psk').is(':checked')) {
 				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
 			}
 			else {
 				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
 			}
 
-			if ((jQuery('#tls_connect').val() == <?= HOST_ENCRYPTION_PSK ?>
+			if ((jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
 					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_PASSIVE ?>)
 					|| (jQuery('#tls_in_psk').is(':checked')
 					&& jQuery('#status').val() == <?= HOST_STATUS_PROXY_ACTIVE ?>)) {
