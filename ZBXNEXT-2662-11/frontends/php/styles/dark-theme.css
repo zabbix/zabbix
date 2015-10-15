@@ -29,7 +29,6 @@ table {
   border-collapse: collapse;
   border-spacing: 0; }
 
-/* ----------- Zabbix Styles ----------- */
 html {
   position: relative;
   min-height: 100%; }
@@ -139,7 +138,6 @@ pre {
 :-ms-input-placeholder {
   color: #6d6d6d !important; }
 
-/* Main Navigation */
 nav, .nav {
   background-color: #454545; }
 
@@ -341,11 +339,9 @@ ul.top-nav-icons {
       position: relative;
       padding: 0 0 0 14px; }
 
-/* Article */
 article, .article {
   padding: 13px 13px 0 13px; }
 
-/* Obgect Group Navigation */
 .object-group {
   margin: 0 0 10px 0; }
   .object-group li {
@@ -375,7 +371,6 @@ article, .article {
   .hor-list li:last-child {
     margin: 0; }
 
-/* Footer */
 footer, .footer {
   position: absolute;
   bottom: 0;
@@ -395,7 +390,6 @@ footer, .footer {
   background: url(../img/icon-sprite.svg) no-repeat 0 -712px;
   background-size: 94px; }
 
-/* Tables */
 .list-table {
   width: 100%;
   background-color: #2b2b2b;
@@ -589,7 +583,6 @@ footer, .footer {
   overflow-x: auto;
   position: relative; }
 
-/* Filters */
 .filter-btn-container {
   text-align: center; }
 
@@ -841,7 +834,6 @@ footer, .footer {
     text-align: right;
     margin-left: 8px; }
 
-/* Forms */
 .table-forms-container, .browser-warning-container {
   margin: 0 0 10px 0;
   background-color: #2b2b2b;
@@ -1399,7 +1391,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   cursor: move;
   background: url(../img/icon-sprite.svg) no-repeat -6px -762px; }
 
-/* Sign in, Installation */
 .setup-container {
   background-color: #2b2b2b;
   width: 766px;
@@ -1511,7 +1502,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   padding: 10px 5px;
   width: 100%; }
 
-/* Dashboard */
 .widget-placeholder .cell {
   min-width: 250px; }
   .widget-placeholder .cell:last-child .dashbrd-widget {
@@ -1569,7 +1559,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: inline-block;
     padding: 8px 0 8px 13px; }
 
-/* Action Menus, Pop-up Menus */
 .action-menu {
   position: absolute;
   z-index: 1000;
@@ -1763,7 +1752,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     float: left;
     margin-top: 0; }
 
-/* Problem notification overlay */
 .notif {
   width: 250px; }
   .notif .dashbrd-widget-head {
@@ -1812,7 +1800,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     display: inline-block;
     margin: 0 2px 0 0; }
 
-/* Maps, Screens, Graphs */
 .box_on {
   position: absolute;
   z-index: 99; }
@@ -1866,7 +1853,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   border: 3px dashed #e99003;
   margin: -3px; }
 
-/* Debug, Overlay Description */
 .debug-output {
   max-height: 600px;
   overflow-y: auto;
@@ -1879,10 +1865,10 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   position: fixed;
   bottom: 13px;
   right: 13px;
-  z-index: 10000;
+  z-index: 15000;
   padding: 4px 11px;
   border: 1px solid #303030;
-  background-color: rgba(14, 16, 18, 0.7);
+  background-color: rgba(14, 16, 18, 0.8);
   -webkit-border-radius: 2px;
   -moz-border-radius: 2px;
   border-radius: 2px; }
@@ -1905,7 +1891,6 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
   background-size: 100% 40px, 100% 40px, 100% 4px, 100% 4px;
   background-attachment: local, local, scroll, scroll; }
 
-/* Alerts */
 .green, a.green {
   color: #59db8f; }
 
@@ -2131,7 +2116,7 @@ td.active-bg {
   display: none;
   position: fixed;
   bottom: 0;
-  z-index: 20000;
+  z-index: 10000;
   width: 100%;
   padding: 5px 5px;
   text-align: center;
@@ -2146,7 +2131,6 @@ td.active-bg {
   margin-top: 5%;
   max-width: 25%; }
 
-/* Close/Remove icon */
 .overlay-close-btn, a.overlay-close-btn, .subfilter-disable-btn {
   display: block;
   width: 18px;
@@ -2209,7 +2193,6 @@ td.active-bg {
   .subfilter-disable-btn:active {
     color: black; }
 
-/* Color picker */
 .color-picker {
   height: 20px; }
   .color-picker div {
