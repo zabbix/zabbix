@@ -1963,7 +1963,8 @@ $var-icons: (
 	maint: url(../img/icon-sprite.svg) no-repeat -46px -802px,
 	depend-up: url(../img/icon-sprite.svg) no-repeat -49px -730px,
 	depend-down: url(../img/icon-sprite.svg) no-repeat -49px -766px,
-	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px
+	ackn: url(../img/icon-sprite.svg) no-repeat -45px -693px,
+	wzrd-action: url(../img/icon-sprite.svg) no-repeat -10px -622px
 );
 
 @each $var-icons, $bgimage in $var-icons {
@@ -3496,3 +3497,594 @@ $browser-logos: (
 .uppercase {
 	text-transform: $font-transform;
 }
+
+/*doc
+---
+title: Components
+name: components
+category: Components
+---
+*/
+
+/*doc
+---
+title: About
+name: about
+category: About
+---
+
+The Zabbix styleguide is a collection of all front-end user interface elements and best practices.
+*/
+
+/*doc
+---
+parent: components
+title: Typography
+name: typography
+---
+
+This is typography
+
+```html_example_table
+<h1>Test Header</h1>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Tables
+name: table
+---
+
+Tables tables:
+*/
+
+/*doc
+---
+parent: table
+title: Default Table
+name: tableDefault
+---
+
+Default table:
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Test host</a></td>
+            <td><a href="">Applications</a></td>
+            <td><a href="">Items</a></td>
+            <td><a href="">Triggers</a></td>
+            <td><a href="">Graphs</a></td>
+            <td><a href="">Discovery</a></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr class="row-selected">
+            <td><input type="checkbox" checked=""></td>
+            <td><a href="">Zabbix server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Main server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Backup server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+*/
+
+/*doc
+---
+parent: table
+title: Table with Pagination
+name: tablePagination
+---
+
+Table with pagination:
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Test host</a></td>
+            <td><a href="">Applications</a></td>
+            <td><a href="">Items</a></td>
+            <td><a href="">Triggers</a></td>
+            <td><a href="">Graphs</a></td>
+            <td><a href="">Discovery</a></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr class="row-selected">
+            <td><input type="checkbox" checked=""></td>
+            <td><a href="">Zabbix server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>11</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>41</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>3</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>4</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>6</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Main server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>32</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>54</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>21</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>72</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>40</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+         <tr>
+            <td><input type="checkbox"></td>
+            <td><a href="">Backup server</a></td>
+            <td><a href="">Applications</a>&nbsp;<sup>8</sup></td>
+            <td><a href="">Items</a>&nbsp;<sup>9</sup></td>
+            <td><a href="">Triggers</a>&nbsp;<sup>88</sup></td>
+            <td><a href="">Graphs</a>&nbsp;<sup>221</sup></td>
+            <td><a href="">Discovery</a>&nbsp;<sup>56</sup></td>
+            <td><a href="">Web</a></td>
+            <td>127.0.01: 10050</td>
+            <td><a href="" class="grey link-alt">Template App Zabbix Server</a></td>
+            <td><a href="">Enabled</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+<div class="table-paging">
+   <a href=""><span class="arrow-left"></span></a><a href="">1</a><a href="" class="paging-selected">2</a><a href="">3</a><a href=""><span class="arrow-right"></span></a>
+</div>
+```
+*/
+
+/*doc
+---
+parent: table
+title: Table with No Results
+name: tableNores
+---
+
+Table with no results:
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th class="cell-width"><input type="checkbox"></th>
+            <th><a href="">Hosts<span class="arrow-down"></span></a></th>
+            <th><a href="">Applications<span class="arrow-up"></span></a></th>
+            <th>Items</th>
+            <th>Triggers</th>
+            <th>Graphs</th>
+            <th>Discovery</th>
+            <th>Web</th>
+            <th>Interface</th>
+            <th>Templates</th>
+            <th><a href="">Status</a></th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr class="nothing-to-show">
+            <td colspan="11">We couldn't find any results</td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Forms
+name: forms
+---
+
+Forms:
+
+```html_example
+example
+```
+*/
+
+/*doc
+---
+parent: components
+title: Dialogs
+name: dialog
+---
+
+Dialogs:
+
+```html_example
+<div class="overlay-dialogue">
+   <span class="overlay-close-btn"></span>
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Execution confirmation</h4>
+   </div>
+   <div class="overlay-dialogue-body">Some random confirmation text goes right here</div>
+   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Execute</button></div>
+</div>
+```
+*/
+
+/*doc
+---
+parent: dialog
+name: dialogsContent
+title: Dialogs with Content
+---
+
+Dialogs:
+
+```html_example
+<div class="overlay-dialogue" style="max-width: 500px">
+   <span class="overlay-close-btn"></span>
+   <div class="overlay-descr">Zabbix offers great <a href="">performance</a> for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema. Polling and trapping is supported, with native high performance agents gathering data from virtually any popular operating system; agent-less monitoring methods are available as well.Zabbix offers great performance for data gathering and can be scaled to very large environments.
+   </div>
+   <div class="overlay-descr-url"><a href="">A random link goes here</a></div>
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th>Time</th>
+            <th>Status</th>
+            <th>Duration</th>
+            <th>Age</th>
+            <th>Ack</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td>2015-09-08 13:47:58</td>
+            <td><span style="color: #DC0000">PROBLEM</span></td>
+            <td>15d 23h 45m</td>
+            <td>15d 23h 45m</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-05 06:14:58</td>
+            <td><span style="color: #00AA00">OK</span></td>
+            <td>1m 4d 7h</td>
+            <td>1m 20d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-05 05:32:58</td>
+            <td><span style="color: #DC0000">PROBLEM</span></td>
+            <td>42m</td>
+            <td>1m 20d 8h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-04 06:11:58</td>
+            <td><span style="color: #00AA00">OK</span></td>
+            <td>23h 21m</td>
+            <td>1m 21d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+         <tr>
+            <td>2015-08-04 05:38:58</td>
+            <td><span style="color: #DC0000">PROBLEM</span></td>
+            <td>33m</td>
+            <td>1m 21d 7h</td>
+            <td><a class="link-alt red" href="">No</a></td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
+*/
+
+/*doc
+---
+parent: dialog
+name: dialogsContexttual
+title: Contextual Dialogs
+---
+
+Contextual Dialogs:
+
+```html_example
+<ul class="action-menu"">
+   <li>
+      <h3>Favourite screens</h3>
+   </li>
+   <li><span class="action-menu-item">Add</span></li>
+   <li>
+      <span class="action-menu-item">Remove<span class="arrow-right"></span></span>
+      <ul class="action-menu" style="top: 47px; left: 203px;">
+         <li><span class="action-menu-item">Zabbix server</span></li>
+      </ul>
+   </li>
+   <li><span class="action-menu-item">Remove all</span></li>
+   <li>
+      <div></div>
+   </li>
+   <li>
+      <h3>Favourite slide shows</h3>
+   </li>
+   <li><span class="action-menu-item selected">Add</span></li>
+   <li><span class="action-menu-item-disabled">Remove</span></li>
+   <li><span class="action-menu-item-disabled">Remove all</span></li>
+</ul>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Notifications
+name: notifications
+---
+
+Notificatiions:
+
+```html_example
+example
+```
+*/
+
+/*doc
+---
+parent: notifications
+name: notificationSuccess
+title: Success Notification
+---
+
+Success Notification:
+
+```html_example
+<div class="msg-good">
+   Well done! You successfully added new parameters.
+   <div class="msg-details">
+      <span class="link-action">Details</span>
+      <ul class="msg-details-border">
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+      </ul>
+   </div>
+   <span class="overlay-close-btn" title="Close"></span>
+</div>
+```
+*/
+
+/*doc
+---
+parent: notifications
+name: notificationError
+title: Error Notification
+---
+
+Error Notification:
+
+```html_example
+<div class="msg-bad">
+   Oh snap! Check form fields and try submitting again.
+   <div class="msg-details">
+      <span class="link-action">Details</span>
+      <ul class="msg-details-border">
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+         <li>Something</li>
+      </ul>
+   </div>
+   <span class="overlay-close-btn" title="Close"></span>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Icons
+name: icons
+---
+
+Icons:
+
+```html_example
+example
+```
+*/
+
+/*doc
+---
+parent: components
+title: Calendar
+name: calendar
+---
+
+Calendar:
+
+```html_example_table
+<div class="overlay-dialogue calendar">
+   <div class="calendar-header">
+      <div class="calendar-year">
+         <button type="button" class="btn-grey"><span class="arrow-left"></span></button>2015<button type="button" class="btn-grey"><span class="arrow-right"></span></button>
+      </div>
+      <div class="calendar-month"><button type="button" class="btn-grey"><span class="arrow-left"></span></button>March<button type="button" class="btn-grey"><span class="arrow-right"></span></button></div>
+   </div>
+   <table>
+      <thead>
+         <tr>
+            <th>M</th>
+            <th>T</th>
+            <th>W</th>
+            <th>T</th>
+            <th>F</th>
+            <th>S</th>
+            <th>S</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td class="grey">29</td>
+            <td>1</td>
+            <td>2</td>
+            <td>3</td>
+            <td>4</td>
+            <td>5</td>
+            <td>6</td>
+         </tr>
+         <tr>
+            <td>7</td>
+            <td>8</td>
+            <td>9</td>
+            <td>10</td>
+            <td>11</td>
+            <td>12</td>
+            <td>13</td>
+         </tr>
+         <tr>
+            <td>14</td>
+            <td>15</td>
+            <td class="selected">16</td>
+            <td>17</td>
+            <td>18</td>
+            <td>19</td>
+            <td>20</td>
+         </tr>
+         <tr>
+            <td>21</td>
+            <td>22</td>
+            <td>23</td>
+            <td>24</td>
+            <td>25</td>
+            <td>26</td>
+            <td>27</td>
+         </tr>
+         <tr>
+            <td>28</td>
+            <td>29</td>
+            <td>30</td>
+            <td>31</td>
+            <td class="grey">1</td>
+            <td class="grey">2</td>
+            <td class="grey">3</td>
+         </tr>
+         <tr>
+            <td class="grey">4</td>
+            <td class="grey">5</td>
+            <td class="grey">6</td>
+            <td class="grey">7</td>
+            <td class="grey">8</td>
+            <td class="grey">9</td>
+            <td class="grey">10</td>
+         </tr>
+      </tbody>
+   </table>
+   <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
+   <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Done</button></div>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Colors
+name: colors
+---
+
+Colors:
+
+```html_example
+example
+```
+*/
+
+/*doc
+---
+parent: components
+title: Links
+name: links
+---
+
+Links:
+
+```html_example
+example
+```
+*/
