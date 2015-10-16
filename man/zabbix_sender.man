@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 8 "10 November 2011"
+.TH ZABBIX_SENDER 8 "16 October 2015"
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility.
@@ -6,7 +6,7 @@ zabbix_sender \- Zabbix sender utility.
 .B zabbix_sender [-hpzvIV] {-kso | [-T] -i \fI<inputfile>\fB} [-c \fI<config-file>\fB]
 .SH DESCRIPTION
 .B zabbix_sender
-is a command line utility for sending data to a remote Zabbix server. On the Zabbix server an item of type \fBZabbix trapper\fR should be created with corresponding key. Note that incoming values will only be accepted from hosts specified in \fBAllowed hosts\fR field for this item.
+is a command line utility for sending performance data to a remote Zabbix server. On the Zabbix server an item of type \fBZabbix trapper\fR should be created with corresponding key. Note that incoming values will only be accepted from hosts specified in \fBAllowed hosts\fR field for this item.
 
 .SS Options
 .IP "-c, --config \fI<config-file>\fR"
@@ -17,7 +17,7 @@ Hostname or IP address of Zabbix server. If a host is monitored by a proxy, prox
 .IP "-p, --port \fI<port>\fR"
 Specify port number of server trapper running on the server. Default is 10051.
 .IP "-s, --host \fI<host>\fR"
-Specify host name as registered in Zabbix frontend. Host IP address and DNS name will not work.
+Specify agent hostname as registered in Zabbix frontend. Host IP address and DNS name will not work.
 .IP "-I, --source-address \fI<IP>\fR"
 Specify source IP address.
 .IP "-k, --key \fI<key>\fR"
@@ -25,11 +25,49 @@ Specify item key to send value to.
 .IP "-o, --value \fI<value>\fR"
 Specify value.
 .IP "-i, --input-file \fI<inputfile>\fR"
-Load values from input file. Specify \fB-\fR for standard input. Each line of file contains whitespace delimited: \fB<hostname> <key> <value>\fR. \
-Specify \fB-\fR in \fB<hostname>\fR to use hostname from configuration file or \fB--host\fR argument. All entries are sent in a sequential order top-down.
+
+Load values from input file. Specify \fB-\fR as <inputfile> to read values from standard input.
+
+Each value must be specified on its own line. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR, where "hostname" is the name of monitored host as registered in Zabbix frontend, "key" is target item key and "value" - the value to send. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument.
+
+An example of a line of an input file:
+
+\fB "Linux DB3" db.connections 43\fR
+
+The value type must be correctly set in item configuration of Zabbix frontend. Zabbix sender will send up to 250 values in one connection. Contents of the input file must be in the UTF-8 encoding. All values from the input file are sent in a sequential order top-down. Entries must be formatted using the following rules:
+
+.RS
+.RS
+.IP \[bu] 2
+Quoted and non-quoted entries are supported.
+.IP \[bu]
+Double-quote is the quoting character.
+.IP \[bu]
+Entries with whitespace must be quoted.
+.IP \[bu]
+Double-quote and backslash characters inside quoted entry must be escaped with a backslash.
+.IP \[bu]
+Escaping is not supported in non-quoted entries.
+.IP \[bu]
+Linefeed escape sequences (\\n) are supported in quoted strings.
+.IP \[bu]
+Linefeed escape sequences are trimmed from the end of an entry.
+.RE
+
+.RE
+
 .IP "-T, --with-timestamps"
-Each line of file contains whitespace delimited: \fB<hostname> <key> <timestamp> <value>\fR. This can be used with \fB--input-file\fR option. Timestamp should be specified in Unix timestamp format. \
-If target item has triggers referencing it, all timestamps must be in an increasing order, otherwise event calculation will not be correct.
+
+This option can be only used with \fB--input-file\fR option.
+
+Each line of the input file must contain 4 whitespace delimited entries: \fB<hostname> <key> <timestamp> <value>\fR. Timestamp should be specified in Unix timestamp format. If target item has triggers referencing it, all timestamps must be in an increasing order, otherwise event calculation will not be correct.
+
+An example of a line of the input file:
+
+\fB "Linux DB3" db.connections 1429533600 43\fR
+
+For more details please see option \fB--input-file\fR.
+
 .IP "-r, --real-time"
 Send values one by one as soon as they are received. This can be used when reading from standard input.
 .IP "-v, --verbose"
@@ -45,7 +83,7 @@ If data was sent, but processing of at least one of the values failed, the exit 
 If data sending failed, the exit status is 1.
 
 .SH "EXAMPLES"
-.B zabbix_sender -c /usr/local/etc/zabbix_agentd.conf -s """Monitored Host""" -k mysql.queries -o 342.45
+.B zabbix_sender -c /etc/zabbix/zabbix_agentd.conf -s """Monitored Host""" -k mysql.queries -o 342.45
 
 Send \fB342.45\fR as the value for \fBmysql.queries\fR key in \fBMonitored Host\fR host using Zabbix server defined in agent daemon configuration file.
 
