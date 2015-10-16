@@ -567,7 +567,9 @@ function make_latest_issues(array $filter = [], $backurl) {
 	];
 
 	$triggers = API::Trigger()->get(array_merge($options, [
-		'output' => ['triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'lastchange'],
+		'output' => ['triggerid', 'expression', 'description', 'url', 'priority', 'lastchange', 'comments', 'error',
+			'state'
+		],
 		'selectHosts' => ['hostid', 'name'],
 		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
@@ -746,18 +748,10 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		// description
-		if ($trigger['url'] !== '') {
-			$description = (new CLink($description, $trigger['url']))->removeSID();
-		}
-		else {
-			$description = (new CSpan($description))->addClass(ZBX_STYLE_LINK_ACTION);
-		}
+		$description = (new CSpan($description))->addClass(ZBX_STYLE_LINK_ACTION);
+
 		if ($trigger['lastEvent']) {
-			$description->setHint(
-				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid'], $backurl),
-				'',
-				$trigger['url'] === ''
-			);
+			$description->setHint(make_popup_eventlist($trigger, $backurl), '', true, 'max-width: 500px');
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 
