@@ -45,7 +45,7 @@ static zbx_vector_ptr_t	recipients;
 static int		lastsent = 0;
 
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 /******************************************************************************
@@ -102,7 +102,7 @@ static void	sync_config(void)
 	result = DBselect_once(
 			"select mt.mediatypeid,mt.type,mt.description,mt.smtp_server,mt.smtp_helo,mt.smtp_email,"
 				"mt.exec_path,mt.gsm_modem,mt.username,mt.passwd,mt.smtp_port,mt.smtp_security,"
-				"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,m.sendto"
+				"mt.smtp_verify_peer,mt.smtp_verify_host,mt.smtp_authentication,mt.exec_params,m.sendto"
 			" from media m,users_groups u,config c,media_type mt"
 			" where m.userid=u.userid"
 				" and u.usrgrpid=c.alert_usrgrpid"
@@ -143,6 +143,7 @@ static void	sync_config(void)
 		STR_REPLACE(recipient->mediatype.smtp_helo, row[4]);
 		STR_REPLACE(recipient->mediatype.smtp_email, row[5]);
 		STR_REPLACE(recipient->mediatype.exec_path, row[6]);
+		STR_REPLACE(recipient->mediatype.exec_params, row[15]);
 		STR_REPLACE(recipient->mediatype.gsm_modem, row[7]);
 		STR_REPLACE(recipient->mediatype.username, row[8]);
 		STR_REPLACE(recipient->mediatype.passwd, row[9]);
@@ -152,7 +153,7 @@ static void	sync_config(void)
 		ZBX_STR2UCHAR(recipient->mediatype.smtp_verify_host, row[13]);
 		ZBX_STR2UCHAR(recipient->mediatype.smtp_authentication, row[14]);
 
-		STR_REPLACE(recipient->alert.sendto, row[15]);
+		STR_REPLACE(recipient->alert.sendto, row[16]);
 
 		if (NULL == recipient->alert.subject)
 			recipient->alert.message = recipient->alert.subject = zbx_strdup(NULL, "Zabbix database is down.");
@@ -216,7 +217,7 @@ ZBX_THREAD_ENTRY(watchdog_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zbx_vector_ptr_create(&recipients);

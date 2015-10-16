@@ -10,8 +10,6 @@ bin/win64/dev/zabbix_sender.lib -text
 bin/win64/zabbix_agentd.exe -text
 bin/win64/zabbix_get.exe -text
 bin/win64/zabbix_sender.exe -text
-build/win32/project/Makefile_sender_dll -text
-build/win32/project/Makefile_sender_dll_x64 -text
 create/src/data.tmpl -text
 frontends/php/app/.htaccess -text
 frontends/php/audio/alarm_average.wav -text
@@ -97,6 +95,7 @@ frontends/php/tests/unit/include/classes/import/xml/host18.xml svneol=native#tex
 frontends/php/tests/unit/include/classes/import/xml/hostAndTemplate.xml svneol=native#text/xml
 frontends/php/tests/unit/include/classes/import/xml/map.xml svneol=native#text/xml
 frontends/php/tests/unit/include/classes/import/xml/screen.xml svneol=native#text/xml
+include/zbxnix.h -text
 man/zabbix_agentd.man -text
 man/zabbix_get.man -text
 man/zabbix_proxy.man -text
@@ -394,6 +393,7 @@ sass/stylesheets/sass/_fonts.scss -text
 sass/stylesheets/sass/_mixins.scss -text
 sass/stylesheets/sass/dark-theme.scss -text
 sass/touch-icon-192x192.png -text svneol=unset#image/png
+src/libs/zbxnix/coredump.c -text
 src/libs/zbxsysinfo/win32/wmi.cpp -text
 src/zabbix_java/lib/README svneol=native#text/plain
 src/zabbix_java/lib/android-json-4.3_r3.1.jar -text
