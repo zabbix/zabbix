@@ -30,11 +30,11 @@ Load values from input file. Specify \fB-\fR as <inputfile> to read values from 
 
 Each value must be specified on its own line. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR, where "hostname" is the name of monitored host as registered in Zabbix frontend, "key" is target item key and "value" - the value to send. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument.
 
-An example of a line of the input file:
+An example of a line of an input file:
 
 \fB "Linux DB3" db.connections 43\fR
 
-The value type must be correctly set in item configuration of Zabbix frontend. Zabbix sender will send up to 250 values in one connection. Contents of the input file must be in the UTF-8 encoding. All values from an input file are sent in a sequential order top-down. Entries must be formatted using the following rules:
+The value type must be correctly set in item configuration of Zabbix frontend. Zabbix sender will send up to 250 values in one connection. Contents of the input file must be in the UTF-8 encoding. All values from the input file are sent in a sequential order top-down. Entries must be formatted using the following rules:
 
 .RS
 .RS
