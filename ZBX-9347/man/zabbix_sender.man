@@ -1,4 +1,4 @@
-.TH ZABBIX_SENDER 8 "1 October 2015"
+.TH ZABBIX_SENDER 8 "16 October 2015"
 .if n .ad l
 .SH NAME
 zabbix_sender \- Zabbix sender utility.
@@ -26,23 +26,15 @@ Specify item key to send value to.
 Specify value.
 .IP "-i, --input-file \fI<inputfile>\fR"
 
-Load values from input file. Specify \fB-\fR to read values from standard input.
+Load values from input file. Specify \fB-\fR as <inputfile> to read values from standard input.
 
-Each value must be specified on its own line. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR, where "hostname" is the name of monitored host as registered in Zabbix frontend, "key" is target item key and "value" - the value to send. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument. All entries are sent in a sequential order top-down.
+Each value must be specified on its own line. Each line must contain 3 whitespace delimited entries: \fB<hostname> <key> <value>\fR, where "hostname" is the name of monitored host as registered in Zabbix frontend, "key" is target item key and "value" - the value to send. Specify \fB-\fR as \fB<hostname>\fR to use hostname from agent configuration file or from \fB--host\fR argument.
 
 An example of a line of the input file:
 
 \fB "Linux DB3" db.connections 43\fR
 
-Note, that the value type must be correctly set in item configuration of Zabbix frontend.
-
-Zabbix sender will send up to 250 values in one connection.
-
-The contents of the file is accepted in UTF-8 encoding (for both UNIX-like systems and Windows).
-
-All values from an input file are sent in a sequential order top-down.
-
-Entries must be formatted using the following rules:
+The value type must be correctly set in item configuration of Zabbix frontend. Zabbix sender will send up to 250 values in one connection. Contents of the input file must be in the UTF-8 encoding. All values from an input file are sent in a sequential order top-down. Entries must be formatted using the following rules:
 
 .RS
 .RS
