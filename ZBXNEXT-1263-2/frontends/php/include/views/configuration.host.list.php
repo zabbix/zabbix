@@ -202,13 +202,22 @@ foreach ($data['hosts'] as $host) {
 		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
 			$out_encryption[] = (new CSpan(_('None')))->addClass('status-green');
 		}
+		else {
+			$out_encryption[] = (new CSpan(_('None')))->addClass('status-grey');
+		}
 
 		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
 			$out_encryption[] = (new CSpan(_('PSK')))->addClass('status-green');
 		}
+		else {
+			$out_encryption[] = (new CSpan(_('PSK')))->addClass('status-grey');
+		}
 
 		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
 			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-green');
+		}
+		else {
+			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-grey');
 		}
 
 		$encryption = (new CDiv([$in_encryption, ' ', $out_encryption]))->addClass('status-container');
