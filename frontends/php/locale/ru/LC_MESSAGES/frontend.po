@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 15:06+0300\n"
-"PO-Revision-Date: 2015-09-10 07:00+0300\n"
+"POT-Creation-Date: 2015-10-16 15:19+0300\n"
+"PO-Revision-Date: 2015-10-11 19:35+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1441861233.0\n"
+"X-POOTLE-MTIME: 1444584952.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -9580,7 +9580,7 @@ msgstr "Множественные события ПРОБЛЕМА"
 
 #: include/views/configuration.triggers.edit.php:250
 msgid "Multiple PROBLEM events generation"
-msgstr "Многократная генерация событий ПРОБЛЕМА"
+msgstr "Формирование множественных событий ПРОБЛЕМА"
 
 #: jsLoader.php:161
 msgid "Mute"
