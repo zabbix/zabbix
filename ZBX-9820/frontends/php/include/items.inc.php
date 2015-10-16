@@ -674,7 +674,7 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 
 	$items = array();
 	$item_counter = array();
-
+	$host_items = array();
 	foreach ($dbItems as $dbItem) {
 		$item_name = $dbItem['name_expanded'];
 		$host_name = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
@@ -684,19 +684,40 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 			$item_counter[$host_name] = array($item_name => 0);
 		}
 
-		$items[$item_name][$item_counter[$host_name][$item_name]][$host_name] = array(
-			'itemid' => $dbItem['itemid'],
-			'value_type' => $dbItem['value_type'],
-			'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
-			'units' => $dbItem['units'],
-			'name' => $dbItem['name_expanded'],
-			'valuemapid' => $dbItem['valuemapid'],
-			'severity' => $dbItem['priority'],
-			'tr_value' => $dbItem['tr_value'],
-			'triggerid' => $dbItem['triggerid']
-		);
+		if (!array_key_exists($item_name, $host_items) || !array_key_exists($host_name, $host_items[$item_name])) {
+			$host_items[$item_name][$host_name] = array();
+		}
 
-		$item_counter[$host_name][$item_name]++;
+		// a little tricky check for attempt to overwrite active trigger (value=1) with
+		// inactive or active trigger with lower priority.
+		if (!array_key_exists($dbItem['itemid'], $host_items[$item_name][$host_name])
+			|| (($host_items[$item_name][$host_name][$dbItem['itemid']]['tr_value'] == TRIGGER_VALUE_FALSE && $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+				|| (($host_items[$item_name][$host_name][$dbItem['itemid']]['tr_value'] == TRIGGER_VALUE_FALSE || $dbItem['tr_value'] == TRIGGER_VALUE_TRUE)
+					&& $dbItem['priority'] > $host_items[$item_name][$host_name][$dbItem['itemid']]['severity']))) {
+
+			if (array_key_exists($dbItem['itemid'], $host_items[$item_name][$host_name])) {
+				$item_place = $host_items[$item_name][$host_name][$dbItem['itemid']]['item_place'];
+			}
+			else {
+				$item_place = $item_counter[$host_name][$item_name];
+				$item_counter[$host_name][$item_name]++;
+			}
+
+			$items[$item_name][$item_place][$host_name] = array(
+				'itemid' => $dbItem['itemid'],
+				'value_type' => $dbItem['value_type'],
+				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
+				'units' => $dbItem['units'],
+				'name' => $dbItem['name_expanded'],
+				'valuemapid' => $dbItem['valuemapid'],
+				'severity' => $dbItem['priority'],
+				'tr_value' => $dbItem['tr_value'],
+				'triggerid' => $dbItem['triggerid'],
+				'item_place' => $item_place
+			);
+
+			$host_items[$item_name][$host_name][$dbItem['itemid']] = $items[$item_name][$item_place][$host_name];
+		}
 	}
 
 	$table = new CTableInfo(_('No items found.'));
