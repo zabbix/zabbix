@@ -540,47 +540,17 @@ class CValueMap extends CApiService {
 
 		// Select mappings for value map.
 		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
-			$relation_map = $this->createRelationMap($result, 'valuemapid', 'mappingid', 'mappings');
+			$db_mappings = API::getApiService()->select('mappings', [
+				'output' => $this->outputExtend($options['selectMappings'], ['valuemapid']),
+				'filter' => array_key_exists('valuemapids', $options) ? ['valuemapid' => $options['valuemapids']] : null
+			]);
 
-			// Set output fields.
-			if (is_array($options['selectMappings'])) {
-				$pk_field = $this->pk('mappings');
-
-				$output_fields = [
-					$pk_field => $this->fieldId($pk_field, 'm')
-				];
-
-				foreach ($options['selectMappings'] as $field) {
-					if ($this->hasField($field, 'mappings')) {
-						$output_fields[$field] = $this->fieldId($field, 'm');
-					}
-				}
-
-				$output_fields = implode(',', $output_fields);
-			}
-			else {
-				$output_fields = 'm.*';
-			}
-
-			$db_mappings = DBfetchArray(DBselect(
-				'SELECT '.$output_fields.
-				' FROM mappings m'.
-				' WHERE '.dbConditionInt('m.mappingid', $relation_map->getRelatedIds())
-			));
-			$db_mappings = zbx_toHash($db_mappings, 'mappingid');
-
-			foreach ($db_mappings as $i => &$db_mapping) {
-				// These fields are for internal usage and must not be in output.
+			foreach ($db_mappings as $db_mapping) {
+				$valuemapid = $db_mapping['valuemapid'];
 				unset($db_mapping['mappingid'], $db_mapping['valuemapid']);
 
-				// Remove record from output if no fields to display.
-				if (!$db_mappings[$i]) {
-					unset($db_mappings[$i]);
-				}
+				$result[$valuemapid]['mappings'][] = $db_mapping;
 			}
-			unset($db_mapping);
-
-			$result = $relation_map->mapMany($result, $db_mappings, 'mappings');
 		}
 
 		return $result;
