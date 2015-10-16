@@ -23,8 +23,8 @@
 static const char	copyright_message[] =
 	"Copyright (C) 2015 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
-	"This is free software: you are free to change and redistribute it according to the license.\n"
-	"There is NO WARRANTY, to the extent permitted by law.";
+	"This is free software: you are free to change and redistribute it according to\n"
+	"the license. There is NO WARRANTY, to the extent permitted by law.";
 
 static const char	help_message_footer[] =
 	"Report bugs to: <https://support.zabbix.com>\n"
@@ -33,9 +33,10 @@ static const char	help_message_footer[] =
 
 /******************************************************************************
  *                                                                            *
- * Function: app_title                                                        *
+ * Function: version                                                          *
  *                                                                            *
- * Purpose: print title of application on stdout                              *
+ * Purpose: print version and compilation time of application on stdout       *
+ *          by application request with parameter '-V'                        *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -43,24 +44,9 @@ static const char	help_message_footer[] =
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-static void	app_title(void)
-{
-	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: version                                                          *
- *                                                                            *
- * Purpose: print version and compilation time of application on stdout       *
- *          by application request with parameter '-v'                        *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- ******************************************************************************/
 void	version(void)
 {
-	app_title();
+	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
 }
@@ -69,7 +55,8 @@ void	version(void)
  *                                                                            *
  * Function: usage                                                            *
  *                                                                            *
- * Purpose: print application parameters on stdout                            *
+ * Purpose: print application parameters on stdout with layout suitable for   *
+ *          80-column terminal                                                *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -79,13 +66,47 @@ void	version(void)
  ******************************************************************************/
 void	usage(void)
 {
+#define ZBX_MAXCOL	79
+#define ZBX_SPACE1	"  "			/* left margin for the first line */
+#define ZBX_SPACE2	"               "	/* left margin for subsequent lines */
 	const char	**p = usage_message;
 
 	if (NULL != *p)
 		printf("usage:\n");
 
 	while (NULL != *p)
-		printf("       %s %s\n", progname, *p++);
+	{
+		size_t	pos;
+
+		printf("%s%s", ZBX_SPACE1, progname);
+		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(progname);
+
+		while (NULL != *p)
+		{
+			size_t	len;
+
+			len = strlen(*p);
+
+			if (ZBX_MAXCOL > pos + len)
+			{
+				pos += len + 1;
+				printf(" %s", *p);
+			}
+			else
+			{
+				pos = ZBX_CONST_STRLEN(ZBX_SPACE2) + len + 1;
+				printf("\n%s %s", ZBX_SPACE2, *p);
+			}
+
+			p++;
+		}
+
+		printf("\n");
+		p++;
+	}
+#undef ZBX_MAXCOL
+#undef ZBX_SPACE1
+#undef ZBX_SPACE2
 }
 
 /******************************************************************************
@@ -509,7 +530,7 @@ void	zbx_remove_chars(register char *str, const char *charlist)
  * Purpose: Copy src to string dst of size siz. At most siz - 1 characters    *
  *          will be copied. Always null terminates (unless siz == 0).         *
  *                                                                            *
- * Return value : the number of characters copied (excluding the null byte)   *
+ * Return value: the number of characters copied (excluding the null byte)    *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
@@ -546,6 +567,30 @@ void	zbx_strlcat(char *dst, const char *src, size_t siz)
 	}
 
 	zbx_strlcpy(dst, src, siz);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_strlcpy_utf8                                                 *
+ *                                                                            *
+ * Purpose: copies utf-8 string + terminating zero character into specified   *
+ *          buffer                                                            *
+ *                                                                            *
+ * Return value: the number of copied bytes excluding terminating zero        *
+ *               character.                                                   *
+ *                                                                            *
+ * Comments: If the source string is larger than destination buffer then the  *
+ *           string is truncated after last valid utf-8 character rather than *
+ *           byte.                                                            *
+ *                                                                            *
+ ******************************************************************************/
+size_t	zbx_strlcpy_utf8(char *dst, const char *src, size_t size)
+{
+	size = zbx_strlen_utf8_nbytes(src, size - 1);
+	memcpy(dst, src, size);
+	dst[size] = '\0';
+
+	return size;
 }
 
 /******************************************************************************
@@ -2186,6 +2231,27 @@ int	cmp_key_id(const char *key_1, const char *key_2)
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
 }
 
+const char	*get_program_type_string(unsigned char program_type)
+{
+	switch (program_type)
+	{
+		case ZBX_PROGRAM_TYPE_SERVER:
+			return "server";
+		case ZBX_PROGRAM_TYPE_PROXY_ACTIVE:
+		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
+			return "proxy";
+		case ZBX_PROGRAM_TYPE_AGENTD:
+		case ZBX_PROGRAM_TYPE_AGENT:
+			return "agent";
+		case ZBX_PROGRAM_TYPE_SENDER:
+			return "sender";
+		case ZBX_PROGRAM_TYPE_GET:
+			return "get";
+		default:
+			return "unknown";
+	}
+}
+
 const char	*zbx_permission_string(int perm)
 {
 	switch (perm)
@@ -3404,4 +3470,3 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
 
 	return arg_esc;
 }
-

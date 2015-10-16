@@ -252,7 +252,8 @@ function make_small_eventlist($startEvent, $backurl) {
 			$duration,
 			zbx_date2age($event['clock']),
 			$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null,
-			isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : SPACE
+			(new CCol(isset($actions[$event['eventid']]) ? $actions[$event['eventid']] : ''))
+				->addClass(ZBX_STYLE_NOWRAP)
 		]);
 	}
 

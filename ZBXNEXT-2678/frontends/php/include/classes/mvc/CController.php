@@ -110,6 +110,15 @@ class CController {
 	}
 
 	/**
+	 * Return debug mode.
+	 *
+	 * @return var
+	 */
+	public function getDebugMode() {
+		return CWebUser::getDebugMode();
+	}
+
+	/**
 	 * Return user type.
 	 *
 	 * @return var
