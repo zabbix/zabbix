@@ -539,17 +539,38 @@ class CValueMap extends CApiService {
 		$result = parent::addRelatedObjects($options, $result);
 
 		// Select mappings for value map.
-		if ($options['selectMappings'] !== null && $options['selectMappings'] != API_OUTPUT_COUNT) {
-			$db_mappings = API::getApiService()->select('mappings', [
-				'output' => $this->outputExtend($options['selectMappings'], ['valuemapid']),
-				'filter' => array_key_exists('valuemapids', $options) ? ['valuemapid' => $options['valuemapids']] : null
-			]);
+		if ($options['selectMappings'] !== null) {
+			if ($options['selectMappings'] == API_OUTPUT_COUNT) {
+				$db_mappings = API::getApiService()->select('mappings', [
+					'output' => ['valuemapid'],
+					'filter' => array_key_exists('valuemapids', $options)
+						? ['valuemapid' => $options['valuemapids']]
+						: null
+				]);
 
-			foreach ($db_mappings as $db_mapping) {
-				$valuemapid = $db_mapping['valuemapid'];
-				unset($db_mapping['mappingid'], $db_mapping['valuemapid']);
+				foreach ($db_mappings as $db_mapping) {
+					$valuemapid = $db_mapping['valuemapid'];
+					if (!array_key_exists('mappings', $result[$valuemapid])) {
+						$result[$valuemapid]['mappings'] = 0;
+					}
 
-				$result[$valuemapid]['mappings'][] = $db_mapping;
+					$result[$valuemapid]['mappings']++;
+				}
+			}
+			else {
+				$db_mappings = API::getApiService()->select('mappings', [
+					'output' => $this->outputExtend($options['selectMappings'], ['valuemapid']),
+					'filter' => array_key_exists('valuemapids', $options)
+						? ['valuemapid' => $options['valuemapids']]
+						: null
+				]);
+
+				foreach ($db_mappings as $db_mapping) {
+					$valuemapid = $db_mapping['valuemapid'];
+					unset($db_mapping['mappingid'], $db_mapping['valuemapid']);
+
+					$result[$valuemapid]['mappings'][] = $db_mapping;
+				}
 			}
 		}
 
