@@ -26,7 +26,20 @@ typedef int	ssize_t;
 #	else
 typedef long	ssize_t;
 #	endif
+#endif
 
+#if defined(HAVE_POLARSSL)
+#	if defined(_WINDOWS) && defined(uint32_t)
+#		undef uint32_t
+#	endif
+#	include <polarssl/ssl.h>
+#elif defined(HAVE_GNUTLS)
+#	include <gnutls/gnutls.h>
+#elif defined(HAVE_OPENSSL)
+#	include <openssl/ssl.h>
+#endif
+
+#if defined(_WINDOWS)
 #	define ZBX_TCP_WRITE(s, b, bl)	((ssize_t)send((s), (b), (bl), 0))
 #	define ZBX_TCP_READ(s, b, bl)	((ssize_t)recv((s), (b), (bl), 0))
 #	define zbx_socket_close(s)	if (ZBX_SOCKET_ERROR != (s)) closesocket(s)
@@ -62,17 +75,29 @@ zbx_buf_type_t;
 
 typedef struct
 {
-	int		num_socks;
-	ZBX_SOCKET	sockets[ZBX_SOCKET_COUNT];
-	ZBX_SOCKET	socket;
-	ZBX_SOCKET	socket_orig;
-	size_t		read_bytes;
-	zbx_buf_type_t	buf_type;
-	char		buf_stat[ZBX_STAT_BUF_LEN];
-	char		*buffer;
-	unsigned char	accepted;
-	char		*next_line;
-	int		timeout;
+	ZBX_SOCKET			socket;
+	ZBX_SOCKET			socket_orig;
+	size_t				read_bytes;
+	char				*buffer;
+	char				*next_line;
+#if defined(HAVE_POLARSSL)
+	ssl_context			*tls_ctx;
+#elif defined(HAVE_GNUTLS)
+	gnutls_session_t		tls_ctx;
+	gnutls_psk_client_credentials_t	tls_psk_client_creds;
+	gnutls_psk_server_credentials_t	tls_psk_server_creds;
+#elif defined(HAVE_OPENSSL)
+	SSL				*tls_ctx;
+#endif
+	unsigned int 			connection_type;	/* type of connection actually established: */
+								/* ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
+								/* ZBX_TCP_SEC_TLS_CERT */
+	int				timeout;
+	zbx_buf_type_t			buf_type;
+	unsigned char			accepted;
+	int				num_socks;
+	ZBX_SOCKET			sockets[ZBX_SOCKET_COUNT];
+	char				buf_stat[ZBX_STAT_BUF_LEN];
 }
 zbx_socket_t;
 
@@ -83,9 +108,17 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 #endif
 
 void	zbx_tcp_init(zbx_socket_t *s, ZBX_SOCKET o);
-int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout);
+int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
+		unsigned int tls_connect, char *tls_arg1, char *tls_arg2);
 
 #define ZBX_TCP_PROTOCOL	0x01
+
+#define ZBX_TCP_SEC_UNENCRYPTED		1		/* do not use encryption with this socket */
+#define ZBX_TCP_SEC_TLS_PSK		2		/* use TLS with pre-shared key (PSK) with this socket */
+#define ZBX_TCP_SEC_TLS_CERT		4		/* use TLS with certificate with this socket */
+#define ZBX_TCP_SEC_UNENCRYPTED_TXT	"unencrypted"
+#define ZBX_TCP_SEC_TLS_PSK_TXT		"psk"
+#define ZBX_TCP_SEC_TLS_CERT_TXT	"cert"
 
 #define zbx_tcp_send(s, d)				zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, 0)
 #define zbx_tcp_send_to(s, d, timeout)			zbx_tcp_send_ext((s), (d), strlen(d), ZBX_TCP_PROTOCOL, timeout)
@@ -102,7 +135,7 @@ int	get_address_family(const char *addr, int *family, char *error, int max_error
 
 int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port);
 
-int	zbx_tcp_accept(zbx_socket_t *s);
+int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept);
 void	zbx_tcp_unaccept(zbx_socket_t *s);
 
 #define ZBX_TCP_READ_UNTIL_CLOSE 0x01

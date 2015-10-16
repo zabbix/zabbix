@@ -10,4 +10,5 @@ libzbxnix_a_SOURCES = \
 	sighandler.c \
 	sigcommon.h \
 	control.c control.h \
-	dshm.c
+	dshm.c \
+	coredump.c
