@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha4
 
 New features:
+...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
 
