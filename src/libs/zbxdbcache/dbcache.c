@@ -3186,7 +3186,10 @@ void	DCupdate_hosts_availability()
 				hosts.values[i].first);
 
 		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+		{
+			DBrollback();
 			goto out;
+		}
 	}
 
 	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -3196,11 +3199,6 @@ void	DCupdate_hosts_availability()
 
 	DBcommit();
 out:
-	/* if transaction level is not 0 it means that database commit */
-	/* was not done because of errors - do rollback instead        */
-	if (0 != zbx_db_txn_level())
-		DBrollback();
-
 	zbx_vector_uint64_pair_destroy(&hosts);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
