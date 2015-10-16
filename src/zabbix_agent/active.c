@@ -36,7 +36,7 @@
 #include "zbxjson.h"
 #include "alias.h"
 
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 #if defined(ZABBIX_SERVICE)
@@ -44,6 +44,8 @@ extern int		server_num, process_num;
 #elif defined(ZABBIX_DAEMON)
 #	include "daemon.h"
 #endif
+
+#include "../libs/zbxcrypto/tls.h"
 
 ZBX_THREAD_LOCAL static ZBX_ACTIVE_BUFFER	buffer;
 ZBX_THREAD_LOCAL static zbx_vector_ptr_t	active_metrics;
@@ -488,8 +490,9 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	const char	*__function_name = "refresh_active_checks";
 
 	ZBX_THREAD_LOCAL static int	last_ret = SUCCEED;
-	zbx_socket_t			s;
 	int				ret;
+	char				*tls_arg1 = NULL, *tls_arg2 = NULL;
+	zbx_socket_t			s;
 	struct zbx_json			json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%hu", __function_name, host, port);
@@ -559,7 +562,21 @@ static int	refresh_active_checks(const char *host, unsigned short port)
 	if (ZBX_DEFAULT_AGENT_PORT != CONFIG_LISTEN_PORT)
 		zbx_json_adduint64(&json, ZBX_PROTO_TAG_PORT, CONFIG_LISTEN_PORT);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT)))
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
+	}
+
+	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
+#endif
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, CONFIG_TIMEOUT,
+			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "sending [%s]", json.buffer);
 
@@ -660,12 +677,13 @@ static int	check_response(char *response)
 static int	send_buffer(const char *host, unsigned short port)
 {
 	const char			*__function_name = "send_buffer";
-	struct zbx_json 		json;
 	ZBX_ACTIVE_BUFFER_ELEMENT	*el;
-	zbx_socket_t			s;
 	int				ret = SUCCEED, i, now;
+	char				*tls_arg1 = NULL, *tls_arg2 = NULL;
 	zbx_timespec_t			ts;
 	const char			*err_send_step = "";
+	zbx_socket_t			s;
+	struct zbx_json 		json;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' port:%d entries:%d/%d",
 			__function_name, host, port, buffer.count, CONFIG_BUFFER_SIZE);
@@ -721,8 +739,21 @@ static int	send_buffer(const char *host, unsigned short port)
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_CLOCK, ts.sec);
 	zbx_json_adduint64(&json, ZBX_PROTO_TAG_NS, ts.ns);
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port,
-					MIN(buffer.count * CONFIG_TIMEOUT, 60))))
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
+	}
+
+	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
+#endif
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, host, port, MIN(buffer.count * CONFIG_TIMEOUT, 60),
+			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 
@@ -1540,7 +1571,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	activechk_args.host = zbx_strdup(NULL, ((ZBX_THREAD_ACTIVECHK_ARGS *)((zbx_thread_args_t *)args)->args)->host);
@@ -1548,6 +1579,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	zbx_free(args);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	init_active_metrics();
 
 	while (ZBX_IS_RUNNING())

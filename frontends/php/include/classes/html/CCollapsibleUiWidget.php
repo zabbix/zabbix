@@ -77,10 +77,10 @@ class CCollapsibleUiWidget extends CUiWidget {
 		}
 
 		$this->cleanItems();
-
 		$this->addItem($this->header);
 		$this->addItem($body);
 		$this->addItem($this->footer);
+
 		return $this;
 	}
 

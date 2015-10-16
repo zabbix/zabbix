@@ -64,7 +64,7 @@ class CControllerProxyList extends CController {
 		];
 
 		$data['proxies'] = API::Proxy()->get([
-			'output' => ['proxyid', 'host', 'status', 'lastaccess'],
+			'output' => ['proxyid', 'host', 'status', 'lastaccess', 'tls_connect', 'tls_accept'],
 			'selectHosts' => ['hostid', 'name', 'status'],
 			'sortfield' => $sortField,
 			'limit' => $config['search_limit'] + 1,

@@ -25,22 +25,23 @@
 #include "dbcache.h"
 #include "zbxjson.h"
 
-#define MACRO_TYPE_MESSAGE_NORMAL	0x0001
-#define MACRO_TYPE_MESSAGE_RECOVERY	0x0002
-#define MACRO_TYPE_TRIGGER_URL		0x0004
-#define MACRO_TYPE_TRIGGER_EXPRESSION	0x0008
-#define MACRO_TYPE_TRIGGER_DESCRIPTION	0x0010	/* name */
-#define MACRO_TYPE_TRIGGER_COMMENTS	0x0020	/* description */
-#define MACRO_TYPE_ITEM_KEY		0x0040
-#define MACRO_TYPE_ITEM_EXPRESSION	0x0080
-#define MACRO_TYPE_INTERFACE_ADDR	0x0100
-#define MACRO_TYPE_INTERFACE_ADDR_DB	0x0200
-#define MACRO_TYPE_COMMON		0x0400
-#define MACRO_TYPE_PARAMS_FIELD		0x0800
-#define MACRO_TYPE_SCRIPT		0x1000
-#define MACRO_TYPE_SNMP_OID		0x2000
-#define MACRO_TYPE_HTTPTEST_FIELD	0x4000
-#define MACRO_TYPE_LLD_FILTER		0x8000
+#define MACRO_TYPE_MESSAGE_NORMAL	0x00000001
+#define MACRO_TYPE_MESSAGE_RECOVERY	0x00000002
+#define MACRO_TYPE_TRIGGER_URL		0x00000004
+#define MACRO_TYPE_TRIGGER_EXPRESSION	0x00000008
+#define MACRO_TYPE_TRIGGER_DESCRIPTION	0x00000010	/* name */
+#define MACRO_TYPE_TRIGGER_COMMENTS	0x00000020	/* description */
+#define MACRO_TYPE_ITEM_KEY		0x00000040
+#define MACRO_TYPE_ITEM_EXPRESSION	0x00000080
+#define MACRO_TYPE_INTERFACE_ADDR	0x00000100
+#define MACRO_TYPE_INTERFACE_ADDR_DB	0x00000200
+#define MACRO_TYPE_COMMON		0x00000400
+#define MACRO_TYPE_PARAMS_FIELD		0x00000800
+#define MACRO_TYPE_SCRIPT		0x00001000
+#define MACRO_TYPE_SNMP_OID		0x00002000
+#define MACRO_TYPE_HTTPTEST_FIELD	0x00004000
+#define MACRO_TYPE_LLD_FILTER		0x00008000
+#define MACRO_TYPE_ALERT		0x00010000
 
 #define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
 
@@ -50,8 +51,8 @@ int	evaluate_function(char *value, DC_ITEM *item, const char *function, const ch
 		char **error);
 
 int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_EVENT *r_event, zbx_uint64_t *userid,
-		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, zbx_hashset_t *macro_cache, char **data,
-		int macro_type, char *error, int maxerrlen);
+		zbx_uint64_t *hostid, DC_HOST *dc_host, DC_ITEM *dc_item, DB_ALERT *alert, zbx_hashset_t *macro_cache,
+		char **data, int macro_type, char *error, int maxerrlen);
 
 void	evaluate_expressions(zbx_vector_ptr_t *triggers);
 
