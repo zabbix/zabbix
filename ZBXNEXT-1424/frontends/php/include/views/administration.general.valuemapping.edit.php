@@ -79,10 +79,21 @@ $tab = (new CTabView())->addTab('valuemap_tab', _('Value mapping'), $form_list);
 
 // append buttons
 if ($data['valuemapid'] != 0) {
+	if ($data['valuemap_count'] == 0) {
+		$confirm_message = _('Delete selected value mapping?');
+	}
+	else {
+		$confirm_message = _n(
+			'Delete selected value mapping? It is used for %d item!',
+			'Delete selected value mapping? It is used for %d items!',
+			$data['valuemap_count']
+		);
+	}
+
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
-			new CButtonDelete($data['confirmMessage'], url_param('valuemapid')),
+			new CButtonDelete($confirm_message, url_param('valuemapid')),
 			new CButtonCancel()
 		]
 	));
