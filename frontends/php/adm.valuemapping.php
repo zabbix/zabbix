@@ -98,7 +98,7 @@ if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
-		'confirmMessage' => null
+		'valuemap_count' => 0
 	];
 
 	if ($data['valuemapid'] != 0 && !hasRequest('form_refresh')) {
@@ -121,17 +121,7 @@ if (hasRequest('form')) {
 		$valuemap_count = DBfetch(DBselect(
 			'SELECT COUNT(*) AS cnt FROM items i WHERE i.valuemapid='.zbx_dbstr($data['valuemapid'])
 		));
-
-		if ($valuemap_count['cnt'] == 0) {
-			$data['confirmMessage'] = _('Delete selected value mapping?');
-		}
-		else {
-			$data['confirmMessage'] = _n(
-				'Delete selected value mapping? It is used for %d item!',
-				'Delete selected value mapping? It is used for %d items!',
-				$valuemap_count['cnt']
-			);
-		}
+		$data['valuemap_count'] = $valuemap_count['cnt'];
 	}
 
 	if (!$data['mappings']) {
