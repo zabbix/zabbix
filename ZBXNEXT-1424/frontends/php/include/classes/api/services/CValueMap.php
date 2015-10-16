@@ -184,6 +184,10 @@ class CValueMap extends CApiService {
 			foreach ($db_valuemaps as $db_valuemap) {
 				$upd_valuemap = $upd_valuemaps[$db_valuemap['valuemapid']];
 
+				if (!array_key_exists('name', $upd_valuemap)) {
+					continue;
+				}
+
 				// Skip updating value maps, if name was not changed.
 				if ($upd_valuemap['name'] !== $db_valuemap['name']) {
 					$update[] = [
