@@ -39,10 +39,10 @@ struct MemoryStruct
 static size_t write_memory_callback(void *contents, size_t size, size_t nmemb, void *userp)
 {
 	const char	*__function_name = "write_memory_callback";
-	size_t		realsize = size * nmemb;
+	size_t		real_size = size * nmemb;
 	struct		MemoryStruct *mem = (struct MemoryStruct *) userp;
 
-	mem->memory = zbx_realloc(mem->memory, mem->size + realsize + 1);
+	mem->memory = zbx_realloc(mem->memory, mem->size + real_size + 1);
 	if (mem->memory == NULL)
 	{
 		/* out of memory! */
@@ -50,61 +50,97 @@ static size_t write_memory_callback(void *contents, size_t size, size_t nmemb, v
 		return FAIL;
 	}
 
-	memcpy(&(mem->memory[mem->size]), contents, realsize);
-	mem->size += realsize;
+	memcpy(&(mem->memory[mem->size]), contents, real_size);
+	mem->size += real_size;
 	mem->memory[mem->size] = 0;
 
-	return realsize;
+	return real_size;
 }
-#endif
+#endif /* HAVE_LIBCURL */
 
-static int	get_http_page(const char *host, const char *path, unsigned short port, char *buffer, size_t max_buffer_len)
+static int 	get_http_page(const char *host, const char *path, unsigned short port, char *headers, char *buffer,
+		size_t max_buffer_len)
 {
 #ifdef HAVE_LIBCURL
-	CURL		*curl_handle;
-	CURLcode	ret;
+	CURL			*curl_handle;
+	CURLcode		res;
+	char			*header_params[MAX_STRING_LEN];
+	long			size = ZBX_MAX_WEBPAGE_SIZE;
+	int			param_count = 0, ret = SYSINFO_RET_FAIL, i;
 
-	struct MemoryStruct chunk;
+	struct MemoryStruct	chunk;
+	struct curl_slist	*slist = NULL;
 
-	chunk.memory = zbx_malloc(chunk.memory, 1); /* will be grown as needed by the realloc above */
+	chunk.memory = zbx_malloc(chunk.memory, size); /* will be grown as needed by the realloc above */
 	chunk.size = 0; /* no data at this point */
 
 	/* init the curl session */
 	curl_handle = curl_easy_init();
-
-	/* specify URL to get */
-	curl_easy_setopt(curl_handle, CURLOPT_URL, host);
-
-	/* pass headers to the data stream */
-	curl_easy_setopt(curl_handle, CURLOPT_HEADER, 1L);
-
-	/* send all data to this function  */
-	curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_memory_callback);
-
-	/* we pass our 'chunk' struct to the callback function */
-	curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void * )&chunk);
-
-	/* some servers don't like requests that are made without a user-agent field, so we provide one */
-	curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "libcurl-agent/1.0");
-
-	/* get it! */
-	ret = curl_easy_perform(curl_handle);
-
-	/* check for errors */
-	if (ret != CURLE_OK)
+	if (curl_handle)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "curl_easy_perform() failed: %s\n", curl_easy_strerror(ret));
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "%lu bytes retrieved\n", (long) chunk.size);
-		zbx_strlcpy(buffer, chunk.memory, max_buffer_len);
-	}
+		if ('\0' != *headers)
+		{
+			/* Removing a header that curl is adding by itself */
+			slist = curl_slist_append(slist, "Accept:");
 
-	/* cleanup curl stuff */
-	curl_easy_cleanup(curl_handle);
+			if (0 == (param_count = num_param(headers)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "headers are badly formatted");
+				goto out;
+			}
 
-	free(chunk.memory);
+			for (i = 0; i < param_count; i++)
+				header_params[i] = get_param_dyn(headers, i + 1);
+
+			/* Add all custom headers */
+			for (i = 0; i < param_count; i++)
+				slist = curl_slist_append(slist, header_params[i]);
+
+			/* set our custom set of headers */
+			res = curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, slist);
+		}
+
+		/* set verbose mode on/off for debugging */
+		curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);
+
+		/* specify URL to get */
+		curl_easy_setopt(curl_handle, CURLOPT_URL, host);
+
+		/* follow locations specified by the response header */
+		curl_easy_setopt(curl_handle, CURLOPT_FOLLOWLOCATION, 1);
+
+		/* send all data to this function  */
+		curl_easy_setopt(curl_handle, CURLOPT_WRITEFUNCTION, write_memory_callback);
+
+		/* we pass our 'chunk' struct to the callback function */
+		curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void * )&chunk);
+
+		/* some servers don't like requests that are made without a user-agent field, so we provide one */
+		curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "Zabbix 3.0.0");
+
+		/* get it! */
+		res = curl_easy_perform(curl_handle);
+
+		/* check for errors */
+		if (res != CURLE_OK)
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "curl_easy_perform() failed: %s", curl_easy_strerror(ret));
+			ret = SYSINFO_RET_FAIL;
+		}
+		else
+		{
+			zbx_strlcpy(buffer, chunk.memory, max_buffer_len);
+			ret = SYSINFO_RET_OK;
+		}
+
+		/* cleanup curl stuff */
+		curl_easy_cleanup(curl_handle);
+
+		/* free the custom headers */
+		curl_slist_free_all(slist);
+	}
+out:
+	zbx_free(chunk.memory);
 
 	return ret;
 #else
@@ -145,10 +181,11 @@ static int	get_http_page(const char *host, const char *path, unsigned short port
 
 int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*hostname, *path_str, *port_str, buffer[MAX_BUFFER_LEN], path[MAX_STRING_LEN];
+	char		*hostname, *path_str, *port_str, *header_str, buffer[MAX_BUFFER_LEN],
+			path[MAX_STRING_LEN], header[MAX_STRING_LEN];
 	unsigned short	port_number;
 
-	if (3 < request->nparam)
+	if (4 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
 		return SYSINFO_RET_FAIL;
@@ -157,6 +194,7 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 	hostname = get_rparam(request, 0);
 	path_str = get_rparam(request, 1);
 	port_str = get_rparam(request, 2);
+	header_str = get_rparam(request, 3);
 
 	if (NULL == hostname || '\0' == *hostname)
 	{
@@ -177,7 +215,12 @@ int	WEB_PAGE_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, sizeof(buffer)))
+	if (NULL == header_str)
+		*header = '\0';
+	else
+		strscpy(header, header_str);
+
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, header, buffer, sizeof(buffer)))
 	{
 		zbx_rtrim(buffer, "\r\n");
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
@@ -225,7 +268,7 @@ int	WEB_PAGE_PERF(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	start_time = zbx_time();
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, NULL, 0))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, NULL, NULL, 0))
 		SET_DBL_RESULT(result, zbx_time() - start_time);
 	else
 		SET_DBL_RESULT(result, 0.0);
@@ -293,7 +336,7 @@ int	WEB_PAGE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	buffer = zbx_malloc(buffer, ZBX_MAX_WEBPAGE_SIZE);
 
-	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, buffer, ZBX_MAX_WEBPAGE_SIZE))
+	if (SYSINFO_RET_OK == get_http_page(hostname, path, port_number, NULL, buffer, ZBX_MAX_WEBPAGE_SIZE))
 	{
 		for (str = buffer; ;)
 		{
