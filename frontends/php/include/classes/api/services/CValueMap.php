@@ -53,11 +53,7 @@ class CValueMap extends CApiService {
 	public function get($options = []) {
 		$options = zbx_array_merge($this->getOptions, $options);
 
-		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN) {
-		}
-		elseif ($options['editable'] === null && self::$userData['type'] == USER_TYPE_ZABBIX_ADMIN) {
-		}
-		elseif ($options['editable'] !== null || self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if ($options['editable'] !== null && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			return [];
 		}
 
