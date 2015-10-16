@@ -363,8 +363,22 @@ var jqBlink = {
  */
 var hintBox = {
 
-	createBox: function(e, target, hintText, className, isStatic) {
+	createBox: function(e, target, hintText, className, isStatic, styles) {
 		var box = jQuery('<div></div>').addClass('overlay-dialogue');
+
+		if (styles) {
+			// property1: value1; property2: value2; property(n): value(n)
+
+			var style_list = styles.split(';');
+
+			for (var i = 0; i < style_list.length; i++) {
+				var style_props = style_list[i].split(':');
+
+				if (style_props[1]) {
+					box.css(style_props[0].trim(), style_props[1].trim());
+				}
+			}
+		}
 
 		if (typeof hintText === 'string') {
 			hintText = hintText.replace(/\n/g, '<br />');
@@ -392,14 +406,14 @@ var hintBox = {
 		return box;
 	},
 
-	HintWraper: function(e, target, hintText, className) {
+	HintWraper: function(e, target, hintText, className, styles) {
 		target.isStatic = false;
 
 		jQuery(target).on('mouseenter', function(e, d) {
 			if (d) {
 				e = d;
 			}
-			hintBox.showHint(e, target, hintText, className, false);
+			hintBox.showHint(e, target, hintText, className, false, styles);
 
 		}).on('mouseleave', function(e) {
 			hintBox.hideHint(e, target);
@@ -412,13 +426,13 @@ var hintBox = {
 		jQuery(target).trigger('mouseenter', e);
 	},
 
-	showStaticHint: function(e, target, hint, className, resizeAfterLoad) {
+	showStaticHint: function(e, target, hint, className, resizeAfterLoad, styles) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
 		if (!isStatic) {
 			target.isStatic = true;
-			hintBox.showHint(e, target, hint, className, true);
+			hintBox.showHint(e, target, hint, className, true, styles);
 
 			if (resizeAfterLoad) {
 				hint.one('load', function(e) {
@@ -428,12 +442,12 @@ var hintBox = {
 		}
 	},
 
-	showHint: function(e, target, hintText, className, isStatic) {
+	showHint: function(e, target, hintText, className, isStatic, styles) {
 		if (target.hintBoxItem) {
 			return;
 		}
 
-		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic);
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic, styles);
 		hintBox.positionHint(e, target);
 		target.hintBoxItem.show();
 	},
