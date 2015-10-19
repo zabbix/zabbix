@@ -44,12 +44,12 @@ check_fields($fields);
  * Permissions
  */
 if (hasRequest('valuemapid')) {
-	$valuemap = API::ValueMap()->get([
+	$valuemaps = API::ValueMap()->get([
 		'output' => ['valuemapid'],
 		'valuemapids' => [getRequest('valuemapid')]
 	]);
 
-	if (!$valuemap) {
+	if (!$valuemaps) {
 		access_deny();
 	}
 }
@@ -81,7 +81,6 @@ if (hasRequest('add') || hasRequest('update')) {
 	}
 }
 elseif (hasRequest('delete') && hasRequest('valuemapid')) {
-
 	$result = (bool) API::ValueMap()->delete([getRequest('valuemapid')]);
 
 	show_messages($result, _('Value map deleted'), _('Cannot delete value map'));
@@ -104,7 +103,7 @@ if (hasRequest('form')) {
 	if ($data['valuemapid'] != 0 && !hasRequest('form_refresh')) {
 		$valuemaps = API::ValueMap()->get([
 			'output' => ['valuemapid', 'name'],
-			'selectMappings' => ['mappingid', 'value', 'newvalue'],
+			'selectMappings' => ['value', 'newvalue'],
 			'valuemapids' => [$data['valuemapid']]
 		]);
 		$valuemap = reset($valuemaps);
@@ -133,7 +132,7 @@ if (hasRequest('form')) {
 else {
 	$data['valuemaps'] = API::ValueMap()->get([
 		'output' => ['valuemapid', 'name'],
-		'selectMappings' => ['mappingid', 'value', 'newvalue']
+		'selectMappings' => ['value', 'newvalue']
 	]);
 	order_result($data['valuemaps'], 'name');
 
