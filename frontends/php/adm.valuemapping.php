@@ -117,10 +117,15 @@ if (hasRequest('form')) {
 	}
 
 	if ($data['valuemapid'] != 0) {
-		$valuemap_count = DBfetch(DBselect(
-			'SELECT COUNT(*) AS cnt FROM items i WHERE i.valuemapid='.zbx_dbstr($data['valuemapid'])
-		));
-		$data['valuemap_count'] = $valuemap_count['cnt'];
+		$data['valuemap_count'] += API::Item()->get([
+			'countOutput' => true,
+			'webitems' => true,
+			'filter' => ['valuemapid' => $data['valuemapid']]
+		]);
+		$data['valuemap_count'] += API::ItemPrototype()->get([
+			'countOutput' => true,
+			'filter' => ['valuemapid' => $data['valuemapid']]
+		]);
 	}
 
 	if (!$data['mappings']) {
