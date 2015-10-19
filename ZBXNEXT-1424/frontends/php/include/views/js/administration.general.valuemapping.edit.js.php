@@ -16,5 +16,15 @@
 		$('#mappings_table').dynamicRows({
 			template: '#mapping_row'
 		});
+
+		// clone button
+		jQuery('#clone').click(function() {
+			jQuery('#valuemapid, #delete, #clone').remove();
+			jQuery('#update')
+				.text(<?= CJs::encodeJson(_('Add')) ?>)
+				.attr({id: 'add', name: 'add'});
+			jQuery('#form').val('clone');
+			jQuery('#name').focus();
+		});
 	});
 </script>

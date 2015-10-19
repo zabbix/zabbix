@@ -93,6 +93,7 @@ if ($data['valuemapid'] != 0) {
 	$tab->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
+			new CButton('clone', _('Clone')),
 			new CButtonDelete($confirm_message, url_param('valuemapid')),
 			new CButtonCancel()
 		]
