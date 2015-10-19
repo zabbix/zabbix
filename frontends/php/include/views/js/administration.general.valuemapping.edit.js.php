@@ -1,16 +1,15 @@
 <script type="text/x-jquery-tmpl" id="mapping_row">
-	<tr class="form_row">
-		<td>
-			<input type="text" id="mappings_#{rowNum}_value" name="mappings[#{rowNum}][value]" maxlength="64" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px;">
-		</td>
-		<td>&rArr;</td>
-			<td>
-			<input type="text" id="mappings_#{rowNum}_newvalue" name="mappings[#{rowNum}][newvalue]" maxlength="64" style="width: <?= ZBX_TEXTAREA_SMALL_WIDTH ?>px;">
-		</td>
-		<td>
-			<button type="button" id="mappings_#{rowNum}_remove" name="mappings[#{rowNum}][remove]" class="<?= ZBX_STYLE_BTN_LINK ?> element-table-remove"><?= _('Remove') ?></button>
-		</td>
-	</tr>
+	<?= (new CRow([
+		(new CTextBox('mappings[#{rowNum}][value]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		'&rArr;',
+		(new CTextBox('mappings[#{rowNum}][newvalue]', '', false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+		(new CButton('mappings[#{rowNum}][remove]', _('Remove')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-remove')
+	]))
+		->addClass('form_row')
+		->toString()
+	?>
 </script>
 <script type="text/javascript">
 	jQuery(document).ready(function($) {
