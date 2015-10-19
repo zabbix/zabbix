@@ -414,7 +414,7 @@ If data was sent, but processing of at least one of the values failed, the exit 
 If data sending failed, the exit status is 1.
 
 .SH "EXAMPLES"
-\fBzabbix_sender \-c /usr/local/etc/zabbix_agentd.conf \-k mysql.queries \-o 342.45\fR
+\fBzabbix_sender \-c /etc/zabbix/zabbix_agentd.conf \-k mysql.queries \-o 342.45\fR
 .br
 .RS
 Send \fB342.45\fR as the value for \fBmysql.queries\fR item of monitored host. Use monitored host and Zabbix server defined in agent configuration file.
