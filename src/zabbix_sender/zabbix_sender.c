@@ -981,23 +981,23 @@ int	main(int argc, char **argv)
 	sendval_args.server = ZABBIX_SERVER;
 	sendval_args.port = ZABBIX_SERVER_PORT;
 
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config();
-#if defined(_WINDOWS)
-	zbx_tls_init_parent();
-#endif
-	zbx_tls_init_child();
-#else
 	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
 			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
 			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
 			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
 	{
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		zbx_tls_validate_config();
+#if defined(_WINDOWS)
+		zbx_tls_init_parent();
+#endif
+		zbx_tls_init_child();
+#else
 		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
 				" support");
 		goto exit;
-	}
 #endif
+	}
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
