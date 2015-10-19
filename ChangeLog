@@ -4,6 +4,7 @@ New features:
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+.D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0alpha3
