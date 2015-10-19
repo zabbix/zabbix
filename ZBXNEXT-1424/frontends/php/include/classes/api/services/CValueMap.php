@@ -26,7 +26,7 @@ class CValueMap extends CApiService {
 
 	protected $tableName = 'valuemaps';
 	protected $tableAlias = 'vm';
-	protected $sortColumns = ['valuemapid'];
+	protected $sortColumns = ['valuemapid', 'name'];
 
 	/**
 	 * Set value map default options in addition to global options.
