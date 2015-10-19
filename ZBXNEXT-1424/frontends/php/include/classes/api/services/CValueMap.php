@@ -54,7 +54,7 @@ class CValueMap extends CApiService {
 		$options = zbx_array_merge($this->getOptions, $options);
 
 		if ($options['editable'] !== null && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			return [];
+			return ($options['countOutput'] !== null && $options['groupCount'] === null) ? 0 : [];
 		}
 
 		$res = DBselect($this->createSelectQuery($this->tableName(), $options), $options['limit']);
