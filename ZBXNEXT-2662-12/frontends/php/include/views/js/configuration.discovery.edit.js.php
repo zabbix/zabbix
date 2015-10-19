@@ -607,9 +607,18 @@
 			jQuery('#add_new_dcheck').prop('disabled', false);
 
 			if (validationErrors.length) {
+				var content = jQuery('<span>');
+
+				for (var i = 0; i < validationErrors.length; i++) {
+					if (content.html() !== '') {
+						content.append(jQuery('<br>'));
+					}
+					content.append(jQuery('<span>').text(validationErrors[i]));
+				}
+
 				overlayDialogue({
 					'title': '<?= _('Discovery check error') ?>',
-					'content': jQuery('<span>').text(validationErrors.join('\n') + "\n" + 'sdfkjsdhfkhsd'),
+					'content': content,
 					'buttons': [
 						{
 							'title': '<?= _('Cancel') ?>',
