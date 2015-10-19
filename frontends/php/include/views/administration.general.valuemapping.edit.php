@@ -100,13 +100,13 @@ if ($data['valuemapid'] != 0) {
 	));
 }
 else {
-	$tab->setFooter(makeFormFooter(
+	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('add', _('Add')),
 		[new CButtonCancel()]
 	));
 }
 
-$form->addItem($tab);
+$form->addItem($tab_view);
 
 $widget->addItem($form);
 
