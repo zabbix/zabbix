@@ -533,29 +533,30 @@ class CValueMap extends CApiService {
 		// Select mappings for value map.
 		if ($options['selectMappings'] !== null) {
 			if ($options['selectMappings'] == API_OUTPUT_COUNT) {
-				$db_mappings = API::getApiService()->select('mappings', [
-					'output' => ['valuemapid'],
-					'filter' => array_key_exists('valuemapids', $options)
-						? ['valuemapid' => $options['valuemapids']]
-						: null
-				]);
+				$sql = 'SELECT valuemapid,COUNT(*) AS cnt FROM mappings';
+
+				if ($options['valuemapids'] !== null) {
+					$sql .= ' WHERE '.dbConditionInt('valuemapid', $options['valuemapids']);
+				}
+
+				$sql .= ' GROUP BY valuemapid';
+
+				$db_mappings = DBfetchArray(DBselect($sql));
 
 				foreach ($db_mappings as $db_mapping) {
-					$valuemapid = $db_mapping['valuemapid'];
-					if (!array_key_exists('mappings', $result[$valuemapid])) {
-						$result[$valuemapid]['mappings'] = 0;
-					}
-
-					$result[$valuemapid]['mappings']++;
+					$result[$db_mapping['valuemapid']]['mappings'] = $db_mapping['cnt'];
 				}
 			}
 			else {
-				$db_mappings = API::getApiService()->select('mappings', [
-					'output' => $this->outputExtend($options['selectMappings'], ['valuemapid']),
-					'filter' => array_key_exists('valuemapids', $options)
-						? ['valuemapid' => $options['valuemapids']]
-						: null
-				]);
+				$mappings_options = [
+					'output' => $this->outputExtend($options['selectMappings'], ['valuemapid'])
+				];
+
+				if ($options['valuemapids'] !== null) {
+					$mappings_options['filter'] = ['valuemapid' => $options['valuemapids']];
+				}
+
+				$db_mappings = API::getApiService()->select('mappings', $mappings_options);
 
 				foreach ($db_mappings as $db_mapping) {
 					$valuemapid = $db_mapping['valuemapid'];
