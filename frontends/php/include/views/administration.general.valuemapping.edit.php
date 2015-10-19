@@ -28,9 +28,7 @@ $widget = (new CWidget())
 		->addItem((new CList())->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php')))
 	);
 
-$form = (new CForm())
-	->setName('valuemap_form')
-	->addVar('form', $data['form']);
+$form = (new CForm())->addVar('form', $data['form']);
 
 if ($data['valuemapid'] != 0) {
 	$form->addVar('valuemapid', $data['valuemapid']);
@@ -43,15 +41,14 @@ $form_list = (new CFormList())
 			->setAttribute('autofocus', 'autofocus')
 	);
 
-$mappings_table = (new CTable())
+$table = (new CTable())
 	->setId('mappings_table')
 	->setHeader([_('Value'), '', _('Mapped to'), _('Action')])
 	->setAttribute('style', 'width: 100%;');
 
 foreach ($data['mappings'] as $i => $mapping) {
-	$mappings_table->addRow([
-		(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+	$table->addRow([
+		(new CTextBox('mappings['.$i.'][value]', $mapping['value'], false, 64))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
 		'&rArr;',
 		(new CTextBox('mappings['.$i.'][newvalue]', $mapping['newvalue'], false, 64))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
@@ -63,19 +60,22 @@ foreach ($data['mappings'] as $i => $mapping) {
 	);
 }
 
-$mappings_table->addRow([(new CButton('mapping_add', _('Add')))
-	->addClass(ZBX_STYLE_BTN_LINK)
-	->addClass('element-table-add')]);
+$table->addRow([
+	(new CCol(
+		(new CButton('mapping_add', _('Add')))
+			->addClass(ZBX_STYLE_BTN_LINK)
+			->addClass('element-table-add')
+	))->setColSpan(4)
+]);
 
 $form_list->addRow(_('Mappings'),
-	(new CDiv($mappings_table))
+	(new CDiv($table))
 		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
-	'row_mappings'
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 );
 
 // append form list to tab
-$tab = (new CTabView())->addTab('valuemap_tab', _('Value mapping'), $form_list);
+$tab_view = (new CTabView())->addTab('valuemap_tab', _('Value mapping'), $form_list);
 
 // append buttons
 if ($data['valuemapid'] != 0) {
@@ -90,7 +90,7 @@ if ($data['valuemapid'] != 0) {
 		);
 	}
 
-	$tab->setFooter(makeFormFooter(
+	$tab_view->setFooter(makeFormFooter(
 		new CSubmit('update', _('Update')),
 		[
 			new CButton('clone', _('Clone')),
