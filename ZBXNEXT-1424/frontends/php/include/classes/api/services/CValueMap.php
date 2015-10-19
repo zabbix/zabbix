@@ -533,17 +533,17 @@ class CValueMap extends CApiService {
 		// Select mappings for value map.
 		if ($options['selectMappings'] !== null) {
 			if ($options['selectMappings'] == API_OUTPUT_COUNT) {
-				$sql = 'SELECT valuemapid,COUNT(*) AS cnt FROM mappings';
+				$sql = 'SELECT m.valuemapid,COUNT(*) AS cnt FROM mappings m';
 
 				if ($options['valuemapids'] !== null) {
-					$sql .= ' WHERE '.dbConditionInt('valuemapid', $options['valuemapids']);
+					$sql .= ' WHERE '.dbConditionInt('m.valuemapid', $options['valuemapids']);
 				}
 
-				$sql .= ' GROUP BY valuemapid';
+				$sql .= ' GROUP BY m.valuemapid';
 
-				$db_mappings = DBfetchArray(DBselect($sql));
+				$db_mappings = DBselect($sql);
 
-				foreach ($db_mappings as $db_mapping) {
+				while ($db_mapping = DBfetch($db_mappings)) {
 					$result[$db_mapping['valuemapid']]['mappings'] = $db_mapping['cnt'];
 				}
 			}
