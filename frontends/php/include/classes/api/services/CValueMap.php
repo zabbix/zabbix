@@ -163,8 +163,8 @@ class CValueMap extends CApiService {
 
 			unset($valuemap['valuemapid'], $valuemap['mappings']);
 
-			// Skip updating value maps, if nothing is given.
-			if ($valuemap) {
+			// Skip updating value maps, if name is not given.
+			if (array_key_exists('name', $valuemap)) {
 				$upd_valuemaps[$valuemapid] = $valuemap;
 			}
 		}
@@ -179,10 +179,6 @@ class CValueMap extends CApiService {
 
 			foreach ($db_valuemaps as $db_valuemap) {
 				$upd_valuemap = $upd_valuemaps[$db_valuemap['valuemapid']];
-
-				if (!array_key_exists('name', $upd_valuemap)) {
-					continue;
-				}
 
 				// Skip updating value maps, if name was not changed.
 				if ($upd_valuemap['name'] !== $db_valuemap['name']) {
