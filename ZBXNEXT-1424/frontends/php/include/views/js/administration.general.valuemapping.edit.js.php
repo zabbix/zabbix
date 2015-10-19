@@ -12,19 +12,19 @@
 	?>
 </script>
 <script type="text/javascript">
-	jQuery(document).ready(function($) {
+	jQuery(function($) {
 		$('#mappings_table').dynamicRows({
 			template: '#mapping_row'
 		});
 
 		// clone button
-		jQuery('#clone').click(function() {
-			jQuery('#valuemapid, #delete, #clone').remove();
-			jQuery('#update')
+		$('#clone').click(function() {
+			$('#valuemapid, #delete, #clone').remove();
+			$('#update')
 				.text(<?= CJs::encodeJson(_('Add')) ?>)
 				.attr({id: 'add', name: 'add'});
-			jQuery('#form').val('clone');
-			jQuery('#name').focus();
+			$('#form').val('clone');
+			$('#name').focus();
 		});
 	});
 </script>
