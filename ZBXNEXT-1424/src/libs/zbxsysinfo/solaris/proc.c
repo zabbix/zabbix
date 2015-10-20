@@ -410,7 +410,6 @@ static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdlin
 	return FAIL;
 }
 
-
 #ifdef HAVE_ZONE_H
 /******************************************************************************
  *                                                                            *
@@ -497,8 +496,8 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
  ******************************************************************************/
 void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 {
-	const char	*__function_name = "zbx_proc_get_stats";
-	int	i;
+	const char	*__function_name = "zbx_proc_get_process_stats";
+	int		i;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s() procs_num:%d", __function_name, procs_num);
 
@@ -665,7 +664,6 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __function_name);
 }
-
 
 int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {

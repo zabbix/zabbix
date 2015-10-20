@@ -574,7 +574,7 @@ function appendZero(val) {
 }
 
 /**
- * Trims all elements values that have currect selector and are inside Jquery object first element.
+ * Trims selected element values.
  *
  * @param array selectors
  */
