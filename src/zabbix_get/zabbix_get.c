@@ -184,7 +184,8 @@ static void	get_signal_handler(int sig)
 		zbx_error("Timeout while executing operation");
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free_on_signal();
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+		zbx_tls_free_on_signal();
 #endif
 	exit(EXIT_FAILURE);
 }
@@ -418,13 +419,19 @@ int	main(int argc, char **argv)
 		goto out;
 	}
 
+	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
+			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
+			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
+			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+	{
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_validate_config();
+		zbx_tls_validate_config();
 #if defined(_WINDOWS)
-	zbx_tls_init_parent();
+		zbx_tls_init_parent();
 #endif
-	zbx_tls_init_child();
+		zbx_tls_init_child();
 #endif
+	}
 #if !defined(_WINDOWS)
 	signal(SIGINT,  get_signal_handler);
 	signal(SIGTERM, get_signal_handler);
@@ -438,10 +445,13 @@ out:
 	zbx_free(key);
 	zbx_free(source_ip);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		zbx_tls_free();
 #if defined(_WINDOWS)
-	zbx_tls_library_deinit();
+		zbx_tls_library_deinit();
 #endif
+	}
 #endif
 	return SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE;
 }

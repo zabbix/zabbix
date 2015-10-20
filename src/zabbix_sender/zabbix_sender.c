@@ -452,8 +452,11 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	/* take TLS data passed from 'main' thread */
-	zbx_tls_take_vars(&sendval_args->tls_vars);
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		/* take TLS data passed from 'main' thread */
+		zbx_tls_take_vars(&sendval_args->tls_vars);
+	}
 #endif
 
 #if !defined(_WINDOWS)
@@ -1000,8 +1003,11 @@ int	main(int argc, char **argv)
 	}
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
-	/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
-	zbx_tls_pass_vars(&sendval_args.tls_vars);
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
+		zbx_tls_pass_vars(&sendval_args.tls_vars);
+	}
 #endif
 	zbx_json_init(&sendval_args.json, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
@@ -1218,10 +1224,13 @@ exit:
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_free();
+	if (ZBX_TCP_SEC_UNENCRYPTED != configured_tls_connect_mode)
+	{
+		zbx_tls_free();
 #if defined(_WINDOWS)
-	zbx_tls_library_deinit();
+		zbx_tls_library_deinit();
 #endif
+	}
 #endif
 	zabbix_close_log();
 
