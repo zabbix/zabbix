@@ -823,6 +823,11 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
+#ifdef HAVE_IPV6
+#	define IPV6_FEATURE_STATUS	"YES"
+#else
+#	define IPV6_FEATURE_STATUS	" NO"
+#endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	define TLS_FEATURE_STATUS	"YES"
 #else
@@ -833,6 +838,7 @@ int	MAIN_ZABBIX_ENTRY()
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
+	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:          " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
