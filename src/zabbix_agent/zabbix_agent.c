@@ -29,27 +29,33 @@
 #include "sighandler.h"
 #include "threads.h"
 
+#define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_agent.conf"
+
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_agent";
 const char	syslog_app_name[] = "zabbix_agent";
 const char	*usage_message[] = {
-	"[-c config-file]",
-	"[-c config-file] -p",
-	"[-c config-file] -t item-key",
-	"-h",
-	"-V",
+	"[-c config-file]", NULL,
+	"[-c config-file]", "-p", NULL,
+	"[-c config-file]", "-t item-key", NULL,
+	"-h", NULL,
+	"-V", NULL,
 	NULL	/* end of text */
 };
 
-unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
-int process_num;
-int server_num			= 0;
+unsigned char	program_type	= ZBX_PROGRAM_TYPE_AGENT;
+
+unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+int		process_num;
+int		server_num	= 0;
 
 const char	*help_message[] = {
-	"A Zabbix executable for monitoring of various server parameters, to be started upon request by inetd.",
+	"A Zabbix executable for monitoring of various server parameters, to be started",
+	"upon request by inetd.",
 	"",
 	"Options:",
 	"  -c --config config-file  Absolute path to the configuration file",
+	"                           (default: \"" DEFAULT_CONFIG_FILE "\")",
 	"  -p --print               Print known items and exit",
 	"  -t --test item-key       Test specified item and exit",
 	"",
@@ -67,8 +73,6 @@ static struct zbx_option	longopts[] =
 	{"test",	1,	NULL,	't'},
 	{NULL}
 };
-
-static char	DEFAULT_CONFIG_FILE[] = SYSCONFDIR "/zabbix_agent.conf";
 
 /******************************************************************************
  *                                                                            *
@@ -228,7 +232,7 @@ int	main(int argc, char **argv)
 	}
 
 	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = DEFAULT_CONFIG_FILE;
+		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 
 	/* load configuration */
 	if (ZBX_TASK_PRINT_SUPPORTED == task || ZBX_TASK_TEST_METRIC == task)
