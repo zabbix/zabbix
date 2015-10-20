@@ -5,6 +5,7 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 
 --------------------------------------------------------------------------------
@@ -210,6 +211,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 ..F....... [ZBX-9948] fixed graph prototype preview for pie charts (vitalijs)
 ........S. [ZBX-9889] fixed vmware.eventlog item values to have unique timestamps in history table (dimir)
@@ -903,6 +905,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 ..F....... [ZBX-9919] fixed y scale calculation for linear graphs (vitalijs)
 ...G...PS. [ZBX-9864] fixed compilation warnings regarding SIZE_T_MAX under NetBSD (Sasha)
