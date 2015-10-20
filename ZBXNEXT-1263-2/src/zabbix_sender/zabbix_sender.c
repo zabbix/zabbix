@@ -605,7 +605,7 @@ static void	parse_commandline(int argc, char **argv)
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
-		opt_count[ch]++;
+		opt_count[(unsigned char)ch]++;
 
 		switch (ch)
 		{
@@ -716,7 +716,7 @@ static void	parse_commandline(int argc, char **argv)
 	{
 		ch = longopts[i].val;
 
-		if ('v' == ch && 2 < opt_count[ch])	/* '-v' or '-vv' can be specified */
+		if ('v' == ch && 2 < opt_count[(unsigned char)ch])	/* '-v' or '-vv' can be specified */
 		{
 			zbx_error("option \"-v\" or \"--verbose\" specified more than 2 times");
 
@@ -724,7 +724,7 @@ static void	parse_commandline(int argc, char **argv)
 			continue;
 		}
 
-		if ('v' != ch && 1 < opt_count[ch])
+		if ('v' != ch && 1 < opt_count[(unsigned char)ch])
 		{
 			if (NULL == strchr(shortopts, ch))
 				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
@@ -1018,7 +1018,7 @@ int	main(int argc, char **argv)
 				setvbuf(stdin, (char *)NULL, _IOLBF, 1024);
 			}
 		}
-		else if (NULL == (in = fopen(INPUT_FILE, "r")) )
+		else if (NULL == (in = fopen(INPUT_FILE, "r")))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot open [%s]: %s", INPUT_FILE, zbx_strerror(errno));
 			goto free;
