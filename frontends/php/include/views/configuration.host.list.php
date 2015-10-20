@@ -183,41 +183,42 @@ foreach ($data['hosts'] as $host) {
 			&& ($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE
 			&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
 			&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
-		$encryption = (new CDiv((new CSpan(_('None')))->addClass('status-green')))->addClass('status-container');
+		$encryption = (new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN)))
+			->addClass('status-container');
 	}
 	else {
 		// Incoming encryption.
 		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
-			$in_encryption = (new CSpan(_('None')))->addClass('status-green');
+			$in_encryption = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
-			$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
+			$in_encryption = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
-			$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
+			$in_encryption = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 
 		// Outgoing encryption.
 		$out_encryption = [];
 		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
-			$out_encryption[] = (new CSpan(_('None')))->addClass('status-green');
+			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
-			$out_encryption[] = (new CSpan(_('None')))->addClass('status-grey');
+			$out_encryption[] = (new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
 		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
-			$out_encryption[] = (new CSpan(_('PSK')))->addClass('status-green');
+			$out_encryption[] = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
-			$out_encryption[] = (new CSpan(_('PSK')))->addClass('status-grey');
+			$out_encryption[] = (new CSpan(_('PSK')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
 		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
-			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-green');
+			$out_encryption[] = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 		else {
-			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-grey');
+			$out_encryption[] = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
 		$encryption = (new CDiv([$in_encryption, ' ', $out_encryption]))->addClass('status-container');
