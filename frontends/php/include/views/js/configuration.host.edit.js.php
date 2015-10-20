@@ -21,7 +21,9 @@
 	<?= (new CCol(
 			(new CRadioButtonList('interfaces[#{iface.interfaceid}][useip]', null))
 				->addValue(_('IP'), INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
-				->addValue(_('DNS'), INTERFACE_USE_DNS, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']')
+				->addValue(_('DNS'), INTERFACE_USE_DNS,
+					'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']'
+				)
 				->setModern(true)
 		))->toString()
 	?>
