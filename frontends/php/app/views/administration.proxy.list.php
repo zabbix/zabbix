@@ -110,7 +110,7 @@ foreach ($data['proxies'] as $proxy) {
 			$out_encryption_array[] = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREEN);
 		}
 
-		$out_encryption = (new CDiv($out_encryption_array))->addClass('status-container');
+		$out_encryption = (new CDiv($out_encryption_array))->addClass(ZBX_STYLE_STATUS_CONTAINER);
 	}
 
 	$proxyTable->addRow([

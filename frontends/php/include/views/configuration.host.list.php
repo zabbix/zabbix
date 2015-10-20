@@ -184,7 +184,7 @@ foreach ($data['hosts'] as $host) {
 			&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
 			&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
 		$encryption = (new CDiv((new CSpan(_('None')))->addClass(ZBX_STYLE_STATUS_GREEN)))
-			->addClass('status-container');
+			->addClass(ZBX_STYLE_STATUS_CONTAINER);
 	}
 	else {
 		// Incoming encryption.
@@ -221,7 +221,7 @@ foreach ($data['hosts'] as $host) {
 			$out_encryption[] = (new CSpan(_('CERT')))->addClass(ZBX_STYLE_STATUS_GREY);
 		}
 
-		$encryption = (new CDiv([$in_encryption, ' ', $out_encryption]))->addClass('status-container');
+		$encryption = (new CDiv([$in_encryption, ' ', $out_encryption]))->addClass(ZBX_STYLE_STATUS_CONTAINER);
 	}
 
 	$table->addRow([
