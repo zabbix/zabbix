@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha4
 
 New features:
+A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, sasha)
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
