@@ -1188,7 +1188,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		'monitored' => true,
 		'skipDependent' => true,
 		'output' => API_OUTPUT_EXTEND,
-		'selectHosts' => array('hostid', 'name'),
+		'selectHosts' => array('hostid'),
 		'sortfield' => 'description'
 	));
 
@@ -1197,12 +1197,12 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 	foreach ($dbTriggers as $trigger) {
 		$host = reset($trigger['hosts']);
 
-		$hostIds[$host['hostid']] = $host['hostid'];
+		$hostIds[$host['hostid']] = true;
 	}
 
 	$hosts = API::Host()->get(array(
 		'output' => array('name', 'hostid', 'status'),
-		'hostids' => $hostIds,
+		'hostids' => array_keys($hostIds),
 		'preservekeys' => true,
 		'selectScreens' => ($viewMode == STYLE_LEFT) ? API_OUTPUT_COUNT : null
 	));
@@ -1212,27 +1212,33 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 	$trcounter = array();
 
 	foreach ($dbTriggers as $trigger) {
-		$host = reset($trigger['hosts']);
-		$host_name = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
-		$host['name'] = $host_name;
 		$trigger_name = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
-		$hostNames[$host['hostid']] = $host_name;
 
-		if (!array_key_exists($host_name, $trcounter) || !array_key_exists($trigger_name, $trcounter[$host_name])) {
-			$trcounter[$host_name] = array($trigger_name => 0);
+		foreach ($trigger['hosts'] as $host) {
+			$hostid = $host['hostid'];
+			$host_name = get_node_name_by_elid($hostid, null, NAME_DELIMITER).$hosts[$hostid]['name'];
+			$hostNames[$hostid] = $host_name;
+
+			if (!array_key_exists($host_name, $trcounter)) {
+				$trcounter[$host_name] = array();
+			}
+
+			if (!array_key_exists($trigger_name, $trcounter[$host_name])) {
+				$trcounter[$host_name][$trigger_name] = 0;
+			}
+
+			$triggers[$trigger_name][$trcounter[$host_name][$trigger_name]][$host_name] = array(
+				'hostid' => $hostid,
+				'triggerid' => $trigger['triggerid'],
+				'value' => $trigger['value'],
+				'lastchange' => $trigger['lastchange'],
+				'priority' => $trigger['priority'],
+				'flags' => $trigger['flags'],
+				'url' => $trigger['url'],
+				'hosts' => array($host)
+			);
+			$trcounter[$host_name][$trigger_name]++;
 		}
-
-		$triggers[$trigger_name][$trcounter[$host_name][$trigger_name]][$host_name] = array(
-			'hostid' => $host['hostid'],
-			'triggerid' => $trigger['triggerid'],
-			'value' => $trigger['value'],
-			'lastchange' => $trigger['lastchange'],
-			'priority' => $trigger['priority'],
-			'flags' => $trigger['flags'],
-			'url' => $trigger['url'],
-			'hosts' => array($host)
-		);
-		$trcounter[$host_name][$trigger_name]++;
 	}
 
 	$triggerTable = new CTableInfo(_('No triggers found.'));
