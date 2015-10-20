@@ -285,14 +285,14 @@
 				uniquenessCriteria = jQuery('#uniqueness_criteria_row_' + value.dcheckid);
 
 			if (jQuery.inArray(parseInt(value.type, 10), availableDeviceTypes) > -1) {
+				var new_uniqueness_criteria = uniqRowTpl.evaluate(value);
 				if (uniquenessCriteria.length) {
-					var criteriaLabel = jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']'),
-						criteriaInput = jQuery('input', criteriaLabel).clone();
-					criteriaLabel.text(value['name']);
-					criteriaLabel.prepend(criteriaInput);
+					var checked_id = jQuery('input:radio[name=uniqueness_criteria]:checked').attr('id');
+					uniquenessCriteria.replaceWith(new_uniqueness_criteria);
+					jQuery('#' + checked_id).prop('checked', true);
 				}
 				else {
-					jQuery('#uniqueness_criteria').append(uniqRowTpl.evaluate(value));
+					jQuery('#uniqueness_criteria').append(new_uniqueness_criteria);
 				}
 			}
 			else {
