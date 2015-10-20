@@ -378,74 +378,74 @@
 
 <script type="text/x-jquery-tmpl" id="elementLinkTableRowTpl">
 	<?= (new CRow([
-		'#{toElementName}',
-		(new CCol())->addClass('element-urls'),
-		(new CCol(
-			(new CButton(null, _('Edit')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('openlink')
-				->setAttribute('data-linkid', '#{linkid}')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->toString()
+			'#{toElementName}',
+			(new CCol())->addClass('element-urls'),
+			(new CCol(
+				(new CButton(null, _('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('openlink')
+					->setAttribute('data-linkid', '#{linkid}')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->toString()
 	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="massElementLinkTableRowTpl">
 	<?= (new CRow([
-		'#{fromElementName}',
-		'#{toElementName}',
-		(new CCol())->addClass('element-urls'),
-		(new CCol(
-			(new CButton(null, _('Edit')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('openlink')
-				->setAttribute('data-linkid', '#{linkid}')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->toString()
+			'#{fromElementName}',
+			'#{toElementName}',
+			(new CCol())->addClass('element-urls'),
+			(new CCol(
+				(new CButton(null, _('Edit')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('openlink')
+					->setAttribute('data-linkid', '#{linkid}')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->toString()
 	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="linkTriggerRow">
 	<?= (new CRow([
-		'#{desc_exp}',
-		[
-			new CVar('linktrigger_#{linktriggerid}_desc_exp', '#{desc_exp}'),
-			new CVar('linktrigger_#{linktriggerid}_triggerid', '#{triggerid}'),
-			new CVar('linktrigger_#{linktriggerid}_linktriggerid', '#{linktriggerid}'),
-			(new CComboBox('linktrigger_#{linktriggerid}_drawtype', null, null, [
-				GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
-				GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
-				GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
-				GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
-			]))
-		],
-		new CColor('linktrigger_#{linktriggerid}_color', '#{color}', false),
-		(new CCol(
-			(new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('triggerRemove')
-				->setAttribute('data-linktriggerid', '#{linktriggerid}')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->setId('linktrigger_#{linktriggerid}')
-		->toString()
+			'#{desc_exp}',
+			[
+				new CVar('linktrigger_#{linktriggerid}_desc_exp', '#{desc_exp}'),
+				new CVar('linktrigger_#{linktriggerid}_triggerid', '#{triggerid}'),
+				new CVar('linktrigger_#{linktriggerid}_linktriggerid', '#{linktriggerid}'),
+				(new CComboBox('linktrigger_#{linktriggerid}_drawtype', null, null, [
+					GRAPH_ITEM_DRAWTYPE_LINE => _('Line'),
+					GRAPH_ITEM_DRAWTYPE_BOLD_LINE => _('Bold line'),
+					GRAPH_ITEM_DRAWTYPE_DOT => _('Dot'),
+					GRAPH_ITEM_DRAWTYPE_DASHED_LINE => _('Dashed line')
+				]))
+			],
+			new CColor('linktrigger_#{linktriggerid}_color', '#{color}', false),
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('triggerRemove')
+					->setAttribute('data-linktriggerid', '#{linktriggerid}')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setId('linktrigger_#{linktriggerid}')
+			->toString()
 	?>
 </script>
 
 <script type="text/x-jquery-tmpl" id="selementFormUrls">
 	<?= (new CRow([
-		(new CTextBox('url_#{selementurlid}_name', '#{name}'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-		(new CTextBox('url_#{selementurlid}_url', '#{url}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		(new CCol(
-			(new CButton(null, _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->onClick('jQuery("#urlrow_#{selementurlid}").remove();')
-		))->addClass(ZBX_STYLE_NOWRAP)
-	]))
-		->setId('urlrow_#{selementurlid}')
-		->toString()
+			(new CTextBox('url_#{selementurlid}_name', '#{name}'))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
+			(new CTextBox('url_#{selementurlid}_url', '#{url}'))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CCol(
+				(new CButton(null, _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->onClick('jQuery("#urlrow_#{selementurlid}").remove();')
+			))->addClass(ZBX_STYLE_NOWRAP)
+		]))
+			->setId('urlrow_#{selementurlid}')
+			->toString()
 	?>
 </script>
 
