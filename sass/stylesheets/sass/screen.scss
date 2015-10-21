@@ -285,7 +285,7 @@ ul.top-nav-icons {
 	li {
 		display: block;
 		float: left;
-		background-color: $main-nav-bg-color;
+		//background-color: $main-nav-bg-color;
 
 		.search-suggest {
 			min-width: 186px;
@@ -3500,20 +3500,20 @@ $browser-logos: (
 
 /*doc
 ---
-title: Components
-name: components
-category: Components
----
-*/
-
-/*doc
----
-title: About
+//title: About
 name: about
 category: About
 ---
 
 The Zabbix styleguide is a collection of all front-end user interface elements and best practices.
+*/
+
+/*doc
+---
+//title: Components
+name: components
+category: Components
+---
 */
 
 /*doc
@@ -3537,15 +3537,9 @@ title: Tables
 name: table
 ---
 
-Tables tables:
-*/
+Tables tables: sdfsdfsfs
 
-/*doc
----
-parent: table
-title: Default Table
-name: tableDefault
----
+##Default Table
 
 Default table:
 
@@ -3624,14 +3618,8 @@ Default table:
    </table>
 </div>
 ```
-*/
 
-/*doc
----
-parent: table
-title: Table with Pagination
-name: tablePagination
----
+##Table with Pagination
 
 Table with pagination:
 
@@ -3713,14 +3701,8 @@ Table with pagination:
    <a href=""><span class="arrow-left"></span></a><a href="">1</a><a href="" class="paging-selected">2</a><a href="">3</a><a href=""><span class="arrow-right"></span></a>
 </div>
 ```
-*/
 
-/*doc
----
-parent: table
-title: Table with No Results
-name: tableNores
----
+##Table with No Results
 
 Table with no results:
 
@@ -3759,10 +3741,92 @@ title: Forms
 name: forms
 ---
 
-Forms:
+Forms forms forms
+
+
+##Buttons
 
 ```html_example
-example
+<button type="button">Button</button>
+<button type="button" disabled>Button</button>
+```
+
+```html_example
+<button type="button" class="btn-alt">Button</button>
+<button type="button" class="btn-alt" disabled>Button</button>
+```
+
+```html_example
+<button type="button" class="btn-grey">Button</button>
+<button type="button" class="btn-grey" disabled>Button</button>
+```
+
+```html_example
+<button type="button" class="btn-link">Button</button>
+<button type="button" class="btn-link" disabled>Button</button>
+```
+
+```html_example
+<button type="button" class="btn-max" title="Maximize"></button>
+<button type="button" class="btn-max" title="Maximize" disabled></button>
+```
+
+##Inputs
+
+```html_example
+<input type="text" placeholder="Text">
+<input type="text" disabled>
+<input type="text" readonly>
+```
+
+```html_example
+<input type="text"><div class="form-input-margin"></div><button type="button" class="btn-grey">Button</button>
+```
+
+##Selects
+
+```html_example
+<select>
+   <option>Select options</option>
+   <option>Option 1</option>
+   <option>Option 2</option>
+   <option>Option 3</option>
+</select>
+<select disabled>
+   <option>Select options</option>
+   <option>Option 1</option>
+   <option>Option 2</option>
+   <option>Option 3</option>
+</select>
+```
+
+
+##Radio and checkboxes
+
+```html_example
+<label for="Radio"><input type="radio" id="Radio">I am a radio</label>
+<label for="RadioDisbld"><input type="radio" id="RadioDisbld" disabled>I am a disabled radio</label>
+```
+
+```html_example
+<label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
+<label for="ChecBoxkDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
+```
+
+```html_example
+<ul class="list-check-radio">
+   <li><label for="RadioDescr"><input type="radio" id="RadioDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
+   <li><label for="CheckBoxDescr"><input type="checkbox" id="CheckBoxDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
+</ul>
+```
+
+```html_example
+<ul class="radio-segmented">
+   <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3"><label for="RadioSegm3">Radio 3</label></li>
+</ul>
+<ul class="radio-segmented">
+   <li><input type="radio" id="RadioSegmDisbld1" disabled><label for="RadioSegmDisbld1">Radio 1</label></li><li><input type="radio" id="RadioSegmDisbld2" disabled><label for="RadioSegmDisbld2">Radio 2</label></li><li><input type="radio" id="RadioSegmDisbld3" disabled><label for="RadioSegmDisbld3">Radio 3</label></li>
+</ul>
 ```
 */
 
@@ -3785,14 +3849,8 @@ Dialogs:
    <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Execute</button></div>
 </div>
 ```
-*/
 
-/*doc
----
-parent: dialog
-name: dialogsContent
-title: Dialogs with Content
----
+##Dialogs with Content
 
 Dialogs:
 
@@ -3852,14 +3910,8 @@ Dialogs:
    </table>
 </div>
 ```
-*/
 
-/*doc
----
-parent: dialog
-name: dialogsContexttual
-title: Contextual Dialogs
----
+##Contextual Dialogs
 
 Contextual Dialogs:
 
@@ -3901,14 +3953,8 @@ Notificatiions:
 ```html_example
 example
 ```
-*/
 
-/*doc
----
-parent: notifications
-name: notificationSuccess
-title: Success Notification
----
+##Success Notification
 
 Success Notification:
 
@@ -3927,14 +3973,8 @@ Success Notification:
    <span class="overlay-close-btn" title="Close"></span>
 </div>
 ```
-*/
 
-/*doc
----
-parent: notifications
-name: notificationError
-title: Error Notification
----
+##Error Notification
 
 Error Notification:
 
@@ -4086,5 +4126,19 @@ Links:
 
 ```html_example
 example
+```
+*/
+
+/*doc
+---
+parent: components
+title: Labels
+name: labels
+---
+
+Labels:
+
+```html_example
+<div class="status-container"><span class="status-red">red 1</span><span class="status-red">red 2</span><span class="status-red">red 3</span><span class="status-red">ipmi</span></div>
 ```
 */
