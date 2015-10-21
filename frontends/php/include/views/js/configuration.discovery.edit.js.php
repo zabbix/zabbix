@@ -314,7 +314,7 @@
 		var obj = jQuery('#uniqueness_criteria_' + dcheckid);
 
 		if (obj.length) {
-			if (obj.attr('checked') == 'checked') {
+			if (obj.is(':checked')) {
 				selectUniquenessCriteriaDefault();
 			}
 
