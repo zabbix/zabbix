@@ -18,33 +18,6 @@
 **/
 
 
-function removeDelayFlex(index) {
-	jQuery('#delayFlex_' + index).remove();
-	jQuery('#delay_flex_' + index + '_delay').remove();
-	jQuery('#delay_flex_' + index + '_period').remove();
-
-	displayNewDeleyFlexInterval();
-}
-
-function displayNewDeleyFlexInterval() {
-	// visible_delay_flex is in massupdate, no visible_delay_flex in items
-	if (jQuery('#visible_delay_flex').length == 0 || jQuery('#visible_delay_flex').is(':checked')) {
-		jQuery('#row_new_delay_flex').show();
-	}
-	else {
-		jQuery('#row_new_delay_flex').hide();
-	}
-
-	if (jQuery('#delayFlexTable tr').length <= 7) {
-		jQuery('#row-new-delay-flex-fields').show();
-		jQuery('#row-new-delay-flex-max-reached').hide();
-	}
-	else {
-		jQuery('#row-new-delay-flex-fields').hide();
-		jQuery('#row-new-delay-flex-max-reached').show();
-	}
-}
-
 function organizeInterfaces(interfaceType) {
 	var selectedInterfaceId = +jQuery('#selectedInterfaceId').val();
 	var matchingInterfaces = jQuery('#interfaceid option[data-interfacetype="' + interfaceType + '"]');

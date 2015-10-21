@@ -38,6 +38,7 @@
 #ifdef _WINDOWS
 #	include "perfstat.h"
 #else
+#	include "zbxnix.h"
 #	include "sighandler.h"
 #endif
 #include "active.h"
@@ -52,21 +53,22 @@
 #endif
 
 #include "setproctitle.h"
+#include "../libs/zbxcrypto/tls.h"
 
 const char	*progname = NULL;
 
 /* default config file location */
 #ifdef _WINDOWS
-	static char	DEFAULT_CONFIG_FILE[]	= "C:\\zabbix_agentd.conf";
+#	define DEFAULT_CONFIG_FILE	"C:\\zabbix_agentd.conf"
 #else
-	static char	DEFAULT_CONFIG_FILE[]	= SYSCONFDIR "/zabbix_agentd.conf";
+#	define DEFAULT_CONFIG_FILE	SYSCONFDIR "/zabbix_agentd.conf"
 #endif
 
 /* application TITLE */
 const char	title_message[] = "zabbix_agentd"
 #if defined(_WIN64)
 				" Win64"
-#elif defined(WIN32)
+#elif defined(_WIN32)
 				" Win32"
 #endif
 #if defined(ZABBIX_SERVICE)
@@ -81,19 +83,19 @@ const char	syslog_app_name[] = "zabbix_agentd";
 
 /* application USAGE message */
 const char	*usage_message[] = {
-	"[-c config-file]",
-	"[-c config-file] -p",
-	"[-c config-file] -t item-key",
+	"[-c config-file]", NULL,
+	"[-c config-file]", "-p", NULL,
+	"[-c config-file]", "-t item-key", NULL,
 #ifdef _WINDOWS
-	"[-c config-file] -i [-m]",
-	"[-c config-file] -d [-m]",
-	"[-c config-file] -s [-m]",
-	"[-c config-file] -x [-m]",
+	"[-c config-file]", "-i", "[-m]", NULL,
+	"[-c config-file]", "-d", "[-m]", NULL,
+	"[-c config-file]", "-s", "[-m]", NULL,
+	"[-c config-file]", "-x", "[-m]", NULL,
 #else
-	"[-c config-file] -R runtime-option",
+	"[-c config-file]", "-R runtime-option", NULL,
 #endif
-	"-h",
-	"-V",
+	"-h", NULL,
+	"-V", NULL,
 	NULL	/* end of text */
 };
 /* end of application USAGE message */
@@ -103,37 +105,45 @@ const char	*help_message[] = {
 	"A Zabbix daemon for monitoring of various server parameters.",
 	"",
 	"Options:",
-	"  -c --config config-file               Absolute path to the configuration file",
-	"  -p --print                            Print known items and exit",
-	"  -t --test item-key                    Test specified item and exit",
+	"  -c --config config-file        Absolute path to the configuration file",
+	"                                 (default: \"" DEFAULT_CONFIG_FILE "\")",
+	"  -p --print                     Print known items and exit",
+	"  -t --test item-key             Test specified item and exit",
 #ifdef _WINDOWS
-	"",
+	"  -m --multiple-agents           For -i -d -s -x functions service name will",
+	"                                 include Hostname parameter specified in",
+	"                                 configuration file",
 	"Functions:",
 	"",
-	"  -i --install                          Install Zabbix agent as service",
-	"  -d --uninstall                        Uninstall Zabbix agent from service",
+	"  -i --install                   Install Zabbix agent as service",
+	"  -d --uninstall                 Uninstall Zabbix agent from service",
 
-	"  -s --start                            Start Zabbix agent service",
-	"  -x --stop                             Stop Zabbix agent service",
-
-	"  -m --multiple-agents                  Service name will include hostname",
+	"  -s --start                     Start Zabbix agent service",
+	"  -x --stop                      Stop Zabbix agent service",
 #else
 	"  -R --runtime-control runtime-option   Perform administrative functions",
 	"",
 	"    Runtime control options:",
-	"      " ZBX_LOG_LEVEL_INCREASE "=target         Increase log level, affects all processes if target is not specified",
-	"      " ZBX_LOG_LEVEL_DECREASE "=target         Decrease log level, affects all processes if target is not specified",
+	"      " ZBX_LOG_LEVEL_INCREASE "=target  Increase log level, affects all processes if",
+	"                                 target is not specified",
+	"      " ZBX_LOG_LEVEL_DECREASE "=target  Decrease log level, affects all processes if",
+	"                                 target is not specified",
 	"",
 	"      Log level control targets:",
-	"        pid                             Process identifier",
-	"        process-type                    All processes of specified type (e.g., listener)",
-	"        process-type,N                  Process type and number (e.g., listener,3)",
+	"        pid                      Process identifier",
+	"        process-type             All processes of specified type (e.g.,",
+	"                                 listener)",
+	"        process-type,N           Process type and number (e.g., listener,3)",
 #endif
 	"",
-	"  -h --help                             Display this help message",
-	"  -V --version                          Display version number",
+	"  -h --help                      Display this help message",
+	"  -V --version                   Display version number",
 	"",
+#ifdef _WINDOWS
+	"Example: zabbix_agentd -c C:\\zabbix\\zabbix_agentd.conf",
+#else
 	"Example: zabbix_agentd -c /etc/zabbix/zabbix_agentd.conf",
+#endif
 	NULL	/* end of text */
 };
 /* end of application HELP message */
@@ -174,11 +184,11 @@ static char		*TEST_METRIC = NULL;
 int			threads_num = 0;
 ZBX_THREAD_HANDLE	*threads = NULL;
 
-unsigned char	daemon_type = ZBX_DAEMON_TYPE_AGENT;
+unsigned char	program_type = ZBX_PROGRAM_TYPE_AGENTD;
 
-ZBX_THREAD_LOCAL unsigned char process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
-ZBX_THREAD_LOCAL int process_num;
-ZBX_THREAD_LOCAL int server_num			= 0;
+ZBX_THREAD_LOCAL unsigned char	process_type	= 255;	/* ZBX_PROCESS_TYPE_UNKNOWN */
+ZBX_THREAD_LOCAL int		process_num;
+ZBX_THREAD_LOCAL int		server_num	= 0;
 
 ZBX_THREAD_ACTIVECHK_ARGS	*CONFIG_ACTIVE_ARGS = NULL;
 
@@ -248,29 +258,27 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 
 static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	char		ch = '\0';
-	int		opt_c = 0, opt_p = 0, opt_t = 0, opt_r = 0, ret = SUCCEED;
-#ifdef _WINDOWS
-	int		opt_i = 0, opt_d = 0, opt_s = 0, opt_x = 0, opt_m = 0;
+	int		i, ret = SUCCEED;
+	char		ch;
 	unsigned int	opt_mask = 0;
-#endif
+	unsigned short	opt_count[256] = {0};
 
 	t->task = ZBX_TASK_START;
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
+		opt_count[ch]++;
+
 		switch (ch)
 		{
 			case 'c':
-				opt_c++;
 				if (NULL == CONFIG_FILE)
 					CONFIG_FILE = strdup(zbx_optarg);
 				break;
 #ifndef _WINDOWS
 			case 'R':
-				opt_r++;
-				if (SUCCEED != parse_rtc_options(zbx_optarg, daemon_type, &t->flags))
+				if (SUCCEED != parse_rtc_options(zbx_optarg, program_type, &t->flags))
 					exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
@@ -283,12 +291,10 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				t->task = ZBX_TASK_SHOW_VERSION;
 				goto out;
 			case 'p':
-				opt_p++;
 				if (ZBX_TASK_START == t->task)
 					t->task = ZBX_TASK_PRINT_SUPPORTED;
 				break;
 			case 't':
-				opt_t++;
 				if (ZBX_TASK_START == t->task)
 				{
 					t->task = ZBX_TASK_TEST_METRIC;
@@ -297,23 +303,18 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 				break;
 #ifdef _WINDOWS
 			case 'i':
-				opt_i++;
 				t->task = ZBX_TASK_INSTALL_SERVICE;
 				break;
 			case 'd':
-				opt_d++;
 				t->task = ZBX_TASK_UNINSTALL_SERVICE;
 				break;
 			case 's':
-				opt_s++;
 				t->task = ZBX_TASK_START_SERVICE;
 				break;
 			case 'x':
-				opt_x++;
 				t->task = ZBX_TASK_STOP_SERVICE;
 				break;
 			case 'm':
-				opt_m++;
 				t->flags = ZBX_TASK_FLAG_MULTIPLE_AGENTS;
 				break;
 #endif
@@ -324,38 +325,29 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 
 	/* every option may be specified only once */
-	if (1 < opt_c || 1 < opt_p || 1 < opt_t || 1 < opt_r)
-	{
-		if (1 < opt_c)
-			zbx_error("option \"-c\" or \"--config\" specified multiple times");
-		if (1 < opt_p)
-			zbx_error("option \"-p\" or \"--print\" specified multiple times");
-		if (1 < opt_t)
-			zbx_error("option \"-t\" or \"--test\" specified multiple times");
-		if (1 < opt_r)
-			zbx_error("option \"-R\" or \"--runtime-control\" specified multiple times");
 
-		ret = FAIL;
-		goto out;
+	for (i = 0; NULL != longopts[i].name; i++)
+	{
+		ch = longopts[i].val;
+
+		if ('h' == ch || 'V' == ch)
+			continue;
+
+		if (1 < opt_count[ch])
+		{
+			if (NULL == strchr(shortopts, ch))
+				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
+			else
+				zbx_error("option \"-%c\" or \"--%s\" specified multiple times", ch, longopts[i].name);
+
+			ret = FAIL;
+		}
 	}
+
+	if (FAIL == ret)
+		goto out;
+
 #ifdef _WINDOWS
-	if (1 < opt_i || 1 < opt_d || 1 < opt_s || 1 < opt_x || 1 < opt_m)
-	{
-		if (1 < opt_i)
-			zbx_error("option \"-i\" or \"--install\" specified multiple times");
-		if (1 < opt_d)
-			zbx_error("option \"-d\" or \"--uninstall\" specified multiple times");
-		if (1 < opt_s)
-			zbx_error("option \"-s\" or \"--start\" specified multiple times");
-		if (1 < opt_x)
-			zbx_error("option \"-x\" or \"--stop\" specified multiple times");
-		if (1 < opt_m)
-			zbx_error("option \"-m\" or \"--multiple-agents\" specified multiple times");
-
-		ret = FAIL;
-		goto out;
-	}
-
 	/* check for mutually exclusive options */
 	/* Allowed option combinations.		*/
 	/* Option 'c' is always optional.	*/
@@ -374,19 +366,19 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/*   -  -  -  -  -  x  m	0x03	*/
 	/*   -  -  -  -  -  -  m	0x01 special case required for starting as a service with '-m' option */
 
-	if (0 < opt_p)
+	if (0 < opt_count['p'])
 		opt_mask |= 0x40;
-	if (0 < opt_t)
+	if (0 < opt_count['t'])
 		opt_mask |= 0x20;
-	if (0 < opt_i)
+	if (0 < opt_count['i'])
 		opt_mask |= 0x10;
-	if (0 < opt_d)
+	if (0 < opt_count['d'])
 		opt_mask |= 0x08;
-	if (0 < opt_s)
+	if (0 < opt_count['s'])
 		opt_mask |= 0x04;
-	if (0 < opt_x)
+	if (0 < opt_count['x'])
 		opt_mask |= 0x02;
-	if (0 < opt_m)
+	if (0 < opt_count['m'])
 		opt_mask |= 0x01;
 
 	switch (opt_mask)
@@ -412,10 +404,10 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 #else
 	/* check for mutually exclusive options */
-	if (1 < opt_p + opt_t + opt_r)
+	if (1 < opt_count['p'] + opt_count['t'] + opt_count['R'])
 	{
-		zbx_error("only one of options \"-p\", \"--print\", \"-t\", \"--test\", \"-R\" or \"--runtime-control\""
-				" can be used");
+		zbx_error("only one of options \"-p\" or \"--print\", \"-t\" or \"--test\","
+				" \"-R\" or \"--runtime-control\" can be used");
 		ret = FAIL;
 		goto out;
 	}
@@ -424,8 +416,6 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
 	if (argc > zbx_optind)
 	{
-		int	i;
-
 		for (i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
@@ -434,14 +424,12 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	}
 
 	if (NULL == CONFIG_FILE)
-		CONFIG_FILE = DEFAULT_CONFIG_FILE;
+		CONFIG_FILE = zbx_strdup(NULL, DEFAULT_CONFIG_FILE);
 out:
 	if (FAIL == ret)
 	{
 		zbx_free(TEST_METRIC);
-
-		if (DEFAULT_CONFIG_FILE != CONFIG_FILE)
-			zbx_free(CONFIG_FILE);
+		zbx_free(CONFIG_FILE);
 	}
 
 	return ret;
@@ -516,40 +504,54 @@ static void	set_defaults(void)
 static void	zbx_validate_config(void)
 {
 	char	*ch_error;
+	int	err = 0;
 
 	if (NULL == CONFIG_HOSTNAME)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
-
-	if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
+	else if (FAIL == zbx_check_hostname(CONFIG_HOSTNAME, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s': %s", CONFIG_HOSTNAME,
 				ch_error);
 		zbx_free(ch_error);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (NULL != CONFIG_HOST_METADATA && HOST_METADATA_LEN < zbx_strlen_utf8(CONFIG_HOST_METADATA))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "the value of \"HostMetadata\" configuration parameter cannot be longer than"
 				" %d characters", HOST_METADATA_LEN);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	/* make sure active or passive check is enabled */
 	if (0 == CONFIG_ACTIVE_FORKS && 0 == CONFIG_PASSIVE_FORKS)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
 
 	if (NULL != CONFIG_SOURCE_IP && ('\0' == *CONFIG_SOURCE_IP || SUCCEED != is_ip(CONFIG_SOURCE_IP)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"SourceIP\" configuration parameter: '%s'", CONFIG_SOURCE_IP);
-		exit(EXIT_FAILURE);
+		err = 1;
 	}
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	err |= (FAIL == check_cfg_feature_str("TLSConnect", CONFIG_TLS_CONNECT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSAccept", CONFIG_TLS_ACCEPT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCAFile", CONFIG_TLS_CA_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCRLFile", CONFIG_TLS_CRL_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertIssuer", CONFIG_TLS_SERVER_CERT_ISSUER, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSServerCertSubject", CONFIG_TLS_SERVER_CERT_SUBJECT, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSCertFile", CONFIG_TLS_CERT_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSKeyFile", CONFIG_TLS_KEY_FILE, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKIdentity", CONFIG_TLS_PSK_IDENTITY, "TLS support"));
+	err |= (FAIL == check_cfg_feature_str("TLSPSKFile", CONFIG_TLS_PSK_FILE, "TLS support"));
+#endif
+	if (0 != err)
+		exit(EXIT_FAILURE);
 }
 
 static int	add_activechk_host(const char *host, unsigned short port)
@@ -702,6 +704,26 @@ static void	zbx_load_config(int requirement)
 		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
+		{"TLSConnect",			&CONFIG_TLS_CONNECT,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSAccept",			&CONFIG_TLS_ACCEPT,			TYPE_STRING_LIST,
+			PARM_OPT,	0,			0},
+		{"TLSCAFile",			&CONFIG_TLS_CA_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCRLFile",			&CONFIG_TLS_CRL_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSServerCertIssuer",		&CONFIG_TLS_SERVER_CERT_ISSUER,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSServerCertSubject",	&CONFIG_TLS_SERVER_CERT_SUBJECT,	TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCertFile",			&CONFIG_TLS_CERT_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&CONFIG_TLS_KEY_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKIdentity",		&CONFIG_TLS_PSK_IDENTITY,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&CONFIG_TLS_PSK_FILE,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -714,7 +736,6 @@ static void	zbx_load_config(int requirement)
 #ifdef _WINDOWS
 	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
 #endif
-
 	parse_cfg_file(CONFIG_FILE, cfg, requirement, ZBX_CFG_STRICT);
 
 	set_defaults();
@@ -731,7 +752,12 @@ static void	zbx_load_config(int requirement)
 	zbx_free(active_hosts);
 
 	if (ZBX_CFG_FILE_REQUIRED == requirement)
+	{
 		zbx_validate_config();
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		zbx_tls_validate_config();
+#endif
+	}
 }
 
 /******************************************************************************
@@ -795,12 +821,28 @@ int	MAIN_ZABBIX_ENTRY()
 	else
 		zabbix_open_log(LOG_TYPE_FILE, CONFIG_LOG_LEVEL, CONFIG_LOG_FILE);
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+#	define TLS_FEATURE_STATUS	"YES"
+#else
+#	define TLS_FEATURE_STATUS	" NO"
+#endif
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "Starting Zabbix Agent [%s]. Zabbix %s (revision %s).",
 			CONFIG_HOSTNAME, ZABBIX_VERSION, ZABBIX_REVISION);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "**** Enabled features ****");
+	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:           " TLS_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "**************************");
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", CONFIG_FILE);
 
 #ifndef _WINDOWS
+	if (SUCCEED != zbx_coredump_disable())
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
+		exit(EXIT_FAILURE);
+	}
+
 	if (FAIL == load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, CONFIG_TIMEOUT, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
@@ -824,6 +866,9 @@ int	MAIN_ZABBIX_ENTRY()
 #endif
 	zbx_free_config();
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_parent();
+#endif
 	/* --- START THREADS ---*/
 
 	/* allocate memory for a collector, all listeners and active checks */
@@ -976,6 +1021,10 @@ void	zbx_on_exit(void)
 
 	zbx_free_service_resources();
 
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	zbx_tls_free();
+	zbx_tls_library_deinit();	/* deinitialize crypto library from parent thread */
+#endif
 #if defined(PS_OVERWRITE_ARGV)
 	setproctitle_free_env();
 #endif

@@ -23,6 +23,7 @@
 #include "proxy.h"
 
 #include "proxyconfig.h"
+#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 /******************************************************************************
  *                                                                            *
@@ -43,7 +44,7 @@ void	send_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, &error))
+	if (SUCCEED != get_active_proxy_id(jp, &proxy_hostid, host, sock, &error))
 	{
 		zbx_send_response(sock, FAIL, error, CONFIG_TIMEOUT);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data request from active proxy at"
@@ -106,12 +107,14 @@ void	recv_proxyconfig(zbx_socket_t *sock, struct zbx_json_parse *jp)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
 				" \"%s\": %s", get_ip_by_socket(sock), zbx_json_strerror());
 		zbx_send_response(sock, ret, zbx_json_strerror(), CONFIG_TIMEOUT);
-	}
-	else
-	{
-		process_proxyconfig(&jp_data);
-		zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+		goto out;
 	}
 
+	if (SUCCEED != check_access_passive_proxy(sock, ZBX_SEND_RESPONSE, "configuration update"))
+		goto out;
+
+	process_proxyconfig(&jp_data);
+	zbx_send_response(sock, ret, NULL, CONFIG_TIMEOUT);
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }

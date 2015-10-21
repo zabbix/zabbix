@@ -31,9 +31,10 @@
 #include "discoverer.h"
 #include "../poller/checks_agent.h"
 #include "../poller/checks_snmp.h"
+#include "../../libs/zbxcrypto/tls.h"
 
 extern int		CONFIG_DISCOVERER_FORKS;
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 #define ZBX_DISCOVERER_IPRANGE_LIMIT	(1 << 16)
@@ -236,7 +237,7 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 					item.snmp_oid = strdup(dcheck->key_);
 
 					substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-							&item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
+							NULL, &item.snmp_community, MACRO_TYPE_COMMON, NULL, 0);
 					substitute_key_macros(&item.snmp_oid, NULL, NULL, NULL,
 							MACRO_TYPE_SNMP_OID, NULL, 0);
 
@@ -254,13 +255,17 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char **value,
 						item.snmpv3_contextname = zbx_strdup(NULL, dcheck->snmpv3_contextname);
 
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_securityname, MACRO_TYPE_COMMON, NULL, 0);
+								NULL, &item.snmpv3_securityname, MACRO_TYPE_COMMON,
+								NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_authpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+								NULL, &item.snmpv3_authpassphrase, MACRO_TYPE_COMMON,
+								NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_privpassphrase, MACRO_TYPE_COMMON, NULL, 0);
+								NULL, &item.snmpv3_privpassphrase, MACRO_TYPE_COMMON,
+								NULL, 0);
 						substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-								&item.snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
+								NULL, &item.snmpv3_contextname, MACRO_TYPE_COMMON,
+								NULL, 0);
 					}
 
 					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))
@@ -371,9 +376,9 @@ static void	process_check(DB_DRULE *drule, DB_DCHECK *dcheck, DB_DHOST *dhost, i
 				goto out;
 			}
 
-			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 				discovery_update_service(drule, dcheck, dhost, ip, dns, port, status, value, now);
-			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
+			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_service(drule, dcheck, ip, dns, port, status, value, now);
 
 			DBcommit();
@@ -540,9 +545,9 @@ static void	process_rule(DB_DRULE *drule)
 				goto out;
 			}
 
-			if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 				discovery_update_host(&dhost, ip, host_status, now);
-			else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
+			else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 				proxy_update_host(drule, ip, dns, host_status, now);
 
 			DBcommit();
@@ -712,7 +717,7 @@ static int	process_discovery(int now)
 			process_rule(&drule);
 		}
 
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(druleid);
 
 		DBexecute("update drules set nextcheck=%d+delay where druleid=" ZBX_FS_UI64, now, druleid);
@@ -771,12 +776,15 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 #ifdef HAVE_NETSNMP
 	init_snmp(progname);
 #endif
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child();
+#endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 	last_stat_time = time(NULL);
 
