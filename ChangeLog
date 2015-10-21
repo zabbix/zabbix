@@ -12,6 +12,7 @@ Bug fixes:
 Changes for 3.0.0alpha3
 
 New features:
+..F....... [ZBX-2517] minimum period for time navigator set to 5 minutes; thanks to Zabbix community (Alexei)
 A.FGI..PS. [ZBXNEXT-1263] added encryption support for communications between Zabbix components (Alexei, Andris, asaveljevs, dimir, gleb, Ivo, Oleg, wiper)
 ..F....... [ZBXNEXT-2662] implemented on-click navigation for sub menus (Alex)
 ........S. [ZBXNEXT-2844] added multiple escalator support (wiper)
