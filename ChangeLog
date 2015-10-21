@@ -467,7 +467,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
-..F....... [ZBX-7941] changed page footer to show debug in fullscreen mode again (sasha)
+..F....... [ZBX-7941] changed page footer to show debug in fullscreen mode again (Sasha)
 ........S. [ZBX-8011] fixed escalator giving false 'no media defined' errors (wiper)
 .......PS. [ZBX-8450] removed carriage return stripping from text values when inserting data into the database (Juris)
 ..F....... [ZBX-8439] fixed layout problems in host and template configuration, host inventory in Safari (Krists)
