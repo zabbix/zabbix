@@ -42,8 +42,7 @@ $scriptId = getRequest('scriptid');
 $hostId = getRequest('hostid');
 
 $data = [
-	'message' => '',
-	'info' => DBfetch(DBselect('SELECT s.name FROM scripts s WHERE s.scriptid='.zbx_dbstr($scriptId)))
+	'message' => ''
 ];
 
 $result = API::Script()->execute([
