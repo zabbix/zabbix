@@ -567,8 +567,8 @@ function make_latest_issues(array $filter = [], $backurl) {
 	];
 
 	$triggers = API::Trigger()->get(array_merge($options, [
-		'output' => ['triggerid', 'expression', 'description', 'url', 'priority', 'lastchange', 'comments', 'error',
-			'state'
+		'output' => [
+			'triggerid', 'expression', 'description', 'url', 'priority', 'lastchange', 'comments', 'error', 'state'
 		],
 		'selectHosts' => ['hostid', 'name'],
 		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],

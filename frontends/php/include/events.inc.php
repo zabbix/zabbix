@@ -259,11 +259,11 @@ function make_small_eventlist($startEvent, $backurl) {
 
 	return $table;
 }
+
 /**
  * Create table with trigger description and events.
  *
- * @param array $trigger							An array of trigger data.
- *
+ * @param array  $trigger							An array of trigger data.
  * @param string $trigger['triggerid']				Trigger ID to select events.
  * @param string $trigger['description']			Trigger description.
  * @param string $trigger['url']					Trigger URL.
@@ -277,20 +277,18 @@ function make_popup_eventlist($trigger, $backurl) {
 	$div = (new CDiv());
 
 	if ($trigger['comments'] !== '') {
-		$trigger['comments'] = zbx_str2links($trigger['comments']);
-
 		$div->addItem(
 			(new CDiv())
+				->addItem(zbx_str2links($trigger['comments']))
 				->addClass(ZBX_STYLE_OVERLAY_DESCR)
-				->addItem($trigger['comments'])
 		);
 	}
 
 	if ($trigger['url'] !== '') {
 		$div->addItem(
 			(new CDiv())
-				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 				->addItem((new CLink($trigger['url'], $trigger['url']))->removeSID())
+				->addClass(ZBX_STYLE_OVERLAY_DESCR_URL)
 		);
 	}
 
@@ -311,7 +309,7 @@ function make_popup_eventlist($trigger, $backurl) {
 		'source' => EVENT_SOURCE_TRIGGERS,
 		'object' => EVENT_OBJECT_TRIGGER,
 		'output' => API_OUTPUT_EXTEND,
-		'objectids' => $trigger['triggerid'],
+		'objectids' => [$trigger['triggerid']],
 		'eventid_till' => $trigger['lastEvent']['eventid'],
 		'select_acknowledges' => API_OUTPUT_COUNT,
 		'sortfield' => ['clock', 'eventid'],
