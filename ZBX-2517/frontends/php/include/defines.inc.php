@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0alpha3');
+define('ZABBIX_VERSION',		'3.0.0alpha4');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050061);
+define('ZABBIX_DB_VERSION',		2050069);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -243,6 +243,10 @@ define('HOST_STATUS_TEMPLATE',		3);
 define('HOST_STATUS_PROXY_ACTIVE',	5);
 define('HOST_STATUS_PROXY_PASSIVE',	6);
 
+define('HOST_ENCRYPTION_NONE',			1);
+define('HOST_ENCRYPTION_PSK',			2);
+define('HOST_ENCRYPTION_CERTIFICATE',	4);
+
 define('HOST_MAINTENANCE_STATUS_OFF',	0);
 define('HOST_MAINTENANCE_STATUS_ON',	1);
 
@@ -408,6 +412,9 @@ define('ITEM_LOGTYPE_FAILURE_AUDIT',	7);
 define('ITEM_LOGTYPE_SUCCESS_AUDIT',	8);
 define('ITEM_LOGTYPE_CRITICAL',			9);
 define('ITEM_LOGTYPE_VERBOSE',			10);
+
+define('ITEM_DELAY_FLEX_TYPE_FLEXIBLE',		0);
+define('ITEM_DELAY_FLEX_TYPE_SCHEDULING',	1);
 
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
@@ -1151,6 +1158,7 @@ define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
+define('ZBX_STYLE_YELLOW', 'yellow');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

@@ -23,9 +23,17 @@ $this->includeJSfile('app/views/administration.proxy.edit.js.php');
 
 $widget = (new CWidget())->setTitle(_('Proxies'));
 
+$tabs = new CTabView();
+
+if ($data['form_refresh'] == 0) {
+	$tabs->setSelected(0);
+}
+
 $proxyForm = (new CForm())
 	->setId('proxyForm')
-	->addVar('proxyid', $data['proxyid']);
+	->addVar('proxyid', $data['proxyid'])
+	->addVar('tls_accept', $data['tls_accept']);
+
 if ($data['proxyid'] != 0 && $data['status'] == HOST_STATUS_PROXY_PASSIVE) {
 	$proxyForm->addVar('interfaceid', $data['interfaceid']);
 }
@@ -48,14 +56,14 @@ $interfaceTable = (new CTable())
 	]);
 
 // append hosts to form list
-$hostsTweenBox = new CTweenBox($proxyForm, 'proxy_hostids', $data['proxy_hostids']);
+$hosts_tween_box = new CTweenBox($proxyForm, 'proxy_hostids', $data['proxy_hostids']);
 foreach ($data['all_hosts'] as $host) {
 	// show only normal hosts, and discovered hosts monitored by the current proxy
 	// for new proxies display only normal hosts
 	if ($host['flags'] == ZBX_FLAG_DISCOVERY_NORMAL
 			|| ($data['proxyid'] != 0 && bccomp($data['proxyid'], $host['proxy_hostid']) == 0)) {
 
-		$hostsTweenBox->addItem(
+		$hosts_tween_box->addItem(
 			$host['hostid'],
 			$host['name'],
 			null,
@@ -65,7 +73,7 @@ foreach ($data['all_hosts'] as $host) {
 	}
 }
 
-$proxyFormList = (new CFormList('proxyFormList'))
+$proxy_form_list = (new CFormList('proxyFormList'))
 	->addRow(_('Proxy name'),
 		(new CTextBox('host', $data['host'], false, 128))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -76,25 +84,57 @@ $proxyFormList = (new CFormList('proxyFormList'))
 		HOST_STATUS_PROXY_PASSIVE => _('Passive')
 	]))
 	->addRow(_('Interface'), (new CDiv($interfaceTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR))
-	->addRow(_('Hosts'), $hostsTweenBox->get(_('Proxy hosts'), _('Other hosts')))
+	->addRow(_('Hosts'), $hosts_tween_box->get(_('Proxy hosts'), _('Other hosts')))
 	->addRow(_('Description'),
 		(new CTextArea('description', $data['description']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 
 // append tabs to form
-$proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxyFormList);
+$proxyTab = (new CTabView())->addTab('proxyTab', _('Proxy'), $proxy_form_list);
+
+// Encryption form list.
+$encryption_form_list = (new CFormList('encryption'))
+	->addRow(_('Connections to host'),
+		(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
+	)
+	->addRow(_('Connections from proxy'), [
+		[new CCheckBox('tls_in_none'), _('No encryption')],
+		BR(),
+		[new CCheckBox('tls_in_psk'), _('PSK')],
+		BR(),
+		[new CCheckBox('tls_in_cert'), _('Certificate')]
+	])
+	->addRow(_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('PSK'),
+		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('Issuer'),
+		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('Subject'),
+		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	);
+
+$tabs->addTab('proxyTab', _('Proxy'), $proxy_form_list);
+$tabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 // append buttons to form
 $cancelButton = new CRedirectButton(_('Cancel'), 'zabbix.php?action=proxy.list');
 
 if ($data['proxyid'] == 0) {
-	$proxyTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmitButton(_('Add'), 'action', 'proxy.create'),
 		[$cancelButton]
 	));
 }
 else {
-	$proxyTab->setFooter(makeFormFooter(
+	$tabs->setFooter(makeFormFooter(
 		new CSubmitButton(_('Update'), 'action', 'proxy.update'),
 		[
 			(new CSimpleButton(_('Clone')))->setId('clone'),
@@ -107,5 +147,5 @@ else {
 	));
 }
 
-$proxyForm->addItem($proxyTab);
+$proxyForm->addItem($tabs);
 $widget->addItem($proxyForm)->show();

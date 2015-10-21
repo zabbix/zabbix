@@ -25,81 +25,202 @@
 #include "log.h"
 #include "zbxgetopt.h"
 #include "zbxjson.h"
+#include "../libs/zbxcrypto/tls.h"
+
+#ifndef _WINDOWS
+#	include "zbxnix.h"
+#endif
 
 const char	*progname = NULL;
 const char	title_message[] = "zabbix_sender";
 const char	syslog_app_name[] = "zabbix_sender";
 
 const char	*usage_message[] = {
-	"[-v] -z server [-p port] [-I IP-address] -s host -k key -o value",
-	"[-v] -z server [-p port] [-I IP-address] [-s host] [-T] [-r] -i input-file",
-	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] -k key -o value",
-	"[-v] -c config-file [-z server] [-p port] [-I IP-address] [-s host] [-T] [-r] -i input-file",
-	"-h",
-	"-V",
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "-k key", "-o value", NULL,
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-r]", "-i input-file", NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "-k key", "-o value",
+	NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "[-T]", "[-r]",
+	"-i input-file", NULL,
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect cert", "--tls-ca-file CA-file",
+	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
+	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "-k key",
+	"-o value", NULL,
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert", "--tls-ca-file CA-file",
+	"[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
+	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "[-T]",
+	"[-r]", "-i input-file", NULL,
+	"[-v]", "-c config-file [-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
+	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
+	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "-k key",
+	"-o value", NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect cert",
+	"--tls-ca-file CA-file", "[--tls-crl-file CRL-file]", "[--tls-server-cert-issuer cert-issuer]",
+	"[--tls-server-cert-subject cert-subject]", "--tls-cert-file cert-file", "--tls-key-file key-file", "[-T]",
+	"[-r]", "-i input-file", NULL,
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "-s host", "--tls-connect psk",
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "-k key", "-o value", NULL,
+	"[-v]", "-z server", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "[-T]", "[-r]", "-i input-file", NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "-k key", "-o value", NULL,
+	"[-v]", "-c config-file", "[-z server]", "[-p port]", "[-I IP-address]", "[-s host]", "--tls-connect psk",
+	"--tls-psk-identity PSK-identity", "--tls-psk-file PSK-file", "[-T]", "[-r]", "-i input-file", NULL,
+#endif
+	"-h", NULL,
+	"-V", NULL,
 	NULL	/* end of text */
 };
+
+unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 
 const char	*help_message[] = {
 	"Utility for sending monitoring data to Zabbix server or proxy.",
 	"",
-	"Options:",
-	"  -c --config config-file              Absolute path to Zabbix agentd configuration file",
+	"General options:",
+	"  -c --config config-file    Absolute path to Zabbix agentd configuration file",
 	"",
-	"  -z --zabbix-server server            Hostname or IP address of Zabbix server or proxy to send data to.",
-	"                                       When used together with --config, overrides first entry of \"ServerActive\"",
-	"                                       parameter specified in agentd configuration file",
-	"  -p --port port                       Specify port number of trapper process of Zabbix server or proxy.",
-	"                                       When used together with --config, overrides the port of the first entry of",
-	"                                       \"ServerActive\" parameter specified in agentd configuration file",
-	"                                       Default is " ZBX_DEFAULT_SERVER_PORT_STR,
-	"  -I --source-address IP-address       Specify source IP address",
-	"                                       When used together with --config, overrides \"SourceIP\" parameter",
-	"                                       specified in agentd configuration file",
+	"  -z --zabbix-server server  Hostname or IP address of Zabbix server or proxy",
+	"                             to send data to. When used together with --config,",
+	"                             overrides the first entry of \"ServerActive\"",
+	"                             parameter specified in agentd configuration file",
 	"",
-	"  -s --host host                       Specify host name the item belongs to (as registered in Zabbix front-end).",
-	"                                       Host IP address and DNS name will not work.",
-	"                                       When used together with --config, overrides \"Hostname\" parameter",
-	"                                       specified in agentd configuration file",
-	"  -k --key key                         Specify item key",
-	"  -o --value value                     Specify item value",
+	"  -p --port port             Specify port number of trapper process of Zabbix",
+	"                             server or proxy. When used together with --config,",
+	"                             overrides the port of the first entry of",
+	"                             \"ServerActive\" parameter specified in agentd",
+	"                             configuration file (default: " ZBX_DEFAULT_SERVER_PORT_STR ")",
 	"",
-	"  -i --input-file input-file           Load values from input file. Specify - for standard input.",
-	"                                       Each line of file contains whitespace delimited: <host> <key> <value>.",
-	"                                       Specify - in <host> to use hostname from configuration file or --host argument",
-	"  -T --with-timestamps                 Each line of file contains whitespace delimited: <host> <key> <timestamp> <value>.",
-	"                                       This can be used with --input-file option.",
-	"                                       Timestamp should be specified in Unix timestamp format",
-	"  -r --real-time                       Send metrics one by one as soon as they are received.",
-	"                                       This can be used when reading from standard input",
+	"  -I --source-address IP-address   Specify source IP address. When used",
+	"                             together with --config, overrides \"SourceIP\"",
+	"                             parameter specified in agentd configuration file",
 	"",
-	"  -v --verbose                         Verbose mode, -vv for more details",
+	"  -s --host host             Specify host name the item belongs to (as",
+	"                             registered in Zabbix frontend). Host IP address",
+	"                             and DNS name will not work. When used together",
+	"                             with --config, overrides \"Hostname\" parameter",
+	"                             specified in agentd configuration file",
 	"",
-	"  -h --help                            Display this help message",
-	"  -V --version                         Display version number",
+	"  -k --key key               Specify item key",
+	"  -o --value value           Specify item value",
 	"",
-	"Example: zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43",
+	"  -i --input-file input-file   Load values from input file. Specify - for",
+	"                             standard input. Each line of file contains",
+	"                             whitespace delimited: <host> <key> <value>.",
+	"                             Specify - in <host> to use hostname from",
+	"                             configuration file or --host argument",
+	"",
+	"  -T --with-timestamps       Each line of file contains whitespace delimited:",
+	"                             <host> <key> <timestamp> <value>. This can be used",
+	"                             with --input-file option. Timestamp should be",
+	"                             specified in Unix timestamp format",
+	"",
+	"  -r --real-time             Send metrics one by one as soon as they are",
+	"                             received. This can be used when reading from",
+	"                             standard input",
+	"",
+	"  -v --verbose               Verbose mode, -vv for more details",
+	"",
+	"  -h --help                  Display this help message",
+	"  -V --version               Display version number",
+	"",
+	"TLS connection options:",
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"  --tls-connect value        How to connect to server or proxy. Values:",
+	"                               unencrypted - connect without encryption",
+	"                               psk         - connect using TLS and a pre-shared",
+	"                                             key",
+	"                               cert        - connect using TLS and a",
+	"                                             certificate",
+	"",
+	"  --tls-ca-file CA-file      Full pathname of a file containing the top-level",
+	"                             CA(s) certificates for peer certificate",
+	"                             verification",
+	"",
+	"  --tls-crl-file CRL-file    Full pathname of a file containing revoked",
+	"                             certificates",
+	"",
+	"  --tls-server-cert-issuer cert-issuer   Allowed server certificate issuer",
+	"",
+	"  --tls-server-cert-subject cert-subject   Allowed server certificate subject",
+	"",
+	"  --tls-cert-file cert-file  Full pathname of a file containing the certificate",
+	"                             or certificate chain",
+	"",
+	"  --tls-key-file key-file    Full pathname of a file containing the private key",
+	"",
+	"  --tls-psk-identity PSK-identity   Unique, case sensitive string used to",
+	"                             identify the pre-shared key",
+	"",
+	"  --tls-psk-file PSK-file    Full pathname of a file containing the pre-shared",
+	"                             key",
+#else
+	"  Not available. This Zabbix sender was compiled without TLS support",
+#endif
+	"",
+	"Example(s):",
+	"  zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43",
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	"",
+	"  zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 \\",
+	"    --tls-connect cert --tls-ca-file /home/zabbix/zabbix_ca_file \\",
+	"    --tls-server-cert-issuer \\",
+	"    \"CN=Signing CA,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"    --tls-server-cert-subject \\",
+	"    \"CN=Zabbix proxy,OU=IT operations,O=Example Corp,DC=example,DC=com\" \\",
+	"    --tls-cert-file /home/zabbix/zabbix_agentd.crt \\",
+	"    --tls-key-file /home/zabbix/zabbix_agentd.key",
+	"",
+	"  zabbix_sender -z 127.0.0.1 -s \"Linux DB3\" -k db.connections -o 43 \\",
+	"    --tls-connect psk --tls-psk-identity \"PSK ID Zabbix agentd\" \\",
+	"    --tls-psk-file /home/zabbix/zabbix_agentd.psk",
+#endif
 	NULL	/* end of text */
 };
+
+/* TLS parameters */
+unsigned int	configured_tls_connect_mode = ZBX_TCP_SEC_UNENCRYPTED;
+unsigned int	configured_tls_accept_modes = ZBX_TCP_SEC_UNENCRYPTED;	/* not used in zabbix_sender, just for */
+									/* linking with tls.c */
+char	*CONFIG_TLS_CONNECT		= NULL;
+char	*CONFIG_TLS_ACCEPT		= NULL; /* not used in zabbix_sender, just for linking with tls.c */
+char	*CONFIG_TLS_CA_FILE		= NULL;
+char	*CONFIG_TLS_CRL_FILE		= NULL;
+char	*CONFIG_TLS_SERVER_CERT_ISSUER	= NULL;
+char	*CONFIG_TLS_SERVER_CERT_SUBJECT	= NULL;
+char	*CONFIG_TLS_CERT_FILE		= NULL;
+char	*CONFIG_TLS_KEY_FILE		= NULL;
+char	*CONFIG_TLS_PSK_IDENTITY	= NULL;
+char	*CONFIG_TLS_PSK_FILE		= NULL;
 
 /* COMMAND LINE OPTIONS */
 
 /* long options */
 static struct zbx_option	longopts[] =
 {
-	{"config",		1,	NULL,	'c'},
-	{"zabbix-server",	1,	NULL,	'z'},
-	{"port",		1,	NULL,	'p'},
-	{"host",		1,	NULL,	's'},
-	{"source-address",	1,	NULL,	'I'},
-	{"key",			1,	NULL,	'k'},
-	{"value",		1,	NULL,	'o'},
-	{"input-file",		1,	NULL,	'i'},
-	{"with-timestamps",	0,	NULL,	'T'},
-	{"real-time",		0,	NULL,	'r'},
-	{"verbose",		0,	NULL,	'v'},
-	{"help",		0,	NULL,	'h'},
-	{"version",		0,	NULL,	'V'},
+	{"config",			1,	NULL,	'c'},
+	{"zabbix-server",		1,	NULL,	'z'},
+	{"port",			1,	NULL,	'p'},
+	{"host",			1,	NULL,	's'},
+	{"source-address",		1,	NULL,	'I'},
+	{"key",				1,	NULL,	'k'},
+	{"value",			1,	NULL,	'o'},
+	{"input-file",			1,	NULL,	'i'},
+	{"with-timestamps",		0,	NULL,	'T'},
+	{"real-time",			0,	NULL,	'r'},
+	{"verbose",			0,	NULL,	'v'},
+	{"help",			0,	NULL,	'h'},
+	{"version",			0,	NULL,	'V'},
+	{"tls-connect",			1,	NULL,	'1'},
+	{"tls-ca-file",			1,	NULL,	'2'},
+	{"tls-crl-file",		1,	NULL,	'3'},
+	{"tls-server-cert-issuer",	1,	NULL,	'4'},
+	{"tls-server-cert-subject",	1,	NULL,	'5'},
+	{"tls-cert-file",		1,	NULL,	'6'},
+	{"tls-key-file",		1,	NULL,	'7'},
+	{"tls-psk-identity",		1,	NULL,	'8'},
+	{"tls-psk-file",		1,	NULL,	'9'},
 	{NULL}
 };
 
@@ -138,6 +259,9 @@ typedef struct
 	char		*server;
 	unsigned short	port;
 	struct zbx_json	json;
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	ZBX_THREAD_SENDVAL_TLS_ARGS	tls_vars;
+#endif
 }
 ZBX_THREAD_SENDVAL_ARGS;
 
@@ -317,14 +441,20 @@ static int	check_response(char *response)
 
 static	ZBX_THREAD_ENTRY(send_value, args)
 {
-	ZBX_THREAD_SENDVAL_ARGS	*sentdval_args;
-	zbx_socket_t		sock;
+	ZBX_THREAD_SENDVAL_ARGS	*sendval_args;
 	int			tcp_ret, ret = FAIL;
+	char			*tls_arg1, *tls_arg2;
+	zbx_socket_t		sock;
 
 	assert(args);
 	assert(((zbx_thread_args_t *)args)->args);
 
-	sentdval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
+	sendval_args = (ZBX_THREAD_SENDVAL_ARGS *)((zbx_thread_args_t *)args)->args;
+
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	/* take TLS data passed from 'main' thread */
+	zbx_tls_take_vars(&sendval_args->tls_vars);
+#endif
 
 #if !defined(_WINDOWS)
 	signal(SIGINT,  send_signal_handler);
@@ -332,10 +462,26 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	signal(SIGQUIT, send_signal_handler);
 	signal(SIGALRM, send_signal_handler);
 #endif
-
-	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sentdval_args->server, sentdval_args->port, GET_SENDER_TIMEOUT)))
+	if (ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode)
 	{
-		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sentdval_args->json.buffer)))
+		tls_arg1 = NULL;
+		tls_arg2 = NULL;
+	}
+	else if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+	}
+	else	/* ZBX_TCP_SEC_TLS_PSK */
+	{
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;
+		tls_arg2 = NULL;		/* in case of TLS with PSK zbx_tls_connect() will find PSK */
+	}
+
+	if (SUCCEED == (tcp_ret = zbx_tcp_connect(&sock, CONFIG_SOURCE_IP, sendval_args->server, sendval_args->port,
+			GET_SENDER_TIMEOUT, configured_tls_connect_mode, tls_arg1, tls_arg2)))
+	{
+		if (SUCCEED == (tcp_ret = zbx_tcp_send(&sock, sendval_args->json.buffer)))
 		{
 			if (SUCCEED == (tcp_ret = zbx_tcp_recv(&sock)))
 			{
@@ -354,9 +500,25 @@ static	ZBX_THREAD_ENTRY(send_value, args)
 	zbx_thread_exit(ret);
 }
 
+static void	zbx_fill_from_config_file(char **dst, char *src)
+{
+	/* helper function, only for TYPE_STRING configuration parameters */
+
+	if (NULL != src)
+	{
+		if (NULL == *dst)
+			*dst = zbx_strdup(*dst, src);
+
+		zbx_free(src);
+	}
+}
+
 static void    zbx_load_config(const char *config_file)
 {
-	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *r = NULL;
+	char	*cfg_source_ip = NULL, *cfg_active_hosts = NULL, *cfg_hostname = NULL, *r = NULL,
+		*cfg_tls_connect = NULL, *cfg_tls_ca_file = NULL, *cfg_tls_crl_file = NULL,
+		*cfg_tls_server_cert_issuer = NULL, *cfg_tls_server_cert_subject = NULL, *cfg_tls_cert_file = NULL,
+		*cfg_tls_key_file = NULL, *cfg_tls_psk_file = NULL, *cfg_tls_psk_identity = NULL;
 
 	struct cfg_line	cfg[] =
 	{
@@ -368,6 +530,24 @@ static void    zbx_load_config(const char *config_file)
 			PARM_OPT,	0,			0},
 		{"Hostname",			&cfg_hostname,				TYPE_STRING,
 			PARM_OPT,	0,			0},
+		{"TLSConnect",			&cfg_tls_connect,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCAFile",			&cfg_tls_ca_file,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCRLFile",			&cfg_tls_crl_file,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSServerCertIssuer",		&cfg_tls_server_cert_issuer,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSServerCertSubject",	&cfg_tls_server_cert_subject,		TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSCertFile",			&cfg_tls_cert_file,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSKeyFile",			&cfg_tls_key_file,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKIdentity",		&cfg_tls_psk_identity,			TYPE_STRING,
+			PARM_OPT,	0,			0},
+		{"TLSPSKFile",			&cfg_tls_psk_file,			TYPE_STRING,
+			PARM_OPT,	0,			0},
 		{NULL}
 	};
 
@@ -377,14 +557,7 @@ static void    zbx_load_config(const char *config_file)
 	/* do not complain about unknown parameters in agent configuration file */
 	parse_cfg_file(config_file, cfg, ZBX_CFG_FILE_REQUIRED, ZBX_CFG_NOT_STRICT);
 
-	if (NULL != cfg_source_ip)
-	{
-		if (NULL == CONFIG_SOURCE_IP)
-		{
-			CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, cfg_source_ip);
-		}
-		zbx_free(cfg_source_ip);
-	}
+	zbx_fill_from_config_file(&CONFIG_SOURCE_IP, cfg_source_ip);
 
 	if (NULL == ZABBIX_SERVER)
 	{
@@ -409,30 +582,34 @@ static void    zbx_load_config(const char *config_file)
 	}
 	zbx_free(cfg_active_hosts);
 
-	if (NULL != cfg_hostname)
-	{
-		if (NULL == ZABBIX_HOSTNAME)
-		{
-			ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, cfg_hostname);
-		}
-		zbx_free(cfg_hostname);
-	}
+	zbx_fill_from_config_file(&ZABBIX_HOSTNAME, cfg_hostname);
+
+	zbx_fill_from_config_file(&CONFIG_TLS_CONNECT, cfg_tls_connect);
+	zbx_fill_from_config_file(&CONFIG_TLS_CA_FILE, cfg_tls_ca_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_CRL_FILE, cfg_tls_crl_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_SERVER_CERT_ISSUER, cfg_tls_server_cert_issuer);
+	zbx_fill_from_config_file(&CONFIG_TLS_SERVER_CERT_SUBJECT, cfg_tls_server_cert_subject);
+	zbx_fill_from_config_file(&CONFIG_TLS_CERT_FILE, cfg_tls_cert_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_KEY_FILE, cfg_tls_key_file);
+	zbx_fill_from_config_file(&CONFIG_TLS_PSK_IDENTITY, cfg_tls_psk_identity);
+	zbx_fill_from_config_file(&CONFIG_TLS_PSK_FILE, cfg_tls_psk_file);
 }
 
 static void	parse_commandline(int argc, char **argv)
 {
-	char		ch = '\0';
-	int		opt_c = 0, opt_cap_i = 0, opt_z = 0, opt_p = 0, opt_s = 0, opt_k = 0, opt_o = 0, opt_i = 0,
-			opt_cap_t = 0, opt_r = 0, opt_v = 0;
+	int		i, fatal = 0;
+	char		ch;
 	unsigned int	opt_mask = 0;
+	unsigned short	opt_count[256] = {0};
 
 	/* parse the command-line */
 	while ((char)EOF != (ch = (char)zbx_getopt_long(argc, argv, shortopts, longopts, NULL)))
 	{
+		opt_count[ch]++;
+
 		switch (ch)
 		{
 			case 'c':
-				opt_c++;
 				if (NULL == CONFIG_FILE)
 					CONFIG_FILE = zbx_strdup(CONFIG_FILE, zbx_optarg);
 				break;
@@ -445,54 +622,87 @@ static void	parse_commandline(int argc, char **argv)
 				exit(EXIT_SUCCESS);
 				break;
 			case 'I':
-				opt_cap_i++;
 				if (NULL == CONFIG_SOURCE_IP)
 					CONFIG_SOURCE_IP = zbx_strdup(CONFIG_SOURCE_IP, zbx_optarg);
 				break;
 			case 'z':
-				opt_z++;
 				if (NULL == ZABBIX_SERVER)
 					ZABBIX_SERVER = zbx_strdup(ZABBIX_SERVER, zbx_optarg);
 				break;
 			case 'p':
-				opt_p++;
 				ZABBIX_SERVER_PORT = (unsigned short)atoi(zbx_optarg);
 				break;
 			case 's':
-				opt_s++;
 				if (NULL == ZABBIX_HOSTNAME)
 					ZABBIX_HOSTNAME = zbx_strdup(ZABBIX_HOSTNAME, zbx_optarg);
 				break;
 			case 'k':
-				opt_k++;
 				if (NULL == ZABBIX_KEY)
 					ZABBIX_KEY = zbx_strdup(ZABBIX_KEY, zbx_optarg);
 				break;
 			case 'o':
-				opt_o++;
 				if (NULL == ZABBIX_KEY_VALUE)
 					ZABBIX_KEY_VALUE = zbx_strdup(ZABBIX_KEY_VALUE, zbx_optarg);
 				break;
 			case 'i':
-				opt_i++;
 				if (NULL == INPUT_FILE)
 					INPUT_FILE = zbx_strdup(INPUT_FILE, zbx_optarg);
 				break;
 			case 'T':
-				opt_cap_t++;
 				WITH_TIMESTAMPS = 1;
 				break;
 			case 'r':
-				opt_r++;
 				REAL_TIME = 1;
 				break;
 			case 'v':
-				opt_v++;
 				if (LOG_LEVEL_WARNING > CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_WARNING;
 				else if (LOG_LEVEL_DEBUG > CONFIG_LOG_LEVEL)
 					CONFIG_LOG_LEVEL = LOG_LEVEL_DEBUG;
 				break;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			case '1':
+				CONFIG_TLS_CONNECT = zbx_strdup(CONFIG_TLS_CONNECT, zbx_optarg);
+				break;
+			case '2':
+				CONFIG_TLS_CA_FILE = zbx_strdup(CONFIG_TLS_CA_FILE, zbx_optarg);
+				break;
+			case '3':
+				CONFIG_TLS_CRL_FILE = zbx_strdup(CONFIG_TLS_CRL_FILE, zbx_optarg);
+				break;
+			case '4':
+				CONFIG_TLS_SERVER_CERT_ISSUER = zbx_strdup(CONFIG_TLS_SERVER_CERT_ISSUER, zbx_optarg);
+				break;
+			case '5':
+				CONFIG_TLS_SERVER_CERT_SUBJECT = zbx_strdup(CONFIG_TLS_SERVER_CERT_SUBJECT, zbx_optarg);
+				break;
+			case '6':
+				CONFIG_TLS_CERT_FILE = zbx_strdup(CONFIG_TLS_CERT_FILE, zbx_optarg);
+				break;
+			case '7':
+				CONFIG_TLS_KEY_FILE = zbx_strdup(CONFIG_TLS_KEY_FILE, zbx_optarg);
+				break;
+			case '8':
+				CONFIG_TLS_PSK_IDENTITY = zbx_strdup(CONFIG_TLS_PSK_IDENTITY, zbx_optarg);
+				break;
+			case '9':
+				CONFIG_TLS_PSK_FILE = zbx_strdup(CONFIG_TLS_PSK_FILE, zbx_optarg);
+				break;
+#else
+			case '1':
+			case '2':
+			case '3':
+			case '4':
+			case '5':
+			case '6':
+			case '7':
+			case '8':
+			case '9':
+				zbx_error("TLS parameters cannot be used: Zabbix sender was compiled without TLS"
+						" support");
+				exit(EXIT_FAILURE);
+				break;
+#endif
 			default:
 				usage();
 				exit(EXIT_FAILURE);
@@ -501,35 +711,32 @@ static void	parse_commandline(int argc, char **argv)
 	}
 
 	/* every option may be specified only once */
-	if (1 < opt_c || 1 < opt_cap_i || 1 < opt_z || 1 < opt_p || 1 < opt_s || 1 < opt_k || 1 < opt_o || 1 < opt_i ||
-			1 < opt_cap_t || 1 < opt_r || 2 < opt_v)
+
+	for (i = 0; NULL != longopts[i].name; i++)
 	{
-		if (1 < opt_c)
-			zbx_error("option \"-c\" or \"--config\" specified multiple times");
-		if (1 < opt_cap_i)
-			zbx_error("option \"-I\" or \"--source-address\" specified multiple times");
-		if (1 < opt_z)
-			zbx_error("option \"-z\" or \"--zabbix-server\" specified multiple times");
-		if (1 < opt_p)
-			zbx_error("option \"-p\" or \"--port\" specified multiple times");
-		if (1 < opt_s)
-			zbx_error("option \"-s\" or \"--host\" specified multiple times");
-		if (1 < opt_k)
-			zbx_error("option \"-k\" or \"--key\" specified multiple times");
-		if (1 < opt_o)
-			zbx_error("option \"-o\" or \"--value\" specified multiple times");
-		if (1 < opt_i)
-			zbx_error("option \"-i\" or \"--input-file\" specified multiple times");
-		if (1 < opt_cap_t)
-			zbx_error("option \"-T\" or \"--with-timestamps\" specified multiple times");
-		if (1 < opt_r)
-			zbx_error("option \"-r\" or \"--real-time\" specified multiple times");
-		/* '-v' or '-vv' can be specified */
-		if (2 < opt_v)
+		ch = longopts[i].val;
+
+		if ('v' == ch && 2 < opt_count[ch])	/* '-v' or '-vv' can be specified */
+		{
 			zbx_error("option \"-v\" or \"--verbose\" specified more than 2 times");
 
-		exit(EXIT_FAILURE);
+			fatal = 1;
+			continue;
+		}
+
+		if ('v' != ch && 1 < opt_count[ch])
+		{
+			if (NULL == strchr(shortopts, ch))
+				zbx_error("option \"--%s\" specified multiple times", longopts[i].name);
+			else
+				zbx_error("option \"-%c\" or \"--%s\" specified multiple times", ch, longopts[i].name);
+
+			fatal = 1;
+		}
 	}
+
+	if (1 == fatal)
+		exit(EXIT_FAILURE);
 
 	/* check for mutually exclusive options    */
 
@@ -659,7 +866,7 @@ static void	parse_commandline(int argc, char **argv)
 	/*   c  z  s  k  o  -  -  -  p  -  0x3e2                    */
 	/*   c  z  s  k  o  -  -  -  p  I  0x3e3                    */
 
-	if (0 == opt_c + opt_z)
+	if (0 == opt_count['c'] + opt_count['z'])
 	{
 		zbx_error("either '-c' or '-z' option must be specified");
 		usage();
@@ -667,39 +874,39 @@ static void	parse_commandline(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 
-	if (0 < opt_c)
+	if (0 < opt_count['c'])
 		opt_mask |= 0x200;
-	if (0 < opt_z)
+	if (0 < opt_count['z'])
 		opt_mask |= 0x100;
-	if (0 < opt_s)
+	if (0 < opt_count['s'])
 		opt_mask |= 0x80;
-	if (0 < opt_k)
+	if (0 < opt_count['k'])
 		opt_mask |= 0x40;
-	if (0 < opt_o)
+	if (0 < opt_count['o'])
 		opt_mask |= 0x20;
-	if (0 < opt_i)
+	if (0 < opt_count['i'])
 		opt_mask |= 0x10;
-	if (0 < opt_cap_t)
+	if (0 < opt_count['T'])
 		opt_mask |= 0x08;
-	if (0 < opt_r)
+	if (0 < opt_count['r'])
 		opt_mask |= 0x04;
-	if (0 < opt_p)
+	if (0 < opt_count['p'])
 		opt_mask |= 0x02;
-	if (0 < opt_cap_i)
+	if (0 < opt_count['I'])
 		opt_mask |= 0x01;
 
 	if (
-			(0 == opt_c && 1 == opt_i &&	/* !c i */
+			(0 == opt_count['c'] && 1 == opt_count['i'] &&	/* !c i */
 					!((0x110 <= opt_mask && opt_mask <= 0x11f) ||
 					(0x190 <= opt_mask && opt_mask <= 0x19f))) ||
-			(0 == opt_c && 0 == opt_i &&	/* !c !i */
+			(0 == opt_count['c'] && 0 == opt_count['i'] &&	/* !c !i */
 					!(0x1e0 <= opt_mask && opt_mask <= 0x1e3)) ||
-			(1 == opt_c && 1 == opt_i &&	/* c i */
+			(1 == opt_count['c'] && 1 == opt_count['i'] &&	/* c i */
 					!((0x210 <= opt_mask && opt_mask <= 0x21f) ||
 					(0x310 <= opt_mask && opt_mask <= 0x31f) ||
 					(0x290 <= opt_mask && opt_mask <= 0x29f) ||
 					(0x390 <= opt_mask && opt_mask <= 0x39f))) ||
-			(1 == opt_c && 0 == opt_i &&	/* c !i */
+			(1 == opt_count['c'] && 0 == opt_count['i'] &&	/* c !i */
 					!((0x260 <= opt_mask && opt_mask <= 0x263) ||
 					(0x2e0 <= opt_mask && opt_mask <= 0x2e3) ||
 					(0x360 <= opt_mask && opt_mask <= 0x363) ||
@@ -714,8 +921,6 @@ static void	parse_commandline(int argc, char **argv)
 	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
 	if (argc > zbx_optind)
 	{
-		int	i;
-
 		for (i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
@@ -737,7 +942,7 @@ int	main(int argc, char **argv)
 	double			last_send = 0;
 	const char		*p;
 	zbx_thread_args_t	thread_args;
-	ZBX_THREAD_SENDVAL_ARGS sentdval_args;
+	ZBX_THREAD_SENDVAL_ARGS sendval_args;
 
 	progname = get_program_name(argv[0]);
 
@@ -747,11 +952,19 @@ int	main(int argc, char **argv)
 
 	zabbix_open_log(LOG_TYPE_UNDEFINED, CONFIG_LOG_LEVEL, NULL);
 
+#ifndef _WINDOWS
+	if (SUCCEED != zbx_coredump_disable())
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
+		goto exit;
+	}
+#endif
 	if (NULL == ZABBIX_SERVER)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "'ServerActive' parameter required");
 		goto exit;
 	}
+
 	if (0 == ZABBIX_SERVER_PORT)
 		ZABBIX_SERVER_PORT = ZBX_DEFAULT_SERVER_PORT;
 
@@ -763,14 +976,36 @@ int	main(int argc, char **argv)
 	}
 
 	thread_args.server_num = 0;
-	thread_args.args = &sentdval_args;
+	thread_args.args = &sendval_args;
 
-	sentdval_args.server = ZABBIX_SERVER;
-	sentdval_args.port = ZABBIX_SERVER_PORT;
+	sendval_args.server = ZABBIX_SERVER;
+	sendval_args.port = ZABBIX_SERVER_PORT;
 
-	zbx_json_init(&sentdval_args.json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
-	zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_validate_config();
+#if defined(_WINDOWS)
+	zbx_tls_init_parent();
+#endif
+	zbx_tls_init_child();
+#else
+	if (NULL != CONFIG_TLS_CONNECT || NULL != CONFIG_TLS_CA_FILE || NULL != CONFIG_TLS_CRL_FILE ||
+			NULL != CONFIG_TLS_SERVER_CERT_ISSUER || NULL != CONFIG_TLS_SERVER_CERT_SUBJECT ||
+			NULL != CONFIG_TLS_CERT_FILE || NULL != CONFIG_TLS_KEY_FILE ||
+			NULL != CONFIG_TLS_PSK_IDENTITY || NULL != CONFIG_TLS_PSK_FILE)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "TLS parameters cannot be used: Zabbix sender was compiled without TLS"
+				" support");
+		goto exit;
+	}
+#endif
+
+#if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+	/* prepare to pass necessary TLS data to 'send_value' thread (to be started soon) */
+	zbx_tls_pass_vars(&sendval_args.tls_vars);
+#endif
+	zbx_json_init(&sendval_args.json, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA, ZBX_JSON_TYPE_STRING);
+	zbx_json_addarray(&sendval_args.json, ZBX_PROTO_TAG_DATA);
 
 	if (INPUT_FILE)
 	{
@@ -812,8 +1047,8 @@ int	main(int argc, char **argv)
 			{
 				if (NULL == ZABBIX_HOSTNAME)
 				{
-					zabbix_log(LOG_LEVEL_CRIT, "[line %d] '-' encountered as 'Hostname', "
-							"but no default hostname was specified", total_count);
+					zabbix_log(LOG_LEVEL_CRIT, "[line %d] '-' encountered as 'Hostname',"
+							" but no default hostname was specified", total_count);
 					ret = FAIL;
 					break;
 				}
@@ -863,13 +1098,13 @@ int	main(int argc, char **argv)
 				break;
 			}
 
-			zbx_json_addobject(&sentdval_args.json, NULL);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
+			zbx_json_addobject(&sendval_args.json, NULL);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_HOST, hostname, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_KEY, key, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_VALUE, key_value, ZBX_JSON_TYPE_STRING);
 			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, timestamp);
-			zbx_json_close(&sentdval_args.json);
+				zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, timestamp);
+			zbx_json_close(&sendval_args.json);
 
 			succeed_count++;
 			buffer_count++;
@@ -903,29 +1138,29 @@ int	main(int argc, char **argv)
 
 			if (VALUES_MAX == buffer_count || (stdin == in && 1 == REAL_TIME && 0 >= read_more))
 			{
-				zbx_json_close(&sentdval_args.json);
+				zbx_json_close(&sendval_args.json);
 
 				if (1 == WITH_TIMESTAMPS)
-					zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+					zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 				last_send = zbx_time();
 
 				ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 
 				buffer_count = 0;
-				zbx_json_clean(&sentdval_args.json);
-				zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
+				zbx_json_clean(&sendval_args.json);
+				zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_SENDER_DATA,
 						ZBX_JSON_TYPE_STRING);
-				zbx_json_addarray(&sentdval_args.json, ZBX_PROTO_TAG_DATA);
+				zbx_json_addarray(&sendval_args.json, ZBX_PROTO_TAG_DATA);
 			}
 		}
 
 		if (FAIL != ret && 0 != buffer_count)
 		{
-			zbx_json_close(&sentdval_args.json);
+			zbx_json_close(&sendval_args.json);
 
 			if (1 == WITH_TIMESTAMPS)
-				zbx_json_adduint64(&sentdval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
+				zbx_json_adduint64(&sendval_args.json, ZBX_PROTO_TAG_CLOCK, (int)time(NULL));
 
 			ret = update_exit_status(ret, zbx_thread_wait(zbx_thread_start(send_value, &thread_args)));
 		}
@@ -957,11 +1192,11 @@ int	main(int argc, char **argv)
 
 			ret = SUCCEED;
 
-			zbx_json_addobject(&sentdval_args.json, NULL);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(&sentdval_args.json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
-			zbx_json_close(&sentdval_args.json);
+			zbx_json_addobject(&sendval_args.json, NULL);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_HOST, ZABBIX_HOSTNAME, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_KEY, ZABBIX_KEY, ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&sendval_args.json, ZBX_PROTO_TAG_VALUE, ZABBIX_KEY_VALUE, ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&sendval_args.json);
 
 			succeed_count++;
 
@@ -970,7 +1205,7 @@ int	main(int argc, char **argv)
 		while (0); /* try block simulation */
 	}
 free:
-	zbx_json_free(&sentdval_args.json);
+	zbx_json_free(&sendval_args.json);
 exit:
 	if (FAIL != ret)
 	{
@@ -982,6 +1217,12 @@ exit:
 				" Use option -vv for more detailed output." : "");
 	}
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_free();
+#if defined(_WINDOWS)
+	zbx_tls_library_deinit();
+#endif
+#endif
 	zabbix_close_log();
 
 	if (FAIL == ret)

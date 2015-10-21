@@ -379,7 +379,7 @@ var CMessageList = Class.create({
 		this.dom.container.setAttribute('id', 'zbx_messages');
 		this.dom.container.className = 'overlay-dialogue notif';
 		this.dom.container.style.right = '0px';
-		this.dom.container.style.top = '115px';
+		this.dom.container.style.top = '126px';
 		$(this.dom.container).hide();
 
 		// close all
