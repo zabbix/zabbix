@@ -1,7 +1,7 @@
 Changes for 3.0.0alpha4
 
 New features:
-A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, sasha)
+A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, Sasha)
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
@@ -26,11 +26,11 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Italian, Japanese and
 Bug fixes:
 ..F....... [ZBXNEXT-2662] fixed debug messages in the dashboard widgets (Sasha)
 ..F....... [ZBXNEXT-2662] fixed year and month vertical alignment in calendar (Pavel)
-..F....... [ZBXNEXT-2662] fixed displaying of month and year in calendar popup (sasha)
-..F....... [ZBXNEXT-2662] fixed script execution window layout (sasha)
-..F....... [ZBXNEXT-2662] fixed displaying of modal dialogs (Pavel, sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of month and year in calendar popup (Sasha)
+..F....... [ZBXNEXT-2662] fixed script execution window layout (Sasha)
+..F....... [ZBXNEXT-2662] fixed displaying of modal dialogs (Pavel, Sasha)
 ..F....... [ZBXNEXT-2662] fixed top nav jumping icon bug on page zoom in Safari (Pavel)
-..F....... [ZBXNEXT-2662] fixed resizing of multiselect items in filters (sasha)
+..F....... [ZBXNEXT-2662] fixed resizing of multiselect items in filters (Sasha)
 ..F....... [ZBX-9941] fixed button attributes changes for map cloning (vitalijs)
 ........S. [ZBX-7006] implemented trend cache cleanup procedure which forces hourly flush of deleted, disabled or rarely updated item trends (dimir, gleb)
 ........S. [ZBX-9889] fixed vmware.eventlog item values to have unique timestamps in history table (dimir)
@@ -161,7 +161,7 @@ Bug fixes:
 A......... [ZBX-7821] removed restriction to have log type information for items with key "log", "logrt" and "eventlog" (Ivo)
 ..F....... [ZBX-8252] renamed "Retries" to "Attempts" in web scenario edit form and list view (Ivo)
 ........S. [ZBX-9623] fixed possible SQL error when network discovery rule and LLD rule are processed at the same time (dimir)
-A.F....... [ZBX-9540] fixed import/export of the "Host time" clock screen element (sasha)
+A.F....... [ZBX-9540] fixed import/export of the "Host time" clock screen element (Sasha)
 ...G...... [ZBX-9142] made vm.memory.size[available] read MemAvailable from /proc/meminfo on Linux kernels 3.14 and above (asaveljevs)
 A.F.I..... [ZBX-9414] fixed sorting, displaying and filtering by trends and interval in items, item prototypes and discovery rules (Ivo)
 ..F....... [ZBXNEXT-2791] synchronised item key helper descriptions and return values from the Zabbix manual (Richlv)
@@ -674,7 +674,7 @@ A.F....... [ZBX-1357] updated Brazilian Portuguese, Japanese, Polish, Russian an
 ..F....... [ZBX-8113] changed frontend configuration wizard to store info in session instead of cookies (Andrejs)
 
 Bug fixes:
-..F....... [ZBX-7941] changed page footer to show debug in fullscreen mode again (sasha)
+..F....... [ZBX-7941] changed page footer to show debug in fullscreen mode again (Sasha)
 ........S. [ZBX-8011] fixed escalator giving false 'no media defined' errors (wiper)
 .......PS. [ZBX-8450] removed carriage return stripping from text values when inserting data into the database (Juris)
 ..F....... [ZBX-8439] fixed layout problems in host and template configuration, host inventory in Safari (Krists)
