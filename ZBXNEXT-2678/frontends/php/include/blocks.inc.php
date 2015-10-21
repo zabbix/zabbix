@@ -748,10 +748,10 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		// description
-		$description = (new CSpan($description))->addClass(ZBX_STYLE_LINK_ACTION);
-
-		if ($trigger['lastEvent']) {
-			$description->setHint(make_popup_eventlist($trigger, $backurl), '', true, 'max-width: 500px');
+		if ($trigger['lastEvent'] || $trigger['comments'] !== '' || $trigger['url'] !== '') {
+			$description = (new CSpan($description))
+				->setHint(make_popup_eventlist($trigger, $backurl), '', true, 'max-width: 500px')
+				->addClass(ZBX_STYLE_LINK_ACTION);
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 

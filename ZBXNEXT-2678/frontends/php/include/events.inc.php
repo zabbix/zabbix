@@ -297,7 +297,7 @@ function make_popup_eventlist($trigger, $backurl) {
 
 	$table = new CTableInfo();
 
-	// if acknowledges are turned on, we show 'ack' column
+	// If acknowledges are turned on, we show 'ack' column.
 	if ($config['event_ack_enable']) {
 		$table->setHeader([_('Time'), _('Status'), _('Duration'), _('Age'), _('Ack')]);
 	}
@@ -305,36 +305,38 @@ function make_popup_eventlist($trigger, $backurl) {
 		$table->setHeader([_('Time'), _('Status'), _('Duration'), _('Age')]);
 	}
 
-	$events = API::Event()->get([
-		'source' => EVENT_SOURCE_TRIGGERS,
-		'object' => EVENT_OBJECT_TRIGGER,
-		'output' => API_OUTPUT_EXTEND,
-		'objectids' => [$trigger['triggerid']],
-		'eventid_till' => $trigger['lastEvent']['eventid'],
-		'select_acknowledges' => API_OUTPUT_COUNT,
-		'sortfield' => ['clock', 'eventid'],
-		'sortorder' => ZBX_SORT_DOWN,
-		'limit' => ZBX_WIDGET_ROWS
-	]);
-
-	$lclock = time();
-
-	foreach ($events as $event) {
-		$duration = zbx_date2age($lclock, $event['clock']);
-		$lclock = $event['clock'];
-
-		$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
-
-		// add colors and blinking to span depending on configuration and trigger parameters
-		addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
-
-		$table->addRow([
-			zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
-			$eventStatusSpan,
-			$duration,
-			zbx_date2age($event['clock']),
-			$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null
+	if ($trigger['lastEvent']) {
+		$events = API::Event()->get([
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'object' => EVENT_OBJECT_TRIGGER,
+			'output' => API_OUTPUT_EXTEND,
+			'objectids' => [$trigger['triggerid']],
+			'eventid_till' => $trigger['lastEvent']['eventid'],
+			'select_acknowledges' => API_OUTPUT_COUNT,
+			'sortfield' => ['clock', 'eventid'],
+			'sortorder' => ZBX_SORT_DOWN,
+			'limit' => ZBX_WIDGET_ROWS
 		]);
+
+		$lclock = time();
+
+		foreach ($events as $event) {
+			$duration = zbx_date2age($lclock, $event['clock']);
+			$lclock = $event['clock'];
+
+			$eventStatusSpan = new CSpan(trigger_value2str($event['value']));
+
+			// add colors and blinking to span depending on configuration and trigger parameters
+			addTriggerValueStyle($eventStatusSpan, $event['value'], $event['clock'], $event['acknowledged']);
+
+			$table->addRow([
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $event['clock']),
+				$eventStatusSpan,
+				$duration,
+				zbx_date2age($event['clock']),
+				$config['event_ack_enable'] ? getEventAckState($event, $backurl) : null
+			]);
+		}
 	}
 
 	$div->addItem($table);
