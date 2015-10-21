@@ -98,6 +98,7 @@ $tranStrings = [
 		'S_MONTH_SHORT' => _x('m', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'S_DATE_FORMAT' => DATE_TIME_FORMAT
 	],
 	'functions.js' => [
