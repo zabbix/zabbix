@@ -403,7 +403,7 @@ $itemFormList->addRow(_('Description'),
 
 // status
 $enabledCheckBox = (new CCheckBox('status', ITEM_STATUS_ACTIVE))
-	->setChecked($this->data['status'] != ITEM_STATUS_ACTIVE);
+	->setChecked($this->data['status'] == ITEM_STATUS_ACTIVE);
 $itemFormList->addRow(_('Enabled'), $enabledCheckBox);
 
 // append tabs to form

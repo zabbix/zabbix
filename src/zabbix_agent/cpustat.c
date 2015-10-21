@@ -400,8 +400,10 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	zbx_fclose(file);
 
 	for (idx = 0; idx <= pcpus->count; idx++)
+	{
 		if (SYSINFO_RET_FAIL == cpu_status[idx])
 			update_cpu_counters(&pcpus->cpu[idx], NULL);
+	}
 
 	zbx_free(cpu_status);
 
@@ -462,7 +464,8 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 	update_cpu_counters(&pcpus->cpu[0], counter);
 
 	/* get size of result set for CPU statistics */
-	if (-1 == sysctlbyname("kern.cp_times", NULL, &nlen_alloc, NULL, 0)) {
+	if (-1 == sysctlbyname("kern.cp_times", NULL, &nlen_alloc, NULL, 0))
+	{
 		for (idx = 1; idx <= pcpus->count; idx++)
 			update_cpu_counters(&pcpus->cpu[idx], NULL);
 		goto exit;
@@ -482,8 +485,7 @@ static void	update_cpustats(ZBX_CPUS_STAT_DATA *pcpus)
 			counter[ZBX_CPU_STATE_USER] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_USER);
 			counter[ZBX_CPU_STATE_NICE] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_NICE);
 			counter[ZBX_CPU_STATE_SYSTEM] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_SYS);
-			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES +
-					CP_INTR);
+			counter[ZBX_CPU_STATE_INTERRUPT] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_INTR);
 			counter[ZBX_CPU_STATE_IDLE] = (zbx_uint64_t)*(cp_times + cpu_num * CPUSTATES + CP_IDLE);
 
 			update_cpu_counters(&pcpus->cpu[idx], counter);
