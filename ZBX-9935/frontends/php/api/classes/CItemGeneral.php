@@ -299,16 +299,18 @@ abstract class CItemGeneral extends CZBXAPI {
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
 				if ($fullItem['delay'] < 0 || $fullItem['delay'] > SEC_PER_DAY) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Item will not be refreshed. Please enter a correct update interval.')
+						_('Item will not be refreshed. Please enter a correct update interval.')
 					);
 				}
-				else {
-					$res = calculateItemNextcheck(0, 0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'], time());
-					if ($res['delay'] == 0) {
-						self::exception(ZBX_API_ERROR_PARAMETERS,
-							_('Item will not be refreshed. Please enter a correct update interval.')
-						);
-					}
+
+				$res = calculateItemNextcheck(0, 0, $fullItem['type'], $fullItem['delay'], $fullItem['delay_flex'],
+					time()
+				);
+
+				if ($res['delay'] == 0) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_('Item will not be refreshed. Please enter a correct update interval.')
+					);
 				}
 			}
 
