@@ -6,6 +6,7 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9945] fixed updating of "Device uniqueness criterias" while editing discovery checks (Sasha)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 
