@@ -680,8 +680,12 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 		$host_name = get_node_name_by_elid($dbItem['hostid'], null, NAME_DELIMITER).$dbItem['hostname'];
 		$hostNames[$dbItem['hostid']] = $host_name;
 
-		if (!array_key_exists($host_name, $item_counter) || !array_key_exists($item_name, $item_counter[$host_name])) {
-			$item_counter[$host_name] = array($item_name => 0);
+		if (!array_key_exists($host_name, $item_counter)) {
+			$item_counter[$host_name] = array();
+		}
+
+		if (!array_key_exists($item_name, $item_counter[$host_name])) {
+			$item_counter[$host_name][$item_name] = 0;
 		}
 
 		if (!array_key_exists($item_name, $host_items) || !array_key_exists($host_name, $host_items[$item_name])) {
