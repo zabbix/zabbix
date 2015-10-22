@@ -677,6 +677,28 @@ class CItemKeyTest extends PHPUnit_Framework_TestCase {
 				[]
 			],
 			[
+				'{}key', 0,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => 'incorrect syntax near "{}key"',
+					'match' => '',
+					'key' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
+				'{}key', 1,
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'error' => 'incorrect syntax near "}key"',
+					'match' => '',
+					'key' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
 				'ssh,21', 0,
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
