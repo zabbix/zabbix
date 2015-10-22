@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
-"PO-Revision-Date: 2015-09-10 05:36+0300\n"
+"POT-Creation-Date: 2015-10-22 15:56+0300\n"
+"PO-Revision-Date: 2015-09-18 01:12+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1441856216.0\n"
+"X-POOTLE-MTIME: 1442531556.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -68,7 +68,7 @@ msgstr[0] "%1$s日"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
+msgstr[0] "%1$sイベント"
 
 #: include/views/monitoring.history.php:27
 #, c-format
@@ -1101,7 +1101,7 @@ msgstr "CPUの負荷。浮動小数点値を返す。"
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "CPU使用率。浮動小数点値を返す。"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1149,7 +1149,6 @@ msgstr "キャンセル"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "イベントの障害対応コメントを入力できません"
@@ -2702,7 +2701,7 @@ msgstr "条件式ビルダーを閉じる"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:171
 msgid "Collapse"
-msgstr ""
+msgstr "縮小"
 
 #: include/views/configuration.graph.edit.php:263
 #: include/views/js/configuration.sysmaps.js.php:354
@@ -3668,7 +3667,7 @@ msgstr "デフォルトの更新間隔 (秒)"
 
 #: adm.other.php:38 include/views/administration.general.other.edit.php:48
 msgid "Default host inventory mode"
-msgstr ""
+msgstr "デフォルトのホストインベントリモード"
 
 #: include/views/configuration.action.edit.php:50
 #: include/views/configuration.action.edit.php:671
@@ -5040,7 +5039,6 @@ msgstr "最新のログのイベントIDが正規表現と一致 N = 1、その�
 
 #: app/controllers/CControllerAcknowledgeCreate.php:124
 #: include/actions.inc.php:58
-#, fuzzy
 msgid "Event acknowledged"
 msgid_plural "Events acknowledged"
 msgstr[0] "障害対応済"
@@ -5143,7 +5141,7 @@ msgstr "実行の確認"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:170
 msgid "Expand"
-msgstr ""
+msgstr "展開"
 
 #: include/views/configuration.sysmap.constructor.php:42
 msgid "Expand macros"
@@ -7273,7 +7271,7 @@ msgstr "インベントリのフィールド\"%s\"が正しくありません。
 
 #: include/classes/api/services/CAction.php:1456
 msgid "Incorrect inventory mode in action operation."
-msgstr ""
+msgstr "実行するアクション内のインベントリモードが正しくありません。"
 
 #: include/classes/api/services/CScreenItem.php:732
 #, c-format
@@ -7665,7 +7663,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:231
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr ""
+msgstr "フィールド\"%1$s\": %2$sの値が正しくありません。"
 
 #: include/validate.inc.php:319
 #, c-format
@@ -7746,7 +7744,7 @@ msgstr "継承したマクロとホストマクロ"
 
 #: include/views/hostmacros.php:173
 msgid "Inherited and template macros"
-msgstr ""
+msgstr "継承したマクロとテンプレートマクロ"
 
 #: include/views/configuration.triggers.expression.php:128
 msgid "Insert"
@@ -8720,7 +8718,7 @@ msgstr "次にリンク"
 #: include/views/js/configuration.sysmaps.js.php:302
 #: include/views/js/configuration.sysmaps.js.php:313
 msgid "Links"
-msgstr ""
+msgstr "リンク"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -9055,7 +9053,7 @@ msgstr "マップ"
 
 #: include/views/js/configuration.sysmaps.js.php:2
 msgid "Map element"
-msgstr ""
+msgstr "マップの要素"
 
 #: sysmap.php:84
 msgid "Map is updated! Return?"
@@ -10006,7 +10004,7 @@ msgstr "ホスト\"%s\"にインターフェースが設定されていません
 
 #: include/classes/api/services/CAction.php:1451
 msgid "No inventory mode specified for action operation."
-msgstr ""
+msgstr "実行するアクションのインベントリモードが設定されていません。"
 
 #: include/classes/api/services/CScreenItem.php:554
 #: include/classes/api/services/CScreenItem.php:564
@@ -10700,7 +10698,7 @@ msgstr "同時には1つのユーザーグループ名しか変更できませ�
 #: app/views/monitoring.acknowledge.edit.php:58
 msgid "Only selected event"
 msgid_plural "Only selected events"
-msgstr[0] ""
+msgstr[0] "選択したイベントのみ"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
@@ -11497,7 +11495,7 @@ msgstr "障害"
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:427
 msgid "Process CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "プロセスごとのCPU使用率。浮動小数点値を返す。"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:255
@@ -12582,11 +12580,11 @@ msgstr "選択したアクションを削除しました"
 
 #: app/views/monitoring.acknowledge.edit.php:63
 msgid "Selected and all unacknowledged PROBLEM events"
-msgstr ""
+msgstr "選択したイベントとすべてのコメント未入力障害イベント"
 
 #: app/views/monitoring.acknowledge.edit.php:68
 msgid "Selected and all unacknowledged events"
-msgstr ""
+msgstr "選択したイベントとすべてのコメント未入力イベント"
 
 #: include/views/js/configuration.sysmaps.js.php:209
 msgid "Selected elements"
@@ -12739,7 +12737,7 @@ msgstr "セッションが切断されました。再度ログインしてくだ
 
 #: include/actions.inc.php:889
 msgid "Set host inventory mode"
-msgstr ""
+msgstr "インベントリモードの設定"
 
 #: events.php:453 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
@@ -13430,7 +13428,7 @@ msgstr "テンプレートのリンク"
 
 #: include/views/hostmacros.php:172
 msgid "Template macros"
-msgstr ""
+msgstr "テンプレートのマクロ"
 
 #: include/views/configuration.template.edit.php:73 templates.php:54
 msgid "Template name"
@@ -15904,7 +15902,7 @@ msgstr "点滅"
 #: include/classes/api/services/CMediatype.php:417
 #: include/classes/validators/CNewValidator.php:88
 msgid "cannot be empty"
-msgstr ""
+msgstr "空白は指定できません"
 
 #: include/classes/parsers/CConditionFormula.php:188
 #, c-format
