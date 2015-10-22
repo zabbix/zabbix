@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
-"PO-Revision-Date: 2015-03-26 11:38+0300\n"
+"POT-Creation-Date: 2015-10-22 15:56+0300\n"
+"PO-Revision-Date: 2015-09-24 09:46+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pl\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1427362729.0\n"
+"X-POOTLE-MTIME: 1443080767.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -21,7 +21,7 @@ msgstr ""
 #: include/classes/import/validators/C30XmlValidator.php:873
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "oczekiwano \"%1$s\""
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -76,17 +76,17 @@ msgstr[2] "%1$s dni"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s zdarzenie"
+msgstr[1] "%1$s zdarzenia"
+msgstr[2] "%1$s zdarzeń"
 
 #: include/views/monitoring.history.php:27
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s pozycja"
+msgstr[1] "%1$s pozycje"
+msgstr[2] "%1$s pozycji"
 
 #: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
 #, c-format
@@ -154,7 +154,7 @@ msgstr "(brak proxy)"
 
 #: include/classes/setup/CSetupWizard.php:236
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - użyj port domyślny"
 
 #: include/triggers.inc.php:2078 include/triggers.inc.php:2080
 #: include/triggers.inc.php:2081 include/triggers.inc.php:2083
@@ -174,7 +174,7 @@ msgstr "10 sekund"
 
 #: include/views/reports.toptriggers.php:24 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 najbardziej zajętych wyzwalaczy"
 
 #: queue.php:106 queue.php:167
 msgid "30 seconds"
@@ -238,7 +238,7 @@ msgstr "Akceptowalne SLA"
 
 #: include/func.inc.php:1635
 msgid "Access denied"
-msgstr ""
+msgstr "Dostęp zabroniony"
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -589,7 +589,7 @@ msgstr "Agent"
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:339
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Sprawdzenie dostępności agenta. Nic nie zwróciło - niedostępny, 1 - dostępny"
 
 #: include/views/configuration.host.list.php:70
 msgid "Agent encryption"
@@ -598,7 +598,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Nazwa hosta agenta. Zwraca ciąg znaków"
 
 #: include/views/configuration.host.edit.php:140
 #: include/views/configuration.host.edit.php:225
@@ -618,7 +618,7 @@ msgstr "Kontrole sumaryczne nie wymagają, by na monitorowanym hoście działał
 #: app/controllers/CControllerAcknowledgeEdit.php:146
 #: app/views/monitoring.acknowledge.edit.php:83
 msgid "Alarm acknowledgements"
-msgstr ""
+msgstr "Powiadomienia alarmów"
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:46
 #: include/views/administration.users.list.php:47 popup.php:625 users.php:43
@@ -653,7 +653,7 @@ msgstr "Wszystkie grupy"
 
 #: include/html.inc.php:369
 msgid "All hosts"
-msgstr ""
+msgstr "Wszystkie hosty"
 
 #: jsLoader.php:152
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -661,7 +661,7 @@ msgstr "Wszystkie połączenia powinny mieć określone pola \"Name\" i \"URL\""
 
 #: include/html.inc.php:330
 msgid "All templates"
-msgstr ""
+msgstr "Wszystkie szablony"
 
 #: include/views/configuration.host.discovery.edit.php:247
 #: include/views/configuration.item.edit.php:401
@@ -672,7 +672,7 @@ msgstr "Dopuszczalne hosty"
 
 #: include/classes/setup/CSetupWizard.php:384
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Alternatywnie, można zainstalować to ręcznie:"
 
 #: include/triggers.inc.php:1530
 #: include/views/configuration.action.edit.php:135
@@ -733,7 +733,7 @@ msgstr "Błąd aplikacji."
 
 #: include/views/configuration.item.prototype.edit.php:397
 msgid "Application prototypes"
-msgstr ""
+msgstr "Prototypy aplikacji"
 
 #: applications.php:110
 msgid "Application updated"
@@ -870,7 +870,7 @@ msgstr "Przynajmniej jedna z baz MySQL, PostgreSQL, Oracle, SQLite3 lub IBM DB2 
 #: httpconf.php:47 include/views/configuration.httpconf.edit.php:80
 #: include/views/configuration.httpconf.list.php:60
 msgid "Attempts"
-msgstr ""
+msgstr "Próby"
 
 #: include/menu.inc.php:142
 #: include/views/administration.general.housekeeper.edit.php:74
@@ -1026,7 +1026,7 @@ msgstr "Średnia wartość w okresie T NIE jest = N"
 #: include/classes/setup/CSetupWizard.php:121
 #: include/classes/setup/CSetupWizard.php:341
 msgid "Back"
-msgstr ""
+msgstr "Wstecz"
 
 #: include/views/administration.general.image.edit.php:55
 #: include/views/administration.general.image.list.php:39
@@ -1075,7 +1075,7 @@ msgstr "Zablokowane"
 
 #: include/classes/core/ZBase.php:265
 msgid "Blue"
-msgstr ""
+msgstr "Niebieski"
 
 #: include/graphs.inc.php:59 include/views/js/configuration.sysmaps.js.php:343
 #: include/views/js/configuration.sysmaps.js.php:423
@@ -1123,17 +1123,17 @@ msgstr "KONFIGURACJA WYZWALACZY"
 #: include/classes/items/CHelpItems.php:205
 #: include/classes/items/CHelpItems.php:487
 msgid "CPU information. Returns string or integer"
-msgstr ""
+msgstr "Informacje o CPU. Zwraca ciąg znaków lub liczbę"
 
 #: include/classes/items/CHelpItems.php:181
 #: include/classes/items/CHelpItems.php:463
 msgid "CPU load. Returns float"
-msgstr ""
+msgstr "Obciążenie CPU. Zwraca liczbę zmiennoprzecinkową"
 
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Użycie procentowe CPU. Zwraca liczbę zmiennoprzecinkową"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1181,7 +1181,6 @@ msgstr "Anuluj"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Nie można potwierdzić zdarzenia"
@@ -1191,7 +1190,7 @@ msgstr[2] "Nie można potwierdzić zdarzenia"
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
 msgid "Cannot add a discovered application \"%1$s\" to a web scenario."
-msgstr ""
+msgstr "Nie można dodać wykrytej aplikacji \"%1$s\" do scenariusza sieci www."
 
 #: include/classes/api/services/CGraph.php:725
 #: include/classes/api/services/CGraph.php:739
@@ -1401,7 +1400,7 @@ msgstr "Nie można powielić prototypów wyzwalaczy."
 
 #: include/classes/setup/CSetupWizard.php:262
 msgid "Cannot connect to the database."
-msgstr ""
+msgstr "Nie można połączyć się do bazy danych."
 
 #: scripts_exec.php:69
 msgid "Cannot connect to the trapper port of zabbix server daemon, but it should be available to run the script."
@@ -1440,7 +1439,7 @@ msgstr "Nie można utworzyć zależności do tego samego wyzwalacza."
 
 #: include/classes/api/services/CTriggerPrototype.php:1024
 msgid "Cannot create dependency on trigger prototype itself."
-msgstr ""
+msgstr "Nie można utworzyć zależności do samego prototypu wyzwalacza."
 
 #: discoveryconf.php:154
 msgid "Cannot create discovery rule"
@@ -1470,7 +1469,7 @@ msgstr "Nie można utworzyć szablonu."
 
 #: include/classes/setup/CSetupWizard.php:382
 msgid "Cannot create the configuration file."
-msgstr ""
+msgstr "Nie można utworzyć pliku konfiguracyjnego."
 
 #: include/classes/api/services/CUser.php:1317
 #, c-format
@@ -1496,7 +1495,7 @@ msgstr "Nie można usunąć zależności"
 #: include/classes/api/services/CApplication.php:415
 #, c-format
 msgid "Cannot delete discovered application \"%1$s\"."
-msgstr ""
+msgstr "Nie można usunąć wykrytej aplikacji \"%1$s\"."
 
 #: include/classes/api/services/CGraph.php:554
 #, c-format
@@ -2082,7 +2081,7 @@ msgstr[2] "Nie można zaimportować szablonu \"%1$s\", nie istnieją podłączon
 #: include/classes/mvc/CView.php:219
 #, c-format
 msgid "Cannot include JS file \"%s\"."
-msgstr ""
+msgstr "Nie można załadować pliku JS \"%s\"."
 
 #: include/classes/mvc/CView.php:141
 #, c-format
@@ -2179,7 +2178,7 @@ msgstr "Nie można wydać polecenia, sprawdź połączenie z serwerem Zabbix'a \
 #: include/classes/api/services/CApplication.php:302
 #, c-format
 msgid "Cannot set \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "Nie można ustawić \"%1$s\" dla aplikacji \"%2$s\"."
 
 #: include/classes/api/services/CHostGroup.php:389
 #, c-format
@@ -2199,7 +2198,7 @@ msgstr "Nie można ustawić \"%1$s\" dla wyzwalacza \"%2$s\"."
 #: include/classes/api/services/CItemPrototype.php:306
 #, c-format
 msgid "Cannot set \"templateid\" field for application prototype in item prototype \"%1$s\"."
-msgstr ""
+msgstr "nie można ustawić pola \"templateid\" dla prototypu aplikacji w prototypie pozycji \"%1$s\"."
 
 #: include/classes/api/services/CScreen.php:350
 #, c-format
@@ -2286,7 +2285,7 @@ msgstr "Nie można zaktualizować \"%1$s\" dla akcji \"%2$s\"."
 #: include/classes/api/services/CApplication.php:296
 #, c-format
 msgid "Cannot update \"%1$s\" for application \"%2$s\"."
-msgstr ""
+msgstr "Nie można zaktualizować \"%1$s\" dla aplikacji \"%2$s\"."
 
 #: include/classes/api/services/CHostGroup.php:451
 #, c-format
@@ -2376,7 +2375,7 @@ msgstr "Nie można zaktualizować opisu"
 #: include/classes/api/services/CApplication.php:314
 #, c-format
 msgid "Cannot update discovered application \"%1$s\"."
-msgstr ""
+msgstr "Nie można zaktualizować wykrytej aplikacji \"%1$s\"."
 
 #: discoveryconf.php:147 host_discovery.php:327
 msgid "Cannot update discovery rule"
@@ -2617,7 +2616,7 @@ msgstr "Obudowa"
 #: include/classes/items/CHelpItems.php:201
 #: include/classes/items/CHelpItems.php:483
 msgid "Chassis information. Returns string"
-msgstr ""
+msgstr "Informacje o obudowie. Zwraca ciąg znaków"
 
 #: include/views/js/configuration.discovery.edit.js.php:533
 msgid "Check already exists."
@@ -2631,7 +2630,7 @@ msgstr "Proszę sprawdzić część wyrażenia zaczynającą się od \"%1$s\"."
 #: include/classes/setup/CSetupWizard.php:39
 #: include/classes/setup/CSetupWizard.php:202
 msgid "Check of pre-requisites"
-msgstr ""
+msgstr "Kontrola wymagań"
 
 #: include/classes/api/services/CItemGeneral.php:293
 #: include/classes/api/services/CItemGeneral.php:300
@@ -2651,17 +2650,17 @@ msgstr "Testy"
 #: include/classes/items/CHelpItems.php:85
 #: include/classes/items/CHelpItems.php:367
 msgid "Checks if DNS service is up. Returns 0 - DNS is down (server did not respond or DNS resolution failed); 1 - DNS is up"
-msgstr ""
+msgstr "Sprawdza, czy usługa DNS działa. Zwraca 0 - DNS nie działa (serwer nie odpowiada lub rozwiązanie DNS nie udało się); 1 - DNS działa"
 
 #: include/classes/items/CHelpItems.php:281
 #: include/classes/items/CHelpItems.php:563
 msgid "Checks if file exists. Returns 0 - not found; 1 - regular file or a link (symbolic or hard) to regular file exists"
-msgstr ""
+msgstr "Sprawdza, czy plik istnieje. Zwraca 0 - nie znaleziono; 1 - istnieje zwykły plik lub link (symboliczny lub twardy) do zwykłego pliku"
 
 #: include/classes/items/CHelpItems.php:117
 #: include/classes/items/CHelpItems.php:399
 msgid "Checks if it is possible to make TCP connection to specified port. Returns 0 - cannot connect; 1 - can connect"
-msgstr ""
+msgstr "Sprawdza, czy możliwe jest nawiązanie połączenia do określonego portu. Zwraca 0 - nie można się połączyć; 1 - można się połączyć"
 
 #: include/classes/items/CHelpItems.php:623
 msgid "Checks if server is accessible by ICMP ping. 0 - ICMP ping fails. 1 - ICMP ping successful. One of zabbix_server processes performs ICMP pings once per PingerFrequency seconds."
@@ -2671,35 +2670,35 @@ msgstr "Sprawdź czy serwer jest dostępny dla pingów ICMP. 0 - pingi ICMP nie 
 #: include/classes/items/CHelpItems.php:403
 #: include/classes/items/CHelpItems.php:635
 msgid "Checks if service is running and accepting TCP connections. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "Sprawdza, czy usługa jest uruchomiona i akceptuje połączenia TCP. Zwraca 0 - usługa nie działa; 1 - usługa działa"
 
 #: include/classes/items/CHelpItems.php:133
 #: include/classes/items/CHelpItems.php:415
 #: include/classes/items/CHelpItems.php:643
 msgid "Checks if service is running and responding to UDP requests. Returns 0 - service is down; 1 - service is running"
-msgstr ""
+msgstr "Sprawdza, czy usługa jest uruchomiona i odpowiada na zapytania UDP. Zwraca 0 - usługa nie działa; 1 - usługa działa"
 
 #: include/classes/items/CHelpItems.php:113
 #: include/classes/items/CHelpItems.php:395
 msgid "Checks if this TCP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "Sprawdza, czy port TCP jest w trybie NASŁUCHU. Zwraca 0 - nie jest w trybie NASŁUCHU; 1 - jest w trybie NASŁUCHU"
 
 #: include/classes/items/CHelpItems.php:129
 #: include/classes/items/CHelpItems.php:411
 msgid "Checks if this UDP port is in LISTEN state. Returns 0 - it is not in LISTEN state; 1 - it is in LISTEN state"
-msgstr ""
+msgstr "Sprawdza, czy port UDP jest w trybie NASŁUCHU. Zwraca 0 - nie jest w trybie NASŁUCHU; 1 - jest w trybie NASŁUCHU"
 
 #: include/classes/items/CHelpItems.php:125
 #: include/classes/items/CHelpItems.php:407
 #: include/classes/items/CHelpItems.php:639
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
-msgstr ""
+msgstr "Sprawdza wydajność usługi TCP. Zwraca 0 - usługa nie działa; liczba sekund - liczba sekund spędzonych na łączeniu się do usługi"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:419
 #: include/classes/items/CHelpItems.php:647
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
-msgstr ""
+msgstr "Sprawdza wydajność usługi UDP. Zwraca 0 - usługa nie działa; liczba sekund - liczba sekund spędzonych na łączeniu się do usługi"
 
 #: include/classes/api/services/CDRule.php:349
 msgid "Checks should be unique."
@@ -2800,7 +2799,7 @@ msgstr "Zamknij generator wyrażeń"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:171
 msgid "Collapse"
-msgstr ""
+msgstr "Zwiń"
 
 #: include/views/configuration.graph.edit.php:263
 #: include/views/js/configuration.sysmaps.js.php:354
@@ -2911,7 +2910,7 @@ msgstr "Statystyki cache'a konfiguracji. Cache - bufor (tryby: pfree, total, use
 #: include/classes/setup/CSetupWizard.php:400
 #, c-format
 msgid "Configuration file \"%1$s\" created."
-msgstr ""
+msgstr "Utworzono plik konfiguracji \"%1$s\"."
 
 #: conf.import.php:25
 msgid "Configuration import"
@@ -3072,12 +3071,12 @@ msgstr "Zaktualizowano konfigurację"
 
 #: include/html.inc.php:220
 msgid "Configure"
-msgstr ""
+msgstr "Konfiguruj"
 
 #: include/classes/setup/CSetupWizard.php:43
 #: include/classes/setup/CSetupWizard.php:269
 msgid "Configure DB connection"
-msgstr ""
+msgstr "Konfiguruj połączenie DB"
 
 #: app/views/administration.script.edit.php:97
 msgid "Confirmation text"
@@ -3085,7 +3084,7 @@ msgstr "Tekst potwierdzenia"
 
 #: include/classes/setup/CSetupWizard.php:397
 msgid "Congratulations! You have successfully installed Zabbix frontend."
-msgstr ""
+msgstr "Gratulacje! Poprawnie zainstalowano interfejs użytkownika Zabbix."
 
 #: app/views/administration.proxy.edit.php:45
 #: include/views/configuration.host.edit.php:130
@@ -3098,7 +3097,7 @@ msgstr "Połącz z"
 
 #: app/views/administration.mediatype.edit.php:65
 msgid "Connection security"
-msgstr ""
+msgstr "Zabezpieczenia połączenia"
 
 #: include/classes/server/CZabbixServer.php:207
 #, c-format
@@ -3209,7 +3208,7 @@ msgstr "Ilość"
 #: include/classes/items/CHelpItems.php:189
 #: include/classes/items/CHelpItems.php:471
 msgid "Count of context switches. Returns integer"
-msgstr ""
+msgstr "Liczba przełączeń kontekstu. Zwraca liczbę całkowitą"
 
 #: include/views/configuration.action.list.php:35
 msgid "Create action"
@@ -3503,7 +3502,7 @@ msgstr "D"
 #: include/classes/import/validators/C10XmlValidator.php:344
 msgctxt "XML date format"
 msgid "DD.MM.YY"
-msgstr ""
+msgstr "DD.MM.YY"
 
 #: include/views/configuration.host.discovery.edit.php:140
 #: include/views/configuration.item.edit.php:149
@@ -3530,7 +3529,7 @@ msgstr "DNS"
 
 #: include/views/configuration.host.list.php:38
 msgid "DNS like"
-msgstr ""
+msgstr "DNS like"
 
 #: app/views/administration.proxy.edit.php:44
 #: include/views/configuration.host.edit.php:129
@@ -3551,7 +3550,7 @@ msgstr "Dziennie"
 
 #: include/classes/core/ZBase.php:266
 msgid "Dark"
-msgstr ""
+msgstr "Ciemny"
 
 #: app/controllers/CControllerDashboardView.php:66
 #: app/views/monitoring.dashboard.view.php:25 include/menu.inc.php:34
@@ -3768,7 +3767,7 @@ msgstr "Domyślne opóźnienie (w sekundach)"
 
 #: adm.other.php:38 include/views/administration.general.other.edit.php:48
 msgid "Default host inventory mode"
-msgstr ""
+msgstr "Domyślny tryb inwentarza hosta"
 
 #: include/views/configuration.action.edit.php:50
 #: include/views/configuration.action.edit.php:671
@@ -3910,7 +3909,7 @@ msgstr "Usunąć okres utrzymania?"
 
 #: app/views/administration.mediatype.edit.php:167
 msgid "Delete media type?"
-msgstr ""
+msgstr "Usunąć typ mediów?"
 
 #: include/views/conf.import.php:24
 msgid "Delete missing"
@@ -4243,7 +4242,7 @@ msgstr "Zaktualizowano opis"
 #: include/classes/items/CHelpItems.php:253
 #: include/classes/items/CHelpItems.php:535
 msgid "Detailed host information. Returns string"
-msgstr ""
+msgstr "Szczegółowe informacje hosta. Zwraca ciąg znaków"
 
 #: app/views/administration.mediatype.list.php:47 include/actions.inc.php:1183
 #: include/blocks.inc.php:467 include/func.inc.php:1709
@@ -4265,7 +4264,7 @@ msgstr "Urządzenie"
 #: include/classes/items/CHelpItems.php:177
 #: include/classes/items/CHelpItems.php:459
 msgid "Device interrupts. Returns integer"
-msgstr ""
+msgstr "Przerwania urządzenia. Zwraca liczbę całkowitą"
 
 #: discoveryconf.php:40 include/views/configuration.discovery.edit.php:77
 msgid "Device uniqueness criteria"
@@ -4314,7 +4313,7 @@ msgstr "Różnica między ostatnią i poprzednią wartością jest NIE jest = N"
 #: include/classes/items/CHelpItems.php:157
 #: include/classes/items/CHelpItems.php:439
 msgid "Different information about specific process(es). Returns float"
-msgstr ""
+msgstr "Różne informacje na temat określonego procesu(ów). Zwraca liczbę zmiennoprzecinkową"
 
 #: include/views/configuration.screen.list.php:50
 msgid "Dimension (cols x rows)"
@@ -4574,7 +4573,7 @@ msgstr "Stan wykrywania"
 #: include/classes/items/CHelpItems.php:265
 #: include/classes/items/CHelpItems.php:547
 msgid "Disk read statistics. Returns integer with type in sectors, operations, bytes; float with type in sps, ops, bps"
-msgstr ""
+msgstr "Statystyki odczytu dysku. Zwraca liczbę całkowitą dla typów sectors, operations, bytes; liczbę zmiennoprzecinkową dla typów sps, ops, bps"
 
 #: include/classes/items/CHelpItems.php:309
 #: include/classes/items/CHelpItems.php:591
@@ -4685,7 +4684,7 @@ msgstr "Powielone zależności w wyzwalaczu \"%1$s\""
 #: include/classes/api/services/CTriggerPrototype.php:1255
 #, c-format
 msgid "Duplicate dependencies in trigger prototype \"%1$s\"."
-msgstr ""
+msgstr "Powielone zależności w prototypie wyzwalacza \"%1$s\"."
 
 #: include/classes/api/services/CHostPrototype.php:197
 #, c-format
@@ -4771,7 +4770,7 @@ msgstr "Edycja wyzwalacza"
 
 #: include/views/hostmacros.php:46
 msgid "Effective value"
-msgstr ""
+msgstr "Wartość efektywna"
 
 #: include/views/configuration.sysmap.edit.php:155
 msgid "Element"
@@ -5146,7 +5145,6 @@ msgstr "ID zdarzenia ostatniego wpisu logu jest zgodne z wyrażeniem regularnym 
 
 #: app/controllers/CControllerAcknowledgeCreate.php:124
 #: include/actions.inc.php:58
-#, fuzzy
 msgid "Event acknowledged"
 msgid_plural "Events acknowledged"
 msgstr[0] "Zdarzenie potwierdzone"

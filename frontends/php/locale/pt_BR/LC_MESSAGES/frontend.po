@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
-"PO-Revision-Date: 2015-09-01 23:08+0300\n"
+"POT-Creation-Date: 2015-10-22 15:56+0300\n"
+"PO-Revision-Date: 2015-09-17 14:24+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1441141723.0\n"
+"X-POOTLE-MTIME: 1442492659.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -72,8 +72,8 @@ msgstr[1] "%1$s dias"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s evento"
+msgstr[1] "%1$s eventos"
 
 #: include/views/monitoring.history.php:27
 #, c-format
@@ -1118,7 +1118,7 @@ msgstr "Carga da CPU. Retorna um ponto flutuante (número)"
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Uso percentual de CPU. Retorna número com ponto flutuante"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1166,7 +1166,6 @@ msgstr "Cancelar"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Não foi possível reconhecer evento"
@@ -2753,7 +2752,7 @@ msgstr "Fechar construtor de expressão"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:171
 msgid "Collapse"
-msgstr ""
+msgstr "Recolher"
 
 #: include/views/configuration.graph.edit.php:263
 #: include/views/js/configuration.sysmaps.js.php:354
@@ -3719,7 +3718,7 @@ msgstr "Atraso padrão (em segundos)"
 
 #: adm.other.php:38 include/views/administration.general.other.edit.php:48
 msgid "Default host inventory mode"
-msgstr ""
+msgstr "Modo padrão do inventário em novos hosts"
 
 #: include/views/configuration.action.edit.php:50
 #: include/views/configuration.action.edit.php:671
@@ -4456,7 +4455,7 @@ msgstr "Regra de descoberta"
 #: include/classes/api/services/CDiscoveryRule.php:40
 #, c-format
 msgid "Discovery rule \"%1$s\" already exists on \"%2$s\", inherited from another template."
-msgstr "A regra de descoberta  \"%1$s\" já existe em \"%2$s\", importada de outro template."
+msgstr "A regra de descoberta \"%1$s\" já existe em \"%2$s\", importada de outro template."
 
 #: include/classes/api/services/CDiscoveryRule.php:41
 #, c-format
@@ -5096,7 +5095,6 @@ msgstr "O ID de evento da última entrada do log corresponde à expressão regul
 
 #: app/controllers/CControllerAcknowledgeCreate.php:124
 #: include/actions.inc.php:58
-#, fuzzy
 msgid "Event acknowledged"
 msgid_plural "Events acknowledged"
 msgstr[0] "Evento reconhecido"
@@ -5200,7 +5198,7 @@ msgstr "Confirmação de execução"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:170
 msgid "Expand"
-msgstr ""
+msgstr "Expandir"
 
 #: include/views/configuration.sysmap.constructor.php:42
 msgid "Expand macros"
@@ -7336,7 +7334,7 @@ msgstr "O campo de inventário \"%s\" é inválido."
 
 #: include/classes/api/services/CAction.php:1456
 msgid "Incorrect inventory mode in action operation."
-msgstr ""
+msgstr "A operação da ação possui um modo inválido para o inventário."
 
 #: include/classes/api/services/CScreenItem.php:732
 #, c-format
@@ -7729,7 +7727,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:231
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr ""
+msgstr "Valor inválido para o campo \"%1$s\": %2$s."
 
 #: include/validate.inc.php:319
 #, c-format
@@ -7810,7 +7808,7 @@ msgstr "Herdado e macros de host"
 
 #: include/views/hostmacros.php:173
 msgid "Inherited and template macros"
-msgstr ""
+msgstr "Macros herdadas e de template"
 
 #: include/views/configuration.triggers.expression.php:128
 msgid "Insert"
@@ -8796,7 +8794,7 @@ msgstr "Associado a"
 #: include/views/js/configuration.sysmaps.js.php:302
 #: include/views/js/configuration.sysmaps.js.php:313
 msgid "Links"
-msgstr ""
+msgstr "Links"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -9132,7 +9130,7 @@ msgstr "Mapa"
 
 #: include/views/js/configuration.sysmaps.js.php:2
 msgid "Map element"
-msgstr ""
+msgstr "Elemento do mapa"
 
 #: sysmap.php:84
 msgid "Map is updated! Return?"
@@ -10090,7 +10088,7 @@ msgstr "Nenhuma interface para o host \"%s\"."
 
 #: include/classes/api/services/CAction.php:1451
 msgid "No inventory mode specified for action operation."
-msgstr ""
+msgstr "A operação da ação não tem um modo de inventário definido."
 
 #: include/classes/api/services/CScreenItem.php:554
 #: include/classes/api/services/CScreenItem.php:564
@@ -10786,8 +10784,8 @@ msgstr "Apenas um nome de grupo de usuário pode ser modificado por vez."
 #: app/views/monitoring.acknowledge.edit.php:58
 msgid "Only selected event"
 msgid_plural "Only selected events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Apenas evento selecionado"
+msgstr[1] "Apenas eventos selecionados"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
@@ -11584,7 +11582,7 @@ msgstr "Incidentes"
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:427
 msgid "Process CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Utilização percentual, pelo processo, de CPU. Retorna número com ponto flutuante"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:255
@@ -12674,11 +12672,11 @@ msgstr "A ação selecionada foi excluída"
 
 #: app/views/monitoring.acknowledge.edit.php:63
 msgid "Selected and all unacknowledged PROBLEM events"
-msgstr ""
+msgstr "Todos os eventos de INCIDENTE selecionados e os sem reconhecimento"
 
 #: app/views/monitoring.acknowledge.edit.php:68
 msgid "Selected and all unacknowledged events"
-msgstr ""
+msgstr "Todos os eventos selecionados e os sem reconhecimento"
 
 #: include/views/js/configuration.sysmaps.js.php:209
 msgid "Selected elements"
@@ -12831,7 +12829,7 @@ msgstr "Sessão terminada, conecte-se novamente por favor."
 
 #: include/actions.inc.php:889
 msgid "Set host inventory mode"
-msgstr ""
+msgstr "Defina o modo de inventário de host"
 
 #: events.php:453 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
@@ -13526,7 +13524,7 @@ msgstr "Associação a templates"
 
 #: include/views/hostmacros.php:172
 msgid "Template macros"
-msgstr ""
+msgstr "Macros de template"
 
 #: include/views/configuration.template.edit.php:73 templates.php:54
 msgid "Template name"
@@ -16014,7 +16012,7 @@ msgstr "piscando"
 #: include/classes/api/services/CMediatype.php:417
 #: include/classes/validators/CNewValidator.php:88
 msgid "cannot be empty"
-msgstr ""
+msgstr "não pode ser vazio"
 
 #: include/classes/parsers/CConditionFormula.php:188
 #, c-format
