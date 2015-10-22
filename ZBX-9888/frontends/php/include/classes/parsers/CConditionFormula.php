@@ -469,7 +469,9 @@ class CConditionFormula {
 					$triggers_and_count = 0;
 
 					foreach ($and_condition as $constant_key => $constant) {
-						if (array_intersect($constant, $triggers)) {
+						if (array_key_exists('all', $constant)) {
+							$triggers_and_count += $this->getCountTriggersAnd($triggers, $constant);
+						} else if (array_intersect($constant, $triggers)) {
 							$triggers_and_count++;
 						}
 					}

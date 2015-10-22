@@ -262,6 +262,70 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_AND,
 				]
+			],
+			[
+				[
+					'conditions' => [
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'A',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
+							'formulaid' => 'B',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'C',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'D',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'E',
+						]
+					],
+					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+					'formula' => '(A and B) or (C and D) and E'
+				]
+			],
+			[
+				[
+					'conditions' => [
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'A',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_EVENT_TYPE,
+							'formulaid' => 'B',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'C',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'D',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'E',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'F',
+						],
+						[
+							'conditiontype' => CONDITION_TYPE_TRIGGER,
+							'formulaid' => 'G',
+						]
+					],
+					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
+					'formula' => '(A and B) or ((C and D) or (E and F)) and G'
+				]
 			]
 		];
 	}
