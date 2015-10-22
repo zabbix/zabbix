@@ -58,8 +58,8 @@ static size_t write_memory_callback(void *contents, size_t size, size_t nmemb, v
 }
 #endif /* HAVE_LIBCURL */
 
-static int 	get_http_page(const char *host, const char *path, unsigned short port, char *headers, char *buffer,
-		size_t max_buffer_len)
+static int 	get_http_page(const char *host, const char *path, unsigned short port, const char *headers,
+		char *buffer, size_t max_buffer_len)
 {
 #ifdef HAVE_LIBCURL
 	CURL			*curl_handle;
@@ -78,7 +78,14 @@ static int 	get_http_page(const char *host, const char *path, unsigned short por
 	curl_handle = curl_easy_init();
 	if (curl_handle)
 	{
-		if ('\0' != *headers)
+		/* set verbose mode on for debugging */
+		if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+			curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);
+
+		/* pass headers to the data stream */
+		curl_easy_setopt(curl_handle, CURLOPT_HEADER, 1L);
+
+		if (NULL != headers)
 		{
 			/* Removing a header that curl is adding by itself */
 			slist = curl_slist_append(slist, "Accept:");
@@ -100,9 +107,6 @@ static int 	get_http_page(const char *host, const char *path, unsigned short por
 			res = curl_easy_setopt(curl_handle, CURLOPT_HTTPHEADER, slist);
 		}
 
-		/* set verbose mode on/off for debugging */
-		curl_easy_setopt(curl_handle, CURLOPT_VERBOSE, 1L);
-
 		/* specify URL to get */
 		curl_easy_setopt(curl_handle, CURLOPT_URL, host);
 
@@ -116,7 +120,7 @@ static int 	get_http_page(const char *host, const char *path, unsigned short por
 		curl_easy_setopt(curl_handle, CURLOPT_WRITEDATA, (void * )&chunk);
 
 		/* some servers don't like requests that are made without a user-agent field, so we provide one */
-		curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, "Zabbix 3.0.0");
+		curl_easy_setopt(curl_handle, CURLOPT_USERAGENT, ZABBIX_VERSION);
 
 		/* get it! */
 		res = curl_easy_perform(curl_handle);
