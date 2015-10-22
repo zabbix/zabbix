@@ -20,6 +20,7 @@
 #include "common.h"
 #include "comms.h"
 #include "log.h"
+#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
 #include "checks_agent.h"
 
@@ -57,8 +58,9 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:%u", __function_name,
-			item->host.host, item->interface.addr, item->key, (unsigned int)item->host.tls_connect);
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:'%s'", __function_name,
+				item->host.host, item->interface.addr, item->key,
+				zbx_tls_connection_type_name(item->host.tls_connect));
 	}
 
 	if (ZBX_TCP_SEC_UNENCRYPTED == item->host.tls_connect)
