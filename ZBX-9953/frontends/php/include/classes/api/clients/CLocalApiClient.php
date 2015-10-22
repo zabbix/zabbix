@@ -83,6 +83,16 @@ class CLocalApiClient extends CApiClient {
 			return $response;
 		}
 
+		// check $params incompatibility
+		if (checkRequiredKeys($params,['countOutput', 'sortfield']) === array()) {
+			$response->errorCode = ZBX_API_ERROR_INTERNAL;
+			$response->errorMessage = _s('Used incompatible options "%1$s", "%2$s"',
+				'countOutput', 'sortfield'
+			);
+
+			return $response;
+		}
+
 		$newTransaction = false;
 		try {
 			// authenticate

@@ -530,7 +530,7 @@ class CApiService {
 			foreach ($options['sortfield'] as $i => $sortfield) {
 				// validate sortfield
 				if (!str_in_array($sortfield, $this->sortColumns)) {
-					throw new APIException(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
+					self::exception(ZBX_API_ERROR_INTERNAL, _s('Sorting by field "%1$s" not allowed.', $sortfield));
 				}
 
 				// add sort field to order

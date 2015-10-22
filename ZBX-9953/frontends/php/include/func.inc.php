@@ -2144,12 +2144,12 @@ function hasErrorMesssages() {
 
 /**
  * Check if all keys from $keys exist in $array.
- * If some keys are missing return array of missing keys, true otherwise.
+ * If some keys are missing return array of missing keys, empty array() otherwise.
  *
  * @param array $array
  * @param array $keys
  *
- * @return array|bool
+ * @return array
  */
 function checkRequiredKeys(array $array, array $keys) {
 	return array_diff($keys, array_keys($array));

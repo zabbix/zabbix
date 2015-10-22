@@ -23,7 +23,6 @@
  * Creates global database connection.
  *
  * @param string $error returns a message in case of an error
- * @param bool   $debug turns On or Off trace calls when making connections. Suggested debug mode Off during Zabbix setup
  *
  * @return bool
  */
@@ -376,7 +375,8 @@ function DBselect($query, $limit = null, $offset = 0) {
 	}
 
 	// add the LIMIT clause
-	if(!$query = DBaddLimit($query, $limit, $offset)) {
+	$query = DBaddLimit($query, $limit, $offset);
+	if(!$query) {
 		return false;
 	}
 
@@ -385,17 +385,20 @@ function DBselect($query, $limit = null, $offset = 0) {
 
 	switch ($DB['TYPE']) {
 		case ZBX_DB_MYSQL:
-			if (!$result = mysqli_query($DB['DB'], $query)) {
+			$result = @mysqli_query($DB['DB'], $query);
+			if (!$result) {
 				error('Error in query ['.$query.'] ['.mysqli_error($DB['DB']).']');
 			}
 			break;
 		case ZBX_DB_POSTGRESQL:
-			if (!$result = pg_query($DB['DB'], $query)) {
+			$result = @pg_query($DB['DB'], $query);
+			if (!$result) {
 				error('Error in query ['.$query.'] ['.pg_last_error().']');
 			}
 			break;
 		case ZBX_DB_ORACLE:
-			if (!$result = oci_parse($DB['DB'], $query)) {
+			$result = @oci_parse($DB['DB'], $query);
+			if (!$result) {
 				$e = @oci_error();
 				error('SQL error ['.$e['message'].'] in ['.$e['sqltext'].']');
 			}
@@ -410,11 +413,12 @@ function DBselect($query, $limit = null, $offset = 0) {
 				$options['autocommit'] = DB2_AUTOCOMMIT_OFF;
 			}
 
-			if (!$result = db2_prepare($DB['DB'], $query)) {
+			$result = db2_prepare($DB['DB'], $query);
+			if (!$result) {
 				$e = @db2_stmt_errormsg($result);
 				error('SQL error ['.$query.'] in ['.$e.']');
 			}
-			elseif (true !== @db2_execute($result, $options)) {
+			elseif (@db2_execute($result, $options) !== true) {
 				$e = @db2_stmt_errormsg($result);
 				error('SQL error ['.$query.'] in ['.$e.']');
 				$result = false;
@@ -424,7 +428,8 @@ function DBselect($query, $limit = null, $offset = 0) {
 			if ($DB['TRANSACTIONS'] == 0) {
 				lock_sqlite3_access();
 			}
-			if (false === ($result = $DB['DB']->query($query))) {
+			$result = $DB['DB']->query($query);
+			if ($result === false) {
 				error('Error in query ['.$query.'] Error code ['.$DB['DB']->lastErrorCode().'] Message ['.$DB['DB']->lastErrorMsg().']');
 			}
 			if ($DB['TRANSACTIONS'] == 0) {
