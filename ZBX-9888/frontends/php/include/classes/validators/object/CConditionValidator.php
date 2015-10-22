@@ -57,18 +57,18 @@ class CConditionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($object) {
-		// get trigger conditions formulaid
-		$triggers = [];
+		// get triggers count in formula
+		$triggers_count = 0;
 		foreach ($object['conditions'] as $condition) {
 			if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER
 				|| $condition['conditiontype'] == CONDITION_TYPE_TRIGGER_NAME) {
 
-				$triggers[] = $condition['formulaid'];
+				$triggers_count++;
 			}
 		}
 
 		// check if multiple triggers are compared with AND
-		if ((count($triggers) > 1) && ($object['evaltype'] == CONDITION_EVAL_TYPE_AND)) {
+		if (($triggers_count > 1) && ($object['evaltype'] == CONDITION_EVAL_TYPE_AND)) {
 			$this->error($this->messageAndWithSeveralTriggers);
 
 			return false;
@@ -83,13 +83,6 @@ class CConditionValidator extends CValidator {
 		$parser = new CConditionFormula();
 		if (!$parser->parse($object['formula'])) {
 			$this->error($this->messageInvalidFormula, $object['formula'], $parser->error);
-
-			return false;
-		}
-
-		// check if multiple triggers are compared with AND
-		if ((count($triggers) > 1) && !$parser->validTriggersComparison($triggers)) {
-			$this->error($this->messageAndWithSeveralTriggers);
 
 			return false;
 		}
