@@ -3773,6 +3773,8 @@ Forms forms forms
 
 ##Inputs
 
+Text on html5 input types 
+
 ```html_example
 <input type="text" placeholder="Text">
 <input type="text" disabled>
@@ -4104,14 +4106,57 @@ Calendar:
 /*doc
 ---
 parent: components
-title: Colors
-name: colors
+title: Navigation
+name: navigation
 ---
 
-Colors:
+Navigation:
+
+##Main Navigation
 
 ```html_example
-example
+<nav role="navigation">
+   <div class="top-nav-container">
+      <ul class="top-nav">
+         <li class="selected"><a href="#">Monitoring</a></li>
+         <li><a href="#">Inventory</a></li>
+         <li><a href="#">Reports</a></li>
+         <li><a href="#">Configuration</a></li>
+         <li><a href="#">Administration</a></li>
+      </ul>
+      <ul class="top-nav-icons">
+         <li>
+            <form><input type="text"><button type="button" class="btn-search"></button></form>
+         </li>
+         <li><a href="#" class="top-nav-help" title="Help"></a></li>
+         <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
+         <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
+         <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
+      </ul>
+   </div>
+   <div class="top-subnav-container">
+      <ul class="top-subnav">
+         <li><a href="#" class="selected">Dashboard</a></li>
+         <li><a href="#">Overview</a></li>
+         <li><a href="#">Web</a></li>
+         <li><a href="#">Latest data</a></li>
+         <li><a href="#">Triggers</a></li>
+         <li><a href="#">Events</a></li>
+         <li><a href="#">Graphs</a></li>
+         <li><a href="#">Screens</a></li>
+         <li><a href="#">Maps</a></li>
+         <li><a href="#">Discovery</a></li>
+         <li><a href="#">IT services</a></li>
+      </ul>
+      <div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>
+   </div>
+</nav>
+```
+
+##Tabs
+
+```html_example
+<ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
 ```
 */
 
@@ -4125,7 +4170,7 @@ name: links
 Links:
 
 ```html_example
-example
+<a href="#">Normal link</a>
 ```
 */
 
