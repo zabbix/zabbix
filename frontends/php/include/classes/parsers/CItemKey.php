@@ -114,7 +114,9 @@ class CItemKey extends CParser {
 
 		// is key empty?
 		if ($p == $offset) {
-			$this->error = _('key is empty');
+			$this->error = isset($data[$p])
+				? $this->errorMessage(substr($data, $offset), 0)
+				: _('key is empty');
 			return self::PARSE_FAIL;
 		}
 
