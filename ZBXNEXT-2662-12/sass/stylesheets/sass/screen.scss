@@ -1197,6 +1197,10 @@ footer {
 	border: 1px solid $ui-border-color;
 	padding: 10px;
 	text-align: left;
+
+	> .ui-tabs-nav {
+		margin: -10px -10px 10px -10px;
+	}
 }
 
 .form-btns {
@@ -1899,16 +1903,16 @@ button[disabled] {
 	margin: 0 14px 0 0;
 }
 
-.tabs-nav-container {
-	height: 36px;
-	line-height: 36px;
-	margin: 0 0 15px 0;
-}
+//.tabs-nav-container {
+//	height: 36px;
+//	line-height: 36px;
+//	margin: 0 0 15px 0;
+//}
 
 .ui-tabs-nav {
 	height: 36px;
 	line-height: 36px;
-	margin: -10px -10px 10px -10px;
+	//margin: -10px -10px 10px -10px;
 	border-bottom: 1px solid $table-border-color;
 
 	li {
@@ -1940,7 +1944,8 @@ button[disabled] {
 
 			a {
 				padding: 11px 13px 9px 13px;
-				background-color: $ui-bg-color;
+				//background-color: $ui-bg-color;
+				background-color: $transparent;
 				color: $font-color;
 				text-decoration: none;
 				cursor: default;
@@ -1953,7 +1958,8 @@ button[disabled] {
 			a {
 				cursor: default;
 				color: $btn-disabled-font-color;
-				background-color: $ui-bg-color;
+				//background-color: $ui-bg-color;
+				background-color: $transparent;
 			}
 		}
 	}
@@ -4151,6 +4157,25 @@ Navigation:
       <div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>
    </div>
 </nav>
+```
+
+##Object Navigation
+
+```html_example
+<ul class="object-group">
+   <li><b><a href="#">All hosts</a> / Zabbix server:</b></li>
+   <li class="green">Enabled</li>
+   <li>
+      <div class="status-container"><span class="status-grey">z</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+   </li>
+   <li><span><b><a href="#">Discovery</a></b></span></li>
+   <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
+   <li><span class="selected"><a href="">Items</a>&nbsp;<sup>67</sup></span></li>
+   <li><span><a href="#">Triggers</a>&nbsp;<sup>41</sup></span></li>
+   <li><span><a href="#">Graphs</a>&nbsp;<sup>11</sup></span></li>
+   <li><span><a href="#">Discovery rules</a>&nbsp;<sup>2</sup></span></li>
+   <li><span><a href="#">Web scenarios</a></span></li>
+</ul>
 ```
 
 ##Tabs
