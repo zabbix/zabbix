@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
-"PO-Revision-Date: 2015-09-14 13:43+0300\n"
+"POT-Creation-Date: 2015-10-22 15:56+0300\n"
+"PO-Revision-Date: 2015-10-16 06:39+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1442230984.0\n"
+"X-POOTLE-MTIME: 1444970345.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -1181,7 +1181,6 @@ msgstr "Zrušit"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Nelze potvrdit událost"
@@ -3768,7 +3767,7 @@ msgstr "Předvolené zpoždění (v sekundách)"
 
 #: adm.other.php:38 include/views/administration.general.other.edit.php:48
 msgid "Default host inventory mode"
-msgstr ""
+msgstr "Defaultní mód inventář hostitele"
 
 #: include/views/configuration.action.edit.php:50
 #: include/views/configuration.action.edit.php:671
@@ -5146,7 +5145,6 @@ msgstr "ID události posledního log záznamu vybraného regulérním výrazem T
 
 #: app/controllers/CControllerAcknowledgeCreate.php:124
 #: include/actions.inc.php:58
-#, fuzzy
 msgid "Event acknowledged"
 msgid_plural "Events acknowledged"
 msgstr[0] "Událost potvrzena"
@@ -5251,7 +5249,7 @@ msgstr "Potvrzení vykonání"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:170
 msgid "Expand"
-msgstr ""
+msgstr "Rozbalit"
 
 #: include/views/configuration.sysmap.constructor.php:42
 msgid "Expand macros"
@@ -7393,7 +7391,7 @@ msgstr "Neplatné inventární pole \"%s\"."
 
 #: include/classes/api/services/CAction.php:1456
 msgid "Incorrect inventory mode in action operation."
-msgstr ""
+msgstr "Neplatný mód inventáře v akci provoz."
 
 #: include/classes/api/services/CScreenItem.php:732
 #, c-format
@@ -7785,7 +7783,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:231
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr ""
+msgstr "Nesprávná hodnota pro pole \"%1$s\": %2$s."
 
 #: include/validate.inc.php:319
 #, c-format
@@ -7866,7 +7864,7 @@ msgstr "Dědičná a hostitelská makra"
 
 #: include/views/hostmacros.php:173
 msgid "Inherited and template macros"
-msgstr ""
+msgstr "Makra dědičnost a šablona"
 
 #: include/views/configuration.triggers.expression.php:128
 msgid "Insert"
@@ -8850,7 +8848,7 @@ msgstr "Připojené k"
 #: include/views/js/configuration.sysmaps.js.php:302
 #: include/views/js/configuration.sysmaps.js.php:313
 msgid "Links"
-msgstr ""
+msgstr "Propojení"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -9185,7 +9183,7 @@ msgstr "Mapa"
 
 #: include/views/js/configuration.sysmaps.js.php:2
 msgid "Map element"
-msgstr ""
+msgstr "Element mapy"
 
 #: sysmap.php:84
 msgid "Map is updated! Return?"
@@ -10146,7 +10144,7 @@ msgstr "Žádné rozhraní pro host \"%s\"."
 
 #: include/classes/api/services/CAction.php:1451
 msgid "No inventory mode specified for action operation."
-msgstr ""
+msgstr "Žádný režim inventář určený pro akci provoz."
 
 #: include/classes/api/services/CScreenItem.php:554
 #: include/classes/api/services/CScreenItem.php:564
@@ -10563,7 +10561,7 @@ msgstr "Počet sekund od začátku epochy je NOT N"
 
 #: include/views/configuration.slideconf.list.php:41
 msgid "Number of slides"
-msgstr ""
+msgstr "Počet snímků"
 
 #: include/views/reports.toptriggers.php:121
 msgid "Number of status changes"

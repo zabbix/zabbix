@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
-"PO-Revision-Date: 2015-09-10 07:00+0300\n"
+"POT-Creation-Date: 2015-10-22 15:56+0300\n"
+"PO-Revision-Date: 2015-10-20 20:58+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1441861255.0\n"
+"X-POOTLE-MTIME: 1445367481.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -76,9 +76,9 @@ msgstr[2] "%1$s дней"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s событие"
+msgstr[1] "%1$s события"
+msgstr[2] "%1$s событий"
 
 #: include/views/monitoring.history.php:27
 #, c-format
@@ -1133,7 +1133,7 @@ msgstr "Загрузка ЦПУ. Возвращает дробное значе�
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Утилизация CPU в процентах. Возвращает число с плавающей точкой"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1181,7 +1181,6 @@ msgstr "Отмена"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Не удалось подтвердить событие"
@@ -2800,7 +2799,7 @@ msgstr "Закрыть конструктор выражения"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:171
 msgid "Collapse"
-msgstr ""
+msgstr "Свернуть"
 
 #: include/views/configuration.graph.edit.php:263
 #: include/views/js/configuration.sysmaps.js.php:354
@@ -3358,7 +3357,7 @@ msgstr "Создано: Правило обнаружения \"%1$s\" в \"%2$s
 #: include/classes/api/services/CHostPrototype.php:364
 #, c-format
 msgid "Created: Host prototype \"%1$s\" on \"%2$s\"."
-msgstr "Создано: Прототип узлов сети \"%1$s\" у \"%2$s\"."
+msgstr "Создано: Прототип узлов сети \"%1$s\" в \"%2$s\"."
 
 #: include/classes/api/services/CItem.php:457
 #, c-format
@@ -3383,7 +3382,7 @@ msgstr "Создано: Прототип триггеров \"%1$s\" в \"%2$s\"
 #: include/classes/api/managers/CHttpTestManager.php:124
 #, c-format
 msgid "Created: Web scenario \"%1$s\" on \"%2$s\"."
-msgstr "Создано: Веб-сценарий \"%1$s\" у \"%2$s\"."
+msgstr "Создано: Веб-сценарий \"%1$s\" в \"%2$s\"."
 
 #: include/items.inc.php:41
 msgid "Critical"
@@ -3768,7 +3767,7 @@ msgstr "Задержка по умолчанию (в сек)"
 
 #: adm.other.php:38 include/views/administration.general.other.edit.php:48
 msgid "Default host inventory mode"
-msgstr ""
+msgstr "Режим инвентаризации узлов сети по умолчанию"
 
 #: include/views/configuration.action.edit.php:50
 #: include/views/configuration.action.edit.php:671
@@ -5146,7 +5145,6 @@ msgstr "Event ID последней записи в журнале соотве�
 
 #: app/controllers/CControllerAcknowledgeCreate.php:124
 #: include/actions.inc.php:58
-#, fuzzy
 msgid "Event acknowledged"
 msgid_plural "Events acknowledged"
 msgstr[0] "Событие подтверждено"
@@ -5251,7 +5249,7 @@ msgstr "Подтверждение выполнения"
 
 #: include/classes/html/CCollapsibleUiWidget.php:54 jsLoader.php:170
 msgid "Expand"
-msgstr ""
+msgstr "Раскрыть"
 
 #: include/views/configuration.sysmap.constructor.php:42
 msgid "Expand macros"
@@ -6086,7 +6084,7 @@ msgstr "Аппаратные средства (полная детализаци
 #: include/classes/items/CHelpItems.php:161
 #: include/classes/items/CHelpItems.php:443
 msgid "Hardware sensor reading. Returns float"
-msgstr "Значение аппаратного датчика. Возвращает число с плавающей точкой"
+msgstr "Значение аппаратного сенсора. Возвращает число с плавающей точкой"
 
 #: include/views/configuration.httpconf.edit.php:110
 #: include/views/configuration.httpconf.popup.php:97
@@ -6701,7 +6699,7 @@ msgstr "Уровень привилегии IPMI"
 #: include/views/configuration.item.edit.php:163
 #: include/views/configuration.item.prototype.edit.php:161 items.php:103
 msgid "IPMI sensor"
-msgstr "Сенсор IPMI"
+msgstr "IPMI датчик"
 
 #: include/views/configuration.host.massupdate.php:261
 msgid "IPMI username"
@@ -7393,7 +7391,7 @@ msgstr "Некорректное поле \"%s\" инвентарных данн
 
 #: include/classes/api/services/CAction.php:1456
 msgid "Incorrect inventory mode in action operation."
-msgstr ""
+msgstr "Некорректный режим инвентарных данных в операции действия."
 
 #: include/classes/api/services/CScreenItem.php:732
 #, c-format
@@ -7785,7 +7783,7 @@ msgstr ""
 #: include/classes/validators/CNewValidator.php:231
 #, c-format
 msgid "Incorrect value for field \"%1$s\": %2$s."
-msgstr ""
+msgstr "Некорректное значение для поля \"%1$s\": %2$s."
 
 #: include/validate.inc.php:319
 #, c-format
@@ -7866,7 +7864,7 @@ msgstr "Макросы узла сети и унаследованные"
 
 #: include/views/hostmacros.php:173
 msgid "Inherited and template macros"
-msgstr ""
+msgstr "Унаследованные и макросы из шаблонов"
 
 #: include/views/configuration.triggers.expression.php:128
 msgid "Insert"
@@ -8851,7 +8849,7 @@ msgstr "Присоединен к"
 #: include/views/js/configuration.sysmaps.js.php:302
 #: include/views/js/configuration.sysmaps.js.php:313
 msgid "Links"
-msgstr ""
+msgstr "Связи"
 
 #: include/classes/html/CList.php:39
 msgid "List is empty"
@@ -9186,7 +9184,7 @@ msgstr "Карта сети"
 
 #: include/views/js/configuration.sysmaps.js.php:2
 msgid "Map element"
-msgstr ""
+msgstr "Элемент карты сети"
 
 #: sysmap.php:84
 msgid "Map is updated! Return?"
@@ -9623,7 +9621,7 @@ msgstr "Множественные события ПРОБЛЕМА"
 #: include/views/configuration.trigger.prototype.edit.php:241
 #: include/views/configuration.triggers.edit.php:246
 msgid "Multiple PROBLEM events generation"
-msgstr "Многократная генерация событий ПРОБЛЕМА"
+msgstr "Формирование множественных событий ПРОБЛЕМА"
 
 #: jsLoader.php:160
 msgid "Mute"
@@ -10147,7 +10145,7 @@ msgstr "Нет интерфейсов для узла сети \"%s\"."
 
 #: include/classes/api/services/CAction.php:1451
 msgid "No inventory mode specified for action operation."
-msgstr ""
+msgstr "Не указан режим инвентарных данных для операции действия."
 
 #: include/classes/api/services/CScreenItem.php:554
 #: include/classes/api/services/CScreenItem.php:564
@@ -10841,9 +10839,9 @@ msgstr "Только одно имя группы пользователей м�
 #: app/views/monitoring.acknowledge.edit.php:58
 msgid "Only selected event"
 msgid_plural "Only selected events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Только выбранное событие"
+msgstr[1] "Только выбранные события"
+msgstr[2] "Только выбранные события"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
@@ -11640,7 +11638,7 @@ msgstr "Проблемы"
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:427
 msgid "Process CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Утилизация CPU процесса в процентах. Возвращает число с плавающей точкой"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:255
@@ -12732,11 +12730,11 @@ msgstr "Выбранные действия удалены"
 
 #: app/views/monitoring.acknowledge.edit.php:63
 msgid "Selected and all unacknowledged PROBLEM events"
-msgstr ""
+msgstr "Выбранные и все неподтвержденные ПРОБЛЕМА события"
 
 #: app/views/monitoring.acknowledge.edit.php:68
 msgid "Selected and all unacknowledged events"
-msgstr ""
+msgstr "Выбранные и все неподтвержденные события"
 
 #: include/views/js/configuration.sysmaps.js.php:209
 msgid "Selected elements"
@@ -12889,7 +12887,7 @@ msgstr "Сессия завершена, пожалуйста, зайдите п
 
 #: include/actions.inc.php:889
 msgid "Set host inventory mode"
-msgstr ""
+msgstr "Установить режим инвентарных данных узлов сети"
 
 #: events.php:453 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
@@ -13584,7 +13582,7 @@ msgstr "Соединения с шаблонами"
 
 #: include/views/hostmacros.php:172
 msgid "Template macros"
-msgstr ""
+msgstr "Шаблонные макросы"
 
 #: include/views/configuration.template.edit.php:73 templates.php:54
 msgid "Template name"
@@ -16080,7 +16078,7 @@ msgstr "мигание"
 #: include/classes/api/services/CMediatype.php:417
 #: include/classes/validators/CNewValidator.php:88
 msgid "cannot be empty"
-msgstr ""
+msgstr "не может быть пустым"
 
 #: include/classes/parsers/CConditionFormula.php:188
 #, c-format

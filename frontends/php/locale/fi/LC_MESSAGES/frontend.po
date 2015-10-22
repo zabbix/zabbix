@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
-"PO-Revision-Date: 2013-10-10 08:23+0300\n"
-"Last-Translator: richlv <richlv@nakts.net>\n"
+"POT-Creation-Date: 2015-10-22 15:56+0300\n"
+"PO-Revision-Date: 2015-10-09 08:08+0300\n"
+"Last-Translator: ekakela <ekakela@gmail.com>\n"
 "Language-Team: none\n"
 "Language: fi\n"
 "MIME-Version: 1.0\n"
@@ -12,7 +12,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Pootle 2.5.0\n"
-"X-POOTLE-MTIME: 1381386223.0\n"
+"X-POOTLE-MTIME: 1444370898.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -20,7 +20,7 @@ msgstr ""
 #: include/classes/import/validators/C30XmlValidator.php:873
 #, c-format
 msgid "\"%1$s\" is expected"
-msgstr ""
+msgstr "\"%1$s\" ei voi olla tyhjä"
 
 #: include/classes/api/services/CMaintenance.php:352
 #: include/classes/api/services/CMaintenance.php:357
@@ -35,15 +35,15 @@ msgstr "\"%s\" täytyy olla välillä 1970.01.01 - 2038.01.18."
 #, c-format
 msgid "%1$d day"
 msgid_plural "%1$d days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d vuorokausi"
+msgstr[1] "%1$d vuorokautta"
 
 #: include/blocks.inc.php:784
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$d ongelma %2$d :sta näytetään"
+msgstr[1] "%1$d ongelmaa %2$d :sta näytetään"
 
 #: chart4.php:91 chart5.php:85
 #, c-format
@@ -62,8 +62,8 @@ msgstr[1] "%1$s Nimikettä"
 #, c-format
 msgid "%1$s day"
 msgid_plural "%1$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s vuorokausi"
+msgstr[1] "%1$s vuorokautta "
 
 #: app/views/monitoring.acknowledge.edit.php:60
 #: app/views/monitoring.acknowledge.edit.php:65
@@ -71,44 +71,44 @@ msgstr[1] ""
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s tapahtuma"
+msgstr[1] "%1$s tapahtumaa"
 
 #: include/views/monitoring.history.php:27
 #, c-format
 msgid "%1$s item"
 msgid_plural "%1$s items"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s kohde"
+msgstr[1] "%1$s kohdetta"
 
 #: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s minuutti "
+msgstr[1] "%1$s minuuttia"
 
 #: include/classes/screens/CScreenActions.php:152
 #: include/views/administration.auditacts.list.php:68
 #, c-format
 msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s yritys jäljellä"
+msgstr[1] "%1$s yritystä jäljellä"
 
 #: jsLoader.php:222 jsLoader.php:223
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s sekuntti"
+msgstr[1] "%1$s sekunttia"
 
 #: app/views/layout.htmlpage.php:77 include/page_header.php:242
 #, c-format
 msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%4$s epäonnistunut kirjautumisyritys. Viimeinen epäonnistunut kirjautumisyritys %2$s %3$s osoitteesta %1$s. "
+msgstr[1] "%4$s epäonnistunutta kirjautumisyritystä. Viimeinen epäonnistunut kirjautumisyritys %2$s %3$s osoitteesta %1$s. "
 
 #: app/views/monitoring.discovery.view.php:136
 #, c-format
@@ -121,13 +121,13 @@ msgstr[1] "%d laitetta"
 #, c-format
 msgctxt "user fullname"
 msgid "(%1$s %2$s)"
-msgstr ""
+msgstr "(%1$s %2$s)"
 
 #: include/views/configuration.host.edit.php:95
 #: include/views/configuration.hostgroups.list.php:26
 #: include/views/configuration.template.edit.php:123
 msgid "(Only super admins can create groups)"
-msgstr ""
+msgstr "(Vain järjestelmäylläpitäjät voivat luoda ryhmiä)"
 
 #: include/views/configuration.action.edit.php:539
 msgid "(minimum 60 seconds, 0 - use action default)"
@@ -142,7 +142,7 @@ msgstr "(ei välityspalvelinta)"
 
 #: include/classes/setup/CSetupWizard.php:236
 msgid "0 - use default port"
-msgstr ""
+msgstr "0 - Käytä oletusporttia"
 
 #: include/triggers.inc.php:2078 include/triggers.inc.php:2080
 #: include/triggers.inc.php:2081 include/triggers.inc.php:2083
@@ -162,7 +162,7 @@ msgstr "10 sekuntia"
 
 #: include/views/reports.toptriggers.php:24 toptriggers.php:25
 msgid "100 busiest triggers"
-msgstr ""
+msgstr "100 aktiivisinta triggeriä"
 
 #: queue.php:106 queue.php:167
 msgid "30 seconds"
@@ -184,13 +184,17 @@ msgstr "5 sekuntia"
 msgid "500 latest values"
 msgstr "500 viimeisintä arvoa"
 
+# Selvitettävä miten tuo <Sub-menu/Sub-menu.../> parsiutuu
 #: app/views/administration.script.edit.php:39
+#, fuzzy
 msgid "<Sub-menu/Sub-menu.../>Script"
-msgstr ""
+msgstr "<Sub-menu/Sub-menu.../>Skripti "
 
+# Selvitettävä sub-menun parsiutuminen
 #: include/views/configuration.sysmap.edit.php:61
+#, fuzzy
 msgid "<manual>"
-msgstr "<manuaalinen>"
+msgstr "<Sub-menu/Sub-menu.../>Skripti "
 
 #: include/views/configuration.host.discovery.edit.php:141
 #: include/views/configuration.item.edit.php:150
@@ -198,7 +202,7 @@ msgstr "<manuaalinen>"
 #: include/views/configuration.item.prototype.edit.php:149
 #: include/views/js/configuration.discovery.edit.js.php:98
 msgid "AES"
-msgstr ""
+msgstr "AES"
 
 #: tr_logform.php:265
 msgid "AND"
@@ -206,19 +210,19 @@ msgstr "JA"
 
 #: popup_trexpr.php:186
 msgid "Absolute difference between last and previous value is < N"
-msgstr ""
+msgstr "Absoluuttinen ero viimeisen ja edeltävän arvon välillä on < N "
 
 #: popup_trexpr.php:194
 msgid "Absolute difference between last and previous value is = N"
-msgstr ""
+msgstr "Absoluuttinen ero viimeisen ja edeltävän arvon välillä on = N "
 
 #: popup_trexpr.php:190
 msgid "Absolute difference between last and previous value is > N"
-msgstr ""
+msgstr "Absoluuttinen ero viimeisen ja edeltävän arvon välillä on > N "
 
 #: popup_trexpr.php:198
 msgid "Absolute difference between last and previous value is NOT N"
-msgstr ""
+msgstr "Absoluuttinen ero viimeisen ja edeltävän arvon välillä EI OLE N "
 
 #: report3.php:84 srv_status.php:143
 msgid "Acceptable SLA"
@@ -226,7 +230,7 @@ msgstr "Hyväksyttävä SLA"
 
 #: include/func.inc.php:1635
 msgid "Access denied"
-msgstr ""
+msgstr "Ei käyttöoikeutta."
 
 #: sysmap.php:75
 msgid "Access denied!"
@@ -329,7 +333,7 @@ msgstr "Toiminto"
 #: include/classes/api/services/CAction.php:2108
 #, c-format
 msgid "Action \"%1$s\" already exists."
-msgstr ""
+msgstr "Toiminto \"%1$s\" on jo olemassa."
 
 #: include/classes/api/services/CAction.php:1956
 #: include/classes/api/services/CAction.php:2055
@@ -340,7 +344,7 @@ msgstr "Toiminnolla \"%1$s\" on väärä arvo kohdalle \"esc_period\" (minimi %2
 #: include/classes/api/services/CAction.php:2130
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
-msgstr ""
+msgstr "Toiminnolle \"%1$s\" ei ole määritelty operaatioita."
 
 #: actionconf.php:187
 msgid "Action added"
@@ -353,19 +357,19 @@ msgstr "Toiminto poistettu"
 #: actionconf.php:416
 msgid "Action disabled"
 msgid_plural "Actions disabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Toiminto poistettu käytöstä. "
+msgstr[1] "Toiminnot poistettu käytöstä. "
 
 #: actionconf.php:415
 msgid "Action enabled"
 msgid_plural "Actions enabled"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Toiminto otettu käyttöön."
+msgstr[1] "Toiminnot otettu käyttöön."
 
 #: auditacts.php:27 include/menu.inc.php:147 include/screens.inc.php:31
 #: include/views/administration.auditacts.list.php:21
 msgid "Action log"
-msgstr ""
+msgstr "Toimintoloki "
 
 #: include/views/configuration.action.edit.php:502
 msgid "Action operations"
@@ -503,8 +507,9 @@ msgid "Add"
 msgstr "Lisää"
 
 #: jsLoader.php:183
+#, fuzzy
 msgid "Add child"
-msgstr ""
+msgstr "Lisää lapsi"
 
 #: include/actions.inc.php:594 include/actions.inc.php:881
 msgid "Add host"
@@ -512,11 +517,11 @@ msgstr "Lisää kone"
 
 #: include/views/configuration.item.massupdate.php:555
 msgid "Add new or existing applications"
-msgstr ""
+msgstr "Lisää uusia tai olemassaolevia sovelluksia"
 
 #: include/views/configuration.host.massupdate.php:110
 msgid "Add new or existing host groups"
-msgstr ""
+msgstr "Lisää uusia tai olemassaolevia koneryhmiä"
 
 #: include/views/configuration.graph.edit.php:277
 #: include/views/configuration.trigger.prototype.edit.php:314
@@ -574,8 +579,9 @@ msgstr "Agentti"
 
 #: include/classes/items/CHelpItems.php:69
 #: include/classes/items/CHelpItems.php:339
+#, fuzzy
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
-msgstr ""
+msgstr "Agentin saatavuustarkistus. Ei palauta mitään - saavuttamattomissa; 1 - saavutettavissa.  "
 
 #: include/views/configuration.host.list.php:70
 msgid "Agent encryption"
@@ -584,7 +590,7 @@ msgstr ""
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
 msgid "Agent host name. Returns string"
-msgstr ""
+msgstr "Agentin isäntänimi. Palauttaa merkkijonon. "
 
 #: include/views/configuration.host.edit.php:140
 #: include/views/configuration.host.edit.php:225
@@ -604,7 +610,7 @@ msgstr ""
 #: app/controllers/CControllerAcknowledgeEdit.php:146
 #: app/views/monitoring.acknowledge.edit.php:83
 msgid "Alarm acknowledgements"
-msgstr ""
+msgstr "Hälytysten kuittaukset"
 
 #: include/hosts.inc.php:114 include/views/administration.users.edit.php:46
 #: include/views/administration.users.list.php:47 popup.php:625 users.php:43
@@ -639,7 +645,7 @@ msgstr "Kaikki ryhmät"
 
 #: include/html.inc.php:369
 msgid "All hosts"
-msgstr ""
+msgstr "Kaikki isäntäkoneet"
 
 #: jsLoader.php:152
 msgid "All links should have \"Name\" and \"URL\" specified"
@@ -647,7 +653,7 @@ msgstr "Kaikilla linkeillä pitäisi olla \"Nimi\" tai \"URL\" määriteltynä"
 
 #: include/html.inc.php:330
 msgid "All templates"
-msgstr ""
+msgstr "Kaikki mallit"
 
 #: include/views/configuration.host.discovery.edit.php:247
 #: include/views/configuration.item.edit.php:401
@@ -658,7 +664,7 @@ msgstr "Sallitut koneet"
 
 #: include/classes/setup/CSetupWizard.php:384
 msgid "Alternatively, you can install it manually:"
-msgstr ""
+msgstr "Vaihtoehtoisesti voit asentaa sen manuaalisesti"
 
 #: include/triggers.inc.php:1530
 #: include/views/configuration.action.edit.php:135
@@ -667,13 +673,13 @@ msgstr ""
 #: include/views/configuration.trigger.prototype.edit.php:99
 #: include/views/configuration.triggers.edit.php:104
 msgid "And"
-msgstr ""
+msgstr "ja"
 
 #: include/views/configuration.action.edit.php:134
 #: include/views/configuration.action.edit.php:994
 #: include/views/configuration.host.discovery.edit.php:268
 msgid "And/Or"
-msgstr ""
+msgstr "ja/tai"
 
 #: include/views/common.filter.trigger.php:35
 #: include/views/common.filter.trigger.php:45
@@ -707,7 +713,6 @@ msgid "Application added"
 msgstr "Sovellus lisätty"
 
 #: applications.php:167 applications.php:207
-#, fuzzy
 msgid "Application deleted"
 msgid_plural "Applications deleted"
 msgstr[0] "Sovellus poistettu"
@@ -719,7 +724,7 @@ msgstr "Sovelluksessa virhe."
 
 #: include/views/configuration.item.prototype.edit.php:397
 msgid "Application prototypes"
-msgstr ""
+msgstr "Sovellusten prototyypit"
 
 #: applications.php:110
 msgid "Application updated"
@@ -921,7 +926,7 @@ msgstr "Tunnistautumistavaksi vaihdettu Zabbixin oma"
 #: include/views/configuration.item.prototype.edit.php:141
 #: include/views/js/configuration.discovery.edit.js.php:91
 msgid "Authentication passphrase"
-msgstr ""
+msgstr "Tunnistautumisen avainfraasi"
 
 #: include/views/configuration.host.discovery.edit.php:126
 #: include/views/configuration.item.edit.php:135
@@ -929,7 +934,7 @@ msgstr ""
 #: include/views/configuration.item.prototype.edit.php:134
 #: include/views/js/configuration.discovery.edit.js.php:81
 msgid "Authentication protocol"
-msgstr ""
+msgstr "Tunnistatumisprotokolla"
 
 #: include/views/configuration.action.list.php:31
 msgid "Auto registration"
@@ -1010,7 +1015,7 @@ msgstr "Ajanjakson T keskiarvo EI ole N"
 #: include/classes/setup/CSetupWizard.php:121
 #: include/classes/setup/CSetupWizard.php:341
 msgid "Back"
-msgstr ""
+msgstr "Takaisin"
 
 #: include/views/administration.general.image.edit.php:55
 #: include/views/administration.general.image.list.php:39
@@ -1028,7 +1033,7 @@ msgstr "Perus-DN"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
-msgstr ""
+msgstr "Perus"
 
 #: include/views/administration.authentication.edit.php:78
 msgid "Bind DN"
