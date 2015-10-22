@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-16 14:47+0300\n"
-"PO-Revision-Date: 2015-10-11 19:36+0300\n"
+"PO-Revision-Date: 2015-10-20 20:48+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1444584967.0\n"
+"X-POOTLE-MTIME: 1445366923.0\n"
 
 #: api/classes/CMaintenance.php:387 api/classes/CMaintenance.php:392
 #: api/classes/CMaintenance.php:504 api/classes/CMaintenance.php:509
@@ -6564,7 +6564,7 @@ msgstr "Уровень привилегии IPMI"
 #: disc_prototypes.php:100 host_discovery.php:97
 #: include/views/configuration.item.edit.php:173 items.php:107
 msgid "IPMI sensor"
-msgstr "Сенсор IPMI"
+msgstr "IPMI датчик"
 
 #: include/views/configuration.host.massupdate.php:242
 msgid "IPMI username"
