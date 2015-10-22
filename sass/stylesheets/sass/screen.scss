@@ -4192,10 +4192,17 @@ title: Links
 name: links
 ---
 
-Links:
+About link style and usage
 
 ```html_example
-<a href="#">Normal link</a>
+<a href="#">Default link</a>
+<a href="#" class="grey link-alt">Alternative link</a>
+<a href="#" class="green link-alt">Alternative link</a>
+<a href="#" class="red link-alt">Alternative link</a>
+<span class="link-action">Action link</span>
+<span class="green link-action">Action link</span>
+<span class="yellow link-action">Action link</span>
+<span class="red link-action">Action link</span>
 ```
 */
 
