@@ -443,7 +443,7 @@ class CConditionFormula {
 	 */
 	public function validTriggersComparison(&$triggers) {
 		$and_comparables = $this->getAndConditions($this->conditions_map);
-		$triggers_and_count = $this->getCountTriggersAnd($triggers, $and_comparables);
+		$triggers_and_count = $this->getCountTriggersAnd($triggers, $and_comparables, false);
 
 		return ($triggers_and_count > 1) ? false : true;
 	}
@@ -451,43 +451,55 @@ class CConditionFormula {
 	/**
 	 * Get count of triggers compared with "and".
 	 *
-	 * @param unknown $triggers
-	 * @param unknown $and_comparables
+	 * @param array $triggers			array of formula triggers
+	 * @param array $and_comparables	array of constants compared by "and"
+	 * @param boolean $in_and			flag indicating that function is called recursively from "and" block
 	 *
 	 * return int $triggers_and_count
 	 */
-	protected function getCountTriggersAnd(&$triggers, $and_comparables) {
-		if (array_key_exists('all', $and_comparables)) {
-			unset($and_comparables['all']);
-		}
-
+	protected function getCountTriggersAnd(&$triggers, $and_comparables, $in_and) {
 		$triggers_and_count = 0;
-		foreach ($and_comparables as $key => $conditions) {
-			if($key === 'and') {
-				// and conditions
-				foreach ($conditions as $and_condition) {
-					$triggers_and_count = 0;
 
-					foreach ($and_condition as $constant_key => $constant) {
-						if (array_key_exists('all', $constant)) {
-							$triggers_and_count += $this->getCountTriggersAnd($triggers, $constant);
-						} else if (array_intersect($constant, $triggers)) {
-							$triggers_and_count++;
-						}
-					}
+		if(array_key_exists('and', $and_comparables)) {
+			// and conditions
 
-					if ($triggers_and_count > 1) {
-						return $triggers_and_count;
+			$conditions = $and_comparables['and'];
+			foreach ($conditions as $and_condition) {
+				$triggers_and_count = 0;
+				foreach ($and_condition as $constant_key => $constant) {
+					if (array_key_exists('all', $constant)) {
+						$triggers_and_count += $this->getCountTriggersAnd($triggers, $constant, true);
+					} else if (array_intersect($constant, $triggers)) {
+						$triggers_and_count++;
 					}
 				}
-			}
-			else {
-				// subquery scope
-				$triggers_and_count = $this->getCountTriggersAnd($triggers, $conditions);
+
 				if ($triggers_and_count > 1) {
 					return $triggers_and_count;
 				}
 			}
+			unset($and_comparables['and']);
+		}
+
+		$trigger_cout_in_subquery = 0;
+		if (array_key_exists('all', $and_comparables)) {
+			$conditions = $and_comparables['all'];
+			if ($in_and && array_intersect($conditions, $triggers)) {
+				$trigger_cout_in_subquery = 1;
+			}
+			unset($and_comparables['all']);
+		}
+
+		foreach ($and_comparables as $key => $conditions) {
+			// subquery scope
+			$triggers_and_count = $this->getCountTriggersAnd($triggers, $conditions, $in_and);
+			if ($triggers_and_count > 1) {
+				return $triggers_and_count;
+			}
+		}
+
+		if ($in_and && ($triggers_and_count == 0)) {
+			return $trigger_cout_in_subquery;
 		}
 
 		return $triggers_and_count;
