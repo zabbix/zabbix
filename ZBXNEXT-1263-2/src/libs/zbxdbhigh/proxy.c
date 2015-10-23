@@ -110,8 +110,7 @@ static zbx_history_table_t areg = {
 int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_socket_t *sock,
 		char **error)
 {
-	char			*ch_error;
-	zbx_tls_conn_attr_t	attr;
+	char	*ch_error;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
@@ -126,14 +125,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_tls_get_attr(sock, &attr))
-	{
-		*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
-
-	if (SUCCEED != DCcheck_proxy_permissions(host, &attr, hostid, error))
+	if (SUCCEED != DCcheck_proxy_permissions(host, sock, hostid, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -2281,8 +2273,6 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			}
 			else
 			{
-				int	tls_get_attr_res;
-
 				hostid_prev = items[i].host.hostid;
 
 				if (0 == ((unsigned int)items[i].host.tls_accept & sock->connection_type))
@@ -2297,15 +2287,15 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				if (SUCCEED != zbx_tls_get_attr(sock, &attr))
-				{
-					THIS_SHOULD_NEVER_HAPPEN;
-					flag_host_allow = 0;
-					continue;
-				}
-
 				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 				{
+					if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+					{
+						THIS_SHOULD_NEVER_HAPPEN;
+						flag_host_allow = 0;
+						continue;
+					}
+
 					/* simplified match, not compliant with RFC 4517, 4518 */
 					if ('\0' != *items[i].host.tls_issuer &&
 							0 != strcmp(items[i].host.tls_issuer, attr.issuer))
@@ -2330,6 +2320,13 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 				else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 				{
+					if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+					{
+						THIS_SHOULD_NEVER_HAPPEN;
+						flag_host_allow = 0;
+						continue;
+					}
+
 					if (strlen(items[i].host.tls_psk_identity) != attr.psk_identity_len ||
 							0 != memcmp(items[i].host.tls_psk_identity, attr.psk_identity,
 							attr.psk_identity_len))

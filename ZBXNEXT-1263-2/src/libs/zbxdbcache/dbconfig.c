@@ -4212,7 +4212,7 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
  *                                                                            *
  * Parameters:                                                                *
  *     host   - [IN] proxy name                                               *
- *     attr   - [IN] connection attributes                                    *
+ *     sock   - [IN] connection socket context                                *
  *     hostid - [OUT] proxy ID found in configuration cache                   *
  *     error  - [OUT] error message why access was denied                     *
  *                                                                            *
@@ -4224,10 +4224,10 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
  *     locking.                                                               *
  *                                                                            *
  ******************************************************************************/
-int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr, zbx_uint64_t *hostid,
-		char **error)
+int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
+	zbx_tls_conn_attr_t	attr;
 
 	LOCK_CACHE;
 
@@ -4245,19 +4245,27 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 		return FAIL;
 	}
 
-	if (0 == ((unsigned int)dc_host->tls_accept & attr->connection_type))
+	if (0 == ((unsigned int)dc_host->tls_accept & sock->connection_type))
 	{
 		UNLOCK_CACHE;
 		*error = zbx_dsprintf(NULL, "connection of type \"%s\" is not allowed for proxy \"%s\"",
-				zbx_tls_connection_type_name(attr->connection_type), host);
+				zbx_tls_connection_type_name(sock->connection_type), host);
 		return FAIL;
 	}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (ZBX_TCP_SEC_TLS_CERT == attr->connection_type)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
+		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+		{
+			UNLOCK_CACHE;
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+
 		/* simplified match, not compliant with RFC 4517, 4518 */
-		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr->issuer))
+		if ('\0' != *dc_host->tls_issuer && 0 != strcmp(dc_host->tls_issuer, attr.issuer))
 		{
 			UNLOCK_CACHE;
 			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate issuer does not match", host);
@@ -4265,20 +4273,28 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_tls_conn_attr_t *attr,
 		}
 
 		/* simplified match, not compliant with RFC 4517, 4518 */
-		if ('\0' != *dc_host->tls_subject && 0 != strcmp(dc_host->tls_subject, attr->subject))
+		if ('\0' != *dc_host->tls_subject && 0 != strcmp(dc_host->tls_subject, attr.subject))
 		{
 			UNLOCK_CACHE;
 			*error = zbx_dsprintf(*error, "proxy \"%s\" certificate subject does not match", host);
 			return FAIL;
 		}
 	}
-	else if (ZBX_TCP_SEC_TLS_PSK == attr->connection_type)
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
+		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+		{
+			UNLOCK_CACHE;
+			*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+
 		if (NULL != dc_host->tls_dc_psk)
 		{
-			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr->psk_identity_len ||
-					0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr->psk_identity,
-					attr->psk_identity_len))
+			if (strlen(dc_host->tls_dc_psk->tls_psk_identity) != attr.psk_identity_len ||
+					0 != memcmp(dc_host->tls_dc_psk->tls_psk_identity, attr.psk_identity,
+					attr.psk_identity_len))
 			{
 				UNLOCK_CACHE;
 				*error = zbx_dsprintf(*error, "proxy \"%s\" is using false PSK identity", host);
