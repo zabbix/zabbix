@@ -104,19 +104,18 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			if ((ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
-					ZBX_TCP_SEC_TLS_PSK == sock->connection_type) &&
-					SUCCEED != zbx_tls_get_attr(sock, &attr))
-			{
-				THIS_SHOULD_NEVER_HAPPEN;
-
-				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host \"%s\"",
-						host);
-				goto done;
-			}
 
 			if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 			{
+				if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+
+					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host \"%s\"",
+							host);
+					goto done;
+				}
+
 				/* simplified match, not compliant with RFC 4517, 4518 */
 				if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
 				{
@@ -135,6 +134,15 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			}
 			else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 			{
+				if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
+				{
+					THIS_SHOULD_NEVER_HAPPEN;
+
+					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host \"%s\"",
+							host);
+					goto done;
+				}
+
 				if (strlen(row[5]) != attr.psk_identity_len ||
 						0 != memcmp(row[5], attr.psk_identity, attr.psk_identity_len))
 				{

@@ -4902,9 +4902,6 @@ const char	*zbx_tls_connection_type_name(unsigned int type)
  ******************************************************************************/
 int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 {
-	if (ZBX_TCP_SEC_TLS_CERT != s->connection_type)
-		THIS_SHOULD_NEVER_HAPPEN;
-
 	attr->connection_type = s->connection_type;
 
 #if defined(HAVE_POLARSSL)
@@ -5022,9 +5019,6 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
  ******************************************************************************/
 int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 {
-	if (ZBX_TCP_SEC_TLS_PSK != s->connection_type)
-		THIS_SHOULD_NEVER_HAPPEN;
-
 	attr->connection_type = s->connection_type;
 
 #if defined(HAVE_POLARSSL)
@@ -5051,33 +5045,6 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 
 	return SUCCEED;
 }
-
-/******************************************************************************
- *                                                                            *
- * Function: zbx_tls_get_attr                                                 *
- *                                                                            *
- * Purpose: get connection type, attributes from the context of               *
- *          established connection                                            *
- *                                                                            *
- * Comments:                                                                  *
- *     This function can be used only on server-side of TLS connection        *
- *     (GnuTLS makes it asymmetric).                                          *
- *                                                                            *
- ******************************************************************************/
-int	zbx_tls_get_attr(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
-{
-	int	rc = SUCCEED;
-
-	attr->connection_type = s->connection_type;
-
-	if (ZBX_TCP_SEC_TLS_CERT == s->connection_type)
-		rc = zbx_tls_get_attr_cert(s, attr);
-	else if (ZBX_TCP_SEC_TLS_PSK == s->connection_type)
-		rc = zbx_tls_get_attr_psk(s, attr);
-
-	return rc;
-}
-
 
 #if defined(_WINDOWS) && (defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 /******************************************************************************
