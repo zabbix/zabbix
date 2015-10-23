@@ -106,7 +106,7 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			if ((ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
 					ZBX_TCP_SEC_TLS_PSK == sock->connection_type) &&
-					SUCCEED != zbx_tls_get_attr(sock, &attr))
+					SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
 			{
 				THIS_SHOULD_NEVER_HAPPEN;
 

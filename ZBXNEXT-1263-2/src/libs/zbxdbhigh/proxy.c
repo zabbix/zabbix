@@ -112,6 +112,7 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 {
 	char			*ch_error;
 	zbx_tls_conn_attr_t	attr;
+	int			tls_get_attr_res;
 
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
@@ -126,7 +127,14 @@ int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *h
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_tls_get_attr(sock, &attr))
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+		tls_get_attr_res = zbx_tls_get_attr_cert(sock, &attr);
+	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+		tls_get_attr_res = zbx_tls_get_attr_psk(sock, &attr);
+	else
+		tls_get_attr_res = SUCCEED;
+
+	if (SUCCEED != tls_get_attr_res)
 	{
 		*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -2272,7 +2280,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 		/* It is enough to check connection type, and optionally, certificate issuer and subject, and PSK */
 		/* identity only for a host. No need to check it for every item if the host is the same. */
 
-		if (0 == proxy_hostid && NULL != sock)
+		if (0 == proxy_hostid)
 		{
 			if (hostid_prev == items[i].host.hostid)	/* host and connection already checked */
 			{
@@ -2281,6 +2289,8 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 			}
 			else
 			{
+				int	tls_get_attr_res;
+
 				hostid_prev = items[i].host.hostid;
 
 				if (0 == ((unsigned int)items[i].host.tls_accept & sock->connection_type))
@@ -2295,15 +2305,18 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
-						ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+					tls_get_attr_res = zbx_tls_get_attr_cert(sock, &attr);
+				else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+					tls_get_attr_res = zbx_tls_get_attr_psk(sock, &attr);
+				else
+					tls_get_attr_res = SUCCEED;
+
+				if (SUCCEED != tls_get_attr_res)
 				{
-					if (SUCCEED != zbx_tls_get_attr(sock, &attr))
-					{
-						THIS_SHOULD_NEVER_HAPPEN;
-						flag_host_allow = 0;
-						continue;
-					}
+					THIS_SHOULD_NEVER_HAPPEN;
+					flag_host_allow = 0;
+					continue;
 				}
 
 				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
