@@ -36,7 +36,8 @@ $titles = [
 	'graphs' => _('Graphs'),
 	'screens' => _('Screens'),
 	'maps' => _('Maps'),
-	'images' => _('Images')
+	'images' => _('Images'),
+	'valueMaps' => _('Value mappings')
 ];
 
 foreach ($titles as $key => $title) {
@@ -54,6 +55,16 @@ foreach ($titles as $key => $title) {
 			}
 
 			$cbExist->onClick('if (this.checked) return confirm(\''._('Images for all maps will be updated!').'\')');
+		}
+
+		if ($key === 'valueMaps') {
+			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
+				continue;
+			}
+
+			$cbExist->onClick(
+				'updateWarning(this, '.CJs::encodeJson(_('Value mappings for value maps will be updated!')).')'
+			);
 		}
 	}
 

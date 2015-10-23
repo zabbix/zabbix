@@ -59,7 +59,8 @@ $data = [
 		'graphs' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
 		'screens' => ['updateExisting' => false, 'createMissing' => false],
 		'maps' => ['updateExisting' => false, 'createMissing' => false],
-		'images' => ['updateExisting' => false, 'createMissing' => false]
+		'images' => ['updateExisting' => false, 'createMissing' => false],
+		'valueMaps' => ['updateExisting' => false, 'createMissing' => false],
 	],
 	'backurl' => getRequest('backurl', 'zabbix.php?action=dashboard.view')
 ];
@@ -146,6 +147,12 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 			$data['rules']['screens'] = ['updateExisting' => true, 'createMissing' => true];
 
 			$data['backurl'] = 'screenconf.php';
+			break;
+
+		case 'valuemap':
+			$data['rules']['valueMaps'] = ['updateExisting' => true, 'createMissing' => true];
+
+			$data['backurl'] = 'adm.valuemapping.php';
 			break;
 
 	}
