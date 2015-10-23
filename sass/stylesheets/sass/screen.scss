@@ -677,7 +677,7 @@ footer {
 }
 
 .radio-switch {
-	cursor: pointer;
+	cursor: default;
 	background-color: $form-bg-color;
 	@extend %paging-btn;
 }
@@ -3535,8 +3535,18 @@ This is typography
 
 ```html_example
 <h1>Main Heading</h1>
+<h2>Section Header</h2>
 <h3>Contextual Menu Heading</h3>
 <h4>Widget and Dialog Heading</h4>
+```
+
+##Paragraphs
+
+```html_example
+<h2>Default Text</h2>
+<p>Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
+<h2>Grey Text</h2>
+<p class="grey">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</p>
 ```
 */
 
@@ -3812,7 +3822,6 @@ Text on html5 input types
 </select>
 ```
 
-
 ##Radio and checkboxes
 
 ```html_example
@@ -3960,10 +3969,6 @@ name: notifications
 ---
 
 Notificatiions:
-
-```html_example
-example
-```
 
 ##Success Notification
 
@@ -4133,7 +4138,7 @@ Navigation:
          <li><a href="#">Configuration</a></li>
          <li><a href="#">Administration</a></li>
       </ul>
-      <ul class="top-nav-icons">
+      <!--<ul class="top-nav-icons">
          <li>
             <form><input type="text"><button type="button" class="btn-search"></button></form>
          </li>
@@ -4141,7 +4146,7 @@ Navigation:
          <li><a href="#" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li>
          <li><a href="#" class="top-nav-profile" title="Profile"></a></li>
          <li><a href="#" class="top-nav-signout" title="Sign out"></a></li>
-      </ul>
+      </ul>-->
    </div>
    <div class="top-subnav-container">
       <ul class="top-subnav">
@@ -4157,7 +4162,7 @@ Navigation:
          <li><a href="#">Discovery</a></li>
          <li><a href="#">IT services</a></li>
       </ul>
-      <div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>
+      <!--<div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>-->
    </div>
 </nav>
 ```
