@@ -26,7 +26,7 @@ $widget = (new CWidget())
 		->addItem((new CList())
 			->addItem(makeAdministrationGeneralMenu('adm.valuemapping.php'))
 			->addItem(new CSubmit('form', _('Create value map')))
-			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=valuemaps")'))
+			->addItem((new CButton('form', _('Import')))->onClick('redirect("conf.import.php?rules_preset=valuemap")'))
 		)
 	);
 
