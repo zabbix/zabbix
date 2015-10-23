@@ -514,8 +514,68 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+
+int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row, char **error)
+{
+	char		*exp, *tmp = *data, *e, *func, *key, *orig, *host = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, len, orig_alloc = 128, orig_offset = 0;
+	zbx_function_t	funcdata;
+	int		i;
+
+	exp = zbx_malloc(NULL, exp_alloc);
+	orig = zbx_malloc(NULL, orig_alloc);
+
+	for (e = tmp; '\0' != *e; e++)
+	{
+		if (FAIL == zbx_function_parse(&funcdata, e, &len))
+		{
+			zbx_chrcpy_alloc(&exp, &exp_alloc, &exp_offset, *e);
+			continue;
+		}
+
+		zbx_strncpy_alloc(&orig, &orig_alloc, &orig_offset, e, len);
+		e += len - 1;
+
+		if (0 < funcdata.nparam)
+		{
+			parse_host_key(funcdata.params[0], &host, &key);
+			substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+
+			if (NULL != host)
+			{
+				funcdata.params[0] = zbx_dsprintf(funcdata.params[0], "%s:%s", host, key);
+				zbx_free(host);
+				zbx_free(key);
+			}
+			else
+			{
+				funcdata.params[0] = key;
+				key = NULL;
+			}
+
+			for (i = 1; i < funcdata.nparam; i++)
+				substitute_discovery_macros(&funcdata.params[i], jp_row);
+		}
+
+		zbx_function_tostr(&funcdata, orig, &func);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
+
+		zbx_free(func);
+		orig_offset = 0;
+
+		zbx_function_clean(&funcdata);
+	}
+
+	zbx_free(orig);
+
+	zbx_free(*data);
+	*data = exp;
+
+	return SUCCEED;
+}
+
 static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
-		const char *params_proto, const char *snmp_oid_proto, struct zbx_json_parse *jp_row)
+		const char *params_proto, const char *snmp_oid_proto, unsigned char type, struct zbx_json_parse *jp_row)
 {
 	const char	*__function_name = "lld_make_item";
 
@@ -559,7 +619,10 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 
 		item->params = zbx_strdup(NULL, params_proto);
 		item->params_orig = NULL;
-		substitute_discovery_macros(&item->params, jp_row);
+		if (ITEM_TYPE_CALCULATED == type)
+			substitute_formula_macros(&item->params, jp_row, NULL);
+		else
+			substitute_discovery_macros(&item->params, jp_row);
 		zbx_lrtrim(item->params, ZBX_WHITESPACE);
 
 		item->snmp_oid = zbx_strdup(NULL, snmp_oid_proto);
@@ -594,7 +657,11 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 		}
 
 		buffer = zbx_strdup(buffer, params_proto);
-		substitute_discovery_macros(&buffer, jp_row);
+		if (ITEM_TYPE_CALCULATED == type)
+			substitute_formula_macros(&buffer, jp_row, NULL);
+		else
+			substitute_discovery_macros(&buffer, jp_row);
+
 		zbx_lrtrim(buffer, ZBX_WHITESPACE);
 		if (0 != strcmp(item->params, buffer))
 		{
@@ -626,7 +693,7 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 }
 
 static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
-		const char *params_proto, const char *snmp_oid_proto, zbx_vector_ptr_t *lld_rows)
+		const char *params_proto, const char *snmp_oid_proto, unsigned char type, zbx_vector_ptr_t *lld_rows)
 {
 	int	i;
 
@@ -634,7 +701,7 @@ static void	lld_items_make(zbx_vector_ptr_t *items, const char *name_proto, cons
 	{
 		zbx_lld_row_t	*lld_row = (zbx_lld_row_t *)lld_rows->values[i];
 
-		lld_item_make(items, name_proto, key_proto, params_proto, snmp_oid_proto, &lld_row->jp_row);
+		lld_item_make(items, name_proto, key_proto, params_proto, snmp_oid_proto, type, &lld_row->jp_row);
 	}
 
 	zbx_vector_ptr_sort(items, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -1464,7 +1531,7 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 				snmpv3_privpassphrase, authtype, username, password, publickey, privatekey, description,
 				interfaceid);
 
-		lld_items_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, lld_rows);
+		lld_items_make(&items, name_proto, key_proto, params_proto, snmp_oid_proto, type, lld_rows);
 
 		lld_items_validate(hostid, &items, error);
 
@@ -1492,3 +1559,4 @@ void	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_p
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
