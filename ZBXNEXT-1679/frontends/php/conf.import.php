@@ -66,35 +66,18 @@ $data = [
 ];
 
 // rules presets
-if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
-	switch ($_REQUEST['rules_preset']) {
+if (hasRequest('rules_preset') && !hasRequest('rules')) {
+	switch (getRequest('rules_preset')) {
 		case 'host':
 			$data['rules']['groups'] = ['createMissing' => true];
 			$data['rules']['hosts'] = ['updateExisting' => true, 'createMissing' => true];
-			$data['rules']['applications'] = [
-				'createMissing' => true,
+			$data['rules']['applications'] = ['createMissing' => true, 'deleteMissing' => false];
+			$data['rules']['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+			$data['rules']['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
 				'deleteMissing' => false
 			];
-			$data['rules']['items'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['discoveryRules'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['triggers'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['graphs'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
-			];
+			$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+			$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['templateLinkage'] = ['createMissing' => true];
 
 			$data['backurl'] = 'hosts.php';
@@ -103,35 +86,16 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 		case 'template':
 			$data['rules']['groups'] = ['createMissing' => true];
 			$data['rules']['templates'] = ['updateExisting' => true, 'createMissing' => true];
-			$data['rules']['templateScreens'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
+			$data['rules']['templateScreens'] = ['updateExisting' => true, 'createMissing' => true,
 				'deleteMissing' => false
 			];
-			$data['rules']['applications'] = [
-				'createMissing' => true,
+			$data['rules']['applications'] = ['createMissing' => true, 'deleteMissing' => false];
+			$data['rules']['items'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+			$data['rules']['discoveryRules'] = ['updateExisting' => true, 'createMissing' => true,
 				'deleteMissing' => false
 			];
-			$data['rules']['items'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['discoveryRules'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['triggers'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
-			];
-			$data['rules']['graphs'] = [
-				'updateExisting' => true,
-				'createMissing' => true,
-				'deleteMissing' => false
-			];
+			$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
+			$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['templateLinkage'] = ['createMissing' => true];
 
 			$data['backurl'] = 'templates.php';
@@ -158,21 +122,21 @@ if (isset($_REQUEST['rules_preset']) && !isset($_REQUEST['rules'])) {
 	}
 }
 
-if (isset($_REQUEST['rules'])) {
+if (hasRequest('rules')) {
 	$requestRules = getRequest('rules', []);
 	// if form was submitted with some checkboxes unchecked, those values are not submitted
 	// so that we set missing values to false
 	foreach ($data['rules'] as $ruleName => $rule) {
-		if (!isset($requestRules[$ruleName])) {
-			if (isset($rule['updateExisting'])) {
+		if (!array_key_exists($ruleName, $requestRules)) {
+			if (array_key_exists('updateExisting', $rule)) {
 				$requestRules[$ruleName]['updateExisting'] = false;
 			}
 
-			if (isset($rule['createMissing'])) {
+			if (array_key_exists('createMissing', $rule)) {
 				$requestRules[$ruleName]['createMissing'] = false;
 			}
 
-			if (isset($rule['deleteMissing'])) {
+			if (array_key_exists('deleteMissing', $rule)) {
 				$requestRules[$ruleName]['deleteMissing'] = false;
 			}
 		}
