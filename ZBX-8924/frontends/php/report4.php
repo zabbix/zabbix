@@ -123,6 +123,7 @@ else {
 	show_table_header(_('Notifications'), $form);
 
 	$header = array();
+	$users = array();
 	$db_users = DBselect(
 			'SELECT u.*'.
 			' FROM users u'.
@@ -191,27 +192,9 @@ else {
 			break;
 	}
 
-	// time till
-	$maxTime = ($year == $currentYear) ? time() : mktime(0, 0, 0, 1, 1, $year + 1);
-
-	// run one query for all periods
-	$i = 0;
-	$sql = '';
+	// initialize periods array
 	$periods = array();
 	foreach ($intervals as $from => $till) {
-		if ($i > 0) {
-			$sql .= ' UNION ';
-		}
-
-		$sql .= 'SELECT count(a.alertid) as alerts_count,a.userid,a.mediatypeid,'.zbx_dbstr($from).' as period_from'.
-				' FROM alerts a'.
-				' WHERE a.clock>='.zbx_dbstr($from).
-					' AND a.clock<'.zbx_dbstr($till).
-					(get_request('media_type') ? ' AND a.mediatypeid='.zbx_dbstr(get_request('media_type')) : null).
-				' GROUP BY a.userid, a.mediatypeid';
-
-		$i++;
-
 		$periods[$from] = array();
 		foreach ($users as $userid => $alias) {
 			$periods[$from][$userid] = array();
@@ -222,12 +205,12 @@ else {
 			}
 		}
 	}
-	$all_alerts = DBfetchArray(DBselect($sql));
 
 	// collect data by period
-	foreach($all_alerts as $alerts) {
-		$periods[$alerts['period_from']][$alerts['userid']]['medias'][$alerts['mediatypeid']] = $alerts['alerts_count'];
-		$periods[$alerts['period_from']][$alerts['userid']]['total'] += $alerts['alerts_count'];
+	$alerts = API::Alert()->getAlertsCountByIntervals(array('intervals' => $intervals));
+	foreach($alerts as $adata) {
+		$periods[$adata['period_from']][$adata['userid']]['medias'][$adata['mediatypeid']] = $adata['alerts_count'];
+		$periods[$adata['period_from']][$adata['userid']]['total'] += $adata['alerts_count'];
 	}
 
 	// generate data table
