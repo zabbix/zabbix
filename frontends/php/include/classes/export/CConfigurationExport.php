@@ -57,8 +57,10 @@ class CConfigurationExport {
 			'groups' => [],
 			'screens' => [],
 			'images' => [],
-			'maps' => []
+			'maps' => [],
+			'valueMaps' => []
 		];
+
 		$this->options = array_merge($this->options, $options);
 
 		$this->data = [
@@ -71,7 +73,8 @@ class CConfigurationExport {
 			'graphPrototypes' => [],
 			'screens' => [],
 			'images' => [],
-			'maps' => []
+			'maps' => [],
+			'valueMaps' => []
 		];
 
 		$this->dataFields = [
@@ -130,26 +133,37 @@ class CConfigurationExport {
 		if ($this->data['groups']) {
 			$this->builder->buildGroups($this->data['groups']);
 		}
+
 		if ($this->data['templates']) {
 			$this->builder->buildTemplates($this->data['templates']);
 		}
+
 		if ($this->data['hosts']) {
 			$this->builder->buildHosts($this->data['hosts']);
 		}
+
 		if ($this->data['triggers']) {
 			$this->builder->buildTriggers($this->data['triggers']);
 		}
+
 		if ($this->data['graphs']) {
 			$this->builder->buildGraphs($this->data['graphs']);
 		}
+
 		if ($this->data['screens']) {
 			$this->builder->buildScreens($this->data['screens']);
 		}
+
 		if ($this->data['images']) {
 			$this->builder->buildImages($this->data['images']);
 		}
+
 		if ($this->data['maps']) {
 			$this->builder->buildMaps($this->data['maps']);
+		}
+
+		if ($this->data['valueMaps']) {
+			$this->builder->buildValueMaps($this->data['valueMaps']);
 		}
 
 		return $this->writer->write($this->builder->getExport());
@@ -163,6 +177,11 @@ class CConfigurationExport {
 
 		if ($options['groups']) {
 			$this->gatherGroups($options['groups']);
+		}
+
+		// Gather value maps before items if possible.
+		if ($options['valueMaps'] && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+			$this->gatherValueMaps($options['valueMaps']);
 		}
 
 		if ($options['templates']) {
@@ -421,30 +440,54 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get items related objects data from database.
+	 * Get items related objects data from database. and set 'valueMaps' data.
 	 *
 	 * @param array $items
 	 *
 	 * @return array
 	 */
 	protected function prepareItems(array $items) {
-		// gather value maps
-		$valueMapNames = [];
+		// Value map IDs that are zeroes, should be skipped.
+		$valuemapids = zbx_objectValues($items, 'valuemapid');
 
-		$dbValueMaps = DBselect(
-			'SELECT vm.valuemapid, vm.name FROM valuemaps vm'.
-			' WHERE '.dbConditionInt('vm.valuemapid', zbx_objectValues($items, 'valuemapid'))
-		);
+		foreach ($valuemapids as $valuemapid) {
+			if ($valuemapid == 0) {
+				unset($valuemapids[$valuemapid]);
+			}
+		}
 
-		while ($valueMap = DBfetch($dbValueMaps)) {
-			$valueMapNames[$valueMap['valuemapid']] = $valueMap['name'];
+		$valuemapids = array_combine($valuemapids, $valuemapids);
+
+		if ($this->data['valueMaps']) {
+			/*
+			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
+			 * value map IDs that should not be selected again.
+			 */
+			$valuemaps = $this->data['valueMaps'];
+
+			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
+				if (array_key_exists($valuemapid, $valuemapids)) {
+					unset($valuemapids[$valuemapid]);
+				}
+			}
+		}
+
+		if ($valuemapids) {
+			$valuemaps = API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'selectMappings' => ['value', 'newvalue'],
+				'valuemapids' => $valuemapids,
+				'preservekeys' => true
+			]);
+
+			$this->data['valueMaps'] = zbx_array_merge($this->data['valueMaps'], $valuemaps);
 		}
 
 		foreach ($items as $idx => &$item) {
 			$item['valuemap'] = [];
 
 			if ($item['valuemapid']) {
-				$item['valuemap'] = ['name' => $valueMapNames[$item['valuemapid']]];
+				$item['valuemap'] = ['name' => $this->data['valueMaps'][$item['valuemapid']]['name']];
 			}
 
 			// Remove items linked to discovered applications.
@@ -852,6 +895,7 @@ class CConfigurationExport {
 
 		return $triggers;
 	}
+
 	/**
 	 * Get maps for export from database.
 	 *
@@ -905,6 +949,22 @@ class CConfigurationExport {
 
 		$this->prepareScreenExport($screens);
 		$this->data['screens'] = $screens;
+	}
+
+	/**
+	 * Get value maps for export builder from database.
+	 *
+	 * @param array $valuemapids
+	 *
+	 * return array
+	 */
+	protected function gatherValueMaps(array $valuemapids) {
+		$this->data['valueMaps'] = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'selectMappings' => ['value', 'newvalue'],
+			'valuemapids' => $valuemapids,
+			'preservekeys' => true
+		]);
 	}
 
 	/**

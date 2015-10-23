@@ -210,6 +210,35 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format value maps.
+	 *
+	 * @param array $valuemaps
+	 */
+	public function buildValueMaps(array $valuemaps) {
+		CArrayHelper::sort($valuemaps, ['name']);
+
+		foreach ($valuemaps as &$valuemap) {
+			CArrayHelper::sort($valuemap['mappings'], ['value']);
+		}
+		unset($valuemap);
+
+		$this->data['value_maps'] = [];
+
+		foreach ($valuemaps as $key => $valuemap) {
+			$this->data['value_maps'][$key] = [
+				'name' => $valuemap['name']
+			];
+
+			foreach ($valuemap['mappings'] as $mapping) {
+				$this->data['value_maps'][$key]['mappings'][] = [
+					'value' => $mapping['value'],
+					'newvalue' => $mapping['newvalue']
+				];
+			}
+		}
+	}
+
+	/**
 	 * For each host interface an unique reference must be created and then added for all items, discovery rules
 	 * and item prototypes that use the interface.
 	 *
