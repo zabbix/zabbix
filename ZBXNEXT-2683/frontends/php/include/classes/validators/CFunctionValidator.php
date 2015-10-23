@@ -244,7 +244,7 @@ class CFunctionValidator extends CValidator {
 					['type' => 'sec_num', 'mandat' => true],
 					['type' => 'sec_zero', 'can_be_empty' => true],
 					['type' => 'num', 'mandat' => true],
-					['type' => 'str', 'can_be_empty' => true],
+					['type' => 'str', 'can_be_empty' => true]
 				],
 				'value_types' => $valueTypesNum
 			]

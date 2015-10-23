@@ -22,14 +22,14 @@
 class CMacroParser extends CParser {
 
 	/**
-	 * Macro name
+	 * Macro name.
 	 *
 	 * @var string
 	 */
 	private $macro;
 
 	/**
-	 * Reference number
+	 * Reference number.
 	 *
 	 * @var int
 	 */
@@ -41,7 +41,7 @@ class CMacroParser extends CParser {
 	private $set_parser;
 
 	/**
-	 * An options array
+	 * An options array.
 	 *
 	 * Supported options:
 	 *   'allow_reference' => true		support of reference {MACRO<1-9>}
@@ -95,6 +95,7 @@ class CMacroParser extends CParser {
 
 		if (!isset($source[$p]) || $source[$p] != '}') {
 			$this->n = 0;
+
 			return self::PARSE_FAIL;
 		}
 		$p++;
@@ -118,7 +119,7 @@ class CMacroParser extends CParser {
 	/**
 	 * Returns the reference.
 	 *
-	 * @return string
+	 * @return int
 	 */
 	public function getN() {
 		return $this->n;

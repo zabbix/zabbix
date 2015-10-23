@@ -55,15 +55,15 @@ class CMacrosResolverGeneral {
 	protected function resolveTriggerReferences($expression, $references) {
 		$matched_macros = $this->getMacroPositions($expression, ['usermacros' => true]);
 
-		// replace user macros with string 'macro' to make values search easier
+		// Replace user macros with string 'macro' to make values search easier.
 		foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 			$text = substr_replace($expression, 'macro', $pos, strlen($macro));
 		}
 
-		// replace functionids with string 'function' to make values search easier
+		// Replace functionids with string 'function' to make values search easier.
 		$expression = preg_replace('/\{[0-9]+\}/', 'function', $expression);
 
-		// search for numeric values in expression
+		// Search for numeric values in expression.
 		preg_match_all('/'.ZBX_PREG_NUMBER.'/', $expression, $values);
 
 		foreach ($references as $reference => &$value) {
@@ -94,7 +94,7 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Transform types, used in extractMacros() function to types which can be used in getMacroPositions()
+	 * Transform types, used in extractMacros() function to types which can be used in getMacroPositions().
 	 *
 	 * @param array  $types
 	 *
@@ -598,7 +598,7 @@ class CMacrosResolverGeneral {
 					' AND n.main=1'
 			);
 
-			// macro should be resolved to interface with highest priority ($priorities)
+			// Macro should be resolved to interface with highest priority ($priorities).
 			$interfaces = [];
 
 			while ($dbInterface = DBfetch($dbInterfaces)) {
@@ -658,7 +658,7 @@ class CMacrosResolverGeneral {
 
 			$history = Manager::History()->getLast($functions, 1, ZBX_HISTORY_PERIOD);
 
-			// false passed to DBfetch to get data without null converted to 0, which is done by default
+			// False passed to DBfetch to get data without null converted to 0, which is done by default.
 			foreach ($functions as $func) {
 				foreach ($macros[$func['functionid']] as $macro => $fNums) {
 					$lastValue = isset($history[$func['itemid']]) ? $history[$func['itemid']][0]['value'] : null;
@@ -763,7 +763,7 @@ class CMacrosResolverGeneral {
 	 * @return array
 	 */
 	protected function getUserMacros(array $data) {
-		// User macros
+		// User macros.
 		$hostids = [];
 		foreach ($data as $element) {
 			foreach ($element['hostids'] as $hostid) {
@@ -832,7 +832,7 @@ class CMacrosResolverGeneral {
 			}
 
 			foreach ($db_hosts as $db_host) {
-				// only unprocessed templates will be populated
+				// Only unprocessed templates will be populated.
 				foreach ($host_templates[$db_host['hostid']] as $templateid) {
 					if (!array_key_exists($templateid, $host_templates)) {
 						$hostids[$templateid] = true;
@@ -865,7 +865,7 @@ class CMacrosResolverGeneral {
 					}
 				}
 				else {
-					// this macro cannot be resolved
+					// This macro cannot be resolved.
 					$value = ['value' => $usermacro, 'value_default' => null];
 				}
 			}
@@ -874,7 +874,7 @@ class CMacrosResolverGeneral {
 		unset($element);
 
 		if (!$all_macros_resolved) {
-			// Global macros
+			// Global macros.
 			$db_global_macros = API::UserMacro()->get([
 				'output' => ['macro', 'value'],
 				'globalmacro' => true
@@ -941,7 +941,7 @@ class CMacrosResolverGeneral {
 					$value = $value['value_default'];
 				}
 				else {
-					// unresolved macro
+					// Unresolved macro.
 					$value = $usermacro;
 				}
 			}
