@@ -83,7 +83,7 @@ class CItemKey extends CParser {
 	/**
 	 * Check if given character is a valid key id char
 	 * this function is a copy of is_key_char() from /src/libs/zbxcommon/misc.c
-	 * don't forget to take look in there before changing anything
+	 * don't forget to take look in there before changing anything.
 	 *
 	 * @param string $char
 	 * @return bool
@@ -109,14 +109,16 @@ class CItemKey extends CParser {
 		$this->key = '';
 		$this->parameters = [];
 
-		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++)
-			;
+		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
+			// "For" loop used to increment the value.
+		}
 
 		// is key empty?
 		if ($p == $offset) {
 			$this->error = isset($data[$p])
 				? $this->errorMessage(substr($data, $offset), 0)
 				: _('key is empty');
+
 			return self::PARSE_FAIL;
 		}
 
@@ -134,6 +136,7 @@ class CItemKey extends CParser {
 			// numeric parameter or empty parameter
 			else {
 				for (; isset($data[$p]) && $data[$p] > '0' && $data[$p] < '9'; $p++) {
+					// "For" loop used to increment the value.
 				}
 			}
 
@@ -144,7 +147,7 @@ class CItemKey extends CParser {
 		$p2 = $p;
 
 		if (!$_18_simple_check) {
-			// Zapcat compatibility
+			// Zapcat compatibility.
 			for (; isset($data[$p2]) && $data[$p2] == '['; $p = $p2) {
 				$_parameters = [
 					'type' => self::PARAM_ARRAY,
@@ -341,6 +344,7 @@ class CItemKey extends CParser {
 		foreach ($this->parameters as $parameter) {
 			$num += count($parameter['parameters']);
 		}
+
 		return $num;
 	}
 

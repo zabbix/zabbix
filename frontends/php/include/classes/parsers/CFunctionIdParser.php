@@ -42,6 +42,7 @@ class CFunctionIdParser extends CParser {
 		$p++;
 
 		for (; isset($source[$p]) && ($source[$p] >= '0' && $source[$p] <= '9'); $p++) {
+			// "For" loop used to increment the value.
 		}
 
 		if ($p == $pos + 1 || !isset($source[$p]) || $source[$p] !== '}') {

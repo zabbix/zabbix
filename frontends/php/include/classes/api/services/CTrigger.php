@@ -541,10 +541,11 @@ class CTrigger extends CTriggerGeneral {
 			if ($update) {
 				$dbTrigger = $dbTriggers[$trigger['triggerid']];
 
-				if (isset($trigger['expression']) && $trigger['expression'] === $dbTrigger['expression']) {
+				if (array_key_exists('expression', $trigger) && $trigger['expression'] === $dbTrigger['expression']) {
 					$expressionChanged = false;
 				}
-				if (isset($trigger['description']) && strcmp($trigger['description'], $dbTrigger['description']) == 0) {
+				if (array_key_exists('description', $trigger)
+						&& strcmp($trigger['description'], $dbTrigger['description']) == 0) {
 					unset($trigger['description']);
 				}
 			}

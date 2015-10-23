@@ -71,12 +71,14 @@ class CUserMacroParser extends CParser {
 
 		if (!isset($source[$p]) || $source[$p] != '{') {
 			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+
 			return self::PARSE_FAIL;
 		}
 		$p++;
 
 		if (!isset($source[$p]) || $source[$p] != '$') {
 			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+
 			return self::PARSE_FAIL;
 		}
 		$p++;
@@ -86,6 +88,7 @@ class CUserMacroParser extends CParser {
 
 		if ($p == $pos + 2 || !isset($source[$p])) {
 			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+
 			return self::PARSE_FAIL;
 		}
 
@@ -98,6 +101,7 @@ class CUserMacroParser extends CParser {
 
 			if (isset($source[$p])) {
 				$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+
 				return self::PARSE_SUCCESS_CONT;
 			}
 
@@ -107,6 +111,7 @@ class CUserMacroParser extends CParser {
 		if ($source[$p] != ':') {
 			$this->macro = '';
 			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+
 			return self::PARSE_FAIL;
 		}
 		$p++;
@@ -183,6 +188,7 @@ class CUserMacroParser extends CParser {
 			$this->context = null;
 			$this->context_quoted = false;
 			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+
 			return self::PARSE_FAIL;
 		}
 
@@ -191,6 +197,7 @@ class CUserMacroParser extends CParser {
 
 		if (isset($source[$p])) {
 			$this->error = $this->errorMessage(substr($source, $pos), $p - $pos);
+
 			return self::PARSE_SUCCESS_CONT;
 		}
 

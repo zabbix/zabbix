@@ -47,7 +47,8 @@ class C20ItemKeyConverter extends CConverter {
 			return $value;
 		}
 
-		if (!in_array($this->item_key_parser->getKey(), ['net.tcp.service', 'net.tcp.service.perf'], true)) {
+		if ($this->item_key_parser->getKey() !== 'net.tcp.service'
+				&& $this->item_key_parser->getKey() !== 'net.tcp.service.perf') {
 			return $value;
 		}
 

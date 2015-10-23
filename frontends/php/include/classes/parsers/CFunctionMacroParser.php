@@ -25,7 +25,7 @@
 class CFunctionMacroParser extends CParser {
 
 	/**
-	 * An options array
+	 * An options array.
 	 *
 	 * Supported options:
 	 *   '18_simple_checks' => true		with support for old-style simple checks like "ftp,{$PORT}"
@@ -103,6 +103,7 @@ class CFunctionMacroParser extends CParser {
 		// for instance, agent.ping.last(0)
 		if ($this->item_key_parser->getParamsNum() == 0 && isset($source[$p]) && $source[$p] == '(') {
 			for (; $p > $p2 && $source[$p] != '.'; $p--) {
+				// "For" loop used to increment the value.
 			}
 
 			if ($p == $p2) {
@@ -136,7 +137,7 @@ class CFunctionMacroParser extends CParser {
 	}
 
 	/**
-	 * Parses a host in a trigger function macro constant and moves a position ($pos) on a next symbol after the host
+	 * Parses a host in a trigger function macro constant and moves a position ($pos) on a next symbol after the host.
 	 *
 	 * @param string	$source
 	 * @param int		$pos
@@ -147,6 +148,7 @@ class CFunctionMacroParser extends CParser {
 		$p = $pos;
 
 		for (; isset($source[$p]) && $this->isHostChar($source[$p]); $p++) {
+			// "For" loop used to increment the value.
 		}
 
 		// is host empty?

@@ -365,12 +365,12 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 			'templated_hosts' => true
 		]);
 
-		// if provided $srcHostId doesn't match any record in DB, return false
+		// If provided $srcHostId doesn't match any record in DB, return false.
 		if (!($srcHost = reset($srcHost))) {
 			return false;
 		}
 	}
-	// if no $srcHostId provided we will need trigger host 'host'
+	// If no $srcHostId provided we will need trigger host 'host'.
 	else {
 		$options['selectHosts'] = ['host'];
 	}
@@ -386,21 +386,27 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 	]);
 
 	$newTriggers = [];
-	// create each trigger for each host
+
+	// Create each trigger for each host.
 	foreach ($dbDstHosts as $dstHost) {
 		foreach ($dbSrcTriggers as &$srcTrigger) {
-			// if $srcHostId provided, get host 'host' for triggerExpressionReplaceHost()
+			// If $srcHostId provided, get host 'host' for triggerExpressionReplaceHost().
 			if ($srcHostId != 0) {
 				$host = $srcHost['host'];
 				$srcTriggerContextHostId = $srcHostId;
 			}
-			// if $srcHostId not provided, use source trigger first host 'host'
+			// If $srcHostId not provided, use source trigger first host 'host'.
 			else {
-				// if we have multiple hosts in trigger expression and we haven't pointed ($srcHostId) which host to replace, call error
+
+				/*
+				 * If we have multiple hosts in trigger expression and we haven't pointed ($srcHostId) which host to
+				 * replace, call error.
+				 */
 				if (count($srcTrigger['hosts']) > 1) {
 					error(_s('Cannot copy trigger "%1$s:%2$s", because it has multiple hosts in the expression.',
 						$srcTrigger['description'], $srcTrigger['expression']
 					));
+
 					return false;
 				}
 				$host = $srcTrigger['hosts'][0]['host'];
@@ -411,7 +417,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 				$dstHost['host']
 			);
 
-			// the dependddencies must be added after all triggers are created
+			// The dependddencies must be added after all triggers are created.
 			$result = API::Trigger()->create([[
 				'description' => $srcTrigger['description'],
 				'expression' => $srcTrigger['expression'],
@@ -437,14 +443,14 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 		unset($srcTrigger);
 	}
 
-	$depIds = [];
+	$depids = [];
 	foreach ($dbSrcTriggers as $srcTrigger) {
 		foreach ($srcTrigger['dependencies'] as $depTrigger) {
-			$depIds[] = $depTrigger['triggerid'];
+			$depids[] = $depTrigger['triggerid'];
 		}
 	}
 	$depTriggers = API::Trigger()->get([
-		'triggerids' => $depIds,
+		'triggerids' => $depids,
 		'output' => ['description', 'expression'],
 		'selectHosts' => ['hostid'],
 		'preservekeys' => true
@@ -452,32 +458,33 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 
 	$depTriggers = CMacrosResolverHelper::resolveTriggerExpressions($depTriggers);
 
-	// map dependencies to the new trigger IDs and save
+	// Map dependencies to the new trigger IDs and save.
 	if ($newTriggers) {
 		$dependencies = [];
 		foreach ($dbSrcTriggers as $srcTrigger) {
 			if ($srcTrigger['dependencies']) {
-				// get corresponding created trigger id
+				// Get corresponding created trigger id.
 				$newTrigger = $newTriggers[$srcTrigger['triggerid']];
 
-
 				foreach ($srcTrigger['dependencies'] as $depTrigger) {
-					// we have added $depTrigger trigger, and we know corresponding trigger id for newly created trigger
+					// We have added $depTrigger trigger and we know corresponding trigger id for newly created trigger.
 					if (isset($newTriggers[$depTrigger['triggerid']])) {
 
-						// dependency is within same host
-						// according to $srcHostId parameter or dep trigger has single host
+						/*
+						 * Dependency is within same host according to $srcHostId parameter or dep trigger has
+						 * single host.
+						 */
 						if ($newTrigger['srcTriggerContextHostId'] == $newTriggers[$depTrigger['triggerid']]['srcTriggerContextHostId']) {
 							$depTriggerId = $newTriggers[$depTrigger['triggerid']]['newTriggerId'];
 						}
-						// dependency is to trigger from another host
+						// Dependency is to trigger from another host.
 						else {
 							$depTriggerId = $depTrigger['triggerid'];
 						}
 					}
-					// we need to search for $depTrigger trigger if target host is within dependency hosts
+					// We need to search for $depTrigger trigger if target host is within dependency hosts.
 					elseif (in_array(['hostid'=>$newTrigger['srcTriggerContextHostId']], $depTriggers[$depTrigger['triggerid']]['hosts'])) {
-						// get all possible $depTrigger matching triggers by description
+						// Get all possible $depTrigger matching triggers by description.
 						$targetHostTriggersByDescription = API::Trigger()->get([
 							'hostids' => $newTrigger['newTriggerHostId'],
 							'output' => ['hosts', 'triggerid', 'expression'],
@@ -488,7 +495,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 						$targetHostTriggersByDescription =
 							CMacrosResolverHelper::resolveTriggerExpressions($targetHostTriggersByDescription);
 
-						// compare exploded expressions for exact match
+						// Compare exploded expressions for exact match.
 						$expr1 = $depTriggers[$depTrigger['triggerid']]['expression'];
 						$depTriggerId = null;
 						foreach ($targetHostTriggersByDescription as $potentialTargetTrigger) {
@@ -496,13 +503,13 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 								$newTrigger['newTriggerHost'], $newTrigger['srcTriggerContextHost']
 							);
 							if ($expr2 == $expr1) {
-								// matching trigger has been found
+								// Matching trigger has been found.
 								$depTriggerId = $potentialTargetTrigger['triggerid'];
 								break;
 							}
 						}
 
-						// if matching trigger wasn't found rise exception
+						// If matching trigger wasn't found rise exception.
 						if (is_null($depTriggerId)) {
 							$expr2 = triggerExpressionReplaceHost($depTriggers[$depTrigger['triggerid']]['expression'],
 								$newTrigger['srcTriggerContextHost'], $newTrigger['newTriggerHost']
@@ -510,10 +517,11 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 							error(_s('Cannot add dependency from trigger "%1$s:%2$s" to non existing trigger "%3$s:%4$s".',
 								$srcTrigger['description'], $srcTrigger['expression'],
 								$depTriggers[$depTrigger['triggerid']]['description'], $expr2));
+
 							return false;
 						}
 					}
-					// leave original dependency
+					// Leave original dependency.
 					else {
 						$depTriggerId = $depTrigger['triggerid'];
 					}
@@ -536,7 +544,7 @@ function copyTriggersToHosts($srcTriggerIds, $dstHostIds, $srcHostId = null) {
 }
 
 /**
- * Purpose: Replaces host in trigger expression
+ * Purpose: Replaces host in trigger expression.
  * {localhost:agent.ping.nodata(5m)}  =>  {localhost6:agent.ping.nodata(5m)}
  *
  * @param string $expression	full expression with host names and item keys
@@ -1821,7 +1829,7 @@ function get_item_function_info($expr) {
 		'dayofweek' =>	['value_type' => '1-7',		'type' => T_ZBX_INT,			'validation' => IN('1,2,3,4,5,6,7')],
 		'delta' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
 		'diff' =>		['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
-		'forecast' =>		['value_type' => $value_type, $type_of_value_type,	'validation' => NOT_EMPTY],
+		'forecast' =>	['value_type' => $value_type, $type_of_value_type,	'validation' => NOT_EMPTY],
 		'fuzzytime' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'iregexp' =>	['value_type' => _('0 or 1'),	'type' => T_ZBX_INT,			'validation' => IN('0,1')],
 		'last' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
@@ -1839,7 +1847,7 @@ function get_item_function_info($expr) {
 		'strlen' =>		['value_type' => _('Numeric (integer 64bit)'), 'type' => T_ZBX_INT, 'validation' => NOT_EMPTY],
 		'sum' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY],
 		'time' =>		['value_type' => 'HHMMSS',		'type' => T_ZBX_INT,			'validation' => 'strlen({})==6'],
-		'timeleft' =>		['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY]
+		'timeleft' =>	['value_type' => $value_type,	'type' => $type_of_value_type,	'validation' => NOT_EMPTY]
 	];
 
 	$expressionData = new CTriggerExpression();
