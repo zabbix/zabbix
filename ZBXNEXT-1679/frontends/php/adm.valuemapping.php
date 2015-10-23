@@ -21,13 +21,24 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-$page['title'] = _('Configuration of value mapping');
-$page['file'] = 'adm.valuemapping.php';
+if (hasRequest('action') && getRequest('action') == 'valuemap.export' && hasRequest('valuemapids')) {
+	$page['file'] = 'zbx_export_valuemaps.xml';
+	$page['type'] = detect_page_type(PAGE_TYPE_XML);
+
+	$export = true;
+}
+else {
+	$page['title'] = _('Configuration of value mapping');
+	$page['file'] = 'adm.valuemapping.php';
+
+	$export = false;
+}
 
 require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
+	'valuemapids' =>	[T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		null],
 	'valuemapid' =>		[T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form}) && {form} == "update") || isset({delete})'],
 	'name' =>			[T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'mappings' =>		[T_ZBX_STR, O_OPT,	null,			null,		null],
@@ -36,7 +47,11 @@ $fields = [
 	'update' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null],
 	'delete' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null],
 	'form' =>			[T_ZBX_STR, O_OPT,	P_SYS,			null,		null],
-	'form_refresh' =>	[T_ZBX_INT, O_OPT,	null,			null,		null]
+	'form_refresh' =>	[T_ZBX_INT, O_OPT,	null,			null,		null],
+	'action' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	IN('"valuemap.export","valuemap.massdelete"'), null],
+	// sort and sortorder
+	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
+	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -52,6 +67,26 @@ if (hasRequest('valuemapid')) {
 	if (!$valuemaps) {
 		access_deny();
 	}
+}
+
+/*
+ * Export
+ */
+if ($export) {
+	$export = new CConfigurationExport(['valueMaps' => getRequest('valuemapids', [])]);
+	$export->setBuilder(new CConfigurationExportBuilder());
+	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
+
+	$export_data = $export->export();
+
+	if (hasErrorMesssages()) {
+		show_messages();
+	}
+	else {
+		print($export_data);
+	}
+
+	exit;
 }
 
 /*
@@ -80,14 +115,26 @@ if (hasRequest('add') || hasRequest('update')) {
 		unset($_REQUEST['form']);
 	}
 }
-elseif (hasRequest('delete') && hasRequest('valuemapid')) {
-	$result = (bool) API::ValueMap()->delete([getRequest('valuemapid')]);
+elseif ((hasRequest('delete') && hasRequest('valuemapid'))
+		|| (hasRequest('action') && getRequest('action') === 'valuemap.massdelete' && hasRequest('valuemapids'))) {
+	$valuemapids = getRequest('valuemapids', []);
+	if (hasRequest('valuemapid')) {
+		$valuemapids[] = getRequest('valuemapid');
+	}
 
-	show_messages($result, _('Value map deleted'), _('Cannot delete value map'));
+	$result = (bool) API::ValueMap()->delete($valuemapids);
 
 	if ($result) {
 		unset($_REQUEST['form']);
+		uncheckTableRows();
 	}
+
+	$deleted = count($valuemapids);
+
+	show_messages($result,
+		_n('Value map deleted', 'Value maps deleted', $deleted),
+		_n('Cannot delete value map', 'Cannot delete value maps', $deleted)
+	);
 }
 
 /*
@@ -135,11 +182,26 @@ if (hasRequest('form')) {
 	$view = new CView('administration.general.valuemapping.edit', $data);
 }
 else {
+	$sortfield = getRequest('sort', CProfile::get('web.'.$page['file'].'.sort', 'name'));
+	$sortorder = getRequest('sortorder', CProfile::get('web.'.$page['file'].'.sortorder', ZBX_SORT_UP));
+
+	CProfile::update('web.'.$page['file'].'.sort', $sortfield, PROFILE_TYPE_STR);
+	CProfile::update('web.'.$page['file'].'.sortorder', $sortorder, PROFILE_TYPE_STR);
+
+	$data = [
+		'sort' => $sortfield,
+		'sortorder' => $sortorder
+	];
+
 	$data['valuemaps'] = API::ValueMap()->get([
 		'output' => ['valuemapid', 'name'],
-		'selectMappings' => ['value', 'newvalue']
+		'selectMappings' => ['value', 'newvalue'],
+		'sortfield' => $sortfield,
+		'limit' => $config['search_limit'] + 1
 	]);
-	order_result($data['valuemaps'], 'name');
+
+	order_result($data['valuemaps'], $sortfield, $sortorder);
+	$data['paging'] = getPagingLine($data['valuemaps'], $sortorder);
 
 	foreach ($data['valuemaps'] as &$valuemap) {
 		order_result($valuemap['mappings'], 'value');
