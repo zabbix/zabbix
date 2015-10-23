@@ -3531,8 +3531,12 @@ name: typography
 
 This is typography
 
-```html_example_table
-<h1>Test Header</h1>
+##Headings
+
+```html_example
+<h1>Main Heading</h1>
+<h3>Contextual Menu Heading</h3>
+<h4>Widget and Dialog Heading</h4>
 ```
 */
 
@@ -3829,12 +3833,11 @@ Text on html5 input types
 ```
 
 ```html_example
+<p>
 <ul class="radio-segmented">
-   <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3"><label for="RadioSegm3">Radio 3</label></li>
+   <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
 </ul>
-<ul class="radio-segmented">
-   <li><input type="radio" id="RadioSegmDisbld1" disabled><label for="RadioSegmDisbld1">Radio 1</label></li><li><input type="radio" id="RadioSegmDisbld2" disabled><label for="RadioSegmDisbld2">Radio 2</label></li><li><input type="radio" id="RadioSegmDisbld3" disabled><label for="RadioSegmDisbld3">Radio 3</label></li>
-</ul>
+</p>
 ```
 */
 
@@ -4166,7 +4169,7 @@ Navigation:
    <li><b><a href="#">All hosts</a> / Zabbix server:</b></li>
    <li class="green">Enabled</li>
    <li>
-      <div class="status-container"><span class="status-grey">z</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
+      <div class="status-container"><span class="status-grey">zbx</span><span class="status-green">snmp</span><span class="status-grey">jmx</span><span class="status-grey">ipmi</span></div>
    </li>
    <li><span><b><a href="#">Discovery</a></b></span></li>
    <li><span><a href="#">Applications</a>&nbsp;<sup>11</sup></span></li>
@@ -4216,6 +4219,6 @@ name: labels
 Labels:
 
 ```html_example
-<div class="status-container"><span class="status-red">red 1</span><span class="status-red">red 2</span><span class="status-red">red 3</span><span class="status-red">ipmi</span></div>
+<div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
 ```
 */
