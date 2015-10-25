@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 11:56+0300\n"
+"POT-Creation-Date: 2015-10-25 13:18+0200\n"
 "PO-Revision-Date: 2013-11-08 09:29+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -601,7 +601,7 @@ msgstr "Σφάλμα εφαρμογής."
 msgid "Application updated"
 msgstr "Κατηγορία ενημερώθηκε"
 
-#: api/classes/CItemGeneral.php:333
+#: api/classes/CItemGeneral.php:343
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Κατηγορία με ID \"%1$s\" δεν είναι διαθέσιμη σε \"%2$s\"."
@@ -1599,7 +1599,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Δεν βρίσκω ξενιστή \"%1$s\" χρησιμοποιούμενο στην οθόνη \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:584 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -6014,12 +6014,12 @@ msgstr "Λανθασμένα πεδία για έναυσμα."
 msgid "Incorrect file upload."
 msgstr "Λανθασμένο αρχείο αναφόρτωσης."
 
-#: api/classes/CItemGeneral.php:759
+#: api/classes/CItemGeneral.php:769
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Λανθασμένο ευέλικτο διάστημα \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:748
+#: api/classes/CItemGeneral.php:758
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Λανθασμένο ευέλικτο διάστημα στο συλλέκτη \"%1$s\". Ευέλικτο διάστημα πρέπει να είναι συμβολοσειρά."
@@ -6556,7 +6556,7 @@ msgstr "Ιταλικά (it_IT)"
 msgid "Item"
 msgstr "Συλλέκτης"
 
-#: api/classes/CItemGeneral.php:583
+#: api/classes/CItemGeneral.php:593
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Ο συλλέκτης \"%1$s\" υπάρχει ήδη σε \"%2$s\", κληρονομημένος απο άλλο σχεδιότυπο."
@@ -6587,7 +6587,7 @@ msgstr "Συλλέκτης \"%1$s\" σε \"%2$s\": κατηγορία \"%3$s\" �
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Συλλέκτης \"%1$s\" παραλειπόμενος - κανόνας χρήστη."
 
-#: api/classes/CItemGeneral.php:325
+#: api/classes/CItemGeneral.php:335
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Συλλέκτης \"%1$s:%2$s\" έχει άκυρη θύρα: \"%3$s\"."
@@ -6631,36 +6631,36 @@ msgstr "Ο συλλέκτης χρησιμοποιεί διεπαφή ξενισ
 msgid "Item uses incorrect interface type."
 msgstr "Ο συλλέκτης χρησιμοποιεί λάθος τύπο διεπαφής."
 
-#: api/classes/CItemGeneral.php:303
+#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Ο συλλέκτης δεν θα ανανεωθεί. Δώστε σωστό χρονικό διάστημα ενημέρωσης."
 
-#: api/classes/CItemGeneral.php:376
+#: api/classes/CItemGeneral.php:386
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως κανόνας εντοπισμού."
 
-#: api/classes/CItemGeneral.php:382
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως συλλέκτης δημιουργηθείς απο πρωτότυπο συλλέκτη."
 
-#: api/classes/CItemGeneral.php:379
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως πρωτότυπος συλλέκτης."
 
-#: api/classes/CItemGeneral.php:373
+#: api/classes/CItemGeneral.php:383
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως συλλέκτης."
 
-#: api/classes/CItemGeneral.php:385
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως άγνωστο στοιχείο συλλέκτη."
 
-#: api/classes/CItemGeneral.php:725
+#: api/classes/CItemGeneral.php:735
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
@@ -8097,7 +8097,7 @@ msgstr "Δεν καθορίστηκε τύπος ταυτοποίησης για
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Δεν καθορίστηκε όνομα χρήστη ταυτοποίησης για εντολή εργασίας ενέργειας \"%s\"."
 
-#: api/classes/CItemGeneral.php:309
+#: api/classes/CItemGeneral.php:319
 msgid "No authentication user name specified."
 msgstr "Δεν καθορίστηκε όνομα χρήστη ταυτοποίησης."
 
@@ -8480,7 +8480,7 @@ msgstr "Χωρίς δικαιώματα σε αντικείμενο που αν�
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Δεν καθορίστηκε αρχείο ιδιωτικού κλειδιού για εντολή εργασίας ενέργειας \"%s\"."
 
-#: api/classes/CItemGeneral.php:317
+#: api/classes/CItemGeneral.php:327
 msgid "No private key file specified."
 msgstr "Δεν καθορίστηκε αρχείο ιδιωτικού κλειδιού."
 
@@ -8497,7 +8497,7 @@ msgstr "Χωρίς διαμεσολαβητή"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Δεν καθορίστηκε αρχείο δημοσίου κλειδιού για εντολή εργασίας ενέργειας \"%s\"."
 
-#: api/classes/CItemGeneral.php:314
+#: api/classes/CItemGeneral.php:324
 msgid "No public key file specified."
 msgstr "Δεν καθορίστηκε αρχείο δημοσίου κλειδιού."
 

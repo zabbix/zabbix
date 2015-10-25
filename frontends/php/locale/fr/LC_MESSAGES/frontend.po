@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 11:56+0300\n"
+"POT-Creation-Date: 2015-10-25 13:18+0200\n"
 "PO-Revision-Date: 2014-02-03 08:45+0300\n"
 "Last-Translator: Sébastien <sebastien@tiramiseb.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -597,7 +597,7 @@ msgstr "Erreur application."
 msgid "Application updated"
 msgstr "Application modifiée"
 
-#: api/classes/CItemGeneral.php:333
+#: api/classes/CItemGeneral.php:343
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "L'application avec l'ID \"%1$s\" n'est pas disponible sur \"%2$s\"."
@@ -1595,7 +1595,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Impossible de trouver l'hôte \"%1$s\" utilisé dans l'écran \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:584 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -6010,12 +6010,12 @@ msgstr "Champs incorrects pour le déclencheur."
 msgid "Incorrect file upload."
 msgstr "Téléversement de fichier incorrect."
 
-#: api/classes/CItemGeneral.php:759
+#: api/classes/CItemGeneral.php:769
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Intervalle flexible \"%1$s\" incorrect."
 
-#: api/classes/CItemGeneral.php:748
+#: api/classes/CItemGeneral.php:758
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Intervalle flexible dans l'élément \"%1$s\" incorrect. L'intervalle flexiblet doit être une chaîne."
@@ -6552,7 +6552,7 @@ msgstr "Italien (it_IT)"
 msgid "Item"
 msgstr "Élément"
 
-#: api/classes/CItemGeneral.php:583
+#: api/classes/CItemGeneral.php:593
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "L'élément \"%1$s\" existe déjà sur \"%2$s\", hérité depuis un autre modèle."
@@ -6583,7 +6583,7 @@ msgstr "Élément \"%1$s\" sur \"%2$s\" : l'application \"%3$s\" n'existe pas."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Élément \"%1$s\" sauté - règle utilisateur."
 
-#: api/classes/CItemGeneral.php:325
+#: api/classes/CItemGeneral.php:335
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "L'élément \"%1$s:%2$s\" a un port invalide : \"%3$s\"."
@@ -6627,36 +6627,36 @@ msgstr "L'élément utilise une interface d'un hôte non-parent."
 msgid "Item uses incorrect interface type."
 msgstr "L'élément utilise un type d'interface incorrect."
 
-#: api/classes/CItemGeneral.php:303
+#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "L'élément ne sera pas rafraichi. Veuillez saisir une période de mise à jour valide."
 
-#: api/classes/CItemGeneral.php:376
+#: api/classes/CItemGeneral.php:386
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme règle de découverte."
 
-#: api/classes/CItemGeneral.php:382
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément créé d'un prototype d'élément."
 
-#: api/classes/CItemGeneral.php:379
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme prototype d'élément."
 
-#: api/classes/CItemGeneral.php:373
+#: api/classes/CItemGeneral.php:383
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément."
 
-#: api/classes/CItemGeneral.php:385
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément inconnu."
 
-#: api/classes/CItemGeneral.php:725
+#: api/classes/CItemGeneral.php:735
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\"."
@@ -8093,7 +8093,7 @@ msgstr "Aucun type d'authentification spécifiée pour la commande d'opération 
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Aucun nom d'utilisateur d'authentification spécifié pour la commande d'opération d'action \"%s\"."
 
-#: api/classes/CItemGeneral.php:309
+#: api/classes/CItemGeneral.php:319
 msgid "No authentication user name specified."
 msgstr "Aucun nom d'utilisateur d'authentification spécifié."
 
@@ -8476,7 +8476,7 @@ msgstr "Aucune permission pour l'objet appelé ou il n'existe pas !"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Aucun fichier de clé privée spécifié pour la commande d'opération d'action \"%s\"."
 
-#: api/classes/CItemGeneral.php:317
+#: api/classes/CItemGeneral.php:327
 msgid "No private key file specified."
 msgstr "Aucun fichier de clé privée spécifié."
 
@@ -8493,7 +8493,7 @@ msgstr "Aucun proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Aucun fichier de clé publique spécifié pour la commande d'opération d'action \"%s\"."
 
-#: api/classes/CItemGeneral.php:314
+#: api/classes/CItemGeneral.php:324
 msgid "No public key file specified."
 msgstr "Aucun fichier de clé publique spécifié."
 

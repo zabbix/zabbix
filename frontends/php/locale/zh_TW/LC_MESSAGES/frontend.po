@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 11:56+0300\n"
+"POT-Creation-Date: 2015-10-25 13:18+0200\n"
 "PO-Revision-Date: 2012-11-06 15:57+0800\n"
 "Last-Translator: Yaochiu Huang <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -593,7 +593,7 @@ msgstr "應用集 錯誤."
 msgid "Application updated"
 msgstr "應用集已更新"
 
-#: api/classes/CItemGeneral.php:333
+#: api/classes/CItemGeneral.php:343
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
@@ -1590,7 +1590,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "無法找到用在篩選\"%2$s\"中的主機\"%1$s\"."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:584 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -6000,12 +6000,12 @@ msgstr "不正確的觸發器欄位."
 msgid "Incorrect file upload."
 msgstr "不正確的檔案上傳."
 
-#: api/classes/CItemGeneral.php:759
+#: api/classes/CItemGeneral.php:769
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "不正確的彈性間隔\"%1$s\"."
 
-#: api/classes/CItemGeneral.php:748
+#: api/classes/CItemGeneral.php:758
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "在項目\"%1$s\"中不正確的彈性間隔. 彈性間隔必須是一個字串."
@@ -6542,7 +6542,7 @@ msgstr "意大利語 (it_IT)"
 msgid "Item"
 msgstr "項目"
 
-#: api/classes/CItemGeneral.php:583
+#: api/classes/CItemGeneral.php:593
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "鍵值為 \"%1$s\"的項目已存在於 \"%2$s\", 繼承自其他模板."
@@ -6573,7 +6573,7 @@ msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "略過項目\"%1$s\"-用戶規則."
 
-#: api/classes/CItemGeneral.php:325
+#: api/classes/CItemGeneral.php:335
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "項目\"%1$s:%2$s\"有無效的埠: \"%3$s\"."
@@ -6617,36 +6617,36 @@ msgstr "項目使用來自非上層主機的主機介面."
 msgid "Item uses incorrect interface type."
 msgstr "項目使用不正確的介面類型."
 
-#: api/classes/CItemGeneral.php:303
+#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "項目將不會被刷新. 請輸入正確的更新區間."
 
-#: api/classes/CItemGeneral.php:376
+#: api/classes/CItemGeneral.php:386
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為探索規則."
 
-#: api/classes/CItemGeneral.php:382
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為創建自項目原型的項目."
 
-#: api/classes/CItemGeneral.php:379
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目原型."
 
-#: api/classes/CItemGeneral.php:373
+#: api/classes/CItemGeneral.php:383
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目."
 
-#: api/classes/CItemGeneral.php:385
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為未知的項目組件."
 
-#: api/classes/CItemGeneral.php:725
+#: api/classes/CItemGeneral.php:735
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" ."
@@ -8079,7 +8079,7 @@ msgstr "沒有指定給動作操作命令\"%s\"的認證類型."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的認證用戶名稱."
 
-#: api/classes/CItemGeneral.php:309
+#: api/classes/CItemGeneral.php:319
 msgid "No authentication user name specified."
 msgstr "沒有指定的認證用戶名稱"
 
@@ -8462,7 +8462,7 @@ msgstr "沒有所說的物件的許可權或其不存在!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的私有金鑰."
 
-#: api/classes/CItemGeneral.php:317
+#: api/classes/CItemGeneral.php:327
 msgid "No private key file specified."
 msgstr "沒有指定的私有金鑰."
 
@@ -8479,7 +8479,7 @@ msgstr "沒有系統代理程式"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的公開金鑰檔."
 
-#: api/classes/CItemGeneral.php:314
+#: api/classes/CItemGeneral.php:324
 msgid "No public key file specified."
 msgstr "沒有指定的公開金鑰檔"
 
