@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 14:45+0300\n"
+"POT-Creation-Date: 2015-10-25 13:20+0200\n"
 "PO-Revision-Date: 2014-03-24 15:26+0300\n"
 "Last-Translator: Mehmet Barış <mbarisk@gmail.com>\n"
 "Language-Team: American English <>\n"
@@ -648,7 +648,7 @@ msgstr "Uygulama hatası."
 msgid "Application updated"
 msgstr "Uygulama güncellendi"
 
-#: api/classes/CItemGeneral.php:397
+#: api/classes/CItemGeneral.php:406
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "\"%1$s\" ID'li uygulama \"%2$s\" üzerinde mevcut değil."
@@ -7002,7 +7002,7 @@ msgstr "Yönteme geçersiz değişkenler geçirildi."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "\"%1$s\" keşif kuralı için geçersiz kimlik doğrulama protokolü."
 
-#: api/classes/CItemGeneral.php:378
+#: api/classes/CItemGeneral.php:387
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "\"%1$s\" öğesi için geçersiz kimlik doğrulama protokolü."
@@ -7080,12 +7080,12 @@ msgstr ""
 msgid "Incorrect file upload."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:840
+#: api/classes/CItemGeneral.php:849
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:829
+#: api/classes/CItemGeneral.php:838
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr ""
@@ -7305,7 +7305,7 @@ msgstr "Geçersiz port aralığı."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:387
+#: api/classes/CItemGeneral.php:396
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
@@ -7806,7 +7806,7 @@ msgstr ""
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:369
+#: api/classes/CItemGeneral.php:378
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "\"%1$s:%2$s\" öğesi geçersiz porta sahip: \"%3$s\"."
@@ -7912,36 +7912,36 @@ msgstr ""
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:326 api/classes/CItemGeneral.php:336
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Öğe yenilenmeyecek. Lütfen doğru bir güncelleme zaman aralığı giriniz."
 
-#: api/classes/CItemGeneral.php:440
+#: api/classes/CItemGeneral.php:449
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:446
+#: api/classes/CItemGeneral.php:455
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:443
+#: api/classes/CItemGeneral.php:452
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:437
+#: api/classes/CItemGeneral.php:446
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:449
+#: api/classes/CItemGeneral.php:458
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:806
+#: api/classes/CItemGeneral.php:815
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
@@ -9502,11 +9502,11 @@ msgstr "Hiçbir BT servisi bulunmadı."
 msgid "No JMX interfaces found."
 msgstr "Hiçbir JMX arabirimi bulunmadı."
 
-#: api/classes/CItemGeneral.php:357
+#: api/classes/CItemGeneral.php:366
 msgid "No SNMP OID specified."
 msgstr "Hiçbir SNMP OID belirtilmedi."
 
-#: api/classes/CItemGeneral.php:363
+#: api/classes/CItemGeneral.php:372
 msgid "No SNMP community specified."
 msgstr "Hiçbir SNMP community belirtilmedi"
 
@@ -9567,7 +9567,7 @@ msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama tipi belirtil
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir kimlik doğrulama kullanıcı ismi belirtilmemiş."
 
-#: api/classes/CItemGeneral.php:334
+#: api/classes/CItemGeneral.php:343
 msgid "No authentication user name specified."
 msgstr "Hiçbir kimlik doğrulama kullanıcı adı belirtilmedi."
 
@@ -9970,7 +9970,7 @@ msgstr "Refere edilen obje için izin yk veya mevcut değil!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir özel anahtar dosyası belirtilmemiş."
 
-#: api/classes/CItemGeneral.php:342
+#: api/classes/CItemGeneral.php:351
 msgid "No private key file specified."
 msgstr ""
 
@@ -9991,7 +9991,7 @@ msgstr "Hiçbir vekil ID verilmemiş."
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Eylem işlem komutu \"%s\" için hiçbir genel anahtar dosyası belirtilmemiş."
 
-#: api/classes/CItemGeneral.php:339
+#: api/classes/CItemGeneral.php:348
 msgid "No public key file specified."
 msgstr "Hiçbir genel anahtar dosyası belirtilmemiş."
 
@@ -12021,7 +12021,7 @@ msgstr "SNMP arabirimi"
 msgid "SNMP trap"
 msgstr ""
 
-#: api/classes/CItemGeneral.php:351
+#: api/classes/CItemGeneral.php:360
 msgid "SNMP trap key is invalid."
 msgstr ""
 

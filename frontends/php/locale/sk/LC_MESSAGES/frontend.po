@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 14:45+0300\n"
+"POT-Creation-Date: 2015-10-25 13:20+0200\n"
 "PO-Revision-Date: 2015-02-13 00:45+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -655,7 +655,7 @@ msgstr "Chyba aplikácie."
 msgid "Application updated"
 msgstr "Aplikácia bola aktualizovaná"
 
-#: api/classes/CItemGeneral.php:397
+#: api/classes/CItemGeneral.php:406
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikácia s ID \"%1$s\" nie je na \"%2$s\" dostupná."
@@ -7047,7 +7047,7 @@ msgstr "Metóde boli predané neplatné argumenty."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Neplatný protokol prihlasovania pre zisťovacie pravidlo \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:378
+#: api/classes/CItemGeneral.php:387
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Neplatný protokol prihlasovania pre položku \"%1$s\"."
@@ -7125,12 +7125,12 @@ msgstr "Neplatné polia pre spúšťač."
 msgid "Incorrect file upload."
 msgstr "Nahraný neplatný súbor."
 
-#: api/classes/CItemGeneral.php:840
+#: api/classes/CItemGeneral.php:849
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Neplatný flexibilný interval \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:829
+#: api/classes/CItemGeneral.php:838
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Neplatný flexibilný interval v položke \"%1$s\". Flexibilný interval musí byť reťazec."
@@ -7350,7 +7350,7 @@ msgstr "Neplatný rozsah portov."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Neplatný protokol utajenia pre zisťovacie pravidlo \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:387
+#: api/classes/CItemGeneral.php:396
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Neplatný protokol utajenia pre položku \"%1$s\"."
@@ -7851,7 +7851,7 @@ msgstr "Položka \"%1$s\" na \"%2$s\": aplikácia \"%3$s\" neexistuje."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Položka \"%1$s\" preskočená - používateľské pravidlo."
 
-#: api/classes/CItemGeneral.php:369
+#: api/classes/CItemGeneral.php:378
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Položka \"%1$s:%2$s\" má neplatný port: \"%3$s\"."
@@ -7961,36 +7961,36 @@ msgstr "Položka používa rozhranie z nie nadriadeného hosta."
 msgid "Item uses incorrect interface type."
 msgstr "Položka používa neplatný typ rozhrania."
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:326 api/classes/CItemGeneral.php:336
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Položka nebude akutalizovaná. Zadajte prosím správny interval aktualizacií."
 
-#: api/classes/CItemGeneral.php:440
+#: api/classes/CItemGeneral.php:449
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako zisťovacie pravidlo."
 
-#: api/classes/CItemGeneral.php:446
+#: api/classes/CItemGeneral.php:455
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako položka vytvorená z prototypu položky."
 
-#: api/classes/CItemGeneral.php:443
+#: api/classes/CItemGeneral.php:452
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako prototyp položky."
 
-#: api/classes/CItemGeneral.php:437
+#: api/classes/CItemGeneral.php:446
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako položka."
 
-#: api/classes/CItemGeneral.php:449
+#: api/classes/CItemGeneral.php:458
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako neznámy element položky."
 
-#: api/classes/CItemGeneral.php:806
+#: api/classes/CItemGeneral.php:815
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\"."
@@ -9560,11 +9560,11 @@ msgstr "Nenájdené žiadne IT služby."
 msgid "No JMX interfaces found."
 msgstr "Nenájdené žiadne JMX rozhrania."
 
-#: api/classes/CItemGeneral.php:357
+#: api/classes/CItemGeneral.php:366
 msgid "No SNMP OID specified."
 msgstr "Nie je špecifikované žiadne SNMP OID."
 
-#: api/classes/CItemGeneral.php:363
+#: api/classes/CItemGeneral.php:372
 msgid "No SNMP community specified."
 msgstr "Nie je špecifikované žiadne SNMP community."
 
@@ -9625,7 +9625,7 @@ msgstr "Nie je špecifikovaný typ autentifikácie pre príkaz akcie \"%s\"."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Nie je špecifikované používateľské meno autentifikácie pre príkaz akcie \"%s\"."
 
-#: api/classes/CItemGeneral.php:334
+#: api/classes/CItemGeneral.php:343
 msgid "No authentication user name specified."
 msgstr "Nie je špecifikované používateľské meno autentifikácie."
 
@@ -10028,7 +10028,7 @@ msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Žiaden špecifikovaný súbor so súkromným kľúčom pre akciu príkazu \"%s\"."
 
-#: api/classes/CItemGeneral.php:342
+#: api/classes/CItemGeneral.php:351
 msgid "No private key file specified."
 msgstr "Žiaden špecifikovaný súbor so súkromným kľúčom."
 
@@ -10049,7 +10049,7 @@ msgstr "Žiadne neposkytnuté proxy ID."
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom pre akciu príkazu \"%s\"."
 
-#: api/classes/CItemGeneral.php:339
+#: api/classes/CItemGeneral.php:348
 msgid "No public key file specified."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom."
 
@@ -12080,7 +12080,7 @@ msgstr "SNMP rozhrania"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: api/classes/CItemGeneral.php:351
+#: api/classes/CItemGeneral.php:360
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap kľúč je neplatný."
 

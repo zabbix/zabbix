@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 14:45+0300\n"
+"POT-Creation-Date: 2015-10-25 13:20+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0200\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -646,7 +646,7 @@ msgstr "Грешка в приложението."
 msgid "Application updated"
 msgstr "Приложение актуализирано"
 
-#: api/classes/CItemGeneral.php:397
+#: api/classes/CItemGeneral.php:406
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Приложение с ID \"%1$s\" не е налично за \"%2$s\"."
@@ -7019,7 +7019,7 @@ msgstr "Подадени са неправилни аргументи за ме�
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Неправилен протокол за автентификация на правило за откриването \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:378
+#: api/classes/CItemGeneral.php:387
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Неправилен протокол за автентификация за елемент на данните \"%1$s\"."
@@ -7097,12 +7097,12 @@ msgstr "Неправилни полета за тригер."
 msgid "Incorrect file upload."
 msgstr "Неправилно качване на файл."
 
-#: api/classes/CItemGeneral.php:840
+#: api/classes/CItemGeneral.php:849
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Неправилен променлив интервал \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:829
+#: api/classes/CItemGeneral.php:838
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Неправилен променлив интервал в елемент на данните \"%1$s\". Променливият интервал трябва да бъде низ."
@@ -7322,7 +7322,7 @@ msgstr "Неправилен диапазон от портовете."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Неправилен протокол за поверителност на правило за откриване \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:387
+#: api/classes/CItemGeneral.php:396
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Неправилен протокол за поверителност за елемент на данните \"%1$s\"."
@@ -7823,7 +7823,7 @@ msgstr "Елемент на данните \"%1$s\" в \"%2$s\": приложе�
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент на данните \"%1$s\" пропуска - потребителското правило."
 
-#: api/classes/CItemGeneral.php:369
+#: api/classes/CItemGeneral.php:378
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент на данните \"%1$s:%2$s\" има невалиден порт: \"%3$s\"."
@@ -7929,36 +7929,36 @@ msgstr "Елемент на данните използва интерфейс �
 msgid "Item uses incorrect interface type."
 msgstr "Елемент на данните използва невалиден тип интерфейс."
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:326 api/classes/CItemGeneral.php:336
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемента на данните не се обновява. Моля, въведете правилния интервал за актуализация."
 
-#: api/classes/CItemGeneral.php:440
+#: api/classes/CItemGeneral.php:449
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като правило за откриване."
 
-#: api/classes/CItemGeneral.php:446
+#: api/classes/CItemGeneral.php:455
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните създаден в елемент на данните прототип."
 
-#: api/classes/CItemGeneral.php:443
+#: api/classes/CItemGeneral.php:452
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните прототип."
 
-#: api/classes/CItemGeneral.php:437
+#: api/classes/CItemGeneral.php:446
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните."
 
-#: api/classes/CItemGeneral.php:449
+#: api/classes/CItemGeneral.php:458
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като неизвестен елемент на данните."
 
-#: api/classes/CItemGeneral.php:806
+#: api/classes/CItemGeneral.php:815
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\"."
@@ -9523,11 +9523,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:357
+#: api/classes/CItemGeneral.php:366
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:363
+#: api/classes/CItemGeneral.php:372
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9588,7 +9588,7 @@ msgstr "В операция на действие за команда \"%s\" н�
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "В операция на действие за команда \"%s\" не е уточнено потребителското име за автентификация."
 
-#: api/classes/CItemGeneral.php:334
+#: api/classes/CItemGeneral.php:343
 msgid "No authentication user name specified."
 msgstr "Не е уточнено потребителското име за автентификация."
 
@@ -9991,7 +9991,7 @@ msgstr "Нямате право на достъп до посочения обе
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не е уточнен файла с личен ключ за команда \"%s\" в операция на действие."
 
-#: api/classes/CItemGeneral.php:342
+#: api/classes/CItemGeneral.php:351
 msgid "No private key file specified."
 msgstr "Не е уточнен файла с личен ключ."
 
@@ -10012,7 +10012,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не е уточнен файла с обществен ключ за команда \"%s\" в операция на действие."
 
-#: api/classes/CItemGeneral.php:339
+#: api/classes/CItemGeneral.php:348
 msgid "No public key file specified."
 msgstr "Не е уточнен файла с обществен ключ."
 
@@ -12048,7 +12048,7 @@ msgstr "SNMP интерфейс"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: api/classes/CItemGeneral.php:351
+#: api/classes/CItemGeneral.php:360
 msgid "SNMP trap key is invalid."
 msgstr "Ключа за SNMP trap е невалиден."
 
