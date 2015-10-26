@@ -25,8 +25,9 @@
 #include "zbxregexp.h"
 
 #include "active.h"
+#include "../../libs/zbxcrypto/tls_tcp_active.h"
 
-extern unsigned char	daemon_type;
+extern unsigned char	program_type;
 
 /******************************************************************************
  *                                                                            *
@@ -44,8 +45,8 @@ extern unsigned char	daemon_type;
  * Comments: NB! adds host to the database if it does not exist               *
  *                                                                            *
  ******************************************************************************/
-static int	get_hostid_by_host(const char *host, const char *ip, unsigned short port, const char *host_metadata,
-		zbx_uint64_t *hostid, char *error)
+static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const char *ip, unsigned short port,
+		const char *host_metadata, zbx_uint64_t *hostid, char *error)
 {
 	const char	*__function_name = "get_hostid_by_host";
 
@@ -65,20 +66,85 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 
 	host_esc = DBdyn_escape_string(host);
 
-	result = DBselect(
-			"select hostid,status"
+	result =
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		DBselect(
+			"select hostid,status,tls_accept,tls_issuer,tls_subject,tls_psk_identity"
 			" from hosts"
 			" where host='%s'"
 				" and status in (%d,%d)"
 				" and flags<>%d"
 				" and proxy_hostid is null",
 			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
-
+#else
+		DBselect(
+			"select hostid,status,tls_accept"
+			" from hosts"
+			" where host='%s'"
+				" and status in (%d,%d)"
+				" and flags<>%d"
+				" and proxy_hostid is null",
+			host_esc, HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE);
+#endif
 	if (NULL != (row = DBfetch(result)))
 	{
 		if (HOST_STATUS_MONITORED == atoi(row[1]))
 		{
+			unsigned int		tls_accept;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			zbx_tls_conn_attr_t	attr;
+#endif
+			tls_accept = (unsigned int)atoi(row[2]);
+
+			if (0 == (tls_accept & sock->connection_type))
+			{
+				zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
+						" \"%s\"", zbx_tls_connection_type_name(sock->connection_type), host);
+				goto done;
+			}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			if ((ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
+					ZBX_TCP_SEC_TLS_PSK == sock->connection_type) &&
+					SUCCEED != zbx_tls_get_attr(sock, &attr))
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+
+				zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host \"%s\"",
+						host);
+				goto done;
+			}
+
+			if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+			{
+				/* simplified match, not compliant with RFC 4517, 4518 */
+				if ('\0' != *row[3] && 0 != strcmp(row[3], attr.issuer))
+				{
+					zbx_snprintf(error, MAX_STRING_LEN, "certificate issuer does not match for"
+							" host \"%s\"", host);
+					goto done;
+				}
+
+				/* simplified match, not compliant with RFC 4517, 4518 */
+				if ('\0' != *row[4] && 0 != strcmp(row[4], attr.subject))
+				{
+					zbx_snprintf(error, MAX_STRING_LEN, "certificate subject does not match for"
+							" host \"%s\"", host);
+					goto done;
+				}
+			}
+			else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+			{
+				if (strlen(row[5]) != attr.psk_identity_len ||
+						0 != memcmp(row[5], attr.psk_identity, attr.psk_identity_len))
+				{
+					zbx_snprintf(error, MAX_STRING_LEN, "false PSK identity for host \"%s\"", host);
+					goto done;
+				}
+			}
+#endif
 			ZBX_STR2UINT64(*hostid, row[0]);
+
 			ret = SUCCEED;
 		}
 		else
@@ -98,14 +164,14 @@ static int	get_hostid_by_host(const char *host, const char *ip, unsigned short p
 
 		DBbegin();
 
-		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER))
+		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 			DBregister_host(0, host, ip, dns, port, host_metadata, (int)time(NULL));
-		else if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY))
+		else if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY))
 			DBproxy_register_host(host, ip, dns, port, host_metadata);
 
 		DBcommit();
 	}
-
+done:
 	DBfree_result(result);
 
 	zbx_free(host_esc);
@@ -180,7 +246,7 @@ int	send_list_of_active_checks(zbx_socket_t *sock, char *request)
 	strscpy(ip, get_ip_by_socket(sock));
 
 	/* no host metadata in older versions of agent */
-	if (FAIL == get_hostid_by_host(host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, ip, ZBX_DEFAULT_AGENT_PORT, "", &hostid, error))
 		goto out;
 
 	zbx_vector_uint64_create(&itemids);
@@ -397,7 +463,7 @@ int	send_list_of_active_checks_json(zbx_socket_t *sock, struct zbx_json_parse *j
 	if (FAIL == is_ushort(tmp, &port))
 		port = ZBX_DEFAULT_AGENT_PORT;
 
-	if (FAIL == get_hostid_by_host(host, ip, port, host_metadata, &hostid, error))
+	if (FAIL == get_hostid_by_host(sock, host, ip, port, host_metadata, &hostid, error))
 		goto error;
 
 	zbx_vector_uint64_create(&itemids);

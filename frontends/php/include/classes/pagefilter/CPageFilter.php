@@ -697,7 +697,7 @@ class CPageFilter {
 		$items = $classes = [];
 		foreach ($this->hosts as $id => $host) {
 			$items[$id] = $host['name'];
-			$classes[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
+			$classes[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? ZBX_STYLE_RED : null;
 		}
 		$options = ['objectName' => 'hosts', 'classes' => $classes];
 

@@ -46,6 +46,11 @@
 #	define ZBX_FS_UO64	"%I64o"
 #	define ZBX_FS_UX64	"%I64x"
 
+#	define zbx_int64_t	__int64
+#	define ZBX_FS_I64	"%I64d"
+#	define ZBX_FS_O64	"%I64o"
+#	define ZBX_FS_X64	"%I64x"
+
 #	define snprintf		_snprintf
 
 #	define alloca		_alloca
@@ -76,6 +81,14 @@ typedef __int64	zbx_offset_t;
 #		endif
 #	endif
 
+#	ifndef __INT64_C
+#		ifdef INT64_C
+#			define __INT64_C(c)	(INT64_C(c))
+#		else
+#			define __INT64_C(c)	(c ## LL)
+#		endif
+#	endif
+
 #	define zbx_uint64_t	uint64_t
 #	if __WORDSIZE == 64
 #		define ZBX_FS_UI64	"%lu"
@@ -93,6 +106,23 @@ typedef __int64	zbx_offset_t;
 #		endif
 #	endif
 
+#	define zbx_int64_t	int64_t
+#	if __WORDSIZE == 64
+#		define ZBX_FS_I64	"%ld"
+#		define ZBX_FS_O64	"%lo"
+#		define ZBX_FS_X64	"%lx"
+#	else
+#		ifdef HAVE_LONG_LONG_QU
+#			define ZBX_FS_I64	"%qd"
+#			define ZBX_FS_O64	"%qo"
+#			define ZBX_FS_X64	"%qx"
+#		else
+#			define ZBX_FS_I64	"%lld"
+#			define ZBX_FS_O64	"%llo"
+#			define ZBX_FS_X64	"%llx"
+#		endif
+#	endif
+
 #	ifndef PATH_SEPARATOR
 #		define PATH_SEPARATOR	'/'
 #	endif
@@ -103,7 +133,9 @@ typedef off_t	zbx_offset_t;
 #endif	/* _WINDOWS */
 
 #define ZBX_FS_SIZE_T		ZBX_FS_UI64
+#define ZBX_FS_SSIZE_T		ZBX_FS_I64
 #define zbx_fs_size_t		zbx_uint64_t	/* use this type only in calls to printf() for formatting size_t */
+#define zbx_fs_ssize_t		zbx_int64_t	/* use this type only in calls to printf() for formatting ssize_t */
 
 #ifndef S_ISREG
 #	define S_ISREG(x) (((x) & S_IFMT) == S_IFREG)
