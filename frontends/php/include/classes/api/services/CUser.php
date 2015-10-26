@@ -557,7 +557,11 @@ class CUser extends CApiService {
 		DB::delete('profiles', ['userid' => $userids]);
 		DB::delete('users_groups', ['userid' => $userids]);
 		DB::delete('users', ['userid' => $userids]);
-		$this->disableActionsWithoutOperations(zbx_objectValues($del_operations, 'actionid'));
+
+		$actionids = zbx_objectValues($del_operations, 'actionid');
+		if ($actionids) {
+			$this->disableActionsWithoutOperations($actionids);
+		}
 
 		return ['userids' => $userids];
 	}
@@ -1321,10 +1325,13 @@ class CUser extends CApiService {
 			'SELECT DISTINCT a.actionid'.
 			' FROM actions a'.
 			' WHERE NOT EXISTS (SELECT NULL FROM operations o WHERE o.actionid=a.actionid)'.
-			($actionids ? ' AND '.dbConditionInt('a.actionid', $actionids) : '')
+				' AND '.dbConditionInt('a.actionid', $actionids)
 		));
 
-		$this->disableActions(zbx_objectValues($actions, 'actionid'));
+		$empty_actions = zbx_objectValues($actions, 'actionid');
+		if ($empty_actions) {
+			$this->disableActions($empty_actions);
+		}
 	}
 
 	/**
@@ -1333,18 +1340,16 @@ class CUser extends CApiService {
 	 * @param array $actionids
 	 */
 	protected function disableActions(array $actionids) {
-		if ($actionids) {
-			$update = [
-				'values' => ['status' => ACTION_STATUS_DISABLED],
-				'where' => ['actionid' => $actionids]
-			];
-			DB::update('actions', $update);
+		$update = [
+			'values' => ['status' => ACTION_STATUS_DISABLED],
+			'where' => ['actionid' => $actionids]
+		];
+		DB::update('actions', $update);
 
-			foreach($actionids as $actionid) {
-				add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
-					_('Action disabled due to deletion of user'), null
-				);
-			}
+		foreach($actionids as $actionid) {
+			add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
+				_('Action disabled due to deletion of user'), null
+			);
 		}
 	}
 }
