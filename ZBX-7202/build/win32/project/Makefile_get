@@ -1,6 +1,45 @@
-PROGNAME = ..\..\..\bin\win32\zabbix_get.exe
-INCS = /I .\ /I ..\include /I ..\..\..\include /I ..\..\..\src\zabbix_get
-CFLAGS = $(INCS) /O2 /Ob1 /GF /FD /EHsc /MT /Gy /W3 /c /TC /D _WINDOWS /D _WIN32_WINNT=0x0500 /D _CONSOLE /D UNICODE /D _UNICODE /D NDEBUG /D WIN32 /D HAVE_WINLDAP_H /D HAVE_ASSERT_H /D ZABBIX_SERVICE /D "_VC80_UPGRADE=0x0600" /D HAVE_IPV6
-LFLAGS = /INCREMENTAL:NO /MANIFEST /MANIFESTFILE:"zabbix_get.exe.manifest" /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /PDB:"zabbix_get.pdb" /SUBSYSTEM:CONSOLE /DYNAMICBASE:NO /MACHINE:X86
+# detect target architecture
+!IF "$(CPU)" == "i386"
+TARGETDIR = ..\..\..\bin\win32
+ADD_LFLAGS = /MACHINE:X86
 
-include Makefile_get.inc
+!ELSEIF "$(CPU)" == "AMD64"
+TARGETDIR = ..\..\..\bin\win64
+ADD_LFLAGS = /MACHINE:X64
+
+!ELSE
+!ERROR Unsupported CPU architecture: $(CPU)
+!ENDIF
+
+PROJECTNAME = zabbix_get
+PROJECTDIR = ..\..\..\src\$(PROJECTNAME)
+TARGETNAME = zabbix_get
+TARGETEXT = exe
+PROGNAME = $(TARGETDIR)\$(TARGETNAME).$(TARGETEXT)
+
+ADD_CFLAGS = $(ADD_CFLAGS) /D NDEBUG /Fd$(TARGETNAME).$(TARGETEXT).pdb
+ADD_RFLAGS = /d "ZABBIX_GET"
+
+!INCLUDE Makefile_common.inc
+
+OBJS = \
+	..\..\..\src\libs\zbxcommon\comms.o \
+	..\..\..\src\libs\zbxcommon\iprange.o \
+	..\..\..\src\libs\zbxcommon\misc.o \
+	..\..\..\src\libs\zbxcommon\str.o \
+	..\..\..\src\libs\zbxcommon\xml.o \
+	..\..\..\src\libs\zbxcommon\zbxgetopt.o \
+	..\..\..\src\libs\zbxcomms\comms.o \
+	..\..\..\src\libs\zbxconf\cfg.o \
+	..\..\..\src\libs\zbxcrypto\base64.o \
+	..\..\..\src\libs\zbxlog\log.o \
+	..\..\..\src\libs\zbxsys\mutexs.o \
+	..\..\..\src\libs\zbxsys\symbols.o \
+	..\..\..\src\libs\zbxsys\threads.o \
+	..\..\..\src\zabbix_get\zabbix_get.o \
+	..\..\..\src\libs\zbxwin32\fatal.o
+
+LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib
+
+!INCLUDE Makefile_tls.inc
+!INCLUDE Makefile_targets.inc

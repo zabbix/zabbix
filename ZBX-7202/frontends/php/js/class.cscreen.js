@@ -91,10 +91,10 @@ Cscreen.prototype = {
 
 		jQuery.post('screenedit.php', params, function(data) {
 			if (!isset('result', data) || !data.result) {
-				jQuery('<p>Ajax request error</p>').dialog({
-					modal: true,
-					resizable: false,
-					draggable: false
+				overlayDialogue({
+					'title': 'Error',
+					'content': jQuery('<span>').text('Ajax request error'),
+					'buttons': []
 				});
 			}
 			else {

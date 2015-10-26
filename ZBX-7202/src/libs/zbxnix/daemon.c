@@ -35,6 +35,10 @@ static int	parent_pid = -1;
 extern pid_t	*threads;
 extern int	threads_num;
 
+#ifdef HAVE_SIGQUEUE
+extern unsigned char	program_type;
+#endif
+
 extern int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type,
 		int *local_process_num);
 
@@ -184,8 +188,7 @@ void	zbx_set_sigusr_handler(void (*handler)(int flags))
 static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 {
 #ifdef HAVE_SIGQUEUE
-	int			flags;
-	extern unsigned char	daemon_type;
+	int	flags;
 #endif
 	SIG_CHECK_PARAMS(sig, siginfo, context);
 
@@ -213,7 +216,7 @@ static void	user1_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	switch (ZBX_RTC_GET_MSG(flags))
 	{
 		case ZBX_RTC_CONFIG_CACHE_RELOAD:
-			if (0 != (daemon_type & ZBX_DAEMON_TYPE_PROXY_PASSIVE))
+			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_PASSIVE))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache"
 						" cannot be performed for a passive proxy");
@@ -259,7 +262,7 @@ static void	pipe_signal_handler(int sig, siginfo_t *siginfo, void *context)
  * Purpose: set the signal handlers used by daemons                           *
  *                                                                            *
  ******************************************************************************/
-static void	set_daemon_signal_handlers()
+static void	set_daemon_signal_handlers(void)
 {
 	struct sigaction	phan;
 
@@ -380,7 +383,7 @@ int	daemon_start(int allow_root, const char *user)
 	return MAIN_ZABBIX_ENTRY();
 }
 
-void	daemon_stop()
+void	daemon_stop(void)
 {
 	/* this function is registered using atexit() to be called when we terminate */
 	/* there should be nothing like logging or calls to exit() beyond this point */

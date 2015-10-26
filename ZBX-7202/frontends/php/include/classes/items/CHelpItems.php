@@ -142,7 +142,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
-					'description' => _('Process CPU utilisation in percent. Returns float')
+					'description' => _('Process CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
@@ -153,7 +153,7 @@ class CHelpItems {
 					'description' => _('The number of processes. Returns integer')
 				],
 				[
-					'key' => 'proc_info[<process>,<attribute>,<type>]',
+					'key' => 'proc_info[process,<attribute>,<type>]',
 					'description' => _('Different information about specific process(es). Returns float')
 				],
 				[
@@ -190,7 +190,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU utilisation in percent. Returns float')
+					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',
@@ -423,8 +423,8 @@ class CHelpItems {
 					'description' => _('Value of any Windows performance counter. Returns integer, float, string or text (depending on the request)')
 				],
 				[
-					'key' => 'proc.cpu.util[<name>,<user>,<state>,<cmdline>,<mode>,<scope>]',
-					'description' => _('Process CPU utilisation in percent. Returns float')
+					'key' => 'proc.cpu.util[<name>,<user>,<type>,<cmdline>,<mode>,<zone>]',
+					'description' => _('Process CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'proc.mem[<name>,<user>,<mode>,<cmdline>,<memtype>]',
@@ -435,7 +435,7 @@ class CHelpItems {
 					'description' => _('The number of processes. Returns integer')
 				],
 				[
-					'key' => 'proc_info[<process>,<attribute>,<type>]',
+					'key' => 'proc_info[process,<attribute>,<type>]',
 					'description' => _('Different information about specific process(es). Returns float')
 				],
 				[
@@ -472,7 +472,7 @@ class CHelpItems {
 				],
 				[
 					'key' => 'system.cpu.util[<cpu>,<type>,<mode>]',
-					'description' => _('CPU utilisation in percent. Returns float')
+					'description' => _('CPU utilisation percentage. Returns float')
 				],
 				[
 					'key' => 'system.hostname[<type>]',

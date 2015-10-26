@@ -56,8 +56,15 @@ foreach ($drules as $drule) {
 	]);
 }
 
-echo (new CJson())->encode([
-	'header' =>  _('Discovery status'),
-	'body' =>  (new CDiv($table))->toString(),
-	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-]);
+$output = [
+	'header' => _('Discovery status'),
+	'body' => (new CDiv($table))->toString(),
+	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);

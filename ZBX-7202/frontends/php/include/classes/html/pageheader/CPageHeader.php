@@ -132,6 +132,8 @@ class CPageHeader {
 		<link rel="icon" sizes="192x192" href="img/touch-icon-192x192.png">
 		<meta name="msapplication-TileImage" content="img/ms-tile-144x144.png">
 		<meta name="msapplication-TileColor" content="#d40000">
+		<meta name="msapplication-config" content="none"/>
+
 HTML;
 
 		foreach ($this->cssFiles as $path) {
