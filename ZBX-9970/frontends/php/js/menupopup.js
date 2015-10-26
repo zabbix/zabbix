@@ -931,7 +931,7 @@ jQuery(function($) {
 	 * Menu popup.
 	 *
 	 * @param array  sections				menu sections
-	 * @param string sections[n]['label']	section title
+	 * @param string sections[n]['label']	(optional) section title
 	 * @param array  sections[n]['items']	section menu data (see createMenuItem() for available options)
 	 * @param object event					menu popup call event
 	 *
