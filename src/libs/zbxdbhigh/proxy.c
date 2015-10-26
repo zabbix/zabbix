@@ -27,6 +27,9 @@
 #include "dbcache.h"
 #include "discovery.h"
 #include "zbxalgo.h"
+#include "../zbxcrypto/tls_tcp_active.h"
+
+extern unsigned int	configured_tls_accept_modes;
 
 typedef struct
 {
@@ -85,76 +88,108 @@ static zbx_history_table_t areg = {
  *                                                                            *
  * Function: get_active_proxy_id                                              *
  *                                                                            *
- * Purpose: extract a proxy name from JSON and find the proxy ID in database. *
- *          The proxy must be configured in active mode.                      *
+ * Purpose:                                                                   *
+ *     Extract a proxy name from JSON and find the proxy ID in configuration  *
+ *     cache, and check access rights. The proxy must be configured in active *
+ *     mode.                                                                  *
  *                                                                            *
- * Parameters: jp            - [IN] JSON with the proxy name                  *
- *             hostid        - [OUT] proxy host ID found in database          *
- *             host          - [IN] buffer with minimum size                  *
- *                                  'HOST_HOST_LEN_MAX'                       *
- *             error         - [OUT] error message                            *
+ * Parameters:                                                                *
+ *     jp      - [IN] JSON with the proxy name                                *
+ *     hostid  - [OUT] proxy host ID found in database                        *
+ *     host    - [OUT] buffer provided by caller with minimum size            *
+ *                     'HOST_HOST_LEN_MAX' for writing proxy name             *
+ *     sock    - [IN] connection socket context                               *
+ *     error   - [OUT] error message                                          *
  *                                                                            *
- * Return value:  SUCCEED - proxy ID was found in database                    *
- *                FAIL    - an error occurred (e.g. an unknown proxy or the   *
- *                          proxy is configured in passive mode               *
+ * Return value:                                                              *
+ *     SUCCEED - proxy ID was found in database                               *
+ *     FAIL    - an error occurred (e.g. an unknown proxy, the proxy is       *
+ *               configured in passive mode or access denied)                 *
  *                                                                            *
  ******************************************************************************/
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error)
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_socket_t *sock,
+		char **error)
 {
-	DB_RESULT	result;
-	DB_ROW		row;
-	char		*host_esc;
-	int		ret = FAIL, status;
+	char			*ch_error;
+	zbx_tls_conn_attr_t	attr;
 
-	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, HOST_HOST_LEN_MAX))
 	{
-		char	*ch_error;
-
-		if (FAIL == zbx_check_hostname(host, &ch_error))
-		{
-			*error = zbx_dsprintf(*error, "invalid proxy name \"%s\": %s", host, ch_error);
-			zbx_free(ch_error);
-			return ret;
-		}
-
-		host_esc = DBdyn_escape_string(host);
-
-		result = DBselect(
-				"select hostid,status"
-				" from hosts"
-				" where host='%s'"
-					" and status in (%d,%d)",
-				host_esc, HOST_STATUS_PROXY_ACTIVE, HOST_STATUS_PROXY_PASSIVE);
-
-		zbx_free(host_esc);
-
-		if (NULL != (row = DBfetch(result)) && FAIL == DBis_null(row[0]))
-		{
-			if (SUCCEED == is_uint31(row[1], &status))
-			{
-				if (HOST_STATUS_PROXY_ACTIVE == status)
-				{
-					ZBX_STR2UINT64(*hostid, row[0]);
-					ret = SUCCEED;
-				}
-				else
-				{
-					*error = zbx_dsprintf(*error, "proxy \"%s\" is configured in passive mode",
-							host);
-				}
-			}
-			else
-				THIS_SHOULD_NEVER_HAPPEN;
-		}
-		else
-			*error = zbx_dsprintf(*error, "proxy \"%s\" not found", host);
-
-		DBfree_result(result);
-	}
-	else
 		*error = zbx_strdup(*error, "missing name of proxy");
+		return FAIL;
+	}
 
-	return ret;
+	if (SUCCEED != zbx_check_hostname(host, &ch_error))
+	{
+		*error = zbx_dsprintf(*error, "invalid proxy name \"%s\": %s", host, ch_error);
+		zbx_free(ch_error);
+		return FAIL;
+	}
+
+	if (SUCCEED != zbx_tls_get_attr(sock, &attr))
+	{
+		*error = zbx_strdup(*error, "internal error: cannot get connection attributes");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+	if (SUCCEED != DCcheck_proxy_permissions(host, &attr, hostid, error))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: check_access_passive_proxy                                       *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     Check access rights to a passive proxy for the given connection and    *
+ *     send a response if denied.                                             *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     sock          - [IN] connection socket context                         *
+ *     send_response - [IN] to send or not to send a response to server.      *
+ *                          Value: ZBX_SEND_RESPONSE or                       *
+ *                          ZBX_DO_NOT_SEND_RESPONSE                          *
+ *     req           - [IN] request, included into error message              *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - access is allowed                                            *
+ *     FAIL    - access is denied                                             *
+ *                                                                            *
+ ******************************************************************************/
+int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req)
+{
+	char	*msg = NULL;
+
+	if (0 == (configured_tls_accept_modes & sock->connection_type))
+	{
+		msg = zbx_dsprintf(NULL, "%s from server over connection of type \"%s\" is not allowed", req,
+				zbx_tls_connection_type_name(sock->connection_type));
+
+		zabbix_log(LOG_LEVEL_WARNING, "%s by proxy configuration parameter \"TLSAccept\"", msg);
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_response(sock, FAIL, msg, CONFIG_TIMEOUT);
+
+		zbx_free(msg);
+		return FAIL;
+	}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_check_server_issuer_subject(sock, &msg))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "%s from server is not allowed: %s", req, msg);
+
+		if (ZBX_SEND_RESPONSE == send_response)
+			zbx_send_response(sock, FAIL, "certificate issuer or subject mismatch", CONFIG_TIMEOUT);
+
+		zbx_free(msg);
+		return FAIL;
+	}
+#endif
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -449,31 +484,25 @@ static void	get_proxy_monitored_httptests(zbx_uint64_t proxy_hostid, zbx_vector_
  ******************************************************************************/
 int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **error)
 {
-	typedef struct
+	static const char	*proxytable[] =
 	{
-		const char	*table;
-	}
-	proxytable_t;
-
-	static const proxytable_t pt[] =
-	{
-		{"globalmacro"},
-		{"hosts"},
-		{"interface"},
-		{"hosts_templates"},
-		{"hostmacro"},
-		{"items"},
-		{"drules"},
-		{"dchecks"},
-		{"regexps"},
-		{"expressions"},
-		{"groups"},
-		{"config"},
-		{"httptest"},
-		{"httptestitem"},
-		{"httpstep"},
-		{"httpstepitem"},
-		{NULL}
+		"globalmacro",
+		"hosts",
+		"interface",
+		"hosts_templates",
+		"hostmacro",
+		"items",
+		"drules",
+		"dchecks",
+		"regexps",
+		"expressions",
+		"groups",
+		"config",
+		"httptest",
+		"httptestitem",
+		"httpstep",
+		"httpstepitem",
+		NULL
 	};
 
 	const char		*__function_name = "get_proxyconfig_data";
@@ -492,9 +521,9 @@ int	get_proxyconfig_data(zbx_uint64_t proxy_hostid, struct zbx_json *j, char **e
 	get_proxy_monitored_hosts(proxy_hostid, &hosts);
 	get_proxy_monitored_httptests(proxy_hostid, &httptests);
 
-	for (i = 0; NULL != pt[i].table; i++)
+	for (i = 0; NULL != proxytable[i]; i++)
 	{
-		table = DBget_table(pt[i].table);
+		table = DBget_table(proxytable[i]);
 		assert(NULL != table);
 
 		if (SUCCEED != get_proxyconfig_table(proxy_hostid, j, table, &hosts, &httptests))
@@ -910,7 +939,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 					if (fields_count == f)
 					{
 						*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-								jp_row.end - jp_row.start + 1, jp_row.start);
+								(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 						goto clean2;
 					}
 
@@ -1039,7 +1068,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				if (f == fields_count)
 				{
 					*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-							jp_row.end - jp_row.start + 1, jp_row.start);
+							(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 					goto clean;
 				}
 
@@ -1077,7 +1106,8 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 						break;
 					default:
 						*error = zbx_dsprintf(*error, "unsupported field type %d in \"%s.%s\"",
-								fields[f]->type, table->table, fields[f]->name);
+								(int)fields[f]->type, table->table, fields[f]->name);
+						zbx_free(value);
 						goto clean;
 
 				}
@@ -1105,7 +1135,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			if (f != fields_count)
 			{
 				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-						jp_row.end - jp_row.start + 1, jp_row.start);
+						(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 				goto clean;
 			}
 		}
@@ -1136,7 +1166,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 				if (f == fields_count)
 				{
 					*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-							jp_row.end - jp_row.start + 1, jp_row.start);
+							(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 					goto clean;
 				}
 
@@ -1187,7 +1217,7 @@ static int	process_proxyconfig_table(const ZBX_TABLE *table, struct zbx_json_par
 			if (f != fields_count)
 			{
 				*error = zbx_dsprintf(*error, "invalid number of fields \"%.*s\"",
-						jp_row.end - jp_row.start + 1, jp_row.start);
+						(int)(jp_row.end - jp_row.start + 1), jp_row.start);
 				goto clean;
 			}
 
@@ -2152,19 +2182,22 @@ void	calc_timestamp(const char *line, int *timestamp, const char *format)
  *             processed    - [OUT] number of processed elements              *
  *                                                                            *
  ******************************************************************************/
-void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
-		AGENT_VALUE *values, size_t values_num, int *processed)
+void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALUE *values, size_t values_num,
+		int *processed)
 {
-	const char	*__function_name = "process_mass_data";
-	AGENT_RESULT	agent;
-	DC_ITEM		*items = NULL;
-	zbx_host_key_t	*keys = NULL;
-	size_t		i;
-	zbx_uint64_t	*itemids = NULL, *lastlogsizes = NULL;
-	unsigned char	*states = NULL;
-	int		*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL;
-	size_t		num = 0;
-
+	const char		*__function_name = "process_mass_data";
+	AGENT_RESULT		agent;
+	DC_ITEM			*items = NULL;
+	zbx_host_key_t		*keys = NULL;
+	size_t			i;
+	zbx_uint64_t		*itemids = NULL, *lastlogsizes = NULL, hostid_prev = 0;
+	unsigned char		*states = NULL;
+	int			*lastclocks = NULL, *errcodes = NULL, *mtimes = NULL, *errcodes2 = NULL,
+				flag_host_allow = 0;
+	size_t			num = 0;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_conn_attr_t	attr;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
 	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * values_num);
@@ -2220,7 +2253,7 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 			char	*allowed_hosts;
 
 			allowed_hosts = zbx_strdup(NULL, items[i].trapper_hosts);
-			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL,
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, &items[i], NULL, NULL,
 					&allowed_hosts, MACRO_TYPE_PARAMS_FIELD, NULL, 0);
 			security_check = zbx_tcp_check_security(sock, allowed_hosts, 1);
 			zbx_free(allowed_hosts);
@@ -2230,6 +2263,90 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid,
 				zabbix_log(LOG_LEVEL_WARNING, "cannot process trapper item \"%s\": %s",
 						items[i].key_orig, zbx_socket_strerror());
 				continue;
+			}
+		}
+
+		/* If data have come from a proxy then trust them (connection with the proxy has been already checked */
+		/* and it is the responsibility of proxy to check incoming data). If the data have come directly into */
+		/* trapper process (active check or trapper item) then check if the connection is allowed. */
+		/* It is enough to check connection type, and optionally, certificate issuer and subject, and PSK */
+		/* identity only for a host. No need to check it for every item if the host is the same. */
+
+		if (0 == proxy_hostid && NULL != sock)
+		{
+			if (hostid_prev == items[i].host.hostid)	/* host and connection already checked */
+			{
+				if (0 == flag_host_allow)
+					continue;
+			}
+			else
+			{
+				hostid_prev = items[i].host.hostid;
+
+				if (0 == ((unsigned int)items[i].host.tls_accept & sock->connection_type))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "connection of type \"%s\" is not allowed for"
+							" host \"%s\" item \"%s\" (not every rejected item might be"
+							" reported)",
+							zbx_tls_connection_type_name(sock->connection_type),
+							items[i].host.host, items[i].key_orig);
+					flag_host_allow = 0;
+					continue;
+				}
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type ||
+						ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+				{
+					if (SUCCEED != zbx_tls_get_attr(sock, &attr))
+					{
+						THIS_SHOULD_NEVER_HAPPEN;
+						flag_host_allow = 0;
+						continue;
+					}
+				}
+
+				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
+				{
+					/* simplified match, not compliant with RFC 4517, 4518 */
+					if ('\0' != *items[i].host.tls_issuer &&
+							0 != strcmp(items[i].host.tls_issuer, attr.issuer))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "certificate issuer does not match for "
+								"host \"%s\" item \"%s\" (not every rejected item might"
+								" be reported)", items[i].host.host, items[i].key_orig);
+						flag_host_allow = 0;
+						continue;
+					}
+
+					/* simplified match, not compliant with RFC 4517, 4518 */
+					if ('\0' != *items[i].host.tls_subject &&
+							0 != strcmp(items[i].host.tls_subject, attr.subject))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "certificate subject does not match for "
+								"host \"%s\" item \"%s\" (not every rejected item might"
+								" be reported)", items[i].host.host, items[i].key_orig);
+						flag_host_allow = 0;
+						continue;
+					}
+				}
+				else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
+				{
+					if (strlen(items[i].host.tls_psk_identity) != attr.psk_identity_len ||
+							0 != memcmp(items[i].host.tls_psk_identity, attr.psk_identity,
+							attr.psk_identity_len))
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "false PSK identity for host \"%s\" item"
+								" \"%s\" (not every rejected item might be reported):"
+								" configured identity \"%s\", received identity \"%s\"",
+								items[i].host.host, items[i].key_orig,
+								items[i].host.tls_psk_identity, attr.psk_identity);
+						flag_host_allow = 0;
+						continue;
+					}
+				}
+#endif
+				flag_host_allow = 1;
 			}
 		}
 
@@ -2672,7 +2789,7 @@ exit:
  *                                                                            *
  * Function: process_areg_data                                                *
  *                                                                            *
- * Purpose: update auto-registration data, received from proxy                *
+ * Purpose: update auto registration data, received from proxy                *
  *                                                                            *
  ******************************************************************************/
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid)

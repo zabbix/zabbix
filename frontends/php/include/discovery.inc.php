@@ -30,8 +30,8 @@ function check_right_on_discovery() {
 	return (CWebUser::getType() >= USER_TYPE_ZABBIX_ADMIN);
 }
 
-function svc_default_port($type_int) {
-	$typePort = [
+function svc_default_port($type) {
+	$types = [
 		SVC_SSH =>		'22',
 		SVC_LDAP =>		'389',
 		SVC_SMTP =>		'25',
@@ -48,11 +48,11 @@ function svc_default_port($type_int) {
 		SVC_TELNET =>	'23'
 	];
 
-	return isset($typePort[$type_int]) ? $typePort[$type_int] : 0;
+	return isset($types[$type]) ? $types[$type] : 0;
 }
 
 function discovery_check_type2str($type = null) {
-	$discoveryTypes = [
+	$types = [
 		SVC_SSH => _('SSH'),
 		SVC_LDAP => _('LDAP'),
 		SVC_SMTP => _('SMTP'),
@@ -72,14 +72,10 @@ function discovery_check_type2str($type = null) {
 	];
 
 	if ($type === null) {
-		return $discoveryTypes;
+		return $types;
 	}
-	elseif (isset($discoveryTypes[$type])) {
-		return $discoveryTypes[$type];
-	}
-	else {
-		return false;
-	}
+
+	return isset($types[$type]) ? $types[$type] : false;
 }
 
 function discovery_check2str($type, $key, $port) {
@@ -116,20 +112,16 @@ function discovery_port2str($type_int, $port) {
 }
 
 function discovery_status2str($status = null) {
-	$discoveryStatus = [
+	$statuses = [
 		DRULE_STATUS_ACTIVE => _('Enabled'),
 		DRULE_STATUS_DISABLED => _('Disabled')
 	];
 
 	if (is_null($status)) {
-		return $discoveryStatus;
+		return $statuses;
 	}
-	elseif (isset($discoveryStatus[$status])) {
-		return $discoveryStatus[$status];
-	}
-	else {
-		return _('Unknown');
-	}
+
+	return isset($statuses[$status]) ? $statuses[$status] : _('Unknown');
 }
 
 function discovery_status2style($status) {

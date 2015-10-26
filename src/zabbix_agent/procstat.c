@@ -58,13 +58,14 @@
  * * procstat_init() initialises procstat dshm structure but doesn't allocate memory from the system
  *   (zbx_dshm_create() called with size 0).
  * * the first call of procstat_add() allocates the shared memory for the header and the first query
- *   via call to zbx_dshm_reserve().
- * * The header is initialised in procstat_copy_data() which is called back from zbx_dshm_reserve().
+ *   via call to zbx_dshm_realloc().
+ * * The header is initialised in procstat_copy_data() which is called back from zbx_dshm_realloc().
  *
  * Memory allocation within dshm.
  * * Ensure that memory segment has enough free space with procstat_dshm_has_enough_space() before
  *   allocating space within segment with procstat_alloc() or functions that use it.
- * * Reserve more space if needed with zbx_dshm_reserve().
+ * * Check how much of the allocated dshm is actually used by procstat by procstat_dshm_used_size().
+ * * Change the dshm size with with zbx_dshm_realloc().
  *
  * Synchronisation.
  * * agentd processes share a single instance of ZBX_COLLECTOR_DATA (*collector) containing reference
@@ -542,7 +543,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 			exit(EXIT_FAILURE);
 		}
 
-		/* header initialised in procstat_copy_data() which is called back from zbx_dshm_reserve() */
+		/* header initialised in procstat_copy_data() which is called back from zbx_dshm_realloc() */
 		procstat_reattach();
 	}
 
@@ -721,8 +722,7 @@ out:
 static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_ptr_t *processes)
 {
 	zbx_procstat_query_data_t	*qdata;
-	int				i;
-	int				pids_num = 0;
+	int				i, pids_num = 0;
 
 	for (i = 0; i < queries->values_num; i++)
 	{
@@ -753,7 +753,7 @@ static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_
 static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vector_ptr_t *queries, int pids_num)
 {
 	zbx_procstat_query_data_t	*qdata;
-	int i;
+	int				i;
 
 	zbx_vector_uint64_reserve(pids, pids_num);
 
@@ -790,8 +790,8 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
 static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_t *stats,
 				zbx_vector_uint64_t *pids)
 {
-	zbx_timespec_t			snapshot_timestamp;
-	int				i;
+	zbx_timespec_t	snapshot_timestamp;
+	int		i;
 
 	for (i = 0; i < pids->values_num; i++)
 		stats[i].pid = pids->values[i];
@@ -1027,7 +1027,6 @@ void	zbx_procstat_destroy()
 	procstat_ref.addr = NULL;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_procstat_get_util                                            *
@@ -1057,9 +1056,9 @@ void	zbx_procstat_destroy()
 int	zbx_procstat_get_util(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
 		int period, int type, double *value, char **errmsg)
 {
-	int		ret = FAIL, current, start;
+	int			ret = FAIL, current, start;
 	zbx_procstat_query_t	*query;
-	zbx_uint64_t	ticks_diff = 0, time_diff;
+	zbx_uint64_t		ticks_diff = 0, time_diff;
 
 	zbx_dshm_lock(&collector->procstat);
 
@@ -1185,10 +1184,8 @@ clean:
 
 	zbx_vector_ptr_clear_ext(&queries, (zbx_mem_free_func_t)procstat_free_query_data);
 	zbx_vector_ptr_destroy(&queries);
-
 out:
 	runid++;
 }
 
 #endif
-

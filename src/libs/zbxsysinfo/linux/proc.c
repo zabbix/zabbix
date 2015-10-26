@@ -38,7 +38,6 @@ typedef struct
 }
 zbx_sysinfo_proc_t;
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sysinfo_proc_free                                            *
@@ -54,7 +53,6 @@ void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 
 	zbx_free(proc);
 }
-
 
 static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 {
@@ -989,7 +987,7 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 	if (-1 == (fd = open(tmp, O_RDONLY)))
 		return -errno;
 
-	if (-1 == (n = read(fd, tmp, sizeof(tmp))))
+	if (-1 == (n = read(fd, tmp, sizeof(tmp) - 1)))
 	{
 		ret = -errno;
 		goto out;
@@ -1048,7 +1046,6 @@ out:
 
 	return ret;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1146,7 +1143,7 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 {
 	char			*procname = NULL, *cmdline = NULL, *name_arg0 = NULL;
-	uid_t			uid;
+	uid_t			uid = -1;
 	zbx_sysinfo_proc_t	*proc = NULL;
 	int			ret = FAIL;
 
@@ -1296,8 +1293,8 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	int			i;
 	zbx_sysinfo_proc_t	*proc;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s", __function_name,
-			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline));
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%d", __function_name,
+			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline), flags);
 
 	if (NULL != username)
 	{

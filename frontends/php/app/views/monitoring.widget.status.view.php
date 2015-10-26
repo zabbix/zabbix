@@ -21,8 +21,15 @@
 
 $widget = make_status_of_zbx();
 
-echo (new CJson())->encode([
+$output = [
 	'header' => _('Status of Zabbix'),
-	'body' =>  $widget->toString(),
-	'footer' =>  _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-]);
+	'body' => $widget->toString(),
+	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);
