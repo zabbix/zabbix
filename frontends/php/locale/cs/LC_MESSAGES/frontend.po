@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-22 15:56+0300\n"
-"PO-Revision-Date: 2015-10-16 06:39+0300\n"
+"PO-Revision-Date: 2015-10-23 14:24+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1444970345.0\n"
+"X-POOTLE-MTIME: 1445603084.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -44,7 +44,7 @@ msgstr[2] "%1$d dní"
 #, c-format
 msgid "%1$d of %2$d issue is shown"
 msgid_plural "%1$d of %2$d issues are shown"
-msgstr[0] "Zobrazený %1$d z %2$d problémů"
+msgstr[0] "Zobrazený %1$d z %2$d problém"
 msgstr[1] "Zobrazené %1$d z %2$d problémů"
 msgstr[2] "Zobrazené %1$d z %2$d problémů"
 
@@ -76,9 +76,9 @@ msgstr[2] "%1$s dní"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s událost"
+msgstr[1] "%1$s události"
+msgstr[2] "%1$s události"
 
 #: include/views/monitoring.history.php:27
 #, c-format
@@ -593,7 +593,7 @@ msgstr "Kontrola dostupnosti agenta. Vrátí nic - nedostupný, 1 - dostupný"
 
 #: include/views/configuration.host.list.php:70
 msgid "Agent encryption"
-msgstr ""
+msgstr "Agent šifrování"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
@@ -830,7 +830,7 @@ msgstr "V %1$s:%2$s dne %3$s každý %4$s"
 #, c-format
 msgid "At %1$s:%2$s on every %3$s of every week"
 msgid_plural "At %1$s:%2$s on every %3$s of every %4$s weeks"
-msgstr[0] "Na %1$s:%2$s na každý %3$s každého týdne"
+msgstr[0] "Na %1$s:%2$s na každý %3$s každého týden"
 msgstr[1] "Na %1$s:%2$s na každý %3$s každého %4$s týdne"
 msgstr[2] "Na %1$s:%2$s na každý %3$s každého %4$s týdne"
 
@@ -861,7 +861,7 @@ msgstr "Minimálně jedna plánovaná odstávka musí být vytvořená."
 #: include/classes/api/services/CValueMap.php:488
 #, c-format
 msgid "At least one mapping should be given for value map \"%1$s\"."
-msgstr ""
+msgstr "Alespoň jedno mapování by mělo být uvedeno pro hodnotu mapy \"%1$s\"."
 
 #: include/classes/setup/CFrontendSetup.php:249
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1114,7 +1114,7 @@ msgstr "Podle šablony spouštěče"
 #: include/views/configuration.host.list.php:197
 #: include/views/configuration.host.list.php:211
 msgid "CERT"
-msgstr ""
+msgstr "CERT"
 
 #: triggers.php:376
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1133,7 +1133,7 @@ msgstr "CPU load. Vrátí desetinné číslo"
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Využití CPU v procentech. Návratová hodnota float"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1596,8 +1596,8 @@ msgstr "Nelze smazat servisní okno"
 msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] "Není možné smazat typ média"
-msgstr[1] ""
-msgstr[2] ""
+msgstr[1] "Není možné smazat typy médií"
+msgstr[2] "Není možné smazat typy médií"
 
 #: sysmaps.php:220
 msgid "Cannot delete network map"
@@ -2414,7 +2414,7 @@ msgstr "Nelze upravit hostitele"
 
 #: include/classes/api/services/CHost.php:802
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
-msgstr ""
+msgstr "Nelze aktualizovat nastavení šifrování hostitele. Měly by být upřesněny nastavení připojení pro oba směry."
 
 #: host_prototypes.php:193
 msgid "Cannot update host prototype"
@@ -2573,7 +2573,7 @@ msgstr "Střed"
 #: include/views/configuration.host.prototype.edit.php:356
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Certificate"
-msgstr ""
+msgstr "Certifikát"
 
 #: include/classes/screens/CScreenBase.php:267
 #: include/classes/screens/CScreenBuilder.php:465
@@ -2799,7 +2799,7 @@ msgstr "Zavřít kunstruktéra výrazu"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:171
 msgid "Collapse"
-msgstr ""
+msgstr "Zhroucení"
 
 #: include/views/configuration.graph.edit.php:263
 #: include/views/js/configuration.sysmaps.js.php:354
@@ -3143,24 +3143,24 @@ msgstr ""
 
 #: include/views/configuration.host.massupdate.php:372
 msgid "Connections"
-msgstr ""
+msgstr "Připojení"
 
 #: include/views/configuration.host.edit.php:774
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:360
 msgid "Connections from host"
-msgstr ""
+msgstr "Připojení z hostitele"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
-msgstr ""
+msgstr "Připojení z proxy"
 
 #: app/views/administration.proxy.edit.php:97
 #: include/views/configuration.host.edit.php:766
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:352
 msgid "Connections to host"
-msgstr ""
+msgstr "Připojení na hostitele"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3455,7 +3455,7 @@ msgstr "Vlastní grafy"
 #: include/views/configuration.item.massupdate.php:372
 #: include/views/configuration.item.prototype.edit.php:311
 msgid "Custom intervals"
-msgstr ""
+msgstr "Vlastní intervaly"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
@@ -4663,7 +4663,7 @@ msgstr "Zapamatovat označený výběr \"%1$s\"."
 #: include/classes/api/services/CMediatype.php:450
 #, c-format
 msgid "Duplicate \"description\" value \"%1$s\" for media type."
-msgstr ""
+msgstr "Duplicitní \"description\" hodnota \"%1$s\" pro typ média."
 
 #: include/classes/api/services/CItemPrototype.php:316
 #, c-format
@@ -4674,7 +4674,7 @@ msgstr "Duplicita \"name\" hodnoty \"%1$s\" pro prototyp aplikace v prototypu po
 #: include/classes/api/services/CValueMap.php:437
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for value map."
-msgstr ""
+msgstr "Duplicitní \"name\" hodnota \"%1$s\" pro hodnotu mapy."
 
 #: include/classes/api/services/CTrigger.php:1479
 #, c-format
@@ -4716,7 +4716,7 @@ msgstr "Kopírování jména mapy pro mapu \"%s\"."
 #: include/classes/api/services/CValueMap.php:524
 #, c-format
 msgid "Duplicate mapping value \"%1$s\" for value map \"%2$s\"."
-msgstr ""
+msgstr "Duplicitní hodnota mapování \"%1$s\" pro hodnotu mapy \"%2$s\"."
 
 #: include/profiles.inc.php:91
 #, c-format
@@ -4901,7 +4901,7 @@ msgstr "Prázdné makro."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
-msgstr ""
+msgstr "Prázdný typ média ID."
 
 #: include/classes/api/services/CHostPrototype.php:222
 msgid "Empty name for group prototype."
@@ -4924,7 +4924,7 @@ msgstr "Prázdné jméno."
 #: include/classes/api/services/CValueMap.php:516
 #, c-format
 msgid "Empty new value in value map \"%1$s\"."
-msgstr ""
+msgstr "Prázdná nová hodnota v hodnotě mapy \"%1$s\"."
 
 #: include/classes/api/services/CImage.php:369
 msgid "Empty parameters"
@@ -4949,7 +4949,7 @@ msgstr "Prázdná časová perioda."
 
 #: include/classes/api/services/CValueMap.php:396
 msgid "Empty value map ID."
-msgstr ""
+msgstr "Prázdná hodnota mapy ID."
 
 #: include/classes/api/services/CHttpTest.php:298
 msgid "Empty web scenario ID."
@@ -5103,7 +5103,7 @@ msgstr "Povoleno"
 #: include/views/configuration.host.massupdate.php:393
 #: include/views/configuration.host.prototype.edit.php:388
 msgid "Encryption"
-msgstr ""
+msgstr "Šifrování"
 
 #: include/locales.inc.php:52
 msgid "English (en_GB)"
@@ -5425,7 +5425,7 @@ msgstr "Pole \"%1$s\" je povinné."
 #: include/classes/api/services/CMediatype.php:807
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
-msgstr ""
+msgstr "Položka \"%1$s\" chybí hodnota pro typ média \"%2$s\"."
 
 #: include/validate.inc.php:220
 #, c-format
@@ -5445,7 +5445,7 @@ msgstr "Pole \"%1$s\" není řetězec."
 #: include/classes/api/services/CMediatype.php:801
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
-msgstr ""
+msgstr "Položka \"%1$s\" je nutné pro typ médií \"%2$s\"."
 
 #: include/validate.inc.php:289
 #, c-format
@@ -5563,7 +5563,7 @@ msgstr "První"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
-msgstr ""
+msgstr "Fit"
 
 #: include/views/js/configuration.sysmaps.js.php:35
 msgid "Fit to map"
@@ -5581,7 +5581,7 @@ msgstr "Pevná"
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:7
 msgid "Flexible"
-msgstr ""
+msgstr "Flexibilní"
 
 #: include/views/configuration.httpconf.popup.php:100
 msgid "Follow redirects"
@@ -5593,19 +5593,19 @@ msgstr "Heslo účtu guest musí být prázdné"
 
 #: popup_trexpr.php:598
 msgid "Forecast for next t seconds based on period T is < N"
-msgstr ""
+msgstr "Předpověď na další t sekund založených na období T je < N"
 
 #: popup_trexpr.php:608
 msgid "Forecast for next t seconds based on period T is = N"
-msgstr ""
+msgstr "Předpověď na další t sekund založených na období T je = N"
 
 #: popup_trexpr.php:603
 msgid "Forecast for next t seconds based on period T is > N"
-msgstr ""
+msgstr "Předpověď na další t sekund založených na období T je > N"
 
 #: popup_trexpr.php:613
 msgid "Forecast for next t seconds based on period T is NOT N"
-msgstr ""
+msgstr "Předpověď na další t sekund založených na období T je NOT N"
 
 #: include/items.inc.php:1323 include/views/configuration.item.edit.php:200
 #: include/views/configuration.item.prototype.edit.php:198
@@ -7371,7 +7371,7 @@ msgstr "Neplatný obrázkový index."
 #: include/classes/api/services/CScreen.php:343
 #: include/classes/api/services/CTemplateScreen.php:522
 msgid "Incorrect input parameters."
-msgstr "Neplatný parametr DNS pro rozhraní \"%s\"."
+msgstr "Nesprávné vstupní parametry."
 
 #: include/classes/api/services/CHostInterface.php:574
 #, c-format
@@ -7478,7 +7478,7 @@ msgstr "Neplatný počet maximálních sloupců v prvku obrazovky."
 
 #: include/classes/api/services/CMediatype.php:387
 msgid "Incorrect media type ID."
-msgstr ""
+msgstr "Nesprávný typ média ID."
 
 #: include/classes/api/services/CScript.php:532
 #, c-format
@@ -7775,7 +7775,7 @@ msgstr "Neplatná hodnota \"%1$s\" pro unsigned int pole \"%2$s\"."
 #: include/classes/api/services/CMediatype.php:782
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
-msgstr ""
+msgstr "Nesprávná hodnota \"%1$s\" v položce \"%2$s\" pro typ média \"%3$s\"."
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:417
@@ -7792,28 +7792,28 @@ msgstr "Neplatná hodnota pro pole \"%1$s\": nemůže být prázdna."
 
 #: include/classes/api/services/CValueMap.php:397
 msgid "Incorrect value map ID."
-msgstr ""
+msgstr "Nesprávná hodnota mapy ID."
 
 #: include/classes/api/services/CHost.php:1557
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
-msgstr ""
+msgstr "Nesprávná hodnota používaná pro PSK položku. To by mělo obsahovat sudý počet hexadecimálních znaků."
 
 #: include/classes/api/services/CHost.php:1540
 msgid "Incorrect value used for connections from host field."
-msgstr ""
+msgstr "Nesprávná hodnota používaná pro připojení z položky hostitele."
 
 #: include/classes/api/services/CProxy.php:651
 msgid "Incorrect value used for connections from proxy field."
-msgstr ""
+msgstr "Nesprávná hodnota použitá pro připojení z položky proxy."
 
 #: include/classes/api/services/CHost.php:1536
 msgid "Incorrect value used for connections to host field."
-msgstr ""
+msgstr "Nesprávná hodnota použitá pro připojení k položce hostitele."
 
 #: include/classes/api/services/CProxy.php:646
 msgid "Incorrect value used for connections to proxy field."
-msgstr ""
+msgstr "Nesprávná hodnota použitá pro připojení k položce proxy."
 
 #: include/classes/api/services/CProxy.php:720
 #: include/classes/api/services/CProxy.php:818
@@ -8026,7 +8026,7 @@ msgstr "Neplatný první parametr."
 #: include/classes/validators/CItemDelayFlexValidator.php:73
 #, c-format
 msgid "Invalid flexible interval delay: \"%1$s\" exceeds maximum delay of \"%2$s\"."
-msgstr ""
+msgstr "Neplatný flexibilní interval zpoždění: \"%1$s\" přesahuje maximální zpoždění \"%2$s\"."
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid fourth parameter."
@@ -8043,97 +8043,97 @@ msgstr "Neplatné hostid pro makro \"%1$s\"."
 #: items.php:601
 #, c-format
 msgid "Invalid interval \"%1$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:390
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": %2$s."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:306
 #: include/classes/validators/CItemDelayFlexValidator.php:321
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hour step \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatný krok hodiny \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:269
 #: include/classes/validators/CItemDelayFlexValidator.php:282
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hours \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatné hodiny \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:375
 #: include/classes/validators/CItemDelayFlexValidator.php:390
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minute step \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatný krok minut \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:338
 #: include/classes/validators/CItemDelayFlexValidator.php:351
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minutes \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatné minuty \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:127
 #: include/classes/validators/CItemDelayFlexValidator.php:140
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatný den v měsíci \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:165
 #: include/classes/validators/CItemDelayFlexValidator.php:180
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day step \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatný krok dne v měsíci \"%2$s\"h."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:446
 #: include/classes/validators/CItemDelayFlexValidator.php:461
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid second step \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatný krok sekund \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:408
 #: include/classes/validators/CItemDelayFlexValidator.php:421
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid seconds \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatné sekundy \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:198
 #: include/classes/validators/CItemDelayFlexValidator.php:211
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatný den v týdnu \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:236
 #: include/classes/validators/CItemDelayFlexValidator.php:251
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day step \"%2$s\"."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": neplatný krok dne v týdnu \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:292
 #, c-format
 msgid "Invalid interval \"%1$s\": starting hour must be less or equal to ending hour."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": začínající hodina musí být menší nebo rovna končící hodině."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:361
 #, c-format
 msgid "Invalid interval \"%1$s\": starting minute must be less or equal to ending minute."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": začínající minuta musí být menší nebo rovna končící minutě."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:151
 #, c-format
 msgid "Invalid interval \"%1$s\": starting month day must be less or equal to ending month day."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": začínající den v měsíci musí být menší nebo roven končícímu dni v měsíc."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:432
 #, c-format
 msgid "Invalid interval \"%1$s\": starting second must be less or equal to ending second."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": začínající sekunda musí být menší nebo rovna končící sekundě."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:222
 #, c-format
 msgid "Invalid interval \"%1$s\": starting week day must be less or equal to ending week day."
-msgstr ""
+msgstr "Neplatný interval \"%1$s\": začínající den v týdnu, musí být menší nebo roven končícímu dni v týdnu."
 
 #: include/classes/api/services/CDiscoveryRule.php:42
 #, c-format
@@ -8236,7 +8236,7 @@ msgstr "Problém"
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:377
 msgid "Issuer"
-msgstr ""
+msgstr "Emitent"
 
 #: include/classes/api/services/CUser.php:141
 msgid "It is not possible to filter by user password."
@@ -9209,7 +9209,7 @@ msgstr "Mapované k"
 #: include/classes/api/services/CValueMap.php:501
 #, c-format
 msgid "Mapping is missing parameters: %1$s for value map \"%2$s\"."
-msgstr ""
+msgstr "Chybějící parametry mapování: %1$s pro hodnotu mapy \"%2$s\"."
 
 #: include/views/administration.general.iconmap.edit.php:124
 #: include/views/administration.general.valuemapping.edit.php:71
@@ -9370,7 +9370,7 @@ msgstr[2] "Typ média povolený"
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
 msgid "Media type is missing parameters: %1$s"
-msgstr ""
+msgstr "Typ média je chybějící parametr: %1$s"
 
 #: app/controllers/CControllerMediatypeUpdate.php:143
 msgid "Media type updated"
@@ -9485,9 +9485,9 @@ msgstr "Minimální závažnost"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Minimální doba periody zobrazení je %1$s minuta."
+msgstr[1] "Minimální doba periody zobrazení je %1$s minuty."
+msgstr[2] "Minimální doba periody zobrazení je %1$s minuty."
 
 #: include/views/common.filter.trigger.php:71
 #: include/views/configuration.sysmap.edit.php:149
@@ -9615,7 +9615,7 @@ msgstr "Mozilla Firefox"
 
 #: include/triggers.inc.php:1472
 msgid "Multiple PROBLEM events"
-msgstr "Opakování události"
+msgstr "Multiple PROBLEM události"
 
 #: include/views/configuration.trigger.prototype.edit.php:241
 #: include/views/configuration.triggers.edit.php:246
@@ -9853,7 +9853,7 @@ msgstr "Žádné \"%1$s\" dané pro prototyp hosta."
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
 msgid "No \"%1$s\" given for media type."
-msgstr ""
+msgstr "Ne \"%1$s\" vzhledem k tomu, typu média."
 
 #: include/classes/api/services/CScreen.php:455
 #, c-format
@@ -9868,7 +9868,7 @@ msgstr "Žádné \"%1$s\" dané pro šablonu obrazovky."
 #: include/classes/api/services/CValueMap.php:395
 #, c-format
 msgid "No \"%1$s\" given for value map."
-msgstr ""
+msgstr "Ne \"%1$s\" vzhledem k hodnotě mapy."
 
 #: include/classes/api/services/CHttpTest.php:297
 #, c-format
@@ -10028,7 +10028,7 @@ msgstr "Žádné stanovené ID objevovacího pravidla."
 #: include/views/configuration.host.prototype.edit.php:354
 #: include/views/configuration.host.prototype.edit.php:361
 msgid "No encryption"
-msgstr ""
+msgstr "Bez šifrování"
 
 #: include/blocks.inc.php:744 include/blocks.inc.php:828 tr_status.php:676
 msgid "No events"
@@ -10601,7 +10601,7 @@ msgstr "Počet nepodporovaných položek v Zabbix databázi."
 
 #: include/classes/items/CHelpItems.php:891
 msgid "Number of unsupported items on the host."
-msgstr ""
+msgstr "Počet nepodporovaných položek na hostitele."
 
 #: include/blocks.inc.php:505
 msgid "Number of users (online)"
@@ -10610,7 +10610,7 @@ msgstr "Počet uživatelů (přihlášených)"
 #: include/classes/items/CHelpItems.php:261
 #: include/classes/items/CHelpItems.php:543
 msgid "Number of users logged in. Returns integer"
-msgstr ""
+msgstr "Počet přihlášení uživatelů. Návratová hodnota celé číslo"
 
 #: include/classes/items/CHelpItems.php:867
 msgid "Number of values stored in table HISTORY."
@@ -10647,7 +10647,7 @@ msgstr "Počet virtuálních serverů na VMware hypervizorovi, <url> - URL VMwar
 #: include/classes/items/CHelpItems.php:305
 #: include/classes/items/CHelpItems.php:587
 msgid "Number or percentage of inodes. Returns integer for number; float for percentage"
-msgstr ""
+msgstr "Počet nebo procentní podíl uzlů. návratová hodnota celé číslo pro počet; plovoucí číslo pro procento"
 
 #: include/forms.inc.php:426 include/items.inc.php:127
 #: include/triggers.inc.php:2054 include/views/configuration.item.edit.php:216
@@ -10838,21 +10838,21 @@ msgstr "Jen jedna uživatelská skupina může byt změněná naráz."
 #: app/views/monitoring.acknowledge.edit.php:58
 msgid "Only selected event"
 msgid_plural "Only selected events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Pouze vybraná událost"
+msgstr[1] "Pouze vybrané události"
+msgstr[2] "Pouze vybrané události"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
-msgstr ""
+msgstr "Pouze super administrátoři mohou vytvářet hodnoty map."
 
 #: include/classes/api/services/CValueMap.php:267
 msgid "Only super admins can delete value maps."
-msgstr ""
+msgstr "Pouze super administrátoři mohou odstraňovat hodnoty map."
 
 #: include/classes/api/services/CValueMap.php:386
 msgid "Only super admins can update value maps."
-msgstr ""
+msgstr "Pouze super administrátoři mohou aktualizovat hodnoty map."
 
 #: include/services.inc.php:265
 #, c-format
@@ -10874,7 +10874,7 @@ msgstr "Opera"
 #: include/classes/items/CHelpItems.php:233
 #: include/classes/items/CHelpItems.php:515
 msgid "Operating system information. Returns string"
-msgstr ""
+msgstr "Informace operačního systému. Návratová hodnota řetězec"
 
 #: actionconf.php:350
 #, c-format
@@ -11018,7 +11018,7 @@ msgstr "Další"
 #: include/classes/items/CHelpItems.php:105
 #: include/classes/items/CHelpItems.php:387
 msgid "Outgoing traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Odchozí statistiky provozu na síťovém rozhraní. Návratová hodnota celé číslo"
 
 #: include/views/configuration.item.edit.php:325
 #: include/views/configuration.item.edit.php:346
@@ -11235,24 +11235,24 @@ msgstr "PROBLÉM"
 #: include/views/configuration.host.prototype.edit.php:363
 #: include/views/configuration.host.prototype.edit.php:372
 msgid "PSK"
-msgstr ""
+msgstr "PSK"
 
 #: include/classes/api/services/CHost.php:1552
 #: include/classes/api/services/CProxy.php:665
 msgid "PSK cannot be empty."
-msgstr ""
+msgstr "PSK nemůže být prázdný."
 
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:781
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:367
 msgid "PSK identity"
-msgstr ""
+msgstr "PSK identita"
 
 #: include/classes/api/services/CHost.php:1548
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
-msgstr ""
+msgstr "PSK identita nemůže být prázdná."
 
 #: include/validate.inc.php:389
 msgid "Page received incorrect data"
@@ -11264,7 +11264,7 @@ msgstr "Parametr"
 
 #: include/classes/debug/CProfiler.php:158
 msgid "Parameters"
-msgstr ""
+msgstr "Parametry"
 
 #: include/views/configuration.host.discovery.edit.php:43
 #: include/views/configuration.host.prototype.edit.php:55
@@ -11345,7 +11345,7 @@ msgstr "Heslo je nedostupné pro uživatele s %1$s."
 #: include/classes/api/services/CMediatype.php:554
 #, c-format
 msgid "Password required for media type \"%1$s\"."
-msgstr ""
+msgstr "Heslo nutné pro typ médií \"%1$s\"."
 
 #: profile.php:119 users.php:201
 msgid "Password should not be empty"
@@ -11354,11 +11354,11 @@ msgstr "Heslo nemůže být prázdné"
 #: include/classes/debug/CProfiler.php:139
 #, c-format
 msgid "Peak memory usage: %1$s"
-msgstr ""
+msgstr "Vrchol využití paměti: %1$s"
 
 #: popup_trexpr.php:100
 msgid "Percentage"
-msgstr ""
+msgstr "Procento"
 
 #: popup_trexpr.php:346
 msgid "Percentile P of a period T is < N"
@@ -11517,7 +11517,7 @@ msgstr "Post"
 #: include/classes/setup/CSetupWizard.php:51
 #: include/classes/setup/CSetupWizard.php:339
 msgid "Pre-installation summary"
-msgstr ""
+msgstr "Shrnutí před instalací"
 
 #: include/views/administration.general.iconmap.edit.php:74
 #: include/views/administration.general.iconmap.edit.php:116
@@ -11637,7 +11637,7 @@ msgstr "Problémy"
 #: include/classes/items/CHelpItems.php:145
 #: include/classes/items/CHelpItems.php:427
 msgid "Process CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Procesové využití CPU v procentech. Návratová hodnota float"
 
 #: app/views/administration.proxy.edit.php:24
 #: app/views/administration.proxy.list.php:27 include/menu.inc.php:255
@@ -11724,7 +11724,7 @@ msgstr "Fronta"
 
 #: queue.php:66
 msgid "Queue of items to be updated"
-msgstr ""
+msgstr "Fronta položek, které mají být aktualizovány"
 
 #: include/hosts.inc.php:37
 msgid "RMCP+"
@@ -12096,7 +12096,7 @@ msgstr "Stahovat jen hlavičky"
 #: include/classes/items/CHelpItems.php:277
 #: include/classes/items/CHelpItems.php:559
 msgid "Retrieving contents of a file. Returns text"
-msgstr ""
+msgstr "Načítání obsahu souboru. Návratová hodnota text"
 
 #: include/views/general.warning.php:27
 msgid "Retry"
@@ -12104,7 +12104,7 @@ msgstr "Znovu zkusit"
 
 #: include/classes/items/CHelpItems.php:977
 msgid "Return first column of the first row of the SQL query result."
-msgstr ""
+msgstr "Vrátí první sloupec z prvního řádku výsledku dotazu SQL."
 
 #: include/classes/items/CHelpItems.php:631
 msgid "Returns ICMP ping response time in seconds. Example: 0.02"
@@ -12206,7 +12206,7 @@ msgstr "Spustí vzdálené příkazy na hostech"
 #: include/classes/items/CHelpItems.php:221
 #: include/classes/items/CHelpItems.php:503
 msgid "Run specified command on the host. Returns text result of the command"
-msgstr ""
+msgstr "Vykoná zadaný příkaz na hostiteli. Návratová hodnota textový výsledek příkazu"
 
 #: include/locales.inc.php:75
 msgid "Russian (ru_RU)"
@@ -12264,7 +12264,7 @@ msgstr "SMTP server"
 
 #: app/views/administration.mediatype.edit.php:60
 msgid "SMTP server port"
-msgstr ""
+msgstr "SMTP port serveru"
 
 #: include/hosts.inc.php:465 include/items.inc.php:287
 msgid "SNMP"
@@ -12284,7 +12284,7 @@ msgstr "SNMP OID"
 
 #: include/forms.inc.php:475
 msgid "SNMP OID like"
-msgstr ""
+msgstr "SNMP OID jako"
 
 #: disc_prototypes.php:96 host_discovery.php:75
 #: include/views/configuration.host.discovery.edit.php:109
@@ -12297,7 +12297,7 @@ msgstr "SNMP community"
 
 #: include/forms.inc.php:465
 msgid "SNMP community like"
-msgstr ""
+msgstr "SNMP komunity jako"
 
 #: include/views/configuration.host.edit.php:156
 #: include/views/configuration.host.edit.php:242
@@ -12332,7 +12332,7 @@ msgstr "SNMPv3 agent"
 #: include/classes/debug/CProfiler.php:134
 #, c-format
 msgid "SQL count: %1$s (selects: %2$s | executes: %3$s)"
-msgstr ""
+msgstr "SQL počet: %1$s (selecty: %2$s | vykonání: %3$s)"
 
 #: include/items.inc.php:1321
 #: include/views/configuration.host.discovery.edit.php:185
@@ -12429,7 +12429,7 @@ msgstr "Naplánovaná kontrola"
 #: include/views/js/common.item.edit.js.php:10
 #: include/views/js/configuration.item.massupdate.js.php:10
 msgid "Scheduling"
-msgstr ""
+msgstr "Plánování"
 
 #: include/audit.inc.php:41 include/screens.inc.php:36
 #: include/views/configuration.screen.constructor.edit.php:541
@@ -12561,17 +12561,17 @@ msgstr "Skript se jménem \"%1$s\" již existuje v menu cestě pro skript \"%2$s
 #: include/classes/api/services/CScript.php:395
 #: include/classes/api/services/CScript.php:437
 msgid "Script name cannot be empty."
-msgstr "Jméno skriptu nemůže být prázdné."
+msgstr "Script parametry"
 
 #: app/views/administration.mediatype.edit.php:106
 msgid "Script parameters"
-msgstr ""
+msgstr "Script parametry"
 
 #: include/classes/api/services/CMediatype.php:340
 #: include/classes/api/services/CMediatype.php:631
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
-msgstr ""
+msgstr "Script parametr \"%1$s\" chybí poslední nová řádka dat pro typ média \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:126
 msgid "Script profiler"
@@ -12728,11 +12728,11 @@ msgstr "Označené akce smazané"
 
 #: app/views/monitoring.acknowledge.edit.php:63
 msgid "Selected and all unacknowledged PROBLEM events"
-msgstr ""
+msgstr "Vybrané a všechny nepotvrzené PROBLÉM události"
 
 #: app/views/monitoring.acknowledge.edit.php:68
 msgid "Selected and all unacknowledged events"
-msgstr ""
+msgstr "Vybrané a všechny nepotvrzené události"
 
 #: include/views/js/configuration.sysmaps.js.php:209
 msgid "Selected elements"
@@ -12885,7 +12885,7 @@ msgstr "Sezení ukončené, prosím přihlaste se znovu."
 
 #: include/actions.inc.php:889
 msgid "Set host inventory mode"
-msgstr ""
+msgstr "Nastavení hostitelského inventáře"
 
 #: events.php:453 include/classes/screens/CScreenEvents.php:43
 #: include/classes/screens/CScreenHistory.php:149
@@ -13350,7 +13350,7 @@ msgstr "Styl"
 
 #: include/forms.inc.php:617
 msgid "Subfilter"
-msgstr ""
+msgstr "Podfiltr"
 
 #: app/views/administration.proxy.edit.php:120
 #: include/views/administration.auditacts.list.php:77
@@ -13372,7 +13372,7 @@ msgstr "Úspěšný audit"
 #: include/classes/items/CHelpItems.php:109
 #: include/classes/items/CHelpItems.php:391
 msgid "Sum of incoming and outgoing traffic statistics on network interface. Returns integer"
-msgstr ""
+msgstr "Součet příchozích a odchozích statistik provozu na síťové rozhraní. Návratová hodnota celé číslo"
 
 #: popup_trexpr.php:412
 msgid "Sum of values of a period T is < N"
@@ -13411,17 +13411,17 @@ msgstr "Příjmení"
 #: include/classes/items/CHelpItems.php:241
 #: include/classes/items/CHelpItems.php:523
 msgid "Swap in (from device into memory) statistics. Returns integer"
-msgstr ""
+msgstr "Swap in (ze zařízení do paměti) statistika. Návratová hodnota celé číslo"
 
 #: include/classes/items/CHelpItems.php:245
 #: include/classes/items/CHelpItems.php:527
 msgid "Swap out (from memory onto device) statistics. Returns integer"
-msgstr ""
+msgstr "Swap our (ze zařízení do paměti) statistika. Návratová hodnota celé číslo"
 
 #: include/classes/items/CHelpItems.php:249
 #: include/classes/items/CHelpItems.php:531
 msgid "Swap space size in bytes or in percentage from total. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "Swap velikost prostoru v bytech nebo v procentech z celkového počtu. Návratová hodnota celé číslo, pro byty; float pro procento"
 
 #: include/locales.inc.php:78
 msgid "Swedish (sv_SE)"
@@ -13434,7 +13434,7 @@ msgstr "Přepnutí autentizační metody způsobí ukončení všech sezení mim
 #: include/classes/items/CHelpItems.php:173
 #: include/classes/items/CHelpItems.php:455
 msgid "System boot time. Returns integer (Unix timestamp)"
-msgstr ""
+msgstr "Doba nastartování systému. Návratová hodnota celé číslo (Unix timestamp)"
 
 #: include/users.inc.php:83 include/views/administration.users.edit.php:155
 msgid "System default"
@@ -13447,12 +13447,12 @@ msgstr "Sytémová chyba."
 #: include/classes/items/CHelpItems.php:197
 #: include/classes/items/CHelpItems.php:479
 msgid "System host name. Returns string"
-msgstr ""
+msgstr "Název hostitelského systému. Návratová hodnota string"
 
 #: include/classes/items/CHelpItems.php:225
 #: include/classes/items/CHelpItems.php:507
 msgid "System statistics. Returns integer or float"
-msgstr ""
+msgstr "Systémové statistiky. Návratová hodnota celé číslo nebo plovoucí"
 
 #: app/views/monitoring.dashboard.view.php:98
 #: app/views/monitoring.widget.system.view.php:25 include/screens.inc.php:41
@@ -13462,7 +13462,7 @@ msgstr "Stav systému"
 #: include/classes/items/CHelpItems.php:217
 #: include/classes/items/CHelpItems.php:499
 msgid "System time. Returns integer with type as utc; string - with type as local"
-msgstr ""
+msgstr "Systémový čas. Návratová hodnota celé číslo s typem jako UTC; řetězec - s typem jako lokální"
 
 #: include/classes/items/CHelpItems.php:257
 #: include/classes/items/CHelpItems.php:539
@@ -13477,7 +13477,7 @@ msgstr "Čt"
 #: jsLoader.php:126
 msgctxt "Tuesday short"
 msgid "T"
-msgstr "\"%1$s.%2$s\" metoda musí být volaná bez \"auth\" parametru."
+msgstr "T"
 
 #: include/discovery.inc.php:64
 #: include/views/js/configuration.discovery.edit.js.php:171
@@ -13580,7 +13580,7 @@ msgstr "Propojení šablon"
 
 #: include/views/hostmacros.php:172
 msgid "Template macros"
-msgstr ""
+msgstr "Makra šablon"
 
 #: include/views/configuration.template.edit.php:73 templates.php:54
 msgid "Template name"
@@ -13713,7 +13713,7 @@ msgstr "Aplikace není objevena a již bude smazána v %1$s (%2$s %3$s)."
 
 #: include/views/configuration.application.list.php:92
 msgid "The application is not discovered anymore and will be deleted the next time discovery rule is processed."
-msgstr "Aplikace není objevena a již bude odstraněna při příštím objevovacím pravidle  bude zpracováno."
+msgstr "Aplikace není objevena a již bude odstraněna při příštím objevovacím pravidle bude zpracováno."
 
 #: include/classes/db/Db2DbBackend.php:41
 #: include/classes/db/MysqlDbBackend.php:35
@@ -13831,7 +13831,7 @@ msgstr "Tento rok"
 
 #: popup_trexpr.php:153
 msgid "Threshold"
-msgstr ""
+msgstr "Prahová hodnota"
 
 #: include/func.inc.php:217
 msgid "Thu"
@@ -13897,19 +13897,19 @@ msgstr "Časový posun"
 
 #: popup_trexpr.php:618
 msgid "Time to reach threshold estimated based on period T is < N"
-msgstr ""
+msgstr "Čas k dosažení prahové hodnoty odhadnuty na základě periody T je < N"
 
 #: popup_trexpr.php:628
 msgid "Time to reach threshold estimated based on period T is = N"
-msgstr ""
+msgstr "Čas k dosažení prahové hodnoty odhadnuty na základě periody T je = N"
 
 #: popup_trexpr.php:623
 msgid "Time to reach threshold estimated based on period T is > N"
-msgstr ""
+msgstr "Čas k dosažení prahové hodnoty odhadnuty na základě periody T je > N"
 
 #: popup_trexpr.php:633
 msgid "Time to reach threshold estimated based on period T is NOT N"
-msgstr ""
+msgstr "Čas k dosažení prahové hodnoty odhadnuty na základě periody T is NOT N"
 
 #: include/views/configuration.screen.constructor.edit.php:609
 msgid "Time type"
@@ -14141,7 +14141,7 @@ msgstr "Jméno spouštěče"
 
 #: include/views/monitoring.dashconf.php:107
 msgid "Trigger name like"
-msgstr ""
+msgstr "Trigger název jako"
 
 #: include/audit.inc.php:34
 #: include/views/configuration.trigger.prototype.edit.php:266
@@ -14156,7 +14156,7 @@ msgstr "Prototyp spouštěče \"%1$s\" obsahuje prototypy položek z různých p
 #: include/classes/import/CConfigurationImport.php:1109
 #, c-format
 msgid "Trigger prototype \"%1$s\" depends on trigger \"%2$s\", which does not exist."
-msgstr ""
+msgstr "Trigger prototyp \"%1$s\" závisí na spouštěči \"%2$s\", který neexistuje."
 
 #: include/classes/api/services/CTriggerPrototype.php:1459
 #, c-format
@@ -14169,7 +14169,7 @@ msgstr "Prototyp spouštěč přidaný"
 
 #: include/classes/api/services/CTriggerPrototype.php:1190
 msgid "Trigger prototype cannot be dependent on a trigger that is inherited from it."
-msgstr ""
+msgstr "Trigger prototyp nemůže být závislý na spoušťěči, který se z něj dědí."
 
 #: trigger_prototypes.php:238
 msgid "Trigger prototype deleted"
@@ -14224,11 +14224,11 @@ msgstr "Závažnost spouštěče"
 
 #: jsLoader.php:198
 msgid "Trigger status \"OK\""
-msgstr "\"OK\" status spouštěče"
+msgstr "Status spouštěče \"OK\""
 
 #: jsLoader.php:199
 msgid "Trigger status \"Problem\""
-msgstr "\"Problém\" status spouštěče"
+msgstr "Status spouštěče \"Problém\""
 
 #: triggers.php:209 triggers.php:272 tr_logform.php:126
 msgid "Trigger updated"
@@ -14393,7 +14393,7 @@ msgstr "Typ informace"
 
 #: include/classes/api/services/CItemGeneral.php:342
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
-msgstr ""
+msgstr "Typ informací musí být \"Numeric (unsigned)\" nebo \"Numeric (float)\" pro agregované položky."
 
 #: include/forms.inc.php:887
 msgid "Types"
@@ -14469,11 +14469,11 @@ msgstr "Ukrajinsky (uk_UA)"
 
 #: include/classes/core/CConfigFile.php:153
 msgid "Unable to create the configuration file."
-msgstr ""
+msgstr "Nelze vytvořit konfigurační soubor."
 
 #: include/classes/core/CConfigFile.php:150
 msgid "Unable to overwrite the existing configuration file."
-msgstr ""
+msgstr "Nelze přepsat existující konfigurační soubor."
 
 #: include/classes/db/DbBackend.php:63
 msgid "Unable to select configuration."
@@ -14509,7 +14509,7 @@ msgstr "Nedostupné pro uživatele s %1$s."
 
 #: include/views/administration.users.list.php:145
 msgid "Unblock"
-msgstr ""
+msgstr "Odblokovat"
 
 #: include/views/administration.users.list.php:145
 msgid "Unblock selected users?"
@@ -14902,7 +14902,7 @@ msgstr "Uživatel byl přidán"
 
 #: include/views/configuration.httpconf.edit.php:95
 msgid "User agent string"
-msgstr ""
+msgstr "Uživatelský řetězec agenta"
 
 #: include/views/administration.users.edit.php:386
 msgid "User can't change type for himself"
@@ -15238,7 +15238,7 @@ msgstr "VMware velikost privátní paměti virtuálního stroje, <url> - URL VMw
 
 #: include/classes/items/CHelpItems.php:763
 msgid "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
-msgstr ""
+msgstr "VMware virtual machine processor ready time %, <url> - VMware service URL, <uuid> - VMware virtual machine jméno hosta"
 
 #: include/classes/items/CHelpItems.php:767
 msgid "VMware virtual machine processor usage in Hz, <url> - VMware service URL, <uuid> - VMware virtual machine host name"
@@ -15355,12 +15355,12 @@ msgstr "Mapa hodnot byla smazána"
 #: include/classes/api/services/CValueMap.php:338
 #, c-format
 msgid "Value map is missing parameters: %1$s"
-msgstr ""
+msgstr "Hodnota mapy je chybějící parametr: %1$s"
 
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/api/services/CValueMap.php:423
 msgid "Value map name cannot be empty."
-msgstr ""
+msgstr "Hodnota názvu mapy nemůže být prázdná."
 
 #: adm.valuemapping.php:71
 msgid "Value map updated"
@@ -15798,12 +15798,12 @@ msgstr "Ano"
 
 #: include/views/reports.toptriggers.php:40
 msgid "Yesterday"
-msgstr ""
+msgstr "Včera"
 
 #: include/func.inc.php:1637
 #, c-format
 msgid "You are logged in as \"%1$s\"."
-msgstr ""
+msgstr "Jste přihlášeni jako \"%1$s\"."
 
 #: include/views/administration.users.edit.php:144
 msgid "You are not able to choose some of the languages, because locales for them are not installed on the web server."
@@ -15816,7 +15816,7 @@ msgstr "Není Vám dovolené měnit oprávnění pro uživatele \"%s\"."
 
 #: include/func.inc.php:1654
 msgid "You are not logged in"
-msgstr ""
+msgstr "Nejste přihlášen"
 
 #: popup.php:486
 msgid "You can not switch hosts for current selection."
@@ -15893,7 +15893,7 @@ msgstr "Zabbix Admin"
 
 #: app/views/layout.htmlpage.menu.php:50
 msgid "Zabbix Share"
-msgstr ""
+msgstr "Zabbix Share"
 
 #: include/users.inc.php:56
 msgid "Zabbix Super Admin"
@@ -15955,7 +15955,7 @@ msgstr "IP nebo port pro Zabbix server není nastavené!"
 #: include/classes/setup/CSetupWizard.php:47
 #: include/classes/setup/CSetupWizard.php:298
 msgid "Zabbix server details"
-msgstr ""
+msgstr "Podrobnosti Zabbix serveru"
 
 #: include/classes/html/CServerInfo.php:40
 msgid "Zabbix server info"
@@ -16003,11 +16003,11 @@ msgstr "[Nesprávná hodnota pro měsíc: \"%s\" ]"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:172
 #: include/classes/validators/CNewValidator.php:231
 msgid "a character string is expected"
-msgstr ""
+msgstr "řetězec znaků se očekává"
 
 #: include/forms.inc.php:617
 msgid "affects only filtered data"
-msgstr ""
+msgstr "ovlivňuje pouze filtrovaná data"
 
 #: include/hosts.inc.php:462
 msgid "agent"
@@ -16035,7 +16035,7 @@ msgstr "všechny média"
 
 #: include/classes/import/validators/CXmlValidatorGeneral.php:186
 msgid "an array is expected"
-msgstr ""
+msgstr "očekává se pole"
 
 #: include/views/monitoring.history.php:164
 msgid "as Blue"
@@ -16070,13 +16070,13 @@ msgstr "průměr"
 #: include/views/administration.general.trigger.options.edit.php:53
 #: include/views/administration.general.trigger.options.edit.php:61
 msgid "blinking"
-msgstr ""
+msgstr "blikající"
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:417
 #: include/classes/validators/CNewValidator.php:88
 msgid "cannot be empty"
-msgstr ""
+msgstr "nemůže být prázdný"
 
 #: include/classes/parsers/CConditionFormula.php:188
 #, c-format
@@ -16425,7 +16425,7 @@ msgstr "sekund"
 
 #: include/classes/html/CActionButtonList.php:89
 msgid "selected"
-msgstr ""
+msgstr "vybrané"
 
 #: include/views/configuration.services.edit.php:251
 msgid "short description"
@@ -16450,7 +16450,7 @@ msgstr "šablona ID \"%1$s\" je použitá %2$s krát"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:115
 #, c-format
 msgid "the tag \"%1$s\" is missing"
-msgstr ""
+msgstr "tag \"%1$s\" chybí"
 
 #: include/classes/api/services/CMap.php:362 include/events.inc.php:34
 #: include/events.inc.php:63
@@ -16463,7 +16463,7 @@ msgstr "pište zde pro vyhledávání"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2213
 msgid "unexpected end of interval"
-msgstr ""
+msgstr "neočekávaný konec intervalu"
 
 #: include/classes/parsers/CItemKey.php:62
 msgid "unexpected end of key"
@@ -16473,7 +16473,7 @@ msgstr "neočekávaný konec klíče"
 #: include/classes/import/validators/CXmlValidatorGeneral.php:129
 #, c-format
 msgid "unexpected tag \"%1$s\""
-msgstr ""
+msgstr "nečekaný tag \"%1$s\""
 
 #: include/classes/setup/CFrontendSetup.php:223
 #: include/classes/setup/CFrontendSetup.php:405
@@ -16483,7 +16483,7 @@ msgstr "neznámy"
 
 #: include/classes/import/validators/CXmlValidator.php:62
 msgid "unsupported version number"
-msgstr ""
+msgstr "nepodporované číslo verze"
 
 #: include/views/administration.general.macros.edit.php:43
 #: include/views/hostmacros.php:84
