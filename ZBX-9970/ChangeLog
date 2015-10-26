@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha4
 
 New features:
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-2678] implemented trigger description and URL popups in the dashboard's "Last 20 issues" and screen element's "Host group issues" and "Host issues" (Ivo)
 ..F....... [ZBX-2517] minimum period for time navigator set to 5 minutes; thanks to Zabbix community (Alexei)
 A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, Sasha)
@@ -214,6 +215,7 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 ..F....... [ZBX-9948] fixed graph prototype preview for pie charts (vitalijs)
@@ -908,6 +910,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 ..F....... [ZBX-9919] fixed y scale calculation for linear graphs (vitalijs)
@@ -2223,6 +2226,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
 ........S. [ZBX-9677] fixed compilation warnings in the escalator.c module (igors)
