@@ -1286,6 +1286,10 @@ class CLineGraphDraw extends CGraphDraw {
 	private function calculateTimeInterval() {
 		$timeInterval = ($this->gridPixels * $this->period) / $this->sizeX;
 		$intervals = [
+			['main' => 30, 'sub' => 1],								// 30 seconds and 1 second
+			['main' => 60, 'sub' => 5],								// 60 seconds and 5 seconds
+			['main' => 300, 'sub' => 10],							// 5 minuts and 10 seconds
+			['main' => 900, 'sub' => 30],							// 15 minuts and 30 seconds
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN],			// 1 hour and 1 minute
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 2],		// 1 hour and 2 minutes
 			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 5],		// 1 hour and 5 minutes
