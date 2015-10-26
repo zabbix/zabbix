@@ -3245,33 +3245,35 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
  *                                                                            *
  * Purpose: parses function name                                              *
  *                                                                            *
- * Parameters: expr      - [IN] the function expression: func(p1, p2,...)     *
- *             length    - [OUT] the function name length                     *
- *             param_pos - [OUT] the first parameter position relative to the *
- *                               function name                                *
+ * Parameters: expr     - [IN] the function expression: func(p1, p2,...)      *
+ *             length   - [OUT] the function name length                      *
+ *             next_pos - [OUT] position of the next character to parse.      *
+ *                              If function name was parsed successfully it   *
+ *                              contains position of the first parameter.     *
+ *                              Otherwise it contains position of the next    *
+ *                              character to check for possible function name.*
  *                                                                            *
- * Return value: SUCCEED - the function name was succesfully parsed           *
- *               FAIL    - failed to parse function name - either it contains *
- *                         invalid characters or is not followed with '('     *
+ * Return value: SUCCEED - the function name was successfully parsed          *
+ *               FAIL    - failed to parse function name                      *
  *                                                                            *
  ******************************************************************************/
-static int	function_parse_name(const char *expr, size_t *length, size_t *param_pos)
+static int	function_parse_name(const char *expr, size_t *length, size_t *next_pos)
 {
 	const char	*ptr;
+	int		ret = FAIL;
 
 	for (ptr = expr; SUCCEED == is_function_char(*ptr); ptr++)
 		;
 
-	if (ptr == expr)
-		return FAIL;
+	if (ptr != expr && '(' == *ptr)
+	{
+		*length = ptr - expr;
+		ret = SUCCEED;
+	}
 
-	if ('(' != *ptr)
-		return FAIL;
+	*next_pos = ptr - expr + 1;
 
-	*length = ptr - expr;
-	*param_pos = ptr - expr + 1;
-
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************
@@ -3585,22 +3587,29 @@ void	zbx_function_clean(zbx_function_t *func)
  *                                                                            *
  * Purpose: parses expression into function data                              *
  *                                                                            *
- * Parameters: func - [OUT] the function data                                 *
- *             expr - [IN] the expression to parse                            *
+ * Parameters: func   - [OUT] the function data                               *
+ *             expr   - [IN] the expression to parse                          *
+ *             length - [OUT] the length of parsed data.                      *
  *                                                                            *
- * Return value: SUCCEED - the expression was succesfully parsed              *
- *               FAIL    - failed to parse expression                         *
+ * Return value: SUCCEED - the expression was successfully parsed             *
+ *               FAIL    - the expression does not start with a function      *
  *                                                                            *
  ******************************************************************************/
 int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 {
-	size_t		params_alloc = 8, alloc = 0, offset = 0, param_pos, next_pos, len;
+	size_t		alloc = 0, offset = 0, param_pos, next_pos, len, next_func;
 	const char	*ptr = expr;
+	int		params_alloc = 8;
 
 	memset(func, '\0', sizeof(zbx_function_t));
 
 	if (FAIL == function_parse_name(ptr, &len, &next_pos))
+	{
+		*length = next_pos;
 		return FAIL;
+	}
+
+	next_func = next_pos;
 
 	zbx_strncpy_alloc(&func->name, &offset, &alloc, ptr, len);
 	func->params = (char **)zbx_malloc(NULL, sizeof(char *) * params_alloc);
@@ -3612,6 +3621,7 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 		if (SUCCEED != function_parse_param(ptr, &param_pos, &len, &next_pos))
 		{
 			zbx_function_clean(func);
+			*length = next_func;
 			return FAIL;
 		}
 
@@ -3640,9 +3650,10 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
  * Purpose: converts function data into string format based on the specified  *
  *          expression                                                        *
  *                                                                            *
- * Parameters: func - [IN] the function data                                  *
- *             expr - [IN] the template expression                            *
- *             out  - [OUT] the function data in string format                *
+ * Parameters: func     - [IN] the function data                              *
+ *             expr     - [IN] the template expression                        *
+ *             expr_len - [IN] the expression length                          *
+ *             out      - [OUT] the function data in string format            *
  *                                                                            *
  * Return value: SUCCEED - the function was successfully converted            *
  *               FAIL    - failed to parse expression                         *
@@ -3652,13 +3663,15 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
  *           data.                                                            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_function_tostr(const zbx_function_t *func, const char *expr, char **out)
+int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr_len, char **out)
 {
 	int		ret = FAIL, index = 0, quoted;
 	size_t		right, len, offset, next_pos, param_pos, next_offset;
 	char		*param;
 
-	*out = zbx_strdup(NULL, expr);
+	*out = zbx_malloc(NULL, expr_len + 1);
+	memcpy(*out, expr, expr_len);
+	(*out)[expr_len] = '\0';
 
 	if (FAIL == function_parse_name(*out, &len, &next_pos))
 		goto out;

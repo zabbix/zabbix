@@ -514,27 +514,33 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
-
-int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row, char **error)
+/******************************************************************************
+ *                                                                            *
+ * Function: substitute_formula_macros                                        *
+ *                                                                            *
+ * Purpose: substitutes lld macros in calculated item formula expression      *
+ *                                                                            *
+ * Parameters: data   - [IN/OUT] the expression                               *
+ *             jp_row - [IN] the lld data row                                 *
+ *             out  - [OUT] the function data in string format                *
+ *                                                                            *
+ ******************************************************************************/
+void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
 {
-	char		*exp, *tmp = *data, *e, *func, *key, *orig, *host = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, len, orig_alloc = 128, orig_offset = 0;
+	char		*exp, *tmp = *data, *e, *func, *key, *host = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, len;
 	zbx_function_t	funcdata;
 	int		i;
 
 	exp = zbx_malloc(NULL, exp_alloc);
-	orig = zbx_malloc(NULL, orig_alloc);
 
-	for (e = tmp; '\0' != *e; e++)
+	for (e = tmp; '\0' != *e; e += len)
 	{
 		if (FAIL == zbx_function_parse(&funcdata, e, &len))
 		{
-			zbx_chrcpy_alloc(&exp, &exp_alloc, &exp_offset, *e);
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, e, len);
 			continue;
 		}
-
-		zbx_strncpy_alloc(&orig, &orig_alloc, &orig_offset, e, len);
-		e += len - 1;
 
 		if (0 < funcdata.nparam)
 		{
@@ -557,21 +563,16 @@ int	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row, char *
 				substitute_discovery_macros(&funcdata.params[i], jp_row);
 		}
 
-		zbx_function_tostr(&funcdata, orig, &func);
+		zbx_function_tostr(&funcdata, e, len, &func);
 		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, func);
 
 		zbx_free(func);
-		orig_offset = 0;
 
 		zbx_function_clean(&funcdata);
 	}
 
-	zbx_free(orig);
-
 	zbx_free(*data);
 	*data = exp;
-
-	return SUCCEED;
 }
 
 static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const char *key_proto,
@@ -620,7 +621,7 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 		item->params = zbx_strdup(NULL, params_proto);
 		item->params_orig = NULL;
 		if (ITEM_TYPE_CALCULATED == type)
-			substitute_formula_macros(&item->params, jp_row, NULL);
+			substitute_formula_macros(&item->params, jp_row);
 		else
 			substitute_discovery_macros(&item->params, jp_row);
 		zbx_lrtrim(item->params, ZBX_WHITESPACE);
@@ -658,7 +659,7 @@ static void	lld_item_make(zbx_vector_ptr_t *items, const char *name_proto, const
 
 		buffer = zbx_strdup(buffer, params_proto);
 		if (ITEM_TYPE_CALCULATED == type)
-			substitute_formula_macros(&buffer, jp_row, NULL);
+			substitute_formula_macros(&buffer, jp_row);
 		else
 			substitute_discovery_macros(&buffer, jp_row);
 
