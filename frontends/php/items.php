@@ -1049,11 +1049,10 @@ elseif (((hasRequest('action') && getRequest('action') == 'item.massupdateform')
 	unset($data['itemTypes'][ITEM_TYPE_HTTPTEST]);
 
 	// valuemap
-	$data['valuemaps'] = DBfetchArray(DBselect(
-		'SELECT v.valuemapid,v.name FROM valuemaps v'
-	));
-
-	order_result($data['valuemaps'], 'name');
+	$data['valuemaps'] = API::ValueMap()->get([
+		'output' => ['valuemapid', 'name']
+	]);
+	CArrayHelper::sort($data['valuemaps'], ['name']);
 
 	if (!$data['delay_flex']) {
 		$data['delay_flex'][] = ['delay' => '', 'period' => '', 'type' => ITEM_DELAY_FLEX_TYPE_FLEXIBLE];
