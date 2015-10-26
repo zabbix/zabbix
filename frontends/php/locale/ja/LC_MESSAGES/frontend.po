@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-10-22 15:56+0300\n"
-"PO-Revision-Date: 2015-09-18 01:12+0300\n"
+"PO-Revision-Date: 2015-10-26 03:24+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1442531556.0\n"
+"X-POOTLE-MTIME: 1445822691.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -567,7 +567,7 @@ msgstr "エージェントの状態チェック。エージェントが使用可
 
 #: include/views/configuration.host.list.php:70
 msgid "Agent encryption"
-msgstr ""
+msgstr "エージェント暗号化"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
@@ -829,7 +829,7 @@ msgstr "少なくとも1つ以上のメンテナンス期間を作成する必�
 #: include/classes/api/services/CValueMap.php:488
 #, c-format
 msgid "At least one mapping should be given for value map \"%1$s\"."
-msgstr ""
+msgstr "値のマッピング\"%1$s\"には少なくとも1つ以上のマッピングを登録する必要があります。"
 
 #: include/classes/setup/CFrontendSetup.php:249
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1082,7 +1082,7 @@ msgstr "トリガーテンプレートごと"
 #: include/views/configuration.host.list.php:197
 #: include/views/configuration.host.list.php:211
 msgid "CERT"
-msgstr ""
+msgstr "証明書"
 
 #: triggers.php:376
 msgid "CONFIGURATION OF TRIGGERS"
@@ -2316,7 +2316,7 @@ msgstr "ホストを更新できません"
 
 #: include/classes/api/services/CHost.php:802
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
-msgstr ""
+msgstr "ホストの暗号化設定が更新できません。両方向の接続設定を指定する必要があります。"
 
 #: host_prototypes.php:193
 msgid "Cannot update host prototype"
@@ -2475,7 +2475,7 @@ msgstr "中央"
 #: include/views/configuration.host.prototype.edit.php:356
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Certificate"
-msgstr ""
+msgstr "証明書"
 
 #: include/classes/screens/CScreenBase.php:267
 #: include/classes/screens/CScreenBuilder.php:465
@@ -3045,24 +3045,24 @@ msgstr ""
 
 #: include/views/configuration.host.massupdate.php:372
 msgid "Connections"
-msgstr ""
+msgstr "接続"
 
 #: include/views/configuration.host.edit.php:774
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:360
 msgid "Connections from host"
-msgstr ""
+msgstr "ホストからの接続"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
-msgstr ""
+msgstr "プロキシからの接続"
 
 #: app/views/administration.proxy.edit.php:97
 #: include/views/configuration.host.edit.php:766
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:352
 msgid "Connections to host"
-msgstr ""
+msgstr "ホストへの接続"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3355,7 +3355,7 @@ msgstr "カスタムグラフ"
 #: include/views/configuration.item.massupdate.php:372
 #: include/views/configuration.item.prototype.edit.php:311
 msgid "Custom intervals"
-msgstr ""
+msgstr "更新間隔カスタマイズ"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
@@ -4557,7 +4557,7 @@ msgstr "ドロップダウンの選択を記憶する \"%1$s\""
 #: include/classes/api/services/CMediatype.php:450
 #, c-format
 msgid "Duplicate \"description\" value \"%1$s\" for media type."
-msgstr ""
+msgstr "メディアタイプのための\"description\"の値\"%1$s\"が重複しています。"
 
 #: include/classes/api/services/CItemPrototype.php:316
 #, c-format
@@ -4568,7 +4568,7 @@ msgstr "アイテムプロトタイプ\"%2$s\"内のアプリケーションプ�
 #: include/classes/api/services/CValueMap.php:437
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for value map."
-msgstr ""
+msgstr "値のマッピングの\"名前\"の値\"%1$s\"が重複しています。"
 
 #: include/classes/api/services/CTrigger.php:1479
 #, c-format
@@ -4610,7 +4610,7 @@ msgstr "マップ\"%s\"のマップ名が重複しています"
 #: include/classes/api/services/CValueMap.php:524
 #, c-format
 msgid "Duplicate mapping value \"%1$s\" for value map \"%2$s\"."
-msgstr ""
+msgstr "値のマッピング\"%2$s\"のマッピングさせた値\"%1$s\"が重複しています。"
 
 #: include/profiles.inc.php:91
 #, c-format
@@ -4795,7 +4795,7 @@ msgstr "マクロが空白です。"
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
-msgstr ""
+msgstr "メディアタイプIDが空白です。"
 
 #: include/classes/api/services/CHostPrototype.php:222
 msgid "Empty name for group prototype."
@@ -4818,7 +4818,7 @@ msgstr "名前が空白です。"
 #: include/classes/api/services/CValueMap.php:516
 #, c-format
 msgid "Empty new value in value map \"%1$s\"."
-msgstr ""
+msgstr "値のマッピング\"%1$s\"の新しい値が空白です。"
 
 #: include/classes/api/services/CImage.php:369
 msgid "Empty parameters"
@@ -4843,7 +4843,7 @@ msgstr "期間が空白です。"
 
 #: include/classes/api/services/CValueMap.php:396
 msgid "Empty value map ID."
-msgstr ""
+msgstr "値のマッピングIDが空白です。"
 
 #: include/classes/api/services/CHttpTest.php:298
 msgid "Empty web scenario ID."
@@ -4997,7 +4997,7 @@ msgstr "有効"
 #: include/views/configuration.host.massupdate.php:393
 #: include/views/configuration.host.prototype.edit.php:388
 msgid "Encryption"
-msgstr ""
+msgstr "暗号化"
 
 #: include/locales.inc.php:52
 msgid "English (en_GB)"
@@ -5317,7 +5317,7 @@ msgstr "フィールド\"%1$s\"は必須です。"
 #: include/classes/api/services/CMediatype.php:807
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
-msgstr ""
+msgstr "メディアタイプ\"%2$s\"のためのフィールド\"%1$s\"が設定されていません。"
 
 #: include/validate.inc.php:220
 #, c-format
@@ -5337,7 +5337,7 @@ msgstr "フィールド\"%1$s\"は文字列ではありません。"
 #: include/classes/api/services/CMediatype.php:801
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
-msgstr ""
+msgstr "メディアタイプ\"%2$s\"のためのフィールド\"%1$s\"を指定してください。"
 
 #: include/validate.inc.php:289
 #, c-format
@@ -5455,7 +5455,7 @@ msgstr "第1週"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
-msgstr ""
+msgstr "近似関数"
 
 #: include/views/js/configuration.sysmaps.js.php:35
 msgid "Fit to map"
@@ -5473,7 +5473,7 @@ msgstr "固定"
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:7
 msgid "Flexible"
-msgstr ""
+msgstr "個別設定"
 
 #: include/views/configuration.httpconf.popup.php:100
 msgid "Follow redirects"
@@ -5485,19 +5485,19 @@ msgstr "ゲストのパスワードは空白である必要があります"
 
 #: popup_trexpr.php:598
 msgid "Forecast for next t seconds based on period T is < N"
-msgstr ""
+msgstr "期間Tをもとにした次のt秒の予測値 < N"
 
 #: popup_trexpr.php:608
 msgid "Forecast for next t seconds based on period T is = N"
-msgstr ""
+msgstr "期間Tをもとにした次のt秒の予測値 = N"
 
 #: popup_trexpr.php:603
 msgid "Forecast for next t seconds based on period T is > N"
-msgstr ""
+msgstr "期間Tをもとにした次のt秒の予測値 > N"
 
 #: popup_trexpr.php:613
 msgid "Forecast for next t seconds based on period T is NOT N"
-msgstr ""
+msgstr "期間Tをもとにした次のt秒の予測値 NOT N"
 
 #: include/items.inc.php:1323 include/views/configuration.item.edit.php:200
 #: include/views/configuration.item.prototype.edit.php:198
@@ -7358,7 +7358,7 @@ msgstr "スクリーンの要素の最大列数が正しくありません。"
 
 #: include/classes/api/services/CMediatype.php:387
 msgid "Incorrect media type ID."
-msgstr ""
+msgstr "メディアタイプIDが正しくありません。"
 
 #: include/classes/api/services/CScript.php:532
 #, c-format
@@ -7655,7 +7655,7 @@ msgstr "符号なし整数フィールド\"%2$s\"の値\"%1$s\"が正しくあ�
 #: include/classes/api/services/CMediatype.php:782
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
-msgstr ""
+msgstr "メディアタイプ\"%3$s\"のためのフィールド\"%2$s\"内の値\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:417
@@ -7672,28 +7672,28 @@ msgstr "フィールド\"%1$s\"の値が正しくありません: 空の値を�
 
 #: include/classes/api/services/CValueMap.php:397
 msgid "Incorrect value map ID."
-msgstr ""
+msgstr "値のマッピングIDが正しくありません。"
 
 #: include/classes/api/services/CHost.php:1557
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
-msgstr ""
+msgstr "PSKフィールドに利用された値が正しくありません。16進文字列で構成されていません。"
 
 #: include/classes/api/services/CHost.php:1540
 msgid "Incorrect value used for connections from host field."
-msgstr ""
+msgstr "ホストからの接続に指定された値が正しくありません。"
 
 #: include/classes/api/services/CProxy.php:651
 msgid "Incorrect value used for connections from proxy field."
-msgstr ""
+msgstr "プロキシからの接続に指定された値が正しくありません。"
 
 #: include/classes/api/services/CHost.php:1536
 msgid "Incorrect value used for connections to host field."
-msgstr ""
+msgstr "ホストへの接続に指定された値が正しくありません。"
 
 #: include/classes/api/services/CProxy.php:646
 msgid "Incorrect value used for connections to proxy field."
-msgstr ""
+msgstr "プロキシへの接続に指定された値が正しくありません。"
 
 #: include/classes/api/services/CProxy.php:720
 #: include/classes/api/services/CProxy.php:818
@@ -7906,7 +7906,7 @@ msgstr "1つ目のパラメータが正しくありません。"
 #: include/classes/validators/CItemDelayFlexValidator.php:73
 #, c-format
 msgid "Invalid flexible interval delay: \"%1$s\" exceeds maximum delay of \"%2$s\"."
-msgstr ""
+msgstr "更新間隔の個別設定が正しくありません: \"%1$s\"が\"%2$s\"の最大更新間隔を超えています。"
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid fourth parameter."
@@ -7923,97 +7923,97 @@ msgstr "マクロ\"%1$s\"のhostidが正しくありません。"
 #: items.php:601
 #, c-format
 msgid "Invalid interval \"%1$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません。"
 
 #: include/classes/api/services/CItemGeneral.php:390
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
-msgstr ""
+msgstr "更新間隔\"%1$s\": %2$sが正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:306
 #: include/classes/validators/CItemDelayFlexValidator.php:321
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hour step \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 時間間隔\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:269
 #: include/classes/validators/CItemDelayFlexValidator.php:282
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hours \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 時間\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:375
 #: include/classes/validators/CItemDelayFlexValidator.php:390
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minute step \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 分間隔\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:338
 #: include/classes/validators/CItemDelayFlexValidator.php:351
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minutes \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 分\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:127
 #: include/classes/validators/CItemDelayFlexValidator.php:140
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 日付\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:165
 #: include/classes/validators/CItemDelayFlexValidator.php:180
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day step \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 日間隔\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:446
 #: include/classes/validators/CItemDelayFlexValidator.php:461
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid second step \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 秒間隔\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:408
 #: include/classes/validators/CItemDelayFlexValidator.php:421
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid seconds \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 秒\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:198
 #: include/classes/validators/CItemDelayFlexValidator.php:211
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 曜日\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:236
 #: include/classes/validators/CItemDelayFlexValidator.php:251
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day step \"%2$s\"."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 曜日間隔\"%2$s\"が正しくありません。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:292
 #, c-format
 msgid "Invalid interval \"%1$s\": starting hour must be less or equal to ending hour."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 開始時の値は終了時より小さいか同じにしてください。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:361
 #, c-format
 msgid "Invalid interval \"%1$s\": starting minute must be less or equal to ending minute."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 開始分の値は終了分より小さいか同じにしてください。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:151
 #, c-format
 msgid "Invalid interval \"%1$s\": starting month day must be less or equal to ending month day."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 開始日の値は終了日より小さいか同じにしてください。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:432
 #, c-format
 msgid "Invalid interval \"%1$s\": starting second must be less or equal to ending second."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 開始秒の値は終了秒より小さいか同じにしてください。"
 
 #: include/classes/validators/CItemDelayFlexValidator.php:222
 #, c-format
 msgid "Invalid interval \"%1$s\": starting week day must be less or equal to ending week day."
-msgstr ""
+msgstr "更新間隔\"%1$s\"が正しくありません: 開始曜日の値は終了曜日より小さいか同じにしてください。"
 
 #: include/classes/api/services/CDiscoveryRule.php:42
 #, c-format
@@ -8116,7 +8116,7 @@ msgstr "問題"
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:377
 msgid "Issuer"
-msgstr ""
+msgstr "発行者"
 
 #: include/classes/api/services/CUser.php:141
 msgid "It is not possible to filter by user password."
@@ -9079,7 +9079,7 @@ msgstr "マッピング文字列"
 #: include/classes/api/services/CValueMap.php:501
 #, c-format
 msgid "Mapping is missing parameters: %1$s for value map \"%2$s\"."
-msgstr ""
+msgstr "マッピングされた値がありません: 値のマッピング\"%2$s\"の%1$s。"
 
 #: include/views/administration.general.iconmap.edit.php:124
 #: include/views/administration.general.valuemapping.edit.php:71
@@ -9232,7 +9232,7 @@ msgstr[0] "メディアタイプを有効にしました"
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
 msgid "Media type is missing parameters: %1$s"
-msgstr ""
+msgstr "メディアタイプがパラメータに設定されていません: %1$s"
 
 #: app/controllers/CControllerMediatypeUpdate.php:143
 msgid "Media type updated"
@@ -9347,7 +9347,7 @@ msgstr "最小の深刻度"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] ""
+msgstr[0] "表示できる最小の期間は%1$s分です。"
 
 #: include/views/common.filter.trigger.php:71
 #: include/views/configuration.sysmap.edit.php:149
@@ -9713,7 +9713,7 @@ msgstr "ホストのプロトタイプに\"%1$s\"が定義されていません�
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
 msgid "No \"%1$s\" given for media type."
-msgstr ""
+msgstr "メディアタイプに\"%1$s\"が定義されていません。"
 
 #: include/classes/api/services/CScreen.php:455
 #, c-format
@@ -9728,7 +9728,7 @@ msgstr "テンプレートスクリーンに\"%1$s\"が定義されていませ�
 #: include/classes/api/services/CValueMap.php:395
 #, c-format
 msgid "No \"%1$s\" given for value map."
-msgstr ""
+msgstr "値のマッピングに\"%1$s\"が定義されていません。"
 
 #: include/classes/api/services/CHttpTest.php:297
 #, c-format
@@ -9888,7 +9888,7 @@ msgstr "ディスカバリルールIDが設定されていません。"
 #: include/views/configuration.host.prototype.edit.php:354
 #: include/views/configuration.host.prototype.edit.php:361
 msgid "No encryption"
-msgstr ""
+msgstr "暗号なし"
 
 #: include/blocks.inc.php:744 include/blocks.inc.php:828 tr_status.php:676
 msgid "No events"
@@ -10702,15 +10702,15 @@ msgstr[0] "選択したイベントのみ"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
-msgstr ""
+msgstr "特権管理者のみが値のマッピングを作成できます。"
 
 #: include/classes/api/services/CValueMap.php:267
 msgid "Only super admins can delete value maps."
-msgstr ""
+msgstr "特権管理者のみが値のマッピングを削除できます。"
 
 #: include/classes/api/services/CValueMap.php:386
 msgid "Only super admins can update value maps."
-msgstr ""
+msgstr "特権管理者のみが値のマッピングを更新できます。"
 
 #: include/services.inc.php:265
 #, c-format
@@ -11093,24 +11093,24 @@ msgstr "障害"
 #: include/views/configuration.host.prototype.edit.php:363
 #: include/views/configuration.host.prototype.edit.php:372
 msgid "PSK"
-msgstr ""
+msgstr "PSK"
 
 #: include/classes/api/services/CHost.php:1552
 #: include/classes/api/services/CProxy.php:665
 msgid "PSK cannot be empty."
-msgstr ""
+msgstr "PSKを設定してください。"
 
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:781
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:367
 msgid "PSK identity"
-msgstr ""
+msgstr "PSKユーザー名"
 
 #: include/classes/api/services/CHost.php:1548
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
-msgstr ""
+msgstr "PSKユーザー名を設定してください。"
 
 #: include/validate.inc.php:389
 msgid "Page received incorrect data"
@@ -11203,7 +11203,7 @@ msgstr "ユーザーのパスワードに%1$sは使用できません。"
 #: include/classes/api/services/CMediatype.php:554
 #, c-format
 msgid "Password required for media type \"%1$s\"."
-msgstr ""
+msgstr "メディアタイプ\"%1$s\"にはパスワードが必要です。"
 
 #: profile.php:119 users.php:201
 msgid "Password should not be empty"
@@ -12283,7 +12283,7 @@ msgstr "スケジュールされたチェック時刻"
 #: include/views/js/common.item.edit.js.php:10
 #: include/views/js/configuration.item.massupdate.js.php:10
 msgid "Scheduling"
-msgstr ""
+msgstr "定期設定"
 
 #: include/audit.inc.php:41 include/screens.inc.php:36
 #: include/views/configuration.screen.constructor.edit.php:541
@@ -12417,13 +12417,13 @@ msgstr "スクリプト名は必須項目です。"
 
 #: app/views/administration.mediatype.edit.php:106
 msgid "Script parameters"
-msgstr ""
+msgstr "スクリプトパラメータ"
 
 #: include/classes/api/services/CMediatype.php:340
 #: include/classes/api/services/CMediatype.php:631
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
-msgstr ""
+msgstr "メディアタイプ\"%2$s\"のためのスクリプトパラメータ\"%1$s\"に最後の改行がありません。"
 
 #: include/classes/debug/CProfiler.php:126
 msgid "Script profiler"
@@ -13673,7 +13673,7 @@ msgstr "今年"
 
 #: popup_trexpr.php:153
 msgid "Threshold"
-msgstr ""
+msgstr "閾値"
 
 #: include/func.inc.php:217
 msgid "Thu"
@@ -13739,19 +13739,19 @@ msgstr "タイムシフト"
 
 #: popup_trexpr.php:618
 msgid "Time to reach threshold estimated based on period T is < N"
-msgstr ""
+msgstr "期間Tをもとにした閾値への予想到達時間 < N"
 
 #: popup_trexpr.php:628
 msgid "Time to reach threshold estimated based on period T is = N"
-msgstr ""
+msgstr "期間Tをもとにした閾値への予想到達時間 = N"
 
 #: popup_trexpr.php:623
 msgid "Time to reach threshold estimated based on period T is > N"
-msgstr ""
+msgstr "期間Tをもとにした閾値への予想到達時間 > N"
 
 #: popup_trexpr.php:633
 msgid "Time to reach threshold estimated based on period T is NOT N"
-msgstr ""
+msgstr "期間Tをもとにした閾値への予想到達時間 NOT N"
 
 #: include/views/configuration.screen.constructor.edit.php:609
 msgid "Time type"
@@ -15185,12 +15185,12 @@ msgstr "値のマッピングを削除しました"
 #: include/classes/api/services/CValueMap.php:338
 #, c-format
 msgid "Value map is missing parameters: %1$s"
-msgstr ""
+msgstr "値のマッピングがパラメータに設定されていません: %1$s"
 
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/api/services/CValueMap.php:423
 msgid "Value map name cannot be empty."
-msgstr ""
+msgstr "値のマッピングの名前を設定してください。"
 
 #: adm.valuemapping.php:71
 msgid "Value map updated"
@@ -16289,7 +16289,7 @@ msgstr "検索文字列を入力"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2213
 msgid "unexpected end of interval"
-msgstr ""
+msgstr "更新間隔の末尾が間違っています"
 
 #: include/classes/parsers/CItemKey.php:62
 msgid "unexpected end of key"
