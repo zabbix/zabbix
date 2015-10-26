@@ -853,6 +853,17 @@ class C30XmlValidator {
 						]]
 					]]
 				]]
+			]],
+			'value_maps' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'value_map', 'rules' => [
+				'value_map' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'mappings' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'mapping', 'rules' => [
+						'mapping' =>				['type' => XML_ARRAY, 'rules' => [
+							'value' =>					['type' => XML_STRING | XML_REQUIRED],
+							'newvalue' =>				['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]]
+				]]
 			]]
 		]];
 
