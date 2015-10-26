@@ -57,21 +57,21 @@ class CConditionValidator extends CValidator {
 	 * @return bool
 	 */
 	public function validate($object) {
-		// get triggers count in formula
-		$triggers_count = 0;
-		foreach ($object['conditions'] as $condition) {
-			if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER
-				|| $condition['conditiontype'] == CONDITION_TYPE_TRIGGER_NAME) {
-
-				$triggers_count++;
+		if ($object['evaltype'] == CONDITION_EVAL_TYPE_AND) {
+			// get triggers count in formula
+			$trigger_count = 0;
+			foreach ($object['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER) {
+					$trigger_count++;
+				}
 			}
-		}
 
-		// check if multiple triggers are compared with AND
-		if (($triggers_count > 1) && ($object['evaltype'] == CONDITION_EVAL_TYPE_AND)) {
-			$this->error($this->messageAndWithSeveralTriggers);
+			// check if multiple triggers are compared with AND
+			if ($trigger_count > 1) {
+				$this->error($this->messageAndWithSeveralTriggers);
 
-			return false;
+				return false;
+			}
 		}
 
 		// validate only custom expressions
