@@ -756,6 +756,7 @@ class CTriggerPrototype extends CTriggerGeneral {
 				}
 			}
 
+			$expression = '';
 			if ($expressionChanged) {
 				DB::delete('functions', ['triggerid' => $triggerPrototype['triggerid']]);
 
@@ -772,9 +773,6 @@ class CTriggerPrototype extends CTriggerGeneral {
 				if (!isset($triggerPrototype['dependencies'])) {
 					$triggerPrototype['dependencies'] = $dbTriggerPrototype['dependencies'];
 				}
-			}
-			else {
-				$expression = $triggerPrototype['expression'];
 			}
 
 			$triggerPrototypeUpdate = $triggerPrototype;
