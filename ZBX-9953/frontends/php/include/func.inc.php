@@ -2143,8 +2143,7 @@ function hasErrorMesssages() {
 }
 
 /**
- * Check if all keys from $keys exist in $array.
- * If some keys are missing return array of missing keys, empty array() otherwise.
+ * Return array of values that are in $keys but are not in keys of $array.
  *
  * @param array $array
  * @param array $keys
