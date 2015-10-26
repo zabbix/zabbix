@@ -544,19 +544,23 @@ void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
 
 		if (0 < funcdata.nparam)
 		{
-			parse_host_key(funcdata.params[0], &host, &key);
-			substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
+			if (SUCCEED == parse_host_key(funcdata.params[0], &host, &key))
+			{
+				zbx_free(funcdata.params[0]);
+				substitute_key_macros(&key, NULL, NULL, jp_row, MACRO_TYPE_ITEM_KEY, NULL, 0);
 
-			if (NULL != host)
-			{
-				funcdata.params[0] = zbx_dsprintf(funcdata.params[0], "%s:%s", host, key);
-				zbx_free(host);
-				zbx_free(key);
-			}
-			else
-			{
-				funcdata.params[0] = key;
-				key = NULL;
+				if (NULL != host)
+				{
+					funcdata.params[0] = zbx_dsprintf(NULL, "%s:%s", host, key);
+					zbx_free(host);
+					zbx_free(key);
+				}
+				else
+				{
+
+					funcdata.params[0] = key;
+					key = NULL;
+				}
 			}
 
 			for (i = 1; i < funcdata.nparam; i++)

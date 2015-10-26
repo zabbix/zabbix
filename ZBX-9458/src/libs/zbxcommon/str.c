@@ -3247,11 +3247,12 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
  *                                                                            *
  * Parameters: expr     - [IN] the function expression: func(p1, p2,...)      *
  *             length   - [OUT] the function name length                      *
- *             next_pos - [OUT] position of the next character to parse.      *
+ *             next_pos - [OUT] position of the next character to parse       *
  *                              If function name was parsed successfully it   *
  *                              contains position of the first parameter.     *
  *                              Otherwise it contains position of the next    *
- *                              character to check for possible function name.*
+ *                              character to check for possible function name *
+ *                              or position of the terminating zero character.*
  *                                                                            *
  * Return value: SUCCEED - the function name was successfully parsed          *
  *               FAIL    - failed to parse function name                      *
@@ -3271,7 +3272,11 @@ static int	function_parse_name(const char *expr, size_t *length, size_t *next_po
 		ret = SUCCEED;
 	}
 
-	*next_pos = ptr - expr + 1;
+	*next_pos = ptr - expr;
+
+	/* return position of the next unparsed character or the terminating zero character */
+	if ('\0' != *ptr)
+		(*next_pos)++;
 
 	return ret;
 }
@@ -3286,11 +3291,10 @@ static int	function_parse_name(const char *expr, size_t *length, size_t *next_po
  *                             parameter to parse : "p1", p3, p4)             *
  *             length   - [OUT] the parameter length including enclosing      *
  *                              quotes and excluding trailing whitespace      *
- *             next_pos - [OUT] the next parameter position relative to the   *
- *                              current parameter. 0 if this was the last     *
- *                              parameter.                                    *
+ *             next_pos - [OUT] position of the next parameter or the ending  *
+ *                              ')'                                           *
  *                                                                            *
- * Return value: SUCCEED - the parameter was succesfully parsed               \*
+ * Return value: SUCCEED - the parameter was successfully parsed              *
  *               FAIL    - failed to parse parameter                          *
  *                                                                            *
  ******************************************************************************/
@@ -3343,11 +3347,10 @@ static int	function_parse_quoted_param(const char *expr, size_t *length, size_t 
  *                             parameter to parse : p1, p3, p4)               *
  *             length   - [OUT] the parameter length excluding the trailing   *
  *                              whitespace                                    *
- *             next_pos - [OUT] the next parameter position relative to the   *
- *                              current parameter. 0 if this was the last     *
- *                              parameter.                                    *
+ *             next_pos - [OUT] position of the next parameter or the ending  *
+ *                              ')'                                           *
  *                                                                            *
- * Return value: SUCCEED - the parameter was succesfully parsed               *
+ * Return value: SUCCEED - the parameter was successfully parsed              *
  *               FAIL    - failed to parse parameter                          *
  *                                                                            *
  ******************************************************************************/
@@ -3391,11 +3394,10 @@ out:
  *                               whitespace                                   *
  *             length    - [OUT] the parameter length excluding trailing      *
  *                               whitespace                                   *
- *             next_pos  - [OUT] the next parameter position relative to the  *
- *                               expression. 0 if this was the last           *
- *                               parameter.                                   *
+ *             next_pos  - [OUT] the next parameter position, 0 if there are  *
+ *                               no more parameters to parse.                 *
  *                                                                            *
- * Return value: SUCCEED - the parameter was succesfully parsed               *
+ * Return value: SUCCEED - the parameter was successfully parsed              *
  *               FAIL    - failed to parse parameter                          *
  *                                                                            *
  ******************************************************************************/
@@ -3414,6 +3416,8 @@ static int function_parse_param(const char *expr, size_t *param_pos, size_t *len
 	else
 		ret = function_parse_unquoted_param(ptr, length, next_pos);
 
+	/* adjust next_pos to be relative from expression, not parameter */
+	/* by adding leading whitespace length                           */
 	if (0 != *next_pos)
 		*next_pos += *param_pos;
 
@@ -3439,7 +3443,7 @@ static char	*function_unqote_param_dyn(const char *param, size_t len)
 
 	out = (char *)zbx_malloc(NULL, len + 1);
 
-	if ('"' != *param)
+	if (0 == len || '"' != *param)
 	{
 		/* unquoted parameter - simply copy it */
 		memcpy(out, param, len);
@@ -3451,7 +3455,7 @@ static char	*function_unqote_param_dyn(const char *param, size_t len)
 		const char	*pin;
 		char		*pout = out;
 
-		for (pin = param + 1; pin - param < len - 1; pin++)
+		for (pin = param + 1; (size_t)(pin - param) < len - 1; pin++)
 		{
 			if ('\\' == pin[0] && '"' == pin[1])
 				pin++;
@@ -3539,7 +3543,7 @@ static char	*function_quote_param_dyn(const char *param, int quoted)
 	}
 	else
 	{
-		/* quoting is required - apply the eclosing quotes and escape " with \" sequences */
+		/* quoting is required - apply the enclosing quotes and escape " with \" sequences */
 		const char	*pin = param;
 		char		*pout = out;
 
@@ -3594,6 +3598,11 @@ void	zbx_function_clean(zbx_function_t *func)
  * Return value: SUCCEED - the expression was successfully parsed             *
  *               FAIL    - the expression does not start with a function      *
  *                                                                            *
+ * Comments: If the function fails, the number of characters returned in      *
+ *           length are guaranteed not to be a part of another function.      *
+ *           So even if zbx_function_parse() failed the cursor can be safely  *
+ *           moved by length characters.                                      *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 {
@@ -3625,7 +3634,8 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 			return FAIL;
 		}
 
-		if (')' == ptr[next_pos] && 0 == len &&  0 == func->nparam)
+		/* if the only parameter is empty - it's a function without parameters */
+		if (0 == len && ')' == ptr[next_pos] && 0 == func->nparam)
 			break;
 
 		if (params_alloc == func->nparam)
@@ -3689,11 +3699,12 @@ int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr
 		if (SUCCEED != function_parse_param(*out + next_pos, &param_pos, &len, &next_offset))
 			goto out;
 
-		/* the param_pos and next_offset values are relative offsets from next_pos - */
-		/* convert to the absolute positions from the expression beginning           */
+		/* the param_pos and next_offset values are relative offsets from next_pos, */
+		/* convert to the absolute positions from the expression start              */
 		param_pos += next_pos;
 		next_pos += next_offset;
 
+		/* if the only parameter is empty - it's a function without parameters */
 		if (')' == (*out)[next_pos] && 0 == len &&  0 == func->nparam)
 			break;
 
@@ -3704,6 +3715,7 @@ int	zbx_function_tostr(const zbx_function_t *func, const char *expr, size_t expr
 		quoted = ('"' == (*out)[param_pos] ? 1 : 0);
 		param = function_quote_param_dyn(func->params[index++], quoted);
 		zbx_replace_string(out, param_pos, &right, param);
+		zbx_free(param);
 
 		/* recalculate next parameter position in the updated expression */
 		next_pos = right + offset;
