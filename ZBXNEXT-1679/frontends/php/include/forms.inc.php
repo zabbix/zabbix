@@ -1244,16 +1244,23 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	// valuemapid
 	if ($data['limited']) {
-		if (!empty($data['valuemapid'])) {
-			if ($map_data = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($data['valuemapid'])))) {
-				$data['valuemaps'] = $map_data['name'];
+		if ($data['valuemapid'] != 0) {
+			$valuemaps = API::ValueMap()->get([
+				'output' => ['name'],
+				'valuemapids' => [$data['valuemapid']]
+			]);
+
+			if ($valuemaps) {
+				$data['valuemaps'] = $valuemaps[0]['name'];
 			}
 		}
 	}
 	else {
-		$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.* FROM valuemaps v'));
+		$data['valuemaps'] = API::ValueMap()->get([
+			'output' => ['valemapid', 'name']
+		]);
 
-		order_result($data['valuemaps'], 'name');
+		CArrayHelper::sort($data['valuemaps'], ['name']);
 	}
 
 	// possible host inventories

@@ -463,6 +463,7 @@ class CConfigurationExport {
 			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
 			 * value map IDs that should not be selected again.
 			 */
+
 			$valuemaps = $this->data['valueMaps'];
 
 			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
@@ -576,32 +577,57 @@ class CConfigurationExport {
 
 		// gather item prototypes
 		$prototypes = API::ItemPrototype()->get([
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'output' => $this->dataFields['discoveryrule'],
-			'selectApplications' => API_OUTPUT_EXTEND,
+			'selectApplications' => ['name'],
 			'selectApplicationPrototypes' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true
 		]);
 
-		// gather value maps
-		$valueMaps = [];
+		// Gather value maps. Value map IDs that are zeroes, should be skipped.
+		$valuemapids = zbx_objectValues($prototypes, 'valuemapid');
 
-		$dbValueMaps = DBselect(
-			'SELECT vm.valuemapid, vm.name FROM valuemaps vm'.
-			' WHERE '.dbConditionInt('vm.valuemapid', zbx_objectValues($prototypes, 'valuemapid'))
-		);
+		foreach ($valuemapids as $valuemapid) {
+			if ($valuemapid == 0) {
+				unset($valuemapids[$valuemapid]);
+			}
+		}
 
-		while ($valueMap = DBfetch($dbValueMaps)) {
-			$valueMaps[$valueMap['valuemapid']] = $valueMap['name'];
+		$valuemapids = array_combine($valuemapids, $valuemapids);
+
+		if ($this->data['valueMaps']) {
+			/*
+			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
+			 * value map IDs that should not be selected again.
+			 */
+
+			$valuemaps = $this->data['valueMaps'];
+
+			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
+				if (array_key_exists($valuemapid, $valuemapids)) {
+					unset($valuemapids[$valuemapid]);
+				}
+			}
+		}
+
+		if ($valuemapids) {
+			$valuemaps = API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'selectMappings' => ['value', 'newvalue'],
+				'valuemapids' => $valuemapids,
+				'preservekeys' => true
+			]);
+
+			$this->data['valueMaps'] = zbx_array_merge($this->data['valueMaps'], $valuemaps);
 		}
 
 		foreach ($prototypes as $prototype) {
 			$prototype['valuemap'] = [];
 
 			if ($prototype['valuemapid']) {
-				$prototype['valuemap']['name'] = $valueMaps[$prototype['valuemapid']];
+				$prototype['valuemap']['name'] = $this->data['valueMaps'][$prototype['valuemapid']]['name'];
 			}
 
 			$items[$prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $prototype;
