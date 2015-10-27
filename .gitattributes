@@ -38,6 +38,7 @@ frontends/php/img/browser-sprite.png -text svneol=unset#image/png
 frontends/php/img/icon-sprite.svg -text svneol=unset#image/svg%2Bxml
 frontends/php/img/ms-tile-144x144.png -text svneol=unset#image/png
 frontends/php/img/touch-icon-192x192.png -text svneol=unset#image/png
+frontends/php/include/classes/api/services/CValueMap.php -text
 frontends/php/include/classes/helpers/CViewHelper.php -text
 frontends/php/include/classes/html/CColHeader.php -text
 frontends/php/include/classes/html/CFilter.php -text
