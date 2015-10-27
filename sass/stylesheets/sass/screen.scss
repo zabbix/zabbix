@@ -1430,9 +1430,10 @@ footer {
 			}
 
 			&:active {
-				color: $white;
+				//color: $white;
 				border-color: $form-border-color;
-				background-color: $ui-bg-selected-color;
+				//background-color: $ui-bg-selected-color;
+				background-color: $btn-form-hover-color;
 			}
 		}
 
@@ -3506,7 +3507,7 @@ $browser-logos: (
 
 /*doc
 ---
-title: About
+//title: About
 name: about
 category: About
 ---
@@ -3516,7 +3517,7 @@ The Zabbix styleguide is a collection of all front-end user interface elements a
 
 /*doc
 ---
-title: Components
+//title: Components
 name: components
 category: Components
 ---
