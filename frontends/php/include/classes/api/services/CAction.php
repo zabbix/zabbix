@@ -1935,7 +1935,7 @@ class CAction extends CApiService {
 	 *
 	 * @param $actions
 	 */
-	public function validateCreate($actions) {
+	protected function validateCreate($actions) {
 		$actionDbFields = [
 			'name'        => null,
 			'eventsource' => null
@@ -2024,7 +2024,7 @@ class CAction extends CApiService {
 	 *
 	 * @internal param array $actionDb
 	 */
-	public function validateUpdate($actions, $actionsDb) {
+	protected function validateUpdate($actions, $actionsDb) {
 		foreach ($actions as $action) {
 			if (isset($action['actionid']) && !isset($actionsDb[$action['actionid']])) {
 				self::exception(
