@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-16 15:06+0300\n"
+"POT-Creation-Date: 2015-10-25 13:33+0200\n"
 "PO-Revision-Date: 2013-10-10 08:35+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: none\n"
@@ -721,7 +721,7 @@ msgstr "Erro na aplicação."
 msgid "Application updated"
 msgstr "Aplicação actualizada"
 
-#: include/classes/api/services/CItemGeneral.php:397
+#: include/classes/api/services/CItemGeneral.php:405
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplicação com ID \"%1$s\" não está disponível no \"%2$s\"."
@@ -7210,7 +7210,7 @@ msgstr "Argumentos incorrectos passados para o método."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:378
+#: include/classes/api/services/CItemGeneral.php:386
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
@@ -7335,12 +7335,12 @@ msgstr ""
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:838
+#: include/classes/api/services/CItemGeneral.php:846
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "O intervalo flexível \"%1$s\" é inválido."
 
-#: include/classes/api/services/CItemGeneral.php:827
+#: include/classes/api/services/CItemGeneral.php:835
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "O intervalo flexível do campo \"%1$s\" é inválido. O intervalo flexível tem se ser uma string."
@@ -7581,7 +7581,7 @@ msgstr "Gama de portos incorrecto."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:387
+#: include/classes/api/services/CItemGeneral.php:395
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
@@ -8159,7 +8159,7 @@ msgstr "O item \"%1$s\" em \"%2$s\": a aplicação \"%3$s\" não existe."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "O item \"%1$s\" foi ignorado - regra de utilizador."
 
-#: include/classes/api/services/CItemGeneral.php:369
+#: include/classes/api/services/CItemGeneral.php:377
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "O item \"%1$s:%2$s\" tem um porto inválido: \"%3$s\"."
@@ -8269,36 +8269,37 @@ msgstr "O item utiliza um tipo de interface inválido."
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:327
+#: include/classes/api/services/CItemGeneral.php:326
+#: include/classes/api/services/CItemGeneral.php:334
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "O item não será actualizado. Por favor especifique um intervalo de actualização correcto."
 
-#: include/classes/api/services/CItemGeneral.php:440
+#: include/classes/api/services/CItemGeneral.php:448
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como uma regra de descoberta."
 
-#: include/classes/api/services/CItemGeneral.php:446
+#: include/classes/api/services/CItemGeneral.php:454
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item criado a partir de um protótipo de item."
 
-#: include/classes/api/services/CItemGeneral.php:443
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um protótipo de item."
 
-#: include/classes/api/services/CItemGeneral.php:437
+#: include/classes/api/services/CItemGeneral.php:445
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item."
 
-#: include/classes/api/services/CItemGeneral.php:449
+#: include/classes/api/services/CItemGeneral.php:457
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\" como um item desconhecido."
 
-#: include/classes/api/services/CItemGeneral.php:804
+#: include/classes/api/services/CItemGeneral.php:812
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Já existe um item com a chave \"%1$s\" em \"%2$s\"."
@@ -9827,11 +9828,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:357
+#: include/classes/api/services/CItemGeneral.php:365
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:363
+#: include/classes/api/services/CItemGeneral.php:371
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9896,7 +9897,7 @@ msgstr "Não foi definido o tipo de autenticação para a operação do comando 
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Não foi definido um utilizador para autenticação para a operação do comando da acção \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:334
+#: include/classes/api/services/CItemGeneral.php:342
 msgid "No authentication user name specified."
 msgstr "Não foi definido um nome de utilizador para autenticação."
 
@@ -10357,7 +10358,7 @@ msgstr "Sem permissões para o objecto referenciado ou o objecto não existe!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Não foi especificado o ficheiro de chave privada para a operação comando da acção \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:350
 msgid "No private key file specified."
 msgstr "Não foi especificado o ficheiro de chave privada."
 
@@ -10374,7 +10375,7 @@ msgstr "Sem proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Não foi especificado o ficheiro de chave pública para a operação comando acção \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:339
+#: include/classes/api/services/CItemGeneral.php:347
 msgid "No public key file specified."
 msgstr "Não foi especificado o ficheiro de chave pública."
 
@@ -12388,7 +12389,7 @@ msgstr "Interfaces SNMP"
 msgid "SNMP trap"
 msgstr "Trap SNMP"
 
-#: include/classes/api/services/CItemGeneral.php:351
+#: include/classes/api/services/CItemGeneral.php:359
 msgid "SNMP trap key is invalid."
 msgstr "A chave do trap SNMP é inválida."
 

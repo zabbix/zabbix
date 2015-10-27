@@ -1194,7 +1194,7 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *
- * @return array
+ * @return int
  */
 function calculateItemNextCheck($seed, $delay, $flexIntervals, $now) {
 	// try to find the nearest 'nextcheck' value with condition 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR
