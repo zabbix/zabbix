@@ -1213,7 +1213,7 @@ function getNextDelayInterval(array $flexible_intervals, $now, &$next_interval) 
  * @param array $flexible_intervals		array of flexible intervals
  * @param int $now						current timestamp
  *
- * @return array
+ * @return int
  */
 function calculateItemNextCheck($seed, $delay, $flexible_intervals, $now) {
 	/*
