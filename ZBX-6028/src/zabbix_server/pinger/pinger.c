@@ -38,6 +38,7 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+extern char		*CONFIG_LOG_FILE;
 
 /******************************************************************************
  *                                                                            *
@@ -587,6 +588,8 @@ ZBX_THREAD_ENTRY(pinger_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log(CONFIG_LOG_FILE);
+
 		zbx_setproctitle("%s #%d [getting values]", get_process_type_string(process_type), process_num);
 
 		sec = zbx_time();

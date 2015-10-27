@@ -33,6 +33,7 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+extern char		*CONFIG_LOG_FILE;
 
 static int	connect_to_proxy(DC_PROXY *proxy, zbx_socket_t *sock, int timeout)
 {
@@ -408,6 +409,8 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log(CONFIG_LOG_FILE);
+
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [exchanged data with %d proxies in " ZBX_FS_DBL " sec,"

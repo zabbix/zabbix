@@ -37,6 +37,7 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+extern char		*CONFIG_LOG_FILE;
 
 /******************************************************************************
  *                                                                            *
@@ -838,6 +839,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		}
 
 		zbx_sleep_loop(sleeptime);
+
+		zbx_handle_log(CONFIG_LOG_FILE);
 
 		if (0 != sleeptime)
 		{

@@ -30,6 +30,7 @@
 extern int		CONFIG_HISTSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
+extern char		*CONFIG_LOG_FILE;
 
 /******************************************************************************
  *                                                                            *
@@ -65,6 +66,8 @@ ZBX_THREAD_ENTRY(dbsyncer_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log(CONFIG_LOG_FILE);
+
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [synced %d items in " ZBX_FS_DBL " sec, syncing history]",
