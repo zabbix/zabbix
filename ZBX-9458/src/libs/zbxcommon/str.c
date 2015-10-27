@@ -3247,12 +3247,8 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
  *                                                                            *
  * Parameters: expr     - [IN] the function expression: func(p1, p2,...)      *
  *             length   - [OUT] the function name length                      *
- *             next_pos - [OUT] position of the next character to parse       *
- *                              If function name was parsed successfully it   *
- *                              contains position of the first parameter.     *
- *                              Otherwise it contains position of the next    *
- *                              character to check for possible function name *
- *                              or position of the terminating zero character.*
+ *             next_pos - [OUT] position of the next character after function *
+ *                              name. For valid expressions it should be '('. *
  *                                                                            *
  * Return value: SUCCEED - the function name was successfully parsed          *
  *               FAIL    - failed to parse function name                      *
@@ -3274,10 +3270,6 @@ static int	function_parse_name(const char *expr, size_t *length, size_t *next_po
 
 	*next_pos = ptr - expr;
 
-	/* return position of the next unparsed character or the terminating zero character */
-	if ('\0' != *ptr)
-		(*next_pos)++;
-
 	return ret;
 }
 
@@ -3287,18 +3279,18 @@ static int	function_parse_name(const char *expr, size_t *length, size_t *next_po
  *                                                                            *
  * Purpose: parses quoted parameter                                           *
  *                                                                            *
- * Parameters: expr     - [IN] the function expression, starting with the     *
- *                             parameter to parse : "p1", p3, p4)             *
+ * Parameters: expr      - [IN] the function expression, starting with the    *
+ *                             parameter to parse: "p1",p2 ...                *
  *             length   - [OUT] the parameter length including enclosing      *
  *                              quotes and excluding trailing whitespace      *
- *             next_pos - [OUT] position of the next parameter or the ending  *
- *                              ')'                                           *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or ')') position.                       *
  *                                                                            *
  * Return value: SUCCEED - the parameter was successfully parsed              *
  *               FAIL    - failed to parse parameter                          *
  *                                                                            *
  ******************************************************************************/
-static int	function_parse_quoted_param(const char *expr, size_t *length, size_t *next_pos)
+static int	function_parse_quoted_param(const char *expr, size_t *length, size_t *sep_pos)
 {
 	const char	*ptr;
 
@@ -3325,10 +3317,8 @@ static int	function_parse_quoted_param(const char *expr, size_t *length, size_t 
 	switch (*ptr)
 	{
 		case ',':
-			*next_pos = ptr - expr + 1;
-			break;
 		case ')':
-			*next_pos = ptr - expr;
+			*sep_pos = ptr - expr;
 			break;
 		default:
 			return FAIL;
@@ -3343,18 +3333,19 @@ static int	function_parse_quoted_param(const char *expr, size_t *length, size_t 
  *                                                                            *
  * Purpose: parses unquoted parameter                                         *
  *                                                                            *
- * Parameters: expr     - [IN] the function expression, starting with the     *
- *                             parameter to parse : p1, p3, p4)               *
+ * Parameters: expr      - [IN] the function expression, starting with the    *
+ *                             parameter to parse: p1,p2 ...                  *
  *             length   - [OUT] the parameter length excluding the trailing   *
  *                              whitespace                                    *
- *             next_pos - [OUT] position of the next parameter or the ending  *
- *                              ')'                                           *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or ')') position.                       *
+ *                               0 if there are no more parameters to parse.  *
  *                                                                            *
  * Return value: SUCCEED - the parameter was successfully parsed              *
  *               FAIL    - failed to parse parameter                          *
  *                                                                            *
  ******************************************************************************/
-static int	function_parse_unquoted_param(const char *expr, size_t *length, size_t *next_pos)
+static int	function_parse_unquoted_param(const char *expr, size_t *length, size_t *sep_pos)
 {
 	const char	*ptr;
 
@@ -3365,10 +3356,8 @@ static int	function_parse_unquoted_param(const char *expr, size_t *length, size_
 			case '\0':
 				return FAIL;
 			case ',':
-				*next_pos = ptr - expr + 1;
-				goto out;
 			case ')':
-				*next_pos = ptr - expr;
+				*sep_pos = ptr - expr;
 				goto out;
 		}
 	}
@@ -3389,37 +3378,36 @@ out:
  * Purpose: parses function parameter                                         *
  *                                                                            *
  * Parameters: expr      - [IN] the function expression, starting with the    *
- *                             parameter to parse :  p1, p3, p4)              *
+ *                             parameter separator: (p1,p2 ... or ,p2,p3 ...  *
  *             param_pos - [OUT] the parameter position, excluding leading    *
  *                               whitespace                                   *
  *             length    - [OUT] the parameter length excluding trailing      *
  *                               whitespace                                   *
- *             next_pos  - [OUT] the next parameter position, 0 if there are  *
- *                               no more parameters to parse.                 *
+ *             sep_pos   - [OUT] the parameter separator character            *
+ *                               (',' or ')') position.                       *
+ *                               0 if there are no more parameters to parse.  *
  *                                                                            *
  * Return value: SUCCEED - the parameter was successfully parsed              *
  *               FAIL    - failed to parse parameter                          *
  *                                                                            *
  ******************************************************************************/
-static int function_parse_param(const char *expr, size_t *param_pos, size_t *length, size_t *next_pos)
+static int function_parse_param(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos)
 {
 	int		ret;
 	const char	*ptr = expr;
 
-	while (' ' == *ptr)
-		ptr++;
+	while (' ' == *(++ptr))
+		;
 
 	*param_pos = ptr - expr;
 
 	if ('"' == *ptr)
-		ret = function_parse_quoted_param(ptr, length, next_pos);
+		ret = function_parse_quoted_param(ptr, length, sep_pos);
 	else
-		ret = function_parse_unquoted_param(ptr, length, next_pos);
+		ret = function_parse_unquoted_param(ptr, length, sep_pos);
 
-	/* adjust next_pos to be relative from expression, not parameter */
-	/* by adding leading whitespace length                           */
-	if (0 != *next_pos)
-		*next_pos += *param_pos;
+	/* adjust next_pos to be relative from expression, not parameter start */
+	*sep_pos += *param_pos;
 
 	return ret;
 }
@@ -3614,7 +3602,7 @@ int	zbx_function_parse(zbx_function_t *func, const char *expr, size_t *length)
 
 	if (FAIL == function_parse_name(ptr, &len, &next_pos))
 	{
-		*length = next_pos;
+		*length = next_pos + 1;
 		return FAIL;
 	}
 
