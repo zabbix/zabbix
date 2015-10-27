@@ -42,6 +42,7 @@
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 extern size_t		(*find_psk_in_cache)(const unsigned char *, unsigned char *, size_t);
+extern char		*CONFIG_LOG_FILE;
 
 /******************************************************************************
  *                                                                            *
@@ -679,6 +680,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log(CONFIG_LOG_FILE);
+
 		zbx_setproctitle("%s #%d [processed data in " ZBX_FS_DBL " sec, waiting for connection]",
 				get_process_type_string(process_type), process_num, sec);
 

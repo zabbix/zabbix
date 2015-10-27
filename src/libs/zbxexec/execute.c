@@ -536,7 +536,7 @@ int	zbx_execute_nowait(const char *command)
 
 			/* suppress the output of the executed script, otherwise */
 			/* the output might get written to a logfile or elsewhere */
-			redirect_std(NULL);
+			zbx_handle_log(NULL);
 
 			/* replace the process with actual command to be executed */
 			execl("/bin/sh", "sh", "-c", command, NULL);
