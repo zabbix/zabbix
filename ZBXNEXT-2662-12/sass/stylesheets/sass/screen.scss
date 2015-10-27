@@ -3512,7 +3512,12 @@ name: about
 category: About
 ---
 
-The Zabbix styleguide is a collection of all front-end user interface elements and best practices.
+##About the Zabbix Styleguide
+
+The Zabbix styleguide is a collection of UI elements.
+
+* A common design language
+* Reusable components
 */
 
 /*doc
@@ -4033,7 +4038,7 @@ title: Calendar
 name: calendar
 ---
 
-Calendar:
+A Calendar pop-up is used to select a single date or a date range.
 
 ```html_example_table
 <div class="overlay-dialogue calendar">
