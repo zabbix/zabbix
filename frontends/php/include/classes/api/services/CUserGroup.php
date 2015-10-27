@@ -743,9 +743,9 @@ class CUserGroup extends CApiService {
 				' AND '.dbConditionInt('a.actionid', $actionids)
 		));
 
-		$empty_actions = zbx_objectValues($actions, 'actionid');
-		if ($empty_actions) {
-			$this->disableActions($empty_actions);
+		$actions_without_operations = zbx_objectValues($actions, 'actionid');
+		if ($actions_without_operations) {
+			$this->disableActions($actions_without_operations);
 		}
 	}
 
