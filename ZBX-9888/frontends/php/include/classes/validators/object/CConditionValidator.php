@@ -61,8 +61,8 @@ class CConditionValidator extends CValidator {
 			// get triggers count in formula
 			$trigger_count = 0;
 			foreach ($object['conditions'] as $condition) {
-				if (($condition['conditiontype'] == CONDITION_TYPE_TRIGGER)
-					&& ($condition['operator'] == CONDITION_OPERATOR_EQUAL)) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER
+						&& $condition['operator'] == CONDITION_OPERATOR_EQUAL) {
 					$trigger_count++;
 				}
 			}
