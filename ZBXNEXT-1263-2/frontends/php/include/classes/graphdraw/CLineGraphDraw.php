@@ -1062,16 +1062,20 @@ class CLineGraphDraw extends CGraphDraw {
 		// align to the closest human time interval
 		$raw_time_interval = ($this->gridPixels*$this->period)/$this->sizeX;
 		$intervals = [
+			['main' => 30, 'sub' => 1],				// 1 second
+			['main' => 60, 'sub' => 5],				// 5 seconds
+			['main' => 300, 'sub' => 10],			// 10 seconds
+			['main' => 900, 'sub' => 30],			// 30 seconds
 			['main' => 3600, 'sub' => 60],			// 1 minute
-			['main' => 3600, 'sub' => 120],		// 5 minutes
-			['main' => 3600, 'sub' => 300],		// 5 minutes
-			['main' => 3600, 'sub' => 900],		// 15 minutes
+			['main' => 3600, 'sub' => 120],			// 2 minutes
+			['main' => 3600, 'sub' => 300],			// 5 minutes
+			['main' => 3600, 'sub' => 900],			// 15 minutes
 			['main' => 3600, 'sub' => 1800],		// 30 minutes
 			['main' => 86400, 'sub' => 3600],		// 1 hour
 			['main' => 86400, 'sub' => 10800],		// 3 hours
 			['main' => 86400, 'sub' => 21600],		// 6 hours
 			['main' => 86400, 'sub' => 43200],		// 12 hours
-			['main' => 604800, 'sub' => 86400],	// 1 day
+			['main' => 604800, 'sub' => 86400],		// 1 day
 			['main' => 1209600, 'sub' => 604800],	// 1 week
 			['main' => 2419200, 'sub' => 1209600],	// 2 weeks
 			['main' => 4838400, 'sub' => 2419200],	// 4 weeks
@@ -1387,6 +1391,9 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			elseif ($interval > SEC_PER_DAY) {
 				$date_format = _('d.m');
+			}
+			elseif ($interval < SEC_PER_MIN) {
+				$date_format = _('H:i:s');
 			}
 			elseif ($interval < SEC_PER_DAY) {
 				$date_format = _('H:i');

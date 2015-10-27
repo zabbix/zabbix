@@ -30,7 +30,7 @@ define('ZABBIX_COPYRIGHT_TO',	'2015');
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
 
-define('ZBX_MIN_PERIOD',		3600); // 1 hour
+define('ZBX_MIN_PERIOD',		60); // 1 minute
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
@@ -1132,6 +1132,8 @@ define('ZBX_STYLE_NOTIF_INDIC_CONTAINER', 'notif-indic-container');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
+define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');
+define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_RADIO_SEGMENTED', 'radio-segmented');
