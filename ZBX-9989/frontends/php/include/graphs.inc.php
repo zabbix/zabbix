@@ -209,7 +209,6 @@ function get_min_itemclock_by_itemid($itemIds) {
 
 	// data for ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64 can be stored in trends tables or history table
 	// get max trends and history values for such type items to find out in what tables to look for data
-	$sqlFrom = 'history';
 	$sqlFromNum = '';
 
 	if (!empty($itemTypes[ITEM_VALUE_TYPE_FLOAT]) || !empty($itemTypes[ITEM_VALUE_TYPE_UINT64])) {
@@ -234,6 +233,7 @@ function get_min_itemclock_by_itemid($itemIds) {
 		}
 	}
 
+	$sqlUnions = [];
 	foreach ($itemTypes as $type => $items) {
 		if (empty($items)) {
 			continue;
@@ -259,17 +259,14 @@ function get_min_itemclock_by_itemid($itemIds) {
 				$sqlFrom = 'history';
 		}
 
-		foreach ($itemIds as $itemId) {
-			$sqlUnions[] = 'SELECT MIN(ht.clock) AS c FROM '.$sqlFrom.' ht WHERE ht.itemid='.zbx_dbstr($itemId);
-		}
-
-		$dbMin = DBfetch(DBselect(
-			'SELECT MIN(ht.c) AS min_clock'.
-			' FROM ('.implode(' UNION ALL ', $sqlUnions).') ht'
-		));
-
-		$min = $min ? min($min, $dbMin['min_clock']) : $dbMin['min_clock'];
+		$sqlUnions[] = 'SELECT MIN(ht.clock) AS c FROM '.$sqlFrom.' ht WHERE '.dbConditionInt('ht.itemid', $items);
 	}
+
+	$dbMin = DBfetch(DBselect(
+		'SELECT MIN(ht.c) AS min_clock'.
+		' FROM ('.implode(' UNION ALL ', $sqlUnions).') ht'
+	));
+	$min = $dbMin['min_clock'];
 
 	// in case DB clock column is corrupted having negative numbers, return min clock from max possible history storage
 	return ($min > 0) ? $min : $result;

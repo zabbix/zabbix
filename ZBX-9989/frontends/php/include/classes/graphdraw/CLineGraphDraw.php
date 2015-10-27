@@ -225,8 +225,6 @@ class CLineGraphDraw extends CGraphDraw {
 			$to_time = $this->to_time;
 			$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)'; // required for 'group by' support of Oracle
 
-			$sql_arr = [];
-
 			// override item history setting with housekeeping settings
 			if ($config['hk_history_global']) {
 				$item['history'] = $config['hk_history'];
@@ -239,51 +237,29 @@ class CLineGraphDraw extends CGraphDraw {
 						&& ($this->period / $this->sizeX) <= (ZBX_MAX_TREND_DIFF / ZBX_GRAPH_MAX_SKIP_CELL))) {
 				$this->dataFrom = 'history';
 
-				array_push($sql_arr,
-					'SELECT itemid,'.$calc_field.' AS i,'.
+				$sql = 'SELECT itemid,'.$calc_field.' AS i,'.
 						'COUNT(*) AS count,AVG(value) AS avg,MIN(value) as min,'.
-						'MAX(value) AS max,MAX(clock) AS clock'.
-					' FROM history '.
-					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND clock>='.zbx_dbstr($from_time).
-						' AND clock<='.zbx_dbstr($to_time).
-					' GROUP BY itemid,'.$calc_field
-					,
-					'SELECT itemid,'.$calc_field.' AS i,'.
-						'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,'.
-						'MAX(value) AS max,MAX(clock) AS clock'.
-					' FROM history_uint '.
-					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND clock>='.zbx_dbstr($from_time).
-						' AND clock<='.zbx_dbstr($to_time).
-					' GROUP BY itemid,'.$calc_field
-				);
+						'MAX(value) AS max,MAX(clock) AS clock';
 			}
 			else {
 				$this->dataFrom = 'trends';
-
-				array_push($sql_arr,
-					'SELECT itemid,'.$calc_field.' AS i,'.
-						'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,'.
-						'MAX(value_max) AS max,MAX(clock) AS clock'.
-					' FROM trends'.
-					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND clock>='.zbx_dbstr($from_time).
-						' AND clock<='.zbx_dbstr($to_time).
-					' GROUP BY itemid,'.$calc_field
-					,
-					'SELECT itemid,'.$calc_field.' AS i,'.
-						'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,'.
-						'MAX(value_max) AS max,MAX(clock) AS clock'.
-					' FROM trends_uint '.
-					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND clock>='.zbx_dbstr($from_time).
-						' AND clock<='.zbx_dbstr($to_time).
-					' GROUP BY itemid,'.$calc_field
-				);
-
 				$this->items[$i]['delay'] = max($this->items[$i]['delay'], SEC_PER_HOUR);
+
+				$sql = 'SELECT itemid,'.$calc_field.' AS i,'.
+						'SUM(num) AS count,AVG(value_avg) AS avg,MIN(value_min) AS min,'.
+						'MAX(value_max) AS max,MAX(clock) AS clock';
 			}
+
+			$sqlFrom = $this->dataFrom;
+			if ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+				$sqlFrom .='_uint';
+			}
+
+			$sql .= ' FROM '.$sqlFrom.
+					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND clock>='.zbx_dbstr($from_time).
+						' AND clock<='.zbx_dbstr($to_time).
+					' GROUP BY itemid,'.$calc_field;
 
 			if (!isset($this->data[$this->items[$i]['itemid']])) {
 				$this->data[$this->items[$i]['itemid']] = [];
@@ -296,35 +272,34 @@ class CLineGraphDraw extends CGraphDraw {
 			$curr_data['avg'] = null;
 			$curr_data['clock'] = null;
 
-			foreach ($sql_arr as $sql) {
-				$result = DBselect($sql);
-				while ($row = DBfetch($result)) {
-					$idx = $row['i'] - 1;
-					if ($idx < 0) {
-						continue;
-					}
-
-					/* --------------------------------------------------
-						We are taking graph on 1px more than we need,
-						and here we are skiping first px, because of MOD (in SELECT),
-						it combines prelast point (it would be last point if not that 1px in begining)
-						and first point, but we still losing prelast point :(
-						but now we've got the first point.
-					--------------------------------------------------*/
-					$curr_data['count'][$idx] = $row['count'];
-					$curr_data['min'][$idx] = $row['min'];
-					$curr_data['max'][$idx] = $row['max'];
-					$curr_data['avg'][$idx] = $row['avg'];
-					$curr_data['clock'][$idx] = $row['clock'];
-					$curr_data['shift_min'][$idx] = 0;
-					$curr_data['shift_max'][$idx] = 0;
-					$curr_data['shift_avg'][$idx] = 0;
+			$result = DBselect($sql);
+			while ($row = DBfetch($result)) {
+				$idx = $row['i'] - 1;
+				if ($idx < 0) {
+					continue;
 				}
 
-				$loc_min = is_array($curr_data['min']) ? min($curr_data['min']) : null;
-				$this->setGraphOrientation($loc_min, $this->items[$i]['axisside']);
-				unset($row);
+				/* --------------------------------------------------
+					We are taking graph on 1px more than we need,
+					and here we are skiping first px, because of MOD (in SELECT),
+					it combines prelast point (it would be last point if not that 1px in begining)
+					and first point, but we still losing prelast point :(
+					but now we've got the first point.
+				--------------------------------------------------*/
+				$curr_data['count'][$idx] = $row['count'];
+				$curr_data['min'][$idx] = $row['min'];
+				$curr_data['max'][$idx] = $row['max'];
+				$curr_data['avg'][$idx] = $row['avg'];
+				$curr_data['clock'][$idx] = $row['clock'];
+				$curr_data['shift_min'][$idx] = 0;
+				$curr_data['shift_max'][$idx] = 0;
+				$curr_data['shift_avg'][$idx] = 0;
 			}
+
+			$loc_min = is_array($curr_data['min']) ? min($curr_data['min']) : null;
+			$this->setGraphOrientation($loc_min, $this->items[$i]['axisside']);
+			unset($row);
+
 			$curr_data['avg_orig'] = is_array($curr_data['avg']) ? zbx_avg($curr_data['avg']) : null;
 
 			// calculate missed points
