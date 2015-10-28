@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
+"POT-Creation-Date: 2015-10-28 15:17+0200\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -79,7 +79,7 @@ msgid "%1$s item"
 msgid_plural "%1$s items"
 msgstr[0] ""
 
-#: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
+#: jsLoader.php:223 jsLoader.php:224 jsLoader.php:225 jsLoader.php:226
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -92,7 +92,7 @@ msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
 msgstr[0] ""
 
-#: jsLoader.php:222 jsLoader.php:223
+#: jsLoader.php:221 jsLoader.php:222
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
@@ -225,7 +225,7 @@ msgstr ""
 msgid "Access denied!"
 msgstr "存取被拒!"
 
-#: include/classes/api/services/CUser.php:988
+#: include/classes/api/services/CUser.php:986
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "帳號被封鎖%s秒"
@@ -316,21 +316,21 @@ msgstr "無權知悉"
 msgid "Action"
 msgstr "動作"
 
-#: include/classes/api/services/CAction.php:1961
-#: include/classes/api/services/CAction.php:1976
-#: include/classes/api/services/CAction.php:2072
-#: include/classes/api/services/CAction.php:2108
+#: include/classes/api/services/CAction.php:1962
+#: include/classes/api/services/CAction.php:1977
+#: include/classes/api/services/CAction.php:2073
+#: include/classes/api/services/CAction.php:2109
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1956
-#: include/classes/api/services/CAction.php:2055
+#: include/classes/api/services/CAction.php:1957
+#: include/classes/api/services/CAction.php:2056
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
 msgstr "動作\"%1$s\"已有不正確值達\"esc_period\" (最少%2$s秒)."
 
-#: include/classes/api/services/CAction.php:2130
+#: include/classes/api/services/CAction.php:2131
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
 msgstr ""
@@ -347,6 +347,14 @@ msgstr "動作已刪除"
 msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
+
+#: include/classes/api/services/CUserGroup.php:766
+msgid "Action disabled due to deletion of user group."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:1351
+msgid "Action disabled due to deletion of user."
+msgstr ""
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -715,7 +723,7 @@ msgstr ""
 msgid "Application updated"
 msgstr "應用集已更新"
 
-#: include/classes/api/services/CItemGeneral.php:475
+#: include/classes/api/services/CItemGeneral.php:476
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
@@ -1442,7 +1450,7 @@ msgstr ""
 msgid "Cannot create the configuration file."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1317
+#: include/classes/api/services/CUser.php:1315
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "無法刪除Zabbix內部用戶 \"%1$s\", 試試停用那用戶."
@@ -1675,7 +1683,7 @@ msgstr "無法删除觸發器"
 msgid "Cannot delete user"
 msgstr "無法删除用户"
 
-#: include/classes/api/services/CUser.php:888
+#: include/classes/api/services/CUser.php:886
 msgid "Cannot delete user media."
 msgstr "無法刪除用戶示警媒介."
 
@@ -2003,7 +2011,7 @@ msgstr "不能包含檢視檔案\"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:677
+#: include/classes/api/services/CUser.php:675
 msgid "Cannot insert user media."
 msgstr "不能插入用戶示警媒介"
 
@@ -2016,11 +2024,11 @@ msgstr "無法連結模板"
 msgid "Cannot link template."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1029
+#: include/classes/api/services/CUser.php:1027
 msgid "Cannot login."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:954
+#: include/classes/api/services/CUser.php:952
 msgid "Cannot logout."
 msgstr "不能登出"
 
@@ -2188,7 +2196,7 @@ msgstr ""
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "不能斷連觸發器\"%s\",其已有項目來自於留存連到主機的模板."
 
-#: include/classes/api/services/CAction.php:2063
+#: include/classes/api/services/CAction.php:2064
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr ""
@@ -2439,7 +2447,7 @@ msgstr ""
 msgid "Cannot update user"
 msgstr "無法更新用户"
 
-#: include/classes/api/services/CUser.php:757
+#: include/classes/api/services/CUser.php:755
 msgid "Cannot update user media."
 msgstr "無法更新用戶媒介."
 
@@ -2773,6 +2781,10 @@ msgstr "評論"
 #: app/views/administration.mediatype.edit.php:47
 msgid "Commercial"
 msgstr "商業的"
+
+#: include/classes/api/services/CAction.php:1837
+msgid "Comparing several triggers with \"and\" is not allowed."
+msgstr ""
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
@@ -4729,7 +4741,7 @@ msgstr ""
 msgid "Empty color."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1878
+#: include/classes/api/services/CAction.php:1879
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr ""
@@ -6927,7 +6939,7 @@ msgstr "不正確的可接受SLA予服務\"%1$s\"."
 msgid "Incorrect action condition discovery check."
 msgstr "不正確的動作條件探索檢查."
 
-#: include/classes/api/services/CAction.php:2238
+#: include/classes/api/services/CAction.php:2239
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "不正確的動作條件探索檢查. 探索檢查不存在或您沒有存取權."
 
@@ -6935,7 +6947,7 @@ msgstr "不正確的動作條件探索檢查. 探索檢查不存在或您沒有�
 msgid "Incorrect action condition discovery object."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2232
+#: include/classes/api/services/CAction.php:2233
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "不正確的動作條件探索規則. 探索規則不存在或您沒有存取權."
 
@@ -6947,11 +6959,11 @@ msgstr "不正確的動作條件探索狀態."
 msgid "Incorrect action condition event type."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2208
+#: include/classes/api/services/CAction.php:2209
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr "不正確的動作條件主機群組. 主機群組不存在或您沒有存取權."
 
-#: include/classes/api/services/CAction.php:2214
+#: include/classes/api/services/CAction.php:2215
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "不正確的動作條件主機. 主機不存在或您沒有存取權."
 
@@ -6960,11 +6972,11 @@ msgstr "不正確的動作條件主機. 主機不存在或您沒有存取權."
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2244
+#: include/classes/api/services/CAction.php:2245
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "不正確的動作條件系統代理程式. 系統代理程式不存在或您沒有存取權."
 
-#: include/classes/api/services/CAction.php:2220
+#: include/classes/api/services/CAction.php:2221
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "不正確的動作條件模板. 模板不存在或您沒有存取權."
 
@@ -6976,7 +6988,7 @@ msgstr ""
 msgid "Incorrect action condition trigger value."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:2226
+#: include/classes/api/services/CAction.php:2227
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "不正確的動作條件觸發器. 觸發器不存在或您沒有存取權."
 
@@ -7031,7 +7043,7 @@ msgstr "不正確的動作操作用戶群組. 用戶群組不存在或您沒有�
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
 msgstr "不正確的動作操作用戶. 用戶不存在或您沒有存取權."
 
-#: include/classes/api/services/CAction.php:2143
+#: include/classes/api/services/CAction.php:2144
 msgid "Incorrect action operationid."
 msgstr "不正確的動作操作ID(operationid)."
 
@@ -7071,7 +7083,7 @@ msgstr "不正確的自變數傳給方法."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:444
+#: include/classes/api/services/CItemGeneral.php:445
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
@@ -7168,7 +7180,7 @@ msgstr "不正確的觸發器欄位."
 msgid "Incorrect file upload."
 msgstr "不正確的檔案上傳."
 
-#: include/classes/api/services/CAction.php:1879
+#: include/classes/api/services/CAction.php:1880
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr ""
@@ -7183,7 +7195,7 @@ msgstr ""
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1883
+#: include/classes/api/services/CAction.php:1884
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr ""
@@ -7193,7 +7205,7 @@ msgstr ""
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1871
+#: include/classes/api/services/CAction.php:1872
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
@@ -7386,8 +7398,8 @@ msgstr ""
 msgid "Incorrect object value."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1949
-#: include/classes/api/services/CAction.php:2002
+#: include/classes/api/services/CAction.php:1950
+#: include/classes/api/services/CAction.php:2003
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
 msgstr ""
@@ -7401,7 +7413,7 @@ msgstr "不正確的操作參數."
 msgid "Incorrect parameter is used for icon map \"%s\"."
 msgstr "用了不正確的參數於圖示對應\"%s\"."
 
-#: include/classes/api/services/CAction.php:2045
+#: include/classes/api/services/CAction.php:2046
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
 msgstr ""
@@ -7443,7 +7455,7 @@ msgstr "不正確的埠範圍."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:453
+#: include/classes/api/services/CItemGeneral.php:454
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
@@ -7937,7 +7949,7 @@ msgstr "無效的主機ID予巨集 \"%1$s\"."
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:390
+#: include/classes/api/services/CItemGeneral.php:391
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr ""
@@ -8060,10 +8072,10 @@ msgstr ""
 #: include/classes/api/services/CService.php:1268
 #: include/classes/api/services/CUserMacro.php:304
 #: include/classes/api/services/CUserMacro.php:448
-#: include/classes/api/services/CUser.php:612
-#: include/classes/api/services/CUser.php:632
-#: include/classes/api/services/CUser.php:790
-#: include/classes/api/services/CUser.php:835
+#: include/classes/api/services/CUser.php:610
+#: include/classes/api/services/CUser.php:630
+#: include/classes/api/services/CUser.php:788
+#: include/classes/api/services/CUser.php:833
 #: include/classes/core/CJsonRpc.php:185
 msgid "Invalid method parameters."
 msgstr "無效的方法參數."
@@ -8184,7 +8196,7 @@ msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
 
-#: include/classes/api/services/CItemGeneral.php:435
+#: include/classes/api/services/CItemGeneral.php:436
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "項目\"%1$s:%2$s\"有無效的埠: \"%3$s\"."
@@ -8289,37 +8301,37 @@ msgstr "項目使用不正確的介面類型."
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:350
-#: include/classes/api/services/CItemGeneral.php:381
+#: include/classes/api/services/CItemGeneral.php:351
+#: include/classes/api/services/CItemGeneral.php:382
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "項目將不會被刷新. 請輸入正確的更新區間."
 
-#: include/classes/api/services/CItemGeneral.php:516
+#: include/classes/api/services/CItemGeneral.php:517
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為探索規則."
 
-#: include/classes/api/services/CItemGeneral.php:522
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為創建自項目原型的項目."
 
-#: include/classes/api/services/CItemGeneral.php:519
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目原型."
 
-#: include/classes/api/services/CItemGeneral.php:513
+#: include/classes/api/services/CItemGeneral.php:514
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目."
 
-#: include/classes/api/services/CItemGeneral.php:525
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為未知的項目組件."
 
-#: include/classes/api/services/CItemGeneral.php:932
+#: include/classes/api/services/CItemGeneral.php:933
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" ."
@@ -8842,12 +8854,12 @@ msgstr "登入為"
 msgid "Login"
 msgstr "登入"
 
-#: include/classes/api/services/CUser.php:1067
+#: include/classes/api/services/CUser.php:1065
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "登入失敗\"%s\"."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1032
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8856,9 +8868,9 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:923
-#: include/classes/api/services/CUser.php:939
-#: include/classes/api/services/CUser.php:982
+#: include/classes/api/services/CUser.php:921
+#: include/classes/api/services/CUser.php:937
+#: include/classes/api/services/CUser.php:980
 msgid "Login name or password is incorrect."
 msgstr "登入名稱或密碼是不正確的."
 
@@ -9749,7 +9761,7 @@ msgstr ""
 msgid "No \"%1$s\" given for web scenario."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1890
+#: include/classes/api/services/CAction.php:1891
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr ""
@@ -9764,7 +9776,7 @@ msgstr ""
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1840
+#: include/classes/api/services/CAction.php:1841
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr ""
@@ -9784,11 +9796,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:423
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:429
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9834,7 +9846,7 @@ msgstr "沒有指定給動作操作命令\"%s\"的認證類型."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的認證用戶名稱."
 
-#: include/classes/api/services/CItemGeneral.php:400
+#: include/classes/api/services/CItemGeneral.php:401
 msgid "No authentication user name specified."
 msgstr "沒有指定的認證用戶名稱"
 
@@ -9996,7 +10008,7 @@ msgstr "沒有圖片"
 #: include/views/configuration.host.discovery.edit.php:93
 #: include/views/configuration.item.edit.php:102
 #: include/views/configuration.item.massupdate.php:74
-#: include/views/configuration.item.prototype.edit.php:101 jsLoader.php:231
+#: include/views/configuration.item.prototype.edit.php:101 jsLoader.php:230
 msgid "No interface found"
 msgstr "沒有找到介面"
 
@@ -10075,13 +10087,13 @@ msgstr ""
 msgid "No permissions"
 msgstr "沒有許可權"
 
-#: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1125
+#: include/classes/api/services/CUser.php:994
+#: include/classes/api/services/CUser.php:1123
 msgid "No permissions for system access."
 msgstr "沒有系統存取的許可權"
 
 #: include/classes/api/services/CAction.php:1272
-#: include/classes/api/services/CAction.php:2032
+#: include/classes/api/services/CAction.php:2033
 #: include/classes/api/services/CApplication.php:283
 #: include/classes/api/services/CApplication.php:290
 #: include/classes/api/services/CApplication.php:408
@@ -10173,11 +10185,11 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/api/services/CTriggerPrototype.php:1485
 #: include/classes/api/services/CUserMacro.php:563
 #: include/classes/api/services/CUserMacro.php:672
-#: include/classes/api/services/CUser.php:619
-#: include/classes/api/services/CUser.php:798
-#: include/classes/api/services/CUser.php:818
-#: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1282
+#: include/classes/api/services/CUser.php:617
+#: include/classes/api/services/CUser.php:796
+#: include/classes/api/services/CUser.php:816
+#: include/classes/api/services/CUser.php:875
+#: include/classes/api/services/CUser.php:1280
 #: include/classes/api/services/CValueMap.php:287
 #: include/classes/api/services/CValueMap.php:413 include/func.inc.php:1622
 msgid "No permissions to referred object or it does not exist!"
@@ -10188,7 +10200,7 @@ msgstr "沒有所說的物件的許可權或其不存在!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的私有金鑰."
 
-#: include/classes/api/services/CItemGeneral.php:408
+#: include/classes/api/services/CItemGeneral.php:409
 msgid "No private key file specified."
 msgstr "沒有指定的私有金鑰."
 
@@ -10201,7 +10213,7 @@ msgstr "沒有系統代理程式"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的公開金鑰檔."
 
-#: include/classes/api/services/CItemGeneral.php:405
+#: include/classes/api/services/CItemGeneral.php:406
 msgid "No public key file specified."
 msgstr "沒有指定的公開金鑰檔"
 
@@ -10681,15 +10693,15 @@ msgstr "只有超級管理員可以更新全域巨集."
 msgid "Only Super Admins can update icon maps."
 msgstr "只有超級管理員可以更新圖示對應."
 
-#: include/classes/api/services/CUser.php:608
+#: include/classes/api/services/CUser.php:606
 msgid "Only Zabbix Admins can add user media."
 msgstr "只有超級管理員可以新增用戶示警媒介."
 
-#: include/classes/api/services/CUser.php:786
+#: include/classes/api/services/CUser.php:784
 msgid "Only Zabbix Admins can change user media."
 msgstr "只有超級管理員可以用改變戶示警媒介."
 
-#: include/classes/api/services/CUser.php:867
+#: include/classes/api/services/CUser.php:865
 msgid "Only Zabbix Admins can remove user media."
 msgstr "只有超級管理員可以移除用戶示警媒介."
 
@@ -11470,7 +11482,7 @@ msgstr "私有金鑰檔"
 msgid "Privilege level"
 msgstr "優先權層級"
 
-#: include/classes/api/services/CUser.php:914
+#: include/classes/api/services/CUser.php:912
 msgid "Probably php-ldap module is missing."
 msgstr "可能的php-ldap模組不存在."
 
@@ -12178,7 +12190,7 @@ msgstr "SNMP介面"
 msgid "SNMP trap"
 msgstr "SNMP捉捕"
 
-#: include/classes/api/services/CItemGeneral.php:417
+#: include/classes/api/services/CItemGeneral.php:418
 msgid "SNMP trap key is invalid."
 msgstr "SNMP捉捕鍵值是無效的"
 
@@ -12680,11 +12692,6 @@ msgstr "伺服器時間"
 msgid "Service"
 msgstr "服務"
 
-#: jsLoader.php:216
-#, c-format
-msgid "Service \"%1$s\""
-msgstr ""
-
 #: include/classes/api/services/CService.php:1097
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
@@ -12745,7 +12752,7 @@ msgstr "服務"
 msgid "Services form a circular dependency."
 msgstr "服務形成了一個循環式迴圈."
 
-#: include/classes/api/services/CUser.php:1119
+#: include/classes/api/services/CUser.php:1117
 msgid "Session terminated, re-login, please."
 msgstr "連線期已中斷, 請重連."
 
@@ -13223,7 +13230,7 @@ msgstr ""
 msgid "Subject"
 msgstr "主旨"
 
-#: jsLoader.php:217
+#: jsLoader.php:216
 msgid "Submap"
 msgstr "子拓墣圖"
 
@@ -13799,7 +13806,7 @@ msgstr "和Zabbix伺服器的時間戳記差異不超過T秒, 則 N 非 1, 0 - �
 msgid "To"
 msgstr "到"
 
-#: jsLoader.php:230
+#: jsLoader.php:229
 msgid "To set a host interface select a single item type for all items"
 msgstr "要設定一個主機介面, 選擇一個單一的項目類型給所有的項目"
 
@@ -13886,7 +13893,7 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:19
 #: include/views/js/configuration.sysmaps.js.php:88
 #: include/views/js/configuration.sysmaps.js.php:354
-#: include/views/reports.toptriggers.php:119 jsLoader.php:143 jsLoader.php:218
+#: include/views/reports.toptriggers.php:119 jsLoader.php:143 jsLoader.php:217
 #: services.php:471 tr_comments.php:76 tr_logform.php:27 tr_logform.php:158
 #: tr_logform.php:174
 msgid "Trigger"
@@ -14103,7 +14110,7 @@ msgstr "觸發器值"
 #: include/views/inventory.host.view.php:162
 #: include/views/inventory.host.view.php:175
 #: include/views/monitoring.overview.items.php:47
-#: include/views/monitoring.overview.triggers.php:81 jsLoader.php:219
+#: include/views/monitoring.overview.triggers.php:81 jsLoader.php:218
 #: popup.php:59 search.php:129 search.php:136 search.php:170 search.php:199
 #: search.php:232 search.php:284 search.php:334 search.php:400 search.php:431
 #: search.php:457 templates.php:600 templates.php:734
@@ -14263,7 +14270,7 @@ msgstr "上線"
 #: include/views/configuration.sysmap.edit.php:155
 #: include/views/configuration.trigger.prototype.edit.php:247
 #: include/views/configuration.triggers.edit.php:252
-#: include/views/js/configuration.sysmaps.js.php:165 jsLoader.php:220
+#: include/views/js/configuration.sysmaps.js.php:165 jsLoader.php:219
 #: popup_httpstep.php:37 tr_logform.php:372
 msgid "URL"
 msgstr "URL"
@@ -14303,7 +14310,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:206
-#: include/views/js/configuration.sysmaps.js.php:162 jsLoader.php:221
+#: include/views/js/configuration.sysmaps.js.php:162 jsLoader.php:220
 msgid "URLs"
 msgstr "URLs"
 
@@ -14518,7 +14525,7 @@ msgstr "未支援的匯入格式\"%1$s\"."
 msgid "Unsupported parameter \"%1$s\" for group prototype."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1891
+#: include/classes/api/services/CAction.php:1892
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr ""
@@ -14538,7 +14545,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1841
+#: include/classes/api/services/CAction.php:1842
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr ""
@@ -14835,7 +14842,7 @@ msgstr ""
 msgid "User groups"
 msgstr "用户群組"
 
-#: include/classes/api/services/CUser.php:1295
+#: include/classes/api/services/CUser.php:1293
 msgid "User is not allowed to delete himself."
 msgstr "用戶是不允許刪除自己"
 
