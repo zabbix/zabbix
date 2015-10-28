@@ -169,8 +169,6 @@ class CPieGraphDraw extends CGraphDraw {
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 
-			$sql_arr = [];
-
 			// override item history setting with housekeeping settings
 			if ($config['hk_history_global']) {
 				$item['history'] = $config['hk_history'];
@@ -181,49 +179,28 @@ class CPieGraphDraw extends CGraphDraw {
 			if (!$trendsEnabled || (($item['history'] * SEC_PER_DAY) > (time() - ($from_time + $this->period / 2)))) {
 				$this->dataFrom = 'history';
 
-				array_push($sql_arr,
-					'SELECT h.itemid,'.
-						'AVG(h.value) AS avg,MIN(h.value) AS min,'.
-						'MAX(h.value) AS max,MAX(h.clock) AS clock'.
-					' FROM history h'.
-					' WHERE h.itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND h.clock>='.zbx_dbstr($from_time).
-						' AND h.clock<='.zbx_dbstr($to_time).
-					' GROUP BY h.itemid'
-					,
-					'SELECT hu.itemid,'.
-						'AVG(hu.value) AS avg,MIN(hu.value) AS min,'.
-						'MAX(hu.value) AS max,MAX(hu.clock) AS clock'.
-					' FROM history_uint hu'.
-					' WHERE hu.itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND hu.clock>='.zbx_dbstr($from_time).
-						' AND hu.clock<='.zbx_dbstr($to_time).
-					' GROUP BY hu.itemid'
-				);
+				$sql = 'SELECT itemid,'.
+						'AVG(value) AS avg,MIN(value) AS min,'.
+						'MAX(value) AS max,MAX(clock) AS clock';
 			}
 			else {
 				$this->dataFrom = 'trends';
 
-				array_push($sql_arr,
-					'SELECT t.itemid,'.
-						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
-						'MAX(t.value_max) AS max,MAX(t.clock) AS clock'.
-					' FROM trends t'.
-					' WHERE t.itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND t.clock>='.zbx_dbstr($from_time).
-						' AND t.clock<='.zbx_dbstr($to_time).
-					' GROUP BY t.itemid'
-					,
-					'SELECT t.itemid,'.
-						'AVG(t.value_avg) AS avg,MIN(t.value_min) AS min,'.
-						'MAX(t.value_max) AS max,MAX(t.clock) AS clock'.
-					' FROM trends_uint t'.
-					' WHERE t.itemid='.zbx_dbstr($this->items[$i]['itemid']).
-						' AND t.clock>='.zbx_dbstr($from_time).
-						' AND t.clock<='.zbx_dbstr($to_time).
-					' GROUP BY t.itemid'
-				);
+				$sql = 'SELECT itemid,'.
+						'AVG(value_avg) AS avg,MIN(value_min) AS min,'.
+						'MAX(value_max) AS max,MAX(clock) AS clock';
 			}
+
+			$sqlFrom = $this->dataFrom;
+			if ($item['value_type'] == ITEM_VALUE_TYPE_UINT64) {
+				$sqlFrom .='_uint';
+			}
+
+			$sql .= ' FROM '.$sqlFrom.
+					' WHERE itemid='.zbx_dbstr($this->items[$i]['itemid']).
+						' AND clock>='.zbx_dbstr($from_time).
+						' AND clock<='.zbx_dbstr($to_time).
+					' GROUP BY itemid';
 
 			$this->data[$this->items[$i]['itemid']][$type]['last'] = isset($history[$item['itemid']])
 				? $history[$item['itemid']][0]['value'] : null;
@@ -231,16 +208,14 @@ class CPieGraphDraw extends CGraphDraw {
 			$this->data[$this->items[$i]['itemid']][$type]['shift_max'] = 0;
 			$this->data[$this->items[$i]['itemid']][$type]['shift_avg'] = 0;
 
-			foreach ($sql_arr as $sql) {
-				$result = DBselect($sql);
-				while ($row = DBfetch($result)) {
-					$this->data[$this->items[$i]['itemid']][$type]['min'] = $row['min'];
-					$this->data[$this->items[$i]['itemid']][$type]['max'] = $row['max'];
-					$this->data[$this->items[$i]['itemid']][$type]['avg'] = $row['avg'];
-					$this->data[$this->items[$i]['itemid']][$type]['clock'] = $row['clock'];
-				}
-				unset($row);
+			$result = DBselect($sql);
+			while ($row = DBfetch($result)) {
+				$this->data[$this->items[$i]['itemid']][$type]['min'] = $row['min'];
+				$this->data[$this->items[$i]['itemid']][$type]['max'] = $row['max'];
+				$this->data[$this->items[$i]['itemid']][$type]['avg'] = $row['avg'];
+				$this->data[$this->items[$i]['itemid']][$type]['clock'] = $row['clock'];
 			}
+			unset($row);
 
 			switch ($this->items[$i]['calc_fnc']) {
 				case CALC_FNC_MIN:
