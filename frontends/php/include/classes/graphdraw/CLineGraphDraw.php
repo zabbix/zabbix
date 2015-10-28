@@ -95,7 +95,8 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->m_showTriggers = ($value == 1) ? 1 : 0;
 	}
 
-	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null, $drawtype = null, $type = null) {
+	public function addItem($itemid, $axis = GRAPH_YAXIS_SIDE_DEFAULT, $calc_fnc = CALC_FNC_AVG, $color = null,
+			$drawtype = null) {
 		if ($this->type == GRAPH_TYPE_STACKED) {
 			$drawtype = GRAPH_ITEM_DRAWTYPE_FILLED_REGION;
 		}
@@ -108,7 +109,9 @@ class CLineGraphDraw extends CGraphDraw {
 		$item['name'] = $item['name_expanded'];
 
 		$this->items[$this->num] = $item;
-		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $item['delay_flex']);
+
+		$parser = new CItemDelayFlexParser($item['delay_flex']);
+		$this->items[$this->num]['delay'] = getItemDelay($item['delay'], $parser->getFlexibleIntervals());
 
 		if (strpos($item['units'], ',') === false) {
 			$this->items[$this->num]['unitsLong'] = '';
@@ -125,7 +128,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->items[$this->num]['drawtype'] = is_null($drawtype) ? GRAPH_ITEM_DRAWTYPE_LINE : $drawtype;
 		$this->items[$this->num]['axisside'] = is_null($axis) ? GRAPH_YAXIS_SIDE_DEFAULT : $axis;
 		$this->items[$this->num]['calc_fnc'] = is_null($calc_fnc) ? CALC_FNC_AVG : $calc_fnc;
-		$this->items[$this->num]['calc_type'] = is_null($type) ? GRAPH_ITEM_SIMPLE : $type;
+		$this->items[$this->num]['calc_type'] = GRAPH_ITEM_SIMPLE;
 
 		if ($this->items[$this->num]['axisside'] == GRAPH_YAXIS_SIDE_LEFT) {
 			$this->yaxisleft = 1;
@@ -217,7 +220,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->axis_valuetype[$this->items[$i]['axisside']] = ITEM_VALUE_TYPE_FLOAT;
 			}
 
-			$type = $this->items[$i]['calc_type'];
+			$calc_type = $this->items[$i]['calc_type'];
 			$from_time = $this->from_time;
 			$to_time = $this->to_time;
 			$calc_field = 'round('.$x.'*'.zbx_sql_mod(zbx_dbcast_2bigint('clock').'+'.$z, $p).'/('.$p.'),0)'; // required for 'group by' support of Oracle
@@ -285,12 +288,7 @@ class CLineGraphDraw extends CGraphDraw {
 			if (!isset($this->data[$this->items[$i]['itemid']])) {
 				$this->data[$this->items[$i]['itemid']] = [];
 			}
-
-			if (!isset($this->data[$this->items[$i]['itemid']][$type])) {
-				$this->data[$this->items[$i]['itemid']][$type] = [];
-			}
-
-			$curr_data = &$this->data[$this->items[$i]['itemid']][$type];
+			$curr_data = &$this->data[$this->items[$i]['itemid']][$calc_type];
 
 			$curr_data['count'] = null;
 			$curr_data['min'] = null;
@@ -1064,16 +1062,20 @@ class CLineGraphDraw extends CGraphDraw {
 		// align to the closest human time interval
 		$raw_time_interval = ($this->gridPixels*$this->period)/$this->sizeX;
 		$intervals = [
+			['main' => 30, 'sub' => 1],				// 1 second
+			['main' => 60, 'sub' => 5],				// 5 seconds
+			['main' => 300, 'sub' => 10],			// 10 seconds
+			['main' => 900, 'sub' => 30],			// 30 seconds
 			['main' => 3600, 'sub' => 60],			// 1 minute
-			['main' => 3600, 'sub' => 120],		// 5 minutes
-			['main' => 3600, 'sub' => 300],		// 5 minutes
-			['main' => 3600, 'sub' => 900],		// 15 minutes
+			['main' => 3600, 'sub' => 120],			// 2 minutes
+			['main' => 3600, 'sub' => 300],			// 5 minutes
+			['main' => 3600, 'sub' => 900],			// 15 minutes
 			['main' => 3600, 'sub' => 1800],		// 30 minutes
 			['main' => 86400, 'sub' => 3600],		// 1 hour
 			['main' => 86400, 'sub' => 10800],		// 3 hours
 			['main' => 86400, 'sub' => 21600],		// 6 hours
 			['main' => 86400, 'sub' => 43200],		// 12 hours
-			['main' => 604800, 'sub' => 86400],	// 1 day
+			['main' => 604800, 'sub' => 86400],		// 1 day
 			['main' => 1209600, 'sub' => 604800],	// 1 week
 			['main' => 2419200, 'sub' => 1209600],	// 2 weeks
 			['main' => 4838400, 'sub' => 2419200],	// 4 weeks
@@ -1389,6 +1391,9 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			elseif ($interval > SEC_PER_DAY) {
 				$date_format = _('d.m');
+			}
+			elseif ($interval < SEC_PER_MIN) {
+				$date_format = _('H:i:s');
 			}
 			elseif ($interval < SEC_PER_DAY) {
 				$date_format = _('H:i');
