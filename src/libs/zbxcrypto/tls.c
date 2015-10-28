@@ -4904,103 +4904,105 @@ int	zbx_tls_get_attr_cert(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 {
 	attr->connection_type = s->connection_type;
 
+	{
 #if defined(HAVE_POLARSSL)
-	const x509_crt	*peer_cert;
-	char		*error = NULL;
+		const x509_crt	*peer_cert;
+		char		*error = NULL;
 
-	if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, ssl_get_peer_cert() returned NULL");
-		return FAIL;
-	}
+		if (NULL == (peer_cert = ssl_get_peer_cert(s->tls_ctx)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "no peer certificate, ssl_get_peer_cert() returned NULL");
+			return FAIL;
+		}
 
-	if (SUCCEED != zbx_x509_dn_gets(&peer_cert->issuer, attr->issuer, sizeof(attr->issuer), &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "error while getting issuer name: \"%s\"", error);
-		zbx_free(error);
-		return FAIL;
-	}
+		if (SUCCEED != zbx_x509_dn_gets(&peer_cert->issuer, attr->issuer, sizeof(attr->issuer), &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "error while getting issuer name: \"%s\"", error);
+			zbx_free(error);
+			return FAIL;
+		}
 
-	if (SUCCEED != zbx_x509_dn_gets(&peer_cert->subject, attr->subject, sizeof(attr->subject), &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "error while getting subject name: \"%s\"", error);
-		zbx_free(error);
-		return FAIL;
-	}
+		if (SUCCEED != zbx_x509_dn_gets(&peer_cert->subject, attr->subject, sizeof(attr->subject), &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "error while getting subject name: \"%s\"", error);
+			zbx_free(error);
+			return FAIL;
+		}
 #elif defined(HAVE_GNUTLS)
-	gnutls_x509_crt_t	peer_cert;
-	gnutls_x509_dn_t	dn;
-	char			*error = NULL;
-	int			res;
+		gnutls_x509_crt_t	peer_cert;
+		gnutls_x509_dn_t	dn;
+		char			*error = NULL;
+		int			res;
 
-	/* here is some inefficiency - we do not know will it be required to verify peer certificate issuer */
-	/* and subject - but we prepare for it */
-	if (NULL == (peer_cert = zbx_get_peer_cert(s->tls_ctx, &error)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot get peer certificate: %s", error);
-		zbx_free(error);
-		return FAIL;
-	}
+		/* here is some inefficiency - we do not know will it be required to verify peer certificate issuer */
+		/* and subject - but we prepare for it */
+		if (NULL == (peer_cert = zbx_get_peer_cert(s->tls_ctx, &error)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "cannot get peer certificate: %s", error);
+			zbx_free(error);
+			return FAIL;
+		}
 
-	if (0 != (res = gnutls_x509_crt_get_issuer(peer_cert, &dn)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_issuer() failed: %d %s", res,
-				gnutls_strerror(res));
+		if (0 != (res = gnutls_x509_crt_get_issuer(peer_cert, &dn)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_issuer() failed: %d %s", res,
+					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(peer_cert);
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_x509_dn_gets(dn, attr->issuer, sizeof(attr->issuer), &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "zbx_x509_dn_gets() failed: %s", error);
+			zbx_free(error);
+			gnutls_x509_crt_deinit(peer_cert);
+			return FAIL;
+		}
+
+		if (0 != (res = gnutls_x509_crt_get_subject(peer_cert, &dn)))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_subject() failed: %d %s", res,
+					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(peer_cert);
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_x509_dn_gets(dn, attr->subject, sizeof(attr->subject), &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "zbx_x509_dn_gets() failed: %s", error);
+			zbx_free(error);
+			gnutls_x509_crt_deinit(peer_cert);
+			return FAIL;
+		}
+
 		gnutls_x509_crt_deinit(peer_cert);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_x509_dn_gets(dn, attr->issuer, sizeof(attr->issuer), &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "zbx_x509_dn_gets() failed: %s", error);
-		zbx_free(error);
-		gnutls_x509_crt_deinit(peer_cert);
-		return FAIL;
-	}
-
-	if (0 != (res = gnutls_x509_crt_get_subject(peer_cert, &dn)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "gnutls_x509_crt_get_subject() failed: %d %s", res,
-				gnutls_strerror(res));
-		gnutls_x509_crt_deinit(peer_cert);
-		return FAIL;
-	}
-
-	if (SUCCEED != zbx_x509_dn_gets(dn, attr->subject, sizeof(attr->subject), &error))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "zbx_x509_dn_gets() failed: %s", error);
-		zbx_free(error);
-		gnutls_x509_crt_deinit(peer_cert);
-		return FAIL;
-	}
-
-	gnutls_x509_crt_deinit(peer_cert);
 #elif defined(HAVE_OPENSSL)
-	X509	*peer_cert;
-	char	*issuer = NULL, *subject = NULL;
-	int	err = 0;
+		X509	*peer_cert;
+		char	*issuer = NULL, *subject = NULL;
+		int	err = 0;
 
-	if (NULL != (peer_cert = SSL_get_peer_certificate(s->tls_ctx)) &&
-			SUCCEED == zbx_get_issuer_subject(peer_cert, &issuer, &subject))
-	{
-		zbx_strlcpy(attr->issuer, issuer, sizeof(attr->issuer));
-		zbx_strlcpy(attr->subject, subject, sizeof(attr->subject));
-	}
-	else
-		err = 1;
+		if (NULL != (peer_cert = SSL_get_peer_certificate(s->tls_ctx)) &&
+				SUCCEED == zbx_get_issuer_subject(peer_cert, &issuer, &subject))
+		{
+			zbx_strlcpy(attr->issuer, issuer, sizeof(attr->issuer));
+			zbx_strlcpy(attr->subject, subject, sizeof(attr->subject));
+		}
+		else
+			err = 1;
 
-	if (NULL != issuer)
-		OPENSSL_free(issuer);
+		if (NULL != issuer)
+			OPENSSL_free(issuer);
 
-	if (NULL != subject)
-		OPENSSL_free(subject);
+		if (NULL != subject)
+			OPENSSL_free(subject);
 
-	if (NULL != peer_cert)
-		X509_free(peer_cert);
+		if (NULL != peer_cert)
+			X509_free(peer_cert);
 
-	if (0 != err)
-		return FAIL;
+		if (0 != err)
+			return FAIL;
 #endif
+	}
 
 	return SUCCEED;
 }
@@ -5021,27 +5023,29 @@ int	zbx_tls_get_attr_psk(const zbx_socket_t *s, zbx_tls_conn_attr_t *attr)
 {
 	attr->connection_type = s->connection_type;
 
-#if defined(HAVE_POLARSSL)
-	attr->psk_identity = (char *)s->tls_ctx->psk_identity;
-	attr->psk_identity_len = s->tls_ctx->psk_identity_len;
-#elif defined(HAVE_GNUTLS)
-	if (NULL != (attr->psk_identity = gnutls_psk_server_get_username(s->tls_ctx)))
-		attr->psk_identity_len = strlen(attr->psk_identity);
-	else
-		return FAIL;
-#elif defined(HAVE_OPENSSL)
-	SSL_SESSION	*sess;
-
-	if (NULL != (sess = SSL_get_session(s->tls_ctx)))
 	{
-		if (NULL != (attr->psk_identity = sess->psk_identity))
+#if defined(HAVE_POLARSSL)
+		attr->psk_identity = (char *)s->tls_ctx->psk_identity;
+		attr->psk_identity_len = s->tls_ctx->psk_identity_len;
+#elif defined(HAVE_GNUTLS)
+		if (NULL != (attr->psk_identity = gnutls_psk_server_get_username(s->tls_ctx)))
 			attr->psk_identity_len = strlen(attr->psk_identity);
 		else
 			return FAIL;
-	}
-	else
-		return FAIL;
+#elif defined(HAVE_OPENSSL)
+		SSL_SESSION	*sess;
+
+		if (NULL != (sess = SSL_get_session(s->tls_ctx)))
+		{
+			if (NULL != (attr->psk_identity = sess->psk_identity))
+				attr->psk_identity_len = strlen(attr->psk_identity);
+			else
+				return FAIL;
+		}
+		else
+			return FAIL;
 #endif
+	}
 
 	return SUCCEED;
 }
