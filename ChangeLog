@@ -1,6 +1,7 @@
 Changes for 2.2.11rc1
 
 New features:
+..F....... [ZBX-2616] update bundled DejaVu font from 2.34 to 2.35 (Richlv)
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
