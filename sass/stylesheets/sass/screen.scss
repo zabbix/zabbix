@@ -3431,7 +3431,6 @@ $browser-logos: (
 	&::-webkit-scrollbar-thumb {
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid darken($scrollbar-thumb-color,5%);
-		border-radius: 6px;
 	}
 }
 
@@ -3514,11 +3513,13 @@ category: About
 
 ##About the Zabbix Styleguide
 
-The Zabbix styleguide is our journey to the bright future of a more modular and systematic approach to design. It is a single source of information for front-end developers and designers. Instead of reinventing the wheel.
+The Zabbix styleguide is our journey to the bright future of a more modular and systematic approach to design. It is a single source of information for front-end developers and designers. Instead of reinventing the wheel every time there is a need to implement an already existing UI pattern, developers can consult with the styleguide.
 
 * A common design language inside the company and community
 * More modular approach to design, reusable components
 * A single source of information for front-end developers
+
+May the force be with you!
 */
 
 /*doc
@@ -3648,7 +3649,7 @@ Default table:
 
 ##Table with Pagination
 
-Table with pagination:
+A pagination is used to 
 
 ```html_example
 <div class="overflow-table">
@@ -3771,27 +3772,35 @@ name: forms
 Forms forms forms
 
 
-##Buttons
+##Primary Button
 
 ```html_example
-<button type="button">Button</button>
-<button type="button" disabled>Button</button>
+<button type="button">Primary Button</button>
+<button type="button" disabled>Primary Button</button>
 ```
 
-```html_example
-<button type="button" class="btn-alt">Button</button>
-<button type="button" class="btn-alt" disabled>Button</button>
-```
+##Secondary Button
 
 ```html_example
-<button type="button" class="btn-grey">Button</button>
-<button type="button" class="btn-grey" disabled>Button</button>
+<button type="button" class="btn-alt">Secondary Button</button>
+<button type="button" class="btn-alt" disabled>Secondary Button</button>
 ```
 
+##Form Button
+
 ```html_example
-<button type="button" class="btn-link">Button</button>
-<button type="button" class="btn-link" disabled>Button</button>
+<button type="button" class="btn-grey">Form Button</button>
+<button type="button" class="btn-grey" disabled>Form Button</button>
 ```
+
+##Link Button
+
+```html_example
+<button type="button" class="btn-link">Link Button</button>
+<button type="button" class="btn-link" disabled>Link Button</button>
+```
+
+##Icon Button
 
 ```html_example
 <button type="button" class="btn-max" title="Maximize"></button>
@@ -3804,6 +3813,7 @@ Text on html5 input types
 
 ```html_example
 <input type="text" placeholder="Text">
+<div class="red">You can't leave this empty.</div>
 <input type="text" disabled>
 <input type="text" readonly>
 ```
@@ -3975,7 +3985,7 @@ title: Notifications
 name: notifications
 ---
 
-Notificatiions:
+Notificatiions are used to provide feedback after certain actions or give information.
 
 ##Success Notification
 
@@ -4035,13 +4045,13 @@ example
 /*doc
 ---
 parent: components
-title: Calendar
-name: calendar
+title: Date Picker
+name: date
 ---
 
-A Calendar pop-up is used to select a single date or a date range.
+A date picker pop-up is used to select a single date or a date range.
 
-```html_example_table
+```html_example
 <div class="overlay-dialogue calendar">
    <div class="calendar-header">
       <div class="calendar-year">
@@ -4131,9 +4141,9 @@ title: Navigation
 name: navigation
 ---
 
-Navigation:
-
 ##Main Navigation
+
+Main navigation is used to jump between high level sections of the application.
 
 ```html_example
 <nav role="navigation">
@@ -4195,6 +4205,8 @@ Navigation:
 
 ##Tabs
 
+Tabs are used to switch between 
+
 ```html_example
 <ul class="ui-tabs-nav"><li class="ui-tabs-active"><a href="#">Host</a></li><li class="ui-state-disabled"><a href="#">Templates</a></li><li><a href="#">IPMI</a></li><li><a href="#">Macros</a></li><li><a href="#">Host inventory</a></li></ul>
 ```
@@ -4207,7 +4219,7 @@ title: Links
 name: links
 ---
 
-About link style and usage
+A link is used to navigate through different parts of the front-end. Action links are used to
 
 ```html_example
 <a href="#">Default link</a>
@@ -4228,9 +4240,25 @@ title: Labels
 name: labels
 ---
 
-Labels:
+Labels add information.
 
 ```html_example
 <div class="status-container"><span class="status-red">zbx</span><span class="status-green">snmp</span><span class="status-green">jmx</span><span class="status-grey">ipmi</span></div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Spinners
+name: spinners
+---
+
+Spinners are used to show data retrieval or computation.
+
+```html_example
+<div class="preloader-container">
+   <div class="preloader"></div>
+</div>
 ```
 */
