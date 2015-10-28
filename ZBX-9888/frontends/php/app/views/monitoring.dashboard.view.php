@@ -37,95 +37,96 @@ $dashboard = (new CWidget())
 $dashboardGrid = [[], [], []];
 $widgetRefreshParams = [];
 
-$icon = (new CButton(null))
-	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
-	->setTitle(_('Action'))
-	->setId('favouriteGraphs')
-	->setMenuPopup(CMenuPopupHelper::getFavouriteGraphs());
+$widgets = [
+	WIDGET_FAVOURITE_GRAPHS => [
+		'id' => 'favouriteGraphs',
+		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteGraphs'],
+		'data' => $data['favourite_graphs'],
+		'header' => _('Favourite graphs'),
+		'links' => [
+			['name' => _('Graphs'), 'url' => 'charts.php']
+		],
+		'defaults' => ['col' => 0, 'row' => 0]
+	],
+	WIDGET_FAVOURITE_SCREENS => [
+		'id' => 'favouriteScreens',
+		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteScreens'],
+		'data' => $data['favourite_screens'],
+		'header' => _('Favourite screens'),
+		'links' => [
+			['name' => _('Screens'), 'url' => 'screens.php'],
+			['name' => _('Slide shows'), 'url' => 'slides.php']
+		],
+		'defaults' => ['col' => 0, 'row' => 1]
+	],
+	WIDGET_FAVOURITE_MAPS => [
+		'id' => 'favouriteMaps',
+		'menu_popup' => ['CMenuPopupHelper', 'getFavouriteMaps'],
+		'data' => $data['favourite_maps'],
+		'header' => _('Favourite maps'),
+		'links' => [
+			['name' => _('Maps'), 'url' => 'zabbix.php?action=map.view']
+		],
+		'defaults' => ['col' => 0, 'row' => 2]
+	]
+];
 
-$favouriteGraphs = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_GRAPHS, $data['favourite_graphs']))
-	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.state', true))
-	->setHeader(_('Favourite graphs'), [$icon], true, 'zabbix.php?action=dashboard.widget')
-	->setFooter(new CList([
-		new CLink(_('Graphs'), 'charts.php')
-	]));
+foreach ($widgets as $widgetid => $widget) {
+	$icon = (new CButton(null))
+		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
+		->setTitle(_('Action'))
+		->setId($widget['id'])
+		->setMenuPopup(call_user_func($widget['menu_popup']));
 
-$col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.col', 0);
-$row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_GRAPHS.'.row', 0);
-$dashboardGrid[$col][$row] = $favouriteGraphs;
+	$footer = new CList();
+	foreach ($widget['links'] as $link) {
+		$footer->addItem(new CLink($link['name'], $link['url']));
+	}
 
-// favourite maps
-$icon = (new CButton(null))
-	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
-	->setTitle(_('Action'))
-	->setId('favouriteMaps')
-	->setMenuPopup(CMenuPopupHelper::getFavouriteMaps());
+	$col = CProfile::get('web.dashboard.widget.'.$widgetid.'.col', $widget['defaults']['col']);
+	$row = CProfile::get('web.dashboard.widget.'.$widgetid.'.row', $widget['defaults']['row']);
 
-$favouriteMaps = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_MAPS, $data['favourite_maps']))
-	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.state', true))
-	->setHeader(_('Favourite maps'), [$icon], true, 'zabbix.php?action=dashboard.widget')
-	->setFooter(new CList([
-		new CLink(_('Maps'), 'zabbix.php?action=map.view')
-	]));
-
-$col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.col', 0);
-$row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_MAPS.'.row', 2);
-$dashboardGrid[$col][$row] = $favouriteMaps;
-
-// favourite screens
-$icon = (new CButton(null))
-	->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
-	->setTitle(_('Action'))
-	->setId('favouriteScreens')
-	->setMenuPopup(CMenuPopupHelper::getFavouriteScreens());
-
-$favouriteScreens = (new CCollapsibleUiWidget(WIDGET_FAVOURITE_SCREENS, $data['favourite_screens']))
-	->setExpanded((bool) CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.state', true))
-	->setHeader(_('Favourite screens'), [$icon], true, 'zabbix.php?action=dashboard.widget')
-	->setFooter(new CList([
-		new CLink(_('Screens'), 'screens.php'),
-		new CLink(_('Slide shows'), 'slides.php')
-	]));
-
-$col = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.col', 0);
-$row = CProfile::get('web.dashboard.widget.'.WIDGET_FAVOURITE_SCREENS.'.row', 1);
-$dashboardGrid[$col][$row] = $favouriteScreens;
+	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, $widget['data']))
+		->setExpanded((bool) CProfile::get('web.dashboard.widget.'.$widgetid.'.state', true))
+		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
+		->setFooter($footer);
+}
 
 $widgets = [
 	WIDGET_SYSTEM_STATUS => [
 		'action' => 'widget.system.view',
-		'col' => 1,
-		'row' => 1
+		'header' => _('System status'),
+		'defaults' => ['col' => 1, 'row' => 1]
 	],
 	WIDGET_HOST_STATUS => [
 		'action' => 'widget.hosts.view',
-		'col' => 1,
-		'row' => 2
+		'header' => _('Host status'),
+		'defaults' => ['col' => 1, 'row' => 2]
 	],
 	WIDGET_LAST_ISSUES => [
 		'action' => 'widget.issues.view',
-		'col' => 1,
-		'row' => 3
+		'header' => _n('Last %1$d issue', 'Last %1$d issues', DEFAULT_LATEST_ISSUES_CNT),
+		'defaults' => ['col' => 1, 'row' => 3]
 	],
 	WIDGET_WEB_OVERVIEW => [
 		'action' => 'widget.web.view',
-		'col' => 1,
-		'row' => 4
+		'header' => _('Web monitoring'),
+		'defaults' => ['col' => 1, 'row' => 4]
 	],
 ];
 
 if ($data['show_status_widget']) {
 	$widgets[WIDGET_ZABBIX_STATUS] = [
 		'action' => 'widget.status.view',
-		'col' => 1,
-		'row' => 0
+		'header' => _('Status of Zabbix'),
+		'defaults' => ['col' => 1, 'row' => 0]
 	];
 }
 if ($data['show_discovery_widget']) {
 	$widgets[WIDGET_DISCOVERY_STATUS] = [
 		'action' => 'widget.discovery.view',
-		'col' => 1,
-		'row' => 5
+		'header' => _('Discovery status'),
+		'defaults' => ['col' => 1, 'row' => 5]
 	];
 }
 
@@ -134,8 +135,8 @@ foreach ($widgets as $widgetid => $widget) {
 
 	$rate = CProfile::get($profile.'.rf_rate', 60);
 	$expanded = (bool) CProfile::get($profile.'.state', true);
-	$col = CProfile::get($profile.'.col', $widget['col']);
-	$row = CProfile::get($profile.'.row', $widget['row']);
+	$col = CProfile::get($profile.'.col', $widget['defaults']['col']);
+	$row = CProfile::get($profile.'.row', $widget['defaults']['row']);
 
 	$icon = (new CButton(null))
 		->addClass(ZBX_STYLE_BTN_WIDGET_ACTION)
@@ -144,7 +145,7 @@ foreach ($widgets as $widgetid => $widget) {
 
 	$dashboardGrid[$col][$row] = (new CCollapsibleUiWidget($widgetid, (new CDiv())->addClass('preloader')))
 		->setExpanded($expanded)
-		->setHeader(null, [$icon], true, 'zabbix.php?action=dashboard.widget')
+		->setHeader($widget['header'], [$icon], true, 'zabbix.php?action=dashboard.widget')
 		->setFooter(new CList([
 			(new CListItem(''))->setId($widgetid.'_footer')
 		]));

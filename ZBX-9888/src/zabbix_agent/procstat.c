@@ -722,8 +722,7 @@ out:
 static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_ptr_t *processes)
 {
 	zbx_procstat_query_data_t	*qdata;
-	int				i;
-	int				pids_num = 0;
+	int				i, pids_num = 0;
 
 	for (i = 0; i < queries->values_num; i++)
 	{
@@ -754,7 +753,7 @@ static int	procstat_scan_query_pids(zbx_vector_ptr_t *queries, const zbx_vector_
 static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vector_ptr_t *queries, int pids_num)
 {
 	zbx_procstat_query_data_t	*qdata;
-	int i;
+	int				i;
 
 	zbx_vector_uint64_reserve(pids, pids_num);
 
@@ -791,8 +790,8 @@ static void	procstat_get_monitored_pids(zbx_vector_uint64_t *pids, const zbx_vec
 static zbx_timespec_t	procstat_get_cpu_util_snapshot_for_pids(zbx_procstat_util_t *stats,
 				zbx_vector_uint64_t *pids)
 {
-	zbx_timespec_t			snapshot_timestamp;
-	int				i;
+	zbx_timespec_t	snapshot_timestamp;
+	int		i;
 
 	for (i = 0; i < pids->values_num; i++)
 		stats[i].pid = pids->values[i];
@@ -1028,7 +1027,6 @@ void	zbx_procstat_destroy()
 	procstat_ref.addr = NULL;
 }
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_procstat_get_util                                            *
@@ -1058,9 +1056,9 @@ void	zbx_procstat_destroy()
 int	zbx_procstat_get_util(const char *procname, const char *username, const char *cmdline, zbx_uint64_t flags,
 		int period, int type, double *value, char **errmsg)
 {
-	int		ret = FAIL, current, start;
+	int			ret = FAIL, current, start;
 	zbx_procstat_query_t	*query;
-	zbx_uint64_t	ticks_diff = 0, time_diff;
+	zbx_uint64_t		ticks_diff = 0, time_diff;
 
 	zbx_dshm_lock(&collector->procstat);
 
@@ -1186,10 +1184,8 @@ clean:
 
 	zbx_vector_ptr_clear_ext(&queries, (zbx_mem_free_func_t)procstat_free_query_data);
 	zbx_vector_ptr_destroy(&queries);
-
 out:
 	runid++;
 }
 
 #endif
-
