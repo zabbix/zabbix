@@ -231,32 +231,51 @@ static void	rotate_log(const char *log_filename)
 #endif
 }
 
-void	zbx_handle_log(const char *log_filename)
+#ifndef _WINDOWS
+static sigset_t	orig_mask;
+static void	lock_log()
 {
-#ifndef _WINDOWS
-	sigset_t	mask, orig_mask;
-#endif
-	if (LOG_TYPE_FILE != log_type)
-		return;
+	sigset_t	mask;
 
-#ifndef _WINDOWS
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGUSR1);
 	sigaddset(&mask, SIGTERM);	/* block SIGTERM to prevent deadlock on log file mutex */
 
 	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
 		zbx_error("cannot set sigprocmask to block the user signal");
-#endif
+
 	LOCK_LOG;
+}
+
+static void	unlock_log()
+{
+	UNLOCK_LOG;
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore sigprocmask");
+}
+#else
+static void	lock_log()
+{
+	LOCK_LOG;
+}
+
+static void	unlock_log()
+{
+	UNLOCK_LOG;
+}
+#endif
+
+void	zbx_handle_log(const char *log_filename)
+{
+	if (LOG_TYPE_FILE != log_type)
+		return;
+
+	lock_log();
 
 	rotate_log(log_filename);
 
-	UNLOCK_LOG;
-
-#ifndef _WINDOWS
-	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-		zbx_error("cannot restore sigprocmask");
-#endif
+	unlock_log();
 }
 
 int	zabbix_open_log(int type, int level, const char *filename)
@@ -398,24 +417,13 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 #ifdef _WINDOWS
 	WORD		wType;
 	wchar_t		thread_id[20], *strings[2];
-#else
-	sigset_t	mask, orig_mask;
 #endif
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
-#ifndef _WINDOWS
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGTERM);	/* block SIGTERM to prevent deadlock on log file mutex */
-#endif
 	if (LOG_TYPE_FILE == log_type)
 	{
-#ifndef _WINDOWS
-		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-			zbx_error("cannot set sigprocmask to block the user signal");
-#endif
-		LOCK_LOG;
+		lock_log();
 
 		rotate_log(log_filename);
 
@@ -444,12 +452,8 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 			zbx_fclose(log_file);
 		}
 
-		UNLOCK_LOG;
+		unlock_log();
 
-#ifndef _WINDOWS
-		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-			zbx_error("cannot restore sigprocmask");
-#endif
 		return;
 	}
 
@@ -521,11 +525,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	}	/* LOG_TYPE_SYSLOG */
 	else	/* LOG_TYPE_UNDEFINED == log_type */
 	{
-#ifndef _WINDOWS
-		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-			zbx_error("cannot set sigprocmask to block the user signal");
-#endif
-		LOCK_LOG;
+		lock_log();
 
 		switch (level)
 		{
@@ -549,11 +549,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		UNLOCK_LOG;
-#ifndef _WINDOWS
-		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-			zbx_error("cannot restore sigprocmask");
-#endif
+		unlock_log();
 	}
 }
 
