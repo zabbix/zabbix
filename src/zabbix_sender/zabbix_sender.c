@@ -129,6 +129,7 @@ const char	*help_message[] = {
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	"  --tls-connect value        How to connect to server or proxy. Values:",
 	"                               unencrypted - connect without encryption",
+	"                                             (default)",
 	"                               psk         - connect using TLS and a pre-shared",
 	"                                             key",
 	"                               cert        - connect using TLS and a",
