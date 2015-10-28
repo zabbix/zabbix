@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha4
 
 New features:
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-2678] implemented trigger description and URL popups in the dashboard's "Last 20 issues" and screen element's "Host group issues" and "Host issues" (Ivo)
 ..F....... [ZBX-2517] minimum period for time navigator set to 5 minutes; thanks to Zabbix community (Alexei)
@@ -8,6 +9,9 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+........S. [ZBX-9959] fixed JSON validation: produce an error on invalid escape sequences in a string value (dimir)
+A.F....... [ZBX-7202] fixed action disabling when deleting user or user group (Gunars)
+..F....... [ZBX-9970] removed service label from configuration popup menu (Gunars)
 ..F....... [ZBX-9945] fixed updating of "Device uniqueness criterias" while editing discovery checks (Sasha, vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
@@ -215,6 +219,8 @@ New features:
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+........S. [ZBX-9959] fixed JSON validation: produce an error on invalid escape sequences in a string value (dimir)
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 ..F....... [ZBX-9948] fixed graph prototype preview for pie charts (vitalijs)
@@ -909,6 +915,7 @@ New features:
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
 ..F....... [ZBX-9919] fixed y scale calculation for linear graphs (vitalijs)
