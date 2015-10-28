@@ -38,12 +38,12 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'C',
-							'operator' => 0
+							'operator' => CONDITION_OPERATOR_EQUAL
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'D',
-							'operator' => 0
+							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_AND
@@ -61,12 +61,12 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'A',
-							'operator' => 0
+							'operator' => CONDITION_OPERATOR_EQUAL
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'B',
-							'operator' => 0
+							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_EXPRESSION,
@@ -87,12 +87,12 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'C',
-							'operator' => 0
+							'operator' => CONDITION_OPERATOR_EQUAL
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'D',
-							'operator' => 0
+							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_OR
@@ -116,7 +116,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'D',
-							'operator' => 0
+							'operator' => CONDITION_OPERATOR_EQUAL
 						]
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_AND
@@ -136,12 +136,12 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'C',
-							'operator' => 0
+							'operator' => CONDITION_OPERATOR_EQUAL
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
 							'formulaid' => 'D',
-							'operator' => 1
+							'operator' => CONDITION_OPERATOR_NOT_EQUAL
 						]
 					],
 					'evaltype' => CONDITION_EVAL_TYPE_AND
