@@ -291,7 +291,8 @@ By default
 .B Zabbix sender
 does not read any configuration file.
 Absolute path should be specified.
-Only parameters \fBHostname\fR, \fBServerActive\fR and \fBSourceIP\fR are supported.
+Only parameters \fBHostname\fR, \fBServerActive\fR, \fBSourceIP\fR, \fBTLSConnect\fR, \fBTLSCAFile\fR, \fBTLSCRLFile\fR,
+\fBTLSServerCertIssuer\fR, \fBTLSServerCertSubject\fR, \fBTLSCertFile\fR, \fBTLSKeyFile\fR, \fBTLSPSKIdentity\fR and \fBTLSPSKFile\fR are supported.
 First entry from the \fBServerActive\fR parameter is used.
 .IP "\fB\-z\fR, \fB\-\-zabbix\-server\fR \fIserver\fR"
 Hostname or IP address of Zabbix server.
