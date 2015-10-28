@@ -238,7 +238,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->dataFrom = 'history';
 
 				$sql = 'SELECT itemid,'.$calc_field.' AS i,'.
-						'COUNT(*) AS count,AVG(value) AS avg,MIN(value) as min,'.
+						'COUNT(*) AS count,AVG(value) AS avg,MIN(value) AS min,'.
 						'MAX(value) AS max,MAX(clock) AS clock';
 			}
 			else {
