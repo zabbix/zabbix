@@ -46,7 +46,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 							'operator' => 0
 						]
 					],
-					'evaltype' => CONDITION_EVAL_TYPE_AND,
+					'evaltype' => CONDITION_EVAL_TYPE_AND
 				]
 			]
 		];
@@ -78,11 +78,11 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 					'conditions' => [
 						[
 							'conditiontype' => CONDITION_TYPE_MAINTENANCE,
-							'formulaid' => 'A',
+							'formulaid' => 'A'
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_TEMPLATE,
-							'formulaid' => 'B',
+							'formulaid' => 'B'
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
@@ -95,7 +95,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 							'operator' => 0
 						]
 					],
-					'evaltype' => CONDITION_EVAL_TYPE_OR,
+					'evaltype' => CONDITION_EVAL_TYPE_OR
 				]
 			],
 			[
@@ -103,15 +103,15 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 					'conditions' => [
 						[
 							'conditiontype' => CONDITION_TYPE_MAINTENANCE,
-							'formulaid' => 'A',
+							'formulaid' => 'A'
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_TEMPLATE,
-							'formulaid' => 'B',
+							'formulaid' => 'B'
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_HOST,
-							'formulaid' => 'C',
+							'formulaid' => 'C'
 						],
 						[
 							'conditiontype' => CONDITION_TYPE_TRIGGER,
@@ -119,7 +119,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 							'operator' => 0
 						]
 					],
-					'evaltype' => CONDITION_EVAL_TYPE_AND,
+					'evaltype' => CONDITION_EVAL_TYPE_AND
 				]
 			],
 			[
@@ -144,7 +144,7 @@ class CConditionValidatorTest extends PHPUnit_Framework_TestCase {
 							'operator' => 1
 						]
 					],
-					'evaltype' => CONDITION_EVAL_TYPE_AND,
+					'evaltype' => CONDITION_EVAL_TYPE_AND
 				]
 			]
 		];
