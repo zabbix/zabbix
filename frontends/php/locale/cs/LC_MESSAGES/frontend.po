@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-28 15:17+0200\n"
-"PO-Revision-Date: 2015-10-23 14:24+0300\n"
+"POT-Creation-Date: 2015-10-28 15:20+0200\n"
+"PO-Revision-Date: 2015-10-26 08:20+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1445603084.0\n"
+"X-POOTLE-MTIME: 1445840436.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -12573,7 +12573,7 @@ msgstr "Skript se jménem \"%1$s\" již existuje v menu cestě pro skript \"%2$s
 #: include/classes/api/services/CScript.php:395
 #: include/classes/api/services/CScript.php:437
 msgid "Script name cannot be empty."
-msgstr "Script parametry"
+msgstr "Název skriptu nemůže být prázdný."
 
 #: app/views/administration.mediatype.edit.php:106
 msgid "Script parameters"
