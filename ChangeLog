@@ -9,6 +9,7 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+A......... [ZBX-9975] fixed undefined index when updating trigger prototype (Gunars)
 ........S. [ZBX-9959] fixed JSON validation: produce an error on invalid escape sequences in a string value (dimir)
 A.F....... [ZBX-7202] fixed action disabling when deleting user or user group (Gunars)
 ..F....... [ZBX-9970] removed service label from configuration popup menu (Gunars)
