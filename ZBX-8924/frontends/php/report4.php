@@ -207,7 +207,11 @@ else {
 	}
 
 	// collect data by period
-	$alerts = API::Alert()->getAlertsCountByIntervals(array('intervals' => $intervals));
+	$alerts = API::Alert()->getAlertsCountByIntervals(array(
+		'intervals' => $intervals,
+		'media_type' => getRequest('media_type', 0)
+	));
+
 	foreach($alerts as $adata) {
 		$periods[$adata['period_from']][$adata['userid']]['medias'][$adata['mediatypeid']] = $adata['alerts_count'];
 		$periods[$adata['period_from']][$adata['userid']]['total'] += $adata['alerts_count'];

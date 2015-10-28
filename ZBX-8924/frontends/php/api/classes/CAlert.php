@@ -445,24 +445,26 @@ class CAlert extends CZBXAPI {
 	 * Get alerts count by intersvals for each user.
 	 *
 	 * @param array $options
-	 * @param array $options['intervals']	time periods
+	 * @param array $options['intervals']	time periods from => till
+	 * @param int	$options['media_type']	media type id
 	 *
 	 * @return array
 	 */
 	public function getAlertsCountByIntervals(array $options) {
-		$i = 0;
+		$union = false;
 		$sql = '';
 		foreach ($options['intervals'] as $from => $till) {
-			if ($i > 0) {
+			if ($union) {
 				$sql .= ' UNION ';
 			}
 			$sql .= 'SELECT count(a.alertid) as alerts_count,a.userid,a.mediatypeid,'.zbx_dbstr($from).' as period_from'.
 				' FROM alerts a'.
 				' WHERE a.clock>='.zbx_dbstr($from).
-				' AND a.clock<'.zbx_dbstr($till).
-				(get_request('media_type') ? ' AND a.mediatypeid='.zbx_dbstr(get_request('media_type')) : null).
+					' AND a.clock<'.zbx_dbstr($till).
+					(($options['media_type'] > 0) ? ' AND a.mediatypeid='.zbx_dbstr($options['media_type']) : '').
 				' GROUP BY a.userid, a.mediatypeid';
-			$i++;
+
+			$union = true;
 		}
 		$alerts = DBfetchArray(DBselect($sql));
 
