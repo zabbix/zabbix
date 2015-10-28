@@ -1348,7 +1348,7 @@ class CUser extends CApiService {
 
 		foreach($actionids as $actionid) {
 			add_audit_details(AUDIT_ACTION_DISABLE, AUDIT_RESOURCE_ACTION, $actionid, '',
-				_('Action disabled due to deletion of user'), null
+				_('Action disabled due to deletion of user.'), null
 			);
 		}
 	}
