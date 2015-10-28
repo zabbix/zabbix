@@ -1286,26 +1286,26 @@ class CLineGraphDraw extends CGraphDraw {
 	private function calculateTimeInterval() {
 		$timeInterval = ($this->gridPixels * $this->period) / $this->sizeX;
 		$intervals = [
-			['main' => 30, 'sub' => 1],								// 30 seconds and 1 second
-			['main' => 60, 'sub' => 5],								// 60 seconds and 5 seconds
-			['main' => 300, 'sub' => 10],							// 5 minuts and 10 seconds
-			['main' => 900, 'sub' => 30],							// 15 minuts and 30 seconds
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN],			// 1 hour and 1 minute
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 2],		// 1 hour and 2 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 5],		// 1 hour and 5 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 15],	// 1 hour and 15 minutes
-			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 30],	// 1 hour and 30 minutes
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR],			// 1 day and 1 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 3],		// 1 day and 3 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],		// 1 day and 6 hours
-			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],	// 1 day and 12 hours
-			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],			// 1 week and 1 day
-			['main' => SEC_PER_WEEK * 2, 'sub' => SEC_PER_WEEK],	// 2 weeks and 1 week
-			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_DAY * 15],	// 30 days and 15 days
-			['main' => SEC_PER_MONTH * 6, 'sub' => SEC_PER_MONTH],	// half year and 30 days
-			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],		// 1 year and 30 days
-			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 6],	// 1 year and 180 days
-			['main' => SEC_PER_YEAR * 5, 'sub' => SEC_PER_YEAR]		// 5 years and 1 year
+			['main' => SEC_PER_MIN / 2, 'sub' => SEC_PER_MIN / 60],		// 30 seconds and 1 second
+			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 12],			// 60 seconds and 5 seconds
+			['main' => SEC_PER_MIN * 5, 'sub' => SEC_PER_MIN / 6],		// 5 minuts and 10 seconds
+			['main' => SEC_PER_MIN * 15, 'sub' => SEC_PER_MIN / 2],		// 15 minuts and 30 seconds
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN],				// 1 hour and 1 minute
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 2],			// 1 hour and 2 minutes
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 5],			// 1 hour and 5 minutes
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 15],		// 1 hour and 15 minutes
+			['main' => SEC_PER_HOUR, 'sub' => SEC_PER_MIN * 30],		// 1 hour and 30 minutes
+			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR],				// 1 day and 1 hours
+			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 3],			// 1 day and 3 hours
+			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],			// 1 day and 6 hours
+			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],		// 1 day and 12 hours
+			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],				// 1 week and 1 day
+			['main' => SEC_PER_WEEK * 2, 'sub' => SEC_PER_WEEK],		// 2 weeks and 1 week
+			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_DAY * 15],		// 30 days and 15 days
+			['main' => SEC_PER_MONTH * 6, 'sub' => SEC_PER_MONTH],		// half year and 30 days
+			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],			// 1 year and 30 days
+			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 6],		// 1 year and 180 days
+			['main' => SEC_PER_YEAR * 5, 'sub' => SEC_PER_YEAR]			// 5 years and 1 year
 		];
 
 		// default values
@@ -1378,12 +1378,13 @@ class CLineGraphDraw extends CGraphDraw {
 		$mainIntervalX = $this->grid['horizontal']['main']['intervalx'];
 		$mainOffset = $this->grid['horizontal']['main']['offset'];
 
+		$element_size = imageTextSize(7, 90, 'WWW');
+
 		if ($subInterval == $mainInterval || ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX))
 				|| ($mainIntervalX < (ceil($mainInterval / $subInterval + 1) * $element_size['width']))) {
 			return;
 		}
 
-		$element_size = imageTextSize(7, 90, 'WWW');
 		$position = 0;
 
 		$i = 1;
@@ -1461,15 +1462,15 @@ class CLineGraphDraw extends CGraphDraw {
 			elseif ((date('H', $new_time) == 0 && date('i', $new_time) == 0) || $subInterval > SEC_PER_HOUR * 12) {
 				$format = _('m-d');
 			}
-			else {
+			elseif (date('s', $new_time) == 0 && $subInterval >= 60) {
 				$format = TIME_FORMAT;
+			}
+			else {
+				$format = _('H:i:s');
 			}
 
 			// main interval checks
-			if (($subInterval < SEC_PER_HOUR && date('i', $new_time) == 0)
-					|| ($subInterval == SEC_PER_DAY && date('N', $new_time) == 7)
-					|| ($subInterval >= SEC_PER_HOUR && date('H', $new_time) == '00' && $subInterval < SEC_PER_DAY)
-					|| $format == YEAR_FORMAT) {
+			if (!($new_time % $mainInterval) || $format == YEAR_FORMAT) {
 				$this->drawMainPeriod($new_time, $format, $position);
 				continue;
 			}
