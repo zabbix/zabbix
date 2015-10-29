@@ -134,19 +134,20 @@ $sysmapList->addRow(_('Icon label location'), new CComboBox('label_location', $d
 	]
 ));
 
-// append show unack to form list
-$showUnackComboBox = new CComboBox('show_unack', $this->data['sysmap']['show_unack'], null, [
-	EXTACK_OPTION_ALL => _('All'),
-	EXTACK_OPTION_BOTH => _('Separated'),
-	EXTACK_OPTION_UNACK => _('Unacknowledged only'),
-]);
-$showUnackComboBox->setEnabled($this->data['config']['event_ack_enable']);
-if (!$this->data['config']['event_ack_enable']) {
-	$showUnackComboBox->setAttribute('title', _('Acknowledging disabled'));
+if ($this->data['config']['event_ack_enable']) {
+	// append show unack to form list
+	$showUnackComboBox = new CComboBox('show_unack', $this->data['sysmap']['show_unack'], null, [
+		EXTACK_OPTION_ALL => _('All'),
+		EXTACK_OPTION_BOTH => _('Separated'),
+		EXTACK_OPTION_UNACK => _('Unacknowledged only'),
+	]);
+	$sysmapList->addRow(_('Problem display'), $showUnackComboBox);
 }
-$sysmapList
-	->addRow(_('Problem display'), $showUnackComboBox)
-	->addRow(_('Minimum trigger severity'), new CSeverity(['name' => 'severity_min', 'value' => (int) $this->data['sysmap']['severity_min']]));
+
+$sysmapList->addRow(_('Minimum trigger severity'), new CSeverity([
+	'name' => 'severity_min',
+	'value' => (int) $this->data['sysmap']['severity_min']
+]));
 
 // create url table
 $urlTable = (new CTable())

@@ -110,17 +110,16 @@ $dashconfFormList->addRow(_('Trigger name like'),
 		->setEnabled($data['isFilterEnable'])
 );
 
-// append problem display to form list
-$extAckComboBox = new CComboBox('extAck', $this->data['extAck'], null, [
-	EXTACK_OPTION_ALL => _('All'),
-	EXTACK_OPTION_BOTH => _('Separated'),
-	EXTACK_OPTION_UNACK => _('Unacknowledged only')
-]);
-$extAckComboBox->setEnabled($this->data['isFilterEnable'] && $this->data['config']['event_ack_enable']);
-if (!$this->data['config']['event_ack_enable']) {
-	$extAckComboBox->setAttribute('title', _('Event acknowledging disabled'));
+if ($data['config']['event_ack_enable']) {
+	// append problem display to form list
+	$ext_ack_combobox = new CComboBox('extAck', $data['extAck'], null, [
+		EXTACK_OPTION_ALL => _('All'),
+		EXTACK_OPTION_BOTH => _('Separated'),
+		EXTACK_OPTION_UNACK => _('Unacknowledged only')
+	]);
+	$ext_ack_combobox->setEnabled($data['isFilterEnable']);
+	$dashconfFormList->addRow(_('Problem display'), $ext_ack_combobox);
 }
-$dashconfFormList->addRow(_('Problem display'), $extAckComboBox);
 
 // create tab
 $dashconfTab = new CTabView();
