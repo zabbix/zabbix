@@ -1300,6 +1300,7 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],			// 1 day and 6 hours
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],		// 1 day and 12 hours
 			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],				// 1 week and 1 day
+			['main' => SEC_PER_WEEK * 2, 'sub' => SEC_PER_DAY],			// 2 weeks and 1 day
 			['main' => SEC_PER_WEEK * 2, 'sub' => SEC_PER_WEEK],		// 2 weeks and 1 week
 			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_DAY * 15],		// 30 days and 15 days
 			['main' => SEC_PER_MONTH * 6, 'sub' => SEC_PER_MONTH],		// half year and 30 days
@@ -1378,15 +1379,13 @@ class CLineGraphDraw extends CGraphDraw {
 		$mainIntervalX = $this->grid['horizontal']['main']['intervalx'];
 		$mainOffset = $this->grid['horizontal']['main']['offset'];
 
-		$element_size = imageTextSize(7, 90, 'WWW');
-
-		if ($subInterval == $mainInterval || ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX))
-				|| ($mainIntervalX < (ceil($mainInterval / $subInterval + 1) * $element_size['width']))) {
+		if ($subInterval == $mainInterval || ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX))) {
 			return;
 		}
 
+		$element_size = imageTextSize(7, 90, 'WWW');
+		$end_element_size = imageTextSize(8, 90, 'WWW');
 		$position = 0;
-
 		$i = 1;
 
 		while ($this->stime + $i * $subInterval + $subOffset < $this->to_time) {
@@ -1440,13 +1439,19 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$timeInterval = $new_time - $previous_time;
 
-			$timeIntervalX = (($timeInterval) * $this->sizeX) / $this->period;
+			$timeIntervalX = ($timeInterval * $this->sizeX) / $this->period;
 
 			$position += $timeIntervalX;
 
+			// First element cheack.
 			if (($i == 1 && $position < $element_size['width']) || $new_time >= $this->to_time) {
 				$i++;
 				continue;
+			}
+
+			// Last element cheack.
+			if ($position > $this->sizeX - $end_element_size['width'] / 2) {
+				break;
 			}
 
 			$i++;
@@ -1470,7 +1475,11 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 
 			// main interval checks
-			if (!($new_time % $mainInterval) || $format == YEAR_FORMAT) {
+			if ((!($new_time % $mainInterval) && $mainInterval < SEC_PER_DAY)
+					|| ($mainInterval == SEC_PER_DAY && date('H', $new_time) == 0 && date('i', $new_time) == 0)
+					|| ($mainInterval == SEC_PER_WEEK && date('N', $new_time) == 7)
+					|| ($mainInterval == SEC_PER_MONTH && date('d', $new_time) == 1)
+					|| $format == YEAR_FORMAT) {
 				$this->drawMainPeriod($new_time, $format, $position);
 				continue;
 			}
