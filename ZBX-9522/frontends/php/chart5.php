@@ -31,7 +31,9 @@ include_once('include/page_header.php');
 $fields = array(
 	'serviceid' => array(T_ZBX_INT, O_MAND, P_SYS, DB_ID, null)
 );
-check_fields($fields);
+if (!check_fields($fields)) {
+	exit();
+}
 
 /*
  * Permissions
