@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
+"POT-Creation-Date: 2015-10-25 13:18+0200\n"
 "PO-Revision-Date: 2013-01-23 18:56+0200\n"
 "Last-Translator: jeppe <jeppe@arabuusimiehet.com>\n"
 "Language-Team: none\n"
@@ -42,7 +42,7 @@ msgid_plural "%1$d scenarios"
 msgstr[0] "%1$d skenaario"
 msgstr[1] "%1$d skenaariota"
 
-#: chart4.php:90 chart5.php:83
+#: chart4.php:92 chart5.php:85
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (vuosi %2$s)"
@@ -595,7 +595,7 @@ msgstr "Sovelluksessa virhe."
 msgid "Application updated"
 msgstr "Sovellus päivitetty"
 
-#: api/classes/CItemGeneral.php:333
+#: api/classes/CItemGeneral.php:343
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Sovellus ID:llä \"%1$s\" ei ole käytettävissä koneella \"%2$s\"."
@@ -1478,7 +1478,7 @@ msgstr ""
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr ""
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr ""
 
@@ -1593,7 +1593,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr ""
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:584 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -1999,7 +1999,7 @@ msgstr ""
 msgid "Cannot update slide show"
 msgstr ""
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr ""
 
@@ -4664,7 +4664,7 @@ msgstr ""
 msgid "General"
 msgstr ""
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
+#: chart4.php:182 chart5.php:202 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr ""
@@ -5995,12 +5995,12 @@ msgstr ""
 msgid "Incorrect file upload."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:759
+#: api/classes/CItemGeneral.php:769
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:748
+#: api/classes/CItemGeneral.php:758
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr ""
@@ -6537,7 +6537,7 @@ msgstr ""
 msgid "Item"
 msgstr ""
 
-#: api/classes/CItemGeneral.php:583
+#: api/classes/CItemGeneral.php:593
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr ""
@@ -6568,7 +6568,7 @@ msgstr ""
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:325
+#: api/classes/CItemGeneral.php:335
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr ""
@@ -6612,36 +6612,36 @@ msgstr ""
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:303
+#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:376
+#: api/classes/CItemGeneral.php:386
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:382
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:379
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:373
+#: api/classes/CItemGeneral.php:383
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:385
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:725
+#: api/classes/CItemGeneral.php:735
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr ""
@@ -8078,7 +8078,7 @@ msgstr ""
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:309
+#: api/classes/CItemGeneral.php:319
 msgid "No authentication user name specified."
 msgstr ""
 
@@ -8193,7 +8193,7 @@ msgstr ""
 msgid "No graph prototypes defined."
 msgstr ""
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
+#: chart2.php:51 chart6.php:53 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1340
@@ -8325,7 +8325,7 @@ msgstr ""
 msgid "No item with itemid=\"%1$s\"."
 msgstr ""
 
-#: chart.php:49 include/items.inc.php:725
+#: chart.php:51 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:953 popup.php:1088
 msgid "No items defined."
@@ -8461,7 +8461,7 @@ msgstr ""
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:317
+#: api/classes/CItemGeneral.php:327
 msgid "No private key file specified."
 msgstr ""
 
@@ -8478,7 +8478,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:314
+#: api/classes/CItemGeneral.php:324
 msgid "No public key file specified."
 msgstr ""
 
@@ -8553,7 +8553,7 @@ msgstr ""
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr ""
 
-#: chart4.php:40 include/triggers.inc.php:1193
+#: chart4.php:42 include/triggers.inc.php:1193
 #: include/views/configuration.triggers.list.php:90 popup.php:973
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8811,7 +8811,7 @@ msgstr ""
 msgid "OEM"
 msgstr ""
 
-#: chart4.php:167 chart5.php:192 httpdetails.php:147 httpdetails.php:213
+#: chart4.php:169 chart5.php:194 httpdetails.php:147 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:843
 #: include/maps.inc.php:940 include/setup.inc.php:200
@@ -9002,7 +9002,7 @@ msgstr ""
 msgid "Opera"
 msgstr ""
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr ""
@@ -9300,7 +9300,7 @@ msgstr ""
 msgid "POP"
 msgstr ""
 
-#: chart5.php:196 include/maps.inc.php:637 include/triggers.inc.php:166
+#: chart5.php:198 include/maps.inc.php:637 include/triggers.inc.php:166
 msgid "PROBLEM"
 msgstr ""
 
@@ -9650,7 +9650,7 @@ msgstr ""
 msgid "Problem, if at least one child has a problem"
 msgstr ""
 
-#: chart4.php:171 include/maps.inc.php:689 include/maps.inc.php:779
+#: chart4.php:173 include/maps.inc.php:689 include/maps.inc.php:779
 #: include/maps.inc.php:877 report2.php:237 report3.php:85
 msgid "Problems"
 msgstr ""
@@ -10763,7 +10763,7 @@ msgstr ""
 msgid "Selected"
 msgstr ""
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr ""
 
@@ -11323,7 +11323,7 @@ msgstr ""
 msgid "Status only"
 msgstr ""
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr ""
 
@@ -12269,7 +12269,7 @@ msgstr ""
 msgid "Units"
 msgstr ""
 
-#: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
+#: chart4.php:177 events.php:506 events.php:507 events.php:516 events.php:517
 #: events.php:518 events.php:519 hosts.php:807 httpdetails.php:160
 #: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
 #: include/actions.inc.php:105 include/actions.inc.php:129
@@ -12822,7 +12822,7 @@ msgstr ""
 msgid "Warning"
 msgstr ""
 
-#: chart7.php:76
+#: chart7.php:78
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
 msgstr ""
 
@@ -13250,9 +13250,9 @@ msgstr ""
 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
-#: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
-#: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
-#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1602
+#: api/classes/CHostGroup.php:912 api/classes/CHostGroup.php:967
+#: api/classes/CHostGroup.php:1012 api/classes/CHostGroup.php:1025
+#: api/classes/CHostGroup.php:1041 api/classes/CHost.php:1602
 #: api/classes/CHost.php:1656 api/classes/CHost.php:1970
 #: api/classes/CMaintenance.php:618 api/classes/CMaintenance.php:725
 #: api/classes/CMaintenance.php:737 api/classes/CScript.php:258
@@ -13518,7 +13518,7 @@ msgstr ""
 msgid "d M Y H:i:s"
 msgstr ""
 
-#: chart4.php:127 chart5.php:137
+#: chart4.php:129 chart5.php:139
 msgid "d.M"
 msgstr ""
 

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-03-23 22:50+0200\n"
-"PO-Revision-Date: 2015-07-24 12:51+0300\n"
+"POT-Creation-Date: 2015-10-25 13:18+0200\n"
+"PO-Revision-Date: 2015-08-17 14:06+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1437735070.0\n"
+"X-POOTLE-MTIME: 1439813204.0\n"
 
 #: api/classes/CMaintenance.php:458 api/classes/CMaintenance.php:463
 #: api/classes/CMaintenance.php:575 api/classes/CMaintenance.php:580
@@ -46,7 +46,7 @@ msgstr[0] "%1$d scénář"
 msgstr[1] "%1$d scénáře"
 msgstr[2] "%1$d scénářů"
 
-#: chart4.php:90 chart5.php:83
+#: chart4.php:92 chart5.php:85
 #, php-format
 msgid "%1$s (year %2$s)"
 msgstr "%1$s (rok %2$s)"
@@ -71,9 +71,9 @@ msgstr[2] "Bolo detekováno %1$s neúspěšných pokusů o přihlášení. Posle
 #, php-format
 msgid "%2$d of %1$d issue is shown"
 msgid_plural "%2$d of %1$d issues are shown"
-msgstr[0] "zobrazji %2$d z %1$d"
-msgstr[1] "zobrazji %2$d z %1$d"
-msgstr[2] "zobrazji %2$d z %1$d"
+msgstr[0] "zobrazuji %2$d z %1$d"
+msgstr[1] "zobrazuji %2$d z %1$d"
+msgstr[2] "zobrazuji %2$d z %1$d"
 
 #: include/views/monitoring.discovery.php:133
 #, php-format
@@ -254,7 +254,7 @@ msgstr "Přijaté OK události"
 
 #: include/views/administration.general.triggerDisplayOptions.edit.php:49
 msgid "Acknowledged PROBLEM events"
-msgstr "Přijaté PROBLÉMy"
+msgstr "Potvrzené PROBLÉMOVÉ události"
 
 #: acknow.php:27 tr_events.php:123
 msgid "Acknowledges"
@@ -501,7 +501,7 @@ msgstr "Agent"
 
 #: include/views/configuration.host.edit.php:233
 msgid "Agent interfaces"
-msgstr "Agentova rozhraní"
+msgstr "Agent rozhraní"
 
 #: hosts.php:56
 msgid "Agent or SNMP or JMX or IPMI interface"
@@ -603,7 +603,7 @@ msgstr "Chyba aplikace."
 msgid "Application updated"
 msgstr "Aplikace byla aktualizována"
 
-#: api/classes/CItemGeneral.php:333
+#: api/classes/CItemGeneral.php:343
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikace s ID \"%1$s\" není na \"%2$s\" dostupná."
@@ -1487,7 +1487,7 @@ msgstr "Není možné smazat skripty. Skript \"%1$s\" se používá v operaci ak
 msgid "Cannot delete scripts. Script with scriptid \"%s\" does not exist."
 msgstr "Není možné smazat skripty. Skript se scriptid \"%s\" neexistuje."
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Cannot delete selected actions"
 msgstr "Není možné smazat označené akce"
 
@@ -1602,7 +1602,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Host \"%1$s\" použitý v obrazovce \"%2$s\" nebyl nalezený."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:584 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -2010,7 +2010,7 @@ msgstr "Nelze upravit službu"
 msgid "Cannot update slide show"
 msgstr "Není možné aktualizovat prezentaci"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Cannot update status"
 msgstr "Nelze upravit stav"
 
@@ -4316,7 +4316,7 @@ msgstr "Události"
 
 #: include/forms.inc.php:1514
 msgid "Every day(s)"
-msgstr "Každý dne(í)"
+msgstr "Každý den(í)"
 
 #: include/forms.inc.php:1521
 msgid "Every week(s)"
@@ -4687,7 +4687,7 @@ msgstr "GUI přístup vypnut."
 msgid "General"
 msgstr "Obecné"
 
-#: chart4.php:180 chart5.php:200 include/classes/class.cbar.php:770
+#: chart4.php:182 chart5.php:202 include/classes/class.cbar.php:770
 #, php-format
 msgid "Generated in %s sec"
 msgstr "Vygenerované za %s sekund"
@@ -5207,7 +5207,7 @@ msgstr "Hostitel \"%s\" již existuje."
 #: include/classes/import/CXmlImport18.php:928
 #, php-format
 msgid "Host \"%s\" has \"useipmi\" parameter checked, but has no \"ipmi_ip\" parameter! Using host IP address as an address for IPMI interface."
-msgstr "Host \"%s\" má nastavený parameter \"useipmi\", ale nemá parametr \"ipmi_ip\". Použij IP adresu hosta jako adresu pro IPMI rozhraní."
+msgstr "Host \"%s\" má nastavený parametr \"useipmi\", ale nemá parametr \"ipmi_ip\". Použij IP adresu hosta jako adresu pro IPMI rozhraní."
 
 #: include/views/configuration.screen.constructor.edit.php:343
 msgid "Host (ascending)"
@@ -6018,12 +6018,12 @@ msgstr "Neplatné pole pro spouštěč."
 msgid "Incorrect file upload."
 msgstr "Nahraný neplatný soubor."
 
-#: api/classes/CItemGeneral.php:759
+#: api/classes/CItemGeneral.php:769
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Neplatný flexibilní interval \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:748
+#: api/classes/CItemGeneral.php:758
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Neplatný flexibilní interval u položky \"%1$s\". Flexibilní interval musí být řetězec."
@@ -6560,7 +6560,7 @@ msgstr "Italsky (it_IT)"
 msgid "Item"
 msgstr "Položka"
 
-#: api/classes/CItemGeneral.php:583
+#: api/classes/CItemGeneral.php:593
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Položka \"%1$s\" už existuje na \"%2$s\", zděděná z jiné šablony."
@@ -6591,7 +6591,7 @@ msgstr "Položka \"%1$s\" na \"%2$s\": aplikaci \"%3$s\" neexistuje."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Položka \"%1$s\" překočená - uživatelské pravidlo."
 
-#: api/classes/CItemGeneral.php:325
+#: api/classes/CItemGeneral.php:335
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Položka \"%1$s:%2$s\" má neplatný port: \"%3$s\"."
@@ -6635,36 +6635,36 @@ msgstr "Položka používá rozhraní z ne nadřazeného hosta."
 msgid "Item uses incorrect interface type."
 msgstr "Položka používá neplatný typ rozhraní."
 
-#: api/classes/CItemGeneral.php:303
+#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Položka nebude akutalizována. Zadejte, prosím, správný interval aktualizací."
 
-#: api/classes/CItemGeneral.php:376
+#: api/classes/CItemGeneral.php:386
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\" jako objevovací pravidlo."
 
-#: api/classes/CItemGeneral.php:382
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\" jako položka vytvořená z prototypu položky."
 
-#: api/classes/CItemGeneral.php:379
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\" jako prototyp položky."
 
-#: api/classes/CItemGeneral.php:373
+#: api/classes/CItemGeneral.php:383
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\" jako položka."
 
-#: api/classes/CItemGeneral.php:385
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\" jako neznámy element položky."
 
-#: api/classes/CItemGeneral.php:725
+#: api/classes/CItemGeneral.php:735
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Položka s klíčem \"%1$s\" již existuje na \"%2$s\"."
@@ -7702,12 +7702,12 @@ msgstr "Minimalizovat"
 #: include/classes/class.frontendsetup.php:121
 #, php-format
 msgid "Minimum required PHP memory limit is %s (configuration option \"memory_limit\")"
-msgstr "Minimální požadovaný PHP paměťový limit je %s (konfigurační volba \"memory_limit\""
+msgstr "Minimální požadovaný PHP paměťový limit je %s (konfigurační volba \"memory_limit\")"
 
 #: include/classes/class.frontendsetup.php:159
 #, php-format
 msgid "Minimum required PHP upload filesize is %s (configuration option \"upload_max_filesize\")"
-msgstr "Minimální požadovaná PHP velikost nahrávaného souboru je %s (konfigurační volba \"upload_max_filesize\""
+msgstr "Minimální požadovaná PHP velikost nahrávaného souboru je %s (konfigurační volba \"upload_max_filesize\")"
 
 #: include/classes/class.frontendsetup.php:102
 #, php-format
@@ -7717,17 +7717,17 @@ msgstr "Minimální požadovaná verze PHP je %s"
 #: include/classes/class.frontendsetup.php:178
 #, php-format
 msgid "Minimum required limit on execution time of PHP scripts is %s (configuration option \"max_execution_time\")"
-msgstr "Minimální požadovaný PHP časový limit vykonání skriptů je %s (konfigurační volba \"max_execution_time\""
+msgstr "Minimální požadovaný PHP časový limit vykonání skriptů je %s (konfigurační volba \"max_execution_time\")"
 
 #: include/classes/class.frontendsetup.php:197
 #, php-format
 msgid "Minimum required limit on input parse time for PHP scripts is %s (configuration option \"max_input_time\")"
-msgstr "Minimální požadovaný PHP časový limit vstupního parsování je %s (konfigurační volba \"max_input_time\""
+msgstr "Minimální požadovaný PHP časový limit vstupního parsování je %s (konfigurační volba \"max_input_time\")"
 
 #: include/classes/class.frontendsetup.php:140
 #, php-format
 msgid "Minimum required size of PHP post is %s (configuration option \"post_max_size\")"
-msgstr "Minimální požadovaná velikost PHP POST údajů je %s (konfigurační volba \"post_max_size\""
+msgstr "Minimální požadovaná velikost PHP POST údajů je %s (konfigurační volba \"post_max_size\")"
 
 #: popup_trexpr.php:262
 msgid "Minimum value for period T is < N"
@@ -7867,7 +7867,7 @@ msgstr "NNTP"
 
 #: include/classes/screens/CScreenClock.php:59
 msgid "NO DATA"
-msgstr "BEZ ÚDAJÚ"
+msgstr "BEZ ÚDAJŮ"
 
 #: include/httptest.inc.php:29
 msgid "NTLM authentication"
@@ -8105,7 +8105,7 @@ msgstr "Není specifikovaný typ autentizace pro příkaz akce \"%s\"."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Není specifikované uživatelské jméno autentizace pro příkaz akce \"%s\"."
 
-#: api/classes/CItemGeneral.php:309
+#: api/classes/CItemGeneral.php:319
 msgid "No authentication user name specified."
 msgstr "Není specifikované uživatelské jméno autentizace."
 
@@ -8220,12 +8220,12 @@ msgstr "Žádná položka grafu s graphid \"%s\"."
 msgid "No graph prototypes defined."
 msgstr "Žádný definovaný prototyp grafu."
 
-#: chart2.php:49 chart6.php:51 include/views/configuration.graph.list.php:73
+#: chart2.php:51 chart6.php:53 include/views/configuration.graph.list.php:73
 #: include/views/monitoring.charts.php:54
 #: include/views/monitoring.charts.php:70
 #: include/views/monitoring.history.php:175 popup.php:1340
 msgid "No graphs defined."
-msgstr ""
+msgstr "Žádné definované grafy."
 
 #: api/classes/CHost.php:1311 api/classes/CHost.php:1325
 #, php-format
@@ -8243,7 +8243,7 @@ msgstr "Žádné skupiny pro šablonu"
 #: api/classes/CTemplate.php:954
 #, php-format
 msgid "No groups for template [ %s ]"
-msgstr ""
+msgstr "Žádné skupiny pro šablonu [ %s ]"
 
 #: include/classes/screens/CScreenHistory.php:159
 #: include/classes/screens/CScreenHistory.php:265
@@ -8332,7 +8332,7 @@ msgstr "Žádné rozhraní pro proxy \"%s\"."
 #: api/classes/CProxy.php:326 api/classes/CProxy.php:336
 #, php-format
 msgid "No interfaces provided for proxy \"%s\"."
-msgstr ""
+msgstr "Žádné rozhraní pro proxy \"%s\"."
 
 #: api/classes/CScreenItem.php:456
 msgid "No item ID provided for screen element."
@@ -8340,7 +8340,7 @@ msgstr "Žádné ID položek pro obrazovkový element."
 
 #: popup.php:1197
 msgid "No item prototypes defined."
-msgstr ""
+msgstr "Žádné definované prototypy položek."
 
 #: include/items.inc.php:443
 #, php-format
@@ -8352,7 +8352,7 @@ msgstr "Žádná položka s itemid \"%1$s\"."
 msgid "No item with itemid=\"%1$s\"."
 msgstr "Žádná položka s itemid=\"%1$s\"."
 
-#: chart.php:49 include/items.inc.php:725
+#: chart.php:51 include/items.inc.php:725
 #: include/views/configuration.graph.edit.php:62
 #: include/views/configuration.item.list.php:50 popup.php:953 popup.php:1088
 msgid "No items defined."
@@ -8360,15 +8360,15 @@ msgstr "Žádná definovaná položka."
 
 #: include/views/configuration.item.prototype.list.php:43
 msgid "No items prototypes defined."
-msgstr ""
+msgstr "Žádné definované prototypy položek."
 
 #: include/views/configuration.maintenance.list.php:41
 msgid "No maintenance defined."
-msgstr ""
+msgstr "Žádná definovaná údržba."
 
 #: include/views/configuration.maintenance.edit.php:130
 msgid "No maintenance period defined."
-msgstr ""
+msgstr "Žádná definovaná perioda údržby."
 
 #: api/classes/CScreenItem.php:462
 msgid "No map ID provided for screen element."
@@ -8376,19 +8376,19 @@ msgstr "Žádné ID mapy pro obrazovkový element."
 
 #: include/views/monitoring.maps.php:26 popup.php:1445 sysmaps.php:254
 msgid "No maps defined."
-msgstr ""
+msgstr "Žádná definovaná mapa."
 
 #: include/views/administration.users.edit.php:132
 msgid "No media defined."
-msgstr ""
+msgstr "Žádné definované médium."
 
 #: include/views/administration.mediatypes.list.php:36 report4.php:64
 msgid "No media types defined."
-msgstr ""
+msgstr "Žádné definované typy médií."
 
 #: include/views/administration.node.list.php:39 popup.php:1320
 msgid "No nodes defined."
-msgstr ""
+msgstr "Žádné definované uzly."
 
 #: include/views/configuration.action.edit.php:314
 msgid "No operations defined."
@@ -8427,7 +8427,7 @@ msgstr "Nemáte oprávnění"
 
 #: include/views/administration.usergroups.edit.php:79
 msgid "No permissions defined."
-msgstr ""
+msgstr "Žádné definované oprávnění."
 
 #: include/classes/import/CXmlImport18.php:1024
 #, php-format
@@ -8488,13 +8488,13 @@ msgstr "Žádné oprávnění k odkazovanému objektu nebo objekt neexistuje!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Žádný specifikovaný soubor se soukromým klíčem pro akci příkazu \"%s\"."
 
-#: api/classes/CItemGeneral.php:317
+#: api/classes/CItemGeneral.php:327
 msgid "No private key file specified."
 msgstr "Žádný specifikovaný soubor se soukromým klíčem."
 
 #: include/views/administration.proxy.list.php:42 popup.php:1776
 msgid "No proxies defined."
-msgstr ""
+msgstr "Žádné definované proxy."
 
 #: include/views/configuration.discovery.edit.php:42
 msgid "No proxy"
@@ -8505,7 +8505,7 @@ msgstr "Žádné proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Žádný specifikovaný soubor s veřejným klíčem pro akci příkazu \"%s\"."
 
-#: api/classes/CItemGeneral.php:314
+#: api/classes/CItemGeneral.php:324
 msgid "No public key file specified."
 msgstr "Žádný specifikovaný soubor s veřejným klíčem."
 
@@ -8515,11 +8515,11 @@ msgstr "Žádný příjemce pro operaci odeslání zprávy."
 
 #: include/views/administration.general.regularexpressions.list.php:28
 msgid "No regular expressions defined."
-msgstr ""
+msgstr "Žádné definované regulární výrazy."
 
 #: popup_right.php:74
 msgid "No resources defined."
-msgstr ""
+msgstr "Žádné definované zdroje."
 
 #: api/classes/CScreenItem.php:468
 msgid "No screen ID provided for screen element."
@@ -8530,7 +8530,7 @@ msgstr "Žádné ID obrazovky pro obrazovkový element."
 #: include/views/monitoring.hostscreen.php:32
 #: include/views/monitoring.screen.php:37 popup.php:1577 popup.php:1635
 msgid "No screens defined."
-msgstr ""
+msgstr "Žádné definované obrazovky."
 
 #: api/classes/CAction.php:1532
 msgid "No script specified for action operation command."
@@ -8538,7 +8538,7 @@ msgstr "Není specifikovaný skript pro akci příkazu."
 
 #: include/views/administration.script.list.php:34 popup.php:1802
 msgid "No scripts defined."
-msgstr ""
+msgstr "Žádné definované skripty."
 
 #: include/views/configuration.slideconf.list.php:37
 #: include/views/monitoring.slides.php:38 slides.php:146
@@ -8548,11 +8548,11 @@ msgstr "Žádné definované prezentace."
 #: include/views/configuration.slideconf.edit.php:42
 #: include/views/monitoring.slides.php:111 popup.php:1518
 msgid "No slides defined."
-msgstr ""
+msgstr "Žádné definované slajdy."
 
 #: httpdetails.php:127 include/views/configuration.httpconf.edit.php:124
 msgid "No steps defined."
-msgstr ""
+msgstr "Žádné definované kroky."
 
 #: triggers.php:350
 msgid "No target selected"
@@ -8565,7 +8565,7 @@ msgstr "Není vybraný cíl."
 #: include/views/configuration.host.massupdate.php:87 popup.php:631
 #: popup.php:738 popup.php:792 templates.php:453
 msgid "No templates defined."
-msgstr ""
+msgstr "Žádné definované šablony."
 
 #: include/views/configuration.services.edit.php:113
 msgid "No times defined. Work 24x7."
@@ -8580,7 +8580,7 @@ msgstr "Není spouštěč"
 msgid "No trigger with triggerid \"%1$s\"."
 msgstr "Žádný spouštěč s triggerid \"%1$s\"."
 
-#: chart4.php:40 include/triggers.inc.php:1193
+#: chart4.php:42 include/triggers.inc.php:1193
 #: include/views/configuration.triggers.list.php:90 popup.php:973
 #: report2.php:232 tr_comments.php:43 tr_status.php:267
 msgid "No triggers defined."
@@ -8593,15 +8593,15 @@ msgstr "Nenalezené žádné spouštěče."
 #: include/views/administration.usergroups.list.php:42 popup.php:835
 #: popup_usrgrp.php:89
 msgid "No user groups defined."
-msgstr ""
+msgstr "Žádné definované uživatelské skupiny."
 
 #: include/views/administration.users.list.php:51 popup.php:893
 msgid "No users defined."
-msgstr ""
+msgstr "Žádní definovaní uživatelé."
 
 #: include/views/administration.general.valuemapping.list.php:22
 msgid "No value map defined."
-msgstr ""
+msgstr "Žádná definovaná hodnota mapy."
 
 #: latest.php:187
 msgid "No values found."
@@ -8609,11 +8609,11 @@ msgstr "Nenalezené žádné hodnoty."
 
 #: httpmon.php:138
 msgid "No web checks defined."
-msgstr ""
+msgstr "Žádné definované WEB kontroly."
 
 #: include/views/configuration.httpconf.list.php:63
 msgid "No web scenarios defined."
-msgstr ""
+msgstr "Žádné definované scénáře."
 
 #: events.php:559 events.php:572 hostinventories.php:156 httpmon.php:140
 #: include/actions.inc.php:68 include/audit.inc.php:42
@@ -8715,7 +8715,7 @@ msgstr "Nesledován"
 
 #: include/html.inc.php:96
 msgid "Not request variable require."
-msgstr ""
+msgstr "Nejsou požadované proměnné HTTP požadavku."
 
 #: include/items.inc.php:151
 msgid "Not supported"
@@ -8838,7 +8838,7 @@ msgstr "Číslo (unsigned)"
 msgid "OEM"
 msgstr "OEM"
 
-#: chart4.php:167 chart5.php:192 httpdetails.php:147 httpdetails.php:213
+#: chart4.php:169 chart5.php:194 httpdetails.php:147 httpdetails.php:213
 #: httpmon.php:259 include/classes/tree/CServiceTree.php:46
 #: include/maps.inc.php:656 include/maps.inc.php:746 include/maps.inc.php:843
 #: include/maps.inc.php:940 include/setup.inc.php:200
@@ -8933,7 +8933,7 @@ msgstr "Jednorázový downtime"
 
 #: api/classes/CUserGroup.php:330 api/classes/CUserGroup.php:407
 msgid "Only Super Admins can add user groups."
-msgstr ""
+msgstr "Jen super administrátoři mohou přidat uživatelské skupiny."
 
 #: api/classes/CUserMacro.php:398
 msgid "Only Super Admins can create global macros."
@@ -8978,7 +8978,7 @@ msgstr "Jen super administrátoři mohou aktualizovat mapové ikony."
 
 #: api/classes/CUserGroup.php:382 api/classes/CUserGroup.php:504
 msgid "Only Super Admins can update user groups."
-msgstr ""
+msgstr "Jen super administrátoři mohou aktualizovat uživatelské skupiny."
 
 #: api/classes/CUser.php:685
 msgid "Only Zabbix Admins can add user media."
@@ -9010,7 +9010,7 @@ msgstr "Jen jedna uživatelská skupina může byt změněná naráz."
 
 #: api/classes/CProxy.php:608
 msgid "Only super admins can delete proxies."
-msgstr ""
+msgstr "Jen super administrátoři mohou smazat proxy."
 
 #: include/services.inc.php:298
 #, php-format
@@ -9029,7 +9029,7 @@ msgstr "Jen celá čísla"
 msgid "Opera"
 msgstr "Opera"
 
-#: actionconf.php:243
+#: actionconf.php:246
 #, php-format
 msgid "Operation \"%s\" already exists."
 msgstr "Operace \"%s\" již existuje."
@@ -9288,7 +9288,7 @@ msgstr "PHP nastavení session auto start musí být vypnuto (PHP příkaz \"ses
 
 #: include/classes/class.frontendsetup.php:570
 msgid "PHP session extension missing (PHP configuration parameter --enable-session)"
-msgstr ""
+msgstr "PHP modul session chybí (PHP konfigurační parametr --enable-session)"
 
 #: include/classes/class.frontendsetup.php:354
 msgid "PHP sockets"
@@ -9296,7 +9296,7 @@ msgstr "PHP modul sockets"
 
 #: include/classes/class.frontendsetup.php:358
 msgid "PHP sockets extension missing (PHP configuration parameter --enable-sockets)"
-msgstr ""
+msgstr "PHP modul sockets chybí (PHP konfigurační parameter --enable-sockets)"
 
 #: include/classes/class.frontendsetup.php:212
 msgid "PHP time zone"
@@ -9312,7 +9312,7 @@ msgstr "PHP modul xmlreader"
 
 #: include/classes/class.frontendsetup.php:522
 msgid "PHP xmlreader extension missing"
-msgstr ""
+msgstr "PHP modul xmlreader chybí"
 
 #: include/classes/class.frontendsetup.php:499
 msgid "PHP xmlwriter"
@@ -9320,14 +9320,14 @@ msgstr "PHP modul xmlwriter"
 
 #: include/classes/class.frontendsetup.php:503
 msgid "PHP xmlwriter extension missing"
-msgstr ""
+msgstr "PHP modul xmlwriter chybí"
 
 #: include/discovery.inc.php:62
 #: include/views/js/configuration.discovery.edit.js.php:128
 msgid "POP"
 msgstr "POP"
 
-#: chart5.php:196 include/maps.inc.php:637 include/triggers.inc.php:166
+#: chart5.php:198 include/maps.inc.php:637 include/triggers.inc.php:166
 msgid "PROBLEM"
 msgstr "PROBLÉM"
 
@@ -9358,22 +9358,22 @@ msgstr "Parametr"
 #: include/classes/validators/CTriggerFunctionValidator.php:113
 #, php-format
 msgid "Parameter num or user macro expected, \"%1$s\" given."
-msgstr ""
+msgstr "Očekávaný parametr číslo nebo uživatelské makro, dané \"%1$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:92
 #, php-format
 msgid "Parameter of type string or user macro expected, \"%1$s\" given."
-msgstr ""
+msgstr "Očekávaný parametr řetězec nebo uživatelské makro, dané \"%1$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:106
 #, php-format
 msgid "Parameter sec or #num or user macro expected, \"%1$s\" given."
-msgstr ""
+msgstr "Očekávaný parametr sec nebo #num nebo uživatelské makro, dané \"%1$s\"."
 
 #: include/classes/validators/CTriggerFunctionValidator.php:99
 #, php-format
 msgid "Parameter sec or user macro expected, \"%1$s\" given."
-msgstr ""
+msgstr "Očekávaný parametr sec nebo uživatelské makro, dané \"%1$s\"."
 
 #: include/views/configuration.item.edit.php:53
 msgid "Parent discovery rules"
@@ -9381,7 +9381,7 @@ msgstr "Nadřazená objevovací pravidla"
 
 #: include/views/configuration.graph.edit.php:51
 msgid "Parent graph"
-msgstr ""
+msgstr "Nadřazený graf"
 
 #: include/views/configuration.item.edit.php:56
 msgid "Parent items"
@@ -9677,7 +9677,7 @@ msgstr "Problém, když všechny podřazené mají problém"
 msgid "Problem, if at least one child has a problem"
 msgstr "Problém, když alespoň jeden podřazený má problém"
 
-#: chart4.php:171 include/maps.inc.php:689 include/maps.inc.php:779
+#: chart4.php:173 include/maps.inc.php:689 include/maps.inc.php:779
 #: include/maps.inc.php:877 report2.php:237 report3.php:85
 msgid "Problems"
 msgstr "Problémy"
@@ -9997,7 +9997,7 @@ msgstr "Nahradit"
 
 #: include/views/configuration.triggers.massupdate.php:109
 msgid "Replace depenencies"
-msgstr ""
+msgstr "Nahradit závislosti"
 
 #: include/views/configuration.host.massupdate.php:42
 msgid "Replace host groups"
@@ -10107,7 +10107,7 @@ msgstr "Kód odpovědi"
 #: api/classes/CWebCheck.php:732
 #, php-format
 msgid "Response code for step \"%1$s\" of scenario \"%2$s\"."
-msgstr ""
+msgstr "Návratový kód pro krok \"%1$s\" scénáře \"%2$s\"."
 
 #: httpdetails.php:131 httpdetails.php:315
 msgid "Response time"
@@ -10116,7 +10116,7 @@ msgstr "Odezva"
 #: api/classes/CWebCheck.php:725
 #, php-format
 msgid "Response time for step \"%1$s\" of scenario \"%2$s\"."
-msgstr ""
+msgstr "Čas odezvy pro krok \"%1$s\" scénáře \"%2$s\"."
 
 #: include/forms.inc.php:1774 include/forms.inc.php:1856 tr_testexpr.php:135
 #: tr_testexpr.php:167
@@ -10180,7 +10180,7 @@ msgstr "Rozsah řádků"
 #: api/classes/CScreenItem.php:608
 #, php-format
 msgid "Row span of screen element located at X - %1$s and Y - %2$s is too big."
-msgstr ""
+msgstr "Rozsah řádků je příliš velký pro obrazovkový element umístěný na X - %1$s a Y - %2$s."
 
 #: include/views/configuration.screen.edit.php:41 screenconf.php:52
 msgid "Rows"
@@ -10491,17 +10491,17 @@ msgstr "Scénář"
 #: api/classes/CWebCheck.php:483
 #, php-format
 msgid "Scenario \"%1$s\" \"%2$s\" host \"%3$s\"."
-msgstr ""
+msgstr "Scénář \"%1$s\" \"%2$s\" host \"%3$s\"."
 
 #: api/classes/CWebCheck.php:500 api/classes/CWebCheck.php:532
 #, php-format
 msgid "Scenario \"%s\" already exists."
-msgstr ""
+msgstr "Scénář \"%s\" již existuje."
 
 #: api/classes/CWebCheck.php:476
 #, php-format
 msgid "Scenario \"%s\" deleted."
-msgstr ""
+msgstr "Scénář \"%s\" smazaný."
 
 #: httpconf.php:313 httpconf.php:316
 msgid "Scenario activated"
@@ -10521,11 +10521,11 @@ msgstr "Scénář byl zakázán"
 
 #: api/classes/CWebCheck.php:694 api/classes/CWebCheck.php:794
 msgid "Scenario step name should contain only printable characters."
-msgstr ""
+msgstr "Jméno kroku scénáře by mělo obsahovat jen tisknutelné znaky."
 
 #: api/classes/CWebCheck.php:708 api/classes/CWebCheck.php:809
 msgid "Scenario step number cannot be less than 1."
-msgstr ""
+msgstr "Číslo kroku scénáře nesmí být menší jak 1."
 
 #: httpconf.php:204
 msgid "Scenario updated"
@@ -10589,7 +10589,7 @@ msgstr "Obrazovka byla smazána"
 
 #: api/classes/CScreenItem.php:176
 msgid "Screen item in same cell already exists."
-msgstr ""
+msgstr "Položka obrazovky již existuje v té samé buňce."
 
 #: screenedit.php:236 screenedit.php:251
 msgid "Screen should contain at least one row and column."
@@ -10602,12 +10602,12 @@ msgstr "Obrazovka byla aktualizována"
 #: include/views/monitoring.screen.php:48
 #, php-format
 msgid "Screen with ID \"%s\" does not exist."
-msgstr ""
+msgstr "Obrazovka s ID \"%s\" neexistuje."
 
 #: include/views/monitoring.screen.php:47
 #, php-format
 msgid "Screen with name \"%s\" does not exist."
-msgstr ""
+msgstr "Obrazovka se jménem \"%s\" neexistuje."
 
 #: dashboard.php:267 include/blocks.inc.php:1380 include/html.inc.php:477
 #: include/html.inc.php:481 include/menu.inc.php:67 include/menu.inc.php:197
@@ -10633,7 +10633,7 @@ msgstr "Skript"
 #: api/classes/CScript.php:283 api/classes/CScript.php:335
 #, php-format
 msgid "Script \"%s\" already exists."
-msgstr ""
+msgstr "Skript \"%s\" již existuje."
 
 #: scripts.php:117
 msgid "Script added"
@@ -10659,7 +10659,7 @@ msgstr "Skript byl aktualizován"
 #: api/classes/CScript.php:316
 #, php-format
 msgid "Script with scriptid \"%s\" does not exist."
-msgstr ""
+msgstr "Skript se scriptid \"%s\" neexistuje."
 
 #: include/menu.inc.php:262 include/views/administration.script.list.php:27
 #: include/views/js/monitoring.maps.js.php:14 jsLoader.php:179 report5.php:160
@@ -10791,7 +10791,7 @@ msgstr "Vybrat řádky s hodnotou jako"
 msgid "Selected"
 msgstr "Vybrané"
 
-#: actionconf.php:308
+#: actionconf.php:311
 msgid "Selected actions deleted"
 msgstr "Označené akce smazané"
 
@@ -11050,7 +11050,7 @@ msgstr "Zobrazit nepotvrzené"
 
 #: events.php:369
 msgid "Show unknown events"
-msgstr ""
+msgstr "Zobrazit neznáme události"
 
 #: include/views/configuration.item.edit.php:388
 #: include/views/configuration.item.massupdate.php:397
@@ -11237,7 +11237,7 @@ msgstr "Seřazení podle pole \"%1$s\" není dovolené."
 #: api/classes/CTrigger.php:512
 #, php-format
 msgid "Sorting by field \"%s\" not allowed."
-msgstr ""
+msgstr "Seřazení podle pole \"%s\" není dovolené."
 
 #: events.php:312 include/classes/screens/CScreenHistory.php:165
 msgid "Source"
@@ -11336,7 +11336,7 @@ msgstr "Stav průzkumu"
 
 #: include/screens.inc.php:39
 msgid "Status of host group triggers"
-msgstr ""
+msgstr "Stav skupiny spouštěčů"
 
 #: include/screens.inc.php:40
 msgid "Status of host triggers"
@@ -11351,7 +11351,7 @@ msgstr "Stav spouštěčů"
 msgid "Status only"
 msgstr "Pouze stav"
 
-#: actionconf.php:298 trigger_prototypes.php:285 triggers.php:320
+#: actionconf.php:301 trigger_prototypes.php:285 triggers.php:320
 msgid "Status updated"
 msgstr "Stav byl aktualizován"
 
@@ -11368,7 +11368,7 @@ msgstr "Krok \"%1$s\" [%2$s z %3$s] selhal: %4$s"
 #: api/classes/CWebCheck.php:702
 #, php-format
 msgid "Step \"%s\" already exists."
-msgstr ""
+msgstr "Krok \"%s\" již existuje."
 
 #: include/views/configuration.action.edit.php:436
 msgid "Step duration"
@@ -11381,7 +11381,7 @@ msgstr "Krok scénáře"
 #: include/httptest.inc.php:171
 #, php-format
 msgid "Step with name \"%s\" already exists."
-msgstr ""
+msgstr "Krok se jménem \"%s\" již existuje."
 
 #: httpconf.php:48 include/views/configuration.action.edit.php:317
 #: include/views/configuration.httpconf.edit.php:202
@@ -11489,7 +11489,7 @@ msgstr "T"
 #: jsLoader.php:129
 msgctxt "Thursday short"
 msgid "T"
-msgstr "St"
+msgstr "Čt"
 
 #: jsLoader.php:127
 msgctxt "Tuesday short"
@@ -11575,7 +11575,7 @@ msgstr "Šablona \"%1$s\" pro host \"%2$s\" neexistuje."
 #: api/classes/CTemplate.php:1000
 #, php-format
 msgid "Template \"%s\" already exists."
-msgstr ""
+msgstr "Šablona \"%s\" již existuje."
 
 #: templates.php:182
 msgid "Template added"
@@ -11620,7 +11620,7 @@ msgstr "Šablona byla aktualizována"
 #: api/classes/CHostGeneral.php:194 include/hosts.inc.php:1228
 #, php-format
 msgid "Template with application \"%1$s\" already linked to host."
-msgstr ""
+msgstr "Šablona s aplikací \"%1$s\" je již připojena k hostu."
 
 #: api/classes/CHostGeneral.php:182 include/hosts.inc.php:1214
 #, php-format
@@ -11693,17 +11693,17 @@ msgstr "Text"
 #, php-format
 msgid "The image is used in icon map %2$s."
 msgid_plural "The image is used in icon maps %2$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Obrázek je použitý v mapě ikon %2$s."
+msgstr[1] "Obrázek je použitý v mapách ikon %2$s."
+msgstr[2] "Obrázek je použitý v mapách ikon %2$s."
 
 #: api/classes/CImage.php:562
 #, php-format
 msgid "The image is used in map %2$s."
 msgid_plural "The image is used in maps %2$s."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Obrázek je použitý v mapě %2$s."
+msgstr[1] "Obrázek je použitý v mapách %2$s."
+msgstr[2] "Obrázek je použitý v mapách %2$s."
 
 #: include/views/configuration.item.list.php:100
 #, php-format
@@ -11863,7 +11863,7 @@ msgstr "Dnes"
 #: api/classes/CProxy.php:345
 #, php-format
 msgid "Too many interfaces provided for proxy \"%s\"."
-msgstr ""
+msgstr "Mnoho rozhraní pro proxy \"%s\"."
 
 #: include/views/configuration.screen.constructor.edit.php:557
 #: include/views/configuration.screen.constructor.edit.php:598
@@ -11947,7 +11947,7 @@ msgstr "Spouštěč byl přidán"
 
 #: api/classes/CTrigger.php:1855
 msgid "Trigger cannot be dependant on a trigger, that is inherited from it."
-msgstr ""
+msgstr "Spouštěč nemůže záviset na spouštěči, který dědí z něho."
 
 #: tr_comments.php:26
 msgid "Trigger comments"
@@ -12038,7 +12038,7 @@ msgstr "Závažnost spouštěče"
 
 #: triggers.php:289
 msgid "Trigger status became \"Disabled\"."
-msgstr ""
+msgstr "Stav spouštěče se stal \"Zakázaný\"."
 
 #: trigger_prototypes.php:163 trigger_prototypes.php:202 triggers.php:152
 #: triggers.php:203 tr_logform.php:112
@@ -12300,7 +12300,7 @@ msgstr "Odblokovat vybrané uživatele?"
 msgid "Units"
 msgstr "Jednotky"
 
-#: chart4.php:175 events.php:506 events.php:507 events.php:516 events.php:517
+#: chart4.php:177 events.php:506 events.php:507 events.php:516 events.php:517
 #: events.php:518 events.php:519 hosts.php:807 httpdetails.php:160
 #: httpmon.php:249 include/actions.inc.php:41 include/actions.inc.php:94
 #: include/actions.inc.php:105 include/actions.inc.php:129
@@ -12618,7 +12618,7 @@ msgstr "Uživatelská skupina \"%s\" již existuje."
 #: api/classes/CUserGroup.php:725
 #, php-format
 msgid "User group [%s] is used in configuration for database down messages."
-msgstr ""
+msgstr "Uživatelská skupina [%s] je použitá v konfiguraci zpráv při nefunkční databázi."
 
 #: include/views/administration.general.other.edit.php:38
 msgid "User group for database down message"
@@ -12626,7 +12626,7 @@ msgstr "Skupina uživatelů pro zprávy o nefunkční databázi"
 
 #: adm.other.php:88
 msgid "User group for database down message."
-msgstr ""
+msgstr "Uživatelská skupina pro správu o nefunkční databázi."
 
 #: include/views/administration.script.edit.php:82
 #: include/views/administration.usergroups.list.php:28
@@ -12729,12 +12729,12 @@ msgstr "Hodnota \"%1$s\" je neplatná pro parametr \"grid_align\". Možnosti: \"
 #: api/classes/CMap.php:612
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\""
-msgstr ""
+msgstr "Hodnota \"%1$s\" je neplatná pro parametr \"grid_show\". Možnosti: \"%2$s\""
 
 #: api/classes/CMap.php:620
 #, php-format
 msgid "Value \"%1$s\" is invalid for parameter \"grid_show\". Choices are: \"%2$s\" and \"%3$s\""
-msgstr ""
+msgstr "Hodnota \"%1$s\" je neplatná pro parametr \"grid_show\". Možnosti: \"%2$s\" a \"%3$s\""
 
 #: include/classes/db/DB.php:304
 #, php-format
@@ -12801,7 +12801,7 @@ msgstr "Mapování hodnot musí mít nejméně jedno mapování."
 
 #: include/valuemap.inc.php:126
 msgid "Value maps are used to create a mapping between numeric values and string representations."
-msgstr ""
+msgstr "Mapy hodnot jsou používané na mapování mezi číselnými hodnotami a jejích textovými reprezentacemi."
 
 #: include/classes/class.cpie.php:319
 #, php-format
@@ -12853,90 +12853,90 @@ msgstr "St"
 msgid "Warning"
 msgstr "Upozornění"
 
-#: chart7.php:76
+#: chart7.php:78
 msgid "Warning. Cannot display more than one item with type \"Graph sum\"."
-msgstr ""
+msgstr "Varování. Není možné zobrazit víc jak jednu položku typu \"Součtový graf\"."
 
 #: include/validate.inc.php:440
 #, php-format
 msgid "Warning. Field \"%1$s\" is mandatory."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" je povinné."
 
 #: include/validate.inc.php:319
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP range."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" není IP rozsah."
 
 #: include/validate.inc.php:305
 #, php-format
 msgid "Warning. Field \"%1$s\" is not IP."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" není IP adresa."
 
 #: include/validate.inc.php:391
 #, php-format
 msgid "Warning. Field \"%1$s\" is not a colour."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" není barva."
 
 #: include/validate.inc.php:357
 #, php-format
 msgid "Warning. Field \"%1$s\" is not decimal number."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" není desítkové číslo."
 
 #: include/validate.inc.php:333
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer list or range."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" není celočíselný seznam nebo rozsah."
 
 #: include/validate.inc.php:346
 #, php-format
 msgid "Warning. Field \"%1$s\" is not integer."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" není celé číslo."
 
 #: include/validate.inc.php:368
 #, php-format
 msgid "Warning. Field \"%1$s\" is not string."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" není řetězec."
 
 #: include/validate.inc.php:379
 #, php-format
 msgid "Warning. Field \"%1$s\" multibyte chars are restricted."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" má omezení na multibytové znaky."
 
 #: include/validate.inc.php:457
 #, php-format
 msgid "Warning. Field \"%1$s\" must be missing."
-msgstr ""
+msgstr "Varování. Pole \"%1$s\" musí chybět."
 
 #: include/validate.inc.php:510
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\"."
-msgstr ""
+msgstr "Varování. Neplatná hodnota pro pole \"%1$s\"."
 
 #: include/validate.inc.php:491
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": cannot be empty."
-msgstr ""
+msgstr "Varování. Neplatná hodnota pro pole \"%1$s\": nemůže být prázdné."
 
 #: include/validate.inc.php:501
 #, php-format
 msgid "Warning. Incorrect value for field \"%1$s\": must be between %2$s and %3$s."
-msgstr ""
+msgstr "Varování. Neplatná hodnota pro pole \"%1$s\": musí být mezi %2$s a %3$s."
 
 #: include/classes/screens/CScreenBase.php:339 include/graphs.inc.php:406
 #, php-format
 msgid "Warning. Maximum time period to display is %1$s day."
 msgid_plural "Warning. Maximum time period to display is %1$s days."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Varování. Maximální perioda zobrazení je %1$s den."
+msgstr[1] "Varování. Maximální perioda zobrazení je %1$s dny."
+msgstr[2] "Varování. Maximální perioda zobrazení je %1$s dní."
 
 #: include/classes/screens/CScreenBase.php:334 include/graphs.inc.php:399
 #, php-format
 msgid "Warning. Minimum time period to display is %1$s hour."
 msgid_plural "Warning. Minimum time period to display is %1$s hours."
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "Varování. Minimální perioda zobrazení je %1$s hodina."
+msgstr[1] "Varování. Minimální perioda zobrazení je %1$s hodiny."
+msgstr[2] "Varování. Minimální perioda zobrazení je %1$s hodin."
 
 #: jsLoader.php:169
 msgid "We are sorry, the maximum possible number of elements to remember has been reached."
@@ -12948,17 +12948,17 @@ msgstr "Web"
 
 #: httpmon.php:123
 msgid "Web checks"
-msgstr ""
+msgstr "Web kontroly"
 
 #: api/classes/CWebCheck.php:680 api/classes/CWebCheck.php:779
 #, php-format
 msgid "Web item \"%s\" created."
-msgstr ""
+msgstr "Web položka \"%s\" vytvořena."
 
 #: api/classes/CWebCheck.php:745
 #, php-format
 msgid "Web item with key \"%s\" already exists."
-msgstr ""
+msgstr "Web položka s klíčem \"%s\" již existuje."
 
 #: dashboard.php:324 include/items.inc.php:93
 msgid "Web monitoring"
@@ -12966,7 +12966,7 @@ msgstr "Sledování webů"
 
 #: api/classes/CWebCheck.php:505
 msgid "Webcheck must have at least one step."
-msgstr ""
+msgstr "Web kontrola musí mít nejméně jeden krok."
 
 #: include/func.inc.php:197
 msgid "Wed"
@@ -13069,15 +13069,15 @@ msgstr "Nesprávné pole pro hosta \"%s\"."
 
 #: api/classes/CMapElement.php:792
 msgid "Wrong fields for linktrigger"
-msgstr ""
+msgstr "Nesprávné pole odkazu na spouštěč"
 
 #: api/classes/CMapElement.php:835
 msgid "Wrong fields for linktrigger delete"
-msgstr ""
+msgstr "Nesprávné pole pro smazání odkazu na spouštěč"
 
 #: api/classes/CMapElement.php:812
 msgid "Wrong fields for linktrigger update"
-msgstr ""
+msgstr "Nesprávné pole pro aktualizaci odkazu na spouštěč"
 
 #: api/classes/CUserMacro.php:404 api/classes/CUserMacro.php:450
 #: api/classes/CUserMacro.php:539 api/classes/CUserMacro.php:599
@@ -13087,7 +13087,7 @@ msgstr "Nesprávné pole pro makro \"%1$s\"."
 
 #: api/classes/CMapElement.php:570
 msgid "Wrong fields for map link"
-msgstr ""
+msgstr "Nesprávná pole pro mapovou spojnici"
 
 #: api/classes/CMediatype.php:326 api/classes/CMediatype.php:377
 msgid "Wrong fields for media type."
@@ -13096,13 +13096,13 @@ msgstr "Nesprávné pole pro typ média."
 #: api/classes/CProxy.php:313
 #, php-format
 msgid "Wrong fields for proxy \"%s\"."
-msgstr ""
+msgstr "Nesprávné pole pro proxy \"%s\"."
 
 #: api/classes/CScreen.php:432 api/classes/CTemplateScreen.php:708
 #: api/classes/CTemplateScreen.php:746
 #, php-format
 msgid "Wrong fields for screen \"%1$s\"."
-msgstr ""
+msgstr "Nesprávné pole pro obrazovku \"%1$s\"."
 
 #: api/classes/CScript.php:266
 msgid "Wrong fields for script."
@@ -13283,9 +13283,9 @@ msgstr "Nespecifikovali jste cíle pro akci globálního skriptu \"%s\"."
 
 #: api/classes/CGraph.php:709 api/classes/CGraphPrototype.php:758
 #: api/classes/CHostGroup.php:684 api/classes/CHostGroup.php:742
-#: api/classes/CHostGroup.php:895 api/classes/CHostGroup.php:950
-#: api/classes/CHostGroup.php:995 api/classes/CHostGroup.php:1008
-#: api/classes/CHostGroup.php:1024 api/classes/CHost.php:1602
+#: api/classes/CHostGroup.php:912 api/classes/CHostGroup.php:967
+#: api/classes/CHostGroup.php:1012 api/classes/CHostGroup.php:1025
+#: api/classes/CHostGroup.php:1041 api/classes/CHost.php:1602
 #: api/classes/CHost.php:1656 api/classes/CHost.php:1970
 #: api/classes/CMaintenance.php:618 api/classes/CMaintenance.php:725
 #: api/classes/CMaintenance.php:737 api/classes/CScript.php:258
@@ -13304,11 +13304,11 @@ msgstr "Nemáte oprávnění na vytváření uživatelů."
 
 #: api/classes/CUser.php:362
 msgid "You do not have permissions to delete user or user does not exist."
-msgstr ""
+msgstr "Nemáte oprávnění na smazání uživatele nebo uživatel neexistuje."
 
 #: api/classes/CUser.php:358
 msgid "You do not have permissions to delete users."
-msgstr ""
+msgstr "Nemáte oprávnění na smazání uživatelů."
 
 #: api/classes/CUser.php:351
 msgid "You do not have permissions to update other users."
@@ -13554,7 +13554,7 @@ msgstr "j M Y G:i"
 msgid "d M Y H:i:s"
 msgstr "j M Y G:i:s"
 
-#: chart4.php:127 chart5.php:137
+#: chart4.php:129 chart5.php:139
 msgid "d.M"
 msgstr "j M"
 
