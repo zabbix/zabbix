@@ -101,6 +101,12 @@ class CConfigurationExportBuilder {
 				'ipmi_privilege' => $host['ipmi_privilege'],
 				'ipmi_username' => $host['ipmi_username'],
 				'ipmi_password' => $host['ipmi_password'],
+				'tls_connect' => $host['tls_connect'],
+				'tls_accept' => $host['tls_accept'],
+				'tls_issuer' => $host['tls_issuer'],
+				'tls_subject' => $host['tls_subject'],
+				'tls_psk_identity' => $host['tls_psk_identity'],
+				'tls_psk' => $host['tls_psk'],
 				'templates' => $this->formatTemplateLinkage($host['parentTemplates']),
 				'groups' => $this->formatGroups($host['groups']),
 				'interfaces' => $this->formatHostInterfaces($host['interfaces']),
@@ -571,6 +577,10 @@ class CConfigurationExportBuilder {
 				'valuemap' => $item['valuemap'],
 				'logtimefmt' => $item['logtimefmt']
 			];
+
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+				$data['application_prototypes'] = $this->formatApplications($item['applicationPrototypes']);
+			}
 
 			if (isset($item['interface_ref'])) {
 				$data['interface_ref'] = $item['interface_ref'];

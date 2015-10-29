@@ -98,15 +98,16 @@ $tranStrings = [
 		'S_MONTH_SHORT' => _x('m', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
+		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'S_DATE_FORMAT' => DATE_TIME_FORMAT
 	],
 	'functions.js' => [
 		'Cancel' => _('Cancel'),
 		'Execute' => _('Execute'),
-		'Execution confirmation' => _('Execution confirmation'),
-		'S_DELETE' => _('Delete'),
-		'S_DELETE_KEYWORD_Q' => _('Delete keyword?'),
-		'S_DELETE_EXPRESSION_Q' => _('Delete expression?')
+		'Execution confirmation' => _('Execution confirmation')
+	],
+	'tr_logform.js' => [
+		'S_REMOVE' => _('Remove')
 	],
 	'class.calendar.js' => [
 		'S_JANUARY' => _('January'),
@@ -143,7 +144,6 @@ $tranStrings = [
 		'S_HOST_GROUP' => _('Host group'),
 		'S_IMAGE' => _('Image'),
 		'S_DEFAULT' => _('Default'),
-		'S_CLOSE' => _('Close'),
 		'S_PLEASE_SELECT_TWO_ELEMENTS' => _('Please select two elements'),
 		'S_DOT' => _('Dot'),
 		'S_TWO_ELEMENTS_SHOULD_BE_SELECTED' => _('Two elements should be selected'),
@@ -167,7 +167,8 @@ $tranStrings = [
 		'S_MAX_COOKIE_SIZE_REACHED' => _('We are sorry, the maximum possible number of elements to remember has been reached.')
 	],
 	'main.js' => [
-		'S_CLOSE' => _('Close')
+		'S_EXPAND' => _('Expand'),
+		'S_COLLAPSE' => _('Collapse'),
 	],
 	'multiselect.js' => [
 		'No matches found' => _('No matches found'),
@@ -212,7 +213,6 @@ $tranStrings = [
 		'Remove' => _('Remove'),
 		'Remove all' => _('Remove all'),
 		'Scripts' => _('Scripts'),
-		'Service "%1$s"' => _('Service "%1$s"'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
 		'Triggers' => _('Triggers'),

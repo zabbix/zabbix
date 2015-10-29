@@ -277,9 +277,9 @@ static int	file_start_md5(int f, int length, md5_byte_t *md5buf, const char *fil
 		return FAIL;
 	}
 
-	md5_init(&state);
-	md5_append(&state, (const md5_byte_t *)buf, length);
-	md5_finish(&state, md5buf);
+	zbx_md5_init(&state);
+	zbx_md5_append(&state, (const md5_byte_t *)buf, length);
+	zbx_md5_finish(&state, md5buf);
 
 	return SUCCEED;
 }
@@ -1622,7 +1622,7 @@ static int	zbx_read2(int fd, unsigned char flags, zbx_uint64_t *lastlogsize, int
 						value = buf;
 
 					zabbix_log(LOG_LEVEL_WARNING, "Logfile contains a large record: \"%.64s\""
-							" (showing only the first 64 characters). Only the first 64 kB"
+							" (showing only the first 64 characters). Only the first 256 kB"
 							" will be analyzed, the rest will be ignored while Zabbix agent"
 							" is running.", value);
 

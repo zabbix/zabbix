@@ -210,7 +210,7 @@ class CSetupWizard extends CForm {
 		$table = new CFormList();
 
 		$table->addRow(_('Database type'),
-			new CComboBox('type', $DB['TYPE'], 'submit()', $this->frontendSetup->getSupportedDatabases())
+			new CComboBox('type', $DB['TYPE'], 'submit()', CFrontendSetup::getSupportedDatabases())
 		);
 
 		switch ($DB['TYPE']) {
@@ -283,8 +283,7 @@ class CSetupWizard extends CForm {
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 		);
 
-		$table->addRow(
-			(new CCol('Port'))->addClass('header'),
+		$table->addRow(_('Port'),
 			(new CNumericBox('zbx_server_port', $this->getConfig('ZBX_SERVER_PORT', '10051'), 5, false, false, false))
 				->removeAttribute('style')
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -306,7 +305,7 @@ class CSetupWizard extends CForm {
 
 	function stage4() {
 		$db_type = $this->getConfig('DB_TYPE');
-		$databases = $this->frontendSetup->getSupportedDatabases();
+		$databases = CFrontendSetup::getSupportedDatabases();
 
 		$table = new CFormList();
 		$table->addRow((new CSpan(_('Database type')))->addClass(ZBX_STYLE_GREY), $databases[$db_type]);

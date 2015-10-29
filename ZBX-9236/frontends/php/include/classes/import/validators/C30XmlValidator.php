@@ -55,6 +55,12 @@ class C30XmlValidator {
 					'ipmi_privilege' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_username' =>			['type' => XML_STRING | XML_REQUIRED],
 					'ipmi_password' =>			['type' => XML_STRING | XML_REQUIRED],
+					'tls_connect' =>			['type' => XML_STRING | XML_REQUIRED],
+					'tls_accept' =>				['type' => XML_STRING | XML_REQUIRED],
+					'tls_issuer' =>				['type' => XML_STRING | XML_REQUIRED],
+					'tls_subject' =>			['type' => XML_STRING | XML_REQUIRED],
+					'tls_psk_identity' =>		['type' => XML_STRING | XML_REQUIRED],
+					'tls_psk' =>				['type' => XML_STRING | XML_REQUIRED],
 					'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
 						'template' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED]
@@ -210,6 +216,11 @@ class C30XmlValidator {
 									'applications' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application', 'rules' => [
 										'application' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'application_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'name' =>						['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
@@ -525,6 +536,11 @@ class C30XmlValidator {
 									'applications' =>			['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application', 'rules' => [
 										'application' =>			['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'application_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'application_prototype', 'rules' => [
+										'application_prototype' =>		['type' => XML_ARRAY, 'rules' => [
+											'name' =>						['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]],
 									'valuemap' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [

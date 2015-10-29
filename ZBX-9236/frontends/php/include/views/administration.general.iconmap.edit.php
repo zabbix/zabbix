@@ -43,9 +43,9 @@ if (isset($this->data['iconmapid'])) {
 }
 
 $iconMapTable = (new CTable())
-	->setAttribute('style', 'min-width: 700px;')
+	->setAttribute('style', 'width: 100%;')
 	->setId('iconMapTable')
-	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', '']);
+	->setHeader(['', '', _('Inventory field'), _('Expression'), _('Icon'), '', _('Action')]);
 
 order_result($this->data['iconmap']['mappings'], 'sortorder');
 $i = 0;
@@ -73,6 +73,7 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 	$iconPreviewImage = (new CImg('imgstore.php?iconid='.$mapping['iconid'].'&width='.ZBX_ICON_PREVIEW_WIDTH.
 		'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
 		->addClass('preview')
+		->addClass(ZBX_STYLE_CURSOR_POINTER)
 		->setAttribute('data-image-full', 'imgstore.php?iconid='.$mapping['iconid']);
 
 	$iconMapTable->addRow(
@@ -85,9 +86,11 @@ foreach ($this->data['iconmap']['mappings'] as $mapping) {
 			$expressionTextBox,
 			$iconsComboBox,
 			$iconPreviewImage,
-			(new CButton('remove', _('Remove')))
-				->addClass(ZBX_STYLE_BTN_LINK)
-				->addClass('removeMapping')
+			(new CCol(
+				(new CButton('remove', _('Remove')))
+					->addClass(ZBX_STYLE_BTN_LINK)
+					->addClass('removeMapping')
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
 			->addClass('sortable')
 			->setId('iconmapidRow_'.$i)
@@ -111,13 +114,18 @@ $iconsComboBox->addClass('mappingIcon');
 
 $iconPreviewImage = (new CImg('imgstore.php?iconid='.$this->data['iconmap']['default_iconid'].
 	'&width='.ZBX_ICON_PREVIEW_WIDTH.'&height='.ZBX_ICON_PREVIEW_HEIGHT, _('Preview'), null, null))
+	->addClass(ZBX_STYLE_CURSOR_POINTER)
 	->addClass('preview')
 	->setAttribute('data-image-full', 'imgstore.php?iconid='.$this->data['iconmap']['default_iconid']);
 
 $iconMapTable->addRow([(new CCol(_('Default')))->setColSpan(4), $iconsComboBox, $iconPreviewImage]);
 // </default icon row>
 
-$iconMapTab->addRow(_('Mappings'), (new CDiv($iconMapTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+$iconMapTab->addRow(_('Mappings'),
+	(new CDiv($iconMapTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 $iconMapView = new CTabView();
 $iconMapView->addTab('iconmap', _('Icon map'), $iconMapTab);
 

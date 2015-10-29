@@ -71,6 +71,13 @@ class CProfiler {
 	private static $instance;
 
 	/**
+	 * Root directory path
+	 *
+	 * @var string
+	 */
+	private $root_dir;
+
+	/**
 	 * @static
 	 *
 	 * @return CProfiler
@@ -86,7 +93,9 @@ class CProfiler {
 	/**
 	 * Private constructor.
 	 */
-	private function __construct() {}
+	private function __construct() {
+		$this->root_dir = realpath(dirname(__FILE__).'/../../..');
+	}
 
 	/**
 	 * Start script profiling.
@@ -103,9 +112,11 @@ class CProfiler {
 	}
 
 	/**
-	 * Output profiling data.
+	 * Make profiling data.
+	 *
+	 * @return CPre
 	 */
-	public function show() {
+	public function make() {
 		global $DB;
 
 		$debug = [];
@@ -136,7 +147,7 @@ class CProfiler {
 
 			// api method
 			$debug[] = ($i + 1).'. ';
-			$debug[] = new CTag('b', true, $class.'.'.$method);
+			$debug[] = bold($class.'.'.$method);
 			$debug[] = ($file !== null ? ' ['.$file.':'.$line.']' : null);
 			$debug[] = BR();
 			$debug[] = BR();
@@ -159,26 +170,32 @@ class CProfiler {
 			$sql = [
 				'SQL ('.$time.'): ',
 				(new CSpan($query[1]))
-					->addClass(substr($query[1], 0, 6) === 'SELECT' ? ZBX_STYLE_GREEN : ZBX_STYLE_RED),
+					->addClass(substr($query[1], 0, 6) === 'SELECT' ? ZBX_STYLE_GREEN : ZBX_STYLE_BLUE),
 				BR()
 			];
 
 			if ($time > $this->slowSqlQueryTime) {
-				$sql = new CTag('b', true, $sql);
+				$sql = bold($sql);
 			}
 			$debug[] = $sql;
 
-			$debug[] = (new CSpan($this->formatCallStack($query[2])))->addStyle('font-style: italic;');
+			$debug[] = $this->formatCallStack($query[2]);
 			$debug[] = BR();
 			$debug[] = BR();
 		}
 
-		$debug = (new CPre())
+		return (new CPre())
 			->addClass(ZBX_STYLE_DEBUG_OUTPUT)
 			->setAttribute('name', 'zbx_debug_info')
 			->addStyle('display: none;')
-			->addItem($debug)
-			->show();
+			->addItem($debug);
+	}
+
+	/**
+	 * Output profiling data.
+	 */
+	public function show() {
+		return $this->make()->show();
 	}
 
 	/**
@@ -268,7 +285,7 @@ class CProfiler {
 			array_shift($callStack);
 		}
 
-		$callStackString = '';
+		$functions = [];
 		$callWithFile = [];
 
 		$callStack = array_reverse($callStack);
@@ -277,11 +294,12 @@ class CProfiler {
 		foreach ($callStack as $call) {
 			// do not show the call to the error handler function
 			if ($call['function'] != 'zbx_err_handler') {
-				if (isset($call['class'])) {
-					$callStackString .= $call['class'].$call['type'];
+				if (array_key_exists('class', $call)) {
+					$functions[] = $call['class'].$call['type'].$call['function'].'()';
 				}
-
-				$callStackString .= $call['function'].'() &rarr; ';
+				else {
+					$functions[] = $call['function'].'()';
+				}
 			}
 
 			// if the error is caused by an incorrect function call - the location of that call is contained in
@@ -289,18 +307,25 @@ class CProfiler {
 			// if it's caused by something else (like an undefined index) - the location of the call is contained in the
 			// call to the error handler function
 			// to display the location we use the last call where this information is present
-			if (isset($call['file'])) {
+			if (array_key_exists('file', $call)) {
 				$callWithFile = $call;
 			}
 		}
 
-		if ($callStackString) {
-			$path = pathinfo($firstCall['file']);
-			$callStackString = $path['basename'].':'.$firstCall['line'] . ' &rarr; '.rtrim($callStackString, '&rarr; ');
+		$callStackString = '';
+
+		if ($functions) {
+			$callStackString .= pathinfo($firstCall['file'], PATHINFO_BASENAME).':'.$firstCall['line'].' &rarr; '.
+				implode(' &rarr; ', $functions);
 		}
 
 		if ($callWithFile) {
-			$callStackString .= ' in '.$callWithFile['file'].':'.$callWithFile['line'];
+			$file_name = $callWithFile['file'];
+
+			if (substr_compare($file_name, $this->root_dir, 0, strlen($this->root_dir)) === 0) {
+				$file_name = substr($file_name, strlen($this->root_dir) + 1);
+			}
+			$callStackString .= ' in '.$file_name.':'.$callWithFile['line'];
 		}
 
 		return $callStackString;

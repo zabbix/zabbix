@@ -390,10 +390,11 @@ class CPageFilter {
 		$this->data['groups'] = API::HostGroup()->get($options);
 
 		// select remembered selection
-		if ($groupId === null && $this->config['DDRemember']) {
+		if ($groupId === null && $this->config['DDRemember'] && $this->_profileIds['groupid']) {
 			// set group only if host is in group or hostid is not set
 			$host = null;
 			$template = null;
+
 			if ($hostId) {
 				// Profile ID can contain zero, hence no host will be selected.
 				$host = API::Host()->get([
@@ -401,6 +402,7 @@ class CPageFilter {
 					'hostids' => $hostId,
 					'groupids' => $this->_profileIds['groupid']
 				]);
+
 				if (!$host) {
 					$template = API::Template()->get([
 						'output' => ['hostid'],
@@ -408,8 +410,8 @@ class CPageFilter {
 						'groupids' => $this->_profileIds['groupid']
 					]);
 				}
-
 			}
+
 			if (!$hostId || $host || $template) {
 				$groupId = $this->_profileIds['groupid'];
 			}
@@ -429,24 +431,35 @@ class CPageFilter {
 
 				// For 'Dropdown first entry' option NONE, select the first possible group when the host is given.
 				if ($this->config['DDFirst'] == ZBX_DROPDOWN_FIRST_NONE && $hostId) {
+					$groupids = [];
+
 					$hosts = API::Host()->get([
 						'output' => ['hostid'],
 						'selectGroups' => ['groupid'],
 						'hostids' => [$hostId]
 					]);
-					$host = reset($hosts);
-					$host_groupids = zbx_objectValues($host['groups'], 'groupid');
 
-					foreach ($host_groupids as $host_groupid) {
-						if (array_key_exists($host_groupid, $this->data['groups'])) {
-							$groupId = $host_groupid;
-							break;
-						}
+					if ($hosts) {
+						$host = reset($hosts);
+						$groupids = zbx_objectValues($host['groups'], 'groupid');
+					}
+					else {
+						$templates = API::Template()->get([
+							'output' => ['hostid'],
+							'selectGroups' => ['groupid'],
+							'templateids' => [$hostId]
+						]);
+
+						$template = reset($templates);
+						$groupids = zbx_objectValues($template['groups'], 'groupid');
 					}
 
-					// If host group does not exist in the group list, set it to NONE.
-					if (!array_key_exists($groupId, $this->data['groups'])) {
-						$groupId = 0;
+					// Set first possible group (ordered by ID, not names), if found in list. Leave 0 (NONE) otherwise.
+					foreach ($groupids as $id) {
+						if (array_key_exists($id, $this->data['groups'])) {
+							$groupId = $id;
+							break;
+						}
 					}
 				}
 			}
@@ -499,7 +512,7 @@ class CPageFilter {
 			}
 
 			// select remembered selection
-			if (is_null($hostId) && $this->_profileIds['hostid']) {
+			if (is_null($hostId) && $this->config['DDRemember'] && $this->_profileIds['hostid']) {
 				$hostId = $this->_profileIds['hostid'];
 			}
 
@@ -684,7 +697,7 @@ class CPageFilter {
 		$items = $classes = [];
 		foreach ($this->hosts as $id => $host) {
 			$items[$id] = $host['name'];
-			$classes[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? 'not-monitored' : null;
+			$classes[$id] = ($host['status'] == HOST_STATUS_NOT_MONITORED) ? ZBX_STYLE_RED : null;
 		}
 		$options = ['objectName' => 'hosts', 'classes' => $classes];
 

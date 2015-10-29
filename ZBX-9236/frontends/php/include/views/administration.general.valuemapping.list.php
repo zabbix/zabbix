@@ -29,28 +29,23 @@ $widget = (new CWidget())
 		)
 	);
 
-$valueMappingTable = (new CTableInfo())
-	->setHeader([
-		_('Name'),
-		_('Value map')
-	]);
+$valuemap_table = (new CTableInfo())->setHeader([_('Name'), _('Value map')]);
 
-foreach ($this->data['valuemaps'] as $valuemap) {
-	order_result($valuemap['maps'], 'value');
-
+foreach ($data['valuemaps'] as $valuemap) {
 	$mappings = [];
-	foreach ($valuemap['maps'] as $map) {
-		$mappings[] = $map['value'].' &rArr; '.$map['newvalue'];
+
+	foreach ($valuemap['mappings'] as $mapping) {
+		$mappings[] = $mapping['value'].' &rArr; '.$mapping['newvalue'];
 		$mappings[] = BR();
 	}
 	array_pop($mappings);
 
-	$valueMappingTable->addRow([
+	$valuemap_table->addRow([
 		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
 		$mappings
 	]);
 }
 
-$widget->addItem($valueMappingTable);
+$widget->addItem($valuemap_table);
 
 return $widget;

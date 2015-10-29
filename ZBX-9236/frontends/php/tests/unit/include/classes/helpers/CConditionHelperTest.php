@@ -258,6 +258,9 @@ class CConditionHelperTest extends PHPUnit_Framework_TestCase {
 			[
 				'A and B or A', ['A' => 1, 'B' => 2], '{1} and {2} or {1}'
 			],
+			[
+				'A and (B or AA)', ['A' => 1, 'B' => 2, 'AA' => 3], '{1} and ({2} or {3})'
+			]
 		];
 	}
 

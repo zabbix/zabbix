@@ -379,7 +379,7 @@ var CMessageList = Class.create({
 		this.dom.container.setAttribute('id', 'zbx_messages');
 		this.dom.container.className = 'overlay-dialogue notif';
 		this.dom.container.style.right = '0px';
-		this.dom.container.style.top = '115px';
+		this.dom.container.style.top = '126px';
 		$(this.dom.container).hide();
 
 		// close all
@@ -390,7 +390,7 @@ var CMessageList = Class.create({
 
 		// header
 		this.dom.header = document.createElement('div');
-		this.dom.header.className = 'dashbrd-widget-head';
+		this.dom.header.className = 'dashbrd-widget-head cursor-move';
 		this.dom.container.appendChild(this.dom.header);
 
 		// controls

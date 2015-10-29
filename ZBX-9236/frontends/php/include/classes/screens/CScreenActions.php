@@ -151,7 +151,7 @@ class CScreenActions extends CScreenBase {
 					BR(),
 					_n('%1$s retry left', '%1$s retries left', ALERT_MAX_RETRIES - $alert['retries'])])
 				)
-					->addClass(ZBX_STYLE_ORANGE);
+					->addClass(ZBX_STYLE_YELLOW);
 			}
 			else {
 				$status = (new CSpan(_('Not sent')))->addClass(ZBX_STYLE_RED);
@@ -161,32 +161,14 @@ class CScreenActions extends CScreenBase {
 				? [bold(getUserFullname($dbUsers[$alert['userid']])), BR(), $alert['sendto']]
 				: $alert['sendto'];
 
-			$message = [
-				bold(_('Subject').':'),
-				br(),
-				$alert['subject'],
-				br(),
-				br(),
-				bold(_('Message').':'),
-				br(),
-				$alert['message']
-			];
-
-			if (zbx_empty($alert['error'])) {
-				$info = '';
-			}
-			else {
-				$info = makeErrorIcon($alert['error']);
-			}
-
 			$actionTable->addRow([
-				new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock'])),
-				new CCol($actions[$alert['actionid']]['name']),
-				new CCol(($alert['mediatypeid'] == 0) ? '' : $alert['description']),
-				new CCol($recipient),
-				new CCol($message),
-				new CCol($status),
-				new CCol($info)
+				zbx_date2str(DATE_TIME_FORMAT_SECONDS, $alert['clock']),
+				$actions[$alert['actionid']]['name'],
+				$alert['mediatypeid'] == 0 ? '' : $alert['description'],
+				$recipient,
+				[bold($alert['subject']), BR(), BR(), zbx_nl2br($alert['message'])],
+				$status,
+				$alert['error'] === '' ? '' : makeErrorIcon($alert['error'])
 			]);
 		}
 

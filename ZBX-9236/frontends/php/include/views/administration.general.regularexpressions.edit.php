@@ -38,13 +38,13 @@ $form = (new CForm())
  */
 $exprTable = (new CTable())
 	->setId('tbl_expr')
-	->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+	->setAttribute('style', 'width: 100%;')
 	->setHeader([
 		_('Expression type'),
 		_('Expression'),
 		_('Delimiter'),
 		_('Case sensitive'),
-		''
+		_('Action')
 	]);
 
 foreach ($data['expressions'] as $i => $expression) {
@@ -75,7 +75,7 @@ foreach ($data['expressions'] as $i => $expression) {
 		$button_cell[] = new CVar('expressions['.$i.'][expressionid]', $expression['expressionid']);
 	}
 
-	$row[] = $button_cell;
+	$row[] = (new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP);
 
 	$exprTable->addRow(
 		(new CRow($row))
@@ -96,7 +96,10 @@ $exprTab = (new CFormList('exprTab'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAttribute('autofocus', 'autofocus')
 	)
-	->addRow(_('Expressions'), (new CDiv($exprTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR));
+	->addRow(_('Expressions'), (new CDiv($exprTable))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	);
 
 /*
  * Test tab
@@ -105,16 +108,17 @@ $testTab = (new CFormList())
 	->addRow(_('Test string'),
 		(new CTextArea('test_string', $data['test_string']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT));
-
-$testTab->addRow(_('Result'), [
-	(new CDiv(
-		(new CTable())
-			->setId('testResultTable')
+	->addRow('', (new CButton('testExpression', _('Test expressions')))->addClass(ZBX_STYLE_BTN_ALT))
+	->addRow(_('Result'),
+		(new CDiv(
+			(new CTable())
+				->setId('testResultTable')
+				->setAttribute('style', 'width: 100%;')
+				->setHeader([_('Expression type'), _('Expression'), _('Result')])
+		))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
-			->setHeader([_('Expression type'), _('Expression'), _('Result')])
-	))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-]);
+	);
 
 $regExpView = new CTabView();
 if (!$data['form_refresh']) {

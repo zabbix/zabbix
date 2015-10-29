@@ -50,11 +50,11 @@ function init_mbstrings() {
 function getLocales() {
 	return [
 		'en_GB' => ['name' => _('English (en_GB)'),	'display' => true],
-		'en_US' => ['name' => _('English (en_US)'),	'display' => true],
+		'en_US' => ['name' => _('English (en_US)'),	'display' => false],
 		'bg_BG' => ['name' => _('Bulgarian (bg_BG)'),	'display' => false],
 		'zh_CN' => ['name' => _('Chinese (zh_CN)'),	'display' => false],
 		'zh_TW' => ['name' => _('Chinese (zh_TW)'),	'display' => false],
-		'cs_CZ' => ['name' => _('Czech (cs_CZ)'),		'display' => false],
+		'cs_CZ' => ['name' => _('Czech (cs_CZ)'),		'display' => true],
 		'nl_NL' => ['name' => _('Dutch (nl_NL)'),		'display' => false],
 		'fi_FI' => ['name' => _('Finnish (fi_FI)'),	'display' => false],
 		'fr_FR' => ['name' => _('French (fr_FR)'),		'display' => false],

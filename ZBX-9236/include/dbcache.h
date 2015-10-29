@@ -44,6 +44,8 @@
 
 #define ZBX_TRIGGER_DEPENDENCY_LEVELS_MAX	32
 
+#define ZBX_SNMPTRAP_LOGGING_ENABLED	1
+
 extern char	*CONFIG_FILE;
 extern int	CONFIG_TIMEOUT;
 
@@ -105,6 +107,14 @@ typedef struct
 	int		jmx_disable_until;
 	char		inventory_mode;
 	unsigned char	status;
+	unsigned char	tls_connect;
+	unsigned char	tls_accept;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
+	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
+#endif
 }
 DC_HOST;
 
@@ -129,6 +139,7 @@ typedef struct
 	unsigned char	snmpv3_privprotocol;
 	unsigned char	inventory_link;
 	unsigned char	status;
+	unsigned char	unreachable;
 	char		key_orig[ITEM_KEY_LEN * 4 + 1], *key;
 	char		*formula;
 	char		*units;
@@ -199,6 +210,20 @@ typedef struct
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
+	unsigned char	tls_connect;				/* how to connect: ZBX_TCP_SEC_UNENCRYPTED, */
+								/* ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT */
+#if HOST_TLS_ISSUER_LEN_MAX > HOST_TLS_PSK_IDENTITY_LEN_MAX
+	char		tls_arg1[HOST_TLS_ISSUER_LEN_MAX];	/* for passing 'tls_issuer' or 'tls_psk_identity' */
+								/* depending on value of 'tls_connect' */
+#else
+	char		tls_arg1[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+#endif
+#if HOST_TLS_SUBJECT_LEN_MAX > HOST_TLS_PSK_LEN_MAX
+	char		tls_arg2[HOST_TLS_SUBJECT_LEN_MAX];	/* for passing 'tls_subject' or 'tls_psk' */
+								/* depending on value of 'tls_connect' */
+#else
+	char		tls_arg2[HOST_TLS_PSK_LEN_MAX];
+#endif
 }
 DC_PROXY;
 
@@ -233,6 +258,30 @@ typedef struct
 }
 zbx_config_hk_t;
 
+/* global configuration data (loaded from config table) */
+typedef struct
+{
+	/* the fields set by zbx_config_get() function, see ZBX_CONFIG_FLAGS_ defines */
+	zbx_uint64_t	flags;
+
+	char		**severity_name;
+	zbx_uint64_t	discovery_groupid;
+	int		default_inventory_mode;
+	int		refresh_unsupported;
+	unsigned char	snmptrap_logging;
+
+	/* housekeeping related configuration data */
+	zbx_config_hk_t	hk;
+}
+zbx_config_t;
+
+#define ZBX_CONFIG_FLAGS_SEVERITY_NAME			0x00000001
+#define ZBX_CONFIG_FLAGS_DISCOVERY_GROUPID		0x00000002
+#define ZBX_CONFIG_FLAGS_DEFAULT_INVENTORY_MODE		0x00000004
+#define ZBX_CONFIG_FLAGS_REFRESH_UNSUPPORTED		0x00000008
+#define ZBX_CONFIG_FLAGS_SNMPTRAP_LOGGING		0x00000010
+#define ZBX_CONFIG_FLAGS_HOUSEKEEPER			0x00000020
+
 typedef struct
 {
 	zbx_uint64_t		itemid;
@@ -265,7 +314,7 @@ int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
-		zbx_timespec_t *ts, unsigned char state, const char *error);
+		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
 int	DCsync_history(int sync_type);
 void	init_database_cache();
@@ -298,9 +347,9 @@ void	*DCget_stats(int request);
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 void	DCsync_configuration(void);
-void	init_configuration_cache();
-void	free_configuration_cache();
-void	DCload_config();
+void	init_configuration_cache(void);
+void	free_configuration_cache(void);
+void	DCload_config(void);
 
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num);
@@ -328,19 +377,13 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM *items);
 int	DCconfig_get_snmp_interfaceids_by_addr(const char *addr, zbx_uint64_t **interfaceids);
 size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM **items);
 
-#define	CONFIG_REFRESH_UNSUPPORTED	1
-#define	CONFIG_DISCOVERY_GROUPID	2
-#define	CONFIG_SNMPTRAP_LOGGING		3
-
 #define ZBX_HK_OPTION_DISABLED		0
 #define ZBX_HK_OPTION_ENABLED		1
 
-void	*DCconfig_get_config_data(void *data, int type);
-void	DCconfig_get_config_hk(zbx_config_hk_t *data);
-int	DCget_trigger_severity_name(unsigned char priority, char **replace_to);
-
 void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
 		int *mtimes, int *errcodes, size_t num);
+void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
+		int *mtimes, int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
@@ -358,7 +401,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
-int	DCconfig_get_proxypoller_nextcheck();
+int	DCconfig_get_proxypoller_nextcheck(void);
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff);
 
@@ -376,11 +419,11 @@ void	DCset_delta_items(zbx_hashset_t *items);
 void	DCfree_item_queue(zbx_vector_ptr_t *queue);
 int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
-int	DCget_item_count();
-int	DCget_item_unsupported_count();
-int	DCget_trigger_count();
-double	DCget_required_performance();
-int	DCget_host_count();
+int	DCget_item_count(zbx_uint64_t hostid);
+int	DCget_item_unsupported_count(zbx_uint64_t hostid);
+int	DCget_trigger_count(void);
+double	DCget_required_performance(void);
+int	DCget_host_count(void);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
@@ -406,5 +449,9 @@ const char	*zbx_umc_get_macro_value(zbx_hashset_t *cache, zbx_uint64_t objectid,
 void	DCget_bulk_hostids_by_functionids(zbx_vector_ptr_t *functionids, zbx_vector_ptr_t *hostids);
 void	DCget_hostids_by_functionids(zbx_vector_uint64_t *functionids, zbx_vector_uint64_t *hostids);
 void	zbx_idset_free(zbx_idset_t *idset);
+
+/* global configuration support */
+void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
+void	zbx_config_clean(zbx_config_t *cfg);
 
 #endif

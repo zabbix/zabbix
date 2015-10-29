@@ -760,7 +760,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 				DB::delete('functions', ['triggerid' => $triggerPrototype['triggerid']]);
 
 				try {
-					$triggerPrototype['expression'] = implode_exp($expressionFull, $triggerPrototype['triggerid'], $hosts);
+					// Don't change the original expression for inheritance.
+					$expression = implode_exp($expressionFull, $triggerPrototype['triggerid'], $hosts);
 				}
 				catch (Exception $e) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
@@ -774,10 +775,15 @@ class CTriggerPrototype extends CTriggerGeneral {
 			}
 
 			$triggerPrototypeUpdate = $triggerPrototype;
+
 			if (!$descriptionChanged) {
 				unset($triggerPrototypeUpdate['description']);
 			}
-			if (!$expressionChanged) {
+
+			if ($expressionChanged) {
+				$triggerPrototypeUpdate['expression'] = $expression;
+			}
+			else {
 				unset($triggerPrototypeUpdate['expression']);
 			}
 

@@ -109,7 +109,7 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	zbx_stat_t	buf;
 	char		*filename;
-	int		ret = SYSINFO_RET_FAIL, file_exists = -1;
+	int		ret = SYSINFO_RET_FAIL, file_exists;
 
 	if (1 < request->nparam)
 	{
@@ -126,15 +126,21 @@ int	VFS_FILE_EXISTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (0 == zbx_stat(filename, &buf))
-		file_exists = S_ISREG(buf.st_mode) ? 1 : 0;
-	else if (errno == ENOENT)
-		file_exists = 0;
-
-	if (-1 != file_exists)
 	{
-		SET_UI64_RESULT(result, file_exists);
-		ret = SYSINFO_RET_OK;
+		file_exists = S_ISREG(buf.st_mode) ? 1 : 0;
 	}
+	else if (errno == ENOENT)
+	{
+		file_exists = 0;
+	}
+	else
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain file information: %s", zbx_strerror(errno)));
+		goto err;
+	}
+
+	SET_UI64_RESULT(result, file_exists);
+	ret = SYSINFO_RET_OK;
 err:
 	return ret;
 }
@@ -189,7 +195,10 @@ int	VFS_FILE_CONTENTS(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (-1 == (f = zbx_open(filename, O_RDONLY)))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open file: %s", zbx_strerror(errno)));
 		goto err;
+	}
 
 	if (CONFIG_TIMEOUT < zbx_time() - ts)
 	{
@@ -246,11 +255,11 @@ err:
 
 int	VFS_FILE_REGEXP(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char	buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
-	int	nbytes, f = -1, ret = SYSINFO_RET_FAIL;
-	size_t	start_line, end_line, current_line = 0;
-	double	ts;
+	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
+	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr;
+	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
+	uint32_t	start_line, end_line, current_line = 0;
+	double		ts;
 
 	ts = zbx_time();
 
@@ -367,11 +376,11 @@ err:
 
 int	VFS_FILE_REGMATCH(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char	*filename, *regexp, *tmp, encoding[32];
-	char	buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
-	int	nbytes, len, res, f = -1, ret = SYSINFO_RET_FAIL;
-	size_t	start_line, end_line, current_line = 0;
-	double	ts;
+	char		*filename, *regexp, *tmp, encoding[32];
+	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
+	int		nbytes, len, res, f = -1, ret = SYSINFO_RET_FAIL;
+	uint32_t	start_line, end_line, current_line = 0;
+	double		ts;
 
 	ts = zbx_time();
 
@@ -516,7 +525,7 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	md5_init(&state);
+	zbx_md5_init(&state);
 
 	while (0 < (nbytes = (int)read(f, buf, sizeof(buf))))
 	{
@@ -526,10 +535,10 @@ int	VFS_FILE_MD5SUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			goto err;
 		}
 
-		md5_append(&state, (const md5_byte_t *)buf, nbytes);
+		zbx_md5_append(&state, (const md5_byte_t *)buf, nbytes);
 	}
 
-	md5_finish(&state, hash);
+	zbx_md5_finish(&state, hash);
 
 	if (0 > nbytes)
 	{

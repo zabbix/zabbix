@@ -1,29 +1,32 @@
 <script type="text/javascript">
 	jQuery(function($) {
-		/**
-		 * Make so that all visible table rows would alternate colors
-		 */
-		var rebuildRowColoring = function() {
-			var a = 1;
-			$('.tableinfo tr:visible').each(function() {
-				a = a ? 0 : 1;
-
-				if (a) {
-					$(this).addClass('even_row');
-				}
-				else {
-					$(this).removeClass('even_row');
-				}
-			});
-		};
 
 		var initialize = function() {
-			// if at least one toggle group is opened
-			if ($('.app-list-toggle.icon-minus-9x9').length) {
-				$('.app-list-toggle-all').addClass('icon-minus-9x9').data('openState', 1);
-			}
+			var open_state_all = '0';
 
-			rebuildRowColoring();
+			$('.app-list-toggle').each(function() {
+				if ($(this).data('open-state') == '0') {
+					$('span', this).addClass('<?= ZBX_STYLE_ARROW_RIGHT ?>');
+
+					var applicationid = $(this).attr('data-app-id');
+					$('tr[parent_app_id=' + applicationid + ']').hide();
+				}
+				else {
+					$('span', this).addClass('<?= ZBX_STYLE_ARROW_DOWN ?>');
+
+					open_state_all = '1';
+				}
+			});
+
+			$('.app-list-toggle-all').data('open-state', open_state_all);
+
+			// if at least one toggle group is opened
+			if (open_state_all == '0') {
+				$('.app-list-toggle-all span').addClass('<?= ZBX_STYLE_ARROW_RIGHT ?>');
+			}
+			else {
+				$('.app-list-toggle-all span').addClass('<?= ZBX_STYLE_ARROW_DOWN ?>');
+			}
 		};
 
 		initialize();
@@ -31,89 +34,122 @@
 		// click event for main toggle (+-) button
 		$('.app-list-toggle-all').click(function() {
 			// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
-			$('.tableinfo').fadeTo(0, 0);
+			$(this).closest('table').fadeTo(0, 0);
 
-			var openState = $(this).data('openState'),
-				appIdList = [];
+			var open_state = $(this).data('open-state'),
+				applicationids = [];
 
-			// switch between + and - icon
-			$(this).toggleClass('icon-minus-9x9');
+			if (open_state == '0') {
+				$(this).data('open-state', '1');
+				$('span', this)
+					.removeClass('<?= ZBX_STYLE_ARROW_RIGHT ?>')
+					.addClass('<?= ZBX_STYLE_ARROW_DOWN ?>');
 
-			if (openState) {
-				$('.app-list-toggle.icon-minus-9x9').each(function() {
-					$(this).toggleClass('icon-minus-9x9');
-					$(this).data('openState', 0);
+				$('.app-list-toggle').each(function() {
+					if ($(this).data('open-state') == '0') {
+						$(this).data('open-state', '1');
+						$('span', this)
+							.removeClass('<?= ZBX_STYLE_ARROW_RIGHT ?>')
+							.addClass('<?= ZBX_STYLE_ARROW_DOWN ?>');
 
-					var appId = $(this).attr('data-app-id');
-					$('tr[parent_app_id=' + appId + ']').hide();
+						var applicationid = $(this).attr('data-app-id');
+						$('tr[parent_app_id=' + applicationid + ']').show();
 
-					appIdList.push(appId);
+						applicationids.push(applicationid);
+					}
 				});
 			}
 			else {
-				$('.app-list-toggle').not('.icon-minus-9x9').each(function() {
-					$(this).toggleClass('icon-minus-9x9');
-					$(this).data('openState', 1);
+				$(this).data('open-state', '0');
+				$('span', this)
+					.removeClass('<?= ZBX_STYLE_ARROW_DOWN ?>')
+					.addClass('<?= ZBX_STYLE_ARROW_RIGHT ?>');
 
-					var appId = $(this).attr('data-app-id');
-					$('tr[parent_app_id=' + appId + ']').show();
+				$('.app-list-toggle').each(function() {
+					if ($(this).data('open-state') != '0') {
+						$(this).data('open-state', '0');
+						$('span', this)
+							.removeClass('<?= ZBX_STYLE_ARROW_DOWN ?>')
+							.addClass('<?= ZBX_STYLE_ARROW_RIGHT ?>');
 
-					appIdList.push(appId);
+						var applicationid = $(this).attr('data-app-id');
+						$('tr[parent_app_id=' + applicationid + ']').hide();
+
+						applicationids.push(applicationid);
+					}
 				});
 			}
 
 			// change and store new state
-			openState = openState ? 0 : 1;
-			$(this).data('openState', openState);
-
-			rebuildRowColoring();
+			open_state = (open_state == '0') ? '1' : '0';
 
 			// this is for Opera browser with large tables, which renders table layout while showing/hiding rows
-			$('.tableinfo').fadeTo(0, 1);
+			$(this).closest('table').fadeTo(0, 1);
 
 			// store toggle state in DB
 			var url = new Curl('latest.php?output=ajax');
 			url.addSID();
 			$.post(url.getUrl(), {
 				favobj: 'toggle',
-				toggle_ids: appIdList,
-				toggle_open_state: openState
+				toggle_ids: applicationids,
+				toggle_open_state: open_state
 			});
 		});
 
 		// click event for every toggle (+-) button
 		$('.app-list-toggle').click(function() {
-			var appId = $(this).attr('data-app-id'),
-				openState = $(this).data('openState');
-
-			// hide/show all corresponding toggle sub rows
-			$('tr[parent_app_id=' + appId + ']')[(openState ? 'hide' : 'show')]();
-
-			// switch between + and - icon
-			$(this).toggleClass('icon-minus-9x9');
+			var applicationid = $(this).attr('data-app-id'),
+				open_state = $(this).data('open-state');
 
 			// change and store new state
-			openState = openState ? 0 : 1;
-			$(this).data('openState', openState);
+			open_state = (open_state == '0') ? '1' : '0';
+			$(this).data('open-state', open_state);
 
-			// if at least one toggle is opened, make main toggle as -
-			if (openState) {
-				$('.app-list-toggle-all').addClass('icon-minus-9x9').data('openState', 1);
-			}
-			// if all toggles are closed, make main toggle as +
-			else if (!$('.app-list-toggle.icon-minus-9x9').length) {
-				$('.app-list-toggle-all').removeClass('icon-minus-9x9').data('openState', 0);
-			}
+			if (open_state == '0') {
+				$('span', this)
+					.removeClass('<?= ZBX_STYLE_ARROW_DOWN ?>')
+					.addClass('<?= ZBX_STYLE_ARROW_RIGHT ?>');
 
-			rebuildRowColoring();
+				$('tr[parent_app_id=' + applicationid + ']').hide();
+
+				var open_state_all = '0';
+
+				$('.app-list-toggle').each(function() {
+					if ($(this).data('open-state') != '0') {
+						open_state_all = '1';
+					}
+				});
+
+				if (open_state_all == '0') {
+					$('.app-list-toggle-all').data('open-state', '0');
+					$('.app-list-toggle-all span')
+						.removeClass('<?= ZBX_STYLE_ARROW_DOWN ?>')
+						.addClass('<?= ZBX_STYLE_ARROW_RIGHT ?>');
+				}
+			}
+			else {
+				$(this).data('open-state', '1');
+				$('span', this)
+					.removeClass('<?= ZBX_STYLE_ARROW_RIGHT ?>')
+					.addClass('<?= ZBX_STYLE_ARROW_DOWN ?>');
+
+				$('tr[parent_app_id=' + applicationid + ']').show();
+
+				if ($('.app-list-toggle-all').data('open-state') == '0') {
+					$('.app-list-toggle-all').data('open-state', '1');
+					$('.app-list-toggle-all span')
+						.removeClass('<?= ZBX_STYLE_ARROW_RIGHT ?>')
+						.addClass('<?= ZBX_STYLE_ARROW_DOWN ?>')
+				}
+			}
 
 			// store toggle state in DB
 			var url = new Curl('latest.php?output=ajax');
 			url.addSID();
 			$.post(url.getUrl(), {
 				favobj: 'toggle',
-				toggle_ids: appId,
-				toggle_open_state: openState
+				toggle_ids: [applicationid],
+				toggle_open_state: open_state
 			});
 		});
 

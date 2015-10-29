@@ -637,7 +637,6 @@ function getMenuPopupServiceConfiguration(options) {
 	}
 
 	return [{
-		label: sprintf(t('Service "%1$s"'), options.name),
 		items: items
 	}];
 }
@@ -646,13 +645,14 @@ function getMenuPopupServiceConfiguration(options) {
  * Get menu popup trigger section data.
  *
  * @param string options['triggerid']				trigger id
+ * @param string options['groupid']					group id
+ * @param string options['hostid']					host id
  * @param object options['items']					link to trigger item history page (optional)
  * @param string options['items'][]['name']			item name
  * @param object options['items'][]['params']		item url parameters ("name" => "value")
  * @param object options['acknowledge']				link to acknowledge page (optional)
  * @param string options['acknowledge']['eventid']	event id
- * @param string options['acknowledge']['screenid']	screen id (optional)
- * @param string options['acknowledge']['backurl']	return url (optional)
+ * @param string options['acknowledge']['backurl']	return url
  * @param int    options['eventTime']				event page url navigation time parameter (optional)
  * @param object options['configuration']			link to trigger configuration page (optional)
  * @param string options['url']						trigger url link (optional)
@@ -663,7 +663,9 @@ function getMenuPopupTrigger(options) {
 	var sections = [], items = [];
 
 	// events
-	var url = new Curl('events.php?filter_set=1&source=0&triggerid=' + options.triggerid);
+	var url = new Curl('events.php?filter_set=1&source=0&groupid=' + options.groupid + '&hostid=' + options.hostid +
+		'&triggerid=' + options.triggerid
+	);
 	if (typeof options.eventTime !== 'undefined') {
 		url.setArgument('nav_time', options.eventTime);
 	}
@@ -683,11 +685,7 @@ function getMenuPopupTrigger(options) {
 
 	// acknowledge
 	if (typeof options.acknowledge !== 'undefined' && objectSize(options.acknowledge) > 0) {
-		var url = new Curl('acknow.php');
-
-		jQuery.each(options.acknowledge, function(name, value) {
-			url.setArgument(name, value);
-		});
+		var url = new Curl('zabbix.php?action=acknowledge.edit&eventids[]=' + options.acknowledge.eventid + '&backurl=' + options.acknowledge.backurl);
 
 		items[items.length] = {
 			label: t('Acknowledge'),
@@ -763,8 +761,8 @@ function getMenuPopupTriggerLog(options) {
 			openWinCentered(
 				'tr_logform.php?sform=1&itemid=' + options.itemid,
 				'TriggerLog',
-				760,
-				540,
+				1000,
+				700,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 
@@ -787,8 +785,8 @@ function getMenuPopupTriggerLog(options) {
 					openWinCentered(
 						'tr_logform.php?sform=1&itemid=' + options.itemid + '&triggerid=' + trigger.id,
 						'TriggerLog',
-						760,
-						540,
+						1000,
+						700,
 						'titlebar=no, resizable=yes, scrollbars=yes'
 					);
 
@@ -933,7 +931,7 @@ jQuery(function($) {
 	 * Menu popup.
 	 *
 	 * @param array  sections				menu sections
-	 * @param string sections[n]['label']	section title
+	 * @param string sections[n]['label']	(optional) section title
 	 * @param array  sections[n]['items']	section menu data (see createMenuItem() for available options)
 	 * @param object event					menu popup call event
 	 *
@@ -979,8 +977,10 @@ jQuery(function($) {
 			// create sections
 			if (sections.length > 0) {
 				$.each(sections, function(i, section) {
-					var h3 = $('<h3>').text(section.label);
-					var sectionItem = $('<li>').append(h3);
+					if ((typeof section.label !== 'undefined') && (section.label.length > 0)) {
+						var h3 = $('<h3>').text(section.label);
+						var sectionItem = $('<li>').append(h3);
+					}
 
 					// add section delimited for all sections except first one
 					if (i > 0) {

@@ -72,14 +72,14 @@ int	DBconnect(int flag)
 			exit(EXIT_FAILURE);
 		}
 
-		zabbix_log(LOG_LEVEL_WARNING, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
+		zabbix_log(LOG_LEVEL_ERR, "database is down: reconnecting in %d seconds", ZBX_DB_WAIT_DOWN);
 		connection_failure = 1;
 		zbx_sleep(ZBX_DB_WAIT_DOWN);
 	}
 
 	if (0 != connection_failure)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "database connection re-established");
+		zabbix_log(LOG_LEVEL_ERR, "database connection re-established");
 		connection_failure = 0;
 	}
 
@@ -122,7 +122,7 @@ static void	DBtxn_operation(int (*txn_operation)())
 
 		if (ZBX_DB_DOWN == (rc = txn_operation()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -217,7 +217,7 @@ void	DBstatement_prepare(const char *sql)
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_statement_prepare(sql)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -247,7 +247,7 @@ void	DBbind_parameter(int position, void *buffer, unsigned char type)
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_bind_parameter(position, buffer, type)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -276,7 +276,7 @@ int	DBstatement_execute()
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_statement_execute()))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -311,7 +311,7 @@ int	__zbx_DBexecute(const char *fmt, ...)
 
 		if (ZBX_DB_DOWN == (rc = zbx_db_vexecute(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -378,7 +378,7 @@ DB_RESULT	__zbx_DBselect(const char *fmt, ...)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_vselect(fmt, args)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -411,7 +411,7 @@ DB_RESULT	DBselectN(const char *query, int n)
 
 		if ((DB_RESULT)ZBX_DB_DOWN == (rc = zbx_db_select_n(query, n)))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
+			zabbix_log(LOG_LEVEL_ERR, "database is down: retrying in %d seconds", ZBX_DB_WAIT_DOWN);
 			connection_failure = 1;
 			sleep(ZBX_DB_WAIT_DOWN);
 		}
@@ -654,104 +654,6 @@ void	process_triggers(zbx_vector_ptr_t *triggers)
 clean:
 	zbx_vector_ptr_pair_destroy(&trigger_sqls);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-void	DBadd_trend(zbx_uint64_t itemid, double value, int clock)
-{
-	const char	*__function_name = "DBadd_trend";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		hour, num;
-	double		value_min, value_avg, value_max;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	hour = clock - clock % SEC_PER_HOUR;
-
-	result = DBselect("select num,value_min,value_avg,value_max from trends where itemid=" ZBX_FS_UI64 " and clock=%d",
-			itemid, hour);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		num = atoi(row[0]);
-		value_min = atof(row[1]);
-		value_avg = atof(row[2]);
-		value_max = atof(row[3]);
-		if (value < value_min)
-			value_min = value;
-		if (value > value_max)
-			value_max = value;
-		value_avg = (num * value_avg + value) / (num + 1);
-		num++;
-
-		DBexecute("update trends"
-				" set num=%d,"
-				"value_min=" ZBX_FS_DBL ","
-				"value_avg=" ZBX_FS_DBL ","
-				"value_max=" ZBX_FS_DBL
-				" where itemid=" ZBX_FS_UI64
-					" and clock=%d",
-				num, value_min, value_avg, value_max, itemid, hour);
-	}
-	else
-	{
-		DBexecute("insert into trends (itemid,clock,num,value_min,value_avg,value_max)"
-				" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_DBL "," ZBX_FS_DBL "," ZBX_FS_DBL ")",
-				itemid, hour, 1, value, value, value);
-	}
-	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
-}
-
-void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock)
-{
-	const char	*__function_name = "DBadd_trend_uint";
-
-	DB_RESULT	result;
-	DB_ROW		row;
-	int		hour, num;
-	zbx_uint64_t	value_min, value_avg, value_max;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
-	hour = clock - clock % SEC_PER_HOUR;
-
-	result = DBselect("select num,value_min,value_avg,value_max from trends_uint where itemid=" ZBX_FS_UI64 " and clock=%d",
-		itemid, hour);
-
-	if (NULL != (row = DBfetch(result)))
-	{
-		num = atoi(row[0]);
-		ZBX_STR2UINT64(value_min, row[1]);
-		ZBX_STR2UINT64(value_avg, row[2]);
-		ZBX_STR2UINT64(value_max, row[3]);
-		if (value < value_min)
-			value_min = value;
-		if (value > value_max)
-			value_max = value;
-		value_avg = (num * value_avg + value) / (num + 1);
-		num++;
-
-		DBexecute("update trends_uint"
-				" set num=%d,"
-				"value_min=" ZBX_FS_UI64 ","
-				"value_avg=" ZBX_FS_UI64 ","
-				"value_max=" ZBX_FS_UI64
-				" where itemid=" ZBX_FS_UI64
-					" and clock=%d",
-				num, value_min, value_avg, value_max, itemid, hour);
-	}
-	else
-	{
-		DBexecute("insert into trends_uint (itemid,clock,num,value_min,value_avg,value_max)"
-				" values (" ZBX_FS_UI64 ",%d,%d," ZBX_FS_UI64 "," ZBX_FS_UI64 "," ZBX_FS_UI64 ")",
-				itemid, hour, 1, value, value, value);
-	}
-	DBfree_result(result);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 

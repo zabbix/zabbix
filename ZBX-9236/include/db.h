@@ -311,6 +311,7 @@ typedef struct
 	char			*smtp_helo;
 	char			*smtp_email;
 	char			*exec_path;
+	char			*exec_params;
 	char			*gsm_modem;
 	char			*username;
 	char			*passwd;
@@ -321,17 +322,6 @@ typedef struct
 	unsigned char		smtp_authentication;
 }
 DB_MEDIATYPE;
-
-typedef struct
-{
-	zbx_uint64_t	actionid;
-	char		*shortdata;
-	char		*longdata;
-	int		esc_period;
-	unsigned char	eventsource;
-	unsigned char	recovery_msg;
-}
-DB_ACTION;
 
 typedef struct
 {
@@ -520,9 +510,6 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 void	zbx_create_itservices_lock();
 void	zbx_destroy_itservices_lock();
 
-void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
-void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
-
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
 void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
@@ -547,6 +534,9 @@ zbx_uint64_t	DBadd_interface(zbx_uint64_t hostid, unsigned char type,
 
 const char	*DBget_inventory_field(unsigned char inventory_link);
 unsigned short	DBget_inventory_field_len(unsigned char inventory_link);
+
+void	DBset_host_inventory(zbx_uint64_t hostid, int inventory_mode);
+void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode);
 
 int	DBtxn_status(void);
 int	DBtxn_ongoing(void);

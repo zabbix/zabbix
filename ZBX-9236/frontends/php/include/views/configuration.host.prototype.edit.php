@@ -38,20 +38,17 @@ if (!isset($_REQUEST['form_refresh'])) {
 $frmHost = (new CForm())
 	->setName('hostPrototypeForm.')
 	->addVar('form', getRequest('form', 1))
-	->addVar('parent_discoveryid', $discoveryRule['itemid']);
+	->addVar('parent_discoveryid', $discoveryRule['itemid'])
+	->addVar('tls_accept', $parentHost['tls_accept']);
 
 $hostList = new CFormList('hostlist');
 
 if ($hostPrototype['templateid'] && $data['parents']) {
 	$parents = [];
 	foreach (array_reverse($data['parents']) as $parent) {
-		$parents[] = (new CLink(
-			$parent['parentHost']['name'],
-			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid'])
-		)
-			->addClass('highlight')
-			->addClass('underline')
-			->addClass('weight_normal');
+		$parents[] = new CLink($parent['parentHost']['name'],
+			'?form=update&hostid='.$parent['hostid'].'&parent_discoveryid='.$parent['discoveryRule']['itemid']
+		);
 		$parents[] = SPACE.'&rArr;'.SPACE;
 	}
 	array_pop($parents);
@@ -88,13 +85,13 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$ifTab = (new CTable())
 		->setId('agentInterfaces')
 		->setHeader([
-		new CColHeader(),
-		new CColHeader(_('IP address')),
-		new CColHeader(_('DNS name')),
-		new CColHeader(_('Connect to')),
-		new CColHeader(_('Port')),
-		(new CColHeader(_('Default')))->setColSpan(2)
-	]);
+			'',
+			_('IP address'),
+			_('DNS name'),
+			_('Connect to'),
+			_('Port'),
+			(new CColHeader(_('Default')))->setColSpan(2)
+		]);
 
 	$row = (new CRow())->setId('agentInterfacesFooter');
 	if (!array_key_exists(INTERFACE_TYPE_AGENT, $existingInterfaceTypes)) {
@@ -107,6 +104,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'agent')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// SNMP interfaces
@@ -123,6 +121,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'snmp')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// JMX interfaces
@@ -139,6 +138,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'jmx')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// IPMI interfaces
@@ -156,6 +156,7 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 		(new CDiv($ifTab))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-type', 'ipmi')
+			->setWidth(ZBX_HOST_INTERFACE_WIDTH)
 	);
 
 	// proxy
@@ -205,8 +206,9 @@ $groupList->addRow(_('Groups'),
 $customGroupTable = (new CTable())->setId('tbl_group_prototypes');
 
 // buttons
-$addButton = (new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK);
-$buttonColumn = (new CCol($addButton))->setAttribute('colspan', 5);
+$buttonColumn = (new CCol(
+	(new CButton('group_prototype_add', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)
+))->setAttribute('colspan', 5);
 
 $buttonRow = (new CRow())
 	->setId('row_new_group_prototype')
@@ -223,7 +225,7 @@ $tmplList = new CFormList();
 if ($hostPrototype['templateid']) {
 	$linkedTemplateTable = (new CTable())
 		->setNoDataMessage(_('No templates linked.'))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
 	foreach ($hostPrototype['templates'] as $template) {
@@ -235,7 +237,9 @@ if ($hostPrototype['templateid']) {
 	}
 
 	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($linkedTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 else {
@@ -243,7 +247,7 @@ else {
 
 	$linkedTemplateTable = (new CTable())
 		->setNoDataMessage(_('No templates linked.'))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
 	foreach ($hostPrototype['templates'] as $template) {
@@ -253,14 +257,18 @@ else {
 
 		$linkedTemplateTable->addRow([
 			$templateLink,
-			(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK)
+			(new CCol(
+				(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK)
+			))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 
 		$ignoreTemplates[$template['templateid']] = $template['name'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($linkedTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
 	// create new linked template table
@@ -279,7 +287,9 @@ else {
 		->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
 	$tmplList->addRow(_('Link new templates'),
-		(new CDiv($newTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($newTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 
@@ -319,42 +329,63 @@ if ($parentHost['status'] != HOST_STATUS_TEMPLATE) {
 	$macrosView = new CView('hostmacros', [
 		'macros' => $macros,
 		'show_inherited_macros' => $data['show_inherited_macros'],
+		'is_template' => false,
 		'readonly' => true
 	]);
 	$divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 }
 
-$inventoryFormList = new CFormList('inventorylist');
-
-// radio buttons for inventory type choice
-$inventoryMode = (isset($hostPrototype['inventory']['inventory_mode'])) ? $hostPrototype['inventory']['inventory_mode'] : HOST_INVENTORY_DISABLED;
-$inventoryDisabledBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, $inventoryMode == HOST_INVENTORY_DISABLED))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_DISABLED)
-	->setEnabled(!$hostPrototype['templateid']);
-
-$inventoryManualBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, $inventoryMode == HOST_INVENTORY_MANUAL))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_MANUAL)
-	->setEnabled(!$hostPrototype['templateid']);
-
-$inventoryAutomaticBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, $inventoryMode == HOST_INVENTORY_AUTOMATIC))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
-	->setEnabled(!$hostPrototype['templateid']);
-
-$inventoryTypeRadioButton = [
-	$inventoryDisabledBtn,
-	new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
-	$inventoryManualBtn,
-	new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
-	$inventoryAutomaticBtn,
-	new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC),
-];
-$inventoryFormList->addRow((new CDiv($inventoryTypeRadioButton))->addClass('jqueryinputset')->addClass('radioset'));
-
-// clearing the float
-$clearFixDiv = (new CDiv())->addStyle('clear: both;');
-$inventoryFormList->addRow('', $clearFixDiv);
+$inventoryFormList = (new CFormList('inventorylist'))
+	->addRow(null,
+		(new CRadioButtonList('inventory_mode', (int) $hostPrototype['inventory']['inventory_mode']))
+			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+			->setEnabled($hostPrototype['templateid'] == 0)
+			->setModern(true)
+	);
 
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+
+// Encryption form list.
+$encryption_form_list = (new CFormList('encryption'))
+	->addRow(_('Connections to host'),
+		(new CRadioButtonList('tls_connect', (int) $parentHost['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
+			->setEnabled(false)
+	)
+	->addRow(_('Connections from host'), [
+		[(new CCheckBox('tls_in_none'))->setAttribute('disabled', 'disabled'), _('No encryption')],
+		BR(),
+		[(new CCheckBox('tls_in_psk'))->setAttribute('disabled', 'disabled'), _('PSK')],
+		BR(),
+		[(new CCheckBox('tls_in_cert'))->setAttribute('disabled', 'disabled'), _('Certificate')]
+	])
+	->addRow(_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $parentHost['tls_psk_identity'], false, 128))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('disabled', 'disabled')
+	)
+	->addRow(_('PSK'),
+		(new CTextBox('tls_psk', $parentHost['tls_psk'], false, 512))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('disabled', 'disabled')
+	)
+	->addRow(_('Issuer'),
+		(new CTextBox('tls_issuer', $parentHost['tls_issuer'], false, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('disabled', 'disabled')
+	)
+	->addRow(_('Subject'),
+		(new CTextBox('tls_subject', $parentHost['tls_subject'], false, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+			->setAttribute('disabled', 'disabled')
+	);
+
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 /*
  * footer

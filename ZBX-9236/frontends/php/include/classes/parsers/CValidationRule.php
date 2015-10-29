@@ -51,11 +51,13 @@ class CValidationRule {
 						case ' ':
 							$pos++;
 							break;
+
 						default:
 							$is_empty = false;
 							$rule = [];
 
-							if (!$this->parseRequired($buffer, $pos, $rule)				// required
+							if (!$this->parseString($buffer, $pos, $rule)				// string
+									&& !$this->parseRequired($buffer, $pos, $rule)		// required
 									&& !$this->parseNotEmpty($buffer, $pos, $rule)		// not_empty
 									&& !$this->parseJson($buffer, $pos, $rule)			// json
 									&& !$this->parseInt32($buffer, $pos, $rule)			// int32
@@ -64,8 +66,8 @@ class CValidationRule {
 									&& !$this->parseFatal($buffer, $pos, $rule)			// fatal
 									&& !$this->parseDB($buffer, $pos, $rule)			// db
 									&& !$this->parseArrayId($buffer, $pos, $rule)		// array_id
-									&& !$this->parseArrayDB($buffer, $pos, $rule)) {	// array_db
-
+									&& !$this->parseArrayDB($buffer, $pos, $rule)		// array_db
+									&& !$this->parseArray($buffer, $pos, $rule)) {		// array
 								// incorrect validation rule
 								break 3;
 							}
@@ -81,6 +83,7 @@ class CValidationRule {
 							break;
 					}
 					break;
+
 				case self::STATE_END:
 					switch ($buffer[$pos]) {
 						case ' ':
@@ -128,6 +131,22 @@ class CValidationRule {
 
 		$pos += 5;
 		$rule['fatal'] = true;
+
+		return true;
+	}
+
+	/**
+	 * string
+	 *
+	 * 'string' => true
+	 */
+	private function parseString($buffer, &$pos, &$rules) {
+		if (0 != strncmp(substr($buffer, $pos), 'string', 6)) {
+			return false;
+		}
+
+		$pos += 6;
+		$rules['string'] = true;
 
 		return true;
 	}
@@ -277,6 +296,45 @@ class CValidationRule {
 
 		$pos = $i;
 		$rules['db'] = [
+			'table' => $table,
+			'field' => $field
+		];
+
+		return true;
+	}
+
+	/**
+	 * array
+	 *
+	 * 'array' => true
+	 */
+	private function parseArray($buffer, &$pos, &$rules) {
+		$i = $pos;
+		if (strncmp(substr($buffer, $pos), 'array ', 6) != 0) {
+			return false;
+		}
+
+		$i += 6;
+
+		while (isset($buffer[$i]) && $buffer[$i] === ' ') {
+			$i++;
+		}
+
+		$table = '';
+
+		if (!$this->parseField($buffer, $i, $table) || !isset($buffer[$i]) || $buffer[$i++] !== '.') {
+			return false;
+		}
+
+		$field = '';
+
+		if (!$this->parseField($buffer, $i, $field)) {
+			return false;
+		}
+
+		$pos = $i;
+
+		$rules['array'] = [
 			'table' => $table,
 			'field' => $field
 		];

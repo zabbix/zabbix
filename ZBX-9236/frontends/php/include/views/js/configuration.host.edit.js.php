@@ -2,35 +2,39 @@
 <tr class="interfaceRow" id="hostInterfaceRow_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}">
 	<td class="interface-drag-control <?= ZBX_STYLE_TD_DRAG_ICON ?>">
 		<div class="<?= ZBX_STYLE_DRAG_ICON ?>"></div>
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][items]" value="#{iface.items}" />
+		<input type="hidden" name="interfaces[#{iface.interfaceid}][locked]" value="#{iface.locked}" />
 	</td>
 	<td class="interface-ip">
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][isNew]" value="#{iface.isNew}">
 		<input type="hidden" name="interfaces[#{iface.interfaceid}][interfaceid]" value="#{iface.interfaceid}">
 		<input type="hidden" id="interface_type_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][type]" value="#{iface.type}">
-		<input class="input text" name="interfaces[#{iface.interfaceid}][ip]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_IP_WIDTH ?>px" maxlength="64" value="#{iface.ip}">
+		<input name="interfaces[#{iface.interfaceid}][ip]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_IP_WIDTH ?>px" maxlength="64" value="#{iface.ip}">
 		<div class="interface-bulk">
-			<input class="input checkbox pointer" type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
+			<input type="checkbox" id="interfaces[#{iface.interfaceid}][bulk]" name="interfaces[#{iface.interfaceid}][bulk]" value="1" #{*attrs.checked_bulk}>
 			<label for="interfaces[#{iface.interfaceid}][bulk]"><?= _('Use bulk requests') ?></label>
 		</div>
 	</td>
 	<td class="interface-dns">
-		<input class="input text" name="interfaces[#{iface.interfaceid}][dns]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_DNS_WIDTH ?>px" maxlength="64" value="#{iface.dns}">
+		<input name="interfaces[#{iface.interfaceid}][dns]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_DNS_WIDTH ?>px" maxlength="64" value="#{iface.dns}">
 	</td>
-	<td class="interface-connect-to">
-		<div class="jqueryinputset radioset">
-			<input class="interface-useip" type="radio" id="radio_ip_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="1" #{*attrs.checked_ip}>
-			<input class="interface-useip" type="radio" id="radio_dns_#{iface.interfaceid}" name="interfaces[#{iface.interfaceid}][useip]" value="0" #{*attrs.checked_dns}>
-			<label for="radio_ip_#{iface.interfaceid}"><?= _('IP') ?></label><label for="radio_dns_#{iface.interfaceid}"><?= _('DNS') ?></label>
-		</div>
-	</td>
+	<?= (new CCol(
+			(new CRadioButtonList('interfaces[#{iface.interfaceid}][useip]', null))
+				->addValue(_('IP'), INTERFACE_USE_IP, 'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_IP.']')
+				->addValue(_('DNS'), INTERFACE_USE_DNS,
+					'interfaces[#{iface.interfaceid}][useip]['.INTERFACE_USE_DNS.']'
+				)
+				->setModern(true)
+		))->toString()
+	?>
 	<td class="interface-port">
-		<input class="input text" name="interfaces[#{iface.interfaceid}][port]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_PORT_WIDTH ?>px" maxlength="64" value="#{iface.port}">
+		<input name="interfaces[#{iface.interfaceid}][port]" type="text" style="width: <?= ZBX_TEXTAREA_INTERFACE_PORT_WIDTH ?>px" maxlength="64" value="#{iface.port}">
 	</td>
 	<td class="interface-default">
 		<input class="mainInterface" type="radio" id="interface_main_#{iface.interfaceid}" name="mainInterfaces[#{iface.type}]" value="#{iface.interfaceid}">
 		<label class="checkboxLikeLabel" for="interface_main_#{iface.interfaceid}" style="height: 16px; width: 16px;"></label>
 	</td>
-	<td class="interface-control">
+	<td class="<?= ZBX_STYLE_NOWRAP ?> interface-control">
 		<button class="<?= ZBX_STYLE_BTN_LINK ?> remove" type="button" id="removeInterface_#{iface.interfaceid}" data-interfaceid="#{iface.interfaceid}" #{*attrs.disabled}><?= _('Remove') ?></button>
 	</td>
 </tr>
@@ -57,13 +61,14 @@
 			jQuery(domId).before(rowTemplate.evaluate({iface: hostInterface, attrs: domAttrs}));
 
 			domRow = jQuery('#hostInterfaceRow_' + hostInterface.interfaceid);
-			jQuery('.jqueryinputset', domRow).buttonset();
 
 			if (hostInterface.type != <?= INTERFACE_TYPE_SNMP ?>) {
 				jQuery('.interface-bulk', domRow).remove();
 			}
 
-			if (hostInterface.locked) {
+			jQuery('#interfaces_' + hostInterface.interfaceid + '_useip_' + hostInterface.useip).prop('checked', true);
+
+			if (hostInterface.locked > 0) {
 				addNotDraggableIcon(domRow);
 			}
 			else {
@@ -157,25 +162,11 @@
 
 		function getDomElementsAttrsForInterface(hostInterface) {
 			var attrs = {
-				disabled: '',
-				checked_dns: '',
-				checked_ip: '',
-				checked_main: ''
+				disabled: ''
 			};
 
-			if (hostInterface.items) {
+			if (hostInterface.items > 0) {
 				attrs.disabled = 'disabled="disabled"';
-			}
-
-			if (hostInterface.useip == 0) {
-				attrs.checked_dns = 'checked="checked"';
-			}
-			else {
-				attrs.checked_ip = 'checked="checked"';
-			}
-
-			if (hostInterface.main) {
-				attrs.checked_main = 'checked="checked"';
 			}
 
 			if (hostInterface.type == <?= INTERFACE_TYPE_SNMP ?>) {
@@ -315,7 +306,6 @@
 					.removeAttr('name');
 				jQuery('.interfaceRow').find('input[type="text"]').attr('readonly', true);
 				jQuery('.interfaceRow').find('input[type="radio"], input[type="checkbox"]').attr('disabled', true);
-				jQuery('.interface-connect-to').find('input').button('disable');
 			}
 		}
 	}());
@@ -340,6 +330,26 @@
 		jQuery('#hostlist').on('click', 'input[type=radio].interface-useip', function() {
 			var interfaceId = jQuery(this).attr('id').match(/\d+/);
 			hostInterfacesManager.setUseipForInterface(interfaceId[0], jQuery(this).val());
+		});
+
+		jQuery('#tls_connect, #tls_in_psk, #tls_in_cert').change(function() {
+			// If certificate is selected or checked.
+			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_CERTIFICATE ?>
+					|| jQuery('#tls_in_cert').is(':checked')) {
+				jQuery('#tls_issuer, #tls_subject').closest('li').show();
+			}
+			else {
+				jQuery('#tls_issuer, #tls_subject').closest('li').hide();
+			}
+
+			// If PSK is selected or checked.
+			if (jQuery('input[name=tls_connect]:checked').val() == <?= HOST_ENCRYPTION_PSK ?>
+					|| jQuery('#tls_in_psk').is(':checked')) {
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').show();
+			}
+			else {
+				jQuery('#tls_psk, #tls_psk_identity').closest('li').hide();
+			}
 		});
 
 		jQuery('#agentInterfaces, #SNMPInterfaces, #JMXInterfaces, #IPMIInterfaces').parent().droppable({
@@ -406,7 +416,7 @@
 		});
 
 		// radio button of inventory modes was clicked
-		jQuery('div.jqueryinputset input[name=inventory_mode]').click(function() {
+		jQuery('input[name=inventory_mode]').click(function() {
 			// action depending on which button was clicked
 			var inventoryFields = jQuery('#inventorylist :input:gt(2)');
 
@@ -433,6 +443,36 @@
 		jQuery('#mass_replace_tpls').on('change', function() {
 			jQuery('#mass_clear_tpls').prop('disabled', !this.checked);
 		}).change();
+
+		// Refresh field visibility on document load.
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_NONE ?>) == <?= HOST_ENCRYPTION_NONE ?>) {
+			jQuery('#tls_in_none').prop('checked', true);
+		}
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_PSK ?>) == <?= HOST_ENCRYPTION_PSK ?>) {
+			jQuery('#tls_in_psk').prop('checked', true);
+		}
+		if ((jQuery('#tls_accept').val() & <?= HOST_ENCRYPTION_CERTIFICATE ?>) == <?= HOST_ENCRYPTION_CERTIFICATE ?>) {
+			jQuery('#tls_in_cert').prop('checked', true);
+		}
+
+		jQuery('input[name=tls_connect]').trigger('change');
+
+		// Depending on checkboxes, create a value for hidden field 'tls_accept'.
+		jQuery('#hostForm').submit(function() {
+			var tls_accept = 0x00;
+
+			if (jQuery('#tls_in_none').is(':checked')) {
+				tls_accept |= <?= HOST_ENCRYPTION_NONE ?>;
+			}
+			if (jQuery('#tls_in_psk').is(':checked')) {
+				tls_accept |= <?= HOST_ENCRYPTION_PSK ?>;
+			}
+			if (jQuery('#tls_in_cert').is(':checked')) {
+				tls_accept |= <?= HOST_ENCRYPTION_CERTIFICATE ?>;
+			}
+
+			jQuery('#tls_accept').val(tls_accept);
+		});
 	});
 
 	function getHostInterfaceNumericType(typeName) {

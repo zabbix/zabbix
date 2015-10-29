@@ -25,15 +25,16 @@ $widget = (new CWidget())->setTitle(_('Media types'));
 
 // create form
 $mediaTypeForm = (new CForm())
-	->setId('mediaTypeForm')
+	->setId('media_type_form')
 	->addVar('form', 1)
-	->addVar('mediatypeid', $data['mediatypeid']);
+	->addVar('mediatypeid', $data['mediatypeid'])
+	->addVar('exec_params_count', $data['exec_params_count']);
 
 // create form list
 $nameTextBox = (new CTextBox('description', $data['description'], false, 100))
 	->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	->setAttribute('autofocus', 'autofocus');
-$mediaTypeFormList = (new CFormList('mediaTypeFormList'))
+$mediaTypeFormList = (new CFormList())
 	->addRow(_('Name'), $nameTextBox);
 
 // append type to form list
@@ -51,73 +52,67 @@ $ez_texting_link = (new CLink('https://app.eztexting.com', 'https://app.eztextin
 	->setTarget('_blank');
 $cmbTypeRow[] = $ez_texting_link;
 
-$connections = [
-	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_NONE,
-		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_NONE
-	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_NONE),
-	new CLabel(_('None'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_NONE),
-	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_STARTTLS,
-		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_STARTTLS
-	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_STARTTLS),
-	new CLabel(_('STARTTLS'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_STARTTLS),
-	(new CRadioButton('smtp_security', SMTP_CONNECTION_SECURITY_SSL_TLS,
-		$data['smtp_security'] == SMTP_CONNECTION_SECURITY_SSL_TLS
-	))->setId('smtp_security_'.SMTP_CONNECTION_SECURITY_SSL_TLS),
-	new CLabel(_('SSL/TLS'), 'smtp_security_'.SMTP_CONNECTION_SECURITY_SSL_TLS)
-];
-
-$authentication = [
-	(new CRadioButton('smtp_authentication', SMTP_AUTHENTICATION_NONE,
-		$data['smtp_authentication'] == SMTP_AUTHENTICATION_NONE
-	))->setId('smtp_authentication_'.SMTP_AUTHENTICATION_NONE),
-	new CLabel(_('None'), 'smtp_authentication_'.SMTP_AUTHENTICATION_NONE),
-	(new CRadioButton('smtp_authentication', SMTP_AUTHENTICATION_NORMAL,
-		$data['smtp_authentication'] == SMTP_AUTHENTICATION_NORMAL
-	))->setId('smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL),
-	new CLabel(_('Normal password'), 'smtp_authentication_'.SMTP_AUTHENTICATION_NORMAL)
-];
-
 $mediaTypeFormList
 	->addRow(_('Type'), $cmbTypeRow)
-	->addRow(_('SMTP server'), [
-			(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			_('Port'),
-			(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-		],
-		$data['type'] != MEDIA_TYPE_EMAIL
+	->addRow(_('SMTP server'),
+		(new CTextBox('smtp_server', $data['smtp_server']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	)
-	->addRow(_('SMTP helo'),
-		(new CTextBox('smtp_helo', $data['smtp_helo']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		$data['type'] != MEDIA_TYPE_EMAIL
+	->addRow(_('SMTP server port'),
+		(new CNumericBox('smtp_port', $data['smtp_port'], 5, false, false, false))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
-	->addRow(_('SMTP email'),
-		(new CTextBox('smtp_email', $data['smtp_email']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		$data['type'] != MEDIA_TYPE_EMAIL
-	)
+	->addRow(_('SMTP helo'), (new CTextBox('smtp_helo', $data['smtp_helo']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
+	->addRow(_('SMTP email'), (new CTextBox('smtp_email', $data['smtp_email']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH))
 	->addRow(_('Connection security'),
-		$connections, $data['type'] != MEDIA_TYPE_EMAIL
+		(new CRadioButtonList('smtp_security', (int) $data['smtp_security']))
+			->addValue(_('None'), SMTP_CONNECTION_SECURITY_NONE)
+			->addValue(_('STARTTLS'), SMTP_CONNECTION_SECURITY_STARTTLS)
+			->addValue(_('SSL/TLS'), SMTP_CONNECTION_SECURITY_SSL_TLS)
+			->setModern(true)
 	)
-	->addRow(_('SSL verify peer'),
-		(new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer']),
-		$data['type'] != MEDIA_TYPE_EMAIL
+	->addRow(_('SSL verify peer'), (new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer']))
+	->addRow(_('SSL verify host'), (new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host']))
+	->addRow(_('Authentication'),
+		(new CRadioButtonList('smtp_authentication', (int) $data['smtp_authentication']))
+			->addValue(_('None'), SMTP_AUTHENTICATION_NONE)
+			->addValue(_('Normal password'), SMTP_AUTHENTICATION_NORMAL)
+			->setModern(true)
 	)
-	->addRow(_('SSL verify host'),
-		(new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host']),
-		$data['type'] != MEDIA_TYPE_EMAIL
-	)
-	->addRow(_('Authentication'), $authentication, $data['type'] != MEDIA_TYPE_EMAIL)
-	->addRow(_('Username'),
-		(new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-	)
-	->addRow(_('Script name'),
-		(new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		$data['type'] != MEDIA_TYPE_EXEC
-	)
-	->addRow(_('GSM modem'),
-		(new CTextBox('gsm_modem', $data['gsm_modem']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		$data['type'] != MEDIA_TYPE_SMS
-	);
+	->addRow(_('Username'), (new CTextBox('smtp_username', $data['smtp_username']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
+	->addRow(_('Script name'), (new CTextBox('exec_path', $data['exec_path']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH));
+
+$exec_params_table = (new CTable())
+	->setId('exec_params_table')
+	->setHeader([_('Parameter'), _('Action')])
+	->setAttribute('style', 'width: 100%;');
+
+if ($data['exec_params_count'] != 0) {
+	foreach ($data['exec_params'] as $i => $exec_param) {
+		$exec_params_table->addRow([
+			(new CTextBox('exec_params['.$i.'][exec_param]', $exec_param['exec_param'], false, 255))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+			(new CButton('exec_params['.$i.'][remove]', _('Remove')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->addClass('element-table-remove')
+			],
+			'form_row'
+		);
+	}
+}
+
+$exec_params_table->addRow([(new CButton('exec_param_add', _('Add')))
+	->addClass(ZBX_STYLE_BTN_LINK)
+	->addClass('element-table-add')]);
+
+$mediaTypeFormList->addRow(_('Script parameters'),
+	(new CDiv($exec_params_table))
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;'),
+	'row_exec_params'
+);
+
+$mediaTypeFormList->addRow(_('GSM modem'),
+	(new CTextBox('gsm_modem', $data['gsm_modem']))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+);
 
 // create password field
 if ($data['passwd'] != '') {

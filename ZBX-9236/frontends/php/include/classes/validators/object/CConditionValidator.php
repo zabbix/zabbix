@@ -43,14 +43,38 @@ class CConditionValidator extends CValidator {
 	public $messageUnusedCondition;
 
 	/**
+	 * Error message if several triggers are compared with "and".
+	 *
+	 * @var string
+	 */
+	public $messageAndWithSeveralTriggers;
+
+	/**
 	 * Validates the given condition formula and checks if the given conditions match the formula.
 	 *
 	 * @param array $object
 	 *
 	 * @return bool
 	 */
-	public function validate($object)
-	{
+	public function validate($object) {
+		if ($object['evaltype'] == CONDITION_EVAL_TYPE_AND) {
+			// get triggers count in formula
+			$trigger_count = 0;
+			foreach ($object['conditions'] as $condition) {
+				if ($condition['conditiontype'] == CONDITION_TYPE_TRIGGER
+						&& $condition['operator'] == CONDITION_OPERATOR_EQUAL) {
+					$trigger_count++;
+				}
+			}
+
+			// check if multiple triggers are compared with AND
+			if ($trigger_count > 1) {
+				$this->error($this->messageAndWithSeveralTriggers);
+
+				return false;
+			}
+		}
+
 		// validate only custom expressions
 		if ($object['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
 			return true;
@@ -66,15 +90,15 @@ class CConditionValidator extends CValidator {
 
 		// check that all conditions used in the formula are defined in the "conditions" array
 		$conditions = zbx_toHash($object['conditions'], 'formulaid');
-		foreach ($parser->constants as $formulaId) {
-			if (!isset($conditions[$formulaId])) {
-				$this->error($this->messageMissingCondition, $formulaId, $object['formula']);
+		$constants = array_unique(zbx_objectValues($parser->constants, 'value'));
+		foreach ($constants as $constant) {
+			if (!array_key_exists($constant, $conditions)) {
+				$this->error($this->messageMissingCondition, $constant, $object['formula']);
 
 				return false;
 			}
-			else {
-				unset($conditions[$formulaId]);
-			}
+
+			unset($conditions[$constant]);
 		}
 
 		// check that the "conditions" array has no unused conditions

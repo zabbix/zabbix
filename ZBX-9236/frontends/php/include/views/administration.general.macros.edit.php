@@ -29,7 +29,6 @@ $widget = (new CWidget())
 	);
 
 $table = (new CTable())
-	->addClass('formElementTable')
 	->setId('tbl_macros')
 	->setHeader([_('Macro'), '', _('Value'), '']);
 
@@ -37,7 +36,6 @@ $table = (new CTable())
 foreach ($data['macros'] as $i => $macro) {
 	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 64))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-		->addClass('macro')
 		->setAttribute('placeholder', '{$MACRO}');
 
 	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))
@@ -53,7 +51,9 @@ foreach ($data['macros'] as $i => $macro) {
 		$button_cell[] = new CVar('macros['.$i.'][globalmacroid]', $macro['globalmacroid']);
 	}
 
-	$table->addRow([$macro_input, '&rArr;', $value_input, $button_cell], 'form_row');
+	$table->addRow([
+		$macro_input, '&rArr;', $value_input, (new CCol($button_cell))->addClass(ZBX_STYLE_NOWRAP)
+	], 'form_row');
 }
 
 // buttons
@@ -69,9 +69,7 @@ $macros_form_list = (new CFormList('macrosFormList'))
 
 $tab_view = (new CTabView())->addTab('macros', _('Macros'), $macros_form_list);
 
-$saveButton = (new CSubmit('update', _('Update')))
-	->setAttribute('data-removed-count', 0)
-	->main();
+$saveButton = (new CSubmit('update', _('Update')))->setAttribute('data-removed-count', 0);
 
 $tab_view->setFooter(makeFormFooter($saveButton));
 

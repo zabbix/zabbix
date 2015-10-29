@@ -172,7 +172,7 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 
 		$graphPrototypeItems = API::GraphItem()->get([
 			'output' => [
-				'gitemid', 'itemid', 'sortorder', 'flags', 'type', 'calc_fnc',  'drawtype', 'yaxisside', 'color'
+				'gitemid', 'itemid', 'sortorder', 'flags', 'type', 'calc_fnc', 'drawtype', 'yaxisside', 'color'
 			],
 			'graphids' => [$graphPrototype['graphid']]
 		]);
@@ -190,8 +190,6 @@ class CScreenLldGraph extends CScreenLldGraphBase {
 
 		$url .= '?'.http_build_query($queryParams);
 
-		$img = (new CImg($url))->preload();
-
-		return new CSpan($img);
+		return new CSpan(new CImg($url));
 	}
 }

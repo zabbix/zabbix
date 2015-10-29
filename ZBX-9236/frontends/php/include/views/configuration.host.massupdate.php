@@ -26,7 +26,9 @@ $hostWidget = (new CWidget())->setTitle(_('Hosts'));
 // create form
 $hostView = (new CForm())
 	->setName('hostForm')
-	->addVar('action', 'host.massupdate');
+	->addVar('action', 'host.massupdate')
+	->addVar('tls_accept', $data['tls_accept'])
+	->setAttribute('id', 'hostForm');
 foreach ($data['hosts'] as $hostid) {
 	$hostView->addVar('hosts['.$hostid.']', $hostid);
 }
@@ -192,15 +194,8 @@ $hostFormList->addRow(
 $templatesFormList = new CFormList('templatesFormList');
 
 // append templates table to from list
-$templatesTable = (new CTable())
-	->addClass('formElementTable')
-	->setAttribute('style', 'min-width: 500px;')
-	->setId('template_table');
-
-$clearDiv = (new CDiv())->addStyle('clear: both;');
-
-$templatesDiv = (new CDiv(
-	[
+$newTemplateTable = (new CTable())
+	->addRow([
 		(new CMultiSelect([
 			'name' => 'templates[]',
 			'objectName' => 'templates',
@@ -209,21 +204,21 @@ $templatesDiv = (new CDiv(
 				'parameters' => 'srctbl=templates&srcfld1=hostid&srcfld2=host&dstfrm='.$hostView->getName().
 					'&dstfld1=templates_&templated_hosts=1&multiselect=1'
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-		$clearDiv,
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+	])
+	->addRow([
 		(new CDiv([
-			(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1),
-			SPACE,
-			_('Replace'),
+			new CLabel(
+				[(new CCheckBox('mass_replace_tpls'))->setChecked($data['mass_replace_tpls'] == 1), _('Replace')],
+				'mass_replace_tpls'
+			),
 			BR(),
-			(new CCheckBox('mass_clear_tpls'))->setChecked($data['mass_clear_tpls'] == 1),
-			SPACE,
-			_('Clear when unlinking')
+			new CLabel(
+				[(new CCheckBox('mass_clear_tpls'))->setChecked($data['mass_clear_tpls'] == 1), _('Clear when unlinking')],
+				'mass_clear_tpls'
+			)
 		]))->addClass('floatleft')
-	]
-))
-	->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-	->setId('templateDiv');
+	]);
 
 $templatesFormList->addRow(
 	[
@@ -232,7 +227,10 @@ $templatesFormList->addRow(
 		(new CVisibilityBox('visible[templates]', 'templateDiv', _('Original')))
 			->setChecked(isset($data['visible']['templates']))
 	],
-	$templatesDiv
+	(new CDiv($newTemplateTable))
+		->setId('templateDiv')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 );
 
 $ipmiFormList = new CFormList('ipmiFormList');
@@ -285,14 +283,16 @@ $inventoryFormList->addRow(
 	[
 		_('Inventory mode'),
 		SPACE,
-		(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode', _('Original')))
+		(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode_div', _('Original')))
 			->setChecked(isset($data['visible']['inventory_mode']))
 	],
-	new CComboBox('inventory_mode', $data['inventory_mode'], null, [
-		HOST_INVENTORY_DISABLED => _('Disabled'),
-		HOST_INVENTORY_MANUAL => _('Manual'),
-		HOST_INVENTORY_AUTOMATIC => _('Automatic')
-	])
+	(new CDiv(
+		(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
+			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+			->setModern(true)
+	))->setId('inventory_mode_div')
 );
 
 $hostInventoryTable = DB::getSchema('host_inventory');
@@ -333,9 +333,52 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 				_('Original')
 			))->setChecked(isset($data['visible'][$field]))
 		],
-		$fieldInput, false, null, 'formrow-inventory'
+		$fieldInput, null, 'formrow-inventory'
 	);
 }
+
+// Encryption
+$encryption_form_list = new CFormList('encryption');
+
+$encryption_table = (new CTable())
+	->addRow([_('Connections to host'),
+		(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
+	])
+	->addRow([_('Connections from host'), [
+		[(new CCheckBox('tls_in_none')), _('No encryption')],
+		BR(),
+		[(new CCheckBox('tls_in_psk')), _('PSK')],
+		BR(),
+		[(new CCheckBox('tls_in_cert')), _('Certificate')]
+	]])
+	->addRow([_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], false, 128))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('PSK'),
+		(new CTextBox('tls_psk', $data['tls_psk'], false, 512))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('Issuer'),
+		(new CTextBox('tls_issuer', $data['tls_issuer'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	])
+	->addRow([_('Subject'),
+		(new CTextBox('tls_subject', $data['tls_subject'], false, 1024))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	]);
+
+$encryption_form_list->addRow([
+	_('Connections'),
+	SPACE,
+	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))
+		->setChecked(isset($data['visible']['encryption']))
+	],
+	(new CDiv($encryption_table))
+		->setId('encryption_div')
+		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+);
 
 // append tabs to form
 $hostTab = (new CTabView())
@@ -347,6 +390,7 @@ $hostTab = (new CTabView())
 if (!hasRequest('masssave') && !hasRequest('inventory_mode')) {
 	$hostTab->setSelected(0);
 }
+$hostTab->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 // append buttons to form
 $hostTab->setFooter(makeFormFooter(

@@ -136,7 +136,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($dbItems, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => ['applicationid'],
+				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
 		}
@@ -156,7 +156,7 @@ abstract class CItemGeneral extends CApiService {
 				'hostids' => zbx_objectValues($items, 'hostid'),
 				'templated_hosts' => true,
 				'editable' => true,
-				'selectApplications' => ['applicationid'],
+				'selectApplications' => ['applicationid', 'flags'],
 				'preservekeys' => true
 			]);
 		}
@@ -190,7 +190,7 @@ abstract class CItemGeneral extends CApiService {
 				$this->checkPartialValidator($item, $updateDiscoveredValidator, $dbItem);
 			}
 
-			$items = $this->extendObjects($this->tableName(), $items, ['name']);
+			$items = $this->extendObjects($this->tableName(), $items, ['name', 'flags']);
 		}
 
 		foreach ($items as $inum => &$item) {
@@ -344,10 +344,54 @@ abstract class CItemGeneral extends CApiService {
 
 			// update interval
 			if ($fullItem['type'] != ITEM_TYPE_TRAPPER && $fullItem['type'] != ITEM_TYPE_SNMPTRAP) {
-				$nextCheck = calculateItemNextCheck(0, $fullItem['delay'], $fullItem['delay_flex'], time());
-				if ($nextCheck == ZBX_JAN_2038) {
+				// delay must be between 0 and 86400, if delay is 0, delay_flex interval must be set.
+				if ($fullItem['delay'] < 0 || $fullItem['delay'] > SEC_PER_DAY
+					|| ($fullItem['delay'] == 0 && $fullItem['delay_flex'] === '')) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_('Item will not be refreshed. Please enter a correct update interval.'));
+						_('Item will not be refreshed. Please enter a correct update interval.')
+					);
+				}
+
+				// Don't parse empty strings, they will not be valid.
+				if ($fullItem['delay_flex'] === '') {
+					continue;
+				}
+
+				// Validate item delay_flex string. First check syntax with parser, then validate time ranges.
+				$item_delay_flex_parser = new CItemDelayFlexParser($fullItem['delay_flex']);
+
+				if ($item_delay_flex_parser->isValid()) {
+					$delay_flex_validator = new CItemDelayFlexValidator();
+
+					if ($delay_flex_validator->validate($item_delay_flex_parser->getIntervals())) {
+						// Some valid intervals exist at this point.
+						$flexible_intervals = $item_delay_flex_parser->getFlexibleIntervals();
+
+						// If there are no flexible intervals, skip the next check calculation.
+						if (!$flexible_intervals) {
+							continue;
+						}
+
+						$nextCheck = calculateItemNextCheck(0, $fullItem['delay'],
+							$item_delay_flex_parser->getFlexibleIntervals($flexible_intervals),
+							time()
+						);
+
+						if ($nextCheck == ZBX_JAN_2038) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_('Item will not be refreshed. Please enter a correct update interval.')
+							);
+						}
+					}
+					else {
+						self::exception(ZBX_API_ERROR_PARAMETERS, $delay_flex_validator->getError());
+					}
+				}
+				else {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid interval "%1$s": %2$s.',
+						$fullItem['delay_flex'],
+						$item_delay_flex_parser->getError())
+					);
 				}
 			}
 
@@ -412,18 +456,28 @@ abstract class CItemGeneral extends CApiService {
 				}
 			}
 
-			// check that the given applications belong to the item's host
 			if (isset($item['applications']) && $item['applications']) {
+				/*
+				 * 'flags' is available for update and item prototypes.
+				 * Don't allow discovered or any other application types for item prototypes in 'applications' option.
+				 */
+				if (array_key_exists('flags', $fullItem) && $fullItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
+					foreach ($host['applications'] as $num => $application) {
+						if ($application['flags'] != ZBX_FLAG_DISCOVERY_NORMAL) {
+							unset($host['applications'][$num]);
+						}
+					}
+				}
+
+				// check that the given applications belong to the item's host
 				$dbApplicationIds = zbx_objectValues($host['applications'], 'applicationid');
-				foreach($item['applications'] as $appId) {
+				foreach ($item['applications'] as $appId) {
 					if (!in_array($appId, $dbApplicationIds)) {
 						$error = _s('Application with ID "%1$s" is not available on "%2$s".', $appId, $host['name']);
 						self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 					}
 				}
 			}
-
-			$this->checkDelayFlex($fullItem);
 
 			$this->checkSpecificFields($fullItem);
 		}
@@ -699,6 +753,24 @@ abstract class CItemGeneral extends CApiService {
 			$exItemsKeys = zbx_toHash($exItems, 'key_');
 			$exItemsTpl = zbx_toHash($exItems, 'templateid');
 
+			$itemids_with_application_prototypes = [];
+
+			foreach ($parentItems as $parentItem) {
+				if (isset($parentItem['applicationPrototypes']) && is_array($parentItem['applicationPrototypes'])
+						&& !array_key_exists('ruleid', $parentItem)) {
+					$itemids_with_application_prototypes[$parentItem['itemid']] = true;
+				}
+			}
+
+			if ($itemids_with_application_prototypes) {
+				$discovery_rules = DBfetchArray(DBselect(
+					'SELECT id.itemid,id.parent_itemid'.
+					' FROM item_discovery id'.
+					' WHERE '.dbConditionInt('id.itemid', array_keys($itemids_with_application_prototypes))
+				));
+				$discovery_rules = zbx_toHash($discovery_rules, 'itemid');
+			}
+
 			foreach ($parentItems as $parentItem) {
 				$exItem = null;
 
@@ -772,6 +844,40 @@ abstract class CItemGeneral extends CApiService {
 					$newItem['applications'] = get_same_applications_for_host($parentItem['applications'], $host['hostid']);
 				}
 
+				if ($parentItem['flags'] == ZBX_FLAG_DISCOVERY_PROTOTYPE
+						&& array_key_exists('applicationPrototypes', $parentItem)) {
+
+					// Get discovery rule ID for current item prototype, if it is not yet set.
+					if (array_key_exists('ruleid', $parentItem)) {
+						$discovery_ruleid = $parentItem['ruleid'];
+					}
+					else {
+						$discovery_ruleid = $discovery_rules[$parentItem['itemid']]['parent_itemid'];
+					}
+
+					$newItem['applicationPrototypes'] = [];
+
+					$db_application_prototypes = DBfetchArray(DBselect(
+						'SELECT ap.application_prototypeid,ap.name'.
+						' FROM application_prototype ap'.
+						' WHERE ap.itemid='.zbx_dbstr($discovery_ruleid).
+							' AND '.dbConditionString('ap.name',
+								zbx_objectValues($parentItem['applicationPrototypes'], 'name')
+							)
+					));
+
+					$db_application_prototypes = zbx_toHash($db_application_prototypes, 'name');
+
+					foreach ($parentItem['applicationPrototypes'] as $application_prototype) {
+						$db_application_prototype = $db_application_prototypes[$application_prototype['name']];
+
+						$newItem['applicationPrototypes'][] = [
+							'name' => $application_prototype['name'],
+							'templateid' => $db_application_prototype['application_prototypeid']
+						];
+					}
+				}
+
 				if ($exItem) {
 					$newItem['itemid'] = $exItem['itemid'];
 				}
@@ -825,45 +931,6 @@ abstract class CItemGeneral extends CApiService {
 			while ($dbItem = DBfetch($dbItems)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
 					_s('Item with key "%1$s" already exists on "%2$s".', $dbItem['key_'], $dbItem['host']));
-			}
-		}
-	}
-
-	/**
-	 * Validate flexible intervals.
-	 * Flexible intervals is string with format:
-	 *   'delay/day1-day2,time1-time2;interval2;interval3;...' (day2 is optional)
-	 * Examples:
-	 *   600/5-7,00:00-09:00;600/1-2,00:00-09:00
-	 *   600/5,0:0-9:0;600/1-2,0:0-9:0
-	 *
-	 * @param array $item
-	 *
-	 * @return bool
-	 */
-	protected function checkDelayFlex(array $item) {
-		if (array_key_exists('delay_flex', $item)) {
-			$delayFlex = $item['delay_flex'];
-
-			if (!is_string($delayFlex)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Incorrect flexible interval in item "%1$s". Flexible interval must be a string.', $item['name']));
-			}
-
-			if ($delayFlex === '') {
-				return true;
-			}
-
-			$validator = new CTimePeriodValidator();
-			$intervals = explode(';', rtrim($delayFlex, ';'));
-			foreach ($intervals as $interval) {
-				if (!preg_match('#^\d+/(.+)$#', $interval, $matches)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect flexible interval "%1$s".', $interval));
-				}
-
-				if (!$validator->validate($matches[1])) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $validator->getError());
-				}
 			}
 		}
 	}

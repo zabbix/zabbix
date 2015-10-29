@@ -85,7 +85,9 @@ $maintenanceCheckBox = (new CCheckBox('maintenance'))->setChecked($this->data['m
 if (!$this->data['isFilterEnable']) {
 	$maintenanceCheckBox->setAttribute('disabled', 'disabled');
 }
-$dashconfFormList->addRow(_('Hosts'), [$maintenanceCheckBox, _('Show hosts in maintenance')]);
+$dashconfFormList->addRow(_('Hosts'),
+	new CLabel([$maintenanceCheckBox, _('Show hosts in maintenance')], 'maintenance')
+);
 
 // append trigger severities to form list
 $severities = [];
@@ -93,12 +95,20 @@ foreach ($this->data['severities'] as $severity) {
 	$serverityCheckBox = (new CCheckBox('trgSeverity['.$severity.']'))
 		->setChecked(isset($this->data['severity'][$severity]))
 		->setEnabled($this->data['isFilterEnable']);
-	$severities[] = [$serverityCheckBox, getSeverityName($severity, $this->data['config'])];
+	$severities[] = new CLabel([$serverityCheckBox, getSeverityName($severity, $this->data['config'])],
+		'trgSeverity['.$severity.']'
+	);
 	$severities[] = BR();
 }
 array_pop($severities);
 
 $dashconfFormList->addRow(_('Triggers with severity'), $severities);
+
+$dashconfFormList->addRow(_('Trigger name like'),
+	(new CTextBox('trigger_name', $data['trigger_name']))
+		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		->setEnabled($data['isFilterEnable'])
+);
 
 // append problem display to form list
 $extAckComboBox = new CComboBox('extAck', $this->data['extAck'], null, [

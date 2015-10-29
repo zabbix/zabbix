@@ -23,6 +23,10 @@
 
 #include "checks_agent.h"
 
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+extern unsigned char	program_type;
+#endif
+
 /******************************************************************************
  *                                                                            *
  * Function: get_value_agent                                                  *
@@ -47,22 +51,59 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 {
 	const char	*__function_name = "get_value_agent";
 	zbx_socket_t	s;
-	char		buffer[MAX_STRING_LEN];
+	char		buffer[MAX_STRING_LEN], *tls_arg1, *tls_arg2;
 	int		ret = SUCCEED;
 	ssize_t		received_len;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s'",
-			__function_name, item->host.host, item->interface.addr, item->key);
+	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_DEBUG))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' key:'%s' conn:%u", __function_name,
+			item->host.host, item->interface.addr, item->key, (unsigned int)item->host.tls_connect);
+	}
 
-	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0)))
+	if (ZBX_TCP_SEC_UNENCRYPTED == item->host.tls_connect)
+	{
+		tls_arg1 = NULL;
+		tls_arg2 = NULL;
+	}
+	else
+	{
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+		if (ZBX_TCP_SEC_TLS_CERT == item->host.tls_connect)
+		{
+			tls_arg1 = item->host.tls_issuer;
+			tls_arg2 = item->host.tls_subject;
+		}
+		else	/* ZBX_TCP_SEC_TLS_PSK */
+		{
+			tls_arg1 = item->host.tls_psk_identity;
+			tls_arg2 = item->host.tls_psk;
+		}
+#else
+		zbx_snprintf(buffer, sizeof(buffer), "A TLS connection is configured to be used with agent but support"
+				" for TLS was not compiled into %s.", get_program_type_string(program_type));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, buffer));
+		ret = NETWORK_ERROR;
+		goto out;
+#endif
+	}
+
+	if (SUCCEED == (ret = zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+			item->host.tls_connect, tls_arg1, tls_arg2)))
 	{
 		zbx_snprintf(buffer, sizeof(buffer), "%s\n", item->key);
 		zabbix_log(LOG_LEVEL_DEBUG, "Sending [%s]", buffer);
 
 		/* send requests using old protocol */
-		if (SUCCEED == (ret = zbx_tcp_send_raw(&s, buffer)))
-			ret = SUCCEED_OR_FAIL(received_len = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0));
+		if (SUCCEED != zbx_tcp_send_raw(&s, buffer))
+			ret = NETWORK_ERROR;
+		else if (FAIL != (received_len = zbx_tcp_recv_ext(&s, ZBX_TCP_READ_UNTIL_CLOSE, 0)))
+			ret = SUCCEED;
+		else
+			ret = TIMEOUT_ERROR;
 	}
+	else
+		ret = NETWORK_ERROR;
 
 	if (SUCCEED == ret)
 	{
@@ -104,9 +145,13 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 		zbx_snprintf(buffer, sizeof(buffer), "Get value from agent failed: %s",
 				zbx_socket_strerror());
 		SET_MSG_RESULT(result, strdup(buffer));
-		ret = NETWORK_ERROR;
 	}
+#if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
+out:
+#endif
 	zbx_tcp_close(&s);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
 }

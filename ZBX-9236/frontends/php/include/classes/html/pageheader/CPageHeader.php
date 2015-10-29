@@ -120,10 +120,19 @@ class CPageHeader {
 <html>
 	<head>
 		<meta http-equiv="X-UA-Compatible" content="IE=Edge"/>
-		<title>$this->title</title>
-		<meta name="Author" content="Zabbix SIA" />
 		<meta charset="utf-8" />
-		<link rel="shortcut icon" href="images/general/zabbix.ico" />
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="Author" content="Zabbix SIA" />
+		<title>$this->title</title>
+		<link rel="icon" href="favicon.ico">
+		<link rel="apple-touch-icon-precomposed" sizes="76x76" href="img/apple-touch-icon-76x76-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="120x120" href="img/apple-touch-icon-120x120-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="152x152" href="img/apple-touch-icon-152x152-precomposed.png">
+		<link rel="apple-touch-icon-precomposed" sizes="180x180" href="img/apple-touch-icon-180x180-precomposed.png">
+		<link rel="icon" sizes="192x192" href="img/touch-icon-192x192.png">
+		<meta name="msapplication-TileImage" content="img/ms-tile-144x144.png">
+		<meta name="msapplication-TileColor" content="#d40000">
+		<meta name="msapplication-config" content="none"/>
 
 HTML;
 

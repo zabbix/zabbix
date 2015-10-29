@@ -34,7 +34,9 @@ $frmHost = (new CForm())
 	->setName('web.hosts.host.php.')
 	->addVar('form', $data['form'])
 	->addVar('clear_templates', $data['clear_templates'])
-	->addVar('flags', $data['flags']);
+	->addVar('flags', $data['flags'])
+	->addVar('tls_accept', $data['tls_accept'])
+	->setAttribute('id', 'hostForm');
 
 if ($data['hostid'] != 0) {
 	$frmHost->addVar('hostid', $data['hostid']);
@@ -50,12 +52,10 @@ $hostList = new CFormList('hostlist');
 
 // LLD rule link
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-	$hostList->addRow(
-		_('Discovered by'),
-		(new CLink($data['discoveryRule']['name'], 'host_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid']))
-			->addClass('highlight')
-			->addClass('underline')
-			->addClass('weight_normal')
+	$hostList->addRow(_('Discovered by'),
+		new CLink($data['discoveryRule']['name'],
+			'host_prototypes.php?parent_discoveryid='.$data['discoveryRule']['itemid']
+		)
 	);
 }
 
@@ -307,7 +307,8 @@ if ($data['clone_hostid'] != 0) {
 		'output' => ['name'],
 		'hostids' => [$data['clone_hostid']],
 		'inherited' => false,
-		'preservekeys' => true
+		'preservekeys' => true,
+		'filter' => ['flags' => ZBX_FLAG_DISCOVERY_NORMAL]
 	]);
 
 	if ($hostApps) {
@@ -562,36 +563,34 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 
 	$linkedTemplateTable = (new CTable())
 		->setNoDataMessage(_('No templates linked.'))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name'), _('Action')]);
 
 	foreach ($data['linked_templates'] as $template) {
 		$tmplList->addVar('templates[]', $template['templateid']);
-		$templateLink =
-			(new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
-				->setTarget('_blank');
+		$templateLink = (new CLink($template['name'], 'templates.php?form=update&templateid='.$template['templateid']))
+			->setTarget('_blank');
 
-		$unlinkButton = (new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))
-			->addClass(ZBX_STYLE_BTN_LINK);
-		if (array_key_exists($template['templateid'], $data['original_templates'])) {
-			$unlinkAndClearButton =
-				(new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
-					->addClass(ZBX_STYLE_BTN_LINK)
-					->addStyle('margin-left: 8px');
-		}
-		else {
-			$unlinkAndClearButton = null;
-		}
-
-		$linkedTemplateTable->addRow([$templateLink, [$unlinkButton, $unlinkAndClearButton]], null,
-			'conditions_'.$template['templateid']
-		);
+		$linkedTemplateTable->addRow([
+			$templateLink,
+			(new CCol(
+				new CHorList([
+					(new CSubmit('unlink['.$template['templateid'].']', _('Unlink')))->addClass(ZBX_STYLE_BTN_LINK),
+					array_key_exists($template['templateid'], $data['original_templates'])
+						? (new CSubmit('unlink_and_clear['.$template['templateid'].']', _('Unlink and clear')))
+							->addClass(ZBX_STYLE_BTN_LINK)
+						: null
+				])
+			))->addClass(ZBX_STYLE_NOWRAP)
+		], null, 'conditions_'.$template['templateid']);
 
 		$ignoredTemplates[$template['templateid']] = $template['name'];
 	}
 
 	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($linkedTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 
 	// create new linked template table
@@ -610,14 +609,16 @@ if ($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED) {
 		->addRow([(new CSubmit('add_template', _('Add')))->addClass(ZBX_STYLE_BTN_LINK)]);
 
 	$tmplList->addRow(_('Link new templates'),
-		(new CDiv($newTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($newTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 // templates for discovered hosts
 else {
 	$linkedTemplateTable = (new CTable())
 		->setNoDataMessage(_('No templates linked.'))
-		->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		->setAttribute('style', 'width: 100%;')
 		->setHeader([_('Name')]);
 
 	foreach ($data['linked_templates'] as $template) {
@@ -629,7 +630,9 @@ else {
 	}
 
 	$tmplList->addRow(_('Linked templates'),
-		(new CDiv($linkedTemplateTable))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		(new CDiv($linkedTemplateTable))
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
 	);
 }
 
@@ -675,34 +678,20 @@ $divTabs->addTab('ipmiTab', _('IPMI'),
 $macrosView = new CView('hostmacros', [
 	'macros' => $data['macros'],
 	'show_inherited_macros' => $data['show_inherited_macros'],
+	'is_template' => false,
 	'readonly' => ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 ]);
 $divTabs->addTab('macroTab', _('Macros'), $macrosView->render());
 
 $inventoryFormList = new CFormList('inventorylist');
 
-// radio buttons for inventory type choice
-$inventoryDisabledBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_DISABLED, ($data['inventory_mode'] == HOST_INVENTORY_DISABLED)))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_DISABLED)
-	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
-
-$inventoryManualBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_MANUAL, ($data['inventory_mode'] == HOST_INVENTORY_MANUAL)))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_MANUAL)
-	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
-
-$inventoryAutomaticBtn = (new CRadioButton('inventory_mode', HOST_INVENTORY_AUTOMATIC, ($data['inventory_mode'] == HOST_INVENTORY_AUTOMATIC)))
-	->setId('host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
-	->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED);
-
-$inventoryTypeRadioButton = [
-	$inventoryDisabledBtn, new CLabel(_('Disabled'), 'host_inventory_radio_'.HOST_INVENTORY_DISABLED),
-	$inventoryManualBtn, new CLabel(_('Manual'), 'host_inventory_radio_'.HOST_INVENTORY_MANUAL),
-	$inventoryAutomaticBtn, new CLabel(_('Automatic'), 'host_inventory_radio_'.HOST_INVENTORY_AUTOMATIC)
-];
 $inventoryFormList->addRow(null,
-	(new CDiv($inventoryTypeRadioButton))
-		->addClass('jqueryinputset')
-		->addClass('radioset')
+	(new CRadioButtonList('inventory_mode', (int) $data['inventory_mode']))
+		->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+		->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+		->setModern(true)
 );
 if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 	$inventoryFormList->addVar('inventory_mode', $data['inventory_mode']);
@@ -770,11 +759,43 @@ foreach ($hostInventoryFields as $inventoryNo => $inventoryInfo) {
 	$inventoryFormList->addRow($inventoryInfo['title'], [$input, $inventory_item]);
 }
 
-// clearing the float
-$clearFixDiv = (new CDiv())->addStyle('clear: both;');
-$inventoryFormList->addRow('', $clearFixDiv);
-
 $divTabs->addTab('inventoryTab', _('Host inventory'), $inventoryFormList);
+
+// Encryption form list.
+$encryption_form_list = (new CFormList('encryption'))
+	->addRow(_('Connections to host'),
+		(new CRadioButtonList('tls_connect', (int) $data['tls_connect']))
+			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
+			->addValue(_('PSK'), HOST_ENCRYPTION_PSK)
+			->addValue(_('Certificate'), HOST_ENCRYPTION_CERTIFICATE)
+			->setModern(true)
+			->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED)
+	)
+	->addRow(_('Connections from host'), [
+		[(new CCheckBox('tls_in_none'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('No encryption')],
+		BR(),
+		[(new CCheckBox('tls_in_psk'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('PSK')],
+		BR(),
+		[(new CCheckBox('tls_in_cert'))->setEnabled($data['flags'] != ZBX_FLAG_DISCOVERY_CREATED), _('Certificate')]
+	])
+	->addRow(_('PSK identity'),
+		(new CTextBox('tls_psk_identity', $data['tls_psk_identity'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 128))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('PSK'),
+		(new CTextBox('tls_psk', $data['tls_psk'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 512))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('Issuer'),
+		(new CTextBox('tls_issuer', $data['tls_issuer'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	)
+	->addRow(_('Subject'),
+		(new CTextBox('tls_subject', $data['tls_subject'], $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED, 1024))
+			->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+	);
+
+$divTabs->addTab('encryptionTab', _('Encryption'), $encryption_form_list);
 
 /*
  * footer

@@ -89,7 +89,8 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
-	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0))
+	if (FAIL == zbx_tcp_connect(&s, CONFIG_SOURCE_IP, item->interface.addr, item->interface.port, 0,
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot connect to SSH server: %s", zbx_socket_strerror()));
 		goto close;
@@ -203,8 +204,6 @@ static int	ssh_run(DC_ITEM *item, AGENT_RESULT *result, const char *encoding)
 
 				rc = libssh2_userauth_publickey_fromfile(session, item->username, publickey,
 						privatekey, item->password);
-				zbx_free(publickey);
-				zbx_free(privatekey);
 
 				if (0 != rc)
 				{
@@ -323,6 +322,8 @@ tcp_close:
 	zbx_tcp_close(&s);
 
 close:
+	zbx_free(publickey);
+	zbx_free(privatekey);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
 	return ret;
