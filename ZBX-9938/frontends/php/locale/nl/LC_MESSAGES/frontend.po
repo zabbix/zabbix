@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-09-17 11:59+0300\n"
+"POT-Creation-Date: 2015-10-25 13:20+0200\n"
 "PO-Revision-Date: 2013-11-08 15:57+0300\n"
 "Last-Translator: open-future <patrik@open-future.be>\n"
 "Language-Team: NL\n"
@@ -649,7 +649,7 @@ msgstr "Applicatie fout."
 msgid "Application updated"
 msgstr "Applicatie bijgewerkt"
 
-#: api/classes/CItemGeneral.php:397
+#: api/classes/CItemGeneral.php:406
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Applicatie ID \"%1$s\" is niet beschikbaar op \"%2$s\"."
@@ -3443,7 +3443,7 @@ msgstr "Aangepaste slides"
 msgid "Czech (cs_CZ)"
 msgstr "Tsjechisch (cs_CZ)"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1368
 msgid "D"
 msgstr "D"
 
@@ -3542,7 +3542,7 @@ msgstr "Data"
 msgid "Data cache statistics. Cache - one of values (modes: all, float, uint, str, log, text), history (modes: pfree, total, used, free), trend (modes: pfree, total, used, free), text (modes: pfree, total, used, free)."
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:2511
+#: include/classes/graphdraw/CLineGraphDraw.php:2508
 #: include/classes/graphdraw/CPieGraphDraw.php:730
 #, c-format
 msgid "Data from %1$s. Generated in %2$s sec."
@@ -5852,8 +5852,8 @@ msgstr "Groepen in onderhoud"
 msgid "H.i"
 msgstr "H.i"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1377
-#: include/classes/graphdraw/CLineGraphDraw.php:1436
+#: include/classes/graphdraw/CLineGraphDraw.php:1374
+#: include/classes/graphdraw/CLineGraphDraw.php:1433
 #: include/page_header.php:450
 msgid "H:i"
 msgstr "H:i"
@@ -7007,7 +7007,7 @@ msgstr "Onjuiste argumenten doorgegeven aan de werkwijze."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Onjuist authenticatie protocol voor discovery rule \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:378
+#: api/classes/CItemGeneral.php:387
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Onjuiste authenticatie protocol voor punt \"%1$s\"."
@@ -7085,12 +7085,12 @@ msgstr "Onjuiste velden voor trigger."
 msgid "Incorrect file upload."
 msgstr "Onjuist bestand opgeladen."
 
-#: api/classes/CItemGeneral.php:840
+#: api/classes/CItemGeneral.php:849
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Onjuist flexibele interval \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:829
+#: api/classes/CItemGeneral.php:838
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Onjuiste flexibel interval in Item \"%1$s\". Flexibele interval moet een string zijn."
@@ -7310,7 +7310,7 @@ msgstr "Verkeerd poortbereik."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Verkeerd privacy protocol voor discovery rule \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:387
+#: api/classes/CItemGeneral.php:396
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Verkeerd privacy protocol voor item \"%1$s\"."
@@ -7811,7 +7811,7 @@ msgstr "Item \"%1$s\" op \"%2$s\": applicatie \"%3$s\" bestaat niet."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Item \"%1$s\" overgeslagen - user regel."
 
-#: api/classes/CItemGeneral.php:369
+#: api/classes/CItemGeneral.php:378
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Item \"%1$s:%2$s\" bevat ongeldige poort: \"%3$s\"."
@@ -7917,36 +7917,36 @@ msgstr "Item maakt gebruik van de host interface van niet-ouder host."
 msgid "Item uses incorrect interface type."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:326 api/classes/CItemGeneral.php:336
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Item zal niet worden vernieuwd. Vul alstublieft een werkend update-interval in."
 
-#: api/classes/CItemGeneral.php:440
+#: api/classes/CItemGeneral.php:449
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Item met de key \"%1$s\" bestaat reeds op \"%2$s\" als een ontdekking regel."
 
-#: api/classes/CItemGeneral.php:446
+#: api/classes/CItemGeneral.php:455
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Item met de key \"%1$s\" bestaat reeds op \"%2$s\" als een item gemaakt van prototype item."
 
-#: api/classes/CItemGeneral.php:443
+#: api/classes/CItemGeneral.php:452
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Item met de sleutel \"%1$s\" bestaat reeds op \"%2$s\" als een item prototype."
 
-#: api/classes/CItemGeneral.php:437
+#: api/classes/CItemGeneral.php:446
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Item met de sleutel \"%1$s\" bestaat reeds op \"%2$s\" als een item."
 
-#: api/classes/CItemGeneral.php:449
+#: api/classes/CItemGeneral.php:458
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item met de sleutel \"%1$s\" bestaat reeds op \"%2$s\" als een onbekende item element."
 
-#: api/classes/CItemGeneral.php:806
+#: api/classes/CItemGeneral.php:815
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item met de sleutel \"%1$s\" bestaat reeds op \"%2$s\"."
@@ -9511,11 +9511,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:357
+#: api/classes/CItemGeneral.php:366
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:363
+#: api/classes/CItemGeneral.php:372
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9576,7 +9576,7 @@ msgstr ""
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:334
+#: api/classes/CItemGeneral.php:343
 msgid "No authentication user name specified."
 msgstr ""
 
@@ -9979,7 +9979,7 @@ msgstr ""
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:342
+#: api/classes/CItemGeneral.php:351
 msgid "No private key file specified."
 msgstr ""
 
@@ -10000,7 +10000,7 @@ msgstr ""
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:339
+#: api/classes/CItemGeneral.php:348
 msgid "No public key file specified."
 msgstr ""
 
@@ -12030,7 +12030,7 @@ msgstr ""
 msgid "SNMP trap"
 msgstr ""
 
-#: api/classes/CItemGeneral.php:351
+#: api/classes/CItemGeneral.php:360
 msgid "SNMP trap key is invalid."
 msgstr ""
 
@@ -13702,7 +13702,7 @@ msgid "Trends"
 msgstr "Trends"
 
 #: events.php:300 events.php:341 include/actions.inc.php:56
-#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:480
+#: include/audit.inc.php:33 include/classes/graphdraw/CLineGraphDraw.php:477
 #: include/maps.inc.php:26 include/triggers.inc.php:1629
 #: include/views/configuration.services.child.list.php:40
 #: include/views/configuration.services.edit.php:69
@@ -15333,7 +15333,7 @@ msgid "Y axis MAX value"
 msgstr "Y-as MAX waarde"
 
 #: api/classes/CGraphGeneral.php:361
-#: include/classes/graphdraw/CLineGraphDraw.php:708
+#: include/classes/graphdraw/CLineGraphDraw.php:705
 msgid "Y axis MAX value must be greater than Y axis MIN value."
 msgstr ""
 
@@ -15484,7 +15484,7 @@ msgstr "ZABBIX"
 msgid "Zabbix"
 msgstr "Zabbix"
 
-#: include/page_footer.php:103 include/views/general.browserwarning.php:60
+#: include/page_footer.php:103 include/views/general.browserwarning.php:61
 #: include/views/general.login.php:48
 #, c-format
 msgid "Zabbix %1$s Copyright %2$s-%3$s by Zabbix SIA"
@@ -15611,7 +15611,7 @@ msgid "agent"
 msgstr ""
 
 #: include/classes/class.cpagefilter.php:940
-#: include/classes/graphdraw/CLineGraphDraw.php:1852
+#: include/classes/graphdraw/CLineGraphDraw.php:1849
 #: include/classes/screens/CScreenHostgroupTriggers.php:109
 #: include/classes/screens/CScreenHostgroupTriggers.php:115
 #: include/classes/screens/CScreenHostTriggers.php:110
@@ -15662,8 +15662,8 @@ msgstr ""
 msgid "auto-registered host"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1834
-#: include/classes/graphdraw/CLineGraphDraw.php:1856
+#: include/classes/graphdraw/CLineGraphDraw.php:1831
+#: include/classes/graphdraw/CLineGraphDraw.php:1853
 #: include/classes/graphdraw/CPieGraphDraw.php:320 include/graphs.inc.php:95
 #: include/views/js/configuration.graph.edit.js.php:41
 #: include/views/js/configuration.graph.edit.js.php:49 popup_bitem.php:145
@@ -15708,14 +15708,14 @@ msgstr "d M H:i:s"
 msgid "d.M"
 msgstr "d.M"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1374
-#: include/classes/graphdraw/CLineGraphDraw.php:1427
+#: include/classes/graphdraw/CLineGraphDraw.php:1371
+#: include/classes/graphdraw/CLineGraphDraw.php:1424
 msgid "d.m"
 msgstr "d.m"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1396
-#: include/classes/graphdraw/CLineGraphDraw.php:1411
-#: include/classes/graphdraw/CLineGraphDraw.php:1430
+#: include/classes/graphdraw/CLineGraphDraw.php:1393
+#: include/classes/graphdraw/CLineGraphDraw.php:1408
+#: include/classes/graphdraw/CLineGraphDraw.php:1427
 msgid "d.m H:i"
 msgstr "d.m H:i"
 
@@ -15846,7 +15846,7 @@ msgstr ""
 msgid "key is empty"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1832
+#: include/classes/graphdraw/CLineGraphDraw.php:1829
 #: include/classes/graphdraw/CPieGraphDraw.php:315 include/graphs.inc.php:92
 #: include/views/js/configuration.graph.edit.js.php:43
 #, fuzzy
@@ -15888,16 +15888,16 @@ msgstr "onderhoud"
 msgid "map"
 msgstr "kaart"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1835
-#: include/classes/graphdraw/CLineGraphDraw.php:1849
+#: include/classes/graphdraw/CLineGraphDraw.php:1832
+#: include/classes/graphdraw/CLineGraphDraw.php:1846
 #: include/classes/graphdraw/CPieGraphDraw.php:311 include/graphs.inc.php:90
 #: include/views/js/configuration.graph.edit.js.php:42
 #: include/views/js/configuration.graph.edit.js.php:50 popup_bitem.php:146
 msgid "max"
 msgstr "max"
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1833
-#: include/classes/graphdraw/CLineGraphDraw.php:1846
+#: include/classes/graphdraw/CLineGraphDraw.php:1830
+#: include/classes/graphdraw/CLineGraphDraw.php:1843
 #: include/classes/graphdraw/CPieGraphDraw.php:307 include/graphs.inc.php:88
 #: include/views/js/configuration.graph.edit.js.php:40
 #: include/views/js/configuration.graph.edit.js.php:48 popup_bitem.php:144
@@ -15933,7 +15933,7 @@ msgctxt "new element in multiselect"
 msgid "new"
 msgstr ""
 
-#: include/classes/graphdraw/CLineGraphDraw.php:1927
+#: include/classes/graphdraw/CLineGraphDraw.php:1924
 #: include/classes/graphdraw/CPieGraphDraw.php:343
 #, c-format
 msgid "no data"

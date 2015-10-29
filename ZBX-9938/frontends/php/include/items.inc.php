@@ -1219,7 +1219,7 @@ function getNextDelayInterval(array $arrOfFlexIntervals, $now, &$nextInterval) {
  * @param string $flexIntervals      flexible intervals
  * @param int $now                   current timestamp
  *
- * @return array
+ * @return int
  */
 function calculateItemNextcheck($seed, $itemType, $delay, $flexIntervals, $now) {
 	// special processing of active items to see better view in queue
