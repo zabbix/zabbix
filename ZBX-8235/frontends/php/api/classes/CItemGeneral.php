@@ -190,8 +190,10 @@ abstract class CItemGeneral extends CZBXAPI {
 				foreach ($this->fieldRules as $field => $rules) {
 					if ((0 != $fullItem['templateid'] && isset($rules['template'])) || isset($rules['system'])) {
 						unset($item[$field]);
-						// put back the old value
-						if (array_key_exists($field, $dbItems[$item['itemid']]) && array_key_exists($field, $fullItem)) {
+
+						// For templated item and fields that should not be modified, use the value from DB.
+						if (array_key_exists($field, $dbItems[$item['itemid']])
+								&& array_key_exists($field, $fullItem)) {
 							$fullItem[$field] = $dbItems[$item['itemid']][$field];
 						}
 					}
