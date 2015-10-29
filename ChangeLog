@@ -10,6 +10,7 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A.F....... [ZBX-9888] added validation in action condition formula to prohibit comparison of several triggers with "AND" operator (Gunars)
 A......... [ZBX-9975] fixed undefined index when updating trigger prototype (Gunars)
 ........S. [ZBX-9959] fixed JSON validation: produce an error on invalid escape sequences in a string value (dimir)
