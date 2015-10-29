@@ -237,13 +237,29 @@ ZBX_DC_CALCITEM;
 
 typedef zbx_item_history_value_t	ZBX_DC_DELTAITEM;
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+typedef struct
+{
+	char		*host_string;
+	size_t		host_alloc;
+	size_t		host_offset;
+	char		*proxy_string;
+	size_t		proxy_alloc;
+	size_t		proxy_offset;
+}
+ZBX_PSK_CONF;
+
 typedef struct
 {
 	const char	*tls_psk_identity;	/* pre-shared key identity		*/
 	const char	*tls_psk;		/* pre-shared key value (hex-string) 	*/
 	unsigned int	refcount;		/* reference count			*/
+	unsigned int	changes;		/* changes per one config update	*/
+	ZBX_PSK_CONF	*conflict;		/* hosts and proxies with the same	*/
+						/* identity but different keys		*/
 }
 ZBX_DC_PSK;
+#endif
 
 typedef struct
 {
@@ -1045,6 +1061,75 @@ static int	DCsync_config(DB_RESULT result, int *refresh_unsupported_changed)
 	return SUCCEED;
 }
 
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+static void	append_conflicting_host(ZBX_DC_HOST *host)
+{
+	if (NULL == host->tls_dc_psk->conflict)
+	{
+		host->tls_dc_psk->conflict = zbx_malloc(NULL, sizeof(ZBX_PSK_CONF));
+		host->tls_dc_psk->conflict->host_string = NULL;
+		host->tls_dc_psk->conflict->host_alloc = host->tls_dc_psk->conflict->host_offset = 0;
+		host->tls_dc_psk->conflict->proxy_string = NULL;
+		host->tls_dc_psk->conflict->proxy_alloc = host->tls_dc_psk->conflict->proxy_offset = 0;
+	}
+
+	if (HOST_STATUS_MONITORED == host->status || HOST_STATUS_NOT_MONITORED == host->status)
+	{
+		if (NULL != host->tls_dc_psk->conflict->host_string)
+		{
+			zbx_snprintf_alloc(&host->tls_dc_psk->conflict->host_string,
+					&host->tls_dc_psk->conflict->host_alloc,
+					&host->tls_dc_psk->conflict->host_offset, ", ");
+		}
+
+		zbx_snprintf_alloc(&host->tls_dc_psk->conflict->host_string, &host->tls_dc_psk->conflict->host_alloc,
+				&host->tls_dc_psk->conflict->host_offset, "\"%s\"", host->host);
+	}
+	else if (HOST_STATUS_PROXY_ACTIVE == host->status || HOST_STATUS_PROXY_PASSIVE == host->status)
+	{
+		if (NULL != host->tls_dc_psk->conflict->proxy_string)
+		{
+			zbx_snprintf_alloc(&host->tls_dc_psk->conflict->proxy_string,
+					&host->tls_dc_psk->conflict->proxy_alloc,
+					&host->tls_dc_psk->conflict->proxy_offset, ", ");
+		}
+
+		zbx_snprintf_alloc(&host->tls_dc_psk->conflict->proxy_string, &host->tls_dc_psk->conflict->proxy_alloc,
+				&host->tls_dc_psk->conflict->proxy_offset, "\"%s\"", host->host);
+	}
+}
+
+static void	report_conflict(ZBX_DC_PSK *psk)
+{
+	if (NULL != psk->conflict->host_string)
+	{
+		if (NULL != psk->conflict->proxy_string)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "multiple PSK values configured for identity \"%s\" on hosts: %s "
+					"and proxies: %s", psk->tls_psk_identity, psk->conflict->host_string,
+					psk->conflict->proxy_string);
+		}
+		else
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "multiple PSK values configured for identity \"%s\" on hosts: %s",
+					psk->tls_psk_identity, psk->conflict->host_string);
+		}
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "multiple PSK values configured for identity \"%s\" on proxies: %s",
+				psk->tls_psk_identity, psk->conflict->proxy_string);
+	}
+}
+
+static void	free_conflict(ZBX_PSK_CONF **conflict)
+{
+	zbx_free((*conflict)->host_string);
+	zbx_free((*conflict)->proxy_string);
+	zbx_free(*conflict);
+}
+#endif
+
 static void	DCsync_hosts(DB_RESULT result)
 {
 	const char		*__function_name = "DCsync_hosts";
@@ -1270,9 +1355,13 @@ static void	DCsync_hosts(DB_RESULT result)
 				if (0 != strcmp(host->tls_dc_psk->tls_psk, row[29]))	/* new PSK value */
 											/* differs from old */
 				{
-					/* change underlying PSK value and 'config->psks' is updated, too */
-					DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[29]);
-					zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[28]);
+					if (0 == host->tls_dc_psk->changes++)
+					{
+						/* change underlying PSK value and 'config->psks' is updated, too */
+						DCstrpool_replace(1, &host->tls_dc_psk->tls_psk, row[29]);
+						zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"",
+								row[28]);
+					}
 				}
 
 				goto done;
@@ -1303,8 +1392,11 @@ static void	DCsync_hosts(DB_RESULT result)
 
 			if (0 != strcmp(psk_i->tls_psk, row[29]))	/* PSKid stored but PSK value is different */
 			{
-				DCstrpool_replace(1, &psk_i->tls_psk, row[29]);
-				zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[28]);
+				if (0 == psk_i->changes++)
+				{
+					DCstrpool_replace(1, &psk_i->tls_psk, row[29]);
+					zabbix_log(LOG_LEVEL_WARNING, "PSK value changed for identity \"%s\"", row[28]);
+				}
 			}
 
 			host->tls_dc_psk = psk_i;
@@ -1317,6 +1409,8 @@ static void	DCsync_hosts(DB_RESULT result)
 		DCstrpool_replace(0, &psk_i_local.tls_psk_identity, row[28]);
 		DCstrpool_replace(0, &psk_i_local.tls_psk, row[29]);
 		psk_i_local.refcount = 1;
+		psk_i_local.changes = 1;
+		psk_i_local.conflict = NULL;
 		host->tls_dc_psk = zbx_hashset_insert(&config->psks, &psk_i_local, sizeof(ZBX_DC_PSK));
 done:
 #endif
@@ -1441,7 +1535,13 @@ done:
 		hostid = host->hostid;
 
 		if (FAIL != zbx_vector_uint64_bsearch(&ids, hostid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			if (NULL != host->tls_dc_psk && 1 < host->tls_dc_psk->changes)
+				append_conflicting_host(host);
+#endif
 			continue;
+		}
 
 		/* IPMI hosts */
 
@@ -1515,7 +1615,21 @@ done:
 	}
 
 	zbx_vector_uint64_destroy(&ids);
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	/* report conflicts within PSK identities */
+	zbx_hashset_iter_reset(&config->psks, &iter);
 
+	while (NULL != (psk_i = zbx_hashset_iter_next(&iter)))
+	{
+		if (NULL != psk_i->conflict)
+		{
+			report_conflict(psk_i);
+			free_conflict(&psk_i->conflict);
+		}
+
+		psk_i->changes = 0;
+	}
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
