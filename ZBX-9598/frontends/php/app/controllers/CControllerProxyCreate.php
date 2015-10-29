@@ -30,7 +30,20 @@ class CControllerProxyCreate extends CController {
 			'useip' =>			'db       interface.useip  |in 0,1',
 			'port' =>			'db       interface.port',
 			'proxy_hostids' =>	'array_db hosts.hostid',
-			'description' =>	'db       hosts.description'
+			'description' =>	'db       hosts.description',
+			'tls_connect' => 	'db       hosts.tls_connect    |in '.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+				HOST_ENCRYPTION_CERTIFICATE,
+			'tls_accept' => 	'db       hosts.tls_accept     |in 0,'.HOST_ENCRYPTION_NONE.','.HOST_ENCRYPTION_PSK.','.
+				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK).','.
+				HOST_ENCRYPTION_CERTIFICATE.','.
+				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_CERTIFICATE).','.
+				(HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE).','.
+				(HOST_ENCRYPTION_NONE | HOST_ENCRYPTION_PSK | HOST_ENCRYPTION_CERTIFICATE),
+			'tls_issuer' => 	'db       hosts.tls_issuer',
+			'tls_psk' =>		'db       hosts.tls_psk',
+			'tls_psk_identity'=>'db       hosts.tls_psk_identity',
+			'tls_subject' => 	'db       hosts.tls_subject',
+			'form_refresh' =>	'int32'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -59,7 +72,9 @@ class CControllerProxyCreate extends CController {
 	protected function doAction() {
 		$proxy = [];
 
-		$this->getInputs($proxy, ['host', 'description', 'status']);
+		$this->getInputs($proxy, ['host', 'status', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
+			'tls_subject', 'tls_psk_identity', 'tls_psk'
+		]);
 
 		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
 			$proxy['interface'] = [];

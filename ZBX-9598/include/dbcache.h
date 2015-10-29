@@ -107,6 +107,14 @@ typedef struct
 	int		jmx_disable_until;
 	char		inventory_mode;
 	unsigned char	status;
+	unsigned char	tls_connect;
+	unsigned char	tls_accept;
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	char		tls_issuer[HOST_TLS_ISSUER_LEN_MAX];
+	char		tls_subject[HOST_TLS_SUBJECT_LEN_MAX];
+	char		tls_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+	char		tls_psk[HOST_TLS_PSK_LEN_MAX];
+#endif
 }
 DC_HOST;
 
@@ -202,6 +210,20 @@ typedef struct
 	char		port_orig[INTERFACE_PORT_LEN_MAX];
 	char		*addr;
 	unsigned short	port;
+	unsigned char	tls_connect;				/* how to connect: ZBX_TCP_SEC_UNENCRYPTED, */
+								/* ZBX_TCP_SEC_TLS_PSK or ZBX_TCP_SEC_TLS_CERT */
+#if HOST_TLS_ISSUER_LEN_MAX > HOST_TLS_PSK_IDENTITY_LEN_MAX
+	char		tls_arg1[HOST_TLS_ISSUER_LEN_MAX];	/* for passing 'tls_issuer' or 'tls_psk_identity' */
+								/* depending on value of 'tls_connect' */
+#else
+	char		tls_arg1[HOST_TLS_PSK_IDENTITY_LEN_MAX];
+#endif
+#if HOST_TLS_SUBJECT_LEN_MAX > HOST_TLS_PSK_LEN_MAX
+	char		tls_arg2[HOST_TLS_SUBJECT_LEN_MAX];	/* for passing 'tls_subject' or 'tls_psk' */
+								/* depending on value of 'tls_connect' */
+#else
+	char		tls_arg2[HOST_TLS_PSK_LEN_MAX];
+#endif
 }
 DC_PROXY;
 
@@ -292,7 +314,7 @@ int	is_item_processed_by_server(unsigned char type, const char *key);
 int	in_maintenance_without_data_collection(unsigned char maintenance_status, unsigned char maintenance_type,
 		unsigned char type);
 void	dc_add_history(zbx_uint64_t itemid, unsigned char value_type, unsigned char flags, AGENT_RESULT *value,
-		zbx_timespec_t *ts, unsigned char state, const char *error);
+		const zbx_timespec_t *ts, unsigned char state, const char *error);
 void	dc_flush_history();
 int	DCsync_history(int sync_type);
 void	init_database_cache();
@@ -325,9 +347,9 @@ void	*DCget_stats(int request);
 zbx_uint64_t	DCget_nextid(const char *table_name, int num);
 
 void	DCsync_configuration(void);
-void	init_configuration_cache();
-void	free_configuration_cache();
-void	DCload_config();
+void	init_configuration_cache(void);
+void	free_configuration_cache(void);
+void	DCload_config(void);
 
 void	DCconfig_get_triggers_by_triggerids(DC_TRIGGER *triggers, const zbx_uint64_t *triggerids, int *errcode,
 		size_t num);
@@ -360,6 +382,8 @@ size_t	DCconfig_get_snmp_items_by_interfaceid(zbx_uint64_t interfaceid, DC_ITEM 
 
 void	DCrequeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
 		int *mtimes, int *errcodes, size_t num);
+void	DCpoller_requeue_items(zbx_uint64_t *itemids, unsigned char *states, int *lastclocks, zbx_uint64_t *lastlogsizes,
+		int *mtimes, int *errcodes, size_t num, unsigned char poller_type, int *nextcheck);
 int	DCconfig_activate_host(DC_ITEM *item);
 int	DCconfig_deactivate_host(DC_ITEM *item, int now);
 
@@ -377,7 +401,7 @@ void	DCconfig_set_maintenance(const zbx_uint64_t *hostids, int hostids_num, int 
 void	*DCconfig_get_stats(int request);
 
 int	DCconfig_get_proxypoller_hosts(DC_PROXY *proxies, int max_hosts);
-int	DCconfig_get_proxypoller_nextcheck();
+int	DCconfig_get_proxypoller_nextcheck(void);
 void	DCrequeue_proxy(zbx_uint64_t hostid, unsigned char update_nextcheck);
 void	DCconfig_set_proxy_timediff(zbx_uint64_t hostid, const zbx_timespec_t *timediff);
 
@@ -397,9 +421,9 @@ int	DCget_item_queue(zbx_vector_ptr_t *queue, int from, int to);
 
 int	DCget_item_count(zbx_uint64_t hostid);
 int	DCget_item_unsupported_count(zbx_uint64_t hostid);
-int	DCget_trigger_count();
-double	DCget_required_performance();
-int	DCget_host_count();
+int	DCget_trigger_count(void);
+double	DCget_required_performance(void);
+int	DCget_host_count(void);
 
 void	DCget_expressions_by_names(zbx_vector_ptr_t *expressions, const char * const *names, int names_num);
 void	DCget_expressions_by_name(zbx_vector_ptr_t *expressions, const char *name);
@@ -429,6 +453,5 @@ void	zbx_idset_free(zbx_idset_t *idset);
 /* global configuration support */
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
-
 
 #endif

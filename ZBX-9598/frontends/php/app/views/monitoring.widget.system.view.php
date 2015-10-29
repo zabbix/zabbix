@@ -21,8 +21,15 @@
 
 $widget = make_system_status($data['filter'], 'zabbix.php?action=dashboard.view');
 
-echo (new CJson())->encode([
+$output = [
 	'header' => _('System status'),
 	'body' => $widget->toString(),
 	'footer' => _s('Updated: %s', zbx_date2str(TIME_FORMAT_SECONDS))
-]);
+];
+
+if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+	CProfiler::getInstance()->stop();
+	$output['debug'] = CProfiler::getInstance()->make()->toString();
+}
+
+echo (new CJson())->encode($output);

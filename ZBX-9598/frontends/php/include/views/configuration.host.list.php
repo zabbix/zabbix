@@ -66,7 +66,8 @@ $table = (new CTableInfo())
 		_('Templates'),
 		make_sorting_header(_('Status'), 'status', $data['sortField'], $data['sortOrder']),
 		_('Availability'),
-		_('Info')
+		_('Info'),
+		_('Agent encryption')
 	]);
 
 $current_time = time();
@@ -178,6 +179,41 @@ foreach ($data['hosts'] as $host) {
 		$lifetime_indicator = '';
 	}
 
+	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_PSK) != HOST_ENCRYPTION_PSK
+			&& ($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) != HOST_ENCRYPTION_CERTIFICATE) {
+		$encryption = (new CDiv((new CSpan(_('None')))->addClass('status-green')))->addClass('status-container');
+	}
+	else {
+		// Incoming encryption.
+		if ($host['tls_connect'] == HOST_ENCRYPTION_NONE) {
+			$in_encryption = (new CSpan(_('None')))->addClass('status-green');
+		}
+		elseif ($host['tls_connect'] == HOST_ENCRYPTION_PSK) {
+			$in_encryption = (new CSpan(_('PSK')))->addClass('status-green');
+		}
+		else {
+			$in_encryption = (new CSpan(_('CERT')))->addClass('status-green');
+		}
+
+		// Outgoing encryption.
+		$out_encryption = [];
+		if (($host['tls_accept'] & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
+			$out_encryption[] = (new CSpan(_('None')))->addClass('status-green');
+		}
+
+		if (($host['tls_accept'] & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
+			$out_encryption[] = (new CSpan(_('PSK')))->addClass('status-green');
+		}
+
+		if (($host['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
+			$out_encryption[] = (new CSpan(_('CERT')))->addClass('status-green');
+		}
+
+		$encryption = (new CDiv([$in_encryption, ' ', $out_encryption]))->addClass('status-container');
+	}
+
 	$table->addRow([
 		new CCheckBox('hosts['.$host['hostid'].']', $host['hostid']),
 		(new CCol($description))->addClass(ZBX_STYLE_NOWRAP),
@@ -209,7 +245,8 @@ foreach ($data['hosts'] as $host) {
 		$hostTemplates,
 		$status,
 		getHostAvailabilityTable($host),
-		$lifetime_indicator
+		$lifetime_indicator,
+		$encryption
 	]);
 }
 
@@ -219,7 +256,7 @@ $form->addItem([
 	new CActionButtonList('action', 'hosts',
 		[
 			'host.massenable' => ['name' => _('Enable'), 'confirm' => _('Enable selected hosts?')],
-			'host.massdisable' => ['name' => _('Disable'), 'confirm' =>  _('Disable selected hosts?')],
+			'host.massdisable' => ['name' => _('Disable'), 'confirm' => _('Disable selected hosts?')],
 			'host.export' => ['name' => _('Export')],
 			'host.massupdateform' => ['name' => _('Mass update')],
 			'host.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected hosts?')]
