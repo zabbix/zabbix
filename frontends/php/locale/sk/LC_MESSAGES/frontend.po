@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
+"POT-Creation-Date: 2015-10-28 15:17+0200\n"
 "PO-Revision-Date: 2015-08-13 00:15+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -88,7 +88,7 @@ msgstr[0] "%1$s položka"
 msgstr[1] "%1$s položky"
 msgstr[2] "%1$s položiek"
 
-#: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
+#: jsLoader.php:223 jsLoader.php:224 jsLoader.php:225 jsLoader.php:226
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -105,7 +105,7 @@ msgstr[0] "ostáva %1$s pokus"
 msgstr[1] "ostávajú %1$s pokusy"
 msgstr[2] "ostáva %1$s pokusov"
 
-#: jsLoader.php:222 jsLoader.php:223
+#: jsLoader.php:221 jsLoader.php:222
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
@@ -244,7 +244,7 @@ msgstr "Prístup zamietnutý"
 msgid "Access denied!"
 msgstr "Prístup zamietnutý!"
 
-#: include/classes/api/services/CUser.php:988
+#: include/classes/api/services/CUser.php:986
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "Konto je zablokované na %s sekúnd"
@@ -335,21 +335,21 @@ msgstr "Potvrdzovanie vypnuté"
 msgid "Action"
 msgstr "Akcia"
 
-#: include/classes/api/services/CAction.php:1961
-#: include/classes/api/services/CAction.php:1976
-#: include/classes/api/services/CAction.php:2072
-#: include/classes/api/services/CAction.php:2108
+#: include/classes/api/services/CAction.php:1962
+#: include/classes/api/services/CAction.php:1977
+#: include/classes/api/services/CAction.php:2073
+#: include/classes/api/services/CAction.php:2109
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Akcia \"%1$s\" už existuje."
 
-#: include/classes/api/services/CAction.php:1956
-#: include/classes/api/services/CAction.php:2055
+#: include/classes/api/services/CAction.php:1957
+#: include/classes/api/services/CAction.php:2056
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
 msgstr "Akcia \"%1$s\" má nesprávnu hodnotu pre \"esc_period\" (minimum %2$s sekúnd)."
 
-#: include/classes/api/services/CAction.php:2130
+#: include/classes/api/services/CAction.php:2131
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
 msgstr "Pre akciu \"%1$s\" nie je definovaná operácia."
@@ -368,6 +368,14 @@ msgid_plural "Actions disabled"
 msgstr[0] "Akcia vypnutá"
 msgstr[1] "Akcie vypnuté"
 msgstr[2] "Akcie vypnuté"
+
+#: include/classes/api/services/CUserGroup.php:766
+msgid "Action disabled due to deletion of user group."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:1351
+msgid "Action disabled due to deletion of user."
+msgstr ""
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -739,7 +747,7 @@ msgstr "Prototypy aplikácií"
 msgid "Application updated"
 msgstr "Aplikácia aktualizovaná"
 
-#: include/classes/api/services/CItemGeneral.php:475
+#: include/classes/api/services/CItemGeneral.php:476
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikácia s ID \"%1$s\" nie je na \"%2$s\" dostupná."
@@ -1472,7 +1480,7 @@ msgstr "Nie je možné vytvoriť šablónu."
 msgid "Cannot create the configuration file."
 msgstr "Nie je možné vytvoriť konfiguračný súbor."
 
-#: include/classes/api/services/CUser.php:1317
+#: include/classes/api/services/CUser.php:1315
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Nie je možné zmazať interného Zabbix používateľa \"%1$s\", skúste ho vypnúť."
@@ -1716,7 +1724,7 @@ msgid "Cannot delete user"
 msgstr "Nie je možné zmazať používateľa"
 
 # užívateľ!=používateľ
-#: include/classes/api/services/CUser.php:888
+#: include/classes/api/services/CUser.php:886
 msgid "Cannot delete user media."
 msgstr "Nie je možné zmazať médium používateľa."
 
@@ -2094,7 +2102,7 @@ msgstr "Nie je možné vložiť view súbor \"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr "Nie je možné vložiť výraz spúšťača"
 
-#: include/classes/api/services/CUser.php:677
+#: include/classes/api/services/CUser.php:675
 msgid "Cannot insert user media."
 msgstr "Nie je možné vložiť médium používateľa."
 
@@ -2107,11 +2115,11 @@ msgstr "Nie je možné nalinkovať šablónu"
 msgid "Cannot link template."
 msgstr "Nie je možné nalinkovať šablónu."
 
-#: include/classes/api/services/CUser.php:1029
+#: include/classes/api/services/CUser.php:1027
 msgid "Cannot login."
 msgstr "Nie je možné Vás prihlásiť."
 
-#: include/classes/api/services/CUser.php:954
+#: include/classes/api/services/CUser.php:952
 msgid "Cannot logout."
 msgstr "Odhlásenie nie je možné."
 
@@ -2279,7 +2287,7 @@ msgstr "Nie je možné zrušiť prepojenie šablóny."
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Nie je možné zrušiť prepojenie spúšťača \"%s\", pretože obsahuje položky zo šablóny, ktorá je prepojená s hostom."
 
-#: include/classes/api/services/CAction.php:2063
+#: include/classes/api/services/CAction.php:2064
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr "Nie je možné aktualizovať \"%1$s\" pre akciu \"%2$s\"."
@@ -2530,7 +2538,7 @@ msgstr "Nie je možné aktualizovať prototypy spúšťačov"
 msgid "Cannot update user"
 msgstr "Nie je možné aktualizovať používateľa"
 
-#: include/classes/api/services/CUser.php:757
+#: include/classes/api/services/CUser.php:755
 msgid "Cannot update user media."
 msgstr "Nie je možné aktualizovať médiá používateľa."
 
@@ -2864,6 +2872,10 @@ msgstr "Komentáre"
 #: app/views/administration.mediatype.edit.php:47
 msgid "Commercial"
 msgstr "Komerčné"
+
+#: include/classes/api/services/CAction.php:1837
+msgid "Comparing several triggers with \"and\" is not allowed."
+msgstr ""
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
@@ -4828,7 +4840,7 @@ msgstr ""
 msgid "Empty color."
 msgstr "Prázdna farba."
 
-#: include/classes/api/services/CAction.php:1878
+#: include/classes/api/services/CAction.php:1879
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr "Prázdna filtrovacia podmienka ID vzorca pre akciu \"%1$s\"."
@@ -7038,7 +7050,7 @@ msgstr "Neplatná akceptovateľná SLA pre službu \"%1$s\"."
 msgid "Incorrect action condition discovery check."
 msgstr "Neplatná podmienka akcie zisťovacej kontroly."
 
-#: include/classes/api/services/CAction.php:2238
+#: include/classes/api/services/CAction.php:2239
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie zisťovacej kontroly. Zisťovacia kontrola neexistuje alebo nemáte k nej prístup."
 
@@ -7046,7 +7058,7 @@ msgstr "Neplatná podmienka akcie zisťovacej kontroly. Zisťovacia kontrola nee
 msgid "Incorrect action condition discovery object."
 msgstr "Neplatná podmienka akcie zisťovacieho pravidla."
 
-#: include/classes/api/services/CAction.php:2232
+#: include/classes/api/services/CAction.php:2233
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie zisťovacieho pravidla. Zisťovacie pravidlo neexituje alebo nemáte k nemu prístup."
 
@@ -7058,11 +7070,11 @@ msgstr "Neplatná podmienka akcie zisťovacieho stavu."
 msgid "Incorrect action condition event type."
 msgstr "Neplatná podmienka akcie typu udalosti."
 
-#: include/classes/api/services/CAction.php:2208
+#: include/classes/api/services/CAction.php:2209
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie skupiny. Skupina neexistuje alebo nemáte k nej prístup."
 
-#: include/classes/api/services/CAction.php:2214
+#: include/classes/api/services/CAction.php:2215
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie hosta. Host neexistuje alebo nemáte k nemu prístup."
 
@@ -7071,11 +7083,11 @@ msgstr "Neplatná podmienka akcie hosta. Host neexistuje alebo nemáte k nemu pr
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Neplatná podmienka akcie portu \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:2244
+#: include/classes/api/services/CAction.php:2245
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie proxy. Proxy neexistuje alebo nemáte k nej prístup."
 
-#: include/classes/api/services/CAction.php:2220
+#: include/classes/api/services/CAction.php:2221
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie šablóny. Šablóna neexistuje alebo nemáte k nej prístup."
 
@@ -7087,7 +7099,7 @@ msgstr "Neplatná podmienka akcie závažnosti spúšťača."
 msgid "Incorrect action condition trigger value."
 msgstr "Neplatná podmienka akcie hodnoty spúšťača."
 
-#: include/classes/api/services/CAction.php:2226
+#: include/classes/api/services/CAction.php:2227
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Neplatná podmienka akcie spúšťača. Spúšťač neexistuje alebo nemáte k nemu prístup."
 
@@ -7142,7 +7154,7 @@ msgstr "Neplatná prevádzková akcia používateľskej skupiny. Skupina neexist
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
 msgstr "Neplatná prevádzková akcia používateľa. Používateľ neexistuje alebo nemáte k nemu prístup."
 
-#: include/classes/api/services/CAction.php:2143
+#: include/classes/api/services/CAction.php:2144
 msgid "Incorrect action operationid."
 msgstr "Neplatný operationid akcie."
 
@@ -7182,7 +7194,7 @@ msgstr "Metóde boli predané neplatné argumenty."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Neplatný protokol prihlasovania pre zisťovacie pravidlo \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:444
+#: include/classes/api/services/CItemGeneral.php:445
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Neplatný protokol prihlasovania pre položku \"%1$s\"."
@@ -7279,7 +7291,7 @@ msgstr "Neplatné polia pre spúšťač."
 msgid "Incorrect file upload."
 msgstr "Nahraný neplatný súbor."
 
-#: include/classes/api/services/CAction.php:1879
+#: include/classes/api/services/CAction.php:1880
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr "Nesprávna filtrovacia podmienka ID vzorca pre akciu \"%1$s\"."
@@ -7294,7 +7306,7 @@ msgstr "Nesprávna filtrovacia podmienka ID vzorca pre zisťovacie pravidlo \"%1
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr "Nesprávna filtrovacia podmienka makra pre zisťovacie pravidlo \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:1883
+#: include/classes/api/services/CAction.php:1884
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr "Nesprávna filtrovacia podmienka operátora pre akciu \"%1$s\"."
@@ -7304,7 +7316,7 @@ msgstr "Nesprávna filtrovacia podmienka operátora pre akciu \"%1$s\"."
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr "Nesprávna filtrovacia podmienka operátora pre zisťovacie pravidlo \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:1871
+#: include/classes/api/services/CAction.php:1872
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr "Nesprávny typ filtrovacej podmienky pre akciu \"%1$s\"."
@@ -7497,8 +7509,8 @@ msgstr "Neplatná metóda \"%1$s.%2$s\"."
 msgid "Incorrect object value."
 msgstr "Neplatná hodnota objektu."
 
-#: include/classes/api/services/CAction.php:1949
-#: include/classes/api/services/CAction.php:2002
+#: include/classes/api/services/CAction.php:1950
+#: include/classes/api/services/CAction.php:2003
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
 msgstr "Neplatný parameter pre akciu \"%1$s\"."
@@ -7512,7 +7524,7 @@ msgstr "Neplatný parameter pre operáciu."
 msgid "Incorrect parameter is used for icon map \"%s\"."
 msgstr "Neplatný parameter je použitý pre mapovú ikonu \"%s\"."
 
-#: include/classes/api/services/CAction.php:2045
+#: include/classes/api/services/CAction.php:2046
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
 msgstr "Neplatné parametre pre aktulizačnú metódu \"%1$s\"."
@@ -7554,7 +7566,7 @@ msgstr "Neplatný rozsah portov."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Neplatný protokol utajenia pre zisťovacie pravidlo \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:453
+#: include/classes/api/services/CItemGeneral.php:454
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Neplatný protokol utajenia pre položku \"%1$s\"."
@@ -8048,7 +8060,7 @@ msgstr "Neplatné hostid pre makro \"%1$s\"."
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:390
+#: include/classes/api/services/CItemGeneral.php:391
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr ""
@@ -8171,10 +8183,10 @@ msgstr "Neplatná perióda údržby"
 #: include/classes/api/services/CService.php:1268
 #: include/classes/api/services/CUserMacro.php:304
 #: include/classes/api/services/CUserMacro.php:448
-#: include/classes/api/services/CUser.php:612
-#: include/classes/api/services/CUser.php:632
-#: include/classes/api/services/CUser.php:790
-#: include/classes/api/services/CUser.php:835
+#: include/classes/api/services/CUser.php:610
+#: include/classes/api/services/CUser.php:630
+#: include/classes/api/services/CUser.php:788
+#: include/classes/api/services/CUser.php:833
 #: include/classes/core/CJsonRpc.php:185
 msgid "Invalid method parameters."
 msgstr "Neplatné parametre metódy."
@@ -8295,7 +8307,7 @@ msgstr "Položka \"%1$s\" neexistuje v šablóne \"%2$s\"."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Položka \"%1$s\" na \"%2$s\": aplikácia \"%3$s\" neexistuje."
 
-#: include/classes/api/services/CItemGeneral.php:435
+#: include/classes/api/services/CItemGeneral.php:436
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Položka \"%1$s:%2$s\" má neplatný port: \"%3$s\"."
@@ -8408,37 +8420,37 @@ msgstr "Položka používa neplatný typ rozhrania."
 msgid "Item values"
 msgstr "Hodnoty položky"
 
-#: include/classes/api/services/CItemGeneral.php:350
-#: include/classes/api/services/CItemGeneral.php:381
+#: include/classes/api/services/CItemGeneral.php:351
+#: include/classes/api/services/CItemGeneral.php:382
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Položka nebude akutalizovaná. Zadajte prosím správny interval aktualizacií."
 
-#: include/classes/api/services/CItemGeneral.php:516
+#: include/classes/api/services/CItemGeneral.php:517
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako zisťovacie pravidlo."
 
-#: include/classes/api/services/CItemGeneral.php:522
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako položka vytvorená z prototypu položky."
 
-#: include/classes/api/services/CItemGeneral.php:519
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako prototyp položky."
 
-#: include/classes/api/services/CItemGeneral.php:513
+#: include/classes/api/services/CItemGeneral.php:514
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako položka."
 
-#: include/classes/api/services/CItemGeneral.php:525
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako neznámy element položky."
 
-#: include/classes/api/services/CItemGeneral.php:932
+#: include/classes/api/services/CItemGeneral.php:933
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\"."
@@ -8963,12 +8975,12 @@ msgstr "Prihlásený ako"
 msgid "Login"
 msgstr "Prihlásenie"
 
-#: include/classes/api/services/CUser.php:1067
+#: include/classes/api/services/CUser.php:1065
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Prihlásenie zlyhalo \"%s\"."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1032
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr "Prihlasovacie meno \"%1$s\" sa nezhoduje s menom \"%2$s\" použitým v HTTP autentifikácii."
@@ -8977,9 +8989,9 @@ msgstr "Prihlasovacie meno \"%1$s\" sa nezhoduje s menom \"%2$s\" použitým v H
 msgid "Login name or password is incorrect!"
 msgstr "Nesprávne prihlasovacie meno alebo heslo!"
 
-#: include/classes/api/services/CUser.php:923
-#: include/classes/api/services/CUser.php:939
-#: include/classes/api/services/CUser.php:982
+#: include/classes/api/services/CUser.php:921
+#: include/classes/api/services/CUser.php:937
+#: include/classes/api/services/CUser.php:980
 msgid "Login name or password is incorrect."
 msgstr "Nesprávne prihlasovacie meno alebo heslo."
 
@@ -9878,7 +9890,7 @@ msgstr ""
 msgid "No \"%1$s\" given for web scenario."
 msgstr "Žiadne \"%1$s\" dané pre web scenár."
 
-#: include/classes/api/services/CAction.php:1890
+#: include/classes/api/services/CAction.php:1891
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr "Žiadne \"%2$s\" dané pre filtrovaciu podmienku akcie \"%1$s\"."
@@ -9893,7 +9905,7 @@ msgstr "Žiadne \"%2$s\" dané pre filtrovaciu podmienku zisťovacieho pravidla 
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr "Žiadne \"%2$s\" dané pre prototyp hosta \"%1$s\"."
 
-#: include/classes/api/services/CAction.php:1840
+#: include/classes/api/services/CAction.php:1841
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr "Žiadne \"%2$s\" dané pre filter akcie \"%1$s\"."
@@ -9913,11 +9925,11 @@ msgstr "Nenájdené žiadne IPMI rozhrania."
 msgid "No JMX interfaces found."
 msgstr "Nenájdené žiadne JMX rozhrania."
 
-#: include/classes/api/services/CItemGeneral.php:423
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "No SNMP OID specified."
 msgstr "Nie je špecifikované žiadne SNMP OID."
 
-#: include/classes/api/services/CItemGeneral.php:429
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP community specified."
 msgstr "Nie je špecifikované žiadne SNMP community."
 
@@ -9963,7 +9975,7 @@ msgstr "Nie je špecifikovaný typ autentifikácie pre príkaz akcie \"%s\"."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Nie je špecifikované používateľské meno autentifikácie pre príkaz akcie \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:400
+#: include/classes/api/services/CItemGeneral.php:401
 msgid "No authentication user name specified."
 msgstr "Nie je špecifikované používateľské meno autentifikácie."
 
@@ -10125,7 +10137,7 @@ msgstr "Žiadny obrázok"
 #: include/views/configuration.host.discovery.edit.php:93
 #: include/views/configuration.item.edit.php:102
 #: include/views/configuration.item.massupdate.php:74
-#: include/views/configuration.item.prototype.edit.php:101 jsLoader.php:231
+#: include/views/configuration.item.prototype.edit.php:101 jsLoader.php:230
 msgid "No interface found"
 msgstr "Nenájdené žiadne rozhranie"
 
@@ -10204,13 +10216,13 @@ msgstr "Nedefinované žiadne operácie."
 msgid "No permissions"
 msgstr "Nemáte oprávnenia"
 
-#: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1125
+#: include/classes/api/services/CUser.php:994
+#: include/classes/api/services/CUser.php:1123
 msgid "No permissions for system access."
 msgstr "Žiadne oprávnenia pre prístup do systému."
 
 #: include/classes/api/services/CAction.php:1272
-#: include/classes/api/services/CAction.php:2032
+#: include/classes/api/services/CAction.php:2033
 #: include/classes/api/services/CApplication.php:283
 #: include/classes/api/services/CApplication.php:290
 #: include/classes/api/services/CApplication.php:408
@@ -10302,11 +10314,11 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CTriggerPrototype.php:1485
 #: include/classes/api/services/CUserMacro.php:563
 #: include/classes/api/services/CUserMacro.php:672
-#: include/classes/api/services/CUser.php:619
-#: include/classes/api/services/CUser.php:798
-#: include/classes/api/services/CUser.php:818
-#: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1282
+#: include/classes/api/services/CUser.php:617
+#: include/classes/api/services/CUser.php:796
+#: include/classes/api/services/CUser.php:816
+#: include/classes/api/services/CUser.php:875
+#: include/classes/api/services/CUser.php:1280
 #: include/classes/api/services/CValueMap.php:287
 #: include/classes/api/services/CValueMap.php:413 include/func.inc.php:1622
 msgid "No permissions to referred object or it does not exist!"
@@ -10317,7 +10329,7 @@ msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Žiaden špecifikovaný súbor so súkromným kľúčom pre akciu príkazu \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:408
+#: include/classes/api/services/CItemGeneral.php:409
 msgid "No private key file specified."
 msgstr "Žiaden špecifikovaný súbor so súkromným kľúčom."
 
@@ -10330,7 +10342,7 @@ msgstr "Žiadne proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom pre akciu príkazu \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:405
+#: include/classes/api/services/CItemGeneral.php:406
 msgid "No public key file specified."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom."
 
@@ -10810,15 +10822,15 @@ msgstr "Len super administrátori môžu upravovať globálne makrá."
 msgid "Only Super Admins can update icon maps."
 msgstr "Len super administrátori môžu aktualizovať mapové ikony."
 
-#: include/classes/api/services/CUser.php:608
+#: include/classes/api/services/CUser.php:606
 msgid "Only Zabbix Admins can add user media."
 msgstr "Len Zabbix administrátori môžu pridať používateľské médiá."
 
-#: include/classes/api/services/CUser.php:786
+#: include/classes/api/services/CUser.php:784
 msgid "Only Zabbix Admins can change user media."
 msgstr "Len Zabbix administrátori môžu zmeniť používateľské médiá."
 
-#: include/classes/api/services/CUser.php:867
+#: include/classes/api/services/CUser.php:865
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Len Zabbix administrátori môžu zmazať používateľské médiá."
 
@@ -11601,7 +11613,7 @@ msgstr "Súbor so súkromným kľúčom"
 msgid "Privilege level"
 msgstr "Úroveň oprávnenia"
 
-#: include/classes/api/services/CUser.php:914
+#: include/classes/api/services/CUser.php:912
 msgid "Probably php-ldap module is missing."
 msgstr "Pravdepodobne chýba php-ldap modul."
 
@@ -12313,7 +12325,7 @@ msgstr "SNMP rozhrania"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: include/classes/api/services/CItemGeneral.php:417
+#: include/classes/api/services/CItemGeneral.php:418
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap kľúč je neplatný."
 
@@ -12817,11 +12829,6 @@ msgstr "Čas na servery"
 msgid "Service"
 msgstr "Služba"
 
-#: jsLoader.php:216
-#, c-format
-msgid "Service \"%1$s\""
-msgstr "Služba \"%1$s\""
-
 #: include/classes/api/services/CService.php:1097
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
@@ -12882,7 +12889,7 @@ msgstr "Služby"
 msgid "Services form a circular dependency."
 msgstr "Služby tvoria kruhovú závislosť."
 
-#: include/classes/api/services/CUser.php:1119
+#: include/classes/api/services/CUser.php:1117
 msgid "Session terminated, re-login, please."
 msgstr "Sedenie ukončené, prosím prihláste sa znovu."
 
@@ -13364,7 +13371,7 @@ msgstr ""
 msgid "Subject"
 msgstr "Predmet"
 
-#: jsLoader.php:217
+#: jsLoader.php:216
 msgid "Submap"
 msgstr "Podmapa"
 
@@ -13946,7 +13953,7 @@ msgstr "Časová značka nie je odlišná od serverového Zabbix času o viac ak
 msgid "To"
 msgstr "Do"
 
-#: jsLoader.php:230
+#: jsLoader.php:229
 msgid "To set a host interface select a single item type for all items"
 msgstr "Na nastavenie rozhrania hosta označte jeden typ položky pre všetky položky"
 
@@ -14033,7 +14040,7 @@ msgstr "Trendy (v dňoch)"
 #: include/views/js/configuration.sysmaps.js.php:19
 #: include/views/js/configuration.sysmaps.js.php:88
 #: include/views/js/configuration.sysmaps.js.php:354
-#: include/views/reports.toptriggers.php:119 jsLoader.php:143 jsLoader.php:218
+#: include/views/reports.toptriggers.php:119 jsLoader.php:143 jsLoader.php:217
 #: services.php:471 tr_comments.php:76 tr_logform.php:27 tr_logform.php:158
 #: tr_logform.php:174
 msgid "Trigger"
@@ -14258,7 +14265,7 @@ msgstr "Hodnota spúšťača"
 #: include/views/inventory.host.view.php:162
 #: include/views/inventory.host.view.php:175
 #: include/views/monitoring.overview.items.php:47
-#: include/views/monitoring.overview.triggers.php:81 jsLoader.php:219
+#: include/views/monitoring.overview.triggers.php:81 jsLoader.php:218
 #: popup.php:59 search.php:129 search.php:136 search.php:170 search.php:199
 #: search.php:232 search.php:284 search.php:334 search.php:400 search.php:431
 #: search.php:457 templates.php:600 templates.php:734
@@ -14418,7 +14425,7 @@ msgstr "UP"
 #: include/views/configuration.sysmap.edit.php:155
 #: include/views/configuration.trigger.prototype.edit.php:247
 #: include/views/configuration.triggers.edit.php:252
-#: include/views/js/configuration.sysmaps.js.php:165 jsLoader.php:220
+#: include/views/js/configuration.sysmaps.js.php:165 jsLoader.php:219
 #: popup_httpstep.php:37 tr_logform.php:372
 msgid "URL"
 msgstr "URL"
@@ -14458,7 +14465,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr "URL by malo mať \"meno\" aj \"url\" pre mapu \"%s\"."
 
 #: include/views/configuration.sysmap.edit.php:206
-#: include/views/js/configuration.sysmaps.js.php:162 jsLoader.php:221
+#: include/views/js/configuration.sysmaps.js.php:162 jsLoader.php:220
 msgid "URLs"
 msgstr "URLky"
 
@@ -14673,7 +14680,7 @@ msgstr "Neplatný formát importu \"%1$s\"."
 msgid "Unsupported parameter \"%1$s\" for group prototype."
 msgstr "Nepodporovaný parameter \"%1$s\" pre prototyp skupiny."
 
-#: include/classes/api/services/CAction.php:1891
+#: include/classes/api/services/CAction.php:1892
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr "Nepodporovaný parameter \"%2$s\" pre filtrovaciu podmienku akcie \"%1$s\"."
@@ -14693,7 +14700,7 @@ msgstr "Nepodporovaný parameter \"%2$s\" pre prototyp skupiny \"%1$s\"."
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr "Nepodporovaný parameter \"%2$s\" pre prototyp hosta %1$s inventár hosta."
 
-#: include/classes/api/services/CAction.php:1841
+#: include/classes/api/services/CAction.php:1842
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr "Nepodporovaný parameter \"%2$s\" pre filter akcie \"%1$s\"."
@@ -14994,7 +15001,7 @@ msgstr "Používateľská skupina pre správu o nedostupnej databáze \"%1$s\"."
 msgid "User groups"
 msgstr "Používateľské skupiny"
 
-#: include/classes/api/services/CUser.php:1295
+#: include/classes/api/services/CUser.php:1293
 msgid "User is not allowed to delete himself."
 msgstr "Používateľ nemá dovolené zmazať sám seba."
 

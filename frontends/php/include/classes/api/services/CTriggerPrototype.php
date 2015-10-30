@@ -773,17 +773,17 @@ class CTriggerPrototype extends CTriggerGeneral {
 					$triggerPrototype['dependencies'] = $dbTriggerPrototype['dependencies'];
 				}
 			}
-			else {
-				$expression = $triggerPrototype['expression'];
-			}
 
 			$triggerPrototypeUpdate = $triggerPrototype;
-			$triggerPrototypeUpdate['expression'] = $expression;
 
 			if (!$descriptionChanged) {
 				unset($triggerPrototypeUpdate['description']);
 			}
-			if (!$expressionChanged) {
+
+			if ($expressionChanged) {
+				$triggerPrototypeUpdate['expression'] = $expression;
+			}
+			else {
 				unset($triggerPrototypeUpdate['expression']);
 			}
 
