@@ -1833,7 +1833,8 @@ class CAction extends CApiService {
 				new CConditionValidator([
 					'messageInvalidFormula' => _('Incorrect custom expression "%2$s" for action "%1$s": %3$s.'),
 					'messageMissingCondition' => _('Condition "%2$s" used in formula "%3$s" for action "%1$s" is not defined.'),
-					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for action "%1$s".')
+					'messageUnusedCondition' => _('Condition "%2$s" is not used in formula "%3$s" for action "%1$s".'),
+					'messageAndWithSeveralTriggers' => _('Comparing several triggers with "and" is not allowed.')
 				])
 			],
 			'required' => ['evaltype', 'conditions'],
@@ -1935,7 +1936,7 @@ class CAction extends CApiService {
 	 *
 	 * @param $actions
 	 */
-	public function validateCreate($actions) {
+	protected function validateCreate($actions) {
 		$actionDbFields = [
 			'name'        => null,
 			'eventsource' => null
@@ -2024,7 +2025,7 @@ class CAction extends CApiService {
 	 *
 	 * @internal param array $actionDb
 	 */
-	public function validateUpdate($actions, $actionsDb) {
+	protected function validateUpdate($actions, $actionsDb) {
 		foreach ($actions as $action) {
 			if (isset($action['actionid']) && !isset($actionsDb[$action['actionid']])) {
 				self::exception(

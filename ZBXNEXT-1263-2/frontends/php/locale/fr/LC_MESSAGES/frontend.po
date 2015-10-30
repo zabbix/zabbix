@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-22 15:51+0300\n"
+"POT-Creation-Date: 2015-10-28 15:17+0200\n"
 "PO-Revision-Date: 2015-06-27 21:59+0300\n"
 "Last-Translator: antonin <antonin.sommier@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -82,7 +82,7 @@ msgid_plural "%1$s items"
 msgstr[0] ""
 msgstr[1] ""
 
-#: jsLoader.php:224 jsLoader.php:225 jsLoader.php:226 jsLoader.php:227
+#: jsLoader.php:223 jsLoader.php:224 jsLoader.php:225 jsLoader.php:226
 #, c-format
 msgid "%1$s minute"
 msgid_plural "%1$s minutes"
@@ -97,7 +97,7 @@ msgid_plural "%1$s retries left"
 msgstr[0] ""
 msgstr[1] ""
 
-#: jsLoader.php:222 jsLoader.php:223
+#: jsLoader.php:221 jsLoader.php:222
 #, c-format
 msgid "%1$s second"
 msgid_plural "%1$s seconds"
@@ -233,7 +233,7 @@ msgstr ""
 msgid "Access denied!"
 msgstr "Accès refusé !"
 
-#: include/classes/api/services/CUser.php:988
+#: include/classes/api/services/CUser.php:986
 #, c-format
 msgid "Account is blocked for %s seconds"
 msgstr "Compte bloqué pendant %s secondes"
@@ -324,21 +324,21 @@ msgstr "Acquittement désactivé"
 msgid "Action"
 msgstr "Action"
 
-#: include/classes/api/services/CAction.php:1961
-#: include/classes/api/services/CAction.php:1976
-#: include/classes/api/services/CAction.php:2072
-#: include/classes/api/services/CAction.php:2108
+#: include/classes/api/services/CAction.php:1962
+#: include/classes/api/services/CAction.php:1977
+#: include/classes/api/services/CAction.php:2073
+#: include/classes/api/services/CAction.php:2109
 #, c-format
 msgid "Action \"%1$s\" already exists."
 msgstr "Action \"%1$s\" déjà existante."
 
-#: include/classes/api/services/CAction.php:1956
-#: include/classes/api/services/CAction.php:2055
+#: include/classes/api/services/CAction.php:1957
+#: include/classes/api/services/CAction.php:2056
 #, c-format
 msgid "Action \"%1$s\" has incorrect value for \"esc_period\" (minimum %2$s seconds)."
 msgstr "L'action \"%1$s\" a une valeur incorrecte pour \"esc_period\" (%2$s secondes minimum)."
 
-#: include/classes/api/services/CAction.php:2130
+#: include/classes/api/services/CAction.php:2131
 #, c-format
 msgid "Action \"%1$s\" no operations defined."
 msgstr "Aucune opération définie pour l'action \"%1$s\"."
@@ -356,6 +356,14 @@ msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
+
+#: include/classes/api/services/CUserGroup.php:766
+msgid "Action disabled due to deletion of user group."
+msgstr ""
+
+#: include/classes/api/services/CUser.php:1351
+msgid "Action disabled due to deletion of user."
+msgstr ""
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -726,7 +734,7 @@ msgstr ""
 msgid "Application updated"
 msgstr "Application modifiée"
 
-#: include/classes/api/services/CItemGeneral.php:475
+#: include/classes/api/services/CItemGeneral.php:476
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "L'application avec l'ID \"%1$s\" n'est pas disponible sur \"%2$s\"."
@@ -1456,7 +1464,7 @@ msgstr ""
 msgid "Cannot create the configuration file."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1317
+#: include/classes/api/services/CUser.php:1315
 #, c-format
 msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Impossible de supprimer l'utilisateur interne Zabbix \"%1$s\", essayez de désactiver cet utilisateur."
@@ -1695,7 +1703,7 @@ msgstr "Impossible de supprimer les déclencheurs"
 msgid "Cannot delete user"
 msgstr "Impossible de supprimer l'utilisateur"
 
-#: include/classes/api/services/CUser.php:888
+#: include/classes/api/services/CUser.php:886
 msgid "Cannot delete user media."
 msgstr "Impossible de supprimer le média utilisateur."
 
@@ -2050,7 +2058,7 @@ msgstr "Impossible d'inclure le fichier de vue \"%s\"."
 msgid "Cannot insert trigger expression"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:677
+#: include/classes/api/services/CUser.php:675
 msgid "Cannot insert user media."
 msgstr "Impossible d'ajouter le média utilisateur."
 
@@ -2063,11 +2071,11 @@ msgstr "Impossible de lier le modèle"
 msgid "Cannot link template."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:1029
+#: include/classes/api/services/CUser.php:1027
 msgid "Cannot login."
 msgstr ""
 
-#: include/classes/api/services/CUser.php:954
+#: include/classes/api/services/CUser.php:952
 msgid "Cannot logout."
 msgstr "Impossible de se déconnecter."
 
@@ -2235,7 +2243,7 @@ msgstr ""
 msgid "Cannot unlink trigger \"%s\", it has items from template that is left linked to host."
 msgstr "Impossible de délier le déclencheur \"%s\", il a des éléments du modèle qui sont laissés liés à l'hôte."
 
-#: include/classes/api/services/CAction.php:2063
+#: include/classes/api/services/CAction.php:2064
 #, c-format
 msgid "Cannot update \"%1$s\" for action \"%2$s\"."
 msgstr ""
@@ -2487,7 +2495,7 @@ msgstr ""
 msgid "Cannot update user"
 msgstr "Impossible de mettre à jour l'utilisateur"
 
-#: include/classes/api/services/CUser.php:757
+#: include/classes/api/services/CUser.php:755
 msgid "Cannot update user media."
 msgstr "Impossible de mettre à jour le média utilisateur."
 
@@ -2821,6 +2829,10 @@ msgstr "Commentaires"
 #: app/views/administration.mediatype.edit.php:47
 msgid "Commercial"
 msgstr "Commercial"
+
+#: include/classes/api/services/CAction.php:1837
+msgid "Comparing several triggers with \"and\" is not allowed."
+msgstr ""
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
@@ -4781,7 +4793,7 @@ msgstr ""
 msgid "Empty color."
 msgstr "Couleur vide."
 
-#: include/classes/api/services/CAction.php:1878
+#: include/classes/api/services/CAction.php:1879
 #, c-format
 msgid "Empty filter condition formula ID for action \"%1$s\"."
 msgstr ""
@@ -6987,7 +6999,7 @@ msgstr "SLA acceptable incorrect pour le service \"%1$s\"."
 msgid "Incorrect action condition discovery check."
 msgstr "Test de découverte associé à la condition d'action incorrect."
 
-#: include/classes/api/services/CAction.php:2238
+#: include/classes/api/services/CAction.php:2239
 msgid "Incorrect action condition discovery check. Discovery check does not exist or you have no access to it."
 msgstr "Test de découverte associé à la condition d'action incorrect. Le test de découverte n'existe pas ou vous n'y avez pas accès."
 
@@ -6995,7 +7007,7 @@ msgstr "Test de découverte associé à la condition d'action incorrect. Le test
 msgid "Incorrect action condition discovery object."
 msgstr "Test de découverte associé à la condition d'action incorrect."
 
-#: include/classes/api/services/CAction.php:2232
+#: include/classes/api/services/CAction.php:2233
 msgid "Incorrect action condition discovery rule. Discovery rule does not exist or you have no access to it."
 msgstr "Règle de découverte associée à la condition d'action incorrecte. La règle de découverte n'existe pas ou vous n'y avez pas accès."
 
@@ -7007,11 +7019,11 @@ msgstr "État de découverte associé à la condition d'action incorrect."
 msgid "Incorrect action condition event type."
 msgstr "Type d'événement associé à la condition d'action incorrect."
 
-#: include/classes/api/services/CAction.php:2208
+#: include/classes/api/services/CAction.php:2209
 msgid "Incorrect action condition host group. Host group does not exist or you have no access to it."
 msgstr "Groupe d'hôtes associé à la condition d'action incorrect. Le groupe d'hôtes n'existe pas ou vous n'y avez pas accès."
 
-#: include/classes/api/services/CAction.php:2214
+#: include/classes/api/services/CAction.php:2215
 msgid "Incorrect action condition host. Host does not exist or you have no access to it."
 msgstr "Hôte associé à la condition d'action incorrect. L'hôte n'existe pas ou vous n'y avez pas accès."
 
@@ -7020,11 +7032,11 @@ msgstr "Hôte associé à la condition d'action incorrect. L'hôte n'existe pas 
 msgid "Incorrect action condition port \"%1$s\"."
 msgstr "Port de condition d'action \"%1$s\" incorrect."
 
-#: include/classes/api/services/CAction.php:2244
+#: include/classes/api/services/CAction.php:2245
 msgid "Incorrect action condition proxy. Proxy does not exist or you have no access to it."
 msgstr "Proxy associé à la condition d'action incorrect. Le proxy n'existe pas ou vous n'y avez pas accès."
 
-#: include/classes/api/services/CAction.php:2220
+#: include/classes/api/services/CAction.php:2221
 msgid "Incorrect action condition template. Template does not exist or you have no access to it."
 msgstr "Modèle associé à la condition d'action incorrect. Le modèle n'existe pas ou vous n'y avez pas accès."
 
@@ -7036,7 +7048,7 @@ msgstr "Sévérité de déclencheur de condition d'action incorrecte."
 msgid "Incorrect action condition trigger value."
 msgstr "Valeur de déclencheur de condition d'action incorrecte."
 
-#: include/classes/api/services/CAction.php:2226
+#: include/classes/api/services/CAction.php:2227
 msgid "Incorrect action condition trigger. Trigger does not exist or you have no access to it."
 msgstr "Déclencheur associé à la condition d'action incorrect. Le déclencheur n'existe pas ou vous n'y avez pas accès."
 
@@ -7091,7 +7103,7 @@ msgstr "Groupe d'utilisateurs associé à l'action incorrect. Le groupe d'utilis
 msgid "Incorrect action operation user. User does not exist or you have no access to this user."
 msgstr "Utilisateur associé à l'action incorrect. L'utilisateur n'existe pas ou vous n'y avez pas accès."
 
-#: include/classes/api/services/CAction.php:2143
+#: include/classes/api/services/CAction.php:2144
 msgid "Incorrect action operationid."
 msgstr "Identifiant d'opération d'action incorrect."
 
@@ -7131,7 +7143,7 @@ msgstr "Arguments incorrects passés à la méthode."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Protocole d'authentification incorrect pour la règle de découverte \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:444
+#: include/classes/api/services/CItemGeneral.php:445
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Protocole d'authentification incorrect pour l'élément \"%1$s\"."
@@ -7228,7 +7240,7 @@ msgstr "Champs incorrects pour le déclencheur."
 msgid "Incorrect file upload."
 msgstr "Téléversement de fichier incorrect."
 
-#: include/classes/api/services/CAction.php:1879
+#: include/classes/api/services/CAction.php:1880
 #, c-format
 msgid "Incorrect filter condition formula ID for action \"%1$s\"."
 msgstr ""
@@ -7243,7 +7255,7 @@ msgstr ""
 msgid "Incorrect filter condition macro for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1883
+#: include/classes/api/services/CAction.php:1884
 #, c-format
 msgid "Incorrect filter condition operator for action \"%1$s\"."
 msgstr ""
@@ -7253,7 +7265,7 @@ msgstr ""
 msgid "Incorrect filter condition operator for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1871
+#: include/classes/api/services/CAction.php:1872
 #, c-format
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
@@ -7446,8 +7458,8 @@ msgstr ""
 msgid "Incorrect object value."
 msgstr "Valeur d'objet incorrecte."
 
-#: include/classes/api/services/CAction.php:1949
-#: include/classes/api/services/CAction.php:2002
+#: include/classes/api/services/CAction.php:1950
+#: include/classes/api/services/CAction.php:2003
 #, c-format
 msgid "Incorrect parameter for action \"%1$s\"."
 msgstr "Paramètre incorrect pour l'action \"%1$s\"."
@@ -7461,7 +7473,7 @@ msgstr "Paramètre incorrect pour les opérations."
 msgid "Incorrect parameter is used for icon map \"%s\"."
 msgstr "Paramètre incorrect pour l'icône de la carte \"%s\"."
 
-#: include/classes/api/services/CAction.php:2045
+#: include/classes/api/services/CAction.php:2046
 #, c-format
 msgid "Incorrect parameters for action update method \"%1$s\"."
 msgstr ""
@@ -7503,7 +7515,7 @@ msgstr "Intervalle de ports incorrect."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Protocole de sécurité incorrect pour la règle de découverte \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:453
+#: include/classes/api/services/CItemGeneral.php:454
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Protocole de sécurité incorrect pour l'élément \"%1$s\"."
@@ -7997,7 +8009,7 @@ msgstr "Identifiant d'hôte (hostid) invalide pour la macro \"%1$s\"."
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:390
+#: include/classes/api/services/CItemGeneral.php:391
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr ""
@@ -8120,10 +8132,10 @@ msgstr "Période de maintenance invalide"
 #: include/classes/api/services/CService.php:1268
 #: include/classes/api/services/CUserMacro.php:304
 #: include/classes/api/services/CUserMacro.php:448
-#: include/classes/api/services/CUser.php:612
-#: include/classes/api/services/CUser.php:632
-#: include/classes/api/services/CUser.php:790
-#: include/classes/api/services/CUser.php:835
+#: include/classes/api/services/CUser.php:610
+#: include/classes/api/services/CUser.php:630
+#: include/classes/api/services/CUser.php:788
+#: include/classes/api/services/CUser.php:833
 #: include/classes/core/CJsonRpc.php:185
 msgid "Invalid method parameters."
 msgstr "Paramètres de la méthode invalides."
@@ -8244,7 +8256,7 @@ msgstr "L'élément \"%1$s\" n'existe pas dans le modèle \"%2$s\"."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Élément \"%1$s\" sur \"%2$s\" : l'application \"%3$s\" n'existe pas."
 
-#: include/classes/api/services/CItemGeneral.php:435
+#: include/classes/api/services/CItemGeneral.php:436
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "L'élément \"%1$s:%2$s\" a un port invalide : \"%3$s\"."
@@ -8353,37 +8365,37 @@ msgstr "L'élément utilise un type d'interface incorrect."
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:350
-#: include/classes/api/services/CItemGeneral.php:381
+#: include/classes/api/services/CItemGeneral.php:351
+#: include/classes/api/services/CItemGeneral.php:382
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "L'élément ne sera pas rafraichi. Veuillez saisir une période de mise à jour valide."
 
-#: include/classes/api/services/CItemGeneral.php:516
+#: include/classes/api/services/CItemGeneral.php:517
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme règle de découverte."
 
-#: include/classes/api/services/CItemGeneral.php:522
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément créé d'un prototype d'élément."
 
-#: include/classes/api/services/CItemGeneral.php:519
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme prototype d'élément."
 
-#: include/classes/api/services/CItemGeneral.php:513
+#: include/classes/api/services/CItemGeneral.php:514
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément."
 
-#: include/classes/api/services/CItemGeneral.php:525
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément inconnu."
 
-#: include/classes/api/services/CItemGeneral.php:932
+#: include/classes/api/services/CItemGeneral.php:933
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\"."
@@ -8907,12 +8919,12 @@ msgstr "Connecté en tant que"
 msgid "Login"
 msgstr "Connexion"
 
-#: include/classes/api/services/CUser.php:1067
+#: include/classes/api/services/CUser.php:1065
 #, c-format
 msgid "Login failed \"%s\"."
 msgstr "Connexion échouée \"%s\"."
 
-#: include/classes/api/services/CUser.php:1034
+#: include/classes/api/services/CUser.php:1032
 #, c-format
 msgid "Login name \"%1$s\" does not match the name \"%2$s\" used to pass HTTP authentication."
 msgstr ""
@@ -8921,9 +8933,9 @@ msgstr ""
 msgid "Login name or password is incorrect!"
 msgstr ""
 
-#: include/classes/api/services/CUser.php:923
-#: include/classes/api/services/CUser.php:939
-#: include/classes/api/services/CUser.php:982
+#: include/classes/api/services/CUser.php:921
+#: include/classes/api/services/CUser.php:937
+#: include/classes/api/services/CUser.php:980
 msgid "Login name or password is incorrect."
 msgstr "Nom ou mot de passe incorrect."
 
@@ -9819,7 +9831,7 @@ msgstr ""
 msgid "No \"%1$s\" given for web scenario."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1890
+#: include/classes/api/services/CAction.php:1891
 #, c-format
 msgid "No \"%2$s\" given for a filter condition of action \"%1$s\"."
 msgstr ""
@@ -9834,7 +9846,7 @@ msgstr ""
 msgid "No \"%2$s\" given for host prototype \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1840
+#: include/classes/api/services/CAction.php:1841
 #, c-format
 msgid "No \"%2$s\" given for the filter of action \"%1$s\"."
 msgstr ""
@@ -9854,11 +9866,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:423
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:429
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9904,7 +9916,7 @@ msgstr "Aucun type d'authentification spécifiée pour la commande d'opération 
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Aucun nom d'utilisateur d'authentification spécifié pour la commande d'opération d'action \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:400
+#: include/classes/api/services/CItemGeneral.php:401
 msgid "No authentication user name specified."
 msgstr "Aucun nom d'utilisateur d'authentification spécifié."
 
@@ -10066,7 +10078,7 @@ msgstr "Aucune image"
 #: include/views/configuration.host.discovery.edit.php:93
 #: include/views/configuration.item.edit.php:102
 #: include/views/configuration.item.massupdate.php:74
-#: include/views/configuration.item.prototype.edit.php:101 jsLoader.php:231
+#: include/views/configuration.item.prototype.edit.php:101 jsLoader.php:230
 msgid "No interface found"
 msgstr "Aucune interface trouvée"
 
@@ -10145,13 +10157,13 @@ msgstr ""
 msgid "No permissions"
 msgstr "Aucune permission"
 
-#: include/classes/api/services/CUser.php:996
-#: include/classes/api/services/CUser.php:1125
+#: include/classes/api/services/CUser.php:994
+#: include/classes/api/services/CUser.php:1123
 msgid "No permissions for system access."
 msgstr "Aucune permission pour l'accès au système."
 
 #: include/classes/api/services/CAction.php:1272
-#: include/classes/api/services/CAction.php:2032
+#: include/classes/api/services/CAction.php:2033
 #: include/classes/api/services/CApplication.php:283
 #: include/classes/api/services/CApplication.php:290
 #: include/classes/api/services/CApplication.php:408
@@ -10243,11 +10255,11 @@ msgstr "Aucune permission pour l'accès au système."
 #: include/classes/api/services/CTriggerPrototype.php:1485
 #: include/classes/api/services/CUserMacro.php:563
 #: include/classes/api/services/CUserMacro.php:672
-#: include/classes/api/services/CUser.php:619
-#: include/classes/api/services/CUser.php:798
-#: include/classes/api/services/CUser.php:818
-#: include/classes/api/services/CUser.php:877
-#: include/classes/api/services/CUser.php:1282
+#: include/classes/api/services/CUser.php:617
+#: include/classes/api/services/CUser.php:796
+#: include/classes/api/services/CUser.php:816
+#: include/classes/api/services/CUser.php:875
+#: include/classes/api/services/CUser.php:1280
 #: include/classes/api/services/CValueMap.php:287
 #: include/classes/api/services/CValueMap.php:413 include/func.inc.php:1622
 msgid "No permissions to referred object or it does not exist!"
@@ -10258,7 +10270,7 @@ msgstr "Aucune permission pour l'objet appelé ou il n'existe pas !"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Aucun fichier de clé privée spécifié pour la commande d'opération d'action \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:408
+#: include/classes/api/services/CItemGeneral.php:409
 msgid "No private key file specified."
 msgstr "Aucun fichier de clé privée spécifié."
 
@@ -10271,7 +10283,7 @@ msgstr "Aucun proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Aucun fichier de clé publique spécifié pour la commande d'opération d'action \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:405
+#: include/classes/api/services/CItemGeneral.php:406
 msgid "No public key file specified."
 msgstr "Aucun fichier de clé publique spécifié."
 
@@ -10751,15 +10763,15 @@ msgstr "Seuls les super administrateurs peuvent mettre à jour les macros global
 msgid "Only Super Admins can update icon maps."
 msgstr "Seuls les super administrateurs peuvent mettre à jour les correspondances d'icônes."
 
-#: include/classes/api/services/CUser.php:608
+#: include/classes/api/services/CUser.php:606
 msgid "Only Zabbix Admins can add user media."
 msgstr "Seuls les administrateurs Zabbix peuvent ajouter des médias utilisateurs."
 
-#: include/classes/api/services/CUser.php:786
+#: include/classes/api/services/CUser.php:784
 msgid "Only Zabbix Admins can change user media."
 msgstr "Seuls les administrateurs Zabbix peuvent changer les médias utilisateurs."
 
-#: include/classes/api/services/CUser.php:867
+#: include/classes/api/services/CUser.php:865
 msgid "Only Zabbix Admins can remove user media."
 msgstr "Seuls les administrateurs Zabbix peuvent supprimer des médias utilisateurs."
 
@@ -11542,7 +11554,7 @@ msgstr "Fichier de clé privée"
 msgid "Privilege level"
 msgstr "Niveau de privilège"
 
-#: include/classes/api/services/CUser.php:914
+#: include/classes/api/services/CUser.php:912
 msgid "Probably php-ldap module is missing."
 msgstr "Le module php-ldap est probablement manquant."
 
@@ -12253,7 +12265,7 @@ msgstr "Interfaces SNMP"
 msgid "SNMP trap"
 msgstr "Trap SNMP"
 
-#: include/classes/api/services/CItemGeneral.php:417
+#: include/classes/api/services/CItemGeneral.php:418
 msgid "SNMP trap key is invalid."
 msgstr "La clé du trap SNMP est invalide."
 
@@ -12756,11 +12768,6 @@ msgstr "Temps serveur"
 msgid "Service"
 msgstr "Service"
 
-#: jsLoader.php:216
-#, c-format
-msgid "Service \"%1$s\""
-msgstr ""
-
 #: include/classes/api/services/CService.php:1097
 #, c-format
 msgid "Service \"%1$s\" cannot be deleted, because it is dependent on another service."
@@ -12821,7 +12828,7 @@ msgstr "Services"
 msgid "Services form a circular dependency."
 msgstr "Les services forment une dépendance circulaire."
 
-#: include/classes/api/services/CUser.php:1119
+#: include/classes/api/services/CUser.php:1117
 msgid "Session terminated, re-login, please."
 msgstr "Session terminée, veuillez vous reconnecter."
 
@@ -13301,7 +13308,7 @@ msgstr ""
 msgid "Subject"
 msgstr "Sujet"
 
-#: jsLoader.php:217
+#: jsLoader.php:216
 msgid "Submap"
 msgstr "Sous-carte"
 
@@ -13880,7 +13887,7 @@ msgstr "Si l'heure n'est pas différente de celle du serveur Zabbix de plus de T
 msgid "To"
 msgstr "À"
 
-#: jsLoader.php:230
+#: jsLoader.php:229
 msgid "To set a host interface select a single item type for all items"
 msgstr "Pour configurer une interface d'hôte, sélectionner un type d'élément pour tous les éléments"
 
@@ -13967,7 +13974,7 @@ msgstr ""
 #: include/views/js/configuration.sysmaps.js.php:19
 #: include/views/js/configuration.sysmaps.js.php:88
 #: include/views/js/configuration.sysmaps.js.php:354
-#: include/views/reports.toptriggers.php:119 jsLoader.php:143 jsLoader.php:218
+#: include/views/reports.toptriggers.php:119 jsLoader.php:143 jsLoader.php:217
 #: services.php:471 tr_comments.php:76 tr_logform.php:27 tr_logform.php:158
 #: tr_logform.php:174
 msgid "Trigger"
@@ -14188,7 +14195,7 @@ msgstr "Valeur du déclencheur"
 #: include/views/inventory.host.view.php:162
 #: include/views/inventory.host.view.php:175
 #: include/views/monitoring.overview.items.php:47
-#: include/views/monitoring.overview.triggers.php:81 jsLoader.php:219
+#: include/views/monitoring.overview.triggers.php:81 jsLoader.php:218
 #: popup.php:59 search.php:129 search.php:136 search.php:170 search.php:199
 #: search.php:232 search.php:284 search.php:334 search.php:400 search.php:431
 #: search.php:457 templates.php:600 templates.php:734
@@ -14348,7 +14355,7 @@ msgstr "ACTIF"
 #: include/views/configuration.sysmap.edit.php:155
 #: include/views/configuration.trigger.prototype.edit.php:247
 #: include/views/configuration.triggers.edit.php:252
-#: include/views/js/configuration.sysmaps.js.php:165 jsLoader.php:220
+#: include/views/js/configuration.sysmaps.js.php:165 jsLoader.php:219
 #: popup_httpstep.php:37 tr_logform.php:372
 msgid "URL"
 msgstr "URL"
@@ -14388,7 +14395,7 @@ msgid "URL should have both \"name\" and \"url\" fields for map \"%s\"."
 msgstr ""
 
 #: include/views/configuration.sysmap.edit.php:206
-#: include/views/js/configuration.sysmaps.js.php:162 jsLoader.php:221
+#: include/views/js/configuration.sysmaps.js.php:162 jsLoader.php:220
 msgid "URLs"
 msgstr "URLs"
 
@@ -14603,7 +14610,7 @@ msgstr "Format d'import \"%1$s\" non supporté."
 msgid "Unsupported parameter \"%1$s\" for group prototype."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1891
+#: include/classes/api/services/CAction.php:1892
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for a filter condition of action \"%1$s\"."
 msgstr ""
@@ -14623,7 +14630,7 @@ msgstr ""
 msgid "Unsupported parameter \"%2$s\" for host prototype %1$s host inventory."
 msgstr ""
 
-#: include/classes/api/services/CAction.php:1841
+#: include/classes/api/services/CAction.php:1842
 #, c-format
 msgid "Unsupported parameter \"%2$s\" for the filter of action \"%1$s\"."
 msgstr ""
@@ -14923,7 +14930,7 @@ msgstr ""
 msgid "User groups"
 msgstr "Groupes d'utilisateurs"
 
-#: include/classes/api/services/CUser.php:1295
+#: include/classes/api/services/CUser.php:1293
 msgid "User is not allowed to delete himself."
 msgstr "Un utilisateur n'est pas autorisé à s'effacer lui-même."
 
