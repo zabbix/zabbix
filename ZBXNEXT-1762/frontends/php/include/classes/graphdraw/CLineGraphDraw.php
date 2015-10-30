@@ -1304,6 +1304,8 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_DAY * 15],		// 30 days and 15 days
 			['main' => SEC_PER_MONTH * 6, 'sub' => SEC_PER_MONTH],		// half year and 30 days
 			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],			// 1 year and 30 days
+			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 3],		// 1 year and 90 days
+			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 4],		// 1 year and 120 days
 			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH * 6],		// 1 year and 180 days
 			['main' => SEC_PER_YEAR * 5, 'sub' => SEC_PER_YEAR],		// 5 years and 1 year
 			['main' => SEC_PER_YEAR * 10, 'sub' => SEC_PER_YEAR * 2],	// 10 years and 2 years
@@ -1415,6 +1417,60 @@ class CLineGraphDraw extends CGraphDraw {
 					}
 				}
 			}
+			elseif ($subInterval == SEC_PER_MONTH * 4) {
+				if ($i == 1) {
+					if (date('m', $this->stime) > 9) {
+						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
+					}
+					elseif (date('m', $this->stime) > 5) {
+						$new_time = mktime(0, 0, 0, 9, 1, date('Y', $previous_time));
+					}
+					else {
+						$new_time = mktime(0, 0, 0, 5, 1, date('Y', $previous_time));
+					}
+				}
+				else {
+					if (date('m', $previous_time) == 9) {
+						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
+					}
+					elseif (date('m', $previous_time) == 5) {
+						$new_time = mktime(0, 0, 0, 9, 1, date('Y', $previous_time));
+					}
+					else {
+						$new_time = mktime(0, 0, 0, 5, 1, date('Y', $previous_time));
+					}
+				}
+			}
+			elseif ($subInterval == SEC_PER_MONTH * 3) {
+				if ($i == 1) {
+					if (date('m', $this->stime) > 10) {
+						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
+					}
+					elseif (date('m', $this->stime) > 7) {
+						$new_time = mktime(0, 0, 0, 10, 1, date('Y', $previous_time));
+					}
+					elseif (date('m', $this->stime) > 4) {
+						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
+					}
+					else {
+						$new_time = mktime(0, 0, 0, 4, 1, date('Y', $previous_time));
+					}
+				}
+				else {
+					if (date('m', $previous_time) == 10) {
+						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
+					}
+					elseif (date('m', $previous_time) == 7) {
+						$new_time = mktime(0, 0, 0, 10, 1, date('Y', $previous_time));
+					}
+					elseif (date('m', $previous_time) == 4) {
+						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
+					}
+					else {
+						$new_time = mktime(0, 0, 0, 4, 1, date('Y', $previous_time));
+					}
+				}
+			}
 			elseif ($subInterval == SEC_PER_MONTH) {
 				$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 			}
@@ -1464,7 +1520,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$format = YEAR_FORMAT;
 			}
 			elseif (date('d', $new_time) == 1 && date('H', $new_time) == 0 && date('i', $new_time) == 0
-					&& ($subInterval == SEC_PER_MONTH || $subInterval == SEC_PER_MONTH * 6)) {
+					&& ($subInterval == SEC_PER_MONTH || $subInterval == SEC_PER_MONTH * 3
+						|| $subInterval == SEC_PER_MONTH * 4 || $subInterval == SEC_PER_MONTH * 6)) {
 				$format = _('M');
 			}
 			elseif ((date('H', $new_time) == 0 && date('i', $new_time) == 0) || $subInterval > SEC_PER_HOUR * 12) {
