@@ -6551,7 +6551,7 @@ int	DCget_trigger_count()
 			}
 
 			if (NULL == (q = strchr(p + 1, '}')))
-				break;
+				goto next;
 
 			if (SUCCEED != is_uint64_n(p + 1, q - p - 1, &functionid))
 					continue;
