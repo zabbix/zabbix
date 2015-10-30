@@ -2790,7 +2790,7 @@ $form-icon-btn: (
 	// Shadow covers
 	linear-gradient($ui-bg-color 30%, rgba($ui-bg-color, 0)),
 	linear-gradient(rgba($ui-bg-color,0), $ui-bg-color 70%) 0 100%,
-	/// Shadows
+	// Shadows
 	radial-gradient(farthest-side at 50% 0, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)),
 	radial-gradient(farthest-side at 50% 100%, rgba($action-shadow-color, .4), rgba($action-shadow-color, 0)) 0 100%;
 	background-repeat: no-repeat;
@@ -3537,7 +3537,7 @@ title: Typography
 name: typography
 ---
 
-This is typography
+Type sizes are in relative units&nbsp;&mdashems. Default font face is Arial.
 
 ##Headings
 
@@ -3839,24 +3839,14 @@ Text on html5 input types
 </select>
 ```
 
-##Radio and checkboxes
+## Radios
 
 ```html_example
 <label for="Radio"><input type="radio" id="Radio">I am a radio</label>
 <label for="RadioDisbld"><input type="radio" id="RadioDisbld" disabled>I am a disabled radio</label>
 ```
 
-```html_example
-<label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
-<label for="ChecBoxkDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
-```
-
-```html_example
-<ul class="list-check-radio">
-   <li><label for="RadioDescr"><input type="radio" id="RadioDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
-   <li><label for="CheckBoxDescr"><input type="checkbox" id="CheckBoxDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
-</ul>
-```
+## Segmented Radio Controls
 
 ```html_example
 <p>
@@ -3864,6 +3854,22 @@ Text on html5 input types
    <li><input type="radio" id="RadioSegm1"><label for="RadioSegm1">Radio 1</label></li><li><input type="radio" id="RadioSegm2"><label for="RadioSegm2">Radio 2</label></li><li><input type="radio" id="RadioSegm3" disabled><label for="RadioSegm3">Radio 3</label></li>
 </ul>
 </p>
+```
+
+## Checkboxes
+
+```html_example
+<label for="CheckBox"><input type="checkbox" id="CheckBox">I am a checkbox</label>
+<label for="ChecBoxkDisbld"><input type="checkbox" id="CheckBoxDisbld" disabled>I am a disabled checkbox</label>
+```
+
+## Radio and Checkbox Lists
+
+```html_example
+<ul class="list-check-radio">
+   <li><label for="RadioDescr"><input type="radio" id="RadioDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
+   <li><label for="CheckBoxDescr"><input type="checkbox" id="CheckBoxDescr">Zabbix offers great performance for data gathering and can be scaled to very large environments. Distributed monitoring options are available with the use of Zabbix proxies. Zabbix comes with a web-based interface, secure user authentication and a flexible user permission schema.</label></li>
+</ul>
 ```
 */
 
