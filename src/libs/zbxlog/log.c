@@ -87,7 +87,7 @@ int	zabbix_decrease_log_level(void)
 }
 
 #ifndef _WINDOWS
-static void	redirect_stdio(const char *filename)
+void	zbx_redirect_stdio(const char *filename)
 {
 	int		fd;
 	const char	default_file[] = "/dev/null";
@@ -161,7 +161,7 @@ static void	rotate_log(const char *log_filename)
 		if (ZBX_MAX_UINT64 == old_size)
 		{
 			old_size = 0;
-			redirect_stdio(log_filename);
+			zbx_redirect_stdio(log_filename);
 		}
 #endif
 		return;
@@ -225,7 +225,7 @@ static void	rotate_log(const char *log_filename)
 	}
 #ifndef _WINDOWS
 	if (old_size > new_size)
-		redirect_stdio(log_filename);
+		zbx_redirect_stdio(log_filename);
 
 	old_size = new_size;
 #endif
