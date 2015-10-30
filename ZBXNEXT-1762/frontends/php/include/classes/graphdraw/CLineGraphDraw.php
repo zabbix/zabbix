@@ -1384,88 +1384,130 @@ class CLineGraphDraw extends CGraphDraw {
 		$mainIntervalX = $this->grid['horizontal']['main']['intervalx'];
 		$mainOffset = $this->grid['horizontal']['main']['offset'];
 
+		// Infinite loop checks.
 		if ($subInterval == $mainInterval || ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX))) {
 			return;
 		}
 
+		// Sub interval title size.
 		$element_size = imageTextSize(7, 90, 'WWW');
+
+		// Main interval title size.
 		$end_element_size = imageTextSize(8, 90, 'WWW');
+
 		$position = 0;
 		$i = 1;
 
 		while ($this->stime + $i * $subInterval + $subOffset < $this->to_time) {
 			$previous_time = isset($new_time) ? $new_time : $this->stime;
 
-			if ($subInterval == SEC_PER_YEAR) {
+			// Next step calculation by interval.
+			if ($subInterval == SEC_PER_YEAR * 10) {
+				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 10);
+			}
+			elseif ($subInterval == SEC_PER_YEAR * 5) {
+				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 5);
+			}
+			elseif ($subInterval == SEC_PER_YEAR * 3) {
+				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 3);
+			}
+			elseif ($subInterval == SEC_PER_YEAR * 2) {
+				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 2);
+			}
+			elseif ($subInterval == SEC_PER_YEAR) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 			}
 			elseif ($subInterval == SEC_PER_MONTH * 6) {
+				// First step calculation.
 				if ($i == 1) {
+					// If month > july, then set 1 january and + 1 year.
 					if (date('m', $this->stime) > 7) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
+					// Otherwise set july as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
 					}
 				}
+				// Other steps calculation.
 				else {
+					// If month = january, then set july.
 					if (date('m', $previous_time) == 1) {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
 					}
+					// Otherwise set 1 january and + 1 year.
 					else {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
 				}
 			}
 			elseif ($subInterval == SEC_PER_MONTH * 4) {
+				// First step calculation.
 				if ($i == 1) {
+					// If month > september, then set 1 january and + 1 year.
 					if (date('m', $this->stime) > 9) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
+					// If month > may, then set september.
 					elseif (date('m', $this->stime) > 5) {
 						$new_time = mktime(0, 0, 0, 9, 1, date('Y', $previous_time));
 					}
+					// Otherwise set may as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 5, 1, date('Y', $previous_time));
 					}
 				}
+				// Other steps calculation.
 				else {
+					// If month = september, then set 1 january and + 1 year.
 					if (date('m', $previous_time) == 9) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
+					// If month = may, then set september.
 					elseif (date('m', $previous_time) == 5) {
 						$new_time = mktime(0, 0, 0, 9, 1, date('Y', $previous_time));
 					}
+					// Otherwise set may as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 5, 1, date('Y', $previous_time));
 					}
 				}
 			}
 			elseif ($subInterval == SEC_PER_MONTH * 3) {
+				// First step calculation.
 				if ($i == 1) {
+					// If month > october, then set 1 january and + 1 year.
 					if (date('m', $this->stime) > 10) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
+					// If month > july, then set october.
 					elseif (date('m', $this->stime) > 7) {
 						$new_time = mktime(0, 0, 0, 10, 1, date('Y', $previous_time));
 					}
+					// If month > april, then set july.
 					elseif (date('m', $this->stime) > 4) {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
 					}
+					// Otherwise set april as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 4, 1, date('Y', $previous_time));
 					}
 				}
+				// Other steps calculation.
 				else {
+					// If month = october, then set 1 january and + 1 year.
 					if (date('m', $previous_time) == 10) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
+					// If month = july, then set october.
 					elseif (date('m', $previous_time) == 7) {
 						$new_time = mktime(0, 0, 0, 10, 1, date('Y', $previous_time));
 					}
+					// If month = april, then set july.
 					elseif (date('m', $previous_time) == 4) {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
 					}
+					// Otherwise set april as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 4, 1, date('Y', $previous_time));
 					}
@@ -1475,18 +1517,24 @@ class CLineGraphDraw extends CGraphDraw {
 				$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 			}
 			elseif ($subInterval == SEC_PER_DAY * 15) {
+				// First step calculation.
 				if ($i == 1) {
+					// If day > 15, then set 1 day and + 1 month.
 					if (date('d', $this->stime) > 15) {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 					}
+					// Otherwise set 15 day.
 					else {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time), 15, date('Y', $previous_time));
 					}
 				}
+				// Other steps calculation.
 				else {
+					// If day = 1, then day = 15.
 					if (date('d', $previous_time) == 1) {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time), 15, date('Y', $previous_time));
 					}
+					// Otherwise set 1 day and + 1 month.
 					else {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 					}
@@ -1502,7 +1550,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$position += $timeIntervalX;
 
-			// First element cheack.
+			// First element checks.
 			if (($i == 1 && $position < $element_size['width']) || $new_time >= $this->to_time) {
 				$i++;
 				continue;
