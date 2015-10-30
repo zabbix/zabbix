@@ -76,5 +76,5 @@ char		*strerror_from_module(unsigned long error, const wchar_t *module);
 void		zbx_redirect_stdio(const char *filename);
 #endif
 
-void		zbx_handle_log(const char *log_filename);
+void		zbx_handle_log(void);
 #endif

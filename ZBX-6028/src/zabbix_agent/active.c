@@ -38,7 +38,6 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-extern char		*CONFIG_LOG_FILE;
 
 #if defined(ZABBIX_SERVICE)
 #	include "service.h"
@@ -1587,7 +1586,7 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_handle_log(CONFIG_LOG_FILE);
+		zbx_handle_log();
 
 		if (time(NULL) >= nextsend)
 		{

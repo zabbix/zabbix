@@ -47,7 +47,6 @@ static int		lastsent = 0;
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-extern char		*CONFIG_LOG_FILE;
 
 /******************************************************************************
  *                                                                            *
@@ -225,7 +224,7 @@ ZBX_THREAD_ENTRY(watchdog_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log(CONFIG_LOG_FILE);
+		zbx_handle_log();
 
 		zbx_setproctitle("%s [pinging database]", get_process_type_string(process_type));
 

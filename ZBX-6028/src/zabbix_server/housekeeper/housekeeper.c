@@ -29,7 +29,6 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-extern char		*CONFIG_LOG_FILE;
 
 static int	hk_period;
 
@@ -834,7 +833,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		else
 			zbx_sleep_loop(sleeptime);
 
-		zbx_handle_log(CONFIG_LOG_FILE);
+		zbx_handle_log();
 
 		time_slept = zbx_time() - sec;
 

@@ -29,7 +29,6 @@
 extern int		CONFIG_CONFSYNCER_FREQUENCY;
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-extern char		*CONFIG_LOG_FILE;
 
 void	zbx_dbconfig_sigusr_handler(int flags)
 {
@@ -85,7 +84,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log(CONFIG_LOG_FILE);
+		zbx_handle_log();
 
 		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
 				get_process_type_string(process_type), sec);
