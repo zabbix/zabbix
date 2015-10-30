@@ -525,21 +525,37 @@ static void	lld_items_validate(zbx_uint64_t hostid, zbx_vector_ptr_t *items, cha
  *             out  - [OUT] the function data in string format                *
  *                                                                            *
  ******************************************************************************/
-void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
+static void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
 {
-	char		*exp, *tmp = *data, *e, *func, *key, *host = NULL;
-	size_t		exp_alloc = 128, exp_offset = 0, len;
+	char		*exp, *tmp, *e, *func, *key, *host = NULL;
+	size_t		exp_alloc = 128, exp_offset = 0, tmp_alloc = 128, tmp_offset = 0, len;
 	zbx_function_t	funcdata;
 	int		i;
 
 	exp = zbx_malloc(NULL, exp_alloc);
+	tmp = zbx_malloc(NULL, tmp_alloc);
 
-	for (e = tmp; '\0' != *e; e += len)
+	for (e = *data; '\0' != *e; e += len)
 	{
 		if (FAIL == zbx_function_parse(&funcdata, e, &len))
 		{
-			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, e, len);
+			zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, e, len);
 			continue;
+		}
+
+		if (0 != tmp_offset)
+		{
+			size_t	tmp_len;
+
+			substitute_discovery_macros(&tmp, jp_row);
+			tmp_len = strlen(tmp);
+
+			zbx_strncpy_alloc(&exp, &exp_alloc, &exp_offset, tmp, tmp_len);
+
+			if (++tmp_len > tmp_alloc)
+				tmp_alloc = tmp_len;
+
+			tmp_offset = 0;
 		}
 
 		if (0 < funcdata.nparam)
@@ -574,6 +590,14 @@ void	substitute_formula_macros(char **data, struct zbx_json_parse *jp_row)
 
 		zbx_function_clean(&funcdata);
 	}
+
+	if (0 != tmp_offset)
+	{
+		substitute_discovery_macros(&tmp, jp_row);
+		zbx_strcpy_alloc(&exp, &exp_alloc, &exp_offset, tmp);
+	}
+
+	zbx_free(tmp);
 
 	zbx_free(*data);
 	*data = exp;
