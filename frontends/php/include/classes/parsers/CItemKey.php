@@ -110,7 +110,7 @@ class CItemKey extends CParser {
 		$this->parameters = [];
 
 		for ($p = $offset; isset($data[$p]) && $this->isKeyChar($data[$p]); $p++) {
-			// "For" loop used to increment the value.
+			// Code is not missing here.
 		}
 
 		// is key empty?
@@ -136,7 +136,7 @@ class CItemKey extends CParser {
 			// numeric parameter or empty parameter
 			else {
 				for (; isset($data[$p]) && $data[$p] > '0' && $data[$p] < '9'; $p++) {
-					// "For" loop used to increment the value.
+					// Code is not missing here.
 				}
 			}
 

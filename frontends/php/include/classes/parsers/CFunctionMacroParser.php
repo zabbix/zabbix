@@ -103,7 +103,7 @@ class CFunctionMacroParser extends CParser {
 		// for instance, agent.ping.last(0)
 		if ($this->item_key_parser->getParamsNum() == 0 && isset($source[$p]) && $source[$p] == '(') {
 			for (; $p > $p2 && $source[$p] != '.'; $p--) {
-				// "For" loop used to increment the value.
+				// Code is not missing here.
 			}
 
 			if ($p == $p2) {
@@ -148,7 +148,7 @@ class CFunctionMacroParser extends CParser {
 		$p = $pos;
 
 		for (; isset($source[$p]) && $this->isHostChar($source[$p]); $p++) {
-			// "For" loop used to increment the value.
+			// Code is not missing here.
 		}
 
 		// is host empty?
