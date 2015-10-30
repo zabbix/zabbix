@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-if (hasRequest('action') && getRequest('action') == 'valuemap.export' && hasRequest('valuemapids')) {
+if (hasRequest('action') && getRequest('action') === 'valuemap.export' && hasRequest('valuemapids')) {
 	$page['file'] = 'zbx_export_valuemaps.xml';
 	$page['type'] = detect_page_type(PAGE_TYPE_XML);
 
@@ -50,8 +50,8 @@ $fields = [
 	'form_refresh' =>	[T_ZBX_INT, O_OPT,	null,			null,		null],
 	'action' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	IN('"valuemap.export","valuemap.massdelete"'), null],
 	// sort and sortorder
-	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),								null],
-	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
+	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
 check_fields($fields);
 
@@ -73,7 +73,7 @@ if (hasRequest('valuemapid')) {
  * Export
  */
 if ($export) {
-	$export = new CConfigurationExport(['valueMaps' => getRequest('valuemapids', [])]);
+	$export = new CConfigurationExport(['valueMaps' => getRequest('valuemapids')]);
 	$export->setBuilder(new CConfigurationExportBuilder());
 	$export->setWriter(CExportWriterFactory::getWriter(CExportWriterFactory::XML));
 
