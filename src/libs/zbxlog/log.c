@@ -233,7 +233,7 @@ static void	rotate_log(const char *log_filename)
 
 #ifndef _WINDOWS
 static sigset_t	orig_mask;
-static void	lock_log()
+static void	lock_log(void)
 {
 	sigset_t	mask;
 
@@ -247,7 +247,7 @@ static void	lock_log()
 	LOCK_LOG;
 }
 
-static void	unlock_log()
+static void	unlock_log(void)
 {
 	UNLOCK_LOG;
 
@@ -255,18 +255,18 @@ static void	unlock_log()
 		zbx_error("cannot restore sigprocmask");
 }
 #else
-static void	lock_log()
+static void	lock_log(void)
 {
 	LOCK_LOG;
 }
 
-static void	unlock_log()
+static void	unlock_log(void)
 {
 	UNLOCK_LOG;
 }
 #endif
 
-void	zbx_handle_log(const char *log_filename)
+void	zbx_handle_log(void)
 {
 	if (LOG_TYPE_FILE != log_type)
 		return;

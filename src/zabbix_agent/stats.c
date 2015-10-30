@@ -41,7 +41,6 @@ ZBX_COLLECTOR_DATA	*collector = NULL;
 
 extern unsigned char	process_type;
 extern int		server_num, process_num;
-extern char		*CONFIG_LOG_FILE;
 
 #ifndef _WINDOWS
 static int		shm_id;
@@ -442,7 +441,7 @@ ZBX_THREAD_ENTRY(collector_thread, args)
 
 	while (ZBX_IS_RUNNING())
 	{
-		zbx_handle_log(CONFIG_LOG_FILE);
+		zbx_handle_log();
 
 		zbx_setproctitle("collector [processing data]");
 #ifdef _WINDOWS

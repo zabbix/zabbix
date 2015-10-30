@@ -32,7 +32,6 @@
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-extern char		*CONFIG_LOG_FILE;
 
 /******************************************************************************
  *                                                                            *
@@ -158,7 +157,7 @@ ZBX_THREAD_ENTRY(datasender_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log(CONFIG_LOG_FILE);
+		zbx_handle_log();
 
 		zbx_setproctitle("%s [sent %d values in " ZBX_FS_DBL " sec, sending data]",
 				get_process_type_string(process_type), records, sec);

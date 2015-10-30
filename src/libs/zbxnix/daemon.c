@@ -363,7 +363,7 @@ int	daemon_start(int allow_root, const char *user)
 
 	umask(0002);
 
-	zbx_handle_log(CONFIG_LOG_FILE);
+	zbx_handle_log();
 
 	if (FAIL == create_pid_file(CONFIG_PID_FILE))
 		exit(EXIT_FAILURE);

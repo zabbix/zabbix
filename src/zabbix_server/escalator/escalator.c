@@ -62,7 +62,6 @@ DB_ACTION;
 
 extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
-extern char		*CONFIG_LOG_FILE;
 
 /******************************************************************************
  *                                                                            *
@@ -1688,7 +1687,7 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 	for (;;)
 	{
-		zbx_handle_log(CONFIG_LOG_FILE);
+		zbx_handle_log();
 
 		if (0 != sleeptime)
 		{
