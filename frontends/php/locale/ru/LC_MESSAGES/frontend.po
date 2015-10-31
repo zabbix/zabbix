@@ -2,9 +2,9 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:18+0200\n"
-"PO-Revision-Date: 2015-10-20 20:48+0300\n"
-"Last-Translator: Alexey <dotneft@gmail.com>\n"
+"POT-Creation-Date: 2015-11-01 00:19+0200\n"
+"PO-Revision-Date: 2015-10-28 12:05+0300\n"
+"Last-Translator: neogan <neogan74@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1445366905.0\n"
+"X-POOTLE-MTIME: 1446026700.0\n"
 
 #: include/classes/api/services/CMaintenance.php:376
 #: include/classes/api/services/CMaintenance.php:381
@@ -4521,7 +4521,7 @@ msgstr "Деактивировать выбранные веб-сценарии?
 #: include/views/monitoring.dashconf.php:41 popup_media.php:133
 #: tr_logform.php:343
 msgid "Disabled"
-msgstr "Деактивировано"
+msgstr "Деактивирован"
 
 #: adm.triggerseverities.php:65
 #: include/views/administration.general.triggerSeverity.edit.php:64
@@ -5149,7 +5149,7 @@ msgstr "Активировать выбранные веб-сценарии?"
 #: include/views/configuration.triggers.edit.php:262
 #: include/views/monitoring.dashconf.php:37 popup_media.php:132
 msgid "Enabled"
-msgstr "Активировано"
+msgstr "Активирован"
 
 #: include/locales.inc.php:52
 msgid "English (en_GB)"
