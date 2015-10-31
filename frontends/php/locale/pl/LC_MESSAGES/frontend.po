@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:18+0200\n"
+"POT-Creation-Date: 2015-11-01 00:13+0200\n"
 "PO-Revision-Date: 2015-01-19 20:15+0300\n"
 "Last-Translator: Paweł <pawel.seledec@zeto.olsztyn.pl>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -603,7 +603,7 @@ msgstr "Błąd aplikacji."
 msgid "Application updated"
 msgstr "Zaktualizowano aplikację"
 
-#: api/classes/CItemGeneral.php:343
+#: api/classes/CItemGeneral.php:349
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikacja o ID \"%1$s\" nie jest dostępna na \"%2$s\"."
@@ -1602,7 +1602,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Nie można znaleźć hosta \"%1$s\" użytego na ekranie \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:600 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -1780,7 +1780,7 @@ msgstr "Nie można ustawić \"templateid\" dla aplikacji \"%1$s\"."
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
 msgstr "Nie można ustawić \"templateid\" dla wykresu \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:223
+#: api/classes/CItemGeneral.php:229
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
 msgstr "Nie można ustawić \"templateid\" dla pozycji \"%1$s\"."
@@ -2100,7 +2100,7 @@ msgstr "Test już istnieje."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Proszę sprawdzić część wyrażenia zaczynającą się od \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:262
+#: api/classes/CItemGeneral.php:268
 msgid "Check the key, please. Default example was passed."
 msgstr "Proszę, sprawdź klucz. Wartość domyślna została podana."
 
@@ -4245,7 +4245,7 @@ msgstr "Błąd opisu: maksymalny czas odpowiedzi ze stałej ZBX_SCRIPT_TIMEOUT z
 msgid "Error description: empty response received."
 msgstr "Błąd opisu: otrzymano pustą odpowiedź."
 
-#: api/classes/CItemGeneral.php:267
+#: api/classes/CItemGeneral.php:273
 #, php-format
 msgid "Error in item key: \"%s\"."
 msgstr "Błąd w kluczu pozycji: \"%s\"."
@@ -6019,12 +6019,12 @@ msgstr "Błędne pola dla wyzwalacza."
 msgid "Incorrect file upload."
 msgstr "Błędne ładowanie pliku."
 
-#: api/classes/CItemGeneral.php:769
+#: api/classes/CItemGeneral.php:775
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Błędny elastyczny interwał \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:758
+#: api/classes/CItemGeneral.php:764
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Nieprawidłowy elastyczny interwał w pozycji \"%1$s\". Elastyczny interwał musi być ciągiem znaków."
@@ -6561,7 +6561,7 @@ msgstr "Włoski (it_IT)"
 msgid "Item"
 msgstr "Pozycja"
 
-#: api/classes/CItemGeneral.php:593
+#: api/classes/CItemGeneral.php:599
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Pozycja \"%1$s\" już istnieje w \"%2$s\", odziedziczona z innego szablonu."
@@ -6592,7 +6592,7 @@ msgstr "Pozycja \"%1$s\" w \"%2$s\": aplikacja \"%3$s\" nie istnieje."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Pominięto pozycję \"%1$s\" - reguła użytkownika."
 
-#: api/classes/CItemGeneral.php:335
+#: api/classes/CItemGeneral.php:341
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Pozycja \"%1$s:%2$s\" posiada nieprawidłowy port: \"%3$s\"."
@@ -6628,44 +6628,44 @@ msgstr "Prototypy pozycji"
 msgid "Item updated"
 msgstr "Zaktualizowano pozycję"
 
-#: api/classes/CItemGeneral.php:246
+#: api/classes/CItemGeneral.php:252
 msgid "Item uses host interface from non-parent host."
 msgstr "Pozycja wykorzystuje interfejs hosta z hosta, który nie jest nadrzędny."
 
-#: api/classes/CItemGeneral.php:249
+#: api/classes/CItemGeneral.php:255
 msgid "Item uses incorrect interface type."
 msgstr "Pozycja wykorzystuje niepoprawny typ interfejsu."
 
-#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
+#: api/classes/CItemGeneral.php:308 api/classes/CItemGeneral.php:318
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Pozycja nie zostanie odświeżona. Należy podać poprawny interwał aktualizacji."
 
-#: api/classes/CItemGeneral.php:386
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Pozycja z kluczem \"%1$s\" już istnieje w \"%2$s\" jako reguła wykrywania."
 
-#: api/classes/CItemGeneral.php:392
+#: api/classes/CItemGeneral.php:398
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Pozycja z kluczem \"%1$s\" już istnieje w \"%2$s\" jako pozycja utworzona z prototypu pozycji."
 
-#: api/classes/CItemGeneral.php:389
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Pozycja z kluczem \"%1$s\" już istnieje w \"%2$s\" jako prototyp pozycji."
 
-#: api/classes/CItemGeneral.php:383
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Pozycja z kluczem \"%1$s\" już istnieje w \"%2$s\" jako pozycja."
 
-#: api/classes/CItemGeneral.php:395
+#: api/classes/CItemGeneral.php:401
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Pozycja z kluczem \"%1$s\" już istnieje w \"%2$s\" jako nieznany element pozycji."
 
-#: api/classes/CItemGeneral.php:735
+#: api/classes/CItemGeneral.php:741
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Pozycja z kluczem \"%1$s\" już istnieje w \"%2$s\"."
@@ -6827,7 +6827,7 @@ msgstr "Pamiętaj trendy (w dniach)"
 msgid "Key"
 msgstr "Klucz"
 
-#: api/classes/CItemGeneral.php:277
+#: api/classes/CItemGeneral.php:283
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Klucz \"%1$s\" nie pasuje do wyrażenia <grpmax|grpmin|grpsum|grpavg>[\"grupa hostów\", \"klucz pozycji\", \"<last|min|max|avg|sum|count>\", \"parametr\"]."
@@ -8106,7 +8106,7 @@ msgstr "Nie określono typu uwierzytelniania dla polecenia operacji akcji \"%s\"
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Nie określono nazwy użytkownika do uwierzytelniania dla polecenia operacji akcji \"%s\"."
 
-#: api/classes/CItemGeneral.php:319
+#: api/classes/CItemGeneral.php:325
 msgid "No authentication user name specified."
 msgstr "Nie określono nazwy użytkownika do uwierzytelniania."
 
@@ -8312,7 +8312,7 @@ msgstr "Nie zdefiniowano żadnych obrazków."
 msgid "No interface found"
 msgstr "Nie znaleziono interfejsu"
 
-#: api/classes/CItemGeneral.php:243
+#: api/classes/CItemGeneral.php:249
 msgid "No interface found."
 msgstr "Nie znaleziono interfejsu."
 
@@ -8463,7 +8463,7 @@ msgstr "Brak uprawnień dla dostępu do systemu."
 #: api/classes/CHost.php:1298 api/classes/CHost.php:1330
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
-#: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
+#: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:222
 #: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:541
@@ -8489,7 +8489,7 @@ msgstr "Brak uprawnień do tego obiektu lub obiekt nie istnieje!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Nie określono pliku klucza prywatnego dla polecenia operacji akcji \"%s\"."
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:333
 msgid "No private key file specified."
 msgstr "Nie określono pliku klucza prywatnego."
 
@@ -8506,7 +8506,7 @@ msgstr "Bez proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Nie określono pliku klucza publicznego dla polecenia operacji akcji \"%s\"."
 
-#: api/classes/CItemGeneral.php:324
+#: api/classes/CItemGeneral.php:330
 msgid "No public key file specified."
 msgstr "Nie określono pliku klucza publicznego."
 
@@ -10327,7 +10327,7 @@ msgstr "Interfejsy SNMP"
 msgid "SNMP trap"
 msgstr "Pułapka SNMP"
 
-#: api/classes/CItemGeneral.php:285
+#: api/classes/CItemGeneral.php:291
 msgid "SNMP trap key is invalid."
 msgstr "Błędny klucz pułapki SNMP."
 
@@ -12193,11 +12193,11 @@ msgstr "Typ obliczeń"
 msgid "Type of information"
 msgstr "Typ informacji"
 
-#: api/classes/CItemGeneral.php:295
+#: api/classes/CItemGeneral.php:301
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Typem informacji dla klucza log musi być \"Log\"."
 
-#: api/classes/CItemGeneral.php:291
+#: api/classes/CItemGeneral.php:297
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Typem informacji dla pozycji agregowanych musi być \"Numerycznie (zmiennoprzecinkowo)\"."
 

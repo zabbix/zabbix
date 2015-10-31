@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:18+0200\n"
+"POT-Creation-Date: 2015-11-01 00:13+0200\n"
 "PO-Revision-Date: 2012-10-30 11:01+0200\n"
 "Last-Translator: busel7 <bonny.useful@gmail.com>\n"
 "Language-Team: none\n"
@@ -589,7 +589,7 @@ msgstr "Aplikasi bermasalah."
 msgid "Application updated"
 msgstr "Aplikasi telah diperbarui"
 
-#: api/classes/CItemGeneral.php:343
+#: api/classes/CItemGeneral.php:349
 #, php-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikasi dengan ID \"%1$s\" tidak tersedia pada \"%2$s\"."
@@ -1586,7 +1586,7 @@ msgid "Cannot find host \"%1$s\" used in screen \"%2$s\"."
 msgstr "Tidak dapat menemukan host \"%1$s\" yang digunakan pada layar \"%2$s\"."
 
 #: api/classes/CDiscoveryRule.php:964 api/classes/CDiscoveryRule.php:1036
-#: api/classes/CItemGeneral.php:594 include/items.inc.php:288
+#: api/classes/CItemGeneral.php:600 include/items.inc.php:288
 #: include/items.inc.php:344
 #, php-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -1760,7 +1760,7 @@ msgstr "Tidak dapat merubah \"templateid\" untuk aplikasi \"%1$s\"."
 msgid "Cannot set \"templateid\" for graph \"%1$s\"."
 msgstr "Tidak dapat merubah \"templateid\" untuk grafik \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:223
+#: api/classes/CItemGeneral.php:229
 #, php-format
 msgid "Cannot set \"templateid\" for item \"%1$s\"."
 msgstr "Tidak dapat merubah \"templateid\" untuk item \"%1$s\"."
@@ -2080,7 +2080,7 @@ msgstr "Pemeriksaan sudah ada."
 msgid "Check expression part starting from \"%1$s\"."
 msgstr "Pemeriksaan bagian ekspresi dimulai dari \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:262
+#: api/classes/CItemGeneral.php:268
 msgid "Check the key, please. Default example was passed."
 msgstr "Mohon periksa kunci. Contoh standar disahkan."
 
@@ -4221,7 +4221,7 @@ msgstr "Keterangan error: didefinisikan dalam \"include/defines.inc.php\" konsta
 msgid "Error description: empty response received."
 msgstr "Keterangan error: respon kosong diterima."
 
-#: api/classes/CItemGeneral.php:267
+#: api/classes/CItemGeneral.php:273
 #, php-format
 msgid "Error in item key: \"%s\"."
 msgstr "Error pada item key: \"%s\"."
@@ -5995,12 +5995,12 @@ msgstr "Kesalahan field untuk trigger."
 msgid "Incorrect file upload."
 msgstr "Kesalahan file upload."
 
-#: api/classes/CItemGeneral.php:769
+#: api/classes/CItemGeneral.php:775
 #, php-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Kesalahan interval flexible \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:758
+#: api/classes/CItemGeneral.php:764
 #, php-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Kesalahan interval fleksibel dalam item \"%1$s\". Interval fleksibel harus string."
@@ -6537,7 +6537,7 @@ msgstr "Italian (it_IT)"
 msgid "Item"
 msgstr "Item"
 
-#: api/classes/CItemGeneral.php:593
+#: api/classes/CItemGeneral.php:599
 #, php-format
 msgid "Item \"%1$s\" already exists on \"%2$s\", inherited from another template."
 msgstr "Item \"%1$s\" sudah ada di \"%2$s\", mewarisi dari template lain."
@@ -6568,7 +6568,7 @@ msgstr "Item \"%1$s\" pada \"%2$s\": aplikasi \"%3$s\" tidak ada."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Item \"%1$s\" diabaikan - aturan user."
 
-#: api/classes/CItemGeneral.php:335
+#: api/classes/CItemGeneral.php:341
 #, php-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Item \"\"%1$s:%2$s\" memiliki port yang salah: \"%3$s\"."
@@ -6604,44 +6604,44 @@ msgstr "Item prototipe dari"
 msgid "Item updated"
 msgstr "Item diperbarui"
 
-#: api/classes/CItemGeneral.php:246
+#: api/classes/CItemGeneral.php:252
 msgid "Item uses host interface from non-parent host."
 msgstr "Item menggunakan interface host dari yang bukan host induk."
 
-#: api/classes/CItemGeneral.php:249
+#: api/classes/CItemGeneral.php:255
 msgid "Item uses incorrect interface type."
 msgstr "Item menggunakan tipe inferface yang salah."
 
-#: api/classes/CItemGeneral.php:302 api/classes/CItemGeneral.php:312
+#: api/classes/CItemGeneral.php:308 api/classes/CItemGeneral.php:318
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Item tidak akan disegarkan. Mohon masukkan pembaruan interval yang benar."
 
-#: api/classes/CItemGeneral.php:386
+#: api/classes/CItemGeneral.php:392
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai aturan discovery."
 
-#: api/classes/CItemGeneral.php:392
+#: api/classes/CItemGeneral.php:398
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item yang dibuat dari protipe item."
 
-#: api/classes/CItemGeneral.php:389
+#: api/classes/CItemGeneral.php:395
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah prototipe item."
 
-#: api/classes/CItemGeneral.php:383
+#: api/classes/CItemGeneral.php:389
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai sebuah item."
 
-#: api/classes/CItemGeneral.php:395
+#: api/classes/CItemGeneral.php:401
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\" sebagai elemen item yang tidak diketahui."
 
-#: api/classes/CItemGeneral.php:735
+#: api/classes/CItemGeneral.php:741
 #, php-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item dengan key \"%1$s\" sudah ada pada \"%2$s\"."
@@ -6803,7 +6803,7 @@ msgstr "Simpan tren (dalam hari)"
 msgid "Key"
 msgstr "Kunci"
 
-#: api/classes/CItemGeneral.php:277
+#: api/classes/CItemGeneral.php:283
 #, php-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Kunci \"%1$s\" tidak cocok <grpmax|grpmin|grpsum|grpavg>[\"Grup host\", \"Kunci item\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -8074,7 +8074,7 @@ msgstr "Tidak ada tipe otentikasi yang spesifik untuk aksi operasi perintah \"%s
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Tidak ada otentikasi nama user yang spesifik untuk aksi operasi perintah \"%s\"."
 
-#: api/classes/CItemGeneral.php:319
+#: api/classes/CItemGeneral.php:325
 msgid "No authentication user name specified."
 msgstr "Tidak ada otentikasi nama user yang spesifik."
 
@@ -8280,7 +8280,7 @@ msgstr "Tidak ada gambar yang didefinisikan."
 msgid "No interface found"
 msgstr "Tidak ada interface yang ditemukan"
 
-#: api/classes/CItemGeneral.php:243
+#: api/classes/CItemGeneral.php:249
 msgid "No interface found."
 msgstr "Tidak ada interface yang ditemukan."
 
@@ -8431,7 +8431,7 @@ msgstr "Tidak ada izin untuk akses sistem."
 #: api/classes/CHost.php:1298 api/classes/CHost.php:1330
 #: api/classes/CIconMap.php:412 api/classes/CImage.php:290
 #: api/classes/CImage.php:405 api/classes/CImage.php:514
-#: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:216
+#: api/classes/CItemGeneral.php:179 api/classes/CItemGeneral.php:222
 #: api/classes/CItem.php:947 api/classes/CItemPrototype.php:726
 #: api/classes/CMaintenance.php:391 api/classes/CMaintenance.php:416
 #: api/classes/CMaintenance.php:429 api/classes/CMaintenance.php:541
@@ -8457,7 +8457,7 @@ msgstr "Tidak ada izin untuk objek yang dirujuk atau objek tidak ada!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
 
-#: api/classes/CItemGeneral.php:327
+#: api/classes/CItemGeneral.php:333
 msgid "No private key file specified."
 msgstr "Tidak ada file kunci pribadi yang dispesifikasikan."
 
@@ -8474,7 +8474,7 @@ msgstr "Tidak ada proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Tidak ada file kunci pribadi yang dispesifikasikan untuk aksi operasi perintah \"%s\"."
 
-#: api/classes/CItemGeneral.php:324
+#: api/classes/CItemGeneral.php:330
 msgid "No public key file specified."
 msgstr "Tidak file kunci publik yang dispesifikasikan."
 
@@ -10293,7 +10293,7 @@ msgstr "Interface SNMP"
 msgid "SNMP trap"
 msgstr "Jebakan SNMP"
 
-#: api/classes/CItemGeneral.php:285
+#: api/classes/CItemGeneral.php:291
 msgid "SNMP trap key is invalid."
 msgstr "Kunci jebakan SNMP tidak sah."
 
@@ -12153,11 +12153,11 @@ msgstr "Tipe kalkulasi"
 msgid "Type of information"
 msgstr "Tipe informasi"
 
-#: api/classes/CItemGeneral.php:295
+#: api/classes/CItemGeneral.php:301
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Tipe informasi harus berupa \"Log\" untuk kunci log."
 
-#: api/classes/CItemGeneral.php:291
+#: api/classes/CItemGeneral.php:297
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Tipe informasi harus berupa \"Numerik (float)\" untuk item yang diagregasi."
 
