@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:33+0200\n"
+"POT-Creation-Date: 2015-11-01 00:18+0200\n"
 "PO-Revision-Date: 2014-09-08 07:23+0300\n"
 "Last-Translator: Oleksiy <zalex_ua@i.ua>\n"
 "Language-Team: Zabbix translation team\n"
@@ -748,7 +748,7 @@ msgstr "Помилка програми."
 msgid "Application updated"
 msgstr "Групу елементів даних оновлено"
 
-#: include/classes/api/services/CItemGeneral.php:405
+#: include/classes/api/services/CItemGeneral.php:411
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Група елементів даних з ID \"%1$s\" недоступна для \"%2$s\"."
@@ -2357,7 +2357,7 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:242
+#: include/classes/api/services/CItemGeneral.php:248
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
@@ -2814,7 +2814,7 @@ msgstr ""
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:282
+#: include/classes/api/services/CItemGeneral.php:288
 msgid "Check the key, please. Default example was passed."
 msgstr "Будь ласка, перевірте ключ. Приклад по замовчуванню показано."
 
@@ -7321,7 +7321,7 @@ msgstr "Некоректні параметри передано методу."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:386
+#: include/classes/api/services/CItemGeneral.php:392
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
@@ -7446,12 +7446,12 @@ msgstr ""
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:846
+#: include/classes/api/services/CItemGeneral.php:852
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Некоректний гнучкий інтервал \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:835
+#: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Некоректний гнучкий інтервал в елементі даних \"%1$s\". Гнучкий інтервал має бути рядком."
@@ -7692,7 +7692,7 @@ msgstr "Некоректний діапазон портів."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:395
+#: include/classes/api/services/CItemGeneral.php:401
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
@@ -8270,7 +8270,7 @@ msgstr "Елемент даних \"%1$s\" в \"%2$s\": група елемен�
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент даних \"%1$s\" пропущено - правило користувача."
 
-#: include/classes/api/services/CItemGeneral.php:377
+#: include/classes/api/services/CItemGeneral.php:383
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент даних \"%1$s:%2$s\" має неправильний порт: \"%3$s\"."
@@ -8376,11 +8376,11 @@ msgstr "Прототипи елементів даних для"
 msgid "Item updated"
 msgstr "Елемент оновлено"
 
-#: include/classes/api/services/CItemGeneral.php:266
+#: include/classes/api/services/CItemGeneral.php:272
 msgid "Item uses host interface from non-parent host."
 msgstr "Елемент даних використовує інтерфейс не від батьківського вузла мережі."
 
-#: include/classes/api/services/CItemGeneral.php:269
+#: include/classes/api/services/CItemGeneral.php:275
 msgid "Item uses incorrect interface type."
 msgstr "Елемент даних використовує некоректний тип інтерфейсу."
 
@@ -8388,37 +8388,37 @@ msgstr "Елемент даних використовує некоректни�
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:326
-#: include/classes/api/services/CItemGeneral.php:334
+#: include/classes/api/services/CItemGeneral.php:332
+#: include/classes/api/services/CItemGeneral.php:340
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемент не було оновлено. Будь ласка введіть коректний інтервал оновлення."
 
-#: include/classes/api/services/CItemGeneral.php:448
+#: include/classes/api/services/CItemGeneral.php:454
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\" як правило виявлення."
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\" як елемент даних створений з прототипу елемента даних."
 
-#: include/classes/api/services/CItemGeneral.php:451
+#: include/classes/api/services/CItemGeneral.php:457
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\" як прототип елемента даних."
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\" як елемент даних."
 
-#: include/classes/api/services/CItemGeneral.php:457
+#: include/classes/api/services/CItemGeneral.php:463
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\" як невідомий елемент даних."
 
-#: include/classes/api/services/CItemGeneral.php:812
+#: include/classes/api/services/CItemGeneral.php:818
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Елемент даних з ключем \"%1$s\" вже існує в \"%2$s\"."
@@ -8559,7 +8559,7 @@ msgstr "Період збереження втрачених ресурсів (�
 msgid "Key"
 msgstr "Ключ"
 
-#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:312
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не співпадає з <grpmax|grpmin|grpsum|grpavg>[\"Група вузлів мережі\", \"Ключ елемента даних\", \"<last|min|max|avg|sum|count>\", \"параметр\"]."
@@ -9957,11 +9957,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:365
+#: include/classes/api/services/CItemGeneral.php:371
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:371
+#: include/classes/api/services/CItemGeneral.php:377
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -10026,7 +10026,7 @@ msgstr "Не вказано тип аутентифікації для кома�
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Не вказано імені користувача аутентифікації для команди \"%s\" в операції дії."
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "No authentication user name specified."
 msgstr "Для аутентифікації не вказано ім'я користувача."
 
@@ -10238,7 +10238,7 @@ msgstr ""
 msgid "No interface found"
 msgstr "Інтерфейсу не знайдено"
 
-#: include/classes/api/services/CItemGeneral.php:263
+#: include/classes/api/services/CItemGeneral.php:269
 msgid "No interface found."
 msgstr "Інтерфейсу не знайдено."
 
@@ -10435,7 +10435,7 @@ msgstr "Немає прав доступу до системи."
 #: include/classes/api/services/CImage.php:533
 #: include/classes/api/services/CImage.php:551
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:234
+#: include/classes/api/services/CItemGeneral.php:240
 #: include/classes/api/services/CItem.php:635
 #: include/classes/api/services/CItemPrototype.php:474
 #: include/classes/api/services/CMaintenance.php:290
@@ -10487,7 +10487,7 @@ msgstr "Немає прав доступу до запитуваного об'є
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не вказано файл приватного ключа для команди \"%s\" в операції дії."
 
-#: include/classes/api/services/CItemGeneral.php:350
+#: include/classes/api/services/CItemGeneral.php:356
 msgid "No private key file specified."
 msgstr "Файл приватного ключа не вказано."
 
@@ -10504,7 +10504,7 @@ msgstr "Без проксі"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не вказано файл публічного ключа для команди \"%s\" в операції дії."
 
-#: include/classes/api/services/CItemGeneral.php:347
+#: include/classes/api/services/CItemGeneral.php:353
 msgid "No public key file specified."
 msgstr "Файл публічного ключа не вказано."
 
@@ -12520,7 +12520,7 @@ msgstr "SNMP інтерфейси"
 msgid "SNMP trap"
 msgstr "SNMP трап"
 
-#: include/classes/api/services/CItemGeneral.php:359
+#: include/classes/api/services/CItemGeneral.php:365
 msgid "SNMP trap key is invalid."
 msgstr "Ключ SNMP trap помилковий."
 
@@ -14564,11 +14564,11 @@ msgstr "Тип калькуляції"
 msgid "Type of information"
 msgstr "Тип інформації"
 
-#: include/classes/api/services/CItemGeneral.php:319
+#: include/classes/api/services/CItemGeneral.php:325
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Тип інформації повинен бути \"Журнал (лог)\" для ключа журналу."
 
-#: include/classes/api/services/CItemGeneral.php:314
+#: include/classes/api/services/CItemGeneral.php:320
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Тип інформації повинен бути \"Числовий (дробове)\" для агрегованих елементів даних."
 

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:33+0200\n"
+"POT-Creation-Date: 2015-11-01 00:18+0200\n"
 "PO-Revision-Date: 2015-09-17 09:23+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -721,7 +721,7 @@ msgstr "Erreur application."
 msgid "Application updated"
 msgstr "Application modifiée"
 
-#: include/classes/api/services/CItemGeneral.php:405
+#: include/classes/api/services/CItemGeneral.php:411
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "L'application avec l'ID \"%1$s\" n'est pas disponible sur \"%2$s\"."
@@ -2263,7 +2263,7 @@ msgstr "Impossible d'envoyer une commande, veuillez vérifier la connexion avec 
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:242
+#: include/classes/api/services/CItemGeneral.php:248
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Impossible de configurer \"%1$s\" pour l'élément \"%2$s\"."
@@ -2721,7 +2721,7 @@ msgstr "Vérifie la performance du service \"service\". 0 - le service est arrê
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr "Vérifie l'accessibilité de l'agent. Retourne toujours 1. Peut être utilisé comme ping TCP."
 
-#: include/classes/api/services/CItemGeneral.php:282
+#: include/classes/api/services/CItemGeneral.php:288
 msgid "Check the key, please. Default example was passed."
 msgstr "Veuillez vérifier la clé. L'exemple par défaut a été utilisé."
 
@@ -7206,7 +7206,7 @@ msgstr "Arguments incorrects passés à la méthode."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Protocole d'authentification incorrect pour la règle de découverte \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:386
+#: include/classes/api/services/CItemGeneral.php:392
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Protocole d'authentification incorrect pour l'élément \"%1$s\"."
@@ -7331,12 +7331,12 @@ msgstr ""
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:846
+#: include/classes/api/services/CItemGeneral.php:852
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Intervalle flexible \"%1$s\" incorrect."
 
-#: include/classes/api/services/CItemGeneral.php:835
+#: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Intervalle flexible dans l'élément \"%1$s\" incorrect. L'intervalle flexiblet doit être une chaîne."
@@ -7577,7 +7577,7 @@ msgstr "Intervalle de ports incorrect."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Protocole de sécurité incorrect pour la règle de découverte \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:395
+#: include/classes/api/services/CItemGeneral.php:401
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Protocole de sécurité incorrect pour l'élément \"%1$s\"."
@@ -8155,7 +8155,7 @@ msgstr "Élément \"%1$s\" sur \"%2$s\" : l'application \"%3$s\" n'existe pas."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Élément \"%1$s\" sauté - règle utilisateur."
 
-#: include/classes/api/services/CItemGeneral.php:377
+#: include/classes/api/services/CItemGeneral.php:383
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "L'élément \"%1$s:%2$s\" a un port invalide : \"%3$s\"."
@@ -8253,11 +8253,11 @@ msgstr "Prototypes d'éléments de"
 msgid "Item updated"
 msgstr "Élément mis à jour"
 
-#: include/classes/api/services/CItemGeneral.php:266
+#: include/classes/api/services/CItemGeneral.php:272
 msgid "Item uses host interface from non-parent host."
 msgstr "L'élément utilise une interface d'un hôte non-parent."
 
-#: include/classes/api/services/CItemGeneral.php:269
+#: include/classes/api/services/CItemGeneral.php:275
 msgid "Item uses incorrect interface type."
 msgstr "L'élément utilise un type d'interface incorrect."
 
@@ -8265,37 +8265,37 @@ msgstr "L'élément utilise un type d'interface incorrect."
 msgid "Item values"
 msgstr "Valeurs de l'élément"
 
-#: include/classes/api/services/CItemGeneral.php:326
-#: include/classes/api/services/CItemGeneral.php:334
+#: include/classes/api/services/CItemGeneral.php:332
+#: include/classes/api/services/CItemGeneral.php:340
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "L'élément ne sera pas rafraichi. Veuillez saisir une période de mise à jour valide."
 
-#: include/classes/api/services/CItemGeneral.php:448
+#: include/classes/api/services/CItemGeneral.php:454
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme règle de découverte."
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément créé d'un prototype d'élément."
 
-#: include/classes/api/services/CItemGeneral.php:451
+#: include/classes/api/services/CItemGeneral.php:457
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme prototype d'élément."
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément."
 
-#: include/classes/api/services/CItemGeneral.php:457
+#: include/classes/api/services/CItemGeneral.php:463
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\" comme élément inconnu."
 
-#: include/classes/api/services/CItemGeneral.php:812
+#: include/classes/api/services/CItemGeneral.php:818
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Un élément avec la clé \"%1$s\" existe déjà sur \"%2$s\"."
@@ -8436,7 +8436,7 @@ msgstr "Période de conservation des ressources perdues (en jours)"
 msgid "Key"
 msgstr "Clé"
 
-#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:312
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "La clé \"%1$s\" ne correspond pas à <grpmax|grpmin|grpsum|grpavg>[\"Groupe(s) d'hôtes\", \"Clé\", \"<last|min|max|avg|sum|count>\", \"paramètre\"]."
@@ -9822,11 +9822,11 @@ msgstr "Aucun service trouvé."
 msgid "No JMX interfaces found."
 msgstr "Aucune interface JMX trouvée."
 
-#: include/classes/api/services/CItemGeneral.php:365
+#: include/classes/api/services/CItemGeneral.php:371
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:371
+#: include/classes/api/services/CItemGeneral.php:377
 msgid "No SNMP community specified."
 msgstr "Aucune communauté SNMP spécifiée."
 
@@ -9891,7 +9891,7 @@ msgstr "Aucun type d'authentification spécifiée pour la commande d'opération 
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Aucun nom d'utilisateur d'authentification spécifié pour la commande d'opération d'action \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "No authentication user name specified."
 msgstr "Aucun nom d'utilisateur d'authentification spécifié."
 
@@ -10103,7 +10103,7 @@ msgstr "Aucune image trouvée."
 msgid "No interface found"
 msgstr "Aucune interface trouvée"
 
-#: include/classes/api/services/CItemGeneral.php:263
+#: include/classes/api/services/CItemGeneral.php:269
 msgid "No interface found."
 msgstr "Aucune interface trouvée."
 
@@ -10300,7 +10300,7 @@ msgstr "Aucune permission pour l'accès au système."
 #: include/classes/api/services/CImage.php:533
 #: include/classes/api/services/CImage.php:551
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:234
+#: include/classes/api/services/CItemGeneral.php:240
 #: include/classes/api/services/CItem.php:635
 #: include/classes/api/services/CItemPrototype.php:474
 #: include/classes/api/services/CMaintenance.php:290
@@ -10352,7 +10352,7 @@ msgstr "Aucune permission pour l'objet appelé ou il n'existe pas !"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Aucun fichier de clé privée spécifié pour la commande d'opération d'action \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:350
+#: include/classes/api/services/CItemGeneral.php:356
 msgid "No private key file specified."
 msgstr "Aucun fichier de clé privée spécifié."
 
@@ -10369,7 +10369,7 @@ msgstr "Aucun proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Aucun fichier de clé publique spécifié pour la commande d'opération d'action \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:347
+#: include/classes/api/services/CItemGeneral.php:353
 msgid "No public key file specified."
 msgstr "Aucun fichier de clé publique spécifié."
 
@@ -12383,7 +12383,7 @@ msgstr "Interfaces SNMP"
 msgid "SNMP trap"
 msgstr "Trap SNMP"
 
-#: include/classes/api/services/CItemGeneral.php:359
+#: include/classes/api/services/CItemGeneral.php:365
 msgid "SNMP trap key is invalid."
 msgstr "La clé du trap SNMP est invalide."
 
@@ -14409,11 +14409,11 @@ msgstr "Type de calcul"
 msgid "Type of information"
 msgstr "Type d'information"
 
-#: include/classes/api/services/CItemGeneral.php:319
+#: include/classes/api/services/CItemGeneral.php:325
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Le type d'information doit être \"Journal\" pour une clé journal."
 
-#: include/classes/api/services/CItemGeneral.php:314
+#: include/classes/api/services/CItemGeneral.php:320
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Le type d'information doit être \"Numérique (flottant)\" pour les éléments agrégés."
 

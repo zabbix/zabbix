@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:33+0200\n"
+"POT-Creation-Date: 2015-11-01 00:18+0200\n"
 "PO-Revision-Date: 2013-01-12 23:52+0300\n"
 "Last-Translator: Fahri <fahri_hasan@hotmail.com>\n"
 "Language-Team: \n"
@@ -722,7 +722,7 @@ msgstr "Грешка в приложението."
 msgid "Application updated"
 msgstr "Приложение актуализирано"
 
-#: include/classes/api/services/CItemGeneral.php:405
+#: include/classes/api/services/CItemGeneral.php:411
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Приложение с ID \"%1$s\" не е налично за \"%2$s\"."
@@ -2273,7 +2273,7 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:242
+#: include/classes/api/services/CItemGeneral.php:248
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
@@ -2731,7 +2731,7 @@ msgstr ""
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:282
+#: include/classes/api/services/CItemGeneral.php:288
 msgid "Check the key, please. Default example was passed."
 msgstr "Моля, проверете ключа. Пример показва по подразбиране."
 
@@ -7228,7 +7228,7 @@ msgstr "Подадени са неправилни аргументи за ме�
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Неправилен протокол за автентификация на правило за откриването \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:386
+#: include/classes/api/services/CItemGeneral.php:392
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Неправилен протокол за автентификация за елемент на данните \"%1$s\"."
@@ -7353,12 +7353,12 @@ msgstr ""
 msgid "Incorrect filter condition type for action \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:846
+#: include/classes/api/services/CItemGeneral.php:852
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Неправилен променлив интервал \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:835
+#: include/classes/api/services/CItemGeneral.php:841
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Неправилен променлив интервал в елемент на данните \"%1$s\". Променливият интервал трябва да бъде низ."
@@ -7599,7 +7599,7 @@ msgstr "Неправилен диапазон от портовете."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Неправилен протокол за поверителност на правило за откриване \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:395
+#: include/classes/api/services/CItemGeneral.php:401
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Неправилен протокол за поверителност за елемент на данните \"%1$s\"."
@@ -8177,7 +8177,7 @@ msgstr "Елемент на данните \"%1$s\" в \"%2$s\": приложе�
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Елемент на данните \"%1$s\" пропуска - потребителското правило."
 
-#: include/classes/api/services/CItemGeneral.php:377
+#: include/classes/api/services/CItemGeneral.php:383
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Елемент на данните \"%1$s:%2$s\" има невалиден порт: \"%3$s\"."
@@ -8275,11 +8275,11 @@ msgstr "Елемент на данните прототип за"
 msgid "Item updated"
 msgstr "Елемент на данните актуализиран"
 
-#: include/classes/api/services/CItemGeneral.php:266
+#: include/classes/api/services/CItemGeneral.php:272
 msgid "Item uses host interface from non-parent host."
 msgstr "Елемент на данните използва интерфейс от не родителски хост."
 
-#: include/classes/api/services/CItemGeneral.php:269
+#: include/classes/api/services/CItemGeneral.php:275
 msgid "Item uses incorrect interface type."
 msgstr "Елемент на данните използва невалиден тип интерфейс."
 
@@ -8287,37 +8287,37 @@ msgstr "Елемент на данните използва невалиден �
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:326
-#: include/classes/api/services/CItemGeneral.php:334
+#: include/classes/api/services/CItemGeneral.php:332
+#: include/classes/api/services/CItemGeneral.php:340
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Елемента на данните не се обновява. Моля, въведете правилния интервал за актуализация."
 
-#: include/classes/api/services/CItemGeneral.php:448
+#: include/classes/api/services/CItemGeneral.php:454
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като правило за откриване."
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните създаден в елемент на данните прототип."
 
-#: include/classes/api/services/CItemGeneral.php:451
+#: include/classes/api/services/CItemGeneral.php:457
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните прототип."
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като елемент на данните."
 
-#: include/classes/api/services/CItemGeneral.php:457
+#: include/classes/api/services/CItemGeneral.php:463
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\" като неизвестен елемент на данните."
 
-#: include/classes/api/services/CItemGeneral.php:812
+#: include/classes/api/services/CItemGeneral.php:818
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Ключ от елемент на данните \"%1$s\" вече съществува в \"%2$s\"."
@@ -8458,7 +8458,7 @@ msgstr "Период на пазене на загубените ресурси 
 msgid "Key"
 msgstr "Ключ"
 
-#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:312
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не съвпада с <grpmax|grpmin|grpsum|grpavg>[\"Хост група(и)\", \"Ключ елемент на данните\", \"<last|min|max|avg|sum|count>\", \"параметри\"]."
@@ -9848,11 +9848,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:365
+#: include/classes/api/services/CItemGeneral.php:371
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:371
+#: include/classes/api/services/CItemGeneral.php:377
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9917,7 +9917,7 @@ msgstr "В операция на действие за команда \"%s\" н�
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "В операция на действие за команда \"%s\" не е уточнено потребителското име за автентификация."
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "No authentication user name specified."
 msgstr "Не е уточнено потребителското име за автентификация."
 
@@ -10129,7 +10129,7 @@ msgstr ""
 msgid "No interface found"
 msgstr "Не е открит интерфейс"
 
-#: include/classes/api/services/CItemGeneral.php:263
+#: include/classes/api/services/CItemGeneral.php:269
 msgid "No interface found."
 msgstr "Не е открит интерфейс."
 
@@ -10326,7 +10326,7 @@ msgstr "Нямате право на достъп до системата."
 #: include/classes/api/services/CImage.php:533
 #: include/classes/api/services/CImage.php:551
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:234
+#: include/classes/api/services/CItemGeneral.php:240
 #: include/classes/api/services/CItem.php:635
 #: include/classes/api/services/CItemPrototype.php:474
 #: include/classes/api/services/CMaintenance.php:290
@@ -10378,7 +10378,7 @@ msgstr "Нямате право на достъп до посочения обе
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не е уточнен файла с личен ключ за команда \"%s\" в операция на действие."
 
-#: include/classes/api/services/CItemGeneral.php:350
+#: include/classes/api/services/CItemGeneral.php:356
 msgid "No private key file specified."
 msgstr "Не е уточнен файла с личен ключ."
 
@@ -10395,7 +10395,7 @@ msgstr "Няма прокси"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не е уточнен файла с обществен ключ за команда \"%s\" в операция на действие."
 
-#: include/classes/api/services/CItemGeneral.php:347
+#: include/classes/api/services/CItemGeneral.php:353
 msgid "No public key file specified."
 msgstr "Не е уточнен файла с обществен ключ."
 
@@ -12415,7 +12415,7 @@ msgstr "SNMP интерфейс"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: include/classes/api/services/CItemGeneral.php:359
+#: include/classes/api/services/CItemGeneral.php:365
 msgid "SNMP trap key is invalid."
 msgstr "Ключа за SNMP trap е невалиден."
 
@@ -14442,11 +14442,11 @@ msgstr "Тип на изчислението"
 msgid "Type of information"
 msgstr "Тип на информацията"
 
-#: include/classes/api/services/CItemGeneral.php:319
+#: include/classes/api/services/CItemGeneral.php:325
 msgid "Type of information must be \"Log\" for log key."
 msgstr "За ключ на дневника (лога) типа на информацията трябва да бъде \"Дневник (лог)\"."
 
-#: include/classes/api/services/CItemGeneral.php:314
+#: include/classes/api/services/CItemGeneral.php:320
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "За обобщаване елентите на данните типа на информацията трябва да бъде \"Числен (с плаваща точка)\"."
 
