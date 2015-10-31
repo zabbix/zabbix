@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:21+0200\n"
-"PO-Revision-Date: 2015-09-17 14:24+0300\n"
+"POT-Creation-Date: 2015-11-01 00:35+0200\n"
+"PO-Revision-Date: 2015-10-29 18:03+0300\n"
 "Last-Translator: Adail <the.spaww@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1442492659.0\n"
+"X-POOTLE-MTIME: 1446134587.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -359,11 +359,11 @@ msgstr[1] "Ações desativadas"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
-msgstr ""
+msgstr "Ação desabilitada pela exclusão de grupo de usuários."
 
 #: include/classes/api/services/CUser.php:1351
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "Ação desativada pela exclusão de usuário."
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -589,7 +589,7 @@ msgstr "Verificação de disponibilidade do agente. Se retornar nulo - indispon�
 
 #: include/views/configuration.host.list.php:70
 msgid "Agent encryption"
-msgstr ""
+msgstr "Criptografia do agente"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
@@ -854,7 +854,7 @@ msgstr "No mínimo um período de manutenção deve ser definido."
 #: include/classes/api/services/CValueMap.php:488
 #, c-format
 msgid "At least one mapping should be given for value map \"%1$s\"."
-msgstr ""
+msgstr "No mínimo um mapeamento de valor deverá ser informado no mapa \"%1$s\"."
 
 #: include/classes/setup/CFrontendSetup.php:249
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1107,7 +1107,7 @@ msgstr "Por trigger template"
 #: include/views/configuration.host.list.php:197
 #: include/views/configuration.host.list.php:211
 msgid "CERT"
-msgstr ""
+msgstr "CERT"
 
 #: triggers.php:376
 msgid "CONFIGURATION OF TRIGGERS"
@@ -2375,7 +2375,7 @@ msgstr "Host não foi atualizado"
 
 #: include/classes/api/services/CHost.php:802
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
-msgstr ""
+msgstr "Não foi possível atualizar as configurações de criptografia do host. As configurações de conexão em ambas as direções deverá ser especificada."
 
 #: host_prototypes.php:193
 msgid "Cannot update host prototype"
@@ -2534,7 +2534,7 @@ msgstr "Centro"
 #: include/views/configuration.host.prototype.edit.php:356
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Certificate"
-msgstr ""
+msgstr "Certificado"
 
 #: include/classes/screens/CScreenBase.php:267
 #: include/classes/screens/CScreenBuilder.php:465
@@ -2826,7 +2826,7 @@ msgstr "Comercial"
 
 #: include/classes/api/services/CAction.php:1837
 msgid "Comparing several triggers with \"and\" is not allowed."
-msgstr ""
+msgstr "Comparação de diversas triggers com o operador \"and\" não é permitido."
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
@@ -3107,24 +3107,24 @@ msgstr ""
 
 #: include/views/configuration.host.massupdate.php:372
 msgid "Connections"
-msgstr ""
+msgstr "Conexões"
 
 #: include/views/configuration.host.edit.php:774
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:360
 msgid "Connections from host"
-msgstr ""
+msgstr "Conexões do host"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
-msgstr ""
+msgstr "Conexões do proxy"
 
 #: app/views/administration.proxy.edit.php:97
 #: include/views/configuration.host.edit.php:766
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:352
 msgid "Connections to host"
-msgstr ""
+msgstr "Conexões para o host"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3418,7 +3418,7 @@ msgstr "Gráficos personalizados"
 #: include/views/configuration.item.massupdate.php:372
 #: include/views/configuration.item.prototype.edit.php:311
 msgid "Custom intervals"
-msgstr ""
+msgstr "Intervalo customizado"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
@@ -4625,7 +4625,7 @@ msgstr "Lembrete de seleção na caixa suspensa \"%1$s\"."
 #: include/classes/api/services/CMediatype.php:450
 #, c-format
 msgid "Duplicate \"description\" value \"%1$s\" for media type."
-msgstr ""
+msgstr "Valor duplicado no campo \"descrição\" do tipo de mídia \"%1$s\"."
 
 #: include/classes/api/services/CItemPrototype.php:316
 #, c-format
@@ -4636,7 +4636,7 @@ msgstr "O protótipo de aplicação \"%1$s\" aplicado ao protótipo de item \"%2
 #: include/classes/api/services/CValueMap.php:437
 #, c-format
 msgid "Duplicate \"name\" value \"%1$s\" for value map."
-msgstr ""
+msgstr "O nome \"%1$s\" está duplicado no mapeamento de valores."
 
 #: include/classes/api/services/CTrigger.php:1479
 #, c-format
@@ -4678,7 +4678,7 @@ msgstr "Nome duplicado para o mapa: \"%s\"."
 #: include/classes/api/services/CValueMap.php:524
 #, c-format
 msgid "Duplicate mapping value \"%1$s\" for value map \"%2$s\"."
-msgstr ""
+msgstr "O mapeamento de valor \"%1$s\" está duplicado no mapeamento de valores \"%2$s\"."
 
 #: include/profiles.inc.php:91
 #, c-format
@@ -4863,7 +4863,7 @@ msgstr "Macro nula."
 
 #: include/classes/api/services/CMediatype.php:386
 msgid "Empty media type ID."
-msgstr ""
+msgstr "O ID do tipo de mídia está ausente."
 
 #: include/classes/api/services/CHostPrototype.php:222
 msgid "Empty name for group prototype."
@@ -4886,7 +4886,7 @@ msgstr "Nome nulo."
 #: include/classes/api/services/CValueMap.php:516
 #, c-format
 msgid "Empty new value in value map \"%1$s\"."
-msgstr ""
+msgstr "O novo valor do mapeamento de valores \"%1$s\" está vazio."
 
 #: include/classes/api/services/CImage.php:369
 msgid "Empty parameters"
@@ -4911,7 +4911,7 @@ msgstr "Período de hora nulo."
 
 #: include/classes/api/services/CValueMap.php:396
 msgid "Empty value map ID."
-msgstr ""
+msgstr "ID de mapeamento de valores ausente."
 
 #: include/classes/api/services/CHttpTest.php:298
 msgid "Empty web scenario ID."
@@ -5065,7 +5065,7 @@ msgstr "Ativo"
 #: include/views/configuration.host.massupdate.php:393
 #: include/views/configuration.host.prototype.edit.php:388
 msgid "Encryption"
-msgstr ""
+msgstr "Criptografia"
 
 #: include/locales.inc.php:52
 msgid "English (en_GB)"
@@ -5386,7 +5386,7 @@ msgstr "O campo \"%1$s\" é obrigatório."
 #: include/classes/api/services/CMediatype.php:807
 #, c-format
 msgid "Field \"%1$s\" is missing a value for media type \"%2$s\"."
-msgstr ""
+msgstr "O campo \"%1$s\" está ausente para um valor do tipo de mídia \"%2$s\"."
 
 #: include/validate.inc.php:220
 #, c-format
@@ -5406,7 +5406,7 @@ msgstr "O campo \"%1$s\" não é um texto."
 #: include/classes/api/services/CMediatype.php:801
 #, c-format
 msgid "Field \"%1$s\" is required for media type \"%2$s\"."
-msgstr ""
+msgstr "O campo \"%1$s\" é necessário no tipo de mídia \"%2$s\"."
 
 #: include/validate.inc.php:289
 #, c-format
@@ -5524,7 +5524,7 @@ msgstr "Primeiro"
 
 #: popup_trexpr.php:134 popup_trexpr.php:157
 msgid "Fit"
-msgstr ""
+msgstr "Ajuste"
 
 #: include/views/js/configuration.sysmaps.js.php:35
 msgid "Fit to map"
@@ -5542,7 +5542,7 @@ msgstr "Fixo"
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:7
 msgid "Flexible"
-msgstr ""
+msgstr "Flexível"
 
 #: include/views/configuration.httpconf.popup.php:100
 msgid "Follow redirects"
@@ -5554,19 +5554,19 @@ msgstr "Para convidado, senha deve ser vazia"
 
 #: popup_trexpr.php:598
 msgid "Forecast for next t seconds based on period T is < N"
-msgstr ""
+msgstr "Previsão de \"t\" segundos estimada baseada em um período T < N"
 
 #: popup_trexpr.php:608
 msgid "Forecast for next t seconds based on period T is = N"
-msgstr ""
+msgstr "Previsão de \"t\" segundos estimada baseada em um período T = N"
 
 #: popup_trexpr.php:603
 msgid "Forecast for next t seconds based on period T is > N"
-msgstr ""
+msgstr "Previsão de \"t\" segundos estimada baseada em um período T > N"
 
 #: popup_trexpr.php:613
 msgid "Forecast for next t seconds based on period T is NOT N"
-msgstr ""
+msgstr "Previsão de \"t\" segundos estimada baseada em um período T não é N"
 
 #: include/items.inc.php:1323 include/views/configuration.item.edit.php:200
 #: include/views/configuration.item.prototype.edit.php:198
@@ -7433,7 +7433,7 @@ msgstr "O máximo de colunas informado é inválido para o elemento da tela."
 
 #: include/classes/api/services/CMediatype.php:387
 msgid "Incorrect media type ID."
-msgstr ""
+msgstr "ID inválido para o tipo de mídia."
 
 #: include/classes/api/services/CScript.php:532
 #, c-format
@@ -7731,7 +7731,7 @@ msgstr "O valor \"%1$s\" é inválido para o campo \"%2$s\" - espera-se um núme
 #: include/classes/api/services/CMediatype.php:782
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
-msgstr ""
+msgstr "Foi informado um valor inválido (%1$s) no campo \"%2$s\" do tipo de mídia \"%3$s\"."
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:417
@@ -7748,28 +7748,28 @@ msgstr "Valor inválido para o campo \"%1$s\": ele não pode ser nulo."
 
 #: include/classes/api/services/CValueMap.php:397
 msgid "Incorrect value map ID."
-msgstr ""
+msgstr "ID inválido para o mapeamento de valores."
 
 #: include/classes/api/services/CHost.php:1557
 #: include/classes/api/services/CProxy.php:670
 msgid "Incorrect value used for PSK field. It should consist of an even number of hexadecimal characters."
-msgstr ""
+msgstr "Valor inválido para o campo PSK. O valor deverá ser consistente com a quantidade de caracteres hexadecimais."
 
 #: include/classes/api/services/CHost.php:1540
 msgid "Incorrect value used for connections from host field."
-msgstr ""
+msgstr "Valor inválido para as conexões no campo do host."
 
 #: include/classes/api/services/CProxy.php:651
 msgid "Incorrect value used for connections from proxy field."
-msgstr ""
+msgstr "Foi informado um valor inválido no campo de conexões do proxy."
 
 #: include/classes/api/services/CHost.php:1536
 msgid "Incorrect value used for connections to host field."
-msgstr ""
+msgstr "Foi informado um valor inválido no campo de conexões do host."
 
 #: include/classes/api/services/CProxy.php:646
 msgid "Incorrect value used for connections to proxy field."
-msgstr ""
+msgstr "Foi informado um valor inválido no campo de conexões do proxy."
 
 #: include/classes/api/services/CProxy.php:720
 #: include/classes/api/services/CProxy.php:818
@@ -7984,7 +7984,7 @@ msgstr "O primeiro parâmetro é inválido."
 #: include/classes/validators/CItemDelayFlexValidator.php:73
 #, c-format
 msgid "Invalid flexible interval delay: \"%1$s\" exceeds maximum delay of \"%2$s\"."
-msgstr ""
+msgstr "Intervalo flexível inválido: \"%1$s\" excede o intervalo máximo de \"%2$s\"."
 
 #: include/classes/validators/CFunctionValidator.php:296
 msgid "Invalid fourth parameter."
@@ -8001,97 +8001,97 @@ msgstr "O ID de host na macro \"%1$s\" é inválido."
 #: items.php:601
 #, c-format
 msgid "Invalid interval \"%1$s\"."
-msgstr ""
+msgstr "Intervalo inválido \"%1$s\"."
 
 #: include/classes/api/services/CItemGeneral.php:397
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
-msgstr ""
+msgstr "Intervalo inválido \"%1$s\": %2$s."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:306
 #: include/classes/validators/CItemDelayFlexValidator.php:321
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hour step \"%2$s\"."
-msgstr ""
+msgstr "Intervalo inválido \"%1$s\": passo com hora inválida \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:269
 #: include/classes/validators/CItemDelayFlexValidator.php:282
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid hours \"%2$s\"."
-msgstr ""
+msgstr "Intervalo invalido \"%1$s\": hora inválida \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:375
 #: include/classes/validators/CItemDelayFlexValidator.php:390
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minute step \"%2$s\"."
-msgstr ""
+msgstr "Intervalo invalido \"%1$s\": minuto inválido \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:338
 #: include/classes/validators/CItemDelayFlexValidator.php:351
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid minutes \"%2$s\"."
-msgstr ""
+msgstr "Intervalo invalido \"%1$s\": minutos inválidos \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:127
 #: include/classes/validators/CItemDelayFlexValidator.php:140
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day \"%2$s\"."
-msgstr ""
+msgstr "Intervalo invalido \"%1$s\": dia do mês inválido \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:165
 #: include/classes/validators/CItemDelayFlexValidator.php:180
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid month day step \"%2$s\"."
-msgstr ""
+msgstr "Intervalo invalido \"%1$s\": dia do mês inválido no passo \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:446
 #: include/classes/validators/CItemDelayFlexValidator.php:461
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid second step \"%2$s\"."
-msgstr ""
+msgstr "Intervalo invalido \"%1$s\": segundo inválido no passo \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:408
 #: include/classes/validators/CItemDelayFlexValidator.php:421
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid seconds \"%2$s\"."
-msgstr ""
+msgstr "Intervalo invalido \"%1$s\": segundos inválidos \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:198
 #: include/classes/validators/CItemDelayFlexValidator.php:211
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day \"%2$s\"."
-msgstr ""
+msgstr "Invervalo inválido: \"%1$s\": dia da semana inválido \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:236
 #: include/classes/validators/CItemDelayFlexValidator.php:251
 #, c-format
 msgid "Invalid interval \"%1$s\": invalid week day step \"%2$s\"."
-msgstr ""
+msgstr "Invervalo inválido: \"%1$s\": dia da semana inválido no passo \"%2$s\"."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:292
 #, c-format
 msgid "Invalid interval \"%1$s\": starting hour must be less or equal to ending hour."
-msgstr ""
+msgstr "Invervalo inválido: \"%1$s\": a hora de início deve ser menor ou igual à hora de fim."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:361
 #, c-format
 msgid "Invalid interval \"%1$s\": starting minute must be less or equal to ending minute."
-msgstr ""
+msgstr "Invervalo inválido: \"%1$s\": minuto de início deve ser menor ou igual ao minuto de fim."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:151
 #, c-format
 msgid "Invalid interval \"%1$s\": starting month day must be less or equal to ending month day."
-msgstr ""
+msgstr "Invervalo inválido: \"%1$s\": o dia de início do mês deve ser menor ao de fim."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:432
 #, c-format
 msgid "Invalid interval \"%1$s\": starting second must be less or equal to ending second."
-msgstr ""
+msgstr "Invervalo inválido: \"%1$s\": o segundo de início deve ser menor ou igual ao de fim."
 
 #: include/classes/validators/CItemDelayFlexValidator.php:222
 #, c-format
 msgid "Invalid interval \"%1$s\": starting week day must be less or equal to ending week day."
-msgstr ""
+msgstr "Invervalo inválido: \"%1$s\": o dia da semana de início deve ser menor ou igual ao de fim."
 
 #: include/classes/api/services/CDiscoveryRule.php:42
 #, c-format
@@ -8194,7 +8194,7 @@ msgstr "Assunto"
 #: include/views/configuration.host.massupdate.php:364
 #: include/views/configuration.host.prototype.edit.php:377
 msgid "Issuer"
-msgstr ""
+msgstr "Emissor"
 
 #: include/classes/api/services/CUser.php:141
 msgid "It is not possible to filter by user password."
@@ -9168,7 +9168,7 @@ msgstr "Mapeado para"
 #: include/classes/api/services/CValueMap.php:501
 #, c-format
 msgid "Mapping is missing parameters: %1$s for value map \"%2$s\"."
-msgstr ""
+msgstr "Está ausente os parâmetros: %1$s para o valor mapeado \"%2$s\"."
 
 #: include/views/administration.general.iconmap.edit.php:124
 #: include/views/administration.general.valuemapping.edit.php:71
@@ -9325,7 +9325,7 @@ msgstr[1] "Tipos de mídia ativados"
 #: include/classes/api/services/CMediatype.php:190
 #, c-format
 msgid "Media type is missing parameters: %1$s"
-msgstr ""
+msgstr "O tipo de mídia tem parâmetros ausentes: %1$s"
 
 #: app/controllers/CControllerMediatypeUpdate.php:143
 msgid "Media type updated"
@@ -9440,8 +9440,8 @@ msgstr "Severidade mínima"
 #, c-format
 msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "Período mínimo para apresentação é %1$s minuto."
+msgstr[1] "Período mínimo para apresentação são %1$s minutos."
 
 #: include/views/common.filter.trigger.php:71
 #: include/views/configuration.sysmap.edit.php:149
@@ -9807,7 +9807,7 @@ msgstr "Não foi encontrado \"%1$s\" para o protótipo de host."
 #: include/classes/api/services/CMediatype.php:385
 #, c-format
 msgid "No \"%1$s\" given for media type."
-msgstr ""
+msgstr "Nenhum \"%1$s\" informado para o tipo de mídia."
 
 #: include/classes/api/services/CScreen.php:455
 #, c-format
@@ -9822,7 +9822,7 @@ msgstr "Sem \"%1$s\" encontrado no template de tela."
 #: include/classes/api/services/CValueMap.php:395
 #, c-format
 msgid "No \"%1$s\" given for value map."
-msgstr ""
+msgstr "Nenhum \"%1$s\" informado para o mapeamento de valor."
 
 #: include/classes/api/services/CHttpTest.php:297
 #, c-format
@@ -9982,7 +9982,7 @@ msgstr "Não foram informados os IDs de regra de descoberta."
 #: include/views/configuration.host.prototype.edit.php:354
 #: include/views/configuration.host.prototype.edit.php:361
 msgid "No encryption"
-msgstr ""
+msgstr "Sem criptografia"
 
 #: include/blocks.inc.php:744 include/blocks.inc.php:828 tr_status.php:676
 msgid "No events"
@@ -10801,15 +10801,15 @@ msgstr[1] "Apenas eventos selecionados"
 
 #: include/classes/api/services/CValueMap.php:320
 msgid "Only super admins can create value maps."
-msgstr ""
+msgstr "Apenas usuários com perfil de Super Admin podem criar mapeamentos de valor."
 
 #: include/classes/api/services/CValueMap.php:267
 msgid "Only super admins can delete value maps."
-msgstr ""
+msgstr "Apenas usuários com perfil de Super Admin podem excluir mapeamentos de valor."
 
 #: include/classes/api/services/CValueMap.php:386
 msgid "Only super admins can update value maps."
-msgstr ""
+msgstr "Apenas usuários com perfil de Super Admin podem atualizar mapeamentos de valor."
 
 #: include/services.inc.php:265
 #, c-format
@@ -11192,24 +11192,24 @@ msgstr "INCIDENTE"
 #: include/views/configuration.host.prototype.edit.php:363
 #: include/views/configuration.host.prototype.edit.php:372
 msgid "PSK"
-msgstr ""
+msgstr "PSK"
 
 #: include/classes/api/services/CHost.php:1552
 #: include/classes/api/services/CProxy.php:665
 msgid "PSK cannot be empty."
-msgstr ""
+msgstr "O PSK não pode ser vazio."
 
 #: app/views/administration.proxy.edit.php:111
 #: include/views/configuration.host.edit.php:781
 #: include/views/configuration.host.massupdate.php:358
 #: include/views/configuration.host.prototype.edit.php:367
 msgid "PSK identity"
-msgstr ""
+msgstr "Identidade PSK"
 
 #: include/classes/api/services/CHost.php:1548
 #: include/classes/api/services/CProxy.php:661
 msgid "PSK identity cannot be empty."
-msgstr ""
+msgstr "A identidade PSK não pode estar ausente."
 
 #: include/validate.inc.php:389
 msgid "Page received incorrect data"
@@ -11302,7 +11302,7 @@ msgstr "A senha está indisponível para usuários com %1$s."
 #: include/classes/api/services/CMediatype.php:554
 #, c-format
 msgid "Password required for media type \"%1$s\"."
-msgstr ""
+msgstr "Uma senha é necessária para o tipo de mídia \"%1$s\"."
 
 #: profile.php:119 users.php:201
 msgid "Password should not be empty"
@@ -12384,7 +12384,7 @@ msgstr "Verificação agendada"
 #: include/views/js/common.item.edit.js.php:10
 #: include/views/js/configuration.item.massupdate.js.php:10
 msgid "Scheduling"
-msgstr ""
+msgstr "Agendamento"
 
 #: include/audit.inc.php:41 include/screens.inc.php:36
 #: include/views/configuration.screen.constructor.edit.php:541
@@ -12521,13 +12521,13 @@ msgstr "O nome do script não pode ser nulo."
 
 #: app/views/administration.mediatype.edit.php:106
 msgid "Script parameters"
-msgstr ""
+msgstr "Parâmetros do script"
 
 #: include/classes/api/services/CMediatype.php:340
 #: include/classes/api/services/CMediatype.php:631
 #, c-format
 msgid "Script parameters \"%1$s\" are missing the last new line feed for media type \"%2$s\"."
-msgstr ""
+msgstr "Está ausente o avanço de linha nos parâmetros do script \"%1$s\" para o tipo de mídia \"%2$s\"."
 
 #: include/classes/debug/CProfiler.php:126
 msgid "Script profiler"
@@ -13780,7 +13780,7 @@ msgstr "Este ano"
 
 #: popup_trexpr.php:153
 msgid "Threshold"
-msgstr ""
+msgstr "Limiar"
 
 #: include/func.inc.php:217
 msgid "Thu"
@@ -13846,19 +13846,19 @@ msgstr "Deslocamento de tempo"
 
 #: popup_trexpr.php:618
 msgid "Time to reach threshold estimated based on period T is < N"
-msgstr ""
+msgstr "Previsão de \"t\" segundos estimada baseada em um período T < N"
 
 #: popup_trexpr.php:628
 msgid "Time to reach threshold estimated based on period T is = N"
-msgstr ""
+msgstr "Tempo necessário para atingir limiar estimado com base no período T = N"
 
 #: popup_trexpr.php:623
 msgid "Time to reach threshold estimated based on period T is > N"
-msgstr ""
+msgstr "Tempo necessário para atingir limiar estimado com base no período T > N"
 
 #: popup_trexpr.php:633
 msgid "Time to reach threshold estimated based on period T is NOT N"
-msgstr ""
+msgstr "Tempo necessário para atingir limiar estimado com base no período T não é N"
 
 #: include/views/configuration.screen.constructor.edit.php:609
 msgid "Time type"
@@ -15299,12 +15299,12 @@ msgstr "Mapeamento de valor removido"
 #: include/classes/api/services/CValueMap.php:338
 #, c-format
 msgid "Value map is missing parameters: %1$s"
-msgstr ""
+msgstr "Parâmetro ausente para o mapeamento de valor: %1$s"
 
 #: include/classes/api/services/CValueMap.php:347
 #: include/classes/api/services/CValueMap.php:423
 msgid "Value map name cannot be empty."
-msgstr ""
+msgstr "O nome do mapeamento de valor não pode ser vazio."
 
 #: adm.valuemapping.php:71
 msgid "Value map updated"
@@ -16408,7 +16408,7 @@ msgstr "informe aqui o argumento para pesquisa"
 
 #: include/classes/parsers/CItemDelayFlexParser.php:2213
 msgid "unexpected end of interval"
-msgstr ""
+msgstr "fim inesperado do intervalo"
 
 #: include/classes/parsers/CItemKey.php:62
 msgid "unexpected end of key"

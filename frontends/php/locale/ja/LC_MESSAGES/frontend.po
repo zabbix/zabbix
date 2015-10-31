@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:21+0200\n"
-"PO-Revision-Date: 2015-10-26 03:24+0300\n"
+"POT-Creation-Date: 2015-11-01 00:35+0200\n"
+"PO-Revision-Date: 2015-10-30 01:40+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=1; plural=0;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1445822691.0\n"
+"X-POOTLE-MTIME: 1446162023.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -347,11 +347,11 @@ msgstr[0] "アクションを無効にしました"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
-msgstr ""
+msgstr "ユーザーグループの削除によってアクションを無効にしました。"
 
 #: include/classes/api/services/CUser.php:1351
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "ユーザーの削除によってアクションを無効にしました。"
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -2775,7 +2775,7 @@ msgstr "商用サービス"
 
 #: include/classes/api/services/CAction.php:1837
 msgid "Comparing several triggers with \"and\" is not allowed."
-msgstr ""
+msgstr "いくつかのトリガーを\"and\"で比較することはできません。"
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
