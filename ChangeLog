@@ -3,7 +3,7 @@ Changes for 3.0.0alpha4
 New features:
 ..F....... [ZBX-2616] update bundled DejaVu font from 2.34 to 2.35 (Richlv)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-2678] implemented trigger description and URL popups in the dashboard's "Last 20 issues" and screen element's "Host group issues" and "Host issues" (Ivo)
 ..F....... [ZBX-2517] minimum period for time navigator set to 5 minutes; thanks to Zabbix community (Alexei)
 A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, Sasha)
