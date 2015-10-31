@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-28 15:17+0200\n"
+"POT-Creation-Date: 2015-11-01 00:21+0200\n"
 "PO-Revision-Date: 2014-10-03 08:43+0300\n"
 "Last-Translator: ΓΙΑΝΝΗΣ <yannis@computerstudio.gr>\n"
 "Language-Team: none\n"
@@ -738,7 +738,7 @@ msgstr ""
 msgid "Application updated"
 msgstr "Κατηγορία ενημερώθηκε"
 
-#: include/classes/api/services/CItemGeneral.php:476
+#: include/classes/api/services/CItemGeneral.php:482
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Κατηγορία με ID \"%1$s\" δεν είναι διαθέσιμη σε \"%2$s\"."
@@ -2155,7 +2155,7 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:247
+#: include/classes/api/services/CItemGeneral.php:253
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
@@ -2602,9 +2602,9 @@ msgstr "Ελέγξτε το τμήμα έκφρασης που ξεκινά απ
 msgid "Check of pre-requisites"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:293
-#: include/classes/api/services/CItemGeneral.php:300
-#: include/classes/api/services/CItemGeneral.php:308
+#: include/classes/api/services/CItemGeneral.php:299
+#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:314
 msgid "Check the key, please. Default example was passed."
 msgstr "Ελέγξτε το κλειδί, παρακαλώ. Προκαθορισμένο παράδειγμα πέρασε."
 
@@ -7146,7 +7146,7 @@ msgstr "Λανθασμένα ορίσματα πέρασαν στη μέθοδο
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
@@ -7518,7 +7518,7 @@ msgstr "Λανθασμένη περιοχή θυρών."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
@@ -8012,7 +8012,7 @@ msgstr "Άκυρο hostid για μακροεντολή \"%1$s\"."
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:391
+#: include/classes/api/services/CItemGeneral.php:397
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr ""
@@ -8259,7 +8259,7 @@ msgstr ""
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:436
+#: include/classes/api/services/CItemGeneral.php:442
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Συλλέκτης \"%1$s:%2$s\" έχει άκυρη θύρα: \"%3$s\"."
@@ -8356,11 +8356,11 @@ msgstr ""
 msgid "Item updated"
 msgstr "Συλλέκτης ενημερώθηκε"
 
-#: include/classes/api/services/CItemGeneral.php:277
+#: include/classes/api/services/CItemGeneral.php:283
 msgid "Item uses host interface from non-parent host."
 msgstr "Ο συλλέκτης χρησιμοποιεί διεπαφή ξενιστή από όχι γονικό ξενιστή."
 
-#: include/classes/api/services/CItemGeneral.php:280
+#: include/classes/api/services/CItemGeneral.php:286
 msgid "Item uses incorrect interface type."
 msgstr "Ο συλλέκτης χρησιμοποιεί λάθος τύπο διεπαφής."
 
@@ -8368,37 +8368,37 @@ msgstr "Ο συλλέκτης χρησιμοποιεί λάθος τύπο δι�
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:351
-#: include/classes/api/services/CItemGeneral.php:382
+#: include/classes/api/services/CItemGeneral.php:357
+#: include/classes/api/services/CItemGeneral.php:388
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Ο συλλέκτης δεν θα ανανεωθεί. Δώστε σωστό χρονικό διάστημα ενημέρωσης."
 
-#: include/classes/api/services/CItemGeneral.php:517
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως κανόνας εντοπισμού."
 
-#: include/classes/api/services/CItemGeneral.php:523
+#: include/classes/api/services/CItemGeneral.php:529
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως συλλέκτης δημιουργηθείς απο πρωτότυπο συλλέκτη."
 
-#: include/classes/api/services/CItemGeneral.php:520
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως πρωτότυπος συλλέκτης."
 
-#: include/classes/api/services/CItemGeneral.php:514
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως συλλέκτης."
 
-#: include/classes/api/services/CItemGeneral.php:526
+#: include/classes/api/services/CItemGeneral.php:532
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\" ως άγνωστο στοιχείο συλλέκτη."
 
-#: include/classes/api/services/CItemGeneral.php:933
+#: include/classes/api/services/CItemGeneral.php:939
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Ο συλλέκτης με κλειδί \"%1$s\" υπάρχει ήδη σε \"%2$s\"."
@@ -8536,7 +8536,7 @@ msgstr "Διατήρηση περιόδου απωλεσθέντων πόρων 
 msgid "Key"
 msgstr "Κλειδί"
 
-#: include/classes/api/services/CItemGeneral.php:333
+#: include/classes/api/services/CItemGeneral.php:339
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Το κλειδί \"%1$s\" δεν ταιριάζει <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -9869,11 +9869,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:424
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:430
+#: include/classes/api/services/CItemGeneral.php:436
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9919,7 +9919,7 @@ msgstr "Δεν καθορίστηκε τύπος ταυτοποίησης για
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Δεν καθορίστηκε όνομα χρήστη ταυτοποίησης για εντολή εργασίας ενέργειας \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:401
+#: include/classes/api/services/CItemGeneral.php:407
 msgid "No authentication user name specified."
 msgstr ""
 
@@ -10085,7 +10085,7 @@ msgstr "Χωρίς εικόνα"
 msgid "No interface found"
 msgstr "Δεν βρέθηκε διεπαφή"
 
-#: include/classes/api/services/CItemGeneral.php:274
+#: include/classes/api/services/CItemGeneral.php:280
 msgid "No interface found."
 msgstr "Δεν βρέθηκε διεπαφή."
 
@@ -10216,7 +10216,7 @@ msgstr "Χωρίς δικαιώματα για πρόσβαση συστήματ
 #: include/classes/api/services/CImage.php:492
 #: include/classes/api/services/CImage.php:510
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:239
+#: include/classes/api/services/CItemGeneral.php:245
 #: include/classes/api/services/CItem.php:571
 #: include/classes/api/services/CItemPrototype.php:723
 #: include/classes/api/services/CMaintenance.php:266
@@ -10273,7 +10273,7 @@ msgstr "Χωρίς δικαιώματα σε αντικείμενο που αν�
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Δεν καθορίστηκε αρχείο ιδιωτικού κλειδιού για εντολή εργασίας ενέργειας \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:409
+#: include/classes/api/services/CItemGeneral.php:415
 msgid "No private key file specified."
 msgstr ""
 
@@ -10286,7 +10286,7 @@ msgstr "Χωρίς διαμεσολαβητή"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Δεν καθορίστηκε αρχείο δημοσίου κλειδιού για εντολή εργασίας ενέργειας \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:406
+#: include/classes/api/services/CItemGeneral.php:412
 msgid "No public key file specified."
 msgstr ""
 
@@ -12268,7 +12268,7 @@ msgstr "Διεπαφές SNMP"
 msgid "SNMP trap"
 msgstr "SNMP παγίδα"
 
-#: include/classes/api/services/CItemGeneral.php:418
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "SNMP trap key is invalid."
 msgstr "SNMP άκυρο κλειδί παγίδας."
 
@@ -14334,7 +14334,7 @@ msgstr "Τύπος υπολογισμού"
 msgid "Type of information"
 msgstr "Τύπος πληροφοριών"
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr ""
 

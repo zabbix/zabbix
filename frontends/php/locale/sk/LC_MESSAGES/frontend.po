@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-28 15:17+0200\n"
+"POT-Creation-Date: 2015-11-01 00:21+0200\n"
 "PO-Revision-Date: 2015-08-13 00:15+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -747,7 +747,7 @@ msgstr "Prototypy aplikácií"
 msgid "Application updated"
 msgstr "Aplikácia aktualizovaná"
 
-#: include/classes/api/services/CItemGeneral.php:476
+#: include/classes/api/services/CItemGeneral.php:482
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplikácia s ID \"%1$s\" nie je na \"%2$s\" dostupná."
@@ -2195,7 +2195,7 @@ msgstr "Nie je možné nastaviť \"%1$s\" pre aplikáciu \"%2$s\"."
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr "Nie je možné nastaviť \"%1$s\" pre skupinu \"%2$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:247
+#: include/classes/api/services/CItemGeneral.php:253
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Nie je možné nastaviť \"%1$s\" pre položku \"%2$s\"."
@@ -2642,9 +2642,9 @@ msgstr "Skontrolujte časť výrazu začínajúcu od \"%1$s\"."
 msgid "Check of pre-requisites"
 msgstr "Kontrola požiadaviek"
 
-#: include/classes/api/services/CItemGeneral.php:293
-#: include/classes/api/services/CItemGeneral.php:300
-#: include/classes/api/services/CItemGeneral.php:308
+#: include/classes/api/services/CItemGeneral.php:299
+#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:314
 msgid "Check the key, please. Default example was passed."
 msgstr "Skontrolujte prosím kľúč. Bol zadaný predvolený kľúč z príkladu."
 
@@ -7194,7 +7194,7 @@ msgstr "Metóde boli predané neplatné argumenty."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Neplatný protokol prihlasovania pre zisťovacie pravidlo \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Neplatný protokol prihlasovania pre položku \"%1$s\"."
@@ -7566,7 +7566,7 @@ msgstr "Neplatný rozsah portov."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Neplatný protokol utajenia pre zisťovacie pravidlo \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Neplatný protokol utajenia pre položku \"%1$s\"."
@@ -8060,7 +8060,7 @@ msgstr "Neplatné hostid pre makro \"%1$s\"."
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:391
+#: include/classes/api/services/CItemGeneral.php:397
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr ""
@@ -8307,7 +8307,7 @@ msgstr "Položka \"%1$s\" neexistuje v šablóne \"%2$s\"."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Položka \"%1$s\" na \"%2$s\": aplikácia \"%3$s\" neexistuje."
 
-#: include/classes/api/services/CItemGeneral.php:436
+#: include/classes/api/services/CItemGeneral.php:442
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Položka \"%1$s:%2$s\" má neplatný port: \"%3$s\"."
@@ -8408,11 +8408,11 @@ msgstr "Prototypu položiek zmazané"
 msgid "Item updated"
 msgstr "Položka aktualizovaná"
 
-#: include/classes/api/services/CItemGeneral.php:277
+#: include/classes/api/services/CItemGeneral.php:283
 msgid "Item uses host interface from non-parent host."
 msgstr "Položka používa rozhranie z nie nadriadeného hosta."
 
-#: include/classes/api/services/CItemGeneral.php:280
+#: include/classes/api/services/CItemGeneral.php:286
 msgid "Item uses incorrect interface type."
 msgstr "Položka používa neplatný typ rozhrania."
 
@@ -8420,37 +8420,37 @@ msgstr "Položka používa neplatný typ rozhrania."
 msgid "Item values"
 msgstr "Hodnoty položky"
 
-#: include/classes/api/services/CItemGeneral.php:351
-#: include/classes/api/services/CItemGeneral.php:382
+#: include/classes/api/services/CItemGeneral.php:357
+#: include/classes/api/services/CItemGeneral.php:388
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Položka nebude akutalizovaná. Zadajte prosím správny interval aktualizacií."
 
-#: include/classes/api/services/CItemGeneral.php:517
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako zisťovacie pravidlo."
 
-#: include/classes/api/services/CItemGeneral.php:523
+#: include/classes/api/services/CItemGeneral.php:529
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako položka vytvorená z prototypu položky."
 
-#: include/classes/api/services/CItemGeneral.php:520
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako prototyp položky."
 
-#: include/classes/api/services/CItemGeneral.php:514
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako položka."
 
-#: include/classes/api/services/CItemGeneral.php:526
+#: include/classes/api/services/CItemGeneral.php:532
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\" ako neznámy element položky."
 
-#: include/classes/api/services/CItemGeneral.php:933
+#: include/classes/api/services/CItemGeneral.php:939
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Položka s kľúčom \"%1$s\" už existuje na \"%2$s\"."
@@ -8588,7 +8588,7 @@ msgstr "Ponechať stratené zdroje (v dňoch)"
 msgid "Key"
 msgstr "Kľúč"
 
-#: include/classes/api/services/CItemGeneral.php:333
+#: include/classes/api/services/CItemGeneral.php:339
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Kľúč \"%1$s\" nevybral <grpmax|grpmin|grpsum|grpavg>[\"Skupina(y)\", \"Kľúč položky\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -9925,11 +9925,11 @@ msgstr "Nenájdené žiadne IPMI rozhrania."
 msgid "No JMX interfaces found."
 msgstr "Nenájdené žiadne JMX rozhrania."
 
-#: include/classes/api/services/CItemGeneral.php:424
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP OID specified."
 msgstr "Nie je špecifikované žiadne SNMP OID."
 
-#: include/classes/api/services/CItemGeneral.php:430
+#: include/classes/api/services/CItemGeneral.php:436
 msgid "No SNMP community specified."
 msgstr "Nie je špecifikované žiadne SNMP community."
 
@@ -9975,7 +9975,7 @@ msgstr "Nie je špecifikovaný typ autentifikácie pre príkaz akcie \"%s\"."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Nie je špecifikované používateľské meno autentifikácie pre príkaz akcie \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:401
+#: include/classes/api/services/CItemGeneral.php:407
 msgid "No authentication user name specified."
 msgstr "Nie je špecifikované používateľské meno autentifikácie."
 
@@ -10141,7 +10141,7 @@ msgstr "Žiadny obrázok"
 msgid "No interface found"
 msgstr "Nenájdené žiadne rozhranie"
 
-#: include/classes/api/services/CItemGeneral.php:274
+#: include/classes/api/services/CItemGeneral.php:280
 msgid "No interface found."
 msgstr "Nenájdené žiadne rozhranie."
 
@@ -10272,7 +10272,7 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #: include/classes/api/services/CImage.php:492
 #: include/classes/api/services/CImage.php:510
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:239
+#: include/classes/api/services/CItemGeneral.php:245
 #: include/classes/api/services/CItem.php:571
 #: include/classes/api/services/CItemPrototype.php:723
 #: include/classes/api/services/CMaintenance.php:266
@@ -10329,7 +10329,7 @@ msgstr "Žiadne oprávnenia k odkazovanému objektu alebo objekt neexistuje!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Žiaden špecifikovaný súbor so súkromným kľúčom pre akciu príkazu \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:409
+#: include/classes/api/services/CItemGeneral.php:415
 msgid "No private key file specified."
 msgstr "Žiaden špecifikovaný súbor so súkromným kľúčom."
 
@@ -10342,7 +10342,7 @@ msgstr "Žiadne proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom pre akciu príkazu \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:406
+#: include/classes/api/services/CItemGeneral.php:412
 msgid "No public key file specified."
 msgstr "Žiadny špecifikovaný súbor s verejným kľúčom."
 
@@ -12325,7 +12325,7 @@ msgstr "SNMP rozhrania"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: include/classes/api/services/CItemGeneral.php:418
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap kľúč je neplatný."
 
@@ -14401,7 +14401,7 @@ msgstr "Typ kalkulácie"
 msgid "Type of information"
 msgstr "Typ informácií"
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr "Typ informácie musí byť \"Číslo (unsigned)\" alebo \"Číslo (float)\" pre agregované položky."
 

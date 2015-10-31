@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-28 15:17+0200\n"
+"POT-Creation-Date: 2015-11-01 00:21+0200\n"
 "PO-Revision-Date: 2015-10-26 03:24+0300\n"
 "Last-Translator: Atsushi <a.tanaka77@gmail.com>\n"
 "Language-Team: Zabbix\n"
@@ -719,7 +719,7 @@ msgstr "アプリケーションプロトタイプ"
 msgid "Application updated"
 msgstr "アプリケーションを更新しました"
 
-#: include/classes/api/services/CItemGeneral.php:476
+#: include/classes/api/services/CItemGeneral.php:482
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "\"%2$s\"にID\"%1$s\"を持つアプリケーションは使用できません。"
@@ -2095,7 +2095,7 @@ msgstr "アプリケーション\"%2$s\"に\"%1$s\"を設定できません。"
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr "ホストグループ\"%2$s\"に\"%1$s\"を設定できません。"
 
-#: include/classes/api/services/CItemGeneral.php:247
+#: include/classes/api/services/CItemGeneral.php:253
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "アイテム\"%2$s\"に\"%1$s\"を設定できません。"
@@ -2542,9 +2542,9 @@ msgstr "条件式の%1$s\"から始まる部分を確認してください。"
 msgid "Check of pre-requisites"
 msgstr "前提条件のチェック"
 
-#: include/classes/api/services/CItemGeneral.php:293
-#: include/classes/api/services/CItemGeneral.php:300
-#: include/classes/api/services/CItemGeneral.php:308
+#: include/classes/api/services/CItemGeneral.php:299
+#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:314
 msgid "Check the key, please. Default example was passed."
 msgstr "キーを確認してください。デフォルトの例は使用できました。"
 
@@ -7071,7 +7071,7 @@ msgstr "入力項目が正しくありません。"
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "ディスカバリルール\"%1$s\"の認証プロトコルが正しくありません。"
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "アイテム\"%1$s\"の認証プロトコルが正しくありません。"
@@ -7443,7 +7443,7 @@ msgstr "ポートの範囲が正しくありません。"
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "ディスカバリルール\"%1$s\"のプライバシープロトコルが正しくありません。"
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "アイテム\"%1$s\"のプライバシープロトコルが正しくありません。"
@@ -7937,7 +7937,7 @@ msgstr "マクロ\"%1$s\"のhostidが正しくありません。"
 msgid "Invalid interval \"%1$s\"."
 msgstr "更新間隔\"%1$s\"が正しくありません。"
 
-#: include/classes/api/services/CItemGeneral.php:391
+#: include/classes/api/services/CItemGeneral.php:397
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr "更新間隔\"%1$s\": %2$sが正しくありません。"
@@ -8184,7 +8184,7 @@ msgstr "アイテム\"%1$s\"はテンプレート\"%2$s\"に存在しません�
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上のアイテム\"%1$s\": アプリケーション\"%3$s\"は存在しません。"
 
-#: include/classes/api/services/CItemGeneral.php:436
+#: include/classes/api/services/CItemGeneral.php:442
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "アイテム\"%1$s:%2$s\"のポート\"%3$s\"は正しくありません。"
@@ -8277,11 +8277,11 @@ msgstr "アイテムのプロトタイプを削除しました"
 msgid "Item updated"
 msgstr "アイテムを更新しました"
 
-#: include/classes/api/services/CItemGeneral.php:277
+#: include/classes/api/services/CItemGeneral.php:283
 msgid "Item uses host interface from non-parent host."
 msgstr "アイテムが親ホストのものではないホストインターフェースを使用しています。"
 
-#: include/classes/api/services/CItemGeneral.php:280
+#: include/classes/api/services/CItemGeneral.php:286
 msgid "Item uses incorrect interface type."
 msgstr "アイテムに正しくないインターフェースタイプが設定されています。"
 
@@ -8289,37 +8289,37 @@ msgstr "アイテムに正しくないインターフェースタイプが設定
 msgid "Item values"
 msgstr "アイテムの値"
 
-#: include/classes/api/services/CItemGeneral.php:351
-#: include/classes/api/services/CItemGeneral.php:382
+#: include/classes/api/services/CItemGeneral.php:357
+#: include/classes/api/services/CItemGeneral.php:388
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "アイテムは更新されません。正しい更新間隔を設定してください。"
 
-#: include/classes/api/services/CItemGeneral.php:517
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "キー\"%1$s\"が設定されたアイテムは\"%2$s\"にディスカバリルールとしてすでに存在します。"
 
-#: include/classes/api/services/CItemGeneral.php:523
+#: include/classes/api/services/CItemGeneral.php:529
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にプロトタイプから生成されたアイテムとしてすでに存在します。"
 
-#: include/classes/api/services/CItemGeneral.php:520
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にプロトタイプとしてすでに存在します。"
 
-#: include/classes/api/services/CItemGeneral.php:514
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"にすでに存在します。"
 
-#: include/classes/api/services/CItemGeneral.php:526
+#: include/classes/api/services/CItemGeneral.php:532
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "キー\"%1$s\"が設定されたアイテムはホスト\"%2$s\"に不明なアイテムとしてすでに存在します。"
 
-#: include/classes/api/services/CItemGeneral.php:933
+#: include/classes/api/services/CItemGeneral.php:939
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "キー\"%1$s\"が設定されたアイテムは指定したホスト\"%2$s\"にすでに存在します。"
@@ -8457,7 +8457,7 @@ msgstr "存在しなくなったリソースの保持期間(日)"
 msgid "Key"
 msgstr "キー"
 
-#: include/classes/api/services/CItemGeneral.php:333
+#: include/classes/api/services/CItemGeneral.php:339
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "キー\"%1$s\"が<grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]とマッチしません。"
@@ -9782,11 +9782,11 @@ msgstr "IPMIインターフェースが設定されていません"
 msgid "No JMX interfaces found."
 msgstr "JMXインターフェースが設定されていません。"
 
-#: include/classes/api/services/CItemGeneral.php:424
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP OID specified."
 msgstr "SNMP OIDが設定されていません。"
 
-#: include/classes/api/services/CItemGeneral.php:430
+#: include/classes/api/services/CItemGeneral.php:436
 msgid "No SNMP community specified."
 msgstr "SNMPコミュニティ名が設定されていません。"
 
@@ -9832,7 +9832,7 @@ msgstr "実行するアクションのコマンド\"%s\"に認証のタイプが
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "実行するアクションのコマンド\"%s\"に認証ユーザー名が設定されていません。"
 
-#: include/classes/api/services/CItemGeneral.php:401
+#: include/classes/api/services/CItemGeneral.php:407
 msgid "No authentication user name specified."
 msgstr "認証ユーザー名が設定されていません。"
 
@@ -9998,7 +9998,7 @@ msgstr "イメージは存在しません"
 msgid "No interface found"
 msgstr "インターフェースが見つかりません。"
 
-#: include/classes/api/services/CItemGeneral.php:274
+#: include/classes/api/services/CItemGeneral.php:280
 msgid "No interface found."
 msgstr "インターフェースが見つかりません。"
 
@@ -10129,7 +10129,7 @@ msgstr "システムへのアクセス権がありません。"
 #: include/classes/api/services/CImage.php:492
 #: include/classes/api/services/CImage.php:510
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:239
+#: include/classes/api/services/CItemGeneral.php:245
 #: include/classes/api/services/CItem.php:571
 #: include/classes/api/services/CItemPrototype.php:723
 #: include/classes/api/services/CMaintenance.php:266
@@ -10186,7 +10186,7 @@ msgstr "対象が存在しないか、アクセス権がありません！"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "実行するアクションのコマンド\"%s\"に秘密鍵ファイルが設定されていません。"
 
-#: include/classes/api/services/CItemGeneral.php:409
+#: include/classes/api/services/CItemGeneral.php:415
 msgid "No private key file specified."
 msgstr "秘密鍵ファイルが設定されていません。"
 
@@ -10199,7 +10199,7 @@ msgstr "プロキシなし"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "実行するアクションのコマンド\"%s\"に公開鍵ファイルが設定されていません。"
 
-#: include/classes/api/services/CItemGeneral.php:406
+#: include/classes/api/services/CItemGeneral.php:412
 msgid "No public key file specified."
 msgstr "公開鍵ファイルが設定されていません。"
 
@@ -12176,7 +12176,7 @@ msgstr "SNMPインターフェース"
 msgid "SNMP trap"
 msgstr "SNMPトラップ"
 
-#: include/classes/api/services/CItemGeneral.php:418
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "SNMP trap key is invalid."
 msgstr "SNMPトラップのキーが正しくありません。"
 
@@ -14232,7 +14232,7 @@ msgstr "計算のタイプ"
 msgid "Type of information"
 msgstr "データ型"
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr "Zabbixアグリゲートを利用する場合はデータ型を\"数値(整数)\"か\"数値(浮動小数)\"に設定してください。"
 

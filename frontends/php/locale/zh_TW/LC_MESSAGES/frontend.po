@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-28 15:17+0200\n"
+"POT-Creation-Date: 2015-11-01 00:21+0200\n"
 "PO-Revision-Date: 2012-11-06 09:39+0300\n"
 "Last-Translator: Yaochiu <brian.huang@primillet.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -723,7 +723,7 @@ msgstr ""
 msgid "Application updated"
 msgstr "應用集已更新"
 
-#: include/classes/api/services/CItemGeneral.php:476
+#: include/classes/api/services/CItemGeneral.php:482
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "ID為 \"%1$s\"的應用集不在\"%2$s\"之中."
@@ -2104,7 +2104,7 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:247
+#: include/classes/api/services/CItemGeneral.php:253
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr ""
@@ -2551,9 +2551,9 @@ msgstr "檢查開始於\"%1$s\"的表示式部份."
 msgid "Check of pre-requisites"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:293
-#: include/classes/api/services/CItemGeneral.php:300
-#: include/classes/api/services/CItemGeneral.php:308
+#: include/classes/api/services/CItemGeneral.php:299
+#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:314
 msgid "Check the key, please. Default example was passed."
 msgstr "請檢查鍵值. 用的是預設的例子."
 
@@ -7083,7 +7083,7 @@ msgstr "不正確的自變數傳給方法."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr ""
@@ -7455,7 +7455,7 @@ msgstr "不正確的埠範圍."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr ""
@@ -7949,7 +7949,7 @@ msgstr "無效的主機ID予巨集 \"%1$s\"."
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:391
+#: include/classes/api/services/CItemGeneral.php:397
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr ""
@@ -8196,7 +8196,7 @@ msgstr "項目\"%1$s\"不存在於模板\"%2$s\"中."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "\"%2$s\"上的項目\"%1$s\" : 應用集\"%3$s\"不存在."
 
-#: include/classes/api/services/CItemGeneral.php:436
+#: include/classes/api/services/CItemGeneral.php:442
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "項目\"%1$s:%2$s\"有無效的埠: \"%3$s\"."
@@ -8289,11 +8289,11 @@ msgstr ""
 msgid "Item updated"
 msgstr "項目已更新"
 
-#: include/classes/api/services/CItemGeneral.php:277
+#: include/classes/api/services/CItemGeneral.php:283
 msgid "Item uses host interface from non-parent host."
 msgstr "項目使用來自非上層主機的主機介面."
 
-#: include/classes/api/services/CItemGeneral.php:280
+#: include/classes/api/services/CItemGeneral.php:286
 msgid "Item uses incorrect interface type."
 msgstr "項目使用不正確的介面類型."
 
@@ -8301,37 +8301,37 @@ msgstr "項目使用不正確的介面類型."
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:351
-#: include/classes/api/services/CItemGeneral.php:382
+#: include/classes/api/services/CItemGeneral.php:357
+#: include/classes/api/services/CItemGeneral.php:388
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "項目將不會被刷新. 請輸入正確的更新區間."
 
-#: include/classes/api/services/CItemGeneral.php:517
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為探索規則."
 
-#: include/classes/api/services/CItemGeneral.php:523
+#: include/classes/api/services/CItemGeneral.php:529
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為創建自項目原型的項目."
 
-#: include/classes/api/services/CItemGeneral.php:520
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目原型."
 
-#: include/classes/api/services/CItemGeneral.php:514
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為項目."
 
-#: include/classes/api/services/CItemGeneral.php:526
+#: include/classes/api/services/CItemGeneral.php:532
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" 為未知的項目組件."
 
-#: include/classes/api/services/CItemGeneral.php:933
+#: include/classes/api/services/CItemGeneral.php:939
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "鍵值為 \"%1$s\"的項目已存在於\"%2$s\" ."
@@ -8469,7 +8469,7 @@ msgstr "保留失去的資源期間(日記)"
 msgid "Key"
 msgstr "鍵值"
 
-#: include/classes/api/services/CItemGeneral.php:333
+#: include/classes/api/services/CItemGeneral.php:339
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "鍵值\"%1$s\"不符 <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -9796,11 +9796,11 @@ msgstr ""
 msgid "No JMX interfaces found."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:424
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP OID specified."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:430
+#: include/classes/api/services/CItemGeneral.php:436
 msgid "No SNMP community specified."
 msgstr ""
 
@@ -9846,7 +9846,7 @@ msgstr "沒有指定給動作操作命令\"%s\"的認證類型."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的認證用戶名稱."
 
-#: include/classes/api/services/CItemGeneral.php:401
+#: include/classes/api/services/CItemGeneral.php:407
 msgid "No authentication user name specified."
 msgstr "沒有指定的認證用戶名稱"
 
@@ -10012,7 +10012,7 @@ msgstr "沒有圖片"
 msgid "No interface found"
 msgstr "沒有找到介面"
 
-#: include/classes/api/services/CItemGeneral.php:274
+#: include/classes/api/services/CItemGeneral.php:280
 msgid "No interface found."
 msgstr "沒有找到介面."
 
@@ -10143,7 +10143,7 @@ msgstr "沒有系統存取的許可權"
 #: include/classes/api/services/CImage.php:492
 #: include/classes/api/services/CImage.php:510
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:239
+#: include/classes/api/services/CItemGeneral.php:245
 #: include/classes/api/services/CItem.php:571
 #: include/classes/api/services/CItemPrototype.php:723
 #: include/classes/api/services/CMaintenance.php:266
@@ -10200,7 +10200,7 @@ msgstr "沒有所說的物件的許可權或其不存在!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的私有金鑰."
 
-#: include/classes/api/services/CItemGeneral.php:409
+#: include/classes/api/services/CItemGeneral.php:415
 msgid "No private key file specified."
 msgstr "沒有指定的私有金鑰."
 
@@ -10213,7 +10213,7 @@ msgstr "沒有系統代理程式"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "沒有指定給動作操作命令\"%s\"的公開金鑰檔."
 
-#: include/classes/api/services/CItemGeneral.php:406
+#: include/classes/api/services/CItemGeneral.php:412
 msgid "No public key file specified."
 msgstr "沒有指定的公開金鑰檔"
 
@@ -12190,7 +12190,7 @@ msgstr "SNMP介面"
 msgid "SNMP trap"
 msgstr "SNMP捉捕"
 
-#: include/classes/api/services/CItemGeneral.php:418
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "SNMP trap key is invalid."
 msgstr "SNMP捉捕鍵值是無效的"
 
@@ -14246,7 +14246,7 @@ msgstr "計算方式"
 msgid "Type of information"
 msgstr "數據類型"
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr ""
 

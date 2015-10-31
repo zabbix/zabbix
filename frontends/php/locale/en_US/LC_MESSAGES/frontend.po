@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-28 15:17+0200\n"
+"POT-Creation-Date: 2015-11-01 00:21+0200\n"
 "PO-Revision-Date: 2014-02-04 10:36+0300\n"
 "Last-Translator: richlv <richlv@nakts.net>\n"
 "Language-Team: \n"
@@ -733,7 +733,7 @@ msgstr ""
 msgid "Application updated"
 msgstr "Application updated"
 
-#: include/classes/api/services/CItemGeneral.php:476
+#: include/classes/api/services/CItemGeneral.php:482
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Application with ID \"%1$s\" is not available on \"%2$s\"."
@@ -2150,7 +2150,7 @@ msgstr ""
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:247
+#: include/classes/api/services/CItemGeneral.php:253
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Cannot set \"%1$s\" for item \"%2$s\"."
@@ -2597,9 +2597,9 @@ msgstr "Check expression part starting from \"%1$s\"."
 msgid "Check of pre-requisites"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:293
-#: include/classes/api/services/CItemGeneral.php:300
-#: include/classes/api/services/CItemGeneral.php:308
+#: include/classes/api/services/CItemGeneral.php:299
+#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:314
 msgid "Check the key, please. Default example was passed."
 msgstr "Check the key, please. Default example was passed."
 
@@ -7140,7 +7140,7 @@ msgstr "Incorrect arguments passed to method."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Incorrect authentication protocol for discovery rule \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Incorrect authentication protocol for item \"%1$s\"."
@@ -7512,7 +7512,7 @@ msgstr "Incorrect port range."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Incorrect privacy protocol for discovery rule \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Incorrect privacy protocol for item \"%1$s\"."
@@ -8006,7 +8006,7 @@ msgstr "Invalid hostid for macro \"%1$s\"."
 msgid "Invalid interval \"%1$s\"."
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:391
+#: include/classes/api/services/CItemGeneral.php:397
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr ""
@@ -8253,7 +8253,7 @@ msgstr "Item \"%1$s\" does not exist on template \"%2$s\"."
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 
-#: include/classes/api/services/CItemGeneral.php:436
+#: include/classes/api/services/CItemGeneral.php:442
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
@@ -8350,11 +8350,11 @@ msgstr ""
 msgid "Item updated"
 msgstr "Item updated"
 
-#: include/classes/api/services/CItemGeneral.php:277
+#: include/classes/api/services/CItemGeneral.php:283
 msgid "Item uses host interface from non-parent host."
 msgstr "Item uses host interface from non-parent host."
 
-#: include/classes/api/services/CItemGeneral.php:280
+#: include/classes/api/services/CItemGeneral.php:286
 msgid "Item uses incorrect interface type."
 msgstr "Item uses incorrect interface type."
 
@@ -8362,37 +8362,37 @@ msgstr "Item uses incorrect interface type."
 msgid "Item values"
 msgstr ""
 
-#: include/classes/api/services/CItemGeneral.php:351
-#: include/classes/api/services/CItemGeneral.php:382
+#: include/classes/api/services/CItemGeneral.php:357
+#: include/classes/api/services/CItemGeneral.php:388
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Item will not be refreshed. Please enter a correct update interval."
 
-#: include/classes/api/services/CItemGeneral.php:517
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 
-#: include/classes/api/services/CItemGeneral.php:523
+#: include/classes/api/services/CItemGeneral.php:529
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 
-#: include/classes/api/services/CItemGeneral.php:520
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 
-#: include/classes/api/services/CItemGeneral.php:514
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 
-#: include/classes/api/services/CItemGeneral.php:526
+#: include/classes/api/services/CItemGeneral.php:532
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 
-#: include/classes/api/services/CItemGeneral.php:933
+#: include/classes/api/services/CItemGeneral.php:939
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item with key \"%1$s\" already exists on \"%2$s\"."
@@ -8530,7 +8530,7 @@ msgstr "Keep lost resources period (in days)"
 msgid "Key"
 msgstr "Key"
 
-#: include/classes/api/services/CItemGeneral.php:333
+#: include/classes/api/services/CItemGeneral.php:339
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -9863,11 +9863,11 @@ msgstr "No IPMI interfaces found."
 msgid "No JMX interfaces found."
 msgstr "No JMX interfaces found."
 
-#: include/classes/api/services/CItemGeneral.php:424
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP OID specified."
 msgstr "No SNMP OID specified."
 
-#: include/classes/api/services/CItemGeneral.php:430
+#: include/classes/api/services/CItemGeneral.php:436
 msgid "No SNMP community specified."
 msgstr "No SNMP community specified."
 
@@ -9913,7 +9913,7 @@ msgstr "No authentication type specified for action operation command \"%s\"."
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "No authentication user name specified for action operation command \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:401
+#: include/classes/api/services/CItemGeneral.php:407
 msgid "No authentication user name specified."
 msgstr "No authentication user name specified."
 
@@ -10079,7 +10079,7 @@ msgstr "No image"
 msgid "No interface found"
 msgstr "No interface found"
 
-#: include/classes/api/services/CItemGeneral.php:274
+#: include/classes/api/services/CItemGeneral.php:280
 msgid "No interface found."
 msgstr "No interface found."
 
@@ -10210,7 +10210,7 @@ msgstr "No permissions for system access."
 #: include/classes/api/services/CImage.php:492
 #: include/classes/api/services/CImage.php:510
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:239
+#: include/classes/api/services/CItemGeneral.php:245
 #: include/classes/api/services/CItem.php:571
 #: include/classes/api/services/CItemPrototype.php:723
 #: include/classes/api/services/CMaintenance.php:266
@@ -10267,7 +10267,7 @@ msgstr "No permissions to referred object or it does not exist!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "No private key file specified for action operation command \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:409
+#: include/classes/api/services/CItemGeneral.php:415
 msgid "No private key file specified."
 msgstr "No private key file specified."
 
@@ -10280,7 +10280,7 @@ msgstr "No proxy"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "No public key file specified for action operation command \"%s\"."
 
-#: include/classes/api/services/CItemGeneral.php:406
+#: include/classes/api/services/CItemGeneral.php:412
 msgid "No public key file specified."
 msgstr "No public key file specified."
 
@@ -12260,7 +12260,7 @@ msgstr "SNMP interfaces"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: include/classes/api/services/CItemGeneral.php:418
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "SNMP trap key is invalid."
 msgstr "SNMP trap key is invalid."
 
@@ -14326,7 +14326,7 @@ msgstr "Type of calculation"
 msgid "Type of information"
 msgstr "Type of information"
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr ""
 

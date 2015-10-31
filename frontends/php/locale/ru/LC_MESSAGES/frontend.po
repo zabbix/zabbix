@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-28 15:20+0200\n"
+"POT-Creation-Date: 2015-11-01 00:21+0200\n"
 "PO-Revision-Date: 2015-10-26 16:39+0300\n"
 "Last-Translator: Alexey <dotneft@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
@@ -747,7 +747,7 @@ msgstr "Прототипы групп элементов данных"
 msgid "Application updated"
 msgstr "Группа элементов данных обновлена"
 
-#: include/classes/api/services/CItemGeneral.php:476
+#: include/classes/api/services/CItemGeneral.php:482
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Группа элементов данных с ID \"%1$s\" недоступна для \"%2$s\"."
@@ -2193,7 +2193,7 @@ msgstr "Не удалось установить \"%1$s\" для группы э
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для группы узлов сети \"%2$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:247
+#: include/classes/api/services/CItemGeneral.php:253
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Не удалось установить \"%1$s\" для элемента данных \"%2$s\"."
@@ -2640,9 +2640,9 @@ msgstr "Проверьте часть выражения начиная с \"%1$
 msgid "Check of pre-requisites"
 msgstr "Проверка предварительных условий"
 
-#: include/classes/api/services/CItemGeneral.php:293
-#: include/classes/api/services/CItemGeneral.php:300
-#: include/classes/api/services/CItemGeneral.php:308
+#: include/classes/api/services/CItemGeneral.php:299
+#: include/classes/api/services/CItemGeneral.php:306
+#: include/classes/api/services/CItemGeneral.php:314
 msgid "Check the key, please. Default example was passed."
 msgstr "Пожалуйста, проверьте ключ. Пример по умолчанию был показан."
 
@@ -7191,7 +7191,7 @@ msgstr "Для метода предоставлены некорректные 
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Некорректный протокол аутентификации для правила обнаружения \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:445
+#: include/classes/api/services/CItemGeneral.php:451
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Некорректный протокол аутентификации для элемента данных \"%1$s\"."
@@ -7563,7 +7563,7 @@ msgstr "Некорректный диапазон портов."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Некорректный приватный протокол для правила обнаружения \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:454
+#: include/classes/api/services/CItemGeneral.php:460
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Некорректный приватный протокол для элемента данных \"%1$s\"."
@@ -8057,7 +8057,7 @@ msgstr "Ошибочный hostid для макроса \"%1$s\"."
 msgid "Invalid interval \"%1$s\"."
 msgstr "Некорректный интервал \"%1$s\"."
 
-#: include/classes/api/services/CItemGeneral.php:391
+#: include/classes/api/services/CItemGeneral.php:397
 #, c-format
 msgid "Invalid interval \"%1$s\": %2$s."
 msgstr "Некорректный интервал \"%1$s\": %2$s."
@@ -8304,7 +8304,7 @@ msgstr "Элемент данных \"%1$s\" не существует у шаб
 msgid "Item \"%1$s\" on \"%2$s\": application \"%3$s\" does not exist."
 msgstr "Элемент данных \"%1$s\" в \"%2$s\": группа элементов данных \"%3$s\" не существует."
 
-#: include/classes/api/services/CItemGeneral.php:436
+#: include/classes/api/services/CItemGeneral.php:442
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "У элемента данных \"%1$s:%2$s\" ошибочный порт \"%3$s\"."
@@ -8405,11 +8405,11 @@ msgstr "Прототип элементов данных удален"
 msgid "Item updated"
 msgstr "Элемент данных обновлен"
 
-#: include/classes/api/services/CItemGeneral.php:277
+#: include/classes/api/services/CItemGeneral.php:283
 msgid "Item uses host interface from non-parent host."
 msgstr "Элемент данных использует интерфейс не от родительского узла сети."
 
-#: include/classes/api/services/CItemGeneral.php:280
+#: include/classes/api/services/CItemGeneral.php:286
 msgid "Item uses incorrect interface type."
 msgstr "Элемент данных использует некорректный тип интерфейса."
 
@@ -8417,37 +8417,37 @@ msgstr "Элемент данных использует некорректны�
 msgid "Item values"
 msgstr "Значения элемента данных"
 
-#: include/classes/api/services/CItemGeneral.php:351
-#: include/classes/api/services/CItemGeneral.php:382
+#: include/classes/api/services/CItemGeneral.php:357
+#: include/classes/api/services/CItemGeneral.php:388
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Элемент данных не обновлен. Пожалуйста, введите корректный интервал обновления."
 
-#: include/classes/api/services/CItemGeneral.php:517
+#: include/classes/api/services/CItemGeneral.php:523
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как правило обнаружения."
 
-#: include/classes/api/services/CItemGeneral.php:523
+#: include/classes/api/services/CItemGeneral.php:529
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных созданный из прототипа элементов данных."
 
-#: include/classes/api/services/CItemGeneral.php:520
+#: include/classes/api/services/CItemGeneral.php:526
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как прототип элемента данных."
 
-#: include/classes/api/services/CItemGeneral.php:514
+#: include/classes/api/services/CItemGeneral.php:520
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как элемент данных."
 
-#: include/classes/api/services/CItemGeneral.php:526
+#: include/classes/api/services/CItemGeneral.php:532
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Элемент данных с ключем \"%1$s\" уже существует у \"%2$s\", как неизвестный элемент данных."
 
-#: include/classes/api/services/CItemGeneral.php:933
+#: include/classes/api/services/CItemGeneral.php:939
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Элемент данных с ключом \"%1$s\" уже существует у \"%2$s\"."
@@ -8585,7 +8585,7 @@ msgstr "Период сохранения потерянных ресурсов 
 msgid "Key"
 msgstr "Ключ"
 
-#: include/classes/api/services/CItemGeneral.php:333
+#: include/classes/api/services/CItemGeneral.php:339
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Ключ \"%1$s\" не совпадает с <grpmax|grpmin|grpsum|grpavg>[\"Группа(ы) узлов сети\", \"Ключ элемента данных\", \"<last|min|max|avg|sum|count>\", \"параметр\"]."
@@ -9923,11 +9923,11 @@ msgstr "Интерфейсы IPMI не найдены."
 msgid "No JMX interfaces found."
 msgstr "Интерфейсы JMX не найдены."
 
-#: include/classes/api/services/CItemGeneral.php:424
+#: include/classes/api/services/CItemGeneral.php:430
 msgid "No SNMP OID specified."
 msgstr "SNMP OID не указан."
 
-#: include/classes/api/services/CItemGeneral.php:430
+#: include/classes/api/services/CItemGeneral.php:436
 msgid "No SNMP community specified."
 msgstr "SNMP community не указан."
 
@@ -9973,7 +9973,7 @@ msgstr "В операции действия для команды \"%s\" не �
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "В операции действия для команды \"%s\" не указано имя пользователя для аутентификации."
 
-#: include/classes/api/services/CItemGeneral.php:401
+#: include/classes/api/services/CItemGeneral.php:407
 msgid "No authentication user name specified."
 msgstr "Для аутентификации не указано имя пользователя."
 
@@ -10139,7 +10139,7 @@ msgstr "Нет изображения"
 msgid "No interface found"
 msgstr "Интерфейс не найден"
 
-#: include/classes/api/services/CItemGeneral.php:274
+#: include/classes/api/services/CItemGeneral.php:280
 msgid "No interface found."
 msgstr "Интерфейс не найден."
 
@@ -10270,7 +10270,7 @@ msgstr "Нет прав доступа в систему."
 #: include/classes/api/services/CImage.php:492
 #: include/classes/api/services/CImage.php:510
 #: include/classes/api/services/CItemGeneral.php:181
-#: include/classes/api/services/CItemGeneral.php:239
+#: include/classes/api/services/CItemGeneral.php:245
 #: include/classes/api/services/CItem.php:571
 #: include/classes/api/services/CItemPrototype.php:723
 #: include/classes/api/services/CMaintenance.php:266
@@ -10327,7 +10327,7 @@ msgstr "Нет прав доступа к запрашиваемому объе�
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Не указан файл приватного ключа для команды \"%s\" в операции действия."
 
-#: include/classes/api/services/CItemGeneral.php:409
+#: include/classes/api/services/CItemGeneral.php:415
 msgid "No private key file specified."
 msgstr "Файл приватного ключа не указан."
 
@@ -10340,7 +10340,7 @@ msgstr "Без прокси"
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Не указан файл публичного ключа для команды \"%s\" в операции действия."
 
-#: include/classes/api/services/CItemGeneral.php:406
+#: include/classes/api/services/CItemGeneral.php:412
 msgid "No public key file specified."
 msgstr "Файл публичного ключа не указан."
 
@@ -12324,7 +12324,7 @@ msgstr "Интерфейсы SNMP"
 msgid "SNMP trap"
 msgstr "SNMP trap"
 
-#: include/classes/api/services/CItemGeneral.php:418
+#: include/classes/api/services/CItemGeneral.php:424
 msgid "SNMP trap key is invalid."
 msgstr "Ключ SNMP trap ошибочный."
 
@@ -14400,7 +14400,7 @@ msgstr "Тип вычисления"
 msgid "Type of information"
 msgstr "Тип информации"
 
-#: include/classes/api/services/CItemGeneral.php:342
+#: include/classes/api/services/CItemGeneral.php:348
 msgid "Type of information must be \"Numeric (unsigned)\" or \"Numeric (float)\" for aggregate items."
 msgstr "Тип информации должен быть \"Числовой (целочисленный)\" или \"Числовой (дробный)\" для агрегативных элементов данных."
 
