@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:21+0200\n"
-"PO-Revision-Date: 2015-08-13 00:15+0300\n"
+"POT-Creation-Date: 2015-11-01 00:35+0200\n"
+"PO-Revision-Date: 2015-10-31 09:20+0300\n"
 "Last-Translator: Jan <jan.garaj@gmail.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1439417729.0\n"
+"X-POOTLE-MTIME: 1446276031.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -76,9 +76,9 @@ msgstr[2] "%1$s dní"
 #, c-format
 msgid "%1$s event"
 msgid_plural "%1$s events"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "%1$s udalosť"
+msgstr[1] "%1$s udalosti"
+msgstr[2] "%1$s udalostí"
 
 #: include/views/monitoring.history.php:27
 #, c-format
@@ -371,11 +371,11 @@ msgstr[2] "Akcie vypnuté"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
-msgstr ""
+msgstr "Akcia vypnutá, kvôli vymazaniu používateľskej skupiny."
 
 #: include/classes/api/services/CUser.php:1351
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "Akcia vypnutá, kvôli vymazaniu používateľa."
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -601,7 +601,7 @@ msgstr "Kontrola dostupnosti agenta. Vráti nič - nedostupný, 1 - dostupný"
 
 #: include/views/configuration.host.list.php:70
 msgid "Agent encryption"
-msgstr ""
+msgstr "Agent šifrovanie"
 
 #: include/classes/items/CHelpItems.php:65
 #: include/classes/items/CHelpItems.php:335
@@ -869,7 +869,7 @@ msgstr "Minimálne jedna plánovaná odstávka musí byť vytvorená."
 #: include/classes/api/services/CValueMap.php:488
 #, c-format
 msgid "At least one mapping should be given for value map \"%1$s\"."
-msgstr ""
+msgstr "Minimálne jedno mapovanie by malo byť pre mapu hodnôt \"%1$s\"."
 
 #: include/classes/setup/CFrontendSetup.php:249
 msgid "At least one of MySQL, PostgreSQL, Oracle, SQLite3 or IBM DB2 should be supported."
@@ -1122,7 +1122,7 @@ msgstr "Podľa šablóny spúšťača"
 #: include/views/configuration.host.list.php:197
 #: include/views/configuration.host.list.php:211
 msgid "CERT"
-msgstr ""
+msgstr "CERT"
 
 #: triggers.php:376
 msgid "CONFIGURATION OF TRIGGERS"
@@ -1141,7 +1141,7 @@ msgstr "CPU load. Vráti desatinné číslo"
 #: include/classes/items/CHelpItems.php:193
 #: include/classes/items/CHelpItems.php:475
 msgid "CPU utilisation percentage. Returns float"
-msgstr ""
+msgstr "Využitie CPU v percentách. Vráti desatinné číslo"
 
 #: include/views/configuration.services.edit.php:69 services.php:43
 msgid "Calculate SLA, acceptable SLA (in %)"
@@ -1189,12 +1189,11 @@ msgstr "Zrušiť"
 
 #: app/controllers/CControllerAcknowledgeCreate.php:39
 #: app/controllers/CControllerAcknowledgeCreate.php:129
-#, fuzzy
 msgid "Cannot acknowledge event"
 msgid_plural "Cannot acknowledge events"
 msgstr[0] "Nie je možné potvrdiť udalosť"
-msgstr[1] "Nie je možné potvrdiť udalosť"
-msgstr[2] "Nie je možné potvrdiť udalosť"
+msgstr[1] "Nie je možné potvrdiť udalosti"
+msgstr[2] "Nie je možné potvrdiť udalosti"
 
 #: include/classes/api/services/CHttpTest.php:621
 #, c-format
@@ -2424,7 +2423,7 @@ msgstr "Nie je možné aktualizovať hosta"
 
 #: include/classes/api/services/CHost.php:802
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
-msgstr ""
+msgstr "Nie je možné aktualizovať nastavenie šifrovania hosta. Mali by byť upresnené nastavenia spojenia pre oba smery."
 
 #: host_prototypes.php:193
 msgid "Cannot update host prototype"
@@ -2583,7 +2582,7 @@ msgstr "Stred"
 #: include/views/configuration.host.prototype.edit.php:356
 #: include/views/configuration.host.prototype.edit.php:365
 msgid "Certificate"
-msgstr ""
+msgstr "Certifikát"
 
 #: include/classes/screens/CScreenBase.php:267
 #: include/classes/screens/CScreenBuilder.php:465
@@ -2702,13 +2701,13 @@ msgstr "Kontrola, či UDP port je v LISTEN stave. 0 - nie je v LISTEN stave, 1 -
 #: include/classes/items/CHelpItems.php:407
 #: include/classes/items/CHelpItems.php:639
 msgid "Checks performance of TCP service. Returns 0 - service is down; seconds - the number of seconds spent while connecting to the service"
-msgstr ""
+msgstr "Kontroly výkonnosti TCP služby. Vráti 0 - služba je nedostupná, sekundy - počet sekúnd strávených pripojovaním k službe"
 
 #: include/classes/items/CHelpItems.php:137
 #: include/classes/items/CHelpItems.php:419
 #: include/classes/items/CHelpItems.php:647
 msgid "Checks performance of UDP service. Returns 0 - service is down; seconds - the number of seconds spent waiting for response from the service"
-msgstr ""
+msgstr "Kontroly výkonnosti UDP služby. Vráti 0 - služba je nedostupná, sekundy - počet sekúnd strávených čakaním na odpoveď služby"
 
 #: include/classes/api/services/CDRule.php:349
 msgid "Checks should be unique."
@@ -2808,8 +2807,9 @@ msgid "Close expression constructor"
 msgstr "Zavrieť konštruktéra výrazu"
 
 #: include/classes/html/CCollapsibleUiWidget.php:50 jsLoader.php:171
+#, fuzzy
 msgid "Collapse"
-msgstr ""
+msgstr "Zavrieť"
 
 #: include/views/configuration.graph.edit.php:263
 #: include/views/js/configuration.sysmaps.js.php:354
@@ -2875,7 +2875,7 @@ msgstr "Komerčné"
 
 #: include/classes/api/services/CAction.php:1837
 msgid "Comparing several triggers with \"and\" is not allowed."
-msgstr ""
+msgstr "Porovnanie viacerých spúšťačov pomocou \"and\" nie je povolené."
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
@@ -3157,24 +3157,24 @@ msgstr ""
 
 #: include/views/configuration.host.massupdate.php:372
 msgid "Connections"
-msgstr ""
+msgstr "Pripojenia"
 
 #: include/views/configuration.host.edit.php:774
 #: include/views/configuration.host.massupdate.php:351
 #: include/views/configuration.host.prototype.edit.php:360
 msgid "Connections from host"
-msgstr ""
+msgstr "Pripojenia z hosta"
 
 #: app/views/administration.proxy.edit.php:104
 msgid "Connections from proxy"
-msgstr ""
+msgstr "Pripojenia z proxy"
 
 #: app/views/administration.proxy.edit.php:97
 #: include/views/configuration.host.edit.php:766
 #: include/views/configuration.host.massupdate.php:344
 #: include/views/configuration.host.prototype.edit.php:352
 msgid "Connections to host"
-msgstr ""
+msgstr "Pripojenia k hostovi"
 
 #: include/hosts.inc.php:209
 msgid "Contact"
@@ -3458,7 +3458,7 @@ msgstr "Aktuálny rok"
 #: include/views/configuration.action.edit.php:137
 #: include/views/configuration.host.discovery.edit.php:271
 msgid "Custom expression"
-msgstr "Osobitný výraz"
+msgstr "Vlastný výraz"
 
 #: charts.php:26
 msgid "Custom graphs"
@@ -3469,7 +3469,7 @@ msgstr "Vlastné grafy"
 #: include/views/configuration.item.massupdate.php:372
 #: include/views/configuration.item.prototype.edit.php:311
 msgid "Custom intervals"
-msgstr ""
+msgstr "Vlastné intervaly"
 
 #: include/maps.inc.php:50
 msgid "Custom label"
@@ -3542,8 +3542,9 @@ msgid "DNS"
 msgstr "DNS"
 
 #: include/views/configuration.host.list.php:38
+#, fuzzy
 msgid "DNS like"
-msgstr ""
+msgstr "DNS like"
 
 #: app/views/administration.proxy.edit.php:44
 #: include/views/configuration.host.edit.php:129
@@ -3563,8 +3564,9 @@ msgid "Daily"
 msgstr "Denne"
 
 #: include/classes/core/ZBase.php:266
+#, fuzzy
 msgid "Dark"
-msgstr ""
+msgstr "Tmavá"
 
 #: app/controllers/CControllerDashboardView.php:66
 #: app/views/monitoring.dashboard.view.php:25 include/menu.inc.php:34
@@ -3781,7 +3783,7 @@ msgstr "Predvolené oneskorenie (v sekundách)"
 
 #: adm.other.php:38 include/views/administration.general.other.edit.php:48
 msgid "Default host inventory mode"
-msgstr ""
+msgstr "Predvolený mód inventára hosta"
 
 #: include/views/configuration.action.edit.php:50
 #: include/views/configuration.action.edit.php:671
@@ -4298,7 +4300,7 @@ msgstr "Rozdiel medzi MAX a MIN hodnotou v perióde T je > N"
 
 #: popup_trexpr.php:237
 msgid "Difference between MAX and MIN value of a period T is NOT N"
-msgstr "Rozdiel medzi MAX a MIN hodnotou v perióde T je NOT N"
+msgstr "Rozdiel medzi MAX a MIN hodnotou v perióde T NIE JE N"
 
 #: popup_trexpr.php:278
 msgid "Difference between last and preceding values, then N = 1, 0 - otherwise"
@@ -5595,8 +5597,9 @@ msgstr "Pevná"
 #: include/views/configuration.item.prototype.edit.php:276
 #: include/views/js/common.item.edit.js.php:7
 #: include/views/js/configuration.item.massupdate.js.php:7
+#, fuzzy
 msgid "Flexible"
-msgstr ""
+msgstr "Flexibilný"
 
 #: include/views/configuration.httpconf.popup.php:100
 msgid "Follow redirects"
@@ -5608,19 +5611,19 @@ msgstr "Heslo účtu guest musí byť prázdne"
 
 #: popup_trexpr.php:598
 msgid "Forecast for next t seconds based on period T is < N"
-msgstr ""
+msgstr "Predpoveď na ďalších t sekúnd založených na perióde T je < N"
 
 #: popup_trexpr.php:608
 msgid "Forecast for next t seconds based on period T is = N"
-msgstr ""
+msgstr "Predpoveď na ďalších t sekúnd založených na perióde T je = N"
 
 #: popup_trexpr.php:603
 msgid "Forecast for next t seconds based on period T is > N"
-msgstr ""
+msgstr "Predpoveď na ďalších t sekúnd založených na perióde T je > N"
 
 #: popup_trexpr.php:613
 msgid "Forecast for next t seconds based on period T is NOT N"
-msgstr ""
+msgstr "Predpoveď na ďalších t sekúnd založených na perióde T NIE JE N"
 
 #: include/items.inc.php:1323 include/views/configuration.item.edit.php:200
 #: include/views/configuration.item.prototype.edit.php:198
@@ -6398,7 +6401,7 @@ msgstr "Typ popisu hosta"
 
 #: include/views/hostmacros.php:172
 msgid "Host macros"
-msgstr ""
+msgstr "Makrá hosta"
 
 #: include/actions.inc.php:62
 msgid "Host metadata"
@@ -6660,8 +6663,9 @@ msgid "IP and DNS cannot be empty for host interface."
 msgstr "IP a DNS nemôže byť prázdne pre hostovo rozhranie."
 
 #: include/views/configuration.host.list.php:41
+#, fuzzy
 msgid "IP like"
-msgstr ""
+msgstr "IP like"
 
 #: include/views/configuration.discovery.edit.php:51
 #: include/views/configuration.discovery.list.php:38
@@ -7405,8 +7409,9 @@ msgid "Incorrect inventory field \"%s\"."
 msgstr "Neplatné inventárne pole \"%s\"."
 
 #: include/classes/api/services/CAction.php:1456
+#, fuzzy
 msgid "Incorrect inventory mode in action operation."
-msgstr ""
+msgstr "Neplatný mód inventára v prevádzke."
 
 #: include/classes/api/services/CScreenItem.php:732
 #, c-format
@@ -7493,7 +7498,7 @@ msgstr "Neplatný počet maximálnych stĺpcov v prvku obrazovky."
 
 #: include/classes/api/services/CMediatype.php:387
 msgid "Incorrect media type ID."
-msgstr ""
+msgstr "Nesprávny typ média ID."
 
 #: include/classes/api/services/CScript.php:532
 #, c-format
@@ -7790,7 +7795,7 @@ msgstr "Neplatná hodnota \"%1$s\" pre unsigned int pole \"%2$s\"."
 #: include/classes/api/services/CMediatype.php:782
 #, c-format
 msgid "Incorrect value \"%1$s\" in field \"%2$s\" for media type \"%3$s\"."
-msgstr ""
+msgstr "Nesprávna hodnota \"%1$s\" v poli \"%2$s\" pre typ média \"%3$s\"."
 
 #: include/classes/api/services/CEvent.php:436
 #: include/classes/api/services/CMediatype.php:417
@@ -7870,8 +7875,9 @@ msgstr "Informatívna"
 
 #: include/classes/items/CHelpItems.php:165
 #: include/classes/items/CHelpItems.php:447
+#, fuzzy
 msgid "Information about a service. Returns integer with param as state, startup; string - with param as displayname, path, user; text - with param as description; Specifically for state: 0 - running, 1 - paused, 2 - start pending, 3 - pause pending, 4 - continue pending, 5 - stop pending, 6 - stopped, 7 - unknown, 255 - no such service; Specifically for startup: 0 - automatic, 1 - automatic delayed, 2 - manual, 3 - disabled, 4 - unknown"
-msgstr ""
+msgstr "Informácia o službe. Vráti celé číslo s parametrom ako status, startup, reťazec - s parametrom ako displayname, cesta, používateľ, text - s parametrom ako popis. Špeciálne pre state: 0 - beží, 1 - pozastavený, 2 - čakajúci na štart, 3 - čakajúci na pozastavenie, 4 - čakajúci na pokračovanie, 5 - čakajúci na zastavenie, 6 - zastavený, 7 - neznámy, 255 - žiadna služba. Špeciálne pro startup: 0 - automatický, 1 - automatický oneskorený, 2 - manuálny, 3 - zakázaný, 4 - neznámy"
 
 #: include/views/hostmacros.php:173
 msgid "Inherited and host macros"
@@ -9523,7 +9529,7 @@ msgstr "Minimálna hodnota pre periódu T je > N"
 
 #: popup_trexpr.php:341
 msgid "Minimum value for period T is NOT N"
-msgstr "Minimálna hodnota pre periódu T je NOT N"
+msgstr "Minimálna hodnota pre periódu T NIE JE N"
 
 #: include/forms.inc.php:1959
 msgid "Minutes"
@@ -10007,7 +10013,7 @@ msgstr "Žiadne údaje neboli prijaté počas doby T, then N = 1, 0 - inak"
 
 #: popup_trexpr.php:583
 msgid "No data received during period of time T, then N NOT 1, 0 - otherwise"
-msgstr "Žiadne údaje neboli prijaté počas doby T, then N NOT 1, 0 - inak"
+msgstr "Žiadne údaje neboli prijaté počas doby T, potom N NIE JE 1, 0 - inak"
 
 #: include/classes/api/services/CHostInterface.php:798
 #, c-format

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-01 00:21+0200\n"
-"PO-Revision-Date: 2015-10-26 08:20+0300\n"
+"POT-Creation-Date: 2015-11-01 00:35+0200\n"
+"PO-Revision-Date: 2015-10-29 15:46+0300\n"
 "Last-Translator: Lukáš <iam@lukasmaly.net>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
@@ -13,7 +13,7 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Pootle 2.5.0\n"
 "X-Poedit-Basepath: ../../\n"
-"X-POOTLE-MTIME: 1445840436.0\n"
+"X-POOTLE-MTIME: 1446126380.0\n"
 
 #: include/classes/import/validators/C10XmlValidator.php:344
 #: include/classes/import/validators/C10XmlValidator.php:361
@@ -371,11 +371,11 @@ msgstr[2] "Akce vypnuty"
 
 #: include/classes/api/services/CUserGroup.php:766
 msgid "Action disabled due to deletion of user group."
-msgstr ""
+msgstr "Akce zakázána kvůli vymazání skupiny uživatelů."
 
 #: include/classes/api/services/CUser.php:1351
 msgid "Action disabled due to deletion of user."
-msgstr ""
+msgstr "Akce zakázána kvůli vymazání uživatele."
 
 #: actionconf.php:415
 msgid "Action enabled"
@@ -2873,7 +2873,7 @@ msgstr "Komerční"
 
 #: include/classes/api/services/CAction.php:1837
 msgid "Comparing several triggers with \"and\" is not allowed."
-msgstr ""
+msgstr "Porovnání více spouštěčů pomocí \"and\" není dovoleno."
 
 #: include/views/administration.usergroups.edit.php:143
 msgid "Composing permissions"
