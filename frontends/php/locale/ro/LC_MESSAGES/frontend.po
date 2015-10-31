@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Zabbix 2.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-10-25 13:20+0200\n"
+"POT-Creation-Date: 2015-11-01 00:14+0200\n"
 "PO-Revision-Date: 2014-05-02 16:44+0300\n"
 "Last-Translator: altmir <rmircea@birotec.ro>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
@@ -655,7 +655,7 @@ msgstr "Eroare aplicație."
 msgid "Application updated"
 msgstr "Aplicație actualizată"
 
-#: api/classes/CItemGeneral.php:406
+#: api/classes/CItemGeneral.php:412
 #, c-format
 msgid "Application with ID \"%1$s\" is not available on \"%2$s\"."
 msgstr "Aplicația cu ID \"%1$s\" nu este disponibilă pe \"%2$s\"."
@@ -2234,7 +2234,7 @@ msgstr "Nu se poate trimite comanda, verificați conexiunea cu serverul Zabbix \
 msgid "Cannot set \"%1$s\" for host group \"%2$s\"."
 msgstr ""
 
-#: api/classes/CItemGeneral.php:242
+#: api/classes/CItemGeneral.php:248
 #, c-format
 msgid "Cannot set \"%1$s\" for item \"%2$s\"."
 msgstr "Nu se poate seta \"%1$s\" pentru elementul \"%2$s\"."
@@ -2688,7 +2688,7 @@ msgstr "Verifică performanța serviciului. 0 - serviciul este oprit, sec - num�
 msgid "Check the agent usability. Always return 1. Can be used as a TCP ping."
 msgstr "Verifică modul de utilizare al agentului. Întotdeauna returnează 1. Poate fi folosit ca ping TCP."
 
-#: api/classes/CItemGeneral.php:282
+#: api/classes/CItemGeneral.php:288
 msgid "Check the key, please. Default example was passed."
 msgstr "Vă rugăm să verificați cheia. A fost folosit exemplul implicit."
 
@@ -7045,7 +7045,7 @@ msgstr "Argumente incorecte trimise metodei."
 msgid "Incorrect authentication protocol for discovery rule \"%1$s\"."
 msgstr "Protocol de autentificare incorect pentru regula de detecție \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:387
+#: api/classes/CItemGeneral.php:393
 #, c-format
 msgid "Incorrect authentication protocol for item \"%1$s\"."
 msgstr "Protocol de autentificare incorect pentru itemul \"%1$s\"."
@@ -7123,12 +7123,12 @@ msgstr "Câmpuri incorecte pentru trigger."
 msgid "Incorrect file upload."
 msgstr "Încărcare fișier incorectă. "
 
-#: api/classes/CItemGeneral.php:849
+#: api/classes/CItemGeneral.php:855
 #, c-format
 msgid "Incorrect flexible interval \"%1$s\"."
 msgstr "Interval flexibil \"%1$s\" incorect."
 
-#: api/classes/CItemGeneral.php:838
+#: api/classes/CItemGeneral.php:844
 #, c-format
 msgid "Incorrect flexible interval in item \"%1$s\". Flexible interval must be a string."
 msgstr "Interval flexibil incorect în itemul \"%1$s\". Intervalul flexibil trebuie să fie un șir."
@@ -7348,7 +7348,7 @@ msgstr "Gamă port incorectă."
 msgid "Incorrect privacy protocol for discovery rule \"%1$s\"."
 msgstr "Protocol intimitate incorect pentru regula de detecție \"%1$s\"."
 
-#: api/classes/CItemGeneral.php:396
+#: api/classes/CItemGeneral.php:402
 #, c-format
 msgid "Incorrect privacy protocol for item \"%1$s\"."
 msgstr "Protocol intimitate incorect pentru item \"%1$s\"."
@@ -7849,7 +7849,7 @@ msgstr "Itemul \"%1$s\" pe \"%2$s\": aplicația \"%3$s\" nu există."
 msgid "Item \"%1$s\" skipped - user rule."
 msgstr "Itemul \"%1$s\" sărit - regula utilizatorului."
 
-#: api/classes/CItemGeneral.php:378
+#: api/classes/CItemGeneral.php:384
 #, c-format
 msgid "Item \"%1$s:%2$s\" has invalid port: \"%3$s\"."
 msgstr "Itemul \"%1$s:%2$s\" are un port invalid: \"%3$s\"."
@@ -7951,44 +7951,44 @@ msgstr "Prototipuri item ale"
 msgid "Item updated"
 msgstr "Item actualizat"
 
-#: api/classes/CItemGeneral.php:266
+#: api/classes/CItemGeneral.php:272
 msgid "Item uses host interface from non-parent host."
 msgstr "Itemul folosește interfața serverului dintr-un server ne-părinte."
 
-#: api/classes/CItemGeneral.php:269
+#: api/classes/CItemGeneral.php:275
 msgid "Item uses incorrect interface type."
 msgstr "Itemul folosește un tip de interfață incorectă."
 
-#: api/classes/CItemGeneral.php:326 api/classes/CItemGeneral.php:336
+#: api/classes/CItemGeneral.php:332 api/classes/CItemGeneral.php:342
 msgid "Item will not be refreshed. Please enter a correct update interval."
 msgstr "Itemul nu va fi actualizat. Va rugăm să introduceți un interval de actualizare corect."
 
-#: api/classes/CItemGeneral.php:449
+#: api/classes/CItemGeneral.php:455
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as a discovery rule."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca o regulă de detecție."
 
-#: api/classes/CItemGeneral.php:455
+#: api/classes/CItemGeneral.php:461
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item created from item prototype."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca și un item creat dintr-un prototip item. "
 
-#: api/classes/CItemGeneral.php:452
+#: api/classes/CItemGeneral.php:458
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item prototype."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca și un prototip item."
 
-#: api/classes/CItemGeneral.php:446
+#: api/classes/CItemGeneral.php:452
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as an item."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca și un item."
 
-#: api/classes/CItemGeneral.php:458
+#: api/classes/CItemGeneral.php:464
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\" as unknown item element."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\" ca și un element item necunoscut."
 
-#: api/classes/CItemGeneral.php:815
+#: api/classes/CItemGeneral.php:821
 #, c-format
 msgid "Item with key \"%1$s\" already exists on \"%2$s\"."
 msgstr "Item cu cheia \"%1$s\" deja există pe \"%2$s\"."
@@ -8128,7 +8128,7 @@ msgstr "Păstrează perioada resurselor pierdute (în zile)"
 msgid "Key"
 msgstr "Cheie"
 
-#: api/classes/CItemGeneral.php:306
+#: api/classes/CItemGeneral.php:312
 #, c-format
 msgid "Key \"%1$s\" does not match <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
 msgstr "Cheia \"%1$s\" nu se potrivește <grpmax|grpmin|grpsum|grpavg>[\"Host group(s)\", \"Item key\", \"<last|min|max|avg|sum|count>\", \"parameter\"]."
@@ -9558,11 +9558,11 @@ msgstr "Niciun serviciu IT găsit."
 msgid "No JMX interfaces found."
 msgstr "Nicio interfață JMX găsită."
 
-#: api/classes/CItemGeneral.php:366
+#: api/classes/CItemGeneral.php:372
 msgid "No SNMP OID specified."
 msgstr "Niciun SNMP OID specificat."
 
-#: api/classes/CItemGeneral.php:372
+#: api/classes/CItemGeneral.php:378
 msgid "No SNMP community specified."
 msgstr "Nicio comunitate SNMP specificată."
 
@@ -9623,7 +9623,7 @@ msgstr "Niciun tip de autentificare specificat pentru comanda de acțiune a oper
 msgid "No authentication user name specified for action operation command \"%s\"."
 msgstr "Niciun nume de utilizator specificat pentru comanda de acțiune a operațiunii \"%s\"."
 
-#: api/classes/CItemGeneral.php:343
+#: api/classes/CItemGeneral.php:349
 msgid "No authentication user name specified."
 msgstr "Niciun nume de utilizator specificat."
 
@@ -9833,7 +9833,7 @@ msgstr "Nici o imagine găsită."
 msgid "No interface found"
 msgstr "Nicio interfață găsită"
 
-#: api/classes/CItemGeneral.php:263
+#: api/classes/CItemGeneral.php:269
 msgid "No interface found."
 msgstr "Nicio interfață găsită."
 
@@ -9996,7 +9996,7 @@ msgstr "Nicio permisiune de acces la sistem."
 #: api/classes/CHttpTest.php:610 api/classes/CIconMap.php:319
 #: api/classes/CImage.php:242 api/classes/CImage.php:356
 #: api/classes/CImage.php:473 api/classes/CItemGeneral.php:181
-#: api/classes/CItemGeneral.php:234 api/classes/CItem.php:690
+#: api/classes/CItemGeneral.php:240 api/classes/CItem.php:690
 #: api/classes/CItemPrototype.php:509 api/classes/CMaintenance.php:320
 #: api/classes/CMaintenance.php:345 api/classes/CMaintenance.php:358
 #: api/classes/CMaintenance.php:470 api/classes/CMaintenance.php:487
@@ -10026,7 +10026,7 @@ msgstr "Nicio permisiune la obiectul menționat sau acesta nu există!"
 msgid "No private key file specified for action operation command \"%s\"."
 msgstr "Nu a fost specificat niciun fișier cu cheie privată pentru comanda de acțiune a operațiunii \"%s\"."
 
-#: api/classes/CItemGeneral.php:351
+#: api/classes/CItemGeneral.php:357
 msgid "No private key file specified."
 msgstr "Nu a fost specificat nici un fișier cu cheie privată."
 
@@ -10047,7 +10047,7 @@ msgstr "Niciun proxy ID dat."
 msgid "No public key file specified for action operation command \"%s\"."
 msgstr "Nu a fost specificat niciun fișier cu cheie publică pentru comanda de acțiune a operațiunii \"%s\"."
 
-#: api/classes/CItemGeneral.php:348
+#: api/classes/CItemGeneral.php:354
 msgid "No public key file specified."
 msgstr "Nu a fost specificat nici un fișier cu cheie publică."
 
@@ -12078,7 +12078,7 @@ msgstr "Interfață SNMP"
 msgid "SNMP trap"
 msgstr "SNMP ttrap"
 
-#: api/classes/CItemGeneral.php:360
+#: api/classes/CItemGeneral.php:366
 msgid "SNMP trap key is invalid."
 msgstr "Cheie SNMP trap invalidă."
 
@@ -14102,11 +14102,11 @@ msgstr "Tip de calcul"
 msgid "Type of information"
 msgstr "Tip de informație"
 
-#: api/classes/CItemGeneral.php:319
+#: api/classes/CItemGeneral.php:325
 msgid "Type of information must be \"Log\" for log key."
 msgstr "Tipul de informație trebuie să fie \"Log\" pentru cheia de autentificare."
 
-#: api/classes/CItemGeneral.php:314
+#: api/classes/CItemGeneral.php:320
 msgid "Type of information must be \"Numeric (float)\" for aggregate items."
 msgstr "Tipul de informație trebuie să fie \"Numeric (float)\" pentru itemii agregați."
 
