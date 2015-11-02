@@ -449,14 +449,13 @@ class CConfigurationExport {
 	protected function prepareItems(array $items) {
 		// Value map IDs that are zeroes, should be skipped.
 		$valuemapids = zbx_objectValues($items, 'valuemapid');
+		$valuemapids = array_combine($valuemapids, $valuemapids);
 
 		foreach ($valuemapids as $valuemapid) {
 			if ($valuemapid == 0) {
 				unset($valuemapids[$valuemapid]);
 			}
 		}
-
-		$valuemapids = array_combine($valuemapids, $valuemapids);
 
 		if ($this->data['valueMaps']) {
 			/*
@@ -588,14 +587,13 @@ class CConfigurationExport {
 
 		// Gather value maps. Value map IDs that are zeroes, should be skipped.
 		$valuemapids = zbx_objectValues($prototypes, 'valuemapid');
+		$valuemapids = array_combine($valuemapids, $valuemapids);
 
 		foreach ($valuemapids as $valuemapid) {
 			if ($valuemapid == 0) {
 				unset($valuemapids[$valuemapid]);
 			}
 		}
-
-		$valuemapids = array_combine($valuemapids, $valuemapids);
 
 		if ($this->data['valueMaps']) {
 			/*
