@@ -1300,6 +1300,7 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],			// 1 day and 6 hours
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],		// 1 day and 12 hours
 			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],				// 1 week and 1 day
+			['main' => SEC_PER_WEEK * 2, 'sub' => SEC_PER_WEEK],		// 2 weeks and 1 week
 			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_DAY * 15],		// 30 days and 15 days
 			['main' => SEC_PER_MONTH * 6, 'sub' => SEC_PER_MONTH],		// half year and 30 days
 			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],			// 1 year and 30 days
@@ -1586,6 +1587,7 @@ class CLineGraphDraw extends CGraphDraw {
 					|| ($mainInterval == SEC_PER_DAY && date('H', $new_time) == 0 && date('i', $new_time) == 0)
 					|| ($mainInterval == SEC_PER_WEEK && date('N', $new_time) == 7)
 					|| ($mainInterval == SEC_PER_MONTH && date('d', $new_time) == 1)
+					|| ($mainInterval == SEC_PER_WEEK * 2 && date('m', $new_time) != date('m', $previous_time))
 					|| $format == YEAR_FORMAT) {
 				$this->drawMainPeriod($new_time, $format, $position);
 				continue;
