@@ -436,6 +436,7 @@ void	zbx_config_clean(zbx_config_t *cfg);
 #define ZBX_FLAG_INTERFACE_SNMP		0x02
 #define ZBX_FLAG_INTERFACE_IPMI		0x04
 #define ZBX_FLAG_INTERFACE_JMX		0x08
+#define ZBX_FLAG_INTERFACE_UNKNOWN	0x80
 
 int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
 void	DCupdate_hosts_availability();
