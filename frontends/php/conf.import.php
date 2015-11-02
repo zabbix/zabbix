@@ -60,7 +60,7 @@ $data = [
 		'screens' => ['updateExisting' => false, 'createMissing' => false],
 		'maps' => ['updateExisting' => false, 'createMissing' => false],
 		'images' => ['updateExisting' => false, 'createMissing' => false],
-		'valueMaps' => ['updateExisting' => false, 'createMissing' => false],
+		'valueMaps' => ['updateExisting' => false, 'createMissing' => false]
 	],
 	'backurl' => getRequest('backurl', 'zabbix.php?action=dashboard.view')
 ];
