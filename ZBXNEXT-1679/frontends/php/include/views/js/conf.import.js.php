@@ -19,6 +19,7 @@
 					},
 					{
 						'title': '<?= _('Cancel') ?>',
+						'cancel': true,
 						'focused': false,
 						'class': 'btn-alt',
 						'action': function() {

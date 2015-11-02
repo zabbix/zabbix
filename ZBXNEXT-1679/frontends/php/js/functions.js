@@ -553,9 +553,14 @@ function overlayDialogue(params) {
 		class: 'overlay-dialogue-footer'
 	});
 
-	var button_focused = null;
+	var button_focused = null,
+		button_cancel = null;
 
 	jQuery.each(params.buttons, function(index, obj) {
+		if (obj.cancel) {
+			button_cancel = obj;
+		}
+
 		var button = jQuery('<button>', {
 			type: 'button',
 			text: obj.title
@@ -595,6 +600,9 @@ function overlayDialogue(params) {
 				class: 'overlay-close-btn'
 			})
 				.click(function() {
+					if (button_cancel) {
+						button_cancel.action();
+					}
 					overlayDialogueDestroy();
 					return false;
 				})
@@ -612,6 +620,9 @@ function overlayDialogue(params) {
 		.append(overlay_dialogue_footer)
 		.on('keypress keydown', function(e) {
 			if (e.which == 27) { // ESC
+				if (button_cancel) {
+					button_cancel.action();
+				}
 				overlayDialogueDestroy();
 				return false;
 			}
