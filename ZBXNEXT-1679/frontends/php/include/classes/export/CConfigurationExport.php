@@ -447,6 +447,16 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function prepareItems(array $items) {
+		// Remove items linked to discovered applications.
+		foreach ($items as $idx => $item) {
+			foreach ($item['applications'] as $application) {
+				if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+					unset($items[$idx]);
+					continue 2;
+				}
+			}
+		}
+
 		// Value map IDs that are zeroes, should be skipped.
 		$valuemapids = zbx_objectValues($items, 'valuemapid');
 		$valuemapids = array_combine($valuemapids, $valuemapids);
@@ -484,14 +494,6 @@ class CConfigurationExport {
 
 			if ($item['valuemapid'] != 0) {
 				$item['valuemap'] = ['name' => $this->data['valueMaps'][$item['valuemapid']]['name']];
-			}
-
-			// Remove items linked to discovered applications.
-			foreach ($item['applications'] as $application) {
-				if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-					unset($items[$idx]);
-					continue 2;
-				}
 			}
 		}
 		unset($item);
