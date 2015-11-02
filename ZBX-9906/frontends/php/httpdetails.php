@@ -42,17 +42,9 @@ $fields = array(
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
-	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	null),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
-	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	null),
-	'favcnt' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null)
+	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	null)
 );
-
-if (!array_key_exists('favobj', $_REQUEST)
-	|| ($_REQUEST['favobj'] != 'set_rf_rate')
-	|| ($page['type'] != PAGE_TYPE_JS && $page['type'] != PAGE_TYPE_HTML_BLOCK)) {
-	check_fields($fields);
-}
 
 /*
  * Ajax
@@ -73,20 +65,6 @@ if (isset($_REQUEST['favobj'])) {
 		$details = make_webdetails(get_request('httptestid'));
 		$details->show();
 	}
-
-	if ($_REQUEST['favobj'] == 'set_rf_rate') {
-		CProfile::update('web.httpdetails.widget.webdetails.rf_rate', $_REQUEST['favcnt'], PROFILE_TYPE_INT);
-		$_REQUEST['favcnt'] = CProfile::get('web.httpdetails.widget.webdetails.rf_rate', 60);
-
-		echo get_update_doll_script('mainpage', $_REQUEST['favref'], 'frequency', $_REQUEST['favcnt'])
-		.get_update_doll_script('mainpage', $_REQUEST['favref'], 'stopDoll')
-		.get_update_doll_script('mainpage', $_REQUEST['favref'], 'startDoll');
-
-		$menu = array();
-		$submenu = array();
-		make_refresh_menu('mainpage', $_REQUEST['favref'], $_REQUEST['favcnt'], null, $menu, $submenu);
-		echo 'page_menu["menu_'.$_REQUEST['favref'].'"] = '.zbx_jsvalue($menu['menu_'.$_REQUEST['favref']]).';';
-	}
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -99,7 +77,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $httpTest = API::HttpTest()->get(array(
 	'httptestids' => get_request('httptestid'),
-	'output' => array('httptestid', 'name'),
+	'output' => array('httptestid', 'hostid', 'name'),
 	'selectSteps' => array('httpstepid', 'name', 'no'),
 	'preservekeys' => true
 ));
@@ -113,31 +91,35 @@ $itemIds = zbx_objectValues($itemIds, 'itemid');
 /*
  * Display
  */
-$menu = array();
-$submenu = array();
-// append web widget
-make_refresh_menu('mainpage', 'hat_webdetails', CProfile::get('web.httpdetails.widget.webdetails.rf_rate', 60), null, $menu, $submenu);
-insert_js('var page_menu='.zbx_jsvalue($menu).";\n".'var page_submenu='.zbx_jsvalue($submenu).";\n");
 
-$refresh_menu = get_icon('menu', array('menu' => 'hat_webdetails'));
-$httpdetails = new CUIWidget('hat_webdetails', new CSpan(_('Loading...'), 'textcolorstyles'), 1);
-$httpdetails->setHeader(new CDiv(_('DETAILS OF SCENARIO'), 'textwhite', 'hat_webdetails_header'),
+$widget = new CWidget();
+$widget->addPageHeader(
+	new CSpan(
+		array(_('DETAILS OF SCENARIO'), SPACE,
+			bold(CMacrosResolverHelper::resolveHttpTestName($httpTest['hostid'], $httpTest['name']))
+		),
+		null,
+		'hat_webdetails_header'
+	),
 	array(
-		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen'])),
-		$refresh_menu
+		get_icon('reset', array('id' => get_request('httptestid'))),
+		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
 	)
 );
+$widget->show();
+
+$httpdetails = (new CDiv(new CSpan(_('Loading...'), 'textcolorstyles'), null,'hat_webdetails'));
 $httpdetails->show();
 
 // refresh tab
-$refresh_tab = array(
+$data_refresh = array(
 	array(
 		'id' => 'hat_webdetails',
-		'frequency' => CProfile::get('web.httpdetails.widget.webdetails.rf_rate', 60),
+		'frequency' => CWebUser::$data['refresh'],
 		'params' => array('httptestid' => $httpTest['httptestid'])
 	)
 );
-add_doll_objects($refresh_tab);
+add_doll_objects($data_refresh);
 
 echo SBR;
 
