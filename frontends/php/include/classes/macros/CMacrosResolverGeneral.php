@@ -920,7 +920,7 @@ class CMacrosResolverGeneral {
 								if ($context === null) {
 									$value['value'] = $global_macros[$macro]['value'];
 								}
-								elseif ($value['value_default'] !== null) {
+								elseif ($value['value_default'] === null) {
 									$value['value_default'] = $global_macros[$macro]['value'];
 								}
 							}
@@ -986,7 +986,7 @@ class CMacrosResolverGeneral {
 					if ($context === null) {
 						return ['value' => $host_macros[$hostid][$macro]['value'], 'value_default' => $value_default];
 					}
-					elseif ($value_default !== null) {
+					elseif ($value_default === null) {
 						$value_default = $host_macros[$hostid][$macro]['value'];
 					}
 				}
