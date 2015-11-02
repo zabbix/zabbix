@@ -3437,6 +3437,15 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 	/* Set RNG callback where to get random numbers from */
 	ssl_set_rng(s->tls_ctx, ctr_drbg_random, ctr_drbg);
 
+	/* disable using of session tickets (by default it is enabled on client) */
+	if (0 != (res = ssl_set_session_tickets(s->tls_ctx, SSL_SESSION_TICKETS_DISABLED)))
+	{
+		zbx_tls_error_msg(res, "ssl_set_session_tickets(): ", error);
+		ssl_free(s->tls_ctx);
+		zbx_free(s->tls_ctx);
+		goto out;
+	}
+
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 	{
 		/* Set our own debug callback function. The 3rd parameter of ssl_set_dbg() we set to NULL. It will be */
@@ -4139,6 +4148,15 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	/* Set RNG callback where to get random numbers from */
 	ssl_set_rng(s->tls_ctx, ctr_drbg_random, ctr_drbg);
+
+	/* explicitly disable using of session tickets (although by default it is disabled on server) */
+	if (0 != (res = ssl_set_session_tickets(s->tls_ctx, SSL_SESSION_TICKETS_DISABLED)))
+	{
+		zbx_tls_error_msg(res, "ssl_set_session_tickets(): ", error);
+		ssl_free(s->tls_ctx);
+		zbx_free(s->tls_ctx);
+		goto out;
+	}
 
 	if (SUCCEED == zabbix_check_log_level(LOG_LEVEL_TRACE))
 	{
