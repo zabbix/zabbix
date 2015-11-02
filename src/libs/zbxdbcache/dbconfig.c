@@ -30,6 +30,7 @@
 #include "dbcache.h"
 #include "zbxregexp.h"
 #include "macrocache.h"
+#include "cfg.h"
 
 static int	sync_in_progress = 0;
 
@@ -292,6 +293,7 @@ typedef struct
 	int		proxy_config_nextcheck;
 	int		proxy_data_nextcheck;
 	int		timediff;
+	int		lastaccess;
 	unsigned char	location;
 }
 ZBX_DC_PROXY;
@@ -1078,9 +1080,11 @@ static void	DCsync_hosts(DB_RESULT result)
 
 		/* store new information in host structure */
 
-		host->proxy_hostid = proxy_hostid;
 		DCstrpool_replace(found, &host->host, row[2]);
 		DCstrpool_replace(found, &host->name, row[23]);
+
+		/* reset the used interfaces flag */
+		host->used_interfaces = ZBX_FLAG_INTERFACE_NONE;
 
 		if (0 == found)
 		{
@@ -1101,12 +1105,19 @@ static void	DCsync_hosts(DB_RESULT result)
 			host->jmx_errors_from = atoi(row[19]);
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
+
 		}
 		else
 		{
 			if (HOST_STATUS_MONITORED == status && HOST_STATUS_MONITORED != host->status)
 				host->data_expected_from = now;
+
+			/* reset host status if host proxy assignment has been changed */
+			if (proxy_hostid != host->proxy_hostid)
+				host->used_interfaces = ZBX_FLAG_INTERFACE_UNKNOWN;
 		}
+
+		host->proxy_hostid = proxy_hostid;
 
 		/* update hosts_h index using new data, if not done already */
 
@@ -1167,6 +1178,8 @@ static void	DCsync_hosts(DB_RESULT result)
 				zbx_binary_heap_remove_direct(&config->pqueue, proxy->hostid);
 				proxy->location = ZBX_LOC_NOWHERE;
 			}
+
+			proxy->lastaccess = atoi(row[24]);
 		}
 		else if (NULL != (proxy = zbx_hashset_search(&config->proxies, &hostid)))
 		{
@@ -1180,9 +1193,6 @@ static void	DCsync_hosts(DB_RESULT result)
 		}
 
 		host->status = status;
-
-		/* reset the used interfaces flag */
-		host->used_interfaces = ZBX_FLAG_INTERFACE_NONE;
 	}
 
 	/* remove deleted hosts from buffer */
@@ -2013,22 +2023,25 @@ static void	DCsync_items(DB_RESULT result, int refresh_unsupported_changed)
 			}
 
 			/* update host's used_interfaces flag */
-			switch (type)
+			if (ZBX_FLAG_INTERFACE_UNKNOWN != host->used_interfaces)
 			{
-				case ITEM_TYPE_ZABBIX:
-					host->used_interfaces |= ZBX_FLAG_INTERFACE_AGENT;
-					break;
-				case ITEM_TYPE_SNMPv1:
-				case ITEM_TYPE_SNMPv2c:
-				case ITEM_TYPE_SNMPv3:
-					host->used_interfaces |= ZBX_FLAG_INTERFACE_SNMP;
-					break;
-				case ITEM_TYPE_IPMI:
-					host->used_interfaces |= ZBX_FLAG_INTERFACE_IPMI;
-					break;
-				case ITEM_TYPE_JMX:
-					host->used_interfaces |= ZBX_FLAG_INTERFACE_JMX;
-					break;
+				switch (type)
+				{
+					case ITEM_TYPE_ZABBIX:
+						host->used_interfaces |= ZBX_FLAG_INTERFACE_AGENT;
+						break;
+					case ITEM_TYPE_SNMPv1:
+					case ITEM_TYPE_SNMPv2c:
+					case ITEM_TYPE_SNMPv3:
+						host->used_interfaces |= ZBX_FLAG_INTERFACE_SNMP;
+						break;
+					case ITEM_TYPE_IPMI:
+						host->used_interfaces |= ZBX_FLAG_INTERFACE_IPMI;
+						break;
+					case ITEM_TYPE_JMX:
+						host->used_interfaces |= ZBX_FLAG_INTERFACE_JMX;
+						break;
+				}
 			}
 		}
 		else
@@ -2978,7 +2991,7 @@ void	DCsync_configuration(void)
 				"errors_from,available,disable_until,snmp_errors_from,"
 				"snmp_available,snmp_disable_until,ipmi_errors_from,ipmi_available,"
 				"ipmi_disable_until,jmx_errors_from,jmx_available,jmx_disable_until,"
-				"status,name"
+				"status,name,lastaccess"
 			" from hosts"
 			" where status in (%d,%d,%d,%d)"
 				" and flags<>%d",
@@ -6858,8 +6871,11 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 	zbx_uint64_pair_t	pair;
 	ZBX_DC_HOST		*host;
 	zbx_hashset_iter_t	iter;
+	int			now;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	now = time(NULL);
 
 	LOCK_CACHE;
 
@@ -6867,10 +6883,26 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 
 	while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 	{
-		/* On server skip hosts handled by proxies. They are handled dirrectly */
-		/* when receiving hosts' availability data from proxies.               */
+		/* On server skip hosts handled by proxies. They are handled directly */
+		/* when receiving hosts' availability data from proxies.              */
+		/* Unless a host was just (re)assigned to a proxy or the proxy has    */
+		/* not updated its status during the maximum proxy heartbeat period.  */
+		/* In this case reset all interfaces to unknown status.               */
 		if (0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) && 0 != host->proxy_hostid)
-			continue;
+		{
+			if (ZBX_FLAG_INTERFACE_UNKNOWN != host->used_interfaces)
+			{
+				ZBX_DC_PROXY	*proxy;
+
+				if (NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)) &&
+						ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX >= now - proxy->lastaccess)
+				{
+					continue;
+				}
+
+				host->used_interfaces = ZBX_FLAG_INTERFACE_UNKNOWN;
+			}
+		}
 
 		pair.second = ZBX_FLAG_INTERFACE_NONE;
 
