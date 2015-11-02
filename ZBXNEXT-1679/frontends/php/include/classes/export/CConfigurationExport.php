@@ -487,7 +487,7 @@ class CConfigurationExport {
 		foreach ($items as $idx => &$item) {
 			$item['valuemap'] = [];
 
-			if ($item['valuemapid']) {
+			if ($item['valuemapid'] != 0) {
 				$item['valuemap'] = ['name' => $this->data['valueMaps'][$item['valuemapid']]['name']];
 			}
 
@@ -626,7 +626,7 @@ class CConfigurationExport {
 		foreach ($prototypes as $prototype) {
 			$prototype['valuemap'] = [];
 
-			if ($prototype['valuemapid']) {
+			if ($prototype['valuemapid'] != 0) {
 				$prototype['valuemap']['name'] = $this->data['valueMaps'][$prototype['valuemapid']]['name'];
 			}
 
