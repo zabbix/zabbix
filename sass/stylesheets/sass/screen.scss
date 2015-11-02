@@ -3760,6 +3760,57 @@ Table with no results:
    </table>
 </div>
 ```
+
+##Tables with elements
+
+```html_example
+<div class="overflow-table">
+   <table class="list-table">
+      <thead>
+         <tr>
+            <th>Type</th>
+            <th>Description</th>
+            <th>Example</th>
+         </tr>
+      </thead>
+      <tbody>
+         <tr>
+            <td>Alerts</td>
+            <td>asdasasdasd</td>
+            <td><span class="status-yellow"><b>!</b></span> <span class="status-red"><b>&times;</b></span></td>
+         </tr>
+         <tr>
+            <td>Icons</td>
+            <td>asdasasdasd</td>
+            <td><span class="rel-container"><span class="icon-depend-down cursor-pointer"></span></span><span class="rel-container"><span class="icon-depend-up cursor-pointer"></span></span><span class="rel-container"><span class="icon-ackn cursor-pointer"></span></span></td>
+         </tr>
+         <tr>
+            <td>Links with icons</td>
+            <td>asdasasdasd</td>
+            <td><span class="rel-container"><a href="">Some link</a><span class="icon-maint cursor-pointer"></span></span></td>
+         </tr>
+         <tr>
+            <td>Labels</td>
+            <td>asdasasdasd</td>
+            <td>
+               <div class="status-container"><span class="status-green">label</span> <span class="status-grey">label</span></div>
+               <div class="status-container"><span class="status-red">label</span></div>
+            </td>
+         </tr>
+         <tr>
+            <td>Tree</td>
+            <td>asdasd</td>
+            <td>
+               <div class="treeview"><span class="arrow-right"></span></div>
+               <a href="#">Collapsed</a> 
+               <div class="treeview"><span class="arrow-down"></span></div>
+               <a href="#">Expanded</a>
+            </td>
+         </tr>
+      </tbody>
+   </table>
+</div>
+```
 */
 
 /*doc
@@ -3916,35 +3967,35 @@ Dialogs:
       <tbody>
          <tr>
             <td>2015-09-08 13:47:58</td>
-            <td><span style="color: #DC0000">PROBLEM</span></td>
+            <td><span class="red">PROBLEM</span></td>
             <td>15d 23h 45m</td>
             <td>15d 23h 45m</td>
             <td><a class="link-alt red" href="">No</a></td>
          </tr>
          <tr>
             <td>2015-08-05 06:14:58</td>
-            <td><span style="color: #00AA00">OK</span></td>
+            <td><span class="green">OK</span></td>
             <td>1m 4d 7h</td>
             <td>1m 20d 7h</td>
             <td><a class="link-alt red" href="">No</a></td>
          </tr>
          <tr>
             <td>2015-08-05 05:32:58</td>
-            <td><span style="color: #DC0000">PROBLEM</span></td>
+            <td><span class="red">PROBLEM</span></td>
             <td>42m</td>
             <td>1m 20d 8h</td>
             <td><a class="link-alt red" href="">No</a></td>
          </tr>
          <tr>
             <td>2015-08-04 06:11:58</td>
-            <td><span style="color: #00AA00">OK</span></td>
+            <td><span class="green">OK</span></td>
             <td>23h 21m</td>
             <td>1m 21d 7h</td>
             <td><a class="link-alt red" href="">No</a></td>
          </tr>
          <tr>
             <td>2015-08-04 05:38:58</td>
-            <td><span style="color: #DC0000">PROBLEM</span></td>
+            <td><span class="red">PROBLEM</span></td>
             <td>33m</td>
             <td>1m 21d 7h</td>
             <td><a class="link-alt red" href="">No</a></td>
@@ -3995,7 +4046,7 @@ Notificatiions are used to provide feedback after certain actions or give inform
 
 ##Success Notification
 
-Success Notification:
+Success notification appears after an action has been completed without errors. Has green background.
 
 ```html_example
 <div class="msg-good">
@@ -4015,7 +4066,7 @@ Success Notification:
 
 ##Error Notification
 
-Error Notification:
+Error notification appears after an action has been completed with errors or an error in general. Has red background.
 
 ```html_example
 <div class="msg-bad">
@@ -4031,6 +4082,14 @@ Error Notification:
    </div>
    <span class="overlay-close-btn" title="Close"></span>
 </div>
+```
+
+##Global Notification
+
+Global notification
+
+```html_example
+<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
 ```
 */
 
@@ -4051,11 +4110,11 @@ example
 /*doc
 ---
 parent: components
-title: Date Picker
+title: Datepickers
 name: date
 ---
 
-A date picker pop-up is used to select a single date or a date range.
+A datepicker pop-up is used to select a single date or a date range.
 
 ```html_example
 <div class="overlay-dialogue calendar">
@@ -4265,6 +4324,43 @@ Spinners are used to show data retrieval or computation.
 ```html_example
 <div class="preloader-container">
    <div class="preloader"></div>
+</div>
+```
+*/
+
+/*doc
+---
+parent: components
+title: Widgets
+name: widgets
+---
+
+Widgets
+
+```html_example
+<div class="dashbrd-widget">
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Favorite screens</h4>
+      <ul>
+         <li><button type="button" class="btn-widget-action" title="Action"></button></li>
+         <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
+         <li><button type="button" class="btn-widget-expand" title="Expand"></button></li>
+      </ul>
+   </div>
+   <table class="list-table">
+      <tbody>
+         <tr>
+            <td><a href="#">Zabbix server</a></td>
+         </tr>
+         <tr>
+            <td><a href="#">My 2nd megaserver</a></td>
+         </tr>
+      </tbody>
+   </table>
+   <ul class="dashbrd-widget-foot">
+      <li><a href="#">Screens</a></li>
+      <li><a href="#">Slide shows</a></li>
+   </ul>
 </div>
 ```
 */
