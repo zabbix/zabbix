@@ -463,8 +463,6 @@ class CConfigurationExport {
 			 * value map IDs that should not be selected again.
 			 */
 
-			$valuemaps = $this->data['valueMaps'];
-
 			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
 				if (array_key_exists($valuemapid, $valuemapids)) {
 					unset($valuemapids[$valuemapid]);
@@ -600,8 +598,6 @@ class CConfigurationExport {
 			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
 			 * value map IDs that should not be selected again.
 			 */
-
-			$valuemaps = $this->data['valueMaps'];
 
 			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
 				if (array_key_exists($valuemapid, $valuemapids)) {
