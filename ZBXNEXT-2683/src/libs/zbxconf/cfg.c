@@ -21,6 +21,8 @@
 #include "cfg.h"
 #include "log.h"
 
+extern unsigned char	program_type;
+
 char	*CONFIG_FILE		= NULL;
 
 char	*CONFIG_LOG_FILE	= NULL;
@@ -550,4 +552,28 @@ error:
 int	parse_cfg_file(const char *cfg_file, struct cfg_line *cfg, int optional, int strict)
 {
 	return __parse_cfg_file(cfg_file, cfg, 0, optional, strict);
+}
+
+int	check_cfg_feature_int(const char *parameter, int value, const char *feature)
+{
+	if (0 != value)
+	{
+		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
+				parameter, get_program_type_string(program_type), feature);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+int	check_cfg_feature_str(const char *parameter, const char *value, const char *feature)
+{
+	if (NULL != value)
+	{
+		zbx_error("\"%s\" configuration parameter cannot be used: Zabbix %s was compiled without %s",
+				parameter, get_program_type_string(program_type), feature);
+		return FAIL;
+	}
+
+	return SUCCEED;
 }
