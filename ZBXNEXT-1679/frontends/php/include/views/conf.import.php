@@ -36,10 +36,13 @@ $titles = [
 	'triggers' => _('Triggers'),
 	'graphs' => _('Graphs'),
 	'screens' => _('Screens'),
-	'maps' => _('Maps'),
-	'images' => _('Images'),
-	'valueMaps' => _('Value mappings')
+	'maps' => _('Maps')
 ];
+
+if (CWebUser::$data['type'] == USER_TYPE_SUPER_ADMIN) {
+	$titles['images'] = _('Images');
+	$titles['valueMaps'] = _('Value mappings');
+}
 
 foreach ($titles as $key => $title) {
 	$cbExist = null;
@@ -51,20 +54,10 @@ foreach ($titles as $key => $title) {
 			->setChecked($data['rules'][$key]['updateExisting']);
 
 		if ($key === 'images') {
-			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-				continue;
-			}
-
-			$cbExist->onClick(
-				'updateWarning(this, '.CJs::encodeJson(_('Images for all maps will be updated!')).')'
-			);
+			$cbExist->onClick('updateWarning(this, '.CJs::encodeJson(_('Images for all maps will be updated!')).')');
 		}
 
 		if ($key === 'valueMaps') {
-			if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN) {
-				continue;
-			}
-
 			$cbExist->onClick(
 				'updateWarning(this, '.CJs::encodeJson(_('Value mappings for value maps will be updated!')).')'
 			);
@@ -109,6 +102,4 @@ $form = (new CForm('post', null, 'multipart/form-data'))
 	->addItem($tab_view);
 
 // widget
-$widget = (new CWidget())->addItem($form);
-
-return $widget;
+return (new CWidget())->addItem($form);
