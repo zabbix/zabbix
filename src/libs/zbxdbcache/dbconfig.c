@@ -6191,14 +6191,19 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 	LOCK_CACHE;
 
+	/* User macros should be expanded according to the following priority: */
+	/*                                                                     */
+	/*  1) host context macro                                              */
+	/*  2) global context macro                                            */
+	/*  3) host base (default) macro                                       */
+	/*  4) global base (default) macro                                     */
+	/*                                                                     */
+	/* We try to expand host macros first. If there is no perfect match on */
+	/* the host level, we try to expand global macros, passing the default */
+	/* macro value found on the host level, if any.                        */
+
 	DCget_host_macro(hostids, host_num, name, context, &value, &value_default);
 
-	/* Use the values returned by host macro as initial values when expanding  */
-	/* global macro. This ensures the following user macro resolving priority: */
-	/*  1) host context macro                                                  */
-	/*  2) global context macro                                                */
-	/*  3) host base (default) macro                                           */
-	/*  4) global base (default) macro                                         */
 	if (NULL == value)
 		DCget_global_macro(name, context, &value, &value_default);
 
@@ -6764,6 +6769,8 @@ unlock:
  *                                                                            *
  * Parameters: cache  - [IN] the user macro cache                             *
  *                                                                            *
+ * Comments: assumes macros have not been expanded yet (macro->value is NULL) *
+ *                                                                            *
  ******************************************************************************/
 void	zbx_umc_resolve(zbx_hashset_t *cache)
 {
@@ -6785,28 +6792,30 @@ void	zbx_umc_resolve(zbx_hashset_t *cache)
 			zbx_umc_macro_t	*macro = (zbx_umc_macro_t *)object->macros.values[i];
 			char		*value = NULL, *value_default = NULL;
 
+			/* User macros should be expanded according to the following priority: */
+			/*                                                                     */
+			/*  1) host context macro                                              */
+			/*  2) global context macro                                            */
+			/*  3) host base (default) macro                                       */
+			/*  4) global base (default) macro                                     */
+			/*                                                                     */
+			/* We try to expand host macros first. If there is no perfect match on */
+			/* the host level, we try to expand global macros, passing the default */
+			/* macro value found on the host level, if any.                        */
+
 			DCget_host_macro(object->hostids.values, object->hostids.values_num, macro->name,
 					macro->context, &value, &value_default);
 
-			/* Use the values returned by host macro as initial values when expanding  */
-			/* global macro. This ensures the following user macro resolving priority: */
-			/*  1) host context macro                                                  */
-			/*  2) global context macro                                                */
-			/*  3) host base (default) macro                                           */
-			/*  4) global base (default) macro                                         */
 			if (NULL == value)
 				DCget_global_macro(macro->name, macro->context, &value, &value_default);
 
 			if (NULL != value)
 			{
-				zbx_free(macro->value);
 				macro->value = value;
-
 				zbx_free(value_default);
 			}
 			else if (NULL != value_default)
 			{
-				zbx_free(macro->value);
 				macro->value = value_default;
 			}
 
