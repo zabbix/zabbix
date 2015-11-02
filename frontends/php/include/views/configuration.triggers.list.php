@@ -60,6 +60,8 @@ $triggersTable = (new CTableInfo())
 		$this->data['showInfoColumn'] ? _('Info') : null
 	]);
 
+$this->data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($this->data['triggers'], ['html' => true]);
+
 foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 
@@ -67,8 +69,6 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 	$description = [];
 
 	$trigger['hosts'] = zbx_toHash($trigger['hosts'], 'hostid');
-	$trigger['items'] = zbx_toHash($trigger['items'], 'itemid');
-	$trigger['functions'] = zbx_toHash($trigger['functions'], 'functionid');
 
 	if ($trigger['templateid'] > 0) {
 		if (!isset($this->data['realHosts'][$triggerid])) {
@@ -180,7 +180,7 @@ foreach ($this->data['triggers'] as $tnum => $trigger) {
 		getSeverityCell($trigger['priority'], $this->data['config']),
 		$hosts,
 		$description,
-		triggerExpression($trigger, true),
+		$trigger['expression'],
 		$status,
 		$info
 	]);

@@ -1,6 +1,7 @@
 Changes for 3.0.0alpha4
 
 New features:
+A.F....PS. [ZBXNEXT-2683] added user macro context (Ivo, Oleg, Sasha, wiper)
 ..F....... [ZBX-2616] updated bundled DejaVu font from 2.34 to 2.35 (Richlv)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)

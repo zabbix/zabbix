@@ -594,11 +594,6 @@ class CConfigurationExport {
 		$triggers = $this->prepareTriggers($triggers);
 
 		foreach ($triggers as $trigger) {
-			foreach ($trigger['dependencies'] as &$dependency) {
-				$dependency['expression'] = explode_exp($dependency['expression']);
-			}
-			unset($dependency);
-
 			$items[$trigger['discoveryRule']['itemid']]['triggerPrototypes'][] = $trigger;
 		}
 
@@ -841,14 +836,11 @@ class CConfigurationExport {
 				}
 			}
 
-			$trigger['expression'] = explode_exp($trigger['expression']);
-
-			foreach ($trigger['dependencies'] as &$dependency) {
-				$dependency['expression'] = explode_exp($dependency['expression']);
-			}
-			unset($dependency);
+			$trigger['dependencies'] = CMacrosResolverHelper::resolveTriggerExpressions($trigger['dependencies']);
 		}
 		unset($trigger);
+
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
 
 		return $triggers;
 	}
@@ -1297,10 +1289,12 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
+
 		foreach ($triggers as $id => $trigger) {
 			$ids[$id] = [
 				'description' => $trigger['description'],
-				'expression' => explode_exp($trigger['expression'])
+				'expression' => $trigger['expression']
 			];
 		}
 

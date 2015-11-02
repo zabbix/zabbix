@@ -84,6 +84,19 @@ static int	get_N_functionid(const char *expression, int N_functionid, zbx_uint64
 	{
 		if ('{' == *c)
 		{
+			/* skip user macros */
+			if ('$' == c[1])
+			{
+				int	macro_r, context_l, context_r;
+
+				if (SUCCEED == zbx_user_macro_parse(c, &macro_r, &context_l, &context_r))
+					c += macro_r;
+				else
+					c++;
+
+				continue;
+			}
+
 			state = ID;
 			p_functionid = c + 1;
 		}
@@ -312,6 +325,24 @@ static void	DCexpand_trigger_expression(char **expression)
 			continue;
 		}
 
+		/* skip user macros */
+		if ('$' == (*expression)[l + 1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (SUCCEED == zbx_user_macro_parse(*expression + l, &macro_r, &context_l, &context_r))
+			{
+				zbx_strncpy_alloc(&tmp, &tmp_alloc, &tmp_offset, *expression + l, macro_r + 1);
+				l += macro_r;
+				continue;
+			}
+
+			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '{');
+			zbx_chrcpy_alloc(&tmp, &tmp_alloc, &tmp_offset, '$');
+			l++;
+			continue;
+		}
+
 		for (r = l + 1; 0 != isdigit((*expression)[r]); r++)
 			;
 
@@ -379,6 +410,7 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 	AGENT_REQUEST	request;
 	const char	*param;
 	char		c, *p, *m, *n, *str_out = NULL, *replace_to = NULL;
+	int		macro_r, context_l, context_r;
 
 	init_request(&request);
 
@@ -389,9 +421,12 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 	while (NULL != (m = strchr(p, '$')))
 	{
-		if (m > p && '{' == *(m - 1) && NULL != (n = strchr(m + 1, '}')))	/* user defined macros */
+		if (m > p && '{' == *(m - 1) && FAIL != zbx_user_macro_parse(m - 1, &macro_r, &context_l, &context_r))
 		{
-			c = *++n;
+			/* user macros */
+
+			n = m + macro_r;
+			c = *n;
 			*n = '\0';
 			DCget_user_macro(&hostid, 1, m - 1, &replace_to);
 
@@ -410,8 +445,10 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 			*n = c;
 			p = n;
 		}
-		else if ('1' <= *(m + 1) && *(m + 1) <= '9')				/* macros $1, $2, ... */
+		else if ('1' <= *(m + 1) && *(m + 1) <= '9')
 		{
+			/* macros $1, $2, ... */
+
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
 			*m++ = '$';
@@ -421,8 +458,10 @@ static void	item_description(char **data, const char *key, zbx_uint64_t hostid)
 
 			p = m + 1;
 		}
-		else									/* just a dollar sign */
+		else
 		{
+			/* just a dollar sign */
+
 			c = *++m;
 			*m = '\0';
 			str_out = zbx_strdcat(str_out, p);
@@ -2332,33 +2371,52 @@ int	substitute_simple_macros(zbx_uint64_t *actionid, const DB_EVENT *event, DB_E
 
 	for (; NULL != bl && SUCCEED == res; m = bl = strchr(p, '{'))
 	{
-		if (NULL == (br = strchr(bl, '}')))
-			break;
+		indexed_macro = 0;
+
+		/* User macros can have macro closing symbol } in quoted context. */
+		/* We must use user macro parsing function to find macro end.     */
+		if ('$' == m[1])
+		{
+			int	macro_r, context_l, context_r;
+
+			if (FAIL == zbx_user_macro_parse(m, &macro_r, &context_l, &context_r))
+			{
+				p = bl + 1;
+				continue;
+			}
+
+			br = bl + macro_r;
+		}
+		else
+		{
+			if (NULL == (br = strchr(bl, '}')))
+				break;
+
+			N_functionid = 1;
+
+			if ('1' <= *(br - 1) && *(br - 1) <= '9')
+			{
+				int	i, diff;
+
+				for (i = 0; NULL != ex_macros[i]; i++)
+				{
+					diff = zbx_mismatch(ex_macros[i], bl);
+
+					if ('}' == ex_macros[i][diff] && bl + diff == br - 1)
+					{
+						N_functionid = *(br - 1) - '0';
+						indexed_macro = 1;
+						m = ex_macros[i];
+						break;
+					}
+				}
+			}
+		}
 
 		c = *++br;
 		*br = '\0';
 
 		ret = SUCCEED;
-		N_functionid = 1;
-		indexed_macro = 0;
-
-		if ('1' <= *(br - 2) && *(br - 2) <= '9')
-		{
-			int	i, diff;
-
-			for (i = 0; NULL != ex_macros[i]; i++)
-			{
-				diff = zbx_mismatch(ex_macros[i], bl);
-
-				if ('}' == ex_macros[i][diff] && bl + diff == br - 2)
-				{
-					N_functionid = *(br - 2) - '0';
-					indexed_macro = 1;
-					m = ex_macros[i];
-					break;
-				}
-			}
-		}
 
 		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY)))
 		{
@@ -4198,6 +4256,46 @@ int	substitute_discovery_macros(char **data, struct zbx_json_parse *jp_row, int 
 
 			if (SUCCEED == rc)
 				zbx_replace_string(data, l, &r, replace_to);
+		}
+		/* substitute user macro context */
+		else if (0 == (flags & ZBX_MACRO_CONTEXT) && '$' == (*data)[l + 1])
+		{
+			int	macro_r, context_l, context_r, force_quote = 0;
+			char	*context, *context_esc;
+
+			if (FAIL == zbx_user_macro_parse(*data + l, &macro_r, &context_l, &context_r))
+				continue;
+
+			if (0 == context_l)
+			{
+				/* user macro without context, skip it */
+				l += macro_r;
+				continue;
+			}
+
+			force_quote = ('"' == (*data)[l + context_l]);
+
+			context = zbx_user_macro_unquote_context_dyn(*data + l + context_l, context_r - context_l + 1);
+
+			if (FAIL == substitute_discovery_macros(&context, jp_row, ZBX_MACRO_CONTEXT, error,
+					max_error_len))
+			{
+				zbx_free(context);
+				ret = FAIL;
+				break;
+			}
+
+			context_esc = zbx_user_macro_quote_context_dyn(context, force_quote);
+
+			r = l + context_r;
+			zbx_replace_string(data, l + context_l, &r, context_esc);
+
+			zbx_free(context_esc);
+			zbx_free(context);
+
+			/* move cursor to the end of user macro */
+			while ('}' != (*data)[r++])
+				;
 		}
 		/* substitute LLD macros, located in the item key parameters in simple macros */
 		/* e.g. {Zabbix server:ifAlias[{#SNMPINDEX}].last(0)}                         */
