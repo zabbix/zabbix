@@ -478,7 +478,7 @@ class CConfigurationExport {
 				'preservekeys' => true
 			]);
 
-			$this->data['valueMaps'] = zbx_array_merge($this->data['valueMaps'], $valuemaps);
+			$this->data['valueMaps'] += $valuemaps;
 		}
 
 		foreach ($items as $idx => &$item) {
@@ -614,7 +614,7 @@ class CConfigurationExport {
 				'preservekeys' => true
 			]);
 
-			$this->data['valueMaps'] = zbx_array_merge($this->data['valueMaps'], $valuemaps);
+			$this->data['valueMaps'] += $valuemaps;
 		}
 
 		foreach ($prototypes as $prototype) {
