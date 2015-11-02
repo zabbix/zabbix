@@ -55,7 +55,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$this->grid = []; // vertical & horizontal grids params
 		$this->gridLinesCount = []; // How many grids to draw
 		$this->gridStep = []; // grid step
-		$this->gridPixels = 25; // optimal grid size
+		$this->gridPixels = 30; // optimal grid size
 		$this->gridPixelsVert = 40;
 	}
 
@@ -1300,7 +1300,6 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 6],			// 1 day and 6 hours
 			['main' => SEC_PER_DAY, 'sub' => SEC_PER_HOUR * 12],		// 1 day and 12 hours
 			['main' => SEC_PER_WEEK, 'sub' => SEC_PER_DAY],				// 1 week and 1 day
-			['main' => SEC_PER_WEEK * 2, 'sub' => SEC_PER_WEEK],		// 2 weeks and 1 week
 			['main' => SEC_PER_MONTH, 'sub' => SEC_PER_DAY * 15],		// 30 days and 15 days
 			['main' => SEC_PER_MONTH * 6, 'sub' => SEC_PER_MONTH],		// half year and 30 days
 			['main' => SEC_PER_YEAR, 'sub' => SEC_PER_MONTH],			// 1 year and 30 days
@@ -1396,7 +1395,7 @@ class CLineGraphDraw extends CGraphDraw {
 		$end_element_size = imageTextSize(8, 90, 'WWW');
 
 		$position = 0;
-		$i = 1;
+		$i = 0;
 
 		while ($this->stime + $i * $subInterval + $subOffset < $this->to_time) {
 			$previous_time = isset($new_time) ? $new_time : $this->stime;
@@ -1419,7 +1418,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			elseif ($subInterval == SEC_PER_MONTH * 6) {
 				// First step calculation.
-				if ($i == 1) {
+				if ($i == 0) {
 					// If month > july, then set 1 january and + 1 year.
 					if (date('m', $this->stime) > 7) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
@@ -1443,7 +1442,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			elseif ($subInterval == SEC_PER_MONTH * 4) {
 				// First step calculation.
-				if ($i == 1) {
+				if ($i == 0) {
 					// If month > september, then set 1 january and + 1 year.
 					if (date('m', $this->stime) > 9) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
@@ -1475,7 +1474,7 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			elseif ($subInterval == SEC_PER_MONTH * 3) {
 				// First step calculation.
-				if ($i == 1) {
+				if ($i == 0) {
 					// If month > october, then set 1 january and + 1 year.
 					if (date('m', $this->stime) > 10) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
@@ -1518,21 +1517,21 @@ class CLineGraphDraw extends CGraphDraw {
 			}
 			elseif ($subInterval == SEC_PER_DAY * 15) {
 				// First step calculation.
-				if ($i == 1) {
-					// If day > 15, then set 1 day and + 1 month.
-					if (date('d', $this->stime) > 15) {
+				if ($i == 0) {
+					// If day > 16, then set 1 day and + 1 month.
+					if (date('d', $this->stime) > 16) {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 					}
-					// Otherwise set 15 day.
+					// Otherwise set 16 day.
 					else {
-						$new_time = mktime(0, 0, 0, date('m', $previous_time), 15, date('Y', $previous_time));
+						$new_time = mktime(0, 0, 0, date('m', $previous_time), 16, date('Y', $previous_time));
 					}
 				}
 				// Other steps calculation.
 				else {
-					// If day = 1, then day = 15.
+					// If day = 1, then day = 16.
 					if (date('d', $previous_time) == 1) {
-						$new_time = mktime(0, 0, 0, date('m', $previous_time), 15, date('Y', $previous_time));
+						$new_time = mktime(0, 0, 0, date('m', $previous_time), 16, date('Y', $previous_time));
 					}
 					// Otherwise set 1 day and + 1 month.
 					else {
@@ -1550,14 +1549,14 @@ class CLineGraphDraw extends CGraphDraw {
 
 			$position += $timeIntervalX;
 
-			// First element checks.
-			if (($i == 1 && $position < $element_size['width']) || $new_time >= $this->to_time) {
+			// First element overlaping checks.
+			if (($i == 0 && $position < $element_size['width']) || $new_time >= $this->to_time) {
 				$i++;
 				continue;
 			}
 
-			// Last element cheack.
-			if ($position > $this->sizeX - $end_element_size['width'] / 2) {
+			// Last element overlaping cheack.
+			if ($position > $this->sizeX - $end_element_size['width'] / 2 - 2) {
 				break;
 			}
 
