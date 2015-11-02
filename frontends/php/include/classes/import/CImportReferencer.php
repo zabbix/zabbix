@@ -776,10 +776,11 @@ class CImportReferencer {
 				'editable' => true
 			]);
 
+			$dbTriggers = CMacrosResolverHelper::resolveTriggerExpressions($dbTriggers);
+
 			foreach ($dbTriggers as $dbTrigger) {
-				$dbTriggerExpression = explode_exp($dbTrigger['expression']);
-				if (isset($this->triggers[$dbTrigger['description']][$dbTriggerExpression])) {
-					$this->triggersRefs[$dbTrigger['description']][$dbTriggerExpression] = $dbTrigger['triggerid'];
+				if (isset($this->triggers[$dbTrigger['description']][$dbTrigger['expression']])) {
+					$this->triggersRefs[$dbTrigger['description']][$dbTrigger['expression']] = $dbTrigger['triggerid'];
 				}
 			}
 		}
