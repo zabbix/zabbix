@@ -307,7 +307,7 @@ foreach ($conditions as $i => $condition) {
 	// macro
 	$macro = (new CTextBox('conditions['.$i.'][macro]', $condition['macro'], false, 64))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-		->addClass('macro')
+		->addClass('uppercase')
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $condition['formulaid']);
 

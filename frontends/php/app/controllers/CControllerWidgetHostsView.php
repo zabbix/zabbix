@@ -103,7 +103,7 @@ class CControllerWidgetHostsView extends CController {
 			$filter['extAck'] = $config['event_ack_enable'] ? CProfile::get('web.dashconf.events.extAck', 0) : 0;
 		}
 
-		$data = [
+		$this->setResponse(new CControllerResponseData([
 			'filter' => $filter,
 			'config' => [
 				'severity_name_0' => $config['severity_name_0'],
@@ -112,10 +112,10 @@ class CControllerWidgetHostsView extends CController {
 				'severity_name_3' => $config['severity_name_3'],
 				'severity_name_4' => $config['severity_name_4'],
 				'severity_name_5' => $config['severity_name_5']
+			],
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
 			]
-		];
-
-		$response = new CControllerResponseData($data);
-		$this->setResponse($response);
+		]));
 	}
 }

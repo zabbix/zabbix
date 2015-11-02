@@ -783,7 +783,7 @@ else {
 						getSeverityCell($trigger['priority'], $config, null, !$event['value']),
 						$event['duration'],
 						$config['event_ack_enable'] ? getEventAckState($event, $page['file']) : null,
-						$action
+						(new CCol($action))->addClass(ZBX_STYLE_NOWRAP)
 					]);
 				}
 			}
