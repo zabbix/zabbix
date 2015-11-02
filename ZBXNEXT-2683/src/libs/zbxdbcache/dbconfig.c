@@ -6193,13 +6193,12 @@ void	DCget_user_macro(zbx_uint64_t *hostids, int host_num, const char *macro, ch
 
 	DCget_host_macro(hostids, host_num, name, context, &value, &value_default);
 
-	/* Use the base value returned by host macro as default value when */
-	/* expanding expand global macro. This will ensure the following   */
-	/* user macro resolving priority:                                  */
-	/*  1) host context macro                                          */
-	/*  2) global context macro                                        */
-	/*  3) host base (default) macro                                   */
-	/*  4) global base (default) macro                                 */
+	/* Use the values returned by host macro as initial values when expanding  */
+	/* global macro. This ensures the following user macro resolving priority: */
+	/*  1) host context macro                                                  */
+	/*  2) global context macro                                                */
+	/*  3) host base (default) macro                                           */
+	/*  4) global base (default) macro                                         */
 	if (NULL == value)
 		DCget_global_macro(name, context, &value, &value_default);
 
@@ -6789,13 +6788,12 @@ void	zbx_umc_resolve(zbx_hashset_t *cache)
 			DCget_host_macro(object->hostids.values, object->hostids.values_num, macro->name,
 					macro->context, &value, &value_default);
 
-			/* Use the base value returned by host macro as default value when */
-			/* expanding expand global macro. This will ensure the following   */
-			/* user macro resolving priority:                                  */
-			/*  1) host context macro                                          */
-			/*  2) global context macro                                        */
-			/*  3) host base (default) macro                                   */
-			/*  4) global base (default) macro                                 */
+			/* Use the values returned by host macro as initial values when expanding  */
+			/* global macro. This ensures the following user macro resolving priority: */
+			/*  1) host context macro                                                  */
+			/*  2) global context macro                                                */
+			/*  3) host base (default) macro                                           */
+			/*  4) global base (default) macro                                         */
 			if (NULL == value)
 				DCget_global_macro(macro->name, macro->context, &value, &value_default);
 
