@@ -471,14 +471,12 @@ class CConfigurationExport {
 		}
 
 		if ($valuemapids) {
-			$valuemaps = API::ValueMap()->get([
+			$this->data['valueMaps'] += API::ValueMap()->get([
 				'output' => ['valuemapid', 'name'],
 				'selectMappings' => ['value', 'newvalue'],
 				'valuemapids' => $valuemapids,
 				'preservekeys' => true
 			]);
-
-			$this->data['valueMaps'] += $valuemaps;
 		}
 
 		foreach ($items as $idx => &$item) {
@@ -607,14 +605,12 @@ class CConfigurationExport {
 		}
 
 		if ($valuemapids) {
-			$valuemaps = API::ValueMap()->get([
+			$this->data['valueMaps'] += API::ValueMap()->get([
 				'output' => ['valuemapid', 'name'],
 				'selectMappings' => ['value', 'newvalue'],
 				'valuemapids' => $valuemapids,
 				'preservekeys' => true
 			]);
-
-			$this->data['valueMaps'] += $valuemaps;
 		}
 
 		foreach ($prototypes as $prototype) {
