@@ -218,6 +218,8 @@ static void	rotate_log(const char *log_filename)
 						filename_old);
 
 				zbx_fclose(log_file);
+
+				new_size = 0;
 			}
 		}
 		else
