@@ -210,31 +210,42 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format mappings.
+	 *
+	 * @param array $mappings
+	 *
+	 * @return array
+	 */
+	protected function formatMappings(array $mappings) {
+		$result = [];
+
+		CArrayHelper::sort($mappings, ['value']);
+
+		foreach ($mappings as $mapping) {
+			$result[] = [
+				'value' => $mapping['value'],
+				'newvalue' => $mapping['newvalue']
+			];
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Format value maps.
 	 *
 	 * @param array $valuemaps
 	 */
 	public function buildValueMaps(array $valuemaps) {
-		CArrayHelper::sort($valuemaps, ['name']);
-
-		foreach ($valuemaps as &$valuemap) {
-			CArrayHelper::sort($valuemap['mappings'], ['value']);
-		}
-		unset($valuemap);
-
 		$this->data['value_maps'] = [];
 
-		foreach ($valuemaps as $key => $valuemap) {
-			$this->data['value_maps'][$key] = [
-				'name' => $valuemap['name']
-			];
+		CArrayHelper::sort($valuemaps, ['name']);
 
-			foreach ($valuemap['mappings'] as $mapping) {
-				$this->data['value_maps'][$key]['mappings'][] = [
-					'value' => $mapping['value'],
-					'newvalue' => $mapping['newvalue']
-				];
-			}
+		foreach ($valuemaps as $valuemap) {
+			$this->data['value_maps'][] = [
+				'name' => $valuemap['name'],
+				'mappings' => $this->formatMappings($valuemap['mappings'])
+			];
 		}
 	}
 
