@@ -19,18 +19,24 @@
 **/
 
 
-abstract class CImportConverterTest extends PHPUnit_Framework_TestCase {
+class CFunctionIdParserTest extends CParserTest {
 
-	abstract protected function createConverter();
-	abstract protected function createSource(array $data = []);
-	abstract protected function createExpectedResult(array $data = []);
-
-	public function testConvertGeneral() {
-		$this->assertConvert($this->createExpectedResult(), $this->createSource());
+	protected function getParser() {
+		return new CFunctionIdParser();
 	}
 
-	protected function assertConvert(array $expectedResult, array $source) {
-		$result = $this->createConverter()->convert($source);
-		$this->assertEquals($expectedResult, $result);
+	public function testProvider() {
+		return [
+			['{1}', 0, CParser::PARSE_SUCCESS, '{1}'],
+			['{12345}', 0, CParser::PARSE_SUCCESS, '{12345}'],
+			['{9223372036854775807} = 0', 0, CParser::PARSE_SUCCESS_CONT, '{9223372036854775807}'],
+			['not {34356} = 0', 4, CParser::PARSE_SUCCESS_CONT, '{34356}'],
+
+			['', 0, CParser::PARSE_FAIL, ''],
+			['1', 0, CParser::PARSE_FAIL, ''],
+			['{2Q', 0, CParser::PARSE_FAIL, ''],
+			['{0}', 0, CParser::PARSE_FAIL, ''],
+			['{9223372036854775808}', 0, CParser::PARSE_FAIL, '']
+		];
 	}
 }
