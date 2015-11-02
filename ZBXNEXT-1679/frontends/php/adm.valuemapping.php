@@ -39,16 +39,15 @@ require_once dirname(__FILE__).'/include/page_header.php';
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'valuemapids' =>	[T_ZBX_INT, O_OPT,	P_SYS,			DB_ID,		null],
-	'valuemapid' =>		[T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'(isset({form}) && {form} == "update") || isset({delete})'],
+	'valuemapid' =>		[T_ZBX_INT, O_NO,	P_SYS,			DB_ID,		'isset({form}) && {form} == "update"'],
 	'name' =>			[T_ZBX_STR, O_OPT,	null,			NOT_EMPTY,	'isset({add}) || isset({update})'],
 	'mappings' =>		[T_ZBX_STR, O_OPT,	null,			null,		null],
 	// actions
 	'add' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null],
 	'update' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null],
-	'delete' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	null,		null],
 	'form' =>			[T_ZBX_STR, O_OPT,	P_SYS,			null,		null],
 	'form_refresh' =>	[T_ZBX_INT, O_OPT,	null,			null,		null],
-	'action' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	IN('"valuemap.export","valuemap.massdelete"'), null],
+	'action' =>			[T_ZBX_STR, O_OPT,	P_SYS|P_ACT,	IN('"valuemap.export","valuemap.delete"'), null],
 	// sort and sortorder
 	'sort' =>			[T_ZBX_STR, O_OPT, P_SYS, IN('"name"'),									null],
 	'sortorder' =>		[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
@@ -115,12 +114,8 @@ if (hasRequest('add') || hasRequest('update')) {
 		unset($_REQUEST['form']);
 	}
 }
-elseif ((hasRequest('delete') && hasRequest('valuemapid'))
-		|| (hasRequest('action') && getRequest('action') === 'valuemap.massdelete' && hasRequest('valuemapids'))) {
+elseif (getRequest('action') === 'valuemap.delete' && hasRequest('valuemapids')) {
 	$valuemapids = getRequest('valuemapids', []);
-	if (hasRequest('valuemapid')) {
-		$valuemapids[] = getRequest('valuemapid');
-	}
 
 	$result = (bool) API::ValueMap()->delete($valuemapids);
 
@@ -144,7 +139,8 @@ if (hasRequest('form')) {
 	$data = [
 		'form' => getRequest('form', ''),
 		'valuemapid' => getRequest('valuemapid', 0),
-		'valuemap_count' => 0
+		'valuemap_count' => 0,
+		'sid' => substr(CWebUser::getSessionCookie(), 16, 16)
 	];
 
 	if ($data['valuemapid'] != 0 && !hasRequest('form_refresh')) {

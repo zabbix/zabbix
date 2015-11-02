@@ -64,7 +64,7 @@ $form->addItem([
 	$data['paging'],
 	new CActionButtonList('action', 'valuemapids', [
 		'valuemap.export' => ['name' => _('Export')],
-		'valuemap.massdelete' => ['name' => _('Delete'), 'confirm' => _('Delete selected value maps?')]
+		'valuemap.delete' => ['name' => _('Delete'), 'confirm' => _('Delete selected value maps?')]
 	])
 ]);
 
