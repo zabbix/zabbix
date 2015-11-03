@@ -114,7 +114,7 @@ if (hasRequest('rules_preset') && !hasRequest('rules')) {
 			break;
 
 		case 'valuemap':
-			$data['rules']['valueMaps'] = ['updateExisting' => true, 'createMissing' => true];
+			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 
 			$data['backurl'] = 'adm.valuemapping.php';
 			break;
