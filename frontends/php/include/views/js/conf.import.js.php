@@ -13,18 +13,17 @@
 				'content': jQuery('<span>').text(content),
 				'buttons': [
 					{
-						'title': '<?= _('Ok') ?>',
-						'focused': true,
-						'action': function() {}
-					},
-					{
 						'title': '<?= _('Cancel') ?>',
 						'cancel': true,
-						'focused': false,
-						'class': 'btn-alt',
+						'class': '<?= ZBX_STYLE_BTN_ALT ?>',
 						'action': function() {
 							jQuery(obj).prop('checked', false);
 						}
+					},
+					{
+						'title': '<?= _('Ok') ?>',
+						'focused': true,
+						'action': function() {}
 					}
 				]
 			});
