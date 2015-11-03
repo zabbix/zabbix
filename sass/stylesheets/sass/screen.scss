@@ -3820,8 +3820,7 @@ title: Forms
 name: forms
 ---
 
-Forms forms forms
-
+Forms contain UI elements that are used to submit information. Some form elements have primary and secondary functionality.
 
 ##Primary Button
 
@@ -3931,22 +3930,35 @@ title: Dialogs
 name: dialog
 ---
 
-Dialogs:
+Dialogsxcvxcvxv.
+
+##Alert Dialogs
+
+Alert dialogs are used to urgently inform the user about a certain situation. Primary button should be furthest to the right, labeled with the specific action. Avoid labeling buttons with *No*, *Ok*, *Confirm* and asking questions *Are you sure?*
 
 ```html_example
 <div class="overlay-dialogue">
    <span class="overlay-close-btn"></span>
    <div class="dashbrd-widget-head cursor-move">
-      <h4>Execution confirmation</h4>
+      <h4>Delete the selected item?</h4>
    </div>
-   <div class="overlay-dialogue-body">Some random confirmation text goes right here</div>
-   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Execute</button></div>
+   <div class="overlay-dialogue-body">Some explanatory information</div>
+   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
+</div>
+
+<div class="overlay-dialogue">
+   <span class="overlay-close-btn"></span>
+   <div class="dashbrd-widget-head cursor-move">
+      <h4>Delete the selected item?</h4>
+   </div>
+   <div class="overlay-dialogue-body"></div>
+   <div class="overlay-dialogue-footer"><button type="button" class="btn-alt">Cancel</button><button type="button">Delete</button></div>
 </div>
 ```
 
-##Dialogs with Content
+##Dialogs with Scrollable Content
 
-Dialogs:
+In exceptional cases dialogs may contain additional information inside a scrollable area.
 
 ```html_example
 <div class="overlay-dialogue" style="max-width: 500px">
@@ -4007,7 +4019,7 @@ Dialogs:
 
 ##Contextual Dialogs
 
-Contextual Dialogs:
+Contextual dialogs are used to display commands that are directly related to an item. Contextual dialogs are revealed on click or touch. 
 
 ```html_example
 <ul class="action-menu"">
@@ -4114,7 +4126,7 @@ title: Datepickers
 name: date
 ---
 
-A datepicker pop-up is used to select a single date or a date range.
+Datepickers are used to select a single date or a date range.
 
 ```html_example
 <div class="overlay-dialogue calendar">
@@ -4194,7 +4206,7 @@ A datepicker pop-up is used to select a single date or a date range.
       </tbody>
    </table>
    <div class="calendar-time"><label>Time</label> <input type="text" placeholder="HH" maxlength="2"> : <input type="text" placeholder="MM" maxlength="2"></div>
-   <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Done</button></div>
+   <div class="calendar-footer"><button type="button" class="btn-grey">Now</button><button type="button">Set date</button></div>
 </div>
 ```
 */
@@ -4335,7 +4347,7 @@ title: Widgets
 name: widgets
 ---
 
-Widgets
+Widgets are used to group related information.
 
 ```html_example
 <div class="dashbrd-widget">
