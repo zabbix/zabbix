@@ -71,7 +71,7 @@ function DBconnect(&$error) {
 					(!empty($DB['PASSWORD']) ? 'password=\''.pg_connect_escape($DB['PASSWORD']).'\' ' : '').
 					(!empty($DB['PORT']) ? 'port='.pg_connect_escape($DB['PORT']) : '');
 
-				$DB['DB']= @pg_connect($pg_connection_string);
+				$DB['DB'] = @pg_connect($pg_connection_string);
 				if (!$DB['DB']) {
 					$error = 'Error connecting to database.';
 					$result = false;
