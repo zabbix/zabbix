@@ -600,8 +600,7 @@ class CConfigurationImport {
 	 * Import value maps.
 	 */
 	protected function processValueMaps() {
-		if (CWebUser::$data['type'] != USER_TYPE_SUPER_ADMIN
-				|| (!$this->options['valueMaps']['createMissing'] && !$this->options['valueMaps']['updateExisting'])) {
+		if (!$this->options['valueMaps']['createMissing'] && !$this->options['valueMaps']['updateExisting']) {
 			return;
 		}
 
