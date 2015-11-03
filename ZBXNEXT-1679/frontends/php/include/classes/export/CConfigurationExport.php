@@ -92,7 +92,7 @@ class CConfigurationExport {
 				'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'interfaceid', 'port', 'description', 'inventory_link', 'flags', 'filter', 'lifetime'
 			],
-			'discoveryrule' => ['hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_',
+			'item_prototype' => ['hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_',
 				'delay', 'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'delta',
 				'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
 				'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'valuemapid',
@@ -447,25 +447,22 @@ class CConfigurationExport {
 	 * @return array
 	 */
 	protected function prepareItems(array $items) {
-		// Remove items linked to discovered applications.
+		$valuemapids = [];
+
 		foreach ($items as $idx => $item) {
+			// Remove items linked to discovered applications.
 			foreach ($item['applications'] as $application) {
 				if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($items[$idx]);
 					continue 2;
 				}
 			}
+
+			$valuemapids[$item['valuemapid']] = true;
 		}
 
 		// Value map IDs that are zeroes, should be skipped.
-		$valuemapids = zbx_objectValues($items, 'valuemapid');
-		$valuemapids = array_combine($valuemapids, $valuemapids);
-
-		foreach ($valuemapids as $valuemapid) {
-			if ($valuemapid == 0) {
-				unset($valuemapids[$valuemapid]);
-			}
-		}
+		unset($valuemapids[0]);
 
 		if ($this->data['valueMaps']) {
 			/*
@@ -484,7 +481,7 @@ class CConfigurationExport {
 			$this->data['valueMaps'] += API::ValueMap()->get([
 				'output' => ['valuemapid', 'name'],
 				'selectMappings' => ['value', 'newvalue'],
-				'valuemapids' => $valuemapids,
+				'valuemapids' => array_keys($valuemapids),
 				'preservekeys' => true
 			]);
 		}
@@ -574,7 +571,7 @@ class CConfigurationExport {
 
 		// gather item prototypes
 		$prototypes = API::ItemPrototype()->get([
-			'output' => $this->dataFields['discoveryrule'],
+			'output' => $this->dataFields['item_prototype'],
 			'selectApplications' => ['name'],
 			'selectApplicationPrototypes' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
@@ -583,15 +580,14 @@ class CConfigurationExport {
 			'preservekeys' => true
 		]);
 
-		// Gather value maps. Value map IDs that are zeroes, should be skipped.
-		$valuemapids = zbx_objectValues($prototypes, 'valuemapid');
-		$valuemapids = array_combine($valuemapids, $valuemapids);
+		$valuemapids = [];
 
-		foreach ($valuemapids as $valuemapid) {
-			if ($valuemapid == 0) {
-				unset($valuemapids[$valuemapid]);
-			}
+		foreach ($prototypes as $prototype) {
+			$valuemapids[$prototype['valuemapid']] = true;
 		}
+
+		// Value map IDs that are zeroes, should be skipped.
+		unset($valuemapids[0]);
 
 		if ($this->data['valueMaps']) {
 			/*
@@ -610,7 +606,7 @@ class CConfigurationExport {
 			$this->data['valueMaps'] += API::ValueMap()->get([
 				'output' => ['valuemapid', 'name'],
 				'selectMappings' => ['value', 'newvalue'],
-				'valuemapids' => $valuemapids,
+				'valuemapids' => array_keys($valuemapids),
 				'preservekeys' => true
 			]);
 		}
