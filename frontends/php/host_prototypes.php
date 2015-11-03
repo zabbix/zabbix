@@ -320,6 +320,10 @@ if (isset($_REQUEST['form'])) {
 	if (getRequest('hostid') && !getRequest('form_refresh')) {
 		$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
 
+		if (!array_key_exists('inventory_mode', $data['host_prototype']['inventory'])) {
+			$data['host_prototype']['inventory']['inventory_mode'] = $config['default_inventory_mode'];
+		}
+
 		$data['groups'] = API::HostGroup()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'groupids' => zbx_objectValues($data['host_prototype']['groupLinks'], 'groupid'),
