@@ -536,6 +536,7 @@ function overlayDialogueDestroy() {
  * @param array  buttons				window buttons
  * @param string buttons[]['title']
  * @param string buttons[]['class']
+ * @param bool	 buttons[]['cancel']	(optional) it means what this button has cancel action
  * @param bool	 buttons[]['focused']
  * @param bool   buttons[]['enabled']
  * @param object buttons[]['click']
@@ -554,13 +555,9 @@ function overlayDialogue(params) {
 	});
 
 	var button_focused = null,
-		button_cancel = null;
+		cancel_action = null;
 
 	jQuery.each(params.buttons, function(index, obj) {
-		if (obj.cancel) {
-			button_cancel = obj;
-		}
-
 		var button = jQuery('<button>', {
 			type: 'button',
 			text: obj.title
@@ -582,6 +579,10 @@ function overlayDialogue(params) {
 			button_focused = button;
 		}
 
+		if ('cancel' in obj && obj.cancel === true) {
+			cancel_action = obj.action;
+		}
+
 		overlay_dialogue_footer.append(button);
 	});
 
@@ -600,8 +601,8 @@ function overlayDialogue(params) {
 				class: 'overlay-close-btn'
 			})
 				.click(function() {
-					if (button_cancel) {
-						button_cancel.action();
+					if (cancel_action !== null) {
+						cancel_action();
 					}
 					overlayDialogueDestroy();
 					return false;
@@ -620,8 +621,8 @@ function overlayDialogue(params) {
 		.append(overlay_dialogue_footer)
 		.on('keypress keydown', function(e) {
 			if (e.which == 27) { // ESC
-				if (button_cancel) {
-					button_cancel.action();
+				if (cancel_action !== null) {
+					cancel_action();
 				}
 				overlayDialogueDestroy();
 				return false;
