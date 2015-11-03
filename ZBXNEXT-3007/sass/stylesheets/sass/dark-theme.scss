@@ -1,0 +1,93 @@
+// NOTIFICATION & ALERT
+$red: #e45959;
+$light-red: #503434;
+$lighter-red: #473232;
+
+$dark-yellow: #e99003;
+$yellow: #423601;
+$light-yellow: #2f280a;
+$lighter-yellow: #2f280a;
+
+$green: #59db8f;
+$light-green: #344e3f;
+$lighter-green: #32453a;
+
+$blue: #429ae3;
+
+// MAIN
+$main-nav-bg-color: #2b2b2b;
+$main-subnav-bg-color: #454545;
+$main-subnav-bg-selected-color: #2e2e2e;
+$main-color: #2d3135;
+$font-color: #f2f2f2;
+$font-alt-color: #737373;;
+$body-bg-color: #0e1012;
+
+
+// UI
+$ui-bg-color: #2b2b2b;
+$ui-bg-selected-color: #4f4f4f;
+$ui-hover-color: #383838;
+$ui-border-color: #303030;
+
+$action-hover-color: #454545;
+$action-border-color: #383838;
+$action-shadow-color: rgba(#000, 0.5);
+
+$table-border-color: #383838;
+
+$ui-tab-bg-selected-color: #69808d;
+
+
+// FORMS
+$form-font-color: #e1e3ed;
+$form-bg-color: #383838;
+$form-border-color: #4f4f4f;
+$form-border-focus-color: #768d99;
+
+$form-disabled-font-color: #525252;
+$form-disabled-bg-color: #2b2b2b;
+$form-disabled-border-color: #3d3d3d;
+
+$scrollbar-track-color: #1f1f1f;
+$scrollbar-thumb-color: #383838;
+
+
+// BUTTONS
+$btn-font-color: #f2f2f2;
+$btn-bg-color: #69808d;
+$btn-border-color: #768d99;
+
+$btn-alt-font-color: #768d99;
+$btn-alt-bg-color: transparent;
+$btn-alt-border-color: $btn-border-color;
+
+$btn-form-font-color: #f2f2f2;
+$btn-form-bg-color: $form-bg-color;
+$btn-form-hover-color: #414141;
+$btn-form-border-color: $form-border-color;
+
+$btn-disabled-font-color: #525252;
+$btn-disabled-bg-color: transparent;
+$btn-disabled-border-color: #3d3d3d;
+
+
+// LINKS
+$link-color: #4796c4;
+$link-hover-color: #4796c4;
+$link-active-color: #4796c4;
+$link-visited-color: #4796c4;
+
+$link-main-nav-color: rgba(#fff, 0.75);
+$link-main-nav-hover-color: rgba(#fff, 1);
+$link-main-nav-active-color: rgba(#fff, 1);
+$link-main-nav-visited-color: rgba(#fff, 0.75);
+
+$link-main-subnav-color: rgba(#fff, 0.75);
+$link-main-subnav-hover-color: rgba(#fff, 1);
+$link-main-subnav-active-color: rgba(#fff, 1);
+$link-main-subnav-visited-color: rgba(#fff, 0.75);
+
+
+// Important! @import string should come after variables
+@import 'screen.scss';
