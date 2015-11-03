@@ -3934,7 +3934,7 @@ Dialogsxcvxcvxv.
 
 ##Alert Dialogs
 
-Alert dialogs are used to urgently inform the user about a certain situation. Primary button should be furthest to the right, labeled with the specific action. Avoid labeling buttons with *No*, *Ok*, *Confirm* and asking questions *Are you sure?*
+Alert dialogs are used to urgently inform the user about a certain situation. Primary action button, labeled with the specific action, should be furthest to the right and continue the process. Secondary action button should be placed to the left of the primary action button and return the user to the general screen. Avoid labeling buttons with *No*, *Ok*, *Confirm*, *Done* and asking equally uninformative questions like *Are you sure?*
 
 ```html_example
 <div class="overlay-dialogue">
