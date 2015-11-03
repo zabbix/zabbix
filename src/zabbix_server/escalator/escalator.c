@@ -1687,6 +1687,8 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [processed %d escalations in " ZBX_FS_DBL
