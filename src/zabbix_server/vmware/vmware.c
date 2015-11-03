@@ -3550,6 +3550,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [updated %d, removed %d VMware services in " ZBX_FS_DBL " sec, "
