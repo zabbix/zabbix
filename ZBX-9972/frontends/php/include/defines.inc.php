@@ -433,7 +433,7 @@ define('SERVICE_ALGORITHM_NONE',	0); // do not calculate
 define('SERVICE_ALGORITHM_MAX',		1); // problem, if one children has a problem
 define('SERVICE_ALGORITHM_MIN',		2); // problem, if all children have problems
 
-define('SERVICE_SLA', 99.05);
+define('SERVICE_SLA', 99.9000);
 
 define('SERVICE_SHOW_SLA_OFF',	0);
 define('SERVICE_SHOW_SLA_ON',	1);
