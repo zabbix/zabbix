@@ -30,6 +30,7 @@ abstract class CImportConverterTest extends PHPUnit_Framework_TestCase {
 	}
 
 	protected function assertConvert(array $expectedResult, array $source) {
-		$result = $this->createConverter()->convert($source); $this->assertEquals($expectedResult, $result);
+		$result = $this->createConverter()->convert($source);
+		$this->assertEquals($expectedResult, $result);
 	}
 }

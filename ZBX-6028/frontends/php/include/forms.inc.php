@@ -1438,8 +1438,9 @@ function getTriggerFormData($exprAction) {
 			'selectHosts' => ['hostid'],
 			'triggerids' => $data['triggerid']
 		];
-		$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
-		$data['trigger'] = reset($trigger);
+		$triggers = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
+		$data['trigger'] = reset($triggers);
 
 		// get templates
 		$tmp_triggerid = $data['triggerid'];
@@ -1482,7 +1483,7 @@ function getTriggerFormData($exprAction) {
 	}
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
-		$data['expression'] = explode_exp($data['trigger']['expression']);
+		$data['expression'] = $data['trigger']['expression'];
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $data['trigger']['description'];
