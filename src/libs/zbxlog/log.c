@@ -86,40 +86,199 @@ int	zabbix_decrease_log_level(void)
 	return SUCCEED;
 }
 
-#if !defined(_WINDOWS)
-void	redirect_std(const char *filename)
+#ifndef _WINDOWS
+void	zbx_redirect_stdio(const char *filename)
 {
 	int		fd;
 	const char	default_file[] = "/dev/null";
-	const char	*out_file = default_file;
 	int		open_flags = O_WRONLY;
 
-	close(STDIN_FILENO);
-	open(default_file, O_RDONLY);	/* stdin, normally fd==0 */
-
 	if (NULL != filename && '\0' != *filename)
-	{
-		out_file = filename;
 		open_flags |= O_CREAT | O_APPEND;
-	}
-
-	if (-1 != (fd = open(out_file, open_flags, 0666)))
-	{
-		if (-1 == dup2(fd, STDERR_FILENO))
-			zbx_error("cannot redirect stderr to [%s]", filename);
-
-		if (-1 == dup2(fd, STDOUT_FILENO))
-			zbx_error("cannot redirect stdout to [%s]", filename);
-
-		close(fd);
-	}
 	else
+		filename = default_file;
+
+	if (-1 == (fd = open(filename, open_flags, 0666)))
 	{
-		zbx_error("cannot open [%s]: %s", filename, zbx_strerror(errno));
+		zbx_error("cannot open \"%s\": %s", filename, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+
+	fflush(stdout);
+	if (-1 == dup2(fd, STDOUT_FILENO))
+		zbx_error("cannot redirect stdout to \"%s\": %s", filename, zbx_strerror(errno));
+
+	fflush(stderr);
+	if (-1 == dup2(fd, STDERR_FILENO))
+		zbx_error("cannot redirect stderr to \"%s\": %s", filename, zbx_strerror(errno));
+
+	close(fd);
+
+	if (-1 == (fd = open(default_file, O_RDONLY)))
+	{
+		zbx_error("cannot open \"%s\": %s", default_file, zbx_strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+
+	if (-1 == dup2(fd, STDIN_FILENO))
+		zbx_error("cannot redirect stdin to \"%s\": %s", default_file, zbx_strerror(errno));
+
+	close(fd);
 }
-#endif	/* not _WINDOWS */
+#endif
+
+static void	get_time(struct tm **tm, long *milliseconds)
+{
+#ifdef _WINDOWS
+	struct _timeb	current_time;
+
+	_ftime(&current_time);
+	*tm = localtime(&current_time.time);
+	*milliseconds = current_time.millitm;
+#else
+	struct timeval	current_time;
+	struct tm	tm_local;
+
+	gettimeofday(&current_time, NULL);
+	*tm = localtime_r(&current_time.tv_sec, &tm_local);
+	*milliseconds = current_time.tv_usec / 1000;
+#endif
+}
+
+static void	rotate_log(const char *log_filename)
+{
+	zbx_stat_t		buf;
+	long			milliseconds;
+	struct tm		*tm;
+	zbx_uint64_t		new_size;
+#ifndef _WINDOWS
+	static zbx_uint64_t	old_size = ZBX_MAX_UINT64;
+#endif
+	if (0 == CONFIG_LOG_FILE_SIZE || NULL == log_filename || '\0' == *log_filename)
+	{
+#ifndef _WINDOWS
+		/* redirect only once if log file wasn't specified or there is no log file size limit */
+		if (ZBX_MAX_UINT64 == old_size)
+		{
+			old_size = 0;
+			zbx_redirect_stdio(log_filename);
+		}
+#endif
+		return;
+	}
+
+	if (0 != zbx_stat(log_filename, &buf))
+		return;
+
+	new_size = buf.st_size;
+
+	if (CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < new_size)
+	{
+		char	filename_old[MAX_STRING_LEN];
+
+		strscpy(filename_old, log_filename);
+		zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
+		remove(filename_old);
+
+		if (0 != rename(log_filename, filename_old))
+		{
+			FILE	*log_file = NULL;
+
+			if (NULL != (log_file = fopen(log_filename, "w")))
+			{
+				get_time(&tm, &milliseconds);
+
+				fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
+						" cannot rename log file \"%s\" to \"%s\": %s\n",
+						zbx_get_thread_id(),
+						tm->tm_year + 1900,
+						tm->tm_mon + 1,
+						tm->tm_mday,
+						tm->tm_hour,
+						tm->tm_min,
+						tm->tm_sec,
+						milliseconds,
+						log_filename,
+						filename_old,
+						zbx_strerror(errno));
+
+				fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
+						" Logfile \"%s\" size reached configured limit"
+						" LogFileSize but moving it to \"%s\" failed. The logfile"
+						" was truncated.\n",
+						zbx_get_thread_id(),
+						tm->tm_year + 1900,
+						tm->tm_mon + 1,
+						tm->tm_mday,
+						tm->tm_hour,
+						tm->tm_min,
+						tm->tm_sec,
+						milliseconds,
+						log_filename,
+						filename_old);
+
+				zbx_fclose(log_file);
+
+				new_size = 0;
+			}
+		}
+		else
+			new_size = 0;
+	}
+#ifndef _WINDOWS
+	if (old_size > new_size)
+		zbx_redirect_stdio(log_filename);
+
+	old_size = new_size;
+#endif
+}
+
+#ifndef _WINDOWS
+static sigset_t	orig_mask;
+static void	lock_log(void)
+{
+	sigset_t	mask;
+
+	sigemptyset(&mask);
+	sigaddset(&mask, SIGUSR1);
+	sigaddset(&mask, SIGTERM);	/* block SIGTERM to prevent deadlock on log file mutex */
+
+	if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
+		zbx_error("cannot set sigprocmask to block the user signal");
+
+	LOCK_LOG;
+}
+
+static void	unlock_log(void)
+{
+	UNLOCK_LOG;
+
+	if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
+		zbx_error("cannot restore sigprocmask");
+}
+#else
+static void	lock_log(void)
+{
+	LOCK_LOG;
+}
+
+static void	unlock_log(void)
+{
+	UNLOCK_LOG;
+}
+#endif
+
+void	zbx_handle_log(void)
+{
+	if (LOG_TYPE_FILE != log_type)
+		return;
+
+	lock_log();
+
+	rotate_log(log_filename);
+
+	unlock_log();
+}
 
 int	zabbix_open_log(int type, int level, const char *filename)
 {
@@ -252,141 +411,51 @@ int	zabbix_check_log_level(int level)
 
 void	__zbx_zabbix_log(int level, const char *fmt, ...)
 {
-	FILE			*log_file = NULL;
-	char			message[MAX_BUFFER_LEN], filename_old[MAX_STRING_LEN];
-	long			milliseconds;
-	static zbx_uint64_t	old_size = 0;
-	va_list			args;
-	struct tm		*tm;
-	zbx_stat_t		buf;
+	FILE		*log_file = NULL;
+	char		message[MAX_BUFFER_LEN];
+	long		milliseconds;
+	va_list		args;
+	struct tm	*tm;
 #ifdef _WINDOWS
-	struct _timeb		current_time;
-	WORD			wType;
-	wchar_t			thread_id[20], *strings[2];
-#else
-	struct timeval		current_time;
-	sigset_t		mask, orig_mask;
-	struct tm		tm_local;
+	WORD		wType;
+	wchar_t		thread_id[20], *strings[2];
 #endif
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level))
 		return;
 
-#ifndef _WINDOWS
-	sigemptyset(&mask);
-	sigaddset(&mask, SIGUSR1);
-	sigaddset(&mask, SIGTERM);	/* block SIGTERM to prevent deadlock on log file mutex */
-#endif
 	if (LOG_TYPE_FILE == log_type)
 	{
-#ifndef _WINDOWS
-		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-			zbx_error("cannot set sigprocmask to block the user signal");
-#endif
-		LOCK_LOG;
+		lock_log();
 
-		if (0 != CONFIG_LOG_FILE_SIZE && 0 == zbx_stat(log_filename, &buf))
+		rotate_log(log_filename);
+
+		if (NULL != (log_file = fopen(log_filename, "a+")))
 		{
-			if (CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < buf.st_size)
-			{
-				strscpy(filename_old, log_filename);
-				zbx_strlcat(filename_old, ".old", MAX_STRING_LEN);
-				remove(filename_old);
+			get_time(&tm, &milliseconds);
 
-				if (0 != rename(log_filename, filename_old))
-				{
-					log_file = fopen(log_filename, "w");
-
-					if (NULL != log_file)
-					{
-#ifdef _WINDOWS
-						_ftime(&current_time);
-						tm = localtime(&current_time.time);
-						milliseconds = current_time.millitm;
-#else
-						gettimeofday(&current_time,NULL);
-						tm = localtime_r(&current_time.tv_sec, &tm_local);
-						milliseconds = current_time.tv_usec / 1000;
-#endif
-						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
-								" cannot rename log file \"%s\" to \"%s\": %s\n",
-								zbx_get_thread_id(),
-								tm->tm_year + 1900,
-								tm->tm_mon + 1,
-								tm->tm_mday,
-								tm->tm_hour,
-								tm->tm_min,
-								tm->tm_sec,
-								milliseconds,
-								log_filename,
-								filename_old,
-								zbx_strerror(errno));
-
-						fprintf(log_file, "%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld"
-								" Logfile \"%s\" size reached configured limit"
-								" LogFileSize. Renaming the logfile to \"%s\" and"
-								" starting a new logfile failed. The logfile"
-								" was truncated and started from beginning.\n",
-								zbx_get_thread_id(),
-								tm->tm_year + 1900,
-								tm->tm_mon + 1,
-								tm->tm_mday,
-								tm->tm_hour,
-								tm->tm_min,
-								tm->tm_sec,
-								milliseconds,
-								log_filename,
-								filename_old);
-
-						zbx_fclose(log_file);
-					}
-				}
-			}
-
-			if (old_size > (zbx_uint64_t)buf.st_size)
-				redirect_std(log_filename);
-
-			old_size = (zbx_uint64_t)buf.st_size;
-		}
-
-		log_file = fopen(log_filename,"a+");
-
-		if (NULL != log_file)
-		{
-#ifdef _WINDOWS
-		        _ftime(&current_time);
-			tm = localtime(&current_time.time);
-			milliseconds = current_time.millitm;
-#else
-			gettimeofday(&current_time,NULL);
-			tm = localtime_r(&current_time.tv_sec, &tm_local);
-			milliseconds = current_time.tv_usec / 1000;
-#endif
 			fprintf(log_file,
-				"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
-				zbx_get_thread_id(),
-				tm->tm_year + 1900,
-				tm->tm_mon + 1,
-				tm->tm_mday,
-				tm->tm_hour,
-				tm->tm_min,
-				tm->tm_sec,
-				milliseconds
-				);
+					"%6li:%.4d%.2d%.2d:%.2d%.2d%.2d.%03ld ",
+					zbx_get_thread_id(),
+					tm->tm_year + 1900,
+					tm->tm_mon + 1,
+					tm->tm_mday,
+					tm->tm_hour,
+					tm->tm_min,
+					tm->tm_sec,
+					milliseconds
+					);
 
 			va_start(args, fmt);
 			vfprintf(log_file, fmt, args);
 			va_end(args);
 
 			fprintf(log_file, "\n");
+
 			zbx_fclose(log_file);
 		}
 
-		UNLOCK_LOG;
+		unlock_log();
 
-#ifndef _WINDOWS
-		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-			zbx_error("cannot restore sigprocmask");
-#endif
 		return;
 	}
 
@@ -458,11 +527,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 	}	/* LOG_TYPE_SYSLOG */
 	else	/* LOG_TYPE_UNDEFINED == log_type */
 	{
-#ifndef _WINDOWS
-		if (0 > sigprocmask(SIG_BLOCK, &mask, &orig_mask))
-			zbx_error("cannot set sigprocmask to block the user signal");
-#endif
-		LOCK_LOG;
+		lock_log();
 
 		switch (level)
 		{
@@ -486,11 +551,7 @@ void	__zbx_zabbix_log(int level, const char *fmt, ...)
 				break;
 		}
 
-		UNLOCK_LOG;
-#ifndef _WINDOWS
-		if (0 > sigprocmask(SIG_SETMASK, &orig_mask, NULL))
-			zbx_error("cannot restore sigprocmask");
-#endif
+		unlock_log();
 	}
 }
 
