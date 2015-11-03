@@ -79,6 +79,7 @@ if (hasRequest('rules_preset') && !hasRequest('rules')) {
 			$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['templateLinkage'] = ['createMissing' => true];
+			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 
 			$data['backurl'] = 'hosts.php';
 			break;
@@ -97,6 +98,7 @@ if (hasRequest('rules_preset') && !hasRequest('rules')) {
 			$data['rules']['triggers'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['graphs'] = ['updateExisting' => true, 'createMissing' => true, 'deleteMissing' => false];
 			$data['rules']['templateLinkage'] = ['createMissing' => true];
+			$data['rules']['valueMaps'] = ['updateExisting' => false, 'createMissing' => true];
 
 			$data['backurl'] = 'templates.php';
 			break;
