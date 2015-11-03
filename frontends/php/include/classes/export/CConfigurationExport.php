@@ -180,7 +180,7 @@ class CConfigurationExport {
 		}
 
 		// Gather value maps before items if possible.
-		if ($options['valueMaps'] && CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
+		if ($options['valueMaps']) {
 			$this->gatherValueMaps($options['valueMaps']);
 		}
 
