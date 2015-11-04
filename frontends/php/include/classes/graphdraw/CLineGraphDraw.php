@@ -1544,11 +1544,22 @@ class CLineGraphDraw extends CGraphDraw {
 				$new_time = $this->from_time + $i * $subInterval + $subOffset;
 			}
 
+			// Draw untill year 2038.
+			if ($previous_time > $new_time) {
+				break;
+			}
+
 			$timeInterval = $new_time - $previous_time;
 
 			$timeIntervalX = ($timeInterval * $this->sizeX) / $this->period;
 
 			$position += $timeIntervalX;
+
+			// Start drawing after year 1970.
+			if ($new_time < 0) {
+				$i++;
+				continue;
+			}
 
 			// First element overlaping checks.
 			if (($i == 0 && $position < $element_size['width']) || $new_time >= $this->to_time) {
