@@ -1544,7 +1544,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$new_time = $this->from_time + $i * $subInterval + $subOffset;
 			}
 
-			// Draw untill year 2038.
+			// Draw until year 2038.
 			if ($previous_time > $new_time) {
 				break;
 			}
