@@ -19,8 +19,8 @@
 
 AC_DEFUN([LIBLDAP_CHECK_CONFIG],
 [
-  AC_ARG_WITH(ldap,
-    [If you want to check LDAP servers:
+  AC_ARG_WITH(ldap,[
+If you want to check LDAP servers:
 AC_HELP_STRING([--with-ldap@<:@=DIR@:>@],[Include LDAP support @<:@default=no@:>@. DIR is the LDAP base install directory, default is to search through a number of common places for the LDAP files.])],
      [ if test "$withval" = "no"; then
             want_ldap="no"

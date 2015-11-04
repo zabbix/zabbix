@@ -35,7 +35,7 @@ static int	offset = 0;
 static int	force = 0;
 static int	overflow_warning = 0;
 
-extern unsigned char	process_type, daemon_type;
+extern unsigned char	process_type, program_type;
 extern int		server_num, process_num;
 
 static void	DBget_lastsize()
@@ -596,7 +596,7 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 	server_num = ((zbx_thread_args_t *)args)->server_num;
 	process_num = ((zbx_thread_args_t *)args)->process_num;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_daemon_type_string(daemon_type),
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __function_name, CONFIG_SNMPTRAP_FILE);
@@ -612,6 +612,8 @@ ZBX_THREAD_ENTRY(snmptrapper_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
 		sec = zbx_time();

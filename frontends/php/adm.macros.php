@@ -54,12 +54,6 @@ if (hasRequest('update')) {
 		}
 	}
 
-	foreach ($macros as &$macro) {
-		// transform macros to uppercase {$aaa} => {$AAA}
-		$macro['macro'] = mb_strtoupper($macro['macro']);
-	}
-	unset($macro);
-
 	// update
 	$macrosToUpdate = [];
 	foreach ($macros as $idx => $macro) {

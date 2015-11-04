@@ -27,14 +27,37 @@
 #include "comms.h"
 #include "servercomms.h"
 
+extern unsigned int	configured_tls_connect_mode;
+
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+extern char	*CONFIG_TLS_SERVER_CERT_ISSUER;
+extern char	*CONFIG_TLS_SERVER_CERT_SUBJECT;
+extern char	*CONFIG_TLS_PSK_IDENTITY;
+#endif
+
 int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 {
 	int	res, lastlogtime, now;
+	char	*tls_arg1 = NULL, *tls_arg2 = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In connect_to_server() [%s]:%d [timeout:%d]",
 			CONFIG_SERVER, CONFIG_SERVER_PORT, timeout);
 
-	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (ZBX_TCP_SEC_TLS_CERT == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_SERVER_CERT_ISSUER;
+		tls_arg2 = CONFIG_TLS_SERVER_CERT_SUBJECT;
+	}
+	else if (ZBX_TCP_SEC_TLS_PSK == configured_tls_connect_mode)
+	{
+		tls_arg1 = CONFIG_TLS_PSK_IDENTITY;	/* zbx_tls_connect() will find PSK */
+	}
+
+	/* do nothing if ZBX_TCP_SEC_UNENCRYPTED == configured_tls_connect_mode */
+#endif
+	if (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout,
+			configured_tls_connect_mode, tls_arg1, tls_arg2)))
 	{
 		if (0 == retry_interval)
 		{
@@ -43,19 +66,26 @@ int	connect_to_server(zbx_socket_t *sock, int timeout, int retry_interval)
 		}
 		else
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every %d second(s)",
-					CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_socket_strerror(), retry_interval);
+			zabbix_log(LOG_LEVEL_WARNING, "Unable to connect to the server [%s]:%d [%s]. Will retry every"
+					" %d second(s)", CONFIG_SERVER, CONFIG_SERVER_PORT, zbx_socket_strerror(),
+					retry_interval);
+
 			lastlogtime = (int)time(NULL);
-			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT, timeout)))
+
+			while (FAIL == (res = zbx_tcp_connect(sock, CONFIG_SOURCE_IP, CONFIG_SERVER, CONFIG_SERVER_PORT,
+					timeout, configured_tls_connect_mode, tls_arg1, tls_arg2)))
 			{
 				now = (int)time(NULL);
+
 				if (60 <= now - lastlogtime)
 				{
 					zabbix_log(LOG_LEVEL_WARNING, "Still unable to connect...");
 					lastlogtime = now;
 				}
+
 				sleep(retry_interval);
 			}
+
 			zabbix_log(LOG_LEVEL_WARNING, "Connection restored.");
 		}
 	}
