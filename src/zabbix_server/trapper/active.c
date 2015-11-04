@@ -90,10 +90,8 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 	{
 		if (HOST_STATUS_MONITORED == atoi(row[1]))
 		{
-			unsigned int		tls_accept;
-#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			zbx_tls_conn_attr_t	attr;
-#endif
+			unsigned int	tls_accept;
+
 			tls_accept = (unsigned int)atoi(row[2]);
 
 			if (0 == (tls_accept & sock->connection_type))
@@ -104,15 +102,16 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			}
 
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-
 			if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 			{
+				zbx_tls_conn_attr_t	attr;
+
 				if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 
-					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host \"%s\"",
-							host);
+					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
+							" \"%s\"", host);
 					goto done;
 				}
 
@@ -134,12 +133,14 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 			}
 			else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 			{
+				zbx_tls_conn_attr_t	attr;
+
 				if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
 				{
 					THIS_SHOULD_NEVER_HAPPEN;
 
-					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host \"%s\"",
-							host);
+					zbx_snprintf(error, MAX_STRING_LEN, "cannot get connection attributes for host"
+							" \"%s\"", host);
 					goto done;
 				}
 

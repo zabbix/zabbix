@@ -4352,7 +4352,6 @@ int	DCget_host_by_hostid(DC_HOST *host, zbx_uint64_t hostid)
 int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_uint64_t *hostid, char **error)
 {
 	const ZBX_DC_HOST	*dc_host;
-	zbx_tls_conn_attr_t	attr;
 
 	LOCK_CACHE;
 
@@ -4381,6 +4380,8 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 	{
+		zbx_tls_conn_attr_t	attr;
+
 		if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
 		{
 			UNLOCK_CACHE;
@@ -4407,6 +4408,8 @@ int	DCcheck_proxy_permissions(const char *host, const zbx_socket_t *sock, zbx_ui
 	}
 	else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 	{
+		zbx_tls_conn_attr_t	attr;
+
 		if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
 		{
 			UNLOCK_CACHE;
