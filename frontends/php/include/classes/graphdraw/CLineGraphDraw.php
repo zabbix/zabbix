@@ -1584,6 +1584,7 @@ class CLineGraphDraw extends CGraphDraw {
 
 			// main interval checks
 			if ((!($new_time % $mainInterval) && $mainInterval < SEC_PER_DAY)
+					|| ($subInterval < SEC_PER_MIN && date('s', $new_time) == 0)
 					|| ($mainInterval == SEC_PER_DAY && date('H', $new_time) == 0 && date('i', $new_time) == 0)
 					|| ($mainInterval == SEC_PER_WEEK && date('N', $new_time) == 7)
 					|| ($mainInterval == SEC_PER_MONTH && date('d', $new_time) == 1)
