@@ -40,7 +40,8 @@ $table = (new CTableInfo())
 				->onClick("checkAll('".$form->getName()."', 'all_valuemaps', 'valuemapids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder']),
-		_('Value map')
+		_('Value map'),
+		_('Used in items')
 	]);
 
 foreach ($data['valuemaps'] as $valuemap) {
@@ -55,7 +56,8 @@ foreach ($data['valuemaps'] as $valuemap) {
 	$table->addRow([
 		new CCheckBox('valuemapids['.$valuemap['valuemapid'].']', $valuemap['valuemapid']),
 		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
-		$mappings
+		$mappings,
+		(new CCol(($valuemap['item_count'] != 0) ? _('Yes') : ''))->addClass(ZBX_STYLE_GREEN)
 	]);
 }
 
