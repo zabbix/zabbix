@@ -199,8 +199,36 @@ else {
 	order_result($data['valuemaps'], $sortfield, $sortorder);
 	$data['paging'] = getPagingLine($data['valuemaps'], $sortorder);
 
+	$valuemapids = zbx_objectValues($data['valuemaps'], 'valuemapid');
+
+	$items = API::Item()->get([
+		'output' => ['valuemapid'],
+		'webitems' => true,
+		'filter' => ['valuemapid' => $valuemapids]
+	]);
+	$item_prototypes = API::ItemPrototype()->get([
+		'output' => ['valuemapid'],
+		'filter' => ['valuemapid' => $valuemapids]
+	]);
+
 	foreach ($data['valuemaps'] as &$valuemap) {
 		order_result($valuemap['mappings'], 'value');
+
+		if (!array_key_exists('items', $valuemap)) {
+			$valuemap['item_count'] = 0;
+		}
+
+		foreach ($items as $item) {
+			if (bccomp($item['valuemapid'], $valuemap['valuemapid']) == 0) {
+				$valuemap['item_count']++;
+			}
+		}
+
+		foreach ($item_prototypes as $item_prototype) {
+			if (bccomp($item_prototype['valuemapid'], $valuemap['valuemapid']) == 0) {
+				$valuemap['item_count']++;
+			}
+		}
 	}
 	unset($valuemap);
 
