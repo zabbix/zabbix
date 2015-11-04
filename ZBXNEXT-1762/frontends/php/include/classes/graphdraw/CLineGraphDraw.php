@@ -1311,7 +1311,10 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_YEAR * 10, 'sub' => SEC_PER_YEAR * 2],	// 10 years and 2 years
 			['main' => SEC_PER_YEAR * 15, 'sub' => SEC_PER_YEAR * 3],	// 15 years and 3 years
 			['main' => SEC_PER_YEAR * 20, 'sub' => SEC_PER_YEAR * 5],	// 20 years and 5 years
-			['main' => SEC_PER_YEAR * 30, 'sub' => SEC_PER_YEAR * 10]	// 30 years and 10 years
+			['main' => SEC_PER_YEAR * 30, 'sub' => SEC_PER_YEAR * 10],	// 30 years and 10 years
+			['main' => SEC_PER_YEAR * 40, 'sub' => SEC_PER_YEAR * 20],	// 40 years and 20 years
+			['main' => SEC_PER_YEAR * 60, 'sub' => SEC_PER_YEAR * 30],	// 60 years and 30 years
+			['main' => SEC_PER_YEAR * 80, 'sub' => SEC_PER_YEAR * 40]	// 80 years and 40 years
 		];
 
 		// default values
@@ -1402,7 +1405,16 @@ class CLineGraphDraw extends CGraphDraw {
 			$previous_time = isset($new_time) ? $new_time : $this->stime;
 
 			// Next step calculation by interval.
-			if ($subInterval == SEC_PER_YEAR * 10) {
+			if ($subInterval == SEC_PER_YEAR * 40) {
+				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 40);
+			}
+			elseif ($subInterval == SEC_PER_YEAR * 30) {
+				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 30);
+			}
+			elseif ($subInterval == SEC_PER_YEAR * 20) {
+				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 20);
+			}
+			elseif ($subInterval == SEC_PER_YEAR * 10) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 10);
 			}
 			elseif ($subInterval == SEC_PER_YEAR * 5) {
