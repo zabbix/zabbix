@@ -72,6 +72,8 @@ static void	process_listener(zbx_socket_t *s)
 				static size_t	buffer_alloc = 256;
 				size_t		buffer_offset = 0;
 
+				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s: %s]",ZBX_NOTSUPPORTED, *value);
+
 				if (NULL == buffer)
 					buffer = zbx_malloc(buffer, buffer_alloc);
 
