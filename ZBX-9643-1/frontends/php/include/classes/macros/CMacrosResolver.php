@@ -434,6 +434,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			if ($referenceMacrosAvailable) {
+				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($trigger);
 				foreach ($this->getTriggerReference($trigger['expression'], $trigger[$source]) as $macro => $value) {
 					$macroValues[$triggerId][$macro] = $value;
 				}
@@ -508,12 +509,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Expand reference macros for trigger.
 	 * If macro reference non existing value it expands to empty string.
 	 *
-	 * @param string $expression
-	 * @param string $text
+	 * @param array $trigger
 	 *
 	 * @return string
 	 */
-	public function resolveTriggerReference($expression, $text) {
+	public function resolveTriggerReference($trigger) {
+		$expression = CMacrosResolverHelper::resolveTriggerExpressionUserMacro($trigger);
+		$text = $trigger['description'];
 		foreach ($this->getTriggerReference($expression, $text) as $key => $value) {
 			$text = str_replace($key, $value, $text);
 		}

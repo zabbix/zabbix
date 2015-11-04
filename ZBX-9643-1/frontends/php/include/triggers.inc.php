@@ -1214,7 +1214,7 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 		$host = reset($trigger['hosts']);
 
 		$host['name'] = get_node_name_by_elid($host['hostid'], null, NAME_DELIMITER).$host['name'];
-		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger['expression'], $trigger['description']);
+		$trigger['description'] = CMacrosResolverHelper::resolveTriggerReference($trigger);
 		$hostNames[$host['hostid']] = $host['name'];
 
 		// a little tricky check for attempt to overwrite active trigger (value=1) with

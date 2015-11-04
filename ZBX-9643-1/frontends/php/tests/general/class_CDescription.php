@@ -88,7 +88,10 @@ class class_CDescription extends PHPUnit_Framework_TestCase {
 	 * @dataProvider providerReferenceMacros
 	 */
 	public function test_resolveTriggerReference($expression, $text) {
-		$result = CMacrosResolverHelper::resolveTriggerReference($expression, $text);
+		$result = CMacrosResolverHelper::resolveTriggerReference(array(
+			'expression' => $expression,
+			'description' => $text
+		));
 
 		$this->assertEquals($text, $result);
 	}
