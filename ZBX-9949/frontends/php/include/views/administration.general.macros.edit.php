@@ -34,9 +34,8 @@ $table = (new CTable())
 
 // fields
 foreach ($data['macros'] as $i => $macro) {
-	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 64))
+	$macro_input = (new CTextBox('macros['.$i.'][macro]', $macro['macro'], false, 255))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-		->addClass('macro')
 		->setAttribute('placeholder', '{$MACRO}');
 
 	$value_input = (new CTextBox('macros['.$i.'][value]', $macro['value'], false, 255))

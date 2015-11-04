@@ -417,7 +417,8 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 	}
 
 	var days = Math.floor((timestamp - years * 31536000 - months * 2592000) / 86400),
-		hours = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600);
+		hours = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400) / 3600),
+		minutes = Math.floor((timestamp - years * 31536000 - months * 2592000 - days * 86400 - hours * 3600) / 60);
 
 	// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
 	if (months == 12) {
@@ -435,6 +436,9 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		if (hours.toString().length == 1) {
 			hours = '0' + hours;
 		}
+		if (minutes.toString().length == 1) {
+			minutes = '0' + minutes;
+		}
 	}
 
 	var str = (years == 0) ? '' : years + locale['S_YEAR_SHORT'] + ' ';
@@ -443,6 +447,7 @@ function formatTimestamp(timestamp, isTsDouble, isExtend) {
 		? days + locale['S_DAY_SHORT'] + ' '
 		: ((days == 0) ? '' : days + locale['S_DAY_SHORT'] + ' ');
 	str += (hours == 0) ? '' : hours + locale['S_HOUR_SHORT'] + ' ';
+	str += (minutes == 0) ? '' : minutes + locale['S_MINUTE_SHORT'] + ' ';
 
 	return str;
 }
@@ -517,139 +522,179 @@ function stripslashes(str) {
 	});
 }
 
+function overlayDialogueDestroy() {
+	jQuery('#overlay_bg, #overlay_dialogue').remove();
+	jQuery('body').css({'overflow': ''});
+	jQuery('body[style=""]').removeAttr('style');
+}
+
+/**
+ * Display modal window
+ *
+ * @param string title					modal window title
+ * @param object content				window content
+ * @param array  buttons				window buttons
+ * @param string buttons[]['title']
+ * @param string buttons[]['class']
+ * @param bool	 buttons[]['focused']
+ * @param bool   buttons[]['enabled']
+ * @param object buttons[]['click']
+ */
+function overlayDialogue(params) {
+	var overlay_bg = jQuery('<div>', {
+		id: 'overlay_bg',
+		class: 'overlay-bg',
+		css: {
+			'display': 'none'
+		}
+	});
+
+	var overlay_dialogue_footer = jQuery('<div>', {
+		class: 'overlay-dialogue-footer'
+	});
+
+	var button_focused = null;
+
+	jQuery.each(params.buttons, function(index, obj) {
+		var button = jQuery('<button>', {
+			type: 'button',
+			text: obj.title
+		}).click(function() {
+			obj.action();
+			overlayDialogueDestroy();
+			return false;
+		});
+
+		if ('class' in obj) {
+			button.addClass(obj.class);
+		}
+
+		if ('enabled' in obj && obj.enabled === false) {
+			button.attr('disabled', 'disabled');
+		}
+
+		if ('focused' in obj && obj.focused === true) {
+			button_focused = button;
+		}
+
+		overlay_dialogue_footer.append(button);
+	});
+
+	overlay_dialogue = jQuery('<div>', {
+		id: 'overlay_dialogue',
+		class: 'overlay-dialogue',
+		css: {
+			'position': 'fixed',
+			'top': '40%',
+			'left': '50%',
+			'display': 'none'
+		}
+	})
+		.append(
+			jQuery('<span>', {
+				class: 'overlay-close-btn'
+			})
+				.click(function() {
+					overlayDialogueDestroy();
+					return false;
+				})
+		)
+		.append(
+			jQuery('<div>', {
+				class: 'dashbrd-widget-head'
+			}).append(jQuery('<h4>').text(params.title))
+		)
+		.append(
+			jQuery('<div>', {
+				class: 'overlay-dialogue-body'
+			}).append(params.content)
+		)
+		.append(overlay_dialogue_footer)
+		.on('keypress keydown', function(e) {
+			if (e.which == 27) { // ESC
+				overlayDialogueDestroy();
+				return false;
+			}
+		});
+
+	overlay_bg
+		.appendTo('body')
+		.show();
+	overlay_dialogue
+		.appendTo('body')
+		.css({
+			'margin-top': '-' + (overlay_dialogue.outerHeight() / 2) + 'px',
+			'margin-left': '-' + (overlay_dialogue.outerWidth() / 2) + 'px'
+		})
+		.show();
+
+	var focusable = jQuery(':focusable', overlay_dialogue);
+
+	if (focusable.length > 0) {
+		var first_focusable = focusable.filter(':first'),
+			last_focusable = focusable.filter(':last');
+
+		first_focusable.on('keydown', function(e) {
+			if (e.keyCode == 9 && e.shiftKey) {
+				last_focusable.focus();
+				return false;
+			}
+		});
+
+		last_focusable.on('keydown', function(e) {
+			if (e.keyCode == 9 && !e.shiftKey) {
+				first_focusable.focus();
+				return false;
+			}
+		});
+	}
+
+	jQuery('body').css({'overflow': 'hidden'});
+
+	if (button_focused !== null) {
+		button_focused.focus();
+	}
+}
+
 /**
  * Execute script.
  *
- * @param string hostId			host id
- * @param string scriptId		script id
+ * @param string hostid			host id
+ * @param string scriptid		script id
  * @param string confirmation	confirmation text
  */
-function executeScript(hostId, scriptId, confirmation) {
+function executeScript(hostid, scriptid, confirmation) {
 	var execute = function() {
-		if (!empty(hostId)) {
-			openWinCentered('scripts_exec.php?hostid=' + hostId + '&scriptid=' + scriptId, 'Tools', 560, 470,
+		if (hostid !== null) {
+			openWinCentered('scripts_exec.php?hostid=' + hostid + '&scriptid=' + scriptid, 'Tools', 950, 470,
 				'titlebar=no, resizable=yes, scrollbars=yes, dialog=no'
 			);
 		}
 	};
 
 	if (confirmation.length > 0) {
-		var scriptDialog = jQuery('#scriptDialog');
-
-		if (scriptDialog.length == 0) {
-			scriptDialog = jQuery('<div>', {
-				id: 'scriptDialog',
-				css: {
-					display: 'none',
-					'white-space': 'normal'
-				}
-			});
-
-			jQuery('body').append(scriptDialog);
-		}
-
-		scriptDialog
-			.text(confirmation)
-			.dialog({
-				buttons: [
-					{text: t('Execute'), click: function() {
-						jQuery(this).dialog('destroy');
+		overlayDialogue({
+			'title': t('Execution confirmation'),
+			'content': jQuery('<span>').text(confirmation),
+			'buttons': [
+				{
+					'title': t('Cancel'),
+					'class': 'btn-alt',
+					'focused': (hostid === null),
+					'action': function() {}
+				},
+				{
+					'title': t('Execute'),
+					'enabled': (hostid !== null),
+					'focused': (hostid !== null),
+					'action': function() {
 						execute();
-					}},
-					{text: t('Cancel'), click: function() {
-						jQuery(this).dialog('destroy');
-					}}
-				],
-				draggable: true,
-				modal: true,
-				width: (scriptDialog.outerWidth() + 20 > 600) ? 600 : 'inherit',
-				resizable: false,
-				minWidth: 200,
-				minHeight: 100,
-				title: t('Execution confirmation'),
-				close: function() {
-					jQuery(this).dialog('destroy');
+					}
 				}
-			});
-
-		if (empty(hostId)) {
-			jQuery('.ui-dialog-buttonset .ui-button:first').prop('disabled', true).addClass('ui-state-disabled');
-			jQuery('.ui-dialog-buttonset .ui-button:last').addClass('main').focus();
-		}
-		else {
-			jQuery('.ui-dialog-buttonset .ui-button:first').addClass('main');
-		}
+			]
+		});
 	}
 	else {
 		execute();
 	}
-}
-
-/**
- * Makes all elements which are not supported for printing view to disappear by including css file.
- *
- * @param bool show
- */
-function printLess(show) {
-	if (!jQuery('#printLess').length) {
-		jQuery('<link rel="stylesheet" type="text/css" id="printLess">')
-			.appendTo('head')
-			.attr('href', './styles/print.css');
-
-		jQuery('.header_l.left, .header_r.right').each(function(i, obj) {
-			if (jQuery(this).find('input, form, select, .menu_icon').length) {
-				jQuery(this).addClass('hide-all-children');
-			}
-		});
-
-		jQuery('body')
-			.prepend('<div class="printless">&laquo;BACK</div>')
-			.click(function() {
-				printLess(false);
-			});
-	}
-
-	jQuery('#printLess').prop('disabled', !show);
-}
-
-/**
- * Display jQuery model window.
- *
- * @param string title					modal window title
- * @param string text					window message
- * @param array  buttons				window buttons
- * @param array  buttons[]['text']		button text
- * @param object buttons[]['click']		button click action
- */
-function showModalWindow(title, text, buttons) {
-	var modalWindow = jQuery('#modalWindow');
-
-	if (modalWindow.length == 0) {
-		modalWindow = jQuery('<div>', {
-			id: 'modalWindow',
-			css: {
-				padding: '10px',
-				display: 'none',
-				'white-space': 'normal'
-			}
-		});
-
-		jQuery('body').append(modalWindow);
-	}
-
-	modalWindow
-		.text(text)
-		.dialog({
-			title: title,
-			buttons: buttons,
-			draggable: true,
-			modal: true,
-			resizable: false,
-			width: 'inherit',
-			minWidth: 200,
-			minHeight: 120,
-			close: function() {
-				jQuery(this).dialog('destroy');
-			}
-		});
 }

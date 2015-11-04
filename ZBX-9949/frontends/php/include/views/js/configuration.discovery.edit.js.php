@@ -18,14 +18,18 @@
 </script>
 <script type="text/x-jquery-tmpl" id="uniqRowTPL">
 	<?=	(new CListItem(
-		(new CLabel(
-			[
-				(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))->setId('uniqueness_criteria_#{dcheckid}'),
-				'#{name}'
-			],
-			'uniqueness_criteria_#{dcheckid}'
+			(new CLabel(
+				[
+					(new CInput('radio', 'uniqueness_criteria', '#{dcheckid}'))
+						->setId('uniqueness_criteria_#{dcheckid}'),
+					'#{name}'
+				],
+				'uniqueness_criteria_#{dcheckid}'
+			))
 		))
-	))->toString() ?>
+			->setId('uniqueness_criteria_row_#{dcheckid}')
+			->toString()
+	?>
 </script>
 <script type="text/x-jquery-tmpl" id="newDCheckTPL">
 	<div id="new_check_form">
@@ -74,27 +78,29 @@
 					</td>
 				</tr>
 				<?= (new CRow([
-					_('Authentication protocol'),
-					(new CRadioButtonList('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5))
-						->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
-						->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
-						->setModern(true)
-				]))
-					->setId('newCheckAuthProtocolRow')
-					->toString() ?>
+						_('Authentication protocol'),
+						(new CRadioButtonList('snmpv3_authprotocol', ITEM_AUTHPROTOCOL_MD5))
+							->addValue(_('MD5'), ITEM_AUTHPROTOCOL_MD5, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_MD5)
+							->addValue(_('SHA'), ITEM_AUTHPROTOCOL_SHA, 'snmpv3_authprotocol_'.ITEM_AUTHPROTOCOL_SHA)
+							->setModern(true)
+					]))
+						->setId('newCheckAuthProtocolRow')
+						->toString()
+				?>
 				<tr id="newCheckAuthPassRow">
 					<td><label for="snmpv3_authpassphrase"><?= _('Authentication passphrase') ?></label></td>
 					<td><input type="text" id="snmpv3_authpassphrase" name="snmpv3_authpassphrase" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
 				</tr>
 				<?= (new CRow([
-					_('Privacy protocol'),
-					(new CRadioButtonList('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES))
-						->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
-						->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
-						->setModern(true)
-				]))
-					->setId('newCheckPrivProtocolRow')
-					->toString() ?>
+						_('Privacy protocol'),
+						(new CRadioButtonList('snmpv3_privprotocol', ITEM_PRIVPROTOCOL_DES))
+							->addValue(_('DES'), ITEM_PRIVPROTOCOL_DES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_DES)
+							->addValue(_('AES'), ITEM_PRIVPROTOCOL_AES, 'snmpv3_privprotocol_'.ITEM_PRIVPROTOCOL_AES)
+							->setModern(true)
+					]))
+						->setId('newCheckPrivProtocolRow')
+						->toString()
+				?>
 				<tr id="newCheckPrivPassRow">
 					<td><label for="snmpv3_privpassphrase"><?= _('Privacy passphrase') ?></label></td>
 					<td><input type="text" id="snmpv3_privpassphrase" name="snmpv3_privpassphrase" value="" style="width: <?= ZBX_TEXTAREA_STANDARD_WIDTH ?>px" maxlength="64"></td>
@@ -102,9 +108,9 @@
 				</tbody>
 			</table>
 			<?= (new CHorList([
-				(new CButton('add_new_dcheck', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
-				(new CButton('cancel_new_dcheck', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
-			]))->toString()
+					(new CButton('add_new_dcheck', _('Add')))->addClass(ZBX_STYLE_BTN_LINK),
+					(new CButton('cancel_new_dcheck', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+				]))->toString()
 			?>
 		</div>
 	</div>
@@ -279,11 +285,14 @@
 				uniquenessCriteria = jQuery('#uniqueness_criteria_row_' + value.dcheckid);
 
 			if (jQuery.inArray(parseInt(value.type, 10), availableDeviceTypes) > -1) {
+				var new_uniqueness_criteria = uniqRowTpl.evaluate(value);
 				if (uniquenessCriteria.length) {
-					jQuery('label[for=uniqueness_criteria_' + value.dcheckid + ']').text(value['name']);
+					var checked_id = jQuery('input:radio[name=uniqueness_criteria]:checked').attr('id');
+					uniquenessCriteria.replaceWith(new_uniqueness_criteria);
+					jQuery('#' + checked_id).prop('checked', true);
 				}
 				else {
-					jQuery('#uniqueness_criteria').append(uniqRowTpl.evaluate(value));
+					jQuery('#uniqueness_criteria').append(new_uniqueness_criteria);
 				}
 			}
 			else {
@@ -305,7 +314,7 @@
 		var obj = jQuery('#uniqueness_criteria_' + dcheckid);
 
 		if (obj.length) {
-			if (obj.attr('checked') == 'checked') {
+			if (obj.is(':checked')) {
 				selectUniquenessCriteriaDefault();
 			}
 
@@ -518,13 +527,18 @@
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_securityname'] === dCheck['snmpv3_securityname'])
 						&& (typeof dCheck['snmpv3_contextname'] === 'undefined'
 							|| ZBX_CHECKLIST[zbxDcheckId]['snmpv3_contextname'] === dCheck['snmpv3_contextname'])) {
-					showModalWindow(
-						t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
-						<?= CJs::encodeJson(_('Check already exists.')) ?>,
-						[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
-							jQuery(this).dialog('destroy');
-						}}]
-					);
+
+					overlayDialogue({
+						'title': '<?= _('Discovery check error') ?>',
+						'content': jQuery('<span>').text('<?= _('Check already exists.') ?>'),
+						'buttons': [
+							{
+								'title': '<?= _('Cancel') ?>',
+								'focused': true,
+								'action': function() {}
+							}
+						]
+					});
 
 					return null;
 				}
@@ -582,14 +596,17 @@
 					}
 				},
 				error: function() {
-					showModalWindow(
-						t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
-						<?= CJs::encodeJson(_('Cannot validate discovery check: invalid request or connection to Zabbix server failed.')) ?>,
-						[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
-							jQuery(this).dialog('destroy');
-						}}]
-					);
-
+					overlayDialogue({
+						'title': '<?= _('Discovery check error') ?>',
+						'content': jQuery('<span>').text('<?= _('Cannot validate discovery check: invalid request or connection to Zabbix server failed.') ?>'),
+						'buttons': [
+							{
+								'title': '<?= _('Cancel') ?>',
+								'focused': true,
+								'action': function() {}
+							}
+						]
+					});
 					jQuery('#add_new_dcheck').prop('disabled', false);
 				}
 			});
@@ -599,13 +616,17 @@
 			jQuery('#add_new_dcheck').prop('disabled', false);
 
 			if (validationErrors.length) {
-				showModalWindow(
-					t(<?= CJs::encodeJson(_('Discovery check error')) ?>),
-					validationErrors.join('\n'),
-					[{text: t(<?= CJs::encodeJson(_('Close')) ?>), click: function() {
-						jQuery(this).dialog('destroy');
-					}}]
-				);
+				overlayDialogue({
+					'title': '<?= _('Discovery check error') ?>',
+					'content': jQuery('<span>').text(validationErrors.join('\n') + "\n" + 'sdfkjsdhfkhsd'),
+					'buttons': [
+						{
+							'title': '<?= _('Cancel') ?>',
+							'focused': true,
+							'action': function() {}
+						}
+					]
+				});
 			}
 			else {
 				dCheck.name = jQuery('#type :selected').text();

@@ -567,7 +567,9 @@ function make_latest_issues(array $filter = [], $backurl) {
 	];
 
 	$triggers = API::Trigger()->get(array_merge($options, [
-		'output' => ['triggerid', 'state', 'error', 'url', 'expression', 'description', 'priority', 'lastchange'],
+		'output' => [
+			'triggerid', 'expression', 'description', 'url', 'priority', 'lastchange', 'comments', 'error', 'state'
+		],
 		'selectHosts' => ['hostid', 'name'],
 		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
@@ -580,7 +582,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'preservekeys' => true
 	]));
 
-	$triggers = CMacrosResolverHelper::resolveTriggerUrl($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 	// don't use withLastEventUnacknowledged and skipDependent because of performance issues
 	$triggersTotalCount = API::Trigger()->get(array_merge($options, [
@@ -746,18 +748,10 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		// description
-		if ($trigger['url'] !== '') {
-			$description = (new CLink($description, $trigger['url']))->removeSID();
-		}
-		else {
-			$description = (new CSpan($description))->addClass(ZBX_STYLE_LINK_ACTION);
-		}
-		if ($trigger['lastEvent']) {
-			$description->setHint(
-				make_popup_eventlist($trigger['triggerid'], $trigger['lastEvent']['eventid'], $backurl),
-				'',
-				$trigger['url'] === ''
-			);
+		if ($trigger['lastEvent'] || $trigger['comments'] !== '' || $trigger['url'] !== '') {
+			$description = (new CSpan($description))
+				->setHint(make_popup_eventlist($trigger, $backurl), '', true, 'max-width: 500px')
+				->addClass(ZBX_STYLE_LINK_ACTION);
 		}
 		$description = (new CCol($description))->addClass(getSeverityStyle($trigger['priority']));
 
@@ -780,7 +774,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
-			$actionHint
+			(new CCol($actionHint))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 	}
 
@@ -818,7 +812,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 
 	CArrayHelper::sort($triggers, [['field' => 'lastchange', 'order' => ZBX_SORT_DOWN]]);
 
-	$triggers = CMacrosResolverHelper::resolveTriggerNames($triggers);
+	$triggers = CMacrosResolverHelper::resolveTriggerNames(zbx_toHash($triggers, 'triggerid'));
 
 	foreach ($triggers as $trigger) {
 		// unknown triggers
@@ -848,7 +842,7 @@ function makeTriggersPopup(array $triggers, $backurl, array $actions, array $con
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
-			$action
+			(new CCol($action))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 	}
 

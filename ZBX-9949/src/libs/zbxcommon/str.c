@@ -23,8 +23,8 @@
 static const char	copyright_message[] =
 	"Copyright (C) 2015 Zabbix SIA\n"
 	"License GPLv2+: GNU GPL version 2 or later <http://gnu.org/licenses/gpl.html>.\n"
-	"This is free software: you are free to change and redistribute it according to the license.\n"
-	"There is NO WARRANTY, to the extent permitted by law.";
+	"This is free software: you are free to change and redistribute it according to\n"
+	"the license. There is NO WARRANTY, to the extent permitted by law.";
 
 static const char	help_message_footer[] =
 	"Report bugs to: <https://support.zabbix.com>\n"
@@ -33,9 +33,10 @@ static const char	help_message_footer[] =
 
 /******************************************************************************
  *                                                                            *
- * Function: app_title                                                        *
+ * Function: version                                                          *
  *                                                                            *
- * Purpose: print title of application on stdout                              *
+ * Purpose: print version and compilation time of application on stdout       *
+ *          by application request with parameter '-V'                        *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -43,24 +44,9 @@ static const char	help_message_footer[] =
  *                            in each zabbix application                      *
  *                                                                            *
  ******************************************************************************/
-static void	app_title(void)
-{
-	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: version                                                          *
- *                                                                            *
- * Purpose: print version and compilation time of application on stdout       *
- *          by application request with parameter '-v'                        *
- *                                                                            *
- * Author: Eugene Grigorjev                                                   *
- *                                                                            *
- ******************************************************************************/
 void	version(void)
 {
-	app_title();
+	printf("%s (Zabbix) %s\n", title_message, ZABBIX_VERSION);
 	printf("Revision %s %s, compilation time: %s %s\n\n", ZABBIX_REVISION, ZABBIX_REVDATE, __DATE__, __TIME__);
 	puts(copyright_message);
 }
@@ -69,7 +55,8 @@ void	version(void)
  *                                                                            *
  * Function: usage                                                            *
  *                                                                            *
- * Purpose: print application parameters on stdout                            *
+ * Purpose: print application parameters on stdout with layout suitable for   *
+ *          80-column terminal                                                *
  *                                                                            *
  * Author: Eugene Grigorjev                                                   *
  *                                                                            *
@@ -79,13 +66,47 @@ void	version(void)
  ******************************************************************************/
 void	usage(void)
 {
+#define ZBX_MAXCOL	79
+#define ZBX_SPACE1	"  "			/* left margin for the first line */
+#define ZBX_SPACE2	"               "	/* left margin for subsequent lines */
 	const char	**p = usage_message;
 
 	if (NULL != *p)
 		printf("usage:\n");
 
 	while (NULL != *p)
-		printf("       %s %s\n", progname, *p++);
+	{
+		size_t	pos;
+
+		printf("%s%s", ZBX_SPACE1, progname);
+		pos = ZBX_CONST_STRLEN(ZBX_SPACE1) + strlen(progname);
+
+		while (NULL != *p)
+		{
+			size_t	len;
+
+			len = strlen(*p);
+
+			if (ZBX_MAXCOL > pos + len)
+			{
+				pos += len + 1;
+				printf(" %s", *p);
+			}
+			else
+			{
+				pos = ZBX_CONST_STRLEN(ZBX_SPACE2) + len + 1;
+				printf("\n%s %s", ZBX_SPACE2, *p);
+			}
+
+			p++;
+		}
+
+		printf("\n");
+		p++;
+	}
+#undef ZBX_MAXCOL
+#undef ZBX_SPACE1
+#undef ZBX_SPACE2
 }
 
 /******************************************************************************
@@ -509,7 +530,7 @@ void	zbx_remove_chars(register char *str, const char *charlist)
  * Purpose: Copy src to string dst of size siz. At most siz - 1 characters    *
  *          will be copied. Always null terminates (unless siz == 0).         *
  *                                                                            *
- * Return value : the number of characters copied (excluding the null byte)   *
+ * Return value: the number of characters copied (excluding the null byte)    *
  *                                                                            *
  ******************************************************************************/
 size_t	zbx_strlcpy(char *dst, const char *src, size_t siz)
@@ -1940,7 +1961,7 @@ int	str_in_list(const char *list, const char *value, char delimiter)
 	{
 		if (NULL != (end = strchr(list, delimiter)))
 		{
-			ret = (len == end - list && 0 == strncmp(list, value, len) ? SUCCEED : FAIL);
+			ret = (len == (size_t)(end - list) && 0 == strncmp(list, value, len) ? SUCCEED : FAIL);
 			list = end + 1;
 		}
 		else
@@ -2208,6 +2229,27 @@ int	cmp_key_id(const char *key_1, const char *key_2)
 		;
 
 	return ('\0' == *p || '[' == *p) && ('\0' == *q || '[' == *q) ? SUCCEED : FAIL;
+}
+
+const char	*get_program_type_string(unsigned char program_type)
+{
+	switch (program_type)
+	{
+		case ZBX_PROGRAM_TYPE_SERVER:
+			return "server";
+		case ZBX_PROGRAM_TYPE_PROXY_ACTIVE:
+		case ZBX_PROGRAM_TYPE_PROXY_PASSIVE:
+			return "proxy";
+		case ZBX_PROGRAM_TYPE_AGENTD:
+		case ZBX_PROGRAM_TYPE_AGENT:
+			return "agent";
+		case ZBX_PROGRAM_TYPE_SENDER:
+			return "sender";
+		case ZBX_PROGRAM_TYPE_GET:
+			return "get";
+		default:
+			return "unknown";
+	}
 }
 
 const char	*zbx_permission_string(int perm)
@@ -3387,6 +3429,273 @@ int	zbx_strcmp_null(const char *s1, const char *s2)
 
 /******************************************************************************
  *                                                                            *
+ * Function: zbx_user_macro_parse                                             *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     parses user macro and finds its end position and context location      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     macro     - [IN] the macro to parse                                    *
+ *     macro_r   - [OUT] the position of ending '}' character                 *
+ *     context_l - [OUT] the position of context start character (first non   *
+ *                       space character after context separator ':')         *
+ *                       0 if macro does not have context specified.          *
+ *     context_r - [OUT] the position of context end character (either the    *
+ *                       ending '"' for quoted context values or the last     *
+ *                       character before the ending '}' character)           *
+ *                       0 if macro does not have context specified.          *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - the macro was parsed succesfully.                            *
+ *     FAIL    - the macro parsing failed, the content of output variables    *
+ *               is not defined.                                              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_user_macro_parse(const char *macro, int *macro_r, int *context_l, int *context_r)
+{
+	int	i;
+
+	/* find the end of macro name by skipping {$ characters and iterating through */
+	/* valid macro name characters                                                */
+	for (i = 2; SUCCEED == is_macro_char(macro[i]); i++)
+		;
+
+	/* check for empty macro name */
+	if (2 == i)
+		return FAIL;
+
+	if ('}' == macro[i])
+	{
+		/* no macro context specified, parsing done */
+		*macro_r = i;
+		*context_l = 0;
+		*context_r = 0;
+		return SUCCEED;
+	}
+
+	/* fail if the next character is not a macro context separator */
+	if  (':' != macro[i])
+		return FAIL;
+
+	/* skip the whitespace after macro context separator */
+	while (' ' == macro[++i])
+		;
+
+	*context_l = i;
+
+	if ('"' == macro[i])
+	{
+		i++;
+
+		/* process quoted context */
+		for (; '"' != macro[i]; i++)
+		{
+			if ('\0' == macro[i])
+				return FAIL;
+
+			if ('\\' == macro[i] && '"' == macro[i + 1])
+				i++;
+		}
+
+		*context_r = i;
+
+		while (' ' == macro[++i])
+			;
+	}
+	else
+	{
+		/* process unquoted context */
+		for (; '}' != macro[i]; i++)
+		{
+			if ('\0' == macro[i])
+				return FAIL;
+		}
+
+		*context_r = i - 1;
+	}
+
+	if ('}' != macro[i])
+		return FAIL;
+
+	*macro_r = i;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_user_macro_parse_dyn                                         *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     parses user macro {$MACRO:<context>} into {$MACRO} and <context>       *
+ *     strings                                                                *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     macro   - [IN] the macro to parse                                      *
+ *     name    - [OUT] the macro name without context                         *
+ *     context - [OUT] the unquoted macro context, NULL for macros without    *
+ *                     context                                                *
+ *     length  - [OUT] the length of parsed macro (optional)                  *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - the macro was parsed successfully                            *
+ *     FAIL    - the macro parsing failed, invalid parameter syntax           *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int *length)
+{
+	const char	*ptr;
+	int		macro_r, context_l, context_r, len;
+
+	if (SUCCEED != zbx_user_macro_parse(macro, &macro_r, &context_l, &context_r))
+		return FAIL;
+
+	zbx_free(*context);
+
+	if (0 != context_l)
+	{
+		ptr = macro + context_l;
+
+		/* find the context separator ':' by stripping spaces before context */
+		while (' ' == *(--ptr))
+			;
+
+		/* extract the macro name and close with '}' character */
+		len = ptr - macro + 1;
+		*name = zbx_realloc(*name, len + 1);
+		memcpy(*name, macro, len - 1);
+		(*name)[len - 1] = '}';
+		(*name)[len] = '\0';
+
+		*context = zbx_user_macro_unquote_context_dyn(macro + context_l, context_r - context_l + 1);
+	}
+	else
+	{
+		*name = zbx_realloc(*name, macro_r + 2);
+		zbx_strlcpy(*name, macro, macro_r + 2);
+	}
+
+	if (NULL != length)
+		*length = macro_r + 1;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_user_macro_unquote_context_dyn                               *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     extracts the macro context unquoting if necessary                      *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     context - [IN] the macro context inside a user macro                   *
+ *     len     - [IN] the macro context length (including quotes for quoted   *
+ *                    contexts)                                               *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A string containing extracted macro context. This string must be freed *
+ *     by the caller.                                                         *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_user_macro_unquote_context_dyn(const char *context, int len)
+{
+	int	quoted = 0;
+	char	*buffer, *ptr;
+
+	ptr = buffer = zbx_malloc(NULL, len + 1);
+
+	if ('"' == *context)
+	{
+		quoted = 1;
+		context++;
+		len--;
+	}
+
+	while (0 < len)
+	{
+		if (1 == quoted && '\\' == *context && '"' == context[1])
+		{
+			context++;
+			len--;
+		}
+
+		*ptr++ = *context++;
+		len--;
+	}
+
+	if (1 == quoted)
+		ptr--;
+
+	*ptr = '\0';
+
+	return buffer;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_user_macro_quote_context_dyn                                 *
+ *                                                                            *
+ * Purpose:                                                                   *
+ *     quotes user macro context if necessary                                 *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     context     - [IN] the macro context                                   *
+ *     force_quote - [IN] if non zero then context quoting is enforced        *
+ *                                                                            *
+ * Return value:                                                              *
+ *     A string containing quoted macro context. This string must be freed by *
+ *     the caller.                                                            *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote)
+{
+	int		len, quotes = 0;
+	char		*buffer, *ptr_buffer;
+	const char	*ptr_context;
+
+	for (ptr_context = context; ' ' == *ptr_context; ptr_context++)
+		;
+
+	if ('"' == *ptr_context)
+		force_quote = 1;
+
+	for (; '\0' != *ptr_context; ptr_context++)
+	{
+		if ('}' == *ptr_context)
+			force_quote = 1;
+
+		if ('"' == *ptr_context)
+			quotes++;
+	}
+
+	if (0 == force_quote)
+		return zbx_strdup(NULL, context);
+
+	len = strlen(context) + 2 + quotes;
+	ptr_buffer = buffer = zbx_malloc(NULL, len + 1);
+
+	*ptr_buffer++ = '"';
+
+	while (' ' == *context)
+		*ptr_buffer++ = *context++;
+
+	while ('\0' != *context)
+	{
+		if ('"' == *context)
+			*ptr_buffer++ = '\\';
+
+		*ptr_buffer++ = *context++;
+	}
+
+	*ptr_buffer++ = '"';
+	*ptr_buffer++ = '\0';
+
+	return buffer;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: zbx_dyn_escape_shell_single_quote                                *
  *                                                                            *
  * Purpose: escape single quote in shell command arguments                    *
@@ -3428,4 +3737,3 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg)
 
 	return arg_esc;
 }
-

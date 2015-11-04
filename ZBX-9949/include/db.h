@@ -510,9 +510,6 @@ int	DBremove_triggers_from_itservices(zbx_uint64_t *triggerids, int triggerids_n
 void	zbx_create_itservices_lock();
 void	zbx_destroy_itservices_lock();
 
-void	DBadd_trend(zbx_uint64_t itemid, double value, int clock);
-void	DBadd_trend_uint(zbx_uint64_t itemid, zbx_uint64_t value, int clock);
-
 void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const zbx_uint64_t *values, const int num);
 void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
