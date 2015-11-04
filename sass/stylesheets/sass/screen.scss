@@ -3537,7 +3537,7 @@ title: Typography
 name: typography
 ---
 
-Type sizes are in relative units&nbsp;&mdashems. Default font face is Arial.
+Type size is set in relative units, we use ems. Default font face is Arial.
 
 ##Headings
 
@@ -3649,7 +3649,7 @@ Default table:
 
 ##Table with Pagination
 
-A pagination is used to 
+Pagnation is used to  
 
 ```html_example
 <div class="overflow-table">
@@ -3761,7 +3761,7 @@ Table with no results:
 </div>
 ```
 
-##Tables with elements
+##Tables with Elements and Highlights
 
 ```html_example
 <div class="overflow-table">
@@ -3805,6 +3805,13 @@ Table with no results:
                <a href="#">Collapsed</a> 
                <div class="treeview"><span class="arrow-down"></span></div>
                <a href="#">Expanded</a>
+            </td>
+         </tr>
+          <tr>
+            <td>Severity</td>
+            <td>asdasd</td>
+            <td class="normal-bg">
+               <span class="link-action">25</span> 
             </td>
          </tr>
       </tbody>
@@ -3930,7 +3937,7 @@ title: Dialogs
 name: dialog
 ---
 
-Dialogsxcvxcvxv.
+Dialogs are used to reveal an addtional piece of information: data tables, text, forms or certain actions. Dialogs can be dismissed by clickng/pushing &times; at the top right corner, *cancel* button, or outside of the dialog area.
 
 ##Alert Dialogs
 
@@ -3938,7 +3945,7 @@ Alert dialogs are used to urgently inform the user about a certain situation. Pr
 
 ```html_example
 <div class="overlay-dialogue">
-   <span class="overlay-close-btn"></span>
+   <!--<span class="overlay-close-btn"></span>-->
    <div class="dashbrd-widget-head cursor-move">
       <h4>Delete the selected item?</h4>
    </div>
@@ -3947,7 +3954,7 @@ Alert dialogs are used to urgently inform the user about a certain situation. Pr
 </div>
 
 <div class="overlay-dialogue">
-   <span class="overlay-close-btn"></span>
+   <!--<span class="overlay-close-btn"></span>-->
    <div class="dashbrd-widget-head cursor-move">
       <h4>Delete the selected item?</h4>
    </div>
@@ -4331,7 +4338,7 @@ title: Spinners
 name: spinners
 ---
 
-Spinners are used to show data retrieval or computation.
+Spinners are used to show data retrieval or an ongoing computation. Use spinners to make UI look more fast and responsive.
 
 ```html_example
 <div class="preloader-container">
@@ -4347,7 +4354,7 @@ title: Widgets
 name: widgets
 ---
 
-Widgets are used to group related information.
+Widgets are used as containers to group any related information. Widget consists of *header*, *body* and *footer*.
 
 ```html_example
 <div class="dashbrd-widget">
@@ -4356,7 +4363,7 @@ Widgets are used to group related information.
       <ul>
          <li><button type="button" class="btn-widget-action" title="Action"></button></li>
          <li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li>
-         <li><button type="button" class="btn-widget-expand" title="Expand"></button></li>
+         <!--<li><button type="button" class="btn-widget-expand" title="Expand"></button></li>-->
       </ul>
    </div>
    <table class="list-table">
