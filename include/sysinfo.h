@@ -178,6 +178,11 @@ int	get_diskstat(const char *devname, zbx_uint64_t *dstat);
 #define PROCESS_MODULE_COMMAND	0x2
 #define PROCESS_WITH_ALIAS	0x4
 
+/* works only on a variables that are assigned signed integer values, e. g. */
+/* int x = -10;                   <-- 32 bit, signed integer value assigned */
+/* uint64_t x = -100000000000;    <-- 64 bit, signed integer value assigned */
+#define IS_NEGATIVE(X)	(((X) < 0) || ((((X) << 1) < (X)) && (((X) << 1) >= 0)))
+
 void	init_metrics();
 int	add_metric(ZBX_METRIC *metric, char *error, size_t max_error_len);
 void	free_metrics();
