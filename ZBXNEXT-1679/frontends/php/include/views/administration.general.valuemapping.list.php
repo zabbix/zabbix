@@ -57,7 +57,7 @@ foreach ($data['valuemaps'] as $valuemap) {
 		new CCheckBox('valuemapids['.$valuemap['valuemapid'].']', $valuemap['valuemapid']),
 		new CLink($valuemap['name'], 'adm.valuemapping.php?form=update&valuemapid='.$valuemap['valuemapid']),
 		$mappings,
-		(new CCol(($valuemap['item_count'] != 0) ? _('Yes') : ''))->addClass(ZBX_STYLE_GREEN)
+		$valuemap['used_in_items'] ? (new CCol(_('Yes')))->addClass(ZBX_STYLE_GREEN) : ''
 	]);
 }
 
