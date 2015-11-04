@@ -172,7 +172,7 @@ static void	rotate_log(const char *log_filename)
 
 	new_size = buf.st_size;
 
-	if (CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < new_size)
+	if ((zbx_uint64_t)CONFIG_LOG_FILE_SIZE * ZBX_MEBIBYTE < new_size)
 	{
 		char	filename_old[MAX_STRING_LEN];
 
