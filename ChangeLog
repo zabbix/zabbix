@@ -1,15 +1,24 @@
 Changes for 3.0.0alpha4
 
 New features:
-..F....... [ZBX-2616] update bundled DejaVu font from 2.34 to 2.35 (Richlv)
+A.F....... [ZBXNEXT-1679] implemented value map import/export (Ivo)
+..F....... [ZBXNEXT-1679] added checkbox column in value map list view and bulk "Delete" button (Ivo)
+..F....... [ZBXNEXT-1679] added "Used in items" column in value map list view and green text "Yes" if value map is used in items or item prototypes (Ivo, Sasha)
+..F....... [ZBXNEXT-1679] added value map sorting by name (Ivo)
+..F....... [ZBXNEXT-1679] added limit for the amount of records and paging in value maps (Ivo)
+..F....... [ZBXNEXT-1679] replaced built-in confirmation dialog with modal window dialog for image import when selecting "Update existing" (Ivo)
+A.F....PS. [ZBXNEXT-2683] added user macro context (Ivo, Oleg, Sasha, wiper)
+..F....... [ZBX-2616] updated bundled DejaVu font from 2.34 to 2.35 (Richlv)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-2678] implemented trigger description and URL popups in the dashboard's "Last 20 issues" and screen element's "Host group issues" and "Host issues" (Ivo)
 ..F....... [ZBX-2517] minimum period for time navigator set to 5 minutes; thanks to Zabbix community (Alexei)
 A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, Sasha)
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9949] fixed undefined index in proxy edit form (Gunars)
+...G...PS. [ZBX-6028] improved log rotation so that zabbix components do not keep writing to the old log file (dimir)
 .D........ [ZBXNEXT-2637] fixed incorrect double quote character in the default agent configuration files (Richlv)
 A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A.F....... [ZBX-9888] added validation in action condition formula to prohibit comparison of several triggers with "AND" operator (Gunars)
