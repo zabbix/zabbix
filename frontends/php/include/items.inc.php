@@ -747,7 +747,6 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 	$ack = null;
 	$css = '';
 	$value = UNKNOWN_VALUE;
-	$config = select_config();
 
 	if (isset($ithosts[$hostName])) {
 		$item = $ithosts[$hostName];
@@ -755,6 +754,8 @@ function getItemDataOverviewCells($tableRow, $ithosts, $hostName) {
 		if ($item['tr_value'] == TRIGGER_VALUE_TRUE) {
 			$css = getSeverityStyle($item['severity']);
 
+			// Display event acknowledgement.
+			$config = select_config();
 			if ($config['event_ack_enable']) {
 				$ack = get_last_event_by_triggerid($item['triggerid']);
 				$ack = ($ack['acknowledged'] == 1)
