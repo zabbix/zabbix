@@ -1,6 +1,12 @@
 Changes for 3.0.0alpha4
 
 New features:
+A.F....... [ZBXNEXT-1679] implemented value map import/export (Ivo)
+..F....... [ZBXNEXT-1679] added checkbox column in value map list view and bulk "Delete" button (Ivo)
+..F....... [ZBXNEXT-1679] added "Used in items" column in value map list view and green text "Yes" if value map is used in items or item prototypes (Ivo, Sasha)
+..F....... [ZBXNEXT-1679] added value map sorting by name (Ivo)
+..F....... [ZBXNEXT-1679] added limit for the amount of records and paging in value maps (Ivo)
+..F....... [ZBXNEXT-1679] replaced built-in confirmation dialog with modal window dialog for image import when selecting "Update existing" (Ivo)
 A.F....PS. [ZBXNEXT-2683] added user macro context (Ivo, Oleg, Sasha, wiper)
 ..F....... [ZBX-2616] updated bundled DejaVu font from 2.34 to 2.35 (Richlv)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
