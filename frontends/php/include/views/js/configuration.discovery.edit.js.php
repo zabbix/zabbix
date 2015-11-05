@@ -534,6 +534,7 @@
 						'buttons': [
 							{
 								'title': '<?= _('Cancel') ?>',
+								'cancel': true,
 								'focused': true,
 								'action': function() {}
 							}
@@ -602,6 +603,7 @@
 						'buttons': [
 							{
 								'title': '<?= _('Cancel') ?>',
+								'cancel': true,
 								'focused': true,
 								'action': function() {}
 							}
@@ -622,6 +624,7 @@
 					'buttons': [
 						{
 							'title': '<?= _('Cancel') ?>',
+							'cancel': true,
 							'focused': true,
 							'action': function() {}
 						}
