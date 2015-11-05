@@ -545,7 +545,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				" and o.operationid=" ZBX_FS_UI64
 				" and h.status=%d"
 			" union "
-			/* the 3nd 'select' works if remote command target is "Current host" */
+			/* the 3rd 'select' works if remote command target is "Current host" */
 			"select distinct 0,null,o.type,o.scriptid,o.execute_on,o.port"
 				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,%d",
 			operationid, HOST_STATUS_MONITORED, ZBX_TCP_SEC_UNENCRYPTED);
