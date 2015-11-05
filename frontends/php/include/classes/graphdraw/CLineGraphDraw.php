@@ -1206,22 +1206,28 @@ class CLineGraphDraw extends CGraphDraw {
 	}
 
 	private function drawTimeGrid() {
-		$beginEndTimeFormat = (date('Y', $this->stime) != date('Y', $this->to_time))
+		$time_format = (date('Y', $this->stime) != date('Y', $this->to_time))
 			? DATE_FORMAT
 			: DATE_TIME_FORMAT_SHORT;
 
-		// begin date
-		$this->drawBeginEndTimePeriod($this->stime, $beginEndTimeFormat, 0);
+		// Draw start date (and time) label.
+		$this->drawStartEndTimePeriod($this->stime, $time_format, 0);
 
-		// between date
 		$this->calculateTimeInterval();
-		$this->drawBetweenData();
+		$this->drawDateTimeIntervals();
 
-		// end date
-		$this->drawBeginEndTimePeriod($this->to_time, $beginEndTimeFormat, $this->sizeX);
+		// Draw end date (and time) label.
+		$this->drawStartEndTimePeriod($this->to_time, $time_format, $this->sizeX);
 	}
 
-	private function drawBeginEndTimePeriod($value, $format, $position) {
+	/**
+	 * Draw start or end date (and time) label.
+	 *
+	 * @param int $value		Unix time.
+	 * @param sring $format		Date time format.
+	 * @param int $position		Position on X axis.
+	 */
+	private function drawStartEndTimePeriod($value, $format, $position) {
 		$point = zbx_date2str(_($format), $value);
 		$element = imageTextSize(8, 90, $point);
 		imageText(
@@ -1235,6 +1241,14 @@ class CLineGraphDraw extends CGraphDraw {
 		);
 	}
 
+	/**
+	 * Draw main period label in red color with 8px font size under X axis and a 2px dashed gray vertical line
+	 * according to that label.
+	 *
+	 * @param int $value		Unix time.
+	 * @param sring $format		Date time format.
+	 * @param int $position		Position on X axis.
+	 */
 	private function drawMainPeriod($value, $format, $position) {
 		$str = zbx_date2str($format, $value);
 		$dims = imageTextSize(8, 90, $str);
@@ -1259,6 +1273,14 @@ class CLineGraphDraw extends CGraphDraw {
 		);
 	}
 
+	/**
+	 * Draw main period label in black color with 7px font size under X axis and a 1px dashed gray vertical line
+	 * according to that label.
+	 *
+	 * @param int $value		Unix time.
+	 * @param sring $format		Date time format.
+	 * @param int $position		Position on X axis.
+	 */
 	private function drawSubPeriod($value, $format, $position) {
 		$point = zbx_date2str($format, $value);
 		$element = imageTextSize(7, 90, $point);
@@ -1283,8 +1305,11 @@ class CLineGraphDraw extends CGraphDraw {
 		);
 	}
 
+	/**
+	 * Calculates the optimal size of time interval.
+	 */
 	private function calculateTimeInterval() {
-		$timeInterval = ($this->gridPixels * $this->period) / $this->sizeX;
+		$time_interval = ($this->gridPixels * $this->period) / $this->sizeX;
 		$intervals = [
 			['main' => SEC_PER_MIN / 2, 'sub' => SEC_PER_MIN / 60],		// 30 seconds and 1 second
 			['main' => SEC_PER_MIN, 'sub' => SEC_PER_MIN / 12],			// 60 seconds and 5 seconds
@@ -1317,78 +1342,76 @@ class CLineGraphDraw extends CGraphDraw {
 			['main' => SEC_PER_YEAR * 80, 'sub' => SEC_PER_YEAR * 40]	// 80 years and 40 years
 		];
 
-		// default values
+		// Default inteval values.
 		$distance = SEC_PER_YEAR * 5;
-		$mainInterval = 0;
-		$subInterval = 0;
+		$main_interval = 0;
+		$sub_interval = 0;
 
 		foreach ($intervals as $interval) {
-			$time = abs($interval['sub'] - $timeInterval);
+			$time = abs($interval['sub'] - $time_interval);
 
 			if ($time < $distance) {
 				$distance = $time;
-				$subInterval = $interval['sub'];
-				$mainInterval = $interval['main'];
+				$sub_interval = $interval['sub'];
+				$main_interval = $interval['main'];
 			}
 		}
 
-		// sub
-		$intervalX = ($subInterval * $this->sizeX) / $this->period;
+		// Calculate sub interval.
+		$interval_x = ($sub_interval * $this->sizeX) / $this->period;
 
-		if ($subInterval > SEC_PER_DAY) {
+		if ($sub_interval > SEC_PER_DAY) {
 			$offset = (7 - date('w', $this->from_time)) * SEC_PER_DAY;
 			$offset += $this->diffTZ;
 
 			$next = $this->from_time + $offset;
 
 			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
-			$offsetX = $offset * ($this->sizeX / $this->period);
 		}
 		else {
-			$offset = $subInterval - (($this->from_time + date('Z', $this->from_time)) % $subInterval);
-			$offsetX = ($offset * $this->sizeX) / $this->period;
+			$offset = $sub_interval - (($this->from_time + date('Z', $this->from_time)) % $sub_interval);
 		}
 
 		$sub = &$this->grid['horizontal']['sub'];
-		$sub['interval'] = $subInterval;
-		$sub['intervalx'] = $intervalX;
+		$sub['interval'] = $sub_interval;
+		$sub['interval_x'] = $interval_x;
 		$sub['offset'] = $offset;
-		$sub['offsetx'] = $offsetX;
 
-		// main
-		$intervalX = ($mainInterval * $this->sizeX) / $this->period;
+		// Calculate main interval.
+		$interval_x = ($main_interval * $this->sizeX) / $this->period;
 
-		if ($mainInterval > SEC_PER_DAY) {
+		if ($main_interval > SEC_PER_DAY) {
 			$offset = (7 - date('w', $this->from_time)) * SEC_PER_DAY;
 			$offset += $this->diffTZ;
 			$next = $this->from_time + $offset;
 
 			$offset = mktime(0, 0, 0, date('m', $next), date('d', $next), date('Y', $next)) - $this->from_time;
-			$offsetX = $offset * ($this->sizeX / $this->period);
 		}
 		else {
-			$offset = $mainInterval - (($this->from_time + (date('Z', $this->from_time))) % $mainInterval);
+			$offset = $main_interval - (($this->from_time + (date('Z', $this->from_time))) % $main_interval);
 			$offset += $this->diffTZ;
-			$offsetX = $offset * ($this->sizeX / $this->period);
 		}
 
 		$main = &$this->grid['horizontal']['main'];
-		$main['interval'] = $mainInterval;
-		$main['intervalx'] = $intervalX;
+		$main['interval'] = $main_interval;
+		$main['interval_x'] = $interval_x;
 		$main['offset'] = $offset;
-		$main['offsetx'] = $offsetX;
 	}
 
-	private function drawBetweenData() {
-		$subInterval = $this->grid['horizontal']['sub']['interval'];
-		$subIntervalX = $this->grid['horizontal']['sub']['intervalx'];
-		$subOffset = $this->grid['horizontal']['sub']['offset'];
-		$mainInterval = $this->grid['horizontal']['main']['interval'];
-		$mainIntervalX = $this->grid['horizontal']['main']['intervalx'];
-		$mainOffset = $this->grid['horizontal']['main']['offset'];
+	/**
+	 * Draw date and time intervals under the X axis.
+	 */
+	private function drawDateTimeIntervals() {
+		$sub_interval = $this->grid['horizontal']['sub']['interval'];
+		$sub_interval_x = $this->grid['horizontal']['sub']['interval_x'];
+		$sub_offset = $this->grid['horizontal']['sub']['offset'];
+		$main_interval = $this->grid['horizontal']['main']['interval'];
+		$main_interval_x = $this->grid['horizontal']['main']['interval_x'];
+		$main_offset = $this->grid['horizontal']['main']['offset'];
 
 		// Infinite loop checks.
-		if ($subInterval == $mainInterval || ($mainIntervalX < floor(($mainInterval / $subInterval) * $subIntervalX))) {
+		if ($sub_interval == $main_interval
+				|| ($main_interval_x < floor(($main_interval / $sub_interval) * $sub_interval_x))) {
 			return;
 		}
 
@@ -1401,159 +1424,175 @@ class CLineGraphDraw extends CGraphDraw {
 		$position = 0;
 		$i = 0;
 
-		while ($this->stime + $i * $subInterval + $subOffset < $this->to_time) {
+		// Calculate the next date and time, postion and determines label type (main or sub) for label placement.
+		while ($this->stime + $i * $sub_interval + $sub_offset < $this->to_time) {
+			// Next step calculation by interval.
+
 			$previous_time = isset($new_time) ? $new_time : $this->stime;
 
-			// Next step calculation by interval.
-			if ($subInterval == SEC_PER_YEAR * 40) {
+			// Every 40 years.
+			if ($sub_interval == SEC_PER_YEAR * 40) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 40);
 			}
-			elseif ($subInterval == SEC_PER_YEAR * 30) {
+			// Every 30 years.
+			elseif ($sub_interval == SEC_PER_YEAR * 30) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 30);
 			}
-			elseif ($subInterval == SEC_PER_YEAR * 20) {
+			// Every 20 years.
+			elseif ($sub_interval == SEC_PER_YEAR * 20) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 20);
 			}
-			elseif ($subInterval == SEC_PER_YEAR * 10) {
+			// Every 10 years.
+			elseif ($sub_interval == SEC_PER_YEAR * 10) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 10);
 			}
-			elseif ($subInterval == SEC_PER_YEAR * 5) {
+			// Every 5 years.
+			elseif ($sub_interval == SEC_PER_YEAR * 5) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 5);
 			}
-			elseif ($subInterval == SEC_PER_YEAR * 3) {
+			// Every 3 years.
+			elseif ($sub_interval == SEC_PER_YEAR * 3) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 3);
 			}
-			elseif ($subInterval == SEC_PER_YEAR * 2) {
+			// Every 2 years.
+			elseif ($sub_interval == SEC_PER_YEAR * 2) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 2);
 			}
-			elseif ($subInterval == SEC_PER_YEAR) {
+			// Every year.
+			elseif ($sub_interval == SEC_PER_YEAR) {
 				$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 			}
-			elseif ($subInterval == SEC_PER_MONTH * 6) {
+			// Every 6 months.
+			elseif ($sub_interval == SEC_PER_MONTH * 6) {
 				// First step calculation.
 				if ($i == 0) {
-					// If month > july, then set 1 january and + 1 year.
+					// If month > July, then chanage it to 1st of January of the next year.
 					if (date('m', $this->stime) > 7) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
-					// Otherwise set july as next step.
+					// Otherwise set 1st of July of the same year as the next step.
 					else {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
 					}
 				}
 				// Other steps calculation.
 				else {
-					// If month = january, then set july.
+					// If month = January, then change it to 1st July of the same year.
 					if (date('m', $previous_time) == 1) {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
 					}
-					// Otherwise set 1 january and + 1 year.
+					// Otherwise set 1st of January of the next year as the next step.
 					else {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
 				}
 			}
-			elseif ($subInterval == SEC_PER_MONTH * 4) {
+			// Every 4 months.
+			elseif ($sub_interval == SEC_PER_MONTH * 4) {
 				// First step calculation.
 				if ($i == 0) {
-					// If month > september, then set 1 january and + 1 year.
+					// If month > September, then chanage it to 1st of January of the next year.
 					if (date('m', $this->stime) > 9) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
-					// If month > may, then set september.
+					// If month > May, then change it to 1st of September of the same year.
 					elseif (date('m', $this->stime) > 5) {
 						$new_time = mktime(0, 0, 0, 9, 1, date('Y', $previous_time));
 					}
-					// Otherwise set may as next step.
+					// Otherwise set 1st of May of the same year as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 5, 1, date('Y', $previous_time));
 					}
 				}
 				// Other steps calculation.
 				else {
-					// If month = september, then set 1 january and + 1 year.
+					// If month = September, then change it to 1st of January of the next year.
 					if (date('m', $previous_time) == 9) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
-					// If month = may, then set september.
+					// If month = May, then change it to 1st of September of the same year.
 					elseif (date('m', $previous_time) == 5) {
 						$new_time = mktime(0, 0, 0, 9, 1, date('Y', $previous_time));
 					}
-					// Otherwise set may as next step.
+					// Otherwise set 1st of May of the same year as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 5, 1, date('Y', $previous_time));
 					}
 				}
 			}
-			elseif ($subInterval == SEC_PER_MONTH * 3) {
+			// Every 3 months.
+			elseif ($sub_interval == SEC_PER_MONTH * 3) {
 				// First step calculation.
 				if ($i == 0) {
-					// If month > october, then set 1 january and + 1 year.
+					// If month > October, then change it to 1st of January of the next year.
 					if (date('m', $this->stime) > 10) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
-					// If month > july, then set october.
+					// If month > July, then change it to 1st of October of the same year.
 					elseif (date('m', $this->stime) > 7) {
 						$new_time = mktime(0, 0, 0, 10, 1, date('Y', $previous_time));
 					}
-					// If month > april, then set july.
+					// If month > April, then change it to 1st of July of the same year.
 					elseif (date('m', $this->stime) > 4) {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
 					}
-					// Otherwise set april as next step.
+					// Otherwise set 1st of April of the same year as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 4, 1, date('Y', $previous_time));
 					}
 				}
 				// Other steps calculation.
 				else {
-					// If month = october, then set 1 january and + 1 year.
+					// If month = October, then change it to 1st of January of the next year.
 					if (date('m', $previous_time) == 10) {
 						$new_time = mktime(0, 0, 0, 1, 1, date('Y', $previous_time) + 1);
 					}
-					// If month = july, then set october.
+					// If month = July, then change it to 1st of October of the same year.
 					elseif (date('m', $previous_time) == 7) {
 						$new_time = mktime(0, 0, 0, 10, 1, date('Y', $previous_time));
 					}
-					// If month = april, then set july.
+					// If month = April, then change it to 1st of July of the same year.
 					elseif (date('m', $previous_time) == 4) {
 						$new_time = mktime(0, 0, 0, 7, 1, date('Y', $previous_time));
 					}
-					// Otherwise set april as next step.
+					// Otherwise set 1st of April of the same year as next step.
 					else {
 						$new_time = mktime(0, 0, 0, 4, 1, date('Y', $previous_time));
 					}
 				}
 			}
-			elseif ($subInterval == SEC_PER_MONTH) {
+			// Every month.
+			elseif ($sub_interval == SEC_PER_MONTH) {
 				$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 			}
-			elseif ($subInterval == SEC_PER_DAY * 15) {
+			// Every 15 days (about half of a month).
+			elseif ($sub_interval == SEC_PER_DAY * 15) {
 				// First step calculation.
 				if ($i == 0) {
-					// If day > 16, then set 1 day and + 1 month.
+					// If day > 16, then change it to the 1st day of the next month.
 					if (date('d', $this->stime) > 16) {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 					}
-					// Otherwise set 16 day.
+					// Otherwise set 16th day of the same month.
 					else {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time), 16, date('Y', $previous_time));
 					}
 				}
 				// Other steps calculation.
 				else {
-					// If day = 1, then day = 16.
+					// If 1st day of the month, then change it to 16th day of the same month.
 					if (date('d', $previous_time) == 1) {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time), 16, date('Y', $previous_time));
 					}
-					// Otherwise set 1 day and + 1 month.
+					// Otherwise set 1st day of the next month.
 					else {
 						$new_time = mktime(0, 0, 0, date('m', $previous_time) + 1, 1, date('Y', $previous_time));
 					}
 				}
 			}
+			// Less than 15 days.
 			else {
-				$new_time = $this->from_time + $i * $subInterval + $subOffset;
+				$new_time = $this->from_time + $i * $sub_interval + $sub_offset;
 			}
 
 			// Draw until year 2038.
@@ -1579,39 +1618,40 @@ class CLineGraphDraw extends CGraphDraw {
 				continue;
 			}
 
-			// Last element overlaping cheack.
+			// Last element overlaping check.
 			if ($position > $this->sizeX - $end_element_size['width'] / 2 - 2) {
 				break;
 			}
 
 			$i++;
 
+			// What time format to display.
 			if (date('d', $new_time) == 1 && date('m', $new_time) == 1 && date('H', $new_time) == 0
 					&& date('i', $new_time) == 0) {
 				$format = YEAR_FORMAT;
 			}
 			elseif (date('d', $new_time) == 1 && date('H', $new_time) == 0 && date('i', $new_time) == 0
-					&& ($subInterval == SEC_PER_MONTH || $subInterval == SEC_PER_MONTH * 3
-						|| $subInterval == SEC_PER_MONTH * 4 || $subInterval == SEC_PER_MONTH * 6)) {
+					&& ($sub_interval == SEC_PER_MONTH || $sub_interval == SEC_PER_MONTH * 3
+						|| $sub_interval == SEC_PER_MONTH * 4 || $sub_interval == SEC_PER_MONTH * 6)) {
 				$format = _('M');
 			}
-			elseif ((date('H', $new_time) == 0 && date('i', $new_time) == 0) || $subInterval > SEC_PER_HOUR * 12) {
+			elseif ((date('H', $new_time) == 0 && date('i', $new_time) == 0) || $sub_interval > SEC_PER_HOUR * 12) {
 				$format = _('m-d');
 			}
-			elseif (date('s', $new_time) == 0 && $subInterval >= 60) {
+			elseif (date('s', $new_time) == 0 && $sub_interval >= 60) {
 				$format = TIME_FORMAT;
 			}
 			else {
 				$format = _('H:i:s');
 			}
 
-			// main interval checks
-			if ((!($new_time % $mainInterval) && $mainInterval < SEC_PER_DAY)
-					|| ($subInterval < SEC_PER_MIN && date('s', $new_time) == 0)
-					|| ($mainInterval == SEC_PER_DAY && date('H', $new_time) == 0 && date('i', $new_time) == 0)
-					|| ($mainInterval == SEC_PER_WEEK && date('N', $new_time) == 7)
-					|| ($mainInterval == SEC_PER_MONTH && date('d', $new_time) == 1)
-					|| ($mainInterval == SEC_PER_WEEK * 2 && date('m', $new_time) != date('m', $previous_time))
+			// Check if main or sub interval and then draw it.
+			if ((!($new_time % $main_interval) && $main_interval < SEC_PER_DAY)
+					|| ($sub_interval < SEC_PER_MIN && date('s', $new_time) == 0)
+					|| ($main_interval == SEC_PER_DAY && date('H', $new_time) == 0 && date('i', $new_time) == 0)
+					|| ($main_interval == SEC_PER_WEEK && date('N', $new_time) == 7)
+					|| ($main_interval == SEC_PER_MONTH && date('d', $new_time) == 1)
+					|| ($main_interval == SEC_PER_WEEK * 2 && date('m', $new_time) != date('m', $previous_time))
 					|| $format == YEAR_FORMAT) {
 				$this->drawMainPeriod($new_time, $format, $position);
 				continue;
