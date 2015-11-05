@@ -18,8 +18,6 @@ use Time::HiRes qw(time);
 
 use constant SUCCESS => 0;
 use constant E_FAIL => -1;
-use constant E_ID_NONEXIST => -2;
-use constant E_ID_MULTIPLE => -3;
 
 use constant UP => 1;
 use constant DOWN => 0;
@@ -72,9 +70,9 @@ my $sql_count = 0;
 our %OPTS; # specified command-line options
 
 our @EXPORT = qw($result $dbh $tld
-		SUCCESS E_FAIL E_ID_NONEXIST E_ID_MULTIPLE UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR
-		MAX_LOGIN_ERROR MIN_INFO_ERROR MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT PROBE_ONLINE_STR PROBE_OFFLINE_STR
-		PROBE_NORESULT_STR AVAIL_SHIFT_BACK JSON_RDDS_43 JSON_RDDS_80
+		SUCCESS E_FAIL UP DOWN RDDS_UP SLV_UNAVAILABILITY_LIMIT MIN_LOGIN_ERROR MAX_LOGIN_ERROR MIN_INFO_ERROR
+		MAX_INFO_ERROR RESULT_TIMESTAMP_SHIFT PROBE_ONLINE_STR PROBE_OFFLINE_STR PROBE_NORESULT_STR
+		AVAIL_SHIFT_BACK JSON_RDDS_43 JSON_RDDS_80
 		get_macro_minns get_macro_dns_probe_online get_macro_rdds_probe_online get_macro_dns_rollweek_sla
 		get_macro_rdds_rollweek_sla get_macro_dns_udp_rtt_high get_macro_dns_udp_rtt_low
 		get_macro_dns_tcp_rtt_low get_macro_rdds_rtt_low get_macro_dns_udp_delay get_macro_dns_tcp_delay
@@ -300,8 +298,9 @@ sub get_item_data
 sub get_itemid_by_key
 {
 	my $key = shift;
+	my $errbuf = shift;
 
-	return __get_itemid_by_sql("select itemid from items where key_='$key'");
+	return __get_itemid_by_sql("select itemid from items where key_='$key'", $errbuf);
 }
 
 sub get_itemid_by_host
@@ -326,26 +325,38 @@ sub get_itemid_by_hostid
 {
 	my $hostid = shift;
 	my $key = shift;
+	my $errbuf = shift;
 
-	return __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_='$key'");
+	return __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_='$key'", $errbuf);
 }
 
 sub get_itemid_like_by_hostid
 {
 	my $hostid = shift;
 	my $key = shift;
+	my $errbuf = shift;
 
-	return __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_ like '$key'");
+	return __get_itemid_by_sql("select itemid from items where hostid=$hostid and key_ like '$key'", $errbuf);
 }
 
 sub __get_itemid_by_sql
 {
 	my $sql = shift;
+	my $errbuf = shift;
 
 	my $rows_ref = db_select($sql);
 
-	return E_ID_NONEXIST if (scalar(@$rows_ref) == 0);
-        return E_ID_MULTIPLE if (scalar(@$rows_ref) > 1);
+	if (scalar(@$rows_ref) == 0)
+	{
+		$$errbuf = "itemid not found (sql was [$sql])" if ($errbuf);
+		return -1;
+	}
+
+	if (scalar(@$rows_ref) > 1)
+	{
+		$$errbuf = "more than one itemid found (sql was [$sql])" if ($errbuf);
+		return -1;
+	}
 
         return $rows_ref->[0]->[0];
 }
@@ -1098,16 +1109,11 @@ sub get_online_probes
 		$hostid = $reachable_probes{$host};
 
 		# get itemid
+		my $errbuf;
 		my $key = PROBE_KEY_MANUAL;
-		my $itemid = get_itemid_by_hostid($hostid, $key);
+		my $itemid = get_itemid_by_hostid($hostid, $key, \$errbuf);
 
-		if ($itemid < 0)
-                {
-                        fail("misconfiguration: no item \"$key\" to check manual online status found at probe host \"$host\"") if ($itemid == E_ID_NONEXIST);
-                        fail("misconfiguration: multiple items \"$key\" to check manual online status found at probe host \"$host\"") if ($itemid == E_ID_MULTIPLE);
-
-                        fail("cannot get ID of item \"$key\" at probe host \"$host\": unknown error");
-                }
+		fail("configuration error: cannot get item \"$key\" to check manual online status of probe host \"$host\": $errbuf") if ($itemid < 0);
 
 		$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
 
@@ -1146,16 +1152,11 @@ sub get_online_probes
 
 		# Probe is considered manually up, check automatic status.
 
+		my $errbuf;
 		$key = PROBE_KEY_AUTOMATIC;
-		$itemid = get_itemid_like_by_hostid($hostid, $key);
+		$itemid = get_itemid_like_by_hostid($hostid, $key, \$errbuf);
 
-		if ($itemid < 0)
-                {
-                        fail("misconfiguration: no item \"$key\" to check automatic online status found at probe host \"$host\"") if ($itemid == E_ID_NONEXIST);
-                        fail("misconfiguration: multiple items \"$key\" to check automatic online status found at probe host \"$host\"") if ($itemid == E_ID_MULTIPLE);
-
-                        fail("cannot get ID of item \"$key\" at probe host \"$host\": unknown error");
-                }
+		fail("configuration error: cannot get item \"$key\" to check automatic online status of probe host \"$host\": $errbuf") if ($itemid < 0);
 
 		$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock between $from and $till order by clock");
 
@@ -3817,23 +3818,17 @@ sub __get_probestatus_times
 	my $key_match = "i.key_";
 	$key_match .= ($key =~ m/%/) ? " like '$key'" : "='$key'";
 
-	my $itemid;
+	my ($itemid, $errbuf);
 	if ($key =~ m/%/)
 	{
-		$itemid = get_itemid_like_by_hostid($hostid, $key);
+		$itemid = get_itemid_like_by_hostid($hostid, $key, \$errbuf);
 	}
 	else
 	{
-		$itemid = get_itemid_by_hostid($hostid, $key);
+		$itemid = get_itemid_by_hostid($hostid, $key, \$errbuf);
 	}
 
-	if ($itemid < 0)
-	{
-		fail("misconfiguration: no item \"$key\" at probe host \"$probe\"") if ($itemid == E_ID_NONEXIST);
-		fail("misconfiguration: multiple items \"$key\" at probe host \"$probe\"") if ($itemid == E_ID_MULTIPLE);
-
-		fail("cannot get ID of item \"$key\" at probe host \"$probe\": unknown error");
-	}
+	fail("configuration error: cannot get item \"$key\" at probe host \"$probe\": $errbuf") if ($itemid < 0);
 
 	$rows_ref = db_select("select value from history_uint where itemid=$itemid and clock<" . $times_ref->[0] . " order by clock desc limit 1");
 
@@ -3896,16 +3891,12 @@ sub __get_configvalue
 	my $diff = $hour;
 	my $value = undef;
 
+	my $errbuf;
+
 	my $key = "$item_prefix.configvalue[$item_param]";
-	my $itemid = get_itemid_by_key($key);
+	my $itemid = get_itemid_by_key($key, \$errbuf);
 
-	if ($itemid < 0)
-	{
-		fail("configuration item \"$key\" not found") if ($itemid == E_ID_NONEXIST);
-		fail("more than one configuration item \"$key\" found") if ($itemid == E_ID_MULTIPLE);
-
-		fail("cannot get ID of configuration item \"$key\": unknown error");
-	}
+	fail("configuration error: cannot get item \"$key\": $errbuf") if ($itemid < 0);
 
 	while (not $value and $diff < $month)
 	{

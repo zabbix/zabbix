@@ -359,24 +359,13 @@ foreach (keys(%$servicedata))
 			next;
 		}
 
+		my $errbuf;
 		my $hostid = get_hostid($tld);
-		my $avail_itemid = get_itemid_by_hostid($hostid, $avail_key);
+		my $avail_itemid = get_itemid_by_hostid($hostid, $avail_key, \$errbuf);
 
 		if ($avail_itemid < 0)
 		{
-			if ($avail_itemid == E_ID_NONEXIST)
-			{
-				wrn("configuration error: service $service enabled but item \"$avail_key\" not found");
-			}
-			elsif ($avail_itemid == E_ID_MULTIPLE)
-			{
-				wrn("configuration error: multiple items with key \"$avail_key\" found");
-			}
-			else
-			{
-				wrn("cannot get ID of $service item ($avail_key): unknown error");
-			}
-
+			wrn("configuration error: service $service enabled but item \"$avail_key\" was not found: $errbuf");
 			next;
 		}
 
