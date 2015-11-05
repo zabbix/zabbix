@@ -474,13 +474,14 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 
 static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_t operationid, int esc_step)
 {
-	const char	*__function_name = "execute_commands";
-	DB_RESULT	result;
-	DB_ROW		row;
-	zbx_db_insert_t	db_insert;
-	int		alerts_num = 0;
-	char		*buffer = NULL;
-	size_t		buffer_alloc = ZBX_KIBIBYTE, buffer_offset = 0;
+	const char		*__function_name = "execute_commands";
+	DB_RESULT		result;
+	DB_ROW			row;
+	zbx_db_insert_t		db_insert;
+	int			alerts_num = 0;
+	char			*buffer = NULL;
+	size_t			buffer_alloc = ZBX_KIBIBYTE, buffer_offset = 0;
+	zbx_vector_uint64_t	executed_on_hosts;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 
@@ -531,6 +532,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 	result = DBselect("%s", buffer);
 
 	zbx_free(buffer);
+	zbx_vector_uint64_create(&executed_on_hosts);
 
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -562,6 +564,11 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 			if (0 != host.hostid)
 			{
+				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+					goto skip;
+
+				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 				strscpy(host.host, row[1]);
 #ifdef HAVE_OPENIPMI
 				host.ipmi_authtype = (signed char)atoi(row[12]);
@@ -570,8 +577,14 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				strscpy(host.ipmi_password, row[15]);
 #endif
 			}
-			else
-				rc = get_dynamic_hostid(event, &host, error, sizeof(error));
+			else if (SUCCEED == (rc = get_dynamic_hostid(event, &host, error, sizeof(error))))
+			{
+				if (FAIL != zbx_vector_uint64_search(&executed_on_hosts, host.hostid,
+						ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+					goto skip;
+
+				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
+			}
 		}
 
 		if (SUCCEED == rc)
@@ -600,10 +613,11 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 		add_command_alert(&db_insert, alerts_num++, &host, event->eventid, actionid, esc_step, script.command,
 				status, error);
-
+skip:
 		zbx_script_clean(&script);
 	}
 	DBfree_result(result);
+	zbx_vector_uint64_destroy(&executed_on_hosts);
 
 	if (0 < alerts_num)
 	{
