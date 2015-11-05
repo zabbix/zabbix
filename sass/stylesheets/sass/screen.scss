@@ -1286,6 +1286,10 @@ footer {
 		vertical-align: middle;
 		width: 85%;
 
+		th {
+			padding: 0;
+		}
+
 		td {
 			padding: 5px 5px 5px 0;
 			position: relative;
@@ -1446,8 +1450,10 @@ footer {
 
 		&:checked + label {
 			color: $white;
-			border-color: $form-border-color;
-			background-color: $ui-bg-selected-color;	
+			border-color: $ui-bg-selected-color;
+			background-color: $ui-bg-selected-color;
+			position: relative;
+			z-index: 1;	
 		}
 
 		&:checked:focus + label {
