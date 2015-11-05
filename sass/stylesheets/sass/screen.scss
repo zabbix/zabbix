@@ -1359,7 +1359,7 @@ footer {
 
 	li {
 		display: block;
-		padding: 0.3em 0;
+		padding: .3em 0;
 	}
 
 	label {
@@ -1386,6 +1386,7 @@ footer {
 	li {
 		display: inline-block;
 		margin-right: 15px;
+		padding: .3em 0 0 0;
 
 		&:last-child {
 			margin-right: 0;
@@ -1450,10 +1451,8 @@ footer {
 
 		&:checked + label {
 			color: $white;
-			border-color: $ui-bg-selected-color;
-			background-color: $ui-bg-selected-color;
-			position: relative;
-			z-index: 1;	
+			border-color: $form-border-color;
+			background-color: $ui-bg-selected-color;	
 		}
 
 		&:checked:focus + label {
@@ -3543,7 +3542,7 @@ title: Typography
 name: typography
 ---
 
-Type size is set in relative units, we use ems. Default font face is Arial.
+The default font face is Arial. Type size and line height should be set in relative units: ems.
 
 ##Headings
 
@@ -3805,7 +3804,7 @@ Table with no results:
          </tr>
          <tr>
             <td>Tree</td>
-            <td>asdasd</td>
+            <td>Trees are used to represent a hierarchy of different structures: navigation, table, data, etc. Tree branches can be collapsed and expanded.</td>
             <td>
                <div class="treeview"><span class="arrow-right"></span></div>
                <a href="#">Collapsed</a> 
