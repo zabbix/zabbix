@@ -1628,7 +1628,7 @@ class CLineGraphDraw extends CGraphDraw {
 			// What time format to display.
 			if (date('d', $new_time) == 1 && date('m', $new_time) == 1 && date('H', $new_time) == 0
 					&& date('i', $new_time) == 0) {
-				$format = YEAR_FORMAT;
+				$format = _x('Y', DATE_FORMAT_CONTEXT);
 			}
 			elseif (date('d', $new_time) == 1 && date('H', $new_time) == 0 && date('i', $new_time) == 0
 					&& ($sub_interval == SEC_PER_MONTH || $sub_interval == SEC_PER_MONTH * 3
@@ -1652,7 +1652,7 @@ class CLineGraphDraw extends CGraphDraw {
 					|| ($main_interval == SEC_PER_WEEK && date('N', $new_time) == 7)
 					|| ($main_interval == SEC_PER_MONTH && date('d', $new_time) == 1)
 					|| ($main_interval == SEC_PER_WEEK * 2 && date('m', $new_time) != date('m', $previous_time))
-					|| $format == YEAR_FORMAT) {
+					|| $format == _x('Y', DATE_FORMAT_CONTEXT)) {
 				$this->drawMainPeriod($new_time, $format, $position);
 				continue;
 			}
