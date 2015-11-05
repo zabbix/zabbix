@@ -11,6 +11,7 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9949] fixed undefined index in proxy edit form (Gunars)
 ...G...PS. [ZBX-6028] improved log rotation so that zabbix components do not keep writing to the old log file (dimir)
 A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A.F....... [ZBX-9888] added validation in action condition formula to prohibit comparison of several triggers with "AND" operator (Gunars)
