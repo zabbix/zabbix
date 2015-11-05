@@ -533,30 +533,22 @@ class CValueMap extends CApiService {
 		// Select mappings for value map.
 		if ($options['selectMappings'] !== null) {
 			if ($options['selectMappings'] == API_OUTPUT_COUNT) {
-				$sql = 'SELECT m.valuemapid,COUNT(*) AS cnt FROM mappings m';
-
-				if ($options['valuemapids'] !== null) {
-					$sql .= ' WHERE '.dbConditionInt('m.valuemapid', $options['valuemapids']);
-				}
-
-				$sql .= ' GROUP BY m.valuemapid';
-
-				$db_mappings = DBselect($sql);
+				$db_mappings = DBselect(
+					'SELECT m.valuemapid,COUNT(*) AS cnt'.
+					' FROM mappings m'.
+					' WHERE '.dbConditionInt('m.valuemapid', array_keys($result)).
+					' GROUP BY m.valuemapid'
+				);
 
 				while ($db_mapping = DBfetch($db_mappings)) {
 					$result[$db_mapping['valuemapid']]['mappings'] = $db_mapping['cnt'];
 				}
 			}
 			else {
-				$mappings_options = [
-					'output' => $this->outputExtend($options['selectMappings'], ['valuemapid'])
-				];
-
-				if ($options['valuemapids'] !== null) {
-					$mappings_options['filter'] = ['valuemapid' => $options['valuemapids']];
-				}
-
-				$db_mappings = API::getApiService()->select('mappings', $mappings_options);
+				$db_mappings = API::getApiService()->select('mappings', [
+					'output' => $this->outputExtend($options['selectMappings'], ['valuemapid']),
+					'filter' => ['valuemapid' => array_keys($result)]
+				]);
 
 				foreach ($db_mappings as $db_mapping) {
 					$valuemapid = $db_mapping['valuemapid'];
