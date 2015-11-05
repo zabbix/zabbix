@@ -1244,16 +1244,23 @@ function getItemFormData(array $item = [], array $options = []) {
 
 	// valuemapid
 	if ($data['limited']) {
-		if (!empty($data['valuemapid'])) {
-			if ($map_data = DBfetch(DBselect('SELECT v.name FROM valuemaps v WHERE v.valuemapid='.zbx_dbstr($data['valuemapid'])))) {
-				$data['valuemaps'] = $map_data['name'];
+		if ($data['valuemapid'] != 0) {
+			$valuemaps = API::ValueMap()->get([
+				'output' => ['name'],
+				'valuemapids' => [$data['valuemapid']]
+			]);
+
+			if ($valuemaps) {
+				$data['valuemaps'] = $valuemaps[0]['name'];
 			}
 		}
 	}
 	else {
-		$data['valuemaps'] = DBfetchArray(DBselect('SELECT v.* FROM valuemaps v'));
+		$data['valuemaps'] = API::ValueMap()->get([
+			'output' => ['valemapid', 'name']
+		]);
 
-		order_result($data['valuemaps'], 'name');
+		CArrayHelper::sort($data['valuemaps'], ['name']);
 	}
 
 	// possible host inventories
@@ -1438,8 +1445,9 @@ function getTriggerFormData($exprAction) {
 			'selectHosts' => ['hostid'],
 			'triggerids' => $data['triggerid']
 		];
-		$trigger = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
-		$data['trigger'] = reset($trigger);
+		$triggers = ($data['parent_discoveryid']) ? API::TriggerPrototype()->get($options) : API::Trigger()->get($options);
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
+		$data['trigger'] = reset($triggers);
 
 		// get templates
 		$tmp_triggerid = $data['triggerid'];
@@ -1482,7 +1490,7 @@ function getTriggerFormData($exprAction) {
 	}
 
 	if ((!empty($data['triggerid']) && !isset($_REQUEST['form_refresh'])) || $data['limited']) {
-		$data['expression'] = explode_exp($data['trigger']['expression']);
+		$data['expression'] = $data['trigger']['expression'];
 
 		if (!$data['limited'] || !isset($_REQUEST['form_refresh'])) {
 			$data['description'] = $data['trigger']['description'];
