@@ -46,5 +46,31 @@
 					.text(<?= CJs::encodeJson(_('Remove')) ?>);
 			}
 		});
+
+		// Convert macro names to uppercase.
+		$('#tbl_macros').on('blur', 'input.macro', function() {
+			macroToUpperCase(this);
+		});
+
+		$('form[name="hostsForm"], form[name="templatesForm"]').submit(function() {
+			$('input.macro').each(function() {
+				macroToUpperCase(this);
+			});
+		});
+
+		function macroToUpperCase(element) {
+			var macro = $(element).val(),
+				end = macro.indexOf(':');
+
+			if (end == -1) {
+				$(element).val(macro.toUpperCase());
+			}
+			else {
+				var macro_part = macro.substr(0, end),
+					context_part = macro.substr(end, macro.length);
+
+				$(element).val(macro_part.toUpperCase() + context_part);
+			}
+		}
 	});
 </script>
