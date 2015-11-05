@@ -321,7 +321,7 @@ if (isset($_REQUEST['form'])) {
 		$data['host_prototype'] = array_merge($data['host_prototype'], $hostPrototype);
 
 		if (!array_key_exists('inventory_mode', $data['host_prototype']['inventory'])) {
-			$data['host_prototype']['inventory']['inventory_mode'] = $config['default_inventory_mode'];
+			$data['host_prototype']['inventory']['inventory_mode'] = HOST_INVENTORY_DISABLED;
 		}
 
 		$data['groups'] = API::HostGroup()->get([
