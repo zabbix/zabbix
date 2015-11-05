@@ -1152,7 +1152,6 @@ sub get_online_probes
 
 		# Probe is considered manually up, check automatic status.
 
-		my $errbuf;
 		$key = PROBE_KEY_AUTOMATIC;
 		$itemid = get_itemid_like_by_hostid($hostid, $key, \$errbuf);
 
