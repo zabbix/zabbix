@@ -18,6 +18,7 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+..F....... [ZBX-9977] fixed inconsistent display of acknowledge-related elements when acknowledgement is disabled in configuration (Gunars)
 ..F....... [ZBX-9964] fixed undefined index "inventory_mode" in host prototype edit form (Gunars)
 ..F....... [ZBXNEXT-1762] fixed time interval calculation and displaying issues in line graphs (Oleg)
 ..F....... [ZBX-9949] fixed undefined index in proxy edit form (Gunars)
