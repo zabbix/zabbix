@@ -23,6 +23,15 @@
 #include "zbxtypes.h"
 #include "zbxalgo.h"
 
+/* user macro structure used to store user macros in user macro cache */
+typedef struct
+{
+	char	*name;
+	char	*context;
+	char	*value;
+}
+zbx_umc_macro_t;
+
 /* user macro cache object */
 typedef struct
 {
@@ -31,8 +40,10 @@ typedef struct
 	/* the macro source hosts */
 	zbx_vector_uint64_t	hostids;
 	/* the macro:value pairs */
-	zbx_vector_ptr_pair_t	macros;
+	zbx_vector_ptr_t	macros;
 }
 zbx_umc_object_t;
+
+int	zbx_umc_compare_macro(const void *d1, const void *d2);
 
 #endif
