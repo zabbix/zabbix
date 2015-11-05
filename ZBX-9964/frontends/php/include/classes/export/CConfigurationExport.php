@@ -57,8 +57,10 @@ class CConfigurationExport {
 			'groups' => [],
 			'screens' => [],
 			'images' => [],
-			'maps' => []
+			'maps' => [],
+			'valueMaps' => []
 		];
+
 		$this->options = array_merge($this->options, $options);
 
 		$this->data = [
@@ -71,7 +73,8 @@ class CConfigurationExport {
 			'graphPrototypes' => [],
 			'screens' => [],
 			'images' => [],
-			'maps' => []
+			'maps' => [],
+			'valueMaps' => []
 		];
 
 		$this->dataFields = [
@@ -89,7 +92,7 @@ class CConfigurationExport {
 				'ipmi_sensor', 'data_type', 'authtype', 'username', 'password', 'publickey', 'privatekey',
 				'interfaceid', 'port', 'description', 'inventory_link', 'flags', 'filter', 'lifetime'
 			],
-			'discoveryrule' => ['hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_',
+			'item_prototype' => ['hostid', 'multiplier', 'type', 'snmp_community', 'snmp_oid', 'name', 'key_',
 				'delay', 'history', 'trends', 'status', 'value_type', 'trapper_hosts', 'units', 'delta',
 				'snmpv3_contextname', 'snmpv3_securityname', 'snmpv3_securitylevel', 'snmpv3_authprotocol',
 				'snmpv3_authpassphrase', 'snmpv3_privprotocol', 'snmpv3_privpassphrase', 'formula', 'valuemapid',
@@ -130,26 +133,37 @@ class CConfigurationExport {
 		if ($this->data['groups']) {
 			$this->builder->buildGroups($this->data['groups']);
 		}
+
 		if ($this->data['templates']) {
 			$this->builder->buildTemplates($this->data['templates']);
 		}
+
 		if ($this->data['hosts']) {
 			$this->builder->buildHosts($this->data['hosts']);
 		}
+
 		if ($this->data['triggers']) {
 			$this->builder->buildTriggers($this->data['triggers']);
 		}
+
 		if ($this->data['graphs']) {
 			$this->builder->buildGraphs($this->data['graphs']);
 		}
+
 		if ($this->data['screens']) {
 			$this->builder->buildScreens($this->data['screens']);
 		}
+
 		if ($this->data['images']) {
 			$this->builder->buildImages($this->data['images']);
 		}
+
 		if ($this->data['maps']) {
 			$this->builder->buildMaps($this->data['maps']);
+		}
+
+		if ($this->data['valueMaps']) {
+			$this->builder->buildValueMaps($this->data['valueMaps']);
 		}
 
 		return $this->writer->write($this->builder->getExport());
@@ -163,6 +177,11 @@ class CConfigurationExport {
 
 		if ($options['groups']) {
 			$this->gatherGroups($options['groups']);
+		}
+
+		// Gather value maps before items if possible.
+		if ($options['valueMaps']) {
+			$this->gatherValueMaps($options['valueMaps']);
 		}
 
 		if ($options['templates']) {
@@ -421,38 +440,57 @@ class CConfigurationExport {
 	}
 
 	/**
-	 * Get items related objects data from database.
+	 * Get items related objects data from database. and set 'valueMaps' data.
 	 *
 	 * @param array $items
 	 *
 	 * @return array
 	 */
 	protected function prepareItems(array $items) {
-		// gather value maps
-		$valueMapNames = [];
+		$valuemapids = [];
 
-		$dbValueMaps = DBselect(
-			'SELECT vm.valuemapid, vm.name FROM valuemaps vm'.
-			' WHERE '.dbConditionInt('vm.valuemapid', zbx_objectValues($items, 'valuemapid'))
-		);
-
-		while ($valueMap = DBfetch($dbValueMaps)) {
-			$valueMapNames[$valueMap['valuemapid']] = $valueMap['name'];
-		}
-
-		foreach ($items as $idx => &$item) {
-			$item['valuemap'] = [];
-
-			if ($item['valuemapid']) {
-				$item['valuemap'] = ['name' => $valueMapNames[$item['valuemapid']]];
-			}
-
+		foreach ($items as $idx => $item) {
 			// Remove items linked to discovered applications.
 			foreach ($item['applications'] as $application) {
 				if ($application['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 					unset($items[$idx]);
 					continue 2;
 				}
+			}
+
+			$valuemapids[$item['valuemapid']] = true;
+		}
+
+		// Value map IDs that are zeroes, should be skipped.
+		unset($valuemapids[0]);
+
+		if ($this->data['valueMaps']) {
+			/*
+			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
+			 * value map IDs that should not be selected again.
+			 */
+
+			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
+				if (array_key_exists($valuemapid, $valuemapids)) {
+					unset($valuemapids[$valuemapid]);
+				}
+			}
+		}
+
+		if ($valuemapids) {
+			$this->data['valueMaps'] += API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'selectMappings' => ['value', 'newvalue'],
+				'valuemapids' => array_keys($valuemapids),
+				'preservekeys' => true
+			]);
+		}
+
+		foreach ($items as $idx => &$item) {
+			$item['valuemap'] = [];
+
+			if ($item['valuemapid'] != 0) {
+				$item['valuemap'] = ['name' => $this->data['valueMaps'][$item['valuemapid']]['name']];
 			}
 		}
 		unset($item);
@@ -533,32 +571,51 @@ class CConfigurationExport {
 
 		// gather item prototypes
 		$prototypes = API::ItemPrototype()->get([
-			'discoveryids' => zbx_objectValues($items, 'itemid'),
-			'output' => $this->dataFields['discoveryrule'],
-			'selectApplications' => API_OUTPUT_EXTEND,
+			'output' => $this->dataFields['item_prototype'],
+			'selectApplications' => ['name'],
 			'selectApplicationPrototypes' => ['name'],
 			'selectDiscoveryRule' => ['itemid'],
+			'discoveryids' => zbx_objectValues($items, 'itemid'),
 			'inherited' => false,
 			'preservekeys' => true
 		]);
 
-		// gather value maps
-		$valueMaps = [];
+		$valuemapids = [];
 
-		$dbValueMaps = DBselect(
-			'SELECT vm.valuemapid, vm.name FROM valuemaps vm'.
-			' WHERE '.dbConditionInt('vm.valuemapid', zbx_objectValues($prototypes, 'valuemapid'))
-		);
+		foreach ($prototypes as $prototype) {
+			$valuemapids[$prototype['valuemapid']] = true;
+		}
 
-		while ($valueMap = DBfetch($dbValueMaps)) {
-			$valueMaps[$valueMap['valuemapid']] = $valueMap['name'];
+		// Value map IDs that are zeroes, should be skipped.
+		unset($valuemapids[0]);
+
+		if ($this->data['valueMaps']) {
+			/*
+			 * If there is an option "valueMaps", some value maps may already been selected. Copy the result and remove
+			 * value map IDs that should not be selected again.
+			 */
+
+			foreach ($this->data['valueMaps'] as $valuemapid => $valuemap) {
+				if (array_key_exists($valuemapid, $valuemapids)) {
+					unset($valuemapids[$valuemapid]);
+				}
+			}
+		}
+
+		if ($valuemapids) {
+			$this->data['valueMaps'] += API::ValueMap()->get([
+				'output' => ['valuemapid', 'name'],
+				'selectMappings' => ['value', 'newvalue'],
+				'valuemapids' => array_keys($valuemapids),
+				'preservekeys' => true
+			]);
 		}
 
 		foreach ($prototypes as $prototype) {
 			$prototype['valuemap'] = [];
 
-			if ($prototype['valuemapid']) {
-				$prototype['valuemap']['name'] = $valueMaps[$prototype['valuemapid']];
+			if ($prototype['valuemapid'] != 0) {
+				$prototype['valuemap']['name'] = $this->data['valueMaps'][$prototype['valuemapid']]['name'];
 			}
 
 			$items[$prototype['discoveryRule']['itemid']]['itemPrototypes'][] = $prototype;
@@ -844,6 +901,7 @@ class CConfigurationExport {
 
 		return $triggers;
 	}
+
 	/**
 	 * Get maps for export from database.
 	 *
@@ -897,6 +955,22 @@ class CConfigurationExport {
 
 		$this->prepareScreenExport($screens);
 		$this->data['screens'] = $screens;
+	}
+
+	/**
+	 * Get value maps for export builder from database.
+	 *
+	 * @param array $valuemapids
+	 *
+	 * return array
+	 */
+	protected function gatherValueMaps(array $valuemapids) {
+		$this->data['valueMaps'] = API::ValueMap()->get([
+			'output' => ['valuemapid', 'name'],
+			'selectMappings' => ['value', 'newvalue'],
+			'valuemapids' => $valuemapids,
+			'preservekeys' => true
+		]);
 	}
 
 	/**
