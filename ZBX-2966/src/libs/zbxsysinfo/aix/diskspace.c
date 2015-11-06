@@ -48,8 +48,9 @@ static int	get_fs_size_stat(const char *fs, zbx_uint64_t *total, zbx_uint64_t *f
 		return SYSINFO_RET_FAIL;
 	}
 
-	/* Available space could be negative if we hit disk space reserved for non-privileged users. Treat it as 0. */
-	if (0 != IS_NEGATIVE(s.f_bavail))
+	/* Available space could be negative (top bit set) if we hit disk space */
+	/* reserved for non-privileged users. Treat it as 0.                    */
+	if (0 != ZBX_IS_TOP_BIT_SET(s.f_bavail))
 		s.f_bavail = 0;
 
 	if (NULL != total)
