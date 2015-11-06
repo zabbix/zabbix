@@ -381,7 +381,7 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 	offset = zbx_snprintf(sql, sizeof(sql), "select distinct h.hostid,h.host,h.tls_connect");
 #ifdef HAVE_OPENIPMI
 	offset += zbx_snprintf(sql + offset, sizeof(sql) - offset,
-			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI-fields change */
+			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password");
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -511,7 +511,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 			"select distinct h.hostid,h.host,o.type,o.scriptid,o.execute_on,o.port"
 				",o.authtype,o.username,o.password,o.publickey,o.privatekey,o.command,h.tls_connect"
 #ifdef HAVE_OPENIPMI
-			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI-fields change */
+			/* do not forget to update ZBX_IPMI_FIELDS_NUM if number of selected IPMI fields changes */
 			",h.ipmi_authtype,h.ipmi_privilege,h.ipmi_username,h.ipmi_password"
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
@@ -660,6 +660,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
+
 #undef ZBX_IPMI_FIELDS_NUM
 
 static void	add_message_alert(DB_ESCALATION *escalation, DB_EVENT *event, DB_EVENT *r_event, DB_ACTION *action,
