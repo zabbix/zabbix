@@ -455,7 +455,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			}
 			else
 			{
-				zbx_uint128_t avg;
+				zbx_uint128_t	avg;
 
 				ZBX_STR2UINT64(value_min.ui64, row[2]);
 				ZBX_STR2UINT64(value_avg.ui64, row[3]);
