@@ -607,13 +607,10 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 				strscpy(host.ipmi_password, row[16]);
 #endif
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-				if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script.type)
-				{
-					strscpy(host.tls_issuer, row[13 + ZBX_IPMI_FIELDS_NUM]);
-					strscpy(host.tls_subject, row[14 + ZBX_IPMI_FIELDS_NUM]);
-					strscpy(host.tls_psk_identity, row[15 + ZBX_IPMI_FIELDS_NUM]);
-					strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
-				}
+				strscpy(host.tls_issuer, row[13 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_subject, row[14 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk_identity, row[15 + ZBX_IPMI_FIELDS_NUM]);
+				strscpy(host.tls_psk, row[16 + ZBX_IPMI_FIELDS_NUM]);
 #endif
 			}
 			else
