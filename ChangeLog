@@ -8,6 +8,7 @@ Bug fixes:
 Changes for 3.0.0alpha4
 
 New features:
+..F....... [ZBX-9985] fixed template search results (vitalijs)
 ..F....... [ZBXNEXT-1762] added years, months and half of months periods displaying on graphs X axis (Oleg)
 A.F....... [ZBXNEXT-1679] implemented value map import/export (Ivo)
 ..F....... [ZBXNEXT-1679] added checkbox column in value map list view and bulk "Delete" button (Ivo)
