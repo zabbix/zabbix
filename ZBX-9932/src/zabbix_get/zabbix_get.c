@@ -113,7 +113,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 {
 	zbx_sock_t	s;
 	int		ret;
-	char		*buf, request[1024];
+	char		*buf, *request = NULL;
 
 	assert(value);
 
@@ -121,7 +121,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT)))
 	{
-		zbx_snprintf(request, sizeof(request), "%s\n", key);
+		request = zbx_dsprintf(request, "%s", key);
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
@@ -137,6 +137,8 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 	if (FAIL == ret)
 		zbx_error("Get value error: %s", zbx_tcp_strerror());
+
+	zbx_free(request);
 
 	return ret;
 }
