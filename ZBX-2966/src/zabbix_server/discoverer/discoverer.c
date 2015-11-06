@@ -792,6 +792,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		if (0 != sleeptime)
 		{
 			zbx_setproctitle("%s #%d [processed %d rules in " ZBX_FS_DBL " sec, performing discovery]",
