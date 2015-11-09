@@ -3509,6 +3509,36 @@ $browser-logos: (
 	text-transform: $font-transform;
 }
 
+// Analog Clock
+.clock {
+	margin: .4em 0 1em 0;
+	position: relative;
+	text-align: center;
+}
+
+.local-clock {
+	margin: auto;
+	left: 0;
+	right: 0;
+	position: absolute;
+}
+
+.clock-face {
+	fill: $clock-face-color;
+}
+
+.clock-hand {
+	fill: $clock-hand-color;
+}
+
+.clock-hand-sec {
+	fill: $clock-hand-sec-color;
+}
+
+.clock-lines {
+	fill: $clock-lines-color;
+}
+
 /*doc
 ---
 //title: About
