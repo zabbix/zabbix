@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0alpha4');
+define('ZABBIX_VERSION',		'3.0.0alpha5');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050069);
+define('ZABBIX_DB_VERSION',		2050071);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -30,7 +30,7 @@ define('ZABBIX_COPYRIGHT_TO',	'2015');
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
 
-define('ZBX_MIN_PERIOD',		3600); // 1 hour
+define('ZBX_MIN_PERIOD',		60); // 1 minute
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
@@ -832,7 +832,6 @@ define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
-define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
 define('ZBX_PREG_EXPRESSION_LLD_MACROS', '(\{\#'.ZBX_PREG_MACRO_NAME_LLD.'\})');
 
 // !!! should be used with "x" modifier
@@ -931,12 +930,12 @@ define('ZBX_API_ERROR_NO_METHOD',	300);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
-define('SEC_PER_MIN',	60);
-define('SEC_PER_HOUR',	3600);
-define('SEC_PER_DAY',	86400);
-define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
-define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
-define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
+define('SEC_PER_MIN',			60);
+define('SEC_PER_HOUR',			3600);
+define('SEC_PER_DAY',			86400);
+define('SEC_PER_WEEK',			604800);
+define('SEC_PER_MONTH',			2592000);
+define('SEC_PER_YEAR',			31536000);
 
 define('ZBX_JAN_2038', 2145916800);
 
@@ -1132,6 +1131,8 @@ define('ZBX_STYLE_NOTIF_INDIC_CONTAINER', 'notif-indic-container');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
+define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');
+define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_RADIO_SEGMENTED', 'radio-segmented');

@@ -224,6 +224,8 @@ ZBX_THREAD_ENTRY(watchdog_thread, args)
 
 	for (;;)
 	{
+		zbx_handle_log();
+
 		zbx_setproctitle("%s [pinging database]", get_process_type_string(process_type));
 
 		sec = zbx_time();

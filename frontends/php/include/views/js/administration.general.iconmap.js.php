@@ -92,7 +92,7 @@
 			})
 			.delegate('img.preview', 'click', function(e) {
 				var img = $('<img>', {src: $(this).data('imageFull')});
-				hintBox.showStaticHint(e, this, img, '', '', true);
+				hintBox.showStaticHint(e, this, img, '', true);
 			});
 
 		addMappindButton.click(function() {
