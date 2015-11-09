@@ -513,7 +513,7 @@ class DB {
 			// check
 			self::checkValueTypes($table, $row['values']);
 			if (empty($row['values'])) {
-				continue;
+				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without values.', $table));
 			}
 
 			// set creation
