@@ -3560,11 +3560,12 @@ sub ts_full
 {
 	my $ts = shift;
 
-	$ts = time() unless ($ts);
+	if ($ts)
+	{
+		return ts_str($ts) . " ($ts)";
+	}
 
-	my $str = ts_str($ts);
-
-	return "$str ($ts)";
+	return "(null)";
 }
 
 sub selected_period
