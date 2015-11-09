@@ -451,6 +451,7 @@ static int	get_dynamic_hostid(DB_EVENT *event, DC_HOST *host, char *error, size_
 		strscpy(host->ipmi_username, row[4]);
 		strscpy(host->ipmi_password, row[5]);
 #endif
+		host->tls_connect = (unsigned char)1;	/* temporary fix */
 	}
 	DBfree_result(result);
 
@@ -570,6 +571,7 @@ static void	execute_commands(DB_EVENT *event, zbx_uint64_t actionid, zbx_uint64_
 
 				zbx_vector_uint64_append(&executed_on_hosts, host.hostid);
 				strscpy(host.host, row[1]);
+				host.tls_connect = (unsigned char)1;	/* temporary fix */
 #ifdef HAVE_OPENIPMI
 				host.ipmi_authtype = (signed char)atoi(row[12]);
 				host.ipmi_privilege = (unsigned char)atoi(row[13]);
