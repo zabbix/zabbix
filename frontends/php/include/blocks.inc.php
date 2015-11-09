@@ -543,15 +543,15 @@ function make_status_of_zbx() {
  */
 function make_latest_issues(array $filter = [], $backurl) {
 	// hide the sort indicator if no sortfield and sortorder are given
-	$showSortIndicator = isset($filter['sortfield']) || isset($filter['sortorder']);
+	$show_sort_indicator = isset($filter['sortfield']) || isset($filter['sortorder']);
 
 	if (isset($filter['sortfield']) && $filter['sortfield'] !== 'lastchange') {
-		$sortField = [$filter['sortfield'], 'lastchange'];
-		$sortOrder = [$filter['sortorder'], ZBX_SORT_DOWN];
+		$sort_field = [$filter['sortfield'], 'lastchange'];
+		$sort_order = [$filter['sortorder'], ZBX_SORT_DOWN];
 	}
 	else {
-		$sortField = ['lastchange'];
-		$sortOrder = [ZBX_SORT_DOWN];
+		$sort_field = ['lastchange'];
+		$sort_order = [ZBX_SORT_DOWN];
 	}
 
 	$options = [
@@ -576,8 +576,8 @@ function make_latest_issues(array $filter = [], $backurl) {
 			? true
 			: null,
 		'skipDependent' => true,
-		'sortfield' => $sortField,
-		'sortorder' => $sortOrder,
+		'sortfield' => $sort_field,
+		'sortorder' => $sort_order,
 		'limit' => isset($filter['limit']) ? $filter['limit'] : DEFAULT_LATEST_ISSUES_CNT,
 		'preservekeys' => true
 	]));
@@ -585,27 +585,27 @@ function make_latest_issues(array $filter = [], $backurl) {
 	$triggers = CMacrosResolverHelper::resolveTriggerUrls($triggers);
 
 	// don't use withLastEventUnacknowledged and skipDependent because of performance issues
-	$triggersTotalCount = API::Trigger()->get(array_merge($options, [
+	$triggers_total_count = API::Trigger()->get(array_merge($options, [
 		'countOutput' => true
 	]));
 
 	// get acknowledges
-	$eventIds = [];
+	$eventids = [];
 	foreach ($triggers as $trigger) {
 		if ($trigger['lastEvent']) {
-			$eventIds[] = $trigger['lastEvent']['eventid'];
+			$eventids[] = $trigger['lastEvent']['eventid'];
 		}
 	}
-	if ($eventIds) {
-		$eventAcknowledges = API::Event()->get([
+	if ($eventids) {
+		$event_acknowledges = API::Event()->get([
 			'output' => ['eventid'],
-			'eventids' => $eventIds,
+			'eventids' => $eventids,
 			'select_acknowledges' => API_OUTPUT_EXTEND,
 			'preservekeys' => true
 		]);
 	}
 
-	$hostIds = [];
+	$hostids = [];
 	foreach ($triggers as $tnum => $trigger) {
 		// if trigger is lost (broken expression) we skip it
 		if (empty($trigger['hosts'])) {
@@ -613,11 +613,11 @@ function make_latest_issues(array $filter = [], $backurl) {
 			continue;
 		}
 
-		$hostIds = array_merge($hostIds, zbx_objectValues($trigger['hosts'], 'hostid'));
+		$hostids = array_merge($hostids, zbx_objectValues($trigger['hosts'], 'hostid'));
 
 		if ($trigger['lastEvent']) {
-			$trigger['lastEvent']['acknowledges'] = isset($eventAcknowledges[$trigger['lastEvent']['eventid']])
-				? $eventAcknowledges[$trigger['lastEvent']['eventid']]['acknowledges']
+			$trigger['lastEvent']['acknowledges'] = isset($event_acknowledges[$trigger['lastEvent']['eventid']])
+				? $event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges']
 				: null;
 		}
 
@@ -626,7 +626,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 	// get hosts
 	$hosts = API::Host()->get([
-		'hostids' => array_values($hostIds),
+		'hostids' => array_values($hostids),
 		'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
@@ -634,35 +634,39 @@ function make_latest_issues(array $filter = [], $backurl) {
 	]);
 
 	// actions
-	$actions = makeEventsActions($eventIds);
+	$actions = makeEventsActions($eventids);
 
 	$config = select_config();
 
 	// indicator of sort field
-	if ($showSortIndicator) {
-		$sortDiv = (new CDiv(SPACE))
-			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN) ? 'icon_sortdown default_cursor' : 'icon_sortup default_cursor')
+	if ($show_sort_indicator) {
+		$sort_div = (new CDiv(SPACE))
+			->addClass(($filter['sortorder'] === ZBX_SORT_DOWN)
+				? 'icon_sortdown default_cursor'
+				: 'icon_sortup default_cursor')
 			->addStyle('float: left');
-		$hostHeaderDiv = (new CDiv([_('Host'), SPACE]))
+		$host_header = (new CDiv([_('Host'), SPACE]))
 			->addStyle('float: left');
-		$issueHeaderDiv = (new CDiv([_('Issue'), SPACE]))
+		$issue_header = (new CDiv([_('Issue'), SPACE]))
 			->addStyle('float: left');
-		$lastChangeHeaderDiv = (new CDiv([_('Time'), SPACE]))
+		$last_change_header = (new CDiv([_('Time'), SPACE]))
 			->addStyle('float: left');
 	}
 
 	$table = (new CTableInfo())
 		->setHeader([
-			($showSortIndicator && ($filter['sortfield'] === 'hostname')) ? [$hostHeaderDiv, $sortDiv] : _('Host'),
-			($showSortIndicator && ($filter['sortfield'] === 'priority')) ? [$issueHeaderDiv, $sortDiv] : _('Issue'),
-			($showSortIndicator && ($filter['sortfield'] === 'lastchange')) ? [$lastChangeHeaderDiv, $sortDiv] : _('Last change'),
+			($show_sort_indicator && ($filter['sortfield'] === 'hostname')) ? [$host_header, $sort_div] : _('Host'),
+			($show_sort_indicator && ($filter['sortfield'] === 'priority')) ? [$issue_header, $sort_div] : _('Issue'),
+			($show_sort_indicator && ($filter['sortfield'] === 'lastchange'))
+				? [$last_change_header, $sort_div]
+				: _('Last change'),
 			_('Age'),
 			_('Info'),
 			$config['event_ack_enable'] ? _('Ack') : null,
 			_('Actions')
 		]);
 
-	$scripts = API::Script()->getScriptsByHosts($hostIds);
+	$scripts = API::Script()->getScriptsByHosts($hostids);
 
 	$maintenanceids = [];
 	foreach ($hosts as $host) {
@@ -764,7 +768,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		);
 
 		// actions
-		$actionHint = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
+		$action_hint = ($trigger['lastEvent'] && isset($actions[$trigger['lastEvent']['eventid']]))
 			? $actions[$trigger['lastEvent']['eventid']]
 			: SPACE;
 
@@ -775,17 +779,18 @@ function make_latest_issues(array $filter = [], $backurl) {
 			zbx_date2age($trigger['lastchange']),
 			$unknown,
 			$ack,
-			(new CCol($actionHint))->addClass(ZBX_STYLE_NOWRAP)
+			(new CCol($action_hint))->addClass(ZBX_STYLE_NOWRAP)
 		]);
 	}
 
 	// initialize blinking
 	zbx_add_post_js('jqBlink.blink();');
 
-	$infoDiv = (new CDiv(_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggersTotalCount)))
-		->addStyle('text-align: right; padding-right: 3px;');
+	$info_div = (new CDiv(
+		_n('%1$d of %2$d issue is shown', '%1$d of %2$d issues are shown', count($triggers), $triggers_total_count)
+	))->addStyle('text-align: right; padding-right: 3px;');
 
-	return new CDiv([$table, $infoDiv]);
+	return new CDiv([$table, $info_div]);
 }
 
 /**
