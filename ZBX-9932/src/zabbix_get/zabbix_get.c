@@ -121,7 +121,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, GET_SENDER_TIMEOUT)))
 	{
-		request = zbx_dsprintf(request, "%s", key);
+		request = zbx_dsprintf(request, "%s\n", key);
 
 		if (SUCCEED == (ret = zbx_tcp_send(&s, request)))
 		{
