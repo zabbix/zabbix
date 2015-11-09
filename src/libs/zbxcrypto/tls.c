@@ -1574,7 +1574,7 @@ static void	zbx_log_ciphersuites(const char *title1, const char *title2, SSL_CTX
  *                                                                            *
  * Return value:                                                              *
  *     number of bytes written into 'buf'                                     *
- *     '*error' is not NULL if an error occured                               *
+ *     '*error' is not NULL if an error occurred                               *
  *                                                                            *
  ******************************************************************************/
 static size_t	zbx_print_rdn_value(const unsigned char *value, size_t len, unsigned char *buf, size_t size,
@@ -3867,7 +3867,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 	return SUCCEED;
 
-out:	/* an error occured */
+out:	/* an error occurred */
 	if (NULL != s->tls_ctx)
 	{
 		gnutls_credentials_clear(s->tls_ctx);
@@ -4091,7 +4091,7 @@ int	zbx_tls_connect(zbx_socket_t *s, char **error, unsigned int tls_connect, cha
 
 	return SUCCEED;
 
-out:	/* an error occured */
+out:	/* an error occurred */
 	if (NULL != s->tls_ctx)
 	{
 		SSL_free(s->tls_ctx);
@@ -4586,7 +4586,7 @@ int	zbx_tls_accept(zbx_socket_t *s, char **error, unsigned int tls_accept)
 
 	return SUCCEED;
 
-out:	/* an error occured */
+out:	/* an error occurred */
 	if (NULL != s->tls_ctx)
 	{
 		gnutls_credentials_clear(s->tls_ctx);
