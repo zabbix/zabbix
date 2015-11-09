@@ -2337,6 +2337,29 @@ td.active-bg {
 .uppercase {
   text-transform: uppercase; }
 
+.clock {
+  margin: .4em 0 1em 0;
+  position: relative;
+  text-align: center; }
+
+.local-clock {
+  margin: auto;
+  left: 0;
+  right: 0;
+  position: absolute; }
+
+.clock-face {
+  fill: #ebebeb; }
+
+.clock-hand {
+  fill: #1f2c33; }
+
+.clock-hand-sec {
+  fill: #0275b8; }
+
+.clock-lines {
+  fill: #acbbc2; }
+
 /*doc
 ---
 //title: About
