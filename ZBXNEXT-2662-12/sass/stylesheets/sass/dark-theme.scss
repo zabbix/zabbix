@@ -89,10 +89,10 @@ $link-main-subnav-active-color: rgba(#fff, 1);
 $link-main-subnav-visited-color: rgba(#fff, 0.75);
 
 // ANALOG CLOCK
-$clock-face-color: #ebebeb;
-$clock-hand-color: #1f2c33;
-$clock-hand-sec-color: #0275b8;
-$clock-lines-color: #acbbc2;
+$clock-face-color: #383838;
+$clock-hand-color: #f2f2f2;
+$clock-hand-sec-color: #69808d;
+$clock-lines-color: #4f4f4f;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
