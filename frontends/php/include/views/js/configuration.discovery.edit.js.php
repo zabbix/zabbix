@@ -1,7 +1,7 @@
 <script type="text/x-jquery-tmpl" id="dcheckRowTPL">
 	<?= (new CRow([
 			(new CCol(
-				(new CSpan('#{name}'))->addClass('bold')
+				new CSpan('#{name}')
 			))->setId('dcheckCell_#{dcheckid}'),
 			new CHorList([
 				(new CButton(null, _('Edit')))
@@ -277,7 +277,7 @@
 				}
 
 				// update check name
-				jQuery('#dcheckCell_' + value.dcheckid + ' .bold').text(value['name']);
+				jQuery('#dcheckCell_' + value.dcheckid + ' span').text(value['name']);
 			}
 
 			// update device uniqueness criteria

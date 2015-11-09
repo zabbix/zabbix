@@ -238,7 +238,7 @@ $httpdetailsTable->addRow([
 	SPACE,
 	bold(($totalTime['value']) ? formatHistoryValue($totalTime['value'], $totalTime) : UNKNOWN_VALUE),
 	SPACE,
-	(new CSpan($status['msg']))->addClass($status['style'])->addClass('bold')
+	(new CSpan($status['msg']))->addClass($status['style'])
 ]);
 
 $widget->addItem($httpdetailsTable)->show();
