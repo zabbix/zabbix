@@ -605,6 +605,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		]);
 	}
 
+	$hostIds = [];
 	foreach ($triggers as $tnum => $trigger) {
 		// if trigger is lost (broken expression) we skip it
 		if (empty($trigger['hosts'])) {
@@ -612,9 +613,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			continue;
 		}
 
-		$host = reset($trigger['hosts']);
-		$trigger['hostid'] = $host['hostid'];
-		$trigger['hostname'] = $host['name'];
+		$hostIds = array_merge($hostIds, zbx_objectValues($trigger['hosts'], 'hostid'));
 
 		if ($trigger['lastEvent']) {
 			$trigger['lastEvent']['acknowledges'] = isset($eventAcknowledges[$trigger['lastEvent']['eventid']])
@@ -625,11 +624,9 @@ function make_latest_issues(array $filter = [], $backurl) {
 		$triggers[$tnum] = $trigger;
 	}
 
-	$hostIds = zbx_objectValues($triggers, 'hostid');
-
 	// get hosts
 	$hosts = API::Host()->get([
-		'hostids' => $hostIds,
+		'hostids' => array_values($hostIds),
 		'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
 		'selectGraphs' => API_OUTPUT_COUNT,
 		'selectScreens' => API_OUTPUT_COUNT,
@@ -668,10 +665,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 	$scripts = API::Script()->getScriptsByHosts($hostIds);
 
 	$maintenanceids = [];
-
-	foreach ($triggers as $trigger) {
-		$host = $hosts[$trigger['hostid']];
-
+	foreach ($hosts as $host) {
 		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 			$maintenanceids[$host['maintenanceid']] = true;
 		}
@@ -687,33 +681,40 @@ function make_latest_issues(array $filter = [], $backurl) {
 
 	// triggers
 	foreach ($triggers as $trigger) {
-		$host = $hosts[$trigger['hostid']];
+		$host_list = [];
+		foreach($trigger['hosts'] as $trigger_host) {
+			$host = $hosts[$trigger_host['hostid']];
 
-		$host_name = (new CSpan($host['name']))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
+			$host_name = (new CSpan($host['name']))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->setMenuPopup(CMenuPopupHelper::getHost($host, $scripts[$host['hostid']]));
 
-		if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
-			$maintenance_icon = (new CSpan())
-				->addClass(ZBX_STYLE_ICON_MAINT)
-				->addClass(ZBX_STYLE_CURSOR_POINTER);
+			if ($host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
+				$maintenance_icon = (new CSpan())
+					->addClass(ZBX_STYLE_ICON_MAINT)
+					->addClass(ZBX_STYLE_CURSOR_POINTER);
 
-			if (array_key_exists($host['maintenanceid'], $maintenances)) {
-				$maintenance = $maintenances[$host['maintenanceid']];
+				if (array_key_exists($host['maintenanceid'], $maintenances)) {
+					$maintenance = $maintenances[$host['maintenanceid']];
 
-				$hint = $maintenance['name'].' ['.($host['maintenance_type']
-					? _('Maintenance without data collection')
-					: _('Maintenance with data collection')).']';
+					$hint = $maintenance['name'].' ['.($host['maintenance_type']
+						? _('Maintenance without data collection')
+						: _('Maintenance with data collection')).']';
 
-				if ($maintenance['description']) {
-					$hint .= "\n".$maintenance['description'];
+					if ($maintenance['description']) {
+						$hint .= "\n".$maintenance['description'];
+					}
+
+					$maintenance_icon->setHint($hint);
 				}
 
-				$maintenance_icon->setHint($hint);
+				$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
 			}
 
-			$host_name = (new CSpan([$host_name, $maintenance_icon]))->addClass(ZBX_STYLE_REL_CONTAINER);
+			$host_list[] = $host_name;
+			$host_list[] = ', ';
 		}
+		array_pop($host_list);
 
 		// unknown triggers
 		$unknown = SPACE;
@@ -768,7 +769,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 			: SPACE;
 
 		$table->addRow([
-			(new CCol($host_name))->addClass(ZBX_STYLE_NOWRAP),
+			(new CCol($host_list)),
 			$description,
 			$clock,
 			zbx_date2age($trigger['lastchange']),
