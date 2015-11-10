@@ -6900,12 +6900,11 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 			{
 				ZBX_DC_PROXY	*proxy;
 
-				if (NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)) &&
-						ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX >= now - proxy->lastaccess)
+				if (NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 				{
-					continue;
+					if (ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX + SEC_PER_MIN >= now - proxy->lastaccess)
+						continue;
 				}
-
 				host->used_interfaces = ZBX_FLAG_INTERFACE_UNKNOWN;
 			}
 		}
