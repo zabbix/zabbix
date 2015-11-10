@@ -2192,9 +2192,9 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (0 == proxy_hostid && (ZBX_TCP_SEC_TLS_CERT == sock->connection_type &&
-			SUCCEED != zbx_tls_get_attr_cert(sock, &attr) || ZBX_TCP_SEC_TLS_PSK == sock->connection_type &&
-			SUCCEED != zbx_tls_get_attr_psk(sock, &attr)))
+	if (0 == proxy_hostid &&
+			(ZBX_TCP_SEC_TLS_PSK == sock->connection_type && SUCCEED != zbx_tls_get_attr_psk(sock, &attr) ||
+			ZBX_TCP_SEC_TLS_CERT == sock->connection_type && SUCCEED != zbx_tls_get_attr_cert(sock, &attr)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		return;
