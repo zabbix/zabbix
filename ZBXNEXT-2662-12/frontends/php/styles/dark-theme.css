@@ -2349,16 +2349,16 @@ td.active-bg {
   position: absolute; }
 
 .clock-face {
-  fill: #ebebeb; }
+  fill: #383838; }
 
 .clock-hand {
-  fill: #1f2c33; }
+  fill: #f2f2f2; }
 
 .clock-hand-sec {
-  fill: #0275b8; }
+  fill: #69808d; }
 
 .clock-lines {
-  fill: #acbbc2; }
+  fill: #4f4f4f; }
 
 /*doc
 ---
