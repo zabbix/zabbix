@@ -2191,7 +2191,15 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 	zbx_tls_conn_attr_t	attr;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
-
+#if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	if (0 == proxy_hostid && (ZBX_TCP_SEC_TLS_CERT == sock->connection_type &&
+			SUCCEED != zbx_tls_get_attr_cert(sock, &attr) || ZBX_TCP_SEC_TLS_PSK == sock->connection_type &&
+			SUCCEED != zbx_tls_get_attr_psk(sock, &attr)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+#endif
 	keys = zbx_malloc(keys, sizeof(zbx_host_key_t) * values_num);
 	items = zbx_malloc(items, sizeof(DC_ITEM) * values_num);
 	errcodes = zbx_malloc(errcodes, sizeof(int) * values_num);
@@ -2289,13 +2297,6 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 				if (ZBX_TCP_SEC_TLS_CERT == sock->connection_type)
 				{
-					if (SUCCEED != zbx_tls_get_attr_cert(sock, &attr))
-					{
-						THIS_SHOULD_NEVER_HAPPEN;
-						flag_host_allow = 0;
-						continue;
-					}
-
 					/* simplified match, not compliant with RFC 4517, 4518 */
 					if ('\0' != *items[i].host.tls_issuer &&
 							0 != strcmp(items[i].host.tls_issuer, attr.issuer))
@@ -2320,13 +2321,6 @@ void	process_mass_data(zbx_socket_t *sock, zbx_uint64_t proxy_hostid, AGENT_VALU
 				}
 				else if (ZBX_TCP_SEC_TLS_PSK == sock->connection_type)
 				{
-					if (SUCCEED != zbx_tls_get_attr_psk(sock, &attr))
-					{
-						THIS_SHOULD_NEVER_HAPPEN;
-						flag_host_allow = 0;
-						continue;
-					}
-
 					if (strlen(items[i].host.tls_psk_identity) != attr.psk_identity_len ||
 							0 != memcmp(items[i].host.tls_psk_identity, attr.psk_identity,
 							attr.psk_identity_len))
