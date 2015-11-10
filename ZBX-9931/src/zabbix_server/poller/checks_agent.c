@@ -66,6 +66,8 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 			ret = SUCCEED;
 		else
 			ret = TIMEOUT_ERROR;
+
+		zbx_free(buffer);
 	}
 	else
 		ret = NETWORK_ERROR;
@@ -79,13 +81,13 @@ int	get_value_agent(DC_ITEM *item, AGENT_RESULT *result)
 
 		if (0 == strcmp(buf, ZBX_NOTSUPPORTED))
 		{
-			buffer = zbx_dsprintf(buffer, "Not supported by Zabbix Agent", NULL);
+			buffer = zbx_strdup(buffer, "Not supported by Zabbix Agent");
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = NOTSUPPORTED;
 		}
 		else if (0 == strcmp(buf, ZBX_ERROR))
 		{
-			buffer = zbx_dsprintf(buffer, "Zabbix Agent non-critical error", NULL);
+			buffer = zbx_strdup(buffer, "Zabbix Agent non-critical error");
 			SET_MSG_RESULT(result, strdup(buffer));
 			ret = AGENT_ERROR;
 		}
