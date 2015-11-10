@@ -22,8 +22,6 @@
 
 typedef struct
 {
-	unsigned int	connection_type;	/* Values: ZBX_TCP_SEC_UNENCRYPTED, ZBX_TCP_SEC_TLS_PSK or */
-						/* ZBX_TCP_SEC_TLS_CERT. */
 #if defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	const char	*psk_identity;
 	size_t		psk_identity_len;
