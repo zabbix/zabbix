@@ -399,6 +399,11 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	char		service[8], *error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
+	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
@@ -493,6 +498,11 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	char		*error = NULL;
 	void		(*func_socket_close)(zbx_socket_t *s);
 
+	if (SOCK_DGRAM == type && (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
 #if !(defined(HAVE_POLARSSL) || defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL))
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
 	{
