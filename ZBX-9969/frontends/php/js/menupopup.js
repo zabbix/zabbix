@@ -378,7 +378,7 @@ function getMenuPopupMap(options) {
 				label: t('Triggers')
 			};
 
-			if (options.gotos.showTriggers) {
+			if (!options.gotos.showTriggers) {
 				triggers.disabled = true;
 			}
 			else {
@@ -400,7 +400,7 @@ function getMenuPopupMap(options) {
 				label: t('Graphs')
 			};
 
-			if (options.gotos.showGraphs) {
+			if (!options.gotos.showGraphs) {
 				graphs.disabled = true;
 			}
 			else {
@@ -422,7 +422,7 @@ function getMenuPopupMap(options) {
 				label: t('Host screens')
 			};
 
-			if (options.gotos.showScreens) {
+			if (!options.gotos.showScreens) {
 				screens.disabled = true;
 			}
 			else {
@@ -455,11 +455,10 @@ function getMenuPopupMap(options) {
 		// events
 		if (typeof options.gotos.events !== 'undefined') {
 			var events = {
-				label: t('Events'),
-				url: url.getUrl()
+				label: t('Events')
 			};
 
-			if (options.gotos.showEvents) {
+			if (!options.gotos.showEvents) {
 				events.disabled = true;
 			}
 			else {
@@ -469,6 +468,7 @@ function getMenuPopupMap(options) {
 					url.setArgument(name, value);
 				});
 
+				events.url = url.getUrl();
 			}
 
 			gotos[gotos.length] = events;
