@@ -147,7 +147,7 @@ foreach ($hosts as $hnum => $host) {
 	$host['dns'] = $interface['dns'];
 	$host['port'] = $interface['port'];
 
-	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null;
+	$style = $host['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED.' '.ZBX_STYLE_LINK_ALT : null;
 
 	$link = 'hostid='.$hostid;
 
