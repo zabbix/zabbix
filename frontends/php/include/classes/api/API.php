@@ -333,6 +333,13 @@ class API {
 	}
 
 	/**
+	 * @return CTrend
+	 */
+	public static function Trend() {
+		return self::getApi('trend');
+	}
+
+	/**
 	 * @return CTrigger
 	 */
 	public static function Trigger() {
