@@ -84,19 +84,22 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  */
 $_REQUEST['action'] = getRequest('action', HISTORY_GRAPH);
 
+$item_ids = getRequest('itemids');
+$item_ids = is_array($item_ids) ? $item_ids : [$item_ids];
+
 /*
  * Display
  */
 $items = API::Item()->get([
-	'itemids' => getRequest('itemids'),
+	'itemids' => $item_ids,
 	'webitems' => true,
 	'selectHosts' => ['name'],
 	'output' => ['itemid', 'key_', 'name', 'value_type', 'hostid', 'valuemapid'],
 	'preservekeys' => true
 ]);
 
-foreach (getRequest('itemids') as $itemid) {
-	if (!isset($items[$itemid])) {
+foreach ($item_ids as $item_id) {
+	if (!isset($items[$item_id])) {
 		access_deny();
 	}
 }
@@ -106,7 +109,7 @@ $items = CMacrosResolverHelper::resolveItemNames($items);
 $item = reset($items);
 
 $data = [
-	'itemids' => getRequest('itemids'),
+	'itemids' => $item_ids,
 	'items' => $items,
 	'value_type' => $item['value_type'],
 	'action' => getRequest('action'),
@@ -120,8 +123,8 @@ $data = [
 ];
 
 // render view
-$historyView = new CView('monitoring.history', $data);
-$historyView->render();
-$historyView->show();
+$history_view = new CView('monitoring.history', $data);
+$history_view->render();
+$history_view->show();
 
 require_once dirname(__FILE__).'/include/page_footer.php';
