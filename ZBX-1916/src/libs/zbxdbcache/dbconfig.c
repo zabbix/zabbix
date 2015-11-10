@@ -5363,8 +5363,11 @@ int	DChost_activate(zbx_host_availability_t *in, zbx_host_availability_t *out)
 	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
 		goto unlock;
 
-	if (HOST_STATUS_MONITORED != dc_host->status)
+	if ((0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
+			HOST_STATUS_MONITORED != dc_host->status)
+	{
 		goto unlock;
+	}
 
 	DChost_get_availability(dc_host, in->type, in);
 
@@ -5414,8 +5417,11 @@ int	DChost_deactivate(const zbx_timespec_t *ts, zbx_host_availability_t *in, zbx
 	if (NULL == (dc_host = zbx_hashset_search(&config->hosts, &in->hostid)))
 		goto unlock;
 
-	if (HOST_STATUS_MONITORED != dc_host->status)
+	if ((0 != (daemon_type & ZBX_DAEMON_TYPE_SERVER) && 0 != dc_host->proxy_hostid) ||
+			HOST_STATUS_MONITORED != dc_host->status)
+	{
 		goto unlock;
+	}
 
 	DChost_get_availability(dc_host, in->type, in);
 	*out = *in;
