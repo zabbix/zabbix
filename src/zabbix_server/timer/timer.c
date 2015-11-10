@@ -839,6 +839,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		zbx_sleep_loop(sleeptime);
 
+		zbx_handle_log();
+
 		if (0 != sleeptime)
 		{
 			if (1 != process_num)

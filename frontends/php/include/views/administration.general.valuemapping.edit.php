@@ -94,7 +94,10 @@ if ($data['valuemapid'] != 0) {
 		new CSubmit('update', _('Update')),
 		[
 			new CButton('clone', _('Clone')),
-			new CButtonDelete($confirm_message, url_param('valuemapid')),
+			(new CRedirectButton(_('Delete'),
+				'adm.valuemapping.php?action=valuemap.delete&valuemapids[]='.$data['valuemapid'].'&sid='.$data['sid'],
+				$confirm_message
+			))->setId('delete'),
 			new CButtonCancel()
 		]
 	));
