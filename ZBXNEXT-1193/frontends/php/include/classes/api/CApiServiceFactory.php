@@ -61,6 +61,7 @@ class CApiServiceFactory extends CRegistryFactory {
 			'template' => 'CTemplate',
 			'templatescreen' => 'CTemplateScreen',
 			'templatescreenitem' => 'CTemplateScreenItem',
+			'trend' => 'CTrend',
 			'trigger' => 'CTrigger',
 			'triggerprototype' => 'CTriggerPrototype',
 			'user' => 'CUser',
