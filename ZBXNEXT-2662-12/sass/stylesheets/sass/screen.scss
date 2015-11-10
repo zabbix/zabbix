@@ -48,6 +48,11 @@ a {
 		color: $link-active-color;
 		border-bottom: 1px solid rgba($link-active-color, 0.5);
 	}
+
+	img {
+		border: none;
+		vertical-align: top;
+	}
 }
 
 .link-action {
