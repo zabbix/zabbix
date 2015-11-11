@@ -62,7 +62,6 @@
 		<table>
 		<thead><tr><th></th><th></th><th style="width: 225px">IP address</th><th style="width: 175px">DNS name</th><th>Connect to</th><th style="width: 100px">Port</th><th>Default</th><th></th></tr></thead>
 		<tbody>
-		<!--<tr><td colspan="7">Agent</td></tr>-->
 		<tr>
 		<td rowspan="4">Agent</td><td class="td-drag-icon"><div class="drag-icon disabled"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address" style="width: 225px"></td><td><input type="text" id="DnsName" style="width: 175px"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW" disabled><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew" disabled><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port" style="width: 100px"></td><td><input type="radio"></td><td><button type="button" class="btn-link" disabled>Remove</button></td>
 		</tr>
@@ -72,25 +71,25 @@
 		<tr>
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address" style="width: 225px"></td><td><input type="text" id="DnsName" style="width: 175px"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port" style="width: 100px"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
 		</tr>
-		<tr><td>&nbsp;</td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr>
+		<tr><td></td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr>
 		<tr><td colspan="8"></td></tr>
-		<!--<tr><td colspan="7">SNMP</td></tr>-->
-		<tr class="sdrag-drop-area">
+
+		<tr class="drag-drop-area">
 		<td rowspan="3">SNMP</td><td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address" style="width: 225px"><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName" style="width: 175px"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port" style="width: 100px"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
 		</tr>
-		<tr>
+		<tr class="drag-drop-area">
 		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress" placeholder="IP Address" style="width: 225px"><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName" style="width: 175px"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port" style="width: 100px"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
 		</tr>
-		<tr><td>&nbsp;</td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr>
+		<tr class="drag-drop-area"><td></td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr></tbody>
 		<tr><td colspan="8"></td></tr>
-		<!--<tr><td colspan="7">JMX</td></tr>-->
-		<tr><td rowspan="1">JMX</td><td>&nbsp;</td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr>
-		<tr><td></td></tr>
-		<!--<tr><td colspan="7">JMX</td></tr>-->
-		<tr><td rowspan="1">IPMI</td><td>&nbsp;</td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr>
+
+		<tr><td rowspan="1">SNMP</td><td></td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr>
+		<tr><td colspan="8"></td></tr>
+
+		<tr><td rowspan="1">IPMI</td><td></td><td colspan="6"><button type="button" class="btn-link">Add</button></td></tr>
 		</tbody></table></div></div>
 		</li>
-		<li>
+		<!--<li>
 		<div class="table-forms-td-left"><label>Agent interfaces</label></div><div class="table-forms-td-right">
 		<div class="table-forms-separator" style="width: 750px">
 		<table>
@@ -104,10 +103,10 @@
 		<div class="table-forms-separator drag-drop-area" style="width: 750px">
 		<table><tbody>
 		<tr>
-		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><!--<br><label for="BulkReq1"><input type="checkbox" id="BulkReq1" checked>Use bulk requests</label>--><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
 		</tr>
 		<tr>
-		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><!--<br><label for="BulkReq2"><input type="checkbox" id="BulkReq2" checked>Use bulk requests</label>--><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
+		<td class="td-drag-icon"><div class="drag-icon"></div></td><td><input type="text" id="IpAddress"><ul class="list-hor-check-radio"><li><label for="BulkReq1"><input type="checkbox" id="BulkReq1">Use bulk requests</label></li></ul></td><td><input type="text" id="DnsName"></td><td><ul class="radio-segmented"><li><input type="radio" id="IpAddrNEW"><label for="IpAddrNEW">IP</label></li><li><input type="radio" id="DNSnew"><label for="DNSnew">DNS</label></li></ul></td><td><input type="text" id="Port"></td><td><input type="radio"></td><td><button type="button" class="btn-link">Remove</button></td>
 		</tr><tr><td>&nbsp;</td><td><button type="button" class="btn-link">Add</button></td></tr>
 		</tbody></table>
 		</div>
@@ -119,7 +118,7 @@
 		</li>
 		<li><div class="table-forms-td-left"><label for="ipmi">IPMI interfaces</label></div><div class="table-forms-td-right">
 		<div class="table-forms-separator" style="width: 750px"><button type="button" class="btn-link">Add</button></div></div>
-		</li>
+		</li>-->
 		<li>
 		<div class="table-forms-td-left"><label for="descr">Description</label></div><div class="table-forms-td-right"><textarea name="" id="descr"></textarea></div>
 		</li>
