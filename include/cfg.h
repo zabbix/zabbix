@@ -36,6 +36,9 @@
 #define	ZBX_CFG_NOT_STRICT	0
 #define	ZBX_CFG_STRICT		1
 
+
+#define ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX	SEC_PER_HOUR
+
 extern char	*CONFIG_FILE;
 extern char	*CONFIG_LOG_FILE;
 extern int	CONFIG_ALLOW_ROOT;

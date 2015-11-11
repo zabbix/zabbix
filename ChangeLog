@@ -4,6 +4,7 @@ New features:
 
 Bug fixes:
 ...G...... [ZBX-10045] fixed first proc.cpu.util[] request returning empty value which was treated as network error by server (wiper)
+.......PS. [ZBX-1916] improved host availability handling by resetting it for disabled hosts, interfaces without enabled items and hosts monitored by offline proxies (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 3.0.0alpha4
