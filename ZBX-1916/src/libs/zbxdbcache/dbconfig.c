@@ -1354,7 +1354,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		/* Detect errors: PSK identity without PSK value or vice versa. This should have been prevented by */
 		/* validation in frontend or API. Do not update cache in case of error. */
 
-		if ('\0' != *row[30] && '\0' == *row[30])
+		if ('\0' != *row[29] && '\0' == *row[30])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host \"%s\""
 					" (hostid %s)", row[28], row[2], row[0]);
