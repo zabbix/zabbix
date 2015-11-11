@@ -241,6 +241,42 @@ return [
 				'type' => DB::FIELD_TYPE_TEXT,
 				'default' => '',
 			],
+			'tls_connect' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'tls_accept' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1',
+			],
+			'tls_issuer' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => '',
+			],
+			'tls_subject' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 1024,
+				'default' => '',
+			],
+			'tls_psk_identity' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128,
+				'default' => '',
+			],
+			'tls_psk' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 512,
+				'default' => '',
+			],
 		],
 	],
 	'groups' => [
@@ -1453,6 +1489,12 @@ return [
 				'length' => 10,
 				'default' => '0',
 			],
+			'exec_params' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => '',
+			],
 		],
 	],
 	'users' => [
@@ -2247,37 +2289,37 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'DBDBDB',
+				'default' => '97AAB3',
 			],
 			'severity_color_1' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'D6F6FF',
+				'default' => '7499FF',
 			],
 			'severity_color_2' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'FFF6A5',
+				'default' => 'FFC859',
 			],
 			'severity_color_3' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'FFB689',
+				'default' => 'FFA059',
 			],
 			'severity_color_4' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'FF9999',
+				'default' => 'E97659',
 			],
 			'severity_color_5' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 6,
-				'default' => 'FF3838',
+				'default' => 'E45959',
 			],
 			'severity_name_0' => [
 				'null' => false,
@@ -2925,7 +2967,7 @@ return [
 			'macro' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'value' => [
@@ -2954,7 +2996,7 @@ return [
 			'macro' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
+				'length' => 255,
 				'default' => '',
 			],
 			'value' => [
@@ -5903,24 +5945,6 @@ return [
 				'default' => '0',
 			],
 			'optional' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0',
-			],
-		],
-	],
-	'opinventory' => [
-		'key' => 'operationid',
-		'fields' => [
-			'operationid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'operations',
-				'ref_field' => 'operationid',
-			],
-			'inventory_mode' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

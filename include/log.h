@@ -69,12 +69,12 @@ char		*strerror_from_system(unsigned long error);
 
 #ifdef _WINDOWS
 char		*strerror_from_module(unsigned long error, const wchar_t *module);
-#endif
 
-#if defined(_WINDOWS)
-#	define redirect_std(filename)
+#define zbx_redirect_stdio(filename)
+
 #else
-	void	redirect_std(const char *filename);
+void		zbx_redirect_stdio(const char *filename);
 #endif
 
+void		zbx_handle_log(void);
 #endif

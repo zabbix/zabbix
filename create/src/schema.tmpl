@@ -66,6 +66,12 @@ FIELD		|name		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|hosts	|hostid
 FIELD		|description	|t_shorttext	|''	|NOT NULL	|0
+FIELD		|tls_connect	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_accept	|t_integer	|'1'	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_issuer	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_subject	|t_varchar(1024)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_psk_identity|t_varchar(128)|''	|NOT NULL	|ZBX_PROXY
+FIELD		|tls_psk	|t_varchar(512)	|''	|NOT NULL	|ZBX_PROXY
 INDEX		|1		|host
 INDEX		|2		|status
 INDEX		|3		|proxy_hostid
@@ -322,6 +328,7 @@ FIELD		|smtp_security	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_peer|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_verify_host|t_integer	|'0'	|NOT NULL	|0
 FIELD		|smtp_authentication|t_integer	|'0'	|NOT NULL	|0
+FIELD		|exec_params	|t_varchar(255)	|''	|NOT NULL	|0
 UNIQUE		|1		|description
 
 TABLE|users|userid|ZBX_DATA
@@ -500,12 +507,12 @@ FIELD		|dropdown_first_remember|t_integer|'1'	|NOT NULL	|ZBX_NODATA
 FIELD		|discovery_groupid|t_id		|	|NOT NULL	|ZBX_PROXY		|2|groups	|groupid	|RESTRICT
 FIELD		|max_in_table	|t_integer	|'50'	|NOT NULL	|ZBX_NODATA
 FIELD		|search_limit	|t_integer	|'1000'	|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_0|t_varchar(6)	|'DBDBDB'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_1|t_varchar(6)	|'D6F6FF'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_2|t_varchar(6)	|'FFF6A5'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_3|t_varchar(6)	|'FFB689'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_4|t_varchar(6)	|'FF9999'|NOT NULL	|ZBX_NODATA
-FIELD		|severity_color_5|t_varchar(6)	|'FF3838'|NOT NULL	|ZBX_NODATA
+FIELD		|severity_color_0|t_varchar(6)	|'97AAB3'|NOT NULL	|ZBX_NODATA
+FIELD		|severity_color_1|t_varchar(6)	|'7499FF'|NOT NULL	|ZBX_NODATA
+FIELD		|severity_color_2|t_varchar(6)	|'FFC859'|NOT NULL	|ZBX_NODATA
+FIELD		|severity_color_3|t_varchar(6)	|'FFA059'|NOT NULL	|ZBX_NODATA
+FIELD		|severity_color_4|t_varchar(6)	|'E97659'|NOT NULL	|ZBX_NODATA
+FIELD		|severity_color_5|t_varchar(6)	|'E45959'|NOT NULL	|ZBX_NODATA
 FIELD		|severity_name_0|t_varchar(32)	|'Not classified'|NOT NULL|ZBX_NODATA
 FIELD		|severity_name_1|t_varchar(32)	|'Information'|NOT NULL	|ZBX_NODATA
 FIELD		|severity_name_2|t_varchar(32)	|'Warning'|NOT NULL	|ZBX_NODATA
@@ -637,14 +644,14 @@ UNIQUE		|1		|theme
 
 TABLE|globalmacro|globalmacroid|ZBX_DATA
 FIELD		|globalmacroid	|t_id		|	|NOT NULL	|0
-FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|macro
 
 TABLE|hostmacro|hostmacroid|ZBX_DATA
 FIELD		|hostmacroid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NOT NULL	|ZBX_PROXY		|1|hosts
-FIELD		|macro		|t_varchar(64)	|''	|NOT NULL	|ZBX_PROXY
+FIELD		|macro		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid,macro
 
@@ -1300,4 +1307,4 @@ FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050054	|2050054
+ROW		|2050071	|2050071

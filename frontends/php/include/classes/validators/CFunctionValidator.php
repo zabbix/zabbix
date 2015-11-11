@@ -125,6 +125,16 @@ class CFunctionValidator extends CValidator {
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
 			],
+			'forecast' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true],
+					['type' => 'sec_zero', 'mandat' => true],
+					['type' => 'str', 'can_be_empty' => true],
+					['type' => 'str', 'can_be_empty' => true]
+				],
+				'value_types' => $valueTypesNum
+			],
 			'fuzzytime' => [
 				'args' => [
 					['type' => 'sec_zero', 'mandat' => true]
@@ -228,6 +238,15 @@ class CFunctionValidator extends CValidator {
 			'time' => [
 				'args' => $argsIgnored,
 				'value_types' => $valueTypesAll
+			],
+			'timeleft' => [
+				'args' => [
+					['type' => 'sec_num', 'mandat' => true],
+					['type' => 'sec_zero', 'can_be_empty' => true],
+					['type' => 'num', 'mandat' => true],
+					['type' => 'str', 'can_be_empty' => true]
+				],
+				'value_types' => $valueTypesNum
 			]
 		];
 	}
@@ -277,6 +296,8 @@ class CFunctionValidator extends CValidator {
 			_('Invalid fourth parameter.')
 		];
 
+		$user_macro_parser = new CUserMacroParser();
+
 		foreach ($this->allowed[$value['functionName']]['args'] as $aNum => $arg) {
 			// mandatory check
 			if (isset($arg['mandat']) && $arg['mandat'] && !isset($value['functionParamList'][$aNum])) {
@@ -294,7 +315,7 @@ class CFunctionValidator extends CValidator {
 			}
 
 			// user macro
-			if (preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value['functionParamList'][$aNum])) {
+			if ($user_macro_parser->parse($value['functionParamList'][$aNum]) == CParser::PARSE_SUCCESS) {
 				continue;
 			}
 

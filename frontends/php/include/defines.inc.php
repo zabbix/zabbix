@@ -19,10 +19,10 @@
 **/
 
 
-define('ZABBIX_VERSION',		'2.5.1');
-define('ZABBIX_API_VERSION',	'2.5.1');
+define('ZABBIX_VERSION',		'3.0.0alpha5');
+define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
-define('ZABBIX_DB_VERSION',		2050054);
+define('ZABBIX_DB_VERSION',		2050071);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
 define('ZABBIX_COPYRIGHT_TO',	'2015');
@@ -30,7 +30,7 @@ define('ZABBIX_COPYRIGHT_TO',	'2015');
 define('ZBX_LOGIN_ATTEMPTS',	5);
 define('ZBX_LOGIN_BLOCK',		30); // sec
 
-define('ZBX_MIN_PERIOD',		3600); // 1 hour
+define('ZBX_MIN_PERIOD',		60); // 1 minute
 define('ZBX_MAX_PERIOD',		63072000); // the maximum period for the time bar control, ~2 years (2 * 365 * 86400)
 define('ZBX_MAX_DATE',			2147483647); // 19 Jan 2038 05:14:07
 define('ZBX_PERIOD_DEFAULT',	3600); // 1 hour
@@ -243,6 +243,10 @@ define('HOST_STATUS_TEMPLATE',		3);
 define('HOST_STATUS_PROXY_ACTIVE',	5);
 define('HOST_STATUS_PROXY_PASSIVE',	6);
 
+define('HOST_ENCRYPTION_NONE',			1);
+define('HOST_ENCRYPTION_PSK',			2);
+define('HOST_ENCRYPTION_CERTIFICATE',	4);
+
 define('HOST_MAINTENANCE_STATUS_OFF',	0);
 define('HOST_MAINTENANCE_STATUS_ON',	1);
 
@@ -409,6 +413,9 @@ define('ITEM_LOGTYPE_SUCCESS_AUDIT',	8);
 define('ITEM_LOGTYPE_CRITICAL',			9);
 define('ITEM_LOGTYPE_VERBOSE',			10);
 
+define('ITEM_DELAY_FLEX_TYPE_FLEXIBLE',		0);
+define('ITEM_DELAY_FLEX_TYPE_SCHEDULING',	1);
+
 define('GRAPH_ITEM_DRAWTYPE_LINE',			0);
 define('GRAPH_ITEM_DRAWTYPE_FILLED_REGION',	1);
 define('GRAPH_ITEM_DRAWTYPE_BOLD_LINE',		2);
@@ -461,6 +468,9 @@ define('ALERT_STATUS_FAILED',	2);
 
 define('ALERT_TYPE_MESSAGE',	0);
 define('ALERT_TYPE_COMMAND',	1);
+
+define('MEDIA_STATUS_ACTIVE',	0);
+define('MEDIA_STATUS_DISABLED',	1);
 
 define('MEDIA_TYPE_STATUS_ACTIVE',		0);
 define('MEDIA_TYPE_STATUS_DISABLED',	1);
@@ -822,7 +832,6 @@ define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9\.:% ]+$/');
 define('ZBX_PREG_DNS_FORMAT', '([0-9a-zA-Z_\.\-$]|\{\$?'.ZBX_PREG_MACRO_NAME.'\})*');
 define('ZBX_PREG_HOST_FORMAT', ZBX_PREG_INTERNAL_NAMES);
 define('ZBX_PREG_MACRO_NAME_FORMAT', '(\{[A-Z\.]+\})');
-define('ZBX_PREG_EXPRESSION_USER_MACROS', '(\{\$'.ZBX_PREG_MACRO_NAME.'\})');
 define('ZBX_PREG_EXPRESSION_LLD_MACROS', '(\{\#'.ZBX_PREG_MACRO_NAME_LLD.'\})');
 
 // !!! should be used with "x" modifier
@@ -921,12 +930,12 @@ define('ZBX_API_ERROR_NO_METHOD',	300);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
-define('SEC_PER_MIN',	60);
-define('SEC_PER_HOUR',	3600);
-define('SEC_PER_DAY',	86400);
-define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
-define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
-define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
+define('SEC_PER_MIN',			60);
+define('SEC_PER_HOUR',			3600);
+define('SEC_PER_DAY',			86400);
+define('SEC_PER_WEEK',			604800);
+define('SEC_PER_MONTH',			2592000);
+define('SEC_PER_YEAR',			31536000);
 
 define('ZBX_JAN_2038', 2145916800);
 
@@ -963,17 +972,29 @@ define('ZBX_HOST_INTERFACE_WIDTH',				750);
 // overviews help
 define('ZBX_OVERVIEW_HELP_MIN_WIDTH',			125);
 
-// widgets
-define('WIDGET_DISCOVERY_STATUS',	'dscvry');
-define('WIDGET_FAVOURITE_GRAPHS',	'favgrph');
-define('WIDGET_FAVOURITE_MAPS',		'favmap');
-define('WIDGET_FAVOURITE_SCREENS',	'favscr');
-define('WIDGET_HOST_STATUS',		'hoststat');
-define('WIDGET_LAST_ISSUES',		'lastiss');
-define('WIDGET_SLIDESHOW',			'hat_slides');
-define('WIDGET_SYSTEM_STATUS',		'syssum');
-define('WIDGET_WEB_OVERVIEW',		'webovr');
-define('WIDGET_ZABBIX_STATUS',		'stszbx');
+// dashboard widgets
+define('WIDGET_DISCOVERY_STATUS',		'dscvry');
+define('WIDGET_FAVOURITE_GRAPHS',		'favgrph');
+define('WIDGET_FAVOURITE_MAPS',			'favmap');
+define('WIDGET_FAVOURITE_SCREENS',		'favscr');
+define('WIDGET_HOST_STATUS',			'hoststat');
+define('WIDGET_LAST_ISSUES',			'lastiss');
+define('WIDGET_SYSTEM_STATUS',			'syssum');
+define('WIDGET_WEB_OVERVIEW',			'webovr');
+define('WIDGET_ZABBIX_STATUS',			'stszbx');
+// event details widgets
+define('WIDGET_HAT_TRIGGERDETAILS',		'hat_triggerdetails');
+define('WIDGET_HAT_EVENTDETAILS',		'hat_eventdetails');
+define('WIDGET_HAT_EVENTACK',			'hat_eventack');
+define('WIDGET_HAT_EVENTACTIONMSGS',	'hat_eventactionmsgs');
+define('WIDGET_HAT_EVENTACTIONMCMDS',	'hat_eventactionmcmds');
+define('WIDGET_HAT_EVENTLIST',			'hat_eventlist');
+// search widget
+define('WIDGET_SEARCH_HOSTS',			'search_hosts');
+define('WIDGET_SEARCH_HOSTGROUP',		'search_hostgroup');
+define('WIDGET_SEARCH_TEMPLATES',		'search_templates');
+// slideshow
+define('WIDGET_SLIDESHOW',				'hat_slides');
 
 // validation
 define('DB_ID',		"({}>=0&&bccomp({},\"9223372036854775807\")<=0)&&");
@@ -1028,6 +1049,7 @@ define('MAP_DEFAULT_ICON', 'Server_(96)');
 // CSS styles
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ACTIVE_INDIC', 'active-indic');
+define('ZBX_STYLE_ACTIVE_BG', 'active-bg');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
 define('ZBX_STYLE_ARTICLE', 'article');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
@@ -1056,6 +1078,7 @@ define('ZBX_STYLE_CENTER', 'center');
 define('ZBX_STYLE_COLOR_PICKER', 'color-picker');
 define('ZBX_STYLE_CURSOR_MOVE', 'cursor-move');
 define('ZBX_STYLE_CURSOR_POINTER', 'cursor-pointer');
+define('ZBX_STYLE_DASHBRD_WIDGET_HEAD', 'dashbrd-widget-head');
 define('ZBX_STYLE_DEBUG_OUTPUT', 'debug-output');
 define('ZBX_STYLE_DISABLED', 'disabled');
 define('ZBX_STYLE_DISASTER_BG', 'disaster-bg');
@@ -1075,11 +1098,13 @@ define('ZBX_STYLE_GREEN', 'green');
 define('ZBX_STYLE_GREY', 'grey');
 define('ZBX_STYLE_HIDDEN', 'hidden');
 define('ZBX_STYLE_HIGH_BG', 'high-bg');
+define('ZBX_STYLE_HOR_LIST', 'hor-list');
 define('ZBX_STYLE_ICON_ACKN', 'icon-ackn');
 define('ZBX_STYLE_ICON_CAL', 'icon-cal');
 define('ZBX_STYLE_ICON_DEPEND_DOWN', 'icon-depend-down');
 define('ZBX_STYLE_ICON_DEPEND_UP', 'icon-depend-up');
 define('ZBX_STYLE_ICON_MAINT', 'icon-maint');
+define('ZBX_STYLE_INACTIVE_BG', 'inactive-bg');
 define('ZBX_STYLE_INFO_BG', 'info-bg');
 define('ZBX_STYLE_INPUT_COLOR_PICKER', 'input-color-picker');
 define('ZBX_STYLE_LINK_ACTION', 'link-action');
@@ -1088,6 +1113,11 @@ define('ZBX_STYLE_LIST_HOR_CHECK_RADIO', 'list-hor-check-radio');
 define('ZBX_STYLE_LIST_HOR_MIN_WIDTH', 'list-hor-min-width');
 define('ZBX_STYLE_LIST_CHECK_RADIO', 'list-check-radio');
 define('ZBX_STYLE_LIST_TABLE', 'list-table');
+define('ZBX_STYLE_LOG_NA_BG', 'log-na-bg');
+define('ZBX_STYLE_LOG_INFO_BG', 'log-info-bg');
+define('ZBX_STYLE_LOG_WARNING_BG', 'log-warning-bg');
+define('ZBX_STYLE_LOG_HIGH_BG', 'log-high-bg');
+define('ZBX_STYLE_LOG_DISASTER_BG', 'log-disaster-bg');
 define('ZBX_STYLE_MSG_GOOD', 'msg-good');
 define('ZBX_STYLE_MSG_BAD', 'msg-bad');
 define('ZBX_STYLE_MSG_BAD_GLOBAL', 'msg-bad-global');
@@ -1101,6 +1131,8 @@ define('ZBX_STYLE_NOTIF_INDIC_CONTAINER', 'notif-indic-container');
 define('ZBX_STYLE_NOWRAP', 'nowrap');
 define('ZBX_STYLE_ORANGE', 'orange');
 define('ZBX_STYLE_OVERLAY_CLOSE_BTN', 'overlay-close-btn');
+define('ZBX_STYLE_OVERLAY_DESCR', 'overlay-descr');
+define('ZBX_STYLE_OVERLAY_DESCR_URL', 'overlay-descr-url');
 define('ZBX_STYLE_OVERFLOW_ELLIPSIS', 'overflow-ellipsis');
 define('ZBX_STYLE_OBJECT_GROUP', 'object-group');
 define('ZBX_STYLE_RADIO_SEGMENTED', 'radio-segmented');
@@ -1115,16 +1147,19 @@ define('ZBX_STYLE_STATUS_GREEN', 'status-green');
 define('ZBX_STYLE_STATUS_GREY', 'status-grey');
 define('ZBX_STYLE_STATUS_RED', 'status-red');
 define('ZBX_STYLE_STATUS_YELLOW', 'status-yellow');
+define('ZBX_STYLE_SUBFILTER_ENABLED', 'subfilter-enabled');
 define('ZBX_STYLE_TABLE', 'table');
 define('ZBX_STYLE_TABLE_FORMS', 'table-forms');
 define('ZBX_STYLE_TABLE_FORMS_CONTAINER', 'table-forms-container');
 define('ZBX_STYLE_TABLE_FORMS_TD_LEFT', 'table-forms-td-left');
 define('ZBX_STYLE_TABLE_FORMS_TD_RIGHT', 'table-forms-td-right');
 define('ZBX_STYLE_TABS_NAV', 'tabs-nav');
+define('ZBX_STYLE_TFOOT_BUTTONS', 'tfoot-buttons');
 define('ZBX_STYLE_TD_DRAG_ICON', 'td-drag-icon');
 define('ZBX_STYLE_TREEVIEW', 'treeview');
 define('ZBX_STYLE_TREEVIEW_PLUS', 'treeview-plus');
 define('ZBX_STYLE_WARNING_BG', 'warning-bg');
+define('ZBX_STYLE_YELLOW', 'yellow');
 
 // server variables
 define('HTTPS', isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] && $_SERVER['HTTPS'] != 'off');

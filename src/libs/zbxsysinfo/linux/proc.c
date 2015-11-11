@@ -22,8 +22,8 @@
 #include "zbxregexp.h"
 #include "log.h"
 #include "stats.h"
-#include "db.h"
 
+extern int	CONFIG_TIMEOUT;
 
 typedef struct
 {
@@ -40,7 +40,6 @@ typedef struct
 }
 zbx_sysinfo_proc_t;
 
-
 /******************************************************************************
  *                                                                            *
  * Function: zbx_sysinfo_proc_free                                            *
@@ -56,7 +55,6 @@ void	zbx_sysinfo_proc_free(zbx_sysinfo_proc_t *proc)
 
 	zbx_free(proc);
 }
-
 
 static int	get_cmdline(FILE *f_cmd, char **line, size_t *line_offset)
 {
@@ -991,7 +989,7 @@ static int	proc_read_cpu_util(zbx_procstat_util_t *procutil)
 	if (-1 == (fd = open(tmp, O_RDONLY)))
 		return -errno;
 
-	if (-1 == (n = read(fd, tmp, sizeof(tmp))))
+	if (-1 == (n = read(fd, tmp, sizeof(tmp) - 1)))
 	{
 		ret = -errno;
 		goto out;
@@ -1050,7 +1048,6 @@ out:
 
 	return ret;
 }
-
 
 /******************************************************************************
  *                                                                            *
@@ -1148,7 +1145,7 @@ void	zbx_proc_get_process_stats(zbx_procstat_util_t *procs, int procs_num)
 static zbx_sysinfo_proc_t	*proc_create(int pid, unsigned int flags)
 {
 	char			*procname = NULL, *cmdline = NULL, *name_arg0 = NULL;
-	uid_t			uid;
+	uid_t			uid = -1;
 	zbx_sysinfo_proc_t	*proc = NULL;
 	int			ret = FAIL;
 
@@ -1298,8 +1295,8 @@ void	zbx_proc_get_matching_pids(const zbx_vector_ptr_t *processes, const char *p
 	int			i;
 	zbx_sysinfo_proc_t	*proc;
 
-	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s", __function_name,
-			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline));
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() procname:%s username:%s cmdline:%s zone:%d", __function_name,
+			ZBX_NULL2EMPTY_STR(procname), ZBX_NULL2EMPTY_STR(username), ZBX_NULL2EMPTY_STR(cmdline), flags);
 
 	if (NULL != username)
 	{
@@ -1333,8 +1330,9 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	const char	*procname, *username, *cmdline, *tmp;
 	char		*errmsg = NULL;
-	int		period, type, ret;
+	int		period, type;
 	double		value;
+	zbx_timespec_t	ts_timeout, ts;
 
 	/* proc.cpu.util[<procname>,<username>,(user|system),<cmdline>,(avg1|avg5|avg15)] */
 	/*                   0          1           2            3             4          */
@@ -1399,7 +1397,10 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (SUCCEED != (ret = zbx_procstat_get_util(procname, username, cmdline, 0, period, type, &value, &errmsg)))
+	zbx_timespec(&ts_timeout);
+	ts_timeout.sec += CONFIG_TIMEOUT;
+
+	while (SUCCEED != zbx_procstat_get_util(procname, username, cmdline, 0, period, type, &value, &errmsg))
 	{
 		/* zbx_procstat_get_* functions will return FAIL when either a collection   */
 		/* error was registered or if less than 2 data samples were collected.      */
@@ -1409,9 +1410,19 @@ int	PROC_CPU_UTIL(AGENT_REQUEST *request, AGENT_RESULT *result)
 			SET_MSG_RESULT(result, errmsg);
 			return SYSINFO_RET_FAIL;
 		}
+
+		zbx_timespec(&ts);
+
+		if (0 > zbx_timespec_compare(&ts_timeout, &ts))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Timeout while waiting for collector data."));
+			return SYSINFO_RET_FAIL;
+		}
+
+		sleep(1);
 	}
-	else
-		SET_DBL_RESULT(result, value);
+
+	SET_DBL_RESULT(result, value);
 
 	return SYSINFO_RET_OK;
 }

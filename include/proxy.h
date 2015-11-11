@@ -45,7 +45,9 @@ typedef struct
 }
 AGENT_VALUE;
 
-int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, char **error);
+int	get_active_proxy_id(struct zbx_json_parse *jp, zbx_uint64_t *hostid, char *host, const zbx_socket_t *sock,
+		char **error);
+int	check_access_passive_proxy(zbx_socket_t *sock, int send_response, const char *req);
 
 void	update_proxy_lastaccess(const zbx_uint64_t hostid);
 
@@ -71,7 +73,7 @@ int	process_hist_data(zbx_socket_t *sock, struct zbx_json_parse *jp,
 void	process_dhis_data(struct zbx_json_parse *jp);
 void	process_areg_data(struct zbx_json_parse *jp, zbx_uint64_t proxy_hostid);
 
-void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, zbx_timespec_t *ts);
+void	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, char *value, const zbx_timespec_t *ts);
 
 int	proxy_get_history_count(void);
 

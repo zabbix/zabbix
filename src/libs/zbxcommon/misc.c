@@ -21,6 +21,37 @@
 #include "log.h"
 #include "setproctitle.h"
 
+/* scheduler support */
+
+#define ZBX_SCHEDULER_FILTER_DAY	1
+#define ZBX_SCHEDULER_FILTER_HOUR	2
+#define ZBX_SCHEDULER_FILTER_MINUTE	3
+#define ZBX_SCHEDULER_FILTER_SECOND	4
+
+typedef struct zbx_scheduler_filter_t
+{
+	int				start;
+	int				end;
+	int				step;
+
+	struct zbx_scheduler_filter_t	*next;
+}
+zbx_scheduler_filter_t;
+
+typedef struct zbx_scheduler_interval_t
+{
+	zbx_scheduler_filter_t		*mdays;
+	zbx_scheduler_filter_t		*wdays;
+	zbx_scheduler_filter_t		*hours;
+	zbx_scheduler_filter_t		*minutes;
+	zbx_scheduler_filter_t		*seconds;
+
+	int				filter_level;
+
+	struct zbx_scheduler_interval_t	*next;
+}
+zbx_scheduler_interval_t;
+
 #ifdef _WINDOWS
 
 char	ZABBIX_SERVICE_NAME[ZBX_SERVICE_NAME_LEN] = APPLICATION_NAME;
@@ -347,6 +378,29 @@ char    *zbx_strdup2(const char *filename, int line, char *old, const char *str)
 	exit(EXIT_FAILURE);
 }
 
+/****************************************************************************************
+ *                                                                                      *
+ * Function: zbx_guaranteed_memset                                                      *
+ *                                                                                      *
+ * Purpose: For overwriting sensitive data in memory.                                   *
+ *          Similar to memset() but should not be optimized out by a compiler.          *
+ *                                                                                      *
+ * Derived from:                                                                        *
+ *   http://www.dwheeler.com/secure-programs/Secure-Programs-HOWTO/protect-secrets.html *
+ * See also:                                                                            *
+ *   http://www.open-std.org/jtc1/sc22/wg14/www/docs/n1381.pdf on secure_memset()       *
+ *                                                                                      *
+ ****************************************************************************************/
+void	*zbx_guaranteed_memset(void *v, int c, size_t n)
+{
+	volatile signed char	*p = (volatile signed char *)v;
+
+	while (0 != n--)
+		*p++ = (signed char)c;
+
+	return v;
+}
+
 /******************************************************************************
  *                                                                            *
  * Function: zbx_setproctitle                                                 *
@@ -495,7 +549,7 @@ static int	get_current_delay(int delay, const char *flex_intervals, time_t now)
 			}
 		}
 		else
-			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format [%s]", s);
+			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format: \"%s\"", s);
 
 		if (NULL == delim)
 			break;
@@ -605,7 +659,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 			}
 		}
 		else
-			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format [%s]", s);
+			zabbix_log(LOG_LEVEL_ERR, "wrong delay period format: \"%s\"", s);
 
 		if (NULL != delim)
 			s = delim + 1;
@@ -621,17 +675,796 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
 
 /******************************************************************************
  *                                                                            *
+ * Function: scheduler_filter_free                                            *
+ *                                                                            *
+ * Purpose: frees scheduler interval filter                                   *
+ *                                                                            *
+ * Parameters: filter - [IN] scheduler interval filter                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_filter_free(zbx_scheduler_filter_t *filter)
+{
+	zbx_scheduler_filter_t	*filter_next;
+
+	for (; NULL != filter; filter = filter_next)
+	{
+		filter_next = filter->next;
+		zbx_free(filter);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_interval_free                                          *
+ *                                                                            *
+ * Purpose: frees scheduler interval                                          *
+ *                                                                            *
+ * Parameters: filter - [IN] scheduler interval                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_interval_free(zbx_scheduler_interval_t *interval)
+{
+	zbx_scheduler_interval_t	*interval_next;
+
+	for (; NULL != interval; interval = interval_next)
+	{
+		interval_next = interval->next;
+
+		scheduler_filter_free(interval->mdays);
+		scheduler_filter_free(interval->wdays);
+		scheduler_filter_free(interval->hours);
+		scheduler_filter_free(interval->minutes);
+		scheduler_filter_free(interval->seconds);
+
+		zbx_free(interval);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_parse_filter_r                                         *
+ *                                                                            *
+ * Purpose: parses text string into scheduler filter                          *
+ *                                                                            *
+ * Parameters: filter  - [IN/OUT] the first filter                            *
+ *             text    - [IN] the text to parse                               *
+ *             len     - [IN/OUT] the number of characters left to parse      *
+ *             min     - [IN] the minimal time unit value                     *
+ *             max     - [IN] the maximal time unit value                     *
+ *             var_len - [IN] the maximum number of characters for a filter   *
+ *                       variable (<from>, <to>, <step>)                      *
+ *                                                                            *
+ * Return value: SUCCEED - the fitler was successfully parsed                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function recursively calls itself for each filter fragment. *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_parse_filter_r(zbx_scheduler_filter_t **filter, const char *text, int *len, int min, int max,
+		int var_len)
+{
+	int			start = 0, end = 0, step = 1;
+	const char		*pstart, *pend;
+	zbx_scheduler_filter_t	*filter_new;
+
+	pstart = pend = text;
+	while (0 != isdigit(*pend) && 0 < *len)
+	{
+		pend++;
+		(*len)--;
+	}
+
+	if (pend != pstart)
+	{
+		if (pend - pstart > var_len)
+			return FAIL;
+
+		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &start, 4, min, max))
+			return FAIL;
+
+		if ('-' == *pend)
+		{
+			pstart = pend + 1;
+
+			do
+			{
+				pend++;
+				(*len)--;
+			}
+			while (0 != isdigit(*pend) && 0 < *len);
+
+			/* empty or too long value, fail */
+			if (pend == pstart || pend - pstart > var_len)
+				return FAIL;
+
+			if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &end, 4, min, max))
+				return FAIL;
+
+			if (end < start)
+				return FAIL;
+		}
+		else
+		{
+			/* step is valid only for defined range */
+			if ('/' == *pend)
+				return FAIL;
+
+			end = start;
+		}
+	}
+	else
+	{
+		start = min;
+		end = max;
+	}
+
+	if ('/' == *pend)
+	{
+		pstart = pend + 1;
+
+		do
+		{
+			pend++;
+			(*len)--;
+		}
+		while (0 != isdigit(*pend) && 0 < *len);
+
+		/* empty or too long step, fail */
+		if (pend == pstart || pend - pstart > var_len)
+			return FAIL;
+
+		if (SUCCEED != is_uint_n_range(pstart, pend - pstart, &step, 4, 1, end - start))
+			return FAIL;
+	}
+	else
+	{
+		if (pend == text)
+			return FAIL;
+	}
+
+	if (',' == *pend)
+	{
+		/* no next filter after ',' */
+		if (0 == --(*len))
+			return FAIL;
+
+		pend++;
+
+		if (SUCCEED != scheduler_parse_filter_r(filter, pend, len, min, max, var_len))
+			return FAIL;
+	}
+
+	filter_new = zbx_malloc(NULL, sizeof(zbx_scheduler_filter_t));
+	filter_new->start = start;
+	filter_new->end = end;
+	filter_new->step = step;
+	filter_new->next = *filter;
+	*filter = filter_new;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_parse_filter                                           *
+ *                                                                            *
+ * Purpose: parses text string into scheduler filter                          *
+ *                                                                            *
+ * Parameters: filter  - [IN/OUT] the first filter                            *
+ *             text    - [IN] the text to parse                               *
+ *             len     - [IN/OUT] the number of characters left to parse      *
+ *             min     - [IN] the minimal time unit value                     *
+ *             max     - [IN] the maximal time unit value                     *
+ *             var_len - [IN] the maximum number of characters for a filter   *
+ *                       variable (<from>, <to>, <step>)                      *
+ *                                                                            *
+ * Return value: SUCCEED - the fitler was successfully parsed                 *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function will fail if a filter already exists. This         *
+ *           user from defining multiple filters of the same time unit in a   *
+ *           single interval. For example: h0h12 is invalid filter and its    *
+ *           parsing must fail.                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_parse_filter(zbx_scheduler_filter_t **filter, const char *text, int *len, int min, int max,
+		int var_len)
+{
+	if (NULL != *filter)
+		return FAIL;
+
+	return scheduler_parse_filter_r(filter, text, len, min, max, var_len);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_interval_parse                                         *
+ *                                                                            *
+ * Purpose: parses scheduler interval                                         *
+ *                                                                            *
+ * Parameters: interval - [IN/OUT] the first interval                         *
+ *             text     - [IN] the text to parse                              *
+ *             len      - [IN] the text length                                *
+ *                                                                            *
+ * Return value: SUCCEED - the interval was successfully parsed               *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_interval_parse(zbx_scheduler_interval_t *interval, const char *text, int len)
+{
+	int	ret = SUCCEED;
+
+	if (0 == len)
+		return FAIL;
+
+	while (SUCCEED == ret && 0 != len)
+	{
+		int	old_len = len--;
+
+		switch (*text)
+		{
+			case '\0':
+				return FAIL;
+			case 'h':
+				if (ZBX_SCHEDULER_FILTER_HOUR < interval->filter_level)
+					return FAIL;
+
+				ret = scheduler_parse_filter(&interval->hours, text + 1, &len, 0, 23, 2);
+				interval->filter_level = ZBX_SCHEDULER_FILTER_HOUR;
+
+				break;
+			case 's':
+				if (ZBX_SCHEDULER_FILTER_SECOND < interval->filter_level)
+					return FAIL;
+
+				ret = scheduler_parse_filter(&interval->seconds, text + 1, &len, 0, 59, 2);
+				interval->filter_level = ZBX_SCHEDULER_FILTER_SECOND;
+
+				break;
+			case 'w':
+				if ('d' != text[1])
+					return FAIL;
+
+				if (ZBX_SCHEDULER_FILTER_DAY < interval->filter_level)
+					return FAIL;
+
+				len--;
+				ret = scheduler_parse_filter(&interval->wdays, text + 2, &len, 1, 7, 1);
+				interval->filter_level = ZBX_SCHEDULER_FILTER_DAY;
+
+				break;
+			case 'm':
+				if ('d' == text[1])
+				{
+					if (ZBX_SCHEDULER_FILTER_DAY < interval->filter_level ||
+							NULL != interval->wdays)
+					{
+						return FAIL;
+					}
+
+					len--;
+					ret = scheduler_parse_filter(&interval->mdays, text + 2, &len, 1, 31, 2);
+					interval->filter_level = ZBX_SCHEDULER_FILTER_DAY;
+				}
+				else
+				{
+					if (ZBX_SCHEDULER_FILTER_MINUTE < interval->filter_level)
+						return FAIL;
+
+					ret = scheduler_parse_filter(&interval->minutes, text + 1, &len, 0, 59, 2);
+					interval->filter_level = ZBX_SCHEDULER_FILTER_MINUTE;
+				}
+
+				break;
+			default:
+				return FAIL;
+		}
+
+		text += old_len - len;
+	}
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: preprocess_flexible_interval                                     *
+ *                                                                            *
+ * Purpose: parses out the flexible interval in a text format and scheduler   *
+ *          interval in zbx_scheduler_interval_t structure                    *
+ *                                                                            *
+ * Parameters: text       - [IN] the text to parse                            *
+ *             interval   - [OUT] the parsed scheduler interval. Must be a    *
+ *                          pointer to a NULL pointer on the first call. It   *
+ *                          will be left untouched if the text does not       *
+ *                          contain scheduler intervals                       *
+ *             out        - [IN/OUT] flexible interval in text format         *
+ *             out_alloc  - [IN/OUT] the number of bytes allocated for out    *
+ *             out_offset - [IN/OUT] the flexible interval length in out      *
+ *                          buffer                                            *
+ *                                                                            *
+ * Return value: SUCCEED - the text was successfully parsed                   *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function recursively calls itself for each interval.        *
+ *                                                                            *
+ ******************************************************************************/
+static int	preprocess_flexible_interval(const char *text, zbx_scheduler_interval_t **interval,
+		char **out, size_t *out_alloc, size_t *out_offset, char **errmsg)
+{
+	const char			*ptr;
+	zbx_scheduler_interval_t	*new_interval;
+
+	ptr = strchr(text, ';');
+
+	if (NULL == ptr)
+		ptr = text + strlen(text);
+
+	if (0 != isdigit(*text))
+	{
+		if (0 != *out_offset)
+			zbx_chrcpy_alloc(out, out_alloc, out_offset, ';');
+
+		zbx_strncpy_alloc(out, out_alloc, out_offset, text, ptr - text);
+	}
+
+	if ('\0' != *ptr)
+	{
+		if (SUCCEED != preprocess_flexible_interval(ptr + 1, interval, out, out_alloc, out_offset, errmsg))
+			return FAIL;
+	}
+
+	/* flexible interval has already been copied, return success */
+	if (0 != isdigit(*text))
+		return SUCCEED;
+
+	new_interval = zbx_malloc(NULL, sizeof(zbx_scheduler_interval_t));
+	memset(new_interval, 0, sizeof(zbx_scheduler_interval_t));
+
+	if (SUCCEED != scheduler_interval_parse(new_interval, text, ptr - text))
+	{
+		size_t	errmsg_alloc = 0, errmsg_offset = 0;
+
+		zbx_free(*errmsg);
+		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "invalid scheduling interval: \"");
+		zbx_strncpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, text, ptr - text + 1);
+		zbx_strcpy_alloc(errmsg, &errmsg_alloc, &errmsg_offset, "\"");
+
+		scheduler_interval_free(new_interval);
+		return FAIL;
+	}
+
+	new_interval->next = *interval;
+	*interval = new_interval;
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_get_nearest_filter_value                               *
+ *                                                                            *
+ * Purpose: gets the next nearest value that satisfies the filter chain       *
+ *                                                                            *
+ * Parameters: filter - [IN] the filter chain                                 *
+ *             value  - [IN] the current value                                *
+ *                      [OUT] the next nearest value (>= than input value)    *
+ *                                                                            *
+ * Return value: SUCCEED - the next nearest value was successfully found      *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_get_nearest_filter_value(const zbx_scheduler_filter_t *filter, int *value)
+{
+	const zbx_scheduler_filter_t	*filter_next = NULL;
+
+	for (; NULL != filter; filter = filter->next)
+	{
+		/* find matching filter */
+		if (filter->start <= *value && *value <= filter->end)
+		{
+			int	next = *value, offset;
+
+			/* apply step */
+			offset = (next - filter->start) % filter->step;
+			if (0 != offset)
+				next += filter->step - offset;
+
+			/* succeed if the calculated value is still in filter range */
+			if (next <= filter->end)
+			{
+				*value = next;
+				return SUCCEED;
+			}
+		}
+
+		/* find the next nearest filter */
+		if (filter->start > *value && (NULL == filter_next || filter_next->start > filter->start))
+			filter_next = filter;
+	}
+
+	/* The value is not in a range of any filters, but we have next nearest filter. */
+	if (NULL != filter_next)
+	{
+		*value = filter_next->start;
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_get_wday_nextcheck                                     *
+ *                                                                            *
+ * Purpose: calculates the next day that satisfies the week day filter        *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             tm       - [IN/OUT] the input/output date & time               *
+ *                                                                            *
+ * Return value: SUCCEED - the next day was found                             *
+ *               FAIL    - the next day satisfying week day filter was not    *
+ *                         found in the current month                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_get_wday_nextcheck(const zbx_scheduler_interval_t *interval, struct tm *tm)
+{
+	int	value_now, value_next;
+
+	if (NULL == interval->wdays)
+		return SUCCEED;
+
+	value_now = value_next = (0 == tm->tm_wday ? 7 : tm->tm_wday);
+
+	/* get the nearest week day from the current week day*/
+	if (SUCCEED != scheduler_get_nearest_filter_value(interval->wdays, &value_next))
+	{
+		/* in the case of failure move month day to the next week, reset week day and try again */
+		tm->tm_mday += 7 - value_now + 1;
+		value_now = value_next = 1;
+
+		if (SUCCEED != scheduler_get_nearest_filter_value(interval->wdays, &value_next))
+		{
+			/* a valid week day filter must always match some day of a new week */
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+		}
+	}
+
+	/* adjust the month day by the week day offset */
+	tm->tm_mday += value_next - value_now;
+
+	/* check if the resulting month day is valid */
+	return (-1 != mktime(tm) ? SUCCEED : FAIL);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_validate_wday_filter                                   *
+ *                                                                            *
+ * Purpose: checks if the specified date satisfies week day filter            *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             tm       - [IN] the date & time to validate                    *
+ *                                                                            *
+ * Return value: SUCCEED - the input date satisfies week day filter           *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_validate_wday_filter(const zbx_scheduler_interval_t *interval, struct tm *tm)
+{
+	time_t				nextcheck;
+	const zbx_scheduler_filter_t	*filter;
+	int				value;
+
+	if (NULL == interval->wdays)
+		return SUCCEED;
+
+	/* mktime will aso set correct wday value */
+	if (-1 == (nextcheck = mktime(tm)))
+		return FAIL;
+
+	value = (0 == tm->tm_wday ? 7 : tm->tm_wday);
+
+	/* check if the value match week day filter */
+	for (filter = interval->wdays; NULL != filter; filter = filter->next)
+	{
+		if (filter->start <= value && value <= filter->end)
+		{
+			int	next = value, offset;
+
+			/* apply step */
+			offset = (next - filter->start) % filter->step;
+			if (0 != offset)
+				next += filter->step - offset;
+
+			/* succeed if the calculated value is still in filter range */
+			if (next <= filter->end)
+				return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_get_day_nextcheck                                      *
+ *                                                                            *
+ * Purpose: calculates the next day that satisfies month and week day filters *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             tm       - [IN/OUT] the input/output date & time               *
+ *                                                                            *
+ * Return value: SUCCEED - the next day was found                             *
+ *               FAIL    - the next day satisfying day filters was not        *
+ *                         found in the current month                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_get_day_nextcheck(const zbx_scheduler_interval_t *interval, struct tm *tm)
+{
+	/* first check if the provided tm structure has valid date format */
+	if (-1 == mktime(tm))
+		return FAIL;
+
+	if (NULL == interval->mdays)
+		return scheduler_get_wday_nextcheck(interval, tm);
+
+	/* iterate through month days until week day filter matches or we have ran out of month days */
+	while (SUCCEED == scheduler_get_nearest_filter_value(interval->mdays, &tm->tm_mday))
+	{
+		if (SUCCEED == scheduler_validate_wday_filter(interval, tm))
+			return SUCCEED;
+
+		tm->tm_mday++;
+
+		/* check if the date is still valid - we haven't ran out of month days */
+		if (-1 == mktime(tm))
+			break;
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_get_filter_nextcheck                                   *
+ *                                                                            *
+ * Purpose: calculates the time/day that satisfies the specified filter       *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             level    - [IN] the filter level, see ZBX_SCHEDULER_FILTER_*   *
+ *                        defines                                             *
+ *             tm       - [IN/OUT] the input/output date & time               *
+ *                                                                            *
+ * Return value: SUCCEED - the next time/day was found                        *
+ *               FAIL    - the next time/day was not found on the current     *
+ *                         filter level                                       *
+ *                                                                            *
+ ******************************************************************************/
+static int	scheduler_get_filter_nextcheck(const zbx_scheduler_interval_t *interval, int level, struct tm *tm)
+{
+	const zbx_scheduler_filter_t	*filter;
+	int				max, *value;
+
+	/* initialize data depending on filter level */
+	switch (level)
+	{
+		case ZBX_SCHEDULER_FILTER_DAY:
+			return scheduler_get_day_nextcheck(interval, tm);
+		case ZBX_SCHEDULER_FILTER_HOUR:
+			max = 23;
+			filter = interval->hours;
+			value = &tm->tm_hour;
+			break;
+		case ZBX_SCHEDULER_FILTER_MINUTE:
+			max = 59;
+			filter = interval->minutes;
+			value = &tm->tm_min;
+			break;
+		case ZBX_SCHEDULER_FILTER_SECOND:
+			max = 59;
+			filter = interval->seconds;
+			value = &tm->tm_sec;
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return FAIL;
+	}
+
+	if (max < *value)
+		return FAIL;
+
+	/* handle unspecified (default) filter */
+	if (NULL == filter)
+	{
+		/* Empty filter matches all valid values if the filter level is less than        */
+		/* interval filter level. For example if interval filter level is minutes - m30, */
+		/* then hour filter matches all hours.                                           */
+		if (interval->filter_level > level)
+			return SUCCEED;
+
+		/* If the filter level is greater than interval filter level, then filter       */
+		/* matches only 0 value. For example if interval filter level is minutes - m30, */
+		/* then seconds filter matches the 0th second.                                  */
+		return 0 == *value ? SUCCEED : FAIL;
+	}
+
+	return scheduler_get_nearest_filter_value(filter, value);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_apply_day_filter                                       *
+ *                                                                            *
+ * Purpose: applies day filter to the specified time/day calculating the next *
+ *          scheduled check                                                   *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             tm       - [IN/OUT] the input/output date & time               *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_apply_day_filter(zbx_scheduler_interval_t *interval, struct tm *tm)
+{
+	int	day = tm->tm_mday, mon = tm->tm_mon, year = tm->tm_year;
+
+	while (SUCCEED != scheduler_get_filter_nextcheck(interval, ZBX_SCHEDULER_FILTER_DAY, tm))
+	{
+		if (11 < ++tm->tm_mon)
+		{
+			tm->tm_mon = 0;
+			tm->tm_year++;
+		}
+
+		tm->tm_mday = 1;
+	}
+
+	/* reset hours, minutes and seconds if the day has been changed */
+	if (tm->tm_mday != day || tm->tm_mon != mon || tm->tm_year != year)
+	{
+		tm->tm_hour = 0;
+		tm->tm_min = 0;
+		tm->tm_sec = 0;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_apply_hour_filter                                      *
+ *                                                                            *
+ * Purpose: applies hour filter to the specified time/day calculating the     *
+ *          next scheduled check                                              *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             tm       - [IN/OUT] the input/output date & time               *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_apply_hour_filter(zbx_scheduler_interval_t *interval, struct tm *tm)
+{
+	int	hour = tm->tm_hour;
+
+	while (SUCCEED != scheduler_get_filter_nextcheck(interval, ZBX_SCHEDULER_FILTER_HOUR, tm))
+	{
+		tm->tm_mday++;
+		tm->tm_hour = 0;
+
+		/* day has been changed, we have to reapply day filter */
+		scheduler_apply_day_filter(interval, tm);
+	}
+
+	/* reset minutes and seconds if hours has been changed */
+	if (tm->tm_hour != hour)
+	{
+		tm->tm_min = 0;
+		tm->tm_sec = 0;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_apply_minute_filter                                    *
+ *                                                                            *
+ * Purpose: applies minute filter to the specified time/day calculating the   *
+ *          next scheduled check                                              *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             tm       - [IN/OUT] the input/output date & time               *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_apply_minute_filter(zbx_scheduler_interval_t *interval, struct tm *tm)
+{
+	int	min = tm->tm_min;
+
+	while (SUCCEED != scheduler_get_filter_nextcheck(interval, ZBX_SCHEDULER_FILTER_MINUTE, tm))
+	{
+		tm->tm_hour++;
+		tm->tm_min = 0;
+
+		/* hours have been changed, we have to reapply hour filter */
+		scheduler_apply_hour_filter(interval, tm);
+	}
+
+	/* reset seconds if minutes has been changed */
+	if (tm->tm_min != min)
+		tm->tm_sec = 0;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_apply_second_filter                                    *
+ *                                                                            *
+ * Purpose: applies second filter to the specified time/day calculating the   *
+ *          next scheduled check                                              *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             tm       - [IN/OUT] the input/output date & time               *
+ *                                                                            *
+ ******************************************************************************/
+static void	scheduler_apply_second_filter(zbx_scheduler_interval_t *interval, struct tm *tm)
+{
+	while (SUCCEED != scheduler_get_filter_nextcheck(interval, ZBX_SCHEDULER_FILTER_SECOND, tm))
+	{
+		tm->tm_min++;
+		tm->tm_sec = 0;
+
+		/* minutes have been changed, we have to reapply minute filter */
+		scheduler_apply_minute_filter(interval, tm);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: scheduler_get_nextcheck                                          *
+ *                                                                            *
+ * Purpose: applies second filter to the specified time/day calculating the   *
+ *          next scheduled check                                              *
+ *                                                                            *
+ * Parameters: interval - [IN] the scheduler interval                         *
+ *             now      - [IN] the current timestamp                          *
+ *                                                                            *
+ * Return Value: Timestamp when the next check must be scheduled.             *
+ *                                                                            *
+ ******************************************************************************/
+static time_t	scheduler_get_nextcheck(zbx_scheduler_interval_t *interval, time_t now)
+{
+	struct tm	tm_start, tm;
+	int		nextcheck = 0, current_nextcheck;
+
+	tm_start = *(localtime(&now));
+	tm_start.tm_isdst = -1;
+
+	for (; NULL != interval; interval = interval->next)
+	{
+		tm = tm_start;
+
+		scheduler_apply_day_filter(interval, &tm);
+		scheduler_apply_hour_filter(interval, &tm);
+		scheduler_apply_minute_filter(interval, &tm);
+		scheduler_apply_second_filter(interval, &tm);
+
+		current_nextcheck = mktime(&tm);
+
+		if (0 == nextcheck || current_nextcheck < nextcheck)
+			nextcheck = current_nextcheck;
+	}
+
+	return nextcheck;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Function: calculate_item_nextcheck                                         *
  *                                                                            *
  * Purpose: calculate nextcheck timestamp for item                            *
  *                                                                            *
- * Parameters: seed      - [IN] the seed value applied to delay to spread     *
- *                              item checks over the delay period             *
- *             item_type - [IN] the item type                                 *
- *             delay     - [IN] default delay value, can be overridden        *
- *             flex_intervals - [IN] descriptions of flexible intervals       *
- *                                   in the form [dd/d1-d2,hh:mm-hh:mm;]      *
- *             now       - [IN] current timestamp                             *
+ * Parameters: seed             - [IN] the seed value applied to delay to     *
+ *                                     spread item checks over the delay      *
+ *                                     period                                 *
+ *             item_type        - [IN] the item type                          *
+ *             delay            - [IN] default delay value, can be overridden *
+ *             custom_intervals - [IN] descriptions of flexible intervals     *
+ *                                     in the form [dd/d1-d2,hh:mm-hh:mm;]    *
+ *             now              - [IN] current timestamp                      *
  *                                                                            *
  * Return value: nextcheck value                                              *
  *                                                                            *
@@ -645,7 +1478,7 @@ static int	get_next_delay_interval(const char *flex_intervals, time_t now, time_
  *           !!! Don't forget to sync code with PHP !!!                       *
  *                                                                            *
  ******************************************************************************/
-int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *flex_intervals, time_t now)
+int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const char *custom_intervals, time_t now)
 {
 	int	nextcheck = 0;
 
@@ -660,7 +1493,29 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 	else
 	{
 		int	current_delay = 0, try = 0;
-		time_t	next_interval, t, tmax;
+		time_t	next_interval, t, tmax, scheduled_check = 0;
+		char	*flex = NULL;
+		size_t	flex_alloc = 0, flex_offset = 0;
+
+		/* first try to parse out and calculate scheduled intervals */
+		if (NULL != custom_intervals)
+		{
+			zbx_scheduler_interval_t	*interval = NULL;
+			char				*errmsg = NULL;
+
+			if (SUCCEED == preprocess_flexible_interval(custom_intervals, &interval, &flex, &flex_alloc,
+					&flex_offset, &errmsg))
+			{
+				custom_intervals = flex;
+				scheduled_check = scheduler_get_nextcheck(interval, now + 1);
+				scheduler_interval_free(interval);
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_ERR, "%s", errmsg);
+				zbx_free(errmsg);
+			}
+		}
 
 		/* Try to find the nearest 'nextcheck' value with condition */
 		/* 'now' < 'nextcheck' < 'now' + SEC_PER_YEAR. If it is not */
@@ -672,7 +1527,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 		while (t < tmax)
 		{
 			/* calculate 'nextcheck' value for the current interval */
-			current_delay = get_current_delay(delay, flex_intervals, t);
+			current_delay = get_current_delay(delay, custom_intervals, t);
 
 			if (0 != current_delay)
 			{
@@ -695,7 +1550,7 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 
 			/* 'nextcheck' < end of the current interval ? */
 			/* the end of the current interval is the beginning of the next interval - 1 */
-			if (FAIL != get_next_delay_interval(flex_intervals, t, &next_interval) &&
+			if (FAIL != get_next_delay_interval(custom_intervals, t, &next_interval) &&
 					nextcheck >= next_interval)
 			{
 				/* 'nextcheck' is beyond the current interval */
@@ -705,6 +1560,11 @@ int	calculate_item_nextcheck(zbx_uint64_t seed, int item_type, int delay, const 
 			else
 				break;	/* nextcheck is within the current interval */
 		}
+
+		zbx_free(flex);
+
+		if (0 != scheduled_check && scheduled_check < nextcheck)
+			nextcheck = scheduled_check;
 	}
 
 	return nextcheck;

@@ -1350,18 +1350,22 @@ function zbx_array_mintersect($keys, $array) {
 
 function zbx_str2links($text) {
 	$result = [];
-	if (zbx_empty($text)) {
-		return $result;
-	}
-	preg_match_all('#https?://[^\n\t\r ]+#u', $text, $matches, PREG_OFFSET_CAPTURE);
 
-	$start = 0;
-	foreach ($matches[0] as $match) {
-		$result[] = mb_substr($text, $start, $match[1] - $start);
-		$result[] = (new CLink($match[0], $match[0]))->removeSID();
-		$start = $match[1] + mb_strlen($match[0]);
+	foreach (explode("\n", $text) as $line) {
+		$line = rtrim($line, "\r ");
+
+		preg_match_all('#https?://[^\n\t\r ]+#u', $line, $matches, PREG_OFFSET_CAPTURE);
+
+		$start = 0;
+		foreach ($matches[0] as $match) {
+			$result[] = mb_substr($line, $start, $match[1] - $start);
+			$result[] = (new CLink($match[0], $match[0]))->removeSID();
+			$start = $match[1] + mb_strlen($match[0]);
+		}
+		$result[] = mb_substr($line, $start);
+		$result[] = BR();
 	}
-	$result[] = mb_substr($text, $start, mb_strlen($text));
+	array_pop($result);
 
 	return $result;
 }
@@ -1720,7 +1724,9 @@ function makeMessageBox($good, array $messages, $title = null, $show_close_box =
 			}
 		}
 		foreach ($messages as $message) {
-			$list->addItem(/*$msg['type'].'&nbsp;'.*/$message['message']);
+			foreach (explode("\n", $message['message']) as $message_part) {
+				$list->addItem(/*$message['type'].'&nbsp;'.*/$message_part);
+			}
 		}
 		$msg_details->addItem($list);
 

@@ -60,23 +60,28 @@
 				<tbody>
 				<tr>
 					<?= (new CCol([
-						_('Target'),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						new CComboBox('opCmdTarget', null, null, [
-							'current' => _('Current host'),
-							'host' => _('Host'),
-							'hostGroup' => _('Host group')
-						]),
-						(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-						new CVar('opCmdId', '#{opcmdid}')
-					]))->toString() ?>
+							_('Target'),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							new CComboBox('opCmdTarget', null, null, [
+								'current' => _('Current host'),
+								'host' => _('Host'),
+								'hostGroup' => _('Host group')
+							]),
+							(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+							new CVar('opCmdId', '#{opcmdid}')
+						]))->toString()
+					?>
 				</tr>
 				<tr>
-					<td colspan="3">
-						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="save">#{operationName}</button>
-						&nbsp;
-						<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?>" name="cancel"><?= CHtml::encode(_('Cancel')) ?></button>
-					</td>
+					<?= (new CCol(
+							new CHorList([
+								(new CButton('save', '#{operationName}'))->addClass(ZBX_STYLE_BTN_LINK),
+								(new CButton('cancel', _('Cancel')))->addClass(ZBX_STYLE_BTN_LINK)
+							])
+						))
+							->setColSpan(3)
+							->toString()
+					?>
 				</tr>
 				</tbody>
 			</table>

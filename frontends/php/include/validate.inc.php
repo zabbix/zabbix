@@ -417,7 +417,7 @@ function validateNumber($value, $min = null, $max = null) {
 }
 
 function validateUserMacro($value) {
-	return preg_match('/^'.ZBX_PREG_EXPRESSION_USER_MACROS.'$/', $value);
+	return ((new CUserMacroParser())->parse($value) == CParser::PARSE_SUCCESS);
 }
 
 /**

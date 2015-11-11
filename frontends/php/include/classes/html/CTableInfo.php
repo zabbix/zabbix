@@ -38,31 +38,18 @@ class CTableInfo extends CTable {
 
 		$string = parent::toString($destroy);
 
-		if($this->addMakeVerticalRotationJs) {
+		if ($this->addMakeVerticalRotationJs) {
 			$string .= get_js(
-				'var makeVerticalRotationForTable = function() {
-					var table = jQuery("#'.$tableId.'");
-
-					table.makeVerticalRotation();
-
-					if (IE9) {
-						jQuery(".vertical_rotation_inner", table).css({
-							"-ms-transform": "rotate(270deg)"
-						});
-					}
-					else {
-						jQuery(".vertical_rotation_inner", table).css({
-							"writing-mode": "tb-rl"
-						});
-					}
-				}
-
-				if(!jQuery.isReady) {
-					jQuery(document).ready(makeVerticalRotationForTable);
-				}
-				else {
-					makeVerticalRotationForTable();
-				}',
+				'var makeVerticalRotationForTable = function() {'."\n".
+				'	jQuery("#'.$tableId.'").makeVerticalRotation();'."\n".
+				'}'."\n".
+				"\n".
+				'if (!jQuery.isReady) {'."\n".
+				'	jQuery(document).ready(makeVerticalRotationForTable);'."\n".
+				'}'."\n".
+				'else {'."\n".
+				'	makeVerticalRotationForTable();'."\n".
+				'}',
 			true);
 		}
 		return $string;
