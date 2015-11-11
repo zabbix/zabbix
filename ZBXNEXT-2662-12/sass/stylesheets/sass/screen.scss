@@ -2320,6 +2320,7 @@ $form-icon-btn: (
 	z-index: 1000;
 	padding: 5px 15px 5px 25px;
 	min-width: 166px;
+	max-width: 250px;
 	background-color: $ui-bg-color;
 	border: 1px solid $action-border-color;
 	border-bottom-color: darken($action-border-color, 1%);
@@ -2327,7 +2328,6 @@ $form-icon-btn: (
 
 	li {
 		display: block;
-		white-space: nowrap;
 
 		div {
 			border-top: 1px solid $table-border-color;
@@ -2344,6 +2344,7 @@ $form-icon-btn: (
 		padding: 0 15px 0 25px;
 		margin: 0 -15px 0 -25px;
 		position: relative;
+		@extend %overflow-ellipsis; 
 		@include transition(background-color .2s ease-out);
 
 		&:hover {
@@ -2390,6 +2391,7 @@ $form-icon-btn: (
 	h3 {
 		height: 24px;
 		line-height: 24px;
+		@extend %overflow-ellipsis;
 	}
 }
 
@@ -2632,9 +2634,7 @@ $form-icon-btn: (
 		display: block;
 		max-width: 250px;
 		padding-bottom: 0.083em;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		@extend %overflow-ellipsis;
 	}
 
 	p {
@@ -3590,9 +3590,9 @@ The default font face is Arial. Type size and line height should be set in relat
 ##Headings
 
 ```html_example
-<h1>Main Heading</h1>
-<h2>Section Header</h2>
-<h3>Contextual Menu Heading</h3>
+<h1>Main Heading</h1><br>
+<h2>Section Header</h2><br>
+<h3>Contextual Menu Heading</h3><br>
 <h4>Widget and Dialog Heading</h4>
 ```
 
@@ -3779,8 +3779,6 @@ Pagnation is used to
 ```
 
 ##Table with No Results
-
-Table with no results:
 
 ```html_example
 <div class="overflow-table">
