@@ -19,6 +19,7 @@
 
 #include "checks_snmp.h"
 #include "comms.h"
+#include "threads.h"
 #include "zbxalgo.h"
 #include "zbxjson.h"
 
@@ -43,7 +44,7 @@ typedef struct
 }
 zbx_snmp_timeout_spec_t;
 
-static int	parse_snmp_timeout_spec(const char *text, zbx_vector_ptr_t *specs, char **error)
+static int	parse_snmp_timeout_spec(const char *text, zbx_vector_ptr_t *specs, char *error, int max_error_len)
 {
 	const char		*__function_name = "parse_snmp_timeout_spec";
 
@@ -146,9 +147,9 @@ static int	parse_snmp_timeout_spec(const char *text, zbx_vector_ptr_t *specs, ch
 
 	return SUCCEED;
 syntax:
-	*error = zbx_dsprintf(*error, "Unexpected SNMP timeout specification syntax near \"%s\".", text);
+	zbx_snprintf(error, max_error_len, "Syntax error in SNMP timeout specification near \"%s\".", text);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL error:'%s'", __function_name, *error);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL error:'%s'", __function_name, error);
 
 	return FAIL;
 }
@@ -194,12 +195,7 @@ static int	get_attempt_interval(int attempt, const zbx_vector_ptr_t *specs)
 		const zbx_snmp_timeout_spec_t	*spec = (const zbx_snmp_timeout_spec_t *)specs->values[i];
 
 		if (spec->attempts >= attempt)
-		{
-			if (spec->attempts == attempt && i == specs->values_num - 1)
-				return 0;
-
 			return spec->timeout;
-		}
 
 		attempt -= spec->attempts;
 	}
@@ -615,6 +611,7 @@ static struct snmp_session	*zbx_snmp_open_session(const DC_ITEM *item, char *err
 
 	session.timeout = CONFIG_TIMEOUT * 1000 * 1000;	/* timeout of one attempt in microseconds */
 							/* (net-snmp default = 1 second) */
+	session.retries = 0;
 
 #ifdef HAVE_IPV6
 	if (SUCCEED != get_address_family(item->interface.addr, &family, error, max_error_len))
@@ -1099,7 +1096,8 @@ numeric:
 #define ZBX_SNMP_WALK_MODE_DISCOVERY	1
 
 static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const char *OID, unsigned char mode,
-		AGENT_RESULT *result, int *max_succeed, int *min_fail, int max_vars)
+		AGENT_RESULT *result, int *max_succeed, int *min_fail, const zbx_vector_ptr_t *timeout_specs,
+		int max_vars)
 {
 	const char		*__function_name = "zbx_snmp_walk";
 
@@ -1108,7 +1106,7 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	size_t			anOID_len = MAX_OID_LEN, rootOID_len = MAX_OID_LEN, root_string_len, root_numeric_len;
 	char			snmp_oid[MAX_STRING_LEN], error[MAX_STRING_LEN];
 	struct variable_list	*var;
-	int			bulk, status, level, running, num_vars, ret = SUCCEED;
+	int			bulk, status, level, running, attempt, attempt_count, num_vars, ret = SUCCEED;
 	struct zbx_json		j;
 	AGENT_RESULT		snmp_result;
 
@@ -1163,6 +1161,8 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 	level = 0;
 	running = 1;
 
+	attempt_count = get_attempt_count(timeout_specs);
+
 	while (1 == running)
 	{
 		if (NULL == (pdu = snmp_pdu_create(0 == bulk ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK)))	/* create PDU */
@@ -1186,14 +1186,32 @@ static int	zbx_snmp_walk(struct snmp_session *ss, const DC_ITEM *item, const cha
 			pdu->max_repetitions = max_vars;
 		}
 
-		ss->retries = (0 == bulk || (1 == max_vars && 0 == level) ? 1 : 0);
+		attempt = 1;
+retry:
+		ss->timeout = get_attempt_timeout(attempt, timeout_specs) * 1000 * 1000;
 
 		/* communicate with agent */
 		status = snmp_synch_response(ss, pdu, &response);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d s_snmp_errno:%d errstat:%ld"
-				" max_vars:%d", __function_name, status, ss->s_snmp_errno,
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() attempt:%d status:%d s_snmp_errno:%d"
+				" errstat:%ld max_vars:%d", __function_name, attempt, status, ss->s_snmp_errno,
 				NULL == response ? (long)-1 : response->errstat, max_vars);
+
+		if (STAT_TIMEOUT == status && attempt_count > attempt)
+		{
+			int	interval;
+
+			if (NULL != response)
+				snmp_free_pdu(response);
+
+			interval = get_attempt_interval(attempt, timeout_specs);
+
+			if (0 != interval)
+				zbx_sleep(interval);
+
+			attempt++;
+			goto retry;
+		}
 
 		if (1 < max_vars &&
 			((STAT_SUCCESS == status && SNMP_ERR_TOOBIG == response->errstat) || STAT_TIMEOUT == status))
@@ -1328,11 +1346,11 @@ out:
 
 static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, char oids[][ITEM_SNMP_OID_LEN_MAX],
 		AGENT_RESULT *results, int *errcodes, unsigned char *query_and_ignore_type, int num, int level,
-		char *error, int max_error_len, int *max_succeed, int *min_fail)
+		char *error, int max_error_len, int *max_succeed, int *min_fail, const zbx_vector_ptr_t *timeout_specs)
 {
 	const char		*__function_name = "zbx_snmp_get_values";
 
-	int			i, j, status, ret = SUCCEED;
+	int			i, j, status, attempt, attempt_count, ret = SUCCEED;
 	int			mapping[MAX_SNMP_ITEMS], mapping_num = 0;
 	oid			parsed_oids[MAX_SNMP_ITEMS][MAX_OID_LEN];
 	size_t			parsed_oid_lens[MAX_SNMP_ITEMS];
@@ -1382,13 +1400,33 @@ static int	zbx_snmp_get_values(struct snmp_session *ss, const DC_ITEM *items, ch
 		goto out;
 	}
 
-	ss->retries = (1 == mapping_num && 0 == level ? 1 : 0);
+	attempt_count = get_attempt_count(timeout_specs);
+
+	attempt = 1;
 retry:
+	ss->timeout = get_attempt_timeout(attempt, timeout_specs) * 1000 * 1000;
+
 	status = snmp_synch_response(ss, pdu, &response);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() status:%d s_snmp_errno:%d errstat:%ld mapping_num:%d",
-			__function_name, status, ss->s_snmp_errno, NULL == response ? (long)-1 : response->errstat,
-			mapping_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_synch_response() attempt:%d status:%d s_snmp_errno:%d errstat:%ld"
+			" mapping_num:%d", __function_name, attempt, status, ss->s_snmp_errno,
+			NULL == response ? (long)-1 : response->errstat, mapping_num);
+
+	if (STAT_TIMEOUT == status && attempt_count > attempt)
+	{
+		int	interval;
+
+		if (NULL != response)
+			snmp_free_pdu(response);
+
+		interval = get_attempt_interval(attempt, timeout_specs);
+
+		if (0 != interval)
+			zbx_sleep(interval);
+
+		attempt++;
+		goto retry;
+	}
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
@@ -1524,6 +1562,8 @@ retry:
 				mapping_num--;
 
 				snmp_free_pdu(response);
+
+				attempt = 1;
 				goto retry;
 			}
 			else
@@ -1562,7 +1602,7 @@ halve:
 			int	base;
 
 			ret = zbx_snmp_get_values(ss, items, oids, results, errcodes, query_and_ignore_type, num / 2,
-					level + 1, error, max_error_len, max_succeed, min_fail);
+					level + 1, error, max_error_len, max_succeed, min_fail, timeout_specs);
 
 			if (SUCCEED != ret)
 				goto exit;
@@ -1571,7 +1611,7 @@ halve:
 
 			ret = zbx_snmp_get_values(ss, items + base, oids + base, results + base, errcodes + base,
 					NULL == query_and_ignore_type ? NULL : query_and_ignore_type + base, num - base,
-					level + 1, error, max_error_len, max_succeed, min_fail);
+					level + 1, error, max_error_len, max_succeed, min_fail, timeout_specs);
 		}
 		else if (1 == level)
 		{
@@ -1584,7 +1624,7 @@ halve:
 
 				ret = zbx_snmp_get_values(ss, items + i, oids + i, results + i, errcodes + i,
 						NULL == query_and_ignore_type ? NULL : query_and_ignore_type + i, 1,
-						level + 1, error, max_error_len, max_succeed, min_fail);
+						level + 1, error, max_error_len, max_succeed, min_fail, timeout_specs);
 
 				if (SUCCEED != ret)
 					goto exit;
@@ -1672,7 +1712,8 @@ static void	zbx_snmp_translate(char *oid_translated, const char *oid, size_t max
 }
 
 static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail, int max_vars)
+		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail,
+		const zbx_vector_ptr_t *timeout_specs, int max_vars)
 {
 	const char	*__function_name = "zbx_snmp_process_discovery";
 
@@ -1688,7 +1729,7 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 		case 0:
 			zbx_snmp_translate(oid_translated, items[0].snmp_oid, sizeof(oid_translated));
 			errcodes[0] = zbx_snmp_walk(ss, &items[0], oid_translated, ZBX_SNMP_WALK_MODE_DISCOVERY,
-					&results[0], max_succeed, min_fail, max_vars);
+					&results[0], max_succeed, min_fail, timeout_specs, max_vars);
 			break;
 		default:
 			SET_MSG_RESULT(&results[0], zbx_dsprintf(NULL, "OID \"%s\" contains unsupported parameters.",
@@ -1705,7 +1746,8 @@ static int	zbx_snmp_process_discovery(struct snmp_session *ss, const DC_ITEM *it
 }
 
 static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail)
+		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail,
+		const zbx_vector_ptr_t *timeout_specs)
 {
 	const char	*__function_name = "zbx_snmp_process_dynamic";
 
@@ -1774,7 +1816,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 	if (0 != to_verify_num)
 	{
 		ret = zbx_snmp_get_values(ss, items, to_verify_oids, results, errcodes, query_and_ignore_type, num, 0,
-				error, max_error_len, max_succeed, min_fail);
+				error, max_error_len, max_succeed, min_fail, timeout_specs);
 
 		if (SUCCEED != ret && NOTSUPPORTED != ret)
 			goto exit;
@@ -1838,7 +1880,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 			init_result(&result);
 
 			errcode = zbx_snmp_walk(ss, &items[j], oids_translated[j], ZBX_SNMP_WALK_MODE_CACHE, &result,
-					max_succeed, min_fail, num);
+					max_succeed, min_fail, timeout_specs, num);
 
 			if (NETWORK_ERROR == errcode)
 			{
@@ -1904,7 +1946,7 @@ static int	zbx_snmp_process_dynamic(struct snmp_session *ss, const DC_ITEM *item
 	/* query values based on the indices verified and/or determined above */
 
 	ret = zbx_snmp_get_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len,
-			max_succeed, min_fail);
+			max_succeed, min_fail, timeout_specs);
 exit:
 	zbx_free(idx);
 
@@ -1914,7 +1956,8 @@ exit:
 }
 
 static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *items, AGENT_RESULT *results,
-		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail)
+		int *errcodes, int num, char *error, int max_error_len, int *max_succeed, int *min_fail,
+		const zbx_vector_ptr_t *timeout_specs)
 {
 	const char	*__function_name = "zbx_snmp_process_standard";
 
@@ -1940,7 +1983,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const DC_ITEM *ite
 	}
 
 	ret = zbx_snmp_get_values(ss, items, oids_translated, results, errcodes, NULL, num, 0, error, max_error_len,
-			max_succeed, min_fail);
+			max_succeed, min_fail, timeout_specs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __function_name, zbx_result_string(ret));
 
@@ -1963,6 +2006,7 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 	struct snmp_session	*ss;
 	char			error[MAX_STRING_LEN];
 	int			i, j, err = SUCCEED, max_succeed = 0, min_fail = MAX_SNMP_ITEMS + 1;
+	zbx_vector_ptr_t	timeout_specs;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() host:'%s' addr:'%s' num:%d",
 			__function_name, items[0].host.host, items[0].interface.addr, num);
@@ -1975,6 +2019,14 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 
 	if (j == num)	/* all items already NOTSUPPORTED (with invalid key, port or SNMP parameters) */
 		goto out;
+
+	zbx_vector_ptr_create(&timeout_specs);
+
+	if (SUCCEED != parse_snmp_timeout_spec(items[j].params, &timeout_specs, error, sizeof(error)))
+	{
+		err = CONFIG_ERROR;
+		goto exit;
+	}
 
 	if (NULL == (ss = zbx_snmp_open_session(&items[j], error, sizeof(error))))
 	{
@@ -1995,17 +2047,17 @@ void	get_values_snmp(const DC_ITEM *items, AGENT_RESULT *results, int *errcodes,
 			max_vars = 1;
 
 		err = zbx_snmp_process_discovery(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail, max_vars);
+				&max_succeed, &min_fail, &timeout_specs, max_vars);
 	}
 	else if (NULL != strchr(items[j].snmp_oid, '['))
 	{
 		err = zbx_snmp_process_dynamic(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail);
+				&max_succeed, &min_fail, &timeout_specs);
 	}
 	else
 	{
 		err = zbx_snmp_process_standard(ss, items + j, results + j, errcodes + j, num - j, error, sizeof(error),
-				&max_succeed, &min_fail);
+				&max_succeed, &min_fail, &timeout_specs);
 	}
 
 	zbx_snmp_close_session(ss);
@@ -2027,6 +2079,9 @@ exit:
 	{
 		DCconfig_update_interface_snmp_stats(items[j].interface.interfaceid, max_succeed, min_fail);
 	}
+
+	zbx_vector_ptr_clean(&timeout_specs, zbx_ptr_free);
+	zbx_vector_ptr_destroy(&timeout_specs);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
