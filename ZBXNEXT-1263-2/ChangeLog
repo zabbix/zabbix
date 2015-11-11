@@ -1,6 +1,17 @@
+Changes for 3.0.0alpha5
+
+New features:
+
+Bug fixes:
+...G...... [ZBX-10045] fixed first proc.cpu.util[] request returning empty value which was treated as network error by server (wiper)
+.......PS. [ZBX-1916] improved host availability handling by resetting it for disabled hosts, interfaces without enabled items and hosts monitored by offline proxies (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.0alpha4
 
 New features:
+..F....... [ZBX-9985] fixed template search results (vitalijs)
+..F....... [ZBXNEXT-1762] added years, months and half of months periods displaying on graphs X axis (Oleg)
 A.F....... [ZBXNEXT-1679] implemented value map import/export (Ivo)
 ..F....... [ZBXNEXT-1679] added checkbox column in value map list view and bulk "Delete" button (Ivo)
 ..F....... [ZBXNEXT-1679] added "Used in items" column in value map list view and green text "Yes" if value map is used in items or item prototypes (Ivo, Sasha)
@@ -17,6 +28,10 @@ A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in v
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+...G...... [ZBX-2966] fixed handling of possible negative value of vfs.fs.size check (dimir)
+..F....... [ZBX-9977] fixed inconsistent display of acknowledge-related elements when acknowledgement is disabled in configuration (Gunars)
+..F....... [ZBX-9964] fixed undefined index "inventory_mode" in host prototype edit form (Gunars)
+..F....... [ZBXNEXT-1762] fixed time interval calculation and displaying issues in line graphs (Oleg)
 ..F....... [ZBX-9949] fixed undefined index in proxy edit form (Gunars)
 ...G...PS. [ZBX-6028] improved log rotation so that zabbix components do not keep writing to the old log file (dimir)
 .D........ [ZBXNEXT-2637] fixed incorrect double quote character in the default agent configuration files (Richlv)

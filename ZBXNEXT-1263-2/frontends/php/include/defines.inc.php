@@ -19,7 +19,7 @@
 **/
 
 
-define('ZABBIX_VERSION',		'3.0.0alpha4');
+define('ZABBIX_VERSION',		'3.0.0alpha5');
 define('ZABBIX_API_VERSION',	'3.0.0');
 define('ZABBIX_EXPORT_VERSION',	'3.0');
 define('ZABBIX_DB_VERSION',		2050071);
@@ -930,12 +930,12 @@ define('ZBX_API_ERROR_NO_METHOD',	300);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
-define('SEC_PER_MIN',	60);
-define('SEC_PER_HOUR',	3600);
-define('SEC_PER_DAY',	86400);
-define('SEC_PER_WEEK',	604800); // 7 * SEC_PER_DAY
-define('SEC_PER_MONTH',	2592000); // 30 * SEC_PER_DAY
-define('SEC_PER_YEAR',	31536000); // 365 * SEC_PER_DAY
+define('SEC_PER_MIN',			60);
+define('SEC_PER_HOUR',			3600);
+define('SEC_PER_DAY',			86400);
+define('SEC_PER_WEEK',			604800);
+define('SEC_PER_MONTH',			2592000);
+define('SEC_PER_YEAR',			31536000);
 
 define('ZBX_JAN_2038', 2145916800);
 
