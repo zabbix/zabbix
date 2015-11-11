@@ -1195,9 +1195,9 @@ function getTriggersOverview($hostIds, $application, $pageFile, $viewMode = null
 	// get hosts
 	$hostIds = array();
 	foreach ($dbTriggers as $trigger) {
-		$host = reset($trigger['hosts']);
-
-		$hostIds[$host['hostid']] = true;
+		foreach ($trigger['hosts'] as $host) {
+			$hostIds[$host['hostid']] = true;
+		}
 	}
 
 	$hosts = API::Host()->get(array(
