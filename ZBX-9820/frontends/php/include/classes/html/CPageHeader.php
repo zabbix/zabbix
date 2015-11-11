@@ -129,6 +129,7 @@ class CPageHeader {
 		<title>$this->title</title>
 		<meta name="Author" content="Zabbix SIA" />
 		<meta charset="utf-8" />
+		<meta name="msapplication-config" content="none"/>
 		<link rel="shortcut icon" href="images/general/zabbix.ico" />
 
 HTML;
