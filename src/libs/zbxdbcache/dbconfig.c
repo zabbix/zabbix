@@ -6902,6 +6902,7 @@ int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts)
 
 				if (NULL != (proxy = zbx_hashset_search(&config->proxies, &host->proxy_hostid)))
 				{
+					/* SEC_PER_MIN is a tolerance interval, it was chosen arbitrarily */
 					if (ZBX_PROXY_HEARTBEAT_FREQUENCY_MAX + SEC_PER_MIN >= now - proxy->lastaccess)
 						continue;
 				}
