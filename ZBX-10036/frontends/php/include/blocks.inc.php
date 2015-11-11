@@ -675,7 +675,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 	// triggers
 	foreach ($triggers as $trigger) {
 		$host_list = [];
-		foreach($trigger['hosts'] as $trigger_host) {
+		foreach ($trigger['hosts'] as $trigger_host) {
 			$host = $hosts[$trigger_host['hostid']];
 
 			$host_name = (new CSpan($host['name']))
@@ -710,7 +710,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		array_pop($host_list);
 
 		// unknown triggers
-		$unknown = SPACE;
+		$unknown = '';
 		if ($trigger['state'] == TRIGGER_STATE_UNKNOWN) {
 			$unknown = makeUnknownIcon($trigger['error']);
 		}
