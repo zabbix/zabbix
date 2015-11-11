@@ -464,4 +464,5 @@ void	zbx_config_clean(zbx_config_t *cfg);
 
 int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
 void	DCupdate_hosts_availability();
+
 #endif
