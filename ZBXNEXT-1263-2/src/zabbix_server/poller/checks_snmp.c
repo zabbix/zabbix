@@ -50,7 +50,7 @@
  *   HOST-RESOURCES-MIB::hrSWRunPath:<PID> <NAME>
  *
  * SNMP OID as configured in Zabbix to get memory usage of "snmpd" process:
- *   HOST-RESOURCES-MIB::hrSWRunPerfMem["index","HOST-RESOURCES-MIB::hrSWRunPath", "snmpd"]
+ *   HOST-RESOURCES-MIB::hrSWRunPerfMem["index","HOST-RESOURCES-MIB::hrSWRunPath","snmpd"]
  *
  * 1. Zabbix walks hrSWRunPath table and caches all <PID> and <NAME> pairs of particular SNMP agent/user.
  * 2. Before each GET request Zabbix revalidates the cached <PID> by getting its <NAME> from hrSWRunPath table.
