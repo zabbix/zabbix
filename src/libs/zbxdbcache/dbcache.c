@@ -455,7 +455,7 @@ static void	DCflush_trends(ZBX_DC_TREND *trends, int *trends_num, int update_cac
 			}
 			else
 			{
-				zbx_uint128_t avg;
+				zbx_uint128_t	avg;
 
 				ZBX_STR2UINT64(value_min.ui64, row[2]);
 				ZBX_STR2UINT64(value_avg.ui64, row[3]);
@@ -3144,3 +3144,101 @@ zbx_uint64_t	DCget_nextid(const char *table_name, int num)
 	return nextid;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Function: DCupdate_hosts_availability                                      *
+ *                                                                            *
+ * Purpose: performs host availability reset for hosts with availability set  *
+ *          on interfaces without enabled items                               *
+ *                                                                            *
+ ******************************************************************************/
+void	DCupdate_hosts_availability()
+{
+	const char			*__function_name = "DCupdate_hosts_availability";
+	zbx_vector_uint64_pair_t	hosts;
+	char				*sql = NULL;
+	size_t				sql_alloc = 0, sql_offset = 0;
+	int				i;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __function_name);
+
+	zbx_vector_uint64_pair_create(&hosts);
+
+	if (SUCCEED != DCreset_hosts_availability(&hosts))
+		goto out;
+
+	DBbegin();
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < hosts.values_num; i++)
+	{
+		char			delim = ' ';
+		zbx_uint64_pair_t	*pair = &hosts.values[i];
+
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update hosts set");
+
+		if (0 != (pair->second & ZBX_FLAG_INTERFACE_AGENT))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c"
+					"available=%d,"
+					"errors_from=0,"
+					"disable_until=0,"
+					"error=''",
+					delim, HOST_AVAILABLE_UNKNOWN);
+			delim = ',';
+		}
+
+		if (0 != (pair->second & ZBX_FLAG_INTERFACE_SNMP))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c"
+					"snmp_available=%d,"
+					"snmp_errors_from=0,"
+					"snmp_disable_until=0,"
+					"snmp_error=''",
+					delim, HOST_AVAILABLE_UNKNOWN);
+			delim = ',';
+		}
+
+		if (0 != (pair->second & ZBX_FLAG_INTERFACE_IPMI))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c"
+					"ipmi_available=%d,"
+					"ipmi_errors_from=0,"
+					"ipmi_disable_until=0,"
+					"ipmi_error=''",
+					delim, HOST_AVAILABLE_UNKNOWN);
+			delim = ',';
+		}
+
+		if (0 != (pair->second & ZBX_FLAG_INTERFACE_JMX))
+		{
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%c"
+					"jmx_available=%d,"
+					"jmx_errors_from=0,"
+					"jmx_disable_until=0,"
+					"jmx_error=''",
+					delim, HOST_AVAILABLE_UNKNOWN);
+		}
+
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where hostid=" ZBX_FS_UI64 ";\n",
+				hosts.values[i].first);
+
+		if (SUCCEED != DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
+		{
+			DBrollback();
+			goto out;
+		}
+	}
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset && ZBX_DB_OK > DBexecute("%s", sql))
+		goto out;
+
+	DBcommit();
+out:
+	zbx_vector_uint64_pair_destroy(&hosts);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
+}

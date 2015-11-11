@@ -454,4 +454,14 @@ void	zbx_idset_free(zbx_idset_t *idset);
 void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags);
 void	zbx_config_clean(zbx_config_t *cfg);
 
+/* flags to specify which host interfaces have enabled items */
+#define ZBX_FLAG_INTERFACE_NONE		0x00
+#define ZBX_FLAG_INTERFACE_AGENT	0x01
+#define ZBX_FLAG_INTERFACE_SNMP		0x02
+#define ZBX_FLAG_INTERFACE_IPMI		0x04
+#define ZBX_FLAG_INTERFACE_JMX		0x08
+#define ZBX_FLAG_INTERFACE_UNKNOWN	0x80
+
+int	DCreset_hosts_availability(zbx_vector_uint64_pair_t *hosts);
+void	DCupdate_hosts_availability();
 #endif
