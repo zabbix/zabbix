@@ -19,7 +19,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix],[2.5.1])
+AC_INIT([Zabbix],[3.0.0alpha5])
 AC_CONFIG_SRCDIR(src/zabbix_server/server.c)
 AM_INIT_AUTOMAKE
 
@@ -1097,6 +1097,7 @@ have_snmp="no"
 have_ipmi="no"
 have_ipv6="no"
 have_ssh2="no"
+have_tls="no"
 
 if test "x$ipv6" = "xyes"; then
 	AC_DEFINE(HAVE_IPV6,1,[Define to 1 if IPv6 should be enabled.])
@@ -1343,6 +1344,78 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 	PROXY_LIBS="$PROXY_LIBS $OPENIPMI_LIBS"
 fi
 
+dnl Check for mbed TLS (PolarSSL) libpolarssl [by default - skip]
+LIBMBEDTLS_CHECK_CONFIG([no])
+if test "x$want_mbedtls" = "xyes"; then
+	if test "x$have_tls" != "xno"; then
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
+	fi
+
+	if test "x$found_mbedtls" != "xyes"; then
+		AC_MSG_ERROR([mbed TLS (PolarSSL) library libpolarssl not found])
+	elif test "x$accept_mbedtls_version" != "xyes"; then
+		AC_MSG_ERROR([mbed TLS (PolarSSL) library version requirement not met (>= 1.3.9)])
+	else
+		have_tls="mbed TLS"
+	fi
+	TLS_CFLAGS="$MBEDTLS_CFLAGS"
+	TLS_LDFLAGS="$MBEDTLS_LDFLAGS"
+	TLS_LIBS="$MBEDTLS_LIBS"
+fi
+
+dnl Check for GnuTLS libgnutls [by default - skip]
+LIBGNUTLS_CHECK_CONFIG([no])
+if test "x$want_gnutls" = "xyes"; then
+	if test "x$have_tls" != "xno"; then
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
+	fi
+
+	if test "x$found_gnutls" != "xyes"; then
+		AC_MSG_ERROR([GnuTLS library libgnutls not found])
+	elif test "x$accept_gnutls_version" != "xyes"; then
+		AC_MSG_ERROR([GnuTLS library version requirement not met (>= 3.1.18)])
+	else
+		have_tls="GnuTLS"
+	fi
+	TLS_CFLAGS="$GNUTLS_CFLAGS"
+	TLS_LDFLAGS="$GNUTLS_LDFLAGS"
+	TLS_LIBS="$GNUTLS_LIBS"
+fi
+
+dnl Check for OpenSSL libssl and libcrypto [by default - skip]
+LIBOPENSSL_CHECK_CONFIG([no])
+if test "x$want_openssl" = "xyes"; then
+	if test "x$have_tls" != "xno"; then
+		AC_MSG_ERROR([You can configure for only one TLS library (--with-mbedtls, --with-gnutls or --with-openssl).])
+	fi
+
+	if test "x$found_openssl" != "xyes"; then
+		AC_MSG_ERROR([OpenSSL library libssl or libcrypto not found])
+	elif test "x$accept_openssl_version" != "xyes"; then
+		AC_MSG_ERROR([OpenSSL library version requirement not met (>= 1.0.1)])
+	else
+		have_tls="OpenSSL"
+	fi
+	TLS_CFLAGS="$OPENSSL_CFLAGS"
+	TLS_LDFLAGS="$OPENSSL_LDFLAGS"
+	TLS_LIBS="$OPENSSL_LIBS"
+fi
+CFLAGS="$CFLAGS $TLS_CFLAGS"
+SERVER_LDFLAGS="$SERVER_LDFLAGS $TLS_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $TLS_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $TLS_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $TLS_LIBS"
+
+AGENT_LDFLAGS="$AGENT_LDFLAGS $TLS_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $TLS_LIBS"
+
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $TLS_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $TLS_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $TLS_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $TLS_LIBS"
+
 if test "x$java" = "xyes"; then
 	AC_CHECK_PROGS([JAVAC], [javac], [no])
 	if test "x$JAVAC" = "xno"; then
@@ -1420,6 +1493,12 @@ AC_SUBST(PROXY_LIBS)
 
 AC_SUBST(AGENT_LDFLAGS)
 AC_SUBST(AGENT_LIBS)
+
+AC_SUBST(ZBXGET_LDFLAGS)
+AC_SUBST(ZBXGET_LIBS)
+
+AC_SUBST(SENDER_LDFLAGS)
+AC_SUBST(SENDER_LIBS)
 
 dnl *****************************************************************
 dnl *                                                               *
@@ -1545,6 +1624,7 @@ echo "  Server details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
+    TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${SERVER_LDFLAGS}
     Libraries:             ${LIBS} ${SERVER_LIBS}"
@@ -1562,6 +1642,7 @@ echo "  Proxy details:
     SNMP:                  ${have_snmp}
     IPMI:                  ${have_ipmi}
     SSH:                   ${have_ssh2}
+    TLS:                   ${have_tls}
     ODBC:                  ${have_unixodbc}
     Linker flags:          ${LDFLAGS} ${PROXY_LDFLAGS}
     Libraries:             ${LIBS} ${PROXY_LIBS}"
@@ -1574,6 +1655,7 @@ echo "
 if test "x$agent" != "xno"; then
 
 echo "  Agent details:
+    TLS:                   ${have_tls}
     Linker flags:          ${LDFLAGS} ${AGENT_LDFLAGS}
     Libraries:             ${LIBS} ${AGENT_LIBS}"
 

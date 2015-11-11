@@ -325,7 +325,7 @@ var CTimeLine = Class.create({
 	_period:	null,	// selected period
 	_now:		false,	// state if time is set to NOW
 	_isNow:		false,	// state if time is set to NOW (for outside usage)
-	minperiod:	3600,	// minimal allowed period
+	minperiod:	60,		// minimal allowed period
 	maxperiod:	null,	// max period in seconds
 
 	initialize: function(period, starttime, usertime, endtime, maximumPeriod, isNow) {
@@ -1093,23 +1093,12 @@ var CScrollBar = Class.create({
 		addListener(this.dom.info_right, 'click', this.calendarShowRight.bindAsEventListener(this));
 	},
 
-	/**
-	 * Optimization:
-	 * 7200 = 2 * 3600
-	 * 10800 = 3 * 3600
-	 * 21600 = 6 * 3600
-	 * 43200 = 12 * 3600
-	 * 604800 = 7 * 86400
-	 * 1209600 = 14 * 86400
-	 * 2592000 = 30 * 86400
-	 * 7776000 = 90 * 86400
-	 * 15552000 = 180 * 86400
-	 * 31536000 = 365 * 86400
-	 */
 	appendZoomLinks: function() {
 		var timeline = timeControl.timeline.endtime() - timeControl.timeline.starttime();
 		var caption = '';
-		var zooms = [3600, 7200, 10800, 21600, 43200, 86400, 604800, 1209600, 2592000, 7776000, 15552000, 31536000];
+		var zooms = [300, 900, 1800, 3600, 7200, 10800, 21600, 43200, 86400, 259200, 604800, 1209600, 2592000,
+			7776000, 15552000, 31536000
+		];
 		var links = 0;
 
 		for (var key in zooms) {
@@ -1152,7 +1141,7 @@ var CScrollBar = Class.create({
 	appendNavLinks: function() {
 		var timeline = timeControl.timeline.endtime() - timeControl.timeline.starttime();
 		var caption = '';
-		var moves = [3600, 43200, 86400, 604800, 2592000, 15552000, 31536000];
+		var moves = [300, 3600, 43200, 86400, 604800, 2592000, 15552000, 31536000];
 		var links = 0;
 
 		var tmp_laquo = document.createElement('span');
@@ -1599,7 +1588,7 @@ var sbox = Class.create({
 			this.period = this.calcPeriod();
 
 			if (!is_null(this.dom_box)) {
-				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 3600 ? ' [min 1h]' : '');
+				this.dom_period_span.innerHTML = formatTimestamp(this.period, false, true) + (this.period < 60 ? ' [min 1' + locale['S_MINUTE_SHORT'] + ']'  : '');
 			}
 		}
 	},

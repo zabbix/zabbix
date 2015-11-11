@@ -554,6 +554,158 @@ static int	DBpatch_2050054(void)
 
 	return DBadd_foreign_key("opinventory", 1, &field);
 }
+
+static int	DBpatch_2050055(void)
+{
+	DB_RESULT	result;
+	DB_ROW		row;
+	int		ret = FAIL;
+
+	if (NULL == (result = DBselect(
+			"select severity_color_0,severity_color_1,severity_color_2,severity_color_3,severity_color_4,"
+				"severity_color_5"
+			" from config")))
+		return FAIL;
+
+	if (NULL == (row = DBfetch(result))) {
+		goto out;
+	}
+
+	if (0 == strcmp(row[0], "DBDBDB") && 0 == strcmp(row[1], "D6F6FF") &&
+			0 == strcmp(row[2], "FFF6A5") && 0 == strcmp(row[3], "FFB689") &&
+			0 == strcmp(row[4], "FF9999") && 0 == strcmp(row[5], "FF3838")) {
+		if (ZBX_DB_OK > DBexecute(
+				"update config set severity_color_0='97AAB3',severity_color_1='7499FF',"
+					"severity_color_2='FFC859',severity_color_3='FFA059',"
+					"severity_color_4='E97659',severity_color_5='E45959'"))
+			goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	DBfree_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_2050056(void)
+{
+	const ZBX_FIELD field = {"severity_color_0", "97AAB3", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050057(void)
+{
+	const ZBX_FIELD field = {"severity_color_1", "7499FF", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050058(void)
+{
+	const ZBX_FIELD field = {"severity_color_2", "FFC859", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050059(void)
+{
+	const ZBX_FIELD field = {"severity_color_3", "FFA059", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050060(void)
+{
+	const ZBX_FIELD field = {"severity_color_4", "E97659", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050061(void)
+{
+	const ZBX_FIELD field = {"severity_color_5", "E45959", NULL, NULL, 6, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("config", &field);
+}
+
+static int	DBpatch_2050062(void)
+{
+	const ZBX_FIELD field = {"exec_params", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("media_type", &field);
+}
+
+static int	DBpatch_2050063(void)
+{
+	/* type=1 -> type=MEDIA_TYPE_EXEC */
+	if (ZBX_DB_OK > DBexecute("update media_type"
+			" set exec_params='{ALERT.SENDTO}\n{ALERT.SUBJECT}\n{ALERT.MESSAGE}\n'"
+			" where type=1"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2050064(void)
+{
+	const ZBX_FIELD field = {"tls_connect", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050065(void)
+{
+	const ZBX_FIELD field = {"tls_accept", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050066(void)
+{
+	const ZBX_FIELD field = {"tls_issuer", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050067(void)
+{
+	const ZBX_FIELD field = {"tls_subject", "", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050068(void)
+{
+	const ZBX_FIELD field = {"tls_psk_identity", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050069(void)
+{
+	const ZBX_FIELD field = {"tls_psk", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("hosts", &field);
+}
+
+static int	DBpatch_2050070(void)
+{
+	const ZBX_FIELD	field = {"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("globalmacro", &field);
+}
+
+static int	DBpatch_2050071(void)
+{
+	const ZBX_FIELD	field = {"macro", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("hostmacro", &field);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -607,5 +759,22 @@ DBPATCH_ADD(2050051, 0, 1)
 DBPATCH_ADD(2050052, 0, 1)
 DBPATCH_ADD(2050053, 0, 1)
 DBPATCH_ADD(2050054, 0, 1)
+DBPATCH_ADD(2050055, 0, 1)
+DBPATCH_ADD(2050056, 0, 1)
+DBPATCH_ADD(2050057, 0, 1)
+DBPATCH_ADD(2050058, 0, 1)
+DBPATCH_ADD(2050059, 0, 1)
+DBPATCH_ADD(2050060, 0, 1)
+DBPATCH_ADD(2050061, 0, 1)
+DBPATCH_ADD(2050062, 0, 1)
+DBPATCH_ADD(2050063, 0, 1)
+DBPATCH_ADD(2050064, 0, 1)
+DBPATCH_ADD(2050065, 0, 1)
+DBPATCH_ADD(2050066, 0, 1)
+DBPATCH_ADD(2050067, 0, 1)
+DBPATCH_ADD(2050068, 0, 1)
+DBPATCH_ADD(2050069, 0, 1)
+DBPATCH_ADD(2050070, 0, 1)
+DBPATCH_ADD(2050071, 0, 1)
 
 DBPATCH_END()

@@ -87,7 +87,7 @@ abstract class CTriggerGeneral extends CApiService {
 				$trigger['description'] = $dbTrigger['description'];
 			}
 			if (!isset($trigger['expression'])) {
-				$trigger['expression'] = explode_exp($dbTrigger['expression']);
+				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpression($dbTrigger['expression']);
 			}
 		}
 
@@ -132,7 +132,9 @@ abstract class CTriggerGeneral extends CApiService {
 			$newTrigger['dependencies'] = replace_template_dependencies($deps, $chdHost['hostid']);
 		}
 		$expressionData = new CTriggerExpression();
-		$expressionData->parse($trigger['expression']);
+		if (!$expressionData->parse($trigger['expression'])) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $expressionData->error);
+		}
 
 		$newTrigger['expression'] = $trigger['expression'];
 		// replace template separately in each expression, only in beginning (host part)
@@ -176,9 +178,10 @@ abstract class CTriggerGeneral extends CApiService {
 				'hostids' => $chdHost['hostid']
 			]);
 
+			$childTriggers = CMacrosResolverHelper::resolveTriggerExpressions($childTriggers);
+
 			foreach ($childTriggers as $childTrigger) {
-				$tmpExp = explode_exp($childTrigger['expression']);
-				if (strcmp($tmpExp, $newTrigger['expression']) == 0) {
+				if ($childTrigger['expression'] === $newTrigger['expression']) {
 					// we have a trigger with the same description and expression as the parent
 					// convert it to a template trigger
 					$newTrigger['triggerid'] = $childTrigger['triggerid'];
@@ -235,7 +238,7 @@ abstract class CTriggerGeneral extends CApiService {
 			$trigger = $this->extendObject($this->tableName(), $trigger, ['description', 'expression']);
 
 			if ($explodeExpression) {
-				$trigger['expression'] = explode_exp($trigger['expression']);
+				$trigger['expression'] = CMacrosResolverHelper::resolveTriggerExpression($trigger['expression']);
 			}
 		}
 
@@ -257,13 +260,13 @@ abstract class CTriggerGeneral extends CApiService {
 			'nopermissions' => true
 		]);
 
-		foreach ($triggers as $dbTrigger) {
-			$tmpExp = explode_exp($dbTrigger['expression']);
+		$triggers = CMacrosResolverHelper::resolveTriggerExpressions($triggers);
 
+		foreach ($triggers as $dbTrigger) {
 			// check if the expressions are also equal and that this is a different trigger
 			$differentTrigger = (!isset($trigger['triggerid']) || !idcmp($trigger['triggerid'], $dbTrigger['triggerid']));
 
-			if (strcmp($tmpExp, $trigger['expression']) == 0 && $differentTrigger) {
+			if ($dbTrigger['expression'] === $trigger['expression'] && $differentTrigger) {
 				$options = [
 					'output' => ['name'],
 					'templated_hosts' => true,

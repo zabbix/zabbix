@@ -109,7 +109,7 @@ var MMenu = {
 
 	mouseOver: function(show_label) {
 		clearTimeout(this.timeout_reset);
-		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 200);
+		this.timeout_change = setTimeout('MMenu.showSubMenu("' + show_label + '")', 10);
 		PageRefresh.restart();
 	},
 
@@ -128,6 +128,7 @@ var MMenu = {
 		var menu_div = $('sub_' + show_label);
 		if (!is_null(menu_div)) {
 			$(show_label).className = 'selected';
+			$(show_label).firstChild.focus();
 			menu_div.show();
 			for (var key in this.menus) {
 				if (key == show_label) {
@@ -136,9 +137,7 @@ var MMenu = {
 
 				var menu_cell = $(key);
 				if (!is_null(menu_cell)) {
-					if (menu_cell.tagName.toLowerCase() != 'select') {
-						menu_cell.className = '';
-					}
+					menu_cell.className = '';
 				}
 				var sub_menu_cell = $('sub_' + key);
 				if (!is_null(sub_menu_cell)) {
@@ -364,8 +363,22 @@ var jqBlink = {
  */
 var hintBox = {
 
-	createBox: function(e, target, hintText, className, isStatic) {
+	createBox: function(e, target, hintText, className, isStatic, styles) {
 		var box = jQuery('<div></div>').addClass('overlay-dialogue');
+
+		if (styles) {
+			// property1: value1; property2: value2; property(n): value(n)
+
+			var style_list = styles.split(';');
+
+			for (var i = 0; i < style_list.length; i++) {
+				var style_props = style_list[i].split(':');
+
+				if (style_props[1]) {
+					box.css(style_props[0].trim(), style_props[1].trim());
+				}
+			}
+		}
 
 		if (typeof hintText === 'string') {
 			hintText = hintText.replace(/\n/g, '<br />');
@@ -393,14 +406,14 @@ var hintBox = {
 		return box;
 	},
 
-	HintWraper: function(e, target, hintText, className) {
+	HintWraper: function(e, target, hintText, className, styles) {
 		target.isStatic = false;
 
 		jQuery(target).on('mouseenter', function(e, d) {
 			if (d) {
 				e = d;
 			}
-			hintBox.showHint(e, target, hintText, className, false);
+			hintBox.showHint(e, target, hintText, className, false, styles);
 
 		}).on('mouseleave', function(e) {
 			hintBox.hideHint(e, target);
@@ -413,13 +426,13 @@ var hintBox = {
 		jQuery(target).trigger('mouseenter', e);
 	},
 
-	showStaticHint: function(e, target, hint, className, resizeAfterLoad) {
+	showStaticHint: function(e, target, hint, className, resizeAfterLoad, styles) {
 		var isStatic = target.isStatic;
 		hintBox.hideHint(e, target, true);
 
 		if (!isStatic) {
 			target.isStatic = true;
-			hintBox.showHint(e, target, hint, className, true);
+			hintBox.showHint(e, target, hint, className, true, styles);
 
 			if (resizeAfterLoad) {
 				hint.one('load', function(e) {
@@ -429,12 +442,12 @@ var hintBox = {
 		}
 	},
 
-	showHint: function(e, target, hintText, className, isStatic) {
+	showHint: function(e, target, hintText, className, isStatic, styles) {
 		if (target.hintBoxItem) {
 			return;
 		}
 
-		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic);
+		target.hintBoxItem = hintBox.createBox(e, target, hintText, className, isStatic, styles);
 		hintBox.positionHint(e, target);
 		target.hintBoxItem.show();
 	},
@@ -629,7 +642,7 @@ function updateUserProfile(idx, value_int) {
 	});
 }
 
-function changeWidgetState(obj, widgetId) {
+function changeWidgetState(obj, widgetId, url) {
 	var widgetObj = jQuery('#' + widgetId + '_widget'),
 		css = switchElementClass(obj, 'btn-widget-collapse', 'btn-widget-expand'),
 		state = 0;
@@ -645,7 +658,9 @@ function changeWidgetState(obj, widgetId) {
 		state = 1;
 	}
 
-	sendAjaxData('zabbix.php?action=dashboard.widget', {
+	obj.title = (state == 1) ? locale['S_COLLAPSE'] : locale['S_EXPAND'];
+
+	sendAjaxData(url, {
 		data: {
 			widget: widgetId,
 			state: state
@@ -871,39 +886,6 @@ function getConditionFormula(conditions, evalType) {
 jQuery(function ($) {
 	var verticalHeaderTables = {};
 
-	var tablesWidthChangeChecker = function() {
-		for (var tableId in verticalHeaderTables) {
-			if (verticalHeaderTables.hasOwnProperty(tableId)) {
-				var table = verticalHeaderTables[tableId];
-
-				if (table && table.width() != table.data('last-width')) {
-					centerVerticalCellContents(table);
-				}
-			}
-		}
-		setTimeout(tablesWidthChangeChecker, 100);
-	};
-
-	var centerVerticalCellContents = function(table) {
-		var verticalCells = $('.vertical_rotation', table);
-
-		verticalCells.each(function() {
-			var cell = $(this),
-				cellWidth = cell.width();
-
-			if (cellWidth > 30) {
-				cell.children().css({
-					position: 'relative',
-					left: (cellWidth / 2 - 12) + 'px'
-				});
-			}
-		});
-
-		table.data('last-width', table.width());
-	};
-
-	tablesWidthChangeChecker();
-
 	$.fn.makeVerticalRotation = function() {
 		this.each(function(i) {
 			var table = $(this);
@@ -923,10 +905,6 @@ jQuery(function ($) {
 						text: cell.html()
 					}).css({'white-space': 'nowrap'});
 
-				if (IE) {
-					text.css({'font-family': 'monospace'});
-				}
-
 				cell.text('').append(text);
 			});
 
@@ -938,20 +916,16 @@ jQuery(function ($) {
 					width = span.width(),
 					transform = (width / 2) + 'px ' + (width / 2) + 'px';
 
-				var css = {
-					"transform-origin": transform,
-					"-webkit-transform-origin": transform,
-					"-moz-transform-origin": transform,
-					"-o-transform-origin": transform
-				};
-
-				if (IE) {
-					css['font-family'] = 'monospace';
-					css['-ms-transform-origin'] = '50% 50%';
-				}
+				var css = {};
 
 				if (IE9) {
 					css['-ms-transform-origin'] = transform;
+				}
+				else {
+					css['transform-origin'] = transform;
+					css['-webkit-transform-origin'] = transform;
+					css['-moz-transform-origin'] = transform;
+					css['-o-transform-origin'] = transform;
 				}
 
 				var divInner = $('<div>', {
@@ -972,8 +946,6 @@ jQuery(function ($) {
 			cellsToRotate.each(function(i) {
 				$(this).html(betterCells[i]);
 			});
-
-			centerVerticalCellContents(table);
 
 			table.on('remove', function() {
 				delete verticalHeaderTables[table.attr('id')];
