@@ -570,7 +570,7 @@ function make_latest_issues(array $filter = [], $backurl) {
 		'output' => [
 			'triggerid', 'expression', 'description', 'url', 'priority', 'lastchange', 'comments', 'error', 'state'
 		],
-		'selectHosts' => ['hostid', 'name'],
+		'selectHosts' => ['hostid'],
 		'selectLastEvent' => ['eventid', 'acknowledged', 'objectid', 'clock', 'ns'],
 		'withLastEventUnacknowledged' => (isset($filter['extAck']) && $filter['extAck'] == EXTACK_OPTION_UNACK)
 			? true
@@ -590,13 +590,21 @@ function make_latest_issues(array $filter = [], $backurl) {
 	]));
 
 	// get acknowledges
+	$hostids = [];
 	$eventids = [];
 	foreach ($triggers as $trigger) {
+		foreach ($trigger['hosts'] as $host) {
+			$hostids[$host['hostid']] = true;
+		}
+
 		if ($trigger['lastEvent']) {
 			$eventids[] = $trigger['lastEvent']['eventid'];
 		}
 	}
-	if ($eventids) {
+
+	$config = select_config();
+
+	if ($config['event_ack_enable'] && $eventids) {
 		$event_acknowledges = API::Event()->get([
 			'output' => ['eventid'],
 			'eventids' => $eventids,
@@ -605,38 +613,8 @@ function make_latest_issues(array $filter = [], $backurl) {
 		]);
 	}
 
-	$hostids = [];
-	foreach ($triggers as $tnum => $trigger) {
-		// if trigger is lost (broken expression) we skip it
-		if (empty($trigger['hosts'])) {
-			unset($triggers[$tnum]);
-			continue;
-		}
-
-		$hostids = array_merge($hostids, zbx_objectValues($trigger['hosts'], 'hostid'));
-
-		if ($trigger['lastEvent']) {
-			$trigger['lastEvent']['acknowledges'] = isset($event_acknowledges[$trigger['lastEvent']['eventid']])
-				? $event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges']
-				: null;
-		}
-
-		$triggers[$tnum] = $trigger;
-	}
-
-	// get hosts
-	$hosts = API::Host()->get([
-		'hostids' => array_values($hostids),
-		'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
-		'selectGraphs' => API_OUTPUT_COUNT,
-		'selectScreens' => API_OUTPUT_COUNT,
-		'preservekeys' => true
-	]);
-
 	// actions
 	$actions = makeEventsActions($eventids);
-
-	$config = select_config();
 
 	// indicator of sort field
 	if ($show_sort_indicator) {
@@ -666,7 +644,18 @@ function make_latest_issues(array $filter = [], $backurl) {
 			_('Actions')
 		]);
 
+	$hostids = array_keys($hostids);
+
 	$scripts = API::Script()->getScriptsByHosts($hostids);
+
+	// get hosts
+	$hosts = API::Host()->get([
+		'hostids' => $hostids,
+		'output' => ['hostid', 'name', 'status', 'maintenance_status', 'maintenance_type', 'maintenanceid'],
+		'selectGraphs' => API_OUTPUT_COUNT,
+		'selectScreens' => API_OUTPUT_COUNT,
+		'preservekeys' => true
+	]);
 
 	$maintenanceids = [];
 	foreach ($hosts as $host) {
@@ -744,9 +733,14 @@ function make_latest_issues(array $filter = [], $backurl) {
 		}
 
 		if ($config['event_ack_enable']) {
-			$ack = $trigger['lastEvent']
-				? getEventAckState($trigger['lastEvent'], $backurl)
-				: (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
+			if ($trigger['lastEvent']) {
+				$trigger['lastEvent']['acknowledges'] =
+					$event_acknowledges[$trigger['lastEvent']['eventid']]['acknowledges'];
+
+				$ack = getEventAckState($trigger['lastEvent'], $backurl);
+			}
+			else
+				$ack = (new CSpan(_('No events')))->addClass(ZBX_STYLE_GREY);
 		}
 		else {
 			$ack = null;
