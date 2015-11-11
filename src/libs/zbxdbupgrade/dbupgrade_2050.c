@@ -706,6 +706,76 @@ static int	DBpatch_2050071(void)
 	return DBmodify_field_type("hostmacro", &field);
 }
 
+static int	DBpatch_2050072(void)
+{
+	const ZBX_FIELD field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_2050073(void)
+{
+	/* type=3 -> type=USER_TYPE_SUPER_ADMIN */
+	if (ZBX_DB_OK > DBexecute(
+			"update sysmaps set userid=("
+				"select min(u.userid)"
+				" from users u"
+				" where u.type=3)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_2050074(void)
+{
+	const ZBX_FIELD	field = {"userid", NULL, "users", "userid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE};
+
+	return DBmodify_field_type("sysmaps", &field);
+}
+
+static int	DBpatch_2050075(void)
+{
+	const ZBX_FIELD field = {"private", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("sysmaps", &field);
+}
+
+static int	DBpatch_2050076(void)
+{
+	const ZBX_TABLE table =
+		{"sysmap_user",	"sysmapuserid",	0,
+			{
+				{"sysmapuserid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"sysmapid", NULL, "sysmaps", "sysmapid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+				{"userid", NULL, "users", "userid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+				{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			"sysmapid,userid"
+		};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_2050077(void)
+{
+	const ZBX_TABLE table =
+		{"sysmap_usrgrp", "sysmapusrgrpid", 0,
+			{
+				{"sysmapusrgrpid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"sysmapid", NULL, "sysmaps", "sysmapid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+				{"usrgrpid", NULL, "usrgrp", "usrgrpid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, ZBX_FK_CASCADE_DELETE},
+				{"permission", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+				{0}
+			},
+			"sysmapid,usrgrpid"
+		};
+
+	return DBcreate_table(&table);
+}
+
 #endif
 
 DBPATCH_START(2050)
@@ -776,5 +846,11 @@ DBPATCH_ADD(2050068, 0, 1)
 DBPATCH_ADD(2050069, 0, 1)
 DBPATCH_ADD(2050070, 0, 1)
 DBPATCH_ADD(2050071, 0, 1)
+DBPATCH_ADD(2050072, 0, 1)
+DBPATCH_ADD(2050073, 0, 1)
+DBPATCH_ADD(2050074, 0, 1)
+DBPATCH_ADD(2050075, 0, 1)
+DBPATCH_ADD(2050076, 0, 1)
+DBPATCH_ADD(2050077, 0, 1)
 
 DBPATCH_END()
