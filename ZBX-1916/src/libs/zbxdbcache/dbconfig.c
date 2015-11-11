@@ -1481,7 +1481,6 @@ done:
 			host->jmx_errors_from = atoi(row[19]);
 			host->jmx_available = (unsigned char)atoi(row[20]);
 			host->jmx_disable_until = atoi(row[21]);
-
 		}
 		else
 		{
