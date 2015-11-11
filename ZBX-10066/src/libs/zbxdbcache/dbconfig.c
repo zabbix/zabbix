@@ -3729,6 +3729,17 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __function_name);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Helper functions for configuration cache data structure element comparison *
+ * and hash value calculation.                                                *
+ *                                                                            *
+ * The __config_mem_XXX_func(), __config_XXX_hash and __config_XXX_compare    *
+ * functions are used only inside init_configuration_cache() function to      *
+ * initialize internal data structures.                                       *
+ *                                                                            *
+ ******************************************************************************/
+
 static zbx_hash_t	__config_item_hk_hash(const void *data)
 {
 	const ZBX_DC_ITEM_HK	*item_hk = (const ZBX_DC_ITEM_HK *)data;
@@ -3970,7 +3981,8 @@ static int	__config_proxy_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-/* hash and compare functitions for expressions hashset */
+/* hash and compare functions for expressions hashset */
+
 static zbx_hash_t	__config_regexp_hash(const void *data)
 {
 	const ZBX_DC_REGEXP	*regexp = (const ZBX_DC_REGEXP *)data;
@@ -4012,10 +4024,6 @@ static int	__config_psk_compare(const void *d1, const void *d2)
  * Purpose: Allocate shared memory for configuration cache                    *
  *                                                                            *
  * Author: Alexander Vladishev, Aleksandrs Saveljevs                          *
- *                                                                            *
- * Comments: helper functions __config_mem_XXX_func(), __config_XXX_hash,     *
- *           and __config_XXX_compare are only used inside this function      *
- *           for initializing hashset, vector, and heap data structures       *
  *                                                                            *
  ******************************************************************************/
 void	init_configuration_cache(void)
