@@ -266,6 +266,8 @@ static int	discover_service(DB_DCHECK *dcheck, char *ip, int port, char *value)
 								&item.snmpv3_contextname, MACRO_TYPE_COMMON, NULL, 0);
 					}
 
+					item.params = "";
+
 					if (SUCCEED == get_value_snmp(&item, &result) && NULL != GET_STR_RESULT(&result))
 						zbx_strlcpy(value, result.str, DSERVICE_VALUE_LEN_MAX);
 					else

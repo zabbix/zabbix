@@ -138,6 +138,7 @@ ZBX_DC_NUMITEM;
 typedef struct
 {
 	zbx_uint64_t	itemid;
+	const char	*params;
 	const char	*snmp_oid;
 	const char	*snmp_community;
 	const char	*snmpv3_securityname;
@@ -1398,6 +1399,7 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			snmpitem = DCfind_id(&config->snmpitems, itemid, sizeof(ZBX_DC_SNMPITEM), &found);
 
+			DCstrpool_replace(found, &snmpitem->params, row[19]);
 			DCstrpool_replace(found, &snmpitem->snmp_community, row[7]);
 			DCstrpool_replace(found, &snmpitem->snmpv3_securityname, row[10]);
 			snmpitem->snmpv3_securitylevel = (unsigned char)atoi(row[11]);
@@ -1421,6 +1423,7 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			/* remove SNMP parameters for non-SNMP item */
 
+			zbx_strpool_release(snmpitem->params);
 			zbx_strpool_release(snmpitem->snmp_community);
 			zbx_strpool_release(snmpitem->snmp_oid);
 			zbx_strpool_release(snmpitem->snmpv3_securityname);
@@ -1649,6 +1652,7 @@ static void	DCsync_items(DB_RESULT result)
 		{
 			snmpitem = zbx_hashset_search(&config->snmpitems, &itemid);
 
+			zbx_strpool_release(snmpitem->params);
 			zbx_strpool_release(snmpitem->snmp_community);
 			zbx_strpool_release(snmpitem->snmp_oid);
 			zbx_strpool_release(snmpitem->snmpv3_securityname);
@@ -3827,6 +3831,8 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 		case ITEM_TYPE_SNMPv3:
 			snmpitem = zbx_hashset_search(&config->snmpitems, &src_item->itemid);
 
+			dst_item->params = zbx_strdup(NULL, snmpitem->params);
+
 			strscpy(dst_item->snmp_community_orig, snmpitem->snmp_community);
 			strscpy(dst_item->snmp_oid_orig, snmpitem->snmp_oid);
 			strscpy(dst_item->snmpv3_securityname_orig, snmpitem->snmpv3_securityname);
@@ -3985,6 +3991,9 @@ void	DCconfig_clean_items(DC_ITEM *items, int *errcodes, size_t num)
 
 		switch (items[i].type)
 		{
+			case ITEM_TYPE_SNMPv1:
+			case ITEM_TYPE_SNMPv2c:
+			case ITEM_TYPE_SNMPv3:
 			case ITEM_TYPE_DB_MONITOR:
 			case ITEM_TYPE_SSH:
 			case ITEM_TYPE_TELNET:
