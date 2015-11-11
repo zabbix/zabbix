@@ -26,6 +26,188 @@
 
 extern int	CONFIG_SNMP_BULK_REQUESTS;
 
+/* timeout specification */
+
+#define ZBX_MIN_ATTEMPTS	1
+#define ZBX_MAX_ATTEMPTS	20
+#define ZBX_MIN_TIMEOUT		1
+#define ZBX_MAX_TIMEOUT		60
+#define ZBX_MIN_INTERVAL	0
+#define ZBX_MAX_INTERVAL	60
+
+typedef struct
+{
+	int	attempts;
+	int	timeout;
+	int	interval;
+}
+zbx_snmp_timeout_spec_t;
+
+static int	parse_snmp_timeout_spec(const char *text, zbx_vector_ptr_t *specs, char **error)
+{
+	const char		*__function_name = "parse_snmp_timeout_spec";
+
+	int			attempts, timeout, interval;
+	zbx_snmp_timeout_spec_t	*spec;
+	const char		*p;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() text:'%s'", __function_name, text);
+
+	do
+	{
+		while ('\0' != *text && NULL != strchr(ZBX_WHITESPACE, *text))
+			text++;
+
+		if ('\0' == *text)
+			break;
+
+		/* "... attempts / timeout / interval ..." */
+		/*      ^                                  */
+
+		if (NULL == (p = strpbrk(text, "/" ZBX_WHITESPACE)))
+			goto syntax;
+
+		if (SUCCEED != is_uint_n_range(text, p - text, &attempts, 4, ZBX_MIN_ATTEMPTS, ZBX_MAX_ATTEMPTS))
+			goto syntax;
+
+		text = p;
+
+		while ('\0' != *text && NULL != strchr(ZBX_WHITESPACE, *text))
+			text++;
+
+		if ('/' != *text)
+			goto syntax;
+
+		text++;
+
+		while ('\0' != *text && NULL != strchr(ZBX_WHITESPACE, *text))
+			text++;
+
+		/* "... attempts / timeout / interval ..." */
+		/*                 ^                       */
+
+		if (NULL == (p = strpbrk(text, "/" ZBX_WHITESPACE)))
+			goto syntax;
+
+		if (SUCCEED != is_uint_n_range(text, p - text, &timeout, 4, ZBX_MIN_TIMEOUT, ZBX_MAX_TIMEOUT))
+			goto syntax;
+
+		text = p;
+
+		while ('\0' != *text && NULL != strchr(ZBX_WHITESPACE, *text))
+			text++;
+
+		if ('/' != *text)
+			goto syntax;
+
+		text++;
+
+		while ('\0' != *text && NULL != strchr(ZBX_WHITESPACE, *text))
+			text++;
+
+		/* "... attempts / timeout / interval ..." */
+		/*                           ^             */
+
+		p = text + strcspn(text, ZBX_WHITESPACE);
+
+		if (SUCCEED != is_uint_n_range(text, p - text, &interval, 4, ZBX_MIN_INTERVAL, ZBX_MAX_INTERVAL))
+			goto syntax;
+
+		text = p;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): parsed specification #%d (attempts:%d, timeout:%d, interval:%d)",
+				__function_name, specs->values_num + 1, attempts, timeout, interval);
+
+		spec = zbx_malloc(NULL, sizeof(zbx_snmp_timeout_spec_t));
+
+		spec->attempts = attempts;
+		spec->timeout = timeout;
+		spec->interval = interval;
+
+		zbx_vector_ptr_append(specs, spec);
+	}
+	while (1);
+
+	if (0 == specs->values_num)
+	{
+		spec = zbx_malloc(NULL, sizeof(zbx_snmp_timeout_spec_t));
+
+		spec->attempts = 1;
+		spec->timeout = CONFIG_TIMEOUT;
+		spec->interval = 0;
+
+		zbx_vector_ptr_append(specs, spec);
+
+		zabbix_log(LOG_LEVEL_DEBUG, "%s(): using default specification (attempts:%d, timeout:%d, interval:%d)",
+				__function_name, spec->attempts, spec->timeout, spec->interval);
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():SUCCEED specifications:%d", __function_name, specs->values_num);
+
+	return SUCCEED;
+syntax:
+	*error = zbx_dsprintf(*error, "Unexpected SNMP timeout specification syntax near \"%s\".", text);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():FAIL error:'%s'", __function_name, *error);
+
+	return FAIL;
+}
+
+static int	get_attempt_count(const zbx_vector_ptr_t *specs)
+{
+	int	i, count = 0;
+
+	for (i = 0; i < specs->values_num; i++)
+	{
+		const zbx_snmp_timeout_spec_t	*spec = (const zbx_snmp_timeout_spec_t *)specs->values[i];
+
+		count += spec->attempts;
+	}
+
+	return count;
+}
+
+static int	get_attempt_timeout(int attempt, const zbx_vector_ptr_t *specs)
+{
+	int	i;
+
+	for (i = 0; i < specs->values_num; i++)
+	{
+		const zbx_snmp_timeout_spec_t	*spec = (const zbx_snmp_timeout_spec_t *)specs->values[i];
+
+		if (spec->attempts >= attempt)
+			return spec->timeout;
+
+		attempt -= spec->attempts;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	return CONFIG_TIMEOUT;
+}
+
+static int	get_attempt_interval(int attempt, const zbx_vector_ptr_t *specs)
+{
+	int	i;
+
+	for (i = 0; i < specs->values_num; i++)
+	{
+		const zbx_snmp_timeout_spec_t	*spec = (const zbx_snmp_timeout_spec_t *)specs->values[i];
+
+		if (spec->attempts >= attempt)
+		{
+			if (spec->attempts == attempt && i == specs->values_num - 1)
+				return 0;
+
+			return spec->timeout;
+		}
+
+		attempt -= spec->attempts;
+	}
+
+	THIS_SHOULD_NEVER_HAPPEN;
+	return 0;
+}
+
 /*
  * SNMP Dynamic Index Cache
  * ========================
