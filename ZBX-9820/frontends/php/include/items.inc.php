@@ -712,7 +712,6 @@ function getItemsDataOverview($hostIds, $application, $viewMode) {
 				'value_type' => $dbItem['value_type'],
 				'value' => isset($history[$dbItem['itemid']]) ? $history[$dbItem['itemid']][0]['value'] : null,
 				'units' => $dbItem['units'],
-				'name' => $dbItem['name_expanded'],
 				'valuemapid' => $dbItem['valuemapid'],
 				'severity' => $dbItem['priority'],
 				'tr_value' => $dbItem['tr_value'],
