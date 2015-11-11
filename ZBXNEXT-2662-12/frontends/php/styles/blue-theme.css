@@ -61,6 +61,9 @@ a:focus {
 a:active {
   color: #0275b8;
   border-bottom: 1px solid rgba(2, 117, 184, 0.5); }
+a img {
+  border: none;
+  vertical-align: top; }
 
 .link-action {
   border-bottom: 1px dotted;
@@ -2338,9 +2341,16 @@ td.active-bg {
   text-transform: uppercase; }
 
 .clock {
-  margin: .4em 0 1em 0;
+  margin: 2em 0;
   position: relative;
   text-align: center; }
+
+.time-zone {
+  margin: auto;
+  top: -1.55em;
+  left: 0;
+  right: 0;
+  position: absolute; }
 
 .local-clock {
   margin: auto;
@@ -3149,7 +3159,7 @@ title: Links
 name: links
 ---
 
-A link is used to navigate through different parts of the front-end. Action links are used to
+A link is used to navigate through different parts of the front-end. Action links are used to call out any additional content, like contextual menus and popovers.
 
 ```html_example
 <a href="#">Default link</a>
