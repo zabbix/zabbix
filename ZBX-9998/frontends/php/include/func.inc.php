@@ -468,12 +468,13 @@ function convertUnitsUptime($value) {
  * 1y 4d, not 1y 0m 4d or 1y 4d #h.
  *
  * @param int $value	time period in seconds
- * @param bool $ignoreMillisec	without ms (1s 200 ms = 1.2s)
+ * @param bool $ignore_millisec	without ms (1s 200 ms = 1.2s)
  *
  * @return string
  */
-function convertUnitsS($value, $ignoreMillisec = false) {
-	if (($secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000) < 0) {
+function convertUnitsS($value, $ignore_millisec = false) {
+	$secs = round($value * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT) / 1000;
+	if ($secs < 0) {
 		$secs = -$secs;
 		$str = '-';
 	}
@@ -482,68 +483,79 @@ function convertUnitsS($value, $ignoreMillisec = false) {
 	}
 
 	$values = ['y' => null, 'm' => null, 'd' => null, 'h' => null, 'mm' => null, 's' => null, 'ms' => null];
+
+	/*
+	 * $n_unit == 4,	(#y #m #d)
+	 * $n_unit == 3,	(#m #d #h)
+	 * $n_unit == 2,	(#d #h #mm)
+	 * $n_unit == 1,	(#h #mm #s)
+	 * $n_unit == 0,	(#mm #s) or (#mm #s #ms)
+	 */
 	$n_unit = 0;
 
-	if (($n = floor($secs / SEC_PER_YEAR)) != 0) {
+	$n = floor($secs / SEC_PER_YEAR);
+	if ($n != 0) {
 		$secs -= $n * SEC_PER_YEAR;
-		if ($n_unit == 0) {
-			$n_unit = 4;
-		}
+		$n_unit = 4;
+
 		$values['y'] = $n;
 	}
 
-	if (($n = floor($secs / SEC_PER_MONTH)) != 0) {
-		$secs -= $n * SEC_PER_MONTH;
-		// due to imprecise calculations it is possible that the remainder contains 12 whole months but no whole years
-		if ($n == 12) {
-			$values['y']++;
-			$values['m'] = null;
-			if ($n_unit == 0) {
-				$n_unit = 4;
-			}
-		}
-		else {
+	$n = floor($secs / SEC_PER_MONTH);
+	$secs -= $n * SEC_PER_MONTH;
+
+	if ($n == 12) {
+		$values['y']++;
+	}
+	else {
+		if ($n != 0) {
 			$values['m'] = $n;
 			if ($n_unit == 0) {
 				$n_unit = 3;
 			}
 		}
-	}
 
-	if (($n = floor($secs / SEC_PER_DAY)) != 0) {
-		$secs -= $n * SEC_PER_DAY;
-		$values['d'] = $n;
-		if ($n_unit == 0) {
-			$n_unit = 2;
+		$n = floor($secs / SEC_PER_DAY);
+		if ($n != 0) {
+			$secs -= $n * SEC_PER_DAY;
+			$values['d'] = $n;
+			if ($n_unit == 0) {
+				$n_unit = 2;
+			}
 		}
-	}
 
-	if ($n_unit < 4 && ($n = floor($secs / SEC_PER_HOUR)) != 0) {
-		$secs -= $n * SEC_PER_HOUR;
-		$values['h'] = $n;
-		if ($n_unit == 0) {
-			$n_unit = 1;
+		$n = floor($secs / SEC_PER_HOUR);
+		if ($n_unit < 4 && $n != 0) {
+			$secs -= $n * SEC_PER_HOUR;
+			$values['h'] = $n;
+			if ($n_unit == 0) {
+				$n_unit = 1;
+			}
 		}
-	}
 
-	if ($n_unit < 3 && ($n = floor($secs / SEC_PER_MIN)) != 0) {
-		$secs -= $n * SEC_PER_MIN;
-		$values['mm'] = $n;
-	}
-
-	if ($n_unit < 2 && ($n = floor($secs)) != 0) {
-		$secs -= $n;
-		$values['s'] = $n;
-	}
-
-	if ($ignoreMillisec) {
-		if ($n_unit < 1 && ($n = round($secs, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
-			$values['s'] += $n;
+		$n = floor($secs / SEC_PER_MIN);
+		if ($n_unit < 3 && $n != 0) {
+			$secs -= $n * SEC_PER_MIN;
+			$values['mm'] = $n;
 		}
-	}
-	else {
-		if ($n_unit < 1 && ($n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT)) != 0) {
-			$values['ms'] = $n;
+
+		$n = floor($secs);
+		if ($n_unit < 2 && $n != 0) {
+			$secs -= $n;
+			$values['s'] = $n;
+		}
+
+		if ($ignore_millisec) {
+			$n = round($secs, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+			if ($n_unit < 1 && $n != 0) {
+				$values['s'] += $n;
+			}
+		}
+		else {
+			$n = round($secs * 1000, ZBX_UNITS_ROUNDOFF_UPPER_LIMIT);
+			if ($n_unit < 1 && $n != 0) {
+				$values['ms'] = $n;
+			}
 		}
 	}
 
@@ -555,7 +567,7 @@ function convertUnitsS($value, $ignoreMillisec = false) {
 	$str .= isset($values['s']) ? $values['s']._x('s', 'second short').' ' : '';
 	$str .= isset($values['ms']) ? $values['ms']._x('ms', 'millisecond short') : '';
 
-	return $str ? rtrim($str) : 0;
+	return $str ? rtrim($str) : '0';
 }
 
 /**
