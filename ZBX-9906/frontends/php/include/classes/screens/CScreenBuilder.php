@@ -252,6 +252,9 @@ class CScreenBuilder {
 			case SCREEN_RESOURCE_CHART:
 				return new CScreenChart($options);
 
+			case SCREEN_RESOURCE_WEBDETAILS:
+				return new CScreenWebdetails($options);
+
 			default:
 				return null;
 		}

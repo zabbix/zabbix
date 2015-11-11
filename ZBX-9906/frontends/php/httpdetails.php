@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/include/blocks.inc.php';
 $page['title'] = _('Details of scenario');
 $page['file'] = 'httpdetails.php';
 $page['hist_arg'] = array('httptestid');
-$page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js','class.pmaster.js');
+$page['scripts'] = array('class.calendar.js', 'gtlc.js', 'flickerfreescreen.js');
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
 require_once dirname(__FILE__).'/include/page_header.php';
@@ -42,9 +42,11 @@ $fields = array(
 	'fullscreen' =>	array(T_ZBX_INT, O_OPT, P_SYS,	IN('0,1'),	null),
 	// ajax
 	'favobj' =>		array(T_ZBX_STR, O_OPT, P_ACT,	null,		null),
+	'favref' =>		array(T_ZBX_STR, O_OPT, P_ACT,	NOT_EMPTY,	null),
 	'favid' =>		array(T_ZBX_INT, O_OPT, P_ACT,	null,		null),
 	'favstate' =>	array(T_ZBX_INT, O_OPT, P_ACT,	NOT_EMPTY,	null)
 );
+check_fields($fields);
 
 /*
  * Ajax
@@ -60,11 +62,6 @@ if (isset($_REQUEST['favobj'])) {
 			CProfile::update('web.httptest.timelinefixed', $_REQUEST['favid'], PROFILE_TYPE_INT);
 		}
 	}
-
-	if ($_REQUEST['favobj'] == 'hat') {
-		$details = make_webdetails(get_request('httptestid'));
-		$details->show();
-	}
 }
 
 if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
@@ -76,7 +73,7 @@ if ($page['type'] == PAGE_TYPE_JS || $page['type'] == PAGE_TYPE_HTML_BLOCK) {
  * Collect data
  */
 $httpTest = API::HttpTest()->get(array(
-	'httptestids' => get_request('httptestid'),
+	'httptestids' => getRequest('httptestid'),
 	'output' => array('httptestid', 'hostid', 'name'),
 	'selectSteps' => array('httpstepid', 'name', 'no'),
 	'preservekeys' => true
@@ -85,12 +82,20 @@ $httpTest = reset($httpTest);
 if (!$httpTest) {
 	access_deny();
 }
-$itemIds = get_httpstepitems_by_httptestid($httpTest['httptestid'], array('itemid'));
-$itemIds = zbx_objectValues($itemIds, 'itemid');
+
+$httptest_manager = new CHttpTestManager();
+$itemids = $httptest_manager->getHttpStepItems($httpTest['httptestid']);
+$itemids = zbx_objectValues($itemids, 'itemid');
 
 /*
  * Display
  */
+$details_screen_params = array(
+	'resourcetype' => SCREEN_RESOURCE_WEBDETAILS,
+	'mode' => SCREEN_MODE_JS,
+	'dataId' => 'webdetails',
+	'profileIdx2' => $httpTest['httptestid'],
+);
 
 $widget = new CWidget();
 $widget->addPageHeader(
@@ -102,24 +107,16 @@ $widget->addPageHeader(
 		'hat_webdetails_header'
 	),
 	array(
-		get_icon('reset', array('id' => get_request('httptestid'))),
-		get_icon('fullscreen', array('fullscreen' => $_REQUEST['fullscreen']))
+		get_icon('reset', array('id' => getRequest('httptestid'))),
+		get_icon('fullscreen', array('fullscreen' => getRequest('fullscreen')))
 	)
 );
+$details_screen = CScreenBuilder::getScreen($details_screen_params);
+$widget->addItem($details_screen->get());
 $widget->show();
 
-$httpdetails = (new CDiv(new CSpan(_('Loading...'), 'textcolorstyles'), null,'hat_webdetails'));
-$httpdetails->show();
-
-// refresh tab
-$data_refresh = array(
-	array(
-		'id' => 'hat_webdetails',
-		'frequency' => CWebUser::$data['refresh'],
-		'params' => array('httptestid' => $httpTest['httptestid'])
-	)
-);
-add_doll_objects($data_refresh);
+$details_js = new CScreenBase($details_screen_params);
+$details_js->insertFlickerfreeJs();
 
 echo SBR;
 
@@ -150,7 +147,7 @@ $graphInScreen = new CScreenBase(array(
 	'stime' => get_request('stime')
 ));
 
-$graphInScreen->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemIds));
+$graphInScreen->timeline['starttime'] = date(TIMESTAMP_FORMAT, get_min_itemclock_by_itemid($itemids));
 
 $src = 'chart3.php?height=150'.
 	'&name='.$httpTest['name'].
@@ -223,6 +220,7 @@ $graphTimeScreen->insertFlickerfreeJs();
 
 // scroll
 CScreenBuilder::insertScreenScrollJs(array('timeline' => $graphInScreen->timeline));
+CScreenBuilder::insertScreenRefreshTimeJs();
 CScreenBuilder::insertProcessObjectsJs();
 
 $graphsWidget->addItem($graphTable);

@@ -244,21 +244,3 @@ function copyHttpTests($srcHostId, $dstHostId) {
 
 	return (bool) API::HttpTest()->create($httpTests);
 }
-
-/**
- * Get httptest step items by httptestid.
- *
- * @param int $httptestid		ID of httptest
- * @param array $output			requested fields
- *
- * @return array
- */
-
-function get_httpstepitems_by_httptestid($httptestid, array $output) {
-	return DBfetchArray(DBselect(
-		'SELECT hi.'.implode(',hi.', $output).
-		' FROM httpstepitem hi,httpstep hs'.
-		' WHERE hi.httpstepid=hs.httpstepid'.
-			' AND hs.httptestid='.zbx_dbstr($httptestid)
-	));
-}

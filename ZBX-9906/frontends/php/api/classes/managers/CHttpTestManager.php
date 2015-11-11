@@ -1087,4 +1087,21 @@ class CHttpTestManager {
 
 		return $data;
 	}
+
+	/**
+	 * Get httptest step items by httptestid.
+	 *
+	 * @param str $httptestid		ID of httptest
+	 *
+	 * @return array
+	 */
+	public function getHttpStepItems($httptestid) {
+		return DBfetchArray(DBselect(
+			'SELECT hi.itemid'.
+			' FROM httpstepitem hi,httpstep hs'.
+			' WHERE hi.httpstepid=hs.httpstepid'.
+			' AND hs.httptestid='.zbx_dbstr($httptestid)
+		));
+	}
+
 }
