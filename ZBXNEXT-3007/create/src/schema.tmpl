@@ -776,6 +776,8 @@ FIELD		|label_string_image|t_varchar(255)|''	|NOT NULL	|0
 FIELD		|iconmapid	|t_id		|	|NULL		|0			|2|icon_map	|		|RESTRICT
 FIELD		|expand_macros	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|severity_min	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|3|users
+FIELD		|private	|t_integer	|'1'	|NOT NULL	|0
 UNIQUE		|1		|name
 INDEX		|2		|backgroundid
 INDEX		|3		|iconmapid
@@ -841,6 +843,20 @@ FIELD		|name		|t_varchar(255)	|	|NOT NULL	|0
 FIELD		|url		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|elementtype	|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|sysmapid,name
+
+TABLE|sysmap_user|sysmapuserid|ZBX_DATA
+FIELD		|sysmapuserid|t_id		|	|NOT NULL	|0
+FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|2|users
+FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
+UNIQUE		|1		|sysmapid,userid
+
+TABLE|sysmap_usrgrp|sysmapusrgrpid|ZBX_DATA
+FIELD		|sysmapusrgrpid|t_id		|	|NOT NULL	|0
+FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0			|2|usrgrp
+FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
+UNIQUE		|1		|sysmapid,usrgrpid
 
 TABLE|maintenances_hosts|maintenance_hostid|ZBX_DATA
 FIELD		|maintenance_hostid|t_id	|	|NOT NULL	|0
@@ -1307,4 +1323,4 @@ FIELD		|inventory_mode	|t_integer	|'0'	|NOT NULL	|0
 TABLE|dbversion||
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|2050071	|2050071
+ROW		|2050077	|2050077
