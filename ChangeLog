@@ -3,6 +3,7 @@ Changes for 3.0.0alpha5
 New features:
 
 Bug fixes:
+.......PS. [ZBX-10061] fixed possible server and proxy crash on attempt to clean up text cache if log item meta update packets are present in history cache (gleb)
 ...G...... [ZBX-10045] fixed first proc.cpu.util[] request returning empty value which was treated as network error by server (wiper)
 .......PS. [ZBX-1916] improved host availability handling by resetting it for disabled hosts, interfaces without enabled items and hosts monitored by offline proxies (wiper)
 
@@ -239,6 +240,18 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 .D........ [ZBX-5166] replaced '-' with '\-' in man-pages (Andris)
 ...G...PS. [ZBX-8391] added stronger command-line parameter validation, revised help and version messages, revised man-pages for Zabbix server, proxy, agent, sender and get utilities (Andris)
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
+
+--------------------------------------------------------------------------------
+Changes for 2.4.8rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.4.7
+
+2.4.7rc1 was released as 2.4.7 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.4.7rc1
@@ -937,6 +950,18 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ...G...... [ZBX-7413] fixed inconsistency of config file handling for loading and checking userparameters and aliases before starting the daemon (igors)
 ...G...... [ZBX-7412] fixed alias parsing; colon symbols are now supported in alias parameters (Juris)
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
+
+--------------------------------------------------------------------------------
+Changes for 2.2.12rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.11
+
+2.2.11rc1 was released as 2.2.11 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.2.11rc1
@@ -2255,6 +2280,18 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-5142] changed media type field label from 'Description' to 'Name' (Vedmak)
 ....I..... [ZBX-5314] increased size of autoincrement fields for PostgreSQL database (Sasha)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
+
+--------------------------------------------------------------------------------
+Changes for 2.0.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.16
+
+2.0.16rc1 was released as 2.0.16 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 2.0.16rc1
