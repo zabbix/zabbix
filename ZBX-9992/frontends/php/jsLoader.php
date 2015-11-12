@@ -213,7 +213,6 @@ $tranStrings = [
 		'Remove' => _('Remove'),
 		'Remove all' => _('Remove all'),
 		'Scripts' => _('Scripts'),
-		'Service "%1$s"' => _('Service "%1$s"'),
 		'Submap' => _('Submap'),
 		'Trigger' => _('Trigger'),
 		'Triggers' => _('Triggers'),

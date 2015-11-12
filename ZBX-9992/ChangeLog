@@ -1,13 +1,47 @@
+Changes for 3.0.0alpha5
+
+New features:
+
+Bug fixes:
+..F....... [ZBX-9992] fixed forecast() function info index for trigger expression constructor (gleb)
+.......PS. [ZBX-10061] fixed possible server and proxy crash on attempt to clean up text cache if log item meta update packets are present in history cache (gleb)
+...G...... [ZBX-10045] fixed first proc.cpu.util[] request returning empty value which was treated as network error by server (wiper)
+.......PS. [ZBX-1916] improved host availability handling by resetting it for disabled hosts, interfaces without enabled items and hosts monitored by offline proxies (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 3.0.0alpha4
 
 New features:
-A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish and Russian translations; thanks to Zabbix translators (Richlv)
+..F....... [ZBX-9985] fixed template search results (vitalijs)
+..F....... [ZBXNEXT-1762] added years, months and half of months periods displaying on graphs X axis (Oleg)
+A.F....... [ZBXNEXT-1679] implemented value map import/export (Ivo)
+..F....... [ZBXNEXT-1679] added checkbox column in value map list view and bulk "Delete" button (Ivo)
+..F....... [ZBXNEXT-1679] added "Used in items" column in value map list view and green text "Yes" if value map is used in items or item prototypes (Ivo, Sasha)
+..F....... [ZBXNEXT-1679] added value map sorting by name (Ivo)
+..F....... [ZBXNEXT-1679] added limit for the amount of records and paging in value maps (Ivo)
+..F....... [ZBXNEXT-1679] replaced built-in confirmation dialog with modal window dialog for image import when selecting "Update existing" (Ivo)
+A.F....PS. [ZBXNEXT-2683] added user macro context (Ivo, Oleg, Sasha, wiper)
+..F....... [ZBX-2616] updated bundled DejaVu font from 2.34 to 2.35 (Richlv)
+A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
+A.F....... [ZBX-1357] updated Brazilian Portuguese, Czech, Finnish, Japanese, Polish, Russian and Slovak translations; thanks to Zabbix translators (Richlv)
 ..F....... [ZBXNEXT-2678] implemented trigger description and URL popups in the dashboard's "Last 20 issues" and screen element's "Host group issues" and "Host issues" (Ivo)
 ..F....... [ZBX-2517] minimum period for time navigator set to 5 minutes; thanks to Zabbix community (Alexei)
 A.F....... [ZBXNEXT-1424] implemented value mapping API, added clone button in value map edit form and slightly improved performance of value map caching in frontend (Ivo, Sasha)
 ...G...... [ZBXNEXT-2960] reduced the default MaxLinesPerSecond value to 20 (Richlv)
 
 Bug fixes:
+...G...... [ZBX-2966] fixed handling of possible negative value of vfs.fs.size check (dimir)
+..F....... [ZBX-9977] fixed inconsistent display of acknowledge-related elements when acknowledgement is disabled in configuration (Gunars)
+..F....... [ZBX-9964] fixed undefined index "inventory_mode" in host prototype edit form (Gunars)
+..F....... [ZBXNEXT-1762] fixed time interval calculation and displaying issues in line graphs (Oleg)
+..F....... [ZBX-9949] fixed undefined index in proxy edit form (Gunars)
+...G...PS. [ZBX-6028] improved log rotation so that zabbix components do not keep writing to the old log file (dimir)
+A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
+A.F....... [ZBX-9888] added validation in action condition formula to prohibit comparison of several triggers with "AND" operator (Gunars)
+A......... [ZBX-9975] fixed undefined index when updating trigger prototype (Gunars)
+........S. [ZBX-9959] fixed JSON validation: produce an error on invalid escape sequences in a string value (dimir)
+A.F....... [ZBX-7202] fixed action disabling when deleting user or user group (Gunars)
+..F....... [ZBX-9970] removed service label from configuration popup menu (Gunars)
 ..F....... [ZBX-9945] fixed updating of "Device uniqueness criterias" while editing discovery checks (Sasha, vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
@@ -209,12 +243,27 @@ A......... [ZBX-8660] fixed API to disallow deleting of discovered items, trigge
 ....I..... [ZBX-8658] made various changes to ODBC related m4 scripts to improve readability and library function availability (Juris)
 
 --------------------------------------------------------------------------------
+Changes for 2.4.8rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.4.7
+
+2.4.7rc1 was released as 2.4.7 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.4.7rc1
 
 New features:
+..F....... [ZBX-2616] update bundled DejaVu font from 2.34 to 2.35 (Richlv)
 A.F....... [ZBX-1357] updated Chinese (China), Chinese (Taiwan), Czech, French, Italian, Russian and Turkish translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
+........S. [ZBX-9959] fixed JSON validation: produce an error on invalid escape sequences in a string value (dimir)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
@@ -904,12 +953,26 @@ A......... [ZBX-4772] fixed possibility to pass incorrect host status value (Ivo
 ........S. [ZBX-7204] fixed timestamp order of events generated during network discovery (igors)
 
 --------------------------------------------------------------------------------
+Changes for 2.2.12rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.2.11
+
+2.2.11rc1 was released as 2.2.11 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.2.11rc1
 
 New features:
+..F....... [ZBX-2616] update bundled DejaVu font from 2.34 to 2.35 (Richlv)
 A.F....... [ZBX-1357] updated Czech, Italian and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ...G...... [ZBX-9967] fixed agent compilation error on NetBSD 7 (dimir)
 .D........ [ZBX-9347] added information about zabbix_sender input file format to the man page (dimir, Richlv)
@@ -2220,12 +2283,25 @@ A......... [ZBX-5498] applications API refactoring (Vedmak)
 ..F....... [ZBX-1845] added tabs to host massupdate form (Vedmak)
 
 --------------------------------------------------------------------------------
+Changes for 2.0.17rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 2.0.16
+
+2.0.16rc1 was released as 2.0.16 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 2.0.16rc1
 
 New features:
 A.F....... [ZBX-1357] updated Czech and Russian translations; thanks to Zabbix translators (Richlv)
 
 Bug fixes:
+A......... [ZBX-8235] fixed losing initial values when updating templated items (Gunars)
 A......... [ZBX-9935] added check for item delay, to be between 0 and 86400 seconds (vitalijs)
 ........S. [ZBX-9858] added error message logging when SNMP trapper file size exceeds 2GB (wiper)
 A......... [ZBX-9738] fixed deletion of related action operations when deleting a host group (Gunars)
