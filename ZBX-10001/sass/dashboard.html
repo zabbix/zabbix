@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Zabbix | Hosts</title>
+		<link rel="stylesheet" href="stylesheets/screen.css">
+		<!--<link rel="stylesheet" href="stylesheets/dark-theme.css">-->
+        <link rel="icon" href="favicon.ico">
+        <link rel="apple-touch-icon-precomposed" sizes="76x76" href="apple-touch-icon-76x76-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="120x120" href="apple-touch-icon-120x120-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="152x152" href="apple-touch-icon-152x152-precomposed.png">
+        <link rel="apple-touch-icon-precomposed" sizes="180x180" href="apple-touch-icon-180x180-precomposed.png">
+        <link rel="icon" sizes="192x192" href="touch-icon-192x192.png">
+        <meta name="msapplication-TileImage" content="ms-tile-144x144.png"> 
+        <meta name="msapplication-TileColor" content="#d40000">
+	</head>
+<body>
+	<header role="banner">
+		<div class="nav" role="navigation">
+			<div class="top-nav-container">
+			<ul class="top-nav"><li class="selected"><a href="">Monitoring</a></li><li><a href="filter-collapsed.html">Inventory</a></li><li><a href="forms.html">Reports</a></li><li><a href="">Configuration</a></li><li><a href="">Administration</a></li></ul><ul class="top-nav-icons"><li><form><input type="text"><button type="button" class="btn-search"></button></form><!--<ul class="search-suggest" style="top: 31px"><li class="suggest-hover"><span class="suggest-found">Za</span>bbix server</li><li><span class="suggest-found">Za</span>bbix server<li>Zabbix server</li></ul>--></li><li><a href="" class="top-nav-help" title="Help"></a></li><li><a href="" class="top-nav-zbbshare" title="Zabbix Share">Share</a></li><!--<li><a href="" class="top-nav-print" title="Print"></a></li>--><li><a href="" class="top-nav-profile" title="Profile"></a></li><li><a href="" class="top-nav-signout" title="Sign out"></a></li></ul>
+			</div>
+			<div class="top-subnav-container">
+			<ul class="top-subnav"><li><a href="" class="selected">Dashboard</a></li><li><a href="">Overview</a></li><li><a href="">Web</a></li><li><a href="">Latest data</a></li><li><a href="">Triggers</a></li><li><a href="">Events</a></li><li><a href="">Graphs</a></li><li><a href="">Screens</a></li><li><a href="">Maps</a></li><li><a href="">Discovery</a></li><li><a href="">IT services</a></li></ul>
+            <div class="server-name">This is a loooooooong loooooooong loooooooong loooooooong server name</div>
+			</div>
+		</div>
+	</header>
+	<div class="article">
+	<div class="header-title">
+	<h1>Dashboard</h1>
+	<form><ul><li><label for="groupid">Group</label>&nbsp;<select id="groupid"><option>All</option><option>Zabbix</option></select></li><li><button type="button">Import</button></li><li><button type="button" class="btn-conf" title="Configuration"></button><div class="active-indic" title="Enabled"></div></li><li><button type="button" class="btn-max" title="Maximize"></button></li><li><button type="button" class="btn-min" title="Restore"></button></li><li><button type="button" class="btn-add-fav" title="Add to dashboard"></button></li><li><button type="button" class="btn-remove-fav" title="Remove from dashboard"></button></li><li><button type="button" class="btn-action" title="Action"></button></li><li><button type="button" class="btn-info" title="Info"></button></li><li><button type="button" class="btn-reset" title="Reset"></button></li></ul></form>
+	</div>
+	<div class="table widget-placeholder">
+	<div class="row">
+	<div class="cell">
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head cursor-move">
+		<h4>Favorite screens</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<tbody>
+			<tr>
+				<td><a href="#">Zabbix server</a></td>
+			</tr>
+			<tr>
+				<td><a href="#">My 2nd megaserver</a></td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li><a href="#">Screens</a></li><li><a href="#">Slide shows</a></li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head cursor-move">
+		<h4>Favorite graphs</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<tbody>
+			<tr class="nothing-to-show">
+				<td>No graphs added</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li><a href="#">Graphs</a></li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head cursor-move">
+		<h4>Favorite maps</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+	</div>
+	</div>
+	<div class="cell">
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head cursor-move">
+		<h4>Status of Zabbix</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+        <div class="msg-bad">
+    Oh snap! Check form fields and try submitting again.
+    <div class="msg-details"><span class="link-action">Details</span>
+    <ul class="msg-details-border">
+    <li>Something</li>
+    <li>Something</li>
+    <li>Something</li>
+    <li>Something</li>
+    </ul></div>
+    <span class="overlay-close-btn" title="Close"></span>
+    </div>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Parameter</th>
+			<th>Value</th>
+			<th>Details</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><pre>Zabbix server is running</pre></td><td><span class="green">Yes</span></td><td>Localhost: 10051</td>
+			</tr>
+			<tr>
+				<td>Number of hosts (enabled/disabled/templates)</td><td>25</td><td><span class="green">2</span>/<span class="red">0</span>/<span class="grey">23</span></td>
+			</tr>
+			<tr>
+				<td>Number of items (enabled/disabled/not supported)</td><td>67</td><td><span class="green">62</span>/<span class="red">2</span>/<span class="grey">3</span></td>
+			</tr>
+			<tr>
+				<td>Number of triggers (enabled/disabled/[problem/ok])</td><td>40</td><td>40/0/[<span class="red">0</span>/<span class="green">40</span>]</td>
+			</tr>
+			<tr>
+				<td>Number of users (online)</td><td>2</td><td><span class="green">1</span></td>
+			</tr>
+			<tr>
+				<td>Required server performance, new values per second</td><td>0.86</td><td>&ndash;</td>
+			</tr>
+		</tbody>
+		</table>
+        <div>
+        <pre class="debug-output"><a name="debug"></a>******************** Script profiler ********************<br>Total time: 0.024499<br>Total SQL time: 0.015921<br>SQL count: 33 (selects: 22 | executes: 11)<br>Peak memory usage: 3.75M<br>Memory limit: 512M<br><br>1. <b>drule.get</b> [CControllerDashboardView.php:53]<br><br><table><tbody><tr><td>Parameters:<br>Array
+(
+    [output] =&gt; Array
+        (
+        )
+
+    [filter] =&gt; Array
+        (
+            [status] =&gt; 0
+        )
+
+    [limit] =&gt; 1
+)
+</td><td>Result:<br>Array
+(
+    [0] =&gt; Array
+        (
+            [druleid] =&gt; 3
+        )
+
+)
+</td></tr></tbody></table><br>2. <b>graph.get</b> [blocks.inc.php:57]<br><br><table><tbody><tr><td>Parameters:<br>Array
+(
+    [output] =&gt; Array
+        (
+            [0] =&gt; graphid
+            [1] =&gt; name
+        )
+
+    [selectHosts] =&gt; Array
+        (
+            [0] =&gt; hostid
+            [1] =&gt; name
+        )
+
+    [expandName] =&gt; 1
+    [graphids] =&gt; Array
+        (
+            [700135] =&gt; 700135
+            [700127] =&gt; 700127
+            [700132] =&gt; 700132
+            [700133] =&gt; 700133
+            [700136] =&gt; 700136
+            [700129] =&gt; 700129
+            [700134] =&gt; 700134
+            [700128] =&gt; 700128
+        )
+
+    [preservekeys] =&gt; 1
+)
+</td><td>Result:<br>Array
+(
+    [700127] =&gt; Array
+        (
+            [graphid] =&gt; 700127
+            [name] =&gt; CPU jumps
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700128] =&gt; Array
+        (
+            [graphid] =&gt; 700128
+            [name] =&gt; Test graph 1
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700129] =&gt; Array
+        (
+            [graphid] =&gt; 700129
+            [name] =&gt; Memory usage
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700132] =&gt; Array
+        (
+            [graphid] =&gt; 700132
+            [name] =&gt; CPU load
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700133] =&gt; Array
+        (
+            [graphid] =&gt; 700133
+            [name] =&gt; CPU utilization
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700134] =&gt; Array
+        (
+            [graphid] =&gt; 700134
+            [name] =&gt; Swap usage
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700135] =&gt; Array
+        (
+            [graphid] =&gt; 700135
+            [name] =&gt; Network traffic on eth0
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700136] =&gt; Array
+        (
+            [graphid] =&gt; 700136
+            [name] =&gt; Disk space usage /
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+)
+</td></tr></tbody></table><br>3. <b>graph.get</b> [CMenuPopupHelper.php:57]<br><br><table><tbody><tr><td>Parameters:<br>Array
+(
+    [output] =&gt; Array
+        (
+            [0] =&gt; graphid
+            [1] =&gt; name
+        )
+
+    [selectHosts] =&gt; Array
+        (
+            [0] =&gt; hostid
+            [1] =&gt; name
+        )
+
+    [expandName] =&gt; 1
+    [graphids] =&gt; Array
+        (
+            [0] =&gt; 700135
+            [1] =&gt; 700127
+            [2] =&gt; 700132
+            [3] =&gt; 700133
+            [4] =&gt; 700136
+            [5] =&gt; 700129
+            [6] =&gt; 700134
+            [7] =&gt; 700128
+        )
+
+    [preservekeys] =&gt; 1
+)
+</td><td>Result:<br>Array
+(
+    [700127] =&gt; Array
+        (
+            [graphid] =&gt; 700127
+            [name] =&gt; CPU jumps
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700128] =&gt; Array
+        (
+            [graphid] =&gt; 700128
+            [name] =&gt; Test graph 1
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700129] =&gt; Array
+        (
+            [graphid] =&gt; 700129
+            [name] =&gt; Memory usage
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700132] =&gt; Array
+        (
+            [graphid] =&gt; 700132
+            [name] =&gt; CPU load
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700133] =&gt; Array
+        (
+            [graphid] =&gt; 700133
+            [name] =&gt; CPU utilization
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700134] =&gt; Array
+        (
+            [graphid] =&gt; 700134
+            [name] =&gt; Swap usage
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700135] =&gt; Array
+        (
+            [graphid] =&gt; 700135
+            [name] =&gt; Network traffic on eth0
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700136] =&gt; Array
+        (
+            [graphid] =&gt; 700136
+            [name] =&gt; Disk space usage /
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+)
+</td></tr></tbody></table><br><br><b>SQL (0.000244): <span class="red">SET search_path = 'public'</span></b><br>zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:82<br><br>SQL (0.000132): <span class="red">SET bytea_output = escape</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:93</span><br><br>SQL (0.003804): <span class="green">SELECT 1 FROM information_schema.tables WHERE table_catalog='s_hudson_25' AND table_schema='public' AND table_name='dbversion'</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DbBackend-&gt;checkDbVersion() → PostgresqlDbBackend-&gt;checkDbVersionTable() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/db/PostgresqlDbBackend.php:41</span><br><br>SQL (0.000347): <span class="green">SELECT dv.mandatory,dv.optional FROM dbversion dv</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DbBackend-&gt;checkDbVersion() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/db/DbBackend.php:46</span><br><br>SQL (0.000572): <span class="green">SELECT NULL FROM config c</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DbBackend-&gt;checkConfig() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/db/DbBackend.php:62</span><br><br>SQL (5.5E-5): <span class="red">BEGIN</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBstart() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:251</span><br><br>SQL (0.000597): <span class="green">SELECT u.userid,u.autologout,s.lastaccess FROM sessions s,users u WHERE s.sessionid='529c55c93ce6817446a848855a1e39bf' AND s.status=0 AND s.userid=u.userid AND (s.lastaccess+u.autologout&gt;1436281028 OR u.autologout=0)</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1116</span><br><br>SQL (0.000346): <span class="green">SELECT g.usrgrpid FROM usrgrp g,users_groups ug WHERE ug.userid='1' AND g.usrgrpid=ug.usrgrpid AND g.users_status=1 LIMIT 1 OFFSET 0</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → check_perm2system() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/perm.inc.php:75</span><br><br>SQL (0.000202): <span class="red">UPDATE sessions SET lastaccess=1436281028 WHERE userid='1' AND sessionid='529c55c93ce6817446a848855a1e39bf'</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1141</span><br><br>SQL (0.000223): <span class="green">SELECT MAX(g.gui_access) AS gui_access FROM usrgrp g,users_groups ug WHERE ug.userid='1' AND g.usrgrpid=ug.usrgrpid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1149</span><br><br>SQL (0.000145): <span class="green">SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type, u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page FROM users u WHERE u.userid='1'</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → CUser-&gt;_getUserData() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1173</span><br><br>SQL (0.000141): <span class="green">SELECT ug.userid FROM usrgrp g,users_groups ug WHERE ug.userid='1' AND g.usrgrpid=ug.usrgrpid AND g.debug_mode=1</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → CUser-&gt;_getUserData() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1181</span><br><br>SQL (0.00329): <span class="blue">COMMIT</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBend() → DBcommit() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:312</span><br><br>SQL (6.8E-5): <span class="red">BEGIN</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBstart() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:251</span><br><br>SQL (0.00036): <span class="green">SELECT   dr.druleid FROM drules dr WHERE dr.status='0' LIMIT 1 OFFSET 0</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CDRule-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CDRule.php:140</span><br><br>SQL (6.5E-5): <span class="blue">COMMIT</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBend() → DBcommit() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:312</span><br><br>SQL (0.001204): <span class="green">SELECT p.* FROM profiles p WHERE p.userid=1 ORDER BY p.userid,p.profileid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → CProfile::get() → CProfile::init() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/user/CProfile.php:42</span><br><br>SQL (0.000259): <span class="green">SELECT p.value_id,p.source FROM profiles p WHERE p.userid=1 AND p.idx='web.favorite.graphids' ORDER BY p.profileid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFavorite::get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/user/CFavorite.php:56</span><br><br>SQL (5.6E-5): <span class="red">BEGIN</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBstart() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:251</span><br><br>SQL (0.000439): <span class="green">SELECT   g.graphid,g.name FROM graphs g WHERE (g.graphid BETWEEN '700132' AND '700136' OR g.graphid IN ('700127','700128','700129')) AND g.flags IN ('0','4')</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CGraph.php:296</span><br><br>SQL (0.000606): <span class="green">SELECT i.hostid,gi.graphid,h.host FROM graphs_items gi,items i,hosts h WHERE gi.itemid=i.itemid AND i.hostid=h.hostid AND 1=0 ORDER BY gi.sortorder</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CMacrosResolverHelper::resolveGraphNameByIds() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/macros/CMacrosResolverHelper.php:432</span><br><br>SQL (0.000624): <span class="green">SELECT gi.graphid,i.hostid FROM graphs_items gi,items i WHERE (gi.graphid BETWEEN '700132' AND '700136' OR gi.graphid IN ('700127','700128','700129')) AND gi.itemid=i.itemid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CGraph-&gt;addRelatedObjects() → CGraphGeneral-&gt;addRelatedObjects() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CGraphGeneral.php:357</span><br><br>SQL (0.000213): <span class="green">SELECT   h.hostid,h.name FROM hosts h WHERE h.flags IN (0,4) AND h.hostid='50026' AND h.status IN (0,1,3)</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CGraph-&gt;addRelatedObjects() → CGraphGeneral-&gt;addRelatedObjects() → CHost-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CHost.php:434</span><br><br>SQL (9.0E-5): <span class="blue">COMMIT</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBend() → DBcommit() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:312</span><br><br>SQL (0.000169): <span class="green">SELECT p.value_id,p.source FROM profiles p WHERE p.userid=1 AND p.idx='web.favorite.sysmapids' ORDER BY p.profileid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteMaps() → getFavouriteMapsData() → CFavorite::get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/user/CFavorite.php:56</span><br><br>SQL (0.000164): <span class="green">SELECT p.value_id,p.source FROM profiles p WHERE p.userid=1 AND p.idx='web.favorite.screenids' ORDER BY p.profileid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteScreens() → getFavouriteScreensData() → CFavorite::get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/user/CFavorite.php:56</span><br><br>SQL (8.5E-5): <span class="red">BEGIN</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBstart() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:251</span><br><br>SQL (0.000205): <span class="green">SELECT   g.graphid,g.name FROM graphs g WHERE (g.graphid BETWEEN '700132' AND '700136' OR g.graphid IN ('700127','700128','700129')) AND g.flags IN ('0','4')</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CGraph.php:296</span><br><br>SQL (0.000166): <span class="green">SELECT i.hostid,gi.graphid,h.host FROM graphs_items gi,items i,hosts h WHERE gi.itemid=i.itemid AND i.hostid=h.hostid AND 1=0 ORDER BY gi.sortorder</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CMacrosResolverHelper::resolveGraphNameByIds() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/macros/CMacrosResolverHelper.php:432</span><br><br>SQL (0.000409): <span class="green">SELECT gi.graphid,i.hostid FROM graphs_items gi,items i WHERE (gi.graphid BETWEEN '700132' AND '700136' OR gi.graphid IN ('700127','700128','700129')) AND gi.itemid=i.itemid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CGraph-&gt;addRelatedObjects() → CGraphGeneral-&gt;addRelatedObjects() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CGraphGeneral.php:357</span><br><br>SQL (0.000193): <span class="green">SELECT   h.hostid,h.name FROM hosts h WHERE h.flags IN (0,4) AND h.hostid='50026' AND h.status IN (0,1,3)</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CGraph-&gt;addRelatedObjects() → CGraphGeneral-&gt;addRelatedObjects() → CHost-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CHost.php:434</span><br><br>SQL (8.7E-5): <span class="blue">COMMIT</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBend() → DBcommit() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:312</span><br><br>SQL (0.000361): <span class="green">SELECT c.* FROM config c</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → local_generateHeader() → CView-&gt;getOutput() → include() → select_config() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/profiles.inc.php:33</span><br><br></pre>
+</div>
+		<ul class="dashbrd-widget-foot"><li>Updated 17:51:21</li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head cursor-move">
+		<h4>Host status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Host group</th>
+			<th>Without problems</th>
+			<th>With problems</th>
+			<th>Total</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Zabbix servers</td><td class="normal-bg"><span class="link-action">2222222</span></td><td class="normal-bg">0</td><td><ul class="list-hor-min-width"><li><span class="green link-action">1</span></li><li><span class="yellow link-action">5</span></li><li><span class="red link-action">35</span></li></ul><!--<span class="icon-help-position"><button class="icon-help"></button></span>--></td>
+			</tr>
+            <tr>
+                <td>Zabbix servers</td><td class="normal-bg"><span class="link-action">2222222</span></td><td class="normal-bg">0</td><td><ul class="list-hor-min-width"><li><span class="green link-action">16</span></li><li><span class="yellow link-action">5</span></li><li><span class="red link-action">407</span></li></ul><!--<span class="icon-help-position"><button class="icon-help"></button></span>--></td>
+            </tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head cursor-move">
+		<h4>Web monitoring</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<tbody>
+			<tr class="nothing-to-show">
+				<td><!--No web scenarios found--><div class="preloader-container"><div class="preloader"></div></div></td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 09:28:45</li></ul>
+	</div>
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head cursor-move">
+		<h4>Last 20 issues</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<tbody>
+			<tr class="nothing-to-show">
+				<td>No events found</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>10 of 10 issues</li><li>Updated 09:28:45</li></ul>
+	</div>
+	</div>
+	<div class="cell">
+	<div class="dashbrd-widget">
+		<div class="dashbrd-widget-head cursor-move">
+		<h4>System status</h4><ul><li><button type="button" class="btn-widget-action" title="Action"></button></li><li><button type="button" class="btn-widget-collapse" title="Collapse"></button></li><li><button type="button" class="btn-widget-expand" title="Expand"></button></li></ul>
+		</div>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Host group</th>
+			<th>Disaster</th>
+			<th>High</th>
+			<th>Average</th>
+			<th>Warning</th>
+			<th>Info</th>
+			<th>Not classified</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td><a href="#">Zabbix servers</a></td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td><td>0</td>
+			</tr>
+		</tbody>
+		</table>
+		<ul class="dashbrd-widget-foot"><li>Updated 11:17:48</li></ul>
+	</div>
+	</div>
+	</div>
+	</div>
+
+	<ul class="action-menu" style="top: 156px; left: 669px">
+	<li><h3>Favourite screens</h3></li>
+	<li><span class="action-menu-item">Add</span></li>
+	<li><span class="action-menu-item">Remove<span class="arrow-right"></span></span>
+	<ul class="action-menu" style="top: 47px; left: 204px">
+	<li><span class="action-menu-item">Zabbix server</span></li>
+	</ul></li>
+	<li><span class="action-menu-item">Remove all</span></li>
+	<li><div></div></li>
+	<li><h3>Favourite slide shows</h3></li>
+	<li><span class="action-menu-item selected">Add</span></li>
+	<li><span class="action-menu-item-disabled">Remove</span></li>
+	<li><span class="action-menu-item-disabled">Remove all</span></li>
+	</ul>
+
+	<div class="overlay-dialogue" style="top: 520px; left: 700px">
+	<span class="overlay-close-btn"></span>
+		<table class="list-table">
+		<thead>
+		<tr>
+			<th>Host</th>
+			<th>Disaster</th>
+			<th>High</th>
+			<th>Average</th>
+			<th>Warning</th>
+			<th>Information</th>
+			<th>Not classified</th>
+		</tr>
+		</thead>
+		<tbody>
+			<tr><td><a href="#">vSphere 001</a></td><td class="disaster-bg">25</td><td class="high-bg">7</td><td class="average-bg">0</td><td class="warning-bg">2</td><td class="info-bg">0</td><td class="na-bg">0</td></tr>
+			<tr><td><a href="#">vSphere 002</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+			<tr><td><a href="#">vSphere 003</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+			<tr><td><a href="#">vSphere 004</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+			<tr><td><a href="#">vSphere 005</a></td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="normal-bg">0</td><td class="warning-bg">2</td><td class="normal-bg">0</td><td class="normal-bg">0</td></tr>
+		</tbody>
+		</table>
+	</div>
+
+	</div>
+	<div class="footer">
+	<a href="http://www.zabbix.com" target="_blank" class="logo"></a>
+	Zabbix 2.4.1. &copy; 2001&ndash;2015, <a href="http://www.zabbix.com" class="grey link-alt" target="_blank">Zabbix SIA</a>
+	</div>
+
+	<pre class="debug-output"><a name="debug"></a>******************** Script profiler ********************<br>Total time: 0.024499<br>Total SQL time: 0.015921<br>SQL count: 33 (selects: 22 | executes: 11)<br>Peak memory usage: 3.75M<br>Memory limit: 512M<br><br>1. <b>drule.get</b> [CControllerDashboardView.php:53]<br><br><table><tbody><tr><td>Parameters:<br>Array
+(
+    [output] =&gt; Array
+        (
+        )
+
+    [filter] =&gt; Array
+        (
+            [status] =&gt; 0
+        )
+
+    [limit] =&gt; 1
+)
+</td><td>Result:<br>Array
+(
+    [0] =&gt; Array
+        (
+            [druleid] =&gt; 3
+        )
+
+)
+</td></tr></tbody></table><br>2. <b>graph.get</b> [blocks.inc.php:57]<br><br><table><tbody><tr><td>Parameters:<br>Array
+(
+    [output] =&gt; Array
+        (
+            [0] =&gt; graphid
+            [1] =&gt; name
+        )
+
+    [selectHosts] =&gt; Array
+        (
+            [0] =&gt; hostid
+            [1] =&gt; name
+        )
+
+    [expandName] =&gt; 1
+    [graphids] =&gt; Array
+        (
+            [700135] =&gt; 700135
+            [700127] =&gt; 700127
+            [700132] =&gt; 700132
+            [700133] =&gt; 700133
+            [700136] =&gt; 700136
+            [700129] =&gt; 700129
+            [700134] =&gt; 700134
+            [700128] =&gt; 700128
+        )
+
+    [preservekeys] =&gt; 1
+)
+</td><td>Result:<br>Array
+(
+    [700127] =&gt; Array
+        (
+            [graphid] =&gt; 700127
+            [name] =&gt; CPU jumps
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700128] =&gt; Array
+        (
+            [graphid] =&gt; 700128
+            [name] =&gt; Test graph 1
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700129] =&gt; Array
+        (
+            [graphid] =&gt; 700129
+            [name] =&gt; Memory usage
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700132] =&gt; Array
+        (
+            [graphid] =&gt; 700132
+            [name] =&gt; CPU load
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700133] =&gt; Array
+        (
+            [graphid] =&gt; 700133
+            [name] =&gt; CPU utilization
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700134] =&gt; Array
+        (
+            [graphid] =&gt; 700134
+            [name] =&gt; Swap usage
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700135] =&gt; Array
+        (
+            [graphid] =&gt; 700135
+            [name] =&gt; Network traffic on eth0
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700136] =&gt; Array
+        (
+            [graphid] =&gt; 700136
+            [name] =&gt; Disk space usage /
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+)
+</td></tr></tbody></table><br>3. <b>graph.get</b> [CMenuPopupHelper.php:57]<br><br><table><tbody><tr><td>Parameters:<br>Array
+(
+    [output] =&gt; Array
+        (
+            [0] =&gt; graphid
+            [1] =&gt; name
+        )
+
+    [selectHosts] =&gt; Array
+        (
+            [0] =&gt; hostid
+            [1] =&gt; name
+        )
+
+    [expandName] =&gt; 1
+    [graphids] =&gt; Array
+        (
+            [0] =&gt; 700135
+            [1] =&gt; 700127
+            [2] =&gt; 700132
+            [3] =&gt; 700133
+            [4] =&gt; 700136
+            [5] =&gt; 700129
+            [6] =&gt; 700134
+            [7] =&gt; 700128
+        )
+
+    [preservekeys] =&gt; 1
+)
+</td><td>Result:<br>Array
+(
+    [700127] =&gt; Array
+        (
+            [graphid] =&gt; 700127
+            [name] =&gt; CPU jumps
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700128] =&gt; Array
+        (
+            [graphid] =&gt; 700128
+            [name] =&gt; Test graph 1
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700129] =&gt; Array
+        (
+            [graphid] =&gt; 700129
+            [name] =&gt; Memory usage
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700132] =&gt; Array
+        (
+            [graphid] =&gt; 700132
+            [name] =&gt; CPU load
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700133] =&gt; Array
+        (
+            [graphid] =&gt; 700133
+            [name] =&gt; CPU utilization
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700134] =&gt; Array
+        (
+            [graphid] =&gt; 700134
+            [name] =&gt; Swap usage
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700135] =&gt; Array
+        (
+            [graphid] =&gt; 700135
+            [name] =&gt; Network traffic on eth0
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+    [700136] =&gt; Array
+        (
+            [graphid] =&gt; 700136
+            [name] =&gt; Disk space usage /
+            [hosts] =&gt; Array
+                (
+                    [0] =&gt; Array
+                        (
+                            [hostid] =&gt; 50026
+                            [name] =&gt; Zabbix server
+                        )
+
+                )
+
+        )
+
+)
+</td></tr></tbody></table><br><br><b>SQL (0.000244): <span class="red">SET search_path = 'public'</span></b><br>zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:82<br><br>SQL (0.000132): <span class="red">SET bytea_output = escape</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:93</span><br><br>SQL (0.003804): <span class="green">SELECT 1 FROM information_schema.tables WHERE table_catalog='s_hudson_25' AND table_schema='public' AND table_name='dbversion'</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DbBackend-&gt;checkDbVersion() → PostgresqlDbBackend-&gt;checkDbVersionTable() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/db/PostgresqlDbBackend.php:41</span><br><br>SQL (0.000347): <span class="green">SELECT dv.mandatory,dv.optional FROM dbversion dv</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DbBackend-&gt;checkDbVersion() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/db/DbBackend.php:46</span><br><br>SQL (0.000572): <span class="green">SELECT NULL FROM config c</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;initDB() → DBconnect() → DbBackend-&gt;checkConfig() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/db/DbBackend.php:62</span><br><br>SQL (5.5E-5): <span class="red">BEGIN</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBstart() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:251</span><br><br>SQL (0.000597): <span class="green">SELECT u.userid,u.autologout,s.lastaccess FROM sessions s,users u WHERE s.sessionid='529c55c93ce6817446a848855a1e39bf' AND s.status=0 AND s.userid=u.userid AND (s.lastaccess+u.autologout&gt;1436281028 OR u.autologout=0)</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1116</span><br><br>SQL (0.000346): <span class="green">SELECT g.usrgrpid FROM usrgrp g,users_groups ug WHERE ug.userid='1' AND g.usrgrpid=ug.usrgrpid AND g.users_status=1 LIMIT 1 OFFSET 0</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → check_perm2system() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/perm.inc.php:75</span><br><br>SQL (0.000202): <span class="red">UPDATE sessions SET lastaccess=1436281028 WHERE userid='1' AND sessionid='529c55c93ce6817446a848855a1e39bf'</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1141</span><br><br>SQL (0.000223): <span class="green">SELECT MAX(g.gui_access) AS gui_access FROM usrgrp g,users_groups ug WHERE ug.userid='1' AND g.usrgrpid=ug.usrgrpid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1149</span><br><br>SQL (0.000145): <span class="green">SELECT u.userid,u.alias,u.name,u.surname,u.url,u.autologin,u.autologout,u.lang,u.refresh,u.type, u.theme,u.attempt_failed,u.attempt_ip,u.attempt_clock,u.rows_per_page FROM users u WHERE u.userid='1'</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → CUser-&gt;_getUserData() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1173</span><br><br>SQL (0.000141): <span class="green">SELECT ug.userid FROM usrgrp g,users_groups ug WHERE ug.userid='1' AND g.usrgrpid=ug.usrgrpid AND g.debug_mode=1</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CUser-&gt;checkAuthentication() → CUser-&gt;_getUserData() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CUser.php:1181</span><br><br>SQL (0.00329): <span class="blue">COMMIT</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;authenticateUser() → CWebUser::checkAuthentication() → CFrontendApiWrapper-&gt;checkAuthentication() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBend() → DBcommit() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:312</span><br><br>SQL (6.8E-5): <span class="red">BEGIN</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBstart() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:251</span><br><br>SQL (0.00036): <span class="green">SELECT   dr.druleid FROM drules dr WHERE dr.status='0' LIMIT 1 OFFSET 0</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CDRule-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CDRule.php:140</span><br><br>SQL (6.5E-5): <span class="blue">COMMIT</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBend() → DBcommit() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:312</span><br><br>SQL (0.001204): <span class="green">SELECT p.* FROM profiles p WHERE p.userid=1 ORDER BY p.userid,p.profileid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → CProfile::get() → CProfile::init() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/user/CProfile.php:42</span><br><br>SQL (0.000259): <span class="green">SELECT p.value_id,p.source FROM profiles p WHERE p.userid=1 AND p.idx='web.favorite.graphids' ORDER BY p.profileid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFavorite::get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/user/CFavorite.php:56</span><br><br>SQL (5.6E-5): <span class="red">BEGIN</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBstart() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:251</span><br><br>SQL (0.000439): <span class="green">SELECT   g.graphid,g.name FROM graphs g WHERE (g.graphid BETWEEN '700132' AND '700136' OR g.graphid IN ('700127','700128','700129')) AND g.flags IN ('0','4')</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CGraph.php:296</span><br><br>SQL (0.000606): <span class="green">SELECT i.hostid,gi.graphid,h.host FROM graphs_items gi,items i,hosts h WHERE gi.itemid=i.itemid AND i.hostid=h.hostid AND 1=0 ORDER BY gi.sortorder</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CMacrosResolverHelper::resolveGraphNameByIds() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/macros/CMacrosResolverHelper.php:432</span><br><br>SQL (0.000624): <span class="green">SELECT gi.graphid,i.hostid FROM graphs_items gi,items i WHERE (gi.graphid BETWEEN '700132' AND '700136' OR gi.graphid IN ('700127','700128','700129')) AND gi.itemid=i.itemid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CGraph-&gt;addRelatedObjects() → CGraphGeneral-&gt;addRelatedObjects() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CGraphGeneral.php:357</span><br><br>SQL (0.000213): <span class="green">SELECT   h.hostid,h.name FROM hosts h WHERE h.flags IN (0,4) AND h.hostid='50026' AND h.status IN (0,1,3)</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CGraph-&gt;addRelatedObjects() → CGraphGeneral-&gt;addRelatedObjects() → CHost-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CHost.php:434</span><br><br>SQL (9.0E-5): <span class="blue">COMMIT</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteGraphs() → getFavouriteGraphsData() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBend() → DBcommit() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:312</span><br><br>SQL (0.000169): <span class="green">SELECT p.value_id,p.source FROM profiles p WHERE p.userid=1 AND p.idx='web.favorite.sysmapids' ORDER BY p.profileid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteMaps() → getFavouriteMapsData() → CFavorite::get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/user/CFavorite.php:56</span><br><br>SQL (0.000164): <span class="green">SELECT p.value_id,p.source FROM profiles p WHERE p.userid=1 AND p.idx='web.favorite.screenids' ORDER BY p.profileid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CController-&gt;run() → CControllerDashboardView-&gt;doAction() → getFavouriteScreens() → getFavouriteScreensData() → CFavorite::get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/user/CFavorite.php:56</span><br><br>SQL (8.5E-5): <span class="red">BEGIN</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBstart() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:251</span><br><br>SQL (0.000205): <span class="green">SELECT   g.graphid,g.name FROM graphs g WHERE (g.graphid BETWEEN '700132' AND '700136' OR g.graphid IN ('700127','700128','700129')) AND g.flags IN ('0','4')</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CGraph.php:296</span><br><br>SQL (0.000166): <span class="green">SELECT i.hostid,gi.graphid,h.host FROM graphs_items gi,items i,hosts h WHERE gi.itemid=i.itemid AND i.hostid=h.hostid AND 1=0 ORDER BY gi.sortorder</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CMacrosResolverHelper::resolveGraphNameByIds() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/macros/CMacrosResolverHelper.php:432</span><br><br>SQL (0.000409): <span class="green">SELECT gi.graphid,i.hostid FROM graphs_items gi,items i WHERE (gi.graphid BETWEEN '700132' AND '700136' OR gi.graphid IN ('700127','700128','700129')) AND gi.itemid=i.itemid</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CGraph-&gt;addRelatedObjects() → CGraphGeneral-&gt;addRelatedObjects() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CGraphGeneral.php:357</span><br><br>SQL (0.000193): <span class="green">SELECT   h.hostid,h.name FROM hosts h WHERE h.flags IN (0,4) AND h.hostid='50026' AND h.status IN (0,1,3)</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → call_user_func_array() → CGraph-&gt;get() → CGraph-&gt;addRelatedObjects() → CGraphGeneral-&gt;addRelatedObjects() → CHost-&gt;get() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/classes/api/services/CHost.php:434</span><br><br>SQL (8.7E-5): <span class="blue">COMMIT</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → CMenuPopupHelper::getFavouriteGraphs() → CFrontendApiWrapper-&gt;get() → CApiWrapper-&gt;__call() → CFrontendApiWrapper-&gt;callMethod() → CApiWrapper-&gt;callMethod() → CFrontendApiWrapper-&gt;callClientMethod() → CLocalApiClient-&gt;callMethod() → DBend() → DBcommit() → DBexecute() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/db.inc.php:312</span><br><br>SQL (0.000361): <span class="green">SELECT c.* FROM config c</span><br><span style="font-style: italic;">zabbix.php:21 → require_once() → ZBase-&gt;run() → ZBase-&gt;processRequest() → CView-&gt;getOutput() → include() → local_generateHeader() → CView-&gt;getOutput() → include() → select_config() → DBselect() in /home/sasha/zabbix-svn/branches/dev/ZBXNEXT-2662-5/frontends/php/include/profiles.inc.php:33</span><br><br></pre>
+
+	<div class="msg-bad-global">Zabbix server is not running: the information displayed may not be current.</div>
+
+	<div id="" class="overlay-dialogue notif" style="top: 128px; right: 13px">
+	<span class="overlay-close-btn"></span>
+	<div class="dashbrd-widget-head cursor-move">
+	<ul><li><button type="button" class="btn-alarm-on" title="Alarm on"></button></li><li><button type="button" class="btn-alarm-off" title="Alarm off"></button></li><li><button type="button" class="btn-sound-on" title="Sound on"></button></li><li><button type="button" class="btn-sound-off" title="Sound off"></button></li></ul></div>
+	<ul class="notif-body">
+		<li><div class="notif-indic disaster-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic high-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic average-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic warning-bg"></div>
+		<h4>Problem <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix server 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>Resolved <a href="tr_status.php?hostid=10177">Zabbix sdfsdf sdfsdfsdfsdfsdfsdf sdfsdf sdfsdfsdfsdf sserver 11</a></h4>
+		<p><a href="events.php?filter_set=1&amp;triggerid=14154&amp;source=0">More than 100 items having missing data for more than 10 minutes</a></p>
+		<p><a href="tr_events.php?eventid=12026&amp;triggerid=14154">2015-04-22 17:23:06</a></p>
+		</li>
+	</ul>
+	</div>
+
+<div style="top: 128px; left: 1400px" class="overlay-dialogue"><span class="overlay-close-btn"></span>
+	<ul class="notif-body">
+		<li><div class="notif-indic normal-bg"></div>
+		<h4>OK</h4>
+		<p class="grey"></p></li>
+		<li><div class="notif-indic na-bg"></div>
+		<h4>Not classified</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic info-bg"></div>
+		<h4>Information</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic warning-bg"></div>
+		<h4>Warning</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic average-bg"></div>
+		<h4>Average</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic high-bg"></div>
+		<h4>High</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic disaster-bg"></div>
+		<h4>Disaster</h4>
+		<p class="grey">Problem</p>
+		</li>
+		<li><div class="notif-indic-container"><div class="notif-indic normal-bg"></div><div class="notif-indic na-bg"></div><div class="notif-indic info-bg"></div><div class="notif-indic warning-bg"></div><div class="notif-indic average-bg"></div><div class="notif-indic high-bg"></div><div class="notif-indic disaster-bg"></div>
+		<p class="grey">Age less then 30 m</p>
+		</div>
+		</li>
+	</ul>
+</div>
+
+<div class="btn-debug"><a href="">Hide Debug</a></div>
+</body>
+</html>
