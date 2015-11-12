@@ -309,7 +309,6 @@ typedef struct
 }
 ZBX_DC_HOST;
 
-
 typedef struct
 {
 	zbx_uint64_t	hostid;
@@ -1444,7 +1443,7 @@ static void	DCsync_hosts(DB_RESULT result)
 		if ('\0' != *row[29] && '\0' == *row[30])
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "empty PSK for PSK identity \"%s\" configured for host \"%s\""
-					" (hostid %s)", row[28], row[2], row[0]);
+					" (hostid %s)", row[29], row[2], row[0]);
 			THIS_SHOULD_NEVER_HAPPEN;
 			goto done;
 		}
